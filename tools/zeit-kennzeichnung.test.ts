@@ -1,6 +1,7 @@
 /**
  * Eine geschätzte Uhrzeit ist in jeder Ausgabe erkennbar: „≈" in Teilseite und Vorschaubild, „ca." in der Mail
- * (HTML und Text, Wiederholungsliste). Eine gemessene Uhrzeit bleibt unmarkiert. Feste Daten, keine Uhr.
+ * (HTML und Text, Wiederholungsliste). Eine gemessene Uhrzeit bleibt unmarkiert, auch an einem fortgeschriebenen
+ * Termin (Daniel, 21.11.2026: einmal bestätigt gilt sie, bis eine Quelle sie widerlegt). Feste Daten, keine Uhr.
  *
  * Aufruf: `npx tsx tools/zeit-kennzeichnung.test.ts`
  */
@@ -63,18 +64,22 @@ function fall(titel: string, release: Release, vorsatz: string) {
 
 fall('gemessen', plan({}), '')
 fall('timeEstimated', plan({ timeEstimated: true }), 'ca. ')
-fall('estimated-Termin mit Uhrzeit', plan({ estimated: true }), 'ca. ')
+fall('estimated-Termin mit belegter Uhrzeit', plan({ estimated: true }), '')
 
 function zusatzFaelle(): void {
   console.log('A1/A2: eine Marke je Zeile')
   const est = plan({ estimated: true })
   const mail = digestMail([expandEvents(est)[0]!], 'daily', 'https://anime-kalender.de/', 'https://x/u', {})
-  pruefe(mail.html.includes('ca. 17:00') && !mail.html.includes('geschätzt'), 'HTML-Mail: estimated mit Uhrzeit nur „ca."')
+  pruefe(!mail.html.includes('ca. 17:00') && mail.html.includes('geschätzt'), 'HTML-Mail: estimated mit belegter Uhrzeit: „geschätzt“ am Termin, Uhrzeit ohne „ca.“')
+  const beides = digestMail([expandEvents(plan({ estimated: true, timeEstimated: true }))[0]!], 'daily', 'https://anime-kalender.de/', 'https://x/u', {})
+  pruefe(beides.html.includes('ca. 17:00') && !beides.html.includes('geschätzt'), 'HTML-Mail: estimated mit geschätzter Uhrzeit nur „ca."')
   const ohneZeit = plan({ estimated: true, time: undefined })
   const mailOhne = digestMail([expandEvents(ohneZeit)[0]!], 'daily', 'https://anime-kalender.de/', 'https://x/u', {})
   pruefe(mailOhne.html.includes('geschätzt') && !mailOhne.html.includes('ca.'), 'HTML-Mail: estimated ohne Uhrzeit bleibt „geschätzt"')
   const seite = body(est, undefined, undefined, HEUTE, [], 1, 'zeit-test', umfeld)
-  pruefe(seite.includes('≈ 17:00 Uhr') && !seite.includes('Termin abgeleitet'), 'Teilseite: estimated mit Uhrzeit nur „≈"')
+  pruefe(!seite.includes('≈') && seite.includes('17:00 Uhr (Termin abgeleitet)'), 'Teilseite: estimated mit belegter Uhrzeit: „abgeleitet“, Uhrzeit ohne „≈“')
+  const seiteBeides = body(plan({ estimated: true, timeEstimated: true }), undefined, undefined, HEUTE, [], 1, 'zeit-test', umfeld)
+  pruefe(seiteBeides.includes('≈ 17:00 Uhr') && !seiteBeides.includes('Termin abgeleitet'), 'Teilseite: estimated mit geschätzter Uhrzeit nur „≈"')
   const seiteOhne = body(ohneZeit, undefined, undefined, HEUTE, [], 1, 'zeit-test', umfeld)
   pruefe(seiteOhne.includes('(Termin abgeleitet)') && !seiteOhne.includes('≈'), 'Teilseite: estimated ohne Uhrzeit bleibt „abgeleitet"')
   const gemessenOhne = plan({ time: undefined })
@@ -98,27 +103,27 @@ function zusatzFaelle(): void {
   console.log('A3: TV, Pille, ICS')
   const tv = { ...plan({ estimated: true }), platform: 'tv' } as Release
   const pille = tvAngabe(tv, {} as Title, [], HEUTE, '12:00')
-  pruefe(!!pille && pille.text.includes('≈ 17:00') && pille.zeit?.includes('≈ 17:00') === true, `TV-Pille: ${pille?.text}`)
+  pruefe(!!pille && pille.text.includes('17:00') && !pille.text.includes('≈') && pille.zeit?.includes('≈') === false, `TV-Pille: ${pille?.text}`)
   const tvGemessen = tvAngabe({ ...plan({}), platform: 'tv' } as Release, {} as Title, [], HEUTE, '12:00')
   pruefe(!!tvGemessen && tvGemessen.text.includes('17:00') && !tvGemessen.text.includes('≈'), 'TV-Pille gemessen ohne ≈')
   const vergangen = tvZuletzt([{ ...plan({ estimated: true, firstEpisodeDate: '2026-10-01', episodeCount: 1 }), platform: 'tv' } as Release], HEUTE, '12:00')
-  pruefe(vergangen[0]?.text.includes('≈ 17:00') === true, `TV zuletzt: ${vergangen[0]?.text}`)
+  pruefe(vergangen[0]?.text.includes('17:00') === true && !vergangen[0]?.text.includes('≈'), `TV zuletzt: ${vergangen[0]?.text}`)
   const ics = (z: Partial<ReleaseEvent>) => eventDescription({ ...evs[0]!, timeEstimated: false, estimated: false, ...z })
-  pruefe(ics({ estimated: true }).includes('Uhrzeit voraussichtlich, nicht gemessen.'), 'ICS: estimated mit Uhrzeit trägt den Uhrzeit-Hinweis')
+  pruefe(!ics({ estimated: true }).includes('Uhrzeit voraussichtlich') && ics({ estimated: true }).includes('Geschätzter Termin'), 'ICS: estimated mit belegter Uhrzeit: nur der Termin-Hinweis')
   pruefe(ics({ timeEstimated: true }).includes('Netflix veröffentlicht Anime meist um 17:00'), 'ICS: timeEstimated bei Netflix mit Netflix-Satz')
   pruefe(!ics({ estimated: true }).includes('Netflix veröffentlicht'), 'ICS: estimated allein ohne Netflix-Satz')
   pruefe(!ics({}).includes('Uhrzeit voraussichtlich'), 'ICS: gemessen ohne Hinweis')
   pruefe(!ics({ estimated: true, time: undefined }).includes('Uhrzeit voraussichtlich'), 'ICS: estimated ohne Uhrzeit ohne Uhrzeit-Hinweis')
-  pruefe(zeitText({ ...evs[0]!, estimated: true }) === '≈ 17:00' && zeitText({ ...evs[0]!, timeEstimated: false, estimated: false }) === '17:00', 'Kachel zeitText')
+  pruefe(zeitText({ ...evs[0]!, timeEstimated: false, estimated: true }) === '17:00' && zeitText({ ...evs[0]!, timeEstimated: false, estimated: false }) === '17:00', 'Kachel zeitText')
 }
 zusatzFaelle()
 
 console.log('Helfer')
 pruefe(zeitMitMarke({ time: '17:00' }, '≈ ') === '17:00', 'gemessen: unmarkiert')
 pruefe(zeitMitMarke({ time: '17:00', timeEstimated: true }, '≈ ') === '≈ 17:00', 'timeEstimated: ≈')
-pruefe(zeitMitMarke({ time: '17:00', estimated: true }, 'ca. ') === 'ca. 17:00', 'estimated: ca.')
+pruefe(zeitMitMarke({ time: '17:00', estimated: true }, 'ca. ') === '17:00', 'estimated-Termin, belegte Uhrzeit: unmarkiert')
 pruefe(zeitMitMarke({ timeEstimated: true }, '≈ ') === '', 'ohne Uhrzeit leer')
-pruefe(!zeitGeschaetzt({ time: '17:00' }) && zeitGeschaetzt({ estimated: true }), 'zeitGeschaetzt')
+pruefe(!zeitGeschaetzt({ time: '17:00' }) && !zeitGeschaetzt({ time: '17:00', estimated: true }) && zeitGeschaetzt({ time: '17:00', timeEstimated: true }), 'zeitGeschaetzt')
 
 if (fehler > 0) {
   console.error(`zeit-kennzeichnung: ${fehler} Fehler`)

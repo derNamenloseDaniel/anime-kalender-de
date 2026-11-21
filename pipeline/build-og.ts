@@ -115,6 +115,7 @@ async function main(): Promise<void> {
     )
     written++
     if (kopf.fakt.includes('≈')) mitSchaetzung.add(release.slug)
+    else mitSchaetzung.delete(release.slug)
   }
 
   log(`${written} Vorschaubilder erzeugt, ${releases.length} Releases insgesamt`)

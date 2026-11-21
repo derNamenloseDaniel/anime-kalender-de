@@ -54,6 +54,11 @@ Dieses Projekt lebt davon, dass die Termine stimmen. Deshalb gilt ausnahmslos:
 - **Abgeleitetes kennzeichnen.** Datum aus dem Simulcast-Start übernommen statt aus einer
   Dub-Ankündigung? Dann `estimated: true`. Folgenzahl geraten? Setzt die Pipeline selbst als
   `episodeCountAssumed`. Beides erscheint im UI als `≈`.
+  **Eine einmal belegte Uhrzeit gilt auch am fortgeschriebenen Termin, bis eine Quelle sie widerlegt**
+  (Daniel, 21.11.2026: „einmal bestätigte uhrzeiten gelten als erwartete uhrzeiten bis andere quellen es
+  widerlegen“). Sie steht dort ohne „≈“; der abgeleitete Tag bleibt gekennzeichnet („voraussichtlich“,
+  „(Termin abgeleitet)“, Mail „geschätzt“, ICS „Geschätzter Termin“). „≈“ an der Uhrzeit nur bei `timeEstimated`
+  (`zeitGeschaetzt()` in `shared/zeit-text.ts`, Test `tools/zeit-kennzeichnung.test.ts`).
 - **Keine Folgenzahl erfinden, auch nicht als Rückfall.** Ein einzelner Termin im
   Crunchyroll-Kalender ist kein Beleg für eine Wochenserie — dort stehen auch Specials,
   Filmpremieren und die Anime Awards. Ein `Math.max(12, …)` als Standardwert machte daraus neun

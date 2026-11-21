@@ -236,3 +236,11 @@
   quellen:
     - https://www.themoviedb.org/movie/843267?language=de-DE
     - https://www.anisearch.de/article/144246,princess-principal-crown-handler-chapter-12
+
+- id: 20691
+  titleDe: "Attack on Titan: Teil 1 - Feuerroter Pfeil und Bogen"
+  geprueftAm: "2026-11-21"
+  note: "aniSearch führt die deutsche Disc-Ausgabe (2018-06-29) unter diesem Namen; der Crunchyroll-Katalog DE (API, 28.09.2026) führt „Film 1 - Feuerroter Pfeil und Bogen“ in „Attack on Titan Movies“ mit Ton de-DE."
+  quellen:
+    - https://www.anisearch.de/article/46086,attack-on-titan-teil-1-feuerroter-pfeil-und-bogen-blu-ray
+    - https://www.crunchyroll.com/de/series/GVDHX8P8Q/attack-on-titan-movies

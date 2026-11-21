@@ -178,9 +178,9 @@ pruefe('Drei Prüfer-Schritte (Stufe 0, voll, Abnahme)', pruefer.length === 3, p
 // Abnahme-Modus (21.10.2026): jeder Kopf läuft durch genau einen der drei Prüfer; der Modus-Schritt steht vor der Sperre.
 const bedingung = (name) => String(pruefer.find((s) => s.name === name)?.if ?? '')
 // Seit 20.11.2026 (Mod-Schnellweg) entfällt jeder Modellschritt bei `nur-mod == '1'`; tools/pr-pruefer-nur-mod.test.mjs prüft die Freigabe ohne Modell.
-pruefe('Stufe 0 läuft nur außerhalb der Abnahme', bedingung('Prüfer (Stufe 0, schlank)') === "steps.kette.outputs.laeuft != 'ja' && steps.stufe.outputs.stufe == '0' && steps.stufe.outputs.nur-mod != '1' && steps.modus.outputs.modus != 'abnahme'", bedingung('Prüfer (Stufe 0, schlank)'))
-pruefe('Voller Prüfer läuft nur außerhalb der Abnahme', bedingung('Prüfer') === "steps.kette.outputs.laeuft != 'ja' && steps.stufe.outputs.stufe != '0' && steps.stufe.outputs.nur-mod != '1' && steps.modus.outputs.modus != 'abnahme'", bedingung('Prüfer'))
-pruefe('Abnahme-Prüfer läuft nur im Abnahme-Modus', bedingung('Prüfer (Abnahme)') === "steps.kette.outputs.laeuft != 'ja' && steps.stufe.outputs.nur-mod != '1' && steps.modus.outputs.modus == 'abnahme'", bedingung('Prüfer (Abnahme)'))
+pruefe('Stufe 0 läuft nur außerhalb der Abnahme', bedingung('Prüfer (Stufe 0, schlank)') === "steps.stufe.outputs.stufe == '0' && steps.stufe.outputs.nur-mod != '1' && steps.modus.outputs.modus != 'abnahme'", bedingung('Prüfer (Stufe 0, schlank)'))
+pruefe('Voller Prüfer läuft nur außerhalb der Abnahme', bedingung('Prüfer') === "steps.stufe.outputs.stufe != '0' && steps.stufe.outputs.nur-mod != '1' && steps.modus.outputs.modus != 'abnahme'", bedingung('Prüfer'))
+pruefe('Abnahme-Prüfer läuft nur im Abnahme-Modus', bedingung('Prüfer (Abnahme)') === "steps.stufe.outputs.nur-mod != '1' && steps.modus.outputs.modus == 'abnahme'", bedingung('Prüfer (Abnahme)'))
 const indexVon = (id) => schritte.findIndex((s) => s.id === id)
 pruefe('Reihenfolge: Prüfstufe, Prüfmodus, Sperre, dann die Prüfer', indexVon('stufe') < indexVon('modus') && indexVon('modus') < indexVon('eingang') && indexVon('eingang') < schritte.indexOf(pruefer[0]))
 const abnahmePrompt = String(pruefer.find((s) => s.name === 'Prüfer (Abnahme)')?.with?.prompt ?? '')
@@ -207,12 +207,12 @@ pruefe('A1: nur der Job mutationsprobe hat actions: write, genau contents/pull-r
   && JSON.stringify(probe.permissions) === JSON.stringify({ contents: 'read', 'pull-requests': 'read', actions: 'write' }), probe.permissions)
 pruefe('A1: der Schreib-Job hat keinen Claude-Schritt und holt nie einen Zweig (Checkout ohne ref)',
   !probe.steps.some((s) => String(s.uses ?? '').startsWith('anthropics/')) && probe.steps.filter((s) => String(s.uses ?? '').startsWith('actions/checkout')).every((s) => s.with?.ref === undefined && s.with?.repository === undefined))
-pruefe('A1: pruefen wartet auf uebernahme und mutationsprobe und läuft auch, wenn die Probe fehlschlägt (!cancelled())', JSON.stringify(wf.jobs.pruefen.needs) === '["uebernahme","mutationsprobe"]' && String(wf.jobs.pruefen.if).startsWith('!cancelled() &&') && !String(probe.if).includes('cancelled'), [wf.jobs.pruefen.needs, wf.jobs.pruefen.if])
+pruefe('A1: pruefen wartet auf uebernahme und mutationsprobe und läuft auch, wenn die Probe fehlschlägt (!cancelled())', JSON.stringify(wf.jobs.pruefen.needs) === '["ziel","uebernahme","mutationsprobe"]' && String(wf.jobs.pruefen.if).startsWith('!cancelled() &&') && !String(probe.if).includes('cancelled'), [wf.jobs.pruefen.needs, wf.jobs.pruefen.if])
 pruefe('A1: beide Jobs gelten für dieselben PR (gleiche Bedingung bis auf !cancelled())', String(wf.jobs.pruefen.if).replace('!cancelled() &&', '').trim() === String(probe.if).trim())
 // Übernahme (21.11.2026): `uebernommen=1` überspringt Probe und Review; der Job gilt für dieselben PR wie beide, ohne actions-Recht und ohne Claude.
 const ueb = wf.jobs.uebernahme
-const ohneUeb = (t) => String(t).replace("needs.uebernahme.outputs.uebernommen != '1' &&", '').trim()
-pruefe('Übernahme: Probe und Review hängen an uebernommen != 1', probe.needs === 'uebernahme' && String(probe.if).startsWith("needs.uebernahme.outputs.uebernommen != '1' &&") && String(wf.jobs.pruefen.if).includes("needs.uebernahme.outputs.uebernommen != '1' &&"), [probe.needs, probe.if])
+const ohneUeb = (t) => String(t).replace(" && needs.uebernahme.outputs.uebernommen != '1'", '').trim()
+pruefe('Übernahme: Probe und Review hängen an uebernommen != 1', JSON.stringify(probe.needs) === '["ziel","uebernahme"]' && String(probe.if).endsWith("&& needs.uebernahme.outputs.uebernommen != '1'") && String(wf.jobs.pruefen.if).endsWith("&& needs.uebernahme.outputs.uebernommen != '1'"), [probe.needs, probe.if])
 pruefe('Übernahme: gleiche PR-Bedingung wie die Probe', String(ueb.if).trim() === ohneUeb(probe.if), ueb.if)
 pruefe('Übernahme: nur contents read und pull-requests write, kein Claude-Schritt, Checkout ohne ref',
   JSON.stringify(ueb.permissions) === JSON.stringify({ contents: 'read', 'pull-requests': 'write' })
@@ -221,7 +221,7 @@ pruefe('Übernahme: nur contents read und pull-requests write, kein Claude-Schri
 const uebSchritt = ueb.steps.find((s) => s.id === 'uebernahme')
 pruefe('Übernahme: Job-Ausgabe kommt aus dem Schritt, der das Werkzeug fährt',
   ueb.outputs?.uebernommen === '${{ steps.uebernahme.outputs.uebernommen }}' && uebSchritt?.run === 'node tools/pr-pruefer-uebernahme.mjs'
-  && uebSchritt.env?.HEAD_SHA === '${{ github.event.pull_request.head.sha }}' && uebSchritt.env?.PR === '${{ github.event.pull_request.number }}', [ueb.outputs, uebSchritt])
+  && uebSchritt.env?.HEAD_SHA === '${{ needs.ziel.outputs.sha }}' && uebSchritt.env?.PR === '${{ needs.ziel.outputs.pr }}', [ueb.outputs, uebSchritt])
 // A4: Kettenbudget. `pruefen` beginnt erst nach dem Probe-Job, sein eigenes Budget (60 min, Rechnung samt Zeitkonto für „rate limit“ in pr-pruefer-eingabe.test.mjs) bleibt; der Probe-Job braucht Frist 8 min + Checkout/Stufe/Upload (~2 min) unter seinem Timeout.
 pruefe('A4: Probe-Job-Timeout deckt die 8-min-Frist plus 2 min Vor- und Nachlauf, ohne ein Stunden-Job zu werden', probe['timeout-minutes'] >= 8 + 2 && probe['timeout-minutes'] <= 15 && wf.jobs.pruefen['timeout-minutes'] === 60, [probe['timeout-minutes'], wf.jobs.pruefen['timeout-minutes']])
 const pNamen = probe.steps.map((s) => s.name ?? s.uses)

@@ -73,7 +73,7 @@ gleich('Umgebungsvariable als Text im Prompt: keine Abweichung (die Action setzt
 gleich('Prompt mit Secret: Abweichung', geaendert(prueferIndex, anhaengen('K: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}\n')).length > 0, true)
 gleich('Prompt mit toJSON(secrets): Abweichung', geaendert(prueferIndex, anhaengen('K: ${{ toJSON(secrets) }}\n')).length > 0, true)
 gleich('Prompt Stufe 0 mit PR-Text: Abweichung', geaendert(stufe0Index, anhaengen('${{github.event.pull_request.body}}\n')).length > 0, true)
-gleich('Ausdruck im Prompt ersetzt (head.sha → base.sha): Abweichung', geaendert(prueferIndex, (s) => (s.with.prompt = s.with.prompt.replaceAll('pull_request.head.sha', 'pull_request.base.sha'))).length > 0, true)
+gleich('Ausdruck im Prompt ersetzt (Kopf → Basis): Abweichung', geaendert(prueferIndex, (s) => (s.with.prompt = s.with.prompt.replaceAll('needs.ziel.outputs.sha', 'needs.ziel.outputs.basis'))).length > 0, true)
 gleich('Ausdruck im Prompt entfernt: Abweichung', geaendert(prueferIndex, (s) => (s.with.prompt = s.with.prompt.replaceAll('${{ github.workspace }}', '/repo'))).length > 0, true)
 gleich('Secret über Schritt-env: Abweichung', geaendert(prueferIndex, (s) => (s.env = { K: '${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}' })), [`jobs.pruefen.steps[${prueferIndex}].env`])
 gleich('Abweichungspfad des Secrets zeigt auf die Ausdrucksliste', geaendert(prueferIndex, anhaengen('${{ secrets.X }}\n')).every((p) => p.startsWith(P(prueferIndex))), true)

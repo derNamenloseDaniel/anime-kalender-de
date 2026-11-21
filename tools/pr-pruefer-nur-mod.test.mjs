@@ -23,9 +23,9 @@ assert.equal(modell.length, 3, 'drei Modellschritte')
 for (const s of modell) assert.ok(String(s.if).includes("steps.stufe.outputs.nur-mod != '1'"), `${s.name}: entfällt bei nur-mod`)
 
 const ohneModell = schritt('Freigabe ohne Modell (nur Mod)')
-assert.equal(ohneModell.if, "steps.kette.outputs.laeuft != 'ja' && steps.stufe.outputs.nur-mod == '1'", 'läuft nur bei nur-mod und beendeter Kette')
+assert.equal(ohneModell.if, "steps.stufe.outputs.nur-mod == '1'", 'läuft nur bei nur-mod (der Prüfer startet erst nach dem Kettenende)')
 const idx = (s) => schritte.indexOf(s)
-assert.ok(idx(schritt('Kette läuft noch')) < idx(ohneModell), 'nach „Kette läuft noch“ (sonst überschriebe der Platzhalter das Urteil)')
+assert.ok(idx(schritt('Kettenlog bereitlegen')) < idx(ohneModell), 'nach dem Kettenlog')
 assert.ok(idx(ohneModell) < Math.min(...modell.map(idx)), 'vor den Modellschritten')
 assert.ok(idx(ohneModell) < idx(schritt('Check-Stand des Kopfes')) && idx(schritt('Check-Stand des Kopfes')) < idx(schritt('Protokoll und Freigabe')), 'Check-Stand und Freigabe folgen')
 

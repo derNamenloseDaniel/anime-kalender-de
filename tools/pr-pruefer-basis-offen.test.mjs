@@ -87,24 +87,24 @@ gleich('Ablauf: kein Hinweis im PR-Text -> Exit 1', (await kettenlogMit({ basisS
 // Neustart nach grüner Kette (nach-kette): Tabelle der Entscheidung ...
 const BOT = 'github-actions[bot]'
 const OFFEN = { user: { login: BOT }, body: `**Prüfer-Review** für ${SHA.slice(0, 9)} - Urteil: **nicht beurteilt, Kette lief noch**\n\n${MARKE_KETTE_OFFEN}\n` }
-const pr = { number: 7, state: 'open', draft: false, head: { sha: SHA }, body: TEXT }
-const los = (e) => entscheide({ kommentare: [OFFEN], kopf: SHA, pr, lauf: { id: 5, status: 'completed' }, ...e }).los
-gleich('nach-kette: Basis offen, Kette rot -> kein Neustart', los({ basisOffen: true, kette: ROT }), false)
-gleich('nach-kette: Basis offen, Kette grün -> Neustart', los({ basisOffen: true, kette: GRUEN }), true)
-gleich('nach-kette: Basis offen, Kettenlauf unbekannt -> kein Neustart', los({ basisOffen: true, kette: null }), false)
-gleich('nach-kette: Basis nicht offen, Kette rot -> Neustart wie bisher', los({ basisOffen: false, kette: ROT }), true)
+const REPO = { full_name: 'o/r' }
+const pr = { number: 7, state: 'open', draft: false, head: { sha: SHA, ref: 'claude/stapel', repo: REPO }, base: { ref: 'main', sha: 'a'.repeat(40), repo: REPO }, body: TEXT }
+const los = (e) => entscheide({ kommentare: [OFFEN], kopf: SHA, pr, ...e }).los
+gleich('nach-kette: Basis offen, Kette rot -> kein Start', los({ basisOffen: true, kette: ROT.conclusion }), false)
+gleich('nach-kette: Basis offen, Kette grün -> Start', los({ basisOffen: true, kette: GRUEN.conclusion }), true)
+gleich('nach-kette: Basis offen, Kettenergebnis unbekannt -> kein Start', los({ basisOffen: true, kette: null }), false)
+gleich('nach-kette: Basis nicht offen, Kette rot -> Start wie bisher', los({ basisOffen: false, kette: ROT.conclusion }), true)
 
-// ... und über main mit eingespeistem gh (Verdrahtung: Basisstand und Kettenlauf werden wirklich abgefragt).
+// ... und über main mit eingespeistem gh (Verdrahtung: Basisstand wird abgefragt, das Kettenergebnis kommt aus workflow_run über env).
+const DISPATCH = `api -X POST repos/o/r/actions/workflows/pr-pruefer.yml/dispatches -f ref=main -f inputs[pr]=7 -f inputs[sha]=${SHA}`
 function lauf({ basisStand, kette, body = TEXT }) {
   const gh = (args) => {
     const a = args.join(' ')
     if (a === `api repos/o/r/commits/${SHA}/pulls`) return JSON.stringify([{ ...pr, body }])
-    if (a.includes('/workflows/pr-pruefer.yml/runs')) return JSON.stringify([{ id: 5, status: 'completed' }])
     if (a.includes('/pulls/3435')) {
       if (basisStand === 'FEHLER') throw new Error('boom')
       return `${basisStand}\n`
     }
-    if (a.includes('/workflows/pr-pruefung.yml/runs')) return `${kette.id}\t${kette.status}\t${kette.conclusion}\n`
     if (args.includes('--slurp')) return JSON.stringify([[OFFEN]])
     gh.aenderungen.push(a)
     return ''
@@ -112,15 +112,15 @@ function lauf({ basisStand, kette, body = TEXT }) {
   gh.aenderungen = []
   const mute = console.log
   console.log = () => {}
-  const code = nkMain({ GITHUB_REPOSITORY: 'o/r', KOPF_SHA: SHA }, { gh, warte: () => {} })
+  const code = nkMain({ GITHUB_REPOSITORY: 'o/r', KOPF_SHA: SHA, KETTE_ERGEBNIS: kette.conclusion }, { gh, warte: () => {} })
   console.log = mute
-  return { code, rerun: gh.aenderungen.filter((a) => a.startsWith('run rerun')) }
+  return { code, start: gh.aenderungen }
 }
-gleich('main: Basis offen, Kette rot -> kein rerun, Exit 0', (() => { const r = lauf({ basisStand: 'open', kette: ROT }); return [r.code, r.rerun] })(), [0, []])
-gleich('main: Basis offen, Kette grün -> rerun', lauf({ basisStand: 'open', kette: GRUEN }).rerun, ['run rerun 5'])
-gleich('main: Basis gemergt, Kette rot -> rerun (altes Verhalten)', lauf({ basisStand: 'closed', kette: ROT }).rerun, ['run rerun 5'])
-gleich('main: Abruffehler beim Basisstand, Kette rot -> rerun (altes Verhalten)', lauf({ basisStand: 'FEHLER', kette: ROT }).rerun, ['run rerun 5'])
-gleich('main: kein Hinweis im PR-Text, Kette rot -> rerun (altes Verhalten)', lauf({ basisStand: 'open', kette: ROT, body: 'fix' }).rerun, ['run rerun 5'])
+gleich('main: Basis offen, Kette rot -> kein Start, Exit 0', (() => { const r = lauf({ basisStand: 'open', kette: ROT }); return [r.code, r.start] })(), [0, []])
+gleich('main: Basis offen, Kette grün -> Start', lauf({ basisStand: 'open', kette: GRUEN }).start, [DISPATCH])
+gleich('main: Basis gemergt, Kette rot -> Start (altes Verhalten)', lauf({ basisStand: 'closed', kette: ROT }).start, [DISPATCH])
+gleich('main: Abruffehler beim Basisstand, Kette rot -> Start (altes Verhalten)', lauf({ basisStand: 'FEHLER', kette: ROT }).start, [DISPATCH])
+gleich('main: kein Hinweis im PR-Text, Kette rot -> Start (altes Verhalten)', lauf({ basisStand: 'open', kette: ROT, body: 'fix' }).start, [DISPATCH])
 
 console.log(`Prüfer Basis offen: ${fehler.length === 0 ? 'alle Fälle grün' : fehler.length + ' Fälle rot'}`)
 process.exit(fehler.length === 0 ? 0 : 1)

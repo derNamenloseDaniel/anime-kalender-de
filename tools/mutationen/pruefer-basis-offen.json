@@ -25,16 +25,6 @@
     "tests": ["node tools/pr-pruefer-basis-offen.test.mjs", "node tools/pr-pruefer-freigabe.test.mjs"]
   },
   {
-    "name": "Schritt „Kette läuft noch“: ohne --nur-lauf (Basis offen würde den Modelllauf auslassen)",
-    "aenderungen": [{ "datei": ".github/workflows/pr-pruefer.yml", "suche": "pr-pruefer-kette-offen.mjs --nur-lauf", "ersetze": "pr-pruefer-kette-offen.mjs" }],
-    "tests": ["node tools/pr-pruefer-kette-offen.test.mjs"]
-  },
-  {
-    "name": "Schritt „Kette läuft noch“: Marke der Wache fehlt im Protokoll",
-    "aenderungen": [{ "datei": ".github/workflows/pr-pruefer.yml", "suche": "\"<!-- pruefer-ohne-modell -->\" > ", "ersetze": "\"\" > " }],
-    "tests": ["node tools/pr-pruefer-kette-offen.test.mjs"]
-  },
-  {
     "name": "nach-kette: Läufe ohne Modell zählen gegen die Neustart-Grenze",
     "aenderungen": [{ "datei": "tools/pr-pruefer-nach-kette.mjs", "suche": " && !String(k.body).includes(MARKE_OHNE_MODELL)", "ersetze": "" }],
     "tests": ["node tools/pr-pruefer-nach-kette.test.mjs"]
@@ -61,12 +51,12 @@
   },
   {
     "name": "nach-kette: rote Kette bei offener Basis startet neu",
-    "aenderungen": [{ "datei": "tools/pr-pruefer-nach-kette.mjs", "suche": "if (basisOffen && kette?.conclusion !== 'success')", "ersetze": "if (false)" }],
+    "aenderungen": [{ "datei": "tools/pr-pruefer-nach-kette.mjs", "suche": "if (basisOffen && kette !== 'success')", "ersetze": "if (false)" }],
     "tests": ["node tools/pr-pruefer-basis-offen.test.mjs"]
   },
   {
-    "name": "nach-kette: Kettenlauf wird nicht abgefragt",
-    "aenderungen": [{ "datei": "tools/pr-pruefer-nach-kette.mjs", "suche": "basisOffen ? holeLauf(repo, kopf, gh) : null", "ersetze": "null" }],
+    "name": "nach-kette: Kettenergebnis aus workflow_run nicht durchgereicht",
+    "aenderungen": [{ "datei": "tools/pr-pruefer-nach-kette.mjs", "suche": "kette: env.KETTE_ERGEBNIS ?? null", "ersetze": "kette: null" }],
     "tests": ["node tools/pr-pruefer-basis-offen.test.mjs"]
   },
   {

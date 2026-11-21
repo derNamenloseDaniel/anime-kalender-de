@@ -61,17 +61,16 @@ esac
 `
 
 /** Die env des Schritts aus der YAML; nur die beiden bekannten Ausdrücke werden eingesetzt. */
-function werteEnv(zustand, checks, modus = '', frei = '', kette = '') {
+function werteEnv(zustand, checks, modus = '', frei = '') {
   const ausdruecke = {
     'steps.modus.outputs.modus': modus,
     'steps.modus.outputs.aendern-frei': frei,
     'steps.eingang.outputs.zustand': zustand,
     'steps.checks.outputs.stand': checks,
-    'steps.kette.outputs.laeuft': kette,
     'secrets.GITHUB_TOKEN': TOKEN,
-    'github.event.pull_request.number': '7',
-    'github.event.pull_request.head.sha': KOPF,
-    'github.event.pull_request.base.sha': ANDERER,
+    'needs.ziel.outputs.pr': '7',
+    'needs.ziel.outputs.sha': KOPF,
+    'needs.ziel.outputs.basis': ANDERER,
   }
   const setze = (_, a) => {
     if (!(a in ausdruecke)) throw new Error(`Ausdruck nicht nachgebildet: ${a}`)
@@ -112,7 +111,7 @@ function laufe(f) {
     Object.assign(env, {
       GITHUB_REPOSITORY: 'o/r',
       RUNNER_TEMP: temp,
-      ...werteEnv(f.zustand, f.checks ?? 'gruen', f.modus, f.frei, f.kette),
+      ...werteEnv(f.zustand, f.checks ?? 'gruen', f.modus, f.frei),
       ATTRAPPE_LOG: log,
       ATTRAPPE_KOMMENTAR: kommentar,
       ATTRAPPE_AKTUELL: f.aktuell ?? KOPF,
@@ -268,12 +267,6 @@ const KETTE_GRUEN = kettenlog({ id: 9, status: 'completed', conclusion: 'success
 const AUSSTEHEND = '**Prüfer-Review** für ccccccccc - Urteil: **nicht beurteilt, Kette lief noch**'
 const offenFall = (extra) => laufe({ ...basis, urteil: urteil('aendern'), kettenlog: KETTE_LAEUFT, ...extra })
 const kOffen = offenFall({})
-// Platzhalter-Urteil des Schritts „Kette läuft noch“ (13.11.2026, Prüfer startet bei laufender Kette ohne Modell): auch bei
-// leerem oder unvollständigem Diff-Zustand „nicht beurteilt“ mit Marke, nie ein Änderungswunsch auf Platzhalter-Grundlage.
-for (const zustand of ['ok', 'unvollstaendig', '']) {
-  const platzhalter = offenFall({ kette: 'ja', zustand, protokoll: 'Die PR-Prüfkette lief beim Start des Prüfers noch; er hat nichts geprüft.\n' })
-  pruefe(`Kette läuft beim Start (Diff „${zustand}“): still, kein Kommentar, kein Review`, still(platzhalter), platzhalter)
-}
 pruefe('Kette offen, Urteil aendern: still, kein Kommentar, kein Review', still(kOffen), kOffen)
 const kRot = laufe({ ...basis, urteil: urteil('aendern'), kettenlog: KETTE_ROT })
 pruefe('Gegenfall: Kette fertig und rot, Urteil aendern: Änderungswunsch wie bisher, keine Marke', JSON.stringify(kRot.aufrufe) === JSON.stringify(ABLEHNUNG.aufrufe) && ersteZeile(kRot).endsWith('Urteil: **aendern**') && !kRot.kommentar.includes('pruefer-kette-offen'), kRot)

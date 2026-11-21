@@ -135,6 +135,7 @@ export const OHNE_WECKPLAN = {
   'crunchyroll-nachholen.yml': 'Nachhol-Lauf von Hand, auf Ansage (Kopfkommentar)',
   'fund-nachliefern.yml': 'spielt den Fund eines gescheiterten Sammel-Laufs auf Ansage nach, Lauf-Nummer als Eingabe',
   'mutationsprobe.yml': 'Mutationsreihe per Knopf (gh workflow run), Zweig und Liste als Eingabe',
+  'pr-pruefer.yml': 'CI-Prüfer, gestartet per Dispatch am Ende der PR-Prüfkette und bei Nachträgen (pr-pruefer-nachtrag.yml, tools/pr-pruefer-start.mjs)',
   'region-test.yml': 'einmaliger Versuch von Hand (Kopfkommentar)',
   'weiche-test.yml': 'einmalige Messung von Hand (Kopfkommentar)',
 }

@@ -343,15 +343,15 @@
   {
     "name": "pr-pruefer.yml: Review läuft trotz Übernahme",
     "datei": ".github/workflows/pr-pruefer.yml",
-    "suche": "      !cancelled() &&\n      needs.uebernahme.outputs.uebernommen != '1' &&\n",
-    "ersetze": "      !cancelled() &&\n",
+    "suche": "      needs.ziel.outputs.los == '1' &&\n      needs.uebernahme.outputs.uebernommen != '1'\n",
+    "ersetze": "      needs.ziel.outputs.los == '1'\n",
     "tests": ["node tools/pr-pruefer-ablauf.test.mjs"]
   },
   {
     "name": "pr-pruefer.yml: Mutationsprobe läuft trotz Übernahme",
     "datei": ".github/workflows/pr-pruefer.yml",
-    "suche": "    needs: uebernahme\n    if: >-\n      needs.uebernahme.outputs.uebernommen != '1' &&\n",
-    "ersetze": "    needs: uebernahme\n    if: >-\n",
+    "suche": "    if: needs.ziel.outputs.los == '1' && needs.uebernahme.outputs.uebernommen != '1'\n",
+    "ersetze": "    if: needs.ziel.outputs.los == '1'\n",
     "tests": ["node tools/pr-pruefer-ablauf.test.mjs"]
   },
   {

@@ -137,7 +137,7 @@ const wurzel = mkdtempSync(join(tmpdir(), 'diff-mutanten-'))
 try {
   const git = (...a) => execFileSync('git', a, { cwd: wurzel, stdio: 'pipe', encoding: 'utf8', timeout: 120_000 })
   mkdirSync(join(wurzel, 'tools'))
-  for (const d of ['diff-mutanten.mjs', 'mutationslaeufer.mjs']) copyFileSync(join(fileURLToPath(new URL('.', import.meta.url)), d), join(wurzel, 'tools', d))
+  for (const d of ['diff-mutanten.mjs', 'diff-mutanten-klassen.mjs', 'mutationslaeufer.mjs']) copyFileSync(join(fileURLToPath(new URL('.', import.meta.url)), d), join(wurzel, 'tools', d))
   symlinkSync(join(fileURLToPath(new URL('..', import.meta.url)), 'node_modules'), join(wurzel, 'node_modules'))
   writeFileSync(join(wurzel, 'tools/lib.mjs'), 'export const f = (a, b) => a\n')
   writeFileSync(join(wurzel, 'tools/lib.test.mjs'), "import { f } from './lib.mjs'\nif (f(1, 2) !== 1) process.exit(1)\n")

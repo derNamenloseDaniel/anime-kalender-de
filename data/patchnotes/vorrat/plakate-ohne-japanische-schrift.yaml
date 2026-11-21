@@ -1,0 +1,5 @@
+kategorie: bugfix
+text: Plakate und Banner seltener mit japanischer Schrift
+untertitel: Deutsche, englische oder textlose Fassung geht jetzt vor
+wartetAuf: "Lauf data:tmdb-poster nach PR 4510, der Plakate neu wählt. Probe: In data/tmdb-poster.json sinkt die Zahl der Titel-Cover mit l: ja unter 335 (Stand f6ab4407, PR 4510), und public/data/titles.json trägt geänderte coverImage. Am 21.11. 23:10 UTC: 0 Cover und 0 Banner geändert. Sinkt die Zahl nach dem Lauf nicht, hat der Eintrag keine Wirkung und wird gelöscht."
+seit: '2026-11-21'

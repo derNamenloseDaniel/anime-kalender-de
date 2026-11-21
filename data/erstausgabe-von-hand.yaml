@@ -578,3 +578,15 @@
   sources:
     - https://www.anime2you.de/news/373156/ghost-in-the-shell-arise-erscheint-als-komplettbox/
     - https://www.anime2you.de/news/395321/ghost-in-the-shell-arise-erneut-auf-prosieben-maxx/
+
+# The Ramparts of Ice: Staffel 2 (Netflix, Simulcast): Anime2You nennt für jeden Monat den Donnerstag-Simulcast mit „Sprache: Deutsch, Japanisch (UT)“
+# (Abruf 21.11.2026: Oktober 1052708 „1. Oktober“, November 1062641, Dezember 1073600 „Donnerstag“); 1056287: Folge 1 am 01.10.2026 mit deutschem Ton.
+# aniSearch führt „Deutsch“ mit „dubbed“, Netflix, Start 01.10.2026 (Abruf 10.10.2026). Hebt `low` auf `normal`; ein Tonspur-Handbeleg je Folge steht aus.
+- anilistId: 213805
+  title: 'The Ramparts of Ice: Staffel 2'
+  von: '2026-10-01'
+  publisher: 'Netflix'
+  sources:
+    - https://www.anime2you.de/news/1056287/netflix-yamada-kun-synchro-und-mehr/
+    - https://www.anime2you.de/news/1062641/netflix-anime-neu-im-november-2026/
+    - https://www.anime2you.de/news/1073600/netflix-anime-neu-im-dezember-2026/

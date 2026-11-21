@@ -50,6 +50,8 @@ pruefe('Grenze: Staffel 2 bis 88 ist angebrochen', angabe(horizonte, { platform:
 pruefe('Offene Staffel ist nie voll', angabe([[1, 1, 2], [2, 3]], { platform: 'rtlplus', dubRanges: [{ from: 1, to: 5, dub: true }] }, []) === 'detail.teilStaffelEine:{"nr":1} · detail.staffelFolgen:{"s":2,"bereiche":"1–3"}')
 pruefe('Folge hinter der letzten Staffel: durchgehende Zählung', angabe([[1, 1, 10]], { platform: 'rtlplus', dubRanges: [{ from: 1, to: 12, dub: true }] }, []) === undefined)
 pruefe('Folge vor der ersten Staffel: durchgehende Zählung', staffelTeile([[2, 3, 5]], [[1, 5]]) === undefined)
+pruefe('staffelTeile ohne Grenzen: nichts', staffelTeile(undefined, [[1, 5]]) === undefined && staffelTeile([], [[1, 5]]) === undefined)
+pruefe('Bereich über die Grenze 45/46: „Staffel 1 Fg. 45 · Staffel 2 Fg. 1“', JSON.stringify(staffelTeile(horizonte, [[45, 46]])) === '[{"staffel":1,"folgen":[[45,45]]},{"staffel":2,"folgen":[[1,1]]}]', staffelTeile(horizonte, [[45, 46]]))
 pruefe('Ohne Staffelgrenzen: nichts', angabe(undefined, rtl, [s4]) === undefined && angabe([], rtl, [s4]) === undefined)
 pruefe('Ohne deutsche Folgen: nichts', angabe(horizonte, { platform: 'rtlplus', dubRanges: [] }, []) === undefined)
 pruefe('Joyn (rollendes Fenster): nichts', angabe(horizonte, { ...rtl, platform: 'joyn' }, [s4]) === undefined)

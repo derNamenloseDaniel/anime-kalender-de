@@ -21,7 +21,7 @@ export type StaffelTeil = { staffeln: [number, number] } | { staffel: number; fo
  * Ende nicht belegt ist. Liegt eine Folge außerhalb aller Staffeln, nichts: dann zählt die Zeile weiter durchgehend.
  */
 export function staffelTeile(s: StaffelZeile[] | undefined, de: [number, number][]): StaffelTeil[] | undefined {
-  if (!s?.length || !de.length) return undefined
+  if (!s?.length) return undefined
   const teile: StaffelTeil[] = []
   let zugeordnet = 0
   for (const [nr, von, bis] of s) {

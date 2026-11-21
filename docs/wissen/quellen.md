@@ -4466,3 +4466,31 @@ Messung an `public/data` (Stand 18.11.2026) gegen `data/justwatch-audio.json`, `
 ## Crunchyroll anonym: leere Staffelliste ist kein Nein (21.11.2026)
 
 Der anonyme Zugang (`/content/v2/cms/series/<id>/seasons`) antwortet bei Sammelreihen mit HTTP 200 und einer leeren Staffelliste, ohne Fehlerfeld — gemessen an Detektiv Conan `GVDHX8DWX` beim Streaming-Durchgang C1/C2 (29 Titel ab 2020). Eine stille Null ist deshalb kein Befund „keine deutsche Fassung“: Das Nein stützt sich in diesem Fall nur auf Katalog und Suche, und das wird im Bericht so genannt. Wer eine Staffelliste auswertet, behandelt `total: 0` bei einer Reihe mit bekannten Folgen als „nicht gelesen“, nicht als „nicht vorhanden“.
+
+## Quellenprüfung für die Mängel-Lösungskarte (21.11.2026)
+
+Auftrag `maengel-wege-2111`; Ergebnis je Mängelart in `maengel.md`, „Lösungskarte: Wege zu vollen Daten“. Nur Stichproben, kein Massenabruf, kein aniSearch-Seitenabruf, keine Netflix-Serienseite.
+
+**Geprüft und brauchbar**
+
+- **AniList GraphQL (`graphql.anilist.co`)**, 3 Abfragen à ≤ 50 Kennungen, 2 s Pause: Von 50 offenen Laufzeit-Titeln haben 50 `duration` (Gegenprobe an 50 Titeln mit aniSearch-Laufzeit: 44 auf ±2 min gleich). Von 50 offenen Wertungs-Titeln haben 22 heute `averageScore` und 48 `meanScore`; von 40 offenen Studio-Titeln haben 9 heute ein Studio, von 12 offenen Genre-Titeln keiner ein Genre. Bedingungen wie bisher (nichtkommerziell, `quellen.md` „Sprecher-Suche“).
+- **de.wikipedia API (`/w/api.php`, `action=query&list=search`, `action=parse&prop=wikitext`)**: robots.txt sperrt nur namentliche Bots und Spezialpfade, nicht die API. Lizenz CC BY-SA 4.0 (Quellennennung). Stichprobe: Sprechertabelle bei 4 von 8 Synchro-Titeln, Episodenliste bei 2–3 von 5. **Rate Limit aus der Cloud-Sitzung**: nach rund 10 Abrufen im Abstand von 1,5 s „You are making too many requests to the API.“ (geteilte Ausgangsadresse); mit 6 s Abstand liefen 16 Abrufe ohne Sperre. Ein Lauf braucht einen eigenen User-Agent mit Kontakt und ≥ 5 s Abstand. Die Suche trifft oft das Franchise statt der Staffel (Aoashi 2 → „Kaguya-sama“, Space Dandy Picture Drama → „Marlon Brando“): Zuordnung Seite → Titel nur von Hand.
+
+**Geprüft, schon im Repo, für die offenen Titel ausgeschöpft**
+
+- JustWatch `altersangabe`: 1.023 der 1.222 Titel ohne FSK haben `ohneTreffer`; die 13 mit Wert hängen an geteilten TMDB-Kennungen.
+- TMDB `fsk`, `nameDe`, `overviewDe`, `tmdb-banner.json`: Treffer nur bei geteilten Kennungen (Mehrteiler-Filme), dort zu Recht verworfen.
+- aniSearch-Sprecher: 36 Treffer, alle Bündel-Einträge mehrerer Titel.
+- Kitsu-Folgentitel: englisch, seit 24.10.2026 (F57) nicht übernommen.
+- Crunchyroll-Katalog (`cr-katalog-de.json`): Beschreibung über die Weg-Adresse bei 2 von 3 offenen Titeln mit CR-Weg; Namensabgleich 0.
+- ADN-Katalog `age`: keine FSK-Stufe (10 Hinweise).
+
+**Nicht messbar aus der Cloud-Sitzung** (Hosts nicht freigegeben, DNS-Fehler über den Proxy): `www.ofdb.de`, `api.jikan.moe`/`docs.api.jikan.moe`, `www.schnittberichte.com`, `bluray-disc.de`, `www.synchronkartei.de`. robots.txt und AGB dieser Quellen sind damit **ungeprüft**; der Prüfauftrag (OFDb und bluray-disc.de als Disc-FSK-Quelle, Jikan/MAL für Wertung und Studio) braucht eine Sitzung mit freiem Netz oder die Hosts in der Netzwerkfreigabe der Umgebung.
+
+**Verworfen (unverändert, mit Grund)**
+
+- FSK-Datenbank (`fsk.de/fskapi`): Impressum verlangt schriftliche Zustimmung; Abruf am 08.10.2026 eingestellt. Einziger Weg zum FSK-Rest ist eine Anfrage.
+- Deutsche Synchronkartei: untersagt automatisiertes Auslesen (11.08.2026).
+- synchrondatenbank.de: frei nur für Einträge über 30 Jahre.
+- fernsehserien.de / wunschliste.de: nur mit schriftlicher Genehmigung, Anfrage seit 12.11.2026 offen.
+- werstreamt.es: robots.txt verbietet automatisiertes Auslesen.

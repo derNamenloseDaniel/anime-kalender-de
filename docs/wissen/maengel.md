@@ -324,3 +324,130 @@ Grenzen der Messung: Die Staffelliste ist ein Stand (`gemeldetAm`); ein Titel oh
   - **198369 `erstausgabe-ohne-weg`:** Belegt ist der Kinostart 25.08.2026 (`data/curated/kino-2026.yaml`, deutsche und japanische Fassung, Anime2You 1030216), aber kein Disc- und kein Stream-Datum: Anime2You-Suche am 18.11.2026 („Gefallener Engel des Highways“, „Film 29 Blu-ray“, „Conan Film 29 Heimkino“, „Conan Film 29 Prime Video“) nennt nur Discs der Filme 1–28, Film 28 hat eine Disc-Meldung, Film 29 keine. `zaehleErstausgabeOhneWeg` zählt nur Disc-Termine als Weg; der vergangene Kino-Termin ist keiner. Ob ein vergangener Kinostart die Art schließen soll, ist eine Regeländerung (gleiche Klasse wie Eichhörnchen und Igel, Block 6). Wiedervorlage: sobald Anime2You eine Disc- oder Streaming-Meldung bringt (`node tools/anime2you-suche.mjs suche "Detektiv Conan Film 29"`).
   - **5000003 M.A.S.K. `sprecher`:** Eigentitel (`data/eigene-titel.yaml` nr 3, Prime-Kanal aniverse, TMDB tv/4961 nur fürs Plakat): kein AniList-Eintrag, kein aniSearch-Eintrag (`data/anisearch-slugs.json` führt kein „M.A.S.K.“, `anisearch-offen.json`: `ohne-mal`). Beide automatischen Sprecher-Quellen führen den Titel nicht, und `public/data/voices/` ist erzeugt, einen Handweg gibt es im Bau nicht. Synchronkartei untersagt. Nächster Schritt: Besetzung aus einer erlaubten Quelle (etwa Wikipedia de) braucht erst eine Handdatei samt Bauphase.
   - **5000003 `termin-fehlt-laufend`:** Eigentitel tragen kein `jpEnd`; die Serie (1985, 73 Folgen am 01.11. komplett bei aniverse) gilt deshalb als laufend ohne künftigen Termin. Lösung wäre ein optionales `jpEnd` in `eigene-titel.yaml` (Code in `pipeline/bau/eigene-titel.ts`, nicht Teil dieses Blocks).
+
+## Lösungskarte: Wege zu vollen Daten (21.11.2026)
+
+Auftrag `maengel-wege-2111`, nur gemessen, nichts gebaut. Stand `main` 21.11.2026 (`data/maengel.json`, `stand` 2026-11-21). Gemessen an den committeten Sammlerdateien in `data/` (`tmdb-titles.json`, `justwatch-audio.json`, `anisearch.json`, `anisearch-eintraege.json`, `anisearch-sprecher.json`, `anisearch-folgen.json`, `tmdb-folgen.json`, `kitsu-folgen.json`, `tmdb-banner.json`, `cr-katalog-de.json`, `adn-catalog.json`, `wikidata-titel.json`) und an je einer Stichprobe bei AniList (3 Abfragen à ≤ 50 Kennungen) und de.wikipedia (13 Seiten). `data/cache/` (AniList-Rohdaten) lag in der Cloud-Sitzung nicht vor; AniList-Aussagen stammen deshalb aus der Live-Stichprobe. Messskripte im Scratchpad, nicht im Repo. Neue Quellen und verworfene: `quellen.md`, „Quellenprüfung für die Mängel-Lösungskarte“ (21.11.2026).
+
+Titelklassen der offenen Mängel: AniList-Titel (Kennung < 5 Mio.), aniSearch-Zeilen (≥ 10 Mio., gebaut in `pipeline/bau/anisearch-titel.ts`), Eigentitel (5 Mio.).
+
+**Wichtigster Befund:** Zwei Mängelarten liegen fast ganz an Daten, die schon im Repo stehen. `ergaenzeAnisearchTitel` baut aniSearch-Zeilen mit `genres: []` und ohne `runtimeMin`, obwohl `anisearch-eintraege.json` für sie `g` (Genre) und `min` (Laufzeit) trägt; und der Bau nimmt AniLists `duration` nicht als Laufzeit, obwohl `pipeline/lib/anilist.ts` sie holt (`runtimeMin` kommt nur aus `anisearch.json`). Zweiter Befund: AniList-Werte im Bestand sind teils veraltet (Wertung 22 von 50, Studio 9 von 40 heute bei AniList vorhanden, im Bestand leer) — das gehört zum Parallelauftrag `auto-arten-2111`.
+
+### Je Mängelart
+
+Spalte „gemessen“: offene Titel, für die der Weg heute einen Wert hätte. „Obergrenze“ heißt: Wert liegt vor, die Übernahme scheitert an einer bewussten Regel (geteilte Kennung, Staffelzählung), die erst zu prüfen ist.
+
+**fsk (1.222 offen; 1.116 AniList, 104 aniSearch-Zeilen, 511 mit Synchro-Weg)**
+
+| Weg | gemessen | Aufwand | Risiko | Empfehlung |
+|---|---|---|---|---|
+| (a) JustWatch `altersangabe` | 13 (alle bei Titeln, deren TMDB-Kennung mehrere Titel teilen → `tmdbMehrdeutig`, zu Recht verworfen); 1.023 offene haben `ohneTreffer` | — | — | ausgeschöpft |
+| (a) TMDB `fsk` | dieselben 13 (geteilte Kennung: Mehrteiler Sailor Moon Eternal, Psycho-Pass SS, Code Geass Akito) | S | niedrig | Handzeilen oder Regel „alle Teile einer TMDB-Sammelkennung tragen denselben Wert → übernehmen“; 13 |
+| (a) ADN `age` | 10 (keine FSK-Stufe, nur Hinweis) | — | — | nein |
+| (c) Ableitung aus dem Franchise, gleiches Format, nur Freigaben (nicht `fskQuelle`), nur wenn alle Geschwister denselben Wert haben | **359** (29 %); Gegenprobe Leave-one-out an 397 Titeln mit Freigabe: 94,0 % richtig, 12 zu niedrig, 12 zu hoch | S–M | mittel (3 % zu niedrig) | **ja, gekennzeichnet** als `fskQuelle: 'franchise'` („≈ ab 12, wie die anderen Teile“), Rang hinter Freigabe und JustWatch. Ohne Formatbedingung 548 Titel, aber nur 88,4 % richtig — verworfen |
+| (b) FSK-Datenbank | Hochrechnung 08.10.: ~800 der damals 1.683 | M | Recht | nur mit schriftlicher Zustimmung der FSK (Impressum); Abruf am 08.10. von Daniel eingestellt. Anfrage an die FSK ist der einzige Weg zum großen Rest |
+| (b) OFDb, schnittberichte.com, bluray-disc.de | nicht messbar (Hosts in der Cloud-Sitzung gesperrt) | ? | ? | Prüfauftrag von einer Sitzung mit Netz (robots, AGB, Disc-FSK je Titel) |
+
+Rest nach (a)+(c): ~850, überwiegend Disc-/TV-Altbestand (1.022 der 1.222 haben `deErstausgabe`) — ohne FSK-Datenbank oder Disc-Datenbank nicht schließbar.
+
+**sprecher (370 offen; 158 mit Synchro-Stream, 212 nur mit Erstausgabe)**
+
+| Weg | gemessen | Aufwand | Risiko | Empfehlung |
+|---|---|---|---|---|
+| (a) aniSearch-Sprecher | 36 mit deutscher Besetzung, alle an aniSearch-Kennungen, die mehrere Titel führen (Bündel, z. B. 6300, 8303) — zu Recht nicht zugeordnet; 332 mit leerer deutscher Liste | — | — | ausgeschöpft |
+| (c) Bündel-Besetzung an alle Teile, gekennzeichnet | 36 | S | mittel (Besetzung je Teil kann abweichen) | nur als Hand-Entscheidung je Bündel |
+| (b) de.wikipedia, Abschnitt „Synchronisation“ | Stichprobe 8 Synchro-Titel: 4 mit passender Seite und Sprechertabelle (Yū Yū Hakusho, Baki, Ron Kamonohashi, Ranma ½), 2 Fehltreffer der Suche, 2 ohne Seite; hochgerechnet ~80 der 158, unbekannt für die 212 Altfälle | M–L (Tabellenparser, Staffel-Zuordnung, Attribution CC BY-SA) | mittel | **ja, als neue Quelle mit Handzuordnung Seite→Titel** |
+| (b) Deutsche Synchronkartei | — | — | Recht | nein (untersagt, 11.08.2026) |
+| (b) synchrondatenbank.de | — | — | Recht | nein (frei nur über 30 Jahre) |
+
+**banner (310 offen)**
+
+| Weg | gemessen | Aufwand | Risiko | Empfehlung |
+|---|---|---|---|---|
+| (a) `tmdb-banner.json` | 6 mit Bild, alle geteilte TMDB-Kennung | — | — | nein |
+| (c) Banner eines anderen Franchise-Teils | **242** (78 %) | S | niedrig (Schmuckbild, Wirkung 1) | **ja**, nur Titel mit Franchise, Teil mit eigenem Banner gleichen Formats zuerst |
+| Rest | 68 | — | — | Ausnahme „kein-banner-bekannt“ prüfen |
+
+**laufzeit (307 offen; 146 AniList, 158 aniSearch-Zeilen, 3 Eigentitel)**
+
+| Weg | gemessen | Aufwand | Risiko | Empfehlung |
+|---|---|---|---|---|
+| (a) `anisearch-eintraege.json` `min` für aniSearch-Zeilen | **155** von 158; Gegenprobe: 17 von 17 gleich `runtimeMin` | S (eine Zeile in `ergaenzeAnisearchTitel`) | sehr niedrig | **ja, zuerst** |
+| (a) AniList `duration` als Rückfall | **50 von 50** Stichprobe haben einen Wert → ~146; Gegenprobe an 50 Titeln mit aniSearch-Laufzeit: 44 auf ±2 min gleich, 6 bis 6 min kürzer | S | niedrig | **ja**, nur wo aniSearch nichts hat |
+| (c) Franchise | Leave-one-out 48,5 % richtig | — | hoch | nein |
+
+Erwartet: ~301 von 307.
+
+**folgentitel (294 offen; 97 mit Synchro-Weg; nur deutsche Titel zählen, F57 vom 24.10.2026)**
+
+| Weg | gemessen | Aufwand | Risiko | Empfehlung |
+|---|---|---|---|---|
+| (a) aniSearch-Folgen `de` | volle Liste 23, teilweise 98 | M | mittel | Prüfauftrag: warum übernimmt die Stufe sie nicht (Bündel? Nummernversatz?) |
+| (a) TMDB-Folgen (deutsche Namen ohne „Folge n“) | volle Liste ≤ 33 (Obergrenze, Staffelzuordnung nicht geprüft) | M | mittel | zusammen mit aniSearch: **bis 53 Titel** voll; gleicher Prüfauftrag |
+| (a) Kitsu | 65 voll, aber englisch | — | — | nein (F57) |
+| (b) de.wikipedia Episodenlisten (`fetch-wikipedia-folgen`, bisher wenige Titel) | Stichprobe 5 Synchro-Titel: 2–3 mit Episodenliste | M | niedrig | ja, Titelliste des vorhandenen Abrufs auf die 97 Synchro-Titel erweitern |
+| (b) fernsehserien.de | — | — | Recht | nur mit Genehmigung (Anfrage seit 12.11. offen) |
+
+**genre (173 offen; 158 aniSearch-Zeilen, 12 AniList, 3 Eigentitel)**
+
+| Weg | gemessen | Aufwand | Risiko | Empfehlung |
+|---|---|---|---|---|
+| (a) `anisearch-eintraege.json` `g` | **131** von 158 | S (Zuordnungstabelle von 21 deutschen aniSearch-Genres auf AniList-Genres, z. B. „Actionkomödie“ → Action + Comedy, „Unbestimmt“ → nichts) | niedrig | **ja** |
+| (a) TMDB `genreIds` | 75 (überschneidet sich) | S | mittel (TMDB-Genres grob: „Animation“) | nur Rückfall |
+| AniList | 0 von 12 haben heute ein Genre | — | — | Ausnahme |
+| (c) Franchise | 16,3 % gleich | — | — | nein |
+
+**wertung (108 offen; 50 AniList, 55 aniSearch-Zeilen, 3 Eigentitel)**
+
+| Weg | gemessen | Aufwand | Risiko | Empfehlung |
+|---|---|---|---|---|
+| (a) AniList neu holen (`averageScore`) | 22 von 50 haben heute eine | S (Cache-Frische, Auftrag `auto-arten-2111`) | niedrig | ja |
+| (a) AniList `meanScore` als Rückfall | 48 von 50 | S | mittel (weniger Stimmen; kennzeichnen) | ja, wenn eine Mindestzahl Stimmen gilt (Feld `stats.scoreDistribution`) |
+| aniSearch-Zeilen | kein erlaubter Weg (Wertung nur auf der Seite) | — | — | Ausnahme „ohne-anilist“ (55) |
+
+**studio (105 offen; 40 AniList, 62 aniSearch-Zeilen, 3 Eigentitel)**
+
+| Weg | gemessen | Aufwand | Risiko | Empfehlung |
+|---|---|---|---|---|
+| (a) AniList neu holen | 9 von 40 | S | niedrig | ja (`auto-arten-2111`) |
+| (a) aniSearch `st` / `info.studios` | 0 (bei allen 62 leer) | — | — | — |
+| (c) Franchise | 76,6 % gleich | — | mittel | nein |
+| Rest | ~93 | — | — | Ausnahme „quelle-ohne-studio“ |
+
+**handlung-de (73 offen; 54 ohne Weg, 16 mit Synchro)**
+
+| Weg | gemessen | Aufwand | Risiko | Empfehlung |
+|---|---|---|---|---|
+| (a) aniSearch | 0 (41 Einträge ohne `descriptionDe`) | — | — | — |
+| (a) TMDB `overviewDe` | 4 (geteilte Kennung) | — | — | nein |
+| (a) Crunchyroll-Katalog über die Weg-Adresse | 2 | S | niedrig | ja, Rückfall |
+| Hand (`handlung-eigen.yaml`) | 16 Synchro-Titel | M | niedrig | ja |
+
+**kein-weg (204) und erstausgabe-ohne-weg (174; alle 174 auch in kein-weg)**
+
+| Weg | gemessen | Aufwand | Risiko | Empfehlung |
+|---|---|---|---|---|
+| (a) JustWatch, TMDB-Angebote, CR-, ADN-Katalog | JW-Stream 2, JW-Kauf 1, TMDB-Angebote 4, CR 0, ADN 1 | — | — | nichts zu holen |
+| (c) Regel: historische Erstausgabe | 150 ohne Publisher, Erstausgabe 1950–2009: 87 | — | — | Entscheidung Daniel: Ist ein Titel, den es nur einmal im Fernsehen oder auf längst vergriffener Disc gab, ein Mangel? Vorschlag: Ausnahme „historisch“ (Erstausgabe vor 2010, kein Angebot bei JustWatch) |
+| Hand | 17 mit Streamer als Publisher (Netflix 12, Crunchyroll 3, Amazon 2) — wahrscheinlich ausgelaufen | S | niedrig | belegtes „nicht mehr verfügbar“ setzen |
+
+**sprachurteil-offen (59; 52 Prime)**: (a) JustWatch-Tonspur `de` bei 33, aniSearch „Deutsch, synchronisiert“ bei 48, zusammen 54 — beides nur Hinweis; Weg: Prüfliste nach diesen Hinweisen sortieren, Handbelege (`synchro-belegen`). **synchro-schwach (66, alle Prime)**: Hinweise nur bei 10; Anime2You-Belegsuche. **titel-de (32)**: TMDB-`nameDe` bei 18, aber fast alle über geteilte Kennung falsch zugeordnet, Wikidata schon gefragt; Hand. **folgenzahl-widerspruch (19)**: Hand.
+
+### Rangfolge (geschlossene Mängel je Aufwand)
+
+| Rang | Maßnahme | Art | schließt (gemessen) | Aufwand |
+|---|---|---|---|---|
+| 1 | aniSearch-Zeilen: `min` → `runtimeMin` | laufzeit | 155 | S |
+| 2 | AniList `duration` als Laufzeit-Rückfall | laufzeit | ~146 | S |
+| 3 | Banner aus dem Franchise | banner | 242 | S |
+| 4 | aniSearch-Zeilen: `g` → Genres (Zuordnungstabelle) | genre | 131 | S |
+| 5 | FSK aus dem Franchise, gleiches Format, gekennzeichnet | fsk | 359 | S–M |
+| 6 | Ausnahmen mit Grund (aniSearch-Zeilen ohne Wertung/Studio, kein Banner) | wertung, studio, banner | 55 + ~93 + 68 | S (Regeln) |
+| 7 | AniList-Frische + `meanScore`-Rückfall | wertung, studio | ~48 + 9 | S (mit `auto-arten-2111`) |
+| 8 | Folgentitel: aniSearch-/TMDB-Stufe prüfen, warum volle Listen liegen bleiben | folgentitel | bis 53 | M |
+| 9 | Regel „historische Erstausgabe“ (Entscheidung) | kein-weg, erstausgabe | bis 87 | S nach Entscheidung |
+| 10 | de.wikipedia: Sprecher und Episodenlisten | sprecher, folgentitel | ~80 + ~40 (Hochrechnung aus 8 bzw. 5 Proben) | M–L |
+| 11 | Handarbeit (Sprachurteil, Handlung, Titel, Folgenzahl, Synchro-schwach) | 5 Arten | 59 + 16 + 32 + 19 + 66 | M je Block |
+| 12 | Anfrage an die FSK (schriftliche Zustimmung) | fsk | ~800 (Hochrechnung 08.10.) | Mail, Ausgang offen |
+
+Ziel 25.11. „volle Daten“: Mit Rang 1–7 sinken die Wirkung-1-Arten (banner, laufzeit, genre, wertung, studio) fast auf null; FSK bleibt mit ~850 der große Rest und ist ohne Rang 12 nicht schließbar. Sprecher bleibt ohne Rang 10 bei ~330.

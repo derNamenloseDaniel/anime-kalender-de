@@ -16,6 +16,8 @@ export interface Nachleger {
   time?: string
   /** Datum oder Uhrzeit sind abgeleitet, nicht bestätigt — der Text trägt „≈“. */
   geschaetzt: boolean
+  /** Nur die Uhrzeit ist geschätzt; eine belegte Uhrzeit bleibt am fortgeschriebenen Tag ohne „≈“. */
+  timeEstimated?: boolean
 }
 
 /**
@@ -49,7 +51,8 @@ function naechster(termine: ReleaseEvent[]): Nachleger {
     bis: Math.max(...amTag),
     date: erster.date,
     time: erster.time,
-    geschaetzt: zeitGeschaetzt(erster),
+    geschaetzt: !!erster.estimated || zeitGeschaetzt(erster),
+    timeEstimated: zeitGeschaetzt(erster),
   }
 }
 
@@ -58,6 +61,6 @@ export function nachlegerText(n: Nachleger): string {
   const [, monat, tag] = n.date.split('-')
   const folge = n.bis > n.von ? `${n.von}–${n.bis}` : String(n.von)
   const wann = `${weekdayName(n.date, true)} ${tag}.${monat}.`
-  const zeit = n.time ? ` um ${n.geschaetzt ? '≈ ' : ''}${n.time} Uhr` : ''
+  const zeit = n.time ? ` um ${n.timeEstimated ? '≈ ' : ''}${n.time} Uhr` : ''
   return `${anbieterName(n.platform)}: Folge ${folge} ${n.geschaetzt ? '≈' : 'am'} ${wann}${zeit}`
 }

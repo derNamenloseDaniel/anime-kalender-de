@@ -26,8 +26,10 @@ function einheitenpruefung(): void {
   pruefe('gleiche Folge und Zeit: eine gemeinsame Angabe', zeitGemeinsam(zwei[0]!) && folgeGemeinsam(zwei[0]!))
   const verschieden = kacheln([ev('crunchyroll'), ev('primevideo', { episode: 1, time: '18:00', estimated: true })])
   pruefe('verschiedene Folge und Zeit bleiben je Anbieter erhalten', verschieden.length === 1 && !zeitGemeinsam(verschieden[0]!) && !folgeGemeinsam(verschieden[0]!), verschieden)
-  const schaetzung = kacheln([ev('crunchyroll'), ev('primevideo', { estimated: true })])
+  const schaetzung = kacheln([ev('crunchyroll'), ev('primevideo', { timeEstimated: true })])
   pruefe('gleiche Uhrzeit, aber nur bei einem geschätzt: Zeit je Anbieter', !zeitGemeinsam(schaetzung[0]!), schaetzung)
+  const abgeleitet = kacheln([ev('crunchyroll'), ev('primevideo', { estimated: true })])
+  pruefe('gleiche belegte Uhrzeit, nur der Tag abgeleitet: eine gemeinsame Zeit', zeitGemeinsam(abgeleitet[0]!), abgeleitet)
   const bruendel = kacheln([ev('crunchyroll', { id: 'a', episode: 3 }), ev('crunchyroll', { id: 'b', episode: 4 }), ev('primevideo', { episode: 3 })])
   pruefe('weitere Folgen desselben Anbieters bleiben im Bündel', bruendel.length === 1 && bruendel[0]!.length === 2 && bruendel[0]![0]!.length === 2 && !folgeGemeinsam(bruendel[0]!), bruendel)
 

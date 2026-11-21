@@ -11,7 +11,7 @@ Gesamtüberblick aller **Animation mit deutscher Synchronfassung** (nicht nur ja
 ## Harte Grundsätze (Details im Volltext)
 
 - Kein Termin ohne `sources`; keine erfundenen Uhrzeiten (Ausnahmen als `timeEstimated`: Netflix-Eigenproduktion 08:00 UTC; Regeltermin aus Sichtungsfenster (`timeSighting`, unter 60 min ohne ≈); Altfall in `FESTGELEGTE_ZEITEN`, sonst prüft `data:validate` jede `time` + `timeEstimated`); keine erfundene Folgenzahl.
-- Abgeleitetes kennzeichnen (`estimated`, `episodeCountAssumed`, „≈"); Wochentakt wird gemessen (`bestimmeRhythmus()`); belegtes Ende (`lastEpisodeDate`) schlägt Fortschreibung.
+- Abgeleitetes kennzeichnen (`estimated`, `episodeCountAssumed`, „≈"; belegte Uhrzeit am fortgeschriebenen Tag ohne ≈); Wochentakt wird gemessen (`bestimmeRhythmus()`); belegtes Ende (`lastEpisodeDate`) schlägt Fortschreibung.
 - Plattform-Serienkennung = Franchise, keine Staffel (Zuordnung über Folgenzahl); ein Anime gehört genau einer Kennung. Namensabgleich: bester Treffer, nicht erster (`bewerteTreffer`).
 - Ein Vorfilter verschiebt, er löscht. „Früheste Beobachtung" ≠ erste Folge; „Im Angebot seit" ≠ „erschienen am". Anime auf AniList/aniSearch/MAL ist kein Cartoon (`cartoon-umzug.json`).
 - News-Meldung = Aussage zu ihrem Tag, nie umschreiben ([news-plan.md](docs/wissen/news-plan.md)). Geteilte Staffelstarts: `schedule.firstEpisodeNumber`; bei Fortsetzungen AniList-ID prüfen (`npx tsx pipeline/qa-resolve.ts`).

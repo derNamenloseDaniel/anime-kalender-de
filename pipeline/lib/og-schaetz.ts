@@ -1,6 +1,7 @@
 /**
- * Bilder, die ihre geschätzte Uhrzeit mit „≈" zeigen. Der Lauf überspringt vorhandene Bilder; ein vor dem „≈"
- * gezeichnetes Bild mit geschätzter Uhrzeit wird deshalb einmal neu gezeichnet (nicht alle, `OG_FASSUNG` bleibt).
+ * Bilder, die ihre geschätzte Uhrzeit mit „≈" zeigen. Der Lauf überspringt vorhandene Bilder; ein Bild, dessen „≈"
+ * dazukommt oder wegfällt (belegte Uhrzeit am fortgeschriebenen Termin, 21.11.2026), wird deshalb einmal neu
+ * gezeichnet (nicht alle, `OG_FASSUNG` bleibt).
  */
 export const SCHAETZ_DATEI = 'schaetz.txt'
 
@@ -12,9 +13,9 @@ export function schreibSchaetzListe(slugs: ReadonlySet<string>): string {
   return `${[...slugs].sort().join('\n')}\n`
 }
 
-/** Das Bild zeigt ein „≈" und steht noch nicht in der Liste der damit gezeichneten Bilder. */
+/** Das „≈" im Bild weicht von der Liste der damit gezeichneten Bilder ab (neu dazu oder weggefallen). */
 export function neuWegenSchaetzung(fakt: string, slug: string, bekannt: ReadonlySet<string>): boolean {
-  return fakt.includes('≈') && !bekannt.has(slug)
+  return fakt.includes('≈') !== bekannt.has(slug)
 }
 
 /** Slugs ohne Release fallen aus der Liste, sie wuchs sonst mit jedem entfernten Release. */

@@ -45,7 +45,9 @@ assert.deepEqual(zeilen([ohne], [[]], '18:10').zeilen, [{ art: 'vorbei' }])
 // Geschätzte Zeit: nie „läuft", nie „nächste" (auch wenn eine Sendung zur Zeit passen würde).
 const geschaetzt = [tv('18:00', { timeEstimated: true })]
 assert.deepEqual(zeilen([geschaetzt], [[sendung('18:00', '18:30')]], '18:10').zeilen, [{ art: 'vorbei' }])
-assert.deepEqual(zeilen([[tv('18:00', { estimated: true })]], [[]], '17:50').zeilen, [{ art: 'spaeter' }])
+assert.deepEqual(zeilen([[tv('18:00', { timeEstimated: true })]], [[]], '17:50').zeilen, [{ art: 'spaeter' }])
+// Belegte Uhrzeit an fortgeschriebenem Tag (nur `estimated`): gilt als erwartete Zeit, also „nächste".
+assert.deepEqual(zeilen([[tv('18:00', { estimated: true })]], [[]], '17:50').zeilen, [{ art: 'naechste', minuten: 10 }])
 
 // Nur die erste ausstehende Zeile ist „nächste", und nur bis drei Stunden.
 const drei = [[tv('18:00')], [tv('18:30')], [tv('19:00')]]
@@ -82,9 +84,12 @@ assert.deepEqual(kachelAngabe(kachel('19:00'), T, '15:30', fruehesteKommende(tag
 assert.deepEqual(kachelAngabe(kachel('17:00'), T, '17:00', undefined), { seit: '17:00' })
 
 // Geschätzt, verpasst, ohne Uhrzeit, anderer Tag: nie „seit", nie „in" — und eine Schätzung bestimmt auch nicht die „frühste".
-const unsicher = [kachel('17:00', { estimated: true }), kachel('17:00', { timeEstimated: true }), kachel('17:00', { verpasst: {} }), kachel(undefined), kachel('17:00', { date: '2026-10-15' })]
+const unsicher = [kachel('17:00', { timeEstimated: true }), kachel('17:00', { verpasst: {} }), kachel(undefined), kachel('17:00', { date: '2026-10-15' })]
 for (const t of unsicher) assert.deepEqual(kachelAngabe(t, T, '18:00', '19:00'), {})
-assert.equal(fruehesteKommende([kachel('19:00', { estimated: true }), kachel('20:00')], T, '18:00'), '20:00')
+assert.equal(fruehesteKommende([kachel('19:00', { timeEstimated: true }), kachel('20:00')], T, '18:00'), '20:00')
+// Belegte Uhrzeit an abgeleitetem Tag (nur `estimated`) gilt als erwartete Zeit: „seit" und „frühste" wie belegt.
+assert.deepEqual(kachelAngabe(kachel('17:00', { estimated: true }), T, '18:00', '19:00'), { seit: '17:00' })
+assert.equal(fruehesteKommende([kachel('19:00', { estimated: true }), kachel('20:00')], T, '18:00'), '19:00')
 assert.equal(fruehesteKommende([kachel('19:00', { zweitanbieter: true }), kachel('20:00', { releaseType: 'disc' })], T, '18:00'), undefined)
 
 console.log('buehne-relative-uhrzeit.test: ok')

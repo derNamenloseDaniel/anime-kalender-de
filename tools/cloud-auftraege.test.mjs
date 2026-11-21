@@ -109,6 +109,9 @@ pruefe('vorab (d): fünf aktive → nein', /5 aktive/.test(vorabUrteil('neu', ['
 pruefe('vorab (d): fünf Einträge, einer fertig → ja', vorabUrteil('neu', ['a', 'b', 'c', 'd', 'e'].map(eintrag), [gemergtMit('a')], frei).ok)
 pruefe('vorab (d): fünf Einträge, einer mit geschlossenem PR → ja', vorabUrteil('neu', ['a', 'b', 'c', 'd', 'e'].map(eintrag), [geschlossenMit('c')], frei).ok)
 pruefe('vorab (d): fünf Einträge, zwei fertig, einer offen → ja', vorabUrteil('neu', ['a', 'b', 'c', 'd', 'e'].map(eintrag), [gemergtMit('a'), gemergtMit('b', 53), offenMit('c', 54)], frei).ok)
+pruefe('vorab (d): fünf Einträge ohne PR, einer mit ende → ja', vorabUrteil('neu', [...['a', 'b', 'c', 'd'].map(eintrag), { ...eintrag('e'), ende: '2026-11-14T09:00:00Z' }], [], frei).ok)
+pruefe('vorab (a): id im Register ohne PR, aber ende → ja', vorabUrteil('a', [{ ...eintrag('a'), ende: '2026-11-14T09:00:00Z' }], [], frei).ok)
+pruefe('stand: Eintrag ohne PR mit ende ist fertig', eintragStand({ ...eintrag('a'), ende: '2026-11-14T09:00:00Z' }, [], {}, () => ({}), Date.parse('2026-11-14T10:00:00Z'), null).fertig)
 
 // --- Vorrat und Register ----------------------------------------------------------------------------------------------
 gleich('Vergeben-Zeile in Berliner Zeit (Winter, UTC+1)', vergebenZeile('trig_A', JETZT), '**Vergeben:** Cloud-Routine https://claude.ai/code/routines/trig_A (14.11. 10:15)')

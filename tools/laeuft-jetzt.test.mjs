@@ -85,7 +85,7 @@ assert.equal(stand(geschaetzt, sendungenG, '16:30').zustand.zeilen[1].art, 'naec
 assert.deepEqual(stand([[tv(undefined)]], [[]], '14:00').linie, { nichtsMehr: false, restInZeile: false })
 assert.deepEqual(stand([], [], '14:00').linie, { nichtsMehr: false, restInZeile: false })
 // Läuft etwas, steht „in … Min" trotzdem nicht an einer Zeile hinter einer geschätzten, die früher kommen könnte.
-const dahinter = [[tv('17:00')], [tv('18:00', { estimated: true })], [tv('18:30')]]
+const dahinter = [[tv('17:00')], [tv('18:00', { timeEstimated: true })], [tv('18:30')]]
 const sd = stand(dahinter, [[sendung('17:00', '17:50')], [], []], '17:30')
 assert.deepEqual(art(sd), ['laeuft', 'spaeter', 'naechste'])
 assert.equal(sd.linie.restInZeile, false)

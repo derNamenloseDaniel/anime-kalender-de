@@ -110,6 +110,11 @@ export function letzteFolgen(grenzen: StaffelGrenzen[]): Map<number, number> {
   return new Map(grenzen.map((t) => [t.anilistId, t.staffeln[t.staffeln.length - 1]!.bis ?? t.staffeln[t.staffeln.length - 1]!.von]))
 }
 
+/** Kennungen mit offener letzter Staffel: ihre Folgenzahl ist keine Gesamtzahl (`zaehlung.json` trägt dann eine dritte Stelle `1`). */
+export function offeneStaffeln(grenzen: StaffelGrenzen[]): Set<number> {
+  return new Set(grenzen.filter((t) => t.staffeln[t.staffeln.length - 1]!.offen).map((t) => t.anilistId))
+}
+
 /**
  * `[alle, deutsche]` für `folgen/zaehlung.json`. Reichen die Staffelgrenzen weiter als die Folgenliste (Horizonte: aniSearch führt 122,
  * die deutschen Staffeln 1–3 haben 136), zählt der Kopf bis zur letzten belegten Folge statt „122 von 122“ — nie unter der höchsten

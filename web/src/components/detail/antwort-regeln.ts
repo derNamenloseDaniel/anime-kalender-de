@@ -268,12 +268,19 @@ const belegteZahl = (r: Release): boolean => Boolean(r.schedule?.episodeCount &&
 /** Ist `gesamt` belegt: AniList führt mindestens so viele Folgen, oder irgendein Release nennt eine belegte Zahl? */
 export const gesamtIstBelegt = (title: Title, releases: Release[], gesamt: number): boolean => (title.episodes ?? 0) >= gesamt || releases.some(belegteZahl)
 
+/** `[alle, deutsch]` aus `folgen/zaehlung.json`; die dritte Stelle `1` heißt: die letzte Staffel ist offen, `alle` ist keine Gesamtzahl. */
+export type FolgenZaehlung = [number, number] | [number, number, 1]
+
+/** Reicht die belegte Zahl des Releases bis Folge `m`? Ein Teilstapel (Folge 101–122) belegt keine 128 Folgen. */
+const reichtBis = (r: Release, m: number): boolean => belegteZahl(r) && (r.schedule.firstEpisodeNumber ?? 1) + r.schedule.episodeCount! - 1 >= m
+
 /**
- * „N von M Folgen auf Deutsch“ aus der Folgenliste (`[alle, deutsch]`). Das „von M“ steht nur, wenn ein Release die Gesamtzahl belegt
- * (Zahl da, weder angenommen noch nur gesichtet); sonst ist die Listenlänge keine Gesamtzahl — dann „N Folgen auf Deutsch“ ohne „von“.
+ * „N von M Folgen auf Deutsch“ aus der Folgenliste. Das „von M“ steht nur, wenn ein Release die Zahl bis M belegt (weder angenommen
+ * noch nur gesichtet) und keine Staffel offen ist — sonst ist M keine Gesamtzahl (Horizonte: „137 von 137“, Staffel 4 lief erst an,
+ * 21.11.2026), dann „N Folgen auf Deutsch“ ohne „von“.
  */
-export function deFolgenZahlText(z: [number, number], releases: Release[], T: (k: string, v?: Record<string, string | number>) => string): string {
-  return !releases.some(belegteZahl)
+export function deFolgenZahlText(z: FolgenZaehlung, releases: Release[], T: (k: string, v?: Record<string, string | number>) => string): string {
+  return z[2] || !releases.some((r) => reichtBis(r, z[0]))
     ? T('detail.dubKopf', { n: z[1] })
     : T('antwort.teilweiseZahl', { raus: z[1], gesamt: z[0] })
 }

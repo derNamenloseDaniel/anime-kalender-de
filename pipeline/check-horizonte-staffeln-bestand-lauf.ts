@@ -14,8 +14,8 @@ const tsx = pathToFileURL(join(REPO, 'node_modules/tsx/dist/esm/index.mjs')).hre
 const SKRIPT = 'pipeline/check-horizonte-staffeln-bestand.ts'
 const ID = '158871'
 
-type Kulisse = { wiki?: number[]; toggo?: number[]; s?: number | null; kopf?: number }
-const GUT: Required<Kulisse> = { wiki: [45, 44, 47, 23], toggo: [45, 44, 47, 1], s: 4, kopf: 137 }
+type Kulisse = { wiki?: number[]; toggo?: number[]; s?: number | null; kopf?: number; offen?: boolean }
+const GUT: Required<Kulisse> = { wiki: [45, 44, 47, 23], toggo: [45, 44, 47, 1], s: 4, kopf: 137, offen: true }
 
 /** Folgen je Staffel → Wikipedia-Zeilen mit `st` bzw. TOGGO-Einträge. */
 const wikiFolgen = (je: number[]) => je.flatMap((n) => Array.from({ length: n }, (_, i) => ({ st: i + 1 })))
@@ -30,7 +30,7 @@ function lauf(k: Kulisse): { status: number | null; aus: string } {
     writeFileSync(join(wurzel, 'data/wikipedia-folgen.json'), JSON.stringify({ titel: k.wiki === undefined && 'wiki' in k ? {} : { [ID]: { folgen: wikiFolgen(w.wiki) } } }))
     writeFileSync(join(wurzel, 'data/toggo.json'), JSON.stringify({ titel: { [ID]: { folgen: toggoFolgen(w.toggo) } } }))
     if (w.s !== null) writeFileSync(join(wurzel, `public/data/folgen/${ID}.json`), JSON.stringify({ f: [], de: [], s: Array.from({ length: w.s }, (_, i) => [i + 1, 1]) }))
-    writeFileSync(join(wurzel, 'public/data/folgen/zaehlung.json'), JSON.stringify({ [ID]: [w.kopf, w.kopf] }))
+    writeFileSync(join(wurzel, 'public/data/folgen/zaehlung.json'), JSON.stringify({ [ID]: w.offen ? [w.kopf, w.kopf, 1] : [w.kopf, w.kopf] }))
     const r = spawnSync(process.execPath, ['--import', tsx, join(REPO, SKRIPT)], { cwd: wurzel, encoding: 'utf8', timeout: 90_000 })
     return { status: r.status, aus: `${r.stdout}${r.stderr}` }
   } finally {
@@ -56,6 +56,7 @@ fall('Detaildatei fehlt: Meldung statt Absturz', { s: null }, 1, `Detaildatei pu
 fall('Detaildatei ohne Staffeln: rot', { s: 0 }, 1, 'Detaildatei trägt 0 Staffeln')
 fall('Kopfzählung unter der letzten belegten Folge: rot', { kopf: 122 }, 1, 'Kopfzählung 122 Folgen, belegt sind 137')
 fall('Kopfzählung genau an der letzten belegten Folge: grün', { kopf: 137 }, 0, 'check-horizonte-staffeln-bestand: ok')
+fall('Staffel 4 offen, Kopf ohne Kennzeichen („137 von 137“): rot', { offen: false }, 1, 'Kopfzählung ohne Kennzeichen „Staffel offen“')
 
 const liste = readFileSync(join(REPO, 'tools/check-bestand-liste.txt'), 'utf8').split('\n').map((z) => z.trim())
 if (liste.includes(SKRIPT)) console.log('  ✓ Wächter steht in tools/check-bestand-liste.txt')
@@ -65,4 +66,4 @@ else {
 }
 
 if (fehler) process.exit(1)
-console.log('check-horizonte-staffeln-bestand-lauf: ok (9 Fälle und Listeneintrag)')
+console.log('check-horizonte-staffeln-bestand-lauf: ok (10 Fälle und Listeneintrag)')

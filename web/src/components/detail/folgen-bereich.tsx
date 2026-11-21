@@ -5,6 +5,7 @@ import { DeFlaggeZeichen } from '../de-flagge.tsx'
 import { folgeIstDeutsch } from './stream-bereiche.ts'
 import { SERIENBELEG_HINWEIS, serienbelegOhneFolgenbeleg } from '@shared/folgen-flagge.ts'
 import { staffelAbschnitte, staffelZeile, type StaffelZeile } from './folgen-staffeln.ts'
+import type { FolgenZaehlung } from './antwort-regeln.ts'
 
 /**
  * **Die Folgenliste im Antwortkasten** (Daniel, 04.10.2026): Ein Pfeil klappt sie auf, der Kasten wächst mit,
@@ -44,14 +45,14 @@ export function useHatFolgenListe(titleId: number): boolean {
   return gibtEs
 }
 
-let zaehlungen: Promise<Record<string, [number, number]>> | undefined
+let zaehlungen: Promise<Record<string, FolgenZaehlung>> | undefined
 /** `[alle Folgen, Folgen mit deutscher Synchro]` aus `folgen/zaehlung.json` — für die Überschrift, wo AniList keine Folgenzahl führt. */
-export function useFolgenZaehlung(titleId: number): [number, number] | undefined {
-  const [z, setZ] = useState<[number, number]>()
+export function useFolgenZaehlung(titleId: number): FolgenZaehlung | undefined {
+  const [z, setZ] = useState<FolgenZaehlung>()
   useEffect(() => {
     let aktiv = true
     setZ(undefined)
-    void (zaehlungen ??= loadJson<Record<string, [number, number]>>('folgen/zaehlung.json').catch(() => ({} as Record<string, [number, number]>))).then((m) => aktiv && setZ(m[String(titleId)]))
+    void (zaehlungen ??= loadJson<Record<string, FolgenZaehlung>>('folgen/zaehlung.json').catch(() => ({} as Record<string, FolgenZaehlung>))).then((m) => aktiv && setZ(m[String(titleId)]))
     return () => {
       aktiv = false
     }

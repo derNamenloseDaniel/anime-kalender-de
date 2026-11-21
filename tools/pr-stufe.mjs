@@ -28,6 +28,7 @@
  * | .claude/(rules|agents|hooks|mods|commands)/** (steuern Daniels Agenten; settings.json bleibt 2) | 1       |
  * | nur .claude/mods/arbeitsliste/** (+ Skill-Markdown), mindestens eine Mod-Datei (tools/pr-nur-mod.mjs) | 0 |
  * | Handwerkzeug tools/<name>.(mjs|cjs|js|ts) mit eigenem Test, dessen Name in .github, package.json, tools, pipeline, shared, web, worker, extension, .claude, Wurzeldateien nirgends (auch nicht in fremden Tests) vorkommt und kein Glob trifft (tools/pr-stufe-kette.mjs) | 1 |
+ * | tools/kennzahlen/tage.jsonl, tools/kennzahlen/daten.js (erzeugte Tageskennzahlen) | 1       |
  * | Doku: *.md, docs, daniel-zum-abarbeiten, mockups                            | 0       |
  * | Text: data/patchnotes/(vorrat/)*.yaml, web/src/**\/i18n*.ts(x)                       | 0       |
  * | eine einzelne *.css unter web/src oder extension, höchstens 30 Zeilen       | 0       |
@@ -67,7 +68,9 @@ const RECHTSTEXT = /(impressum|datenschutz|nutzungsbedingungen)/i
 const STUFE_1 = /^(web\/src\/|extension\/|data\/dub-confirmed\.yaml$|data\/curated\/|data\/[^/]+\.yaml$)/
 // Testdatei: Name endet auf .test./.spec. mit Skript-Endung (in jedem Ordner).
 const TESTDATEI = /(^|\/)[^/]+\.(test|spec)\.[cm]?[jt]sx?$/
-const FAKTENZAHL = /\b\d{1,2}:\d{2}\b|\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\.\d{1,2}\.(\d{2,4})?(?!\d)|\b\d+\s*(Folgen?|Episoden?|Staffeln?|Uhr)\b|\b\d{5,}\b/i
+// Erzeugte Tageskennzahlen (täglicher Kennzahlen-PR): nur diese zwei Dateien, die Logik daneben (kennzahlen-logik.cjs) bleibt 2.
+const KENNZAHLEN_ERZEUGT = /^tools\/kennzahlen\/(tage\.jsonl|daten\.js)$/
+const FAKTENZAHL =/\b\d{1,2}:\d{2}\b|\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\.\d{1,2}\.(\d{2,4})?(?!\d)|\b\d+\s*(Folgen?|Episoden?|Staffeln?|Uhr)\b|\b\d{5,}\b/i
 
 /**
  * Zerlegt einen Unified-Diff in Dateien (Zielpfad, Quellpfad bei Umbenennen/Kopieren, hinzugefügte und entfernte Zeilen,
@@ -148,6 +151,7 @@ function stufeOhneModus(d, n, kette) {
   if (DOKU_ANDERE_ENDUNG.test(d.pfad)) return [1, 'Datei in docs/mockups mit anderer Endung']
   if (CLAUDE_GLOBAL.test(d.pfad)) return [1, 'globale Claude-Konfiguration (Regel, Skill, Hook, Mod)']
   if (BUEHNE.test(d.pfad)) return [1, 'Bühne (nicht ausgeliefert)']
+  if (KENNZAHLEN_ERZEUGT.test(d.pfad)) return [1, 'erzeugte Kennzahlen']
   if (STUFE_1.test(d.pfad)) return [1, 'UI-Logik, Handbeleg oder Datenwert']
   if (istHandwerkzeug(d.pfad, kette, kette?.diff)) return [1, 'Handwerkzeug unter tools/ (kein Workflow, npm-Skript, keine Liste oder Quelle ruft es auf, eigener Test)']
   return [2, 'Pfad ohne Herabstufungsregel (Pipeline, Logik, Workflow, Worker, Schema oder unbekannt)']

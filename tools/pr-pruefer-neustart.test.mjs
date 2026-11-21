@@ -83,7 +83,7 @@ gleich('kein cancel, kein rerun, kein Warten (concurrency bricht ab)', [ab.ander
 gleich('Logzeile nennt PR, Kopf (9 Zeichen) und Grund', ab.zeilen, ['Prüfer-Neustart: ja, PR 7 Kopf ddddddddd gestartet (Nachtrag eines Berechtigten)'])
 // Zwei Läufe von PR 7: der neueste (zuerst gelistet) begann nach dem Kommentar und hat ihn gelesen; der ältere davor zählt nicht.
 const zwei = laufe({ KOMMENTAR_ZEIT: ZEIT }, [{ id: 6, status: 'in_progress', display_title: titel(7), run_started_at: '2026-11-12T14:33:00Z' }, { id: 5, status: 'completed', conclusion: 'success', display_title: titel(7), run_started_at: '2026-11-12T14:00:00Z' }])
-gleich('zwei Läufe des PR: der neueste entscheidet (startete nach dem Kommentar), kein Dispatch', [zwei.starts, zwei.zeilen], [[], ['Prüfer-Neustart: nein (Lauf 6 startete nach dem Kommentar)']])
+gleich('zwei Läufe des PR: der neueste entscheidet (startete nach dem Kommentar), kein Dispatch, Exit 0', [zwei.starts, zwei.zeilen, zwei.code], [[], ['Prüfer-Neustart: nein (Lauf 6 startete nach dem Kommentar)'], 0])
 gleich('kein Prüfer-Lauf des PR (nur fremde): Dispatch', laufe({}, fremd).starts, [DISPATCH])
 gleich('gar kein Prüfer-Lauf: Dispatch', laufe({}, []).starts, [DISPATCH])
 gleich('Kette des Kopfes läuft noch: kein Dispatch (ihr Ende startet den Prüfer), Exit 0', (() => { const r = laufe({}, [], { kette: [{ id: 41, status: 'in_progress' }] }); return [r.starts, r.code, r.zeilen] })(), [[], 0, ['Prüfer-Neustart: nein (Kette für ddddddddd nicht fertig, ihr Ende startet den Prüfer)']])

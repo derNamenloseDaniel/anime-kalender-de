@@ -3,24 +3,27 @@
  *
  * Laufzeit (Daniel, 04.10.2026): Ein Special mit drei Folgen à zwei Minuten ist für Nutzer weniger interessant
  * als eines in Serien- oder Filmlänge — die Angabe gehört in jedes Detail-Panel. Quelle ist die Laufzeit je
- * Folge laut aniSearch (`info.runtimeMinutes`, bei 3.166 von 3.190 Einträgen gesetzt, 04.10.2026).
+ * Folge laut aniSearch (`info.runtimeMinutes`, bei 3.166 von 3.190 Einträgen gesetzt, 04.10.2026). Sie überschreibt den
+ * AniList-Rückfall (`laufzeitAusAnilist`; Stichprobe 21.11.2026: 44 von 50 auf ±2 min gleich).
  */
 import type { Title } from '../../shared/types.ts'
 import { discBonusAnwenden } from './disc-bonus.ts'
 import { ladeAnisearchAbruf } from './anisearch-verworfen.ts'
+import { EIGENE_ID_BASIS } from '../../shared/eigene-titel.ts'
 
 export function anisearchFelderAnwenden(titles: Map<number, Title>): string {
   const bonus = discBonusAnwenden(titles)
   const roh = ladeAnisearchAbruf<{ info?: { runtimeMinutes?: number } }>()
   let laufzeit = 0
+  let ausAnilist = 0
   for (const t of titles.values()) {
     const min = roh[String(t.id)]?.info?.runtimeMinutes
     if (min && min > 0) {
       t.runtimeMin = min
       laufzeit++
-    }
+    } else if (t.runtimeMin && t.id < EIGENE_ID_BASIS) ausAnilist++
   }
-  return `${bonus} Titel als Bonus auf einer deutschen Disc belegt, ${laufzeit} mit Laufzeit aus aniSearch`
+  return `${bonus} Titel als Bonus auf einer deutschen Disc belegt, ${laufzeit} mit Laufzeit aus aniSearch, ${ausAnilist} aus AniList`
 }
 
 let laufzeiten: Map<number, number> | undefined

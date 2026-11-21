@@ -6,8 +6,7 @@ import { folgenzahlAusnahme, type FranchiseTeil } from './folgenzahl-erklaerung.
 import { herkunftFremderTitel } from './herkunft-fremder-titel.ts'
 import { ohneSprachurteil } from './ohne-sprachurteil.ts'
 import { STAFFEL_AUSNAHME, type StaffelBefund } from './maengel-staffel.ts'
-import { fremdeBilder, KEINE_LESBARE, type BildLookup } from './bild-sprache.ts'
-import type { PlakatEintrag } from './tmdb-plakat-suche.ts'
+import { fremdeBilder, KEINE_LESBARE, type BildLookup, type PlakatWahl } from './bild-sprache.ts'
 
 /**
  * **Regeltabelle des Mängel-Registers** (Entscheidung 16.11.2026, `docs/wissen/maengel.md`). Jede Mangelart ist eine Zeile: Gruppe, Wirkung, wer sie abbaut,
@@ -43,7 +42,7 @@ export interface Kontext {
   /** Verneint ein Handbeleg die Plattform für einen Termin ab diesem Tag (`baueNeinGilt`)? */
   neinGilt: (id: number, plattform: string, ab: string) => boolean
   /** Eintrag in `data/tmdb-poster.json` bzw. `data/tmdb-banner.json` (Sprache und Abruftag des gewählten Bildes). */
-  plakat: BildLookup<NonNullable<PlakatEintrag>>
+  plakat: BildLookup<PlakatWahl>
   banner: BildLookup<{ p: string }>
 }
 

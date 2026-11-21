@@ -11,10 +11,9 @@ import { ANBIETER_STAFFELN_DATEI, letzterNetflixStart, staffelZuordnung } from '
 import { franchiseTeile } from '../lib/folgenzahl-erklaerung.ts'
 import { baueNeinGilt } from '../lib/maengel-nein.ts'
 import { MAENGEL_DATEI, schreibeFort, serialisiere, type Register } from '../lib/maengel-register.ts'
-import type { PlakatEintrag } from '../lib/tmdb-plakat-suche.ts'
 import { BANNER_DATEI } from '../lib/tmdb-banner.ts'
 import { ohneGeteilteFilme } from '../lib/tmdb-eindeutig.ts'
-import { alsLookup, type BildLookup } from '../lib/bild-sprache.ts'
+import { alsLookup, type BildLookup, type PlakatWahl } from '../lib/bild-sprache.ts'
 
 const OUT = 'public/data'
 
@@ -40,7 +39,7 @@ function bildBestand<T>(datei: string, was: string): BildLookup<T> {
 /** Die Bildbestände von TMDB (gewähltes Plakat mit Sprache, Banner) für `bild-fremdsprachig`. */
 function bildLeser(): Pick<Kontext, 'plakat' | 'banner'> {
   return {
-    plakat: bildBestand<NonNullable<PlakatEintrag>>('data/tmdb-poster.json', 'Plakate (Bildsprache)'),
+    plakat: bildBestand<PlakatWahl>('data/tmdb-poster.json', 'Plakate (Bildsprache)'),
     banner: bildBestand<{ p: string }>(BANNER_DATEI, 'Banner (Bildsprache)'),
   }
 }

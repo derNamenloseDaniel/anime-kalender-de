@@ -150,6 +150,9 @@ pruefe(!(await takt(SLOT - 20 * MIN)).includes('Schalter'), 'Schalter „an “ 
 zeile = await takt(SLOT - 5 * MIN)
 pruefe(zeile === '[ausbleiben] ziele=2 dran=0', `vor dem Slot: zwei Ziele, nichts dran (${zeile})`)
 pruefe(cr().length === 0, 'vor dem Slot: kein Crunchyroll-Abruf')
+welt.r2.set(STAND_SCHLUESSEL, 'kein json') // würde beim Lesen werfen: beweist, dass der Stand ohne fällige Lesung gar nicht gelesen wird
+pruefe((await takt(SLOT - 5 * MIN)) === '[ausbleiben] ziele=2 dran=0', 'vor dem Slot: stand.json bleibt ungelesen')
+welt.r2.delete(STAND_SCHLUESSEL)
 pruefe((await takt(SLOT + 60 * MIN)).includes('volle Stunde') && welt.aufrufe.length === 0, 'zur vollen Stunde: nichts geladen, nichts abgerufen (die Stunden-Aufrufe bleiben wie vorher)')
 
 // 3. 15:10, Folge ohne deutsche Fassung: Token, Staffelliste, Folgenliste; Stand in R2; kein D1

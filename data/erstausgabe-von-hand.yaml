@@ -578,3 +578,20 @@
   sources:
     - https://www.anime2you.de/news/373156/ghost-in-the-shell-arise-erscheint-als-komplettbox/
     - https://www.anime2you.de/news/395321/ghost-in-the-shell-arise-erneut-auf-prosieben-maxx/
+
+# Ajin Film 2 und 3 (Kazé, Disc-Erstausgabe): aniSearch führt die Filme unter einem Sammeleintrag (10462), die Einzel-Discs nennen
+# je „Deutsch (Dolby Digital 5.1)“ und „Japanisch (Dolby Digital 5.1)“, Untertitel Deutsch. Film 1 (21212) hat einen Prime-Handbeleg.
+- anilistId: 21505
+  title: 'Ajin: Shoutotsu'
+  von: '2020-03-05'
+  publisher: 'Kazé Deutschland'
+  sources:
+    - https://www.anisearch.de/article/62445,ajin-film-2-collision-limited-steelcase-edition-blu-ray
+    - https://www.anime2you.de/news/307145/kaze-lizenziert-ajin-demi-human-filme/
+- anilistId: 21681
+  title: 'Ajin: Shougeki'
+  von: '2020-07-02'
+  publisher: 'Kazé Deutschland'
+  sources:
+    - https://www.anisearch.de/article/62436,ajin-film-3-clash-limited-steelcase-edition-blu-ray
+    - https://www.anime2you.de/news/307145/kaze-lizenziert-ajin-demi-human-filme/

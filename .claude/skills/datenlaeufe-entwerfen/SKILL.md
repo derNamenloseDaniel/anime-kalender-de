@@ -45,7 +45,7 @@ Läufe samt dem, was gerade lief, und die längsten Schritte. Erst dann entschei
 
 ## Auslöser streichen: Bedingungen am Ereignis mitziehen (25.10.2026)
 
-Wer `schedule` (oder einen anderen Auslöser) streicht oder ersetzt, sucht alle `github.event_name`-Bedingungen im Workflow ab. Im Nativ-Repo hing die Regel „gleicher Stand, kein Bau“ am `schedule`-Ereignis; nach dem Wechsel auf den Wecker-Dispatch hätte jede Stunde ein voller Bau samt Deploy gestartet.
+Wer `schedule` (oder einen anderen Auslöser) streicht oder ersetzt, sucht alle `github.event_name`-Bedingungen im Workflow ab. Im Nativ-Repo hing die Regel „gleicher Stand, kein Bau“ am `schedule`-Ereignis; nach dem Wechsel auf den Wecker-Dispatch hätte jede Stunde ein voller Bau samt Deploy gestartet. Vorher auch die Actions-Policies des Repos lesen (`gh api repos/<r>/actions/policies`): Eine Regel `restrict_action_events` für den Pfad lässt nur ihre Ereignisse zu, jeder andere Start endet als `startup_failure` ohne Jobs (21.11.2026, Prüfer nach PR 4495). Die Policy-Änderung gehört als E-Zeile vor den Merge.
 
 ## Takt eines Sammlers erhöhen: gemeinsame Dateien und Statusanzeige zuerst (27.10.2026)
 

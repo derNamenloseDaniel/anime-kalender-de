@@ -49,8 +49,8 @@ function zuweisungImCallback(node) {
 
 /** Je Argument ein Mutant: Argument samt einem Komma weg (folgendes, sonst vorangehendes). */
 function argumentEntfernt(node) {
-  if (!(ts.isCallExpression(node) || ts.isNewExpression(node)) || !node.arguments?.length) return []
-  const args = node.arguments
+  if (!(ts.isCallExpression(node) || ts.isNewExpression(node))) return []
+  const args = node.arguments ?? []
   const callee = node.expression.getText()
   return args.map((a, i) => {
     const [von, bis] = i + 1 < args.length ? [a.getStart(), args[i + 1].getStart()] : [i > 0 ? args[i - 1].end : a.getStart(), a.end]

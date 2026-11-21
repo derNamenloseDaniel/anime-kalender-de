@@ -80,6 +80,9 @@ pruefe('Name trägt Datei:Zeile und Art', m0.name === 'a.mjs:1 && → ||')
 pruefe('Läuferformat: datei, suche, ersetze, zeile, tests', m0.aenderungen[0].datei === 'a.mjs' && m0.aenderungen[0].zeile === 1 && m0.tests[0] === 't')
 const zwei = mutantenListe('a.mjs', 'x = f(a, b) && f(a, b)', new Set([1]), ['t']).filter((m) => m.name.includes('Argumente'))
 pruefe('gleicher Text zweimal auf der Zeile: erstes nr 1, zweites nr 2', zwei.length === 2 && zwei[0].aenderungen[0].nr === 1 && zwei[1].aenderungen[0].nr === 2)
+// feste Klassen laufen über mutantenListe mit (Verdrahtung; die Klassen selbst prüft diff-mutanten-klassen.test.mjs)
+const klassen = namen('x = { a: 1 }\ny = f(b, c)')
+pruefe('feste Klassen: Objekt-Eigenschaft und Aufrufort-Parameter kommen mit den Standardmutanten', klassen.includes('a.mjs:1 Objekt-Eigenschaft entfernt a') && klassen.includes('a.mjs:2 Parameter am Aufrufort entfernt f (1. von 2)') && klassen.includes('a.mjs:2 Argumente getauscht f'))
 pruefe('ohne tests: Feld fehlt', !('tests' in mutantenListe('a.mjs', 'x = a && b', new Set([1]))[0]))
 
 // Diff lesen

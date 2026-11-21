@@ -47,6 +47,8 @@ const KL = 'Zuweisung im Callback entfernt'
 pruefe(`${Z}: Anweisung im Block`, gleich(mutiert('xs.forEach((x) => { gesamt += x })', KL), ['xs.forEach((x) => { void 0 })']))
 pruefe(`${Z}: Eigenschaftszuweisung im function-Callback`, gleich(mutiert('p.then(function (r) { o.wert = r })', KL), ['p.then(function (r) { void 0 })']))
 pruefe(`${Z}: knapper Pfeilkörper`, gleich(mutiert('xs.map((x) => (n = x))', KL), ['xs.map((x) => (void 0))']))
+pruefe(`${Z}: erste und letzte Zuweisungsart (= und ^=)`, mutiert('xs.forEach((x) => { n ^= x })', KL).length === 1 && mutiert('xs.forEach((x) => { n = x })', KL).length === 1)
+pruefe(`${Z}: Vergleich und Zählen sind keine Zuweisung`, mutiert('xs.forEach((x) => { n === x\n n++ })', KL).length === 0)
 pruefe(`${Z}: Zuweisung außerhalb eines Callbacks bleibt`, mutiert('let n\nn = 1\nfunction f() { n = 2 }', KL).length === 0)
 pruefe(`${Z}: Funktion, die nicht Argument ist, bleibt`, mutiert('const f = () => { n = 2 }\nconst g = function () { m = 3 }', KL).length === 0)
 pruefe(`${Z}: Zuweisung im Ausdruck (Wert genutzt) bleibt`, mutiert('xs.forEach((x) => { const r = (n = x) })', KL).length === 0)

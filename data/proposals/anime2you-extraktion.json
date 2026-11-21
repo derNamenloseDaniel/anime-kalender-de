@@ -2058,6 +2058,10 @@
     "1074258": {
       "am": "2026-11-21",
       "vorschlaege": 1
+    },
+    "1074274": {
+      "am": "2026-11-21",
+      "vorschlaege": 1
     }
   },
   "vorschlaege": [
@@ -16165,6 +16169,27 @@
       "artikelId": "1073204",
       "artikel": "»To Be Hero X« erscheint als Komplettbox auf Blu-ray",
       "quelle": "https://www.anime2you.de/news/1073204/to-be-hero-x-blu-ray-komplettbox/",
+      "veroeffentlicht": "2026-11-21",
+      "gelesenAm": "2026-11-21"
+    },
+    {
+      "titel": "Tank Chair",
+      "zitat": "»Tank Chair« umfasst demnach insgesamt zwölf Episoden, die seit dem 4. Oktober 2026 im japanischen Fernsehen laufen und hierzulande auf Deutsch sowie im Originalton mit Untertiteln bei Prime Video im Simulcast zu sehen sind.",
+      "art": "sprachfassung",
+      "sprache": "deutsch+omu",
+      "plattform": "primevideo",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Prime Video",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "zwölf",
+      "unsicher": "Das Datum 4. Oktober 2026 im Zitat gehört zur japanischen TV-Ausstrahlung; ob der deutsche Prime-Video-Simulcast ab demselben Tag läuft, sagt der Artikel nicht ausdrücklich.",
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1074274",
+      "artikel": "Episodenanzahl des Action-Anime »Tank Chair« steht fest",
+      "quelle": "https://www.anime2you.de/news/1074274/tank-chair-episodenanzahl/",
       "veroeffentlicht": "2026-11-21",
       "gelesenAm": "2026-11-21"
     }

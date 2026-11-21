@@ -13,7 +13,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { ghApiJsonMitLimit } from './gh-ratelimit.mjs'
 
-export const NACHTRAG = /^\s*(\*\*|#+ *)?(Nachtrag|Nachbesserung)/i
+export const NACHTRAG = /^\s*(\*\*|#+ *)?(Nachtrag|Nachträge|Nachbesserung)/i
 // Frühere Prüferrunden: Agent-Kommentare „Prüfer Runde N“ und das CI-Protokoll (Bot), damit der Prüfer seine Auflagen einlösen kann.
 export const PRUEFER_RUNDE = /^\s*(\*\*|#+ *)?Prüfer Runde/i
 const CI_PROTOKOLL = /\*\*Prüfer-Review\*\* für/

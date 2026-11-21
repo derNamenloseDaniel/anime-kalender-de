@@ -13,7 +13,7 @@ import { melde } from './lib/quarantaene.ts'
 const lies = <T>(pfad: string): T | undefined => (existsSync(pfad) ? (JSON.parse(readFileSync(pfad, 'utf8')) as T) : undefined)
 const wiki = lies<{ titel: Record<string, { folgen: { st?: number }[] }> }>('data/wikipedia-folgen.json')?.titel ?? {}
 const toggo = lies<{ titel: Record<string, { folgen: { staffel: number; folge: number }[] }> }>('data/toggo.json')?.titel ?? {}
-const zaehlung = lies<Record<string, [number, number]>>('public/data/folgen/zaehlung.json') ?? {}
+const zaehlung = lies<Record<string, [number, number, 1?]>>('public/data/folgen/zaehlung.json') ?? {}
 
 let fehler = 0
 function fehlt(id: number, text: string): void {
@@ -42,6 +42,9 @@ for (const g of ladeStaffelGrenzen(HORIZONTE_STAFFELN)) {
   else if ((detail.s?.length ?? 0) !== g.staffeln.length) fehlt(id, `Detaildatei trägt ${detail.s?.length ?? 0} Staffeln, die Datei ${g.staffeln.length}`)
   const letzte = letzteFolgen([g]).get(id)!
   if ((zaehlung[id]?.[0] ?? 0) < letzte) fehlt(id, `Kopfzählung ${zaehlung[id]?.[0]} Folgen, belegt sind ${letzte}`)
+  /* Offene letzte Staffel: der Kopf darf kein „N von N“ zeigen (21.11.2026: „137 von 137“, Staffel 4 lief erst an). */
+  const offen = g.staffeln[g.staffeln.length - 1]!.offen === true
+  if (offen !== (zaehlung[id]?.[2] === 1)) fehlt(id, `Kopfzählung ${offen ? 'ohne' : 'mit'} Kennzeichen „Staffel offen“, die Datei sagt ${offen ? 'offen' : 'abgeschlossen'}`)
 }
 if (fehler) process.exit(1)
 console.log('check-horizonte-staffeln-bestand: ok')

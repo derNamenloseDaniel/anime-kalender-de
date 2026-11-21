@@ -9,6 +9,7 @@ import {
   deFolgenZahlText,
   deSeitQuelleSchluessel,
   kopfSchluesselOhneBeleg,
+  type FolgenZaehlung,
 } from './antwort-regeln.ts'
 import { istAusgeblieben } from '@shared/logic.ts'
 import { ausgebliebenTerminText, faelligText, widerlegtTexte } from './kasten-texte.ts'
@@ -112,7 +113,7 @@ type KopfEingabe = {
   betont: (text: string) => ReactNode
   ohneSprachbeleg: boolean | 'omu' | 'anbieter' | undefined
   releases: Release[]
-  folgenZahl: [number, number] | undefined
+  folgenZahl: FolgenZaehlung | undefined
   deSeitNeben: string
   title: Title
 }

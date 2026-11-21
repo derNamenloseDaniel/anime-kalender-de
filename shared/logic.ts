@@ -332,6 +332,14 @@ function gesamtzahl(s: NonNullable<Release['schedule']>, letzte: number): { epis
   return s.episodeCountNurGesichtet ? {} : { episodeCount: letzte }
 }
 
+/**
+ * Ein Stapel mit genau einer Folge und belegter Folgennummer ist eine Folge, keine Staffel: der Termin trägt die Nummer statt „1 Folge“
+ * (Horizonte Staffel 4 bei RTL+ stand als „Neu bei RTL+“ ohne Folge im Kalender, 21.11.2026). Ein Takt folgt daraus nicht.
+ */
+function stapelFolgen(art: Release['releaseType'], s: NonNullable<Release['schedule']>): { episode?: number; episodeCount?: number } {
+  return art === 'batch' && s.episodeCount === 1 && s.firstEpisodeNumber ? { episode: s.firstEpisodeNumber } : { episodeCount: s.episodeCount }
+}
+
 function termineAusPlan(release: Release): ReleaseEvent[] {
   const s = release.schedule
   if (!s?.firstEpisodeDate || release.widerlegt) return []
@@ -354,7 +362,7 @@ function termineAusPlan(release: Release): ReleaseEvent[] {
         ...base,
         id: `${release.slug}@${s.firstEpisodeDate}`,
         date: s.firstEpisodeDate,
-        episodeCount: s.episodeCount,
+        ...stapelFolgen(release.releaseType, s),
       },
     ]
   }

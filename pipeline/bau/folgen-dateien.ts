@@ -14,7 +14,8 @@
  * Folgen mit belegter deutscher Synchro: die belegten Bereiche der Wege (`dubRanges` mit `dub: true`) und die Folgen,
  * die laut deutscher Wikipedia-Episodenliste schon im deutschen Fernsehen liefen. `h` sind Handhinweise je Folge
  * (`data/folgen-hinweise.yaml`, z. B. „nie in Deutschland ausgestrahlt"). `zaehlung.json` führt je Titel `[alle, deutsche]`
- * für die Überschrift des Antwortkastens, wo AniList keine Folgenzahl kennt (One Piece). `s` sind die deutschen Staffelgrenzen
+ * für die Überschrift des Antwortkastens, wo AniList keine Folgenzahl kennt (One Piece); eine dritte Stelle `1` heißt „letzte
+ * Staffel offen“, dann ist `alle` keine Gesamtzahl. `s` sind die deutschen Staffelgrenzen
  * innerhalb des Titels, `[[Staffel, von, bis], …]` (nur Pokémon, `data/curated/pokemon-staffeln.yaml`).
  */
 import type { Release, Title } from '../../shared/types.ts'
@@ -31,7 +32,7 @@ import { englischeTitel, ohneEnglischeTitel } from './folgentitel-englisch.ts'
 import { folgenZeilen } from './folgentitel-zeilen.ts'
 import { eineZeileJeNummer } from './folgen-nummern.ts'
 import { ohneWikiVersatz } from './folgen-wiki-versatz.ts'
-import { ladeStaffelGrenzen, letzteFolgen, mitStapelFolgen, staffelFeld, staffelListen, zaehleFolgen } from '../lib/pokemon-staffeln.ts'
+import { ladeStaffelGrenzen, letzteFolgen, mitStapelFolgen, offeneStaffeln, staffelFeld, staffelListen, zaehleFolgen } from '../lib/pokemon-staffeln.ts'
 
 interface Folge {
   nr: number
@@ -116,12 +117,13 @@ export function schreibeFolgenDateien(titel: Title[], releases: Release[]): void
   const grenzen = ladeStaffelGrenzen()
   const staffeln = staffelListen(grenzen)
   const letzte = letzteFolgen(grenzen)
+  const offen = offeneStaffeln(grenzen)
   const releasesJeTitel = new Map<number, Release[]>()
   for (const r of releases) releasesJeTitel.set(r.titleId, [...(releasesJeTitel.get(r.titleId) ?? []), r])
   const ordner = `${OUT}/folgen`
   clearDir(ordner)
   const index: number[] = []
-  const zaehlung: Record<number, [number, number]> = {}
+  const zaehlung: Record<number, [number, number] | [number, number, 1]> = {}
   let folgenGesamt = 0
   let verschmolzen = 0
   for (const t of titel) {
@@ -137,7 +139,8 @@ export function schreibeFolgenDateien(titel: Title[], releases: Release[]): void
     const deWege = deutscheFolgen(t, wikiFolgen, heute, Math.max(...f.map((x) => x.nr)), hoechsteFolgeJeAnbieter(releasesJeTitel.get(t.id) ?? [], heute), versetzt)
     /* Titel mit Staffelgrenzen: erschienene Stapel-Termine mit Folgennummer zählen deutsch (Horizonte Staffel 4). */
     const de = letzte.has(t.id) ? mitStapelFolgen(deWege, releasesJeTitel.get(t.id) ?? [], heute) : deWege
-    zaehlung[t.id] = zaehleFolgen(f.map((x) => x.nr), de, letzte.get(t.id))
+    const z = zaehleFolgen(f.map((x) => x.nr), de, letzte.get(t.id))
+    zaehlung[t.id] = offen.has(t.id) ? [...z, 1] : z
     writeJson(`${ordner}/${t.id}.json`, {
       f: folgenZeilen(f, einheitlich),
       de,

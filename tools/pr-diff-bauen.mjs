@@ -19,10 +19,15 @@
  * Bleibt auch das leer oder schlägt fehl, gilt weiter „nicht lieferbar" (fail closed).
  * Gesamtgrenze (25.10.2026): Würde der Diff GRENZE_GESAMT überschreiten, werden zusätzlich stubbare Dateien (dieselbe Positivliste, nie
  * NIE_STUB, nie Code/Doku) gestubbt, größte zuerst, bis der Rest passt (PR 1944: 90 Erzeugnis-Diffs je < 50 KB rissen die Grenze).
+ * Gelöschte Dateien (21.11.2026, PRs 4417/4472: Lösch-PRs rissen die Grenze, der Prüfer musste „aendern" urteilen): Bleibt der Diff nach dem
+ * Stubben über GRENZE_GESAMT, wandern gelöschte Dateien (größte zuerst, nur so viele wie nötig) mit vollem Patch in `geloescht.diff` neben
+ * pr.diff; in pr.diff bleibt je Datei Kopf plus Hinweiszeile. Der Inhalt geht so nicht verloren, steht nur nicht im Hauptdiff. Dateien mit
+ * Steuerzeichen im Pfad und NIE_STUB bleiben in pr.diff. `ok` setzt voraus, dass auch geloescht.diff höchstens GRENZE_GESAMT Byte hat.
  * Ist der Rest über GRENZE_GESAMT Byte, fehlt der Diff einer nicht stubbaren Datei oder die Liste ist leer, ist der Zustand `unvollstaendig`.
  */
 import { spawnSync } from 'node:child_process'
-import { readFileSync, writeFileSync } from 'node:fs'
+import { readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 export const GRENZE_STUB = 50000
@@ -168,12 +173,35 @@ function stubbeBisPasst(sicher, teile, quellen, inhalt) {
   }
 }
 
-/** Eingabe: Dateiobjekte der API und die Datenläufe-Liste (ladeQuellen). Ausgabe: { diff, zustand, gestubbt[] }. */
+const hinweisZeile = (d) => `${kopf(d)}\nGelöschte Datei ${d.filename} (-${d.deletions ?? 0} Zeilen): voller Inhalt in geloescht.diff`
+
+/** Gesamtdiff noch über der Grenze: gelöschte, lieferbare Abschnitte größte zuerst nach `geloescht` verschieben (Hinweiszeile bleibt in `teile`). */
+function verschiebeGeloeschte(sicher, teile, geloescht) {
+  let summe = Buffer.byteLength(teile.map((t) => t.text).join('\n') + '\n')
+  const kandidaten = sicher
+    .map((d, i) => ({ d, i, laenge: Buffer.byteLength(teile[i].text) }))
+    .filter(({ d, i }) => d.status === 'removed' && !d.steuer && !NIE_STUB.test(d.filename) && !teile[i].gestubbt)
+    .sort((a, b) => b.laenge - a.laenge)
+  for (const { d, i, laenge } of kandidaten) {
+    const hinweis = hinweisZeile(d)
+    const ersparnis = laenge - Buffer.byteLength(hinweis)
+    if (summe <= GRENZE_GESAMT || ersparnis <= 0) break
+    geloescht.push(teile[i].text)
+    summe -= ersparnis
+    // „nicht lieferbar“ ist kürzer als der Hinweis und wird nie verschoben; `fehlt` bliebe ohnehin erhalten.
+    teile[i] = { text: hinweis, gestubbt: false, fehlt: teile[i].fehlt, verschoben: d.filename }
+  }
+}
+
+/** Eingabe: Dateiobjekte der API und die Datenläufe-Liste (ladeQuellen). Ausgabe: { diff, zustand, gestubbt[], geloescht, verschoben[] }. */
 export function baueDiff(dateien, quellen, gitDiff = () => null, inhalt = () => null) {
   const steuer = (d) => STEUERZEICHEN.test(d.filename) || STEUERZEICHEN.test(d.previous_filename ?? '')
   const sicher = dateien.map((d) => ({ ...d, filename: maskiere(d.filename), previous_filename: maskiere(d.previous_filename), steuer: steuer(d) }))
   const teile = sicher.map((d) => abschnitt(d, quellen, gitDiff, inhalt))
   stubbeBisPasst(sicher, teile, quellen, inhalt)
+  const abschnitte = []
+  verschiebeGeloeschte(sicher, teile, abschnitte)
+  let geloescht = abschnitte.length > 0 ? abschnitte.join('\n') + '\n' : ''
   let diff = teile.map((t) => t.text).join('\n') + '\n'
   let zustand = 'ok'
   if (dateien.length === 0 || dateien.length >= API_MAXIMUM || teile.some((t) => t.fehlt)) zustand = 'unvollstaendig'
@@ -181,17 +209,26 @@ export function baueDiff(dateien, quellen, gitDiff = () => null, inhalt = () => 
     zustand = 'unvollstaendig'
     diff = Buffer.from(diff).subarray(0, GRENZE_GESAMT).toString()
   }
+  if (Buffer.byteLength(geloescht) > GRENZE_GESAMT) {
+    zustand = 'unvollstaendig'
+    geloescht = Buffer.from(geloescht).subarray(0, GRENZE_GESAMT).toString()
+  }
   const gestubbt = sicher.filter((_, i) => teile[i].gestubbt).map((d) => d.filename)
-  return { diff, zustand, gestubbt }
+  const verschoben = teile.flatMap((t) => (t.verschoben ? [t.verschoben] : []))
+  return { diff, zustand, gestubbt, geloescht, verschoben }
 }
 
 function main() {
   const [eingabe, ausgabe, basis, kopf] = process.argv.slice(2)
   const zeilen = readFileSync(eingabe, 'utf8').split('\n').filter((z) => z.trim() !== '')
   const quellen = ladeQuellen(readFileSync(new URL('./quellen-liste.sh', import.meta.url), 'utf8'))
-  const { diff, zustand, gestubbt } = baueDiff(zeilen.map((z) => JSON.parse(z)), quellen, gitDiffRunner(basis, kopf), gitInhaltRunner(kopf))
+  const { diff, zustand, gestubbt, geloescht, verschoben } = baueDiff(zeilen.map((z) => JSON.parse(z)), quellen, gitDiffRunner(basis, kopf), gitInhaltRunner(kopf))
   writeFileSync(ausgabe, diff)
+  const geloeschtPfad = join(dirname(ausgabe), 'geloescht.diff')
+  if (geloescht) writeFileSync(geloeschtPfad, geloescht)
+  else rmSync(geloeschtPfad, { force: true })
   for (const pfad of gestubbt) console.error(`gestubbt: ${pfad}`)
+  for (const pfad of verschoben) console.error(`nach geloescht.diff verschoben: ${pfad}`)
   console.log(zustand)
 }
 

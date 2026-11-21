@@ -27,12 +27,17 @@ description: "Bei „ende“, „zum ende kommen“, „feierabend“, „nichts
 1. **Bestand aufnehmen:** `ListAgents`/Aufgabenliste (wer läuft noch, woran), `CronList` (sitzungsgebundene Termine), `node C:/code/ai/__assets/tools/prozess-register.mjs aufraeumen --still` und `list`.
 2. **Eigene Hintergrundbefehle** ohne Zweck beenden; nur die lassen, deren Ergebnis noch gebraucht wird.
 3. **Lagebuch `.claude/dirigent/lage.md` und `stand.md` nachführen** (Skill `daniel-dateien-pflegen`): In-Arbeit-Kopf mit Uhrzeit und „Ende“, jede laufende Sache mit ihrem nächsten Schritt, Auflagen offener Runden, Termine als 📅-Zeile. Lehren aus den letzten Berichten verankern (bauer.md, pruefer.md, Skills).
-4. **Übergabe schreiben:** Memory `project-uebergabe.md` überschreiben (nicht ergänzen), Zeile in `MEMORY.md` mitziehen. Inhalt:
+4. **Übergabe an das Nacht-Orchester** (Daniel, 21.11.2026: „übergabe an nacht orchester – wie gestern“). Was über Nacht weiterlaufen soll, bekommt das Cloud-Orchester (Issue 4420, Routine `nacht-orchester`, Label `orchester-aktiv`; Grundauftrag und Rollen stehen im Issue), nicht die lokale Sitzung:
+   - Vorher prüfen, dass Label und Routine aktiv sind (`gh issue view 4420 --json labels`; Routine per `RemoteTrigger get`). Fehlt eins, einschalten.
+   - Ein Kommentar `## Ergänzung (Nacht <Datum>, Übergabe Dirigent <HH:MM>) — ersetzt nichts` per `--body-file`. Die Aufgabenliste des letzten Nachtrags gilt weiter, die Ergänzung ändert sie nie. Inhalt: **A. Angefangenes zuerst.** Je offener PR die Nummer und der Kopf, der Stand (abgenommen, Nachbesserung läuft, Kette rot), die Kommentarkennung der Auflagenliste, wer mergt (Nacht-Merger mit Nachtrag zum Kopf, siehe `tools/nacht-merger-wahl.mjs`) und die Lehre, die nach dem Merge anzuhängen ist. Dazu jeder laufende Cloud-Auftrag mit Name und dem, was er liefert. **B. Neue Aufgaben**, fortlaufend nummeriert, jede mit Pfad und Zeile aus einer Werkzeugausgabe und dem Test, der rot sein muss. **Nicht anfassen:** offene F-Fragen an Daniel.
+   - Auch eine bereits abgenommene PR, die nur noch auf CI wartet, gehört in A. Der Nacht-Merger nimmt sie mit; die lokale Merge-Wache wird beendet.
+   - Lokal Gebundenes (Meldungskopie, Worker-Deploy, Edge, Mods) kommt nicht in den Kommentar, sondern als Zeile in `stand.md`.
+5. **Übergabe schreiben:** Memory `project-uebergabe.md` überschreiben (nicht ergänzen), Zeile in `MEMORY.md` mitziehen. Inhalt:
    - Stand mit Datum und Uhrzeit, Daniels Wortlaut, Modus (autonom aus, Ruhemodus);
    - **was noch läuft und was bei welchem Ergebnis zu tun ist** („frei“ → mergen, „ändern“ → Auflagen eintragen);
    - Warteschlange in Reihenfolge (Verweis auf `stand.md`, nicht kopieren);
    - feste Termine und Crons, die nur in dieser Sitzung leben, samt Ersatzweg, falls die Sitzung endet.
-5. **Antwort an Daniel**, drei, vier Sätze: was noch läuft und was ich damit tue, wann der nächste Termin ist. Kein Footer, keine Liste des Erledigten.
+6. **Antwort an Daniel**, drei, vier Sätze: was noch läuft und was ich damit tue, wann der nächste Termin ist. Kein Footer, keine Liste des Erledigten.
 
 ## Danach, bis alles still ist
 

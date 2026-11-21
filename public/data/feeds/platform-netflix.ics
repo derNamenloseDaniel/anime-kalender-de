@@ -10,19 +10,6 @@ X-WR-TIMEZONE:Europe/Berlin
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:das-band-der-unterwelt-netflix@2026-11-14@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261114
-DTEND;VALUE=DATE:20261115
-SUMMARY:Das Band der Unterwelt – Folge 20/24 (neu bei Netflix)
-DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nAuf D
- eutsch zuerst bei Crunchyroll erschienen (12.09.2026).\nUhrzeit noch nicht
-  bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, sonde
- rn aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anime-
- kalender.de/t/16919/
-CATEGORIES:Netflix
-END:VEVENT
-BEGIN:VEVENT
 UID:auto-189123-netflix@2026-11-15@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261115

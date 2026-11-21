@@ -46,8 +46,8 @@ try {
   const luecken = new Map<string, number>()
   pruefe('zwei Genres, ohne Doppelte', JSON.stringify(genresAusAnisearch(['Actionkomödie', 'Komödie'], luecken)) === '["Action","Comedy"]')
   pruefe('ohne g → keins', genresAusAnisearch(undefined, luecken).length === 0)
-  genresAusAnisearch(['Ganbatte', 'Neu'], luecken)
-  genresAusAnisearch(['Ganbatte', 'Romanze'], luecken)
+  genresAusAnisearch(['Neu', 'Ganbatte'], luecken)
+  genresAusAnisearch(['Romanze', 'Ganbatte'], luecken)
   pruefe('Lücken je Name gezählt, häufigste zuerst', genreLueckenText(luecken) === 'aniSearch-Genre ohne Zuordnung: Ganbatte ×2, Neu ×1', genreLueckenText(luecken))
   pruefe('ohne Lücke: eigener Text', genreLueckenText(new Map()) === 'jedes aniSearch-Genre zugeordnet')
 } catch (fehler) {

@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-21T19:01:53.602Z",
+  "scrapedAt": "2026-11-21T23:01:50.391Z",
   "verworfen": {
     "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 7,
@@ -460,7 +460,7 @@
         }
       ],
       "dub": "unklar",
-      "alreadyCurated": false,
+      "alreadyCurated": true,
       "sammel": [
         {
           "titel": "STEEL BALL RUN: JoJo’s Bizarre Adventure",
@@ -3345,7 +3345,7 @@
         }
       ],
       "dub": "unklar",
-      "alreadyCurated": false,
+      "alreadyCurated": true,
       "sammel": [
         {
           "titel": "Der Held ohne Klasse: Der Aufstieg eines Talentlosen",

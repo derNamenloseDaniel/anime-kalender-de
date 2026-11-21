@@ -1,6 +1,6 @@
 /**
  * Ausweg aus der Patch-Notes-Prüfung per PR-Kommentar. Beschreibungen werden nie geändert; trifft die Textsuche
- * (`VERTAGUNG_IM_TEXT`) einen Satz der Beschreibung falsch (z. B. eine Messung „der nächste Bau zeigt sie“), hätte der PR sonst keinen Weg.
+ * (`VERTAGUNG_IM_GRUND`) die Zeile falsch (z. B. eine Messung „der nächste Bau zeigt sie“), hätte der PR sonst keinen Weg.
  * Ein Kommentar von PR-Autor oder Repo-Berechtigten mit einer Zeile „Patch Notes: …“ ersetzt die Beschreibung für diese Prüfung
  * (der neueste Kommentar gewinnt); dann wird der Text der Beschreibung nicht mehr abgesucht, nur die Zeile selbst gilt.
  */

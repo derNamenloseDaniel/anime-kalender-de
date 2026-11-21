@@ -3,7 +3,8 @@
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { MARKE_OHNE_MODELL, hatUrteil, prueferZeilen, pruefpflichtig } from './pruefer-unfertig-wache.mjs'
+import { MARKE_OHNE_MODELL, hatUrteil, prueferZeilen } from './pruefer-unfertig-wache.mjs'
+import { pruefpflichtig } from './pr-pruefer-start.mjs'
 
 const BOT = 'github-actions[bot]'
 const KOPF = 'c'.repeat(40)

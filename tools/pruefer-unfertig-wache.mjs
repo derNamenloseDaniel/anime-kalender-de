@@ -4,14 +4,14 @@
  * still ohne Urteil: Diese Wache meldet jeden offenen, prüfpflichtigen PR, dessen Kopf seit mehr als 60 min kein Prüfer-Urteil hat.
  * „Basis offen“ gilt als Urteil (der Prüfer wartet dort gewollt auf den Basis-Merge).
  */
+import { pruefpflichtig } from './pr-pruefer-start.mjs'
+
 export const OHNE_URTEIL_MIN = 60
 
 const BOT = 'github-actions[bot]'
 /** Steht im Kommentar eines Prüfer-Laufs, der bei laufender Kette ohne Modell endete (bis 19.11.2026 kommentiert, pr-pruefer.yml): kein Urteil. */
 export const MARKE_OHNE_MODELL = '<!-- pruefer-ohne-modell -->'
 const URTEIL = /^\*\*Prüfer-Review\*\* für (\S+) - Urteil: \*\*(.*)\*\*/
-// Zweige, für die pr-pruefer.yml gar nicht läuft (Job-Bedingung `pruefen`).
-const OHNE_PRUEFER = (ref) => ref.startsWith('daten/') || ref === 'zug-fahrt' || ref === 'zug-probe'
 
 /** Hat der Kopf ein Prüfer-Urteil? „nicht beurteilt“ (Kette lief noch, Diff unvollständig) zählt nicht, „Basis offen“ schon. */
 export function hatUrteil(kommentare, kopf) {
@@ -21,11 +21,6 @@ export function hatUrteil(kommentare, kopf) {
     if (!treffer || treffer[1] !== kopf.slice(0, 9)) return false
     return !treffer[2].startsWith('nicht beurteilt') || treffer[2].includes('Basis offen')
   })
-}
-
-/** Offene PRs, für die der Prüfer laufen müsste: kein Entwurf, kein Fork, kein Datenzweig, Basis main oder zug. */
-export function pruefpflichtig(pulls) {
-  return pulls.filter((p) => !p.draft && p.state === 'open' && p.head?.repo?.full_name === p.base?.repo?.full_name && ['main', 'zug'].includes(p.base?.ref) && !OHNE_PRUEFER(String(p.head?.ref ?? '')))
 }
 
 /** Minuten seit dem Push des Kopfes (frühester Prüfer-Lauf, sonst Commit-Datum) und ob der neueste Lauf noch läuft: `{ alter, laeuft }`. */

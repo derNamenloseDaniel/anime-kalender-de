@@ -7,6 +7,7 @@
  *   vorab <id> --register <pfad>
  *   eintragen <id> --routine <trig_id> --register <pfad> [--vorrat <datei.md>] [--pr <n>]  (--pr: Nachbesserung an bestehendem PR; gilt als fertig, sobald er gemergt/geschlossen ist)
  *   uebersicht --register <pfad> [--runs <runs.json>] [--json]
+ *   Ein Eintrag mit `ende` (ISO-Zeit) gilt als fertig, auch ohne PR.
  *   kontingent
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
@@ -26,6 +27,8 @@ const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 /** PR, dessen Beschreibung die Zeile `Auftrag: <id>` trägt (die Zeile darf weitere Teile hinter ` · ` haben). */
 export const traegtAuftrag = (pr, id) => new RegExp(`^\\s*Auftrag:\\s*${esc(id)}(?=\\s|·|$)`, 'm').test(pr.beschreibung ?? '')
 const erledigt = (pr) => pr !== undefined && !pr.offen
+/** Fertig: PR gemergt/geschlossen, oder `ende` gesetzt (Auftrag ohne eigenen PR, z. B. Analyse oder Orchester; sonst zählt er für immer als aktiv). */
+const eintragFertig = (prs, e) => e.ende !== undefined || erledigt(prDesEintrags(prs, e))
 
 /** PR eines Register-Eintrags: bei `pr` (Nachbesserung an bestehendem PR, ohne eigene Auftragszeile) genau dieser, sonst über die Zeile `Auftrag: <id>`. */
 export const prDesEintrags = (prs, e) => (e.pr === undefined ? prZuAuftrag(prs, e.id) : prs.find((p) => p.nummer === e.pr))
@@ -73,11 +76,11 @@ export const kontingentZeile = (k) => `Kontingent: ${k.offen}/${k.grenze} (Durch
 /** Darf der Auftrag starten? { ok, grund } nach den vier Regeln a–d; die erste Abweisung zählt. */
 export function vorabUrteil(id, register, prs, kontingent) {
   const eintrag = register.find((e) => e.id === id)
-  if (eintrag && !erledigt(prDesEintrags(prs, eintrag))) return { ok: false, grund: `${id} steht im Register und sein PR ist weder gemergt noch geschlossen` }
+  if (eintrag && !eintragFertig(prs, eintrag)) return { ok: false, grund: `${id} steht im Register und sein PR ist weder gemergt noch geschlossen` }
   const offener = prs.find((p) => p.offen && traegtAuftrag(p, id))
   if (offener) return { ok: false, grund: `offener PR #${offener.nummer} trägt „Auftrag: ${id}“` }
   if (kontingent.voll) return { ok: false, grund: kontingentZeile(kontingent) }
-  const aktiv = register.filter((e) => !erledigt(prDesEintrags(prs, e))).length
+  const aktiv = register.filter((e) => !eintragFertig(prs, e)).length
   if (aktiv >= AKTIV_HOECHSTENS) return { ok: false, grund: `${aktiv} aktive Cloud-Sitzungen im Register (höchstens ${AKTIV_HOECHSTENS - 1} plus der neue)` }
   return { ok: true, grund: 'darf starten' }
 }
@@ -113,7 +116,7 @@ export function sitzungVon(lauf, hatPr, startMs, jetztMs) {
 /** Eine Zeile je Eintrag als Objekt; `pruefstand(nummer)` liefert { kette, kandidat, grund } oder wirft. */
 export function eintragStand(eintrag, prs, runs, pruefstand, jetztMs, letzterCommit) {
   const pr = prDesEintrags(prs, eintrag)
-  if (erledigt(pr)) return { id: eintrag.id, fertig: true, pr: pr.nummer }
+  if (eintragFertig(prs, eintrag)) return { id: eintrag.id, fertig: true, pr: pr?.nummer ?? null }
   const sitzung = sitzungVon(letzterEvent(runs?.[eintrag.routine]), pr !== undefined, Date.parse(eintrag.start), jetztMs)
   const stand = { id: eintrag.id, fertig: false, start: eintrag.start, pr: pr?.nummer ?? null, commit: null, kette: null, kandidat: null, grund: null, sitzung: sitzung.zustand, alarm: sitzung.alarm }
   if (pr === undefined) return stand

@@ -53,7 +53,9 @@
 # Black Clover Staffel 2, deutsche Fassung: Crunchyrolls Katalog (Abruf 07.11.2026, `data/crunchyroll-dub.json`, Staffel „GS00385471JAJP“)
 # führt Folge 171 (durchlaufend gezählt, Folge 1 der Staffel) mit deutscher Tonspur, `verfuegbarAb` 07.11.2026 16:00 UTC. Der OmU-Eintrag oben bleibt
 # (Start 03.10.2026, Untertitel); ohne diesen zweiten Eintrag trug der Weg „deutsch", während jeder Termin „nur OmU" sagte (Bau 42389332341).
-# Der Wochentakt der Synchro ist mit einer Folge nicht messbar, deshalb keine Folgenzahl, keine Uhrzeit und kein `lastEpisodeDate`.
+# Folgen 172/173 (Folge 2/3 der Staffel) laut Katalog ab 14.11./21.11.2026 16:00 UTC. Keine Folgenzahl und kein `lastEpisodeDate` (nicht belegt).
+# Regeltermin 17:00: Folge 173 fehlte im CR-Lauf um 16:02 (`data/crunchyroll-neu.json` geholtAm 15:02:28Z, Commit ebb45dcb8) und war um 17:01
+# da (16:01:21Z, fdbf8e03a); Fenster unter 60 min gilt als belegt, daher ohne ≈. Deckt sich mit `verfuegbarAb` 16:00 UTC aller drei Folgen.
 - slug: black-clover-s2-crunchyroll-synchro
   anilistId: 195604
   titleDe: "Black Clover – Staffel 2"
@@ -61,9 +63,17 @@
   releaseType: weekly
   schedule:
     firstEpisodeDate: "2026-11-07"
+    time: "17:00"
+    timeSighting:
+      notSeen: "16:02"
+      seen: "17:01"
+      date: "2026-11-21"
+      source: Crunchyroll-Katalogabruf (stündlicher Lauf)
     observed:
       1: "2026-11-07"
-  note: "Die deutsche Synchro läuft bei Crunchyroll seit dem 07.11.2026 (Folge 171, Folge 1 der Staffel); der Katalog nennt bisher nur diese eine deutsche Folge. Die Folgen mit Untertiteln laufen seit dem 03.10.2026."
+      2: "2026-11-14"
+      3: "2026-11-21"
+  note: "Die deutsche Synchro läuft bei Crunchyroll seit dem 07.11.2026 (Folge 171, Folge 1 der Staffel), samstags eine neue Folge. Die Folgen mit Untertiteln laufen seit dem 03.10.2026."
   sources:
     - https://www.crunchyroll.com/de/series/GRE50KV36
     - https://www.crunchyroll.com/de/news/seasonal-lineup/2026/9/15/crunchyroll-deutsche-synchros-herbst-2026

@@ -5,7 +5,7 @@
  *
  * Aufruf: npx tsx pipeline/check-anisearch-genres.ts
  */
-import { ergaenzeAnisearchTitel } from './bau/anisearch-titel.ts'
+import { alle, ergaenzeAnisearchTitel, traegerJeSeite } from './bau/anisearch-titel.ts'
 import { kompakt } from './fetch-anisearch-eintraege.ts'
 import { GENRE_DE } from '../shared/mappings.ts'
 import type { Title } from '../shared/types.ts'
@@ -37,6 +37,25 @@ pruefe('Gegenprobe: Es war einmal … der Mensch, 4749 „Unbestimmt“ → kein
 pruefe('Gegenprobe: 9970 mit leerem g → keins', JSON.stringify(genres(9970)) === '[]', genres(9970))
 const zeile = baulog.find((z) => z.includes('Titel nur bei aniSearch ergänzt')) ?? ''
 pruefe('Baulog zählt die nicht zuordenbaren Genres mit Namen (Ganbatte, Unbestimmt)', /aniSearch-Genre ohne Zuordnung: .*Ganbatte ×\d+/.test(zeile) && /Unbestimmt ×\d+/.test(zeile), zeile.slice(-120))
+
+console.log('\nBestehende AniList-Titel mit aniSearch-Kennung bleiben unberührt:')
+{
+  const zwei = [...traegerJeSeite()].filter(([seite, ids]) => String(seite) in alle() && ids.length === 1).slice(0, 2)
+  const aus = new Map<number, Title>(zwei.map(([, [anilist]]) => [anilist, { id: anilist, genres: ['Drama'] } as Title]))
+  const stumm = console.log
+  console.log = () => {}
+  try {
+    ergaenzeAnisearchTitel(aus, new Map(), new Map())
+  } finally {
+    console.log = stumm
+  }
+  pruefe('Fixture: mindestens zwei AniList-Titel mit Kennung', zwei.length === 2, zwei.length)
+  pruefe('Fixture: mindestens zwei reine aniSearch-Zeilen entstehen', [...aus.keys()].filter((id) => id >= BASIS).length >= 2)
+  for (const [seite, [anilist]] of zwei) {
+    pruefe(`AniList ${anilist}: Genres unverändert`, JSON.stringify(aus.get(anilist)?.genres) === '["Drama"]', aus.get(anilist)?.genres)
+    pruefe(`aniSearch ${seite}: keine zweite Zeile`, !aus.has(BASIS + seite))
+  }
+}
 
 console.log('\nZuordnungstabelle (anisearch-genres):')
 try {

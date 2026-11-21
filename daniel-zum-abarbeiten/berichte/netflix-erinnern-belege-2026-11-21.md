@@ -203,3 +203,7 @@ Entsperrt würden also höchstens **11 Netflix-Wege** (aniSearch-Listung, Seite 
 - **Offen für die startende Sitzung (Empfehlung: ja):** Block-Rücknahme der 141 Zeilen nach dem Muster „Zurückgenommen am 10.09.2026“ in der YAML (Kopfkommentar mit Grund, Zeilen entfernen, `belege-entfernt.yaml` prüfen, `check:handbelege`). Wirkung nach Abschnitt 6: 11 Netflix-Wege kämen zurück, sonst nichts. Gegenargument: Der Zustand „angekündigt“ wäre weiter unsichtbar (die Seite hat kein Feld dafür), und die 11 Wege zeigten eine Seite ohne abspielbare Folge. Ob das als Gewinn zählt, entscheidet nicht der Bauer.
 - Die 2 unsicheren und die Belege mit jüngerem Umleitungs-Beleg (AnoHana) bleiben in jedem Fall.
 - Offen: Live-TMDB-Abruf (kein Schlüsselzugang in dieser Sitzung); Netflix-Seiten (Projektregel); Cyborg 009 vs Devilman (21231) ist nicht im Datensatz (`titles.json`), Beleg trifft ins Leere.
+
+## 8. Entscheidung Dirigent (21.11.2026 18:55)
+
+Die 141 Erinnern-Belege bleiben. Die 11 Wege, die zurückkämen, zeigten eine Netflix-Seite ohne abspielbare Folge; das wäre eine unbelegte Verfügbarkeit. Erst ein eigener Zustand „angekündigt“ auf der Seite würde sie sinnvoll sichtbar machen. Erweiterungsversion in der Meldung: erledigt (PR 4204, 4363). Punkt „Netflix-Prüfliste“ damit abgeschlossen.

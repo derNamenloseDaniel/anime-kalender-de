@@ -11,6 +11,9 @@ import { ANBIETER_STAFFELN_DATEI, letzterNetflixStart, staffelZuordnung } from '
 import { franchiseTeile } from '../lib/folgenzahl-erklaerung.ts'
 import { baueNeinGilt } from '../lib/maengel-nein.ts'
 import { MAENGEL_DATEI, schreibeFort, serialisiere, type Register } from '../lib/maengel-register.ts'
+import type { PlakatEintrag } from '../lib/tmdb-plakat-suche.ts'
+import { BANNER_DATEI } from '../lib/tmdb-banner.ts'
+import { ohneGeteilteFilme } from '../lib/tmdb-eindeutig.ts'
 
 const OUT = 'public/data'
 
@@ -24,6 +27,21 @@ function leser(): Pick<Kontext, 'folgen' | 'synopse'> {
       if (!gruppen.has(g)) gruppen.set(g, readJson(`${OUT}/synopses/${g}.json`, {}))
       return gruppen.get(g)![id]
     },
+  }
+}
+
+/** Ein Bildbestand wie der Bau ihn liest: das Bild eines geteilten Films gehört keinem Titel (`ohneGeteilteFilme`), TMDB hat also keins für ihn (`null`). */
+function bildBestand<T>(datei: string, was: string): (id: number) => T | null | undefined {
+  const roh = readJson<Record<string, T | null>>(datei, {})
+  const gilt = ohneGeteilteFilme(roh, was)
+  return (id) => (String(id) in roh && !(String(id) in gilt) ? null : gilt[String(id)])
+}
+
+/** Die Bildbestände von TMDB (gewähltes Plakat mit Sprache, Banner) für `bild-fremdsprachig`. */
+function bildLeser(): Pick<Kontext, 'plakat' | 'banner'> {
+  return {
+    plakat: bildBestand<NonNullable<PlakatEintrag>>('data/tmdb-poster.json', 'Plakate (Bildsprache)'),
+    banner: bildBestand<{ p: string }>(BANNER_DATEI, 'Banner (Bildsprache)'),
   }
 }
 
@@ -50,6 +68,7 @@ function baueKontext(titel: Title[], heute: string): Kontext {
     staffelZuordnung: staffelZuordnung(titel, readJson(ANBIETER_STAFFELN_DATEI, {}), (id) => letzterNetflixStart(releases.get(id) ?? [])),
     franchiseTeile: (t) => (teile.get(t.franchiseId ?? t.id) ?? []).filter((x) => x.id !== t.id),
     neinGilt: lazyNeinGilt(),
+    ...bildLeser(),
     ...leser(),
   }
 }

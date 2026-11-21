@@ -74,6 +74,8 @@ const weitere = () => [
   titel(12, { franchiseId: 60, streams: stream('f12') }),
   titel(13, { franchiseId: 60, streams: stream('f13') }),
   titel(14, { streams: stream('f14') }),
+  einfach(15, { coverImage: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx15.jpg', bannerImage: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/15.jpg' }),
+  einfach(16, { coverImage: 'https://image.tmdb.org/t/p/w500/j16.jpg' }),
 ]
 schreibe('public/data/titles.json', [titel1({ coverImage: undefined }), titel(2), kurz(), ...weitere()])
 schreibe('public/data/events.json', [{ titleId: 1, date: '2099-01-01' }, { titleId: 8, date: todayIso() }])
@@ -86,12 +88,15 @@ schreibe('public/data/releases.json', [
 schreibe('public/data/folgen/1.json', { f: [[1, 'A'], [2, 'B'], [3, 'C']] })
 schreibe('public/data/folgen/2.json', { f: [[1, 'A'], [2, ''], [3, 'C']] })
 schreibe('public/data/synopses/1.json', { 1: { de: 'Text' }, 33: { de: 'Text' } })
-for (const id of [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]) schreibe(`public/data/synopses/${id}.json`, { [id]: { de: 'Text' } })
+for (const id of [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]) schreibe(`public/data/synopses/${id}.json`, { [id]: { de: 'Text' } })
 for (const id of [12, 13, 14]) schreibe(`public/data/folgen/${id}.json`, { f: [[1, 'A'], [2, 'B'], [3, 'C']] })
 /* Titel 12 und 13: ein Franchise, je 6 Folgen beim Anbieter bei 3 Folgen und einer Schwester von 3 → Ausnahme anbieter-franchise (Verdrahtung franchiseTeile); Titel 14 ohne Franchise bleibt offen. */
 /* Titel 10 und 11: ein Franchise, eine Netflix-Adresse mit einer Staffel zu einer Folge, zusammen zwei: staffel-zuordnung (Verdrahtung Bau → Regel). */
 schreibe('data/anbieter-staffeln.json', { 999: { staffeln: [{ folgen: 1 }], gemeldetAm: '2026-01-01' } })
 schreibe(COVER_BEKANNT_DATEI, { 5: 'TMDB führt ihn nicht' })
+/* Titel 15: AniList-Cover und -Banner, TMDB hat keins; Titel 16: japanisches Plakat nach der neuen Sprachfolge geholt → beide Ausnahme bei bild-fremdsprachig (Verdrahtung der Bildbestände). */
+schreibe('data/tmdb-poster.json', { 15: null, 16: { p: '/j16.jpg', w: 1000, h: 1500, l: 'ja', inhaltAm: '2026-12-01' } })
+schreibe('data/tmdb-banner.json', { 15: null })
 /* Der Import von `luecken-titel.ts` (über `fehlendes`) liest diese Datei schon beim Laden. */
 schreibe('data/kino-ankuendigungen.yaml', '[]')
 /* Titel 9: Handbeleg „ohne deutschen Ton“ bei ADN → Ausnahme belegtes-nein; Titel 1 hat keinen und bleibt offen. */
@@ -109,7 +114,8 @@ pruefe('Lauf 1: Disc-Termin ist ein Weg (kein kein-weg, kein erstausgabe-ohne-we
 pruefe('Lauf 1: Termin am heutigen Tag zählt als künftig (kein termin-fehlt-laufend bei Titel 8)', !r1.zeilen.some((z) => z.t === 8), r1.zeilen.filter((z) => z.t === 8))
 pruefe('Lauf 1: Erstlauf kennt kein „neu“', Object.values(r1.zaehler).every((z) => z.neu === 0) && r1.zeilen.every((z) => !z.ereignis), r1)
 pruefe('Lauf 1: erschienen-ohne-weg: Titel 1 offen, Titel 9 (Handbeleg dub:false) Ausnahme', r1.zaehler['erschienen-ohne-weg']?.offen === 1 && r1.zaehler['erschienen-ohne-weg']?.ausnahme === 1, r1.zaehler['erschienen-ohne-weg'])
-pruefe('Lauf 1: alle 26 Arten im Zähler', Object.keys(r1.zaehler).length === 26, Object.keys(r1.zaehler))
+pruefe('Lauf 1: alle 27 Arten im Zähler', Object.keys(r1.zaehler).length === 27, Object.keys(r1.zaehler))
+pruefe('Lauf 1: bild-fremdsprachig: Titel 15 (TMDB ohne Bild) und 16 (nur japanisch) sind Ausnahme', r1.zaehler['bild-fremdsprachig']?.offen === 0 && r1.zaehler['bild-fremdsprachig']?.ausnahme === 2, r1.zaehler['bild-fremdsprachig'])
 
 /* Vorfassung altern lassen und committen; Titel 1 bekommt sein Cover, Titel 3 ist neu ohne Banner. */
 schreibe('data/maengel.json', readFileSync(join(wurzel, 'data/maengel.json'), 'utf8').replaceAll(/"seit":"[\d-]+"/g, '"seit":"2026-01-01"'))

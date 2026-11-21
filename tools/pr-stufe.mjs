@@ -70,7 +70,7 @@ const STUFE_1 = /^(web\/src\/|extension\/|data\/dub-confirmed\.yaml$|data\/curat
 const TESTDATEI = /(^|\/)[^/]+\.(test|spec)\.[cm]?[jt]sx?$/
 // Erzeugte Tageskennzahlen (täglicher Kennzahlen-PR): nur diese zwei Dateien, die Logik daneben (kennzahlen-logik.cjs) bleibt 2.
 const KENNZAHLEN_ERZEUGT = /^tools\/kennzahlen\/(tage\.jsonl|daten\.js)$/
-const FAKTENZAHL =/\b\d{1,2}:\d{2}\b|\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\.\d{1,2}\.(\d{2,4})?(?!\d)|\b\d+\s*(Folgen?|Episoden?|Staffeln?|Uhr)\b|\b\d{5,}\b/i
+const FAKTENZAHL = /\b\d{1,2}:\d{2}\b|\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\.\d{1,2}\.(\d{2,4})?(?!\d)|\b\d+\s*(Folgen?|Episoden?|Staffeln?|Uhr)\b|\b\d{5,}\b/i
 
 /**
  * Zerlegt einen Unified-Diff in Dateien (Zielpfad, Quellpfad bei Umbenennen/Kopieren, hinzugefügte und entfernte Zeilen,

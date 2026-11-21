@@ -15,6 +15,7 @@ import { KinoZuletzt } from './kino-zuletzt.tsx'
 import type { sortiereNachZugang } from './wege-sortieren.ts'
 import { ankuendigungOhneTermin } from '@shared/ankuendigung.ts'
 import { ohneAnkuendigungsWeg, TerminOffenKarte } from './termin-offen-karte.tsx'
+import { useStaffelGrenzen } from './folgen-bereich.tsx'
 
 export function AntwortBereich({ antwort, sortiertNachZugang, streamReleases, terminReleases, title, t, today, wegeHinweis, tvVorbei, kastenNotiz, folgenLuecke, verbindung, favorites, onToggleFavorite, folgenAngabeFuer, dubZeilen, releaseJePlattform, releases, discAusgaben, discReleases, discZuerst }: {
   antwort: ReturnType<typeof berechneAntwort>
@@ -42,6 +43,7 @@ export function AntwortBereich({ antwort, sortiertNachZugang, streamReleases, te
   discZuerst?: boolean
 }) {
   const ankuendigung = ankuendigungOhneTermin(title, antwort?.art)
+  const staffeln = useStaffelGrenzen(title.id)
   return (
     <>
       {antwort && (
@@ -88,7 +90,7 @@ export function AntwortBereich({ antwort, sortiertNachZugang, streamReleases, te
               </>
             ) : <KinoZuletzt titleId={title.id} antwort={antwort} t={t} />
           }
-          stream={streamZeilen({ sortiertNachZugang: ohneAnkuendigungsWeg(sortiertNachZugang, ankuendigung), title, t, today, folgenAngabeFuer, dubZeilen, releaseJePlattform, streamReleases, releases, tvVorbei })}
+          stream={streamZeilen({ sortiertNachZugang: ohneAnkuendigungsWeg(sortiertNachZugang, ankuendigung), title, t, today, folgenAngabeFuer, dubZeilen, releaseJePlattform, streamReleases, releases, tvVorbei, staffeln })}
           disc={discZeilen({ sortiertNachZugang, title, t, today, folgenAngabeFuer, discAusgaben, discReleases })}
           discZuerst={discZuerst}
           key={discZuerst ? 'disc' : 'stream'}

@@ -11,21 +11,28 @@ export function seitOhneDoppelung(datum: string | undefined, folgenAngabe: strin
   return datum && datum > today && folgenAngabe.includes(`ab ${formatDate(datum).slice(0, 6)}`) ? undefined : datum
 }
 
-/** Die zweite Zeile einer Stream-Pille: Folgen, Stand der JustWatch-Angabe, Teilbereich, seit wann der Anbieter es führt; leer, wenn nichts davon gilt. */
-export function pilleUnten({ title, s, releases, folgenAngabe, today, t }: {
+/**
+ * Die zweite Zeile einer Stream-Pille: Folgen, Stand der JustWatch-Angabe, Teilbereich, seit wann der Anbieter es führt; leer, wenn nichts davon gilt.
+ * Mit `staffelAngabe` zählt die Zeile in Staffeln; ein Termin, der mitten im Titel beginnt (Horizonte Staffel 4 ab Folge 137), ist dann kein
+ * „seit“ des ganzen Wegs — er steht schon als „Staffel 4 Fg. 1“ da.
+ */
+export function pilleUnten({ title, s, releases, folgenAngabe, today, t, staffelAngabe }: {
   title: Title
   s: StreamLink
   releases: Release[]
   folgenAngabe: string
   today: string
   t: Translate
+  staffelAngabe?: string
 }): string | undefined {
+  const folgen = staffelAngabe ?? folgenAngabe
+  const seitReleases = staffelAngabe ? releases.filter((r) => (r.schedule?.firstEpisodeNumber ?? 1) <= 1) : releases
   return (
     [
-      folgenAngabe,
+      folgen,
       streamStatus(title, s, releases) === 'justwatch' ? t('detail.stand', { datum: formatDate(s.dubStand!) }) : '',
       s.teilBereich ? teilAngaben(title, s.teilBereich, t, folgenAngabe).unten : '',
-      seitAbText(seitOhneDoppelung(seitDatumFuerPille(title, s.platform, releases, s.kanal), folgenAngabe, today), today, t),
+      seitAbText(seitOhneDoppelung(seitDatumFuerPille(title, s.platform, seitReleases, s.kanal), folgen, today), today, t),
     ]
       .filter(Boolean)
       .join(' · ') || undefined

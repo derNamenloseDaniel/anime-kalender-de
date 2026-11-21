@@ -16,6 +16,8 @@ import { widerlegeDeutscheTermine } from './widerlegung-woche.ts'
 import { ohneVerschobene, verschiebeHinterToggle } from './hinter-toggle.ts'
 import { urteilSchliesstLuecken } from './urteil-schliesst-luecken.ts'
 import { hinweiseAnVerworfenen, ohneOmuTermine } from './omu-ohne-termin.ts'
+import { schreibeStaffelFolgen } from './staffel-folge-termine.ts'
+import { ladeStaffelGrenzen, staffelListen } from '../lib/pokemon-staffeln.ts'
 
 /**
  * **Die zwei Auskünfte an den Termin schreiben** (28.09.2026, `shared/tv-signale.ts`).
@@ -114,6 +116,7 @@ export function rolleTermineAus({ releases, titles, jpStart }: {
   const verschoben = verschiebeHinterToggle({ titles, releases, jpStart, mitStimmen, heuteIso: todayIso() })
   schreibeTvAuskunft(events, releases, titles)
   schreibeKostenlosAuskunft(events, titles)
+  log(`Staffel und Folge: ${schreibeStaffelFolgen(events, staffelListen(ladeStaffelGrenzen()))} Termine`)
   return { events: ohneOmuTermine(ohneVerschobene(events, verschoben), titles), mitStimmen, verschoben }
 }
 

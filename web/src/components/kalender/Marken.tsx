@@ -52,10 +52,19 @@ export function anbieterUndFolge(event: ReleaseEvent, t: Translate, buendel?: Re
   if (!event.episode || event.sichtung || event.releaseType === 'movie') {
     return event.episodeCount && event.episodeCount > 1 && !event.episode ? `${anbieter} · ${t('kal.folgen', { n: event.episodeCount })}` : anbieter
   }
+  if (event.staffelFolge) return `${anbieter} · ${staffelFolgeText(event.staffelFolge, event.name, t)}`
   /* Im Fernsehen nur die Folge: tv.de kennt die Gesamtzahl nicht (23.09.2026). */
   const gesamt = event.platform === 'tv' ? undefined : event.episodeCount
   const von = event.episodeCountAssumed ? `≈${gesamt}` : gesamt
   return `${anbieter} · ${gesamt ? t('kal.folgeVon', { n: event.episode, von: von! }) : t('kal.folge', { n: event.episode })}`
+}
+
+/**
+ * „Staffel 4 · Folge 1“ in deutscher Staffelzählung, ohne Gesamtzahl (die zählt durchgehend). Nennt der Name auf der Karte die Staffel
+ * schon („Pokémon Horizonte – Staffel 4“), nur „Folge 1“: keine Angabe zweimal.
+ */
+export function staffelFolgeText([staffel, folge]: [number, number], name: string, t: Translate): string {
+  return new RegExp(`Staffel ${staffel}(?![0-9])`).test(name) ? t('kal.folge', { n: folge }) : t('kal.staffelFolge', { s: staffel, n: folge })
 }
 
 function spannenText(event: ReleaseEvent, spanne: FolgenSpanne, t: Translate): string {

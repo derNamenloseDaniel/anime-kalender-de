@@ -48,6 +48,23 @@ export function useHatFolgenListe(titleId: number): boolean {
   return gibtEs
 }
 
+/** Die deutschen Staffelgrenzen des Titels (`s` der Folgenliste) für die Anbieterzeilen; ohne Liste oder Grenzen nichts. */
+export function useStaffelGrenzen(titleId: number): StaffelZeile[] | undefined {
+  const gibtEs = useHatFolgenListe(titleId)
+  const [s, setS] = useState<StaffelZeile[]>()
+  useEffect(() => {
+    setS(undefined)
+    if (!gibtEs) return
+    let aktiv = true
+    /* Ohne Datei bleibt die Zeile bei der durchgehenden Zählung; den Fehler zeigt der Folgenkasten selbst. */
+    void holeListe(titleId).then((l) => aktiv && setS(l.s)).catch(() => aktiv && setS(undefined))
+    return () => {
+      aktiv = false
+    }
+  }, [gibtEs, titleId])
+  return s
+}
+
 let zaehlungen: Promise<Record<string, FolgenZaehlung>> | undefined
 /** `[alle Folgen, Folgen mit deutscher Synchro]` aus `folgen/zaehlung.json` — für die Überschrift, wo AniList keine Folgenzahl führt. */
 export function useFolgenZaehlung(titleId: number): FolgenZaehlung | undefined {

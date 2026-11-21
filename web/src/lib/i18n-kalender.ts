@@ -76,6 +76,7 @@ export const TEXTE_KALENDER = {
   'kal.finaleHinweis': 'Letzte Folge der Staffel — danach ist sie auf Deutsch vollständig.',
   'kal.folge': 'Folge {n}',
   'kal.folgeVon': 'Folge {n}/{von}',
+  'kal.staffelFolge': 'Staffel {s} · Folge {n}',
   'kal.folgen': '{n} Folgen',
   'kal.kanalNeu': 'neu bei {kanal}',
   'kal.folgenSpanne': 'Folgen {von}–{bis}',

@@ -94,8 +94,8 @@ for (const id of [12, 13, 14]) schreibe(`public/data/folgen/${id}.json`, { f: [[
 /* Titel 10 und 11: ein Franchise, eine Netflix-Adresse mit einer Staffel zu einer Folge, zusammen zwei: staffel-zuordnung (Verdrahtung Bau → Regel). */
 schreibe('data/anbieter-staffeln.json', { 999: { staffeln: [{ folgen: 1 }], gemeldetAm: '2026-01-01' } })
 schreibe(COVER_BEKANNT_DATEI, { 5: 'TMDB führt ihn nicht' })
-/* Titel 15: AniList-Cover und -Banner, TMDB hat keins; Titel 16: japanisches Plakat nach der neuen Sprachfolge geholt → beide Ausnahme bei bild-fremdsprachig (Verdrahtung der Bildbestände). */
-schreibe('data/tmdb-poster.json', { 15: null, 16: { p: '/j16.jpg', w: 1000, h: 1500, l: 'ja', inhaltAm: '2026-12-01' } })
+/* Titel 15: AniList-Cover und -Banner, TMDB hat keins; Titel 16: japanisches Plakat mit Beleg `nurJa` → beide Ausnahme bei bild-fremdsprachig (Verdrahtung der Bildbestände). */
+schreibe('data/tmdb-poster.json', { 15: null, 16: { p: '/j16.jpg', w: 1000, h: 1500, l: 'ja', inhaltAm: '2026-12-01', nurJa: true } })
 schreibe('data/tmdb-banner.json', { 15: null })
 /* Der Import von `luecken-titel.ts` (über `fehlendes`) liest diese Datei schon beim Laden. */
 schreibe('data/kino-ankuendigungen.yaml', '[]')

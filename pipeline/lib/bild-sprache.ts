@@ -1,13 +1,7 @@
 import type { Title } from '../../shared/types.ts'
 
 /** Was die Regel aus einem Eintrag in `data/tmdb-poster.json` liest (`PlakatEintrag`; eigener Typ, damit der Bau den Abrufcode nicht importiert). */
-export type PlakatWahl = { p: string; l: string | null; inhaltAm?: string }
-
-/**
- * Ab diesem Abruftag (`inhaltAm`) wählt der Plakat-Lauf ein japanisches Plakat erst nach dem textlosen (`tmdb-plakat.ts`). Ein japanisches
- * Plakat von da an ist das einzige Hochformat bei TMDB; eines von vorher kann noch einer lesbaren Fassung weichen.
- */
-export const SPRACHFOLGE_AB = '2026-11-22'
+export type PlakatWahl = { p: string; l: string | null; nurJa?: true }
 
 /** Bestandseintrag eines Bildes: `undefined` = nie gesucht, `null` = TMDB hat keins. */
 export type BildLookup<T> = (id: number) => T | null | undefined
@@ -28,7 +22,7 @@ export function fremdeBilder(t: Title, plakat: BildLookup<PlakatWahl>, banner: B
   const aus: boolean[] = []
   const cover = t.coverImage ?? ''
   const p = plakat(t.id)
-  if (cover.includes('image.tmdb.org') && p && cover.endsWith(p.p) && p.l === 'ja') aus.push((p.inhaltAm ?? '') >= SPRACHFOLGE_AB)
+  if (cover.includes('image.tmdb.org') && p && cover.endsWith(p.p) && p.l === 'ja') aus.push(p.nurJa === true)
   if (cover.includes('anilist.co')) aus.push(p === null)
   if (t.bannerImage?.includes('anilist.co')) aus.push(banner(t.id) === null)
   return aus

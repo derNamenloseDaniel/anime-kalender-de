@@ -140,6 +140,66 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:ranma-s3-netflix@2026-11-21@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261121
+DTEND;VALUE=DATE:20261122
+SUMMARY:Ranma ½ – Staffel 3 – Folge 8/≈12
+DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nUhrze
+ it noch nicht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannte
+ r Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: h
+ ttps://anime-kalender.de/t/17567/
+CATEGORIES:Netflix
+END:VEVENT
+BEGIN:VEVENT
+UID:ranma-s3-netflix@2026-11-28@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261128
+DTEND;VALUE=DATE:20261129
+SUMMARY:Ranma ½ – Staffel 3 – Folge 9/≈12
+DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nUhrze
+ it noch nicht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannte
+ r Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: h
+ ttps://anime-kalender.de/t/17567/
+CATEGORIES:Netflix
+END:VEVENT
+BEGIN:VEVENT
+UID:ranma-s3-netflix@2026-12-05@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261205
+DTEND;VALUE=DATE:20261206
+SUMMARY:Ranma ½ – Staffel 3 – Folge 10/≈12
+DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nUhrze
+ it noch nicht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannte
+ r Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: h
+ ttps://anime-kalender.de/t/17567/
+CATEGORIES:Netflix
+END:VEVENT
+BEGIN:VEVENT
+UID:ranma-s3-netflix@2026-12-12@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261212
+DTEND;VALUE=DATE:20261213
+SUMMARY:Ranma ½ – Staffel 3 – Folge 11/≈12
+DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nUhrze
+ it noch nicht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannte
+ r Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: h
+ ttps://anime-kalender.de/t/17567/
+CATEGORIES:Netflix
+END:VEVENT
+BEGIN:VEVENT
+UID:ranma-s3-netflix@2026-12-19@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261219
+DTEND;VALUE=DATE:20261220
+SUMMARY:Ranma ½ – Staffel 3 – Folge 12/≈12
+DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nUhrze
+ it noch nicht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannte
+ r Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: h
+ ttps://anime-kalender.de/t/17567/
+CATEGORIES:Netflix
+END:VEVENT
+BEGIN:VEVENT
 UID:auto-813-disc@2027-02-19@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20270219

@@ -1,12 +1,12 @@
 {
-  "scrapedAt": "2026-11-21T16:02:02.113Z",
+  "scrapedAt": "2026-11-21T18:02:04.901Z",
   "verworfen": {
     "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 8,
-    "schon in einem Rubrik-Feed gelesen": 10,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 3,
+    "schon in einem Rubrik-Feed gelesen": 9,
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 9,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 2,
     "Sprachhinweis älter als 45 Tage": 6
   },
   "proposals": [
@@ -79,6 +79,63 @@
       "dates": [],
       "dub": "ja",
       "hinweis": "sprache",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Prime Video entfernt zwei Anime-Titel aus seinem Programm",
+      "articleUrl": "https://www.anime2you.de/news/1074323/prime-video-entfernt-karakuri-circus-und-mehr/",
+      "publishedAt": "2026-11-21",
+      "category": "streaming",
+      "platforms": [
+        "primevideo"
+      ],
+      "dates": [
+        {
+          "iso": "2026-12-03",
+          "context": "-Klassikers »Eine fröhliche Familie« sind demzufolge nur noch bis zum 3. Dezember 2026 mit deutscher Synchronisation bei Prime Video abrufba"
+        }
+      ],
+      "dub": "ja",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Zweite »Spy x Family«-Staffel erscheint als Blu-ray-Gesamtausgabe",
+      "articleUrl": "https://www.anime2you.de/news/1074194/spy-x-family-staffel-2-blu-ray-gesamtausgabe/",
+      "publishedAt": "2026-11-21",
+      "category": "disc",
+      "platforms": [
+        "disc"
+      ],
+      "dates": [
+        {
+          "iso": "2027-02-19",
+          "context": "sgabe der zweiten »Spy x Family«-Staffel erscheint voraussichtlich am 19. Februar 2027 als DVD und Blu-ray. Diese beinhaltet alle zwölf Epis"
+        },
+        {
+          "month": "2027-02",
+          "context": "einer Gesamtausgabe in den Handel kommt. Wir fassen zusammen. Release im Februar 2027 Die Gesamtausgabe der zweiten »Spy x Family«-Staffel e"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "ProSieben MAXX zeigt »One Piece« bald wieder in Doppelfolgen",
+      "articleUrl": "https://www.anime2you.de/news/1074310/prosieben-maxx-one-piece-bald-wieder-in-doppelfolgen/",
+      "publishedAt": "2026-11-21",
+      "category": "allgemein",
+      "platforms": [],
+      "dates": [
+        {
+          "iso": "2026-12-14",
+          "context": "Doppelfolgen ProSieben MAXX zeigt die Anime-Serie »One Piece« ab dem 14. Dezember 2026 jeweils von Montag bis Freitag ab 18:30 Uhr mit […]"
+        },
+        {
+          "month": "2026-12",
+          "context": "« bald wieder in Doppelfolgen Der Free-TV-Sender ProSieben MAXX nimmt im Dezember 2026 eine Änderung an seinem Anime-Programm vor: »One Piec"
+        }
+      ],
+      "dub": "unklar",
       "alreadyCurated": false
     },
     {

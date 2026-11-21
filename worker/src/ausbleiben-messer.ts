@@ -141,6 +141,8 @@ export async function ausbleibenMessen(env: MessEnv, jetzt: Date, ladeTermine: (
   const ziele = waehleZiele(await ladeTermine(), jetzt)
   if (ziele.length === 0) return 'ziele=0'
   const jetztMs = jetzt.getTime()
+  // Ein Stand fügt nur Bedingungen hinzu: ist ohne ihn keine Lesung fällig, entfällt die R2-Lesung von stand.json
+  if (!ziele.some((z) => lesungFaellig({ slotMs: z.slotMs }, jetztMs))) return `ziele=${ziele.length} dran=0`
   const gespeichert = ((await leseJson(env, STAND_SCHLUESSEL)) as StandDatei | null) ?? {}
   const stand: StandDatei = {}
   for (const [k, s] of Object.entries(gespeichert)) if (jetztMs - s.slotMs <= STAND_AUFBEWAHREN_MS) stand[k] = s

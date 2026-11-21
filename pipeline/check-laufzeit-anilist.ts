@@ -42,11 +42,11 @@ try {
       titleFromMedia(medium(900_402, 25), 'high'), // aniSearch ohne Eintrag → AniList 25
       titleFromMedia(medium(900_403, 30), 'high'), // aniSearch-Eintrag ohne Laufzeit → AniList 30
       titleFromMedia(medium(900_404, null), 'high'), // keine Quelle → leer
-      { ...titleFromMedia(medium(900_405, null), 'high'), id: 5_000_405, runtimeMin: 40 }, // Eigentitel: zählt nicht als AniList
+      { ...titleFromMedia(medium(900_405, null), 'high'), id: 5_000_000, runtimeMin: 40 }, // Eigentitel (Grenze EIGENE_ID_BASIS): zählt nicht als AniList
     ].map((t) => [t.id, t]),
   )
   const meldung = anisearchFelderAnwenden(karten)
-  const werte = [900_401, 900_402, 900_403, 900_404, 5_000_405].map((id) => karten.get(id)?.runtimeMin ?? null)
+  const werte = [900_401, 900_402, 900_403, 900_404, 5_000_000].map((id) => karten.get(id)?.runtimeMin ?? null)
   pruefe('aniSearch schlägt AniList (24 statt 23), sonst bleibt AniList (25, 30), ohne Quelle leer', JSON.stringify(werte) === '[24,25,30,null,40]', werte)
   pruefe('Baulog nennt 1 aus aniSearch und 2 aus AniList (Eigentitel nicht mitgezählt)', meldung.endsWith('1 mit Laufzeit aus aniSearch, 2 aus AniList'), meldung)
 } finally {

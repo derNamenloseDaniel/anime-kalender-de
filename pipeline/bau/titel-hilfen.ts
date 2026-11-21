@@ -391,7 +391,7 @@ export function jpEndAusAnilist(media: AniListMedia): string | undefined {
 
 /** Minuten je Folge (Film: Gesamtlänge) laut AniList; nur Rückfall, `anisearchFelderAnwenden` überschreibt mit aniSearch, wo es einen Wert hat. */
 export function laufzeitAusAnilist(media: AniListMedia): { runtimeMin?: number } {
-  return media.duration && media.duration > 0 ? { runtimeMin: media.duration } : {}
+  return media.duration ? { runtimeMin: media.duration } : {}
 }
 
 export function titleFromMedia(media: AniListMedia, confidence: DubConfidence): Title {

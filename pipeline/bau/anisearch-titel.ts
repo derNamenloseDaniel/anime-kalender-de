@@ -9,6 +9,7 @@ import { anisearchHand } from './grundlagen.ts'
 import { anisearchKatalogPaare } from '../lib/anisearch-katalog-ids.ts'
 import { slugify } from '../lib/util.ts'
 import { aufgenommeneSeiten } from '../lib/anisearch-aufgenommen.ts'
+import { genreLueckenText, genresAusAnisearch } from '../lib/anisearch-genres.ts'
 
 /**
  * **Titel, die nur bei aniSearch stehen** (Daniel, 06.10.2026: „wir nehmen alle Kennungen von aniSearch und tragen alle Titel so ein, wie
@@ -35,6 +36,8 @@ type Eintrag = {
   bis?: string
   mal?: number
   st?: string[]
+  /** Hauptgenres bei aniSearch (deutsche Namen, z. B. „Actionkomödie“), leer wenn keins genannt. */
+  g?: string[]
   /** Deutsch bei aniSearch: `d` vertont, `p` geplant, `c` abgebrochen, `-` nicht genannt. */
   dub: 'd' | 'p' | 'c' | '-'
   pub?: string[]
@@ -175,6 +178,7 @@ export function ergaenzeAnisearchTitel(titles: Map<number, Title>, jpStart: Map<
   const vergeben = vergebeneSeiten(titles)
   for (const asId of frei) vergeben.delete(asId)
   let neu = 0
+  const genreLuecken = new Map<string, number>()
   for (const [schluessel, e] of Object.entries(alle())) {
     const asId = Number(schluessel)
     if (vergeben.has(asId)) continue
@@ -193,7 +197,7 @@ export function ergaenzeAnisearchTitel(titles: Map<number, Title>, jpStart: Map<
       episodes: e.f,
       jpYear: e.y,
       jpEnd: jpEndAusAnisearch(e.bis, e.von, FORMAT[e.ty] === 'MOVIE' || e.f === 1),
-      genres: [],
+      genres: genresAusAnisearch(e.g, genreLuecken),
       keywords: [],
       studios: e.st ?? [],
       /* Laufzeit je Folge aus derselben API-Antwort (`duration`); ohne sie blieben 155 reine aniSearch-Titel ohne Laufzeit (21.11.2026). */
@@ -209,7 +213,7 @@ export function ergaenzeAnisearchTitel(titles: Map<number, Title>, jpStart: Map<
     neu++
   }
   erstausgabeUebernehmen(titles)
-  if (neu) log(`${neu} Titel nur bei aniSearch ergänzt (${anisearchNurKatalog().size} davon ohne Deutsch, nur im Katalog); ${[...vergeben].filter((a) => String(a) in alle()).length} Einträge entfallen, weil ein AniList-Titel ihre Kennung trägt`)
+  if (neu) log(`${neu} Titel nur bei aniSearch ergänzt (${anisearchNurKatalog().size} davon ohne Deutsch, nur im Katalog); ${[...vergeben].filter((a) => String(a) in alle()).length} Einträge entfallen, weil ein AniList-Titel ihre Kennung trägt; ${genreLueckenText(genreLuecken)}`)
   return neu
 }
 

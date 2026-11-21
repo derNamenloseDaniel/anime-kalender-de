@@ -94,6 +94,8 @@ export function kompakt(r: Roh): Record<string, unknown> {
     bis: frei(r.aired_to),
     mal: frei(r.external_ids?.myanimelist),
     st: (r.studios ?? []).slice(0, 2).map((s) => s.name),
+    /* Hauptgenres: der Bau macht daraus die Genres der aniSearch-Zeile (`anisearch-genres.ts`). */
+    g: r.genres?.main,
     dub: dubKennzeichen(r),
     en: frei(r.releases?.en?.title),
     pub: de?.publishers?.map((p) => p.name),

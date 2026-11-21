@@ -1,13 +1,6 @@
 {
-  "stand": "2026-11-21",
+  "stand": "2026-11-22",
   "eintraege": [
-    {
-      "titel": "CARDFIGHT!! VANGUARD Divinez: Parallactic Fate",
-      "id": 214536,
-      "anbieter": "unbekannt",
-      "start": "2026-11-07",
-      "seit": "2026-11-08"
-    },
     {
       "titel": "Expelled from Paradise: Liberated from Paradise",
       "id": 157330,
@@ -129,6 +122,13 @@
     }
   ],
   "abgeloest": [
+    {
+      "titel": "CARDFIGHT!! VANGUARD Divinez: Parallactic Fate",
+      "id": 214536,
+      "anbieter": "unbekannt",
+      "start": "2026-11-07",
+      "seit": "2026-11-08"
+    },
     {
       "titel": "Strike Witches 2",
       "id": 6381,

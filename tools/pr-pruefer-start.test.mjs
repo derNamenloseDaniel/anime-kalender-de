@@ -26,7 +26,7 @@ const kopf = (a) => ({ head: { sha: KOPF, ref: 'claude/x-1', repo: REPO, ...a } 
 // Ziel: jede Bedingung kippt allein, der Basisfall gibt alle Werte aus der API weiter.
 gleich('Basisfall: los mit PR, Kopf, Basis, Zweig aus der API', ziel(pr(), KOPF), { los: true, grund: 'prüfpflichtig, Kopf aktuell', pr: 7, sha: KOPF, basis: BASIS, zweig: 'claude/x-1' })
 gleich('sha leer: aktueller Kopf', ziel(pr(), '').sha, KOPF)
-gleich('Kopf inzwischen weiter als der Kettenlauf: nichts tun', ziel(pr(), ALT).los, false)
+gleich('Kopf inzwischen weiter als der Kettenlauf: nichts tun, Grund nennt den neuen Kopf', ziel(pr(), ALT), { los: false, grund: 'Kopf inzwischen ccccccccc, der neue Kettenlauf startet den Prüfer' })
 gleich('kein PR', ziel(null, KOPF).los, false)
 gleich('geschlossen', ziel(pr({ state: 'closed' }), KOPF).los, false)
 gleich('Entwurf', ziel(pr({ draft: true }), KOPF).los, false)
@@ -72,7 +72,8 @@ function lauf(env, antwort = pr()) {
 try {
   const ja = lauf({ PR_EINGABE: '7', SHA_EINGABE: KOPF })
   gleich('main: los mit allen Werten, ein Abruf des PR, Exit 0', [ja.code, ja.ausgabe, ja.gerufen], [0, `los=1\npr=7\nsha=${KOPF}\nbasis=${BASIS}\nzweig=claude/x-1\n`, ['api repos/o/r/pulls/7']])
-  gleich('main: Kopf weiter: los=0, Exit 0', (() => { const r = lauf({ PR_EINGABE: '7', SHA_EINGABE: ALT }); return [r.code, r.ausgabe] })(), [0, 'los=0\n'])
+  gleich('main: Logzeile ja mit Grund', ja.zeilen, ['Prüfer-Ziel: PR 7 ja (prüfpflichtig, Kopf aktuell)'])
+  gleich('main: Kopf weiter: los=0, Exit 0, Logzeile nein', (() => { const r = lauf({ PR_EINGABE: '7', SHA_EINGABE: ALT }); return [r.code, r.ausgabe, r.zeilen] })(), [0, 'los=0\n', ['Prüfer-Ziel: PR 7 nein (Kopf inzwischen ccccccccc, der neue Kettenlauf startet den Prüfer)']])
   gleich('main: ohne sha: aktueller Kopf', lauf({ PR_EINGABE: '7', SHA_EINGABE: '' }).ausgabe.includes(`sha=${KOPF}`), true)
   gleich('main: Entwurf: los=0', lauf({ PR_EINGABE: '7' }, pr({ draft: true })).ausgabe, 'los=0\n')
   for (const [name, env] of [['pr keine Zahl', { PR_EINGABE: '7; rm -rf /' }], ['pr fehlt', {}], ['sha kurz', { PR_EINGABE: '7', SHA_EINGABE: 'abc' }], ['sha Großbuchstaben', { PR_EINGABE: '7', SHA_EINGABE: 'C'.repeat(40) }]]) {
@@ -81,6 +82,10 @@ try {
   }
   const kaputt = lauf({ PR_EINGABE: '7' }, new Error('HTTP 404: Not Found'))
   gleich('main: PR nicht lesbar: Exit 1 mit Grund, keine Ausgabe', [kaputt.code, kaputt.ausgabe, kaputt.zeilen.some((z) => z.includes('FEHLGESCHLAGEN PR 7') && z.includes('404'))], [1, '', true])
+  // CLI wie im Job `ziel`: ungültige Eingabe -> Exit 1 als eigener Prozess (process.exit(main())), nichts abgerufen.
+  const { spawnSync } = await import('node:child_process')
+  const cli = spawnSync(process.execPath, [new URL('./pr-pruefer-start.mjs', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')], { encoding: 'utf8', timeout: 30_000, windowsHide: true, env: { PATH: process.env.PATH, GITHUB_REPOSITORY: 'o/r', PR_EINGABE: 'x' } })
+  gleich('Prozess: ungültige PR-Eingabe -> Exit 1 mit FEHLGESCHLAGEN', [cli.status, cli.stdout.includes('Prüfer-Ziel: FEHLGESCHLAGEN')], [1, true])
 } finally {
   fs.rmSync(ordner, { recursive: true, force: true })
 }

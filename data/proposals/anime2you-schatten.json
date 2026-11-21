@@ -1174,6 +1174,24 @@
         "stichprobe": 0,
         "rest": 1
       }
+    },
+    {
+      "am": "2026-11-21",
+      "artikel": 4,
+      "ohneAntwort": 0,
+      "schattenFehler": 0,
+      "gleich": 1,
+      "nurRegel": 0,
+      "nurClaude": 0,
+      "ms": 5.735359000000017,
+      "faelle": [],
+      "router": {
+        "scharf": false,
+        "artikel": 4,
+        "erspart": 0,
+        "stichprobe": 0,
+        "rest": 4
+      }
     }
   ]
 }

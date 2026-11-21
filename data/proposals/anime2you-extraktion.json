@@ -1889,6 +1889,10 @@
       "am": "2026-11-17",
       "vorschlaege": 1
     },
+    "1072861": {
+      "am": "2026-11-21",
+      "vorschlaege": 1
+    },
     "1072992": {
       "am": "2026-11-20",
       "vorschlaege": 0
@@ -2051,6 +2055,10 @@
       "am": "2026-11-21",
       "vorschlaege": 2
     },
+    "1074194": {
+      "am": "2026-11-21",
+      "vorschlaege": 1
+    },
     "1074210": {
       "am": "2026-11-21",
       "vorschlaege": 1
@@ -2062,6 +2070,14 @@
     "1074274": {
       "am": "2026-11-21",
       "vorschlaege": 1
+    },
+    "1074310": {
+      "am": "2026-11-21",
+      "vorschlaege": 4
+    },
+    "1074323": {
+      "am": "2026-11-21",
+      "vorschlaege": 2
     }
   },
   "vorschlaege": [
@@ -2650,7 +2666,8 @@
       "warnungen": [
         "Uhrzeit widerspricht 18:50 (Artikel 1059541) – gegenlesen",
         "Uhrzeit widerspricht 18:50 (Artikel 1059541), 18:30 (Artikel 1063795) – gegenlesen",
-        "Uhrzeit widerspricht 18:50 (Artikel 1059541), 18:30 (Artikel 1063795), 06:45 (Artikel 1068887) – gegenlesen"
+        "Uhrzeit widerspricht 18:50 (Artikel 1059541), 18:30 (Artikel 1063795), 06:45 (Artikel 1068887) – gegenlesen",
+        "Uhrzeit widerspricht 18:50 (Artikel 1059541), 18:30 (Artikel 1063795), 06:45 (Artikel 1068887), 18:30 (Artikel 1074310) – gegenlesen"
       ],
       "artikelId": "1060030",
       "artikel": "TV-Guide: Anime im deutschen Fernsehen in KW 42/2026",
@@ -10252,7 +10269,8 @@
       "wochentag": null,
       "warnungen": [
         "Uhrzeit widerspricht 18:50 (Artikel 1059541), 18:30 (Artikel 1063795) – gegenlesen",
-        "Uhrzeit widerspricht 18:50 (Artikel 1059541), 18:30 (Artikel 1063795), 06:45 (Artikel 1068887) – gegenlesen"
+        "Uhrzeit widerspricht 18:50 (Artikel 1059541), 18:30 (Artikel 1063795), 06:45 (Artikel 1068887) – gegenlesen",
+        "Uhrzeit widerspricht 18:50 (Artikel 1059541), 18:30 (Artikel 1063795), 06:45 (Artikel 1068887), 18:30 (Artikel 1074310) – gegenlesen"
       ],
       "artikelId": "1066723",
       "artikel": "TV-Guide: Anime im deutschen Fernsehen in KW 45/2026",
@@ -16190,6 +16208,188 @@
       "artikelId": "1074274",
       "artikel": "Episodenanzahl des Action-Anime »Tank Chair« steht fest",
       "quelle": "https://www.anime2you.de/news/1074274/tank-chair-episodenanzahl/",
+      "veroeffentlicht": "2026-11-21",
+      "gelesenAm": "2026-11-21"
+    },
+    {
+      "titel": "One Piece",
+      "zitat": "ProSieben MAXX zeigt die Anime-Serie »One Piece« ab dem 14. Dezember 2026 jeweils von Montag bis Freitag ab 18:30 Uhr mit zwei Episoden am Stück in der deutschen Sprachfassung.",
+      "art": "folgen",
+      "sprache": "deutsch",
+      "plattform": "tv",
+      "datum": "2026-12-14",
+      "uhrzeit": "18:30",
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": "Montag bis Freitag",
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Montag",
+      "warnungen": [
+        "Uhrzeit widerspricht 18:55 (Artikel 1060030), 18:55 (Artikel 1066723) – gegenlesen"
+      ],
+      "artikelId": "1074310",
+      "artikel": "ProSieben MAXX zeigt »One Piece« bald wieder in Doppelfolgen",
+      "quelle": "https://www.anime2you.de/news/1074310/prosieben-maxx-one-piece-bald-wieder-in-doppelfolgen/",
+      "veroeffentlicht": "2026-11-21",
+      "gelesenAm": "2026-11-21"
+    },
+    {
+      "titel": "One Piece",
+      "zitat": "Die aktuelle Ausstrahlung von »One Piece« begann am 5. November 2026 mit Episode 780.",
+      "art": "folgen",
+      "sprache": "unklar",
+      "plattform": "tv",
+      "datum": "2026-11-05",
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": null,
+      "folgen": "780",
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [
+        "sender „ProSieben MAXX“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1074310",
+      "artikel": "ProSieben MAXX zeigt »One Piece« bald wieder in Doppelfolgen",
+      "quelle": "https://www.anime2you.de/news/1074310/prosieben-maxx-one-piece-bald-wieder-in-doppelfolgen/",
+      "veroeffentlicht": "2026-11-21",
+      "gelesenAm": "2026-11-21"
+    },
+    {
+      "titel": "One Piece",
+      "zitat": "Für Frühjahr 2027 hat der Free-TV-Sender außerdem die deutsche Erstausstrahlung weiterer Episoden ab Folge 1123 angekündigt.",
+      "art": "ankuendigung",
+      "sprache": "deutsch",
+      "plattform": "tv",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": null,
+      "folgen": "1123",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "sender „ProSieben MAXX“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1074310",
+      "artikel": "ProSieben MAXX zeigt »One Piece« bald wieder in Doppelfolgen",
+      "quelle": "https://www.anime2you.de/news/1074310/prosieben-maxx-one-piece-bald-wieder-in-doppelfolgen/",
+      "veroeffentlicht": "2026-11-21",
+      "gelesenAm": "2026-11-21"
+    },
+    {
+      "titel": "YAIBA: Samurai Legend",
+      "zitat": "Die Umstellung erfolgt nach dem Abschluss der deutschen TV-Premiere von »YAIBA: Samurai Legend«, die seit dem 5. November 2026 den früheren Sendeplatz belegt.",
+      "art": "start",
+      "sprache": "unklar",
+      "plattform": "tv",
+      "datum": "2026-11-05",
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [
+        "sender „ProSieben MAXX“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1074310",
+      "artikel": "ProSieben MAXX zeigt »One Piece« bald wieder in Doppelfolgen",
+      "quelle": "https://www.anime2you.de/news/1074310/prosieben-maxx-one-piece-bald-wieder-in-doppelfolgen/",
+      "veroeffentlicht": "2026-11-21",
+      "gelesenAm": "2026-11-21"
+    },
+    {
+      "titel": "Eine fröhliche Familie",
+      "zitat": "»Eine fröhliche Familie« Verfügbar bis: 3. Dezember 2026 Sprache: Deutsch",
+      "art": "abgang",
+      "sprache": "deutsch",
+      "plattform": "primevideo",
+      "datum": "2026-12-03",
+      "uhrzeit": null,
+      "anbieter": "Prime Video",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [
+        "anbieter „Prime Video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „prime video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1074323",
+      "artikel": "Prime Video entfernt zwei Anime-Titel aus seinem Programm",
+      "quelle": "https://www.anime2you.de/news/1074323/prime-video-entfernt-karakuri-circus-und-mehr/",
+      "veroeffentlicht": "2026-11-21",
+      "gelesenAm": "2026-11-21"
+    },
+    {
+      "titel": "Karakuri Circus",
+      "zitat": "»Karakuri Circus« Verfügbar bis: wöchentlich eine Episode weniger Sprache: Japanisch (UT)",
+      "art": "abgang",
+      "sprache": "omu",
+      "plattform": "primevideo",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Prime Video",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": "Kein fester Tag, nur „wöchentlich eine Episode weniger“ genannt.",
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „Prime Video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „prime video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1074323",
+      "artikel": "Prime Video entfernt zwei Anime-Titel aus seinem Programm",
+      "quelle": "https://www.anime2you.de/news/1074323/prime-video-entfernt-karakuri-circus-und-mehr/",
+      "veroeffentlicht": "2026-11-21",
+      "gelesenAm": "2026-11-21"
+    },
+    {
+      "titel": "Spy x Family",
+      "zitat": "Die Gesamtausgabe der zweiten »Spy x Family«-Staffel erscheint voraussichtlich am 19. Februar 2027 als DVD und Blu-ray. Diese beinhaltet alle zwölf Episoden mit deutscher und japanischer Sprachausgabe auf drei Volumes sowie einen Sammelschuber.",
+      "art": "disc",
+      "sprache": "deutsch+omu",
+      "plattform": "disc",
+      "datum": "2027-02-19",
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": "alle zwölf Episoden",
+      "unsicher": "Termin laut Artikel vorläufig („voraussichtlich“).",
+      "wochentag": "Freitag",
+      "warnungen": [],
+      "artikelId": "1074194",
+      "artikel": "Zweite »Spy x Family«-Staffel erscheint als Blu-ray-Gesamtausgabe",
+      "quelle": "https://www.anime2you.de/news/1074194/spy-x-family-staffel-2-blu-ray-gesamtausgabe/",
+      "veroeffentlicht": "2026-11-21",
+      "gelesenAm": "2026-11-21"
+    },
+    {
+      "titel": "Gantz",
+      "zitat": "Hierzulande erscheint die Serie am 20. November 2026 durch Hardball Films in einer limitierten Collector's Edition auf Blu-ray. Die Gesamtausgabe enthält alle Folgen mit deutscher Synchronisation und japanischem Originalton sowie mehrere Extras.",
+      "art": "disc",
+      "sprache": "deutsch+omu",
+      "plattform": "disc",
+      "datum": "2026-11-20",
+      "uhrzeit": null,
+      "anbieter": "Hardball Films",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "alle Folgen",
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [],
+      "artikelId": "1072861",
+      "artikel": "»Gantz«-Schöpfer sieht wenig Hoffnung für eine Anime-Neuauflage",
+      "quelle": "https://www.anime2you.de/news/1072861/gantz-schoepfer-wenig-hoffnung-fuer-anime-neuauflage/",
       "veroeffentlicht": "2026-11-21",
       "gelesenAm": "2026-11-21"
     }

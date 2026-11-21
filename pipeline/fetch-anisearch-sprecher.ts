@@ -48,12 +48,12 @@ const haupt = readJson<Zeile[]>('public/data/titles.json', []).map((t) => kennun
 
 const luecken = (): Luecken => sprecherLuecken({ haupt, katalog, bestand, weg, jetztMs: Date.now() })
 const zaehle = (l: Luecken): string =>
-  `Hauptbestand ${l.haupt.length} von ${new Set(haupt).size}, Katalog ${l.katalog.length} von ${katalog.size} Kennungen ohne Sprecherseite`
+  `Hauptbestand ${l.haupt.length} von ${new Set(haupt).size}, Katalog ${l.katalog.length} von ${katalog.size} Kennungen ohne Sprecherseite; ${l.nachholen.length} Hauptbestand-Seiten ohne deutsche Rolle nachzuholen`
 const vorher = luecken()
 log(`aniSearch-Sprecher-Lücke vorher: ${zaehle(vorher)}`)
 
-const dran = [...vorher.haupt, ...vorher.katalog].slice(0, GRENZE)
-log(`${dran.length} Sprecherseiten kommen dran (davon ${Math.min(dran.length, vorher.haupt.length)} aus dem Hauptbestand)`)
+const dran = [...vorher.haupt, ...vorher.nachholen, ...vorher.katalog].slice(0, GRENZE)
+log(`${dran.length} Sprecherseiten kommen dran (davon ${Math.min(dran.length, vorher.haupt.length + vorher.nachholen.length)} aus dem Hauptbestand)`)
 
 const sichern = (): void => {
   writeJson(ZIEL, bestand, true)

@@ -4,6 +4,8 @@ import type { Sprecher } from './anisearch-sprecher.ts'
 /** Hochzählen, sobald `sprecherAus()` ein Feld mehr liest. */
 export const PARSER_STAND = 1
 const ALTER_TAGE = 180
+/** Hauptbestand-Seite ohne deutsche Rolle: nach zwei Wochen wieder fragen, aniSearch trägt die deutsche Besetzung oft erst Wochen nach dem Start nach (21.11.2026: 332 offene Sprecher-Mängel auf Seiten vom Oktober). */
+export const LEER_TAGE = 14
 
 export interface Eintrag extends Sprecher {
   fetchedAt: string
@@ -34,6 +36,28 @@ export function faellig(bestand: Record<string, Eintrag>, id: number, jetztMs: n
 export interface Luecken {
   haupt: number[]
   katalog: number[]
+  /** Hauptbestand-Seiten ohne deutsche Rolle, mindestens {@link LEER_TAGE} alt: werden erneut gefragt. */
+  nachholen: number[]
+}
+
+/**
+ * Seiten ohne jede Besetzung (`ja` 0) wechseln mit solchen ab, die eine führen: 15 leere in Folge hält der Lauf für eine Sperrseite (`anisearch-sprecher-lauf.ts`).
+ * Je Seite mit Besetzung kommt höchstens eine ohne dran; der Überhang wartet auf einen späteren Lauf (die ältesten stehen vorn, siehe `nachholen`).
+ */
+export function verzahne(mitJa: number[], ohneJa: number[]): number[] {
+  return mitJa.flatMap((id, i) => (i < ohneJa.length ? [ohneJa[i]!, id] : [id]))
+}
+
+function nachholen(ids: number[], bestand: Record<string, Eintrag>, jetztMs: number): number[] {
+  const alter = (id: number): number => (jetztMs - Date.parse(bestand[String(id)]!.fetchedAt)) / 86_400_000
+  const leer = ids
+    .filter((id) => {
+      const e = bestand[String(id)]
+      return e !== undefined && !e.de?.length && alter(id) >= LEER_TAGE
+    })
+    .sort((a, b) => alter(b) - alter(a))
+  const ja = (id: number): number => bestand[String(id)]!.ja
+  return verzahne(leer.filter((id) => ja(id) > 0), leer.filter((id) => !ja(id)))
 }
 
 /**
@@ -54,5 +78,6 @@ export function sprecherLuecken(e: {
   return {
     haupt: [...imHaupt].filter(offen).sort((a, b) => markiert(b) - markiert(a)),
     katalog: [...e.katalog.keys()].filter((id) => !imHaupt.has(id) && offen(id)).sort((a, b) => markiert(a) - markiert(b)),
+    nachholen: nachholen([...imHaupt].filter((id) => !offen(id) && !zurueckgestellt(e.weg, id, e.jetztMs)), e.bestand, e.jetztMs),
   }
 }

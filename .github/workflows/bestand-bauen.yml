@@ -332,7 +332,8 @@ jobs:
             echo "DATEN_WARNUNG=${DATEN_WARNUNG}" >> "$GITHUB_ENV"
           fi
           # Mängel-Register (`data/maengel.json`, vom Bau): neu offene Mängel, Rückfälle je Art und ein Hinweis zur Vorfassung, Zeilen aus `qualitaet-warnzeilen.ts`. Cover steht nur im Register.
-          for art in NEU:neu RUECKFALL:Rückfall VORFASSUNG:Vorfassung; do
+          # STILLSTAND: eine auto-Art sinkt seit drei Tagen nicht, obwohl der Bestand wächst (`maengel-stillstand.ts`).
+          for art in NEU:neu RUECKFALL:Rückfall VORFASSUNG:Vorfassung STILLSTAND:Stillstand; do
             if grep -q "^MAENGEL_${art%%:*} " "$RUNNER_TEMP/qualitaet.log"; then
               maengel="$(grep -m1 "^MAENGEL_${art%%:*} " "$RUNNER_TEMP/qualitaet.log" | cut -d' ' -f2-)"
               echo "::warning::Mängel ${art##*:}: ${maengel}"

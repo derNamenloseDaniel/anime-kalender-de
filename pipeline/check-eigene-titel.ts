@@ -121,6 +121,28 @@ console.log('Titel aus der Zeile')
   pruefe(titles.get(42)?.titleDe === 'Fremd' && !titles.has(eigeneId(910002)), 'der fremde Titel ist unverändert, der widerrufene fehlt')
 }
 
+console.log('Stammdaten mit Quelle')
+{
+  const stamm = ['  studios: [Fixture Studio]', '  genres: [Action, Sci-Fi]', '  runtimeMin: 22', '  jpYear: 1985', '  datenQuelle: https://example.org/stamm']
+  const kaputt = (extra: string[], teil: string, text: string) => {
+    schreibeDatei(zeile(910001, 'A', extra))
+    pruefe(wirft(() => ladeEigeneTitel(bauOrdner), teil), text)
+  }
+  kaputt(stamm.filter((z) => !z.includes('datenQuelle')), 'datenQuelle', 'Stammdaten ohne datenQuelle brechen ab')
+  kaputt(['  runtimeMin: 22'], 'datenQuelle', 'schon ein einzelnes Feld braucht die Quelle')
+  kaputt(stamm.map((z) => z.replace('https://example.org/stamm', 'http://example.org/stamm')), 'datenQuelle', 'datenQuelle ohne https bricht ab')
+  kaputt(stamm.map((z) => z.replace('[Fixture Studio]', '[]')), 'studios', 'leere Studioliste bricht ab')
+  kaputt(stamm.map((z) => z.replace('runtimeMin: 22', 'runtimeMin: 0')), 'runtimeMin', 'Laufzeit 0 bricht ab')
+  kaputt(stamm.map((z) => z.replace('jpYear: 1985', 'jpYear: 85')), 'jpYear', 'zweistelliges Jahr bricht ab')
+  const titles = new Map<number, Title>()
+  schreibeDatei([...zeile(910001, 'Mit Daten', stamm), ...zeile(910002, 'Ohne Daten')])
+  ergaenzeEigeneTitel(titles, ladeEigeneTitel(bauOrdner))
+  const mit = titles.get(eigeneId(910001))
+  const ohne = titles.get(eigeneId(910002))
+  pruefe(mit?.studios?.[0] === 'Fixture Studio' && mit.genres.join() === 'Action,Sci-Fi' && mit.runtimeMin === 22 && mit.jpYear === 1985, 'Stammdaten landen im Titel')
+  pruefe(ohne?.studios?.length === 0 && ohne.genres.length === 0 && ohne.runtimeMin === undefined && ohne.jpYear === undefined, 'ohne Stammdaten bleibt der Titel leer (nichts erfunden)')
+}
+
 console.log('Bau und Termin über releasesAus (Z wie Zorro, M.A.S.K.)')
 {
   schreibeDatei([

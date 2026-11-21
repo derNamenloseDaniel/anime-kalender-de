@@ -2,6 +2,7 @@
 import type { Release, Title } from '../shared/types.ts'
 import { adresseMehrfach, REGELN, zaehleMaengel, type Kontext } from './lib/maengel-regeln.ts'
 import { baueNeinGilt } from './lib/maengel-nein.ts'
+import { alsLookup } from './lib/bild-sprache.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -71,6 +72,8 @@ pruefe('bild-fremdsprachig: deutsches, englisches und textloses Plakat zählen n
 pruefe('bild-fremdsprachig: TMDB-Cover eines anderen Plakats (Schwestertitel) zählt nicht', arten(gut(1, { coverImage: TMDB }), plakat('ja', '2026-10-27', '/y.jpg')).length === 0)
 pruefe('bild-fremdsprachig: AniList-Cover offen, solange TMDB nicht „kein Plakat“ sagt', arten(gut(1, { coverImage: ANILIST })).join() === 'bild-fremdsprachig' && arten(gut(1, { coverImage: ANILIST }), kontext({ plakat: () => null })).join() === 'bild-fremdsprachig:keine-lesbare-fassung')
 pruefe('bild-fremdsprachig: AniList-Banner offen, solange TMDB nicht „kein Banner“ sagt', arten(gut(1, { bannerImage: ANILIST })).join() === 'bild-fremdsprachig' && arten(gut(1, { bannerImage: ANILIST }), kontext({ banner: () => null })).join() === 'bild-fremdsprachig:keine-lesbare-fassung')
+const nachschlagen = alsLookup({ 1: { p: '/a.jpg' }, 2: null, 3: { p: '/geteilt.jpg' } }, { 1: { p: '/a.jpg' }, 2: null })
+pruefe('bild-fremdsprachig: Bestand wie im Bau – Eintrag, null, geteilter Film wird null, nie gesucht bleibt undefined', nachschlagen(1)?.p === '/a.jpg' && nachschlagen(2) === null && nachschlagen(3) === null && nachschlagen(4) === undefined)
 pruefe('bild-fremdsprachig: Ausnahme nur, wenn jedes Bild sie hat', arten(gut(1, { coverImage: ANILIST, bannerImage: ANILIST }), kontext({ plakat: () => null })).join() === 'bild-fremdsprachig' && arten(gut(1, { coverImage: ANILIST, bannerImage: ANILIST }), kontext({ plakat: () => null, banner: () => null })).join() === 'bild-fremdsprachig:keine-lesbare-fassung')
 pruefe('titel-de: Treffer mit Weg', arten(gut(1, { titleDe: undefined })).join() === 'titel-de')
 pruefe('titel-de: ohne Weg und Erstausgabe zu Recht leer', arten(gut(1, { titleDe: undefined, streams: [], watchLinks: [], deErstausgabe: undefined })).join() === 'titel-de:ohne-deutsche-fassung,kein-weg')

@@ -10,6 +10,11 @@ export const SPRACHFOLGE_AB = '2026-11-22'
 /** Bestandseintrag eines Bildes: `undefined` = nie gesucht, `null` = TMDB hat keins. */
 export type BildLookup<T> = (id: number) => T | null | undefined
 
+/** Ein Bildbestand wie der Bau ihn liest: was `gilt` gegenüber `roh` verwirft (geteilter Film), hat für den Titel kein Bild (`null`). */
+export function alsLookup<T>(roh: Record<string, T | null>, gilt: Record<string, T | null>): BildLookup<T> {
+  return (id) => (String(id) in roh && !(String(id) in gilt) ? null : gilt[String(id)])
+}
+
 /** Grund, warum ein Bild mit fremder Schrift zu Recht steht. */
 export const KEINE_LESBARE = 'keine-lesbare-fassung'
 

@@ -14,6 +14,7 @@ import { MAENGEL_DATEI, schreibeFort, serialisiere, type Register } from '../lib
 import type { PlakatEintrag } from '../lib/tmdb-plakat-suche.ts'
 import { BANNER_DATEI } from '../lib/tmdb-banner.ts'
 import { ohneGeteilteFilme } from '../lib/tmdb-eindeutig.ts'
+import { alsLookup, type BildLookup } from '../lib/bild-sprache.ts'
 
 const OUT = 'public/data'
 
@@ -30,11 +31,10 @@ function leser(): Pick<Kontext, 'folgen' | 'synopse'> {
   }
 }
 
-/** Ein Bildbestand wie der Bau ihn liest: das Bild eines geteilten Films gehört keinem Titel (`ohneGeteilteFilme`), TMDB hat also keins für ihn (`null`). */
-function bildBestand<T>(datei: string, was: string): (id: number) => T | null | undefined {
+/** Das Bild eines geteilten Films gehört keinem Titel (`ohneGeteilteFilme`), TMDB hat also keins für ihn. */
+function bildBestand<T>(datei: string, was: string): BildLookup<T> {
   const roh = readJson<Record<string, T | null>>(datei, {})
-  const gilt = ohneGeteilteFilme(roh, was)
-  return (id) => (String(id) in roh && !(String(id) in gilt) ? null : gilt[String(id)])
+  return alsLookup(roh, ohneGeteilteFilme(roh, was))
 }
 
 /** Die Bildbestände von TMDB (gewähltes Plakat mit Sprache, Banner) für `bild-fremdsprachig`. */

@@ -62,7 +62,7 @@ const mit = pilleUnten({ title: titel, s: weg, releases: [s4], folgenAngabe: 'de
 pruefe('Pille Horizonte RTL+: Staffeln, ohne „seit 20.11.2026“', mit === `${S13} · ${S4F1}`, mit)
 const ohne = pilleUnten({ title: titel, s: weg, releases: [s4], folgenAngabe: 'detail.folgenBereich:{"bereich":"1–136"}', today: '2026-11-21', t: T })
 pruefe('Gegenfall ohne Staffeln: Bereich und „seit“ wie bisher', ohne === 'detail.folgenBereich:{"bereich":"1–136"} · detail.seitDatum:{"d":"20.11.2026"}', ohne)
-const abEins = pilleUnten({ title: titel, s: weg, releases: [rel({ firstEpisodeNumber: 1, episodeCount: 136 })],folgenAngabe: '', today: '2026-11-21', t: T, staffelAngabe: S13 })
+const abEins = pilleUnten({ title: titel, s: weg, releases: [rel({ firstEpisodeNumber: 1, episodeCount: 136 })], folgenAngabe: '', today: '2026-11-21', t: T, staffelAngabe: S13 })
 pruefe('Termin ab Folge 1 bleibt „seit“ auch mit Staffeln', abEins === `${S13} · detail.seitDatum:{"d":"20.11.2026"}`, abEins)
 
 /* Verdrahtung im Panel: die gerenderten Anbieterzeilen bekommen die Staffelgrenzen durchgereicht. */

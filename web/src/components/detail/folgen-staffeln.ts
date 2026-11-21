@@ -3,10 +3,11 @@
  * Staffelgrenzen (`s`, `pipeline/lib/pokemon-staffeln.ts`), zeigt der Kasten je Staffel ihre Folgen und ihren eigenen Deutsch-Stand statt
  * Paketen zu 50. Folgen ohne Titel in der Liste (Horizonte: aniSearch führt 122, die Staffeln reichen bis 137) stehen mit Nummer da.
  */
+import type { StaffelZeile } from '@shared/staffel-folge.ts'
+
 type Folge = [nr: number, titel: string, minuten?: number]
 
-/** `[Staffel, von, bis]`, die offene letzte Staffel `[Staffel, von]`. */
-export type StaffelZeile = [number, number] | [number, number, number]
+export type { StaffelZeile }
 
 export type StaffelAbschnitt = { nr: number; von: number; bis: number; offen: boolean; deutsch: number; folgen: Folge[] }
 

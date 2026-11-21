@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { loadJson } from '../../lib/data.ts'
+import { gemerkt } from '../../lib/lade-neuversuch.ts'
 import { Tooltip } from '../ui.tsx'
 import { DeFlaggeZeichen } from '../de-flagge.tsx'
 import { folgeIstDeutsch } from './stream-bereiche.ts'
@@ -30,6 +31,8 @@ interface Liste {
 const PAKET = 50
 let verzeichnis: Promise<Set<number>> | undefined
 const holeVerzeichnis = (): Promise<Set<number>> => (verzeichnis ??= loadJson<number[]>('folgen/index.json').then((l) => new Set(l)).catch(() => new Set<number>()))
+/** Ein Abruf je Titel: Folgenkasten und Anbieterzeilen (Staffelgrenzen) lesen dieselbe Datei. */
+const holeListe = (titleId: number): Promise<Liste> => gemerkt(`folgen/${titleId}`, () => loadJson<Liste>(`folgen/${titleId}.json`))
 
 /** Gibt es zu diesem Titel eine Folgenliste? Erst nach dem Laden des Verzeichnisses `true`; wer die Liste als Inhalt braucht (leerer Kasten), fragt hier. */
 export function useHatFolgenListe(titleId: number): boolean {
@@ -43,6 +46,25 @@ export function useHatFolgenListe(titleId: number): boolean {
     }
   }, [titleId])
   return gibtEs
+}
+
+/** Die deutschen Staffelgrenzen des Titels (`s` der Folgenliste) für die Anbieterzeilen; ohne Liste oder Grenzen nichts. */
+export function useStaffelGrenzen(titleId: number): StaffelZeile[] | undefined {
+  const [s, setS] = useState<StaffelZeile[]>()
+  useEffect(() => {
+    setS(undefined)
+    let aktiv = true
+    /* Das Verzeichnis im selben Effekt fragen: ein Zustand „Liste da“ des vorigen Titels löste sonst beim Wechsel einen Abruf ohne Datei aus.
+       Ohne Datei bleibt die Zeile bei der durchgehenden Zählung; den Fehler zeigt der Folgenkasten selbst. */
+    void holeVerzeichnis()
+      .then((v) => (v.has(titleId) ? holeListe(titleId) : undefined))
+      .then((l) => aktiv && setS(l?.s))
+      .catch(() => aktiv && setS(undefined))
+    return () => {
+      aktiv = false
+    }
+  }, [titleId])
+  return s
 }
 
 let zaehlungen: Promise<Record<string, FolgenZaehlung>> | undefined
@@ -80,7 +102,7 @@ export function FolgenBereich({ titleId, wege, erschienen, laufzeitImKopf, serie
   useEffect(() => {
     if (!gibtEs || liste) return
     let aktiv = true
-    void loadJson<Liste>(`folgen/${titleId}.json`).then((l) => aktiv && setListe(l)).catch(() => aktiv && setListe({ f: [], de: [] }))
+    void holeListe(titleId).then((l) => aktiv && setListe(l)).catch(() => aktiv && setListe({ f: [], de: [] }))
     return () => {
       aktiv = false
     }

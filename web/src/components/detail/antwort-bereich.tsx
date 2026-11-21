@@ -15,6 +15,12 @@ import { KinoZuletzt } from './kino-zuletzt.tsx'
 import type { sortiereNachZugang } from './wege-sortieren.ts'
 import { ankuendigungOhneTermin } from '@shared/ankuendigung.ts'
 import { ohneAnkuendigungsWeg, TerminOffenKarte } from './termin-offen-karte.tsx'
+import { useStaffelGrenzen } from './folgen-bereich.tsx'
+
+/** Ankündigung ohne Termin und die deutschen Staffelgrenzen (Anbieterzeilen in Staffeln) des Titels. */
+function useAngabenDesTitels(title: Title, art: Parameters<typeof ankuendigungOhneTermin>[1]) {
+  return { ankuendigung: ankuendigungOhneTermin(title, art), staffeln: useStaffelGrenzen(title.id) }
+}
 
 export function AntwortBereich({ antwort, sortiertNachZugang, streamReleases, terminReleases, title, t, today, wegeHinweis, tvVorbei, kastenNotiz, folgenLuecke, verbindung, favorites, onToggleFavorite, folgenAngabeFuer, dubZeilen, releaseJePlattform, releases, discAusgaben, discReleases, discZuerst }: {
   antwort: ReturnType<typeof berechneAntwort>
@@ -41,7 +47,7 @@ export function AntwortBereich({ antwort, sortiertNachZugang, streamReleases, te
   /** Über einen Disc-Termin geöffnet — der Umschalter startet auf „Disc". */
   discZuerst?: boolean
 }) {
-  const ankuendigung = ankuendigungOhneTermin(title, antwort?.art)
+  const { ankuendigung, staffeln } = useAngabenDesTitels(title, antwort?.art)
   return (
     <>
       {antwort && (
@@ -88,7 +94,7 @@ export function AntwortBereich({ antwort, sortiertNachZugang, streamReleases, te
               </>
             ) : <KinoZuletzt titleId={title.id} antwort={antwort} t={t} />
           }
-          stream={streamZeilen({ sortiertNachZugang: ohneAnkuendigungsWeg(sortiertNachZugang, ankuendigung), title, t, today, folgenAngabeFuer, dubZeilen, releaseJePlattform, streamReleases, releases, tvVorbei })}
+          stream={streamZeilen({ sortiertNachZugang: ohneAnkuendigungsWeg(sortiertNachZugang, ankuendigung), title, t, today, folgenAngabeFuer, dubZeilen, releaseJePlattform, streamReleases, releases, tvVorbei, staffeln })}
           disc={discZeilen({ sortiertNachZugang, title, t, today, folgenAngabeFuer, discAusgaben, discReleases })}
           discZuerst={discZuerst}
           key={discZuerst ? 'disc' : 'stream'}

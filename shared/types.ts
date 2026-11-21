@@ -697,6 +697,8 @@ export interface ReleaseEvent {
   staffelfinale?: boolean
   /** Erste Folge einer wöchentlichen Staffel (siehe `istStaffelstart`). */
   staffelstart?: boolean
+  /** `episode` in deutscher Staffelzählung, wo der Titel Staffelgrenzen hat (Horizonte 137 = Staffel 4 Folge 1; `bau/staffel-folge-termine.ts`). */
+  staffelFolge?: [staffel: number, folge: number]
   /** An diesem Tag kostenlos schaubar — nur für Termine von heute gesetzt (`shared/kostenlos.ts`). */
   kostenlos?: boolean
   name: string

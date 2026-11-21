@@ -17,6 +17,8 @@ import { pillenSchluessel, type sortiereNachZugang } from './wege-sortieren.ts'
 import { tvAngabe } from '../../lib/tv-angabe.ts'
 import { teilAngaben } from './wege-falten.ts'
 import { pilleUnten } from './pille-unten.ts'
+import { staffelAngabe } from './staffel-angabe.ts'
+import type { StaffelZeile } from '@shared/staffel-folge.ts'
 import { ausgabenOhneDeSichtbar, kanalTerminQuelle } from './chips-regeln.ts'
 
 /** Eine Zeile je Termin: Sender oder Anbieter, Datum, Folge; ein Prime-Kanal-Termin mit deutschem Anbieter-Weg trägt dessen Folgen und „Deutsch“. */
@@ -40,7 +42,7 @@ type Sortiert = ReturnType<typeof sortiereNachZugang>
 type FolgenAngabeFuer = (s: { platform?: string; url?: string; nurFolge?: number; dubRanges?: StreamLink['dubRanges']; dub?: boolean; fenster?: StreamLink['fenster'] } | undefined) => string
 
 /** Die Zeilen unter „Stream" im Antwortkasten (Anbieter, Ausgaben ohne Deutsch, Bezugswege, Termine, TV). */
-export function streamZeilen({ sortiertNachZugang, title, t, today, folgenAngabeFuer, dubZeilen, releaseJePlattform, streamReleases, releases, tvVorbei }: {
+export function streamZeilen({ sortiertNachZugang, title, t, today, folgenAngabeFuer, dubZeilen, releaseJePlattform, streamReleases, releases, tvVorbei, staffeln }: {
   sortiertNachZugang: Sortiert
   title: Title
   t: Translate
@@ -51,8 +53,10 @@ export function streamZeilen({ sortiertNachZugang, title, t, today, folgenAngabe
   streamReleases: Release[]
   releases: Release[]
   tvVorbei: TvZuletzt[]
+  /** Deutsche Staffelgrenzen des Titels (`s` der Folgenliste): die Anbieterzeilen zählen dann in Staffeln. */
+  staffeln?: StaffelZeile[]
 }) {
-  return anbieterPillen({ sortiertNachZugang, title, t, today, folgenAngabeFuer, dubZeilen, releaseJePlattform, releases })
+  return anbieterPillen({ sortiertNachZugang, title, t, today, folgenAngabeFuer, dubZeilen, releaseJePlattform, releases, staffeln })
     /*
       **Ein Abgang ist eine Auskunft, kein Loch — und er gehört zu
       den anderen Wegen.**
@@ -92,7 +96,7 @@ export function streamZeilen({ sortiertNachZugang, title, t, today, folgenAngabe
 }
 
 /** Eine Pille je Anbieter mit deutscher Fassung, nach Zugangsart sortiert. */
-function anbieterPillen({ sortiertNachZugang, title, t, today, folgenAngabeFuer, dubZeilen, releaseJePlattform, releases }: {
+function anbieterPillen({ sortiertNachZugang, title, t, today, folgenAngabeFuer, dubZeilen, releaseJePlattform, releases, staffeln }: {
   sortiertNachZugang: Sortiert
   title: Title
   t: Translate
@@ -101,6 +105,7 @@ function anbieterPillen({ sortiertNachZugang, title, t, today, folgenAngabeFuer,
   dubZeilen: (s: { dubRanges?: StreamLink['dubRanges'] }) => string[]
   releaseJePlattform: Map<string, Release>
   releases: Release[]
+  staffeln?: StaffelZeile[]
 }) {
   /*
     **Stream ist, wo man es ansehen kann.** Die Zugangsart
@@ -138,7 +143,7 @@ function anbieterPillen({ sortiertNachZugang, title, t, today, folgenAngabeFuer,
           farbe={PLATFORMS[s.platform].color}
           icon={<AnbieterIcon was={s.platform} />}
           url={s.url}
-          unten={pilleUnten({ title, s, releases, folgenAngabe, today, t })}
+          unten={pilleUnten({ title, s, releases, folgenAngabe, today, t, staffelAngabe: staffelAngabe(staffeln, s, releases, today, t) })}
           /*
             **Was in der Pille kürzt, steht hier ausgeschrieben.**
 

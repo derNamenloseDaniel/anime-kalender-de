@@ -152,6 +152,7 @@ export const TEXTE_SPAET = {
   'detail.teilFolgeTitel': 'Dieser Eintrag umfasst dort die Folge {nr}',
   'detail.teilStaffel': 'Staffel {von}–{bis}',
   'detail.teilStaffelEine': 'Staffel {nr}',
+  'detail.staffelFolgen': 'Staffel {s} Fg. {bereiche}',
   'detail.dubLuecken': 'ohne Deutsch: Fg. {n}',
   'detail.dubLueckenTitel': 'Nicht alle Folgen auf Deutsch',
   'detail.sharedUrlNote':

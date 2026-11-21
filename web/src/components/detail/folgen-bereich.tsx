@@ -50,18 +50,20 @@ export function useHatFolgenListe(titleId: number): boolean {
 
 /** Die deutschen Staffelgrenzen des Titels (`s` der Folgenliste) für die Anbieterzeilen; ohne Liste oder Grenzen nichts. */
 export function useStaffelGrenzen(titleId: number): StaffelZeile[] | undefined {
-  const gibtEs = useHatFolgenListe(titleId)
   const [s, setS] = useState<StaffelZeile[]>()
   useEffect(() => {
     setS(undefined)
-    if (!gibtEs) return
     let aktiv = true
-    /* Ohne Datei bleibt die Zeile bei der durchgehenden Zählung; den Fehler zeigt der Folgenkasten selbst. */
-    void holeListe(titleId).then((l) => aktiv && setS(l.s)).catch(() => aktiv && setS(undefined))
+    /* Das Verzeichnis im selben Effekt fragen: ein Zustand „Liste da“ des vorigen Titels löste sonst beim Wechsel einen Abruf ohne Datei aus.
+       Ohne Datei bleibt die Zeile bei der durchgehenden Zählung; den Fehler zeigt der Folgenkasten selbst. */
+    void holeVerzeichnis()
+      .then((v) => (v.has(titleId) ? holeListe(titleId) : undefined))
+      .then((l) => aktiv && setS(l?.s))
+      .catch(() => aktiv && setS(undefined))
     return () => {
       aktiv = false
     }
-  }, [gibtEs, titleId])
+  }, [titleId])
   return s
 }
 

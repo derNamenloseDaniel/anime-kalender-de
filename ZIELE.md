@@ -41,6 +41,13 @@ Die Seite ist auf einem Handy mit schwacher Leitung immer schnell und flüssig. 
 - 1.331 Titel ohne Verweis: prüfen, ob es sie wirklich nirgends deutsch gibt
 - Die 62 offenen Prime-Suchen und 30 Netflix-Titel der Prüfliste
 
+**Der Bestand aller Anbieter, laufend nachgeführt (Entscheidung 21.11.2026).** Ziel ist,
+von allen Streaming-Anbietern zu wissen, was jetzt im Angebot ist, und es anzuzeigen —
+nicht als einmalige Momentaufnahme, sondern so, dass sich Änderungen im Bestand eines
+Anbieters im Datensatz niederschlagen. Fehlende Wege bei älteren Titeln (Erstausgabe 2020
+oder früher) bleiben Mängel und zählen mit, werden aber getrennt ausgewiesen und mit
+niedrigerer Priorität gefüllt (`node tools/maengel.mjs`).
+
 ## Hauptziel 2: Die Webseite bleibt aktuell
 
 > „automatisches Erfassen von Informationen zu Neu-Ankündigungen … sobald

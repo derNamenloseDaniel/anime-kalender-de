@@ -1,12 +1,9 @@
 /**
  * Zusicherung: `stillstandZeile` meldet auto-Arten, die seit drei Tagen nicht sinken, obwohl der Bestand wächst (Auftrag auto-arten-2111, 21.11.2026).
- * Läuft in `check:logic`; der letzte Fall liest den echten Verlauf `data/qualitaet-verlauf.json`.
+ * Läuft in `check:logic`, nur mit Kulisse: der echte Verlauf rollt nach 370 Tagen aus (Messung am echten Verlauf im PR-Text).
  */
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import { MAENGEL_STILLSTAND_ZEILE, stillstandZeile, type Tagesstand } from './lib/maengel-stillstand.ts'
 import type { Register, Zaehler } from './lib/maengel-register.ts'
-import { ROOT } from './lib/util.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -33,15 +30,6 @@ console.log('\nStillstand der auto-Arten:')
   pruefe('Grenze: erst zwei Tage, Bezug fehlt, keine Zeile', kurz === undefined, kurz)
   const null_ = stillstandZeile(verlauf, tag('2026-11-21', 104, { fsk: 0, laufzeit: 19, 'titel-de': 5 }), register)
   pruefe('Art ohne offene Mängel steht nicht still', !null_?.includes('fsk'), null_)
-}
-
-console.log('\nEchter Verlauf (data/qualitaet-verlauf.json, Register data/maengel.json):')
-{
-  const echt = JSON.parse(readFileSync(join(ROOT, 'data/qualitaet-verlauf.json'), 'utf8')) as Tagesstand[]
-  const reg = JSON.parse(readFileSync(join(ROOT, 'data/maengel.json'), 'utf8')) as Register
-  const erste = echt.find((h, i) => stillstandZeile(echt.slice(0, i), h, reg) !== undefined)
-  pruefe('der Stillstand ab 16.11.2026 wäre spätestens am 21.11. gemeldet worden', erste !== undefined && erste.gemessenAm <= '2026-11-21', erste?.gemessenAm)
-  console.log(`  (erste Meldung im echten Verlauf: ${erste?.gemessenAm}: ${erste ? stillstandZeile(echt.slice(0, echt.indexOf(erste)), erste, reg) : '-'})`)
 }
 
 if (verletzt) {

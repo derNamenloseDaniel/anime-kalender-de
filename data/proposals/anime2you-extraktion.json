@@ -2038,6 +2038,10 @@
       "am": "2026-11-20",
       "vorschlaege": 2
     },
+    "1073980": {
+      "am": "2026-11-21",
+      "vorschlaege": 0
+    },
     "1074073": {
       "am": "2026-11-21",
       "vorschlaege": 0
@@ -2071,6 +2075,10 @@
       "am": "2026-11-21",
       "vorschlaege": 1
     },
+    "1074300": {
+      "am": "2026-11-21",
+      "vorschlaege": 2
+    },
     "1074310": {
       "am": "2026-11-21",
       "vorschlaege": 4
@@ -2078,6 +2086,15 @@
     "1074323": {
       "am": "2026-11-21",
       "vorschlaege": 2
+    },
+    "1074350": {
+      "am": "2026-11-21",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1074495": {
+      "am": "2026-11-21",
+      "vorschlaege": 0
     }
   },
   "vorschlaege": [
@@ -16390,6 +16407,48 @@
       "artikelId": "1072861",
       "artikel": "»Gantz«-Schöpfer sieht wenig Hoffnung für eine Anime-Neuauflage",
       "quelle": "https://www.anime2you.de/news/1072861/gantz-schoepfer-wenig-hoffnung-fuer-anime-neuauflage/",
+      "veroeffentlicht": "2026-11-21",
+      "gelesenAm": "2026-11-21"
+    },
+    {
+      "titel": "Chainsaw Man",
+      "zitat": "Die zwölfteilige Anime-Serie »Chainsaw Man« ist demnach ab dem 18. Dezember 2026 jeden Freitag um 23:50 Uhr erneut mit deutscher Vertonung auf ProSieben MAXX zu sehen.",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "tv",
+      "datum": "2026-12-18",
+      "uhrzeit": "23:50",
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": "jeden Freitag",
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [],
+      "artikelId": "1074300",
+      "artikel": "ProSieben MAXX strahlt »Chainsaw Man« bald erneut aus",
+      "quelle": "https://www.anime2you.de/news/1074300/prosieben-maxx-wiederholt-chainsaw-man/",
+      "veroeffentlicht": "2026-11-21",
+      "gelesenAm": "2026-11-21"
+    },
+    {
+      "titel": "Chainsaw Man",
+      "zitat": "Die zwölfteilige Anime-Serie »Chainsaw Man« ist demnach ab dem 18. Dezember 2026 jeden Freitag um 23:50 Uhr erneut mit deutscher Vertonung auf ProSieben MAXX zu sehen. Nach der Ausstrahlung werden die Episoden kostenlos auf Joyn veröffentlicht.",
+      "art": "ankuendigung",
+      "sprache": "deutsch",
+      "plattform": "joyn",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Joyn",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": "Kein eigener Tag für Joyn genannt, Veröffentlichung erfolgt im Anschluss an die TV-Ausstrahlung.",
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1074300",
+      "artikel": "ProSieben MAXX strahlt »Chainsaw Man« bald erneut aus",
+      "quelle": "https://www.anime2you.de/news/1074300/prosieben-maxx-wiederholt-chainsaw-man/",
       "veroeffentlicht": "2026-11-21",
       "gelesenAm": "2026-11-21"
     }

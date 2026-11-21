@@ -30,6 +30,13 @@ export interface EigenerEintrag {
   tmdb?: string
   /** Statt `tmdb`: warum es kein Plakat gibt. */
   coverGrund?: string
+  /** Stammdaten, die `datenQuelle` belegt (nie aus der Ankündigung): Produktionsfirma, Genres (AniList-Schreibweise), Minuten je Folge, Erstausstrahlungsjahr. */
+  studios?: string[]
+  genres?: string[]
+  runtimeMin?: number
+  jpYear?: number
+  /** Adresse, die die Stammdaten belegt (Pflicht, sobald eines davon steht). */
+  datenQuelle?: string
 }
 
 const FORMATE = ['TV', 'MOVIE', 'OVA', 'ONA', 'SPECIAL']
@@ -39,6 +46,17 @@ function pruefeCover(e: Partial<EigenerEintrag>, wo: string): void {
   if (e.tmdb !== undefined && !/^(movie|tv)\/\d+$/.test(String(e.tmdb))) throw new Error(`${wo}: tmdb muss movie/<Kennung> oder tv/<Kennung> sein`)
   if (e.widerrufen || e.zuId) return
   if (e.tmdb === undefined && !e.coverGrund?.trim()) throw new Error(`${wo}: tmdb (Plakat) oder coverGrund fehlt`)
+}
+
+/** Stammdatenfelder: gültige Werte, und ohne `datenQuelle` kein Wert. */
+function pruefeStammdaten(e: Partial<EigenerEintrag>, wo: string): void {
+  const liste = (v: unknown) => Array.isArray(v) && v.length > 0 && v.every((x) => typeof x === 'string' && x.trim())
+  if (e.studios !== undefined && !liste(e.studios)) throw new Error(`${wo}: studios ist keine Liste von Namen`)
+  if (e.genres !== undefined && !liste(e.genres)) throw new Error(`${wo}: genres ist keine Liste von Namen`)
+  if (e.runtimeMin !== undefined && (!Number.isInteger(e.runtimeMin) || e.runtimeMin < 1)) throw new Error(`${wo}: runtimeMin ist keine positive Zahl`)
+  if (e.jpYear !== undefined && (!Number.isInteger(e.jpYear) || e.jpYear < 1900 || e.jpYear > 2100)) throw new Error(`${wo}: jpYear ist kein Jahr`)
+  const hat = e.studios || e.genres || e.runtimeMin !== undefined || e.jpYear !== undefined
+  if (hat && !/^https:\/\//.test(String(e.datenQuelle ?? ''))) throw new Error(`${wo}: datenQuelle (https-Adresse) fehlt für die Stammdaten`)
 }
 
 /** Prüft eine Zeile der Handdatei; ein Fehler bricht den Bau ab, statt einen halben Titel zu zeigen. */
@@ -58,6 +76,7 @@ function pruefeZeile(e: Partial<EigenerEintrag>, i: number, gesehen: Set<number>
   if (e.kanal !== undefined && !String(e.kanal).trim()) throw new Error(`${wo}: kanal ist leer`)
   if (e.geschaetzt !== undefined && typeof e.geschaetzt !== 'boolean') throw new Error(`${wo}: geschaetzt muss true oder false sein`)
   pruefeCover(e, wo)
+  pruefeStammdaten(e, wo)
   return e as EigenerEintrag
 }
 
@@ -80,9 +99,11 @@ export function titelAusEintrag(e: EigenerEintrag): Title {
     slug: `${slugify(e.name)}-${id}`,
     titleDe: e.name,
     format: e.format,
-    genres: [],
+    genres: e.genres ?? [],
     keywords: [],
-    studios: [],
+    studios: e.studios ?? [],
+    ...(e.runtimeMin ? { runtimeMin: e.runtimeMin } : {}),
+    ...(e.jpYear ? { jpYear: e.jpYear } : {}),
     dubConfidence: 'normal',
     streams: [],
   } as Title

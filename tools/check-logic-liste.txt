@@ -400,6 +400,7 @@ pipeline/check-lade-neuversuch.ts
 pipeline/check-ladefehler-nein.ts
 pipeline/check-ladeplatz-frist.ts
 pipeline/check-lauf-fortschritt.ts
+pipeline/check-laufzeit-anilist.ts
 pipeline/check-laut-gleich.ts
 pipeline/check-lazy-rueckfall.ts
 pipeline/check-leere-liste.ts

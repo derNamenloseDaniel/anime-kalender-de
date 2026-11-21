@@ -1,5 +1,9 @@
 /** Tests für tools/pr-diff-bauen.mjs: Stub nur für große Dateien der Positivliste, alles andere vollständig. */
-import { readFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { baueDiff, gitDiffRunner, gitInhaltRunner, istDatenJs, ladeQuellen, stubbar, GRENZE_STUB, GRENZE_GESAMT } from './pr-diff-bauen.mjs'
 
 const fehler = []
@@ -166,6 +170,45 @@ pruefe('Rest GRENZE_GESAMT + 1: auch der zweite gestubbt', mitRest(klein + 1).ge
 const steuerDatei = datei('public/data/a\nb.json', mitGroesse(49000).replace(/y/g, 'q'))
 const mitSteuer = bau([steuerDatei, ...erzeugnisse, codeDatei])
 pruefe('Pfad mit Steuerzeichen bleibt unter Druck sichtbar', mitSteuer.diff.includes('q'.repeat(49000)) && mitSteuer.gestubbt.every((p) => !p.includes('\\x0a')))
+
+// Gelöschte Dateien (21.11.2026, PR 4417): Code unter der Grenze plus große Löschungen, Summe darüber → Löschungen nach geloescht.diff.
+const geloeschtDatei = (name, n, extra = {}) => datei(name, '@@ -1,5 +0,0 @@\n' + 'z'.repeat(n), { status: 'removed', additions: 0, deletions: 5, ...extra })
+const codeAlt = Array.from({ length: 6 }, (_, i) => datei(`pipeline/lib/k${i}.ts`, '@@\n' + mitGroesse(40000)))
+const loeschungen = [geloeschtDatei('tools/alt-a.mjs', 150000), geloeschtDatei('tools/alt-b.mjs', 60000), geloeschtDatei('tools/alt-c.mjs', 30000)]
+const lösch = bau([...codeAlt, ...loeschungen])
+pruefe('4417-Form: Code + Löschungen über der Grenze → ok', lösch.zustand === 'ok' && Buffer.byteLength(lösch.diff) <= GRENZE_GESAMT)
+pruefe('Hinweiszeile in pr.diff, Patch nicht', lösch.diff.includes('Gelöschte Datei tools/alt-a.mjs (-5 Zeilen): voller Inhalt in geloescht.diff') && !lösch.diff.includes('z'.repeat(150000)))
+pruefe('voller Patch unverändert in geloescht.diff', lösch.geloescht.includes('deleted file mode 100644\n--- a/tools/alt-a.mjs\n+++ b/tools/alt-a.mjs\n@@ -1,5 +0,0 @@\n' + 'z'.repeat(150000)))
+pruefe('nur so viele wie nötig: größte zuerst, kleinste bleibt', lösch.verschoben.join() === 'tools/alt-a.mjs' && lösch.diff.includes('z'.repeat(30000)))
+const ohneNeu = bau([...codeAlt, ...loeschungen.slice(1)])
+pruefe('(c) unter der Grenze wird nichts verschoben', ohneNeu.geloescht === '' && ohneNeu.verschoben.length === 0 && ohneNeu.diff.includes('z'.repeat(60000)))
+const stubUndLoesch = bau([...erzeugnisse, ...codeAlt.slice(0, 3), ...loeschungen])
+pruefe('erst Stub, dann Verschieben nur falls nötig', stubUndLoesch.gestubbt.length > 0 && stubUndLoesch.verschoben.length === 0)
+const nurAdded = bau([...codeAlt, geloeschtDatei('tools/neu-a.mjs', 150000, { status: 'added' }), geloeschtDatei('tools/neu-b.mjs', 90000, { status: 'modified' })])
+pruefe('nur status removed wird verschoben', nurAdded.verschoben.length === 0 && nurAdded.geloescht === '')
+const steuerLoesch = bau([...codeAlt.slice(0, 4), geloeschtDatei('tools/a\nb.mjs', 150000), geloeschtDatei('tools/alt-b.mjs', 60000), geloeschtDatei('tools/alt-c.mjs', 30000)])
+pruefe('(d) gelöschte Datei mit Steuerzeichen bleibt in pr.diff', steuerLoesch.diff.includes('z'.repeat(150000)) && steuerLoesch.verschoben.join() === 'tools/alt-b.mjs')
+const nieLoesch = bau([...codeAlt, geloeschtDatei('data/dub-confirmed.yaml', 150000), geloeschtDatei('data/curated/x.yaml', 100000), geloeschtDatei('tools/alt-c.mjs', 60000)])
+pruefe('(d) gelöschter Handbeleg und data/curated bleiben in pr.diff', nieLoesch.diff.includes('z'.repeat(150000)) && nieLoesch.diff.includes('z'.repeat(100000)) && nieLoesch.verschoben.join() === 'tools/alt-c.mjs')
+const nieAllein = bau([...codeAlt, geloeschtDatei('data/dub-confirmed.yaml', 200000)])
+pruefe('(d) nur NIE_STUB gelöscht, Summe zu groß → unvollstaendig, nichts verschoben', nieAllein.zustand === 'unvollstaendig' && nieAllein.geloescht === '')
+const ohnePatchLoesch = bau([...codeAlt, geloeschtDatei('tools/alt-a.mjs', 150000, { patch: undefined }), geloeschtDatei('tools/alt-b.mjs', 200000)])
+pruefe('gelöscht ohne lieferbaren Diff: nie verschoben, unvollstaendig', ohnePatchLoesch.zustand === 'unvollstaendig' && ohnePatchLoesch.verschoben.join() === 'tools/alt-b.mjs')
+const riesig = bau([...codeAlt, geloeschtDatei('tools/alt-a.mjs', 300000), geloeschtDatei('tools/alt-b.mjs', 300000)])
+pruefe('geloescht.diff über der Grenze → unvollstaendig, gekürzt', riesig.zustand === 'unvollstaendig' && Buffer.byteLength(riesig.geloescht) <= GRENZE_GESAMT && riesig.verschoben.length === 2)
+pruefe('Löschungen genau am Rand: Hinweis ersetzt nur, wenn kürzer', bau([geloeschtDatei('a.txt', 10), ...Array.from({ length: 5 }, (_, i) => datei(`p/c${i}.ts`, '@@\n' + mitGroesse(80000)))]).verschoben.length === 0)
+
+// Aufruf wie im Workflow: geloescht.diff liegt neben pr.diff, ein alter Stand verschwindet, wenn nichts verschoben wird.
+const ordner = mkdtempSync(join(tmpdir(), 'pr-diff-'))
+const lauf = (dateien) => {
+  writeFileSync(join(ordner, 'd.ndjson'), dateien.map((d) => JSON.stringify(d)).join('\n') + '\n')
+  return spawnSync(process.execPath, [fileURLToPath(new URL('./pr-diff-bauen.mjs', import.meta.url)), join(ordner, 'd.ndjson'), join(ordner, 'pr.diff')], { encoding: 'utf8', timeout: 60000 })
+}
+const cli = lauf([...codeAlt, ...loeschungen])
+pruefe('Aufruf: ok, geloescht.diff neben pr.diff', cli.stdout.trim() === 'ok' && readFileSync(join(ordner, 'geloescht.diff'), 'utf8').includes('z'.repeat(150000)))
+const cliKlein = lauf([codeDatei])
+pruefe('Aufruf ohne Verschieben: alte geloescht.diff entfernt', cliKlein.stdout.trim() === 'ok' && !existsSync(join(ordner, 'geloescht.diff')))
+rmSync(ordner, { recursive: true, force: true })
 
 if (fehler.length > 0) {
   console.error(`pr-diff-bauen.test: ${fehler.length} Fehler`)

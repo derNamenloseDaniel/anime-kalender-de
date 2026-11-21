@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-21T11:01:33.671Z",
+  "scrapedAt": "2026-11-21T16:01:42.204Z",
   "serien": [
     {
       "url": "http://www.crunchyroll.com/de/a-place-further-than-the-universe",
@@ -70223,7 +70223,7 @@
       "seriesId": "GRE50KV36",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-14",
+      "geprueftAm": "2026-11-21",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -70556,109 +70556,109 @@
               "nummer": 52,
               "guid": "G14U4D3W8",
               "laufend": 1,
-              "verfuegbarAb": "2018-10-02T22:00:00Z"
+              "verfuegbarAb": "2018-10-02T15:00:00Z"
             },
             {
               "nummer": 53,
               "guid": "GJWU23M5M",
               "laufend": 2,
-              "verfuegbarAb": "2018-10-09T22:00:00Z"
+              "verfuegbarAb": "2018-10-09T15:00:00Z"
             },
             {
               "nummer": 54,
               "guid": "GN7UDEZPW",
               "laufend": 3,
-              "verfuegbarAb": "2018-10-16T22:00:00Z"
+              "verfuegbarAb": "2018-10-16T15:00:00Z"
             },
             {
               "nummer": 55,
               "guid": "GK9U3JZ54",
               "laufend": 4,
-              "verfuegbarAb": "2018-10-23T22:00:00Z"
+              "verfuegbarAb": "2018-10-23T15:00:00Z"
             },
             {
               "nummer": 56,
               "guid": "GMKUX2Z8W",
               "laufend": 5,
-              "verfuegbarAb": "2018-10-30T22:00:00Z"
+              "verfuegbarAb": "2018-10-30T15:00:00Z"
             },
             {
               "nummer": 57,
               "guid": "GVWU0EVQQ",
               "laufend": 6,
-              "verfuegbarAb": "2018-11-06T23:00:00Z"
+              "verfuegbarAb": "2018-11-06T16:00:00Z"
             },
             {
               "nummer": 58,
               "guid": "G31UX1P0D",
               "laufend": 7,
-              "verfuegbarAb": "2018-11-13T23:00:00Z"
+              "verfuegbarAb": "2018-11-13T16:00:00Z"
             },
             {
               "nummer": 59,
               "guid": "GQJUGJDP3",
               "laufend": 8,
-              "verfuegbarAb": "2018-11-20T23:00:00Z"
+              "verfuegbarAb": "2018-11-20T16:00:00Z"
             },
             {
               "nummer": 60,
               "guid": "GG1U29MQ5",
               "laufend": 9,
-              "verfuegbarAb": "2018-11-27T23:00:00Z"
+              "verfuegbarAb": "2018-11-27T16:00:00Z"
             },
             {
               "nummer": 61,
               "guid": "GEVUZ9Z53",
               "laufend": 10,
-              "verfuegbarAb": "2018-12-04T23:00:00Z"
+              "verfuegbarAb": "2018-12-04T16:00:00Z"
             },
             {
               "nummer": 62,
               "guid": "G7PU4Q4KD",
               "laufend": 11,
-              "verfuegbarAb": "2018-12-11T23:00:00Z"
+              "verfuegbarAb": "2018-12-11T16:00:00Z"
             },
             {
               "nummer": 63,
               "guid": "G9DUE8EWE",
               "laufend": 12,
-              "verfuegbarAb": "2018-12-18T23:00:00Z"
+              "verfuegbarAb": "2018-12-18T16:00:00Z"
             },
             {
               "nummer": 64,
               "guid": "GX9UQ5QN3",
               "laufend": 13,
-              "verfuegbarAb": "2018-12-25T23:00:00Z"
+              "verfuegbarAb": "2018-12-25T16:00:00Z"
             },
             {
               "nummer": 65,
               "guid": "G4VUQNQPD",
               "laufend": 14,
-              "verfuegbarAb": "2019-01-08T23:00:00Z"
+              "verfuegbarAb": "2019-01-08T16:00:00Z"
             },
             {
               "nummer": 66,
               "guid": "G14U4N48Z",
               "laufend": 15,
-              "verfuegbarAb": "2019-01-15T23:00:00Z"
+              "verfuegbarAb": "2019-01-15T16:00:00Z"
             },
             {
               "nummer": 67,
               "guid": "GJWU2Z24P",
               "laufend": 16,
-              "verfuegbarAb": "2019-01-22T23:00:00Z"
+              "verfuegbarAb": "2019-01-22T16:00:00Z"
             },
             {
               "nummer": 68,
               "guid": "GPWUKPKW1",
               "laufend": 17,
-              "verfuegbarAb": "2019-01-29T23:00:00Z"
+              "verfuegbarAb": "2019-01-29T16:00:00Z"
             },
             {
               "nummer": 69,
               "guid": "GZ7UVZVNZ",
               "laufend": 18,
-              "verfuegbarAb": "2019-02-05T23:00:00Z"
+              "verfuegbarAb": "2019-02-05T16:00:00Z"
             },
             {
               "nummer": 70,
@@ -71302,9 +71302,9 @@
         {
           "name": "Staffel 2",
           "staffelId": "GS00385471JAJP",
-          "folgen": 7,
-          "kacheln": 7,
-          "deutsch": 2,
+          "folgen": 8,
+          "kacheln": 8,
+          "deutsch": 3,
           "fremd": 3,
           "deutscheFassung": true,
           "deutscheFolgen": [
@@ -71319,11 +71319,18 @@
               "guid": "GE00385473DEDE",
               "laufend": 2,
               "verfuegbarAb": "2026-11-14T16:00:00Z"
+            },
+            {
+              "nummer": 173,
+              "guid": "GE00385474DEDE",
+              "laufend": 3,
+              "verfuegbarAb": "2026-11-21T16:00:00Z"
             }
           ]
         }
       ],
       "neuFolgen": [
+        "GE00385474DEDE",
         "GE00385473DEDE",
         "GE00385472DEDE"
       ]
@@ -73833,7 +73840,7 @@
       "seriesId": "GT00361955",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-16",
+      "geprueftAm": "2026-11-21",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -73922,9 +73929,9 @@
         {
           "name": "Staffel 2",
           "staffelId": "GS00384019JAJP",
-          "folgen": 8,
-          "kacheln": 8,
-          "deutsch": 5,
+          "folgen": 9,
+          "kacheln": 9,
+          "deutsch": 6,
           "fremd": 0,
           "deutscheFassung": true,
           "deutscheFolgen": [
@@ -73957,11 +73964,18 @@
               "guid": "GE00384101DEDE",
               "laufend": 5,
               "verfuegbarAb": "2026-11-16T14:30:00Z"
+            },
+            {
+              "nummer": 6,
+              "guid": "GE00384102DEDE",
+              "laufend": 6,
+              "verfuegbarAb": "2026-11-21T14:30:00Z"
             }
           ]
         }
       ],
       "neuFolgen": [
+        "GE00384102DEDE",
         "GE00384101DEDE",
         "GE00384100DEDE",
         "GE00384099DEDE",

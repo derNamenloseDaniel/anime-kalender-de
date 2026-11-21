@@ -603,6 +603,7 @@ pipeline/check-spinoff-zaehlung.ts
 pipeline/check-sprache-netz.ts
 pipeline/check-sprache-termin.ts
 pipeline/check-sprecher-anisearch.ts
+pipeline/check-sprecher-dran.ts
 pipeline/check-sprecher-filter.ts
 pipeline/check-sprung-lage.ts
 pipeline/check-sprung-lesestelle.ts

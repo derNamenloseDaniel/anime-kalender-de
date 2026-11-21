@@ -14,7 +14,7 @@ import { beschreibungMitKommentaren, wirksameBeschreibung } from './patchnotes-k
 
 const WURZEL = process.argv[2] ?? tmpdir()
 const ZEILE = 'Patch Notes: keine – Werkzeug, 0 Titel/Termine/Meldungen/Wege/Zeilen.'
-const FALSCHTREFFER = `Wirkung\nDie Zahl der betroffenen Titel misst der nächste Bau, der nächste Bau zeigt sie.\n${ZEILE}`
+const FALSCHTREFFER = `Wirkung\nDie Zahl der betroffenen Titel misst der nächste Bau.\nPatch Notes: keine – Umbau, der nächste Bau zeigt die Zahl.`
 const k = (body, login = 'autor', assoc = 'NONE') => ({ body, user: { login }, author_association: assoc })
 
 // Reine Auswahl
@@ -30,7 +30,7 @@ assert.equal(wirksameBeschreibung('B', [k('Ich schreibe Patch Notes: keine – x
 // Urteil: Falschtreffer mit und ohne Kommentar, Vertagung, altes Verhalten
 const dateien = ['pipeline/x.ts']
 const urteil = (beschreibung) => bewerte({ dateien, neu: [], beschreibung })
-assert.equal(urteil(FALSCHTREFFER).ok, false, 'Vorbedingung: ohne Kommentar trifft die Textsuche')
+assert.equal(urteil(FALSCHTREFFER).ok, false, 'Vorbedingung: ohne Kommentar trifft die Zeilensuche')
 assert.equal(urteil(wirksameBeschreibung(FALSCHTREFFER, [k('Patch Notes: keine – Umbau/intern, Messung nennt nur den Bau')], 'autor')).ok, true, 'Kommentar rettet den Falschtreffer')
 assert.equal(urteil(wirksameBeschreibung(FALSCHTREFFER, [k('Patch Notes: vertagt – wirkt nach dem Bau')], 'autor')).ok, false, 'vertagt ohne Vorrat bleibt rot')
 assert.equal(urteil(wirksameBeschreibung(FALSCHTREFFER, [k('kein Zeile hier')], 'autor')).ok, false, 'kein Patch-Notes-Kommentar: altes Verhalten')

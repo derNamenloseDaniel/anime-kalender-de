@@ -40,21 +40,22 @@ export interface Luecken {
   nachholen: number[]
 }
 
-/** Seiten ohne jede Besetzung (`ja` 0) wechseln mit solchen ab, die eine führen: 15 leere in Folge hält der Lauf für eine Sperrseite (`anisearch-sprecher-lauf.ts`). */
+/**
+ * Seiten ohne jede Besetzung (`ja` 0) wechseln mit solchen ab, die eine führen: 15 leere in Folge hält der Lauf für eine Sperrseite (`anisearch-sprecher-lauf.ts`).
+ * Je Seite mit Besetzung kommt höchstens eine ohne dran; der Überhang wartet auf einen späteren Lauf (die ältesten stehen vorn, siehe `nachholen`).
+ */
 export function verzahne(mitJa: number[], ohneJa: number[]): number[] {
-  const aus: number[] = []
-  for (let i = 0; i < Math.max(mitJa.length, ohneJa.length); i++) {
-    if (i < ohneJa.length) aus.push(ohneJa[i]!)
-    if (i < mitJa.length) aus.push(mitJa[i]!)
-  }
-  return aus
+  return mitJa.flatMap((id, i) => (i < ohneJa.length ? [ohneJa[i]!, id] : [id]))
 }
 
 function nachholen(ids: number[], bestand: Record<string, Eintrag>, jetztMs: number): number[] {
-  const leer = ids.filter((id) => {
-    const e = bestand[String(id)]
-    return e !== undefined && !e.de?.length && (jetztMs - Date.parse(e.fetchedAt)) / 86_400_000 >= LEER_TAGE
-  })
+  const alter = (id: number): number => (jetztMs - Date.parse(bestand[String(id)]!.fetchedAt)) / 86_400_000
+  const leer = ids
+    .filter((id) => {
+      const e = bestand[String(id)]
+      return e !== undefined && !e.de?.length && alter(id) >= LEER_TAGE
+    })
+    .sort((a, b) => alter(b) - alter(a))
   const ja = (id: number): number => bestand[String(id)]!.ja
   return verzahne(leer.filter((id) => ja(id) > 0), leer.filter((id) => !ja(id)))
 }

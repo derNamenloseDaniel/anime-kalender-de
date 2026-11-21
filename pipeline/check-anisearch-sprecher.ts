@@ -47,7 +47,15 @@ console.log('\naniSearch-Sprecherseiten: Reihenfolge:')
     weg: { 15: { code: 404, am: new Date(JETZT - TAG).toISOString() } },
     jetztMs: JETZT,
   })
-  pruefe('Hauptbestand-Seite ohne deutsche Rolle ab 14 Tagen nachholen, ohne Besetzung (ja 0) im Wechsel', leer.nachholen.join() === '13,10,14', leer.nachholen)
+  pruefe('Hauptbestand-Seite ohne deutsche Rolle ab 14 Tagen nachholen; je Seite mit Besetzung eine ohne, die älteste zuerst (14 vor 13)', leer.nachholen.join() === '14,10', leer.nachholen)
+  // Zyklus 2 (Prüfer #4508): die Seiten mit Besetzung haben inzwischen Rollen, übrig sind 20 ohne Besetzung gegen 3 mit.
+  const bestand2: Record<string, Eintrag> = {}
+  for (let id = 100; id < 120; id++) bestand2[id] = vor(15 + (id - 100), [], 0)
+  for (const id of [200, 201, 202]) bestand2[id] = vor(15, [], 4)
+  const z2 = sprecherLuecken({ haupt: Object.keys(bestand2).map(Number), katalog: new Map(), bestand: bestand2, weg: {}, jetztMs: JETZT })
+  const folge = z2.nachholen.reduce((s, id) => (bestand2[id]!.ja ? { n: 0, max: s.max } : { n: s.n + 1, max: Math.max(s.max, s.n + 1) }), { n: 0, max: 0 })
+  pruefe('Überhang ohne Besetzung (20 gegen 3): nur 3 davon kommen dran, nie zwei hintereinander, die ältesten zuerst', z2.nachholen.length === 6 && folge.max === 1 && z2.nachholen[0] === 119, z2.nachholen)
+  pruefe('Verzahnen: Überhang ohne Besetzung wartet', verzahne([1], [7, 8, 9]).join() === '7,1', verzahne([1], [7, 8, 9]))
   pruefe('Nachholen: jünger als 14 Tage, mit deutscher Rolle, Katalog oder zurückgestellt bleibt liegen', !leer.nachholen.some((id) => [11, 12, 15, 20].includes(id)) && leer.haupt.length === 0, leer)
   pruefe('Verzahnen: nie zwei Seiten ohne Besetzung hintereinander, solange eine mit Besetzung bleibt', verzahne([1, 2, 3], [7, 8]).join() === '7,1,8,2,3', verzahne([1, 2, 3], [7, 8]))
 }

@@ -43,6 +43,7 @@ function einheiten(): void {
   pruefe('Banner: ohne textloses geht englisch vor dem breiteren japanischen', waehleBanner([bild(3840, 2160, 'ja'), bild(1920, 1080, 'en')])?.iso_639_1 === 'en')
   pruefe('Banner: deutsch vor englisch, japanisch zuletzt', waehleBanner([bild(1920, 1080, 'ja'), bild(1920, 1080, 'en'), bild(1280, 720, 'de')])?.iso_639_1 === 'de')
   pruefe('Banner: textlos vor dem breiteren deutschen (Hintergrund trägt sonst einen Schriftzug)', waehleBanner([bild(3840, 2160, 'de'), bild(1280, 720, null)])?.iso_639_1 === null)
+  pruefe('Banner: deutsch vor dem breiteren japanischen', waehleBanner([bild(3840, 2160, 'ja'), bild(1280, 720, 'de')])?.iso_639_1 === 'de')
   pruefe('Banner: nur japanisch bleibt japanisch', waehleBanner([bild(1920, 1080, 'ja')])?.iso_639_1 === 'ja')
   pruefe('Banner: zu schmal oder Hochformat gibt keins', waehleBanner([bild(1000, 562, null), bild(1000, 1500, null)]) === undefined)
 }

@@ -3,7 +3,10 @@ import type { TmdbBild } from './tmdb-plakat.ts'
 /** Breite, die TMDB als `w1280` ausliefert; schmalere Hintergrundbilder wären als Vorschaubild zu grob. */
 export const BANNER_MIN_BREITE = 1280
 
-/** Rangfolge der Sprachfassungen: ohne Schrift zuerst (das Bild trägt sonst fremde Titel), dann lesbare, japanisch zuletzt (21.11.2026). */
+/**
+ * Rangfolge: textlos vor deutsch, weil ein Banner hinter der Oberfläche liegt und Schrift darauf mit ihr konkurriert; japanisch zuletzt
+ * (Dirigent, 21.11.2026). Das Plakat wählt de, en, textlos, ja (`tmdb-plakat.ts`).
+ */
 const SPRACHEN: (string | null)[] = [null, 'de', 'en', 'ja']
 
 /** Querformat 16:9 (1,78) mit Spielraum. */

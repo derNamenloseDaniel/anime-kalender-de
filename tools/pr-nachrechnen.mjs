@@ -23,6 +23,7 @@ import { istBotBild, istBotDatei } from './pr-nachrechnen-bot-pfade.mjs'
 import { ZUG, istZugPr, leseZugAktiv } from './zug-aktiv.mjs'
 import { ersetzer, ersetztMeldung } from './pr-ersetzt.mjs'
 import { prueferSperre } from './pr-nachrechnen-pruefer.mjs'
+import { compareKennung, diffGleich } from './pr-eigener-diff.mjs'
 import { aktualisiereZweig } from './pr-nachrechnen-zweig.mjs'
 
 const OEFFNEN_VERSUCHE = 3
@@ -60,7 +61,7 @@ function vorpruefung(nummer, gh, melde, zugAktiv) {
     melde(halt)
     return { exit: 2 }
   }
-  const prueferHalt = prueferSperre(pr.comments, pr.commits)
+  const prueferHalt = prueferSperre(pr.comments, pr.commits, diffGleich(compareKennung(gh, pr.baseRefName ?? 'main'), pr.commits ?? [], pr.headRefOid))
   if (prueferHalt !== null) {
     melde(`PR ${nummer}: ${prueferHalt}`)
     return { exit: 4 }

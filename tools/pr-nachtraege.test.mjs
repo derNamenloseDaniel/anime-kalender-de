@@ -26,6 +26,12 @@ pruefe('Schreibweise egal', treffer('NACHBESSERUNG') && treffer('nachtrag'))
 pruefe('Prüfer: ändern nicht getroffen', !treffer('Prüfer: ändern'))
 pruefe('Nachbesserung mitten im Text nicht getroffen', !treffer('Siehe Nachbesserung oben'))
 pruefe('Nachtrag mitten im Text nicht getroffen', !treffer('Siehe Nachtrag oben'))
+// 21.11.2026, PR 4478: „## Nachträge“ (Mehrzahl mit ä) startete keinen Prüfer neu.
+pruefe('## Nachträge getroffen', treffer('## Nachträge Runde 2'))
+pruefe('**Nachträge getroffen', treffer('**Nachträge**'))
+pruefe('Nachträge unmarkiert, Großschreibung getroffen', treffer('Nachträge') && treffer('NACHTRÄGE'))
+pruefe('Nachtragsfrage mitten im Satz nicht getroffen', !treffer('Siehe die Nachtragsfrage im Fließtext mitten im Satz'))
+pruefe('Nachträge mitten im Text nicht getroffen', !treffer('Siehe Nachträge oben'))
 pruefe('* Nachtrag nicht getroffen', !treffer('* Nachtrag'))
 pruefe('Text vor **Nachtrag in neuer Zeile nicht getroffen', !treffer('Text\n**Nachtrag'))
 const drei = [k('autor', '**Nachtrag A'), k('fremd', '**Nachtrag X'), k('autor', 'Plauderei'), k('autor', '## Nachtrag B')]

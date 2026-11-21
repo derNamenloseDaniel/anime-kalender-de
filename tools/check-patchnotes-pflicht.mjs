@@ -42,6 +42,10 @@ const VERTAGT_ZEILE = /^\s*Patch Notes:\s*vertagt\s*[–—-]\s*\S/im
 // Eine „keine“-Zeile, die in Wahrheit vertagt (Anlass: 7 von 94 Zeilen seit 29.10.2026, nie folgte ein Eintrag).
 const VERTAGUNG_IM_GRUND =
   /sp[äa]ter|vertag|wirkt erst|(n[äa]chste[nm]?|folgenden) (\S+ )?\S*(lauf|bau|abruf|lesung|deploy)|(patch note|note) folgt/i
+// Vertagung im Body (Anlass: 9 von 10 PRs, 01.–09.11.2026, schrieben sie unter „Wirkung“; Rückmessung 21.11.2026: 0 Treffer in 80 „keine“-PRs der letzten 395).
+// Nur ein Wirkungssatz zählt („wirkt erst nach/mit …“, „Wirkung/sichtbar/erscheint … erst nach dem Lauf“, „… nach dem nächsten Bau“), nicht ein Messsatz mit „nächster Bau“.
+const VERTAGUNG_IM_TEXT =
+  /wirkt erst (nach|mit|im|in|beim)\b|\b(wirkung|sichtbar\w*|erscheinen?|entsteht)\b[^.\n]*(erst (nach|mit|im|in) (dem|der)|(nach|mit) (dem|der) (n[äa]chste[nm]?|folgenden)) (\S+ )?\S*(lauf|bau|abruf|lesung|deploy)\b/i
 // Die Zeile nennt selbst eine sichtbare Wirkung („sichtbar entfällt …“); „keine sichtbare …“ und „0 … sichtbar geändert“ sind keine.
 const SICHTBARE_WIRKUNG_IM_GRUND = /\bsichtbar\w*\s+(entf[äa]llt|[äa]ndert|wechselt|verschwindet|erscheint|kommt|fehlt|wird)\b/i
 
@@ -90,8 +94,9 @@ function vertagungOhneVorrat(beschreibung, vorrat) {
   const vertagt = VERTAGT_ZEILE.test(beschreibung)
   const grund = KEINE_ZEILE.exec(beschreibung)?.[1]
   const verkappt = VERTAGUNG_IM_GRUND.test(grund ?? '')
-  if (!vertagt && !verkappt) return null
-  const wo = vertagt ? '„vertagt“' : '„keine“ mit „später/nächster Lauf“'
+  const imText = grund !== undefined && VERTAGUNG_IM_TEXT.test(beschreibung)
+  if (!vertagt && !verkappt && !imText) return null
+  const wo = vertagt ? '„vertagt“' : verkappt ? '„keine“ mit „später/nächster Lauf“' : '„keine“, der Text nennt die Wirkung „erst nach dem Lauf/Bau“'
   return (
     `Die Beschreibung vertagt die Patch Note (${wo}), legt aber keinen Entwurf an.\n` +
     '  Neue Datei data/patchnotes/vorrat/<name>.yaml (Felder wie ein Eintrag, dazu wartetAuf und seit), Zeile „Patch Notes: vertagt – <Grund>“.\n' +
@@ -189,20 +194,19 @@ function nachschaerfungsFaelle(web) {
     'die Joyn-Wege erscheinen mit dem folgenden Bestandsbau',
   ]
   return [
-    // Seit 21.11.2026 zählt nur die Zeile „Patch Notes:“, nicht der übrige Body.
-    ...text.map((t, i) => [`Vertagung im Text ${i + 1} von ${text.length} ohne Vorrat bleibt grün`, { dateien: pipeline, neu: [], beschreibung: mitText(t) }, true]),
+    ...text.map((t, i) => [`Vertagung im Text ${i + 1} von ${text.length} ohne Vorrat ist rot`, { dateien: pipeline, neu: [], beschreibung: mitText(t) }, false]),
     ...text.map((t, i) => [`Vertagung im Text ${i + 1} von ${text.length} mit Vorrat ist grün`, { dateien: pipeline, neu: [], beschreibung: mitText(t), vorrat }, true]),
     ['Satz ohne Vertagung bleibt grün', { dateien: pipeline, neu: [], beschreibung: mitText('Rot würde den Bestandsbau stoppen, Bots schreiben die Datei laufend.') }, true],
     ['„nach dem ersten Bestandsbau“ als Rückblick bleibt grün', { dateien: pipeline, neu: [], beschreibung: mitText('Probe vor/nach dem ersten Bestandsbau nach #2428.') }, true],
-    ['Vertagungswort außerhalb der Zeile bleibt grün (Messung „nächster Bau“)', { dateien: pipeline, neu: [], beschreibung: mitText('Der nächste Bau zeigt die Zahl; Wirkung nach dem nächsten Abruf.') }, true],
-    ['Vertagungswort außerhalb der Zeile bleibt grün (zweites Glied)', { dateien: pipeline, neu: [], beschreibung: mitText('Der Beleg wirkt erst mit der Datenübernahme, danach nächster Lauf.') }, true],
+    ['Messsatz mit „nächster Bau“ im Text bleibt grün', { dateien: pipeline, neu: [], beschreibung: mitText('Der nächste Bau zeigt die Zahl; Messung nach dem nächsten Abruf: 0 Abweichungen.') }, true],
+    ['Messsatz mit „folgender Lauf“ im Text bleibt grün', { dateien: pipeline, neu: [], beschreibung: mitText('Probe: der folgende Lauf bestätigt 394 von 394 Fällen.') }, true],
     ['„Wirkt erst, wenn …“ ohne Lauf bleibt grün', { dateien: pipeline, neu: [], beschreibung: mitText('Wirkt erst, wenn Zweig zug existiert.') }, true],
     ['Vertagung im Text ohne „keine“-Zeile ist keine Zeilen-Vertagung', { dateien: pipeline, neu: [], beschreibung: 'Wirkung nach dem nächsten Bestandsbau.' }, true],
     ['2704 sichtbare Wirkung in der „keine“-Zeile ist rot', { dateien: ['data/dub-confirmed.yaml'], neu: [], beschreibung: keine('intern, Korrektur eines Belegs; sichtbar entfällt höchstens ein falscher Prime-Link bei Yashahime') }, false],
     ['sichtbare Wirkung in der Zeile ohne sichtbare Dateien bleibt grün', { dateien: pipeline, neu: [], beschreibung: keine('Werkzeug, sichtbar ändert sich nichts') }, true],
     ['„unsichtbar wird …“ ist keine sichtbare Wirkung', { dateien: web, neu: [], beschreibung: keine('Umbau, unsichtbar wird nur die Messung') }, true],
     ['„sichtbar wird …“ in der Zeile ist rot', { dateien: web, neu: [], beschreibung: keine('Test, sichtbar wird davon nur der Link') }, false],
-    ['„wirkt erst mit …“ im Text außerhalb der Zeile bleibt grün', { dateien: pipeline, neu: [], beschreibung: mitText('Der Beleg wirkt erst mit der Datenübernahme.') }, true],
+    ['„wirkt erst mit …“ ohne Lauf/Bau ist rot', { dateien: pipeline, neu: [], beschreibung: mitText('Der Beleg wirkt erst mit der Datenübernahme.') }, false],
     ['„keine sichtbare Änderung“ in der Zeile bleibt grün', { dateien: web, neu: [], beschreibung: keine('Werkzeug/CI, keine sichtbare Änderung (0 Titel/Termine/Meldungen).') }, true],
     ['„0 … sichtbar geändert“ in der Zeile bleibt grün', { dateien: web, neu: [], beschreibung: keine('Umbau und Werkzeug, 0 Titel/Termine/Meldungen/Wege/Zeilen sichtbar geändert.') }, true],
     ['sichtbare Wirkung in der Zeile mit Eintrag ist grün', { dateien: web, neu: ['A'], beschreibung: keine('intern, sichtbar entfällt ein Link') }, true],

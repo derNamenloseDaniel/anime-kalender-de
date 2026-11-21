@@ -30,9 +30,8 @@ gleich('Lauf ohne Modell (Altbestand) zählt nicht', hatUrteil([k('ok', KOPF, BO
 gleich('Zeile muss am Textanfang stehen', hatUrteil([{ user: { login: BOT }, body: `Hallo\n${k('ok').body}` }], KOPF), false)
 gleich('keine Kommentare', hatUrteil([], KOPF), false)
 gleich('kein Text, kein Nutzer', hatUrteil([{}, { user: { login: BOT } }], KOPF), false)
-gleich('Marke steht im Workflow', fs.readFileSync(new URL('../.github/workflows/pr-pruefer.yml', import.meta.url), 'utf8').includes(MARKE_OHNE_MODELL), true)
 
-// Prüfpflicht: genau die Bedingung der Job-Zeile `pruefen` in pr-pruefer.yml
+// Prüfpflicht: dieselbe Funktion wie der Job `ziel` in pr-pruefer.yml (tools/pr-pruefer-start.mjs)
 const pr = (a = {}) => ({ number: 7, state: 'open', draft: false, head: { sha: KOPF, ref: 'claude/x', repo: { full_name: 'o/r' } }, base: { ref: 'main', repo: { full_name: 'o/r' } }, ...a })
 gleich('Normalfall prüfpflichtig', pruefpflichtig([pr()]).length, 1)
 gleich('Entwurf nicht', pruefpflichtig([pr({ draft: true })]).length, 0)
@@ -42,42 +41,48 @@ gleich('zug-fahrt und zug-probe nicht', pruefpflichtig(['zug-fahrt', 'zug-probe'
 gleich('andere Basis nicht', pruefpflichtig([pr({ base: { ref: 'dev', repo: { full_name: 'o/r' } } })]).length, 0)
 gleich('Basis zug ja', pruefpflichtig([pr({ base: { ref: 'zug', repo: { full_name: 'o/r' } } })]).length, 1)
 const wf = fs.readFileSync(new URL('../.github/workflows/pr-pruefer.yml', import.meta.url), 'utf8')
-gleich('Workflow nennt dieselben Ausnahmen', ["startsWith(github.head_ref, 'daten/')", "github.head_ref != 'zug-fahrt'", "github.head_ref != 'zug-probe'", 'branches: [main, zug]'].every((t) => wf.includes(t)), true)
+gleich('Workflow prüft das Ziel mit demselben Modul', wf.includes('node tools/pr-pruefer-start.mjs'), true)
 
-// Ablauf mit eingespeistem gh
+// Ablauf mit eingespeistem gh. `ketten`: Läufe der PR-Prüfkette des Kopfes; `laeufe`: Prüfer-Läufe (Dispatch, PR im Laufnamen).
 const JETZT = Date.parse('2026-11-19T12:00:00Z')
 const vor = (min) => new Date(JETZT - min * 60_000).toISOString()
-function ablauf({ pulls = [pr()], laeufe = [{ status: 'completed', conclusion: 'success', created_at: vor(90) }], kommentare = [], commitMin = 90, fehler = null } = {}) {
+const P7 = 'PR-Prüfer #7 x'
+function ablauf({ pulls = [pr()], ketten = [{ created_at: vor(90) }], laeufe = [{ status: 'completed', conclusion: 'success', display_title: P7 }], kommentare = [], commitMin = 90, fehler = null } = {}) {
   const aufrufe = []
   const gh = (...a) => {
     aufrufe.push(a.join(' '))
     if (fehler) throw new Error(fehler)
     const url = a.at(-1)
     if (url.includes('/pulls?state=open')) return JSON.stringify(pulls)
-    if (url.includes('/workflows/pr-pruefer.yml/runs')) return JSON.stringify({ workflow_runs: laeufe })
+    if (url === 'repos/o/r/actions/workflows/pr-pruefer.yml/runs?event=workflow_dispatch&per_page=50') return JSON.stringify({ workflow_runs: laeufe })
+    if (url.startsWith('repos/o/r/actions/workflows/pr-pruefung.yml/runs?head_sha=') && url.endsWith('&event=pull_request&per_page=30')) return JSON.stringify({ workflow_runs: url.includes(KOPF) ? ketten : [] })
     if (url.includes('/commits/')) return JSON.stringify({ commit: { committer: { date: vor(commitMin) } } })
     // Alle Seiten, als ein Feld je Seite: ohne --paginate/--slurp (oder mit vertauschter Reihenfolge) fehlen Kommentare hinter Seite 1.
-    if (url.includes('/issues/7/comments')) {
+    if (url.includes('/issues/7/comments') || url.includes('/issues/8/comments')) {
       if (a.slice(0, 3).join(' ') !== 'api --paginate --slurp') throw new Error('Kommentare ohne --paginate --slurp: ' + a.join(' '))
-      return JSON.stringify([kommentare])
+      // PR 8 (Kopf ALT) hat immer ein Urteil: trennt „je PR die eigenen Kommentare“ von „alle PRs gleich“.
+      return JSON.stringify([url.includes('/issues/8/') ? [k('ok', ALT)] : kommentare])
     }
     throw new Error('unerwartet ' + url)
   }
   return { zeilen: prueferZeilen(gh, 'o/r', JETZT), aufrufe }
 }
-const MELDUNG = 'PRUEFER: PR #7 Kopf ccccccccc ohne Urteil seit 90 min (Grenze 60 min): Neustart nach Kettenende ausgefallen? pr-pruefer-nachtrag.yml, Job nach-kette'
+const MELDUNG = 'PRUEFER: PR #7 Kopf ccccccccc ohne Urteil seit 90 min (Grenze 45 min): Kette hängt oder fehlt, oder Start nach Kettenende ausgefallen? pr-pruefer-nachtrag.yml, Job nach-kette'
 gleich('Kopf 90 min ohne Urteil: Meldung', ablauf().zeilen, [MELDUNG])
 gleich('Kopf mit Urteil: still', ablauf({ kommentare: [k('ok')] }).zeilen, [])
 gleich('Kopf nur mit „nicht beurteilt, Kette lief noch“ (Altbestand): Meldung', ablauf({ kommentare: [k('nicht beurteilt, Kette lief noch')] }).zeilen, [MELDUNG])
-gleich('Kopf 59 min alt: still, ohne Kommentarabruf', (() => { const r = ablauf({ laeufe: [{ status: 'completed', conclusion: 'success', created_at: vor(59) }] }); return [r.zeilen, r.aufrufe.some((a) => a.includes('/comments'))] })(), [[], false])
-gleich('Kopf genau 60 min alt: still (Grenze ist „mehr als“)', ablauf({ laeufe: [{ status: 'completed', conclusion: 'success', created_at: vor(60) }] }).zeilen, [])
-gleich('Prüfer-Lauf läuft noch: still', ablauf({ laeufe: [{ status: 'in_progress', created_at: vor(90) }] }).zeilen, [])
-gleich('Prüfer-Lauf übersprungen: still', ablauf({ laeufe: [{ status: 'completed', conclusion: 'skipped', created_at: vor(90) }] }).zeilen, [])
-gleich('ältester Lauf zählt als Push-Zeit (Neustart ändert sie nicht)', ablauf({ laeufe: [{ status: 'completed', conclusion: 'success', created_at: vor(5) }, { status: 'completed', conclusion: 'success', created_at: vor(90) }] }).zeilen, [MELDUNG])
-gleich('ohne Lauf: Commit-Datum entscheidet', ablauf({ laeufe: [] }).zeilen, [MELDUNG])
-gleich('ohne Lauf, junger Commit: still', ablauf({ laeufe: [], commitMin: 10 }).zeilen, [])
-gleich('Entwurf und Datenzweig: still, kein Abruf je PR', (() => { const r = ablauf({ pulls: [pr({ draft: true }), pr({ head: { sha: KOPF, ref: 'daten/x', repo: { full_name: 'o/r' } } })] }); return [r.zeilen, r.aufrufe.length] })(), [[], 1])
-gleich('zwei PRs, einer ohne Urteil: genau eine Zeile', ablauf({ pulls: [pr(), pr({ number: 8, head: { sha: ALT, ref: 'claude/y', repo: { full_name: 'o/r' } } })], kommentare: [] }).zeilen.length, 1)
+gleich('Kopf 44 min alt: still, ohne Kommentarabruf', (() => { const r = ablauf({ ketten: [{ created_at: vor(44) }] }); return [r.zeilen, r.aufrufe.some((a) => a.includes('/comments'))] })(), [[], false])
+gleich('Kopf genau 45 min alt: still (Grenze ist „mehr als“)', ablauf({ ketten: [{ created_at: vor(45) }] }).zeilen, [])
+gleich('Kopf 46 min alt: Meldung', ablauf({ ketten: [{ created_at: vor(46) }] }).zeilen.length, 1)
+gleich('Prüfer-Lauf des PR läuft noch: still, kein weiterer Abruf je PR', (() => { const r = ablauf({ laeufe: [{ status: 'in_progress', display_title: P7 }] }); return [r.zeilen, r.aufrufe.length] })(), [[], 2])
+gleich('Prüfer-Lauf wartet (queued): still', ablauf({ laeufe: [{ status: 'queued', display_title: P7 }] }).zeilen, [])
+gleich('laufender Prüfer eines anderen PR (#70): zählt nicht, Meldung', ablauf({ laeufe: [{ status: 'in_progress', display_title: 'PR-Prüfer #70 x' }] }).zeilen, [MELDUNG])
+gleich('ältester Kettenlauf zählt als Push-Zeit (neu gestartete Kette ändert sie nicht)', ablauf({ ketten: [{ created_at: vor(5) }, { created_at: vor(90) }] }).zeilen, [MELDUNG])
+gleich('Kette fehlt ganz: Commit-Datum entscheidet (meldet die fehlende Kette)', ablauf({ ketten: [] }).zeilen, [MELDUNG])
+gleich('Kette fehlt, junger Commit: still', ablauf({ ketten: [], commitMin: 10 }).zeilen, [])
+gleich('Entwurf und Datenzweig: still, kein Abruf je PR, auch keine Laufliste', (() => { const r = ablauf({ pulls: [pr({ draft: true }), pr({ head: { sha: KOPF, ref: 'daten/x', repo: { full_name: 'o/r' } } })] }); return [r.zeilen, r.aufrufe.length] })(), [[], 1])
+gleich('zwei PRs, nur #7 ohne Urteil: genau seine Zeile', ablauf({ pulls: [pr(), pr({ number: 8, head: { sha: ALT, ref: 'claude/y', repo: { full_name: 'o/r' } } })], kommentare: [] }).zeilen, [MELDUNG])
+gleich('zwei PRs: die Prüfer-Laufliste nur einmal abgerufen', ablauf({ pulls: [pr(), pr({ number: 8, head: { sha: ALT, ref: 'claude/y', repo: { full_name: 'o/r' } } })] }).aufrufe.filter((a) => a.includes('pr-pruefer.yml/runs')).length, 1)
 gleich('Normalbetrieb ohne offene PRs: ein Aufruf, keine Zeile', (() => { const r = ablauf({ pulls: [] }); return [r.zeilen, r.aufrufe.length] })(), [[], 1])
 
 // Abruffehler
@@ -112,7 +117,8 @@ const repoApi = 'api repos/derNamenloseDaniel/anime-kalender-de/'
 const warnt = starte(
   { aus: JSON.stringify([pr()]) },
   {
-    [`${repoApi}actions/workflows/pr-pruefer.yml/runs?head_sha=${KOPF}&per_page=10`]: { aus: JSON.stringify({ workflow_runs: [{ status: 'completed', conclusion: 'success', created_at: '2020-01-01T00:00:00Z' }] }) },
+    [`${repoApi}actions/workflows/pr-pruefer.yml/runs?event=workflow_dispatch&per_page=50`]: { aus: JSON.stringify({ workflow_runs: [] }) },
+    [`${repoApi}actions/workflows/pr-pruefung.yml/runs?head_sha=${KOPF}&event=pull_request&per_page=30`]: { aus: JSON.stringify({ workflow_runs: [{ created_at: '2020-01-01T00:00:00Z' }] }) },
     'api --paginate --slurp repos/derNamenloseDaniel/anime-kalender-de/issues/7/comments': { aus: '[[]]' },
   },
 )

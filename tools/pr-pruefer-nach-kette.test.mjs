@@ -1,14 +1,13 @@
 /**
  * Test für tools/pr-pruefer-nach-kette.mjs und den Job `nach-kette` in pr-pruefer-nachtrag.yml: Entscheidung als Tabelle,
- * Ablauf mit eingespeistem gh (Kreislauf: „Kette offen“-Kommentar -> Kettenende -> Neustart -> zweites Mal -> Grenze),
- * Verdrahtung über die env-Namen der YAML. Keine echte Uhr: `warte` ist eine Attrappe.
+ * Ablauf mit eingespeistem gh (Kettenende -> Dispatch des Prüfers, kein Warten, kein rerun), Verdrahtung über die env-Namen der YAML.
  */
 import fs from 'node:fs'
 import { parse } from 'yaml'
 import { MARKE_KETTE_OFFEN } from './pr-pruefer-kette-offen.mjs'
 import { MARKE_OHNE_MODELL } from './pruefer-unfertig-wache.mjs'
 import { KONTO_MS, neuesKonto } from './gh-ratelimit.mjs'
-import { MAX_NEUSTARTS, WARTE_MS, WARTE_RUNDEN, entscheide, letztesUrteil, main } from './pr-pruefer-nach-kette.mjs'
+import { MAX_NEUSTARTS, entscheide, letztesUrteil, main } from './pr-pruefer-nach-kette.mjs'
 
 const fehler = []
 const gleich = (name, ist, soll) => {
@@ -27,95 +26,87 @@ const urteil = (kopf, titel, mitMarke, login = BOT) => ({
 const OFFEN = (kopf = KOPF) => urteil(kopf, 'nicht beurteilt, Kette lief noch', true)
 const AENDERN = (kopf = KOPF) => urteil(kopf, 'aendern', false)
 const OK = (kopf = KOPF) => urteil(kopf, 'ok', false)
-const pr = (a = {}) => ({ number: 7, state: 'open', draft: false, head: { sha: KOPF }, ...a })
-const lauf = { id: 5, status: 'completed' }
-const los = (e) => entscheide({ kommentare: [OFFEN()], kopf: KOPF, pr: pr(), lauf, ...e }).los
+const REPO = { full_name: 'o/r' }
+const pr = (a = {}) => ({ number: 7, state: 'open', draft: false, body: '', head: { sha: KOPF, ref: 'claude/x', repo: REPO }, base: { ref: 'main', sha: 'e'.repeat(40), repo: REPO }, ...a })
+const los = (e) => entscheide({ kommentare: [OFFEN()], kopf: KOPF, pr: pr(), ...e }).los
 
+// Normalfall seit 21.11.2026: Push -> Kette -> Kettenende -> Kopf ohne Urteil -> Start.
+gleich('keine Kommentare (Kopf frisch gepusht): Start', los({ kommentare: [] }), true)
+gleich('Kopf ohne Urteil, Kette rot (failure): trotzdem Start', los({ kommentare: [], kette: 'failure' }), true)
 gleich('Basisfall: letztes Urteil „Kette offen“', los({}), true)
-gleich('letztes Urteil aendern (echt, Kette fertig gesehen): kein Neustart', los({ kommentare: [OFFEN(), AENDERN()] }), false)
-gleich('letztes Urteil ok: kein Neustart', los({ kommentare: [OFFEN(), OK()] }), false)
-gleich('Kette-offen-Kommentar nach aendern: Neustart', los({ kommentare: [AENDERN(), OFFEN()] }), true)
-gleich('Kommentar eines Menschen mit Marke und Urteilszeile ist kein Prüfer-Urteil: Kopf ohne Urteil, Neustart', los({ kommentare: [urteil(KOPF, 'nicht beurteilt, Kette lief noch', true, 'inhaber')] }), true)
-gleich('Mensch schreibt Urteil „ok“ ab: zählt nicht, Neustart', los({ kommentare: [urteil(KOPF, 'ok', false, 'inhaber')] }), true)
-gleich('Kette-offen-Kommentar nur zu altem Kopf: der aktuelle Kopf hat kein Urteil, Neustart', los({ kommentare: [OFFEN(ALT)] }), true)
-gleich('Urteil zu altem Kopf, keins zum aktuellen: Neustart', los({ kommentare: [OK(ALT)] }), true)
-gleich('Titel „nicht beurteilt“ ohne Marke: kein Neustart', los({ kommentare: [urteil(KOPF, 'nicht beurteilt, Kette lief noch', false)] }), false)
-// Seit 19.11.2026 schweigt der Prüfer bei laufender Kette: kein Kommentar zum Kopf = Kopf ohne Urteil = genau ein Neustart nach Kettenende.
-gleich('keine Kommentare (Prüfer schwieg): Neustart', los({ kommentare: [] }), true)
-gleich('Kopf ohne Urteil, Prüfer-Lauf übersprungen (daten/-Zweig, Fork): kein Neustart', los({ kommentare: [], lauf: { id: 5, status: 'completed', conclusion: 'skipped' } }), false)
-gleich('Kopf ohne Urteil, Lauf gescheitert (failure): Neustart', los({ kommentare: [], lauf: { id: 5, status: 'completed', conclusion: 'failure' } }), true)
-gleich('Kopf ohne Urteil, Versuch 1 bis 3: Neustart', [1, 2, 3].map((v) => los({ kommentare: [], lauf: { ...lauf, run_attempt: v } })), [true, true, true])
-gleich('Kopf ohne Urteil, Versuch 4: Schluss (Schleifenschutz; die Wache meldet den Kopf nach 60 min)', los({ kommentare: [], lauf: { ...lauf, run_attempt: 4 } }), false)
+gleich('letztes Urteil aendern (echt): kein Start', los({ kommentare: [OFFEN(), AENDERN()] }), false)
+gleich('letztes Urteil ok: kein Start (Kette nachgerechnet, Urteil bleibt)', los({ kommentare: [OFFEN(), OK()] }), false)
+gleich('Kette-offen-Kommentar nach aendern: Start', los({ kommentare: [AENDERN(), OFFEN()] }), true)
+gleich('Kommentar eines Menschen mit Marke und Urteilszeile ist kein Prüfer-Urteil: Kopf ohne Urteil, Start', los({ kommentare: [urteil(KOPF, 'nicht beurteilt, Kette lief noch', true, 'inhaber')] }), true)
+gleich('Mensch schreibt Urteil „ok“ ab: zählt nicht, Start', los({ kommentare: [urteil(KOPF, 'ok', false, 'inhaber')] }), true)
+gleich('Kette-offen-Kommentar nur zu altem Kopf: der aktuelle Kopf hat kein Urteil, Start', los({ kommentare: [OFFEN(ALT)] }), true)
+gleich('Urteil zu altem Kopf, keins zum aktuellen: Start', los({ kommentare: [OK(ALT)] }), true)
+gleich('Titel „nicht beurteilt“ ohne Marke: kein Start', los({ kommentare: [urteil(KOPF, 'nicht beurteilt, Kette lief noch', false)] }), false)
+// Prüfpflicht (früher: Job-Bedingung in pr-pruefer.yml, Lauf „skipped“): jetzt vor dem Dispatch.
+gleich('Datenzweig: kein Start', los({ kommentare: [], pr: pr({ head: { sha: KOPF, ref: 'daten/x', repo: REPO } }) }), false)
+gleich('zug-fahrt und zug-probe: kein Start', ['zug-fahrt', 'zug-probe'].map((ref) => los({ kommentare: [], pr: pr({ head: { sha: KOPF, ref, repo: REPO } }) })), [false, false])
+gleich('Fork: kein Start', los({ kommentare: [], pr: pr({ head: { sha: KOPF, ref: 'x', repo: { full_name: 'f/r' } } }) }), false)
+gleich('Basis dev: kein Start', los({ kommentare: [], pr: pr({ base: { ref: 'dev', sha: 'e'.repeat(40), repo: REPO } }) }), false)
+gleich('Basis zug: Start', los({ kommentare: [], pr: pr({ base: { ref: 'zug', sha: 'e'.repeat(40), repo: REPO } }) }), true)
 // Marken-Pfad („Basis offen“-Kommentar): erst nach grüner Kette neu (trennt `!== success` von `=== success`).
-gleich('Marke, Basis offen, Kette rot: kein Neustart', los({ kommentare: [OFFEN()], basisOffen: true, kette: { conclusion: 'failure' } }), false)
-gleich('Marke, Basis offen, Kette grün: Neustart', los({ kommentare: [OFFEN()], basisOffen: true, kette: { conclusion: 'success' } }), true)
-gleich('Marke, Basis offen, Kette unbekannt (null): kein Neustart', los({ kommentare: [OFFEN()], basisOffen: true, kette: null }), false)
-gleich('Marke, Basis nicht offen, Kette rot: Neustart', los({ kommentare: [OFFEN()], basisOffen: false, kette: { conclusion: 'failure' } }), true)
-gleich('Kopf ohne Urteil, Basis offen und Kette rot: trotzdem Neustart (es folgt der Kommentar „Basis offen“)', los({ kommentare: [], basisOffen: true, kette: { conclusion: 'failure' } }), true)
+gleich('Marke, Basis offen, Kette rot: kein Start', los({ kommentare: [OFFEN()], basisOffen: true, kette: 'failure' }), false)
+gleich('Marke, Basis offen, Kette grün: Start', los({ kommentare: [OFFEN()], basisOffen: true, kette: 'success' }), true)
+gleich('Marke, Basis offen, Kette unbekannt (null): kein Start', los({ kommentare: [OFFEN()], basisOffen: true, kette: null }), false)
+gleich('Marke, Basis nicht offen, Kette rot: Start', los({ kommentare: [OFFEN()], basisOffen: false, kette: 'failure' }), true)
+gleich('Kopf ohne Urteil, Basis offen und Kette rot: trotzdem Start (es folgt der Kommentar „Basis offen“)', los({ kommentare: [], basisOffen: true, kette: 'failure' }), true)
 gleich('PR geschlossen', los({ pr: pr({ state: 'closed' }) }), false)
 gleich('PR Entwurf', los({ pr: pr({ draft: true }) }), false)
-gleich('Kopf des PR inzwischen ein anderer', los({ pr: pr({ head: { sha: ALT } }) }), false)
+gleich('Kopf des PR inzwischen ein anderer', los({ pr: pr({ head: { sha: ALT, ref: 'claude/x', repo: REPO } }) }), false)
 gleich('kein PR', los({ pr: null }), false)
-gleich('kein Prüfer-Lauf', los({ lauf: null }), false)
-gleich('Grenze: Neustarts erlaubt bis zur Anzahl', MAX_NEUSTARTS, 2)
-gleich('zweites Kette-offen: noch Neustart', los({ kommentare: [OFFEN(), OFFEN()] }), true)
+gleich('Grenze: Starts erlaubt bis zur Anzahl', MAX_NEUSTARTS, 2)
+gleich('zweites Kette-offen: noch Start', los({ kommentare: [OFFEN(), OFFEN()] }), true)
 gleich('drittes Kette-offen: Schluss (Schleifenschutz)', los({ kommentare: [OFFEN(), OFFEN(), OFFEN()] }), false)
-// Läufe ohne Modell (Kette lief beim Start) verbrauchen die Neustart-Grenze nicht (Prüfer-Befund 13.11.2026), echte „Kette offen“ weiter.
+// Läufe ohne Modell (Altbestand) verbrauchen die Grenze nicht (Prüfer-Befund 13.11.2026), echte „Kette offen“ weiter.
 const STUB = (kopf = KOPF) => ({ user: { login: BOT }, body: `${OFFEN(kopf).body}\n${MARKE_OHNE_MODELL}\n` })
-gleich('drei Läufe ohne Modell: weiter Neustart', los({ kommentare: [STUB(), STUB(), STUB(), STUB()] }), true)
+gleich('vier Läufe ohne Modell: weiter Start', los({ kommentare: [STUB(), STUB(), STUB(), STUB()] }), true)
 gleich('drei Läufe ohne Modell und drei echte Kette-offen: Schluss', los({ kommentare: [STUB(), STUB(), STUB(), OFFEN(), OFFEN(), OFFEN()] }), false)
 gleich('letztesUrteil: neuester zum Kopf, nicht der zum alten Kopf', letztesUrteil([OFFEN(), AENDERN(ALT)], KOPF).body.includes('nicht beurteilt'), true)
 
-// Ablauf mit eingespeistem gh. `laeufe`: Prüfer-Läufe neueste zuerst; `stand`: Status je Abfrage, danach der letzte Wert.
-function laufe({ kommentare, laeufe = [lauf], pulls = [pr()], fehlerBei = null }) {
+// Ablauf mit eingespeistem gh: drei Leseaufrufe höchstens, dann genau ein Dispatch (kein rerun, kein Warten).
+const DISPATCH = `api -X POST repos/o/r/actions/workflows/pr-pruefer.yml/dispatches -f ref=main -f inputs[pr]=7 -f inputs[sha]=${KOPF}`
+function laufe({ kommentare, pulls = [pr()], fehlerBei = null, env = {} }) {
   const aufrufe = []
   const wartet = []
-  let abfrage = 0
   const gh = (args) => {
-    aufrufe.push(args.join(' '))
-    if (fehlerBei && args.join(' ').includes(fehlerBei)) throw new Error('boom')
+    const s = args.join(' ')
+    aufrufe.push(s)
+    if (fehlerBei && s.includes(fehlerBei)) throw new Error('boom')
     if (args[1] === `repos/o/r/commits/${KOPF}/pulls`) return JSON.stringify(pulls)
-    if (args[1]?.includes('/workflows/pr-pruefer.yml/runs')) {
-      const l = laeufe[Math.min(abfrage++, laeufe.length - 1)]
-      return JSON.stringify(l ? [l] : [])
-    }
     if (args.includes('--slurp')) return JSON.stringify([kommentare])
+    if (args[1] === 'repos/o/r/pulls/5') return 'open\n'
     return ''
   }
   const mute = console.log
   const zeilen = []
   console.log = (z) => zeilen.push(z)
-  const code = main({ GITHUB_REPOSITORY: 'o/r', KOPF_SHA: KOPF }, { gh, warte: (ms) => wartet.push(ms) })
+  const code = main({ GITHUB_REPOSITORY: 'o/r', KOPF_SHA: KOPF, KETTE_ERGEBNIS: 'success', ...env }, { gh, warte: (ms) => wartet.push(ms) })
   console.log = mute
-  return { code, aenderungen: aufrufe.filter((a) => a.startsWith('run ')), wartet, zeilen }
+  return { code, starts: aufrufe.filter((a) => a.includes('/dispatches')), andere: aufrufe.filter((a) => /^run /.test(a)), aufrufe, wartet, zeilen }
 }
 
-// Kreislauf: Prüfer sah Kette offen (Kommentar 1) -> Kette endet -> Neustart -> Prüfer sah sie wieder offen (Kommentar 2) -> Neustart -> Kommentar 3: Schluss.
-gleich('Kreislauf 1: Kette endet, Marke da: rerun', laufe({ kommentare: [OFFEN()] }).aenderungen, ['run rerun 5'])
-gleich('Kreislauf 2: zweiter Kommentar: rerun', laufe({ kommentare: [OFFEN(), OFFEN()] }).aenderungen, ['run rerun 5'])
-gleich('Kreislauf 3: dritter Kommentar: kein rerun, Exit 0', (() => { const r = laufe({ kommentare: [OFFEN(), OFFEN(), OFFEN()] }); return [r.aenderungen, r.code] })(), [[], 0])
-gleich('Kreislauf: nach Neustart ein echtes aendern: Kette endet erneut, kein rerun', laufe({ kommentare: [OFFEN(), AENDERN()] }).aenderungen, [])
-gleich('Kreislauf: nach Neustart ok: kein rerun', laufe({ kommentare: [OFFEN(), OK()] }).aenderungen, [])
-// Gegenfall zur Regel: das Prüfer-Urteil „aendern“ bei fertiger Kette bleibt stehen, auch wenn davor „Kette offen“ kam.
-gleich('Kettenende ohne jedes Prüfer-Urteil (Prüfer schwieg): genau ein rerun', laufe({ kommentare: [] }).aenderungen, ['run rerun 5'])
-// Der Job läuft bei success und failure (nicht bei cancelled; siehe Verdrahtung unten), die Entscheidung hängt nicht von der Konklusion ab: auch eine rote Kette bekommt ihr Urteil.
-// Zweites Kettenende desselben Kopfes (Kette neu gestartet), während der Neustart schon läuft: wartet ab, sieht das Urteil, startet nichts mehr.
-gleich('zweites Kettenende: Lauf noch offen, dann Urteil da: kein zweiter rerun', laufe({ kommentare: [OK()], laeufe: [{ id: 5, status: 'in_progress', run_attempt: 2 }, lauf] }).aenderungen, [])
-gleich('Ausfall des Neustarts (gh-Fehler beim rerun): Exit 1, Zeile FEHLGESCHLAGEN, Kopf bleibt ohne Urteil (Wache nach 60 min)', (() => { const r = laufe({ kommentare: [], fehlerBei: 'run rerun' }); return [r.code, r.zeilen.some((z) => z.includes('FEHLGESCHLAGEN'))] })(), [1, true])
-// Prüfer-Lauf läuft beim Kettenende noch: auf sein Ende warten (sein Kommentar entsteht zuletzt), dann entscheiden.
-const wartend = laufe({ kommentare: [OFFEN()], laeufe: [{ id: 5, status: 'in_progress' }, { id: 5, status: 'in_progress' }, lauf] })
-gleich('Prüfer-Lauf noch offen: zwei Pausen, dann rerun', [wartend.wartet.length, wartend.aenderungen], [2, ['run rerun 5']])
-const haengt = laufe({ kommentare: [OFFEN()], laeufe: [{ id: 5, status: 'in_progress' }] })
-const SPAET = [...Array(25).fill({ id: 5, status: 'in_progress' }), lauf]
-const spaet = laufe({ kommentare: [OFFEN()], laeufe: SPAET })
-// Anlass der Prüferauflage (PR 3002): das Kettenende fällt meist mitten in den Prüfer-Lauf (Kettenlog nach ~13 min, Modell danach bis 17 min).
-gleich('Prüfer-Lauf endet erst nach 25 min (25 Pausen): trotzdem rerun, kein stiller Verlust', [spaet.wartet.length, spaet.aenderungen, spaet.code], [25, ['run rerun 5'], 0])
-gleich('Prüfer-Lauf endet nie: Exit 1 mit Zeile FEHLGESCHLAGEN, kein rerun', [haengt.code, haengt.aenderungen, haengt.zeilen.some((z) => z.includes('FEHLGESCHLAGEN') && z.includes('nicht fertig'))], [1, [], true])
-gleich('Prüfer-Lauf endet nie: 28 Pausen à 60 s (28 min)', [haengt.wartet.length, haengt.wartet[0]], [28, 60_000])
-gleich('kein offener PR zum Kopf: nichts, Exit 0', (() => { const r = laufe({ kommentare: [OFFEN()], pulls: [] }); return [r.aenderungen, r.code] })(), [[], 0])
-gleich('PR zum Kopf geschlossen: nichts', laufe({ kommentare: [OFFEN()], pulls: [pr({ state: 'closed' })] }).aenderungen, [])
+const frisch = laufe({ kommentare: [] })
+gleich('Kettenende, Kopf ohne Urteil: genau ein Dispatch mit PR und Kopf, Exit 0', [frisch.starts, frisch.code], [[DISPATCH], 0])
+gleich('Kettenende: kein rerun, kein cancel, kein Warten', [frisch.andere, frisch.wartet], [[], []])
+gleich('Kettenende: zwei Leseaufrufe plus Dispatch', frisch.aufrufe.length, 3)
+gleich('Kreislauf: Marke da: Dispatch', laufe({ kommentare: [OFFEN()] }).starts, [DISPATCH])
+gleich('Kreislauf: dritter Kommentar: kein Dispatch, Exit 0', (() => { const r = laufe({ kommentare: [OFFEN(), OFFEN(), OFFEN()] }); return [r.starts, r.code] })(), [[], 0])
+gleich('Kreislauf: nach Start ein echtes aendern: kein Dispatch', laufe({ kommentare: [OFFEN(), AENDERN()] }).starts, [])
+gleich('Kreislauf: nach Start ok: kein Dispatch', laufe({ kommentare: [OFFEN(), OK()] }).starts, [])
+// Stapel-PR: Basis aus der Beschreibung, Kette aus der env (keine Laufabfrage mehr).
+const STAPEL = pr({ body: 'mergen nach #5\n' })
+gleich('Basis offen, Marke, Kette failure aus env: kein Dispatch', laufe({ kommentare: [OFFEN()], pulls: [STAPEL], env: { KETTE_ERGEBNIS: 'failure' } }).starts, [])
+gleich('Basis offen, Marke, Kette success aus env: Dispatch', laufe({ kommentare: [OFFEN()], pulls: [STAPEL], env: { KETTE_ERGEBNIS: 'success' } }).starts, [DISPATCH])
+gleich('Datenzweig: kein Dispatch, kein Kommentarabruf', (() => { const r = laufe({ kommentare: [], pulls: [pr({ head: { sha: KOPF, ref: 'daten/x', repo: REPO } })] }); return [r.starts, r.aufrufe.length, r.code] })(), [[], 1, 0])
+gleich('Ausfall des Starts (gh-Fehler beim Dispatch): Exit 1, Zeile FEHLGESCHLAGEN, Kopf bleibt ohne Urteil (Wache nach 45 min)', (() => { const r = laufe({ kommentare: [], fehlerBei: '/dispatches' }); return [r.code, r.zeilen.some((z) => z.includes('FEHLGESCHLAGEN'))] })(), [1, true])
+gleich('kein offener PR zum Kopf: nichts, Exit 0', (() => { const r = laufe({ kommentare: [OFFEN()], pulls: [] }); return [r.starts, r.code] })(), [[], 0])
+gleich('PR zum Kopf geschlossen: nichts', laufe({ kommentare: [OFFEN()], pulls: [pr({ state: 'closed' })] }).starts, [])
 const abbruch = laufe({ kommentare: [OFFEN()], fehlerBei: '/issues/7/comments' })
-gleich('gh-Fehler beim Kommentar-Abruf: Exit 1, Zeile FEHLGESCHLAGEN', [abbruch.code, abbruch.zeilen.some((z) => z.includes('FEHLGESCHLAGEN Kopf ' + KOPF.slice(0, 9)))], [1, true])
+gleich('gh-Fehler beim Kommentar-Abruf: Exit 1, Zeile FEHLGESCHLAGEN', [abbruch.code, abbruch.zeilen.some((z) => z.includes('FEHLGESCHLAGEN Kopf ' + KOPF.slice(0, 9))), abbruch.starts], [1, true, []])
 // Kontingent erschöpft (PR 4467): auch dieser Job wartet bis zum Reset, aber alle Warteplätze zusammen nur bis zum Zeitkonto.
 // Jeder verschiedene gh-Aufruf scheitert beim ersten Mal mit „rate limit“, Reset 5 min voraus = 302 s je Wartezeit: zwei passen, die dritte nicht.
 function mitLimit(kommentare) {
@@ -129,7 +120,6 @@ function mitLimit(kommentare) {
       throw new Error(`gh ${s} Exit 1: HTTP 403: API rate limit exceeded`)
     }
     if (args[1] === `repos/o/r/commits/${KOPF}/pulls`) return JSON.stringify([pr()])
-    if (args[1]?.includes('/workflows/pr-pruefer.yml/runs')) return JSON.stringify([lauf])
     if (args.includes('--slurp')) return JSON.stringify([kommentare])
     return ''
   }
@@ -140,7 +130,7 @@ function mitLimit(kommentare) {
   console.log = mute
   return { code, wartet, zeilen }
 }
-const dauerLimit = mitLimit([OFFEN()])
+const dauerLimit = mitLimit([])
 gleich('Dauer-Limit: zwei Warten à 302 s, die dritte scheitert ohne zu warten, Exit 1 mit „nicht gewartet“ im Log', [dauerLimit.wartet, dauerLimit.code, dauerLimit.zeilen.some((z) => z.includes('FEHLGESCHLAGEN') && z.includes('nicht gewartet'))], [[302_000, 302_000], 1, true])
 gleich('Dauer-Limit: Summe der Wartezeiten <= Zeitkonto', dauerLimit.wartet.reduce((s, ms) => s + ms, 0) <= KONTO_MS, true)
 gleich('Kopf fehlt: Exit 1', (() => { const m = console.log; console.log = () => {}; const c = main({ GITHUB_REPOSITORY: 'o/r' }, { gh: () => '', warte: () => {} }); console.log = m; return c })(), 1)
@@ -148,21 +138,17 @@ gleich('Kopf fehlt: Exit 1', (() => { const m = console.log; console.log = () =>
 // Verdrahtung: Job, Auslöser und env-Namen aus der YAML.
 const wf = parse(fs.readFileSync(new URL('../.github/workflows/pr-pruefer-nachtrag.yml', import.meta.url), 'utf8'))
 const job = wf.jobs['nach-kette']
-const schritt = job.steps.find((s) => s.name === 'Prüfer nach Kettenende neu starten')
+const schritt = job.steps.find((s) => s.name === 'Prüfer nach Kettenende starten')
 gleich('Job nur beim Ende der Kette eines Pull-Request-Laufs, nicht bei cancelled', job.if, "github.event_name == 'workflow_run' && github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion != 'cancelled'")
+gleich('Auslöser: Ende der PR-Prüfkette', wf.on.workflow_run, { workflows: ['PR-Prüfkette'], types: ['completed'] })
 gleich('Schritt ruft das Skript ohne Argumente', schritt.run, 'node tools/pr-pruefer-nach-kette.mjs')
-gleich('Kopf kommt aus workflow_run.head_sha, nur über env', schritt.env.KOPF_SHA, '${{ github.event.workflow_run.head_sha }}')
+gleich('Kopf und Ergebnis kommen aus workflow_run, nur über env', [schritt.env.KOPF_SHA, schritt.env.KETTE_ERGEBNIS], ['${{ github.event.workflow_run.head_sha }}', '${{ github.event.workflow_run.conclusion }}'])
 gleich('run enthält keinen Ausdruck', schritt.run.includes('${{'), false)
-const pausenMs = haengt.wartet.reduce((s, ms) => s + ms, 0)
-gleich('Pausen des wartenden Laufs = Runden x Takt aus dem Werkzeug', [pausenMs, WARTE_RUNDEN * WARTE_MS], [1_680_000, 1_680_000])
-// Zeitbudget aus den echten Pausen (haengt: 28 x 60 s) plus Zeitkonto für „rate limit“ plus 2 min Reserve.
-const budgetMin = (pausenMs + KONTO_MS + 120_000) / 60_000
-gleich(`Zeitbudget: Pausen + Zeitkonto + 2 min = ${budgetMin} min <= timeout-minutes ${job['timeout-minutes']}`, budgetMin <= job['timeout-minutes'], true)
-gleich('Zeitbudget: Job-Timeout höchstens zwei Minuten über dem gerundeten Budget', job['timeout-minutes'] <= Math.ceil(budgetMin) + 2, true)
-// Untergrenze: Prüfer-Job 30 min, Kettenlog nach 13 min -> mindestens 17 min Restdauer müssen abgedeckt sein.
-gleich('Wartezeit deckt die Restdauer des Prüfer-Laufs (≥ 17 min)', pausenMs >= 17 * 60_000, true)
+// Zeitbudget: 5 min für Checkout und vier Aufrufe plus Zeitkonto für „rate limit“; kein Warten auf den Prüfer mehr.
+const budgetMin = (5 * 60_000 + KONTO_MS) / 60_000
+gleich(`Zeitbudget: 5 min + Zeitkonto = ${budgetMin} min = timeout-minutes ${job['timeout-minutes']}`, job['timeout-minutes'], budgetMin)
 gleich('Gruppe trennt Nachtrag (PR-Nummer) und Kettenende (Kopf), cancelled eigene Gruppe', wf.concurrency.group, "pr-pruefer-nachtrag-${{ github.event_name == 'pull_request_target' && 'basis-' || '' }}${{ github.event.issue.number || github.event.workflow_run.head_sha || github.event.pull_request.number }}${{ github.event.workflow_run.conclusion == 'cancelled' && '-abgebrochen' || '' }}")
-gleich('Rechte unverändert: Aktionen schreiben, sonst lesen', wf.permissions, { contents: 'read', 'pull-requests': 'read', actions: 'write' })
+gleich('Rechte: Aktionen schreiben (Dispatch), sonst lesen', wf.permissions, { contents: 'read', 'pull-requests': 'read', actions: 'write' })
 
-console.log(`Prüfer-Nachlauf: ${fehler.length === 0 ? 'alle Fälle grün' : fehler.length + ' Fälle rot'}`)
+console.log(`Prüfer nach Kette: ${fehler.length === 0 ? 'alle Fälle grün' : fehler.length + ' Fälle rot'}`)
 process.exit(fehler.length === 0 ? 0 : 1)

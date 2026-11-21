@@ -1,11 +1,11 @@
 /**
  * Test für tools/pr-pruefer-neustart.mjs und .github/workflows/pr-pruefer-nachtrag.yml: Entscheidung als Tabelle,
- * Ablauf (Abbruch eines laufenden Laufs, Neustart) mit eingespeistem gh, Verdrahtung über die env-Namen der YAML.
+ * Ablauf (Kette fertig? Prüfer schon nach dem Kommentar gestartet? sonst Dispatch) mit eingespeistem gh, Verdrahtung über die env-Namen der YAML.
  */
 import fs from 'node:fs'
 import { parse } from 'yaml'
 import { KONTO_MS, neuesKonto } from './gh-ratelimit.mjs'
-import { entscheide, main, WARTE_MS, WARTE_RUNDEN } from './pr-pruefer-neustart.mjs'
+import { entscheide, main } from './pr-pruefer-neustart.mjs'
 
 const fehler = []
 const gleich = (name, ist, soll) => {
@@ -16,6 +16,7 @@ const gleich = (name, ist, soll) => {
 
 const KOPF = 'd'.repeat(40)
 const pr = (aendere = {}) => ({
+  number: 7,
   state: 'open',
   draft: false,
   user: { login: 'claude[bot]' },
@@ -44,49 +45,51 @@ gleich('Entwurf', los({ pr: pr({ draft: true }) }), false)
 gleich('Fork', los({ pr: pr({ head: { sha: KOPF, ref: 'x', repo: { full_name: 'f/r' } } }) }), false)
 gleich('Zweig daten/', los({ pr: pr({ head: { sha: KOPF, ref: 'daten/x', repo: { full_name: 'o/r' } } }) }), false)
 
-// Ablauf mit eingespeistem gh: Aufrufe werden protokolliert; die Läufe stehen neueste zuerst.
-function laufe(env, laeufe, { pruefer = pr(), stand = ['in_progress', 'completed'], rerunFehlt = false } = {}) {
+// Ablauf mit eingespeistem gh. `kette`: Läufe der PR-Prüfkette des Kopfes; `laeufe`: Prüfer-Läufe (Dispatch, neueste zuerst, PR im Laufnamen).
+const DISPATCH = `api -X POST repos/o/r/actions/workflows/pr-pruefer.yml/dispatches -f ref=main -f inputs[pr]=7 -f inputs[sha]=${KOPF}`
+const FERTIG = [{ id: 40, status: 'completed', conclusion: 'success' }]
+const titel = (nr) => `PR-Prüfer #${nr} ${KOPF}`
+function laufe(env, laeufe, { kette = FERTIG, pruefer = pr(), dispatchFehlt = false } = {}) {
   const aufrufe = []
   const wartet = []
   const gh = (args) => {
-    aufrufe.push(args.join(' '))
-    if (rerunFehlt && args[1] === 'rerun') throw new Error('Lauf läuft noch')
+    const s = args.join(' ')
+    aufrufe.push(s)
     if (args[1] === 'repos/o/r/pulls/7') return JSON.stringify(pruefer)
-    // Wie die API: nur Läufe der abgefragten head_sha.
-    if (args[1]?.includes('/workflows/pr-pruefer.yml/runs')) return JSON.stringify(laeufe.filter((l) => args[1].includes(`head_sha=${l.head_sha}&`)))
-    if (args[1] === 'repos/o/r/actions/runs/5') return JSON.stringify({ status: stand.shift() ?? 'completed' })
-    return ''
+    // Wie die API: nur Kettenläufe der abgefragten head_sha (Ausgabe als TSV wie in holeLauf verlangt).
+    if (args[1] === `repos/o/r/actions/workflows/pr-pruefung.yml/runs?head_sha=${KOPF}&event=pull_request&per_page=30`) return kette.map((l) => `${l.id}\t${l.status}\t${l.conclusion ?? ''}`).join('\n')
+    if (args[1] === 'repos/o/r/actions/workflows/pr-pruefer.yml/runs?event=workflow_dispatch&per_page=30') return JSON.stringify(laeufe)
+    if (s.includes('/dispatches')) {
+      if (dispatchFehlt) throw new Error('HTTP 422: Workflow does not have workflow_dispatch trigger')
+      return ''
+    }
+    throw new Error('unerwartet ' + s)
   }
   const mute = console.log
   const zeilen = []
   console.log = (z) => zeilen.push(z)
   const code = main({ GITHUB_REPOSITORY: 'o/r', PR_NUMMER: '7', KOMMENTAR: '## Nachtrag', KOMMENTAR_LOGIN: 'inhaber', KOMMENTAR_ASSOZIATION: 'OWNER', ...env }, { gh, warte: (ms) => wartet.push(ms) })
   console.log = mute
-  return { code, aufrufe: aufrufe.filter((a) => a.startsWith('run ')), wartet, zeilen }
+  return { code, starts: aufrufe.filter((a) => a.includes('/dispatches')), andere: aufrufe.filter((a) => /^run /.test(a)), wartet, zeilen, aufrufe }
 }
-const ALT = 'a'.repeat(40)
-// Läufe alter Köpfe (neuere Id 9 und ältere 3) stehen dazwischen: nur der Lauf des aktuellen Kopfs darf neu starten.
-const fremd = [{ id: 9, status: 'completed', head_sha: ALT }, { id: 3, status: 'completed', head_sha: ALT }]
-const abgeschlossen = [fremd[0], { id: 5, status: 'completed', head_sha: KOPF }, { id: 4, status: 'completed', head_sha: KOPF }, fremd[1]]
-const laufend = [{ id: 5, status: 'in_progress', head_sha: KOPF }, { id: 4, status: 'completed', head_sha: KOPF }, ...fremd]
+// Läufe anderer PRs (#70 beginnt mit „7“) stehen dazwischen: nur der Lauf von PR 7 zählt.
+const fremd = [{ id: 9, status: 'completed', conclusion: 'success', display_title: 'PR-Prüfer #70 x', run_started_at: '2026-11-12T15:00:00Z' }, { id: 3, status: 'in_progress', display_title: 'PR-Prüfer #8 x', run_started_at: '2026-11-12T15:00:00Z' }]
+const ZEIT = '2026-11-12T14:31:55Z'
+const lauf5 = (zusatz) => [fremd[0], { id: 5, status: 'in_progress', display_title: titel(7), run_started_at: '2026-11-12T14:32:37Z', ...zusatz }, fremd[1]]
 
-gleich('abgeschlossener Lauf: nur rerun des neuesten', laufe({}, abgeschlossen).aufrufe, ['run rerun 5'])
-const l = laufe({}, laufend)
-gleich('laufender Lauf: erst cancel, warten, dann rerun', l.aufrufe, ['run cancel 5', 'run rerun 5'])
-gleich('laufender Lauf: gewartet bis completed (einmal)', l.wartet, [15_000])
-gleich('kein Lauf zum Kopf: nichts', laufe({}, []).aufrufe, [])
-gleich('nur Läufe alter Köpfe: nichts', laufe({}, fremd).aufrufe, [])
-// Lauf wird nach cancel nie completed: 14 Abfragen im 15-s-Takt (210 s, Kontingent 21.11.2026; vorher 40 x 5 s; gemessen 04.11.2026: cancel bis completed 75–85 s, 60 s reichten nicht) und Pausen, dann scheitert rerun; Meldung statt Rot.
-const haengt = laufe({}, laufend, { stand: Array(50).fill('in_progress'), rerunFehlt: true })
-gleich('Lauf bleibt nach cancel offen: Exit 1', haengt.code, 1)
-gleich('Lauf bleibt nach cancel offen: Zeile mit PR, Kopf und Grund', haengt.zeilen.some((z) => z.includes('FEHLGESCHLAGEN PR 7 Kopf ' + KOPF.slice(0, 9) + ': nicht neu gestartet (Lauf läuft noch)')), true)
-gleich('Erfolg: Exit 0 ohne FEHLGESCHLAGEN', [laufe({}, laufend).code, laufe({}, laufend).zeilen.some((z) => z.includes('FEHLGESCHLAGEN'))], [0, false])
-gleich('kein Lauf zum Kopf: Exit 0', laufe({}, []).code, 0)
-gleich('Lauf bleibt nach cancel offen: vierzehn Pausen', haengt.wartet.length, 14)
-// Anlass 04.11.2026: cancel brauchte etwa 80 s bis completed; im 15-s-Takt (21.11.2026) sind das 6 Abfragen, 14 Runden decken 210 s.
-const spaet = laufe({}, laufend, { stand: [...Array(6).fill('in_progress'), 'completed'] })
-gleich('Lauf endet erst nach 6 Abfragen: rerun kommt trotzdem', spaet.aufrufe, ['run cancel 5', 'run rerun 5'])
-gleich('Lauf endet erst nach 6 Abfragen: 6 Pausen', spaet.wartet.length, 6)
+const ab = laufe({}, [fremd[0], { id: 5, status: 'completed', conclusion: 'success', display_title: titel(7) }])
+gleich('Kette fertig, Lauf vor dem Kommentar: genau ein Dispatch für PR und Kopf, Exit 0', [ab.starts, ab.code], [[DISPATCH], 0])
+gleich('kein cancel, kein rerun, kein Warten (concurrency bricht ab)', [ab.andere, ab.wartet], [[], []])
+gleich('kein Prüfer-Lauf des PR (nur fremde): Dispatch', laufe({}, fremd).starts, [DISPATCH])
+gleich('gar kein Prüfer-Lauf: Dispatch', laufe({}, []).starts, [DISPATCH])
+gleich('Kette des Kopfes läuft noch: kein Dispatch (ihr Ende startet den Prüfer), Exit 0', (() => { const r = laufe({}, [], { kette: [{ id: 41, status: 'in_progress' }] }); return [r.starts, r.code, r.zeilen.some((z) => z.includes('nicht fertig'))] })(), [[], 0, true])
+gleich('Kette neu gestartet (neuester läuft, älterer fertig): kein Dispatch', laufe({}, [], { kette: [{ id: 42, status: 'queued' }, ...FERTIG] }).starts, [])
+gleich('Kette nie gelaufen: kein Dispatch', laufe({}, [], { kette: [] }).starts, [])
+gleich('Kette abgebrochen, ältere fertig: Dispatch (abgebrochene zählt nicht)', laufe({}, [], { kette: [{ id: 43, status: 'completed', conclusion: 'cancelled' }, ...FERTIG] }).starts, [DISPATCH])
+gleich('Kette rot: Dispatch (der Prüfer urteilt auch bei roter Kette)', laufe({}, [], { kette: [{ id: 44, status: 'completed', conclusion: 'failure' }] }).starts, [DISPATCH])
+const kaputt = laufe({}, [], { dispatchFehlt: true })
+gleich('Dispatch scheitert: Exit 1, Zeile mit PR, Kopf und Grund', [kaputt.code, kaputt.zeilen.some((z) => z.includes('FEHLGESCHLAGEN PR 7 Kopf ' + KOPF.slice(0, 9) + ': nicht neu gestartet (HTTP 422'))], [1, true])
+gleich('Erfolg: Exit 0 ohne FEHLGESCHLAGEN', [ab.code, ab.zeilen.some((z) => z.includes('FEHLGESCHLAGEN'))], [0, false])
 gleich('gh-Absturz bei der Lauf-Abfrage: Exit 1', (() => {
   const mute = console.log
   console.log = () => {}
@@ -98,10 +101,10 @@ gleich('gh-Absturz bei der Lauf-Abfrage: Exit 1', (() => {
   console.log = mute
   return code
 })(), 1)
-gleich('Abnahme-Kommentar: nichts', laufe({ KOMMENTAR: '## Nachtrag (Abnahme Dirigent)' }, abgeschlossen).aufrufe, [])
-gleich('fremder Autor: nichts', laufe({ KOMMENTAR_LOGIN: 'x', KOMMENTAR_ASSOZIATION: 'NONE' }, abgeschlossen).aufrufe, [])
-gleich('PR-Autor ohne Recht (über main): Neustart', laufe({ KOMMENTAR_LOGIN: 'claude[bot]', KOMMENTAR_ASSOZIATION: 'NONE' }, abgeschlossen).aufrufe, ['run rerun 5'])
-gleich('PR-Nummer fehlt: Exit 1', laufe({ PR_NUMMER: '' }, abgeschlossen).code, 1)
+gleich('Abnahme-Kommentar: nichts', laufe({ KOMMENTAR: '## Nachtrag (Abnahme Dirigent)' }, []).starts, [])
+gleich('fremder Autor: nichts', laufe({ KOMMENTAR_LOGIN: 'x', KOMMENTAR_ASSOZIATION: 'NONE' }, []).starts, [])
+gleich('PR-Autor ohne Recht (über main): Dispatch', laufe({ KOMMENTAR_LOGIN: 'claude[bot]', KOMMENTAR_ASSOZIATION: 'NONE' }, []).starts, [DISPATCH])
+gleich('PR-Nummer fehlt: Exit 1', laufe({ PR_NUMMER: '' }, []).code, 1)
 gleich('Absturz von gh: Exit 1, kein Neustart', (() => {
   const mute = console.log
   console.log = () => {}
@@ -123,7 +126,8 @@ function mitFehler(text, reset) {
       throw new Error(text)
     }
     if (args[1] === 'repos/o/r/pulls/7') return JSON.stringify(pr())
-    if (args[1]?.includes('/workflows/pr-pruefer.yml/runs')) return JSON.stringify(abgeschlossen.filter((l) => args[1].includes(`head_sha=${l.head_sha}&`)))
+    if (args[1]?.includes('/workflows/pr-pruefung.yml/runs')) return '40\tcompleted\tsuccess'
+    if (args[1]?.includes('/workflows/pr-pruefer.yml/runs')) return '[]'
     return ''
   }
   const mute = console.log
@@ -136,25 +140,24 @@ function mitFehler(text, reset) {
 }
 const LIMIT_TEXT = 'gh api repos/o/r/pulls/7 Exit 1: HTTP 403: API rate limit exceeded for installation'
 const limit = mitFehler(LIMIT_TEXT, 1_000_000_000 + 60)
-gleich('rate limit: wartet bis zum Reset (62 s), dann Neustart, Exit 0', [limit.code, limit.wartet, limit.aufrufe.includes('run rerun 5')], [0, [62_000], true])
+gleich('rate limit: wartet bis zum Reset (62 s), dann Neustart, Exit 0', [limit.code, limit.wartet, limit.aufrufe.includes(DISPATCH)], [0, [62_000], true])
 const fern = mitFehler(LIMIT_TEXT, 1_000_000_000 + 7200)
 gleich('rate limit mit Reset in 2 h: nicht gewartet (jenseits des Zeitkontos), Exit 1, Grund im Log', [fern.code, fern.wartet, fern.zeilen.some((z) => z.includes('rate limit') && z.includes('nicht gewartet'))], [1, [], true])
 const anders = mitFehler('gh api repos/o/r/pulls/7 Exit 1: HTTP 404: Not Found', 1_000_000_000 + 60)
 gleich('anderer Fehler: kein Warten, Exit 1, Grund im Log', [anders.code, anders.wartet, anders.zeilen.some((z) => z.includes('404'))], [1, [], true])
 
-// Zweiter Lauf auf demselben Kopf (12.11.2026, PRs 3579/3584): ein Hand-Rerun nach dem Kommentar hat ihn schon gelesen, der Neustart lässt ihn in Ruhe.
-const ZEIT = '2026-11-12T14:31:55Z'
-const lauf5 = (zusatz) => [{ id: 5, status: 'in_progress', head_sha: KOPF, run_started_at: '2026-11-12T14:32:37Z', ...zusatz }]
-gleich('3579: Hand-Rerun 14:32:37 nach Kommentar 14:31:55, läuft: kein cancel, kein rerun', laufe({ KOMMENTAR_ZEIT: ZEIT }, lauf5()).aufrufe, [])
-gleich('3584: Hand-Rerun 4 s nach dem Kommentar, läuft: nichts', laufe({ KOMMENTAR_ZEIT: '2026-11-12T14:40:00Z' }, lauf5({ run_started_at: '2026-11-12T14:40:04Z' })).aufrufe, [])
-gleich('Lauf nach dem Kommentar fertig und success: nichts', laufe({ KOMMENTAR_ZEIT: ZEIT }, lauf5({ status: 'completed', conclusion: 'success' })).aufrufe, [])
-gleich('Lauf nach dem Kommentar abgebrochen: rerun', laufe({ KOMMENTAR_ZEIT: ZEIT }, lauf5({ status: 'completed', conclusion: 'cancelled' })).aufrufe, ['run rerun 5'])
-gleich('Lauf nach dem Kommentar fehlgeschlagen: rerun', laufe({ KOMMENTAR_ZEIT: ZEIT }, lauf5({ status: 'completed', conclusion: 'failure' })).aufrufe, ['run rerun 5'])
-gleich('Lauf vor dem Kommentar gestartet, läuft: cancel und rerun', laufe({ KOMMENTAR_ZEIT: ZEIT }, lauf5({ run_started_at: '2026-11-12T14:24:36Z' })).aufrufe, ['run cancel 5', 'run rerun 5'])
-gleich('Lauf startete genau zur Kommentarzeit: Neustart (Grenze)', laufe({ KOMMENTAR_ZEIT: ZEIT }, lauf5({ run_started_at: ZEIT, status: 'completed', conclusion: 'success' })).aufrufe, ['run rerun 5'])
-gleich('Kommentarzeit fehlt: Neustart wie bisher', laufe({ KOMMENTAR_ZEIT: undefined }, lauf5({ status: 'completed', conclusion: 'success' })).aufrufe, ['run rerun 5'])
-gleich('Kommentarzeit unlesbar: Neustart wie bisher', laufe({ KOMMENTAR_ZEIT: 'gestern' }, lauf5({ status: 'completed', conclusion: 'success' })).aufrufe, ['run rerun 5'])
-gleich('Laufzeit fehlt: Neustart wie bisher', laufe({ KOMMENTAR_ZEIT: ZEIT }, lauf5({ run_started_at: undefined, status: 'completed', conclusion: 'success' })).aufrufe, ['run rerun 5'])
+// Zweiter Lauf desselben PR (12.11.2026, PRs 3579/3584): ein Lauf, der nach dem Kommentar startete, hat ihn schon gelesen.
+gleich('3579: Lauf 14:32:37 nach Kommentar 14:31:55, läuft: kein Dispatch', laufe({ KOMMENTAR_ZEIT: ZEIT }, lauf5()).starts, [])
+gleich('3584: Lauf 4 s nach dem Kommentar, läuft: nichts', laufe({ KOMMENTAR_ZEIT: '2026-11-12T14:40:00Z' }, lauf5({ run_started_at: '2026-11-12T14:40:04Z' })).starts, [])
+gleich('Lauf nach dem Kommentar fertig und success: nichts', laufe({ KOMMENTAR_ZEIT: ZEIT }, lauf5({ status: 'completed', conclusion: 'success' })).starts, [])
+gleich('Lauf nach dem Kommentar abgebrochen: Dispatch', laufe({ KOMMENTAR_ZEIT: ZEIT }, lauf5({ status: 'completed', conclusion: 'cancelled' })).starts, [DISPATCH])
+gleich('Lauf nach dem Kommentar fehlgeschlagen: Dispatch', laufe({ KOMMENTAR_ZEIT: ZEIT }, lauf5({ status: 'completed', conclusion: 'failure' })).starts, [DISPATCH])
+gleich('Lauf vor dem Kommentar gestartet, läuft: Dispatch (concurrency bricht ihn ab)', laufe({ KOMMENTAR_ZEIT: ZEIT }, lauf5({ run_started_at: '2026-11-12T14:24:36Z' })).starts, [DISPATCH])
+gleich('Lauf startete genau zur Kommentarzeit: Dispatch (Grenze)', laufe({ KOMMENTAR_ZEIT: ZEIT }, lauf5({ run_started_at: ZEIT, status: 'completed', conclusion: 'success' })).starts, [DISPATCH])
+gleich('Kommentarzeit fehlt: Dispatch wie bisher', laufe({ KOMMENTAR_ZEIT: undefined }, lauf5({ status: 'completed', conclusion: 'success' })).starts, [DISPATCH])
+gleich('Kommentarzeit unlesbar: Dispatch wie bisher', laufe({ KOMMENTAR_ZEIT: 'gestern' }, lauf5({ status: 'completed', conclusion: 'success' })).starts, [DISPATCH])
+gleich('Laufzeit fehlt: Dispatch wie bisher', laufe({ KOMMENTAR_ZEIT: ZEIT }, lauf5({ run_started_at: undefined, status: 'completed', conclusion: 'success' })).starts, [DISPATCH])
+gleich('Lauf eines anderen PR nach dem Kommentar: zählt nicht, Dispatch', laufe({ KOMMENTAR_ZEIT: ZEIT }, fremd).starts, [DISPATCH])
 
 // Verdrahtung: die Namen aus der YAML speisen main; der Mutant „anderer env-Name“ bleibt so nicht grün.
 const wf = parse(fs.readFileSync(new URL('../.github/workflows/pr-pruefer-nachtrag.yml', import.meta.url), 'utf8'))
@@ -171,9 +174,6 @@ gleich('Schritt ruft das Skript ohne Argumente', schritt.run, 'node tools/pr-pru
 gleich('Kommentartext nur über env', Object.entries(schritt.env).filter(([, w]) => w.includes('comment.body')).map(([s]) => s), ['KOMMENTAR'])
 gleich('run enthält keinen Ausdruck', schritt.run.includes('${{'), false)
 gleich('YAML reicht die Kommentarzeit durch (comment.created_at)', schritt.env.KOMMENTAR_ZEIT, '${{ github.event.comment.created_at }}')
-// Zeitbudget: Pausen plus 60 s für Checkout und Abfragen müssen unter der Jobfrist bleiben.
-const pausenMs = haengt.wartet.reduce((s, ms) => s + ms, 0)
-gleich('Pausen des hängenden Laufs = Runden x Takt aus dem Werkzeug', [pausenMs, WARTE_RUNDEN * WARTE_MS], [210_000, 210_000])
 // Dauer-Limit durch main: jeder verschiedene Aufruf scheitert beim ersten Mal mit „rate limit“ (Reset 5 min voraus = 302 s Wartezeit).
 // Das Zeitkonto deckt zwei dieser Wartezeiten (604 s), die dritte (302 s > 296 s Rest) nicht mehr: Exit 1, Summe der echten Warten <= KONTO_MS.
 const dauer = (() => {
@@ -187,8 +187,8 @@ const dauer = (() => {
       throw new Error(`gh ${s} Exit 1: HTTP 403: API rate limit exceeded`)
     }
     if (args[1] === 'repos/o/r/pulls/7') return JSON.stringify(pr())
-    if (args[1]?.includes('/workflows/pr-pruefer.yml/runs')) return JSON.stringify(laufend)
-    return JSON.stringify({ status: 'completed' })
+    if (args[1]?.includes('/workflows/pr-pruefung.yml/runs')) return '40\tcompleted\tsuccess'
+    return '[]'
   }
   const mute = console.log
   console.log = () => {}
@@ -198,12 +198,11 @@ const dauer = (() => {
 })()
 gleich('Dauer-Limit: zwei Warten (302 s), dann Schluss ohne weiteres Warten, Exit 1', [dauer.wartet, dauer.code], [[302_000, 302_000], 1])
 gleich('Dauer-Limit: Summe der Wartezeiten <= Zeitkonto', dauer.wartet.reduce((s, ms) => s + ms, 0) <= KONTO_MS, true)
-// Zeitbudget aus den echten Pausen des hängenden Laufs (haengt: 14 x 15 s) plus Zeitkonto plus 60 s für Checkout und Abfragen.
-const budgetMin = (pausenMs + KONTO_MS + 60_000) / 60_000
-gleich(`Zeitbudget: Pausen + Zeitkonto + 60 s = ${budgetMin.toFixed(1)} min <= timeout-minutes ${job['timeout-minutes']}`, budgetMin <= job['timeout-minutes'], true)
-gleich('Zeitbudget: Job-Timeout höchstens eine Minute über dem gerundeten Budget', job['timeout-minutes'] <= Math.ceil(budgetMin) + 1, true)
+// Zeitbudget: 5 min für Checkout, vier Abfragen und Dispatch (kein Warten auf einen abgebrochenen Lauf mehr) plus Zeitkonto.
+const budgetMin = (5 * 60_000 + KONTO_MS) / 60_000
+gleich(`Zeitbudget: 5 min + Zeitkonto = ${budgetMin} min = timeout-minutes ${job['timeout-minutes']}`, job['timeout-minutes'], budgetMin)
 const ausYaml = Object.fromEntries(Object.keys(schritt.env).map((s) => [s, { PR_NUMMER: '7', KOMMENTAR: '## Nachtrag', KOMMENTAR_LOGIN: 'inhaber', KOMMENTAR_ASSOZIATION: 'OWNER' }[s] ?? 'x']))
-gleich('env-Namen der YAML lösen den Neustart aus', laufe({ ...ausYaml, KOMMENTAR: '## Nachtrag', GITHUB_REPOSITORY: 'o/r' }, abgeschlossen).aufrufe, ['run rerun 5'])
+gleich('env-Namen der YAML lösen den Neustart aus', laufe({ ...ausYaml, KOMMENTAR: '## Nachtrag', GITHUB_REPOSITORY: 'o/r' }, []).starts, [DISPATCH])
 
 console.log(`Prüfer-Neustart: ${fehler.length === 0 ? 'alle Fälle grün' : fehler.length + ' Fälle rot'}`)
 process.exit(fehler.length === 0 ? 0 : 1)

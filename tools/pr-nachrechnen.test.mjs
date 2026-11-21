@@ -273,7 +273,9 @@ function prozess(daten, argv) {
 const kette = parse(fs.readFileSync(new URL('../.github/workflows/pr-pruefung.yml', import.meta.url), 'utf8'))
 pruefe('pr-pruefung.yml: reopened startet die Kette', kette.on.pull_request.types.includes('reopened'), kette.on)
 const pruefer = parse(fs.readFileSync(new URL('../.github/workflows/pr-pruefer.yml', import.meta.url), 'utf8'))
-pruefe('pr-pruefer.yml: nur pull_request_target, ohne reopened', Object.keys(pruefer.on).join() === 'pull_request_target' && pruefer.on.pull_request_target.types.join() === 'opened,synchronize,ready_for_review', pruefer.on)
+// Seit 21.11.2026 startet der Prüfer nur per Dispatch nach dem Kettenende; das Wiederöffnen rechnet die Kette nach, und
+// pr-pruefer-nach-kette.mjs startet ihn nicht, weil der Kopf sein Urteil schon hat (Fall „Kette nachgerechnet, Urteil bleibt“ dort).
+pruefe('pr-pruefer.yml: kein PR-Ereignis, nur workflow_dispatch', Object.keys(pruefer.on).join() === 'workflow_dispatch', pruefer.on)
 
 if (fehler.length > 0) {
   console.error(`pr-nachrechnen.test: ${fehler.length} rot`)

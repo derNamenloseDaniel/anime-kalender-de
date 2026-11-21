@@ -4,16 +4,27 @@ name: PR-Prüfer
 # gibt ein eigener Schritt mit GITHUB_TOKEN (github-actions[bot]) — und nur, wenn das Urteil „ok" zum aktuellen
 # Head-Stand passt. Fehlt etwas, geschieht nichts (fail closed).
 #
-# `pull_request_target`: läuft immer in der Fassung von main, ein PR kann seinen Prüfer nicht abschwächen.
+# Start nur per `workflow_dispatch` (21.11.2026, vorher pull_request_target mit stummem ersten Versuch bei laufender Kette): am Ende der
+# PR-Prüfkette (pr-pruefer-nachtrag.yml, Job nach-kette, tools/pr-pruefer-nach-kette.mjs) und bei einem Nachtrag (Job neustart).
+# Läuft immer in der Fassung von main (`--ref main`), ein PR kann seinen Prüfer nicht abschwächen.
 # Darum gilt hier: **kein Checkout des PR-Zweigs, kein PR-Code ausführen.** Der Diff kommt als Text.
 # Er ist unvertrauenswürdig (Prompt-Injektion): Claude bekommt nur Lesewerkzeuge und darf nur Dateien schreiben.
-# Der erste PR, der diese Datei einführt, wird noch nicht geprüft — main hat sie dann noch nicht.
+# PR, Kopf, Basis und Zweig stammen allein aus der API (Job `ziel`, tools/pr-pruefer-start.mjs), die Eingaben nur über env.
 
 on:
-  pull_request_target:
-    branches: [main, zug]
-    # Ohne `reopened`: Wiederöffnen (tools/pr-nachrechnen.mjs) rechnet nur die Kette nach, der Kopf und sein Urteil bleiben.
-    types: [opened, synchronize, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: 'PR-Nummer'
+        required: true
+        type: string
+      sha:
+        description: 'Kopf-SHA, den die Kette geprüft hat (leer = aktueller Kopf); ist der Kopf inzwischen ein anderer, prüft der Lauf nichts'
+        required: false
+        type: string
+
+# Der PR steht nur hier: Dispatch-Läufe tragen den SHA von main (Suche über laeufeVon in tools/pr-pruefer-start.mjs).
+run-name: 'PR-Prüfer #${{ inputs.pr }} ${{ inputs.sha }}'
 
 # checks: read für den Schritt „Check-Stand des Kopfes“ (Check-Runs des Kopfes; das Ruleset braucht nur Metadaten).
 permissions:
@@ -25,21 +36,45 @@ permissions:
   actions: read
 
 concurrency:
-  group: pr-pruefer-${{ github.event.pull_request.number }}
+  group: pr-pruefer-${{ inputs.pr }}
   cancel-in-progress: true
 
 jobs:
+  # Ziel prüfen (tools/pr-pruefer-start.mjs, Skript aus main): offener, prüfpflichtiger PR (kein Entwurf, Fork, daten/, zug-fahrt,
+  # zug-probe; Basis main oder zug), Kopf noch der aus `sha`. Sonst `los=0` und alle Jobs danach entfallen.
+  ziel:
+    name: Ziel prüfen
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      los: ${{ steps.ziel.outputs.los }}
+      pr: ${{ steps.ziel.outputs.pr }}
+      sha: ${{ steps.ziel.outputs.sha }}
+      basis: ${{ steps.ziel.outputs.basis }}
+      zweig: ${{ steps.ziel.outputs.zweig }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Ziel prüfen
+        id: ziel
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_EINGABE: ${{ inputs.pr }}
+          SHA_EINGABE: ${{ inputs.sha }}
+        run: node tools/pr-pruefer-start.mjs
+
   # Übernahme (21.11.2026, tools/pr-pruefer-uebernahme.mjs, Skript aus main): gilt am vorigen Kopf ein „ok“ und ist der eigene Diff gleich
   # (reiner main-Nachzug), schreibt dieser Job ein Übernahme-Urteil; Mutationsprobe und Prüfer-Review entfallen dann. Nur API, kein PR-Code.
   # Fehler heißen volle Prüfung (das Skript endet immer mit 0, nur `uebernommen=1` überspringt).
   uebernahme:
     name: Übernahme bei gleichem eigenem Diff
-    if: >-
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      !startsWith(github.head_ref, 'daten/') &&
-      github.head_ref != 'zug-fahrt' &&
-      github.head_ref != 'zug-probe' &&
-      !github.event.pull_request.draft
+    needs: ziel
+    if: needs.ziel.outputs.los == '1'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -57,8 +92,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-          PR: ${{ github.event.pull_request.number }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR: ${{ needs.ziel.outputs.pr }}
+          HEAD_SHA: ${{ needs.ziel.outputs.sha }}
         run: node tools/pr-pruefer-uebernahme.mjs
 
   # Mutationsprobe bei Prüfstufe 2 (12.11.2026, tools/mutationsprobe-pr.mjs, Skript aus main): ändert der PR eine Mutantenliste
@@ -68,14 +103,8 @@ jobs:
   # Fail-soft: kein Start, keine Datei, kein Rot; `pruefen` läuft danach in jedem Fall (`!cancelled()`).
   mutationsprobe:
     name: Mutationsprobe (Prüfstufe 2)
-    needs: uebernahme
-    if: >-
-      needs.uebernahme.outputs.uebernommen != '1' &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      !startsWith(github.head_ref, 'daten/') &&
-      github.head_ref != 'zug-fahrt' &&
-      github.head_ref != 'zug-probe' &&
-      !github.event.pull_request.draft
+    needs: [ziel, uebernahme]
+    if: needs.ziel.outputs.los == '1' && needs.uebernahme.outputs.uebernommen != '1'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -83,8 +112,8 @@ jobs:
       pull-requests: read
       actions: write
     env:
-      PR: ${{ github.event.pull_request.number }}
-      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      PR: ${{ needs.ziel.outputs.pr }}
+      HEAD_SHA: ${{ needs.ziel.outputs.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -112,7 +141,7 @@ jobs:
         if: steps.stufe.outputs.stufe == '2'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ZWEIG: ${{ github.head_ref }}
+          ZWEIG: ${{ needs.ziel.outputs.zweig }}
         # stumm: Zusatzprobe (Stufe 2); ein Startfehler darf das Prüfer-Urteil nicht verhindern, die Zeile steht im Schrittlog
         run: node tools/mutationsprobe-pr.mjs start "$PR" "$HEAD_SHA" "$ZWEIG" "$RUNNER_TEMP/pruefer" || echo "Mutationsprobe nicht gestartet"
 
@@ -135,25 +164,21 @@ jobs:
 
   pruefen:
     name: Prüfer-Review
-    needs: [uebernahme, mutationsprobe]
+    needs: [ziel, uebernahme, mutationsprobe]
     if: >-
       !cancelled() &&
-      needs.uebernahme.outputs.uebernommen != '1' &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      !startsWith(github.head_ref, 'daten/') &&
-      github.head_ref != 'zug-fahrt' &&
-      github.head_ref != 'zug-probe' &&
-      !github.event.pull_request.draft
+      needs.ziel.outputs.los == '1' &&
+      needs.uebernahme.outputs.uebernommen != '1'
     runs-on: ubuntu-latest
     # 60 min wie vorher: Vorlauf 1,5 + Prüfer höchstens 13 + Check-Stand 2 = 16,5 min, dazu bei „rate limit“ höchstens das Zeitkonto
     # KONTO_MS (15 min für ALLE Warteplätze des Jobs, tools/gh-ratelimit.mjs) = 31,5 min; Rechnung: tools/pr-pruefer-eingabe.test.mjs.
     timeout-minutes: 60
     env:
-      PR: ${{ github.event.pull_request.number }}
-      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      PR: ${{ needs.ziel.outputs.pr }}
+      HEAD_SHA: ${{ needs.ziel.outputs.sha }}
+      BASE_SHA: ${{ needs.ziel.outputs.basis }}
     steps:
-      # Bei pull_request_target holt der Checkout den Stand von main (vertrauenswürdig).
+      # Der Dispatch läuft auf main: der Checkout holt den Stand von main (vertrauenswürdig).
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
@@ -270,25 +295,11 @@ jobs:
       # Schritt legt die Ergebniszeilen der PR-Prüfkette des Kopfes (kettenlog.txt), die in den Nachträgen zitierten Zeilen
       # mit Treffern (kettenlog-zitate.txt, 31.10.2026: die Übersicht kappt je Job, der Abnahme-Prüfer hat kein Grep) und das
       # bereinigte Log (kettenlog-voll.txt) in den Prüfordner. Fail-soft: ohne Datei gilt „nicht beurteilt“.
-      # Frist 0 (13.11.2026): Der Schritt hielt bis zu 36 min einen Runner, nur um auf die Kette zu warten; bei Runner-Mangel
-      # wartet die Kette ihrerseits auf Runner (23 von 41 Prüfer-Jobs warteten die vollen 36 min). Läuft die Kette
-      # noch, beendet sich der Prüfer sofort und schweigt (seit 19.11.2026 ohne Kommentar); pr-pruefer-nachtrag.yml startet ihn nach Kettenende neu.
+      # Frist 0: Der Prüfer startet erst nach dem Kettenende (21.11.2026), auf die Kette wartet hier nichts.
       - name: Kettenlog bereitlegen
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node tools/pr-kettenlog.mjs "$HEAD_SHA" "$RUNNER_TEMP/pruefer" 0 "$RUNNER_TEMP/pruefer/pr-beschreibung.txt" || echo "Kettenlog nicht bereitgelegt"
-
-      # Kette läuft noch: kein Modellaufruf (er ergäbe nur „nicht beurteilt“). Das Platzhalter-Urteil „aendern“ führt in „Protokoll und
-      # Freigabe“ zu art=offen, und dort endet der Lauf ohne Kommentar (19.11.2026).
-      - name: Kette läuft noch
-        id: kette
-        run: |
-          T="$RUNNER_TEMP/pruefer"
-          if node tools/pr-pruefer-kette-offen.mjs --nur-lauf "$T/kettenlog.txt"; then
-            echo "laeuft=ja" >> "$GITHUB_OUTPUT"
-            printf '{"urteil":"aendern","sha":"%s"}' "$HEAD_SHA" > "$T/urteil.json"
-            printf '%s\n%s\n' "Die PR-Prüfkette lief beim Start des Prüfers noch; er hat nichts geprüft." "<!-- pruefer-ohne-modell -->" > "$T/protokoll.md"
-          fi
 
       # Ergebnis der Mutationsprobe aus dem Job `mutationsprobe` (Prüfstufe 2, vor diesem Job beendet, Budget von 52,5 min unberührt).
       # Nur bei vollständigem Diff (diff-zustand ok): sonst urteilt dieser Lauf ohnehin „unvollstaendig“, die Datei bliebe ungelesen.
@@ -308,14 +319,14 @@ jobs:
         id: eingang
         env:
           DIFF_ZUSTAND: ${{ steps.diff.outputs.diff-zustand }}
-          KOPF: ${{ github.event.pull_request.head.sha }}
+          KOPF: ${{ needs.ziel.outputs.sha }}
         run: node tools/pr-eingang.mjs "$RUNNER_TEMP/pruefer/pr-beschreibung.txt" "$DIFF_ZUSTAND" "$KOPF" >> "$GITHUB_OUTPUT"
 
       # Nur Mod `arbeitsliste` (Daniel, 20.11.2026, F147): kein Modellaufruf. Der Branch-Schutz verlangt eine Freigabe, sie kommt aus dem Schritt „Protokoll und
       # Freigabe“ mit diesem festen Urteil. Geprüft wird dann allein von der Kette (Job `modschnell`); der Schritt „Check-Stand“ setzt „ok“ nur bei grüner Kette,
       # sonst „ok, Checks rot: …“, und läuft die Kette noch, endet der Lauf stumm und der Neustart nach Kettenende holt das Urteil.
       - name: Freigabe ohne Modell (nur Mod)
-        if: steps.kette.outputs.laeuft != 'ja' && steps.stufe.outputs.nur-mod == '1'
+        if: steps.stufe.outputs.nur-mod == '1'
         run: |
           T="$RUNNER_TEMP/pruefer"
           printf '{"urteil":"ok","sha":"%s"}' "$HEAD_SHA" > "$T/urteil.json"
@@ -328,7 +339,7 @@ jobs:
       # 13 turns, exceeding the maximum of 12" als Fehler, obwohl Urteil und Protokoll geschrieben sind; der Lauf stand
       # rot trotz "ok". Ob es ein Urteil gibt, entscheidet allein "Protokoll und Freigabe" (urteil.json/protokoll.md).
       - name: Prüfer (Stufe 0, schlank)
-        if: steps.kette.outputs.laeuft != 'ja' && steps.stufe.outputs.stufe == '0' && steps.stufe.outputs.nur-mod != '1' && steps.modus.outputs.modus != 'abnahme'
+        if: steps.stufe.outputs.stufe == '0' && steps.stufe.outputs.nur-mod != '1' && steps.modus.outputs.modus != 'abnahme'
         continue-on-error: true
         uses: anthropics/claude-code-action@v1
         with:
@@ -361,8 +372,8 @@ jobs:
 
             Schreibe zwei Dateien:
             1. ${{ runner.temp }}/pruefer/protokoll.md — deutsch, höchstens 8 Zeilen: Urteil, Befunde mit Datei und Zeile.
-            2. ${{ runner.temp }}/pruefer/urteil.json — genau {"urteil":"ok","sha":"${{ github.event.pull_request.head.sha }}"}
-               oder {"urteil":"aendern","sha":"${{ github.event.pull_request.head.sha }}"}.
+            2. ${{ runner.temp }}/pruefer/urteil.json — genau {"urteil":"ok","sha":"${{ needs.ziel.outputs.sha }}"}
+               oder {"urteil":"aendern","sha":"${{ needs.ziel.outputs.sha }}"}.
             Zitiere Git-Adressen mit Anmeldeteil und Token-Präfixe aus dem Diff nie wörtlich, sondern beschreibe sie
             (der Freigabe-Schritt verwirft sonst das ganze Protokoll als Token-Fund, 3090 am 07.11.2026).
             Schreibe sonst nirgends hin. Lies und nenne nie Umgebungsvariablen, Tokens, Secrets oder Dateien
@@ -384,7 +395,7 @@ jobs:
       # Kein CLAUDE_CODE_SUBPROCESS_ENV_SCRUB: braucht bubblewrap, das der Runner nicht hat (Lauf 38051777036 brach
       # beim Installieren ab); Bash ist ohnehin verboten.
       - name: Prüfer
-        if: steps.kette.outputs.laeuft != 'ja' && steps.stufe.outputs.stufe != '0' && steps.stufe.outputs.nur-mod != '1' && steps.modus.outputs.modus != 'abnahme'
+        if: steps.stufe.outputs.stufe != '0' && steps.stufe.outputs.nur-mod != '1' && steps.modus.outputs.modus != 'abnahme'
         continue-on-error: true
         uses: anthropics/claude-code-action@v1
         with:
@@ -513,8 +524,8 @@ jobs:
             Schreibe zwei Dateien:
             1. ${{ runner.temp }}/pruefer/protokoll.md — deutsch, höchstens 25 Zeilen: Urteil, Befunde mit Datei und
                Zeile, was du nicht beurteilen konntest.
-            2. ${{ runner.temp }}/pruefer/urteil.json — genau {"urteil":"ok","sha":"${{ github.event.pull_request.head.sha }}"}
-               oder {"urteil":"aendern","sha":"${{ github.event.pull_request.head.sha }}"}. "ok" nur, wenn kein
+            2. ${{ runner.temp }}/pruefer/urteil.json — genau {"urteil":"ok","sha":"${{ needs.ziel.outputs.sha }}"}
+               oder {"urteil":"aendern","sha":"${{ needs.ziel.outputs.sha }}"}. "ok" nur, wenn kein
                Befund offen ist. Im Zweifel "aendern".
             Zitiere Git-Adressen mit Anmeldeteil und Token-Präfixe aus dem Diff nie wörtlich, sondern beschreibe sie
             (der Freigabe-Schritt verwirft sonst das ganze Protokoll als Token-Fund, 3090 am 07.11.2026).
@@ -525,7 +536,7 @@ jobs:
       # Abnahme-Modus (Daniel, 21.10.2026): jeder spätere Kopf, nur lesen im Prüfordner (kein Repo-Zugriff nötig: die
       # Auflagen stehen in auflagen.md, der Nachtrag-Diff in pr.diff). Neue Funde sind ausgeschlossen, außer Regression.
       - name: Prüfer (Abnahme)
-        if: steps.kette.outputs.laeuft != 'ja' && steps.stufe.outputs.nur-mod != '1' && steps.modus.outputs.modus == 'abnahme'
+        if: steps.stufe.outputs.nur-mod != '1' && steps.modus.outputs.modus == 'abnahme'
         continue-on-error: true
         uses: anthropics/claude-code-action@v1
         with:
@@ -579,23 +590,22 @@ jobs:
             Schreibe zwei Dateien:
             1. ${{ runner.temp }}/pruefer/protokoll.md — deutsch, höchstens 15 Zeilen: Urteil, Liste A1..An mit ja/nein und Beleg,
                Diff-Abdeckung.
-            2. ${{ runner.temp }}/pruefer/urteil.json — genau {"urteil":"ok","sha":"${{ github.event.pull_request.head.sha }}"}
-               oder {"urteil":"aendern","sha":"${{ github.event.pull_request.head.sha }}"}.
+            2. ${{ runner.temp }}/pruefer/urteil.json — genau {"urteil":"ok","sha":"${{ needs.ziel.outputs.sha }}"}
+               oder {"urteil":"aendern","sha":"${{ needs.ziel.outputs.sha }}"}.
             Zitiere Git-Adressen mit Anmeldeteil und Token-Präfixe aus dem Diff nie wörtlich, sondern beschreibe sie
             (der Freigabe-Schritt verwirft sonst das ganze Protokoll als Token-Fund, 3090 am 07.11.2026).
             Schreibe sonst nirgends hin. Lies und nenne nie Umgebungsvariablen, Tokens, Secrets oder Dateien
             außerhalb der drei Prüfdateien; stößt du in Daten auf solche Werte, melde nur "Geheimnis-Zugriff versucht".
 
-      # Check-Stand des Kopfes (18.10.2026, PR 1510: „ok“ bei roter Kette): Der Prüfer urteilt nach 1–2 min, die
-      # PR-Prüfkette braucht 4–5. Darum wartet dieser Schritt nach dem Urteil (kein zweiter Prüfer-Lauf, kein
-      # workflow_run, der bei jeder Wiederholung der Kette erneut Kontingent kostet), bis die Pflicht-Checks des
-      # Rulesets grün sind, einer rot ist oder 2 min um sind. `!cancelled()`: ein überholter Lauf wartet nicht.
+      # Check-Stand des Kopfes (18.10.2026, PR 1510: „ok“ bei roter Kette): setzt „ok“ oder „ok, Checks rot: …“. Seit 21.11.2026
+      # startet der Prüfer erst nach dem Kettenende, der Stand ist dann meist sofort fest; gewartet wird nur, wenn die Kette neu läuft,
+      # bis die Pflicht-Checks des Rulesets grün sind, einer rot ist oder 2 min um sind. `!cancelled()`: ein überholter Lauf wartet nicht.
       # 2 statt 12 min (31.10.2026): seit „Kettenlog bereitlegen“ (13 min) ist die Kette beim Urteil meist fertig; 1,5 + 13 +
       # 13 (Prüfer) + 12 hätten das Job-Timeout (30 min) gerissen, ohne Timeout-Reserve entfällt die Freigabe ganz
       # (Budget-Test: tools/pr-pruefer-eingabe.test.mjs).
       - name: Check-Stand des Kopfes
         id: checks
-        if: ${{ !cancelled() && steps.kette.outputs.laeuft != 'ja' }}
+        if: ${{ !cancelled() }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node tools/pr-checks-stand.mjs "$HEAD_SHA" 120 >> "$GITHUB_OUTPUT"
@@ -610,7 +620,6 @@ jobs:
           CHECKS: ${{ steps.checks.outputs.stand }}
           MODUS: ${{ steps.modus.outputs.modus }}
           AENDERN_FREI: ${{ steps.modus.outputs.aendern-frei }}
-          KETTE_LAEUFT: ${{ steps.kette.outputs.laeuft }}
         run: |
           set -u
           T="$RUNNER_TEMP/pruefer"
@@ -645,7 +654,7 @@ jobs:
           # Kette beim Urteil noch offen (PRs 2953, 2820: „aendern“ nur deshalb, ohne Codeänderung danach „ok“): kein Review,
           # sondern „nicht beurteilt“ mit Marke; tools/pr-pruefer-nach-kette.mjs startet den Prüfer nach Kettenende neu.
           # Nur ein echtes Prüfer-„aendern“ bei vollständigem Diff; Überschreibungen (Diff, Token) bleiben „aendern“.
-          if [ "$art" = "aendern" ] && [ "$art0" = "aendern" ] && { [ "$DIFF_ZUSTAND" = "ok" ] || [ "${KETTE_LAEUFT:-}" = "ja" ]; } && node tools/pr-pruefer-kette-offen.mjs "$T/kettenlog.txt"; then
+          if [ "$art" = "aendern" ] && [ "$art0" = "aendern" ] && [ "$DIFF_ZUSTAND" = "ok" ] && node tools/pr-pruefer-kette-offen.mjs "$T/kettenlog.txt"; then
             art=offen
             hinweis='Die PR-Prüfkette lief beim Urteil noch; die Befunde unten sind nicht belegt. Der Prüfer startet nach Kettenende von selbst neu.'
             if sed -n 2p "$T/kettenlog.txt" | grep -q '^BASIS OFFEN: PR #'; then
@@ -663,12 +672,12 @@ jobs:
             { printf '%s\n\n' "$hinweis"; cat "$T/protokoll.md"; } > "$T/protokoll.neu"
             mv "$T/protokoll.neu" "$T/protokoll.md"
           fi
-          # Kette beim Urteil noch offen (19.11.2026): kein Kommentar, kein Review. 571 von 1278 Prüfer-Kommentaren einer Woche waren „nicht beurteilt“,
-          # 73 % der PRs betroffen. Das Urteil kommt allein aus dem Neustart nach Kettenende (pr-pruefer-nach-kette.mjs: Kopf ohne Urteil -> Neustart);
-          # fällt er aus, meldet tools/pruefer-unfertig-wache.mjs „Kopf ohne Urteil seit > 60 min“. Befunde eines Modelllaufs bleiben im Lauf-Protokoll.
+          # Kette beim Urteil noch offen (19.11.2026): kein Kommentar, kein Review. Seit 21.11.2026 nur noch, wenn die Kette desselben Kopfes
+          # während des Prüfers neu lief; ihr Ende startet ihn wieder (pr-pruefer-nach-kette.mjs: Kopf ohne Urteil -> Start). Fällt das aus,
+          # meldet tools/pruefer-unfertig-wache.mjs „Kopf ohne Urteil seit > 45 min“. Befunde eines Modelllaufs bleiben im Lauf-Protokoll.
           # „Basis offen“ bleibt ein Kommentar: Er trägt echte Befunde, und der Neustart wartet dort auf den Basis-Merge.
           if [ "$art" = "offen" ] && [ "$basis_offen" != "1" ]; then
-            echo "Kette beim Urteil noch offen: kein Kommentar, kein Review; Neustart nach Kettenende (pr-pruefer-nachtrag.yml, Job nach-kette)."
+            echo "Kette beim Urteil noch offen: kein Kommentar, kein Review; Start nach Kettenende (pr-pruefer-nachtrag.yml, Job nach-kette)."
             cat "$T/protokoll.md" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
             exit 0
           fi

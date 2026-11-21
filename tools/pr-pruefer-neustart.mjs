@@ -1,17 +1,16 @@
 /**
  * Startet den CI-Prüfer (pr-pruefer.yml) neu, wenn auf einem offenen PR ein Nachtrag-Kommentar erscheint.
  * Aufruf aus .github/workflows/pr-pruefer-nachtrag.yml; nur Node-Bordmittel, der Kommentartext kommt nur über die Umgebung.
- * Der Prüfer liest die Kommentare bei jedem Start neu (tools/pr-nachtraege.mjs); ein Neustart des Laufs auf demselben Kopf genügt.
+ * Der Prüfer liest die Kommentare bei jedem Start neu (tools/pr-nachtraege.mjs). Seit 21.11.2026 per Dispatch (pr-pruefer-start.mjs):
+ * ein laufender Prüfer desselben PR bricht über die concurrency-Gruppe ab, kein cancel und kein Warten mehr.
  */
 import { pathToFileURL } from 'node:url'
 import { ghMitLimit, ghRoh, neuesKonto, warteSync } from './gh-ratelimit.mjs'
+import { holeLauf } from './pr-kettenlog.mjs'
 import { CI_BOT, NACHTRAG, VERTRAUT } from './pr-nachtraege.mjs'
+import { PRUEFER_WORKFLOW, laeufeVon, starte } from './pr-pruefer-start.mjs'
 
-const PRUEFER_WORKFLOW = 'pr-pruefer.yml'
 const ABNAHME = /Abnahme Dirigent/i
-/** Höchstens so lange wartet `neustart` auf das Ende des abgebrochenen Laufs (Rechengrundlage des Job-Timeouts, tools/pr-pruefer-neustart.test.mjs). */
-export const WARTE_RUNDEN = 14
-export const WARTE_MS = 15_000
 
 /** Ja/Nein samt Grund: zählt der Kommentar als Prüfauftrag? `pr` = Antwort der API für den PR. */
 export function entscheide({ body, kommentarLogin, assoziation, pr }) {
@@ -28,11 +27,6 @@ export function entscheide({ body, kommentarLogin, assoziation, pr }) {
   return { los: true, grund: 'Nachtrag eines Berechtigten' }
 }
 
-/** Neuester Lauf des Prüfer-Workflows für den Kopf (Liste der API, neueste zuerst). */
-export function neuesterLauf(laeufe) {
-  return (laeufe ?? []).find((l) => l.id) ?? null
-}
-
 /**
  * Hat der neueste Lauf den Kommentar schon gelesen? Ja, wenn dieser Versuch nach dem Kommentar startete und nicht abgebrochen oder
  * gescheitert ist: er liest die Kommentare erst im Schritt „Diff bereitlegen“. Ein zweiter Lauf auf demselben Kopf (12.11.2026, PR 3579:
@@ -46,20 +40,7 @@ export function liestKommentarSchon(lauf, kommentarZeit) {
   return lauf.status !== 'completed' || lauf.conclusion === 'success'
 }
 
-/** Beendet einen laufenden Lauf (cancel + Warten), dann `rerun`. `gh(args)` und `warte(ms)` sind einspeisbar. */
-export function neustart(lauf, repo, { gh, warte }) {
-  if (lauf.status !== 'completed') {
-    gh(['run', 'cancel', String(lauf.id)])
-    for (let i = 0; i < WARTE_RUNDEN; i++) {
-      const stand = JSON.parse(gh(['api', `repos/${repo}/actions/runs/${lauf.id}`]))
-      if (stand.status === 'completed') break
-      warte(WARTE_MS)
-    }
-  }
-  gh(['run', 'rerun', String(lauf.id)])
-}
-
-/** Einstieg; Rückgabe ist der Exit-Code. 1 bei fehlenden Eingaben, unlesbarem PR oder gescheitertem Neustart (Lauf-Abfrage, cancel, rerun): eine Zeile „FEHLGESCHLAGEN PR n Kopf h: Grund“ im Log, der Job wird rot und `laeufe-aufraeumen` sieht ihn; der Prüfer-Zustand ist dann der von vorher. */
+/** Einstieg; Rückgabe ist der Exit-Code. 1 bei fehlenden Eingaben, unlesbarem PR oder gescheitertem Neustart (Abfrage, Dispatch): eine Zeile „FEHLGESCHLAGEN PR n Kopf h: Grund“ im Log, der Job wird rot und `laeufe-aufraeumen` sieht ihn; der Prüfer-Zustand ist dann der von vorher. */
 export function main(env = process.env, { gh: ghBasis = ghRoh, warte = warteSync, jetzt = Date.now, konto = neuesKonto() } = {}) {
   // Bei „rate limit“ wartet ein Aufruf bis zum Reset, alle zusammen höchstens KONTO_MS (Job-Timeout im Workflow daraus abgeleitet).
   const gh = (args) => ghMitLimit(ghBasis, args, { warte, jetzt, konto })
@@ -75,12 +56,14 @@ export function main(env = process.env, { gh: ghBasis = ghRoh, warte = warteSync
   const urteil = entscheide({ body: env.KOMMENTAR, kommentarLogin: env.KOMMENTAR_LOGIN, assoziation: env.KOMMENTAR_ASSOZIATION, pr })
   if (!urteil.los) return console.log(`Prüfer-Neustart: nein (${urteil.grund})`), 0
   try {
-    const liste = gh(['api', `repos/${repo}/actions/workflows/${PRUEFER_WORKFLOW}/runs?head_sha=${pr.head.sha}&per_page=10`, '-q', '.workflow_runs'])
-    const lauf = neuesterLauf(JSON.parse(liste))
-    if (!lauf) return console.log(`Prüfer-Neustart: kein Lauf für ${pr.head.sha.slice(0, 9)}, nichts zu tun`), 0
-    if (liestKommentarSchon(lauf, env.KOMMENTAR_ZEIT)) return console.log(`Prüfer-Neustart: nein (Lauf ${lauf.id} startete nach dem Kommentar)`), 0
-    neustart(lauf, repo, { gh, warte })
-    console.log(`Prüfer-Neustart: ja, Lauf ${lauf.id} für ${pr.head.sha.slice(0, 9)} neu gestartet (${urteil.grund})`)
+    // Kette des Kopfes noch nicht fertig (oder nie gelaufen): ihr Ende startet den Prüfer, der dann auch diesen Kommentar liest.
+    const kette = holeLauf(repo, pr.head.sha, gh)
+    if (kette?.status !== 'completed') return console.log(`Prüfer-Neustart: nein (Kette für ${pr.head.sha.slice(0, 9)} nicht fertig, ihr Ende startet den Prüfer)`), 0
+    const liste = JSON.parse(gh(['api', `repos/${repo}/actions/workflows/${PRUEFER_WORKFLOW}/runs?event=workflow_dispatch&per_page=30`, '-q', '.workflow_runs']))
+    const lauf = laeufeVon(liste, pr.number)[0]
+    if (lauf && liestKommentarSchon(lauf, env.KOMMENTAR_ZEIT)) return console.log(`Prüfer-Neustart: nein (Lauf ${lauf.id} startete nach dem Kommentar)`), 0
+    starte(repo, pr.number, pr.head.sha, gh)
+    console.log(`Prüfer-Neustart: ja, PR ${nr} Kopf ${pr.head.sha.slice(0, 9)} gestartet (${urteil.grund})`)
   } catch (e) {
     console.log(`Prüfer-Neustart: FEHLGESCHLAGEN PR ${nr} Kopf ${pr.head.sha.slice(0, 9)}: nicht neu gestartet (${e.message.split('\n')[0]})`)
     return 1

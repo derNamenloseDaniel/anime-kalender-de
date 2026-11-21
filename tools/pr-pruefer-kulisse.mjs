@@ -15,7 +15,7 @@ const BASIS = 'e'.repeat(40)
 const CHECKOUT = 'actions/checkout@v4'
 const REPO = 'o/r'
 const WURZEL = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
-const SCHLUESSEL = { workflow: ['name', 'on', 'permissions', 'concurrency', 'jobs'], job: ['name', 'needs', 'if', 'runs-on', 'timeout-minutes', 'permissions', 'env', 'steps'] }
+const SCHLUESSEL = { workflow: ['name', 'on', 'run-name', 'permissions', 'concurrency', 'jobs'], job: ['name', 'needs', 'if', 'runs-on', 'timeout-minutes', 'permissions', 'env', 'steps'] }
 
 const ATTRAPPE = fs.readFileSync(new URL('./pr-pruefer-kulisse-gh.cjs', import.meta.url), 'utf8')
 
@@ -40,11 +40,12 @@ export function prDaten(n, kopf) {
 function auswerten(text, kontext) {
   return String(text).replace(/\$\{\{\s*([^}]+?)\s*\}\}/g, (_, a) => {
     const werte = {
-      'github.event.pull_request.number': kontext.pr,
-      'github.event.pull_request.head.sha': KOPF,
-      'github.event.pull_request.base.sha': BASIS,
+      // Ausgaben des Jobs `ziel` (tools/pr-pruefer-start.mjs) für PR 7.
+      'needs.ziel.outputs.pr': kontext.pr,
+      'needs.ziel.outputs.sha': KOPF,
+      'needs.ziel.outputs.basis': BASIS,
+      'needs.ziel.outputs.zweig': 'zweig-7',
       'github.repository': REPO,
-      'github.head_ref': 'zweig-7',
       'secrets.GITHUB_TOKEN': 'tok-attrappe',
       'runner.temp': kontext.temp,
     }

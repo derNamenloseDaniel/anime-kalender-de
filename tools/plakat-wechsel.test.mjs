@@ -10,7 +10,7 @@ const werkzeug = resolve('tools/plakat-wechsel.mjs')
 
 function repo(vorher, nachher) {
   const dir = mkdtempSync(join(tmpdir(), 'plakat-'))
-  const git = (...a) => execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...a], { cwd: dir, encoding: 'utf8' })
+  const git = (...a) => execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...a], { cwd: dir, encoding: 'utf8', timeout: 30_000 })
   git('init', '-q')
   mkdirSync(join(dir, 'data'))
   for (const [stand, msg] of [[vorher, 'v'], [nachher, 'n']]) {
@@ -18,7 +18,7 @@ function repo(vorher, nachher) {
     git('add', '.')
     git('commit', '-q', '-m', msg)
   }
-  return (...args) => execFileSync('node', [werkzeug, ...args], { cwd: dir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+  return (...args) => execFileSync('node', [werkzeug, ...args], { cwd: dir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30_000 })
 }
 
 test('plakat-wechsel zählt die vier Wechselarten', () => {

@@ -5,7 +5,11 @@
  * Lehre: Eine Folgennummer in Gesamtzählung ist bei einem Titel mit Staffeln keine Antwort auf „welche Staffel, welche Folge?“, und ein
  * Datum gehört zu den Folgen, deren Termin es trägt. Aufruf: npx tsx pipeline/check-staffel-anzeige.ts (läuft in `check:logic`).
  */
+import { createElement, Fragment } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import type { Release, ReleaseEvent, StreamLink, Title } from '../shared/types.ts'
+import { streamZeilen } from '../web/src/components/detail/wege-zeilen.tsx'
+import { sortiereNachZugang } from '../web/src/components/detail/wege-sortieren.ts'
 import { staffelTeile, staffelUndFolge, type StaffelZeile } from '../shared/staffel-folge.ts'
 import { staffelAngabe } from '../web/src/components/detail/staffel-angabe.ts'
 import { pilleUnten } from '../web/src/components/detail/pille-unten.ts'
@@ -60,6 +64,33 @@ const ohne = pilleUnten({ title: titel, s: weg, releases: [s4], folgenAngabe: 'd
 pruefe('Gegenfall ohne Staffeln: Bereich und „seit“ wie bisher', ohne === 'detail.folgenBereich:{"bereich":"1–136"} · detail.seitDatum:{"d":"20.11.2026"}', ohne)
 const abEins = pilleUnten({ title: titel, s: weg, releases: [rel({ firstEpisodeNumber: 1, episodeCount: 136 })],folgenAngabe: '', today: '2026-11-21', t: T, staffelAngabe: S13 })
 pruefe('Termin ab Folge 1 bleibt „seit“ auch mit Staffeln', abEins === `${S13} · detail.seitDatum:{"d":"20.11.2026"}`, abEins)
+
+/* Verdrahtung im Panel: die gerenderten Anbieterzeilen bekommen die Staffelgrenzen durchgereicht. */
+const rtlWeg = { platform: 'rtlplus', url: 'https://plus.rtl.de/probe', dub: true, zugang: 'abo', dubRanges: rtl.dubRanges } as StreamLink
+const panelTitel = { id: 900410, slug: 'probe', format: 'TV', streams: [rtlWeg], watchLinks: [] } as unknown as Title
+const zeilenMarkup = (staffeln: StaffelZeile[] | undefined): string =>
+  renderToStaticMarkup(
+    createElement(
+      Fragment,
+      null,
+      ...streamZeilen({
+        sortiertNachZugang: sortiereNachZugang({ title: panelTitel }),
+        title: panelTitel,
+        t: T as never,
+        today: '2026-11-21',
+        folgenAngabeFuer: () => 'detail.folgenBereich:{"bereich":"1–136"}',
+        dubZeilen: () => [],
+        releaseJePlattform: new Map(),
+        streamReleases: [],
+        releases: [s4],
+        tvVorbei: [],
+        staffeln,
+      }),
+    ),
+  )
+const gerendert = zeilenMarkup(horizonte)
+pruefe('Panel gerendert: RTL+-Zeile in Staffeln', gerendert.includes(`${S13} · ${S4F1}`.replaceAll('"', '&quot;')) && !gerendert.includes('1–136'), gerendert)
+pruefe('Panel gerendert ohne Grenzen: „1–136“ wie bisher', zeilenMarkup(undefined).includes('1–136'))
 
 /* Kalender: Staffel und Folge am Termin, und der Kartentext. */
 pruefe('staffelUndFolge: 137 → Staffel 4 Folge 1 (offen)', JSON.stringify(staffelUndFolge(horizonte, 137)) === '[4,1]')

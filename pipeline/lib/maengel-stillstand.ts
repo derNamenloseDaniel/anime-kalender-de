@@ -1,9 +1,13 @@
 import type { Register } from './maengel-register.ts'
 
-/** Präfix der Warnzeile; `bestand-bauen.yml` („Datenqualität messen“) macht daraus die DATEN_WARNUNG. */
+/** Präfix der Kurzzeile; `bestand-bauen.yml` („Datenqualität messen“) hängt sie als letzte Warnung an die Lauf-Meldung. */
 export const MAENGEL_STILLSTAND_ZEILE = 'MAENGEL_STILLSTAND '
-/** So viele Tage darf eine auto-Art stehen, bevor es auffällt (21.11.2026: fünf Tage Stillstand bemerkte niemand). */
+/** Präfix der Zeile mit allen Arten; steht nur im Log des Schritts, damit die Lauf-Meldung kurz bleibt. */
+export const MAENGEL_STILLSTAND_ARTEN = 'MAENGEL_STILLSTAND_ARTEN '
+/** Abstand zum Bezugstag. Mit 3 trifft der Verlauf am 19.11.2026 (erster Tag mit Bezug, `maengel` gibt es seit 16.11.). */
 export const STILLSTAND_TAGE = 3
+/** Unter diesem Abbau (Anteil am Bezug, mindestens ein Mangel) steht eine Art: fsk 1232→1230 in drei Tagen sind rund 600 Tage Restlaufzeit. */
+export const MINDESTABBAU_ANTEIL = 0.01
 
 export interface Tagesstand {
   gemessenAm: string
@@ -12,31 +16,43 @@ export interface Tagesstand {
 }
 
 export interface Stillstand {
-  /** Kurz für die DATEN_WARNUNG (die Wache zeigt nur ihren Anfang): Zahl der Arten und Bezugstag. */
-  zeile: string
-  /** Je Art Zahl vorher → heute und Quelle, fürs Log. */
-  einzeln: string
+  seit: string
+  stehen: string[]
+  steigen: string[]
 }
 
 const tagDavor = (heute: string, tage: number): string => new Date(Date.parse(heute) - tage * 86_400_000).toISOString().slice(0, 10)
 
 /**
- * Auto-Arten (`wer: auto:…`) mit offenen Mängeln, deren Zahl seit {@link STILLSTAND_TAGE} Tagen nicht gesunken ist: ihr Sammler läuft nicht,
- * nimmt die Titel nicht auf oder das Feld kommt im Bau nicht an. Bezug ist der jüngste Verlaufseintrag mit Mängelzahlen, der mindestens so alt ist;
- * fehlt er (Verlauf zu kurz) oder kennt er die Art nicht (neu im Register), gibt es für sie keine Meldung.
+ * Auto-Arten (`wer: auto:…`), die seit {@link STILLSTAND_TAGE} Tagen kaum abgebaut wurden (`stehen`) oder gestiegen sind (`steigen`):
+ * ihr Sammler läuft nicht, nimmt neue Titel nicht auf oder das Feld kommt im Bau nicht an. Bezug ist der jüngste Verlaufseintrag mit
+ * `maengel`, der mindestens so alt ist; Arten ohne Wert am Bezugstag oder ohne offene Mängel heute zählen nicht.
  */
-export function stillstand(verlauf: Tagesstand[], heute: Tagesstand, register: Register | null): Stillstand | undefined {
+export function stillstandMessen(verlauf: Tagesstand[], heute: Tagesstand, register: Register | null): Stillstand | undefined {
   if (!register || !heute.maengel) return undefined
   const grenze = tagDavor(heute.gemessenAm, STILLSTAND_TAGE)
-  const eintrag = verlauf.filter((v) => v.gemessenAm <= grenze && v.maengel).at(-1)
-  const bezug = eintrag?.maengel
-  if (!eintrag || !bezug) return undefined
-  const stehen = Object.entries(register.zaehler).filter(
-    ([art, z]) => z.wer.startsWith('auto:') && (heute.maengel![art] ?? 0) > 0 && heute.maengel![art]! >= (bezug[art] ?? Infinity),
-  )
-  if (!stehen.length) return undefined
-  return {
-    zeile: `${MAENGEL_STILLSTAND_ZEILE}${stehen.length} auto-Arten sinken nicht seit ${eintrag.gemessenAm}`,
-    einzeln: stehen.map(([art, z]) => `${art} ${bezug[art]}→${heute.maengel![art]} (${z.wer})`).join('; '),
+  const bezugstag = verlauf.filter((v) => v.gemessenAm <= grenze && v.maengel).at(-1)
+  const bezug = bezugstag?.maengel
+  if (!bezug) return undefined
+  const stehen: string[] = []
+  const steigen: string[] = []
+  for (const [art, z] of Object.entries(register.zaehler)) {
+    const vorher = bezug[art]
+    const jetzt = heute.maengel[art]
+    if (!z.wer.startsWith('auto:') || vorher === undefined || jetzt === undefined || jetzt === 0) continue
+    const text = `${art} ${vorher}→${jetzt} (${z.wer})`
+    const abgebaut = vorher - jetzt >= Math.max(1, vorher * MINDESTABBAU_ANTEIL)
+    if (jetzt > vorher) steigen.push(text)
+    else if (!abgebaut) stehen.push(text)
   }
+  return stehen.length || steigen.length ? { seit: bezugstag!.gemessenAm, stehen, steigen } : undefined
+}
+
+/** Kurzzeile (Zahl der Arten, Verweis auf die Artenzeile) und Artenzeile; leer, wenn nichts steht oder steigt. */
+export function stillstandZeilen(verlauf: Tagesstand[], heute: Tagesstand, register: Register | null): string[] {
+  const s = stillstandMessen(verlauf, heute, register)
+  if (!s) return []
+  const zahl = [s.stehen.length && `${s.stehen.length} auto-Arten ohne Abbau`, s.steigen.length && `${s.steigen.length} gestiegen`].filter(Boolean).join(', ')
+  const arten = [s.stehen.length && `ohne Abbau: ${s.stehen.join('; ')}`, s.steigen.length && `gestiegen: ${s.steigen.join('; ')}`].filter(Boolean).join(' | ')
+  return [`${MAENGEL_STILLSTAND_ZEILE}seit ${s.seit}: ${zahl} (Arten: Logzeile ${MAENGEL_STILLSTAND_ARTEN.trim()})`, `${MAENGEL_STILLSTAND_ARTEN}${arten}`]
 }

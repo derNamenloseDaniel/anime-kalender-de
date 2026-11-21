@@ -332,8 +332,7 @@ jobs:
             echo "DATEN_WARNUNG=${DATEN_WARNUNG}" >> "$GITHUB_ENV"
           fi
           # Mängel-Register (`data/maengel.json`, vom Bau): neu offene Mängel, Rückfälle je Art und ein Hinweis zur Vorfassung, Zeilen aus `qualitaet-warnzeilen.ts`. Cover steht nur im Register.
-          # STILLSTAND: eine auto-Art sinkt seit drei Tagen nicht, obwohl der Bestand wächst (`maengel-stillstand.ts`).
-          for art in NEU:neu RUECKFALL:Rückfall VORFASSUNG:Vorfassung STILLSTAND:Stillstand; do
+          for art in NEU:neu RUECKFALL:Rückfall VORFASSUNG:Vorfassung; do
             if grep -q "^MAENGEL_${art%%:*} " "$RUNNER_TEMP/qualitaet.log"; then
               maengel="$(grep -m1 "^MAENGEL_${art%%:*} " "$RUNNER_TEMP/qualitaet.log" | cut -d' ' -f2-)"
               echo "::warning::Mängel ${art##*:}: ${maengel}"
@@ -341,6 +340,13 @@ jobs:
               echo "DATEN_WARNUNG=${DATEN_WARNUNG}" >> "$GITHUB_ENV"
             fi
           done
+          # auto-Arten ohne Abbau seit drei Tagen (`maengel-stillstand.ts`): steht oft tagelang, darum kurz und erst in „Lauf abmelden“
+          # ans Ende der Lauf-Meldung, sonst schöbe sie spätere Warnungen aus den 160 Zeichen der Wachzeile (`laeufe-abruf.mjs`).
+          if grep -q '^MAENGEL_STILLSTAND ' "$RUNNER_TEMP/qualitaet.log"; then
+            still="$(grep -m1 '^MAENGEL_STILLSTAND ' "$RUNNER_TEMP/qualitaet.log" | cut -d' ' -f2-)"
+            echo "::warning::Mängel Stillstand: ${still}"
+            echo "STILLSTAND_WARNUNG=Mängel Stillstand: ${still}" >> "$GITHUB_ENV"
+          fi
           # Harter Wächter rot (`HART` in check-qualitaet.ts): als gelbe Meldung sichtbar machen, sonst bleibt der Schritt unbemerkt rot.
           if grep -q 'das darf nicht vorkommen' "$RUNNER_TEMP/qualitaet.log"; then
             hart="$(grep 'das darf nicht vorkommen' "$RUNNER_TEMP/qualitaet.log" | sed 's/^.*⚠ *//; s/ — das darf nicht vorkommen//' | paste -sd';' -)"
@@ -482,6 +488,7 @@ jobs:
           LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
         run: |
           z="${{ job.status == 'success' && 'ok' || job.status == 'cancelled' && 'abgebrochen' || 'fehler' }}"
+          DATEN_WARNUNG="${DATEN_WARNUNG:-}${STILLSTAND_WARNUNG:+${DATEN_WARNUNG:+ · }$STILLSTAND_WARNUNG}"
           if [ "$z" = ok ] && [ -n "${DATEN_WARNUNG:-}" ]; then
             bash "$MELDER" warnung "$DATEN_WARNUNG"
           elif [ "$z" = fehler ] && [ -n "${DATEN_WARNUNG:-}" ]; then

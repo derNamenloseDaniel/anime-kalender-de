@@ -67,7 +67,8 @@ pruefe('ohne Register: keine Mängel-Zeile, kein Feld `maengel` im Verlauf', !d.
 
 const auto = { ...mitNeu, zaehler: { ...mitNeu.zaehler, fsk: { ...zaehler(2, 1), wer: 'auto:justwatch' } } }
 const e = lauf(auto, [{ gemessenAm: '2000-01-01', titel: 0, maengel: { fsk: 2 } }])
-pruefe('STILLSTAND: auto-Art nicht gesunken, kurze Zeile und Einzelheiten im Log', e.ausgabe.split('\n').includes('MAENGEL_STILLSTAND 1 auto-Arten sinken nicht seit 2000-01-01') && e.ausgabe.includes('Stillstand je Art: fsk 2→2 (auto:justwatch)'), e.ausgabe)
+const zeilen = e.ausgabe.split('\n')
+pruefe('STILLSTAND: auto-Art ohne Abbau, Kurz- und Artenzeile in der Ausgabe', zeilen.includes('MAENGEL_STILLSTAND seit 2000-01-01: 1 auto-Arten ohne Abbau (Arten: Logzeile MAENGEL_STILLSTAND_ARTEN)') && zeilen.includes('MAENGEL_STILLSTAND_ARTEN ohne Abbau: fsk 2→2 (auto:justwatch)'), e.ausgabe)
 
 if (verletzt) process.exit(1)
 console.log('check-qualitaet-maengel-lauf: 7 Fälle grün')

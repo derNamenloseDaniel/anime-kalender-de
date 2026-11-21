@@ -78,15 +78,33 @@ try {
   assert.equal(neu.env, 'DATEN_WARNUNG=Mängel neu: fsk: 12 (1, 2, 3, …); banner: 1 (7)', 'Mängel neu setzt DATEN_WARNUNG')
   const maengelBeide = lauf({ npmAusgabe: RUECKGANG + MAENGEL_NEU + MAENGEL_RUECK, exit: 0, vorher: 'Anderes' })
   assert.equal(maengelBeide.env.split('\n').at(-1), 'DATEN_WARNUNG=Anderes · Streaming-Abdeckung gesunken: mitStreamingWeg: 1947 → 1900 (−47, mehr als 1 % weniger als beim letzten Wert) · Mängel neu: fsk: 12 (1, 2, 3, …); banner: 1 (7) · Mängel Rückfall: kein-weg: 1 (495)', 'Mängel hängen sich an die übrigen Warnungen')
-  const STILL = 'MAENGEL_STILLSTAND 11 auto-Arten sinken nicht seit 2026-11-18\n[pipeline] Stillstand je Art: fsk 1222→1222 (auto:justwatch)\n'
-  const still2 = lauf({ npmAusgabe: MAENGEL_NEU + STILL + '[pipeline] ⚠  verwaisteTermine: 2 — das darf nicht vorkommen\n', exit: 1 })
-  assert.equal(still2.env.split('\n').at(-1), 'DATEN_WARNUNG=Mängel neu: fsk: 12 (1, 2, 3, …); banner: 1 (7) · Mängel Stillstand: 11 auto-Arten sinken nicht seit 2026-11-18 · Datenqualität hart rot: verwaisteTermine: 2', 'Stillstand kurz, nach den Mängel-Ereignissen, vor der harten Zeile; Einzelheiten nicht in der Warnung')
   const vorfassung = lauf({ npmAusgabe: 'MAENGEL_VORFASSUNG Vorfassung von data/maengel.json nicht lesbar, ohne Vorfassung gebaut (alles gilt als Bestand)\n', exit: 0 })
   assert.equal(vorfassung.status, 0, 'Vorfassung-Hinweis: Schritt grün')
   assert.equal(vorfassung.env, 'DATEN_WARNUNG=Mängel Vorfassung: Vorfassung von data/maengel.json nicht lesbar, ohne Vorfassung gebaut (alles gilt als Bestand)', 'Hinweis erreicht die Lauf-Meldung')
   const maengelHart = lauf({ npmAusgabe: MAENGEL_RUECK + '[pipeline] ⚠  verwaisteTermine: 2 — das darf nicht vorkommen\n', exit: 1 })
   assert.equal(maengelHart.status, 1, 'Exit-Code der Messung bleibt auch mit Mängel-Zeile')
   assert.match(maengelHart.env.split('\n').at(-1), /^DATEN_WARNUNG=Mängel Rückfall: kein-weg: 1 \(495\) · Datenqualität hart rot: verwaisteTermine: 2$/, 'harte Zeile hängt an die Mängel-Warnung')
+
+  const STILL = 'MAENGEL_STILLSTAND seit 2026-11-18: 7 auto-Arten ohne Abbau, 5 gestiegen (Arten: Logzeile MAENGEL_STILLSTAND_ARTEN)\nMAENGEL_STILLSTAND_ARTEN ohne Abbau: fsk 1230→1222 (auto:justwatch)\n'
+  const steht = lauf({ npmAusgabe: STILL + MAENGEL_NEU, exit: 0, vorher: 'Anderes' })
+  const stillEnv = steht.env.split('\n')
+  assert.equal(stillEnv.at(-1), 'STILLSTAND_WARNUNG=Mängel Stillstand: seit 2026-11-18: 7 auto-Arten ohne Abbau, 5 gestiegen (Arten: Logzeile MAENGEL_STILLSTAND_ARTEN)', 'Stillstand kommt als eigene Variable, nur die Kurzzeile')
+  assert.ok(!stillEnv.some((z) => z.startsWith('DATEN_WARNUNG=') && z.includes('Stillstand')), 'Stillstand steht nicht mitten in der DATEN_WARNUNG')
+  const stehtHart = lauf({ npmAusgabe: MAENGEL_NEU + STILL + '[pipeline] ⚠  verwaisteTermine: 2 — das darf nicht vorkommen\n', exit: 1 })
+  assert.equal(stehtHart.env.split('\n').filter((z) => z.startsWith('DATEN_WARNUNG=')).at(-1), 'DATEN_WARNUNG=Mängel neu: fsk: 12 (1, 2, 3, …); banner: 1 (7) · Datenqualität hart rot: verwaisteTermine: 2', 'harte Zeile folgt direkt auf die Mängel, Stillstand drängt sich nicht dazwischen')
+
+  // „Lauf abmelden“ hängt den Stillstand ans Ende; die Wachzeile (160 Zeichen) zeigt die früheren Warnungen weiter.
+  const abmelden = wf.jobs.bauen.steps.find((s) => s.name === 'Lauf abmelden')
+  const melderLog = join(ordner, 'melder.txt')
+  writeFileSync(join(ordner, 'melder.sh'), `printf '%s|%s\\n' "$1" "$2" > "${melderLog}"\n`)
+  const run = abmelden.run.replace(/\$\{\{[^}]*\}\}/, 'ok')
+  const crWarnung = 'Anderes · Crunchyroll-Folgen ohne Termin (2): Last Boss #1;Last Boss #2'
+  spawnMitLimit('bash', ['-e', '-c', run], { encoding: 'utf8', env: { ...process.env, MELDER: join(ordner, 'melder.sh'), DATEN_WARNUNG: crWarnung, STILLSTAND_WARNUNG: 'Mängel Stillstand: seit 2026-11-18: 7 auto-Arten ohne Abbau' } })
+  assert.equal(readFileSync(melderLog, 'utf8'), `warnung|${crWarnung} · Mängel Stillstand: seit 2026-11-18: 7 auto-Arten ohne Abbau\n`, 'Stillstand als letzte Warnung')
+  const { verlaufsZeile } = await import('./laeufe-abruf.mjs')
+  assert.match(verlaufsZeile({ zustand: 'warnung', art: 'bestand', am: 'x', stunden: 1 }, readFileSync(melderLog, 'utf8').split('|')[1]), /Last Boss #2/, 'Wachzeile zeigt die Crunchyroll-Warnung trotz Stillstand')
+  spawnMitLimit('bash', ['-e', '-c', run], { encoding: 'utf8', env: { ...process.env, MELDER: join(ordner, 'melder.sh'), DATEN_WARNUNG: '', STILLSTAND_WARNUNG: 'Mängel Stillstand: x' } })
+  assert.equal(readFileSync(melderLog, 'utf8'), 'warnung|Mängel Stillstand: x\n', 'nur Stillstand: ohne Trenner vorn')
 
   const absturz = lauf({ npmAusgabe: 'Error: kaputt\n', exit: 1 })
   assert.equal(absturz.status, 1, 'Absturz: Schritt rot')

@@ -196,6 +196,8 @@ export function ergaenzeAnisearchTitel(titles: Map<number, Title>, jpStart: Map<
       genres: [],
       keywords: [],
       studios: e.st ?? [],
+      /* Laufzeit je Folge aus derselben API-Antwort (`duration`); ohne sie blieben 155 reine aniSearch-Titel ohne Laufzeit (21.11.2026). */
+      ...(e.min ? { runtimeMin: e.min } : {}),
       dubConfidence: SICHERHEIT[e.dub],
       streams: [],
       ...(e.dub !== '-' && e.dub !== 'p' ? { deErstausgabe: erstausgabeAus(e) } : {}),

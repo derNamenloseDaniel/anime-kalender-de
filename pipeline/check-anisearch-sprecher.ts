@@ -12,7 +12,7 @@ import { gunzipSync } from 'node:zlib'
 import type { WegListe } from './lib/anisearch-archiv-vorrang.ts'
 import { legeArchivAb, zeilenAus } from './lib/anisearch-sprecher-archiv.ts'
 import { arbeiteAb, type Abruf, type Lauf } from './lib/anisearch-sprecher-lauf.ts'
-import { sprecherLuecken, type Eintrag } from './lib/anisearch-sprecher-reihe.ts'
+import { sprecherLuecken, verzahne, type Eintrag } from './lib/anisearch-sprecher-reihe.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -38,6 +38,18 @@ console.log('\naniSearch-Sprecherseiten: Reihenfolge:')
   pruefe('Nach Ablauf der Frist ist die Kennung wieder dran', spaet.haupt.includes(5), spaet.haupt)
   const alt = sprecherLuecken({ haupt: [4], katalog, bestand: { 4: { ...frisch(), fetchedAt: new Date(JETZT - 181 * TAG).toISOString() } }, weg: {}, jetztMs: JETZT })
   pruefe('Eine Seite über 180 Tage alt ist wieder fällig', alt.haupt.join() === '4', alt.haupt)
+  const vor = (tage: number, de: Eintrag['de'], ja: number): Eintrag => ({ de, ja, fetchedAt: new Date(JETZT - tage * TAG).toISOString(), stand: 1 })
+  const rolle = [{ figur: 'A', sprecher: 'B' }] as Eintrag['de']
+  const leer = sprecherLuecken({
+    haupt: [10, 11, 12, 13, 14, 15],
+    katalog: new Map([[20, true]]),
+    bestand: { 10: vor(15, [], 3), 11: vor(13, [], 3), 12: vor(15, rolle, 3), 13: vor(20, [], 0), 14: vor(30, [], 0), 15: vor(15, [], 2), 20: vor(30, [], 3) },
+    weg: { 15: { code: 404, am: new Date(JETZT - TAG).toISOString() } },
+    jetztMs: JETZT,
+  })
+  pruefe('Hauptbestand-Seite ohne deutsche Rolle ab 14 Tagen nachholen, ohne Besetzung (ja 0) im Wechsel', leer.nachholen.join() === '13,10,14', leer.nachholen)
+  pruefe('Nachholen: jünger als 14 Tage, mit deutscher Rolle, Katalog oder zurückgestellt bleibt liegen', !leer.nachholen.some((id) => [11, 12, 15, 20].includes(id)) && leer.haupt.length === 0, leer)
+  pruefe('Verzahnen: nie zwei Seiten ohne Besetzung hintereinander, solange eine mit Besetzung bleibt', verzahne([1, 2, 3], [7, 8]).join() === '7,1,8,2,3', verzahne([1, 2, 3], [7, 8]))
 }
 
 console.log('\naniSearch-Sprecherseiten: Lauf, Sperre, Archiv:')

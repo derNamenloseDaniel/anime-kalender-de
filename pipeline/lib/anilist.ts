@@ -39,6 +39,11 @@ export interface AniListMedia {
   endDate?: { year: number | null; month: number | null; day: number | null }
 }
 
+/** Muss ein Zwischenspeicher-Eintrag neu geholt werden? Nicht abgeschlossen, ohne Herkunftsland (vor 09.10.2026) oder ohne Stimmenverteilung (vor 22.11.2026, sonst bliebe der AniList-Rückfall der Wertung leer). */
+export function eintragNochOffen(m: Pick<AniListMedia, 'status' | 'countryOfOrigin' | 'stats'>): boolean {
+  return (m.status !== 'FINISHED' && m.status !== 'CANCELLED') || m.countryOfOrigin === undefined || m.stats === undefined
+}
+
 const MEDIA_FIELDS = `
   id idMal
   title { romaji english native }

@@ -1,15 +1,32 @@
 {
-  "scrapedAt": "2026-11-22T04:17:51.168Z",
+  "scrapedAt": "2026-11-22T10:02:03.431Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 39,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 7,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 40,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 11,
-    "schon in einem Rubrik-Feed gelesen": 34,
-    "Sprachhinweis älter als 45 Tage": 7
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 9,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 2,
+    "schon in einem Rubrik-Feed gelesen": 9,
+    "Sprachhinweis älter als 45 Tage": 6
   },
   "proposals": [
+    {
+      "articleTitle": "Termin des Netflix-Anime »Bride of the Barrier Master« + Trailer",
+      "articleUrl": "https://www.anime2you.de/news/1074561/bride-of-the-barrier-master-konkreter-termin/",
+      "publishedAt": "2026-11-22",
+      "category": "allgemein",
+      "platforms": [
+        "netflix"
+      ],
+      "dates": [
+        {
+          "iso": "2027-01-06",
+          "context": ".: »Kekkaishi no Ichirinka«) wurde heute verkündet, dass die Serie am 6. Januar 2027 mit einer einstündigen Episode im japanischen Fernsehen"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
     {
       "articleTitle": "Design und Extras der ersten »Inazuma Eleven«-Blu-ray-Staffelbox",
       "articleUrl": "https://www.anime2you.de/news/1074177/inazuma-eleven-staffel-1-blu-ray-design/",

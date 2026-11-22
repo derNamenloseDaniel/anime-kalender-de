@@ -104,6 +104,8 @@ Jede Regel ist ein Kurzimperativ; Anlass, PR-Nummer, Datum und alter Wortlaut je
 
 ## Weitere Prüfregeln
 
+- **Warnung ohne Suche (Lehre 214, 22.11.2026):** Eine Warnung, ein „offen“, „unklar“ oder eine Frage an Daniel im PR oder Bericht zu einer öffentlich nachschlagbaren Angabe (Datum, Folge, Staffel, Zuordnung) ohne genannten Suchbegriff einer vorherigen Websuche ist ein Befund. Anlass: „Ein Lied im Nebel“ lag als Warnung vor, Daniel googelte S1 F31 selbst.
+
 - **Hauptzeile behauptet, Nachweis höchstens klein (22.11.2026, `design-regeln.md` Abschnitt 14):** Nutzertext, der einen Termin oder Zustand nennt, sagt in der Hauptzeile die Erwartung aus Fakten und Vergangenheit; „gesehen“, „geprüft“, „bestätigt“, „wird geprüft“ dort sind ein Befund. Lehre: Der Prüfer las bisher nur, ob ein Text nichts Falsches behauptet, nie, ob er Prüfstand statt Aussage zeigt.
 
 - `public/` ohne Hash im Namen → Cache-Regel in `public/sw.js`. Neues Tor vor gebuchtem Zähler → Fall „dauerhaft voll, N Anfragen“. Geänderte Quell-Adresse → Zähler über die ganze Historie (`#/quellen`); Scanner zuerst gegen Fixture-Liste.

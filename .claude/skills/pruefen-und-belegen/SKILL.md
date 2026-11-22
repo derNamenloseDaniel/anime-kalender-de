@@ -42,6 +42,16 @@ Der Unterschied zur Regel „nichts behaupten, was nicht belegt ist": Dort geht 
 um Angaben, die ich **ausspreche**. Hier um Angaben, die ich **brauche**, um
 weiterzuarbeiten. Beide Male ist die Quelle billiger als die Vermutung.
 
+**Zweiter Anlass, 22.11.2026 (Lehre 214):** Der Horizonte-Bauer fand für den
+TV-Termin „Ein Lied im Nebel“ (13.11.) keine Staffel, weil Wikipedia die Folge
+ohne Artikel führt („Lied im Nebel“, S1 F31). Er legte eine Warnung ab, ich gab
+sie weiter, Daniel googelte selbst. Daniel: „wenn unklar, oder daten fehlen,
+dann kurze websearch, ich möchte sowas nicht mehr machen müssen … das dauert
+<5sec“. Die Regel von 26.08. galt nur für mich; `bauer` und `analyst` hatten
+kein WebSearch in ihrer Werkzeugliste. Seitdem: beide haben WebSearch/WebFetch,
+und jede Warnung, jedes „offen“ und jede Frage an Daniel nennt den Suchbegriff
+der Suche, die vorher gelaufen ist.
+
 
 ## Die sechs Prüfgriffe
 

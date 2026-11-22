@@ -2095,6 +2095,18 @@
     "1074495": {
       "am": "2026-11-21",
       "vorschlaege": 0
+    },
+    "1074551": {
+      "am": "2026-11-22",
+      "vorschlaege": 2
+    },
+    "1074561": {
+      "am": "2026-11-22",
+      "vorschlaege": 1
+    },
+    "1074568": {
+      "am": "2026-11-22",
+      "vorschlaege": 1
     }
   },
   "vorschlaege": [
@@ -16451,6 +16463,90 @@
       "quelle": "https://www.anime2you.de/news/1074300/prosieben-maxx-wiederholt-chainsaw-man/",
       "veroeffentlicht": "2026-11-21",
       "gelesenAm": "2026-11-21"
+    },
+    {
+      "titel": "SHIBOYUGI: Playing Death Games to Put Food on the Table",
+      "zitat": "Die Streaming-Dienste Crunchyroll und Netflix bieten alle Episoden sowie den Film mit deutscher Sprachfassung und im Originalton mit Untertiteln auf Abruf an.",
+      "art": "sprachfassung",
+      "sprache": "deutsch+omu",
+      "plattform": "crunchyroll",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1074551",
+      "artikel": "»SHIBOYUGI« erhält weitere Anime-Fortsetzung + Visual",
+      "quelle": "https://www.anime2you.de/news/1074551/shiboyugi-erhaelt-weitere-anime-fortsetzung/",
+      "veroeffentlicht": "2026-11-22",
+      "gelesenAm": "2026-11-22"
+    },
+    {
+      "titel": "SHIBOYUGI: Playing Death Games to Put Food on the Table",
+      "zitat": "Die Streaming-Dienste Crunchyroll und Netflix bieten alle Episoden sowie den Film mit deutscher Sprachfassung und im Originalton mit Untertiteln auf Abruf an.",
+      "art": "sprachfassung",
+      "sprache": "deutsch+omu",
+      "plattform": "netflix",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Netflix",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1074551",
+      "artikel": "»SHIBOYUGI« erhält weitere Anime-Fortsetzung + Visual",
+      "quelle": "https://www.anime2you.de/news/1074551/shiboyugi-erhaelt-weitere-anime-fortsetzung/",
+      "veroeffentlicht": "2026-11-22",
+      "gelesenAm": "2026-11-22"
+    },
+    {
+      "titel": "Classroom of the Elite",
+      "zitat": "Der Streaming-Dienst Crunchyroll hat alle vier bisherigen Staffeln, die zwischen Juli 2017 und Juni 2026 im Simulcast liefen, auf Deutsch und Japanisch im Programm.",
+      "art": "sprachfassung",
+      "sprache": "deutsch",
+      "plattform": "crunchyroll",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": "Artikel nennt für die japanische Fassung keine Untertitel ausdrücklich, ob OmU vorliegt bleibt offen.",
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1074568",
+      "artikel": "Fünfte Staffel von »Classroom of the Elite« startet 2027 + Teaser",
+      "quelle": "https://www.anime2you.de/news/1074568/classroom-of-the-elite-staffel-5-startet-2027/",
+      "veroeffentlicht": "2026-11-22",
+      "gelesenAm": "2026-11-22"
+    },
+    {
+      "titel": "Bride of the Barrier Master",
+      "zitat": "Der Streaming-Dienst Netflix zeigt die Fantasy-Serie weltweit im Simulcast.",
+      "art": "ankuendigung",
+      "sprache": "unklar",
+      "plattform": "netflix",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Netflix",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": "Das Datum 6. Januar 2027 gilt im Zitat dem japanischen Fernsehen, nicht ausdrücklich dem Netflix-Simulcast.",
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1074561",
+      "artikel": "Termin des Netflix-Anime »Bride of the Barrier Master« + Trailer",
+      "quelle": "https://www.anime2you.de/news/1074561/bride-of-the-barrier-master-konkreter-termin/",
+      "veroeffentlicht": "2026-11-22",
+      "gelesenAm": "2026-11-22"
     }
   ]
 }

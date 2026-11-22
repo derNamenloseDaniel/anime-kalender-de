@@ -388,6 +388,14 @@ Erwartet: ~301 von 307.
 | (b) de.wikipedia Episodenlisten (`fetch-wikipedia-folgen`, bisher wenige Titel) | Stichprobe 5 Synchro-Titel: 2–3 mit Episodenliste | M | niedrig | ja, Titelliste des vorhandenen Abrufs auf die 97 Synchro-Titel erweitern |
 | (b) fernsehserien.de | — | — | Recht | nur mit Genehmigung (Anfrage seit 12.11. offen) |
 
+**Rang 8, Ursachen gemessen und geschlossen (22.11.2026, Auftrag `folgentitel-tmdb-2211`, TMDB erreichbar, HTTP 200):** Nach Abzug der Platzhalter hatten 9 der 294 offenen Titel eine volle aniSearch-Liste und 26 eine TMDB-Liste mit mehr Titeln als die Datei (nicht 53); viele „volle" aniSearch-Listen bestehen aus Platzhaltern („Folge 1": 20875, 10570, 11328, 12586), die kein Titel sind. Geschlossen (294 → 283, Simulation mit den echten Bau-Funktionen über alle Titel):
+- **Filter** (9 Titel: 1822, 2221, 2568, 2572, 4083, 11307, 126438, 126830, 189046): `erschieneneFolgen` schnitt die Liste bei der höchsten datierten Nummer ab, aniSearch datiert bei alten Serien oft nur die erste Folge (126438: 1 von 73). Jetzt gilt bei Ende vor heute die Folgenzahl als Grenze (`endeNummer`).
+- **Nummern** (Kickers 3053, T・P Bon 169930): `luecke()` sah eine Liste ohne fehlende Titel, aber mit weniger Zeilen als Folgen (23 von 26, 12 von 24) als vollständig, und `mitCrTiteln` füllt nur vorhandene Zeilen. Neu: `verlaengereBisFolgenzahl`, nur wenn die schon benannten Folgen zu ≥ 80 % mit TMDB übereinstimmen. T・P Bon liegt bei TMDB in zwei Staffeln (12 + 12): Staffelsumme gilt nur mit drei benannten Folgen als Gegenprobe.
+- **Staffelzuordnung** (10004750 Es war einmal … Amerika): einzige TMDB-Staffel, Name und Folgenzahl gleich, Beginnjahr 1991 gegen 1992: ±1 genügt bei einziger Staffel.
+- **Bündel:** keiner der 294 hängt an einer geteilten aniSearch-Seite; Ursache entfällt.
+- **Offen, nicht gewinnbar:** AniList zählt eine Folge mehr als aniSearch/TMDB (K-On! 13 vs 12, Spice and Wolf, Fate/Stay Night UBW, Tales of Zestiria, Highschool D×D Hero …; Folgenzahl-Frage, keine Titel); laufende Serien (Detective Is Already Dead S2, Iruma-kun S4: die Liste führt nur Erschienenes); TMDB-Titel gleich dem englischen (YooHoo, Burn the Witch, Pacific Rim: The Black); Kurzformate unter sechs Folgen (Oni 10020607, Strike Witches OVA); Reporter Blues (TMDB 52 gegen unsere 26); Pokémon/Yu-Gi-Oh! GX (1 bzw. 6 Titel unübersetzt).
+- **Brauchte eine Sammleränderung:** Es war einmal … Die Entdeckung unserer Welt (10005217) und … Entdecker und Erfinder (10005293): TMDB-Treffer ist richtig (Gegenprobe: Originalname „Il était une fois… les Explorateurs" bzw. „les Découvreurs" gleich unserem Romaji), nur der deutsche TMDB-Name weicht ab und sperrt den Namensabgleich. Der Folgen-Abruf müsste `original_name` mitschreiben.
+
 **genre (173 offen; 158 aniSearch-Zeilen, 12 AniList, 3 Eigentitel)**
 
 | Weg | gemessen | Aufwand | Risiko | Empfehlung |

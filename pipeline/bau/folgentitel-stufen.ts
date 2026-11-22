@@ -4,6 +4,7 @@ import { ROOT, readJson } from '../lib/util.ts'
 import { crFolgentitel, ladeCrArchiv, mitCrTiteln, type CrSerie } from './folgentitel-cr.ts'
 import { crFolgentitelGeteilt } from './folgentitel-cr-geteilt.ts'
 import { tmdbFolgentitel, type TmdbEintrag } from './folgentitel-tmdb.ts'
+import { verlaengereBisFolgenzahl } from './folgentitel-verlaengern.ts'
 import { tmdbStaffelFolgentitel } from './folgentitel-tmdb-staffel.ts'
 import { tmdbTitelNachDatum } from './folgentitel-tmdb-datum.ts'
 import { mitKitsuTiteln, type KitsuEintrag } from './folgentitel-kitsu.ts'
@@ -64,18 +65,22 @@ export function deutscheTitel(f: Folge[] | undefined): Map<number, string> {
 export function mitFremdTiteln(t: Title, ausAsRoh: Folge[] | undefined, q: TitelQuellen): Folge[] | undefined {
   const ausAs = ohnePlatzhalterTitel(ausAsRoh)
   const kitsu = q.kitsu[String(t.id)]
-  if (!luecke(ausAs)) return mitKitsuTiteln(t, ausAs, kitsu)
+  /* Auch eine Liste, die kürzer ist als die Folgenzahl, hat eine Lücke: TMDB kann die fehlenden Nummern liefern (Kickers 23 von 26). */
+  const fehlt = (f: Folge[] | undefined): boolean => luecke(f) || (t.episodes ?? 0) > (f?.length ?? 0)
+  if (!fehlt(ausAs)) return mitKitsuTiteln(t, ausAs, kitsu)
   const crUrl = t.streams.find((s) => s.platform === 'crunchyroll')?.url
   const crSerie = crUrl ? q.crSerien.get(crUrl) : undefined
   const archiv = ladeCrArchiv(crSerie?.seriesId)
   const mitCr = mitCrTiteln(ausAs, crFolgentitel(t, crSerie, archiv) ?? crFolgentitelGeteilt(t, crSerie, archiv, vorhandeneTitel(ausAs)))
   const mitRtl = mitCrTiteln(mitCr, rtlplusFolgentitel(deutscheTitel(mitCr), q.rtlplus[String(t.id)]), true)
-  if (!luecke(mitRtl)) return mitKitsuTiteln(t, mitRtl, kitsu)
+  if (!fehlt(mitRtl)) return mitKitsuTiteln(t, mitRtl, kitsu)
   const nummern = mitRtl?.length ? mitRtl.map((x) => x.nr) : Array.from({ length: t.episodes ?? 0 }, (_, i) => i + 1)
-  const tmdbEigen = tmdbFolgentitel(t, q.tmdbNamen[String(t.id)]?.nameDe, q.tmdbFolgen[String(t.id)], nummern, vorhandeneTitel(mitRtl))
+  /* Eine Liste kürzer als die Folgenzahl (Kickers 23 von 26) bekommt TMDB-Titel auch für die fehlenden Nummern; `verlaengereBisFolgenzahl` prüft sie dann gegen die vorhandenen. */
+  const tmdbNummern = (mitRtl?.length ?? 0) >= (t.episodes ?? 0) ? nummern : Array.from({ length: t.episodes ?? 0 }, (_, i) => i + 1)
+  const tmdbEigen = tmdbFolgentitel(t, q.tmdbNamen[String(t.id)]?.nameDe, q.tmdbFolgen[String(t.id)], tmdbNummern, vorhandeneTitel(mitRtl))
   // Container-Staffel nur ohne jeden vorhandenen Titel: ohne Reihenfolge-Gegenprobe (vgl. `reihenfolgeStimmt`) füllt sie keine Teillisten.
   const containerStaffel = vorhandeneTitel(mitRtl).size ? undefined : tmdbStaffelFolgentitel(t, q.tmdbFolgen[String(t.franchiseId)], nummern)
-  const mitTmdbStaffel = mitCrTiteln(mitRtl, tmdbEigen ?? containerStaffel)
+  const mitTmdbStaffel = verlaengereBisFolgenzahl(t, mitCrTiteln(mitRtl, tmdbEigen ?? containerStaffel), tmdbEigen, deutscheTitel(mitRtl))
   const mitTmdb = mitCrTiteln(mitTmdbStaffel, tmdbTitelNachDatum(mitTmdbStaffel, q.tmdbFolgen[String(t.id)]))
   return mitKitsuTiteln(t, mitCrTiteln(mitTmdb, q.hand[String(t.id)]), kitsu)
 }

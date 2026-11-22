@@ -202,7 +202,7 @@ pruefe('Datei ab zwei Zeilen (Staffel 2: 2 Zeilen → Datei, Staffel 1 und 3: 1 
     const folgen = (n: number) => Array.from({ length: n }, (_, i) => ({ nr: i + 1, datum: '2023-04-14', minuten: 24, de: `Folge ${i + 1}` }))
     writeFileSync(join(wurzel, 'data', 'anisearch-folgen.json'), JSON.stringify({ 801: { folgen: folgen(5) }, 802: { folgen: folgen(2) } }))
     writeFileSync(join(wurzel, 'data', 'anisearch.json'), JSON.stringify({ 900501: { anisearchId: 801 }, 900502: { anisearchId: 802 } }))
-    writeFileSync(join(wurzel, 'data', 'folgen-hinweise.yaml'), '[]\n')
+    writeFileSync(join(wurzel, 'data', 'folgen-hinweise.yaml'), '- { anilistId: 900502, folge: 2, art: hinweis, text: Zwei }\n- { anilistId: 900501, folge: 5, art: hinweis, text: Fünf }\n')
     writeFileSync(join(wurzel, 'data', 'kino-ankuendigungen.yaml'), '[]\n')
     const tsx = createRequire(import.meta.url).resolve('tsx/cli')
     const lauf = spawnSync(process.execPath, [tsx, fileURLToPath(new URL('./lib/kulisse-staffel-folgen.ts', import.meta.url))], { env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8', windowsHide: true, timeout: 120_000 })
@@ -210,6 +210,7 @@ pruefe('Datei ab zwei Zeilen (Staffel 2: 2 Zeilen → Datei, Staffel 1 und 3: 1 
     pruefe('Folgenliste im Bau: Sammeltitel geteilt (Staffel 1 und Basis), gewöhnlicher Titel wie bisher', lauf.status === 0 && aus.index?.join() === '900501,900502,7000001', `${lauf.status} ${aus.index} ${lauf.stderr.slice(-300)}`)
     pruefe('Folgenliste im Bau: Staffel 1 drei Zeilen, Basis zwei ab 1, deutsch aus den Wegen des Sammeltitels', aus.dateien?.['7000001']?.f.length === 3 && JSON.stringify(aus.dateien?.['900501']?.f.map((z) => z[0])) === '[1,2]' && JSON.stringify(aus.dateien?.['900501']?.de) === '[[1,2]]' && JSON.stringify(aus.dateien?.['7000001']?.de) === '[[1,3]]', JSON.stringify(aus.dateien))
     pruefe('Folgenliste im Bau: Zählung je Staffel, offene Basis mit dritter Stelle', JSON.stringify(aus.zaehlung) === '{"900501":[2,2,1],"900502":[2,0],"7000001":[3,3]}', JSON.stringify(aus.zaehlung))
+    pruefe('Folgenliste im Bau: Hinweise je Titel, beim Sammeltitel in die Staffel umgezählt (Folge 5 → Basis Folge 2)', JSON.stringify(aus.dateien?.['900502']).includes('"h":[[2,"Zwei"]]') && JSON.stringify(aus.dateien?.['900501']).includes('"h":[[2,"Fünf"]]') && !JSON.stringify(aus.dateien?.['7000001']).includes('"h"'), JSON.stringify(aus.dateien))
   } finally {
     rmSync(wurzel, { recursive: true, force: true })
   }

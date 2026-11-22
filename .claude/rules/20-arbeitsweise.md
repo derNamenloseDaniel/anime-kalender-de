@@ -23,6 +23,7 @@ kopiert, nie geschrieben, und Kennung und Sache müssen in derselben Ausgabe ges
 Zeitangaben nur aus zwei echten Zeitstempeln. Optisches mit Playwright-Screenshot (beide Themen)
 ansehen, nicht rechnen. Beim zweiten Fix am selben Symptom wird gemessen, nicht geraten —
 notfalls mit einem Messskript für Daniel (Skill `pruefen-und-belegen`).
+**Fehlt ein Datum oder ist eine Zuordnung unklar, sucht der Agent selbst kurz im Netz (Daniel, 22.11.2026: „das dauert <5sec“);** das Ergebnis kommt mit Quelle in Daten, PR oder Bericht, und eine Warnung, ein „offen“ oder eine Frage an Daniel steht erst danach, mit dem Suchbegriff (Lehre 214).
 **Eine Freigabe braucht die Bilanz, nicht die Bestätigung (Daniel, 15.10.2026):** Gemessen wird die
 Gesamtwirkung gegen Vorher und Budget, nicht nur der erwartete Anteil. Ein unerklärter Rest
 gehört der Sache, die ich gerade freigeben will, und hält die Freigabe auf, bis er erklärt ist.

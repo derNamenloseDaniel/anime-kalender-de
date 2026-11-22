@@ -74,6 +74,14 @@ die gefährlicheren, weil man ihnen zutraut, richtig zu sein. Ist eine Prüfung 
 wird genau das gesagt („ungeprüft", „laut X"). Prüfgriffe, Warnzeichen und die realen
 Fehlschläge stehen im Skill `pruefen-und-belegen`.
 
+**Unklares oder Fehlendes klärt eine kurze Websuche (Daniel, 22.11.2026):** „wenn unklar, oder
+daten fehlen, dann kurze websearch, ich möchte sowas nicht mehr machen müssen, änder das am
+workflow, das muss eigenständig klappen, das dauert <5sec“. Anlass: Der TV-Termin „Ein Lied im
+Nebel“ (Pokémon Horizonte, 13.11.) blieb ohne Staffel, weil Wikipedia „Lied im Nebel“ ohne Artikel
+führt; der Bauer legte eine Warnung ab, ich gab sie weiter, Daniel googelte S1 F31 selbst. Gilt
+für mich und jeden Agenten (`bauer`, `analyst` haben seitdem WebSearch/WebFetch); jede Warnung,
+jedes „offen“ und jede Frage an Daniel nennt den Suchbegriff der vorherigen Suche (Lehre 214).
+
 **Bei allem Optischen wird hingesehen, nicht gerechnet.** Kontrast, Überlappung, Abstände,
 Theme-Wechsel: Dafür wird ein **Screenshot mit Playwright** erzeugt (headless, beide Themen in
 einem Lauf) und angesehen. Der Preview-Pane taugt nicht — er rendert kein Bild, solange er nicht

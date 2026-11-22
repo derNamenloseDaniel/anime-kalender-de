@@ -412,7 +412,7 @@ Erwartet: ~301 von 307.
 | Weg | gemessen | Aufwand | Risiko | Empfehlung |
 |---|---|---|---|---|
 | (a) AniList neu holen (`averageScore`) | 22 von 50 haben heute eine | S (Cache-Frische, Auftrag `auto-arten-2111`) | niedrig | ja |
-| (a) AniList `meanScore` als Rückfall | 48 von 50 | S | mittel (weniger Stimmen; kennzeichnen) | ja, wenn eine Mindestzahl Stimmen gilt (Feld `stats.scoreDistribution`) |
+| (a) AniList `meanScore` als Rückfall | 48 von 50 | S | mittel (weniger Stimmen; kennzeichnen) | ja, wenn eine Mindestzahl Stimmen gilt (Feld `stats.scoreDistribution`); **gebaut 22.11.2026** (Schwelle 10 Stimmen, `scoreQuelle: 'anilist'`, [quellen.md](quellen.md) „Bewertung“); wirkt, sobald der Zwischenspeicher `meanScore`/`stats` trägt (Rang 7b) |
 | aniSearch-Zeilen | kein erlaubter Weg (Wertung nur auf der Seite) | — | — | Ausnahme „ohne-anilist“ (55) |
 
 **studio (105 offen; 40 AniList, 62 aniSearch-Zeilen, 3 Eigentitel)**

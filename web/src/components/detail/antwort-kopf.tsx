@@ -22,6 +22,7 @@ import { formatDate } from '@shared/time.ts'
 import { ankuendigungOhneTermin, titelSynchroAngekuendigt, ankuendigungZeile } from '@shared/ankuendigung.ts'
 import { PLATFORMS, type Release, type ReleaseEvent, type Title } from '@shared/types.ts'
 import { type Antwort } from './antwort-typ.ts'
+import type { StaffelZeile } from '@shared/staffel-folge.ts'
 
 /**
  * „Auf Deutsch seit …" — die Nebenzeile aus `deErstausgabe`.
@@ -114,6 +115,7 @@ type KopfEingabe = {
   ohneSprachbeleg: boolean | 'omu' | 'anbieter' | undefined
   releases: Release[]
   folgenZahl: FolgenZaehlung | undefined
+  staffeln?: StaffelZeile[]
   deSeitNeben: string
   title: Title
 }
@@ -219,7 +221,7 @@ function kopfTeilweise({ antwort, T }: Omit<KopfEingabe, 'antwort'> & { antwort:
 }
 
 /** Antwortart „fertig“. */
-function kopfFertig({ antwort, T, releases, folgenZahl, deSeitNeben, title }: Omit<KopfEingabe, 'antwort'> & { antwort: Extract<Antwort, { art: 'fertig' }> }): KopfTeile {
+function kopfFertig({ antwort, T, releases, folgenZahl, staffeln, deSeitNeben, title }: Omit<KopfEingabe, 'antwort'> & { antwort: Extract<Antwort, { art: 'fertig' }> }): KopfTeile {
   let haupt: ReactNode, neben: string, anteil: number | undefined, zaehl: ReactNode, fakten: Fakt[] | undefined, gedaempft = false, nebenTitel: string | undefined
   /*
     **Eine Auskunft, eine Zeile.**
@@ -237,7 +239,7 @@ function kopfFertig({ antwort, T, releases, folgenZahl, deSeitNeben, title }: Om
   /* „Alle 1 Folgen" stand über OVAs mit einer Folge — dort sagt die Überschrift ohne Zahl dasselbe. */
   haupt = antwort.heuteOffen && antwort.gesamt && antwort.gesamt > 1 ? T('antwort.heuteUhrzeitOffen', { count: antwort.gesamt }) : antwort.gesamt && antwort.gesamt > 1
     ? fertigZahlText(antwort.gesamt, antwort.gesamtAbgeleitet, T)
-    : folgenZahl && !antwort.gesamt && folgenZahl[1] > 1 ? deFolgenZahlText(folgenZahl, releases, T) : T('antwort.fertigTitel')
+    : folgenZahl && !antwort.gesamt && folgenZahl[1] > 1 ? deFolgenZahlText(folgenZahl, releases, T, staffeln) : T('antwort.fertigTitel')
   /*
     **„Seit wann?" ist die einzige Frage, die hier noch offen war.**
 

@@ -82,6 +82,11 @@ export function useFolgenZaehlung(titleId: number): FolgenZaehlung | undefined {
   return z
 }
 
+/** Zahl und Staffelgrenzen für den Kopf des Antwort-Kastens: Sammeltitel mit laufender Staffel zählen dort je Staffel (`offeneStaffelText`). */
+export function useKopfZahlen(titleId: number): { folgenZahl: FolgenZaehlung | undefined; staffeln: StaffelZeile[] | undefined } {
+  return { folgenZahl: useFolgenZaehlung(titleId), staffeln: useStaffelGrenzen(titleId) }
+}
+
 /** `laufzeitImKopf`: Die Laufzeit steht schon im Kopf des Panels — dann nicht noch einmal (mit anderem Wert) im Kasten. */
 export function FolgenBereich({ titleId, wege, erschienen, laufzeitImKopf, serieBelegt }: { titleId: number; wege: { from: number; to: number }[]; erschienen?: number; laufzeitImKopf?: boolean; serieBelegt?: boolean }) {
   const [gibtEs, setGibtEs] = useState(false)

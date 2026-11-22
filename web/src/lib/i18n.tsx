@@ -209,6 +209,10 @@ const TEXTE = {
   // Der Hinweis, zeilenweise.
   'detail.dubKopfVon': '{n} von {m} Folgen auf Deutsch',
   'detail.dubKopf': '{n} Folgen auf Deutsch',
+  // Sammeltitel mit laufender letzter Staffel (Horizonte): je Staffel statt einer Gesamtzahl.
+  'detail.dubKopfStaffeln': '{voll}: {n} Folgen auf Deutsch · Staffel {offen}: {m} Folgen (läuft)',
+  'detail.dubKopfStaffelnEine': '{voll}: {n} Folgen auf Deutsch · Staffel {offen}: 1 Folge (läuft)',
+  'detail.staffelBereich': 'Staffel {von}–{bis}',
   // „Nicht im Angebot" statt „nicht erfasst": Bei bekannter Folgenzahl ist das die
   // Aussage, die der Leser braucht — dort gibt es sie nicht, nicht einmal untertitelt.
   // Die vier Gruppen der Reihenliste. „Hauptserie" statt „Staffeln", weil eine

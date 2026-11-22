@@ -1,13 +1,13 @@
 {
-  "scrapedAt": "2026-11-22T01:01:52.159Z",
+  "scrapedAt": "2026-11-22T04:17:51.168Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 39,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 7,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 7,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 3,
-    "schon in einem Rubrik-Feed gelesen": 9,
-    "Sprachhinweis älter als 45 Tage": 6
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 40,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 11,
+    "schon in einem Rubrik-Feed gelesen": 34,
+    "Sprachhinweis älter als 45 Tage": 7
   },
   "proposals": [
     {
@@ -1168,7 +1168,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-19"
+      "sammelGelesen": "2026-11-22"
     },
     {
       "articleTitle": "Neun Disc-Neuheiten ab sofort im AKIBA PASS SHOP vorbestellbar",
@@ -1277,7 +1277,7 @@
           "folgen": 25
         }
       ],
-      "sammelGelesen": "2026-11-19"
+      "sammelGelesen": "2026-11-22"
     },
     {
       "articleTitle": "Große Anime-Rabattaktion mit Serien und Filmen bei Amazon gestartet",
@@ -1683,7 +1683,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-19"
+      "sammelGelesen": "2026-11-22"
     },
     {
       "articleTitle": "Erster Trailer zum Netflix-Anime »Fool Night« + Visual",
@@ -1995,7 +1995,7 @@
           "folgen": 13
         }
       ],
-      "sammelGelesen": "2026-11-19"
+      "sammelGelesen": "2026-11-22"
     },
     {
       "articleTitle": "Sieben Disc-Neuheiten ab sofort im AKIBA PASS SHOP vorbestellbar",
@@ -2175,7 +2175,7 @@
           "folgen": 24
         }
       ],
-      "sammelGelesen": "2026-11-19"
+      "sammelGelesen": "2026-11-22"
     },
     {
       "articleTitle": "19,99 Euro pro Staffel: polyband startet große »Pokémon«-Rabattaktion",
@@ -2355,7 +2355,7 @@
           "folgen": 12
         }
       ],
-      "sammelGelesen": "2026-11-19"
+      "sammelGelesen": "2026-11-22"
     },
     {
       "articleTitle": "Disney+ nimmt zwei Anime-Neuzugänge ins Programm",

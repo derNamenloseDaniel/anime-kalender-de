@@ -42,3 +42,7 @@ Bericht: ≤ 10 Zeilen, Link-Form wie in Schritt 5
 ```
 
 Beispiel: „Ziel: Beim Panel soll man auf einen Blick sehen, in welcher Staffel man ist. Ausschnitt: detailpanel. Fälle: tokyo-revengers, attack-on-titan, 86. Varianten: A Staffelzeile mit Sprung unter dem Titel, B Karte unter dem Kasten. Ergebnis: `web/buehne/mockups/reihen-box.tsx`. …"
+
+## Desktop-Rahmen nie unter Gerätehöhe
+
+Desktop-Rahmen der Bühne bekommen eine Mindesthöhe von der Gerätehöhe (`.zelle.desktop` in `web/buehne/rahmen.css`, bei „beide" mit Zoom ½ also 400 px); die Seite scrollt dann (Daniel, 22.11.2026: „Desktop-Mockups mit min-height versehen, die sind viel zu klein"). `tools/buehne-fenster-pruefen.mjs` meldet eine kleinere Desktop-Zelle rot.

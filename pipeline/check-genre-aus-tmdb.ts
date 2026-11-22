@@ -65,6 +65,17 @@ console.log = alt
 pruefe('Echtfall aus data/tmdb-titles.json: Adventure, Fantasy, Sci-Fi, gekennzeichnet', echt.get(16570)!.genres.join() === 'Adventure,Fantasy,Sci-Fi' && echt.get(16570)!.genreQuelle === 'tmdb', echt.get(16570))
 pruefe('Baulog nennt die Zahl der ergänzten Titel', gemeldet.some((z) => z.includes('Genre aus TMDB: 1 Titel')), gemeldet)
 
+const kaputt = new Map<number, Title>([[9, { id: 9, genres: [], genreQuelle: 'tmdb' } as unknown as Title]])
+let abgebrochen = ''
+console.log = (): void => undefined
+try {
+  uebernehmeGenreAusTmdb({ titles: kaputt, tmdbMehrdeutig: new Set(), tmdb: {} })
+} catch (e) {
+  abgebrochen = String(e)
+}
+console.log = alt
+pruefe('Bau bricht ab, wenn ein Titel genreQuelle ohne Genre trägt', abgebrochen.includes('Titel 9: genreQuelle tmdb ohne Genre'), abgebrochen)
+
 const abschluss = await import('./bau/11-wege-abschluss.ts')
 const text = (await import('node:fs')).readFileSync(new URL('./bau/11-wege-abschluss.ts', import.meta.url), 'utf8')
 pruefe('Einbau: der Bauschritt ruft den Rückfall auf', typeof abschluss.schliesseWegeAb === 'function' && /uebernehmeGenreAusTmdb\(\{ titles, tmdbMehrdeutig \}\)/.test(text))

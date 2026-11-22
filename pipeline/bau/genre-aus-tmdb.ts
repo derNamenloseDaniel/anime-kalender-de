@@ -47,6 +47,8 @@ export function uebernehmeGenreAusTmdb({ titles, tmdbMehrdeutig, tmdb = readJson
     title.genreQuelle = 'tmdb'
     gesetzt++
   }
+  const fehler = genreQuelleFehler(titles.values())
+  if (fehler.length) throw new Error(`Genre aus TMDB widerspricht der Zusicherung:\n${fehler.slice(0, 10).join('\n')}`)
   log(`Genre aus TMDB: ${gesetzt} Titel ohne Genre ergänzt (Rückfall, gekennzeichnet)`)
 }
 

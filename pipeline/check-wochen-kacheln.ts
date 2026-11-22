@@ -153,7 +153,7 @@ pruefe('Objekt gegen null wird gemeldet', pruefeKachelDatei(mitPlan({}), planVol
 pruefe('Liste gegen Text gleicher Länge wird gemeldet', pruefeKachelDatei(mitPlan(['x']), planVoll('x')).some((f) => f.includes('Release a weicht')))
 
 /* Die Abzugslisten, fest eingetragen: gemessen mit `tools/kachel-felder-messen.mjs` (25.10.2026); jede Änderung ist eine Entscheidung. */
-const TITEL_FEST = 'angebotSeit,anisearchId,ankuendigung,annId,ausgabenOhneDe,bannerImage,dubHinweis,einzelquelle,entfernteStreams,episodes,franchiseId,fskQuelle,hasVoices,jpEnd,jpSeason,jpStart,jpStatus,jpYear,kino,malId,runtimeMin,score,scoreQuelle,staffeln,staffelnQuelle,studios,synopsis,titleDe,titleEn,titleNative,titleRomaji,tmdbId,trailer,westlich'
+const TITEL_FEST = 'angebotSeit,anisearchId,ankuendigung,annId,ausgabenOhneDe,bannerImage,dubHinweis,einzelquelle,entfernteStreams,episodes,franchiseId,fskQuelle,genreQuelle,hasVoices,jpEnd,jpSeason,jpStart,jpStatus,jpYear,kino,malId,runtimeMin,score,scoreQuelle,staffeln,staffelnQuelle,studios,synopsis,titleDe,titleEn,titleNative,titleRomaji,tmdbId,trailer,westlich'
 const RELEASE_FEST = 'automatisch,buyUrl,cinemaUntil,disputedDates,edition,herkunft,hinweis,netflixOriginal,nachtrag,note,platformUrl,publisher,quellen,rhythmus,schnitt,sources'
 pruefe('Dateiname der Kachel-Datei', KACHEL_DATEI === 'woche-kacheln')
 pruefe('Abzugsliste Titel', TITEL_OHNE.join() === TITEL_FEST)

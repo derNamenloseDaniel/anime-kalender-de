@@ -297,6 +297,7 @@ pipeline/check-folgenzahl-kennzeichnung.ts
 pipeline/check-folgenzahl-offen-bau.ts
 pipeline/check-folgenzahl-offen.ts
 pipeline/check-folgenzahl-sichtung.ts
+pipeline/check-genre-aus-tmdb.ts
 pipeline/check-geteilte-adressen.ts
 pipeline/check-gleiche-adresse.ts
 pipeline/check-gleichtag-grenze.ts

@@ -17,7 +17,7 @@ export const KACHEL_DATEI = 'woche-kacheln'
 
 export const TITEL_OHNE = [
   'angebotSeit', 'anisearchId', 'ankuendigung', 'annId', 'ausgabenOhneDe', 'bannerImage', 'dubHinweis', 'einzelquelle', 'entfernteStreams',
-  'episodes', 'franchiseId', 'fskQuelle', 'hasVoices', 'jpEnd', 'jpSeason', 'jpStart', 'jpStatus', 'jpYear', 'kino', 'malId', 'runtimeMin',
+  'episodes', 'franchiseId', 'fskQuelle', 'genreQuelle', 'hasVoices', 'jpEnd', 'jpSeason', 'jpStart', 'jpStatus', 'jpYear', 'kino', 'malId', 'runtimeMin',
   'score', 'scoreQuelle', 'staffeln', 'staffelnQuelle', 'studios', 'synopsis', 'titleDe', 'titleEn', 'titleNative', 'titleRomaji', 'tmdbId',
   'trailer', 'westlich',
 ] as const

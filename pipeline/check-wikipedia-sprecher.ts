@@ -1,0 +1,85 @@
+/**
+ * Sprechertabellen aus de.wikipedia (Vorstufe, `pipeline/lib/wikipedia-sprecher.ts`): die vier abgerufenen Abschnitte
+ * „Synchronisation“ unter `pipeline/fixtures/wikipedia-sprecher/` (Stand 22.11.2026) und Kleinstfälle für jede Weiche
+ * des Parsers (Kopf mit rowspan/colspan, <br>, <small>, Strich als „kein Sprecher“, Verweise, Vorlagen, Links, keine deutsche Spalte).
+ * Dazu die Handliste Seite → Titel. Kein Netzabruf. Aufruf: `npm run check:logic`.
+ */
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import yaml from 'js-yaml'
+import { liesSprechertabelle, type SprecherZeile } from './lib/wikipedia-sprecher.ts'
+
+let fehler = 0
+function pruefe(name: string, ok: boolean, ist?: unknown): void {
+  if (ok) return void console.log(`  ✓ ${name}`)
+  fehler++
+  console.error(`  ✖ ${name}${ist === undefined ? '' : ` — gefunden: ${JSON.stringify(ist)}`}`)
+}
+
+const REPO = join(dirname(fileURLToPath(import.meta.url)), '..')
+const fixture = (name: string): string => readFileSync(join(REPO, 'pipeline', 'fixtures', 'wikipedia-sprecher', `${name}.wikitext`), 'utf8')
+const kurz = (z: SprecherZeile | undefined): string => (z ? `${z.rolle}=${z.deutsch.map((d) => `${d.sprecher}[${d.zusatz ?? ''}]`).join('+')}` : '–')
+const zeile = (z: SprecherZeile[], rolle: string): SprecherZeile | undefined => z.find((x) => x.rolle === rolle)
+
+console.log('Yū Yū Hakusho (einspaltig deutsch, Verweis mit Vorlage im Kopf)')
+const yy = liesSprechertabelle(fixture('yu-yu-hakusho'))
+pruefe('deutsche Spalte, 7 Rollen', yy.deutscheSpalte && yy.zeilen.length === 7, yy.zeilen.length)
+pruefe('Urameshi: Link mit Klammerzusatz → Anzeigename', kurz(zeile(yy.zeilen, 'Yūsuke Urameshi')) === 'Yūsuke Urameshi=Tobias Müller[]', kurz(zeile(yy.zeilen, 'Yūsuke Urameshi')))
+pruefe('Hiei und Botan', kurz(yy.zeilen[0]) === 'Hiei Jaganshi=Hannes Maurer[]' && kurz(zeile(yy.zeilen, 'Botan')) === 'Botan=Cathlen Gawlich[]', yy.zeilen.map(kurz))
+pruefe('japanische Sprecher stehen nicht darin', !JSON.stringify(yy.zeilen).includes('Hiyama'))
+
+console.log('Baki (zweizeiliger Kopf, zwei deutsche Spalten je Fassung)')
+const baki = liesSprechertabelle(fixture('baki'))
+pruefe('9 Rollen', baki.deutscheSpalte && baki.zeilen.length === 9, baki.zeilen.length)
+pruefe('Baki Hanma: beide Fassungen mit Spaltenzusatz', kurz(zeile(baki.zeilen, 'Baki Hanma')) === 'Baki Hanma=Linus Kraus[1. Serie (2001)]+Karim El Kammouchi[2. Serie (2018)]', kurz(zeile(baki.zeilen, 'Baki Hanma')))
+pruefe('Emi Akezawa: Strich in der 2. Serie → nur eine Stimme', kurz(zeile(baki.zeilen, 'Emi Akezawa')) === 'Emi Akezawa=Sabina Godec[1. Serie (2001)]', kurz(zeile(baki.zeilen, 'Emi Akezawa')))
+pruefe('Biscuit Oliva: Strich in der 1. Serie → nur die 2.', kurz(zeile(baki.zeilen, 'Biscuit Oliva')) === 'Biscuit Oliva=Jo Vossenkuhl[2. Serie (2018)]', kurz(zeile(baki.zeilen, 'Biscuit Oliva')))
+pruefe('Yūjirō: zusätzlich in japanischer Spalte genannter Name ist nicht deutsch', !JSON.stringify(baki.zeilen).includes('Ōtsuka') && !JSON.stringify(baki.zeilen).includes('Kikuchi'))
+
+console.log('Ron Kamonohashi (nur japanische Sprecher)')
+const ron = liesSprechertabelle(fixture('ron-kamonohashi'))
+pruefe('keine deutsche Spalte, keine Zeilen', !ron.deutscheSpalte && ron.zeilen.length === 0, ron)
+
+console.log('Ranma ½ (Fließtext vor der Tabelle, <br> und <small>)')
+const ranma = liesSprechertabelle(fixture('ranma'))
+pruefe('18 Rollen', ranma.deutscheSpalte && ranma.zeilen.length === 18, ranma.zeilen.length)
+pruefe('Ranma ♂: zwei Stimmen mit Fassung aus <small>', kurz(zeile(ranma.zeilen, 'Ranma Saotome (♂)')) === 'Ranma Saotome (♂)=Clemens Ostermann[alte Serie u. Filme]+Florian Knorn[neue Serie]', kurz(zeile(ranma.zeilen, 'Ranma Saotome (♂)')))
+pruefe('Ranma ♀: eine Stimme ohne Zusatz', kurz(zeile(ranma.zeilen, 'Ranma Saotome (♀)')) === 'Ranma Saotome (♀)=Angela Wiederhut[]', kurz(zeile(ranma.zeilen, 'Ranma Saotome (♀)')))
+pruefe('Cologne: drei Stimmen', zeile(ranma.zeilen, 'Cologne')?.deutsch.map((d) => `${d.sprecher}[${d.zusatz}]`).join('+') === 'Ingeborg Lapsien[alte Serie]+Gisela Fritsch[Filme]+Marion Hartmann[neue Serie]', kurz(zeile(ranma.zeilen, 'Cologne')))
+pruefe('Ukyō: Zusatz „Filme und neue Serie“', zeile(ranma.zeilen, 'Ukyō Kuonji')?.deutsch[1]?.zusatz === 'Filme und neue Serie', kurz(zeile(ranma.zeilen, 'Ukyō Kuonji')))
+pruefe('Fließtext vor der Tabelle wird nicht zur Rolle', !ranma.zeilen.some((z) => z.rolle.includes('Synchronstudio') || z.rolle.includes('Laske')))
+
+console.log('Kleinstfälle')
+const tab = (kopf: string, ...zeilen: string[]): string => `{| class="wikitable"\n${kopf}\n${zeilen.map((z) => `|-\n${z}`).join('\n')}\n|}`
+const einfach = liesSprechertabelle(tab('! Rolle !! Japanisch !! Deutsch', '| A || [[X]] || [[P|Anna]]', '| B || Y || Berta<ref name="q">{{Vorlage|a=b}}</ref>', '| C || Z || {{Vorlage|a=b}}'))
+pruefe('Link, Verweis und Vorlage; Zeile ohne Sprecher entfällt', einfach.zeilen.map(kurz).join(';') === 'A=Anna[];B=Berta[]', einfach.zeilen.map(kurz))
+const zwei = liesSprechertabelle(tab('! Rolle !! Deutsch (Serie) !! Deutsch (Film)', '| A || Anna || —', '| B || – || Berta', '| C || - || '))
+pruefe('Striche und leere Zellen sind kein Sprecher; zwei deutsche Spalten ohne Unterkopf', zwei.zeilen.map(kurz).join(';') === 'A=Anna[];B=Berta[]', zwei.zeilen.map(kurz))
+const zweiKopf = liesSprechertabelle('{| class="wikitable"\n! rowspan="2"| Rolle !! colspan="2"| Deutsch\n|-\n! Alt !! Neu\n|-\n| A || Anna || Anja\n|}')
+pruefe('rowspan/colspan: Rolle bleibt Spalte 0, Unterköpfe werden Zusatz', zweiKopf.zeilen.map(kurz).join(';') === 'A=Anna[Alt]+Anja[Neu]', zweiKopf.zeilen.map(kurz))
+const zweiKopfSpalte = liesSprechertabelle('{| class="wikitable"\n! rowspan="2"| Rolle !! colspan="2"| Japanisch !! rowspan="2"| Deutsch\n|-\n! Alt !! Neu\n|-\n| A || Ja || Jo || Anna\n|}')
+pruefe('rowspan in späterer Spalte verschiebt die Zeile der Unterköpfe', zweiKopfSpalte.zeilen.map(kurz).join(';') === 'A=Anna[]', zweiKopfSpalte.zeilen.map(kurz))
+const zeilenKopf = liesSprechertabelle(tab('!Rolle\n!Japanisch', '|A\n|B'))
+pruefe('Tabelle mit Kopfzellen je Zeile, ohne Deutsch', !zeilenKopf.deutscheSpalte, zeilenKopf)
+const mehrere = liesSprechertabelle(`{| class="wikitable"\n! Rolle !! Japanisch\n|-\n| A || B\n|}\n\n${tab('! Rolle !! Deutscher Sprecher', '| A || Anna')}`)
+pruefe('erste Tabelle ohne Deutsch wird übersprungen, die zweite gelesen', mehrere.deutscheSpalte && mehrere.zeilen.map(kurz).join(';') === 'A=Anna[]', mehrere)
+pruefe('Kommentar im Wikitext ignoriert', liesSprechertabelle(`<!-- {| ! Deutsch -->\n${tab('! Rolle !! Deutsch', '| A || Anna')}`).zeilen.length === 1)
+pruefe('leere Eingabe', !liesSprechertabelle('').deutscheSpalte)
+
+console.log('Handliste')
+type Eintrag = { seite: string; fixture: string; titel: { id: number; fassung?: string }[] }
+const liste = yaml.load(readFileSync(join(REPO, 'data', 'wikipedia-sprecher-seiten.yaml'), 'utf8')) as Eintrag[]
+pruefe('4 Seiten, jede einmal', liste.length === 4 && new Set(liste.map((e) => e.seite)).size === 4, liste.map((e) => e.seite))
+pruefe('Seiten wie auf der Wikipedia', liste.map((e) => e.seite).join('|') === 'Yū Yū Hakusho|Grappler Baki|Meisterdetektiv Ron Kamonohashi|Ranma ½', liste.map((e) => e.seite))
+pruefe('jede Fixture-Datei liegt vor und liefert Zeilen oder (Ron) keine deutsche Spalte', liste.every((e) => liesSprechertabelle(fixture(e.fixture.replace(/\.wikitext$/, ''))).deutscheSpalte === (e.seite !== 'Meisterdetektiv Ron Kamonohashi')))
+pruefe('jedes Ziel hat eine Kennung', liste.every((e) => e.titel.length > 0 && e.titel.every((t) => Number.isInteger(t.id))))
+pruefe('Kennungen eindeutig über die Liste', new Set(liste.flatMap((e) => e.titel.map((t) => t.id))).size === 6, liste.flatMap((e) => e.titel.map((t) => t.id)))
+const ranmaFassungen = liste[3]!.titel.map((t) => t.fassung)
+pruefe('Fassung jedes Ziels kommt in der Tabelle vor', liste.every((e) => e.titel.every((t) => !t.fassung || liesSprechertabelle(fixture(e.fixture.replace(/\.wikitext$/, ''))).zeilen.some((z) => z.deutsch.some((d) => d.zusatz?.includes(t.fassung!))))) && ranmaFassungen.length === 2)
+
+if (fehler) {
+  console.error(`\n${fehler} Prüfung(en) fehlgeschlagen`)
+  process.exit(1)
+}
+console.log('\nWikipedia-Sprecher: 4 Fixtures, 4 Seiten in der Handliste, alle Prüfungen ok')

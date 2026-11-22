@@ -64,13 +64,10 @@ export function stillstandZeilen(verlauf: Tagesstand[], heute: Tagesstand, regis
     { s: stillstandMessenHand(verlauf, heute, register), name: 'hand' },
   ].filter((g): g is { s: Stillstand; name: string } => !!g.s)
   if (!gruppen.length) return []
-  const zahl = gruppen
-    .map(({ s, name }) => {
-      const teile = [s.stehen.length && `${s.stehen.length} ${name}-Arten ohne Abbau`, s.steigen.length && `${s.steigen.length} gestiegen`].filter(Boolean).join(', ')
-      return gruppen.length > 1 ? `${teile} seit ${s.seit}` : teile
-    })
-    .join('; ')
+  // Eine Kurzzeile mit einem Bezug (der ersten Gruppe) und Summen, damit sie mit dem Vorsatz der Wachzeile unter 160 Zeichen bleibt.
+  const stehen = gruppen.filter((g) => g.s.stehen.length).map((g) => `${g.s.stehen.length} ${g.name}`)
+  const steigen = gruppen.reduce((n, g) => n + g.s.steigen.length, 0)
+  const zahl = [stehen.length && `${stehen.join('/')}-Arten ohne Abbau`, steigen && `${steigen} gestiegen`].filter(Boolean).join(', ')
   const arten = gruppen.map(({ s }) => [s.stehen.length && `ohne Abbau: ${s.stehen.join('; ')}`, s.steigen.length && `gestiegen: ${s.steigen.join('; ')}`].filter(Boolean).join(' | ')).join(' | ')
-  const seit = gruppen.length > 1 ? '' : `seit ${gruppen[0]!.s.seit}: `
-  return [`${MAENGEL_STILLSTAND_ZEILE}${seit}${zahl} (Arten: Logzeile ${MAENGEL_STILLSTAND_ARTEN.trim()})`, `${MAENGEL_STILLSTAND_ARTEN}${arten}`]
+  return [`${MAENGEL_STILLSTAND_ZEILE}seit ${gruppen[0]!.s.seit}: ${zahl} (Arten: Logzeile ${MAENGEL_STILLSTAND_ARTEN.trim()})`, `${MAENGEL_STILLSTAND_ARTEN}${arten}`]
 }

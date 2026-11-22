@@ -6,7 +6,7 @@
  * Aufruf: npm run check:logic (steckt darin) oder `tsx pipeline/check-sprecher-dran.ts`
  */
 import { spawnSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -38,10 +38,9 @@ const r = spawnSync(process.execPath, ['--import', 'tsx', '--import', pathToFile
   timeout: 120_000,
   env: { ...process.env, AK_ROOT: ordner },
 })
-let gelesen: string[] = []
-try {
-  gelesen = readFileSync(aufruf, 'utf8').split('\n').filter(Boolean).map((u) => /anime\/(\d+)\/seiyuu/.exec(u)?.[1] ?? u)
-} catch {}
+const gelesen: string[] = existsSync(aufruf)
+  ? readFileSync(aufruf, 'utf8').split('\n').filter(Boolean).map((u) => /anime\/(\d+)\/seiyuu/.exec(u)?.[1] ?? u)
+  : []
 rmSync(ordner, { recursive: true, force: true })
 
 const soll = '101,102,201,202,301,302'

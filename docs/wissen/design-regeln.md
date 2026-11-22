@@ -252,3 +252,9 @@ Zahlen aus der Bestandsaufnahme (App auf d9e398fc8, lokaler Bau). Die Vorschläg
 | E7 | unter 11 px: Datenbank 90, News 22, Woche 6; Kontrast 8 Paare | Mindestschrift und Seitenkontrast als Bühnen-Messung; `prefers-reduced-motion` |
 | E8 | Klick außerhalb 1 (CLS beim Erstladen seit 16.11.2026 durch `check:cls-erstladen` gedeckt) | Klick außerhalb des Desktop-Filters |
 | E9 | 3 Doppelmuster | Zählung `type="checkbox"` und Chip-Höhen |
+
+## 14. Behauptung vs. Nachweis in Hauptzeilen (22.11.2026, Daniel)
+
+Anlass: Panel „Overgeared“ zeigte „Folge 9 fällig seit 15:30 Uhr, noch nicht gesehen“, obwohl der Ausbleiben-Messer die Folge um 15:30:36 auf Crunchyroll gesehen hatte; Daniel: „solche infos sind nachweise, die gehören nicht in behauptung bereich. wir behaupten was wir denken, auf basis von fakten und vergangenheit“.
+
+**Regel:** Die Hauptzeile sagt, was wir erwarten (Erwartung aus belegter Uhrzeit, gemessenem Rhythmus, Vergangenheit): „Folge 9 seit 15:30 Uhr“. Prüfstand und Sichtung („gesehen“, „geprüft“, „bestätigt“, „wird geprüft“) sind Nachweis und stehen höchstens klein darunter, nie in der Hauptzeile. Erst ein belegtes Ausbleiben (Vermerk `verpasst`, `AUSBLEIBEN_NACH_MS` = 15 min; Messer frühestens 26 min) darf die Hauptzeile ändern, dann als Tatsache („ausgeblieben“). **Wächter:** `pipeline/check-cr-faellig.ts` („keine Nachweis-Wörter in der Hauptzeile“), Mutant in `tools/mutationen/ausbleiben-faellig.json`. **Offen:** der Messer-Stand (R2 `ausbleiben/stand.json`) erreicht die Seite nicht; ein kleiner Nachweis „bestätigt 15:30“ bräuchte eine Worker-Route oder einen Bau-Schritt, der den Stand nach `public/data/` schreibt (der Messer ist zudem standardmäßig aus).

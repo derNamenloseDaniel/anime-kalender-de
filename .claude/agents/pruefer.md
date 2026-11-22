@@ -104,6 +104,8 @@ Jede Regel ist ein Kurzimperativ; Anlass, PR-Nummer, Datum und alter Wortlaut je
 
 ## Weitere Prüfregeln
 
+- **Hauptzeile behauptet, Nachweis höchstens klein (22.11.2026, `design-regeln.md` Abschnitt 14):** Nutzertext, der einen Termin oder Zustand nennt, sagt in der Hauptzeile die Erwartung aus Fakten und Vergangenheit; „gesehen“, „geprüft“, „bestätigt“, „wird geprüft“ dort sind ein Befund. Lehre: Der Prüfer las bisher nur, ob ein Text nichts Falsches behauptet, nie, ob er Prüfstand statt Aussage zeigt.
+
 - `public/` ohne Hash im Namen → Cache-Regel in `public/sw.js`. Neues Tor vor gebuchtem Zähler → Fall „dauerhaft voll, N Anfragen“. Geänderte Quell-Adresse → Zähler über die ganze Historie (`#/quellen`); Scanner zuerst gegen Fixture-Liste.
 - Benannte Titel: Bau-Funktionen auf echten Daten vorher/nachher; „im Panel“ per `meldungenImPanel` mit heutigem Datum; Bühnen-Kacheln per `node tools/buehne-panel-pruefen.mjs`. Versteckte Beschriftung gegen Vorher-Bild ist Auflage, außer ★/✕.
 - Mutant an der ursprünglichen Fehlerstelle bzw. am echten Aufrufort; Anzeigeregel durch Komponente plus Verdrahtungs-Mutant. Einzahl/Mehrzahl: Fall „zweiter Parameter ≠ 1“.

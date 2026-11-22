@@ -41752,6 +41752,11 @@
   platform: netflix
   url: https://www.netflix.com/title/82031882
   dub: true
+  dubRanges:
+    - from: 1
+      to: 1
+      dub: true
+      checked: [1]
   checkedAt: '2026-11-22'
   note: "Nicht auf der Netflix-Seite gemessen, sondern Meldung von Anime2You (Artikel 1056287, anime2you.de/news/1056287/netflix-yamada-kun-synchro-und-mehr/): Staffel 2, Folge 1 am 01.10.2026 bei Netflix, Simulcast jeden Donnerstag, Sprache: Deutsch, Japanisch (UT); gleiche Angabe für November (1062641) und Dezember (1073600). Netflix-Adresse aus dem Netflix-Link im Artikel 1056287. Welche Folgen deutsch vorliegen, ist nicht je Folge belegt."
   zweiteQuelle: "Anime2You 2026-10-01: Die erste Episode der zweiten Staffel von »The Ramparts of Ice« ist bei Netflix verfügbar, Simulcast jeden Donnerstag, Sprache Deutsch, Japanisch (UT). — https://www.anime2you.de/news/1056287/netflix-yamada-kun-synchro-und-mehr/"

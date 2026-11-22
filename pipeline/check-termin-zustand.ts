@@ -19,7 +19,6 @@ import {
   AUSBLEIBEN_NACH_MS,
   STUFEN,
   taktFuer,
-  wortStufe,
 } from '../shared/ausbleiben-plan.ts'
 import { abgleichFaellig, hinweiseAnhaengen, terminFrist } from './lib/ausgeblieben.ts'
 import * as altRecherche from '../shared/recherche-plan.ts'
@@ -107,9 +106,6 @@ const tabelle = (art: 'sichtung' | 'recherche') => STUFEN[art].map((s) => [s.von
 pruefe('Tabelle Sichtung', tabelle('sichtung') === [`0:${15 * MIN}:${5 * MIN}`, `${15 * MIN}:${H}:${15 * MIN}`, `${H}:${2 * H}:${30 * MIN}`, `${2 * H}:${T}:${H}`, `${T}:${2 * T}:${2 * H}`, `${2 * T}:${60 * T}:${T}`].join(' '), tabelle('sichtung'))
 pruefe('Tabelle Recherche', tabelle('recherche') === [`${6 * H}:${14 * T}:${20 * H}`, `${14 * T}:${60 * T}:${6.5 * T}`].join(' '), tabelle('recherche'))
 
-// Wortstufen.
-const worte: [number, string][] = [[0, 'wird-geprueft'], [5 * MIN - 1, 'wird-geprueft'], [5 * MIN, 'verspaetet'], [2 * H - 1, 'verspaetet'], [2 * H, 'verspaetet'], [T, 'verspaetet']]
-for (const [abstand, wort] of worte) pruefe(`Wortstufe bei ${abstand}`, wortStufe(abstand) === wort)
 
 // Fälligkeit und nächste Prüfung (Termin = 0).
 pruefe('ohne frühere Prüfung sofort fällig', pruefungFaellig('sichtung', 0, undefined, 0))

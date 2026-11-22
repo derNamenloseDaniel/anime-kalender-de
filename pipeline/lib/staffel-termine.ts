@@ -184,7 +184,7 @@ export function staffelRelease(
     if (neu.schedule?.firstEpisodeNumber !== undefined) verschiebeErsteFolge(neu, s.von)
     return neu
   }
-  const sortiert = [...events].sort((a, b) => `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`))
+  const sortiert = [...events].sort((a, b) => a.date.localeCompare(b.date) || (a.time ?? '').localeCompare(b.time ?? ''))
   const mitFolge = sortiert.filter((e) => e.episode !== undefined)
   const observed: Record<number, string> = {}
   const zeiten: Record<number, string> = {}

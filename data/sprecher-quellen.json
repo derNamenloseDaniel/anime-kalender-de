@@ -1,7 +1,7 @@
 {
   "stand": "2026-11-22",
   "titelVerloren": 0,
-  "titelNeu": 24,
+  "titelNeu": 0,
   "geteilt": 106,
   "rollenErsetzt": 0,
   "rollenBehalten": 1867,
@@ -15,10 +15,10 @@
       "rollen": 1050
     },
     "anisearch": {
-      "titel": 2433,
-      "rollen": 64621
+      "titel": 2457,
+      "rollen": 65004
     },
-    "titelGesamt": 2521
+    "titelGesamt": 2545
   },
   "nachher": {
     "anilist": {

@@ -41,7 +41,15 @@ const mitglied = titel(11, { franchiseId: 10, bannerImage: 'm.jpg' })
 uebernehmeFranchiseBanner(karte(kopf, mitglied))
 pruefe('Reihenkopf ohne franchiseId übernimmt das Banner eines Mitglieds', kopf.bannerImage === 'm.jpg' && kopf.bannerVon === 11, kopf)
 
-// Ausgabegrenze: `bannerVon` läuft wie `franchiseId` auf die eigene Kennung (`ak`).
+// Reihenkopf mit eigenem Banner ist Spender für Mitglieder; zwei Teile mit eigenem Banner behalten beide ihr eigenes.
+const kopfEigen = titel(20, { franchiseId: undefined, bannerImage: 'k.jpg' })
+const mitgliedLeer = titel(21, { franchiseId: 20 })
+const mitgliedEigen = titel(22, { franchiseId: 20, bannerImage: 'e.jpg' })
+uebernehmeFranchiseBanner(karte(kopfEigen, mitgliedLeer, mitgliedEigen))
+pruefe('Reihenkopf mit Banner spendet an Mitglied ohne', mitgliedLeer.bannerImage === 'k.jpg' && mitgliedLeer.bannerVon === 20, mitgliedLeer)
+pruefe('Teil mit eigenem Banner behält es', mitgliedEigen.bannerImage === 'e.jpg' && mitgliedEigen.bannerVon === undefined && kopfEigen.bannerImage === 'k.jpg', [mitgliedEigen, kopfEigen])
+
+// Ausgabegrenze:`bannerVon` läuft wie `franchiseId` auf die eigene Kennung (`ak`).
 const aus = uebersetzeDatei('titles.json', [{ id: 5, franchiseId: 3, bannerVon: 3, slug: 'x-5' }], (n: number) => n + 1000) as Record<string, unknown>[]
 pruefe('bannerVon wird an der Ausgabegrenze auf ak übersetzt', aus[0]!.bannerVon === 1003 && aus[0]!.franchiseId === 1003, aus[0])
 

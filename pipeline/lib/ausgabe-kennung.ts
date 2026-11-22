@@ -38,6 +38,7 @@ function titel(t: Record<string, unknown>, ak: AkVon): Record<string, unknown> {
   if (typeof id !== 'number' || id < 0) return t
   const neu: Record<string, unknown> = { ...t, id: ak(id), al: id }
   if (typeof t.franchiseId === 'number') neu.franchiseId = ak(t.franchiseId)
+  if (typeof t.bannerVon === 'number') neu.bannerVon = ak(t.bannerVon)
   if (typeof t.slug === 'string') neu.slug = String(ak(id))
   return neu
 }

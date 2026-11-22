@@ -99,6 +99,7 @@ pipeline/check-ausbleiben-messen.ts
 pipeline/check-ausgeblieben-text.ts
 pipeline/check-ausloeser-zeilen.ts
 pipeline/check-auto-disc-handeintrag.ts
+pipeline/check-banner-franchise.ts
 pipeline/check-beleg-adresswechsel.ts
 pipeline/check-beleg-anbieter.ts
 pipeline/check-beleg-api-web.ts
@@ -289,6 +290,7 @@ pipeline/check-folgentitel-englisch.ts
 pipeline/check-folgentitel-luecke-lauf.ts
 pipeline/check-folgentitel-luecke.ts
 pipeline/check-folgentitel-staffel-quote.ts
+pipeline/check-folgentitel-uebernahme.ts
 pipeline/check-folgenzahl-belegt.ts
 pipeline/check-folgenzahl-kasten.ts
 pipeline/check-folgenzahl-kennzeichnung.ts

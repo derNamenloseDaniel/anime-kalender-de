@@ -86,12 +86,17 @@ export function kulisseAntwort(datei, inhalt, wochen) {
 }
 
 /** Rechteck der Cover und ihrer Leisten (Seitenkoordinaten). Läuft im Browser. */
-function messeKacheln({ selektor, monat, ausschnitt }) {
+export function messeKacheln({ selektor, monat, ausschnitt }) {
   const [dx, dy] = ausschnitt ? [0, 0] : [scrollX, scrollY]
+  /* Unterkante des scrollenden Vorfahren (Tageszeilen-Fenster am Handy, 22.11.2026: es endet über dem Bildrand und beschneidet die letzte Kachel). */
+  const sichtBis = (el) => {
+    for (let p = el.parentElement; p; p = p.parentElement) if (/auto|scroll/.test(getComputedStyle(p).overflowY)) return Math.min(innerHeight, p.getBoundingClientRect().bottom)
+    return innerHeight
+  }
   return [...document.querySelectorAll(selektor)]
     .filter((el) => el.offsetParent !== null)
     /* Im Ausschnitt nur ganz sichtbare Kacheln: darunter liest das Bild keine Pixel. */
-    .filter((el) => !ausschnitt || el.lastElementChild.getBoundingClientRect().bottom + 5 < innerHeight)
+    .filter((el) => !ausschnitt || el.lastElementChild.getBoundingClientRect().bottom + 5 < sichtBis(el))
     .map((el) => {
       const leiste = monat ? el.lastElementChild : el.nextElementSibling
       const r = leiste.getBoundingClientRect()

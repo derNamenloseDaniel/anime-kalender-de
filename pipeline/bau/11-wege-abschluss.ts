@@ -22,6 +22,7 @@ import { begrenzeWegeAufBelege } from './wege-begrenzen.ts'
 import { baueEanHaendlerWege } from '../lib/disc-haendler-weg.ts'
 import { setzeCoverNachRegel } from './cover-regel.ts'
 import { setzeProduktFelder } from './produkt-regel.ts'
+import { uebernehmeFranchiseBanner } from './banner-franchise.ts'
 import { log, readJson } from '../lib/util.ts'
 import { entferneBezugswegeTrotzNein } from '../lib/handbeleg-bezugswege.ts'
 import { joynAdressenVonJw } from '../lib/handbeleg-weg.ts'
@@ -101,6 +102,7 @@ export function schliesseWegeAb({
   // Das Cover steht nach allen Wege-Änderungen fest und vor `baueMeta`, damit Hauptbestand, Verschobene, Reihen und Meldungen dasselbe Bild sehen.
   setzeCoverNachRegel(titles)
   setzeProduktFelder(titles)
+  uebernehmeFranchiseBanner(titles)
 }
 
 /** Wege ohne Beleg und Crunchyroll-Wege ohne Staffel der Serie fliegen hier endgültig raus. */

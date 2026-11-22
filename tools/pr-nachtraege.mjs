@@ -23,7 +23,7 @@ const CI_PROTOKOLL = /\*\*Prüfer-Review\*\* für/
 export const MUTATIONSPROBE = /^## Mutationsprobe für /
 // Urteilszeile des Prüfer-Agenten („Prüfer: ändern“, „Prüfer Stufe 2: frei“), die `urteilAus` nicht kennt (Prüfer zu PR 4595).
 const AGENT_URTEIL = /^[\s*#]*Prüfer[^:\n]*:\s*\**(ändern|aendern|frei|freigegeben|freigeben|ok)\b/i
-export const CI_BOT ='github-actions[bot]'
+export const CI_BOT = 'github-actions[bot]'
 const MAX_PRUEFER = 6000
 const AUTOR = /^[A-Za-z0-9][A-Za-z0-9-]*(\[bot\])?$/
 export const VERTRAUT = new Set(['OWNER', 'MEMBER', 'COLLABORATOR'])

@@ -64,7 +64,11 @@ const lang = baueBericht({ kopf: KOPF, ergebnisse: [{ liste: L1, lauf: lauf(1, '
 assert.ok(lang.endsWith(`${'x'.repeat(5999)}a\n`), 'Ergebnistext wird bei genau 6000 Zeichen gekappt')
 assert.ok(!baueBericht({ kopf: KOPF, ergebnisse: [{ liste: L1, lauf: null, tabelle: '' }], uebersprungen: [] }).includes('UNVERTRAUENSWÜRDIGE'), 'ohne Tabelle kein Hinweis nötig')
 
-const LEER_ZEILE = '- keine Mutantenliste im Diff: Probe nicht gelaufen, keine Aussage über die Tests dieses PR'
+const zeilenRot = (n) => Array.from({ length: n }, (_, i) => `| ${i + 1} | M${i + 1} | a.ts | rot (Exit 1) | t |`).join('\n')
+const gekappt = baueBericht({ kopf: KOPF, ergebnisse: [{ liste: L1, lauf: lauf(1, 'x'), tabelle: `${zeilenRot(200)}\n| 201 | Überlebender | a.ts | GRÜN (alle Tests grün) |  |\n| 202 | M202 | a.ts | rot (Exit 1) | t |` }], uebersprungen: [] })
+assert.ok(gekappt.includes('| 201 | Überlebender |') && !gekappt.includes('| 202 | M202 |') && !gekappt.includes('| 200 | M200 |'), 'hinter der Kappung bleiben Überlebende sichtbar, rote Zeilen nicht')
+
+const LEER_ZEILE ='- keine Mutantenliste im Diff: Probe nicht gelaufen, keine Aussage über die Tests dieses PR'
 assert.ok(baueBericht({ kopf: KOPF, ergebnisse: [], uebersprungen: [] }).includes(`\n${LEER_ZEILE}\n`), 'leerer Lauf nennt, dass keine Aussage vorliegt')
 assert.ok(!baueBericht({ kopf: KOPF, ergebnisse: [], uebersprungen: [{ liste: L2, grund: 'weil' }] }).includes('keine Mutantenliste'), 'übersprungene Liste ist nicht „keine Liste“')
 assert.ok(!baueBericht({ kopf: KOPF, ergebnisse: [{ liste: L1, lauf: null, tabelle: '' }], uebersprungen: [] }).includes('keine Mutantenliste'), 'gestartete Liste ist nicht „keine Liste“')

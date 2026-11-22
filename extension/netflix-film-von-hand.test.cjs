@@ -279,6 +279,14 @@ async function fall() {
   await s.warte()
   pruefe('aria-disabled sperrt ebenfalls (auch ohne disabled)', s.meldungen.length === 1, s.meldungen.length)
 
+  /* Doppelklick, bevor die Antwort da ist: „unterwegs“ sperrt den zweiten. */
+  const doppelt = await zeichne('/title/81234', FILM, '81234', DEUTSCH)
+  const dk = doppelt.run('knopf')
+  doppelt.klick(dk)
+  doppelt.klick(dk)
+  await doppelt.warte()
+  pruefe('Doppelklick vor der Antwort: genau eine Meldung', doppelt.meldungen.length === 1, doppelt.meldungen.length)
+
   const stumm = await zeichne('/title/81234', FILM, '81234', "[{ code: 'ja', name: 'Japanisch' }]")
   const kd = stumm.run('knopf')
   const keinDeutsch = kd.disabled === false && kd.classList.contains('ak-nein') && kd.textContent === 'Film melden — kein Deutsch'

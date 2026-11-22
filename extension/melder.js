@@ -1736,7 +1736,7 @@ function knopfZeigen() {
   if (!knopf) {
     knopf = document.createElement('button')
     knopf.className = 'ak-melder'
-    akKlick(knopf, melden)
+    akKlick(knopf, () => akNetflixMeldenEinmal(gesendet, schluessel(), melden))
     netflixKasten().querySelector('.ak-z-melden')?.appendChild(knopf)
   }
   /* Der Knopf bleibt auf einer gesuchten Titelseite immer sichtbar, ohne Text steht er abgeblendet da (Daniel, 18.11.2026); ein Schreibvorgang für Text, Klasse und Zustand. */

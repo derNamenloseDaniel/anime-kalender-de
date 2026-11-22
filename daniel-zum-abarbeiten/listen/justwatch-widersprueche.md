@@ -7,7 +7,7 @@ Abschnitt „JustWatch-Ton je Seite“. Unsere Messung (Handbeleg, Meldung der E
 <!-- anime:start -->
 ## Anime
 
-Flagge „Deutsch“: 57 Wege, nur Hinweis: 1.
+Flagge „Deutsch“: 58 Wege, nur Hinweis: 1.
 
 JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine Flagge): mehrere Staffeln 11, Mehrteiler 10.
 
@@ -528,7 +528,7 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | Suzume (142770) | RTL+ Max Amazon Channel | amazon:amzn1.dv.gti.29328f26-ef83-4bfc-983e-2eb64a0696c8 | nein |
 | NieR:Automata Ver1.1a (145665) | Crunchyroll | crunchyroll:G50UZ5VDM | ja |
 | NieR:Automata Ver1.1a (145665) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.96f14089-6dde-4e53-9e32-bd6eddfa0e17 | ja |
-| Spice and Wolf: Merchant Meets the Wise Wolf (145728) | Crunchyroll | crunchyroll:GWDU7V9ZK | nein |
+| Spice and Wolf: Merchant Meets the Wise Wolf (145728) | Crunchyroll | crunchyroll:G7PU3P5GE | nein |
 | Spice and Wolf: Merchant Meets the Wise Wolf (145728) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.ace6b3ba-9d82-49c9-883d-da10bb274f0a | nein |
 | My One-Hit Kill Sister (146234) | Crunchyroll | crunchyroll:G4VUQ8DVK | nein |
 | My One-Hit Kill Sister (146234) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.55e42148-91d6-4261-90fe-63286e7dbb2c | nein |
@@ -649,7 +649,7 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 
 Flagge „Deutsch“: 2 Wege, nur Hinweis: 0.
 
-JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine Flagge): mehrere Staffeln 132, Mehrteiler 1.
+JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine Flagge): mehrere Staffeln 135, Mehrteiler 1.
 
 | Anbieter | mit eigener Messung | Widersprüche | Anteil | Anzeige |
 |---|---|---|---|---|
@@ -661,7 +661,7 @@ JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine
 | Titel | Anbieter | Adresse | JustWatch | Gemessen |
 |---|---|---|---|---|
 
-### Kandidaten für neue Wege (60)
+### Kandidaten für neue Wege (61)
 
 JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „Weg ohne Kennung“: ein Weg zum Anbieter steht, seine Adresse trägt aber keine Seitenkennung.
 
@@ -693,6 +693,7 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | El Taubinio (-153571) | Apple TV Amazon Channel | amazon:amzn1.dv.gti.7b776e12-75ed-4ca7-a487-0e48f64743a8 | nein |
 | Santa Inc. (-103214) | Lionsgate+ Amazon Channel | amazon:amzn1.dv.gti.229ba2f4-85bb-48a1-8c2b-7e7a03d4a2f3 | nein |
 | The Gumball Chronicles (-133529) | HBO Max Amazon Channel | amazon:amzn1.dv.gti.02bbed9d-726c-632d-e712-c40bb0d6a326 | nein |
+| Pikwik Pack (-128072) | RTL+ Max Amazon Channel | amazon:amzn1.dv.gti.bae7771e-831b-4fa6-8bab-25b8564031b3 | nein |
 | 100 Prozent Wolf - Die Legende des Mondsteins (-120161) | RTL+ Max Amazon Channel | amazon:amzn1.dv.gti.eda7de62-f24b-4e5e-942e-b1d7bac03037 | nein |
 | Onyx Equinox (-99777) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.3c467fa5-a8ee-4f6b-845d-9b9735dc446f | nein |
 | Adventure Time: Ferne Länder (-94810) | HBO Max Amazon Channel | amazon:amzn1.dv.gti.1e7f3228-c946-482d-ac94-86791c2935ac | nein |

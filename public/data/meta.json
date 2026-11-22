@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-22T04:09:45.243Z",
-  "titleCount": 2926,
+  "generatedAt": "2026-11-22T04:41:41.135Z",
+  "titleCount": 2925,
   "belegtCount": 2631,
   "releaseCount": 922,
   "eventCount": 4637,
@@ -230,13 +230,13 @@
     "Midnight Factory Amazon Channel",
     "Zdf Schatzkiste Amazon Channel",
     "Arthouse Cnma Amazon Channel",
+    "Jpc",
     "Kino On Demand",
     "Zavvi",
     "Amazon Prime (ProSieben Fun)",
     "Aniverse Amazon Channel",
     "Ard Plus Amazon Channel",
     "Buy Zoxs",
-    "Jpc",
     "ADN",
     "Amasia+ Amazon Channel",
     "Amazon (Blu-ray)",
@@ -315,5 +315,13 @@
     "Termine: aniSearch, Anime2You — siehe Quellenangabe je Eintrag",
     "Markenzeichen der Anbieter: simple-icons (https://simpleicons.org) — CC0, Wikimedia Commons (https://commons.wikimedia.org) — gemeinfrei, ADN-Wortmarke aus der französischen Wikipedia, maxdome-Zeichen nach „Maxdome Logo (2021)“ von videociety GmbH (CC BY-SA 4.0, zugeschnitten); die Marken gehören ihren Inhabern",
     "Welche Folgen auf Netflix eine deutsche Tonspur haben: Streaming Availability API (https://www.movieofthenight.com/about/api)"
+  ],
+  "quarantaene": [
+    {
+      "titleId": 120892,
+      "pruefung": "telekom-annahme",
+      "grund": "Deutsch-Antwort hängt allein an der Annahme",
+      "releases": []
+    }
   ]
 }

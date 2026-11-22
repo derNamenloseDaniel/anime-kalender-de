@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-21",
+  "stand": "2026-11-22",
   "bestand": {
     "inReihen": 3029,
     "reihen": 819,
@@ -1586,8 +1586,8 @@
     ]
   },
   "katalog": {
-    "inReihen": 12042,
-    "reihen": 3076,
+    "inReihen": 12044,
+    "reihen": 3077,
     "pruefliste": [
       {
         "art": "verschmilzt",
@@ -3946,7 +3946,7 @@
           {
             "id": 163571,
             "name": "BanG Dream! It's MyGO!!!!!",
-            "titel": 10
+            "titel": 11
           }
         ],
         "alleinstehende": [],

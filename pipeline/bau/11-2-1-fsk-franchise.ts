@@ -30,10 +30,11 @@ export function franchiseFskFehler(titles: Map<number, Title>, releases: Release
 export function uebernehmeFskAusFranchise(titles: Map<number, Title>, releases: Release[] = []): void {
   const tmdb = readJson<Record<string, { fsk?: Fsk }>>('data/tmdb-titles.json', {})
   const tmdbFsk = (id: number) => tmdb[String(id)]?.fsk
+  const amTermin = new Set(releases.filter((r) => r.fsk !== undefined).map((r) => r.titleId))
   const neu = new Map<number, Fsk>()
   for (const t of titles.values()) {
-    // Liefert TMDB eine Freigabe (verworfen wegen geteilter Kennung), bleibt der Titel offen für die Handzeile.
-    if (tmdbFsk(t.id) !== undefined) continue
+    // Liefert TMDB oder ein Termin eine Freigabe, bleibt der Titel offen (Handzeile bzw. Termin-Freigabe), nichts wird daneben geraten.
+    if (tmdbFsk(t.id) !== undefined || amTermin.has(t.id)) continue
     const stufe = fskAusFranchise(t, titles.values())
     if (stufe !== undefined) neu.set(t.id, stufe)
   }

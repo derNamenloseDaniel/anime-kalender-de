@@ -3,7 +3,7 @@
  * der Zwischenspeicher hat vier Einträge, die Attrappe zählt, welche MAL-Kennungen AniList wirklich gefragt werden. Kein Netz. Aufruf: `check:logic`.
  */
 import { spawnSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -62,7 +62,7 @@ function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
   console.error(`  ✖ ${name}${gefunden === undefined ? '' : ` — gefunden: ${JSON.stringify(gefunden)}`}`)
 }
 pruefe('Lauf endet mit Exit 0', lauf.status === 0, { status: lauf.status, stderr: (lauf.stderr ?? '').slice(-600), stdout: (lauf.stdout ?? '').slice(-600) })
-const zeilen = readFileSync(protokoll, 'utf8').trim().split('\n').map((z) => JSON.parse(z) as unknown[])
+const zeilen = (existsSync(protokoll) ? readFileSync(protokoll, 'utf8') : '').trim().split('\n').filter(Boolean).map((z) => JSON.parse(z) as unknown[])
 const gefragt = zeilen.filter((z) => z[0] !== 'id').flat()
 const gefragtNachId = zeilen.filter((z) => z[0] === 'id').map((z) => z[1])
 pruefe('MAL-Weg: AniList wird nur nach dem veralteten Eintrag mit Mangel gefragt', JSON.stringify(gefragt) === JSON.stringify([900011]), gefragt)

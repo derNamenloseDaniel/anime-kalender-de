@@ -74,6 +74,37 @@ pruefe('Prüferrunden: Fremde und andere Bot-Kommentare zählen nicht', !waehleN
 pruefe('Prüferrunde auf 6000 Zeichen gekappt, Nachtrag nicht', waehleNachtraege([k('autor', 'Prüfer Runde 1' + 'x'.repeat(7000))], 'autor')[0].length === 6000
   && waehleNachtraege([k('autor', 'Nachtrag' + 'x'.repeat(7000))], 'autor')[0].length === 7008)
 
+// 22.11.2026, PR 4581: Antworten des Bauers ohne Wort „Nachtrag“ am Anfang erreichten den Prüfer nicht (Anfänge echt, gekürzt).
+const OWNER = 'OWNER'
+const urteil = (wort) => k('github-actions[bot]', `**Prüfer-Review** für 72201bf12 - Urteil: **${wort}**\n\n# Prüfer-Protokoll`, 'CONTRIBUTOR')
+const stufe = k('github-actions[bot]', '<!-- pr-stufe -->\n**Prüfstufe 2** für fe21e7b7d', 'CONTRIBUTOR')
+const auflage = k('inhaber', 'Prüfer-Auflage umgesetzt (Kopf nach Push, 2 neue Commits):\n\n- Der Negativtest fehlte', OWNER)
+const abnahme = k('inhaber', 'Abnahme Runde 2, Auflage A1 — Nachtrag `fe21e7b7`:\n\n- **aria-disabled am echten Knopf:**', OWNER)
+const roterJob = k('inhaber', 'Der rote Job „PR-Aussehen – Panel“ ist nicht von diesem PR: das Werkzeug nimmt', OWNER)
+const nachAuflage = (...ks) => waehleNachtraege([stufe, urteil('aendern'), ...ks], 'autor').filter((t) => !t.startsWith('**Prüfer-Review') && !t.startsWith('<!--'))
+pruefe('Antwort „Prüfer-Auflage umgesetzt“ nach Urteil kommt an', nachAuflage(auflage).length === 1)
+pruefe('Antwort „Abnahme Runde 2 … Nachtrag“ nach Urteil kommt an', nachAuflage(abnahme).length === 1)
+pruefe('Antwort ohne Schlagwort (roter Job nicht von diesem PR) kommt an', nachAuflage(roterJob).length === 1)
+pruefe('Antworten bleiben nach späterem Urteil erhalten, in Reihenfolge',
+  nachAuflage(auflage, urteil('aendern'), abnahme, urteil('ok')).join('|').startsWith('Prüfer-Auflage umgesetzt') && nachAuflage(auflage, urteil('aendern'), abnahme, urteil('ok')).length === 2)
+pruefe('ohne Prüferurteil kein Treffer für unmarkierten Text', waehleNachtraege([stufe, auflage], 'autor').length === 0)
+pruefe('Text vor dem ersten Urteil ohne Marke zählt nicht', waehleNachtraege([auflage, urteil('aendern')], 'autor').every((t) => t.startsWith('**Prüfer-Review**')))
+pruefe('Fremde und CONTRIBUTOR-Kommentare nach Urteil zählen nicht', nachAuflage(k('fremd', 'Prüfer-Auflage umgesetzt'), k('gast', 'Hallo', 'CONTRIBUTOR')).length === 0)
+pruefe('Bot-Kommentare (Laufmeldung, Stufe) nach Urteil zählen nicht, auch nicht als Autor', waehleNachtraege([urteil('aendern'), k('github-actions[bot]', 'Lauf grün', 'CONTRIBUTOR')], 'github-actions[bot]').length === 1)
+const ohneUrteil = (...ks) => waehleNachtraege([urteil('aendern'), ...ks], 'autor').length - 1
+pruefe('Urteil des Inhabers (Protokollzeile mit Urteil) ist keine Antwort', ohneUrteil(k('inhaber', '**Prüfer-Review** für fe21e7b7d - Urteil: **ok**', OWNER)) === 0)
+pruefe('Protokollzeile des Inhabers ohne „Urteil:“ ist keine Antwort', ohneUrteil(k('inhaber', '**Prüfer-Review** für fe21e7b7d', OWNER)) === 0)
+pruefe('Urteilszeile des Inhabers ohne Protokollkopf ist keine Antwort', ohneUrteil(k('inhaber', 'Prüfer (Abnahme) - Urteil: ok', OWNER)) === 0)
+for (const zeile of ['Prüfer: ändern', 'Prüfer: frei', 'Prüfer Stufe 2: ändern', '**Prüfer: ok**'])
+  pruefe(`Urteil des Prüfer-Agenten „${zeile}“ ist keine Antwort`, ohneUrteil(k('inhaber', `${zeile}\n\nA1 Fehltreffer`, OWNER)) === 0)
+pruefe('Prüfer-Wort ohne Urteilswort bleibt Antwort', ohneUrteil(k('inhaber', 'Prüfer: Auflage umgesetzt', OWNER)) === 1)
+// PR 4579 (echter Anfang): Inhaber-Hinweis nach dem Urteil wird angehängt; bekannter Fehltreffer, 1 von 60 PRs (22.11.2026).
+pruefe('Bekannter Fehltreffer: Inhaber-Hinweis an die Bauer-Sitzungen wird angehängt',
+  ohneUrteil(k('inhaber', '## Hinweis an die Bauer-Sitzungen (Dirigent, 22.11.2026 17:45)\n\nDer Arbeitsstand', OWNER)) === 1)
+pruefe('Kommentar ohne Text (leer, null) nach Urteil bricht nichts und zählt nicht', ohneUrteil(k('inhaber', '', OWNER), k('inhaber', null, OWNER)) === 0)
+pruefe('Prüfer Runde (ohne Urteilswort) als erster Prüferkommentar öffnet die Antworten',
+  waehleNachtraege([k('autor', '## Prüfer Runde 2'), k('autor', 'Auflage umgesetzt')], 'autor').join('|') === '## Prüfer Runde 2|Auflage umgesetzt')
+
 const text = 'Titel: x\n\nBeschreibung'
 pruefe('ohne Treffer bleibt der Text unverändert', ergaenzeBeschreibung(text, [k('autor', 'ok'), k('autor', null), k('fremd', '**Nachtrag')], 'autor') === text)
 const mit = ergaenzeBeschreibung(text, drei, 'autor')

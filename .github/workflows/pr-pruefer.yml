@@ -235,7 +235,7 @@ jobs:
           rm -f "$T/dateien.ndjson"
           ghl pr view "$PR" --repo "$GITHUB_REPOSITORY" --json title,body,headRefName \
             -q '"Titel: " + .title + "\nZweig: " + .headRefName + "\n\n" + .body' > "$T/pr-beschreibung.txt"
-          # Beschreibungen sind unveränderlich; spätere Runden stehen als Kommentar "Nachtrag…" oder "Nachbesserung…" (mit oder ohne **, #) am Textanfang (PR-Autor sowie Inhaber, Mitglieder, Mitarbeiter des Repos).
+          # Beschreibungen sind unveränderlich; spätere Runden stehen als Kommentar "Nachtrag…" oder "Nachbesserung…" (mit oder ohne **, #) am Textanfang, seit 22.11.2026 zusätzlich jede Antwort nach dem ersten Prüferurteil (PR-Autor sowie Inhaber, Mitglieder, Mitarbeiter des Repos).
           # REST-Login statt `gh pr view --json author`: das liefert bei Apps "app/claude" und fällt durch die Prüfung unten (PR 1394).
           autor=$(wdh gh api "repos/$GITHUB_REPOSITORY/pulls/$PR" -q .user.login) || autor=""
           if [[ "$autor" =~ ^[A-Za-z0-9][A-Za-z0-9-]*(\[bot\])?$ ]]; then

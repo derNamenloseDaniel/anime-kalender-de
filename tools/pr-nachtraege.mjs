@@ -5,6 +5,7 @@
  *
  * Beschreibungen sind unveränderlich; spätere Runden stehen als Kommentar, dessen Text mit `Nachtrag` oder
  * `Nachbesserung` beginnt, mit oder ohne Marke (`**`, `#`), beliebige Schreibweise, führender Leerraum erlaubt.
+ * Seit 22.11.2026 zählt auch jeder andere Kommentar nach dem ersten Prüferurteil (Antworten ohne das Wort; den Neustart löst weiter nur `Nachtrag` aus).
  * Es zählen der PR-Autor (REST-Login, bei Apps `name[bot]`) und Konten mit Schreibrecht am Repo: PRs der
  * Claude-App kommentiert der Inhaber (17.10.2026, PR 1394: drei Nachträge nie beim Prüfer angekommen).
  * Die Commit-Liste mit Dateien je Commit braucht der Prüfer für „Umbau und Verhaltensänderung nie im selben Commit“.
@@ -12,6 +13,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { ghApiJsonMitLimit } from './gh-ratelimit.mjs'
+import { urteilAus } from './pr-nachrechnen-pruefer.mjs'
 
 export const NACHTRAG = /^\s*(\*\*|#+ *)?(Nachtrag|Nachträge|Nachbesserung)/i
 // Frühere Prüferrunden: Agent-Kommentare „Prüfer Runde N“ und das CI-Protokoll (Bot), damit der Prüfer seine Auflagen einlösen kann.
@@ -19,6 +21,8 @@ export const PRUEFER_RUNDE = /^\s*(\*\*|#+ *)?Prüfer Runde/i
 const CI_PROTOKOLL = /\*\*Prüfer-Review\*\* für/
 // Ergebniskommentar von mutationsprobe.yml (Bot): der Prüfer verlangt es als Beleg und sah es nicht (PR 2460, 30.10.2026).
 export const MUTATIONSPROBE = /^## Mutationsprobe für /
+// Urteilszeile des Prüfer-Agenten („Prüfer: ändern“, „Prüfer Stufe 2: frei“), die `urteilAus` nicht kennt (Prüfer zu PR 4595).
+const AGENT_URTEIL = /^[\s*#]*Prüfer[^:\n]*:\s*\**(ändern|aendern|frei|freigegeben|freigeben|ok)\b/i
 export const CI_BOT = 'github-actions[bot]'
 const MAX_PRUEFER = 6000
 const AUTOR = /^[A-Za-z0-9][A-Za-z0-9-]*(\[bot\])?$/
@@ -36,8 +40,12 @@ export function waehleNachtraege(kommentare, autor) {
   const botText = (k) => CI_PROTOKOLL.test(k.body ?? '') || MUTATIONSPROBE.test(k.body ?? '')
   const runde = (k) => (zaehlt(k) && PRUEFER_RUNDE.test(k.body ?? '')) || (k.user?.login === CI_BOT && botText(k))
   const nachtrag = (k) => zaehlt(k) && NACHTRAG.test(k.body ?? '')
+  // 22.11.2026 (PR 4581: „Prüfer-Auflage umgesetzt …“ fiel durch): jeder Kommentar eines Berechtigten nach dem ersten Prüferurteil ist Antwort darauf.
+  const urteil = (k) => urteilAus(k.body) !== null || CI_PROTOKOLL.test(k.body ?? '') || AGENT_URTEIL.test(String(k.body ?? '').split('\n')[0])
+  const ersterPruefer = kommentare.findIndex((k) => urteil(k) || runde(k))
+  const antwort = (k, i) => ersterPruefer >= 0 && i > ersterPruefer && zaehlt(k) && k.user?.login !== CI_BOT && !urteil(k) && (k.body ?? '') !== ''
   const text = (k) => (nachtrag(k) ? k.body : k.body.slice(0, MAX_PRUEFER))
-  return kommentare.filter((k) => nachtrag(k) || runde(k)).map(text)
+  return kommentare.filter((k, i) => nachtrag(k) || runde(k) || antwort(k, i)).map(text)
 }
 
 /** Beschreibung plus Nachträge; ohne Treffer genau der Eingabetext. */

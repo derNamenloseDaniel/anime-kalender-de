@@ -510,7 +510,9 @@ jobs:
             fehler, unklar, Sperre) als Datenfall. Mutationen nennst du mit Funktionsname und Muster als Anker, nie
             mit Zeilennummer. Bei geänderten Aufrufseiten und onClick-Handlern verlangst du Mutationen auch dort
             (Aufruf weg, falscher Wert); ein ungetesteter Handler ist ein Befund. Jede Behauptung über Projektregeln
-            ("laut Regel verboten") belegst du per Grep in CLAUDE.md oder docs, sonst nicht als Argument. Ein neuer
+            ("laut Regel verboten") belegst du per Grep in CLAUDE.md oder docs, sonst nicht als Argument. Hauptzeile
+            behauptet (Erwartung aus Fakten/Vergangenheit), Nachweis höchstens klein: "gesehen", "geprüft",
+            "bestätigt" in der Hauptzeile eines Nutzertexts ist ein Befund (design-regeln.md Abschnitt 14). Ein neuer
             Workflow, der andere Workflows auslöst, braucht eine Kostenrechnung (Läufe je Tag mal Claude-Läufe). Die
             Beschreibung bleibt unverändert: Korrekturen stehen als Kommentar unter "Nachträge" und gelten, verlange
             keine Änderung ihres Kopfs. "Im Log nicht gefunden" sagst du nur mit Job-Name, nachdem du kettenlog.txt und

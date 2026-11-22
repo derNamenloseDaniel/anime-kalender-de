@@ -206,12 +206,12 @@
     ]
   },
   {
-    "name": "wortStufe: Schwelle 6 min",
+    "name": "istFaellig: invertiert",
     "aenderungen": [
       {
         "datei": "shared/ausbleiben-plan.ts",
-        "suche": "WORT_VERSPAETET_AB_MS = 5 * MINUTE",
-        "ersetze": "WORT_VERSPAETET_AB_MS = 6 * MINUTE"
+        "suche": "terminZustand(e, jetzt) === 'faellig'",
+        "ersetze": "terminZustand(e, jetzt) !== 'faellig'"
       }
     ],
     "tests": [
@@ -220,49 +220,7 @@
     ]
   },
   {
-    "name": "wortStufe: Schwelle 4 min",
-    "aenderungen": [
-      {
-        "datei": "shared/ausbleiben-plan.ts",
-        "suche": "WORT_VERSPAETET_AB_MS = 5 * MINUTE",
-        "ersetze": "WORT_VERSPAETET_AB_MS = 4 * MINUTE"
-      }
-    ],
-    "tests": [
-      "npx tsx pipeline/check-cr-faellig.ts",
-      "npx tsx pipeline/check-termin-zustand.ts"
-    ]
-  },
-  {
-    "name": "wortStufe: > statt >=",
-    "aenderungen": [
-      {
-        "datei": "shared/ausbleiben-plan.ts",
-        "suche": "abstandMs >= WORT_VERSPAETET_AB_MS",
-        "ersetze": "abstandMs > WORT_VERSPAETET_AB_MS"
-      }
-    ],
-    "tests": [
-      "npx tsx pipeline/check-cr-faellig.ts",
-      "npx tsx pipeline/check-termin-zustand.ts"
-    ]
-  },
-  {
-    "name": "faelligWort: invertiert",
-    "aenderungen": [
-      {
-        "datei": "shared/ausbleiben-plan.ts",
-        "suche": "=== 'faellig' ? wortStufe",
-        "ersetze": "!== 'faellig' ? wortStufe"
-      }
-    ],
-    "tests": [
-      "npx tsx pipeline/check-cr-faellig.ts",
-      "npx tsx pipeline/check-termin-zustand.ts"
-    ]
-  },
-  {
-    "name": "faelligWort: ohne jetzt",
+    "name": "istFaellig: ohne jetzt",
     "aenderungen": [
       {
         "datei": "shared/ausbleiben-plan.ts",
@@ -280,7 +238,7 @@
     "aenderungen": [
       {
         "datei": "web/src/components/detail/antwort-zweige.ts",
-        "suche": "faellig: faelligWort(n, jetzt),",
+        "suche": "faellig: istFaellig(n, jetzt),",
         "ersetze": "faellig: undefined,"
       }
     ],
@@ -308,8 +266,8 @@
     "aenderungen": [
       {
         "datei": "web/src/components/detail/antwort-kopf.tsx",
-        "suche": "antwort.faellig, rel === T('antwort.relHeute'), T",
-        "ersetze": "antwort.faellig, false, T"
+        "suche": "faelligText(e, rel === T('antwort.relHeute'), T",
+        "ersetze": "faelligText(e, false, T"
       }
     ],
     "tests": [
@@ -318,12 +276,12 @@
     ]
   },
   {
-    "name": "faelligHaupt: Fehlerfarbe",
+    "name": "faellig: Nachweis in der Hauptzeile",
     "aenderungen": [
       {
-        "datei": "web/src/components/detail/antwort-kopf.tsx",
-        "suche": "className=\"text-ak-warnung-text\"",
-        "ersetze": "className=\"text-ak-fehler-text\""
+        "datei": "web/src/lib/i18n.tsx",
+        "suche": "'antwort.faellig': 'Folge {n} seit {wann}'",
+        "ersetze": "'antwort.faellig': 'Folge {n} seit {wann}, noch nicht gesehen'"
       }
     ],
     "tests": [
@@ -366,20 +324,6 @@
         "datei": "shared/logic.ts",
         "suche": "markiereOhneSichtung(release, termineAusPlan(release))",
         "ersetze": "termineAusPlan(release)"
-      }
-    ],
-    "tests": [
-      "npx tsx pipeline/check-cr-faellig.ts",
-      "npx tsx pipeline/check-termin-zustand.ts"
-    ]
-  },
-  {
-    "name": "faelligText: Schlüssel vertauscht",
-    "aenderungen": [
-      {
-        "datei": "web/src/components/detail/kasten-texte.ts",
-        "suche": "verspaetet: 'antwort.faelligVerspaetet'",
-        "ersetze": "verspaetet: 'antwort.faelligWirdGeprueft'"
       }
     ],
     "tests": [

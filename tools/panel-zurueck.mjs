@@ -19,9 +19,10 @@ const WURZEL = path.resolve(import.meta.dirname, '..')
 const DIST = path.join(WURZEL, 'dist')
 const EIN_PUNKT = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64')
 const TYPEN = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json' }
-/** Jujutsu Kaisen (mit Banner) und Rozen Maiden: Dreaming (ohne Banner, `listen/luecken/banner.md`). */
+/** Jujutsu Kaisen (mit Banner); „ohne Banner“ wird aus dem Bestand gewählt, weil Banner nachgefüllt werden (AniList 65 bekam am 22.11.2026 eins). */
 const MIT_BANNER = akVon('113415')
-const OHNE_BANNER = akVon('65')
+const ohneBannerTitel = JSON.parse(readFileSync(path.join(WURZEL, 'public', 'data', 'titles.json'), 'utf8')).find((t) => !t.bannerImage)
+const OHNE_BANNER = ohneBannerTitel ? akVon(String(ohneBannerTitel.id)) : null
 /** Ein Cartoon aus dem Bestand mit Cartoon-Marke (`westlich`). */
 const CARTOON = JSON.parse(readFileSync(path.join(WURZEL, 'public', 'data', 'cartoons.json'), 'utf8')).find((t) => t.westlich)
 const rot = []
@@ -73,6 +74,7 @@ async function pruefeBanner(seite) {
   await seite.goBack()
   await seite.waitForTimeout(500)
   ist(!(await panelOffen(seite)), 'nach Escape genügt ein Zurück für das Panel (kein Verlaufseintrag übrig)')
+  if (OHNE_BANNER === null) return console.log('  – ohne Banner: kein Titel ohne Banner im Bestand, Fall entfällt')
   await oeffnePanel(seite, OHNE_BANNER)
   await seite.locator('[data-kopf]').click({ position: { x: 20, y: 100 } })
   await schicht(seite, 'Cover').waitFor({ state: 'visible', timeout: 5000 })

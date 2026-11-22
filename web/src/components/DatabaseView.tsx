@@ -95,6 +95,7 @@ export function DatabaseView({
         liste={liste.slice(0, visible)}
         zahlen={zahlen}
         data={data}
+        ausgeschlossen={filters.excluded}
         today={today}
         grouped={grouped}
         favorites={favorites}

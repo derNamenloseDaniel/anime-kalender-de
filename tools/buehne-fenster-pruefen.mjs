@@ -28,6 +28,7 @@ async function messe(seite, geraet, breite, hoehe) {
       html: ueberlauf(document.documentElement),
       body: ueberlauf(document.body),
       rahmen: zellen.map((z) => z.querySelector('iframe').getBoundingClientRect().height.toFixed(1)),
+      desktop: zellen.filter((z) => !z.querySelector('iframe').dataset.zelle.includes('-375-')).map((z) => z.querySelector('iframe').getBoundingClientRect().height),
       figuren: zellen.map((z) => z.getBoundingClientRect().height.toFixed(1)),
       oberkanten: zellen.map((z) => z.getBoundingClientRect().top),
       unterkante: Math.max(...zellen.map((z) => z.getBoundingClientRect().bottom)),
@@ -36,7 +37,7 @@ async function messe(seite, geraet, breite, hoehe) {
 }
 
 async function pruefeFensterFuellt(seite) {
-  for (const geraet of ['375', 'beide']) {
+  for (const geraet of ['375']) {
     for (const breite of [1280, 1728]) {
       const m = await messe(seite, geraet, breite, 785)
       const wo = `Gerät ${geraet}, ${breite}×785`
@@ -44,6 +45,15 @@ async function pruefeFensterFuellt(seite) {
       assert.equal(m.body, 0, `${wo}: body scrollt (${m.body} px)`)
       assert.ok(m.unterkante >= 785 - 16 - 2, `${wo}: Zellen enden bei ${m.unterkante} px, das Fenster bleibt unten leer`)
     }
+  }
+}
+
+/** Desktop-Rahmen nie unter Gerätehöhe (Daniel, 22.11.2026): bei „beide" gezeichnet mit Zoom ½, also mindestens 400 px; die Seite scrollt dafür. */
+async function pruefeDesktopMindesthoehe(seite) {
+  for (const [breite, hoehe] of [[1280, 785], [1600, 900], [1728, 785]]) {
+    const m = await messe(seite, 'beide', breite, hoehe)
+    const kleinste = Math.min(...m.desktop)
+    assert.ok(m.desktop.length > 0 && kleinste >= 399, `beide, ${breite}×${hoehe}: Desktop-Rahmen nur ${kleinste} px hoch (Mindestens Gerätehöhe × ½ = 400)`)
   }
 }
 
@@ -77,12 +87,13 @@ async function main() {
     await pruefeVolleHoehe(seite)
     await pruefeFensterFuellt(seite)
     await pruefeUntergrenze(seite)
+    await pruefeDesktopMindesthoehe(seite)
     await pruefeObergrenze(seite)
   } finally {
     await browser.close()
   }
   assert.equal(fremde.length, 0, `Anfragen nach draußen: ${fremde[0]}`)
-  console.log('buehne-fenster-pruefen: ok (4 Fenster ohne Überlauf, Unter- und Obergrenze, volle Gerätehöhe im hohen Fenster)')
+  console.log('buehne-fenster-pruefen: ok (Handy-Fenster ohne Überlauf, Desktop-Mindesthöhe, Unter- und Obergrenze, volle Gerätehöhe im hohen Fenster)')
 }
 
 main().catch((e) => {

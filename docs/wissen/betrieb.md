@@ -2537,3 +2537,7 @@ Der Job `ziel` in `pr-pruefer.yml` prüft die Eingaben gegen die API (offen, kei
 ## Routinen-Quellen-Sperre (22.11.2026, Lehre 220)
 
 `.claude/hooks/routine-quellen-sperre.js` (im Dispatcher, Matcher `RemoteTrigger`; Test `routine-quellen-sperre-test.mjs`, Verdrahtung in `tools/dispatch-pretooluse.test.mjs`) weist `RemoteTrigger` `create`/`update` mit `job_config.ccr` ab, wenn `session_context.model` oder `session_context.sources` (mit `git_repository.url`) fehlt: sonst scheitert der Push der Cloud-Sitzung mit 403 und die Arbeit ist verloren. `update` ohne `job_config`, `run`, `list`, `get` bleiben frei. Mutationsprobe 22.11.2026: 10 von 10 rot.
+
+## Lehre: Einheit der Entscheidung = Einheit der Eigenschaft (Filterkonzept, 22.11.2026)
+
+„⊘ Disc" warf Yaiba aus der Datenbank, weil `releases.some(disc)` über den **Titel** entschied, obwohl „Disc" eine Eigenschaft eines **Weges** ist; zugleich teilten Kalender und Datenbank (und über `useKalenderFilter` das Push-Abo) einen Geräte-Eintrag. Die Kette ließ es durch, weil die Filter-Zusicherungen nur Titel mit einem Weg prüften. Schärfung: Fixtures mit mehreren Wegen (`check-filter-wege.ts`), jede Feldebene deklariert (`check-filter-ebenen.ts`), Speicher je Ansicht (`check-vorlieben-getrennt.ts`); Prüfer-/Bauer-Frage „Welche Einheit entscheidet, welche trägt die Eigenschaft?" (`pruefer.md`, Skill `stille-ausfaelle-verhindern`). Plan: `docs/konzept/filter/umsetzungsplan.md`.

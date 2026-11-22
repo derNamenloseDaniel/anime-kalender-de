@@ -1,5 +1,5 @@
 /**
- * Zusicherungen zu `web/src/lib/vorlieben.ts` an einer Speicher-Attrappe: Lesen nimmt nur echtes `true` (Zeichenkette, Zahl,
+ * Zusicherungen zu `web/src/lib/vorlieben.ts` an einer Speicher-Attrappe: (Ansicht Kalender; die Trennung und Migration: check-vorlieben-getrennt.ts) Lesen nimmt nur echtes `true` (Zeichenkette, Zahl,
  * fremde Schlüssel fallen weg), kaputtes JSON und gesperrter Speicher geben die Standardansicht; `discAus` folgt dem Ausschluss
  * `disc`, nicht dem Einschluss; Nachführen merkt nur, was sich zwischen vorher und nachher geändert hat (ein per Adresse
  * eingeschalteter Filter wird keine Vorliebe), schreibt nichts ohne Änderung und wirft bei gesperrtem Speicher nie. Läuft in `check:logic`.
@@ -52,18 +52,18 @@ const LEER = {
   availableExcluded: false,
   zweitanbieterExcluded: false,
 }
-const gemerkt = () => JSON.parse(speicher.get('vorlieben') ?? 'null') as unknown
+const gemerkt = () => JSON.parse(speicher.get('vorlieben.kalender') ?? 'null') as unknown
 
 // Lesen
-pruefe('leerer Speicher → Standardansicht', vorliebenLesen(), LEER)
+pruefe('leerer Speicher → Standardansicht', vorliebenLesen('kalender'), LEER)
 speicher.set('vorlieben', '{kaputt')
-pruefe('kaputtes JSON → Standardansicht', vorliebenLesen(), LEER)
+pruefe('kaputtes JSON → Standardansicht', vorliebenLesen('kalender'), LEER)
 speicher.set('vorlieben', 'null')
-pruefe('JSON null → Standardansicht (Zugriff auf null wirft, catch fängt)', vorliebenLesen(), LEER)
+pruefe('JSON null → Standardansicht (Zugriff auf null wirft, catch fängt)', vorliebenLesen('kalender'), LEER)
 speicher.set('vorlieben', JSON.stringify({ favoritesOnly: 'true', discAus: 1, kostenlosOnly: true, fremd: true, zweitanbieterExcluded: true }))
-pruefe('nur echtes true zählt, fremde Schlüssel fallen weg', vorliebenLesen(), { ...LEER, kostenlosOnly: true, zweitanbieterExcluded: true })
+pruefe('nur echtes true zählt, fremde Schlüssel fallen weg', vorliebenLesen('kalender'), { ...LEER, kostenlosOnly: true, zweitanbieterExcluded: true })
 g.localStorage = gesperrt
-pruefe('gesperrter Speicher → Standardansicht', vorliebenLesen(), LEER)
+pruefe('gesperrter Speicher → Standardansicht', vorliebenLesen('kalender'), LEER)
 g.localStorage = offen
 speicher.clear()
 
@@ -76,28 +76,28 @@ pruefe('Einschluss disc ist kein discAus', vorliebenAus(discEin).discAus, false)
 pruefe('Schalter wandern 1:1', vorliebenAus({ ...EMPTY_FILTERS, confirmedOnly: true, availableExcluded: true }), { ...LEER, confirmedOnly: true, availableExcluded: true })
 
 // Nachführen
-vorliebenNachfuehren(EMPTY_FILTERS, EMPTY_FILTERS)
+vorliebenNachfuehren('kalender', EMPTY_FILTERS, EMPTY_FILTERS)
 pruefe('ohne Änderung kein Schreibzugriff', schreibzugriffe, 0)
-pruefe('ohne Änderung kein Eintrag', speicher.has('vorlieben'), false)
+pruefe('ohne Änderung kein Eintrag', speicher.has('vorlieben.kalender'), false)
 
-vorliebenNachfuehren(EMPTY_FILTERS, mitDisc)
+vorliebenNachfuehren('kalender', EMPTY_FILTERS, mitDisc)
 pruefe('Disc ausblenden wird gemerkt', gemerkt(), { ...LEER, discAus: true })
 
 // Push-Adresse schaltet favoritesOnly ein (vorher und nachher gleich), daneben wird kostenlosOnly umgelegt.
 const perAdresse = { ...mitDisc, favoritesOnly: true }
-vorliebenNachfuehren(perAdresse, { ...perAdresse, kostenlosOnly: true })
+vorliebenNachfuehren('kalender', perAdresse, { ...perAdresse, kostenlosOnly: true })
 pruefe('Adress-Filter wird keine Vorliebe, nur der umgelegte Schalter', gemerkt(), { ...LEER, discAus: true, kostenlosOnly: true })
 
 const vorZaehler = schreibzugriffe
-vorliebenNachfuehren(EMPTY_FILTERS, mitDisc)
+vorliebenNachfuehren('kalender', EMPTY_FILTERS, mitDisc)
 pruefe('Änderung, die schon gemerkt ist, schreibt nicht', schreibzugriffe, vorZaehler)
 
-vorliebenNachfuehren(mitDisc, EMPTY_FILTERS)
+vorliebenNachfuehren('kalender', mitDisc, EMPTY_FILTERS)
 pruefe('Ausschalten wird gemerkt, Rest bleibt', gemerkt(), { ...LEER, kostenlosOnly: true })
 
 g.localStorage = gesperrt
 try {
-  vorliebenNachfuehren(EMPTY_FILTERS, mitDisc)
+  vorliebenNachfuehren('kalender', EMPTY_FILTERS, mitDisc)
   pruefe('gesperrter Speicher wirft nicht', true, true)
 } catch (e) {
   pruefe('gesperrter Speicher wirft nicht', String(e), 'kein Fehler')

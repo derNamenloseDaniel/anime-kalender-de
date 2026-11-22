@@ -30,8 +30,9 @@ gelesen: '2026-11-20'
 titel:
 - anilistId: 158871
   titel: "Pokémon Horizonte"
+  basis: 4
   staffeln:
-    - { nr: 1, von: 1, bis: 45, folgen: 45 }
-    - { nr: 2, von: 46, bis: 89, folgen: 44 }
-    - { nr: 3, von: 90, bis: 136, folgen: 47 }
+    - { nr: 1, von: 1, bis: 45, folgen: 45, kennung: 7000001 }
+    - { nr: 2, von: 46, bis: 89, folgen: 44, kennung: 7000002 }
+    - { nr: 3, von: 90, bis: 136, folgen: 47, kennung: 7000003 }
     - { nr: 4, von: 137, offen: true }

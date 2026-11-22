@@ -265,6 +265,20 @@ async function fall() {
   pruefe('Klick sendet genau eine Meldung mit Deutsch', s.meldungen.length === 1 && sprachen[0]?.includes('de|Deutsch'), sprachen)
   pruefe('Meldung trägt die Titelseite des Films', s.meldungen[0]?.url === 'https://www.netflix.com/title/81234', s.meldungen[0]?.url)
 
+  /* Takt zeichnet neu: nach „gesendet“ gesperrt, ein zweiter Klick meldet nichts (Doppelmeldung = D1-Schreibzeilen). */
+  s.run('knopfZeigen()')
+  const gesperrt = s.run('knopf')
+  pruefe('nach dem Neuzeichnen gesperrt und Meldung bestätigt', gesperrt.disabled === true && /gemeldet/.test(gesperrt.textContent), { d: gesperrt.disabled, t: gesperrt.textContent })
+  s.klick(gesperrt)
+  await s.warte()
+  pruefe('zweiter Klick löst keine Meldung aus', s.meldungen.length === 1, s.meldungen.length)
+  gesperrt.disabled = false
+  gesperrt.setAttribute('aria-disabled', 'true')
+  gesperrt.ariaDisabled = 'true'
+  s.klick(gesperrt)
+  await s.warte()
+  pruefe('aria-disabled sperrt ebenfalls (auch ohne disabled)', s.meldungen.length === 1, s.meldungen.length)
+
   const stumm = await zeichne('/title/81234', FILM, '81234', "[{ code: 'ja', name: 'Japanisch' }]")
   const kd = stumm.run('knopf')
   const keinDeutsch = kd.disabled === false && kd.classList.contains('ak-nein') && kd.textContent === 'Film melden — kein Deutsch'

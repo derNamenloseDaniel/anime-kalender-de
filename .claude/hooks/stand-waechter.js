@@ -127,7 +127,7 @@ function liesDatei(pfad) {
 }
 
 /** Meldungen zum Aufbau einer Jetzt-Datei: Kennung in der ersten Überschrift, `##`-Abschnitte je genau einmal in fester Reihenfolge (Archiv darf fehlen). */
-function dateiAufbau(kennung, text, mtime = null) {
+function dateiAufbau(kennung, text, mtime) {
   const zeilen = text.split(/\r?\n/)
   const titel = zeilen.find((z) => /^# /.test(z)) || ''
   const meldungen = []

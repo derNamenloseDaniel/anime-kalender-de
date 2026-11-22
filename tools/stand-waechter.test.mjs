@@ -218,7 +218,7 @@ const STAND_ZEILE = '*Stand: 20.10.2026 11:30*'
 const GUT = '# F7 Titel\n' + STAND_ZEILE + '\n\n## Deine Aufgabe\nx\n## Worum es geht\nx\n## Warum ich es nicht selbst tue\nkann nicht: x\n## Archiv\nx\n'
 const jetztStand = (zeile) => ['# Stand', '## Daniel-Todo', '### Jetzt', zeile, '### Später', '', `## In Arbeit${FRISCH}`, '', '## Als Nächstes', ...hand(40, '🔵 '), ''].join('\n')
 const ZEILE = '- 🟠 **F7 Frage** — [Datei](file:///C:/code/ai/jetzt-f7.md) {eigen · normal · - · 01.10.}'
-const mitDatei = (inhalt, mtime = null) => w.waechter(jetztStand(ZEILE), JETZT, () => true, (p) => (p === 'C:/code/ai/jetzt-f7.md' ? inhalt : null), () => mtime)
+const mitDatei = (inhalt, mtime = null) => w.waechter(jetztStand(ZEILE), JETZT, () => true, (p) => (p === 'C:/code/ai/jetzt-f7.md' ? inhalt : null), (p) => (p === 'C:/code/ai/jetzt-f7.md' ? mtime : 123))
 assert.equal(mitDatei(GUT), '', 'Jetzt-Datei gut')
 const OHNE_GRUND = 'Jetzt-Datei F7: Abschnitt „Warum ich es nicht selbst tue“ nennt kein „kann nicht“, „darf nicht“ oder „soll nicht“'
 assert.equal(mitDatei(GUT.replace('kann nicht: x', 'x')), OHNE_GRUND, 'Warum-Abschnitt ohne Grund')
@@ -269,6 +269,11 @@ assert.equal(mitDatei(MIT_BEFEHL), BEFEHLSMELDUNG, 'git reset ohne ⚠-Zeile')
 for (const befehl of ['git restore a', 'git clean -fd', 'git push origin x', 'rm -rf x', 'DNS-Eintrag setzen', 'DROP TABLE t', 'DELETE FROM t', 'wrangler d1 execute']) {
   assert.equal(mitDatei(GUT.replace('## Worum es geht\nx', '## Worum es geht\n' + befehl)), BEFEHLSMELDUNG, befehl)
 }
+assert.equal(
+  mitDatei(MIT_BEFEHL.replace(STAND_ZEILE + '\n', '').replace('kann nicht: x', 'x')),
+  [OHNE_GRUND, STAND_FEHLT, BEFEHLSMELDUNG].join('; '),
+  'Reihenfolge: Grund, Stand, Befehl',
+)
 assert.equal(mitDatei(GUT.replace('## Worum es geht\nx', '## Worum es geht\ngit status und git commit')), '', 'harmlose Git-Befehle')
 assert.equal(mitDatei(MIT_BEFEHL.replace('## Worum', '> ⚠ **Kann veraltet sein:** nur wenn der Zweig unverändert ist\n\n## Worum')), '', 'Kann-veraltet-Zeile genügt')
 assert.equal(mitDatei(MIT_BEFEHL.replace('## Worum', '> ⚠ **Verfallen:** nach dem 30.11.\n\n## Worum')), '', 'Verfallen-Zeile genügt')

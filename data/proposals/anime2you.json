@@ -1,11 +1,11 @@
 {
-  "scrapedAt": "2026-11-22T13:05:52.759Z",
+  "scrapedAt": "2026-11-22T17:01:45.580Z",
   "verworfen": {
     "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 7,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "schon in einem Rubrik-Feed gelesen": 9,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 9,
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 10,
+    "schon in einem Rubrik-Feed gelesen": 8,
     "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 2,
     "Sprachhinweis älter als 45 Tage": 6
   },
@@ -44,6 +44,23 @@
         {
           "month": "2027-02",
           "context": "nächst auf Blu-ray veröffentlichen wird. Wir fassen zusammen. Release im Februar 2027 Die zweite »Campfire Cooking«-Staffel erscheint voraus"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Zweite »BOFURI-Staffel erscheint als Blu-ray-Gesamtausgabe",
+      "articleUrl": "https://www.anime2you.de/news/1074234/bofuri-staffel-2-blu-ray-gesamtausgabe/",
+      "publishedAt": "2026-11-22",
+      "category": "disc",
+      "platforms": [
+        "disc"
+      ],
+      "dates": [
+        {
+          "month": "2027-02",
+          "context": "einer Gesamtausgabe in den Handel kommt. Wir fassen zusammen. Release im Februar 2027 Die neue Gesamtausgabe der zweiten »BOFURI«-Staffel, d"
         }
       ],
       "dub": "unklar",

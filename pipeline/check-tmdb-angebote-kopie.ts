@@ -64,7 +64,7 @@ pruefe('gleicherName: true ist Zuordnungsfrage, keine Kopie', titelMitKopierterA
 const echtJw = JSON.parse(readFileSync('data/justwatch-audio.json', 'utf8')) as Record<string, JwBefundKopf>
 const echt = JSON.parse(readFileSync('data/tmdb-titles.json', 'utf8')) as Record<string, TmdbTitelEintrag>
 const roh = titelMitKopierterAnbieterliste(echtJw, echt)
-if (roh.size) console.log(`  Hinweis: ${roh.size} Kopie(n) im Rohbestand (${[...roh].join(', ')}); der Bau verwirft sie`)
+if (roh.size) console.log(`⚠ WARNUNG: ${roh.size} Kopie(n) im Rohbestand (${[...roh].join(', ')}); der Bau verwirft sie`)
 verwirfKopierteAnbieter(echt, echtJw)
 pruefe('Echter Bestand: nach dem Verwerfen keine Kopie mehr', titelMitKopierterAnbieterliste(echtJw, echt).size === 0)
 

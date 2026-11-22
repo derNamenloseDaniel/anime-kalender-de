@@ -3,5 +3,6 @@
   { "name": "Kopie: nichts wird mehr als Kopie erkannt", "aenderungen": [{ "datei": "pipeline/lib/tmdb-angebote-kopie.ts", "suche": "if (!e.ohneTreffer || !e.namenTreffer", "ersetze": "if (true || !e.namenTreffer" }], "tests": ["npx tsx pipeline/check-tmdb-angebote-kopie.ts"] },
   { "name": "Kopie: Teilmenge genügt", "aenderungen": [{ "datei": "pipeline/lib/tmdb-angebote-kopie.ts", "suche": "=== eigene", "ersetze": ".includes('')" }], "tests": ["npx tsx pipeline/check-tmdb-angebote-kopie.ts"] },
   { "name": "Kopie: auch gleicher Name gilt als Kopie", "aenderungen": [{ "datei": "pipeline/lib/tmdb-angebote-kopie.ts", "suche": " || e.namenTreffer.gleicherName", "ersetze": "" }], "tests": ["npx tsx pipeline/check-tmdb-angebote-kopie.ts"] },
+  { "name": "Kontrolle: unmutiert bleibt grün", "aenderungen": [], "tests": ["npx tsx pipeline/check-tmdb-angebote-kopie.ts"] },
   { "name": "Kopie: Liste bleibt trotz Erkennung stehen", "aenderungen": [{ "datei": "pipeline/lib/tmdb-angebote-kopie.ts", "suche": "    delete tmdbTitles[id]!.offers\n", "ersetze": "" }], "tests": ["npx tsx pipeline/check-tmdb-angebote-kopie.ts"] }
 ]

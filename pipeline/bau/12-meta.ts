@@ -1,5 +1,6 @@
 import { leseAuslieferbarePatchnotes } from '../lib/patchnotes.ts'
 import { ergaenzeStudiosAusArchiv } from './studio-aus-archiv.ts'
+import { ladeStudioVonHand, setzeStudiosVonHand } from '../lib/studio-von-hand.ts'
 import { type PlatformId, type DataMeta, type Title, type Release, type ReleaseEvent } from '../../shared/types.ts'
 
 export function baueMeta({ titles, releases, events, motnBelege }: {
@@ -8,6 +9,7 @@ export function baueMeta({ titles, releases, events, motnBelege }: {
   events: ReleaseEvent[]
   motnBelege: number
 }) {
+  setzeStudiosVonHand(titles, ladeStudioVonHand()) // Handbeleg vor dem Archiv
   ergaenzeStudiosAusArchiv(titles) // vor der Auslieferung (13-2): `slim` kopiert die Felder
   const allTitles = [...titles.values()]
   const genres = [...new Set(allTitles.flatMap((t) => t.genres))].sort((a, b) => a.localeCompare(b, 'de'))

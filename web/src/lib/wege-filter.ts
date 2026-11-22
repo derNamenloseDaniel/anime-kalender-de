@@ -74,7 +74,7 @@ export const bestehendeWege = (wege: Weg[], x: FilterState['excluded']): Weg[] =
 
 const jahreVon = (t: Title, releases: Release[]) => (releases.length ? releases.map((r) => r.year) : t.jpYear ? [t.jpYear] : [])
 
-/** Ausschluss: Ein Titel bleibt, wenn er keinen Weg hat oder mindestens einen, den kein Ausschluss trifft (R3). */
+/** Ausschluss: Ein Titel bleibt, wenn er keinen Weg hat oder mindestens einen, den kein Ausschluss trifft (Regel R3, docs/konzept/filter/umsetzungsplan.md). */
 function passtAusschluss(t: Title, releases: Release[], wege: Weg[], f: FilterState, heute: string): boolean {
   const x = f.excluded
   /* „Film ausschließen" heißt das Werk, nicht nur den Termin (Daniel, 03.09.2026). */
@@ -105,7 +105,7 @@ function dimensionen(t: Title, f: FilterState, modus: ModusVon): Dimension[] {
 }
 
 /**
- * Einschluss auf gleichem Weg (R4): Kandidaten bestehen alle Ausschlüsse und tragen in jeder ODER-Dimension
+ * Einschluss auf gleichem Weg (Regel R4, umsetzungsplan.md): Kandidaten bestehen alle Ausschlüsse und tragen in jeder ODER-Dimension
  * einen gewählten Wert; jede UND-Dimension braucht je Wert einen Zeugen unter den Kandidaten.
  * „kostenlos" verlangt zusätzlich einen kostenlosen Weg, sobald Plattformen gewählt sind.
  */
@@ -139,7 +139,7 @@ export function passtWege(t: Title, releases: Release[], f: FilterState, heute: 
 }
 
 /**
- * Die Plattform auf der Kachel: die erste, die kein Ausschluss trifft (R5). Yaiba zeigt bei „Disc aus" Joyn statt Disc.
+ * Die Plattform auf der Kachel: die erste, die kein Ausschluss trifft (Regel R5, umsetzungsplan.md). Yaiba zeigt bei „Disc aus" Joyn statt Disc.
  * Ohne Ausschluss wie bisher: erstes Release, sonst erster Stream.
  */
 export function kartenPlattform(t: Title, releases: Release[], x: FilterState['excluded']): PlatformId | undefined {

@@ -1,6 +1,7 @@
 /** Prüfsatz für tools/handlung-ueberschneidung.mjs: feste Texte, kein Netz. */
 import assert from 'node:assert/strict'
 import { findeUeberschneidungen, findeUebersetzungen, htmlZuText, istAniSearch, pruefeEintrag } from './handlung-ueberschneidung.mjs'
+import { uebersetzungsNaehe } from './handlung-fakten/uebersetzung.ts'
 
 let fehler = 0
 async function fall(name, fn) {
@@ -90,6 +91,13 @@ await fall('Übersetzung des Klappentexts: kein 5-Wort-Fund, aber Übersetzungsv
 
 await fall('eigener Text bleibt ohne Verdacht (knapp unter der Schwelle, im Längenfenster)', () => {
   assert.deepEqual(findeUebersetzungen(EIGEN_102501, [{ name: 'AniList', text: ANILIST_102501 }]), [])
+})
+
+await fall('uebersetzung.ts: gleiche Anker, aber Länge außerhalb des Fensters (Kurzfassung) ist kein Verdacht', () => {
+  const m = uebersetzungsNaehe('Riko und Reg erkunden den Abyss.', ANILIST_101343)
+  assert.equal(m.verdacht, false)
+  assert.ok(m.laengenverhaeltnis < 0.75)
+  assert.equal(uebersetzungsNaehe('', ANILIST_101343).verdacht, false)
 })
 
 await fall('pruefeEintrag meldet die Übersetzung samt Zahlen', async () => {

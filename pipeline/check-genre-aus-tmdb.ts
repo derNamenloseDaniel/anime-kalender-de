@@ -37,8 +37,20 @@ pruefe('Zusicherung meldet Kennzeichen ohne Genre', genreQuelleFehler([{ id: 9, 
 
 console.log('\nGenre aus TMDB: jede Zeile der Tabelle, Echtfall, Zählung, Einbau')
 const ERWARTET: Record<number, string> = {
-  12: 'Adventure', 14: 'Fantasy', 18: 'Drama', 27: 'Horror', 28: 'Action', 35: 'Comedy', 53: 'Thriller', 80: 'Crime', 878: 'Sci-Fi', 9648: 'Mystery',
-  10402: 'Music', 10749: 'Romance', 10759: 'Action,Adventure', 10765: 'Sci-Fi,Fantasy',
+  12: 'Adventure',
+  14: 'Fantasy',
+  18: 'Drama',
+  27: 'Horror',
+  28: 'Action',
+  35: 'Comedy',
+  53: 'Thriller',
+  80: 'Crime',
+  878: 'Sci-Fi',
+  9648: 'Mystery',
+  10402: 'Music',
+  10749: 'Romance',
+  10759: 'Action,Adventure',
+  10765: 'Sci-Fi,Fantasy',
 }
 for (const [id, soll] of Object.entries(ERWARTET)) pruefe(`TMDB ${id} → ${soll}`, genresAusTmdb([16, Number(id)]).join() === soll, genresAusTmdb([16, Number(id)]))
 pruefe('Tabelle hat genau diese Zeilen', Object.keys(TMDB_GENRE).length === Object.keys(ERWARTET).length)

@@ -6,6 +6,7 @@
 import type { Title } from '../shared/types.ts'
 import { endeNummer, erschieneneFolgen } from './bau/folgen-dateien.ts'
 import { mitFremdTiteln, type TitelQuellen } from './bau/folgentitel-stufen.ts'
+import { verlaengereBisFolgenzahl } from './bau/folgentitel-verlaengern.ts'
 import { tmdbFolgentitel, type TmdbFolge } from './bau/folgentitel-tmdb.ts'
 
 let verletzt = 0
@@ -39,6 +40,12 @@ pruefe('vorhandene Titel bleiben', lang?.[0].de === 'T1-1')
 const fremd = tmdb8.map((f) => ({ ...f, titel: `Ganz anders ${f.e}` }))
 pruefe('Nummern stimmen nicht überein (Titel verschoben): Liste bleibt kurz', mitFremdTiteln(serie(), liste(6, 6), quellen(fremd))?.length === 6)
 pruefe('nur zwei benannte Folgen sind keine Gegenprobe: Liste bleibt kurz', mitFremdTiteln(serie(), liste(6, 2), quellen(tmdb8))?.length === 6)
+const tmdbTitel = new Map(tmdb8.map((f) => [f.e, f.titel as string] as const))
+const eigene6 = new Map([...tmdbTitel].filter(([nr]) => nr <= 6))
+const mitLuecke = [1, 2, 3, 4, 5, 7, 8, 9].map((nr) => ({ nr, de: `T1-${nr}` }))
+pruefe('Liste mit Nummernlücke, aber so lang wie die Folgenzahl: unverändert', verlaengereBisFolgenzahl(serie(), mitLuecke, tmdbTitel, new Map(mitLuecke.map((x) => [x.nr, x.de] as const)))?.length === 8)
+const tmdbZuLang = new Map([...tmdbTitel, [9, 'T1-9'], [10, 'T1-10']])
+pruefe('TMDB-Nummern über der Folgenzahl kommen nicht dazu', verlaengereBisFolgenzahl(serie(), liste(6, 6), tmdbZuLang, eigene6)?.map((x) => x.nr).join() === '1,2,3,4,5,6,7,8')
 pruefe('ohne Folgenzahl keine Verlängerung', mitFremdTiteln(serie({ episodes: undefined }), liste(6, 6), quellen(tmdb8))?.length === 6)
 const mitFalschen = (falsch: number) => liste(6, 5).map((x, i) => (i < falsch ? { ...x, de: `Ganz anders ${i}` } : x))
 pruefe('4 von 5 benannten Folgen stimmen (Grenze): Verlängerung', mitFremdTiteln(serie(), mitFalschen(1), quellen(tmdb8))?.length === 8)
@@ -50,7 +57,7 @@ pruefe('ein Jahr Abstand: Titel', jahr('1987-04-01')?.size === 8)
 pruefe('zwei Jahre Abstand: nichts', jahr('1988-04-01') === undefined)
 pruefe('Gegenprobe der Nummernliste bleibt: Folgen 7 und 8 fehlen dort, also kein Titel dafür', tmdbFolgentitel(serie(), 'Beispielserie', { folgen: staffel(1, 8, '1986-04-01') }, [1, 2, 3, 4, 5, 6], new Map())?.size === 6)
 const zwei = [...staffel(1, 8, '1987-04-01'), ...staffel(2, 8, '1988-04-01')]
-pruefe('bei mehreren Staffeln gilt das Jahr genau', tmdbFolgentitel(serie({ jpYear: 1986 }), 'Beispielserie', { folgen: zwei }, [], new Map()) === undefined)
+pruefe('bei mehreren Staffeln gilt das Jahr genau', tmdbFolgentitel(serie({ jpYear: 1986 }), 'Beispielserie', { folgen: zwei }, [1, 2, 3, 4, 5, 6, 7, 8], new Map()) === undefined)
 
 console.log('\nStaffelsumme bei bekannter Folgenzahl')
 const bon = [...staffel(1, 6, '2024-01-01'), ...staffel(2, 6, '2024-07-01')]
@@ -61,6 +68,7 @@ pruefe('ohne vorhandene Titel keine Verkettung', tmdbFolgentitel(serie({ jpYear:
 pruefe('Beginnjahr ohne Treffer (Staffel 1 beginnt 2024, wir 2023): nichts', tmdbFolgentitel(serie({ jpYear: 2023, episodes: 12 }), 'Beispielserie', { folgen: bon }, [], vorh) === undefined)
 const verschoben = new Map([[1, 'T1-4'], [2, 'T1-5'], [3, 'T1-6']])
 pruefe('vorhandene Titel gehören zu anderen Nummern (verschoben): nichts', tmdbFolgentitel(serie({ jpYear: 2024, episodes: 12 }), 'Beispielserie', { folgen: bon }, [], verschoben) === undefined)
+pruefe('Staffelsumme mit nur zwei benannten Folgen: keine Gegenprobe, nichts', tmdbFolgentitel(serie({ jpYear: 2024, episodes: 12 }), 'Beispielserie', { folgen: bon }, [], new Map([[1, 'T1-1'], [2, 'T1-2']])) === undefined)
 pruefe('Summe passt nicht (11): nichts', tmdbFolgentitel(serie({ jpYear: 2024, episodes: 11 }), 'Beispielserie', { folgen: bon }, [], vorh) === undefined)
 
 if (verletzt) {

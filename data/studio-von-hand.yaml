@@ -1,5 +1,5 @@
 # Studios von Hand für Titel, die AniList ohne Studio führt und das aniSearch-Archiv nicht ergänzt (`pipeline/lib/studio-von-hand.ts`, in `bau/12-meta.ts` vor dem Archiv).
-# Ein vorhandenes Studio wird nie ersetzt. Schreibweise wie im Bestand (AniList: „bones“, „david production“). Je Titel 1 bis 3 Studios, mindestens eine https-Quelle (Abruf 22.11.2026).
+# Ein vorhandenes Studio wird nie ersetzt. Schreibweise wie im Bestand (AniList: „bones film“, „david production“). Je Titel 1 bis 3 Studios, mindestens eine https-Quelle (Abruf 22.11.2026).
 - id: 5090
   studios: [Artmic, Studio Nue]
   quellen:
@@ -10,9 +10,10 @@
   quellen:
     - https://en.wikipedia.org/wiki/Cencoroll
 - id: 6609
-  studios: [VOOZ Character System, Studio B Productions]
+  studios: [Studio B Productions, Bazooka Studio]
   quellen:
     - https://en.wikipedia.org/wiki/Pucca_(TV_series)
+    - https://www.thejakartapost.com/life/2018/12/10/korea-born-character-pucca-reimagined-as-3d-animation
 - id: 10763
   studios: [Seoul Donghwa]
   quellen:
@@ -32,9 +33,10 @@
   quellen:
     - https://myanimelist.net/anime/39605
 - id: 211711
-  studios: [bones]
+  studios: [bones film]
   quellen:
-    - https://animecorner.me/db/anime/my-hero-academia-i-am-a-hero-too
+    - https://myanimelist.net/anime/64107
+    - https://www.animeexplained.com/news/the-complete-my-hero-academia-ending-will-be-adapted-soon/
 - id: 10006994
   studios: [A-1 Pictures]
   quellen:

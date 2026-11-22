@@ -31,6 +31,7 @@ import { tonDerKanalWege } from './deutsch-nicht-gegen-sprach-termin.ts'
 import { schliesseSpaeteLuecken } from './urteil-schliesst-luecken.ts'
 import { log } from '../lib/util.ts'
 import { type IstTot } from '../lib/adresse-tot.ts'
+import { type StaffelSammel } from './staffel-titel.ts'
 
 export function schreibeDatensatz({
   allTitles,
@@ -66,7 +67,7 @@ export function schreibeDatensatz({
   /** Suchadressen, die der Bau entfernt hat; die Liste entsteht erst hier, im Endzustand. */
   suchOffen: OffeneSuche[]
   meta: DataMeta
-}) {
+}, staffelSammel: StaffelSammel[] = []) {
   /* Der vorige Bestand muss vor dem ersten Schreiben von titles.json gelesen werden (`13-3-listen`). */
   const bekannteSeiten = bekannteSeitenAusBestand()
   const { trenneQuelle, synopses, annKennungen, trailer } = schreibeSynopsenUndReichereAn({
@@ -107,7 +108,7 @@ export function schreibeDatensatz({
   ergaenzeAngebotTermine({ events, releases, ab: releasesVorAngebot, slim, titles })
   schreibeKinoZuletzt(titles, tmdbTitles)
 
-  schreibeZusatzdateien({ titles, anisearch, slim, verschoben, releases, synopses, jpStartAnzeige })
+  schreibeZusatzdateien({ titles, anisearch, slim, verschoben, releases, synopses, jpStartAnzeige, staffelSammel })
   bereinigePruefliste(slim)
   schreibeLueckenTitel(slim, synopses)
   ordneCartoonsZuAnime()

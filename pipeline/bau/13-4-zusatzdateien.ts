@@ -2,6 +2,7 @@ import { readJson, writeJson, log, clearDir } from '../lib/util.ts'
 import { OUT } from './grundlagen.ts'
 import { schreibeOhneSynchro, schreibeNeuMitSynchro, schreibeMeldungen } from './nebendateien.ts'
 import { schreibeFolgenDateien } from './folgen-dateien.ts'
+import { type StaffelSammel } from './staffel-titel.ts'
 import {
   SYNOPSIS_GROUPS,
   type DiscAusgabe,
@@ -35,7 +36,7 @@ function fruehesterDeutscherStart(releases: Release[]): Map<number, string> {
   return deStart
 }
 
-export function schreibeZusatzdateien({ titles, anisearch, slim, verschoben, releases, synopses, jpStartAnzeige }: {
+export function schreibeZusatzdateien({ titles, anisearch, slim, verschoben, releases, synopses, jpStartAnzeige, staffelSammel = [] }: {
   titles: Map<number, Title>
   anisearch: Record<string, AnisearchEintrag>
   slim: SlimTitel[]
@@ -43,7 +44,7 @@ export function schreibeZusatzdateien({ titles, anisearch, slim, verschoben, rel
   releases: Release[]
   synopses: Record<number, SynopsisEintrag>
   jpStartAnzeige: Map<number, string>
-}) {
+} & { staffelSammel?: StaffelSammel[] }) {
   /*
     **Weitere Namen für die Suche — eine eigene Datei, geladen erst in der Datenbank.**
 
@@ -87,7 +88,7 @@ export function schreibeZusatzdateien({ titles, anisearch, slim, verschoben, rel
     deutscheReihe,
     new Set(releases.map((r) => r.titleId)),
   )
-  schreibeNeuMitSynchro(slim, releases); schreibeFolgenDateien([...titles.values()], releases); ergaenzeCoverGross(synopses, slim); schreibeSaisonDatei(titles, releases); schreibeAnisearchOffen(slim)
+  schreibeNeuMitSynchro(slim, releases); schreibeFolgenDateien([...titles.values()], releases, staffelSammel); ergaenzeCoverGross(synopses, slim); schreibeSaisonDatei(titles, releases); schreibeAnisearchOffen(slim)
   // Synopsen in Gruppen statt in einer Datei.
   //
   // Vorher lag alles in `synopses.json`: 3,8 MB, die beim ersten Öffnen eines

@@ -32,6 +32,8 @@ import { englischeTitel, ohneEnglischeTitel } from './folgentitel-englisch.ts'
 import { folgenZeilen } from './folgentitel-zeilen.ts'
 import { eineZeileJeNummer } from './folgen-nummern.ts'
 import { ohneWikiVersatz } from './folgen-wiki-versatz.ts'
+import { sammelSicht, schreibeFolgenEintrag } from './staffel-folgen-schreiben.ts'
+import type { StaffelSammel } from './staffel-titel.ts'
 import { ladeStaffelGrenzen, letzteFolgen, mitStapelFolgen, offeneStaffeln, staffelFeld, staffelListen, zaehleFolgen } from '../lib/pokemon-staffeln.ts'
 
 interface Folge {
@@ -106,7 +108,9 @@ export function ohneUnuebersetzte(t: Title, f: Folge[] | undefined, asFolgen: Fo
   return ohneEnglischeTitel(f, asDe, englischeTitel(q.kitsu[String(t.id)], q.tmdbFolgen[String(t.id)], asFolgen))
 }
 
-export function schreibeFolgenDateien(titel: Title[], releases: Release[]): void {
+export function schreibeFolgenDateien(nachSchnitt: Title[], releasesNachSchnitt: Release[], staffelSammel: StaffelSammel[] = []): void {
+  const { titel, releases } = sammelSicht(nachSchnitt, releasesNachSchnitt, staffelSammel)
+  const sammelJeId = new Map(staffelSammel.map((s) => [s.plan.sammel, s]))
   const roh = readJson<Record<string, { folgen?: Folge[] }>>('data/anisearch-folgen.json', {})
   const zuordnung = ladeAnisearchAbruf<{ anisearchId?: number }>()
   const wiki = readJson<WikiListe>('data/wikipedia-folgen.json', {}).titel ?? {}
@@ -146,15 +150,14 @@ export function schreibeFolgenDateien(titel: Title[], releases: Release[]): void
     /* Titel mit Staffelgrenzen: erschienene Stapel-Termine mit Folgennummer zählen deutsch (Horizonte Staffel 4). */
     const de = letzte.has(t.id) ? mitStapelFolgen(deWege, releasesJeTitel.get(t.id) ?? [], heute) : deWege
     const z = zaehleFolgen(f.map((x) => x.nr), de, letzte.get(t.id))
-    zaehlung[t.id] = offen.has(t.id) ? [...z, 1] : z
-    writeJson(`${ordner}/${t.id}.json`, {
+    const datei = {
       f: folgenZeilen(f, einheitlich),
       de,
       ...(einheitlich ? { min: einheitlich } : {}),
       ...staffelFeld(staffeln, t.id),
-      ...(hinweise.some((h) => h.anilistId === t.id) ? { h: hinweise.filter((h) => h.anilistId === t.id).map((h) => [h.folge, h.text]) } : {}),
-    })
-    index.push(t.id)
+      ...(hinweise.some((h) => h.anilistId === t.id) ? { h: hinweise.filter((h) => h.anilistId === t.id).map((h): [number, string] => [h.folge, h.text]) } : {}),
+    }
+    schreibeFolgenEintrag(ordner, t.id, datei, offen.has(t.id) ? [...z, 1] : z, sammelJeId.get(t.id), { index, zaehlung })
     folgenGesamt += f.length
   }
   writeJson(`${ordner}/index.json`, index.sort((a, b) => a - b))

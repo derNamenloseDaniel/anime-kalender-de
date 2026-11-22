@@ -1,0 +1,5 @@
+kategorie: bugfix
+text: One Piece Log und Cyborg 009 zeigen deutsche Synchro
+untertitel: "Auf Deutsch seit dem 01.01.2026 bzw. 10.02.2017"
+wartetAuf: "Bestandsbau nach diesem PR. Probe: In public/data/titles.json haben die Kennungen 183423 und 87481 dubConfidence normal statt low und deErstausgabe.von 2026-01-01 bzw. 2017-02-10."
+seit: '2026-11-22'

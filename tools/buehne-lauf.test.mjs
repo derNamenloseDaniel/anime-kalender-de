@@ -7,7 +7,7 @@ import assert from 'node:assert/strict'
 import { mkdtemp, readdir, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
-import { cli, lauf as messe, schreibeBasis } from './buehne-messen.mjs'
+import { cli, lauf as messe, neueBefunde, schreibeBasis } from './buehne-messen.mjs'
 import { deckung } from './buehne-basis-warnung.mjs'
 import { readFileSync } from 'node:fs'
 import { lauf as bilder } from './buehne-bilder.mjs'
@@ -296,6 +296,19 @@ async function bilderMit(optionen) {
 {
   const { exit } = await bilderMit({ bricht: () => false, fremde: ['http://x.test/a'] })
   assert.equal(exit, 1)
+}
+
+/* Kachelknöpfe bei leerem Vorher (Filterkonzept, 22.11.2026): Blendet ein Filter den Titel im Vorher aus, sind die Kachelknöpfe der App im Nachher nicht neu;
+   die Ausnahme ist eng — nur diese zwei Knöpfe, nur ohne Kachel im Vorher, nie beim Kontrast. */
+{
+  const knopf = (name, w, h) => ({ schluessel: `button „${name}“`, w, h })
+  const nachher = { tipp: [knopf('Details zu Yaiba', 1, 1), knopf('Als Favorit merken', 28, 28), knopf('Quellen', 43, 16)], kontrast: [{ schluessel: 'span „·“', verhaeltnis: '3.2', soll: '4.5' }] }
+  const leer = { tipp: [knopf('Quellen', 43, 16)], kontrast: [] }
+  const schluessel = (r) => r.map(({ art, f }) => `${art}:${f.schluessel}`)
+  assert.deepEqual(schluessel(neueBefunde(nachher, leer, undefined)), ['kontrast:span „·“'], 'Vorher ohne Kachel: Kachelknöpfe nicht neu, Kontrast und andere Knöpfe schon')
+  assert.deepEqual(schluessel(neueBefunde({ tipp: [knopf('Quellen', 43, 16), knopf('Impressum', 63, 16)], kontrast: [] }, leer, undefined)), ['tipp:button „Impressum“'], 'andere Knöpfe bleiben neu')
+  const mitKachel = { tipp: [knopf('Details zu Anderer Titel', 1, 1), knopf('Quellen', 43, 16)], kontrast: [] }
+  assert.deepEqual(schluessel(neueBefunde({ tipp: [knopf('Details zu Anderer Titel', 1, 1), knopf('Als Favorit merken', 28, 28)], kontrast: [] }, mitKachel, undefined)), ['tipp:button „Als Favorit merken“'], 'Vorher mit Kachel: ein Kachelknopf, den das Vorher nicht zeigt, bleibt neu')
 }
 
 console.log('ok  buehne-lauf: 4 Fälle Messen (Kontrolle, Scheibe mit Gruppe und leere Scheibe, Wiederholung ohne Doppelung, zweimal Absturz), 6 Fälle Basis (App-Befund gegen main rot/grün, nur Vorher, erste Variante, Tippziel themenunabhängig, Basis schreiben), Deckung leer/dünn/80-%-Grenze, schreibeBasis Exit 1 bei Absturz und leerer Messung, Nachmessung flackernder Befund, 3 Fälle Bilder (Kontrolle, zweimal Absturz, fremde Anfrage)')

@@ -15,6 +15,8 @@ const WEICHEN = [
   { importeur: '/web/src/components/kalender/PosterKarte.tsx', quelle: './Marken.tsx', ziel: './weichen/marken.tsx' },
   { importeur: '/web/src/components/DatabaseView.tsx', quelle: './filter/DbWerkzeug.tsx', ziel: './weichen/db-werkzeug.tsx' },
   { importeur: '/web/src/components/DatabaseView.tsx', quelle: './db-bedienung.tsx', ziel: './weichen/db-bedienung.tsx' },
+  { importeur: '/web/src/lib/filters.ts', quelle: './wege-filter.ts', ziel: './weichen/wege-filter.ts' },
+  { importeur: '/web/src/lib/router.ts', quelle: './vorlieben.ts', ziel: './weichen/vorlieben.ts' },
   { importeur: '/web/src/components/db-bedienung.tsx', quelle: './db-kopfzeile.tsx', ziel: './weichen/db-kopfzeile.tsx' },
   { importeur: '/web/src/components/filter/DbWerkzeug.tsx', quelle: '../db-kopfzeile.tsx', ziel: './weichen/db-kopfzeile.tsx' },
   { importeur: '/web/src/components/detail/antwort-bereich.tsx', quelle: './wege-zeilen.tsx', ziel: './weichen/wege-zeilen.tsx' },

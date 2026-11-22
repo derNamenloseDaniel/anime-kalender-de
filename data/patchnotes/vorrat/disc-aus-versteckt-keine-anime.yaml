@@ -1,0 +1,5 @@
+kategorie: bugfix
+text: Disc ausblenden versteckt keine Anime mehr
+untertitel: Yaiba bleibt sichtbar; Kalender und Datenbank filtern getrennt
+wartetAuf: "Merge und Deploy von PR 4609, danach Yaiba in der Datenbank mit Disc aus prüfen."
+seit: '2026-11-22'

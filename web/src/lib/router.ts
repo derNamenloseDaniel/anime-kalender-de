@@ -10,7 +10,7 @@ import {
 } from './filters.ts'
 import { FSK_COLORS, PLATFORMS, RELEASE_TYPES, STATUS_LABEL } from '@shared/types.ts'
 import { todayIso } from '@shared/time.ts'
-import { vorliebenLesen, vorliebenNachfuehren } from './vorlieben.ts'
+import { filterAusVorlieben, vorliebenLesen, vorliebenNachfuehren, type Ansicht } from './vorlieben.ts'
 import { kalenderBasis } from './kalender-filter.ts'
 import { HERKUENFTE } from './herkunft.ts'
 import { ohneEcchiGenre } from './ecchi.ts'
@@ -18,6 +18,8 @@ import { wertungAusAdresse, wertungInAdresse } from './filter-wertung.ts'
 
 /** Woche und Monat haben ihre Filter nicht in der Adresse (`kalender-filter.ts`). */
 const istKalender = (view: ViewId): boolean => view === 'woche' || view === 'monat'
+/** Welchem Vorlieben-Speicher die Ansicht gehört (`vorlieben.ts`). */
+const ansichtVon = (view: ViewId): Ansicht => (istKalender(view) ? 'kalender' : 'datenbank')
 
 export type ViewId =
   | 'woche'
@@ -179,17 +181,17 @@ export function parseHash(hash: string): AppRoute {
     Die Schnellfilter kommen aus den Vorlieben im Browser. Eine Adresse mit `fav=1` & Co. (Push, alte Links)
     schaltet sie für diese Ansicht zusätzlich ein; sie wird nie mehr geschrieben (`buildHash`).
   */
-  const vorlieben = vorliebenLesen()
+  const kalender = istKalender(view)
+  const vorlieben = vorliebenLesen(ansichtVon(view))
   const excluded = readLists(params, 'x')
   if (vorlieben.discAus && !excluded.releaseTypes.includes('disc')) excluded.releaseTypes = [...excluded.releaseTypes, 'disc']
-  const kalender = istKalender(view)
   /* Im Kalender zählt von der Adresse nur `fav=1` (veröffentlichte Push-Links); Suche und Filter der Datenbank gelten dort nicht. */
   const filters: FilterState = {
     ...EMPTY_FILTERS,
     ...(kalender ? {} : readLists(params, '')),
     excluded: kalender ? { ...EMPTY_FILTERS.excluded, releaseTypes: excluded.releaseTypes.filter((a) => a === 'disc') } : excluded,
     search: kalender ? '' : (params.get('q') ?? ''),
-    confirmedOnly: vorlieben.confirmedOnly || (!kalender && params.get('sicher') === '1'),
+    confirmedOnly: vorlieben.confirmedOnly,
     favoritesOnly: vorlieben.favoritesOnly || params.get('fav') === '1' || !!alt?.favoriten,
     availableOnly: vorlieben.availableOnly || (!kalender && params.get('wo') === '1') || !!alt?.verfuegbar,
     kostenlosOnly: vorlieben.kostenlosOnly || (!kalender && params.get('frei') === '1'),
@@ -447,8 +449,10 @@ export function schreiber(route: AppRoute, setRoute: (r: AppRoute) => void, umge
     const merged: AppRoute = { ...route, ...next }
     /* Die Filter der Datenbank gehen nicht in den Kalender mit, die des Kalenders nicht in die Datenbank (`App.tsx`). */
     if (istKalender(merged.view)) merged.filters = kalenderBasis(merged.filters)
-    /* Ändert sich ein Schnellfilter, wird er zur Vorliebe — vor dem Adresswechsel, den `parseHash` danach liest. */
-    vorliebenNachfuehren(route.filters, merged.filters)
+    /* Ändert sich ein Schnellfilter, wird er zur Vorliebe der Ansicht — vor dem Adresswechsel, den `parseHash` danach liest. */
+    if (ansichtVon(route.view) === ansichtVon(merged.view)) vorliebenNachfuehren(ansichtVon(merged.view), route.filters, merged.filters)
+    /* Ein Ansichtswechsel nimmt die Schnellfilter der anderen Ansicht nicht mit, sondern holt die der Zielansicht. */
+    else if (!next.filters) merged.filters = filterAusVorlieben(ansichtVon(merged.view))
     navigiere(route, next, merged, umgebung(), setRoute)
     titelNachEintrag(route, merged, typeof document === 'undefined' ? undefined : document)
   }

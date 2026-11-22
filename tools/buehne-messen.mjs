@@ -40,15 +40,22 @@ const ort = (schluessel) => schluessel.split('-').slice(1).join('-')
 
 const zeile = (art, f) => (art === 'tipp' ? `${f.schluessel} ${f.w}×${f.h} px` : `${f.schluessel} ${f.verhaeltnis}:1 (soll ${f.soll}:1)`)
 
+/** Die Kachelknöpfe der Datenbank-Liste: Details (1×1, unsichtbar über der Kachel) und Favorit (28 px). Beleg: Bühne-Messen auf main zeigt sie als bestehend in jedem Fall mit Kachel (z. B. suchhinweis-ohne-synchro). Ausnahme gilt für alle Mockups, getestet in buehne-lauf.test.mjs. */
+const KACHELKNOPF = /„(Details zu |Als Favorit merken)/
+
 /**
  * Vergleicht eine Nachher-Messung mit der Vorher-Messung derselben Stelle (`vorher`) und gibt die neuen Befunde zurück.
  * Tippziele hängen nicht vom Thema ab: Dort zählt auch das Vorher des anderen Themas (`vorherAnders`) — die ganze App zeigt
  * je nach Scrollstand einmal mehr, einmal weniger Knöpfe, z. B. „heute“.
+ * Zeigt die Vorher-Zelle keine Kachel (ein Filter blendet den Titel aus, den das Nachher zeigt), gelten die Kachelknöpfe der Liste nicht
+ * als neu: Sie kämen auch im Vorher, sobald dort eine Kachel stünde.
  */
-function neueBefunde(nachher, vorher, vorherAnders) {
+export function neueBefunde(nachher, vorher, vorherAnders) {
   const kennt = (liste) => new Set((liste ?? []).map((f) => f.schluessel))
   const bekannt = { tipp: kennt([...(vorher?.tipp ?? []), ...(vorherAnders?.tipp ?? [])]), kontrast: kennt(vorher?.kontrast) }
-  return ['tipp', 'kontrast'].flatMap((art) => nachher[art].filter((f) => !bekannt[art].has(f.schluessel)).map((f) => ({ art, f })))
+  const vorherMitKachel = [...(vorher?.tipp ?? []), ...(vorherAnders?.tipp ?? [])].some((f) => /„Details zu /.test(f.schluessel))
+  const ohneKachelknoepfe = (f) => vorherMitKachel || !KACHELKNOPF.test(f.schluessel)
+  return ['tipp', 'kontrast'].flatMap((art) => nachher[art].filter((f) => !bekannt[art].has(f.schluessel) && (art === 'kontrast' || ohneKachelknoepfe(f))).map((f) => ({ art, f })))
 }
 
 /** Neue Befunde werden einmal nachgemessen; was dabei verschwindet, war ein Zustand der Animation (Scroll, Einblenden), kein Befund. */

@@ -1178,3 +1178,58 @@
       url: https://www.anime2you.de/news/1056679/devils-crest-neuer-trailer/
     - name: AniList
       url: https://anilist.co/anime/203275
+
+- id: 103713 # Sailor Moon Eternal – Film 1 (2021, Film, ~80 min; zweiteilig, Text beschreibt die Reihe)
+  umfang: reihe
+  lizenz: CC BY-SA 4.0
+  text: >-
+    Erster Teil des Kinofilms „Sailor Moon Eternal“ (2021, rund 80 Minuten), der den vierten Handlungsbogen der Neuverfilmung „Sailor Moon Crystal“ erzählt. Es geht weiter um die Schülerin Usagi Tsukino, die als Sailor Moon gegen das Böse antritt, an ihrer Seite ihr Freund Mamoru und die Tochter aus der Zukunft, Chibiusa. Der Bogen heißt „Dead Moon“.
+  quellen:
+    - name: Wikipedia (DE)
+      url: https://de.wikipedia.org/wiki/Sailor_Moon_Crystal
+    - name: AniList
+      url: https://anilist.co/anime/103713
+
+- id: 103712 # Sailor Moon Eternal – Film 2 (2021, Film, ~80 min; zweiteilig, Text beschreibt die Reihe)
+  umfang: reihe
+  lizenz: CC BY-SA 4.0
+  text: >-
+    Zweiter Teil des Kinofilms „Sailor Moon Eternal“ (2021, rund 80 Minuten) und Abschluss des vierten Handlungsbogens der Neuverfilmung „Sailor Moon Crystal“. Im Mittelpunkt stehen weiter Usagi Tsukino als Sailor Moon, ihr Freund Mamoru und die Tochter aus der Zukunft, Chibiusa. Der Bogen heißt „Dead Moon“.
+  quellen:
+    - name: Wikipedia (DE)
+      url: https://de.wikipedia.org/wiki/Sailor_Moon_Crystal
+    - name: AniList
+      url: https://anilist.co/anime/103712
+
+- id: 119837 # Larva Island (2018, ONA, 13 Folgen à ~8 min)
+  umfang: titel
+  lizenz: CC BY-SA 4.0
+  text: >-
+    Netflix-Ableger (ab 2018) der südkoreanischen Zeichentrickserie „Larva“, produziert vom Studio TUBAn. Im Mittelpunkt stehen zwei befreundete Larven, die stumm bleiben und humorvoll, teils auch gehässig, ihre Abenteuer erleben. Die rote Larve ist gierig, die gelbe gutmütig und ruhig.
+  quellen:
+    - name: Wikipedia (DE)
+      url: https://de.wikipedia.org/wiki/Larva_(Zeichentrickserie)
+    - name: AniList
+      url: https://anilist.co/anime/119837
+
+- id: 209499 # Tank Chair (2026, TV, ~25 min je Folge; Folgenzahl offen)
+  umfang: titel
+  lizenz: CC BY-SA 4.0
+  text: >-
+    Actionserie (2026) nach dem Manga von Manabu Yashiro. Schauplatz ist Gui Cheng, eine Insel und nach Ruf die gefährlichste Stadt im Universum. Dort arbeitet Nagi als Auftragsmörder und sitzt im Rollstuhl, seit er für seine Schwester Shizuka eine Kugel abgefangen hat. Meist liegt er im Koma; spürt er Mordlust, wacht er auf und kämpft mit seinem bewaffneten Rollstuhl. Shizuka sucht Gegner, die so gefährlich sind, dass er dauerhaft wach bleibt.
+  quellen:
+    - name: Wikipedia (DE)
+      url: https://de.wikipedia.org/wiki/Tank_Chair
+    - name: AniList
+      url: https://anilist.co/anime/209499
+
+- id: 99717 # Tekkon Kinkreet Pilot (1999, Special, ~4 min)
+  umfang: titel
+  lizenz: CC BY-SA 4.0
+  text: >-
+    Kurzer Computeranimations-Pilotfilm von 1999 (rund vier Minuten) zum späteren Kinofilm „Tekkon Kinkreet“ nach Taiyō Matsumotos Manga. Michael Arias begann ihn als Übung in 3D-Grafik, Kōji Morimoto stieß dazu, und ein Team von nur zwölf Leuten setzte ihn komplett am Rechner um. Der Pilot erhielt beim Japan Media Arts Festival den Preis für Exzellenz.
+  quellen:
+    - name: Wikipedia (DE)
+      url: https://de.wikipedia.org/wiki/Tekkon_Kinkreet
+    - name: AniList
+      url: https://anilist.co/anime/99717

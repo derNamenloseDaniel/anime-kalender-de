@@ -1,3 +1,5 @@
 kategorie: bugfix
-text: „Disc aus" blendet nur noch Disc-Einträge aus, nicht mehr den ganzen Anime
-untertitel: Wer Yaiba streamen kann, findet ihn auch mit ausgeblendeter Disc. Kalender und Datenbank merken sich ihre Filter getrennt.
+text: Disc ausblenden versteckt keine Anime mehr
+untertitel: Yaiba bleibt sichtbar; Kalender und Datenbank filtern getrennt
+wartetAuf: "Merge und Deploy von PR 4609, danach Yaiba in der Datenbank mit Disc aus prüfen."
+seit: '2026-11-22'

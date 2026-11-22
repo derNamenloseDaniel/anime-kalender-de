@@ -35,10 +35,10 @@ async function beantworte(route) {
 const chip = (seite) => seite.getByRole('button', { name: `Suche: ${BEGRIFF} entfernen` })
 const adresseQ = (seite) => new URLSearchParams(seite.url().split('?')[1] ?? '').get('q')
 
-/** Am Handy liegt der Chip im Filterfenster, und das zeigt Chips nur bei einem weiteren Filter (die Suche zählt nicht mit): daher sicher=1. Am Rechner steht er im Filterfeld unten, das erst nach dem Klick auf den Filter-Knopf aufklappt (Variante A, 29.10.2026). */
+/** Am Handy liegt der Chip im Filterfenster, und das zeigt Chips nur bei einem weiteren Filter (die Suche zählt nicht mit): daher wo=1 ("sicher=1" gilt in der Datenbank seit 22.11.2026 nicht mehr). Am Rechner steht er im Filterfeld unten, das erst nach dem Klick auf den Filter-Knopf aufklappt (Variante A, 29.10.2026). */
 async function oeffne(seite, mobil) {
   await seite.goto('about:blank')
-  await seite.goto(`http://ak.test/#/datenbank?q=${BEGRIFF}${mobil ? '&sicher=1' : ''}`, { waitUntil: 'networkidle' })
+  await seite.goto(`http://ak.test/#/datenbank?q=${BEGRIFF}${mobil ? '&wo=1' : ''}`, { waitUntil: 'networkidle' })
   if (mobil) await seite.getByRole('button', { name: /^Filter/ }).first().click()
   else await seite.locator('button[data-filter-knopf]').click()
   await chip(seite).waitFor({ state: 'visible', timeout: 20_000 })

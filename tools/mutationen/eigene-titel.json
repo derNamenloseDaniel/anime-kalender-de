@@ -93,7 +93,7 @@
   { "name": "Verdrahtungs-Prüfer: Argumente nicht verglichen", "aenderungen": [{ "datei": "pipeline/lib/eigene-titel-verdrahtung.ts", "suche": ".join(', ') !== args)", "ersetze": ".join(', ') !== args && false)" }] },
   { "name": "Verdrahtungs-Prüfer: davor nicht geprüft", "aenderungen": [{ "datei": "pipeline/lib/eigene-titel-verdrahtung.ts", "suche": "if (davor && ", "ersetze": "if (false && " }] },
   { "name": "Verdrahtungs-Prüfer: Aufruf unter if zählt", "aenderungen": [{ "datei": "pipeline/lib/eigene-titel-verdrahtung.ts", "suche": "const ist = (s: ts.Statement) => ts.isExpressionStatement(s) && ts.isCallExpression(s.expression) && s.expression.expression.getText() === aufruf", "ersetze": "const ist = (s: ts.Statement) => s.getText().includes(aufruf + '(')" }] },
-  { "name": "episodes: Titel übernimmt die Folgenzahl nicht", "aenderungen": [{ "datei": "pipeline/bau/eigene-titel.ts", "suche": "...(e.episodes ? { episodes: e.episodes } : {}),", "ersetze": "" }] },
-  { "name": "episodes: Zahl unter 1 erlaubt", "aenderungen": [{ "datei": "pipeline/bau/eigene-titel.ts", "suche": "e.episodes < 1))", "ersetze": "e.episodes < 0))" }] },
-  { "name": "episodes: braucht keine datenQuelle", "aenderungen": [{ "datei": "pipeline/bau/eigene-titel.ts", "suche": " || e.episodes !== undefined\n", "ersetze": "\n" }] }
+  { "name": "episodes: Titel übernimmt die Folgenzahl nicht", "aenderungen": [{ "datei": "pipeline/bau/eigene-titel.ts", "suche": "...(e.episodes ? { episodes: e.episodes } : {}),", "ersetze": "" }], "tests": ["npx tsx pipeline/check-eigene-titel.ts"] },
+  { "name": "episodes: Zahl unter 1 erlaubt", "aenderungen": [{ "datei": "pipeline/bau/eigene-titel.ts", "suche": "e.episodes < 1))", "ersetze": "e.episodes < 0))" }], "tests": ["npx tsx pipeline/check-eigene-titel.ts"] },
+  { "name": "episodes: braucht keine datenQuelle", "aenderungen": [{ "datei": "pipeline/bau/eigene-titel.ts", "suche": " || e.episodes !== undefined\n", "ersetze": "\n" }], "tests": ["npx tsx pipeline/check-eigene-titel.ts"] }
 ]

@@ -16,7 +16,7 @@ import { STAFFEL_ID_BASIS, istStaffelTitel, staffelVonTiteln, zurueckAufSammelti
 import { bereicheDerStaffel, staffelDerFolge, staffelPlaene, teileStreams, teileTitel, teileWatchLinks, type StaffelPlan } from './lib/staffel-titel.ts'
 import { folgenDerStaffel, teileFolgenDatei } from './lib/staffel-folgen.ts'
 import { uebersetzeDatei } from './lib/ausgabe-kennung.ts'
-import { pruefeSchnitt } from './bau/staffel-titel.ts'
+import { gleicheKennungen, pruefeSchnitt } from './bau/staffel-titel.ts'
 import { sammelSicht, schreibeFolgenEintrag } from './bau/staffel-folgen-schreiben.ts'
 
 let fehler = 0
@@ -129,6 +129,10 @@ pruefe('Riegel: ev.id geändert', wirft(() => pruefeSchnitt('X', { ...gut, idsGl
 pruefe('Riegel: Wege verloren', wirft(() => pruefeSchnitt('X', { ...gut, wegeVerloren: 1 }), /in keiner Staffel/))
 pruefe('Riegel: TOGGO-Block fehlt', wirft(() => pruefeSchnitt('X', { ...gut, bloeckeNachher: 101 }), /TOGGO-Blöcke 102 vorher, 101 nachher/))
 pruefe('Riegel: fremder TOGGO-Block', wirft(() => pruefeSchnitt('X', { ...gut, fremdeBloecke: 1 }), /unbekannten Staffel/))
+pruefe('Riegel: mehrere Abweichungen stehen getrennt in einer Meldung', wirft(() => pruefeSchnitt('X', { ...gut, termineNachher: 116, fremdeBloecke: 1 }), /116 nachher; 1 TOGGO-Blöcke/))
+pruefe('Kennungen gleich: dieselben', gleicheKennungen(['a', 'b'], new Set(['b', 'a'])))
+pruefe('Kennungen: gleiche Zahl, andere Kennung → verschieden', !gleicheKennungen(['a', 'b'], new Set(['a', 'c'])))
+pruefe('Kennungen: eine fehlt → verschieden', !gleicheKennungen(['a', 'b'], new Set(['a'])) && !gleicheKennungen(['a'], new Set(['a', 'b'])))
 
 // --- Folgenliste ----------------------------------------------------------------------------------------------------------------------
 const zeilen: [number, string][] = Array.from({ length: 122 }, (_, i) => [i + 1, `Folge ${i + 1}`])

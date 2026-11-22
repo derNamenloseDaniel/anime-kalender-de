@@ -38,6 +38,11 @@ function toggoBloecke(t: Title): number {
   return (t.watchLinks ?? []).reduce((n, w) => n + (w.toggo?.length ?? 0), 0)
 }
 
+/** Dieselben Termin-Kennungen vorher und nachher (`ev.id` ist die UID im Kalender der Abonnenten). */
+export function gleicheKennungen(vorher: string[], nachher: Set<string>): boolean {
+  return vorher.length === nachher.size && vorher.every((id) => nachher.has(id))
+}
+
 /** Bricht ab, wenn der Schnitt etwas verloren hat; `fehler` nennt jede Abweichung. */
 export function pruefeSchnitt(name: string, z: { termineVorher: number; termineNachher: number; idsGleich: boolean; wegeVerloren: number; bloeckeVorher: number; bloeckeNachher: number; fremdeBloecke: number }): void {
   const fehler = [
@@ -72,7 +77,7 @@ export function teileEinenSammeltitel(
   pruefeSchnitt(plan.titel, {
     termineVorher: teil.vorher,
     termineNachher: teil.nachher,
-    idsGleich: idsVorher.length === idsNachher.size && idsVorher.every((id) => idsNachher.has(id)),
+    idsGleich: gleicheKennungen(idsVorher, idsNachher),
     wegeVerloren: teileStreams(sammel.streams ?? [], plan).verloren,
     bloeckeVorher: toggoBloecke(sammel),
     bloeckeNachher: neu.reduce((n, t) => n + toggoBloecke(t), 0),

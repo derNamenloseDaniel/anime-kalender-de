@@ -146,6 +146,8 @@ pruefe('Phase ohne Plan (Yaml ohne basis): No-op', teileStaffelTitel(unberuehrt,
 pruefe('Liste ohne „Folge in der Staffel“ (st): keine Zuordnung', staffelJeFolgentitel(wiki.map((f, i) => (i === 2 ? { nr: f.nr, dt: f.dt } : f)), plan).size === 0)
 const mitDoppelpunkt = staffelJeFolgentitel([{ nr: 1, st: 1, dt: 'Teil 1: Der Anfang des Weges' }], plan)
 pruefe('Folgentitel mit Doppelpunkt: ganzer Titel trifft, wenn der gekürzte nicht trifft', trefferFuer(mitDoppelpunkt, 'Teil 1: Der Anfang des Weges')?.folge === 1 && trefferFuer(mitDoppelpunkt, undefined) === undefined)
+const kurz = staffelJeFolgentitel([{ nr: 1, st: 1, dt: 'Kurz' }], plan)
+pruefe('kurzer Folgentitel hinter Vorspann: wörtlicher Treffer (ohne Schreibvarianten-Suche)', trefferFuer(kurz, 'Pokémon Horizonte: Kurz')?.folge === 1)
 const handTv = { ...tvRelease, slug: 'hand-tv', sendungen: undefined, schedule: { firstEpisodeDate: '2026-10-01', firstEpisodeNumber: 5, episodeCount: 2 } } as unknown as Release
 const handEv = { ...ev('2026-10-01', '09:00', 5), id: 'hand-tv@2026-10-01', releaseSlug: 'hand-tv', sichtung: undefined }
 const hand = teileTermine([handTv], [handEv], plan, sendeplatz, jeTitel)
@@ -193,6 +195,10 @@ pruefe('Phase ohne Termine ohne Treffer: Hinweis ohne ⚠', /Staffel-Titel Poké
 const fehlt = bau()
 fehlt.titles.delete(SAMMEL)
 pruefe('Phase: Sammeltitel fehlt → Hinweis im Log', /Staffel-Titel 158871: nicht im Bau, nichts geteilt/.test(ausgabe(() => teileEinenSammeltitel(plan, fehlt, { sendungen, wiki: {} }))))
+const mitLinks = bau()
+mitLinks.titles.get(SAMMEL)!.watchLinks = [{ name: 'TOGGO', url: 't', kind: 'stream', toggo: [{ staffel: 1, von: 1, bis: 3, ab: '', ende: '' }, { staffel: 2, von: 1, bis: 3, ab: '', ende: '' }] }, { name: 'Amazon', url: 'a', kind: 'buy' }] as never
+ausgabe(() => teileEinenSammeltitel(plan, mitLinks, { sendungen, wiki: {} }))
+pruefe('Phase: TOGGO-Blöcke verteilt, Kaufhinweis an jeder Staffel, Riegel zählt nur Blöcke', mitLinks.titles.get(7_000_001)!.watchLinks!.length === 2 && mitLinks.titles.get(SAMMEL)!.watchLinks!.length === 1)
 const b3 = bau()
 const alle = teileStaffelTitel(b3, { plaene: [plan], sendungen, wiki: {} })
 pruefe('teileStaffelTitel: fährt jeden Plan und gibt seinen Sammeltitel zurück', alle.length === 1 && alle[0]!.plan.sammel === SAMMEL && b3.titles.has(7_000_001))
@@ -209,6 +215,10 @@ pruefe('teileStaffelTitel: fährt jeden Plan und gibt seinen Sammeltitel zurück
     const lauf = spawnSync(process.execPath, ['--import', 'tsx', fileURLToPath(new URL('./lib/kulisse-staffel-titel.ts', import.meta.url))], { env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8', windowsHide: true, timeout: 60_000 })
     const zeile = lauf.stdout.trim().split('\n').at(-1) ?? ''
     pruefe('Ladeweg: Plan, Sichtungen und Liste aus AK_ROOT; Termin landet in Staffel 1 Folge 2', lauf.status === 0 && zeile === '{"plaene":[[7000001,158871]],"sendungen":1,"wiki":["158871"],"sammel":[158871],"termin":[[7000001,2]]}', `${lauf.status} ${zeile} ${lauf.stderr.slice(-300)}`)
+    rmSync(join(wurzel, 'data', 'tv-programm.json'))
+    rmSync(join(wurzel, 'data', 'wikipedia-folgen.json'))
+    const ohneDaten = spawnSync(process.execPath, ['--import', 'tsx', fileURLToPath(new URL('./lib/kulisse-staffel-titel.ts', import.meta.url))], { env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8', windowsHide: true, timeout: 60_000 })
+    pruefe('Ladeweg mit Plan, ohne Sichtungen und Liste: Termin bleibt ohne Folge an der Basis, kein Absturz', ohneDaten.status === 0 && ohneDaten.stdout.trim().split('\n').at(-1) === '{"plaene":[[7000001,158871]],"sendungen":0,"wiki":[],"sammel":[158871],"termin":[[158871,null]]}', ohneDaten.stdout + ohneDaten.stderr.slice(-300))
     rmSync(join(wurzel, 'data', 'curated', 'horizonte-staffeln.yaml'))
     const ohne = spawnSync(process.execPath, ['--import', 'tsx', fileURLToPath(new URL('./lib/kulisse-staffel-titel.ts', import.meta.url))], { env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8', windowsHide: true, timeout: 60_000 })
     pruefe('Ladeweg ohne Plan: nichts gelesen, nichts geteilt', ohne.status === 0 && ohne.stdout.trim().split('\n').at(-1) === '{"plaene":[],"sendungen":0,"wiki":[],"sammel":[],"termin":[[158871,1]]}', ohne.stdout + ohne.stderr.slice(-300))

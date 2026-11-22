@@ -49,14 +49,20 @@ type WikiListe = { titel?: Record<string, { folgen: { nr: number; ead?: string }
  * Nur Folgen, die schon erschienen sind. aniSearch führt auch Ankündigungen (One Piece: 1.200 Einträge, Folge 1.174 bis
  * 1.200 ohne Datum); die deutsche Wikipedia-Liste nennt 1.180 (Daniel, 04.10.2026). Die Obergrenze ist die höchste
  * Nummer mit Datum bis heute oder die höchste Wikipedia-Nummer, je nachdem was größer ist. Ohne ein einziges Datum
- * gilt die Liste, wie sie ist.
+ * gilt die Liste, wie sie ist. `endeNummer`: Bei einer abgeschlossenen Serie sind alle Folgen bis zur Folgenzahl erschienen,
+ * auch wo aniSearch nur die ersten datiert (Chuck, der schlaue Biber: Datum nur bei Folge 1 von 73).
  */
-export function erschieneneFolgen(f: Folge[], wikiHoechste: number, heute: string): Folge[] {
+export function erschieneneFolgen(f: Folge[], wikiHoechste: number, heute: string, endeNummer = 0): Folge[] {
   const gedatet = f.filter((x) => x.datum && x.datum <= heute).map((x) => x.nr)
   // Nur künftige Daten: aniSearch belegt nichts als erschienen, es bleibt die Wikipedia-Grenze.
   const ausAnisearch = gedatet.length ? Math.max(...gedatet) : f.some((x) => x.datum) ? 0 : Math.max(...f.map((x) => x.nr))
-  const bis = Math.max(ausAnisearch, wikiHoechste)
+  const bis = Math.max(ausAnisearch, wikiHoechste, endeNummer)
   return f.filter((x) => x.nr <= bis)
+}
+
+/** Folgenzahl eines abgeschlossenen Titels (Ende vor heute), sonst 0: Bis dahin gelten alle Folgen als erschienen. */
+export function endeNummer(t: Title, heute: string): number {
+  return t.jpEnd && t.jpEnd < heute ? (t.episodes ?? 0) : 0
 }
 
 /** Die Folgen mit belegter deutscher Synchro, als Bereiche. */
@@ -129,7 +135,7 @@ export function schreibeFolgenDateien(titel: Title[], releases: Release[]): void
   for (const t of titel) {
     const asId = zuordnung[String(t.id)]?.anisearchId
     const { folgen: wikiFolgen, versetzt } = ohneWikiVersatz(wiki[String(t.id)]?.folgen, roh[String(asId)]?.folgen)
-    const erschienen = asId && jeAsId.get(asId) === 1 ? erschieneneFolgen(roh[String(asId)]?.folgen ?? [], wikiFolgen?.length ? Math.max(...wikiFolgen.map((w) => w.nr)) : 0, heute) : undefined
+    const erschienen = asId && jeAsId.get(asId) === 1 ? erschieneneFolgen(roh[String(asId)]?.folgen ?? [], wikiFolgen?.length ? Math.max(...wikiFolgen.map((w) => w.nr)) : 0, heute, endeNummer(t, heute)) : undefined
     const ausAs = erschienen && eineZeileJeNummer(erschienen)
     verschmolzen += ausAs?.verschmolzen ?? 0
     const f = ohneUnuebersetzte(t, mitFremdTiteln(t, ausAs?.folgen, quellen), roh[String(asId)]?.folgen ?? [], quellen)

@@ -137,15 +137,18 @@ export function tmdbFolgentitel(titel: Title, tmdbNameDe: string | undefined, ei
   if (!titel.episodes) return absoluteTitel(titel.jpYear, eintrag.folgen, nummern, vorhanden)
   const jeStaffel = new Map<number, TmdbFolge[]>()
   for (const f of eintrag.folgen) if (f.s >= 1) jeStaffel.set(f.s, [...(jeStaffel.get(f.s) ?? []), f])
+  /* Gibt es nur eine Staffel, wäre sie bei gleichem Namen und gleicher Folgenzahl die einzige Wahl; das Beginnjahr darf dann um eins abweichen (Es war einmal … Amerika: 1991 bei AniList, 1992 bei TMDB). */
+  const einzige = jeStaffel.size === 1
   const passend = [...jeStaffel.values()].filter((fs) => {
     const jahr = Math.min(...fs.map((f) => Number(f.datum?.slice(0, 4) ?? 9999)))
-    return fs.length === titel.episodes && jahr === titel.jpYear
+    return fs.length === titel.episodes && (jahr === titel.jpYear || (einzige && Math.abs(jahr - titel.jpYear!) <= 1))
   })
-  if (passend.length !== 1) return undefined
+  /* Mehrere Staffeln, deren Summe unsere Folgenzahl ist (T・P Bon: 12 + 12 = 24), liegen hintereinander — aber nur mit drei schon benannten Folgen als Gegenprobe der Nummern. */
+  if (passend.length !== 1) return vorhanden.size < 3 ? undefined : absoluteTitel(titel.jpYear, eintrag.folgen, Array.from({ length: titel.episodes }, (_, i) => i + 1), vorhanden)
   const aus = new Map<number, string>()
   for (const f of passend[0]) {
     const t = echterTitel(f)
-    if (t && nummern.includes(f.e)) aus.set(f.e, t)
+    if (t && f.e >= 1 && f.e <= titel.episodes) aus.set(f.e, t)
   }
   return aus.size ? aus : undefined
 }

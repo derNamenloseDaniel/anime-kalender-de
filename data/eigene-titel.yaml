@@ -57,6 +57,7 @@
   genres: [Action, Sci-Fi]
   runtimeMin: 22
   jpYear: 1985
+  jpEnd: "1986-11-28" # Infobox „Finale = 28. November 1986“ (US-Erstausstrahlung), abgelesen 22.11.2026
   episodes: 75 # Infobox „Episoden = 75“ (Aniverse führt 73), abgelesen 22.11.2026
   datenQuelle: https://de.wikipedia.org/wiki/M.A.S.K. # Infobox (Länge 22, Genre Actionserie/Science-Fiction, 1985–1986), „produziert von DiC Entertainment“, abgelesen 21.11.2026
   sources: [https://www.anime2you.de/news/1065078/aniverse-november-2026-neuzugaenge/]

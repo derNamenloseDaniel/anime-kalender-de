@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-22T00:02:04.558Z",
+  "scrapedAt": "2026-11-22T01:01:52.159Z",
   "verworfen": {
     "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 7,
@@ -245,7 +245,7 @@
         }
       ],
       "dub": "unklar",
-      "alreadyCurated": false,
+      "alreadyCurated": true,
       "sammel": [
         {
           "titel": "Overlord: The Sacred Kingdom",

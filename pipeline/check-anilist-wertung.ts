@@ -53,13 +53,16 @@ pruefe('Rückfall: Wertung von AniList, gekennzeichnet', JSON.stringify(rueck(90
 pruefe('Rückfall meanScore im Bau ebenfalls gekennzeichnet', JSON.stringify(rueck(900102)) === JSON.stringify({ score: 64, scoreQuelle: 'anilist' }), rueck(900102))
 pruefe('zu wenig Stimmen: keine Wertung, keine Kennzeichnung', rueck(900103).score === undefined && rueck(900103).scoreQuelle === undefined)
 pruefe('aniSearch-Klarwert (Seite 10: 74 %, 1991 Stimmen) hat Vorrang vor AniList', JSON.stringify(rueck(900101, 10)) === JSON.stringify({ score: 74, scoreQuelle: undefined }), rueck(900101, 10))
+pruefe('aniSearch genau 5 Stimmen (Seite 1001: 36 %) gilt, 4 Stimmen (Seite 10066) fallen auf AniList zurück',
+  JSON.stringify(rueck(900101, 1001)) === JSON.stringify({ score: 36, scoreQuelle: undefined }) && JSON.stringify(rueck(900101, 10066)) === JSON.stringify({ score: 70, scoreQuelle: 'anilist' }), [rueck(900101, 1001), rueck(900101, 10066)])
+pruefe('fehlende Zwischenspeicher-Datei zählt leer, die vorhandene bleibt', ladeAnilistWertungen(['data/cache/gibt-es-nicht.json', 'data/cache/anilist-by-id.json']).get(900101)?.score === 70)
 pruefe('TMDB-Wertung (Cartoon) bleibt', JSON.stringify(rueck(900101, undefined, { score: 66, scoreQuelle: 'tmdb' })) === JSON.stringify({ score: 66, scoreQuelle: 'tmdb' }))
 pruefe('Titel ohne Eintrag: keine Wertung', rueck(900199).score === undefined)
 pruefe('bewertungNachRegel ohne AniList-Wertung und ohne Seite: leer', Object.keys(bewertungNachRegel({}, undefined)).length === 0)
 
 const alsAnilist = titel(900101, { score: 70, scoreQuelle: 'anilist', anisearchId: 10 })
 const verweise = verweiseFuer(alsAnilist)
-pruefe('Absprung der Wertung führt zu AniList, nicht zu aniSearch', verweise.length === 1 && verweise[0]?.name === 'AniList' && verweise[0].ziel === 'https://anilist.co/anime/900101', verweise)
+pruefe('Absprung der Wertung führt zu AniList, nicht zu aniSearch', verweise.length === 1 && verweise[0]?.name === 'AniList' && verweise[0].ziel === 'https://anilist.co/anime/900101' && verweise[0].hinweis === 'Bei AniList ansehen', verweise)
 pruefe('ohne Rückfall bleibt der Absprung aniSearch', verweiseFuer(titel(900101, { score: 74, anisearchId: 10 }))[0]?.name === 'aniSearch')
 
 rmSync(wurzel, { recursive: true, force: true })

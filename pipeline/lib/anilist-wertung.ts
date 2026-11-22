@@ -13,17 +13,19 @@ export function anilistWertungAus(m: Pick<AniListMedia, 'averageScore' | 'meanSc
   return score && stimmen >= MIN_STIMMEN_ANILIST ? { score, stimmen } : undefined
 }
 
+const ZWISCHENSPEICHER = ['data/cache/anilist-media.json', 'data/cache/anilist-by-id.json']
 let alle: Map<number, AnilistWertung> | undefined
 
-/** Wertungen aller Zwischenspeicher-Einträge (nach AniList-Kennung), einmal je Prozess gelesen; nur Einträge, die gelten. */
-export function ladeAnilistWertungen(): Map<number, AnilistWertung> {
-  if (alle) return alle
-  alle = new Map()
-  for (const datei of ['data/cache/anilist-media.json', 'data/cache/anilist-by-id.json']) {
+/** Wertungen aller Zwischenspeicher-Einträge (nach AniList-Kennung), einmal je Prozess gelesen; nur Einträge, die gelten. Fehlt eine Datei, zählt sie leer. */
+export function ladeAnilistWertungen(dateien = ZWISCHENSPEICHER): Map<number, AnilistWertung> {
+  if (alle && dateien === ZWISCHENSPEICHER) return alle
+  const karte = new Map<number, AnilistWertung>()
+  for (const datei of dateien) {
     for (const m of Object.values(readJson<Record<string, AniListMedia>>(datei, {}))) {
       const wertung = anilistWertungAus(m)
-      if (wertung) alle.set(m.id, wertung)
+      if (wertung) karte.set(m.id, wertung)
     }
   }
-  return alle
+  if (dateien === ZWISCHENSPEICHER) alle = karte
+  return karte
 }

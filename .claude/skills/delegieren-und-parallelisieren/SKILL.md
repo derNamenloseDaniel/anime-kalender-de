@@ -56,6 +56,8 @@ Der Auftrag ist vor dem Start vollständig (Umfang, Gegenproben, bekannte Fälle
 
 **Mutationsbeleg als Fertig-Punkt (22.11.2026, Lehre 211):** Baut ein Cloud- oder Orchester-Auftrag einen Wächter oder Test, nennt er ausdrücklich: „Fertig erst mit Mutationstabelle aus `node tools/diff-mutanten.mjs` und Beleg ‚rot an der Basis‘ im PR.“ Der Verweis auf `bauer.md` allein reicht nicht: PR 4566 und 4568 fehlten beide, beide CI-Prüfer urteilten deshalb „aendern“.
 
+**Daniels Wortlaut im Auftrag (22.11.2026, Lehre 212):** Geht ein Auftrag auf eine Meldung oder einen Wunsch von Daniel zurück, steht sein Satz wörtlich im Auftrag, und die Abnahme hält das Ergebnis dagegen, nicht gegen meine Zusammenfassung. Verwirft ein Bauer einen Weg, den der Wortlaut verlangt, geht das als F-Zeile an Daniel statt in den Merge (Horizonte: PR 4403 baute Staffelreiter statt eigener Einträge, Daniel meldete es zwei Tage später erneut).
+
 **Anfragebudget (16.11.2026, Lehre 110):** Aufträge, die über Läufe oder Logs zählen, nennen ein Anfragebudget (Richtwert 500) und laufen nacheinander; das GitHub-Stundenkontingent (5000) teilen sich alle Werkzeuge.
 
 **Vorrat-Aufträge vor der Vergabe gegen main lesen (15.11.2026, Lehre 91):** Vor jeder Vergabe aus `daniel-zum-abarbeiten/vorrat/*.md` greppe ich die genannten Bezeichner auf main und lese `daniel-zum-abarbeiten/cloud-register.json` gegen die Auftrags-ID — ein Auftrag von 01:25 war um 10:59 schon gemergt (PR 3909), trotzdem lief ein Bauer los.

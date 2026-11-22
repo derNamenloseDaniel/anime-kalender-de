@@ -405,6 +405,8 @@ Erwartet: ~301 von 307.
 | AniList | 0 von 12 haben heute ein Genre | — | — | Ausnahme |
 | (c) Franchise | 16,3 % gleich | — | — | nein |
 
+**Genre-Rest, TMDB-Rückfall (22.11.2026, Auftrag genre-rest-2211):** `bau/genre-aus-tmdb.ts` (Phase `11-wege-abschluss`) setzt für Titel ohne Genre aus AniList/aniSearch die Genres aus `genreIds` in `data/tmdb-titles.json` (Tabelle `TMDB_GENRE`, nur Animation-Treffer, mehrdeutige Zuordnungen nie) und kennzeichnet sie mit `genreQuelle: 'tmdb'` (Muster `fskQuelle`). Gemessen am committeten Datensatz: 51 offen → 41; 3 von 14 AniList/eigenen, 6 von 28 „g leer“, 1 von 5 „Ganbatte“, 0 von 4 „Unbestimmt“ (TMDB nennt dort nur Animation/Familie/Doku). Der Rest von 41 ist ohne Quelle nicht füllbar (Ausnahme, nicht raten). AniList-Gegenprobe 22.11.: 16570, 135255, 10282 haben dort `genres: []`.
+
 **wertung (108 offen; 50 AniList, 55 aniSearch-Zeilen, 3 Eigentitel)**
 
 | Weg | gemessen | Aufwand | Risiko | Empfehlung |

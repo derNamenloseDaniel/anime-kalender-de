@@ -6,6 +6,7 @@
  *   node tools/handlung-ueberschneidung.mjs --alle      alle Einträge, ein Durchlauf, Pause je Anfrage
  *   node tools/handlung-ueberschneidung.mjs --datei <yaml> <id>   andere Fassung der Datei (z. B. alter Stand)
  *
+ * Zusätzlich die Übersetzungsprobe (`handlung-fakten/uebersetzung.ts`): Klappentext übersetzt statt eigener Fassung.
  * aniSearch-Adressen werden nie abgerufen (übersprungen und gemeldet). Wikipedia: `?action=raw`
  * nach robots.txt-Prüfung, AniList: GraphQL `description`, sonst HTML ohne Tags.
  */
@@ -15,6 +16,7 @@ import { parse } from 'yaml'
 import { laengsteFolge, woerter } from './handlung-fakten/naehe.ts'
 import { istErlaubt, pruefeRobots } from './handlung-fakten/robots.ts'
 import { UA } from './handlung-fakten/typen.ts'
+import { uebersetzungsNaehe } from './handlung-fakten/uebersetzung.ts'
 import { sauber } from './handlung-fakten/wikitext.ts'
 
 export const FENSTER = 5
@@ -31,6 +33,11 @@ export function findeUeberschneidungen(text, quellen, fenster = FENSTER) {
     funde.push({ quelle: q.name, laenge: len, folge })
   }
   return funde
+}
+
+/** Fassungen, die einen Quelltext übersetzen statt ihn mit eigenen Worten zu erzählen (der Wortvergleich oben sieht keine Sprachgrenze). */
+export function findeUebersetzungen(text, quellen) {
+  return quellen.map((q) => ({ quelle: q.name, ...uebersetzungsNaehe(text, q.text) })).filter((m) => m.verdacht)
 }
 
 export const istAniSearch = (url) => /(^|\/\/|\.)anisearch\.[a-z]+(\/|$)/i.test(url)
@@ -94,12 +101,13 @@ export async function pruefeEintrag(eintrag, holeText, wartezeit = pause) {
     }
     await wartezeit(PAUSE_MS)
   }
-  return { id: eintrag.id, funde: findeUeberschneidungen(eintrag.text, quellen), uebersprungen }
+  return { id: eintrag.id, funde: findeUeberschneidungen(eintrag.text, quellen), uebersetzungen: findeUebersetzungen(eintrag.text, quellen), uebersprungen }
 }
 
 function drucke(r) {
-  console.log(`${r.funde.length ? 'FEHL' : 'OK  '} ${r.id}`)
+  console.log(`${r.funde.length || r.uebersetzungen.length ? 'FEHL' : 'OK  '} ${r.id}`)
   for (const f of r.funde) console.log(`    ${f.quelle}: ${f.laenge} Wörter gemeinsam „${f.folge}“`)
+  for (const u of r.uebersetzungen) console.log(`    ${u.quelle}: Übersetzung vermutet (Anker-Folge ${u.anteil.toFixed(2)}, Längenverhältnis ${u.laengenverhaeltnis.toFixed(2)})`)
   for (const u of r.uebersprungen) console.log(`    übersprungen ${u}`)
 }
 
@@ -118,7 +126,7 @@ async function main(argv) {
   for (const e of gewaehlt) {
     const r = await pruefeEintrag(e, (url) => quellText(url, regeln))
     drucke(r)
-    if (r.funde.length) fehl++
+    if (r.funde.length || r.uebersetzungen.length) fehl++
   }
   console.log(`${gewaehlt.length - fehl} von ${gewaehlt.length} ohne gemeinsame ${FENSTER}-Wort-Folge`)
   return fehl ? 1 : 0

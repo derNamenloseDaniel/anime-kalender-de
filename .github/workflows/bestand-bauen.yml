@@ -340,7 +340,7 @@ jobs:
               echo "DATEN_WARNUNG=${DATEN_WARNUNG}" >> "$GITHUB_ENV"
             fi
           done
-          # auto-Arten ohne Abbau seit drei Tagen (`maengel-stillstand.ts`): steht oft tagelang, darum kurz und erst in „Lauf abmelden“
+          # auto-Arten (3 Tage) und hand-Arten (7 Tage) ohne Abbau (`maengel-stillstand.ts`): steht oft tagelang, darum kurz und erst in „Lauf abmelden“
           # ans Ende der Lauf-Meldung, sonst schöbe sie spätere Warnungen aus den 160 Zeichen der Wachzeile (`laeufe-abruf.mjs`).
           if grep -q '^MAENGEL_STILLSTAND ' "$RUNNER_TEMP/qualitaet.log"; then
             still="$(grep -m1 '^MAENGEL_STILLSTAND ' "$RUNNER_TEMP/qualitaet.log" | cut -d' ' -f2-)"

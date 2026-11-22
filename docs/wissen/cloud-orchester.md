@@ -1,6 +1,6 @@
 # Cloud-Orchester — Nachtbetrieb mit Cloud-Sitzungen
 
-Stand 21.11.2026, 05:30 UTC (erste Nacht, Auftrag Issue 4420). Alle Zeiten UTC, jede Dauer aus zwei GitHub-Zeitstempeln.
+Stand 22.11.2026, 02:00 UTC (erste und zweite Nacht, Auftrag Issue 4420). Alle Zeiten UTC, jede Dauer aus zwei GitHub-Zeitstempeln.
 **Wann lesen:** bevor ein Orchester (Routine + Bauer-Sitzungen) wieder aufgesetzt wird oder Aufgaben nachts in die Cloud gehen.
 
 ## Ablauf
@@ -45,12 +45,46 @@ Stand 21.11.2026, 05:30 UTC (erste Nacht, Auftrag Issue 4420). Alle Zeiten UTC, 
 | 03:54:58 – 04:25:16 | 30 min | Ansichten-Messung „Filterfenster am Rechner“ bestand auf main nur durch Rundung (Scroller 403/401 px); +1 px kippte sie (PR 4436). | Urteil 7056913189, Bericht 7057243467 |
 | 01:36 – 03:05 | – | „PR-Aussehen – Lighthouse“ streut bei den Titel-Bytes um > 1 MB (4395 KB gegen 3245 KB), Neustart grün. | PR 4423, Bericht 7055866603 |
 
+## Zweite Nacht 21./22.11.2026 (bis 02:00)
+
+**Umgebung:** eigene Cloud-Umgebung „nacht-orchester“ mit Netz zu `anime-kalender.de`, TMDB (ohne Schlüssel 401), AniList, de.wikipedia (drosselt mit 429), Anime2You, GitHub und npm. Nicht erreichbar: `amazon.de`, `aniverse.de`, `fsk.de` (403), `anisearch.de` (403).
+
+**Ergebnis:**
+- 19 PRs durch den Nacht-Merger gemergt (`merged_at`, 21.11. 22:36:31 bis 22.11. 01:57:12, im 20-min-Takt): 4512, 4510, 4515, 4517, 4518, 4520, 4521, 4523, 4524, 4525, 4522, 4526, 4527, 4519, 4529, 4531, 4532, 4534, 4536.
+- Offen beim Dirigenten: 4509 (berührt `bestand-bauen.yml`, Frage 7070221945, A1–A7 erfüllt) und 4533 (Frage 7071452470: Jahresgrenze sortiert vor der Terminstufe, `tools/maengel.mjs:59`).
+- Ohne PR: Aufgaben 2 Chrono Crusade (7070216249), 9 Bakugan (7070323940), 10 B-Daman (7070558106); Nachschub Abenteuer auf dem Eis (7071249907), Akito 1 (7071274337), Demon Slayer 142329 (7071694597), Date A Bullet 111852 (7071718314), Dusk 195153 (7071735219), Rockman.EXE AXESS (7071747174), Grisaia 120892 (7071760470).
+- Blockiert: Aufgabe 18 und die Lehren zu 4510 (`daniel-zum-abarbeiten/berichte/lehren.md` liegt nicht im Repo).
+- Gemessen (Aufgabe 19, Protokoll 7070875480, 7071550276, 7072206841): `laufzeit` 307 → 14 → 13 (Erwartung −155; 4512 wirkte mit), `sprecher` 370 → 371 → 373 (Sprecherlauf bis 01:25 ohne Wirkung). Aufgabe 21: Live-Anbieterzeile Pokémon Horizonte „Staffel 1–3 · Staffel 4 Fg. 1“ wie erwartet (Live-Daten `generatedAt` 23:40:20).
+
+**Was gut lief:**
+- Die eigene Umgebung hob die Netzsperre der ersten Nacht auf; die Datenaufgaben 1 und 3–8 lieferten PRs.
+- Bauer-Sitzungen waren schnell: Datenaufgaben brauchten wenige Minuten bis zum Bericht (Peter Pan: Sitzung 22:27:55, Bericht 7070237337).
+- Prüfer-Agenten für Gegenproben fanden echte Lücken: 4515 (überlebender Mutant `continue`), 4533 (Sortierung).
+
+**Hänger:**
+
+| von – bis | Dauer | Ursache | Beleg |
+|---|---|---|---|
+| 22:49 – 23:09 | 20 min | Fünf Daten-PRs ohne Patch-Notes-Eintrag, Kette rot; je eine Auflagen-Sitzung. | 7070437049, 7070451298, 7070459738 |
+| ganze Nacht | – | Auflagen nicht an denselben Bauer zurückzugeben (`SendMessage` an Cloud-Sitzung abgewiesen); je Auflage eine neue Sitzung. | Protokoll 7070466502 |
+| 22:52 | – | Eine Auflagen-Sitzung startete nicht; der Zweigname war geraten. | – |
+| 23:48 – 00:14 | 26 min | PR 4531: Kette zweimal rot an Mutationslisten (Anker nicht gefunden; Mutanten ohne `tests` 107 > 101). | 7071125668, 7071242448 |
+| 00:15 – 00:36 | 21 min | 4519 und 4522 DIRTY nach Merges; Bauer mergte main nach. | Merger-Lauf 44965743231, 7071563507 |
+| 00:26 – 01:29 | 63 min | 4534: Auflage per PR-Kommentar ohne Commit erfüllt, daher kein neuer Prüfer-Lauf, letztes Urteil blieb „ändern“; Prüfer per Dispatch neu angestoßen. | Lauf 44971467170, Protokoll 7072206841 |
+| 00:39 – 00:46 | 7 min | Nachschub aus `maengel --top`: 9 von 10 Versuchen ohne PR, weil Quellen gesperrt; Nachschub angehalten. | 7071704348, 7071770846 |
+
 ## Verbesserungsvorschläge
 
-1. **Netz:** Für Nacht-Orchester eine eigene Cloud-Umgebung mit erlaubten Hosts (`anime-kalender.de`, `api.themoviedb.org`, `graphql.anilist.co`, …) und Setup-Skript `npm ci` anlegen; die Default-Umgebung hat keines, jeder Bauer verlor Zeit mit `npm ci`.
+1. **Netz (erledigt, zweite Nacht: Umgebung „nacht-orchester“):** Für Nacht-Orchester eine eigene Cloud-Umgebung mit erlaubten Hosts (`anime-kalender.de`, `api.themoviedb.org`, `graphql.anilist.co`, …) und Setup-Skript `npm ci` anlegen; die Default-Umgebung hat keines, jeder Bauer verlor Zeit mit `npm ci`.
 2. **Mod-Test:** Stempel in `anzeige.test.ts` aus fester Uhr bilden; `uhr-in-tests` auf `.claude/mods` ausdehnen (Vorschlag A8).
-3. **Rückgabe an Bauer:** Bauer als Hintergrund-Agent (Agent-Werkzeug) statt Cloud-Sitzung, wenn Auflagen-Runden wahrscheinlich sind — dann geht `SendMessage`; oder die Auflage gleich als neue Sitzung mit Zweig und Auflagenliste planen.
+3. **Rückgabe an Bauer (offen, auch in der zweiten Nacht):** Bauer als Hintergrund-Agent (Agent-Werkzeug) statt Cloud-Sitzung, wenn Auflagen-Runden wahrscheinlich sind — dann geht `SendMessage`; oder die Auflage gleich als neue Sitzung mit Zweig und Auflagenliste planen.
 4. **Stufe 2 ohne Auflagen:** Der Orchester-Auftrag erlaubt Abnahme nur nach umgesetzten Auflagen; reine Stufe-2-PRs mit Bot-„ok“ (4415, 4423, 4424, 4427, 4428, 4435, 4438) bleiben bis zum Morgen liegen. Entscheiden, ob der Orchestrator sie nach eigener Stichprobe abnehmen darf.
 5. **Reine Kommentar-PRs** in `pr-stufe` herabstufen (Vorschlag A21).
 6. **Gegenprobe:** Mutanten nur per Zeilenanker setzen, nie per erster Textfundstelle.
 7. **Monitor:** meldet `github-actions`-Kommentare; `## Frage`-Kommentare der Bauer meldet er nicht — mit aufnehmen.
+8. **Patch-Notes-Pflicht** von Anfang an in jeden Daten-Auftrag schreiben (Hänger 22:49–23:09).
+9. **Zweig der Auflagen-Sitzung** nur aus `pulls/<N> --jq .head.ref` nehmen, nie raten.
+10. **Prüfer-Neustart**, wenn eine Auflage per Kommentar statt Commit erfüllt wird (`pr-pruefer-nachtrag.yml`, Job `neustart`).
+11. **Nachschub** nur für Mängelarten mit erreichbarer Quelle; TMDB-Schlüssel als Netzwerk-Secret der Umgebung.
+12. **Lehren-Aufgaben:** `lehren.md` ins Repo legen oder solche Aufgaben als „lokal“ markieren.
+13. **Neue Mutanten** sofort mit `tests`-Eintrag anlegen (PR 4531).

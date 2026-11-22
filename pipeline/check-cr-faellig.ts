@@ -127,16 +127,17 @@ function kastenZeile(jetzt: Date): { text: unknown; farbe: unknown } {
     deSeitNeben: '',
     title: titel(6),
   })
-  const haupt = kopf.haupt as { props?: { className?: string; children?: unknown } }
-  return { text: haupt?.props?.children, farbe: haupt?.props?.className }
+  return { text: kopf.haupt, farbe: undefined }
 }
 const zeile0 = kastenZeile(new Date('2026-11-15T14:00:30Z'))
 const zeile5 = kastenZeile(UHR_15_05)
 const zeile2h = kastenZeile(UHR_17_00)
-pruefe('Kasten 15:00: wird geprüft', zeile0.text === 'Folge 7 fällig seit 15:00 Uhr, wird geprüft', String(zeile0.text))
-pruefe('Kasten 15:05: noch nicht gesehen', zeile5.text === 'Folge 7 fällig seit 15:00 Uhr, noch nicht gesehen', String(zeile5.text))
-pruefe('Kasten 17:00: unverändert „noch nicht gesehen“, nie „nicht erschienen“', zeile2h.text === 'Folge 7 fällig seit 15:00 Uhr, noch nicht gesehen', String(zeile2h.text))
-pruefe('Kasten: immer abwartend gefärbt, nie als Fehler', zeile5.farbe === 'text-ak-warnung-text' && zeile2h.farbe === 'text-ak-warnung-text', `${zeile5.farbe} ${zeile2h.farbe}`)
+const BEHAUPTET = 'Folge 7 seit 15:00 Uhr'
+pruefe('Kasten 15:00: Hauptzeile behauptet', zeile0.text === BEHAUPTET, String(zeile0.text))
+pruefe('Kasten 15:05: Hauptzeile behauptet', zeile5.text === BEHAUPTET, String(zeile5.text))
+pruefe('Kasten 17:00: unverändert, kein Prüfstand', zeile2h.text === BEHAUPTET, String(zeile2h.text))
+/* Wächter 22.11.2026: Nachweis-Wörter gehören nie in die Hauptzeile einer Fälligkeit (Daniel: „solche infos sind nachweise“). */
+pruefe('Kasten: keine Nachweis-Wörter in der Hauptzeile', ![zeile0, zeile5, zeile2h].some((z) => /gesehen|geprüft|bestätigt|fällig|noch nicht/i.test(String(z.text))), String(zeile5.text))
 // Deckel: Nach 24 Stunden ohne Sichtung gilt die Folge wieder als erschienen (geschätzt), der Kasten sagt nichts mehr von „fällig“.
 const GRENZE = new Date('2026-11-16T14:00:00Z')
 const nachGrenze = new Date('2026-11-16T14:00:01Z')

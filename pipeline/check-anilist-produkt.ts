@@ -1,7 +1,7 @@
 /**
  * Zusicherungen für Bewertung, Schlagworte und Banner nach dem Wechsel von AniList (Daniel, 11.10.2026):
  *
- * - Bewertung: keine AniList-Bewertung mehr im Datensatz. Jeder Wert (außer TMDB bei Cartoons) ist der Klarwert der aniSearch-Seite des Titels.
+ * - Bewertung: ohne `scoreQuelle` ist jeder Wert der Klarwert der aniSearch-Seite des Titels; TMDB (Cartoons) und der AniList-Rückfall (`anilist`, `check-anilist-wertung.ts`) sind gekennzeichnet.
  * - Stimmen: keine Bewertung bei weniger als `MIN_STIMMEN_BEWERTUNG` Stimmen auf der aniSearch-Seite (`bau/produkt-regel.ts`).
  * - Schlagworte: keins außerhalb der festen Liste (`shared/schlagworte.ts`).
  * - Banner: nur das TMDB-Bild aus `data/tmdb-banner.json` oder, wo TMDB keins hat, das markierte Übergangs-Banner von AniList.

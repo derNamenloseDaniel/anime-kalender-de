@@ -6,7 +6,7 @@
  */
 import type { Release, Title } from '../shared/types.ts'
 import { EMPTY_FILTERS, emptyLists, filterTitles, type FilterState } from '../web/src/lib/filters.ts'
-import { bestehendeWege, istDiscWeg, wegeVon } from '../web/src/lib/wege-filter.ts'
+import { bestehendeWege, istDiscWeg, kartenPlattform, wegeVon } from '../web/src/lib/wege-filter.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -54,6 +54,7 @@ pruefe('Nur Prime: „Prime aus" nimmt ihn heraus', !bleibt(nurPrime, [], aus('p
 const filmWerk = titel({ format: 'MOVIE', streams: [stream('crunchyroll')] })
 pruefe('Film-Werk fällt bei „Film aus" weg, auch ohne Movie-Release', !bleibt(filmWerk, [], aus('releaseTypes', ['movie'])))
 pruefe('Die bestehenden Wege der Karte: Yaiba ohne Disc', bestehendeWege(wegeVon(yaiba, yaibaR, HEUTE), aus('releaseTypes', ['disc']).excluded).map((w) => w.plattform).sort().join() === 'joyn,joyn,tv')
+pruefe('Kachel: Yaiba zeigt bei „Disc aus" Joyn, sonst die erste Plattform (Disc)', kartenPlattform(yaiba, yaibaR, aus('releaseTypes', ['disc']).excluded) === 'joyn' && kartenPlattform(yaiba, yaibaR, emptyLists()) === 'disc')
 const anbieter = titel({ streams: [stream('joyn')], watchLinks: [link('maxdome')] })
 pruefe('Anbieter „maxdome" aus: Titel mit Joyn-Stream bleibt', bleibt(anbieter, [], aus('providers', ['maxdome'])))
 

@@ -137,3 +137,12 @@ export function passtWege(t: Title, releases: Release[], f: FilterState, heute: 
   }
   return passtEinschluss(t, wege, f, modus)
 }
+
+/**
+ * Die Plattform auf der Kachel: die erste, die kein Ausschluss trifft (R5). Yaiba zeigt bei „Disc aus" Joyn statt Disc.
+ * Ohne Ausschluss wie bisher: erstes Release, sonst erster Stream.
+ */
+export function kartenPlattform(t: Title, releases: Release[], x: FilterState['excluded']): PlatformId | undefined {
+  const frei = (plattform: PlatformId, art?: ReleaseType) => !trifftAusschluss({ plattform, art, quelle: 'release' }, x)
+  return releases.find((r) => frei(r.platform, r.releaseType))?.platform ?? t.streams.find((s) => frei(s.platform))?.platform
+}

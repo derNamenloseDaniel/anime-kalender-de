@@ -27,7 +27,7 @@ Bilder: `top5/<n>-<fall>-vorher|nachher-hell|dunkel.png`, aus der Bühne (`npm r
 4. **„Netflix + Disc" erfindet nichts** (`4-dan-da-dan-*`). Kombinierte Weg-Filter verlangen denselben Weg: Netflix + Disc 22 → 0, TV + Disc 5 → 0; Dan Da Dan 2 → 0 Treffer, und der Hinweis nennt die Filter („ausgeblendet durch: Plattform Netflix, Art disc").
 5. **„Kostenlos + Crunchyroll" zeigt nur Kostenloses** (`5-fernsehtag-detektiv-conan-*`). Kostenlos + Netflix 17 → 0; Detektiv Conan (kostenlos nur auf Joyn) 1 → 0 Treffer; „Netflix + 2026" 90 → 47.
 
-Nicht in den Top 5, aber geändert: Im Kalender fehlen „Jahr" und der doppelte TV-Plattformchip, in der Datenbank „bestätigt";.
+Nicht in den Top 5, aber geändert: Im Kalender fehlen „Jahr" und der doppelte TV-Plattformchip, in der Datenbank „bestätigt".
 
 ## Zahlen (titles.json, Stichtag 22.11.2026, Messskript im Scratchpad)
 

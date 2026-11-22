@@ -183,3 +183,7 @@ einem abgelehnten Angebot weiter „installieren“ an.
 Nur auf echten Geräten prüfbar (Daniel/Martin): Chrome Android nicht installiert (Kopf-Knopf, Installation läuft durch),
 installiert im Tab (Angebot verschwindet), Samsung Internet (Hinweis im Menü), iPhone Safari (Anleitung im Menü). Nach einem
 Deploy erst etwa 5 Minuten warten: GitHub Pages hält `index.html` bis zu ~10 Minuten im Cache, ein früher Test sieht den alten Stand.
+
+## Schnellfilter je Ansicht (22.11.2026)
+
+Kalender und Datenbank haben je einen Vorlieben-Speicher (`vorlieben.kalender`, `vorlieben.datenbank`, `web/src/lib/vorlieben.ts`); ein Ansichtswechsel schreibt nichts und nimmt keinen Zustand mit (`router.ts`, `schreiber`). Das Push-Abo liest die Schnellfilter nur aus dem Kalender (`kalenderGrundlage`). Der alte Schlüssel `vorlieben` wird als Kopie gelesen, bis beide neuen existieren (Migrationscode entfällt frühestens 31.01.2027). Im Kalender entfällt „Streambar"/`availableX`, in der Datenbank „bestätigt"/`confirmedX`. Wächter: `check-vorlieben-getrennt.ts`.

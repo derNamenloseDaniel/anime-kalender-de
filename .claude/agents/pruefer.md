@@ -132,3 +132,5 @@ Jede Regel ist ein Kurzimperativ; Anlass, PR-Nummer, Datum und alter Wortlaut je
 
 - Ticket (`AK-n/rolle#k`): `node C:/code/ai/ticket-board/bin/ticket.mjs subtask <Kennung> status=laeuft agent=<name> modell=<modell>`, Ende `… status=fertig ergebnis="…" befunde=<n>`; nur den eigenen Sub-Task.
 - Bericht höchstens zehn Zeilen: Urteil / Befunde mit Datei:Zeile / nicht beurteilt, „Prozesse: keine übrig“, Rückblick in höchstens fünf Zeilen (gut, schlecht, unerwartet, Vorschlag nach `.claude/skills/prueftisch/SKILL.md`, „Nebenbei beobachten“, veraltet). Keine Zeitschätzung.
+
+- **Einheit der Entscheidung (22.11.2026, Filterkonzept):** Bei Filtern und Ausschlüssen fragen: Welche Einheit entscheidet (Titel, Weg), welche trägt die Eigenschaft? Der Test braucht einen Titel mit mehreren Wegen (z. B. Disc + Stream), nicht nur einen mit einem Weg; ein Ansichtswechsel darf keinen Zustand der anderen Ansicht schreiben (`docs/wissen/datensatz.md`, „Filterebene Titel/Weg").

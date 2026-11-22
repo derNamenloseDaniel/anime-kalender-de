@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs'
 import { lesekennung } from '../shared/staffel-titel.ts'
 import { pruefeToggoVerteilung, toggoFolgenDerStaffel } from './lib/staffel-titel.ts'
 import { fehlendes } from './bau/luecken-titel.ts'
+import { mitStaffelTiteln } from './bau/cartoon-reihen.ts'
 
 let fehler = 0
 let faelle = 0
@@ -46,10 +47,13 @@ const ohneMal = (ueber: object) => fehlendes({ id: 7000001, titleDe: 'T', jpYear
 pruefe('Lücken: Staffel-Titel ohne MAL-Kennung ist keine Lücke (MAL liegt an der Basis)', ohneMal({ staffelTitel: { sammel: 158871 } }) === '')
 pruefe('Lücken: gewöhnlicher Titel ohne MAL-Kennung bleibt eine Lücke', ohneMal({}) === 'm')
 
+const eigene = mitStaffelTiteln([{ ids: [158871, 5], grund: 'g', quelle: 'https://x' }], [{ id: 7000001, staffelTitel: { sammel: 158871 } }, { id: 158871, staffelTitel: { sammel: 158871 } }, { id: 7000009, staffelTitel: { sammel: 99 } }, { id: 20 }])
+pruefe('Eigene Werke: Staffel-Titel eines gelisteten Sammeltitels zählen mit, ohne Doppelte', JSON.stringify(eigene[0]!.ids) === '[158871,5,7000001]', JSON.stringify(eigene))
+
 const quelle = (datei: string): string => readFileSync(new URL(datei, import.meta.url), 'utf8')
 const auslieferung = quelle('./bau/13-2-auslieferung.ts')
 pruefe('13-2: Handlung, aniSearch, TMDB, Sprecher, Trailer unter der Lesekennung', ['anisearch[q]', 'tmdbTitles[q]', 'kennungen.get(q)', 'mitStimmen.has(q)', 'annKennungen[String(q)]', 'trailer[String(q)]'].every((s) => auslieferung.includes(s)))
-pruefe('13-4: Synonyme und AniList-Start unter der Lesekennung', ['anisearch[lesekennung(t)]', 'jpStartAnzeige.get(lesekennung(t))'].every((s) => quelle('./bau/13-4-zusatzdateien.ts').includes(s)))
+pruefe('13-4: Synonyme und AniList-Start unter der Lesekennung', ['anisearch[lesekennung(t)]', 'jpStartAnzeige.get(lesekennung(t))', 'mitStaffelTiteln(ladeAlleEigenenWerke(), titles.values())'].every((s) => quelle('./bau/13-4-zusatzdateien.ts').includes(s)))
 const toggo = quelle('./bau/13-1-toggo-fenster.ts')
 pruefe('13-1: TOGGO nach Lesekennung, je Staffel gefiltert, mit Riegel', ['toggo[String(lesekennung(t))]', 'toggoFolgenDerStaffel(roh, t)', 'pruefeToggoVerteilung(sammel'].every((s) => toggo.includes(s)))
 

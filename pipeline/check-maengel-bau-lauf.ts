@@ -80,6 +80,7 @@ const weitere = () => [
   einfach(15, { coverImage: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx15.jpg', bannerImage: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/15.jpg' }),
   einfach(16, { coverImage: 'https://image.tmdb.org/t/p/w500/j16.jpg' }),
   einfach(17, { coverImage: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx17.jpg' }),
+  einfach(18),
 ]
 schreibe('public/data/titles.json', [titel1({ coverImage: undefined }), titel(2), kurz(), ...weitere()])
 schreibe('public/data/events.json', [{ titleId: 1, date: '2099-01-01' }, { titleId: 8, date: todayIso() }])
@@ -88,11 +89,14 @@ schreibe('public/data/releases.json', [
   { titleId: 9, platform: 'adn', releaseType: 'batch', sprache: 'omu', sources: [{ url: 'https://q' }], schedule: { firstEpisodeDate: '2020-01-01', episodeCount: 1 } },
   ...[12, 13, 14].map((id) => ({ titleId: id, platform: 'netflix', releaseType: 'batch', sources: [{ url: 'https://q' }], schedule: { firstEpisodeDate: '2020-01-01', episodeCount: 6 } })),
   { titleId: 4, platform: 'disc', releaseType: 'disc', schedule: { firstEpisodeDate: '2022-01-01' } },
+  { titleId: 18, platform: 'tv', sender: 'Super RTL', releaseType: 'weekly', sources: [{ url: 'https://q' }], schedule: { firstEpisodeDate: '2020-01-01' } },
 ])
+/* Titel 18: eine Sichtung mit Folgentitel, den keine Folgenliste führt → tv-sichtung-ohne-folge (Verdrahtung Bau → Regel, Prüfer Runde 2). */
+schreibe('data/tv-programm.json', { sendungen: { k1: { titleId: 18, titel: 'T', folge: 'Ein Lied im Nebel', sender: 'Super RTL', start: '2026-11-13T17:15:00+01:00', ende: '2026-11-13T17:45:00+01:00', gesehenAm: '2026-11-13' } } })
 schreibe('public/data/folgen/1.json', { f: [[1, 'A'], [2, 'B'], [3, 'C']] })
 schreibe('public/data/folgen/2.json', { f: [[1, 'A'], [2, ''], [3, 'C']] })
 schreibe('public/data/synopses/1.json', { 1: { de: 'Text' }, 33: { de: 'Text' } })
-for (const id of [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]) schreibe(`public/data/synopses/${id}.json`, { [id]: { de: 'Text' } })
+for (const id of [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]) schreibe(`public/data/synopses/${id}.json`, { [id]: { de: 'Text' } })
 for (const id of [12, 13, 14]) schreibe(`public/data/folgen/${id}.json`, { f: [[1, 'A'], [2, 'B'], [3, 'C']] })
 /* Titel 12 und 13: ein Franchise, je 6 Folgen beim Anbieter bei 3 Folgen und einer Schwester von 3 → Ausnahme anbieter-franchise (Verdrahtung franchiseTeile); Titel 14 ohne Franchise bleibt offen. */
 /* Titel 10 und 11: ein Franchise, eine Netflix-Adresse mit einer Staffel zu einer Folge, zusammen zwei: staffel-zuordnung (Verdrahtung Bau → Regel). */
@@ -112,7 +116,7 @@ git('commit', '-q', '-m', 'kulisse')
 const l1 = lauf()
 pruefe('Lauf 1 endet mit Exit 0', l1.status === 0, l1.stderr.slice(-300))
 const r1 = register()
-pruefe('Lauf 1: genau die erwarteten Mängel aus den echten Dateiformaten', schluessel(r1) === 'adresse-mehrfach:6:offen adresse-mehrfach:7:offen cover:1:offen erschienen-ohne-weg:1:offen folgentitel:2:offen folgenzahl-widerspruch:14:offen handlung-de:2:offen staffel-zuordnung:10:offen staffel-zuordnung:11:offen', schluessel(r1))
+pruefe('Lauf 1: genau die erwarteten Mängel aus den echten Dateiformaten', schluessel(r1) === 'adresse-mehrfach:6:offen adresse-mehrfach:7:offen cover:1:offen erschienen-ohne-weg:1:offen folgentitel:2:offen folgenzahl-widerspruch:14:offen handlung-de:2:offen staffel-zuordnung:10:offen staffel-zuordnung:11:offen tv-sichtung-ohne-folge:18:offen', schluessel(r1))
 pruefe('Lauf 1: Handliste: Cover von Titel 5 ist Ausnahme (nur im Zähler)', r1.zaehler.cover!.ausnahme === 1 && !r1.zeilen.some((z) => z.art === 'cover' && z.t === 5), r1.zaehler.cover)
 pruefe('Lauf 1: Disc-Termin ist ein Weg (kein kein-weg, kein erstausgabe-ohne-weg bei Titel 4)', !r1.zeilen.some((z) => z.t === 4), r1.zeilen.filter((z) => z.t === 4))
 pruefe('Lauf 1: Termin am heutigen Tag zählt als künftig (kein termin-fehlt-laufend bei Titel 8)', !r1.zeilen.some((z) => z.t === 8), r1.zeilen.filter((z) => z.t === 8))
@@ -129,7 +133,7 @@ schreibe('public/data/synopses/3.json', { 3: { de: 'Text' } })
 schreibe('public/data/titles.json', [titel1(), titel(2), kurz(), einfach(3, { bannerImage: undefined }), ...weitere()])
 pruefe('Lauf 2 endet mit Exit 0', lauf().status === 0)
 const r2 = register()
-pruefe('Lauf 2: Cover behoben, Banner von Titel 3 neu, Rest bleibt', schluessel(r2) === 'adresse-mehrfach:6:offen adresse-mehrfach:7:offen banner:3:offen cover:1:behoben erschienen-ohne-weg:1:offen folgentitel:2:offen folgenzahl-widerspruch:14:offen handlung-de:2:offen staffel-zuordnung:10:offen staffel-zuordnung:11:offen', schluessel(r2))
+pruefe('Lauf 2: Cover behoben, Banner von Titel 3 neu, Rest bleibt', schluessel(r2) === 'adresse-mehrfach:6:offen adresse-mehrfach:7:offen banner:3:offen cover:1:behoben erschienen-ohne-weg:1:offen folgentitel:2:offen folgenzahl-widerspruch:14:offen handlung-de:2:offen staffel-zuordnung:10:offen staffel-zuordnung:11:offen tv-sichtung-ohne-folge:18:offen', schluessel(r2))
 pruefe('Lauf 2: `seit` der offenen Zeile bleibt aus der Vorfassung', r2.zeilen.find((z) => z.art === 'handlung-de')!.seit === '2026-01-01', r2.zeilen)
 pruefe('Lauf 2: Zähler neu 1 (banner), behoben 1 (cover)', r2.zaehler.banner!.neu === 1 && r2.zaehler.cover!.behoben === 1, r2.zaehler)
 pruefe('Lauf 2: Ereignis nur an der neuen Zeile', r2.zeilen.filter((z) => z.ereignis).map((z) => `${z.art}:${z.t}:${z.ereignis}`).join() === 'banner:3:neu', r2.zeilen)

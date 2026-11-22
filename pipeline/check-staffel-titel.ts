@@ -17,6 +17,7 @@ import { bereicheDerStaffel, staffelDerFolge, staffelPlaene, teileStreams, teile
 import { folgenDerStaffel, teileFolgenDatei } from './lib/staffel-folgen.ts'
 import { uebersetzeDatei } from './lib/ausgabe-kennung.ts'
 import { gleicheKennungen, pruefeSchnitt } from './bau/staffel-titel.ts'
+import { beobachtungenDerSpanne } from './lib/urteil-spanne.ts'
 import { sammelSicht, schreibeFolgenEintrag } from './bau/staffel-folgen-schreiben.ts'
 
 let fehler = 0
@@ -193,6 +194,17 @@ const kurzDe = teileFolgenDatei({ f: zeilen, de: [[1, 100]] }, plan)
 pruefe('Zählung: abgeschlossene Staffel zählt bis zu ihrem Ende, auch wenn Deutsch früher endet (Staffel 3: [47, 11])', JSON.stringify(kurzDe.zaehlung.get(7_000_003)) === '[47,11]', JSON.stringify(kurzDe.zaehlung.get(7_000_003)))
 const zwei = teileFolgenDatei({ f: [[45, 'a'], [46, 'b'], [47, 'c'], [90, 'd']], de: [] }, plan)
 pruefe('Datei ab zwei Zeilen (Staffel 2: 2 Zeilen → Datei, Staffel 1 und 3: 1 Zeile → keine)', [...zwei.dateien.keys()].join() === '7000002', [...zwei.dateien.keys()].join())
+
+// --- Urteile: Beobachtungen einer Meldung (Schleife aus `fetch-urteile.ts`) ---------------------------------------------------------------
+const gemeinsam = { anbieter: 'netflix', vorhanden: 'ja', tonDe: 'ja', art: 'gemessen' as const, tag: '2026-11-22', kanal: false }
+const zuStaffel = beobachtungenDerSpanne(7_000_002, { von: 3, bis: 4 }, gemeinsam, staffelVon)
+pruefe('Urteile: Meldung zu Staffel 2, Folge 3–4 → Sammeltitel, Folge 48–49, Felder der Meldung bleiben', JSON.stringify(zuStaffel.map((b) => [b.titel, b.folge, b.anbieter, b.tonDe, b.tag])) === '[[158871,48,"netflix","ja","2026-11-22"],[158871,49,"netflix","ja","2026-11-22"]]', JSON.stringify(zuStaffel))
+pruefe('Urteile: gewöhnlicher Titel und Basis unverändert, eine Beobachtung je Folge', JSON.stringify(beobachtungenDerSpanne(20, { von: 1, bis: 3 }, gemeinsam, staffelVon).map((b) => [b.titel, b.folge])) === '[[20,1],[20,2],[20,3]]' && beobachtungenDerSpanne(SAMMEL, { von: 5, bis: 5 }, gemeinsam, staffelVon)[0]!.folge === 5)
+pruefe('Urteile: Spanne 0 (ganze Seite) bleibt 0', beobachtungenDerSpanne(7_000_002, { von: 0, bis: 0 }, gemeinsam, staffelVon)[0]!.folge === 0)
+{
+  const urteileQuelle = readFileSync(new URL('./fetch-urteile.ts', import.meta.url), 'utf8')
+  pruefe('fetch-urteile: Schleife ruft beobachtungenDerSpanne(m.titel_id, spanne, gemeinsam, staffelVon) mit staffelVonTiteln(titelAlle)', /beobachtungenDerSpanne\(m\.titel_id, spanne, gemeinsam, staffelVon\)/.test(urteileQuelle) && /const staffelVon = staffelVonTiteln\(titelAlle\)/.test(urteileQuelle) && !/for \(let n = von; n <= bis; n\+\+\)/.test(urteileQuelle))
+}
 
 // --- Folgenlisten im echten Aufrufer (`schreibeFolgenDateien`, Kindprozess mit AK_ROOT) ---------------------------------------------------
 {

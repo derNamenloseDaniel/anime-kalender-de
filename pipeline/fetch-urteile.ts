@@ -17,7 +17,8 @@ import { abrufMitStempel } from './lib/abruf-stempel.ts'
 import { adressIndex, artDerMeldung, folgenDerMeldung, meldungGrund, nameIndex, rohfolgenSpanne, titelDerMeldung, urteileJeFolge, type StaffelKandidat, type Urteil } from './lib/urteil-je-folge.ts'
 import { beobachtungenAusRohfolgen, fremdNach, type RohFolge } from './lib/urteil-rohfolgen.ts'
 import type { Title } from '../shared/types.ts'
-import { staffelVonTiteln, zurueckAufSammeltitel } from '../shared/staffel-titel.ts'
+import { staffelVonTiteln } from '../shared/staffel-titel.ts'
+import { beobachtungenDerSpanne } from './lib/urteil-spanne.ts'
 import { adressKern } from './lib/dub-confirmed.ts'
 import type { FolgenZuordnung } from './lib/folgen-je-folge.ts'
 
@@ -165,24 +166,18 @@ async function main() {
       verworfen[spanne.verworfen] = (verworfen[spanne.verworfen] ?? 0) + 1
       continue
     }
-    const { von, bis } = spanne
     /* `folgenDerMeldung` hat beide schon geprüft — ohne Titel oder Befund gibt es keine Spanne. */
     if (!m.titel_id || !vorhanden) continue
     const art = artDerMeldung(m)
-    for (let n = von; n <= bis; n++) {
-      /* Eine Meldung zu einem Staffel-Titel gilt dem Sammeltitel, den der Bau vor dem Schnitt sieht (Folge durchlaufend). */
-      const ziel = zurueckAufSammeltitel(m.titel_id, n, staffelVon)
-      beobachtungen.push({
-        titel: ziel.titel,
-        anbieter: m.plattform,
-        folge: ziel.folge,
-        vorhanden,
-        tonDe,
-        art,
-        tag: m.gemeldet_am.slice(0, 10),
-        kanal: tonDe === 'nein' && KANAL.test(m.abos ?? ''),
-      })
+    const gemeinsam = {
+      anbieter: m.plattform,
+      vorhanden,
+      tonDe,
+      art,
+      tag: m.gemeldet_am.slice(0, 10),
+      kanal: tonDe === 'nein' && KANAL.test(m.abos ?? ''),
     }
+    beobachtungen.push(...beobachtungenDerSpanne(m.titel_id, spanne, gemeinsam, staffelVon))
   }
   const urteile = urteileJeFolge(beobachtungen)
   writeJson(ZIEL, urteile, true)

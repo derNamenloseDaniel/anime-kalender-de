@@ -98,6 +98,8 @@ pruefe('folgenzahl: Ende heute läuft noch, Ende gestern ist offen', arten(gut(1
 pruefe('fsk: fehlt = Treffer', arten(gut(1, { fsk: undefined })).join() === 'fsk')
 pruefe('fsk: 0 ist eine Einstufung, kein Mangel', arten(gut(1, { fsk: 0 as never })).length === 0)
 pruefe('wertung: Treffer', arten(gut(1, { score: undefined })).join() === 'wertung')
+pruefe('wertung: Titel ohne AniList-Kennung (eigener, nur-aniSearch) hat keine Quelle mit genug Stimmen — belegte Ausnahme, kein offener Mangel', arten(gut(5_000_001, { score: undefined })).join() === 'wertung:keine-quelle-mit-stimmen' && arten(gut(10_000_042, { score: undefined })).join() === 'wertung:keine-quelle-mit-stimmen')
+pruefe('wertung: AniList-Titel ohne Wertung bleibt offen (Quelle vorhanden)', arten(gut(4_999_999, { score: undefined })).join() === 'wertung')
 pruefe('studio: Treffer', arten(gut(1, { studios: [] })).join() === 'studio')
 pruefe('genre: Treffer', arten(gut(1, { genres: [] })).join() === 'genre')
 pruefe('laufzeit: Treffer', arten(gut(1, { runtimeMin: undefined })).join() === 'laufzeit')

@@ -44,6 +44,11 @@ pruefe('auch Einträge nach MAL-Kennung (anilist-media.json) zählen, Schlüssel
 pruefe('Stimmen sind die Summe der Verteilung', w.get(900101)?.stimmen === 40, w.get(900101))
 pruefe('Einheit: Stufe mit leerer Verteilung (null) zählt 0 Stimmen', anilistWertungAus({ averageScore: 80, meanScore: 80, stats: { scoreDistribution: null } }) === undefined)
 
+const { eintragNochOffen } = await import('./lib/anilist.ts')
+const fertig = { status: 'FINISHED', countryOfOrigin: 'JP' }
+pruefe('Zwischenspeicher: abgeschlossener Eintrag ohne Stimmenverteilung (vor 22.11.2026) wird neu geholt', eintragNochOffen({ ...fertig, stats: undefined }))
+pruefe('Zwischenspeicher: abgeschlossener Eintrag mit Verteilung (auch null) bleibt', !eintragNochOffen({ ...fertig, stats: { scoreDistribution: null } }) && !eintragNochOffen({ ...fertig, stats: null }))
+
 const titel = (id: number, rest: Partial<Title> = {}): Title => ({ id, dubConfidence: 'low', ...rest }) as Title
 const rueck = (id: number, asId?: number, rest: Partial<Title> = {}) => {
   const t = mitProduktFeldern(titel(id, rest), asId)

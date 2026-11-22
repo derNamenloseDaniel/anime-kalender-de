@@ -8,7 +8,7 @@
  *
  * Aufruf: npm run data:fetch  [-- --force] [-- --skip-anilist]
  */
-import { mediaByMalIds, searchMedia, type AniListMedia, istQuellenAusfall } from './lib/anilist.ts'
+import { mediaByMalIds, searchMedia, type AniListMedia, eintragNochOffen, istQuellenAusfall } from './lib/anilist.ts'
 import { ausAnisearchDubs, ausAnisearchHand } from './lib/anisearch-synchro-ids.ts'
 import { holeAnisearchCover } from './lib/anisearch-cover.ts'
 import { loadCurated, loadSynchroVonHand } from './lib/curated.ts'
@@ -91,10 +91,9 @@ async function main(): Promise<void> {
     `isoDate()` machte daraus „31.10.2026". Dieselbe Falle
     wie in CLAUDE.md, „Ein Abruf, der nur ergänzt, veraltet zwangsläufig".
     Abgeschlossene und abgesetzte Titel ändern sich nicht mehr und bleiben im
-    Speicher. Auch ein Eintrag ohne Herkunftsland (Abruf vor dem 09.10.2026) wird einmal neu geholt.
+    Speicher. Auch ein Eintrag ohne Herkunftsland (Abruf vor dem 09.10.2026) oder ohne Stimmenverteilung (vor dem 22.11.2026) wird einmal neu geholt.
   */
-  const nochOffen = (m: AniListMedia | undefined): boolean =>
-    Boolean(m) && ((m!.status !== 'FINISHED' && m!.status !== 'CANCELLED') || m!.countryOfOrigin === undefined)
+  const nochOffen = (m: AniListMedia | undefined): boolean => Boolean(m) && eintragNochOffen(m!)
   const cached = readJson<Record<string, AniListMedia>>('data/cache/anilist-media.json', {})
   const missing = FORCE ? malIds : malIds.filter((id) => !cached[id] || nochOffen(cached[id]))
   log(`AniList: ${missing.length} von ${malIds.length} IDs fehlen im Cache`)

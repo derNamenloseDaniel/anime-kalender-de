@@ -123,7 +123,7 @@ console.log('Titel aus der Zeile')
 
 console.log('Stammdaten mit Quelle')
 {
-  const stamm = ['  studios: [Fixture Studio]', '  genres: [Action, Sci-Fi]', '  runtimeMin: 22', '  jpYear: 1985', '  datenQuelle: https://example.org/stamm']
+  const stamm = ['  studios: [Fixture Studio]', '  genres: [Action, Sci-Fi]', '  runtimeMin: 22', '  jpYear: 1985', '  episodes: 75', '  datenQuelle: https://example.org/stamm']
   const kaputt = (extra: string[], teil: string, text: string) => {
     schreibeDatei(zeile(910001, 'A', extra))
     pruefe(wirft(() => ladeEigeneTitel(bauOrdner), teil), text)
@@ -134,13 +134,15 @@ console.log('Stammdaten mit Quelle')
   kaputt(stamm.map((z) => z.replace('[Fixture Studio]', '[]')), 'studios', 'leere Studioliste bricht ab')
   kaputt(stamm.map((z) => z.replace('runtimeMin: 22', 'runtimeMin: 0')), 'runtimeMin', 'Laufzeit 0 bricht ab')
   kaputt(stamm.map((z) => z.replace('jpYear: 1985', 'jpYear: 85')), 'jpYear', 'zweistelliges Jahr bricht ab')
+  kaputt(stamm.map((z) => z.replace('episodes: 75', 'episodes: 0')), 'episodes', 'Folgenzahl 0 bricht ab')
+  kaputt(['  episodes: 75'], 'datenQuelle', 'die Folgenzahl allein braucht die Quelle')
   const titles = new Map<number, Title>()
   schreibeDatei([...zeile(910001, 'Mit Daten', stamm), ...zeile(910002, 'Ohne Daten')])
   ergaenzeEigeneTitel(titles, ladeEigeneTitel(bauOrdner))
   const mit = titles.get(eigeneId(910001))
   const ohne = titles.get(eigeneId(910002))
-  pruefe(mit?.studios?.[0] === 'Fixture Studio' && mit.genres.join() === 'Action,Sci-Fi' && mit.runtimeMin === 22 && mit.jpYear === 1985, 'Stammdaten landen im Titel')
-  pruefe(ohne?.studios?.length === 0 && ohne.genres.length === 0 && ohne.runtimeMin === undefined && ohne.jpYear === undefined, 'ohne Stammdaten bleibt der Titel leer (nichts erfunden)')
+  pruefe(mit?.studios?.[0] === 'Fixture Studio' && mit.genres.join() === 'Action,Sci-Fi' && mit.runtimeMin === 22 && mit.jpYear === 1985 && mit.episodes === 75, 'Stammdaten landen im Titel')
+  pruefe(ohne?.studios?.length === 0 && ohne.genres.length === 0 && ohne.runtimeMin === undefined && ohne.jpYear === undefined && ohne.episodes === undefined, 'ohne Stammdaten bleibt der Titel leer (nichts erfunden)')
 }
 
 console.log('Bau und Termin über releasesAus (Z wie Zorro, M.A.S.K.)')

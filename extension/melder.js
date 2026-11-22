@@ -1151,15 +1151,8 @@ function beschriftung(spuren) {
   const wo = stand.folgeNr
     ? ` (${stand.staffel && stand.staffeln?.length > 1 ? `St. ${stand.staffel}, ` : ''}Flg. ${stand.folgeNr})`
     : ''
-  /*
-    **Im Player wird nichts mehr angeboten.**
-
-    Gemeldet wird über den Durchlauf auf der Titelseite. Ein zweiter Weg im
-    Player macht die Herkunft einer Meldung unklar — und war der Grund, warum
-    bei einem Titelwechsel einmal fremde Sprachen ankamen.
-  */
-  void deutsch
-  return { text: null, klasse: null, aktiv: false }
+  /* Im Player wird nichts angeboten (fremde Sprachen bei Titelwechsel); nur ein Film auf seiner Titelseite lässt sich von Hand melden. */
+  return globalThis.akNetflixFilmKnopf({ spuren, deutsch, adresse: titelDerAdresse(), reihe: stand.reihe, eintrag: offeneTitel[String(stand.reihe)] })
 }
 
 async function melden({ automatisch = false } = {}) {

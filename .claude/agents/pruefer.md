@@ -119,6 +119,7 @@ Jede Regel ist ein Kurzimperativ; Anlass, PR-Nummer, Datum und alter Wortlaut je
 - Async-Umstellung: Doppelklick-Fall und Mutationsliste je geänderter Verzweigung. Merkliste: Eintrag verschwindet nur nach autoritativer Antwort (Test mit mehreren Seitenaufrufen und verspäteter Quelle). Filternde Konstante (Stichtag): Auslieferungsbeleg im Kommentar, Schätzung nur als Untergrenze mit Ablaufdatum, Logzeile zählt Zurückgehaltenes.
 - Befundregel geändert: Fortschreibung (`trifftNochZu`) mit, „verschwindet“ per Lauf-Test mit Alteintrag, jeden Zweig samt Rückfall lesen; Wirkung ohne Bau-Vergleich ist „ungeprüft“.
 - Werkzeug mit Erkennungslogik ohne Fehlalarm-Liste aus echten Diffs der letzten 7 Tage: Auflage.
+- **Versprochene Handlung in der Oberfläche** (Prüfliste „öffnen und melden“ u. ä.): Kette Seite → Zustand → sichtbarer Knopf → Klick → Meldung einmal gegen die echte Seitenfunktion spielen; Quelltext-Wortlaut-Tests zählen nicht, jede Seite, die den Knopf entfernt (Player), gegen das Versprechen halten (Fall Netflix-Film von Hand, 22.11.2026).
 - **Neuer Test gegen die Basis:** mindestens ein Fall rot gegen die main-Fassung, sonst „ändern“, auch bei CI-„ok“; Befehl und rote Ausgabe wörtlich im Urteil.
 
 ## Ticket und Bericht

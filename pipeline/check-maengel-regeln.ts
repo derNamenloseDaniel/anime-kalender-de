@@ -173,6 +173,7 @@ pruefe('adresse-mehrfach: Regel nutzt die Menge', arten(gut(1), kontext({ adress
 
 /* Grenzfälle und Einheitlichkeit (Prüfer-Auflagen N4, N7) */
 const regel = (art: string) => REGELN.find((r) => r.art === art)!
+pruefe('studio und weg-ohne-adresse haben Handbesitzer (kein Automat füllt sie, 22.11.2026)', regel('studio').wer === 'hand:studio-von-hand' && regel('weg-ohne-adresse').wer === 'hand:adresse-belegen', [regel('studio').wer, regel('weg-ohne-adresse').wer])
 pruefe('Tabelle: cover und kein-weg tragen Wirkung 3; wer auto:tmdb-poster bzw. daniel', regel('cover').wirkung === 3 && regel('cover').wer === 'auto:tmdb-poster' && regel('kein-weg').wirkung === 3 && regel('kein-weg').wer === 'daniel')
 pruefe('Tabelle: bild-fremdsprachig ist schwach, Wirkung 2, wer auto:tmdb-poster', regel('bild-fremdsprachig')?.gruppe === 'schwach' && regel('bild-fremdsprachig')?.wirkung === 2 && regel('bild-fremdsprachig')?.wer === 'auto:tmdb-poster')
 pruefe('folgentitel: SPECIAL und MUSIC mit mehreren Folgen sind keine Ausnahme', ['SPECIAL', 'MUSIC', 'OVA'].every((f) => arten(gut(1, { format: f as Title['format'] }), ohneFolgen).join() === 'folgentitel'))

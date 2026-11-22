@@ -70,3 +70,4 @@
 {"datei":"pipeline/check-fsk-franchise.ts","liest":"data/tmdb-titles.json","grund":"Verdrahtungsfall: sucht im echten Bestand einen Titel mit TMDB-Freigabe, um zu prüfen, dass er offen für die Handzeile bleibt"}
 {"datei":"pipeline/check-tmdb-angebote-kopie.ts","liest":"data/justwatch-audio.json","grund":"Wächter: prüft am echten Bestand, dass keine TMDB-Anbieterliste die Kopie der Liste eines Namensvetters ist (Stargazer 120892)"}
 {"datei":"pipeline/check-tmdb-angebote-kopie.ts","liest":"data/tmdb-titles.json","grund":"Wächter: prüft am echten Bestand, dass keine TMDB-Anbieterliste die Kopie der Liste eines Namensvetters ist (Stargazer 120892)"}
+{"datei":"pipeline/check-maengel-tv-folge.ts","liest":"data/wikipedia-folgen.json","grund":"Fixture-Quelle: liest die echte Horizonte-Liste, damit „Lied im Nebel“ mit Nummer belegt ist (Prüfer A2/A4, 22.11.2026)"}

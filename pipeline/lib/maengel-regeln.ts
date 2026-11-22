@@ -37,6 +37,8 @@ export interface Kontext {
   adresseMehrfach: Map<number, 'fremd' | 'franchise'>
   /** Titel, deren Staffel-Zuordnung an einer geteilten Netflix-Adresse nicht zur Staffelliste des Anbieters passt (`staffelZuordnung`). */
   staffelZuordnung: Map<number, StaffelBefund>
+  /** Titel mit einer TV-Sichtung ohne Folgennummer, über alle Sichtungen gemessen (`titelMitSichtungOhneFolge`). */
+  tvOhneFolge: ReadonlySet<number>
   /** Die anderen Titel desselben Franchise (Format, Folgenzahl), ohne den Titel selbst. */
   franchiseTeile: (t: Title) => FranchiseTeil[]
   /** Verneint ein Handbeleg die Plattform für einen Termin ab diesem Tag (`baueNeinGilt`)? */
@@ -168,6 +170,7 @@ export const REGELN: Regel[] = [
   { art: 'staffel-zuordnung', gruppe: 'falsch', wirkung: 2, wer: 'hand:synchro-belegen', zaehle: (t, k) => k.staffelZuordnung.has(t.id), ausnahme: (t, k) => STAFFEL_AUSNAHME[k.staffelZuordnung.get(t.id)!] ?? (laeuftNoch(t, k) ? 'laeuft' : undefined) },
   { art: 'herkunft-fremder-titel', gruppe: 'falsch', wirkung: 3, wer: 'auto:bau', zaehle: (t, k) => herkunftFremderTitel(t, k.releases.get(t.id) ?? []) },
   { art: 'weg-ohne-adresse', gruppe: 'fehlend', wirkung: 3, wer: 'auto:anbieterkalender', zaehle: (t) => Boolean(t.streams?.some((s) => !s.url)) },
+  { art: 'tv-sichtung-ohne-folge', gruppe: 'fehlend', wirkung: 2, wer: 'auto:bau', zaehle: (t, k) => k.tvOhneFolge.has(t.id) },
 ]
 
 /**

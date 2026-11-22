@@ -8,6 +8,9 @@ import { discTitelIds } from '../lib/erstausgabe-ohne-weg.ts'
 import { adresseMehrfach, COVER_BEKANNT_DATEI, REGELN, zaehleMaengel, type Kontext } from '../lib/maengel-regeln.ts'
 import { ladeHandbelege } from '../lib/dub-confirmed.ts'
 import { ANBIETER_STAFFELN_DATEI, letzterNetflixStart, staffelZuordnung } from '../lib/maengel-staffel.ts'
+import { titelMitSichtungOhneFolge } from '../lib/maengel-tv-folge.ts'
+import { folgenListen } from './08-news-tv.ts'
+import type { TvSendung } from '../fetch-tv-programm.ts'
 import { franchiseTeile } from '../lib/folgenzahl-erklaerung.ts'
 import { baueNeinGilt } from '../lib/maengel-nein.ts'
 import { MAENGEL_DATEI, schreibeFort, serialisiere, type Register } from '../lib/maengel-register.ts'
@@ -50,6 +53,12 @@ function lazyNeinGilt(): Kontext['neinGilt'] {
   return (id, plattform, ab) => (gilt ??= baueNeinGilt(ladeHandbelege()))(id, plattform, ab)
 }
 
+/** Die Folgenlisten sind dieselben wie in `08-news-tv.ts`; das Programm liest die Art ganz, nicht nur ab gestern. */
+function tvOhneFolgeLesen(titel: Title[], alle: Release[]): Set<number> {
+  const programm = readJson<{ sendungen?: Record<string, TvSendung> }>('data/tv-programm.json', {}).sendungen ?? {}
+  return titelMitSichtungOhneFolge(alle, Object.values(programm), folgenListen(new Map(titel.map((t) => [t.id, t]))))
+}
+
 /** Erzeugt den Kontext der Regeln aus den fertig geschriebenen Dateien. */
 function baueKontext(titel: Title[], heute: string): Kontext {
   const events = readJson<{ titleId?: number; date?: string }[]>(`${OUT}/events.json`, [])
@@ -65,6 +74,7 @@ function baueKontext(titel: Title[], heute: string): Kontext {
     discTitel: discTitelIds(alle),
     adresseMehrfach: adresseMehrfach(titel),
     staffelZuordnung: staffelZuordnung(titel, readJson(ANBIETER_STAFFELN_DATEI, {}), (id) => letzterNetflixStart(releases.get(id) ?? [])),
+    tvOhneFolge: tvOhneFolgeLesen(titel, alle),
     franchiseTeile: (t) => (teile.get(t.franchiseId ?? t.id) ?? []).filter((x) => x.id !== t.id),
     neinGilt: lazyNeinGilt(),
     ...bildLeser(),

@@ -11,7 +11,9 @@
  *   node tools/diff-mutanten.mjs --basis <ref>    gegen <ref> statt origin/main vergleichen (Zweig baut auf offenem PR auf)
  * Je Datei läuft eine Sonde mit (wirft beim Laden): bleibt sie grün, lädt der Test die Datei nicht → Abbruch, Exit 2, kein „Überlebt“ (19.11.2026).
  * Test je Datei: `<name>.test.(mjs|cjs|ts|tsx)` neben der Datei, sonst `pipeline/check-<name>.ts`; ohne Test keine Läuferfahrt.
- * Mutantenarten: Vergleich getauscht, Grenze ±1, && ↔ ||, ?:-Zweige vertauscht, Zahl 0/1, Aufruf entfernt, Argumente getauscht.
+ * Mutantenarten: Vergleich getauscht, Grenze ±1, && ↔ ||, ?:-Zweige vertauscht, Zahl 0/1, Aufruf entfernt, Argumente getauscht;
+ * feste Klassen (21.11.2026, diff-mutanten-klassen.mjs): Objekt-Eigenschaft entfernt, Parameter-Vorgabe → 0, Zuweisung im Callback
+ * entfernt, Parameter am Aufrufort entfernt, throw → if (false).
  */
 import { execFileSync, spawnSync } from 'node:child_process'
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
@@ -19,6 +21,7 @@ import { tmpdir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
+import { klassenMutanten } from './diff-mutanten-klassen.mjs'
 
 const CODE = /\.(ts|tsx|mjs|js)$/
 const KEIN_CODE = /(\.test\.|\.d\.ts$|(^|\/)pipeline\/check-|(^|\/)node_modules\/)/
@@ -54,8 +57,8 @@ const VERGLEICH = new Map([
   [K.BarBarToken, ['&&']],
 ])
 
-/** Mutanten eines Knotens als { art, von, bis, ersetze } (Offsets im Quelltext). */
-function mutantenVon(node, q) {
+/** Operator- und Aufrufmutanten eines Knotens als { art, von, bis, ersetze } (Offsets im Quelltext). */
+function standardMutanten(node, q) {
   const text = (n) => q.slice(n.getStart(), n.end)
   const art = (name, von, bis, ersetze) => ({ art: name, von, bis, ersetze })
   if (ts.isBinaryExpression(node) && VERGLEICH.has(node.operatorToken.kind)) {
@@ -78,6 +81,9 @@ function mutantenVon(node, q) {
   }
   return []
 }
+
+/** Standardmutanten plus feste Klassen (tools/diff-mutanten-klassen.mjs). */
+const mutantenVon = (node, q) => [...standardMutanten(node, q), ...klassenMutanten(node, q)]
 
 /** Läuferfelder zur Eindeutigkeit: `nr` (n-tes Vorkommen von `suche` auf `zeile`) nur, wenn `suche` dort mehrfach steht. */
 function vorkommenAufZeile(q, suche, von, zeile) {

@@ -80,6 +80,9 @@ pruefe('Name trägt Datei:Zeile und Art', m0.name === 'a.mjs:1 && → ||')
 pruefe('Läuferformat: datei, suche, ersetze, zeile, tests', m0.aenderungen[0].datei === 'a.mjs' && m0.aenderungen[0].zeile === 1 && m0.tests[0] === 't')
 const zwei = mutantenListe('a.mjs', 'x = f(a, b) && f(a, b)', new Set([1]), ['t']).filter((m) => m.name.includes('Argumente'))
 pruefe('gleicher Text zweimal auf der Zeile: erstes nr 1, zweites nr 2', zwei.length === 2 && zwei[0].aenderungen[0].nr === 1 && zwei[1].aenderungen[0].nr === 2)
+// feste Klassen laufen über mutantenListe mit (Verdrahtung; die Klassen selbst prüft diff-mutanten-klassen.test.mjs)
+const klassen = mutantenListe('a.mjs', 'x = { a: 1 }\ny = f(b, c)\nthrow y', new Set([1, 2, 3])).map((m) => m.name)
+pruefe('feste Klassen: Objekt-Eigenschaft und Aufrufort-Parameter kommen mit den Standardmutanten', klassen.includes('a.mjs:1 Objekt-Eigenschaft entfernt a') && klassen.includes('a.mjs:2 Parameter am Aufrufort entfernt f (1. von 2)') && klassen.includes('a.mjs:2 Argumente getauscht f') && klassen.includes('a.mjs:3 throw → if (false)'))
 pruefe('ohne tests: Feld fehlt', !('tests' in mutantenListe('a.mjs', 'x = a && b', new Set([1]))[0]))
 
 // Diff lesen
@@ -137,7 +140,7 @@ const wurzel = mkdtempSync(join(tmpdir(), 'diff-mutanten-'))
 try {
   const git = (...a) => execFileSync('git', a, { cwd: wurzel, stdio: 'pipe', encoding: 'utf8', timeout: 120_000 })
   mkdirSync(join(wurzel, 'tools'))
-  for (const d of ['diff-mutanten.mjs', 'mutationslaeufer.mjs']) copyFileSync(join(fileURLToPath(new URL('.', import.meta.url)), d), join(wurzel, 'tools', d))
+  for (const d of ['diff-mutanten.mjs', 'diff-mutanten-klassen.mjs', 'mutationslaeufer.mjs']) copyFileSync(join(fileURLToPath(new URL('.', import.meta.url)), d), join(wurzel, 'tools', d))
   symlinkSync(join(fileURLToPath(new URL('..', import.meta.url)), 'node_modules'), join(wurzel, 'node_modules'))
   writeFileSync(join(wurzel, 'tools/lib.mjs'), 'export const f = (a, b) => a\n')
   writeFileSync(join(wurzel, 'tools/lib.test.mjs'), "import { f } from './lib.mjs'\nif (f(1, 2) !== 1) process.exit(1)\n")

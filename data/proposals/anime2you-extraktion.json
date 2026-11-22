@@ -1914,6 +1914,10 @@
       "am": "2026-11-21",
       "vorschlaege": 1
     },
+    "1073218": {
+      "am": "2026-11-22",
+      "vorschlaege": 2
+    },
     "1073232": {
       "am": "2026-11-19",
       "vorschlaege": 3
@@ -2028,6 +2032,10 @@
     },
     "1073842": {
       "am": "2026-11-20",
+      "vorschlaege": 1
+    },
+    "1073845": {
+      "am": "2026-11-22",
       "vorschlaege": 1
     },
     "1073915": {
@@ -16545,6 +16553,30 @@
       "artikelId": "1074561",
       "artikel": "Termin des Netflix-Anime »Bride of the Barrier Master« + Trailer",
       "quelle": "https://www.anime2you.de/news/1074561/bride-of-the-barrier-master-konkreter-termin/",
+      "veroeffentlicht": "2026-11-22",
+      "gelesenAm": "2026-11-22"
+    },
+    {
+      "titel": "Avatar: Die sieben Häfen",
+      "zitat": "Insgesamt ist die Geschichte auf vier Staffeln ausgelegt, wobei die zweite Staffel mit dem Titel »Discovery« am 21. Mai 2027 starten soll.",
+      "art": "start",
+      "sprache": "unklar",
+      "plattform": "paramountplus",
+      "datum": "2027-05-21",
+      "uhrzeit": null,
+      "anbieter": "Paramount+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „Paramount+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „paramount+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1073845",
+      "artikel": "Neue »Avatar«-Serie setzt auf komplett neues Autorenteam",
+      "quelle": "https://www.anime2you.de/news/1073845/neue-avatar-serie-komplett-neues-autorenteam/",
       "veroeffentlicht": "2026-11-22",
       "gelesenAm": "2026-11-22"
     }

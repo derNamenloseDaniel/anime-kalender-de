@@ -9,7 +9,7 @@ import { copyFileSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, unlinkSync, 
 import os from 'node:os'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import { ansichtErgebnis, bewerte, fehlendeZeilen, kandidatenWochen, kennungsWochen, kulisseAntwort, main, messeMitWahl, messwocheAbbruch, saalFehler, saalKulisse, sammleFehler, setzeSichtbarkeitSchwebender, tagePlus, waehleMesswoche } from './kachel-ecken-messen.mjs'
+import { ansichtErgebnis, bewerte, fehlendeZeilen, kandidatenWochen, kennungsWochen, kulisseAntwort, main, messeKacheln, messeMitWahl, messwocheAbbruch, saalFehler, saalKulisse, sammleFehler, setzeSichtbarkeitSchwebender, tagePlus, waehleMesswoche } from './kachel-ecken-messen.mjs'
 
 const LEISTE = [200, 20, 20]
 const COVER = [70, 90, 130]
@@ -283,5 +283,28 @@ setzeSichtbarkeitSchwebender('')
 assert.deepEqual(lagen.map((e) => e.style.visibility), ['', '', 'start', 'start', 'start'], 'beide wieder gezeigt')
 delete globalThis.document
 delete globalThis.getComputedStyle
+
+// Beschnittene Kachel im scrollenden Fenster (22.11.2026): das Tageszeilen-Fenster am Handy endet bei 792 px, die Seite bei 800 – eine Kachel mit Unterkante 794 ist dort angeschnitten und darf nicht als ganz sichtbar gemessen werden (Ecke = Fensterrand, nicht rund).
+const rect = (bottom) => ({ x: 23, width: 40, height: 3, top: bottom - 56, bottom })
+const zeile = (leisteBottom, vorfahr) => {
+  const leiste = { getBoundingClientRect: () => rect(leisteBottom) }
+  return { offsetParent: {}, parentElement: vorfahr, lastElementChild: leiste, classList: { contains: () => false }, querySelector: () => null, getBoundingClientRect: () => rect(leisteBottom - 3) }
+}
+const fenster = { overflowY: 'auto', parentElement: { overflowY: 'visible', parentElement: null, getBoundingClientRect: () => rect(1600) }, getBoundingClientRect: () => rect(792) }
+const frei = { overflowY: 'visible', parentElement: null, getBoundingClientRect: () => rect(5000) }
+const unten = (ausschnitt, kacheln) => {
+  globalThis.document = { querySelectorAll: () => kacheln }
+  globalThis.getComputedStyle = (el) => ({ overflowY: el.overflowY })
+  globalThis.innerHeight = 800
+  globalThis.scrollX = 0
+  globalThis.scrollY = 0
+  const r = messeKacheln({ selektor: 'x', monat: true, ausschnitt }).map((k) => k.unten)
+  for (const n of ['document', 'getComputedStyle', 'innerHeight', 'scrollX', 'scrollY']) delete globalThis[n]
+  return r
+}
+const imFenster = [zeile(700, fenster), zeile(786, fenster), zeile(787, fenster), zeile(794, fenster)]
+assert.deepEqual(unten(true, imFenster), [700, 786], 'im Fenster zählt dessen Unterkante: 786 + 5 < 792, 787 + 5 nicht, 794 ragt hinaus')
+assert.deepEqual(unten(true, [zeile(794, frei), zeile(795, frei)]), [794], 'ohne scrollenden Vorfahren zählt der Bildrand: 794 + 5 < 800, 795 + 5 nicht')
+assert.deepEqual(unten(false, imFenster), [700, 786, 787, 794], 'ohne Ausschnitt (Ganzseitenbild) bleibt jede Kachel')
 
 console.log('kachel-ecken-messen.test: ok')

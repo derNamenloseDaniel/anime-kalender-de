@@ -29,6 +29,7 @@ import { zaehleVerwaisteTermine } from './lib/verwaiste-termine.ts'
 import { MAENGEL_DATEI, offeneJeArt, type Register } from './lib/maengel-register.ts'
 import { VERLAUF_DATEI } from './lib/streaming-rueckgang.ts'
 import { warnZeilen } from './lib/qualitaet-warnzeilen.ts'
+import { stillstandZeilen } from './lib/maengel-stillstand.ts'
 import { discTitelIds, zaehleErstausgabeOhneWeg } from './lib/erstausgabe-ohne-weg.ts'
 
 interface Kennzahlen {
@@ -134,6 +135,7 @@ function main(): void {
 
   /* Feste Zeilen für den Schritt „Datenqualität messen“ (bestand-bauen.yml): daraus wird die DATEN_WARNUNG. Exit bleibt 0. */
   for (const zeile of warnZeilen(zahlen, bezug, register)) console.log(zeile)
+  for (const zeile of stillstandZeilen(readJson<Kennzahlen[]>(VERLAUF_DATEI, []), zahlen, register)) console.log(zeile)
 
   let kaputt = 0
   for (const k of HART) {

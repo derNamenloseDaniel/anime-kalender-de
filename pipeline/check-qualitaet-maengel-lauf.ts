@@ -27,7 +27,7 @@ const zeile = (t: number, art: string, ereignis?: 'neu' | 'rueckfall') => ({ t, 
 const VERLAUF = [{ gemessenAm: '2000-01-01', mitStreamingWeg: 1 }]
 const TITEL = [{ id: 900001, titleRomaji: 'A', format: 'TV', episodes: 12, streams: [{ platform: 'netflix', url: 'https://x.invalid/1', dub: true }] }]
 
-function lauf(register: Register | null): { ausgabe: string; letzterVerlauf: Record<string, unknown> } {
+function lauf(register: Register | null, bisher: object[] = VERLAUF): { ausgabe: string; letzterVerlauf: Record<string, unknown> } {
   const ak = mkdtempSync(join(tmpdir(), 'qualitaet-maengel-'))
   try {
     mkdirSync(join(ak, 'public', 'data'), { recursive: true })
@@ -35,7 +35,7 @@ function lauf(register: Register | null): { ausgabe: string; letzterVerlauf: Rec
     writeFileSync(join(ak, 'public', 'data', 'titles.json'), JSON.stringify(TITEL))
     writeFileSync(join(ak, 'public', 'data', 'events.json'), '[]')
     writeFileSync(join(ak, 'public', 'data', 'releases.json'), '[]')
-    writeFileSync(join(ak, VERLAUF_DATEI), JSON.stringify(VERLAUF))
+    writeFileSync(join(ak, VERLAUF_DATEI), JSON.stringify(bisher))
     if (register) writeFileSync(join(ak, MAENGEL_DATEI), JSON.stringify(register))
     const r = spawnSync(process.execPath, [tsx, join(wurzel, 'pipeline/check-qualitaet.ts')], { env: { ...process.env, AK_ROOT: ak }, encoding: 'utf8', timeout: 60000, windowsHide: true })
     if (r.status !== 0) throw new Error(`Exit ${r.status}: ${r.stderr}`)
@@ -65,5 +65,10 @@ pruefe('Hinweis des Baus kommt als MAENGEL_VORFASSUNG-Zeile', c.ausgabe.split('\
 const d = lauf(null)
 pruefe('ohne Register: keine Mängel-Zeile, kein Feld `maengel` im Verlauf', !d.ausgabe.includes('MAENGEL_') && !('maengel' in d.letzterVerlauf), d.letzterVerlauf)
 
+const auto = { ...mitNeu, zaehler: { ...mitNeu.zaehler, fsk: { ...zaehler(2, 1), wer: 'auto:justwatch' } } }
+const e = lauf(auto, [{ gemessenAm: '2000-01-01', titel: 0, maengel: { fsk: 2 } }])
+const zeilen = e.ausgabe.split('\n')
+pruefe('STILLSTAND: auto-Art ohne Abbau, Kurz- und Artenzeile in der Ausgabe', zeilen.includes('MAENGEL_STILLSTAND seit 2000-01-01: 1 auto-Arten ohne Abbau (Arten: Logzeile MAENGEL_STILLSTAND_ARTEN)') && zeilen.includes('MAENGEL_STILLSTAND_ARTEN ohne Abbau: fsk 2→2 (auto:justwatch)'), e.ausgabe)
+
 if (verletzt) process.exit(1)
-console.log('check-qualitaet-maengel-lauf: 6 Fälle grün')
+console.log('check-qualitaet-maengel-lauf: 7 Fälle grün')

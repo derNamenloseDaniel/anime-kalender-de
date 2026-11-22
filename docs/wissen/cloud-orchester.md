@@ -6,7 +6,7 @@ Stand 22.11.2026, 02:00 UTC (erste und zweite Nacht, Auftrag Issue 4420). Alle Z
 ## Ablauf
 
 - **Orchestrator:** eine dauerhafte Cloud-Sitzung (Routine, stündlich geweckt). Er vergibt Aufgaben, liest Berichte und Prüfer-Urteile, nimmt ab und pflegt den Lage-Kommentar im Auftrags-Issue. Er baut nicht selbst.
-- **Bauer:** je Aufgabe eine eigene Cloud-Sitzung (`create_session`, Sonnet, höchstens 4 gleichzeitig). Jeder öffnet einen PR mit Label `orchester` und meldet sich mit `## Bauer fertig · <Aufgabe> · PR <N>` im Issue.
+- **Bauer:** je Aufgabe ein Agent in der Orchester-Sitzung (Agent-Werkzeug, `run_in_background`, `isolation: worktree`, Sonnet, 5 gleichzeitig (seit 22.11.2026; jede Spanne über 15 min mit weniger kommt mit Grund in den Nachtbericht); nicht per `create_session`, siehe „Ergänzungen und Bauer-Weg“; die ersten zwei Nächte liefen noch mit `create_session`). Jeder öffnet einen PR mit Label `orchester` und meldet sich mit `## Bauer fertig · <Aufgabe> · PR <N>` im Issue.
 - **Prüfer:** die PR-Prüfkette (CI-Prüfer schreibt „Prüfer-Review“ als Kommentar). Stufe 0/1 mergt der Nacht-Merger nach Bot-„ok“; Stufe 2 nur mit `## Nachtrag (Abnahme Dirigent) — Kopf <9 Zeichen>` zum aktuellen Kopf; Workflow-PRs nur von Hand.
 - **Wecken:** Ereignis-Monitor (Bash-Schleife, 120 s, gesehene IDs in einer Datei, Frist 30 min, bei jedem Wecken neu starten), dazu `ScheduleWakeup` 30 min als Rückfall und die stündliche Routine.
 - **Schalter:** Label `orchester-aktiv` am Issue, geprüft vor jedem Schreiben.
@@ -77,7 +77,7 @@ Stand 22.11.2026, 02:00 UTC (erste und zweite Nacht, Auftrag Issue 4420). Alle Z
 
 1. **Netz (erledigt, zweite Nacht: Umgebung „nacht-orchester“):** Für Nacht-Orchester eine eigene Cloud-Umgebung mit erlaubten Hosts (`anime-kalender.de`, `api.themoviedb.org`, `graphql.anilist.co`, …) und Setup-Skript `npm ci` anlegen; die Default-Umgebung hat keines, jeder Bauer verlor Zeit mit `npm ci`.
 2. **Mod-Test:** Stempel in `anzeige.test.ts` aus fester Uhr bilden; `uhr-in-tests` auf `.claude/mods` ausdehnen (Vorschlag A8).
-3. **Rückgabe an Bauer (offen, auch in der zweiten Nacht):** Bauer als Hintergrund-Agent (Agent-Werkzeug) statt Cloud-Sitzung, wenn Auflagen-Runden wahrscheinlich sind — dann geht `SendMessage`; oder die Auflage gleich als neue Sitzung mit Zweig und Auflagenliste planen.
+3. **Rückgabe an Bauer (seit 22.11.2026 umgesetzt):** Bauer als Hintergrund-Agent (Agent-Werkzeug) statt Cloud-Sitzung — dann geht `SendMessage` für Auflagen.
 4. **Stufe 2 ohne Auflagen:** Der Orchester-Auftrag erlaubt Abnahme nur nach umgesetzten Auflagen; reine Stufe-2-PRs mit Bot-„ok“ (4415, 4423, 4424, 4427, 4428, 4435, 4438) bleiben bis zum Morgen liegen. Entscheiden, ob der Orchestrator sie nach eigener Stichprobe abnehmen darf.
 5. **Reine Kommentar-PRs** in `pr-stufe` herabstufen (Vorschlag A21).
 6. **Gegenprobe:** Mutanten nur per Zeilenanker setzen, nie per erster Textfundstelle.
@@ -85,6 +85,14 @@ Stand 22.11.2026, 02:00 UTC (erste und zweite Nacht, Auftrag Issue 4420). Alle Z
 8. **Patch-Notes-Pflicht** von Anfang an in jeden Daten-Auftrag schreiben (Hänger 22:49–23:09).
 9. **Zweig der Auflagen-Sitzung** nur aus `pulls/<N> --jq .head.ref` nehmen, nie raten.
 10. **Prüfer-Neustart**, wenn eine Auflage per Kommentar statt Commit erfüllt wird (`pr-pruefer-nachtrag.yml`, Job `neustart`).
-11. **Nachschub** nur für Mängelarten mit erreichbarer Quelle; TMDB-Schlüssel als Netzwerk-Secret der Umgebung.
+11. **Nachschub** nur für Mängelarten mit erreichbarer Quelle; TMDB-Aufgaben über `claude-auftrag.yml` (die Umgebung hat keinen Schlüssel, siehe „Ergänzungen und Bauer-Weg“).
 12. **Lehren-Aufgaben:** `lehren.md` ins Repo legen oder solche Aufgaben als „lokal“ markieren.
 13. **Neue Mutanten** sofort mit `tests`-Eintrag anlegen (PR 4531).
+
+## Ergänzungen und Bauer-Weg (22.11.2026)
+
+- **Aufgabenliste:** der neueste `## Nachtrag (Nacht …)`-Kommentar an Issue 4420 plus alle späteren `## Ergänzung`-Kommentare. Das Orchester liest bei jedem Wecken alle Kommentare seit seiner Marke; sein Monitor meldet neue `## Ergänzung`/`## Nachtrag`-Kommentare. Eine Ergänzung mit VORRANG geht vor alle noch nicht vergebenen Aufgaben. Anlass: In der Nacht 21./22.11. blieben die Ergänzungen von 00:14/00:16 (Horizonte, Sitzungs-UI) bis zum Morgen liegen (Lehre 209).
+- **Bauer nur als Agent:** das Orchester startet Bauer als Agent in seiner eigenen Sitzung (`run_in_background`, `isolation: worktree`), nie per `create_session`: jede so erzeugte Sitzung erscheint in Daniels Windows-Client (40 „bauer…“-Sitzungen am 22.11.2026). Der Remote-Konnektor ist seit 22.11.2026 aus der Routine entfernt.
+- **Aufgaben mit TMDB:** die Cloud-Umgebung hat keinen TMDB-Schlüssel, das GitHub-Secret `TMDB_API_KEY` gibt es. Solche Aufgaben laufen per `gh workflow run claude-auftrag.yml` (Eingaben `auftrag`, `zweig`, `zweck`), der den Schlüssel als env setzt.
+- **Nachschub** nur aus Mängeln, die aus der Cloud belegbar sind (aniSearch-Seiten, Amazon, FSK, aniverse sind remote gesperrt; 10 Versuche in der Nacht 21./22.11.2026 ergaben 1 PR).
+- **Leerlauf ist verboten, Dauervorrat (seit 22.11.2026 12:09 UTC im Routine-Prompt):** Ist die Liste leer, vergibt das Orchester der Reihe nach aus (1) Rängen der Lösungskarte in `maengel.md` ohne PR, (2) Mängelarten `auto:anilist`/`auto:bau` mit offen > 0, (3) TMDB-Aufgaben über `claude-auftrag.yml`, (4) Funktionen über 80 Zeilen (`check:umfang`, Skill `zerlegen`), (5) alten Farbklassen (`design-klassen.mjs`). „Vorrat leer“ nur mit Beleg je Quelle; das ist ein Fehler. Anlass: Der alte Prompt erlaubte „Leerlauf im Bericht“, die Nacht 21./22.11. lag 01:59–07:30 UTC still (Lehre 210, Bericht `daniel-zum-abarbeiten/berichte/orchester-durchsatz-2026-11-22.md`).

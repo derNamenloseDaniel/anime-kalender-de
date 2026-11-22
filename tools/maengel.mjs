@@ -1,7 +1,7 @@
 /**
  * Mängel-Register lesen (`data/maengel.json`, Entscheidung 16.11.2026, docs/wissen/maengel.md).
  *   node tools/maengel.mjs                          Übersicht je Art: offen, neu, behoben, Rückfall, Ausnahme, Wirkung, wer
- *   node tools/maengel.mjs --top 20 [--wer auto|hand|daniel]   die nächsten Titel nach Wirkung; gleiche Wirkung: Termin in 30 Tagen vor laufend vor Rang (`tr`)
+ *   node tools/maengel.mjs --top 20 [--wer auto|hand|daniel]   die nächsten Titel nach Wirkung; gleiche Wirkung: Erstausgabe ab 2021 vor 2020 und früher, Termin in 30 Tagen vor laufend vor Rang (`tr`)
  */
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -12,6 +12,23 @@ const lies = (p) => JSON.parse(readFileSync(join(wurzel, p), 'utf8'))
 
 /** Wer eine Zeile abbaut: `auto:…`, `hand:…` oder `daniel` → die Klasse davor. */
 const klasse = (wer) => wer.split(':')[0]
+
+const WEG_ARTEN = ['kein-weg', 'erstausgabe-ohne-weg']
+
+/** Erstausgabe 2020 oder früher: Mangel bleibt, wird aber nachrangig befüllt (Daniel, 21.11.2026, F152). */
+export const ALT_BIS_JAHR = 2020
+
+/** Jahr der deutschen Erstausgabe (`deErstausgabe.von`); ohne Datum `null`, kein Schluss aus `jpYear` (die deutsche Fassung kann viel später kommen). */
+export const erstausgabeJahr = (t) => {
+  const jahr = Number(t?.deErstausgabe?.von?.slice(0, 4))
+  return Number.isInteger(jahr) && jahr > 0 ? jahr : null
+}
+
+/** `alt` (≤ 2020), `neu` (ab 2021) oder `ohneJahr`: Wer kein Jahr belegt, gilt nicht als alt und wird nicht zurückgestellt. */
+export const jahresGruppe = (t) => {
+  const jahr = erstausgabeJahr(t)
+  return jahr === null ? 'ohneJahr' : jahr <= ALT_BIS_JAHR ? 'alt' : 'neu'
+}
 
 /** Titel mit Termin ab heute: 0 = in 30 Tagen, 1 = später, 2 = keiner. */
 export function terminStufe(kennung, events, heute) {
@@ -24,7 +41,7 @@ export function terminStufe(kennung, events, heute) {
 /** Laufend (Stufe 1 der Rangfolge): Serie ohne Ende ab heute; ohne `jpEnd` gilt das Jahresende von `jpYear` (wie `titleStatus`), ein Film läuft nie (17.11.2026: Zorro und Eichhörnchen und Igel, 1977, standen als laufend). */
 export const laeuft = (t, heute) => t.format !== 'MOVIE' && (t.jpEnd ?? (t.jpYear ? `${t.jpYear}-12-31` : '9')) >= heute
 
-/** Die nächsten Titel: je Titel die höchste Wirkung seiner offenen Mängel, geordnet nach Wirkung, dann Termin in 30 Tagen vor laufend vor Titelrang `tr`. */
+/** Die nächsten Titel: je Titel die höchste Wirkung seiner offenen Mängel, geordnet nach Wirkung, dann Erstausgabe ab 2021 vor ≤ 2020, Termin in 30 Tagen vor laufend vor Titelrang `tr`. */
 export function nextTop(register, titel, events, heute, n, wer) {
   const nachKennung = new Map(titel.map((t) => [t.id, t]))
   const je = new Map()
@@ -37,9 +54,9 @@ export function nextTop(register, titel, events, heute, n, wer) {
   }
   const zeilen = [...je.values()].map((e) => {
     const t = nachKennung.get(e.t)
-    return { ...e, name: t?.titleDe ?? t?.titleRomaji ?? '?', stufe: terminStufe(e.t, events, heute), laeuft: t ? laeuft(t, heute) : false, rang: t?.tr ?? Infinity }
+    return { ...e, name: t?.titleDe ?? t?.titleRomaji ?? '?', stufe: terminStufe(e.t, events, heute), alt: jahresGruppe(t) === 'alt', laeuft: t ? laeuft(t, heute) : false, rang: t?.tr ?? Infinity }
   })
-  const reihe = (e) => [-e.wirkung, e.stufe, e.laeuft ? 0 : 1, e.rang]
+  const reihe = (e) => [-e.wirkung, e.alt ? 1 : 0, e.stufe, e.laeuft ? 0 : 1, e.rang]
   zeilen.sort((a, b) => { const x = reihe(a), y = reihe(b); for (let i = 0; i < x.length; i++) if (x[i] !== y[i]) return x[i] < y[i] ? -1 : 1; return a.t - b.t })
   return zeilen.slice(0, n)
 }
@@ -58,7 +75,18 @@ function main() {
     }
     return
   }
-  for (const zeile of uebersicht(register)) console.log(zeile)
+  const titel = lies('public/data/titles.json')
+  for (const zeile of [...uebersicht(register), ...jahresZeilen(register, titel)]) console.log(zeile)
+}
+
+/** Weg-Mängel getrennt nach Erstausgabe: die Summe bleibt die der Übersicht, diese Zeilen zeigen nur, wie sie sich teilt. */
+export function jahresZeilen(register, titel) {
+  const nachKennung = new Map(titel.map((t) => [t.id, t]))
+  return WEG_ARTEN.map((art) => {
+    const n = { alt: 0, neu: 0, ohneJahr: 0 }
+    for (const z of register.zeilen) if (z.art === art && z.status === 'offen') n[jahresGruppe(nachKennung.get(z.t))]++
+    return `${art}: ≤ ${ALT_BIS_JAHR} ${n.alt} · ab ${ALT_BIS_JAHR + 1} ${n.neu} · ohne Jahr ${n.ohneJahr}`
+  })
 }
 
 /** Eine Zeile je Art; Wirkung und `wer` stammen aus dem Zähler, gelten also auch für Arten ohne offene Zeile. */

@@ -65,6 +65,10 @@ const verweise = verweiseFuer(alsAnilist)
 pruefe('Absprung der Wertung führt zu AniList, nicht zu aniSearch', verweise.length === 1 && verweise[0]?.name === 'AniList' && verweise[0].ziel === 'https://anilist.co/anime/900101' && verweise[0].hinweis === 'Bei AniList ansehen', verweise)
 pruefe('ohne Rückfall bleibt der Absprung aniSearch', verweiseFuer(titel(900101, { score: 74, anisearchId: 10 }))[0]?.name === 'aniSearch')
 
+writeFileSync(join(wurzel, 'data', 'cache', 'anilist-by-id.json'), JSON.stringify({ 900101: eintrag(900101, 33, 33, 99) }))
+pruefe('Standardliste wird einmal je Prozess gelesen, eine eigene Liste liest neu und ändert den Merker nicht',
+  ladeAnilistWertungen().get(900101)?.score === 70 && ladeAnilistWertungen(['data/cache/anilist-by-id.json']).get(900101)?.score === 33 && ladeAnilistWertungen().get(900101)?.score === 70)
+
 rmSync(wurzel, { recursive: true, force: true })
 console.log(verletzt ? `\nAniList-Wertung: ${verletzt} Zusicherung(en) verletzt.` : 'AniList-Wertung: alle Zusicherungen halten.')
 process.exit(verletzt ? 1 : 0)

@@ -1,4 +1,6 @@
 import { mockup } from '../register.ts'
+/* Der Nachbau des alten Standes (Vorher) wird von den Weichen geladen; der Import ordnet ihn diesem Mockup zu (`buehne-umfang`). */
+import './filter-konzept-alt.ts'
 
 /** Die Überlegungen hinter dem Filterkonzept (analyse.md, gegenpruefung.md, 22.11.2026), je ein Satz mit Nutzen für den Besucher. */
 const UEBERLEGUNGEN = [

@@ -143,9 +143,13 @@ function keinWegAusnahme(t: Title, k: Kontext): string | undefined {
   return !t.jpYear && !t.jpStart && !t.jpEnd && termine.length === 0 ? 'unveroeffentlicht' : undefined
 }
 
+/** Zu Recht ohne Banner (22.11.2026): TMDB führt keins (`null`, nicht „nie gesucht“) und kein Teil der Reihe hat eins zum Übernehmen. */
+const keinBannerBekannt = (t: Title, k: Kontext): string | undefined =>
+  k.banner(t.id) === null && !k.franchiseTeile(t).some((x) => x.hatBanner) ? 'kein-banner-bekannt' : undefined
+
 export const REGELN: Regel[] = [
   { art: 'cover', gruppe: 'fehlend', wirkung: 3, wer: 'auto:tmdb-poster', zaehle: luecke('c'), ausnahme: (t, k) => (k.coverBekannt[t.id] ? 'ohne-bekanntes-cover' : undefined) },
-  { art: 'banner', gruppe: 'fehlend', wirkung: 1, wer: 'auto:tmdb-banner', zaehle: (t) => !t.bannerImage },
+  { art: 'banner', gruppe: 'fehlend', wirkung: 1, wer: 'auto:tmdb-banner', zaehle: (t) => !t.bannerImage, ausnahme: keinBannerBekannt },
   { art: 'bild-fremdsprachig', gruppe: 'schwach', wirkung: 2, wer: 'auto:tmdb-poster', zaehle: (t, k) => fremdeBilder(t, k.plakat, k.banner).length > 0, ausnahme: (t, k) => (fremdeBilder(t, k.plakat, k.banner).every(Boolean) ? KEINE_LESBARE : undefined) },
   { art: 'titel-de', gruppe: 'fehlend', wirkung: 3, wer: 'hand:synchro-belegen', zaehle: luecke('t'), ausnahme: (t) => (hatEinenWeg(t) || t.deErstausgabe ? undefined : 'ohne-deutsche-fassung') },
   { art: 'handlung-de', gruppe: 'fehlend', wirkung: 2, wer: 'hand:handlung-eigen', zaehle: (t, k) => !k.synopse(t.id)?.de },

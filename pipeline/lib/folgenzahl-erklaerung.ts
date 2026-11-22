@@ -1,7 +1,7 @@
 import type { Release, Title } from '../../shared/types.ts'
 
 /** Folgenzahl und Format eines Titels aus demselben Franchise (Kontext der Regel `folgenzahl-widerspruch`). */
-export interface FranchiseTeil { format?: string; episodes?: number }
+export interface FranchiseTeil { format?: string; episodes?: number; hatBanner?: boolean }
 
 /** Alle Teile je Franchise-Kennung aus `titles.json`, damit die Regel ohne Titelliste auskommt. */
 export function franchiseTeile(titel: Title[]): Map<number, (FranchiseTeil & { id: number })[]> {
@@ -9,7 +9,7 @@ export function franchiseTeile(titel: Title[]): Map<number, (FranchiseTeil & { i
   for (const t of titel) {
     const k = t.franchiseId ?? t.id
     const liste = je.get(k) ?? []
-    liste.push({ id: t.id, format: t.format, episodes: t.episodes })
+    liste.push({ id: t.id, format: t.format, episodes: t.episodes, hatBanner: Boolean(t.bannerImage) })
     je.set(k, liste)
   }
   return je

@@ -8668,7 +8668,7 @@ const speicherSchreiben = (werte) => globalThis.akKontext.schreiben(werte)
   }
 
   function primeSpur(lauf, was, daten = {}) {
-    lauf.spur = [...(lauf.spur ?? []), { t: new Date().toISOString(), was, ...daten }].slice(-80)
+    lauf.spur = globalThis.akPrimeSpurKuerzen([...(lauf.spur ?? []), { t: new Date().toISOString(), was, ...daten }])
     notiere(`durchgang-${was}`, daten)
   }
 

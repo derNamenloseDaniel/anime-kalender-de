@@ -36,6 +36,12 @@ globalThis.akPrimeUebersprungenDazu = (lauf, eintragKennung, text) => {
 }
 
 /*
+  Die Spur des Durchgangs behält die letzten `max` Einträge und dazu jeden mit `ok: false` (gescheiterte Seite), auch wenn er
+  älter ist: Der Fehler steht sonst nicht mehr im Bericht, sobald viele spätere Einträge ihn verdrängt haben.
+*/
+globalThis.akPrimeSpurKuerzen = (spur, max = 80) => spur.filter((e, i) => i >= spur.length - max || e.ok === false)
+
+/*
   Fortschritt am Knopf: Nenner = offene Titel + offene gewählte Karten, beim Start gezählt (`titelGesamt`) und danach
   fest; jede Karte zählt wie ein Titel. Vorher wuchs der Nenner mit den Treffern der Suche („13/13“ auf „16/16“,
   Daniel, 18.11.2026); die Auswahl steht beim Start fest (20.11.2026).

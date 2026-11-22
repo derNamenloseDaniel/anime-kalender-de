@@ -38,7 +38,7 @@
         "datei": "pipeline/lib/maengel-regeln.ts",
         "suche": "2",
         "ersetze": "0",
-        "zeile": 171
+        "zeile": 175
       }
     ],
     "tests": [
@@ -54,7 +54,7 @@
         "datei": "pipeline/lib/maengel-regeln.ts",
         "suche": "laeuftNoch(t, k) ? 'laeuft' : undefined",
         "ersetze": "laeuftNoch(t, k) ? undefined : 'laeuft'",
-        "zeile": 171
+        "zeile": 175
       }
     ],
     "tests": [
@@ -70,7 +70,7 @@
         "datei": "pipeline/lib/maengel-regeln.ts",
         "suche": "laeuftNoch(t, k)",
         "ersetze": "laeuftNoch(k, t)",
-        "zeile": 171
+        "zeile": 175
       }
     ],
     "tests": [

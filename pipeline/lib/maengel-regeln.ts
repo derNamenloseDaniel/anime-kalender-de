@@ -6,6 +6,7 @@ import { folgenzahlAusnahme, type FranchiseTeil } from './folgenzahl-erklaerung.
 import { herkunftFremderTitel } from './herkunft-fremder-titel.ts'
 import { ohneSprachurteil } from './ohne-sprachurteil.ts'
 import { STAFFEL_AUSNAHME, type StaffelBefund } from './maengel-staffel.ts'
+import { fremdeBilder, KEINE_LESBARE, type BildLookup, type PlakatWahl } from './bild-sprache.ts'
 
 /**
  * **Regeltabelle des Mängel-Registers** (Entscheidung 16.11.2026, `docs/wissen/maengel.md`). Jede Mangelart ist eine Zeile: Gruppe, Wirkung, wer sie abbaut,
@@ -40,6 +41,9 @@ export interface Kontext {
   franchiseTeile: (t: Title) => FranchiseTeil[]
   /** Verneint ein Handbeleg die Plattform für einen Termin ab diesem Tag (`baueNeinGilt`)? */
   neinGilt: (id: number, plattform: string, ab: string) => boolean
+  /** Eintrag in `data/tmdb-poster.json` bzw. `data/tmdb-banner.json` (Sprache und Abruftag des gewählten Bildes). */
+  plakat: BildLookup<PlakatWahl>
+  banner: BildLookup<{ p: string }>
 }
 
 export interface Regel {
@@ -139,6 +143,7 @@ function keinWegAusnahme(t: Title, k: Kontext): string | undefined {
 export const REGELN: Regel[] = [
   { art: 'cover', gruppe: 'fehlend', wirkung: 3, wer: 'auto:tmdb-poster', zaehle: luecke('c'), ausnahme: (t, k) => (k.coverBekannt[t.id] ? 'ohne-bekanntes-cover' : undefined) },
   { art: 'banner', gruppe: 'fehlend', wirkung: 1, wer: 'auto:tmdb-banner', zaehle: (t) => !t.bannerImage },
+  { art: 'bild-fremdsprachig', gruppe: 'schwach', wirkung: 2, wer: 'auto:tmdb-poster', zaehle: (t, k) => fremdeBilder(t, k.plakat, k.banner).length > 0, ausnahme: (t, k) => (fremdeBilder(t, k.plakat, k.banner).every(Boolean) ? KEINE_LESBARE : undefined) },
   { art: 'titel-de', gruppe: 'fehlend', wirkung: 3, wer: 'hand:synchro-belegen', zaehle: luecke('t'), ausnahme: (t) => (hatEinenWeg(t) || t.deErstausgabe ? undefined : 'ohne-deutsche-fassung') },
   { art: 'handlung-de', gruppe: 'fehlend', wirkung: 2, wer: 'auto:anisearch', zaehle: (t, k) => !k.synopse(t.id)?.de },
   { art: 'folgentitel', gruppe: 'fehlend', wirkung: 2, wer: 'auto:tmdb', zaehle: folgentitelFehlen, ausnahme: (t) => (t.format === 'MOVIE' ? 'film' : undefined) },

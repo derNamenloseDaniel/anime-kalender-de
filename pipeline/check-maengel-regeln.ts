@@ -2,6 +2,7 @@
 import type { Release, Title } from '../shared/types.ts'
 import { adresseMehrfach, REGELN, zaehleMaengel, type Kontext } from './lib/maengel-regeln.ts'
 import { baueNeinGilt } from './lib/maengel-nein.ts'
+import { alsLookup } from './lib/bild-sprache.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -45,6 +46,8 @@ const kontext = (ueber: Partial<Kontext> = {}): Kontext => ({
   staffelZuordnung: new Map(),
   franchiseTeile: () => [],
   neinGilt: () => false,
+  plakat: () => undefined,
+  banner: () => undefined,
   ...ueber,
 })
 const arten = (t: Title, k = kontext()) => zaehleMaengel([t], k).map((x) => (x.grund ? `${x.art}:${x.grund}` : x.art))
@@ -59,6 +62,19 @@ pruefe('cover: Treffer', arten(gut(1, { coverImage: undefined })).join() === 'co
 pruefe('cover: auf der Handliste cover-ohne-bekannt ist Ausnahme', arten(gut(1, { coverImage: undefined }), kontext({ coverBekannt: { 1: 'TMDB führt ihn nicht' } })).join() === 'cover:ohne-bekanntes-cover')
 pruefe('cover: anderer Titel auf der Handliste ändert nichts', arten(gut(1, { coverImage: undefined }), kontext({ coverBekannt: { 2: 'x' } })).join() === 'cover')
 pruefe('banner: Treffer', arten(gut(1, { bannerImage: undefined })).join() === 'banner')
+/* bild-fremdsprachig: japanisches TMDB-Plakat oder AniList-Key-Visual (Daniel, 21.11.2026) */
+const TMDB = 'https://image.tmdb.org/t/p/w500/x.jpg'
+const ANILIST = 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1.jpg'
+const plakat = (l: string | null, nurJa?: true, p = '/x.jpg') => kontext({ plakat: () => ({ p, w: 1000, h: 1500, l, inhaltAm: '2026-12-01', ...(nurJa ? { nurJa } : {}) }) })
+pruefe('bild-fremdsprachig: japanisches Plakat aus der alten Wahl ist offen', arten(gut(1, { coverImage: TMDB }), plakat('ja')).join() === 'bild-fremdsprachig')
+pruefe('bild-fremdsprachig: japanisches Plakat mit Beleg „nur japanisch“ ist Ausnahme, ohne Beleg (auch mit neuem Abruftag) offen', arten(gut(1, { coverImage: TMDB }), plakat('ja', true)).join() === 'bild-fremdsprachig:keine-lesbare-fassung' && arten(gut(1, { coverImage: TMDB }), plakat('ja')).join() === 'bild-fremdsprachig')
+pruefe('bild-fremdsprachig: deutsches, englisches und textloses Plakat zählen nicht', ['de', 'en', null].every((l) => arten(gut(1, { coverImage: TMDB }), plakat(l)).length === 0))
+pruefe('bild-fremdsprachig: TMDB-Cover eines anderen Plakats (Schwestertitel) zählt nicht', arten(gut(1, { coverImage: TMDB }), plakat('ja', undefined, '/y.jpg')).length === 0)
+pruefe('bild-fremdsprachig: AniList-Cover offen, solange TMDB nicht „kein Plakat“ sagt', arten(gut(1, { coverImage: ANILIST })).join() === 'bild-fremdsprachig' && arten(gut(1, { coverImage: ANILIST }), kontext({ plakat: () => null })).join() === 'bild-fremdsprachig:keine-lesbare-fassung')
+pruefe('bild-fremdsprachig: AniList-Banner offen, solange TMDB nicht „kein Banner“ sagt', arten(gut(1, { bannerImage: ANILIST })).join() === 'bild-fremdsprachig' && arten(gut(1, { bannerImage: ANILIST }), kontext({ banner: () => null })).join() === 'bild-fremdsprachig:keine-lesbare-fassung')
+const nachschlagen = alsLookup({ 1: { p: '/a.jpg' }, 2: null, 3: { p: '/geteilt.jpg' } }, { 1: { p: '/a.jpg' }, 2: null })
+pruefe('bild-fremdsprachig: Bestand wie im Bau – Eintrag, null, geteilter Film wird null, nie gesucht bleibt undefined', nachschlagen(1)?.p === '/a.jpg' && nachschlagen(2) === null && nachschlagen(3) === null && nachschlagen(4) === undefined)
+pruefe('bild-fremdsprachig: Ausnahme nur, wenn jedes Bild sie hat', arten(gut(1, { coverImage: ANILIST, bannerImage: ANILIST }), kontext({ plakat: () => null })).join() === 'bild-fremdsprachig' && arten(gut(1, { coverImage: ANILIST, bannerImage: ANILIST }), kontext({ plakat: () => null, banner: () => null })).join() === 'bild-fremdsprachig:keine-lesbare-fassung')
 pruefe('titel-de: Treffer mit Weg', arten(gut(1, { titleDe: undefined })).join() === 'titel-de')
 pruefe('titel-de: ohne Weg und Erstausgabe zu Recht leer', arten(gut(1, { titleDe: undefined, streams: [], watchLinks: [], deErstausgabe: undefined })).join() === 'titel-de:ohne-deutsche-fassung,kein-weg')
 pruefe('handlung-de: Treffer', arten(gut(1), kontext({ synopse: () => ({ en: 'only' }) })).join() === 'handlung-de')
@@ -158,6 +174,7 @@ pruefe('adresse-mehrfach: Regel nutzt die Menge', arten(gut(1), kontext({ adress
 /* Grenzfälle und Einheitlichkeit (Prüfer-Auflagen N4, N7) */
 const regel = (art: string) => REGELN.find((r) => r.art === art)!
 pruefe('Tabelle: cover und kein-weg tragen Wirkung 3; wer auto:tmdb-poster bzw. daniel', regel('cover').wirkung === 3 && regel('cover').wer === 'auto:tmdb-poster' && regel('kein-weg').wirkung === 3 && regel('kein-weg').wer === 'daniel')
+pruefe('Tabelle: bild-fremdsprachig ist schwach, Wirkung 2, wer auto:tmdb-poster', regel('bild-fremdsprachig')?.gruppe === 'schwach' && regel('bild-fremdsprachig')?.wirkung === 2 && regel('bild-fremdsprachig')?.wer === 'auto:tmdb-poster')
 pruefe('folgentitel: SPECIAL und MUSIC mit mehreren Folgen sind keine Ausnahme', ['SPECIAL', 'MUSIC', 'OVA'].every((f) => arten(gut(1, { format: f as Title['format'] }), ohneFolgen).join() === 'folgentitel'))
 pruefe('kein-weg: Disc-Termin ist ein Weg (wie bei erstausgabe-ohne-weg)', !arten(gut(1, { streams: [], watchLinks: [] }), kontext({ discTitel: new Set([1]) })).includes('kein-weg') && arten(gut(1, { streams: [], watchLinks: [] }), kontext({ discTitel: new Set([2]) })).includes('kein-weg'))
 const ohneWeg = (ueber: Partial<Title> = {}) => gut(1, { streams: [], watchLinks: [], ...ueber })

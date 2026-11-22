@@ -57,7 +57,7 @@ try {
   const { anisearchFelderAnwenden } = await import('./lib/anisearch-felder.ts')
   const titelKarten = new Map<number, { id: number; runtimeMin?: number }>([900_001, 900_002].map((id) => [id, { id }] as const))
   const meldung = anisearchFelderAnwenden(titelKarten as never)
-  pruefe('Laufzeit in der Titelkarte (anisearch-felder): nur der Titel ohne Streichung bekommt sie', meldung.endsWith('1 mit Laufzeit aus aniSearch') && titelKarten.get(900_001)?.runtimeMin === undefined, meldung)
+  pruefe('Laufzeit in der Titelkarte (anisearch-felder): nur der Titel ohne Streichung bekommt sie', meldung.endsWith('1 mit Laufzeit aus aniSearch, 0 aus AniList') && titelKarten.get(900_001)?.runtimeMin === undefined, meldung)
 
   writeFileSync(join(wurzel, 'data/anisearch-ids-hand.yaml'), '')
   const { anisearchBruecke } = await import('./lib/anisearch-katalog-ids.ts')

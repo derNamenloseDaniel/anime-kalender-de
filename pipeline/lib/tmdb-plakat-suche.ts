@@ -4,12 +4,22 @@ import { abrufTag } from './tmdb-ablauf.ts'
 import { urteilTreffer, type KeinTreffer, type TmdbTreffer } from './tmdb-suche.ts'
 import type { Title } from '../../shared/types.ts'
 
-/** `inhaltAm`: Tag des Abrufs bei TMDB (`lib/tmdb-ablauf.ts`, Erneuerung nach 150 Tagen). */
-export type PlakatEintrag = { p: string; w: number; h: number; l: string | null; inhaltAm?: string } | null
+/**
+ * `inhaltAm`: Tag des Abrufs bei TMDB (`lib/tmdb-ablauf.ts`, Erneuerung nach 150 Tagen). `nurJa`: `waehlePlakat` nahm japanisch, weil es kein
+ * deutsches, englisches oder textloses Hochformat gab — Beleg für die Mängelart `bild-fremdsprachig`; Einträge aus der alten Folge haben es nicht.
+ */
+export type PlakatEintrag = { p: string; w: number; h: number; l: string | null; inhaltAm?: string; nurJa?: true } | null
 export type PlakatBestand = Record<string, PlakatEintrag>
 
-/** Der Bestandseintrag zu einem gewählten Plakat, mit dem Tag des Abrufs. */
-export const plakatEintrag = (wahl: TmdbBild): NonNullable<PlakatEintrag> => ({ p: wahl.file_path, w: wahl.width, h: wahl.height, l: wahl.iso_639_1, inhaltAm: abrufTag() })
+/** Der Bestandseintrag zu einem gewählten Plakat (aus `waehlePlakat`), mit dem Tag des Abrufs. */
+export const plakatEintrag = (wahl: TmdbBild): NonNullable<PlakatEintrag> => ({
+  p: wahl.file_path,
+  w: wahl.width,
+  h: wahl.height,
+  l: wahl.iso_639_1,
+  inhaltAm: abrufTag(),
+  ...(wahl.iso_639_1 === 'ja' ? { nurJa: true as const } : {}),
+})
 /** Warum ein Titel kein TMDB-Plakat hat (`data/tmdb-poster-grund.json`); `kandidaten` als `tv/<Kennung>` oder `movie/<Kennung>`. */
 export type PlakatGrund = { grund: KeinTreffer | 'kein Plakat'; kandidaten?: string[] }
 export type GrundBestand = Record<string, PlakatGrund>

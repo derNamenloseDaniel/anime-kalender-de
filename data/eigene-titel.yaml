@@ -20,6 +20,7 @@
 #   widerrufen (optional) Quelle und Datum, wenn die Ankündigung zurückgenommen wurde: Titel und Termin entfallen, die Nummer bleibt vergeben
 #   tmdb       `movie/<Kennung>` oder `tv/<Kennung>`: das TMDB-Werk, dessen Plakat der Titel trägt. Pflicht, außer `coverGrund` oder `zuId` steht da.
 #              Die Kennung stammt aus der TMDB-Suche (Name, Jahr, Genre Animation), nie geraten; der Plakatlauf holt das Bild beim nächsten Durchlauf.
+#   studios, genres, runtimeMin, jpYear   (optional) Stammdaten, die `datenQuelle` (https, Pflicht dazu) belegt; Genres in AniList-Schreibweise
 #   coverGrund statt `tmdb`: warum es kein Plakat gibt (ein Termin ohne Bild fiel am 03.11.2026 erst im Kalender auf)
 #
 # Führt ein Katalog den Titel später selbst, meldet der Bestandsprüfer „Katalog führt jetzt …“: dann `zuId` setzen, nicht löschen.
@@ -52,5 +53,10 @@
   folgen: 73
   tag: 2026-11-01
   tmdb: tv/4961 # TMDB „M.A.S.K.“ (1985-09-30, Animation, 75 Folgen), abgelesen 08.11.2026
+  studios: [DiC Entertainment]
+  genres: [Action, Sci-Fi]
+  runtimeMin: 22
+  jpYear: 1985
+  datenQuelle: https://de.wikipedia.org/wiki/M.A.S.K. # Infobox (Länge 22, Genre Actionserie/Science-Fiction, 1985–1986), „produziert von DiC Entertainment“, abgelesen 21.11.2026
   sources: [https://www.anime2you.de/news/1065078/aniverse-november-2026-neuzugaenge/]
   zitat: "Der Prime Video Channel aniverse stockt sein Programm auch im November 2026 mit mehreren neuen Anime-Titeln auf. … 1. November: »M.A.S.K.« Episoden: 73 (komplett) Sprache: Deutsch Stream: Noch nicht verfügbar"

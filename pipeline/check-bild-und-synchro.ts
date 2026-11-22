@@ -11,6 +11,7 @@ import { ohneBelegteSynchro } from './bau/synchro-belegt.ts'
 import { ausAnisearchDubs } from './lib/anisearch-synchro-ids.ts'
 import { malOhneAnilistTitel } from './lib/anisearch-cover.ts'
 import { waehlePlakat } from './lib/tmdb-plakat.ts'
+import { plakatEintrag } from './lib/tmdb-plakat-suche.ts'
 import { waehleStaffel } from './lib/tmdb-staffel.ts'
 import { berechneAntwort } from '../web/src/components/detail/antwort-berechnen.ts'
 import { mitDubKennzeichen, terminAusEintrag } from './lib/anisearch-termine.ts'
@@ -34,10 +35,11 @@ console.log('Plakat-Auswahl')
 const bild = (iso: string | null, width: number, height: number) => ({ file_path: `/${iso}${width}.jpg`, width, height, iso_639_1: iso })
 pruefe('das deutsche Plakat geht vor dem größeren englischen', waehlePlakat([bild('en', 2000, 3000), bild('de', 1000, 1500), bild('ja', 3000, 4500)])?.iso_639_1 === 'de')
 pruefe('ohne deutsches geht englisch vor ohne Sprache', waehlePlakat([bild(null, 2000, 3000), bild('en', 1000, 1500), bild('ja', 3000, 4500)])?.iso_639_1 === 'en')
-pruefe('ohne de und en bleibt japanisch vor ohne Sprache', waehlePlakat([bild(null, 2000, 3000), bild('ja', 1000, 1500)])?.iso_639_1 === 'ja')
+pruefe('ohne de und en geht ohne Sprache vor japanisch, auch vor dem breiteren', waehlePlakat([bild('ja', 2000, 3000), bild(null, 1000, 1500)])?.iso_639_1 === null)
 pruefe('nur ohne Sprache: es gibt trotzdem ein Plakat', waehlePlakat([bild(null, 1000, 1500)])?.iso_639_1 === null)
 pruefe('nur japanisch: es bleibt japanisch', waehlePlakat([bild('ja', 1000, 1500)])?.iso_639_1 === 'ja')
 pruefe('innerhalb einer Sprache gewinnt das breiteste', waehlePlakat([bild('ja', 1000, 1500), bild('ja', 2000, 3000)])?.width === 2000)
+pruefe('Eintrag: ein japanisches Plakat trägt den Beleg „nur japanisch“, andere nicht', plakatEintrag(bild('ja', 1000, 1500)).nurJa === true && [null, 'en', 'de'].every((l) => plakatEintrag(bild(l, 1000, 1500)).nurJa === undefined))
 pruefe('Querformate zählen nicht', waehlePlakat([bild('ja', 3000, 1500)]) === undefined)
 pruefe('ohne Bilder kein Plakat', waehlePlakat([]) === undefined)
 const staffeln = [{ season_number: 0, air_date: '2005-10-01', episode_count: 3 }, { season_number: 1, air_date: '2005-04-07', episode_count: 12 }, { season_number: 2, air_date: '2005-10-20', episode_count: 12 }]

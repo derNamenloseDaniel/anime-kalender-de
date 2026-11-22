@@ -71,6 +71,7 @@ pipeline/check-anisearch-cover-eigen.ts
 pipeline/check-anisearch-dubletten.ts
 pipeline/check-anisearch-folgen-kennung.ts
 pipeline/check-anisearch-folgen-liste.ts
+pipeline/check-anisearch-genres.ts
 pipeline/check-anisearch-handlung.ts
 pipeline/check-anisearch-katalog-abgleich.ts
 pipeline/check-anisearch-kennung-mehrfach.ts
@@ -400,6 +401,7 @@ pipeline/check-lade-neuversuch.ts
 pipeline/check-ladefehler-nein.ts
 pipeline/check-ladeplatz-frist.ts
 pipeline/check-lauf-fortschritt.ts
+pipeline/check-laufzeit-anilist.ts
 pipeline/check-laut-gleich.ts
 pipeline/check-lazy-rueckfall.ts
 pipeline/check-leere-liste.ts

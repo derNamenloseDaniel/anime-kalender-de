@@ -9311,5 +9311,19 @@
       "sagt": "2027-02-19",
       "stand": "aktuell"
     }
+  ],
+  "ranma-s3-netflix": [
+    {
+      "url": "https://www.anime2you.de/news/1062641/netflix-anime-neu-im-november-2026/",
+      "name": "anime2you.de",
+      "gesehenAm": "2026-11-22",
+      "stand": "aktuell"
+    },
+    {
+      "url": "https://www.anime2you.de/news/1073600/netflix-anime-neu-im-dezember-2026/",
+      "name": "anime2you.de",
+      "gesehenAm": "2026-11-22",
+      "stand": "aktuell"
+    }
   ]
 }

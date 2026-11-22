@@ -152,7 +152,7 @@ export const REGELN: Regel[] = [
   { art: 'folgenzahl', gruppe: 'fehlend', wirkung: 3, wer: 'auto:anilist', zaehle: (t) => SERIE.has(t.format ?? '') && !t.episodes, ausnahme: (t, k) => (laeuftNoch(t, k) ? 'laeuft' : undefined) },
   { art: 'fsk', gruppe: 'fehlend', wirkung: 2, wer: 'auto:justwatch', zaehle: (t) => t.fsk == null },
   { art: 'wertung', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anilist', zaehle: (t) => !t.score },
-  { art: 'studio', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anilist', zaehle: (t) => !t.studios?.length },
+  { art: 'studio', gruppe: 'fehlend', wirkung: 1, wer: 'hand:studio-von-hand', zaehle: (t) => !t.studios?.length },
   { art: 'genre', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anilist', zaehle: (t) => !t.genres?.length },
   { art: 'laufzeit', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anisearch', zaehle: (t) => !t.runtimeMin },
   { art: 'jahr', gruppe: 'fehlend', wirkung: 2, wer: 'auto:anilist', zaehle: luecke('j') },

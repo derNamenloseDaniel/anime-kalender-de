@@ -645,6 +645,7 @@ pipeline/check-streaming-luecke.ts
 pipeline/check-streaming-rueckgang.ts
 pipeline/check-streaming-zaehlen.ts
 pipeline/check-studio-archiv.ts
+pipeline/check-studio-von-hand.ts
 pipeline/check-stuetzpunkt-ueberholt.ts
 pipeline/check-stumme-quellen.ts
 pipeline/check-such-chip.ts

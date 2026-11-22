@@ -35,6 +35,8 @@ export interface EigenerEintrag {
   genres?: string[]
   runtimeMin?: number
   jpYear?: number
+  /** Folgenzahl der Serie laut `datenQuelle`; nicht `folgen` (Umfang des Katalogs der Ankündigung, kann kleiner sein). */
+  episodes?: number
   /** Adresse, die die Stammdaten belegt (Pflicht, sobald eines davon steht). */
   datenQuelle?: string
 }
@@ -55,7 +57,8 @@ function pruefeStammdaten(e: Partial<EigenerEintrag>, wo: string): void {
   if (e.genres !== undefined && !liste(e.genres)) throw new Error(`${wo}: genres ist keine Liste von Namen`)
   if (e.runtimeMin !== undefined && (!Number.isInteger(e.runtimeMin) || e.runtimeMin < 1)) throw new Error(`${wo}: runtimeMin ist keine positive Zahl`)
   if (e.jpYear !== undefined && (!Number.isInteger(e.jpYear) || e.jpYear < 1900 || e.jpYear > 2100)) throw new Error(`${wo}: jpYear ist kein Jahr`)
-  const hat = e.studios || e.genres || e.runtimeMin !== undefined || e.jpYear !== undefined
+  if (e.episodes !== undefined && (!Number.isInteger(e.episodes) || e.episodes < 1)) throw new Error(`${wo}: episodes ist keine positive Zahl`)
+  const hat = e.studios || e.genres || e.runtimeMin !== undefined || e.jpYear !== undefined || e.episodes !== undefined
   if (hat && !/^https:\/\//.test(String(e.datenQuelle ?? ''))) throw new Error(`${wo}: datenQuelle (https-Adresse) fehlt für die Stammdaten`)
 }
 
@@ -104,6 +107,7 @@ export function titelAusEintrag(e: EigenerEintrag): Title {
     studios: e.studios ?? [],
     ...(e.runtimeMin ? { runtimeMin: e.runtimeMin } : {}),
     ...(e.jpYear ? { jpYear: e.jpYear } : {}),
+    ...(e.episodes ? { episodes: e.episodes } : {}),
     dubConfidence: 'normal',
     streams: [],
   } as Title

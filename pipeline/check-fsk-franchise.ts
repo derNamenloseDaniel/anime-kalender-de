@@ -6,6 +6,7 @@ import { fskQuelleFehler } from './bau/11-2-1-fsk-justwatch.ts'
 import { fskAusFranchise, franchiseFskFehler, uebernehmeFskAusFranchise } from './bau/11-2-1-fsk-franchise.ts'
 import { schliesseWegeAb } from './bau/11-wege-abschluss.ts'
 import { PROFILE } from './lib/empfehlung-simulation.ts'
+import { suchadressenInTemp } from './lib/suchadressen-temp.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean): void {
@@ -30,6 +31,7 @@ uebernehmeFskAusFranchise(karte)
 pruefe('Franchise-FSK: gesetzt wird mit Kennzeichnung', karte.get(90003)!.fsk === 12 && karte.get(90003)!.fskQuelle === 'franchise')
 pruefe('Franchise-FSK: abgeleiteter Wert speist den nächsten nicht', karte.get(90005)!.fsk === 16 && karte.get(90005)!.fskQuelle === 'franchise' && karte.get(90008)!.fsk === 18)
 pruefe('Franchise-FSK: Freigabe bleibt unberührt', karte.get(90001)!.fskQuelle === undefined && karte.get(90006)!.fskQuelle === 'justwatch')
+suchadressenInTemp() // der Abschluss schreibt Listen; nie in getrackte Dateien
 // Verdrahtung: der echte Abschluss der Wege setzt den Wert (rot, sobald der Aufruf dort fehlt)
 const abschluss = (titles: Map<number, Title>, releases: Release[] = []) => schliesseWegeAb({
   titles, anisearch: {}, releases, zugangJeAdresse: new Map(), tmdbMehrdeutig: new Set(), toteAdressen: new Set(), linkBefunde: {},

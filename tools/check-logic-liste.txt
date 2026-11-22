@@ -51,6 +51,7 @@ pipeline/check-angebot-stichtag.ts
 pipeline/check-angebot-termine.ts
 pipeline/check-anilist-cover-vorschau.ts
 pipeline/check-anilist-produkt.ts
+pipeline/check-anilist-wertung.ts
 pipeline/check-anime2you-abruf.ts
 pipeline/check-anime2you-bleibt.ts
 pipeline/check-anime2you-blockkopf.ts
@@ -297,6 +298,7 @@ pipeline/check-folgenzahl-kennzeichnung.ts
 pipeline/check-folgenzahl-offen-bau.ts
 pipeline/check-folgenzahl-offen.ts
 pipeline/check-folgenzahl-sichtung.ts
+pipeline/check-fsk-franchise.ts
 pipeline/check-genre-aus-tmdb.ts
 pipeline/check-geteilte-adressen.ts
 pipeline/check-gleiche-adresse.ts
@@ -677,6 +679,7 @@ pipeline/check-titel-vorschau.ts
 pipeline/check-titelwechsel.ts
 pipeline/check-tmdb-404-neusuche.ts
 pipeline/check-tmdb-ablauf.ts
+pipeline/check-tmdb-angebote-kopie.ts
 pipeline/check-tmdb-film-suche.ts
 pipeline/check-tmdb-film-vorrang-lauf.ts
 pipeline/check-tmdb-folgen-404-lauf.ts

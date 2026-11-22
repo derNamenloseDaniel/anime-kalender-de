@@ -3,6 +3,7 @@ import { type DubConfidence, type Fsk, type PlatformId } from '../../shared/type
 import { type AniListMedia } from '../lib/anilist.ts'
 import { type TmdbInfo } from '../lib/tmdb.ts'
 import { mehrdeutigeFilmzuordnungen, merkeGeteilteFilme, schreibeGeteilteFilme } from '../lib/tmdb-eindeutig.ts'
+import { verwirfKopierteAnbieter } from '../lib/tmdb-angebote-kopie.ts'
 import { meldeCacheStand } from './cache-stand.ts'
 import { loadCurated } from '../lib/curated.ts'
 import { ladeAnisearchAbruf } from '../lib/anisearch-verworfen.ts'
@@ -58,6 +59,7 @@ export function ladeQuellen() {
   for (const id of tmdbMehrdeutig) delete tmdbTitles[id]
   if (tmdbMehrdeutig.size)
     log(`${tmdbMehrdeutig.size} TMDB-Zuordnungen verworfen: derselbe Film stand bei mehreren Titeln`)
+  verwirfKopierteAnbieter(tmdbTitles)
   // Deutsche Inhaltsangaben und Anbieter von aniSearch. Fehlt die Datei, läuft
   // alles wie zuvor — nur eben mit den schwächeren Texten.
   const anisearch = ladeAnisearchAbruf<AnisearchEintrag>()

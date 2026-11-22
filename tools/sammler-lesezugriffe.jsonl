@@ -67,3 +67,6 @@
 {"datei":"pipeline/check-cartoon-umzug-bau.ts","liest":"data/cartoon-umzug.json","grund":"Kulisse im Temp-Ordner (AK_ROOT): der Test legt die Datei selbst an, kein Lesen des echten Bestands"}
 {"datei":"pipeline/check-staffel-titel-termine.ts","liest":"data/tv-programm.json","grund":"echter Fall: jede Horizonte-Sichtung mit Wikipedia-Treffer liegt in der Staffel ihres Folgentitels (Zuordnung nach Titel, nicht nach Zählnummer)"}
 {"datei":"pipeline/check-staffel-titel-termine.ts","liest":"data/wikipedia-folgen.json","grund":"echter Fall: Staffel des Folgentitels unabhängig über die Position in der Episodenliste nachgezählt"}
+{"datei":"pipeline/check-fsk-franchise.ts","liest":"data/tmdb-titles.json","grund":"Verdrahtungsfall: sucht im echten Bestand einen Titel mit TMDB-Freigabe, um zu prüfen, dass er offen für die Handzeile bleibt"}
+{"datei":"pipeline/check-tmdb-angebote-kopie.ts","liest":"data/justwatch-audio.json","grund":"Wächter: prüft am echten Bestand, dass keine TMDB-Anbieterliste die Kopie der Liste eines Namensvetters ist (Stargazer 120892)"}
+{"datei":"pipeline/check-tmdb-angebote-kopie.ts","liest":"data/tmdb-titles.json","grund":"Wächter: prüft am echten Bestand, dass keine TMDB-Anbieterliste die Kopie der Liste eines Namensvetters ist (Stargazer 120892)"}

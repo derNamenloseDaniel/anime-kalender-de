@@ -22,6 +22,10 @@ export interface AniListMedia {
   coverImage: { large: string | null; extraLarge: string | null }
   bannerImage: string | null
   averageScore: number | null
+  /** Ungewichtetes Mittel; fehlt in Zwischenspeichern vor dem 22.11.2026. Rückfall der Wertung (`lib/anilist-wertung.ts`). */
+  meanScore?: number | null
+  /** Stimmen je Wertungsstufe (Summe = Zahl der Stimmen); fehlt in Zwischenspeichern vor dem 22.11.2026. */
+  stats?: { scoreDistribution: { score: number; amount: number }[] | null } | null
   /** Produktionsland laut AniList (z. B. `JP`); fehlt in Zwischenspeichern vor dem 09.10.2026. */
   countryOfOrigin?: string | null
   isAdult: boolean
@@ -47,7 +51,7 @@ const MEDIA_FIELDS = `
   studios { nodes { name isAnimationStudio } }
   coverImage { large extraLarge }
   bannerImage
-  averageScore isAdult countryOfOrigin
+  averageScore meanScore stats { scoreDistribution { score amount } } isAdult countryOfOrigin
   description(asHtml: false)
   relations { edges { relationType node { id type title { romaji english } } } }
 `

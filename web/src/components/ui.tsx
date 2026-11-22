@@ -170,14 +170,14 @@ export function DiscZeichen({ className = 'size-3.5' }: { className?: string }) 
   )
 }
 
-/** `quelle: 'justwatch'` = Anbieter-Einstufung statt Freigabe: Hinweis im Tooltip, gestrichelter Rand. */
-export function FskBadge({ fsk, small, quelle }: { fsk: Fsk; small?: boolean; quelle?: 'justwatch' }) {
+/** `quelle` gesetzt (justwatch = Anbieter, franchise = andere Teile der Reihe) = keine Freigabe: Hinweis im Tooltip, gestrichelter Rand. */
+export function FskBadge({ fsk, small, quelle }: { fsk: Fsk; small?: boolean; quelle?: 'justwatch' | 'franchise' }) {
   const { t } = useLang()
   const bg = FSK_COLORS[fsk]
   /* Dunkle Ziffer bis FSK 12: Weiß auf dem FSK-Grün hatte nur 3,6:1, #111 hat 5,3:1 (18.09.2026). */
   const dark = fsk <= 12
   return mitHinweis(
-    quelle ? t('antwort.fskAnbieter', { n: fsk }) : `FSK ${fsk}`,
+    quelle ? t(quelle === 'franchise' ? 'antwort.fskFranchise' : 'antwort.fskAnbieter', { n: fsk }) : `FSK ${fsk}`,
     'oben',
     <span
       className={[

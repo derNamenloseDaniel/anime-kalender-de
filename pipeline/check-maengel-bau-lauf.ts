@@ -20,6 +20,7 @@ function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
 type Reg = { zaehler: Record<string, { offen: number; neu: number; behoben: number; rueckfall: number; ausnahme: number }>; zeilen: { t: number; art: string; seit: string; status: string; ereignis?: string }[]; hinweis?: string }
 
 const phase = fileURLToPath(new URL('./bau/13-12-maengel.ts', import.meta.url))
+const eindeutig = pathToFileURL(fileURLToPath(new URL('./lib/tmdb-eindeutig.ts', import.meta.url))).href
 const wurzel = mkdtempSync(join(tmpdir(), 'maengel-bau-'))
 const schreibe = (pfad: string, inhalt: unknown): void => {
   mkdirSync(join(wurzel, pfad, '..'), { recursive: true })
@@ -46,7 +47,9 @@ const titel = (id: number, ueber: Record<string, unknown> = {}) => ({
   watchLinks: [],
   ...ueber,
 })
-const lauf = () => spawnSync(process.execPath, ['--import', 'tsx', '--input-type=module', '-e', `import(${JSON.stringify(pathToFileURL(phase).href)}).then((m) => m.schreibeMaengel())`], { env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8' })
+/* Wie im Bau setzt `ladeQuellen()` vorher die geteilten Filme (Titel 17); die Phase allein liest sie nicht. */
+const lauf = () =>
+  spawnSync(process.execPath, ['--import', 'tsx', '--input-type=module', '-e', `const e = await import(${JSON.stringify(eindeutig)}); e.merkeGeteilteFilme(new Set(['17'])); await import(${JSON.stringify(pathToFileURL(phase).href)}).then((m) => m.schreibeMaengel())`], { env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8' })
 const register = (): Reg => JSON.parse(readFileSync(join(wurzel, 'data/maengel.json'), 'utf8')) as Reg
 const schluessel = (r: Reg) => r.zeilen.map((z) => `${z.art}:${z.t}:${z.status}`).sort().join(' ')
 const einfach = (id: number, ueber: Record<string, unknown> = {}) => titel(id, { episodes: 1, ...ueber })
@@ -74,6 +77,9 @@ const weitere = () => [
   titel(12, { franchiseId: 60, streams: stream('f12') }),
   titel(13, { franchiseId: 60, streams: stream('f13') }),
   titel(14, { streams: stream('f14') }),
+  einfach(15, { coverImage: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx15.jpg', bannerImage: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/15.jpg' }),
+  einfach(16, { coverImage: 'https://image.tmdb.org/t/p/w500/j16.jpg' }),
+  einfach(17, { coverImage: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx17.jpg' }),
 ]
 schreibe('public/data/titles.json', [titel1({ coverImage: undefined }), titel(2), kurz(), ...weitere()])
 schreibe('public/data/events.json', [{ titleId: 1, date: '2099-01-01' }, { titleId: 8, date: todayIso() }])
@@ -86,12 +92,15 @@ schreibe('public/data/releases.json', [
 schreibe('public/data/folgen/1.json', { f: [[1, 'A'], [2, 'B'], [3, 'C']] })
 schreibe('public/data/folgen/2.json', { f: [[1, 'A'], [2, ''], [3, 'C']] })
 schreibe('public/data/synopses/1.json', { 1: { de: 'Text' }, 33: { de: 'Text' } })
-for (const id of [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]) schreibe(`public/data/synopses/${id}.json`, { [id]: { de: 'Text' } })
+for (const id of [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]) schreibe(`public/data/synopses/${id}.json`, { [id]: { de: 'Text' } })
 for (const id of [12, 13, 14]) schreibe(`public/data/folgen/${id}.json`, { f: [[1, 'A'], [2, 'B'], [3, 'C']] })
 /* Titel 12 und 13: ein Franchise, je 6 Folgen beim Anbieter bei 3 Folgen und einer Schwester von 3 → Ausnahme anbieter-franchise (Verdrahtung franchiseTeile); Titel 14 ohne Franchise bleibt offen. */
 /* Titel 10 und 11: ein Franchise, eine Netflix-Adresse mit einer Staffel zu einer Folge, zusammen zwei: staffel-zuordnung (Verdrahtung Bau → Regel). */
 schreibe('data/anbieter-staffeln.json', { 999: { staffeln: [{ folgen: 1 }], gemeldetAm: '2026-01-01' } })
 schreibe(COVER_BEKANNT_DATEI, { 5: 'TMDB führt ihn nicht' })
+/* Titel 15: AniList-Cover und -Banner, TMDB hat keins; Titel 16: japanisches Plakat mit Beleg `nurJa`; Titel 17: AniList-Cover, Plakat eines geteilten Films → alle drei Ausnahme bei bild-fremdsprachig (Verdrahtung der Bildbestände). */
+schreibe('data/tmdb-poster.json', { 15: null, 16: { p: '/j16.jpg', w: 1000, h: 1500, l: 'ja', inhaltAm: '2026-12-01', nurJa: true }, 17: { p: '/g17.jpg', w: 1000, h: 1500, l: 'de' } })
+schreibe('data/tmdb-banner.json', { 15: null })
 /* Der Import von `luecken-titel.ts` (über `fehlendes`) liest diese Datei schon beim Laden. */
 schreibe('data/kino-ankuendigungen.yaml', '[]')
 /* Titel 9: Handbeleg „ohne deutschen Ton“ bei ADN → Ausnahme belegtes-nein; Titel 1 hat keinen und bleibt offen. */
@@ -109,7 +118,8 @@ pruefe('Lauf 1: Disc-Termin ist ein Weg (kein kein-weg, kein erstausgabe-ohne-we
 pruefe('Lauf 1: Termin am heutigen Tag zählt als künftig (kein termin-fehlt-laufend bei Titel 8)', !r1.zeilen.some((z) => z.t === 8), r1.zeilen.filter((z) => z.t === 8))
 pruefe('Lauf 1: Erstlauf kennt kein „neu“', Object.values(r1.zaehler).every((z) => z.neu === 0) && r1.zeilen.every((z) => !z.ereignis), r1)
 pruefe('Lauf 1: erschienen-ohne-weg: Titel 1 offen, Titel 9 (Handbeleg dub:false) Ausnahme', r1.zaehler['erschienen-ohne-weg']?.offen === 1 && r1.zaehler['erschienen-ohne-weg']?.ausnahme === 1, r1.zaehler['erschienen-ohne-weg'])
-pruefe('Lauf 1: alle 26 Arten im Zähler', Object.keys(r1.zaehler).length === 26, Object.keys(r1.zaehler))
+pruefe('Lauf 1: alle 27 Arten im Zähler', Object.keys(r1.zaehler).length === 27, Object.keys(r1.zaehler))
+pruefe('Lauf 1: bild-fremdsprachig: Titel 15 (TMDB ohne Bild), 16 (nur japanisch) und 17 (geteilter Film) sind Ausnahme', r1.zaehler['bild-fremdsprachig']?.offen === 0 && r1.zaehler['bild-fremdsprachig']?.ausnahme === 3, r1.zaehler['bild-fremdsprachig'])
 
 /* Vorfassung altern lassen und committen; Titel 1 bekommt sein Cover, Titel 3 ist neu ohne Banner. */
 schreibe('data/maengel.json', readFileSync(join(wurzel, 'data/maengel.json'), 'utf8').replaceAll(/"seit":"[\d-]+"/g, '"seit":"2026-01-01"'))

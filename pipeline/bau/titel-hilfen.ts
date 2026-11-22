@@ -389,6 +389,11 @@ export function jpEndAusAnilist(media: AniListMedia): string | undefined {
   return isoDate(media.endDate) ?? (media.status === 'FINISHED' ? isoDate(media.startDate) : undefined)
 }
 
+/** Minuten je Folge (Film: Gesamtlänge) laut AniList; nur Rückfall, `anisearchFelderAnwenden` überschreibt mit aniSearch, wo es einen Wert hat. */
+export function laufzeitAusAnilist(media: AniListMedia): { runtimeMin?: number } {
+  return media.duration ? { runtimeMin: media.duration } : {}
+}
+
 export function titleFromMedia(media: AniListMedia, confidence: DubConfidence): Title {
   const display = media.title.english ?? media.title.romaji ?? media.title.native ?? `#${media.id}`
   return {
@@ -400,6 +405,7 @@ export function titleFromMedia(media: AniListMedia, confidence: DubConfidence): 
     titleNative: media.title.native ?? undefined,
     format: media.format ?? undefined,
     episodes: media.episodes ?? undefined,
+    ...laufzeitAusAnilist(media),
     jpYear: media.seasonYear ?? media.startDate?.year ?? undefined,
     jpSeason: media.season ?? undefined,
     jpEnd: jpEndAusAnilist(media),

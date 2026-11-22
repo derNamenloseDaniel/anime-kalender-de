@@ -10,69 +10,6 @@ X-WR-TIMEZONE:Europe/Berlin
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:auto-176496-tv-prosieben-maxx@2026-11-14@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261113T231000Z
-DTEND:20261113T234000Z
-SUMMARY:Solo Leveling: Arise from the Shadow – Folge 11
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/15790/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-158871-tv-super-rtl@2026-11-14@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261114T115500Z
-DTEND:20261114T122500Z
-SUMMARY:Pokémon Horizonte
-DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
- ails: https://anime-kalender.de/t/14839/
-CATEGORIES:Super RTL
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-158871-tv-toggo-plus@2026-11-14@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261114T125500Z
-DTEND:20261114T132500Z
-SUMMARY:Pokémon Horizonte
-DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/14839/
-CATEGORIES:TOGGO plus
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2026-11-14@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261114T160000Z
-DTEND:20261114T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 2/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
- etails: https://anime-kalender.de/t/16920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-165159-tv-toggo-plus@2026-11-14@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261114T194000Z
-DTEND:20261114T201000Z
-SUMMARY:Beyblade X – Folge 124
-DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/15075/
-CATEGORIES:TOGGO plus
-END:VEVENT
-BEGIN:VEVENT
-UID:das-band-der-unterwelt-netflix@2026-11-14@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261114
-DTEND;VALUE=DATE:20261115
-SUMMARY:Das Band der Unterwelt – Folge 20/24 (neu bei Netflix)
-DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nAuf D
- eutsch zuerst bei Crunchyroll erschienen (12.09.2026).\nUhrzeit noch nicht
-  bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, sonde
- rn aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anime-
- kalender.de/t/16919/
-CATEGORIES:Netflix
-END:VEVENT
-BEGIN:VEVENT
 UID:auto-223-tv-prosieben-maxx@2026-11-15#70@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261115T024500Z
@@ -142,6 +79,46 @@ SUMMARY:As a Reincarnated Aristocrat\, I'll Use My Appraisal Skill to Rise
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
  etails: https://anime-kalender.de/t/16469/
 CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-16#56@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261116T085000Z
+DTEND:20261116T092000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-16#57@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261116T090000Z
+DTEND:20261116T093000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-16#56@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261116T095000Z
+DTEND:20261116T102000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-16#57@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261116T100000Z
+DTEND:20261116T103000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
 UID:last-boss-s2-crunchyroll@2026-11-16@anime-kalender-de
@@ -296,6 +273,46 @@ DESCRIPTION:Plattform: ProSieben FUN\nRelease-Art: Wöchentlich (Simuldub)\
 CATEGORIES:ProSieben FUN
 END:VEVENT
 BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-17#58@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261117T085000Z
+DTEND:20261117T092000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-17#59@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261117T090000Z
+DTEND:20261117T093000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-17#58@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261117T095000Z
+DTEND:20261117T102000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-17#59@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261117T100000Z
+DTEND:20261117T103000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
 UID:auto-158871-tv-super-rtl@2026-11-17@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261117T151500Z
@@ -343,6 +360,46 @@ DTEND:20261117T204500Z
 SUMMARY:Pokémon Reisen: Die Serie
 DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
  tails: https://anime-kalender.de/t/10852/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-18#60@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261118T085000Z
+DTEND:20261118T092000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-18#61@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261118T090000Z
+DTEND:20261118T093000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-18#60@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261118T095000Z
+DTEND:20261118T102000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-18#61@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261118T100000Z
+DTEND:20261118T103000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
 CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
@@ -456,6 +513,46 @@ SUMMARY:Memories (Disc)
 DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
  och nicht bestätigt.\nDetails: https://anime-kalender.de/t/1262/
 CATEGORIES:DVD / Blu-ray
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-19#62@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261119T085000Z
+DTEND:20261119T092000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-19#63@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261119T090000Z
+DTEND:20261119T093000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-19#62@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261119T095000Z
+DTEND:20261119T102000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-19#63@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261119T100000Z
+DTEND:20261119T103000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
 UID:auto-158871-tv-super-rtl@2026-11-19@anime-kalender-de
@@ -632,6 +729,46 @@ SUMMARY:JoJo's Bizarre Adventure: Steel Ball Run – 2nd & 3rd STAGE – Fo
 DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nDetai
  ls: https://anime-kalender.de/t/16796/
 CATEGORIES:Netflix
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-20#64@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261120T085000Z
+DTEND:20261120T092000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-20#65@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261120T090000Z
+DTEND:20261120T093000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-20#64@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261120T095000Z
+DTEND:20261120T102000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-20#65@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261120T100000Z
+DTEND:20261120T103000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
 UID:auto-158871-tv-super-rtl@2026-11-20@anime-kalender-de
@@ -1800,16 +1937,6 @@ DTEND;VALUE=DATE:20261211
 SUMMARY:Digimon 02 (Disc)
 DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
  och nicht bestätigt.\nDetails: https://anime-kalender.de/t/1152/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-1638-disc@2026-12-10@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261210
-DTEND;VALUE=DATE:20261211
-SUMMARY:Peter Pan (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/1409/
 CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT

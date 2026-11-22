@@ -374,5 +374,28 @@
   schedule:
     firstEpisodeDate: "2026-10-05"
     episodeCount: 1
-  hinweis: "Folge 1 gibt es seit dem 05.10. mit deutscher Synchronisation; ob die weiteren Folgen synchron samstags folgen, ist offen (Anime2You, 05.10.2026)."
+  hinweis: "Folge 1 gibt es seit dem 05.10. mit deutscher Synchronisation; die Folgen ab 2 kommen samstags (Anime2You, 05.10.2026)."
   sources: [https://www.anime2you.de/news/1057709/netflix-ranma-12-staffel-3-deutsche-synchro/]
+
+# Folge 2 ff. von Ranma 1/2 Staffel 3 bei Netflix, deutsche Fassung samstags (Anime2You 1062641 vom 21.10. und
+# 1073600 vom 19.11.2026: „Samstag: Ranma 1/2 – Staffel 3 (Simulcast)“, Sprache „Deutsch, Japanisch (UT)“).
+# Der Tag der einzelnen Folge ist aus dem Samstag fortgeschrieben (estimated); Netflix-Messung am 24.10.2026: Folge 1–4 mit
+# deutschem Ton. Folgenzahl: AniList-Sendeplan nennt 12 Folgen, Netflix und Anime2You nennen keine Zahl (episodeCountAssumed).
+# FSK 12: TMDB-DE-Freigabe der Serie Ranma1/2 (2024), Netflix-Titel 81171925, derselbe wie Staffel 1 (data/tmdb-titles.json, 178533).
+- slug: ranma-s3-netflix
+  anilistId: 209872
+  titleDe: "Ranma ½ – Staffel 3"
+  platform: netflix
+  platformUrl: https://www.netflix.com/title/81171925
+  releaseType: weekly
+  fsk: 12
+  schedule:
+    firstEpisodeDate: "2026-10-10"
+    firstEpisodeNumber: 2
+    episodeCount: 11
+    episodeCountAssumed: true
+    estimated: true
+    wochentage: [6]
+  sources:
+    - https://www.anime2you.de/news/1062641/netflix-anime-neu-im-november-2026/
+    - https://www.anime2you.de/news/1073600/netflix-anime-neu-im-dezember-2026/

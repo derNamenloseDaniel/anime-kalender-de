@@ -6,8 +6,8 @@ export interface TmdbBild {
   iso_639_1: string | null
 }
 
-/** Rangfolge der Sprachfassungen: ein deutsches Plakat, sonst englisch, sonst japanisch lassen (Daniel, 26.10.2026); „ohne Sprache“ ist bei TMDB auch der Standard ungetaggter Uploads und kommt deshalb zuletzt. */
-const SPRACHEN: (string | null)[] = ['de', 'en', 'ja', null]
+/** Rangfolge der Sprachfassungen: deutsch, englisch, ohne Sprache, japanisch zuletzt — japanische Schrift kann hier kaum jemand lesen (Daniel, 21.11.2026). */
+const SPRACHEN: (string | null)[] = ['de', 'en', null, 'ja']
 
 /** Hochformat wie ein Cover (2:3 ≈ 0,667; AniList 460 × 644 = 0,714). */
 export const istHochformat = (b: TmdbBild): boolean => b.width / b.height >= 0.64 && b.width / b.height <= 0.76

@@ -268,7 +268,7 @@ export interface Title {
   titleEn?: string
   titleNative?: string
   format?: string
-  episodes?: number; runtimeMin?: number // Minuten je Folge laut aniSearch, bei Einzelwerken die Laufzeit
+  episodes?: number; runtimeMin?: number // Minuten je Folge laut aniSearch (sonst AniList), bei Einzelwerken die Laufzeit
   /**
    * **Beginn der Originalausstrahlung, so genau wie AniList ihn kennt.**
    *

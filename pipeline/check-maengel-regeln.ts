@@ -44,6 +44,7 @@ const kontext = (ueber: Partial<Kontext> = {}): Kontext => ({
   discTitel: new Set(),
   adresseMehrfach: new Map(),
   staffelZuordnung: new Map(),
+  tvOhneFolge: new Set(),
   franchiseTeile: () => [],
   neinGilt: () => false,
   plakat: () => undefined,

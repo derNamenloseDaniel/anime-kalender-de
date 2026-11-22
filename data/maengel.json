@@ -6,8 +6,8 @@
     "bild-fremdsprachig": {"wirkung":2,"wer":"auto:tmdb-poster","offen":541,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":308},
     "titel-de": {"wirkung":3,"wer":"hand:synchro-belegen","offen":28,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":23},
     "handlung-de": {"wirkung":2,"wer":"auto:anisearch","offen":73,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0},
-    "folgentitel": {"wirkung":2,"wer":"auto:tmdb","offen":284,"neu":1,"behoben":0,"rueckfall":0,"ausnahme":6},
-    "folgenzahl": {"wirkung":3,"wer":"auto:anilist","offen":0,"neu":0,"behoben":1,"rueckfall":0,"ausnahme":15},
+    "folgentitel": {"wirkung":2,"wer":"auto:tmdb","offen":284,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":6},
+    "folgenzahl": {"wirkung":3,"wer":"auto:anilist","offen":0,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":15},
     "fsk": {"wirkung":2,"wer":"auto:justwatch","offen":872,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0},
     "wertung": {"wirkung":1,"wer":"auto:anilist","offen":108,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0},
     "studio": {"wirkung":1,"wer":"auto:anilist","offen":104,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0},
@@ -27,7 +27,8 @@
     "adresse-mehrfach": {"wirkung":3,"wer":"hand:synchro-belegen","offen":0,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":460},
     "staffel-zuordnung": {"wirkung":2,"wer":"hand:synchro-belegen","offen":6,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":27},
     "herkunft-fremder-titel": {"wirkung":3,"wer":"auto:bau","offen":0,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0},
-    "weg-ohne-adresse": {"wirkung":3,"wer":"auto:anbieterkalender","offen":5,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0}
+    "weg-ohne-adresse": {"wirkung":3,"wer":"auto:anbieterkalender","offen":5,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0},
+    "tv-sichtung-ohne-folge": {"wirkung":2,"wer":"auto:bau","offen":10,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0}
   },
   "zeilen": [
     {"t":10013739,"art":"cover","wirkung":3,"wer":"auto:tmdb-poster","status":"abwesend","seit":"2026-11-17","bis":"2026-11-17"},
@@ -1261,7 +1262,7 @@
     {"t":212888,"art":"folgentitel","wirkung":2,"wer":"auto:tmdb","status":"offen","seit":"2026-11-16"},
     {"t":213457,"art":"folgentitel","wirkung":2,"wer":"auto:tmdb","status":"offen","seit":"2026-11-16"},
     {"t":213805,"art":"folgentitel","wirkung":2,"wer":"auto:tmdb","status":"offen","seit":"2026-11-21"},
-    {"t":5000003,"art":"folgentitel","wirkung":2,"wer":"auto:tmdb","status":"offen","seit":"2026-11-22","ereignis":"neu"},
+    {"t":5000003,"art":"folgentitel","wirkung":2,"wer":"auto:tmdb","status":"offen","seit":"2026-11-22"},
     {"t":10000479,"art":"folgentitel","wirkung":2,"wer":"auto:tmdb","status":"offen","seit":"2026-11-16"},
     {"t":10003453,"art":"folgentitel","wirkung":2,"wer":"auto:tmdb","status":"offen","seit":"2026-11-16"},
     {"t":10003873,"art":"folgentitel","wirkung":2,"wer":"auto:tmdb","status":"offen","seit":"2026-11-16"},
@@ -4386,6 +4387,16 @@
     {"t":18679,"art":"weg-ohne-adresse","wirkung":3,"wer":"auto:anbieterkalender","status":"behoben","seit":"2026-11-18","bis":"2026-11-18"},
     {"t":129874,"art":"weg-ohne-adresse","wirkung":3,"wer":"auto:anbieterkalender","status":"behoben","seit":"2026-11-16","bis":"2026-11-22"},
     {"t":142329,"art":"weg-ohne-adresse","wirkung":3,"wer":"auto:anbieterkalender","status":"offen","seit":"2026-11-16"},
-    {"t":170083,"art":"weg-ohne-adresse","wirkung":3,"wer":"auto:anbieterkalender","status":"offen","seit":"2026-11-16"}
+    {"t":170083,"art":"weg-ohne-adresse","wirkung":3,"wer":"auto:anbieterkalender","status":"offen","seit":"2026-11-16"},
+    {"t":15,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
+    {"t":21,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
+    {"t":223,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
+    {"t":5027,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
+    {"t":6920,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
+    {"t":101347,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
+    {"t":112153,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
+    {"t":118399,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
+    {"t":158871,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
+    {"t":10012621,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"}
   ]
 }

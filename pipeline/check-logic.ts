@@ -3418,7 +3418,7 @@ console.log('\nJapanischer Start: so genau wie die Quelle, und angekündigte Tit
   const voll = { status: 'FINISHED', countryOfOrigin: 'JP', stats: null, averageScore: 70, studios: { nodes: [{ name: 'X' }] }, abgerufen: '2026-11-22' }
   const speicher = { 1: { ...voll, status: 'RELEASING' }, 2: voll } as unknown as Record<string, import('./lib/anilist-mangel.ts').MitStempel>
   const geholt = zuHolen(speicher, [1, 2, 3], (m) => eintragNochOffen(m), '2026-11-22')
-  pruefe('nicht abgeschlossene und fehlende Titel werden bei jedem Lauf neu geholt, abgeschlossene nicht', geholt.join() === '3,1', geholt)
+  pruefe('nicht abgeschlossene und fehlende Titel werden bei jedem Lauf neu geholt, abgeschlossene nicht', geholt.join() === '1,3', geholt)
   pruefe('fetch.ts wählt über zuHolen mit nochOffen', /zuHolen\(cached, malIds, nochOffen/.test(abruf) && /zuHolen\(byAniId, alleIds, nochOffen/.test(abruf))
 }
 

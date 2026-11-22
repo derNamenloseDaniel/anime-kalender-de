@@ -68,7 +68,7 @@ function pruefeTitel(datei: string, titel: Title[], banner: TmdbBanner): void {
       else if (seite.stimmen < MIN_STIMMEN_BEWERTUNG) schlecht.wenigStimmen.push(`${t.id}:${seite.stimmen}`)
     }
     for (const k of t.keywords ?? []) if (!erlaubt.has(k)) schlecht.schlagwort.push(`${t.id}:${k}`)
-    if (!t.bannerImage) continue
+    if (!t.bannerImage || t.bannerVon !== undefined) continue // übernommene Banner prüft `check-banner-franchise.ts`
     const tmdb = banner[String(t.id)]?.p
     const ok = host(t.bannerImage) === 'image.tmdb.org' ? tmdb && t.bannerImage === bannerAdresse(tmdb) : host(t.bannerImage) === 's4.anilist.co' && !tmdb
     if (!ok) schlecht.banner.push(t.id)

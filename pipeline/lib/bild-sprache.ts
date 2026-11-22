@@ -24,6 +24,7 @@ export function fremdeBilder(t: Title, plakat: BildLookup<PlakatWahl>, banner: B
   const p = plakat(t.id)
   if (cover.includes('image.tmdb.org') && p && cover.endsWith(p.p) && p.l === 'ja') aus.push(p.nurJa === true)
   if (cover.includes('anilist.co')) aus.push(p === null)
-  if (t.bannerImage?.includes('anilist.co')) aus.push(banner(t.id) === null)
+  // Ein übernommenes Banner (`bannerVon`) zählt beim Spender, nicht noch einmal beim Empfänger.
+  if (t.bannerVon === undefined && t.bannerImage?.includes('anilist.co')) aus.push(banner(t.id) === null)
   return aus
 }

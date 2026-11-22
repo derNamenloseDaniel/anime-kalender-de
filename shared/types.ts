@@ -449,6 +449,8 @@ export interface Title {
   coverImage?: string
   /** TMDB-Hintergrundbild; Übergang: wo TMDB keins hat, noch das AniList-Banner (Lückenliste). */
   bannerImage?: string
+  /** Kennung des Titels derselben Reihe, dessen Banner übernommen wurde (`bau/banner-franchise.ts`); fehlt = eigenes Banner. */
+  bannerVon?: number
   synopsis?: string
   studios?: string[]
   /** Bewertung in Prozent (aniSearch-Klarwert). */

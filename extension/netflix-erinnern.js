@@ -54,6 +54,7 @@ globalThis.akNetflixKnopfSchreiben = (el, beschriftung, pfad) => {
   }
   el.hidden = false
   el.disabled = !z.aktiv
+  el.ariaDisabled = String(!z.aktiv) /* `akKlickVerteilen` sperrt auch über dieses Merkmal */
   if (el.classList.contains('ak-erfolg') || el.classList.contains('ak-fehler')) return
   el.textContent = z.text
   el.classList.remove('ak-ja', 'ak-nein', 'ak-leer')

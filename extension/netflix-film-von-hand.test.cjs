@@ -268,13 +268,12 @@ async function fall() {
   /* Takt zeichnet neu: nach „gesendet“ gesperrt, ein zweiter Klick meldet nichts (Doppelmeldung = D1-Schreibzeilen). */
   s.run('knopfZeigen()')
   const gesperrt = s.run('knopf')
-  pruefe('nach dem Neuzeichnen gesperrt und Meldung bestätigt', gesperrt.disabled === true && /gemeldet/.test(gesperrt.textContent), { d: gesperrt.disabled, t: gesperrt.textContent })
+  const gesperrtOk = gesperrt.disabled === true && gesperrt.ariaDisabled === 'true' && /gemeldet/.test(gesperrt.textContent)
+  pruefe('nach dem Neuzeichnen gesperrt (disabled und aria-disabled) und Meldung bestätigt', gesperrtOk, { d: gesperrt.disabled, a: gesperrt.ariaDisabled, t: gesperrt.textContent })
   s.klick(gesperrt)
   await s.warte()
   pruefe('zweiter Klick löst keine Meldung aus', s.meldungen.length === 1, s.meldungen.length)
   gesperrt.disabled = false
-  gesperrt.setAttribute('aria-disabled', 'true')
-  gesperrt.ariaDisabled = 'true'
   s.klick(gesperrt)
   await s.warte()
   pruefe('aria-disabled sperrt ebenfalls (auch ohne disabled)', s.meldungen.length === 1, s.meldungen.length)

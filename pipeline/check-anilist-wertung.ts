@@ -63,6 +63,9 @@ pruefe('bewertungNachRegel ohne AniList-Wertung und ohne Seite: leer', Object.ke
 const alsAnilist = titel(900101, { score: 70, scoreQuelle: 'anilist', anisearchId: 10 })
 const verweise = verweiseFuer(alsAnilist)
 pruefe('Absprung der Wertung führt zu AniList, nicht zu aniSearch', verweise.length === 1 && verweise[0]?.name === 'AniList' && verweise[0].ziel === 'https://anilist.co/anime/900101' && verweise[0].hinweis === 'Bei AniList ansehen', verweise)
+const westlich = verweiseFuer(titel(900101, { score: 70, scoreQuelle: 'anilist', westlich: true, tmdbId: 99, anisearchId: 10 }))
+pruefe('westlicher Titel mit TMDB-Kennung und AniList-Wertung: Flagge nennt AniList, nicht TMDB', westlich.length === 1 && westlich[0]?.name === 'AniList', westlich)
+pruefe('westlicher Titel mit TMDB-Wertung behält den TMDB-Absprung', verweiseFuer(titel(900101, { score: 66, scoreQuelle: 'tmdb', westlich: true, tmdbId: 99 }))[0]?.name === 'TMDB')
 pruefe('ohne Rückfall bleibt der Absprung aniSearch', verweiseFuer(titel(900101, { score: 74, anisearchId: 10 }))[0]?.name === 'aniSearch')
 
 writeFileSync(join(wurzel, 'data', 'cache', 'anilist-by-id.json'), JSON.stringify({ 900101: eintrag(900101, 33, 33, 99) }))

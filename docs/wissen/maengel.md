@@ -412,7 +412,7 @@ Erwartet: ~301 von 307.
 | Weg | gemessen | Aufwand | Risiko | Empfehlung |
 |---|---|---|---|---|
 | (a) AniList neu holen (`averageScore`) | 22 von 50 haben heute eine | S (Cache-Frische, Auftrag `auto-arten-2111`) | niedrig | ja |
-| (a) AniList `meanScore` als Rückfall | 48 von 50 | S | mittel (weniger Stimmen; kennzeichnen) | ja, wenn eine Mindestzahl Stimmen gilt (Feld `stats.scoreDistribution`) |
+| (a) AniList `meanScore` als Rückfall | 48 von 50 | S | mittel (weniger Stimmen; kennzeichnen) | ja, wenn eine Mindestzahl Stimmen gilt (Feld `stats.scoreDistribution`); **gebaut 22.11.2026** (Schwelle 10 Stimmen, `scoreQuelle: 'anilist'`, [quellen.md](quellen.md) „Bewertung“); wirkt, sobald der Zwischenspeicher `meanScore`/`stats` trägt (Rang 7b) |
 | aniSearch-Zeilen | kein erlaubter Weg (Wertung nur auf der Seite) | — | — | Ausnahme „ohne-anilist“ (55) |
 
 **studio (105 offen; 40 AniList, 62 aniSearch-Zeilen, 3 Eigentitel)**
@@ -451,7 +451,7 @@ Erwartet: ~301 von 307.
 | 2 | AniList `duration` als Laufzeit-Rückfall | laufzeit | ~146 | S |
 | 3 | Banner aus dem Franchise | banner | 242 | S |
 | 4 | aniSearch-Zeilen: `g` → Genres (Zuordnungstabelle) | genre | 131 | S |
-| 5 | FSK aus dem Franchise, gleiches Format, gekennzeichnet | fsk | 359 | S–M |
+| 5 | FSK aus dem Franchise, gleiches Format, gekennzeichnet | fsk | 359 | S–M (umgesetzt 22.11.2026: `pipeline/bau/11-2-1-fsk-franchise.ts`, `fskQuelle: 'franchise'`, Anzeige „≈ FSK n, wie die anderen Teile“; Messung 357 Titel, Leave-one-out 94,0 %) |
 | 6 | Ausnahmen mit Grund (aniSearch-Zeilen ohne Wertung/Studio, kein Banner) | wertung, studio, banner | 55 + ~93 + 68 | S (Regeln) |
 | 7 | AniList-Frische + `meanScore`-Rückfall | wertung, studio | ~48 + 9 | S (mit `auto-arten-2111`) |
 | 8 | Folgentitel: aniSearch-/TMDB-Stufe prüfen, warum volle Listen liegen bleiben | folgentitel | bis 53 | M |
@@ -478,3 +478,11 @@ Anlass: Daniel sah auf vielen Covern japanische Schrift. Ursache: `lib/tmdb-plak
 
 `pipeline/bau/banner-franchise.ts` (läuft nach `setzeProduktFelder` in `11-wege-abschluss.ts`): Ein Titel ohne Banner übernimmt das eigene Banner eines anderen Teils derselben `franchiseId` — gleiches Format zuerst, dann nächstes `jpYear`, dann kleinere Kennung; Wer allein in der Reihe steht oder keinen Spender findet, bleibt leer; der Reihenkopf zählt als Mitglied. `bannerVon` läuft an der Ausgabegrenze wie `franchiseId` auf die eigene Kennung (`lib/ausgabe-kennung.ts`). Gekennzeichnet mit `bannerVon` (Kennung des Spenders, Feld in `titles.json`, nur bei Übernahme). Der Mangel `banner` zählt übernommene Bilder als erfüllt (Schmuckbild, Wirkung 1; Lösungskarte „ja“); `bild-fremdsprachig` zählt ein übernommenes AniList-Banner nicht doppelt. Probe am Stand 21.11.2026: 310 → 68 offen (242 übernommen, 105 davon mit Formatwechsel). Wächter: `pipeline/check-banner-franchise.ts`.
 Patch Notes: Entwurf im Vorrat (`data/patchnotes/vorrat/banner-aus-der-reihe.yaml`), frei nach dem Bestandsbau.
+
+## Mängel-Stillstand 22.11.2026 (Auftrag maengel-stillstand-2211)
+
+Bezug 19.11., gemessen mit `stillstandMessen` an `data/maengel.json` (Stichprobe je Art aus den offenen Zeilen, Titel in `public/data/titles.json`):
+- **folgenzahl 0→1 (M.A.S.K., 5000003):** Eigentitel (`data/eigene-titel.yaml`) bekam am 21.11. Studio/Jahr/Laufzeit mit `datenQuelle`, aber nie eine Folgenzahl (`folgen: 73` ist nur der Katalogumfang der Ankündigung, kein `episodes`). Geschlossen: neues Feld `episodes` (mit `datenQuelle` Pflicht), M.A.S.K. = 75 (Wikipedia-Infobox „Episoden = 75“, TMDB ebenso). Nebenwirkung: `folgentitel` kann um 1 steigen (keine Folgenliste für 5000003), `folgenzahl-widerspruch` nicht (73 < 75).
+- **studio 105→104 (auto:anilist):** Schwelle ist `max(1, 1 %)` = 2 Mängel in drei Tage; der Abbau von 1 reicht nicht. Die offenen sind AniList-Einträge ohne Studio (Tamala 2010, Cencoroll, Techno Police 21C u. a., meist koreanische/japanische Filme und alte OVA), das aniSearch-Archiv liefert für sie nichts (`ergaenzeStudiosAusArchiv`). Weder AniList-Lauf noch Code schließen sie; es gibt keinen Handweg für AniList-Titel (nur Eigentitel). Vorschlag: Art auf `hand:` oder Ausnahme „quelle-ohne-studio“ (siehe Lösungskarte Rang 6).
+- **handlung-de 72→73 (auto:anisearch):** Die offenen Titel (Pokémon Ranger, Moero Arthur, Hajime Ningen Gon, …) haben bei aniSearch keinen deutschen Text; ein Sammlerlauf holt nichts. Einziger Weg: `data/handlung-eigen.yaml` (Hand, zwei Quellfamilien) für Titel mit Synchro — Vorschlag: Art auf `hand:synchro-belegen` umstellen.
+- **weg-ohne-adresse 3→5 (auto:anbieterkalender):** Streams aus sicheren Terminen ohne Titelseite (`11-7`): Prime/Aniverse bei 27, 60, 1638; Prime ohne Kanal bei 142329 (zwei Prime-Adressen, mehrdeutig); RTL+ bei 170083 (Dragon Ball Daima, nicht in `rtlplus-katalog.json`, plus.rtl.de aus der Cloud nicht erreichbar). Adresse nur mit Beleg: Workflow für den RTL+-Katalog (`fetch-rtlplus-katalog`) bzw. Prime-Sammler mit Netz.

@@ -23,7 +23,10 @@ export interface Verweis {
 export function verweiseFuer(title: Title, asZiel?: string): Verweis[] {
   const raus: Verweis[] = []
   const tmdb = title.westlich && title.tmdbId ? `https://www.themoviedb.org/tv/${title.tmdbId}` : undefined
-  if (tmdb) raus.push({ name: 'TMDB', ziel: tmdb, hinweis: 'Bei TMDB ansehen' })
+  /* Die Flagge trägt die Quelle der Wertung: stammt sie von AniList, steht AniList da, auch bei westlichen Titeln mit TMDB-Kennung.
+     Live trägt `id` die eigene Kennung (ak), die AniList-Kennung steht in `al`. */
+  if (title.scoreQuelle === 'anilist') raus.push({ name: 'AniList', ziel: `https://anilist.co/anime/${title.al ?? title.id}`, hinweis: 'Bei AniList ansehen' })
+  else if (tmdb) raus.push({ name: 'TMDB', ziel: tmdb, hinweis: 'Bei TMDB ansehen' })
   else if (title.anisearchId)
     raus.push({
       name: 'aniSearch',

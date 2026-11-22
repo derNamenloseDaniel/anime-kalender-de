@@ -275,9 +275,8 @@ const TEXTE = {
   // Die Uhrzeit hängt hinten an, wo eine bekannt ist — „voraussichtlich", weil
   // der einzelne Termin aus dem gemessenen Rhythmus fortgeschrieben ist.
   // Die nächste Folge kam nicht zum angekündigten Termin (`schedule.verpasst`).
-  // Angekündigt und verstrichen, beim Anbieter noch nicht gesehen; das Wort steigt mit dem Abstand (`shared/ausbleiben-plan.ts`).
-  'antwort.faelligWirdGeprueft': 'Folge {n} fällig seit {wann}, wird geprüft',
-  'antwort.faelligVerspaetet': 'Folge {n} fällig seit {wann}, noch nicht gesehen',
+  // Angekündigt und verstrichen: die Seite behauptet den Termin (Erwartung aus Fakten und Vergangenheit), kein Prüfstand (22.11.2026).
+  'antwort.faellig': 'Folge {n} seit {wann}',
   'antwort.angekuendigtFuer': 'angekündigt für {tag} den {datum}.',
   // Fortgeschriebener Tag (`estimated`): kein vom Anbieter genannter Tag (Wochentakt, Starttag laut Quelle, Meldetag), also „geschätzt“.
   'antwort.erwartetFuer': 'erwartet für {tag} den {datum} (geschätzt).',
@@ -333,7 +332,9 @@ const TEXTE = {
   // Die drei Angaben, die es zu einer Kaufausgabe wirklich gibt — an der
   // Stelle, an der bei einer Serie der Fortschrittsbalken steht.
   'einstellungen.titel': 'Einstellungen',
-  'antwort.fskAnbieter': 'FSK {n} laut Anbieter',  'detail.lastEpisode': 'Letzte Folge',
+  'antwort.fskAnbieter': 'FSK {n} laut Anbieter',
+  'antwort.fskFranchise': '≈ FSK {n}, wie die anderen Teile',
+  'detail.lastEpisode': 'Letzte Folge',
   // Ein Knopf sagt, was der Klick bewirkt, nicht wohin er zeigt (Daniel,
   // 24.08.2026: „das button-label sollte lieber sagen was der effekt des
   // klicks ist"). Zwei Fassungen, weil zwei Plätze: der große Knopf trägt

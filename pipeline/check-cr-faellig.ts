@@ -15,7 +15,7 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { ohneSichtungLange, ohneSichtungWarnzeile } from './lib/cr-katalog-schaetzung.ts'
 import { expandEvents, istErschienen } from '../shared/logic.ts'
-import { faelligWort } from '../shared/ausbleiben-plan.ts'
+import { istFaellig } from '../shared/ausbleiben-plan.ts'
 import { ohneSichtungVon, terminZustand } from '../shared/termin-zustand.ts'
 import { berlinToUtc } from '../shared/time.ts'
 import type { Release, ReleaseEvent, Title } from '../shared/types.ts'
@@ -107,7 +107,7 @@ for (const [name, jetzt] of [['15:05', UHR_15_05], ['15:19', UHR_15_19]] as cons
   pruefe(`${name}: Pille ohne ≈`, !planGeschaetzt(events, [{ from: 1, to: 6, dub: true }], [], jetzt))
   const antwort: any = berechneAntwort({ title: titel(6), releases: [ohne7], today: TAG, jetzt })
   pruefe(`${name}: Kasten zählt 6 von 13`, antwort?.art === 'laeuft' && antwort.raus === 6 && antwort.gesamt === 13, `${antwort?.art} ${antwort?.raus}/${antwort?.gesamt}`)
-  pruefe(`${name}: Kasten stellt Folge 7 als fällig voran`, antwort?.haupt?.episode === 7 && antwort.faellig !== undefined, `${antwort?.haupt?.episode} ${antwort?.faellig}`)
+  pruefe(`${name}: Kasten stellt Folge 7 als fällig voran`, antwort?.haupt?.episode === 7 && antwort.faellig === true, `${antwort?.haupt?.episode} ${antwort?.faellig}`)
 }
 pruefe('Folge 7 trägt das Merkmal „ohne Sichtung“', folge(ohne7, 7).ohneSichtung === true)
 pruefe('Folge 6 (beobachtet) trägt es nicht', folge(ohne7, 6).ohneSichtung === undefined)
@@ -127,25 +127,26 @@ function kastenZeile(jetzt: Date): { text: unknown; farbe: unknown } {
     deSeitNeben: '',
     title: titel(6),
   })
-  const haupt = kopf.haupt as { props?: { className?: string; children?: unknown } }
-  return { text: haupt?.props?.children, farbe: haupt?.props?.className }
+  return { text: kopf.haupt, farbe: undefined }
 }
 const zeile0 = kastenZeile(new Date('2026-11-15T14:00:30Z'))
 const zeile5 = kastenZeile(UHR_15_05)
 const zeile2h = kastenZeile(UHR_17_00)
-pruefe('Kasten 15:00: wird geprüft', zeile0.text === 'Folge 7 fällig seit 15:00 Uhr, wird geprüft', String(zeile0.text))
-pruefe('Kasten 15:05: noch nicht gesehen', zeile5.text === 'Folge 7 fällig seit 15:00 Uhr, noch nicht gesehen', String(zeile5.text))
-pruefe('Kasten 17:00: unverändert „noch nicht gesehen“, nie „nicht erschienen“', zeile2h.text === 'Folge 7 fällig seit 15:00 Uhr, noch nicht gesehen', String(zeile2h.text))
-pruefe('Kasten: immer abwartend gefärbt, nie als Fehler', zeile5.farbe === 'text-ak-warnung-text' && zeile2h.farbe === 'text-ak-warnung-text', `${zeile5.farbe} ${zeile2h.farbe}`)
+const BEHAUPTET = 'Folge 7 seit 15:00 Uhr'
+pruefe('Kasten 15:00: Hauptzeile behauptet', zeile0.text === BEHAUPTET, String(zeile0.text))
+pruefe('Kasten 15:05: Hauptzeile behauptet', zeile5.text === BEHAUPTET, String(zeile5.text))
+pruefe('Kasten 17:00: unverändert, kein Prüfstand', zeile2h.text === BEHAUPTET, String(zeile2h.text))
+/* Wächter 22.11.2026: Nachweis-Wörter gehören nie in die Hauptzeile einer Fälligkeit (Daniel: „solche infos sind nachweise“). */
+pruefe('Kasten: keine Nachweis-Wörter in der Hauptzeile', ![zeile0, zeile5, zeile2h].some((z) => /gesehen|geprüft|bestätigt|fällig|noch nicht/i.test(String(z.text))), String(zeile5.text))
 // Deckel: Nach 24 Stunden ohne Sichtung gilt die Folge wieder als erschienen (geschätzt), der Kasten sagt nichts mehr von „fällig“.
 const GRENZE = new Date('2026-11-16T14:00:00Z')
 const nachGrenze = new Date('2026-11-16T14:00:01Z')
 const fE = folge(ohne7, 7)
 pruefe('Deckel: genau 24 h nach dem Termin noch fällig', terminZustand(fE, GRENZE) === 'faellig' && !istErschienen(fE, GRENZE))
 pruefe('Deckel: eine Sekunde später erschienen', terminZustand(fE, nachGrenze) === 'erschienen' && istErschienen(fE, nachGrenze))
-pruefe('Deckel: kein Wort mehr', faelligWort(fE, GRENZE) === 'verspaetet' && faelligWort(fE, nachGrenze) === undefined)
+pruefe('Deckel: kein Wort mehr', istFaellig(fE, GRENZE) && !istFaellig(fE, nachGrenze))
 const antwortNach: any = berechneAntwort({ title: titel(6), releases: [ohne7], today: '2026-11-16', jetzt: nachGrenze })
-pruefe('Deckel: Kasten ohne Fälligkeitszeile, Folge 7 zählt wieder (≈)', antwortNach?.faellig === undefined && antwortNach?.raus === 7, `${antwortNach?.faellig} ${antwortNach?.raus}`)
+pruefe('Deckel: Kasten ohne Fälligkeitszeile, Folge 7 zählt wieder (≈)', !antwortNach?.faellig && antwortNach?.raus === 7, `${antwortNach?.faellig} ${antwortNach?.raus}`)
 pruefe('Deckel: Pille 1–7 mit ≈', erschieneneSpanne(expandEvents(ohne7), nachGrenze) === '1–7' && planGeschaetzt(expandEvents(ohne7), [{ from: 1, to: 6, dub: true }], [], nachGrenze))
 const nachSichtung = antwortKopf({
   antwort: berechneAntwort({ title: titel(7), releases: [spaceMercenary({ ...BEOBACHTET_6, 7: TAG })], today: TAG, jetzt: UHR_NACH_15_19 }) as any,
@@ -164,7 +165,7 @@ pruefe('Kasten nach Sichtung: keine Fälligkeitszeile', typeof (nachSichtung.hau
 const mit7 = spaceMercenary({ ...BEOBACHTET_6, 7: TAG })
 pruefe('nach Sichtung: Folge 7 erschienen', istErschienen(folge(mit7, 7), UHR_NACH_15_19) && folge(mit7, 7).ohneSichtung === undefined)
 const antwort7: any = berechneAntwort({ title: titel(7), releases: [mit7], today: TAG, jetzt: UHR_NACH_15_19 })
-pruefe('nach Sichtung: Kasten zählt 7 von 13', antwort7?.raus === 7 && antwort7?.faellig === undefined, `${antwort7?.raus} ${antwort7?.faellig}`)
+pruefe('nach Sichtung: Kasten zählt 7 von 13', antwort7?.raus === 7 && !antwort7?.faellig, `${antwort7?.raus} ${antwort7?.faellig}`)
 
 // Die Bedingungen von `ohneSichtungVon` einzeln: jede allein entscheidet.
 const plan = (ohne7 as any).schedule
@@ -179,25 +180,20 @@ pruefe('ohneSichtungVon: spätere Beobachtung überholt Folge 7', !ohneSichtungV
 pruefe('ohneSichtungVon: die jüngste beobachtete Folge selbst nie', !ohneSichtungVon(ohne7, plan, 6))
 pruefe('ohneSichtungVon: ohne jede Beobachtung', ohneSichtungVon(ohne7, { ...plan, observed: undefined }, 1))
 
-// Wortstufen nach Abstand (Folge 7, Termin 15:00 Berlin = 14:00 UTC).
+// Fällig nach Abstand (Folge 7, Termin 15:00 Berlin = 14:00 UTC): vom Termin an, ohne Stufen.
 const f7 = folge(ohne7, 7)
-pruefe('15:00 und 15:04: wird geprüft', faelligWort(f7, new Date('2026-11-15T14:04:59Z')) === 'wird-geprueft')
-pruefe('15:05: verspätet, noch nicht gesehen', faelligWort(f7, UHR_15_05) === 'verspaetet')
-pruefe('16:59: noch verspätet', faelligWort(f7, new Date('2026-11-15T15:59:59Z')) === 'verspaetet')
-pruefe('17:00: weiter nur „noch nicht gesehen“', faelligWort(f7, UHR_17_00) === 'verspaetet')
-pruefe('vor 15:00: kein Wort', faelligWort(f7, UHR_15_00) === undefined)
+pruefe('15:00 bis 17:00: fällig', [new Date('2026-11-15T14:04:59Z'), UHR_15_05, new Date('2026-11-15T15:59:59Z'), UHR_17_00].every((u) => istFaellig(f7, u)))
+pruefe('vor 15:00: nicht fällig', !istFaellig(f7, UHR_15_00))
 const T = (k: string, v?: Record<string, string | number>): string =>
-  ({ 'antwort.faelligWirdGeprueft': 'W {n} {wann}', 'antwort.faelligVerspaetet': 'V {n} {wann}' })[k]!.replace('{n}', String(v!.n)).replace('{wann}', String(v!.wann))
-pruefe('Text heute: nur Uhrzeit', faelligText(f7, 'verspaetet', true, T) === 'V 7 15:00 Uhr', faelligText(f7, 'verspaetet', true, T))
-pruefe('Text anderer Tag: mit Datum', faelligText(f7, 'wird-geprueft', false, T) === 'W 7 15.11.2026, 15:00 Uhr', faelligText(f7, 'wird-geprueft', false, T))
-pruefe('Text mit geschätzter Uhrzeit: „≈“', faelligText({ ...f7, timeEstimated: true }, 'verspaetet', true, T) === 'V 7 ≈ 15:00 Uhr', faelligText({ ...f7, timeEstimated: true }, 'verspaetet', true, T))
-pruefe('Text ohne Uhrzeit: nur Datum', faelligText({ ...f7, time: undefined }, 'verspaetet', false, T) === 'V 7 15.11.2026', faelligText({ ...f7, time: undefined }, 'verspaetet', false, T))
+  ({ 'antwort.faellig': 'F {n} {wann}' })[k]!.replace('{n}', String(v!.n)).replace('{wann}', String(v!.wann))
+pruefe('Text heute: nur Uhrzeit', faelligText(f7, true, T) === 'F 7 15:00 Uhr', faelligText(f7, true, T))
+pruefe('Text anderer Tag: mit Datum', faelligText(f7, false, T) === 'F 7 15.11.2026, 15:00 Uhr', faelligText(f7, false, T))
+pruefe('Text mit geschätzter Uhrzeit: „≈“', faelligText({ ...f7, timeEstimated: true }, true, T) === 'F 7 ≈ 15:00 Uhr', faelligText({ ...f7, timeEstimated: true }, true, T))
+pruefe('Text ohne Uhrzeit: nur Datum', faelligText({ ...f7, time: undefined }, false, T) === 'F 7 15.11.2026', faelligText({ ...f7, time: undefined }, false, T))
 
-// Termin ohne Uhrzeit: der Tag zählt ab 23:59 Berlin (22:59 UTC) als verstrichen; Wort und Abstand rechnen von dort.
+// Termin ohne Uhrzeit: der Tag zählt ab 23:59 Berlin (22:59 UTC) als verstrichen.
 const zeitlos = { date: TAG, ohneSichtung: true }
-pruefe('ohne Uhrzeit: um 23:59 Berlin fällig, nach 1 Minute „wird geprüft“', faelligWort(zeitlos, new Date('2026-11-15T23:00:00Z')) === 'wird-geprueft')
-pruefe('ohne Uhrzeit: nach 5 Minuten „noch nicht gesehen“', faelligWort(zeitlos, new Date('2026-11-15T23:04:00Z')) === 'verspaetet')
-pruefe('ohne Uhrzeit: um 23:58 Berlin noch angekündigt, kein Wort', faelligWort(zeitlos, new Date('2026-11-15T22:58:00Z')) === undefined)
+pruefe('ohne Uhrzeit: ab 23:59 Berlin fällig, um 23:58 noch angekündigt', istFaellig(zeitlos, new Date('2026-11-15T23:00:00Z')) && !istFaellig(zeitlos, new Date('2026-11-15T22:58:00Z')))
 
 // `jetzt` wirkt: Fernzukunftstermin (ohne Parameter zählte die echte Uhr und er wäre noch nicht erschienen).
 const fern = [{ date: '2999-01-01', episode: 1, estimated: true }] as ReleaseEvent[]

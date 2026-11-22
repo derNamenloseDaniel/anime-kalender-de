@@ -9,7 +9,7 @@ export function unterzeileVon(title: Title, teil: string | undefined, folgenImKa
     teil,
     title.episodes && title.episodes > 1 && !folgenImKasten ? `${title.episodes} ${t('detail.episodes')}` : undefined,
     /* „ab 0“ sagt nichts — nur eine Freigabe ab 6 aufwärts steht da (Daniel, 11.10.2026). */
-    title.fsk ? t(title.fskQuelle ? 'antwort.fskAnbieter' : 'antwort.fsk', { n: title.fsk }) : undefined,
+    title.fsk ? t(title.fskQuelle === 'franchise' ? 'antwort.fskFranchise' : title.fskQuelle ? 'antwort.fskAnbieter' : 'antwort.fsk', { n: title.fsk }) : undefined,
   ]
     .filter(Boolean)
     .join(' · ')

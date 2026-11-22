@@ -17,15 +17,22 @@ import { aehnlicherKern } from './tv-termine.ts'
 import { staffelDerFolge, staffelName, type StaffelPlan } from './staffel-titel.ts'
 
 export type StaffelFolge = { nr: number; folge: number }
+/** Folgentitel-Kern → Staffel und Folge; `ohneArtikel` ist der Rückfall über Kerne ohne führenden Artikel (nur eindeutige). */
+export type FolgentitelListe = Map<string, StaffelFolge> & { ohneArtikel?: Map<string, StaffelFolge> }
+
+/* Das TV-Programm schreibt „Ein Lied im Nebel“, die Wikipedia „Lied im Nebel“ (Horizonte S1/31, 13.11.2026). */
+const ohneArtikel = (t: string): string => folgenKern(t.replace(/^\s*(?:eine[nm]?|ein|der|die|das|den|dem)\s+/i, ''))
 
 /**
  * Folgentitel → Staffel und Folge aus der Wikipedia-Liste. Die Staffel zählt mit jedem Rücksprung von `st` auf 1 weiter; sie muss mit der
  * Staffel übereinstimmen, die der Plan der durchlaufenden Position gibt (sonst sind Liste und Yaml auseinandergelaufen: wirft).
  * Ein Titel, der zweimal vorkommt, ordnet nichts zu; eine Liste ohne „Folge in der Staffel“ (`st`) auch nicht (die Staffeln wären geraten).
  */
-export function staffelJeFolgentitel(folgen: WikiFolge[], plan: StaffelPlan): Map<string, StaffelFolge> {
-  const aus = new Map<string, StaffelFolge>()
+export function staffelJeFolgentitel(folgen: WikiFolge[], plan: StaffelPlan): FolgentitelListe {
+  const aus: FolgentitelListe = new Map<string, StaffelFolge>()
   const doppelt = new Set<string>()
+  const rueckfall = new Map<string, StaffelFolge>()
+  const rueckfallDoppelt = new Set<string>()
   if (folgen.some((f) => f.st === undefined)) return aus
   let nr = plan.staffeln[0]!.nr - 1
   folgen.forEach((f, i) => {
@@ -36,16 +43,25 @@ export function staffelJeFolgentitel(folgen: WikiFolge[], plan: StaffelPlan): Ma
     if (!k) return
     if (aus.has(k)) doppelt.add(k)
     aus.set(k, { nr, folge: f.st! })
+    const o = ohneArtikel(f.dt)
+    if (rueckfall.has(o)) rueckfallDoppelt.add(o)
+    rueckfall.set(o, { nr, folge: f.st! })
   })
   for (const k of doppelt) aus.delete(k)
+  for (const k of rueckfallDoppelt) rueckfall.delete(k)
+  aus.ohneArtikel = rueckfall
   return aus
 }
 
-/** Der Treffer zu einem Folgentitel der Sendung: wörtlich, sonst über die eine Schreibvariante (`aehnlicherKern`). Vorspann „Serie: “ fällt weg. */
-export function trefferFuer(liste: Map<string, StaffelFolge>, folge: string | undefined): StaffelFolge | undefined {
+/**
+ * Der Treffer zu einem Folgentitel der Sendung: wörtlich, sonst über die eine Schreibvariante (`aehnlicherKern`), zuletzt ohne führenden
+ * Artikel auf beiden Seiten (nur eindeutig). Vorspann „Serie: “ fällt weg.
+ */
+export function trefferFuer(liste: FolgentitelListe, folge: string | undefined): StaffelFolge | undefined {
   if (!folge) return undefined
-  const k = folgenKern(folge.replace(/^[^:]{3,60}:\s*/, ''))
-  return liste.get(k) ?? liste.get(aehnlicherKern(liste.keys(), k) ?? '') ?? liste.get(folgenKern(folge))
+  const ohneVorspann = folge.replace(/^[^:]{3,60}:\s*/, '')
+  const k = folgenKern(ohneVorspann)
+  return liste.get(k) ?? liste.get(aehnlicherKern(liste.keys(), k) ?? '') ?? liste.get(folgenKern(folge)) ?? liste.ohneArtikel?.get(ohneArtikel(ohneVorspann))
 }
 
 const sendeSchluessel = (sender: string, startBerlin: string): string => `${sender.toLowerCase()}|${startBerlin.slice(0, 16)}`
@@ -66,7 +82,7 @@ export function zielDesTermins(
   r: Release | undefined,
   plan: StaffelPlan,
   sendeplatz: Map<string, string | undefined>,
-  jeTitel: Map<string, StaffelFolge>,
+  jeTitel: FolgentitelListe,
 ): Ziel | undefined {
   if (ev.platform === 'tv' && ev.sichtung) {
     const t = trefferFuer(jeTitel, sendeplatz.get(sendeSchluessel(ev.sender ?? '', `${ev.date}T${ev.time ?? ''}`)))
@@ -94,7 +110,7 @@ export function teileTermine(
   events: ReleaseEvent[],
   plan: StaffelPlan,
   sendeplatz: Map<string, string | undefined>,
-  jeTitel: Map<string, StaffelFolge>,
+  jeTitel: FolgentitelListe,
 ): TerminTeilung {
   const jeSlug = new Map(releases.filter((r) => r.titleId === plan.sammel).map((r) => [r.slug, r]))
   const basis = plan.staffeln.find((s) => s.nr === plan.basis)!
@@ -160,7 +176,7 @@ export function staffelRelease(
   plan: StaffelPlan,
   kennung: number,
   nr: number,
-  jeTitel: Map<string, StaffelFolge>,
+  jeTitel: FolgentitelListe,
 ): Release {
   const s = plan.staffeln.find((x) => x.nr === nr)!
   const neu: Release = { ...structuredClone(r), slug: events[0]!.releaseSlug, titleId: kennung }
@@ -208,7 +224,7 @@ function sendungenDerStaffel(
   liste: NonNullable<Release['sendungen']>,
   nr: number,
   istBasis: boolean,
-  jeTitel: Map<string, StaffelFolge>,
+  jeTitel: FolgentitelListe,
 ): NonNullable<Release['sendungen']> {
   return liste.flatMap((s) => {
     const t = trefferFuer(jeTitel, s.folge)

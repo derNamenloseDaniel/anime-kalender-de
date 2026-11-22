@@ -1,11 +1,11 @@
 {
-  "scrapedAt": "2026-11-22T17:01:45.580Z",
+  "scrapedAt": "2026-11-22T19:01:52.044Z",
   "verworfen": {
     "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 7,
-    "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
+    "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 5,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 10,
-    "schon in einem Rubrik-Feed gelesen": 8,
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 9,
+    "schon in einem Rubrik-Feed gelesen": 9,
     "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 2,
     "Sprachhinweis älter als 45 Tage": 6
   },
@@ -64,6 +64,36 @@
         }
       ],
       "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Erste »Horimiya«-Staffel erscheint als Blu-ray-Gesamtausgabe",
+      "articleUrl": "https://www.anime2you.de/news/1074055/horimiya-staffel-1-blu-ray-gesamtausgabe/",
+      "publishedAt": "2026-11-22",
+      "category": "disc",
+      "platforms": [
+        "disc"
+      ],
+      "dates": [
+        {
+          "month": "2027-02",
+          "context": "ausgabe veröffentlicht wird. Wir fassen nachfolgend zusammen. Release im Februar 2027 Die Gesamtausgabe der ersten Staffel von »Horimiya«, d"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Episodenanzahl der zweiten »The Ramparts of Ice«-Staffel steht fest",
+      "articleUrl": "https://www.anime2you.de/news/1074247/the-ramparts-of-ice-staffel-2-episodenanzahl/",
+      "publishedAt": "2026-11-22",
+      "category": "allgemein",
+      "platforms": [
+        "netflix"
+      ],
+      "dates": [],
+      "dub": "ja",
+      "hinweis": "sprache",
       "alreadyCurated": false
     },
     {

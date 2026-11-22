@@ -175,8 +175,11 @@ pruefe('adresse-mehrfach: Regel nutzt die Menge', arten(gut(1), kontext({ adress
 
 /* Grenzfälle und Einheitlichkeit (Prüfer-Auflagen N4, N7) */
 const regel = (art: string) => REGELN.find((r) => r.art === art)!
+pruefe('studio hat Handbesitzer (kein Automat füllt es, 22.11.2026)', regel('studio').wer === 'hand:studio-von-hand', regel('studio').wer)
+pruefe('weg-ohne-adresse bleibt auto: (ein Handbesitzer ohne Abarbeitungsweg schaltet die Stillstand-Warnung nur ab)', regel('weg-ohne-adresse').wer === 'auto:anbieterkalender', regel('weg-ohne-adresse').wer)
 pruefe('Tabelle: cover und kein-weg tragen Wirkung 3; wer auto:tmdb-poster bzw. daniel', regel('cover').wirkung === 3 && regel('cover').wer === 'auto:tmdb-poster' && regel('kein-weg').wirkung === 3 && regel('kein-weg').wer === 'daniel')
 pruefe('Tabelle: bild-fremdsprachig ist schwach, Wirkung 2, wer auto:tmdb-poster', regel('bild-fremdsprachig')?.gruppe === 'schwach' && regel('bild-fremdsprachig')?.wirkung === 2 && regel('bild-fremdsprachig')?.wer === 'auto:tmdb-poster')
+pruefe('Tabelle: handlung-de hat Handbesitzer mit Weg handlung-eigen (keine automatische Quelle liefert den Text)', regel('handlung-de')?.wer === 'hand:handlung-eigen')
 pruefe('folgentitel: SPECIAL und MUSIC mit mehreren Folgen sind keine Ausnahme', ['SPECIAL', 'MUSIC', 'OVA'].every((f) => arten(gut(1, { format: f as Title['format'] }), ohneFolgen).join() === 'folgentitel'))
 pruefe('kein-weg: Disc-Termin ist ein Weg (wie bei erstausgabe-ohne-weg)', !arten(gut(1, { streams: [], watchLinks: [] }), kontext({ discTitel: new Set([1]) })).includes('kein-weg') && arten(gut(1, { streams: [], watchLinks: [] }), kontext({ discTitel: new Set([2]) })).includes('kein-weg'))
 const ohneWeg = (ueber: Partial<Title> = {}) => gut(1, { streams: [], watchLinks: [], ...ueber })

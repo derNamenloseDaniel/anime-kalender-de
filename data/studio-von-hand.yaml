@@ -1,0 +1,43 @@
+# Studios von Hand für Titel, die AniList ohne Studio führt und das aniSearch-Archiv nicht ergänzt (`pipeline/lib/studio-von-hand.ts`, in `bau/12-meta.ts` vor dem Archiv).
+# Ein vorhandenes Studio wird nie ersetzt. Schreibweise wie im Bestand (AniList: „bones film“, „david production“). Je Titel 1 bis 3 Studios, mindestens eine https-Quelle (Abruf 22.11.2026).
+- id: 5090
+  studios: [Artmic, Studio Nue]
+  quellen:
+    - https://myanimelist.net/anime/5090
+    - https://en.wikipedia.org/wiki/Techno_Police_21C
+- id: 3087
+  studios: [Anime Innovation Tokyo, Aniplex]
+  quellen:
+    - https://en.wikipedia.org/wiki/Cencoroll
+- id: 6609
+  studios: [Studio B Productions, Bazooka Studio]
+  quellen:
+    - https://en.wikipedia.org/wiki/Pucca_(TV_series)
+    - https://www.thejakartapost.com/life/2018/12/10/korea-born-character-pucca-reimagined-as-3d-animation
+- id: 10763
+  studios: [Seoul Donghwa]
+  quellen:
+    - https://en.wikipedia.org/wiki/Robot_Taekwon_V
+- id: 2884
+  studios: [JTeam Studios]
+  quellen:
+    - https://en.wikipedia.org/wiki/Aachi_%26_Ssipak
+    - https://sf-encyclopedia.com/entry/aachi_and_ssipak
+- id: 101874
+  studios: [Studio Dadashow]
+  quellen:
+    - https://en.wikipedia.org/wiki/Seoul_Station_(film)
+    - https://www.hollywoodreporter.com/review/seoul-station-seoul-yeok-film-915964
+- id: 109085
+  studios: [david production]
+  quellen:
+    - https://myanimelist.net/anime/39605
+- id: 211711
+  studios: [bones film]
+  quellen:
+    - https://animotaku.fr/encyclotaku/anime/my-hero-academia-i-am-a-hero-too/
+- id: 10006994
+  studios: [A-1 Pictures]
+  quellen:
+    - https://myanimelist.net/anime/9136
+    - https://www.animenewsnetwork.com/encyclopedia/anime.php?id=13411

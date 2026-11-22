@@ -1897,6 +1897,10 @@
       "am": "2026-11-20",
       "vorschlaege": 0
     },
+    "1073095": {
+      "am": "2026-11-22",
+      "vorschlaege": 1
+    },
     "1073183": {
       "am": "2026-11-18",
       "vorschlaege": 0,
@@ -2055,6 +2059,10 @@
       "am": "2026-11-21",
       "vorschlaege": 0
     },
+    "1074055": {
+      "am": "2026-11-22",
+      "vorschlaege": 1
+    },
     "1074073": {
       "am": "2026-11-21",
       "vorschlaege": 0
@@ -2084,6 +2092,10 @@
       "am": "2026-11-22",
       "vorschlaege": 1
     },
+    "1074247": {
+      "am": "2026-11-22",
+      "vorschlaege": 1
+    },
     "1074258": {
       "am": "2026-11-21",
       "vorschlaege": 1
@@ -2103,6 +2115,11 @@
     "1074323": {
       "am": "2026-11-21",
       "vorschlaege": 2
+    },
+    "1074343": {
+      "am": "2026-11-22",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
     },
     "1074350": {
       "am": "2026-11-21",
@@ -16613,6 +16630,69 @@
       "artikelId": "1074234",
       "artikel": "Zweite »BOFURI-Staffel erscheint als Blu-ray-Gesamtausgabe",
       "quelle": "https://www.anime2you.de/news/1074234/bofuri-staffel-2-blu-ray-gesamtausgabe/",
+      "veroeffentlicht": "2026-11-22",
+      "gelesenAm": "2026-11-22"
+    },
+    {
+      "titel": "A Silent Voice",
+      "zitat": "Der Film erschien im November 2026 in einer neuen Steelbook-Edition auf DVD und Blu-ray.",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1073095",
+      "artikel": "»A Silent Voice«-Macher verraten, wie viel sie für den Film opferten",
+      "quelle": "https://www.anime2you.de/news/1073095/a-silent-voice-macher-verraten-wie-viel-sie-opferten/",
+      "veroeffentlicht": "2026-11-22",
+      "gelesenAm": "2026-11-22"
+    },
+    {
+      "titel": "The Ramparts of Ice",
+      "zitat": "Die zweite Staffel von »The Ramparts of Ice« umfasst insgesamt 13 Episoden, die seit dem 1. Oktober 2026 jeden Donnerstag auf Deutsch sowie im Originalton mit Untertiteln bei Netflix veröffentlicht werden.",
+      "art": "start",
+      "sprache": "deutsch+omu",
+      "plattform": "netflix",
+      "datum": "2026-10-01",
+      "uhrzeit": null,
+      "anbieter": "Netflix",
+      "sender": null,
+      "wochentage": "jeden Donnerstag",
+      "folgen": "13",
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [],
+      "artikelId": "1074247",
+      "artikel": "Episodenanzahl der zweiten »The Ramparts of Ice«-Staffel steht fest",
+      "quelle": "https://www.anime2you.de/news/1074247/the-ramparts-of-ice-staffel-2-episodenanzahl/",
+      "veroeffentlicht": "2026-11-22",
+      "gelesenAm": "2026-11-22"
+    },
+    {
+      "titel": "Horimiya",
+      "zitat": "Die Gesamtausgabe der ersten Staffel von »Horimiya«, die alle zwölf Episoden mit deutscher und japanischer Sprachausgabe in zwei Volumes mit Sammelschuber beinhaltet, erscheint voraussichtlich am 5. Februar 2027 als DVD und Blu-ray.",
+      "art": "disc",
+      "sprache": "deutsch+omu",
+      "plattform": "disc",
+      "datum": "2027-02-05",
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": "12",
+      "unsicher": "Termin laut Artikel „voraussichtlich“, noch nicht endgültig bestätigt.",
+      "wochentag": "Freitag",
+      "warnungen": [],
+      "artikelId": "1074055",
+      "artikel": "Erste »Horimiya«-Staffel erscheint als Blu-ray-Gesamtausgabe",
+      "quelle": "https://www.anime2you.de/news/1074055/horimiya-staffel-1-blu-ray-gesamtausgabe/",
       "veroeffentlicht": "2026-11-22",
       "gelesenAm": "2026-11-22"
     }

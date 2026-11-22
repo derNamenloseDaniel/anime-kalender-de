@@ -116,6 +116,7 @@ export function ReihenCover(p: CoverProps) {
     <button
       type="button"
       role="tab"
+      data-reihe-teil={m.id}
       aria-selected={gewaehlt}
       disabled={p.gesperrt}
       onClick={() => {

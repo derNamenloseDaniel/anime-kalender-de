@@ -4,7 +4,7 @@
  * Feste Zeit, Wegwerf-Dateien unter os.tmpdir().
  */
 import assert from 'node:assert/strict'
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -283,11 +283,12 @@ assert.equal(mitDatei(MIT_BEFEHL.replace('## Worum', '⚠ **Verfallen:** ohne Zi
   const dir = mkdtempSync(join(tmpdir(), 'stand-datei-'))
   const datei = join(dir, 'f7.md')
   writeFileSync(datei, GUT)
-  assert.ok(Math.abs(w.aenderungVon(datei) - Date.now()) < 60000, 'aenderungVon liest die mtime')
+  utimesSync(datei, JETZT / 1000, JETZT / 1000)
+  assert.equal(w.aenderungVon(datei), JETZT, 'aenderungVon liest die mtime')
   assert.equal(w.aenderungVon(join(dir, 'fehlt.md')), null, 'fehlende Datei: null')
   if (process.platform === 'win32') {
     const zeile = '- 🟠 **F7 Frage** — [Datei](file:///' + datei.replace(/\\/g, '/') + ') {eigen · normal · - · 01.10.}'
-    assert.match(w.waechter(jetztStand(zeile), Date.now(), () => true), /Stand 20\.10\. 11:30 ist älter als die letzte Änderung/, 'Standard-aenderung liest mtime')
+    assert.match(w.waechter(jetztStand(zeile), JETZT, () => true), /Stand 20\.10\. 11:30 ist älter als die letzte Änderung/, 'Standard-aenderung liest mtime')
   } else console.log('stand-waechter.test: Standardweg über file:///C:/-Link übersprungen (nur win32); aenderungVon direkt geprüft')
   rmSync(dir, { recursive: true, force: true })
 }

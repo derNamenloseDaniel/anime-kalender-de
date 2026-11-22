@@ -23,6 +23,7 @@ import { SYNOPSIS_GROUPS, anbieterName, type Release, type Title } from '../shar
 import { todayIso } from '../shared/time.ts'
 import { ROOT, log, readJson } from './lib/util.ts'
 import { hauptRelease } from './lib/haupt-release.ts'
+import { ladeStaffelGrenzen, staffelListen } from './lib/pokemon-staffeln.ts'
 import { ARTIKEL_STIL as STIL, SITE, esc, titelName, titelInhalt, titelKopf } from './lib/titel-seite.ts'
 import { START_AUSSAGE, startseiteInhalt } from './lib/startseite.ts'
 import { belegteTermine, uebersichtTexte } from './lib/termine-uebersicht.ts'
@@ -167,6 +168,7 @@ function schreibeAlleTitelSeiten(akVon: AkVon, kennungsZeilen: KennungsZeile[], 
 
 /** Eine Seite je Titel: Hat er Termine, trägt sie den nächsten (sonst den letzten) samt der übrigen; sonst die schlichte Titelseite. */
 function schreibeTitelSeiten(mitAk: { t: Title; ak: number; adresse: string }[], r: SeitenRahmen, umfeldRahmen: UmfeldRahmen): void {
+  const grenzen = staffelListen(ladeStaffelGrenzen())
   for (const { t, ak, adresse } of mitAk) {
     const dir = resolve(DIST, teilenPfad(adresse))
     mkdirSync(dir, { recursive: true })
@@ -176,9 +178,9 @@ function schreibeTitelSeiten(mitAk: { t: Title; ak: number; adresse: string }[],
     const text = r.synopses[String(t.id)]?.de ?? (t.westlich ? t.synopsis : undefined)
     const synopsis = text ? { text, quelle: seitenQuelle(r.synopses[String(t.id)]) } : undefined
     const umfeld = umfeldFuer(t, `${SITE}${teilenPfad(adresse)}`, umfeldRahmen)
-    const kopf = haupt ? head(haupt, t, r.today, ak, adresse, umfeld, eigene.length > 1) : titelKopf({ ...t, id: ak, slug: adresse }, umfeld, r.standardKennung, false, r.masse)
+    const kopf = haupt ? head(haupt, t, r.today, ak, adresse, umfeld, eigene.length > 1, grenzen.get(t.id)) : titelKopf({ ...t, id: ak, slug: adresse }, umfeld, r.standardKennung, false, r.masse)
     const inhalt = haupt
-      ? body(haupt, t, synopsis, r.today, eigene.filter((g) => g.slug !== haupt.slug), ak, adresse, umfeld)
+      ? body(haupt, t, synopsis, r.today, eigene.filter((g) => g.slug !== haupt.slug), ak, adresse, umfeld, grenzen.get(t.id))
       : titelInhalt({ ...t, id: ak, slug: adresse }, synopsis, eigene, umfeld)
     writeFileSync(resolve(dir, 'index.html'), (r.before + kopf + r.after).replace(r.rootTag, `<div id="root">${inhalt}</div>`), 'utf8')
   }

@@ -1,4 +1,4 @@
-# Belege ohne Fundstelle (41)
+# Belege ohne Fundstelle (42)
 
 Je Adresse die Titel, für die die letzte Lesung keine Zeile mit Titel und Termin gefunden hat (Fundstelle nur außerhalb des Bildausschnitts zählt nicht; Adressen ohne zugeordneten Titel und aniSearch-Kurzadressen neben ihrer Slug-Form fehlen). Von Hand prüfen: steht der Name im Seitentext, hat das Lesen die Marke verloren (der Lauf meldet es als Warnung „stehen im Seitentext, haben aber keine Marke“); sonst nennt der Artikel den Titel oder den Termin nicht, oder in verschiedenen Zeilen. Fehlt eines davon, ist der Beleg hinfällig und der Termin braucht eine andere Quelle.
 
@@ -8,7 +8,7 @@ Je Adresse die Titel, für die die letzte Lesung keine Zeile mit Titel und Termi
 - https://www.anisearch.de/article/185053,gods-games-we-play-gesamtausgabe-blu-ray (gelesen 2026-11-07) — Kami wa Game ni Ueteiru. (144176)
 - https://www.anisearch.de/article/201864,sakamoto-days-vol-3-4-limited-steelcase-edition-blu-ray (gelesen 2026-11-21) — Sakamoto Days: Teil 2 – Vol. 3 (184237)
 - https://www.anisearch.de/article/201866,sakamoto-days-vol-4-4-limited-steelcase-edition-blu-ray (gelesen 2026-11-21) — Sakamoto Days: Teil 2 – Vol. 4 (184237)
-- https://www.anime2you.de/news/1044479/afro-samurai-steelbook-blu-ray-edition/ (gelesen 2026-11-01) — Afro Samurai + Afro Samurai Resurrection (1292)
+- https://www.anime2you.de/news/1044479/afro-samurai-steelbook-blu-ray-edition/ (gelesen 2026-11-22) — Afro Samurai + Afro Samurai Resurrection (1292)
 - https://www.anime2you.de/news/1052708/netflix-anime-neu-im-oktober-2026/ (gelesen 2026-11-19) — Watashi no Shiawase na Kekkon Tokubetsu-hen (190054)
 - https://www.anisearch.de/news/anime/58458,simulcast-uebersicht-sommer-2026 (gelesen 2026-11-12) — Hanazakari no Kimitachi e 2nd Season (209669), Mushoku Tensei: Jobless Reincarnation – Staffel 3 (178789), Saga of Tanya the Evil – Staffel 2 (135865), Futsutsuka na Akujo de wa Gozaimasu ga: Suuguu Chouso Torikae Den (188139), Tomb Raider King (184356), Trapped in a Dating Sim: The World of Otome Games Is Tough for Mobs Staffel 2 (159309), You and I Are Polar Opposites – Staffel 2 (210031)
 - https://news.animationdigitalnetwork.com/de/2026/05/22/adn-animagic-live-synchro-mit-mayumi-tanaka/ (gelesen 2026-10-28) — Dragon Ball Super (21175), Dan Da Dan (171018), Dan Da Dan: Staffel 2 (185660)
@@ -19,7 +19,7 @@ Je Adresse die Titel, für die die letzte Lesung keine Zeile mit Titel und Termi
 - https://de.wikipedia.org/wiki/Detektiv_Conan/Episodenliste (gelesen 2026-11-16) — Detective Conan (235)
 - https://de.wikipedia.org/wiki/Dragon_Ball/Episodenliste (gelesen 2026-11-16) — Dragon Ball (223)
 - https://www.kinoheld.de/film/your-name-gestern-heute-und-fuer-immer (gelesen 2026-11-02) — Your Name. Gestern, heute und für immer (21519)
-- https://press.disneyplus.com/news/next-on-disney-plus-october-2026 (gelesen 2026-11-01) — Tokyo Revengers: War of the Three Titans Arc (178083)
+- https://press.disneyplus.com/news/next-on-disney-plus-october-2026 (gelesen 2026-11-22) — Tokyo Revengers: War of the Three Titans Arc (178083)
 - https://www.anime2you.de/news/1053610/disney-plus-spy-x-family-und-mehr/ (gelesen 2026-11-07) — Spy × Family (Cour 2) (142838), Spy × Family: Staffel 2 (158927)
 - https://www.anime2you.de/news/1057649/disney-plus-gachiakuta-und-mehr/ (gelesen 2026-11-08) — Spy × Family (Cour 2) (142838), Spy × Family: Staffel 2 (158927)
 - https://www.anime2you.de/news/1054490/netflix-demon-slayer-infinity-castle-und-mehr/ (gelesen 2026-11-12) — Beelzebub (9513)
@@ -28,7 +28,7 @@ Je Adresse die Titel, für die die letzte Lesung keine Zeile mit Titel und Termi
 - https://www.anime2you.de/news/1045191/netflix-gintama-film-und-mehr/ (gelesen 2026-10-28) — Mobile Suit Gundam Hathaway: The Sorcery of Nymph Circe (113971)
 - https://de.wikipedia.org/wiki/Super_Wings (gelesen 2026-11-20) — Chuldong! Super Wings (10012621)
 - https://www.anime2you.de/news/1044124/jujutsu-kaisen-staffel-1-steelbook-edition/ (gelesen 2026-11-20) — Shimetsu Kaiyuu - Kouhen (10021915)
-- https://news.animationdigitalnetwork.com/de/2026/09/28/line-up-zur-herbst-season-2026-neue-anime-bei-adn/ (gelesen 2026-11-12) — Kill La Kill (18679)
+- https://news.animationdigitalnetwork.com/de/2026/09/28/line-up-zur-herbst-season-2026-neue-anime-bei-adn/ (gelesen 2026-11-12) — Kill la Kill (18679)
 - https://www.anime2you.de/news/1049988/disney-plus-the-god-of-high-school-und-mehr/ (gelesen 2026-11-02) — Beyblade X – Staffel 2 - Teil 2 (165159)
 - https://www.joyn.de/filme/boruto-naruto-the-movie (gelesen 2026-11-14) — Boruto: Naruto the Movie (21220)
 - https://news.animationdigitalnetwork.com/de/2026/10/26/die-1-euro-aktion-ist-zurueck-streame-anime-fuer-1e-bei-adn/ (gelesen 2026-11-02) — Shingeki no Kyojin (16498)
@@ -43,3 +43,4 @@ Je Adresse die Titel, für die die letzte Lesung keine Zeile mit Titel und Termi
 - https://de.wikipedia.org/wiki/My_Hero_Academia/Episodenliste (gelesen 2026-11-16) — My Hero Academia Staffel 6 (139630)
 - https://news.animationdigitalnetwork.com/de/2026/11/16/witch-watch-staffel-2-ausstrahlung-in-2027-manga-beendet/ (gelesen 2026-11-17) — Witch Watch (180367)
 - https://www.anime2you.de/news/1062132/disc-neuheiten-november-2026/ (gelesen 2026-11-19) — Master Detective Ron Kamonohashi – Staffel 2 – Vol. 2 (172355)
+- https://www.anime2you.de/news/1073600/netflix-anime-neu-im-dezember-2026/ (gelesen 2026-11-22) — Ranma 1/2 (2024) 3rd Season (209872)

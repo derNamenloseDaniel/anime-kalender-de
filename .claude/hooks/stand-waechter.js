@@ -127,7 +127,7 @@ function liesDatei(pfad) {
 }
 
 /** Meldungen zum Aufbau einer Jetzt-Datei: Kennung in der ersten Überschrift, `##`-Abschnitte je genau einmal in fester Reihenfolge (Archiv darf fehlen). */
-function dateiAufbau(kennung, text) {
+function dateiAufbau(kennung, text, mtime = null) {
   const zeilen = text.split(/\r?\n/)
   const titel = zeilen.find((z) => /^# /.test(z)) || ''
   const meldungen = []
@@ -143,8 +143,38 @@ function dateiAufbau(kennung, text) {
   if (bekannt.some((r, i) => i > 0 && r < bekannt[i - 1])) {
     meldungen.push(`Jetzt-Datei ${kennung}: Abschnitte nicht in der Reihenfolge Aufgabe, Worum, Warum, Archiv`)
   }
-  meldungen.push(...warumGrund(kennung, zeilen))
+  meldungen.push(...warumGrund(kennung, zeilen), ...standUndWarnung(kennung, text, mtime))
   return meldungen
+}
+
+const DATEI_STAND = /^\*Stand: (\d\d)\.(\d\d)\.(\d{4}) (\d\d):(\d\d)\*\s*$/
+const ZUSTANDSBEFEHL = /\bgit (?:restore|reset|clean|push)\b|\brm -|\bDROP TABLE\b|\bDELETE FROM\b|\bwrangler d1\b|\bsendmail\b|\bDNS\b/
+const WARNUNG = /^> ⚠ \*\*(?:Kann veraltet sein|Verfallen):\*\*/m
+const STAND_TOLERANZ = 10 * 60000
+
+/** Meldungen zu `*Stand: TT.MM.JJJJ HH:MM*` direkt unter der Überschrift (Daniel, 21.11.2026), zur ⚠-Zeile bei Zustandsbefehlen und zu einem Stand, der älter ist als die letzte Dateiänderung (`mtime` in ms oder null). */
+function standUndWarnung(kennung, text, mtime) {
+  const zeilen = text.split(/\r?\n/)
+  const nach = zeilen.slice(zeilen.findIndex((z) => /^# /.test(z)) + 1).find((z) => z.trim())
+  const s = DATEI_STAND.exec(nach || '')
+  const meldungen = []
+  if (!s) meldungen.push(`Jetzt-Datei ${kennung}: Zeile „*Stand: TT.MM.JJJJ HH:MM*“ direkt unter der Überschrift fehlt`)
+  else if (mtime != null && mtime - berlinEpoche(Number(s[3]), Number(s[2]), Number(s[1]), Number(s[4]), Number(s[5])) > STAND_TOLERANZ) {
+    meldungen.push(`Jetzt-Datei ${kennung}: Stand ${s[1]}.${s[2]}. ${s[4]}:${s[5]} ist älter als die letzte Änderung — Stand neu setzen`)
+  }
+  if (ZUSTANDSBEFEHL.test(text) && !WARNUNG.test(text)) {
+    meldungen.push(`Jetzt-Datei ${kennung}: Zustandsbefehl (git restore/reset/clean/push, rm, DNS, Datenbank, Mail) ohne „> ⚠ **Kann veraltet sein:**“- oder „> ⚠ **Verfallen:**“-Zeile`)
+  }
+  return meldungen
+}
+
+/** Zeitpunkt der letzten Änderung (ms) oder null (fehlt/unlesbar). */
+function aenderungVon(pfad) {
+  try {
+    return fs.statSync(pfad).mtimeMs
+  } catch {
+    return null
+  }
 }
 
 /** Der Abschnitt „Warum ich es nicht selbst tue“ nennt „kann/darf/soll nicht“ (der Grund steht dort, nicht in der Jetzt-Zeile; Daniel, 16.11.2026). Fehlt der Abschnitt, meldet das dateiAufbau. */
@@ -157,7 +187,7 @@ function warumGrund(kennung, zeilen) {
 }
 
 /** Meldungen zu den Jetzt-Dateien: je Zeile unter „### Jetzt“ mit Kennung und `file:///`-Link auf eine .md-Datei. `lies(pfad)` liefert Text oder null. */
-function jetztDateien(text, lies) {
+function jetztDateien(text, lies, aenderung) {
   const zeilen = text.split(/\r?\n/)
   const kopf = zeilen.findIndex((z) => z.startsWith('### Jetzt'))
   if (kopf < 0) return []
@@ -175,14 +205,14 @@ function jetztDateien(text, lies) {
       continue
     }
     const inhalt = lies(pfad)
-    if (inhalt != null) meldungen.push(...dateiAufbau(kennung[0], inhalt))
+    if (inhalt != null) meldungen.push(...dateiAufbau(kennung[0], inhalt, aenderung(pfad)))
   }
   return meldungen
 }
 
-/** Meldungstext oder '' (alles in Ordnung). `existiert` prüft Dateipfade (Standard fs.existsSync), `lies` liest Jetzt-Dateien. */
-function waechter(text, jetzt, existiert = fs.existsSync, lies = liesDatei) {
-  return [waechterAbschnitte(text, jetzt), ...toteLinks(text, existiert), ...jetztDateien(text, lies)].filter(Boolean).join('; ')
+/** Meldungstext oder '' (alles in Ordnung). `existiert` prüft Dateipfade (Standard fs.existsSync), `lies` liest Jetzt-Dateien, `aenderung` liefert deren Änderungszeit. */
+function waechter(text, jetzt, existiert = fs.existsSync, lies = liesDatei, aenderung = aenderungVon) {
+  return [waechterAbschnitte(text, jetzt), ...toteLinks(text, existiert), ...jetztDateien(text, lies, aenderung)].filter(Boolean).join('; ')
 }
 
 /** Meldungen zu den Abschnitten von stand.md als ein Text oder ''. */
@@ -211,4 +241,4 @@ function waechterAbschnitte(text, jetzt) {
   return meldungen.join('; ')
 }
 
-module.exports = { MAX_ZEILEN, MAX_ALTER, LEER, waechter }
+module.exports = { MAX_ZEILEN, MAX_ALTER, LEER, waechter, aenderungVon }

@@ -214,10 +214,11 @@ if (process.platform === 'win32') {
   console.log('stand-waechter.test: Standard-Dateisystemfall übersprungen (nur win32); Fall mit abgebildetem Pfad lief')
 }
 // Jetzt-Dateien: fester Aufbau (Kennung in der Überschrift, Abschnittsreihenfolge)
-const GUT = '# F7 Titel\n\n## Deine Aufgabe\nx\n## Worum es geht\nx\n## Warum ich es nicht selbst tue\nkann nicht: x\n## Archiv\nx\n'
+const STAND_ZEILE = '*Stand: 20.10.2026 11:30*'
+const GUT = '# F7 Titel\n' + STAND_ZEILE + '\n\n## Deine Aufgabe\nx\n## Worum es geht\nx\n## Warum ich es nicht selbst tue\nkann nicht: x\n## Archiv\nx\n'
 const jetztStand = (zeile) => ['# Stand', '## Daniel-Todo', '### Jetzt', zeile, '### Später', '', `## In Arbeit${FRISCH}`, '', '## Als Nächstes', ...hand(40, '🔵 '), ''].join('\n')
 const ZEILE = '- 🟠 **F7 Frage** — [Datei](file:///C:/code/ai/jetzt-f7.md) {eigen · normal · - · 01.10.}'
-const mitDatei = (inhalt) => w.waechter(jetztStand(ZEILE), JETZT, () => true, (p) => (p === 'C:/code/ai/jetzt-f7.md' ? inhalt : null))
+const mitDatei = (inhalt, mtime = null) => w.waechter(jetztStand(ZEILE), JETZT, () => true, (p) => (p === 'C:/code/ai/jetzt-f7.md' ? inhalt : null), () => mtime)
 assert.equal(mitDatei(GUT), '', 'Jetzt-Datei gut')
 const OHNE_GRUND = 'Jetzt-Datei F7: Abschnitt „Warum ich es nicht selbst tue“ nennt kein „kann nicht“, „darf nicht“ oder „soll nicht“'
 assert.equal(mitDatei(GUT.replace('kann nicht: x', 'x')), OHNE_GRUND, 'Warum-Abschnitt ohne Grund')
@@ -227,24 +228,24 @@ assert.equal(mitDatei(GUT.replace('kann nicht: x', 'Das soll nicht ich entscheid
 assert.equal(mitDatei(GUT.replace('# F7 Titel', '# Titel')), 'Jetzt-Datei F7: Kennung fehlt in der Überschrift', 'Kennung fehlt')
 assert.equal(mitDatei(GUT.replace('# F7 Titel', '# F77 Titel')), 'Jetzt-Datei F7: Kennung fehlt in der Überschrift', 'F77 ist nicht F7')
 assert.equal(
-  mitDatei('# F7 T\n## Worum es geht\nx\n## Deine Aufgabe\nx\n## Warum ich es nicht selbst tue\nkann nicht: x\n'),
+  mitDatei('# F7 T\n*Stand: 20.10.2026 11:30*\n## Worum es geht\nx\n## Deine Aufgabe\nx\n## Warum ich es nicht selbst tue\nkann nicht: x\n'),
   'Jetzt-Datei F7: Abschnitt „Deine Aufgabe“ nicht zuerst; Jetzt-Datei F7: Abschnitte nicht in der Reihenfolge Aufgabe, Worum, Warum, Archiv',
   'falsche Reihenfolge',
 )
 assert.equal(
-  mitDatei('# F7 T\n## Deine Aufgabe\nx\n## Archiv\nx\n## Worum es geht\nx\n## Warum ich es nicht selbst tue\nkann nicht: x\n'),
+  mitDatei('# F7 T\n*Stand: 20.10.2026 11:30*\n## Deine Aufgabe\nx\n## Archiv\nx\n## Worum es geht\nx\n## Warum ich es nicht selbst tue\nkann nicht: x\n'),
   'Jetzt-Datei F7: Abschnitte nicht in der Reihenfolge Aufgabe, Worum, Warum, Archiv',
   'Archiv vor Worum',
 )
-assert.equal(mitDatei('# F7 T\n## Deine Aufgabe\nx\n## Worum es geht\nx\n## Warum ich es nicht selbst tue\nkann nicht: x\n'), '', 'Archiv darf fehlen')
+assert.equal(mitDatei('# F7 T\n*Stand: 20.10.2026 11:30*\n## Deine Aufgabe\nx\n## Worum es geht\nx\n## Warum ich es nicht selbst tue\nkann nicht: x\n'), '', 'Archiv darf fehlen')
 // Pflichtabschnitte je genau einmal (nur Archiv darf fehlen)
 assert.equal(
-  mitDatei('# F7 T\n## Deine Aufgabe\nx\n'),
+  mitDatei('# F7 T\n*Stand: 20.10.2026 11:30*\n## Deine Aufgabe\nx\n'),
   'Jetzt-Datei F7: Abschnitt „Worum es geht“ fehlt; Jetzt-Datei F7: Abschnitt „Warum ich es nicht selbst tue“ fehlt',
   'nur Aufgabe',
 )
 assert.equal(
-  mitDatei('# F7 T\n## Worum es geht\nx\n## Warum ich es nicht selbst tue\nkann nicht: x\n'),
+  mitDatei('# F7 T\n*Stand: 20.10.2026 11:30*\n## Worum es geht\nx\n## Warum ich es nicht selbst tue\nkann nicht: x\n'),
   'Jetzt-Datei F7: Abschnitt „Deine Aufgabe“ fehlt; Jetzt-Datei F7: Abschnitt „Deine Aufgabe“ nicht zuerst',
   'Aufgabe fehlt',
 )
@@ -252,7 +253,39 @@ assert.equal(mitDatei(GUT.replace('## Deine Aufgabe\nx\n', '## Deine Aufgabe\nx\
 assert.equal(mitDatei(`${GUT}## Archiv\nx\n`), 'Jetzt-Datei F7: Abschnitt „Archiv“ doppelt', 'Archiv doppelt')
 // Unbekannte erste Überschrift; Kennung nur im Fließtext zählt nicht
 assert.equal(mitDatei(GUT.replace('## Deine Aufgabe', '## Aufgabe\nx\n## Deine Aufgabe')), 'Jetzt-Datei F7: Abschnitt „Deine Aufgabe“ nicht zuerst', 'unbekannte erste Überschrift')
-assert.equal(mitDatei(GUT.replace('# F7 Titel', '# Titel\nF7 im Text')), 'Jetzt-Datei F7: Kennung fehlt in der Überschrift', 'Kennung nur im Fließtext')
+assert.equal(mitDatei(GUT.replace('# F7 Titel', '# Titel').replace(STAND_ZEILE, STAND_ZEILE + '\nF7 im Text')), 'Jetzt-Datei F7: Kennung fehlt in der Überschrift', 'Kennung nur im Fließtext')
+// Stand-Zeile, Verfallswarnung, Stand gegen Änderungszeit (Daniel, 21.11.2026)
+const STAND_FEHLT = 'Jetzt-Datei F7: Zeile „*Stand: TT.MM.JJJJ HH:MM*“ direkt unter der Überschrift fehlt'
+const BEFEHLSMELDUNG = 'Jetzt-Datei F7: Zustandsbefehl (git restore/reset/clean/push, rm, DNS, Datenbank, Mail) ohne „> ⚠ **Kann veraltet sein:**“- oder „> ⚠ **Verfallen:**“-Zeile'
+assert.equal(mitDatei(GUT.replace(STAND_ZEILE + '\n', '')), STAND_FEHLT, 'Stand-Zeile fehlt')
+assert.equal(mitDatei(GUT.replace(STAND_ZEILE, '*Stand: gestern*')), STAND_FEHLT, 'Stand-Zeile ohne Datum')
+assert.equal(mitDatei(GUT.replace(STAND_ZEILE + '\n', 'Text\n' + STAND_ZEILE + '\n')), STAND_FEHLT, 'Stand nicht direkt unter der Überschrift')
+const STAND_MS = Date.parse('2026-10-20T09:30:00Z') // 11:30 Berlin
+assert.equal(mitDatei(GUT, STAND_MS + 10 * 60000), '', 'Stand genau 10 min vor der Änderung: still')
+assert.equal(mitDatei(GUT, STAND_MS + 10 * 60000 + 1), 'Jetzt-Datei F7: Stand 20.10. 11:30 ist älter als die letzte Änderung — Stand neu setzen', 'Stand über 10 min älter')
+assert.equal(mitDatei(GUT, STAND_MS - 3600000), '', 'Stand neuer als die Änderung: still')
+const MIT_BEFEHL = GUT.replace('## Worum es geht\nx', '## Worum es geht\n`git reset --hard`')
+assert.equal(mitDatei(MIT_BEFEHL), BEFEHLSMELDUNG, 'git reset ohne ⚠-Zeile')
+for (const befehl of ['git restore a', 'git clean -fd', 'git push origin x', 'rm -rf x', 'DNS-Eintrag setzen', 'DROP TABLE t', 'DELETE FROM t', 'wrangler d1 execute']) {
+  assert.equal(mitDatei(GUT.replace('## Worum es geht\nx', '## Worum es geht\n' + befehl)), BEFEHLSMELDUNG, befehl)
+}
+assert.equal(mitDatei(GUT.replace('## Worum es geht\nx', '## Worum es geht\ngit status und git commit')), '', 'harmlose Git-Befehle')
+assert.equal(mitDatei(MIT_BEFEHL.replace('## Worum', '> ⚠ **Kann veraltet sein:** nur wenn der Zweig unverändert ist\n\n## Worum')), '', 'Kann-veraltet-Zeile genügt')
+assert.equal(mitDatei(MIT_BEFEHL.replace('## Worum', '> ⚠ **Verfallen:** nach dem 30.11.\n\n## Worum')), '', 'Verfallen-Zeile genügt')
+assert.equal(mitDatei(MIT_BEFEHL.replace('## Worum', '⚠ **Verfallen:** ohne Zitatzeichen\n\n## Worum')), BEFEHLSMELDUNG, 'ohne „> “ gilt die Zeile nicht')
+// Standard-Änderungszeit aus dem echten Dateisystem: frisch geschriebene Datei ist neuer als ihr Stand
+{
+  const dir = mkdtempSync(join(tmpdir(), 'stand-datei-'))
+  const datei = join(dir, 'f7.md')
+  writeFileSync(datei, GUT)
+  assert.ok(Math.abs(w.aenderungVon(datei) - Date.now()) < 60000, 'aenderungVon liest die mtime')
+  assert.equal(w.aenderungVon(join(dir, 'fehlt.md')), null, 'fehlende Datei: null')
+  if (process.platform === 'win32') {
+    const zeile = '- 🟠 **F7 Frage** — [Datei](file:///' + datei.replace(/\\/g, '/') + ') {eigen · normal · - · 01.10.}'
+    assert.match(w.waechter(jetztStand(zeile), Date.now(), () => true), /Stand 20\.10\. 11:30 ist älter als die letzte Änderung/, 'Standard-aenderung liest mtime')
+  } else console.log('stand-waechter.test: Standardweg über file:///C:/-Link übersprungen (nur win32); aenderungVon direkt geprüft')
+  rmSync(dir, { recursive: true, force: true })
+}
 // Kennung nur im Link-Ziel und Zeilen ohne „- “ führen zu keiner Dateiprüfung
 const GUT_E8 = GUT.replace('# F7', '# E8')
 const lies2 = (p) => (p === 'C:/code/ai/jetzt-e8.md' ? GUT_E8 : 'kaputt')

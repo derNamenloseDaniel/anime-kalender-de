@@ -1,13 +1,13 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useId, useState, type ReactNode } from 'react'
 import type { Translate } from '../../lib/i18n.tsx'
 import { AufklappKopf } from './aufklapp-kopf.tsx'
 import { PanelKarte, StapelZeichen } from './panel-karte.tsx'
-import type { ReihenListeProps } from './reihen-inhalt.tsx'
+import { reihenKarte, type Ordnung, type ReihenListeProps } from './reihen-inhalt.tsx'
+import { ReihenSpur } from './reihen-spur.tsx'
 import { reihenStand } from './reihen-karte.tsx'
 import { OhneSynchroSchalter } from './reihen-kopf.tsx'
 import { istEingeklappt } from './reihen-regeln.ts'
-import { fensterUm, gezeigteGruppen, gezeigteZahl, gruppeVon, GROSSE_GRUPPE, type Gruppe } from './reihen-uebersicht-regeln.ts'
-import { ReihenZeile, type Ordnung } from './reihen-zeile.tsx'
+import { gezeigteGruppen, gezeigteZahl, gruppeVon, type Gruppe } from './reihen-uebersicht-regeln.ts'
 
 type UebersichtProps = ReihenListeProps & { o: Ordnung }
 
@@ -28,41 +28,12 @@ function UebersichtKopf({ t, suche, onSuche, schalter }: { t: Translate; suche: 
   )
 }
 
-/** Die Teile einer offenen Gruppe; in der Gruppe des geöffneten Titels über 12 Teilen nur das Fenster um ihn, dazu „Alle n zeigen“. */
-function Gruppenzeilen({ g, eigen, p }: { g: Gruppe; eigen: boolean; p: UebersichtProps }) {
-  const [alle, setAlle] = useState(false)
-  const liste = useRef<HTMLUListElement>(null)
-  const fokusAuf = useRef<number | null>(null)
-  const fenster = eigen && !alle && g.teile.length > GROSSE_GRUPPE
-  const teile = fenster ? fensterUm(g.teile, p.title.id) : g.teile
-  /* Nach „Alle zeigen“ verschwindet der Knopf; der Fokus geht auf die erste neu gezeigte Zeile statt an den Seitenanfang. */
-  useEffect(() => {
-    if (fokusAuf.current === null) return
-    liste.current?.querySelectorAll('button')[fokusAuf.current]?.focus()
-    fokusAuf.current = null
-  }, [alle])
-  const zeigeAlle = () => {
-    fokusAuf.current = teile[0] === g.teile[0] ? teile.length : 0
-    setAlle(true)
-  }
+/** Die Teile einer offenen Gruppe als waagerechte Spur mit Karussell-Covern (wie die Spur kleiner Reihen); alle Teile, damit Zahl und Karten übereinstimmen. */
+function Gruppenspur({ g, p }: { g: Gruppe; p: UebersichtProps }) {
   return (
-    <>
-      <ul ref={liste} className="flex flex-col">
-        {teile.map((m) => (
-          <ReihenZeile key={m.id} m={m} o={p.o} t={p.t} reihenName={p.reihenName} title={p.title} gemerkt={p.favorites.has(m.id)} wechselt={p.wechselt} wechsleZu={p.wechsleZu} />
-        ))}
-      </ul>
-      {teile.length < g.teile.length && (
-        <button
-          type="button"
-          data-reihe-alle
-          onClick={zeigeAlle}
-          className="min-h-11 w-full cursor-pointer rounded-lg px-2 text-left text-t4 font-semibold text-ak-akzent-text hover:bg-ak-flaeche-2"
-        >
-          {p.t('detail.reiheAlleZeigen', { n: g.teile.length })}
-        </button>
-      )}
-    </>
+    <ReihenSpur gewaehltId={p.title.id} erste t={p.t}>
+      {g.teile.map((m) => reihenKarte(m, p.o, p))}
+    </ReihenSpur>
   )
 }
 
@@ -112,7 +83,7 @@ export function ReihenUebersicht(p: UebersichtProps) {
                 <span className="flex-1">{g.titel}</span>
                 <span className="pr-2 tabular-nums">{g.teile.length}</span>
               </AufklappKopf>
-              <div id={`${basis}-${i}`}>{auf && <Gruppenzeilen g={g} eigen={!suchText && g.titel === eigene} p={p} />}</div>
+              <div id={`${basis}-${i}`}>{auf && <Gruppenspur g={g} p={p} />}</div>
             </div>
           )
         })}

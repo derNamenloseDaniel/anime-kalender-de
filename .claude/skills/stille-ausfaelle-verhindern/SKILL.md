@@ -92,3 +92,7 @@ Ein Abruf einer fremden Liste, die nie leer sein sollte (Soll > 0), warnt sichtb
   gemessen wird, weil es vorher wegfällt.
 - `wissen-veraltet-nie`: eine Arbeitsliste, die aus solchen Ausfällen entsteht, wird auch wieder
   abgeräumt.
+
+## Titel wegen Weg verworfen (22.11.2026)
+
+Ein Filter, der über den Titel entscheidet, obwohl die Eigenschaft am Weg hängt (Release, Stream, Link), verwirft stumm ganze Anime („⊘ Disc" und Yaiba). Beim Ändern eines Ausschlusses oder einer Kombination fragen: Welche Einheit entscheidet, welche trägt die Eigenschaft? Pflicht-Fixture: ein Titel mit mehreren Wegen, davon einer ausgeschlossen. Ort der Weg-Logik: `web/src/lib/wege-filter.ts`.

@@ -915,3 +915,7 @@ Die drei Fehler, gegen die das gerichtet ist — alle drei am selben Tag passier
 
 **Verlust erst nach Ersatzprüfung melden (18.10.2026):** Ein Vorher/Nachher-Vergleich, der ein weggefallenes Feld findet, sucht im selben Zug, was an seine Stelle trat (neuer Beleg, andere Quelle, Handbeleg) — erst wenn nichts es ersetzt, ist es ein Verlust. Anlass: „JustWatch-Hinweise verloren“ waren 356 gemessene Browser-Belege.
 - **Werkzeugverhalten nur mit Fundstelle (Lehre 123, 17.11.2026):** Ein Satz über das Verhalten eines Werkzeugs kommt nur mit Fundstelle (Datei und Funktion) in eine Regel oder einen Auftrag; ohne gelesenen Code steht er als Beobachtung mit dem einen Fall da.
+
+## Filter: welche Einheit entscheidet? (22.11.2026)
+
+Vor jedem Filter oder Ausschluss: Welche Einheit entscheidet (Titel oder Weg), welche trägt die Eigenschaft? Ein Test mit einem Titel mit einem Weg beweist nichts; Pflicht-Fixture mit mehreren Wegen (`pipeline/check-filter-wege.ts`).

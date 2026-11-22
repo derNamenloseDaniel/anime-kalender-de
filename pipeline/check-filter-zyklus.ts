@@ -2,7 +2,7 @@
  * Filter-Pillen schalten reihum nichts → ausgewählt → ausgeschlossen → nichts (Daniel, 04.11.2026; der Klick-Modus entfällt).
  * Die reine Reihenfolge (`naechsterZustand`) und die echte Komponente `FilterDetailsFeld` im Mini-DOM: Genre, Schlagwort, Anbieter,
  * Plattform, Jahr (Listen-Pillen), Schnell-Chips (Favoriten, Cartoon, Disc, TV), Zweitanbieter (kennt nur „ausschließen“),
- * Plattform-Pille TV im Kalender (Schalter: nichts ↔ ausgeschlossen), Gleichstand von Schnell-Chip und Gruppen-Pille,
+ * kein Plattform-Chip TV im Kalender (nur der Schnell-Chip), Gleichstand von Schnell-Chip und Gruppen-Pille,
  * Zustandswort für Screenreader. Aufruf: `npm run check:logic`.
  */
 import { act, createElement as h, useState } from 'react'
@@ -133,32 +133,11 @@ console.log('\nSchnell-Chips')
   a.dom.entferne()
 }
 
-console.log('\nPlattform-Pille „TV“ im Kalender (Fernseh-Schalter): nichts ↔ ausgeschlossen')
+console.log('\nKalender: TV nur als Schnell-Chip (der Plattform-Chip „TV“ entfällt, 22.11.2026)')
 {
   const a = await rendere(true)
-  const folge: string[] = []
-  for (let i = 0; i < 3; i++) {
-    folge.push(stand.tvAn ? 'nichts' : 'nein')
-    await a.klick(a.pille('TV'))
-  }
-  folge.push(stand.tvAn ? 'nichts' : 'nein')
-  pruefe('kein „ausgewählt“: nichts → ausgeschlossen → nichts → ausgeschlossen', folge.join() === 'nichts,nein,nichts,nein' && stand.f.platforms.length === 0, folge)
-  a.dom.entferne()
-}
-
-console.log('\nSchnell-Chip „TV“ und Plattform-Pille „TV“ schließen den Zyklus')
-{
-  const a = await rendere(true)
-  await a.klick(a.schnell('TV'))
-  const ausgewaehlt = [a.nameVon(a.schnell('TV')), String(gedrueckt(a.pille('TV')))]
-  pruefe('Schnell-Chip „ausgewählt“: auch die Pille zeigt „gedrückt“', ausgewaehlt.join() === 'TV: ausgewählt,true', ausgewaehlt)
-  await a.klick(a.pille('TV'))
-  const danach = [a.nameVon(a.schnell('TV')), stand.f.platforms.length, stand.tvAn]
-  pruefe('dann Pille: Wahl aufgehoben, Schnell-Chip „nicht gewählt“, Schalter bleibt an', danach.join() === 'TV: nicht gewählt,0,true', danach)
-  await a.klick(a.pille('TV'))
-  pruefe('weiter Pille: ausgeschlossen, Schnell-Chip „ausgeschlossen“', a.nameVon(a.schnell('TV')) === 'TV: ausgeschlossen' && !stand.tvAn && stand.f.platforms.length === 0, [a.nameVon(a.schnell('TV')), stand.tvAn])
-  await a.klick(a.pille('TV'))
-  pruefe('weiter Pille: wieder „nicht gewählt“ (nie „ausgewählt“ aus dem Ausschluss)', a.nameVon(a.schnell('TV')) === 'TV: nicht gewählt' && stand.tvAn, a.nameVon(a.schnell('TV')))
+  pruefe('im Kalender gibt es keine Plattform-Pille „TV“', a.pille('TV') === undefined)
+  pruefe('der Schnell-Chip „TV“ bleibt', !!a.schnell('TV'))
   a.dom.entferne()
 }
 
@@ -181,9 +160,9 @@ console.log('\nStart mit vorbelegtem Ausschluss (gespeicherter Zustand)')
   pruefe('Zweitanbieter ausgeschlossen: ein Tipp → nichts', zVor === 'Zweitanbieter: ausgeschlossen' && !stand.f.zweitanbieterExcluded, zVor)
   zweit.dom.entferne()
   const tv = await rendere(true, EMPTY_FILTERS, false)
-  const tvVor = [tv.nameVon(tv.schnell('TV')), String(gedrueckt(tv.pille('TV')))]
+  const tvVor = [tv.nameVon(tv.schnell('TV'))]
   await tv.klick(tv.schnell('TV'))
-  pruefe('TV ausgeblendet (Schalter aus): Schnell-Chip „ausgeschlossen“, Pille „mixed“, ein Tipp → nichts', tvVor.join() === 'TV: ausgeschlossen,mixed' && stand.tvAn && stand.f.platforms.length === 0, tvVor)
+  pruefe('TV ausgeblendet (Schalter aus): Schnell-Chip „ausgeschlossen“, ein Tipp → nichts', tvVor.join() === 'TV: ausgeschlossen' && stand.tvAn && stand.f.platforms.length === 0, tvVor)
   tv.dom.entferne()
 }
 

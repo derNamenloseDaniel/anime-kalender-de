@@ -428,7 +428,7 @@ Erwartet: ~301 von 307.
 | Weg | gemessen | Aufwand | Risiko | Empfehlung |
 |---|---|---|---|---|
 | (a) JustWatch, TMDB-Angebote, CR-, ADN-Katalog | JW-Stream 2, JW-Kauf 1, TMDB-Angebote 4, CR 0, ADN 1 | — | — | nichts zu holen |
-| (c) Regel: historische Erstausgabe | 150 ohne Publisher, Erstausgabe 1950–2009: 87 | — | — | Entscheidung Daniel: Ist ein Titel, den es nur einmal im Fernsehen oder auf längst vergriffener Disc gab, ein Mangel? Vorschlag: Ausnahme „historisch“ (Erstausgabe vor 2010, kein Angebot bei JustWatch) |
+| (c) Regel: historische Erstausgabe | 150 ohne Publisher, Erstausgabe 1950–2009: 87 | — | — | **Entschieden 21.11.2026 (F152): Ausnahme „historisch“ verworfen.** Die Mängel bleiben Mängel und zählen in die Summe; `node tools/maengel.mjs` weist sie getrennt aus (Erstausgabe ≤ 2020, ab 2021, ohne Jahr), `--top` stellt ≤ 2020 bei gleicher Wirkung hinter neuere (Rang 9) |
 | Hand | 17 mit Streamer als Publisher (Netflix 12, Crunchyroll 3, Amazon 2) — wahrscheinlich ausgelaufen | S | niedrig | belegtes „nicht mehr verfügbar“ setzen |
 
 **sprachurteil-offen (59; 52 Prime)**: (a) JustWatch-Tonspur `de` bei 33, aniSearch „Deutsch, synchronisiert“ bei 48, zusammen 54 — beides nur Hinweis; Weg: Prüfliste nach diesen Hinweisen sortieren, Handbelege (`synchro-belegen`). **synchro-schwach (66, alle Prime)**: Hinweise nur bei 10; Anime2You-Belegsuche. **titel-de (32)**: TMDB-`nameDe` bei 18, aber fast alle über geteilte Kennung falsch zugeordnet, Wikidata schon gefragt; Hand. **folgenzahl-widerspruch (19)**: Hand.
@@ -445,7 +445,7 @@ Erwartet: ~301 von 307.
 | 6 | Ausnahmen mit Grund (aniSearch-Zeilen ohne Wertung/Studio, kein Banner) | wertung, studio, banner | 55 + ~93 + 68 | S (Regeln) |
 | 7 | AniList-Frische + `meanScore`-Rückfall | wertung, studio | ~48 + 9 | S (mit `auto-arten-2111`) |
 | 8 | Folgentitel: aniSearch-/TMDB-Stufe prüfen, warum volle Listen liegen bleiben | folgentitel | bis 53 | M |
-| 9 | Regel „historische Erstausgabe“ (Entscheidung) | kein-weg, erstausgabe | bis 87 | S nach Entscheidung |
+| 9 | Erstausgabe ≤ 2020 getrennt zählen und nachrangig befüllen (Entscheidung F152, 21.11.2026; keine Ausnahme, die Mängel zählen weiter). Jahr = `deErstausgabe.von`; ohne Jahr gilt als nicht alt. Gemessen 22.11.2026: kein-weg 112 / 28 / 64 (≤ 2020 / ab 2021 / ohne Jahr), erstausgabe-ohne-weg 110 / 28 / 36 | kein-weg, erstausgabe | 0 (nur Reihenfolge) | erledigt (`tools/maengel.mjs`) |
 | 10 | de.wikipedia: Sprecher und Episodenlisten | sprecher, folgentitel | ~80 + ~40 (Hochrechnung aus 8 bzw. 5 Proben) | M–L |
 | 11 | Handarbeit (Sprachurteil, Handlung, Titel, Folgenzahl, Synchro-schwach) | 5 Arten | 59 + 16 + 32 + 19 + 66 | M je Block |
 | 12 | Anfrage an die FSK (schriftliche Zustimmung) | fsk | ~800 (Hochrechnung 08.10.) | Mail, Ausgang offen |

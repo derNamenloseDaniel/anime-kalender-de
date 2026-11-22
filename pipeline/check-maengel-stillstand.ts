@@ -2,7 +2,7 @@
  * Zusicherung: `stillstandZeilen` meldet auto-Arten ohne Abbau und gestiegene auto-Arten (Auftrag auto-arten-2111, 21.11.2026).
  * Läuft in `check:logic`; der echte Verlauf steht eingefroren als Ausschnitt hier, die Datei rollt nach 370 Tagen aus.
  */
-import { MAENGEL_STILLSTAND_ARTEN, MAENGEL_STILLSTAND_ZEILE, stillstandMessen, stillstandZeilen, type Tagesstand } from './lib/maengel-stillstand.ts'
+import { MAENGEL_STILLSTAND_ARTEN, MAENGEL_STILLSTAND_ZEILE, stillstandMessen, stillstandMessenHand, stillstandZeilen, type Tagesstand } from './lib/maengel-stillstand.ts'
 import type { Register, Zaehler } from './lib/maengel-register.ts'
 
 let verletzt = 0
@@ -23,7 +23,7 @@ console.log('\nStillstand der auto-Arten (gebaute Fälle):')
   const [kurz, arten] = stillstandZeilen(verlauf, tag('2026-11-21', 104, { fsk: 50, laufzeit: 25, 'titel-de': 5 }), register)
   pruefe('fsk steht, laufzeit steigt: Kurzzeile zählt beide getrennt, Bezug 18.11.', kurz === `${MAENGEL_STILLSTAND_ZEILE}seit 2026-11-18: 1 auto-Arten ohne Abbau, 1 gestiegen (Arten: Logzeile MAENGEL_STILLSTAND_ARTEN)`, kurz)
   pruefe('Artenzeile trennt ohne Abbau und gestiegen', arten === `${MAENGEL_STILLSTAND_ARTEN}ohne Abbau: fsk 50→50 (auto:justwatch) | gestiegen: laufzeit 19→25 (auto:anisearch)`, arten)
-  pruefe('Hand-Art (titel-de) wird nicht gemeldet', !arten?.includes('titel-de'), arten)
+  pruefe('Hand-Art (titel-de) wird nach drei Tagen noch nicht gemeldet (eigener Abstand 7 Tage)', !arten?.includes('titel-de'), arten)
   const sinkt = stillstandZeilen(verlauf, tag('2026-11-21', 104, { fsk: 49, laufzeit: 18, 'titel-de': 5 }), register)
   pruefe('Gegenprobe: beide um mindestens einen Mangel gesunken, keine Zeile', sinkt.length === 0, sinkt)
   const gleich = stillstandMessen(verlauf, tag('2026-11-21', 101, { fsk: 50, laufzeit: 19 }), register)
@@ -47,6 +47,23 @@ console.log('\nStillstand der auto-Arten (gebaute Fälle):')
   const [lang] = stillstandZeilen([tag('2026-11-18', 1, alle(5000))], tag('2026-11-21', 1, alle(5000)), viele)
   const warnung = `Mängel Stillstand: ${lang!.slice(MAENGEL_STILLSTAND_ZEILE.length)}`
   pruefe('Lauf-Meldung höchstens 160 Zeichen, auch bei 99 Arten', warnung.length <= 160, warnung.length)
+}
+
+console.log('\nStillstand der Hand-Arten (gebaute Fälle, Abstand 7 Tage):')
+{
+  const v = [tag('2026-11-14', 100, { fsk: 50, 'titel-de': 28, 'handlung-de': 70 })]
+  const heute = (titelDe: number, fsk = 50) => tag('2026-11-21', 100, { fsk, 'titel-de': titelDe, 'handlung-de': 60 })
+  const reg = registerAus({ fsk: 'auto:justwatch', 'titel-de': 'hand:synchro-belegen', 'handlung-de': 'hand:handlung-eigen' })
+  const h = stillstandMessenHand(v, heute(28), reg)
+  pruefe('titel-de 28→28 seit 7 Tagen steht, handlung-de 70→60 baut ab', h?.seit === '2026-11-14' && h.stehen.join() === 'titel-de 28→28 (hand:synchro-belegen)' && h.steigen.length === 0, h)
+  pruefe('auto-Messung sieht die Hand-Art nicht', stillstandMessen(v, heute(28), reg)?.stehen.join() === 'fsk 50→50 (auto:justwatch)')
+  pruefe('Hand-Art gestiegen wird als gestiegen gemeldet', stillstandMessenHand(v, heute(30), reg)?.steigen.join() === 'titel-de 28→30 (hand:synchro-belegen)')
+  pruefe('Gegenprobe: titel-de 28→20 baut ab, keine Hand-Meldung', stillstandMessenHand(v, heute(20), reg) === undefined)
+  pruefe('Grenze: Bezug erst 6 Tage alt, keine Hand-Meldung', stillstandMessenHand([tag('2026-11-15', 100, { 'titel-de': 28 })], heute(28), reg) === undefined)
+  const [kurz, arten] = stillstandZeilen(v, heute(28), reg)
+  pruefe('auto und Hand stehen: Kurzzeile trennt beide mit eigenem Bezug, Artenzeile nennt die Hand-Art', kurz === `${MAENGEL_STILLSTAND_ZEILE}1 auto-Arten ohne Abbau seit 2026-11-14; 1 hand-Arten ohne Abbau seit 2026-11-14 (Arten: Logzeile MAENGEL_STILLSTAND_ARTEN)` && !!arten?.includes('titel-de 28→28'), kurz)
+  const nurHand = stillstandZeilen(v, heute(28, 40), reg)
+  pruefe('nur Hand-Art steht (fsk baut ab): Kurzzeile mit Bezug', nurHand[0] === `${MAENGEL_STILLSTAND_ZEILE}seit 2026-11-14: 1 hand-Arten ohne Abbau (Arten: Logzeile MAENGEL_STILLSTAND_ARTEN)`, nurHand[0])
 }
 
 /* Ausschnitt aus data/qualitaet-verlauf.json und data/maengel.json (Stand 21.11.2026), Werte je Art in ARTEN-Reihenfolge, null = fehlt. */

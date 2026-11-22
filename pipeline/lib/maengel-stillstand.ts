@@ -8,6 +8,8 @@ export const MAENGEL_STILLSTAND_ARTEN = 'MAENGEL_STILLSTAND_ARTEN '
 export const STILLSTAND_TAGE = 3
 /** Unter diesem Abbau (Anteil am Bezug, mindestens ein Mangel) steht eine Art: fsk 1232→1230 in drei Tagen sind rund 600 Tage Restlaufzeit. */
 export const MINDESTABBAU_ANTEIL = 0.01
+/** Hand-Arten (`wer: hand:…`) arbeiten Bauer-Aufträge ab, nicht ein täglicher Sammler: Abstand 7 Tage (titel-de stand 22.11.2026 mit 28 offenen Fällen ohne Bewegung). */
+export const STILLSTAND_TAGE_HAND = 7
 
 export interface Tagesstand {
   gemessenAm: string
@@ -28,9 +30,16 @@ const tagDavor = (heute: string, tage: number): string => new Date(Date.parse(he
  * ihr Sammler läuft nicht, nimmt neue Titel nicht auf oder das Feld kommt im Bau nicht an. Bezug ist der jüngste Verlaufseintrag mit
  * `maengel`, der mindestens so alt ist; Arten ohne Wert am Bezugstag oder ohne offene Mängel heute zählen nicht.
  */
-export function stillstandMessen(verlauf: Tagesstand[], heute: Tagesstand, register: Register | null): Stillstand | undefined {
+export const stillstandMessen = (verlauf: Tagesstand[], heute: Tagesstand, register: Register | null): Stillstand | undefined =>
+  gruppeMessen(verlauf, heute, register, 'auto:', STILLSTAND_TAGE)
+
+/** Dasselbe für Hand-Arten (`wer: hand:…`) mit dem längeren Abstand {@link STILLSTAND_TAGE_HAND}. */
+export const stillstandMessenHand = (verlauf: Tagesstand[], heute: Tagesstand, register: Register | null): Stillstand | undefined =>
+  gruppeMessen(verlauf, heute, register, 'hand:', STILLSTAND_TAGE_HAND)
+
+function gruppeMessen(verlauf: Tagesstand[], heute: Tagesstand, register: Register | null, praefix: string, tage: number): Stillstand | undefined {
   if (!register || !heute.maengel) return undefined
-  const grenze = tagDavor(heute.gemessenAm, STILLSTAND_TAGE)
+  const grenze = tagDavor(heute.gemessenAm, tage)
   const bezugstag = verlauf.filter((v) => v.gemessenAm <= grenze && v.maengel).at(-1)
   const bezug = bezugstag?.maengel
   if (!bezug) return undefined
@@ -39,7 +48,7 @@ export function stillstandMessen(verlauf: Tagesstand[], heute: Tagesstand, regis
   for (const [art, z] of Object.entries(register.zaehler)) {
     const vorher = bezug[art]
     const jetzt = heute.maengel[art]
-    if (!z.wer.startsWith('auto:') || vorher === undefined || jetzt === undefined || jetzt === 0) continue
+    if (!z.wer.startsWith(praefix) || vorher === undefined || jetzt === undefined || jetzt === 0) continue
     const text = `${art} ${vorher}→${jetzt} (${z.wer})`
     const abgebaut = vorher - jetzt >= Math.max(1, vorher * MINDESTABBAU_ANTEIL)
     if (jetzt > vorher) steigen.push(text)
@@ -50,9 +59,18 @@ export function stillstandMessen(verlauf: Tagesstand[], heute: Tagesstand, regis
 
 /** Kurzzeile (Zahl der Arten, Verweis auf die Artenzeile) und Artenzeile; leer, wenn nichts steht oder steigt. */
 export function stillstandZeilen(verlauf: Tagesstand[], heute: Tagesstand, register: Register | null): string[] {
-  const s = stillstandMessen(verlauf, heute, register)
-  if (!s) return []
-  const zahl = [s.stehen.length && `${s.stehen.length} auto-Arten ohne Abbau`, s.steigen.length && `${s.steigen.length} gestiegen`].filter(Boolean).join(', ')
-  const arten = [s.stehen.length && `ohne Abbau: ${s.stehen.join('; ')}`, s.steigen.length && `gestiegen: ${s.steigen.join('; ')}`].filter(Boolean).join(' | ')
-  return [`${MAENGEL_STILLSTAND_ZEILE}seit ${s.seit}: ${zahl} (Arten: Logzeile ${MAENGEL_STILLSTAND_ARTEN.trim()})`, `${MAENGEL_STILLSTAND_ARTEN}${arten}`]
+  const gruppen = [
+    { s: stillstandMessen(verlauf, heute, register), name: 'auto' },
+    { s: stillstandMessenHand(verlauf, heute, register), name: 'hand' },
+  ].filter((g): g is { s: Stillstand; name: string } => !!g.s)
+  if (!gruppen.length) return []
+  const zahl = gruppen
+    .map(({ s, name }) => {
+      const teile = [s.stehen.length && `${s.stehen.length} ${name}-Arten ohne Abbau`, s.steigen.length && `${s.steigen.length} gestiegen`].filter(Boolean).join(', ')
+      return gruppen.length > 1 ? `${teile} seit ${s.seit}` : teile
+    })
+    .join('; ')
+  const arten = gruppen.map(({ s }) => [s.stehen.length && `ohne Abbau: ${s.stehen.join('; ')}`, s.steigen.length && `gestiegen: ${s.steigen.join('; ')}`].filter(Boolean).join(' | ')).join(' | ')
+  const seit = gruppen.length > 1 ? '' : `seit ${gruppen[0]!.s.seit}: `
+  return [`${MAENGEL_STILLSTAND_ZEILE}${seit}${zahl} (Arten: Logzeile ${MAENGEL_STILLSTAND_ARTEN.trim()})`, `${MAENGEL_STILLSTAND_ARTEN}${arten}`]
 }

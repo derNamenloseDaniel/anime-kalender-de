@@ -3,6 +3,7 @@ import type { Release, Title } from '../shared/types.ts'
 import { adresseMehrfach, REGELN, zaehleMaengel, type Kontext } from './lib/maengel-regeln.ts'
 import { baueNeinGilt } from './lib/maengel-nein.ts'
 import { alsLookup } from './lib/bild-sprache.ts'
+import { franchiseTeile } from './lib/folgenzahl-erklaerung.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -69,9 +70,11 @@ const teile = (...hat: boolean[]) => hat.map((hatBanner) => ({ format: 'TV', epi
 const tmdbKeins = (ueber: Partial<Kontext> = {}) => kontext({ banner: (id) => (id === 1 ? null : undefined), ...ueber })
 pruefe('banner: TMDB ohne Banner, allein in der Reihe: Ausnahme', arten(ohneBanner, tmdbKeins()).join() === 'banner:kein-banner-bekannt')
 pruefe('banner: TMDB ohne Banner, Teile ohne Banner: Ausnahme', arten(ohneBanner, tmdbKeins({ franchiseTeile: () => teile(false, false) })).join() === 'banner:kein-banner-bekannt')
-pruefe('banner: Teil mit Banner in der Reihe: offen', arten(ohneBanner, tmdbKeins({ franchiseTeile: () => teile(false, true, false) })).join() === 'banner')
+pruefe('banner: Teil mit Banner in der Reihe: offen', arten(ohneBanner, tmdbKeins({ franchiseTeile: (t) => (t.id === 1 ? teile(false, true, false) : []) })).join() === 'banner')
+const reihe = franchiseTeile([gut(1, { bannerImage: undefined, franchiseId: 7 }), gut(2, { franchiseId: 7 }), gut(3, { bannerImage: undefined, franchiseId: 7 }), gut(4, { franchiseId: 8 })])
+pruefe('franchiseTeile: hatBanner je Teil der Reihe, fremde Reihe getrennt', JSON.stringify((reihe.get(7) ?? []).map((x) => [x.id, x.hatBanner])) === '[[1,false],[2,true],[3,false]]' && JSON.stringify((reihe.get(8) ?? []).map((x) => [x.id, x.hatBanner])) === '[[4,true]]', [...reihe])
 pruefe('banner: TMDB hat ein Banner: offen', arten(ohneBanner, tmdbKeins({ banner: () => ({ p: '/b.jpg' }) })).join() === 'banner')
-pruefe('banner: nie gesucht (undefined): offen', arten(ohneBanner, kontext({ franchiseTeile: () => teile(false) })).join() === 'banner')
+pruefe('banner: nie gesucht (undefined): offen', arten(ohneBanner, kontext({ franchiseTeile: (t) => (t.id === 1 ? teile(false) : []) })).join() === 'banner')
 pruefe('banner: TMDB-Eintrag eines anderen Titels ändert nichts', arten(ohneBanner, kontext({ banner: (id) => (id === 2 ? null : undefined) })).join() === 'banner')
 /* bild-fremdsprachig: japanisches TMDB-Plakat oder AniList-Key-Visual (Daniel, 21.11.2026) */
 const TMDB = 'https://image.tmdb.org/t/p/w500/x.jpg'

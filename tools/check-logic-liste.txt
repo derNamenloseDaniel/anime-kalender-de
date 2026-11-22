@@ -676,6 +676,7 @@ pipeline/check-titel-vorschau.ts
 pipeline/check-titelwechsel.ts
 pipeline/check-tmdb-404-neusuche.ts
 pipeline/check-tmdb-ablauf.ts
+pipeline/check-tmdb-angebote-kopie.ts
 pipeline/check-tmdb-film-suche.ts
 pipeline/check-tmdb-film-vorrang-lauf.ts
 pipeline/check-tmdb-folgen-404-lauf.ts
@@ -686,7 +687,7 @@ pipeline/check-tmdb-folgen-luecke-lauf.ts
 pipeline/check-tmdb-folgen-luecke.ts
 pipeline/check-tmdb-folgentitel-absolut.ts
 pipeline/check-tmdb-folgentitel-datum.ts
-pipeline/check-tmdb-folgentitel-staffel.ts
+pipeline/check-tmdb-angebote-kopie.ts
 pipeline/check-tmdb-genre.ts
 pipeline/check-tmdb-geteilt-plakat-bau.ts
 pipeline/check-tmdb-geteilt-plakat.ts

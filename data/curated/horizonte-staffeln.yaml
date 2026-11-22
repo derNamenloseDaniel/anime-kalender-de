@@ -31,6 +31,9 @@ titel:
 - anilistId: 158871
   titel: "Pokémon Horizonte"
   basis: 4
+  # Ab diesem Tag zählen Meldungen der Erweiterung zu 158871 in Staffel 4 (Folge 1 = 137); ältere zählen durchlaufend (Staffel 1: 1–45).
+  # Auf den Tag nach dem Deploy der Aktivierung setzen (`shared/staffel-titel.ts`, `staffelVonTiteln`).
+  aktiv: '2026-11-23'
   staffeln:
     - { nr: 1, von: 1, bis: 45, folgen: 45, kennung: 7000001 }
     - { nr: 2, von: 46, bis: 89, folgen: 44, kennung: 7000002 }

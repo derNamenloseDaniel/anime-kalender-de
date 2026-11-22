@@ -16,7 +16,8 @@ import { slugify } from './util.ts'
 
 export type StaffelPlanZeile = { nr: number; von: number; bis?: number; kennung: number }
 /** `quelle`: die Wikipedia-Episodenliste, aus der TV-Termine Staffel und Folge bekommen (setzt die Phase), für `sources`. */
-export type StaffelPlan = { sammel: number; titel: string; basis: number; staffeln: StaffelPlanZeile[]; quelle?: string }
+/** `aktiv`: ab diesem Tag zählen Meldungen zur Basis-Staffel in ihrer Staffelzählung, ältere durchlaufend (Meldungen vor der Aktivierung). */
+export type StaffelPlan = { sammel: number; titel: string; basis: number; staffeln: StaffelPlanZeile[]; quelle?: string; aktiv?: string }
 
 /**
  * Die Pläne aus der Yaml. Ein Titel ohne `basis` wird nicht geteilt; mit `basis` muss jede andere Staffel eine Kennung aus dem
@@ -37,7 +38,7 @@ export function staffelPlaene(grenzen: StaffelGrenzen[]): StaffelPlan[] {
       vergeben.add(s.kennung)
       return { nr: s.nr, von: s.von, ...(s.bis !== undefined ? { bis: s.bis } : {}), kennung: s.kennung }
     })
-    return [{ sammel: g.anilistId, titel: g.titel ?? String(g.anilistId), basis: g.basis, staffeln }]
+    return [{ sammel: g.anilistId, titel: g.titel ?? String(g.anilistId), basis: g.basis, staffeln, ...(g.aktiv ? { aktiv: g.aktiv } : {}) }]
   })
 }
 
@@ -129,7 +130,7 @@ export function teileTitel(sammel: Title, plan: StaffelPlan): Title[] {
     const t: Title = structuredClone(sammel)
     t.id = s.kennung
     t.titleDe = staffelName(plan, s.nr)
-    t.staffelTitel = { sammel: plan.sammel, nr: s.nr, ab: s.von }
+    t.staffelTitel = { sammel: plan.sammel, nr: s.nr, ab: s.von, ...(s.kennung === plan.sammel && plan.aktiv ? { aktiv: plan.aktiv } : {}) }
     if (s.kennung !== plan.sammel) {
       t.slug = `${slugify(t.titleDe)}-${s.kennung}`
       delete t.malId

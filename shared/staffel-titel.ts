@@ -10,25 +10,30 @@ export const STAFFEL_ID_ENDE = 8_000_000
 /** Abgeleiteter Staffel-Titel: keine eigene AniList-Seite, die Quelle ist der Sammeltitel (`staffelVon`). */
 export const istStaffelTitel = (id: number): boolean => id >= STAFFEL_ID_BASIS && id < STAFFEL_ID_ENDE
 
+/** Wohin eine Meldung zu einer Kennung zurückgerechnet wird (`ab`: erste durchlaufende Folge der Staffel). */
+export type StaffelVon = (id: number, tag?: string) => { sammel: number; ab: number } | undefined
+
 /**
- * Kennung → Sammeltitel und erste Folge, nur für abgeleitete Staffeln: Die Basis-Staffel trägt die Kennung des Sammeltitels, und alte
- * Meldungen mit dieser Kennung zählen durchlaufend — sie bleiben unverändert.
+ * Kennung → Sammeltitel und erste Folge. Die Basis-Staffel trägt die Kennung des Sammeltitels: Meldungen mit dieser Kennung zählen bis zur
+ * Aktivierung (`aktiv`, verglichen mit dem Tag der Meldung) durchlaufend und bleiben unverändert; ab `aktiv` zählen sie in der Staffel der
+ * Basis (Folge 1 = `ab`). Ohne `aktiv` bleibt die Basis unverändert.
  */
-export function staffelVonTiteln(titel: { id: number; staffelTitel?: { sammel: number; ab: number } }[]): (id: number) => { sammel: number; ab: number } | undefined {
-  const je = new Map(titel.flatMap((t) => (t.staffelTitel && t.staffelTitel.sammel !== t.id ? [[t.id, t.staffelTitel] as const] : [])))
-  return (id) => je.get(id)
+export function staffelVonTiteln(titel: { id: number; staffelTitel?: { sammel: number; ab: number; aktiv?: string } }[]): StaffelVon {
+  const je = new Map(titel.flatMap((t) => (t.staffelTitel ? [[t.id, t.staffelTitel] as const] : [])))
+  return (id, tag) => {
+    const s = je.get(id)
+    if (!s) return undefined
+    if (s.sammel !== id) return s
+    return s.aktiv && tag !== undefined && tag >= s.aktiv ? s : undefined
+  }
 }
 
 /**
  * Eine Beobachtung zu einem Staffel-Titel (Kennung, Folge in der Staffel) auf den Sammeltitel und seine durchlaufende Folge zurück: Meldungen
- * und Urteile werden vor der Teilung gelesen, dort gibt es nur den Sammeltitel. Ohne Staffel-Angabe bleibt alles, wie es ist.
+ * und Urteile werden vor der Teilung gelesen, dort gibt es nur den Sammeltitel. Ohne Staffel-Angabe bleibt alles, wie es ist. `tag`: Tag der Meldung.
  */
-export function zurueckAufSammeltitel(
-  titel: number,
-  folge: number,
-  staffelVon: (id: number) => { sammel: number; ab: number } | undefined,
-): { titel: number; folge: number } {
-  const s = staffelVon(titel)
+export function zurueckAufSammeltitel(titel: number, folge: number, staffelVon: StaffelVon, tag?: string): { titel: number; folge: number } {
+  const s = staffelVon(titel, tag)
   if (!s) return { titel, folge }
   /* Folge 0 meint die ganze Seite (`wegUrteileBereinigen`), keine Nummer. */
   return { titel: s.sammel, folge: folge > 0 ? folge + s.ab - 1 : folge }

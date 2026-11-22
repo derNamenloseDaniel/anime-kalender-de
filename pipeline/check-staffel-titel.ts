@@ -173,6 +173,19 @@ pruefe('Meldung zur Basis bleibt (alte Meldungen zählen durchlaufend)', JSON.st
 pruefe('Folge 1 der Staffel 2 → Folge 46', zurueckAufSammeltitel(7_000_002, 1, staffelVon).folge === 46)
 pruefe('Folge 0 (ganze Seite) bleibt 0', zurueckAufSammeltitel(7_000_003, 0, staffelVon).folge === 0)
 pruefe('fremder Titel unverändert', JSON.stringify(zurueckAufSammeltitel(20, 5, staffelVon)) === '{"titel":20,"folge":5}')
+const [planAktiv] = staffelPlaene([{ ...GRENZEN, aktiv: '2026-11-23' }]) as [StaffelPlan]
+const titelAktiv = teileTitel(sammel, planAktiv)
+pruefe('Phase: `aktiv` aus der Yaml steht nur an der Basis-Staffel', titelAktiv[3]!.staffelTitel?.aktiv === '2026-11-23' && titelAktiv.slice(0, 3).every((t) => t.staffelTitel?.aktiv === undefined))
+pruefe('Phase: ohne `aktiv` kein Feld', titel.every((t) => !('aktiv' in (t.staffelTitel ?? {}))))
+/* Befund 2 des Prüfers (PR 4592): alte durchlaufende Meldungen an der Basis gegen neue in der Zählung der Basis-Staffel, getrennt durch `aktiv`. */
+const mitAktiv = staffelVonTiteln([{ id: SAMMEL, staffelTitel: { sammel: SAMMEL, ab: 137, aktiv: '2026-11-23' } }, { id: 7_000_001, staffelTitel: { sammel: SAMMEL, ab: 1 } }])
+pruefe('Basis: Meldung vor `aktiv` zählt durchlaufend (Folge 5 bleibt 5)', JSON.stringify(zurueckAufSammeltitel(SAMMEL, 5, mitAktiv, '2026-11-22')) === '{"titel":158871,"folge":5}')
+pruefe('Basis: Meldung ab `aktiv` zählt in Staffel 4 (Folge 1 → 137)', JSON.stringify(zurueckAufSammeltitel(SAMMEL, 1, mitAktiv, '2026-11-23')) === '{"titel":158871,"folge":137}')
+pruefe('Basis: Meldung ohne Tag bleibt unverändert', zurueckAufSammeltitel(SAMMEL, 1, mitAktiv).folge === 1)
+pruefe('Basis: Folge 0 (ganze Seite) bleibt 0 auch ab `aktiv`', zurueckAufSammeltitel(SAMMEL, 0, mitAktiv, '2026-12-01').folge === 0)
+pruefe('Basis ohne `aktiv`: nie umgerechnet', zurueckAufSammeltitel(SAMMEL, 1, staffelVonTiteln([{ id: SAMMEL, staffelTitel: { sammel: SAMMEL, ab: 137 } }]), '2030-01-01').folge === 1)
+pruefe('Staffel 1 (abgeleitet) rechnet unabhängig vom Tag zurück', zurueckAufSammeltitel(7_000_001, 7, mitAktiv, '2026-11-22').folge === 7)
+pruefe('Spanne der Basis ab `aktiv` → 137.. (Beobachtungen tragen den Tag)', JSON.stringify(beobachtungenDerSpanne(SAMMEL, { von: 1, bis: 2 }, { anbieter: 'rtlplus', vorhanden: 'ja', tonDe: 'ja', art: 'seite', tag: '2026-11-24', kanal: false } as never, mitAktiv).map((b) => b.folge)) === '[137,138]')
 const ak = (id: number) => ({ 7_000_002: 26461, [SAMMEL]: 14839, 527: 99 })[id] ?? id
 const aus = uebersetzeDatei('titles.json', [titel[1], titel[3]], ak) as { id: number; al: number }[]
 pruefe('Ausgabe: al eines Staffel-Titels zeigt auf den Sammeltitel (AniList-Link lebt), Felder bleiben', aus[0]!.id === 26461 && aus[0]!.al === SAMMEL && (aus[0] as { titleDe?: string }).titleDe === 'Pokémon Horizonte – Staffel 2', JSON.stringify(aus[0]))

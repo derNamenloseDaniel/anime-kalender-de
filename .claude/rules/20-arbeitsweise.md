@@ -5,6 +5,7 @@ Einzelpunkte; Erledigtes sofort abhaken, Blockiertes mit Grund offen lassen. **E
 nicht sofort bearbeitet:** erst einordnen (ändert den Ansatz / kritisch / eigenständig /
 Korrektur meiner Arbeitsweise), und diese Einordnung **als erste Zeile** der Antwort ansagen.
 **Diese erste Zeile ist der erste sichtbare Text des Turns, vor jedem Werkzeugaufruf, und bestätigt den Prompt samt Grund für den Aufschub** („Ich antworte gleich auf die Frage, zuerst: <was> (<warum>)“); jeder Zwischenstand bis zur Antwort nennt den offenen Prompt — auch im autonomen Modus (Daniel, 20.11.2026).
+**Wartet Daniel auf eine Antwort, hat sie Vorrang vor allem:** nur das für die Antwort Nötige tun; Agenten starten, Sperren umgehen („lokaler Bauer gesperrt“), Register und Listen warten bis danach (Daniel, 22.11.2026).
 Neuheit ist keine Dringlichkeit. Was testbar fertig ist, sofort oben melden, samt ob die übrigen
 Punkte es noch anfassen (Skill `neue-prompts-einordnen`).
 

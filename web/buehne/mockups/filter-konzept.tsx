@@ -12,7 +12,7 @@ const UEBERLEGUNGEN = [
   '6 · Die Kachel zeigt nur Wege, die der Filter nicht trifft: Yaiba bei „Disc aus" mit Joyn statt Disc.',
   '7 · Nichts doppelt: Die Trefferzahl steht schon im Balken bzw. im Listenkopf.',
   '8 · Das Push-Abo hängt nur am Kalender: ein Filter in der Datenbank stellt keine Benachrichtigung um.',
-  '9 · Jahr bleibt das Jahr, in dem etwas bei uns erscheint; „Streambar" heißt, was es sagt (nicht „hat Synchro").',
+  '9 · Jahr bleibt das Jahr, in dem etwas bei uns erscheint; „verfügbar" meint: kann ich es streamen (nicht „hat Synchro").',
   '10 · Alte Einstellungen bleiben erhalten: Beide Ansichten starten mit der Kopie, nichts springt.',
 ].join('\n')
 

@@ -2,7 +2,7 @@
  * Wächter zur Filterebene (Filterkonzept 22.11.2026): Jedes Listenfeld der Filter hat eine Ebene (`web/src/lib/filter-ebenen.ts`),
  * die Weg-Logik (Wege eines Titels, Plattform-Menge, Release-Art je Titel) steht nur in `wege-filter.ts`, nicht mehr in `filters.ts`
  * (dort lag der Fehler „⊘ Disc wirft den Titel heraus": `releases.some` entschied über den ganzen Titel), und die Schnellchips
- * kennen „bestätigt" nur im Kalender, „Streambar" nur in der Datenbank. Aufruf: `npm run check:logic`.
+ * kennen „bestätigt" nur im Kalender, „verfügbar" (verfuegbar) nur in der Datenbank. Aufruf: `npm run check:logic`.
  */
 import { readFileSync } from 'node:fs'
 import { EMPTY_FILTERS, LIST_KEYS } from '../web/src/lib/filters.ts'
@@ -32,9 +32,9 @@ console.log('\nSchnellchips je Ansicht:')
 const t = ((k: string) => k) as never
 const ids = (mitTv: boolean, konfidenz: boolean) => schnellListe(t, konfidenz, mitTv).map((e) => e.id)
 pruefe('Datenbank (ohne TV): kein „bestätigt"', !ids(false, true).includes('bestaetigt'), ids(false, true))
-pruefe('Datenbank: „Streambar" (verfuegbar) bleibt', ids(false, true).includes('verfuegbar'))
+pruefe('Datenbank: „verfügbar" (verfuegbar) bleibt', ids(false, true).includes('verfuegbar'))
 pruefe('Kalender (mit TV): „bestätigt" und TV bleiben', ids(true, false).includes('bestaetigt') && ids(true, false).includes('tv'))
-pruefe('Kalender: kein „Streambar"', !ids(true, false).includes('verfuegbar'))
+pruefe('Kalender: kein „verfügbar"', !ids(true, false).includes('verfuegbar'))
 
 if (verletzt) {
   console.error(`\ncheck-filter-ebenen: ${verletzt} Verletzung(en)`)

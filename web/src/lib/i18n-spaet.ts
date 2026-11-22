@@ -308,7 +308,7 @@ export const TEXTE_SPAET = {
   'filter.schnell.bestaetigt': 'bestätigt',
   'filter.schnell.tv': 'TV',
   'filter.schnell.disc': 'Disc',
-  'filter.schnell.verfuegbar': 'Streambar',
+  'filter.schnell.verfuegbar': 'verfügbar',
   'filter.schnell.cartoon': 'Cartoon',
   'detail.close': 'Schließen',
   'detail.hiddenNote': 'Dieser Titel ist von dir ausgeblendet. Bis du ihn wieder einblendest, wird hier nichts gezeigt.',

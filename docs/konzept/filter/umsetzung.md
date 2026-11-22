@@ -11,7 +11,7 @@ Schritt 3 von 3. Grundlage: [umsetzungsplan.md](umsetzungsplan.md) (Fassung 2) u
 | S2 Kachel zeigt nur bestehende Wege (R5) | gebaut | `db-karte.tsx`, `kartenPlattform` |
 | S2 Leerzustand nennt die Filter | war schon da (Suchhinweis „… ist ausgeblendet durch: …", Bild 4 und 5) | `suchhinweis*.ts` |
 | S3 Einschluss auf gleichem Weg (Plattform, Art, Jahr, Status, kostenlos, `modus`) | gebaut | `wege-filter.ts` |
-| S4 tote Zustände, „Streambar" | gebaut | `FilterDetails.tsx`, `schnellfilter.tsx`, `i18n-spaet.ts`, `check-filter-ebenen.ts` |
+| S4 tote Zustände | gebaut (Umbenennung „Streambar" zurückgestellt, siehe Entscheidung 10) | `FilterDetails.tsx`, `schnellfilter.tsx`, `check-filter-ebenen.ts` |
 | S5 aktive Chips, Zahlen an Chips, Schnellfläche, Handy-Werkzeugleiste | **nicht gebaut** (eigener PR nach Daniels Test, Plan Abschnitt 3) | — |
 | S6 Doku, Wächter | gebaut | `docs/wissen/*`, Skills, Agenten |
 
@@ -27,7 +27,7 @@ Bilder: `top5/<n>-<fall>-vorher|nachher-hell|dunkel.png`, aus der Bühne (`npm r
 4. **„Netflix + Disc" erfindet nichts** (`4-dan-da-dan-*`). Kombinierte Weg-Filter verlangen denselben Weg: Netflix + Disc 22 → 0, TV + Disc 5 → 0; Dan Da Dan 2 → 0 Treffer, und der Hinweis nennt die Filter („ausgeblendet durch: Plattform Netflix, Art disc").
 5. **„Kostenlos + Crunchyroll" zeigt nur Kostenloses** (`5-fernsehtag-detektiv-conan-*`). Kostenlos + Netflix 17 → 0; Detektiv Conan (kostenlos nur auf Joyn) 1 → 0 Treffer; „Netflix + 2026" 90 → 47.
 
-Nicht in den Top 5, aber geändert: Im Kalender fehlen „Jahr" und der doppelte TV-Plattformchip, in der Datenbank „bestätigt"; „verfügbar" heißt „Streambar".
+Nicht in den Top 5, aber geändert: Im Kalender fehlen „Jahr" und der doppelte TV-Plattformchip, in der Datenbank „bestätigt";.
 
 ## Zahlen (titles.json, Stichtag 22.11.2026, Messskript im Scratchpad)
 
@@ -56,3 +56,5 @@ Nicht in den Top 5, aber geändert: Im Kalender fehlen „Jahr" und der doppelte
 ## Beobachtung nach Einführung (Regel Neueinführung)
 
 Am ersten Fall (Yaiba live bei „Disc aus", Kalender-Auge ändert die Datenbank nicht), nach etwa fünf Fällen, nach einem Tag, nach einer Woche (Zählprobe gegen die Live-Seite; Zahlen oben als Soll).
+
+10. **Umbenennung „verfügbar" → „Streambar" zurückgestellt:** Die Bühne-Basis (`check:buehne-basis`) vergleicht Tippziele nach Beschriftung; der umbenannte Chip (119 × 32 px, unter 44 px) wäre als neuer Befund rot geworden. Sie kommt mit S5, wenn der Chip auf 44 px Tippfläche wächst.

@@ -451,7 +451,7 @@ Erwartet: ~301 von 307.
 | 2 | AniList `duration` als Laufzeit-Rückfall | laufzeit | ~146 | S |
 | 3 | Banner aus dem Franchise | banner | 242 | S |
 | 4 | aniSearch-Zeilen: `g` → Genres (Zuordnungstabelle) | genre | 131 | S |
-| 5 | FSK aus dem Franchise, gleiches Format, gekennzeichnet | fsk | 359 | S–M |
+| 5 | FSK aus dem Franchise, gleiches Format, gekennzeichnet | fsk | 359 | S–M (umgesetzt 22.11.2026: `pipeline/bau/11-2-1-fsk-franchise.ts`, `fskQuelle: 'franchise'`, Anzeige „≈ FSK n, wie die anderen Teile“; Messung 357 Titel, Leave-one-out 94,0 %) |
 | 6 | Ausnahmen mit Grund (aniSearch-Zeilen ohne Wertung/Studio, kein Banner) | wertung, studio, banner | 55 + ~93 + 68 | S (Regeln) |
 | 7 | AniList-Frische + `meanScore`-Rückfall | wertung, studio | ~48 + 9 | S (mit `auto-arten-2111`) |
 | 8 | Folgentitel: aniSearch-/TMDB-Stufe prüfen, warum volle Listen liegen bleiben | folgentitel | bis 53 | M |

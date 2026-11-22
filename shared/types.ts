@@ -459,7 +459,7 @@ export interface Title {
   scoreQuelle?: 'tmdb'
   /** Gesetzt = `genres` stammen aus TMDB (Rückfall, grob), nicht aus AniList/aniSearch (`bau/genre-aus-tmdb.ts`). */
   genreQuelle?: 'tmdb'
-  fsk?: Fsk; fskQuelle?: 'justwatch' // fskQuelle gesetzt = Anbieter-Einstufung (JustWatch), keine FSK-Freigabe
+  fsk?: Fsk; fskQuelle?: 'justwatch' | 'franchise' // fskQuelle gesetzt = abgeleitet (JustWatch-Anbieter bzw. andere Teile der Reihe), keine FSK-Freigabe
   dubConfidence: DubConfidence; einzelquelle?: boolean // alte Stufe low (true) bzw. nicht low (false), nur wo sie von dubConfidence abweicht (09.10.2026)
   /**
    * true bei Titeln **ohne** belegte deutsche Synchro.

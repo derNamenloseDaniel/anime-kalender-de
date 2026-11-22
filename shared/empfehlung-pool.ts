@@ -120,7 +120,7 @@ export function baueEmpfehlung(titles: Title[], franchises: Franchises): Empfehl
         e: t.episodes,
         g: t.genres.map((w) => indexVon(w, genres, genreIndex)),
         k: t.keywords.map((w) => indexVon(w, keywords, keywordIndex)),
-        fsk: t.fsk,
+        fsk: t.fskQuelle === 'franchise' ? undefined : t.fsk, // abgeleitet, nie als belegte FSK empfehlen oder zeigen
         v: t.score,
         p: anbieter(t),
       }

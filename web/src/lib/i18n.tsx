@@ -333,7 +333,9 @@ const TEXTE = {
   // Die drei Angaben, die es zu einer Kaufausgabe wirklich gibt — an der
   // Stelle, an der bei einer Serie der Fortschrittsbalken steht.
   'einstellungen.titel': 'Einstellungen',
-  'antwort.fskAnbieter': 'FSK {n} laut Anbieter',  'detail.lastEpisode': 'Letzte Folge',
+  'antwort.fskAnbieter': 'FSK {n} laut Anbieter',
+  'antwort.fskFranchise': '≈ FSK {n}, wie die anderen Teile',
+  'detail.lastEpisode': 'Letzte Folge',
   // Ein Knopf sagt, was der Klick bewirkt, nicht wohin er zeigt (Daniel,
   // 24.08.2026: „das button-label sollte lieber sagen was der effekt des
   // klicks ist"). Zwei Fassungen, weil zwei Plätze: der große Knopf trägt

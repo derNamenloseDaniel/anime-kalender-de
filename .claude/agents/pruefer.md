@@ -26,6 +26,7 @@ Jede Regel ist ein Kurzimperativ; Anlass, PR-Nummer, Datum und alter Wortlaut je
 - Scratchpad-Unterordner mit Kürzel, Wegwerfdateien nach `mkdir -p X && cd X`; `git status --porcelain` vor und nach jeder Probe.
 - Warten höchstens 170 s je Aufruf, Tests darüber im Hintergrund; Logs mit `tail`/`grep`. `prozess-register` zeigt „gestartet“, nicht „fertig“. Existiert `~/.claude/ruhemodus.txt`, keine künstliche Last.
 - Hänger: nur eigene PID (`taskkill //F //T //PID <pid>`), nie `//IM` oder `pkill`. Eigene Hintergrundläufe vor dem Bericht beenden.
+- `git update-ref` und andere Ref-Befehle nur als `git -C <Worktree>`; im Hauptordner sperrt der Hook schon eine zusammengesetzte Zeile, und dann läuft keiner der Befehle (PR 4591).
 
 ## Runde und Urteil
 
@@ -101,6 +102,7 @@ Jede Regel ist ein Kurzimperativ; Anlass, PR-Nummer, Datum und alter Wortlaut je
 - **K9s Stillgelegte Prüfung:** braucht Ersatz oder Wächter, der bei leerem Fenster rot wird; Ankündigungen zählen nie als Beobachtung.
 - **K9t Leere Mutationsprobe:** steht in `mutationsprobe.txt` „Probe nicht gelaufen“, bei Entscheidungslogik (Stufe 2) Liste unter `tools/mutationen/` oder begründeten Verzicht verlangen.
 - **K12 Daten:** Zeitreihe mit „gleicher Kopf zweimal“, `crunchyroll-dub.json` nur `katalog: de`; Gruppen-Ja mit Fall „1 von N“, Gegenstimmen zählen; Zuordnungen je Ziel per Stichprobe inhaltlich (Folgentitel, fremder Eintrag, Cartoon), Toleranzen einzeln, Schwelle gegen Gegenbeispiel, Positionszuordnung ganz gegen die Anbieterliste; `check:bestand` gegen den neuen Bau; Weg mit `dub: true` zeigt auf Ja-Zeile (Titel × Anbieter × Adresse); „fehlt“ ≠ „widerlegt“, „nicht abgerufen“ selbst abrufen; „Jüngstes je X“ an echter Reichweite; zwei Schreiber, drei Einträge; „unbekannt → wahr“-Seiteneffekte; Prime-Kanal-Ausnahmen `url` und `seite`; negative Cartoon-Kennung je Erzeuger; Prime-Kanal zählt als sein Anbieter (`anbieterDesKanals`); Abo/Kanal aus der Notiz abgleichen; „gleichwertig“ des Bauers nur mit Datenfall der verschmolzenen Zeilenform.
+- **K13 Kommentar-Erkennung:** Jede neue Erkennung von PR-Kommentaren wird gegen alle Urteilsformate getestet, die diese Datei und `pr-pruefer.yml` vorgeben („Urteil: x“, „Prüfer: frei/ändern“, „Prüfer Runde N: x“, „Prüfer Stufe 2: x“), sonst Auflage (Lehre 217, PR 4595).
 
 ## Weitere Prüfregeln
 

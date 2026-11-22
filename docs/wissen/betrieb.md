@@ -2533,3 +2533,7 @@ Der Job `ziel` in `pr-pruefer.yml` prüft die Eingaben gegen die API (offen, kei
 ## Nachtrag-Erkennung des CI-Prüfers (22.11.2026)
 
 `tools/pr-nachtraege.mjs` hängt außer Kommentaren mit `Nachtrag`/`Nachbesserung` am Anfang jeden Kommentar von PR-Autor und Berechtigten an, der nach dem ersten Prüferurteil steht (ohne Urteile und Bot-Kommentare). Anlass PR 4581: „Prüfer-Auflage umgesetzt …“ und „Abnahme Runde 2 … Nachtrag“ fielen durch, der Prüfer urteilte erneut „ändern“. Den Neustart des Prüfers löst weiter nur `NACHTRAG` aus (`pr-pruefer-neustart.mjs`), deshalb beginnt ein Nachtrag mit `## Nachtrag`.
+
+## Routinen-Quellen-Sperre (22.11.2026, Lehre 220)
+
+`.claude/hooks/routine-quellen-sperre.js` (im Dispatcher, Matcher `RemoteTrigger`; Test `routine-quellen-sperre-test.mjs`, Verdrahtung in `tools/dispatch-pretooluse.test.mjs`) weist `RemoteTrigger` `create`/`update` mit `job_config.ccr` ab, wenn `session_context.model` oder `session_context.sources` (mit `git_repository.url`) fehlt: sonst scheitert der Push der Cloud-Sitzung mit 403 und die Arbeit ist verloren. `update` ohne `job_config`, `run`, `list`, `get` bleiben frei. Mutationsprobe 22.11.2026: 10 von 10 rot.

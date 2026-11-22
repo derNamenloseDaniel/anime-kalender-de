@@ -23,6 +23,12 @@ assert.match(mitFrage.permissionDecisionReason, /^wrap_up nur mit recap/, 'Grund
 assert.equal(wrap({ recap: 'x' }), null, 'wrap_up nur recap: keine Entscheidung (andere Module werfen nicht)')
 assert.ok(MODULE.some(([n, a]) => n === 'wrapup-sperre.js' && a === 'grund'), 'wrapup-sperre.js als Art grund eingetragen')
 
+// Verdrahtung RemoteTrigger: create ohne sources wird über den Dispatcher abgewiesen.
+const rt = (tool_input) => entscheide({ tool_name: 'RemoteTrigger', tool_input })
+assert.equal(rt({ action: 'create', body: { job_config: { ccr: { session_context: { model: 'm' } } } } })?.permissionDecision, 'deny', 'RemoteTrigger create ohne sources: deny')
+assert.equal(rt({ action: 'update', body: { enabled: false } }), null, 'RemoteTrigger update nur enabled: frei')
+assert.ok(MODULE.some(([n, a]) => n === 'routine-quellen-sperre.js' && a === 'grund'), 'routine-quellen-sperre.js als Art grund eingetragen')
+
 // Matcher: der Eintrag in settings.json, der den Dispatcher ruft, muss wrap_up nennen (sonst läuft die Sperre nie).
 export function matcherNenntWrapUp(settings) {
   const eintraege = (settings.hooks?.PreToolUse ?? []).filter((e) => (e.hooks ?? []).some((h) => String(h.command).includes('dispatch-pretooluse')))
@@ -35,6 +41,7 @@ assert.equal(matcherNenntWrapUp({ hooks: { PreToolUse: [eintragD] } }), false, '
 assert.equal(matcherNenntWrapUp({ hooks: { PreToolUse: [{ ...eintragD, matcher: 'Bash|mcp__ccd_turn__wrap_up_x' }] } }), false, 'Teilname zählt nicht')
 assert.equal(matcherNenntWrapUp({ hooks: { PreToolUse: [{ ...eintragD, matcher: 'Bash|mcp__ccd_turn__wrap_up' }] } }), true, 'Matcher mit wrap_up: grün')
 assert.equal(matcherNenntWrapUp({ hooks: { PreToolUse: [] } }), false, 'kein Dispatcher-Eintrag: rot')
+assert.ok(settings.hooks.PreToolUse.some((e) => String(e.matcher).split('|').includes('RemoteTrigger')), 'settings.json: Matcher nennt RemoteTrigger')
 
 // pruefrunden.js und agenten-grenze.js haben den Matcher Agent, agenten-vorrat.js ist ein Stop-Hook; alle drei mit eigenem Eintrag in settings.json, kein Teil des Bündels.
 // falls-vorhanden.js ist ein Startskript (process.exit beim Laden): ein require beendete den Test bisher still mit Exit 0, vor allen Zusicherungen.

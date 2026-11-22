@@ -88,7 +88,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Edit|Write|NotebookEdit|MultiEdit|Bash|PowerShell|preview_start|mcp__ccd_turn__wrap_up",
+        "matcher": "Edit|Write|NotebookEdit|MultiEdit|Bash|PowerShell|preview_start|mcp__ccd_turn__wrap_up|RemoteTrigger",
         "hooks": [
           {
             "type": "command",

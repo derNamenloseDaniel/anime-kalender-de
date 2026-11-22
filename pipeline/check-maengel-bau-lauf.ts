@@ -47,9 +47,9 @@ const titel = (id: number, ueber: Record<string, unknown> = {}) => ({
   watchLinks: [],
   ...ueber,
 })
-/* Wie im Bau setzt `ladeQuellen()` vorher die geteilten Filme (Titel 17); die Phase allein liest sie nicht. */
+/* Wie im Bau setzt `ladeQuellen()` vorher die geteilten Filme (Titel 17); die Phase allein liest sie nicht. Das Argument `kulisse` füllt `process.argv[1]`, das `tools/quarantaene.mjs` (Importkette über `08-news-tv.ts`) beim Laden liest. */
 const lauf = () =>
-  spawnSync(process.execPath, ['--import', 'tsx', '--input-type=module', '-e', `const e = await import(${JSON.stringify(eindeutig)}); e.merkeGeteilteFilme(new Set(['17'])); await import(${JSON.stringify(pathToFileURL(phase).href)}).then((m) => m.schreibeMaengel())`], { env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8' })
+  spawnSync(process.execPath, ['--import', 'tsx', '--input-type=module', '-e', `const e = await import(${JSON.stringify(eindeutig)}); e.merkeGeteilteFilme(new Set(['17'])); await import(${JSON.stringify(pathToFileURL(phase).href)}).then((m) => m.schreibeMaengel())`, 'kulisse'], { env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8' })
 const register = (): Reg => JSON.parse(readFileSync(join(wurzel, 'data/maengel.json'), 'utf8')) as Reg
 const schluessel = (r: Reg) => r.zeilen.map((z) => `${z.art}:${z.t}:${z.status}`).sort().join(' ')
 const einfach = (id: number, ueber: Record<string, unknown> = {}) => titel(id, { episodes: 1, ...ueber })

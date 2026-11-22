@@ -1,4 +1,7 @@
 import type { Release } from '../../shared/types.ts'
+import type { TvSendung } from '../fetch-tv-programm.ts'
+import { sendungenAnhaengen } from './tv-termine.ts'
+import type { WikiListen } from './tv-termine.ts'
 
 /**
  * TV-Sichtung ohne Folgennummer (22.11.2026): Die Sendung nennt einen Folgentitel, `sendungenAnhaengen` fand ihn in keiner
@@ -6,3 +9,13 @@ import type { Release } from '../../shared/types.ts'
  */
 export const tvSichtungOhneFolge = (releases: Release[]): boolean =>
   releases.some((r) => r.platform === 'tv' && r.sendungen?.some((s) => s.folge && s.nr === undefined))
+
+/**
+ * Titel mit einer Sichtung ohne Nummer, gemessen über **alle** Sichtungen im Programmbestand, die einen TV-Termin tragen: Der Bau hängt nur
+ * Sendungen ab gestern an (`08-news-tv.ts`), die Zahl der Art schwankte sonst mit dem Fenster und stünde meist auf 0. Die Termine werden kopiert.
+ */
+export function titelMitSichtungOhneFolge(releases: Release[], sendungen: (TvSendung & { kennung?: string })[], wiki: WikiListen): Set<number> {
+  const tv = releases.filter((r) => r.platform === 'tv').map((r) => ({ ...r, sendungen: undefined }))
+  sendungenAnhaengen(tv, sendungen, '0000-00-00', wiki)
+  return new Set(tv.filter((r) => tvSichtungOhneFolge([r])).map((r) => r.titleId))
+}

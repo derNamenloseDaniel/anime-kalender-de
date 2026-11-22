@@ -1,5 +1,5 @@
 {
- "erzeugtAm": "2026-11-22T04:42:09.665Z",
+ "erzeugtAm": "2026-11-22T14:22:01.152Z",
  "anbieter": [
   {
    "name": "Amazon",
@@ -296,7 +296,7 @@
     "B0FJ7GC6S6": 10,
     "B0FDH3SLKB": 11,
     "B0DJWXLZ55": 12,
-    "B0HKFFGQ7F": 7,
+    "B0HKFFGQ7F": 8,
     "B0FN41VKQ5": 12,
     "B0DQ6SDQL2": 12,
     "B0H1QXQL33": 12,
@@ -309,8 +309,8 @@
    "name": "Netflix",
    "plattform": "netflix",
    "gemeldet": 771,
-   "gesamt": 910,
-   "offen": 139,
+   "gesamt": 909,
+   "offen": 138,
    "ohneSeite": 13,
    "ziel": "https://www.netflix.com/title/81608820",
    "ziele": [
@@ -366,10 +366,6 @@
      "staffeln": [
       1
      ]
-    },
-    {
-     "url": "https://www.netflix.com/title/81947352",
-     "titel": "One Piece Fan Letter"
     },
     {
      "url": "https://www.netflix.com/title/81717895",

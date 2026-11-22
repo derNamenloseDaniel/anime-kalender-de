@@ -2529,3 +2529,7 @@ Der Job `ziel` in `pr-pruefer.yml` prüft die Eingaben gegen die API (offen, kei
 **Ansatzvergleich:** Untergrenze: Takte hoch (B1, PR 4478, ≈ −150–200). (a) `workflow_run` direkt in `pr-pruefer.yml` plus Dispatch für Nachträge: ein Aufruf weniger, aber jeder Kettenlauf startet einen Prüfer-Lauf, dessen Gruppe einen laufenden Nachtrag-Prüfer abbricht, auch wenn er selbst nichts zu tun hat. (b) `pull_request_target` nur für die Übernahme: ein Runner-Start je Push bleibt, zwei Auslösewege. (c, gebaut) nur Dispatch: kein PR-Ereignis mehr im Prüfer, die Entscheidung fällt vor dem Start.
 
 **Beobachten:** erster PR nach dem Merge (Actions-Log: `nach-kette` „Prüfer nach Kette: ja … gestartet“, ein Prüfer-Lauf „PR-Prüfer #N …“, kein Lauf mit `pull_request_target`), nach ~5 PRs, nach einem Tag, nach einer Woche (`used` je Stunde, `PRUEFER:`-Zeilen).
+
+## Nachtrag-Erkennung des CI-Prüfers (22.11.2026)
+
+`tools/pr-nachtraege.mjs` hängt außer Kommentaren mit `Nachtrag`/`Nachbesserung` am Anfang jeden Kommentar von PR-Autor und Berechtigten an, der nach dem ersten Prüferurteil steht (ohne Urteile und Bot-Kommentare). Anlass PR 4581: „Prüfer-Auflage umgesetzt …“ und „Abnahme Runde 2 … Nachtrag“ fielen durch, der Prüfer urteilte erneut „ändern“. Den Neustart des Prüfers löst weiter nur `NACHTRAG` aus (`pr-pruefer-neustart.mjs`), deshalb beginnt ein Nachtrag mit `## Nachtrag`.

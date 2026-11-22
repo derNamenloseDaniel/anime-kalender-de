@@ -91,7 +91,13 @@ pruefe('ohne Prüferurteil kein Treffer für unmarkierten Text', waehleNachtraeg
 pruefe('Text vor dem ersten Urteil ohne Marke zählt nicht', waehleNachtraege([auflage, urteil('aendern')], 'autor').every((t) => t.startsWith('**Prüfer-Review**')))
 pruefe('Fremde und CONTRIBUTOR-Kommentare nach Urteil zählen nicht', nachAuflage(k('fremd', 'Prüfer-Auflage umgesetzt'), k('gast', 'Hallo', 'CONTRIBUTOR')).length === 0)
 pruefe('Bot-Kommentare (Laufmeldung, Stufe) nach Urteil zählen nicht, auch nicht als Autor', waehleNachtraege([urteil('aendern'), k('github-actions[bot]', 'Lauf grün', 'CONTRIBUTOR')], 'github-actions[bot]').length === 1)
-pruefe('Urteil des Inhabers selbst ist keine Antwort (nur einmal gezählt als Urteil)', nachAuflage(k('inhaber', '**Prüfer-Review** für fe21e7b7d - Urteil: **ok**', OWNER)).length === 0)
+const ohneUrteil = (...ks) => waehleNachtraege([urteil('aendern'), ...ks], 'autor').length - 1
+pruefe('Urteil des Inhabers (Protokollzeile mit Urteil) ist keine Antwort', ohneUrteil(k('inhaber', '**Prüfer-Review** für fe21e7b7d - Urteil: **ok**', OWNER)) === 0)
+pruefe('Protokollzeile des Inhabers ohne „Urteil:“ ist keine Antwort', ohneUrteil(k('inhaber', '**Prüfer-Review** für fe21e7b7d', OWNER)) === 0)
+pruefe('Urteilszeile des Inhabers ohne Protokollkopf ist keine Antwort', ohneUrteil(k('inhaber', 'Prüfer (Abnahme) - Urteil: ok', OWNER)) === 0)
+pruefe('Kommentar ohne Text (leer, null) nach Urteil bricht nichts und zählt nicht', ohneUrteil(k('inhaber', '', OWNER), k('inhaber', null, OWNER)) === 0)
+pruefe('Prüfer Runde (ohne Urteilswort) als erster Prüferkommentar öffnet die Antworten',
+  waehleNachtraege([k('autor', '## Prüfer Runde 2'), k('autor', 'Auflage umgesetzt')], 'autor').join('|') === '## Prüfer Runde 2|Auflage umgesetzt')
 
 const text = 'Titel: x\n\nBeschreibung'
 pruefe('ohne Treffer bleibt der Text unverändert', ergaenzeBeschreibung(text, [k('autor', 'ok'), k('autor', null), k('fremd', '**Nachtrag')], 'autor') === text)

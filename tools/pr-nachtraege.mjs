@@ -5,6 +5,7 @@
  *
  * Beschreibungen sind unveränderlich; spätere Runden stehen als Kommentar, dessen Text mit `Nachtrag` oder
  * `Nachbesserung` beginnt, mit oder ohne Marke (`**`, `#`), beliebige Schreibweise, führender Leerraum erlaubt.
+ * Seit 22.11.2026 zählt auch jeder andere Kommentar nach dem ersten Prüferurteil (Antworten ohne das Wort; den Neustart löst weiter nur `Nachtrag` aus).
  * Es zählen der PR-Autor (REST-Login, bei Apps `name[bot]`) und Konten mit Schreibrecht am Repo: PRs der
  * Claude-App kommentiert der Inhaber (17.10.2026, PR 1394: drei Nachträge nie beim Prüfer angekommen).
  * Die Commit-Liste mit Dateien je Commit braucht der Prüfer für „Umbau und Verhaltensänderung nie im selben Commit“.

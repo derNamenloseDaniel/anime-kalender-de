@@ -488,7 +488,7 @@ function passtTitel(t: Title, data: Dataset, f: FilterState, today: string, favo
   if (f.fsk.length && (t.fsk === undefined || !f.fsk.includes(t.fsk))) return false
   if (f.land.length && !f.land.includes(herkunftVon(t))) return false
 
-  return passtWege(t, data.releasesByTitle.get(t.id) ?? [], f, today, passt)
+  return passtWege(t, data.releasesByTitle.get(t.id) ?? [], f, today, (feld) => modusVon(f, feld))
 }
 
 /**

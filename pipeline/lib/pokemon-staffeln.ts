@@ -11,8 +11,9 @@ import { ROOT } from './util.ts'
 export { mitStapelFolgen, type StaffelZeile } from '../../shared/staffel-folge.ts'
 
 /** `offen`: die laufende letzte Staffel, deren Ende keine Quelle nennt — ohne `bis` und `folgen`. */
-export type StaffelAbschnitt = { nr: number; von: number; bis?: number; folgen?: number; offen?: true }
-export type StaffelGrenzen = { anilistId: number; titel?: string; staffeln: StaffelAbschnitt[] }
+export type StaffelAbschnitt = { nr: number; von: number; bis?: number; folgen?: number; offen?: true; kennung?: number }
+/** `basis` und `kennung`: der Bau schneidet den Titel in einen Titel je Staffel (`pipeline/lib/staffel-titel.ts`). */
+export type StaffelGrenzen = { anilistId: number; titel?: string; basis?: number; staffeln: StaffelAbschnitt[] }
 
 export const POKEMON_STAFFELN = resolve(ROOT, 'data/curated/pokemon-staffeln.yaml')
 export const HORIZONTE_STAFFELN = resolve(ROOT, 'data/curated/horizonte-staffeln.yaml')

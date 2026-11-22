@@ -19,6 +19,7 @@ import { schreibeOhneWeg } from './bau/13-13-ohne-weg.ts'
 import { schreibeAboFeeds } from './bau/14-ics.ts'
 import { pruefeSchalter } from './bau/phasen-zustand.ts'
 import { merkeBestandVorher } from './lib/bestand-vorher.ts'
+import { teileStaffelTitel } from './bau/staffel-titel.ts'
 
 function main(): void {
   liefereAus(bauePhasenfolge(ladeQuellen()))
@@ -27,6 +28,8 @@ function main(): void {
 /** Ab `baueMeta` beginnt die Auslieferung: Meta, Datensatz, Abo-Feeds. */
 function liefereAus({ synchro, quarantaene, ...rest }: Phasenergebnis): void {
   const { titles, releases, events } = rest
+  /* Nach allen Wegen, Zuordnungen und der Quarantäne, vor `baueMeta`: Sammeltitel werden zu einem Titel je Staffel. */
+  const staffelSammel = teileStaffelTitel({ titles, releases, events })
   const { allTitles, meta, platforms, genres, keywords } = baueMeta({
     titles,
     releases,
@@ -41,7 +44,7 @@ function liefereAus({ synchro, quarantaene, ...rest }: Phasenergebnis): void {
     motnTon: synchro.motnTon,
     suchOffen: synchro.suchOffen,
     meta,
-  })
+  }, staffelSammel)
   schreibeAboFeeds({ newsFuerRss, events, platforms, allTitles, genres, meta, keywords })
   schreibeEmpfehlung()
   schreibeCoverLuecken()

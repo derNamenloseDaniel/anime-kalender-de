@@ -443,6 +443,12 @@ export interface Title {
   beiwerk?: true
   /** Eigene Serie der Reihe (Spin-off, Handliste), keine Staffel; wie `FranchiseMember.eigenesWerk`. */
   eigenesWerk?: true
+  /**
+   * Staffel-Titel (`shared/staffel-titel.ts`): `sammel` = AniList-Kennung des Sammeltitels, aus dem der Bau ihn geschnitten hat
+   * (`pipeline/bau/staffel-titel.ts`), `nr` = deutsche Staffel, `ab` = ihre erste Folge in der durchlaufenden Zählung des Sammeltitels.
+   * `al` der Ausgabe zeigt auf `sammel` (die Staffel hat keine eigene AniList-Seite); Meldungen zur Staffel bildet `zurueckAufSammeltitel` ab.
+   */
+  staffelTitel?: { sammel: number; nr: number; ab: number }
   genres: string[]
   /** Schlagworte aus der festen aniSearch-Liste (`shared/schlagworte.ts`), deutsch; Cartoons tragen TMDB-Schlagworte. */
   keywords: string[]

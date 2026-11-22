@@ -17,6 +17,7 @@ import { abrufMitStempel } from './lib/abruf-stempel.ts'
 import { adressIndex, artDerMeldung, folgenDerMeldung, meldungGrund, nameIndex, rohfolgenSpanne, titelDerMeldung, urteileJeFolge, type StaffelKandidat, type Urteil } from './lib/urteil-je-folge.ts'
 import { beobachtungenAusRohfolgen, fremdNach, type RohFolge } from './lib/urteil-rohfolgen.ts'
 import type { Title } from '../shared/types.ts'
+import { staffelVonTiteln, zurueckAufSammeltitel } from '../shared/staffel-titel.ts'
 import { adressKern } from './lib/dub-confirmed.ts'
 import type { FolgenZuordnung } from './lib/folgen-je-folge.ts'
 
@@ -149,6 +150,7 @@ async function main() {
   const titelListe = readJson<Title[] | { titles: Title[] }>('public/data/titles.json', [])
   const titelAlle = Array.isArray(titelListe) ? titelListe : titelListe.titles
   const einzel = new Set(titelAlle.filter((t) => t.format === 'MOVIE' || t.episodes === 1).map((t) => t.id))
+  const staffelVon = staffelVonTiteln(titelAlle)
   const { nachAdresse, staffelKandidaten, nachName, reiheVon } = meldungsZuordnung(titelAlle)
   const beobachtungen = beobachtungenAusRohfolgen(rohfolgen, zuordnung, kanalAdresse, fremdNach(nachAdresse))
   const verworfen: Record<string, number> = {}
@@ -168,10 +170,12 @@ async function main() {
     if (!m.titel_id || !vorhanden) continue
     const art = artDerMeldung(m)
     for (let n = von; n <= bis; n++) {
+      /* Eine Meldung zu einem Staffel-Titel gilt dem Sammeltitel, den der Bau vor dem Schnitt sieht (Folge durchlaufend). */
+      const ziel = zurueckAufSammeltitel(m.titel_id, n, staffelVon)
       beobachtungen.push({
-        titel: m.titel_id,
+        titel: ziel.titel,
         anbieter: m.plattform,
-        folge: n,
+        folge: ziel.folge,
         vorhanden,
         tonDe,
         art,

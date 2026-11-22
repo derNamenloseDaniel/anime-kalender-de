@@ -52,6 +52,7 @@ const zweiKommend = [kuenftig(5, '2027-03-01T00:00'), ...staffelBloecke(3, 2, '2
 pruefe('Zwei angekündigte Staffeln: die früheste zählt, gleich in welcher Reihenfolge', toggoAngabe(zweiKommend, HEUTE) === 'Fg. 1–2 · bis 31.12. · Staffel 4 ab 08.01.', toggoAngabe(zweiKommend, HEUTE))
 pruefe('… auch umgekehrt sortiert', toggoAngabe([...zweiKommend].reverse(), HEUTE) === 'Fg. 1–2 · bis 31.12. · Staffel 4 ab 08.01.', toggoAngabe([...zweiKommend].reverse(), HEUTE))
 pruefe('Start genau jetzt ist offen, nicht angekündigt', toggoAngabe([...staffelBloecke(3, 2, '2026-01-01T00:00'), kuenftig(4, HEUTE)], HEUTE) === 'Fg. 1–2, 1 · bis 31.12.', toggoAngabe([...staffelBloecke(3, 2, '2026-01-01T00:00'), kuenftig(4, HEUTE)], HEUTE))
+pruefe('Höhere Staffel, deren Fenster schon zu ist: keine Ankündigung', toggoAngabe([...staffelBloecke(3, 2, '2026-01-01T00:00'), { staffel: 4, von: 1, bis: 1, ab: '2026-02-01T00:00', ende: '2026-03-01T00:00' }], HEUTE) === 'Fg. 1–2 · bis 31.12.')
 pruefe('Folge derselben Staffel in der Zukunft ist keine neue Staffel', toggoAngabe(staffelBloecke(1, 2, '2026-01-01T00:00').concat({ staffel: 1, von: 3, bis: 3, ab: '2026-12-01T00:00', ende: '2027-12-31T23:59' }), HEUTE) === 'Fg. 1–2 · bis 31.12.')
 
 console.log('\nKopf je Staffel:')

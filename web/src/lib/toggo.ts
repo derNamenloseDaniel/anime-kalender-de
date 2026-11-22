@@ -66,6 +66,6 @@ export function toggoAngabe(bloecke: Block[] | undefined, jetzt = jetztBerlin())
 /** „Staffel 4 ab 27.11.“: die früheste angekündigte Staffel hinter allen offenen (Horizonte, Daniel 22.11.2026); sonst nichts. */
 export function neueStaffel(bloecke: Block[], offen: Block[], jetzt: string): string | undefined {
   const hoechste = Math.max(...offen.map((b) => b.staffel))
-  const naechster = bloecke.filter((b) => b.staffel > hoechste && b.ab > jetzt).sort((x, y) => (x.ab < y.ab ? -1 : 1))[0]
+  const naechster = bloecke.filter((b) => b.staffel > hoechste && b.ab > jetzt).reduce<Block | undefined>((m, b) => (!m || b.ab < m.ab ? b : m), undefined)
   return naechster && `Staffel ${naechster.staffel} ab ${naechster.ab.slice(8, 10)}.${naechster.ab.slice(5, 7)}.`
 }

@@ -1,7 +1,9 @@
 import type { AniListMedia } from './anilist.ts'
 
-/** Höchstens so viele Einträge mit offenem Mangel je Lauf und Zwischenspeicher: 100 sind 2 Blöcke (MAL-Weg) bzw. 100 Einzelabrufe (Kennungs-Weg, deshalb dort kleiner gesetzt); der Lauf ist stündlich, AniList erlaubt 90 je Minute. */
+/** Höchstens so viele Einträge mit offenem Mangel je Lauf: MAL-Weg 100 = 2 Blöcke zu 50; der Lauf ist stündlich, AniList erlaubt 90 Abrufe je Minute. */
 export const MANGEL_GRENZE_JE_LAUF = 100
+/** Kennungs-Weg: jeder Eintrag ist ein eigener Abruf (750 ms Abstand), deshalb nur 10 je Lauf. */
+export const MANGEL_GRENZE_KENNUNG = 10
 /** Ein Eintrag mit Mangel wird frühestens nach so vielen Tagen erneut geholt: AniLists Antwort von heute ändert sich morgen nicht. */
 export const MANGEL_ABSTAND_TAGE = 2
 

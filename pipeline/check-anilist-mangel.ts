@@ -38,6 +38,9 @@ pruefe('frisch ohne Mangel und veraltet ohne Mangel bleiben', !geholt.includes(9
 pruefe('frisch mit Mangel (heute geholt) und gestern geholt bleiben', !geholt.includes(900005) && !geholt.includes(900007))
 pruefe(`Abstand ${MANGEL_ABSTAND_TAGE} Tage: genau am Abstand gilt, einen Tag davor nicht`, mangelNeuHolen({ 9: eintrag(9, { studios: { nodes: [] }, abgerufen: '2026-11-20' }) }, [9], HEUTE).length === 1 && mangelNeuHolen({ 9: eintrag(9, { studios: { nodes: [] }, abgerufen: '2026-11-21' }) }, [9], HEUTE).length === 0)
 pruefe('Grenze: höchstens 2 je Lauf, die ältesten', JSON.stringify(mangelNeuHolen(speicher, ids, HEUTE, 2)) === JSON.stringify([900006, 900001]), mangelNeuHolen(speicher, ids, HEUTE, 2))
+pruefe('Mangel: Eintrag ganz ohne Studio-Angabe zählt als Mangel', hatOffenenMangel({ averageScore: 70, meanScore: 70, studios: undefined } as unknown as MitStempel))
+const viele: Record<string, MitStempel> = Object.fromEntries(Array.from({ length: 101 }, (_, i) => [900100 + i, eintrag(900100 + i, { studios: { nodes: [] } })]))
+pruefe('Standardgrenze: 101 Einträge mit Mangel, 100 je Lauf', mangelNeuHolen(viele, Object.keys(viele).map(Number), HEUTE).length === 100)
 pruefe('Kennungen ohne Eintrag werden nicht erfunden', mangelNeuHolen(speicher, [777777, 900001], HEUTE).join() === '900001')
 
 process.exit(verletzt ? 1 : 0)

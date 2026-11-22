@@ -9,7 +9,7 @@
  * Aufruf: npm run data:fetch  [-- --force] [-- --skip-anilist]
  */
 import { mediaByMalIds, searchMedia, type AniListMedia, eintragNochOffen, istQuellenAusfall } from './lib/anilist.ts'
-import { MANGEL_GRENZE_JE_LAUF, mangelNeuHolen, stempeln } from './lib/anilist-mangel.ts'
+import { MANGEL_GRENZE_KENNUNG, mangelNeuHolen, stempeln } from './lib/anilist-mangel.ts'
 import { ausAnisearchDubs, ausAnisearchHand } from './lib/anisearch-synchro-ids.ts'
 import { holeAnisearchCover } from './lib/anisearch-cover.ts'
 import { loadCurated, loadSynchroVonHand } from './lib/curated.ts'
@@ -160,7 +160,7 @@ async function main(): Promise<void> {
   const alleIds = [...new Set([...Object.values(resolved), ...handIds])]
   const neededIds = [...new Set([
     ...alleIds.filter((id) => FORCE || !byAniId[id] || nochOffen(byAniId[id])),
-    ...mangelNeuHolen(byAniId, alleIds, heute, MANGEL_GRENZE_JE_LAUF / 4),
+    ...mangelNeuHolen(byAniId, alleIds, heute, MANGEL_GRENZE_KENNUNG),
   ])]
   if (!SKIP_ANILIST && neededIds.length > 0) {
     log(`AniList: ${neededIds.length} kuratierte Titel nachladen`)

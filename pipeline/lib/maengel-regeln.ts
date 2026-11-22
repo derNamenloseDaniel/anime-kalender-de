@@ -147,7 +147,7 @@ export const REGELN: Regel[] = [
   { art: 'banner', gruppe: 'fehlend', wirkung: 1, wer: 'auto:tmdb-banner', zaehle: (t) => !t.bannerImage },
   { art: 'bild-fremdsprachig', gruppe: 'schwach', wirkung: 2, wer: 'auto:tmdb-poster', zaehle: (t, k) => fremdeBilder(t, k.plakat, k.banner).length > 0, ausnahme: (t, k) => (fremdeBilder(t, k.plakat, k.banner).every(Boolean) ? KEINE_LESBARE : undefined) },
   { art: 'titel-de', gruppe: 'fehlend', wirkung: 3, wer: 'hand:synchro-belegen', zaehle: luecke('t'), ausnahme: (t) => (hatEinenWeg(t) || t.deErstausgabe ? undefined : 'ohne-deutsche-fassung') },
-  { art: 'handlung-de', gruppe: 'fehlend', wirkung: 2, wer: 'auto:anisearch', zaehle: (t, k) => !k.synopse(t.id)?.de },
+  { art: 'handlung-de', gruppe: 'fehlend', wirkung: 2, wer: 'hand:handlung-eigen', zaehle: (t, k) => !k.synopse(t.id)?.de },
   { art: 'folgentitel', gruppe: 'fehlend', wirkung: 2, wer: 'auto:tmdb', zaehle: folgentitelFehlen, ausnahme: (t) => (t.format === 'MOVIE' ? 'film' : undefined) },
   { art: 'folgenzahl', gruppe: 'fehlend', wirkung: 3, wer: 'auto:anilist', zaehle: (t) => SERIE.has(t.format ?? '') && !t.episodes, ausnahme: (t, k) => (laeuftNoch(t, k) ? 'laeuft' : undefined) },
   { art: 'fsk', gruppe: 'fehlend', wirkung: 2, wer: 'auto:justwatch', zaehle: (t) => t.fsk == null },

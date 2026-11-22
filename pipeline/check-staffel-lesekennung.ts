@@ -6,6 +6,7 @@
 import { readFileSync } from 'node:fs'
 import { lesekennung } from '../shared/staffel-titel.ts'
 import { pruefeToggoVerteilung, toggoFolgenDerStaffel } from './lib/staffel-titel.ts'
+import { fehlendes } from './bau/luecken-titel.ts'
 
 let fehler = 0
 let faelle = 0
@@ -40,6 +41,10 @@ const wirft = (vorhanden: number, verteilt: number): boolean => {
 pruefe('Riegel: gleiche Zahl geht durch', !wirft(5, 5))
 pruefe('Riegel: verlorene Folge bricht ab', wirft(5, 4))
 pruefe('Riegel: doppelt verteilte Folge bricht ab', wirft(5, 6))
+
+const ohneMal = (ueber: object) => fehlendes({ id: 7000001, titleDe: 'T', jpYear: 2023, coverImage: 'c', ...ueber }, undefined, undefined)
+pruefe('Lücken: Staffel-Titel ohne MAL-Kennung ist keine Lücke (MAL liegt an der Basis)', ohneMal({ staffelTitel: { sammel: 158871 } }) === '')
+pruefe('Lücken: gewöhnlicher Titel ohne MAL-Kennung bleibt eine Lücke', ohneMal({}) === 'm')
 
 const quelle = (datei: string): string => readFileSync(new URL(datei, import.meta.url), 'utf8')
 const auslieferung = quelle('./bau/13-2-auslieferung.ts')

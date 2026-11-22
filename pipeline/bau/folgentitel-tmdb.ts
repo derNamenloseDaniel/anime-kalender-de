@@ -148,7 +148,7 @@ export function tmdbFolgentitel(titel: Title, tmdbNameDe: string | undefined, ei
   const aus = new Map<number, string>()
   for (const f of passend[0]) {
     const t = echterTitel(f)
-    if (t && f.e >= 1 && f.e <= titel.episodes) aus.set(f.e, t)
+    if (t && nummern.includes(f.e)) aus.set(f.e, t)
   }
   return aus.size ? aus : undefined
 }

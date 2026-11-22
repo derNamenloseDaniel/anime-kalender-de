@@ -75,7 +75,9 @@ export function mitFremdTiteln(t: Title, ausAsRoh: Folge[] | undefined, q: Titel
   const mitRtl = mitCrTiteln(mitCr, rtlplusFolgentitel(deutscheTitel(mitCr), q.rtlplus[String(t.id)]), true)
   if (!fehlt(mitRtl)) return mitKitsuTiteln(t, mitRtl, kitsu)
   const nummern = mitRtl?.length ? mitRtl.map((x) => x.nr) : Array.from({ length: t.episodes ?? 0 }, (_, i) => i + 1)
-  const tmdbEigen = tmdbFolgentitel(t, q.tmdbNamen[String(t.id)]?.nameDe, q.tmdbFolgen[String(t.id)], nummern, vorhandeneTitel(mitRtl))
+  /* Eine Liste kürzer als die Folgenzahl (Kickers 23 von 26) bekommt TMDB-Titel auch für die fehlenden Nummern; `verlaengereBisFolgenzahl` prüft sie dann gegen die vorhandenen. */
+  const tmdbNummern = (mitRtl?.length ?? 0) >= (t.episodes ?? 0) ? nummern : Array.from({ length: t.episodes ?? 0 }, (_, i) => i + 1)
+  const tmdbEigen = tmdbFolgentitel(t, q.tmdbNamen[String(t.id)]?.nameDe, q.tmdbFolgen[String(t.id)], tmdbNummern, vorhandeneTitel(mitRtl))
   // Container-Staffel nur ohne jeden vorhandenen Titel: ohne Reihenfolge-Gegenprobe (vgl. `reihenfolgeStimmt`) füllt sie keine Teillisten.
   const containerStaffel = vorhandeneTitel(mitRtl).size ? undefined : tmdbStaffelFolgentitel(t, q.tmdbFolgen[String(t.franchiseId)], nummern)
   const mitTmdbStaffel = verlaengereBisFolgenzahl(t, mitCrTiteln(mitRtl, tmdbEigen ?? containerStaffel), tmdbEigen, deutscheTitel(mitRtl))

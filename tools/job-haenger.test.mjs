@@ -117,6 +117,13 @@ assert.equal(abbr('pull_request_target', 'Kette – Workflows', 60), true)
 assert.equal(abbr('schedule', 'lauf', 400), false)
 assert.equal(abbr('push', 'Kette – Workflows', 60), false)
 assert.equal(abbr('workflow_dispatch', 'Kette – Workflows', 60), false)
+// Prüfer-Dispatch (seit PR 4495): nur Dispatch-Läufe von pr-pruefer.yml sind abbrechbar, andere Dispatch-Läufe nicht.
+const abbrDatei = (ereignis, datei, name = 'Kette – Workflows') => finde([lauf(6, [job(name, 60)], { event: ereignis, name: 'PR-Prüfer #4521 abc1234', path: `.github/workflows/${datei}@refs/heads/main` })])[0].abbrechbar
+assert.equal(abbrDatei('workflow_dispatch', 'pr-pruefer.yml'), true, 'Prüfer-Dispatch 1')
+assert.equal(abbrDatei('workflow_dispatch', 'pr-pruefer.yml', 'PR-Aussehen – bilder'), true, 'Prüfer-Dispatch 2')
+assert.equal(abbrDatei('workflow_dispatch', 'refresh-weekly.yml'), false, 'anderer Dispatch 1')
+assert.equal(abbrDatei('workflow_dispatch', 'pr-pruefer-nachtrag.yml'), false, 'anderer Dispatch 2 (ähnlicher Dateiname)')
+assert.equal(abbrDatei('schedule', 'pr-pruefer.yml'), false, 'Prüfer-Datei, aber kein Dispatch')
 assert.equal(abbr('pull_request', 'ohne', 60), false, 'Job ohne Frist, über 45 min: nur Zeile')
 assert.equal(abbr('pull_request', 'PR-Aussehen – bilder', 60), true, 'Matrix-Name trifft die Frist')
 

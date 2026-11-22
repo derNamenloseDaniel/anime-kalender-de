@@ -14,6 +14,13 @@ export const MAX_VERSUCH = 3
 
 /** Nur Läufe dieser Ereignisse bricht die Wache ab; Sammler, Bestandsbau, Deploy, Claude-Jobs und Jobs ohne Frist nur melden (betrieb.md). */
 export const PR_EREIGNISSE = ['pull_request', 'pull_request_target']
+/** Der Prüfer startet seit PR 4495 per Dispatch (Titel „PR-Prüfer #N …“); nur Dispatch-Läufe dieser Datei gelten wie PR-Läufe, `rerun --failed` behält die Eingabe `pr`. */
+export const PRUEFER_DATEI = '.github/workflows/pr-pruefer.yml'
+
+export function istAbbrechbarerLauf(lauf) {
+  if (PR_EREIGNISSE.includes(lauf.event)) return true
+  return lauf.event === 'workflow_dispatch' && String(lauf.path).split('@')[0] === PRUEFER_DATEI
+}
 
 /** `{ 'Job-Kennung oder -Name': timeout-minutes }` aus dem Text einer Workflow-Datei (Einrückung 2/4 Leerzeichen, wie im Repo). */
 export function jobTimeouts(yamlText) {
@@ -85,7 +92,7 @@ export function haengendeJobs(laeufe, timeoutsJe, jetztMs) {
         minuten: Math.round(minuten),
         grenze,
         versuch: lauf.run_attempt ?? 1,
-        abbrechbar: hatFrist && PR_EREIGNISSE.includes(lauf.event),
+        abbrechbar: hatFrist && istAbbrechbarerLauf(lauf),
         bezug: lauf.pull_requests?.[0]?.number ? `PR ${lauf.pull_requests[0].number}` : lauf.head_branch,
       })
     }

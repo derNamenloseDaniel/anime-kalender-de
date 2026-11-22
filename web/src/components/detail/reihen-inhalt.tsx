@@ -98,28 +98,33 @@ export function reihenOrdnung(reihenTeile: FranchiseMember[], reihenName: string
   return { kuenftig, istHauptstaffel, gruppen, staffelLabel, nummern }
 }
 
-/** Der Inhalt der Reihen-Karte: Suche, Schalter und die Gruppen mit ihren Teilen. */
-export function reihenInhalt({ reihenTeile, t, reihenName, title, favorites, wechselt, wechsleZu, reiheOhneOffen, reihenSchluessel, reiheSuche, setReiheOhneOffen, setReiheSuche }: ReihenListeProps) {
-  const { kuenftig, istHauptstaffel, gruppen, staffelLabel, nummern } = reihenOrdnung(reihenTeile, reihenName, t)
+export type Ordnung = ReturnType<typeof reihenOrdnung>
 
-  const karte = (m: FranchiseMember) => {
-    const offen = kuenftig(m)
-    return (
-      <ReihenCover
-        key={m.id}
-        m={m}
-        t={t}
-        offen={offen}
-        gewaehlt={m.id === title.id}
-        gemerkt={favorites.has(m.id)}
-        nr={nummern.get(m.id)}
-        namen={teilNamen(m, reihenName, istHauptstaffel(m), staffelLabel.get(m.id))}
-        angaben={angabenZeile(m, offen, t)}
-        gesperrt={wechselt}
-        onWaehlen={wechsleZu}
-      />
-    )
-  }
+/** Ein Teil als Cover-Karte der Spur; Spur und Übersicht großer Reihen bauen sie hier, damit beide gleich groß sind. */
+export function reihenKarte(m: FranchiseMember, o: Ordnung, p: Pick<ReihenListeProps, 't' | 'reihenName' | 'title' | 'favorites' | 'wechselt' | 'wechsleZu'>) {
+  const offen = o.kuenftig(m)
+  return (
+    <ReihenCover
+      key={m.id}
+      m={m}
+      t={p.t}
+      offen={offen}
+      gewaehlt={m.id === p.title.id}
+      gemerkt={p.favorites.has(m.id)}
+      nr={o.nummern.get(m.id)}
+      namen={teilNamen(m, p.reihenName, o.istHauptstaffel(m), o.staffelLabel.get(m.id))}
+      angaben={angabenZeile(m, offen, p.t)}
+      gesperrt={p.wechselt}
+      onWaehlen={p.wechsleZu}
+    />
+  )
+}
+
+/** Der Inhalt der Reihen-Karte:Suche, Schalter und die Gruppen mit ihren Teilen. */
+export function reihenInhalt({ reihenTeile, t, reihenName, title, favorites, wechselt, wechsleZu, reiheOhneOffen, reihenSchluessel, reiheSuche, setReiheOhneOffen, setReiheSuche }: ReihenListeProps) {
+  const o = reihenOrdnung(reihenTeile, reihenName, t)
+  const { gruppen } = o
+  const karte = (m: FranchiseMember) => reihenKarte(m, o, { t, reihenName, title, favorites, wechselt, wechsleZu })
 
   /* Teile ohne belegte deutsche Synchro sind eingeklappt — nur der gewählte Teil bleibt sichtbar (`reihen-regeln.ts`). */
   const ohneOffen = reiheOhneOffen === reihenSchluessel

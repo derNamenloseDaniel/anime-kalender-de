@@ -72,7 +72,7 @@ function pfeiltaste(e: KeyboardEvent<HTMLDivElement>): void {
  * Ein Pfeilklick springt um so viele Karten, wie ganz hineinpassen. Beim Öffnen und beim Wechsel des Teils steht die Spur an der Sprungkante des gewählten Teils —
  * gesetzt wird nur `scrollLeft` der Spur, nie `scrollIntoView` (das scrollte das Panel vor, 09.10.2026).
  */
-export function ReihenSpur({ titel, gewaehltId, erste, t, children }: { titel: string; gewaehltId: number; erste: boolean; t: Translate; children: ReactNode }) {
+export function ReihenSpur({ titel, gewaehltId, erste, t, children }: { titel?: string; gewaehltId: number; erste: boolean; t: Translate; children: ReactNode }) {
   const kennung = useId()
   const spur = useRef<HTMLDivElement>(null)
   const zustand = useSpurMessung(spur)
@@ -87,18 +87,25 @@ export function ReihenSpur({ titel, gewaehltId, erste, t, children }: { titel: s
   }
   return (
     <div className={erste ? '' : 'mt-1.5'}>
-      <div className="flex min-h-8 items-center gap-2">
-        <span id={`${kennung}-titel`} className="text-t5 uppercase tracking-[.08em] text-ak-sehr-leise">
-          {titel}
-        </span>
-        <span className="h-px flex-1 bg-ak-linie" />
-        <PfeilPaar zustand={zustand} spurId={`${kennung}-spur`} t={t} springe={springe} />
-      </div>
+      {titel ? (
+        <div className="flex min-h-8 items-center gap-2">
+          <span id={`${kennung}-titel`} className="text-t5 uppercase tracking-[.08em] text-ak-sehr-leise">
+            {titel}
+          </span>
+          <span className="h-px flex-1 bg-ak-linie" />
+          <PfeilPaar zustand={zustand} spurId={`${kennung}-spur`} t={t} springe={springe} />
+        </div>
+      ) : (
+        /* In der Übersicht trägt der Gruppenkopf den Namen; die Pfeile (nur Maus, nur bei Überlauf) stehen rechts darüber. */
+        <div className="flex justify-end">
+          <PfeilPaar zustand={zustand} spurId={`${kennung}-spur`} t={t} springe={springe} />
+        </div>
+      )}
       <div
         ref={spur}
         id={`${kennung}-spur`}
         role="tablist"
-        aria-labelledby={`${kennung}-titel`}
+        aria-labelledby={titel ? `${kennung}-titel` : undefined}
         onKeyDown={pfeiltaste}
         className="relative -m-1 flex snap-x snap-mandatory gap-2 overflow-x-auto overscroll-x-contain scroll-px-1 p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >

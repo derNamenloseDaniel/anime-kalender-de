@@ -1,0 +1,5 @@
+kategorie: feature
+text: Mehr Titel lassen sich nach Genre filtern
+untertitel: "Etwa Manga Nippon Mukashibanashi: Drama, Genre-Angabe von TMDB"
+wartetAuf: "Bestandsbau nach PR 4573. Probe: In public/data/titles.json haben statt 51 nur noch höchstens 41 Titel kein genres, die ergänzten tragen genreQuelle tmdb."
+seit: '2026-11-22'

@@ -62,7 +62,7 @@ function pruefeTitel(datei: string, titel: Title[], banner: TmdbBanner): void {
   const schlecht = { score: [] as number[], wenigStimmen: [] as string[], schlagwort: [] as string[], banner: [] as number[] }
   /* Cartoons (negative Kennung) tragen TMDB-Schlagworte und -Banner und laufen nicht durch die Regeln (`bau/produkt-regel.ts`). */
   for (const t of titel.filter((x) => x.id >= 0)) {
-    if (t.score !== undefined && t.scoreQuelle !== 'tmdb') {
+    if (t.score !== undefined && t.scoreQuelle === undefined) {
       const seite = t.anisearchId === undefined ? undefined : bewertungen.get(t.anisearchId)
       if (seite?.klarwert !== t.score) schlecht.score.push(t.id)
       else if (seite.stimmen < MIN_STIMMEN_BEWERTUNG) schlecht.wenigStimmen.push(`${t.id}:${seite.stimmen}`)

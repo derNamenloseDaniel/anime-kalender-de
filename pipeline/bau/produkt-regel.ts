@@ -1,6 +1,7 @@
 import { ohneGeteilteFilme } from '../lib/tmdb-eindeutig.ts'
 import { log, readJson } from '../lib/util.ts'
 import { ladeBewertungen } from '../lib/anisearch-bewertung.ts'
+import { type AnilistWertung, ladeAnilistWertungen } from '../lib/anilist-wertung.ts'
 import { BANNER_DATEI, bannerAdresse, type TmdbBanner } from '../lib/tmdb-banner.ts'
 import type { Title } from '../../shared/types.ts'
 import { anisearchKennungen } from './anisearch-kennung.ts'
@@ -17,11 +18,12 @@ const banner = (): TmdbBanner => (tmdbBanner ??= ohneGeteilteFilme(readJson<Tmdb
 /** Unter dieser Stimmenzahl zeigt der Titel keine Bewertung: ein Durchschnitt aus 1–4 Stimmen ist kein Beleg (Dirigent, 11.10.2026). */
 export const MIN_STIMMEN_BEWERTUNG = 5
 
-/** Bewertung eines Titels: der aniSearch-Klarwert ab `MIN_STIMMEN_BEWERTUNG` Stimmen, sonst keine. Eine TMDB-Wertung (Cartoons) bleibt. */
-export function bewertungNachRegel(bisher: Bewertung, anisearchId: number | undefined): Bewertung {
+/** Bewertung eines Titels: der aniSearch-Klarwert ab `MIN_STIMMEN_BEWERTUNG` Stimmen, sonst AniLists Wertung (gekennzeichnet `anilist`), sonst keine. Eine TMDB-Wertung (Cartoons) bleibt. */
+export function bewertungNachRegel(bisher: Bewertung, anisearchId: number | undefined, anilist?: AnilistWertung): Bewertung {
   if (bisher.scoreQuelle === 'tmdb') return bisher
   const seite = anisearchId === undefined ? undefined : ladeBewertungen().get(anisearchId)
-  return seite?.klarwert && seite.stimmen >= MIN_STIMMEN_BEWERTUNG ? { score: seite.klarwert } : {}
+  if (seite?.klarwert && seite.stimmen >= MIN_STIMMEN_BEWERTUNG) return { score: seite.klarwert }
+  return anilist ? { score: anilist.score, scoreQuelle: 'anilist' } : {}
 }
 
 /** Schlagworte eines Titels: die erlaubten aniSearch-Tags seiner Seite. */
@@ -40,7 +42,7 @@ export function bannerNachRegel(id: number, anilistBanner: string | undefined): 
 
 /** Bewertung, Schlagworte und Banner nach der Regel; auch für die Kopien in `verschoben`, die vor `setzeProduktFelder` entstanden. */
 export function mitProduktFeldern<T extends Title>(t: T, anisearchId: number | undefined): T {
-  const { score, scoreQuelle } = bewertungNachRegel(t, anisearchId)
+  const { score, scoreQuelle } = bewertungNachRegel(t, anisearchId, ladeAnilistWertungen().get(t.id))
   return {
     ...t,
     score,
@@ -63,5 +65,6 @@ export function setzeProduktFelder(titles: Map<number, Title>): void {
     Object.assign(t, mitProduktFeldern(t, asId))
   }
   const mitBewertung = [...titles.values()].filter((t) => t.score !== undefined).length
-  log(`Bewertung, Schlagworte und Banner nach Regel: ${mitBewertung} von ${titles.size} Titeln mit aniSearch-Bewertung, ${ohneKennung} ohne aniSearch-Kennung`)
+  const ausAnilist = [...titles.values()].filter((t) => t.scoreQuelle === 'anilist').length
+  log(`Bewertung, Schlagworte und Banner nach Regel: ${mitBewertung} von ${titles.size} Titeln mit Bewertung (davon ${ausAnilist} Rückfall AniList), ${ohneKennung} ohne aniSearch-Kennung`)
 }

@@ -49,7 +49,7 @@ export function Flaggen({ title, ziel, t }: { title: Title; ziel?: string; t: Tr
   const verweise = verweiseFuer(title, ziel)
   const quelle = verweise.find((v) => v.name !== 'MAL')
   const mal = verweise.find((v) => v.name === 'MAL')
-  const quellenName = quelle?.name ?? (title.scoreQuelle === 'tmdb' ? 'TMDB' : 'aniSearch')
+  const quellenName = quelle?.name ?? (title.scoreQuelle === 'tmdb' ? 'TMDB' : title.scoreQuelle === 'anilist' ? 'AniList' : 'aniSearch')
   const wertung = title.score === undefined ? undefined : wertungText(title.score)
   const quelleHinweis = [quelle?.hinweis, wertung ? t('detail.scoreHint', { quelle: quellenName }) : undefined].filter(Boolean).join(' — ')
   if (!quelle && !wertung && !mal) return null

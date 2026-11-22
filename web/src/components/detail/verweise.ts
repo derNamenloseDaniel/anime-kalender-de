@@ -24,6 +24,7 @@ export function verweiseFuer(title: Title, asZiel?: string): Verweis[] {
   const raus: Verweis[] = []
   const tmdb = title.westlich && title.tmdbId ? `https://www.themoviedb.org/tv/${title.tmdbId}` : undefined
   if (tmdb) raus.push({ name: 'TMDB', ziel: tmdb, hinweis: 'Bei TMDB ansehen' })
+  else if (title.scoreQuelle === 'anilist') raus.push({ name: 'AniList', ziel: `https://anilist.co/anime/${title.id}`, hinweis: 'Bei AniList ansehen' })
   else if (title.anisearchId)
     raus.push({
       name: 'aniSearch',

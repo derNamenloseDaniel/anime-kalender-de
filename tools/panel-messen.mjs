@@ -88,7 +88,7 @@ async function oeffne(seite, ak, thema) {
 function erwarteteFlaggen(t) {
   const quelle = t.westlich && t.tmdbId ? 'TMDB' : t.anisearchId ? 'aniSearch' : undefined
   const wertung = t.score === undefined ? undefined : (t.score / 10).toFixed(1).replace('.', ',')
-  return { quelle: quelle ?? (wertung ? (t.scoreQuelle === 'tmdb' ? 'TMDB' : 'aniSearch') : undefined), wertung, mal: Boolean(t.malId), link: Boolean(quelle) }
+  return { quelle: quelle ?? (wertung ? (t.scoreQuelle === 'tmdb' ? 'TMDB' : t.scoreQuelle === 'anilist' ? 'AniList' : 'aniSearch') : undefined), wertung, mal: Boolean(t.malId), link: Boolean(quelle) }
 }
 
 function pruefeFlaggen(t, m) {

@@ -54,10 +54,22 @@ globalThis.akNetflixKnopfSchreiben = (el, beschriftung, pfad) => {
   }
   el.hidden = false
   el.disabled = !z.aktiv
+  el.ariaDisabled = String(!z.aktiv) /* `akKlickVerteilen` sperrt auch über dieses Merkmal */
   if (el.classList.contains('ak-erfolg') || el.classList.contains('ak-fehler')) return
   el.textContent = z.text
   el.classList.remove('ak-ja', 'ak-nein', 'ak-leer')
   el.classList.add(z.klasse)
+}
+
+/**
+ * Klick auf den Melde-Knopf: ein zweiter vor der Antwort meldet nichts (Netflix lädt `melde-sperre.js` nicht, Doppelmeldung = D1-Schreibzeilen).
+ * Bricht `melden()` ohne Antwort ab, gibt es den Schlüssel `k` wieder frei.
+ */
+globalThis.akNetflixMeldenEinmal = async (gesendet, k, melden) => {
+  if (gesendet.get(k) === 'unterwegs') return
+  gesendet.set(k, 'unterwegs')
+  await melden()
+  if (gesendet.get(k) === 'unterwegs') gesendet.delete(k)
 }
 
 /** Klick „Zurückstellen" bei „Erinnern" ohne Termin: nur zurückstellen, nichts melden. Gibt den Text für die Rückmeldung zurück. */

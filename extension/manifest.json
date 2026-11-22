@@ -74,6 +74,7 @@
         "netflix-seitentreue.js",
         "netflix-staffel.js",
         "netflix-erinnern.js",
+        "netflix-film-knopf.js",
         "netflix-durchgang-steuerung.js",
         "netflix-zurueckgestellt.js",
         "netflix-liste-ansicht.js",

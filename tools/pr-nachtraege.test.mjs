@@ -74,6 +74,25 @@ pruefe('Prüferrunden: Fremde und andere Bot-Kommentare zählen nicht', !waehleN
 pruefe('Prüferrunde auf 6000 Zeichen gekappt, Nachtrag nicht', waehleNachtraege([k('autor', 'Prüfer Runde 1' + 'x'.repeat(7000))], 'autor')[0].length === 6000
   && waehleNachtraege([k('autor', 'Nachtrag' + 'x'.repeat(7000))], 'autor')[0].length === 7008)
 
+// 22.11.2026, PR 4581: Antworten des Bauers ohne Wort „Nachtrag“ am Anfang erreichten den Prüfer nicht (Anfänge echt, gekürzt).
+const OWNER = 'OWNER'
+const urteil = (wort) => k('github-actions[bot]', `**Prüfer-Review** für 72201bf12 - Urteil: **${wort}**\n\n# Prüfer-Protokoll`, 'CONTRIBUTOR')
+const stufe = k('github-actions[bot]', '<!-- pr-stufe -->\n**Prüfstufe 2** für fe21e7b7d', 'CONTRIBUTOR')
+const auflage = k('inhaber', 'Prüfer-Auflage umgesetzt (Kopf nach Push, 2 neue Commits):\n\n- Der Negativtest fehlte', OWNER)
+const abnahme = k('inhaber', 'Abnahme Runde 2, Auflage A1 — Nachtrag `fe21e7b7`:\n\n- **aria-disabled am echten Knopf:**', OWNER)
+const roterJob = k('inhaber', 'Der rote Job „PR-Aussehen – Panel“ ist nicht von diesem PR: `tools/panel-zurueck.mjs` nimmt', OWNER)
+const nachAuflage = (...ks) => waehleNachtraege([stufe, urteil('aendern'), ...ks], 'autor').filter((t) => !t.startsWith('**Prüfer-Review') && !t.startsWith('<!--'))
+pruefe('Antwort „Prüfer-Auflage umgesetzt“ nach Urteil kommt an', nachAuflage(auflage).length === 1)
+pruefe('Antwort „Abnahme Runde 2 … Nachtrag“ nach Urteil kommt an', nachAuflage(abnahme).length === 1)
+pruefe('Antwort ohne Schlagwort (roter Job nicht von diesem PR) kommt an', nachAuflage(roterJob).length === 1)
+pruefe('Antworten bleiben nach späterem Urteil erhalten, in Reihenfolge',
+  nachAuflage(auflage, urteil('aendern'), abnahme, urteil('ok')).join('|').startsWith('Prüfer-Auflage umgesetzt') && nachAuflage(auflage, urteil('aendern'), abnahme, urteil('ok')).length === 2)
+pruefe('ohne Prüferurteil kein Treffer für unmarkierten Text', waehleNachtraege([stufe, auflage], 'autor').length === 0)
+pruefe('Text vor dem ersten Urteil ohne Marke zählt nicht', waehleNachtraege([auflage, urteil('aendern')], 'autor').every((t) => t.startsWith('**Prüfer-Review**')))
+pruefe('Fremde und CONTRIBUTOR-Kommentare nach Urteil zählen nicht', nachAuflage(k('fremd', 'Prüfer-Auflage umgesetzt'), k('gast', 'Hallo', 'CONTRIBUTOR')).length === 0)
+pruefe('Bot-Kommentare (Laufmeldung, Stufe) nach Urteil zählen nicht, auch nicht als Autor', waehleNachtraege([urteil('aendern'), k('github-actions[bot]', 'Lauf grün', 'CONTRIBUTOR')], 'github-actions[bot]').length === 1)
+pruefe('Urteil des Inhabers selbst ist keine Antwort (nur einmal gezählt als Urteil)', nachAuflage(k('inhaber', '**Prüfer-Review** für fe21e7b7d - Urteil: **ok**', OWNER)).length === 0)
+
 const text = 'Titel: x\n\nBeschreibung'
 pruefe('ohne Treffer bleibt der Text unverändert', ergaenzeBeschreibung(text, [k('autor', 'ok'), k('autor', null), k('fremd', '**Nachtrag')], 'autor') === text)
 const mit = ergaenzeBeschreibung(text, drei, 'autor')

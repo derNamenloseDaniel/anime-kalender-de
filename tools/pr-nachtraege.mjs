@@ -12,6 +12,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { ghApiJsonMitLimit } from './gh-ratelimit.mjs'
+import { urteilAus } from './pr-nachrechnen-pruefer.mjs'
 
 export const NACHTRAG = /^\s*(\*\*|#+ *)?(Nachtrag|Nachträge|Nachbesserung)/i
 // Frühere Prüferrunden: Agent-Kommentare „Prüfer Runde N“ und das CI-Protokoll (Bot), damit der Prüfer seine Auflagen einlösen kann.
@@ -36,8 +37,12 @@ export function waehleNachtraege(kommentare, autor) {
   const botText = (k) => CI_PROTOKOLL.test(k.body ?? '') || MUTATIONSPROBE.test(k.body ?? '')
   const runde = (k) => (zaehlt(k) && PRUEFER_RUNDE.test(k.body ?? '')) || (k.user?.login === CI_BOT && botText(k))
   const nachtrag = (k) => zaehlt(k) && NACHTRAG.test(k.body ?? '')
+  // 22.11.2026 (PR 4581: „Prüfer-Auflage umgesetzt …“ fiel durch): jeder Kommentar eines Berechtigten nach dem ersten Prüferurteil ist Antwort darauf.
+  const urteil = (k) => urteilAus(k.body) !== null || CI_PROTOKOLL.test(k.body ?? '')
+  const ersterPruefer = kommentare.findIndex((k) => urteil(k) || runde(k))
+  const antwort = (k, i) => ersterPruefer >= 0 && i > ersterPruefer && zaehlt(k) && k.user?.login !== CI_BOT && !urteil(k) && (k.body ?? '') !== ''
   const text = (k) => (nachtrag(k) ? k.body : k.body.slice(0, MAX_PRUEFER))
-  return kommentare.filter((k) => nachtrag(k) || runde(k)).map(text)
+  return kommentare.filter((k, i) => nachtrag(k) || runde(k) || antwort(k, i)).map(text)
 }
 
 /** Beschreibung plus Nachträge; ohne Treffer genau der Eingabetext. */

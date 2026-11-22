@@ -68,7 +68,7 @@ export function schliesseWegeAb({
   const hatteStream = titelMitStream(titles)
   fuelleWegeAusJustwatch({ titles, tmdbMehrdeutig, istTot })
   uebernehmeFskAusJustwatch({ titles, tmdbMehrdeutig })
-  uebernehmeFskAusFranchise(titles)
+  uebernehmeFskAusFranchise(titles, releases)
 
   bereinigeWege({
     titles,

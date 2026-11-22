@@ -1,5 +1,5 @@
 import { log, readJson } from '../lib/util.ts'
-import type { Fsk, Title } from '../../shared/types.ts'
+import type { Fsk, Release, Title } from '../../shared/types.ts'
 import { fskQuelleFehler } from './11-2-1-fsk-justwatch.ts'
 
 /**
@@ -19,8 +19,15 @@ export function fskAusFranchise(titel: Title, alle: Iterable<Title>): Fsk | unde
   return werte.size === 1 ? [...werte][0] : undefined
 }
 
+/** Zusicherung: ein abgeleiteter Wert steht nie neben einer Freigabe am Termin, die etwas anderes sagt (dort gilt die Freigabe). */
+export function franchiseFskFehler(titles: Map<number, Title>, releases: Release[]): string[] {
+  return releases
+    .filter((r) => r.fsk !== undefined && titles.get(r.titleId)?.fskQuelle === 'franchise' && titles.get(r.titleId)?.fsk !== r.fsk)
+    .map((r) => `Anime ${r.titleId}: fskQuelle franchise, aber der Termin trägt Freigabe ${r.fsk}`)
+}
+
 /** Läuft nach JustWatch: ein Wert aus Freigabe oder Anbieter bleibt; gelesen werden nur Freigaben der Geschwister. */
-export function uebernehmeFskAusFranchise(titles: Map<number, Title>): void {
+export function uebernehmeFskAusFranchise(titles: Map<number, Title>, releases: Release[] = []): void {
   const tmdb = readJson<Record<string, { fsk?: Fsk }>>('data/tmdb-titles.json', {})
   const tmdbFsk = (id: number) => tmdb[String(id)]?.fsk
   const neu = new Map<number, Fsk>()
@@ -36,7 +43,7 @@ export function uebernehmeFskAusFranchise(titles: Map<number, Title>): void {
     t.fsk = stufe
     t.fskQuelle = 'franchise'
   }
-  const fehler = fskQuelleFehler(titles.values(), tmdbFsk)
+  const fehler = [...fskQuelleFehler(titles.values(), tmdbFsk), ...franchiseFskFehler(titles, releases)]
   if (fehler.length) throw new Error(`FSK aus dem Franchise widerspricht der Zusicherung:\n${fehler.slice(0, 10).join('\n')}`)
   log(`FSK aus dem Franchise: ${neu.size} Titel ohne Freigabe ergänzt (gleiches Format, alle anderen Teile gleicher Wert, gekennzeichnet)`)
 }

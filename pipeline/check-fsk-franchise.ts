@@ -1,9 +1,10 @@
 /** Zusicherungen zu `fskAusFranchise` (`bau/11-2-1-fsk-franchise.ts`): gleiches Format, nur Freigaben, Widerspruch ergibt nichts. Aufruf: `npm run check:logic`. */
-import { readFileSync } from 'node:fs'
 import { baueEmpfehlung } from '../shared/empfehlung-pool.ts'
-import type { Title } from '../shared/types.ts'
+import type { Release, Title } from '../shared/types.ts'
 import { fskQuelleFehler } from './bau/11-2-1-fsk-justwatch.ts'
-import { fskAusFranchise, uebernehmeFskAusFranchise } from './bau/11-2-1-fsk-franchise.ts'
+import { fskAusFranchise, franchiseFskFehler, uebernehmeFskAusFranchise } from './bau/11-2-1-fsk-franchise.ts'
+import { schliesseWegeAb } from './bau/11-wege-abschluss.ts'
+import { PROFILE } from './lib/empfehlung-simulation.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean): void {
@@ -28,11 +29,20 @@ uebernehmeFskAusFranchise(karte)
 pruefe('Franchise-FSK: gesetzt wird mit Kennzeichnung', karte.get(90003)!.fsk === 12 && karte.get(90003)!.fskQuelle === 'franchise')
 pruefe('Franchise-FSK: abgeleiteter Wert speist den nächsten nicht', karte.get(90005)!.fsk === 16 && karte.get(90005)!.fskQuelle === 'franchise' && karte.get(90008)!.fsk === 18)
 pruefe('Franchise-FSK: Freigabe bleibt unberührt', karte.get(90001)!.fskQuelle === undefined && karte.get(90006)!.fskQuelle === 'justwatch')
-const abschluss = readFileSync(new URL('./bau/11-wege-abschluss.ts', import.meta.url), 'utf8')
-const jw = abschluss.indexOf('uebernehmeFskAusJustwatch({')
-pruefe('Franchise-FSK: der Bau ruft die Regel, und zwar nach JustWatch', jw > 0 && abschluss.indexOf('uebernehmeFskAusFranchise(titles)') > jw)
+// Verdrahtung: der echte Abschluss der Wege setzt den Wert (rot, sobald der Aufruf dort fehlt)
+const bau = new Map([t(900040, 'TV', 12), t(900041, 'TV')].map((x) => [x.id, { ...x, streams: [] } as unknown as Title]))
+schliesseWegeAb({
+  titles: bau, anisearch: {}, releases: [], zugangJeAdresse: new Map(), tmdbMehrdeutig: new Set(), toteAdressen: new Set(), linkBefunde: {},
+  verweiseEntfernt: [], crAdresseZu: () => undefined, beantworteteSuchen: new Set(), suchOffen: [], alleChecks: [], lautPruefungTot: () => false,
+  checksJePlattform: new Map(), belegFuer: () => undefined,
+})
+pruefe('Franchise-FSK: schliesseWegeAb setzt den Wert samt Kennzeichnung', bau.get(900041)!.fsk === 12 && bau.get(900041)!.fskQuelle === 'franchise' && bau.get(900040)!.fskQuelle === undefined)
+const mitTermin = new Map([t(900050, 'TV', 12), t(900051, 'TV', 12, 'franchise')].map((x) => [x.id, x]))
+pruefe('Franchise-FSK: Zusicherung meldet abweichende Freigabe am Termin', franchiseFskFehler(mitTermin, [{ titleId: 900051, fsk: 16 }, { titleId: 900051, fsk: 12 }, { titleId: 900050, fsk: 16 }] as unknown as Release[]).length === 1)
 pruefe('Franchise-FSK: Zusicherung meldet ungültige Stufe und TMDB-Freigabe', fskQuelleFehler([t(900020, 'TV', 14, 'franchise')], () => undefined).length === 1 && fskQuelleFehler([t(900021, 'TV', 12, 'franchise')], () => 16).length === 1)
 const pool = (x: Title): Title => ({ ...x, titleDe: 'T', genres: [], keywords: [], coverImage: 'c.jpg', streams: [{ platform: 'netflix', url: 'u', dub: true, zugang: 'abo' }] }) as unknown as Title
 const einstiege = baueEmpfehlung([pool(t(900030, 'TV', 12, 'franchise', 900030)), pool(t(900031, 'TV', 16, undefined, 900031)), pool(t(900032, 'TV', 6, 'justwatch', 900032))], {}).einstiege
 pruefe('Franchise-FSK: die Empfehlung führt abgeleitete FSK nie, Freigabe und Anbieter wie bisher', einstiege.find((k) => k.id === 900030)?.fsk === undefined && einstiege.find((k) => k.id === 900031)?.fsk === 16 && einstiege.find((k) => k.id === 900032)?.fsk === 6)
+const film = (fsk: number | undefined) => ({ f: 'MOVIE', fsk }) as never
+pruefe('Franchise-FSK: Profil Familienfilm trifft nur Kandidaten mit belegter FSK (abgeleitet kommt als leer an)', PROFILE.Familienfilm!(() => true, film(12)) === true && PROFILE.Familienfilm!(() => true, film(undefined)) === false)
 if (verletzt) process.exit(1)

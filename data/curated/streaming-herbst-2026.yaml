@@ -443,6 +443,8 @@
 - slug: demon-slayer-mugen-train-arc-primevideo
   anilistId: 129874
   platform: primevideo
+  # Adresse: Anime2You 1059642 verlinkt den „Mugen Train Arc“-Block (7 Episoden, Prime Video) auf Amazon-Titel B0HLPQXSLK (Abruf 22.11.2026).
+  platformUrl: https://www.amazon.de/dp/B0HLPQXSLK
   releaseType: batch
   dateMeaning: available-from
   schedule: { firstEpisodeDate: "2026-10-10", episodeCount: 7 }

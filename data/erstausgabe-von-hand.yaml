@@ -579,6 +579,23 @@
     - https://www.anime2you.de/news/373156/ghost-in-the-shell-arise-erscheint-als-komplettbox/
     - https://www.anime2you.de/news/395321/ghost-in-the-shell-arise-erneut-auf-prosieben-maxx/
 
+# Ajin Film 2 und 3 (Kazé, Disc-Erstausgabe): aniSearch führt die Filme unter einem Sammeleintrag (10462), die Einzel-Discs nennen
+# je „Deutsch (Dolby Digital 5.1)“ und „Japanisch (Dolby Digital 5.1)“, Untertitel Deutsch. Film 1 (21212) hat einen Prime-Handbeleg.
+- anilistId: 21505
+  title: 'Ajin: Shoutotsu'
+  von: '2020-03-05'
+  publisher: 'Kazé Deutschland'
+  sources:
+    - https://www.anisearch.de/article/62445,ajin-film-2-collision-limited-steelcase-edition-blu-ray
+    - https://www.anime2you.de/news/307145/kaze-lizenziert-ajin-demi-human-filme/
+- anilistId: 21681
+  title: 'Ajin: Shougeki'
+  von: '2020-07-02'
+  publisher: 'Kazé Deutschland'
+  sources:
+    - https://www.anisearch.de/article/62436,ajin-film-3-clash-limited-steelcase-edition-blu-ray
+    - https://www.anime2you.de/news/307145/kaze-lizenziert-ajin-demi-human-filme/
+
 # The Ramparts of Ice: Staffel 2 (Netflix, Simulcast): Anime2You nennt für jeden Monat den Donnerstag-Simulcast mit „Sprache: Deutsch, Japanisch (UT)“
 # (Abruf 21.11.2026: Oktober 1052708 „1. Oktober“, November 1062641, Dezember 1073600 „Donnerstag“); 1056287: Folge 1 am 01.10.2026 mit deutschem Ton.
 # aniSearch führt „Deutsch“ mit „dubbed“, Netflix, Start 01.10.2026 (Abruf 10.10.2026). Hebt `low` auf `normal`; ein Tonspur-Handbeleg je Folge steht aus.

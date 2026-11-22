@@ -33,11 +33,9 @@ export function ladeStaffelEingaben(): StaffelEingaben {
 
 const wikiAdresse = (seite: string): string => `https://de.wikipedia.org/wiki/${encodeURI(seite.replace(/ /g, '_'))}`
 
-/** Folgen aller Wege und TOGGO-Blöcke eines Titels (Riegel). */
-function wegeZahl(t: Title): { folgen: number; bloecke: number } {
-  const folgen = (t.streams ?? []).reduce((n, s) => n + (s.dubRanges ?? []).reduce((m, b) => m + b.to - b.from + 1, 0), 0)
-  const bloecke = (t.watchLinks ?? []).reduce((n, w) => n + (w.toggo?.length ?? 0), 0)
-  return { folgen, bloecke }
+/** TOGGO-Blöcke eines Titels (Riegel). */
+function toggoBloecke(t: Title): number {
+  return (t.watchLinks ?? []).reduce((n, w) => n + (w.toggo?.length ?? 0), 0)
 }
 
 /** Bricht ab, wenn der Schnitt etwas verloren hat; `fehler` nennt jede Abweichung. */
@@ -76,8 +74,8 @@ export function teileEinenSammeltitel(
     termineNachher: teil.nachher,
     idsGleich: idsVorher.length === idsNachher.size && idsVorher.every((id) => idsNachher.has(id)),
     wegeVerloren: teileStreams(sammel.streams ?? [], plan).verloren,
-    bloeckeVorher: wegeZahl(sammel).bloecke,
-    bloeckeNachher: neu.reduce((n, t) => n + wegeZahl(t).bloecke, 0),
+    bloeckeVorher: toggoBloecke(sammel),
+    bloeckeNachher: neu.reduce((n, t) => n + toggoBloecke(t), 0),
     fremdeBloecke: teileWatchLinks(sammel.watchLinks ?? [], plan).fremd,
   })
   releases.splice(0, releases.length, ...teil.releases)

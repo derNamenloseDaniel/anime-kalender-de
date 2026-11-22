@@ -4,13 +4,16 @@
  * nach durchlaufender Folge; `ev.id` bleibt (ICS-UID). Fixtures plus echter Fall: jede Horizonte-Sichtung aus `data/tv-programm.json` mit
  * Treffer in `data/wikipedia-folgen.json` liegt in der Staffel ihres Titels (unabhängig nachgezählt). Läuft in `check:logic`.
  */
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { spawnSync } from 'node:child_process'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { fileURLToPath } from 'node:url'
+import { join, resolve } from 'node:path'
 import type { Release, ReleaseEvent, Title } from '../shared/types.ts'
 import { folgenKern } from '../shared/folgen-zuordnung.ts'
 import type { TvSendung } from './fetch-tv-programm.ts'
 import { staffelPlaene, type StaffelPlan } from './lib/staffel-titel.ts'
-import { folgentitelJeSendeplatz, staffelJeFolgentitel, teileTermine, zielDesTermins } from './lib/staffel-termine.ts'
+import { folgentitelJeSendeplatz, staffelJeFolgentitel, teileTermine, trefferFuer, zielDesTermins } from './lib/staffel-termine.ts'
 import { teileEinenSammeltitel, teileStaffelTitel } from './bau/staffel-titel.ts'
 import { ROOT } from './lib/util.ts'
 import { unbedingteAufrufe, type Aufruf } from './lib/unbedingte-aufrufe.ts'
@@ -48,7 +51,7 @@ let liefAuseinander = false
 try {
   staffelJeFolgentitel(wiki.map((f, i) => (i === 3 ? { ...f, st: 4 } : f)), plan)
 } catch (e) {
-  liefAuseinander = /Yaml sagt 2/.test((e as Error).message)
+  liefAuseinander = /Wikipedia-Folge 4 .„Erneuter Kurs voraus“. liegt in Staffel 1, die Yaml sagt 2/.test((e as Error).message)
 }
 pruefe('Liste und Yaml laufen auseinander (kein Rücksprung bei 4): wirft', liefAuseinander)
 const doppelt = staffelJeFolgentitel([...wiki.slice(0, 6), { nr: 1300, st: 1, dt: 'Der Anhänger beginnt' }], plan)
@@ -138,6 +141,81 @@ ohneTitel.titles.delete(SAMMEL)
 pruefe('Phase: Sammeltitel nicht im Bau → nichts geteilt', teileEinenSammeltitel(plan, ohneTitel, { sendungen, wiki: {} }) === undefined && ohneTitel.events.every((e) => e.titleId === SAMMEL))
 const unberuehrt = bau()
 pruefe('Phase ohne Plan (Yaml ohne basis): No-op', teileStaffelTitel(unberuehrt, { plaene: [], sendungen, wiki: {} }).length === 0 && JSON.stringify(unberuehrt) === JSON.stringify(bau()))
+
+// Ränder (Mutanten der Diff-Probe).
+pruefe('Liste ohne „Folge in der Staffel“ (st): keine Zuordnung', staffelJeFolgentitel(wiki.map((f, i) => (i === 2 ? { nr: f.nr, dt: f.dt } : f)), plan).size === 0)
+const mitDoppelpunkt = staffelJeFolgentitel([{ nr: 1, st: 1, dt: 'Teil 1: Der Anfang des Weges' }], plan)
+pruefe('Folgentitel mit Doppelpunkt: ganzer Titel trifft, wenn der gekürzte nicht trifft', trefferFuer(mitDoppelpunkt, 'Teil 1: Der Anfang des Weges')?.folge === 1 && trefferFuer(mitDoppelpunkt, undefined) === undefined)
+const handTv = { ...tvRelease, slug: 'hand-tv', sendungen: undefined, schedule: { firstEpisodeDate: '2026-10-01', firstEpisodeNumber: 5, episodeCount: 2 } } as unknown as Release
+const handEv = { ...ev('2026-10-01', '09:00', 5), id: 'hand-tv@2026-10-01', releaseSlug: 'hand-tv', sichtung: undefined }
+const hand = teileTermine([handTv], [handEv], plan, sendeplatz, jeTitel)
+pruefe('Fernsehen von Hand (ohne Sichtung): nach Folgennummer (5 → Staffel 2 Folge 2), Plan bleibt', hand.events[0]!.titleId === 7_000_002 && hand.events[0]!.episode === 2 && hand.releases[0]!.slug === 'hand-tv-s2' && hand.releases[0]!.schedule.firstEpisodeNumber === 2 && hand.releases[0]!.schedule.episodeCount === 2, JSON.stringify(hand.releases[0]))
+const ohneNummer = teileTermine([{ ...rtlRelease, slug: 'disc', schedule: { firstEpisodeDate: '2026-12-01' } } as unknown as Release], [{ id: 'disc@2026-12-01', releaseSlug: 'disc', titleId: SAMMEL, date: '2026-12-01', platform: 'disc', releaseType: 'batch', name: 'x' } as unknown as ReleaseEvent], plan, sendeplatz, jeTitel)
+pruefe('Termin ohne Folgennummer, Release ohne erste Folge: Staffel 1', ohneNummer.events[0]!.titleId === 7_000_001 && ohneNummer.events[0]!.episode === undefined && ohneNummer.releases[0]!.slug === 'disc-s1')
+const leerOhne = teileTermine([{ ...rtlRelease, slug: 'leer2', schedule: { firstEpisodeDate: '2026-01-01' } } as unknown as Release], [], plan, sendeplatz, jeTitel)
+pruefe('Release ohne Termine und ohne erste Folge: Staffel 1', leerOhne.releases[0]!.titleId === 7_000_001 && leerOhne.releases[0]!.slug === 'leer2-s1')
+const [zu] = staffelPlaene([{ anilistId: SAMMEL, titel: 'X', basis: 2, staffeln: [{ nr: 1, von: 1, bis: 3, kennung: 7_000_001 }, { nr: 2, von: 4, bis: 6 }] }])
+const jenseits = teileTermine([{ ...rtlRelease, slug: 'spaet', schedule: { firstEpisodeDate: '2026-01-01', firstEpisodeNumber: 9 } } as unknown as Release], [], zu!, sendeplatz, jeTitel)
+pruefe('Release ohne Termine jenseits der letzten Staffel: an die Basis (Slug bleibt)', jenseits.releases[0]!.titleId === SAMMEL && jenseits.releases[0]!.slug === 'spaet')
+const rueckwaerts = teileTermine([tvRelease], [ev('2026-09-17', '16:05', 2), ev('2026-09-16', '16:05', 1)], plan, sendeplatz, jeTitel).releases[0]!
+pruefe('Termine in beliebiger Reihenfolge: erster und letzter Sendetag stimmen', rueckwaerts.schedule.firstEpisodeDate === '2026-09-16' && rueckwaerts.tvLetzteSichtung === '2026-09-17' && rueckwaerts.name === 'Pokémon Horizonte – Staffel 2')
+pruefe('Basis-Release mit Treffer und ohne: Folge 1 um 13:00, Zahl aus den Treffern, letzte Sichtung der ohne Treffer', basisTv.schedule.time === '13:00' && basisTv.schedule.episodeCount === 1 && basisTv.schedule.firstEpisodeDate === '2026-09-19' && basisTv.schedule.firstEpisodeNumber === undefined && basisTv.tvLetzteSichtung === '2026-09-23' && basisTv.schedule.episodeCountAssumed === true && basisTv.schedule.episodeCountNurGesichtet === true, JSON.stringify(basisTv.schedule))
+const nurOhne = teileTermine([tvRelease], [ev('2026-09-23', '16:15', 6)], plan, sendeplatz, jeTitel).releases[0]!
+pruefe('Release nur aus Terminen ohne Treffer: Zahl = Sendungen, keine Beobachtung, keine Uhrzeit', nurOhne.schedule.episodeCount === 1 && nurOhne.schedule.observed === undefined && nurOhne.schedule.time === undefined && nurOhne.schedule.zeiten === undefined && nurOhne.herkunft === 'Automatisch aus dem TV-Programm von RTL+ (1 Sendungen gesichtet).', JSON.stringify(nurOhne))
+const zweiZeiten = [sendung('2026-10-05', '16:15', 'Der Anhänger beginnt'), sendung('2026-10-06', '17:00', 'Feliospa mit Herz')]
+const s1 = teileTermine([tvRelease], [ev('2026-10-05', '16:15', 1), ev('2026-10-06', '17:00', 2)], plan, folgentitelJeSendeplatz(zweiZeiten, SAMMEL), jeTitel).releases[0]!
+pruefe('verschiedene Uhrzeiten: je Folge, ab Folge 1 ohne firstEpisodeNumber', JSON.stringify(s1.schedule.zeiten) === '{"1":"16:15","2":"17:00"}' && s1.schedule.time === undefined && s1.schedule.firstEpisodeNumber === undefined && s1.schedule.episodeCount === 2, JSON.stringify(s1.schedule))
+const schonDa = teileTermine([{ ...tvRelease, sources: ['https://de.wikipedia.org/wiki/X'] } as Release], events.slice(0, 1), { ...plan, quelle: 'https://de.wikipedia.org/wiki/X' }, sendeplatz, jeTitel).releases[0]!
+pruefe('Quelle schon in sources: nicht doppelt', schonDa.sources!.length === 1)
+
+// Phase: Ausgabe der Meldungen, Map-Werte, Rückgabe, Quelle nur bei Wikipedia-Seite.
+function ausgabe(f: () => void): string {
+  const zeilen: string[] = []
+  const [l, w] = [console.log, console.warn]
+  console.log = (...a: unknown[]) => void zeilen.push(a.join(' '))
+  console.warn = (...a: unknown[]) => void zeilen.push(a.join(' '))
+  try {
+    f()
+  } finally {
+    console.log = l
+    console.warn = w
+  }
+  return zeilen.join('\n')
+}
+const b2 = bau()
+const text = ausgabe(() => teileEinenSammeltitel(plan, b2, { sendungen, wiki: { [SAMMEL]: { seite: 'X', url: 'https://plus.rtl.de/liste', folgen: wiki } } }))
+pruefe('Phase warnt mit Zahl der Termine ohne Treffer', /⚠ .*Staffel-Titel Pokémon Horizonte: 3 Titel, 6 Termine, 1 TV-Termine ohne Folgentitel-Treffer/.test(text), text)
+pruefe('Phase: Liste mit eigener Adresse (keine Wikipedia-Seite) setzt keine Quelle', !b2.releases.some((r) => r.sources?.some((s) => s.includes('wikipedia'))))
+pruefe('Phase: Map-Werte sind die Staffel-Titel', b2.titles.get(7_000_001)?.titleDe === 'Pokémon Horizonte – Staffel 1' && b2.titles.get(SAMMEL)?.titleDe === 'Pokémon Horizonte – Staffel 3' && b2.titles.get(1)?.titleDe === 'T1')
+pruefe('Phase: genau die geteilten Releases und Termine (keine Reste, nichts angehängt)', b2.releases.map((r) => r.slug).sort().join() === `auto-158871-tv-super-rtl,auto-7000001-tv-super-rtl,auto-7000002-tv-super-rtl` && b2.events.length === 6 && b2.events.every((e) => [7_000_001, 7_000_002, SAMMEL].includes(e.titleId)), b2.releases.map((r) => r.slug).join())
+const ruhig = ausgabe(() => teileEinenSammeltitel(plan, (() => { const x = bau(); x.events = x.events.slice(0, 2); return x })(), { sendungen, wiki: { [SAMMEL]: { seite: 'X', folgen: wiki } } }))
+pruefe('Phase ohne Termine ohne Treffer: Hinweis ohne ⚠', /Staffel-Titel Pokémon Horizonte: 3 Titel, 2 Termine, 0 TV-Termine/.test(ruhig) && !ruhig.includes('⚠'), ruhig)
+const fehlt = bau()
+fehlt.titles.delete(SAMMEL)
+pruefe('Phase: Sammeltitel fehlt → Hinweis im Log', /Staffel-Titel 158871: nicht im Bau, nichts geteilt/.test(ausgabe(() => teileEinenSammeltitel(plan, fehlt, { sendungen, wiki: {} }))))
+const b3 = bau()
+const alle = teileStaffelTitel(b3, { plaene: [plan], sendungen, wiki: {} })
+pruefe('teileStaffelTitel: fährt jeden Plan und gibt seinen Sammeltitel zurück', alle.length === 1 && alle[0]!.plan.sammel === SAMMEL && b3.titles.has(7_000_001))
+
+// Ladeweg: Yaml, Sichtungen und Liste aus AK_ROOT, Phase mit Vorgabe-Eingaben (Kindprozess, Kulisse `lib/kulisse-staffel-titel.ts`).
+{
+  const wurzel = mkdtempSync(join(tmpdir(), 'staffel-titel-'))
+  try {
+    /* Pfade ohne „data/“-Literal: check-workflows liest es sonst als Schreibziel. */
+    mkdirSync(join(wurzel, 'data', 'curated'), { recursive: true })
+    writeFileSync(join(wurzel, 'data', 'curated', 'horizonte-staffeln.yaml'), 'titel:\n  - anilistId: 158871\n    titel: "Pokémon Horizonte"\n    basis: 2\n    staffeln:\n      - { nr: 1, von: 1, bis: 3, folgen: 3, kennung: 7000001 }\n      - { nr: 2, von: 4, offen: true }\n')
+    writeFileSync(join(wurzel, 'data', 'tv-programm.json'), JSON.stringify({ sendungen: { a: sendung('2026-09-16', '16:05', 'Feliospa mit Herz') } }))
+    writeFileSync(join(wurzel, 'data', 'wikipedia-folgen.json'), JSON.stringify({ titel: { [SAMMEL]: { seite: 'X', folgen: wiki.slice(0, 4) } } }))
+    const lauf = spawnSync(process.execPath, ['--import', 'tsx', fileURLToPath(new URL('./lib/kulisse-staffel-titel.ts', import.meta.url))], { env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8', windowsHide: true, timeout: 60_000 })
+    const zeile = lauf.stdout.trim().split('\n').at(-1) ?? ''
+    pruefe('Ladeweg: Plan, Sichtungen und Liste aus AK_ROOT; Termin landet in Staffel 1 Folge 2', lauf.status === 0 && zeile === '{"plaene":[[7000001,158871]],"sendungen":1,"wiki":["158871"],"sammel":[158871],"termin":[[7000001,2]]}', `${lauf.status} ${zeile} ${lauf.stderr.slice(-300)}`)
+    rmSync(join(wurzel, 'data', 'curated', 'horizonte-staffeln.yaml'))
+    const ohne = spawnSync(process.execPath, ['--import', 'tsx', fileURLToPath(new URL('./lib/kulisse-staffel-titel.ts', import.meta.url))], { env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8', windowsHide: true, timeout: 60_000 })
+    pruefe('Ladeweg ohne Plan: nichts gelesen, nichts geteilt', ohne.status === 0 && ohne.stdout.trim().split('\n').at(-1) === '{"plaene":[],"sendungen":0,"wiki":[],"sammel":[],"termin":[[158871,1]]}', ohne.stdout + ohne.stderr.slice(-300))
+  } finally {
+    rmSync(wurzel, { recursive: true, force: true })
+  }
+}
 
 // Verdrahtung, geparst: Phase am Anfang der Auslieferung (nach der Phasenfolge samt Quarantäne, vor `baueMeta`), Sammeltitel bis zur Folgenliste.
 {

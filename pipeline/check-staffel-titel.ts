@@ -4,14 +4,17 @@
  * Titel, Folgenliste, Riegel, Rückweg der Meldungen und `al` der Ausgabe — mit festen Fixtures (Grenzen wie Horizonte 45/44/47/offen).
  * Termine und TV-Zuordnung nach Folgentitel: `check-staffel-titel-termine.ts`. Läuft in `check:logic`.
  */
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
+import { fileURLToPath } from 'node:url'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { StreamLink, Title } from '../shared/types.ts'
 import type { WatchLink } from '../shared/watchlink-typ.ts'
 import { STAFFEL_ID_BASIS, istStaffelTitel, staffelVonTiteln, zurueckAufSammeltitel } from '../shared/staffel-titel.ts'
-import { staffelPlaene, teileStreams, teileTitel, teileWatchLinks, type StaffelPlan } from './lib/staffel-titel.ts'
-import { teileFolgenDatei } from './lib/staffel-folgen.ts'
+import { bereicheDerStaffel, staffelDerFolge, staffelPlaene, teileStreams, teileTitel, teileWatchLinks, type StaffelPlan } from './lib/staffel-titel.ts'
+import { folgenDerStaffel, teileFolgenDatei } from './lib/staffel-folgen.ts'
 import { uebersetzeDatei } from './lib/ausgabe-kennung.ts'
 import { pruefeSchnitt } from './bau/staffel-titel.ts'
 import { sammelSicht, schreibeFolgenEintrag } from './bau/staffel-folgen-schreiben.ts'
@@ -144,7 +147,7 @@ const nach = [{ id: 1 }, ...titel] as Title[]
 const sicht = sammelSicht(nach, [{ titleId: 7_000_002, slug: 'neu' }, { titleId: 1, slug: 'a' }] as never, [{ plan, titel: sammel, releases: [{ titleId: SAMMEL, slug: 'alt' }] as never }])
 pruefe('Sammelsicht: Staffel-Titel weg, Sammeltitel vor dem Schnitt da', sicht.titel.map((t) => t.id).join() === `1,${SAMMEL}` && sicht.titel[1] === sammel)
 pruefe('Sammelsicht: Releases des Sammeltitels statt der Staffeln', sicht.releases.map((r) => r.slug).join() === 'a,alt')
-pruefe('Sammelsicht ohne Sammeltitel: unverändert', sammelSicht(nach, [], []).titel === nach)
+pruefe('Sammelsicht ohne Sammeltitel: unverändert', sammelSicht(nach, [{ titleId: 1 }] as never, []).titel === nach && sammelSicht(nach, [{ titleId: 1, slug: 'r' }] as never, []).releases.length === 1)
 const ordner = mkdtempSync(join(tmpdir(), 'staffel-folgen-'))
 try {
   const ziel = { index: [] as number[], zaehlung: {} as Record<number, [number, number] | [number, number, 1]> }
@@ -152,6 +155,7 @@ try {
   schreibeFolgenEintrag(ordner, SAMMEL, datei, [137, 137, 1], { plan, titel: sammel, releases: [] }, ziel)
   pruefe('Schreiben: gewöhnlicher Titel wie bisher, Sammeltitel je Staffel', ziel.index.join() === '5,7000001,7000002,7000003' && JSON.stringify(ziel.zaehlung[5]) === '[2,0]' && ziel.zaehlung[SAMMEL]?.length === 3, JSON.stringify(ziel))
   pruefe('Schreiben: Datei der Staffel 2 liegt unter ihrer Kennung', JSON.parse(readFileSync(join(ordner, '7000002.json'), 'utf8')).f.length === 44)
+  pruefe('Schreiben: gewöhnlicher Titel liegt unter seiner Kennung', JSON.parse(readFileSync(join(ordner, '5.json'), 'utf8')).f.length === 2)
   pruefe('Schreiben: Zeile außerhalb aller Staffeln bricht ab', wirft(() => schreibeFolgenEintrag(ordner, SAMMEL, { ...datei, f: [...zeilen, [140, 'x']] }, [1, 1], { plan: geschlossen!, titel: sammel, releases: [] }, ziel), /in keiner Staffel/))
 } finally {
   rmSync(ordner, { recursive: true, force: true })
@@ -161,13 +165,51 @@ try {
 const staffelVon = staffelVonTiteln(titel)
 pruefe('Meldung zu Staffel 2 Folge 3 → Sammeltitel Folge 48', JSON.stringify(zurueckAufSammeltitel(7_000_002, 3, staffelVon)) === '{"titel":158871,"folge":48}')
 pruefe('Meldung zur Basis bleibt (alte Meldungen zählen durchlaufend)', JSON.stringify(zurueckAufSammeltitel(SAMMEL, 3, staffelVon)) === '{"titel":158871,"folge":3}')
+pruefe('Folge 1 der Staffel 2 → Folge 46', zurueckAufSammeltitel(7_000_002, 1, staffelVon).folge === 46)
 pruefe('Folge 0 (ganze Seite) bleibt 0', zurueckAufSammeltitel(7_000_003, 0, staffelVon).folge === 0)
 pruefe('fremder Titel unverändert', JSON.stringify(zurueckAufSammeltitel(20, 5, staffelVon)) === '{"titel":20,"folge":5}')
 const ak = (id: number) => ({ 7_000_002: 26461, [SAMMEL]: 14839, 527: 99 })[id] ?? id
 const aus = uebersetzeDatei('titles.json', [titel[1], titel[3]], ak) as { id: number; al: number }[]
-pruefe('Ausgabe: al eines Staffel-Titels zeigt auf den Sammeltitel (AniList-Link lebt)', aus[0]!.id === 26461 && aus[0]!.al === SAMMEL, JSON.stringify(aus[0]))
+pruefe('Ausgabe: al eines Staffel-Titels zeigt auf den Sammeltitel (AniList-Link lebt), Felder bleiben', aus[0]!.id === 26461 && aus[0]!.al === SAMMEL && (aus[0] as { titleDe?: string }).titleDe === 'Pokémon Horizonte – Staffel 2', JSON.stringify(aus[0]))
 pruefe('Ausgabe: al der Basis ist ihre eigene Kennung', aus[1]!.id === 14839 && aus[1]!.al === SAMMEL)
 pruefe('Ausgabe: al gewöhnlicher Titel unverändert', (uebersetzeDatei('titles.json', [{ id: 20 }], ak) as { al: number }[])[0]!.al === 20)
+
+// --- Grenzen und Ränder (Mutanten der Diff-Probe) -------------------------------------------------------------------------------------
+pruefe('Staffel der Folge an den Grenzen: 45 → 1, 46 → 2, 136 → 3, 137 → 4, 0 → keine', [45, 46, 136, 137, 999].map((n) => staffelDerFolge(plan, n)?.nr).join() === '1,2,3,4,4' && staffelDerFolge(plan, 0) === undefined)
+pruefe('Bereich an der Grenze (45–46): je eine Folge in Staffel 1 und 2', JSON.stringify([1, 2].map((nr) => bereicheDerStaffel([{ from: 45, to: 46, dub: true }], plan.staffeln[nr - 1]!))) === '[[{"from":45,"to":45,"dub":true}],[{"from":1,"to":1,"dub":true}]]')
+const bisVier = teileStreams([{ ...rtl, dubRanges: [{ from: 1, to: 140, dub: true }] }], plan).je.get(4)![0]!
+pruefe('offene Staffel: teilBereich bis zur höchsten Folge des Weges (137–140)', JSON.stringify(bisVier.teilBereich) === '{"von":137,"bis":140}' && JSON.stringify(bisVier.dubRanges) === '[{"from":1,"to":4,"dub":true}]', JSON.stringify(bisVier))
+const [eine] = staffelPlaene([{ anilistId: 5, basis: 1, staffeln: [{ nr: 1, von: 1 }] }])
+pruefe('Plan ohne Titel: Name aus der Kennung; eine Staffel: kein sharedWith', eine!.titel === '5' && teileStreams([ohneBereich, rtl], eine!).je.get(1)!.every((s) => s.sharedWith === undefined))
+pruefe('TOGGO-Hinweis behält Name und Adresse', l.je.get(2)!.find((x) => x.toggo)?.name === 'TOGGO' && l.je.get(2)!.find((x) => x.toggo)?.url === 'https://www.toggo.de/x')
+pruefe('Titel tragen nur ihre Wege: Staffel 2 RTL+ 1–44, kein Netflix; TOGGO nur Staffel 2', JSON.stringify(titel[1]!.streams!.map((s) => [s.platform, s.dubRanges])) === '[["rtlplus",[{"from":1,"to":44,"dub":true}]]]' && titel[1]!.watchLinks!.every((x) => x.toggo!.every((b) => b.staffel === 2)), JSON.stringify(titel[1]!.streams))
+pruefe('Titel tragen ihre Felder weiter (Kopie, nicht nur Kennung)', titel.every((t) => t.franchiseId === 527 && t.genres !== sammel.genres))
+pruefe('Folgenliste: deutscher Bereich, der in der Staffel beginnt, bleibt dort (50–60 → 5–15)', JSON.stringify(folgenDerStaffel({ f: zeilen, de: [[50, 60]] }, plan.staffeln[1]!)!.de) === '[[5,15]]')
+const kurzDe = teileFolgenDatei({ f: zeilen, de: [[1, 100]] }, plan)
+pruefe('Zählung: abgeschlossene Staffel zählt bis zu ihrem Ende, auch wenn Deutsch früher endet (Staffel 3: [47, 11])', JSON.stringify(kurzDe.zaehlung.get(7_000_003)) === '[47,11]', JSON.stringify(kurzDe.zaehlung.get(7_000_003)))
+const zwei = teileFolgenDatei({ f: [[45, 'a'], [46, 'b'], [47, 'c'], [90, 'd']], de: [] }, plan)
+pruefe('Datei ab zwei Zeilen (Staffel 2: 2 Zeilen → Datei, Staffel 1 und 3: 1 Zeile → keine)', [...zwei.dateien.keys()].join() === '7000002', [...zwei.dateien.keys()].join())
+
+// --- Folgenlisten im echten Aufrufer (`schreibeFolgenDateien`, Kindprozess mit AK_ROOT) ---------------------------------------------------
+{
+  const wurzel = mkdtempSync(join(tmpdir(), 'staffel-folgen-bau-'))
+  try {
+    for (const d of ['data', 'public']) mkdirSync(join(wurzel, d, d === 'public' ? 'data' : ''), { recursive: true })
+    const folgen = (n: number) => Array.from({ length: n }, (_, i) => ({ nr: i + 1, datum: '2023-04-14', minuten: 24, de: `Folge ${i + 1}` }))
+    writeFileSync(join(wurzel, 'data', 'anisearch-folgen.json'), JSON.stringify({ 801: { folgen: folgen(5) }, 802: { folgen: folgen(2) } }))
+    writeFileSync(join(wurzel, 'data', 'anisearch.json'), JSON.stringify({ 900501: { anisearchId: 801 }, 900502: { anisearchId: 802 } }))
+    writeFileSync(join(wurzel, 'data', 'folgen-hinweise.yaml'), '[]\n')
+    writeFileSync(join(wurzel, 'data', 'kino-ankuendigungen.yaml'), '[]\n')
+    const tsx = createRequire(import.meta.url).resolve('tsx/cli')
+    const lauf = spawnSync(process.execPath, [tsx, fileURLToPath(new URL('./lib/kulisse-staffel-folgen.ts', import.meta.url))], { env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8', windowsHide: true, timeout: 120_000 })
+    const aus = JSON.parse(lauf.stdout.trim().split('\n').at(-1) || '{}') as { index?: number[]; zaehlung?: Record<string, number[]>; dateien?: Record<string, { f: unknown[][]; de: number[][]; s?: unknown }> }
+    pruefe('Folgenliste im Bau: Sammeltitel geteilt (Staffel 1 und Basis), gewöhnlicher Titel wie bisher', lauf.status === 0 && aus.index?.join() === '900501,900502,7000001', `${lauf.status} ${aus.index} ${lauf.stderr.slice(-300)}`)
+    pruefe('Folgenliste im Bau: Staffel 1 drei Zeilen, Basis zwei ab 1, deutsch aus den Wegen des Sammeltitels', aus.dateien?.['7000001']?.f.length === 3 && JSON.stringify(aus.dateien?.['900501']?.f.map((z) => z[0])) === '[1,2]' && JSON.stringify(aus.dateien?.['900501']?.de) === '[[1,2]]' && JSON.stringify(aus.dateien?.['7000001']?.de) === '[[1,3]]', JSON.stringify(aus.dateien))
+    pruefe('Folgenliste im Bau: Zählung je Staffel, offene Basis mit dritter Stelle', JSON.stringify(aus.zaehlung) === '{"900501":[2,2,1],"900502":[2,0],"7000001":[3,3]}', JSON.stringify(aus.zaehlung))
+  } finally {
+    rmSync(wurzel, { recursive: true, force: true })
+  }
+}
 
 console.log(`check-staffel-titel: ${faelle} Fälle, ${fehler} Fehler`)
 process.exit(fehler ? 1 : 0)

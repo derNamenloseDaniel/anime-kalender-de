@@ -12,6 +12,7 @@ import type { StreamLink, Title } from '../../shared/types.ts'
 import type { WatchLink } from '../../shared/watchlink-typ.ts'
 import { istStaffelTitel } from '../../shared/staffel-titel.ts'
 import type { StaffelGrenzen } from './pokemon-staffeln.ts'
+import { slugify } from './util.ts'
 
 export type StaffelPlanZeile = { nr: number; von: number; bis?: number; kennung: number }
 /** `quelle`: die Wikipedia-Episodenliste, aus der TV-Termine Staffel und Folge bekommen (setzt die Phase), für `sources`. */
@@ -44,14 +45,6 @@ export function staffelPlaene(grenzen: StaffelGrenzen[]): StaffelPlan[] {
 export function staffelDerFolge(plan: StaffelPlan, folge: number): StaffelPlanZeile | undefined {
   return plan.staffeln.find((s) => folge >= s.von && (s.bis === undefined || folge <= s.bis))
 }
-
-const slugTeil = (s: string): string =>
-  s
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
 
 export const staffelName = (plan: StaffelPlan, nr: number): string => `${plan.titel} – Staffel ${nr}`
 
@@ -138,7 +131,7 @@ export function teileTitel(sammel: Title, plan: StaffelPlan): Title[] {
     t.titleDe = staffelName(plan, s.nr)
     t.staffelTitel = { sammel: plan.sammel, nr: s.nr, ab: s.von }
     if (s.kennung !== plan.sammel) {
-      t.slug = `${slugTeil(t.titleDe)}-${s.kennung}`
+      t.slug = `${slugify(t.titleDe)}-${s.kennung}`
       delete t.malId
     }
     if (s.bis !== undefined) t.episodes = s.bis - s.von + 1

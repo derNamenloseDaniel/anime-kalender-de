@@ -21,11 +21,12 @@ export type StaffelFolge = { nr: number; folge: number }
 /**
  * Folgentitel → Staffel und Folge aus der Wikipedia-Liste. Die Staffel zählt mit jedem Rücksprung von `st` auf 1 weiter; sie muss mit der
  * Staffel übereinstimmen, die der Plan der durchlaufenden Position gibt (sonst sind Liste und Yaml auseinandergelaufen: wirft).
- * Ein Titel, der zweimal vorkommt, ordnet nichts zu.
+ * Ein Titel, der zweimal vorkommt, ordnet nichts zu; eine Liste ohne „Folge in der Staffel“ (`st`) auch nicht (die Staffeln wären geraten).
  */
 export function staffelJeFolgentitel(folgen: WikiFolge[], plan: StaffelPlan): Map<string, StaffelFolge> {
   const aus = new Map<string, StaffelFolge>()
   const doppelt = new Set<string>()
+  if (folgen.some((f) => f.st === undefined)) return aus
   let nr = plan.staffeln[0]!.nr - 1
   folgen.forEach((f, i) => {
     if (f.st === 1 || i === 0) nr++
@@ -34,7 +35,7 @@ export function staffelJeFolgentitel(folgen: WikiFolge[], plan: StaffelPlan): Ma
     const k = folgenKern(f.dt)
     if (!k) return
     if (aus.has(k)) doppelt.add(k)
-    aus.set(k, { nr, folge: f.st ?? i + 2 - (lautPlan?.von ?? 1) })
+    aus.set(k, { nr, folge: f.st! })
   })
   for (const k of doppelt) aus.delete(k)
   return aus

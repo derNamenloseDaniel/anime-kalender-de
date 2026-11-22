@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-21T23:01:50.391Z",
+  "scrapedAt": "2026-11-22T00:02:04.558Z",
   "verworfen": {
     "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 7,
@@ -6169,7 +6169,7 @@
         }
       ],
       "dub": "unklar",
-      "alreadyCurated": false
+      "alreadyCurated": true
     },
     {
       "articleTitle": "Disney+ entfernt weitere Streaming-Funktion in Deutschland",

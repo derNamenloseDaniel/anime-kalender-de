@@ -148,9 +148,12 @@ const mitDoppelpunkt = staffelJeFolgentitel([{ nr: 1, st: 1, dt: 'Teil 1: Der An
 pruefe('Folgentitel mit Doppelpunkt: ganzer Titel trifft, wenn der gekürzte nicht trifft', trefferFuer(mitDoppelpunkt, 'Teil 1: Der Anfang des Weges')?.folge === 1 && trefferFuer(mitDoppelpunkt, undefined) === undefined)
 const kurz = staffelJeFolgentitel([{ nr: 1, st: 1, dt: 'Kurz' }], plan)
 pruefe('kurzer Folgentitel hinter Vorspann: wörtlicher Treffer (ohne Schreibvarianten-Suche)', trefferFuer(kurz, 'Pokémon Horizonte: Kurz')?.folge === 1)
-const nebel = staffelJeFolgentitel([{ nr: 1, st: 1, dt: 'Lied im Nebel' }, { nr: 2, st: 2, dt: 'Der Weg nach Hause' }, { nr: 3, st: 3, dt: 'Ein Weg nach Hause' }], plan)
+const nebel = staffelJeFolgentitel([{ nr: 1, st: 1, dt: 'Lied im Nebel' }], plan)
 pruefe('Artikel-Rückfall: „Ein Lied im Nebel“ trifft „Lied im Nebel“', JSON.stringify(trefferFuer(nebel, 'Pokémon Horizonte: Ein Lied im Nebel')) === '{"nr":1,"folge":1}', JSON.stringify(trefferFuer(nebel, 'Ein Lied im Nebel')))
-pruefe('Artikel-Rückfall trifft zwei Folgen („Weg nach Hause“): keine Zuordnung', trefferFuer(nebel, 'Weg nach Hause') === undefined && trefferFuer(nebel, 'Der Weg nach Hause')?.folge === 2)
+// „Der Weg nach Haus“ macht die Schreibvarianten-Suche mehrdeutig: Nur der wörtliche Kern trifft „Der Weg nach Hause“.
+const weg = staffelJeFolgentitel([{ nr: 1, st: 1, dt: 'Der Weg nach Hause' }, { nr: 2, st: 2, dt: 'Ein Weg nach Hause' }, { nr: 3, st: 3, dt: 'Der Weg nach Haus' }], plan)
+pruefe('Artikel-Rückfall trifft zwei Folgen („Weg nach Hause“): keine Zuordnung', trefferFuer(weg, 'Weg nach Hause') === undefined)
+pruefe('wörtlicher Kern vor Schreibvariante und Rückfall', trefferFuer(weg, 'Pokémon Horizonte: Der Weg nach Hause')?.folge === 1)
 const handTv = { ...tvRelease, slug: 'hand-tv', sendungen: undefined, schedule: { firstEpisodeDate: '2026-10-01', firstEpisodeNumber: 5, episodeCount: 2 } } as unknown as Release
 const handEv = { ...ev('2026-10-01', '09:00', 5), id: 'hand-tv@2026-10-01', releaseSlug: 'hand-tv', sichtung: undefined }
 const hand = teileTermine([handTv], [handEv], plan, sendeplatz, jeTitel)

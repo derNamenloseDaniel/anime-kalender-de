@@ -34,9 +34,21 @@ pruefe('Franchise-FSK: Freigabe bleibt unberührt', karte.get(90001)!.fskQuelle 
 suchadressenInTemp() // der Abschluss schreibt Listen; nie in getrackte Dateien
 // Verdrahtung: der echte Abschluss der Wege setzt den Wert (rot, sobald der Aufruf dort fehlt)
 const abschluss = (titles: Map<number, Title>, releases: Release[] = []) => schliesseWegeAb({
-  titles, anisearch: {}, releases, zugangJeAdresse: new Map(), tmdbMehrdeutig: new Set(), toteAdressen: new Set(), linkBefunde: {},
-  verweiseEntfernt: [], crAdresseZu: () => undefined, beantworteteSuchen: new Set(), suchOffen: [], alleChecks: [], lautPruefungTot: () => false,
-  checksJePlattform: new Map(), belegFuer: () => undefined,
+  titles,
+  anisearch: {},
+  releases,
+  zugangJeAdresse: new Map(),
+  tmdbMehrdeutig: new Set(),
+  toteAdressen: new Set(),
+  linkBefunde: {},
+  verweiseEntfernt: [],
+  crAdresseZu: () => undefined,
+  beantworteteSuchen: new Set(),
+  suchOffen: [],
+  alleChecks: [],
+  lautPruefungTot: () => false,
+  checksJePlattform: new Map(),
+  belegFuer: () => undefined,
 })
 const mitStreams = (...x: Title[]) => new Map(x.map((y) => [y.id, { ...y, streams: [] } as unknown as Title]))
 const bau = mitStreams(t(900040, 'TV', 12), t(900041, 'TV'))

@@ -26,7 +26,7 @@ mockup({
   name: 'filter-konzept',
   titel: 'Filterkonzept – Disc aus, getrennte Filter',
   ausschnitt: 'datenbank',
-  faelle: ['yaiba-joyn', 'attack-on-titan', 'sakamoto-days', 'dan-da-dan', 'fernsehtag-detektiv-conan'],
+  faelle: ['attack-on-titan', 'yaiba-joyn', 'sakamoto-days', 'dan-da-dan', 'fernsehtag-detektiv-conan'],
   suchadressen: {
     'yaiba-joyn': { q: 'Yaiba', xrt: 'disc' },
     'attack-on-titan': { q: 'Final Season', xrt: 'disc' },

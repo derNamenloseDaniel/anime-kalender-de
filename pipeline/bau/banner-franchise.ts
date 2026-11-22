@@ -20,7 +20,7 @@ export function waehleBannerSpender(t: Title, spender: Title[]): Title | undefin
 /**
  * Ein Titel ohne Banner übernimmt das eines anderen Teils seiner Reihe (`franchiseId`) und trägt `bannerVon` (Kennung des Spenders),
  * damit Oberfläche und `tools/maengel.mjs` das abgeleitete Bild vom eigenen unterscheiden. Spender ist nur, wer sein Banner selbst hat
- * (keine Ketten); Titel ohne Reihe bekommen nichts. Gibt die Kennungen der Empfänger zurück.
+ * (keine Ketten); Wer allein in der Reihe steht, bekommt nichts; der Reihenkopf (ohne `franchiseId`) zählt als Mitglied. Gibt die Kennungen der Empfänger zurück.
  */
 export function uebernehmeFranchiseBanner(titles: Map<number, Title>): number[] {
   const eigene = new Map<number, Title[]>()

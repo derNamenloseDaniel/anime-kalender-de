@@ -1,5 +1,6 @@
-import { log } from '../lib/util.ts'
+import { log, readJson } from '../lib/util.ts'
 import type { Fsk, Title } from '../../shared/types.ts'
+import { fskQuelleFehler } from './11-2-1-fsk-justwatch.ts'
 
 /**
  * FSK eines Titels ohne Freigabe aus den anderen Teilen seiner Reihe: nur von Teilen **mit gleichem Format**
@@ -20,8 +21,12 @@ export function fskAusFranchise(titel: Title, alle: Iterable<Title>): Fsk | unde
 
 /** Läuft nach JustWatch: ein Wert aus Freigabe oder Anbieter bleibt; gelesen werden nur Freigaben der Geschwister. */
 export function uebernehmeFskAusFranchise(titles: Map<number, Title>): void {
+  const tmdb = readJson<Record<string, { fsk?: Fsk }>>('data/tmdb-titles.json', {})
+  const tmdbFsk = (id: number) => tmdb[String(id)]?.fsk
   const neu = new Map<number, Fsk>()
   for (const t of titles.values()) {
+    // Liefert TMDB eine Freigabe (verworfen wegen geteilter Kennung), bleibt der Titel offen für die Handzeile.
+    if (tmdbFsk(t.id) !== undefined) continue
     const stufe = fskAusFranchise(t, titles.values())
     if (stufe !== undefined) neu.set(t.id, stufe)
   }
@@ -31,5 +36,7 @@ export function uebernehmeFskAusFranchise(titles: Map<number, Title>): void {
     t.fsk = stufe
     t.fskQuelle = 'franchise'
   }
+  const fehler = fskQuelleFehler(titles.values(), tmdbFsk)
+  if (fehler.length) throw new Error(`FSK aus dem Franchise widerspricht der Zusicherung:\n${fehler.slice(0, 10).join('\n')}`)
   log(`FSK aus dem Franchise: ${neu.size} Titel ohne Freigabe ergänzt (gleiches Format, alle anderen Teile gleicher Wert, gekennzeichnet)`)
 }

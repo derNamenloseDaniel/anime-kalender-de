@@ -1,5 +1,8 @@
 /** Zusicherungen zu `fskAusFranchise` (`bau/11-2-1-fsk-franchise.ts`): gleiches Format, nur Freigaben, Widerspruch ergibt nichts. Aufruf: `npm run check:logic`. */
+import { readFileSync } from 'node:fs'
+import { baueEmpfehlung } from '../shared/empfehlung-pool.ts'
 import type { Title } from '../shared/types.ts'
+import { fskQuelleFehler } from './bau/11-2-1-fsk-justwatch.ts'
 import { fskAusFranchise, uebernehmeFskAusFranchise } from './bau/11-2-1-fsk-franchise.ts'
 
 let verletzt = 0
@@ -10,18 +13,26 @@ function pruefe(name: string, ok: boolean): void {
 const t = (id: number, format: string, fsk?: number, fskQuelle?: 'justwatch' | 'franchise', franchiseId = 1): Title =>
   ({ id, format, fsk, fskQuelle, franchiseId }) as unknown as Title
 
-const alle = [t(1, 'TV', 12), t(2, 'TV', 12), t(3, 'TV'), t(4, 'MOVIE', 16), t(5, 'MOVIE'), t(6, 'TV', 16, 'justwatch'), t(7, 'TV', 18, undefined, 9), t(8, 'TV', undefined, undefined, 9)]
+const alle = [t(90001, 'TV', 12), t(90002, 'TV', 12), t(90003, 'TV'), t(90004, 'MOVIE', 16), t(90005, 'MOVIE'), t(90006, 'TV', 16, 'justwatch'), t(90007, 'TV', 18, undefined, 9), t(90008, 'TV', undefined, undefined, 9)]
 pruefe('Franchise-FSK: TV übernimmt von TV', fskAusFranchise(alle[2]!, alle) === 12)
-pruefe('Franchise-FSK: Film übernimmt von Film, nie von einer Serie', fskAusFranchise(alle[4]!, alle) === 16 && fskAusFranchise(t(10, 'OVA'), alle) === undefined)
+pruefe('Franchise-FSK: Film übernimmt von Film, nie von einer Serie', fskAusFranchise(alle[4]!, alle) === 16 && fskAusFranchise(t(900010, 'OVA'), alle) === undefined)
+pruefe('Franchise-FSK: Film bekommt nichts, wenn nur Serien-Teile Freigaben haben', fskAusFranchise(t(9000915, 'MOVIE', undefined, undefined, 9), alle) === undefined)
 pruefe('Franchise-FSK: Anbieter-Angabe der Geschwister zählt nicht (kein Widerspruch durch 16 bei Titel 6)', fskAusFranchise(alle[2]!, alle) === 12)
 pruefe('Franchise-FSK: andere Reihe ist kein Beleg für Titel 3, aber für Titel 8', fskAusFranchise(alle[7]!, alle) === 18)
-pruefe('Franchise-FSK: Widerspruch der Teile ergibt nichts', fskAusFranchise(t(11, 'TV'), [...alle, t(12, 'TV', 16)]) === undefined)
-pruefe('Franchise-FSK: belegte FSK hat Vorrang', fskAusFranchise(t(13, 'TV', 6), alle) === undefined)
-pruefe('Franchise-FSK: ohne Format nichts', fskAusFranchise(t(14, ''), alle) === undefined)
+pruefe('Franchise-FSK: Widerspruch der Teile ergibt nichts', fskAusFranchise(t(900011, 'TV'), [...alle, t(900012, 'TV', 16)]) === undefined)
+pruefe('Franchise-FSK: belegte FSK hat Vorrang', fskAusFranchise(t(900013, 'TV', 6), alle) === undefined)
+pruefe('Franchise-FSK: ohne Format nichts', fskAusFranchise(t(900014, ''), alle) === undefined)
 
 const karte = new Map(alle.map((x) => [x.id, x]))
 uebernehmeFskAusFranchise(karte)
-pruefe('Franchise-FSK: gesetzt wird mit Kennzeichnung', karte.get(3)!.fsk === 12 && karte.get(3)!.fskQuelle === 'franchise')
-pruefe('Franchise-FSK: abgeleiteter Wert speist den nächsten nicht', karte.get(5)!.fsk === 16 && karte.get(5)!.fskQuelle === 'franchise' && karte.get(8)!.fsk === 18)
-pruefe('Franchise-FSK: Freigabe bleibt unberührt', karte.get(1)!.fskQuelle === undefined && karte.get(6)!.fskQuelle === 'justwatch')
+pruefe('Franchise-FSK: gesetzt wird mit Kennzeichnung', karte.get(90003)!.fsk === 12 && karte.get(90003)!.fskQuelle === 'franchise')
+pruefe('Franchise-FSK: abgeleiteter Wert speist den nächsten nicht', karte.get(90005)!.fsk === 16 && karte.get(90005)!.fskQuelle === 'franchise' && karte.get(90008)!.fsk === 18)
+pruefe('Franchise-FSK: Freigabe bleibt unberührt', karte.get(90001)!.fskQuelle === undefined && karte.get(90006)!.fskQuelle === 'justwatch')
+const abschluss = readFileSync(new URL('./bau/11-wege-abschluss.ts', import.meta.url), 'utf8')
+const jw = abschluss.indexOf('uebernehmeFskAusJustwatch({')
+pruefe('Franchise-FSK: der Bau ruft die Regel, und zwar nach JustWatch', jw > 0 && abschluss.indexOf('uebernehmeFskAusFranchise(titles)') > jw)
+pruefe('Franchise-FSK: Zusicherung meldet ungültige Stufe und TMDB-Freigabe', fskQuelleFehler([t(900020, 'TV', 14, 'franchise')], () => undefined).length === 1 && fskQuelleFehler([t(900021, 'TV', 12, 'franchise')], () => 16).length === 1)
+const pool = (x: Title): Title => ({ ...x, titleDe: 'T', genres: [], keywords: [], coverImage: 'c.jpg', streams: [{ platform: 'netflix', url: 'u', dub: true, zugang: 'abo' }] }) as unknown as Title
+const einstiege = baueEmpfehlung([pool(t(900030, 'TV', 12, 'franchise', 900030)), pool(t(900031, 'TV', 16, undefined, 900031)), pool(t(900032, 'TV', 6, 'justwatch', 900032))], {}).einstiege
+pruefe('Franchise-FSK: die Empfehlung führt abgeleitete FSK nie, Freigabe und Anbieter wie bisher', einstiege.find((k) => k.id === 900030)?.fsk === undefined && einstiege.find((k) => k.id === 900031)?.fsk === 16 && einstiege.find((k) => k.id === 900032)?.fsk === 6)
 if (verletzt) process.exit(1)

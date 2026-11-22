@@ -101,6 +101,10 @@ pruefe('wertung: Treffer', arten(gut(1, { score: undefined })).join() === 'wertu
 pruefe('wertung: Titel ohne AniList-Kennung (eigener, nur-aniSearch) hat keine Quelle mit genug Stimmen — belegte Ausnahme, kein offener Mangel', arten(gut(5_000_001, { score: undefined })).join() === 'wertung:keine-quelle-mit-stimmen' && arten(gut(10_000_042, { score: undefined })).join() === 'wertung:keine-quelle-mit-stimmen')
 pruefe('wertung: AniList-Titel ohne Wertung bleibt offen (Quelle vorhanden)', arten(gut(4_999_999, { score: undefined })).join() === 'wertung')
 pruefe('studio: Treffer', arten(gut(1, { studios: [] })).join() === 'studio')
+/* aniSearch-Zeile (Kennung ab 10 Mio.) wird aus einem Eintrag gebaut: leeres Studio heißt `st` des Eintrags leer. */
+pruefe('studio: aniSearch-Zeile mit leerem st ist Ausnahme quelle-ohne-studio', [10_000_042, 10_000_043].every((id) => arten(gut(id, { studios: [] })).join() === 'studio:quelle-ohne-studio'))
+pruefe('studio: Titel ohne aniSearch-Eintrag (Eigentitel, AniList) bleibt offen', [5_000_001, 4_999_999, 4_999_998].every((id) => arten(gut(id, { studios: [] })).join() === 'studio'))
+pruefe('studio: aniSearch-Zeile mit Studio ist kein Mangel', arten(gut(10_000_042, { studios: ['X'] })).length === 0)
 pruefe('genre: Treffer', arten(gut(1, { genres: [] })).join() === 'genre')
 pruefe('laufzeit: Treffer', arten(gut(1, { runtimeMin: undefined })).join() === 'laufzeit')
 pruefe('jahr: Treffer', arten(gut(1, { jpYear: undefined })).join() === 'jahr')

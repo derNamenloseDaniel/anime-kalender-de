@@ -1,123 +1,173 @@
-# Filterkonzept, Teil 2: Umsetzungsplan (22.11.2026)
+# Filterkonzept, Umsetzungsplan (Fassung 2 nach Gegenprüfung, 22.11.2026)
 
-Schritt 1 von 3 (Analyse + Plan). Grundlage: [analyse.md](analyse.md). Schritt 2 ist die Umsetzung, Schritt 3 Mockup/Bilder vorher–nachher. Regeln: Umbau und Verhaltensänderung nie im selben Commit (CLAUDE.md), `check:umfang` darf nur sinken, neues Verhalten in eigener Funktion/Datei, `filters.ts` hat 593 Zeilen und `FilterDetails.tsx` 784 (Grenze 800): neuer Code geht in neue Module.
+**Fassung 2 nach Gegenprüfung.** Grundlage: [analyse.md](analyse.md), Befunde in [gegenpruefung.md](gegenpruefung.md) (B1–B17, hier als „B<n>“ zitiert). Schritt 3 baut nach diesem Plan.
 
-## 1. Untergrenze und Ansatzvergleich
+**Was sich gegenüber Fassung 1 geändert hat:**
 
-**Untergrenze (kleinster Weg, behebt beide Fehler):**
+1. **Film-Regel (B1):** Streams erben die Art `movie` vom Werk (`format: MOVIE`); Fassung 1 hätte „Crunchyroll + Film“ von 115 auf 0 gesenkt.
+2. **Zahlenbasis (B2):** die Datenbank hat 3.550 Einträge, nicht 2.926; „Disc aus“ entfernt 29 Titel zu Recht und 139 nicht mehr zu Unrecht.
+3. **Jahr bleibt Release-Jahr (B3)**, nicht `jpYear` (450 → 118 Titel für 2026 wäre ein Verlust).
+4. **Keine neuen Speicher (B4, B5):** Schnellfilter bleiben Vorlieben, aber je Ansicht ein Schlüssel; nicht in die Adresse; kein `sessionStorage`; kein Dauerspeicher für Kalender-Listenfilter.
+5. **Rettungsweg-Regel (B5, B6)** mit `watchLinks`; Disc-Weg = `platform disc` oder `releaseType disc`.
+6. **Push-Abo (B7):** Kalender-Schnellfilter nur aus eigenem Speicher; Wächter.
+7. **Migration (B8):** durchlesend in `vorliebenLesen`, Datenbank startet mit der **Kopie**, nicht leer.
+8. **Tests (B9):** `pipeline/check-*.ts` mit Fixtures in `tools/check-logic-liste.txt`, Bestandsprobe in `check-bestand-liste`; Test und Fix im selben PR.
+9. **UND/ODER-Regel (B10)** ist festgelegt.
+10. **Darstellung gestrichen/gedreht (B11–B13):** kein „N Titel zeigen“, kein Auge-Tooltip, TV-Plattformchip entfällt statt des Schnellchips.
+11. **Zustände bleiben (B14):** nur tote Filter entfallen.
+12. **Zahlen an Chips eingeschränkt (B15)**; Mockup, Bühnen-Plan und Vorher/Nachher-Bilder neu (Abschnitt 6).
 
-- A: In `passtTitel` den Ausschluss von Plattform/Art/Status auf Weg-Ebene rechnen (ca. 40 Zeilen) und die Vorlieben je Ansicht trennen (zwei Schlüssel statt einem, ca. 30 Zeilen).
-- Kein neues Konzept, keine UI-Änderung. Löst Yaiba und das Leck, lässt aber die falschen Kombinationen (Netflix + Disc 22, Crunchyroll + Film 115) und die toten Filter bestehen.
+Regeln: Umbau und Verhaltensänderung nie im selben Commit; `check:umfang` darf nur sinken (`filters.ts` 593 Zeilen, `FilterDetails.tsx` 784 von 800: neuer Code in neue Module); jeder PR ein Thema.
 
-**Ansatz B (empfohlen): „Wege-Sicht“ als eigenes Modul** `web/src/lib/wege-filter.ts`: Jeder Titel liefert seine Wege (`wegeVon(title, releases)`), Weg-Filter (Plattform, Anbieter, Art, Status, kostenlos, streambar) laufen **einmal** über die Wege, Titel-Filter wie bisher. Karte und Ergebnis lesen dieselben Wege. Löst Yaiba, Kombinationen und das Karten-Badge in einem Zug.
+## 1. Untergrenze, Gegenentwurf, Wahl
 
-**Ansatz C (verworfen):** Den Datensatz in Weg-Zeilen aufteilen (eine Zeile je Weg in `titles.json`). Ändert das Datenformat, Download und Budget (`ZIELE.md`); Gewinn gegenüber B nur bei sehr großen Mengen, bei 2.926 Titeln unnötig.
+- **Untergrenze (Stufe 1, ≈ 70 Zeilen):** Weg-Regel im Ausschluss + je Ansicht ein Vorlieben-Schlüssel + `useKalenderFilter` unabhängig von der Route. Löst beide Fehler von Daniel.
+- **Gegenentwurf (Plan-Agent, nur Ziel bekannt):** `wege[]` als Datenfeld in `titles.json`, Speicher `{kalender, datenbank, version}`. Verworfen (Schema, Download-Budget, Worker); `wegeVon` bleibt rein und kann später in die Pipeline wandern (gegenpruefung.md C).
+- **Gewählt:** Weg-Modul `web/src/lib/wege-filter.ts` in zwei Stufen. Stufe 1 liefert die Untergrenze plus Modul für den Ausschluss; Stufe 2 den Einschluss (gleicher Weg), Jahr/Status/kostenlos und die Darstellung.
 
-B kostet etwa dreimal so viel wie A, schließt aber die Klasse, nicht nur den Einzelfall. Der Gegenentwurf eines Agenten, der nur das Ziel kennt, wird vor Schritt 2 eingeholt (Regel „tragende Aufgaben“), und die Rechnung (Messskript, Analyse 2.4) wird gegen den Neubau gehalten.
+## 2. Festgelegte Regeln (Spezifikation für Schritt 3)
 
-## 2. Schritte
+**R1 Einheiten.** Titel-Filter (Genre, Schlagwort, FSK, Herkunft, Wertung, Cartoon, Favoriten, Vertrauen, Sprecher, Film-Werk) entscheiden über den Titel. Weg-Filter (Plattform, Anbieter, Art, Status, Jahr, kostenlos, Disc, TV, „streambar“) entscheiden über **Wege**.
 
-Jeder Schritt ist ein eigener PR; Umbau und Verhalten getrennt.
+**R2 Wege eines Titels.** `wegeVon(titel, releases)` liefert je Eintrag `{plattform, art?, status?, jahr?, frei?, quelle}`:
+- je Release: `platform`, `releaseType`, `releaseStatus(r, heute)`, `year`, `quelle: 'release'`;
+- je `streams[]`: `platform`, `frei = zugang === 'kostenlos'`, `art = 'movie'` wenn `titel.format === 'MOVIE'` sonst keine, `quelle: 'stream'`;
+- je `watchLinks` mit `kind: 'stream'`: `plattform = Name` (nur über „Anbieter“ filterbar), `art` wie Stream, `quelle: 'link'`; `buy`-Links sind kein Weg.
+Disc-Weg: `platform === 'disc' || art === 'disc'` (B6). Berechnung einmal je Titel (`WeakMap`).
 
-### S1: Messbasis (Test zuerst, rot vorher)
+**R3 Ausschluss.** Ein Titel bleibt, wenn er **keinen** Weg hat oder mindestens **einen** Weg, der keinen Ausschluss trifft. Reiner Handel („Disc aus“) fällt weg: 29 von 3.550 (Messung 22.11.2026).
 
-- Neu: `web/src/lib/filters.wege.test.ts` mit Fixture aus echten Fällen: Yaiba (`177476`), Titel Netflix+Disc, Crunchyroll+Film, ein Titel nur Disc, einer ganz ohne Weg.
-- Erwartung als **rote** Tests gegen den Ist-Code: Disc-Ausschluss behält Yaiba; Netflix+Disc ergibt 0; „kostenlos + Netflix“ ergibt 0.
-- Vorher/Nachher-Zahlen aus Analyse 2.1 und 2.2 als Zählprobe über `public/data` (Skript `tools/filter-zaehlprobe.mjs`, Ausgabe festgeschrieben in `docs/konzept/filter/zahlen.json`; Exit 0).
-- Dateien: neu `web/src/lib/filters.wege.test.ts`, `tools/filter-zaehlprobe.mjs`.
+**R4 Einschluss und gleicher Weg.** Mehrere Weg-Einschlüsse müssen vom **selben** Weg erfüllt werden. Je Dimension gilt ODER (Vorgabe) oder UND (`modus`, B10):
+1. Kandidatenwege = Wege, die alle Ausschlüsse bestehen und in jeder ODER-Dimension einen gewählten Wert tragen;
+2. je UND-Dimension braucht jeder gewählte Wert einen eigenen Zeugen unter den Kandidaten (verschiedene Wege erlaubt);
+3. gibt es keine UND-Dimension, genügt ein Kandidat.
+Titel ohne Weg scheitern an jedem Einschluss (wie heute).
 
-### S2: Weg-Modul (reiner Umbau, noch kein Verhalten)
+**R5 Karte zeigt nur bestehende Wege.** Plattform-Chips und Disc-Abzeichen der Karte lesen die Kandidatenwege (Yaiba bei „Disc aus“: Joyn und TV, kein Disc-Abzeichen).
 
-- Neu `web/src/lib/wege-filter.ts` (`wegeVon`, `wegPasst`, `titelPasstWege`), nicht angeschlossen; Tests grün für das Modul allein.
-- `check:umfang` bleibt gleich.
-- Dateien: neu `web/src/lib/wege-filter.ts`, Test-Erweiterung.
+**R6 Zahlen am Datensatz sind die Erwartung der Tests** (Tabelle in Abschnitt 5).
 
-### S3: Datenbank-Ausschluss auf Weg-Ebene (Verhaltensänderung, behebt Yaiba)
+**R7 Entfallende Zustände (nur tot oder widersprüchlich):** „bestätigt“ in der Datenbank; „Jahr“ im Kalender; „verfügbar“ im Kalender (Vorliebe, wirkungslos). Alle anderen bleiben dreiwertig. Schnellchip TV bleibt im Kalender, der TV-Plattformchip dort entfällt. Zweitanbieter bleibt „nur ausblenden“.
 
-- `passtTitel` (`filters.ts` Z. 506–520) ruft `titelPasstWege` für Plattform, Anbieter, Art, Status, Jahr (ein Jahr: `jpYear`), kostenlos, streambar; die alten Zeilen entfallen. `filters.ts` sinkt.
-- Karten: `DbKarte` zeigt nur die Wege, die den Filter bestehen (Plattform-Chips, Disc-Badge). Fundstellen/Suche unberührt.
-- Sonderfall „Film ausschließen = Werk“ bleibt (`format === 'MOVIE'`), jetzt als Titel-Filter.
-- Dateien: `web/src/lib/filters.ts`, `web/src/components/` (Karte der Datenbank, `PosterKarte`-Umfeld), Tests, `docs/wissen/datensatz.md` (Abschnitt „Filterebene Titel/Weg“).
+## 3. Schritte (je ein PR; Reihenfolge nach Wirkung)
 
-### S4: Kalender- und Datenbank-Speicher trennen (Verhaltensänderung, behebt das Leck)
+### M0: Mockup auf der Bühne (zuerst, hält die Entscheidung fest; Abschnitt 6)
+Vor dem ersten Bau-PR gemergt (Skill `mockups`).
 
-- `vorlieben.ts` bleibt als Typ, bekommt zwei Schlüssel: `vorlieben.kalender` (localStorage) und `vorlieben.datenbank` (sessionStorage, plus Adresse).
-- `parseHash` (`router.ts` Z. 132–150): Im Kalender nur noch `vorlieben.kalender`; in der Datenbank `vorlieben.datenbank` und Adresse (`fav=1`, `frei=1`, `xrt=…`, `st=…`); `schreiber()` ruft `vorliebenNachfuehren` je Ansicht mit dem passenden Schlüssel.
-- `kalenderBasis()`/`kalenderFilter()` in `kalender-filter.ts` vereinfachen: Kalender hat **einen** eigenen Speicher, `route.filters` trägt nur noch die Datenbank; `useKalenderFilter` schreibt in `vorlieben.kalender`.
-- Push: `usePushNachfuehren` liest weiter die Kalender-Filter (`kalenderFilters`), keine Änderung am Worker (`shared/push-filter.ts`).
-- Dateien: `web/src/lib/vorlieben.ts`, `router.ts`, `kalender-filter.ts`, `App.tsx`, `web/src/components/kalender/KalenderBereich.tsx`, Tests `vorlieben`, `router`, `kalender-filter`.
+### S1: Yaiba-Fix und Trennung (Verhaltensänderung, Stufe 1)
+- Neu `web/src/lib/wege-filter.ts` (`wegeVon`, `kandidatenWege`, `titelPasstAusschluss`); `passtTitel` (`filters.ts:496-520`) nutzt es für Plattform, Anbieter, Art im **Ausschluss**; die alten Zeilen entfallen (`filters.ts` sinkt). Film-Werk-Regel und `hatArt` im Einschluss bleiben unverändert (Einschluss kommt in S3).
+- `vorlieben.ts`: `vorliebenLesen(ansicht)`, `vorliebenNachfuehren(ansicht, vorher, nachher)`; Schlüssel `vorlieben.kalender` und `vorlieben.datenbank`; Lesen fällt auf den alten Schlüssel `vorlieben` zurück (Migration, Abschnitt 5); Felder: Kalender ohne `availableX`, Datenbank ohne `confirmedX`.
+- `router.ts`: `parseHash` setzt Vorlieben nur der aktuellen Ansicht ein (`router.ts:182-197`); `schreiber` ruft `vorliebenNachfuehren` nur, wenn `route.view` **und** `merged.view` dieselbe Gruppe (Kalender oder Datenbank) sind, mit dessen Schlüssel (`router.ts:451`); sonst würde ein Ansichtswechsel den Zustand der anderen Ansicht als „Änderung“ schreiben.
+- `kalender-filter.ts`: `useKalenderFilter` hält die Kalender-Schnellfilter (initial aus `vorliebenLesen('kalender')`) im eigenen Zustand; `kalenderBasis(route.filters)` entfällt aus dem Wirkweg; Push (`App.tsx:88`) liest nur diesen Zustand (B7).
+- Gleichzeitig Wächter (Abschnitt 4) und die neuen Zusicherungen. Test und Fix im selben PR; Rot-Beleg: neue Zusicherungen gegen den Stand `36c6d22a` im PR-Text.
+- Dateien: `web/src/lib/wege-filter.ts` (neu), `filters.ts`, `vorlieben.ts`, `router.ts`, `kalender-filter.ts`, `App.tsx`, `pipeline/check-filter-wege.ts` (neu), `check-vorlieben.ts`, `check-kalender-filter.ts`, `check-adressen*.ts`, `check-push-filter*.ts`, `tools/check-logic-liste.txt`, `docs/wissen/datensatz.md` (Abschnitt „Filterebene Titel/Weg“).
 
-### S5: Zustände bereinigen (Verhaltensänderung)
+### S2: Karte und Leerzustand (Verhaltensänderung)
+- Karte (`DbKarte`-Umfeld, Plattform-Chips, Disc-Abzeichen) liest die Kandidatenwege (R5).
+- Leerzustand nennt die Filter (E6): Erweiterung von `suchhinweis.ts`/`suchhinweis-filter.ts`; Text für Besucher, „Kein Treffer wegen: Disc aus · Fantasy · … [Filter lösen]“.
+- Dateien: `web/src/components/DatabaseView.tsx`-Umfeld, `suchhinweis*.ts`, `i18n-spaet.ts`, Zusicherungen.
 
-- „bestätigt“ aus dem Datenbankfenster entfernen (`schnellListe`, `showConfidence`/Ansicht), und aus `activeFilterCount` der Datenbank.
-- Jahr aus dem Kalenderfenster entfernen; Kalender-`FilterState.years` bleibt leer (alter Wert wird beim Lesen verworfen).
-- Zustände 3 → 2 für kostenlos, bestätigt, Status, Favoriten (Kalender): `NUR_NEIN` in `filter-zyklus.ts` wird zu `ZUSTAENDE` je Filter (`['nichts','ja']` oder `['nichts','nein']`).
-- „verfügbar“ → „streambar“ (nur Datenbank), TV nur als Plattformchip im Kalender; Schnellchip TV entfällt.
-- Dateien: `schnellfilter.ts`, `schnellfilter.tsx`, `filter-zyklus.ts`, `FilterDetails.tsx` (nur Streichungen), `i18n-spaet.ts`, Tests.
+### S3: Einschluss auf gleichem Weg, Jahr, Status, kostenlos (Verhaltensänderung)
+- `titelPasstWege` (R4) ersetzt die Einschlussprüfungen für Plattform, Anbieter, Art, Jahr, Status, kostenlos, „streambar“; `modus` wird eingehalten.
+- Erwartungswerte siehe Abschnitt 5 (Netflix + Disc 22 → 0, kostenlos + Netflix 17 → 0, Crunchyroll + Film 115 bleibt, UND-Fall).
+- Dateien: `wege-filter.ts`, `filters.ts`, Zusicherungen.
 
-### S6: Darstellung (Verhaltensänderung)
+### S4: Aufräumen der Zustände und Namen (Verhaltensänderung)
+- „bestätigt“ aus Datenbankfenster und aus `activeFilterCount` der Datenbank; „Jahr“ aus dem Kalenderfenster; Kalender-`availableX` verworfen.
+- Plattformchip TV im Kalender entfällt (`FilterDetails.tsx:752-763`, nur Streichungen).
+- „verfügbar“ → „Streambar“ (`i18n-spaet.ts:312`), Schlüssel und Adresse `wo=1` bleiben.
+- Dateien: `FilterDetails.tsx`, `schnellfilter.ts`/`.tsx`, `i18n-spaet.ts`, Zusicherungen.
 
-- Neue Komponente `web/src/components/filter/AktiveChips.tsx` (bestehendes Chip-Muster, `ak-*`-Tokens): entfernbare Chips unter der Leiste (Handy eine Zeile scrollbar; Desktop in der Kopfzeile der Liste).
-- Zahlen an den Datenbank-Chips (`filter-zaehlung.ts`, Ergebnis ohne eigene Facette; nur Chips im geöffneten Fenster, Berechnung beim Öffnen, Budget am Handy gemessen).
-- Knopf „N Titel zeigen“ statt „Fertig“ (Handy); Desktop-Kopfzeile mit Trefferzahl.
-- Leerzustand nennt die Filter (Erweiterung von `suchhinweis.ts`, Regel E6).
-- Schnellfläche einfarbig; „ohne Synchro“ und „Staffeln zusammenfassen“ in die Ansichtsleiste (Handy: Werkzeugleiste).
-- Auge „Im Handel“: Tooltip „nur im Kalender“.
-- Dateien: `components/filter/*`, `FilterDetails.tsx` (Streichungen, Chip-Gruppen auslagern), `db-kopfzeile.tsx`, `kalender/BereichAuge.tsx`, `i18n-spaet.ts`, `ansicht-*.mjs` (neue Zusicherungen).
+### S5: Darstellung (Verhaltensänderung, nach Live-Messung von S1–S3)
+- Neu `web/src/components/filter/AktiveChips.tsx` (vorhandenes Chip-Muster, `ak-*`): entfernbare Chips der Datenbank unter der Leiste; Handy eine Zeile, seitlich scrollbar; Desktop im Listenkopf (Trefferzahl dort steht schon). Entfernen-Fläche 44 px (`TIPPFLAECHE`), Name „Disc ausgeschlossen, entfernen“, `role="list"`.
+- Schnellfläche im Filterfenster einfarbig (E9); „ohne Synchro“ und „Staffeln zusammenfassen“ am **Handy** in die Werkzeugleiste (am Desktop stehen sie schon im Listenkopf).
+- Zahlen (`filter-zaehlung.ts`, neu): nur Plattform, Art, Status, Schnellchips; Kernbestand; beim Öffnen des Fensters in `useZeitscheibe`; Chip mit 0 abgeblendet, aber tippbar; Zahl im Namen („Netflix, nur, 14 Titel“).
+- Alte Farbklasse `slate-` in `ModusSchalter` auf `ak-*` (nur sinkend, `tools/design-klassen.mjs`).
+- Dateien: `components/filter/*`, `FilterDetails.tsx` (Gruppen auslagern), `DatenbankBereich.tsx`, `i18n-spaet.ts`, `ansicht-filterfenster.mjs` (neue Zusicherungen).
 
-### S7: Doku und Bilder
+### S6: Doku, Bilder, Beobachtung
+- `docs/wissen/datensatz.md` (Filterebenen), `docs/wissen/betrieb.md` (Lehre), `karte.md` (Speicher je Ansicht), Skill `stille-ausfaelle-verhindern` (Verwerfungspfad „Titel wegen Weg verworfen“), `.claude/agents/pruefer.md`/`bauer.md` und Skill `pruefen-und-belegen` (Frage „Welche Einheit entscheidet, welche trägt die Eigenschaft?“, Pflicht-Fixture mit mehreren Wegen); `status.md`/`stand.md`.
+- Nachher-Bilder `node tools/pr-bilder.mjs` nach `docs/konzept/filter/nachher/`.
+- Nebenbefund in `status.md`: 2 Releases `auto-544-disc`, `auto-142770-disc` (`platform disc`, `releaseType movie`).
 
-- `docs/wissen/datensatz.md` / `docs/wissen/karte.md`: Filterebenen, Speicher je Ansicht, Migration; `status.md` und `stand.md` nachführen.
-- Nachher-Bilder (`node tools/pr-bilder.mjs`) in `docs/konzept/filter/nachher/`, Gegenüberstellung für Schritt 3 (Top 5, `analyse.md` Abschnitt 5).
+## 4. Wächter (fünf Stufen)
 
-## 3. Tests und Prüfungen
-
-- Einheiten: Weg-Modul (alle Zustände, Kombinationen, Titel ohne Weg, Streams ohne Art), `passtTitel` mit echten Fällen, Vorlieben je Ansicht (Kalender ändert Datenbank **nicht** und umgekehrt), Router (Adresse ↔ Datenbank-Filter, Push `fav=1`).
-- Zählprobe (S1) rot → grün: Disc-Ausschluss 2.880 statt 2.738 Titel, „Netflix + Disc“ 0 statt 22, „Crunchyroll + Film“ 0 statt 115, „kostenlos + Netflix“ 0 statt 17.
-- Ansicht: `check:ansichten`/`check:panel` (PR-Aussehen), neue Zusicherung `ansicht-filter-getrennt.mjs`: im Kalender Disc-Auge klicken, in die Datenbank wechseln, Disc darf dort nicht gesetzt sein; und `ansicht-yaiba.mjs`: Karte „Yaiba: Samurai Legend“ bei Disc aus sichtbar.
-- Mess: CLS und Filterzeit am Handy (Drosselung) wie bisher, `ZIELE.md` Budgets; Zahlen an Chips dürfen den Filterwechsel nicht über 50 ms heben (Messung vorher/nachher an 2.926 Titeln).
-- `npm run check:vor-commit` läuft in der Prüfkette (Agenten fahren es nicht lokal).
-
-## 4. Wächter gegen die Yaiba-Klasse (fünf Stufen)
-
-1. **Ursache:** `passtTitel` wertet Ausschluss einer Wegeigenschaft über `releases.some(…)` und entscheidet damit für den ganzen Titel (`filters.ts` Z. 513–517); die Einheit der Entscheidung (Titel) passt nicht zur Einheit der Eigenschaft (Weg).
-2. **Klasse:** Jeder Ausschluss einer Wegeigenschaft in der Datenbank (Messung Analyse 2.1: Disc 142, Prime 443, Crunchyroll 349 …) sowie jeder Einschluss-Mix (Netflix + Disc 22 Titel ohne Weg) und kostenlos + Plattform. Dazu die Geräte-Vorlieben, die über Ansichten fließen (zehn Felder).
-3. **Dauerhaft schließen:** Weg-Modul (S2/S3); Vorlieben je Ansicht (S4).
+1. **Ursache:** Die Einheit der Entscheidung (Titel, `releases.some`) passt nicht zur Einheit der Eigenschaft (Weg), `filters.ts:513-520`; zweitens ein Geräte-Eintrag für zwei Ansichten, `router.ts:184`.
+2. **Klasse:** jeder Ausschluss und jede Kombination von Weg-Eigenschaften (Messungen B1, Analyse 2.1/2.2), alle zehn Vorlieben-Felder, das Push-Abo (B7).
+3. **Dauerhaft schließen:** `wege-filter.ts` als einzige Stelle der Weg-Logik; Vorlieben je Ansicht.
 4. **Wächter mit Lehre:**
-   - Test `filters.wege.test.ts` (Fixtures mit Yaiba-Struktur: ein Titel, drei Weg-Arten) schlägt fehl, sobald ein Weg-Ausschluss den Titel wirft.
-   - Kurzer Prüfer in `check:logic` (`tools/filter-ebenen-pruefen.mjs`): Jede Filterart in `FilterState` hat in `shared`/`web/src/lib/filter-ebenen.ts` eine **deklarierte Ebene** (`titel` | `weg`); ein neues Feld ohne Deklaration lässt den Check scheitern, ein Weg-Feld in `passtTitel` außerhalb von `wege-filter.ts` ebenfalls.
-   - Datensatz-Wächter (`check:filter-zaehlprobe`, nachts, Exit 0): über `public/data` je Weg-Eigenschaft „Titel, die nach Ausschluss verschwinden“ gleich „Titel, deren **alle** Wege die Eigenschaft haben“, sonst Meldung.
-   - Lehre in `ai_agent_learnings.md` und `docs/wissen/betrieb.md` („Filterebene: Ausschluss wirkt auf der Ebene der Eigenschaft“), Skill `stille-ausfaelle-verhindern`: Verwerfungspfad „Titel verworfen wegen Weg“ wird gezählt und im Ergebnis genannt (Leerzustand E6).
-   - Zusicherung für getrennte Speicher (`ansicht-filter-getrennt.mjs`) als Wächter gegen das Leck.
-5. **Warum die Prüfkette es durchließ:** `filters.test` prüfte Ausschlüsse an Titeln mit **einem** Weg (Film-Sonderfall 03.09.2026 wurde als Einzelfall behoben, die Klasse blieb); `kalender-filter.ts` trug seit 09.10.2026 den Satz „Filter gehören dem Kalender allein“, die Schnellfilter wurden aber als „Vorlieben des Geräts“ ausgenommen und niemand prüfte das gegen Disc. Schärfung: Prüfer und Bauer bekommen in `.claude/agents/pruefer.md`/`bauer.md` und im Skill `pruefen-und-belegen` die Frage „**Welche Einheit entscheidet, welche Einheit trägt die Eigenschaft?**“ bei jeder Filteränderung, und Tests für Filter brauchen mindestens ein Fixture mit mehreren Wegen/Zuständen (Mehrfach-Zustände, Analyse 2.1).
+   - `pipeline/check-filter-wege.ts` (Fixtures, kein `public/data`): Yaiba-Struktur (Disc ×2, Joyn, TV, Stream) bleibt bei „Disc aus“; Nur-Disc-Titel fällt weg; Titel ohne Weg bleibt; Netflix + Disc → 0; Film-Werk mit Crunchyroll-Stream trifft „Crunchyroll + Film“; UND-Fall; `watchLinks`-Rettung. **Mutationsprobe** (Skill `pruef-technik`): Rückbau auf `releases.some` muss rot werden.
+   - `pipeline/check-filter-ebenen.ts` (in `check:logic`): jedes Feld von `FilterLists`/`FilterState` hat eine deklarierte Ebene in `web/src/lib/filter-ebenen.ts` (`titel`|`weg`); `passtTitel` prüft Weg-Felder nur über `wege-filter.ts` (Textprüfung auf `releases.some`/`platformsOf` außerhalb des Moduls).
+   - `pipeline/check-vorlieben-getrennt.ts`: Kalender-Änderung lässt `vorlieben.datenbank` unverändert und umgekehrt; Datenbank-Chip ändert `pushFilterWert(...)` nicht (B7); Ansichtswechsel schreibt nichts.
+   - `tools/filter-zaehlprobe.mjs` (Bestand, `check-bestand-liste`/nachts, Exit 0, fester Stichtag): je Weg-Eigenschaft „verschwindet nach Ausschluss“ = „alle Wege tragen sie“, sonst Meldung; Zahlen in `docs/konzept/filter/zahlen.json`.
+   - Zusicherung `ansicht-filter-getrennt.mjs` (Playwright, Bühne): Disc-Auge im Kalender → Datenbank zeigt Disc nicht gesetzt; `ansicht-yaiba.mjs`: Karte „Yaiba: Samurai Legend“ bei „Disc aus“ sichtbar, ohne Disc-Abzeichen.
+5. **Warum die Kette es durchließ:** `filters`-Prüfungen nutzten Titel mit **einem** Weg (Film-Sonderfall 03.09.2026 als Einzelfall behoben); `kalender-filter.ts` trägt seit 09.10.2026 „Filter gehören dem Kalender allein“, nahm aber die Schnellfilter aus, und niemand prüfte das gegen Disc und Push. Schärfung in S6 (Prüfer-/Bauer-Vorgabe, Skills).
 
-## 5. Migration gespeicherter Filter
+## 5. Tests, Erwartungswerte, Migration
 
-Ausgangslage: localStorage `vorlieben` (zehn Felder, veröffentlicht), `tvAus`, `meineAnbieter`; Adressen mit `xrt=disc` (alt: `xp=disc`).
+**Erwartungswerte** (Messung 22.11.2026; Fixtures bilden die Fälle nach, die Bestandsprobe prüft sie am Datensatz):
 
-- **Einmalig beim ersten Start nach der Änderung** (`vorliebenMigrieren()`, in `App.tsx` vor dem ersten Lesen): Liegt `vorlieben` vor und `vorlieben.kalender` fehlt, wird der Wert nach `vorlieben.kalender` kopiert (Kalender behält, was er hatte); die Datenbank startet **leer** (sie hat vorher nur geerbt; ein geerbtes „Disc aus“ war nicht ihre Wahl). Danach wird `vorlieben` gelöscht.
-- Wegfallende Felder (`confirmed*` in der Datenbank, `years` im Kalender, `availableOnly` im Kalender) werden beim Lesen verworfen, nicht gemeldet.
-- `tvAus` bleibt Kalender; `meineAnbieter` bleibt geteilte Hilfsliste.
-- Adressen: `xrt=disc` in der Datenbank bleibt gültig (jetzt Weg-Ausschluss), `xp=disc` wandert wie bisher (`readLists`). Veröffentlichte Push-Links `fav=1` bleiben (Kalender).
-- Ablaufbedingung für den Migrationscode (Regel „Rückwärtskompatibilität nur für Veröffentlichtes“): entfernen, wenn alle Geräte einmal geöffnet haben können, frühestens 31.01.2027; Termin in `stand.md` beim Einführen.
-- Mehrstufige Beobachtung nach Einführung (Regel Neueinführung): am ersten Fall (Yaiba live), nach etwa fünf Fällen (Datenbankfilter in Support/Feedback), nach einem Tag, nach einer Woche (Auswertung der Filterzustände über Meldungen, ohne neues Tracking).
+| Fall | heute | neu |
+|---|---|---|
+| Disc aus, DB-Basis 3.550 | 3.382 | 3.521 |
+| Disc aus, `titles.json` | 2.738 | 2.880 (nur-Handel ohne Link-Stream) / 2.894 mit Rettung über `watchLinks` |
+| Prime aus / Crunchyroll aus / Netflix aus (`titles.json`) | 2.005 / 2.247 / 2.528 | 2.448 / 2.596 / 2.694 |
+| Netflix + Disc | 22 | 0 |
+| TV + Disc | 5 | 0 |
+| kostenlos + Netflix | 17 | 0 |
+| Crunchyroll + Film, Netflix + Film, Prime + Film | 115 / 79 / 340 | gleich (Werk-Regel) |
+| Film aus (Werk) | 2.820 | 2.820 |
 
-## 6. Risiken
+(Die Basis `titles.json` zählt Ecchi mit; die Fixtures müssen die Basis nennen.)
+
+**Einheiten:** `wege-filter` (alle Zustände, Kombinationen, `modus`, Titel ohne Weg, Streams, `watchLinks`), `passtTitel` mit Yaiba-Fixture, Vorlieben je Ansicht, Router (Adresse ↔ Datenbankfilter; `xp=disc` → `xrt=disc`; `fav=1` im Kalender), Push-Filter unverändert aus dem Kalenderzustand.
+
+**Mess und Ansicht:** `check:ansichten`/`check:panel` in der Kette; CLS und Filterzeit am gedrosselten Handy vorher/nachher (Budget aus `ZIELE.md`); Facettenzahlen dürfen den Tippweg nicht verlangsamen (ein Filterlauf heute 14,6 ms / 39,8 ms mit Titeln ohne Synchro, Node). Tippflächen ≥ 44 px (E2), Kontrast AA in beiden Themen, Escape/Fokus des Fensters wie bisher.
+
+**Migration alter Vorlieben.**
+- `vorliebenLesen(ansicht)`: liest `vorlieben.<ansicht>`; fehlt er, den alten Schlüssel `vorlieben` (beide Ansichten starten mit der **Kopie**: kein sichtbarer Sprung, auch nicht im Push-Abo). Verworfen werden `availableX` (Kalender) und `confirmedX` (Datenbank) und `discAus`-Reste beim Lesen.
+- Der erste Schreibvorgang einer Ansicht legt ihren Schlüssel an; der alte Schlüssel wird gelöscht, sobald beide neuen existieren (offene alte Tabs/Service-Worker-Stände schreiben höchstens den alten Schlüssel, der dann ignoriert wird).
+- `tvAus`, `meineAnbieter`, `groupSeasons`, `ecchiZeigen` bleiben unverändert.
+- Adressen: `xrt=disc` bleibt gültig (jetzt Weg-Ausschluss, `buildHash` schreibt es weiter **nicht**, es ist Vorliebe); `xp=disc` wandert wie bisher; `fav=1`, `frei=1`, `wo=1`, `sicher=1` (letzteres in der Datenbank ignoriert) werden gelesen, nicht geschrieben; `#/favoriten`, `#/wo` bleiben.
+- Ablauf: Migrationscode entfernen frühestens 31.01.2027, Termin in `stand.md` beim Einführen (Regel „Rückwärtskompatibilität nur für Veröffentlichtes“).
+- Beobachtung nach Einführung (Regel Neueinführung): am ersten Fall (Yaiba live bei „Disc aus“, Auge ändert Datenbank nicht), nach ≈ 5 Fällen, nach einem Tag, nach einer Woche (Zählprobe gegen Live-Seite; keine neue Erhebung).
+
+## 6. Bühnen-Mockup und Vorher/Nachher (für Daniels Test vor dem Live-Gang)
+
+**Mockup:** `web/buehne/mockups/filter-konzept.tsx` (nach Vorbild `reihen-box.tsx`, Anmeldung mit `mockup({...})`), Ausschnitt `datenbank` (die ganze App, Adressparameter je Fall über `suchadressen`), Fälle aus `faelle.json`: `yaiba-joyn` (vorhanden), `alle`; Fälle werden bei Bedarf mit `npm run buehne:faelle -- --nur <slug>` ergänzt. Keine eigenen Schalter; Leiste, Gerät und Thema liefert der Rahmen.
+
+- **Vorher** = echtes Bauteil auf dem Stand `main`; **Nachher** = die neuen Bauteile hinter Weichen (`web/buehne/vite-weichen.ts`): `AktiveChips`, Weg-Karte, Leerzustand, Filterfenster ohne Schnellfläche. Das Mockup ist der spätere Test: Nach dem Bau wird „Nachher“ zur echten Komponente, die Bilder müssen übereinstimmen; Nachbau-Teile fliegen im Bau-PR raus.
+- Weil die Zellen flüchtigen Speicher haben (B16), zeigt ein Skript (`tools/ansicht-filter-getrennt.mjs`, Playwright, headless) den Wechsel Kalender → Datenbank in **einer** Zelle; das Mockup trägt es als Fall `kalender-auge`.
+- Messung: `npm run buehne:bauen`, `buehne:bilder -- --mockup filter-konzept`, `buehne:messen` (Tippziele ≥ 44 px, Kontrast; ein rotes ✕ im Nachher ist ein Fehler des Entwurfs). Danach Bereitlegen und Upload nach Skill `mockups` Schritt 4–5; Bilder werden **vor** der Bitte an Daniel angesehen.
+
+**Liste der Überlegungen (im Mockup als Notiz je Variante):**
+1. Ausschließen heißt: diese Einträge nicht sehen, nicht diese Anime nicht sehen (Yaiba).
+2. Kalender fragt „was kommt wann“, Datenbank „was gibt es“: eigene Vorlieben, nichts erbt.
+3. Mehrere Bedingungen gelten für denselben Weg („Netflix + Disc“ gibt es nicht).
+4. Film ist ein Werk: ein Stream auf einem Film bleibt ein Film.
+5. Ein Zustand wird nur entfernt, wenn er tot oder widersprüchlich ist; sonst gilt überall derselbe Griff (nichts → nur → ohne).
+6. Zahlen helfen vor der Wahl, aktive Chips danach; Zahlen nur, wo sie billig sind.
+7. Nichts doppelt: die Trefferzahl steht schon im Balken bzw. Listenkopf.
+8. Der Leerzustand nennt den Filter, der die Treffer nimmt, und löst ihn mit einem Tipp.
+9. Das Push-Abo hängt nur am Kalender.
+10. Jahr = Jahr, in dem etwas bei uns erscheint.
+
+**Top-5-Vorher/Nachher-Bilder** (je Handy 390 × 844 und Desktop 1600 × 900, hell und dunkel = 4 Bilder je Zustand; Vorher liegen unter [ist/](ist/)):
+1. **Yaiba bleibt:** Datenbank, Suche „Yaiba“, „Disc aus“. Vorher `ist/*-6-yaiba-disc-ausgeschlossen.png`; nachher: Karte mit Joyn und TV, ohne Disc-Abzeichen.
+2. **Getrennte Filter:** Kalender mit zugeklapptem Disc-Auge, dann Datenbank. Vorher `ist/*-8-datenbank-erbt-disc-aus.png`; nachher: Datenbank ohne Disc-Ausschluss, Kalender behält ihn.
+3. **Aktive Chips und Leerzustand:** Datenbank mit zwei Filtern und leerem Ergebnis; Vorher `ist/handy-*-4-*`, nachher: Chipzeile + „Kein Treffer wegen …“.
+4. **Filterfenster:** ohne farbige Schnellfläche, ohne doppeltes TV im Kalender, Ansichtsschalter in der Werkzeugleiste (Handy). Vorher `ist/*-2-*`, `ist/*-4-*`.
+5. **Zahlen an Chips:** Plattform/Art/Status mit Zahl, 0 abgeblendet. Vorher `ist/desktop-*-4-datenbank-filterfenster.png`.
+
+## 7. Risiken
 
 | Risiko | Gegenmaßnahme |
 |---|---|
-| Geteilte Datenbank-Adressen ändern ihre Treffer (Ausschluss zeigt mehr Titel) | gewollt; Hinweis in den Patch Notes für Besucher („Ausgeschlossene Plattformen blenden nur noch ihre Einträge aus, nicht mehr den ganzen Anime“) |
-| Filtergeschwindigkeit am Handy (18.863 Titel in der Rechnung inkl. ohne Synchro, `filterTitlesGen` gibt alle 6 ms ab) | Weg-Modul rechnet pro Titel O(Wege); vorher/nachher am gedrosselten Handy messen; Zahlen an Chips erst beim Öffnen |
-| Streams ohne Art/Status: Art-Einschluss lässt 1.271 Titel ohne Release aus dem Ergebnis fallen | gewünscht, aber der Hinweis „Art gilt nur für Termine“ steht am Chip; vorher mit der Zählprobe nachsehen, ob Nutzer dadurch Titel vermissen |
-| Push-Worker rechnet nach eigener Regel (`shared/push-filter.ts`) | nicht anfassen; Test, dass `terminFilter` unverändert aus dem Kalender-Speicher kommt |
-| Wegfall von Filtern (bestätigt in DB, Jahr im Kalender) gilt als „Wegfall einer Funktion“ | Projektregel E0: geht an Daniel. Der Wegfall ist wirkungslos (bestätigt) bzw. widersprüchlich (Jahr); wird als Punkt im Schritt-2-PR benannt, nicht stillschweigend |
-| Dateigröße `FilterDetails.tsx` 784 Zeilen | S5/S6 streichen zuerst, neue Gruppen in eigene Dateien; `check:umfang` sinkt |
-| Chips ohne Zahl im Kalender-Zeitraum bei neuem Speicher | Kalender-Zahlen kommen weiter aus `zeitraum`; unverändert |
-
-## 7. Überlegungen (für das Mockup)
-
-- **Reihenfolge nach Wirkung:** S3 (Yaiba) und S4 (Leck) sind die beiden Fehler und kommen zuerst, in dieser Reihenfolge je ein PR; die Darstellung (S6) erst, wenn beide live gemessen sind (Regel „fertig = nach Deploy live gemessen“).
-- **Weg-Modul statt Flickwerk:** Die Untergrenze (A) wäre in zwei Stunden gebaut, ließe aber 22 + 115 + 17 falsche Kombinationstreffer stehen. B behebt die Klasse und ist testbar mit den echten Zahlen.
-- **Mockup zeigt zuerst die Karte:** Yaiba vorher/nachher an einer Stelle (Datenbank, Suche „Yaiba“, Disc aus), dann das Fenster mit entfernbaren aktiven Chips und „N Titel zeigen“.
-- **Was Daniel entscheiden muss (nach Regel E0, Wegfall einer Funktion):** Jahr-Filter im Kalender und „bestätigt“ in der Datenbank entfallen. Beide haben heute keine sinnvolle Wirkung (Analyse 2.3); die Empfehlung ist Entfernen.
-- **Beobachtung:** Der Nachweis „live“ ist ein Vergleich der Zählprobe gegen die Live-Seite (Titel „Yaiba: Samurai Legend“ erscheint bei Disc aus; Kalender-Auge ändert die Datenbank nicht), nicht nur ein grüner Test.
+| Geteilte Datenbank-Adressen zeigen nach dem Umbau mehr Titel (Ausschluss blendet nur Wege aus) | gewollt; Patch-Note für Besucher: „Ausgeschlossene Plattformen und Disc blenden nur noch ihre Einträge aus, nicht mehr den ganzen Anime“ (Skill `patchnotes-autor`) |
+| Push-Abo ändert sich still | Wächter `check-vorlieben-getrennt`, Kopie bei Migration (B7, B8) |
+| Filterzeit am Handy | Weg-Liste einmal je Titel (`WeakMap`); vorher/nachher gedrosselt; Zahlen nie auf dem Tippweg |
+| Streams ohne Art: Art-Einschluss lässt Titel ohne Release aus dem Ergebnis | wie heute; Chip-Hinweis „Art gilt für Termine“ nicht neu eingeführt; Zählprobe vorher ansehen |
+| Dauerhaft gemerkter Schnellfilter in der Datenbank wirkt unsichtbar | aktive Chips (S5) machen ihn sichtbar; bis dahin Zähler am Filterknopf (heute schon) |
+| `FilterDetails.tsx` 784/800 Zeilen | S4 streicht zuerst; neue Gruppen in eigene Dateien; `check:umfang` sinkt |
+| Mockup und Bau driften | Nachbau-Teile werden im Bau-PR gelöscht; Bild muss dem Mockup gleichen |
+| Wegfall toter Filter gilt als „Wegfall einer Funktion“ (E0) | keine wirksame Funktion; im PR-Text mit Messung benannt |

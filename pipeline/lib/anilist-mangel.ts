@@ -35,6 +35,18 @@ export function mangelNeuHolen(
   return faellig.sort((a, b) => stempel(a).localeCompare(stempel(b))).slice(0, grenze)
 }
 
+/** Was `data:fetch` neu holt: fehlende und noch offene Einträge (Bestandsregel) plus die begrenzte Auswahl mit offenem Mangel. */
+export function zuHolen(
+  zwischenspeicher: Record<string, MitStempel | undefined>,
+  ids: number[],
+  nochOffen: (m: MitStempel) => boolean,
+  heute: string,
+  grenze = MANGEL_GRENZE_JE_LAUF,
+): number[] {
+  const offen = ids.filter((id) => !zwischenspeicher[id] || nochOffen(zwischenspeicher[id]!))
+  return [...new Set([...offen, ...mangelNeuHolen(zwischenspeicher, ids, heute, grenze)])]
+}
+
 /** Stempelt frisch geholte Einträge mit dem Abruftag. */
 export function stempeln<T extends object>(m: T, heute: string): T & { abgerufen: string } {
   return { ...m, abgerufen: heute }

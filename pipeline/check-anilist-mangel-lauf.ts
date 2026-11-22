@@ -57,7 +57,11 @@ writeFileSync(join(wurzel, 'data', 'cache', 'anilist-by-id.json'), JSON.stringif
 }))
 
 const lauf = spawnSync(process.execPath, ['--import', 'tsx', '--import', pathToFileURL(attrappe).href, 'pipeline/fetch.ts'], {
-  env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8', timeout: 100_000, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'],
+  env: { ...process.env, AK_ROOT: wurzel },
+  encoding: 'utf8',
+  timeout: 100_000,
+  windowsHide: true,
+  stdio: ['ignore', 'pipe', 'pipe'],
 })
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {

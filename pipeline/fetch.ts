@@ -9,7 +9,7 @@
  * Aufruf: npm run data:fetch  [-- --force] [-- --skip-anilist]
  */
 import { mediaByMalIds, searchMedia, type AniListMedia, eintragNochOffen, istQuellenAusfall } from './lib/anilist.ts'
-import { MANGEL_GRENZE_KENNUNG, mangelNeuHolen, stempeln } from './lib/anilist-mangel.ts'
+import { MANGEL_GRENZE_KENNUNG, stempeln, zuHolen } from './lib/anilist-mangel.ts'
 import { ausAnisearchDubs, ausAnisearchHand } from './lib/anisearch-synchro-ids.ts'
 import { holeAnisearchCover } from './lib/anisearch-cover.ts'
 import { loadCurated, loadSynchroVonHand } from './lib/curated.ts'
@@ -97,9 +97,7 @@ async function main(): Promise<void> {
   const nochOffen = (m: AniListMedia | undefined): boolean => Boolean(m) && eintragNochOffen(m!)
   const cached = readJson<Record<string, AniListMedia>>('data/cache/anilist-media.json', {})
   const heute = new Date().toISOString().slice(0, 10)
-  const offen = malIds.filter((id) => !cached[id] || nochOffen(cached[id]))
-  /* Fehlt einem abgeschlossenen Titel Wertung oder Studio, wird er trotz Cache neu gefragt (begrenzt, `lib/anilist-mangel.ts`). */
-  const missing = FORCE ? malIds : [...new Set([...offen, ...mangelNeuHolen(cached, malIds, heute)])]
+  const missing = FORCE ? malIds : zuHolen(cached, malIds, nochOffen, heute)
   log(`AniList: ${missing.length} von ${malIds.length} IDs fehlen im Cache`)
 
   if (!SKIP_ANILIST && missing.length > 0) {
@@ -158,10 +156,7 @@ async function main(): Promise<void> {
   /* Titel mit Handbeleg (`data/synchro-von-hand.yaml`) kommen über denselben Weg in den Bestand. */
   const handIds = [...loadSynchroVonHand().map((e) => e.anilistId), ...ausAnisearchDubs(Object.values(cached)), ...ausAnisearchHand(Object.values(cached))]
   const alleIds = [...new Set([...Object.values(resolved), ...handIds])]
-  const neededIds = [...new Set([
-    ...alleIds.filter((id) => FORCE || !byAniId[id] || nochOffen(byAniId[id])),
-    ...mangelNeuHolen(byAniId, alleIds, heute, MANGEL_GRENZE_KENNUNG),
-  ])]
+  const neededIds = FORCE ? alleIds : zuHolen(byAniId, alleIds, nochOffen, heute, MANGEL_GRENZE_KENNUNG)
   if (!SKIP_ANILIST && neededIds.length > 0) {
     log(`AniList: ${neededIds.length} kuratierte Titel nachladen`)
     const { mediaById } = await import('./lib/anilist.ts')

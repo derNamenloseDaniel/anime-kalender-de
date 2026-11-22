@@ -1,5 +1,6 @@
 import { EIGENE_ID_BASIS } from '../../shared/eigene-titel.ts'
-import type { Release, Title } from '../../shared/types.ts'
+import { PLATFORMS, type PlatformId, type Release, type Title } from '../../shared/types.ts'
+import { verlagIstAnbieter } from '../../shared/verlag-anbieter.ts'
 import { istSichererTermin } from '../bau/11-7-wege-aus-terminen.ts'
 import { ANISEARCH_ID_BASIS } from '../bau/anisearch-titel.ts'
 import { fehlendes } from '../bau/luecken-titel.ts'
@@ -141,7 +142,15 @@ function nurSichtungen(t: Title, k: Kontext): string | undefined {
 function keinWegAusnahme(t: Title, k: Kontext): string | undefined {
   const termine = k.releases.get(t.id) ?? []
   if (termine.some((r) => r.platform === 'kino' && (r.sources?.length ?? 0) > 0 && (r.schedule?.firstEpisodeDate ?? '') >= k.heute)) return 'kinostart'
+  if (verlagVerneint(t, k)) return 'belegtes-nein'
   return !t.jpYear && !t.jpStart && !t.jpEnd && termine.length === 0 ? 'unveroeffentlicht' : undefined
+}
+
+/** Der Verlag der Erstausgabe ist selbst ein Anbieter (Netflix, Crunchyroll, Prime Video) und ein Handbeleg „nicht verfügbar“ nach dem Erstausgabe-Tag verneint ihn dort. */
+function verlagVerneint(t: Title, k: Kontext): boolean {
+  const { von, publisher } = t.deErstausgabe ?? {}
+  if (!von || !publisher) return false
+  return (Object.keys(PLATFORMS) as PlatformId[]).some((p) => verlagIstAnbieter(publisher, p) && k.neinGilt(t.id, p, von))
 }
 
 export const REGELN: Regel[] = [
@@ -160,7 +169,7 @@ export const REGELN: Regel[] = [
   { art: 'jahr', gruppe: 'fehlend', wirkung: 2, wer: 'auto:anilist', zaehle: luecke('j') },
   { art: 'sprecher', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anisearch', zaehle: (t) => !t.hasVoices, ausnahme: (t) => (hatSynchro(t) ? undefined : 'ohne-synchro') },
   { art: 'kein-weg', gruppe: 'fehlend', wirkung: 3, wer: 'daniel', zaehle: (t, k) => !hatEinenWeg(t) && !k.discTitel.has(t.id), ausnahme: keinWegAusnahme },
-  { art: 'erstausgabe-ohne-weg', gruppe: 'fehlend', wirkung: 3, wer: 'daniel', zaehle: (t, k) => zaehleErstausgabeOhneWeg([t], k.discTitel) === 1 },
+  { art: 'erstausgabe-ohne-weg', gruppe: 'fehlend', wirkung: 3, wer: 'daniel', zaehle: (t, k) => zaehleErstausgabeOhneWeg([t], k.discTitel) === 1, ausnahme: (t, k) => (verlagVerneint(t, k) ? 'belegtes-nein' : undefined) },
   { art: 'termin-fehlt-laufend', gruppe: 'fehlend', wirkung: 3, wer: 'auto:anbieterkalender', zaehle: terminFehltLaufend, ausnahme: nurSichtungen },
   { art: 'sprachurteil-offen', gruppe: 'schwach', wirkung: 2, wer: 'hand:synchro-belegen', zaehle: ohneSprachurteil },
   { art: 'synchro-schwach', gruppe: 'schwach', wirkung: 2, wer: 'hand:synchro-belegen', zaehle: (t) => t.dubConfidence === 'low' },

@@ -80,7 +80,7 @@ const urteil = (wort) => k('github-actions[bot]', `**Prüfer-Review** für 72201
 const stufe = k('github-actions[bot]', '<!-- pr-stufe -->\n**Prüfstufe 2** für fe21e7b7d', 'CONTRIBUTOR')
 const auflage = k('inhaber', 'Prüfer-Auflage umgesetzt (Kopf nach Push, 2 neue Commits):\n\n- Der Negativtest fehlte', OWNER)
 const abnahme = k('inhaber', 'Abnahme Runde 2, Auflage A1 — Nachtrag `fe21e7b7`:\n\n- **aria-disabled am echten Knopf:**', OWNER)
-const roterJob = k('inhaber', 'Der rote Job „PR-Aussehen – Panel“ ist nicht von diesem PR: `tools/panel-zurueck.mjs` nimmt', OWNER)
+const roterJob = k('inhaber', 'Der rote Job „PR-Aussehen – Panel“ ist nicht von diesem PR: das Werkzeug nimmt', OWNER)
 const nachAuflage = (...ks) => waehleNachtraege([stufe, urteil('aendern'), ...ks], 'autor').filter((t) => !t.startsWith('**Prüfer-Review') && !t.startsWith('<!--'))
 pruefe('Antwort „Prüfer-Auflage umgesetzt“ nach Urteil kommt an', nachAuflage(auflage).length === 1)
 pruefe('Antwort „Abnahme Runde 2 … Nachtrag“ nach Urteil kommt an', nachAuflage(abnahme).length === 1)

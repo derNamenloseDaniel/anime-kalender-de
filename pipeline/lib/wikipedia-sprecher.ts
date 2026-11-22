@@ -60,7 +60,7 @@ function zeilenAusTabelle(tabelle: string): Zeile[] {
       continue
     }
     const kopf = l.startsWith('!')
-    if ((!kopf && !l.startsWith('|')) || /^\|[}+]/.test(l)) {
+    if ((!kopf && !l.startsWith('|')) || l.startsWith('|+')) {
       const letzte = aktuell?.zellen.at(-1)
       if (letzte && l.trim()) letzte.text += `\n${l.trim()}`
       continue
@@ -87,7 +87,7 @@ function spaltenPfade(kopfzeilen: Zeile[]): string[][] {
       for (let k = 0; k < c.colspan; k++) {
         pfade[spalte + k] ??= []
         pfade[spalte + k]!.push(c.text)
-        if (c.rowspan > 1) uebrig.set(spalte + k, c.rowspan - 1)
+        uebrig.set(spalte + k, c.rowspan - 1)
       }
       spalte += c.colspan
     }

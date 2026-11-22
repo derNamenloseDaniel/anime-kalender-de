@@ -66,6 +66,14 @@ const mehrere = liesSprechertabelle(`{| class="wikitable"\n! Rolle !! Japanisch\
 pruefe('erste Tabelle ohne Deutsch wird übersprungen, die zweite gelesen', mehrere.deutscheSpalte && mehrere.zeilen.map(kurz).join(';') === 'A=Anna[]', mehrere)
 pruefe('Kommentar im Wikitext ignoriert', liesSprechertabelle(`<!-- {| ! Deutsch -->\n${tab('! Rolle !! Deutsch', '| A || Anna')}`).zeilen.length === 1)
 pruefe('leere Eingabe', !liesSprechertabelle('').deutscheSpalte)
+const lesen = (wikitext: string): string => liesSprechertabelle(wikitext).zeilen.map(kurz).join(';')
+pruefe('Tags, Kommentar, leerer Verweis, nbsp und einfacher Link in Rolle und Sprecher', lesen(tab('! Rolle !! Deutsch', '| <span style="x">[[Rolle A]]</span> || <span>Anna</span><!-- k -->&nbsp;Maria<ref name="a" />')) === 'Rolle A=Anna Maria[]', lesen(tab('! Rolle !! Deutsch', '| <span style="x">[[Rolle A]]</span> || <span>Anna</span><!-- k -->&nbsp;Maria<ref name="a" />')))
+pruefe('Überschrift der Tabelle (|+) steht vor dem Kopf, mehrzeilige Zelle wird angehängt', lesen('{| class="wikitable"\n|+ Titel\n! Rolle !! Deutsch\n|-\n| A || Anna\nund Anja\n|}') === 'A=Anna und Anja[]')
+pruefe('Kopfzelle mit rowspan und colspan: beide Spalten werden in der Folgezeile übersprungen', lesen('{| class="wikitable"\n! rowspan="2" colspan="2"| Rolle !! Japanisch !! Deutsch\n|-\n! Jap !! Alt\n|-\n| A || x || J || Anna\n|}') === 'A=Anna[Alt]')
+pruefe('rowspan 2 gilt nur für eine Folgezeile', lesen('{| class="wikitable"\n! rowspan="2"| Rolle !! Deutsch\n|-\n! Zeitraum\n|-\n! Alt\n|-\n| A || Anna\n|}') === 'A=Anna[Zeitraum]')
+pruefe('rowspan 3: der letzte Unterkopf zählt', lesen('{| class="wikitable"\n! rowspan="3"| Rolle !! Deutsch\n|-\n! Zeitraum\n|-\n! Alt\n|-\n| A || Anna\n|}') === 'A=Anna[Alt]')
+pruefe('rowspan in der Kopfzelle hinter der kürzeren Folgezeile endet nach einer Zeile', lesen('{| class="wikitable"\n! Rolle !! rowspan="2"| Deutsch\n|-\n! Sub\n|-\n! a !! b\n|-\n| A || Anna\n|}') === 'A=Anna[b]')
+pruefe('Spaltenzusatz und <small> werden mit Komma verbunden', lesen('{| class="wikitable"\n! rowspan="2"| Rolle !! Deutsch\n|-\n! Alt\n|-\n| A || Anna <small>(Film)</small>\n|}') === 'A=Anna[Alt, Film]')
 
 console.log('Handliste')
 type Eintrag = { seite: string; fixture: string; titel: { id: number; fassung?: string }[] }

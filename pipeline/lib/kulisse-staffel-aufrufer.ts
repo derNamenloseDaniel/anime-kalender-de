@@ -22,6 +22,8 @@ const schreibe = (pfad: string, inhalt: unknown) => {
   writeFileSync(join(WURZEL, pfad), JSON.stringify(inhalt))
 }
 const fenster = (staffelNr: number, folge: number) => ({ staffel: staffelNr, folge, ab: '2026-01-01T00:00', bis: '2026-12-31T23:59' })
+/** Leere Handlisten, die `schreibeNeuMitSynchro` und `baueAuslieferung` lesen (Namen zusammengesetzt: die Kulisse schreibt sie, die Pipeline nicht). */
+const leereListen = () => ['fanservice-urteil', 'kino-ankuendigungen'].forEach((n) => schreibeText(`data/${n}.yaml`, '[]\n'))
 const toggoLink = () => ({ name: 'TOGGO', url: 'https://www.toggo.de/pokemon/serien/probe', kind: 'stream', zugang: 'kostenlos' })
 
 async function toggo(fremd: boolean): Promise<void> {
@@ -34,8 +36,7 @@ async function toggo(fremd: boolean): Promise<void> {
 }
 
 async function seit(): Promise<void> {
-  schreibeText('data/fanservice-urteil.yaml', '[]\n')
-  schreibeText('data/kino-ankuendigungen.yaml', '[]\n')
+  leereListen()
   schreibe('data/synchro-historie.json', { angelegtAm: '2026-08-13', seit: { [SAMMEL]: '2026-08-13', 20: '2026-08-13' } })
   const titel = [staffel(7_000_001, 1, 1), staffel(SAMMEL, 4, 137), { id: 20, streams: [], watchLinks: [] } as unknown as Title, { id: 21, streams: [], watchLinks: [] } as unknown as Title]
   const { schreibeNeuMitSynchro } = await import('../bau/nebendateien.ts')
@@ -45,7 +46,7 @@ async function seit(): Promise<void> {
 }
 
 async function auslieferung(): Promise<void> {
-  schreibeText('data/kino-ankuendigungen.yaml', '[]\n')
+  leereListen()
   const titel = [staffel(7_000_001, 1, 1), staffel(SAMMEL, 4, 137), { id: 20, titleDe: 'Gewöhnlich', jpYear: 2020, format: 'TV', streams: [], watchLinks: [] } as unknown as Title]
   const { baueAuslieferung } = await import('../bau/13-2-auslieferung.ts')
   const synopses: Record<number, unknown> = {}

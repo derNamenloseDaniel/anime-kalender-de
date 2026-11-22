@@ -23,7 +23,7 @@ export function Raster({ def, zustand, ersteVariante }: { def: MockupDef; zustan
           teile.map((teil) => {
             const adresse = zellenAdresse(zustand, thema, teil === 'vorher' ? '' : variante)
             return (
-              <figure key={adresse + g} className="zelle" style={{ '--hoehe': `${GROESSE[g].hoehe}px` } as CSSProperties}>
+              <figure key={adresse + g} className={g === '375' ? 'zelle' : 'zelle desktop'} style={{ '--hoehe': `${GROESSE[g].hoehe}px` } as CSSProperties}>
                 <figcaption>{teil === 'vorher' ? 'Vorher' : `Nachher (${variante})`} · {GROESSE[g].name} · {thema}</figcaption>
                 <iframe title={`${teil} ${g} ${thema}`} src={adresse} width={GROESSE[g].breite} data-zelle={`${teil}-${g}-${thema}`} />
               </figure>

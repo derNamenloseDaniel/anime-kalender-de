@@ -620,6 +620,7 @@ pipeline/check-staerkste-seite.ts
 pipeline/check-staffel-anzeige-bau.ts
 pipeline/check-staffel-anzeige-panel.ts
 pipeline/check-staffel-anzeige.ts
+pipeline/check-staffel-aufrufer.ts
 pipeline/check-staffel-des-titels.ts
 pipeline/check-staffel-historie.ts
 pipeline/check-staffel-jahr0.ts

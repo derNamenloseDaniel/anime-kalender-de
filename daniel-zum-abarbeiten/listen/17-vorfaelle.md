@@ -4,7 +4,7 @@ Was der Browser-Erweiterung aufgefallen ist, seit dieser Lauf zuletzt gelesen ha
 Bis zum 10.09.2026 stand das in der Browserkonsole — also an einer Stelle, die
 niemand liest: Daniel schaut dort nicht hin, und der Agent kommt gar nicht daran.
 
-Stand: 2026-11-22 13:13 · 3 Vorfall/Vorfälle
+Stand: 2026-11-22 14:16 · 4 Vorfall/Vorfälle
 
 **Ein Vorfall ist nicht zwingend ein Fehler.** „Keine Tonspur gelesen" ist ein
 vorgesehener Fall — interessant wird er erst durch seine Häufigkeit.
@@ -13,7 +13,15 @@ vorgesehener Fall — interessant wird er erst durch seine Häufigkeit.
 
 | Wann | Plattform | Reihe | Folge | Was | Version |
 |---|---|---|---|---|---|
-| 2026-11-22 13:05 | crunchyroll | GT00384004 | 9 | Wochenprogramm: Overgeared Folge 9 am 2026-11-22 — nicht übernommen (Kalender: zuletzt Folge 4 am 2026-10-18) | — |
-| 2026-11-22 13:05 | crunchyroll | GG5H5XQMD | 6 | Wochenprogramm: As a Reincarnated Aristocrat Staffel 3 Folge 6 am 2026-11-22 — nicht übernommen (Kalender: zuletzt Folge 1 am 2026-10-18) | — |
-| 2026-11-22 13:05 | crunchyroll | GT00384006 | 8 | Wochenprogramm: Reborn as a Space Mercenary Folge 8 am 2026-11-22 — nicht übernommen (Kalender: zuletzt Folge 3 am 2026-10-18) | — |
+| 2026-11-22 14:02 | crunchyroll | GG5H5XQMD | 6 | Wochenprogramm: As a Reincarnated Aristocrat Staffel 3 Folge 6 am 2026-11-22 — nicht übernommen (Kalender: zuletzt Folge 1 am 2026-10-18) | — |
+| 2026-11-22 14:02 | crunchyroll | GT00384006 | 8 | Wochenprogramm: Reborn as a Space Mercenary Folge 8 am 2026-11-22 — nicht übernommen (Kalender: zuletzt Folge 3 am 2026-10-18) | — |
+| 2026-11-22 14:02 | crunchyroll | GT00384004 | 9 | Wochenprogramm: Overgeared Folge 9 am 2026-11-22 — nicht übernommen (Kalender: zuletzt Folge 4 am 2026-10-18) | — |
+
+## durchgang-zaehlung — 1×
+
+Ende eines Netflix-Durchgangs: besucht, gemessen, wartet auf Übernahme, übersprungen. Misst er viele besuchte Titel nie, steht es hier.
+
+| Wann | Plattform | Reihe | Folge | Was | Version |
+|---|---|---|---|---|---|
+| 2026-11-22 14:09 | netflix | — | — | {"besucht":2,"gemessen":1,"wartend":0,"uebersprungen":1,"nichtDa":0} | 4.32.192 |
 

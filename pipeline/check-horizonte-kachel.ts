@@ -9,7 +9,7 @@ import type { StaffelZeile } from '../shared/staffel-folge.ts'
 import { kostenloseFolgen } from '../shared/kostenlos.ts'
 import { deFolgenZahlText, offeneStaffelText } from '../web/src/components/detail/antwort-regeln.ts'
 import { toggoAngabe } from '../web/src/lib/toggo.ts'
-import { describe, folgeImTitel, head } from './lib/termin-seite.ts'
+import { body, describe, folgeImTitel, head } from './lib/termin-seite.ts'
 import type { Umfeld } from './lib/titel-umfeld.ts'
 
 let fehler = 0
@@ -40,11 +40,18 @@ pruefe('Horizonte am 22.11.: Staffel 1–3 frei = 136 Folgen', kostenloseFolgen(
 pruefe('Horizonte ab 27.11.: mit Staffel 4 Folge 1 = 137', kostenloseFolgen({ watchLinks: [toggoWeg] }, NACH_START)?.frei === 137, kostenloseFolgen({ watchLinks: [toggoWeg] }, NACH_START))
 const eineStaffel: WatchLink = { ...toggoWeg, toggo: staffelBloecke(1, 5, '2026-01-01T00:00') }
 const youtube = { name: 'YouTube', url: 'https://www.youtube.com/playlist?list=x', kind: 'stream', zugang: 'kostenlos', dubRanges: [{ from: 1, to: 5, dub: true }] } as WatchLink
+pruefe('Genau zum Start 27.11. 00:00 ist Staffel 4 Folge 1 frei', kostenloseFolgen({ watchLinks: [toggoWeg] }, '2026-11-27T00:00')?.frei === 137)
+pruefe('Genau am Fensterende 31.12.2026 23:59 sind Staffel 1–2 zu (47 + 1)', kostenloseFolgen({ watchLinks: [toggoWeg] }, '2026-12-31T23:59')?.frei === 48, kostenloseFolgen({ watchLinks: [toggoWeg] }, '2026-12-31T23:59'))
 pruefe('Eine Staffel: Nummern fallen mit dubRanges eines anderen freien Weges zusammen (5, nicht 10)', kostenloseFolgen({ watchLinks: [eineStaffel, youtube] }, HEUTE)?.frei === 5, kostenloseFolgen({ watchLinks: [eineStaffel, youtube] }, HEUTE))
 
 console.log('\nTOGGO-Karte:')
 pruefe('Horizonte am 22.11.: „136 Folgen · Staffel 4 ab 27.11.“', toggoAngabe(toggo, HEUTE) === '136 Folgen · Staffel 4 ab 27.11.', toggoAngabe(toggo, HEUTE))
 pruefe('ab 27.11.: keine angekündigte Staffel mehr', toggoAngabe(toggo, NACH_START) === '137 Folgen', toggoAngabe(toggo, NACH_START))
+const kuenftig = (staffel: number, ab: string): Block => ({ staffel, von: 1, bis: 1, ab, ende: '2027-12-31T23:59' })
+const zweiKommend = [kuenftig(5, '2027-03-01T00:00'), ...staffelBloecke(3, 2, '2026-01-01T00:00'), kuenftig(4, '2027-01-08T00:00')]
+pruefe('Zwei angekündigte Staffeln: die früheste zählt, gleich in welcher Reihenfolge', toggoAngabe(zweiKommend, HEUTE) === 'Fg. 1–2 · bis 31.12. · Staffel 4 ab 08.01.', toggoAngabe(zweiKommend, HEUTE))
+pruefe('… auch umgekehrt sortiert', toggoAngabe([...zweiKommend].reverse(), HEUTE) === 'Fg. 1–2 · bis 31.12. · Staffel 4 ab 08.01.', toggoAngabe([...zweiKommend].reverse(), HEUTE))
+pruefe('Start genau jetzt ist offen, nicht angekündigt', toggoAngabe([...staffelBloecke(3, 2, '2026-01-01T00:00'), kuenftig(4, HEUTE)], HEUTE) === 'Fg. 1–2, 1 · bis 31.12.', toggoAngabe([...staffelBloecke(3, 2, '2026-01-01T00:00'), kuenftig(4, HEUTE)], HEUTE))
 pruefe('Folge derselben Staffel in der Zukunft ist keine neue Staffel', toggoAngabe(staffelBloecke(1, 2, '2026-01-01T00:00').concat({ staffel: 1, von: 3, bis: 3, ab: '2026-12-01T00:00', ende: '2027-12-31T23:59' }), HEUTE) === 'Fg. 1–2 · bis 31.12.')
 
 console.log('\nKopf je Staffel:')
@@ -56,6 +63,12 @@ pruefe('Zwei Staffeln: „Staffel 1“ statt Bereich', offeneStaffelText([46, 46
 pruefe('Ohne Staffelgrenzen: Gesamtzahl wie bisher', deFolgenZahlText([137, 137, 1], [], T) === 'detail.dubKopf:{"n":137}')
 pruefe('Nicht alle Folgen deutsch: Gesamtzahl', offeneStaffelText([137, 130, 1], STAFFELN, T) === undefined)
 pruefe('Zahl reicht nicht in die offene Staffel: Gesamtzahl', offeneStaffelText([136, 136, 1], STAFFELN, T) === undefined)
+pruefe('Ohne Offen-Marke in der Zählung: keine Staffelzeile', deFolgenZahlText([137, 137], [], T, STAFFELN) === 'detail.dubKopf:{"n":137}', deFolgenZahlText([137, 137], [], T, STAFFELN))
+pruefe('Abgeschlossene Liste direkt: nichts', offeneStaffelText([136, 136, 1], [[1, 1, 45], [2, 46, 89], [3, 90, 136]], T) === undefined)
+pruefe('Nur die offene Staffel: nichts', offeneStaffelText([3, 3, 1], [[1, 1]], T) === undefined)
+pruefe('Nicht alle deutsch, Zahl aber in Staffel 4: nichts', offeneStaffelText([140, 138, 1], STAFFELN, T) === undefined)
+const VERSETZT = 'detail.dubKopfStaffeln:{"voll":"detail.staffelNummer:{\\"n\\":23}","n":10,"offen":24,"m":2}'
+pruefe('Staffelnummer ≠ erste Folge (Reisen 23/24): „Staffel 23: 10 · Staffel 24: 2“', offeneStaffelText([12, 12, 1], [[23, 1, 10], [24, 11]], T) === VERSETZT, offeneStaffelText([12, 12, 1], [[23, 1, 10], [24, 11]], T))
 pruefe('Letzte Staffel abgeschlossen: keine Staffelzeile', deFolgenZahlText([136, 136], [], T, [[1, 1, 45], [2, 46, 89], [3, 90, 136]]) === 'detail.dubKopf:{"n":136}')
 
 console.log('\nLink-Vorschau:')
@@ -85,6 +98,10 @@ const kopf = head(s4, titel, '2026-11-22', 14839, 'pokemon-horizonte-14839', umf
 pruefe('og:title nennt den ganzen Titel, nicht „Staffel 4“', /og:title" content="Pokémon Horizonte/.test(kopf) && !/og:title" content="[^"]*Staffel 4/.test(kopf), kopf.match(/og:title" content="[^"]*"/)?.[0])
 pruefe('og:description in Staffelzählung, ohne „Folge 137“', /og:description" content="Staffel 4 Folge 1 am/.test(kopf) && !kopf.includes('Folge 137'), kopf.match(/og:description" content="[^"]*"/)?.[0])
 const ohne = head(s4, titel, '2026-11-22', 14839, 'pokemon-horizonte-14839', umfeld, false)
+pruefe('og:title genau', kopf.includes('og:title" content="Pokémon Horizonte: Stand der deutschen Synchro und Termine"'), kopf.match(/og:title" content="[^"]*"/)?.[0])
+pruefe('JSON-LD-Beschreibung in Staffelzählung', kopf.includes('"description":"Staffel 4 Folge 1 am Freitag'))
+const seite = body(s4, titel, undefined, '2026-11-22', [], 14839, 'pokemon-horizonte-14839', umfeld, STAFFELN)
+pruefe('Terminliste der Seite: „Staffel 4 Folge 1: Freitag, 20.11.2026“', seite.includes('<li>Staffel 4 Folge 1: Freitag, 20.11.2026</li>'), seite.match(/<li>[^<]*<\/li>/g))
 pruefe('Gegenprobe ohne Staffelgrenzen: Release-Name und Folge 137 bleiben', /og:title" content="Pokémon Horizonte – Staffel 4/.test(ohne) && ohne.includes('Folge 137 am'))
 
 console.log(`\n${faelle - fehler}/${faelle} Fälle grün`)

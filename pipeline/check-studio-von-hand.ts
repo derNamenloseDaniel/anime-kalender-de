@@ -1,10 +1,10 @@
 /**
  * Test von `lib/studio-von-hand.ts` (Handstudios, `data/studio-von-hand.yaml`) und seiner Verdrahtung in `bau/12-meta.ts` (`baueMeta`).
  * Anlass 22.11.2026: 104 Titel ohne Studio, AniList und aniSearch-Archiv liefern keins, ein Handweg fehlte. Kulisse im Wegwerf-Ordner über `AK_ROOT`;
- * die echte Datei wird nur auf Struktur und Kennungen gegen `public/data/titles.json` geprüft.
+ * die echte Datei wird nur auf Struktur geprüft (`public/data` darf `check:logic` nicht lesen, unbekannte Kennungen meldet der Bau als Warnzeile).
  */
 import { spawnSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import yaml from 'js-yaml'
@@ -57,12 +57,17 @@ pruefe('vorhandenes AniList-Studio bleibt', karte.get(2)!.studios?.join() === 'A
 pruefe('Titel ohne Eintrag bleibt leer', karte.get(3)!.studios?.length === 0)
 pruefe('Zahl der gesetzten Titel: 1 (unbekannte Kennung zählt nicht)', gesetzt === 1, gesetzt)
 
-// Die echte Datei: Struktur und jede Kennung gegen den Bestand.
+// Unbekannte Kennung: Warnzeile im Bau (check:logic darf `public/data` nicht lesen, die Kennungen prüft deshalb der Bau).
+const zeilen: string[] = []
+const echtesLog = console.log
+console.log = (...a: unknown[]) => void zeilen.push(a.join(' '))
+setzeStudiosVonHand(new Map([titel(1, [])]), [{ id: 99, studios: ['Hand'], quellen: ['https://example.org/99'] }])
+console.log = echtesLog
+pruefe('unbekannte Kennung 99 gibt eine Warnzeile', zeilen.some((z) => z.includes('⚠ WARNUNG') && z.includes('Kennung 99')), zeilen)
+
+// Die echte Datei besteht die Strukturprüfung (ladeStudioVonHand wirft sonst).
 const echt = ladeStudioVonHand()
-const bestand = JSON.parse(readFileSync(new URL('../public/data/titles.json', import.meta.url), 'utf8')) as { id: number }[]
-const ids = new Set(bestand.map((t) => t.id))
 pruefe('echte Datei hat Einträge', echt.length > 0, echt.length)
-pruefe('jede Kennung der echten Datei steht in titles.json', echt.every((e) => ids.has(e.id)), echt.filter((e) => !ids.has(e.id)).map((e) => e.id))
 
 // Verdrahtung: baueMeta im Kindprozess gegen eine Kulisse (Mutant „Aufruf in baueMeta entfernt“ muss rot werden).
 const wurzel = mkdtempSync(join(tmpdir(), 'studio-von-hand-'))

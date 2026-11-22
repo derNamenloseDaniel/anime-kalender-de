@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import yaml from 'js-yaml'
 import type { Title } from '../../shared/types.ts'
-import { ROOT } from './util.ts'
+import { log, ROOT } from './util.ts'
 
 export const STUDIO_VON_HAND_DATEI = 'data/studio-von-hand.yaml'
 
@@ -41,7 +41,11 @@ export function setzeStudiosVonHand(titles: Map<number, Title>, hand: StudioVonH
   let gesetzt = 0
   for (const e of hand) {
     const t = titles.get(e.id)
-    if (!t || t.studios?.length) continue
+    if (!t) {
+      log(`⚠ WARNUNG ${STUDIO_VON_HAND_DATEI}: Kennung ${e.id} steht nicht im Bestand (Eintrag entfernen oder Kennung prüfen)`)
+      continue
+    }
+    if (t.studios?.length) continue
     t.studios = [...e.studios]
     gesetzt++
   }

@@ -6,8 +6,9 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Release, Title } from '../shared/types.ts'
-import { nurOmuTitel } from './bau/omu-ohne-termin.ts'
-import { meldeVerletzte } from './lib/quarantaene.ts'
+import { deutschMarke } from './lib/anisearch-marke.ts'
+import { nurOmuImHauptbestand } from './lib/nur-omu-vorstand.ts'
+import { melde } from './lib/quarantaene.ts'
 import { ROOT, readJson } from './lib/util.ts'
 
 const titel = readJson<Title[]>('public/data/titles.json', [])
@@ -18,8 +19,9 @@ function mitSprechrollen(id: number): boolean {
   return existsSync(datei) && ((JSON.parse(readFileSync(datei, 'utf8')) as { roles?: unknown[] }).roles?.length ?? 0) > 0
 }
 
-const nurOmu = nurOmuTitel(new Map(titel.map((t) => [t.id, t])), releases)
-const falsch = meldeVerletzte(titel, 'nur-omu-bestand', 'nur OmU-Termine, kein Deutsch-Beleg: gehört hinter den Toggle', (t) => nurOmu.has(t.id) && !mitSprechrollen(t.id))
+// Soll aus einer eigenen Fassung der Regel (`lib/nur-omu-vorstand.ts`), nicht aus `nurOmuTitel`, das der Bau selbst aufruft.
+const falsch = nurOmuImHauptbestand(titel, releases, mitSprechrollen, deutschMarke)
+for (const t of falsch) melde(t.id, 'nur-omu-bestand', 'nur OmU-Termine, kein Deutsch-Beleg: gehört hinter den Toggle')
 for (const t of falsch) console.error(`✖ ${t.id} ${t.slug}: nur OmU-Termine ohne Deutsch-Beleg im Hauptbestand`)
 console.log(`  ${falsch.length ? '✖' : '✓'} ${titel.length} Titel, ${falsch.length} nur mit OmU-Terminen ohne Deutsch-Beleg im Hauptbestand`)
 console.log(`VERSTÖSSE: ${falsch.length}`)

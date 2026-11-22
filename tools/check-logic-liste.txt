@@ -479,6 +479,7 @@ pipeline/check-news-staffel-zuordnung.ts
 pipeline/check-norm-schluessel.ts
 pipeline/check-notiz-fassung.ts
 pipeline/check-nur-omu-hauptbestand.ts
+pipeline/check-nur-omu-vorstand.ts
 pipeline/check-nur-originalton-liste.ts
 pipeline/check-offene-folgenzahl.ts
 pipeline/check-offiziell-html.ts

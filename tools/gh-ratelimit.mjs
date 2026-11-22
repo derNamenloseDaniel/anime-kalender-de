@@ -58,7 +58,10 @@ const standardKonto = () => (prozessKonto ??= neuesKonto())
 
 /** `gh` als Funktion: Argumente rein, stdout raus; scheitert der Aufruf, steht die erste stderr-Zeile im Fehler. */
 export function ghRoh(args) {
-  const r = spawnSync('gh', args, { encoding: 'utf8', windowsHide: true, maxBuffer: 1 << 24, timeout: 60_000 })
+  // WACHE_LIMIT_MS kürzt die Frist nur im Hänger-Test (wache-limit-haenger.test.mjs), sonst wartet er 60 s bis zu seinem eigenen Abbruch.
+  const limitMs = Number(process.env.WACHE_LIMIT_MS) || 60_000
+  const r = spawnSync('gh', args, { encoding: 'utf8', windowsHide: true, maxBuffer: 1 << 24, timeout: limitMs })
+  if (r.error?.code === 'ETIMEDOUT') throw new Error(`FEHLER: gh ${args.slice(0, 2).join(' ')} nach ${Math.round(limitMs / 1000)} s abgebrochen`)
   if (r.error) throw r.error
   if (r.status !== 0) {
     const grund = String(r.stderr ?? '').trim().split('\n')[0]

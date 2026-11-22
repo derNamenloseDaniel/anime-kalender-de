@@ -60,7 +60,7 @@ pruefe('TMDB-Wertung (Cartoon) bleibt', JSON.stringify(rueck(900101, undefined, 
 pruefe('Titel ohne Eintrag: keine Wertung', rueck(900199).score === undefined)
 pruefe('bewertungNachRegel ohne AniList-Wertung und ohne Seite: leer', Object.keys(bewertungNachRegel({}, undefined)).length === 0)
 
-const alsAnilist = titel(900101, { score: 70, scoreQuelle: 'anilist', anisearchId: 10 })
+const alsAnilist = titel(14839, { score: 70, scoreQuelle: 'anilist', anisearchId: 10, al: 900101 })
 const verweise = verweiseFuer(alsAnilist)
 pruefe('Absprung der Wertung führt zu AniList, nicht zu aniSearch', verweise.length === 1 && verweise[0]?.name === 'AniList' && verweise[0].ziel === 'https://anilist.co/anime/900101' && verweise[0].hinweis === 'Bei AniList ansehen', verweise)
 const westlich = verweiseFuer(titel(900101, { score: 70, scoreQuelle: 'anilist', westlich: true, tmdbId: 99, anisearchId: 10 }))

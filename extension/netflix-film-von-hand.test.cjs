@@ -235,7 +235,7 @@ const DEUTSCH = "[{ code: 'ja', name: 'Japanisch' }, { code: 'de', name: 'Deutsc
 const bereit = (eintrag, reihe, spuren) =>
   [
     `offeneTitel['81234'] = ${JSON.stringify(eintrag)}`,
-    `offeneTitel['99999'] = { titel: 'Anderer', staffeln: [] }`,
+    `offeneTitel['99999'] = ${JSON.stringify(eintrag)}` /* auch der fremde Titel ist ein Film: nur die Adresse trennt */,
     `stand.reihe = '${reihe}'`,
     'stand.folgeNr = null',
     'stand.staffel = null',
@@ -258,11 +258,20 @@ async function fall() {
   const knopf = s.run('knopf')
   const bietetAn = knopf && knopf.disabled === false && /^Film melden/.test(knopf.textContent)
   pruefe('Film nach dem Anschauen: Knopf bietet die Meldung an', bietetAn, knopf && { d: knopf.disabled, t: knopf.textContent })
+  pruefe('Deutsch gehört: grün', knopf.classList.contains('ak-ja') && knopf.textContent === 'Film melden — Deutsch gehört', knopf.textContent)
   s.klick(knopf)
   await s.warte()
   const sprachen = s.meldungen.map((m) => m.sprachen)
   pruefe('Klick sendet genau eine Meldung mit Deutsch', s.meldungen.length === 1 && sprachen[0]?.includes('de|Deutsch'), sprachen)
   pruefe('Meldung trägt die Titelseite des Films', s.meldungen[0]?.url === 'https://www.netflix.com/title/81234', s.meldungen[0]?.url)
+
+  const stumm = await zeichne('/title/81234', FILM, '81234', "[{ code: 'ja', name: 'Japanisch' }]")
+  const kd = stumm.run('knopf')
+  const keinDeutsch = kd.disabled === false && kd.classList.contains('ak-nein') && kd.textContent === 'Film melden — kein Deutsch'
+  pruefe('Kein Deutsch: Knopf meldet es, rot', keinDeutsch, { t: kd.textContent, d: kd.disabled })
+  stumm.klick(kd)
+  await stumm.warte()
+  pruefe('Kein-Deutsch-Meldung geht ohne „de“ raus', stumm.meldungen.length === 1 && stumm.meldungen[0].sprachen?.length === 1, stumm.meldungen.map((m) => m.sprachen))
 
   const ohne = await zeichne('/title/81234', FILM, '81234', 'null')
   pruefe('Film ohne gelesene Tonspuren: nichts anzubieten', ohne.run('knopf').disabled === true, ohne.run('knopf').textContent)

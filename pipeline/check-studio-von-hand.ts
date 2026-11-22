@@ -17,14 +17,16 @@ function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
   verletzt++
   console.error(`  ✖ ${name}${gefunden === undefined ? '' : ` — gefunden: ${JSON.stringify(gefunden)}`}`)
 }
-function wirft(roh: unknown): boolean {
+/** Fehlertext der Prüfung, sonst ''. */
+function fehler(roh: unknown): string {
   try {
     pruefeStudioVonHand(roh)
-    return false
-  } catch {
-    return true
+    return ''
+  } catch (e) {
+    return (e as Error).message
   }
 }
+const wirft = (roh: unknown): boolean => fehler(roh) !== ''
 
 const gut = { id: 1, studios: ['A'], quellen: ['https://example.org/a'] }
 pruefe('gültige Zeile', !wirft([gut]))
@@ -38,6 +40,10 @@ pruefe('vier Studios', wirft([{ ...gut, studios: ['A', 'B', 'C', 'D'] }]))
 pruefe('drei Studios sind erlaubt', !wirft([{ ...gut, studios: ['A', 'B', 'C'] }]))
 pruefe('Quelle fehlt', wirft([{ ...gut, quellen: [] }]))
 pruefe('Quelle ohne https', wirft([{ ...gut, quellen: ['http://example.org/a'] }]))
+pruefe('Fehlertext nennt Eintrag 2 und Kennung 7', fehler([gut, { ...gut, id: 7, studios: [] }]).includes('Eintrag 2 (id 7): studios'), fehler([gut, { ...gut, id: 7, studios: [] }]))
+pruefe('Fehlertext der Quelle nennt https', fehler([{ ...gut, quellen: [] }]).includes('https'), fehler([{ ...gut, quellen: [] }]))
+pruefe('Fehlertext: keine Liste', fehler({ id: 1 }).includes('keine Liste'), fehler({ id: 1 }))
+pruefe('Prüfung gibt Quellen zurück', pruefeStudioVonHand([gut])[0]?.quellen.join() === 'https://example.org/a')
 
 const titel = (id: number, studios: string[]): [number, Title] => [id, { id, studios } as Title]
 const karte = new Map([titel(1, []), titel(2, ['AniList']), titel(3, [])])

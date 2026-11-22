@@ -55,7 +55,7 @@ pruefe('zu wenig Stimmen: keine Wertung, keine Kennzeichnung', rueck(900103).sco
 pruefe('aniSearch-Klarwert (Seite 10: 74 %, 1991 Stimmen) hat Vorrang vor AniList', JSON.stringify(rueck(900101, 10)) === JSON.stringify({ score: 74, scoreQuelle: undefined }), rueck(900101, 10))
 pruefe('aniSearch genau 5 Stimmen (Seite 1001: 36 %) gilt, 4 Stimmen (Seite 10066) fallen auf AniList zurück',
   JSON.stringify(rueck(900101, 1001)) === JSON.stringify({ score: 36, scoreQuelle: undefined }) && JSON.stringify(rueck(900101, 10066)) === JSON.stringify({ score: 70, scoreQuelle: 'anilist' }), [rueck(900101, 1001), rueck(900101, 10066)])
-pruefe('fehlende Zwischenspeicher-Datei zählt leer, die vorhandene bleibt', ladeAnilistWertungen([['data', 'cache', 'gibt-es-nicht.json'].join('/'),'data/cache/anilist-by-id.json']).get(900101)?.score === 70)
+pruefe('fehlende Zwischenspeicher-Datei zählt leer, die vorhandene bleibt', ladeAnilistWertungen([['data', 'cache', 'gibt-es-nicht.json'].join('/'), 'data/cache/anilist-by-id.json']).get(900101)?.score === 70)
 pruefe('TMDB-Wertung (Cartoon) bleibt', JSON.stringify(rueck(900101, undefined, { score: 66, scoreQuelle: 'tmdb' })) === JSON.stringify({ score: 66, scoreQuelle: 'tmdb' }))
 pruefe('Titel ohne Eintrag: keine Wertung', rueck(900199).score === undefined)
 pruefe('bewertungNachRegel ohne AniList-Wertung und ohne Seite: leer', Object.keys(bewertungNachRegel({}, undefined)).length === 0)

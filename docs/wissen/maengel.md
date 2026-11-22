@@ -508,3 +508,20 @@ Bezug 19.11., gemessen mit `stillstandMessen` an `data/maengel.json` (Stichprobe
 ## Messungen schreiben in `data/` (22.11.2026, Lehre 216)
 
 `npx tsx pipeline/check-qualitaet.ts` hängt eine Tageszeile an `data/qualitaet-verlauf.json`. Im Hauptordner gestartet, blockierte die Änderung danach `git pull --ff-only`. Messskripte, die nach `data/` schreiben, laufen deshalb nur in einem Worktree.
+
+## Übersetzungsprobe und Hand-Stillstand 22.11.2026 (Lehre 219)
+
+- **Übersetzungsprobe** (`tools/handlung-fakten/uebersetzung.ts`, aufgerufen von `handlung-ueberschneidung.mjs`): Eine Fassung, die den Klappentext übersetzt, teilt keine 5-Wort-Folge. Gemessen wird die längste gemeinsame Folge von 4-Zeichen-Stämmen (Namen, Zahlen, Verwandtes) als Anteil, nur bei Längenverhältnis 0,75–1,33. 24 eigene Texte gegen AniList: im Längenfenster höchstens 0,121; wörtliche Übersetzung von 101343: 0,175; Schwelle 0,145. **Dünn belegt (ein Übersetzungsfall)**; die Probe fängt nur nahe Übersetzungen, ersetzt keine Durchsicht. Netz: AniList hat Rate Limit (429 nach ~20 Abrufen, 2,5 s Pause einhalten).
+- **Hand-Arten im Stillstand:** `stillstandMessenHand` meldet `hand:`-Arten ohne Abbau oder gestiegen mit Abstand 7 Tage (`STILLSTAND_TAGE_HAND`); die Kurzzeile trennt auto und hand, wenn beide stehen. Das gilt zugleich für `handlung-de` und `studio`, deren Besitzerwechsel zu `hand:` die Warnung vorher stumm schaltete (Einträge oben): sie melden jetzt nach 7 Tagen ohne Abbau.
+
+## Wertung: Rest 108 erklärt und geschlossen (22.11.2026, Auftrag wertung-rest-2211)
+
+Messung am selben Tag an den 108 Titeln ohne `score` (AniList-GraphQL, 25 je Anfrage; kein TMDB-Schlüssel in der Umgebung, TMDB-Stimmen nicht gemessen):
+
+| Gruppe | Titel | Quelle | Ergebnis |
+|---|---|---|---|
+| AniList-Kennung (< 5 Mio.) | 50 | AniList ≥ 10 Stimmen | 48 mit Zahl (Schwelle 1/3/5/10 gleich, ≥ 20: 40), 2 ohne `averageScore`/`meanScore` |
+| nur aniSearch (≥ 10 Mio.) | 55 | aniSearch-Seite 0–4 Stimmen (22 mal 0, 33 mal 1–4), kein AniList-Eintrag, keine `malId` | keine Quelle mit genug Stimmen |
+| Eigentitel/Cartoon (5 Mio.) | 3 | TMDB ohne ≥ 10 Stimmen (`cartoons.ts`), keine aniSearch-ID | keine Quelle mit genug Stimmen |
+
+Ursache des Stillstands: `fetch.ts` holte abgeschlossene Zwischenspeicher-Einträge nie neu, auch nicht ohne `stats`/`meanScore` (vor 22.11.2026); der Rückfall aus #4574 hatte nichts zu lesen. Fix: `eintragNochOffen` (`lib/anilist.ts`) holt Einträge ohne `stats` einmal neu (wie bei `countryOfOrigin`, 09.10.2026). Die 58 Titel ohne Quelle sind in der Regel `wertung` die Ausnahme `keine-quelle-mit-stimmen` (Kennung ≥ `EIGENE_ID_BASIS`). Erwartung nach dem nächsten Bestandsbau: wertung offen 108 → 2 (+ 58 Ausnahme). Beobachten: nächster Bestandsbau, dann nach einem Tag.

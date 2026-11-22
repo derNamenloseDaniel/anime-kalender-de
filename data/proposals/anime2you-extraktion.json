@@ -2030,6 +2030,11 @@
       "am": "2026-11-20",
       "vorschlaege": 0
     },
+    "1073790": {
+      "am": "2026-11-22",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
     "1073842": {
       "am": "2026-11-20",
       "vorschlaege": 1
@@ -2075,6 +2080,10 @@
       "am": "2026-11-21",
       "vorschlaege": 1
     },
+    "1074234": {
+      "am": "2026-11-22",
+      "vorschlaege": 1
+    },
     "1074258": {
       "am": "2026-11-21",
       "vorschlaege": 1
@@ -2115,6 +2124,10 @@
     "1074568": {
       "am": "2026-11-22",
       "vorschlaege": 1
+    },
+    "1074589": {
+      "am": "2026-11-22",
+      "vorschlaege": 0
     }
   },
   "vorschlaege": [
@@ -16577,6 +16590,29 @@
       "artikelId": "1073845",
       "artikel": "Neue »Avatar«-Serie setzt auf komplett neues Autorenteam",
       "quelle": "https://www.anime2you.de/news/1073845/neue-avatar-serie-komplett-neues-autorenteam/",
+      "veroeffentlicht": "2026-11-22",
+      "gelesenAm": "2026-11-22"
+    },
+    {
+      "titel": "BOFURI: I Don’t Want to Get Hurt, so I’ll Max Out My Defense.",
+      "zitat": "Die neue Gesamtausgabe der zweiten »BOFURI«-Staffel, die alle zwölf Episoden in drei Volumes mit Sammelschuber enthält, erscheint voraussichtlich am 5. Februar 2027 als DVD und Blu-ray.",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2027-02-05",
+      "uhrzeit": null,
+      "anbieter": "AniMoon Publishing",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "zwölf Episoden",
+      "unsicher": "Termin ist im Artikel als „voraussichtlich“ bezeichnet, also noch nicht endgültig bestätigt.",
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „AniMoon Publishing“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1074234",
+      "artikel": "Zweite »BOFURI-Staffel erscheint als Blu-ray-Gesamtausgabe",
+      "quelle": "https://www.anime2you.de/news/1074234/bofuri-staffel-2-blu-ray-gesamtausgabe/",
       "veroeffentlicht": "2026-11-22",
       "gelesenAm": "2026-11-22"
     }

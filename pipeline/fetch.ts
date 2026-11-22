@@ -10,6 +10,7 @@
  */
 import { mediaByMalIds, searchMedia, type AniListMedia, eintragNochOffen, istQuellenAusfall } from './lib/anilist.ts'
 import { MANGEL_GRENZE_KENNUNG, stempeln, zuHolen } from './lib/anilist-mangel.ts'
+import { todayIso } from '../shared/time.ts'
 import { ausAnisearchDubs, ausAnisearchHand } from './lib/anisearch-synchro-ids.ts'
 import { holeAnisearchCover } from './lib/anisearch-cover.ts'
 import { loadCurated, loadSynchroVonHand } from './lib/curated.ts'
@@ -96,7 +97,7 @@ async function main(): Promise<void> {
   */
   const nochOffen = (m: AniListMedia | undefined): boolean => Boolean(m) && eintragNochOffen(m!)
   const cached = readJson<Record<string, AniListMedia>>('data/cache/anilist-media.json', {})
-  const heute = new Date().toISOString().slice(0, 10)
+  const heute = todayIso() // Berliner Tag wie überall; für den 2-Tage-Abstand genügt er
   const missing = FORCE ? malIds : zuHolen(cached, malIds, nochOffen, heute)
   log(`AniList: ${missing.length} von ${malIds.length} IDs fehlen im Cache`)
 

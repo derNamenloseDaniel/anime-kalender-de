@@ -2,7 +2,7 @@
  * Zusicherungen zur AniList-Frische (Rang 7b, 22.11.2026): ein abgeschlossener Eintrag mit offenem Mangel (Wertung oder Studio fehlt) wird neu geholt,
  * ohne Mangel nicht; ein Eintrag mit Mangel, der heute schon geholt wurde, nicht; höchstens `grenze` je Lauf, älteste zuerst. Reine Einheit, kein Netz. Aufruf: `check:logic`.
  */
-import { hatOffenenMangel, mangelNeuHolen, MANGEL_ABSTAND_TAGE, type MitStempel } from './lib/anilist-mangel.ts'
+import { hatOffenenMangel, mangelNeuHolen, zuHolen,MANGEL_ABSTAND_TAGE, type MitStempel } from './lib/anilist-mangel.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -41,6 +41,9 @@ pruefe('Grenze: höchstens 2 je Lauf, die ältesten', JSON.stringify(mangelNeuHo
 pruefe('Mangel: Eintrag ganz ohne Studio-Angabe zählt als Mangel', hatOffenenMangel({ averageScore: 70, meanScore: 70, studios: undefined } as unknown as MitStempel))
 const viele: Record<string, MitStempel> = Object.fromEntries(Array.from({ length: 101 }, (_, i) => [900100 + i, eintrag(900100 + i, { studios: { nodes: [] } })]))
 pruefe('Standardgrenze: 101 Einträge mit Mangel, 100 je Lauf', mangelNeuHolen(viele, Object.keys(viele).map(Number), HEUTE).length === 100)
+const laufend = (m: MitStempel): boolean => m.id === 900003
+const gesamt = zuHolen(speicher, [...ids, 777777], laufend, HEUTE)
+pruefe('zuHolen: fehlende (777777) und noch offene (900003) Einträge zusätzlich zu den Mangel-Einträgen', gesamt.includes(777777) && gesamt.includes(900003) && gesamt.includes(900001) && !gesamt.includes(900004), gesamt)
 pruefe('Kennungen ohne Eintrag werden nicht erfunden', mangelNeuHolen(speicher, [777777, 900001], HEUTE).join() === '900001')
 
 process.exit(verletzt ? 1 : 0)

@@ -24,6 +24,10 @@ console.log('\naniSearch-Kennung bei mehreren Titeln:')
   pruefe('Handbindung auf eine andere Kennung zählt nicht', anisearchKennungMehrfach(gantz, { 384: 999, 395: 999 }).length === 1)
   pruefe('drei Titel, einer gebunden: Meldung', anisearchKennungMehrfach([...gantz, { id: 400, anisearchId: 585 }], { 395: 585 }).length === 1)
   pruefe('jede Kennung nur einmal: nichts', anisearchKennungMehrfach([{ id: 1, anisearchId: 5 }, { id: 2, anisearchId: 6 }, { id: 3 }, { id: 4 }], {}).length === 0)
+  /* Staffel-Titel aus einem Sammeltitel (Horizonte): alle vier tragen Seite 17947, nur die Basis zählt. */
+  const horizonte = [{ id: 158871, anisearchId: 17947, staffelTitel: { sammel: 158871 } }, ...[7000001, 7000002, 7000003].map((id) => ({ id, anisearchId: 17947, staffelTitel: { sammel: 158871 } }))]
+  pruefe('Staffel-Titel teilen die Seite des Sammeltitels: in Ordnung', anisearchKennungMehrfach(horizonte, {}).length === 0)
+  pruefe('ein fremder Titel auf derselben Seite wird weiter gemeldet', anisearchKennungMehrfach([...horizonte, { id: 99, anisearchId: 17947 }], {}).length === 1)
 }
 
 if (verletzt) {

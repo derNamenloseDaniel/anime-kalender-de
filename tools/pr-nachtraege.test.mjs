@@ -95,6 +95,12 @@ const ohneUrteil = (...ks) => waehleNachtraege([urteil('aendern'), ...ks], 'auto
 pruefe('Urteil des Inhabers (Protokollzeile mit Urteil) ist keine Antwort', ohneUrteil(k('inhaber', '**Prüfer-Review** für fe21e7b7d - Urteil: **ok**', OWNER)) === 0)
 pruefe('Protokollzeile des Inhabers ohne „Urteil:“ ist keine Antwort', ohneUrteil(k('inhaber', '**Prüfer-Review** für fe21e7b7d', OWNER)) === 0)
 pruefe('Urteilszeile des Inhabers ohne Protokollkopf ist keine Antwort', ohneUrteil(k('inhaber', 'Prüfer (Abnahme) - Urteil: ok', OWNER)) === 0)
+for (const zeile of ['Prüfer: ändern', 'Prüfer: frei', 'Prüfer Stufe 2: ändern', '**Prüfer: ok**'])
+  pruefe(`Urteil des Prüfer-Agenten „${zeile}“ ist keine Antwort`, ohneUrteil(k('inhaber', `${zeile}\n\nA1 Fehltreffer`, OWNER)) === 0)
+pruefe('Prüfer-Wort ohne Urteilswort bleibt Antwort', ohneUrteil(k('inhaber', 'Prüfer: Auflage umgesetzt', OWNER)) === 1)
+// PR 4579 (echter Anfang): Inhaber-Hinweis nach dem Urteil wird angehängt; bekannter Fehltreffer, 1 von 60 PRs (22.11.2026).
+pruefe('Bekannter Fehltreffer: Inhaber-Hinweis an die Bauer-Sitzungen wird angehängt',
+  ohneUrteil(k('inhaber', '## Hinweis an die Bauer-Sitzungen (Dirigent, 22.11.2026 17:45)\n\nDer Arbeitsstand', OWNER)) === 1)
 pruefe('Kommentar ohne Text (leer, null) nach Urteil bricht nichts und zählt nicht', ohneUrteil(k('inhaber', '', OWNER), k('inhaber', null, OWNER)) === 0)
 pruefe('Prüfer Runde (ohne Urteilswort) als erster Prüferkommentar öffnet die Antworten',
   waehleNachtraege([k('autor', '## Prüfer Runde 2'), k('autor', 'Auflage umgesetzt')], 'autor').join('|') === '## Prüfer Runde 2|Auflage umgesetzt')

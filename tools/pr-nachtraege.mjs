@@ -21,7 +21,9 @@ export const PRUEFER_RUNDE = /^\s*(\*\*|#+ *)?Prüfer Runde/i
 const CI_PROTOKOLL = /\*\*Prüfer-Review\*\* für/
 // Ergebniskommentar von mutationsprobe.yml (Bot): der Prüfer verlangt es als Beleg und sah es nicht (PR 2460, 30.10.2026).
 export const MUTATIONSPROBE = /^## Mutationsprobe für /
-export const CI_BOT = 'github-actions[bot]'
+// Urteilszeile des Prüfer-Agenten („Prüfer: ändern“, „Prüfer Stufe 2: frei“), die `urteilAus` nicht kennt (Prüfer zu PR 4595).
+const AGENT_URTEIL = /^[\s*#]*Prüfer[^:\n]*:\s*\**(ändern|aendern|frei|freigegeben|freigeben|ok)\b/i
+export const CI_BOT ='github-actions[bot]'
 const MAX_PRUEFER = 6000
 const AUTOR = /^[A-Za-z0-9][A-Za-z0-9-]*(\[bot\])?$/
 export const VERTRAUT = new Set(['OWNER', 'MEMBER', 'COLLABORATOR'])
@@ -39,7 +41,7 @@ export function waehleNachtraege(kommentare, autor) {
   const runde = (k) => (zaehlt(k) && PRUEFER_RUNDE.test(k.body ?? '')) || (k.user?.login === CI_BOT && botText(k))
   const nachtrag = (k) => zaehlt(k) && NACHTRAG.test(k.body ?? '')
   // 22.11.2026 (PR 4581: „Prüfer-Auflage umgesetzt …“ fiel durch): jeder Kommentar eines Berechtigten nach dem ersten Prüferurteil ist Antwort darauf.
-  const urteil = (k) => urteilAus(k.body) !== null || CI_PROTOKOLL.test(k.body ?? '')
+  const urteil = (k) => urteilAus(k.body) !== null || CI_PROTOKOLL.test(k.body ?? '') || AGENT_URTEIL.test(String(k.body ?? '').split('\n')[0])
   const ersterPruefer = kommentare.findIndex((k) => urteil(k) || runde(k))
   const antwort = (k, i) => ersterPruefer >= 0 && i > ersterPruefer && zaehlt(k) && k.user?.login !== CI_BOT && !urteil(k) && (k.body ?? '') !== ''
   const text = (k) => (nachtrag(k) ? k.body : k.body.slice(0, MAX_PRUEFER))

@@ -1,0 +1,5 @@
+kategorie: feature
+text: Vier Titel zeigen jetzt die deutsche Tonspur
+untertitel: "Nils Holgersson, Seven Days War, Freddy Frog und Sonic X auf Prime Video"
+wartetAuf: "Bestandsbau nach diesem PR. Probe: In public/data/titles.json tragen die Prime-Wege von 2151, 101610, 102397, 1816 dub true; check:handbelege grün."
+seit: '2026-11-22'

@@ -427,6 +427,7 @@ pipeline/check-maengel-bau-lauf.ts
 pipeline/check-maengel-regeln.ts
 pipeline/check-maengel-register.ts
 pipeline/check-maengel-staffel.ts
+pipeline/check-maengel-tv-folge.ts
 pipeline/check-maengel-stillstand.ts
 pipeline/check-mail-sorten.ts
 pipeline/check-mail-verschoben-datum.ts

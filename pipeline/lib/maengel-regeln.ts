@@ -5,6 +5,7 @@ import { zaehleErstausgabeOhneWeg } from './erstausgabe-ohne-weg.ts'
 import { folgenzahlAusnahme, type FranchiseTeil } from './folgenzahl-erklaerung.ts'
 import { herkunftFremderTitel } from './herkunft-fremder-titel.ts'
 import { ohneSprachurteil } from './ohne-sprachurteil.ts'
+import { tvSichtungOhneFolge } from './maengel-tv-folge.ts'
 import { STAFFEL_AUSNAHME, type StaffelBefund } from './maengel-staffel.ts'
 import { fremdeBilder, KEINE_LESBARE, type BildLookup, type PlakatWahl } from './bild-sprache.ts'
 
@@ -168,6 +169,7 @@ export const REGELN: Regel[] = [
   { art: 'staffel-zuordnung', gruppe: 'falsch', wirkung: 2, wer: 'hand:synchro-belegen', zaehle: (t, k) => k.staffelZuordnung.has(t.id), ausnahme: (t, k) => STAFFEL_AUSNAHME[k.staffelZuordnung.get(t.id)!] ?? (laeuftNoch(t, k) ? 'laeuft' : undefined) },
   { art: 'herkunft-fremder-titel', gruppe: 'falsch', wirkung: 3, wer: 'auto:bau', zaehle: (t, k) => herkunftFremderTitel(t, k.releases.get(t.id) ?? []) },
   { art: 'weg-ohne-adresse', gruppe: 'fehlend', wirkung: 3, wer: 'auto:anbieterkalender', zaehle: (t) => Boolean(t.streams?.some((s) => !s.url)) },
+  { art: 'tv-sichtung-ohne-folge', gruppe: 'fehlend', wirkung: 2, wer: 'auto:bau', zaehle: (t, k) => tvSichtungOhneFolge(k.releases.get(t.id) ?? []) },
 ]
 
 /**

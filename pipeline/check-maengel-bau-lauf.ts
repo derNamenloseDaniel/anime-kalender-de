@@ -118,7 +118,7 @@ pruefe('Lauf 1: Disc-Termin ist ein Weg (kein kein-weg, kein erstausgabe-ohne-we
 pruefe('Lauf 1: Termin am heutigen Tag zählt als künftig (kein termin-fehlt-laufend bei Titel 8)', !r1.zeilen.some((z) => z.t === 8), r1.zeilen.filter((z) => z.t === 8))
 pruefe('Lauf 1: Erstlauf kennt kein „neu“', Object.values(r1.zaehler).every((z) => z.neu === 0) && r1.zeilen.every((z) => !z.ereignis), r1)
 pruefe('Lauf 1: erschienen-ohne-weg: Titel 1 offen, Titel 9 (Handbeleg dub:false) Ausnahme', r1.zaehler['erschienen-ohne-weg']?.offen === 1 && r1.zaehler['erschienen-ohne-weg']?.ausnahme === 1, r1.zaehler['erschienen-ohne-weg'])
-pruefe('Lauf 1: alle 27 Arten im Zähler', Object.keys(r1.zaehler).length === 27, Object.keys(r1.zaehler))
+pruefe('Lauf 1: alle 28 Arten im Zähler', Object.keys(r1.zaehler).length === 28, Object.keys(r1.zaehler))
 pruefe('Lauf 1: bild-fremdsprachig: Titel 15 (TMDB ohne Bild), 16 (nur japanisch) und 17 (geteilter Film) sind Ausnahme', r1.zaehler['bild-fremdsprachig']?.offen === 0 && r1.zaehler['bild-fremdsprachig']?.ausnahme === 3, r1.zaehler['bild-fremdsprachig'])
 
 /* Vorfassung altern lassen und committen; Titel 1 bekommt sein Cover, Titel 3 ist neu ohne Banner. */

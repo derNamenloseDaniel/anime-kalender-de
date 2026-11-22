@@ -2,7 +2,7 @@
  * Zusicherungen zur AniList-Frische (Rang 7b, 22.11.2026): ein abgeschlossener Eintrag mit offenem Mangel (Wertung oder Studio fehlt) wird neu geholt,
  * ohne Mangel nicht; ein Eintrag mit Mangel, der heute schon geholt wurde, nicht; höchstens `grenze` je Lauf, älteste zuerst. Reine Einheit, kein Netz. Aufruf: `check:logic`.
  */
-import { hatOffenenMangel, mangelNeuHolen, zuHolen,MANGEL_ABSTAND_TAGE, type MitStempel } from './lib/anilist-mangel.ts'
+import { hatOffenenMangel, mangelNeuHolen, zuHolen, MANGEL_ABSTAND_TAGE, type MitStempel } from './lib/anilist-mangel.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {

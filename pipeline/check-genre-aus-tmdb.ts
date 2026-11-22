@@ -35,6 +35,28 @@ pruefe('nur Animation: bleibt ohne Genre', titles.get(4)!.genres.length === 0)
 pruefe('Zusicherung: gekennzeichnet nur mit Genre', genreQuelleFehler(titles.values()).length === 0)
 pruefe('Zusicherung meldet Kennzeichen ohne Genre', genreQuelleFehler([{ id: 9, genres: [], genreQuelle: 'tmdb' } as unknown as Title]).length === 1)
 
+console.log('\nGenre aus TMDB: jede Zeile der Tabelle, Echtfall, Zählung, Einbau')
+const ERWARTET: Record<number, string> = {
+  12: 'Adventure', 14: 'Fantasy', 18: 'Drama', 27: 'Horror', 28: 'Action', 35: 'Comedy', 53: 'Thriller', 80: 'Crime', 878: 'Sci-Fi', 9648: 'Mystery',
+  10402: 'Music', 10749: 'Romance', 10759: 'Action,Adventure', 10765: 'Sci-Fi,Fantasy',
+}
+for (const [id, soll] of Object.entries(ERWARTET)) pruefe(`TMDB ${id} → ${soll}`, genresAusTmdb([16, Number(id)]).join() === soll, genresAusTmdb([16, Number(id)]))
+pruefe('Tabelle hat genau diese Zeilen', Object.keys(TMDB_GENRE).length === Object.keys(ERWARTET).length)
+
+const gemeldet: string[] = []
+const alt = console.log
+console.log = (...a: unknown[]) => void gemeldet.push(a.join(' '))
+/* 16570 (AniList, ohne Genre bei AniList, 22.11.2026): TMDB 467885 nennt [16,12,10751,14,878] aus der echten Datei. */
+const echt = new Map<number, Title>([[16570, titel(16570, [])]])
+uebernehmeGenreAusTmdb({ titles: echt, tmdbMehrdeutig: new Set() })
+console.log = alt
+pruefe('Echtfall aus data/tmdb-titles.json: Adventure, Fantasy, Sci-Fi, gekennzeichnet', echt.get(16570)!.genres.join() === 'Adventure,Fantasy,Sci-Fi' && echt.get(16570)!.genreQuelle === 'tmdb', echt.get(16570))
+pruefe('Baulog nennt die Zahl der ergänzten Titel', gemeldet.some((z) => z.includes('Genre aus TMDB: 1 Titel')), gemeldet)
+
+const abschluss = await import('./bau/11-wege-abschluss.ts')
+const text = (await import('node:fs')).readFileSync(new URL('./bau/11-wege-abschluss.ts', import.meta.url), 'utf8')
+pruefe('Einbau: der Bauschritt ruft den Rückfall auf', typeof abschluss.schliesseWegeAb === 'function' && /uebernehmeGenreAusTmdb\(\{ titles, tmdbMehrdeutig \}\)/.test(text))
+
 if (verletzt) {
   console.error(`\n${verletzt} Zusicherung(en) verletzt.`)
   process.exit(1)

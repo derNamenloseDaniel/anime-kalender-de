@@ -11,9 +11,16 @@ import { type Umfeld } from './titel-umfeld.ts'
 import { teilenPfad, titelAdresse, titelHash } from '../../shared/teilen.ts'
 import { zeitMitMarke } from '../../shared/zeit-text.ts'
 import { OG_FASSUNG } from './og-fassung.ts'
+import { staffelUndFolge, type StaffelZeile } from '../../shared/staffel-folge.ts'
+
+/** „Staffel 4 Folge 1“ bei Sammeltiteln mit deutschen Staffelgrenzen (Horizonte), sonst „Folge 137“ — wie die Kalenderkarte (`staffelFolge`). */
+export function folgeImTitel(nr: number, staffeln: StaffelZeile[] | undefined): string {
+  const sf = staffelUndFolge(staffeln, nr)
+  return sf ? `Staffel ${sf[0]} Folge ${sf[1]}` : `Folge ${nr}`
+}
 
 /** Beschreibungstext der Vorschau — das, was unter der Überschrift steht. */
-export function describe(release: Release, title: Title | undefined, today: string): string {
+export function describe(release: Release, title: Title | undefined, today: string, staffeln?: StaffelZeile[]): string {
   const events = expandEvents(release)
   const next = events.find((e) => e.date >= today) ?? events[0]
   const parts: string[] = []
@@ -25,7 +32,7 @@ export function describe(release: Release, title: Title | undefined, today: stri
       : release.releaseType === 'disc'
         ? ''
         : ' (Uhrzeit noch offen)'
-    const episode = anzeigeFolge(next) ? `Folge ${next.episode}` : null
+    const episode = anzeigeFolge(next) ? folgeImTitel(next.episode!, staffeln) : null
     parts.push(
       release.releaseType === 'disc'
         ? `Erscheint am ${when} auf ${release.edition ?? 'DVD und Blu-ray'}.`
@@ -180,6 +187,7 @@ export function body(
   ak: number,
   adresse: string,
   umfeld: Umfeld,
+  staffeln?: StaffelZeile[],
 ): string {
   const events = expandEvents(release)
   const next = events.find((e) => e.date >= today) ?? events[0]
@@ -201,7 +209,7 @@ export function body(
     .map((e) => {
       const wann = `${weekdayName(e.date)}, ${formatDate(e.date)}`
       const zeit = e.time ? ` um ${zeitMitMarke(e, '≈ ')} Uhr` : ''
-      const folge = anzeigeFolge(e) ? `Folge ${e.episode}${e.episodeCount ? ` von ${e.episodeCount}` : ''}: ` : ''
+      const folge = anzeigeFolge(e) ? `${folgeImTitel(e.episode!, staffeln)}${e.episodeCount ? ` von ${e.episodeCount}` : ''}: ` : ''
       const abgeleitet = e.estimated && !e.timeEstimated ? ' (Termin abgeleitet)' : ''
       return `<li>${esc(`${folge}${wann}${zeit}${abgeleitet}`)}</li>`
     })
@@ -246,7 +254,7 @@ export function body(
  * Typ presst, behauptet für eine Blu-ray-Box dieselbe Sache wie für eine
  * wöchentliche Ausstrahlung.
  */
-function strukturierteDaten(release: Release, title: Title | undefined, today: string, url: string): string {
+function strukturierteDaten(release: Release, title: Title | undefined, today: string, url: string, staffeln?: StaffelZeile[]): string {
   const events = expandEvents(release)
   const next = events.find((e) => e.date >= today) ?? events[0]
 
@@ -258,7 +266,7 @@ function strukturierteDaten(release: Release, title: Title | undefined, today: s
     url,
     ...sprachFeld(title),
     /* Dieselbe Beschreibung wie im og:description — eine Auskunft, eine Quelle. */
-    description: describe(release, title, today),
+    description: describe(release, title, today, staffeln),
   }
   const andere = andereNamen(title, release.name)
   if (andere.length) daten.alternateName = andere
@@ -308,13 +316,13 @@ function strukturierteDaten(release: Release, title: Title | undefined, today: s
 }
 
 /** `mehrereReleases`: Hat der Titel mehrere, nennt der Seitentitel den Titel, nicht den Namen des einen Releases („… – Vol. 1“). */
-export function head(release: Release, title: Title | undefined, today: string, ak: number, adresse: string, umfeld: Umfeld, mehrereReleases = false): string {
+export function head(release: Release, title: Title | undefined, today: string, ak: number, adresse: string, umfeld: Umfeld, mehrereReleases = false, staffeln?: StaffelZeile[]): string {
   const events = expandEvents(release)
   const next = events.find((e) => e.date >= today) ?? events[0]
   const url = `${SITE}${teilenPfad(adresse)}`
   const image = `${SITE}og/${release.slug}.jpg?v=${OG_FASSUNG}`
-  const headline = seitenTitel(mehrereReleases && title ? titelName(title) : release.name, title, true)
-  const description = describe(release, title, today)
+  const headline = seitenTitel((mehrereReleases || staffeln?.length) && title ? titelName(title) : release.name, title, true)
+  const description = describe(release, title, today, staffeln)
   const hash = titelHash(ak, adresse, next?.date)
 
   return `    <title>${esc(headline)}</title>
@@ -335,7 +343,7 @@ export function head(release: Release, title: Title | undefined, today: string, 
     <meta name="twitter:description" content="${esc(description)}" />
     <meta name="twitter:image" content="${image}" />
     <link rel="canonical" href="${url}" />
-${strukturierteDaten(release, title, today, url)}
+${strukturierteDaten(release, title, today, url, staffeln)}
 ${umfeld.krumenJsonLd}
     <script>
       // Läuft vor dem Modul-Skript der App, weil klassische Inline-Skripte

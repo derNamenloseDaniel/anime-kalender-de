@@ -33,12 +33,21 @@ export function jetztBerlin(): string {
   return `${todayIso()}T${nowHhMm()}`
 }
 
+/**
+ * Die offenen TOGGO-Folgen. TOGGO zählt je Staffel ab 1: Über mehrere Staffeln trägt jede Folge einen eigenen Schlüssel
+ * (Staffel × 1.000.000 + Folge), sonst fielen Staffel 1–3 von Horizonte auf 47 Folgen zusammen (Daniel, 22.11.2026).
+ * Bei nur einer Staffel bleibt die Nummer, damit sie mit `dubRanges` anderer freier Wege zusammenfällt (Daima).
+ */
+export function toggoFolgen(bloecke: NonNullable<WatchLink['toggo']>, jetzt: string): number[] {
+  const mehrere = new Set(bloecke.map((b) => b.staffel)).size > 1
+  return bloecke
+    .filter((b) => b.ab <= jetzt && jetzt < b.ende)
+    .flatMap((b) => Array.from({ length: b.bis - b.von + 1 }, (_, i) => (mehrere ? b.staffel * 1_000_000 : 0) + b.von + i))
+}
+
 /** Die Folgennummern eines Weges — `'eine'`, wenn es genau eine ist, deren Nummer wir nicht kennen. */
 function folgenFuer(w: Partial<WatchLink & StreamLink>, jetzt: string): number[] | 'eine' | undefined {
-  if (w.toggo) {
-    const offen = w.toggo.filter((b) => b.ab <= jetzt && jetzt < b.ende)
-    return offen.flatMap((b) => Array.from({ length: b.bis - b.von + 1 }, (_, i) => b.von + i))
-  }
+  if (w.toggo) return toggoFolgen(w.toggo, jetzt)
   /* Kachel-Form von `toggo`: nur Ja/Nein, ohne Folgennummern (die Zahl ist dort unbekannt, der Filter fragt nur nach „irgendeine“). */
   if (w.toggoOffen) return fensterOffen(w.toggoOffen, jetzt) ? 'eine' : []
   if (w.nurFolge != null) return [w.nurFolge]

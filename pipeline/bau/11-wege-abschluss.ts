@@ -16,6 +16,7 @@ import { kennzeichneFreenetLautSchwester } from './11-8-schwester-shop.ts'
 import { verwirfKapitelShopWege } from './11-9-kapitel-shop.ts'
 import { uebernehmeFskAusJustwatch } from './11-2-1-fsk-justwatch.ts'
 import { uebernehmeFskAusFranchise } from './11-2-1-fsk-franchise.ts'
+import { uebernehmeGenreAusTmdb } from './genre-aus-tmdb.ts'
 import { ergaenzeDiscUndZugang } from './11-1-disc-und-zugang.ts'
 import { entferneFremdeNachStaffeln, kennungAusAdresse, type CrStaffel } from './cr-serie-geteilt.ts'
 import { begrenzeWegeAufBelege } from './wege-begrenzen.ts'
@@ -69,6 +70,7 @@ export function schliesseWegeAb({
   fuelleWegeAusJustwatch({ titles, tmdbMehrdeutig, istTot })
   uebernehmeFskAusJustwatch({ titles, tmdbMehrdeutig })
   uebernehmeFskAusFranchise(titles, releases)
+  uebernehmeGenreAusTmdb({ titles, tmdbMehrdeutig })
 
   bereinigeWege({
     titles,

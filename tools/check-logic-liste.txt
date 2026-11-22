@@ -298,6 +298,7 @@ pipeline/check-folgenzahl-offen-bau.ts
 pipeline/check-folgenzahl-offen.ts
 pipeline/check-folgenzahl-sichtung.ts
 pipeline/check-fsk-franchise.ts
+pipeline/check-genre-aus-tmdb.ts
 pipeline/check-geteilte-adressen.ts
 pipeline/check-gleiche-adresse.ts
 pipeline/check-gleichtag-grenze.ts
@@ -325,6 +326,7 @@ pipeline/check-herkunftsfilter.ts
 pipeline/check-herkunftsland.ts
 pipeline/check-hinweis-anzeige.ts
 pipeline/check-hoechstens-ratsche.ts
+pipeline/check-horizonte-kachel.ts
 pipeline/check-horizonte-staffeln-bestand-lauf.ts
 pipeline/check-horizonte-staffeln.ts
 pipeline/check-ics-folgen.ts

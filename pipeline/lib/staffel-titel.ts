@@ -11,6 +11,7 @@
 import type { StreamLink, Title } from '../../shared/types.ts'
 import type { WatchLink } from '../../shared/watchlink-typ.ts'
 import { istStaffelTitel } from '../../shared/staffel-titel.ts'
+import { addDays } from '../../shared/time.ts'
 import type { StaffelGrenzen } from './pokemon-staffeln.ts'
 import { slugify } from './util.ts'
 
@@ -118,6 +119,14 @@ export function teileWatchLinks(links: WatchLink[], plan: StaffelPlan): { je: Ma
   return { je, bloecke, fremd }
 }
 
+/** Folgen der längsten abgeschlossenen Staffel: Eine höhere Nummer kann keine Zählung innerhalb einer Staffel sein (`staffelVonTiteln`). */
+export const laengsteStaffel = (plan: StaffelPlan): number => Math.max(0, ...plan.staffeln.flatMap((s) => (s.bis === undefined ? [] : [s.bis - s.von + 1])))
+
+/** Der Tag, ab dem Meldungen zur Basis-Staffel in deren Zählung gelten: der Tag nach dem ersten ausgelieferten Bestand mit dem Schnitt (steht er schon in `titles.json`, bleibt sein Tag), nie der Tag des Merge. */
+export function aktivTag(vorher: { id: number; staffelTitel?: { aktiv?: string } }[], sammel: number, heute: string): string {
+  return vorher.find((t) => t.id === sammel)?.staffelTitel?.aktiv ?? addDays(heute, 1)
+}
+
 /**
  * Ein Titel je Staffel. Name „<Titel> – Staffel N“, Folgenzahl nur bei abgeschlossener Staffel; die Erstausgabe (`deErstausgabe`) gehört
  * der ersten Staffel. Die MAL-Kennung behält nur die Basis (Katalog „ohne Synchro“ und MAL-Dubletten erkennen den Sammeltitel daran).
@@ -130,7 +139,7 @@ export function teileTitel(sammel: Title, plan: StaffelPlan): Title[] {
     const t: Title = structuredClone(sammel)
     t.id = s.kennung
     t.titleDe = staffelName(plan, s.nr)
-    t.staffelTitel = { sammel: plan.sammel, nr: s.nr, ab: s.von, ...(s.kennung === plan.sammel && plan.aktiv ? { aktiv: plan.aktiv } : {}) }
+    t.staffelTitel = { sammel: plan.sammel, nr: s.nr, ab: s.von, ...(s.kennung === plan.sammel && plan.aktiv ? { aktiv: plan.aktiv, laengste: laengsteStaffel(plan) } : {}) }
     if (s.kennung !== plan.sammel) {
       t.slug = `${slugify(t.titleDe)}-${s.kennung}`
       delete t.malId

@@ -17,8 +17,7 @@ import { abrufMitStempel } from './lib/abruf-stempel.ts'
 import { adressIndex, artDerMeldung, folgenDerMeldung, meldungGrund, nameIndex, rohfolgenSpanne, titelDerMeldung, urteileJeFolge, type StaffelKandidat, type Urteil } from './lib/urteil-je-folge.ts'
 import { beobachtungenAusRohfolgen, fremdNach, type RohFolge } from './lib/urteil-rohfolgen.ts'
 import type { Title } from '../shared/types.ts'
-import { staffelVonTiteln } from '../shared/staffel-titel.ts'
-import { beobachtungenDerSpanne } from './lib/urteil-spanne.ts'
+import { beobachtungenDerSpanne, staffelVonJeMeldung } from './lib/urteil-spanne.ts'
 import { adressKern } from './lib/dub-confirmed.ts'
 import type { FolgenZuordnung } from './lib/folgen-je-folge.ts'
 
@@ -151,7 +150,7 @@ async function main() {
   const titelListe = readJson<Title[] | { titles: Title[] }>('public/data/titles.json', [])
   const titelAlle = Array.isArray(titelListe) ? titelListe : titelListe.titles
   const einzel = new Set(titelAlle.filter((t) => t.format === 'MOVIE' || t.episodes === 1).map((t) => t.id))
-  const staffelVon = staffelVonTiteln(titelAlle)
+  const staffelVon = staffelVonJeMeldung(titelAlle)
   const { nachAdresse, staffelKandidaten, nachName, reiheVon } = meldungsZuordnung(titelAlle)
   const beobachtungen = beobachtungenAusRohfolgen(rohfolgen, zuordnung, kanalAdresse, fremdNach(nachAdresse))
   const verworfen: Record<string, number> = {}
@@ -177,7 +176,7 @@ async function main() {
       tag: m.gemeldet_am.slice(0, 10),
       kanal: tonDe === 'nein' && KANAL.test(m.abos ?? ''),
     }
-    beobachtungen.push(...beobachtungenDerSpanne(m.titel_id, spanne, gemeinsam, staffelVon))
+    beobachtungen.push(...beobachtungenDerSpanne(m.titel_id, spanne, gemeinsam, staffelVon(nachAdresse(m.url))))
   }
   const urteile = urteileJeFolge(beobachtungen)
   writeJson(ZIEL, urteile, true)

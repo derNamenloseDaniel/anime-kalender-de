@@ -448,7 +448,7 @@ export interface Title {
    * (`pipeline/bau/staffel-titel.ts`), `nr` = deutsche Staffel, `ab` = ihre erste Folge in der durchlaufenden Zählung des Sammeltitels.
    * `al` der Ausgabe zeigt auf `sammel` (die Staffel hat keine eigene AniList-Seite); Meldungen zur Staffel bildet `zurueckAufSammeltitel` ab.
    */
-  staffelTitel?: { sammel: number; nr: number; ab: number; aktiv?: string }
+  staffelTitel?: { sammel: number; nr: number; ab: number; aktiv?: string; laengste?: number }
   genres: string[]
   /** Schlagworte aus der festen aniSearch-Liste (`shared/schlagworte.ts`), deutsch; Cartoons tragen TMDB-Schlagworte. */
   keywords: string[]

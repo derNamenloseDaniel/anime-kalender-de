@@ -193,7 +193,7 @@ function kopfLaeuft({ antwort, relativImSatz, T, betont, ohneSprachbeleg, releas
     : ''
   const vorstart = vorstartSatz(antwort, Boolean(ohneSprachbeleg), releases)
   if (vorstart) [haupt, neben, anteil, zaehl] = [betont(vorstart), '', undefined, '']
-  else if (antwort.faellig) haupt = betont(faelligText(e, antwort.faellig, rel === T('antwort.relHeute'), T))
+  else if (antwort.faellig) haupt = betont(faelligText(e, rel === T('antwort.relHeute'), T))
   return { neben, gedaempft, haupt, nebenTitel, fakten, anteil, zaehl }
 }
 

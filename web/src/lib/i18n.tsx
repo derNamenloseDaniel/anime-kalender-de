@@ -276,8 +276,7 @@ const TEXTE = {
   // der einzelne Termin aus dem gemessenen Rhythmus fortgeschrieben ist.
   // Die nächste Folge kam nicht zum angekündigten Termin (`schedule.verpasst`).
   // Angekündigt und verstrichen: die Seite behauptet den Termin (Erwartung aus Fakten und Vergangenheit), kein Prüfstand (22.11.2026).
-  'antwort.faelligWirdGeprueft': 'Folge {n} seit {wann}',
-  'antwort.faelligVerspaetet': 'Folge {n} seit {wann}',
+  'antwort.faellig': 'Folge {n} seit {wann}',
   'antwort.angekuendigtFuer': 'angekündigt für {tag} den {datum}.',
   // Fortgeschriebener Tag (`estimated`): kein vom Anbieter genannter Tag (Wochentakt, Starttag laut Quelle, Meldetag), also „geschätzt“.
   'antwort.erwartetFuer': 'erwartet für {tag} den {datum} (geschätzt).',

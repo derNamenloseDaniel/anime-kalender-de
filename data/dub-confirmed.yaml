@@ -18695,13 +18695,10 @@
   platform: primevideo
   url: https://www.amazon.de/gp/video/detail/B0DC75L8BJ
   dub: true
-  checkedAt: '2026-09-28'
-  note: "Tonspuren: Deutsch, Deutsch Dialogue Boost: Medium, Deutsch Dialogue Boost: High — Amazon-Seite B0DC75L8BJ: alle 10 Folgen geprüft, Abos: Prime, aniversede, zugang=abo_und_kauf, gti=amzn1.dv.gti.5f6a4c2e-b18d-4a34-8a6b-2f48472ef148"
-- anilistId: 13469
-  title: "Hyouka OVA"
-  platform: primevideo
-  url: https://www.amazon.de/gp/video/detail/B0DC75L8BJ
-  dub: true
+  dubRanges:
+    - from: 13
+      to: 22
+      dub: true
   checkedAt: '2026-09-28'
   note: "Tonspuren: Deutsch, Deutsch Dialogue Boost: Medium, Deutsch Dialogue Boost: High — Amazon-Seite B0DC75L8BJ: alle 10 Folgen geprüft, Abos: Prime, aniversede, zugang=abo_und_kauf, gti=amzn1.dv.gti.5f6a4c2e-b18d-4a34-8a6b-2f48472ef148"
 - anilistId: 170695
@@ -39590,14 +39587,6 @@
   available: false
   checkedAt: '2026-11-11'
   note: "Amazon-Seite B09M19FLBJ: alle 0 Folgen geprüft, 5 in der Region gesperrt, Abos: keine Angabe, gti=amzn1.dv.gti.cd1d5cbf-afea-4c0b-aa99-176cf2cb1f06, regionsperre=laut Seite nicht mehr im Abo"
-- anilistId: 1889
-  title: "Higurashi no Naku Koro ni Kai"
-  platform: primevideo
-  url: https://www.amazon.de/gp/video/detail/B09JZHRQ18
-  dub: true
-  kanalMessung: ja
-  checkedAt: '2026-11-11'
-  note: "Tonspuren: Deutsch, Deutsch Dialogue Boost: Medium, Deutsch Dialogue Boost: High, 日本語 — Amazon-Seite B09JZHRQ18: alle 26 Folgen geprüft, Abos: aniversede, zugang=abo, gti=amzn1.dv.gti.64ed5868-bfbf-4e5f-a79b-66b99918b0f8 — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
 - anilistId: -61751
   title: "King Julien"
   platform: primevideo

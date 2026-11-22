@@ -23,6 +23,7 @@ import { cartoonsMitReihe, markiereEigeneWerke } from './cartoon-reihen.ts'
 import { markiereRemakes } from './remake-von.ts'
 import { schreibeAnisearchOffen } from './anisearch-kennung.ts'
 import { ladeKatalogEintraege } from '../lib/katalog-eingefroren.ts'
+import { lesekennung } from '../../shared/staffel-titel.ts'
 
 /** Titel-Kennung → frühester Beginn eines Releases; eine TV-Sichtung nennt unseren ersten Blick, keinen Start (Pokémon Horizonte „16.09.2026", 16.09.2026). */
 function fruehesterDeutscherStart(releases: Release[]): Map<number, string> {
@@ -65,7 +66,7 @@ export function schreibeZusatzdateien({ titles, anisearch, slim, verschoben, rel
       if (neu.length) synonyme[id] = neu
     }
     for (const t of titles.values()) {
-      aufnehmen(t.id, anisearch[t.id]?.info?.synonyms, [t.titleDe, t.titleEn, t.titleRomaji, t.titleNative])
+      aufnehmen(t.id, anisearch[lesekennung(t)]?.info?.synonyms, [t.titleDe, t.titleEn, t.titleRomaji, t.titleNative])
     }
     for (const [id, e] of Object.entries(katalogTitel)) {
       if (!synonyme[id]) aufnehmen(Number(id), e.synonyme, [])
@@ -272,7 +273,7 @@ export function schreibeZusatzdateien({ titles, anisearch, slim, verschoben, rel
         Datum, die auf der Seite sichtbar sind: „Lord of Mysteries Specials"
         zeigte im Panel nur sein Format, obwohl AniList den 20.06.2026 führt.
       */
-      jpStart: t.jpStart ?? jpStartAnzeige.get(t.id),
+      jpStart: t.jpStart ?? jpStartAnzeige.get(lesekennung(t)),
       jpStatus: t.jpStatus,
       deStart: deStart.get(t.id),
       ohneSynchro: (t as { ohneSynchro?: boolean }).ohneSynchro || ohneBelegteSynchro(t, releases) || undefined,

@@ -142,3 +142,18 @@ export function teileTitel(sammel: Title, plan: StaffelPlan): Title[] {
     return t
   })
 }
+
+type ToggoFolge = { staffel: number; folge: number; ab: string; bis: string }
+
+/**
+ * Die TOGGO-Folgen eines Titels (`data/toggo.json`, je Sammeltitel): Eine abgeleitete Staffel nimmt die Folgen, die TOGGO unter ihrer Staffelnummer
+ * führt (TOGGO zählt je Staffel, wie die Yaml). Beim Sammeltitel selbst bleibt es bei allen, solange der Bau ihn nicht geschnitten hat.
+ */
+export function toggoFolgenDerStaffel(folgen: ToggoFolge[], t: { staffelTitel?: { sammel: number; nr: number } }): ToggoFolge[] {
+  return t.staffelTitel ? folgen.filter((f) => f.staffel === t.staffelTitel!.nr) : folgen
+}
+
+/** Riegel „vorher = nachher“ für TOGGO: Jede Folge des Sammeltitels geht an genau eine Staffel, sonst bricht der Bau ab (Folge einer Staffelnummer ohne Titel). */
+export function pruefeToggoVerteilung(sammel: number, vorhanden: number, verteilt: number): void {
+  if (vorhanden !== verteilt) throw new Error(`Staffel-Titel ${sammel}: ${vorhanden} TOGGO-Folgen, ${verteilt} an Staffeln verteilt`)
+}

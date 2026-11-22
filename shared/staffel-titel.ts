@@ -33,3 +33,9 @@ export function zurueckAufSammeltitel(
   /* Folge 0 meint die ganze Seite (`wegUrteileBereinigen`), keine Nummer. */
   return { titel: s.sammel, folge: folge > 0 ? folge + s.ab - 1 : folge }
 }
+
+/**
+ * Unter dieser Kennung liegen die Quelldaten eines Titels (aniSearch, TMDB, Sprecher, Trailer, AniList-Start): bei einer abgeleiteten Staffel
+ * die des Sammeltitels, sonst die eigene. Die Quellen kennen nur AniList-Kennungen, die Phase Staffel-Titel schneidet aber vor der Auslieferung.
+ */
+export const lesekennung = (t: { id: number; staffelTitel?: { sammel: number } }): number => t.staffelTitel?.sammel ?? t.id

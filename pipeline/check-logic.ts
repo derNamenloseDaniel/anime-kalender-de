@@ -3411,7 +3411,7 @@ console.log('\nJapanischer Start: so genau wie die Quelle, und angekündigte Tit
 {
   const bau = bauQuelltext()
   const abruf = readFileSync('pipeline/fetch.ts', 'utf8')
-  pruefe('der Reihe geht das genaue, nicht das aufgefüllte Datum mit', /jpStart: t\.jpStart \?\? jpStartAnzeige\.get\(t\.id\)/.test(bau))
+  pruefe('der Reihe geht das genaue, nicht das aufgefüllte Datum mit', /jpStart: t\.jpStart \?\? jpStartAnzeige\.get\(lesekennung\(t\)\)/.test(bau))
   pruefe('ohne Tag bleibt es beim Monat', /if \(!d\.day\) return `\$\{d\.year\}-\$\{p\(d\.month\)\}`/.test(bau))
   pruefe(
     'nicht abgeschlossene Titel werden bei jedem Lauf neu geholt',

@@ -2,7 +2,7 @@ import { MitFachwoertern } from '../fachwort.tsx'
 import { type ReleaseEvent, type Title, type Release, PLATFORMS } from '@shared/types.ts'
 import { istAusgeblieben } from '@shared/logic.ts'
 import { type ReactNode, useState } from 'react'
-import { useFolgenZaehlung } from './folgen-bereich.tsx'
+import { useKopfZahlen } from './folgen-bereich.tsx'
 import { ankuendigungOhneTermin } from '@shared/ankuendigung.ts'
 import { VermerkAuskunft } from './vermerk.tsx'
 import { Umschalter } from './umschalter.tsx'
@@ -137,7 +137,7 @@ export function AntwortKasten({
     passiert"). Oben rechts liegt er in einer Zeile, die ohnehin da ist — und
     kostet keine Höhe mehr.
   */
-  const [zeigeDisc, setZeigeDisc] = useState(discZuerst); const folgenZahl = useFolgenZaehlung(title.id)
+  const [zeigeDisc, setZeigeDisc] = useState(discZuerst); const { folgenZahl, staffeln } = useKopfZahlen(title.id)
   /*
     **Wo noch nichts erschienen ist, gibt es nichts zu sehen.**
 
@@ -196,7 +196,7 @@ export function AntwortKasten({
   */
   /* „Auf Deutsch seit …“ der Zustände fertig und Film: Neuigkeit, Zukunft oder eine frühere Pille ersetzen die Zeile (`de-seit.ts`). */
   const deSeitNeben = !erstausgabeAlsNeuigkeit(title, today, releases) && deSeitZeigen(title, releases, today) ? deSeitZeile(title, T) : ''
-  const { neben, gedaempft, haupt, nebenTitel, fakten, anteil, zaehl } = antwortKopf({ antwort, relativImSatz, T, betont, ohneSprachbeleg, releases, folgenZahl, deSeitNeben, title })
+  const { neben, gedaempft, haupt, nebenTitel, fakten, anteil, zaehl } = antwortKopf({ antwort, relativImSatz, T, betont, ohneSprachbeleg, releases, folgenZahl, staffeln, deSeitNeben, title })
 
   return (
     /*

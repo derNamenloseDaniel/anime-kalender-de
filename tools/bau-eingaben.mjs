@@ -28,6 +28,8 @@ export const BAU_EINGABEN = [
   'data/cartoon-cover-masse.json',
   'data/cartoon-umzug.json',
   'data/cover-eigen-masse.json',
+  'data/curated/horizonte-staffeln.yaml',
+  'data/curated/pokemon-staffeln.yaml',
   'data/kennungen.json',
   'data/patchnotes/',
   'data/tmdb-poster.json',

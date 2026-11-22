@@ -7,6 +7,7 @@ import { formatDate, todayIso, weekdayName } from '@shared/time.ts'
 import type { Release, ReleaseEvent, Title, WatchLink } from '@shared/types.ts'
 import { erstausgabeVorDisc } from '../../lib/erste-disc.ts'
 import type { Antwort } from './antwort-typ.ts'
+import type { StaffelZeile } from '@shared/staffel-folge.ts'
 
 /**
  * **Gezählt werden Folgen, nicht Termine**.
@@ -279,10 +280,41 @@ const reichtBis = (r: Release, m: number): boolean => belegteZahl(r) && (r.sched
  * noch nur gesichtet) und keine Staffel offen ist — sonst ist M keine Gesamtzahl (Horizonte: „137 von 137“, Staffel 4 lief erst an,
  * 21.11.2026), dann „N Folgen auf Deutsch“ ohne „von“.
  */
-export function deFolgenZahlText(z: FolgenZaehlung, releases: Release[], T: (k: string, v?: Record<string, string | number>) => string): string {
+export function deFolgenZahlText(
+  z: FolgenZaehlung,
+  releases: Release[],
+  T: (k: string, v?: Record<string, string | number>) => string,
+  staffeln?: StaffelZeile[],
+): string {
+  const jeStaffel = z[2] ? offeneStaffelText(z, staffeln, T) : undefined
+  if (jeStaffel) return jeStaffel
   return z[2] || !releases.some((r) => reichtBis(r, z[0]))
     ? T('detail.dubKopf', { n: z[1] })
     : T('antwort.teilweiseZahl', { raus: z[1], gesamt: z[0] })
+}
+
+/**
+ * Sammeltitel mit offener letzter Staffel zählen je Staffel statt durchgehend: „Staffel 1–3: 136 Folgen · Staffel 4: 1 Folge (läuft)“
+ * statt „137 Folgen“ (Horizonte, Daniel 22.11.2026). Nur wenn alle gezählten Folgen deutsch sind (`alle` = `deutsch`) und die Zahl in
+ * die offene Staffel reicht — sonst `undefined` und der Kopf bleibt bei der Gesamtzahl.
+ */
+export function offeneStaffelText(
+  z: FolgenZaehlung,
+  staffeln: StaffelZeile[] | undefined,
+  T: (k: string, v?: Record<string, string | number>) => string,
+): string | undefined {
+  const offen = staffeln?.[staffeln.length - 1]
+  if (!offen || offen.length !== 2 || staffeln!.length < 2 || z[0] !== z[1] || z[1] < offen[1]) return undefined
+  const erste = staffeln![0]![0]
+  const vorige = staffeln![staffeln!.length - 2]![0]
+  const fertig = offen[1] - staffeln![0]![1]
+  const laufend = z[1] - offen[1] + 1
+  return T(laufend === 1 ? 'detail.dubKopfStaffelnEine' : 'detail.dubKopfStaffeln', {
+    voll: erste === vorige ? T('detail.staffelNummer', { n: erste }) : T('detail.staffelBereich', { von: erste, bis: vorige }),
+    n: fertig,
+    offen: offen[0],
+    m: laufend,
+  })
 }
 
 /** Die Überschrift des „teilweise“-Kastens; „von M“ nur, wenn M belegt ist (nicht angenommen, nicht die Listenlänge). */

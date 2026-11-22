@@ -1,9 +1,9 @@
 /**
  * Kindprozess von `check-staffel-aufrufer.ts`: fährt die echten Aufrufer, die nach dem Schnitt in Staffel-Titel über die Kennung nachschlagen
  * (`setzeToggoFenster`, `schreibeNeuMitSynchro`, `baueAuslieferung`), in der Kulisse (`AK_ROOT`) und druckt, was sie geschrieben haben.
- * Aufruf: `<modus>`: `toggo` | `toggo-fremd` | `seit` | `auslieferung`.
+ * Aufruf: `<modus>`: `toggo` | `toggo-fremd` | `seit` | `auslieferung` | `eingaben-festgehalten` | `eingaben-leer`.
  */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Release, Title } from '../../shared/types.ts'
 
@@ -70,9 +70,19 @@ async function auslieferung(): Promise<void> {
   }))
 }
 
+/** Der echte Lader der Phase (`ladeStaffelEingaben`) mit einem ausgelieferten Bestand in der Kulisse: druckt `aktiv` je Plan. */
+async function eingaben(festgehalten: boolean): Promise<void> {
+  symlinkSync(new URL('../../data', import.meta.url).pathname, join(WURZEL, 'data'))
+  schreibe('public/data/titles.json', { titles: festgehalten ? [{ id: SAMMEL, staffelTitel: { sammel: SAMMEL, nr: 4, ab: 137, aktiv: '2026-11-20' } }] : [] })
+  const { ladeStaffelEingaben } = await import('../bau/staffel-titel.ts')
+  console.log(JSON.stringify(ladeStaffelEingaben().plaene.map((p) => p.aktiv)))
+}
+
 const modus = process.argv[2]
 if (modus === 'toggo') await toggo(false)
 else if (modus === 'toggo-fremd') await toggo(true)
 else if (modus === 'seit') await seit()
 else if (modus === 'auslieferung') await auslieferung()
+else if (modus === 'eingaben-festgehalten') await eingaben(true)
+else if (modus === 'eingaben-leer') await eingaben(false)
 else throw new Error(`Modus ${modus} unbekannt`)

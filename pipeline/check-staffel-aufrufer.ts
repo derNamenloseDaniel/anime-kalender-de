@@ -72,5 +72,12 @@ function kind(modus: string): { status: number | null; aus: string; fehler: stri
   pruefe('Auslieferung: gewöhnlicher Titel bekommt nichts vom Sammeltitel', z?.gewoehnlich.stimmen === undefined && z?.gewoehnlich.handlung === false, k.aus)
 }
 
+{
+  const fest = kind('eingaben-festgehalten')
+  pruefe('Lader: steht der Schnitt schon im Bestand, bleibt sein `aktiv` (kein Wandern bei jedem Bau)', fest.status === 0 && fest.aus === JSON.stringify(['2026-11-20']), `${fest.status} ${fest.aus} ${fest.fehler.slice(-300)}`)
+  const leer = kind('eingaben-leer')
+  const tage = leer.status === 0 ? (JSON.parse(leer.aus) as string[]) : []
+  pruefe('Lader: ohne den Schnitt im Bestand gilt der Tag nach dem Bau', tage.length === 1 && tage[0]! > '2026-11-20' && /^\d{4}-\d\d-\d\d$/.test(tage[0]!), `${leer.status} ${leer.aus} ${leer.fehler.slice(-300)}`)
+}
 console.log(`check-staffel-aufrufer: ${faelle} Fälle, ${fehler} Fehler`)
 process.exit(fehler ? 1 : 0)

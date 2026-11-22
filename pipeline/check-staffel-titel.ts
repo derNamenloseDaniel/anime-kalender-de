@@ -16,8 +16,7 @@ import { STAFFEL_ID_BASIS, istStaffelTitel, staffelVonTiteln, zurueckAufSammelti
 import { aktivTag, bereicheDerStaffel, laengsteStaffel, staffelDerFolge, staffelPlaene, teileStreams, teileTitel, teileWatchLinks, type StaffelPlan } from './lib/staffel-titel.ts'
 import { folgenDerStaffel, teileFolgenDatei } from './lib/staffel-folgen.ts'
 import { uebersetzeDatei } from './lib/ausgabe-kennung.ts'
-import { gleicheKennungen, ladeStaffelEingaben, pruefeSchnitt } from './bau/staffel-titel.ts'
-import { todayIso } from '../shared/time.ts'
+import { gleicheKennungen, pruefeSchnitt } from './bau/staffel-titel.ts'
 import { beobachtungenDerSpanne, staffelVonJeMeldung } from './lib/urteil-spanne.ts'
 import { sammelSicht, schreibeFolgenEintrag } from './bau/staffel-folgen-schreiben.ts'
 
@@ -196,13 +195,8 @@ const mitGrenze = staffelVonTiteln([{ id: SAMMEL, staffelTitel: { sammel: SAMMEL
 const nachAktiv = (folge: number) => zurueckAufSammeltitel(SAMMEL, folge, mitGrenze, '2026-11-25').folge
 pruefe('Basis ab `aktiv`: RTL+ Folge 50 (durchlaufend gezählt) bleibt 50 statt 186', nachAktiv(50) === 50 && nachAktiv(136) === 136 && nachAktiv(137) === 137)
 pruefe('Basis ab `aktiv`: Folge 1 und 47 zählen in Staffel 4 (137, 183)', nachAktiv(1) === 137 && nachAktiv(47) === 183)
-{
-  /* Verdrahtung der Phase: Der echte Lader (`ladeStaffelEingaben`) setzt `aktiv` aus dem ausgelieferten Bestand, nichts Hartes aus der Yaml. */
-  const bestand = JSON.parse(readFileSync(new URL('../public/data/titles.json', import.meta.url), 'utf8')) as { id: number; staffelTitel?: { aktiv?: string } }[]
-  const plaene = ladeStaffelEingaben().plaene
-  pruefe('Phase: jeder Plan trägt `aktiv` aus `aktivTag` über dem ausgelieferten Bestand', plaene.length > 0 && plaene.every((p) => p.aktiv === aktivTag(bestand, p.sammel, todayIso())), JSON.stringify(plaene.map((p) => p.aktiv)))
-  pruefe('Phase: kein fester Tag in der Yaml', !/^\s+aktiv:/m.test(readFileSync(new URL('../data/curated/horizonte-staffeln.yaml', import.meta.url), 'utf8')))
-}
+/* Die Verdrahtung des Laders (`aktiv` aus dem Bestand) fährt `check-staffel-aufrufer.ts` im Kindprozess: check:logic darf `public/data` nicht lesen. */
+pruefe('Phase: kein fester Tag in der Yaml', !/^\s+aktiv:/m.test(readFileSync(new URL('../data/curated/horizonte-staffeln.yaml', import.meta.url), 'utf8')))
 pruefe('Basis ab `aktiv`: Spanne 46–49 gemischt (46, 47 Staffel 4, 48, 49 durchlaufend)', JSON.stringify(beobachtungenDerSpanne(SAMMEL, { von: 46, bis: 49 }, { anbieter: 'rtlplus', vorhanden: 'ja', tonDe: 'ja', art: 'seite', tag: '2026-11-25', kanal: false } as never, mitGrenze).map((b) => b.folge)) === '[182,183,48,49]')
 {
   /* Netflix hängt nur an Staffel 1 (7000001), RTL+ an allen vier: Eine Basis-Meldung zählt nach `aktiv` nur in Staffel 4, wenn ihre Adresse an der Basis hängt. */

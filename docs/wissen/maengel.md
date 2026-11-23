@@ -366,7 +366,7 @@ Rest nach (a)+(c): ~850, überwiegend Disc-/TV-Altbestand (1.022 der 1.222 haben
 |---|---|---|---|---|
 | (a) `tmdb-banner.json` | 6 mit Bild, alle geteilte TMDB-Kennung | — | — | nein |
 | (c) Banner eines anderen Franchise-Teils | **242** (78 %) | S | niedrig (Schmuckbild, Wirkung 1) | **ja**, nur Titel mit Franchise, Teil mit eigenem Banner gleichen Formats zuerst |
-| Rest | 68 | — | — | Ausnahme „kein-banner-bekannt“ prüfen |
+| Rest | 68 | — | — | Ausnahme „kein-banner-bekannt“ (22.11.2026): 29 mit `null` in `data/tmdb-banner.json` und ohne Banner im Franchise; 39 bleiben offen (38 nie bei TMDB gesucht, 1 mit TMDB-Bild ohne Übernahme) |
 
 **laufzeit (307 offen; 146 AniList, 158 aniSearch-Zeilen, 3 Eigentitel)**
 

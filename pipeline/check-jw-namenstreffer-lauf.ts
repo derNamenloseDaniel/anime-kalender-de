@@ -21,7 +21,7 @@ function pruefe(name: string, ok: boolean, info: unknown = ''): void {
   console.error(`FEHLER: ${name} ${JSON.stringify(info)}`)
 }
 
-const k = (id: string, titel: string, tmdbId: number | string | null) => ({ id, content: { title: titel, fullPath: `/de/serie/${id}`, externalIds: { tmdbId } } })
+const k = (id: string, titel: string, tmdbId: number | string | null, jahr?: number, typ?: string) => ({ id, objectType: typ, content: { title: titel, originalReleaseYear: jahr, fullPath: `/de/serie/${id}`, externalIds: { tmdbId } } })
 
 /* Auswahl: erwartet 5; Kandidaten: erster Treffer anderer Name, Mitte gleicher Name (tmdb 99), letzter gleicher Name mit erwarteter Kennung (kein Kandidat). */
 const liste = [k('A', 'Etwas ganz anderes', 11), k('B', 'Clear Card!', 99), k('C', 'Clear Card', 5)]
@@ -31,6 +31,14 @@ const ersterBester = besterNamensTreffer(['Clear Card'], [k('A', 'Etwas ganz and
 pruefe('Auswahl: ohne gleichen Namen der erste fremde, gleicherName false', ersterBester?.jwId === 'A' && ersterBester.gleicherName === false, ersterBester)
 pruefe('Auswahl: nur Kennungstreffer oder leer → nichts', besterNamensTreffer(['Clear Card'], [k('C', 'Clear Card', '5')], 5) === undefined && besterNamensTreffer(['x'], [], 5) === undefined)
 pruefe('Auswahl: JustWatch ohne Kennung → tmdbId null', besterNamensTreffer(['Clear Card'], [k('N', 'Clear Card', null)], 5)?.tmdbId === null)
+
+/* Zwei gleichnamige Kandidaten (wie Astro Boy 1963 gegen 1980): der erste gewinnt in der Suchreihenfolge, Jahr und Typ des Gewählten stehen im Befund. */
+const zwei = besterNamensTreffer(['Juliet'], [k('S', 'Juliet', 7, 2024, 'SHOW'), k('F', 'Juliet', 8, 1999, 'MOVIE')], 5)
+pruefe('Auswahl: zwei gleichnamige — Jahr und Typ des gewählten Kandidaten', zwei?.jwId === 'S' && zwei.jahr === 2024 && zwei.typ === 'SHOW', zwei)
+const zweiter = besterNamensTreffer(['Juliet'], [k('S', 'Juliet', 5, 2024, 'SHOW'), k('F', 'Juliet', 8, 1999, 'MOVIE')], 5)
+pruefe('Auswahl: der Kandidat mit erwarteter Kennung fällt weg, der zweite trägt seine eigenen Jahr und Typ', zweiter?.jwId === 'F' && zweiter.jahr === 1999 && zweiter.typ === 'MOVIE', zweiter)
+const ohneAngabe = besterNamensTreffer(['Juliet'], [k('N', 'Juliet', 9)], 5)
+pruefe('Auswahl: ohne Jahr und Typ → null', ohneAngabe?.jahr === null && ohneAngabe.typ === null, ohneAngabe)
 
 const film = (id: number, tmdbId: number) => ({
   id,
@@ -43,7 +51,7 @@ const film = (id: number, tmdbId: number) => ({
 
 /** Attrappe: „Clear Card“ liefert fremde Kennungen (11, 99), „Anderer Titel“ die erwartete 6. */
 const ATTRAPPE = `
-const knoten = (id, titel, tmdb) => ({ id, content: { title: titel, fullPath: '/de/serie/' + id, ageCertification: '6', externalIds: { tmdbId: tmdb } }, offers: [], seasons: [] })
+const knoten = (id, titel, tmdb) => ({ id, objectType: 'SHOW', content: { title: titel, originalReleaseYear: 2018, fullPath: '/de/serie/' + id, ageCertification: '6', externalIds: { tmdbId: tmdb } }, offers: [], seasons: [] })
 globalThis.fetch = async (_u, opt) => {
   const q = JSON.parse(opt.body).variables.q
   const edges = q === 'Clear Card'
@@ -53,7 +61,7 @@ globalThis.fetch = async (_u, opt) => {
 }
 `
 
-type B = { jwId?: string; ohneTreffer?: boolean; namenTreffer?: { jwId: string; tmdbId: number | null; gleicherName: boolean } }
+type B = { jwId?: string; ohneTreffer?: boolean; namenTreffer?: { jwId: string; tmdbId: number | null; gleicherName: boolean; jahr: number | null; typ: string | null } }
 function lauf(): { text: string; status: number | null; bestand: Record<string, B> } {
   const wurzel = mkdtempSync(join(tmpdir(), 'jw-namen-'))
   try {
@@ -84,7 +92,7 @@ const r = lauf()
 pruefe('Lauf endet mit Exit 0', r.status === 0, r.text.slice(-500))
 const a = r.bestand['900002']
 pruefe('900002: bleibt ohneTreffer, ohne jwId (nicht zugeordnet)', a?.ohneTreffer === true && !a.jwId, a)
-pruefe('900002: namenTreffer trägt JustWatch-Kennung B und TMDB 99 mit gleichem Namen', a?.namenTreffer?.jwId === 'B' && a.namenTreffer.tmdbId === 99 && a.namenTreffer.gleicherName === true, a)
+pruefe('900002: namenTreffer trägt JustWatch-Kennung B und TMDB 99 mit gleichem Namen', a?.namenTreffer?.jwId === 'B' && a.namenTreffer.tmdbId === 99 && a.namenTreffer.gleicherName === true && a.namenTreffer.jahr === 2018 && a.namenTreffer.typ === 'SHOW', a)
 const b = r.bestand['900003']
 pruefe('900003: Kennungstreffer wird zugeordnet, ohne namenTreffer', b?.jwId === 'D' && !b.ohneTreffer && !b.namenTreffer, b)
 
@@ -92,4 +100,4 @@ if (fehler) {
   console.error(`${fehler} Fehler`)
   process.exit(1)
 }
-console.log('check-jw-namenstreffer-lauf: ok (8 Prüfungen, Prozess auf Kulisse mit Fetch-Attrappe)')
+console.log('check-jw-namenstreffer-lauf: ok (11 Prüfungen, Prozess auf Kulisse mit Fetch-Attrappe)')

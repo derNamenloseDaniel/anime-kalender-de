@@ -2,6 +2,7 @@ import { EIGENE_ID_BASIS } from '../../shared/eigene-titel.ts'
 import { PLATFORMS, type PlatformId, type Release, type Title } from '../../shared/types.ts'
 import { verlagIstAnbieter } from '../../shared/verlag-anbieter.ts'
 import { istSichererTermin } from '../bau/11-7-wege-aus-terminen.ts'
+import { ANISEARCH_ID_BASIS } from '../bau/anisearch-titel.ts'
 import { fehlendes } from '../bau/luecken-titel.ts'
 import { zaehleErstausgabeOhneWeg } from './erstausgabe-ohne-weg.ts'
 import { folgenzahlAusnahme, type FranchiseTeil } from './folgenzahl-erklaerung.ts'
@@ -152,9 +153,17 @@ function verlagVerneint(t: Title, k: Kontext): boolean {
   return (Object.keys(PLATFORMS) as PlatformId[]).some((p) => verlagIstAnbieter(publisher, p) && k.neinGilt(t.id, p, von))
 }
 
+/** Zu Recht ohne Banner (22.11.2026): TMDB führt keins (`null`, nicht „nie gesucht“) und kein Teil der Reihe hat eins zum Übernehmen. */
+const keinBannerBekannt = (t: Title, k: Kontext): string | undefined =>
+  k.banner(t.id) === null && !k.franchiseTeile(t).some((x) => x.hatBanner) ? 'kein-banner-bekannt' : undefined
+
+/** Zu Recht ohne Jahr (23.11.2026): AniList führt Ankündigungen ohne Startdatum (`NOT_YET_RELEASED`, `seasonYear` und `startDate` leer); solange weder ein Stream noch ein Nicht-Disc-Termin existiert, gibt es kein Jahr zu füllen. */
+const jahrNochOhneStart = (t: Title, k: Kontext): string | undefined =>
+  t.streams?.length || (k.releases.get(t.id) ?? []).some((r) => r.platform !== 'disc') ? undefined : 'noch-ohne-start'
+
 export const REGELN: Regel[] = [
   { art: 'cover', gruppe: 'fehlend', wirkung: 3, wer: 'auto:tmdb-poster', zaehle: luecke('c'), ausnahme: (t, k) => (k.coverBekannt[t.id] ? 'ohne-bekanntes-cover' : undefined) },
-  { art: 'banner', gruppe: 'fehlend', wirkung: 1, wer: 'auto:tmdb-banner', zaehle: (t) => !t.bannerImage },
+  { art: 'banner', gruppe: 'fehlend', wirkung: 1, wer: 'auto:tmdb-banner', zaehle: (t) => !t.bannerImage, ausnahme: keinBannerBekannt },
   { art: 'bild-fremdsprachig', gruppe: 'schwach', wirkung: 2, wer: 'auto:tmdb-poster', zaehle: (t, k) => fremdeBilder(t, k.plakat, k.banner).length > 0, ausnahme: (t, k) => (fremdeBilder(t, k.plakat, k.banner).every(Boolean) ? KEINE_LESBARE : undefined) },
   { art: 'titel-de', gruppe: 'fehlend', wirkung: 3, wer: 'hand:synchro-belegen', zaehle: luecke('t'), ausnahme: (t) => (hatEinenWeg(t) || t.deErstausgabe ? undefined : 'ohne-deutsche-fassung') },
   { art: 'handlung-de', gruppe: 'fehlend', wirkung: 2, wer: 'hand:handlung-eigen', zaehle: (t, k) => !k.synopse(t.id)?.de },
@@ -162,10 +171,10 @@ export const REGELN: Regel[] = [
   { art: 'folgenzahl', gruppe: 'fehlend', wirkung: 3, wer: 'auto:anilist', zaehle: (t) => SERIE.has(t.format ?? '') && !t.episodes, ausnahme: (t, k) => (laeuftNoch(t, k) ? 'laeuft' : undefined) },
   { art: 'fsk', gruppe: 'fehlend', wirkung: 2, wer: 'auto:justwatch', zaehle: (t) => t.fsk == null },
   { art: 'wertung', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anilist', zaehle: (t) => !t.score, ausnahme: (t) => (t.id >= EIGENE_ID_BASIS ? 'keine-quelle-mit-stimmen' : undefined) },
-  { art: 'studio', gruppe: 'fehlend', wirkung: 1, wer: 'hand:studio-von-hand', zaehle: (t) => !t.studios?.length },
+  { art: 'studio', gruppe: 'fehlend', wirkung: 1, wer: 'hand:studio-von-hand', zaehle: (t) => !t.studios?.length, ausnahme: (t) => (t.id >= ANISEARCH_ID_BASIS ? 'quelle-ohne-studio' : undefined) },
   { art: 'genre', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anilist', zaehle: (t) => !t.genres?.length },
   { art: 'laufzeit', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anisearch', zaehle: (t) => !t.runtimeMin },
-  { art: 'jahr', gruppe: 'fehlend', wirkung: 2, wer: 'auto:anilist', zaehle: luecke('j') },
+  { art: 'jahr', gruppe: 'fehlend', wirkung: 2, wer: 'auto:anilist', zaehle: luecke('j'), ausnahme: jahrNochOhneStart },
   { art: 'sprecher', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anisearch', zaehle: (t) => !t.hasVoices, ausnahme: (t) => (hatSynchro(t) ? undefined : 'ohne-synchro') },
   { art: 'kein-weg', gruppe: 'fehlend', wirkung: 3, wer: 'daniel', zaehle: (t, k) => !hatEinenWeg(t) && !k.discTitel.has(t.id), ausnahme: keinWegAusnahme },
   { art: 'erstausgabe-ohne-weg', gruppe: 'fehlend', wirkung: 3, wer: 'daniel', zaehle: (t, k) => zaehleErstausgabeOhneWeg([t], k.discTitel) === 1, ausnahme: (t, k) => (verlagVerneint(t, k) ? 'belegtes-nein' : undefined) },

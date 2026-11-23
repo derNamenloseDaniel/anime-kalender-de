@@ -151,8 +151,9 @@ export function ergaenzeDiscUndZugang({ titles, anisearch, releases, zugangJeAdr
  * deutscher Synchro.
  *
  * `extract-disc-ausgaben.ts` liest die Ausgaben aus dem Archiv, das der
- * aniSearch-Lauf ohnehin anlegt — kein zusätzlicher Abruf. 584 Titel haben
- * eine deutsche Ausgabe, **176 davon zeigen sonst keinen einzigen Weg**.
+ * aniSearch-Lauf ohnehin anlegt — kein zusätzlicher Abruf. Viele Titel haben
+ * eine deutsche Ausgabe, ein Teil davon zeigt sonst keinen einzigen Weg
+ * (Zahlen wandern mit dem Bestand, deshalb hier keine).
  *
  * **Ohne Sprachaussage.** Eine deutsche Disc kann untertitelt sein; im Archiv
  * steht wörtlich „Saber Marionette J (OmU)". Der Eintrag ist deshalb ein
@@ -198,7 +199,7 @@ function ergaenzeDiscWege(titles: Map<number, Title>, releases: Release[]) {
           **Der Name ist konstant, die Zahl nicht.** Die „Wo?"-Ansicht buendelt
           ueber den Anbieternamen; „aniSearch — 6 Disc-Ausgaben" und
           „aniSearch — 2 Disc-Ausgaben" waeren dort zwei verschiedene
-          Anbieter, und aus 176 Titeln wuerden Dutzende Einzelgruppen.
+          Anbieter, und aus vielen Titeln wuerden Dutzende Einzelgruppen.
         */
         /*
           **Das Wort „Disc" ist weg, das Zeichen sagt es besser.** Daniel am

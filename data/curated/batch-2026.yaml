@@ -186,14 +186,14 @@
     - https://www.anisearch.de/anime/20466
 
 - slug: steel-ball-run-2nd-3rd-stage
-  anilistId: 190327
+  anilistId: 210482
   search: "JoJo no Kimyou na Bouken: Steel Ball Run"
   titleDe: "JoJo's Bizarre Adventure: Steel Ball Run – 2nd & 3rd STAGE"
   platform: netflix
   netflixOriginal: true
   platformUrl: https://www.netflix.com/title/82116553
   releaseType: weekly
-  hinweis: "Folge 1 („1st STAGE“) lief bereits am 19.03.2026."
+  hinweis: "Die Auftaktfolge („1st STAGE“, eigener Titel 190327) lief bereits am 19.03.2026."
   schedule:
     firstEpisodeDate: "2026-09-25"
     episodeCount: 11
@@ -205,17 +205,14 @@
       seen: "10:11"
       date: "2026-09-25"
       source: eigene Sichtung
+    # Nummern von Titel 210482 (Phase 2-3, 11 Folgen ab 1): Folge 7 bis 12 der Gesamtreihe = 6 bis 11 hier.
     zeiten:
+      6: "09:00"
       7: "09:00"
       8: "09:00"
       9: "09:00"
       10: "09:00"
       11: "09:00"
-      12: "09:00"
-    # Die Reihe hat zwölf Folgen; Folge 1 lief ein halbes Jahr vorher als
-    # eigenes Release. Ohne diese Angabe stünde hier „1. Fr 25.09.2026", und
-    # genau das las sich wie der Termin der Auftaktfolge.
-    firstEpisodeNumber: 2
     # Netflix schreibt „PHASE 2 bis 3: ab 25. September wöchentlich" — „Phase" ist die
     # Rennetappe (Stage) der Vorlage, keine Folgenzahl. Elf neue Folgen, freitags bis 04.12.
     # (whats-on-netflix, 16.09.2026; Daniels Frage, geprüft).

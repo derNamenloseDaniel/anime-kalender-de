@@ -55,7 +55,7 @@ export function Meldungen({ titleId }: { titleId: number }) {
       </button>
       {!offen ? null : (
       <>
-      <p className="mb-2 mt-2 text-t4 text-slate-500 dark:text-slate-400">{t('detail.newsHint')}</p>
+      <p className="mb-2 mt-2 text-t4 text-ak-leise">{t('detail.newsHint')}</p>
       <ul className="space-y-2">
         {liste.map((m) => (
           <li
@@ -71,7 +71,7 @@ export function Meldungen({ titleId }: { titleId: number }) {
               {m.titel}
             </a>
             {m.zitat && (
-              <p className="mt-1 italic text-slate-500 dark:text-slate-400">
+              <p className="mt-1 italic text-ak-leise">
                 „… {m.zitat} …"
               </p>
             )}

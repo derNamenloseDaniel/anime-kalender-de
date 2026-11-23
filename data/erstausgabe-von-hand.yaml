@@ -83,6 +83,16 @@
   sources:
     - https://bluray-disc.de/blu-ray-filme/79524-hakuoki_demon_of_the_fleeting_blossom_warrior_spirit_of_the_blue_sky
     - https://www.synchronkartei.de/film/33713
+# Hakuoki Wild Dance of Kyoto (Film 1) — bluray-disc.de: KSM, „20.06.2016", „Deutsch DTS-HD MA 5.1" (Datum und Tonspur aus dem Suchtreffer gelesen, Seite aus der Cloud nicht abrufbar, 22.11.2026);
+# Anime2You 657813 (09.03.2023): ProSieben MAXX zeigt „die Filme als deutsche TV-Premiere … mit deutscher Vertonung", Film 1 am 31.03.2023; Programmvorschau 663989: „Freitag 22:10 Uhr: Hakuoki – The Movie 1 (NEU: Film)".
+- anilistId: 13117
+  title: 'Hakuoki: Demon of the Fleeting Blossom - Wild Dance of Kyoto'
+  von: '2016-06-20'
+  publisher: 'KSM'
+  sources:
+    - https://bluray-disc.de/blu-ray-filme/79523-hakuoki_demon_of_the_fleeting_blossom_wild_dance_of_kyoto
+    - https://www.anime2you.de/news/657813/prosieben-maxx-zeigt-hakuoki-filme/
+    - https://www.anime2you.de/news/663989/prosieben-maxx-anime-programm-13-2023/
 # Yo-Kai Watch — fernsehserien.de: „Deutsche TV-Premiere 09.05.2016 Nickelodeon".
 - anilistId: 19157
   title: 'Yo-Kai Watch'
@@ -97,6 +107,14 @@
   publisher: 'ProSieben MAXX'
   sources:
     - https://www.fernsehserien.de/tenkai-knights
+# One Piece Log: Fish-Man Island Saga — Anime2You 03.12.2025: „alle Episoden … als TV-Premiere“, „mit deutscher Vertonung auf ProSieben MAXX“; Anime2You 14.12.2025: „ab 11:10 Uhr laufen alle 21 Episoden … als TV-Premiere“ am 01.01.2026 (Abruf 22.11.2026).
+- anilistId: 183423
+  title: 'One Piece Log: Fish-Man Island Saga'
+  von: '2026-01-01'
+  publisher: 'ProSieben MAXX'
+  sources:
+    - https://www.anime2you.de/news/959660/one-piece-log-auf-prosieben-maxx/
+    - https://www.anime2you.de/news/963512/prosieben-maxx-programm-weihnachten-2025/
 # GITS Arise Pyrophoric Cult — thelostdungeon.de: „28. Juli 2017", Universum Anime, „gute deutsche Synchronisation mit den bekannten Ghost-in-the-Shell-Sprechern"; Disc enthält nur die Pyrophoric-Cult-Fassung (2 Teile).
 - anilistId: 21056
   title: 'Ghost in the Shell: Arise - Pyrophoric Cult'
@@ -607,3 +625,14 @@
     - https://www.anime2you.de/news/1056287/netflix-yamada-kun-synchro-und-mehr/
     - https://www.anime2you.de/news/1062641/netflix-anime-neu-im-november-2026/
     - https://www.anime2you.de/news/1073600/netflix-anime-neu-im-dezember-2026/
+
+# Trinity Seven: Heavens Library & Crimson Lord (Film): KSM Anime, Blu-ray/DVD am 20.03.2025 (Anime2You Disc-Neuheiten März 2025, Abruf 22.11.2026);
+# Anime2You 04.08.2024: „Film … sowie die dazugehörige OVA-Episode werden demnächst mit deutscher und japanischer Vertonung auf Blu-ray veröffentlicht“.
+# Die Prime-Zeile (Crunchyroll-Kanal, nur Japanisch) widerspricht nicht: Die Synchro liegt auf der Disc.
+- anilistId: 103631
+  title: 'Trinity Seven: Heavens Library & Crimson Lord'
+  von: '2025-03-20'
+  publisher: 'KSM Anime'
+  sources:
+    - https://www.anime2you.de/news/814882/ksm-anime-acht-kino-disc-lizenzen/
+    - https://www.anime2you.de/news/870420/anime-neuheiten-maerz-2025/

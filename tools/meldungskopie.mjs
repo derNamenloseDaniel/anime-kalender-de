@@ -14,7 +14,7 @@ import { mkdirSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { fuehreAus, fusszeile } from './meldungskopie-abfrage.mjs'
-import { ARTEFAKT_DATEI, DATEINAME, holen } from './meldungskopie-holen.mjs'
+import { ARTEFAKT_DATEI, DATEINAME, holen, holenZeile } from './meldungskopie-holen.mjs'
 import { wranglerAus, ziehen } from './meldungskopie-ziehen.mjs'
 
 const WURZEL = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -38,7 +38,7 @@ function main(a) {
   if (a[0] === 'holen') {
     mkdirSync(dirname(kopie(a)), { recursive: true })
     const e = holen({ gh, ziel: kopie(a) })
-    console.log(`${e.art === 'aktuell' ? 'Kopie ist aktuell' : `Kopie geholt (Lauf ${e.lauf})`}, Stand ${e.stand}: ${kopie(a)}`)
+    console.log(holenZeile(e, kopie(a)))
   } else if (a[0] === 'abfrage') {
     abfrage(a)
   } else if (a[0] === 'ziehen') {

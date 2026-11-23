@@ -1,0 +1,5 @@
+kategorie: feature
+text: Zwei Filme jetzt mit deutscher Synchro bestätigt
+untertitel: "Cowboy Bebop Film und K Movie 5 bei Prime Video"
+wartetAuf: "Bestandsbau nach diesem PR. Probe: In public/data/titles.json tragen die Prime-Wege von Titel 5 und 102349 dub true."
+seit: '2026-11-22'

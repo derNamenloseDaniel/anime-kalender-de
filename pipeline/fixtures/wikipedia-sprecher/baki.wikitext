@@ -1,0 +1,29 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Grappler_Baki (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-22.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Grappler_Baki&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+{| class="wikitable"
+|-
+! rowspan="2"| Rolle || colspan="4"| japanischer Sprecher ([[Seiyū]]) || colspan="2"| deutscher Sprecher
+|-
+! 1. Serie (2001) || OVA (1994) || OVA (2016) || 2. Serie (2018) || 1. Serie (2001) || 2. Serie (2018)
+|-
+| Baki Hanma || [[Masami Kikuchi]] || [[Kappei Yamaguchi]] || — || [[Nobunaga Shimazaki]] || [[Linus Kraus]] || [[Karim El Kammouchi]]
+|-
+| Yūjirō Hanma || [[Kenji Nomura]] || — || [[Akio Ōtsuka]] ||[[Akio Ōtsuka]]||[[Rolf Buschpeter]] || [[Christian Reimer (Synchronsprecher)|Christian Reimer]]
+|-
+| Doppo Orochi || [[Mugihito]] || [[Shōzō Iizuka]] || — || Takayuki Sugō || [[Gordon Piedesack]] || [[Marc Rosenberg (Schauspieler)|Marc Rosenberg]]
+|-
+| Katsumi Orochi || [[Keiji Fujiwara]] || — || [[Shunsuke Sakuya]] || [[Yoshihisa Kawahara]] || [[Christoph Bautz (Schauspieler)|Christoph Bautz]] || [[Felix Mayer (Synchronsprecher)|Felix Mayer]]
+|-
+| Retsu Kaiō || [[Kunihiko Yasui]] || — || [[Kiyoyuki Yanada]] || [[Rikiya Koyama]] || [[Martin L. Schäfer]] || [[Stefan Lehnen]]
+|-
+| Emi Akezawa || [[Yurika Hino]] || — || — || — || [[Sabina Godec]] || —
+|-
+| Kozue Matsumoto || [[Sachiko Kojima]] || [[Yumi Tōma]] || — || [[Sora Amamiya]] || [[Tanja Esche]] || [[Laura Maire]]
+|-
+| Kaoru Hanayama || [[Masayuki Nakata]] || — || — || [[Takuya Eguchi]] || [[Djamil Deininger]] || [[Gerd Meyer (Synchronsprecher)|Gerd Meyer]]
+|-
+| Biscuit Oliva || [[Yusaku Yara]] || — || — || [[Hochu Otsuka]] || — || [[Jo Vossenkuhl]]
+|}
+

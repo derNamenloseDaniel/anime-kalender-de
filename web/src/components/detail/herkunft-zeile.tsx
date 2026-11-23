@@ -20,7 +20,7 @@ export function HerkunftZeile({ title, t }: { title: Title; t: Translate }) {
   const h = herkunftVon(title)
   return (
     <p className="mb-2 flex items-center gap-1.5 text-t3 text-ak-text/85">
-      <span className="text-t4 text-slate-500 dark:text-slate-400">{t('filter.herkunft')}</span>
+      <span className="text-t4 text-ak-leise">{t('filter.herkunft')}</span>
       <Flagge land={h} />
       {title.land ? landName(title.land) : herkunftName(t, h)}
     </p>

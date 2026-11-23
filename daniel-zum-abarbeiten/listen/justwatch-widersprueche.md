@@ -7,7 +7,7 @@ Abschnitt „JustWatch-Ton je Seite“. Unsere Messung (Handbeleg, Meldung der E
 <!-- anime:start -->
 ## Anime
 
-Flagge „Deutsch“: 58 Wege, nur Hinweis: 1.
+Flagge „Deutsch“: 54 Wege, nur Hinweis: 1.
 
 JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine Flagge): mehrere Staffeln 11, Mehrteiler 9.
 
@@ -15,14 +15,14 @@ JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine
 |---|---|---|---|---|
 | crunchyroll | 4 | 0 | 0.0 % | Flagge |
 | disneyplus | 6 | 0 | 0.0 % | Flagge |
-| primevideo | 112 | 0 | 0.0 % | Flagge |
+| primevideo | 113 | 0 | 0.0 % | Flagge |
 
 ### Widersprüche (0)
 
 | Titel | Anbieter | Adresse | JustWatch | Gemessen |
 |---|---|---|---|---|
 
-### Kandidaten für neue Wege (398)
+### Kandidaten für neue Wege (397)
 
 JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „Weg ohne Kennung“: ein Weg zum Anbieter steht, seine Adresse trägt aber keine Seitenkennung.
 
@@ -105,7 +105,6 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | Die Schatzinsel: Das große Abenteuer der Tiere (3842) | Amazon Prime Video | amazon:amzn1.dv.gti.9a411142-c98c-495b-977e-2c8b04d7582b | ja |
 | Michiko & Hatchin (4087) | Crunchyroll | crunchyroll:GG1U24423 | ja |
 | Michiko & Hatchin (4087) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.c835475f-dcc2-40e6-84ac-07cf1077f7b1 | nein |
-| Batman: Gotham Knight (4094) | Amazon Video | amazon:amzn1.dv.gti.a1ec29eb-069c-489e-9fda-bd7dee23f127 | ja |
 | The Garden of Sinners: Paradoxe Helix (4282) | Crunchyroll | crunchyroll:G50UZ1EDE | ja |
 | Detektiv Conan: Die Partitur des Grauens (4447) | Crunchyroll | crunchyroll:GPWUK08Q5 | ja |
 | Erzählung einer weißen Schlange (4513) | Amazon Prime Video | amazon:amzn1.dv.gti.f06a68b4-be29-4b33-8158-0be169c5484d | ja |

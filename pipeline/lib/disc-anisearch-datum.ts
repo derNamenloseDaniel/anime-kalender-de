@@ -67,7 +67,7 @@ function juengsteMeldung(r: Release, veroeffentlicht: Map<string, string>): stri
  */
 function gelesenAm(r: Release): string | undefined {
   const eigene = (r.quellen ?? []).filter((q) => q.stand !== 'ueberholt' && !/anisearch\.de/.test(q.url))
-  if (!eigene.length || eigene.some((q) => !q.gesehenAm)) return undefined
+  if (eigene.some((q) => !q.gesehenAm)) return undefined
   return eigene.map((q) => q.gesehenAm).sort().at(-1)
 }
 

@@ -228,7 +228,7 @@ const bau = (cwd, mitProposals = false) => () => {
   const marke = (id, p) => `QUARANTAENE ${json({ titleId: id, pruefung: p, grund: 'g' })}`
   fs.writeFileSync(protokoll, ['✗ Titel rot', marke(20, 'toggo-pruefung'), '  ' + marke(30, 'banner-pruefung'), 'QUARANTAENE {kaputt', ''].join('\n'))
   const env = { ...process.env, RUNNER_TEMP: rt, GITHUB_RUN_ID: '4242' }
-  const ablegen = spawnSync(process.execPath, [path.join(hier, 'quarantaene.mjs'), 'schuldige', protokoll], { env, encoding: 'utf8', windowsHide: true, timeout: 30000 })
+  const ablegen = spawnSync(process.execPath, [path.join(hier, 'quarantaene.mjs'), 'schuldige', protokoll], { cwd: wurzel, env, encoding: 'utf8', windowsHide: true, timeout: 30000 })
   assert.equal(ablegen.status, 0, ablegen.stderr)
   assert.match(ablegen.stdout, /^Schuldige Titel des Abbruchs: 20 \(toggo-pruefung\), 30 \(banner-pruefung\)\n$/)
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(rt, 'bau-schuldige.json'), 'utf8')).schuldige.map((e) => e.titleId), [20, 30])

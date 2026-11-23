@@ -63,4 +63,8 @@ const doppelt = bauen()
 doppelt.jobs.bau.steps.push({ uses: 'actions/upload-artifact@v4', with: { name: 'bau-eingaben-zwei', path: 'data/x' } })
 assert.ok(mitText(artefaktVerstoesse(doppelt, rep()), '2 Upload-Schritte'), 'zwei Uploads')
 
+const doppeltRep = rep()
+doppeltRep.jobs.untersuchen.steps.push({ uses: 'actions/download-artifact@v4', with: { name: `bau-eingaben-zwei`, path: 'data', 'run-id': lauf } })
+assert.ok(mitText(artefaktVerstoesse(bauen(), doppeltRep), '2 Download-Schritte'), 'zwei Downloads')
+
 console.log('artefakt-kette.test: ok')

@@ -68,6 +68,9 @@ assert.deepEqual([483, 1349, 10852, 14838].map(lage), ['kommt', 'sonst', 'laeuft
 const mitten = releases.filter((r) => r.titleId === 26469).map((r) => ({ ...r, schedule: { ...r.schedule, observed: { 19: '2026-11-20', 20: '2026-11-21' } } }))
 assert.equal(lageVon(offen(26469), mitten, stichtag), 'laeuft', 'Staffel 1 mitten in der Sendung')
 assert.equal(lageVon(offen(26470), mitten, stichtag), 'laeuft', 'Staffel 2 noch nicht erreicht')
+// Ohne Sammeltitel (Hauptserie) filtert keine Sichtung, auch wenn ein Verweis ein kurzes Ende nennt.
+const haupt = { ...offen(10852), streams: [{ platform: 'netflix', url: 'https://x.invalid', dub: true, teilBereich: { von: 1, bis: 2 } }] } as Title
+assert.equal(lageVon(haupt, releases.filter((r) => r.titleId === 10852), stichtag), 'laeuft', 'Hauptserie ohne Sammeltitel')
 // Titel mit bekannter Folgenzahl und abgelaufenem Plan bleibt „sonst“ (Ende offen gilt nur ohne Folgenzahl).
 assert.equal(lageVon({ ...offen(14839), episodes: 12 }, releases.filter((r) => r.titleId === 14839), stichtag), 'sonst', 'Staffel 4 mit Folgenzahl')
 

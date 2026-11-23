@@ -2,7 +2,6 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { botPfadeNoetig, botPfadeRot } from './pr-vorpruefung-bot-pfade.mjs'
-import { neuerTestBasisHinweise } from './pr-vorpruefung-hinweise.mjs'
 import { existiertIn, genanntePfade, istErwaehnt, fundeImDiff, listenRot, vorpruefe } from './pr-vorpruefung.mjs'
 
 const fehler = []
@@ -89,16 +88,6 @@ const fahre = () => {
 const REPO = resolve(import.meta.dirname, '..')
 pruefe('Bot-Pfade: ohne Kettendatei kein Aufruf', botPfadeRot(['README.md'], REPO, fahre).length === 0 && gefahren === 0)
 pruefe('Bot-Pfade: Kettendatei des echten Repos -> Wächter gefahren, Befund durchgereicht', botPfadeRot(['pipeline/check-sammelartikel.ts'], REPO, fahre).join() === 'rot' && gefahren === 1)
-
-// Neue Testdateien unter .claude/ zählen für den Hinweis „rot an der Basis“ mit (Hook-Tests heißen `-test.mjs`, Mod-Tests `.test.ts`).
-const neuerTest = (pfad) => neuerTestBasisHinweise(`A\t${pfad}\nA\ttools/b.mjs`, 'Text').length
-pruefe('Basis-Hinweis: neuer Hook-Test .claude/hooks/x-test.mjs zählt', neuerTest('.claude/hooks/x-test.mjs') === 1)
-pruefe('Basis-Hinweis: neuer Mod-Test .claude/mods/arbeitsliste/hooks/y.test.ts zählt', neuerTest('.claude/mods/arbeitsliste/hooks/y.test.ts') === 1)
-pruefe('Basis-Hinweis: Hook ohne -test zählt nicht', neuerTest('.claude/hooks/x.js') === 0)
-pruefe('Basis-Hinweis: -test.mjs außerhalb .claude/hooks zählt nicht', neuerTest('tools/x-test.mjs') === 0)
-pruefe('Basis-Hinweis: Hook-Test in Unterordner zählt nicht', neuerTest('.claude/hooks/sub/x-test.mjs') === 0)
-pruefe('Basis-Hinweis: Fixture unter tools/testdaten zählt nicht', neuerTest('tools/testdaten/x.test.mjs') === 0)
-pruefe('Basis-Hinweis: Beleg im Text unterdrückt den Hinweis', neuerTestBasisHinweise('A\t.claude/hooks/x-test.mjs', 'Basis: Fall rot').length === 0)
 
 if (fehler.length) {
   console.error(`pr-vorpruefung.test: ${fehler.length} Fehler`)

@@ -422,9 +422,13 @@
 # je Titel „Sprache: Deutsch, Japanisch (UT)", „Stream: Prime Video". Der Tag ist der Meldetag: im Angebot spätestens seit 10.10.
 # Die Episodenzahlen 11/8/7/11 stammen aus 1059642 selbst („Episoden: n (komplett)“), nicht aus dem Bestand.
 # Ton: `sprache: offen` — „Sprache: Deutsch" nennt die Synchro nicht ausdrücklich; Handbeleg `dub: true` und `dubZitat` scheiden aus.
+# Adresse: Anime2You 1059642 verlinkt den „Entertainment District Arc“-Block (11 Episoden, Prime Video) auf Amazon-Titel B0D65Q2GCW (Abruf 23.11.2026).
+# Ton bleibt offen: Amazons Seiten B0CH5FJ3RK/B0G1BF9WCR (Edge, 23.11.2026) sind „Staffel 2“ mit 18 Folgen (Folge 1 „Flammensäule Rengoku Kyōjurō“ = Mugen-Zug-TV 7 + Entertainment District 11),
+# Wiedergabesprachen Deutsch/日本語, kein Kanal. 18 passt zu keinem der beiden Titel (Zuordnung über Folgenzahl), die Sprachangabe gilt der Seite, nicht den Folgen 8–18: kein Handbeleg.
 - slug: demon-slayer-entertainment-district-arc-primevideo
   anilistId: 142329
   platform: primevideo
+  platformUrl: https://www.amazon.de/dp/B0D65Q2GCW
   releaseType: batch
   dateMeaning: available-from
   schedule: { firstEpisodeDate: "2026-10-10", episodeCount: 11 }

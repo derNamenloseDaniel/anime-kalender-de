@@ -75,6 +75,9 @@ const bau = (cwd, mitProposals = false) => () => {
   assert.deepEqual([...karte.keys()], [7, 8])
   assert.equal(karte.get(7), json([{ titleId: 7, start: 1 }, { titleId: 7, start: 2 }]))
   assert.deepEqual([...eintraege({ sendungen: { a: { titleId: 7 }, n: null } }, tv).keys()], [7], 'ein leerer Eintrag bricht das Auslesen nicht')
+  // Gemessene Form der echten Dateien (23.11.2026, Skript regel-probe): Kennungen liegen unter diesem Schlüssel, sonst am Wurzelschlüssel.
+  const UNTER = { 'toggo.json': 'titel', 'motn.json': 'gesucht', 'rtlplus-folgen.json': 'titel', 'wikipedia-folgen.json': 'titel', 'crunchyroll-de-kennungen.json': 'kennungen', 'tv-programm.json': 'sendungen' }
+  for (const h of HERKUNFT) assert.equal(h.unter, UNTER[h.datei.slice(['data', ''].join('/').length)], `${h.datei}: Ebene der Kennungen`)
   // Jede Regel liest die Kennung 7 an genau der Stelle, die sie nennt, und nirgends sonst.
   for (const h of HERKUNFT) {
     const inhalt = h.schluessel ? { 7: 'x' } : { a: { [h.feld]: 7 } }
@@ -118,6 +121,7 @@ const bau = (cwd, mitProposals = false) => () => {
   assert.equal(waehle({ schuldige: [], dateien, lies: lese }).art, 'alle')
   const unbekannt = waehle({ schuldige: [20, 99], dateien, lies: lese })
   assert.deepEqual([unbekannt.art, unbekannt.grund], ['alle', 'Titel ohne belegte Quelle: 99'])
+  assert.match(auswahlZeile({ ...unbekannt, zahlAlle: 3, engRot: false }), /Zuordnung: 20 → data\/toggo\.json; 99 → \?;/, 'auch beim Rückfall steht die Zuordnung im Log')
   const kaputt = waehle({ schuldige: [20], dateien, lies: (d) => { if (d === 'data/trailer.json') throw new Error('kein JSON'); return lese(d) } })
   assert.deepEqual([kaputt.art, kaputt.grund], ['alle', 'Datei unlesbar: data/trailer.json'])
   const zeile = auswahlZeile({ ...eng, zahlAlle: 3, engRot: false })
@@ -221,6 +225,20 @@ const bau = (cwd, mitProposals = false) => () => {
   const e = zuruecknehmen({ cwd, basis, schuldige: [20], bauen: bau(cwd), committen: () => true })
   assert.match(e.wahl.grund, /^Datei unlesbar: data\/trailer\.json$/)
   assert.equal(e.dateien.length, 5)
+}
+
+// 7b. Keine und genau eine Sammler-Datei in der Spanne.
+{
+  const cwd = path.join(wurzel, 'klein')
+  fs.mkdirSync(cwd)
+  git(cwd, 'init', '-q', '-b', 'main')
+  const basis = commit(cwd, 'Daniel', 'basis', { 'data/toggo.json': json({ titel: { 20: 1 } }) })
+  commit(cwd, 'Daniel', 'mensch', { 'pipeline/x.ts': 'x' })
+  const keine = zuruecknehmen({ cwd, basis, schuldige: [20], bauen: () => true, committen: () => true })
+  assert.deepEqual([keine.art, keine.dateien, keine.wahl], ['nichts', [], null])
+  commit(cwd, SAMMLER, 'gesammelt', { 'data/toggo.json': json({ titel: { 20: 2 } }) })
+  const eine = zuruecknehmen({ cwd, basis, schuldige: [20], bauen: () => true, committen: () => true })
+  assert.deepEqual([eine.art, eine.dateien, eine.wahl.art], ['zurueckgenommen', ['data/toggo.json'], 'eng'])
 }
 
 // 8. Schuldigenliste: Pfad, Vereinigung mit früher Zurückgestellten, Lesen mit allen Weigerungsgründen.

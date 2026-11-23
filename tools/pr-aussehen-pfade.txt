@@ -11,6 +11,7 @@ tools/ansicht-details-overlay.mjs
 tools/ansicht-duell.mjs
 tools/ansicht-escape-einzeln.mjs
 tools/ansicht-escape-stapel.mjs
+tools/ansicht-fahne.mjs
 tools/ansicht-filterfenster-rechner.mjs
 tools/ansicht-filterfenster-s5.mjs
 tools/ansicht-filterfenster.mjs
@@ -52,6 +53,7 @@ tools/ecken-urteil.mjs
 tools/einstellungen-bild.mjs
 tools/einzel-sperre-schlange.mjs
 tools/einzel-sperre.mjs
+tools/fahne-urteil.mjs
 tools/filter-tempo-urteil.mjs
 tools/filter-tempo.mjs
 tools/kachel-ecken-live.mjs

@@ -37,6 +37,7 @@ import { pruefeStatusfarben } from './ansicht-statusfarben.mjs'
 import { distPruefen } from './dist-frisch.mjs'
 import { pruefeTvReihe, meldeTvReihe } from './ansicht-tv-reihe.mjs'
 import { pruefeSaisonChip, meldeSaisonChip } from './ansicht-saison-chip.mjs'
+import { pruefeFahne, meldeFahne } from './ansicht-fahne.mjs'
 import { eckenFehler } from './ecken-urteil.mjs'
 import { messeDuell } from './ansicht-duell.mjs'
 import { messeDetailsOverlay } from './ansicht-details-overlay.mjs'
@@ -524,6 +525,7 @@ async function meldeZusatzpruefungen(seite, ansichten, handy) {
     if (await meldeAbzeichen({ chromium, antworte: antworteAusDist, dist: DIST, lesePixel: lesePixelPng })) rot = true
     if (await meldeTerminKarte({ chromium, antworte: antworteAusDist, dist: DIST, lesePixel: lesePixelPng })) rot = true
     if (meldeSaisonChip(await pruefeSaisonChip(DIST))) rot = true
+    if (meldeFahne(await pruefeFahne(DIST))) rot = true
   }
   return rot
 }

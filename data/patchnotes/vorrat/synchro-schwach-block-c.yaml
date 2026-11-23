@@ -1,5 +1,0 @@
-kategorie: bugfix
-text: One Piece Log zeigt deutsche Synchro
-untertitel: "Auf Deutsch seit der TV-Premiere am 01.01.2026"
-wartetAuf: "Bestandsbau nach diesem PR. Probe: In public/data/titles.json hat Kennung 183423 dubConfidence normal statt low und deErstausgabe.von 2026-01-01."
-seit: '2026-11-22'

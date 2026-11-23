@@ -428,7 +428,7 @@ Erwartet: ~301 von 307.
 
 | Weg | gemessen | Aufwand | Risiko | Empfehlung |
 |---|---|---|---|---|
-| (a) AniList neu holen | 9 von 40 | S | niedrig | ja (`auto-arten-2111`) |
+| (a) AniList neu holen | 9 von 40 | S | niedrig | ja (`auto-arten-2111`); **gebaut 22.11.2026 (Rang 7b)**: `lib/anilist-mangel.ts`, `data:fetch` holt einen abgeschlossenen Titel ohne Wertung oder ohne Studio trotz Cache neu (Stempel `abgerufen`, frühestens alle 2 Tage, je Lauf höchstens 100 MAL-Weg / 10 Kennungs-Weg = rund 2 Blöcke + 10 Einzelabrufe stündlich, AniList erlaubt 90 je Minute; älteste zuerst, damit der Rest reihum drankommt) |
 | (a) aniSearch `st` / `info.studios` | 0 (bei allen 62 leer) | — | — | — |
 | (c) Franchise | 76,6 % gleich | — | mittel | nein |
 | Rest | ~93 | — | — | Ausnahme „quelle-ohne-studio“ |
@@ -539,6 +539,10 @@ Ursache des Stillstands: `fetch.ts` holte abgeschlossene Zwischenspeicher-Eintr�
 ## wertung: die letzten 2 offenen sind Ankündigungen (23.11.2026)
 
 Live gemessen (GraphQL, 23.11.2026): Fool Night (213457) und 2.5-jigen no Ririsa 2nd Season (185515) sind `NOT_YET_RELEASED`, `averageScore` und `meanScore` sind `null` (Fool Night hat 182 Stimmen in `scoreDistribution`, AniList veröffentlicht trotzdem keinen Wert). Kein Codefehler: `anilistWertungAus` braucht eine Zahl und rechnet nichts aus. Neue Ausnahme `noch-ohne-start` (`wertungNochOhneStart`, `pipeline/lib/maengel-regeln.ts`): kein Nicht-Disc-Termin begonnen, Jahr dieses Jahres oder leer, Ende nicht vorbei; sie endet mit dem Start von selbst, dann greift der Rückfall. Erwartung nach dem nächsten Bestandsbau: wertung offen 2 → 0 (+ 2 Ausnahme).
+
+## Genre: Rest 41 erklärt (23.11.2026, Auftrag „Vorrat genre AniList“)
+
+Gemessen an `public/data/titles.json` (41 ohne Genre): **30** aniSearch-Zeilen (Kennung ≥ 10 Mio., kein AniList-Eintrag; `g` leer 22, „Unbestimmt“ 4, „Ganbatte“ 4, TMDB-Rückfall ohne Treffer), **9** AniList-Titel (Filme, Musikvideos, Specials; AniList-GraphQL am 23.11. für alle 9 mit `genres: []`), **2** Eigentitel (5 Mio.; Handweg offen). Kein Titel verliert Genres an einer Bau-Stelle. Behoben: Ausnahme `quelle-ohne-genre` für Kennung ≥ `ANISEARCH_ID_BASIS` (wie `quelle-ohne-studio`): offen 41 → 11 (9 AniList + 2 Eigentitel), 30 Ausnahme. Die 9 bleiben offen, bis AniList Genres führt (Lauf holt neu); die 2 Eigentitel sind von Hand füllbar.
 
 ## folgentitel: warum TMDB keine deutschen Titel liefert (23.11.2026, Auftrag „Vorrat folgentitel TMDB“)
 

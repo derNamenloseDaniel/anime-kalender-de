@@ -1,5 +1,0 @@
-kategorie: feature
-text: Fünf Synchro-Titel erzählen jetzt ihre Handlung
-untertitel: Etwa Das Himmelsbuch und Die Legende von Nezha
-wartetAuf: "Bestandsbau nach diesem PR. Probe: public/data/synopses/ trägt für die Titel 4614, 111939, 11421, 123147 und 109418 einen Text mit `eigen`."
-seit: '2026-11-23'

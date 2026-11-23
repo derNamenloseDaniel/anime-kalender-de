@@ -1,5 +1,0 @@
-kategorie: bugfix
-text: Steel Ball Run Phase 2-3 mit eigenem Wochentermin
-untertitel: "Elf Folgen ab 25.09. gehören jetzt zum zweiten Teil"
-wartetAuf: "Bestandsbau nach diesem PR. Probe: In public/data/releases.json trägt steel-ball-run-2nd-3rd-stage titleId 210482 statt 190327."
-seit: '2026-11-22'

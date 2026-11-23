@@ -3413,10 +3413,13 @@ console.log('\nJapanischer Start: so genau wie die Quelle, und angekündigte Tit
   const abruf = readFileSync('pipeline/fetch.ts', 'utf8')
   pruefe('der Reihe geht das genaue, nicht das aufgefüllte Datum mit', /jpStart: t\.jpStart \?\? jpStartAnzeige\.get\(t\.id\)/.test(bau))
   pruefe('ohne Tag bleibt es beim Monat', /if \(!d\.day\) return `\$\{d\.year\}-\$\{p\(d\.month\)\}`/.test(bau))
-  pruefe(
-    'nicht abgeschlossene Titel werden bei jedem Lauf neu geholt',
-    /!cached\[id\] \|\| nochOffen\(cached\[id\]\)/.test(abruf) && /!byAniId\[id\] \|\| nochOffen\(byAniId\[id\]\)/.test(abruf),
-  )
+  const { zuHolen } = await import('./lib/anilist-mangel.ts')
+  const { eintragNochOffen } = await import('./lib/anilist.ts')
+  const voll = { status: 'FINISHED', countryOfOrigin: 'JP', stats: null, averageScore: 70, studios: { nodes: [{ name: 'X' }] }, abgerufen: '2026-11-22' }
+  const speicher = { 1: { ...voll, status: 'RELEASING' }, 2: voll } as unknown as Record<string, import('./lib/anilist-mangel.ts').MitStempel>
+  const geholt = zuHolen(speicher, [1, 2, 3], (m) => eintragNochOffen(m), '2026-11-22')
+  pruefe('nicht abgeschlossene und fehlende Titel werden bei jedem Lauf neu geholt, abgeschlossene nicht', geholt.join() === '1,3', geholt)
+  pruefe('fetch.ts wählt über zuHolen mit nochOffen', /zuHolen\(cached, malIds, nochOffen/.test(abruf) && /zuHolen\(byAniId, alleIds, nochOffen/.test(abruf))
 }
 
 console.log('\nÄhnliche Titel:')

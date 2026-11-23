@@ -3,6 +3,7 @@
  * fest unter dem Scrollbereich, Tippziele. Aufgerufen von `ansicht-bild.mjs --handy`; die Seite muss die App aus `dist/` ausliefern.
  */
 import { abstandsAbweichungen } from './ansicht-filterfenster-rechner.mjs'
+import { chipAbweichungen, messeChips, messeS5, s5Abweichungen } from './ansicht-filterfenster-s5.mjs'
 
 const BREITEN = [320, 375, 393, 440]
 const ROUTEN = ['woche', 'datenbank']
@@ -17,7 +18,7 @@ function messeFenster() {
     if (parseFloat(getComputedStyle(e).borderTopWidth) > 0) kasten++
   }
   const suche = fenster.querySelector('input[type=search]').getBoundingClientRect().height
-  const chips = [...fenster.querySelectorAll('button.h-8.rounded-full[aria-pressed]')]
+  const chips = [...fenster.querySelectorAll('button.h-11[aria-pressed]')]
   const treffer = chips.map((c) => {
     const r = c.getBoundingClientRect()
     const e = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2 - 20)
@@ -61,7 +62,7 @@ function abweichungen(wo, m, k) {
   if (m.suche < 40) a.push(`${wo}: Suchfeld unter 40 px (${m.suche})`)
   if (m.chipX > 13) a.push(`${wo}: erster Schnell-Chip bei x ${Math.round(m.chipX)} (soll ≤ 13)`)
   if (!m.chips.length) a.push(`${wo}: keine Schnell-Chips gefunden`)
-  for (const c of m.chips.filter((c) => !c.ok || c.h !== 32)) a.push(`${wo}: Chip „${c.text}" Höhe ${c.h}, Treffer 20 px über der Mitte ${c.ok ? 'ok' : 'verfehlt'}`)
+  for (const c of m.chips.filter((c) => !c.ok || c.h !== 44)) a.push(`${wo}: Chip „${c.text}" Höhe ${c.h}, Treffer 20 px über der Mitte ${c.ok ? 'ok' : 'verfehlt'}`)
   if (m.mehrHit.some((h) => h < 44)) a.push(`${wo}: „mehr Filter" Trefferfläche unter 44 px (${m.mehrHit.join('/')})`)
   if (k.fussUnten > 1 || m.fussUnten < -1) a.push(`${wo}: Fuß nicht am Fensterrand (${Math.round(k.fussUnten)} / ${Math.round(m.fussUnten)} px)`)
   if (m.ueberbreite > 0) a.push(`${wo}: Fenster scrollt waagerecht (${m.ueberbreite} px)`)
@@ -82,9 +83,15 @@ export async function pruefeFilterfenster(seite) {
       await seite.waitForTimeout(1500)
       const m = await seite.evaluate(messeFenster)
       const k = await seite.evaluate(messeKleben)
+      const s5 = await seite.evaluate(messeS5, route === 'datenbank')
       messungen.push({ breite, route, ...m, ...k })
-      alle.push(...abweichungen(`${route} ${breite} px`, m, k))
+      alle.push(...abweichungen(`${route} ${breite} px`, m, k), ...s5Abweichungen(`${route} ${breite} px`, s5))
     }
+    /* Schlimmster Fall der Chipzeile: zehn gesetzte Filter auf einmal (Ausschlüsse, Einschlüsse, Suche). */
+    await seite.goto('about:blank')
+    await seite.goto(`http://ak.test/#/datenbank?q=One%20Piece&p=crunchyroll&xp=tv,netflix&xrt=disc,ova&xg=Ecchi,Horror&xkw=Cartoon&st=airing`, { waitUntil: 'networkidle' })
+    await seite.waitForTimeout(1500)
+    alle.push(...chipAbweichungen(`datenbank ${breite} px, viele Filter`, await seite.evaluate(messeChips)))
   }
   return { abweichungen: alle, messungen }
 }

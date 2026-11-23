@@ -63,7 +63,7 @@ export function PanelVersteckt({ title, t, onClose, onToggleHidden }: {
         <p className="text-t3 font-semibold italic text-slate-400 dark:text-slate-500">
           {anzeigeName(title)}
         </p>
-        <p className="text-t3 text-slate-500 dark:text-slate-400">{t('detail.hiddenNote')}</p>
+        <p className="text-t3 text-ak-leise">{t('detail.hiddenNote')}</p>
         <div className="flex justify-center gap-2">
           <Button onClick={() => onToggleHidden(title.id)} size="sm">
             {t('card.unhide')}

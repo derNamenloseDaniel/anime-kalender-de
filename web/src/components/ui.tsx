@@ -60,7 +60,10 @@ export function Chip({
   color,
   title,
   gross,
+  zahl,
 }: {
+  /** Titel im Kernbestand mit diesem Weg (`lib/filter-zaehlung.ts`); 0 blendet den Chip ab, tippbar bleibt er. */
+  zahl?: number
   /** 44 px hoch (Tippziel) — im Detail-Panel, wo Chips Verweise zum Antippen sind. */
   gross?: boolean
   active?: boolean
@@ -85,6 +88,7 @@ export function Chip({
       className={[
         gross ? 'inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border px-4 text-t3 transition' : 'inline-flex items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold transition max-md:min-h-11 max-md:min-w-11',
         CLICKABLE,
+        zahl === 0 && !active && !excluded ? 'text-ak-leise!' : '',
         excluded
           ? // Rot und durchgestrichen: Ein bloß andersfarbiger Chip würde sich
             // wie eine zweite Auswahl lesen, nicht wie ein Verbot.
@@ -105,7 +109,9 @@ export function Chip({
         <span className="size-2 rounded-full" style={{ background: color }} aria-hidden="true" />
       )}
       {children}
+      {zahl !== undefined && <span aria-hidden="true" className="font-normal tabular-nums opacity-70">{zahl.toLocaleString('de-DE')}</span>}
       {zustandWort && <span className="sr-only">{zustandWort}</span>}
+      {zahl !== undefined && <span className="sr-only">{`, ${t('filter.zahlTitel', { n: zahl.toLocaleString('de-DE') })}`}</span>}
     </button>,
   )
 }
@@ -312,7 +318,7 @@ export function Button({
 
 export function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+    <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-ak-leise">
       {children}
     </h2>
   )
@@ -486,11 +492,14 @@ export function Toggle({
   onChange,
   label,
   hint,
+  hoch,
 }: {
   checked: boolean
   onChange: (next: boolean) => void
   label: string
   hint?: string
+  /** Am Handy ist das Etikett selbst 44 px hoch (gemessen wird die Elementbox, nicht ein `::after`). */
+  hoch?: boolean
 }) {
   /*
     **Ein Hinweis ist gekennzeichnet**. Er hängt an einem eigenen ⓘ neben
@@ -498,7 +507,7 @@ export function Toggle({
   */
   const schalter = (
     /* Handy: Trefferfläche 44 px über ::after am umschließenden Pillen-Element (`relative`, siehe db-kopfzeile.tsx); die Pille bleibt 32 px. */
-    <label className={`inline-flex items-center gap-2 text-sm max-sm:after:absolute max-sm:after:inset-x-0 max-sm:after:-inset-y-1.5 max-sm:after:content-[''] ${CLICKABLE}`}>
+    <label className={`inline-flex items-center gap-2 text-sm ${hoch ? 'max-sm:min-h-11' : "max-sm:after:absolute max-sm:after:inset-x-0 max-sm:after:-inset-y-1.5 max-sm:after:content-['']"} ${CLICKABLE}`}>
       <input
         type="checkbox"
         checked={checked}
@@ -529,7 +538,7 @@ export function Toggle({
       <Tooltip text={hint} seite="unten">
         <span
           aria-label={hint}
-          className="relative z-10 grid size-4 cursor-help place-items-center rounded-full border border-slate-400 text-[11px] font-semibold leading-none text-slate-500 dark:border-slate-500 dark:text-slate-400"
+          className="relative z-10 grid size-4 cursor-help place-items-center rounded-full border border-slate-400 text-[11px] font-semibold leading-none text-ak-leise dark:border-slate-500"
         >
           i
         </span>

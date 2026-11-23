@@ -1,5 +1,0 @@
-kategorie: feature
-text: Mehr Titel zeigen oben ein Bild statt Farbverlauf
-untertitel: "Etwa Rozen Maiden: Träumend mit dem Banner der Reihe"
-wartetAuf: "Bestandsbau nach PR 4566. Probe: In public/data/titles.json haben statt 310 nur noch 68 Titel kein bannerImage, 242 tragen bannerVon (Kennung des Spenders)."
-seit: '2026-11-22'

@@ -43,6 +43,7 @@ import { anisearchKennungen } from './anisearch-kennung.ts'
 import { katalogSammeltitel } from './mal-teilung.ts'
 import { ohneWerkDubletten } from './werk-doppelt-bau.ts'
 import { anisearchKatalogReihenQuelle as anisearchKatalogReihen } from './anisearch-reihen-rein-bau.ts'
+import { geerbterSeitTag } from '../lib/staffel-historie.ts'
 
 /**
  * Schreibt die Anime **ohne** belegte deutsche Synchro als eigene Datei.
@@ -372,6 +373,9 @@ function meldeOhneSynchro(alle: { id: number; malId?: number }[], katalog: numbe
 /** Wo die Quellen jedes Termins über Läufe hinweg aufbewahrt werden. */
 const QUELLEN_HISTORIE = 'data/quellen-historie.json'
 
+/** Die aufbewahrten Quellen je Termin (Stand vor diesem Bau). */
+export const quellenHistorieLaden = (): Record<string, Quelle[]> => readJson<Record<string, Quelle[]>>(QUELLEN_HISTORIE, {})
+
 /**
  * Gibt jedem Termin seine Quellen — und **behält die überholten**.
  *
@@ -389,7 +393,7 @@ const QUELLEN_HISTORIE = 'data/quellen-historie.json'
  * weiter ausgeliefert.
  */
 export function quellenPflegen(releases: Release[]): void {
-  const historie = readJson<Record<string, Quelle[]>>(QUELLEN_HISTORIE, {})
+  const historie = quellenHistorieLaden()
   const lesungen = readJson<BelegGedaechtnis>('data/beleg-lesungen.json', {})
   const heute = todayIso()
   const lesetag = ladeAdnLesetage()
@@ -551,7 +555,7 @@ export function schreibeNeuMitSynchro(titles: Title[], releases: Release[]): voi
   const erstlauf = Object.keys(historie.seit).length === 0
 
   for (const t of titles) {
-    if (!historie.seit[t.id]) historie.seit[t.id] = heute
+    if (!historie.seit[t.id]) historie.seit[t.id] = geerbterSeitTag(historie.seit, t) ?? heute
   }
   writeJson(HISTORIE, historie, true)
 

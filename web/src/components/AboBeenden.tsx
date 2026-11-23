@@ -15,7 +15,7 @@ export function AboBeenden({ state, setState }: { state: AbmeldeState; setState:
   return (
     <>
       {abmeldeState === 'weg' ? (
-        <span className="text-[13px] text-slate-500 dark:text-slate-400">{t('news.unsubDone')}</span>
+        <span className="text-[13px] text-ak-leise">{t('news.unsubDone')}</span>
       ) : abmeldeState === 'fragt' ? (
         <span className="flex items-center gap-2 text-[13px]">
           <span className="text-slate-600 dark:text-slate-300">{t('news.unsubConfirm')}</span>
@@ -46,7 +46,7 @@ export function AboBeenden({ state, setState }: { state: AbmeldeState; setState:
           type="button"
           disabled={abmeldeState === 'laeuft'}
           onClick={() => setAbmeldeState('fragt')}
-          className="cursor-pointer text-[13px] text-slate-500 underline decoration-dotted underline-offset-2 transition hover:text-ak-fehler-text disabled:cursor-default disabled:opacity-45 dark:text-slate-400"
+          className="cursor-pointer text-[13px] text-ak-leise underline decoration-dotted underline-offset-2 transition hover:text-ak-fehler-text disabled:cursor-default disabled:opacity-45"
         >
           {t('news.unsub')}
         </button>

@@ -18,6 +18,7 @@ import { log, readJson, ROOT, warn, writeJson } from './lib/util.ts'
 import { fremdeAdressen } from './lib/fremde-adressen.ts'
 import { entfallenZeile, ohneKennungZeile, ordneFolgenOhneFremde } from './lib/folgen-fremde-adressen.ts'
 import { abrufMitStempel } from './lib/abruf-stempel.ts'
+import { mitAbbruchMeldung } from './lib/abbruch.ts'
 import { leseZugeordnet } from './lib/prime-meldung-riegel.ts'
 import { namensAnfang } from './lib/folgen-namen.ts'
 import { adressIndex, ankerAdresse, type Beobachtung, type FolgenZuordnung } from './lib/folgen-je-folge.ts'
@@ -123,4 +124,4 @@ async function main() {
   )
 }
 
-if (process.argv[1]?.endsWith('fetch-folgen-zuordnung.ts')) await abrufMitStempel('folgen-zuordnung', ZIEL, main)
+if (process.argv[1]?.endsWith('fetch-folgen-zuordnung.ts')) await mitAbbruchMeldung('folgen-zuordnung', () => abrufMitStempel('folgen-zuordnung', ZIEL, main), 'prime')

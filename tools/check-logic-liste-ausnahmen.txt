@@ -2,3 +2,4 @@
 # Format wie die Liste: eine Datei je Zeile, `#` beginnt einen Kommentar. Wächter: tools/check-logic-vollstaendig.mjs.
 # Eine Ausnahme, die nicht mehr nötig ist, macht check:logic rot. Dateien, die package.json, check-bestand-liste.txt oder tests-alle.mjs ausführt, brauchen keine.
 pipeline/check-invarianten-kanal.ts # nur Proben-Bibliothek (exportiert kanalProben), läuft über pipeline/check-invarianten.ts
+pipeline/check-filter-zaehlung-bestand.ts # liest public/data, gehört in check-bestand-liste.txt; dort fehlt bis zur Entscheidung über die Obergrenze in tools/bestand-marken.test.mjs (PR 4715), bis dahin von Hand: npx tsx pipeline/check-filter-zaehlung-bestand.ts

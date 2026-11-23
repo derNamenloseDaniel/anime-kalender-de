@@ -4,6 +4,7 @@ import type { Title } from '@shared/types.ts'
 import { todayIso } from '@shared/time.ts'
 import type { Dataset } from '../lib/data.ts'
 import { DbKopfbereich } from './filter/DbWerkzeug.tsx'
+import type { ZaehlKern } from './filter/FilterZaehlungsrahmen.tsx'
 import { zaehleMitSynchro } from './db-kopfzeile.tsx'
 import { DbLeer, DbRaster, MehrKnopf } from './db-bedienung.tsx'
 import { EcchiHinweis } from './EcchiHinweis.tsx'
@@ -42,6 +43,8 @@ export interface DatabaseViewProps {
   onFiltersChange: (next: FilterState) => void
   /** Der Knopf des Hinweises auf Treffer ohne Synchro: Filter und Schalter in einem Adresswechsel. */
   onHinweisLoesen: HinweisLoesen
+  /** Der Kernbestand vor dem Filter — Grundlage der Zahlen an den Chips. */
+  kern?: ZaehlKern
 }
 
 export function DatabaseView({
@@ -63,6 +66,7 @@ export function DatabaseView({
   filters,
   onFiltersChange,
   onHinweisLoesen,
+  kern,
 }: DatabaseViewProps) {
   const { share, copiedSlug } = useShare()
   const today = todayIso()
@@ -86,7 +90,7 @@ export function DatabaseView({
         sort={sort} onSortChange={onSortChange}
         ohneSynchro={ohneSynchro} onOhneSynchroChange={onOhneSynchroChange} laedt={ohneSynchroLaedt}
         grouped={grouped} onGroupedChange={onGroupedChange}
-        hinweis={hinweis} onHinweisLoesen={onHinweisLoesen}
+        hinweis={hinweis} onHinweisLoesen={onHinweisLoesen} kern={kern}
       />
 
       <EcchiHinweis data={data} filters={filters} favorites={favorites} ohneSynchro={ohneSynchro} titles={titles} />

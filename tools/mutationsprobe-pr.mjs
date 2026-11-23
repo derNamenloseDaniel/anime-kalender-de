@@ -69,6 +69,13 @@ export function zustandText(lauf) {
   return `nicht beurteilt: Lauf ${lauf.conclusion || 'ohne Ergebnis'}`
 }
 
+// Gekappt wird nur, was rot ist: Zeilen mit Überlebenden oder Anker-Fehlern (außer der Kontrolle) stehen immer im Bericht.
+export function kuerzeTabelle(text) {
+  if (text.length <= ERGEBNIS_MAX) return text
+  const auffaellig = text.slice(ERGEBNIS_MAX).split('\n').filter((z) => /\| (GRÜN|nicht gefunden|mehrdeutig|wirkungslos|unbrauchbar)/.test(z))
+  return [text.slice(0, ERGEBNIS_MAX), ...(auffaellig.length > 0 ? ['… gekappt, nicht rote Zeilen dahinter:', ...auffaellig] : [])].join('\n')
+}
+
 /** Text für den Prüfer. `ergebnisse`: { liste, lauf, tabelle } je gestarteter, `uebersprungen`: { liste, grund }. */
 export function baueBericht({ kopf, ergebnisse, uebersprungen, fehler = '' }) {
   const z = [`Mutationsprobe zum Kopf ${kopf} (Prüfstufe 2, Mutantenliste im Diff)`]
@@ -81,7 +88,7 @@ export function baueBericht({ kopf, ergebnisse, uebersprungen, fehler = '' }) {
   }
   const tabellen = ergebnisse.filter((e) => e.tabelle)
   if (tabellen.length > 0) z.push('', HINWEIS)
-  for (const e of tabellen) z.push('', `### ${e.liste}`, e.tabelle.replace(/[\u0000-\u0008\u000b-\u001f\u007f]+/g, ' ').slice(0, ERGEBNIS_MAX))
+  for (const e of tabellen) z.push('', `### ${e.liste}`, kuerzeTabelle(e.tabelle.replace(/[\u0000-\u0008\u000b-\u001f\u007f]+/g, ' ')))
   return z.join('\n') + '\n'
 }
 

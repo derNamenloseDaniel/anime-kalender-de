@@ -1586,8 +1586,8 @@
     ]
   },
   "katalog": {
-    "inReihen": 12051,
-    "reihen": 3077,
+    "inReihen": 12057,
+    "reihen": 3078,
     "pruefliste": [
       {
         "art": "verschmilzt",
@@ -5911,7 +5911,7 @@
           {
             "id": 527,
             "name": "Pocket Monsters",
-            "titel": 133
+            "titel": 136
           },
           {
             "id": 145059,

@@ -22,7 +22,7 @@ export function FolgenMitNachlegern({ titleId, wege, antwort, releases, today, l
   return (
     <>
       {zeilen.map((n) => (
-        <p key={n.platform} className="mt-1 text-t4 text-slate-500 dark:text-slate-400">
+        <p key={n.platform} className="mt-1 text-t4 text-ak-leise">
           {nachlegerText(n)}
         </p>
       ))}

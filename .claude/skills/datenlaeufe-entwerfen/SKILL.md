@@ -23,6 +23,7 @@ Entstanden am 05.10.2026 aus einer Vollprüfung der Läufe von anime-kalender-de
 Alles vor ihr lässt sich wiederholen — sie nicht. Ein Sammler braucht drei Dinge **bevor** er sich für fertig hält:
 **Sicherung** (geänderte Dateien als Artefakt, bevor eingereicht wird), **Wiederholung** (mehrere Versuche, jeder auf dem frischen Stand) und einen Weg, **Gesichertes nachzuliefern**.
 Dazu steht das Einreichen mit `if: always()` am Ende **jedes** Jobs: Ein hängender Schritt kostet nur sich selbst.
+**Schritte mit `if: steps.X.outputs…` immer für den Fall „Schritt X rot, Ausgabe gesetzt“ prüfen:** ohne `!cancelled()`/`always()` wird der Schritt nach einem roten Schritt übersprungen (PR 4725: Nachlauf-PR ging bei Exit 1 des Merge-Skripts verloren); die Verdrahtung prüft ein YAML-Test.
 **Prüfschritt vor dem Commit eines Bestandslaufs (PR 1932, 24.10.2026):** Er blockiert auch bei Rot, das nicht vom Bestand kommt (z. B. Fehler in `extension/` auf main). Die PR-Beschreibung nennt dieses Risiko und den Alarm, der es auffängt (`bestand-rot-alarm`).
 
 ## Sichtbarkeit

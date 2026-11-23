@@ -21,5 +21,5 @@ export function KinoZuletzt({ titleId, antwort, t }: { titleId: number; antwort:
   }, [gefragt, titleId])
 
   if (!gefragt || fund?.id !== titleId || !fund.monat) return null
-  return <p className="mt-1 text-t4 text-slate-500 dark:text-slate-400">{t('antwort.kinoZuletzt', { monat: kinoMonatText(fund.monat) })}</p>
+  return <p className="mt-1 text-t4 text-ak-leise">{t('antwort.kinoZuletzt', { monat: kinoMonatText(fund.monat) })}</p>
 }

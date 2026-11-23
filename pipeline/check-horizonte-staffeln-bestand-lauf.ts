@@ -14,8 +14,17 @@ const tsx = pathToFileURL(join(REPO, 'node_modules/tsx/dist/esm/index.mjs')).hre
 const SKRIPT = 'pipeline/check-horizonte-staffeln-bestand.ts'
 const ID = '158871'
 
-type Kulisse = { wiki?: number[]; toggo?: number[]; s?: number | null; kopf?: number; offen?: boolean }
-const GUT: Required<Kulisse> = { wiki: [45, 44, 47, 23], toggo: [45, 44, 47, 1], s: 4, kopf: 137, offen: true }
+/** Je Kennung der Staffeln die Kopfzählung (`zaehlung.json`); `dateien`: Kennungen mit Detaildatei. Staffel 4 = Basis (158871), offen, ohne Detaildatei. */
+type Kopf = Record<string, number[] | null>
+type Kulisse = { wiki?: number[]; toggo?: number[]; dateien?: string[]; kopf?: Kopf; titel?: number[] }
+const GUT: Required<Kulisse> = {
+  wiki: [45, 44, 47, 23],
+  toggo: [45, 44, 47, 1],
+  dateien: ['7000001', '7000002', '7000003'],
+  /* Kennungen in `public/data/titles.json`: die Staffel-Titel stehen im Bestand (nach dem Bestandsbau mit der Aktivierung). */
+  titel: [Number(ID), 7000001, 7000002, 7000003],
+  kopf: { 7000001: [45, 45], 7000002: [44, 44], 7000003: [47, 47], [ID]: [1, 1, 1] },
+}
 
 /** Folgen je Staffel → Wikipedia-Zeilen mit `st` bzw. TOGGO-Einträge. */
 const wikiFolgen = (je: number[]) => je.flatMap((n) => Array.from({ length: n }, (_, i) => ({ st: i + 1 })))
@@ -29,8 +38,9 @@ function lauf(k: Kulisse): { status: number | null; aus: string } {
     mkdirSync(join(wurzel, 'public/data/folgen'), { recursive: true })
     writeFileSync(join(wurzel, 'data/wikipedia-folgen.json'), JSON.stringify({ titel: k.wiki === undefined && 'wiki' in k ? {} : { [ID]: { folgen: wikiFolgen(w.wiki) } } }))
     writeFileSync(join(wurzel, 'data/toggo.json'), JSON.stringify({ titel: { [ID]: { folgen: toggoFolgen(w.toggo) } } }))
-    if (w.s !== null) writeFileSync(join(wurzel, `public/data/folgen/${ID}.json`), JSON.stringify({ f: [], de: [], s: Array.from({ length: w.s }, (_, i) => [i + 1, 1]) }))
-    writeFileSync(join(wurzel, 'public/data/folgen/zaehlung.json'), JSON.stringify({ [ID]: w.offen ? [w.kopf, w.kopf, 1] : [w.kopf, w.kopf] }))
+    writeFileSync(join(wurzel, 'public/data/titles.json'), JSON.stringify(w.titel.map((id) => ({ id }))))
+    for (const d of w.dateien) writeFileSync(join(wurzel, `public/data/folgen/${d}.json`), JSON.stringify({ f: [], de: [] }))
+    writeFileSync(join(wurzel, 'public/data/folgen/zaehlung.json'), JSON.stringify(Object.fromEntries(Object.entries(w.kopf).filter(([, v]) => v !== null))))
     const r = spawnSync(process.execPath, ['--import', tsx, join(REPO, SKRIPT)], { cwd: wurzel, encoding: 'utf8', timeout: 90_000 })
     return { status: r.status, aus: `${r.stdout}${r.stderr}` }
   } finally {
@@ -52,11 +62,16 @@ fall('Wikipedia zählt Staffel 2 anders: rot', { wiki: [45, 45, 46, 23] }, 1, 'S
 fall('TOGGO zählt Staffel 3 anders: rot', { toggo: [45, 44, 48, 1] }, 1, 'Staffel 3: 47 Folgen, TOGGO 48')
 fall('TOGGO führt Staffel 5: Warnzeile, grün', { toggo: [45, 44, 47, 24, 1] }, 0, '⚠ WARNUNG Horizonte-Staffeln: TOGGO führt Staffel 5')
 fall('Wikipedia ohne den Titel: Warnzeile, grün', { wiki: undefined }, 0, '⚠ WARNUNG Horizonte-Staffeln: de.wikipedia')
-fall('Detaildatei fehlt: Meldung statt Absturz', { s: null }, 1, `Detaildatei public/data/folgen/${ID}.json fehlt`)
-fall('Detaildatei ohne Staffeln: rot', { s: 0 }, 1, 'Detaildatei trägt 0 Staffeln')
-fall('Kopfzählung unter der letzten belegten Folge: rot', { kopf: 122 }, 1, 'Kopfzählung 122 Folgen, belegt sind 137')
-fall('Kopfzählung genau an der letzten belegten Folge: grün', { kopf: 137 }, 0, 'check-horizonte-staffeln-bestand: ok')
-fall('Staffel 4 offen, Kopf ohne Kennzeichen („137 von 137“): rot', { offen: false }, 1, 'Kopfzählung ohne Kennzeichen „Staffel offen“')
+fall('Detaildatei einer Staffel fehlt: Meldung statt Absturz', { dateien: ['7000001', '7000003'] }, 1, 'Detaildatei public/data/folgen/7000002.json fehlt')
+fall('Staffel 4 (offen) braucht keine Detaildatei', { dateien: GUT.dateien }, 0, 'check-horizonte-staffeln-bestand: ok')
+fall('Kopfzählung einer abgeschlossenen Staffel unter ihren Folgen: rot', { kopf: { ...GUT.kopf, 7000003: [46, 46] } }, 1, 'Kopfzählung 46 Folgen, belegt sind 47')
+fall('Kopfzählung einer Staffel fehlt: rot', { kopf: { ...GUT.kopf, 7000002: null } }, 1, 'Kopfzählung undefined Folgen, belegt sind 44')
+fall('Staffel 4 offen, Kopf ohne Kennzeichen („1 von 1“): rot', { kopf: { ...GUT.kopf, [ID]: [1, 1] } }, 1, 'Kopfzählung ohne Kennzeichen „Staffel offen“')
+fall('Abgeschlossene Staffel mit Kennzeichen „Staffel offen“: rot', { kopf: { ...GUT.kopf, 7000001: [45, 45, 1] } }, 1, 'Kopfzählung mit Kennzeichen „Staffel offen“, die Datei sagt abgeschlossen')
+fall('Kopfzählung der Basis-Staffel 4 fehlt: rot', { kopf: { ...GUT.kopf, [ID]: null } }, 1, 'Kopfzählung undefined Folgen, belegt sind 1')
+
+fall('Staffel-Titel noch nicht im Bestand (Bestandsbau steht aus): Warnzeile, grün', { titel: [Number(ID)], dateien: [], kopf: {} }, 0, '⚠ WARNUNG Horizonte-Staffeln: Staffel-Titel', 'FEHLER')
+fall('Nur ein Teil der Staffel-Titel im Bestand: rot', { titel: [Number(ID), 7000001], dateien: ['7000001'], kopf: { 7000001: [45, 45] } }, 1, 'Detaildatei public/data/folgen/7000002.json fehlt')
 
 const liste = readFileSync(join(REPO, 'tools/check-bestand-liste.txt'), 'utf8').split('\n').map((z) => z.trim())
 if (liste.includes(SKRIPT)) console.log('  ✓ Wächter steht in tools/check-bestand-liste.txt')
@@ -66,4 +81,4 @@ else {
 }
 
 if (fehler) process.exit(1)
-console.log('check-horizonte-staffeln-bestand-lauf: ok (10 Fälle und Listeneintrag)')
+console.log('check-horizonte-staffeln-bestand-lauf: ok (14 Fälle und Listeneintrag)')

@@ -246,8 +246,8 @@ pruefe('Prüfung (check:logic) rot: der Probebau läuft nicht mehr, der Text nen
 pruefe('Probebau nicht verlangt: läuft nicht, gemergt wie bisher', !bauAus.bauLief && bauAus.titel === 'chore(data): Test' && /pr merge/.test(bauAus.aufrufe), [bauAus.bauLief, bauAus.aufrufe])
 pruefe('Probebau ohne Testbefehl fährt `npm run data:bauprobe`', bauStandard.npmAufrufe === 'run data:bauprobe', bauStandard.npmAufrufe)
 const skripte = JSON.parse(readFileSync(join(wurzel, 'package.json'), 'utf8')).scripts
-const bauSchritte = ['npm run data:build', 'tsx pipeline/check-ja-hat-weg-bestand.ts', 'node tools/pr-bestand-vergleich.mjs HEAD^1']
-pruefe('data:bauprobe fährt genau die Schritte des Jobs PR-Datenbau, in dieser Reihenfolge', `${skripte['data:bauprobe-basis']} && ${bauSchritte[2]}` === bauSchritte.join(' && ') && skripte['data:bauprobe'] === `npm run data:bauprobe-basis && ${bauSchritte[2]}`, [skripte['data:bauprobe'], skripte['data:bauprobe-basis']])
+const bauSchritte = ['npm run data:build', 'npm run data:arbeitslisten', 'tsx pipeline/check-ja-hat-weg-bestand.ts', 'node tools/pr-bestand-vergleich.mjs HEAD^1']
+pruefe('data:bauprobe fährt genau die Schritte des Jobs PR-Datenbau, in dieser Reihenfolge', `${skripte['data:bauprobe-basis']} && ${bauSchritte[3]}` === bauSchritte.join(' && ') && skripte['data:bauprobe'] === `npm run data:bauprobe-basis && ${bauSchritte[3]}`, [skripte['data:bauprobe'], skripte['data:bauprobe-basis']])
 
 console.log('Probebau gegen main (A2): neu rot, geerbt rot, repariert')
 /* Fund-Stand ist v2, main v1 (data/anisearch.json). Die Basis-Befehle erkennen den Stand am Inhalt, so beweist ein Exit, wo der Befehl lief. */

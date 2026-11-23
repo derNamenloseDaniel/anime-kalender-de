@@ -60,7 +60,8 @@ assert.match(neuigkeiten, /\$\{NEWS_PUNKT\[z\.m\.art\]\}/, 'Panel: Punkt aus NEW
 assert.match(neuigkeiten, /\$\{NEWS_FARBE\[z\.m\.art\]\}/, 'Panel: Chip aus NEWS_FARBE')
 assert.match(neuigkeiten, /akzent="info"/, 'Neuigkeiten-Karte ist Info')
 assert.match(lies('components/detail/reihen-karte.tsx'), /akzent="info"/, 'Reihen-Karte ist Info')
-assert.match(lies('components/FilterDetails.tsx'), /"border-y border-ak-info bg-ak-info-grund /, 'Schnellfilter-Band ist Info')
+/* Seit Filterkonzept S5 (23.11.2026, E9) ist die Schnellfläche einfarbig wie das übrige Fenster, kein Info-Band mehr. */
+assert.doesNotMatch(lies('components/FilterDetails.tsx'), /bg-ak-info-grund/, 'Schnellfläche: kein farbiges Band')
 const nachtrag = lies('components/news-nachtrag.tsx')
 assert.match(nachtrag, /quelle: 'border-ak-info\/50 bg-ak-info-grund text-ak-info-text'/)
 assert.match(nachtrag, /zusage: 'border-ak-info\/50 bg-ak-info-grund text-ak-info-text'/)

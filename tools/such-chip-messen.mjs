@@ -35,26 +35,24 @@ async function beantworte(route) {
 const chip = (seite) => seite.getByRole('button', { name: `Suche: ${BEGRIFF} entfernen` })
 const adresseQ = (seite) => new URLSearchParams(seite.url().split('?')[1] ?? '').get('q')
 
-/** Am Handy liegt der Chip im Filterfenster, und das zeigt Chips nur bei einem weiteren Filter (die Suche zählt nicht mit): daher wo=1 ("sicher=1" gilt in der Datenbank seit 22.11.2026 nicht mehr). Am Rechner steht er im Filterfeld unten, das erst nach dem Klick auf den Filter-Knopf aufklappt (Variante A, 29.10.2026). */
-async function oeffne(seite, mobil) {
+/** Seit Filterkonzept S5 (23.11.2026) stehen die gesetzten Filter als Chipzeile über der Liste, Handy und Rechner; das Filterfenster muss nicht mehr geöffnet werden. */
+async function oeffne(seite) {
   await seite.goto('about:blank')
-  await seite.goto(`http://ak.test/#/datenbank?q=${BEGRIFF}${mobil ? '&wo=1' : ''}`, { waitUntil: 'networkidle' })
-  if (mobil) await seite.getByRole('button', { name: /^Filter/ }).first().click()
-  else await seite.locator('button[data-filter-knopf]').click()
+  await seite.goto(`http://ak.test/#/datenbank?q=${BEGRIFF}`, { waitUntil: 'networkidle' })
   await chip(seite).waitFor({ state: 'visible', timeout: 20_000 })
 }
 
 /** „Alle zurücksetzen" räumt die Filter, die Suche bleibt in der Adresse (Daniel, 29.09.2026). */
-async function pruefeZuruecksetzen(seite, art, mobil) {
-  await oeffne(seite, mobil)
+async function pruefeZuruecksetzen(seite, art) {
+  await oeffne(seite)
   ist(adresseQ(seite) === BEGRIFF, `${art}: mit ?q= steht der Such-Chip da`)
   await seite.getByRole('button', { name: 'Alle zurücksetzen' }).first().click()
   await seite.waitForTimeout(400)
   ist(adresseQ(seite) === BEGRIFF, `${art}: „Alle zurücksetzen" lässt die Suche in der Adresse stehen`)
 }
 
-async function pruefeKreuz(seite, art, mobil) {
-  await oeffne(seite, mobil)
+async function pruefeKreuz(seite, art) {
+  await oeffne(seite)
   await chip(seite).click()
   await seite.waitForTimeout(400)
   ist(adresseQ(seite) === null, `${art}: × leert die Adresse (q=${adresseQ(seite)})`)
@@ -66,8 +64,8 @@ async function pruefeKreuz(seite, art, mobil) {
 
 async function pruefe(seite, mobil) {
   const art = mobil ? 'Handy' : 'Rechner'
-  await pruefeZuruecksetzen(seite, art, mobil)
-  await pruefeKreuz(seite, art, mobil)
+  await pruefeZuruecksetzen(seite, art)
+  await pruefeKreuz(seite, art)
 }
 
 async function main() {

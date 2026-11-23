@@ -18707,13 +18707,10 @@
   platform: primevideo
   url: https://www.amazon.de/gp/video/detail/B0DC75L8BJ
   dub: true
-  checkedAt: '2026-09-28'
-  note: "Tonspuren: Deutsch, Deutsch Dialogue Boost: Medium, Deutsch Dialogue Boost: High — Amazon-Seite B0DC75L8BJ: alle 10 Folgen geprüft, Abos: Prime, aniversede, zugang=abo_und_kauf, gti=amzn1.dv.gti.5f6a4c2e-b18d-4a34-8a6b-2f48472ef148"
-- anilistId: 13469
-  title: "Hyouka OVA"
-  platform: primevideo
-  url: https://www.amazon.de/gp/video/detail/B0DC75L8BJ
-  dub: true
+  dubRanges:
+    - from: 13
+      to: 22
+      dub: true
   checkedAt: '2026-09-28'
   note: "Tonspuren: Deutsch, Deutsch Dialogue Boost: Medium, Deutsch Dialogue Boost: High — Amazon-Seite B0DC75L8BJ: alle 10 Folgen geprüft, Abos: Prime, aniversede, zugang=abo_und_kauf, gti=amzn1.dv.gti.5f6a4c2e-b18d-4a34-8a6b-2f48472ef148"
 - anilistId: 170695
@@ -39611,14 +39608,6 @@
   available: false
   checkedAt: '2026-11-11'
   note: "Amazon-Seite B09M19FLBJ: alle 0 Folgen geprüft, 5 in der Region gesperrt, Abos: keine Angabe, gti=amzn1.dv.gti.cd1d5cbf-afea-4c0b-aa99-176cf2cb1f06, regionsperre=laut Seite nicht mehr im Abo"
-- anilistId: 1889
-  title: "Higurashi no Naku Koro ni Kai"
-  platform: primevideo
-  url: https://www.amazon.de/gp/video/detail/B09JZHRQ18
-  dub: true
-  kanalMessung: ja
-  checkedAt: '2026-11-11'
-  note: "Tonspuren: Deutsch, Deutsch Dialogue Boost: Medium, Deutsch Dialogue Boost: High, 日本語 — Amazon-Seite B09JZHRQ18: alle 26 Folgen geprüft, Abos: aniversede, zugang=abo, gti=amzn1.dv.gti.64ed5868-bfbf-4e5f-a79b-66b99918b0f8 — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
 - anilistId: -61751
   title: "King Julien"
   platform: primevideo
@@ -41683,17 +41672,17 @@
   kanalMessung: ja
   checkedAt: '2026-10-13'
   note: "Tonspuren: Deutsch, Français, 日本語 — Amazon-Seite B0GX7VDJK3: alle 48 Folgen geprüft, Abos: crunchyrollde, zugang=abo, gti=amzn1.dv.gti.df04a8a5-ccc5-419a-aa62-81846b1ab8b3 — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
-# Pokémon Horizonte bei RTL+: Staffel 1–3 = Folgen 1–136 (Staffelwähler 45 + 44 + 47, Abruf 20.11.2026). Staffel 4 Folge 1 (137) kommt über den RTL+-Termin der Staffel, nicht über diesen Beleg.
+# Pokémon Horizonte bei RTL+: Staffel 1–3 = Folgen 1–136 (Staffelwähler 45 + 44 + 47, Abruf 20.11.2026), dazu Folge 137 = Staffel 4 Folge 1 (Folgenseite c_2211265, availabilityStarts 2026-11-20). Der Bau teilt den Bereich je Staffel (`pipeline/lib/staffel-titel.ts`).
 - anilistId: 158871
   title: "Pokémon Horizonte"
   platform: rtlplus
   dub: true
   dubRanges:
     - from: 1
-      to: 136
+      to: 137
       dub: true
   checkedAt: '2026-11-20'
-  note: "RTL+ ist rein deutschsprachig (Daniel, 23.08.2026); Serienseite https://plus.rtl.de/pokemon-horizonte-die-serie-p_10142 (Abruf 20.11.2026): TVSeries „Pokémon Horizonte: Die Serie“, inLanguage de, Staffel 1 45, Staffel 2 44, Staffel 3 47 Folgen; zweite Quelle für die Folgen und ihre deutsche Erstveröffentlichung: de.wikipedia.org Pokémon_(Anime)/Horizonte, Folgen 1–136 mit deutschen Titeln und Daten bis 13.11.2026 (Zählung unserer Folge = NR_GES minus 1234)."
+  note: "RTL+ ist rein deutschsprachig (Daniel, 23.08.2026); Serienseite https://plus.rtl.de/pokemon-horizonte-die-serie-p_10142 (Abruf 20.11.2026): TVSeries „Pokémon Horizonte: Die Serie“, inLanguage de, Staffel 1 45, Staffel 2 44, Staffel 3 47 Folgen; Folge 137: https://plus.rtl.de/pokemon-horizonte-die-serie-p_10142/video/eine-welt-voller-abenteuer-c_2211265 (Abruf 20.11.2026, verfügbar ab 20.11.2026, Abo); zweite Quelle für die Folgen und ihre deutsche Erstveröffentlichung: de.wikipedia.org Pokémon_(Anime)/Horizonte, Folgen 1–136 mit deutschen Titeln und Daten bis 13.11.2026 (Zählung unserer Folge = NR_GES minus 1234)."
 - anilistId: 175914
   title: "Call of the Night: Season 2"
   platform: primevideo
@@ -41791,3 +41780,29 @@
   checkedAt: '2026-11-23'
   zweiteQuelle: "JustWatch 2026-11-19: Aniverse Amazon Channel — Ton ja, Deutsch nur als Untertitel"
   note: "Zwei Quellen ohne deutschen Ton: die Kanal-Meldung aus der Erweiterung (für sich kein Beleg, siehe CLAUDE.md) und JustWatch mit 1 Angebot(en), deren Tonspuren belegt sind und Deutsch nicht enthalten."
+# --- Mängel-Stillstand 23.11.2026 (termin-geschaetzt-ohne-weg): Wege aus Anime2You-Steckbriefen ---
+- anilistId: 169969
+  title: "Der Held ohne Klasse: Der Aufstieg eines Talentlosen"
+  platform: netflix
+  url: https://www.netflix.com/title/82662122
+  dub: true
+  dubRanges:
+    - from: 1
+      to: 12
+      dub: true
+  checkedAt: '2026-11-23'
+  note: "Anime2You 01.11.2026 (anime2you.de/news/1066144/netflix-held-ohne-klasse-und-mehr/): Steckbrief „Episoden: 12 (komplett) Sprache: Deutsch, Japanisch (UT) Stream: Netflix“, „Ab sofort auf Netflix“; Netflix-Kennung 82662122 über die Suche („Hero Without a Class: Who Even Needs Skills?!“, englischer Titel im selben Artikel), netflix.com aus der Cloud nicht abrufbar, Abruf der Adresse steht aus."
+- anilistId: 5000001
+  title: "Z wie Zorro – Der Film"
+  platform: joyn
+  url: https://www.joyn.de/filme/z-wie-zorro-der-film
+  dub: true
+  checkedAt: '2026-11-23'
+  note: "Anime2You 03.11.2026 (anime2you.de/news/1066831/joyn-25-anime-neuzugaenge/): „Sprache: Deutsch Stream: Joyn, Prime Video“, Überschrift „ab sofort auf Joyn verfügbar“; die Joyn-Adresse stammt aus der Websuche (Titel „Z wie Zorro - Der Film“, aniverse TV), joyn.de aus der Cloud nicht abrufbar."
+- anilistId: 5000002
+  title: "Zorros Geheimnis"
+  platform: joyn
+  url: https://www.joyn.de/mediatheken/aniverse
+  dub: true
+  checkedAt: '2026-11-23'
+  note: "Anime2You 03.11.2026 (anime2you.de/news/1066831/joyn-25-anime-neuzugaenge/): „Zorros Geheimnis Laufzeit: 88 Minuten Sprache: Deutsch Stream: Joyn, Prime Video“; Einzelseite nicht gefunden, die Websuche führt den Film in der Joyn-Mediathek aniverse (Adresse ist die Mediathek, nicht der Film)."

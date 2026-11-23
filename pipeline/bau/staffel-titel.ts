@@ -11,7 +11,8 @@
 import type { Release, ReleaseEvent, Title } from '../../shared/types.ts'
 import type { TvSendung } from '../fetch-tv-programm.ts'
 import { ladeStaffelGrenzen } from '../lib/pokemon-staffeln.ts'
-import { staffelPlaene, teileStreams, teileTitel, teileWatchLinks, type StaffelPlan } from '../lib/staffel-titel.ts'
+import { todayIso } from '../../shared/time.ts'
+import { aktivTag, staffelPlaene, teileStreams, teileTitel, teileWatchLinks, type StaffelPlan } from '../lib/staffel-titel.ts'
 import { folgentitelJeSendeplatz, staffelJeFolgentitel, teileTermine } from '../lib/staffel-termine.ts'
 import type { WikiListen } from '../lib/tv-termine.ts'
 import { log, readJson, warn } from '../lib/util.ts'
@@ -22,8 +23,11 @@ export type StaffelSammel = { plan: StaffelPlan; titel: Title; releases: Release
 export type StaffelEingaben = { plaene: StaffelPlan[]; sendungen: TvSendung[]; wiki: WikiListen }
 
 export function ladeStaffelEingaben(): StaffelEingaben {
-  const plaene = staffelPlaene(ladeStaffelGrenzen())
-  if (!plaene.length) return { plaene, sendungen: [], wiki: {} }
+  const ohneTag = staffelPlaene(ladeStaffelGrenzen())
+  if (!ohneTag.length) return { plaene: ohneTag, sendungen: [], wiki: {} }
+  /* `aktiv` setzt der Bau aus dem zuletzt ausgelieferten Bestand (`aktivTag`), nicht eine Yaml-Zeile mit einem geratenen Merge-Tag. */
+  const vorher = readJson<Title[] | { titles: Title[] }>('public/data/titles.json', [])
+  const plaene = ohneTag.map((p) => ({ ...p, aktiv: p.aktiv ?? aktivTag(Array.isArray(vorher) ? vorher : vorher.titles, p.sammel, todayIso()) }))
   return {
     plaene,
     sendungen: Object.values(readJson<{ sendungen?: Record<string, TvSendung> }>('data/tv-programm.json', {}).sendungen ?? {}),

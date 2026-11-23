@@ -1,3 +1,6 @@
+import type { Title } from '../../shared/types.ts'
+import { jahre } from './jw-namenssuche.ts'
+
 /**
  * **Eine JustWatch-Kennung gehört einer TMDB-Reihe** (04.11.2026, Anlass: „Fancy Nancy: Fancy It Yourself“ (TMDB 112652, 20 Folgen)
  * bekam im Tiefendurchlauf dieselbe `jwId` wie „Fancy Nancy Clancy“ (80056, 123 Folgen) — Disney-Seite an zwei Reihen, der
@@ -38,6 +41,22 @@ export function nimmTreffer<T extends { id: string }>(
   if (!gefunden) return {}
   const halter = fremderHalter(bestand, schluessel, gefunden.id, Number(erwartet))
   return halter === undefined ? { treffer: gefunden } : { halter }
+}
+
+/**
+ * Ein Film, dessen Erscheinungsjahr bei JustWatch um mehr als eins von unserem abweicht, ist ein anderer Film: JustWatch verknüpft
+ * TMDB-Kennungen auch falsch (23.11.2026: 1310387 = „Yotsuba Succession Arc“ (2026) hängt dort an der Seite des Films von 2017, samt
+ * deutschem Amazon-Ton). Serien bleiben ausgenommen, ihr JustWatch-Jahr ist nicht immer der Start.
+ */
+export function jahrFremd(titel: Pick<Title, 'format' | 'jpYear' | 'deErstausgabe'>, knoten: { content: { originalReleaseYear?: number | null } }): boolean {
+  const jahr = knoten.content.originalReleaseYear
+  const unsere = jahre(titel)
+  return titel.format === 'MOVIE' && typeof jahr === 'number' && unsere.length > 0 && unsere.every((j) => Math.abs(j - jahr) > 1)
+}
+
+/** Die Logzeile für per Jahr abgewiesene Filme: ohne Namen bliebe eine falsche Abweisung (der Titel verliert seine JustWatch-Wege) unsichtbar. */
+export function jahrAbweisungsZeile(namen: string[]): string {
+  return `⚠ WARNUNG JustWatch: ${namen.length} Filme per Jahr abgewiesen, das JustWatch-Jahr weicht um mehr als 1 ab: ${namen.join('; ')}`
 }
 
 /** Die Logzeile für abgewiesene Treffer: sonst bliebe der richtige Titel still `ohneTreffer`, wenn zuerst der falsche Halter gespeichert wurde. */

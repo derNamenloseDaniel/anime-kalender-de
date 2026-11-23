@@ -13,11 +13,12 @@ import { join } from 'node:path'
 import type { StreamLink, Title } from '../shared/types.ts'
 import type { WatchLink } from '../shared/watchlink-typ.ts'
 import { STAFFEL_ID_BASIS, istStaffelTitel, staffelVonTiteln, zurueckAufSammeltitel } from '../shared/staffel-titel.ts'
-import { bereicheDerStaffel, staffelDerFolge, staffelPlaene, teileStreams, teileTitel, teileWatchLinks, type StaffelPlan } from './lib/staffel-titel.ts'
+import { aktivTag, bereicheDerStaffel, laengsteStaffel, staffelDerFolge, staffelName, staffelPlaene, teileStreams, teileTitel, teileWatchLinks, type StaffelPlan } from './lib/staffel-titel.ts'
+import { HORIZONTE_STAFFELN, ladeStaffelGrenzen } from './lib/pokemon-staffeln.ts'
 import { folgenDerStaffel, teileFolgenDatei } from './lib/staffel-folgen.ts'
 import { uebersetzeDatei } from './lib/ausgabe-kennung.ts'
 import { gleicheKennungen, pruefeSchnitt } from './bau/staffel-titel.ts'
-import { beobachtungenDerSpanne } from './lib/urteil-spanne.ts'
+import { beobachtungenDerSpanne, staffelVonJeMeldung } from './lib/urteil-spanne.ts'
 import { sammelSicht, schreibeFolgenEintrag } from './bau/staffel-folgen-schreiben.ts'
 
 let fehler = 0
@@ -173,6 +174,41 @@ pruefe('Meldung zur Basis bleibt (alte Meldungen zählen durchlaufend)', JSON.st
 pruefe('Folge 1 der Staffel 2 → Folge 46', zurueckAufSammeltitel(7_000_002, 1, staffelVon).folge === 46)
 pruefe('Folge 0 (ganze Seite) bleibt 0', zurueckAufSammeltitel(7_000_003, 0, staffelVon).folge === 0)
 pruefe('fremder Titel unverändert', JSON.stringify(zurueckAufSammeltitel(20, 5, staffelVon)) === '{"titel":20,"folge":5}')
+const [planAktiv] = staffelPlaene([{ ...GRENZEN, aktiv: '2026-11-23' }]) as [StaffelPlan]
+const titelAktiv = teileTitel(sammel, planAktiv)
+pruefe('Phase: `aktiv` aus der Yaml steht nur an der Basis-Staffel', titelAktiv[3]!.staffelTitel?.aktiv === '2026-11-23' && titelAktiv.slice(0, 3).every((t) => t.staffelTitel?.aktiv === undefined))
+pruefe('Phase: ohne `aktiv` kein Feld', titel.every((t) => !('aktiv' in (t.staffelTitel ?? {}))))
+/* Befund 2 des Prüfers (PR 4592): alte durchlaufende Meldungen an der Basis gegen neue in der Zählung der Basis-Staffel, getrennt durch `aktiv`. */
+const mitAktiv = staffelVonTiteln([{ id: SAMMEL, staffelTitel: { sammel: SAMMEL, ab: 137, aktiv: '2026-11-23' } }, { id: 7_000_001, staffelTitel: { sammel: SAMMEL, ab: 1 } }])
+pruefe('Basis: Meldung vor `aktiv` zählt durchlaufend (Folge 5 bleibt 5)', JSON.stringify(zurueckAufSammeltitel(SAMMEL, 5, mitAktiv, '2026-11-22')) === '{"titel":158871,"folge":5}')
+pruefe('Basis: Meldung ab `aktiv` zählt in Staffel 4 (Folge 1 → 137)', JSON.stringify(zurueckAufSammeltitel(SAMMEL, 1, mitAktiv, '2026-11-23')) === '{"titel":158871,"folge":137}')
+pruefe('Basis: Meldung ohne Tag bleibt unverändert', zurueckAufSammeltitel(SAMMEL, 1, mitAktiv).folge === 1)
+pruefe('Basis: Folge 0 (ganze Seite) bleibt 0 auch ab `aktiv`', zurueckAufSammeltitel(SAMMEL, 0, mitAktiv, '2026-12-01').folge === 0)
+pruefe('Basis ohne `aktiv`: nie umgerechnet', zurueckAufSammeltitel(SAMMEL, 1, staffelVonTiteln([{ id: SAMMEL, staffelTitel: { sammel: SAMMEL, ab: 137 } }]), '2030-01-01').folge === 1)
+pruefe('Staffel 1 (abgeleitet) rechnet unabhängig vom Tag zurück', zurueckAufSammeltitel(7_000_001, 7, mitAktiv, '2026-11-22').folge === 7)
+pruefe('Spanne der Basis ab `aktiv` → 137.. (Beobachtungen tragen den Tag)', JSON.stringify(beobachtungenDerSpanne(SAMMEL, { von: 1, bis: 2 }, { anbieter: 'rtlplus', vorhanden: 'ja', tonDe: 'ja', art: 'seite', tag: '2026-11-24', kanal: false } as never, mitAktiv).map((b) => b.folge)) === '[137,138]')
+/* Befund 4 des Prüfers (PR 4603): `aktiv` hängt nicht vom Merge-Tag ab, und durchlaufend gezählte Meldungen nach `aktiv` bleiben durchlaufend. */
+pruefe('laengsteStaffel: 47 (Staffel 3), die offene zählt nicht', laengsteStaffel(planAktiv) === 47 && titelAktiv[3]!.staffelTitel?.laengste === 47 && titelAktiv.slice(0, 3).every((t) => t.staffelTitel?.laengste === undefined), JSON.stringify(titelAktiv[3]!.staffelTitel))
+const gebaut = [{ id: SAMMEL, staffelTitel: { aktiv: '2026-11-23' } }, { id: 20 }]
+pruefe('aktivTag: erster Bestand mit dem Schnitt → Tag nach dem Bau, unabhängig vom Merge-Tag', aktivTag([{ id: SAMMEL }], SAMMEL, '2026-12-05') === '2026-12-06' && aktivTag([], SAMMEL, '2026-11-22') === '2026-11-23')
+pruefe('aktivTag: steht der Schnitt schon im Bestand, bleibt sein Tag (kein Wandern bei jedem Bau)', aktivTag(gebaut, SAMMEL, '2026-12-05') === '2026-11-23')
+const mitGrenze = staffelVonTiteln([{ id: SAMMEL, staffelTitel: { sammel: SAMMEL, ab: 137, aktiv: '2026-11-23', laengste: 47 } }])
+const nachAktiv = (folge: number) => zurueckAufSammeltitel(SAMMEL, folge, mitGrenze, '2026-11-25').folge
+pruefe('Basis ab `aktiv`: RTL+ Folge 50 (durchlaufend gezählt) bleibt 50 statt 186', nachAktiv(50) === 50 && nachAktiv(136) === 136 && nachAktiv(137) === 137)
+pruefe('Basis ab `aktiv`: Folge 1 und 47 zählen in Staffel 4 (137, 183)', nachAktiv(1) === 137 && nachAktiv(47) === 183)
+/* Die Verdrahtung des Laders (`aktiv` aus dem Bestand) fährt `check-staffel-aufrufer.ts` im Kindprozess: check:logic darf `public/data` nicht lesen. */
+pruefe('Phase: kein fester Tag in der Yaml', !/^\s+aktiv:/m.test(readFileSync(new URL('../data/curated/horizonte-staffeln.yaml', import.meta.url), 'utf8')))
+pruefe('Basis ab `aktiv`: Spanne 46–49 gemischt (46, 47 Staffel 4, 48, 49 durchlaufend)', JSON.stringify(beobachtungenDerSpanne(SAMMEL, { von: 46, bis: 49 }, { anbieter: 'rtlplus', vorhanden: 'ja', tonDe: 'ja', art: 'seite', tag: '2026-11-25', kanal: false } as never, mitGrenze).map((b) => b.folge)) === '[182,183,48,49]')
+{
+  /* Netflix hängt nur an Staffel 1 (7000001), RTL+ an allen vier: Eine Basis-Meldung zählt nach `aktiv` nur in Staffel 4, wenn ihre Adresse an der Basis hängt. */
+  const bestandTitel = [{ id: SAMMEL, staffelTitel: { sammel: SAMMEL, ab: 137, aktiv: '2026-11-23', laengste: 47 } }, { id: 7_000_001, staffelTitel: { sammel: SAMMEL, ab: 1 } }]
+  const je = staffelVonJeMeldung(bestandTitel)
+  const folge = (titelDerAdresse: number[] | undefined, n: number, tag = '2026-11-25') => zurueckAufSammeltitel(SAMMEL, n, je(titelDerAdresse), tag).folge
+  pruefe('Meldung je Adresse: RTL+ (Adresse an allen Staffeln) Folge 1 ab `aktiv` → 137', folge([7_000_001, SAMMEL], 1) === 137)
+  pruefe('Meldung je Adresse: Netflix (Adresse nur an Staffel 1) Folge 7 bleibt 7, auch ab `aktiv`', folge([7_000_001], 7) === 7)
+  pruefe('Meldung je Adresse: unbekannte Adresse bleibt durchlaufend', folge(undefined, 7) === 7)
+  pruefe('Meldung je Adresse: Staffel-Titel außerhalb der Basis unberührt (Staffel 1 Folge 7 → 7)', zurueckAufSammeltitel(7_000_001, 7, je([7_000_001]), '2026-11-25').folge === 7)
+}
 const ak = (id: number) => ({ 7_000_002: 26461, [SAMMEL]: 14839, 527: 99 })[id] ?? id
 const aus = uebersetzeDatei('titles.json', [titel[1], titel[3]], ak) as { id: number; al: number }[]
 pruefe('Ausgabe: al eines Staffel-Titels zeigt auf den Sammeltitel (AniList-Link lebt), Felder bleiben', aus[0]!.id === 26461 && aus[0]!.al === SAMMEL && (aus[0] as { titleDe?: string }).titleDe === 'Pokémon Horizonte – Staffel 2', JSON.stringify(aus[0]))
@@ -203,7 +239,7 @@ pruefe('Urteile: gewöhnlicher Titel und Basis unverändert, eine Beobachtung je
 pruefe('Urteile: Spanne 0 (ganze Seite) bleibt 0', beobachtungenDerSpanne(7_000_002, { von: 0, bis: 0 }, gemeinsam, staffelVon)[0]!.folge === 0)
 {
   const urteileQuelle = readFileSync(new URL('./fetch-urteile.ts', import.meta.url), 'utf8')
-  pruefe('fetch-urteile: Schleife ruft beobachtungenDerSpanne(m.titel_id, spanne, gemeinsam, staffelVon) mit staffelVonTiteln(titelAlle)', /beobachtungenDerSpanne\(m\.titel_id, spanne, gemeinsam, staffelVon\)/.test(urteileQuelle) && /const staffelVon = staffelVonTiteln\(titelAlle\)/.test(urteileQuelle) && !/for \(let n = von; n <= bis; n\+\+\)/.test(urteileQuelle))
+  pruefe('fetch-urteile: Schleife ruft beobachtungenDerSpanne mit der Staffelzuordnung je Meldung (Adresse) über titelAlle', /beobachtungenDerSpanne\(m\.titel_id, spanne, gemeinsam, staffelVon\(nachAdresse\(m\.url\)\)\)/.test(urteileQuelle) && /const staffelVon = staffelVonJeMeldung\(titelAlle\)/.test(urteileQuelle) && !/for \(let n = von; n <= bis; n\+\+\)/.test(urteileQuelle))
 }
 
 // --- Folgenlisten im echten Aufrufer (`schreibeFolgenDateien`, Kindprozess mit AK_ROOT) ---------------------------------------------------
@@ -216,6 +252,9 @@ pruefe('Urteile: Spanne 0 (ganze Seite) bleibt 0', beobachtungenDerSpanne(7_000_
     writeFileSync(join(wurzel, 'data', 'anisearch.json'), JSON.stringify({ 900501: { anisearchId: 801 }, 900502: { anisearchId: 802 } }))
     writeFileSync(join(wurzel, 'data', 'folgen-hinweise.yaml'), '- { anilistId: 900501, folge: 5, art: hinweis, text: Fünf }\n')
     writeFileSync(join(wurzel, 'data', 'kino-ankuendigungen.yaml'), '[]\n')
+    /* Staffelgrenzen der Kulisse (`ladeStaffelGrenzen`): ohne sie kennt der Bau keinen Stapel-Termin für den Titel (`letzteFolgen`). */
+    mkdirSync(join(wurzel, 'data', 'curated'), { recursive: true })
+    writeFileSync(join(wurzel, 'data', 'curated', 'horizonte-staffeln.yaml'), 'titel:\n- anilistId: 900501\n  basis: 2\n  staffeln:\n    - { nr: 1, von: 1, bis: 3, folgen: 3, kennung: 7000001 }\n    - { nr: 2, von: 4, offen: true }\n')
     const tsx = createRequire(import.meta.url).resolve('tsx/cli')
     const lauf = spawnSync(process.execPath, [tsx, fileURLToPath(new URL('./lib/kulisse-staffel-folgen.ts', import.meta.url))], { env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8', windowsHide: true, timeout: 120_000 })
     const aus = JSON.parse(lauf.stdout.trim().split('\n').at(-1) || '{}') as { index?: number[]; zaehlung?: Record<string, number[]>; dateien?: Record<string, { f: unknown[][]; de: number[][]; s?: unknown }> }
@@ -227,6 +266,12 @@ pruefe('Urteile: Spanne 0 (ganze Seite) bleibt 0', beobachtungenDerSpanne(7_000_
     rmSync(wurzel, { recursive: true, force: true })
   }
 }
+
+// --- Offizielle Namen aus der Yaml ----------------------------------------------------------------------------------------------------
+const [mitNamen] = staffelPlaene([{ ...GRENZEN, staffeln: GRENZEN.staffeln.map((s) => (s.nr === 2 ? { ...s, name: 'Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua' } : s)) }]) as [StaffelPlan]
+pruefe('Name aus der Yaml, sonst „… – Staffel N“', staffelName(mitNamen, 2) === 'Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua' && staffelName(mitNamen, 3) === 'Pokémon Horizonte – Staffel 3')
+const [echt] = staffelPlaene(ladeStaffelGrenzen(HORIZONTE_STAFFELN)) as [StaffelPlan]
+pruefe('Yaml: nur Staffel 3 trägt einen belegten Namen, Staffel 1, 2 und 4 „… – Staffel N“', [1, 2, 3, 4].map((n) => staffelName(echt, n)).join('|') === 'Pokémon Horizonte – Staffel 1|Pokémon Horizonte – Staffel 2|Pokémon Horizonte: Gute Aussichten|Pokémon Horizonte – Staffel 4')
 
 console.log(`check-staffel-titel: ${faelle} Fälle, ${fehler} Fehler`)
 process.exit(fehler ? 1 : 0)

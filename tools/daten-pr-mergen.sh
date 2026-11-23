@@ -4,6 +4,8 @@
 #
 # `--admin` ist der Bypass der App im Ruleset `main-pruefweg`: Ohne das Flag weigert sich `gh` schon, sobald der Pull Request auf eine Freigabe wartet.
 # Ein Pull Request, der sich nicht mergen lässt oder nicht MERGEABLE ist (Konflikt nach dem Auflösen), macht den Lauf rot (Ausgang 1) — still offen bleiben darf er nicht (20.10.2026: grüner Lauf, PR 1556 blieb im Konflikt).
+#
+# Nach einem Merge im selben Lauf bewegt sich main: Ein weiterer PR im Konflikt geht als `nachlauf=<Nummern>` in $GITHUB_OUTPUT (kein Fehler), der Workflow stößt den nächsten Durchgang an.
 set -uo pipefail
 
 # Die App mergt am Ruleset vorbei, also nur, was sie selbst eingereicht hat: eigener Autor, kein Fork, nur Pfade der Quellenliste.
@@ -30,6 +32,8 @@ fremd_grund() {
 }
 
 fehler=0
+gemergt_im_lauf=0
+nachlauf=()
 for nr in "$@"; do
   # Schon gemergt oder geschlossen: `gh` meldet dann mergeable=UNKNOWN, das ist kein Konflikt.
   status="$(gh pr view "$nr" --json state -q .state)"
@@ -49,6 +53,11 @@ for nr in "$@"; do
     [ "$zustand" != UNKNOWN ] && break
     sleep 3
   done
+  if [ "$zustand" = CONFLICTING ] && [ "$gemergt_im_lauf" -gt 0 ]; then
+    echo "::notice::Pull Request $nr steht nach dem Merge eines anderen PR im Konflikt: kommt in den nächsten Durchgang."
+    nachlauf+=("$nr")
+    continue
+  fi
   if [ "$zustand" != MERGEABLE ]; then
     echo "::error::Pull Request $nr bleibt offen ($zustand): der Lauf hat ihn nicht konfliktfrei bekommen."
     fehler=1
@@ -69,6 +78,7 @@ for nr in "$@"; do
   for versuch in 1 2 3 4; do
     if gh pr merge "$nr" --squash --admin --delete-branch --subject "$titel"; then
       gemergt=1
+      gemergt_im_lauf=$((gemergt_im_lauf + 1))
       break
     fi
     echo "::notice::Merge von Pull Request $nr, Versuch $versuch von 4 abgelehnt."
@@ -79,4 +89,5 @@ for nr in "$@"; do
     fehler=1
   fi
 done
+echo "nachlauf=${nachlauf[*]:-}" >> "${GITHUB_OUTPUT:-/dev/null}"
 exit "$fehler"

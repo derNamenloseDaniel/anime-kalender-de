@@ -4494,3 +4494,21 @@ Auftrag `maengel-wege-2111`; Ergebnis je Mängelart in `maengel.md`, „Lösungs
 - synchrondatenbank.de: frei nur für Einträge über 30 Jahre.
 - fernsehserien.de / wunschliste.de: nur mit schriftlicher Genehmigung, Anfrage seit 12.11.2026 offen.
 - werstreamt.es: robots.txt verbietet automatisiertes Auslesen.
+
+## Prime-Seite von Hand zuordnen (22.11.2026)
+
+Wenn eine Prime-Staffelseite zwei AniList-Titeln zugeschrieben wird, die Zahlen aber nur zu einem passen (Seite mit 26 Folgen bei Kai mit 24, OVA-Seite mit 10 Folgen), ordnet man sie nach den deutschen Folgentiteln zu. Belegt sind die Fälle Yu-Gi-Oh! Zexal / Zexal II (19.11.2026, PR 4296), Higurashi / Kai (934/1889) und Hyouka / OVA (12189/13469, 22.11.2026). Vorgehen und die fünf Stellen, die jeder Fall berührt:
+
+- **Zuordnen:** Folgentitel der Seite (`prime_folge` der Meldungskopie, geordnet in `data/prime-zugeordnet.json` als `unsere`) gegen `public/data/folgen/<AniList-ID>.json` halten; die Folgenzahl der Seite gegen die Summe der Anteile. Eine Seite gehört einem Titel, wenn alle ihre Folgen in dessen Folgenliste liegen; gleiche `gti` an zwei Adressen ist derselbe Inhalt.
+- **`data/verweise-von-hand.yaml`:** je Titel und Seite ein Weg mit `belegtAm` und `beleg` (Seite, Folgenbereich, Titelbeispiele), nötig, wenn der Bau die Seite sonst gar nicht oder dem falschen Titel gibt (Zexal). Wo die Meldungen den Weg schon richtig führen (Higurashi, Hyouka), bleibt es beim Handbeleg.
+- **`dubRanges` in `data/dub-confirmed.yaml`:** der Block der Seite nennt den Folgenbereich seines Titels (Hyouka B0DC75L8BJ: 13–22, Zexal Staffel 2: 50–73 bei Zexal und 1–25 bei Zexal II). Ein Block ohne Bereich gilt für den ganzen Titel.
+- **`data/belege-entfernt.yaml`:** der Fremdblock (Kennung des falschen Titels plus Adresse) wird aus dem Beleg gelöscht und hier eingetragen, sonst hängt ihn der Bestandsbau aus den Meldungen wieder an (`datensatz.md`, Entfernte Fehlbelege). Gilt nicht, wenn an derselben Adresse echte Ja-Blöcke desselben Titels stehen.
+- **`data/gleiche-adresse-stand.json`:** teilen sich zwei Titel eine Seite wirklich (Zexal-Staffel 2 = 24 + 25, Hyouka B0B5JVJKCD = 12 + OVA), steht sie unter `erlaubt` mit `anteile`, `folgen` und `grund`; sonst bleibt `hoechstens` bei 0.
+- **Termin-`platformUrl`:** führt ein Titel danach zwei Prime-Wege, vergibt `adresseDesWegs` dem Termin keine Adresse mehr (`platformUrl` würde zur Suche); die Adresse steht dann am kuratierten Termin fest (Zexal II, `data/curated/streaming-nachtrag-2026.yaml`).
+
+- **Higurashi (934/1889):** B09JZHRQ18 (26 Folgen, gti 64ed5868) ist Staffel 1 = 934; der Block für 1889 an dieser Adresse (Messung 11.11.2026, Kanal-Titel) ist entfernt. Kai führt B09KX2VLPR (24 Folgen plus Bonusfolge 25).
+- **Hyouka (12189/13469):** B0B5JVJKCD (13 Folgen) = Folgen 1–12 plus OVA; B0DC75L8BJ (10 Folgen, gti 5f6a4c2e) = Folgen 13–22, gehört nur 12189; der OVA-Block an B0DC75L8BJ ist entfernt. Folge 4 fehlt auf B0B5JVJKCD, nicht Teil dieser Zuordnung.
+
+## JustWatch: Film anderen Jahres unter derselben TMDB-Kennung (23.11.2026)
+
+JustWatch verknüpft TMDB-Kennungen auch falsch: 1310387 (TMDB: „Yotsuba Succession Arc“, 2026, AniList 178707) führt dort zur Seite `tm282890` des Films von 2017 (Amazon-Adresse B07KL1ZV6B = AniList 21684, deutscher Ton). Der Tiefendurchlauf schrieb daraus Angebote mit deutschem Ton an den Film von 2026 (PR 4686: `erschienenOhneTermin` 1 Treffer, 178707 fehlte im gebauten Bestand — Ursache des zweiten Befunds ist Vermutung, der Bau war ohne Cache nicht reproduzierbar). Regel: `jahrFremd` (`lib/jw-kennung-fremd.ts`) weist bei Filmen einen Treffer ab, dessen JustWatch-Jahr um mehr als eins von `jpYear` und deutscher Erstausgabe abweicht; die abgewiesene Antwort überschreibt auch einen vorhandenen Befund (kein „verfehlt, alte Antwort behalten“). Serien sind ausgenommen. Ein schon geschriebener falscher Befund heilt erst beim nächsten Abruf des Titels: fällig ist ein Befund nach der Vorgabe `--alter` (20 Tage), ohne TMDB-Kennung nach 21 Tagen (`NAMEN_ALTER_TAGE`); der Bau liest Befunde bis 28 Tage (`BEFUND_MAX_TAGE`). Der Befund trägt das JustWatch-Jahr (`jahr`), jede Abweisung steht mit Namen und Jahr im Lauf-Log („N per Jahr abgewiesen“, Warnzeile `jahrAbweisungsZeile`).

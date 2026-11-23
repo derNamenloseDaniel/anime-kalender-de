@@ -20,18 +20,18 @@ export function DbSchalter({ ohneSynchro, onOhneSynchroChange, laedt, grouped, o
   const { t } = useLang()
   /* `relative`: das `sr-only`-Input des Schalters ist absolut positioniert und ragte sonst aus der rollbaren Reihe
      bis zur Seitenkante — das Handy legte den Viewport 594 statt 390 px breit an (gemessen, 08.10.2026). */
-  const pille = 'relative inline-flex shrink-0 items-center rounded-full border px-3 py-1.5 whitespace-nowrap transition'
+  const pille = 'relative inline-flex shrink-0 items-center rounded-full border px-3 py-1.5 max-sm:py-0 whitespace-nowrap transition'
   const ruhig = 'border-slate-300 dark:border-white/15'
   return (
     /* Auf dem Handy eine rollbare Reihe (drei Zeilen Schalter über dem Raster waren zu viel), ab `sm` umbrechend. */
     <div className="-mx-4 flex items-center gap-2 overflow-x-auto px-4 py-0.5 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0">
       <span className={`${pille} ${ohneSynchro ? PILLE_JA : `${ruhig} border-dashed`}`}>
-        <Toggle checked={ohneSynchro} onChange={onOhneSynchroChange} label={t('db.withoutDub')} hint={t('db.withoutDubHint')} />
+        <Toggle hoch checked={ohneSynchro} onChange={onOhneSynchroChange} label={t('db.withoutDub')} hint={t('db.withoutDubHint')} />
       </span>
       <span className={`${pille} ${ruhig}`}>
-        <Toggle checked={grouped} onChange={onGroupedChange} label={t('db.groupSeasons')} hint={t('db.groupSeasonsHint')} />
+        <Toggle hoch checked={grouped} onChange={onGroupedChange} label={t('db.groupSeasons')} hint={t('db.groupSeasonsHint')} />
       </span>
-      {laedt && <span className="text-[11px] leading-snug text-slate-500 dark:text-slate-400">{t('db.withoutDubLoading')}</span>}
+      {laedt && <span className="text-[11px] leading-snug text-ak-leise">{t('db.withoutDubLoading')}</span>}
     </div>
   )
 }

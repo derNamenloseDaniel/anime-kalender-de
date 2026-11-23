@@ -128,7 +128,7 @@ export function FolgenBereich({ titleId, wege, erschienen, laufzeitImKopf, serie
       <button type="button" onClick={() => setOffen((o) => !o)} aria-expanded={offen} className="flex min-h-11 w-full cursor-pointer items-center gap-1.5 text-left text-t3 font-semibold">
         <span aria-hidden className={`inline-block transition-transform ${offen ? 'rotate-90' : ''}`}>▸</span>
         Folgen{anzahl !== undefined ? ` (${anzahl})` : ''}
-        {liste?.min && !laufzeitImKopf ? <span className="font-normal text-slate-500 dark:text-slate-400">· ~{liste.min} Min. je Folge</span> : null}
+        {liste?.min && !laufzeitImKopf ? <span className="font-normal text-ak-leise">· ~{liste.min} Min. je Folge</span> : null}
       </button>
       {offen && (
         <div>
@@ -150,15 +150,15 @@ export function FolgenBereich({ titleId, wege, erschienen, laufzeitImKopf, serie
           )}
           {gewaehlt && <p className="pb-1 text-ak-leise">{staffelZeile(gewaehlt)}</p>}
           <ul className="max-h-64 overflow-y-auto pr-1">
-            {!folgen && <li className="text-slate-500 dark:text-slate-400">Lädt …</li>}
-            {folgen && !folgen.length && <li className="text-slate-500 dark:text-slate-400">Keine Folgentitel bekannt.</li>}
-            {ohneTitel && <li className="pb-1 text-slate-500 dark:text-slate-400">Die Folgentitel liegen noch nicht vor.</li>}
+            {!folgen && <li className="text-ak-leise">Lädt …</li>}
+            {folgen && !folgen.length && <li className="text-ak-leise">Keine Folgentitel bekannt.</li>}
+            {ohneTitel && <li className="pb-1 text-ak-leise">Die Folgentitel liegen noch nicht vor.</li>}
             {nurSerienbeleg && <li className="pb-1 text-ak-leise">{SERIENBELEG_HINWEIS}</li>}
             {sichtbar.map(([nr, titel, min]) => (
               <li key={nr} className="flex items-baseline gap-2 py-px">
-                <span className="w-9 shrink-0 text-right tabular-nums text-slate-500 dark:text-slate-400">{nr}</span>
+                <span className="w-9 shrink-0 text-right tabular-nums text-ak-leise">{nr}</span>
                 <span className="min-w-0 flex-1 truncate">{titel || (ohneTitel ? '' : '—')}</span>
-                {min ? <span className="shrink-0 tabular-nums text-slate-500 dark:text-slate-400">{min} Min.</span> : null}
+                {min ? <span className="shrink-0 tabular-nums text-ak-leise">{min} Min.</span> : null}
                 {deutsch(nr) ? <DeFlagge /> : erschienen !== undefined && nr > erschienen ? <NochNichtErschienen /> : <FolgeOhneFlagge hinweis={liste?.h?.find(([n]) => n === nr)?.[1]} gibtDeutsche={Boolean(liste?.de.length)} />}
               </li>
             ))}
@@ -181,7 +181,7 @@ function DeFlagge() {
 function NochNichtErschienen() {
   return (
     <Tooltip text="Erscheint noch. Ob die Folge auf Deutsch kommt, belegt erst ihr Erscheinen." eigenerFokus>
-      <span role="img" aria-label="Noch nicht erschienen" className="inline-flex size-3.5 shrink-0 items-center justify-center text-slate-500 dark:text-slate-400">
+      <span role="img" aria-label="Noch nicht erschienen" className="inline-flex size-3.5 shrink-0 items-center justify-center text-ak-leise">
         <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true"><circle cx="8" cy="8" r="6.5" /><path d="M8 4.5V8l2.5 1.5" /></svg>
       </span>
     </Tooltip>

@@ -104,6 +104,23 @@ Seitdem gilt:
   Der Bau liefe dann 26-mal am Tag doppelt, jedes Mal mit einer Zeile in der
   Statusanzeige. Ein Konflikt ist der Ausnahmefall, und eine Stunde Verzug ist
   dort verkraftbar.
+
+  **Mehrere Konflikt-PRs: Nachlauf statt Verlust (23.11.2026, Lauf 45183026486).**
+  Claude löste 4679 und 4676 nacheinander auf; `daten-pr-mergen.sh` mergte 4679, main
+  bewegte sich, 4676 stand wieder im Konflikt, der Lauf endete rot. Klasse: jeder Lauf mit
+  mehr als einem Konflikt-PR verliert alle außer dem ersten (gleiche Cache-Dateien).
+  Jetzt meldet das Skript einen PR, der erst nach einem Merge desselben Laufs im Konflikt
+  steht, als `nachlauf=<Nummern>` in `$GITHUB_OUTPUT` (Notice, kein Fehler, Ausgang 0), und der
+  Job `anstossen` (läuft auch nach rotem Merge-Job, `!cancelled()`) startet
+  `claude-daten-merge.yml` per `workflow_dispatch` mit dem GITHUB_TOKEN (Ausnahme vom
+  Schleifenschutz). `actions: write` hat nur dieser Job, nicht Claude (Bash). Ohne Merge im
+  Lauf bleibt ein Konflikt rot und stößt nichts an. Obergrenze: Eingabe `durchgang` (1, 2, 3);
+  ab Durchgang 3 wird `anstossen` rot statt neu anzustoßen, ein unlösbarer PR verbraucht so
+  nicht endlos Claude-Kontingent. Verworfen: Claude mergt je PR sofort (sein Token umgeht das
+  Ruleset nicht); mechanisches `git merge origin/main` ohne Claude (Datenkonflikte entscheidet
+  Claude). Test: `tools/daten-pr-mergen.test.mjs` (Skript-Fälle und Verdrahtung des
+  Workflows). **Prüftermin:** nach dem ersten Lauf mit zwei Konflikt-PRs prüfen, ob der zweite
+  Durchgang startet (nicht im echten Lauf belegt).
 - **`Bestand — zusammenführen und bauen` führt zusammen**: Meldungen einarbeiten,
   Rohfolgen zuordnen, bauen, Arbeitslisten, Vorschaubilder, `check:bestand`,
   `data:check`. Er hängt per `workflow_run` an allen dreien und **darf rot
@@ -2541,3 +2558,11 @@ Der Job `ziel` in `pr-pruefer.yml` prüft die Eingaben gegen die API (offen, kei
 ## Lehre: Einheit der Entscheidung = Einheit der Eigenschaft (Filterkonzept, 22.11.2026)
 
 „⊘ Disc" warf Yaiba aus der Datenbank, weil `releases.some(disc)` über den **Titel** entschied, obwohl „Disc" eine Eigenschaft eines **Weges** ist; zugleich teilten Kalender und Datenbank (und über `useKalenderFilter` das Push-Abo) einen Geräte-Eintrag. Die Kette ließ es durch, weil die Filter-Zusicherungen nur Titel mit einem Weg prüften. Schärfung: Fixtures mit mehreren Wegen (`check-filter-wege.ts`), jede Feldebene deklariert (`check-filter-ebenen.ts`), Speicher je Ansicht (`check-vorlieben-getrennt.ts`); Prüfer-/Bauer-Frage „Welche Einheit entscheidet, welche trägt die Eigenschaft?" (`pruefer.md`, Skill `stille-ausfaelle-verhindern`). Plan: `docs/konzept/filter/umsetzungsplan.md`.
+
+## Probebau der Sammler fuhr die Arbeitslisten nicht mit (23.11.2026)
+
+Sechs Sammler-PRs (4676, 4679–4682, 4686) waren am 23.11. rot an `tools/sprache-netz-bestand-pruefen.mjs`, grün auf der Basis. Ursache: `data:bauprobe-basis` baute nur (`data:build`) und prüfte danach gegen die Erweiterungslisten von `main` (`extension/offene-*.js`); die Basis-Gegenprobe in `pr-bestand-vergleich.mjs` fährt dagegen `data:arbeitslisten` mit. Jeder Fund, der „Sprache offen“ verschiebt, wirkte so wie eine `luecke` — dieselbe Lücke wie am 01.11.2026 im Job PR-Datenbau. Jetzt steht `data:arbeitslisten` auch in `data:bauprobe-basis` (Reihenfolge wie im Job; Test `quellen-pr-pruefung.test.mjs`). Beleg: Probebau-Protokolle der PRs; nach dem Merge zeigt der nächste Sammler-Lauf, ob die Funde wieder durchgehen.
+
+## Anker-Wache vor dem Push (23.11.2026, Lehre 227)
+
+Dreimal (PR 4694, 4659, 4718) zog ein Bauer Code um, ohne die Mutationsanker in `tools/mutationen/*.json` nachzuziehen; es fiel erst in der PR-Prüfkette auf (`ankerRot` in `tools/pr-vorpruefung.mjs` lief nur vor `gh pr create`, nicht vor späteren Pushes). `.claude/hooks/anker-wache.js` (im Dispatcher) fährt vor jedem `git push` `node tools/mutationsanker.mjs --diff` (~0,1 s; gleiche Prüfung wie die Vorprüfung: Listen des Diffs und Listen mit Ziel im Diff) und sperrt bei totem Anker mit Liste, Mutant und fehlender Datei bzw. Zeile. Test: `tools/anker-wache.test.mjs` (Anker im Wegwerf-Worktree verrutschen → rot, zurück → grün). Lehre 227 selbst liegt nicht im Repo; Nachtrag dort: „Waechter: .claude/hooks/anker-wache.js“.

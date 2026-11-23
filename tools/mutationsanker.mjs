@@ -6,6 +6,8 @@
  *
  * Aufruf: node tools/mutationsanker.mjs <liste.json>…   prüft genau diese Listen
  *         node tools/mutationsanker.mjs --alle          prüft alle Listen, Exit 1 bei totem Anker
+ *         --diff                                prüft wie die PR-Vorprüfung (ankerRot) die Listen des Diffs gegen origin/main und jede Liste mit Ziel im Diff;
+ *                                                       Exit 1 bei totem Anker (Wächter vor dem Push: .claude/hooks/anker-wache.js)
  *         --umhaengen (zusätzlich)                      totem Anker: enthält genau eine Quelldatei (ohne Tests) die `suche`, wird sie eingetragen;
  *                                                       mehrere oder keine Treffer: nur gemeldet (tools/mutationsanker-umhaengen.mjs)
  * tests-alle fährt dasselbe über tools/mutationsanker-alle.test.mjs für jeden PR (Merge-Ref = Stand von main):
@@ -148,7 +150,27 @@ function schlageVor(listen, umhaengen) {
   return geaendert
 }
 
+/** Wächter vor dem Push: Befunde von ankerRot für den Diff gegen origin/main (ohne origin/main: nichts zu prüfen); ANKER_BASIS ersetzt die Basis (Test im flachen CI-Checkout ohne origin/main). */
+function diffRot() {
+  let basis = process.env.ANKER_BASIS
+  try {
+    basis ||= execFileSync('git', ['merge-base', 'origin/main', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
+  } catch {
+    console.log('Mutationsanker (Diff): kein origin/main, nichts geprüft')
+    return []
+  }
+  const diff = execFileSync('git', ['diff', '--name-only', '--no-renames', `${basis}..HEAD`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
+  return ankerRot(diff.split('\n').filter(Boolean))
+}
+
 function main() {
+  if (process.argv.includes('--diff')) {
+    const rot = diffRot()
+    for (const f of rot) console.error(`  ✖ ${f}`)
+    if (rot.length) console.error('  → Anker nachziehen: Datei, Mutant und `suche` stehen oben; Vorschläge: node tools/mutationsanker.mjs <liste.json> --umhaengen')
+    console.log(`Mutationsanker (Diff): ${rot.length} Anker nicht auffindbar`)
+    return rot.length ? 1 : 0
+  }
   const umhaengen = process.argv.includes('--umhaengen')
   const args = process.argv.slice(2).filter((a) => a !== '--umhaengen')
   if (args.includes('--alle')) {

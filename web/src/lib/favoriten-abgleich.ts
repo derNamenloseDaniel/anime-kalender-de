@@ -1,29 +1,30 @@
 import { useEffect } from 'react'
-import { gleicheAb } from './favoriten-vereinigen.ts'
+import { starteTakt } from './favoriten-takt.ts'
+import { gleicheAb, type AbgleichAnschluss } from './favoriten-vereinigen.ts'
 import { favoritenSetzen, lesFavoriten } from './favorites.ts'
 import { getSyncToken, gesendeterStand, merkeGesendet, pullFavorites, pushFavorites } from './newsletterSync.ts'
 
-const MIN_ABSTAND_MS = 60_000
-let letzterAbgleich = 0
+const anschluss = (token: string): AbgleichAnschluss => ({
+  hole: () => pullFavorites(token),
+  sende: (ids) => pushFavorites(token, ids),
+  lokal: lesFavoriten,
+  setzeLokal: favoritenSetzen,
+  basis: gesendeterStand,
+  merkeBasis: merkeGesendet,
+})
 
-/** Gleicht beim Öffnen und bei jeder Rückkehr in den Tab ab (höchstens einmal je Minute), damit zweite Geräte nicht veralten. */
+/** Hält die Favoriten eines zweiten Geräts aktuell (Serverstand holen, vereinigen, zurückschicken). */
 export function useFavoritenAbgleich(): void {
-  useEffect(() => {
-    const los = () => {
-      const token = getSyncToken()
-      if (!token || document.visibilityState === 'hidden' || Date.now() - letzterAbgleich < MIN_ABSTAND_MS) return
-      letzterAbgleich = Date.now()
-      gleicheAb({
-        hole: () => pullFavorites(token),
-        sende: (ids) => pushFavorites(token, ids),
-        lokal: lesFavoriten,
-        setzeLokal: favoritenSetzen,
-        basis: gesendeterStand,
-        merkeBasis: merkeGesendet,
-      }).catch(() => undefined)
-    }
-    los()
-    document.addEventListener('visibilitychange', los)
-    return () => document.removeEventListener('visibilitychange', los)
-  }, [])
+  useEffect(
+    () =>
+      starteTakt({
+        token: getSyncToken,
+        sichtbar: () => document.visibilityState !== 'hidden',
+        jetzt: Date.now,
+        abgleichen: (token) => gleicheAb(anschluss(token)),
+        bei: (e, f) => document.addEventListener(e, f),
+        ab: (e, f) => document.removeEventListener(e, f),
+      }),
+    [],
+  )
 }

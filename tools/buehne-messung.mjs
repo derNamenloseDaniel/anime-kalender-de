@@ -16,14 +16,33 @@ export function tippzieleImRahmen(minimum) {
     const text = (el.getAttribute('aria-label') || el.textContent || el.getAttribute('title') || '').trim().replace(/\s+/g, ' ').slice(0, 40)
     return `${el.tagName.toLowerCase()} „${text}“`
   }
+  /* Wirksame Trefferfläche statt Elementbox: Ein Knopf mit unsichtbarer Erweiterung (`::after`, `ak-tz`) wird dort getroffen, wo der Daumen landet.
+     Außerhalb des Fensters trifft `elementFromPoint` nichts: Dann erst ins Bild rollen. */
+  const wirksam = (ziel, traeger, achse) => {
+    let r = traeger.getBoundingClientRect()
+    const laenge = achse === 'w' ? r.width : r.height
+    if (laenge >= minimum) return laenge
+    if (!document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)) {
+      traeger.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' })
+      r = traeger.getBoundingClientRect()
+    }
+    const trifft = (d) => {
+      const t = document.elementFromPoint(r.left + r.width / 2 + (achse === 'w' ? d : 0), r.top + r.height / 2 + (achse === 'w' ? 0 : d))
+      return Boolean(t) && (ziel.contains(t) || (ziel.closest('label')?.contains(t) ?? false))
+    }
+    return trifft(-(minimum / 2 - 1)) && trifft(minimum / 2 - 1) ? minimum : laenge
+  }
   const fehler = []
   for (const el of document.querySelectorAll(ZIELE)) {
     const stil = getComputedStyle(el)
     /* Ein unsichtbar gemachtes Eingabefeld (sr-only) in einem Etikett: das Etikett ist das Tippziel. */
-    const r = (el.closest('label') ?? el).getBoundingClientRect()
+    const traeger = el.closest('label') ?? el
+    const r = traeger.getBoundingClientRect()
     const sichtbar = r.width > 0 && r.height > 0 && stil.visibility !== 'hidden' && stil.display !== 'none'
     if (!sichtbar || stil.display === 'inline' || el.closest('[aria-hidden="true"]')) continue
-    if (r.width < minimum || r.height < minimum) fehler.push({ schluessel: beschreibung(el), w: Math.round(r.width), h: Math.round(r.height) })
+    const w = wirksam(el, traeger, 'w')
+    const h = wirksam(el, traeger, 'h')
+    if (w < minimum || h < minimum) fehler.push({ schluessel: beschreibung(el), w: Math.round(w), h: Math.round(h) })
   }
   return fehler
 }

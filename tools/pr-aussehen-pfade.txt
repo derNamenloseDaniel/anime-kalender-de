@@ -10,6 +10,7 @@ tools/ansicht-bild.mjs
 tools/ansicht-details-overlay.mjs
 tools/ansicht-duell.mjs
 tools/ansicht-escape-einzeln.mjs
+tools/ansicht-filterfeld-klick.mjs
 tools/ansicht-escape-stapel.mjs
 tools/ansicht-filterfenster-rechner.mjs
 tools/ansicht-filterfenster-s5.mjs

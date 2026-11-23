@@ -2171,6 +2171,10 @@
       "am": "2026-11-23",
       "vorschlaege": 1
     },
+    "1074979": {
+      "am": "2026-11-23",
+      "vorschlaege": 2
+    },
     "1074988": {
       "am": "2026-11-23",
       "vorschlaege": 2
@@ -16983,6 +16987,48 @@
       "artikelId": "1074988",
       "artikel": "Konkreter Termin der zweiten »Akane-banashi«-Staffel steht fest",
       "quelle": "https://www.anime2you.de/news/1074988/akane-banashi-staffel-2-termin/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Reincarnated Aristocrat",
+      "zitat": "Mit der neunten Episode startete am 22. November 2026 der sogenannte »Assassin«-Arc (jap.: »Shikaku-hen«), in dem Ars Louvent ins Visier eines Attentäters gerät. Crunchyroll zeigt die dritte Staffel weiterhin sonntags um 16:00 Uhr im Simulcast.",
+      "art": "folgen",
+      "sprache": "unklar",
+      "plattform": "crunchyroll",
+      "datum": "2026-11-22",
+      "uhrzeit": "16:00",
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": "sonntags",
+      "folgen": "9",
+      "unsicher": null,
+      "wochentag": "Sonntag",
+      "warnungen": [],
+      "artikelId": "1074979",
+      "artikel": "Trailer zum »Assassin«-Arc der dritten »Reincarnated Aristocrat«-Staffel",
+      "quelle": "https://www.anime2you.de/news/1074979/reincarnated-aristocrat-staffel-3-assassin-arc-trailer/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Reincarnated Aristocrat",
+      "zitat": "Die zweite Staffel erscheint seit dem 20. November 2026 auf Blu-ray.",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2026-11-20",
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [],
+      "artikelId": "1074979",
+      "artikel": "Trailer zum »Assassin«-Arc der dritten »Reincarnated Aristocrat«-Staffel",
+      "quelle": "https://www.anime2you.de/news/1074979/reincarnated-aristocrat-staffel-3-assassin-arc-trailer/",
       "veroeffentlicht": "2026-11-23",
       "gelesenAm": "2026-11-23"
     }

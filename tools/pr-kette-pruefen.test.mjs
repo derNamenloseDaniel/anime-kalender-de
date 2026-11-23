@@ -8,6 +8,7 @@ import { resolve } from 'node:path'
 import { parse } from 'yaml'
 import { pruefeKette } from './pr-kette-pruefen.mjs'
 import { CLI_VERSION } from './pr-kette-schnellweg.mjs'
+import { SOLL_WAECHTER, pruefeWaechter } from './pr-kette-waechter.mjs'
 
 const WURZEL = resolve(import.meta.dirname, '..')
 const lesen = () => parse(readFileSync(resolve(WURZEL, '.github/workflows/pr-pruefung.yml'), 'utf8'))
@@ -137,6 +138,10 @@ fall('Bau-Env in anderem Teiljob', (d) => { d.jobs.typen.steps.at(-1).env = { PA
 fall('zweite fremde Action', (d) => { d.jobs.logik.steps.push({ uses: 'x/y@v1' }) }, /uses "x\/y@v1" nicht erlaubt/)
 fall('Upload-Action anderer Version', (d) => { hochladenSchritt(d).uses = 'actions/upload-pages-artifact@v2' }, /uses "actions\/upload-pages-artifact@v2" nicht erlaubt/)
 // Wächter daten/-Zweig fremder Autoren (Lehre 229, 23.11.2026): Job fest in Form (tools/pr-kette-waechter.mjs), nicht in needs des Sammeljobs.
+// tools/pr-kette-waechter.mjs direkt: die Sollfassung ist grün, ein fehlender Job und ein verändertes `if` sind rot.
+assert.deepEqual(pruefeWaechter({ w: structuredClone(SOLL_WAECHTER) }), [])
+assert.equal(pruefeWaechter({}).length, 1)
+assert.equal(pruefeWaechter({ w: { ...SOLL_WAECHTER, if: "${{ true }}" } }).length, 1)
 const waechter = (d) => d.jobs["daten-zweig-fremd"]
 fall("Wächter fehlt", (d) => { delete d.jobs["daten-zweig-fremd"] }, /Kein \(oder mehr als ein\) Job mit dem Namen "Zweig daten\/ nur für Sammler"/)
 fall("Wächter ohne Autorprüfung (träfe Sammler-PRs)", (d) => { waechter(d).if = "${{ startsWith(github.head_ref, 'daten/') }}" }, /Zweig daten\/ nur für Sammler\) weicht von der Sollfassung/)

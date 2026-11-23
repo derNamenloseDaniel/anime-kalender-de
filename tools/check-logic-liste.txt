@@ -40,6 +40,7 @@ pipeline/check-adresse-kern.ts
 pipeline/check-adressen-schreiben.ts
 pipeline/check-adressen.ts
 pipeline/check-ak-umleitung-lauf.ts
+pipeline/check-aktive-chips.ts
 pipeline/check-aktualisierung-verborgen.ts
 pipeline/check-anbieter-eintraege-bestand-lauf.ts
 pipeline/check-anbieter-logo.ts
@@ -272,6 +273,7 @@ pipeline/check-film-serie-filter.ts
 pipeline/check-filter-ebenen.ts
 pipeline/check-filter-genres.ts
 pipeline/check-filter-wege.ts
+pipeline/check-filter-zaehlung.ts
 pipeline/check-filter-zyklus.ts
 pipeline/check-finale-wache.ts
 pipeline/check-folge-ueber-anzahl-bau.ts

@@ -80,7 +80,7 @@ Vor dem ersten Bau-PR gemergt (Skill `mockups`).
 
 ### S5: Darstellung (Verhaltensänderung, nach Live-Messung von S1–S3)
 - Neu `web/src/components/filter/AktiveChips.tsx` (vorhandenes Chip-Muster, `ak-*`): entfernbare Chips der Datenbank unter der Leiste; Handy eine Zeile, seitlich scrollbar; Desktop im Listenkopf (Trefferzahl dort steht schon). Entfernen-Fläche 44 px (`TIPPFLAECHE`), Name „Disc ausgeschlossen, entfernen“, `role="list"`.
-- Schnellfläche im Filterfenster einfarbig (E9); „ohne Synchro“ und „Staffeln zusammenfassen“ am **Handy** in die Werkzeugleiste (am Desktop stehen sie schon im Listenkopf).
+- Schnellfläche im Filterfenster einfarbig (E9); „ohne Synchro“ und „Staffeln zusammenfassen“ am **Handy** in die Werkzeugleiste (am Desktop stehen sie schon im Listenkopf). **Gebaut anders (23.11.2026, Entscheidung Dirigent):** Am Handy stehen sie als scrollbare Zeile (`DbSchalter`, dasselbe Muster wie am Rechner) über der Liste, nicht in der festen Werkzeugleiste unten: Bei 375 px hat sie neben Filter-Knopf, Trefferzahl und Sortierung keinen Platz, und ihre Höhe (61 px) ist an anderer Stelle festgelegt.
 - Zahlen (`filter-zaehlung.ts`, neu): nur Plattform, Art, Status, Schnellchips; Kernbestand; beim Öffnen des Fensters in `useZeitscheibe`; Chip mit 0 abgeblendet, aber tippbar; Zahl im Namen („Netflix, nur, 14 Titel“).
 - Alte Farbklasse `slate-` in `ModusSchalter` auf `ak-*` (nur sinkend, `tools/design-klassen.mjs`).
 - Dateien: `components/filter/*`, `FilterDetails.tsx` (Gruppen auslagern), `DatenbankBereich.tsx`, `i18n-spaet.ts`, `ansicht-filterfenster.mjs` (neue Zusicherungen).

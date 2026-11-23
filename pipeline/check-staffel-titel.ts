@@ -271,7 +271,7 @@ pruefe('Urteile: Spanne 0 (ganze Seite) bleibt 0', beobachtungenDerSpanne(7_000_
 const [mitNamen] = staffelPlaene([{ ...GRENZEN, staffeln: GRENZEN.staffeln.map((s) => (s.nr === 2 ? { ...s, name: 'Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua' } : s)) }]) as [StaffelPlan]
 pruefe('Name aus der Yaml, sonst „… – Staffel N“', staffelName(mitNamen, 2) === 'Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua' && staffelName(mitNamen, 3) === 'Pokémon Horizonte – Staffel 3')
 const [echt] = staffelPlaene(ladeStaffelGrenzen(HORIZONTE_STAFFELN)) as [StaffelPlan]
-pruefe('Yaml: Staffel 1–3 tragen den offiziellen Namen, Staffel 4 keinen', [1, 2, 3, 4].map((n) => staffelName(echt, n)).join('|') === 'Pokémon Horizonte: Die Serie|Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua|Pokémon Horizonte: Staffel 3 – Gute Aussichten|Pokémon Horizonte – Staffel 4')
+pruefe('Yaml: nur Staffel 3 trägt einen belegten Namen, Staffel 1, 2 und 4 „… – Staffel N“', [1, 2, 3, 4].map((n) => staffelName(echt, n)).join('|') === 'Pokémon Horizonte – Staffel 1|Pokémon Horizonte – Staffel 2|Pokémon Horizonte: Gute Aussichten|Pokémon Horizonte – Staffel 4')
 
 console.log(`check-staffel-titel: ${faelle} Fälle, ${fehler} Fehler`)
 process.exit(fehler ? 1 : 0)

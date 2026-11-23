@@ -11,7 +11,7 @@ import { ROOT } from './util.ts'
 export { mitStapelFolgen, type StaffelZeile } from '../../shared/staffel-folge.ts'
 
 /** `offen`: die laufende letzte Staffel, deren Ende keine Quelle nennt — ohne `bis` und `folgen`. */
-export type StaffelAbschnitt = { nr: number; von: number; bis?: number; folgen?: number; offen?: true; kennung?: number }
+export type StaffelAbschnitt = { nr: number; von: number; bis?: number; folgen?: number; offen?: true; kennung?: number; name?: string }
 /** `basis` und `kennung`: der Bau schneidet den Titel in einen Titel je Staffel (`pipeline/lib/staffel-titel.ts`). */
 export type StaffelGrenzen = { anilistId: number; titel?: string; basis?: number; aktiv?: string; staffeln: StaffelAbschnitt[] }
 

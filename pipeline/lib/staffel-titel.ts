@@ -15,7 +15,8 @@ import { addDays } from '../../shared/time.ts'
 import type { StaffelGrenzen } from './pokemon-staffeln.ts'
 import { slugify } from './util.ts'
 
-export type StaffelPlanZeile = { nr: number; von: number; bis?: number; kennung: number }
+/** `name`: der offizielle deutsche Staffelname aus der Yaml; ohne ihn heißt die Staffel „<Titel> – Staffel N“. */
+export type StaffelPlanZeile = { nr: number; von: number; bis?: number; kennung: number; name?: string }
 /** `quelle`: die Wikipedia-Episodenliste, aus der TV-Termine Staffel und Folge bekommen (setzt die Phase), für `sources`. */
 /** `aktiv`: ab diesem Tag zählen Meldungen zur Basis-Staffel in ihrer Staffelzählung, ältere durchlaufend (Meldungen vor der Aktivierung). */
 export type StaffelPlan = { sammel: number; titel: string; basis: number; staffeln: StaffelPlanZeile[]; quelle?: string; aktiv?: string }
@@ -32,12 +33,12 @@ export function staffelPlaene(grenzen: StaffelGrenzen[]): StaffelPlan[] {
     const staffeln = g.staffeln.map((s): StaffelPlanZeile => {
       if (s.nr === g.basis) {
         if (s.kennung !== undefined) throw new Error(`Staffel-Titel ${g.anilistId}: Staffel ${s.nr} ist basis und trägt trotzdem kennung ${s.kennung}`)
-        return { nr: s.nr, von: s.von, ...(s.bis !== undefined ? { bis: s.bis } : {}), kennung: g.anilistId }
+        return { nr: s.nr, von: s.von, ...(s.bis !== undefined ? { bis: s.bis } : {}), kennung: g.anilistId, ...(s.name ? { name: s.name } : {}) }
       }
       if (s.kennung === undefined || !istStaffelTitel(s.kennung)) throw new Error(`Staffel-Titel ${g.anilistId}: Staffel ${s.nr} ohne gültige kennung (${s.kennung})`)
       if (vergeben.has(s.kennung)) throw new Error(`Staffel-Titel ${g.anilistId}: kennung ${s.kennung} doppelt`)
       vergeben.add(s.kennung)
-      return { nr: s.nr, von: s.von, ...(s.bis !== undefined ? { bis: s.bis } : {}), kennung: s.kennung }
+      return { nr: s.nr, von: s.von, ...(s.bis !== undefined ? { bis: s.bis } : {}), kennung: s.kennung, ...(s.name ? { name: s.name } : {}) }
     })
     return [{ sammel: g.anilistId, titel: g.titel ?? String(g.anilistId), basis: g.basis, staffeln, ...(g.aktiv ? { aktiv: g.aktiv } : {}) }]
   })
@@ -48,7 +49,7 @@ export function staffelDerFolge(plan: StaffelPlan, folge: number): StaffelPlanZe
   return plan.staffeln.find((s) => folge >= s.von && (s.bis === undefined || folge <= s.bis))
 }
 
-export const staffelName = (plan: StaffelPlan, nr: number): string => `${plan.titel} – Staffel ${nr}`
+export const staffelName = (plan: StaffelPlan, nr: number): string => plan.staffeln.find((s) => s.nr === nr)?.name ?? `${plan.titel} – Staffel ${nr}`
 
 type Bereich = { from: number; to: number; dub: boolean }
 

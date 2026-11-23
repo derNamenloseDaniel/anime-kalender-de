@@ -13,7 +13,8 @@ import { join } from 'node:path'
 import type { StreamLink, Title } from '../shared/types.ts'
 import type { WatchLink } from '../shared/watchlink-typ.ts'
 import { STAFFEL_ID_BASIS, istStaffelTitel, staffelVonTiteln, zurueckAufSammeltitel } from '../shared/staffel-titel.ts'
-import { aktivTag, bereicheDerStaffel, laengsteStaffel, staffelDerFolge, staffelPlaene, teileStreams, teileTitel, teileWatchLinks, type StaffelPlan } from './lib/staffel-titel.ts'
+import { aktivTag, bereicheDerStaffel, laengsteStaffel, staffelDerFolge, staffelName, staffelPlaene, teileStreams, teileTitel, teileWatchLinks, type StaffelPlan } from './lib/staffel-titel.ts'
+import { HORIZONTE_STAFFELN, ladeStaffelGrenzen } from './lib/pokemon-staffeln.ts'
 import { folgenDerStaffel, teileFolgenDatei } from './lib/staffel-folgen.ts'
 import { uebersetzeDatei } from './lib/ausgabe-kennung.ts'
 import { gleicheKennungen, pruefeSchnitt } from './bau/staffel-titel.ts'
@@ -265,6 +266,12 @@ pruefe('Urteile: Spanne 0 (ganze Seite) bleibt 0', beobachtungenDerSpanne(7_000_
     rmSync(wurzel, { recursive: true, force: true })
   }
 }
+
+// --- Offizielle Namen aus der Yaml ----------------------------------------------------------------------------------------------------
+const [mitNamen] = staffelPlaene([{ ...GRENZEN, staffeln: GRENZEN.staffeln.map((s) => (s.nr === 2 ? { ...s, name: 'Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua' } : s)) }]) as [StaffelPlan]
+pruefe('Name aus der Yaml, sonst „… – Staffel N“', staffelName(mitNamen, 2) === 'Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua' && staffelName(mitNamen, 3) === 'Pokémon Horizonte – Staffel 3')
+const [echt] = staffelPlaene(ladeStaffelGrenzen(HORIZONTE_STAFFELN)) as [StaffelPlan]
+pruefe('Yaml: Staffel 1–3 tragen den offiziellen Namen, Staffel 4 keinen', [1, 2, 3, 4].map((n) => staffelName(echt, n)).join('|') === 'Pokémon Horizonte: Die Serie|Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua|Pokémon Horizonte: Staffel 3 – Gute Aussichten|Pokémon Horizonte – Staffel 4')
 
 console.log(`check-staffel-titel: ${faelle} Fälle, ${fehler} Fehler`)
 process.exit(fehler ? 1 : 0)

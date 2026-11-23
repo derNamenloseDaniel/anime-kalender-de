@@ -3,9 +3,9 @@
  * Handy und PC behalten, was sie je gemerkt haben; Entferntes einer Seite wirkt auf die andere.
  * Aufruf: `npm run check:logic`.
  */
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { MIN_ABSTAND_MS, starteTakt } from '../web/src/lib/favoriten-takt.ts'
-import { gleicheAb, vereinigeFavoriten } from '../web/src/lib/favoriten-vereinigen.ts'
+import { ergaenzungBeimErstabgleich, gleicheAb, vereinigeFavoriten } from '../web/src/lib/favoriten-vereinigen.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -72,6 +72,11 @@ const rennen = await lauf({ lokal: [1, 9], basis: '1', server: [1, 2], sternWaeh
 pruefe('Stern während des Sendens geht nicht verloren (kein Überschreiben, keine Basis)', rennen.lokal.includes(7) && rennen.gesetzt === 0 && rennen.basis === '1', rennen)
 const erstmals = await lauf({ lokal: [4], basis: null, server: [5] })
 pruefe('erster Abgleich ohne Basis: nur vereinigt', JSON.stringify(erstmals.lokal) === '[4,5]' && erstmals.basis === '4,5', erstmals)
+/* Fall 23.11.2026: PC-Liste [1,2,3], Server trug nur die Handy-Liste [9]. Mit dem alten Sendestand als Basis gingen 1–3 verloren. */
+const pcNachUpdate = await lauf({ lokal: [1, 2, 3], basis: null, server: [9] })
+pruefe('PC nach dem Update (neue Basis leer): nichts geht verloren', JSON.stringify(pcNachUpdate.lokal) === '[1,2,3,9]' && JSON.stringify(pcNachUpdate.gesendet) === '[[1,2,3,9]]', pcNachUpdate)
+pruefe('Erstabgleich holt Titel der Datums-Ablage zurück', JSON.stringify(ergaenzungBeimErstabgleich(null, [1, 2])) === '[1,2]')
+pruefe('nach dem Erstabgleich kommt aus der Datums-Ablage nichts mehr', ergaenzungBeimErstabgleich('1', [1, 2]).length === 0)
 
 /** Takt mit falscher Uhr und falschem Dokument: zählt Abgleiche, Listener und Sichtbarkeit. */
 function takt(o: { token?: string; sichtbar?: boolean }) {
@@ -123,7 +128,16 @@ pruefe('scheiternder Abgleich bleibt stumm (keine unbehandelte Ablehnung)', t4.z
 
 // Kommentar oder toter Code im Quelltext zählt nicht: ohne Kommentare muss Import und Aufruf stehen.
 const app = readFileSync(new URL('../web/src/App.tsx', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '')
-pruefe('App importiert und ruft useFavoritenAbgleich auf (sonst veraltet das zweite Gerät)', /import\s*\{[^}]*useFavoritenAbgleich[^}]*\}\s*from/.test(app) && /^\s*useFavoritenAbgleich\(\)\s*$/m.test(app))
+pruefe('App importiert und ruft useFavoritenAbgleich(favorites) auf (sonst veraltet das zweite Gerät)', /import\s*\{[^}]*useFavoritenAbgleich[^}]*\}\s*from/.test(app) && /^\s*useFavoritenAbgleich\(favorites\)\s*$/m.test(app))
 const hook = readFileSync(new URL('../web/src/lib/favoriten-abgleich.ts', import.meta.url), 'utf8')
 pruefe('Hook nutzt starteTakt und gleicheAb mit der echten Abholung und Sendung', /starteTakt\(/.test(hook) && /gleicheAb\(/.test(hook) && /pullFavorites\(token\)/.test(hook) && /pushFavorites\(token/.test(hook))
+const sync = readFileSync(new URL('../web/src/lib/newsletterSync.ts', import.meta.url), 'utf8')
+pruefe('Basis liegt nicht im alten Sendestand-Schlüssel (dort stand der letzte Upload, nicht der gemeinsame Stand)', /gesendeterStand = \(\)[^\n]*getItem\(BASIS_KEY\)/.test(sync) && !/BASIS_KEY = 'newsletterSyncSent'/.test(sync))
+/* Ein Hochladen ohne vorheriges Abholen überschreibt, was ein anderes Gerät gemerkt hat. Erlaubt: der Abgleich und der Mail-Link (vereinigt vorher). */
+const erlaubt = new Set(['lib/favoriten-abgleich.ts', 'lib/newsletterSync.ts', 'components/StaticViews.tsx'])
+const wurzel = new URL('../web/src/', import.meta.url)
+const fremd = (readdirSync(wurzel, { recursive: true }) as string[])
+  .map((d) => d.replaceAll('\\', '/'))
+  .filter((d) => /\.tsx?$/.test(d) && !erlaubt.has(d) && /pushFavorites\(/.test(readFileSync(new URL(d, wurzel), 'utf8')))
+pruefe('pushFavorites nur im Abgleich und im Mail-Link (kein blindes Überschreiben)', fremd.length === 0, fremd)
 if (verletzt) process.exit(1)

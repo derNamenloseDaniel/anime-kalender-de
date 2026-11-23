@@ -59,7 +59,8 @@ export function ReiterUeberKasten({ data, eigenschaften, kasten }: { data: Datas
   const z = useKastenZustand({ antwort, title, t, stream, disc, pillenGruppen, terminPillen, discZuerst })
   const { gedaempft } = kastenKopfVon({ antwort, title, today, T: z.T, releases, ohneSprachbeleg, folgenZahl: z.folgenZahl, staffeln: z.staffeln })
   const reiter = reiterVon(title, reihenTeile, reihenName, data.titles)
-  const lagen = new Map(reiter.map((r) => [r.id, lageVon(data.titleById.get(r.id)!, data.releasesByTitle.get(r.id) ?? [], today)]))
+  /* Ein Reiter-Titel, den die Seite nicht kennt (nicht in `titleById`), trägt keine Marke. */
+  const lagen = new Map(reiter.map((r) => [r.id, data.titleById.has(r.id) ? lageVon(data.titleById.get(r.id)!, data.releasesByTitle.get(r.id) ?? [], today) : 'sonst']))
   const farbe = kastenFarbe(kastenKlassen({ antwort, title, neben: '', gedaempft }))
   if (reiter.length === 0) return kasten
   return (

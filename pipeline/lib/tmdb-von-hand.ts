@@ -1,9 +1,16 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import yaml from 'js-yaml'
-import type { TmdbTitle } from '../fetch-tmdb-titles.ts'
 import { todayIso } from '../../shared/time.ts'
 import { ROOT } from './util.ts'
+
+/** Die Felder eines Cache-Eintrags, die der Handvorrang liest oder setzt; eigener Typ, damit der Bau nicht über `fetch-tmdb-titles.ts` importiert (Wächter `pr-nachrechnen-bot-pfade`). */
+export interface HandCacheEintrag {
+  tmdbId?: number
+  kind?: 'tv' | 'movie'
+  genreIds?: number[]
+  fetchedAt?: string
+}
 
 export interface VonHandEintrag {
   anilistId: number
@@ -51,8 +58,8 @@ export function ladeHandzeilen(): VonHandEintrag[] {
  * `data/tmdb-titles.json` mit dem Handvorrang: Die Handzeilen gelten auch im Bau, bevor der Wochenabruf sie in die Datei schreibt
  * (Anlass 99196: Handzeile seit 23.11.2026, der Bestandsbau las bis zum nächsten Abruf die alte Kennung). Nur im Speicher, die Datei bleibt.
  */
-export function mitHandvorrang<T extends Record<string, unknown>>(cache: Record<string, T>): Record<string, T> {
-  uebernimmVonHand(cache as Record<string, TmdbTitle>, ladeHandzeilen(), todayIso())
+export function mitHandvorrang<T extends object>(cache: Record<string, T>): Record<string, T> {
+  uebernimmVonHand(cache as Record<string, HandCacheEintrag>, ladeHandzeilen(), todayIso())
   return cache
 }
 
@@ -78,7 +85,7 @@ function streichePoster(id: number, a: Abgeleitet): void {
  * Setzt die von Hand nachgesehenen Kennungen (`data/tmdb-von-hand.yaml`) in den Bestand; gibt die Zahl der geänderten Einträge zurück.
  * Wechselt die Kennung, entfallen die Genres der alten (der Genre-Nachtrag holt die der neuen); mit `abgeleitet` auch Banner und Folgen der alten.
  */
-export function uebernimmVonHand(cache: Record<string, TmdbTitle>, eintraege: VonHandEintrag[], jetzt: string, abgeleitet?: Abgeleitet): number {
+export function uebernimmVonHand(cache: Record<string, HandCacheEintrag>, eintraege: VonHandEintrag[], jetzt: string, abgeleitet?: Abgeleitet): number {
   let gesetzt = 0
   for (const e of eintraege) {
     if (!e?.anilistId) continue

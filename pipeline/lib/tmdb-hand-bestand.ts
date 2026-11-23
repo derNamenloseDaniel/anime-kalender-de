@@ -4,8 +4,7 @@
  */
 import yaml from 'js-yaml'
 import type { Title } from '../../shared/types.ts'
-import type { TmdbTitle } from '../fetch-tmdb-titles.ts'
-import { uebernimmVonHand } from './tmdb-von-hand.ts'
+import { uebernimmVonHand, type HandCacheEintrag } from './tmdb-von-hand.ts'
 import { geteilteFilmeWarnzeile, geteilteFilmGruppen, reihenfremdImBestand } from './tmdb-eindeutig.ts'
 
 type Pruefe = (name: string, bedingung: boolean, gefunden?: unknown) => void
@@ -43,7 +42,7 @@ export function pruefeTmdbHandBestand(lies: (datei: string) => string, pruefeEin
   pruefe('eine geteilte TMDB-Kennung bleibt in ihrer Reihe', fremdGeteilt.length === 0, fremdGeteilt)
   // Dasselbe über den ganzen Cache, nicht nur die Handzeilen (Bestand 12.11.2026: 0 Funde; Einträge ohne Titel im Bestand zählen nicht).
   // Mit Handvorrang wie im Bau: die Handzeile gilt, auch bevor der Wochenabruf sie in die Datei schreibt (Anlass 99196, 23.11.2026).
-  const tmdbCache = JSON.parse(lies('data/tmdb-titles.json')) as Record<string, TmdbTitle>
+  const tmdbCache = JSON.parse(lies('data/tmdb-titles.json')) as Record<string, HandCacheEintrag>
   uebernimmVonHand(tmdbCache, eintraege, '')
   const reihenfremd = reihenfremdImBestand(tmdbCache, bestand)
   pruefe('keine TMDB-Kennung hängt an Titeln verschiedener Reihen', reihenfremd.length === 0, reihenfremd)

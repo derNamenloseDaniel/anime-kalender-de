@@ -26,8 +26,21 @@ pruefe('Name ohne Doppelpunkt: Doppelpunkt', newsZeile('Naruto', 'x') === 'Narut
 const titelNr = (id: number, titleDe: string, extra: object = {}): Title =>
   ({ id, slug: `t${id}`, format: 'TV', episodes: 12, jpYear: 2025, hasVoices: true, streams: [], watchLinks: [], titleDe, ...extra }) as unknown as Title
 const tvAm = (id: number): Release =>
-  ({ slug: `probe-${id}`, titleId: id, name: 'Probe', platform: 'tv', sender: 'ProSieben MAXX', releaseType: 'weekly',
-    schedule: { firstEpisodeDate: '2999-11-05', time: '18:25', episodeCount: 12 }, year: 2999, sources: ['https://example.org/a'] }) as unknown as Release
+  ({
+    slug: `probe-${id}`,
+    titleId: id,
+    name: 'Probe',
+    platform: 'tv',
+    sender: 'ProSieben MAXX',
+    releaseType: 'weekly',
+    schedule: {
+      firstEpisodeDate: '2999-11-05',
+      time: '18:25',
+      episodeCount: 12,
+    },
+    year: 2999,
+    sources: ['https://example.org/a'],
+  }) as unknown as Release
 const teileVon = (teilTitel: string): (string | undefined)[] =>
   baueNews([titelNr(900201, 'Reihe'), titelNr(900202, teilTitel, { franchiseId: 900201 })], [tvAm(900201), tvAm(900202)], [], [], { zuerst: {} })
     .flatMap((e) => e.meldungen).map((m) => m.teil).filter((t) => t !== undefined)

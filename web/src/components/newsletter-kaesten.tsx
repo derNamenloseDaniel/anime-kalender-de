@@ -84,7 +84,7 @@ export function WiederherstellenKasten({ t, zeigeGeraet, abmeldeState, setRestor
           </>
         ) : (
           <>
-        <p className="text-sm text-ak-text">{t('news.restoreBody')}</p>
+        <p className="text-sm text-slate-600 dark:text-slate-300">{t('news.restoreBody')}</p>
         {restoreState === 'done' ? (
           <p className="mt-3 rounded-lg bg-ak-gut-grund px-3 py-2 text-sm text-ak-gut-text">
             {t('news.restoreSent')}
@@ -147,7 +147,7 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
     <>
       <form onSubmit={submit} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium text-ak-text">{t('news.email')}</span>
+          <span className="font-medium text-slate-700 dark:text-slate-200">{t('news.email')}</span>
           <input
             type="email"
             required
@@ -159,7 +159,7 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
         </label>
 
         <fieldset className="flex flex-col gap-1 text-sm">
-          <legend className="mb-1 font-medium text-ak-text">{t('news.frequency')}</legend>
+          <legend className="mb-1 font-medium text-slate-700 dark:text-slate-200">{t('news.frequency')}</legend>
           <div className="flex gap-2">
             {(
               [
@@ -172,7 +172,7 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
                 className={[
                   'flex-1 cursor-pointer rounded-lg border p-3 transition',
                   frequency === value
-                    ? 'border-ak-akzent bg-ak-akzent/10'
+                    ? 'border-sky-400 bg-sky-400/10'
                     : 'border-ak-rand hover:border-ak-leise',
                 ].join(' ')}
               >
@@ -183,7 +183,7 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
                   checked={frequency === value}
                   onChange={() => setFrequency(value)}
                 />
-                <span className="block font-medium text-ak-text">{label}</span>
+                <span className="block font-medium text-slate-800 dark:text-slate-100">{label}</span>
                 <span className="block text-xs text-ak-leise">{hint}</span>
               </label>
             ))}
@@ -191,7 +191,7 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
         </fieldset>
 
         <div className="rounded-lg border border-ak-rand px-3 py-2.5 text-sm">
-          <p className="font-medium text-ak-text">
+          <p className="font-medium text-slate-700 dark:text-slate-200">
             ★ {t('news.favorites', { count: favorites.size })}
           </p>
           <p className="mt-0.5 text-xs text-ak-leise">
@@ -219,7 +219,7 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
         </div>
 
         <fieldset>
-          <legend className="mb-1.5 text-sm font-medium text-ak-text">
+          <legend className="mb-1.5 text-sm font-medium text-slate-700 dark:text-slate-200">
             {t('news.platforms')} <span className="font-normal text-ak-sehr-leise">{t('news.platformsHint')}</span>
           </legend>
           <PlatformToggleList
@@ -231,7 +231,7 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
           />
         </fieldset>
 
-        <label className="flex cursor-pointer items-start gap-2 text-xs text-ak-text">
+        <label className="flex cursor-pointer items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
           <input
             type="checkbox"
             checked={consent}
@@ -286,11 +286,11 @@ export function UebernommenKasten({ uebernommen, t, favorites, toggleFavorit, na
       {uebernommen.length > 0 && (
         <Card>
           <SectionTitle>{t('news.mergedTitle', { count: uebernommen.length })}</SectionTitle>
-          <p className="text-sm text-ak-text">{t('news.mergedBody')}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-300">{t('news.mergedBody')}</p>
           <ul className="mt-3 grid gap-1 sm:grid-cols-2">
             {uebernommen.map((id) => (
               <li key={id}>
-                <label className="flex cursor-pointer items-center gap-2 text-sm text-ak-text">
+                <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
                   <input
                     type="checkbox"
                     checked={favorites.has(id)}

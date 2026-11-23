@@ -92,7 +92,7 @@ assert.equal(stand(folgenAlt), 'alt:19', 'Folgenzahl: Stand der Folgen-Datei')
 const filmFolgen = abgleich(daten([{ ...film, anilistId: 900021 }], { bau: '2026-11-20', tmdbTitel: { 900021: { tmdbId: 7002, kind: 'movie', nameDe: 'Testfilm', jahr: 2020, fetchedAt: '2026-11-19' } } }))
 const filmZahl = filmFolgen.abweichungen.filter((a) => a.feld === 'Folgenzahl')
 assert.equal(filmZahl.length, 1)
-assert.equal(stand(filmZahl[0]),'frisch:1', 'Film-Folgenzahl: Stand des Titeleintrags')
+assert.equal(stand(filmZahl[0]), 'frisch:1', 'Film-Folgenzahl: Stand des Titeleintrags')
 
 assert.deepEqual(standVon('2026-10-01T05:00:00Z', '2026-10-04'), { abruf: '2026-10-01', alterTage: 3, urteil: 'frisch' })
 assert.deepEqual(standVon('kaputt', '2026-10-04'), { abruf: null, alterTage: null, urteil: 'unbekannt' })

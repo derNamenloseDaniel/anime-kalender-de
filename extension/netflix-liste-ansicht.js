@@ -101,7 +101,8 @@ function ansichtZeile(z, jetzt) {
   link.rel = 'noreferrer noopener'
   link.dataset.id = z.id
   titel.appendChild(link)
-  const bis = ansichtElement('td', 'ak-zurueck-bis', ansichtZeit(z.bis, jetzt) ?? 'auf Weiteres')
+  const frist = globalThis.akNetflixStandardFrist(z.grund) ? ` ${globalThis.akNetflixStandardFristText}` : ''
+  const bis = ansichtElement('td', 'ak-zurueck-bis', `${ansichtZeit(z.bis, jetzt) ?? 'auf Weiteres'}${frist}`)
   bis.dataset.name = 'bis'
   const am = ansichtElement('td', 'ak-zurueck-am', ansichtZeit(z.am, jetzt) ?? '—')
   am.dataset.name = 'gemessen'

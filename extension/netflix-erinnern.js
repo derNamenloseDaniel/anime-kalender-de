@@ -29,9 +29,16 @@ globalThis.akNetflixLeerNach = LEER_NACH_MS
 globalThis.akNetflixErinnernKnopf = (termin, zurueck = null) => {
   if (termin) return { text: `Noch nicht da — „ab ${termin}" melden`, klasse: 'ak-nein', aktiv: true }
   /* Ohne Termin gibt es nichts zu melden (Daniel, 18.11.2026: „es sollte auf zurückgestellt gesetzt werden"): der Klick stellt den Titel zurück. */
-  if (zurueck) return { text: `Zurückgestellt bis ${globalThis.akNetflixTagKurz(zurueck.bis)} ✓ — ${zurueck.grund}`, klasse: 'ak-leer', aktiv: false }
+  if (zurueck) {
+    const frist = globalThis.akNetflixStandardFrist(zurueck.grund) ? ` ${globalThis.akNetflixStandardFristText}` : ''
+    return { text: `Zurückgestellt bis ${globalThis.akNetflixTagKurz(zurueck.bis)}${frist} ✓ — ${zurueck.grund}`, klasse: 'ak-leer', aktiv: false }
+  }
   return { text: `Zurückstellen — ${globalThis.akNetflixErinnernGrund(null)}`, klasse: 'ak-leer', aktiv: true }
 }
+
+/** Nennt Netflix kein Datum, gilt die 7-Tage-Frist von `zurueckBis`; die Anzeige sagt es dazu (Daniel, 22.11.2026). */
+globalThis.akNetflixStandardFrist = (grund) => /^Erinnern.*ohne Datum$/.test(grund ?? '')
+globalThis.akNetflixStandardFristText = '(7 Tage)'
 
 /** Berliner Kalendertag eines Zeitpunkts als „25.11.". */
 globalThis.akNetflixTagKurz = (ms) => {

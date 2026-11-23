@@ -109,7 +109,7 @@ async function knoepfeFaelle() {
     pruefe('Klick ohne Termin meldet nichts (nur die Menge der Zurückstellungen geht an den Worker, keine Meldung zum Titel)', s.posts.slice(k0).every((p) => p.eintraege && !p.url && !p.erscheint), s.posts)
     pruefe('… stellt den Titel zurück (Grund „Erinnern-Knopf ohne Datum“) und sagt es als Erfolg', JSON.stringify(s.im('globalThis.erg')) === JSON.stringify(['Zurückgestellt ✓', true]) && s.im(`selbstUebersprungen.get('${K(1)}')`) === 'Erinnern-Knopf ohne Datum', [s.im('globalThis.erg'), s.im(`selbstUebersprungen.get('${K(1)}')`)])
     const danach = s.im('beschriftung()')
-    pruefe('… danach steht „Zurückgestellt bis <Tag> ✓“, nicht mehr klickbar', danach.aktiv === false && /^Zurückgestellt bis \d{1,2}\.\d{1,2}\. ✓ — Erinnern-Knopf ohne Datum$/.test(danach.text), danach)
+    pruefe('… danach steht „Zurückgestellt bis <Tag> ✓“, nicht mehr klickbar', danach.aktiv === false && /^Zurückgestellt bis \d{1,2}\.\d{1,2}\. \(7 Tage\) ✓ — Erinnern-Knopf ohne Datum$/.test(danach.text), danach)
     /* Melde-Knopf immer da (Daniel, 18.11.2026, Punkt 4): auch ohne Text steht er abgeblendet im Kasten, nie versteckt; ein Titelwechsel räumt die Rückmeldung. */
     const meldeKnopf = () => alleElemente(s.body).find((el) => String(el.className).split(/\s+/).includes('ak-melder'))
     s.body.innerText = 'Abspielen 1. Folge'

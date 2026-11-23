@@ -28,6 +28,18 @@ pruefe('zwei getrennte Staffelnummern doppelt: zwei Widersprüche', staffelQuell
 /* Handdatei: :re 2 steht in Staffel 4, √A behält 2 (aniSearch), sonst bliebe der Widerspruch. */
 const quellen = alleStaffelQuellen()
 pruefe('Handdatei: Tokyo Ghoul:re — 2 (102351) = Staffel 4', quellen.get(102351) === 4, String(quellen.get(102351)))
+pruefe('Handdatei: Seven Deadly Sins Urteil des Drachen (116752) = Staffel 5 (Netflix), nicht aniSearch 4', quellen.get(116752) === 5, String(quellen.get(116752)))
+{
+  /* Zwei Hauptstaffeln neben der Staffel 4 (Kaiserlicher Zorn, 108928): mit der Hand-Nummer 5 keine Doppelung, mit aniSearch 4 eine. */
+  const reihe = [
+    { id: 20789, name: 'The Seven Deadly Sins', format: 'TV', episodes: 24 },
+    { id: 108928, name: 'The Seven Deadly Sins: Kaiserlicher Zorn der Götter', format: 'TV', episodes: 24, staffelQuelle: 4 },
+    { id: 116752, name: 'The Seven Deadly Sins: Urteil des Drachen', format: 'TV', episodes: 24, staffelQuelle: quellen.get(116752) },
+  ]
+  pruefe('Seven Deadly Sins mit Handnummer: kein Widerspruch', staffelQuellenWidersprueche(reihe, new Set()).length === 0)
+  const alt = reihe.map((m) => (m.id === 116752 ? { ...m, staffelQuelle: 4 } : m))
+  pruefe('Seven Deadly Sins mit aniSearch-Nummer 4: ein Widerspruch', staffelQuellenWidersprueche(alt, new Set()).length === 1)
+}
 pruefe('√A (20850) bleibt Staffel 2', quellen.get(20850) === 2, String(quellen.get(20850)))
 
 if (fehler) {

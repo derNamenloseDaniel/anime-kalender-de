@@ -104,5 +104,5 @@
   "tools/wecker-wache-entscheid.test.mjs": 1,
   "tools/worker-rohfolgen-rettung.test.ts": 3,
   "tools/worktree-aufraeumen.test.mjs": 2,
-  "tools/zuordnungsbilanz.test.mjs": 3
+  "tools/zuordnungsbilanz.test.mjs": 2
 }

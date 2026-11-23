@@ -13,7 +13,7 @@ import { parse } from 'yaml'
 import { fileURLToPath } from 'node:url'
 import { TABELLEN, SCHEMA_ABFRAGE, baueKopie, exportArgumente, schemaArgumente, schemaAusJson } from './meldungskopie-bauen.mjs'
 import { STAND_MAX_STUNDEN, alterStunden, fuehreAus, fusszeile, istEinzeln, laufe } from './meldungskopie-abfrage.mjs'
-import { ARTEFAKT, ARTEFAKT_DATEI, DATEINAME, WORKFLOW, holen, lokalerStand } from './meldungskopie-holen.mjs'
+import { ARTEFAKT, ARTEFAKT_DATEI, DATEINAME, WORKFLOW, holen, holenZeile, lokalerStand } from './meldungskopie-holen.mjs'
 import { entschluessle, verschluessle } from './meldungskopie-schluessel.mjs'
 import { mitFehlertext, wranglerAus, ziehen } from './meldungskopie-ziehen.mjs'
 
@@ -233,6 +233,14 @@ assert.equal(existsSync(aufrufe[1][6]), false, 'der Download-Ordner ist danach w
 aufrufe = []
 assert.equal(holen({ gh: gh([lauf1], aufrufe, neu), ziel, umgebung: MIT_TOKEN }).art, 'aktuell')
 assert.equal(aufrufe.length, 1)
+// Meldezeile nennt das Alter am Stand der Kopie (feste Uhr); "aktuell" bei einer Kopie vom Vortag trägt die Warnung (Befund 18.11.2026).
+const T = (s) => new Date(Date.parse(s))
+const heute = holenZeile({ art: 'aktuell', stand: '2026-11-17T03:00:00.000Z' }, 'k.sqlite', T('2026-11-18T09:00:00Z'))
+assert.equal(heute, 'Kein neuerer Lauf als die Kopie, Stand 2026-11-17T03:00:00.000Z (vor 30.0 h): k.sqlite')
+const vorgestern = holenZeile({ art: 'aktuell', stand: '2026-11-17T03:00:00.000Z' }, 'k.sqlite', T('2026-11-18T15:00:00Z'))
+assert.match(vorgestern, /\(vor 36\.0 h\): k\.sqlite$/, 'genau 36 h: noch keine Warnung')
+assert.match(holenZeile({ art: 'aktuell', stand: '2026-11-17T03:00:00.000Z' }, 'k.sqlite', T('2026-11-18T15:06:00Z')), /vor 36\.1 h\): k\.sqlite — ÄLTER ALS 36 h: kein neuerer erfolgreicher Lauf/)
+assert.equal(holenZeile({ art: 'geholt', lauf: 9, stand: '2026-11-18T03:00:00.000Z' }, 'k.sqlite', T('2026-11-18T04:30:00Z')), 'Kopie geholt (Lauf 9), Stand 2026-11-18T03:00:00.000Z (vor 1.5 h): k.sqlite')
 // Die vorhandene Kopie ist älter als der Lauf: laden.
 copyFileSync(basis, ziel)
 aufrufe = []

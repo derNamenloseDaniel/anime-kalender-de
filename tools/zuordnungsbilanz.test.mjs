@@ -12,7 +12,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { DatabaseSync } from 'node:sqlite'
-import { alterswarnungen, formatiere, klasseVon, leseZuordnung, summen, vergleiche } from './zuordnungsbilanz.mjs'
+import { alterswarnungen, formatiere, klasseVon, leseZuordnung, main, summen, vergleiche } from './zuordnungsbilanz.mjs'
 
 const ordner = mkdtempSync(join(tmpdir(), 'zuordnungsbilanz-test-'))
 const SKRIPT = join(fileURLToPath(import.meta.url), '..', 'zuordnungsbilanz.mjs')
@@ -25,7 +25,7 @@ const folge = (titelId) => [1, 1, null, null, null, 'ja', 'ja', null, titelId, n
  * Kopie im echten Schema. Zeilen: [tabelle, plattform, url, titel_id]; Tabelle `titel_zeile` legt eine Titelzeile an
  * (die Sicht `pruefung_titel` liest daraus). Die Migrationen, die `subscribers` brauchen, gehören nicht zur Kopie.
  */
-function baueKopie(name, zeilen) {
+function baueKopie(name, zeilen, stand) {
   const pfad = join(ordner, name)
   const db = new DatabaseSync(pfad)
   try {
@@ -37,6 +37,10 @@ function baueKopie(name, zeilen) {
       }
     }
     fuelle(db, zeilen)
+    if (stand) {
+      db.exec('CREATE TABLE kopie_stand (stand TEXT NOT NULL)')
+      db.prepare('INSERT INTO kopie_stand (stand) VALUES (?)').run(stand)
+    }
   } finally {
     db.close()
   }
@@ -59,6 +63,23 @@ function fuelle(db, zeilen) {
   }
 }
 
+// Feste Uhr: "jetzt" ist 2026-11-18 09:00 UTC; die Kopie vom 17.11. 03:00 UTC ist dann 30 h alt (Befund 18.11.2026).
+const JETZT = Date.parse('2026-11-18T09:00:00Z')
+const STAND_ALT = '2026-11-10T03:00:00.000Z'
+const STAND_NEU = '2026-11-17T03:00:00.000Z'
+
+/** Fährt main im Prozess mit fester Uhr und gibt die gedruckten Zeilen zurück. */
+function laufe(argv, jetzt) {
+  const gedruckt = []
+  const orig = console.log
+  console.log = (t) => gedruckt.push(String(t))
+  try {
+    return { status: main(argv, jetzt), gedruckt }
+  } finally {
+    console.log = orig
+  }
+}
+
 try {
   const alt = baueKopie('alt.sqlite', [
     ['pruefung', 'crunchyroll', 'n/gleich', 11],
@@ -74,7 +95,7 @@ try {
     ['pruefung', 'netflix', 'nz/umzug', 999],
     ['titel_zeile', 'disneyplus', 'dz/verlust', 91],
     ['prime_folge', 'disneyplus', 'dz/verlust', 91],
-  ])
+  ], STAND_ALT)
   const neu = baueKopie('neu.sqlite', [
     ['pruefung', 'crunchyroll', 'n/gleich', 11],
     ['pruefung', 'crunchyroll', 'n/neu', 61],
@@ -88,7 +109,7 @@ try {
     ['pruefung', 'netflix', 'nz/umzug', 999],
     ['titel_zeile', 'disneyplus', 'dz/verlust', null],
     ['prime_folge', 'disneyplus', 'dz/verlust', 91],
-  ])
+  ], STAND_NEU)
 
   // Plattform-Regel einzeln: Altzeilen von Netflix/Disney+ fallen heraus, die Sicht gilt
   assert.deepEqual([...leseZuordnung(alt).entries()].filter(([k]) => k.includes('nz/')), [['netflix nz/umzug', [81]]])
@@ -127,24 +148,28 @@ try {
   assert.match(text, /umgezogen 21 -> 22 {2}crunchyroll n\/umgezogen/)
   assert.match(text, /verloren {2}31 -> - {2}crunchyroll n\/verloren/)
 
-  // Alterswarnung: genau an der Grenze keine, eine Stunde drüber eine, beide Kopien einzeln
-  const T0 = 1_000_000_000_000
+  // Alterswarnung nach Stand: genau an der Grenze keine, eine Stunde drüber eine, beide Kopien einzeln, ohne Stand eine eigene Zeile
   const h = 3600000
-  assert.deepEqual(alterswarnungen({ a: T0 - 48 * h, b: T0 }, T0), [])
-  assert.deepEqual(alterswarnungen({ a: T0 - 49 * h, b: T0 }, T0), ['⚠ WARNUNG Kopie a ist 49 h alt (Grenze 48 h)'])
-  assert.equal(alterswarnungen({ a: T0 - 60 * h, b: T0 - 72 * h }, T0).length, 2)
+  const stand = (stunden) => new Date(JETZT - stunden * h).toISOString()
+  assert.deepEqual(alterswarnungen({ a: stand(48), b: stand(0) }, JETZT), [])
+  assert.deepEqual(alterswarnungen({ a: stand(49), b: stand(0) }, JETZT), [`⚠ WARNUNG Kopie a (Stand ${stand(49)}) ist 49 h alt (Grenze 48 h)`])
+  assert.equal(alterswarnungen({ a: stand(60), b: stand(72) }, JETZT).length, 2)
+  assert.deepEqual(alterswarnungen({ a: '', b: stand(1) }, JETZT), ['⚠ WARNUNG Kopie a hat keinen Stand (kopie_stand), Alter unbekannt'])
+
+  // Befund 18.11.2026: Frische zählt am Stand in der Kopie, nicht am Datei-Zeitstempel
+  const frisch = laufe([alt, neu, '--gleich'], JETZT)
+  assert.equal(frisch.status, 0)
+  assert.match(frisch.gedruckt[0], /^⚠ WARNUNG Kopie .*alt\.sqlite \(Stand 2026-11-10T03:00:00\.000Z\) ist 198 h alt \(Grenze 48 h\)$/, 'Datei ist neu, der Stand alt: Warnung')
+  assert.match(frisch.gedruckt[1], /^Zuordnungsbilanz: 10 Adressen/)
+  assert.equal(frisch.gedruckt.length, 2, 'die Kopie vom 17.11. ist 30 h alt: keine zweite Warnung')
+  const zehnTage = new Date(Date.parse('2026-11-08T00:00:00Z'))
+  utimesSync(neu, zehnTage, zehnTage)
+  assert.equal(laufe([alt, neu], JETZT).gedruckt.filter((z) => z.startsWith('⚠')).length, 1, 'alter Datei-Zeitstempel bei frischem Stand: keine Warnung')
+  assert.equal(laufe([alt, neu], Date.parse('2026-11-19T10:00:00Z')).gedruckt.filter((z) => z.startsWith('⚠')).length, 2, 'am 19.11. ist auch der Stand vom 17.11. über 48 h')
 
   const lauf = spawnSync(process.execPath, ['--no-warnings', SKRIPT, alt, neu, '--gleich'], { encoding: 'utf8', windowsHide: true })
   assert.equal(lauf.status, 0, lauf.stderr)
-  assert.match(lauf.stdout, /^Zuordnungsbilanz: 10 Adressen/, 'frische Kopien: keine Warnzeile davor')
   assert.match(lauf.stdout, /gleich {4}11 -> 11 {2}crunchyroll n\/gleich/)
-  // Prozess mit alter Kopie: Datei-Zeitstempel zehn Tage zurück
-  const zehnTage = new Date(Date.parse('2026-10-20T00:00:00Z'))
-  utimesSync(alt, zehnTage, zehnTage)
-  const alterLauf = spawnSync(process.execPath, ['--no-warnings', SKRIPT, alt, neu], { encoding: 'utf8', windowsHide: true })
-  assert.equal(alterLauf.status, 0, alterLauf.stderr)
-  assert.match(alterLauf.stdout.split('\n')[0], /^⚠ WARNUNG Kopie .*alt\.sqlite ist \d+ h alt \(Grenze 48 h\)$/)
-  assert.match(alterLauf.stdout, /\nZuordnungsbilanz: 10 Adressen/)
   const fehl = spawnSync(process.execPath, ['--no-warnings', SKRIPT, join(ordner, 'fehlt.sqlite'), neu], { encoding: 'utf8', windowsHide: true })
   assert.equal(fehl.status, 2)
   console.log('zuordnungsbilanz.test: 10 Adressen in 5 Klassen, Netflix/Disney+ nur Sicht, Alterswarnung, Prozesslauf und Fehlaufruf ok')

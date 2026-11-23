@@ -68,6 +68,22 @@ async function main(): Promise<void> {
   }
   pruefe('Bau ohne bekannte Meldung: Erstsichtung vor der aniSearch-Lesung, der Tag wechselt', nachBau('2026-10-01') === '2999-11-06')
   pruefe('Bau ohne bekannte Meldung: Erstsichtung nach der aniSearch-Lesung, der Tag bleibt', nachBau('2026-10-20') === '2999-10-30')
+
+  /* Zweiter Bau nach einem Lauf, der aniSearch schon angewendet hat (Sakamoto Days Vol. 2, 23.11.2026): die Historie führt die Meldung als überholt, der Handeintrag steht wieder auf dem alten Tag. */
+  const nachAngewendetem = (): string => {
+    const meldung = { url: OHNE_MELDUNG, name: 'anime2you.de', gesehenAm: '2026-10-01', sagt: '2999-10-30', stand: 'ueberholt', grund: 'Termin verschoben auf: 2999-11-06' }
+    schreibe('quellen-historie.json', { 'dracheball-vol1': [meldung, { url: ARTIKEL, name: 'anisearch.de', gesehenAm: '2026-11-23', sagt: '2999-11-06', stand: 'aktuell' }] })
+    const rs = [{ slug: 'dracheball-vol1', titleId: 900005, name: 'Dracheball – Vol. 1', platform: 'disc', releaseType: 'disc', schedule: { firstEpisodeDate: '2999-10-30' }, year: 2999, sources: [OHNE_MELDUNG] }]
+    const alt2 = console.log
+    console.log = () => undefined
+    try {
+      ergaenzeTermineAusNewsUndTv({ titles, releases: rs } as unknown as Parameters<typeof ergaenzeTermineAusNewsUndTv>[0])
+    } finally {
+      console.log = alt2
+    }
+    return rs[0]!.schedule.firstEpisodeDate
+  }
+  pruefe('Bau nach einem Lauf, der aniSearch schon angewendet hat: der Tag bleibt der von aniSearch', nachAngewendetem() === '2999-11-06')
 }
 
 try {

@@ -67,8 +67,8 @@ function juengsteMeldung(r: Release, veroeffentlicht: Map<string, string>): stri
  * derselben Adresse bestätigt nur dasselbe. Eine spätere Bestätigung durch eine andere Quelle hat eine eigene Adresse und zählt als eigene Lesung.
  * Fehlt `gesehenAm` an einer dieser Quellen, gibt es keine Aussage. Im Bau tragen die Releases die `quellen` noch nicht: dann gilt die Historie.
  */
-function gelesenAm(r: Release, historie?: Record<string, Quelle[]>): string | undefined {
-  const eigene = (r.quellen ?? historie?.[r.slug] ?? []).filter((q) => q.stand !== 'ueberholt' && !/anisearch\.de/.test(q.url))
+function gelesenAm(r: Release, unserer: string, historie?: Record<string, Quelle[]>): string | undefined {
+  const eigene = (r.quellen ?? historie?.[r.slug] ?? []).filter((q) => (q.stand !== 'ueberholt' || q.sagt === unserer) && !/anisearch\.de/.test(q.url))
   if (eigene.some((q) => !q.gesehenAm)) return undefined
   return eigene.map((q) => q.gesehenAm).sort().at(-1)
 }
@@ -83,7 +83,7 @@ export function aniSearchGewinnt(r: Release, termin: AniSearchTermin, veroeffent
   if (termin.datum <= heute && unserer > heute) return false
   const meldung = juengsteMeldung(r, veroeffentlicht)
   if (meldung) return termin.gelesen > meldung
-  const lesung = gelesenAm(r, historie)
+  const lesung = gelesenAm(r, unserer, historie)
   return Boolean(lesung) && termin.datum > unserer && termin.gelesen > lesung!
 }
 

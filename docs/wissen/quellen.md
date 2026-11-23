@@ -4508,3 +4508,7 @@ Wenn eine Prime-Staffelseite zwei AniList-Titeln zugeschrieben wird, die Zahlen 
 
 - **Higurashi (934/1889):** B09JZHRQ18 (26 Folgen, gti 64ed5868) ist Staffel 1 = 934; der Block für 1889 an dieser Adresse (Messung 11.11.2026, Kanal-Titel) ist entfernt. Kai führt B09KX2VLPR (24 Folgen plus Bonusfolge 25).
 - **Hyouka (12189/13469):** B0B5JVJKCD (13 Folgen) = Folgen 1–12 plus OVA; B0DC75L8BJ (10 Folgen, gti 5f6a4c2e) = Folgen 13–22, gehört nur 12189; der OVA-Block an B0DC75L8BJ ist entfernt. Folge 4 fehlt auf B0B5JVJKCD, nicht Teil dieser Zuordnung.
+
+## aniSearch-Tag im Bau: überholte Meldung bleibt die Lesung (23.11.2026)
+
+Ohne bekannte Meldung liest `gelesenAm` (`lib/disc-anisearch-datum.ts`) den Lesetag aus `data/quellen-historie.json`. Nach einem Lauf, der aniSearch angewendet hat, führt die Historie die Anime2You-Meldung als `ueberholt` (ihr `sagt` = Tag des Handeintrags). Der nächste Bau startet wieder beim Handeintrag und fand keine Lesung mehr: aniSearch griff nicht, die Prüfung (liest die frisch gepflegten `quellen`) schlug an (Sakamoto Days Vol. 2, Bestand rot 23.11.2026). Jetzt zählt eine überholte Quelle als Lesung, wenn ihr `sagt` der aktuelle Tag des Releases ist; mit anderem `sagt` bleibt sie ohne Aussage. Wächter: `check-disc-anisearch-bau.ts` (zweiter Bau nach angewendetem Lauf) und `check-disc-anisearch-datum.ts`.

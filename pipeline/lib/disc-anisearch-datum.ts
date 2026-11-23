@@ -68,7 +68,9 @@ function juengsteMeldung(r: Release, veroeffentlicht: Map<string, string>): stri
  * Fehlt `gesehenAm` an einer dieser Quellen, gibt es keine Aussage. Im Bau tragen die Releases die `quellen` noch nicht: dann gilt die Historie.
  */
 function gelesenAm(r: Release, historie?: Record<string, Quelle[]>): string | undefined {
-  const eigene = (r.quellen ?? historie?.[r.slug] ?? []).filter((q) => q.stand !== 'ueberholt' && !/anisearch\.de/.test(q.url))
+  /* Eine wegen aniSearch überholte Quelle (`mitAniSearchBeleg`) bleibt Lesebeleg: sonst findet der zweite Bau-Durchgang keinen Lesetag und setzt den alten Tag zurück (23.11.2026, Sakamoto Days Vol. 2). */
+  const zaehlt = (q: Quelle): boolean => q.stand !== 'ueberholt' || Boolean(q.grund?.startsWith('Termin laut aniSearch'))
+  const eigene = (r.quellen ?? historie?.[r.slug] ?? []).filter((q) => zaehlt(q) && !/anisearch\.de/.test(q.url))
   if (eigene.some((q) => !q.gesehenAm)) return undefined
   return eigene.map((q) => q.gesehenAm).sort().at(-1)
 }

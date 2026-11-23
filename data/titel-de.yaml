@@ -324,3 +324,59 @@
   quellen:
     - https://www.anime2you.de/news/866645/netflix-entfernt-cyborg-009-call-of-justice/
     - https://de.wikipedia.org/wiki/Cyborg_009
+
+- id: 8888
+  titleDe: "Code Geass: Akito the Exiled - The Wyvern Arrives"
+  geprueftAm: "2026-11-23"
+  note: "Der deutsche Werktitel ist der englische: OFDb führt den Film so, die deutsche Gesamtausgabe (KSM Anime, OVA 1-5, 06.05.2021) ebenfalls."
+  quellen:
+    - https://www.ofdb.de/film/220143,Code-Geass-Akito-the-Exiled-The-Wyvern-Arrives/
+    - https://www.ofdb.de/fassung/220143,511027,Code-Geass-Akito-the-Exiled-The-Wyvern-Arrives/
+
+- id: 15197
+  titleDe: "Code Geass: Akito the Exiled - The Wyvern Divided"
+  geprueftAm: "2026-11-23"
+  note: "OFDb führt OVA 2 unter diesem Namen; die deutsche Gesamtausgabe (KSM Anime) bündelt ihn als „The Wyvern Divided“. Der Picture-Drama-Titel (109002) bleibt offen."
+  quellen:
+    - https://www.ofdb.de/film/248807,Code-Geass-Akito-the-Exiled-The-Wyvern-Divided/
+    - https://www.ofdb.de/fassung/220143,511027,Code-Geass-Akito-the-Exiled-The-Wyvern-Arrives/
+
+- id: 15199
+  titleDe: "Code Geass: Akito the Exiled - The Brightness Falls"
+  geprueftAm: "2026-11-23"
+  note: "OFDb führt OVA 3 unter diesem Namen (deutsche Ausgabe: Kazé, OVA 3+4); die deutsche Gesamtausgabe (KSM Anime) bündelt ihn als „The Brightness Falls“. OVA 4 (15201) bleibt offen: OFDb schreibt dort „From the Memories of Hatred“, die Gesamtausgabe „Memories of Hatred“."
+  quellen:
+    - https://www.ofdb.de/film/275433,Code-Geass-Akito-the-Exiled-The-Brightness-Falls/
+    - https://www.ofdb.de/fassung/220143,511027,Code-Geass-Akito-the-Exiled-The-Wyvern-Arrives/
+
+- id: 107203
+  titleDe: "Free! The Final Stroke - The First Volume"
+  geprueftAm: "2026-11-23"
+  note: "peppermint anime führt den Film in Deutschland mit englischem Titel (Blu-ray vom 01.09.2022, FSK 6): „Free! the Final Stroke - the First Volume - The Movie“."
+  quellen:
+    - https://www.anime2you.de/news/570162/free-the-final-stroke-film-1-disc-release/
+    - https://m.blu-ray.com/movies/Free-The-Final-Stroke-The-First-Volume-The-Movie--Blu-ray/327734
+
+- id: 133124
+  titleDe: "Free! The Final Stroke - The Second Volume"
+  geprueftAm: "2026-11-23"
+  note: "peppermint anime führt auch den zweiten Film mit englischem Titel: „Free! the Final Stroke - the Second Volume“ (Blu-ray 18.08.2023, FSK 6)."
+  quellen:
+    - https://www.anime2you.de/news/585695/free-the-final-stroke-part-2-disc-release/
+    - https://m.blu-ray.com/movies/Free-The-Final-Stroke-The-Second-Volume-The-Movie--Blu-ray/340662
+
+- id: 103712
+  titleDe: "Pretty Guardian Sailor Moon Eternal: Der Film – Teil 2"
+  geprueftAm: "2026-11-23"
+  note: "Netflix nennt beide Filme „Pretty Guardian Sailor Moon Eternal: Der Film“ und zählt „Teil 1 und Teil 2“; gleiche Schreibweise wie bei Teil 1."
+  quellen:
+    - https://about.netflix.com/de/news/sailor-moon-netflix
+    - https://www.netzwelt.de/serien/sailor-moon/188795-pretty-guardian-sailor-moon-eternal-film-ab-heute-double-feature-netflix.html
+
+- id: 87482
+  titleDe: "Cyborg 009: Call of Justice 2"
+  geprueftAm: "2026-11-23"
+  note: "Wie Teil 3 (87483): der deutsche Titel ist der englische (Netflix, 12 Folgen aus drei Filmen); die Zählung „2“ stammt aus unserem Titel."
+  quellen:
+    - https://www.anime2you.de/news/866645/netflix-entfernt-cyborg-009-call-of-justice/
+    - https://de.wikipedia.org/wiki/Cyborg_009

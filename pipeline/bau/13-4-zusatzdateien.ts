@@ -19,10 +19,11 @@ import { type SlimTitel } from './13-2-auslieferung.ts'
 import { ergaenzeCoverGross } from './cover-gross.ts'
 import { ohneBelegteSynchro } from './synchro-belegt.ts'
 import { schreibeSaisonDatei } from './saison-datei.ts'
-import { cartoonsMitReihe, markiereEigeneWerke } from './cartoon-reihen.ts'
+import { cartoonsMitReihe, ladeAlleEigenenWerke, markiereEigeneWerke, mitStaffelTiteln } from './cartoon-reihen.ts'
 import { markiereRemakes } from './remake-von.ts'
 import { schreibeAnisearchOffen } from './anisearch-kennung.ts'
 import { ladeKatalogEintraege } from '../lib/katalog-eingefroren.ts'
+import { lesekennung } from '../../shared/staffel-titel.ts'
 
 /** Eingaben von `schreibeZusatzdateien`. */
 export interface ZusatzEingabe {
@@ -71,7 +72,7 @@ function schreibeSynonyme(titles: Map<number, Title>, anisearch: Record<string, 
     if (neu.length) synonyme[id] = neu
   }
   for (const t of titles.values()) {
-    aufnehmen(t.id, anisearch[t.id]?.info?.synonyms, [t.titleDe, t.titleEn, t.titleRomaji, t.titleNative])
+    aufnehmen(t.id, anisearch[lesekennung(t)]?.info?.synonyms, [t.titleDe, t.titleEn, t.titleRomaji, t.titleNative])
   }
   for (const [id, e] of Object.entries(katalogTitel)) {
     if (!synonyme[id]) aufnehmen(Number(id), e.synonyme, [])
@@ -270,7 +271,7 @@ function baueReihen(fuerReihen: ReihenTitel[], imBestand: Set<number>, kontext: 
         Datum, die auf der Seite sichtbar sind: „Lord of Mysteries Specials"
         zeigte im Panel nur sein Format, obwohl AniList den 20.06.2026 führt.
       */
-      jpStart: t.jpStart ?? jpStartAnzeige.get(t.id),
+      jpStart: t.jpStart ?? jpStartAnzeige.get(lesekennung(t)),
       jpStatus: t.jpStatus,
       deStart: deStart.get(t.id),
       ohneSynchro: (t as { ohneSynchro?: boolean }).ohneSynchro || ohneBelegteSynchro(t, releases) || undefined,
@@ -403,7 +404,7 @@ export function schreibeZusatzdateien({ titles, anisearch, slim, verschoben, rel
   const imBestand = new Set([...slim, ...cartoons].map((t) => t.id))
   const fuerReihen: ReihenTitel[] = [...slim, ...cartoons, ...ausKatalog.filter((t) => !imBestand.has(t.id)).map((t) => ({ ...t, ohneSynchro: true }))]
   const reihen = baueReihen(fuerReihen, imBestand, { releases, jpStartAnzeige, deStart })
-  writeJson(`${OUT}/franchises.json`, markiereEigeneWerke(markiereRemakes(reihen, fuerReihen)))
+  writeJson(`${OUT}/franchises.json`, markiereEigeneWerke(markiereRemakes(reihen, fuerReihen), mitStaffelTiteln(ladeAlleEigenenWerke(), titles.values())))
   log(`${Object.keys(reihen).length} Reihen mit mehr als einem Eintrag geschrieben`)
 
   schreibeMeldungen(slim)

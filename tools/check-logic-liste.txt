@@ -486,6 +486,7 @@ pipeline/check-news-cr-zuordnung.ts
 pipeline/check-news-einfrieren.ts
 pipeline/check-news-felder-bestand-ablauf.ts
 pipeline/check-news-felder-fest.ts
+pipeline/check-news-name.ts
 pipeline/check-news-offiziell.ts
 pipeline/check-news-rhythmus.ts
 pipeline/check-news-staffel-zuordnung.ts
@@ -625,8 +626,11 @@ pipeline/check-staerkste-seite.ts
 pipeline/check-staffel-anzeige-bau.ts
 pipeline/check-staffel-anzeige-panel.ts
 pipeline/check-staffel-anzeige.ts
+pipeline/check-staffel-aufrufer.ts
 pipeline/check-staffel-des-titels.ts
+pipeline/check-staffel-historie.ts
 pipeline/check-staffel-jahr0.ts
+pipeline/check-staffel-lesekennung.ts
 pipeline/check-staffel-riegel.ts
 pipeline/check-staffel-synonyme.ts
 pipeline/check-staffel-teil.ts

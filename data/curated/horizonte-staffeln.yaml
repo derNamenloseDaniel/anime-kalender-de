@@ -21,8 +21,16 @@
 # - Staffel 4 Folge 1 = Folge 137: RTL+ „Eine Welt voller Abenteuer“, verfügbar ab 20.11.2026
 #   (https://plus.rtl.de/pokemon-horizonte-die-serie-p_10142/video/eine-welt-voller-abenteuer-c_2211265).
 #
-# Nicht gegengelesen: pokewiki.de und Bulbapedia (Hosts im Cloud-Lauf gesperrt, 20.11.2026). Staffelnamen fehlen bewusst, bis eine
-# gelesene Quelle sie trägt. Staffel 4 ist `offen`: ihr Ende nennt keine Quelle, darum kein bis/folgen.
+# Staffelnamen (`name`; Daniel 22.11.2026: „wir folgen offiziellen staffel bezeichnern“). Nur ein gelesen belegter Name steht hier (Prüfer 23.11.2026):
+# - Staffel 3 „Pokémon Horizonte: Gute Aussichten“: so führt TOGGO die Staffel im Programm (Folge 42–45, Samstag 13:00), gelesen im
+#   anime2you-TV-Guide KW 42/2026 (https://www.anime2you.de/news/1060030/anime-tv-programm-42-2026/, gelesen 12.10.2026; Zitat in
+#   `data/proposals/anime2you-extraktion.json`). Die Form „Staffel 3 – …“ ist nicht gelesen belegt, darum nicht übernommen.
+# - Staffel 1 und 2: kein Name. „Pokémon Horizonte: Die Serie“ ist der Titel der Gesamtserie (RTL+ TVSeries, Staffelwähler „Staffel 1–4“ ohne Namen,
+#   gelesen 20.11.2026, `data/verweise-von-hand.yaml`; Super RTL/TOGGO plus führen alle Folgen unter diesem Titel, `data/tv-programm.json`), nicht
+#   der einer einzelnen Staffel. „Die Suche nach Laqua“ (Staffel 2) steht nur in Suchtreffern (Netflix-Titel 81944585, pocketmonsters.net,
+#   Bulbapedia), keine der Seiten war aus dem Cloud-Lauf abrufbar (Hosts gesperrt, 23.11.2026): erst eintragen, wenn eine Seite gelesen ist.
+# - Staffel 4: kein offizieller deutscher Name gefunden (Suche 23.11.2026), bleibt „Pokémon Horizonte – Staffel 4“.
+#   Staffel 4 ist `offen`: ihr Ende nennt keine Quelle, darum kein bis/folgen.
 # Wächter: `pipeline/check-horizonte-staffeln.ts` (check:logic), `pipeline/check-horizonte-staffeln-bestand.ts` (gegen Wikipedia und TOGGO).
 quelle: https://de.wikipedia.org/wiki/Pok%C3%A9mon_(Anime)/Horizonte
 abgerufen: '2026-11-20'  # data/wikipedia-folgen.json und data/toggo.json (geholtAm)
@@ -30,8 +38,11 @@ gelesen: '2026-11-20'
 titel:
 - anilistId: 158871
   titel: "Pokémon Horizonte"
+  basis: 4
+  # Kein `aktiv:` von Hand: Den Tag, ab dem Meldungen zu 158871 in Staffel 4 zählen (Folge 1 = 137; ältere durchlaufend, Staffel 1: 1–45),
+  # setzt der Bau auf den Tag nach dem ersten ausgelieferten Bestand mit dem Schnitt und hält ihn danach fest (`aktivTag`, `pipeline/lib/staffel-titel.ts`).
   staffeln:
-    - { nr: 1, von: 1, bis: 45, folgen: 45 }
-    - { nr: 2, von: 46, bis: 89, folgen: 44 }
-    - { nr: 3, von: 90, bis: 136, folgen: 47 }
+    - { nr: 1, von: 1, bis: 45, folgen: 45, kennung: 7000001 }
+    - { nr: 2, von: 46, bis: 89, folgen: 44, kennung: 7000002 }
+    - { nr: 3, von: 90, bis: 136, folgen: 47, kennung: 7000003, name: "Pokémon Horizonte: Gute Aussichten" }
     - { nr: 4, von: 137, offen: true }

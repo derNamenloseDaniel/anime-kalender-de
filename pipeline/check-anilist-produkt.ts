@@ -15,6 +15,7 @@ import { ladeGeteilteFilme, merkeGeteilteFilme, ohneGeteilteFilme } from './lib/
 import { BANNER_DATEI, bannerAdresse, waehleBanner, type TmdbBanner } from './lib/tmdb-banner.ts'
 import { SCHLAGWORT_LISTE, SCHLAGWORT_MAX } from '../shared/schlagworte.ts'
 import type { Title } from '../shared/types.ts'
+import { lesekennung } from '../shared/staffel-titel.ts'
 
 let fehler = 0
 function pruefe(name: string, bedingung: boolean, gefunden?: unknown): void {
@@ -69,7 +70,7 @@ function pruefeTitel(datei: string, titel: Title[], banner: TmdbBanner): void {
     }
     for (const k of t.keywords ?? []) if (!erlaubt.has(k)) schlecht.schlagwort.push(`${t.id}:${k}`)
     if (!t.bannerImage || t.bannerVon !== undefined) continue // übernommene Banner prüft `check-banner-franchise.ts`
-    const tmdb = banner[String(t.id)]?.p
+    const tmdb = banner[String(lesekennung(t))]?.p /* Staffel-Titel: Banner liegt am Sammeltitel */
     const ok = host(t.bannerImage) === 'image.tmdb.org' ? tmdb && t.bannerImage === bannerAdresse(tmdb) : host(t.bannerImage) === 's4.anilist.co' && !tmdb
     if (!ok) schlecht.banner.push(t.id)
   }

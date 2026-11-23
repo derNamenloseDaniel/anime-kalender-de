@@ -11,12 +11,15 @@
 import type { StreamLink, Title } from '../../shared/types.ts'
 import type { WatchLink } from '../../shared/watchlink-typ.ts'
 import { istStaffelTitel } from '../../shared/staffel-titel.ts'
+import { addDays } from '../../shared/time.ts'
 import type { StaffelGrenzen } from './pokemon-staffeln.ts'
 import { slugify } from './util.ts'
 
-export type StaffelPlanZeile = { nr: number; von: number; bis?: number; kennung: number }
+/** `name`: der offizielle deutsche Staffelname aus der Yaml; ohne ihn heißt die Staffel „<Titel> – Staffel N“. */
+export type StaffelPlanZeile = { nr: number; von: number; bis?: number; kennung: number; name?: string }
 /** `quelle`: die Wikipedia-Episodenliste, aus der TV-Termine Staffel und Folge bekommen (setzt die Phase), für `sources`. */
-export type StaffelPlan = { sammel: number; titel: string; basis: number; staffeln: StaffelPlanZeile[]; quelle?: string }
+/** `aktiv`: ab diesem Tag zählen Meldungen zur Basis-Staffel in ihrer Staffelzählung, ältere durchlaufend (Meldungen vor der Aktivierung). */
+export type StaffelPlan = { sammel: number; titel: string; basis: number; staffeln: StaffelPlanZeile[]; quelle?: string; aktiv?: string }
 
 /**
  * Die Pläne aus der Yaml. Ein Titel ohne `basis` wird nicht geteilt; mit `basis` muss jede andere Staffel eine Kennung aus dem
@@ -30,14 +33,14 @@ export function staffelPlaene(grenzen: StaffelGrenzen[]): StaffelPlan[] {
     const staffeln = g.staffeln.map((s): StaffelPlanZeile => {
       if (s.nr === g.basis) {
         if (s.kennung !== undefined) throw new Error(`Staffel-Titel ${g.anilistId}: Staffel ${s.nr} ist basis und trägt trotzdem kennung ${s.kennung}`)
-        return { nr: s.nr, von: s.von, ...(s.bis !== undefined ? { bis: s.bis } : {}), kennung: g.anilistId }
+        return { nr: s.nr, von: s.von, ...(s.bis !== undefined ? { bis: s.bis } : {}), kennung: g.anilistId, ...(s.name ? { name: s.name } : {}) }
       }
       if (s.kennung === undefined || !istStaffelTitel(s.kennung)) throw new Error(`Staffel-Titel ${g.anilistId}: Staffel ${s.nr} ohne gültige kennung (${s.kennung})`)
       if (vergeben.has(s.kennung)) throw new Error(`Staffel-Titel ${g.anilistId}: kennung ${s.kennung} doppelt`)
       vergeben.add(s.kennung)
-      return { nr: s.nr, von: s.von, ...(s.bis !== undefined ? { bis: s.bis } : {}), kennung: s.kennung }
+      return { nr: s.nr, von: s.von, ...(s.bis !== undefined ? { bis: s.bis } : {}), kennung: s.kennung, ...(s.name ? { name: s.name } : {}) }
     })
-    return [{ sammel: g.anilistId, titel: g.titel ?? String(g.anilistId), basis: g.basis, staffeln }]
+    return [{ sammel: g.anilistId, titel: g.titel ?? String(g.anilistId), basis: g.basis, staffeln, ...(g.aktiv ? { aktiv: g.aktiv } : {}) }]
   })
 }
 
@@ -46,7 +49,7 @@ export function staffelDerFolge(plan: StaffelPlan, folge: number): StaffelPlanZe
   return plan.staffeln.find((s) => folge >= s.von && (s.bis === undefined || folge <= s.bis))
 }
 
-export const staffelName = (plan: StaffelPlan, nr: number): string => `${plan.titel} – Staffel ${nr}`
+export const staffelName = (plan: StaffelPlan, nr: number): string => plan.staffeln.find((s) => s.nr === nr)?.name ?? `${plan.titel} – Staffel ${nr}`
 
 type Bereich = { from: number; to: number; dub: boolean }
 
@@ -117,6 +120,14 @@ export function teileWatchLinks(links: WatchLink[], plan: StaffelPlan): { je: Ma
   return { je, bloecke, fremd }
 }
 
+/** Folgen der längsten abgeschlossenen Staffel: Eine höhere Nummer kann keine Zählung innerhalb einer Staffel sein (`staffelVonTiteln`). */
+export const laengsteStaffel = (plan: StaffelPlan): number => Math.max(0, ...plan.staffeln.flatMap((s) => (s.bis === undefined ? [] : [s.bis - s.von + 1])))
+
+/** Der Tag, ab dem Meldungen zur Basis-Staffel in deren Zählung gelten: der Tag nach dem ersten ausgelieferten Bestand mit dem Schnitt (steht er schon in `titles.json`, bleibt sein Tag), nie der Tag des Merge. */
+export function aktivTag(vorher: { id: number; staffelTitel?: { aktiv?: string } }[], sammel: number, heute: string): string {
+  return vorher.find((t) => t.id === sammel)?.staffelTitel?.aktiv ?? addDays(heute, 1)
+}
+
 /**
  * Ein Titel je Staffel. Name „<Titel> – Staffel N“, Folgenzahl nur bei abgeschlossener Staffel; die Erstausgabe (`deErstausgabe`) gehört
  * der ersten Staffel. Die MAL-Kennung behält nur die Basis (Katalog „ohne Synchro“ und MAL-Dubletten erkennen den Sammeltitel daran).
@@ -129,7 +140,7 @@ export function teileTitel(sammel: Title, plan: StaffelPlan): Title[] {
     const t: Title = structuredClone(sammel)
     t.id = s.kennung
     t.titleDe = staffelName(plan, s.nr)
-    t.staffelTitel = { sammel: plan.sammel, nr: s.nr, ab: s.von }
+    t.staffelTitel = { sammel: plan.sammel, nr: s.nr, ab: s.von, ...(s.kennung === plan.sammel && plan.aktiv ? { aktiv: plan.aktiv, laengste: laengsteStaffel(plan) } : {}) }
     if (s.kennung !== plan.sammel) {
       t.slug = `${slugify(t.titleDe)}-${s.kennung}`
       delete t.malId
@@ -141,4 +152,19 @@ export function teileTitel(sammel: Title, plan: StaffelPlan): Title[] {
     if (sammel.watchLinks) t.watchLinks = links.get(s.nr)!
     return t
   })
+}
+
+type ToggoFolge = { staffel: number; folge: number; ab: string; bis: string }
+
+/**
+ * Die TOGGO-Folgen eines Titels (`data/toggo.json`, je Sammeltitel): Eine abgeleitete Staffel nimmt die Folgen, die TOGGO unter ihrer Staffelnummer
+ * führt (TOGGO zählt je Staffel, wie die Yaml). Beim Sammeltitel selbst bleibt es bei allen, solange der Bau ihn nicht geschnitten hat.
+ */
+export function toggoFolgenDerStaffel(folgen: ToggoFolge[], t: { staffelTitel?: { sammel: number; nr: number } }): ToggoFolge[] {
+  return t.staffelTitel ? folgen.filter((f) => f.staffel === t.staffelTitel!.nr) : folgen
+}
+
+/** Riegel „vorher = nachher“ für TOGGO: Jede Folge des Sammeltitels geht an genau eine Staffel, sonst bricht der Bau ab (Folge einer Staffelnummer ohne Titel). */
+export function pruefeToggoVerteilung(sammel: number, vorhanden: number, verteilt: number): void {
+  if (vorhanden !== verteilt) throw new Error(`Staffel-Titel ${sammel}: ${vorhanden} TOGGO-Folgen, ${verteilt} an Staffeln verteilt`)
 }

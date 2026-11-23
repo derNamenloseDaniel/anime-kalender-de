@@ -10,6 +10,17 @@ import { newsSatz } from '../../web/src/lib/news-text.ts'
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
+/** Voller Name einer Meldung: ein Teil, der die Reihe schon nennt oder einen Doppelpunkt trägt, steht allein; sonst „Reihe: Teil“. */
+export function newsName(titel: string, teil?: string): string {
+  if (!teil) return titel
+  return teil.toLowerCase().startsWith(titel.toLowerCase()) || teil.includes(': ') ? teil : `${titel}: ${teil}`
+}
+
+/** Name und Satz; trägt der Name selbst einen Doppelpunkt, trennt ein Gedankenstrich statt eines zweiten. */
+export function newsZeile(name: string, satz: string): string {
+  return `${name}${name.includes(': ') ? ' –' : ':'} ${satz}`
+}
+
 export function newsRss(eintraege: NewsEintrag[], siteUrl: string, max = 60): string {
   const basis = siteUrl.endsWith('/') ? siteUrl : `${siteUrl}/`
   /*
@@ -21,13 +32,16 @@ export function newsRss(eintraege: NewsEintrag[], siteUrl: string, max = 60): st
     .map((e) => ({ ...e, meldungen: e.meldungen.filter((m) => !m.ersetzt && !m.zurueckgezogen) }))
     .filter((e) => e.meldungen.length)
   const items = aktuell.slice(0, max).map((e) => {
-    const saetze = e.meldungen.map((m) => `${m.teil ? `${m.teil}: ` : ''}${newsSatz(m, e.am.slice(0, 10))}`)
+    const tag = e.am.slice(0, 10)
+    const saetze = e.meldungen.map((m) => (m.teil ? newsZeile(newsName(e.titel, m.teil), newsSatz(m, tag)) : newsSatz(m, tag)))
+    const ersterSatz = newsSatz(e.meldungen[0]!, tag)
+    const titel = newsZeile(newsName(e.titel, e.meldungen[0]!.teil), ersterSatz)
     const link = `${basis}#/news?t=${e.titelId}`
     /* 12 Uhr Berliner Zeit: Die Meldungen tragen nur einen Tag, keine Uhrzeit. */
     const datum = new Date(`${e.am.slice(0, 10)}T10:00:00Z`).toUTCString()
     return [
       '<item>',
-      `<title>${esc(`${e.titel}: ${saetze[0] ?? ''}${saetze.length > 1 ? ` (+${saetze.length - 1})` : ''}`)}</title>`,
+      `<title>${esc(`${titel}${saetze.length > 1 ? ` (+${saetze.length - 1})` : ''}`)}</title>`,
       `<link>${esc(link)}</link>`,
       `<guid isPermaLink="false">${esc(`${e.am.slice(0, 10)}-${e.titelId}`)}</guid>`,
       `<pubDate>${datum}</pubDate>`,

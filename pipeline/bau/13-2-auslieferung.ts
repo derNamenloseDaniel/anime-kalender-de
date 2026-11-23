@@ -8,6 +8,7 @@ import { synopseVon } from './synopse-von.ts'
 import { archivTexte } from '../lib/anisearch-archiv-text.ts'
 import { type AnisearchEintrag, type TmdbTitelEintrag } from './01-quellen.ts'
 import { type SynopsisEintrag } from './13-1-anreichern.ts'
+import { lesekennung } from '../../shared/staffel-titel.ts'
 
 /** Ein Titel, wie er ausgeliefert wird (`titles.json`). */
 export type SlimTitel = ReturnType<typeof baueAuslieferung>['slim'][number]
@@ -40,9 +41,10 @@ export function baueAuslieferung({
   const kennungen = anisearchKennungen(allTitles.map((t) => ({ id: t.id, mal: t.malId })))
   const archiv = archivTexte(kennungen, (id) => !!anisearch[id]?.descriptionDe || !!tmdbTitles[id]?.overviewDe)
   const slim = allTitles.map((t) => {
-    const ausAnisearch = anisearch[t.id]?.descriptionDe ?? archiv.get(t.id)
-    const ausTmdb = tmdbTitles[t.id]
-    const asId = kennungen.get(t.id)
+    const q = lesekennung(t)
+    const ausAnisearch = anisearch[q]?.descriptionDe ?? archiv.get(q)
+    const ausTmdb = tmdbTitles[q]
+    const asId = kennungen.get(q)
     const synopse = synopseVon({ t, asId, ausAnisearch, ausTmdb, trenneQuelle })
     if (synopse) synopses[t.id] = synopse
     const { synopsis: _drop, jpStartTag: _jpStart, ...rest } = t
@@ -57,20 +59,20 @@ export function baueAuslieferung({
       `annId` nur, wo auch Stimmen belegt sind: Ohne sie führt der Verweis auf
       eine Seite, die zu unserer Frage nichts sagt.
     */
-    const annId = mitStimmen.has(t.id) ? annKennungen[String(t.id)] : undefined
+    const annId = mitStimmen.has(q) ? annKennungen[String(q)] : undefined
     return {
       ...rest,
-      ...(mitStimmen.has(t.id) ? { hasVoices: true as const } : {}),
+      ...(mitStimmen.has(q) ? { hasVoices: true as const } : {}),
       ...(Number.isFinite(asId) ? { anisearchId: asId } : {}),
       ...(Number.isFinite(annId) ? { annId } : {}),
       /* Nur die beiden Felder, die die Oberfläche braucht — Herkunft und Prüfdatum bleiben in der Quelle. */
-      ...(trailer[String(t.id)]
+      ...(trailer[String(q)]
         ? {
             trailer: {
-              video: trailer[String(t.id)]!.video,
-              titel: trailer[String(t.id)]!.titel,
+              video: trailer[String(q)]!.video,
+              titel: trailer[String(q)]!.titel,
               /* Ältere Einträge kannten das Feld nicht — sie stammen aus der deutschen Erstfassung. */
-              sprache: trailer[String(t.id)]!.sprache ?? ('de' as const),
+              sprache: trailer[String(q)]!.sprache ?? ('de' as const),
             },
           }
         : {}),

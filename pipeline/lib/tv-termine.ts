@@ -139,7 +139,7 @@ export function sendungenAnhaengen(
     r.sendungen = liste
       .sort((a, b) => a.start.localeCompare(b.start))
       .map((s) => {
-        const nr = s.folge ? nummern?.get(folgenKern(s.folge)) : undefined
+        const nr = s.folge ? nummerFuer(nummern, s.folge) : undefined
         /*
           Die Detailseite der Sendung bei tv.de. `/sendung/r/s,<kennung>/` leitet per 301 auf die
           sprechende Adresse weiter — gemessen am 22.09.2026 an One Piece 23.09. 18:20
@@ -189,10 +189,23 @@ export function aehnlicherKern(kerne: Iterable<string>, k: string): string | und
   return treffer.length === 1 ? treffer[0] : undefined
 }
 
-/** Die Nummer einer Folge in der Liste — wörtlich, sonst über den einen ähnlichen Kern (Schreibvariante). */
-function nummerFuer(nummern: Map<string, number> | undefined, folge: string): number | undefined {
-  const k = folgenKern(folge)
-  return nummern?.get(k) ?? nummern?.get(aehnlicherKern(nummern.keys(), k) ?? '')
+const VORSPANN = /^[^:]{3,60}:\s*/
+const FUEHRENDER_ARTIKEL = /^\s*(?:eine[nm]?|ein|der|die|das|den|dem)\s+/i
+
+/**
+ * Die Nummer einer Folge in der Liste — wörtlich, sonst über den einen ähnlichen Kern (Schreibvariante); dann ohne Vorspann „Reihe: “
+ * (tv.de, `sendungNeuZuordnen` streift ihn auch), zuletzt ohne führenden Artikel („Ein Lied im Nebel“ gegen „Lied im Nebel“, nur ab 10 Zeichen Kern).
+ */
+export function nummerFuer(nummern: Map<string, number> | undefined, folge: string): number | undefined {
+  if (!nummern) return undefined
+  const ohneVorspann = folge.replace(VORSPANN, '')
+  for (const f of [folge, ohneVorspann, ohneVorspann.replace(FUEHRENDER_ARTIKEL, '')]) {
+    const k = folgenKern(f)
+    if (k.length < 10 && f !== folge) continue
+    const nr = nummern.get(k) ?? nummern.get(aehnlicherKern(nummern.keys(), k) ?? '')
+    if (nr !== undefined) return nr
+  }
+  return undefined
 }
 
 /** Ein Staffelwechsel darf nie in einen Termin von Hand oder in eine Gruppe dieses Laufs führen: Zwei Gruppen beim selben Titel trügen denselben Slug (Pokémon Reisen, 05.10.2026). */

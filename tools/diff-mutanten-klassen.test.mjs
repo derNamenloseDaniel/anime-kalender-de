@@ -72,6 +72,16 @@ pruefe(`${T}: erneutes Werfen im catch`, gleich(mutiert('try { g() } catch (e) {
 pruefe(`${T}: ohne Klammer-if, else bleibt am äußeren if`, mutiert('if (a) throw e; else h()', KT).every(gueltig) && mutiert('if (a) throw e; else h()', KT).length === 1)
 pruefe(`${T}: Zeichenkette und Kommentar erzeugen nichts`, mutiert('x = "throw e"\n// throw e', KT).length === 0)
 
+// 6 Anweisung → if (false)
+const N = 'anweisung'
+const KN = 'Anweisung → if (false)'
+pruefe(`${N}: Zuweisung im Block`, gleich(mutiert('function f() { s = 1; }', KN), ['function f() { { if (false) s = 1; } }']))
+pruefe(`${N}: return im Block`, gleich(mutiert('function f() { return a }', KN), ['function f() { { if (false) return a } }']))
+pruefe(`${N}: zwei Zuweisungen und return: drei Mutanten`, mutiert('function f() { a = 1; b = 2; return b }', KN).length === 3)
+pruefe(`${N}: return in if/else bleibt gültig, je einer`, mutiert('function f() { if (c) { return 1 } else { return 2 } }', KN).every(gueltig) && mutiert('function f() { if (c) { return 1 } else { return 2 } }', KN).length === 2)
+pruefe(`${N}: Aufruf, Deklaration, throw und oberste Ebene erzeugen nichts`, mutiert('function f() { g(); const x = 1; throw x }\ny = 2', KN).length === 0)
+pruefe(`${N}: Zeichenkette erzeugt nichts`, mutiert('function f() { g("a = 1;") }', KN).length === 0)
+
 if (fehler.length) {
   console.error(`diff-mutanten-klassen.test: ${fehler.length} Fall/Fälle rot`)
   process.exit(1)

@@ -7,6 +7,7 @@
  *   Zuweisung im Callback entfernt  `cb(() => { s = 1 })` → `void 0`
  *   Parameter am Aufrufort entfernt `f(a, b)` → `f(b)` und `f(a)`
  *   throw e → if (false)          `throw e;` → `{ if (false) throw e; }`
+ *   Anweisung → if (false)        `x = 1;` / `return x` in einem Block → `{ if (false) x = 1; }` (Prüfer 4109 A5: der Text bleibt stehen, ein Regex-Test trifft ihn weiter)
  */
 import ts from 'typescript'
 
@@ -64,5 +65,12 @@ function throwNie(node, q) {
   return [{ art: 'throw → if (false)', von: node.getStart(), bis: node.end, ersetze: `{ if (false) ${q.slice(node.getStart(), node.end)} }` }]
 }
 
+/** Zuweisung oder `return` als Anweisung in einem Block wird nie ausgeführt (Aufrufe deckt „Aufruf entfernt“, throw die Klasse darüber). */
+function anweisungNie(node, q) {
+  const zuweisung = ts.isExpressionStatement(node) && istZuweisung(node.expression)
+  if (!(zuweisung || ts.isReturnStatement(node)) || !ts.isBlock(node.parent)) return []
+  return [{ art: 'Anweisung → if (false)', von: node.getStart(), bis: node.end, ersetze: `{ if (false) ${q.slice(node.getStart(), node.end)} }` }]
+}
+
 /** Alle festen Klassen für einen Knoten. */
-export const klassenMutanten = (node, q) => [eigenschaftEntfernt, vorgabeNull, zuweisungImCallback, argumentEntfernt, throwNie].flatMap((f) => f(node, q))
+export const klassenMutanten = (node, q) => [eigenschaftEntfernt, vorgabeNull, zuweisungImCallback, argumentEntfernt, throwNie, anweisungNie].flatMap((f) => f(node, q))

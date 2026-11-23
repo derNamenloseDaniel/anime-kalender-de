@@ -10,36 +10,6 @@ X-WR-TIMEZONE:Europe/Berlin
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-16#72@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261116T161000Z
-DTEND:20261116T164000Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-16#73@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261116T163500Z
-DTEND:20261116T170500Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-128893-tv-prosieben-fun@2026-11-16@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261116T202000Z
-DTEND:20261116T205000Z
-SUMMARY:Hell’s Paradise – Folge 13/13
-DESCRIPTION:Plattform: ProSieben FUN\nRelease-Art: Wöchentlich (Simuldub)\
- nDetails: https://anime-kalender.de/t/12442/
-CATEGORIES:ProSieben FUN
-END:VEVENT
-BEGIN:VEVENT
 UID:auto-223-tv-prosieben-maxx@2026-11-17#74@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261117T154500Z

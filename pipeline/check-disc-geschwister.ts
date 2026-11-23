@@ -78,6 +78,22 @@ const index = {
 }
 {
   const rs = [disc(S2, 'Ririsa – Vol. 4')]
+  const g = discAufGeschwisterUmhaengen(rs, fruehe, index)
+  pruefe('Rückgabe nennt Name, alte und neue Kennung', JSON.stringify(g) === JSON.stringify([{ name: 'Ririsa – Vol. 4', von: S2, nach: S1 }]), g)
+  pruefe('das umgehängte Release behält Name, Tag und Quellen', rs[0]!.name === 'Ririsa – Vol. 4' && rs[0]!.schedule.firstEpisodeDate === '2026-11-20' && rs[0]!.sources.length === 1, rs[0])
+}
+{
+  const rs = [disc(S2, 'Ririsa – Vol. 4')]
+  discAufGeschwisterUmhaengen(rs, fruehe, { [S1]: [aus('Vol. 4/4', '2025-10-16')] })
+  pruefe('Ausgabe genau 400 Tage vor dem Termin zählt noch', rs[0]!.titleId === S1, rs[0]!.titleId)
+}
+{
+  const rs = [disc(S2, 'Ririsa – Staffel 2 – Vol. 4')]
+  discAufGeschwisterUmhaengen(rs, fruehe, { [S1]: [aus('Ririsa Staffel 2 – Vol. 4/4', '2026-09-04')] })
+  pruefe('gleiche Staffelangabe auf beiden Seiten verbindet', rs[0]!.titleId === S1, rs[0]!.titleId)
+}
+{
+  const rs = [disc(S2, 'Ririsa – Vol. 4')]
   const ohne = karte(titel(S2, undefined as unknown as number), titel(S1, undefined as unknown as number))
   discAufGeschwisterUmhaengen(rs, ohne, index)
   pruefe('ohne Franchise-Kennung wird nie umgehängt', rs[0]!.titleId === S2, rs[0]!.titleId)

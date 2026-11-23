@@ -265,7 +265,7 @@ export function NewsView({ data, oeffne }: { data: Dataset; oeffne: (titelId: nu
         <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
           {t('news.titel')} <span className="text-xs font-normal text-ak-leise">· {t('news.seit', { datum: datumKurz(grenze) })}</span>
         </h1>
-        <a href={feedUrl('news.xml')} className="ak-tz text-xs text-slate-500 underline-offset-2 hover:underline dark:text-slate-400" title={t('news.rssHint')}>
+        <a href={feedUrl('news.xml')} className="ak-tz text-xs text-ak-leise underline-offset-2 hover:underline" title={t('news.rssHint')}>
           RSS
         </a>
       </div>

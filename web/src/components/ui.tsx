@@ -529,7 +529,7 @@ export function Toggle({
       <Tooltip text={hint} seite="unten">
         <span
           aria-label={hint}
-          className="relative z-10 grid size-4 cursor-help place-items-center rounded-full border border-slate-400 text-[11px] font-semibold leading-none text-slate-500 dark:border-slate-500 dark:text-slate-400"
+          className="relative z-10 grid size-4 cursor-help place-items-center rounded-full border border-slate-400 text-[11px] font-semibold leading-none text-ak-leise dark:border-slate-500"
         >
           i
         </span>

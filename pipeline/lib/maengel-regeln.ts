@@ -161,6 +161,14 @@ const keinBannerBekannt = (t: Title, k: Kontext): string | undefined =>
 const jahrNochOhneStart = (t: Title, k: Kontext): string | undefined =>
   t.streams?.length || (k.releases.get(t.id) ?? []).some((r) => r.platform !== 'disc') ? undefined : 'noch-ohne-start'
 
+/** Zu Recht ohne Wertung (23.11.2026): AniList gibt Ankündigungen (`NOT_YET_RELEASED`) keinen `averageScore`/`meanScore`, auch nicht bei Stimmen (Fool Night 213457, 2.5-jigen no Ririsa 2nd Season 185515). Gilt, solange kein Nicht-Disc-Termin begonnen hat, und endet mit dem Start von selbst. */
+const wertungNochOhneStart = (t: Title, k: Kontext): string | undefined => {
+  if (t.id >= EIGENE_ID_BASIS) return 'keine-quelle-mit-stimmen'
+  const jungOderOhneJahr = !t.jpYear || t.jpYear >= Number(k.heute.slice(0, 4))
+  const begonnen = (k.releases.get(t.id) ?? []).some((r) => r.platform !== 'disc' && r.schedule.firstEpisodeDate <= k.heute)
+  return jungOderOhneJahr && !begonnen && (!t.jpEnd || t.jpEnd >= k.heute) ? 'noch-ohne-start' : undefined
+}
+
 export const REGELN: Regel[] = [
   { art: 'cover', gruppe: 'fehlend', wirkung: 3, wer: 'auto:tmdb-poster', zaehle: luecke('c'), ausnahme: (t, k) => (k.coverBekannt[t.id] ? 'ohne-bekanntes-cover' : undefined) },
   { art: 'banner', gruppe: 'fehlend', wirkung: 1, wer: 'auto:tmdb-banner', zaehle: (t) => !t.bannerImage, ausnahme: keinBannerBekannt },
@@ -170,7 +178,7 @@ export const REGELN: Regel[] = [
   { art: 'folgentitel', gruppe: 'fehlend', wirkung: 2, wer: 'auto:tmdb', zaehle: folgentitelFehlen, ausnahme: (t) => (t.format === 'MOVIE' ? 'film' : undefined) },
   { art: 'folgenzahl', gruppe: 'fehlend', wirkung: 3, wer: 'auto:anilist', zaehle: (t) => SERIE.has(t.format ?? '') && !t.episodes, ausnahme: (t, k) => (laeuftNoch(t, k) ? 'laeuft' : undefined) },
   { art: 'fsk', gruppe: 'fehlend', wirkung: 2, wer: 'auto:justwatch', zaehle: (t) => t.fsk == null },
-  { art: 'wertung', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anilist', zaehle: (t) => !t.score, ausnahme: (t) => (t.id >= EIGENE_ID_BASIS ? 'keine-quelle-mit-stimmen' : undefined) },
+  { art: 'wertung', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anilist', zaehle: (t) => !t.score, ausnahme: wertungNochOhneStart },
   { art: 'studio', gruppe: 'fehlend', wirkung: 1, wer: 'hand:studio-von-hand', zaehle: (t) => !t.studios?.length, ausnahme: (t) => (t.id >= ANISEARCH_ID_BASIS ? 'quelle-ohne-studio' : undefined) },
   { art: 'genre', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anilist', zaehle: (t) => !t.genres?.length },
   { art: 'laufzeit', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anisearch', zaehle: (t) => !t.runtimeMin },

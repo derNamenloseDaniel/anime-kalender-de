@@ -535,3 +535,7 @@ Messung am selben Tag an den 108 Titeln ohne `score` (AniList-GraphQL, 25 je Anf
 | Eigentitel/Cartoon (5 Mio.) | 3 | TMDB ohne ≥ 10 Stimmen (`cartoons.ts`), keine aniSearch-ID | keine Quelle mit genug Stimmen |
 
 Ursache des Stillstands: `fetch.ts` holte abgeschlossene Zwischenspeicher-Einträge nie neu, auch nicht ohne `stats`/`meanScore` (vor 22.11.2026); der Rückfall aus #4574 hatte nichts zu lesen. Fix: `eintragNochOffen` (`lib/anilist.ts`) holt Einträge ohne `stats` einmal neu (wie bei `countryOfOrigin`, 09.10.2026). Die 58 Titel ohne Quelle sind in der Regel `wertung` die Ausnahme `keine-quelle-mit-stimmen` (Kennung ≥ `EIGENE_ID_BASIS`). Erwartung nach dem nächsten Bestandsbau: wertung offen 108 → 2 (+ 58 Ausnahme). Beobachten: nächster Bestandsbau, dann nach einem Tag.
+
+## wertung: die letzten 2 offenen sind Ankündigungen (23.11.2026)
+
+Live gemessen (GraphQL, 23.11.2026): Fool Night (213457) und 2.5-jigen no Ririsa 2nd Season (185515) sind `NOT_YET_RELEASED`, `averageScore` und `meanScore` sind `null` (Fool Night hat 182 Stimmen in `scoreDistribution`, AniList veröffentlicht trotzdem keinen Wert). Kein Codefehler: `anilistWertungAus` braucht eine Zahl und rechnet nichts aus. Neue Ausnahme `noch-ohne-start` (`wertungNochOhneStart`, `pipeline/lib/maengel-regeln.ts`): kein Nicht-Disc-Termin begonnen, Jahr dieses Jahres oder leer, Ende nicht vorbei; sie endet mit dem Start von selbst, dann greift der Rückfall. Erwartung nach dem nächsten Bestandsbau: wertung offen 2 → 0 (+ 2 Ausnahme).

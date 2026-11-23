@@ -6,8 +6,9 @@ export interface TaktUmwelt {
   sichtbar: () => boolean
   jetzt: () => number
   abgleichen: (token: string) => Promise<void>
-  bei: (ereignis: 'visibilitychange', f: () => void) => void
-  ab: (ereignis: 'visibilitychange', f: () => void) => void
+  /** Hört auf `visibilitychange` (Rückkehr in den Tab). */
+  bei: (f: () => void) => void
+  ab: (f: () => void) => void
 }
 
 /** Gleicht jetzt und bei jeder Rückkehr in den Tab ab, höchstens einmal je Minute und nie im versteckten Tab; gibt die Aufräumfunktion zurück. */
@@ -20,6 +21,6 @@ export function starteTakt(u: TaktUmwelt): () => void {
     u.abgleichen(token).catch(() => undefined)
   }
   los()
-  u.bei('visibilitychange', los)
-  return () => u.ab('visibilitychange', los)
+  u.bei(los)
+  return () => u.ab(los)
 }

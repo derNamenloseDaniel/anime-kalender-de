@@ -84,8 +84,8 @@ function takt(o: { token?: string; sichtbar?: boolean }) {
       z.abgleiche++
       if (z.fehler) throw new Error('offline')
     },
-    bei: (_e, f) => void z.hoerer.add(f),
-    ab: (_e, f) => void z.hoerer.delete(f),
+    bei: (f) => void z.hoerer.add(f),
+    ab: (f) => void z.hoerer.delete(f),
   })
   const zurueck = () => z.hoerer.forEach((f) => f())
   return { z, aufraeumen, zurueck }

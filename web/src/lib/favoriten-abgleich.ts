@@ -22,8 +22,8 @@ export function useFavoritenAbgleich(): void {
         sichtbar: () => document.visibilityState !== 'hidden',
         jetzt: Date.now,
         abgleichen: (token) => gleicheAb(anschluss(token)),
-        bei: (e, f) => document.addEventListener(e, f),
-        ab: (e, f) => document.removeEventListener(e, f),
+        bei: (f) => document.addEventListener('visibilitychange', f),
+        ab: (f) => document.removeEventListener('visibilitychange', f),
       }),
     [],
   )

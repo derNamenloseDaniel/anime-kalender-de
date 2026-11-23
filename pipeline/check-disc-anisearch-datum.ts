@@ -196,6 +196,7 @@ const mitQuellen = (...quellen: unknown[]): Release => ({ ...virgin(), quellen }
 pruefe('ohne bekannte Meldung: eine Quelle ohne Lesetag nimmt dem Beleg die Aussage', nachOhne(mitQuellen(q1, quelleB({})), gelesen('2026-10-12T05:00:00Z')) === '2026-10-30')
 pruefe('ohne bekannte Meldung: eine überholte Quelle mit späterem Lesetag zählt nicht', nachOhne(mitQuellen(q1, quelleB({ gesehenAm: '2026-10-20', stand: 'ueberholt' })), gelesen('2026-10-12T05:00:00Z')) === '2026-11-06')
 pruefe('ohne bekannte Meldung: eine aniSearch-Quelle mit späterem Lesetag zählt nicht', nachOhne(mitQuellen(q1, quelleB({ url: ARTIKEL, gesehenAm: '2026-10-20' })), gelesen('2026-10-12T05:00:00Z')) === '2026-11-06')
+pruefe('ohne bekannte Meldung: eine wegen aniSearch überholte Quelle bleibt Lesebeleg (zweiter Bau-Durchgang)', nachOhne(mitQuellen({ ...q1, stand: 'ueberholt', grund: 'Termin laut aniSearch: 2026-11-06' }), gelesen('2026-10-12T05:00:00Z')) === '2026-11-06')
 pruefe('ohne bekannte Meldung: nur eine überholte Quelle gibt keine Aussage', nachOhne(mitQuellen({ ...q1, stand: 'ueberholt' }), gelesen('2026-10-12T05:00:00Z')) === '2026-10-30')
 pruefe('mit jüngerer bekannter Meldung: Lesetag der Quelle ändert nichts, Meldung bleibt', datumNach(mitLesung('2026-10-30', '2026-09-01'), gelesen('2026-10-12T05:00:00Z'), '2026-10-20') === '2026-10-30')
 pruefe('mit älterer bekannter Meldung: aniSearch gewinnt, auch bei späterem Lesetag der Quelle', datumNach(mitLesung('2026-10-30', '2026-10-25'), gelesen('2026-10-12T05:00:00Z'), '2026-10-02') === '2026-11-06')

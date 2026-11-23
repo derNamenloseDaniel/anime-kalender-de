@@ -51,6 +51,8 @@ pipeline/check-angebot-seit.ts
 pipeline/check-angebot-stichtag.ts
 pipeline/check-angebot-termine.ts
 pipeline/check-anilist-cover-vorschau.ts
+pipeline/check-anilist-mangel-lauf.ts
+pipeline/check-anilist-mangel.ts
 pipeline/check-anilist-produkt.ts
 pipeline/check-anilist-wertung.ts
 pipeline/check-anime2you-abruf.ts

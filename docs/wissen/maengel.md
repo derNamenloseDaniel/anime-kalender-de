@@ -428,7 +428,7 @@ Erwartet: ~301 von 307.
 
 | Weg | gemessen | Aufwand | Risiko | Empfehlung |
 |---|---|---|---|---|
-| (a) AniList neu holen | 9 von 40 | S | niedrig | ja (`auto-arten-2111`) |
+| (a) AniList neu holen | 9 von 40 | S | niedrig | ja (`auto-arten-2111`); **gebaut 22.11.2026 (Rang 7b)**: `lib/anilist-mangel.ts`, `data:fetch` holt einen abgeschlossenen Titel ohne Wertung oder ohne Studio trotz Cache neu (Stempel `abgerufen`, frühestens alle 2 Tage, je Lauf höchstens 100 MAL-Weg / 10 Kennungs-Weg = rund 2 Blöcke + 10 Einzelabrufe stündlich, AniList erlaubt 90 je Minute; älteste zuerst, damit der Rest reihum drankommt) |
 | (a) aniSearch `st` / `info.studios` | 0 (bei allen 62 leer) | — | — | — |
 | (c) Franchise | 76,6 % gleich | — | mittel | nein |
 | Rest | ~93 | — | — | Ausnahme „quelle-ohne-studio“ |

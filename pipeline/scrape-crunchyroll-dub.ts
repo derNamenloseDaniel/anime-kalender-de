@@ -60,27 +60,27 @@
  *                             [-- --browser] [-- --seitenanzeige] [-- --pause 400]
  */
 import { chromium, type Page } from 'playwright'
-import { log, readJson, sleep, warn, writeJson } from './lib/util.ts'
+import { log, readJson, writeJson } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
 import { fortschrittsMelder } from './lib/lauf-fortschritt.ts'
 import { browserHolerMit } from './lib/cr-browser-start.ts'
 import type { Title } from '../shared/types.ts'
-import { addDays, todayIso } from '../shared/time.ts'
+import { todayIso } from '../shared/time.ts'
 import type { CrSerie, CrStaffel } from './lib/crunchyroll-dub.ts'
-import { crunchyrollSeriesId } from './lib/crunchyroll.ts'
-import { crFrisch, neuFolgenJeSerie, serieAblegen } from './lib/cr-frisch.ts'
 import { offenMelden } from './lib/cr-offen.ts'
-import { serieHinterFolge, serieLesen } from './lib/crunchyroll-lesen.ts'
-import { crunchyrollAdressen, crunchyrollNeinAbrufLaden } from './lib/crunchyroll-adressen.ts'
+import { waehleAdressen, type AuswahlSchalter } from './lib/cr-dub-auswahl.ts'
+import { ladeKennungen, kennungenSichern } from './lib/cr-dub-kennungen.ts'
+import { bearbeiteAdresse, type AdressErgebnis, type AdressKontext } from './lib/cr-dub-adresse.ts'
+import { leseAlleSeitenanzeige } from './lib/cr-dub-seitenanzeige.ts'
 import {
   CrunchyrollApi,
-  CrunchyrollGesperrt,
   CrunchyrollCms,
   CrunchyrollSeiten,
   ZugangspaketFehlt,
   beschaffeZugang,
   bucketLand,
   type CrQuelle,
+  type CrZugang,
   type Tonspur,
 } from './lib/crunchyroll-api.ts'
 
@@ -190,74 +190,6 @@ const PAUSE_MS = zahl('--pause', 500)
 // Die Typen stehen in `lib/crunchyroll-dub.ts` — dort, wo auch die Auswertung
 // wohnt. Zwei Fassungen desselben Typs laufen unweigerlich auseinander.
 export type { CrStaffel, CrSerie } from './lib/crunchyroll-dub.ts'
-
-/**
- * Was zu einer Adresse an Serienkennung bekannt ist.
- *
- * Die Datei ist ein Gedächtnis, kein Zwischenspeicher: Eine Slug-Adresse in die
- * `/series/`-Form aufzulösen kostet einen vollen Seitenaufruf, und das Ergebnis
- * ändert sich nie — eine Serienkennung ist stabil. Ohne diese Datei zahlte
- * jeder Lauf denselben Preis erneut, und zwar auf einem fremden Server.
- *
- * **Ein Fehlschlag ist dagegen nicht endgültig.** Steht kein `seriesId` darin,
- * kommt die Adresse nach der Wiedervorlagefrist erneut dran. Sonst wäre die
- * Datei genau der Filter, vor dem `CLAUDE.md` warnt: „hole, was noch fehlt"
- * macht jede Antwort endgültig, und ein Falschbefund kann sich nicht mehr
- * korrigieren. Bei der Kennung selbst ist das unbedenklich, beim Nicht-Finden
- * nicht.
- */
-interface KennungsEintrag {
-  seriesId?: string
-  /** Wohin die Adresse geführt hat — bei einem Fehlschlag der Beleg dafür. */
-  ziel?: string
-  geprueftAm: string
-  fehler?: string
-  /**
-   * Was die Seite selbst gesagt hat: `weg` das Banner, `fehlt` die 404-Seite.
-   *
-   * Ohne dieses Feld ging der Befund beim zweiten Lesen verloren. Der Ablauf
-   * dahinter: Eine Adresse ohne Serienkennung wird nicht bei jedem Lauf neu
-   * aufgerufen — geschieht das nicht, stand vom letzten Mal nur die Textzeile
-   * da, und aus „Crunchyroll sagt selbst, es gibt die Seite nicht" wurde ein
-   * „keine Auskunft" (37 Adressen am 21.08.2026). Die Zeile ist der Beleg, das
-   * Feld ist der Befund.
-   */
-  art?: 'weg' | 'fehlt'
-}
-interface KennungsDatei {
-  aufgeloestAm: string
-  adressen: Record<string, KennungsEintrag>
-}
-const KENNUNGS_DATEI = 'data/crunchyroll-series-ids.json'
-
-/**
- * Die **im deutschen Katalog gesuchte** Serienkennung — sie schlägt die aus der
- * Adresse.
- *
- * Eine Adresse aufzulösen liefert die Kennung des Eintrags, auf den sie zeigt.
- * Das ist nicht dieselbe wie die der deutschen Serie: „Detektiv Conan" steht bei
- * uns als `crunchyroll.com/de/case-closed`, das ist `G6JQVM3ER` — ein Block mit
- * 33 Folgen und `ja-JP`. Die deutsche Serie liegt unter `GW4HM7NV3` und führt
- * 405 deutsche Folgen in neun Blöcken.
- *
- * `tools/cr-kennungen-suchen.mjs` sucht sie über `content/v2/discover/search`
- * und legt sie hier ab. Der Lauf am 26.08.2026 fand zu 391 offenen Adressen 51
- * Kennungen, **39 davon mit `de-DE`** — Titel, deren deutsche Fassung sonst
- * unauffindbar geblieben wäre.
- *
- * Die Suche braucht eine deutsche Leitung (Crunchyroll liest die Region aus der
- * IP), läuft also nicht in der Cloud. Deshalb dieser Umweg über eine Datei:
- * gesucht wird hier, gelesen wird überall.
- */
-interface DeKennung {
-  seriesId: string
-  crTitel?: string
-  sprachen?: string[]
-  folgen?: number
-  staffeln?: number
-  gesuchtAm?: string
-}
-const DE_KENNUNGS_DATEI = 'data/crunchyroll-de-kennungen.json'
 
 // ─────────────────── Rückfallebene: die gerenderte Seite lesen ───────────────
 //
@@ -519,72 +451,144 @@ async function serieLesenSeitenanzeige(page: Page, url: string): Promise<CrSerie
   return { url, quelle: 'seitenanzeige', deutschImAngebot: true, staffeln, geprueftAm: heute }
 }
 
-/**
- * Wie oft eine Adresse drankommt — je nachdem, ob sich dort etwas bewegt.
- *
- * Bis zum 22.08.2026 galt für alle 959 Adressen dieselbe Frist von vier Wochen.
- * Das behandelt eine Serie von 2009, die seit Jahren unverändert dasteht,
- * genauso wie eine, die nächste Woche eine neue Folge bekommt — und weil ein
- * Lauf bei 300 Adressen gedeckelt ist, dauert ein voller Durchgang 3,2 Wochen.
- *
- * Daniels Vorschlag (22.08.2026): „es könnte sinn machen die liste auch
- * aufzuteilen nach wichtigen und weniger wichtigen titeln. und entsprechend die
- * häufigkeit der polls anpassen."
- *
- * Die Staffelung, gemessen am Bestand:
- *
- * | Gruppe                 | Titel | Frist    | Abrufe/Woche |
- * |------------------------|------:|---------:|-------------:|
- * | anstehender Termin     |    56 |   7 Tage |           56 |
- * | ab 2024 erschienen     |   139 |  14 Tage |           70 |
- * | 2015 bis 2023          |   568 |  28 Tage |          142 |
- * | vor 2015               |   355 |  90 Tage |           27 |
- * |                        |       |          |      **295** |
- *
- * Das passt unter den Deckel von 300, den Crunchyrolls Drosselung setzt — und
- * die 56 Titel, bei denen wirklich etwas passiert, sind viermal so oft dran wie
- * vorher.
- *
- * `--alter <tage>` schaltet die Staffelung ab und setzt eine feste Frist für
- * alle. Das bleibt der Weg für gezielte Läufe.
- */
-const FRIST_TERMIN = 7
-const FRIST_JUNG = 14
-const FRIST_MITTEL = 28
-const FRIST_ALT = 90
-
-/** Titel, für die ein Termin in der Zukunft steht. */
-function titelMitTermin(): Set<number> {
-  const events = readJson<Array<{ titleId: number; date: string }>>('public/data/events.json', [])
-  const heute = todayIso()
-  const menge = new Set<number>()
-  for (const e of events) if (e.date >= heute) menge.add(e.titleId)
-  return menge
+/** Die Schalter der Adressauswahl (`lib/cr-dub-auswahl.ts`), aus der Kommandozeile gelesen. */
+const AUSWAHL: AuswahlSchalter = {
+  nur: NUR,
+  neu: NEU,
+  nurFehler: NUR_FEHLER,
+  nurNeu: NUR_NEU,
+  nurOffene: NUR_OFFENE,
+  alterGesetzt: ALTER_GESETZT,
+  wiedervorlageTage: WIEDERVORLAGE_TAGE,
+  fehlerTage: FEHLER_TAGE,
+  limit: LIMIT,
 }
 
 /**
- * Die Frist je Adresse. Zeigen mehrere Titel auf dieselbe Adresse — bei Demon
- * Slayer sind es fünf —, gewinnt die kürzeste: Ein Termin an einem davon macht
- * die ganze Adresse interessant.
+ * Ein Zeilenprotokoll je Serie, damit ein Abbruch nachvollziehbar bleibt.
+ *
+ * Bei „3 von 8" steht die Zahl hier, nicht nur in der Datei — das ist die
+ * Angabe, die es vorher nirgends gab.
  */
-function fristenJeAdresse(titles: Title[]): Map<string, number> {
-  const mitTermin = titelMitTermin()
-  const fristen = new Map<string, number>()
-  for (const t of titles) {
-    const frist = mitTermin.has(t.id)
-      ? FRIST_TERMIN
-      : (t.jpYear ?? 0) >= 2024
-        ? FRIST_JUNG
-        : (t.jpYear ?? 0) >= 2015
-          ? FRIST_MITTEL
-          : FRIST_ALT
-    for (const s of t.streams) {
-      if (s.platform !== 'crunchyroll') continue
-      const bisher = fristen.get(s.url)
-      if (bisher === undefined || frist < bisher) fristen.set(s.url, frist)
+function serienZeile(i: number, gesamt: number, kurz: string, serie: CrSerie): string {
+  return (
+    `  ${i + 1}/${gesamt} ${serie.nichtVerfuegbar ? '✕' : serie.deutschImAngebot ? '🇩🇪' : serie.fehler ? '?' : '—'} ${kurz.slice(0, 52)}` +
+    (serie.staffeln?.length
+      ? ` (${serie.staffeln.map((s) => `${s.name}: ${s.deutsch}/${s.folgen}`).join(', ')})`
+      : serie.fehler
+        ? ` — ${serie.fehler.slice(0, 60)}`
+        : '')
+  )
+}
+
+/** Das Schlussprotokoll des Regelwegs. */
+function schlussProtokoll(bestand: Map<string, CrSerie>, jeSerie: Map<string, CrSerie>, z: AdressErgebnis): void {
+  const termine = [...jeSerie.values()].reduce(
+    (n, s) => n + (s.staffeln ?? []).reduce((m, st) => m + (st.deutscheFolgen ?? []).filter((f) => f.verfuegbarAb).length, 0),
+    0,
+  )
+  log(
+    `Fertig: ${bestand.size} Adressen im Bestand, ${jeSerie.size} Serien in diesem Lauf gelesen, ` +
+      `${z.ohneDeutsch} davon ohne deutsche Tonspur` +
+      (z.gestoert ? `, ${z.gestoert} Fehlersatz/Fehlersätze verworfen (alter Stand behalten)` : ''),
+  )
+  if (z.neuAufgeloest) log(`${z.neuAufgeloest} Adressen neu in eine Serienkennung aufgelöst, ${z.ohneKennung} ohne Kennung`)
+  log(`${termine} deutsche Folgen mit belegtem Termin aus der Content-API`)
+  // Kein Fehler-Exit: Die Sperre ist kein kaputter Lauf, sondern ein früh
+  // beendeter. Ein roter Lauf für etwas, das sich von selbst wieder öffnet,
+  // wäre eine Warnung, auf die man aufhört hinzusehen.
+  if (z.gesperrt) log('Abgebrochen wegen Crunchyrolls Bot-Sperre — der Rest steht beim nächsten Lauf wieder offen.')
+}
+
+type BrowserHalter = ReturnType<typeof browserHolerMit>
+
+/** Was Auswahl und Protokoll eines Laufs den beiden Lesewegen mitgeben. */
+interface LaufStand {
+  adressen: string[]
+  bestand: Map<string, CrSerie>
+  neuFolgen: Map<string, string[]>
+  fehlerGrenze: string
+  melden: (i: number, kurz: string, serie: CrSerie) => void
+  melde: (jetzt: number, text?: string) => void
+  sichern: () => void
+}
+
+/** Die zweite Rückfallebene: jede Adresse über die gerenderte Seite lesen. */
+async function leseSeitenanzeige(browserHalter: BrowserHalter, stand: LaufStand): Promise<void> {
+  const { adressen, bestand, melden, melde, sichern } = stand
+  const page = await (await browserHalter.holen('--seitenanzeige')).newPage({
+    userAgent: CHROME,
+    locale: 'de-DE',
+    viewport: { width: 1600, height: 1200 },
+  })
+  const ohneDeutsch = await leseAlleSeitenanzeige(page, adressen, { bestand, lese: serieLesenSeitenanzeige, melden, melde, sichern })
+  await browserHalter.aktuell()?.close()
+  sichern()
+  recordSource('crunchyroll-dub', bestand.size, bestand.size ? undefined : 'keine Seite gelesen')
+  log(`Fertig: ${bestand.size} Seiten im Bestand, davon ${ohneDeutsch} in diesem Lauf ohne deutsche Tonspur`)
+}
+
+/**
+ * Der Regelweg ist die beta-api mit Signatur; `--browser` ist die Rückfallebene.
+ *
+ * Der Unterschied ist nicht bloß technisch: Die eine kennt ihre Region und
+ * belegt damit auch ein Nein, die andere kennt sie nicht. Was daraus folgt,
+ * steht in `beurteile()` — hier wird nur festgehalten, welcher Weg es war.
+ * Gibt die Quelle und, wenn der Browser sie trägt, dessen Seite für die Seitenaufrufe zurück.
+ */
+async function baueQuelle(zugang: CrZugang | undefined, browserHalter: BrowserHalter): Promise<{ quelle: CrQuelle; api?: CrunchyrollApi }> {
+  if (zugang) return { quelle: new CrunchyrollCms(zugang, PAUSE_MS) }
+  const api = new CrunchyrollApi(await browserHalter.holen('kein Zugangspaket'), PAUSE_MS)
+  await api.oeffnen()
+  return { quelle: api, api }
+}
+
+async function leseRegelweg(zugang: CrZugang | undefined, browserHalter: BrowserHalter, stand: LaufStand): Promise<void> {
+  const { adressen, bestand, sichern } = stand
+  let seiten: CrunchyrollSeiten | undefined
+  const seitenHolen = async (): Promise<CrunchyrollSeiten> => {
+    if (!seiten) {
+      seiten = new CrunchyrollSeiten(await browserHalter.holen('Adresse ohne Serienkennung'), PAUSE_MS)
+      await seiten.oeffnen()
+    }
+    return seiten
+  }
+  const { quelle, api } = await baueQuelle(zugang, browserHalter)
+  // Dieselbe Seite tut es auch für die Seitenaufrufe — ein zweites Fenster
+  // wäre ein zweites Fenster für nichts.
+  if (api) seiten = api
+  log(`Katalog: ${quelle.katalog ?? 'unbelegt (Region des Rechners)'}`)
+
+  const kennungen = ladeKennungen()
+  const kontext: AdressKontext = {
+    ...stand,
+    quelle,
+    kennungen,
+    jeSerie: new Map<string, CrSerie>(),
+    seitenHolen,
+    nurFehler: NUR_FEHLER,
+    kennungenSichern: () => kennungenSichern(kennungen),
+  }
+  const zaehler: AdressErgebnis = { neuAufgeloest: 0, ohneKennung: 0, ohneDeutsch: 0, gestoert: 0, gesperrt: false }
+  for (const [i, url] of adressen.entries()) {
+    const e = await bearbeiteAdresse(i, url, kontext)
+    zaehler.neuAufgeloest += e.neuAufgeloest
+    zaehler.ohneKennung += e.ohneKennung
+    zaehler.ohneDeutsch += e.ohneDeutsch
+    zaehler.gestoert += e.gestoert
+    if (e.gesperrt) {
+      zaehler.gesperrt = true
+      break
     }
   }
-  return fristen
+
+  await seiten?.schliessen()
+  await browserHalter.aktuell()?.close()
+
+  sichern()
+  kontext.kennungenSichern()
+  recordSource('crunchyroll-dub', bestand.size, bestand.size ? undefined : 'keine Serie gelesen')
+  schlussProtokoll(bestand, kontext.jeSerie, zaehler)
 }
 
 async function main(): Promise<void> {
@@ -607,89 +611,11 @@ async function main(): Promise<void> {
    */
   const katalogJetzt = zugang ? (bucketLand(zugang.bucket) ?? zugang.land).toLowerCase() : OFFEN_PRUEFEN ? 'de' : undefined
 
-  const titles = readJson<Title[]>('public/data/titles.json', [])
-  const offen = crunchyrollAdressen(titles, NUR_OFFENE)
-  const nein = NUR_OFFENE ? undefined : crunchyrollNeinAbrufLaden()
-  let adressen = [...new Set([...offen, ...(nein?.adressen ?? [])])].sort()
-  if (NUR) adressen = adressen.filter((u) => u.includes(NUR))
-
-  /**
-   * Wiederaufsatz: Was schon gelesen ist, wird nicht noch einmal geholt.
-   *
-   * Der erste Volldurchlauf schrieb sein Ergebnis erst **am Ende**. Beim
-   * Abbruch nach 579 von 918 Seiten wäre alles verloren gewesen — anderthalb
-   * Stunden Last auf einem fremden Server für nichts (12.08.2026). Ein langer
-   * Lauf ohne Zwischenstand ist ein Lauf ohne Netz.
-   *
-   * Mit `--neu` wird der Bestand ignoriert und alles frisch geholt.
-   */
-  const bestand = new Map<string, CrSerie>(
-    NEU ? [] : readJson<{ serien: CrSerie[] }>('data/crunchyroll-dub.json', { serien: [] }).serien.map((s) => [s.url, s]),
+  const { adressen, bestand, neuFolgen, fehlerGrenze, schonDa, nachgefasst } = waehleAdressen(
+    readJson<Title[]>('public/data/titles.json', []),
+    katalogJetzt,
+    AUSWAHL,
   )
-  // Frisch genug ist, was innerhalb seiner eigenen Frist gelesen wurde — die
-  // hängt daran, ob sich bei diesem Titel überhaupt etwas bewegt.
-  const fristen = ALTER_GESETZT ? new Map<string, number>() : fristenJeAdresse(titles)
-  const grenzeFuer = (u: string) => addDays(todayIso(), -(fristen.get(u) ?? WIEDERVORLAGE_TAGE))
-  /**
-   * **Eine neue deutsche Folge hebt jede Frist auf.**
-   *
-   * Am 10.09.2026 erschienen die drei „Lord of Mysteries"-Specials auf Deutsch,
-   * einen Tag nachdem dieser Lauf die Serie gelesen hatte. Die nächste
-   * Wiedervorlage wäre der 07.10. gewesen — vier Wochen, in denen die Seite
-   * nichts davon wusste. `fetch-crunchyroll-neu.ts` sieht täglich nach, was
-   * hinzugekommen ist; was dort steht, kommt hier sofort wieder dran.
-   */
-  const neuSeit = new Map<string, string>()
-  const neuFunde = readJson<{ folgen?: { serieId?: string; gesehenAm?: string; guid?: string }[] }>('data/crunchyroll-neu.json', {}).folgen ?? []
-  const neuFolgen = neuFolgenJeSerie(neuFunde)
-  for (const f of neuFunde) {
-    if (!f.serieId || !f.gesehenAm) continue
-    const bisher = neuSeit.get(f.serieId)
-    if (!bisher || f.gesehenAm > bisher) neuSeit.set(f.serieId, f.gesehenAm)
-  }
-  /* Eine Kachel nach dem Messdatum eines Nein macht die Serie sofort fällig (`shared/nein-wiedervorlage.ts`). */
-  for (const [id, am] of nein?.kachelSeit ?? []) {
-    if (am > (neuSeit.get(id) ?? '')) neuSeit.set(id, am)
-  }
-  const fehlerGrenze = addDays(todayIso(), -FEHLER_TAGE)
-  /**
-   * Gezielt die Seiten erneut prüfen, bei denen der letzte Lauf nichts sagen
-   * konnte.
-   *
-   * Anlass: Am 21.08.2026 kam die Erkennung des Banners „Leider sind die Videos
-   * dieser Serie nicht mehr verfügbar" dazu. Die 472 Seiten, die vorher mit
-   * „keine Audio-Zeile gefunden" endeten, haben ihre Antwort damit schon in der
-   * Seite stehen — nur konnte sie niemand lesen. Sie einzeln nachzuholen
-   * kostet eine knappe Stunde; alle 952 noch einmal zu holen wären zwei, und
-   * die frisch geprüften brächten dabei nichts Neues.
-   */
-  const frisch = (u: string) => {
-    const s = bestand.get(u)
-    return s ? crFrisch(s, { katalogJetzt, neuSeit, neuFolgen, nurNeu: NUR_NEU, nurFehler: NUR_FEHLER, befundGrenze: grenzeFuer(u), fehlerGrenze }) : false
-  }
-  /*
-    **`--nur-neu` filtert die Liste, nicht nur die Frist.**
-
-    `frisch()` sagt zu einer Adresse, die im Bestand gar nicht steht, „nicht
-    frisch" — und das ist richtig: Eine nie geprüfte Serie muss drankommen.
-    Beim täglichen Lauf wäre es falsch. Er soll genau die Serien anfassen, bei
-    denen Crunchyroll heute etwas Neues auf Deutsch führt; alles andere ist
-    Sache des Wochenlaufs, sonst zieht der erste Lauf den ganzen Rückstand.
-  */
-  if (NUR_NEU) {
-    const gesucht = new Set(neuSeit.keys())
-    const vorher = adressen.length
-    adressen = adressen.filter((u) => {
-      const s = bestand.get(u)
-      const ausAdresse = /crunchyroll\.com\/(?:[a-z-]+\/)?series\/([A-Z0-9]+)/i.exec(u)?.[1]
-      return (s?.seriesId && gesucht.has(s.seriesId)) || (ausAdresse ? gesucht.has(ausAdresse) : false)
-    })
-    log(`Crunchyroll: nur die Neuzugänge — ${adressen.length} von ${vorher} Adressen betreffen eine Serie mit neuen deutschen Folgen`)
-  }
-  const schonDa = adressen.filter(frisch).length
-  const nachgefasst = adressen.filter((u) => !frisch(u) && bestand.get(u)?.fehler).length
-  adressen = adressen.filter((u) => !frisch(u))
-  if (LIMIT > 0) adressen = adressen.slice(0, LIMIT)
   if (OFFEN_PRUEFEN) return offenMelden(adressen.length)
   log(
     `Crunchyroll: ${adressen.length} Serienadressen offen` +
@@ -717,289 +643,13 @@ async function main(): Promise<void> {
    * kein einziges Mal.
    */
   const browserHalter = browserHolerMit(() => chromium.launch(), log)
-  let seiten: CrunchyrollSeiten | undefined
-  const seitenHolen = async (): Promise<CrunchyrollSeiten> => {
-    if (!seiten) {
-      seiten = new CrunchyrollSeiten(await browserHalter.holen('Adresse ohne Serienkennung'), PAUSE_MS)
-      await seiten.oeffnen()
-    }
-    return seiten
-  }
-
-  let ohneDeutsch = 0
-  /* Wie oft ein Fehlersatz einen guten Eintrag stehen ließ. */
-  let gestoert = 0
-
   /** Schreibt den Stand — alles Bekannte plus alles gerade Gelesene. */
   const sichern = () =>
     writeJson('data/crunchyroll-dub.json', { scrapedAt: new Date().toISOString(), serien: [...bestand.values()] }, true)
-
-  /**
-   * Ein Zeilenprotokoll je Serie, damit ein Abbruch nachvollziehbar bleibt.
-   *
-   * Bei „3 von 8" steht die Zahl hier, nicht nur in der Datei — das ist die
-   * Angabe, die es vorher nirgends gab.
-   */
-  const melden = (i: number, kurz: string, serie: CrSerie) =>
-    log(
-      `  ${i + 1}/${adressen.length} ${serie.nichtVerfuegbar ? '✕' : serie.deutschImAngebot ? '🇩🇪' : serie.fehler ? '?' : '—'} ${kurz.slice(0, 52)}` +
-        (serie.staffeln?.length
-          ? ` (${serie.staffeln.map((s) => `${s.name}: ${s.deutsch}/${s.folgen}`).join(', ')})`
-          : serie.fehler
-            ? ` — ${serie.fehler.slice(0, 60)}`
-            : ''),
-    )
-
-  if (SEITENANZEIGE) {
-    const page = await (await browserHalter.holen('--seitenanzeige')).newPage({
-      userAgent: CHROME,
-      locale: 'de-DE',
-      viewport: { width: 1600, height: 1200 },
-    })
-    for (const [i, url] of adressen.entries()) {
-      const kurz = url.replace(/^https?:\/\/(www\.)?crunchyroll\.com\/de\//, '')
-      try {
-        const serie = await serieLesenSeitenanzeige(page, url)
-        bestand.set(url, serie)
-        if (!serie.deutschImAngebot) ohneDeutsch++
-        melden(i, kurz, serie)
-      } catch (err) {
-        /**
-         * Ein Fehlschlag wird **nicht** als „keine Synchro" gespeichert.
-         *
-         * Sonst stünde ein Zeitüberschreitungs-Fehler später als belegtes Nein
-         * im Datensatz — und der Wiederaufsatz würde die Seite nie wieder
-         * anfassen. Sie bleibt offen und kommt beim nächsten Lauf erneut dran.
-         */
-        warn(`${url}: ${(err as Error).message.slice(0, 100)}`)
-      }
-      if (i % 10 === 9) sichern()
-      void melde(i + 1, kurz)
-      await sleep(1500)
-    }
-    await browserHalter.aktuell()?.close()
-    sichern()
-    recordSource('crunchyroll-dub', bestand.size, bestand.size ? undefined : 'keine Seite gelesen')
-    log(`Fertig: ${bestand.size} Seiten im Bestand, davon ${ohneDeutsch} in diesem Lauf ohne deutsche Tonspur`)
-    return
-  }
-
-  /**
-   * Der Regelweg ist die beta-api mit Signatur; `--browser` ist die Rückfallebene.
-   *
-   * Der Unterschied ist nicht bloß technisch: Die eine kennt ihre Region und
-   * belegt damit auch ein Nein, die andere kennt sie nicht. Was daraus folgt,
-   * steht in `beurteile()` — hier wird nur festgehalten, welcher Weg es war.
-   */
-  let quelle: CrQuelle
-  if (zugang) {
-    quelle = new CrunchyrollCms(zugang, PAUSE_MS)
-  } else {
-    const api = new CrunchyrollApi(await browserHalter.holen('kein Zugangspaket'), PAUSE_MS)
-    await api.oeffnen()
-    // Dieselbe Seite tut es auch für die Seitenaufrufe — ein zweites Fenster
-    // wäre ein zweites Fenster für nichts.
-    seiten = api
-    quelle = api
-  }
-  log(`Katalog: ${quelle.katalog ?? 'unbelegt (Region des Rechners)'}`)
-
-  const kennungen = readJson<KennungsDatei>(KENNUNGS_DATEI, { aufgeloestAm: '', adressen: {} })
-  /*
-    Die deutschen Kennungen überschreiben, was die Adressauflösung ergeben hat.
-    Der Schlüssel ist dort die AniList-Kennung des Titels, hier die Adresse —
-    verbunden über `unserTitel` gibt es nicht, also über die Adresse, die im
-    Eintrag steht.
-  */
-  const deKennungen = readJson<{ kennungen: Record<string, DeKennung & { url?: string }> }>(
-    DE_KENNUNGS_DATEI,
-    { kennungen: {} },
-  )
-  let deUebernommen = 0
-  for (const eintrag of Object.values(deKennungen.kennungen ?? {})) {
-    if (!eintrag.url || !eintrag.seriesId) continue
-    const bisher = kennungen.adressen[eintrag.url]
-    if (bisher?.seriesId === eintrag.seriesId) continue
-    kennungen.adressen[eintrag.url] = {
-      seriesId: eintrag.seriesId,
-      geprueftAm: eintrag.gesuchtAm ?? todayIso(),
-      ziel: 'aus der Suche im deutschen Katalog',
-    }
-    deUebernommen++
-  }
-  if (deUebernommen) console.log(`${deUebernommen} Kennungen aus der deutschen Suche übernommen`)
-  const kennungenSichern = () =>
-    writeJson(KENNUNGS_DATEI, { aufgeloestAm: new Date().toISOString(), adressen: kennungen.adressen }, true)
-
-  /**
-   * Eine Serie wird je Lauf **einmal** geholt, nicht einmal je Adresse.
-   *
-   * Der Bestand ist nach Adresse geschlüsselt, und dieselbe Serie steht mehrfach
-   * darin: `http://` und `https://`, Slug-Form und `/series/`-Form. Von 959
-   * Adressen führen 283 die Kennung schon selbst; die übrigen lösen sich beim
-   * Auflösen reihenweise auf dieselben Kennungen auf. Ohne diese Zwischenablage
-   * wäre jede Dublette ein zweiter vollständiger Abruf über alle Staffeln.
-   */
-  const jeSerie = new Map<string, CrSerie>()
-  let neuAufgeloest = 0
-  let ohneKennung = 0
-  let gesperrt = false
-
-  for (const [i, url] of adressen.entries()) {
-    const kurz = url.replace(/^https?:\/\/(www\.)?crunchyroll\.com\/de\//, '')
-    try {
-      /**
-       * Schritt 1: die Serienkennung.
-       *
-       * Steht sie in der Adresse, ist nichts zu tun. Sonst kostet sie einen
-       * Seitenaufruf — und der wird festgehalten, damit er einmalig bleibt.
-       * Eine Adresse, die schon als „nicht verfügbar" im Bestand steht, wird
-       * dabei nicht noch einmal angefasst: Sie hat ihre Antwort.
-       */
-      let seriesId = crunchyrollSeriesId(url) ?? kennungen.adressen[url]?.seriesId
-      const bekannt = kennungen.adressen[url]
-      // Ein gefundener Eintrag hält ewig, ein Fehlschlag nur bis zur
-      // Wiedervorlage — siehe `KennungsEintrag`. Und weil ein Fehlschlag keine
-      // Auskunft ist, gilt für ihn die kurze Frist.
-      const nochmal = !bekannt || (!bekannt.seriesId && (NUR_FEHLER || bekannt.geprueftAm < fehlerGrenze))
-      if (!seriesId && nochmal && !bestand.get(url)?.nichtVerfuegbar) {
-        const befund = await (await seitenHolen()).seitenBefund(url)
-        // Zeigt der Verweis auf eine einzelne Folge, steht die Serie nicht auf
-        // der Seite, aber in der Folgenkennung.
-        seriesId =
-          befund.seriesId ?? (await serieHinterFolge(quelle, befund.ziel)) ?? (await serieHinterFolge(quelle, url))
-        kennungen.adressen[url] = {
-          seriesId,
-          ziel: befund.ziel,
-          geprueftAm: todayIso(),
-          fehler: seriesId ? undefined : (befund.zeile ?? 'keine Serienkennung hinter dieser Adresse'),
-          art: seriesId ? undefined : befund.art,
-        }
-        neuAufgeloest++
-        // Die Seite hat gerade selbst gesagt, dass es die Serie nicht gibt.
-        // Das ist derselbe Beleg wie beim alten Weg — und er kostet hier keinen
-        // zusätzlichen Aufruf, weil die Seite ohnehin geladen wurde.
-        if (!seriesId && befund.art) {
-          const serie: CrSerie = {
-            url,
-            quelle: 'api',
-            nichtVerfuegbar: true,
-            geprueftAm: todayIso(),
-            fehler: befund.zeile,
-          }
-          bestand.set(url, serie)
-          melden(i, kurz, serie)
-          if (i % 10 === 9) {
-            sichern()
-            kennungenSichern()
-          }
-          void melde(i + 1, kurz)
-          continue
-        }
-      }
-
-      if (!seriesId) {
-        ohneKennung++
-        /**
-         * Ohne Kennung ist über diese Adresse nichts zu sagen — und „nichts zu
-         * sagen" ist ein `fehler`, kein `deutschImAngebot: false`. Ein
-         * Fehlschlag als Befund ist der Fehler, den dieses Projekt an vier
-         * Stellen schon gemacht hat.
-         */
-        // Hat die Seite beim Auflösen selbst gesagt, dass es sie nicht gibt,
-        // bleibt das ein Befund — auch dann, wenn sie diesmal nicht noch einmal
-        // aufgerufen wurde.
-        const serie: CrSerie = {
-          url,
-          quelle: 'api',
-          geprueftAm: todayIso(),
-          nichtVerfuegbar: kennungen.adressen[url]?.art ? true : undefined,
-          fehler: kennungen.adressen[url]?.fehler ?? 'keine Serienkennung zu dieser Adresse',
-        }
-        bestand.set(url, serie)
-        melden(i, kurz, serie)
-        if (i % 10 === 9) sichern()
-        void melde(i + 1, kurz)
-        continue
-      }
-
-      const schon = jeSerie.get(seriesId)
-      const serie = schon ? { ...schon, url } : await serieLesen(quelle, url, seriesId, seitenHolen)
-      if (!schon) jeSerie.set(seriesId, serie)
-      /*
-        **Ein Fehlersatz überschreibt keinen guten Eintrag** (17.09.2026). Antwortet die
-        Content-API einmal nicht, trug der Eintrag danach keine Staffeln — und der Bau
-        entfernte den Verweis als „deutscher Katalog führt keine Staffel". Der alte Stand
-        bleibt stehen, samt Prüfdatum: So kommt die Serie beim nächsten Lauf gleich wieder dran.
-      */
-      if (serieAblegen(bestand, url, serie, seriesId, neuFolgen) === 'behalten') {
-        gestoert++
-        melden(i, kurz, bestand.get(url)!)
-        continue
-      }
-      // Gezählt wird nur, wo die Antwort auch eine ist: „nicht verfügbar" und
-      // „keine Auskunft" sind kein „ohne deutsche Tonspur".
-      if (serie.deutschImAngebot === false) ohneDeutsch++
-      melden(i, kurz, serie)
-    } catch (err) {
-      /**
-       * Eine geschlossene Tür wird nicht 200-mal angeklopft.
-       *
-       * Am 21.08.2026 zog Crunchyroll nach rund 300 Serien die Bot-Sperre. Der
-       * Lauf machte weiter, scheiterte an jeder weiteren Adresse — und weil
-       * `page.goto` fehlschlug, ohne die Seite zu wechseln, schrieb er 91
-       * Adressen die Staffelliste der Aufwärmseite zu. Beides ist behoben; hier
-       * steht die zweite Hälfte davon: aufhören, sichern, den Rest beim
-       * nächsten Lauf holen.
-       */
-      /**
-       * Läuft die Unterschrift mitten im Lauf ab, ist der Lauf zu Ende.
-       *
-       * Weiterzumachen hieße hier, ab dieser Stelle den US-Katalog zu lesen und
-       * ihn in dieselbe Datei zu schreiben — genau das, was der harte Abbruch
-       * beim Start verhindern soll, nur unbemerkt in der Mitte. Der Fehler
-       * fliegt deshalb weiter nach oben und macht den Lauf rot: Wer die Meldung
-       * sieht, holt ein frisches Paket.
-       */
-      if (err instanceof ZugangspaketFehlt) throw err
-      if (err instanceof CrunchyrollGesperrt) {
-        gesperrt = true
-        warn(`Crunchyroll hat nach ${i} Adressen dichtgemacht: ${(err as Error).message}`)
-        warn('Der Lauf endet hier. Was gelesen ist, bleibt; der Rest kommt beim nächsten Lauf dran.')
-        break
-      }
-      // Wie beim alten Weg: Ein Fehlschlag wird nicht gespeichert. Die Adresse
-      // bleibt offen und kommt beim nächsten Lauf erneut dran.
-      warn(`${url}: ${(err as Error).message.slice(0, 100)}`)
-    }
-    if (i % 10 === 9) {
-      sichern()
-      kennungenSichern()
-    }
-    void melde(i + 1, kurz)
-  }
-
-  await seiten?.schliessen()
-  await browserHalter.aktuell()?.close()
-
-  sichern()
-  kennungenSichern()
-  recordSource('crunchyroll-dub', bestand.size, bestand.size ? undefined : 'keine Serie gelesen')
-  const termine = [...jeSerie.values()].reduce(
-    (n, s) => n + (s.staffeln ?? []).reduce((m, st) => m + (st.deutscheFolgen ?? []).filter((f) => f.verfuegbarAb).length, 0),
-    0,
-  )
-  log(
-    `Fertig: ${bestand.size} Adressen im Bestand, ${jeSerie.size} Serien in diesem Lauf gelesen, ` +
-      `${ohneDeutsch} davon ohne deutsche Tonspur` +
-      (gestoert ? `, ${gestoert} Fehlersatz/Fehlersätze verworfen (alter Stand behalten)` : ''),
-  )
-  if (neuAufgeloest) log(`${neuAufgeloest} Adressen neu in eine Serienkennung aufgelöst, ${ohneKennung} ohne Kennung`)
-  log(`${termine} deutsche Folgen mit belegtem Termin aus der Content-API`)
-  // Kein Fehler-Exit: Die Sperre ist kein kaputter Lauf, sondern ein früh
-  // beendeter. Ein roter Lauf für etwas, das sich von selbst wieder öffnet,
-  // wäre eine Warnung, auf die man aufhört hinzusehen.
-  if (gesperrt) log('Abgebrochen wegen Crunchyrolls Bot-Sperre — der Rest steht beim nächsten Lauf wieder offen.')
+  const melden = (i: number, kurz: string, serie: CrSerie) => log(serienZeile(i, adressen.length, kurz, serie))
+  const stand = { adressen, bestand, neuFolgen, fehlerGrenze, melden, melde, sichern }
+  if (SEITENANZEIGE) await leseSeitenanzeige(browserHalter, stand)
+  else await leseRegelweg(zugang, browserHalter, stand)
 }
 
 main().catch((err) => {

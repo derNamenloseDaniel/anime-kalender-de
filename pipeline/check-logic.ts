@@ -4620,7 +4620,7 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
   )
   pruefe(
     'eine neue deutsche Folge hebt die Crunchyroll-Frist auf',
-    readFileSync('pipeline/scrape-crunchyroll-dub.ts', 'utf8').includes('neuSeit'),
+    readFileSync('pipeline/lib/cr-dub-auswahl.ts', 'utf8').includes('neuSeit'),
     'sonst erfährt die Seite von einer neuen Synchro erst Wochen später',
   )
   /*
@@ -4631,6 +4631,7 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
   */
   {
     const scrape = readFileSync('pipeline/scrape-crunchyroll-dub.ts', 'utf8')
+    const auswahl = readFileSync('pipeline/lib/cr-dub-auswahl.ts', 'utf8')
     const taeglich = readFileSync('.github/workflows/refresh-data.yml', 'utf8')
     pruefe(
       'der tägliche Lauf beurteilt die Neuzugänge selbst',
@@ -4639,7 +4640,7 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
     )
     pruefe(
       '`--nur-neu` filtert die Adressliste, nicht nur die Frist',
-      /if \(NUR_NEU\) \{[\s\S]{0,600}adressen = adressen\.filter/.test(scrape),
+      /if \(o\.nurNeu\) adressen = nurNeuzugaenge\(adressen,/.test(auswahl) && /const treffer = adressen\.filter/.test(auswahl),
       'sonst zieht der tägliche Lauf jede nie geprüfte Serie mit — beim ersten Mal den ganzen Rückstand',
     )
     pruefe(

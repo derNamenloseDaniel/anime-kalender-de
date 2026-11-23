@@ -5,7 +5,7 @@ import { createRequire } from 'node:module'
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { bedingung, dateiFreigeben, erfuellt, jetztZeile, lauf, liveBundles, verschiebe, wartende, DROSSEL_MS } from './wartet-auf.mjs'
+import { bedingung, dateiFreigeben, erfuellt, jetztZeile, lauf, liveBundles, meldung, verschiebe, wartende, DROSSEL_MS, GESAMT_PROMPT_MS, GESAMT_START_MS } from './wartet-auf.mjs'
 
 const require = createRequire(import.meta.url)
 const { waechter, berlinEpoche } = require('./stand-waechter.js')
@@ -160,8 +160,91 @@ assert.ok(!waechter(jetztMitWarte, Date.now(), () => true, lies2, aend).includes
 // Wächter: ⏳-Zeile auf jetzt/…md ohne {wartet}
 const spaeter = (z) => `### Jetzt\n### Später\n${z}\n`
 const ohne = waechter(spaeter('- ⏳ [E95 · Netflix](file:///C:/code/ai/anime-kalender-de/daniel-zum-abarbeiten/jetzt/e95.md) — sobald'), Date.now(), () => true, () => null, aend)
-assert.match(ohne, /Später: 1 Zeile \(.*E95.*\) verlinkt eine Jetzt-Datei ohne \{wartet: …\}/)
-assert.ok(!waechter(spaeter('- ⏳ [E95 · Netflix](file:///C:/code/ai/anime-kalender-de/daniel-zum-abarbeiten/jetzt/e95.md) {wartet: pr:1 → 🔴}'), Date.now(), () => true, () => null, aend).includes('ohne {wartet'), 'mit Bedingung keine Meldung')
-assert.ok(!waechter(spaeter('- ⏳ **Aoashi nachmessen** — ich prüfe selbst'), Date.now(), () => true, () => null, aend).includes('ohne {wartet'), 'ohne Jetzt-Datei-Link keine Meldung')
+assert.match(ohne, /Später: 1 Zeile \(.*E95.*\) verlinkt eine Jetzt-Datei ohne gültiges \{wartet: … → <Icon>\} am Zeilenende/)
+const E95_LINK = '[E95 · Netflix](file:///C:/code/ai/anime-kalender-de/daniel-zum-abarbeiten/jetzt/e95.md)'
+const spaeterMeldung = (z) => waechter(spaeter(z), Date.now(), () => true, () => null, aend).includes('ohne gültiges')
+assert.equal(spaeterMeldung(`- ⏳ ${E95_LINK} {wartet: pr:1 → 🔴}`), false, 'mit gültiger Bedingung keine Meldung')
+assert.equal(spaeterMeldung('- ⏳ **Aoashi nachmessen** — ich prüfe selbst'), false, 'ohne Jetzt-Datei-Link keine Meldung')
+assert.equal(spaeterMeldung(`- ⏳ ${E95_LINK} {wartet: pr:1}`), true, 'Klammer ohne → Icon meldet (R1 A2)')
+assert.equal(spaeterMeldung(`- ⏳ ${E95_LINK} {wartet: pr:1 → 🔴} danach Text`), true, 'Text hinter der Klammer meldet')
+
+// R1 A2: unlesbare Klammer wird gemeldet, nie still übersprungen (einmal je Tag)
+const kaputt = ['### Jetzt', '### Später', `- ⏳ ${E95_LINK} {wartet: pr:1}`, `- ⏳ ${E95_LINK.replace('E95', 'E96')} {wartet: pr:2 → 🔴} Rest`]
+const kw = wartende(kaputt)
+assert.equal(kw.length, 2)
+assert.ok(kw.every((x) => x.bedingungen === null), 'beide unlesbar')
+writeFileSync(standPfad, `${kaputt.join('\n')}\n`)
+writeFileSync(statePfad, '{}')
+const unl = await fahre(dienste(true, 'x'))
+assert.match(unl, /\[Wartet unlesbar\] E95: \{wartet: …\} muss am Zeilenende stehen/)
+assert.match(unl, /\[Wartet unlesbar\] E96:/)
+assert.equal(await fahre(dienste(true, 'x')), '', 'am selben Tag nicht noch einmal')
+assert.equal(readFileSync(standPfad, 'utf8'), `${kaputt.join('\n')}\n`, 'unlesbare Zeilen werden nie verschoben')
+
+// R1 A1: Lazy-Chunks werden mitgelesen; Tiefe und Anzahl sind begrenzt; ein fehlender Chunk = Nichtauskunft
+const SITE = 'https://anime-kalender.de/'
+const seite = (dateien) => async (u) => {
+  const t = dateien[String(u)]
+  return t == null ? { ok: false, status: 404, text: async () => '' } : { ok: true, status: 200, text: async () => t }
+}
+const kette = {
+  [SITE]: '<script type="module" src="/assets/index-A.js"></script>',
+  [`${SITE}assets/index-A.js`]: 'x=()=>import("./Dialog-B.js");m=["assets/Lazy-C.js","assets/Lazy-C.js"]',
+  [`${SITE}assets/Dialog-B.js`]: 'import{a}from"./Tief-D.js";const BASIS_KEY="favoritenAbgleichBasis"',
+  [`${SITE}assets/Lazy-C.js`]: 'const t="Oberflächentext aus Lazy-C"',
+  [`${SITE}assets/Tief-D.js`]: 'import"./Tief-E.js"',
+  [`${SITE}assets/Tief-E.js`]: 'import"./Tief-F.js"',
+  [`${SITE}assets/Tief-F.js`]: 'const zuTief="nicht mehr gelesen"',
+}
+const gesamt = await liveBundles(seite(kette))
+assert.ok(gesamt.includes('favoritenAbgleichBasis'), 'String-Literal aus Lazy-Chunk (./ relativ zum Chunk) gefunden')
+assert.ok(gesamt.includes('Oberflächentext aus Lazy-C'), 'assets/-Verweis aus dem Hauptbundle gefunden')
+assert.ok(!gesamt.includes('nicht mehr gelesen'), 'Tiefe ist begrenzt (Hauptbundle = Ebene 0, höchstens 3 weitere)')
+assert.equal(await liveBundles(seite({ ...kette, [`${SITE}assets/Lazy-C.js`]: undefined })), null, 'Lazy-Chunk 404 = Nichtauskunft')
+const viele = { [SITE]: '<script src="/assets/i.js"></script>', [`${SITE}assets/i.js`]: Array.from({ length: 200 }, (_, n) => `"assets/c${n}.js"`).join(',') }
+const geholt = []
+await liveBundles(async (u) => { geholt.push(String(u)); return seite(viele)(u) })
+assert.ok(geholt.length <= 81, `höchstens 80 Dateien (+ index.html), geholt: ${geholt.length}`)
+
+// R1 A4: Zeile wurde zwischen Prüfung und Schreiben von einem anderen Prozess verschoben: nichts doppelt, nichts überschrieben
+einrichten()
+const fremd = async () => {
+  const sonst = readFileSync(standPfad, 'utf8').split('\n').filter((z) => !z.includes('E113 · Gemerkte')).join('\n')
+  writeFileSync(standPfad, sonst.replace('### Jetzt\n', '### Jetzt\n- 🔴 [E113 · Gemerkte Titel](x)\n'))
+  return true
+}
+assert.equal(await fahre({ jetzt: JETZT_MS, pr: fremd, bundles: async () => 'favoritenAbgleichBasis' }), '', 'keine Erfolgsmeldung, wenn die Zeile schon weg ist')
+const nachFremd = readFileSync(standPfad, 'utf8')
+assert.equal(nachFremd.split('\n').filter((z) => z.includes('E113')).length, 1, 'E113 genau einmal')
+assert.ok(nachFremd.includes('E95 · Netflix') && nachFremd.includes('17.11. Aufräumen'), 'keine fremde Zeile entfernt (kein splice(-1))')
+
+// R1 A5: erfüllte Meldung bleibt im Zustand, bis sie ausgegeben wurde (auch bei Drossel)
+einrichten()
+writeFileSync(statePfad, JSON.stringify({ zuletzt: JETZT_MS, ungemeldet: ['[Wartet erfüllt] E9 nach Jetzt geholt — Daniel im Chat Bescheid geben'] }))
+assert.match(await fahre(dienste(false, ''), { drosseln: true }), /\[Wartet erfüllt\] E9/, 'liegengebliebene Meldung kommt trotz Drossel')
+assert.equal(await fahre(dienste(false, ''), { drosseln: true }), '', 'danach nur einmal')
+assert.deepEqual(JSON.parse(readFileSync(statePfad, 'utf8')).ungemeldet, [], 'Zustand geleert')
+writeFileSync(statePfad, JSON.stringify({ ungemeldet: ['[Wartet erfüllt] E8 alt'] }))
+assert.match(await fahre(dienste(false, '')), /\[Wartet erfüllt\] E8 alt/, 'auch ein voller Lauf gibt Liegengebliebenes aus, statt es zu überschreiben')
+
+// R1 A3/A6: langsame Dienste. Zeilen laufen parallel; Gesamtgrenze und Drossel; zuletzt steht schon vor den Abrufen
+const langsam = (ms, wert) => new Promise((ok) => setTimeout(() => ok(wert), ms))
+writeFileSync(standPfad, ['### Jetzt', '### Später', '- ⏳ **E1 a** {wartet: pr:1 → 🔴}', '- ⏳ **E2 b** {wartet: pr:2 → 🔴}', '- ⏳ **E3 c** {wartet: pr:3 → 🔴}', ''].join('\n'))
+writeFileSync(statePfad, '{}')
+let t0 = Date.now()
+await fahre({ jetzt: JETZT_MS, pr: () => langsam(300, false), bundles: async () => '' })
+const dauer = Date.now() - t0
+assert.ok(dauer < 700, `drei Zeilen à 300 ms laufen parallel (gemessen ${dauer} ms, sequentiell wären ≥ 900)`)
+writeFileSync(statePfad, '{}')
+let angefragt = 0
+const haengt = { jetzt: JETZT_MS, pr: () => { angefragt++; return langsam(1500, true) }, bundles: async () => '' }
+t0 = Date.now()
+assert.equal(await meldung('prompt', { standPfad, statePfad, dienste: haengt, gesamtMs: 150, ms: JETZT_MS }), '', 'hängende Dienste: nach der Gesamtgrenze leer')
+assert.ok(Date.now() - t0 < 1500, `Gesamtgrenze hält (gemessen ${Date.now() - t0} ms)`)
+assert.equal(JSON.parse(readFileSync(statePfad, 'utf8')).zuletzt, JETZT_MS, 'zuletzt vor den Abrufen gesetzt')
+const vorher = angefragt
+await meldung('prompt', { standPfad, statePfad, dienste: haengt, gesamtMs: 150, ms: JETZT_MS + 1000 })
+assert.equal(angefragt, vorher, 'Drossel: der nächste Prompt fragt nicht noch einmal')
+assert.equal(GESAMT_PROMPT_MS <= 3000 && GESAMT_START_MS >= GESAMT_PROMPT_MS, true, 'Prompt höchstens 3 s, SessionStart darf länger')
 
 console.log('wartet-auf-test: ok')

@@ -212,7 +212,9 @@ function jetztDateien(text, lies, aenderung) {
   return meldungen
 }
 
-const ERST_WENN = /^> ⚠ \*\*(?:Kann veraltet sein|Verfallen):\*\*.*erst handeln, wenn/m
+/** Gleich streng wie `WARTET` in wartet-auf.mjs: Klammer am Zeilenende, Bedingung, „→“, Icon. */
+const GUELTIG_WARTET = /\{wartet:\s*.+?\s*→\s*\S+\s*\}\s*$/u
+const ERST_WENN =/^> ⚠ \*\*(?:Kann veraltet sein|Verfallen):\*\*.*erst handeln, wenn/m
 
 /** ⏳-Zeilen unter „### Später“, die auf eine Jetzt-Datei verlinken und kein `{wartet: …}` tragen: sonst holt sie nichts zurück und sie wird vergessen (Daniel, 23.11.2026). */
 function spaeterOhneBedingung(zeilen) {
@@ -220,8 +222,8 @@ function spaeterOhneBedingung(zeilen) {
   if (kopf < 0) return []
   let ende = zeilen.findIndex((z, i) => i > kopf && z.startsWith('#'))
   if (ende < 0) ende = zeilen.length
-  const ohne = zeilen.slice(kopf + 1, ende).filter((z) => z.startsWith('- ⏳') && /\(file:\/\/\/[^)]*\/jetzt\/[^)]*\.md/.test(z) && !/\{wartet:[^}]*\}/.test(z))
-  return ohne.length ? [`Später: ${aufzaehlung(ohne)} verlinkt eine Jetzt-Datei ohne {wartet: …} — sonst holt sie nichts zurück (Syntax: Skill daniel-dateien-pflegen)`] : []
+  const ohne = zeilen.slice(kopf + 1, ende).filter((z) => z.startsWith('- ⏳') && /\(file:\/\/\/[^)]*\/jetzt\/[^)]*\.md/.test(z) && !GUELTIG_WARTET.test(z))
+  return ohne.length ? [`Später: ${aufzaehlung(ohne)} verlinkt eine Jetzt-Datei ohne gültiges {wartet: … → <Icon>} am Zeilenende — sonst holt sie nichts zurück (Syntax: Skill daniel-dateien-pflegen)`] : []
 }
 
 /** Meldungstext oder '' (alles in Ordnung). `existiert` prüft Dateipfade (Standard fs.existsSync), `lies` liest Jetzt-Dateien, `aenderung` liefert deren Änderungszeit. */

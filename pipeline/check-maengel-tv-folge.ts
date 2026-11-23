@@ -31,7 +31,7 @@ const messe = (releases: Release[], ...folgen: [string, string?][]) => titelMitS
 pruefe('Fixture „Ein Lied im Sturm“ (nicht in der Liste) ohne Nummer: Mangel', messe([tvTermin('Super RTL')], [UNBEKANNT]).has(ID))
 pruefe('Wikipedia-Schreibweise „Lied im Nebel“: Nummer gefunden, kein Mangel', !messe([tvTermin('Super RTL')], ['Lied im Nebel']).has(ID))
 pruefe('Sender-Schreibweise „Ein Lied im Nebel“ (Wikipedia: ohne Artikel): Nummer über den Artikel-Rückfall, kein Mangel', !messe([tvTermin('Super RTL')], ['Ein Lied im Nebel']).has(ID))
-pruefe('Vorspann „Pokémon Horizonte: Ein Lied im Nebel“ fällt weg, kein Mangel', !messe([tvTermin('Super RTL')], ['Pokémon Horizonte: Ein Lied im Nebel']).has(ID))
+pruefe('Vorspann „Pokémon Horizonte: Ein Lied im Nebel“ wird nicht gestrichen (falsche Folge wäre möglich): Mangel bleibt', messe([tvTermin('Super RTL')], ['Pokémon Horizonte: Ein Lied im Nebel']).has(ID))
 pruefe('Schreibvariante „Lied im Nebl“ (ein Zeichen daneben): Nummer über aehnlicherKern, kein Mangel', !messe([tvTermin('Super RTL')], ['Lied im Nebl']).has(ID))
 pruefe('Sendung vom 13.11. zählt, auch außerhalb des Bau-Fensters ab gestern', messe([tvTermin('Super RTL')], [UNBEKANNT]).size === 1)
 pruefe('Sendung ohne Folgentitel: kein Mangel', !messe([tvTermin('Super RTL')], ['']).has(ID))
@@ -70,12 +70,13 @@ pruefe('Umhängen: Folgentitel in der eigenen Liste → Nummer, kein Mangel', !r
 
 // Artikel-Rückfall erst ab 10 Zeichen Kern; wörtliche Treffer gelten auch kurz.
 const KURZ = 900004
-const kurzListen: WikiListen = { [KURZ]: { seite: 'D', folgen: [{ nr: 5, dt: 'Held' }, { nr: 6, dt: 'Lied am Meer' }, { nr: 7, dt: 'Lied am See' }] } }
+const kurzListen: WikiListen = { [KURZ]: { seite: 'D', folgen: [{ nr: 5, dt: 'Held' }, { nr: 6, dt: 'Lied am Meer' }, { nr: 7, dt: 'Lied am See' }, { nr: 8, dt: '?' }] } }
 const kurzTermin = { titleId: KURZ, platform: 'tv', sender: 'Super RTL', schedule: { firstEpisodeDate: '2026-09-01' } } as unknown as Release
 const kurzMessung = (folge: string) => titelMitSichtungOhneFolge([kurzTermin], [{ ...programm(folge), titleId: KURZ }], kurzListen, new Map([[KURZ, { id: KURZ }]]) as unknown as Map<number, Title>)
 pruefe('Kurz: wörtlicher Treffer „Held“ zählt', !kurzMessung('Held').has(KURZ))
 pruefe('Kurz: „Der Held“ (Kern 4 nach Artikel) wird nicht geraten', kurzMessung('Der Held').has(KURZ))
 pruefe('Kurz: „Ein Lied am Meer“ (Kern genau 10) trifft', !kurzMessung('Ein Lied am Meer').has(KURZ))
 pruefe('Kurz: „Ein Lied am See“ (Kern 9) wird nicht geraten', kurzMessung('Ein Lied am See').has(KURZ))
+pruefe('Kurz: Eintrag mit leerem Kern (dt „?“) ordnet keiner fremden Sendung seine Nummer zu', kurzMessung('Völlig anderer Folgentitel').has(KURZ))
 
 process.exit(verletzt ? 1 : 0)

@@ -189,23 +189,21 @@ export function aehnlicherKern(kerne: Iterable<string>, k: string): string | und
   return treffer.length === 1 ? treffer[0] : undefined
 }
 
-const VORSPANN = /^[^:]{3,60}:\s*/
 const FUEHRENDER_ARTIKEL = /^\s*(?:eine[nm]?|ein|der|die|das|den|dem)\s+/i
 
 /**
- * Die Nummer einer Folge in der Liste — wörtlich, sonst über den einen ähnlichen Kern (Schreibvariante); dann ohne Vorspann „Reihe: “
- * (tv.de, `sendungNeuZuordnen` streift ihn auch), zuletzt ohne führenden Artikel („Ein Lied im Nebel“ gegen „Lied im Nebel“, nur ab 10 Zeichen Kern).
+ * Die Nummer einer Folge in der Liste — wörtlich, sonst über den einen ähnlichen Kern (Schreibvariante), zuletzt wörtlich ohne führenden
+ * Artikel („Ein Lied im Nebel“ gegen „Lied im Nebel“, nur ab 10 Zeichen Kern). Ein Vorspann „Reihe: “ zählt nicht: Die Liste von One Piece führt
+ * die Fish-Man-Folgen mit eigener Zählung ab 1, die Nummer träfe die falsche Folge.
  */
 export function nummerFuer(nummern: Map<string, number> | undefined, folge: string): number | undefined {
   if (!nummern) return undefined
-  const ohneVorspann = folge.replace(VORSPANN, '')
-  for (const f of [folge, ohneVorspann, ohneVorspann.replace(FUEHRENDER_ARTIKEL, '')]) {
-    const k = folgenKern(f)
-    if (k.length < 10 && f !== folge) continue
-    const nr = nummern.get(k) ?? nummern.get(aehnlicherKern(nummern.keys(), k) ?? '')
-    if (nr !== undefined) return nr
-  }
-  return undefined
+  const k = folgenKern(folge)
+  const ahnlich = aehnlicherKern(nummern.keys(), k)
+  const treffer = nummern.get(k) ?? (ahnlich === undefined ? undefined : nummern.get(ahnlich))
+  if (treffer !== undefined) return treffer
+  const ohneArtikel = folgenKern(folge.replace(FUEHRENDER_ARTIKEL, ''))
+  return ohneArtikel.length >= 10 ? nummern.get(ohneArtikel) : undefined
 }
 
 /** Ein Staffelwechsel darf nie in einen Termin von Hand oder in eine Gruppe dieses Laufs führen: Zwei Gruppen beim selben Titel trügen denselben Slug (Pokémon Reisen, 05.10.2026). */

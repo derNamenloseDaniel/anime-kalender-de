@@ -1,12 +1,12 @@
 {
-  "scrapedAt": "2026-11-22T15:01:51.569Z",
+  "scrapedAt": "2026-11-23T05:19:15.506Z",
   "serien": [
     {
       "url": "http://www.crunchyroll.com/de/a-place-further-than-the-universe",
       "seriesId": "GYK541EPR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -126,11 +126,11 @@
       "seriesId": "GY8VJW08Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "Alderamin on the Sky: Season 1",
+          "name": "Alderamin on the Sky",
           "staffelId": "GRZXQ70ZY",
           "folgen": 13,
           "kacheln": 13,
@@ -145,25 +145,25 @@
       "seriesId": "GRP8DNZ1R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "Aldnoah.Zero: Season 1 (English Dub)",
-          "staffelId": "G69PC25X5",
+          "name": "ALDNOAH.ZERO",
+          "staffelId": "GY2P1M9MY",
           "folgen": 12,
           "kacheln": 12,
           "deutsch": 0,
-          "fremd": 12,
+          "fremd": 0,
           "deutscheFassung": false
         },
         {
-          "name": "Aldnoah.Zero: Season 2 (English Dub)",
-          "staffelId": "GR49C70ZQ",
+          "name": "ALDNOAH.ZERO",
+          "staffelId": "GS00095490JAJP",
           "folgen": 12,
           "kacheln": 12,
           "deutsch": 0,
-          "fremd": 12,
+          "fremd": 0,
           "deutscheFassung": false
         }
       ]
@@ -716,7 +716,7 @@
       "seriesId": "GRDQNE7GY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "Leider sind die Videos dieser Serie nicht mehr verfügbar."
     },
@@ -725,7 +725,7 @@
       "seriesId": "G649PJ0JY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -1001,7 +1001,7 @@
       "seriesId": "GR5VXQ8PR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -1047,7 +1047,7 @@
       "seriesId": "GYNVQ5PZR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "Leider sind die Videos dieser Serie nicht mehr verfügbar."
     },
@@ -2860,7 +2860,7 @@
       "seriesId": "GRZXD528Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -2972,7 +2972,7 @@
       "seriesId": "GRGG58V1R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -3224,7 +3224,7 @@
       "seriesId": "GRE5KGN36",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -5644,7 +5644,7 @@
       "seriesId": "GR5V1JKGR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -5679,14 +5679,14 @@
       "seriesId": "GRVN7ZW3Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
           "name": "GARO -VANISHING LINE-",
           "staffelId": "G63V5J1MY",
-          "folgen": 24,
-          "kacheln": 24,
+          "folgen": 23,
+          "kacheln": 23,
           "deutsch": 0,
           "fremd": 0,
           "deutscheFassung": false
@@ -5698,7 +5698,7 @@
       "seriesId": "GYQ4MKDZ6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -5747,7 +5747,7 @@
           "deutscheFassung": false
         },
         {
-          "name": "Gintama: Enchosen (253-265)",
+          "name": "Gintama': Enchōsen (253-265)",
           "staffelId": "GYNQ1X99Y",
           "folgen": 14,
           "kacheln": 14,
@@ -5756,7 +5756,7 @@
           "deutscheFassung": false
         },
         {
-          "name": "Gintama¨8 (266-316)",
+          "name": "Gintama° (266-316)",
           "staffelId": "G62PWWX56",
           "folgen": 51,
           "kacheln": 51,
@@ -5792,7 +5792,7 @@
           "deutscheFassung": false
         },
         {
-          "name": "Gintama Classic: OVA Season 1",
+          "name": "Gintama Classic",
           "staffelId": "GS00363216JAJP",
           "folgen": 11,
           "kacheln": 11,
@@ -6286,7 +6286,7 @@
       "seriesId": "GRVN4W13Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -7271,7 +7271,7 @@
       "seriesId": "GR79PWJ16",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -7298,7 +7298,7 @@
       "seriesId": "GJ0H7Q5X9",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -9163,11 +9163,11 @@
       "seriesId": "GY8VXP2JY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "JOKER GAME: Season 1",
+          "name": "Joker Game",
           "staffelId": "GRZXDV39Y",
           "folgen": 12,
           "kacheln": 12,
@@ -9182,7 +9182,7 @@
       "seriesId": "G6K51X9GY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -9201,16 +9201,16 @@
       "seriesId": "G68V4NDJ6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
           "name": "Junji Ito Collection",
           "staffelId": "GYZXEMJ96",
-          "folgen": 13,
+          "folgen": 14,
           "kacheln": 14,
           "deutsch": 0,
-          "fremd": 13,
+          "fremd": 14,
           "deutscheFassung": false
         }
       ]
@@ -9220,7 +9220,7 @@
       "seriesId": "GYJQVX726",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -9424,7 +9424,7 @@
       "seriesId": "GY5VEEK5Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -9629,7 +9629,7 @@
       "seriesId": "GY5VGNM0Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -9648,7 +9648,7 @@
       "seriesId": "G65VXM1P6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -10076,7 +10076,7 @@
       "seriesId": "G3KHEVPWE",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -10353,7 +10353,7 @@
       "seriesId": "GY09XN14Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -10740,7 +10740,7 @@
       "seriesId": "GR4PVJ1WY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -11487,14 +11487,14 @@
       "seriesId": "G675N15MR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
           "name": "Season 1",
           "staffelId": "G69P2XP0Y",
           "folgen": 10,
-          "kacheln": 11,
+          "kacheln": 10,
           "deutsch": 0,
           "fremd": 10,
           "deutscheFassung": false
@@ -12726,7 +12726,7 @@
       "seriesId": "G609E9EW6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -12754,7 +12754,7 @@
       "seriesId": "G6P83KDJ6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -12773,7 +12773,7 @@
       "seriesId": "GRMG8ZQZR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -12869,8 +12869,17 @@
         {
           "name": "Marineford (459-516)",
           "staffelId": "GYP8PM4KY",
-          "folgen": 58,
-          "kacheln": 58,
+          "folgen": 57,
+          "kacheln": 57,
+          "deutsch": 0,
+          "fremd": 0,
+          "deutscheFassung": false
+        },
+        {
+          "name": "One Piece Fan Letter",
+          "staffelId": "GS00392166JAJP",
+          "folgen": 1,
+          "kacheln": 1,
           "deutsch": 0,
           "fremd": 0,
           "deutscheFassung": false
@@ -12941,8 +12950,8 @@
         {
           "name": "Egghead (1089-1155)",
           "staffelId": "G65VCD972",
-          "folgen": 79,
-          "kacheln": 79,
+          "folgen": 78,
+          "kacheln": 78,
           "deutsch": 0,
           "fremd": 0,
           "deutscheFassung": false
@@ -13468,7 +13477,7 @@
       "seriesId": "G6X0J185Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -13495,7 +13504,7 @@
       "seriesId": "G6QWDD096",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -13616,7 +13625,7 @@
       "seriesId": "GRNQ13VQR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -13624,6 +13633,15 @@
           "staffelId": "GYK5PJEER",
           "folgen": 19,
           "kacheln": 19,
+          "deutsch": 0,
+          "fremd": 0,
+          "deutscheFassung": false
+        },
+        {
+          "name": "REBORN! Season 9 (190-204)",
+          "staffelId": "GS00170840JAJP",
+          "folgen": 1,
+          "kacheln": 1,
           "deutsch": 0,
           "fremd": 0,
           "deutscheFassung": false
@@ -13714,15 +13732,6 @@
           "staffelId": "G65VE3KE6",
           "folgen": 14,
           "kacheln": 14,
-          "deutsch": 0,
-          "fremd": 0,
-          "deutscheFassung": false
-        },
-        {
-          "name": "OVA 1",
-          "staffelId": "GS00391285JAJP",
-          "folgen": 1,
-          "kacheln": 1,
           "deutsch": 0,
           "fremd": 0,
           "deutscheFassung": false
@@ -14531,7 +14540,7 @@
       "seriesId": "G6P8DM3Q6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -14769,14 +14778,14 @@
       "seriesId": "G63V729XY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "Samurai Warriors: Season 1",
+          "name": "Samurai Warriors",
           "staffelId": "G6P8DK0Q6",
-          "folgen": 12,
-          "kacheln": 12,
+          "folgen": 6,
+          "kacheln": 6,
           "deutsch": 0,
           "fremd": 0,
           "deutscheFassung": false
@@ -14788,7 +14797,7 @@
       "seriesId": "G62P4MG76",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -14900,7 +14909,7 @@
       "seriesId": "G65VGXVQ6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -17461,11 +17470,11 @@
       "seriesId": "GRMGDGZVR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "Season 03",
+          "name": "The Irregular at Magic High School Staffel 3",
           "staffelId": "GRDQCG5VZ",
           "folgen": 13,
           "kacheln": 13,
@@ -17480,7 +17489,7 @@
       "seriesId": "G68VXG3G6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -17507,7 +17516,7 @@
       "seriesId": "GY5VEEK5Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -17526,7 +17535,7 @@
       "seriesId": "G60914JM6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -17553,11 +17562,11 @@
       "seriesId": "G1XHJVWXG",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "The Reincarnation of the Strongest Exorcist in Another World: Season 1",
+          "name": "The Reincarnation of the Strongest Exorcist in Another World",
           "staffelId": "G675CDXGD",
           "folgen": 13,
           "kacheln": 13,
@@ -17804,11 +17813,11 @@
       "seriesId": "G6P8DV7V6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "Yu-Gi-Oh! Duel Monsters: Season 1",
+          "name": "Yu-Gi-Oh! (Original Japanese Version)",
           "staffelId": "GR9P35GV6",
           "folgen": 49,
           "kacheln": 49,
@@ -17817,7 +17826,7 @@
           "deutscheFassung": false
         },
         {
-          "name": "Yu-Gi-Oh! Duel Monsters: Season 2",
+          "name": "Yu-Gi-Oh! Season 1 (Subtitled)",
           "staffelId": "GRW43P73Y",
           "folgen": 48,
           "kacheln": 48,
@@ -17826,7 +17835,7 @@
           "deutscheFassung": false
         },
         {
-          "name": "Yu-Gi-Oh! Duel Monsters: Season 3",
+          "name": "Yu-Gi-Oh! Season 1 (Subtitled)",
           "staffelId": "GS00115359JAJP",
           "folgen": 47,
           "kacheln": 47,
@@ -17835,7 +17844,7 @@
           "deutscheFassung": false
         },
         {
-          "name": "Yu-Gi-Oh! Duel Monsters: Season 4",
+          "name": "Yu-Gi-Oh! Season 1 (Subtitled)",
           "staffelId": "GS00115360JAJP",
           "folgen": 40,
           "kacheln": 40,
@@ -17844,21 +17853,12 @@
           "deutscheFassung": false
         },
         {
-          "name": "Yu-Gi-Oh! Duel Monsters: Season 5",
+          "name": "Yu-Gi-Oh! Season 1 (Subtitled)",
           "staffelId": "GS00115361JAJP",
           "folgen": 40,
           "kacheln": 40,
           "deutsch": 0,
           "fremd": 40,
-          "deutscheFassung": false
-        },
-        {
-          "name": "Staffel 6",
-          "staffelId": "GS00389376ENUS",
-          "folgen": 12,
-          "kacheln": 12,
-          "deutsch": 0,
-          "fremd": 12,
           "deutscheFassung": false
         }
       ]
@@ -17868,12 +17868,12 @@
       "seriesId": "G62P107J6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "Yu-Gi-Oh! 5D's: Season 1",
-          "staffelId": "G6JQV810R",
+          "name": "Yu-Gi-Oh! 5D's Season 1 (English Dub)",
+          "staffelId": "GR8V1QN4R",
           "folgen": 64,
           "kacheln": 64,
           "deutsch": 0,
@@ -17881,12 +17881,12 @@
           "deutscheFassung": false
         },
         {
-          "name": "Yu-Gi-Oh! 5D's: Season 2",
-          "staffelId": "GY2P1D2KY",
-          "folgen": 90,
-          "kacheln": 90,
+          "name": "Yu-Gi-Oh! 5D's Season 2 (English Dub)",
+          "staffelId": "GR0913V0R",
+          "folgen": 59,
+          "kacheln": 60,
           "deutsch": 0,
-          "fremd": 58,
+          "fremd": 59,
           "deutscheFassung": false
         }
       ]
@@ -17896,34 +17896,34 @@
       "seriesId": "GY8V1ED9Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "Season 1 (Original Japanese Version)",
+          "name": "Yu-Gi-Oh! GX Season 1 (English Dub)",
           "staffelId": "GRJQVGPVY",
           "folgen": 52,
           "kacheln": 52,
           "deutsch": 0,
-          "fremd": 0,
+          "fremd": 52,
           "deutscheFassung": false
         },
         {
-          "name": "Season 2 (Original Japanese Version)",
+          "name": "Yu-Gi-Oh! GX Season 2 (English Dub)",
           "staffelId": "GS00116619JAJP",
           "folgen": 52,
           "kacheln": 52,
           "deutsch": 0,
-          "fremd": 0,
+          "fremd": 52,
           "deutscheFassung": false
         },
         {
-          "name": "Season 3 (Original Japanese Version)",
-          "staffelId": "GS00116620JAJP",
-          "folgen": 52,
-          "kacheln": 52,
+          "name": "Yu-Gi-Oh! GX Season 3 (English Dub)",
+          "staffelId": "GS00116620ENUS",
+          "folgen": 1,
+          "kacheln": 1,
           "deutsch": 0,
-          "fremd": 0,
+          "fremd": 1,
           "deutscheFassung": false
         },
         {
@@ -17932,7 +17932,7 @@
           "folgen": 24,
           "kacheln": 24,
           "deutsch": 0,
-          "fremd": 0,
+          "fremd": 24,
           "deutscheFassung": false
         },
         {
@@ -17941,7 +17941,7 @@
           "folgen": 52,
           "kacheln": 52,
           "deutsch": 0,
-          "fremd": 52,
+          "fremd": 0,
           "deutscheFassung": false
         },
         {
@@ -17950,7 +17950,7 @@
           "folgen": 52,
           "kacheln": 52,
           "deutsch": 0,
-          "fremd": 52,
+          "fremd": 0,
           "deutscheFassung": false
         },
         {
@@ -17959,7 +17959,7 @@
           "folgen": 51,
           "kacheln": 51,
           "deutsch": 0,
-          "fremd": 51,
+          "fremd": 0,
           "deutscheFassung": false
         }
       ]
@@ -18081,7 +18081,7 @@
       "seriesId": "GXJHM3P19",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -18486,7 +18486,7 @@
       "seriesId": "G6QWDD096",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -20057,7 +20057,7 @@
       "seriesId": "GMTE00350182",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -21025,11 +21025,11 @@
       "seriesId": "GRMGDGZVR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "Season 03",
+          "name": "The Irregular at Magic High School Staffel 3",
           "staffelId": "GRDQCG5VZ",
           "folgen": 13,
           "kacheln": 13,
@@ -22932,7 +22932,7 @@
       "seriesId": "G6WE21DG6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -23023,7 +23023,7 @@
     {
       "url": "https://www.crunchyroll.com/beauty-water/beauty-water-unbekannt-859030",
       "quelle": "api",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "404 - Seite nicht gefunden"
     },
@@ -23172,7 +23172,7 @@
       "seriesId": "GRE5K3NQ6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "Leider sind die Videos dieser Serie nicht mehr verfügbar."
     },
@@ -23181,20 +23181,11 @@
       "seriesId": "GYEXXWD36",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "Strike Witches: Season 2",
-          "staffelId": "GY8DD340Y",
-          "folgen": 12,
-          "kacheln": 12,
-          "deutsch": 0,
-          "fremd": 0,
-          "deutscheFassung": false
-        },
-        {
-          "name": "Strike Witches: Season 3: Road to Berlin",
+          "name": "Strike Witches: Road to Berlin",
           "staffelId": "GRDV0913R",
           "folgen": 12,
           "kacheln": 12,
@@ -23209,11 +23200,29 @@
       "seriesId": "GRVNZK5PY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "A Certain Magical Index: Season 3",
+          "name": "A Certain Magical Index",
+          "staffelId": "G63VJE0XY",
+          "folgen": 24,
+          "kacheln": 24,
+          "deutsch": 0,
+          "fremd": 24,
+          "deutscheFassung": false
+        },
+        {
+          "name": "A Certain Magical Index II",
+          "staffelId": "GYX02WE5R",
+          "folgen": 24,
+          "kacheln": 24,
+          "deutsch": 0,
+          "fremd": 2,
+          "deutscheFassung": false
+        },
+        {
+          "name": "A Certain Magical Index III",
           "staffelId": "GRG5V5J4R",
           "folgen": 26,
           "kacheln": 26,
@@ -23228,11 +23237,29 @@
       "seriesId": "GRVNZK5PY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "A Certain Magical Index: Season 3",
+          "name": "A Certain Magical Index",
+          "staffelId": "G63VJE0XY",
+          "folgen": 24,
+          "kacheln": 24,
+          "deutsch": 0,
+          "fremd": 24,
+          "deutscheFassung": false
+        },
+        {
+          "name": "A Certain Magical Index II",
+          "staffelId": "GYX02WE5R",
+          "folgen": 24,
+          "kacheln": 24,
+          "deutsch": 0,
+          "fremd": 2,
+          "deutscheFassung": false
+        },
+        {
+          "name": "A Certain Magical Index III",
           "staffelId": "GRG5V5J4R",
           "folgen": 26,
           "kacheln": 26,
@@ -23247,11 +23274,29 @@
       "seriesId": "G649J4XPY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "A Certain Scientific Railgun: Season 3: T",
+          "name": "A Certain Scientific Railgun",
+          "staffelId": "GR19J7EQ6",
+          "folgen": 24,
+          "kacheln": 24,
+          "deutsch": 0,
+          "fremd": 24,
+          "deutscheFassung": false
+        },
+        {
+          "name": "A Certain Scientific Railgun S",
+          "staffelId": "GYK5J7J7R",
+          "folgen": 24,
+          "kacheln": 24,
+          "deutsch": 0,
+          "fremd": 2,
+          "deutscheFassung": false
+        },
+        {
+          "name": "A Certain Scientific Railgun T",
           "staffelId": "GYG5EE9WY",
           "folgen": 25,
           "kacheln": 25,
@@ -23291,7 +23336,7 @@
       "seriesId": "G5PHNMW59",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -23326,11 +23371,11 @@
       "seriesId": "GRWE8K5MR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "And you thought there is never a girl online?: Season 1",
+          "name": "And you thought there is never a girl online?",
           "staffelId": "GRGGZKW4R",
           "folgen": 12,
           "kacheln": 12,
@@ -23566,7 +23611,7 @@
       "seriesId": "G5PHNMW9N",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -23585,7 +23630,7 @@
       "seriesId": "GT00378122",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -23612,7 +23657,7 @@
       "seriesId": "GDKHZEDPM",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -24159,7 +24204,7 @@
       "seriesId": "G69PXP1EY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -24459,7 +24504,7 @@
       "seriesId": "GYWEQW20Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -24478,7 +24523,7 @@
       "seriesId": "GYWEQW20Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -24643,7 +24688,7 @@
       "seriesId": "GR5VXQ8PR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -24745,7 +24790,7 @@
       "seriesId": "GP5HJ85ED",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -25310,7 +25355,7 @@
       "seriesId": "GYZX2XE46",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -26241,7 +26286,7 @@
       "seriesId": "G61X24PZ6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -26929,7 +26974,7 @@
       "seriesId": "G609GE8M6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -26975,7 +27020,7 @@
       "seriesId": "GVDHX83V7",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -27214,7 +27259,7 @@
       "seriesId": "G679D84KY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -28119,7 +28164,7 @@
       "seriesId": "GYXM79M56",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -28138,7 +28183,7 @@
       "seriesId": "G63V7VN4Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -29948,7 +29993,7 @@
       "seriesId": "GR24JZ886",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -30900,7 +30945,7 @@
       "seriesId": "GRDQV2VWY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -31460,14 +31505,14 @@
       "seriesId": "G68DVV2G6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
           "name": "Pandora in the Crimson Shell: Season 1",
           "staffelId": "G6JQC14XZ",
-          "folgen": 12,
-          "kacheln": 12,
+          "folgen": 5,
+          "kacheln": 5,
           "deutsch": 0,
           "fremd": 0,
           "deutscheFassung": false
@@ -31618,7 +31663,7 @@
       "seriesId": "G9VHN9P7W",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -32133,11 +32178,11 @@
       "seriesId": "GR9P7JMV6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "Guyver: The Bioboosted Armor: Season 1",
+          "name": "Guyver: The Bioboosted Armor",
           "staffelId": "G6X0P43MY",
           "folgen": 26,
           "kacheln": 26,
@@ -36134,7 +36179,7 @@
       "seriesId": "G4PH0WXEM",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -36359,11 +36404,11 @@
       "seriesId": "G1XHJV3MV",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "Rebuilt Kingdom: Season 1",
+          "name": "How a Realist Hero Rebuilt the Kingdom",
           "staffelId": "GYVNC2VXE",
           "folgen": 26,
           "kacheln": 26,
@@ -36644,7 +36689,7 @@
       "seriesId": "G79H230GE",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -37137,7 +37182,7 @@
       "seriesId": "G9VHN9PDW",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -37291,7 +37336,7 @@
       "seriesId": "GR8DN7N7R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -38794,16 +38839,16 @@
       "seriesId": "G68V4NDJ6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
           "name": "Junji Ito Collection",
           "staffelId": "GYZXEMJ96",
-          "folgen": 13,
+          "folgen": 14,
           "kacheln": 14,
           "deutsch": 0,
-          "fremd": 13,
+          "fremd": 14,
           "deutscheFassung": false
         }
       ]
@@ -38997,7 +39042,7 @@
       "seriesId": "G68D2DQW6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -42699,7 +42744,7 @@
       "seriesId": "G24H1N3MP",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -43112,6 +43157,17 @@
             }
           ]
         }
+      ],
+      "neuFolgen": [
+        "GE00374466DEDE",
+        "GE00374465DEDE",
+        "GE00374464DEDE",
+        "GE00374463DEDE",
+        "GE00374461DEDE",
+        "GE00374462DEDE",
+        "GE00374458DEDE",
+        "GE00374459DEDE",
+        "GE00374460DEDE"
       ]
     },
     {
@@ -50449,7 +50505,7 @@
       "seriesId": "G0XHWM0D3",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -51671,7 +51727,7 @@
       "seriesId": "G24H1N3MP",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -52900,7 +52956,7 @@
       "seriesId": "G3KHEVD3E",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -53361,7 +53417,7 @@
       "seriesId": "G3KHEVDPE",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -55206,7 +55262,7 @@
       "seriesId": "G649PJ0JY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -59502,7 +59558,7 @@
       "seriesId": "G79H23Z8P",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -59834,26 +59890,26 @@
       "seriesId": "G79H23ZE3",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
-          "name": "I'm the Evil Lord of an Intergalactic Empire!",
+          "name": "Season 1",
           "staffelId": "GYWEC3DJJ",
-          "folgen": 11,
+          "folgen": 12,
           "kacheln": 12,
-          "deutsch": 11,
+          "deutsch": 12,
           "fremd": 0,
           "deutscheFassung": true,
           "deutscheFolgen": [
             {
-              "nummer": 2,
+              "nummer": 1,
               "guid": "GG1UXV5XX",
               "laufend": 1,
               "verfuegbarAb": "2025-04-27T21:00:00Z"
             },
             {
-              "nummer": 3,
+              "nummer": 2,
               "guid": "GEVUWQ328",
               "laufend": 2,
               "verfuegbarAb": "2025-05-04T21:00:00Z"
@@ -59927,7 +59983,7 @@
       "seriesId": "G79H23ZGP",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -60109,7 +60165,7 @@
       "seriesId": "G79H23ZVX",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -60202,7 +60258,7 @@
       "seriesId": "G8DHV784M",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -60295,7 +60351,7 @@
       "seriesId": "G8DHV7874",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -60303,7 +60359,7 @@
       "seriesId": "G8DHV78E7",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -60396,7 +60452,7 @@
       "seriesId": "G8DHV78Q4",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -60423,7 +60479,7 @@
       "seriesId": "G8DHV78ZM",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -60612,7 +60668,7 @@
       "seriesId": "G8DHV7E9Q",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -60620,7 +60676,7 @@
       "seriesId": "G8DHV7WJP",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -61191,7 +61247,7 @@
       "seriesId": "G9VHN9QXQ",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -61367,7 +61423,7 @@
       "seriesId": "GDKHZEJ0K",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -61683,7 +61739,7 @@
       "seriesId": "GDKHZEP8W",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -61859,7 +61915,7 @@
       "seriesId": "GEXH3W2EZ",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -61980,6 +62036,11 @@
             }
           ]
         }
+      ],
+      "neuFolgen": [
+        "GE00378390DEDE",
+        "GE00378389DEDE",
+        "GE00378391DEDE"
       ]
     },
     {
@@ -61987,7 +62048,7 @@
       "seriesId": "GEXH3W2GK",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -61995,7 +62056,7 @@
       "seriesId": "GEXH3W2N9",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -62088,7 +62149,7 @@
       "seriesId": "GEXH3W2PK",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -62181,7 +62242,7 @@
       "seriesId": "GEXH3W2V7",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -62994,7 +63055,7 @@
       "seriesId": "GG5H5X3EE",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -63170,7 +63231,7 @@
       "seriesId": "GG5H5XMWV",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -63585,7 +63646,7 @@
       "seriesId": "GG5H5XQ0D",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -63854,7 +63915,7 @@
       "seriesId": "GG5H5XQ7D",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -64082,7 +64143,7 @@
       "seriesId": "GG5H5XQED",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -64484,7 +64545,7 @@
       "seriesId": "GG5H5XQX4",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -64930,7 +64991,7 @@
       "seriesId": "GJ0H7Q5ZJ",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -65304,7 +65365,7 @@
       "seriesId": "GJ0H7QG3M",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -65397,7 +65458,7 @@
       "seriesId": "GJ0H7QG4E",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -65573,7 +65634,7 @@
       "seriesId": "GJ0H7QGME",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -65759,7 +65820,7 @@
       "seriesId": "GKEH2G0DN",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -65852,7 +65913,7 @@
       "seriesId": "GKEH2G0J4",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -65945,7 +66006,7 @@
       "seriesId": "GKEH2G0QK",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -66038,7 +66099,7 @@
       "seriesId": "GKEH2G0W9",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -66316,7 +66377,7 @@
       "seriesId": "GMEHME53W",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -66324,7 +66385,7 @@
       "seriesId": "GMEHME77W",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -66417,7 +66478,7 @@
       "seriesId": "GMEHMENP7",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -66434,7 +66495,7 @@
       "seriesId": "GMTE00002906",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -66442,7 +66503,7 @@
       "seriesId": "GMTE00002907",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -66450,7 +66511,7 @@
       "seriesId": "GMTE00002908",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -66458,7 +66519,7 @@
       "seriesId": "GMTE00002909",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -66466,7 +66527,7 @@
       "seriesId": "GMTE00002910",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -66474,7 +66535,7 @@
       "seriesId": "GMTE00002911",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -66482,7 +66543,7 @@
       "seriesId": "GMTE00002912",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -66490,7 +66551,7 @@
       "seriesId": "GMTE00002914",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -66498,7 +66559,7 @@
       "seriesId": "GMTE00002915",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -66506,7 +66567,7 @@
       "seriesId": "GMTE00002916",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -66514,7 +66575,7 @@
       "seriesId": "GMTE00002917",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -66522,7 +66583,7 @@
       "seriesId": "GMTE00002918",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -66749,7 +66810,7 @@
       "seriesId": "GMTE00351664",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -66776,7 +66837,7 @@
       "seriesId": "GMTE00374450",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -66803,7 +66864,7 @@
       "seriesId": "GMTE00376679",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -66993,7 +67054,7 @@
       "seriesId": "GNVHKN903",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -67181,7 +67242,7 @@
       "seriesId": "GNVHKN92K",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -67208,7 +67269,7 @@
       "seriesId": "GNVHKN933",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -67588,7 +67649,7 @@
       "seriesId": "GNVHKNPW1",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -67753,7 +67814,7 @@
       "seriesId": "GP5HJ8417",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -67846,7 +67907,7 @@
       "seriesId": "GP5HJ8425",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -67873,7 +67934,7 @@
       "seriesId": "GP5HJ84D2",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -68034,10 +68095,10 @@
         {
           "name": "Nikkō-Kegon-Fälle-Arc",
           "staffelId": "GS00390545JAJP",
-          "folgen": 5,
-          "kacheln": 5,
+          "folgen": 8,
+          "kacheln": 8,
           "deutsch": 0,
-          "fremd": 4,
+          "fremd": 8,
           "deutscheFassung": false
         }
       ]
@@ -68047,7 +68108,7 @@
       "seriesId": "GP5HJ84P7",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -68212,7 +68273,7 @@
       "seriesId": "GQWH0M17X",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -68320,7 +68381,7 @@
       "seriesId": "GQWH0M1J3",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -68485,7 +68546,7 @@
       "seriesId": "GQWH0M1K3",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -68493,7 +68554,7 @@
       "seriesId": "GQWH0M1P3",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -68586,7 +68647,7 @@
       "seriesId": "GQWH0M1XK",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -68855,7 +68916,7 @@
       "seriesId": "GQWH0M4NN",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -68863,7 +68924,7 @@
       "seriesId": "GQWH0M9N8",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -69039,7 +69100,7 @@
       "seriesId": "GQWH0MPQ7",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -69297,11 +69358,11 @@
       "seriesId": "GR24GNVM6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-08-22",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
-          "name": "Vampire Knight",
+          "name": "Vampire Knight: Season 1",
           "staffelId": "G609CXD47",
           "folgen": 13,
           "kacheln": 13,
@@ -69312,80 +69373,80 @@
             {
               "nummer": 1,
               "guid": "GJWUQ2V09",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 1
+              "laufend": 1,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 2,
               "guid": "GN7UND411",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 2
+              "laufend": 2,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 3,
               "guid": "GK9UG3XKE",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 3
+              "laufend": 3,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 4,
               "guid": "GMKUEXV19",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 4
+              "laufend": 4,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 5,
               "guid": "GVWU809MX",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 5
+              "laufend": 5,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 6,
               "guid": "G31UVX9N2",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 6
+              "laufend": 6,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 7,
               "guid": "GPWU8KG9K",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 7
+              "laufend": 7,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 8,
               "guid": "G2XUN0Q7N",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 8
+              "laufend": 8,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 9,
               "guid": "G8WU7NMJ5",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 9
+              "laufend": 9,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 10,
               "guid": "GZ7UDV4G5",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 10
+              "laufend": 10,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 11,
               "guid": "GD9UEVXM1",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 11
+              "laufend": 11,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 12,
               "guid": "GQJUMG254",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 12
+              "laufend": 12,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 13,
               "guid": "G50UMZ502",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 13
+              "laufend": 13,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             }
           ]
         },
@@ -69401,80 +69462,80 @@
             {
               "nummer": 1,
               "guid": "GWDU78D2P",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 14
+              "laufend": 14,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 2,
               "guid": "GG1UX2GJE",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 15
+              "laufend": 15,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 3,
               "guid": "G0DUMN824",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 16
+              "laufend": 16,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 4,
               "guid": "GEVUWZE74",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 17
+              "laufend": 17,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 5,
               "guid": "G7PU3497Z",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 18
+              "laufend": 18,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 6,
               "guid": "G9DU9E30J",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 19
+              "laufend": 19,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 7,
               "guid": "GX9U3Q0E5",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 20
+              "laufend": 20,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 8,
               "guid": "G4VUWQ252",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 21
+              "laufend": 21,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 9,
               "guid": "G14UV4M7G",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 22
+              "laufend": 22,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 10,
               "guid": "GJWUQ2VW9",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 23
+              "laufend": 23,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 11,
               "guid": "GN7UND4M1",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 24
+              "laufend": 24,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 12,
               "guid": "GK9UG3XEE",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 25
+              "laufend": 25,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             },
             {
               "nummer": 13,
               "guid": "G50UMZ1KK",
-              "verfuegbarAb": "2026-03-17T21:30:00Z",
-              "laufend": 26
+              "laufend": 26,
+              "verfuegbarAb": "2026-03-17T21:30:00Z"
             }
           ]
         }
@@ -69485,7 +69546,7 @@
       "seriesId": "GR4980206",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -69501,7 +69562,7 @@
       "seriesId": "GR9P57W96",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -69823,7 +69884,7 @@
       "seriesId": "GRDV0019R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -71906,7 +71967,7 @@
       "seriesId": "GRGG9798R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-09",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -72684,7 +72745,7 @@
       "seriesId": "GRVN8MNQY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -73284,7 +73345,7 @@
       "seriesId": "GRZXQJJ8Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-12",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -73662,7 +73723,7 @@
       "seriesId": "GT00258001",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -73761,7 +73822,7 @@
       "seriesId": "GT00356809",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -74002,7 +74063,7 @@
       "seriesId": "GT00362253",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -74095,7 +74156,7 @@
       "seriesId": "GT00364840",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -74188,7 +74249,7 @@
       "seriesId": "GT00365079",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -74196,7 +74257,7 @@
       "seriesId": "GT00365556",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -74289,7 +74350,7 @@
       "seriesId": "GT00365568",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -74464,6 +74525,14 @@
             }
           ]
         }
+      ],
+      "neuFolgen": [
+        "GE00366196DEDE",
+        "GE00366194DEDE",
+        "GE00366195DEDE",
+        "GE00366193DEDE",
+        "GE00366192DEDE",
+        "GE00366191DEDE"
       ]
     },
     {
@@ -74471,7 +74540,7 @@
       "seriesId": "GT00365624",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -74646,6 +74715,15 @@
             }
           ]
         }
+      ],
+      "neuFolgen": [
+        "GE00366891DEDE",
+        "GE00366890DEDE",
+        "GE00366888DEDE",
+        "GE00366889DEDE",
+        "GE00366886DEDE",
+        "GE00366887DEDE",
+        "GE00366885DEDE"
       ]
     },
     {
@@ -74662,7 +74740,7 @@
       "seriesId": "GT00365787",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -74755,7 +74833,7 @@
       "seriesId": "GT00366791",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -75008,7 +75086,7 @@
       "seriesId": "GT00371857",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -75107,7 +75185,7 @@
       "seriesId": "GT00371881",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -75395,7 +75473,7 @@
       "seriesId": "GT00371896",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -75502,7 +75580,7 @@
       "seriesId": "GT00377907",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -75588,6 +75666,11 @@
             }
           ]
         }
+      ],
+      "neuFolgen": [
+        "GE00377920DEDE",
+        "GE00377918DEDE",
+        "GE00377919DEDE"
       ]
     },
     {
@@ -75595,7 +75678,7 @@
       "seriesId": "GT00378078",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-31",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -75810,7 +75893,7 @@
       "seriesId": "GVDHX8504",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -76162,7 +76245,7 @@
       "seriesId": "GVDHX8548",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -76255,7 +76338,7 @@
       "seriesId": "GVDHX859Q",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -76699,7 +76782,7 @@
       "seriesId": "GW4HM79VM",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -76875,7 +76958,7 @@
       "seriesId": "GW4HM7WK9",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -77051,7 +77134,7 @@
       "seriesId": "GW4HM7WQ5",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -77169,7 +77252,7 @@
       "seriesId": "GXJHM39MP",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -77426,7 +77509,7 @@
       "seriesId": "GXJHM3GG8",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -77633,7 +77716,7 @@
       "seriesId": "GXJHM3PK5",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -78124,7 +78207,7 @@
       "seriesId": "GY4PD7Z06",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -78335,7 +78418,7 @@
       "seriesId": "GY5P48XEY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -78343,167 +78426,9 @@
           "staffelId": "GRW4JP20Y",
           "folgen": 26,
           "kacheln": 26,
-          "deutsch": 26,
-          "fremd": 0,
-          "deutscheFassung": true,
-          "deutscheFolgen": [
-            {
-              "nummer": 1,
-              "guid": "GEVUZ4XW2",
-              "laufend": 1,
-              "verfuegbarAb": "2019-04-07T04:30:00Z"
-            },
-            {
-              "nummer": 2,
-              "guid": "G7PU4XM3E",
-              "laufend": 2,
-              "verfuegbarAb": "2019-04-14T04:30:00Z"
-            },
-            {
-              "nummer": 3,
-              "guid": "G9DUE1598",
-              "laufend": 3,
-              "verfuegbarAb": "2019-04-21T04:30:00Z"
-            },
-            {
-              "nummer": 4,
-              "guid": "G14U4W9V9",
-              "laufend": 4,
-              "verfuegbarAb": "2019-04-28T04:30:00Z"
-            },
-            {
-              "nummer": 5,
-              "guid": "GJWU259Q0",
-              "laufend": 5,
-              "verfuegbarAb": "2019-05-05T04:30:00Z"
-            },
-            {
-              "nummer": 6,
-              "guid": "GK9U35MWV",
-              "laufend": 6,
-              "verfuegbarAb": "2019-05-12T04:30:00Z"
-            },
-            {
-              "nummer": 7,
-              "guid": "GVWU0QW12",
-              "laufend": 7,
-              "verfuegbarAb": "2019-05-19T04:30:00Z"
-            },
-            {
-              "nummer": 8,
-              "guid": "G2XU08499",
-              "laufend": 8,
-              "verfuegbarAb": "2019-05-26T04:30:00Z"
-            },
-            {
-              "nummer": 9,
-              "guid": "GZ7UV029W",
-              "laufend": 9,
-              "verfuegbarAb": "2019-06-02T04:30:00Z"
-            },
-            {
-              "nummer": 10,
-              "guid": "GQJUGPVWD",
-              "laufend": 10,
-              "verfuegbarAb": "2019-06-09T04:30:00Z"
-            },
-            {
-              "nummer": 11,
-              "guid": "GWDU85E0K",
-              "laufend": 11,
-              "verfuegbarAb": "2019-06-16T04:30:00Z"
-            },
-            {
-              "nummer": 12,
-              "guid": "GG1U23410",
-              "laufend": 12,
-              "verfuegbarAb": "2019-06-23T04:30:00Z"
-            },
-            {
-              "nummer": 13,
-              "guid": "G7PU4XM8E",
-              "laufend": 13,
-              "verfuegbarAb": "2019-06-30T04:30:00Z"
-            },
-            {
-              "nummer": 14,
-              "guid": "GX9UQPJ20",
-              "laufend": 14,
-              "verfuegbarAb": "2019-07-07T04:30:00Z"
-            },
-            {
-              "nummer": 15,
-              "guid": "G14U4W959",
-              "laufend": 15,
-              "verfuegbarAb": "2019-07-14T04:30:00Z"
-            },
-            {
-              "nummer": 16,
-              "guid": "GN7UDP20M",
-              "laufend": 16,
-              "verfuegbarAb": "2019-07-21T04:30:00Z"
-            },
-            {
-              "nummer": 17,
-              "guid": "G50UZ7X3N",
-              "laufend": 17,
-              "verfuegbarAb": "2019-07-28T04:30:00Z"
-            },
-            {
-              "nummer": 18,
-              "guid": "GG1U234P2",
-              "laufend": 18,
-              "verfuegbarAb": "2019-08-04T04:30:00Z"
-            },
-            {
-              "nummer": 19,
-              "guid": "GEVUZ4XV0",
-              "laufend": 19,
-              "verfuegbarAb": "2019-08-11T04:30:00Z"
-            },
-            {
-              "nummer": 20,
-              "guid": "G9DUE15VK",
-              "laufend": 20,
-              "verfuegbarAb": "2019-08-18T04:30:00Z"
-            },
-            {
-              "nummer": 21,
-              "guid": "G4VUQE143",
-              "laufend": 21,
-              "verfuegbarAb": "2019-08-25T04:30:00Z"
-            },
-            {
-              "nummer": 22,
-              "guid": "GJWU259DX",
-              "laufend": 22,
-              "verfuegbarAb": "2019-09-01T04:30:00Z"
-            },
-            {
-              "nummer": 23,
-              "guid": "GK9U35MP5",
-              "laufend": 23,
-              "verfuegbarAb": "2019-09-08T04:30:00Z"
-            },
-            {
-              "nummer": 24,
-              "guid": "G31UX0WJG",
-              "laufend": 24,
-              "verfuegbarAb": "2019-09-15T04:30:00Z"
-            },
-            {
-              "nummer": 25,
-              "guid": "G2XU084PD",
-              "laufend": 25,
-              "verfuegbarAb": "2019-09-22T04:30:00Z"
-            },
-            {
-              "nummer": 26,
-              "guid": "G8WUN4GQG",
-              "laufend": 26,
-              "verfuegbarAb": "2019-09-29T04:30:00Z"
-            }
-          ]
+          "deutsch": 0,
+          "fremd": 26,
+          "deutscheFassung": false
         },
         {
           "name": "Demon Slayer: Kimetsu no Yaiba Mugen Train Arc",
@@ -78778,7 +78703,7 @@
       "seriesId": "GY79P41KR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -78959,7 +78884,7 @@
       "seriesId": "GY8DWQN5Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -79405,7 +79330,7 @@
       "seriesId": "GY8V11X7Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -79413,7 +79338,7 @@
       "seriesId": "GY8V7NP8Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -79429,7 +79354,7 @@
       "seriesId": "GYEXQKJG6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -80101,7 +80026,7 @@
       "seriesId": "GYQ43P3E6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -80480,7 +80405,7 @@
       "seriesId": "GYQWNXPZY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -81437,7 +81362,7 @@
       "seriesId": "GYZJ43JMR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -82171,7 +82096,7 @@
       "seriesId": "GZJH3D0P5",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -82272,7 +82197,7 @@
       "seriesId": "GZJH3D719",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -149478,7 +149403,7 @@
       "seriesId": "GR2PQ7J2R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -149486,7 +149411,7 @@
       "seriesId": "GYW4EJZ26",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -150117,7 +150042,7 @@
       "seriesId": "GRZJ7QN86",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -150290,7 +150215,7 @@
       "seriesId": "GDKHZEJ0K",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -150472,7 +150397,7 @@
       "seriesId": "G6K57D78Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -150480,7 +150405,7 @@
       "seriesId": "G6NVG359Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -150488,7 +150413,7 @@
       "seriesId": "GYX0ZW80R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -150496,7 +150421,7 @@
       "seriesId": "G6DQ2JX3R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -150504,7 +150429,7 @@
       "seriesId": "G63K4W296",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-08-22",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -150519,158 +150444,158 @@
             {
               "nummer": 1,
               "guid": "GJWU254E4",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 1
+              "laufend": 1,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 2,
               "guid": "GN7UDP5VZ",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 2
+              "laufend": 2,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 3,
               "guid": "GK9U357D8",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 3
+              "laufend": 3,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 4,
               "guid": "GWDU85NQG",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 4
+              "laufend": 4,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 5,
               "guid": "GEVUZ45NM",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 5
+              "laufend": 5,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 6,
               "guid": "G9DUE1WG3",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 6
+              "laufend": 6,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 7,
               "guid": "G4VUQEP81",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 7
+              "laufend": 7,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 8,
               "guid": "GN7UDP52X",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 8
+              "laufend": 8,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 9,
               "guid": "GK9U357M2",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 9
+              "laufend": 9,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 10,
               "guid": "G31UX0MWV",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 10
+              "laufend": 10,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 11,
               "guid": "G2XU08Z4P",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 11
+              "laufend": 11,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 12,
               "guid": "GZ7UV0N2N",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 12
+              "laufend": 12,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 13,
               "guid": "GQJUGP4VE",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 13
+              "laufend": 13,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 14,
               "guid": "G50UZ7JX4",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 14
+              "laufend": 14,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 15,
               "guid": "GG1U23743",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 15
+              "laufend": 15,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 16,
               "guid": "GEVUZ45XM",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 16
+              "laufend": 16,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 17,
               "guid": "G7PU4XKMQ",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 17
+              "laufend": 17,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 18,
               "guid": "G9DUE1W53",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 18
+              "laufend": 18,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 19,
               "guid": "GJWU2549W",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 19
+              "laufend": 19,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 20,
               "guid": "GK9U357K2",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 20
+              "laufend": 20,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 21,
               "guid": "GVWU0QD70",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 21
+              "laufend": 21,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 22,
               "guid": "GPWUK1WVM",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 22
+              "laufend": 22,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 23,
               "guid": "G8WUN491K",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 23
+              "laufend": 23,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 24,
               "guid": "GD9UVP43N",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 24
+              "laufend": 24,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 25,
               "guid": "GQJUGP43E",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 25
+              "laufend": 25,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             },
             {
               "nummer": 26,
               "guid": "GWDU85NJG",
-              "verfuegbarAb": "2022-05-10T17:00:00Z",
-              "laufend": 26
+              "laufend": 26,
+              "verfuegbarAb": "2022-05-10T17:00:00Z"
             }
           ]
         }
@@ -150681,7 +150606,7 @@
       "seriesId": "GMEHMEW1G",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -150689,7 +150614,7 @@
       "seriesId": "GRWEJGZQR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -151211,7 +151136,7 @@
       "seriesId": "G65V4P4K6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -151547,7 +151472,7 @@
     {
       "url": "https://www.crunchyroll.com/de/street-fighter-ii-the-animated-movie",
       "quelle": "api",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "keine Serienkennung hinter dieser Adresse"
     },
     {
@@ -151798,7 +151723,7 @@
       "seriesId": "GYXJWMP86",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -152468,7 +152393,7 @@
       "seriesId": "G24H107GQ",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -152495,7 +152420,7 @@
       "seriesId": "G1XHJV84J",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -152503,7 +152428,7 @@
       "seriesId": "G5PHNM4WD",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -152511,7 +152436,7 @@
       "seriesId": "GR5VXM03R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -152519,7 +152444,7 @@
       "seriesId": "G675W00MR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -152527,7 +152452,7 @@
       "seriesId": "GYZJ43JMR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-17",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -152693,9 +152618,9 @@
         {
           "name": "Staffel 2",
           "staffelId": "G609CXQQ3",
-          "folgen": 25,
-          "kacheln": 25,
-          "deutsch": 25,
+          "folgen": 26,
+          "kacheln": 26,
+          "deutsch": 26,
           "fremd": 0,
           "deutscheFassung": true,
           "deutscheFolgen": [
@@ -152775,6 +152700,11 @@
               "guid": "G0DUN5XNN",
               "laufend": 13,
               "verfuegbarAb": "2021-03-30T13:00:00Z"
+            },
+            {
+              "guid": "G7PU4XD48",
+              "laufend": 14,
+              "verfuegbarAb": "2021-06-29T13:00:00Z"
             },
             {
               "nummer": 37,
@@ -153240,6 +153170,15 @@
             }
           ]
         }
+      ],
+      "neuFolgen": [
+        "GE00374388DEDE",
+        "GE00374387DEDE",
+        "GE00374386DEDE",
+        "GE00374385DEDE",
+        "GE00374384DEDE",
+        "GE00374383DEDE",
+        "GE00374382DEDE"
       ]
     },
     {
@@ -153247,7 +153186,7 @@
       "seriesId": "G1XHJV29J",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -153666,7 +153605,7 @@
       "seriesId": "GDKHZEJVG",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-08-22",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -153679,9 +153618,10 @@
           "deutscheFassung": true,
           "deutscheFolgen": [
             {
+              "nummer": 1,
               "guid": "GX9UQZ09K",
-              "verfuegbarAb": "2023-06-17T00:00:00Z",
-              "laufend": 0
+              "laufend": 1,
+              "verfuegbarAb": "2023-06-17T00:00:00Z"
             }
           ]
         }
@@ -153785,7 +153725,7 @@
       "seriesId": "GYGGXPQ2Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -153793,14 +153733,14 @@
       "seriesId": "G6DK07N7R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-08-22",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
-          "name": "The Garden of Sinners",
+          "name": "the Garden of sinners",
           "staffelId": "G6E5CQPGP",
           "folgen": 8,
-          "kacheln": 8,
+          "kacheln": 12,
           "deutsch": 8,
           "fremd": 0,
           "deutscheFassung": true,
@@ -153808,50 +153748,50 @@
             {
               "nummer": 1,
               "guid": "GN7UD7NZ1",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 1
+              "laufend": 1,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 2,
               "guid": "GK9U34GZE",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 2
+              "laufend": 2,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 3,
               "guid": "GVWU0Z8PX",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 3
+              "laufend": 3,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 4,
               "guid": "GPWUK580K",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 4
+              "laufend": 4,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 5,
               "guid": "G8WUNW725",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 5
+              "laufend": 5,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 6,
               "guid": "GZ7UVXDP5",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 6
+              "laufend": 6,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 7,
               "guid": "GQJUG9ME4",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 7
+              "laufend": 7,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 8,
               "guid": "G9DUEP9PJ",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 8
+              "laufend": 8,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             }
           ]
         }
@@ -153862,14 +153802,14 @@
       "seriesId": "G6DK07N7R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-08-22",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
-          "name": "The Garden of Sinners",
+          "name": "the Garden of sinners",
           "staffelId": "G6E5CQPGP",
           "folgen": 8,
-          "kacheln": 8,
+          "kacheln": 12,
           "deutsch": 8,
           "fremd": 0,
           "deutscheFassung": true,
@@ -153877,50 +153817,50 @@
             {
               "nummer": 1,
               "guid": "GN7UD7NZ1",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 1
+              "laufend": 1,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 2,
               "guid": "GK9U34GZE",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 2
+              "laufend": 2,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 3,
               "guid": "GVWU0Z8PX",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 3
+              "laufend": 3,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 4,
               "guid": "GPWUK580K",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 4
+              "laufend": 4,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 5,
               "guid": "G8WUNW725",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 5
+              "laufend": 5,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 6,
               "guid": "GZ7UVXDP5",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 6
+              "laufend": 6,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 7,
               "guid": "GQJUG9ME4",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 7
+              "laufend": 7,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 8,
               "guid": "G9DUEP9PJ",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 8
+              "laufend": 8,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             }
           ]
         }
@@ -153931,14 +153871,14 @@
       "seriesId": "G6DK07N7R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-08-22",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
-          "name": "The Garden of Sinners",
+          "name": "the Garden of sinners",
           "staffelId": "G6E5CQPGP",
           "folgen": 8,
-          "kacheln": 8,
+          "kacheln": 12,
           "deutsch": 8,
           "fremd": 0,
           "deutscheFassung": true,
@@ -153946,50 +153886,50 @@
             {
               "nummer": 1,
               "guid": "GN7UD7NZ1",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 1
+              "laufend": 1,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 2,
               "guid": "GK9U34GZE",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 2
+              "laufend": 2,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 3,
               "guid": "GVWU0Z8PX",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 3
+              "laufend": 3,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 4,
               "guid": "GPWUK580K",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 4
+              "laufend": 4,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 5,
               "guid": "G8WUNW725",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 5
+              "laufend": 5,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 6,
               "guid": "GZ7UVXDP5",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 6
+              "laufend": 6,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 7,
               "guid": "GQJUG9ME4",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 7
+              "laufend": 7,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 8,
               "guid": "G9DUEP9PJ",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 8
+              "laufend": 8,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             }
           ]
         }
@@ -154000,14 +153940,14 @@
       "seriesId": "G6DK07N7R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-08-22",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
-          "name": "The Garden of Sinners",
+          "name": "the Garden of sinners",
           "staffelId": "G6E5CQPGP",
           "folgen": 8,
-          "kacheln": 8,
+          "kacheln": 12,
           "deutsch": 8,
           "fremd": 0,
           "deutscheFassung": true,
@@ -154015,50 +153955,50 @@
             {
               "nummer": 1,
               "guid": "GN7UD7NZ1",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 1
+              "laufend": 1,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 2,
               "guid": "GK9U34GZE",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 2
+              "laufend": 2,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 3,
               "guid": "GVWU0Z8PX",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 3
+              "laufend": 3,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 4,
               "guid": "GPWUK580K",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 4
+              "laufend": 4,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 5,
               "guid": "G8WUNW725",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 5
+              "laufend": 5,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 6,
               "guid": "GZ7UVXDP5",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 6
+              "laufend": 6,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 7,
               "guid": "GQJUG9ME4",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 7
+              "laufend": 7,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 8,
               "guid": "G9DUEP9PJ",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 8
+              "laufend": 8,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             }
           ]
         }
@@ -154069,14 +154009,14 @@
       "seriesId": "G6DK07N7R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-08-22",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
-          "name": "The Garden of Sinners",
+          "name": "the Garden of sinners",
           "staffelId": "G6E5CQPGP",
           "folgen": 8,
-          "kacheln": 8,
+          "kacheln": 12,
           "deutsch": 8,
           "fremd": 0,
           "deutscheFassung": true,
@@ -154084,50 +154024,50 @@
             {
               "nummer": 1,
               "guid": "GN7UD7NZ1",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 1
+              "laufend": 1,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 2,
               "guid": "GK9U34GZE",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 2
+              "laufend": 2,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 3,
               "guid": "GVWU0Z8PX",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 3
+              "laufend": 3,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 4,
               "guid": "GPWUK580K",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 4
+              "laufend": 4,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 5,
               "guid": "G8WUNW725",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 5
+              "laufend": 5,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 6,
               "guid": "GZ7UVXDP5",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 6
+              "laufend": 6,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 7,
               "guid": "GQJUG9ME4",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 7
+              "laufend": 7,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 8,
               "guid": "G9DUEP9PJ",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 8
+              "laufend": 8,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             }
           ]
         }
@@ -154138,14 +154078,14 @@
       "seriesId": "G6DK07N7R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-08-22",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
-          "name": "The Garden of Sinners",
+          "name": "the Garden of sinners",
           "staffelId": "G6E5CQPGP",
           "folgen": 8,
-          "kacheln": 8,
+          "kacheln": 12,
           "deutsch": 8,
           "fremd": 0,
           "deutscheFassung": true,
@@ -154153,50 +154093,50 @@
             {
               "nummer": 1,
               "guid": "GN7UD7NZ1",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 1
+              "laufend": 1,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 2,
               "guid": "GK9U34GZE",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 2
+              "laufend": 2,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 3,
               "guid": "GVWU0Z8PX",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 3
+              "laufend": 3,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 4,
               "guid": "GPWUK580K",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 4
+              "laufend": 4,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 5,
               "guid": "G8WUNW725",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 5
+              "laufend": 5,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 6,
               "guid": "GZ7UVXDP5",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 6
+              "laufend": 6,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 7,
               "guid": "GQJUG9ME4",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 7
+              "laufend": 7,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 8,
               "guid": "G9DUEP9PJ",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 8
+              "laufend": 8,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             }
           ]
         }
@@ -154207,14 +154147,14 @@
       "seriesId": "G6DK07N7R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-08-22",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
-          "name": "The Garden of Sinners",
+          "name": "the Garden of sinners",
           "staffelId": "G6E5CQPGP",
           "folgen": 8,
-          "kacheln": 8,
+          "kacheln": 12,
           "deutsch": 8,
           "fremd": 0,
           "deutscheFassung": true,
@@ -154222,50 +154162,50 @@
             {
               "nummer": 1,
               "guid": "GN7UD7NZ1",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 1
+              "laufend": 1,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 2,
               "guid": "GK9U34GZE",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 2
+              "laufend": 2,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 3,
               "guid": "GVWU0Z8PX",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 3
+              "laufend": 3,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 4,
               "guid": "GPWUK580K",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 4
+              "laufend": 4,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 5,
               "guid": "G8WUNW725",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 5
+              "laufend": 5,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 6,
               "guid": "GZ7UVXDP5",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 6
+              "laufend": 6,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 7,
               "guid": "GQJUG9ME4",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 7
+              "laufend": 7,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 8,
               "guid": "G9DUEP9PJ",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 8
+              "laufend": 8,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             }
           ]
         }
@@ -154276,14 +154216,14 @@
       "seriesId": "G6DK07N7R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-08-22",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
-          "name": "The Garden of Sinners",
+          "name": "the Garden of sinners",
           "staffelId": "G6E5CQPGP",
           "folgen": 8,
-          "kacheln": 8,
+          "kacheln": 12,
           "deutsch": 8,
           "fremd": 0,
           "deutscheFassung": true,
@@ -154291,50 +154231,50 @@
             {
               "nummer": 1,
               "guid": "GN7UD7NZ1",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 1
+              "laufend": 1,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 2,
               "guid": "GK9U34GZE",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 2
+              "laufend": 2,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 3,
               "guid": "GVWU0Z8PX",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 3
+              "laufend": 3,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 4,
               "guid": "GPWUK580K",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 4
+              "laufend": 4,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 5,
               "guid": "G8WUNW725",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 5
+              "laufend": 5,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 6,
               "guid": "GZ7UVXDP5",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 6
+              "laufend": 6,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 7,
               "guid": "GQJUG9ME4",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 7
+              "laufend": 7,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             },
             {
               "nummer": 8,
               "guid": "G9DUEP9PJ",
-              "verfuegbarAb": "2021-12-08T17:00:00Z",
-              "laufend": 8
+              "laufend": 8,
+              "verfuegbarAb": "2021-12-08T17:00:00Z"
             }
           ]
         }
@@ -154345,7 +154285,7 @@
       "seriesId": "G4PH0WZVE",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -154647,7 +154587,7 @@
       "seriesId": "GZJH3DJ2X",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -154655,7 +154595,7 @@
       "seriesId": "G63K58E96",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "fehler": "Content-API kennt keine Staffel zu dieser Kennung"
     },
     {
@@ -154663,95 +154603,41 @@
       "seriesId": "GRGG7701R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-08-22",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
-          "name": "The Melancholy of Haruhi Suzumiya",
+          "name": "Die Melancholie der Haruhi Suzumiya",
           "staffelId": "G609ZZM96",
-          "folgen": 28,
-          "kacheln": 28,
-          "deutsch": 13,
+          "folgen": 18,
+          "kacheln": 18,
+          "deutsch": 4,
           "fremd": 0,
           "deutscheFassung": true,
           "deutscheFolgen": [
             {
-              "nummer": 1,
-              "guid": "GG1U24413",
-              "verfuegbarAb": "2023-11-14T18:30:00Z",
-              "laufend": 1
-            },
-            {
-              "nummer": 2,
-              "guid": "G0DUNDDZ1",
-              "verfuegbarAb": "2023-11-14T18:30:00Z",
-              "laufend": 2
-            },
-            {
-              "nummer": 3,
-              "guid": "GEVUZXX0M",
-              "verfuegbarAb": "2023-11-14T18:30:00Z",
-              "laufend": 3
-            },
-            {
-              "nummer": 4,
-              "guid": "G7PU4MM8Q",
-              "verfuegbarAb": "2023-11-14T18:30:00Z",
-              "laufend": 4
-            },
-            {
-              "nummer": 5,
-              "guid": "G9DUE5543",
-              "verfuegbarAb": "2023-11-14T18:30:00Z",
-              "laufend": 5
-            },
-            {
-              "nummer": 6,
-              "guid": "GX9UQJJ2Z",
-              "verfuegbarAb": "2023-11-14T18:30:00Z",
-              "laufend": 6
-            },
-            {
-              "nummer": 7,
+              "nummer": 8,
               "guid": "G4VUQ11D1",
-              "verfuegbarAb": "2023-11-14T18:30:00Z",
-              "laufend": 7
+              "laufend": 8,
+              "verfuegbarAb": "2023-11-14T18:30:00Z"
             },
             {
-              "nummer": 9,
-              "guid": "GJWU299KW",
-              "verfuegbarAb": "2023-11-14T18:30:00Z",
-              "laufend": 9
-            },
-            {
-              "nummer": 10,
-              "guid": "GN7UD223X",
-              "verfuegbarAb": "2023-11-14T18:30:00Z",
-              "laufend": 10
-            },
-            {
-              "nummer": 11,
-              "guid": "GPWUKZZ2M",
-              "verfuegbarAb": "2023-11-14T18:30:00Z",
-              "laufend": 11
-            },
-            {
-              "nummer": 26,
+              "nummer": 12,
               "guid": "GQJUGVV8E",
-              "verfuegbarAb": "2023-11-14T18:30:00Z",
-              "laufend": 26
+              "laufend": 12,
+              "verfuegbarAb": "2023-11-14T18:30:00Z"
             },
             {
-              "nummer": 27,
+              "nummer": 13,
               "guid": "GWDU8EEZG",
-              "verfuegbarAb": "2023-11-14T18:30:00Z",
-              "laufend": 27
+              "laufend": 13,
+              "verfuegbarAb": "2023-11-14T18:30:00Z"
             },
             {
-              "nummer": 28,
+              "nummer": 14,
               "guid": "GG1U244P3",
-              "verfuegbarAb": "2023-11-14T18:30:00Z",
-              "laufend": 28
+              "laufend": 14,
+              "verfuegbarAb": "2023-11-14T18:30:00Z"
             }
           ]
         }
@@ -158178,7 +158064,7 @@
       "seriesId": "GRE5K3NQ6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "Leider sind die Videos dieser Serie nicht mehr verfügbar."
     },
@@ -158187,7 +158073,7 @@
       "seriesId": "G649GP1JY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "Leider sind die Videos dieser Serie nicht mehr verfügbar."
     },
@@ -158205,7 +158091,7 @@
       "seriesId": "GRWE20Z3R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "404 - Seite nicht gefunden"
     },
@@ -158214,7 +158100,7 @@
       "seriesId": "GYDQN15K6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "Leider sind die Videos dieser Serie nicht mehr verfügbar."
     },
@@ -158223,7 +158109,7 @@
       "seriesId": "GYK5X1NGR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "Leider sind die Videos dieser Serie nicht mehr verfügbar."
     },
@@ -158232,7 +158118,7 @@
       "seriesId": "G6758GW4R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "Leider sind die Videos dieser Serie nicht mehr verfügbar."
     },
@@ -158241,7 +158127,7 @@
       "seriesId": "GRDQV79DY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "Leider sind die Videos dieser Serie nicht mehr verfügbar."
     },
@@ -158250,7 +158136,7 @@
       "seriesId": "GRGG9PN7R",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "Leider sind die Videos dieser Serie nicht mehr verfügbar."
     },
@@ -158259,7 +158145,7 @@
       "seriesId": "G649G581Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -158278,14 +158164,14 @@
       "seriesId": "GRQ49W9GY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "Leider sind die Videos dieser Serie nicht mehr verfügbar."
     },
     {
       "url": "http://www.crunchyroll.com/de/hamatora",
       "quelle": "api",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "404 - Seite nicht gefunden"
     },
@@ -158474,7 +158360,7 @@
     {
       "url": "http://www.crunchyroll.com/de/kite-liberator",
       "quelle": "api",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "404 - Seite nicht gefunden"
     },
@@ -158519,11 +158405,11 @@
       "seriesId": "GYNQJ8GXY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "My Teen Romantic Comedy SNAFU: Season 1",
+          "name": "My Teen Romantic Comedy SNAFU",
           "staffelId": "G6K5KNQPY",
           "folgen": 13,
           "kacheln": 13,
@@ -158532,7 +158418,7 @@
           "deutscheFassung": false
         },
         {
-          "name": "My Teen Romantic Comedy SNAFU: Season 2: TOO!",
+          "name": "My Teen Romantic Comedy SNAFU TOO!",
           "staffelId": "G6751MXZR",
           "folgen": 13,
           "kacheln": 13,
@@ -158541,7 +158427,7 @@
           "deutscheFassung": false
         },
         {
-          "name": "My Teen Romantic Comedy SNAFU: Season 3: Climax!",
+          "name": "My Teen Romantic Comedy SNAFU Climax!",
           "staffelId": "GR4PZ7PWY",
           "folgen": 12,
           "kacheln": 12,
@@ -158784,11 +158670,11 @@
       "seriesId": "GRNQPEGWR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "Terra Formars: Season 1",
+          "name": "TERRAFORMARS (Unzensiert)",
           "staffelId": "GYK53WQ7R",
           "folgen": 14,
           "kacheln": 14,
@@ -158810,7 +158696,7 @@
     {
       "url": "http://www.crunchyroll.com/de/the-knight-in-the-area",
       "quelle": "api",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "nichtVerfuegbar": true,
       "fehler": "404 - Seite nicht gefunden"
     },
@@ -158899,7 +158785,7 @@
       "seriesId": "G6DQN9KGR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -159091,7 +158977,7 @@
       "seriesId": "GYE5K3GQR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -159240,7 +159126,7 @@
           "name": "OVAs",
           "staffelId": "GYJQC153X",
           "folgen": 2,
-          "kacheln": 3,
+          "kacheln": 2,
           "deutsch": 2,
           "fremd": 0,
           "deutscheFassung": true,
@@ -159249,19 +159135,19 @@
               "nummer": 1,
               "guid": "G4VUQ1G7E",
               "laufend": 1,
-              "verfuegbarAb": "2023-08-29T18:30:00Z"
+              "verfuegbarAb": "2023-08-29T15:00:00Z"
             },
             {
-              "nummer": 11,
+              "nummer": 2,
               "guid": "GJWU29P23",
-              "laufend": 11,
+              "laufend": 2,
               "verfuegbarAb": "2023-08-29T15:00:00Z"
             }
           ]
         },
         {
-          "name": "Legend of Crimson",
-          "staffelId": "GR3VC20W5",
+          "name": "Legend of Crimson (German Dub)",
+          "staffelId": "G65VCDPK7",
           "folgen": 1,
           "kacheln": 1,
           "deutsch": 1,
@@ -160598,7 +160484,7 @@
       "seriesId": "GYK541EPR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -160617,7 +160503,7 @@
       "seriesId": "GR5VXQ8PR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -160663,7 +160549,7 @@
       "seriesId": "GR5VXQ8PR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -160709,7 +160595,7 @@
       "seriesId": "GR5VXQ8PR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -160755,7 +160641,7 @@
       "seriesId": "GR5VXQ8PR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -160801,7 +160687,7 @@
       "seriesId": "G63V7VN4Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -160820,7 +160706,7 @@
       "seriesId": "GR5V1JKGR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -160839,11 +160725,11 @@
       "seriesId": "GR9P7JMV6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "Guyver: The Bioboosted Armor: Season 1",
+          "name": "Guyver: The Bioboosted Armor",
           "staffelId": "G6X0P43MY",
           "folgen": 26,
           "kacheln": 26,
@@ -160874,7 +160760,7 @@
       "seriesId": "GR79PWJ16",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -160893,11 +160779,11 @@
       "seriesId": "GY8VXP2JY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "JOKER GAME: Season 1",
+          "name": "Joker Game",
           "staffelId": "GRZXDV39Y",
           "folgen": 12,
           "kacheln": 12,
@@ -160912,7 +160798,7 @@
       "seriesId": "G6K51X9GY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -160931,16 +160817,16 @@
       "seriesId": "G68V4NDJ6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
           "name": "Junji Ito Collection",
           "staffelId": "GYZXEMJ96",
-          "folgen": 13,
+          "folgen": 14,
           "kacheln": 14,
           "deutsch": 0,
-          "fremd": 13,
+          "fremd": 14,
           "deutscheFassung": false
         }
       ]
@@ -160950,16 +160836,16 @@
       "seriesId": "G68V4NDJ6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
           "name": "Junji Ito Collection",
           "staffelId": "GYZXEMJ96",
-          "folgen": 13,
+          "folgen": 14,
           "kacheln": 14,
           "deutsch": 0,
-          "fremd": 13,
+          "fremd": 14,
           "deutscheFassung": false
         }
       ]
@@ -160969,7 +160855,7 @@
       "seriesId": "GY5VGNM0Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -160994,14 +160880,14 @@
       "seriesId": "G675N15MR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
           "name": "Season 1",
           "staffelId": "G69P2XP0Y",
           "folgen": 10,
-          "kacheln": 11,
+          "kacheln": 10,
           "deutsch": 0,
           "fremd": 10,
           "deutscheFassung": false
@@ -161013,7 +160899,7 @@
       "seriesId": "G6P83KDJ6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -161032,7 +160918,7 @@
       "seriesId": "G6P8DM3Q6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -161051,14 +160937,14 @@
       "seriesId": "G63V729XY",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "Samurai Warriors: Season 1",
+          "name": "Samurai Warriors",
           "staffelId": "G6P8DK0Q6",
-          "folgen": 12,
-          "kacheln": 12,
+          "folgen": 6,
+          "kacheln": 6,
           "deutsch": 0,
           "fremd": 0,
           "deutscheFassung": false
@@ -161070,7 +160956,7 @@
       "seriesId": "G68VXG3G6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -161089,7 +160975,7 @@
       "seriesId": "G60914JM6",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -161108,7 +160994,7 @@
       "seriesId": "G675QE8JR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -161173,7 +161059,7 @@
       "seriesId": "G5PHNMW59",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -161192,11 +161078,11 @@
       "seriesId": "GRWE8K5MR",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
-          "name": "And you thought there is never a girl online?: Season 1",
+          "name": "And you thought there is never a girl online?",
           "staffelId": "GRGGZKW4R",
           "folgen": 12,
           "kacheln": 12,
@@ -161211,7 +161097,7 @@
       "seriesId": "G5PHNMW9N",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -161329,7 +161215,7 @@
       "seriesId": "GDKHZEDPM",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -161348,7 +161234,7 @@
       "seriesId": "GYWEQW20Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -161367,7 +161253,7 @@
       "seriesId": "GXJHM3P19",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -161386,7 +161272,7 @@
       "seriesId": "GP5HJ85ED",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -171101,7 +170987,7 @@
       "seriesId": "GY2P9ED0Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -174881,7 +174767,7 @@
       "seriesId": "G79H23VNQ",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-04",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -174974,7 +174860,7 @@
       "seriesId": "GT00365598",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -175073,7 +174959,7 @@
       "seriesId": "GT00371860",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-26",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -176067,7 +175953,7 @@
       "seriesId": "G8DHV7809",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -176094,7 +175980,7 @@
       "seriesId": "GVDHX8DM5",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-12",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -176521,7 +176407,7 @@
       "seriesId": "GT00371869",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-11-02",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": true,
       "staffeln": [
         {
@@ -176734,7 +176620,7 @@
       "seriesId": "GR75Q020Y",
       "quelle": "api",
       "katalog": "de",
-      "geprueftAm": "2026-10-19",
+      "geprueftAm": "2026-11-23",
       "deutschImAngebot": false,
       "staffeln": [
         {
@@ -176758,8 +176644,8 @@
         {
           "name": "Season 3",
           "staffelId": "GS00363308JAJP",
-          "folgen": 24,
-          "kacheln": 24,
+          "folgen": 23,
+          "kacheln": 23,
           "deutsch": 0,
           "fremd": 0,
           "deutscheFassung": false
@@ -176767,8 +176653,8 @@
         {
           "name": "Season 4",
           "staffelId": "GS00363309JAJP",
-          "folgen": 25,
-          "kacheln": 25,
+          "folgen": 23,
+          "kacheln": 23,
           "deutsch": 0,
           "fremd": 0,
           "deutscheFassung": false
@@ -176776,8 +176662,8 @@
         {
           "name": "Season 5",
           "staffelId": "GS00363310JAJP",
-          "folgen": 26,
-          "kacheln": 26,
+          "folgen": 22,
+          "kacheln": 22,
           "deutsch": 0,
           "fremd": 0,
           "deutscheFassung": false
@@ -176785,8 +176671,8 @@
         {
           "name": "Season 6",
           "staffelId": "GS00363311JAJP",
-          "folgen": 24,
-          "kacheln": 24,
+          "folgen": 21,
+          "kacheln": 21,
           "deutsch": 0,
           "fremd": 0,
           "deutscheFassung": false
@@ -176794,8 +176680,8 @@
         {
           "name": "Season 7",
           "staffelId": "GS00363312JAJP",
-          "folgen": 30,
-          "kacheln": 30,
+          "folgen": 29,
+          "kacheln": 29,
           "deutsch": 0,
           "fremd": 0,
           "deutscheFassung": false
@@ -179227,6 +179113,12 @@
           ]
         }
       ]
+    },
+    {
+      "url": "https://www.crunchyroll.com/de/strike-witches",
+      "quelle": "api",
+      "geprueftAm": "2026-11-23",
+      "fehler": "keine Serienkennung hinter dieser Adresse"
     }
   ]
 }

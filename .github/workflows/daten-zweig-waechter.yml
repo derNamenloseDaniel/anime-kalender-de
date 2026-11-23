@@ -1,0 +1,23 @@
+name: Wächter daten/-Zweig
+
+# Lehre 229 (23.11.2026, PR 4732): `daten/` ist Sammlern vorbehalten. `pr-pruefung.yml` überspringt jeden Job für `daten/`-Zweige und
+# `claude-daten-merge.yml` mergt nur den Sammler-Autor; ein Bauer-PR auf `daten/` bekäme so nie Kette, Prüfer oder Merge.
+# Eigene Datei, weil tools/pr-kette-pruefen.mjs in pr-pruefung.yml nur Kettenjobs zulässt. Sammler-PRs (Autor App) bleiben unberührt.
+
+on:
+  pull_request:
+    branches: [main, zug]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions: {}
+
+jobs:
+  daten-zweig-fremd:
+    name: Zweig daten/ nur für Sammler
+    if: ${{ startsWith(github.head_ref, 'daten/') && github.event.pull_request.user.login != 'anime-kalender-daten[bot]' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: |
+          echo "::error::Zweig daten/ ist Sammlern vorbehalten: Commit auf fix/ oder korrektur/ neu pushen"
+          exit 1

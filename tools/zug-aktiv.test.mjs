@@ -104,7 +104,7 @@ const gruen = [{ name: 'PR-Prüfkette', status: 'COMPLETED', conclusion: 'SUCCES
 function ghAttrappe(basis, gemergteBasis) {
   return (args) => {
     const a = args.join(' ')
-    if (a.includes('--json number,title,headRefOid')) return JSON.stringify([leicht(7, basis)])
+    if (a.includes('--json number,title,headRefName,author,headRefOid')) return JSON.stringify([leicht(7, basis)])
     if (a.includes('--json number,reviews,statusCheckRollup')) return JSON.stringify([{ number: 7, reviews: [], statusCheckRollup: gruen }])
     if (a.includes('--json number,comments')) return JSON.stringify([{ number: 7, comments: [bot] }])
     if (args[0] === 'api' && args[1] === 'graphql') return `${KOPF} ${h(30)}\n`

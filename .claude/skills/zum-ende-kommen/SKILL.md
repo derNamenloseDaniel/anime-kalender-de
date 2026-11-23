@@ -1,6 +1,6 @@
 ---
 name: zum-ende-kommen
-description: "Bei „ende“, „zum ende kommen“, „feierabend“, „nichts neues mehr“ (auch mit Uhrzeit): nichts Neues anfangen, Laufendes abschließen, aufräumen, Übergabe."
+description: "Bei „ende“, „zum ende kommen“ (Standard: sanft), „feierabend“, „nichts neues mehr“ (auch mit Uhrzeit): nichts Neues anfangen, Agenten an sauberen Punkt bringen, Laufendes abschließen, aufräumen, Übergabe."
 ---
 
 # Zum Ende kommen (Daniel, 18.10.2026)

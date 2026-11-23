@@ -32,7 +32,7 @@ export function discAufGeschwisterUmhaengen(
         return n && n.art === nummer.art && n.nr === nummer.nr && staffelVon(a.edition) === staffelVon(r.name) && Date.parse(a.datum) >= fruehestens
       })
     if (fuehrt(r.titleId)) return
-    const treffer = [...titles.values()].filter((t) => t.id !== r.titleId && t.franchiseId === franchise && fuehrt(t.id))
+    const treffer = [...titles.values()].filter((t) => t.franchiseId === franchise && fuehrt(t.id))
     if (treffer.length !== 1) return
     releases[i] = { ...r, titleId: treffer[0]!.id }
     geaendert.push({ name: r.name, von: r.titleId, nach: treffer[0]!.id })

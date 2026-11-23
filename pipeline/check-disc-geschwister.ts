@@ -71,6 +71,23 @@ const index = {
   pruefe('nur der Treffer wandert, ein Titel anderer Franchise bleibt', rs[0]!.titleId === S1 && rs[1]!.titleId === FREMD)
 }
 
+{
+  const rs = [disc(S1, 'Ririsa – Vol. 4')]
+  discAufGeschwisterUmhaengen(rs, fruehe, { ...index, [S2]: [aus('Vol. 4/4', '2026-09-04')] })
+  pruefe('führen eigener Titel und Geschwister die Nummer, bleibt sie beim eigenen', rs[0]!.titleId === S1, rs[0]!.titleId)
+}
+{
+  const rs = [disc(S2, 'Ririsa – Vol. 4')]
+  const ohne = karte(titel(S2, undefined as unknown as number), titel(S1, undefined as unknown as number))
+  discAufGeschwisterUmhaengen(rs, ohne, index)
+  pruefe('ohne Franchise-Kennung wird nie umgehängt', rs[0]!.titleId === S2, rs[0]!.titleId)
+}
+{
+  const rs = [disc(S2, 'Ririsa – Box 4')]
+  discAufGeschwisterUmhaengen(rs, fruehe, index)
+  pruefe('Box 4 ist nicht Vol. 4', rs[0]!.titleId === S2, rs[0]!.titleId)
+}
+
 if (fehler) {
   console.error(`${fehler} Fehler`)
   process.exit(1)

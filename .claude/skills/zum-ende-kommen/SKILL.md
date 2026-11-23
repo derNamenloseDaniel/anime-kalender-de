@@ -7,6 +7,14 @@ description: "Bei „ende“, „zum ende kommen“ (Standard: sanft), „feiera
 
 „Ende“ heißt: **Ende — danach läuft nichts mehr** (Daniel, 05.11.2026: „wenn ende dann ende. dann darf nichts mehr laufen“). Agenten halten an einem sauberen Punkt an, schreiben ihre Übergabe und hören auf; nichts wird „noch fertig“ laufen gelassen. Danach steht eine Übergabe, mit der die nächste Sitzung ohne Nachfragen weitermacht. Die alte Fassung („nichts abwürgen, Laufendes darf fertig werden“) ist aufgehoben; die Abschnitte unten gelten nur noch für ein Ende mit Uhrzeit, bis diese erreicht ist.
 
+**„zum ende kommen“ heißt sanft (Standard seit Daniel 23.11.2026 21:45: „mach sanft zum default, damit ich nur zum ende kommen sagen muss“).** Sanft bedeutet:
+- Nichts Neues anfangen und den Wecker stoppen.
+- Laufende Agenten bekommen sofort die Nachricht, an einem sauberen Punkt anzuhalten: Fertiges mit Nachtrag pushen, Halbfertiges als WIP pushen, Bericht schreiben, aufhören.
+- Ihre Berichte schließe ich noch ab (Nachtrag, Prüfer-„frei“ mergen); Merge-Reihen und Remote-Läufe dürfen auslaufen.
+- Erst wenn alles still ist, steht die Übergabe mit „nichts läuft mehr“.
+
+Hart (Absätze oben und unten) gilt nur bei „ende“ allein, „Schluss für heute“, „sofort“, „hart“ oder „PC geht aus“: Agenten mit TaskStop beenden, lokal sofort alles stoppen.
+
 **„Schluss für heute“ / „ende“ am Abend heißt: der PC wird heruntergefahren (Daniel, 05.11.2026 00:14).** Dann läuft lokal nichts weiter — keine Merge-Reihe, kein Monitor, kein Hintergrundskript. Bauer schreiben ihre Übergabe und hören auf, lokale Reihen und Monitore werden sofort beendet (`ps -ef`, Kontrolle: nichts außer der eigenen Shell). Was über Nacht laufen soll, läuft remote (GitHub Actions, Cloud), sonst morgen. Anlass: Die Merge-Reihe sollte bis 01:34 laufen und blockierte das Git-Update; dazu 62 verwaiste `tail`/`grep`-Monitore seit 09:42.
 
 ## Was ab jetzt nicht mehr passiert

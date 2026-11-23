@@ -81,6 +81,8 @@ const weitere = () => [
   einfach(16, { coverImage: 'https://image.tmdb.org/t/p/w500/j16.jpg' }),
   einfach(17, { coverImage: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx17.jpg' }),
   einfach(18),
+  einfach(19, { franchiseId: 70 }),
+  einfach(20, { franchiseId: 70 }),
 ]
 schreibe('public/data/titles.json', [titel1({ coverImage: undefined }), titel(2), kurz(), ...weitere()])
 schreibe('public/data/events.json', [{ titleId: 1, date: '2099-01-01' }, { titleId: 8, date: todayIso() }])
@@ -90,13 +92,16 @@ schreibe('public/data/releases.json', [
   ...[12, 13, 14].map((id) => ({ titleId: id, platform: 'netflix', releaseType: 'batch', sources: [{ url: 'https://q' }], schedule: { firstEpisodeDate: '2020-01-01', episodeCount: 6 } })),
   { titleId: 4, platform: 'disc', releaseType: 'disc', schedule: { firstEpisodeDate: '2022-01-01' } },
   { titleId: 18, platform: 'tv', sender: 'Super RTL', releaseType: 'weekly', sources: [{ url: 'https://q' }], schedule: { firstEpisodeDate: '2020-01-01' } },
+  { titleId: 19, platform: 'tv', sender: 'Super RTL', releaseType: 'weekly', sources: [{ url: 'https://q' }], schedule: { firstEpisodeDate: '2020-01-01' } },
 ])
 /* Titel 18: eine Sichtung mit Folgentitel, den keine Folgenliste führt → tv-sichtung-ohne-folge (Verdrahtung Bau → Regel, Prüfer Runde 2). */
-schreibe('data/tv-programm.json', { sendungen: { k1: { titleId: 18, titel: 'T', folge: 'Ein Lied im Nebel', sender: 'Super RTL', start: '2026-11-13T17:15:00+01:00', ende: '2026-11-13T17:45:00+01:00', gesehenAm: '2026-11-13' } } })
+schreibe('data/tv-programm.json', { sendungen: { k1: { titleId: 18, titel: 'T', folge: 'Ein Lied im Nebel', sender: 'Super RTL', start: '2026-11-13T17:15:00+01:00', ende: '2026-11-13T17:45:00+01:00', gesehenAm: '2026-11-13' }, k2: { titleId: 19, titel: 'T', folge: 'Der Neuanfang der Strohhüte', sender: 'Super RTL', start: '2026-11-13T18:15:00+01:00', ende: '2026-11-13T18:45:00+01:00', gesehenAm: '2026-11-13' } } })
+/* Titel 19 und 20 (ein Franchise): Titel 19 sieht einen Folgentitel, den nur die Liste von Titel 20 führt → die Sendung gehört Titel 20, kein Mangel bei 19 (Verdrahtung Titelzuordnung des Baus). */
+schreibe('data/tmdb-folgen.json', { 19: { tmdbId: 9019, folgen: [{ s: 1, e: 1, titel: 'Der alte Hafen am Meer' }] }, 20: { tmdbId: 9020, folgen: [{ s: 1, e: 1, titel: 'Der Neuanfang der Strohhüte' }, { s: 1, e: 2, titel: 'Ein ganz anderes Kapitel' }] } })
 schreibe('public/data/folgen/1.json', { f: [[1, 'A'], [2, 'B'], [3, 'C']] })
 schreibe('public/data/folgen/2.json', { f: [[1, 'A'], [2, ''], [3, 'C']] })
 schreibe('public/data/synopses/1.json', { 1: { de: 'Text' }, 33: { de: 'Text' } })
-for (const id of [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]) schreibe(`public/data/synopses/${id}.json`, { [id]: { de: 'Text' } })
+for (const id of [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]) schreibe(`public/data/synopses/${id}.json`, { [id]: { de: 'Text' } })
 for (const id of [12, 13, 14]) schreibe(`public/data/folgen/${id}.json`, { f: [[1, 'A'], [2, 'B'], [3, 'C']] })
 /* Titel 12 und 13: ein Franchise, je 6 Folgen beim Anbieter bei 3 Folgen und einer Schwester von 3 → Ausnahme anbieter-franchise (Verdrahtung franchiseTeile); Titel 14 ohne Franchise bleibt offen. */
 /* Titel 10 und 11: ein Franchise, eine Netflix-Adresse mit einer Staffel zu einer Folge, zusammen zwei: staffel-zuordnung (Verdrahtung Bau → Regel). */

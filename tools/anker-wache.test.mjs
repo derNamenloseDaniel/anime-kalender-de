@@ -25,9 +25,9 @@ const ZEILE = 'if (gruppen.length < 2) return []'
 const liste = readFileSync(join(wurzel, 'tools/mutationen/beleg-marken.json'), 'utf8')
 assert.ok(liste.includes(ZEILE), 'Probe-Anker steht in der Liste')
 const wt = mkdtempSync(join(tmpdir(), 'anker-wache-'))
-const git = (...a) => execFileSync('git', ['-C', wt, ...a], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+const git = (...a) => execFileSync('git', ['-C', wt, ...a], { timeout: 60000, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
 try {
-  execFileSync('git', ['-C', wurzel, 'worktree', 'add', '--detach', '-q', wt, 'HEAD'])
+  execFileSync('git', ['-C', wurzel, 'worktree', 'add', '--detach', '-q', wt, 'HEAD'], { timeout: 60000 })
   const ziel = join(wt, 'pipeline/lib/beleg-marken.ts')
   const quelle = readFileSync(ziel, 'utf8')
   assert.ok(quelle.includes(ZEILE), 'Probe-Anker steht in der Quelle')
@@ -49,6 +49,6 @@ try {
   assert.equal(pruefe(push), null, 'zurück: grün')
   console.log('✓ anker-wache')
 } finally {
-  execFileSync('git', ['-C', wurzel, 'worktree', 'remove', '--force', wt])
+  execFileSync('git', ['-C', wurzel, 'worktree', 'remove', '--force', wt], { timeout: 60000 })
   rmSync(wt, { recursive: true, force: true })
 }

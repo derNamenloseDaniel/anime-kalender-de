@@ -57,8 +57,8 @@ Dazu 78 Disc-Meldungen mit künftigem Termin; sie laufen über die Disc-Übersic
 
 | Quelle | zuletzt erfolgreich | Treffer |
 |---|---|---|
-| adn | 1.0 Tage her | 10 |
-| adn-catalog | 7.0 Tage her | 120 |
+| adn | 0.0 Tage her | 6 |
+| adn-catalog | 6.9 Tage her | 120 |
 | adn-news | 0.1 Tage her | 68 |
 | anilist-voices | 7.0 Tage her | 3012 |
 | anime-offline-database | 7.0 Tage her | 8876 |
@@ -71,7 +71,7 @@ Dazu 78 Disc-Meldungen mit künftigem Termin; sie laufen über die Disc-Übersic
 | anisearch-slugs | 7.0 Tage her | 14919 |
 | anisearch-zuordnung | 0.0 Tage her | 18526 |
 | ann-voices | 7.0 Tage her | 8876 |
-| beleg-lesungen | 1.0 Tage her | 45 |
+| beleg-lesungen | 0.0 Tage her | 29 |
 | cartoon-folgen | 7.0 Tage her | 366 |
 | cartoon-reihen | 1.0 Tage her | 1 |
 | cartoons | 1.0 Tage her | 18 |
@@ -88,20 +88,20 @@ Dazu 78 Disc-Meldungen mit künftigem Termin; sie laufen über die Disc-Übersic
 | link-check | 7.0 Tage her | 18 |
 | messbelege | 0.0 Tage her | 0 |
 | motn | 16.0 Tage her | 2123 |
-| motn-changes | 1.0 Tage her | 29 |
-| rohfolgen | 0.2 Tage her | 0 |
+| motn-changes | 0.0 Tage her | 0 |
+| rohfolgen | 0.1 Tage her | 0 |
 | rtlplus-folgen | 7.0 Tage her | 3 |
 | tmdb-banner | 7.0 Tage her | 11 |
 | tmdb-folgen | 7.0 Tage her | 945 |
 | tmdb-kino | 7.0 Tage her | 3 |
 | tmdb-poster | 7.0 Tage her | 236 |
 | tmdb-titles | 7.0 Tage her | 400 |
-| toggo | 0.1 Tage her | 22 |
+| toggo | 0.0 Tage her | 22 |
 | trailer | 1.0 Tage her | 2 |
 | tv-de | 17.2 Tage her | 0 |
 | tv-programm | 0.0 Tage her | 234 |
 | vorfaelle | 0.0 Tage her | 0 |
 | wikidata-imdb | 0.0 Tage her | 5381 |
 | wikidata-titel | 0.0 Tage her | 4 |
-| wikipedia-folgen | 1.0 Tage her | 10 |
+| wikipedia-folgen | 0.0 Tage her | 10 |
 | youtube-check | 0.0 Tage her | 3 |

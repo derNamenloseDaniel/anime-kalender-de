@@ -57,9 +57,10 @@
     "lastCount": 400
   },
   "motn-changes": {
-    "lastOk": "2026-11-22T04:14:07.756Z",
-    "lastRun": "2026-11-22T04:14:07.756Z",
-    "lastCount": 29
+    "lastOk": "2026-11-23T04:33:35.494Z",
+    "lastRun": "2026-11-23T04:33:35.494Z",
+    "lastCount": 0,
+    "leerSeit": "2026-11-23T04:33:35.494Z"
   },
   "motn": {
     "lastOk": "2026-11-07T04:03:57.039Z",
@@ -123,13 +124,13 @@
     "lastCount": 208
   },
   "cartoons": {
-    "lastOk": "2026-11-22T04:19:57.116Z",
-    "lastRun": "2026-11-22T04:19:57.116Z",
-    "lastCount": 18
+    "lastOk": "2026-11-23T04:39:55.006Z",
+    "lastRun": "2026-11-23T04:39:55.006Z",
+    "lastCount": 1
   },
   "trailer": {
-    "lastOk": "2026-11-22T04:21:50.251Z",
-    "lastRun": "2026-11-22T04:21:50.251Z",
+    "lastOk": "2026-11-23T04:41:49.376Z",
+    "lastRun": "2026-11-23T04:41:49.376Z",
     "lastCount": 2
   },
   "wikidata-titel": {
@@ -149,13 +150,13 @@
     "lastError": "gesperrt (HTTP 403)"
   },
   "toggo": {
-    "lastOk": "2026-11-23T01:30:35.177Z",
-    "lastRun": "2026-11-23T01:30:35.177Z",
+    "lastOk": "2026-11-23T04:34:24.231Z",
+    "lastRun": "2026-11-23T04:34:24.231Z",
     "lastCount": 22
   },
   "wikipedia-folgen": {
-    "lastOk": "2026-11-22T04:16:59.665Z",
-    "lastRun": "2026-11-22T04:16:59.665Z",
+    "lastOk": "2026-11-23T04:36:33.722Z",
+    "lastRun": "2026-11-23T04:36:33.722Z",
     "lastCount": 10
   },
   "kinoheld": {
@@ -190,9 +191,9 @@
     "leerSeit": "2026-11-06T18:01:33.610Z"
   },
   "beleg-lesungen": {
-    "lastOk": "2026-11-22T04:08:19.781Z",
-    "lastRun": "2026-11-22T04:08:19.781Z",
-    "lastCount": 45
+    "lastOk": "2026-11-23T04:32:17.700Z",
+    "lastRun": "2026-11-23T04:32:17.700Z",
+    "lastCount": 29
   },
   "anisearch-dubs": {
     "lastOk": "2026-11-23T04:07:40.428Z",
@@ -210,8 +211,8 @@
     "lastCount": 18526
   },
   "cartoon-reihen": {
-    "lastOk": "2026-11-22T04:20:21.614Z",
-    "lastRun": "2026-11-22T04:20:21.614Z",
+    "lastOk": "2026-11-23T04:40:20.238Z",
+    "lastRun": "2026-11-23T04:40:20.238Z",
     "lastCount": 1
   },
   "tmdb-poster": {

@@ -1,5 +1,5 @@
 {
- "erzeugtAm": "2026-11-23T00:19:31.189Z",
+ "erzeugtAm": "2026-11-23T04:54:32.713Z",
  "anbieter": [
   {
    "name": "Amazon",
@@ -733,8 +733,8 @@
    "name": "Disney+",
    "plattform": "disneyplus",
    "gemeldet": 183,
-   "gesamt": 341,
-   "offen": 158,
+   "gesamt": 342,
+   "offen": 159,
    "ohneSeite": 14,
    "ziel": "https://www.disneyplus.com/browse/entity-faa35b37-3287-4a7c-9d42-a3a5f9ad9185",
    "ziele": [
@@ -775,6 +775,10 @@
     {
      "url": "https://www.disneyplus.com/browse/entity-6c1cfdcd-a3b1-428a-8fe9-aa917d5b6371",
      "titel": "My Hero Academia"
+    },
+    {
+     "url": "https://www.disneyplus.com/de-de/browse/entity-1d36fbbe-0a91-468e-ac73-8d51337195fa",
+     "titel": "Pretty Cure"
     },
     {
      "url": "https://www.disneyplus.com/browse/entity-dc471806-a107-436c-9bec-0e4455c7249c",

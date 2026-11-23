@@ -1,0 +1,9 @@
+[
+  { "name": "Kontrolle (unmutiert)", "aenderungen": [], "tests": ["node tools/vergleich-alt-neu.test.mjs"] },
+  { "name": "Zeile 93: Eingaben nicht verglichen", "aenderungen": [{ "datei": "tools/vergleich-alt-neu.mjs", "suche": "['ergebnis', 'eingaben', 'dateien']", "ersetze": "['ergebnis', 'dateien']", "zeile": 93 }], "tests": ["node tools/vergleich-alt-neu.test.mjs"] },
+  { "name": "Zeile 93: Dateien nicht verglichen", "aenderungen": [{ "datei": "tools/vergleich-alt-neu.mjs", "suche": "['ergebnis', 'eingaben', 'dateien']", "ersetze": "['ergebnis', 'eingaben']", "zeile": 93 }], "tests": ["node tools/vergleich-alt-neu.test.mjs"] },
+  { "name": "Zeile 93: Ergebnis nicht verglichen", "aenderungen": [{ "datei": "tools/vergleich-alt-neu.mjs", "suche": "['ergebnis', 'eingaben', 'dateien']", "ersetze": "['eingaben', 'dateien']", "zeile": 93 }], "tests": ["node tools/vergleich-alt-neu.test.mjs"] },
+  { "name": "Zeile 92: neue Fassung teilt die Eingaben der alten", "aenderungen": [{ "datei": "tools/vergleich-alt-neu.mjs", "suche": "await ruf(neu, structuredClone(f.args), f.dateien)", "ersetze": "await ruf(neu, f.args, f.dateien)", "zeile": 92 }], "tests": ["node tools/vergleich-alt-neu.test.mjs"] },
+  { "name": "Zeile 38: Dateiinhalt fließt nicht in den Hash", "aenderungen": [{ "datei": "tools/vergleich-alt-neu.mjs", "suche": ".update(readFileSync(join(ordner, r)))", "ersetze": "", "zeile": 38 }], "tests": ["node tools/vergleich-alt-neu.test.mjs"] },
+  { "name": "Zeile 98: Zweig-Lücke bleibt unerkannt", "aenderungen": [{ "datei": "tools/vergleich-alt-neu.mjs", "suche": "z.anzahl(e) === 0", "ersetze": "z.anzahl(e) === -1", "zeile": 98 }], "tests": ["node tools/vergleich-alt-neu.test.mjs"] }
+]

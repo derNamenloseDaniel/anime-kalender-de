@@ -4420,6 +4420,7 @@ Die Quelle mit dem besten Umfang für lineares Free-TV (MAXX, Folgennummer, Folg
 - **Echter Befund:** Dragon Ball Super (21175) trägt in `tmdb-titles.json` noch den Namen „ドラゴンボール超 ビルス“ der früheren Kennung 312359, obwohl `tmdbId` schon 62715 ist; die Handzeile ersetzt nur die Kennung, nicht die mitgeholten Felder.
 - **Kein Fehler:** Kakegurui ××, Magilumiere, Tayo, Kitaro — TMDBs Name ist deutsch, AniList kennt keinen deutschen. Pokémon Reisen (112153): TMDB-Staffel 23 hat 48 Folgen, AniList 136; die Staffeln 23–25 haben zusammen 147, weil AniList die letzten 11 Folgen als eigenen Titel führt (158870, Start 2023-01-13 = TMDB S25E47).
 - **Nicht prüfbar** (keine TMDB-Folgen oder kein Name im Repo): 9 Zeilen, darunter die vier Dragon-Ball-Serien ohne Folgen-Cache.
+- **Abrufdatum je Abweichung (23.11.2026):** Jede Abweichung nennt den Stand ihrer Quelle und das Alter gegen den Bau-Stand: `geholtAm` aus `data/tmdb-folgen.json` (Startdatum, Folgenzahl der Serie), `fetchedAt` aus `data/tmdb-titles.json` (Name, Filmjahr). Ab `ALT_TAGE` (7) heißt der Stand „alt“, ohne Datum „Alter unbekannt“. Anlass: `tmdb-folgen.json` kann Tage alt sein, ein Prüfer hielt zwei echte deutsche TMDB-Titel für übersetzt. Beide Dateien tragen das Datum schon je Eintrag, der Schreibweg blieb unverändert.
 
 ## Klasse C (TMDB ja, JustWatch kein Stream): keine unabhängige legale Quelle (15.11.2026)
 

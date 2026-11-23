@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-23T23:10:36.749Z",
+  "stand": "2026-11-23T23:24:09.794Z",
   "verweise": [
     {
       "titleId": 99629,
@@ -7801,17 +7801,6 @@
       "letzterWeg": false
     },
     {
-      "titleId": 114622,
-      "titel": "Dorohedoro: Teuflische Anekdoten",
-      "plattform": "crunchyroll",
-      "url": "https://www.crunchyroll.com/watch/GE00375247JAJP/devilish-anecdotes--disparity-of-the-masks--a-shop-for-you--the-spring-of-the-underling--the-tale-of-the-invisible-gyoza-fairy--the-devils-dance--ohba-memories-in-the-night-breeze",
-      "seriesId": null,
-      "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
-      "geprueftAm": null,
-      "entferntAm": "2026-11-24",
-      "letzterWeg": false
-    },
-    {
       "titleId": 128223,
       "titel": "When Will Ayumu Make His Move?",
       "plattform": "adn",
@@ -7906,6 +7895,28 @@
       "url": "https://www.netflix.com/title/80987039",
       "seriesId": null,
       "grund": "der Anbieter führt 23 + 25 Folgen, und die belegten Titel füllen sie exakt — für 1 weitere ist dort kein Platz",
+      "geprueftAm": null,
+      "entferntAm": "2026-11-24",
+      "letzterWeg": false
+    },
+    {
+      "titleId": 114622,
+      "titel": "Dorohedoro: Teuflische Anekdoten",
+      "plattform": "crunchyroll",
+      "url": "https://www.crunchyroll.com/de/series/GT00371893/dorohedoro",
+      "seriesId": null,
+      "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
+      "geprueftAm": null,
+      "entferntAm": "2026-11-24",
+      "letzterWeg": false
+    },
+    {
+      "titleId": 114622,
+      "titel": "Dorohedoro: Teuflische Anekdoten",
+      "plattform": "crunchyroll",
+      "url": "https://www.crunchyroll.com/watch/GE00375247JAJP/devilish-anecdotes--disparity-of-the-masks--a-shop-for-you--the-spring-of-the-underling--the-tale-of-the-invisible-gyoza-fairy--the-devils-dance--ohba-memories-in-the-night-breeze",
+      "seriesId": null,
+      "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
       "geprueftAm": null,
       "entferntAm": "2026-11-24",
       "letzterWeg": false

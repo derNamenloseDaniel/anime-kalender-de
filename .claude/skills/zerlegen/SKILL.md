@@ -77,6 +77,7 @@ npx tsc --noEmit -p tsconfig.json && npm run check:logic
 git commit …                                      # die Vergleiche arbeiten auf Commits
 node tools/bau-vergleich.mjs origin/main HEAD     # pipeline/: Ausgabe byte-gleich; feste Hashes, Exit 4 = Konflikt, WARNUNG = Zweig hinter main
 node tools/panel-vergleich.mjs origin/main HEAD   # web/src: Panel-HTML von 80 Titeln gleich
+node tools/vergleich-alt-neu.mjs <datei> <funktion> <fallmodul>   # eine Funktion alt (git show) gegen neu, Rückgabe/Eingaben/AK_ROOT-Dateien byte-gleich; statt bau-vergleich, wenn der ganze Bau data/cache/ bräuchte
 npm run check:worker                              # worker/
 node tools/umfang-pruefen.mjs                     # „Überlänge gesunken“ genügt; NICHT festschreiben
 ```

@@ -36,8 +36,8 @@ const rs = new Map<number, Release[]>([
   [s3.id, [release(s3, 'netflix', 'weekly')]],
 ])
 const alle = [yaiba, nurNetflix, ohneWeg, discFilm, frei, s2, s3]
-const rechne = (gruppiert: boolean) => {
-  const gen = zaehleFilterGen(alle, rs, HEUTE, gruppiert)
+const rechne = (gruppiert: boolean, sort?: string) => {
+  const gen = zaehleFilterGen(alle, rs, HEUTE, gruppiert, sort)
   for (;;) {
     const r = gen.next()
     if (r.done) return r.value
@@ -57,6 +57,8 @@ pruefe('Schnellchips: TV 1, Cartoon 1', z.schnell.tv === 1 && z.schnell.cartoon 
 console.log('\nStaffeln zusammengefasst (Zahl = Karten nach dem Antippen):')
 const g = rechne(true)
 pruefe('Netflix: zwei laufende Staffeln derselben Reihe stehen als zwei Karten (3), wie die Liste sie zeigt (`ordneListe`)', g.platforms.get('netflix') === 3, g.platforms.get('netflix'))
+const nachTitel = rechne(true, 'titel')
+pruefe('Netflix bei Sortierung „Titel": eine Karte je Reihe (2), denn nur „Relevanz" listet laufende Staffeln einzeln', nachTitel.platforms.get('netflix') === 2, nachTitel.platforms.get('netflix'))
 
 if (verletzt) {
   console.error(`\n${verletzt} Zusicherung(en) verletzt.`)

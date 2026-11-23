@@ -29,8 +29,8 @@ const quelle = titelQuelle(lies<Title[]>('titles-core.json'), titel, undefined, 
 const data = { releasesByTitle } as never
 const heute = todayIso()
 
-function zaehle(gruppiert: boolean): FilterZaehlung {
-  const gen = zaehleFilterGen(quelle, releasesByTitle, heute, gruppiert)
+function zaehle(gruppiert: boolean, sort: string): FilterZaehlung {
+  const gen = zaehleFilterGen(quelle, releasesByTitle, heute, gruppiert, sort)
   for (;;) {
     const r = gen.next()
     if (r.done) return r.value
@@ -38,10 +38,10 @@ function zaehle(gruppiert: boolean): FilterZaehlung {
 }
 
 /** Die Trefferzahl nach dem Antippen: derselbe Filter wie der Chip (`filterTitles`), dann die Liste der Seite (`ordneListe`) mit allen Gruppen samt „Ohne bekannten Termin". */
-const treffer = (f: Partial<FilterState>, gruppiert: boolean) => {
+const treffer = (f: Partial<FilterState>, gruppiert: boolean, sort: string) => {
   const liste = filterTitles(quelle, data, { ...EMPTY_FILTERS, ...f }, heute, new Set())
   const kacheln = gruppiert ? groupByFranchise(liste) : liste.map((t) => ({ main: t, members: [t] }))
-  return ordneListe(kacheln, 'relevanz', '', releasesByTitle, heute).liste.length
+  return ordneListe(kacheln, sort, '', releasesByTitle, heute).liste.length
 }
 
 const CHIPS: { name: string; filter: Partial<FilterState>; zahl: (z: FilterZaehlung) => number | undefined }[] = [
@@ -54,11 +54,12 @@ const CHIPS: { name: string; filter: Partial<FilterState>; zahl: (z: FilterZaehl
   { name: 'Schnell TV', filter: { platforms: ['tv'] }, zahl: (z) => z.schnell.tv },
 ]
 
-for (const gruppiert of [false, true]) {
-  console.log(`\nChip-Zahl = Treffer des einen Filters (${gruppiert ? 'Karten, Staffeln zusammengefasst' : 'Titel'}), ${quelle.length} Titel:`)
-  const z = zaehle(gruppiert)
+/* „Relevanz" listet laufende Staffeln einer Reihe einzeln, jede andere Sortierung eine Karte je Reihe (`ordneListe`). */
+for (const [gruppiert, sort] of [[false, 'relevanz'], [true, 'relevanz'], [true, 'titel']] as const) {
+  console.log(`\nChip-Zahl = Treffer des einen Filters (${gruppiert ? `Karten, Staffeln zusammengefasst, Sortierung ${sort}` : 'Titel'}), ${quelle.length} Titel:`)
+  const z = zaehle(gruppiert, sort)
   for (const c of CHIPS) {
-    const soll = treffer(c.filter, gruppiert)
+    const soll = treffer(c.filter, gruppiert, sort)
     const ist = c.zahl(z)
     pruefe(`${c.name}: ${soll}`, ist === soll, { gezaehlt: ist, filter: soll })
   }
@@ -68,7 +69,7 @@ console.log('\nDisc-Zahl unabhängig von der Weg-Logik, direkt aus den Releases 
 {
   const direkt = new Set<number>()
   for (const [id, rs] of releasesByTitle) if (rs.some((r) => r.platform === 'disc' || r.releaseType === 'disc')) direkt.add(id)
-  const z = zaehle(false)
+  const z = zaehle(false, 'relevanz')
   pruefe(`Art Disc zählt ${direkt.size} Titel`, z.releaseTypes.get('disc') === direkt.size, z.releaseTypes.get('disc'))
   pruefe('Plattform Disc und Schnell-Chip Disc zählen dasselbe', z.platforms.get('disc') === direkt.size && z.schnell.disc === direkt.size, [z.platforms.get('disc'), z.schnell.disc])
 }

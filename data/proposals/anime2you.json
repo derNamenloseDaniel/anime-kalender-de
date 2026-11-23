@@ -1,15 +1,30 @@
 {
-  "scrapedAt": "2026-11-22T19:01:52.044Z",
+  "scrapedAt": "2026-11-23T01:02:07.099Z",
   "verworfen": {
     "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 7,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 5,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 9,
-    "schon in einem Rubrik-Feed gelesen": 9,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 2,
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 10,
+    "schon in einem Rubrik-Feed gelesen": 8,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 1,
     "Sprachhinweis älter als 45 Tage": 6
   },
   "proposals": [
+    {
+      "articleTitle": "TV-Guide: Anime im deutschen Fernsehen in KW 48/2026",
+      "articleUrl": "https://www.anime2you.de/news/1075001/anime-tv-programm-48-2026/",
+      "publishedAt": "2026-11-23",
+      "category": "allgemein",
+      "platforms": [],
+      "dates": [
+        {
+          "iso": "2026-11-29",
+          "context": "amit ihr keine Sendung verpasst! Premieren und Highlights Vom 23. bis 29. November 2026 gibt es wieder zahlreiche Anime-Premieren und -Highl"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
     {
       "articleTitle": "Termin des Netflix-Anime »Bride of the Barrier Master« + Trailer",
       "articleUrl": "https://www.anime2you.de/news/1074561/bride-of-the-barrier-master-konkreter-termin/",

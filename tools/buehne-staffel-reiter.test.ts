@@ -27,7 +27,10 @@ assert.deepEqual(
   reiter(483).map((r) => r.label),
   ['1–5', '6–9', '10–13', '14–15', '15–16', '16', '16', '17–18', '19', '20–22', '23–25', '25'],
 )
-assert.deepEqual(reiter(10852).map((r) => r.id).slice(0, 3), [483, 1349, 1350])
+assert.deepEqual(
+  reiter(10852).map((r) => r.id),
+  [483, 1349, 1350, 4745, 5979, 6415, 6563, 6802, 7798, 8283, 10852, 14838],
+)
 assert.equal(reiter(10852).length, 12)
 
 // Kein Reiter: Film der Reihe, Special, und ein Titel, der in der Liste fehlt.

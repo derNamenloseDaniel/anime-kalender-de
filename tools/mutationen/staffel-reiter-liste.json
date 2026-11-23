@@ -1,0 +1,18 @@
+[
+  { "name": "Kontrolle (unmutiert)", "aenderungen": [] },
+  { "name": "reiterVon: ab 1 statt 2 Reiter", "aenderungen": [{ "datei": "web/buehne/mockups/staffel-reiter-liste.ts", "suche": "liste.length >= 2", "ersetze": "liste.length >= 1" }] },
+  { "name": "reiterVon: ab 3 statt 2 Reiter", "aenderungen": [{ "datei": "web/buehne/mockups/staffel-reiter-liste.ts", "suche": "liste.length >= 2", "ersetze": "liste.length >= 3" }] },
+  { "name": "reiterVon: geöffneter Titel muss nicht dabei sein", "aenderungen": [{ "datei": "web/buehne/mockups/staffel-reiter-liste.ts", "suche": "liste.some((r) => r.id === title.id)", "ersetze": "true" }] },
+  { "name": "reiterVon: Zweige vertauscht", "aenderungen": [{ "datei": "web/buehne/mockups/staffel-reiter-liste.ts", "suche": "title.staffelTitel ? ausSammeltitel(title, titel) : ausHauptstaffeln(teile, reihenName)", "ersetze": "title.staffelTitel ? ausHauptstaffeln(teile, reihenName) : ausSammeltitel(title, titel)" }] },
+  { "name": "ausSammeltitel: andere Sammeltitel statt gleiche", "aenderungen": [{ "datei": "web/buehne/mockups/staffel-reiter-liste.ts", "suche": "t.staffelTitel?.sammel === sammel", "ersetze": "t.staffelTitel?.sammel !== sammel" }] },
+  { "name": "ausSammeltitel: Nummern absteigend", "aenderungen": [{ "datei": "web/buehne/mockups/staffel-reiter-liste.ts", "suche": "a.staffelTitel!.nr - b.staffelTitel!.nr", "ersetze": "b.staffelTitel!.nr - a.staffelTitel!.nr" }] },
+  { "name": "ausSammeltitel: Beschriftung Nummer + 1", "aenderungen": [{ "datei": "web/buehne/mockups/staffel-reiter-liste.ts", "suche": "label: String(t.staffelTitel!.nr)", "ersetze": "label: String(t.staffelTitel!.nr + 1)" }] },
+  { "name": "ausSammeltitel: ohne Sammeltitel nicht leer", "aenderungen": [{ "datei": "web/buehne/mockups/staffel-reiter-liste.ts", "suche": "if (sammel === undefined) return []", "ersetze": "if (sammel === undefined) return titel.map((t) => ({ id: t.id, label: '1', name: '' }))" }] },
+  { "name": "ausHauptstaffeln: Präfix Staffel bleibt", "aenderungen": [{ "datei": "web/buehne/mockups/staffel-reiter-liste.ts", "suche": ".replace(/^Staffel\\s+/, '')", "ersetze": "" }] },
+  { "name": "ausHauptstaffeln: Eintrag ohne Beschriftung bleibt (|| statt &&)", "aenderungen": [{ "datei": "web/buehne/mockups/staffel-reiter-liste.ts", "suche": "stand.has(m.id) && text.has(m.id)", "ersetze": "stand.has(m.id) || text.has(m.id)" }] },
+  { "name": "ausHauptstaffeln: Eintrag ohne Staffelstand bleibt (nur Beschriftung)", "aenderungen": [{ "datei": "web/buehne/mockups/staffel-reiter-liste.ts", "suche": "stand.has(m.id) && text.has(m.id)", "ersetze": "text.has(m.id)" }] },
+  { "name": "ausHauptstaffeln: Reihenfolge nach Staffelnummer absteigend", "aenderungen": [{ "datei": "web/buehne/mockups/staffel-reiter-liste.ts", "suche": "stand.get(a.id)!.staffel - stand.get(b.id)!.staffel", "ersetze": "stand.get(b.id)!.staffel - stand.get(a.id)!.staffel" }] },
+  { "name": "ausHauptstaffeln: Gleichstand nach Kennung absteigend", "aenderungen": [{ "datei": "web/buehne/mockups/staffel-reiter-liste.ts", "suche": "|| a.id - b.id)", "ersetze": "|| b.id - a.id)" }] },
+  { "name": "ausHauptstaffeln: Gleichstand ohne bis-Vergleich", "aenderungen": [{ "datei": "web/buehne/mockups/staffel-reiter-liste.ts", "suche": "|| (stand.get(a.id)!.bis ?? 0) - (stand.get(b.id)!.bis ?? 0)", "ersetze": "" }] },
+  { "name": "ausHauptstaffeln: Name statt Kurzbeschriftung leer", "aenderungen": [{ "datei": "web/buehne/mockups/staffel-reiter-liste.ts", "suche": "name: m.name }", "ersetze": "name: '' }" }] }
+]

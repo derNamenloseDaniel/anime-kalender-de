@@ -1,27 +1,6 @@
 import type { ReactNode } from 'react'
 import { useLang } from '../../lib/i18n.tsx'
 
-/** Ein Baustein des Filterfensters. Weitere (etwa der Herkunftsabschnitt) reihen sich ein, ohne das Fenster umzubauen. */
-export interface FilterAbschnitt {
-  id: string
-  /** Leer (`null`) lässt den Abschnitt samt Trennlinie weg. */
-  inhalt: ReactNode
-}
-
-export function Abschnitte({ liste }: { liste: FilterAbschnitt[] }) {
-  return (
-    <>
-      {liste
-        .filter((a) => a.inhalt)
-        .map((a) => (
-          <section key={a.id} data-abschnitt={a.id} className="border-b border-ak-linie px-3 py-2.5 last:border-b-0">
-            {a.inhalt}
-          </section>
-        ))}
-    </>
-  )
-}
-
 /** Fuß des Fensters: Zurücksetzen und Fertig; `treffer` ist ein optionaler Satz davor. */
 export function FilterFuss({ treffer, zuruecksetzen, fertig }: { treffer?: ReactNode; zuruecksetzen: () => void; fertig: () => void }) {
   const { t } = useLang()

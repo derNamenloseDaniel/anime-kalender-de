@@ -21,19 +21,21 @@ const UEBERLEGUNGEN = [
  * Filterkonzept auf der Bühne (Daniel, 22.11.2026): Vorher = der Stand von `main` (Nachbau der Weg-Prüfung und des gemeinsamen Speichers,
  * `filter-konzept-alt.ts`, über die Weichen `wege-filter` und `vorlieben`), Nachher = die echte App mit dem Weg-Modell und getrennten Speichern.
  * Fälle: Yaiba (Disc + Stream + TV) und Attack on Titan mit „Disc aus" in der Datenbank; Sakamoto Days mit dem Kalender-Auge „im Handel",
- * das die Datenbank nicht mehr berührt; Dan Da Dan (Netflix + Disc) und Detektiv Conan (kostenlos + Crunchyroll) verlangen denselben Weg. Keine eigenen Schalter: Leiste, Gerät und Thema liefert der Rahmen.
+ * das die Datenbank nicht mehr berührt; Dan Da Dan (Netflix + Disc) und Detektiv Conan (kostenlos + Crunchyroll) verlangen denselben Weg; One Piece trägt zehn gesetzte Filter (Chipzeile im schlimmsten Fall). Keine eigenen Schalter: Leiste, Gerät und Thema liefert der Rahmen.
  */
 mockup({
   name: 'filter-konzept',
   titel: 'Filterkonzept – Disc aus, getrennte Filter',
   ausschnitt: 'datenbank',
-  faelle: ['yaiba-joyn', 'attack-on-titan', 'sakamoto-days', 'dan-da-dan', 'fernsehtag-detektiv-conan'],
+  faelle: ['yaiba-joyn', 'attack-on-titan', 'sakamoto-days', 'dan-da-dan', 'fernsehtag-detektiv-conan', 'one-piece'],
   suchadressen: {
     'yaiba-joyn': { q: 'Yaiba', xrt: 'disc' },
     'attack-on-titan': { q: 'Final Season', xrt: 'disc' },
     'sakamoto-days': { q: 'Sakamoto' },
     'dan-da-dan': { q: 'Dan Da Dan', p: 'netflix', rt: 'disc' },
     'fernsehtag-detektiv-conan': { q: 'Detektiv Conan', frei: '1', p: 'crunchyroll' },
+    /* Schlimmster Fall der Chipzeile (S5): zehn gesetzte Filter (mit Suche), Handy eine scrollbare Zeile, Rechner umbrechend. */
+    'one-piece': { q: 'One Piece', p: 'crunchyroll', xp: 'tv,netflix', xrt: 'disc,ova', xg: 'Ecchi,Horror', xkw: 'Cartoon', st: 'airing' },
   },
   varianten: {
     A: {

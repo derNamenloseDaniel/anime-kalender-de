@@ -1,10 +1,10 @@
-import type { PlatformId, Release, ReleaseStatus, ReleaseType, Title } from '@shared/types.ts'
+import { PLATFORMS, RELEASE_TYPES, type PlatformId, type Release, type ReleaseStatus, type ReleaseType, type Title } from '@shared/types.ts'
 import { kostenloseFolgen } from '@shared/kostenlos.ts'
-import { CARTOON_KEYWORD } from './filters.ts'
+import { CARTOON_KEYWORD, EMPTY_FILTERS, modusVon, type FilterState } from './filters.ts'
 import type { SchnellId } from './schnellfilter.ts'
-import { istDiscWeg, wegeVon } from './wege-filter.ts'
+import { passtWege } from './wege-filter.ts'
 
-/** Wie viele Titel des Kernbestands je Chip einen passenden Weg haben (nur Plattform, Art, Status und Schnellchips). */
+/** Wie viele Titel (bei zusammengefassten Staffeln: Karten) des Kernbestands je Chip dieser einen Bedingung genügen. */
 export interface FilterZaehlung {
   platforms: Map<PlatformId, number>
   releaseTypes: Map<ReleaseType, number>
@@ -12,30 +12,55 @@ export interface FilterZaehlung {
   schnell: Partial<Record<SchnellId, number>>
 }
 
-const hoch = <K>(m: Map<K, number>, k: K) => m.set(k, (m.get(k) ?? 0) + 1)
+const STATUS: ReleaseStatus[] = ['airing', 'tba', 'abgeschlossen', 'erschienen', 'unbekannt']
+
+/** Ein Chip der Zählung: Fundort in `FilterZaehlung`, Schlüssel und der Titel-Test, den auch der Filter anwendet. */
+interface Posten {
+  gruppe: 'platforms' | 'releaseTypes' | 'statuses' | 'schnell'
+  schluessel: string
+  passt: (t: Title, releases: Release[], heute: string) => boolean
+}
+
+const modus = (f: FilterState) => (feld: Parameters<typeof modusVon>[1]) => modusVon(f, feld)
+/** Die Weg-Chips fragen `passtWege` mit genau ihrem einen Filter — dieselbe Frage, die der Filter stellt (Zahl = Treffer nach dem Antippen). */
+const wegPosten = (gruppe: Posten['gruppe'], schluessel: string, patch: Partial<FilterState>): Posten => {
+  const f: FilterState = { ...EMPTY_FILTERS, ...patch }
+  return { gruppe, schluessel, passt: (t, rs, heute) => passtWege(t, rs, f, heute, modus(f)) }
+}
+
+const POSTEN: Posten[] = [
+  ...(Object.keys(PLATFORMS) as PlatformId[]).map((p) => wegPosten('platforms', p, { platforms: [p] })),
+  ...(Object.keys(RELEASE_TYPES) as ReleaseType[]).map((a) => wegPosten('releaseTypes', a, { releaseTypes: [a] })),
+  ...STATUS.map((s) => wegPosten('statuses', s, { statuses: [s] })),
+  wegPosten('schnell', 'disc', { releaseTypes: ['disc'] }),
+  wegPosten('schnell', 'tv', { platforms: ['tv'] }),
+  { gruppe: 'schnell', schluessel: 'cartoon', passt: (t) => t.keywords.includes(CARTOON_KEYWORD) },
+  { gruppe: 'schnell', schluessel: 'kostenlos', passt: (t) => !!kostenloseFolgen(t) },
+]
 
 /**
- * Zählt den Kernbestand einmal durch (je Titel ein Durchgang über seine Wege, nicht je Chip ein Filterlauf) und gibt zwischendurch
- * ab, damit das Öffnen des Filterfensters den Hauptfaden nicht blockiert (`useZeitscheibe`).
+ * Zählt den Kernbestand einmal durch und gibt zwischendurch ab, damit das Öffnen des Filterfensters den Hauptfaden nicht blockiert
+ * (`useZeitscheibe`). Zusammengefasste Staffeln zählen als eine Karte (Schlüssel wie `groupByFranchise`), denn so viele Karten zeigt die Liste danach.
  */
-export function* zaehleFilterGen(kern: Title[], releasesByTitle: Map<number, Release[]>, heute: string): Generator<void, FilterZaehlung> {
-  const z: FilterZaehlung = { platforms: new Map(), releaseTypes: new Map(), statuses: new Map(), schnell: {} }
-  const schnell = (id: SchnellId) => (z.schnell[id] = (z.schnell[id] ?? 0) + 1)
+export function* zaehleFilterGen(kern: Title[], releasesByTitle: Map<number, Release[]>, heute: string, gruppiert = false): Generator<void, FilterZaehlung> {
+  const treffer = POSTEN.map(() => new Set<number>())
   let marke = performance.now()
   for (const t of kern) {
     if (performance.now() - marke > 6) {
       yield
       marke = performance.now()
     }
-    const wege = wegeVon(t, releasesByTitle.get(t.id) ?? [], heute)
-    /* Ein Titel zählt je Chip einmal, auch wenn mehrere Wege ihn tragen. */
-    for (const p of new Set(wege.map((w) => w.plattform))) if (p) hoch(z.platforms, p as PlatformId)
-    for (const a of new Set(wege.flatMap((w) => (w.art ? [w.art] : [])))) hoch(z.releaseTypes, a)
-    for (const s of new Set(wege.flatMap((w) => (w.status ? [w.status] : [])))) hoch(z.statuses, s)
-    if (wege.some(istDiscWeg)) schnell('disc')
-    if (wege.some((w) => w.plattform === 'tv')) schnell('tv')
-    if (t.keywords.includes(CARTOON_KEYWORD)) schnell('cartoon')
-    if (kostenloseFolgen(t)) schnell('kostenlos')
+    const rs = releasesByTitle.get(t.id) ?? []
+    const karte = gruppiert ? (t.franchiseId ?? t.id) : t.id
+    POSTEN.forEach((p, i) => {
+      if (p.passt(t, rs, heute)) treffer[i]!.add(karte)
+    })
   }
+  const z: FilterZaehlung = { platforms: new Map(), releaseTypes: new Map(), statuses: new Map(), schnell: {} }
+  POSTEN.forEach((p, i) => {
+    const n = treffer[i]!.size
+    if (p.gruppe === 'schnell') z.schnell[p.schluessel as SchnellId] = n
+    else (z[p.gruppe] as Map<string, number>).set(p.schluessel, n)
+  })
   return z
 }

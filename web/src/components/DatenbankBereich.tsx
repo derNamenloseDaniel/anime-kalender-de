@@ -56,7 +56,7 @@ export function DatenbankBereich(p: DatenbankBereichProps) {
   const { data, route } = p
   const mobil = useMobil()
   const herkunftZaehlung = useMemo(() => zaehleHerkunft(p.quelle), [p.quelle])
-  const kern = useMemo(() => ({ titel: p.quelle, releasesByTitle: data.releasesByTitle }), [p.quelle, data.releasesByTitle])
+  const kern = useMemo(() => ({ titel: p.quelle, releasesByTitle: data.releasesByTitle, gruppiert: p.grouped }), [p.quelle, data.releasesByTitle, p.grouped])
   const ansicht = (
     <>
       {p.geladen ? (

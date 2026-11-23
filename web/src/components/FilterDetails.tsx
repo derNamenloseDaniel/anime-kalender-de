@@ -322,7 +322,7 @@ export function FilterDetails({
   platformZaehlung?: Map<PlatformId, number>
   genreListe?: string[]
   genreZaehlung?: Map<string, number>
-  /** Abschnitte zwischen Schnell und Gruppen (aktive Filter, Schalter) — sie stehen im Scrollbereich unter dem Suchfeld. */
+  /** Nur der Kalender: der Streifen der aktiven Filter zwischen Schnell und Gruppen, im Scrollbereich unter dem Suchfeld. */
   zwischen?: ReactNode
 }) {
   const [mehr, setMehr] = useState(false)

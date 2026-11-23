@@ -27,3 +27,16 @@ test('Zu kleine Tippfläche und fehlende Zahl im Namen werden gemeldet', () => {
 })
 
 test('Kalender prüft nur die Schnellfläche', () => assert.deepEqual(s5Abweichungen('wo', { ...gut, datenbank: false, plattformZahlSichtbar: false, schalterImFenster: true }), []))
+
+import { chipAbweichungen } from './ansicht-filterfenster-s5.mjs'
+
+const chips = { da: true, anzahl: 8, namen: ['Netflix entfernen', 'Disc ausgeschlossen, entfernen', 'Alle zurücksetzen'], flaeche: [44, 44, 44], seitenUeberbreite: 0, reihen: 1, scrollbar: true, mobil: true }
+
+test('Chipzeile im Soll ist ohne Abweichung', () => assert.deepEqual(chipAbweichungen('db', chips), []))
+test('Fehlende Zeile, kleine Fläche, Überbreite, Handy mit zwei Reihen, Name ohne Zustand werden gemeldet', () => {
+  assert.equal(chipAbweichungen('db', { da: false }).length, 1)
+  assert.equal(chipAbweichungen('db', { ...chips, flaeche: [32, 44, 44] }).length, 1)
+  assert.equal(chipAbweichungen('db', { ...chips, seitenUeberbreite: 120 }).length, 1)
+  assert.equal(chipAbweichungen('db', { ...chips, reihen: 2 }).length, 1)
+  assert.equal(chipAbweichungen('db', { ...chips, namen: ['Netflix entfernen', 'Disc entfernen'] }).length, 1)
+})

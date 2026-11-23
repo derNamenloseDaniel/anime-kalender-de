@@ -3,7 +3,7 @@
  * fest unter dem Scrollbereich, Tippziele. Aufgerufen von `ansicht-bild.mjs --handy`; die Seite muss die App aus `dist/` ausliefern.
  */
 import { abstandsAbweichungen } from './ansicht-filterfenster-rechner.mjs'
-import { messeS5, s5Abweichungen } from './ansicht-filterfenster-s5.mjs'
+import { chipAbweichungen, messeChips, messeS5, s5Abweichungen } from './ansicht-filterfenster-s5.mjs'
 
 const BREITEN = [320, 375, 393, 440]
 const ROUTEN = ['woche', 'datenbank']
@@ -87,6 +87,11 @@ export async function pruefeFilterfenster(seite) {
       messungen.push({ breite, route, ...m, ...k })
       alle.push(...abweichungen(`${route} ${breite} px`, m, k), ...s5Abweichungen(`${route} ${breite} px`, s5))
     }
+    /* Schlimmster Fall der Chipzeile: zehn gesetzte Filter auf einmal (Ausschlüsse, Einschlüsse, Suche). */
+    await seite.goto('about:blank')
+    await seite.goto(`http://ak.test/#/datenbank?q=One%20Piece&p=crunchyroll&xp=tv,netflix&xrt=disc,ova&xg=Ecchi,Horror&xkw=Cartoon&st=airing`, { waitUntil: 'networkidle' })
+    await seite.waitForTimeout(1500)
+    alle.push(...chipAbweichungen(`datenbank ${breite} px, viele Filter`, await seite.evaluate(messeChips)))
   }
   return { abweichungen: alle, messungen }
 }

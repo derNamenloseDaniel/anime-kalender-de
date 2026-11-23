@@ -41,3 +41,33 @@ export function s5Abweichungen(wo, m) {
   if (m.schalterImFenster) a.push(`${wo}: „ohne Synchro"/„Staffeln zusammenfassen" stehen noch im Filterfenster`)
   return a
 }
+
+/** Misst die Chipzeile der Datenbank mit vielen gesetzten Filtern; läuft im Browser. */
+export function messeChips() {
+  const liste = document.querySelector('ul[role=list][aria-label="Gesetzte Filter"]')
+  if (!liste) return { da: false }
+  const knoepfe = [...liste.querySelectorAll('button')]
+  return {
+    da: true,
+    anzahl: knoepfe.length,
+    namen: knoepfe.map((b) => b.getAttribute('aria-label') ?? b.textContent.trim()),
+    flaeche: knoepfe.map((b) => Math.max(b.getBoundingClientRect().height, parseFloat(getComputedStyle(b, '::after').height) || 0)),
+    seitenUeberbreite: document.documentElement.scrollWidth - innerWidth,
+    reihen: new Set(knoepfe.map((b) => Math.round(b.getBoundingClientRect().top))).size,
+    scrollbar: liste.scrollWidth > liste.clientWidth,
+    mobil: innerWidth < 768,
+  }
+}
+
+/** Die Abweichungen der Chipzeile: da, benannt („… entfernen"), 44 px, keine Seitenüberbreite, am Handy eine Reihe zum Scrollen. */
+export function chipAbweichungen(wo, m) {
+  if (!m.da) return [`${wo}: keine Chipzeile für die gesetzten Filter`]
+  const a = []
+  const ohneName = m.namen.filter((n) => !/entfernen$|zurücksetzen$/.test(n))
+  if (ohneName.length) a.push(`${wo}: Chip ohne „entfernen" im Namen („${ohneName[0]}")`)
+  if (!m.namen.some((n) => /ausgeschlossen, entfernen$/.test(n))) a.push(`${wo}: kein Ausschluss-Chip mit Zustand im Namen`)
+  if (m.flaeche.some((h) => h < 44)) a.push(`${wo}: Chip-Tippfläche unter 44 px (${Math.min(...m.flaeche)})`)
+  if (m.seitenUeberbreite > 0) a.push(`${wo}: Chipzeile macht die Seite ${m.seitenUeberbreite} px zu breit`)
+  if (m.mobil && m.reihen > 1) a.push(`${wo}: Chipzeile am Handy in ${m.reihen} Reihen statt einer scrollbaren`)
+  return a
+}

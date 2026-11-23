@@ -12,6 +12,7 @@ tools/ansicht-duell.mjs
 tools/ansicht-escape-einzeln.mjs
 tools/ansicht-escape-stapel.mjs
 tools/ansicht-filterfenster-rechner.mjs
+tools/ansicht-filterfenster-s5.mjs
 tools/ansicht-filterfenster.mjs
 tools/ansicht-filterknopf-escape.mjs
 tools/ansicht-filterknopf.mjs

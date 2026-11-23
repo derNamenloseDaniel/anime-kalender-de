@@ -8,6 +8,8 @@ import { useZeitscheibe } from '../../lib/use-zeitscheibe.ts'
 export interface ZaehlKern {
   titel: Title[]
   releasesByTitle: Map<number, Release[]>
+  /** Staffeln sind zusammengefasst: die Zahl nennt dann Karten, nicht Titel. */
+  gruppiert: boolean
 }
 
 /**
@@ -16,8 +18,8 @@ export interface ZaehlKern {
  */
 export function FilterZaehlungsrahmen({ kern, children }: { kern?: ZaehlKern; children: ReactNode }) {
   const { wert } = useZeitscheibe<FilterZaehlung | null>(
-    () => (kern ? zaehleFilterGen(kern.titel, kern.releasesByTitle, todayIso()) : nichts()),
-    [kern?.titel, kern?.releasesByTitle],
+    () => (kern ? zaehleFilterGen(kern.titel, kern.releasesByTitle, todayIso(), kern.gruppiert) : nichts()),
+    [kern?.titel, kern?.releasesByTitle, kern?.gruppiert],
     null,
   )
   return <FilterZaehlungContext.Provider value={wert ?? undefined}>{children}</FilterZaehlungContext.Provider>

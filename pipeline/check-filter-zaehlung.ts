@@ -1,7 +1,7 @@
 /**
  * Zusicherungen zur Zählung an den Chips des Filterfensters (`web/src/lib/filter-zaehlung.ts`, Filterkonzept S5, 23.11.2026): ein Titel zählt je Chip
  * einmal, auch wenn mehrere Wege ihn tragen; die Zahl ist die Trefferzahl des einen Filters (Disc-Weg, Status, kostenlos eingeschlossen); zusammengefasste
- * Staffeln zählen als eine Karte. Die Rückrechnung am Bestand steht in `check-filter-zaehlung-bestand.ts`. Aufruf: `npm run check:logic`.
+ * Staffeln zählen wie die Liste sie zeigt (laufende Staffeln einer Reihe einzeln, sonst eine Karte). Die Rückrechnung am Bestand steht in `check-filter-zaehlung-bestand.ts`. Aufruf: `npm run check:logic`.
  */
 import type { Release, Title } from '../shared/types.ts'
 import { zaehleFilterGen } from '../web/src/lib/filter-zaehlung.ts'
@@ -56,7 +56,7 @@ pruefe('Schnellchips: TV 1, Cartoon 1', z.schnell.tv === 1 && z.schnell.cartoon 
 
 console.log('\nStaffeln zusammengefasst (Zahl = Karten nach dem Antippen):')
 const g = rechne(true)
-pruefe('Netflix: zwei Staffeln derselben Reihe sind eine Karte (2 statt 3)', g.platforms.get('netflix') === 2, g.platforms.get('netflix'))
+pruefe('Netflix: zwei laufende Staffeln derselben Reihe stehen als zwei Karten (3), wie die Liste sie zeigt (`ordneListe`)', g.platforms.get('netflix') === 3, g.platforms.get('netflix'))
 
 if (verletzt) {
   console.error(`\n${verletzt} Zusicherung(en) verletzt.`)

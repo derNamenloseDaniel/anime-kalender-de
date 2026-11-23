@@ -11,16 +11,30 @@ const { zerlege, ohneHeredoc, eingebetteterBefehl, programmName } = require('./h
 /** Globale Git-Optionen mit eigenem Wert im nächsten Token. */
 const MIT_WERT = new Set(['-C', '-c', '--config-env', '--git-dir', '--work-tree', '--namespace', '--exec-path'])
 
-/** Arbeitsverzeichnisse (`-C`-Wert oder '' = Standard) aller `git push` des Befehls. */
-function pushOrte(befehl) {
+/** Löschender Push (`--delete`/`-d`, Refspec `:zweig`): prüft nichts am HEAD, wird nicht gesperrt. Sonst gilt immer der HEAD des Orts, auch bei `git push origin <anderer Zweig>`. */
+const loeschtZweig = (args) => args.some((a) => a === '--delete' || a === '-d' || a.startsWith(':'))
+
+/** Ort des Pushs: `-C` relativ zum letzten `cd` (`cd <wt> && git push` ist die Standardform der Agenten). */
+const ortVon = (cd, c) => (cd && c && !path.isAbsolute(c) ? path.join(cd, c) : c || cd)
+
+/** Arbeitsverzeichnisse ('' = Standard) aller `git push` des Befehls; ein `cd` gilt bis zum Ende seiner Klammer. */
+function pushOrte(befehl, cd = '') {
   const orte = []
-  for (const { tokens } of zerlege(ohneHeredoc(befehl))) {
+  const stapel = []
+  for (const seg of zerlege(ohneHeredoc(befehl))) {
+    if (seg.auf) stapel.push(cd)
+    else if (seg.zu) cd = stapel.pop() ?? cd
+    const tokens = seg.tokens
     if (!tokens) continue
+    if (tokens[0] === 'cd' && tokens[1]) {
+      cd = ortVon(cd, tokens[1])
+      continue
+    }
     for (let i = 0; i < tokens.length; i++) {
       const p = programmName(tokens[i])
       if (p === 'echo' || p === 'printf') break
       const skript = eingebetteterBefehl(tokens, i)
-      if (skript) orte.push(...pushOrte(skript))
+      if (skript) orte.push(...pushOrte(skript, cd))
       else if (p === 'git' || p === 'git.exe') {
         let ort = ''
         let k = i + 1
@@ -29,7 +43,7 @@ function pushOrte(befehl) {
           if (MIT_WERT.has(tokens[k])) k++
           else if (!tokens[k].startsWith('-')) break
         }
-        if (tokens[k] === 'push') orte.push(ort)
+        if (tokens[k] === 'push' && !loeschtZweig(tokens.slice(k + 1))) orte.push(ortVon(cd, ort))
       }
     }
   }

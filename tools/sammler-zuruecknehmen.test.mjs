@@ -193,7 +193,10 @@ assert.deepEqual(
     "if (process.argv[2] === 'bau') process.exit(n >= 3 ? 0 : 1)",
     "fs.appendFileSync('commit-aufrufe.txt', process.env.SZN_NACHRICHT + '|' + process.env.BAU_LAUF + '\\n')",
   ].join('\n'))
-  const env = { ...process.env, SZN_BAU: `node "${fake}" bau`, SZN_COMMIT: `node "${fake}" commit` }
+  // Eigener RUNNER_TEMP: eine Schuldigenliste aus einem anderen Lauf auf dieser Maschine darf den Test nie beeinflussen.
+  const rt = path.join(wurzel, 'rt-prozess')
+  fs.mkdirSync(rt)
+  const env = { ...process.env, RUNNER_TEMP: rt, SZN_BAU: `node "${fake}" bau`, SZN_COMMIT: `node "${fake}" commit` }
   const lauf = (...args) => spawnSync(process.execPath, [path.join(hier, 'sammler-zuruecknehmen.mjs'), ...args], { cwd, env, encoding: 'utf8', windowsHide: true, timeout: 60000 })
   const r = lauf('--basis', basis)
   assert.equal(r.status, 0, r.stderr)
@@ -256,7 +259,7 @@ else {
   const origin = path.join(wurzel, 'origin.git')
   git(wurzel, 'init', '-q', '--bare', '-b', 'main', origin)
   fs.mkdirSync(path.join(cwd, 'tools'))
-  for (const f of ['sammler-basis.sh', 'sammler-zuruecknehmen.mjs']) fs.copyFileSync(path.join(hier, f), path.join(cwd, 'tools', f))
+  for (const f of ['sammler-basis.sh', 'sammler-zuruecknehmen.mjs', 'sammler-herkunft.mjs', 'quarantaene.mjs']) fs.copyFileSync(path.join(hier, f), path.join(cwd, 'tools', f))
   git(cwd, 'add', 'tools')
   git(cwd, '-c', 'user.name=Daniel', '-c', 'user.email=x@example.org', 'commit', '-q', '-m', 'werkzeug')
   git(cwd, 'remote', 'add', 'origin', origin)
@@ -275,6 +278,7 @@ else {
     PATH: ghDir + path.delimiter + process.env.PATH,
     FIX: fix.replaceAll('\\', '/'),
     GITHUB_REPOSITORY: 'x/y',
+    RUNNER_TEMP: path.join(wurzel, 'rt-schritt'),
     SZN_BAU: `node "${fake}" bau`,
     SZN_COMMIT: `node "${fake}" commit`,
   }

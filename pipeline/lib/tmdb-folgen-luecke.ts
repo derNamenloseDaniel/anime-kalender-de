@@ -29,6 +29,23 @@ export function dubLuecke(datei: FolgenDatei | undefined): number {
   }).length
 }
 
+/** Folgen ohne deutschen Titel gegen die Folgenzahl (leer oder „Folge N“; zu kurze Liste zählt die fehlenden Nummern) — der Mangel `folgentitel` aus `maengel-regeln.ts`, ohne Dub-Bereich. */
+export function unbenannteFolgen(datei: FolgenDatei | undefined, episoden: number): number {
+  const benannt = (datei?.f ?? []).filter(([, titel]) => {
+    const t = String(titel ?? '').trim()
+    return t && !PLATZHALTER.test(t)
+  }).length
+  return Math.max(0, episoden - benannt)
+}
+
+/**
+ * Lücke für die Abrufwahl: erst der Dub-Bereich, sonst jeder offene Folgentitel. Ohne diesen Zweig wurde ein Titel mit TMDB-Kennung, aber
+ * ohne Anbieter und ohne belegten Dub-Bereich nie abgerufen (Arjuna 812: TMDB führt 13 deutsche Titel, uns fehlte einer; Messung 23.11.2026: 64 von 284).
+ */
+export function abrufLuecke(datei: FolgenDatei | undefined, episoden: number): number {
+  return dubLuecke(datei) || unbenannteFolgen(datei, episoden)
+}
+
 /** Titel mit Lücke im Dub-Bereich, die noch keinen TMDB-Eintrag haben: größte Lücke zuerst, bei Gleichstand Katalogreihenfolge. */
 export function waehleLuecke<T extends { id: string }>(
   kandidaten: T[], bestand: Record<string, unknown>, luecke: (id: string) => number, limit: number,

@@ -173,6 +173,13 @@ const zweiLesungen = { ...mitLesung('2026-10-30', '2026-10-01'), quellen: [
   { url: 'https://x.example/b', name: 'x.example', gesehenAm: '2026-10-20', sagt: '2026-10-30', stand: 'aktuell' as const },
 ] } as Release
 pruefe('ohne bekannte Meldung: die jüngste Lesung unserer Quellen zählt', nachOhne(zweiLesungen, gelesen('2026-10-12T05:00:00Z')) === '2026-10-30')
+const quelleB = (extra: Record<string, unknown>) => ({ url: 'https://x.example/b', name: 'x.example', sagt: '2026-10-30', stand: 'aktuell' as const, ...extra })
+const q1 = { url: A2Y, name: 'anime2you.de', gesehenAm: '2026-10-01', sagt: '2026-10-30', stand: 'aktuell' as const }
+const mitQuellen = (...quellen: unknown[]): Release => ({ ...virgin(), quellen } as unknown as Release)
+pruefe('ohne bekannte Meldung: eine Quelle ohne Lesetag nimmt dem Beleg die Aussage', nachOhne(mitQuellen(q1, quelleB({})), gelesen('2026-10-12T05:00:00Z')) === '2026-10-30')
+pruefe('ohne bekannte Meldung: eine überholte Quelle mit späterem Lesetag zählt nicht', nachOhne(mitQuellen(q1, quelleB({ gesehenAm: '2026-10-20', stand: 'ueberholt' })), gelesen('2026-10-12T05:00:00Z')) === '2026-11-06')
+pruefe('ohne bekannte Meldung: eine aniSearch-Quelle mit späterem Lesetag zählt nicht', nachOhne(mitQuellen(q1, quelleB({ url: ARTIKEL, gesehenAm: '2026-10-20' })), gelesen('2026-10-12T05:00:00Z')) === '2026-11-06')
+pruefe('ohne bekannte Meldung: nur eine überholte Quelle gibt keine Aussage', nachOhne(mitQuellen({ ...q1, stand: 'ueberholt' }), gelesen('2026-10-12T05:00:00Z')) === '2026-10-30')
 pruefe('mit jüngerer bekannter Meldung: Lesetag der Quelle ändert nichts, Meldung bleibt', datumNach(mitLesung('2026-10-30', '2026-09-01'), gelesen('2026-10-12T05:00:00Z'), '2026-10-20') === '2026-10-30')
 pruefe('mit älterer bekannter Meldung: aniSearch gewinnt, auch bei späterem Lesetag der Quelle', datumNach(mitLesung('2026-10-30', '2026-10-25'), gelesen('2026-10-12T05:00:00Z'), '2026-10-02') === '2026-11-06')
 const ohneFehler = discTerminFehler([mitLesung('2026-10-30', '2026-10-01')], HEUTE, { index: gelesen('2026-10-12T05:00:00Z'), veroeffentlicht: OHNE })

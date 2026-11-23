@@ -1,26 +1,25 @@
 # Was JustWatch zu offenen Verweisen sagt
 
-Stand: 2026-11-22. Erzeugt von `npm run data:justwatch`.
+Stand: 2026-11-23. Erzeugt von `npm run data:justwatch`.
 
 **Das sind Kandidaten, keine Belege.** Die Angabe gilt der **Serie**, nicht der
 einzelnen Folge — bei „Kill Blue" meldet JustWatch `de` für alle zwölf, belegt
 sind acht. Und ein fehlendes `de` belegt nichts: Netflix meldet dort gar keine
 Tonspur. Was hier steht, sagt, **wo sich das Nachsehen lohnt**.
 
-24 offene Verweise, zu denen JustWatch eine Tonspur nennt.
+23 offene Verweise, zu denen JustWatch eine Tonspur nennt.
 
 | Titel | Anbieter | JustWatch sagt | Tonspuren | Quelle |
 |---|---|---|---|---|
 | [Pokémon](https://anime-kalender.de/#/datenbank?t=527) | primevideo | 🇩🇪 **Deutsch dabei** | `de` | [JustWatch](https://www.justwatch.com/de/Serie/Pokemon) |
 | [Pokémon](https://anime-kalender.de/#/datenbank?t=527) | primevideo | 🇩🇪 **Deutsch dabei** | `de` | [JustWatch](https://www.justwatch.com/de/Serie/Pokemon) |
-| [Sonic X](https://anime-kalender.de/#/datenbank?t=1816) | primevideo | 🇩🇪 **Deutsch dabei** | `de` | [JustWatch](https://www.justwatch.com/de/Serie/Sonic-X) |
 | [Steins;Gate 0](https://anime-kalender.de/#/datenbank?t=21127) | crunchyroll | 🇩🇪 **Deutsch dabei** | `de, en, es, ja, pt` | [JustWatch](https://www.justwatch.com/de/Serie/Steins-Gate-0) |
 | [Konosuba: God’s Blessing on This Wonderful World!](https://anime-kalender.de/#/datenbank?t=21202) | primevideo | 🇩🇪 **Deutsch dabei** | `de` | [JustWatch](https://www.justwatch.com/de/Serie/KonoSuba-Gods-blessing-on-this-wonderful-world) |
 | [Grimgar, Ashes and Illusions](https://anime-kalender.de/#/datenbank?t=21428) | crunchyroll | 🇩🇪 **Deutsch dabei** | `de, en, ja` | [JustWatch](https://www.justwatch.com/de/Serie/Grimgar-Ashes-and-Illusions) |
 | [KonoSuba: God’s Blessing on This Wonderful World! 2](https://anime-kalender.de/#/datenbank?t=21699) | primevideo | 🇩🇪 **Deutsch dabei** | `de` | [JustWatch](https://www.justwatch.com/de/Serie/KonoSuba-Gods-blessing-on-this-wonderful-world) |
 | [Karakai Jozu no Takagi-san: Staffel 2](https://anime-kalender.de/#/datenbank?t=107068) | crunchyroll | 🇩🇪 **Deutsch dabei** | `de, en, ja, ru` | [JustWatch](https://www.justwatch.com/de/Serie/karakaiShang-Shou-noGao-Mu-san) |
 | [Jujutsu Kaisen 0](https://anime-kalender.de/#/datenbank?t=131573) | crunchyroll | 🇩🇪 **Deutsch dabei** | `de, en, es, fr, it, ja, pl, pt, ru, th` | [JustWatch](https://www.justwatch.com/de/Film/jujutsu-kaisen-0) |
-| [undefined](https://anime-kalender.de/#/datenbank?t=-204084) | crunchyroll | kein Deutsch | `en, fr` | [JustWatch](https://www.justwatch.com/de/Serie/dreamland-2026) |
+| [undefined](https://anime-kalender.de/#/datenbank?t=-204084) | crunchyroll | kein Deutsch | `en, fr, ja` | [JustWatch](https://www.justwatch.com/de/Serie/dreamland-2026) |
 | [undefined](https://anime-kalender.de/#/datenbank?t=-99777) | crunchyroll | 🇩🇪 **Deutsch dabei** | `de, en, es, fr, pt, ru` | [JustWatch](https://www.justwatch.com/de/Serie/Onyx-Equinox) |
 | [undefined](https://anime-kalender.de/#/datenbank?t=-13247) | primevideo | 🇩🇪 **Deutsch dabei** | `de` | [JustWatch](https://www.justwatch.com/de/Serie/Sylvanian-Families) |
 | [undefined](https://anime-kalender.de/#/datenbank?t=-13247) | primevideo | 🇩🇪 **Deutsch dabei** | `de` | [JustWatch](https://www.justwatch.com/de/Serie/Sylvanian-Families) |
@@ -38,12 +37,14 @@ Tonspur. Was hier steht, sagt, **wo sich das Nachsehen lohnt**.
 
 ## Titel ganz ohne Bezugsweg
 
-24 Titel im Hauptbestand haben keinen einzigen Weg — hier nennt JustWatch einen.
+26 Titel im Hauptbestand haben keinen einzigen Weg — hier nennt JustWatch einen.
 Ein Titel im Hauptbestand hat per Definition eine belegte deutsche Synchro; das 🇩🇪 sagt,
 dass JustWatch für dieses Angebot auch eine deutsche Tonspur kennt.
 
 | Titel | Angebote laut JustWatch |
 |---|---|
+| [Bakugan: Mechtanium Surge](https://anime-kalender.de/#/datenbank?t=10330) | [Amazon Prime Video](https://watch.amazon.de/detail?gti=amzn1.dv.gti.05a1129f-4c35-4e68-ba66-88466758e697) 🇩🇪, [Amazon Prime Video with Ads](https://watch.amazon.de/detail?gti=amzn1.dv.gti.05a1129f-4c35-4e68-ba66-88466758e697) 🇩🇪, [Amazon Video](https://watch.amazon.de/detail?gti=amzn1.dv.gti.10a9f6c7-0ac4-b773-164f-5e2cdb3b4be5) 🇩🇪 |
+| [The Irregular at Magic High School: The Movie - Yotsuba Succession Arc](https://anime-kalender.de/#/datenbank?t=178707) | [Apple TV Store](https://tv.apple.com/de/movie/the-irregular-at-magic-highschool---the-movie/umc.cmc.4y6d0gp5iz7y0zb3dbzum9vly?at=1000l3V2&ct=app_tv&itscg=30200&itsct=justwatch_tv&playableId=tvs.sbd.9001%3A1441344212) 🇩🇪, [Amazon Video](https://watch.amazon.de/detail?gti=amzn1.dv.gti.807a4d74-16ce-49aa-a5c6-8628caf038cb) 🇩🇪, [Apple TV Store](https://tv.apple.com/de/movie/the-irregular-at-magic-highschool---the-movie/umc.cmc.4y6d0gp5iz7y0zb3dbzum9vly?at=1000l3V2&ct=app_tv&itscg=30200&itsct=justwatch_tv&playableId=tvs.sbd.9001%3A1441344212) 🇩🇪, [Amazon Video](https://watch.amazon.de/detail?gti=amzn1.dv.gti.807a4d74-16ce-49aa-a5c6-8628caf038cb) 🇩🇪 |
 | [Dusk Beyond the End of the World](https://anime-kalender.de/#/datenbank?t=195153) | [Aniverse Amazon Channel](https://watch.amazon.de/detail?gti=amzn1.dv.gti.13bde570-6de4-421c-8495-4979bd84ff87), [Animation Digital Network](https://animationdigitalnetwork.com/de/video/1334-dusk-beyond-the-end-of-the-world/30005-folge-1), [Anime Digital Network Amazon Channel](https://watch.amazon.de/detail?gti=amzn1.dv.gti.13bde570-6de4-421c-8495-4979bd84ff87), [Amazon Video](https://watch.amazon.de/detail?gti=amzn1.dv.gti.32466d79-d505-4816-9cfe-41adaff4075e) |
 | [Detektiv Conan: Der gefallene Engel des Highways](https://anime-kalender.de/#/datenbank?t=198369) | [UCI Kino](https://www.uci-kinowelt.de/film/detektiv-conan-film-29-der-gefallene-engel-des-highways/420556) |
 | [undefined](https://anime-kalender.de/#/datenbank?t=-255760) | [Amazon Prime Video](https://watch.amazon.de/detail?gti=amzn1.dv.gti.5876a543-a76d-4ff0-bfb5-f4211aba99d8), [Amazon Prime Video with Ads](https://watch.amazon.de/detail?gti=amzn1.dv.gti.5876a543-a76d-4ff0-bfb5-f4211aba99d8) |

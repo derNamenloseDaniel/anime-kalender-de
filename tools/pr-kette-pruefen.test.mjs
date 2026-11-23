@@ -136,6 +136,13 @@ fall('Upload in anderem Teiljob mit richtigem with', (d) => { d.jobs.typen.steps
 fall('Bau-Env in anderem Teiljob', (d) => { d.jobs.typen.steps.at(-1).env = { PAGES_BASE: '/', VITE_NEWSLETTER_API: '${{ vars.NEWSLETTER_API_URL }}' } }, /Env des Baus .* nur im Job "bau"/)
 fall('zweite fremde Action', (d) => { d.jobs.logik.steps.push({ uses: 'x/y@v1' }) }, /uses "x\/y@v1" nicht erlaubt/)
 fall('Upload-Action anderer Version', (d) => { hochladenSchritt(d).uses = 'actions/upload-pages-artifact@v2' }, /uses "actions\/upload-pages-artifact@v2" nicht erlaubt/)
+// Wächter daten/-Zweig fremder Autoren (Lehre 229, 23.11.2026): Job fest in Form (tools/pr-kette-waechter.mjs), nicht in needs des Sammeljobs.
+const waechter = (d) => d.jobs["daten-zweig-fremd"]
+fall("Wächter fehlt", (d) => { delete d.jobs["daten-zweig-fremd"] }, /Kein \(oder mehr als ein\) Job mit dem Namen "Zweig daten\/ nur für Sammler"/)
+fall("Wächter ohne Autorprüfung (träfe Sammler-PRs)", (d) => { waechter(d).if = "${{ startsWith(github.head_ref, 'daten/') }}" }, /Zweig daten\/ nur für Sammler\) weicht von der Sollfassung/)
+fall("Wächter endet grün", (d) => { waechter(d).steps[0].run = 'echo ok\n' }, /weicht von der Sollfassung/)
+fall("Wächter in needs des Sammeljobs (übersprungen = rot)", (d) => { sammler(d).needs.push("daten-zweig-fremd") }, /nennt den Wächter/)
+
 // Datenbau (16.10.2026): Auslieferungsprüfung vor dem Merge, Job und Pfadfilter fest in Form (tools/pr-kette-datenbau.mjs).
 const datenbau = (d) => d.jobs.datenbau
 const bauSchritt = (d) => datenbau(d).steps.find((s) => s.run === 'npm run data:build')

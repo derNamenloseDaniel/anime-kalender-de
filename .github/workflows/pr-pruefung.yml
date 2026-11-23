@@ -15,6 +15,7 @@ name: PR-Prüfkette
 #
 # Kein Pfadfilter auf Workflow-Ebene: ein ausgefilterter Pflicht-Check meldet sich nie, der PR hinge fest.
 # Daten-PRs der Sammler (`daten/`) überspringt jeder Job-`if` — übersprungen zählt als bestanden.
+# Ein `daten/`-Zweig von einem anderen Autor als dem Sammler-App-Konto (`anime-kalender-daten[bot]`) bekäme so nie Kette, Prüfer oder Merge (PR 4732, 23.11.2026): `daten-zweig-fremd` endet dann rot.
 
 on:
   pull_request:
@@ -217,6 +218,18 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: node tools/kette-urteil.mjs
 
+
+  # Wächter (23.11.2026, Lehre 229): `daten/` ist Sammlern vorbehalten. Läuft nur bei `daten/`-Zweig UND fremdem Autor; Sammler-PRs (Autor App) bleiben unberührt.
+  # Bewusst nicht in `needs` von `kette`: die Kette überspringt `daten/`-Zweige ganz, dieser Job soll dort allein rot melden. Form fest: tools/pr-kette-waechter.mjs.
+  daten-zweig-fremd:
+    name: Zweig daten/ nur für Sammler
+    if: ${{ startsWith(github.head_ref, 'daten/') && github.event.pull_request.user.login != 'anime-kalender-daten[bot]' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: |
+          echo "::error::Zweig daten/ ist Sammlern vorbehalten: Commit auf fix/ oder korrektur/ neu pushen"
+          exit 1
 
   # Datenbau (16.10.2026): `pipeline/lib/pruefung.ts` lief nur im Bestandsbau nach dem Merge; PR 1368 setzte ein Feld, das ein späterer Bauschritt
   # anders vererbt, und main brach ab. Der Job baut den Datensatz wie `bestand-bauen.yml` (Cache `anilist-cache-`, nur lesen) ohne Commit; ein

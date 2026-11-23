@@ -19,6 +19,7 @@ import { fileURLToPath } from 'node:url'
 import { parse } from 'yaml'
 import { DATENBAU_NAME, pruefeDatenbau } from './pr-kette-datenbau.mjs'
 import { ortFehler, ortZeile } from './pr-kette-ort.mjs'
+import { WAECHTER_NAME, pruefeWaechter } from './pr-kette-waechter.mjs'
 import { pruefeRahmen, pruefeSchrittfolge } from './pr-kette-rahmen.mjs'
 import { IF_VOLLE_KETTE, NEEDS_SCOPE, SCHNELLWEG_NAME, SCOPE_NAME, pruefeSchnellweg } from './pr-kette-schnellweg.mjs'
 
@@ -28,7 +29,7 @@ const AUSSEHEN = 'PR-Aussehen'
 /** Aussehen-Jobs (Matrix, eigene Form, kein Teil von check:vor-commit); sie zählen im Sammeljob trotzdem (seit 16.10.2026). */
 const istAussehen = (job) => String(job.name ?? '').startsWith(AUSSEHEN)
 /** Jobs mit eigener Form (Aussehen-Matrix, Datenbau, Umfang und Mod-Schnellweg), die nicht Teil von check:vor-commit sind. */
-const istSonderjob = (job) => istAussehen(job) || [DATENBAU_NAME, SCOPE_NAME, SCHNELLWEG_NAME].includes(job.name)
+const istSonderjob = (job) => istAussehen(job) || [DATENBAU_NAME, SCOPE_NAME, SCHNELLWEG_NAME, WAECHTER_NAME].includes(job.name)
 const TEILJOB_BEDINGUNG = "!startsWith(github.head_ref, 'daten/') && !github.event.pull_request.draft"
 
 /** Alle `npm run X`-Namen in einem Text (für `check:vor-commit`). */
@@ -109,11 +110,12 @@ function pruefeSammler(jobs, sammlerId) {
   const fehler = []
   const sammler = jobs[sammlerId]
   const erwartet = Object.entries(jobs)
-    .filter(([id]) => id !== sammlerId)
+    .filter(([id, j]) => id !== sammlerId && j.name !== WAECHTER_NAME)
     .map(([id]) => id)
   const needs = [sammler.needs ?? []].flat()
   for (const id of erwartet) if (!needs.includes(id)) fehler.push(`Sammeljob: Teiljob "${id}" fehlt in needs`)
   for (const id of needs) if (!jobs[id]) fehler.push(`Sammeljob: needs nennt unbekannten Job "${id}"`)
+  for (const id of needs) if (jobs[id]?.name === WAECHTER_NAME) fehler.push(`Sammeljob: needs nennt den Wächter "${id}" (übersprungen zählt dort als rot)`)
   const erwartetIf = `\${{ always() && ${TEILJOB_BEDINGUNG} }}`
   if (sammler.if !== erwartetIf) {
     fehler.push(`Sammeljob: if ist nicht textgleich "${erwartetIf}" (always() ist Pflicht, sonst überspringt ihn ein roter Teiljob = bestanden)`)
@@ -173,6 +175,7 @@ export function pruefeKette(doc, scripts, aktion) {
     ...pruefeAuflagen(doc, jobs, sammlerId, vorCommit),
     ...pruefeDatenbau(jobs),
     ...pruefeSchnellweg(jobs),
+    ...pruefeWaechter(jobs),
     ...pruefeRahmen(doc, pflichtJobs, aktion),
   ]
   for (const [name, anzahl] of zaehleVorkommen(teiljobs, vorCommit)) {

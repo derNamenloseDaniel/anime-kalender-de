@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-23T13:28:05.295Z",
+  "stand": "2026-11-23T15:11:36.702Z",
   "verweise": [
     {
       "titleId": 99629,
@@ -6217,6 +6217,17 @@
       "letzterWeg": false
     },
     {
+      "titleId": 103119,
+      "titel": "Strike Witches: Road to Berlin",
+      "plattform": "crunchyroll",
+      "url": "https://www.crunchyroll.com/de/strike-witches",
+      "seriesId": null,
+      "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
+      "geprueftAm": null,
+      "entferntAm": "2026-11-23",
+      "letzterWeg": true
+    },
+    {
       "titleId": 145850,
       "titel": "GREEN DA KA RA × Mirai no Mirai",
       "plattform": "youtube",
@@ -7277,6 +7288,17 @@
       "titel": "Promise of Wizard",
       "plattform": "primevideo",
       "url": "https://www.amazon.de/gp/video/detail/B0DRVH7MBP",
+      "seriesId": null,
+      "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
+      "geprueftAm": null,
+      "entferntAm": "2026-11-23",
+      "letzterWeg": true
+    },
+    {
+      "titleId": 171019,
+      "titel": "Isekai Onsen Paradise",
+      "plattform": "primevideo",
+      "url": "https://www.amazon.de/gp/video/detail/B0CV9X3HY7",
       "seriesId": null,
       "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
       "geprueftAm": null,

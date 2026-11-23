@@ -68,4 +68,14 @@ pruefe('Umhängen: Folgentitel nur beim Geschwister → Mutter ohne Mangel', !re
 pruefe('Umhängen: Folgentitel in keiner Liste → Mutter hat den Mangel', reiheMessung('Der Fund im Nirgendwo').has(MUTTER))
 pruefe('Umhängen: Folgentitel in der eigenen Liste → Nummer, kein Mangel', !reiheMessung('Der alte Hafen am Meer').has(MUTTER))
 
+// Artikel-Rückfall erst ab 10 Zeichen Kern; wörtliche Treffer gelten auch kurz.
+const KURZ = 900004
+const kurzListen: WikiListen = { [KURZ]: { seite: 'D', folgen: [{ nr: 5, dt: 'Held' }, { nr: 6, dt: 'Lied am Meer' }, { nr: 7, dt: 'Lied am See' }] } }
+const kurzTermin = { titleId: KURZ, platform: 'tv', sender: 'Super RTL', schedule: { firstEpisodeDate: '2026-09-01' } } as unknown as Release
+const kurzMessung = (folge: string) => titelMitSichtungOhneFolge([kurzTermin], [{ ...programm(folge), titleId: KURZ }], kurzListen, new Map([[KURZ, { id: KURZ }]]) as unknown as Map<number, Title>)
+pruefe('Kurz: wörtlicher Treffer „Held“ zählt', !kurzMessung('Held').has(KURZ))
+pruefe('Kurz: „Der Held“ (Kern 4 nach Artikel) wird nicht geraten', kurzMessung('Der Held').has(KURZ))
+pruefe('Kurz: „Ein Lied am Meer“ (Kern genau 10) trifft', !kurzMessung('Ein Lied am Meer').has(KURZ))
+pruefe('Kurz: „Ein Lied am See“ (Kern 9) wird nicht geraten', kurzMessung('Ein Lied am See').has(KURZ))
+
 process.exit(verletzt ? 1 : 0)

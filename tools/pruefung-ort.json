@@ -24,7 +24,7 @@
     "pipeline/check-filter-zaehlung-bestand.ts": {
    "ort": "nachts",
    "grund": "Rückrechnung der Chip-Zahlen am Bestand, 2 s; der Bestand ändert sich nur durch den Bestandsbau, nicht durch PRs; Neuzugang 23.11.2026, 0 Funde",
-   "beleg": "pipeline/check-filter-zaehlung-bestand.ts Z. 20-25: liest nur public/data/titles.json und releases.json (Spur strace 23.11.2026), kein data/; rot, wenn eine Chip-Zahl von der Trefferzahl von filterTitles abweicht"
+   "beleg": "pipeline/check-filter-zaehlung-bestand.ts Z. 20-27: liest nur public/data/titles.json, titles-core.json, cartoons.json und releases.json (kein data/); rot, wenn eine Chip-Zahl von der Kartenzahl der Seite (filterTitles, dann ordneListe) abweicht"
   },
   "pipeline/check-fetch-pruefungen-laufzeit.ts": {
       "ort": "nachts",

@@ -9,6 +9,8 @@ import { PLATFORMS, RELEASE_TYPES, type PlatformId, type Release, type ReleaseTy
 import { todayIso } from '../shared/time.ts'
 import { EMPTY_FILTERS, filterTitles, type FilterState } from '../web/src/lib/filters.ts'
 import { groupByFranchise } from '../web/src/lib/db-gruppen.ts'
+import { ordneListe } from '../web/src/lib/db-liste.ts'
+import { titelQuelle } from '../web/src/lib/titel-quelle.ts'
 import { zaehleFilterGen, type FilterZaehlung } from '../web/src/lib/filter-zaehlung.ts'
 
 let verletzt = 0
@@ -22,21 +24,24 @@ const lies = <T>(datei: string) => JSON.parse(readFileSync(new URL(`../public/da
 const titel = lies<Title[]>('titles.json')
 const releasesByTitle = new Map<number, Release[]>()
 for (const r of lies<Release[]>('releases.json')) releasesByTitle.set(r.titleId, [...(releasesByTitle.get(r.titleId) ?? []), r])
+/* Die Quelle der Datenbank wie die Seite sie baut: Kern, alle Titel und die Cartoons (`cartoons.json`) — ohne sie blieb jede Cartoon-Zahl ungeprüft. */
+const quelle = titelQuelle(lies<Title[]>('titles-core.json'), titel, undefined, false, lies<Title[]>('cartoons.json'))
 const data = { releasesByTitle } as never
 const heute = todayIso()
 
 function zaehle(gruppiert: boolean): FilterZaehlung {
-  const gen = zaehleFilterGen(titel, releasesByTitle, heute, gruppiert)
+  const gen = zaehleFilterGen(quelle, releasesByTitle, heute, gruppiert)
   for (;;) {
     const r = gen.next()
     if (r.done) return r.value
   }
 }
 
-/** Die Trefferzahl nach dem Antippen: derselbe Filter wie der Chip, durch `filterTitles`. */
+/** Die Trefferzahl nach dem Antippen: derselbe Filter wie der Chip (`filterTitles`), dann die Liste der Seite (`ordneListe`) mit allen Gruppen samt „Ohne bekannten Termin". */
 const treffer = (f: Partial<FilterState>, gruppiert: boolean) => {
-  const liste = filterTitles(titel, data, { ...EMPTY_FILTERS, ...f }, heute, new Set())
-  return gruppiert ? groupByFranchise(liste).length : liste.length
+  const liste = filterTitles(quelle, data, { ...EMPTY_FILTERS, ...f }, heute, new Set())
+  const kacheln = gruppiert ? groupByFranchise(liste) : liste.map((t) => ({ main: t, members: [t] }))
+  return ordneListe(kacheln, 'relevanz', '', releasesByTitle, heute).liste.length
 }
 
 const CHIPS: { name: string; filter: Partial<FilterState>; zahl: (z: FilterZaehlung) => number | undefined }[] = [
@@ -50,7 +55,7 @@ const CHIPS: { name: string; filter: Partial<FilterState>; zahl: (z: FilterZaehl
 ]
 
 for (const gruppiert of [false, true]) {
-  console.log(`\nChip-Zahl = Treffer des einen Filters (${gruppiert ? 'Karten, Staffeln zusammengefasst' : 'Titel'}), ${titel.length} Titel:`)
+  console.log(`\nChip-Zahl = Treffer des einen Filters (${gruppiert ? 'Karten, Staffeln zusammengefasst' : 'Titel'}), ${quelle.length} Titel:`)
   const z = zaehle(gruppiert)
   for (const c of CHIPS) {
     const soll = treffer(c.filter, gruppiert)

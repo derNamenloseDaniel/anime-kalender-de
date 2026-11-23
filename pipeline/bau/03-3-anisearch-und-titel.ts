@@ -29,7 +29,6 @@ export function uebernehmeAnisearchUndDeutscheTitel({ handTitel, titles, anisear
 
   let deutscheTitel = 0
   let deutscheTitelTmdb = 0
-  let netflixOhneKennung = 0
   for (const title of titles.values()) {
     const extra = anisearch[title.id]
 
@@ -168,9 +167,7 @@ export function uebernehmeAnisearchUndDeutscheTitel({ handTitel, titles, anisear
       (a, b) => PLATFORM_PRIORITY.indexOf(a.platform) - PLATFORM_PRIORITY.indexOf(b.platform),
     )
   }
-  if (netflixOhneKennung) log(`${netflixOhneKennung} Netflix-Verweise ohne Kennung entfernt — sie führen ins Leere`)
   if (deutscheTitelTmdb) log(`${deutscheTitelTmdb} deutsche Titel von TMDB ergänzt (aniSearch hatte keinen)`)
   if (umsortiert) log(`${umsortiert} aniSearch-Verweise umsortiert: Adresse gehört zu einem anderen Anbieter als dem genannten`)
   if (fremdeAdressen) log(`${fremdeAdressen} aniSearch-Verweise verworfen: Adresse führt zu gar keinem bekannten Anbieter`)
-  return { netflixOhneKennung }
 }

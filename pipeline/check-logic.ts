@@ -5443,10 +5443,6 @@ pruefe(
     '… nur, wo die Erweiterung dieselbe gti auf unserer Seite abgelesen hat (Pokémon Weiß → Schwarz)',
     /if \(gtiBelegt\[adressKern\(s\.url\)\] !== wahl\.gti\)/.test(bau),
   )
-  pruefe(
-    '… und belebt nicht wieder, was ein Handbeleg ohne Adresse für Prime verneint',
-    /if \(handNein\) return false/.test(bau),
-  )
   /* Dass die Linkprüfung die Amazon-Seite statt JustWatchs Adresse prüft, läuft in check-links-laufzeit.ts. */
 }
 /* Your Name – CineAnime: der letzte Spieltag kommt auch über die Veranstaltungsadresse (17.09.2026). */

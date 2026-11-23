@@ -3,6 +3,16 @@
 Stand 23.11.2026. Nur Plan, nichts umgebaut. Auftrag: Daniels Entscheidung F153 A („erst Horizonte, danach alle Serien, wo es Sinn macht, aufteilen; eigene beste Aufteilung; Relationen bleiben; offizielle Staffelbezeichner“).
 Alle Zahlen stammen aus `public/data/titles.json` (2929 Titel, davon 1428 TV), `data/tmdb-folgen.json`, `data/anbieter-staffeln.json` (Netflix-Staffelliste je Serienkennung) und den `dubRanges` der Wege. Das Messskript lag im Scratchpad und ist nicht eingecheckt (Wegwerfskript); die Regel unten lässt sich als `pipeline/`-Bericht nachbauen (Schritt 1 der Empfehlung).
 
+## Vorgabe Daniel 23.11.2026 19:39 (geht allem unten vor, ersetzt die Schwelle in 4.1)
+
+„f153 darf keine generischen regeln einführen, jeder anime muss seperiert betrachtet und eingeschätzt werden, wir sammeln wissen aller quellen damit wir alle aktuell genutzten einteilungen kennen, entscheiden uns für eine der quellen die am meisten sinn macht, oder wählen eine eigene einteilung. wir müssen staffelteilung logisch und nützlich machen, jede sinnvolle teilung sollte gemacht werden. gleichzeitig sollen verbindungen erhalten bleiben … favorit horizonte (egal ob favorit staffel 1,2,3,4) zB über staffel 5, sobald sie erscheint“
+
+Daraus folgt:
+- **Keine Schwelle entscheidet.** „≥ 60 Folgen“, „≥ 10 je Staffel“ und Ähnliches dienen höchstens als Suchhilfe für die Reihenfolge, nie als Grund, eine Serie zu teilen oder nicht zu teilen. Auch eine Serie unter 60 Folgen wird geteilt, wenn die Teilung logisch und nützlich ist.
+- **Je Anime eine eigene Einschätzung:** Alle Einteilungen der Quellen werden gesammelt (deutsche Plattformen, Disc, TV-Sender, Wikipedia, TOGGO, TMDB, AniList, aniSearch, MAL). Dann wählen wir die sinnvollste davon oder eine eigene, mit Begründung je Serie.
+- **Gruppen-Favorit:** Ein Favorit auf irgendeine Staffel einer Gruppe (z. B. Horizonte Staffel 1–4) gilt für die ganze Gruppe und meldet künftige Staffeln (Staffel 5), sobald sie erscheinen. Gruppe heißt hier die Serie (Horizonte), nicht das ganze Franchise (Pokémon). Das gilt bei „Abschnitt“ wie bei „Titel“ (F157).
+- **Verbindungen bleiben:** Der Sprung zur Hauptserie und zu Nachbarserien bleibt erhalten.
+
 ## Kurzfassung
 
 - **Nur 61 TV-Titel haben mehr als 60 Folgen** (34 über 100, 9 über 200). Das ist die ganze Menge „wo es Sinn macht“. Unter 60 Folgen gibt es keinen Kandidaten: Von 90 Titeln mit ≥ 3 TMDB-Staffeln trägt TMDB bei 89 die ganze Reihe (Summe > 1,2 × Folgen des AniList-Eintrags), AniList teilt dort schon selbst; 1 Rest habe ich nicht einzeln angesehen.

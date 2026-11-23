@@ -19,7 +19,7 @@ import { type WikiListen, sendungNeuZuordnen, releasesAusTvProgramm, sendungenAn
 import { belegeHandTermine } from '../lib/tv-hand-belege.ts'
 import { type AnisearchFolgen, anisearchFolgenListe, kennungenVereint } from '../lib/anisearch-folgen-liste.ts'
 import { anisearchKennungen } from './anisearch-kennung.ts'
-import { quellenPflegen } from './nebendateien.ts'
+import { quellenHistorieLaden, quellenPflegen } from './nebendateien.ts'
 import { type Title, type Release } from '../../shared/types.ts'
 
 export function ergaenzeTermineAusNewsUndTv({ titles, releases }: {
@@ -58,7 +58,7 @@ export function ergaenzeTermineAusNewsUndTv({ titles, releases }: {
   schreibeUnzugeordnet(sammelV, ausMeldungen, abgedeckt, verluste)
   const verschoben = verschiebungenAnwenden(releases, rohVorschlaege.proposals ?? [], todayIso(), titles, discIndexLaden())
   if (verschoben.length) log(`${verschoben.length} Disc-Termine laut Anime2You verschoben: ${verschoben.map((v) => `${v.name} (${v.von} → ${v.nach})`).join(', ')}`)
-  const neuerBeiAniSearch = aniSearchDatumAnwenden(releases, discIndexLaden(), veroeffentlichungstage(rohVorschlaege.proposals ?? []), todayIso())
+  const neuerBeiAniSearch = aniSearchDatumAnwenden(releases, discIndexLaden(), veroeffentlichungstage(rohVorschlaege.proposals ?? []), todayIso(), quellenHistorieLaden())
   if (neuerBeiAniSearch.length) log(`${neuerBeiAniSearch.length} Disc-Termine laut aniSearch (später gelesen als die Anime2You-Meldung): ${neuerBeiAniSearch.map((v) => `${v.name} (${v.von} → ${v.nach})`).join(', ')}`)
   if (ausMeldungen.length)
     log(

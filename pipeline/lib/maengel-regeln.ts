@@ -172,7 +172,7 @@ export const REGELN: Regel[] = [
   { art: 'fsk', gruppe: 'fehlend', wirkung: 2, wer: 'auto:justwatch', zaehle: (t) => t.fsk == null },
   { art: 'wertung', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anilist', zaehle: (t) => !t.score, ausnahme: (t) => (t.id >= EIGENE_ID_BASIS ? 'keine-quelle-mit-stimmen' : undefined) },
   { art: 'studio', gruppe: 'fehlend', wirkung: 1, wer: 'hand:studio-von-hand', zaehle: (t) => !t.studios?.length, ausnahme: (t) => (t.id >= ANISEARCH_ID_BASIS ? 'quelle-ohne-studio' : undefined) },
-  { art: 'genre', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anilist', zaehle: (t) => !t.genres?.length },
+  { art: 'genre', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anilist', zaehle: (t) => !t.genres?.length, ausnahme: (t) => (t.id >= ANISEARCH_ID_BASIS ? 'quelle-ohne-genre' : undefined) },
   { art: 'laufzeit', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anisearch', zaehle: (t) => !t.runtimeMin },
   { art: 'jahr', gruppe: 'fehlend', wirkung: 2, wer: 'auto:anilist', zaehle: luecke('j'), ausnahme: jahrNochOhneStart },
   { art: 'sprecher', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anisearch', zaehle: (t) => !t.hasVoices, ausnahme: (t) => (hatSynchro(t) ? undefined : 'ohne-synchro') },

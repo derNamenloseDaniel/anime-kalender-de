@@ -1233,3 +1233,58 @@
       url: https://de.wikipedia.org/wiki/Tekkon_Kinkreet
     - name: AniList
       url: https://anilist.co/anime/99717
+
+- id: 4614 # Prinz Arthus (Staffel 2, 1980, TV, 22 Folgen; deutsche Fassung: Wikipedia EN „Prinz Arthus (German)“, Erstausgabe 1995 im Bestand)
+  umfang: titel
+  lizenz: CC BY-SA 4.0
+  text: >-
+    Zweite Serie um „Prinz Arthus“ (Toei Animation, 22 Folgen, 1980), die die Artus-Sage in eine futuristische Welt verlegt. Arthur verbirgt seine wahre Identität, um den Gegenspieler Ziking zu besiegen, und bricht dazu mit vier neuen Gefährten zu einer Reise voller Abenteuer auf.
+  quellen:
+    - name: Wikipedia (EN)
+      url: https://en.wikipedia.org/wiki/King_Arthur:_Prince_on_White_Horse
+    - name: MyAnimeList
+      url: https://myanimelist.net/anime/4614
+
+- id: 111939 # Die Legende von Nezha (2003, TV, 52 Folgen, CCTV; deutsche Fassung RTL II 2007)
+  umfang: titel
+  lizenz: CC BY-SA 4.0
+  text: >-
+    Chinesische Zeichentrickserie des Kinderprogramms von CCTV (52 Folgen, ab Juni 2003) über den Himmelsjungen Nezha. Er ist ein Wildfang, aber im Kern gutherzig und hält zum Recht. Mit Kampfkunst und Zauberkraft stellt er sich dem Bösen entgegen, damit die Menschen in Frieden leben können.
+  quellen:
+    - name: Wikipedia (ZH)
+      url: https://zh.wikipedia.org/wiki/%E5%93%AA%E5%90%92%E4%BC%A0%E5%A5%87
+    - name: MyAnimeList
+      url: https://myanimelist.net/anime/39936
+
+- id: 11421 # Der weiße Delphin (Zoom the White Dolphin, 1971 FR / 1975 JP, 13 japanische Folgen; Bestand: Teil, Erstausgabe 24.12.1988)
+  umfang: reihe
+  lizenz: CC BY-SA 4.0
+  text: >-
+    Französisch-japanische Zeichentrickserie um den weißen Delphin Oum, in Frankreich ab 1971 gezeigt, in Japan 1975 mit 13 Folgen. Die Geschwister Jan und Marina leben mit ihrem Onkel, einem früheren Seemann, auf einer Insel. Gemeinsam mit dem klugen Delphin und Tierfreunden wie einem Koala und einem Faultier erleben sie Abenteuer; später bekommt Oum selbst Nachwuchs.
+  quellen:
+    - name: Wikipedia (EN)
+      url: https://en.wikipedia.org/wiki/Zoom_the_White_Dolphin
+    - name: fernsehserien.de
+      url: https://www.fernsehserien.de/der-weisse-delphin
+
+- id: 123147 # Das Himmelsbuch (1983, Film, ~90 min, Shanghai Animation Film Studio; Bestand: Erstausgabe 27.05.1985)
+  umfang: titel
+  lizenz: CC BY-SA 4.0
+  text: >-
+    Chinesischer Animationsfilm des Shanghai Animation Film Studio (1983, rund 90 Minuten), frei nach Motiven eines alten Romans. Der himmlische Wächter Yuan Gong hat heimlich im Himmelsbuch gelesen und seinen Inhalt in eine Felswand geritzt, damit auch die Menschen davon profitieren. Zur Strafe muss er das Buch fortan auf der Erde hüten. Als ihm ein Vogel ein seltsames Steinei bringt, wollen drei Fuchsgeister das Buch an sich reißen.
+  quellen:
+    - name: Wikipedia (ZH)
+      url: https://zh.wikipedia.org/wiki/%E5%A4%A9%E4%B9%A6%E5%A5%87%E8%B0%AD
+    - name: MyAnimeList
+      url: https://myanimelist.net/anime/37228
+
+- id: 109418 # Persona 5 the Animation: Ein Beweis für die Gerechtigkeit (2019, OVA, 1 Folge, ~17 min)
+  umfang: titel
+  lizenz: CC BY-SA 4.0
+  text: >-
+    Bonusfolge zur Serie „Persona 5 the Animation“ (CloverWorks, 2019, rund 17 Minuten). Wenige Tage nach der Auseinandersetzung mit Akechi entdeckt der Schüler Ren Amamiya in einem Rätselheft einen Eintrag in dessen Handschrift: „Beweis der Gerechtigkeit“. Um zu verstehen, was Akechi damit meinte, zieht er durch die winterliche Stadt und denkt an gemeinsame Erlebnisse zurück.
+  quellen:
+    - name: Wikipedia (EN)
+      url: https://en.wikipedia.org/wiki/Persona_5:_The_Animation
+    - name: MyAnimeList
+      url: https://myanimelist.net/anime/39591

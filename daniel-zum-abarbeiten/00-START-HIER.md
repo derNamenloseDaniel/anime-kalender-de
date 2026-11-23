@@ -19,8 +19,8 @@ schickt die Meldung ab. Die Listen hier sind zum Nachschlagen, nicht zum Abtippe
 
 ## Was das bringt
 
-Von 2926 Titeln zeigen **215** keinen einzigen Bezugsweg,
-**117** davon mit belegter deutscher Synchro. Für die ist die
+Von 2926 Titeln zeigen **217** keinen einzigen Bezugsweg,
+**119** davon mit belegter deutscher Synchro. Für die ist die
 Antwort auf „wo kann ich das sehen?" heute: nirgends bekannt. Jede Meldung von hier
 macht eine davon weniger.
 

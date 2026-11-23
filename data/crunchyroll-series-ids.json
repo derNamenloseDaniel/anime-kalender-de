@@ -1,5 +1,5 @@
 {
-  "aufgeloestAm": "2026-11-22T15:01:51.608Z",
+  "aufgeloestAm": "2026-11-23T05:19:15.533Z",
   "adressen": {
     "http://www.crunchyroll.com/de/a-place-further-than-the-universe": {
       "seriesId": "GYK541EPR",
@@ -2880,8 +2880,8 @@
       "ziel": "aus der Suche im deutschen Katalog"
     },
     "https://www.crunchyroll.com/de/street-fighter-ii-the-animated-movie": {
-      "ziel": "https://www.crunchyroll.com/de/street-fighter-ii-the-animated-movie?__cf_chl_rt_tk=_gCm_64Ros1cOemVLiJit0IdeBBO2oFG8TOP3CPof9M-1793596769-1.0.1.1-KzHqBfAp3V8qTbeLHuxzKrPNdtMzxYV78zXgUF.Ph9A",
-      "geprueftAm": "2026-11-02",
+      "ziel": "https://www.crunchyroll.com/de/street-fighter-ii-the-animated-movie?__cf_chl_rt_tk=uYqKevhLuVqJS6gDgr.vejpoQZpEUyFTWIDyCixgPm8-1795411067-1.0.1.1-Qs3pdJF2rmNcUbJ8CwMQpN7TbDQIzn.kqT9Akca3bjk",
+      "geprueftAm": "2026-11-23",
       "fehler": "keine Serienkennung hinter dieser Adresse"
     },
     "https://www.crunchyroll.com/detektiv-conan-movies/detektiv-conan-film-1-der-tickende-wolkenkratzer-unbekannt-810163": {
@@ -4047,6 +4047,11 @@
       "seriesId": "GMTE00193060",
       "ziel": "https://www.crunchyroll.com/watch/GR790PW36?__cf_chl_rt_tk=DhywpEPA5iO8Y_nb8M7vs1fiVq4H4E5k7vUV00ieL2I-1793804576-1.0.1.1-3p0CFPiVHw2B7Pwu_apO8zBsMVoGTO_OtEjv1MCXr4Q",
       "geprueftAm": "2026-11-04"
+    },
+    "https://www.crunchyroll.com/de/strike-witches": {
+      "ziel": "https://www.crunchyroll.com/de/strike-witches?__cf_chl_rt_tk=cZLQevBqKwM5p8y2J.IV96NAvFzY_kxySSUG0hB4rfM-1795411073-1.0.1.1-OgkcDRUITLeNY6dhdfQ6qqaCI1iXRSQmKwvLGgc8Sys",
+      "geprueftAm": "2026-11-23",
+      "fehler": "keine Serienkennung hinter dieser Adresse"
     }
   }
 }

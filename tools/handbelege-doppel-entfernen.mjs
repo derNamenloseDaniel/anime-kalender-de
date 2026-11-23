@@ -19,51 +19,60 @@
  * Aufruf: `node tools/handbelege-doppel-entfernen.mjs [--trocken]`
  */
 import { readFileSync, writeFileSync } from 'node:fs'
+import { pathToFileURL } from 'node:url'
 import yaml from 'js-yaml'
 
 const pfad = 'data/dub-confirmed.yaml'
-const trocken = process.argv.includes('--trocken')
-const text = readFileSync(pfad, 'utf8')
-const zeilen = text.split('\n')
 
-/* Ein Block beginnt mit „- " in Spalte 0 und reicht bis vor die nächste Zeile, die nicht eingerückt ist. */
-const raus = []
-const gesehen = new Set()
-let entfernt = 0
-for (let i = 0; i < zeilen.length; ) {
-  if (!zeilen[i].startsWith('- ')) {
-    raus.push(zeilen[i])
-    i++
-    continue
+/** Entfernt textgleiche Eintragsblöcke (ab dem zweiten); liefert den neuen Text, die Zeilen davor und danach und die Zahl entfernter Blöcke. */
+export function entferneDoppel(text) {
+  const zeilen = text.split('\n')
+  /* Ein Block beginnt mit „- " in Spalte 0 und reicht bis vor die nächste Zeile, die nicht eingerückt ist. */
+  const raus = []
+  const gesehen = new Set()
+  let entfernt = 0
+  for (let i = 0; i < zeilen.length; ) {
+    if (!zeilen[i].startsWith('- ')) {
+      raus.push(zeilen[i])
+      i++
+      continue
+    }
+    let j = i + 1
+    while (j < zeilen.length && zeilen[j].startsWith('  ')) j++
+    const block = zeilen.slice(i, j)
+    const schluessel = block.map((z) => z.trimEnd()).join('\n')
+    if (gesehen.has(schluessel)) {
+      entfernt++
+      /* Die Leerzeile hinter einem entfernten Block fällt mit, sonst stapeln sie sich. */
+      if (j < zeilen.length && zeilen[j] === '') j++
+    } else {
+      gesehen.add(schluessel)
+      raus.push(...block)
+    }
+    i = j
   }
-  let j = i + 1
-  while (j < zeilen.length && zeilen[j].startsWith('  ')) j++
-  const block = zeilen.slice(i, j)
-  const schluessel = block.map((z) => z.trimEnd()).join('\n')
-  if (gesehen.has(schluessel)) {
-    entfernt++
-    /* Die Leerzeile hinter einem entfernten Block fällt mit, sonst stapeln sie sich. */
-    if (j < zeilen.length && zeilen[j] === '') j++
-  } else {
-    gesehen.add(schluessel)
-    raus.push(...block)
-  }
-  i = j
+  return { neu: raus.join('\n'), raus, zeilen, entfernt }
 }
-const neu = raus.join('\n')
 
-const vorher = yaml.load(text) ?? []
-const nachher = yaml.load(neu) ?? []
-const menge = (liste) => new Set(liste.map((b) => JSON.stringify(b)))
-const a = menge(vorher)
-const b = menge(nachher)
-const gleich = a.size === b.size && [...a].every((x) => b.has(x))
-console.log(`Belege vorher ${vorher.length}, nachher ${nachher.length}, entfernt ${entfernt}`)
-console.log(`Menge der Belege unverändert: ${gleich ? 'ja' : 'NEIN'} (${a.size} verschiedene)`)
-console.log(`Kommentarzeilen vorher ${zeilen.filter((z) => z.startsWith('#')).length}, nachher ${raus.filter((z) => z.startsWith('#')).length}`)
-if (!gleich || vorher.length - nachher.length !== entfernt) {
-  console.error('Gegenprobe gescheitert — nichts geschrieben.')
-  process.exit(1)
+function main() {
+  const trocken = process.argv.includes('--trocken')
+  const text = readFileSync(pfad, 'utf8')
+  const { neu, raus, zeilen, entfernt } = entferneDoppel(text)
+  const vorher = yaml.load(text) ?? []
+  const nachher = yaml.load(neu) ?? []
+  const menge = (liste) => new Set(liste.map((b) => JSON.stringify(b)))
+  const a = menge(vorher)
+  const b = menge(nachher)
+  const gleich = a.size === b.size && [...a].every((x) => b.has(x))
+  console.log(`Belege vorher ${vorher.length}, nachher ${nachher.length}, entfernt ${entfernt}`)
+  console.log(`Menge der Belege unverändert: ${gleich ? 'ja' : 'NEIN'} (${a.size} verschiedene)`)
+  console.log(`Kommentarzeilen vorher ${zeilen.filter((z) => z.startsWith('#')).length}, nachher ${raus.filter((z) => z.startsWith('#')).length}`)
+  if (!gleich || vorher.length - nachher.length !== entfernt) {
+    console.error('Gegenprobe gescheitert — nichts geschrieben.')
+    process.exit(1)
+  }
+  if (!trocken) writeFileSync(pfad, neu)
+  console.log(trocken ? '(trocken — nichts geschrieben)' : `${pfad} geschrieben`)
 }
-if (!trocken) writeFileSync(pfad, neu)
-console.log(trocken ? '(trocken — nichts geschrieben)' : `${pfad} geschrieben`)
+
+if (import.meta.url === pathToFileURL(process.argv[1]).href) main()

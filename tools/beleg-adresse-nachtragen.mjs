@@ -21,49 +21,57 @@
  * Ohne `--schreiben` wird nur gezählt.
  */
 import { readFileSync, writeFileSync } from 'node:fs'
+import { pathToFileURL } from 'node:url'
 
-const SCHREIBEN = process.argv.includes('--schreiben')
 const DATEI = 'data/dub-confirmed.yaml'
 
-const roh = readFileSync(DATEI, 'utf8')
-const bloecke = roh.split(/\n(?=- anilistId:)/)
+/** Ergänzt je Prime-Beleg ohne `url` die Adresse aus der Notiz; liefert Blöcke vorher, Blöcke nachher und die Zähler. */
+export function ergaenzeAdressen(roh) {
+  const bloecke = roh.split(/\n(?=- anilistId:)/)
+  let ergaenzt = 0
+  let hatteSchon = 0
+  let ohneKennung = 0
 
-let ergaenzt = 0
-let hatteSchon = 0
-let ohneKennung = 0
-
-const neu = bloecke.map((block) => {
-  const kennung = /Amazon-Seite ([A-Z0-9]{8,})/.exec(block)?.[1]
-  if (!kennung) {
-    ohneKennung++
-    return block
-  }
-  if (/^\s+url:/m.test(block)) {
-    hatteSchon++
-    return block
-  }
-  /* Nur Amazon-Belege — die Kennung stammt aus einer Amazon-Notiz. */
-  if (!/^\s+platform:\s*primevideo\s*$/m.test(block)) return block
-  /*
+  const neu = bloecke.map((block) => {
+    const kennung = /Amazon-Seite ([A-Z0-9]{8,})/.exec(block)?.[1]
+    if (!kennung) {
+      ohneKennung++
+      return block
+    }
+    if (/^\s+url:/m.test(block)) {
+      hatteSchon++
+      return block
+    }
+    /* Nur Amazon-Belege — die Kennung stammt aus einer Amazon-Notiz. */
+    if (!/^\s+platform:\s*primevideo\s*$/m.test(block)) return block
+    /*
     Die Zeile steht direkt hinter `platform:` — dort steht sie auch bei den
     Belegen, die `fetch-pruefungen.ts` selbst schreibt. Gleiche Reihenfolge
     heißt: Der Diff bleibt lesbar, wenn beide Wege dieselbe Datei anfassen.
-  */
-  ergaenzt++
-  return block.replace(
-    /^(\s+platform:\s*primevideo\s*)$/m,
-    `$1\n  url: https://www.amazon.de/gp/video/detail/${kennung}`,
-  )
-})
-
-console.log(`${bloecke.length} Belege gelesen`)
-console.log(`  ${ergaenzt} bekommen die Adresse aus ihrer eigenen Notiz`)
-console.log(`  ${hatteSchon} hatten schon eine`)
-console.log(`  ${ohneKennung} nennen keine Amazon-Seite`)
-
-if (!SCHREIBEN) {
-  console.log('\nTrockenlauf — mit --schreiben wird die Datei geändert.')
-  process.exit(0)
+    */
+    ergaenzt++
+    return block.replace(
+      /^(\s+platform:\s*primevideo\s*)$/m,
+      `$1\n  url: https://www.amazon.de/gp/video/detail/${kennung}`,
+    )
+  })
+  return { bloecke, neu, ergaenzt, hatteSchon, ohneKennung }
 }
-writeFileSync(DATEI, neu.join('\n'))
-console.log(`\n${DATEI} geschrieben.`)
+
+function main() {
+  const SCHREIBEN = process.argv.includes('--schreiben')
+  const { bloecke, neu, ergaenzt, hatteSchon, ohneKennung } = ergaenzeAdressen(readFileSync(DATEI, 'utf8'))
+  console.log(`${bloecke.length} Belege gelesen`)
+  console.log(`  ${ergaenzt} bekommen die Adresse aus ihrer eigenen Notiz`)
+  console.log(`  ${hatteSchon} hatten schon eine`)
+  console.log(`  ${ohneKennung} nennen keine Amazon-Seite`)
+
+  if (!SCHREIBEN) {
+    console.log('\nTrockenlauf — mit --schreiben wird die Datei geändert.')
+    process.exit(0)
+  }
+  writeFileSync(DATEI, neu.join('\n'))
+  console.log(`\n${DATEI} geschrieben.`)
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1]).href) main()

@@ -1,19 +1,18 @@
 import { useContext, useEffect, useRef, type ComponentProps, type ReactNode } from 'react'
-import { titleStatus } from '@shared/logic.ts'
 import type { Dataset } from '../../src/lib/data.ts'
-import { kastenKopfVon, useKastenZustand } from '../../src/components/detail/antwort-kasten-zustand.tsx'
+import { kastenKlassen, kastenKopfVon, useKastenZustand } from '../../src/components/detail/antwort-kasten-zustand.tsx'
 import type { AntwortKastenMitMarke } from '../../src/components/detail/kasten-marke.tsx'
 import { usePanelReihe } from '../../src/components/detail/panel-reihe-namen.ts'
 import { TitelWechselKontext } from '../titel-wechsel.ts'
+import { lageVon, type Lage } from './staffel-lage.ts'
 import { reiterVon, type Reiter } from './staffel-reiter-liste.ts'
 
 type KastenEigenschaften = ComponentProps<typeof AntwortKastenMitMarke>
 
-/** Farbe und Rand des Antwortkastens (`kastenKlassen`): der gewählte Reiter trägt dieselben, so wächst er aus dem Kasten. */
-const KASTEN_ROT = 'border-[#f6cfc3] bg-[#fff6f3] dark:border-[#4a2a24] dark:bg-[#1a1416]'
-const KASTEN_GRAU = 'border-slate-200 bg-[#f8fafc] dark:border-white/10 dark:bg-[#111623]'
-
-type Lage = 'laeuft' | 'kommt' | 'sonst'
+/** Farbe und Rand aus den Klassen der Kastenhülle (`kastenKlassen`): der gewählte Reiter trägt dieselben, so wächst er aus dem Kasten. */
+function kastenFarbe(huelle: string): string {
+  return huelle.split(' ').filter((k) => /^(dark:)?(border|bg)-/.test(k)).join(' ')
+}
 
 function reiterKlassen(lage: Lage, gewaehlt: boolean, kasten: string): string {
   const basis = 'relative grid shrink-0 cursor-pointer snap-center place-items-center rounded-t-xl border border-b-0 px-3 text-t3 tabular-nums'
@@ -28,13 +27,6 @@ function zeigeGewaehlten(zeile: HTMLElement | null): void {
   const reiter = zeile?.querySelector<HTMLElement>('[aria-current="true"]')
   if (!zeile || !reiter) return
   zeile.scrollLeft = reiter.offsetLeft - (zeile.clientWidth - reiter.offsetWidth) / 2
-}
-
-/** Läuft die Staffel (echter Status des Titels), kommt sie noch, oder ist sie schon da. */
-function lageVon(data: Dataset, id: number, today: string): Lage {
-  const titel = data.titleById.get(id)
-  const status = titleStatus(data.releasesByTitle.get(id) ?? [], today, titel)
-  return status === 'airing' ? 'laeuft' : status === 'tba' ? 'kommt' : 'sonst'
 }
 
 /** „Staffeln“ links, daneben je Staffel ein Reiter mit nur der Nummer; wischt nativ, Beschriftung für Hilfsmittel nennt den Titel. */
@@ -67,11 +59,12 @@ export function ReiterUeberKasten({ data, eigenschaften, kasten }: { data: Datas
   const z = useKastenZustand({ antwort, title, t, stream, disc, pillenGruppen, terminPillen, discZuerst })
   const { gedaempft } = kastenKopfVon({ antwort, title, today, T: z.T, releases, ohneSprachbeleg, folgenZahl: z.folgenZahl, staffeln: z.staffeln })
   const reiter = reiterVon(title, reihenTeile, reihenName, data.titles)
-  const lagen = new Map(reiter.map((r) => [r.id, lageVon(data, r.id, today)]))
+  const lagen = new Map(reiter.map((r) => [r.id, lageVon(data.titleById.get(r.id)!, data.releasesByTitle.get(r.id) ?? [], today)]))
+  const farbe = kastenFarbe(kastenKlassen({ antwort, title, neben: '', gedaempft }))
   if (reiter.length === 0) return kasten
   return (
     <>
-      <ReiterZeile reiter={reiter} aktiv={title.id} lagen={lagen} farbe={gedaempft ? KASTEN_GRAU : KASTEN_ROT} />
+      <ReiterZeile reiter={reiter} aktiv={title.id} lagen={lagen} farbe={farbe} />
       {kasten}
     </>
   )

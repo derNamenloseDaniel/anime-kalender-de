@@ -6,7 +6,8 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import type { FranchiseMember, Title } from '../shared/types.ts'
+import type { FranchiseMember, Release, Title } from '../shared/types.ts'
+import { lageVon } from '../web/buehne/mockups/staffel-lage.ts'
 import { reiterVon } from '../web/buehne/mockups/staffel-reiter-liste.ts'
 
 const datei = fileURLToPath(new URL('../web/buehne/faelle.json', import.meta.url))
@@ -55,5 +56,19 @@ assert.equal(reiter(1315).length, 0, 'Special')
 assert.equal(reiterVon(offen(10852), teile.slice(0, 0), 'Pokémon', titel).length, 0, 'ohne Reihe')
 // Eine einzelne Horizonte-Staffel ohne Geschwister zeigt keine Reiter.
 assert.equal(reiterVon(offen(14839), teile, 'Pokémon', [offen(14839)]).length, 0, 'ein Reiter allein')
+
+// Zustandsmarke je Reiter am Stichtag des Falls (2026-11-23): Horizonte 4 läuft (RTL+ seit 20.11., Ende offen), 1 bis 3 nicht
+// (die Fernsehreihe hat Folge 136 schon am 21.11. gesendet); Hauptserie: 23–25 läuft, 1–5 kommt (Box), 25 ohne Marke.
+const stichtag = '2026-11-23'
+const releases = fall['releases.json'] as Release[]
+const lage = (id: number) => lageVon(offen(id), releases.filter((r) => r.titleId === id), stichtag)
+assert.deepEqual([26469, 26470, 26471, 14839].map(lage), ['sonst', 'sonst', 'sonst', 'laeuft'], 'Horizonte: nur Staffel 4 läuft')
+assert.deepEqual([483, 1349, 10852, 14838].map(lage), ['kommt', 'sonst', 'laeuft', 'sonst'], 'Hauptserie')
+// Eine Reihe, die Staffel 1 noch nicht erreicht hat (Sichtung bis Folge 20 von 45), läuft dort: der Ausschluss gilt nur für Gesichtetes ab dem Ende.
+const mitten = releases.filter((r) => r.titleId === 26469).map((r) => ({ ...r, schedule: { ...r.schedule, observed: { 19: '2026-11-20', 20: '2026-11-21' } } }))
+assert.equal(lageVon(offen(26469), mitten, stichtag), 'laeuft', 'Staffel 1 mitten in der Sendung')
+assert.equal(lageVon(offen(26470), mitten, stichtag), 'laeuft', 'Staffel 2 noch nicht erreicht')
+// Titel mit bekannter Folgenzahl und abgelaufenem Plan bleibt „sonst“ (Ende offen gilt nur ohne Folgenzahl).
+assert.equal(lageVon({ ...offen(14839), episodes: 12 }, releases.filter((r) => r.titleId === 14839), stichtag), 'sonst', 'Staffel 4 mit Folgenzahl')
 
 console.log('buehne-staffel-reiter: ok (Horizonte 4, Pokémon 12, Attack on Titan 4 ohne Junior High, Film/Special/leer/allein 0)')

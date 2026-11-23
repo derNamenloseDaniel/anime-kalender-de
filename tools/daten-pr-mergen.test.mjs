@@ -7,6 +7,7 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, wr
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { parse } from 'yaml'
 
 const fehler = []
 function pruefe(name, bedingung, gefunden) {
@@ -90,6 +91,17 @@ esac
   pruefe('ohne Konflikt: beide gemergt, nachlauf leer', ohneRennen.status === 0 && ohneRennen.liste.join() === '6,7' && ohneRennen.nachlauf === 'nachlauf=', ohneRennen)
   const keinerGemergt = lauf('konflikt', ['6', '7'])
   pruefe('beide im Konflikt, nichts gemergt: weiter rot, kein Nachlauf (sonst Endlosschleife)', keinerGemergt.status === 1 && !keinerGemergt.gemergt && keinerGemergt.nachlauf === 'nachlauf=', keinerGemergt)
+  // Verdrahtung: Das Skript schreibt `nachlauf`, beide Merge-Jobs reichen es aus Schritt `mergen` weiter, der Job `anstossen` läuft auch nach Rot (!cancelled()) und hat als einziger `actions: write`.
+  const wf = parse(readFileSync(join(wurzel, '.github/workflows/claude-daten-merge.yml'), 'utf8'))
+  for (const job of ['nachholen', 'zusammenfuehren']) {
+    const schritt = wf.jobs[job].steps.find((s) => String(s.run ?? '').includes('daten-pr-mergen.sh'))
+    pruefe(`Job ${job}: Merge-Schritt hat id mergen, Job-Ausgabe nachlauf zeigt darauf`, schritt?.id === 'mergen' && wf.jobs[job].outputs?.nachlauf === '${{ steps.mergen.outputs.nachlauf }}', wf.jobs[job].outputs)
+  }
+  const anst = wf.jobs.anstossen
+  pruefe('Job anstossen: hängt an beiden Merge-Jobs, läuft trotz Rot, liest beide nachlauf', JSON.stringify(anst?.needs) === '["nachholen","zusammenfuehren"]' && /!cancelled\(\)/.test(anst.if) && /needs\.nachholen\.outputs\.nachlauf/.test(anst.if) && /needs\.zusammenfuehren\.outputs\.nachlauf/.test(anst.if), anst)
+  pruefe('actions: write nur im Job anstossen, Workflow bei read', anst?.permissions?.actions === 'write' && wf.permissions.actions === 'read' && !wf.jobs.zusammenfuehren.permissions && !wf.jobs.nachholen.permissions, wf.permissions)
+  const anstoss = anst?.steps?.[0]
+  pruefe('Obergrenze: ab Durchgang 3 rot statt neuem Anstoß, Zähler läuft weiter', /-ge 3/.test(anstoss?.run) && /exit 1/.test(anstoss.run) && /durchgang=\$\(\(DURCHGANG \+ 1\)\)/.test(anstoss.run) && wf.on.workflow_dispatch.inputs.durchgang.default === '1', anstoss)
 } finally {
   rmSync(dir, { recursive: true, force: true })
 }

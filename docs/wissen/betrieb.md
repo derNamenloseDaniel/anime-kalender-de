@@ -111,14 +111,16 @@ Seitdem gilt:
   mehr als einem Konflikt-PR verliert alle außer dem ersten (gleiche Cache-Dateien).
   Jetzt meldet das Skript einen PR, der erst nach einem Merge desselben Laufs im Konflikt
   steht, als `nachlauf=<Nummern>` in `$GITHUB_OUTPUT` (Notice, kein Fehler, Ausgang 0), und der
-  Schritt „Nächsten Durchgang anstoßen“ startet `claude-daten-merge.yml` per
-  `workflow_dispatch` mit dem GITHUB_TOKEN (Recht `actions: write`; `workflow_dispatch` ist die
-  Ausnahme vom Schleifenschutz). Jeder Durchgang mergt mindestens einen PR (ohne Merge im
-  Lauf bleibt ein Konflikt rot und stößt nichts an), die Kette endet also. Verworfen: Claude
-  mergt je PR sofort (sein Token umgeht das Ruleset nicht); mechanisches `git merge origin/main`
-  ohne Claude (Datenkonflikte entscheidet Claude). Test: `tools/daten-pr-mergen.test.mjs`
-  (drei neue Zusicherungen, ohne die Änderung rot). Noch nicht im echten Lauf beobachtet:
-  nach dem ersten Lauf mit zwei Konflikt-PRs prüfen, ob der zweite Durchgang startet.
+  Job `anstossen` (läuft auch nach rotem Merge-Job, `!cancelled()`) startet
+  `claude-daten-merge.yml` per `workflow_dispatch` mit dem GITHUB_TOKEN (Ausnahme vom
+  Schleifenschutz). `actions: write` hat nur dieser Job, nicht Claude (Bash). Ohne Merge im
+  Lauf bleibt ein Konflikt rot und stößt nichts an. Obergrenze: Eingabe `durchgang` (1, 2, 3);
+  ab Durchgang 3 wird `anstossen` rot statt neu anzustoßen, ein unlösbarer PR verbraucht so
+  nicht endlos Claude-Kontingent. Verworfen: Claude mergt je PR sofort (sein Token umgeht das
+  Ruleset nicht); mechanisches `git merge origin/main` ohne Claude (Datenkonflikte entscheidet
+  Claude). Test: `tools/daten-pr-mergen.test.mjs` (Skript-Fälle und Verdrahtung des
+  Workflows). **Prüftermin:** nach dem ersten Lauf mit zwei Konflikt-PRs prüfen, ob der zweite
+  Durchgang startet (nicht im echten Lauf belegt).
 - **`Bestand — zusammenführen und bauen` führt zusammen**: Meldungen einarbeiten,
   Rohfolgen zuordnen, bauen, Arbeitslisten, Vorschaubilder, `check:bestand`,
   `data:check`. Er hängt per `workflow_run` an allen dreien und **darf rot

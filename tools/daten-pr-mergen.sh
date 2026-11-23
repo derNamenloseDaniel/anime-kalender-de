@@ -5,7 +5,7 @@
 # `--admin` ist der Bypass der App im Ruleset `main-pruefweg`: Ohne das Flag weigert sich `gh` schon, sobald der Pull Request auf eine Freigabe wartet.
 # Ein Pull Request, der sich nicht mergen lässt oder nicht MERGEABLE ist (Konflikt nach dem Auflösen), macht den Lauf rot (Ausgang 1) — still offen bleiben darf er nicht (20.10.2026: grüner Lauf, PR 1556 blieb im Konflikt).
 #
-# Rennen um main (23.11.2026, Lauf 45183026486): Mergt der Lauf einen PR, bewegt sich main, und ein eben aufgelöster zweiter PR steht wieder im Konflikt. Er wird dann als `nachlauf=<Nummern>` in $GITHUB_OUTPUT gemeldet (kein Fehler), der Workflow stößt einen neuen Durchgang an. Jeder Durchgang mergt mindestens einen PR, die Kette endet also.
+# Nach einem Merge im selben Lauf bewegt sich main: Ein weiterer PR im Konflikt geht als `nachlauf=<Nummern>` in $GITHUB_OUTPUT (kein Fehler), der Workflow stößt den nächsten Durchgang an.
 set -uo pipefail
 
 # Die App mergt am Ruleset vorbei, also nur, was sie selbst eingereicht hat: eigener Autor, kein Fork, nur Pfade der Quellenliste.

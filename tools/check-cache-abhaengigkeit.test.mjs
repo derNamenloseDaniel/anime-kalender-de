@@ -21,7 +21,7 @@ function lauf(register, quellen) {
       mkdirSync(dirname(join(wurzel, pfad)), { recursive: true })
       writeFileSync(join(wurzel, pfad), text)
     }
-    const r = spawnSync(process.execPath, [join(wurzel, 'tools/check-cache-abhaengigkeit.mjs')], { encoding: 'utf8' })
+    const r = spawnSync(process.execPath, [join(wurzel, 'tools/check-cache-abhaengigkeit.mjs')], { encoding: 'utf8', timeout: 60_000 })
     return { status: r.status, aus: r.stdout, fehler: r.stderr }
   } finally {
     rmSync(wurzel, { recursive: true, force: true })

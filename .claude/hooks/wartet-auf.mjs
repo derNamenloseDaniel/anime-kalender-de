@@ -220,10 +220,11 @@ async function bearbeite(w, ctx) {
 /** Erfüllte Zeile nach „Jetzt“ holen: Jetzt-Datei zuerst, dann stand.md frisch gelesen und gegengeprüft (eine zwischenzeitlich entfernte oder
  *  verschobene Zeile wird nicht noch einmal angefasst); ein Abbruch dazwischen holt beim nächsten Lauf idempotent nach. */
 function verschiebeInDatei(w, ctx) {
-  const link = /\]\((file:\/\/\/[A-Za-z]:\/[^)\s#]*\.md)\)/i.exec(w.zeile)
+  // Laufwerk (Daniels Rechner) oder POSIX-Pfad (CI): fileURLToPath löst beide auf.
+  const link = /\]\((file:\/\/\/(?:[A-Za-z]:)?\/?[^)\s#]*\.md)\)/i.exec(w.zeile)
   if (link) {
     try {
-      const pfad = decodeURIComponent(link[1].slice('file:///'.length))
+      const pfad = fileURLToPath(link[1])
       if (existsSync(pfad)) schreibAtomar(pfad, dateiFreigeben(readFileSync(pfad, 'utf8'), ctx.ms))
     } catch { /* Jetzt-Datei unlesbar: Zeile trotzdem holen */ }
   }

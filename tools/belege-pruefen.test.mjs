@@ -22,7 +22,7 @@ const domainsGut = () => ({ 'a.example': GEPRUEFT, 'b.example': GEPRUEFT })
 function lauf(lesungen, domains = domainsGut()) {
   writeFileSync(join(wurzel, 'data/beleg-lesungen.json'), JSON.stringify(lesungen))
   writeFileSync(join(wurzel, 'data/beleg-domains.json'), JSON.stringify(domains))
-  const r = spawnSync(process.execPath, [SKRIPT], { cwd: wurzel, encoding: 'utf8' })
+  const r = spawnSync(process.execPath, [SKRIPT], { cwd: wurzel, encoding: 'utf8', timeout: 60_000 })
   return { status: r.status, aus: r.stdout + r.stderr }
 }
 const verstoss = (name, g, muster, domains) => {

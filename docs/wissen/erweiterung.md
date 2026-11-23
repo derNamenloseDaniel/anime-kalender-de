@@ -2775,6 +2775,11 @@ Anlass: Daniels Bericht 09:42 mit sechs Erinnern-Titeln (AnoHana, Banana Fish, O
 - **Test-Lader:** Handgebaute Lader, die `durchlaufKnopfZeigen` herausschneiden (`netflix-alle-staffeln.test.cjs`), brauchen `netflix-durchgang-steuerung.js` im Kontext; sonst `ReferenceError`. Neue Tests der Leiste nehmen den Sandkasten (`test-melder-sandkasten.cjs`, Skripte in Manifest-Reihenfolge über `test-lader.cjs`).
 - **Mutanten:** Die 17 Überlebenden aus 4190 lagen in `akNetflixKnopfSchreiben` (Klassenwechsel, `ak-fehler`, `hidden`), `akNetflixDatumKurz` (März, Juni/Juli, führende Null, Leerraum) und dem Zähler der Schlusszeile (`akNetflixEndeZeigen`, Bremse). `netflix-durchgang-rest.test.cjs` hält sie rot; Liste `tools/mutationen/netflix-durchgang-rest.json` (40 rot, 0 überlebt, mit Kontrolle).
 
+## Netflix-Durchgang: Standardfrist sichtbar, Stand des Restes aus 4190/4581/4155 (23.11.2026)
+
+- **Frist-Anzeige:** Nennt Netflix beim „Erinnern“ kein Datum, gilt die 7-Tage-Frist (`zurueckBis`); Melde-Knopf („Zurückgestellt bis 30.11. (7 Tage) ✓ — Erinnern-Knopf ohne Datum“) und Spalte „zurück bis“ der Prüfliste tragen jetzt „(7 Tage)“. Eine Entscheidung (`akNetflixStandardFrist`, `netflix-erinnern.js`), zwei Leser. Test: `netflix-tot-vermerk-melder.test.cjs`, `netflix-liste-ansicht.test.cjs`.
+- **Stand des Restes:** Leiste ohne Folgenliste, Test-Lader und die 17 Mutanten waren seit 19.11. erledigt (Abschnitt oben); A3b aus PR 4155 (Urteil „nicht bei Netflix“ bleibt einen Tag zurückgestellt, `dauerhaft` in `netflix-zurueckgestellt.js`) ist gebaut.
+
 ## Netflix-Umleitungs-Totmeldungen: Stichtag belegt, Textvergleich-Falle (18.11.2026)
 
 - Stichtag `UMLEITUNG_GILT_AB` = `2026-11-17T18:15:04Z`: Merge von PR 4144 (18:14:41Z), danach „Version gezählt“ 4.32.151 (71e1278e, 18:15:04Z; der Bericht nannte 4.32.150, die liegt mit 17:05Z vor dem Merge). Vorher geschätzt `2026-11-20`; dadurch blieben 152 Meldungen aus Daniels Durchgang vom 18.11. (Erweiterung 4.32.157) zurückgestellt.

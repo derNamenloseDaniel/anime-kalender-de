@@ -6,7 +6,7 @@ import assert from 'node:assert/strict'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { findeStille, meldetFehler, pruefeMeldung } from './coe-meldung-wache.mjs'
+import { findeStille, meldetFehler, meldetSkript, pruefeMeldung } from './coe-meldung-wache.mjs'
 
 // Meldungswege: je Muster ein Fall, dazu knapp daneben.
 for (const run of [
@@ -39,6 +39,8 @@ assert.deepEqual(findeStille(doc({ name: 'S', run: 'npm run x', 'continue-on-err
 assert.deepEqual(findeStille(doc({ name: 'S', run: 'npm run x' })), [])
 assert.deepEqual(findeStille(doc({ name: 'S', run: 'echo DATEN_WARNUNG=1 >> $GITHUB_ENV', 'continue-on-error': true })), [])
 assert.deepEqual(findeStille({}), [])
+assert.deepEqual(findeStille(doc({ name: 'S', run: 'npm run x', 'continue-on-error': true }), (run) => run === 'npm run x'), [])
+assert.equal(findeStille(doc({ name: 'S', run: 'npm run x', 'continue-on-error': true }), (run) => run === 'npm run y').length, 1)
 
 // Gesamtlauf im Wegwerf-Ordner: drei Dateien, je Rolle mehrere Glieder.
 const wurzel = mkdtempSync(join(tmpdir(), 'coe-meldung-'))
@@ -72,9 +74,39 @@ try {
   rmSync(wurzel, { recursive: true, force: true })
 }
 
+// Pipeline-Skripte, die selbst melden (direkt und über npm run): drei Skripte, der richtige in der Mitte.
+const w2 = mkdtempSync(join(tmpdir(), 'coe-meldung-skript-'))
+try {
+  mkdirSync(join(w2, 'pipeline'), { recursive: true })
+  writeFileSync(join(w2, 'pipeline/a.ts'), 'export const x = 1\n')
+  writeFileSync(join(w2, 'pipeline/m.ts'), 'recordSource(x)\n')
+  writeFileSync(join(w2, 'pipeline/v.ts'), 'meldeAbbruch(x)\n')
+  writeFileSync(join(w2, 'package.json'), JSON.stringify({ scripts: { 'data:a': 'tsx pipeline/a.ts', 'data:m': 'tsx pipeline/m.ts', 'data:v': 'tsx pipeline/v.ts' } }))
+  assert.equal(meldetSkript('npx tsx pipeline/m.ts', w2), true)
+  assert.equal(meldetSkript('npx tsx pipeline/v.ts', w2), true)
+  assert.equal(meldetSkript('npm run data:m', w2), true)
+  assert.equal(meldetSkript('npm run data:v -- --x', w2), true)
+  assert.equal(meldetSkript('npx tsx pipeline/a.ts', w2), false)
+  assert.equal(meldetSkript('npm run data:a', w2), false)
+  assert.equal(meldetSkript('npm run data:fehlt', w2), false)
+  assert.equal(meldetSkript('npx tsx pipeline/fehlt.ts', w2), false)
+  assert.equal(meldetSkript('# npx tsx pipeline/m.ts\necho x', w2), false)
+  assert.equal(meldetSkript(undefined, w2), false)
+  assert.equal(meldetSkript('npx tsx pipeline/m.ts', join(w2, 'leer')), false)
+  mkdirSync(join(w2, '.github/workflows'), { recursive: true })
+  const wf = (run) => `name: P\non: push\njobs:\n  j:\n    runs-on: x\n    steps:\n      - name: S\n        continue-on-error: true\n        run: ${run}\n`
+  writeFileSync(join(w2, '.github/workflows/a.yml'), wf('npm run data:m'))
+  writeFileSync(join(w2, '.github/workflows/b.yml'), wf('npm run data:a'))
+  const rs = pruefeMeldung(w2, [])
+  assert.equal(rs.treffer, 1)
+  assert.match(rs.meldungen[0], /b\.yml: Schritt „S"/)
+} finally {
+  rmSync(w2, { recursive: true, force: true })
+}
+
 // Echte Workflows: grün, Zahlen als feste Werte (Stand 23.11.2026; sinkt die Zahl der geduldeten Schritte, hier nachziehen).
 const echt = pruefeMeldung(process.cwd())
 assert.deepEqual(echt.meldungen, [])
 assert.equal(echt.geduldet, 101)
-assert.equal(echt.treffer, 47)
+assert.equal(echt.treffer, 43)
 console.log('coe-meldung-wache.test: grün (Meldungswege, Funde, Ausnahmen, echte Workflows)')

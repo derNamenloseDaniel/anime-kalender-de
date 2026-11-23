@@ -3,7 +3,7 @@
  * dort blieb `verwaisteTermine: 38` rund zwei Wochen unbemerkt). Als Meldung gilt im `run`-Text (ohne Kommentarzeilen):
  * `DATEN_WARNUNG` (gelbe Lauf-Meldung), eine `FEHLER:`-Zeile (liest `tools/wache-weicher-schritt.mjs` aus dem Log),
  * der Lauf-Melder (`$MELDER`, `lauf-melden.sh`, `lauf-abmelden.sh`) oder `schritte-auswerten.sh` (gibt die Fehlschläge weiter).
- * Alle anderen Schritte (auch `uses:`-Schritte ohne `run`) stehen mit Grund in `AUSNAHMEN`; eine Ausnahme ohne Treffer
+ * Ein Pipeline-Skript mit `recordSource(`/`meldeAbbruch(` (direkt oder über `npm run`) meldet selbst. Alle anderen Schritte (auch `uses:`-Schritte ohne `run`) stehen mit Grund in `AUSNAHMEN`; eine Ausnahme ohne Treffer
  * oder zu einem Schritt, der inzwischen meldet, ist ebenfalls ein Fehler. Prüfschritte (Nr. 43) prüft `coe-pruefschritt-wache.mjs`.
  */
 import { readdirSync, readFileSync } from 'node:fs'
@@ -31,16 +31,12 @@ export const AUSNAHMEN = [
   { datei: 'refresh-hourly.yml', schritt: 'Sofort anmelden', grund: G_ANMELDEN },
   { datei: 'refresh-weekly.yml', schritt: 'Lauf anmelden', grund: G_ANMELDEN },
   { datei: 'tonspuren-monatlich.yml', schritt: 'Sofort anmelden', grund: G_ANMELDEN },
-  { datei: 'bestand-bauen.yml', schritt: 'Vorfaelle aus der Erweiterung abholen', grund: 'Zusatzabruf vor dem Bau; ohne ihn baut der Bau mit dem letzten Stand.' },
-  { datei: 'bestand-bauen.yml', schritt: 'Rohfolgen zuordnen', grund: 'Der Bau-Folgeschritt „Datensatz bauen“ liest dieselben Eingaben und scheitert selbst, wenn sie fehlen.' },
   { datei: 'bestand-bauen.yml', schritt: 'Folgen je Plattform-Folge zuordnen', grund: 'Wie Rohfolgen zuordnen: der Datensatzbau und `check:bestand` sehen fehlende Zuordnung.' },
   { datei: 'bestand-bauen.yml', schritt: 'Urteile je Folge berechnen', grund: 'Wie Rohfolgen zuordnen: der Datensatzbau und `check:bestand` sehen fehlende Urteile.' },
   { datei: 'bestand-bauen.yml', schritt: 'Delta am Bestand festhalten', grund: 'Reine Historie; `delta-wache.yml` meldet ein fehlendes Delta am nächsten Morgen.' },
   { datei: 'bestand-bauen.yml', schritt: 'Behobene Rot-Issues schließen', grund: 'Aufräumen von Issues; bleibt ein Issue offen, schließt es der nächste Bau.' },
   { datei: 'bestand-bauen.yml', schritt: 'Eingaben des roten Baus als Artefakt sichern', grund: G_ARTEFAKT },
   { datei: 'bestand-bauen.yml', schritt: 'Sammler-Stand seit dem letzten grünen Bau zurücknehmen', grund: 'Läuft nur im roten Bau als Aufräumhilfe; der rote Bau ist selbst gemeldet.' },
-  { datei: 'claude-anime2you-extraktion.yml', schritt: 'Artikel-Router', grund: 'Vorsortierung für den Agenten; ohne sie liest der Agent alle Artikel selbst.' },
-  { datei: 'claude-anime2you-extraktion.yml', schritt: 'Schattenlauf der Regel', grund: 'Nur Vergleichsmessung für den Pull Request, ändert keine Daten.' },
   { datei: 'claude-anime2you-extraktion.yml', schritt: 'Zusammenfassung an den Pull Request hängen', grund: G_KOMMENTAR },
   { datei: 'claude-anime2you-extraktion.yml', schritt: 'Belege an den Pull Request hängen', grund: G_KOMMENTAR },
   { datei: 'claude-auftrag.yml', schritt: 'Crunchyroll-Zugangspaket über die Weiche holen', grund: G_ZUGANG },
@@ -81,12 +77,37 @@ export function meldetFehler(schritt) {
   return MELDUNG.test(ohneKommentare(schritt?.run))
 }
 
-/** Alle geduldeten Schritte ohne Meldung eines geparsten Workflows: `{ job, schritt }`. */
-export function findeStille(doc) {
+/**
+ * Meldet ein aufgerufenes Pipeline-Skript selbst (`recordSource(` = Wachhund, `meldeAbbruch(` = Vorfall; dieselbe Regel
+ * wie „Ein geduldeter Schritt darf nicht still scheitern“ in check-workflows.mjs)? Erkennt `pipeline/x.ts` und
+ * `npm run <name>`, dessen Skript in `package.json` ein `pipeline/x.ts` aufruft.
+ */
+export function meldetSkript(run, wurzel) {
+  const text = ohneKommentare(run)
+  let skripte = {}
+  try {
+    skripte = JSON.parse(readFileSync(resolve(wurzel, 'package.json'), 'utf8')).scripts ?? {}
+  } catch {
+    // ohne package.json bleiben nur die direkten Aufrufe
+  }
+  const pfade = [...text.matchAll(/pipeline\/[\w-]+\.ts/g)].map((m) => m[0])
+  for (const m of text.matchAll(/npm run ([\w:-]+)/g)) pfade.push(...[...String(skripte[m[1]] ?? '').matchAll(/pipeline\/[\w-]+\.ts/g)].map((x) => x[0]))
+  return pfade.some((p) => {
+    try {
+      const inhalt = readFileSync(resolve(wurzel, p), 'utf8')
+      return inhalt.includes('recordSource(') || inhalt.includes('meldeAbbruch(')
+    } catch {
+      return false
+    }
+  })
+}
+
+/** Alle geduldeten Schritte ohne Meldung eines geparsten Workflows: `{ job, schritt }`; `meldetExtern(run)` ergänzt weitere Meldewege. */
+export function findeStille(doc, meldetExtern = () => false) {
   const funde = []
   for (const [jobId, job] of Object.entries(doc?.jobs ?? {})) {
     for (const s of job?.steps ?? []) {
-      if (geduldet(s?.['continue-on-error']) && !meldetFehler(s)) funde.push({ job: jobId, schritt: String(s.name ?? s.uses ?? s.run) })
+      if (geduldet(s?.['continue-on-error']) && !meldetFehler(s) && !meldetExtern(s?.run)) funde.push({ job: jobId, schritt: String(s.name ?? s.uses ?? s.run) })
     }
   }
   return funde
@@ -109,7 +130,7 @@ export function pruefeMeldung(wurzel, ausnahmen = AUSNAHMEN) {
     for (const job of Object.values(doc?.jobs ?? {})) {
       for (const s of job?.steps ?? []) if (geduldet(s?.['continue-on-error'])) geduldetGesamt++
     }
-    for (const fund of findeStille(doc)) {
+    for (const fund of findeStille(doc, (run) => meldetSkript(run, wurzel))) {
       treffer++
       const i = ausnahmen.findIndex((a) => a.datei === datei && a.schritt === fund.schritt)
       if (i >= 0) {

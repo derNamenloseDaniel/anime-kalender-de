@@ -373,6 +373,9 @@ function meldeOhneSynchro(alle: { id: number; malId?: number }[], katalog: numbe
 /** Wo die Quellen jedes Termins über Läufe hinweg aufbewahrt werden. */
 const QUELLEN_HISTORIE = 'data/quellen-historie.json'
 
+/** Die aufbewahrten Quellen je Termin (Stand vor diesem Bau). */
+export const quellenHistorieLaden = (): Record<string, Quelle[]> => readJson<Record<string, Quelle[]>>(QUELLEN_HISTORIE, {})
+
 /**
  * Gibt jedem Termin seine Quellen — und **behält die überholten**.
  *
@@ -390,7 +393,7 @@ const QUELLEN_HISTORIE = 'data/quellen-historie.json'
  * weiter ausgeliefert.
  */
 export function quellenPflegen(releases: Release[]): void {
-  const historie = readJson<Record<string, Quelle[]>>(QUELLEN_HISTORIE, {})
+  const historie = quellenHistorieLaden()
   const lesungen = readJson<BelegGedaechtnis>('data/beleg-lesungen.json', {})
   const heute = todayIso()
   const lesetag = ladeAdnLesetage()

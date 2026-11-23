@@ -61,13 +61,30 @@ function juengsteMeldung(r: Release, veroeffentlicht: Map<string, string>): stri
   return tage.sort().at(-1)
 }
 
-/** Gilt der aniSearch-Tag für dieses Release? */
-export function aniSearchGewinnt(r: Release, termin: AniSearchTermin, veroeffentlicht: Map<string, string>, heute: string): boolean {
+/**
+ * Ohne bekannte Veröffentlichung (Meldung aus dem Vorschlagsbestand gefallen): der Tag, an dem wir unseren Tag aus einer Nicht-aniSearch-Quelle gelesen haben.
+ * `gesehenAm` ist die Erstsichtung (`quellenZusammenfuehren`); eine Quelle ist eine feste Meldung, ihr Tag ändert sich nicht, eine spätere Lesung
+ * derselben Adresse bestätigt nur dasselbe. Eine spätere Bestätigung durch eine andere Quelle hat eine eigene Adresse und zählt als eigene Lesung.
+ * Fehlt `gesehenAm` an einer dieser Quellen, gibt es keine Aussage. Im Bau tragen die Releases die `quellen` noch nicht: dann gilt die Historie.
+ */
+function gelesenAm(r: Release, historie?: Record<string, Quelle[]>): string | undefined {
+  const eigene = (r.quellen ?? historie?.[r.slug] ?? []).filter((q) => q.stand !== 'ueberholt' && !/anisearch\.de/.test(q.url))
+  if (eigene.some((q) => !q.gesehenAm)) return undefined
+  return eigene.map((q) => q.gesehenAm).sort().at(-1)
+}
+
+/**
+ * Gilt der aniSearch-Tag für dieses Release? Ohne bekannte Veröffentlichung nur als Verschiebung (aniSearch später als unser Tag) und
+ * nur nach dem Lesetag unserer Quellen; ein früherer aniSearch-Tag ist dort nicht belegt (Amazon- gegen Verlagstermin, Format).
+ */
+export function aniSearchGewinnt(r: Release, termin: AniSearchTermin, veroeffentlicht: Map<string, string>, heute: string, historie?: Record<string, Quelle[]>): boolean {
   const unserer = r.schedule.firstEpisodeDate
   if (!unserer || termin.datum === unserer || termin.datum.endsWith('-12-31')) return false
   if (termin.datum <= heute && unserer > heute) return false
   const meldung = juengsteMeldung(r, veroeffentlicht)
-  return Boolean(meldung) && termin.gelesen > meldung!
+  if (meldung) return termin.gelesen > meldung
+  const lesung = gelesenAm(r, historie)
+  return Boolean(lesung) && termin.datum > unserer && termin.gelesen > lesung!
 }
 
 function mitAniSearchBeleg(r: Release, termin: AniSearchTermin, heute: string): Quelle[] {
@@ -108,12 +125,13 @@ export function aniSearchDatumAnwenden(
   index: DiscIndex,
   veroeffentlicht: Map<string, string>,
   heute: string,
+  historie?: Record<string, Quelle[]>,
 ): { name: string; von: string; nach: string }[] {
   const geaendert: { name: string; von: string; nach: string }[] = []
   releases.forEach((r, i) => {
     if (r.releaseType !== 'disc') return
     const termin = aniSearchTermin(r, index)
-    if (!termin || !aniSearchGewinnt(r, termin, veroeffentlicht, heute)) return
+    if (!termin || !aniSearchGewinnt(r, termin, veroeffentlicht, heute, historie)) return
     const buyUrl = buyUrlNachVerschiebung(r.buyUrl, r.titleId, termin.datum, index)
     const sources = [...new Set([...r.sources, termin.url])]
     const schedule = { ...r.schedule, firstEpisodeDate: termin.datum }

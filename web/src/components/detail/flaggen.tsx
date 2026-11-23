@@ -21,7 +21,7 @@ function Flagge({ name, wertung, verweis, hinweis }: { name: string; wertung?: s
   const inhalt = (
     <>
       {name}
-      {wertung && <span className="text-[#f5c542]" aria-hidden="true">★</span>}
+      {wertung && <span className="text-ak-favorit" aria-hidden="true">★</span>}
       {wertung && <span className="tabular-nums">{wertung}</span>}
       {verweis && <Pfeil />}
     </>

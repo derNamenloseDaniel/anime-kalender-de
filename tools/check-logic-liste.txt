@@ -796,6 +796,7 @@ tools/ausbleiben-cpu-messen.test.ts
 tools/buehne-entwurf-render.test.ts
 tools/buehne-fall-optionen.test.ts
 tools/buehne-speicher.test.ts
+tools/buehne-staffel-reiter.test.ts
 tools/buehne-start.test.ts
 tools/check-patchnotes-pflicht.mjs
 tools/design-klassen.mjs

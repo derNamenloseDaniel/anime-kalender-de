@@ -10,7 +10,6 @@ import type { Pille } from '../src/components/detail/pille.tsx'
 import type { LiveLink } from '../src/components/detail/live-link.tsx'
 import type { discZeilen } from '../src/components/detail/wege-zeilen.tsx'
 import type { AntwortKastenMitMarke } from '../src/components/detail/kasten-marke.tsx'
-import type { HandlungAbschnitt } from '../src/components/detail/abschnitte.tsx'
 import type { ReihenListe } from '../src/components/detail/reihen-liste.tsx'
 
 /** Die Zeilen unter „Disc“ als Bauteil: dieselben Angaben, die `discZeilen()` bekommt. */
@@ -32,8 +31,6 @@ export interface Ersatz {
   TerminZeile: ComponentType<ComponentProps<typeof TerminZeile>>
   Pille: ComponentType<ComponentProps<typeof Pille>>
   LiveLink: ComponentType<ComponentProps<typeof LiveLink>>
-  /** Die Handlung-Karte (Mockup `staffel-abschnitt`: Text je gewählter Staffel). */
-  HandlungAbschnitt: ComponentType<ComponentProps<typeof HandlungAbschnitt>>
   /** Die Reihen-Karte samt Inhalt (Mockup `reihen-box`). */
   ReihenListe: ComponentType<ComponentProps<typeof ReihenListe>>
 }

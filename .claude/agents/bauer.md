@@ -56,6 +56,7 @@ Lokal immer: Tests der berührten Dateien (`npx tsx <test>`) und `npx tsc --noEm
 |---|---|
 | jede Datei | Tests aller Importeure (`grep -rln "<modul>" pipeline tools`), Nachbartests (`grep -l <Name> pipeline/check-*.ts tools/*.test.*`, gleiches Präfix `check-<thema>-*`), `npx eslint` je Datei (`tools/`, `pipeline/`: `-c eslint.mjs-skripte.config.js`; Erweiterung `-c extension/eslint.config.mjs`) (K14), `npx tsx pipeline/check-leerzeichen-gleich.ts` ohne eingerichteten Hook |
 | Quelltext umgeschrieben/verschoben | `pipeline/check-logic.ts` und `pipeline/check-*` nach wörtlichen Stücken der entfernten Zeilen greppen, `grep -rn "<Zeile>" tools/mutationen/`, `node tools/mutationsanker-alle.test.mjs` (K53: `grep -c` je Anker, 0 = „Anker nicht gefunden“) |
+| Regel im Bau plus Wächter am Ende | Test am echten Bauschritt mit dessen Datenstand (Felder wie `quellen` entstehen erst später; Vorbild `pipeline/check-disc-anisearch-bau.ts`, Lehre 224) |
 | Nutzertext | `git grep` nach altem Wortlaut in `pipeline/check-*` und Tests; Bedienelement entfällt/wandert: `grep -rn "<Name>" data/patchnotes docs web/src` |
 | Worker-Datei, `*wecker*`-Test | zusätzlich `npx tsc --noEmit -p tools/tsconfig.worker.json`; Tests mit Worker-Import liegen als `tools/worker-*.test.ts` in `check:worker` (K40) |
 | `web/src` | `npx vite build`, dann `node tools/start-budget.mjs` gegen aktuellen main; neuer `href`: `npx tsx pipeline/check-beleg-href.ts` (sonst Eintrag in `ERLAUBT`); Klassen: `node tools/design-immer-dunkel.test.mjs`, `node tools/design-klassen.mjs` |

@@ -519,7 +519,8 @@ export function baueNews(
     const rest = voll.toLowerCase().startsWith(kopf.toLowerCase())
       ? voll.slice(kopf.length).replace(/^[\s:–—-]+/, '').trim()
       : voll
-    return rest || voll
+    /* Trägt der Rest selbst einen Doppelpunkt („Horizonte: Die Serie“), bleibt der volle Name: „Pokémon: Horizonte: Die Serie“ wäre ein falscher Titel. */
+    return rest && !rest.includes(': ') ? rest : voll
   }
 
   const eintraege: NewsEintrag[] = []

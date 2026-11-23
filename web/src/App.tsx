@@ -14,6 +14,7 @@ import type { Fundstelle } from './lib/search.ts'
 import type { ReleaseEvent } from '@shared/types.ts'
 import { useFavorites, useHidden } from './lib/favorites.ts'
 import { speicherSichern, useNewsletterSync } from './lib/newsletterSync.ts'
+import { useFavoritenAbgleich } from './lib/favoriten-abgleich.ts'
 import { usePushNachfuehren } from './lib/push-nachfuehren.ts'
 import { useRoute, buildHash, type ViewId } from './lib/router.ts'
 import { useDbSchalter } from './lib/db-schalter.ts'
@@ -85,6 +86,7 @@ export default function App() {
   const { hidden, toggle: toggleHidden } = useHidden()
   // Hält Newsletter und Push aktuell — hier oben, damit es unabhängig von der geöffneten Ansicht greift.
   useNewsletterSync(favorites)
+  useFavoritenAbgleich()
   usePushNachfuehren(favorites, kalenderFilters, tvAus)
   // Bittet den Browser einmalig, den lokalen Speicher nicht selbst zu räumen (iOS-Safari: sieben Tage).
   useEffect(speicherSichern, [])

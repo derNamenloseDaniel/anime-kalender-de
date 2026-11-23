@@ -39,6 +39,8 @@ const MODULE = [
   ['wrapup-sperre.js', 'grund'],
   // Routinen-Quellen-Sperre (22.11.2026, Lehre 220): RemoteTrigger create/update mit job_config.ccr nur mit model und sources.
   ['routine-quellen-sperre.js', 'grund'],
+  // Nachbesserungs-Sperre (23.11.2026, Lehre 233): RemoteTrigger run/update einer Nachbesserung nicht, wenn der PR nach dem Prüfer-Urteil schon nachgebessert wurde.
+  ['nachbesserungs-sperre.js', 'grund'],
   // Befehls-Register (13.10.2026): protokolliert nur, ändert den Befehl nicht (seit 10.11.2026 ohne updatedInput) und entscheidet nie.
   ['befehlsregister.js', 'objekt'],
 ]

@@ -36,3 +36,13 @@ export async function meldeAbbruch(
     warn(`Vorfall nicht gemeldet: ${(err as Error).message}`)
   }
 }
+
+/** Führt einen geduldeten Lauf aus; ein Wurf wird als Vorfall gemeldet und dann weitergereicht (Exit bleibt rot). */
+export async function mitAbbruchMeldung(art: string, lauf: () => Promise<void>, plattform = 'crunchyroll'): Promise<void> {
+  try {
+    await lauf()
+  } catch (err) {
+    await meldeAbbruch(art, err, plattform)
+    throw err
+  }
+}

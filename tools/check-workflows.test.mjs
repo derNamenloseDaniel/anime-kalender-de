@@ -79,6 +79,13 @@ try {
 
   rot('|| true ohne Eintrag in der Ausnahmeliste', job('', `${CHECKOUT}      - run: echo x || true\n`), /zz-probe\.yml: `echo x \|\| true` verschluckt einen Fehler/)
 
+  // continue-on-error an Prüfschritten und Prüf-Jobs (Nr. 43): Schritt und Job rot, Nicht-Prüfung grün.
+  const pruefSchritt = (coe) => `${CHECKOUT}      - name: Pruefen\n${coe}        env:\n          LAUF_TOKEN: t\n        run: npm run check:probe\n`
+  rot('Prüfschritt mit continue-on-error', job(ZWECK, CHECKOUT + MELDEN + pruefSchritt('        continue-on-error: true\n')), /zz-probe\.yml: Prüfschritt „Pruefen" .* trägt `continue-on-error`/)
+  gut('Prüfschritt ohne continue-on-error', job(ZWECK, CHECKOUT + MELDEN + pruefSchritt('')))
+  rot('Prüf-Job mit continue-on-error', job(`${ZWECK}    continue-on-error: true\n`, CHECKOUT + MELDEN + pruefSchritt('')), /zz-probe\.yml: Job "a" enthält Prüfschritte und trägt `continue-on-error`/)
+  gut('Job ohne Prüfschritt darf continue-on-error tragen', job(`${ZWECK}    continue-on-error: true\n`, CHECKOUT + MELDEN))
+
   // Ausnahmen der Token-Regel: data:historie meldet keinen Fortschritt.
   const historie = npm.replace('data:probe', 'data:historie').replace('        env:\n          LAUF_TOKEN: t\n', '')
   gut('data:historie braucht kein LAUF_TOKEN', job(ZWECK, CHECKOUT + MELDEN + historie))
@@ -109,6 +116,11 @@ try {
   zurueck()
   zurueck = aendere('tools/quellen-liste.sh', () => '# leer\n')
   rot('Pipeline-Ziel fehlt in quellen-liste.sh', null, /wird von der Pipeline geschrieben, steht aber nicht in tools\/quellen-liste\.sh/)
+  zurueck()
+  zurueck = aendere('.github/workflows/tonspuren-monatlich.yml', (t) =>
+    t.replace('      - name: Messung gegen die eigenen Belege\n        continue-on-error: true\n', '      - name: Messung gegen die eigenen Belege\n'),
+  )
+  rot('Ausnahme ohne Treffer', null, /Ausnahme „Messung gegen die eigenen Belege" \(tonspuren-monatlich\.yml\) hat keinen Treffer mehr/)
   zurueck()
   gut('Kopien zurückgesetzt', null)
 } finally {

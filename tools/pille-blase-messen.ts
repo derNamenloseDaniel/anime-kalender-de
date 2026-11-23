@@ -25,6 +25,7 @@ try {
   for (const thema of ['hell', 'dunkel']) {
     for (const breite of BREITEN) {
       const seite = await browser.newPage({ viewport: { width: breite, height: 900 } })
+      await seite.route('**/*', (r) => r.abort())
       await seite.setContent(`<!doctype html><html class="${thema === 'dunkel' ? 'dark' : ''}"><head><style>${css}</style></head><body><div style="width:${breite}px">${html}</div></body></html>`)
       const raus = await seite.evaluate(() => [...document.querySelectorAll('.pille-test')].flatMap((z) => {
         const blase = z.querySelector('a span.absolute') as HTMLElement

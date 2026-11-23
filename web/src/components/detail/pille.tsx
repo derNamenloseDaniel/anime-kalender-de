@@ -112,7 +112,7 @@ export function DubStatus({ art }: { art: DubStatusArt }) {
   const kopfOffen = useContext(KopfSagtOffen)
   if (art === 'offen' && kopfOffen) return null
   const text = t(STATUS_TEXT[art])
-  /* Der unsichtbare Zwilling ohne Höhe gibt der Pille mindestens die Breite ihrer Blase; sonst ragt die rechtsbündige Blase an schmalen Pillen (Joyn) links heraus. */
+  /* Der unsichtbare Zwilling ohne Höhe (Text nur per ::before, damit textContent ihn nicht doppelt zählt) gibt der Pille mindestens die Breite ihrer Blase; sonst ragt die rechtsbündige Blase an schmalen Pillen (Joyn) links heraus. */
   return (
     <>
       <span
@@ -120,7 +120,7 @@ export function DubStatus({ art }: { art: DubStatusArt }) {
       >
         {text}
       </span>
-      <span aria-hidden className="invisible block h-0 overflow-hidden whitespace-nowrap text-t5 font-bold">{text}</span>
+      <span aria-hidden data-blase-zwilling={text} className="invisible block h-0 overflow-hidden whitespace-nowrap px-2 text-t5 font-bold before:content-[attr(data-blase-zwilling)]" />
     </>
   )
 }

@@ -4,7 +4,8 @@ import { normalisiereName } from './treffer-erben.ts'
  * **Der beste Namenstreffer bei „ohne Treffer“ — nur gespeichert, nie zugeordnet** (06.11.2026). Zugeordnet wird allein über die
  * TMDB-Kennung; findet die Suche den Titel unter einer anderen, bleibt er `ohneTreffer`. Damit die Kennungslücke zählbar wird
  * (Gegenprobe: Cardcaptor Sakura Clear Card 97881, JustWatch 282464, wir 207336), steht der nächste Treffer samt seiner
- * abweichenden Kennung im Befund. Kein Leser im Bau.
+ * abweichenden Kennung im Befund. Gelesen wird er von `ohne-weg` (`gleicherName` hält den Grund auf `offen`) und von der Handliste der
+ * verworfenen Namenstreffer; zugeordnet wird nie.
  */
 export interface NamensTreffer {
   jwId: string
@@ -14,11 +15,16 @@ export interface NamensTreffer {
   tmdbId: number | null
   /** Der Name des Treffers stimmt (normalisiert) mit einem unserer Namen überein; sonst nur der erste Treffer der Suche. */
   gleicherName: boolean
+  /** Erscheinungsjahr laut JustWatch; `null`, wenn JustWatch keines nennt. Unterscheidet gleichnamige Werke, die der Pfad nicht mit Jahr trägt (`/de/Serie/juliet`). */
+  jahr: number | null
+  /** `SHOW` oder `MOVIE` laut JustWatch; Film gegen Serie trennt gleichnamige Werke am schnellsten. */
+  typ: string | null
 }
 
 interface Kandidat {
   id: string
-  content: { title: string; fullPath: string; externalIds?: { tmdbId?: number | string | null } | null }
+  objectType?: string | null
+  content: { title: string; originalReleaseYear?: number | null; fullPath: string; externalIds?: { tmdbId?: number | string | null } | null }
 }
 
 /**
@@ -37,5 +43,7 @@ export function besterNamensTreffer(namen: string[], treffer: Kandidat[], erwart
     titel: bester.content.title,
     tmdbId: Number.isFinite(tmdb) && tmdb > 0 ? tmdb : null,
     gleicherName: unsere.has(normalisiereName(bester.content.title)),
+    jahr: bester.content.originalReleaseYear || null,
+    typ: bester.objectType || null,
   }
 }

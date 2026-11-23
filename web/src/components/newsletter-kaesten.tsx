@@ -79,12 +79,12 @@ export function WiederherstellenKasten({ t, zeigeGeraet, abmeldeState, setRestor
                 fragt, der zweite handelt. Kein Dialogfenster — die Frage steht
                 an derselben Stelle, an der auch der Knopf stand.
               */}
-              {abmeldeState === 'weg' && <span className="text-[13px] text-slate-500 dark:text-slate-400">{t('news.unsubDone')}</span>}
+              {abmeldeState === 'weg' && <span className="text-[13px] text-ak-leise">{t('news.unsubDone')}</span>}
             </div>
           </>
         ) : (
           <>
-        <p className="text-sm text-slate-600 dark:text-slate-300">{t('news.restoreBody')}</p>
+        <p className="text-sm text-ak-text">{t('news.restoreBody')}</p>
         {restoreState === 'done' ? (
           <p className="mt-3 rounded-lg bg-ak-gut-grund px-3 py-2 text-sm text-ak-gut-text">
             {t('news.restoreSent')}
@@ -107,7 +107,7 @@ export function WiederherstellenKasten({ t, zeigeGeraet, abmeldeState, setRestor
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={t('news.email')}
-              className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-white/15 dark:bg-white/5"
+              className="min-w-0 flex-1 rounded-lg border border-ak-rand bg-ak-flaeche px-3 py-2 text-sm"
             />
             <button
               type="submit"
@@ -118,7 +118,7 @@ export function WiederherstellenKasten({ t, zeigeGeraet, abmeldeState, setRestor
             </button>
           </form>
         )}
-        <p className="mt-2 text-[13px] text-slate-500 dark:text-slate-400">{t('news.restoreSafety')}</p>
+        <p className="mt-2 text-[13px] text-ak-leise">{t('news.restoreSafety')}</p>
           </>
         )}
       </Card>
@@ -147,19 +147,19 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
     <>
       <form onSubmit={submit} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium text-slate-700 dark:text-slate-200">{t('news.email')}</span>
+          <span className="font-medium text-ak-text">{t('news.email')}</span>
           <input
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="du@beispiel.de"
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 dark:border-white/15 dark:bg-white/5"
+            className="rounded-lg border border-ak-rand bg-ak-flaeche px-3 py-2"
           />
         </label>
 
         <fieldset className="flex flex-col gap-1 text-sm">
-          <legend className="mb-1 font-medium text-slate-700 dark:text-slate-200">{t('news.frequency')}</legend>
+          <legend className="mb-1 font-medium text-ak-text">{t('news.frequency')}</legend>
           <div className="flex gap-2">
             {(
               [
@@ -172,8 +172,8 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
                 className={[
                   'flex-1 cursor-pointer rounded-lg border p-3 transition',
                   frequency === value
-                    ? 'border-sky-400 bg-sky-400/10'
-                    : 'border-slate-300 hover:border-ak-leise dark:border-white/15',
+                    ? 'border-ak-akzent bg-ak-akzent/10'
+                    : 'border-ak-rand hover:border-ak-leise',
                 ].join(' ')}
               >
                 <input
@@ -183,18 +183,18 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
                   checked={frequency === value}
                   onChange={() => setFrequency(value)}
                 />
-                <span className="block font-medium text-slate-800 dark:text-slate-100">{label}</span>
-                <span className="block text-xs text-slate-500 dark:text-slate-400">{hint}</span>
+                <span className="block font-medium text-ak-text">{label}</span>
+                <span className="block text-xs text-ak-leise">{hint}</span>
               </label>
             ))}
           </div>
         </fieldset>
 
-        <div className="rounded-lg border border-slate-300 px-3 py-2.5 text-sm dark:border-white/15">
-          <p className="font-medium text-slate-700 dark:text-slate-200">
+        <div className="rounded-lg border border-ak-rand px-3 py-2.5 text-sm">
+          <p className="font-medium text-ak-text">
             ★ {t('news.favorites', { count: favorites.size })}
           </p>
-          <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+          <p className="mt-0.5 text-xs text-ak-leise">
             {favorites.size > 0 ? t('news.favoritesHint') : t('news.favoritesNone')}
           </p>
           {/*
@@ -219,8 +219,8 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
         </div>
 
         <fieldset>
-          <legend className="mb-1.5 text-sm font-medium text-slate-700 dark:text-slate-200">
-            {t('news.platforms')} <span className="font-normal text-slate-400">{t('news.platformsHint')}</span>
+          <legend className="mb-1.5 text-sm font-medium text-ak-text">
+            {t('news.platforms')} <span className="font-normal text-ak-sehr-leise">{t('news.platformsHint')}</span>
           </legend>
           <PlatformToggleList
             platforms={meta.platforms}
@@ -231,7 +231,7 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
           />
         </fieldset>
 
-        <label className="flex cursor-pointer items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
+        <label className="flex cursor-pointer items-start gap-2 text-xs text-ak-text">
           <input
             type="checkbox"
             checked={consent}
@@ -255,7 +255,7 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
             <span
               className={[
                 'text-sm',
-                state === 'ok' ? 'text-ak-gut-text' : state === 'error' ? 'text-ak-fehler-text' : 'text-slate-400',
+                state === 'ok' ? 'text-ak-gut-text' : state === 'error' ? 'text-ak-fehler-text' : 'text-ak-sehr-leise',
               ].join(' ')}
             >
               {message}
@@ -286,18 +286,18 @@ export function UebernommenKasten({ uebernommen, t, favorites, toggleFavorit, na
       {uebernommen.length > 0 && (
         <Card>
           <SectionTitle>{t('news.mergedTitle', { count: uebernommen.length })}</SectionTitle>
-          <p className="text-sm text-slate-600 dark:text-slate-300">{t('news.mergedBody')}</p>
+          <p className="text-sm text-ak-text">{t('news.mergedBody')}</p>
           <ul className="mt-3 grid gap-1 sm:grid-cols-2">
             {uebernommen.map((id) => (
               <li key={id}>
-                <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
+                <label className="flex cursor-pointer items-center gap-2 text-sm text-ak-text">
                   <input
                     type="checkbox"
                     checked={favorites.has(id)}
                     onChange={() => toggleFavorit(id)}
                     className="size-4 cursor-pointer accent-ak-akzent"
                   />
-                  <span className={favorites.has(id) ? '' : 'text-slate-400 line-through dark:text-slate-500'}>
+                  <span className={favorites.has(id) ? '' : 'text-ak-sehr-leise line-through'}>
                     {namen.get(id) ?? `#${id}`}
                   </span>
                 </label>

@@ -9,7 +9,23 @@ export function reiheJeTitel(reihen: Record<string, Reiheneintrag[]>): Map<numbe
   return reiheVon
 }
 
-/** Staffelnummer je Hauptstaffel einer Reihe — nur wenn die Reihe mehr als eine hat. */
+/**
+ * Staffelnummer je Hauptstaffel einer Reihe — nur wenn die Reihe mehr als eine hat.
+ *
+ * **Der Schlüssel ist die Reihe, nicht das Glied** (23.11.2026, Nr. 33 aus PR 4459): die Nummer hier zählt die Position in der
+ * Reihe. Die „(Staffel N)" aus dem deutschen aniSearch-Titel (`staffelQuelle`) zählt dagegen innerhalb der Unterserie des
+ * Eintrags („Baki Hanma: Staffel 2", „SAC_2045 Staffel 2", „Owarimonogatari: Staffel 2"). Beide Zählungen laufen in
+ * `shared/titles.ts` `zaehleStaffeln()` zusammen; ein `staffelQuelle` setzt dort `aktuell` neu, die folgenden Glieder zählen von da weiter.
+ * Zwei Hauptstaffeln mit gleicher Nummer in einer Reihe sind deshalb dreierlei, nicht ein Fehler:
+ * 1. Neuverfilmung als eigene Zählgruppe (`remakeVon`, `zaehlgruppen()`): Ranma 1/2 (1989 gegen 2024), Spice and Wolf (2008 gegen 2024).
+ * 2. Unterserien-Nummer, die der Anbieter auch so führt, die Reihe aber anders zählt: Berserk (2016/2017), Baki Hanma (Netflix 12/27 Folgen),
+ *    SAC_2045 (Netflix 12/12; danach zählt „The Ghost in the Shell" 2026 als 3), Owarimonogatari (danach MONOGATARI OFF & MONSTER als 3),
+ *    Bleach TYBW „The Conflict" (Disney+ führt drei Staffeln für 2022 bis 2024).
+ * 3. Falsche aniSearch-Nummer gegen den Anbieter: Seven Deadly Sins „Urteil des Drachen" (aniSearch 4, Netflix 5, `data/staffel-von-hand.yaml`).
+ * 4. Offen, kein Anbieterbeleg in `data/`: Fate/strange Fake (Zoku-hen), Bakemonogatari; The King's Avatar zählt die 3-Folgen-„Specials" mit.
+ * Je Fall mit Beleg: PR zu Nr. 33. Neue Doppelungen gleicher `staffelQuelle` meldet `staffelquelle-widerspruch.ts`; Doppelungen nur aus
+ * der Position oder dem Neuzählen nach einer Unterserien-Nummer meldet keine Prüfung, sie stehen hier.
+ */
 export function staffelNummern(reihe: Reiheneintrag[]): Map<number, number> {
   const haupt = reihe
     .filter((m) => (m.format === 'TV' || m.format === 'ONA') && !m.beiwerk && !istWerbeEintrag(m))

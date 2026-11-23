@@ -62,6 +62,7 @@ const knotenJahr = (jahr: number | null | undefined) => ({ content: { originalRe
 const yotsuba = { format: 'MOVIE', jpYear: 2026 }
 pruefe('Film 2026 gegen JustWatch-Seite von 2017: fremd', jahrFremd(yotsuba, knotenJahr(2017)))
 pruefe('Film 2026 gegen Jahr 2025 oder 2027 (±1): nicht fremd', !jahrFremd(yotsuba, knotenJahr(2025)) && !jahrFremd(yotsuba, knotenJahr(2027)))
+pruefe('Abstand 2 ist fremd (2024 und 2028)', jahrFremd(yotsuba, knotenJahr(2024)) && jahrFremd(yotsuba, knotenJahr(2028)))
 pruefe('Ohne JustWatch-Jahr: nicht fremd', !jahrFremd(yotsuba, knotenJahr(null)) && !jahrFremd(yotsuba, knotenJahr(undefined)))
 pruefe('Serie bleibt ausgenommen', !jahrFremd({ format: 'TV', jpYear: 2026 }, knotenJahr(2017)))
 pruefe('Deutsche Erstausgabe nahe am JustWatch-Jahr genügt', !jahrFremd({ format: 'MOVIE', jpYear: 1988, deErstausgabe: { von: '2017-05-01' } }, knotenJahr(2017)))

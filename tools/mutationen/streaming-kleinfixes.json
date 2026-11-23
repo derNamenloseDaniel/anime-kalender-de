@@ -35,5 +35,6 @@
   {"name":"jahr-fremd: Abweisung nicht durchgereicht","datei":"pipeline/fetch-justwatch-audio.ts","suche":"erwartet, naeherung, jahrAbgewiesen)) z.verfehlt++","ersetze":"erwartet, naeherung)) z.verfehlt++","tests":["npx tsx pipeline/check-jw-jahr-fremd-lauf.ts"]},
   {"name":"jahr-fremd: alte Antwort bleibt stehen","datei":"pipeline/fetch-justwatch-audio.ts","suche":"const kennungFremd = jahrFremd || (","ersetze":"const kennungFremd = (","tests":["npx tsx pipeline/check-jw-jahr-fremd-lauf.ts"]},
   {"name":"jahr-fremd: auch Serien abgewiesen","datei":"pipeline/lib/jw-kennung-fremd.ts","suche":"return titel.format === 'MOVIE' && typeof","ersetze":"return typeof","tests":["npx tsx pipeline/check-jw-jahr-fremd-lauf.ts"]},
-  {"name":"jahr-fremd: Toleranz 0 statt 1","datei":"pipeline/lib/jw-kennung-fremd.ts","suche":"Math.abs(j - jahr) > 1)","ersetze":"Math.abs(j - jahr) > 0)","tests":["npx tsx pipeline/check-jw-kennung-fremd.ts"]}
+  {"name":"jahr-fremd: Toleranz 0 statt 1","datei":"pipeline/lib/jw-kennung-fremd.ts","suche":"Math.abs(j - jahr) > 1)","ersetze":"Math.abs(j - jahr) > 0)","tests":["npx tsx pipeline/check-jw-kennung-fremd.ts"]},
+  {"name":"jahr-fremd: Toleranz 2 statt 1","datei":"pipeline/lib/jw-kennung-fremd.ts","suche":"Math.abs(j - jahr) > 1)","ersetze":"Math.abs(j - jahr) > 2)","tests":["npx tsx pipeline/check-jw-kennung-fremd.ts"]}
 ]

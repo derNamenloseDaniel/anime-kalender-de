@@ -1,3 +1,4 @@
+import { jahre } from './jw-namenssuche.ts'
 /**
  * **Eine JustWatch-Kennung gehört einer TMDB-Reihe** (04.11.2026, Anlass: „Fancy Nancy: Fancy It Yourself“ (TMDB 112652, 20 Folgen)
  * bekam im Tiefendurchlauf dieselbe `jwId` wie „Fancy Nancy Clancy“ (80056, 123 Folgen) — Disney-Seite an zwei Reihen, der
@@ -50,8 +51,13 @@ export function jahrFremd(
   knoten: { content: { originalReleaseYear?: number | null } },
 ): boolean {
   const jahr = knoten.content.originalReleaseYear
-  const unsere = [titel.jpYear, Number(titel.deErstausgabe?.von?.slice(0, 4))].filter((j): j is number => Number.isFinite(j) && Number(j) > 0)
+  const unsere = jahre(titel)
   return titel.format === 'MOVIE' && typeof jahr === 'number' && unsere.length > 0 && unsere.every((j) => Math.abs(j - jahr) > 1)
+}
+
+/** Die Logzeile für Filme, deren JustWatch-Jahr abweicht: eine falsche Abweisung nähme dem Titel still seine JustWatch-Wege. */
+export function jahrAbweisungsZeile(namen: string[]): string {
+  return `⚠ WARNUNG JustWatch: ${namen.length} Film(e) per Jahr abgewiesen: ${namen.join('; ')}`
 }
 
 /** Die Logzeile für abgewiesene Treffer: sonst bliebe der richtige Titel still `ohneTreffer`, wenn zuerst der falsche Halter gespeichert wurde. */

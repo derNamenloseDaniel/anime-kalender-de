@@ -55,7 +55,7 @@ export function suchNamen(t: Pick<Title, 'titleDe' | 'titleEn' | 'titleRomaji'>)
   return alle.filter((n, i) => alle.findIndex((m) => namensSchluessel(m) === namensSchluessel(n)) === i)
 }
 
-function jahre(t: TitelKurz): number[] {
+export function jahre(t: Pick<Title, 'jpYear' | 'deErstausgabe'>): number[] {
   const de = Number(t.deErstausgabe?.von?.slice(0, 4))
   return [t.jpYear, de].filter((j): j is number => Number.isFinite(j) && Number(j) > 0)
 }

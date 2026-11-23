@@ -43,7 +43,7 @@ import yaml from 'js-yaml'
 import { fetchJson, log, readJson, sleep, warn, writeJson } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
 import { istUnplausibel } from './lib/justwatch-plausibel.ts'
-import { abweisungsZeile, jahrFremd, nimmTreffer } from './lib/jw-kennung-fremd.ts'
+import { abweisungsZeile, jahrAbweisungsZeile, jahrFremd, nimmTreffer } from './lib/jw-kennung-fremd.ts'
 import { besterNamensTreffer, type NamensTreffer } from './lib/jw-namenstreffer.ts'
 import { todayIso } from '../shared/time.ts'
 import type { Title } from '../shared/types.ts'
@@ -195,13 +195,13 @@ async function sucheUeberNamen(t: Title, erwartet: number | string, w: Welt): Pr
 }
 
 /** Findet die Namenssuche den Titel nicht, fragt der Lauf einmal über den gespeicherten Pfad nach (`lib/jw-nachfrage.ts`); `jahrFremd`: der Treffer ist ein Film anderen Jahres. */
-async function sucheOderNachfrage(t: Title, erwartet: number, vorher: Befund | undefined, w: Welt): Promise<{ treffer?: JwKnoten; naeherung?: NamensTreffer; jahrFremd?: boolean }> {
+async function sucheOderNachfrage(t: Title, erwartet: number, vorher: Befund | undefined, w: Welt): Promise<{ treffer?: JwKnoten; naeherung?: NamensTreffer; jahrFremd?: boolean; jahrJw?: number }> {
   let ergebnis = await sucheUeberNamen(t, erwartet, w)
   if (!ergebnis.treffer && darfNachfragen(vorher, erwartet)) {
     await w.pause()
     ergebnis = { ...ergebnis, treffer: await nachfrageUeberPfad(vorher.jwPfad, erwartet, w.abruf, ENDPUNKT, UA) }
   }
-  return ergebnis.treffer && jahrFremd(t, ergebnis.treffer) ? { naeherung: ergebnis.naeherung, jahrFremd: true } : ergebnis
+  return ergebnis.treffer && jahrFremd(t, ergebnis.treffer) ? { naeherung: ergebnis.naeherung, jahrFremd: true, jahrJw: ergebnis.treffer.content.originalReleaseYear ?? undefined } : ergebnis
 }
 
 /** Titel mit frischem Kino- oder Disc-Termin aus den veröffentlichten Terminen (`jw-frische.ts`). */
@@ -343,11 +343,11 @@ async function sucheOhneTmdb(titles: Title[], tmdb: Record<string, { tmdbId?: nu
 }
 
 /** Zähler der Hauptschleife — `main()` meldet sie und entscheidet über das Schreiben. */
-interface Zaehler { getroffen: number; mitDeutsch: number; fehler: number; leer: number; verfehlt: number; ohneTrefferNeu: number; abgewiesen: string[] }
+interface Zaehler { getroffen: number; mitDeutsch: number; fehler: number; leer: number; verfehlt: number; ohneTrefferNeu: number; abgewiesen: string[]; jahrAbgewiesen: string[] }
 
 /** Die Hauptschleife: die ersten `limit` offenen Titel über die TMDB-Kennung bei JustWatch suchen und in `bestand` verbuchen. */
 async function frageOffene(offen: Title[], limit: number, tmdb: Record<string, { tmdbId?: number }>, bestand: Record<string, Befund>, w: Welt): Promise<Zaehler> {
-  const z: Zaehler = { getroffen: 0, mitDeutsch: 0, fehler: 0, leer: 0, verfehlt: 0, ohneTrefferNeu: 0, abgewiesen: [] }
+  const z: Zaehler = { getroffen: 0, mitDeutsch: 0, fehler: 0, leer: 0, verfehlt: 0, ohneTrefferNeu: 0, abgewiesen: [], jahrAbgewiesen: [] }
   let sperrenInFolge = 0
 
   for (const t of offen.slice(0, limit)) {
@@ -368,8 +368,9 @@ async function frageOffene(offen: Title[], limit: number, tmdb: Record<string, {
         sauber „0 zugeordnet, 0 Fehler" — der erste Probelauf am 07.09.2026 tat
         genau das, an fünf Titeln, deren Treffer JustWatch alle kannte.
       */
-      const { treffer: gefunden, naeherung, jahrFremd: jahrAbgewiesen } = erwartet ? await sucheOderNachfrage(t, erwartet, bestand[String(t.id)], w) : { treffer: undefined, naeherung: undefined, jahrFremd: false }
+      const { treffer: gefunden, naeherung, jahrFremd: jahrAbgewiesen, jahrJw } = erwartet ? await sucheOderNachfrage(t, erwartet, bestand[String(t.id)], w) : { treffer: undefined, naeherung: undefined, jahrFremd: false }
       /* Eine Kennung, die schon eine andere TMDB-Reihe hält, ist ein Fehlgriff von JustWatch (Spin-off auf Hauptserie). */
+      if (jahrAbgewiesen) z.jahrAbgewiesen.push(`${t.titleDe || t.titleRomaji || t.titleEn} (${t.id}, JustWatch-Jahr ${jahrJw})`)
       const { treffer, halter } = nimmTreffer(bestand, String(t.id), gefunden, erwartet)
       if (halter) z.abgewiesen.push(`${t.titleDe || t.titleRomaji || t.titleEn} (${t.id}, Halter ${halter})`)
       sperrenInFolge = 0
@@ -448,13 +449,14 @@ export async function main(args: string[] = process.argv.slice(2), welt: Welt = 
 
   log(`JustWatch: ${offen.length} Titel mit offenem Verweis, davon werden ${Math.min(limit, offen.length)} geholt.`)
 
-  const { getroffen, mitDeutsch, fehler, leer, verfehlt, ohneTrefferNeu, abgewiesen } = await frageOffene(offen, limit, tmdb, bestand, welt)
+  const { getroffen, mitDeutsch, fehler, leer, verfehlt, ohneTrefferNeu, abgewiesen, jahrAbgewiesen } = await frageOffene(offen, limit, tmdb, bestand, welt)
 
   log(
     `JustWatch: ${getroffen} Titel zugeordnet (${leer} ohne Angebot), ${mitDeutsch} davon mit deutscher Tonspur, ` +
       `${ohneTrefferNeu} ohne Treffer, ${verfehlt} verfehlt (alte Antwort behalten), ${fehler} Fehler.`,
   )
   if (abgewiesen.length) warn(abweisungsZeile(abgewiesen))
+  if (jahrAbgewiesen.length) warn(jahrAbweisungsZeile(jahrAbgewiesen))
   if (istUnplausibel({ getroffen, leer, verfehlt })) {
     warn(`JustWatch: Ergebnis unplausibel (${leer} von ${getroffen} Treffern ohne Angebot, ${verfehlt} früher gefundene jetzt verfehlt) — nichts geschrieben.`)
     recordSource('justwatch-audio', 0)

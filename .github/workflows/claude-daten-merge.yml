@@ -34,7 +34,8 @@ permissions:
   pull-requests: write
   issues: write
   id-token: write
-  actions: read
+  # `workflow_dispatch` darf auch das GITHUB_TOKEN auslösen: So stößt der Nachlauf den nächsten Durchgang an.
+  actions: write
 
 # Zwei Claudes am selben Zweig erzeugen zwei widersprüchliche Auflösungen.
 concurrency:
@@ -92,10 +93,19 @@ jobs:
           permission-pull-requests: write
 
       - name: Mergebare Daten-Pull-Requests mergen
+        id: mergen
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           NUMMERN: ${{ needs.pruefen.outputs.mergebar }}
         run: bash tools/daten-pr-mergen.sh $NUMMERN
+
+      - name: Nächsten Durchgang anstoßen
+        if: steps.mergen.outputs.nachlauf != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Nach dem Merge im Konflikt: ${{ steps.mergen.outputs.nachlauf }}"
+          gh workflow run claude-daten-merge.yml --repo "$GITHUB_REPOSITORY" --ref main
 
   zusammenfuehren:
     needs: pruefen
@@ -226,10 +236,20 @@ jobs:
           permission-pull-requests: write
 
       - name: Aufgelöste Pull Requests mergen
+        id: mergen
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           NUMMERN: ${{ needs.pruefen.outputs.nummern }}
         run: bash tools/daten-pr-mergen.sh ${NUMMERN//,/ }
+
+      # Der erste Merge bewegt main; was danach wieder im Konflikt steht, löst der nächste Durchgang (23.11.2026, Lauf 45183026486). Jeder Durchgang mergt mindestens einen PR, die Kette endet.
+      - name: Nächsten Durchgang anstoßen
+        if: steps.mergen.outputs.nachlauf != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Nach dem Merge im Konflikt: ${{ steps.mergen.outputs.nachlauf }}"
+          gh workflow run claude-daten-merge.yml --repo "$GITHUB_REPOSITORY" --ref main
 
       - name: Lauf abmelden
         continue-on-error: true

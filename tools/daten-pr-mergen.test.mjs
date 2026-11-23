@@ -23,6 +23,7 @@ try {
   const bin = join(dir, 'bin')
   mkdirSync(bin)
   const gemergt = join(dir, 'gemergt.txt')
+  const ausgabe = join(dir, 'ausgabe.txt')
   // Attrappe: Antworten kommen aus FALL (autor | fork | datei | ok); `pr merge` hält die Nummer fest.
   writeFileSync(
     join(bin, 'gh'),
@@ -31,6 +32,7 @@ case "$1 $2" in
   "pr merge") echo "$3" >> "${posix(gemergt)}"; exit 0 ;;
 esac
 [ "$3" = 6 ] && [ -n "$FALL6" ] && FALL="$FALL6"
+[ "$3" = 7 ] && [ -n "$FALL7" ] && FALL="$FALL7"
 case "$7" in
   .state) case " $ERLEDIGT " in *" $3 "*) echo "$ZUSTAND" ;; *) echo OPEN ;; esac ;;
   .mergeable) case " $ERLEDIGT " in *" $3 "*) echo UNKNOWN; exit 0 ;; esac; if [ "$FALL" = konflikt ] || [ "$FALL" = autor-konflikt ]; then echo CONFLICTING; else echo MERGEABLE; fi ;;
@@ -43,15 +45,16 @@ esac
   )
   chmodSync(join(bin, 'gh'), 0o755)
 
-  const lauf = (fall, nummern = ['7'], erledigt = '', zustand = 'MERGED', fall6 = '') => {
+  const lauf = (fall, nummern = ['7'], erledigt = '', zustand = 'MERGED', fall6 = '', fall7 = '') => {
     rmSync(gemergt, { force: true })
+    rmSync(ausgabe, { force: true })
     const r = spawnSync('bash', ['tools/daten-pr-mergen.sh', ...nummern], {
       cwd: wurzel,
       encoding: 'utf8',
-      env: { ...process.env, FALL: fall, ERLEDIGT: erledigt, ZUSTAND: zustand, FALL6: fall6, PATH: `${posix(bin)}:${process.env.PATH}` },
+      env: { ...process.env, FALL: fall, ERLEDIGT: erledigt, ZUSTAND: zustand, FALL6: fall6, FALL7: fall7, GITHUB_OUTPUT: ausgabe, PATH: `${posix(bin)}:${process.env.PATH}` },
     })
     const liste = existsSync(gemergt) ? readFileSync(gemergt, 'utf8').trim().split('\n') : []
-    return { status: r.status, out: `${r.stdout}${r.stderr}`, gemergt: liste.length > 0, liste }
+    return { status: r.status, out: `${r.stdout}${r.stderr}`, gemergt: liste.length > 0, liste, nachlauf: existsSync(ausgabe) ? readFileSync(ausgabe, 'utf8').trim() : '' }
   }
 
   const ok = lauf('ok')
@@ -80,6 +83,13 @@ esac
     const r = lauf('ok', ['6', '7'], '', 'MERGED', fall6)
     pruefe(`PR 6 im Fall „${fall6}“ vor einem guten PR 7: PR 7 wird gemergt, Ausgang ${rot6}`, r.status === rot6 && r.liste.join() === '7', r)
   }
+  // Rennen um main (Lauf 45183026486): PR 6 wird gemergt, danach steht PR 7 im Konflikt — kein Rot, PR 7 geht in den Nachlauf.
+  const rennen = lauf('ok', ['6', '7'], '', 'MERGED', '', 'konflikt')
+  pruefe('PR 7 im Konflikt nach dem Merge von PR 6: Lauf grün, PR 6 gemergt, nachlauf=7', rennen.status === 0 && rennen.liste.join() === '6' && rennen.nachlauf === 'nachlauf=7' && !/::error::/.test(rennen.out), rennen)
+  const ohneRennen = lauf('ok', ['6', '7'])
+  pruefe('ohne Konflikt: beide gemergt, nachlauf leer', ohneRennen.status === 0 && ohneRennen.liste.join() === '6,7' && ohneRennen.nachlauf === 'nachlauf=', ohneRennen)
+  const keinerGemergt = lauf('konflikt', ['6', '7'])
+  pruefe('beide im Konflikt, nichts gemergt: weiter rot, kein Nachlauf (sonst Endlosschleife)', keinerGemergt.status === 1 && !keinerGemergt.gemergt && keinerGemergt.nachlauf === 'nachlauf=', keinerGemergt)
 } finally {
   rmSync(dir, { recursive: true, force: true })
 }

@@ -23,7 +23,7 @@ const ERLAUBT: Record<string, string> = {
   'pipeline/bau/widerlegung-woche.ts::karte': 'sammelt alle Sprachen je Kennung und Tag in einer Menge',
   'pipeline/messung-cr-katalog.ts::jeSerie': 'Messskript: bewusst der erste Eintrag je Kennung (has-Prüfung davor)',
   'pipeline/messung-cr-katalog.ts::adressenJeSerie': 'sammelt die Adressen aller Einträge einer Kennung',
-  'pipeline/scrape-crunchyroll-dub.ts::jeSerie': 'Abruf-Cache: je Kennung wird die Serie einmal gelesen, weitere Adressen übernehmen sie (schon-Prüfung davor)',
+  'pipeline/lib/cr-dub-adresse.ts::k.jeSerie': 'Abruf-Cache: je Kennung wird die Serie einmal gelesen, weitere Adressen übernehmen sie (schon-Prüfung davor)',
 }
 
 function quellDateien(wurzel: string, ordner: string): string[] {

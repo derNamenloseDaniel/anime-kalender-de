@@ -32,6 +32,7 @@ pruefe('Fixture „Ein Lied im Sturm“ (nicht in der Liste) ohne Nummer: Mangel
 pruefe('Wikipedia-Schreibweise „Lied im Nebel“: Nummer gefunden, kein Mangel', !messe([tvTermin('Super RTL')], ['Lied im Nebel']).has(ID))
 pruefe('Sender-Schreibweise „Ein Lied im Nebel“ (Wikipedia: ohne Artikel): Nummer über den Artikel-Rückfall, kein Mangel', !messe([tvTermin('Super RTL')], ['Ein Lied im Nebel']).has(ID))
 pruefe('Vorspann „Pokémon Horizonte: Ein Lied im Nebel“ fällt weg, kein Mangel', !messe([tvTermin('Super RTL')], ['Pokémon Horizonte: Ein Lied im Nebel']).has(ID))
+pruefe('Schreibvariante „Lied im Nebl“ (ein Zeichen daneben): Nummer über aehnlicherKern, kein Mangel', !messe([tvTermin('Super RTL')], ['Lied im Nebl']).has(ID))
 pruefe('Sendung vom 13.11. zählt, auch außerhalb des Bau-Fensters ab gestern', messe([tvTermin('Super RTL')], [UNBEKANNT]).size === 1)
 pruefe('Sendung ohne Folgentitel: kein Mangel', !messe([tvTermin('Super RTL')], ['']).has(ID))
 pruefe('Termin eines anderen Senders: Sendung gehört nicht dazu', !messe([tvTermin('TOGGO plus')], [UNBEKANNT]).has(ID))

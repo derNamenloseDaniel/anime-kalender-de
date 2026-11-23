@@ -58,7 +58,17 @@ export function veroeffentlichungstage(vorschlaege: { articleUrl: string; publis
 /** Die jüngste bekannte Veröffentlichung unter den Quellen des Releases; `undefined`, wenn keine bekannt ist. */
 function juengsteMeldung(r: Release, veroeffentlicht: Map<string, string>): string | undefined {
   const tage = r.sources.map((u) => veroeffentlicht.get(ohneSchraegstrich(u))).filter((t): t is string => Boolean(t))
-  return tage.sort().at(-1)
+  return tage.sort().at(-1) ?? gelesenAm(r)
+}
+
+/**
+ * Ohne bekannte Veröffentlichung (Meldung aus dem Vorschlagsbestand gefallen): der Tag, an dem wir unseren Tag aus einer Nicht-aniSearch-Quelle gelesen haben.
+ * Belegt nur, wie alt unser Tag höchstens ist; fehlt `gesehenAm` an einer dieser Quellen, gibt es keine Aussage.
+ */
+function gelesenAm(r: Release): string | undefined {
+  const eigene = (r.quellen ?? []).filter((q) => q.stand !== 'ueberholt' && !/anisearch\.de/.test(q.url))
+  if (!eigene.length || eigene.some((q) => !q.gesehenAm)) return undefined
+  return eigene.map((q) => q.gesehenAm).sort().at(-1)
 }
 
 /** Gilt der aniSearch-Tag für dieses Release? */

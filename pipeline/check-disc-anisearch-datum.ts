@@ -147,6 +147,38 @@ pruefe('Verdrahtung: `pruefeErgebnis` meldet den kaputten Stand als Fehler', erg
 const gut = pruefeErgebnis(rs, [], new Map(), HEUTE, { index: index(), veroeffentlicht: tage('2026-10-02') })
 pruefe('Verdrahtung: `pruefeErgebnis` ist am reparierten Stand ohne Disc-Fehler', !gut.fehler.some((f) => f.includes('aniSearch nennt')), gut.fehler)
 
+/* Nr. 46: Meldung nicht (mehr) im Vorschlagsbestand — dann zählt der Lesetag unserer Nicht-aniSearch-Quelle (`quellen[].gesehenAm`). */
+const OHNE = new Map<string, string>()
+const mitLesung = (datum: string, gesehenAm: string | undefined, name = 'Virgin Road – Vol. 1'): Release => ({
+  ...virgin(datum),
+  name,
+  quellen: [{ url: A2Y, name: 'anime2you.de', ...(gesehenAm ? { gesehenAm } : {}), sagt: datum, stand: 'aktuell' }],
+} as unknown as Release)
+const nachOhne = (r: Release, i: DiscIndex): string => {
+  const liste = [r]
+  aniSearchDatumAnwenden(liste, i, OHNE, HEUTE)
+  return liste[0]!.schedule.firstEpisodeDate!
+}
+const gelesen = (g: string, datum = '2026-11-06'): DiscIndex => index([{ datum, gelesen: g }])
+pruefe('ohne bekannte Meldung: aniSearch später gelesen als unsere Quelle, Tag verschoben: gilt', nachOhne(mitLesung('2026-10-30', '2026-10-01'), gelesen('2026-10-12T05:00:00Z')) === '2026-11-06')
+pruefe('ohne bekannte Meldung: zweite Verschiebung (Staffel-Name egal), anderer Tag: gilt', nachOhne(mitLesung('2026-12-04', '2026-10-05'), gelesen('2026-10-06T05:00:00Z', '2026-12-18')) === '2026-12-18')
+pruefe('ohne bekannte Meldung: aniSearch früher gelesen als unsere Quelle: bleibt', nachOhne(mitLesung('2026-10-30', '2026-10-01'), gelesen('2026-09-30T05:00:00Z')) === '2026-10-30')
+pruefe('ohne bekannte Meldung: am selben Tag gelesen: bleibt', nachOhne(mitLesung('2026-10-30', '2026-10-12'), gelesen('2026-10-12T05:00:00Z')) === '2026-10-30')
+pruefe('ohne bekannte Meldung: aniSearch nennt denselben Tag: unverändert', nachOhne(mitLesung('2026-11-06', '2026-10-01'), gelesen('2026-10-12T05:00:00Z')) === '2026-11-06')
+pruefe('ohne bekannte Meldung und ohne Quellen-Beleg: bleibt (nie raten)', nachOhne(virgin(), gelesen('2026-10-12T05:00:00Z')) === '2026-10-30')
+pruefe('ohne bekannte Meldung, Lesetag der Quelle fehlt: bleibt', nachOhne(mitLesung('2026-10-30', undefined), gelesen('2026-10-12T05:00:00Z')) === '2026-10-30')
+pruefe('ohne bekannte Meldung: aniSearch-Tag schon vorbei, unserer steht bevor: bleibt', nachOhne(mitLesung('2026-11-20', '2026-10-01'), gelesen('2026-10-12T05:00:00Z', '2026-10-23')) === '2026-11-20')
+const zweiLesungen = { ...mitLesung('2026-10-30', '2026-10-01'), quellen: [
+  { url: A2Y, name: 'anime2you.de', gesehenAm: '2026-10-01', sagt: '2026-10-30', stand: 'aktuell' as const },
+  { url: 'https://x.example/b', name: 'x.example', gesehenAm: '2026-10-20', sagt: '2026-10-30', stand: 'aktuell' as const },
+] } as Release
+pruefe('ohne bekannte Meldung: die jüngste Lesung unserer Quellen zählt', nachOhne(zweiLesungen, gelesen('2026-10-12T05:00:00Z')) === '2026-10-30')
+pruefe('mit jüngerer bekannter Meldung: Lesetag der Quelle ändert nichts, Meldung bleibt', datumNach(mitLesung('2026-10-30', '2026-09-01'), gelesen('2026-10-12T05:00:00Z'), '2026-10-20') === '2026-10-30')
+pruefe('mit älterer bekannter Meldung: aniSearch gewinnt, auch bei späterem Lesetag der Quelle', datumNach(mitLesung('2026-10-30', '2026-10-25'), gelesen('2026-10-12T05:00:00Z'), '2026-10-02') === '2026-11-06')
+const ohneFehler = discTerminFehler([mitLesung('2026-10-30', '2026-10-01')], HEUTE, { index: gelesen('2026-10-12T05:00:00Z'), veroeffentlicht: OHNE })
+pruefe('Wächter: ohne bekannte Meldung ist der alte Tag rot', ohneFehler.length === 1 && ohneFehler[0]!.includes('2026-11-06'), ohneFehler)
+pruefe('Wächter: ohne bekannte Meldung und ohne Beleg schweigt er', discTerminFehler([virgin()], HEUTE, { index: gelesen('2026-10-12T05:00:00Z'), veroeffentlicht: OHNE }).length === 0)
+
 if (fehler) {
   console.error(`\n${fehler} Zusicherung(en) verletzt`)
   process.exit(1)

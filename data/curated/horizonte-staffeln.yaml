@@ -21,15 +21,14 @@
 # - Staffel 4 Folge 1 = Folge 137: RTL+ „Eine Welt voller Abenteuer“, verfügbar ab 20.11.2026
 #   (https://plus.rtl.de/pokemon-horizonte-die-serie-p_10142/video/eine-welt-voller-abenteuer-c_2211265).
 #
-# Staffelnamen (`name`; Daniel 22.11.2026: „wir folgen offiziellen staffel bezeichnern“). Nur ein gelesen belegter Name steht hier (Prüfer 23.11.2026):
-# - Staffel 3 „Pokémon Horizonte: Gute Aussichten“: so führt TOGGO die Staffel im Programm (Folge 42–45, Samstag 13:00), gelesen im
-#   anime2you-TV-Guide KW 42/2026 (https://www.anime2you.de/news/1060030/anime-tv-programm-42-2026/, gelesen 12.10.2026; Zitat in
-#   `data/proposals/anime2you-extraktion.json`). Die Form „Staffel 3 – …“ ist nicht gelesen belegt, darum nicht übernommen.
-# - Staffel 1 und 2: kein Name. „Pokémon Horizonte: Die Serie“ ist der Titel der Gesamtserie (RTL+ TVSeries, Staffelwähler „Staffel 1–4“ ohne Namen,
-#   gelesen 20.11.2026, `data/verweise-von-hand.yaml`; Super RTL/TOGGO plus führen alle Folgen unter diesem Titel, `data/tv-programm.json`), nicht
-#   der einer einzelnen Staffel. „Die Suche nach Laqua“ (Staffel 2) steht nur in Suchtreffern (Netflix-Titel 81944585, pocketmonsters.net,
-#   Bulbapedia), keine der Seiten war aus dem Cloud-Lauf abrufbar (Hosts gesperrt, 23.11.2026): erst eintragen, wenn eine Seite gelesen ist.
-# - Staffel 4: kein offizieller deutscher Name gefunden (Suche 23.11.2026), bleibt „Pokémon Horizonte – Staffel 4“.
+# Staffelnamen (`name`; Daniel 22.11.2026: „wir folgen offiziellen staffel bezeichnern“). Offizielles Muster „Pokémon Horizonte: Staffel N – Name“,
+# Staffel 1 heißt „Pokémon Horizonte: Die Serie“. Belege, gelesen 23.11.2026 (Dirigent per Tavily; die Cloud erreicht diese Seiten evtl. nicht):
+# - PokéWiki https://www.pokewiki.de/Pok%C3%A9mon_Horizonte:_Die_Serie : „Staffel 1: Pokémon Horizonte: Die Serie … Staffel 2: Pokémon Horizonte: Die Suche
+#   nach Laqua … Staffel 3: Pokémon Horizonte: Gute Aussichten … Staffel 4: Pokémon Horizonte: Wunder in Sicht“
+# - PokéWiki https://www.pokewiki.de/Staffel_4_(Pok%C3%A9mon_Horizonte) : „Pokémon Horizonte: Staffel 4 – Wunder in Sicht (engl. Pokémon Horizons: Season 4—Wonders Ahead)“
+# - offiziell https://pokemongo.com/de/news/pokemon-horizons-celebration-event-2026 : „Pokémon Horizonte: Staffel 3 – Gute Aussichten ist jetzt bei TOGGO verfügbar.“
+# - Netflix https://www.netflix.com/de/title/81944585 : „Pokémon Horizons: Season 2: The Search for Laqua“; Netflix 81696980 = „Pokémon Horizonte: Die Serie“ (Staffel 1).
+# - Staffel 3 zusätzlich: TOGGO-Programm KW 42/2026 (anime2you, https://www.anime2you.de/news/1060030/anime-tv-programm-42-2026/, gelesen 12.10.2026).
 #   Staffel 4 ist `offen`: ihr Ende nennt keine Quelle, darum kein bis/folgen.
 # Wächter: `pipeline/check-horizonte-staffeln.ts` (check:logic), `pipeline/check-horizonte-staffeln-bestand.ts` (gegen Wikipedia und TOGGO).
 quelle: https://de.wikipedia.org/wiki/Pok%C3%A9mon_(Anime)/Horizonte
@@ -42,7 +41,7 @@ titel:
   # Kein `aktiv:` von Hand: Den Tag, ab dem Meldungen zu 158871 in Staffel 4 zählen (Folge 1 = 137; ältere durchlaufend, Staffel 1: 1–45),
   # setzt der Bau auf den Tag nach dem ersten ausgelieferten Bestand mit dem Schnitt und hält ihn danach fest (`aktivTag`, `pipeline/lib/staffel-titel.ts`).
   staffeln:
-    - { nr: 1, von: 1, bis: 45, folgen: 45, kennung: 7000001 }
-    - { nr: 2, von: 46, bis: 89, folgen: 44, kennung: 7000002 }
-    - { nr: 3, von: 90, bis: 136, folgen: 47, kennung: 7000003, name: "Pokémon Horizonte: Gute Aussichten" }
-    - { nr: 4, von: 137, offen: true }
+    - { nr: 1, von: 1, bis: 45, folgen: 45, kennung: 7000001, name: "Pokémon Horizonte: Die Serie" }
+    - { nr: 2, von: 46, bis: 89, folgen: 44, kennung: 7000002, name: "Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua" }
+    - { nr: 3, von: 90, bis: 136, folgen: 47, kennung: 7000003, name: "Pokémon Horizonte: Staffel 3 – Gute Aussichten" }
+    - { nr: 4, von: 137, offen: true, name: "Pokémon Horizonte: Staffel 4 – Wunder in Sicht" }

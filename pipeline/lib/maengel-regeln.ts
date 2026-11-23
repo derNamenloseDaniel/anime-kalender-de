@@ -1,4 +1,4 @@
-import { EIGENE_ID_BASIS } from '../../shared/eigene-titel.ts'
+import { wertungNochOhneStart } from './maengel-wertung.ts'
 import { PLATFORMS, type PlatformId, type Release, type Title } from '../../shared/types.ts'
 import { verlagIstAnbieter } from '../../shared/verlag-anbieter.ts'
 import { istSichererTermin } from '../bau/11-7-wege-aus-terminen.ts'
@@ -160,14 +160,6 @@ const keinBannerBekannt = (t: Title, k: Kontext): string | undefined =>
 /** Zu Recht ohne Jahr (23.11.2026): AniList führt Ankündigungen ohne Startdatum (`NOT_YET_RELEASED`, `seasonYear` und `startDate` leer); solange weder ein Stream noch ein Nicht-Disc-Termin existiert, gibt es kein Jahr zu füllen. */
 const jahrNochOhneStart = (t: Title, k: Kontext): string | undefined =>
   t.streams?.length || (k.releases.get(t.id) ?? []).some((r) => r.platform !== 'disc') ? undefined : 'noch-ohne-start'
-
-/** Zu Recht ohne Wertung (23.11.2026): AniList gibt Ankündigungen (`NOT_YET_RELEASED`) keinen `averageScore`/`meanScore`, auch nicht bei Stimmen (Fool Night 213457, 2.5-jigen no Ririsa 2nd Season 185515). Gilt, solange kein Nicht-Disc-Termin begonnen hat, und endet mit dem Start von selbst. */
-const wertungNochOhneStart = (t: Title, k: Kontext): string | undefined => {
-  if (t.id >= EIGENE_ID_BASIS) return 'keine-quelle-mit-stimmen'
-  const jungOderOhneJahr = !t.jpYear || t.jpYear >= Number(k.heute.slice(0, 4))
-  const begonnen = (k.releases.get(t.id) ?? []).some((r) => r.platform !== 'disc' && r.schedule.firstEpisodeDate <= k.heute)
-  return jungOderOhneJahr && !begonnen && (!t.jpEnd || t.jpEnd >= k.heute) ? 'noch-ohne-start' : undefined
-}
 
 export const REGELN: Regel[] = [
   { art: 'cover', gruppe: 'fehlend', wirkung: 3, wer: 'auto:tmdb-poster', zaehle: luecke('c'), ausnahme: (t, k) => (k.coverBekannt[t.id] ? 'ohne-bekanntes-cover' : undefined) },

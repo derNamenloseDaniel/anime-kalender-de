@@ -1,8 +1,8 @@
 {
   "stand": "2026-11-23",
   "deckung": {
-    "titel": 20712,
-    "mitSeite": 16343,
+    "titel": 20715,
+    "mitSeite": 16346,
     "ohneSeite": 8,
     "ohneAnisearchKennung": 3089,
     "ohneReferenz": 1272,
@@ -10,16 +10,16 @@
     "kanten": 18610
   },
   "gesamt": {
-    "titel": 16343,
+    "titel": 16346,
     "gleich": 14003,
-    "fehlen": 901,
+    "fehlen": 904,
     "zusaetzlich": 1322,
     "gemischt": 117
   },
   "hauptbestand": {
-    "titel": 2877,
+    "titel": 2880,
     "gleich": 2290,
-    "fehlen": 327,
+    "fehlen": 330,
     "zusaetzlich": 244,
     "gemischt": 16
   },
@@ -31,9 +31,9 @@
     "gemischt": 110
   },
   "haelfteB": {
-    "titel": 8872,
+    "titel": 8875,
     "gleich": 7663,
-    "fehlen": 587,
+    "fehlen": 590,
     "zusaetzlich": 615,
     "gemischt": 7
   },
@@ -49,7 +49,7 @@
       {
         "id": 527,
         "name": "Pocket Monsters",
-        "titel": 126,
+        "titel": 129,
         "referenz": 1,
         "anisearch": 18
       },

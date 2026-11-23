@@ -2171,6 +2171,10 @@
       "am": "2026-11-23",
       "vorschlaege": 1
     },
+    "1074988": {
+      "am": "2026-11-23",
+      "vorschlaege": 2
+    },
     "1075001": {
       "am": "2026-11-23",
       "vorschlaege": 7
@@ -16937,6 +16941,48 @@
       "artikelId": "1074967",
       "artikel": "Start des zweiten Parts der dritten »Link Click«-Staffel + Visual",
       "quelle": "https://www.anime2you.de/news/1074967/link-click-staffel-3-part-2-start/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Akane-banashi",
+      "zitat": "Hierzulande kann die Serie sowohl auf Deutsch als auch im japanischen Originalton bei aniverse und Netflix gestreamt werden.",
+      "art": "sprachfassung",
+      "sprache": "deutsch+omu",
+      "plattform": "aniverse",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "aniverse",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1074988",
+      "artikel": "Konkreter Termin der zweiten »Akane-banashi«-Staffel steht fest",
+      "quelle": "https://www.anime2you.de/news/1074988/akane-banashi-staffel-2-termin/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Akane-banashi",
+      "zitat": "Hierzulande kann die Serie sowohl auf Deutsch als auch im japanischen Originalton bei aniverse und Netflix gestreamt werden.",
+      "art": "sprachfassung",
+      "sprache": "deutsch+omu",
+      "plattform": "netflix",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Netflix",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1074988",
+      "artikel": "Konkreter Termin der zweiten »Akane-banashi«-Staffel steht fest",
+      "quelle": "https://www.anime2you.de/news/1074988/akane-banashi-staffel-2-termin/",
       "veroeffentlicht": "2026-11-23",
       "gelesenAm": "2026-11-23"
     }

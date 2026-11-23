@@ -48,9 +48,12 @@
 import type { Title } from '../shared/types.ts'
 import { log, readJson, sleep, warn, writeJson } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
-import { handpruefungSchreiben, jwFrisch, type Handpruefung } from './lib/jw-handpruefung.ts'
-import { jahrPasst, reiheFuehrtEsNicht as reiheFuehrtEsNichtRein, type CrStaffel } from './lib/cr-reihe.ts'
+import { handpruefungSchreiben, type Handpruefung } from './lib/jw-handpruefung.ts'
 import { todayIso } from '../shared/time.ts'
+import { slugKern, videoAusJustwatch, type Befund, type Kontext } from './lib/cr-offene-kontext.ts'
+import { beurteileNebenausgabe, beurteileOhneKandidat, beurteileVideo, filmUrteil } from './lib/cr-offene-urteil.ts'
+import { beurteileStaffel, sucheSerie } from './lib/cr-offene-staffel.ts'
+
 
 const DATEI = 'data/crunchyroll-offene.json'
 const UA =
@@ -69,27 +72,6 @@ const TROCKEN = args.includes('--trocken')
  * `--trocken` sinnvoll; ohne schreibt der Lauf die Befunde wie sonst.
  */
 const IDS = args.includes('--ids') ? new Set(String(args[args.indexOf('--ids') + 1]).split(',').map(Number)) : null
-
-interface Befund {
-  /** Woher das Urteil stammt — für den Leser wichtiger als das Urteil selbst. */
-  herkunft: 'video' | 'katalog' | 'tot' | 'offen'
-  dub?: boolean
-  /** Die Serienkennung, sofern eine gefunden wurde. */
-  seriesId?: string
-  /** Was Crunchyroll dort führt — zum Nachlesen, wenn eine Zuordnung strittig ist. */
-  titel?: string
-  audio?: string[]
-  grund?: string
-  geprueftAm: string
-}
-
-
-/** Vergleichbare Form eines Titels: ohne Satzzeichen, klein, Wörter durch ein Leerzeichen. */
-const norm = (s: string | undefined | null): string =>
-  String(s ?? '')
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, ' ')
-    .trim()
 
 /**
  * **In der Cloud über die Weiche in Frankfurt** (`weiche-vercel/`, 16.09.2026).
@@ -143,28 +125,6 @@ export async function main(): Promise<void> {
 
   const roh = readJson<Title[] | Record<string, Title>>('public/data/titles.json', [])
   const titles = (Array.isArray(roh) ? roh : Object.values(roh)) as Title[]
-  /**
-   * **Die Geschwister eines Werks in derselben Reihe, nach Art getrennt.**
-   *
-   * Crunchyroll hängt Nebenausgaben gern an die Staffel, zu der sie gehören:
-   * „Love, Chunibyo & Other Delusions - Heart Throb - (German Dub)" hat 13
-   * Folgen — die Staffel mit 12 plus die OVA als S2 E13; bei Durarara führt die
-   * Serie 25 Folgen, 24 plus das Special Tenka Taihei (aniSearch 6986; Daniel,
-   * 13.09.2026, beide mit Bild). Wer nur nach genau gleicher Folgenzahl sucht, findet in beiden Fällen
-   * keinen Block. Diese Liste liefert die Zahlen, mit denen sich die Summe
-   * rechnen lässt.
-   */
-  const reiheVon = (t: Title): number => (t.franchiseId as number | undefined) ?? t.id
-  const geschwister = (werk: Title): { haupt: number[]; neben: number[] } => {
-    const haupt: number[] = []
-    const neben: number[] = []
-    for (const t of titles) {
-      if (t.id === werk.id || reiheVon(t) !== reiheVon(werk) || !Number.isFinite(t.episodes)) continue
-      if (t.format === 'TV' || t.format === 'ONA') haupt.push(Number(t.episodes))
-      else if (t.format === 'OVA' || t.format === 'SPECIAL') neben.push(Number(t.episodes))
-    }
-    return { haupt, neben }
-  }
   const katalog =
     readJson<{
       eintraege?: { id: string; titel: string; typ?: string; slug?: string | null; audio?: string[]; folgen?: number | null }[]
@@ -183,17 +143,6 @@ export async function main(): Promise<void> {
    * Gemessen am selben Tag ordnet er 9 der 33 offenen Verweise zu, ohne einen
    * einzigen Namensvergleich.
    */
-  /**
-   * **Gleich geschrieben ist nicht gleich geschrieben.**
-   *
-   * Unsere Adresse trägt `free-iwatobi-swim-club`, der Katalog führt
-   * `free---iwatobi-swim-club` — dieselbe Serie, drei Bindestriche
-   * Unterschied. Und `-prelude-` trägt sie am Anfang und am Ende. Normalisiert
-   * wird deshalb auf beiden Seiten gleich: mehrfache Bindestriche zu einem,
-   * Ränder weg.
-   */
-  const slugKern = (s: string): string =>
-    String(s).toLowerCase().replace(/-+/g, '-').replace(/^-|-$/g, '')
   /* Die aniSearch-Zuordnung — sie kennt zu manchen Werken eine Adresse mit Kennung. */
   const anisearch = readJson<Record<string, unknown>>('data/anisearch.json', {})
   /* JustWatch als zweite Quelle — sie entscheidet, ob eine Adresse ins Leere führt. */
@@ -203,50 +152,10 @@ export async function main(): Promise<void> {
   const heuteIso = todayIso()
   /** Tot laut frischen JustWatch-Daten — erst Daniels Blick, dann entfernt (17.09.2026). */
   const zurHand: Handpruefung[] = []
-  const zurHandpruefung = (werk: Title, url: string, grund: string, jwPfad?: string): Befund => {
-    zurHand.push({
-      titleId: werk.id,
-      titel: werk.titleDe ?? werk.titleEn ?? werk.titleRomaji ?? String(werk.id),
-      plattform: 'crunchyroll',
-      url,
-      folgerung: `nicht mehr da (${grund})`,
-      ...(jwPfad ? { jwPfad } : {}),
-      seit: heuteIso,
-    })
-    return { herkunft: 'offen', geprueftAm: todayIso(), grund: `zur Handprüfung: ${grund}` }
-  }
-  /**
-   * **JustWatch nennt die Adresse, die unser Bestand nicht hat — mit Kennung.**
-   *
-   * Ein Verweis aus der Frühzeit trägt einen Slug (`/de/sword-art-online`),
-   * und aus einem Slug wird kein Urteil: Er zeigt auf die Reihe, nicht auf die
-   * Ausgabe. JustWatch führt zu denselben Titeln eine kanonische
-   * Crunchyroll-Adresse, und die trägt eine **Videokennung**
-   * (`/watch/GVWU0Q527`). Damit greift der Zweig, der ohnehin der beste ist:
-   * Crunchyroll selbst wird nach den Fassungen dieser Folge gefragt.
-   *
-   * **Genommen wird nur die Kennung, nie die Sprachangabe.** Dass JustWatch
-   * daneben `audio: ["de", …]` führt, bleibt unbenutzt — die Entscheidung vom
-   * 07.09.2026 („die Tonspurangabe gilt der Serie, nicht der Folge") steht
-   * unberührt. Das Urteil kommt aus erster Hand; JustWatch weist nur den Weg
-   * dorthin. Dieselbe Rolle spielt seit dem 09.09.2026 die aniSearch-Adresse
-   * ein paar Zeilen weiter unten, nur liefert die eine Serien-, keine
-   * Videokennung.
-   *
-   * Gemessen am 10.09.2026: 3 der 9 Verweise ohne Sprachurteil bekommen so
-   * eine Kennung — „Sword Art Online EXTRA EDITION", „Okko's Inn" und
-   * „Sound! Euphonium".
-   */
-  const videoAusJustwatch = (werkId: number | string): string | undefined => {
-    for (const a of justwatch[String(werkId)]?.angebote ?? []) {
-      if (!/crunchyroll/i.test(String(a?.anbieter ?? ''))) continue
-      const treffer = /crunchyroll\.com\/(?:[a-z-]+\/)?watch\/([A-Z0-9]{6,})/i.exec(String(a?.url ?? ''))
-      if (treffer) return treffer[1]
-    }
-    return undefined
-  }
   const katalogNachSlug = new Map(katalog.filter((e) => e.slug).map((e) => [slugKern(String(e.slug)), e]))
   log(`Katalog: ${katalog.length} Einträge, davon ${katalogNachSlug.size} mit Slug.`)
+  const ctx: Kontext = { hol, titles, katalogNachId, katalogNachSlug, anisearch, justwatch, heuteIso, zurHand }
+
 
   /* Die offenen Verweise — Adresse, Werk und was wir über das Werk wissen. */
   const offen: { url: string; titel: Title }[] = []
@@ -265,7 +174,7 @@ export async function main(): Promise<void> {
 
   const zaehler = { video: 0, katalog: 0, tot: 0, offen: 0 }
   for (const { url, titel } of arbeit) {
-    const befund = await beurteile(url, titel)
+    const befund = await beurteile(ctx, url, titel)
     bestand[url] = befund
     zaehler[befund.herkunft]++
     const zeichen = befund.herkunft === 'tot' ? '✕' : befund.dub === true ? '✓' : befund.dub === false ? '–' : '?'
@@ -288,674 +197,94 @@ export async function main(): Promise<void> {
   writeJson(DATEI, bestand)
   handpruefungSchreiben('crunchyroll', zurHand, false, heuteIso)
   recordSource('crunchyroll-offene', arbeit.length, undefined, undefined, true)
+}
+
+/**
+ * Beurteilt einen Verweis über den kürzesten belastbaren Weg, den seine
+ * Adresse zulässt.
+ */
+async function beurteile(ctx: Kontext, url: string, werk: Title): Promise<Befund> {
+const eigeneVideoId = /\/watch\/([A-Z0-9]+)/i.exec(url)?.[1]
+  const videoId = eigeneVideoId ?? videoAusJustwatch(ctx, werk.id)
+  if (videoId) return await beurteileVideo(ctx, videoId, eigeneVideoId)
+  const serieId = /\/series\/([A-Z0-9]+)/i.exec(url)?.[1] ?? serieIdAusAnisearch(ctx.anisearch, werk)
+  /*
+    **Der Slug steht in der Adresse — er wird gelesen, bevor gesucht wird.**
+
+    Reihenfolge nach Verlässlichkeit: die Kennung in der Adresse, dann ihr
+    Slug, dann die Namenssuche. Die Slug-Teile sind alles, was kein Pfadwort
+    und keine Kennung ist; `/de/fruits-basket` liefert `fruits-basket`,
+    `/mobile-suit-gundam-wing-endless-waltz/…-732801` beide Teile.
+  */
+  const ausSlug = slugTeileVon(url)
+    .map((s) => ctx.katalogNachSlug.get(s))
+    .find(Boolean)
+  const kandidat = serieId ? ctx.katalogNachId.get(serieId) : (ausSlug ?? (await sucheSerie(ctx, werk)))
+  if (!kandidat) return beurteileOhneKandidat(ctx, url, werk)
+  /*
+    **Die Serie ist gefunden — das Werk ist damit noch nicht beurteilt.**
+
+    Bei einem Film oder einer OVA sagt der Serieneintrag nichts: Die Serie
+    vererbt ihre Sprache nicht an ihre Nebenausgaben (fünf „Free!"-Filme
+    zeigen auf die Serienadresse). Ein Urteil gibt es deshalb nur, wenn das
+    Werk selbst eine Serie ist.
+  */
+  /**
+   * **Es sei denn, der Treffer ist selbst ein Film.**
+   *
+   * Seit dem 09.09.2026 holt der Katalogsammler auch `type=movie_listing`
+   * (69 Filme, 44 mit deutschem Ton) und merkt sich den Durchlauf als `typ`.
+   * Zeigt der Slug unserer Adresse auf einen **Filmeintrag**, ist das nicht
+   * die Reihe, sondern das Werk — und seine Tonspuren gelten unmittelbar.
+   *
+   * Der Riegel darunter bleibt für alles andere: Fünf „Free!"-Filme zeigen auf
+   * den Slug ihrer **Serie**, und die vererbt ihre Sprache nicht.
+   */
+  if (werk.format === 'MOVIE' && kandidat.typ === 'film') return filmUrteil(kandidat)
+  if (werk.format !== 'TV' && werk.format !== 'ONA') return await beurteileNebenausgabe(ctx, url, werk, kandidat)
+  return await beurteileStaffel(ctx, werk, kandidat)
+}
 
   /**
-   * Beurteilt einen Verweis über den kürzesten belastbaren Weg, den seine
-   * Adresse zulässt.
+   * **aniSearch kennt zu manchen Werken die bessere Adresse — mit Kennung.**
+   *
+   * Unser Bestand führt „Sound! Euphonium" unter einem alten Slug
+   * (`crunchyroll.com/de/sound-euphonium`), aniSearch unter
+   * `series/GRDQNQW9Y`. Eine Kennung schlägt jeden Slug: Sie führt ohne
+   * Umweg in den Katalog und von dort in die Staffelliste.
+   *
+   * Gelesen wird nur, was schon im Haus liegt — dieselbe Datei, aus der der
+   * Bau seit dem 06.09.2026 fehlende Anbieter ergänzt. Das ist die Klasse
+   * Fehler, die CLAUDE.md als „Eine Datei zu schreiben ist nicht dasselbe wie
+   * sie zu benutzen" führt: fünf Fälle an zwei Tagen.
    */
-  async function beurteile(url: string, werk: Title): Promise<Befund> {
-    const eigeneVideoId = /\/watch\/([A-Z0-9]+)/i.exec(url)?.[1]
-    const videoId = eigeneVideoId ?? videoAusJustwatch(werk.id)
-    if (videoId) {
-      const { status, body } = await hol(
-        `https://beta-api.crunchyroll.com/content/v2/cms/objects/${videoId}?locale=de-DE`,
-      )
-      /**
-       * **Ein 404 belegt nur den Verweis, der ihn selbst trägt.**
-       *
-       * Steht die Kennung in **unserer** Adresse, führt sie ins Leere und der
-       * Verweis fliegt raus. Ist sie von JustWatch geliehen, sagt ihr Ende
-       * nichts über unsere Adresse — sie kann längst veraltet sein, während
-       * unser Slug weiterhin trägt. Gemessen am 10.09.2026 an „Okko's Inn":
-       * JustWatch nennt `GWDU8PMGG`, Crunchyroll kennt die Kennung nicht mehr,
-       * und unser Verweis auf `/okkos-inn/…` ist davon unberührt.
-       */
-      if (status === 404) {
-        return eigeneVideoId
-          ? { herkunft: 'tot', geprueftAm: todayIso(), grund: `Videokennung ${videoId} gibt es nicht mehr` }
-          : {
-              herkunft: 'offen',
-              geprueftAm: todayIso(),
-              grund: `die von JustWatch genannte Kennung ${videoId} gibt es nicht mehr`,
-            }
-      }
-      const o = (body as { data?: Record<string, never>[] })?.data?.[0] as
-        | {
-            title?: string
-            episode_metadata?: {
-              audio_locale?: string
-              series_id?: string
-              /* Alle Fassungen derselben Folge — der Schlüssel, siehe unten. */
-              versions?: { audio_locale?: string }[]
-            }
-          }
-        | undefined
-      const md = o?.episode_metadata
-      if (md?.audio_locale === 'de-DE') {
-        return { herkunft: 'video', dub: true, titel: o?.title, seriesId: md.series_id, geprueftAm: todayIso() }
-      }
-      /**
-       * **Die Folge nennt ihre sämtlichen Fassungen selbst — und das ist ein
-       * Beleg.**
-       *
-       * `audio_locale` sagt, in welcher Sprache **dieses** Video vorliegt;
-       * daraus folgt nichts, denn die deutsche Fassung hat eine eigene
-       * Kennung. `versions[]` ist die andere Auskunft: Dort listet Crunchyroll
-       * **alle** Fassungen derselben Folge — genau der Schlüssel, den CLAUDE.md
-       * seit dem 25.08.2026 als den tragfähigen benennt („er hängt an der
-       * Folge, nicht am Block").
-       *
-       * Gemessen am 10.09.2026 an beiden „Rascal"-Filmen: `audio_locale: ja-JP`,
-       * `versions: en-US, ja-JP, fr-FR` — kein Deutsch, und zwar nicht als
-       * Schweigen, sondern als vollständige Liste. Der Serieneintrag führt
-       * `de-DE` (aus anderen Staffeln), der Zweig darunter kam deshalb nie zu
-       * einem Urteil.
-       *
-       * Der Abruf kommt aus Deutschland (`country: DE`, sonst bricht der Lauf
-       * ab) — die Einschränkung vom 22.08.2026 („ein fehlendes de-DE aus
-       * US-Sicht belegt nichts") greift hier nicht.
-       */
-      const fassungen = [...new Set((md?.versions ?? []).map((v) => v?.audio_locale).filter(Boolean))]
-      if (fassungen.length && !fassungen.includes('de-DE')) {
-        return {
-          herkunft: 'video',
-          dub: false,
-          titel: o?.title,
-          seriesId: md?.series_id,
-          audio: fassungen as string[],
-          geprueftAm: todayIso(),
-          grund: `die Folge nennt ihre Fassungen selbst (${fassungen.join(', ')}) — kein Deutsch darunter`,
-        }
-      }
-      /*
-        Kein Deutsch an **diesem** Video und keine Fassungsliste — das ist kein
-        Nein. Gefragt wird deshalb der Serieneintrag: Führt auch er kein
-        `de-DE`, haben zwei Stellen unabhängig geschwiegen, und daraus wird
-        eins.
-      */
-      const serie = md?.series_id ? katalogNachId.get(md.series_id) : undefined
-      if (serie && !(serie.audio ?? []).includes('de-DE')) {
-        return {
-          herkunft: 'katalog',
-          dub: false,
-          titel: serie.titel,
-          seriesId: md?.series_id,
-          audio: serie.audio,
-          geprueftAm: todayIso(),
-          grund: `Video ${md?.audio_locale ?? '—'}, Serie „${serie.titel}" ohne de-DE`,
-        }
-      }
-      return {
-        herkunft: 'offen',
-        seriesId: md?.series_id,
-        geprueftAm: todayIso(),
-        grund: serie
-          ? `Video ${md?.audio_locale ?? '—'}, aber die Serie führt Deutsch — eine andere Fassung kann es geben`
-          : `Video ${md?.audio_locale ?? '—'}, Serie ${md?.series_id ?? '?'} nicht im deutschen Katalog`,
-      }
+function serieIdAusAnisearch(anisearch: Record<string, unknown>, werk: Title): string | undefined {
+  try {
+    const e = anisearch[String(werk.id)] as { streams?: { url?: string }[] } | undefined
+    for (const s of e?.streams ?? []) {
+      const treffer = /crunchyroll\.com\/(?:[a-z-]+\/)?series\/([A-Z0-9]{6,})/i.exec(String(s?.url ?? ''))
+      if (treffer) return treffer[1]
     }
+  } catch {
+    /* Ohne aniSearch-Eintrag bleibt es bei der eigenen Adresse. */
+  }
+  return undefined
+}
 
-    /**
-     * **aniSearch kennt zu manchen Werken die bessere Adresse — mit Kennung.**
-     *
-     * Unser Bestand führt „Sound! Euphonium" unter einem alten Slug
-     * (`crunchyroll.com/de/sound-euphonium`), aniSearch unter
-     * `series/GRDQNQW9Y`. Eine Kennung schlägt jeden Slug: Sie führt ohne
-     * Umweg in den Katalog und von dort in die Staffelliste.
-     *
-     * Gelesen wird nur, was schon im Haus liegt — dieselbe Datei, aus der der
-     * Bau seit dem 06.09.2026 fehlende Anbieter ergänzt. Das ist die Klasse
-     * Fehler, die CLAUDE.md als „Eine Datei zu schreiben ist nicht dasselbe wie
-     * sie zu benutzen" führt: fünf Fälle an zwei Tagen.
-     */
-    const ausAnisearch = (() => {
-      try {
-        const e = anisearch[String(werk.id)] as { streams?: { url?: string }[] } | undefined
-        for (const s of e?.streams ?? []) {
-          const treffer = /crunchyroll\.com\/(?:[a-z-]+\/)?series\/([A-Z0-9]{6,})/i.exec(String(s?.url ?? ''))
-          if (treffer) return treffer[1]
-        }
-      } catch {
-        /* Ohne aniSearch-Eintrag bleibt es bei der eigenen Adresse. */
-      }
-      return undefined
-    })()
-    const serieId = /\/series\/([A-Z0-9]+)/i.exec(url)?.[1] ?? ausAnisearch
-    /*
-      **Der Slug steht in der Adresse — er wird gelesen, bevor gesucht wird.**
-
-      Reihenfolge nach Verlässlichkeit: die Kennung in der Adresse, dann ihr
-      Slug, dann die Namenssuche. Die Slug-Teile sind alles, was kein Pfadwort
-      und keine Kennung ist; `/de/fruits-basket` liefert `fruits-basket`,
-      `/mobile-suit-gundam-wing-endless-waltz/…-732801` beide Teile.
-    */
-    const slugTeile = (() => {
-      try {
-        const pfad = new URL(url).pathname.replace(/^\/(de|de-DE)\//, '/')
-        const raus = new Set(['watch', 'series', 'de'])
-        return pfad
-          .split('/')
-          .filter(Boolean)
-          .filter((t) => !raus.has(t) && !/^G[A-Z0-9]{6,}$/.test(t))
-          .map((t) => slugKern(t))
-      } catch {
-        return []
-      }
-    })()
-    const ausSlug = slugTeile.map((s) => katalogNachSlug.get(s)).find(Boolean)
-    const kandidat = serieId ? katalogNachId.get(serieId) : (ausSlug ?? (await sucheSerie(werk)))
-    if (!kandidat) {
-      /**
-       * **Zwei Stellen, die unabhängig schweigen — dann führt die Adresse ins Leere.**
-       *
-       * „Kennt der deutsche Katalog nicht" war bis heute **kein** Beleg, und der
-       * Grund dafür ist entfallen: Der Katalog holte nur Serien, Filme fehlten
-       * bauartbedingt. Seit dem 09.09.2026 holt er auch `movie_listing` (69
-       * Stück, laut `total` vollständig) — ein Film, der dort fehlt, fehlt
-       * wirklich.
-       *
-       * Ein Beleg wird daraus trotzdem erst mit einer **zweiten** Quelle:
-       * JustWatch muss den Titel kennen, Angebote führen **und** Crunchyroll
-       * nicht darunter haben. Kennt JustWatch gar nichts, ist sein Schweigen
-       * keine Auskunft (5 von 9 Fällen tragen so, 1 widerspricht — „Okko und
-       * ihre Geisterfreunde" läuft dort sehr wohl, nur unter anderem Slug).
-       *
-       * Der Befund gilt der **Adresse**, nicht der Sprache: Der Bau macht daraus
-       * `available: false` und entfernt den Verweis, der niemanden mehr
-       * irgendwohin führt.
-       */
-      const jwEintrag = justwatch[String(werk.id)]
-      const anbieter = (jwEintrag?.angebote ?? []).map((a) => String(a?.anbieter ?? ''))
-      if (anbieter.length && !anbieter.some((n) => /crunchyroll/i.test(n))) {
-        if (jwFrisch(jwEintrag, heuteIso))
-          return zurHandpruefung(werk, url, `nicht im deutschen Katalog, JustWatch ohne Crunchyroll`, jwEintrag?.jwPfad)
-        return {
-          herkunft: 'tot',
-          geprueftAm: todayIso(),
-          grund:
-            `im deutschen Katalog nicht geführt, und JustWatch nennt ${anbieter.length} Anbieter ohne Crunchyroll ` +
-            `(${[...new Set(anbieter)].slice(0, 3).join(', ')})`,
-        }
-      }
-      /*
-        **Eine Altadresse der Form „…-unbekannt-NNNNNN" ist tot.** Crunchyroll hat
-        diese Medienseiten mit dem Umbau abgeschaltet; beide, die am 13.09.2026
-        geöffnet wurden (Cencoroll Connect, Your Voice), führten auf „404 – Seite
-        nicht gefunden“ (Daniel, mit Bildern). Okko trug dieselbe Form und fand
-        sich nur noch unter neuer Serienkennung. Der Befund gilt
-        der Adresse, nicht der Sprache — er entfernt einen Weg, der nirgends
-        mehr hinführt.
-      */
-      if (/-unbekannt-\d+(?:[/?#]|$)/i.test(url)) {
-        return {
-          herkunft: 'tot',
-          geprueftAm: todayIso(),
-          grund: 'Altadresse der Form „…-unbekannt-N" ohne Serienkennung; diese Seiten führen seit dem Umbau auf 404',
-        }
-      }
-      return { herkunft: 'offen', geprueftAm: todayIso(), grund: 'keine Kennung in der Adresse, kein sicherer Treffer' }
-    }
-    /*
-      **Die Serie ist gefunden — das Werk ist damit noch nicht beurteilt.**
-
-      Bei einem Film oder einer OVA sagt der Serieneintrag nichts: Die Serie
-      vererbt ihre Sprache nicht an ihre Nebenausgaben (fünf „Free!"-Filme
-      zeigen auf die Serienadresse). Ein Urteil gibt es deshalb nur, wenn das
-      Werk selbst eine Serie ist.
-    */
-    /**
-     * **Es sei denn, der Treffer ist selbst ein Film.**
-     *
-     * Seit dem 09.09.2026 holt der Katalogsammler auch `type=movie_listing`
-     * (69 Filme, 44 mit deutschem Ton) und merkt sich den Durchlauf als `typ`.
-     * Zeigt der Slug unserer Adresse auf einen **Filmeintrag**, ist das nicht
-     * die Reihe, sondern das Werk — und seine Tonspuren gelten unmittelbar.
-     *
-     * Der Riegel darunter bleibt für alles andere: Fünf „Free!"-Filme zeigen auf
-     * den Slug ihrer **Serie**, und die vererbt ihre Sprache nicht.
-     */
-    if (werk.format === 'MOVIE' && kandidat.typ === 'film') {
-      const deutschImFilm = (kandidat.audio ?? []).includes('de-DE')
-      return {
-        herkunft: 'katalog',
-        dub: deutschImFilm,
-        seriesId: kandidat.id,
-        titel: kandidat.titel,
-        audio: kandidat.audio ?? [],
-        geprueftAm: todayIso(),
-        grund: `Filmeintrag „${kandidat.titel}" im deutschen Katalog${deutschImFilm ? ' mit' : ' ohne'} de-DE`,
-      }
-    }
-    if (werk.format !== 'TV' && werk.format !== 'ONA') {
-      /**
-       * **Zeigt die Adresse auf die Reihe, ist die Sprachfrage offen — die
-       * Angebotsfrage nicht.**
-       *
-       * Fünf „Free!"-Filme, eine Chunibyo-OVA, zwei Specials: Ihre Adresse
-       * nennt den Slug der Serie. Ob der **Film** dort läuft, sagt das nicht,
-       * und die Serie vererbt ihre Sprache nicht.
-       *
-       * Beantwortbar bleibt die Frage daneben: Der deutsche Katalog führt seit
-       * dem 09.09.2026 auch Filme (69, laut `total` vollständig) — steht das
-       * Werk dort nicht und nennt JustWatch Angebote **ohne** Crunchyroll, dann
-       * gibt es dort kein Angebot, und der Verweis führt für dieses Werk ins
-       * Leere.
-       *
-       * Gemessen am 10.09.2026: fünf von neun tragen das. „Sword Art Online:
-       * Extra Edition" widerspricht — JustWatch führt dort einen
-       * Crunchyroll-Kanal, also bleibt der Verweis offen.
-       */
-      /**
-       * **Erst nachsehen, ob Crunchyroll die Ausgabe selbst führt.**
-       *
-       * Der Riegel oben stellt richtig fest, dass eine OVA nicht die Reihe ist.
-       * Daraus folgt aber nicht, dass sie unauffindbar wäre: Crunchyroll legt
-       * Nebenausgaben regelmäßig als **eigene Staffel** unter derselben Reihe
-       * an und schreibt die Art in den Staffeltitel.
-       *
-       * Gemessen am 10.09.2026 an „Love, Chunibyo & Other Delusions - Heart
-       * Throb -": Die Reihe führt zwei Staffeln, `GYP8CXW2Q` („(German Dub)",
-       * 13 Folgen, `de-DE`) und `GR2PCVZM5` („(OVA)", 1 Folge, `ja-JP`). Unser
-       * Werk ist die OVA — und die gibt es dort nur auf Japanisch.
-       *
-       * Zwei Bedingungen, beide notwendig: **genau eine** Staffel trägt die
-       * Ausgabenart im Titel (bei mehreren entscheidet nichts), und sie nennt
-       * überhaupt Fassungen. Eine leere Fassungsliste ist Schweigen, kein Nein.
-       */
-      const ausgabenMuster =
-        werk.format === 'OVA' ? /\bOVA\b/i : werk.format === 'SPECIAL' ? /\bspecials?\b/i : undefined
-      if (ausgabenMuster) {
-        const derReihe = await holeStaffeln(kandidat.id)
-        /*
-          **Steckt die Nebenausgabe synchronisiert in einer Hauptstaffel?**
-
-          Chunibyo Heart Throb: Der Block „(OVA)" hat eine Folge nur mit
-          Untertiteln, und daraus wurde am 10.09.2026 ein Nein. Im Block
-          „(German Dub)" steht dieselbe Folge als S2 E13 mit Synchro — 13 Folgen
-          = Staffel 12 + OVA 1. Bei Durarara führt die Serie 25 deutsche Folgen,
-          24 plus das Special Tenka Taihei (aniSearch 6986).
-
-          Gerechnet wird mit den Folgenzahlen aus unserem Bestand: Ein deutscher
-          Block, dessen Folgenzahl eine Hauptserie der Reihe um **mindestens
-          eine und höchstens so viele** Folgen übersteigt, wie dieses Werk hat,
-          trägt es mit. **Genau ein** solcher Block, sonst kein Urteil.
-        */
-        const { haupt } = geschwister(werk)
-        const eigene = Number.isFinite(werk.episodes) ? Number(werk.episodes) : 1
-        const mitgefuehrt = derReihe.filter(
-          (st) =>
-            st.audio.includes('de-DE') &&
-            st.folgen != null &&
-            /*
-              Ein Block, der selbst so viele Folgen hat wie eine unserer
-              Hauptserien, ist diese Hauptserie und trägt nichts mit: DxD „Hero"
-              hat bei uns wie bei Crunchyroll 13 Folgen, 13 − 12 hätte sonst die
-              Mini-Episoden hineingerechnet (16.09.2026).
-            */
-            !haupt.includes(st.folgen) &&
-            haupt.some((n) => st.folgen! - n >= 1 && st.folgen! - n <= eigene),
-        )
-        if (mitgefuehrt.length === 1) {
-          const st = mitgefuehrt[0]!
-          return {
-            herkunft: 'katalog',
-            dub: true,
-            seriesId: st.id,
-            titel: st.titel,
-            audio: st.audio,
-            geprueftAm: todayIso(),
-            grund: `„${st.titel}" führt ${st.folgen} deutsche Folgen, mehr als die Hauptserie — das ${werk.format} steckt darin`,
-          }
-        }
-        const passend = derReihe.filter((st) => ausgabenMuster.test(st.titel))
-        if (passend.length === 1 && passend[0]!.audio.length) {
-          const st = passend[0]!
-          const deutsch = st.audio.includes('de-DE')
-          return {
-            herkunft: 'katalog',
-            dub: deutsch,
-            seriesId: st.id,
-            titel: st.titel,
-            audio: st.audio,
-            geprueftAm: todayIso(),
-            grund: `Crunchyroll führt „${st.titel}" als eigene Staffel${deutsch ? ' mit' : ' ohne'} de-DE`,
-          }
-        }
-      }
-      const nichtDabei = await reiheFuehrtEsNicht(werk, kandidat, await holeStaffeln(kandidat.id))
-      if (nichtDabei) {
-        return { herkunft: 'tot', seriesId: kandidat.id, titel: kandidat.titel, geprueftAm: todayIso(), grund: nichtDabei }
-      }
-      const jwEintrag2 = justwatch[String(werk.id)]
-      const anbieter2 = (jwEintrag2?.angebote ?? []).map((a) => String(a?.anbieter ?? ''))
-      if (anbieter2.length && !anbieter2.some((n) => /crunchyroll/i.test(n))) {
-        if (jwFrisch(jwEintrag2, heuteIso))
-          return zurHandpruefung(werk, url, `Reihe „${kandidat.titel}", Werk nicht im Katalog, JustWatch ohne Crunchyroll`, jwEintrag2?.jwPfad)
-        return {
-          herkunft: 'tot',
-          seriesId: kandidat.id,
-          titel: kandidat.titel,
-          geprueftAm: todayIso(),
-          grund:
-            `die Adresse zeigt auf die Reihe „${kandidat.titel}", das ${werk.format} steht nicht im deutschen Katalog, ` +
-            `und JustWatch nennt ${anbieter2.length} Anbieter ohne Crunchyroll (${[...new Set(anbieter2)].slice(0, 3).join(', ')})`,
-        }
-      }
-      return {
-        herkunft: 'offen',
-        seriesId: kandidat.id,
-        titel: kandidat.titel,
-        geprueftAm: todayIso(),
-        grund: `„${kandidat.titel}" ist die Reihe, ${werk.format} ist eine eigene Ausgabe`,
-      }
-    }
-    /**
-     * **Und beurteilt wird die Staffel, nicht die Serie.**
-     *
-     * Der Serieneintrag im Katalog bündelt, was AniList trennt: „Kaguya-sama"
-     * steht dort mit 43 Folgen für fünf Staffeln, „Fruits Basket" mit 63 für
-     * drei. Ein Vergleich auf Serienebene kann deshalb **nie** aufgehen — im
-     * ersten Anlauf am 09.09.2026 fiel jede der elf Serien mit „Folgenzahl
-     * weicht ab (12 gegen 43)" durch.
-     *
-     * Die Staffelliste beantwortet dieselbe Frage sauber, und sie
-     * unterscheidet, worauf es ankommt (gemessen am selben Tag):
-     *
-     *     seq 1 | 12 Fg | Kaguya-sama: Love is War   | ja, es, pt, en, fr
-     *     seq 2 | 12 Fg | Kaguya-sama: Love is War?  | ja, en, es, pt, fr, de-DE
-     *
-     * Staffel 1 ohne Deutsch, Staffel 2 mit — auf Serienebene wäre beides ein
-     * „die Serie führt Deutsch" gewesen, und für Staffel 1 falsch.
-     */
-    const staffeln = await holeStaffeln(kandidat.id)
-    if (!staffeln.length) {
-      return {
-        herkunft: 'offen',
-        seriesId: kandidat.id,
-        titel: kandidat.titel,
-        geprueftAm: todayIso(),
-        grund: `„${kandidat.titel}" gibt keine Staffelliste heraus`,
-      }
-    }
-    /*
-      **Name und Folgenzahl müssen beide treffen, und der Treffer muss eindeutig sein.**
-
-      Kaguya-sama Staffel 1 und 2 haben beide zwölf Folgen; sie unterscheiden
-      sich nur im Namen („Love is War" gegen „Love is War?"). Umgekehrt tragen
-      manche Staffeln bei Crunchyroll einen anderen Namen als bei uns — dann
-      entscheidet die Folgenzahl allein, aber nur, wenn keine zweite Staffel
-      dieselbe hat. Bleiben zwei übrig, gibt es kein Urteil.
-    */
-    /*
-      **Erst wörtlich, dann normalisiert — sonst frisst die Normalisierung das
-      unterscheidende Zeichen.**
-
-      Crunchyroll trennt „Kaguya-sama: Love is War" (Staffel 1) und
-      „Kaguya-sama: Love is War**?**" (Staffel 2) allein durch das Fragezeichen,
-      und beide haben zwölf Folgen. `norm()` streicht Satzzeichen — damit trafen
-      beide Werke beide Staffeln, und keines bekam ein Urteil (gemessen
-      09.09.2026: „2 über den Namen, 2 über die Zahl von 5").
-
-      Der wörtliche Vergleich ignoriert nur Groß- und Kleinschreibung und
-      Leerraum. Trifft er genau eine Staffel, ist die Sache entschieden; sonst
-      geht es wie bisher weiter.
-    */
-    const rohNamen = [werk.titleDe, werk.titleEn, werk.titleRomaji]
+/** Die Slug-Teile einer Adresse (alles, was kein Pfadwort und keine Kennung ist), normalisiert. */
+function slugTeileVon(url: string): string[] {
+  try {
+    const pfad = new URL(url).pathname.replace(/^\/(de|de-DE)\//, '/')
+    const raus = new Set(['watch', 'series', 'de'])
+    return pfad
+      .split('/')
       .filter(Boolean)
-      .map((n) => String(n).trim().toLowerCase())
-    const woertlich = staffeln.filter((s) => rohNamen.includes(s.titel.trim().toLowerCase()))
-    const namen = [werk.titleDe, werk.titleEn, werk.titleRomaji].filter(Boolean).map((n) => norm(n as string))
-    const nachName = woertlich.length === 1 ? woertlich : staffeln.filter((s) => namen.includes(norm(s.titel)))
-    /*
-      **Die Folgenzahl allein trifft auch fremde Staffeln — das Jahr hält dagegen.**
-      Stone Ocean (2021, 26 Folgen) traf am 16.09.2026 JoJo Staffel 1 (2012, 26
-      Folgen) und bekam deren „Deutsch". Kennen beide Seiten ein Jahr, muss es passen.
-    */
-    const nachZahl = staffeln.filter(
-      (s) =>
-        werk.episodes != null &&
-        s.folgen === werk.episodes &&
-        (!werk.jpYear || !s.jahre.length || jahrPasst(s.jahre, Number(werk.jpYear))),
-    )
-    /**
-     * **Bleiben mehrere übrig, entscheidet das Jahr.**
-     *
-     * Bei „Sound! Euphonium" heißen zwei Staffeln gleich und zwei haben
-     * dreizehn Folgen — über Name und Zahl ist nichts zu holen. Unser Bestand
-     * führt `jpYear: 2015`, und Crunchyrolls Staffel-Tags nennen
-     * `Frühling-2015`. Ein Jahr ist kein Namensvergleich: Es steht auf beiden
-     * Seiten als Zahl und stammt aus der japanischen Ausstrahlung.
-     *
-     * Angewandt nur, wenn es **genau eine** Staffel trifft — sonst bleibt es
-     * beim bisherigen Ergebnis, also meist bei keinem Urteil.
-     */
-    const nachJahr = werk.jpYear
-      ? staffeln.filter((st) => (st.jahre ?? []).includes(Number(werk.jpYear)))
-      : []
-    /*
-      **Führt eine Staffel ihre Nebenausgabe mit, geht die Folgenzahl als Summe auf.**
-
-      Heart Throb hat bei uns 12 Folgen, Crunchyrolls Dub-Block 13 — die OVA
-      steckt als E13 darin. Gesucht wurde bisher nur nach genau 12, und so blieb
-      die Staffel am 10.09.2026 offen („0 über den Namen, 0 über die Zahl").
-      Die Summe gilt nur mit einer Nebenausgabe **derselben Reihe** und nur,
-      wenn genau eine Staffel sie trifft.
-    */
-    const { neben } = geschwister(werk)
-    const nachSumme =
-      werk.episodes != null && nachZahl.length === 0
-        ? staffeln.filter((s) => s.folgen != null && neben.some((k) => s.folgen === werk.episodes! + k))
-        : []
-    const treffer =
-      nachName.length === 1 && (nachZahl.length === 0 || nachZahl.some((s) => s.id === nachName[0]!.id))
-        ? nachName[0]
-        : nachZahl.length === 1
-          ? nachZahl[0]
-          : nachJahr.length === 1
-            ? nachJahr[0]
-            : nachSumme.length === 1
-              ? nachSumme[0]
-              : undefined
-    if (!treffer) {
-      /**
-       * **Sagen alle Staffeln dasselbe, braucht es keine Zuordnung.**
-       *
-       * „Meine Wiedergeburt als Schleim" führt sechs Staffeln, **jede** mit
-       * deutscher Fassung. Welche unser Eintrag meint, ist dann gleichgültig:
-       * Das Urteil fällt für jede gleich aus. Drei unserer Verweise hingen am
-       * 09.09.2026 allein daran, dass die Folgenzahlen nicht aufgingen (24, 12
-       * und 12 gegen 25, 25, 26, 21, 5, 3).
-       *
-       * **Nur bei Einstimmigkeit**, und nur mit mehr als einer Staffel — sonst
-       * ist es der gewöhnliche Serienvergleich, den dieses Projekt aus gutem
-       * Grund nicht macht. Ein einstimmiges **Nein** zählt ebenso: Es kommt aus
-       * dem deutschen Katalog, und dort ist ein fehlendes `de-DE` ein Beleg.
-       */
-      const nichtDabei = nachName.length + nachZahl.length + nachSumme.length === 0 ? await reiheFuehrtEsNicht(werk, kandidat, staffeln) : undefined
-      if (nichtDabei) {
-        return { herkunft: 'tot', seriesId: kandidat.id, titel: kandidat.titel, geprueftAm: todayIso(), grund: nichtDabei }
-      }
-      const alleDeutsch = staffeln.length > 1 && staffeln.every((s) => s.audio.includes('de-DE'))
-      const keineDeutsch = staffeln.length > 1 && staffeln.every((s) => !s.audio.includes('de-DE'))
-      if (alleDeutsch || keineDeutsch) {
-        return {
-          herkunft: 'katalog',
-          dub: alleDeutsch,
-          seriesId: kandidat.id,
-          titel: kandidat.titel,
-          audio: alleDeutsch ? ['de-DE'] : [],
-          geprueftAm: todayIso(),
-          grund: `alle ${staffeln.length} Staffeln von „${kandidat.titel}" ${alleDeutsch ? 'führen' : 'führen kein'} Deutsch — die Zuordnung ändert daran nichts`,
-        }
-      }
-      return {
-        herkunft: 'offen',
-        seriesId: kandidat.id,
-        titel: kandidat.titel,
-        geprueftAm: todayIso(),
-        grund:
-          `kein eindeutiger Staffeltreffer (${werk.episodes ?? '?'} Fg.; ` +
-          `${nachName.length} über den Namen, ${nachZahl.length} über die Zahl von ${staffeln.length})`,
-      }
-    }
-    const deutsch = treffer.audio.includes('de-DE')
-    return {
-      herkunft: 'katalog',
-      dub: deutsch,
-      seriesId: kandidat.id,
-      titel: treffer.titel,
-      audio: treffer.audio,
-      geprueftAm: todayIso(),
-      grund: `Staffel „${treffer.titel}" mit ${treffer.folgen ?? '?'} Folgen`,
-    }
-  }
-
-  /** Die Regel steht in `lib/cr-reihe.ts`; hier kommen Katalogzahl und Suche dazu. */
-  async function reiheFuehrtEsNicht(
-    werk: Title,
-    kandidat: { id: string; titel: string },
-    staffeln: CrStaffel[],
-  ): Promise<string | undefined> {
-    const katalogFolgen = katalogNachId.get(kandidat.id)?.folgen
-    /* Die Suche kostet einen Abruf — erst fragen, wenn die Liste sonst genügen würde. */
-    if (!reiheFuehrtEsNichtRein(werk, staffeln, katalogFolgen, false)) return undefined
-    return reiheFuehrtEsNichtRein(werk, staffeln, katalogFolgen, await andersWoMoeglich(werk, kandidat))
-  }
-
-  /**
-   * Nennt die Suche nach dem Werk einen anderen Eintrag, der es sein könnte?
-   *
-   * „Könnte" heißt: Der Titel beginnt wie die Reihe (die ersten zwei Wörter,
-   * „attack on …"), oder er steckt ganz im Werknamen („-prelude-" in „Fruits
-   * Basket -prelude-"). Ein Namensvergleich entscheidet hier nichts — er hält
-   * nur einen Befund zurück, der sonst einen Verweis entfernen würde.
-   */
-  async function andersWoMoeglich(werk: Title, kandidat: { id: string; titel: string }): Promise<boolean> {
-    const anfang = norm(kandidat.titel).split(' ').slice(0, 2).join(' ')
-    const werkNamen = [werk.titleDe, werk.titleEn, werk.titleRomaji].filter(Boolean).map((n) => norm(n as string))
-    for (const name of new Set(werkNamen)) {
-      if (name.length < 3) continue
-      const { body } = await hol(
-        `https://beta-api.crunchyroll.com/content/v2/discover/search?q=${encodeURIComponent(name)}&n=8&type=series,movie_listing&locale=de-DE`,
-      )
-      await sleep(700)
-      for (const g of (body as { data?: { items?: { id: string; title: string }[] }[] })?.data ?? []) {
-        for (const it of g.items ?? []) {
-          if (it.id === kandidat.id) continue
-          const t = norm(it.title)
-          if ((anfang.length >= 4 && t.startsWith(anfang)) || (t.length >= 5 && werkNamen.some((w) => w.includes(t)))) {
-            return true
-          }
-        }
-      }
-    }
-    return false
-  }
-
-  /** Die Staffeln einer Serie mit ihren Tonspuren — je Staffel, nicht je Serie. */
-  async function holeStaffeln(
-    serieId: string,
-  ): Promise<{ id: string; titel: string; folgen: number | null; audio: string[]; jahre: number[] }[]> {
-    const { body } = await hol(`https://beta-api.crunchyroll.com/content/v2/cms/series/${serieId}/seasons?locale=de-DE`)
-    const daten =
-      (
-        body as {
-          data?: {
-            id: string
-            title?: string
-            number_of_episodes?: number
-            audio_locale?: string
-            season_tags?: string[]
-            versions?: { audio_locale?: string }[]
-          }[]
-        }
-      )?.data ?? []
-    return daten.map((s) => ({
-      id: s.id,
-      titel: s.title ?? '',
-      folgen: s.number_of_episodes ?? null,
-      /*
-        `versions` nennt alle Fassungen dieser Staffel; `audio_locale` nur die
-        des Blocks, den wir gerade in der Hand haben. Wo es beides gibt, zählt
-        die Liste — sonst hinge das Urteil daran, welchen Block Crunchyroll
-        zuerst ausliefert.
-      */
-      audio: [...new Set((s.versions ?? []).map((v) => v.audio_locale).filter(Boolean) as string[])].length
-        ? [...new Set((s.versions ?? []).map((v) => v.audio_locale).filter(Boolean) as string[])]
-        : s.audio_locale
-          ? [s.audio_locale]
-          : [],
-      /**
-       * **Das Jahr steht in den Staffel-Tags — der Anker, der bisher fehlte.**
-       *
-       * „Sound! Euphonium" hat bei Crunchyroll zwei Staffeln desselben Namens
-       * (14 und 13 Folgen) und eine dritte mit 13. Über Name und Zahl ist
-       * unsere Staffel (13 Folgen) nicht zu treffen; `season_tags` sagt es in
-       * einem Wort: `Frühling-2015`, `Herbst-2016`, `spring-2024`.
-       *
-       * Geschrieben wird mal deutsch, mal englisch — gelesen wird deshalb nur
-       * die **Jahreszahl**.
-       */
-      jahre: [...new Set((s.season_tags ?? []).map((tag) => Number(/(\d{4})/.exec(String(tag))?.[1])).filter(Boolean))],
-    }))
-  }
-
-  /**
-   * Sucht die Serie im **deutschen** Katalog — und nimmt nur einen Treffer, der
-   * im Namen übereinstimmt.
-   *
-   * Gesucht wird über `discover/search`, denselben Weg, der am 25.08.2026 die
-   * Detektiv-Conan-Lücke gelöst hat: Unser Bestand führte den englischen Block
-   * (`case-closed`, 33 Folgen, kein Deutsch), die deutsche Serie liegt unter
-   * einer anderen Kennung mit 405 deutschen Folgen.
-   */
-  async function sucheSerie(
-    werk: Title,
-  ): Promise<{ id: string; titel: string; typ?: string; audio?: string[]; folgen?: number | null } | undefined> {
-    /*
-      **Auch der Reihenname wird gesucht — die Staffel entscheidet danach.**
-
-      Unser Bestand führt „The Promised Neverland Season 2", der Katalog „THE
-      PROMISED NEVERLAND" mit zwei Staffeln. Ein Suchabgleich, der
-      Namensgleichheit verlangt, findet die Serie deshalb nie — und ohne Serie
-      gibt es keine Staffelliste (gemessen 09.09.2026: fünf Werke fielen so
-      durch, darunter drei Slime-Staffeln).
-    */
-    const ohneStaffel = (n: string) =>
-      n
-        .replace(/\s*[:\-–]?\s*(season|staffel|s)\s*\d+\s*$/i, '')
-        .replace(/\s+\d+(st|nd|rd|th)?\s+season\s*$/i, '')
-        .trim()
-    const namen = [
-      ...new Set(
-        [werk.titleDe, werk.titleEn, werk.titleRomaji]
-          .filter(Boolean)
-          .flatMap((n) => [String(n), ohneStaffel(String(n))])
-          .filter((n) => n.length >= 3),
-      ),
-    ]
-    for (const name of namen) {
-      const { body } = await hol(
-        `https://beta-api.crunchyroll.com/content/v2/discover/search?q=${encodeURIComponent(name)}&n=8&type=series,movie_listing&locale=de-DE`,
-      )
-      const gruppen = (body as { data?: { items?: { id: string; title: string }[] }[] })?.data ?? []
-      for (const g of gruppen) {
-        for (const it of g.items ?? []) {
-          if (norm(it.title) !== norm(name)) continue
-              /*
-            **Auch Filme werden gesucht.** Bis zum 10.09.2026 fragte die Suche nur
-            `type=series`, und ein Film liegt bei Crunchyroll als `movie_listing` —
-            der Katalogsammler holt beide seit dem 09.09., die Suche tat es nicht.
-          */
-      /* Der Katalog kennt die Tonspuren; die Suche nennt sie nicht vollständig. */
-          const ausKatalog = katalogNachId.get(it.id)
-          if (ausKatalog) return ausKatalog
-        }
-      }
-      await sleep(700)
-    }
-    return undefined
+      .filter((t) => !raus.has(t) && !/^G[A-Z0-9]{6,}$/.test(t))
+      .map((t) => slugKern(t))
+  } catch {
+    return []
   }
 }
+
 
 await main()

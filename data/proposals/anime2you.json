@@ -1,11 +1,11 @@
 {
-  "scrapedAt": "2026-11-23T01:02:07.099Z",
+  "scrapedAt": "2026-11-23T11:02:51.263Z",
   "verworfen": {
     "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 7,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 5,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 10,
-    "schon in einem Rubrik-Feed gelesen": 8,
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 11,
+    "schon in einem Rubrik-Feed gelesen": 6,
     "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 1,
     "Sprachhinweis älter als 45 Tage": 6
   },
@@ -20,6 +20,38 @@
         {
           "iso": "2026-11-29",
           "context": "amit ihr keine Sendung verpasst! Premieren und Highlights Vom 23. bis 29. November 2026 gibt es wieder zahlreiche Anime-Premieren und -Highl"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Erste »Mashle«-Staffel erscheint als Blu-ray-Gesamtausgabe",
+      "articleUrl": "https://www.anime2you.de/news/1074225/mashle-staffel-1-blu-ray-gesamtausgabe/",
+      "publishedAt": "2026-11-23",
+      "category": "allgemein",
+      "platforms": [
+        "disc"
+      ],
+      "dates": [
+        {
+          "month": "2027-02",
+          "context": "einer Gesamtausgabe in den Handel kommt. Wir fassen zusammen. Release im Februar 2027 Die Gesamtausgabe der ersten »Mashle: Magic and Muscle"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Offizielle Sammelkarten zu »Haikyu!!« vorgestellt + Bilder",
+      "articleUrl": "https://www.anime2you.de/news/1074284/offizielle-haikyu-sammelkarten/",
+      "publishedAt": "2026-11-23",
+      "category": "allgemein",
+      "platforms": [],
+      "dates": [
+        {
+          "month": "2027-05",
+          "context": "t im AKIBA PASS SHOP vorbestellt werden. Wir fassen zusammen. Release im Mai 2027 Die »Manyc Cards« zu »Haikyu!!« werden in zwei Ausführunge"
         }
       ],
       "dub": "unklar",

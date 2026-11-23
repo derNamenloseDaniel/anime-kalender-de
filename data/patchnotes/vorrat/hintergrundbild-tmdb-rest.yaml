@@ -1,0 +1,5 @@
+kategorie: bugfix
+text: Mehr Titel mit Hintergrundbild
+untertitel: Etwa Yosuga no Sora und Dante's Inferno
+wartetAuf: "Bestandsbau nach dem nächsten TMDB-Lauf (Plakat/Banner). Probe: node tools/maengel.mjs zeigt bei banner statt 38 höchstens 22 offene Titel (4 Handzeilen aus PR 4629 inklusive). Ändert sich nichts, wird der Eintrag gelöscht."
+seit: '2026-11-23'

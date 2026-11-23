@@ -985,3 +985,11 @@
   url: https://www.amazon.de/dp/B0F4V6JFH9
   grund: 'Seite B0F4V6JFH9 ist die JoJo-Sammelseite (71 Folgen); die Messung „Folgen 1–26, laut Adresse Staffel 1“ gehört der 26-Folgen-Staffel (14719, Zuordnung der Adresse B0F9FWKDXT), nicht Diamond Is Unbreakable mit 39 Folgen (PR 4312)'
   entferntAm: '2026-11-19'
+- anilistId: 1889
+  url: https://www.amazon.de/gp/video/detail/B09JZHRQ18
+  grund: 'Seite B09JZHRQ18 ist Higurashi no Naku Koro ni Staffel 1 (26 Folgen, gleiche gti 64ed5868 wie der Beleg von 934), nicht Kai (1889, 24 Folgen + Bonusfolge, eigene Seite B09KX2VLPR); die Messung vom 11.11.2026 hing am Kanal-Titel (22.11.2026)'
+  entferntAm: '2026-11-22'
+- anilistId: 13469
+  url: https://www.amazon.de/gp/video/detail/B0DC75L8BJ
+  grund: 'Seite B0DC75L8BJ (10 Folgen, gti 5f6a4c2e) trägt die Hyouka-Folgen 13–22 (12189); die OVA (13469) ist die 13. Folge der Seite B0B5JVJKCD (13 Folgen = Serienfolgen 1–12 plus OVA, gleiche-adresse-stand.json) (22.11.2026)'
+  entferntAm: '2026-11-22'

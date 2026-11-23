@@ -213,27 +213,8 @@ function paareEinesTitels(
   })
 }
 
-/**
- * Die Staffelliste des Anbieters auf unsere Einträge legen.
- *
- * **Das schlägt jede Rechnung.** Bis zum 22.08.2026 rechnete `ordneFolgeZu` die
- * Folgennummer über die Staffelgrenzen hinweg um, weil Netflix bei Jujutsu
- * Kaisen durchzählt (bis 59). Bei Sword Art Online tut es das **nicht**: Die
- * gemeldete Liste ist `[{seq:1, folgen:25, erste:1}, {seq:2, folgen:24,
- * erste:1}]` — jede Staffel fängt wieder bei 1 an. Die Zählweise ist je Serie
- * verschieden, und geraten hätte hier eine Meldung an die falsche Staffel
- * geschrieben.
- *
- * Liegt die Liste vor, wird also nicht mehr gerechnet, sondern gelesen.
- *
- * **Die Folgenzahl ist die Kontrolle**, nicht bloß Beiwerk: Stimmt sie bei
- * einem Paar nicht überein, ist die Reihenfolge falsch, und dann wird gar
- * nichts zugeordnet. Ein falsch zugeordneter Befund sieht aus wie ein geprüfter.
- */
-function ordneNachStaffellisteAbEins(
-  anbieter: AnbieterStaffel[],
-  unsere: Staffeleintrag[],
-): {
+/** Ergebnis der Zuordnung einer Anbieter-Staffelliste auf unsere Einträge. */
+interface Zuordnung {
   paare: Array<{
     anbieter: AnbieterStaffel
     unser: Staffeleintrag
@@ -262,51 +243,32 @@ function ordneNachStaffellisteAbEins(
   zusammengefasst?: Staffeleintrag[]
   /** Warum keine Zuordnung zustande kam — leer, wenn alles passt. */
   problem?: string
-} {
+}
+
+/**
+ * Die Staffelliste des Anbieters auf unsere Einträge legen.
+ *
+ * **Das schlägt jede Rechnung.** Bis zum 22.08.2026 rechnete `ordneFolgeZu` die
+ * Folgennummer über die Staffelgrenzen hinweg um, weil Netflix bei Jujutsu
+ * Kaisen durchzählt (bis 59). Bei Sword Art Online tut es das **nicht**: Die
+ * gemeldete Liste ist `[{seq:1, folgen:25, erste:1}, {seq:2, folgen:24,
+ * erste:1}]` — jede Staffel fängt wieder bei 1 an. Die Zählweise ist je Serie
+ * verschieden, und geraten hätte hier eine Meldung an die falsche Staffel
+ * geschrieben.
+ *
+ * Liegt die Liste vor, wird also nicht mehr gerechnet, sondern gelesen.
+ *
+ * **Die Folgenzahl ist die Kontrolle**, nicht bloß Beiwerk: Stimmt sie bei
+ * einem Paar nicht überein, ist die Reihenfolge falsch, und dann wird gar
+ * nichts zugeordnet. Ein falsch zugeordneter Befund sieht aus wie ein geprüfter.
+ */
+function ordneNachStaffellisteAbEins(
+  anbieter: AnbieterStaffel[],
+  unsere: Staffeleintrag[],
+): Zuordnung {
   const sortiert = [...anbieter].sort((a, b) => a.seq - b.seq)
 
-  /**
-   * **Der Anbieter zählt lückenlos — dann ist die Verteilung Arithmetik.**
-   *
-   * Daniel am 10.09.2026 an „Haikyu!! Lev ist hier!": Die OVA liegt bei Netflix
-   * als **Staffel 1, Folge 26** — sie ist dort keine eigene Staffel, sondern
-   * hängt am Ende der Staffel, zu der sie gehört. Dasselbe bei den drei anderen
-   * Haikyu!!-Nebenausgaben, bei „Hi Score Girl: Extra Stage" (S1 E13–15) und bei
-   * „Dorohedoro: Teuflische Anekdoten" (S1 E13).
-   *
-   * Die Paarung darunter läuft Position gegen Position und prüft die
-   * Folgenzahlen nur auf „Abstand höchstens 3". Bei Haikyu!! passte **keine**
-   * Position (25↔26, 25↔26, 10↔11, 13↔27); drei fast-Treffer deckten die
-   * vierte Abweichung, und der überzählige fünfte Eintrag bekam ein
-   * `available: false` — obwohl er in Staffel 4 steckt (27 = 13 + 2 + 12).
-   *
-   * Hier wird stattdessen aufgefüllt: unsere Titel der Reihe nach in die
-   * Staffeln des Anbieters. Geht **jede** Staffel exakt auf und bleibt keiner
-   * übrig, ist die Zuordnung belegt — und zwar besser als jede Paarung, denn
-   * sie erklärt jede einzelne Folge.
-   *
-   * **Nur bei exaktem Aufgehen.** Ein Titel, der über eine Staffelgrenze
-   * hinausragt, bricht die Rechnung ab; dann bleibt es beim bisherigen Weg.
-   */
-  const kumulativ = ((): Array<{ st: AnbieterStaffel; drin: Staffeleintrag[] }> | null => {
-    if (!sortiert.length || unsere.length <= sortiert.length) return null
-    const raus: Array<{ st: AnbieterStaffel; drin: Staffeleintrag[] }> = []
-    let i = 0
-    for (const st of sortiert) {
-      const drin: Staffeleintrag[] = []
-      let summe = 0
-      while (i < unsere.length && summe < st.folgen) {
-        const u = unsere[i]!
-        if (!u.folgen || summe + u.folgen > st.folgen) break
-        drin.push(u)
-        summe += u.folgen
-        i++
-      }
-      if (summe !== st.folgen || !drin.length) return null
-      raus.push({ st, drin })
-    }
-    return i === unsere.length ? raus : null
-  })()
+  const kumulativ = verteileKumulativ(sortiert, unsere)
   if (kumulativ) {
     return {
       paare: kumulativ.map(({ st, drin }) => ({
@@ -336,37 +298,8 @@ function ordneNachStaffellisteAbEins(
    * Dann wird gar nicht gepaart. Die fehlenden Verweise sind das eigentliche
    * Ergebnis — sie stehen im Problemtext und gehören von Hand ergänzt.
    */
-  /**
-   * Ein einziger Eintrag nimmt alles auf, was der Anbieter dort führt.
-   *
-   * Netflix teilt „One Piece" in sieben Arcs — East Blue, Grand Line, Drum,
-   * Alabasta, Egghead 1 und 2, Elbaph (Daniel, 22.08.2026, mit Bild). Unser
-   * Datensatz kennt einen Eintrag. Von einer falschen Reihenfolge kann hier
-   * nichts kommen: Es gibt nur eine, und alles gehört dazu.
-   *
-   * Dasselbe bei „Carole & Tuesday" (zwei Teile bei Netflix, ein Eintrag bei
-   * uns) und „BAKI-DOU". Die Folgenzahlen bleiben dabei in der Zählung des
-   * Anbieters — sie sind es, die im Player stehen.
-   */
-  /**
-   * Führt der Anbieter **eine** Staffel und wir mehrere, entscheidet die Summe.
-   *
-   * Netflix zeigt BAKI-DOU als eine Staffel mit 25 Folgen, AniList als zwei mit
-   * 13 und 12 — zusammen genau 25. Dann ist klar, dass es
-   * dieselbe Sache ist, nur anders geschnitten. Alles gehört zur ersten unserer
-   * Staffeln; wo genau die Grenze liegt, sagt die Folgennummer der Meldung.
-   */
-  if (sortiert.length === 1 && unsere.length > 1) {
-    const summe = unsere.reduce((n, u) => n + u.folgen, 0)
-    if (Math.abs(summe - sortiert[0]!.folgen) <= 3) {
-      return {
-        paare: [{ anbieter: sortiert[0]!, unser: unsere[0]! }],
-        ohneEntsprechung: [],
-        zusammengefasst: unsere,
-      }
-    }
-  }
-
+  const einzige = eineStaffelGegenMehrere(sortiert, unsere)
+  if (einzige) return einzige
 
   if (unsere.length === 1) return { paare: paareEinesTitels(sortiert, unsere[0]!), ohneEntsprechung: [] }
 
@@ -380,6 +313,107 @@ function ordneNachStaffellisteAbEins(
     }
   }
 
+  const { paare, abweichungen } = paareNachReihe(sortiert, unsere)
+
+  /**
+   * Eine einzelne Abweichung kippt die Reihenfolge nicht — mehrere schon.
+   *
+   * Bei „My Hero Academia" meldet Netflix 13, 25, 25, 25, 25, 25, 25; unsere
+   * sieben Staffeln haben 13, 25, 25, 25, 25, 25, **21**. Sechs Zahlen in Folge
+   * treffen exakt — dass die siebte abweicht, liegt an unterschiedlicher
+   * Zählung (Netflix rechnet dort Folgen mit, die AniList nicht führt), nicht
+   * an einer falschen Reihenfolge.
+   *
+   * Weichen dagegen **zwei oder mehr** ab, ist die Reihe verschoben, und dann
+   * wird gar nichts zugeordnet: Ein falsch zugeordneter Befund sieht aus wie
+   * ein geprüfter.
+   *
+   * **Und die Nachsicht braucht Rückhalt.** Bei einer einzigen Staffel, deren
+   * Zahl nicht stimmt, bestätigt nichts die Reihenfolge — dann ist die
+   * Abweichung nicht die Ausnahme, sondern der ganze Befund. Erst ab zwei
+   * exakten Treffern trägt die Reihe eine Ausnahme.
+   */
+  const exakt = paare.length - abweichungen.length
+  if (abweichungen.length > 1 || (abweichungen.length === 1 && exakt < 2)) {
+    return zusammenfassungNachSumme(sortiert, unsere, exakt) ?? { paare: [], ohneEntsprechung: [], problem: abweichungen.join('; ') }
+  }
+  return {
+    paare,
+    ohneEntsprechung: unsere.slice(sortiert.length),
+    problem: abweichungen[0],
+  }
+}
+
+/**
+ * **Der Anbieter zählt lückenlos — dann ist die Verteilung Arithmetik.**
+ *
+ * Daniel am 10.09.2026 an „Haikyu!! Lev ist hier!": Die OVA liegt bei Netflix
+ * als **Staffel 1, Folge 26** — sie ist dort keine eigene Staffel, sondern
+ * hängt am Ende der Staffel, zu der sie gehört. Dasselbe bei den drei anderen
+ * Haikyu!!-Nebenausgaben, bei „Hi Score Girl: Extra Stage" (S1 E13–15) und bei
+ * „Dorohedoro: Teuflische Anekdoten" (S1 E13).
+ *
+ * Die Paarung danach läuft Position gegen Position und prüft die
+ * Folgenzahlen nur auf „Abstand höchstens 3". Bei Haikyu!! passte **keine**
+ * Position (25↔26, 25↔26, 10↔11, 13↔27); drei fast-Treffer deckten die
+ * vierte Abweichung, und der überzählige fünfte Eintrag bekam ein
+ * `available: false` — obwohl er in Staffel 4 steckt (27 = 13 + 2 + 12).
+ *
+ * Hier wird stattdessen aufgefüllt: unsere Titel der Reihe nach in die
+ * Staffeln des Anbieters. Geht **jede** Staffel exakt auf und bleibt keiner
+ * übrig, ist die Zuordnung belegt — und zwar besser als jede Paarung, denn
+ * sie erklärt jede einzelne Folge.
+ *
+ * **Nur bei exaktem Aufgehen.** Ein Titel, der über eine Staffelgrenze
+ * hinausragt, bricht die Rechnung ab; dann bleibt es beim bisherigen Weg.
+ */
+function verteileKumulativ(
+  sortiert: AnbieterStaffel[],
+  unsere: Staffeleintrag[],
+): Array<{ st: AnbieterStaffel; drin: Staffeleintrag[] }> | null {
+  if (!sortiert.length || unsere.length <= sortiert.length) return null
+  const raus: Array<{ st: AnbieterStaffel; drin: Staffeleintrag[] }> = []
+  let i = 0
+  for (const st of sortiert) {
+    const drin: Staffeleintrag[] = []
+    let summe = 0
+    while (i < unsere.length && summe < st.folgen) {
+      const u = unsere[i]!
+      if (!u.folgen || summe + u.folgen > st.folgen) break
+      drin.push(u)
+      summe += u.folgen
+      i++
+    }
+    if (summe !== st.folgen || !drin.length) return null
+    raus.push({ st, drin })
+  }
+  return i === unsere.length ? raus : null
+}
+
+/**
+ * Führt der Anbieter **eine** Staffel und wir mehrere, entscheidet die Summe.
+ *
+ * Netflix zeigt BAKI-DOU als eine Staffel mit 25 Folgen, AniList als zwei mit
+ * 13 und 12 — zusammen genau 25. Dann ist klar, dass es
+ * dieselbe Sache ist, nur anders geschnitten. Alles gehört zur ersten unserer
+ * Staffeln; wo genau die Grenze liegt, sagt die Folgennummer der Meldung.
+ */
+function eineStaffelGegenMehrere(sortiert: AnbieterStaffel[], unsere: Staffeleintrag[]): Zuordnung | null {
+  if (sortiert.length !== 1 || unsere.length <= 1) return null
+  const summe = unsere.reduce((n, u) => n + u.folgen, 0)
+  if (Math.abs(summe - sortiert[0]!.folgen) > 3) return null
+  return {
+    paare: [{ anbieter: sortiert[0]!, unser: unsere[0]! }],
+    ohneEntsprechung: [],
+    zusammengefasst: unsere,
+  }
+}
+
+/** Position gegen Position paaren und die Folgenzahlen abgleichen; Abweichungen als Texte. */
+function paareNachReihe(
+  sortiert: AnbieterStaffel[],
+  unsere: Staffeleintrag[],
+): { paare: Array<{ anbieter: AnbieterStaffel; unser: Staffeleintrag }>; abweichungen: string[] } {
   const paare: Array<{ anbieter: AnbieterStaffel; unser: Staffeleintrag }> = []
   const abweichungen: string[] = []
   for (let i = 0; i < sortiert.length; i++) {
@@ -404,78 +438,53 @@ function ordneNachStaffellisteAbEins(
     }
     paare.push({ anbieter: a, unser: u })
   }
+  return { paare, abweichungen }
+}
 
-  /**
-   * Eine einzelne Abweichung kippt die Reihenfolge nicht — mehrere schon.
-   *
-   * Bei „My Hero Academia" meldet Netflix 13, 25, 25, 25, 25, 25, 25; unsere
-   * sieben Staffeln haben 13, 25, 25, 25, 25, 25, **21**. Sechs Zahlen in Folge
-   * treffen exakt — dass die siebte abweicht, liegt an unterschiedlicher
-   * Zählung (Netflix rechnet dort Folgen mit, die AniList nicht führt), nicht
-   * an einer falschen Reihenfolge.
-   *
-   * Weichen dagegen **zwei oder mehr** ab, ist die Reihe verschoben, und dann
-   * wird gar nichts zugeordnet: Ein falsch zugeordneter Befund sieht aus wie
-   * ein geprüfter.
-   *
-   * **Und die Nachsicht braucht Rückhalt.** Bei einer einzigen Staffel, deren
-   * Zahl nicht stimmt, bestätigt nichts die Reihenfolge — dann ist die
-   * Abweichung nicht die Ausnahme, sondern der ganze Befund. Erst ab zwei
-   * exakten Treffern trägt die Reihe eine Ausnahme.
-   */
-  const exakt = paare.length - abweichungen.length
-  if (abweichungen.length > 1 || (abweichungen.length === 1 && exakt < 2)) {
-    /**
-     * **Bevor aufgegeben wird: Passt eine seiner Staffeln auf unsere Summe?**
-     *
-     * Disney+ zeigt „Tokyo Revengers" unter einer Adresse mit zwei Staffeln, 24
-     * und 26 Folgen. Unser Bestand führt dort nur die zweite, aufgeteilt in
-     * „Christmas Showdown" und „Tenjiku Arc" mit je 13 — zusammen genau 26. Die
-     * erste hängt bei uns an einer anderen Adresse.
-     *
-     * Der Reihe nach gepaart trifft unsere 13 auf seine 24, beide Zahlen weichen
-     * ab, und 50 Meldungen blieben liegen (26.08.2026). Über die Summe ist der
-     * Fall dagegen eindeutig.
-     *
-     * **Nur bei genau einem Kandidaten**, und nur wenn unsere Staffeln zusammen
-     * wirklich eine seiner ergeben. Führt er zwei mit derselben Zahl, ist nicht
-     * zu entscheiden, welche gemeint ist — dann bleibt es beim Aufgeben.
-     */
-    const summe = unsere.reduce((n, u) => n + u.folgen, 0)
-    /*
-      Erst exakt, dann mit Spielraum. Bei Tokyo Revengers ergeben unsere
-      13 + 13 genau 26 — und der Nachbarblock hat 24, liegt also ebenfalls in
-      der Drei-Folgen-Toleranz. Wer gleich mit Spielraum sucht, findet zwei
-      Kandidaten und gibt auf, obwohl einer exakt trifft.
-    */
-    const genau = sortiert.filter((a) => a.folgen === summe)
-    const passende = genau.length ? genau : sortiert.filter((a) => Math.abs(summe - a.folgen) <= 3)
-    /*
-      **Nur wenn keine einzelne Staffel passt.**
+/**
+ * **Bevor aufgegeben wird: Passt eine seiner Staffeln auf unsere Summe?**
+ *
+ * Disney+ zeigt „Tokyo Revengers" unter einer Adresse mit zwei Staffeln, 24
+ * und 26 Folgen. Unser Bestand führt dort nur die zweite, aufgeteilt in
+ * „Christmas Showdown" und „Tenjiku Arc" mit je 13 — zusammen genau 26. Die
+ * erste hängt bei uns an einer anderen Adresse.
+ *
+ * Der Reihe nach gepaart trifft unsere 13 auf seine 24, beide Zahlen weichen
+ * ab, und 50 Meldungen blieben liegen (26.08.2026). Über die Summe ist der
+ * Fall dagegen eindeutig.
+ *
+ * **Nur bei genau einem Kandidaten**, und nur wenn unsere Staffeln zusammen
+ * wirklich eine seiner ergeben. Führt er zwei mit derselben Zahl, ist nicht
+ * zu entscheiden, welche gemeint ist — dann bleibt es beim Aufgeben (`null`).
+ */
+function zusammenfassungNachSumme(sortiert: AnbieterStaffel[], unsere: Staffeleintrag[], exakt: number): Zuordnung | null {
+  const summe = unsere.reduce((n, u) => n + u.folgen, 0)
+  /*
+    Erst exakt, dann mit Spielraum. Bei Tokyo Revengers ergeben unsere
+    13 + 13 genau 26 — und der Nachbarblock hat 24, liegt also ebenfalls in
+    der Drei-Folgen-Toleranz. Wer gleich mit Spielraum sucht, findet zwei
+    Kandidaten und gibt auf, obwohl einer exakt trifft.
+  */
+  const genau = sortiert.filter((a) => a.folgen === summe)
+  const passende = genau.length ? genau : sortiert.filter((a) => Math.abs(summe - a.folgen) <= 3)
+  /*
+    **Nur wenn keine einzelne Staffel passt.**
 
-      Trifft schon eine der Reihe nach exakt, ist die Reihenfolge im Kern
-      richtig, und die eine Abweichung ist der Befund — nicht ein Hinweis auf
-      eine andere Aufteilung. Der Fall steht als Zusicherung in check-logic:
-      Anbieter [13, 25] gegen unsere [13, 12] ordnet nichts zu, obwohl 13+12
-      seine 25 ergeben. Die 13 passt bereits.
+    Trifft schon eine der Reihe nach exakt, ist die Reihenfolge im Kern
+    richtig, und die eine Abweichung ist der Befund — nicht ein Hinweis auf
+    eine andere Aufteilung. Der Fall steht als Zusicherung in check-logic:
+    Anbieter [13, 25] gegen unsere [13, 12] ordnet nichts zu, obwohl 13+12
+    seine 25 ergeben. Die 13 passt bereits.
 
-      Bei Tokyo Revengers passt dagegen keine einzelne: 13 gegen 24, 13 gegen
-      26. Erst dann ist die Summe die bessere Erklärung.
-    */
-    if (passende.length === 1 && unsere.length > 1 && exakt === 0) {
-      return {
-        paare: [{ anbieter: passende[0]!, unser: unsere[0]! }],
-        ohneEntsprechung: [],
-        zusammengefasst: unsere,
-        problem: `Zusammengefasst: ${unsere.length} Einträge (${summe} Folgen) entsprechen Staffel ${passende[0]!.seq} des Anbieters (${passende[0]!.folgen})`,
-      }
-    }
-    return { paare: [], ohneEntsprechung: [], problem: abweichungen.join('; ') }
-  }
+    Bei Tokyo Revengers passt dagegen keine einzelne: 13 gegen 24, 13 gegen
+    26. Erst dann ist die Summe die bessere Erklärung.
+  */
+  if (passende.length !== 1 || unsere.length <= 1 || exakt !== 0) return null
   return {
-    paare,
-    ohneEntsprechung: unsere.slice(sortiert.length),
-    problem: abweichungen[0],
+    paare: [{ anbieter: passende[0]!, unser: unsere[0]! }],
+    ohneEntsprechung: [],
+    zusammengefasst: unsere,
+    problem: `Zusammengefasst: ${unsere.length} Einträge (${summe} Folgen) entsprechen Staffel ${passende[0]!.seq} des Anbieters (${passende[0]!.folgen})`,
   }
 }
 

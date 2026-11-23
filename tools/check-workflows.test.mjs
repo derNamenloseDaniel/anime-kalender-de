@@ -86,6 +86,11 @@ try {
   rot('Prüf-Job mit continue-on-error', job(`${ZWECK}    continue-on-error: true\n`, CHECKOUT + MELDEN + pruefSchritt('')), /zz-probe\.yml: Job "a" enthält Prüfschritte und trägt `continue-on-error`/)
   gut('Job ohne Prüfschritt darf continue-on-error tragen', job(`${ZWECK}    continue-on-error: true\n`, CHECKOUT + MELDEN))
 
+  // continue-on-error ohne Meldung (Nr. 44): stiller Schritt rot, mit DATEN_WARNUNG grün.
+  const still = (zeile) => `${CHECKOUT}      - name: Still\n        continue-on-error: true\n        run: ${zeile}\n`
+  rot('Schritt mit continue-on-error ohne Meldung', job(ZWECK, CHECKOUT + MELDEN + still('echo x')), /zz-probe\.yml: Schritt „Still" .* ohne Meldung/)
+  gut('Schritt mit continue-on-error und DATEN_WARNUNG', job(ZWECK, CHECKOUT + MELDEN + still('echo "DATEN_WARNUNG=x" >> "$GITHUB_ENV"')))
+
   // Ausnahmen der Token-Regel: data:historie meldet keinen Fortschritt.
   const historie = npm.replace('data:probe', 'data:historie').replace('        env:\n          LAUF_TOKEN: t\n', '')
   gut('data:historie braucht kein LAUF_TOKEN', job(ZWECK, CHECKOUT + MELDEN + historie))

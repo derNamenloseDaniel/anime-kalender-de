@@ -4,8 +4,9 @@
  */
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 const wurzel = join(import.meta.dirname, '..')
@@ -23,7 +24,7 @@ for (const c of [
   'gh.exe pr create --fill',
   '"/c/Program Files/GitHub CLI/gh.exe" pr create --title x',
   'gh -R derNamenloseDaniel/anime-kalender-de pr create --title x',
-  'gh --repo a/b pr create',
+  'gh --repo derNamenloseDaniel/anime-kalender-de pr create',
   'git push -u origin x && gh pr create --title x',
   'node tools/pr-vorpruefung.mjs --titel x; gh pr create --title x',
   "bash -c 'gh pr create --title x'",
@@ -61,6 +62,33 @@ assert.equal(pruefe({ tool_name: 'Bash' }), null, 'ohne tool_input frei')
 // Das Skript selbst darf `gh pr create` weiter rufen: der Hook prüft nur den äußeren Befehl.
 assert.match(readFileSync(join(wurzel, 'tools', 'pr-einreichen.sh'), 'utf8'), /gh pr create/, 'pr-einreichen.sh ruft gh pr create')
 frei('bash tools/pr-einreichen.sh "Titel" "Text"')
+
+// Ziel-Repo: gesperrt nur, wo tools/pr-einreichen.sh existiert (Anlass: chrome-utilities hat es nicht, 23.11.2026).
+const ordner = mkdtempSync(join(tmpdir(), 'pr-sperre-'))
+const mit = join(ordner, 'mit-skript')
+const ohne = join(ordner, 'ohne-skript')
+mkdirSync(join(mit, 'tools'), { recursive: true })
+mkdirSync(join(mit, 'web'), { recursive: true })
+mkdirSync(ohne, { recursive: true })
+writeFileSync(join(mit, 'tools', 'pr-einreichen.sh'), '#!/bin/sh\n')
+const imOrdner = (command, cwd) => pruefe({ tool_name: 'Bash', tool_input: { command }, cwd })
+const sl = (p) => p.replace(/\\/g, '/')
+assert.match(imOrdner('gh pr create --title x', mit), /pr-einreichen\.sh/, 'cwd mit Skript: gesperrt')
+assert.match(imOrdner('gh pr create --title x', join(mit, 'web')), /pr-einreichen\.sh/, 'Unterordner eines Repos mit Skript: gesperrt')
+assert.equal(imOrdner('gh pr create --title x', ohne), null, 'cwd ohne Skript: frei')
+assert.equal(imOrdner('gh pr create --title x && gh pr create', ohne), null, 'zweimal ohne Skript: frei')
+assert.equal(imOrdner(`cd ${sl(ohne)} && gh pr create --title x`, mit), null, 'cd in Ordner ohne Skript: frei')
+assert.match(imOrdner(`cd ${sl(mit)} && gh pr create --title x`, ohne), /pr-einreichen\.sh/, 'cd in Ordner mit Skript: gesperrt')
+assert.equal(imOrdner(`(cd "${sl(ohne)}" && gh pr create --title x)`, mit), null, 'Subshell-cd ohne Skript: frei')
+assert.match(imOrdner(`(cd ${sl(ohne)} && true); gh pr create --title x`, mit), /pr-einreichen\.sh/, 'cd in der Subshell wirkt nicht nach außen')
+assert.equal(imOrdner(`bash -c 'cd ${sl(ohne)} && gh pr create --title x'`, mit), null, 'bash -c mit cd: frei')
+assert.match(imOrdner('cd "$X" && gh pr create --title x', mit), /pr-einreichen\.sh/, 'nicht bestimmbares cd: cwd gilt')
+assert.match(imOrdner('gh --repo derNamenloseDaniel/anime-kalender-de pr create', ohne), /pr-einreichen\.sh/, '--repo eigenes Repo: gesperrt, auch aus fremdem cwd')
+assert.match(imOrdner('gh -R DerNamenloseDaniel/Anime-Kalender-DE pr create', ohne), /pr-einreichen\.sh/, 'Schreibweise egal')
+assert.equal(imOrdner('gh -R derNamenloseDaniel/chrome-utilities pr create --title x', mit), null, '--repo anderes Repo: frei, auch aus cwd mit Skript')
+assert.equal(imOrdner('gh --repo=derNamenloseDaniel/chrome-utilities pr create', mit), null, '--repo= anderes Repo: frei')
+assert.equal(imOrdner('gh pr create --title x', 'C:/gibt/es/nicht'), null, 'nicht existierender cwd: frei')
+assert.match(imOrdner('gh pr create --title x', undefined), /pr-einreichen\.sh/, 'ohne cwd gilt das Repo des Hooks')
 
 // Prozess: Verweigerung als JSON auf stdout, Exit 0; freier Befehl und kaputte Eingabe ohne Ausgabe bzw. mit Fehlerzeile.
 const prozess = (roh) => spawnSync(process.execPath, [hook], { input: roh, encoding: 'utf8', timeout: 20000 })

@@ -299,3 +299,139 @@
   grund: >-
     TMDB-Folgen-Cache: Serie 34109 führt Staffel 4 mit 46 Folgen (2011-02-13 bis 2012-01-26), AniList nennt 46 Folgen, Ende 2012-01-26; dieselbe Serie trägt die erste Staffel dieser Reihe (2156).
     JustWatch führt Staffel 4 (46 Folgen) beim Geschwistertitel mit Amazon Prime Video, Ton de.
+
+- anilistId: 528
+  tmdbId: 10228
+  kind: movie
+  titel: "Pokémon: The First Movie"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (movie, Pokémon: The First Movie (en-US)): "Pokémon: The First Movie" (1998), Name und Jahr (AniList 1998) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 896
+  tmdbId: 39101
+  kind: movie
+  titel: "Dragon Ball Z: The Tree of Might"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (movie, Dragon Ball Z: The Tree of Might (en-US)): "Dragon Ball Z: The Tree of Might" (1990), Name und Jahr (AniList 1990) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 1252
+  tmdbId: 121139
+  kind: movie
+  titel: "Nadia: The Secret of Blue Water - The Motion Picture"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (movie, Nadia: The Secret of Blue Water - The Motion Picture (en-US)): "Nadia: The Secret of Blue Water - The Motion Picture" (1991), Name und Jahr (AniList 1991) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 1327
+  tmdbId: 34173
+  kind: tv
+  titel: "Aoki Densetsu Shoot!"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, Aoki Densetsu Shoot! (en-US)): "Aoki Densetsu Shoot!" (1993), Name und Jahr (AniList 1993) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 1445
+  tmdbId: 30986
+  kind: tv
+  titel: "Speed Racer"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, Speed Racer (en-US)): "Speed Racer" (1967), Name und Jahr (AniList 1967) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 5155
+  tmdbId: 34116
+  kind: tv
+  titel: "Millennium Old Journal: Tale of Genji"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, Millennium Old Journal: Tale of Genji (en-US)): "The Tale of Genji" (2009), Name und Jahr (AniList 2009) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 7279
+  tmdbId: 43589
+  kind: tv
+  titel: "TO"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, トゥー (en-US)): "TO" (2009), Name und Jahr (AniList 2009) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 11285
+  tmdbId: 43079
+  kind: tv
+  titel: "Black Rock Shooter"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, Black Rock Shooter (en-US)): "Black Rock Shooter" (2012), Name und Jahr (AniList 2012) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 14467
+  tmdbId: 45799
+  kind: tv
+  titel: "K"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, K (en-US)): "K" (2012), Name und Jahr (AniList 2012) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 100658
+  tmdbId: 459290
+  kind: movie
+  titel: "Sinbad: Night at High Noon and the Wonder Gate"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (movie, Sinbad: Night at High Noon and the Wonder Gate (en-US)): "Sinbad - Night at High Noon and the Wonder Gate" (2016), Name und Jahr (AniList 2016) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 21894
+  tmdbId: 71007
+  kind: tv
+  titel: "ID-0"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, ID-0 (en-US)): "ID-0" (2017), Name und Jahr (AniList 2017) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 101343
+  tmdbId: 526426
+  kind: movie
+  titel: "Made in Abyss: Journey's Dawn"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (movie, Made in Abyss: Journey's Dawn (en-US)): "Made in Abyss: Journey's Dawn" (2019), Name und Jahr (AniList 2019) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 108463
+  tmdbId: 95269
+  kind: tv
+  titel: "Toilet-bound Hanako-kun"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, Toilet-bound Hanako-kun (en-US)): "Toilet-Bound Hanako-kun" (2020), Name und Jahr (AniList 2020) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 122575
+  tmdbId: 728754
+  kind: movie
+  titel: "STAND BY ME Doraemon 2"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (movie, STAND BY ME Doraemon 2 (en-US)): "Stand by Me Doraemon 2" (2020), Name und Jahr (AniList 2020) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 178707
+  tmdbId: 1310387
+  kind: movie
+  titel: "The Irregular at Magic High School THE MOVIE -Yotsuba Succession Arc-"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (movie, The Irregular at Magic High School THE MOVIE -Yotsuba Succession Arc- (en-US)): "The Irregular at Magic High School THE MOVIE - Yotsuba Succession Arc -" (2026), Name und Jahr (AniList 2026) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 6771
+  tmdbId: 44209
+  kind: tv
+  titel: "Mock & Sweet"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, Mock & Sweet (en-US)): "Mock & Sweet" (1986), Name und Jahr (AniList 1986) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 10014867
+  tmdbId: 330431
+  kind: tv
+  titel: "Re:Zero - Starting Life in Another World: Director’s Cut"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, Re：ゼロから始める異世界生活新編集版 (en-US)): "Re:ゼロから始める異世界生活 新編集版" (2020), Name und Jahr (AniList 2020) passen, Genre Animation, einziger Treffer.

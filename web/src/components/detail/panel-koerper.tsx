@@ -43,11 +43,8 @@ export function PanelKoerper(p: PanelKoerperProps) {
   const keywords = s.allKeywords ? title.keywords : title.keywords.slice(0, KEYWORD_PREVIEW)
   return (
     <div className="relative flex flex-col gap-3 px-4 pb-8">
-      {/* Die Antwortzeile: erster Block nach der Bühne, immer dieselben vier Zeilen (Gründe: design-regeln.md, „Detail-Panel“). */}
-      {title && a.kinoRelease && (
-        <KinoBanner release={a.kinoRelease} title={title} today={today} t={t as never} />
-      )}
-      {/* Der Banner trägt die Auskunft, dann schweigt der Kasten (17.09.2026). */}
+      {/* Antwortzeile: erster Block nach der Bühne; der Kino-Banner trägt die Auskunft, dann schweigt der Kasten (design-regeln.md, „Detail-Panel“). */}
+      {title && a.kinoRelease && <KinoBanner release={a.kinoRelease} title={title} today={today} t={t as never} />}
       <AntwortBereichOderNichts
         antwort={a.antwort}
         sortiertNachZugang={a.sortiertNachZugang}
@@ -95,7 +92,6 @@ export function PanelKoerper(p: PanelKoerperProps) {
       />
       {/* Reihenfolge der Abschnitte und ihre Gründe (Bedingungsblöcke sichtbar schließen, Termine nur bei Bevorstehendem): design-regeln.md, „Detail-Panel“. */}
       <TermineAbschnitt releases={releases} title={title} />
-
       <EckdatenAbschnitt
         title={title}
         t={t}
@@ -104,9 +100,7 @@ export function PanelKoerper(p: PanelKoerperProps) {
         tGenre={tGenre}
         setGenresOffen={s.setGenresOffen}
       />
-
       {title.hasVoices && <VoiceCast titleId={title.id} />}
-
       <SchlagworteAbschnitt
         title={title}
         t={t}
@@ -116,7 +110,6 @@ export function PanelKoerper(p: PanelKoerperProps) {
         setAllKeywords={s.setAllKeywords}
         allKeywords={s.allKeywords}
       />
-
       <AehnlicheTitel title={title} data={p.data} onOpenTitle={p.onOpenTitle} />
       <Quellenuebersicht title={title} releases={releases} asZiel={p.asZiel} />
     </div>

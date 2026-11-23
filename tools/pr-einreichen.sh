@@ -6,7 +6,7 @@
 # Request. Seit 19.10.2026 mergt nichts von selbst: erst `node tools/pr-nachrechnen.mjs <PR>` (Exit 0), dann `gh pr merge <PR> --squash`. Kein `--admin`.
 #
 # Aufruf: bash tools/pr-einreichen.sh "<Titel>" ["<Text für die Squash-Nachricht>"]
-# Der Text gehört beim Merge als --body in die Squash-Nachricht (das Skript druckt den Befehl); `deploy.yml` liest dort `[schlank]`.
+# `PR_BASIS=zug` setzt eine andere Basis als main (Sammelzug). Der Text gehört beim Merge als --body in die Squash-Nachricht (das Skript druckt den Befehl); `deploy.yml` liest dort `[schlank]`.
 set -euo pipefail
 
 TITEL="${1:?Titel fehlt}"
@@ -29,7 +29,7 @@ node tools/pr-vorpruefung.mjs --titel "$TITEL" || { echo "✖ Einreichen abgebro
 
 git push -q -u origin "$ZWEIG"
 if ! gh pr view "$ZWEIG" --json number -q .number > /dev/null 2>&1; then
-  gh pr create --base main --head "$ZWEIG" --title "$TITEL" --body "${TEXT:-$TITEL}"
+  gh pr create --base "${PR_BASIS:-main}" --head "$ZWEIG" --title "$TITEL" --body "${TEXT:-$TITEL}"
 fi
 PR_URL="$(gh pr view "$ZWEIG" --json url -q .url)"
 PR_NR="$(gh pr view "$ZWEIG" --json number -q .number)"

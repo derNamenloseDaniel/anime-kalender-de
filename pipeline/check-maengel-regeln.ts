@@ -113,6 +113,24 @@ pruefe('fsk: 0 ist eine Einstufung, kein Mangel', arten(gut(1, { fsk: 0 as never
 pruefe('wertung: Treffer', arten(gut(1, { score: undefined })).join() === 'wertung')
 pruefe('wertung: Titel ohne AniList-Kennung (eigener, nur-aniSearch) hat keine Quelle mit genug Stimmen — belegte Ausnahme, kein offener Mangel', arten(gut(5_000_001, { score: undefined })).join() === 'wertung:keine-quelle-mit-stimmen' && arten(gut(10_000_042, { score: undefined })).join() === 'wertung:keine-quelle-mit-stimmen')
 pruefe('wertung: AniList-Titel ohne Wertung bleibt offen (Quelle vorhanden)', arten(gut(4_999_999, { score: undefined })).join() === 'wertung')
+/* wertung: Ankündigung (AniList NOT_YET_RELEASED, Titel 213457 und 185515) ist Ausnahme, bis ein Nicht-Disc-Termin begonnen hat */
+const wertungArt = (t: Title, k: Kontext) => arten(t, k).filter((a) => a.startsWith('wertung')).join()
+const startAm = (tag: string, ueber: Partial<Release> = {}) => rel({ releaseType: 'batch', schedule: { firstEpisodeDate: tag }, ...ueber })
+pruefe('wertung: Start in der Zukunft (Fool Night) und nur Disc-Termin ohne Jahr (Ririsa 2nd Season): Ausnahme noch-ohne-start', [
+  wertungArt(gut(1, { score: undefined, jpYear: 2026, jpEnd: '2026-11-26' }), mitReleases(startAm('2026-11-26'))),
+  wertungArt(gut(1, { score: undefined, jpYear: undefined, jpEnd: undefined }), mitReleases(startAm('2026-11-20', { platform: 'disc', releaseType: 'disc' }))),
+  wertungArt(gut(1, { score: undefined, jpYear: undefined, jpEnd: undefined }), kontext()),
+  wertungArt(gut(1, { score: undefined, jpYear: undefined, jpEnd: undefined }), mitReleases(startAm('2026-01-01', { platform: 'disc', releaseType: 'disc' }))), // Disc-Termin gilt nicht als Start
+].every((a) => a === 'wertung:noch-ohne-start'))
+pruefe('wertung: Termin begonnen (heute oder früher), Ende vorbei oder Jahr alt: offen', [
+  wertungArt(gut(1, { score: undefined, jpYear: 2026, jpEnd: undefined }), mitReleases(startAm(HEUTE))),
+  wertungArt(gut(1, { score: undefined, jpYear: 2026, jpEnd: undefined }), mitReleases(startAm('2026-11-26'), startAm('2026-10-01', { platform: 'tv', releaseType: 'weekly' }))),
+  wertungArt(gut(1, { score: undefined, jpYear: 2026, jpEnd: '2026-11-15' }), mitReleases(startAm('2026-11-26'))),
+  wertungArt(gut(1, { score: undefined, jpYear: 1999, jpEnd: undefined }), kontext()),
+  wertungArt(gut(1, { score: undefined, jpYear: 2025, jpEnd: undefined }), mitReleases(startAm('2026-11-26'))),
+].every((a) => a === 'wertung'))
+pruefe('wertung: Grenze — Ende heute ist noch Ausnahme, Start heute schon begonnen', wertungArt(gut(1, { score: undefined, jpYear: 2026, jpEnd: HEUTE }), mitReleases(startAm('2026-11-26'))) === 'wertung:noch-ohne-start' && wertungArt(gut(1, { score: undefined, jpYear: 2026, jpEnd: undefined }), mitReleases(startAm(HEUTE))) === 'wertung')
+pruefe('wertung: Termin eines anderen Titels ändert nichts', wertungArt(gut(1, { score: undefined, jpYear: 2026, jpEnd: undefined }), kontext({ releases: new Map([[2, [startAm('2026-01-01')]]]) })) === 'wertung:noch-ohne-start')
 pruefe('studio: Treffer', arten(gut(1, { studios: [] })).join() === 'studio')
 /* aniSearch-Zeile (Kennung ab 10 Mio.) wird aus einem Eintrag gebaut: leeres Studio heißt `st` des Eintrags leer. */
 pruefe('studio: aniSearch-Zeile mit leerem st ist Ausnahme quelle-ohne-studio', [10_000_042, 10_000_043].every((id) => arten(gut(id, { studios: [] })).join() === 'studio:quelle-ohne-studio'))

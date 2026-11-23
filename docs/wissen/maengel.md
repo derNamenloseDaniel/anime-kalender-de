@@ -536,6 +536,10 @@ Messung am selben Tag an den 108 Titeln ohne `score` (AniList-GraphQL, 25 je Anf
 
 Ursache des Stillstands: `fetch.ts` holte abgeschlossene Zwischenspeicher-Einträge nie neu, auch nicht ohne `stats`/`meanScore` (vor 22.11.2026); der Rückfall aus #4574 hatte nichts zu lesen. Fix: `eintragNochOffen` (`lib/anilist.ts`) holt Einträge ohne `stats` einmal neu (wie bei `countryOfOrigin`, 09.10.2026). Die 58 Titel ohne Quelle sind in der Regel `wertung` die Ausnahme `keine-quelle-mit-stimmen` (Kennung ≥ `EIGENE_ID_BASIS`). Erwartung nach dem nächsten Bestandsbau: wertung offen 108 → 2 (+ 58 Ausnahme). Beobachten: nächster Bestandsbau, dann nach einem Tag.
 
+## wertung: die letzten 2 offenen sind Ankündigungen (23.11.2026)
+
+Live gemessen (GraphQL, 23.11.2026): Fool Night (213457) und 2.5-jigen no Ririsa 2nd Season (185515) sind `NOT_YET_RELEASED`, `averageScore` und `meanScore` sind `null` (Fool Night hat 182 Stimmen in `scoreDistribution`, AniList veröffentlicht trotzdem keinen Wert). Kein Codefehler: `anilistWertungAus` braucht eine Zahl und rechnet nichts aus. Neue Ausnahme `noch-ohne-start` (`wertungNochOhneStart`, `pipeline/lib/maengel-regeln.ts`): kein Nicht-Disc-Termin begonnen, Jahr dieses Jahres oder leer, Ende nicht vorbei; sie endet mit dem Start von selbst, dann greift der Rückfall. Erwartung nach dem nächsten Bestandsbau: wertung offen 2 → 0 (+ 2 Ausnahme).
+
 ## Genre: Rest 41 erklärt (23.11.2026, Auftrag „Vorrat genre AniList“)
 
 Gemessen an `public/data/titles.json` (41 ohne Genre): **30** aniSearch-Zeilen (Kennung ≥ 10 Mio., kein AniList-Eintrag; `g` leer 22, „Unbestimmt“ 4, „Ganbatte“ 4, TMDB-Rückfall ohne Treffer), **9** AniList-Titel (Filme, Musikvideos, Specials; AniList-GraphQL am 23.11. für alle 9 mit `genres: []`), **2** Eigentitel (5 Mio.; Handweg offen). Kein Titel verliert Genres an einer Bau-Stelle. Behoben: Ausnahme `quelle-ohne-genre` für Kennung ≥ `ANISEARCH_ID_BASIS` (wie `quelle-ohne-studio`): offen 41 → 11 (9 AniList + 2 Eigentitel), 30 Ausnahme. Die 9 bleiben offen, bis AniList Genres führt (Lauf holt neu); die 2 Eigentitel sind von Hand füllbar.

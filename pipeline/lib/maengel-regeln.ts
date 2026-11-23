@@ -1,4 +1,4 @@
-import { EIGENE_ID_BASIS } from '../../shared/eigene-titel.ts'
+import { wertungNochOhneStart } from './maengel-wertung.ts'
 import { PLATFORMS, type PlatformId, type Release, type Title } from '../../shared/types.ts'
 import { verlagIstAnbieter } from '../../shared/verlag-anbieter.ts'
 import { istSichererTermin } from '../bau/11-7-wege-aus-terminen.ts'
@@ -170,7 +170,7 @@ export const REGELN: Regel[] = [
   { art: 'folgentitel', gruppe: 'fehlend', wirkung: 2, wer: 'auto:tmdb', zaehle: folgentitelFehlen, ausnahme: (t) => (t.format === 'MOVIE' ? 'film' : undefined) },
   { art: 'folgenzahl', gruppe: 'fehlend', wirkung: 3, wer: 'auto:anilist', zaehle: (t) => SERIE.has(t.format ?? '') && !t.episodes, ausnahme: (t, k) => (laeuftNoch(t, k) ? 'laeuft' : undefined) },
   { art: 'fsk', gruppe: 'fehlend', wirkung: 2, wer: 'auto:justwatch', zaehle: (t) => t.fsk == null },
-  { art: 'wertung', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anilist', zaehle: (t) => !t.score, ausnahme: (t) => (t.id >= EIGENE_ID_BASIS ? 'keine-quelle-mit-stimmen' : undefined) },
+  { art: 'wertung', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anilist', zaehle: (t) => !t.score, ausnahme: wertungNochOhneStart },
   { art: 'studio', gruppe: 'fehlend', wirkung: 1, wer: 'hand:studio-von-hand', zaehle: (t) => !t.studios?.length, ausnahme: (t) => (t.id >= ANISEARCH_ID_BASIS ? 'quelle-ohne-studio' : undefined) },
   { art: 'genre', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anilist', zaehle: (t) => !t.genres?.length, ausnahme: (t) => (t.id >= ANISEARCH_ID_BASIS ? 'quelle-ohne-genre' : undefined) },
   { art: 'laufzeit', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anisearch', zaehle: (t) => !t.runtimeMin },

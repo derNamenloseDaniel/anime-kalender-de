@@ -24,6 +24,8 @@ import { resolve } from 'node:path'
 import { parse } from 'yaml'
 import { OHNE_BEFUND } from './oder-true-ausnahmen.mjs'
 import { pruefe as pruefeOderTrue, sammleFunde, zaehleArten } from './oder-true-wache.mjs'
+import { AUSNAHMEN as COE_AUSNAHMEN, pruefeContinueOnError } from './coe-pruefschritt-wache.mjs'
+import { AUSNAHMEN as MELDUNG_AUSNAHMEN, pruefeMeldung } from './coe-meldung-wache.mjs'
 
 const DIR = resolve(process.cwd(), '.github/workflows')
 let fehler = 0
@@ -562,6 +564,16 @@ for (const meldung of pruefeOderTrue(process.cwd())) {
 }
 const oderTrueFunde = sammleFunde(process.cwd())
 console.log(`✓ oder-true: ${OHNE_BEFUND.length} Ausnahmen, ${oderTrueFunde.length} Treffer (${zaehleArten(oderTrueFunde)})`)
+
+const coe = pruefeContinueOnError(process.cwd())
+coe.meldungen.forEach((meldung) => console.error(meldung))
+fehler += coe.meldungen.length
+console.log(`✓ coe-pruefschritt: ${COE_AUSNAHMEN.length} Ausnahmen, ${coe.treffer} Treffer`)
+
+const coeMeldung = pruefeMeldung(process.cwd())
+coeMeldung.meldungen.forEach((meldung) => console.error(meldung))
+fehler += coeMeldung.meldungen.length
+console.log(`✓ coe-meldung: ${MELDUNG_AUSNAHMEN.length} Ausnahmen, ${coeMeldung.treffer} stille Schritte von ${coeMeldung.geduldet} mit continue-on-error`)
 
 if (fehler) {
   console.error(`\n${fehler} Problem(e) in den Workflow-Dateien.`)

@@ -147,7 +147,7 @@ export function Quellenuebersicht({ title, releases, asZiel }: { title: Title; r
                       <span className="ml-1 tabular-nums text-slate-400">×{r.anzahl}</span>
                     )}
                   </td>
-                  <td className="py-1 text-slate-500 dark:text-slate-400">{r.speist}</td>
+                  <td className="py-1 text-ak-leise">{r.speist}</td>
                 </tr>
               ))}
             </tbody>

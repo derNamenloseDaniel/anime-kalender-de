@@ -33,7 +33,7 @@ export function KartenText({ main, t, keinDub, favorite, statusZeigen, status, g
         </span>
         <FundstellenZeichen text={anzeigeName(main)} schluessel={String(main.id)} />
       </span>
-      <span className="text-[11px] text-slate-500 dark:text-slate-400">
+      <span className="text-[11px] text-ak-leise">
         {main.jpYear ?? '—'}
         {main.episodes ? ` · ${t('db.episodes', { count: main.episodes })}` : ''}
       </span>
@@ -48,7 +48,7 @@ export function KartenText({ main, t, keinDub, favorite, statusZeigen, status, g
           <span
             className={[
               'text-[11px] leading-snug',
-              favorite ? 'font-medium text-ak-favorit-text' : 'text-slate-500 dark:text-slate-400',
+              favorite ? 'font-medium text-ak-favorit-text' : 'text-ak-leise',
             ].join(' ')}
           >
             {favorite ? t('db.noDubWatched') : t('db.noDubWatch')}

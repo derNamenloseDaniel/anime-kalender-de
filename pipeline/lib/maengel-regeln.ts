@@ -157,6 +157,10 @@ function verlagVerneint(t: Title, k: Kontext): boolean {
 const keinBannerBekannt = (t: Title, k: Kontext): string | undefined =>
   k.banner(t.id) === null && !k.franchiseTeile(t).some((x) => x.hatBanner) ? 'kein-banner-bekannt' : undefined
 
+/** Zu Recht ohne Jahr (23.11.2026): AniList führt Ankündigungen ohne Startdatum (`NOT_YET_RELEASED`, `seasonYear` und `startDate` leer); solange weder ein Stream noch ein Nicht-Disc-Termin existiert, gibt es kein Jahr zu füllen. */
+const jahrNochOhneStart = (t: Title, k: Kontext): string | undefined =>
+  t.streams?.length || (k.releases.get(t.id) ?? []).some((r) => r.platform !== 'disc') ? undefined : 'noch-ohne-start'
+
 export const REGELN: Regel[] = [
   { art: 'cover', gruppe: 'fehlend', wirkung: 3, wer: 'auto:tmdb-poster', zaehle: luecke('c'), ausnahme: (t, k) => (k.coverBekannt[t.id] ? 'ohne-bekanntes-cover' : undefined) },
   { art: 'banner', gruppe: 'fehlend', wirkung: 1, wer: 'auto:tmdb-banner', zaehle: (t) => !t.bannerImage, ausnahme: keinBannerBekannt },
@@ -170,7 +174,7 @@ export const REGELN: Regel[] = [
   { art: 'studio', gruppe: 'fehlend', wirkung: 1, wer: 'hand:studio-von-hand', zaehle: (t) => !t.studios?.length, ausnahme: (t) => (t.id >= ANISEARCH_ID_BASIS ? 'quelle-ohne-studio' : undefined) },
   { art: 'genre', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anilist', zaehle: (t) => !t.genres?.length },
   { art: 'laufzeit', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anisearch', zaehle: (t) => !t.runtimeMin },
-  { art: 'jahr', gruppe: 'fehlend', wirkung: 2, wer: 'auto:anilist', zaehle: luecke('j') },
+  { art: 'jahr', gruppe: 'fehlend', wirkung: 2, wer: 'auto:anilist', zaehle: luecke('j'), ausnahme: jahrNochOhneStart },
   { art: 'sprecher', gruppe: 'fehlend', wirkung: 1, wer: 'auto:anisearch', zaehle: (t) => !t.hasVoices, ausnahme: (t) => (hatSynchro(t) ? undefined : 'ohne-synchro') },
   { art: 'kein-weg', gruppe: 'fehlend', wirkung: 3, wer: 'daniel', zaehle: (t, k) => !hatEinenWeg(t) && !k.discTitel.has(t.id), ausnahme: keinWegAusnahme },
   { art: 'erstausgabe-ohne-weg', gruppe: 'fehlend', wirkung: 3, wer: 'daniel', zaehle: (t, k) => zaehleErstausgabeOhneWeg([t], k.discTitel) === 1, ausnahme: (t, k) => (verlagVerneint(t, k) ? 'belegtes-nein' : undefined) },

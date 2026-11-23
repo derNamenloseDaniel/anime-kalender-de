@@ -311,6 +311,8 @@ for versuch in $(seq 1 "$VERSUCHE"); do
       else
         echo "::error::Der gebaute Bestand verletzt eine Zusicherung. Aus dem Bau-Lauf wird nichts committet außer den Abrufen von data:fetch."
         bau_lauf_zuruecknehmen
+        # Die schuldigen Titel für den Schritt „Sammler-Stand … zurücknehmen“ (tools/sammler-herkunft.mjs): er nimmt dann nur deren Quell-Dateien zurück.
+        node tools/quarantaene.mjs schuldige "$TEMP_LAUF/bestand-pruefung.txt" "$TEMP_LAUF/quarantaene.json" || echo "::warning::Die schuldigen Titel des Abbruchs ließen sich nicht ablegen; die Sammler-Zurücknahme nimmt alle Dateien."
         rm -f data/cache/quittung-offen/pruefungen-abhaken.json
         echo "DATEN_WARNUNG=${DATEN_WARNUNG:+$DATEN_WARNUNG · }Bestand nicht übernommen: $grund" >> "${GITHUB_ENV:-/dev/null}"
       fi

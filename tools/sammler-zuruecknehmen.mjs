@@ -11,6 +11,7 @@
  */
 import { execFileSync } from 'node:child_process'
 import { pathToFileURL } from 'node:url'
+import { auswahlZeile, liesSchuldige, paarAusGit, waehle } from './sammler-herkunft.mjs'
 
 export const SAMMLER = 'anime-kalender-daten[bot]'
 // Nur Eingabedaten, die ein Sammler liefert; Cache und Erzeugnisse nie.
@@ -74,21 +75,28 @@ export function nachricht(commits, dateien) {
 }
 
 /**
- * @param {{cwd: string, basis: string, bauen: () => boolean, committen: (nachricht: string) => boolean}} o
- * @returns {{art: 'nichts' | 'zurueckgenommen' | 'bleibt-rot', dateien: string[]}}
+ * Mit der Schuldigenliste des Baus (`schuldige`, Titelkennungen) zuerst nur die Dateien, in denen sich der Eintrag eines schuldigen Titels
+ * geändert hat (`tools/sammler-herkunft.mjs`); wird der Bau damit nicht grün, danach alle Sammler-Dateien der Spanne wie bisher.
+ * @param {{cwd: string, basis: string, bauen: () => boolean, committen: (nachricht: string) => boolean, schuldige?: number[] | null, lies?: (datei: string) => {alt: unknown, neu: unknown}}} o
+ * @returns {{art: 'nichts' | 'zurueckgenommen' | 'bleibt-rot', dateien: string[], wahl: object}}
  */
-export function zuruecknehmen({ cwd, basis, bauen, committen }) {
+export function zuruecknehmen({ cwd, basis, bauen, committen, schuldige = null, lies = paarAusGit(cwd, basis) }) {
   const commits = commitsSeit(cwd, basis)
-  const { dateien, ...ausgelassen } = sammlerAuswahl(commits)
-  if (dateien.length === 0) return { art: 'nichts', dateien, ausgelassen }
+  const { dateien: alle, ...ausgelassen } = sammlerAuswahl(commits)
+  if (alle.length === 0) return { art: 'nichts', dateien: alle, ausgelassen, wahl: null }
+  const wahl = { ...waehle({ schuldige, dateien: alle, lies }), zahlAlle: alle.length, engRot: false }
+  const stufen = wahl.art === 'eng' && wahl.zuordnung.eng.length < alle.length ? [wahl.zuordnung.eng, alle] : [alle]
   // Reste früherer Schritte des roten Laufs (Meldungen, Rohfolgen, halbe Erzeugnisse) kämen sonst mit in den Commit.
   git(cwd, ['reset', '-q', '--hard', 'HEAD'])
   git(cwd, ['clean', '-fdq'])
-  for (const d of dateien) stelleHer(cwd, basis, d)
-  if (bauen() && committen(nachricht(commits, dateien))) return { art: 'zurueckgenommen', dateien, ausgelassen }
-  // Die Ursache liegt woanders (oder der Bestand blieb rot): Sammler-Stand wieder herstellen, nichts verloren.
-  for (const d of dateien) stelleHer(cwd, 'HEAD', d)
-  return { art: 'bleibt-rot', dateien, ausgelassen }
+  for (const dateien of stufen) {
+    for (const d of dateien) stelleHer(cwd, basis, d)
+    if (bauen() && committen(nachricht(commits, dateien))) return { art: 'zurueckgenommen', dateien, ausgelassen, wahl }
+    // Die Ursache liegt woanders (oder der Bestand blieb rot): Sammler-Stand wieder herstellen, nichts verloren.
+    for (const d of dateien) stelleHer(cwd, 'HEAD', d)
+    wahl.engRot = stufen.length === 2
+  }
+  return { art: 'bleibt-rot', dateien: alle, ausgelassen, wahl }
 }
 
 // Der Job hat 45 min und ist schon gelaufen: Bau (gemessen 2–4 min) und Commit mit Prüfketten bekommen je eine Grenze darunter.
@@ -116,12 +124,16 @@ function main(argv, env) {
   }
   const bauBefehl = env.SZN_BAU || 'npm run data:build'
   const commitBefehl = env.SZN_COMMIT || 'bash tools/commit-data.sh "$SZN_NACHRICHT"'
+  const { ids, grund } = liesSchuldige(env)
+  if (!ids?.length) console.log(`Sammler-Zurücknahme: ${grund}, es gelten alle Sammler-Dateien`)
   const erg = zuruecknehmen({
     cwd: process.cwd(),
     basis,
+    schuldige: ids,
     bauen: () => lauf(bauBefehl, env, 10),
     committen: (text) => lauf(commitBefehl, { ...env, BAU_LAUF: '1', SZN_NACHRICHT: text }, 20),
   })
+  if (erg.wahl) console.log(auswahlZeile(erg.wahl))
   console.log(`Sammler-Zurücknahme: ${erg.art} (${erg.dateien.length} Dateien: ${erg.dateien.join(', ') || '-'})`)
   console.log(ausgelassenZeile(erg.ausgelassen))
   return 0

@@ -32,6 +32,6 @@
   { "name": "coe: verwaiste Ausnahme immer gemeldet", "datei": "tools/coe-pruefschritt-wache.mjs", "suche": "    if (benutzt.has(i)) return\n", "ersetze": "", "tests": ["node tools/coe-pruefschritt-wache.test.mjs"] },
   { "name": "coe: Meldung bei Job-Fund wie bei Schritt", "datei": "tools/coe-pruefschritt-wache.mjs", "suche": "fund.art === 'job'\n          ?", "ersetze": "false\n          ?", "tests": ["node tools/coe-pruefschritt-wache.test.mjs"] },
   { "name": "wf: Wächter nicht aufgerufen", "datei": "tools/check-workflows.mjs", "suche": "const coe = pruefeContinueOnError(process.cwd())", "ersetze": "const coe = { meldungen: [], treffer: 0 }", "tests": ["node tools/check-workflows.test.mjs"] },
-  { "name": "wf: coe-Fehler nicht gezählt", "datei": "tools/check-workflows.mjs", "suche": "for (const meldung of coe.meldungen) {\n  console.error(meldung)\n  fehler++\n}", "ersetze": "for (const meldung of coe.meldungen) {\n  console.error(meldung)\n}", "tests": ["node tools/check-workflows.test.mjs"] },
+  { "name": "wf: coe-Fehler nicht gezählt", "datei": "tools/check-workflows.mjs", "suche": "fehler += coe.meldungen.length", "ersetze": "fehler += 0", "tests": ["node tools/check-workflows.test.mjs"] },
   { "name": "wf: Wächter mit leerer Ausnahmeliste", "datei": "tools/check-workflows.mjs", "suche": "pruefeContinueOnError(process.cwd())", "ersetze": "pruefeContinueOnError(process.cwd(), [])", "tests": ["node tools/check-workflows.test.mjs"] }
 ]

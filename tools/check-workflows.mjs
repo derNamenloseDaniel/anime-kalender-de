@@ -565,10 +565,8 @@ const oderTrueFunde = sammleFunde(process.cwd())
 console.log(`✓ oder-true: ${OHNE_BEFUND.length} Ausnahmen, ${oderTrueFunde.length} Treffer (${zaehleArten(oderTrueFunde)})`)
 
 const coe = pruefeContinueOnError(process.cwd())
-for (const meldung of coe.meldungen) {
-  console.error(meldung)
-  fehler++
-}
+coe.meldungen.forEach((meldung) => console.error(meldung))
+fehler += coe.meldungen.length
 console.log(`✓ coe-pruefschritt: ${COE_AUSNAHMEN.length} Ausnahmen, ${coe.treffer} Treffer`)
 
 if (fehler) {

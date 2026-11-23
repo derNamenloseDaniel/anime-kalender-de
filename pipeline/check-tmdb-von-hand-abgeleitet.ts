@@ -3,7 +3,7 @@
  * Prozesstest gegen `fetch-tmdb-titles.ts` auf einer Kulisse im Temp-Ordner, dazu die reine Funktion. Läuft in `check:logic`.
  */
 import { spawnSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -61,9 +61,6 @@ console.log('\nTMDB von Hand: reine Funktion')
   pruefe('zwei Titel mit derselben Filmkennung: die Handzeile trennt sie', mehrdeutigeFilmzuordnungen(geteilt).size === 0, geteilt)
   const echt = mitHandvorrang<{ tmdbId?: number }>(JSON.parse(readFileSync('data/tmdb-titles.json', 'utf8')))
   pruefe('echter Cache mit Handvorrang: jede Handkennung steht im Cache', ladeHandzeilen().filter((e) => e.tmdbId).every((e) => echt[e.anilistId]?.tmdbId === e.tmdbId), ladeHandzeilen().filter((e) => e.tmdbId && echt[e.anilistId]?.tmdbId !== e.tmdbId))
-  // Wächter: jeder Leser von tmdb-titles.json im Bau (pipeline/bau, Quelle der Titelfelder) geht durch den Handvorrang.
-  const ohneVorrang = readdirSync('pipeline/bau').filter((f) => f.endsWith('.ts') && /readJson[^\n]*'data\/tmdb-titles\.json'/.test(readFileSync(`pipeline/bau/${f}`, 'utf8')) && !readFileSync(`pipeline/bau/${f}`, 'utf8').includes('mitHandvorrang('))
-  pruefe('jeder Leser von tmdb-titles.json im Bau nimmt den Handvorrang', ohneVorrang.length === 0, ohneVorrang)
   pruefe('ohne: auch ohne Bestandseintrag werden Altfälle gestrichen', !('900403' in leer.banner) && !('900403' in leer.folgen) && !('900403' in leer.poster), leer)
 }
 

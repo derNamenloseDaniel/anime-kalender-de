@@ -1,6 +1,6 @@
 # YouTube: was die Prüfung gefunden hat
 
-Stand: 2026-11-16 · geprüft über YouTubes oEmbed-Schnittstelle
+Stand: 2026-11-23 · geprüft über YouTubes oEmbed-Schnittstelle
 (Titel und Kanal je Video, ohne Schlüssel und ohne Kontingent).
 
 Eingetragen wurde nur, wo der **Videotitel die Sprache benennt**. Was hier steht,
@@ -15,7 +15,7 @@ Ein Blick zur Bestätigung, dann ist es ein `0` in der Kurzschrift.
 | Unser Titel | Videotitel | Verweis |
 |---|---|---|
 | Maho Tsukai Tai! Magic User’s Club | Magic User's Club (Sub) | [öffnen](https://www.youtube.com/playlist?list=PLrrh84y760v-07h6z6XgXtUgLCZgQkGT8) |
-| Attack on Titan Part I: Crimson Bow and Arrow | Full Movie \| Attack on Titan Part 1 - Guren no Yumiya - (English Dub) | [öffnen](https://www.youtube.com/watch?v=AHT772bRkMY) |
+| Attack on Titan: Teil 1 - Feuerroter Pfeil und Bogen | Full Movie \| Attack on Titan Part 1 - Guren no Yumiya - (English Dub) | [öffnen](https://www.youtube.com/watch?v=AHT772bRkMY) |
 | Attack on Titan - Movie Teil 2: Flügel der Freiheit | Full Movie \| Attack on Titan Part 2 - Jiyuu no Tsubasa - (English Dub) | [öffnen](https://www.youtube.com/watch?v=oVlEVivdY-Y) |
 | Tokyo Ghoul √A | Tokyo Ghoul, 2. Staffel, 1. Episode, OmU | [öffnen](https://www.youtube.com/watch?v=-BMURrauibg) |
 | My Hero Academia | Anime, My Hero Academia, Episode 01, OmU | [öffnen](https://www.youtube.com/watch?v=rHyR-BKxWqU) |
@@ -48,7 +48,7 @@ verschwindet, ist eine Entscheidung, keine Messung.
 
 ## Ohne Hinweis auf die Sprache
 
-32 Verweise, deren Videotitel nichts verrät. Für die hilft nur Hinsehen —
+31 Verweise, deren Videotitel nichts verrät. Für die hilft nur Hinsehen —
 oder die Data API mit Schlüssel, die auch die Tonspuren nennt.
 
 | Unser Titel | Videotitel | Kanal | Verweis |
@@ -75,7 +75,6 @@ oder die Data API mit Schlüssel, die auch die Tonspuren nennt.
 | #115107 | DIGIMON ADVENTURE: LAST EVOLUTION KIZUNA | 東映アニメーション公式YouTubeチャンネル | [öffnen](https://www.youtube.com/playlist?list=PLGLzhXoyF5rLqhNCbHawkJRuBnShf66bk) |
 | Pokétoon: The Pokémon Cartoon Animation | POKÉTOON | ポケモン公式YouTubeチャンネル | [öffnen](https://www.youtube.com/playlist?list=PLBE2D9BnJJUoFiRz8ZjF2KToAirHYn1Ru) |
 | Abenteuer auf dem Eis | 上海美术电影制片厂《冰上遇险》 | 咪咕动漫 MIGU Animation | [öffnen](https://www.youtube.com/watch?v=5j9mrGlQWBs) |
-| Fire Force Staffel 2 Miniepisoden | Fire Force S2 - MiniEP | peppermint anime | [öffnen](https://www.youtube.com/playlist?list=PLY_DM8ieCRPqNeMV1z2EJZDSgLWySL_Cx) |
 | Pokémon Entwicklungen | Pokémon: Evolutions \| Full Episodes | The Official Pokémon YouTube channel | [öffnen](https://youtube.com/playlist?list=PLQWzKIaERirwN5po6LduiSLm8qc7GtuAl&si=I6QtXoF-i7cfG2c8) |
 | Kaguya-sama: Love Is War - Ultra Romantic: Ishigami Yu möchte sich unterhalten | Kaguya-sama: Love Is War -Ultra Romantic- Season 3  \|  Teaser Video - "Yu Ishigami Wants to Chat" | Aniplex USA | [öffnen](https://www.youtube.com/watch?v=cxTxrKrYkcY) |
 | Sylvanian Families: Mini Episodes - Peony | Calico Critters Mini Episodes Season 4 -Peony- | CALICO CRITTERS Official | [öffnen](https://www.youtube.com/playlist?list=PLduwKEaYhJ45z5Gf4Nj3jmsMvOFcpTikR) |

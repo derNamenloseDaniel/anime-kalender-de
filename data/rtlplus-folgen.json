@@ -1,5 +1,5 @@
 {
-  "geholtAm": "2026-11-16T05:05:50.236Z",
+  "geholtAm": "2026-11-23T05:06:43.152Z",
   "titel": {
     "16870": {
       "programm": "the-last-naruto-the-movie-p_226250",
@@ -27,18 +27,25 @@
       "programm": "beyblade-x-p_9519",
       "videos": [
         {
-          "video": "das-battle-royale-des-wahren-x-c_2194177",
-          "titel": "Das Battle Royale des wahren X",
-          "ab": "2026-11-06",
-          "staffel": 3,
-          "folge": 24
-        },
-        {
           "video": "kraft-ohne-motiv-c_2205074",
           "titel": "Kraft ohne Motiv",
           "ab": "2026-11-13",
           "staffel": 3,
           "folge": 25
+        },
+        {
+          "video": "der-verrater-verrat-c_2211267",
+          "titel": "Der Verräter verrät",
+          "ab": "2026-11-20",
+          "staffel": 3,
+          "folge": 26
+        },
+        {
+          "video": "das-battle-royale-des-wahren-x-c_2194177",
+          "titel": "Das Battle Royale des wahren X",
+          "ab": "2026-11-06",
+          "staffel": 3,
+          "folge": 24
         },
         {
           "video": "ein-prozent-hoffnung-c_2166181",
@@ -1749,6 +1756,13 @@
           "staffel": 3,
           "dt": "Kraft ohne Motiv",
           "ab": "2026-11-13"
+        },
+        {
+          "nr": 126,
+          "st": 26,
+          "staffel": 3,
+          "dt": "Der Verräter verrät",
+          "ab": "2026-11-20"
         }
       ]
     }

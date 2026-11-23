@@ -1,11 +1,11 @@
 {
- "erzeugtAm": "2026-11-23T11:46:44.997Z",
+ "erzeugtAm": "2026-11-23T13:28:23.687Z",
  "anbieter": [
   {
    "name": "Amazon",
    "plattform": "primevideo",
-   "gemeldet": 997,
-   "gesamt": 1027,
+   "gemeldet": 996,
+   "gesamt": 1026,
    "offen": 30,
    "ohneSeite": 2,
    "suchAdressen": [

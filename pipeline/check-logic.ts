@@ -5442,7 +5442,7 @@ pruefe(
   )
   pruefe(
     '… und belebt nicht wieder, was ein Handbeleg ohne Adresse für Prime verneint',
-    /if \(handNein\) continue/.test(bau),
+    /if \(handNein\) return false/.test(bau),
   )
   /* Dass die Linkprüfung die Amazon-Seite statt JustWatchs Adresse prüft, läuft in check-links-laufzeit.ts. */
 }

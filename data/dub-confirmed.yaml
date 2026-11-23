@@ -41770,3 +41770,29 @@
   checkedAt: '2026-11-22'
   note: "Nicht auf der Netflix-Seite gemessen, sondern Meldung von Anime2You (Artikel 1056287, anime2you.de/news/1056287/netflix-yamada-kun-synchro-und-mehr/): Staffel 2, Folge 1 am 01.10.2026 bei Netflix, Simulcast jeden Donnerstag, Sprache: Deutsch, Japanisch (UT); gleiche Angabe für November (1062641) und Dezember (1073600). Netflix-Adresse aus dem Netflix-Link im Artikel 1056287. Welche Folgen deutsch vorliegen, ist nicht je Folge belegt."
   zweiteQuelle: "Anime2You 2026-10-01: Die erste Episode der zweiten Staffel von »The Ramparts of Ice« ist bei Netflix verfügbar, Simulcast jeden Donnerstag, Sprache Deutsch, Japanisch (UT). — https://www.anime2you.de/news/1056287/netflix-yamada-kun-synchro-und-mehr/"
+# --- Mängel-Stillstand 23.11.2026 (termin-geschaetzt-ohne-weg): Wege aus Anime2You-Steckbriefen ---
+- anilistId: 169969
+  title: "Der Held ohne Klasse: Der Aufstieg eines Talentlosen"
+  platform: netflix
+  url: https://www.netflix.com/title/82662122
+  dub: true
+  dubRanges:
+    - from: 1
+      to: 12
+      dub: true
+  checkedAt: '2026-11-23'
+  note: "Anime2You 01.11.2026 (anime2you.de/news/1066144/netflix-held-ohne-klasse-und-mehr/): Steckbrief „Episoden: 12 (komplett) Sprache: Deutsch, Japanisch (UT) Stream: Netflix“, „Ab sofort auf Netflix“; Netflix-Kennung 82662122 über die Suche („Hero Without a Class: Who Even Needs Skills?!“, englischer Titel im selben Artikel), netflix.com aus der Cloud nicht abrufbar, Abruf der Adresse steht aus."
+- anilistId: 5000001
+  title: "Z wie Zorro – Der Film"
+  platform: joyn
+  url: https://www.joyn.de/filme/z-wie-zorro-der-film
+  dub: true
+  checkedAt: '2026-11-23'
+  note: "Anime2You 03.11.2026 (anime2you.de/news/1066831/joyn-25-anime-neuzugaenge/): „Sprache: Deutsch Stream: Joyn, Prime Video“, Überschrift „ab sofort auf Joyn verfügbar“; die Joyn-Adresse stammt aus der Websuche (Titel „Z wie Zorro - Der Film“, aniverse TV), joyn.de aus der Cloud nicht abrufbar."
+- anilistId: 5000002
+  title: "Zorros Geheimnis"
+  platform: joyn
+  url: https://www.joyn.de/mediatheken/aniverse
+  dub: true
+  checkedAt: '2026-11-23'
+  note: "Anime2You 03.11.2026 (anime2you.de/news/1066831/joyn-25-anime-neuzugaenge/): „Zorros Geheimnis Laufzeit: 88 Minuten Sprache: Deutsch Stream: Joyn, Prime Video“; Einzelseite nicht gefunden, die Websuche führt den Film in der Joyn-Mediathek aniverse (Adresse ist die Mediathek, nicht der Film)."

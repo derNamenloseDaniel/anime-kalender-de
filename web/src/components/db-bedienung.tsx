@@ -17,7 +17,7 @@ export function DbZaehlzeile({ ergebnisse, mitSynchro, suche, sort, onSortChange
   hinweis?: ReactNode
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-ak-leise">
       {hinweis ? (
         <span className="min-w-0 text-sm leading-7">
           <span className="inline-flex align-middle"><DbKopfzeile ergebnisse={ergebnisse} mitSynchro={mitSynchro} suche={suche} /></span>{' '}
@@ -35,7 +35,7 @@ const GRUPPEN_TEXT: Record<RelevanzArt, { schluessel: TranslationKey; farbe: str
   laeuft: { schluessel: 'db.gruppeLaeuft', farbe: 'text-ak-gut-text' },
   bald: { schluessel: 'db.gruppeBald', farbe: 'text-ak-info-text' },
   erschienen: { schluessel: 'db.gruppeErschienen', farbe: 'text-slate-600 dark:text-slate-300' },
-  unbekannt: { schluessel: 'db.gruppeUnbekannt', farbe: 'text-slate-500 dark:text-slate-400' },
+  unbekannt: { schluessel: 'db.gruppeUnbekannt', farbe: 'text-ak-leise' },
 }
 
 /** Überschrift einer Gruppe in der Relevanz-Ansicht; sie trägt den Status, den die Kachel dann nicht wiederholt. */
@@ -44,7 +44,7 @@ export function DbGruppenKopf({ art, zahl }: { art: RelevanzArt; zahl: number })
   const g = GRUPPEN_TEXT[art]
   return (
     <h2 className={`col-span-full mt-2 border-b border-slate-200 pb-1 text-sm font-semibold first:mt-0 dark:border-white/10 ${g.farbe}`}>
-      {t(g.schluessel)} <span className="font-normal text-slate-500 dark:text-slate-400">· {zahl.toLocaleString('de-DE')}</span>
+      {t(g.schluessel)} <span className="font-normal text-ak-leise">· {zahl.toLocaleString('de-DE')}</span>
     </h2>
   )
 }
@@ -102,7 +102,7 @@ export function MehrKnopf({ schritt, rest, onClick }: { schritt: number; rest: n
       className="mx-auto cursor-pointer rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-ak-flaeche-2 dark:border-white/15 dark:text-slate-300"
     >
       {t('db.more', { count: Math.min(schritt, rest) })}
-      <span className="ml-2 text-xs text-slate-500 dark:text-slate-400">{t('db.remaining', { count: rest })}</span>
+      <span className="ml-2 text-xs text-ak-leise">{t('db.remaining', { count: rest })}</span>
     </button>
   )
 }

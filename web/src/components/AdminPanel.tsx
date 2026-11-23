@@ -81,7 +81,7 @@ export function AdminPanel({ token }: { token: string }) {
   return (
     <div className="rounded-xl border border-ak-warnung/40 bg-ak-warnung-grund p-5">
       <SectionTitle>Nur für den Betreiber</SectionTitle>
-      <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
+      <p className="mb-3 text-xs text-ak-leise">
         Sichtbar, weil die Adresse einen gültigen Schlüssel enthält. Der Schlüssel gilt für diese
         Browsersitzung und ist danach wieder weg. Nicht weitergeben — wer ihn hat, kann Mails an
         alle Abonnenten auslösen.

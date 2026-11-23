@@ -75,7 +75,7 @@ export function AntwortBereich({ antwort, sortiertNachZugang, streamReleases, te
           angebotSeit={angebotSeitZeileVon(title, t)}
           hinweis={
             folgenLuecke ? (
-              <p className="mt-1 text-t4 text-slate-500 dark:text-slate-400">
+              <p className="mt-1 text-t4 text-ak-leise">
                 {t(/^\d+$/.test(folgenLuecke) ? 'detail.folgeOhneAnbieter' : 'detail.folgenOhneAnbieter', { bereich: folgenLuecke })}
               </p>
             ) : /* Beim Kinofilm sagt der Kino-Hinweis darunter dasselbe. */

@@ -74,7 +74,7 @@ export function InstallDialog() {
             <AppMark />
             <div className="min-w-0">
               <p className="text-base font-semibold text-slate-900 dark:text-white">{t('pwa.title')}</p>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('pwa.pitch')}</p>
+              <p className="mt-1 text-sm text-ak-leise">{t('pwa.pitch')}</p>
             </div>
           </div>
 

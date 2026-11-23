@@ -31,7 +31,7 @@ export function DbSchalter({ ohneSynchro, onOhneSynchroChange, laedt, grouped, o
       <span className={`${pille} ${ruhig}`}>
         <Toggle checked={grouped} onChange={onGroupedChange} label={t('db.groupSeasons')} hint={t('db.groupSeasonsHint')} />
       </span>
-      {laedt && <span className="text-[11px] leading-snug text-slate-500 dark:text-slate-400">{t('db.withoutDubLoading')}</span>}
+      {laedt && <span className="text-[11px] leading-snug text-ak-leise">{t('db.withoutDubLoading')}</span>}
     </div>
   )
 }

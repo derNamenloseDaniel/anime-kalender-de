@@ -90,7 +90,7 @@ function FavoritenFeed() {
               {t('sub.favNeu')}
             </Button>
           </div>
-          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{t('sub.favHinweis')}</p>
+          <p className="mt-2 text-xs text-ak-leise">{t('sub.favHinweis')}</p>
         </>
       ) : (
         <Button onClick={() => holen(false)} size="sm">
@@ -147,7 +147,7 @@ export function SubscribeView({ meta }: { meta: DataMeta }) {
           <li>{t('sub.step2')}</li>
           <li>{t('sub.step3')}</li>
         </ol>
-        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">{t('sub.note')}</p>
+        <p className="mt-3 text-xs text-ak-leise">{t('sub.note')}</p>
       </Card>
 
       <FuerApps />
@@ -279,7 +279,7 @@ function AboEinstellungen({ meta, onWechseln, abmeldeState, setAbmeldeState }: {
               />
               <span className="text-sm text-slate-700 dark:text-slate-200">
                 {t('news.franchiseHint')}
-                <span className="mt-0.5 block text-xs text-slate-500 dark:text-slate-400">
+                <span className="mt-0.5 block text-xs text-ak-leise">
                   {t('news.franchiseHintNote')}
                 </span>
               </span>
@@ -690,7 +690,7 @@ export function SourcesView({ meta }: { meta: DataMeta }) {
       <h1 className="mb-1 text-xl font-bold text-slate-900 dark:text-slate-100">
         {t('sources.title')}
       </h1>
-      <p className="mb-6 text-slate-500 dark:text-slate-400">{t('sources.intro')}</p>
+      <p className="mb-6 text-ak-leise">{t('sources.intro')}</p>
       <ul className="space-y-2">
         {meta.attribution.map((a) => (
           <li
@@ -701,7 +701,7 @@ export function SourcesView({ meta }: { meta: DataMeta }) {
           </li>
         ))}
       </ul>
-      <p className="mt-6 text-xs text-slate-500 dark:text-slate-400">{t('sources.perEntry')}</p>
+      <p className="mt-6 text-xs text-ak-leise">{t('sources.perEntry')}</p>
 
       <Wissenswert />
     </div>

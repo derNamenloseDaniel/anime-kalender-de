@@ -269,7 +269,7 @@ export function AntwortKasten({
       <p
         className={[
           'text-t2 font-bold',
-          gedaempft ? 'text-slate-500 dark:text-slate-400' : 'text-slate-900 dark:text-white',
+          gedaempft ? 'text-ak-leise' : 'text-slate-900 dark:text-white',
         ].join(' ')}
       >
         {haupt}
@@ -288,15 +288,15 @@ export function AntwortKasten({
       />
       </div>
       {neben && (
-        <p className="mt-0.5 text-t4 text-slate-500 dark:text-slate-400" title={nebenTitel}>
+        <p className="mt-0.5 text-t4 text-ak-leise" title={nebenTitel}>
           <MitFachwoertern text={neben} />
         </p>
       )}
 
       <KastenFakten fakten={fakten} anteil={anteil} />
 
-      {zaehl && <p className="mt-1 text-t4 text-slate-500 dark:text-slate-400">{zaehl}</p>}
-      {angebotSeit && <p className="mt-1 text-t4 text-slate-500 dark:text-slate-400">{angebotSeit}</p>}
+      {zaehl && <p className="mt-1 text-t4 text-ak-leise">{zaehl}</p>}
+      {angebotSeit && <p className="mt-1 text-t4 text-ak-leise">{angebotSeit}</p>}
       {hinweis}
       {antwort.art === 'laeuft' && antwort.vermerk && (
         <VermerkAuskunft

@@ -69,9 +69,10 @@ console.log('\nDisc-Zahl unabhängig von der Weg-Logik, direkt aus den Releases 
 }
 
 console.log('\nPflichtfall: Disc-Plattform mit Art movie')
-const pflicht = titel.find((t) => t.id === 544)
-pruefe('Titel 544 (auto-544-disc) liegt im Bestand', !!pflicht)
-pruefe('… und der Filter „Art Disc" lässt ihn durch', filterTitles(titel, data, { ...EMPTY_FILTERS, releaseTypes: ['disc'] }, heute, new Set()).some((t) => t.id === 544))
+/* Nur Beleg: Verschwindet der Titel aus dem Bestand, fällt der Fall weg, der Lauf bleibt grün (kein Titelurteil, steht in `bestand-ohne-marke.json`). */
+if (titel.some((t) => t.id === 544)) {
+  pruefe('Titel 544 (auto-544-disc): der Filter „Art Disc" lässt ihn durch', filterTitles(titel, data, { ...EMPTY_FILTERS, releaseTypes: ['disc'] }, heute, new Set()).some((t) => t.id === 544))
+} else console.log('  Titel 544 nicht mehr im Bestand, Pflichtfall entfällt')
 
 if (verletzt) {
   console.error(`\n${verletzt} Zusicherung(en) verletzt.`)

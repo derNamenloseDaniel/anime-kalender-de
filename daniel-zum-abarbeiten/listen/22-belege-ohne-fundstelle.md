@@ -15,7 +15,7 @@ Je Adresse die Titel, für die die letzte Lesung keine Zeile mit Titel und Termi
 - https://news.animationdigitalnetwork.com/de/2026/06/29/maedchen-mit-toedlichen-waffen-gunslinger-girl-jetzt-bei-adn/ (gelesen 2026-10-29) — Gunslinger Girl -Il Teatrino- (3231)
 - https://news.animationdigitalnetwork.com/de/2026/08/17/love-lies-jetzt-im-stream-bei-adn-dystopisches-romance-drama/ (gelesen 2026-10-29) — Love and Lies (98320)
 - https://news.animationdigitalnetwork.com/de/2026/06/01/sailor-moon-sailor-stars-staffel-5-im-stream-bei-adn/ (gelesen 2026-10-29) — Sailor Moon: Das Mädchen mit den Zauberkräften (530), Bishoujo Senshi Sailor Moon R (740), Bishoujo Senshi Sailor Moon S (532), Bishoujo Senshi Sailor Moon SuperS (1239)
-- https://de.wikipedia.org/wiki/Pok%C3%A9mon_(Anime)/Horizonte (gelesen 2026-11-16) — Pokémon Horizonte – Staffel 4 (158871)
+- https://de.wikipedia.org/wiki/Pok%C3%A9mon_(Anime)/Horizonte (gelesen 2026-11-23) — Pokémon Horizonte – Staffel 4 (158871)
 - https://de.wikipedia.org/wiki/Detektiv_Conan/Episodenliste (gelesen 2026-11-16) — Detective Conan (235)
 - https://de.wikipedia.org/wiki/Dragon_Ball/Episodenliste (gelesen 2026-11-16) — Dragon Ball (223)
 - https://www.kinoheld.de/film/your-name-gestern-heute-und-fuer-immer (gelesen 2026-11-02) — Your Name. Gestern, heute und für immer (21519)

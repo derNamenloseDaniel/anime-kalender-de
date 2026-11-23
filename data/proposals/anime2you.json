@@ -1,13 +1,13 @@
 {
-  "scrapedAt": "2026-11-23T01:02:07.099Z",
+  "scrapedAt": "2026-11-23T04:37:27.255Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 7,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 39,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 5,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 10,
-    "schon in einem Rubrik-Feed gelesen": 8,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 1,
-    "Sprachhinweis älter als 45 Tage": 6
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 39,
+    "schon in einem Rubrik-Feed gelesen": 34,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 11,
+    "Sprachhinweis älter als 45 Tage": 7
   },
   "proposals": [
     {
@@ -618,7 +618,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-20"
+      "sammelGelesen": "2026-11-23"
     },
     {
       "articleTitle": "Tickets für »KPop Demon Hunters«-Konzerttour ab Freitag erhältlich",
@@ -673,7 +673,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-20"
+      "sammelGelesen": "2026-11-23"
     },
     {
       "articleTitle": "AKIBA PASS SHOP startet Black Friday Sale mit über 1.000 Produkten",
@@ -1153,7 +1153,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-20"
+      "sammelGelesen": "2026-11-23"
     },
     {
       "articleTitle": "AniMoon startet große Black-Weeks-Aktion mit 26 % Rabatt",
@@ -1561,7 +1561,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-20"
+      "sammelGelesen": "2026-11-23"
     },
     {
       "articleTitle": "ProSieben MAXX startet zweiten werktäglichen Anime-Block",
@@ -1899,7 +1899,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-20"
+      "sammelGelesen": "2026-11-23"
     },
     {
       "articleTitle": "Design der neuen »Neon Genesis Evangelion«-Komplettbox + Extras",
@@ -1972,7 +1972,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-20"
+      "sammelGelesen": "2026-11-23"
     },
     {
       "articleTitle": "AniMoon-Angebot: RomCom-Serie »Toradora!« zum Sonderpreis",
@@ -3271,7 +3271,7 @@
           "edition": "limited-edition sammelschuber"
         }
       ],
-      "discGelesen": "2026-11-20"
+      "discGelesen": "2026-11-23"
     },
     {
       "articleTitle": "Zwei Synchro-Neuzugänge ab sofort auf Crunchyroll verfügbar",

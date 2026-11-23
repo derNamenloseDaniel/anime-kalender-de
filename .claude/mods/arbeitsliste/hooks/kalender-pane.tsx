@@ -1,6 +1,6 @@
 // Bereich „Kalender heute“ (Platz des früheren „Gerade in Arbeit“): Uhrzeit als eigene Spalte, daneben der Titel fett
-// und darunter Anbieter · Folgen gedimmt; Vergangenes grau, damit das Nächste ins Auge fällt (Daniel, 20.11.2026).
-import { istVorbei } from './kalender'
+// und darunter Anbieter · weitere Wege mit Uhrzeit · Folgen gedimmt; Vergangenes grau, damit das Nächste ins Auge fällt (Daniel, 20.11.2026).
+import { istVorbei, metaText } from './kalender'
 import type { KalenderStand, KalenderZeile } from './kalender'
 
 // Breite der Zeitspalte: „≈17:00“ plus Rand und Abstand.
@@ -9,7 +9,7 @@ const ZEIT_BREITE = 8
 function kalenderEintrag(a: any, z: KalenderZeile, vorbei: boolean, key: string) {
   const { Box, Text } = a
   const zeit = z.zeit ? `${z.geschaetzt ? '≈' : ' '}${z.zeit}` : '  –'
-  const meta = [z.anbieter, z.folgen].filter(Boolean).join(' · ')
+  const meta = metaText(z)
   return (
     <Box key={key} flexDirection="row">
       <Box width={ZEIT_BREITE} flexShrink={0}>

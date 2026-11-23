@@ -9,9 +9,7 @@ export interface Reiter {
 }
 
 /** Staffeln einer deutschen Staffelteilung (Pokémon Horizonte): Geschwister mit demselben Sammeltitel, nach Staffelnummer. */
-function ausSammeltitel(title: Title, titel: Title[]): Reiter[] {
-  const sammel = title.staffelTitel?.sammel
-  if (sammel === undefined) return []
+function ausSammeltitel(sammel: number, titel: Title[]): Reiter[] {
   return titel
     .filter((t) => t.staffelTitel?.sammel === sammel)
     .sort((a, b) => a.staffelTitel!.nr - b.staffelTitel!.nr)
@@ -24,8 +22,8 @@ function ausHauptstaffeln(teile: FranchiseMember[], reihenName: string): Reiter[
   const stand = staffelStaende(haupt, reihenName)
   const text = staffelBeschriftungen(haupt, reihenName)
   return haupt
-    .filter((m) => stand.has(m.id) && text.has(m.id))
-    .sort((a, b) => stand.get(a.id)!.staffel - stand.get(b.id)!.staffel || (stand.get(a.id)!.bis ?? 0) - (stand.get(b.id)!.bis ?? 0) || a.id - b.id)
+    .filter((m) => text.has(m.id))
+    .sort((a, b) => stand.get(a.id)!.staffel - stand.get(b.id)!.staffel || a.id - b.id)
     .map((m) => ({ id: m.id, label: text.get(m.id)!.replace(/^Staffel\s+/, ''), name: m.name }))
 }
 
@@ -34,6 +32,6 @@ function ausHauptstaffeln(teile: FranchiseMember[], reihenName: string): Reiter[
  * (ein Film oder Special hat keine Reiter). Alles kommt aus den Daten der Seite, nichts ist ergänzt.
  */
 export function reiterVon(title: Title, teile: FranchiseMember[], reihenName: string, titel: Title[]): Reiter[] {
-  const liste = title.staffelTitel ? ausSammeltitel(title, titel) : ausHauptstaffeln(teile, reihenName)
+  const liste = title.staffelTitel ? ausSammeltitel(title.staffelTitel.sammel, titel) : ausHauptstaffeln(teile, reihenName)
   return liste.length >= 2 && liste.some((r) => r.id === title.id) ? liste : []
 }

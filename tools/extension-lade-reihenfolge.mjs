@@ -29,7 +29,8 @@ export function ladeZugriffe(code) {
     if (istGlobalAk(n) && t === 0) {
       const p = n.parent
       const ziel = ts.isBinaryExpression(p) && p.left === n && p.operatorToken.kind === ts.SyntaxKind.EqualsToken
-      ;(ziel ? schreibt : liest).add(n.name.text)
+      const menge = ziel ? schreibt : liest
+      menge.add(n.name.text)
     }
     ts.forEachChild(n, (k) => gehe(k, t))
   }

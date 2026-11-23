@@ -41,7 +41,6 @@ tools/cache-holen.mjs # Altbestand 12.11.2026, Test fehlt
 tools/cartoon-termine-messen.mjs # Altbestand 12.11.2026, Test fehlt
 tools/check-cache-abhaengigkeit.mjs # Altbestand 12.11.2026, Test fehlt
 tools/check-logic-historie.d.mts # Altbestand 12.11.2026, Test fehlt
-tools/check-pfade.mjs # Altbestand 12.11.2026, Test fehlt
 tools/cover-nach-r2.mjs # Altbestand 12.11.2026, Test fehlt
 tools/cr-blockwahl.d.mts # Altbestand 12.11.2026, Test fehlt
 tools/cr-katalogblock.d.mts # Altbestand 12.11.2026, Test fehlt

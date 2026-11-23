@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url'
 
 const SKRIPT = fileURLToPath(new URL('./check-pfade.mjs', import.meta.url))
 const git = (cwd, ...args) => {
-  const r = spawnSync('git', args, { cwd, encoding: 'utf8' })
+  const r = spawnSync('git', args, { cwd, encoding: 'utf8', timeout: 60_000 })
   assert.equal(r.status, 0, `git ${args.join(' ')}: ${r.stderr}`)
 }
 
@@ -22,7 +22,7 @@ function lauf(pfade) {
       writeFileSync(join(wurzel, p), 'x')
     }
     git(wurzel, 'add', '-A')
-    const r = spawnSync(process.execPath, [SKRIPT], { cwd: wurzel, encoding: 'utf8' })
+    const r = spawnSync(process.execPath, [SKRIPT], { cwd: wurzel, encoding: 'utf8', timeout: 60_000 })
     return { status: r.status, aus: r.stdout, fehler: r.stderr }
   } finally {
     rmSync(wurzel, { recursive: true, force: true })

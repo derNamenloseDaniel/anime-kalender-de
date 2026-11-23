@@ -1,27 +1,17 @@
-import type { ComponentProps } from 'react'
-import { PanelBuehne } from '../../src/components/detail/buehne.tsx'
 import { mockup } from '../register.ts'
-import { StaffelAbschnitt } from './staffel-abschnitt-teile.tsx'
-
-/** Variante A: der echte Kopf (Bild, Name, Merken), darunter der Abschnitt mit allen Staffeln der Serie. */
-function KopfMitStaffeln(eigenschaften: ComponentProps<typeof PanelBuehne>) {
-  return (
-    <>
-      <PanelBuehne {...eigenschaften} />
-      <StaffelAbschnitt />
-    </>
-  )
-}
+import { HandlungDerStaffel, KastenMitReitern, KopfMitStaffelCover } from './staffel-abschnitt-teile.tsx'
 
 mockup({
   name: 'staffel-abschnitt',
-  titel: 'Staffeln als Abschnitt der Serie (F157) – Pokémon Horizonte',
+  titel: 'Staffel-Reiter über der Staffelbox (F157) – Beispiel mit 25 Staffeln',
   ausschnitt: 'detailpanel',
   faelle: ['pokemon-horizonte'],
   varianten: {
     A: {
-      ersatz: { PanelBuehne: KopfMitStaffeln },
-      notiz: 'Eine Seite für Horizonte: Kopf einmal, darunter vier Staffeln mit Namen, Folgenzahl, Status, Synchro und Anbietern; die laufende Staffel 4 ist aufgeklappt. Merken gilt für die ganze Serie. Staffeldaten aus horizonte-staffeln.yaml (Stand 23.11.), nicht aus dem Fall.',
+      ersatz: { PanelBuehne: KopfMitStaffelCover, AntwortKasten: KastenMitReitern, HandlungAbschnitt: HandlungDerStaffel },
+      // Die echte Folgenkarte zählt die ganze Serie (122); unter einem Staffelreiter wäre das falsch.
+      stil: '[data-folgen-karte] { display: none; }',
+      notiz: 'Der Staffelabschnitt entfällt. Über der roten Box steht links „Staffeln“, daneben je Staffel ein Reiter mit nur der Nummer (1 bis 25, wischbar). Die laufende Staffel 22 ist orange gefüllt und beim Öffnen gewählt. Der Reiter tauscht Box, Cover und Handlung. Alle Staffeldaten sind ausgedacht (Mockup); die Serie im Kopf ist nur Kulisse.',
     },
   },
 })

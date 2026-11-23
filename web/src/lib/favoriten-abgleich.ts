@@ -56,11 +56,14 @@ export function useFavoritenAbgleich(favorites: Set<number>): void {
     [],
   )
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
-  useEffect(() => {
-    const token = getSyncToken()
-    if (!token || standText(favorites) === gesendeterStand()) return
-    clearTimeout(timer.current)
-    timer.current = setTimeout(() => void abgleichen(token), ENTPRELLUNG_MS)
-    return () => clearTimeout(timer.current)
-  }, [favorites])
+  useEffect(() => sternGeaendert(favorites, timer), [favorites])
+}
+
+/** Nach einer Sternänderung entprellt abgleichen; gibt das Aufräumen für den Effekt zurück. */
+export function sternGeaendert(favorites: Set<number>, timer: { current?: ReturnType<typeof setTimeout> }): (() => void) | undefined {
+  const token = getSyncToken()
+  if (!token || standText(favorites) === gesendeterStand()) return
+  clearTimeout(timer.current)
+  timer.current = setTimeout(() => void abgleichen(token), ENTPRELLUNG_MS)
+  return () => clearTimeout(timer.current)
 }

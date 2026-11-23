@@ -10,8 +10,12 @@
  * Aufruf (nur `tools/commit-data.sh`):
  *   node tools/quarantaene.mjs sammeln <prüfprotokoll> <liste.json>   Exit 0: Liste um die neuen Marken ergänzt; Exit 1: sperren (Grund auf stdout)
  *   node tools/quarantaene.mjs text <meta.json>                       Exit 0: eine Zeile für DATEN_WARNUNG; Exit 1: nichts zurückgestellt
+ *   node tools/quarantaene.mjs schuldige <prüfprotokoll> [<liste.json>]  Exit 0: schuldige Titel des abgebrochenen Baus nach `schuldigenPfad` geschrieben
+ *                                                                     (Leser: `tools/sammler-zuruecknehmen.mjs` über `tools/sammler-herkunft.mjs`)
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 export const MARKE = 'QUARANTAENE '
@@ -50,6 +54,16 @@ export function entscheide(alt, marken) {
   return { liste }
 }
 
+/** Wo ein abgebrochener Bau seine schuldigen Titel ablegt: außerhalb des Repos, damit `git clean` der Sammler-Zurücknahme sie nicht löscht. */
+export const schuldigenPfad = (env) => join(env.RUNNER_TEMP || tmpdir(), 'bau-schuldige.json')
+
+/** Alle Titel, an denen der Abbruch rot war: die schon zurückgestellten und die Marken des letzten Prüfprotokolls, je Kennung einmal. */
+export function schuldigeTitel(marken, zurueckgestellt) {
+  const liste = []
+  for (const m of [...zurueckgestellt, ...marken]) if (!liste.some((e) => e.titleId === m.titleId)) liste.push(m)
+  return liste.sort((a, b) => a.titleId - b.titleId)
+}
+
 /** Kurztext für die Statusanzeige: Kennung und Prüfung je Titel. */
 export function warnText(liste) {
   return `${liste.length} Titel zurückgestellt: ${liste.map((e) => `${e.titleId} (${e.pruefung})`).join(', ')}`
@@ -58,8 +72,14 @@ export function warnText(liste) {
 /** Fehlt die Datei, ist nichts zurückgestellt (erster Prüflauf, Bau ohne Quarantäne). */
 const liesListe = (pfad) => (existsSync(pfad) ? JSON.parse(readFileSync(pfad, 'utf8')) : [])
 
-export function main(args) {
+export function main(args, env = process.env) {
   const [befehl, a, b] = args
+  if (befehl === 'schuldige' && a) {
+    const liste = schuldigeTitel(liesMarken(readFileSync(a, 'utf8')), b ? liesListe(b) : [])
+    writeFileSync(schuldigenPfad(env), JSON.stringify({ laufId: env.GITHUB_RUN_ID ?? '', schuldige: liste }, null, 2) + '\n')
+    console.log(`Schuldige Titel des Abbruchs: ${liste.length ? liste.map((e) => `${e.titleId} (${e.pruefung})`).join(', ') : 'keine Titelkennung im Protokoll'}`)
+    return 0
+  }
   if (befehl === 'text' && a) {
     const liste = liesListe(a).quarantaene ?? []
     if (!liste.length) return 1

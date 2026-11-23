@@ -14,7 +14,9 @@ import { dienstFetch } from './dienstFetch.ts'
  *
  * Grenze, die bleibt: Der Schlüssel liegt in genau dem Browser, in dem
  * bestätigt wurde. Wer auf einem zweiten Gerät Favoriten setzt, muss dort
- * einmal den Abgleich-Link aus einer Mail öffnen.
+ * einmal den Abgleich-Link aus einer Mail öffnen. Ab da holt
+ * `favoriten-abgleich.ts` bei jedem Öffnen auch den Serverstand (seit 23.11.2026;
+ * vorher ging der Abgleich nur vom Gerät zum Server, das zweite Gerät veraltete).
  */
 const TOKEN_KEY = 'newsletterSyncToken'
 const SENT_KEY = 'newsletterSyncSent'
@@ -84,6 +86,10 @@ export function setSyncToken(token: string): void {
   localStorage.setItem(TOKEN_KEY, token)
   melden()
 }
+
+/** Stand des letzten erfolgreichen Abgleichs (Basis der Vereinigung); `null` = noch nie. */
+export const gesendeterStand = (): string | null => localStorage.getItem(SENT_KEY)
+export const merkeGesendet = (text: string): void => localStorage.setItem(SENT_KEY, text)
 
 export function clearSyncToken(): void {
   localStorage.removeItem(TOKEN_KEY)

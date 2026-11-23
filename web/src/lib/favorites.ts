@@ -24,6 +24,9 @@ export function favoritenErgaenzen(ids: number[]): void {
   favoritesSet.write(jetzt)
 }
 
+export const lesFavoriten = (): Set<number> => favoritesSet.read()
+export const favoritenSetzen = (ids: Set<number>): void => favoritesSet.write(ids)
+
 export function useFavorites(): {
   favorites: Set<number>
   isFavorite: (id: number) => boolean

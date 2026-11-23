@@ -1,4 +1,5 @@
 import { log, readJson } from '../lib/util.ts'
+import { mitHandvorrang } from '../lib/tmdb-von-hand.ts'
 import type { Fsk, Title } from '../../shared/types.ts'
 
 const FSK_STUFEN: readonly number[] = [0, 6, 12, 16, 18]
@@ -59,7 +60,7 @@ export function uebernehmeFskAusJustwatch({ titles, tmdbMehrdeutig }: {
       gesetzt++
     } else if (title.fsk !== stufe) abweichend++
   }
-  const tmdb = readJson<Record<string, { fsk?: Fsk }>>('data/tmdb-titles.json', {})
+  const tmdb = mitHandvorrang(readJson<Record<string, { fsk?: Fsk }>>('data/tmdb-titles.json', {}))
   const fehler = fskQuelleFehler(titles.values(), (id) => tmdb[String(id)]?.fsk)
   if (fehler.length) throw new Error(`FSK aus JustWatch widerspricht der Zusicherung:\n${fehler.slice(0, 10).join('\n')}`)
   log(

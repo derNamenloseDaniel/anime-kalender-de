@@ -1,6 +1,7 @@
 import { resolve } from 'node:path'
 import type { Title } from '../../shared/types.ts'
 import { ROOT, readJson } from '../lib/util.ts'
+import { mitHandvorrang } from '../lib/tmdb-von-hand.ts'
 import { crFolgentitel, ladeCrArchiv, mitCrTiteln, type CrSerie } from './folgentitel-cr.ts'
 import { crFolgentitelGeteilt } from './folgentitel-cr-geteilt.ts'
 import { tmdbFolgentitel, type TmdbEintrag } from './folgentitel-tmdb.ts'
@@ -36,7 +37,7 @@ export function ladeTitelQuellen(): TitelQuellen {
   return {
     crSerien: new Map(cr.filter((s) => s.katalog === 'de').map((s) => [s.url, s])),
     tmdbFolgen: readJson('data/tmdb-folgen.json', {}),
-    tmdbNamen: readJson('data/tmdb-titles.json', {}),
+    tmdbNamen: mitHandvorrang(readJson('data/tmdb-titles.json', {})),
     kitsu: readJson('data/kitsu-folgen.json', {}),
     rtlplus: readJson<{ titel?: Record<string, RtlplusEintrag> }>('data/rtlplus-folgen.json', {}).titel ?? {},
     hand: ladeHandTitel(resolve(ROOT, 'data/folgentitel-hand.yaml')),

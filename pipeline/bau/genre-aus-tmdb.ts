@@ -1,4 +1,5 @@
 import { log, readJson } from '../lib/util.ts'
+import { mitHandvorrang } from '../lib/tmdb-von-hand.ts'
 import { ANIMATION } from '../lib/tmdb-genre.ts'
 import type { Title } from '../../shared/types.ts'
 
@@ -33,7 +34,7 @@ export function genresAusTmdb(genreIds: number[] | undefined): string[] {
  * **Titel ohne Genre aus AniList/aniSearch bekommen TMDBs Genres — als Rückfall gekennzeichnet (`genreQuelle: 'tmdb'`).**
  * TMDB ist grob (viele Titel tragen nur „Animation“); ein vorhandenes Genre bleibt unberührt, mehrdeutige Zuordnungen fallen weg.
  */
-export function uebernehmeGenreAusTmdb({ titles, tmdbMehrdeutig, tmdb = readJson<Record<string, { genreIds?: number[] }>>('data/tmdb-titles.json', {}) }: {
+export function uebernehmeGenreAusTmdb({ titles, tmdbMehrdeutig, tmdb = mitHandvorrang(readJson<Record<string, { genreIds?: number[] }>>('data/tmdb-titles.json', {})) }: {
   titles: Map<number, Title>
   tmdbMehrdeutig: Set<string>
   tmdb?: Record<string, { genreIds?: number[] }>

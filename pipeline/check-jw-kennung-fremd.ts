@@ -4,7 +4,7 @@
  * `data/justwatch-audio.json`. Läuft in `check:logic`.
  */
 import { readFileSync } from 'node:fs'
-import { abweisungsZeile, fremderHalter, geteilteJwKennungen, nimmTreffer, type JwKennungBefund } from './lib/jw-kennung-fremd.ts'
+import { abweisungsZeile, fremderHalter, geteilteJwKennungen, jahrFremd, nimmTreffer, type JwKennungBefund } from './lib/jw-kennung-fremd.ts'
 
 let fehler = 0
 let geprueft = 0
@@ -56,6 +56,16 @@ pruefe('Erwartet als Zeichenkette wie bei JustWatch wird verglichen', nimmTreffe
 /* Auflage 4: die Warnzeile nennt Zahl und Titelnamen. */
 const zeile = abweisungsZeile(['Fancy Nancy: Fancy It Yourself (-112652, Halter -80056)', 'Ranking of Kings: Schatzkiste (153452, Halter 113717)'])
 pruefe('Warnzeile mit WARNUNG, Zahl und beiden Namen', zeile.startsWith('⚠ WARNUNG') && zeile.includes('2 Treffer') && zeile.includes('Fancy It Yourself') && zeile.includes('Schatzkiste'), zeile)
+
+/* Jahresprobe (23.11.2026): JustWatch hängt TMDB 1310387 (Yotsuba Succession Arc, 2026) an die Seite des Films von 2017. */
+const knotenJahr = (jahr: number | null | undefined) => ({ content: { originalReleaseYear: jahr } })
+const yotsuba = { format: 'MOVIE', jpYear: 2026 }
+pruefe('Film 2026 gegen JustWatch-Seite von 2017: fremd', jahrFremd(yotsuba, knotenJahr(2017)))
+pruefe('Film 2026 gegen Jahr 2025 oder 2027 (±1): nicht fremd', !jahrFremd(yotsuba, knotenJahr(2025)) && !jahrFremd(yotsuba, knotenJahr(2027)))
+pruefe('Ohne JustWatch-Jahr: nicht fremd', !jahrFremd(yotsuba, knotenJahr(null)) && !jahrFremd(yotsuba, knotenJahr(undefined)))
+pruefe('Serie bleibt ausgenommen', !jahrFremd({ format: 'TV', jpYear: 2026 }, knotenJahr(2017)))
+pruefe('Deutsche Erstausgabe nahe am JustWatch-Jahr genügt', !jahrFremd({ format: 'MOVIE', jpYear: 1988, deErstausgabe: { von: '2017-05-01' } }, knotenJahr(2017)))
+pruefe('Ohne eigenes Jahr: nicht fremd', !jahrFremd({ format: 'MOVIE' }, knotenJahr(2017)))
 
 /* Auflage 3: eingefrorener Ausschnitt des alten Bestands (origin/main de6aef969 vom 04.11.2026) — der Wächter muss darauf rot sein. */
 const ALT: Record<string, JwKennungBefund> = {

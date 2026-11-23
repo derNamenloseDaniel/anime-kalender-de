@@ -4508,3 +4508,7 @@ Wenn eine Prime-Staffelseite zwei AniList-Titeln zugeschrieben wird, die Zahlen 
 
 - **Higurashi (934/1889):** B09JZHRQ18 (26 Folgen, gti 64ed5868) ist Staffel 1 = 934; der Block für 1889 an dieser Adresse (Messung 11.11.2026, Kanal-Titel) ist entfernt. Kai führt B09KX2VLPR (24 Folgen plus Bonusfolge 25).
 - **Hyouka (12189/13469):** B0B5JVJKCD (13 Folgen) = Folgen 1–12 plus OVA; B0DC75L8BJ (10 Folgen, gti 5f6a4c2e) = Folgen 13–22, gehört nur 12189; der OVA-Block an B0DC75L8BJ ist entfernt. Folge 4 fehlt auf B0B5JVJKCD, nicht Teil dieser Zuordnung.
+
+## JustWatch: Film anderen Jahres unter derselben TMDB-Kennung (23.11.2026)
+
+JustWatch verknüpft TMDB-Kennungen auch falsch: 1310387 (TMDB: „Yotsuba Succession Arc“, 2026, AniList 178707) führt dort zur Seite `tm282890` des Films von 2017 (Amazon-Adresse B07KL1ZV6B = AniList 21684, deutscher Ton). Der Tiefendurchlauf schrieb daraus Angebote mit deutschem Ton an den Film von 2026 (PR 4686: `erschienenOhneTermin` 1 Treffer, 178707 fehlte im gebauten Bestand — Ursache des zweiten Befunds ist Vermutung, der Bau war ohne Cache nicht reproduzierbar). Regel: `jahrFremd` (`lib/jw-kennung-fremd.ts`) weist bei Filmen einen Treffer ab, dessen JustWatch-Jahr um mehr als eins von `jpYear` und deutscher Erstausgabe abweicht; die abgewiesene Antwort überschreibt auch einen vorhandenen Befund (kein „verfehlt, alte Antwort behalten“). Serien sind ausgenommen. Ein schon geschriebener falscher Befund heilt erst beim nächsten Abruf des Titels (Befunde älter als 20 Tage sind fällig).

@@ -40,6 +40,20 @@ export function nimmTreffer<T extends { id: string }>(
   return halter === undefined ? { treffer: gefunden } : { halter }
 }
 
+/**
+ * Ein Film, dessen Erscheinungsjahr bei JustWatch um mehr als eins von unserem abweicht, ist ein anderer Film: JustWatch verknüpft
+ * TMDB-Kennungen auch falsch (23.11.2026: 1310387 = „Yotsuba Succession Arc“ (2026) hängt dort an der Seite des Films von 2017, samt
+ * deutschem Amazon-Ton). Serien bleiben ausgenommen, ihr JustWatch-Jahr ist nicht immer der Start.
+ */
+export function jahrFremd(
+  titel: { format?: string; jpYear?: number; deErstausgabe?: { von?: string } },
+  knoten: { content: { originalReleaseYear?: number | null } },
+): boolean {
+  const jahr = knoten.content.originalReleaseYear
+  const unsere = [titel.jpYear, Number(titel.deErstausgabe?.von?.slice(0, 4))].filter((j): j is number => Number.isFinite(j) && Number(j) > 0)
+  return titel.format === 'MOVIE' && typeof jahr === 'number' && unsere.length > 0 && unsere.every((j) => Math.abs(j - jahr) > 1)
+}
+
 /** Die Logzeile für abgewiesene Treffer: sonst bliebe der richtige Titel still `ohneTreffer`, wenn zuerst der falsche Halter gespeichert wurde. */
 export function abweisungsZeile(namen: string[]): string {
   return `⚠ WARNUNG JustWatch: ${namen.length} Treffer abgewiesen, die Kennung gehört schon einer anderen TMDB-Reihe: ${namen.join('; ')}`

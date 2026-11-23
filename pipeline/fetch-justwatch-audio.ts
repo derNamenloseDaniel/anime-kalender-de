@@ -43,7 +43,7 @@ import yaml from 'js-yaml'
 import { fetchJson, log, readJson, sleep, warn, writeJson } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
 import { istUnplausibel } from './lib/justwatch-plausibel.ts'
-import { abweisungsZeile, nimmTreffer } from './lib/jw-kennung-fremd.ts'
+import { abweisungsZeile, jahrFremd, nimmTreffer } from './lib/jw-kennung-fremd.ts'
 import { besterNamensTreffer, type NamensTreffer } from './lib/jw-namenstreffer.ts'
 import { todayIso } from '../shared/time.ts'
 import type { Title } from '../shared/types.ts'
@@ -194,12 +194,14 @@ async function sucheUeberNamen(t: Title, erwartet: number | string, w: Welt): Pr
   return { naeherung: besterNamensTreffer(namen, alle, erwartet) }
 }
 
-/** Findet die Namenssuche den Titel nicht, fragt der Lauf einmal über den gespeicherten Pfad nach (`lib/jw-nachfrage.ts`). */
-async function sucheOderNachfrage(t: Title, erwartet: number, vorher: Befund | undefined, w: Welt): Promise<{ treffer?: JwKnoten; naeherung?: NamensTreffer }> {
-  const gesucht = await sucheUeberNamen(t, erwartet, w)
-  if (gesucht.treffer || !darfNachfragen(vorher, erwartet)) return gesucht
-  await w.pause()
-  return { ...gesucht, treffer: await nachfrageUeberPfad(vorher.jwPfad, erwartet, w.abruf, ENDPUNKT, UA) }
+/** Findet die Namenssuche den Titel nicht, fragt der Lauf einmal über den gespeicherten Pfad nach (`lib/jw-nachfrage.ts`); `jahrFremd`: der Treffer ist ein Film anderen Jahres. */
+async function sucheOderNachfrage(t: Title, erwartet: number, vorher: Befund | undefined, w: Welt): Promise<{ treffer?: JwKnoten; naeherung?: NamensTreffer; jahrFremd?: boolean }> {
+  let ergebnis = await sucheUeberNamen(t, erwartet, w)
+  if (!ergebnis.treffer && darfNachfragen(vorher, erwartet)) {
+    await w.pause()
+    ergebnis = { ...ergebnis, treffer: await nachfrageUeberPfad(vorher.jwPfad, erwartet, w.abruf, ENDPUNKT, UA) }
+  }
+  return ergebnis.treffer && jahrFremd(t, ergebnis.treffer) ? { naeherung: ergebnis.naeherung, jahrFremd: true } : ergebnis
 }
 
 /** Titel mit frischem Kino- oder Disc-Termin aus den veröffentlichten Terminen (`jw-frische.ts`). */
@@ -213,10 +215,10 @@ function frischeAusTermine(): Set<number> {
  * **Eine verfehlte Suche löscht keine gute Antwort** (17.09.2026). Die Suche geht über den Namen, und ihre Trefferliste
  * schwankt; ohne diesen Zweig verlor ein Titel bei einem Fehlgriff alle Angebote — und mit ihnen seine Wege im Kalender.
  */
-function verbucheFehlschlag(bestand: Record<string, Befund>, schluessel: string, erwartet: number | undefined, naeherung?: NamensTreffer): boolean {
+function verbucheFehlschlag(bestand: Record<string, Befund>, schluessel: string, erwartet: number | undefined, naeherung?: NamensTreffer, jahrFremd = false): boolean {
   const vorher = bestand[schluessel]
   /* Ein Befund mit fremder TMDB-Kennung (Magister Negi Magi: 16950 statt 8859) gehört einem anderen Titel und bleibt nicht stehen. */
-  const kennungFremd = erwartet !== undefined && vorher?.tmdbId !== undefined && Number(vorher.tmdbId) !== erwartet
+  const kennungFremd = jahrFremd || (erwartet !== undefined && vorher?.tmdbId !== undefined && Number(vorher.tmdbId) !== erwartet)
   if (vorher && !vorher.ohneTreffer && vorher.jwId && !kennungFremd) {
     bestand[schluessel] = { ...vorher, geprueftAm: todayIso(), verfehltAm: todayIso() }
     return true
@@ -366,14 +368,14 @@ async function frageOffene(offen: Title[], limit: number, tmdb: Record<string, {
         sauber „0 zugeordnet, 0 Fehler" — der erste Probelauf am 07.09.2026 tat
         genau das, an fünf Titeln, deren Treffer JustWatch alle kannte.
       */
-      const { treffer: gefunden, naeherung } = erwartet ? await sucheOderNachfrage(t, erwartet, bestand[String(t.id)], w) : { treffer: undefined, naeherung: undefined }
+      const { treffer: gefunden, naeherung, jahrFremd: jahrAbgewiesen } = erwartet ? await sucheOderNachfrage(t, erwartet, bestand[String(t.id)], w) : { treffer: undefined, naeherung: undefined, jahrFremd: false }
       /* Eine Kennung, die schon eine andere TMDB-Reihe hält, ist ein Fehlgriff von JustWatch (Spin-off auf Hauptserie). */
       const { treffer, halter } = nimmTreffer(bestand, String(t.id), gefunden, erwartet)
       if (halter) z.abgewiesen.push(`${t.titleDe || t.titleRomaji || t.titleEn} (${t.id}, Halter ${halter})`)
       sperrenInFolge = 0
       const vorher = bestand[String(t.id)]
       if (!treffer) {
-        if (verbucheFehlschlag(bestand, String(t.id), erwartet, naeherung)) z.verfehlt++
+        if (verbucheFehlschlag(bestand, String(t.id), erwartet, naeherung, jahrAbgewiesen)) z.verfehlt++
         else z.ohneTrefferNeu++
         continue
       }

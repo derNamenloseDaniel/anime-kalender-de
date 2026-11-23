@@ -56,17 +56,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
-UID:steel-ball-run-2nd-3rd-stage@2026-11-20@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261120T080000Z
-DTEND:20261120T083000Z
-SUMMARY:JoJo's Bizarre Adventure: Steel Ball Run – 2nd & 3rd STAGE – Fo
- lge 10/12
-DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nDetai
- ls: https://anime-kalender.de/t/16796/
-CATEGORIES:Netflix
-END:VEVENT
-BEGIN:VEVENT
 UID:apothecary-diaries-s3-cour1@2026-11-20@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261120T160000Z
@@ -169,17 +158,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
-UID:steel-ball-run-2nd-3rd-stage@2026-11-27@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261127T080000Z
-DTEND:20261127T083000Z
-SUMMARY:JoJo's Bizarre Adventure: Steel Ball Run – 2nd & 3rd STAGE – Fo
- lge 11/12
-DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nDetai
- ls: https://anime-kalender.de/t/16796/
-CATEGORIES:Netflix
-END:VEVENT
-BEGIN:VEVENT
 UID:apothecary-diaries-s3-cour1@2026-11-27@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261127T160000Z
@@ -260,17 +238,6 @@ SUMMARY:Overlord: The Sacred Kingdom
 DESCRIPTION:Plattform: Prime Video\nRelease-Art: Film\nUhrzeit noch nicht b
  estätigt.\nDetails: https://anime-kalender.de/t/12999/
 CATEGORIES:Prime Video
-END:VEVENT
-BEGIN:VEVENT
-UID:steel-ball-run-2nd-3rd-stage@2026-12-04@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261204T080000Z
-DTEND:20261204T083000Z
-SUMMARY:JoJo's Bizarre Adventure: Steel Ball Run – 2nd & 3rd STAGE – Fo
- lge 12/12
-DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nDetai
- ls: https://anime-kalender.de/t/16796/
-CATEGORIES:Netflix
 END:VEVENT
 BEGIN:VEVENT
 UID:apothecary-diaries-s3-cour1@2026-12-04@anime-kalender-de

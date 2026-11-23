@@ -5,6 +5,7 @@ import { DatabaseSync } from 'node:sqlite'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
+import { STAND_MAX_STUNDEN, alterStunden } from './meldungskopie-abfrage.mjs'
 import { entschluessle, tokenOderAbbruch } from './meldungskopie-schluessel.mjs'
 
 export const WORKFLOW = 'meldungskopie.yml'
@@ -22,6 +23,15 @@ export function lokalerStand(datei) {
   } finally {
     db.close()
   }
+}
+
+/** Meldezeile von `holen`: nennt Stand und Alter der Kopie (aus `kopie_stand`, nicht dem Datei-Zeitstempel); "aktuell" heißt nur
+ * "kein neuerer erfolgreicher Lauf", ein verpasster Lauf macht die Kopie trotzdem alt (Befund 18.11.2026: Kopie vom 17.11. galt am 18.11. als aktuell). */
+export function holenZeile(e, ziel, jetzt = new Date()) {
+  const stunden = alterStunden(e.stand, jetzt)
+  const warnung = stunden > STAND_MAX_STUNDEN ? ` — ÄLTER ALS ${STAND_MAX_STUNDEN} h: kein neuerer erfolgreicher Lauf, meldungskopie.yml anstoßen` : ''
+  const was = e.art === 'aktuell' ? 'Kein neuerer Lauf als die Kopie' : `Kopie geholt (Lauf ${e.lauf})`
+  return `${was}, Stand ${e.stand} (vor ${stunden.toFixed(1)} h): ${ziel}${warnung}`
 }
 
 /** `gh(args)` liefert den Text der Ausgabe; die Kopie wird nur geholt, wenn der jüngste erfolgreiche Lauf neuer ist als sie.

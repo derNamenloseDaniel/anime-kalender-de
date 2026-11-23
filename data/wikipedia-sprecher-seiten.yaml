@@ -1,0 +1,29 @@
+# Handliste: de.wikipedia-Seite (Abschnitt „Synchronisation“) -> unsere Titel, für pipeline/lib/wikipedia-sprecher.ts.
+# Stand 22.11.2026, Zuordnung von Hand an den Tabellenköpfen und titles.json (Kennung, Format, jpYear) geprüft.
+# Quelle de.wikipedia, Lizenz CC BY-SA 4.0 (Quellennennung mit Link auf die Versionsgeschichte der Seite).
+# fassung: Teilzeichenkette im `zusatz` der Stimme (Spaltenüberschrift oder <small>-Vermerk); fehlt sie, gilt die ganze Tabelle.
+# Noch ohne Bau-Anschluss; die Fixtures liegen unter pipeline/fixtures/wikipedia-sprecher/.
+- seite: Yū Yū Hakusho
+  fixture: yu-yu-hakusho.wikitext
+  # Die Tabelle belegt ihre deutschen Sprecher mit der Synchronkartei des Films von 1994 (Typ=film), nicht der Serie.
+  titel:
+    - id: 883
+- seite: Grappler Baki
+  fixture: baki.wikitext
+  titel:
+    - id: 287
+      fassung: 1. Serie (2001)
+    - id: 97888
+      fassung: 2. Serie (2018)
+- seite: Meisterdetektiv Ron Kamonohashi
+  fixture: ron-kamonohashi.wikitext
+  # Die Tabelle nennt nur japanische Sprecher: keine deutsche Spalte, nichts zu übernehmen.
+  titel:
+    - id: 158926
+- seite: Ranma ½
+  fixture: ranma.wikitext
+  titel:
+    - id: 210
+      fassung: alte Serie
+    - id: 178533
+      fassung: neue Serie

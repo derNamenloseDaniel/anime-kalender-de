@@ -20,7 +20,8 @@ export function mutantenOhneTestsHinweise(dateien, lies, liesBasis) {
   })
 }
 
-const NEUER_TEST = /^(?!tools\/testdaten\/).*\.test\.(mjs|cjs|js|ts|tsx)$/
+// Hook-Tests unter .claude/hooks heißen `<name>-test.mjs` (18 Dateien, 23.11.2026) und fielen am `.test.`-Muster vorbei.
+const NEUER_TEST = /^(?!tools\/testdaten\/)(?:.*\.test\.(mjs|cjs|js|ts|tsx)|\.claude\/hooks\/[^/]+-test\.mjs)$/
 // Beleg: „rot“ und „Basis“ in einer Zeile (Lehre 152; die rote Ausgabe selbst steht darunter)
 const BASIS_ROT = /Basis[^\n]{0,80}\brot\b|\brot\b[^\n]{0,80}Basis/i
 

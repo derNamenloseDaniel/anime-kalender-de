@@ -1,0 +1,17 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Meisterdetektiv_Ron_Kamonohashi (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-22.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Meisterdetektiv_Ron_Kamonohashi&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+{| class="wikitable sortable"
+!Rolle
+!Japanische Stimme ([[Seiyū]])
+|-
+|Ron Kamonohashi
+|[[Yōhei Azakami]]
+|-
+|Totomaru Ishiki
+|[[Junya Enoki]]
+|-
+|Amamiya
+|[[Yōko Hikasa]]
+|}

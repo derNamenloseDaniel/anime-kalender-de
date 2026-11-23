@@ -361,6 +361,7 @@ pipeline/check-jw-auswahl.ts
 pipeline/check-jw-folgestaffel-bestand-lauf.ts
 pipeline/check-jw-folgestaffel.ts
 pipeline/check-jw-frisch-lauf.ts
+pipeline/check-jw-jahr-fremd-lauf.ts
 pipeline/check-jw-kennung-fremd-lauf.ts
 pipeline/check-jw-kennung-fremd.ts
 pipeline/check-jw-main-naht.ts

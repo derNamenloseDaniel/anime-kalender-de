@@ -110,3 +110,5 @@ Ergänzt die Klasse K1 in `bauer.md`/`pruefer.md`; Anlässe stehen in `lehren.md
 - **Wächter-Muster deckt alle Schreibweisen (Lehre 130, 17.11.2026, PR 4097):** Ein Muster gegen eine Schreibweise deckt alle Varianten derselben Klasse ab (Strichzahl, Leerraum, Verkettung), der Test hat je Variante einen Fall (`file:///` vs. `file://` war unter Windows stumm).
 
 **Wächter über Reihenfolge oder Anwesenheit: jede geordnete Karte ist im Testfall Pflicht (Lehre 166, PR 4384, 20.11.2026):** Eine Prüfung „falls vorhanden“ (`neu < 0` geduldet) lief seit PR 4365 leer durch, weil der Fall keine Neuigkeit hatte; je Karte ein Fall, in dem sie fehlt und der Wächter rot wird.
+
+**Neue Abweisungsregel in einem Sammler (PR 4724, 23.11.2026):** Sie braucht einen Kulissenlauf durch den echten Abrufweg (Fetch-Attrappe, Fälle mit und ohne vorhandenen Befund, über die Nachfrage, Gegenfall knapp innerhalb der Grenze) plus einen Log-Zähler mit Namen; der Unit-Test der Hilfsfunktion allein deckt die Verdrahtung nicht (Mutant `Hilfsfunktion(...)` zu `false` überlebte alle Tests), und ohne Namen im Log bleibt eine falsche Abweisung unsichtbar.

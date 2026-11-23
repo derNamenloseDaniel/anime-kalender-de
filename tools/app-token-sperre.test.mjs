@@ -83,7 +83,7 @@ const zweiter = (vorne) => (s) => {
 }
 erwarte('zweiter Schritt mit dem Token davor', zweiter(true), /Job urteilen: das App-Token sehen 2 Stellen/)
 erwarte('zweiter Schritt mit dem Token danach', zweiter(false), /Job urteilen: das App-Token sehen 2 Stellen/)
-erwarte('Token als Job-Output', (s) => { job(s, ...MERGEN.slice(0, 2)).outputs = { t: TOKEN } }, /Job nachholen: das App-Token sehen 2 Stellen \(steps\.\d+, outputs\.t\)/)
+erwarte('Token als Job-Output', (s) => { job(s, ...MERGEN.slice(0, 2)).outputs = { t: TOKEN } }, /Job nachholen: das App-Token sehen 2 Stellen \((steps\.\d+, outputs\.t|outputs\.t, steps\.\d+)\)/)
 erwarte('toJSON(steps) in einem späteren Schritt', (s) => { job(s, ...MERGEN.slice(0, 2)).steps.push({ run: 'echo "${{ toJSON(steps) }}"' }) }, /Job nachholen: das App-Token sehen 2 Stellen/)
 erwarte('steps[…]-Schreibweise', (s) => { job(s, ...MERGEN.slice(0, 2)).steps.push({ run: "echo \"${{ steps['app'].outputs.token }}\"" }) }, /Job nachholen: das App-Token sehen 2 Stellen/)
 erwarte('Token-Schritt ohne Verbraucher', (s) => { const j = job(s, ...MERGEN.slice(0, 2)); j.steps = j.steps.filter((x) => x.name !== MERGEN[2]) }, /Job nachholen: das App-Token sehen 0 Stellen/)

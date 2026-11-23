@@ -13,7 +13,8 @@ name: Claude — Daten-PR zusammenführen
 #
 # **Warum nicht `workflow_dispatch` aus dem Sammel-Lauf heraus?** Ein Workflow,
 # den das GITHUB_TOKEN auslöst, startet keine weiteren Workflows — GitHub
-# verhindert damit Endlosschleifen. `workflow_run` fällt nicht darunter. Der
+# verhindert damit Endlosschleifen. `workflow_run` und `workflow_dispatch`
+# fallen nicht darunter (letzteres nutzt der Job `anstossen`). Der
 # Lauf hängt deshalb hinter den Sammlern und sieht selbst nach, ob es etwas zu
 # tun gibt; ist nichts offen, endet er nach wenigen Sekunden.
 
@@ -28,6 +29,10 @@ on:
       - 'Claude — Wache durchsehen'
     types: [completed]
   workflow_dispatch:
+    inputs:
+      durchgang:
+        description: 'Nummer des Durchgangs (nur der Selbstanstoß setzt sie)'
+        default: '1'
 
 permissions:
   contents: write
@@ -74,6 +79,8 @@ jobs:
   # Konfliktfreie Daten-Pull-Requests, die offen geblieben sind (Merge des Sammlers gescheitert): mit dem Token der App nachholen, rot wenn auch das scheitert.
   nachholen:
     needs: pruefen
+    outputs:
+      nachlauf: ${{ steps.mergen.outputs.nachlauf }}
     if: needs.pruefen.outputs.mergebar != ''
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -92,13 +99,17 @@ jobs:
           permission-pull-requests: write
 
       - name: Mergebare Daten-Pull-Requests mergen
+        id: mergen
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           NUMMERN: ${{ needs.pruefen.outputs.mergebar }}
         run: bash tools/daten-pr-mergen.sh $NUMMERN
 
+
   zusammenfuehren:
     needs: pruefen
+    outputs:
+      nachlauf: ${{ steps.mergen.outputs.nachlauf }}
     if: needs.pruefen.outputs.offen != '0'
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -226,10 +237,12 @@ jobs:
           permission-pull-requests: write
 
       - name: Aufgelöste Pull Requests mergen
+        id: mergen
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           NUMMERN: ${{ needs.pruefen.outputs.nummern }}
         run: bash tools/daten-pr-mergen.sh ${NUMMERN//,/ }
+
 
       - name: Lauf abmelden
         continue-on-error: true
@@ -237,3 +250,26 @@ jobs:
         env:
           LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
         run: bash "$MELDER" "${{ job.status == 'success' && 'ok' || job.status == 'cancelled' && 'abgebrochen' || 'fehler' }}"
+
+  # Nach einem Merge steht ein weiterer PR wieder im Konflikt: nächster Durchgang. Eigener Job, damit `actions: write` nicht bei Claude (Bash) liegt.
+  anstossen:
+    needs: [nachholen, zusammenfuehren]
+    if: ${{ !cancelled() && (needs.nachholen.outputs.nachlauf != '' || needs.zusammenfuehren.outputs.nachlauf != '') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      - name: Nächsten Durchgang anstoßen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DURCHGANG: ${{ inputs.durchgang || '1' }}
+          NACHLAUF: ${{ needs.nachholen.outputs.nachlauf }} ${{ needs.zusammenfuehren.outputs.nachlauf }}
+        run: |
+          # Obergrenze: ein PR, den kein Durchgang konfliktfrei bekommt, macht den Lauf rot statt endlos Claude-Kontingent zu verbrauchen.
+          if [ "$DURCHGANG" -ge 3 ]; then
+            echo "::error::Pull Request(s) $NACHLAUF nach $DURCHGANG Durchgängen weiter im Konflikt."
+            exit 1
+          fi
+          echo "Nach dem Merge im Konflikt: $NACHLAUF"
+          gh workflow run claude-daten-merge.yml --repo "$GITHUB_REPOSITORY" --ref main -f durchgang=$((DURCHGANG + 1))

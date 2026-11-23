@@ -104,6 +104,23 @@ Seitdem gilt:
   Der Bau liefe dann 26-mal am Tag doppelt, jedes Mal mit einer Zeile in der
   Statusanzeige. Ein Konflikt ist der Ausnahmefall, und eine Stunde Verzug ist
   dort verkraftbar.
+
+  **Mehrere Konflikt-PRs: Nachlauf statt Verlust (23.11.2026, Lauf 45183026486).**
+  Claude löste 4679 und 4676 nacheinander auf; `daten-pr-mergen.sh` mergte 4679, main
+  bewegte sich, 4676 stand wieder im Konflikt, der Lauf endete rot. Klasse: jeder Lauf mit
+  mehr als einem Konflikt-PR verliert alle außer dem ersten (gleiche Cache-Dateien).
+  Jetzt meldet das Skript einen PR, der erst nach einem Merge desselben Laufs im Konflikt
+  steht, als `nachlauf=<Nummern>` in `$GITHUB_OUTPUT` (Notice, kein Fehler, Ausgang 0), und der
+  Job `anstossen` (läuft auch nach rotem Merge-Job, `!cancelled()`) startet
+  `claude-daten-merge.yml` per `workflow_dispatch` mit dem GITHUB_TOKEN (Ausnahme vom
+  Schleifenschutz). `actions: write` hat nur dieser Job, nicht Claude (Bash). Ohne Merge im
+  Lauf bleibt ein Konflikt rot und stößt nichts an. Obergrenze: Eingabe `durchgang` (1, 2, 3);
+  ab Durchgang 3 wird `anstossen` rot statt neu anzustoßen, ein unlösbarer PR verbraucht so
+  nicht endlos Claude-Kontingent. Verworfen: Claude mergt je PR sofort (sein Token umgeht das
+  Ruleset nicht); mechanisches `git merge origin/main` ohne Claude (Datenkonflikte entscheidet
+  Claude). Test: `tools/daten-pr-mergen.test.mjs` (Skript-Fälle und Verdrahtung des
+  Workflows). **Prüftermin:** nach dem ersten Lauf mit zwei Konflikt-PRs prüfen, ob der zweite
+  Durchgang startet (nicht im echten Lauf belegt).
 - **`Bestand — zusammenführen und bauen` führt zusammen**: Meldungen einarbeiten,
   Rohfolgen zuordnen, bauen, Arbeitslisten, Vorschaubilder, `check:bestand`,
   `data:check`. Er hängt per `workflow_run` an allen dreien und **darf rot

@@ -312,7 +312,7 @@ export function Button({
 
 export function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+    <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-ak-leise">
       {children}
     </h2>
   )

@@ -72,7 +72,7 @@ export function KastenWegeHinweis({ pillen, wegeHinweis, antwort }: {
               'flex min-h-[2.1rem] items-center text-t4',
               antwort.art === 'kino'
                 ? 'text-ak-favorit-text'
-                : 'text-slate-500 dark:text-slate-400',
+                : 'text-ak-leise',
             ].join(' ')}
           >
             {wegeHinweis}
@@ -96,7 +96,7 @@ export function KastenSchnitt({ schnitt }: {
               <li key={w}>{w}</li>
             ))}
           </ul>
-          <p className="mt-1 text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-ak-leise">
             Quellen:{' '}
             {schnitt.quellen.map((q, i) => (
               <span key={q}>

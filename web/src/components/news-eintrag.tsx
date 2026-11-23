@@ -60,7 +60,7 @@ export function NewsEintragInhalt({ umschalten, e, auf, erste, t, arten, sortier
               {erste.teil}
             </span>
           ) : (
-            <span className="truncate text-xs text-slate-500 dark:text-slate-400">
+            <span className="truncate text-xs text-ak-leise">
               {newsKurz(erste)}
               {e.meldungen.length > 1 && (
                 <span> · {t('news.weitere', { n: e.meldungen.length - 1 })}</span>
@@ -76,7 +76,7 @@ export function NewsEintragInhalt({ umschalten, e, auf, erste, t, arten, sortier
               </span>
             ))}
             {erste.teil && erste.teil !== e.titel && (
-              <span className="min-w-0 truncate text-xs text-slate-500 dark:text-slate-400">
+              <span className="min-w-0 truncate text-xs text-ak-leise">
                 {newsKurz(erste)}
                 {e.meldungen.length > 1 && (
                   <span> · {t('news.weitere', { n: e.meldungen.length - 1 })}</span>

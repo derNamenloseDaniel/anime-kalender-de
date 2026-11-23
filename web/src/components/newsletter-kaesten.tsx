@@ -79,7 +79,7 @@ export function WiederherstellenKasten({ t, zeigeGeraet, abmeldeState, setRestor
                 fragt, der zweite handelt. Kein Dialogfenster — die Frage steht
                 an derselben Stelle, an der auch der Knopf stand.
               */}
-              {abmeldeState === 'weg' && <span className="text-[13px] text-slate-500 dark:text-slate-400">{t('news.unsubDone')}</span>}
+              {abmeldeState === 'weg' && <span className="text-[13px] text-ak-leise">{t('news.unsubDone')}</span>}
             </div>
           </>
         ) : (
@@ -118,7 +118,7 @@ export function WiederherstellenKasten({ t, zeigeGeraet, abmeldeState, setRestor
             </button>
           </form>
         )}
-        <p className="mt-2 text-[13px] text-slate-500 dark:text-slate-400">{t('news.restoreSafety')}</p>
+        <p className="mt-2 text-[13px] text-ak-leise">{t('news.restoreSafety')}</p>
           </>
         )}
       </Card>
@@ -184,7 +184,7 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
                   onChange={() => setFrequency(value)}
                 />
                 <span className="block font-medium text-slate-800 dark:text-slate-100">{label}</span>
-                <span className="block text-xs text-slate-500 dark:text-slate-400">{hint}</span>
+                <span className="block text-xs text-ak-leise">{hint}</span>
               </label>
             ))}
           </div>
@@ -194,7 +194,7 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
           <p className="font-medium text-slate-700 dark:text-slate-200">
             ★ {t('news.favorites', { count: favorites.size })}
           </p>
-          <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+          <p className="mt-0.5 text-xs text-ak-leise">
             {favorites.size > 0 ? t('news.favoritesHint') : t('news.favoritesNone')}
           </p>
           {/*

@@ -83,6 +83,16 @@
   sources:
     - https://bluray-disc.de/blu-ray-filme/79524-hakuoki_demon_of_the_fleeting_blossom_warrior_spirit_of_the_blue_sky
     - https://www.synchronkartei.de/film/33713
+# Hakuoki Wild Dance of Kyoto (Film 1) — bluray-disc.de: KSM, „20.06.2016", „Deutsch DTS-HD MA 5.1" (Datum und Tonspur aus dem Suchtreffer gelesen, Seite aus der Cloud nicht abrufbar, 22.11.2026);
+# Anime2You 657813 (09.03.2023): ProSieben MAXX zeigt „die Filme als deutsche TV-Premiere … mit deutscher Vertonung", Film 1 am 31.03.2023; Programmvorschau 663989: „Freitag 22:10 Uhr: Hakuoki – The Movie 1 (NEU: Film)".
+- anilistId: 13117
+  title: 'Hakuoki: Demon of the Fleeting Blossom - Wild Dance of Kyoto'
+  von: '2016-06-20'
+  publisher: 'KSM'
+  sources:
+    - https://bluray-disc.de/blu-ray-filme/79523-hakuoki_demon_of_the_fleeting_blossom_wild_dance_of_kyoto
+    - https://www.anime2you.de/news/657813/prosieben-maxx-zeigt-hakuoki-filme/
+    - https://www.anime2you.de/news/663989/prosieben-maxx-anime-programm-13-2023/
 # Yo-Kai Watch — fernsehserien.de: „Deutsche TV-Premiere 09.05.2016 Nickelodeon".
 - anilistId: 19157
   title: 'Yo-Kai Watch'

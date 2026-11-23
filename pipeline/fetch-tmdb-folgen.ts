@@ -25,7 +25,7 @@
  * (`lib/tmdb-folgen-auswahl.ts`).
  *
  * **Lückentitel** (`lib/tmdb-folgen-luecke.ts`): Titel mit Folgen im belegt deutschen Bereich ohne deutschen Titel und ohne Eintrag
- * kommen zuerst dran, auch ohne Anbieter. Der Bau übernimmt daraus nur Titel, die nicht englisch und kein „Folge N" sind (`folgentitel-tmdb.ts`).
+ * kommen zuerst dran, auch ohne Anbieter; ohne Dub-Bereich gilt jeder offene Folgentitel (`abrufLuecke`). Der Bau übernimmt daraus nur Titel, die nicht englisch und kein „Folge N" sind (`folgentitel-tmdb.ts`).
  * TMDB-Grenze (developer.themoviedb.org/docs/rate-limiting, 24.10.2026): Obergrenze ≈ 40 Anfragen/s, 429 beachten; hier 120 ms Pause ≈ 8/s.
  *
  * Aufruf: `npx tsx pipeline/fetch-tmdb-folgen.ts [--limit N] [--alter TAGE] [--nur-luecke]`
@@ -34,7 +34,8 @@ import { loadEnv, fetchJson, log, readJson, sleep, warn, writeJson } from './lib
 import { recordSource } from './lib/health.ts'
 import type { Title } from '../shared/types.ts'
 import { todayIso } from '../shared/time.ts'
-import { dubLuecke, streicheFremdeKennungen, waehleAbrufe, type FolgenDatei } from './lib/tmdb-folgen-luecke.ts'
+import { abrufLuecke, streicheFremdeKennungen, waehleAbrufe, type FolgenDatei } from './lib/tmdb-folgen-luecke.ts'
+import { FORMATE } from './bau/folgentitel-tmdb.ts'
 import { istSerie404, type Vermerk404 } from './lib/tmdb-folgen-404.ts'
 
 const args = process.argv.slice(2)
@@ -142,7 +143,9 @@ async function main(): Promise<void> {
     .map((t) => ({ t, id: String(t.id), tmdb: tmdbTitles[String(t.id)] }))
     .filter((x) => x.tmdb?.tmdbId && x.tmdb.kind !== 'movie')
 
-  const luecke = (id: string): number => dubLuecke(readJson<FolgenDatei | undefined>(`public/data/folgen/${id}.json`, undefined))
+  // Die Folgenzahl zählt nur dort, wo der Bau TMDB-Titel verwenden darf (`tmdbFolgentitel`: Serienformat, ab sechs Folgen); OVA und Specials kosteten nur Abrufe.
+  const episoden = new Map(alle.map((x) => [x.id, FORMATE.has(x.t.format ?? '') && (x.t.episodes ?? 0) >= 6 ? (x.t.episodes as number) : 0]))
+  const luecke = (id: string): number => abrufLuecke(readJson<FolgenDatei | undefined>(`public/data/folgen/${id}.json`, undefined), episoden.get(id) ?? 0)
   const fehlt = readJson<Record<string, Vermerk404>>('data/tmdb-folgen-404.json', {})
   const offen = waehleAbrufe({ alle, bestand, heute: todayIso(), alterTage: ALTER_TAGE, limit: LIMIT, nurLuecke: NUR_LUECKE, luecke, fehlt })
 

@@ -29,6 +29,8 @@ const MODULE = [
   ['anker-wache.js', 'grund'],
   // Merge-Riegel (09.11.2026, PR 3266): gh pr merge nur mit node tools/pr-nachrechnen.mjs davor.
   ['merge-riegel.js', 'grund'],
+  // PR-Create-Sperre (23.11.2026, Lehre 232): kein rohes gh pr create; PR nur über bash tools/pr-einreichen.sh (Vorprüfung).
+  ['pr-create-sperre.js', 'grund'],
   // Subagenten-Schreibsperre (PR 2942): bauer, pruefer, analyst schreiben nie im Hauptordner.
   ['subagent-schreibsperre.js', 'grund'],
   // Vorrat-Sperre (25.10.2026, F63): vorrat/*.md erst nach Bericht löschen oder verschieben (Marke `# nach-bericht`).

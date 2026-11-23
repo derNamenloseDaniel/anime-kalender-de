@@ -2182,6 +2182,24 @@
     "1075001": {
       "am": "2026-11-23",
       "vorschlaege": 7
+    },
+    "1075044": {
+      "am": "2026-11-23",
+      "vorschlaege": 1
+    },
+    "1075066": {
+      "am": "2026-11-23",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075095": {
+      "am": "2026-11-23",
+      "vorschlaege": 1
+    },
+    "1075107": {
+      "am": "2026-11-23",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
     }
   },
   "vorschlaege": [
@@ -17029,6 +17047,48 @@
       "artikelId": "1074979",
       "artikel": "Trailer zum »Assassin«-Arc der dritten »Reincarnated Aristocrat«-Staffel",
       "quelle": "https://www.anime2you.de/news/1074979/reincarnated-aristocrat-staffel-3-assassin-arc-trailer/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "The Girl Downstairs",
+      "zitat": "Hierzulande bietet ADN alle Episoden im chinesischen Originalton mit deutschen Untertiteln auf Abruf an.",
+      "art": "sprachfassung",
+      "sprache": "omu",
+      "plattform": "adn",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "ADN",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1075095",
+      "artikel": "Zweite »The Girl Downstairs«-Staffel erscheint früher + Teaser",
+      "quelle": "https://www.anime2you.de/news/1075095/the-girl-downstairs-staffel-2-erscheint-frueher/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "The Daily Life of the Immortal King",
+      "zitat": "Der Streaming-Dienst Crunchyroll hat alle Episoden der vorangegangen fünf Staffeln der Fantasy-Serie in der chinesischen Originalfassung mit deutschen Untertiteln im Programm.",
+      "art": "sprachfassung",
+      "sprache": "omu",
+      "plattform": "crunchyroll",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1075044",
+      "artikel": "»The Daily Life of the Immortal King« erhält sechste Staffel + Trailer",
+      "quelle": "https://www.anime2you.de/news/1075044/the-daily-life-of-the-immortal-king-staffel-6-angekuendigt/",
       "veroeffentlicht": "2026-11-23",
       "gelesenAm": "2026-11-23"
     }

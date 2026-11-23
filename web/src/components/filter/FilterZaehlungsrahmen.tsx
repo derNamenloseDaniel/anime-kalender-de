@@ -10,6 +10,10 @@ export interface ZaehlKern {
   releasesByTitle: Map<number, Release[]>
   /** Staffeln sind zusammengefasst: die Zahl nennt dann Karten, nicht Titel. */
   gruppiert: boolean
+  /** Die gewählte Sortierung: nur „Relevanz" listet laufende Staffeln einer Reihe einzeln (`ordneListe`). */
+  sort: string
+  /** Mit Suchtext fasst die Liste keine Staffeln zusammen (`istGruppiert`). */
+  suche: string
 }
 
 /**
@@ -18,8 +22,8 @@ export interface ZaehlKern {
  */
 export function FilterZaehlungsrahmen({ kern, children }: { kern?: ZaehlKern; children: ReactNode }) {
   const { wert } = useZeitscheibe<FilterZaehlung | null>(
-    () => (kern ? zaehleFilterGen(kern.titel, kern.releasesByTitle, todayIso(), kern.gruppiert) : nichts()),
-    [kern?.titel, kern?.releasesByTitle, kern?.gruppiert],
+    () => (kern ? zaehleFilterGen(kern.titel, kern.releasesByTitle, todayIso(), kern.gruppiert, kern.sort, kern.suche) : nichts()),
+    [kern?.titel, kern?.releasesByTitle, kern?.gruppiert, kern?.sort, kern?.suche],
     null,
   )
   return <FilterZaehlungContext.Provider value={wert ?? undefined}>{children}</FilterZaehlungContext.Provider>

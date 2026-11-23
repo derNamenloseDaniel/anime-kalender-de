@@ -60,3 +60,5 @@ Am ersten Fall (Yaiba live bei „Disc aus", Kalender-Auge ändert die Datenbank
 10. **„verfügbar" → „Streambar"** kam mit S5 (Tippfläche 44 px über `TIPPFLAECHE_HOCH`).
 
 11. **Zählprobe 23.11.2026 (Beobachtung nach S5):** Live „Cartoon 922, Treffer 907" und „Prime Video 954, Treffer 953" waren eine Messlücke, kein Zählfehler: die Gruppe „Ohne bekannten Termin" (15 bzw. 1) steht am Listenende und erscheint erst nach „weitere anzeigen"; die Summe der Köpfe davor fehlt genau diese Gruppe. Gemessen wird die Zählzeile über der Liste (922). Echter Fund dabei: bei zusammengefassten Staffeln zählte der Chip Reihen, die Liste zeigt laufende und kommende Staffeln einzeln (`ordneListe`); Chip und Liste rechnen jetzt dieselbe Funktion. `check-filter-zaehlung-bestand.ts` prüft gegen die Quelle der Seite samt `cartoons.json` und gegen `ordneListe`.
+
+12. **Nebenbefund, offen (23.11.2026):** Am Handy schließt sich das Filterfenster in `#/datenbank`, wenn ein Chip per drittem Klick auf „aus" zurückgesetzt wird (in `#/woche` nicht). Vermutet: `useVerlaufEintrag` schließt bei `popstate`, sobald die Adresse wieder der beim Öffnen entspricht; nicht gemessen.

@@ -150,11 +150,11 @@ function schlageVor(listen, umhaengen) {
   return geaendert
 }
 
-/** Wächter vor dem Push: Befunde von ankerRot für den Diff gegen origin/main (ohne origin/main: nichts zu prüfen). */
+/** Wächter vor dem Push: Befunde von ankerRot für den Diff gegen origin/main (ohne origin/main: nichts zu prüfen); ANKER_BASIS ersetzt die Basis (Test im flachen CI-Checkout ohne origin/main). */
 function diffRot() {
-  let basis
+  let basis = process.env.ANKER_BASIS
   try {
-    basis = execFileSync('git', ['merge-base', 'origin/main', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
+    basis ||= execFileSync('git', ['merge-base', 'origin/main', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
   } catch {
     console.log('Mutationsanker (Diff): kein origin/main, nichts geprüft')
     return []

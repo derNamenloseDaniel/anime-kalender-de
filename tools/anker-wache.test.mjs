@@ -31,6 +31,7 @@ try {
   const ziel = join(wt, 'pipeline/lib/beleg-marken.ts')
   const quelle = readFileSync(ziel, 'utf8')
   assert.ok(quelle.includes(ZEILE), 'Probe-Anker steht in der Quelle')
+  process.env.ANKER_BASIS = git('rev-parse', 'HEAD').trim() // CI hat keinen origin/main (flacher Checkout)
   const push = { tool_name: 'Bash', cwd: wt, tool_input: { command: 'git push -u origin x' } }
   const commit = (text, msg) => {
     writeFileSync(ziel, text)

@@ -205,9 +205,23 @@ function jetztDateien(text, lies, aenderung) {
       continue
     }
     const inhalt = lies(pfad)
-    if (inhalt != null) meldungen.push(...dateiAufbau(kennung[0], inhalt, aenderung(pfad)))
+    if (inhalt == null) continue
+    meldungen.push(...dateiAufbau(kennung[0], inhalt, aenderung(pfad)))
+    if (ERST_WENN.test(inhalt)) meldungen.push(`Jetzt: ${kennung[0]} — die Datei sagt „erst handeln, wenn …“, die Zeile gehört nach „### Später“ mit {wartet: …} (wartet-auf.mjs holt sie von selbst zurück)`)
   }
   return meldungen
+}
+
+const ERST_WENN = /^> ⚠ \*\*(?:Kann veraltet sein|Verfallen):\*\*.*erst handeln, wenn/m
+
+/** ⏳-Zeilen unter „### Später“, die auf eine Jetzt-Datei verlinken und kein `{wartet: …}` tragen: sonst holt sie nichts zurück und sie wird vergessen (Daniel, 23.11.2026). */
+function spaeterOhneBedingung(zeilen) {
+  const kopf = zeilen.findIndex((z) => z.startsWith('### Später'))
+  if (kopf < 0) return []
+  let ende = zeilen.findIndex((z, i) => i > kopf && z.startsWith('#'))
+  if (ende < 0) ende = zeilen.length
+  const ohne = zeilen.slice(kopf + 1, ende).filter((z) => z.startsWith('- ⏳') && /\(file:\/\/\/[^)]*\/jetzt\/[^)]*\.md/.test(z) && !/\{wartet:[^}]*\}/.test(z))
+  return ohne.length ? [`Später: ${aufzaehlung(ohne)} verlinkt eine Jetzt-Datei ohne {wartet: …} — sonst holt sie nichts zurück (Syntax: Skill daniel-dateien-pflegen)`] : []
 }
 
 /** Meldungstext oder '' (alles in Ordnung). `existiert` prüft Dateipfade (Standard fs.existsSync), `lies` liest Jetzt-Dateien, `aenderung` liefert deren Änderungszeit. */
@@ -218,7 +232,7 @@ function waechter(text, jetzt, existiert = fs.existsSync, lies = liesDatei, aend
 /** Meldungen zu den Abschnitten von stand.md als ein Text oder ''. */
 function waechterAbschnitte(text, jetzt) {
   const zeilen = text.split(/\r?\n/)
-  const meldungen = [...jetztZeilen(zeilen), ...naechstes(zeilen), ...terminZeilen(zeilen), ...zukunft(zeilen, jetzt)]
+  const meldungen = [...jetztZeilen(zeilen), ...naechstes(zeilen), ...terminZeilen(zeilen), ...spaeterOhneBedingung(zeilen), ...zukunft(zeilen, jetzt)]
   const kopf = zeilen.findIndex((z) => z.startsWith('## In Arbeit'))
   // Ein leeres stand.md darf nicht „ok“ heißen (15.11.2026: `sed -i "${n}d"` mit leerem n leerte die Datei).
   if (!text.trim()) return LEER
@@ -241,4 +255,4 @@ function waechterAbschnitte(text, jetzt) {
   return meldungen.join('; ')
 }
 
-module.exports = { MAX_ZEILEN, MAX_ALTER, LEER, waechter, aenderungVon }
+module.exports = { MAX_ZEILEN, MAX_ALTER, LEER, waechter, aenderungVon, berlinEpoche }

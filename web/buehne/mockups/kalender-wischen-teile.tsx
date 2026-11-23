@@ -23,7 +23,7 @@ function Rand({ seite, anteil, text }: { seite: 'links' | 'rechts'; anteil: numb
   return (
     <span
       aria-hidden="true"
-      className={`pointer-events-none absolute top-24 z-10 rounded-full bg-ak-akzent px-3 py-1 text-t4 font-semibold text-ak-auf-akzent ${seite === 'links' ? 'left-2' : 'right-2'}`}
+      className={`pointer-events-none fixed top-1/2 z-10 -translate-y-1/2 rounded-full bg-ak-akzent px-3 py-1 text-t4 font-semibold text-ak-auf-akzent ${seite === 'links' ? 'left-2' : 'right-2'}`}
       style={{ opacity: anteil }}
     >
       {text}
@@ -49,7 +49,6 @@ export function KalenderMitWischen(p: Eigenschaften) {
     const y = e.clientY - start.current.y
     if (!bewegt.current && Math.abs(x) > HALT && Math.abs(x) > 2 * Math.abs(y)) {
       bewegt.current = true
-      e.currentTarget.setPointerCapture(e.pointerId)
       setZieht(true)
     }
     if (bewegt.current) setDx(x)

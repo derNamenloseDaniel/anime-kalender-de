@@ -1,4 +1,5 @@
 import { readJson, log } from '../lib/util.ts'
+import { mitHandvorrang } from '../lib/tmdb-von-hand.ts'
 import { type MotnDaten, LEER as MOTN_LEER } from '../lib/motn.ts'
 import { type PlatformId, type Release, type Title } from '../../shared/types.ts'
 import { todayIso } from '../../shared/time.ts'
@@ -77,7 +78,7 @@ export function ergaenzeAngebotSeit({ slim, releases, titles, quellen }: { slim:
   const changes = quellen?.changes ?? readJson<MotnChanges>('data/motn-changes.json', {})
   const monatsstand = quellen?.motn ?? readJson<MotnDaten>('data/motn.json', MOTN_LEER)
   const motnDaten = mitFeedSeit(monatsstand, changes)
-  const tmdbFuerTermine = quellen?.tmdb ?? readJson<Record<string, TmdbKennung>>('data/tmdb-titles.json', {})
+  const tmdbFuerTermine = quellen?.tmdb ?? mitHandvorrang(readJson<Record<string, TmdbKennung>>('data/tmdb-titles.json', {}))
   const nachImdb = new Map(
     Object.entries(motnDaten.shows ?? {}).map(([k, v]) => [v.imdbId ?? k, v]),
   )

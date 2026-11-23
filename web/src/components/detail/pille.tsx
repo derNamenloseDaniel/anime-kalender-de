@@ -53,8 +53,8 @@ export function Pille({ name, farbe, url, unten, titel, icon, durchgestrichen, s
       <span className="flex min-w-0 flex-col">
         <span className={`text-t3 font-semibold ${durchgestrichen ? 'line-through' : ''}`}>{name}</span>
         {unten && <span className="text-t4 text-ak-leise">{unten}</span>}
+        {status}
       </span>
-      {status}
     </a>
   )
   const kopf = titel ? (
@@ -111,12 +111,17 @@ export function DubStatus({ art }: { art: DubStatusArt }) {
   const { t } = useLang()
   const kopfOffen = useContext(KopfSagtOffen)
   if (art === 'offen' && kopfOffen) return null
+  const text = t(STATUS_TEXT[art])
+  /* Der unsichtbare Zwilling ohne Höhe gibt der Pille mindestens die Breite ihrer Blase; sonst ragt die rechtsbündige Blase an schmalen Pillen (Joyn) links heraus. */
   return (
-    <span
-      className={`absolute -right-0.5 -top-3.5 inline-flex h-5 items-center whitespace-nowrap rounded-full px-2 text-t5 font-bold ring-2 ring-[color:var(--kasten,transparent)] ${STATUS_KLASSE[art]}`}
-    >
-      {t(STATUS_TEXT[art])}
-    </span>
+    <>
+      <span
+        className={`absolute -right-0.5 -top-3.5 inline-flex h-5 items-center whitespace-nowrap rounded-full px-2 text-t5 font-bold ring-2 ring-[color:var(--kasten,transparent)] ${STATUS_KLASSE[art]}`}
+      >
+        {text}
+      </span>
+      <span aria-hidden className="invisible block h-0 overflow-hidden whitespace-nowrap text-t5 font-bold">{text}</span>
+    </>
   )
 }
 

@@ -94,6 +94,8 @@ interface Befund {
   verfehltAm?: string
   /** Nur bei `ohneTreffer`: bester Namenstreffer mit abweichender TMDB-Kennung — gespeichert, nie zugeordnet (`lib/jw-namenstreffer.ts`). */
   namenTreffer?: NamensTreffer
+  /** Das Erscheinungsjahr, das JustWatch zur Seite führt (seit 23.11.2026) — macht messbar, wie oft `jahrFremd` greift. */
+  jahr?: number | null
   /** Zugeordnet über Namen, Jahr und Art statt über eine TMDB-Kennung unserer Seite (`lib/jw-namenssuche.ts`, seit 06.11.2026). */
   ueberName?: boolean
 }
@@ -194,14 +196,14 @@ async function sucheUeberNamen(t: Title, erwartet: number | string, w: Welt): Pr
   return { naeherung: besterNamensTreffer(namen, alle, erwartet) }
 }
 
-/** Findet die Namenssuche den Titel nicht, fragt der Lauf einmal über den gespeicherten Pfad nach (`lib/jw-nachfrage.ts`); `jahrFremd`: der Treffer ist ein Film anderen Jahres. */
-async function sucheOderNachfrage(t: Title, erwartet: number, vorher: Befund | undefined, w: Welt): Promise<{ treffer?: JwKnoten; naeherung?: NamensTreffer; jahrFremd?: boolean; jahrJw?: number }> {
+/** Findet die Namenssuche den Titel nicht, fragt der Lauf einmal über den gespeicherten Pfad nach (`lib/jw-nachfrage.ts`); `jahrAbgewiesen`: das JustWatch-Jahr eines Treffers, der ein Film anderen Jahres ist. */
+async function sucheOderNachfrage(t: Title, erwartet: number, vorher: Befund | undefined, w: Welt): Promise<{ treffer?: JwKnoten; naeherung?: NamensTreffer; jahrAbgewiesen?: number }> {
   let ergebnis = await sucheUeberNamen(t, erwartet, w)
   if (!ergebnis.treffer && darfNachfragen(vorher, erwartet)) {
     await w.pause()
     ergebnis = { ...ergebnis, treffer: await nachfrageUeberPfad(vorher.jwPfad, erwartet, w.abruf, ENDPUNKT, UA) }
   }
-  return ergebnis.treffer && jahrFremd(t, ergebnis.treffer) ? { naeherung: ergebnis.naeherung, jahrFremd: true, jahrJw: ergebnis.treffer.content.originalReleaseYear ?? undefined } : ergebnis
+  return ergebnis.treffer && jahrFremd(t, ergebnis.treffer) ? { naeherung: ergebnis.naeherung, jahrAbgewiesen: ergebnis.treffer.content.originalReleaseYear as number } : ergebnis
 }
 
 /** Titel mit frischem Kino- oder Disc-Termin aus den veröffentlichten Terminen (`jw-frische.ts`). */
@@ -215,10 +217,10 @@ function frischeAusTermine(): Set<number> {
  * **Eine verfehlte Suche löscht keine gute Antwort** (17.09.2026). Die Suche geht über den Namen, und ihre Trefferliste
  * schwankt; ohne diesen Zweig verlor ein Titel bei einem Fehlgriff alle Angebote — und mit ihnen seine Wege im Kalender.
  */
-function verbucheFehlschlag(bestand: Record<string, Befund>, schluessel: string, erwartet: number | undefined, naeherung?: NamensTreffer, jahrFremd = false): boolean {
+function verbucheFehlschlag(bestand: Record<string, Befund>, schluessel: string, erwartet: number | undefined, naeherung?: NamensTreffer, jahrAbgewiesen?: number): boolean {
   const vorher = bestand[schluessel]
   /* Ein Befund mit fremder TMDB-Kennung (Magister Negi Magi: 16950 statt 8859) gehört einem anderen Titel und bleibt nicht stehen. */
-  const kennungFremd = jahrFremd || (erwartet !== undefined && vorher?.tmdbId !== undefined && Number(vorher.tmdbId) !== erwartet)
+  const kennungFremd = jahrAbgewiesen !== undefined || (erwartet !== undefined && vorher?.tmdbId !== undefined && Number(vorher.tmdbId) !== erwartet)
   if (vorher && !vorher.ohneTreffer && vorher.jwId && !kennungFremd) {
     bestand[schluessel] = { ...vorher, geprueftAm: todayIso(), verfehltAm: todayIso() }
     return true
@@ -235,6 +237,7 @@ function verbucheFehlschlag(bestand: Record<string, Befund>, schluessel: string,
     tmdbId: erwartet,
     erstAm: vorher?.erstAm ?? todayIso(),
     ...(naeherung ? { namenTreffer: naeherung } : {}),
+    ...(jahrAbgewiesen !== undefined ? { jahr: jahrAbgewiesen } : {}),
   }
   return false
 }
@@ -281,6 +284,7 @@ function befundVonNamenstreffer(vorher: Befund | undefined, treffer: JwKnoten, t
     tmdbId,
     jwPfad: treffer.content.fullPath,
     altersangabe: treffer.content.ageCertification ?? null,
+    jahr: treffer.content.originalReleaseYear ?? null,
     staffeln: staffelnVon(treffer.seasons),
     angebote: angeboteVon(treffer.offers),
     ueberName: true,
@@ -368,11 +372,11 @@ async function frageOffene(offen: Title[], limit: number, tmdb: Record<string, {
         sauber „0 zugeordnet, 0 Fehler" — der erste Probelauf am 07.09.2026 tat
         genau das, an fünf Titeln, deren Treffer JustWatch alle kannte.
       */
-      const { treffer: gefunden, naeherung, jahrFremd: jahrAbgewiesen, jahrJw } = erwartet ? await sucheOderNachfrage(t, erwartet, bestand[String(t.id)], w) : { treffer: undefined, naeherung: undefined, jahrFremd: false }
+      const { treffer: gefunden, naeherung, jahrAbgewiesen } = erwartet ? await sucheOderNachfrage(t, erwartet, bestand[String(t.id)], w) : { treffer: undefined, naeherung: undefined, jahrAbgewiesen: undefined }
       /* Eine Kennung, die schon eine andere TMDB-Reihe hält, ist ein Fehlgriff von JustWatch (Spin-off auf Hauptserie). */
-      if (jahrAbgewiesen) z.jahrAbgewiesen.push(`${t.titleDe || t.titleRomaji || t.titleEn} (${t.id}, JustWatch-Jahr ${jahrJw})`)
       const { treffer, halter } = nimmTreffer(bestand, String(t.id), gefunden, erwartet)
       if (halter) z.abgewiesen.push(`${t.titleDe || t.titleRomaji || t.titleEn} (${t.id}, Halter ${halter})`)
+      if (jahrAbgewiesen !== undefined) z.jahrAbgewiesen.push(`${t.titleDe || t.titleRomaji || t.titleEn} (${t.id}, JW-Jahr ${jahrAbgewiesen})`)
       sperrenInFolge = 0
       const vorher = bestand[String(t.id)]
       if (!treffer) {
@@ -390,6 +394,7 @@ async function frageOffene(offen: Title[], limit: number, tmdb: Record<string, {
         tmdbId: erwartet,
         jwPfad: treffer.content.fullPath,
         altersangabe: treffer.content.ageCertification ?? null,
+        jahr: treffer.content.originalReleaseYear ?? null,
         staffeln: staffelnVon(treffer.seasons),
         angebote,
       }
@@ -453,7 +458,7 @@ export async function main(args: string[] = process.argv.slice(2), welt: Welt = 
 
   log(
     `JustWatch: ${getroffen} Titel zugeordnet (${leer} ohne Angebot), ${mitDeutsch} davon mit deutscher Tonspur, ` +
-      `${ohneTrefferNeu} ohne Treffer, ${verfehlt} verfehlt (alte Antwort behalten), ${fehler} Fehler.`,
+      `${ohneTrefferNeu} ohne Treffer, ${verfehlt} verfehlt (alte Antwort behalten), ${jahrAbgewiesen.length} per Jahr abgewiesen, ${fehler} Fehler.`,
   )
   if (abgewiesen.length) warn(abweisungsZeile(abgewiesen))
   if (jahrAbgewiesen.length) warn(jahrAbweisungsZeile(jahrAbgewiesen))

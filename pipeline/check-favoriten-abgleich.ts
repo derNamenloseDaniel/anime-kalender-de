@@ -140,4 +140,56 @@ const fremd = (readdirSync(wurzel, { recursive: true }) as string[])
   .map((d) => d.replaceAll('\\', '/'))
   .filter((d) => /\.tsx?$/.test(d) && !erlaubt.has(d) && /pushFavorites\(/.test(readFileSync(new URL(d, wurzel), 'utf8')))
 pruefe('pushFavorites nur im Abgleich und im Mail-Link (kein blindes Überschreiben)', fremd.length === 0, fremd)
+const altSchreiber = (readdirSync(wurzel, { recursive: true }) as string[])
+  .filter((d) => /\.tsx?$/.test(d) && /setItem\([^)]*newsletterSyncSent|setItem\(ALT_SENT_KEY/.test(readFileSync(new URL(d, wurzel), 'utf8')))
+pruefe('niemand schreibt den alten Sendestand-Schlüssel', altSchreiber.length === 0, altSchreiber)
+
+/*
+  Echte Module auf vorhandenem Browser-Speicher (Lehre 242): der erste Fix bestand die Attrappen-Prüfung oben
+  und löschte trotzdem, weil ein alter Schlüssel im Speicher lag. Hier laufen favorites.ts, newsletterSync.ts
+  und der Hook-Abgleich auf einem befüllten Speicher und einem Server-Stub.
+*/
+console.log('\nFavoriten-Abgleich auf vorhandenem Speicher (echte Module):')
+const speicher = new Map<string, string>()
+let serverStand: number[] = []
+const hochgeladen: number[][] = []
+let meldungen = 0
+Object.assign(globalThis, {
+  localStorage: { getItem: (k: string) => speicher.get(k) ?? null, setItem: (k: string, w: string) => void speicher.set(k, String(w)), removeItem: (k: string) => void speicher.delete(k) },
+  window: { dispatchEvent: () => ((meldungen++), true), addEventListener: () => undefined, removeEventListener: () => undefined },
+  fetch: async (_url: string, init?: RequestInit) => {
+    if (init?.method === 'POST') {
+      const { favorites } = JSON.parse(String(init.body)) as { favorites: number[] }
+      hochgeladen.push(favorites)
+      serverStand = favorites
+      return new Response(JSON.stringify({ ok: true, count: favorites.length }))
+    }
+    return new Response(JSON.stringify({ ok: true, favorites: serverStand }))
+  },
+})
+const { abgleichen } = await import('../web/src/lib/favoriten-abgleich.ts')
+const sortiert = (k: string) => JSON.stringify((JSON.parse(speicher.get(k) ?? '[]') as number[]).sort((a, b) => a - b))
+function befuelle(eintraege: Record<string, string>, server: number[]): void {
+  speicher.clear()
+  hochgeladen.length = 0
+  meldungen = 0
+  serverStand = server
+  for (const [k, w] of Object.entries({ newsletterSyncToken: 't', ...eintraege })) speicher.set(k, w)
+}
+const tag = '"2026-11-20"'
+
+befuelle({ favorites: '[1,2,3]', newsletterSyncSent: '1,2,3' }, [9])
+await abgleichen('t')
+pruefe('alter Sendestand im Speicher, Server vom Handy überschrieben: nichts geht verloren', sortiert('favorites') === '[1,2,3,9]' && JSON.stringify(hochgeladen) === '[[1,2,3,9]]', { lokal: sortiert('favorites'), hochgeladen })
+pruefe('alter Sendestand ist danach weg, neue Basis gesetzt', !speicher.has('newsletterSyncSent') && speicher.get('favoritenAbgleichBasis') === '1,2,3,9', [...speicher.keys()])
+
+befuelle({ favorites: '[9]', 'favorites:seit': `{"1":${tag},"2":${tag},"3":${tag},"9":${tag}}` }, [9])
+await abgleichen('t')
+pruefe('Gerät nach dem Verlust: Titel der Datums-Ablage kommen zurück und gehen auf den Server', sortiert('favorites') === '[1,2,3,9]' && JSON.stringify(serverStand) === '[1,2,3,9]', { lokal: sortiert('favorites'), serverStand })
+pruefe('Oberfläche erfährt die Wiederherstellung (Änderungsmeldung)', meldungen > 0, meldungen)
+
+speicher.set('favorites', '[1,3,9]')
+speicher.set('favorites:seit', `{"1":${tag},"3":${tag},"9":${tag}}`)
+await abgleichen('t')
+pruefe('danach Entferntes kommt nicht aus der Datums-Ablage zurück', sortiert('favorites') === '[1,3,9]' && JSON.stringify(serverStand) === '[1,3,9]', { lokal: sortiert('favorites'), serverStand })
 if (verletzt) process.exit(1)

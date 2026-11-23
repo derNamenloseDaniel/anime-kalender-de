@@ -27,7 +27,7 @@ function vorbereiten(): void {
 
 /** Ein Abgleich nach dem anderen: Takt und Sternänderung dürfen sich nicht überholen. */
 let kette: Promise<void> = Promise.resolve()
-function abgleichen(token: string): Promise<void> {
+export function abgleichen(token: string): Promise<void> {
   kette = kette
     .then(() => {
       vorbereiten()

@@ -14,6 +14,7 @@
 import { log, readJson, ROOT, warn, writeJson } from './lib/util.ts'
 import { fremdeAdressen } from './lib/fremde-adressen.ts'
 import { abrufMitStempel } from './lib/abruf-stempel.ts'
+import { mitAbbruchMeldung } from './lib/abbruch.ts'
 import { adressIndex, artDerMeldung, folgenDerMeldung, meldungGrund, nameIndex, rohfolgenSpanne, titelDerMeldung, urteileJeFolge, type StaffelKandidat, type Urteil } from './lib/urteil-je-folge.ts'
 import { beobachtungenAusRohfolgen, fremdNach, type RohFolge } from './lib/urteil-rohfolgen.ts'
 import type { Title } from '../shared/types.ts'
@@ -202,4 +203,4 @@ async function main() {
   )
   logOhneTitel()
 }
-if (process.argv[1]?.endsWith('fetch-urteile.ts')) await abrufMitStempel('urteile', ZIEL, main)
+if (process.argv[1]?.endsWith('fetch-urteile.ts')) await mitAbbruchMeldung('urteile', () => abrufMitStempel('urteile', ZIEL, main), 'prime')

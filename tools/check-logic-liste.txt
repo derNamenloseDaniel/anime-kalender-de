@@ -8,6 +8,7 @@ pipeline/check-09-4-1-serien-laufzeit.ts
 pipeline/check-09-4-2-bloecke-laufzeit.ts
 pipeline/check-09-4-3-katalog-laufzeit.ts
 pipeline/check-09-4-4-1-katalog-wege-laufzeit.ts
+pipeline/check-abbruch-folgen-urteile.ts
 pipeline/check-abruf-stempel.ts
 pipeline/check-abruf-stoerung-lauf.ts
 pipeline/check-abstand.ts
@@ -266,7 +267,9 @@ pipeline/check-fetch-pruefungen-seite.ts
 pipeline/check-fetch-pruefungen-unbekannt.ts
 pipeline/check-film-ohne-weg.ts
 pipeline/check-film-serie-filter.ts
+pipeline/check-filter-ebenen.ts
 pipeline/check-filter-genres.ts
+pipeline/check-filter-wege.ts
 pipeline/check-filter-zyklus.ts
 pipeline/check-finale-wache.ts
 pipeline/check-folge-ueber-anzahl-bau.ts
@@ -738,6 +741,7 @@ pipeline/check-verweis-ziel.ts
 pipeline/check-verweise-gedaechtnis.ts
 pipeline/check-verweise-von-hand.ts
 pipeline/check-vorfaelle-ablauf.ts
+pipeline/check-vorlieben-getrennt.ts
 pipeline/check-vorlieben.ts
 pipeline/check-weg-adresse-bezugsweg.ts
 pipeline/check-weg-aus-meldung.ts
@@ -753,6 +757,7 @@ pipeline/check-widerlegung-de-folgen-bau.ts
 pipeline/check-widerlegung-de-folgen.ts
 pipeline/check-widerlegung-eigene-serie.ts
 pipeline/check-wikibis-wegbereiche.ts
+pipeline/check-wikipedia-sprecher.ts
 pipeline/check-woche-beleg.ts
 pipeline/check-woche-groesse.ts
 pipeline/check-woche-neue-serien.ts

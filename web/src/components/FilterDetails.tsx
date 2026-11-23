@@ -14,7 +14,7 @@ import { FilterSuche } from './filter/filter-suchfeld.tsx'
 import { FilterSuchHinweis } from './filter/such-hinweis.tsx'
 import { FilmSerieChips } from './filter/film-serie-gruppe.tsx'
 import { WertungInhalt, wertungTexte } from './filter/wertung-gruppe.tsx'
-import { filterMode, modusVon, toggleFilter, type ModusFeld, type FilterState, type ListKey } from '../lib/filters.ts'
+import { filterMode, modusVon, type ModusFeld, type FilterState, type ListKey } from '../lib/filters.ts'
 import { nachZahlGeordnet } from '../lib/filter-liste.ts'
 import { zyklusFilter } from '../lib/filter-zyklus.ts'
 import { useGenreSicht } from './filter/genre-sicht.tsx'
@@ -325,7 +325,7 @@ export function FilterDetails({
 }) {
   const [mehr, setMehr] = useState(false)
   const suche = bereichsSuche(filterQuery)
-  const plattformen: PlatformId[] = (platformZaehlung ? nachZahlGeordnet(meta.platforms, platformZaehlung) : meta.platforms).filter((p) => p !== 'disc')
+  const plattformen: PlatformId[] = (platformZaehlung ? nachZahlGeordnet(meta.platforms, platformZaehlung) : meta.platforms).filter((p) => p !== 'disc' && !(setTvAn && p === 'tv'))
   const genreSicht = useGenreSicht(genreListe, visibleGenres, filters, !!suche, t)
   const mitZahl = (n: number | undefined) => (n ? <span className="opacity-70">{n}</span> : null)
   const plattformLabel = t('filter.platform')
@@ -373,7 +373,7 @@ export function FilterDetails({
               </Chip>
             ))}
           </Bereich>
-          <Grundgruppen t={t} meta={meta} filters={filters} modusVon2={modusVon2} chipState={chipState} pick={pick} suche={suche} set={set} tRelease={tRelease} />
+          <Grundgruppen t={t} meta={meta} filters={filters} modusVon2={modusVon2} chipState={chipState} pick={pick} suche={suche} set={set} tRelease={tRelease} kalender={Boolean(setTvAn)} />
         </div>
 
         {!suche && <MehrKnopf t={t} mehr={mehr} setMehr={setMehr} />}
@@ -527,7 +527,8 @@ function Grundgruppen({
   suche,
   set,
   tRelease,
-}: Pick<FilterMehrProps, 't' | 'meta' | 'filters' | 'modusVon2' | 'chipState' | 'pick' | 'suche' | 'set' | 'tRelease'>) {
+  kalender,
+}: Pick<FilterMehrProps, 't' | 'meta' | 'filters' | 'modusVon2' | 'chipState' | 'pick' | 'suche' | 'set' | 'tRelease'> & { kalender: boolean }) {
   const statusLabel = t('filter.status')
   const fskLabel = t('filter.fsk')
   const jahrLabel = t('filter.year')
@@ -559,6 +560,8 @@ function Grundgruppen({
         ))}
       </Bereich>
 
+      {/* Im Kalender gibt die Woche den Zeitraum vor; ein Jahr widerspräche ihr bei 5 % der Termine (Plan 22.11.2026). */}
+      {!kalender && (
       <Bereich label={jahrLabel} klasse="sm:col-span-2" suche={suche} texte={meta.years.map(String)} modus={modusVon2('years', filters.years.length)}>
         {meta.years.filter((y) => zeigePille(suche, jahrLabel, String(y))).map((y) => (
           <Chip key={y} {...chipState('years', y)} onClick={() => pick('years', y)}>
@@ -566,6 +569,7 @@ function Grundgruppen({
           </Chip>
         ))}
       </Bereich>
+      )}
     </>
   )
 }
@@ -709,7 +713,7 @@ export function FilterDetailsFeld({
   genreZaehlung?: Map<string, number>
   zwischen?: ReactNode
 }) {
-  const werkzeug = useFilterWerkzeug(meta, filters, onChange, tvAn, setTvAn)
+  const werkzeug = useFilterWerkzeug(meta, filters, onChange)
   return (
     <FilterDetails
       {...werkzeug}
@@ -731,9 +735,6 @@ function useFilterWerkzeug(
   meta: DataMeta,
   filters: FilterState,
   onChange: (next: FilterState) => void,
-  /** Nur im Kalender: der Fernseh-Schalter. Er und der Plattform-Chip „TV" sind derselbe Filter. */
-  tvAn?: boolean,
-  setTvAn?: (an: boolean) => void,
 ) {
   const { t, tGenre, tKeyword, tRelease } = useLang()
   const [filterQuery, setFilterQuery] = useState('')
@@ -745,22 +746,8 @@ function useFilterWerkzeug(
     wert: modusVon(filters, feld),
     setzen: (w: 'und' | 'oder') => set({ modus: { ...filters.modus, [feld]: w } }),
   })
-  /* **Der TV-Schalter und der Plattform-Chip „TV" sind derselbe Filter**:
-     „tv ausblenden ist das selbe wie ausschließen tv". Der Zustand kommt aus dem Schalter, damit
-     beide Stellen denselben Stand zeigen und ein Klick an der einen an der anderen wirkt. Das
-     „Premieren bleiben sichtbar" (19.09.2026) hängt an `tvAus` und bleibt so erhalten. */
-  const istTvChip = (key: ListKey, value: unknown) => key === 'platforms' && value === 'tv' && Boolean(setTvAn)
-  const pick = <K extends ListKey>(key: K, value: FilterState[K][number]) => {
-    if (istTvChip(key, value)) {
-      /* Schnell-Chip „TV" ausgewählt (Plattform TV eingeschlossen): der Tipp hebt die Wahl auf, der Schalter bleibt. */
-      if (filterMode(filters, key, value) === 'include') onChange(toggleFilter(filters, key, value, 'include'))
-      else setTvAn?.(tvAn === false)
-      return
-    }
-    onChange(zyklusFilter(filters, key, value))
-  }
+  const pick = <K extends ListKey>(key: K, value: FilterState[K][number]) => onChange(zyklusFilter(filters, key, value))
   const chipState = <K extends ListKey>(key: K, value: FilterState[K][number]) => {
-    if (istTvChip(key, value)) return { active: tvAn !== false && filterMode(filters, key, value) === 'include', excluded: tvAn === false }
     const state = filterMode(filters, key, value)
     return { active: state === 'include', excluded: state === 'exclude' }
   }

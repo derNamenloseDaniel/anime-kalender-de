@@ -1,0 +1,5 @@
+kategorie: bugfix
+text: "Urteil des Drachen zählt als Staffel 5"
+untertitel: "Seven Deadly Sins zählt Staffeln wie Netflix"
+wartetAuf: "Bestandsbau nach diesem PR. Probe: In public/data/franchises.json trägt 116752 staffelQuelle 5 statt 4, 108928 bleibt Staffel 4 ohne Quelle."
+seit: '2026-11-23'

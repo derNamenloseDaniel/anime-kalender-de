@@ -76,7 +76,7 @@ export function KinoKarussell({
   return (
     <div className="mb-4">
       <div className="mb-1.5 flex items-center justify-between">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-ak-leise">
           {t('news.kino.titel')}
         </h2>
         <div className={ueberlaeuft ? 'hidden gap-1 sm:flex' : 'hidden'}>
@@ -263,9 +263,9 @@ export function NewsView({ data, oeffne }: { data: Dataset; oeffne: (titelId: nu
     <section className="mx-auto w-full max-w-5xl px-3 py-4">
       <div className="mb-2 flex items-baseline justify-between gap-3">
         <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
-          {t('news.titel')} <span className="text-xs font-normal text-slate-500 dark:text-slate-400">· {t('news.seit', { datum: datumKurz(grenze) })}</span>
+          {t('news.titel')} <span className="text-xs font-normal text-ak-leise">· {t('news.seit', { datum: datumKurz(grenze) })}</span>
         </h1>
-        <a href={feedUrl('news.xml')} className="ak-tz text-xs text-slate-500 underline-offset-2 hover:underline dark:text-slate-400" title={t('news.rssHint')}>
+        <a href={feedUrl('news.xml')} className="ak-tz text-xs text-ak-leise underline-offset-2 hover:underline" title={t('news.rssHint')}>
           RSS
         </a>
       </div>
@@ -280,7 +280,7 @@ export function NewsView({ data, oeffne }: { data: Dataset; oeffne: (titelId: nu
       )}
 
       {!meldungen && <Ladeplatz />}
-      {meldungen && !tage.length && <p className="text-sm text-slate-500 dark:text-slate-400">{t('news.leer')}</p>}
+      {meldungen && !tage.length && <p className="text-sm text-ak-leise">{t('news.leer')}</p>}
 
       {tage.map(([tag, alle]) => {
         const { normal, gleich } = teileGleichmelder(alle)

@@ -10,36 +10,6 @@ X-WR-TIMEZONE:Europe/Berlin
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-15#70@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261115T024500Z
-DTEND:20261115T031500Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-15#71@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261115T030500Z
-DTEND:20261115T033500Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:kamisama-kiss-staffel-2-2026-11-15@2026-11-15@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261115
-DTEND;VALUE=DATE:20261116
-SUMMARY:Kamisama Kiss: Staffel 2 (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/7349/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
 UID:auto-223-tv-prosieben-maxx@2026-11-16#72@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261116T161000Z
@@ -186,9 +156,9 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261120T080000Z
 DTEND:20261120T083000Z
 SUMMARY:JoJo's Bizarre Adventure: Steel Ball Run – 2nd & 3rd STAGE – Fo
- lge 10/12
+ lge 9/11
 DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nDetai
- ls: https://anime-kalender.de/t/16796/
+ ls: https://anime-kalender.de/t/17588/
 CATEGORIES:Netflix
 END:VEVENT
 BEGIN:VEVENT
@@ -339,9 +309,9 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261127T080000Z
 DTEND:20261127T083000Z
 SUMMARY:JoJo's Bizarre Adventure: Steel Ball Run – 2nd & 3rd STAGE – Fo
- lge 11/12
+ lge 10/11
 DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nDetai
- ls: https://anime-kalender.de/t/16796/
+ ls: https://anime-kalender.de/t/17588/
 CATEGORIES:Netflix
 END:VEVENT
 BEGIN:VEVENT
@@ -399,9 +369,9 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261204T080000Z
 DTEND:20261204T083000Z
 SUMMARY:JoJo's Bizarre Adventure: Steel Ball Run – 2nd & 3rd STAGE – Fo
- lge 12/12
+ lge 11/11
 DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nDetai
- ls: https://anime-kalender.de/t/16796/
+ ls: https://anime-kalender.de/t/17588/
 CATEGORIES:Netflix
 END:VEVENT
 BEGIN:VEVENT

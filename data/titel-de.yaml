@@ -51,6 +51,38 @@
     - https://www.kino.de/serie/aggretsuko/
     - https://animania.de/netflix-neustart-aggretsuko/
 
+- id: 101343
+  titleDe: "Made in Abyss: Die Reise beginnt"
+  geprueftAm: "2026-11-22"
+  note: "Erster Recap-Film (Leonine Anime, deutsche Fassung); ProSieben MAXX zeigte ihn am 22.10.2021 unter diesem Namen als TV-Premiere."
+  quellen:
+    - https://www.anime2you.de/news/511455/prosieben-maxx-filme-oktober-2021/
+    - https://de.wikipedia.org/wiki/Made_in_Abyss
+
+- id: 103713
+  titleDe: "Pretty Guardian Sailor Moon Eternal: Der Film – Teil 1"
+  geprueftAm: "2026-11-22"
+  note: "Netflix-Fassung mit deutscher Synchro (FFS). TMDB (de-DE) führt „Pretty Guardian Sailor Moon Eternal: Der Film - Teil 1“, Wikipedia „Pretty Guardian Sailor Moon Eternal: Der Film“ mit Teil 1. „Teil 1“ übersetzt „Part 1“ unseres Titels."
+  quellen:
+    - https://www.themoviedb.org/movie/618851?language=de-DE
+    - https://de.wikipedia.org/wiki/Sailor_Moon_Crystal
+
+- id: 102649
+  titleDe: "Psycho-Pass: Sinners of the System – Case.1 Schuld und Sühne"
+  geprueftAm: "2026-11-22"
+  note: "Erster Film der Kazé-Trilogie mit deutscher Fassung (Disc 20.07.2020). Anime2You nennt ihn bei Anime on Demand „Case.1 Schuld und Sühne“, TMDB (de-DE) „Case.1 (Schuld und Sühne)“; die Schreibung folgt Anime2You."
+  quellen:
+    - https://www.anime2you.de/news/375929/aod-virtuelles-event-zur-psycho-pass-ss-trilogie-startet-heute/
+    - https://www.themoviedb.org/movie/510242?language=de-DE
+
+- id: 141352
+  titleDe: "The Seven Deadly Sins: Grudge of Edinburgh Part 1"
+  geprueftAm: "2026-11-22"
+  note: "Der deutsche Titel ist der englische: Anime2You nennt den ersten Teil bei Netflix mit deutscher Synchronisation „The Seven Deadly Sins: Grudge of Edinburgh“ (Part 1)."
+  quellen:
+    - https://www.anime2you.de/news/630016/netflix-zwei-neuzugaenge-verfuegbar/
+    - https://www.anime2you.de/news/619818/netflix-seven-deadly-sins-grudge-of-edinburgh-termin/
+
 # Mängel-Block 7 (17.11.2026): zwei unabhängige Quellen je Titel — TMDB-Eintrag (de-DE, im Repo: data/tmdb-titles.json) und aniSearch-Ausgabe (data/disc-ausgaben.json).
 
 - id: 8100
@@ -260,3 +292,35 @@
   quellen:
     - https://www.anisearch.de/article/46086,attack-on-titan-teil-1-feuerroter-pfeil-und-bogen-blu-ray
     - https://www.crunchyroll.com/de/series/GVDHX8P8Q/attack-on-titan-movies
+
+- id: 98452
+  titleDe: "Unterm Wolkenhimmel – Laughing Under the Clouds: Gaiden – Teil 1"
+  geprueftAm: "2026-11-22"
+  note: "Universum Anime bringt die drei Gaiden-Filme am 12.07.2019 als Komplettbox mit deutscher Fassung heraus; Anime2You führt sie als „Unterm Wolkenhimmel – Laughing Under the Clouds: Gaiden“. Der Zusatz „Teil 1“ übersetzt „Part 1“ unseres Titels."
+  quellen:
+    - https://www.anime2you.de/news/321291/unterm-wolkenhimmel-laughing-under-the-clouds-gaiden-blu-ray/
+    - https://de.wikipedia.org/wiki/Unterm_Wolkenhimmel
+
+- id: 99196
+  titleDe: "Unterm Wolkenhimmel – Laughing Under the Clouds: Gaiden – Teil 2"
+  geprueftAm: "2026-11-22"
+  note: "Universum Anime bringt die drei Gaiden-Filme am 12.07.2019 als Komplettbox mit deutscher Fassung heraus; Anime2You führt sie als „Unterm Wolkenhimmel – Laughing Under the Clouds: Gaiden“. Der Zusatz „Teil 2“ übersetzt „Part 2“ unseres Titels."
+  quellen:
+    - https://www.anime2you.de/news/321291/unterm-wolkenhimmel-laughing-under-the-clouds-gaiden-blu-ray/
+    - https://de.wikipedia.org/wiki/Unterm_Wolkenhimmel
+
+- id: 21032
+  titleDe: "Die Abenteuer des jungen Sinbad – Movie 1"
+  geprueftAm: "2026-11-22"
+  note: "Erster Film der Kazé-Trilogie (AniList: 21032 erschien 2015-07-04, Fortsetzung 21368 am 2016-01-16). ProSieben MAXX zeigte ihn als „Movie 1“."
+  quellen:
+    - https://www.anime2you.de/news/360834/die-abenteuer-des-jungen-sinbad-heute-auf-prosieben-maxx/
+    - https://www.anime2you.de/news/318357/die-abenteuer-des-jungen-sinbad-die-trilogie-blu-ray/
+
+- id: 87483
+  titleDe: "Cyborg 009: Call of Justice 3"
+  geprueftAm: "2026-11-22"
+  note: "Der deutsche Titel ist der englische: Netflix (deutsche Vertonung, 12 Folgen aus drei Filmen) und Anime2You schreiben „Cyborg 009: Call of Justice“; die Zählung „3“ stammt aus unserem Titel."
+  quellen:
+    - https://www.anime2you.de/news/866645/netflix-entfernt-cyborg-009-call-of-justice/
+    - https://de.wikipedia.org/wiki/Cyborg_009

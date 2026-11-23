@@ -48,5 +48,15 @@ assert.equal(neuerTestBasisHinweise('A\ttools/testdaten/y.test.mjs', '').length,
 assert.equal(neuerTestBasisHinweise('A\ttools/a.test.mjs\nA\tpipeline/b.test.ts', '').length, 1, 'mehrere neue Tests -> ein Hinweis')
 assert.match(neuerTestBasisHinweise('A\ttools/a.test.mjs\nA\tpipeline/b.test.ts', '')[0], /a\.test\.mjs, pipeline\/b\.test\.ts/, 'alle neuen Tests genannt')
 assert.equal(neuerTestBasisHinweise('', '').length, 0, 'leerer Diff -> kein Hinweis')
+// Dateien unter .claude/: Hook-Tests heißen <name>-test.mjs, Mod-Tests <name>.test.ts
+const claudeTest = (pfad) => neuerTestBasisHinweise(`A\t${pfad}\nA\ttools/b.mjs`, 'Text').length
+assert.equal(claudeTest('.claude/hooks/x-test.mjs'), 1, 'neuer Hook-Test unter .claude/hooks zählt')
+assert.equal(claudeTest('.claude/mods/arbeitsliste/hooks/y.test.ts'), 1, 'neuer Mod-Test unter .claude zählt')
+assert.equal(claudeTest('.claude/hooks/x.js'), 0, 'Hook ohne -test zählt nicht')
+assert.equal(claudeTest('tools/x-test.mjs'), 0, '-test.mjs außerhalb .claude/hooks zählt nicht')
+assert.equal(claudeTest('tools/hooks/x-test.mjs'), 0, 'hooks-Ordner außerhalb .claude zählt nicht')
+assert.equal(claudeTest('.claude/hooks/sub/x-test.mjs'), 0, 'Hook-Test in Unterordner zählt nicht')
+assert.equal(neuerTestBasisHinweise('A\t.claude/hooks/x-test.mjs', BELEG).length, 0, 'Beleg im Text unterdrückt den Hinweis auch für Hook-Tests')
+assert.match(neuerTestBasisHinweise('A\t.claude/hooks/x-test.mjs', '')[0], /\.claude\/hooks\/x-test\.mjs: kein Beleg/, 'Hinweis nennt den Hook-Test')
 
 console.log('pr-vorpruefung-hinweise.test: ok (Mutanten ohne tests: neu, Altfall, Kontrolle, fremde/gelöschte/kaputte Liste; Stempel: gestern, heute, fehlt, neu, gelöscht, Unterordner; neuer Test ohne Basis-Beleg)')

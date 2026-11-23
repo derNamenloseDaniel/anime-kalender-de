@@ -166,8 +166,8 @@
   platformUrl: https://www.amazon.de/gp/video/detail/B0GWMY6WCP
   releaseType: batch
   dateMeaning: available-from
-  schedule: { firstEpisodeDate: "2026-09-09", episodeCount: 97 }
-  hinweis: "Staffel 2 (49 Folgen) und Staffel 3 (48 Folgen) laut Anime2You; die erste Staffel war schon zuvor im Angebot."
+  schedule: { firstEpisodeDate: "2026-09-09", episodeCount: 73 }
+  hinweis: "Staffel 2 (49 Folgen) und Staffel 3 (48 Folgen) laut Anime2You; von den 97 Folgen sind 24 (Staffel 2, Folgen 1–24) Zexal 50–73, bei Zexal II liegen 25 + 48 = 73; die erste Staffel war schon zuvor im Angebot."
   sources: [https://www.anime2you.de/news/1048315/prime-video-date-a-live-staffel-2-und-mehr/]
 
 # 1049988 (14.09.2026): „14 weitere Episoden von »Beyblade X« mit deutscher Synchronisation … Damit ist die zweite Staffel mit insgesamt 49 Folgen nun vollständig auf Disney+ verfügbar.“

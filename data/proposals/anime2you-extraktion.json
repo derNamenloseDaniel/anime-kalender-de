@@ -2088,6 +2088,10 @@
       "am": "2026-11-21",
       "vorschlaege": 1
     },
+    "1074225": {
+      "am": "2026-11-23",
+      "vorschlaege": 2
+    },
     "1074234": {
       "am": "2026-11-22",
       "vorschlaege": 1
@@ -2103,6 +2107,10 @@
     "1074274": {
       "am": "2026-11-21",
       "vorschlaege": 1
+    },
+    "1074284": {
+      "am": "2026-11-23",
+      "vorschlaege": 0
     },
     "1074300": {
       "am": "2026-11-21",
@@ -2126,6 +2134,10 @@
       "vorschlaege": 0,
       "uebersprungen": "kein Deutschland-Bezug"
     },
+    "1074451": {
+      "am": "2026-11-23",
+      "vorschlaege": 0
+    },
     "1074495": {
       "am": "2026-11-21",
       "vorschlaege": 0
@@ -2146,9 +2158,22 @@
       "am": "2026-11-22",
       "vorschlaege": 0
     },
+    "1074948": {
+      "am": "2026-11-23",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
     "1074954": {
       "am": "2026-11-22",
       "vorschlaege": 0
+    },
+    "1074967": {
+      "am": "2026-11-23",
+      "vorschlaege": 1
+    },
+    "1075001": {
+      "am": "2026-11-23",
+      "vorschlaege": 7
     }
   },
   "vorschlaege": [
@@ -2712,7 +2737,8 @@
       "unsicher": null,
       "wochentag": null,
       "warnungen": [
-        "Uhrzeit widerspricht 20:40 (Artikel 1066723) – gegenlesen"
+        "Uhrzeit widerspricht 20:40 (Artikel 1066723) – gegenlesen",
+        "Uhrzeit widerspricht 20:40 (Artikel 1066723), 20:40 (Artikel 1075001) – gegenlesen"
       ],
       "artikelId": "1060030",
       "artikel": "TV-Guide: Anime im deutschen Fernsehen in KW 42/2026",
@@ -6256,7 +6282,8 @@
       "unsicher": null,
       "wochentag": null,
       "warnungen": [
-        "Uhrzeit widerspricht 20:40 (Artikel 1066723) – gegenlesen"
+        "Uhrzeit widerspricht 20:40 (Artikel 1066723) – gegenlesen",
+        "Uhrzeit widerspricht 20:40 (Artikel 1066723), 20:40 (Artikel 1075001) – gegenlesen"
       ],
       "artikelId": "1062070",
       "artikel": "TV-Guide: Anime im deutschen Fernsehen in KW 43/2026",
@@ -8098,7 +8125,8 @@
       "unsicher": null,
       "wochentag": null,
       "warnungen": [
-        "Uhrzeit widerspricht 20:40 (Artikel 1066723) – gegenlesen"
+        "Uhrzeit widerspricht 20:40 (Artikel 1066723) – gegenlesen",
+        "Uhrzeit widerspricht 20:40 (Artikel 1066723), 20:40 (Artikel 1075001) – gegenlesen"
       ],
       "artikelId": "1063795",
       "artikel": "TV-Guide: Anime im deutschen Fernsehen in KW 44/2026",
@@ -16699,6 +16727,218 @@
       "quelle": "https://www.anime2you.de/news/1074055/horimiya-staffel-1-blu-ray-gesamtausgabe/",
       "veroeffentlicht": "2026-11-22",
       "gelesenAm": "2026-11-22"
+    },
+    {
+      "titel": "YAIBA: Samurai Legend",
+      "zitat": "YAIBA: Samurai Legend ProSieben MAXX · Folge 11-14 · Montag bis Mittwoch um 18:25 Uhr und Donnerstag um 18:15 Uhr",
+      "art": "folgen",
+      "sprache": "unklar",
+      "plattform": "tv",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": "Montag bis Mittwoch und Donnerstag",
+      "folgen": "11-14",
+      "unsicher": "Unterschiedliche Uhrzeiten für Montag bis Mittwoch (18:25 Uhr) und Donnerstag (18:15 Uhr), daher kein einheitliches Uhrzeit-Feld.",
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1075001",
+      "artikel": "TV-Guide: Anime im deutschen Fernsehen in KW 48/2026",
+      "quelle": "https://www.anime2you.de/news/1075001/anime-tv-programm-48-2026/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Akame ga KILL!",
+      "zitat": "Akame ga KILL! ProSieben FUN · Folge 2-3 · Montag ab 20:55 Uhr",
+      "art": "folgen",
+      "sprache": "unklar",
+      "plattform": "tv",
+      "datum": null,
+      "uhrzeit": "20:55",
+      "anbieter": null,
+      "sender": "ProSieben FUN",
+      "wochentage": "Montag",
+      "folgen": "2-3",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1075001",
+      "artikel": "TV-Guide: Anime im deutschen Fernsehen in KW 48/2026",
+      "quelle": "https://www.anime2you.de/news/1075001/anime-tv-programm-48-2026/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Dororo",
+      "zitat": "Dororo ProSieben FUN · Folge 15-16 · Montag ab 21:45 Uhr",
+      "art": "folgen",
+      "sprache": "unklar",
+      "plattform": "tv",
+      "datum": null,
+      "uhrzeit": "21:45",
+      "anbieter": null,
+      "sender": "ProSieben FUN",
+      "wochentage": "Montag",
+      "folgen": "15-16",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1075001",
+      "artikel": "TV-Guide: Anime im deutschen Fernsehen in KW 48/2026",
+      "quelle": "https://www.anime2you.de/news/1075001/anime-tv-programm-48-2026/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Beyblade X",
+      "zitat": "Beyblade X TOGGO plus · Folge 126 · Samstag um 20:40 Uhr",
+      "art": "folgen",
+      "sprache": "unklar",
+      "plattform": "tv",
+      "datum": null,
+      "uhrzeit": "20:40",
+      "anbieter": null,
+      "sender": "TOGGO plus",
+      "wochentage": "Samstag",
+      "folgen": "126",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "Uhrzeit widerspricht 20:45 (Artikel 1060030), 20:45 (Artikel 1062070), 20:45 (Artikel 1063795) – gegenlesen"
+      ],
+      "artikelId": "1075001",
+      "artikel": "TV-Guide: Anime im deutschen Fernsehen in KW 48/2026",
+      "quelle": "https://www.anime2you.de/news/1075001/anime-tv-programm-48-2026/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Pokémon Horizonte: Wunder in Sicht",
+      "zitat": "Pokémon Horizonte: Wunder in Sicht SUPER RTL · Folge 1 · Samstag um 12:55 Uhr",
+      "art": "start",
+      "sprache": "unklar",
+      "plattform": "tv",
+      "datum": null,
+      "uhrzeit": "12:55",
+      "anbieter": null,
+      "sender": "SUPER RTL",
+      "wochentage": "Samstag",
+      "folgen": "1",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1075001",
+      "artikel": "TV-Guide: Anime im deutschen Fernsehen in KW 48/2026",
+      "quelle": "https://www.anime2you.de/news/1075001/anime-tv-programm-48-2026/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "The Eminence in Shadow (Staffel 2)",
+      "zitat": "The Eminence in Shadow (Staffel 2) ProSieben MAXX · Folge 21-25 · Freitag ab 23:20 Uhr",
+      "art": "start",
+      "sprache": "unklar",
+      "plattform": "tv",
+      "datum": null,
+      "uhrzeit": "23:20",
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": "Freitag",
+      "folgen": "21-25",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1075001",
+      "artikel": "TV-Guide: Anime im deutschen Fernsehen in KW 48/2026",
+      "quelle": "https://www.anime2you.de/news/1075001/anime-tv-programm-48-2026/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Dragon Ball DAIMA",
+      "zitat": "Dragon Ball DAIMA TOGGO plus · Letzte Episode am Sonntag um 21:15 Uhr",
+      "art": "folgen",
+      "sprache": "unklar",
+      "plattform": "tv",
+      "datum": null,
+      "uhrzeit": "21:15",
+      "anbieter": null,
+      "sender": "TOGGO plus",
+      "wochentage": "Sonntag",
+      "folgen": null,
+      "unsicher": "Artikel nennt dies als Serienfinale (letzte Episode), ohne passende eigene Kategorie in der Vorschlagsliste.",
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1075001",
+      "artikel": "TV-Guide: Anime im deutschen Fernsehen in KW 48/2026",
+      "quelle": "https://www.anime2you.de/news/1075001/anime-tv-programm-48-2026/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Mashle: Magic and Muscles",
+      "zitat": "Die Gesamtausgabe der ersten »Mashle: Magic and Muscles«-Staffel, die alle zwölf Episoden in zwei Volumes mit Sammelschuber enthält, erscheint nach aktueller Planung am 5. Februar 2027 als DVD und Blu-ray.",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2027-02-05",
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [],
+      "artikelId": "1074225",
+      "artikel": "Erste »Mashle«-Staffel erscheint als Blu-ray-Gesamtausgabe",
+      "quelle": "https://www.anime2you.de/news/1074225/mashle-staffel-1-blu-ray-gesamtausgabe/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Mashle: Magic and Muscles",
+      "zitat": "Die ersten beiden Staffeln stehen bereits beim Streaming-Anbieter Crunchyroll auf Abruf zur Verfügung. Die dritte Staffel startet am 9. Januar 2027 und wird dort ebenfalls mit deutschen Untertiteln im Simulcast gezeigt.",
+      "art": "start",
+      "sprache": "omu",
+      "plattform": "crunchyroll",
+      "datum": "2027-01-09",
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Samstag",
+      "warnungen": [],
+      "artikelId": "1074225",
+      "artikel": "Erste »Mashle«-Staffel erscheint als Blu-ray-Gesamtausgabe",
+      "quelle": "https://www.anime2you.de/news/1074225/mashle-staffel-1-blu-ray-gesamtausgabe/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Link Click",
+      "zitat": "Der 13-teilige zweite Part der dritten Staffel von »Link Click« soll nach aktueller Planung im zweiten Halbjahr 2027 starten.",
+      "art": "ankuendigung",
+      "sprache": "unklar",
+      "plattform": null,
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": "13",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1074967",
+      "artikel": "Start des zweiten Parts der dritten »Link Click«-Staffel + Visual",
+      "quelle": "https://www.anime2you.de/news/1074967/link-click-staffel-3-part-2-start/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
     }
   ]
 }

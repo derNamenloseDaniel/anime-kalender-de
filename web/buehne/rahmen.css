@@ -10,7 +10,7 @@ body { margin: 0; font: 14px/1.4 system-ui, sans-serif; background: #e9e9ee; col
 .gruppe > span { font-size: 12px; opacity: .7; margin-right: 4px; }
 .gruppe button { border: 1px solid #8887; background: transparent; color: inherit; border-radius: 999px; padding: 3px 11px; font: inherit; font-size: 12px; cursor: pointer; }
 .gruppe button[aria-pressed="true"] { border-color: #e8590c; background: #e8590c22; color: #e8590c; font-weight: 600; }
-.notiz { padding: 8px 16px 0; font-size: 12px; max-width: 900px; opacity: .85; margin: 0; }
+.notiz { padding: 8px 16px 0; font-size: 12px; max-width: 900px; opacity: .85; margin: 0; white-space: pre-line; }
 
 /*
   Die Seite füllt genau das Fenster: Die Zellen teilen sich die Höhe unter der Leiste, höchstens bis zur Gerätehöhe (--hoehe an der
@@ -25,6 +25,9 @@ body { margin: 0; font: 14px/1.4 system-ui, sans-serif; background: #e9e9ee; col
 .zelle { margin: 0; display: flex; flex-direction: column; max-height: calc(var(--hoehe) * var(--zoom, 1) + 22.8px); }
 .zelle figcaption { font-size: 12px; margin: 0 0 6px; opacity: .75; }
 .zelle iframe { display: block; flex: 1 1 0; min-height: 240px; border: 0; outline: 1px solid #8886; background: transparent; }
+/* Desktop-Rahmen nie unter Gerätehöhe (Daniel, 22.11.2026: bei „beide" waren sie nur ~240 px hoch); die Seite scrollt dann. */
+.zelle.desktop { min-height: calc(var(--hoehe) * var(--zoom, 1) + 22.8px); }
+.zelle.desktop iframe { min-height: 0; }
 @media (max-height: 1400px) {
   .raster.beide { --zoom: .5; }
   .raster.beide iframe { zoom: var(--zoom); }

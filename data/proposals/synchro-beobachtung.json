@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-22",
+  "stand": "2026-11-23",
   "eintraege": [
     {
       "titel": "Expelled from Paradise: Liberated from Paradise",
@@ -72,7 +72,7 @@
       "seit": "2026-11-22"
     },
     {
-      "titel": "Battle Through the Heavens The Movie: Battle of the Two Emperors",
+      "titel": "Battle Through The Heavens: Battle Of The Two Emperors",
       "id": 219986,
       "anbieter": "unbekannt",
       "start": "2026-11-22",
@@ -126,6 +126,13 @@
       "anbieter": "disc",
       "start": "2026-12-18",
       "seit": "2026-11-18"
+    },
+    {
+      "titel": "Disney Twisted-Wonderland: Die Serie - Episode of Savanaclaw",
+      "id": 202282,
+      "anbieter": "unbekannt",
+      "start": "2026-12-23",
+      "seit": "2026-11-23"
     }
   ],
   "abgeloest": [

@@ -299,3 +299,235 @@
   grund: >-
     TMDB-Folgen-Cache: Serie 34109 führt Staffel 4 mit 46 Folgen (2011-02-13 bis 2012-01-26), AniList nennt 46 Folgen, Ende 2012-01-26; dieselbe Serie trägt die erste Staffel dieser Reihe (2156).
     JustWatch führt Staffel 4 (46 Folgen) beim Geschwistertitel mit Amazon Prime Video, Ton de.
+
+- anilistId: 528
+  tmdbId: 10228
+  kind: movie
+  titel: "Pokémon: The First Movie"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (movie, Pokémon: The First Movie (en-US)): "Pokémon: The First Movie" (1998), Name und Jahr (AniList 1998) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 896
+  tmdbId: 39101
+  kind: movie
+  titel: "Dragon Ball Z: The Tree of Might"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (movie, Dragon Ball Z: The Tree of Might (en-US)): "Dragon Ball Z: The Tree of Might" (1990), Name und Jahr (AniList 1990) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 1252
+  tmdbId: 121139
+  kind: movie
+  titel: "Nadia: The Secret of Blue Water - The Motion Picture"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (movie, Nadia: The Secret of Blue Water - The Motion Picture (en-US)): "Nadia: The Secret of Blue Water - The Motion Picture" (1991), Name und Jahr (AniList 1991) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 1327
+  tmdbId: 34173
+  kind: tv
+  titel: "Aoki Densetsu Shoot!"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, Aoki Densetsu Shoot! (en-US)): "Aoki Densetsu Shoot!" (1993), Name und Jahr (AniList 1993) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 1445
+  tmdbId: 30986
+  kind: tv
+  titel: "Speed Racer"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, Speed Racer (en-US)): "Speed Racer" (1967), Name und Jahr (AniList 1967) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 5155
+  tmdbId: 34116
+  kind: tv
+  titel: "Millennium Old Journal: Tale of Genji"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, Millennium Old Journal: Tale of Genji (en-US)): "The Tale of Genji" (2009), Name und Jahr (AniList 2009) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 7279
+  tmdbId: 43589
+  kind: tv
+  titel: "TO"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, トゥー (en-US)): "TO" (2009), Name und Jahr (AniList 2009) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 11285
+  tmdbId: 43079
+  kind: tv
+  titel: "Black Rock Shooter"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, Black Rock Shooter (en-US)): "Black Rock Shooter" (2012), Name und Jahr (AniList 2012) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 14467
+  tmdbId: 45799
+  kind: tv
+  titel: "K"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, K (en-US)): "K" (2012), Name und Jahr (AniList 2012) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 100658
+  tmdbId: 459290
+  kind: movie
+  titel: "Sinbad: Night at High Noon and the Wonder Gate"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (movie, Sinbad: Night at High Noon and the Wonder Gate (en-US)): "Sinbad - Night at High Noon and the Wonder Gate" (2016), Name und Jahr (AniList 2016) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 21894
+  tmdbId: 71007
+  kind: tv
+  titel: "ID-0"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, ID-0 (en-US)): "ID-0" (2017), Name und Jahr (AniList 2017) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 101343
+  tmdbId: 526426
+  kind: movie
+  titel: "Made in Abyss: Journey's Dawn"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (movie, Made in Abyss: Journey's Dawn (en-US)): "Made in Abyss: Journey's Dawn" (2019), Name und Jahr (AniList 2019) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 108463
+  tmdbId: 95269
+  kind: tv
+  titel: "Toilet-bound Hanako-kun"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, Toilet-bound Hanako-kun (en-US)): "Toilet-Bound Hanako-kun" (2020), Name und Jahr (AniList 2020) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 122575
+  tmdbId: 728754
+  kind: movie
+  titel: "STAND BY ME Doraemon 2"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (movie, STAND BY ME Doraemon 2 (en-US)): "Stand by Me Doraemon 2" (2020), Name und Jahr (AniList 2020) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 178707
+  tmdbId: 1310387
+  kind: movie
+  titel: "The Irregular at Magic High School THE MOVIE -Yotsuba Succession Arc-"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (movie, The Irregular at Magic High School THE MOVIE -Yotsuba Succession Arc- (en-US)): "The Irregular at Magic High School THE MOVIE - Yotsuba Succession Arc -" (2026), Name und Jahr (AniList 2026) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 6771
+  tmdbId: 44209
+  kind: tv
+  titel: "Mock & Sweet"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, Mock & Sweet (en-US)): "Mock & Sweet" (1986), Name und Jahr (AniList 1986) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 10014867
+  tmdbId: 330431
+  kind: tv
+  titel: "Re:Zero - Starting Life in Another World: Director’s Cut"
+  geprueftAm: '2026-11-22'
+  grund: >-
+    Namenssuche bei TMDB (tv, Re：ゼロから始める異世界生活新編集版 (en-US)): "Re:ゼロから始める異世界生活 新編集版" (2020), Name und Jahr (AniList 2020) passen, Genre Animation, einziger Treffer.
+
+- anilistId: 3201
+  tmdbId: 42945
+  kind: tv
+  titel: "Serendipity the Pink Dragon"
+  geprueftAm: '2026-11-23'
+  grund: >-
+    Namenssuche bei TMDB (tv, Serendipity the Pink Dragon (de-DE)): "ピュア島の仲間たち" (1983), Originaltitel „ピュア島の仲間たち“ passt zum japanischen Titel bei AniList, Jahr (AniList 1983) stimmen, Genre Animation, TMDB-Kennung bei keinem anderen Titel in Gebrauch, Zuordnung für das Hintergrundbild.
+
+- anilistId: 4138
+  tmdbId: 56391
+  kind: movie
+  titel: "The Adventures of Scamper the Penguin"
+  geprueftAm: '2026-11-23'
+  grund: >-
+    Namenssuche bei TMDB (movie, The Adventures of Scamper the Penguin (de-DE)): "Bauzi, der Pinguin aus der Antarktis" (1987), der deutsche Name ist unser deutscher Titel (der Originaltitel bei TMDB ist russisch), Jahr (AniList 1986) stimmen, Genre Animation, TMDB-Kennung bei keinem anderen Titel in Gebrauch, Zuordnung für das Hintergrundbild.
+
+- anilistId: 8764
+  tmdbId: 211680
+  kind: tv
+  titel: "Hajime Ningen Gon"
+  geprueftAm: '2026-11-23'
+  grund: >-
+    Namenssuche bei TMDB (tv, Hajime Ningen Gon (de-DE)): "はじめ人間 ゴン" (1996), Originaltitel „はじめ人間 ゴン“ passt zum japanischen Titel bei AniList, Jahr (AniList 1996) stimmen, Genre Animation, TMDB-Kennung bei keinem anderen Titel in Gebrauch, Zuordnung für das Hintergrundbild.
+
+- anilistId: 21271
+  tmdbId: 332485
+  kind: movie
+  titel: "Pokémon: Pikachu, What's This Key?"
+  geprueftAm: '2026-11-23'
+  grund: >-
+    Namenssuche bei TMDB (movie, Pokémon: Pikachu, What's This Key? (de-DE)): "ピカチュウ、これなんのカギ？" (2014), Originaltitel „ピカチュウ、これなんのカギ？“ passt zum japanischen Titel bei AniList, Jahr (AniList 2014) stimmen, Genre Animation, TMDB-Kennung bei keinem anderen Titel in Gebrauch, Zuordnung für das Hintergrundbild.
+
+- anilistId: 98452
+  tmdbId: 469912
+  kind: movie
+  titel: "Laughing Under the Clouds: Gaiden Part 1"
+  geprueftAm: '2026-11-23'
+  grund: >-
+    Namenssuche bei TMDB (movie, Laughing Under the Clouds: Gaiden Part 1 (de-DE)): "Unterm Wolkenhimmel: Laughing Under the Clouds - Gaiden: Neues Zeitalter" (2017), Originaltitel „曇天に笑う＜外伝＞～決別、犲の誓い～“ passt zum japanischen Titel bei AniList, Jahr (AniList 2017) stimmen, Genre Animation, TMDB-Kennung bei keinem anderen Titel in Gebrauch, Zuordnung für das Hintergrundbild.
+
+- anilistId: 99196
+  tmdbId: 483459
+  kind: movie
+  titel: "Laughing Under the Clouds: Gaiden Part 2"
+  geprueftAm: '2026-11-23'
+  grund: >-
+    Namenssuche bei TMDB (movie, Laughing Under the Clouds: Gaiden Part 2 (de-DE)): "Unterm Wolkenhimmel: Laughing Under the Clouds - Gaiden: Tödliches Ritual" (2018), Originaltitel „曇天に笑う＜外伝＞～宿命、双頭の風魔～“ passt zum japanischen Titel bei AniList, Jahr (AniList 2018) stimmen, Genre Animation, TMDB-Kennung bei keinem anderen Titel in Gebrauch, Zuordnung für das Hintergrundbild.
+
+- anilistId: 99197
+  tmdbId: 519040
+  kind: movie
+  titel: "Laughing Under the Clouds: Gaiden Part 3"
+  geprueftAm: '2026-11-23'
+  grund: >-
+    Namenssuche bei TMDB (movie, Laughing Under the Clouds: Gaiden Part 3 (de-DE)): "Unterm Wolkenhimmel: Laughing Under the Clouds - Gaiden: Geheimes Experiment" (2018), Originaltitel „曇天に笑う＜外伝＞～桜華、天望の架橋～“ passt zum japanischen Titel bei AniList, Jahr (AniList 2018) stimmen, Genre Animation, TMDB-Kennung bei keinem anderen Titel in Gebrauch, Zuordnung für das Hintergrundbild.
+
+- anilistId: 5000002
+  tmdbId: 1717866
+  kind: movie
+  titel: "Zorros Geheimnis"
+  geprueftAm: '2026-11-23'
+  grund: >-
+    Namenssuche bei TMDB (movie, Zorros Geheimnis (de-DE)): "Zorro’s Geheimnis" (1996), Name und Jahr (AniList 1996) passen, Genre Animation, TMDB-Kennung bei keinem anderen Titel in Gebrauch, Zuordnung für das Hintergrundbild.
+
+- anilistId: 10005407
+  tmdbId: 31967
+  kind: movie
+  titel: "Dante’s Inferno: An Animated Epic"
+  geprueftAm: '2026-11-23'
+  grund: >-
+    Namenssuche bei TMDB (movie, Dante’s Inferno: An Animated Epic (de-DE)): "Dante's Inferno - Ein animiertes Epos" (2010), Name und Jahr (AniList 2010) passen, Genre Animation, TMDB-Kennung bei keinem anderen Titel in Gebrauch, Zuordnung für das Hintergrundbild.
+
+- anilistId: 10006242
+  tmdbId: 68005
+  kind: tv
+  titel: "Yosuga no Sora: In Solitude Where We Are Least Alone"
+  geprueftAm: '2026-11-23'
+  grund: >-
+    Namenssuche bei TMDB (tv, Yosuga no Sora: In Solitude Where We Are Least Alone (de-DE)): "Yosuga no Sora" (2010), Originaltitel „ヨスガノソラ“ passt zum japanischen Titel bei AniList, Jahr (AniList 2010) stimmen, Genre Animation, TMDB-Kennung bei keinem anderen Titel in Gebrauch, Zuordnung für das Hintergrundbild.
+
+- anilistId: 10014545
+  tmdbId: 488397
+  kind: movie
+  titel: "Wheely: Fast & Hilarious!"
+  geprueftAm: '2026-11-23'
+  grund: >-
+    Namenssuche bei TMDB (movie, Wheely: Fast & Hilarious! (de-DE)): "Wheely" (2018), Name und Jahr (AniList 2018) passen, Genre Animation, TMDB-Kennung bei keinem anderen Titel in Gebrauch, Zuordnung für das Hintergrundbild.
+
+- anilistId: 10021510
+  tmdbId: 1524424
+  kind: movie
+  titel: "Modern Love Tokyo: He’s Playing Our Song"
+  geprueftAm: '2026-11-23'
+  grund: >-
+    Namenssuche bei TMDB (movie, Modern Love Tokyo: He’s Playing Our Song (de-DE)): "彼が奏でるふたりの調べ" (2022), Originaltitel „彼が奏でるふたりの調べ“ passt zum japanischen Titel bei AniList, Jahr (AniList 2022) stimmen, Genre Animation, TMDB-Kennung bei keinem anderen Titel in Gebrauch, Zuordnung für das Hintergrundbild.

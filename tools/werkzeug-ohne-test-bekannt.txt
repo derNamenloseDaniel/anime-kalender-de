@@ -27,7 +27,6 @@ tools/ansicht-tv-reihe.mjs # Altbestand 12.11.2026, Test fehlt
 tools/apple-tonspur-gegenprobe.mjs # Altbestand 12.11.2026, Test fehlt
 tools/arbeiterpool-pruefung.mjs # Altbestand 12.11.2026, Test fehlt
 tools/beleg-adresse-nachtragen.mjs # Altbestand 12.11.2026, Test fehlt
-tools/belege-pruefen.mjs # Altbestand 12.11.2026, Test fehlt
 tools/bereich-auge-messen.mjs # Altbestand 12.11.2026, Test fehlt
 tools/bestand-db.mjs # Altbestand 12.11.2026, Test fehlt
 tools/bilder-ordner.mjs # Altbestand 12.11.2026, Test fehlt
@@ -39,9 +38,7 @@ tools/buehne-zeit-pruefen.mjs # Altbestand 12.11.2026, Test fehlt
 tools/buehne-zustand-pruefen.mjs # Altbestand 12.11.2026, Test fehlt
 tools/cache-holen.mjs # Altbestand 12.11.2026, Test fehlt
 tools/cartoon-termine-messen.mjs # Altbestand 12.11.2026, Test fehlt
-tools/check-cache-abhaengigkeit.mjs # Altbestand 12.11.2026, Test fehlt
 tools/check-logic-historie.d.mts # Altbestand 12.11.2026, Test fehlt
-tools/check-pfade.mjs # Altbestand 12.11.2026, Test fehlt
 tools/cover-nach-r2.mjs # Altbestand 12.11.2026, Test fehlt
 tools/cr-blockwahl.d.mts # Altbestand 12.11.2026, Test fehlt
 tools/cr-katalogblock.d.mts # Altbestand 12.11.2026, Test fehlt

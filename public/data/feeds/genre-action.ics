@@ -10,59 +10,6 @@ X-WR-TIMEZONE:Europe/Berlin
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-15#70@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261115T024500Z
-DTEND:20261115T031500Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-15#71@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261115T030500Z
-DTEND:20261115T033500Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GT00384006@2026-11-15@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261115T140000Z
-DTEND:20261115T143000Z
-SUMMARY:Reborn as a Space Mercenary: I Woke Up Piloting the Strongest Stars
- hip! Staffel 1 – Folge 7/13
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
- etails: https://anime-kalender.de/t/16547/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GT00384004@2026-11-15@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261115T143000Z
-DTEND:20261115T150000Z
-SUMMARY:Overgeared Staffel 1 – Folge 8/12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
- etails: https://anime-kalender.de/t/17645/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:tank-chair-primevideo@2026-11-15@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261115T153000Z
-DTEND:20261115T160000Z
-SUMMARY:Tank Chair – Folge 7/≈12
-DESCRIPTION:Plattform: Prime Video\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7554/
-CATEGORIES:Prime Video
-END:VEVENT
-BEGIN:VEVENT
 UID:last-boss-s2-crunchyroll@2026-11-16@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261116T143000Z
@@ -77,7 +24,7 @@ UID:auto-158871-tv-super-rtl@2026-11-16@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261116T151500Z
 DTEND:20261116T154500Z
-SUMMARY:Pokémon Horizonte
+SUMMARY:Pokémon Horizonte – Folge 32
 DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
  ails: https://anime-kalender.de/t/14839/
 CATEGORIES:Super RTL
@@ -117,7 +64,7 @@ UID:auto-158871-tv-toggo-plus@2026-11-16@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261116T161500Z
 DTEND:20261116T164500Z
-SUMMARY:Pokémon Horizonte
+SUMMARY:Pokémon Horizonte – Folge 32
 DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
  tails: https://anime-kalender.de/t/14839/
 CATEGORIES:TOGGO plus
@@ -219,7 +166,7 @@ UID:auto-158871-tv-super-rtl@2026-11-17@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261117T151500Z
 DTEND:20261117T154500Z
-SUMMARY:Pokémon Horizonte
+SUMMARY:Pokémon Horizonte – Folge 33
 DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
  ails: https://anime-kalender.de/t/14839/
 CATEGORIES:Super RTL
@@ -249,7 +196,7 @@ UID:auto-158871-tv-toggo-plus@2026-11-17@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261117T161500Z
 DTEND:20261117T164500Z
-SUMMARY:Pokémon Horizonte
+SUMMARY:Pokémon Horizonte – Folge 33
 DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
  tails: https://anime-kalender.de/t/14839/
 CATEGORIES:TOGGO plus
@@ -280,7 +227,7 @@ UID:auto-158871-tv-super-rtl@2026-11-18@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261118T151500Z
 DTEND:20261118T154500Z
-SUMMARY:Pokémon Horizonte
+SUMMARY:Pokémon Horizonte – Folge 34
 DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
  ails: https://anime-kalender.de/t/14839/
 CATEGORIES:Super RTL
@@ -310,7 +257,7 @@ UID:auto-158871-tv-toggo-plus@2026-11-18@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261118T161500Z
 DTEND:20261118T164500Z
-SUMMARY:Pokémon Horizonte
+SUMMARY:Pokémon Horizonte – Folge 34
 DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
  tails: https://anime-kalender.de/t/14839/
 CATEGORIES:TOGGO plus
@@ -372,7 +319,7 @@ UID:auto-158871-tv-super-rtl@2026-11-19@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261119T151500Z
 DTEND:20261119T154500Z
-SUMMARY:Pokémon Horizonte
+SUMMARY:Pokémon Horizonte – Folge 35
 DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
  ails: https://anime-kalender.de/t/14839/
 CATEGORIES:Super RTL
@@ -402,7 +349,7 @@ UID:auto-158871-tv-toggo-plus@2026-11-19@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261119T161500Z
 DTEND:20261119T164500Z
-SUMMARY:Pokémon Horizonte
+SUMMARY:Pokémon Horizonte – Folge 35
 DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
  tails: https://anime-kalender.de/t/14839/
 CATEGORIES:TOGGO plus
@@ -584,9 +531,9 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261120T080000Z
 DTEND:20261120T083000Z
 SUMMARY:JoJo's Bizarre Adventure: Steel Ball Run – 2nd & 3rd STAGE – Fo
- lge 10/12
+ lge 9/11
 DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nDetai
- ls: https://anime-kalender.de/t/16796/
+ ls: https://anime-kalender.de/t/17588/
 CATEGORIES:Netflix
 END:VEVENT
 BEGIN:VEVENT
@@ -594,7 +541,7 @@ UID:auto-158871-tv-super-rtl@2026-11-20@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261120T151500Z
 DTEND:20261120T154500Z
-SUMMARY:Pokémon Horizonte
+SUMMARY:Pokémon Horizonte – Folge 36
 DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
  ails: https://anime-kalender.de/t/14839/
 CATEGORIES:Super RTL
@@ -624,7 +571,7 @@ UID:auto-158871-tv-toggo-plus@2026-11-20@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261120T161500Z
 DTEND:20261120T164500Z
-SUMMARY:Pokémon Horizonte
+SUMMARY:Pokémon Horizonte – Folge 36
 DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
  tails: https://anime-kalender.de/t/14839/
 CATEGORIES:TOGGO plus
@@ -858,7 +805,7 @@ UID:auto-158871-tv-super-rtl@2026-11-21@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261121T115500Z
 DTEND:20261121T122500Z
-SUMMARY:Pokémon Horizonte
+SUMMARY:Pokémon Horizonte – Folge 136
 DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
  ails: https://anime-kalender.de/t/14839/
 CATEGORIES:Super RTL
@@ -868,7 +815,7 @@ UID:auto-158871-tv-toggo-plus@2026-11-21@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261121T125500Z
 DTEND:20261121T132500Z
-SUMMARY:Pokémon Horizonte
+SUMMARY:Pokémon Horizonte – Folge 136
 DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
  tails: https://anime-kalender.de/t/14839/
 CATEGORIES:TOGGO plus
@@ -962,6 +909,26 @@ DESCRIPTION:Plattform: Prime Video\nRelease-Art: Wöchentlich (Simuldub)\nG
 CATEGORIES:Prime Video
 END:VEVENT
 BEGIN:VEVENT
+UID:auto-158871-tv-super-rtl@2026-11-23@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261123T151500Z
+DTEND:20261123T154500Z
+SUMMARY:Pokémon Horizonte – Folge 37
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/14839/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-158871-tv-toggo-plus@2026-11-23@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261123T161500Z
+DTEND:20261123T164500Z
+SUMMARY:Pokémon Horizonte – Folge 37
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/14839/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
 UID:yaiba-samurai-legend-prosieben-maxx@2026-11-23@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261123T172500Z
@@ -995,6 +962,16 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-112153-tv-toggo-plus@2026-11-23@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261123T201500Z
+DTEND:20261123T204500Z
+SUMMARY:Pokémon Reisen: Die Serie
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/10852/
+CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
 UID:yaiba-samurai-legend-prosieben-maxx@2026-11-24@anime-kalender-de
@@ -1119,9 +1096,9 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261127T080000Z
 DTEND:20261127T083000Z
 SUMMARY:JoJo's Bizarre Adventure: Steel Ball Run – 2nd & 3rd STAGE – Fo
- lge 11/12
+ lge 10/11
 DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nDetai
- ls: https://anime-kalender.de/t/16796/
+ ls: https://anime-kalender.de/t/17588/
 CATEGORIES:Netflix
 END:VEVENT
 BEGIN:VEVENT
@@ -1503,9 +1480,9 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261204T080000Z
 DTEND:20261204T083000Z
 SUMMARY:JoJo's Bizarre Adventure: Steel Ball Run – 2nd & 3rd STAGE – Fo
- lge 12/12
+ lge 11/11
 DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nDetai
- ls: https://anime-kalender.de/t/16796/
+ ls: https://anime-kalender.de/t/17588/
 CATEGORIES:Netflix
 END:VEVENT
 BEGIN:VEVENT

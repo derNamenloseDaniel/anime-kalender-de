@@ -1,6 +1,6 @@
 # Disney+: was noch zu prüfen ist
 
-Stand 2026-11-22 · **2 offene Verweise** in **2 Zeilen**.
+Stand 2026-11-23 · **3 offene Verweise** in **3 Zeilen**.
 
 Erzeugt von `npm run data:dub-checks`, **nicht von Hand pflegen**. Die Kurzschrift zum
 Antworten steht in [07-alle-anbieter.md](07-alle-anbieter.md).
@@ -11,3 +11,4 @@ Antworten steht in [07-alle-anbieter.md](07-alle-anbieter.md).
 |---|---|---|---|
 | 1 | 2026-09-26 | Welcome to Demon School! Iruma-kun | [Staffel 4](https://www.disneyplus.com/browse/entity-b042544d-cd7d-40c6-9be4-db79666a1b51) |
 | 2 | 2020-04-04 | My Hero Academia | [4](https://www.disneyplus.com/browse/entity-6c1cfdcd-a3b1-428a-8fe9-aa917d5b6371) |
+| 3 | 2005-01-30 | Pretty Cure | [Hauptserie](https://www.disneyplus.com/de-de/browse/entity-1d36fbbe-0a91-468e-ac73-8d51337195fa) |

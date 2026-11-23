@@ -2,6 +2,8 @@ import type { Title } from '@shared/types.ts'
 import { titleStatus } from '@shared/logic.ts'
 import { anzeigeName } from '@shared/titles.ts'
 import type { Dataset } from '../lib/data.ts'
+import type { FilterLists } from '../lib/filters.ts'
+import { kartenPlattform } from '../lib/wege-filter.ts'
 import { useLang } from '../lib/i18n.tsx'
 import { ueberschriftSagtStatus, type RelevanzArt } from '../lib/db-relevanz.ts'
 import { istOhneBelegteSynchro } from '../lib/titel-sortierung.ts'
@@ -13,6 +15,8 @@ export interface DbKarteProps {
   main: Title
   members: Title[]
   data: Dataset
+  /** Die Ausschlüsse der Filter: die Kachel zeigt nur Wege, die sie nicht trifft. */
+  ausgeschlossen?: FilterLists
   today: string
   grouped: boolean
   favorites: Set<number>
@@ -31,7 +35,7 @@ export interface DbKarteProps {
 }
 
 /** Eine Kachel der Datenbank (oder, ausgeblendet, ihr Platzhalter). */
-export function DbKarte({ main, members, data, today, grouped, favorites, hidden, onToggleFavorite, onToggleHidden, onOpenTitle, share, copiedSlug, gruppe, ab, titelId, staffel }: DbKarteProps) {
+export function DbKarte({ main, members, data, today, grouped, favorites, hidden, onToggleFavorite, onToggleHidden, onOpenTitle, share, copiedSlug, gruppe, ab, titelId, staffel, ausgeschlossen }: DbKarteProps) {
   const { t } = useLang()
   const releases = members.flatMap((m) => data.releasesByTitle.get(m.id) ?? [])
   const status = titleStatus(releases, today, main)
@@ -40,7 +44,7 @@ export function DbKarte({ main, members, data, today, grouped, favorites, hidden
   // Eine Reihe gilt als ausgeblendet, sobald eine ihrer Staffeln es ist —
   // sonst käme das Cover über den Umweg der Fortsetzung doch wieder.
   const isHidden = members.some((m) => hidden.has(m.id))
-  const platform = releases[0]?.platform ?? main.streams[0]?.platform
+  const platform = (ausgeschlossen && kartenPlattform(main, releases, ausgeschlossen)) || (releases[0]?.platform ?? main.streams[0]?.platform)
   /**
    * Ein Titel ohne belegte deutsche Synchro. Er sieht bewusst anders
    * aus als der gepflegte Bestand: gestrichelter Rahmen, entsättigtes

@@ -79,7 +79,7 @@ export function WiederherstellenKasten({ t, zeigeGeraet, abmeldeState, setRestor
                 fragt, der zweite handelt. Kein Dialogfenster — die Frage steht
                 an derselben Stelle, an der auch der Knopf stand.
               */}
-              {abmeldeState === 'weg' && <span className="text-[13px] text-slate-500 dark:text-slate-400">{t('news.unsubDone')}</span>}
+              {abmeldeState === 'weg' && <span className="text-[13px] text-ak-leise">{t('news.unsubDone')}</span>}
             </div>
           </>
         ) : (
@@ -107,7 +107,7 @@ export function WiederherstellenKasten({ t, zeigeGeraet, abmeldeState, setRestor
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={t('news.email')}
-              className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-white/15 dark:bg-white/5"
+              className="min-w-0 flex-1 rounded-lg border border-ak-rand bg-ak-flaeche px-3 py-2 text-sm"
             />
             <button
               type="submit"
@@ -118,7 +118,7 @@ export function WiederherstellenKasten({ t, zeigeGeraet, abmeldeState, setRestor
             </button>
           </form>
         )}
-        <p className="mt-2 text-[13px] text-slate-500 dark:text-slate-400">{t('news.restoreSafety')}</p>
+        <p className="mt-2 text-[13px] text-ak-leise">{t('news.restoreSafety')}</p>
           </>
         )}
       </Card>
@@ -154,7 +154,7 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="du@beispiel.de"
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 dark:border-white/15 dark:bg-white/5"
+            className="rounded-lg border border-ak-rand bg-ak-flaeche px-3 py-2"
           />
         </label>
 
@@ -173,7 +173,7 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
                   'flex-1 cursor-pointer rounded-lg border p-3 transition',
                   frequency === value
                     ? 'border-sky-400 bg-sky-400/10'
-                    : 'border-slate-300 hover:border-ak-leise dark:border-white/15',
+                    : 'border-ak-rand hover:border-ak-leise',
                 ].join(' ')}
               >
                 <input
@@ -184,17 +184,17 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
                   onChange={() => setFrequency(value)}
                 />
                 <span className="block font-medium text-slate-800 dark:text-slate-100">{label}</span>
-                <span className="block text-xs text-slate-500 dark:text-slate-400">{hint}</span>
+                <span className="block text-xs text-ak-leise">{hint}</span>
               </label>
             ))}
           </div>
         </fieldset>
 
-        <div className="rounded-lg border border-slate-300 px-3 py-2.5 text-sm dark:border-white/15">
+        <div className="rounded-lg border border-ak-rand px-3 py-2.5 text-sm">
           <p className="font-medium text-slate-700 dark:text-slate-200">
             ★ {t('news.favorites', { count: favorites.size })}
           </p>
-          <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+          <p className="mt-0.5 text-xs text-ak-leise">
             {favorites.size > 0 ? t('news.favoritesHint') : t('news.favoritesNone')}
           </p>
           {/*
@@ -220,7 +220,7 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
 
         <fieldset>
           <legend className="mb-1.5 text-sm font-medium text-slate-700 dark:text-slate-200">
-            {t('news.platforms')} <span className="font-normal text-slate-400">{t('news.platformsHint')}</span>
+            {t('news.platforms')} <span className="font-normal text-ak-sehr-leise">{t('news.platformsHint')}</span>
           </legend>
           <PlatformToggleList
             platforms={meta.platforms}
@@ -255,7 +255,7 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
             <span
               className={[
                 'text-sm',
-                state === 'ok' ? 'text-ak-gut-text' : state === 'error' ? 'text-ak-fehler-text' : 'text-slate-400',
+                state === 'ok' ? 'text-ak-gut-text' : state === 'error' ? 'text-ak-fehler-text' : 'text-ak-sehr-leise',
               ].join(' ')}
             >
               {message}
@@ -297,7 +297,7 @@ export function UebernommenKasten({ uebernommen, t, favorites, toggleFavorit, na
                     onChange={() => toggleFavorit(id)}
                     className="size-4 cursor-pointer accent-ak-akzent"
                   />
-                  <span className={favorites.has(id) ? '' : 'text-slate-400 line-through dark:text-slate-500'}>
+                  <span className={favorites.has(id) ? '' : 'text-ak-sehr-leise line-through'}>
                     {namen.get(id) ?? `#${id}`}
                   </span>
                 </label>

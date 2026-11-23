@@ -24,3 +24,13 @@
   quelle: 'https://www.amazon.de/gp/video/detail/B0D7N68Q5T'
   belegtAm: '2026-11-04'
   grund: 'Amazon-Seite „Staffel 4“ trägt die Folgen von :re 2; aniSearch-„Staffel 2“ zählt innerhalb von :re, nicht in der Reihe'
+
+# aniSearch nennt „Urteil des Drachen" „Staffel 4" und lässt „Anzeichen eines Heiligen Kriegs" (4 Folgen) ungezählt; Netflix zählt sie als St. 2:
+# 24 / 4 / 24 / 24 / 24 Folgen (`data/anbieter-staffeln.json`, Netflix 80050063, gelesen 24.09.2026). Die Reihe zählt wie Netflix, „Kaiserlicher Zorn der Götter" ist Staffel 4.
+# Ohne diesen Eintrag standen beide als „Staffel 4 von 4".
+- anilistId: 116752
+  staffel: 5
+  titel: 'The Seven Deadly Sins: Urteil des Drachen'
+  quelle: 'https://www.netflix.com/title/80050063'
+  belegtAm: '2026-09-24'
+  grund: 'Netflix führt die fünfte Staffel mit 24 Folgen; aniSearch-„Staffel 4“ lässt die 4-Folgen-Staffel 2 aus'

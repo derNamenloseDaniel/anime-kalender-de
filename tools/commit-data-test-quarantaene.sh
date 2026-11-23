@@ -9,8 +9,15 @@ warnt() { grep -q -- "^DATEN_WARNUNG=.*$2" "$ARBEIT/$1/env.txt" 2> /dev/null && 
 bau_szenario() {
   local name="$1"
   shift
-  mkdir -p "$ARBEIT/$name"
-  szenario "$name" BAU_LAUF=1 GITHUB_ENV="$ARBEIT/$name/env.txt" "$@"
+  mkdir -p "$ARBEIT/$name/rt"
+  # RUNNER_TEMP/GITHUB_RUN_ID: dorthin legt ein abgebrochener Bau seine Schuldigenliste (tools/quarantaene.mjs schuldige).
+  szenario "$name" BAU_LAUF=1 GITHUB_ENV="$ARBEIT/$name/env.txt" RUNNER_TEMP="$ARBEIT/$name/rt" GITHUB_RUN_ID=4711 "$@"
+}
+# Die Kennungen und die Lauf-Kennung der Schuldigenliste eines Szenarios, eine Zeile; „keine Liste“ ohne Datei.
+schuldige_liste() {
+  local datei="$ARBEIT/$1/rt/bau-schuldige.json"
+  [ -f "$datei" ] || { echo "keine Liste"; return; }
+  echo "$(grep -o '"titleId": -\?[0-9]*' "$datei" | cut -d' ' -f2 | tr '\n' ' ')lauf=$(grep -o '"laufId": "[0-9]*"' "$datei" | cut -d'"' -f4)"
 }
 rot() { [ "$CODE" -ne 0 ] && echo ja || echo nein; }
 zurueckgestellt_im_fernstand() { git -C "$ORIGIN" show main:public/data/meta.json 2> /dev/null | grep -o '"titleId":[-0-9]*' | cut -d: -f2 | tr '\n' ' '; }
@@ -79,12 +86,16 @@ bau_szenario q-vier FAKE_ROT="11 22 33 44"
 pruefe "Exit ≠ 0" ja "$(rot)"
 pruefe "kein Neubau ohne Titel" 0 "$(aufrufe q-vier 'data:build  *q=ja')"
 pruefe "Warnung nennt die Obergrenze" ja "$(warnt q-vier '4 Titel betroffen, zurückgestellt werden höchstens 3')"
+pruefe "Abbruch legt alle vier schuldigen Titel samt Lauf-Kennung ab" "11 22 33 44 lauf=4711" "$(schuldige_liste q-vier)"
+pruefe "grüner Lauf legt keine Schuldigenliste ab" "keine Liste" "$(schuldige_liste q-einer)"
+pruefe "Abbruch ohne Titel-Kennung legt eine leere Liste ab" "lauf=4711" "$(schuldige_liste q-ohne)"
 
 echo "Quarantäne: der vierte Titel in der zweiten Runde sperrt ebenfalls"
 bau_szenario q-vier-spaet FAKE_ROT="11 22,33,44"
 pruefe "Exit ≠ 0" ja "$(rot)"
 pruefe "zwei Neubauten" 2 "$(aufrufe q-vier-spaet 'data:build  *q=ja')"
 pruefe "kein Erzeugnis gepusht" nein "$(im_fernstand public/data/titles.json)"
+pruefe "Schuldigenliste: früher zurückgestellte und neue Marken, je Kennung einmal" "11 22 33 44 lauf=4711" "$(schuldige_liste q-vier-spaet)"
 
 echo "Quarantäne: ein Cartoon (negative Kennung) wird nicht zurückgestellt"
 bau_szenario q-cartoon FAKE_ROT="22 -5"

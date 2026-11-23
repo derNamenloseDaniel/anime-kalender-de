@@ -21,7 +21,7 @@ export function schnellListe(t: Translate, showConfidence: boolean, mitTv: boole
     { id: 'kostenlos', text: t('filter.schnell.kostenlos'), zeichen: '🆓' },
     ...(mitTv ? [{ id: 'tv' as const, text: t('filter.schnell.tv'), zeichen: <TvZeichen className="size-3 opacity-80" /> }] : []),
     { id: 'disc', text: t('filter.schnell.disc'), zeichen: <DiscZeichen className="size-3 opacity-80" /> },
-    { id: 'bestaetigt', text: t('filter.schnell.bestaetigt'), zeichen: '✓' },
+    ...(mitTv ? [{ id: 'bestaetigt' as const, text: t('filter.schnell.bestaetigt'), zeichen: '✓' }] : []),
     ...(showConfidence ? [{ id: 'verfuegbar' as const, text: t('filter.schnell.verfuegbar'), zeichen: '▶' }] : []),
     ...(mitTv ? [{ id: 'zweitanbieter' as const, text: t('filter.schnell.zweitanbieter'), zeichen: '↪' }] : []),
   ]

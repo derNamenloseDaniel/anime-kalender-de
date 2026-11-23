@@ -8,14 +8,16 @@
  * Staffeln trägt eine Menge.
  * Klassen: neu (vorher keine Kennung), verloren (nachher keine), umgezogen (andere Menge), gleich (gleiche Kennung),
  * ohne (in beiden Ständen keine Kennung; zählt nicht als "gleich").
- * Eine Kopie älter als 48 h bekommt eine Warnzeile (Datei-Zeitstempel).
+ * Eine Kopie älter als 48 h bekommt eine Warnzeile; das Alter zählt ab dem Stand in der Kopie (Tabelle kopie_stand,
+ * Beginn des Exports), nie ab dem Datei-Zeitstempel (Kopieren oder Entpacken setzt ihn neu).
  * Aufruf: node tools/zuordnungsbilanz.mjs <alt.sqlite> [<neu.sqlite>] [--gleich]
  *   ohne <neu.sqlite> gilt der Standardort data/cache/meldungskopie/meldungen.sqlite; "gleich" druckt nur mit --gleich.
  */
-import { existsSync, statSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { DatabaseSync } from 'node:sqlite'
+import { lokalerStand } from './meldungskopie-holen.mjs'
 
 const WURZEL = join(fileURLToPath(import.meta.url), '..', '..')
 export const STANDARD_KOPIE = join(WURZEL, 'data', 'cache', 'meldungskopie', 'meldungen.sqlite')
@@ -73,12 +75,23 @@ export function summen(zeilen) {
   return s
 }
 
-/** Warnzeilen für Kopien, deren Datei-Zeitstempel (`mtimes`: Pfad -> ms) mehr als 48 h vor `jetztMs` liegt. */
-export function alterswarnungen(mtimes, jetztMs) {
-  return Object.entries(mtimes)
-    .map(([pfad, ms]) => ({ pfad, stunden: Math.floor((jetztMs - ms) / 3600000) }))
-    .filter((k) => k.stunden > ALTER_GRENZE_STUNDEN)
-    .map((k) => `⚠ WARNUNG Kopie ${k.pfad} ist ${k.stunden} h alt (Grenze ${ALTER_GRENZE_STUNDEN} h)`)
+/** Warnzeilen für Kopien, deren Stand (`staende`: Pfad -> ISO-Zeit aus `kopie_stand`, '' = unbekannt) mehr als 48 h vor `jetztMs` liegt. */
+export function alterswarnungen(staende, jetztMs) {
+  return Object.entries(staende)
+    .map(([pfad, stand]) => ({ pfad, stand, stunden: Math.floor((jetztMs - Date.parse(stand)) / 3600000) }))
+    .filter((k) => !k.stand || k.stunden > ALTER_GRENZE_STUNDEN)
+    .map((k) => (k.stand
+      ? `⚠ WARNUNG Kopie ${k.pfad} (Stand ${k.stand}) ist ${k.stunden} h alt (Grenze ${ALTER_GRENZE_STUNDEN} h)`
+      : `⚠ WARNUNG Kopie ${k.pfad} hat keinen Stand (kopie_stand), Alter unbekannt`))
+}
+
+/** Stand der Kopie; '' (wird als Warnzeile gemeldet), wenn die Datei keine Tabelle kopie_stand hat. */
+function standOderLeer(datei) {
+  try {
+    return lokalerStand(datei)
+  } catch {
+    return ''
+  }
 }
 
 /** Ausgabe: Summenzeile, dann je Adresse "klasse  alt -> neu  adresse"; "gleich" und "ohne" nur auf Wunsch. */
@@ -90,7 +103,7 @@ export function formatiere(zeilen, mitGleich = false) {
   return [kopf, ...sichtbar.map((z) => `${z.klasse.padEnd(9)} ${liste(z.alt)} -> ${liste(z.neu)}  ${z.adresse}`)].join('\n')
 }
 
-export function main(argv) {
+export function main(argv, jetztMs = Date.now()) {
   const mitGleich = argv.includes('--gleich')
   const pfade = argv.filter((a) => !a.startsWith('--'))
   const alt = pfade[0]
@@ -99,8 +112,8 @@ export function main(argv) {
     console.error('Aufruf: node tools/zuordnungsbilanz.mjs <alt.sqlite> [<neu.sqlite>] [--gleich]  (beide Dateien müssen existieren)')
     return 2
   }
-  const mtimes = { [alt]: statSync(alt).mtimeMs, [neu]: statSync(neu).mtimeMs }
-  for (const w of alterswarnungen(mtimes, Date.now())) console.log(w)
+  const staende = { [alt]: standOderLeer(alt), [neu]: standOderLeer(neu) }
+  for (const w of alterswarnungen(staende, jetztMs)) console.log(w)
   console.log(formatiere(vergleiche(leseZuordnung(alt), leseZuordnung(neu)), mitGleich))
   return 0
 }

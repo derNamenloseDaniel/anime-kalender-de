@@ -190,7 +190,7 @@ const imBau = (historie: Record<string, ReturnType<typeof histQ>>): string => {
 pruefe('Bau ohne quellen, Historie mit Erstsichtung vor der aniSearch-Lesung: gilt', imBau({ 'virgin-road-vol1': histQ('2026-10-01'), 'andere-disc': histQ('2026-10-20') }) === '2026-11-06')
 pruefe('Bau ohne quellen, Historie nur unter fremdem Schlüssel: bleibt', imBau({ 'andere-disc': histQ('2026-10-01'), 'noch-eine': histQ('2026-10-02') }) === '2026-10-30')
 pruefe('Bau ohne quellen, Historie mit Erstsichtung nach der aniSearch-Lesung: bleibt', imBau({ 'virgin-road-vol1': histQ('2026-10-20') }) === '2026-10-30')
-const quelleB =(extra: Record<string, unknown>) => ({ url: 'https://x.example/b', name: 'x.example', sagt: '2026-10-30', stand: 'aktuell' as const, ...extra })
+const quelleB = (extra: Record<string, unknown>) => ({ url: 'https://x.example/b', name: 'x.example', sagt: '2026-10-30', stand: 'aktuell' as const, ...extra })
 const q1 = { url: A2Y, name: 'anime2you.de', gesehenAm: '2026-10-01', sagt: '2026-10-30', stand: 'aktuell' as const }
 const mitQuellen = (...quellen: unknown[]): Release => ({ ...virgin(), quellen } as unknown as Release)
 pruefe('ohne bekannte Meldung: eine Quelle ohne Lesetag nimmt dem Beleg die Aussage', nachOhne(mitQuellen(q1, quelleB({})), gelesen('2026-10-12T05:00:00Z')) === '2026-10-30')

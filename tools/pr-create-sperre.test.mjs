@@ -87,8 +87,78 @@ assert.match(imOrdner('gh --repo derNamenloseDaniel/anime-kalender-de pr create'
 assert.match(imOrdner('gh -R DerNamenloseDaniel/Anime-Kalender-DE pr create', ohne), /pr-einreichen\.sh/, 'Schreibweise egal')
 assert.equal(imOrdner('gh -R derNamenloseDaniel/chrome-utilities pr create --title x', mit), null, '--repo anderes Repo: frei, auch aus cwd mit Skript')
 assert.equal(imOrdner('gh --repo=derNamenloseDaniel/chrome-utilities pr create', mit), null, '--repo= anderes Repo: frei')
-assert.equal(imOrdner('gh pr create --title x', 'C:/gibt/es/nicht'), null, 'nicht existierender cwd: frei')
+assert.match(imOrdner('gh pr create --title x', 'C:/gibt/es/nicht'), /pr-einreichen\.sh/, 'nicht existierender cwd: nicht bestimmbar, gesperrt')
 assert.match(imOrdner('gh pr create --title x', undefined), /pr-einreichen\.sh/, 'ohne cwd gilt das Repo des Hooks')
+
+// Prüfer R1 (PR 4770): Umgehungen. A1 Option NACH `create`, aus fremdem cwd (ohne Skript) gesperrt, fremdes Repo frei.
+const EIG = 'derNamenloseDaniel/anime-kalender-de'
+const FREMD = 'derNamenloseDaniel/chrome-utilities'
+for (const c of [
+  `cd ${sl(ohne)} && gh pr create --repo ${EIG}`,
+  `gh pr create --title x -R ${EIG}`,
+  `gh pr create --repo=${EIG} --title x`,
+  `gh pr create --repo "${EIG}"`,
+  `gh pr create --title "a b" --body "t" --repo ${EIG}`,
+  // A2 Normalisierung
+  `gh -R${EIG} pr create`,
+  `gh pr create -R${EIG}`,
+  `gh pr create -R https://github.com/${EIG}`,
+  `gh pr create -R https://github.com/${EIG}.git`,
+  `gh pr create -R github.com/${EIG}`,
+  `gh pr create --repo=git@github.com:${EIG}.git`,
+  `GH_REPO=${EIG} gh pr create --title x`,
+  `env GH_REPO=${EIG} gh pr create --title x`,
+  `export GH_REPO=${EIG}; gh pr create --title x`,
+  `GH_REPO=${FREMD} gh pr create -R ${EIG}`,
+  'gh pr create -R "$R"',
+  'gh pr create -R foo',
+  // A3 cd-Optionen, pushd, cd -
+  `cd -P ${sl(mit)} && gh pr create`,
+  `cd -- ${sl(mit)} && gh pr create`,
+  `pushd ${sl(mit)} && gh pr create`,
+  'cd - && gh pr create',
+  'cd && gh pr create',
+  `cd ${sl(mit)} && popd && gh pr create`,
+  `pushd ${sl(ohne)} && popd && gh pr create`,
+  // A4 Zweifel sperrt; A5 cd in Repo mit Skript, bash -c innen
+  'cd ~/x && gh pr create',
+  `cd ${sl(ordner)}/gibt-es-nicht && gh pr create`,
+  `cd ${sl(mit)} && bash -c "gh pr create"`,
+  `cd ${sl(mit)} && eval 'gh pr create --title x'`,
+]) {
+  assert.match(imOrdner(c, ohne), /pr-einreichen\.sh/, `${c} gesperrt`)
+}
+for (const c of [
+  `gh pr create --title x -R ${FREMD}`,
+  `gh pr create --repo=${FREMD}`,
+  `gh pr create --repo "${FREMD}"`,
+  `gh pr create -R https://github.com/${FREMD}.git`,
+  `gh pr create -R${FREMD}`,
+  `GH_REPO=${FREMD} gh pr create`,
+  `env GH_REPO=${FREMD} gh pr create`,
+  `export GH_REPO=${FREMD}; gh pr create`,
+  `cd -P ${sl(ohne)} && gh pr create`,
+  `pushd ${sl(ohne)} && gh pr create`,
+  `cd ${sl(ohne)} && bash -c "gh pr create"`,
+]) {
+  assert.equal(imOrdner(c, mit), null, `${c} frei`)
+}
+
+// A4: ohne Skript entscheidet das Remote des Ordners (echtes git im Wegwerf-Repo).
+const gitRepo = (name, url) => {
+  const d = join(ordner, name)
+  mkdirSync(d, { recursive: true })
+  for (const a of [['init', '-q'], ['remote', 'add', 'origin', url]]) {
+    assert.equal(spawnSync('git', ['-C', d, ...a], { encoding: 'utf8', timeout: 20000 }).status, 0, `git ${a[0]}`)
+  }
+  return d
+}
+const meins = gitRepo('remote-eigen', `https://github.com/${EIG}.git`)
+const fremd = gitRepo('remote-fremd', `https://github.com/${FREMD}.git`)
+assert.match(imOrdner('gh pr create --title x', meins), /pr-einreichen\.sh/, 'Remote eigenes Repo ohne Skript: gesperrt')
+assert.equal(imOrdner('gh pr create --title x', fremd), null, 'Remote fremdes Repo: frei')
+assert.equal(imOrdner(`cd ${sl(fremd)} && gh pr create`, mit), null, 'cd in fremdes Repo: frei')
+assert.match(imOrdner(`cd ${sl(meins)} && gh pr create`, fremd), /pr-einreichen\.sh/, 'cd in eigenes Repo: gesperrt')
 
 // Prozess: Verweigerung als JSON auf stdout, Exit 0; freier Befehl und kaputte Eingabe ohne Ausgabe bzw. mit Fehlerzeile.
 const prozess = (roh) => spawnSync(process.execPath, [hook], { input: roh, encoding: 'utf8', timeout: 20000 })

@@ -168,6 +168,14 @@ export function nachtragSignal(pr, kopfZeit, jetzt, stufeFn) {
   return [{ nr: 12, text: `Stufe 2: Nachtrag zum Kopf ${pr.headRefOid.slice(0, 9)} fehlt (Nacht-Merger überspringt)`, seit: kopfZeit }]
 }
 
+export const SAMMLER_AUTOR = 'app/anime-kalender-daten'
+
+/** Signal 13: offener PR auf `daten/` von einem anderen Autor als dem Sammler: die Kette überspringt `daten/`, nichts prüft oder mergt ihn (PR 4732, 23.11.2026). */
+export function datenZweigSignal(pr, kopfZeit) {
+  if (!pr.headRefName?.startsWith('daten/') || pr.author?.login === SAMMLER_AUTOR) return []
+  return [{ nr: 13, text: `daten/-Zweig von ${pr.author?.login ?? 'unbekannt'} (Kette überspringt ihn)`, seit: kopfZeit }]
+}
+
 /** Signal 11: Entwurf ohne Aktivität länger als ENTWURF_H; für Entwürfe das einzige Signal (die übrigen gelten nur für ready-PRs). */
 export function entwurfSignal(pr, kopfZeit, jetzt) {
   const letzte = letzteAktivitaet(pr, kopfZeit)
@@ -288,12 +296,13 @@ export function ueberholtTreffer(patches, grepFn) {
   return gesamt > 0 && funde.length === gesamt ? funde : []
 }
 
-const NAECHSTER = { ENTWURF: 'ENTWURF (prüfen, auf bereit stellen oder schließen)', STAPEL: 'STAPEL', STILLSTAND: 'STILLSTAND', SCHLEIFE: 'SCHLEIFE (Nachrechnen-Gründe in den Kommentaren lesen)', UEBERHOLT: 'ÜBERHOLT?', NACHTRAG: 'NACHTRAG (Abnahme Dirigent zum Kopf schreiben)', DANIEL: 'DANIEL', MERGEN: 'MERGEN', ZUG: 'AUF ZUG MERGEN (merge-reihe-zug.sh)', NACHBESSERN: 'NACHBESSERN' }
+const NAECHSTER = { ENTWURF: 'ENTWURF (prüfen, auf bereit stellen oder schließen)', STAPEL: 'STAPEL', STILLSTAND: 'STILLSTAND', SCHLEIFE: 'SCHLEIFE (Nachrechnen-Gründe in den Kommentaren lesen)', UEBERHOLT: 'ÜBERHOLT?', NACHTRAG: 'NACHTRAG (Abnahme Dirigent zum Kopf schreiben)', ZWEIG: 'ZWEIG UMBENENNEN (auf fix/ oder korrektur/ neu pushen)', DANIEL: 'DANIEL', MERGEN: 'MERGEN', ZUG: 'AUF ZUG MERGEN (merge-reihe-zug.sh)', NACHBESSERN: 'NACHBESSERN' }
 
 /** Nächster Schritt aus Signalen und Gegenprobe; `daniel` = Signal 6 oder Signal 2 mit Bot-Urteil als letztem (nur Daniel löst das). */
 export function naechsterSchritt(nummern, treffer, botLetzt, imZug = false) {
   const hat = (n) => nummern.includes(n)
   if (hat(9)) return NAECHSTER.STAPEL
+  if (hat(13)) return NAECHSTER.ZWEIG
   if (hat(12)) return NAECHSTER.NACHTRAG
   if (nummern.every((n) => n === 8)) return NAECHSTER.STILLSTAND
   if (nummern.every((n) => n === 10 || n === 8)) return NAECHSTER.SCHLEIFE
@@ -358,7 +367,7 @@ function bewertePr(ghFn, gitFn, pr, geteilt, jetzt, karte, stapel, imZug, repo, 
   const kopfZeit = kopfZeitVon(ghFn, pr, karte)
   if (Number.isNaN(kopfZeit)) throw new Error(`PR ${pr.number}: Kopf-Zeit nicht lesbar`)
   if (pr.isDraft) return bewerteEntwurf(pr, kopfZeit, jetzt, repo)
-  const signale = [...signaleEinzel(pr, kopfZeit, jetzt), ...stillstandSignal(pr, kopfZeit, jetzt), ...schleifeSignal(pr, schleifenBeginn(ghFn, pr, kopfZeit)), ...nachtragSignal(pr, kopfZeit, jetzt, stufeFn)]
+  const signale = [...signaleEinzel(pr, kopfZeit, jetzt), ...stillstandSignal(pr, kopfZeit, jetzt), ...schleifeSignal(pr, schleifenBeginn(ghFn, pr, kopfZeit)), ...nachtragSignal(pr, kopfZeit, jetzt, stufeFn), ...datenZweigSignal(pr, kopfZeit)]
   const texte = signale.map((s) => `${s.nr} ${s.text}`)
   const zeiten = signale.map((s) => s.seit)
   const nummern = signale.map((s) => s.nr)
@@ -380,7 +389,7 @@ function bewertePr(ghFn, gitFn, pr, geteilt, jetzt, karte, stapel, imZug, repo, 
   return { nr: pr.number, repo, signale: nummern.map((n, i) => ({ nr: n, seit: zeiten[i] })), zeile: text }
 }
 
-const FELDER_LEICHT = 'number,title,headRefOid,createdAt,mergeable,mergeStateStatus,isDraft,body,baseRefName'
+const FELDER_LEICHT = 'number,title,headRefName,author,headRefOid,createdAt,mergeable,mergeStateStatus,isDraft,body,baseRefName'
 const FELDER_GRUPPEN = ['reviews,statusCheckRollup', 'comments']
 
 /** Eine Feldgruppe aller offenen PRs; scheitert die Sammelabfrage am GraphQL-Limit (nur dann), je PR einzeln (`pr view`); jeder andere Fehler schlägt durch. */
@@ -441,7 +450,7 @@ export const liegegut = (ghFn, gitFn, jetzt, hinweis, standText, zugAktiv) => li
 /** Textzeilen aller überwachten Repos. */
 export const liegegutAlle = (ghFn, gitFn, jetzt, hinweis, standText, zugAktiv, stufeFn = null) => liegegutAlleFunde(ghFn, gitFn, jetzt, hinweis, standText, zugAktiv, stufeFn).map((f) => f.zeile)
 
-const KURZ = { 1: 'Freigabe ruht', 2: 'Urteile widersprechen', 3: 'Konflikt', 4: 'rot', 5: 'Ändern offen', 6: 'gleiche Entscheidung', 8: 'Stillstand', 9: 'Stapel', 10: 'Nachrechnen-Schleife', 11: 'Entwurf liegt', 12: 'Nachtrag fehlt' }
+const KURZ = { 1: 'Freigabe ruht', 2: 'Urteile widersprechen', 3: 'Konflikt', 4: 'rot', 5: 'Ändern offen', 6: 'gleiche Entscheidung', 8: 'Stillstand', 9: 'Stapel', 10: 'Nachrechnen-Schleife', 11: 'Entwurf liegt', 12: 'Nachtrag fehlt', 13: 'daten/-Zweig fremd' }
 
 /** Eine Sammelzeile für die Wachphase: `LIEGT: 2377 (Konflikt 30 h, Stillstand 52 h), …`; null ohne Funde. */
 export function liegtZeile(funde, jetzt) {

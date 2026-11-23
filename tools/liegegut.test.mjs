@@ -10,7 +10,7 @@ import { mitLimit } from './kind-mit-limit.mjs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { nachtragSignal, stufeEcht, stufeOderHinweis, STUFE_FRIST_MS, liegegutAlle, liegegutAlleFunde, liegtZeile, offenePrs, checkStand, geteilteEntscheidungen, offeneEntscheidungen, kopfZeitVon, kopfZeiten, liegegut, main, meldeLiegt, hauptordner, standImProjekt, stapelBasis, grepMain, neueBezeichner, naechsterSchritt, signaleEinzel, stillstandSignal, entwurfSignal, stapelKandidat, ueberholtTreffer, urteile, JQ_PATCHES } from './liegegut.mjs'
+import { nachtragSignal, stufeEcht, stufeOderHinweis, STUFE_FRIST_MS, liegegutAlle, liegegutAlleFunde, liegtZeile, offenePrs, checkStand, geteilteEntscheidungen, offeneEntscheidungen, kopfZeitVon, kopfZeiten, liegegut, main, meldeLiegt, hauptordner, standImProjekt, stapelBasis, grepMain, neueBezeichner, naechsterSchritt, signaleEinzel, stillstandSignal, entwurfSignal, datenZweigSignal, stapelKandidat, ueberholtTreffer, urteile, JQ_PATCHES } from './liegegut.mjs'
 
 // Der echte Vorrat im Hauptordner darf diese Fälle nicht färben (Vorrat-Signal: tools/liegegut-vorrat.test.mjs).
 process.env.AK_VORRAT_ORDNER = path.join(os.tmpdir(), 'liegegut-ohne-vorrat')
@@ -323,10 +323,20 @@ console.log('liegegut: Signal 11 Entwurf liegt (12 h)')
   pruefe('KURZ-Name steht in der Sammelzeile', /Entwurf liegt \d+ h/.test(liegtZeile(liegegutAlleFunde(attrappeGh([pr(5, { isDraft: true, comments: [daniel(13, 'x')] })]), attrappeGit(), JETZT), JETZT) ?? ''))
 }
 
+console.log('liegegut: Signal 13 daten/-Zweig von fremdem Autor (PR 4732)')
+{
+  const z = (p) => datenZweigSignal(p, JETZT).map((s) => s.nr)
+  pruefe('Bauer (fremder Autor) auf daten/ → Signal 13', JSON.stringify(z(pr(4732, { headRefName: 'daten/horizonte-staffelnamen', author: { login: 'derNamenloseDaniel' } }))) === '[13]')
+  pruefe('Sammler-App auf daten/ → kein Signal', z(pr(1, { headRefName: 'daten/anilist-2026-11-23', author: { login: 'app/anime-kalender-daten' } })).length === 0)
+  pruefe('fremder Autor auf fix/ → kein Signal', z(pr(2, { headRefName: 'fix/x', author: { login: 'derNamenloseDaniel' } })).length === 0)
+  const f = liegegutAlleFunde(attrappeGh([pr(4732, { headRefName: 'daten/x', author: { login: 'derNamenloseDaniel' }, comments: [daniel(1, 'x')] })]), attrappeGit(), JETZT)
+  pruefe('Gesamtlauf: auffälliger PR mit Schritt ZWEIG UMBENENNEN', f.length === 1 && /ZWEIG UMBENENNEN/.test(f[0].zeile), f)
+}
+
 console.log('liegegut: Sammelzeile je Signalnummer (Tabelle, PR 3854: 8 überlebende Mutanten an KURZ und istZugPr)')
 {
   // Signalnummer → Kurzname; 7 hat keinen Eintrag in KURZ (Signal 7 ist nur Gegenprobe, nie ein eigenes Signal).
-  const tabelle = [[1, 'Freigabe ruht'], [2, 'Urteile widersprechen'], [3, 'Konflikt'], [4, 'rot'], [5, 'Ändern offen'], [6, 'gleiche Entscheidung'], [8, 'Stillstand'], [9, 'Stapel'], [10, 'Nachrechnen-Schleife'], [11, 'Entwurf liegt']]
+  const tabelle = [[1, 'Freigabe ruht'], [2, 'Urteile widersprechen'], [3, 'Konflikt'], [4, 'rot'], [5, 'Ändern offen'], [6, 'gleiche Entscheidung'], [8, 'Stillstand'], [9, 'Stapel'], [10, 'Nachrechnen-Schleife'], [11, 'Entwurf liegt'], [13, 'daten/-Zweig fremd']]
   for (const [nr, kurz] of tabelle) {
     const ist = liegtZeile([{ nr: 77, repo: 'anime-kalender-de', signale: [{ nr, seit: JETZT - 5 * 3600 * 1000 }] }], JETZT)
     pruefe(`Signal ${nr} → „${kurz}“ mit Stundenzahl`, ist === `LIEGT: 77 (${kurz} 5 h)`, ist)
@@ -422,7 +432,7 @@ console.log('liegegut: offene PRs in Blöcken (GraphQL-Limit 05.11.2026)')
   const sammel = (aufrufe, comments) => (args) => {
     aufrufe.push(args.join(' '))
     const f = args[args.indexOf('--json') + 1]
-    if (args[1] === 'list' && f === 'number,title,headRefOid,createdAt,mergeable,mergeStateStatus,isDraft,body,baseRefName') return JSON.stringify([p1, p2])
+    if (args[1] === 'list' && f === 'number,title,headRefName,author,headRefOid,createdAt,mergeable,mergeStateStatus,isDraft,body,baseRefName') return JSON.stringify([p1, p2])
     if (args[1] === 'list' && f === 'number,reviews,statusCheckRollup') return JSON.stringify([{ number: 9, reviews: ['r9'], statusCheckRollup: ['s9'] }, { number: 7, reviews: ['r7'], statusCheckRollup: ['s7'] }])
     if (args[1] === 'list') return comments(args)
     return JSON.stringify({ comments: ['einzeln-' + args[2]] })
@@ -611,7 +621,7 @@ console.log('liegegut: zweites Repo anime-kalender-nativ (erfundene PR-Listen be
 console.log('liegegut: eigener Prozess (Vorlader tools/pr-nachrechnen-mock.mjs)')
 {
   const werk = fs.mkdtempSync(path.join(os.tmpdir(), 'liegegut-'))
-  const leicht = 'number,title,headRefOid,createdAt,mergeable,mergeStateStatus,isDraft,body,baseRefName'
+  const leicht = 'number,title,headRefName,author,headRefOid,createdAt,mergeable,mergeStateStatus,isDraft,body,baseRefName'
   const frei = pr(1676, { comments: [{ author: { login: 'github-actions' }, createdAt: '2026-10-20T10:44:00Z', body: `**Prüfer-Review** für ${KOPF.slice(0, 9)} - Urteil: **ok**` }] })
   const daten = {
     [`pr list --state open --limit 100 --json ${leicht}`]: { aus: JSON.stringify([frei]) },

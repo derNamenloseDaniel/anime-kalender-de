@@ -48,7 +48,7 @@ Du bist Bauer: du arbeitest nur im genannten Worktree, eröffnest einen PR und m
 
 ## Lokal prüfen, schwer prüft die Kette (F40)
 
-Lokal immer: Tests der berührten Dateien (`npx tsx <test>`) und `npx tsc --noEmit -p .` (nie `-p web`). Vollläufe (`check-logic-alle`, `tests-alle`, `check:vor-commit`) sperrt `.claude/hooks/schwerlauf-sperre.js:82`; zur Fehlersuche an roter Kette nur `node tools/schwer.mjs npm run <ziel>`, im Vordergrund, nie zwei zugleich. Lokal bleibt, was die Kette nicht hat: `check:handbelege` bei geänderten Belegen (eine Sperre in `belege-entfernt.yaml` zieht dieselbe Adresse aus `data/kanal-seiten.json` mit und fährt `check:kanal-merkliste-gesperrt`; Lehre 222), Bestands- und Datenbau-Proben am echten Datensatz. Rote CI-Stellen über die Job-API lesen, nie `tests-alle --alle` lokal.
+Lokal immer: Tests der berührten Dateien (`npx tsx <test>`) und `npx tsc --noEmit -p .` (nie `-p web`). Vollläufe (`check-logic-alle`, `tests-alle`, `check:vor-commit`) sperrt `.claude/hooks/schwerlauf-sperre.js:82`; zur Fehlersuche an roter Kette nur `node tools/schwer.mjs npm run <ziel>`, im Vordergrund, nie zwei zugleich. Lokal bleibt, was die Kette nicht hat: `check:handbelege` bei geänderten Belegen (eine Sperre in `belege-entfernt.yaml` zieht dieselbe Adresse aus `data/kanal-seiten.json` mit und fährt `check:kanal-merkliste-gesperrt`; Lehre 222), und wer Code aus einer Datei verschiebt, sucht vorher mit `grep -n "<datei>" pipeline/check-logic.ts` die Quelltext-Wächter darauf; ein „heute“ kommt nur aus `shared/time.ts` (Lehre 223), Bestands- und Datenbau-Proben am echten Datensatz. Rote CI-Stellen über die Job-API lesen, nie `tests-alle --alle` lokal.
 
 **Vor dem ersten Push, je nach Berührung** (Exit-Code lesen, nicht Zeichen):
 

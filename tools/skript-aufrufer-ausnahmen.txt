@@ -15,4 +15,3 @@ tools/pr-kette-pruefen.mjs # Wächter der PR-Kette; sein Test tools/pr-kette-pru
 tools/pr-pruefer-kulisse-gh.cjs # gh-Attrappe, von tools/pr-pruefer-kulisse.mjs als Text gelesen, keine Prüfung
 tools/pruefung-zurueckstellen.mjs # Handwerkzeug (09.09.2026, Prüfliste), von Hand gestartet
 tools/wache-woechentlich-gh-attrappe.mjs # gh-Attrappe, vom Prozess-Test tools/wache-woechentlich-prozess.test.mjs per Umgebungsvariable gestartet, keine Prüfung
-pipeline/check-filter-zaehlung-bestand.ts # Handwerkzeug von Hand, liest public/data; Bestandsliste folgt nach Entscheidung über die Obergrenze in tools/bestand-marken.test.mjs (PR 4715), Aufruf im Kopfkommentar

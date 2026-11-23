@@ -2,6 +2,7 @@ import { readJson, log } from '../lib/util.ts'
 import { type DubConfidence, type Fsk, type PlatformId } from '../../shared/types.ts'
 import { type AniListMedia } from '../lib/anilist.ts'
 import { type TmdbInfo } from '../lib/tmdb.ts'
+import { mitHandvorrang } from '../lib/tmdb-von-hand.ts'
 import { mehrdeutigeFilmzuordnungen, merkeGeteilteFilme, schreibeGeteilteFilme } from '../lib/tmdb-eindeutig.ts'
 import { verwirfKopierteAnbieter } from '../lib/tmdb-angebote-kopie.ts'
 import { meldeCacheStand } from './cache-stand.ts'
@@ -52,7 +53,7 @@ export function ladeQuellen() {
   const tmdb = readJson<Record<string, TmdbInfo>>('data/tmdb.json', {})
   // Je AniList-ID: deutsche Handlung, FSK und Anbieter — für alle Titel, nicht
   // nur die kuratierten.
-  const tmdbTitles = readJson<Record<string, TmdbTitelEintrag>>('data/tmdb-titles.json', {})
+  const tmdbTitles = mitHandvorrang(readJson<Record<string, TmdbTitelEintrag>>('data/tmdb-titles.json', {}))
   /* Mehrfach vergebene Filme verlieren ihre TMDB-Angaben — siehe `mehrdeutigeFilmzuordnungen()`. */
   const tmdbMehrdeutig = mehrdeutigeFilmzuordnungen(tmdbTitles)
   merkeGeteilteFilme(tmdbMehrdeutig)

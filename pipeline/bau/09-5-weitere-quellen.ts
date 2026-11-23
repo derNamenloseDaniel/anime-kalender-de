@@ -1,4 +1,5 @@
 import { readJson, log } from '../lib/util.ts'
+import { mitHandvorrang } from '../lib/tmdb-von-hand.ts'
 import { type MotnDaten, LEER as MOTN_LEER } from '../lib/motn.ts'
 import { werteMotnAus } from './09-5-1-motn-uebernahme.ts'
 import { todayIso } from '../../shared/time.ts'
@@ -52,7 +53,7 @@ export function werteWeitereQuellenAus({ releases, titles, adnKatalog, adnVerwei
    */
   const { motnBelege, motnTon } = werteMotnAus({
     motn: readJson<MotnDaten>('data/motn.json', MOTN_LEER),
-    tmdbTitles: readJson('data/tmdb-titles.json', {}),
+    tmdbTitles: mitHandvorrang(readJson('data/tmdb-titles.json', {})),
     titles,
     releases,
     heute: todayIso(),

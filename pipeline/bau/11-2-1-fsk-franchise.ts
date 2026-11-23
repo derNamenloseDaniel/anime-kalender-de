@@ -1,4 +1,5 @@
 import { log, readJson } from '../lib/util.ts'
+import { mitHandvorrang } from '../lib/tmdb-von-hand.ts'
 import type { Fsk, Release, Title } from '../../shared/types.ts'
 import { fskQuelleFehler } from './11-2-1-fsk-justwatch.ts'
 
@@ -28,7 +29,7 @@ export function franchiseFskFehler(titles: Map<number, Title>, releases: Release
 
 /** Läuft nach JustWatch: ein Wert aus Freigabe oder Anbieter bleibt; gelesen werden nur Freigaben der Geschwister. */
 export function uebernehmeFskAusFranchise(titles: Map<number, Title>, releases: Release[] = []): void {
-  const tmdb = readJson<Record<string, { fsk?: Fsk }>>('data/tmdb-titles.json', {})
+  const tmdb = mitHandvorrang(readJson<Record<string, { fsk?: Fsk }>>('data/tmdb-titles.json', {}))
   const tmdbFsk = (id: number) => tmdb[String(id)]?.fsk
   const amTermin = new Set(releases.filter((r) => r.fsk !== undefined).map((r) => r.titleId))
   const neu = new Map<number, Fsk>()

@@ -3,11 +3,12 @@
  * Prozesstest gegen `fetch-tmdb-titles.ts` auf einer Kulisse im Temp-Ordner, dazu die reine Funktion. Läuft in `check:logic`.
  */
 import { spawnSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { uebernimmVonHand, type Abgeleitet } from './lib/tmdb-von-hand.ts'
+import { ladeHandzeilen, mitHandvorrang, uebernimmVonHand, type Abgeleitet } from './lib/tmdb-von-hand.ts'
+import { mehrdeutigeFilmzuordnungen } from './lib/tmdb-eindeutig.ts'
 
 let verletzt = 0
 let faelle = 0
@@ -50,7 +51,20 @@ console.log('\nTMDB von Hand: reine Funktion')
   pruefe('Kennungswechsel: Folgen, die schon zur neuen Kennung gehören, bleiben', folgenNeu.folgen['900402']?.tmdbId === 7, folgenNeu)
   const leer = bestand()
   uebernimmVonHand({}, [{ anilistId: 900403, ohne: true }], 'x', leer)
-  pruefe('ohne: auch ohne Bestandseintrag werden Altfälle gestrichen', !('900403' in leer.banner) && !('900403' in leer.folgen) && !('900403' in leer.poster), leer)
+  // Handvorrang im Bau (Anlass 99196, 23.11.2026): Kennungswechsel nimmt auch den Inhalt der alten Kennung mit, sonst trüge der Titel Handlung und FSK eines anderen Films.
+  const wechsel: Record<string, any> = { 900406: { tmdbId: 1, kind: 'movie', overviewDe: 'Text des anderen Films', fsk: 12, providers: ['netflix'], genreIds: [16] }, 900407: { tmdbId: 2, kind: 'movie', overviewDe: 'bleibt' } }
+  uebernimmVonHand(wechsel, [{ anilistId: 900406, tmdbId: 3, kind: 'movie' }, { anilistId: 900407, tmdbId: 2, kind: 'movie' }], 'x')
+  pruefe('Kennungswechsel: neue Kennung gilt, Inhalt der alten entfällt', wechsel['900406'].tmdbId === 3 && !wechsel['900406'].overviewDe && !wechsel['900406'].fsk && !wechsel['900406'].providers && !wechsel['900406'].genreIds, wechsel['900406'])
+  pruefe('gleiche Kennung: Inhalt bleibt', wechsel['900407'].overviewDe === 'bleibt', wechsel['900407'])
+  const geteilt: Record<string, any> = { 1: { tmdbId: 469912, kind: 'movie' }, 2: { tmdbId: 469912, kind: 'movie' } }
+  uebernimmVonHand(geteilt, [{ anilistId: 2, tmdbId: 483459, kind: 'movie' }], 'x')
+  pruefe('zwei Titel mit derselben Filmkennung: die Handzeile trennt sie', mehrdeutigeFilmzuordnungen(geteilt).size === 0, geteilt)
+  const echt = mitHandvorrang(JSON.parse(readFileSync('data/tmdb-titles.json', 'utf8')))
+  pruefe('echter Cache mit Handvorrang: jede Handkennung steht im Cache', ladeHandzeilen().filter((e) => e.tmdbId).every((e) => echt[e.anilistId]?.tmdbId === e.tmdbId), ladeHandzeilen().filter((e) => e.tmdbId && echt[e.anilistId]?.tmdbId !== e.tmdbId))
+  // Wächter: jeder Leser von tmdb-titles.json im Bau (pipeline/bau, Quelle der Titelfelder) geht durch den Handvorrang.
+  const ohneVorrang = readdirSync('pipeline/bau').filter((f) => f.endsWith('.ts') && /readJson[^\n]*'data\/tmdb-titles\.json'/.test(readFileSync(`pipeline/bau/${f}`, 'utf8')) && !readFileSync(`pipeline/bau/${f}`, 'utf8').includes('mitHandvorrang('))
+  pruefe('jeder Leser von tmdb-titles.json im Bau nimmt den Handvorrang', ohneVorrang.length === 0, ohneVorrang)
+  pruefe('ohne: auch ohne Bestandseintrag werden Altfälle gestrichen',!('900403' in leer.banner) && !('900403' in leer.folgen) && !('900403' in leer.poster), leer)
 }
 
 console.log('\nTMDB von Hand: Lauf von fetch-tmdb-titles.ts')

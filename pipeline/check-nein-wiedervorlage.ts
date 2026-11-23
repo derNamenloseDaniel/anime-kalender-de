@@ -83,9 +83,9 @@ const beiKennung = crunchyrollNeinAbruf(entfernt, zweiKacheln, zweiTermine)
 pruefe('zwei Titel einer Serie: die jüngste Kachel zählt, nicht die zuletzt gelesene', beiKennung.kachelSeit.get('GT00371869') === '2026-10-11', [...beiKennung.kachelSeit])
 
 console.log('\nAnschluss im Abruf')
-const abruf = readFileSync(new URL('./scrape-crunchyroll-dub.ts', import.meta.url), 'utf8')
+const abruf = readFileSync(new URL('./lib/cr-dub-auswahl.ts', import.meta.url), 'utf8')
 pruefe(
-  'scrape-crunchyroll-dub.ts bildet seine Liste auch aus den entfernten Adressen und macht Kachel-Serien sofort fällig',
+  'scrape-crunchyroll-dub.ts bildet seine Liste (lib/cr-dub-auswahl.ts) auch aus den entfernten Adressen und macht Kachel-Serien sofort fällig',
   abruf.includes('crunchyrollNeinAbrufLaden()') && abruf.includes('nein?.adressen') && abruf.includes('nein?.kachelSeit'),
 )
 

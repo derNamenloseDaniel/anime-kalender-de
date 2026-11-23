@@ -2088,6 +2088,10 @@
       "am": "2026-11-21",
       "vorschlaege": 1
     },
+    "1074225": {
+      "am": "2026-11-23",
+      "vorschlaege": 2
+    },
     "1074234": {
       "am": "2026-11-22",
       "vorschlaege": 1
@@ -2103,6 +2107,10 @@
     "1074274": {
       "am": "2026-11-21",
       "vorschlaege": 1
+    },
+    "1074284": {
+      "am": "2026-11-23",
+      "vorschlaege": 0
     },
     "1074300": {
       "am": "2026-11-21",
@@ -2126,6 +2134,10 @@
       "vorschlaege": 0,
       "uebersprungen": "kein Deutschland-Bezug"
     },
+    "1074451": {
+      "am": "2026-11-23",
+      "vorschlaege": 0
+    },
     "1074495": {
       "am": "2026-11-21",
       "vorschlaege": 0
@@ -2146,9 +2158,18 @@
       "am": "2026-11-22",
       "vorschlaege": 0
     },
+    "1074948": {
+      "am": "2026-11-23",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
     "1074954": {
       "am": "2026-11-22",
       "vorschlaege": 0
+    },
+    "1074967": {
+      "am": "2026-11-23",
+      "vorschlaege": 1
     },
     "1075001": {
       "am": "2026-11-23",
@@ -16853,6 +16874,69 @@
       "artikelId": "1075001",
       "artikel": "TV-Guide: Anime im deutschen Fernsehen in KW 48/2026",
       "quelle": "https://www.anime2you.de/news/1075001/anime-tv-programm-48-2026/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Mashle: Magic and Muscles",
+      "zitat": "Die Gesamtausgabe der ersten »Mashle: Magic and Muscles«-Staffel, die alle zwölf Episoden in zwei Volumes mit Sammelschuber enthält, erscheint nach aktueller Planung am 5. Februar 2027 als DVD und Blu-ray.",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2027-02-05",
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [],
+      "artikelId": "1074225",
+      "artikel": "Erste »Mashle«-Staffel erscheint als Blu-ray-Gesamtausgabe",
+      "quelle": "https://www.anime2you.de/news/1074225/mashle-staffel-1-blu-ray-gesamtausgabe/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Mashle: Magic and Muscles",
+      "zitat": "Die ersten beiden Staffeln stehen bereits beim Streaming-Anbieter Crunchyroll auf Abruf zur Verfügung. Die dritte Staffel startet am 9. Januar 2027 und wird dort ebenfalls mit deutschen Untertiteln im Simulcast gezeigt.",
+      "art": "start",
+      "sprache": "omu",
+      "plattform": "crunchyroll",
+      "datum": "2027-01-09",
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Samstag",
+      "warnungen": [],
+      "artikelId": "1074225",
+      "artikel": "Erste »Mashle«-Staffel erscheint als Blu-ray-Gesamtausgabe",
+      "quelle": "https://www.anime2you.de/news/1074225/mashle-staffel-1-blu-ray-gesamtausgabe/",
+      "veroeffentlicht": "2026-11-23",
+      "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Link Click",
+      "zitat": "Der 13-teilige zweite Part der dritten Staffel von »Link Click« soll nach aktueller Planung im zweiten Halbjahr 2027 starten.",
+      "art": "ankuendigung",
+      "sprache": "unklar",
+      "plattform": null,
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": "13",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1074967",
+      "artikel": "Start des zweiten Parts der dritten »Link Click«-Staffel + Visual",
+      "quelle": "https://www.anime2you.de/news/1074967/link-click-staffel-3-part-2-start/",
       "veroeffentlicht": "2026-11-23",
       "gelesenAm": "2026-11-23"
     }

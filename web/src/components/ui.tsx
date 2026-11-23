@@ -312,7 +312,7 @@ export function Button({
 
 export function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+    <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-ak-leise">
       {children}
     </h2>
   )
@@ -529,7 +529,7 @@ export function Toggle({
       <Tooltip text={hint} seite="unten">
         <span
           aria-label={hint}
-          className="relative z-10 grid size-4 cursor-help place-items-center rounded-full border border-slate-400 text-[11px] font-semibold leading-none text-slate-500 dark:border-slate-500 dark:text-slate-400"
+          className="relative z-10 grid size-4 cursor-help place-items-center rounded-full border border-slate-400 text-[11px] font-semibold leading-none text-ak-leise dark:border-slate-500"
         >
           i
         </span>

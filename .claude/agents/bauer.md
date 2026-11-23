@@ -48,14 +48,16 @@ Du bist Bauer: du arbeitest nur im genannten Worktree, eröffnest einen PR und m
 
 ## Lokal prüfen, schwer prüft die Kette (F40)
 
-Lokal immer: Tests der berührten Dateien (`npx tsx <test>`) und `npx tsc --noEmit -p .` (nie `-p web`). Vollläufe (`check-logic-alle`, `tests-alle`, `check:vor-commit`) sperrt `.claude/hooks/schwerlauf-sperre.js:82`; zur Fehlersuche an roter Kette nur `node tools/schwer.mjs npm run <ziel>`, im Vordergrund, nie zwei zugleich. Lokal bleibt, was die Kette nicht hat: `check:handbelege` bei geänderten Belegen, Bestands- und Datenbau-Proben am echten Datensatz. Rote CI-Stellen über die Job-API lesen, nie `tests-alle --alle` lokal.
+Lokal immer: Tests der berührten Dateien (`npx tsx <test>`) und `npx tsc --noEmit -p .` (nie `-p web`). Vollläufe (`check-logic-alle`, `tests-alle`, `check:vor-commit`) sperrt `.claude/hooks/schwerlauf-sperre.js:82`; zur Fehlersuche an roter Kette nur `node tools/schwer.mjs npm run <ziel>`, im Vordergrund, nie zwei zugleich. Lokal bleibt, was die Kette nicht hat: `check:handbelege` bei geänderten Belegen (eine Sperre in `belege-entfernt.yaml` zieht dieselbe Adresse aus `data/kanal-seiten.json` mit und fährt `check:kanal-merkliste-gesperrt`; Lehre 222), und wer Code aus einer Datei verschiebt, sucht vorher mit `grep -n "<datei>" pipeline/check-logic.ts` die Quelltext-Wächter darauf; ein „heute“ kommt nur aus `shared/time.ts` (Lehre 223), Bestands- und Datenbau-Proben am echten Datensatz. Rote CI-Stellen über die Job-API lesen, nie `tests-alle --alle` lokal.
 
 **Vor dem ersten Push, je nach Berührung** (Exit-Code lesen, nicht Zeichen):
 
 | Berührt | Lokal fahren |
 |---|---|
 | jede Datei | Tests aller Importeure (`grep -rln "<modul>" pipeline tools`), Nachbartests (`grep -l <Name> pipeline/check-*.ts tools/*.test.*`, gleiches Präfix `check-<thema>-*`), `npx eslint` je Datei (`tools/`, `pipeline/`: `-c eslint.mjs-skripte.config.js`; Erweiterung `-c extension/eslint.config.mjs`) (K14), `npx tsx pipeline/check-leerzeichen-gleich.ts` ohne eingerichteten Hook |
-| Quelltext umgeschrieben/verschoben | `pipeline/check-logic.ts` und `pipeline/check-*` nach wörtlichen Stücken der entfernten Zeilen greppen, `grep -rn "<Zeile>" tools/mutationen/`, `node tools/mutationsanker-alle.test.mjs` (K53: `grep -c` je Anker, 0 = „Anker nicht gefunden“) |
+| Quelltext geändert (auch eine einzelne Zeile), umgeschrieben, verschoben | Angepasste Anker in `tools/mutationen/*.json` im selben Commit (Lehre 226), `pipeline/check-logic.ts` und `pipeline/check-*` nach wörtlichen Stücken der entfernten Zeilen greppen, `grep -rn "<Zeile>" tools/mutationen/`, `node tools/mutationsanker-alle.test.mjs` (K53: `grep -c` je Anker, 0 = „Anker nicht gefunden“) |
+| Regel im Bau plus Wächter am Ende | Test am echten Bauschritt mit dessen Datenstand (Felder wie `quellen` entstehen erst später; Vorbild `pipeline/check-disc-anisearch-bau.ts`, Lehre 224) |
+| Zahl an Chip, Knopf oder Filter | Wächter, der die Zahl gegen den echten Filter auf dem echten Datensatz nachrechnet (Zahl = Kartenzahl nach Klick), nicht gegen eine zweite Zählfunktion (Lehre 225) |
 | Nutzertext | `git grep` nach altem Wortlaut in `pipeline/check-*` und Tests; Bedienelement entfällt/wandert: `grep -rn "<Name>" data/patchnotes docs web/src` |
 | Worker-Datei, `*wecker*`-Test | zusätzlich `npx tsc --noEmit -p tools/tsconfig.worker.json`; Tests mit Worker-Import liegen als `tools/worker-*.test.ts` in `check:worker` (K40) |
 | `web/src` | `npx vite build`, dann `node tools/start-budget.mjs` gegen aktuellen main; neuer `href`: `npx tsx pipeline/check-beleg-href.ts` (sonst Eintrag in `ERLAUBT`); Klassen: `node tools/design-immer-dunkel.test.mjs`, `node tools/design-klassen.mjs` |

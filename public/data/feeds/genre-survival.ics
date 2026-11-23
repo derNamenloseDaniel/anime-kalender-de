@@ -99,6 +99,17 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
+UID:apothecary-diaries-s2-vol1@2026-12-04@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261204
+DTEND;VALUE=DATE:20261205
+SUMMARY:Die Tagebücher der Apothekerin – Staffel 2 – Vol. 1 (Disc)
+DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nAuf Deuts
+ ch vor der Disc bei Crunchyroll im Streaming (ab 31.01.2025).\nUhrzeit noc
+ h nicht bestätigt.\nDetails: https://anime-kalender.de/t/15778/
+CATEGORIES:DVD / Blu-ray
+END:VEVENT
+BEGIN:VEVENT
 UID:apothecary-diaries-s3-cour1@2026-12-11@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261211T160000Z
@@ -243,6 +254,19 @@ DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
 CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT
+UID:apothecary-diaries-s2-vol2@2027-01-15@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20270115
+DTEND;VALUE=DATE:20270116
+SUMMARY:Die Tagebücher der Apothekerin – Staffel 2 – Vol. 2 (Disc)
+DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nAuf Deuts
+ ch vor der Disc bei Crunchyroll im Streaming (ab 31.01.2025).\nUhrzeit noc
+ h nicht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\
+ , sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https:/
+ /anime-kalender.de/t/15778/
+CATEGORIES:DVD / Blu-ray
+END:VEVENT
+BEGIN:VEVENT
 UID:im-standing-on-a-million-lives-s2-box@2027-02-05@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20270205
@@ -261,6 +285,17 @@ DTEND;VALUE=DATE:20270226
 SUMMARY:Berserk (Disc)
 DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
  och nicht bestätigt.\nDetails: https://anime-kalender.de/t/24/
+CATEGORIES:DVD / Blu-ray
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-885-disc@2027-02-25@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20270225
+DTEND;VALUE=DATE:20270226
+SUMMARY:Angel’s Egg (Disc)
+DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nAuf Deuts
+ ch vor der Disc bei Prime Video im Streaming (ab 05.11.2026).\nUhrzeit noc
+ h nicht bestätigt.\nDetails: https://anime-kalender.de/t/775/
 CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT

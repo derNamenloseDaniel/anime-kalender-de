@@ -1,5 +1,0 @@
-kategorie: bugfix
-text: Trinity-Seven-Film zeigt deutsche Synchro
-untertitel: "Auf Deutsch seit der Blu-ray vom 20.03.2025"
-wartetAuf: "Bestandsbau nach diesem PR. Probe: In public/data/titles.json hat Kennung 103631 dubConfidence normal statt low und deErstausgabe.von 2025-03-20."
-seit: '2026-11-22'

@@ -105040,6 +105040,50 @@
     "fetchedAt": "2026-11-09T05:10:04.848Z",
     "stand": 1
   },
+  "57351": {
+    "ean": "7630017517142",
+    "audio": [
+      "Deutsch",
+      "Japanisch"
+    ],
+    "untertitel": [
+      "Deutsch"
+    ],
+    "publisher": "Kazé Deutschland",
+    "umfang": "Film",
+    "medium": "Blu-ray",
+    "enthalten": [
+      {
+        "anisearchId": 10156,
+        "typ": "Film",
+        "folgen": 3
+      }
+    ],
+    "fetchedAt": "2026-11-23T06:03:07.516Z",
+    "stand": 1
+  },
+  "57352": {
+    "ean": "7630017517135",
+    "audio": [
+      "Deutsch",
+      "Japanisch"
+    ],
+    "untertitel": [
+      "Deutsch"
+    ],
+    "publisher": "Kazé Deutschland",
+    "umfang": "Film",
+    "medium": "DVD",
+    "enthalten": [
+      {
+        "anisearchId": 10156,
+        "typ": "Film",
+        "folgen": 3
+      }
+    ],
+    "fetchedAt": "2026-11-23T06:03:13.964Z",
+    "stand": 1
+  },
   "57353": {
     "ean": "4260623480641",
     "audio": [

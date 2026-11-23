@@ -1,13 +1,13 @@
 {
-  "scrapedAt": "2026-11-23T05:03:15.926Z",
+  "scrapedAt": "2026-11-23T13:05:00.259Z",
   "verworfen": {
     "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 39,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 5,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 39,
-    "schon in einem Rubrik-Feed gelesen": 34,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 11,
-    "Sprachhinweis älter als 45 Tage": 7
+    "schon in einem Rubrik-Feed gelesen": 8,
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 10,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 1,
+    "Sprachhinweis älter als 45 Tage": 6
   },
   "proposals": [
     {
@@ -20,6 +20,55 @@
         {
           "iso": "2026-11-29",
           "context": "amit ihr keine Sendung verpasst! Premieren und Highlights Vom 23. bis 29. November 2026 gibt es wieder zahlreiche Anime-Premieren und -Highl"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Erste »Mashle«-Staffel erscheint als Blu-ray-Gesamtausgabe",
+      "articleUrl": "https://www.anime2you.de/news/1074225/mashle-staffel-1-blu-ray-gesamtausgabe/",
+      "publishedAt": "2026-11-23",
+      "category": "disc",
+      "platforms": [
+        "disc"
+      ],
+      "dates": [
+        {
+          "month": "2027-02",
+          "context": "einer Gesamtausgabe in den Handel kommt. Wir fassen zusammen. Release im Februar 2027 Die Gesamtausgabe der ersten »Mashle: Magic and Muscle"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Offizielle Sammelkarten zu »Haikyu!!« vorgestellt + Bilder",
+      "articleUrl": "https://www.anime2you.de/news/1074284/offizielle-haikyu-sammelkarten/",
+      "publishedAt": "2026-11-23",
+      "category": "allgemein",
+      "platforms": [],
+      "dates": [
+        {
+          "month": "2027-05",
+          "context": "t im AKIBA PASS SHOP vorbestellt werden. Wir fassen zusammen. Release im Mai 2027 Die »Manyc Cards« zu »Haikyu!!« werden in zwei Ausführunge"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Black-Friday-Aktion: WOW reduziert Abo-Preise um bis zu 70 %",
+      "articleUrl": "https://www.anime2you.de/news/1074451/wow-black-friday-aktion/",
+      "publishedAt": "2026-11-23",
+      "category": "streaming",
+      "platforms": [
+        "wow"
+      ],
+      "dates": [
+        {
+          "iso": "2026-11-30",
+          "context": "verschiedene Abo-Optionen bis zu 70 % reduziert angeboten werden. Bis 30. November 2026 Das »Filme & Serien«-Paket, das insgesamt 15 Anime-F"
         }
       ],
       "dub": "unklar",

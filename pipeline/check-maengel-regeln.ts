@@ -117,6 +117,7 @@ pruefe('studio: Treffer', arten(gut(1, { studios: [] })).join() === 'studio')
 /* aniSearch-Zeile (Kennung ab 10 Mio.) wird aus einem Eintrag gebaut: leeres Studio heißt `st` des Eintrags leer. */
 pruefe('studio: aniSearch-Zeile mit leerem st ist Ausnahme quelle-ohne-studio', [10_000_042, 10_000_043].every((id) => arten(gut(id, { studios: [] })).join() === 'studio:quelle-ohne-studio'))
 pruefe('studio: Titel ohne aniSearch-Eintrag (Eigentitel, AniList) bleibt offen', [5_000_001, 4_999_999, 4_999_998].every((id) => arten(gut(id, { studios: [] })).join() === 'studio'))
+pruefe('genre: aniSearch-Zeile ohne Genre (g leer/Unbestimmt, TMDB-Rückfall ohne Treffer) ist Ausnahme quelle-ohne-genre; AniList-Titel und Eigentitel bleiben offen', [10_000_000, 10_000_042].every((id) => arten(gut(id, { genres: [] })).join() === 'genre:quelle-ohne-genre') && arten(gut(9_999_999, { genres: [] })).join() === 'genre' && arten(gut(5_000_001, { genres: [] })).join() === 'genre')
 pruefe('studio: Grenze — 10 Mio. ist die erste aniSearch-Kennung, 9.999.999 noch nicht; Gruppe bleibt fehlend', arten(gut(10_000_000, { studios: [] })).join() === 'studio:quelle-ohne-studio' && arten(gut(9_999_999, { studios: [] })).join() === 'studio' && REGELN.find((r) => r.art === 'studio')!.gruppe === 'fehlend')
 pruefe('studio: aniSearch-Zeile mit Studio ist kein Mangel', arten(gut(10_000_042, { studios: ['X'] })).length === 0)
 pruefe('genre: Treffer', arten(gut(1, { genres: [] })).join() === 'genre')

@@ -29,8 +29,8 @@ const quelle = titelQuelle(lies<Title[]>('titles-core.json'), titel, undefined, 
 const data = { releasesByTitle } as never
 const heute = todayIso()
 
-function zaehle(gruppiert: boolean, sort: string): FilterZaehlung {
-  const gen = zaehleFilterGen(quelle, releasesByTitle, heute, gruppiert, sort)
+function zaehle(gruppiert: boolean, sort: string, suche = ''): FilterZaehlung {
+  const gen = zaehleFilterGen(quelle, releasesByTitle, heute, gruppiert, sort, suche)
   for (;;) {
     const r = gen.next()
     if (r.done) return r.value
@@ -38,10 +38,10 @@ function zaehle(gruppiert: boolean, sort: string): FilterZaehlung {
 }
 
 /** Die Trefferzahl nach dem Antippen: derselbe Filter wie der Chip (`filterTitles`), dann die Liste der Seite (`ordneListe`) mit allen Gruppen samt „Ohne bekannten Termin". */
-const treffer = (f: Partial<FilterState>, gruppiert: boolean, sort: string) => {
+const treffer = (f: Partial<FilterState>, gruppiert: boolean, sort: string, suche = '') => {
   const liste = filterTitles(quelle, data, { ...EMPTY_FILTERS, ...f }, heute, new Set())
   const kacheln = gruppiert ? groupByFranchise(liste) : liste.map((t) => ({ main: t, members: [t] }))
-  return ordneListe(kacheln, sort, '', releasesByTitle, heute).liste.length
+  return ordneListe(kacheln, sort, suche, releasesByTitle, heute).liste.length
 }
 
 const CHIPS: { name: string; filter: Partial<FilterState>; zahl: (z: FilterZaehlung) => number | undefined }[] = [
@@ -55,11 +55,12 @@ const CHIPS: { name: string; filter: Partial<FilterState>; zahl: (z: FilterZaehl
 ]
 
 /* „Relevanz" listet laufende Staffeln einer Reihe einzeln, jede andere Sortierung eine Karte je Reihe (`ordneListe`). */
-for (const [gruppiert, sort] of [[false, 'relevanz'], [true, 'relevanz'], [true, 'titel']] as const) {
-  console.log(`\nChip-Zahl = Treffer des einen Filters (${gruppiert ? `Karten, Staffeln zusammengefasst, Sortierung ${sort}` : 'Titel'}), ${quelle.length} Titel:`)
-  const z = zaehle(gruppiert, sort)
+/* Mit Suchtext fasst sie keine Staffeln zusammen (`istGruppiert`); der Suchtext geht hier nur an die Ordnung, der Filter bleibt der eine Chip. */
+for (const [gruppiert, sort, suche] of [[false, 'relevanz', ''], [true, 'relevanz', ''], [true, 'titel', ''], [true, 'relevanz', 'wolf']] as const) {
+  console.log(`\nChip-Zahl = Treffer des einen Filters (${gruppiert ? `Karten, Staffeln zusammengefasst, Sortierung ${sort}${suche ? `, Suchtext „${suche}"` : ''}` : 'Titel'}), ${quelle.length} Titel:`)
+  const z = zaehle(gruppiert, sort, suche)
   for (const c of CHIPS) {
-    const soll = treffer(c.filter, gruppiert, sort)
+    const soll = treffer(c.filter, gruppiert, sort, suche)
     const ist = c.zahl(z)
     pruefe(`${c.name}: ${soll}`, ist === soll, { gezaehlt: ist, filter: soll })
   }

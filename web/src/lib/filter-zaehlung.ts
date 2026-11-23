@@ -41,14 +41,14 @@ const POSTEN: Posten[] = [
 ]
 
 /** So viele Karten zeigt die Liste für diese Treffer: dieselbe Rechnung wie `DatabaseView` (laufende und kommende Staffeln einer Reihe stehen einzeln, `ordneListe`). */
-const kartenVon = (treffer: Title[], releasesByTitle: Map<number, Release[]>, heute: string, sort: string): number =>
-  ordneListe(groupByFranchise(treffer), sort, '', releasesByTitle, heute).liste.length
+const kartenVon = (treffer: Title[], releasesByTitle: Map<number, Release[]>, heute: string, sort: string, suche: string): number =>
+  ordneListe(groupByFranchise(treffer), sort, suche, releasesByTitle, heute).liste.length
 
 /**
  * Zählt den Kernbestand einmal durch und gibt zwischendurch ab, damit das Öffnen des Filterfensters den Hauptfaden nicht blockiert
  * (`useZeitscheibe`). Zusammengefasste Staffeln zählen so, wie die Liste sie zeigt (`kartenVon`): so viele Karten stehen danach da.
  */
-export function* zaehleFilterGen(kern: Title[], releasesByTitle: Map<number, Release[]>, heute: string, gruppiert = false, sort = 'relevanz'): Generator<void, FilterZaehlung> {
+export function* zaehleFilterGen(kern: Title[], releasesByTitle: Map<number, Release[]>, heute: string, gruppiert = false, sort = 'relevanz', suche = ''): Generator<void, FilterZaehlung> {
   const treffer = POSTEN.map(() => [] as Title[])
   let marke = performance.now()
   for (const t of kern) {
@@ -64,7 +64,7 @@ export function* zaehleFilterGen(kern: Title[], releasesByTitle: Map<number, Rel
   const z: FilterZaehlung = { platforms: new Map(), releaseTypes: new Map(), statuses: new Map(), schnell: {} }
   for (const [i, p] of POSTEN.entries()) {
     if (gruppiert) yield
-    const n = gruppiert ? kartenVon(treffer[i]!, releasesByTitle, heute, sort) : new Set(treffer[i]!.map((t) => t.id)).size
+    const n = gruppiert ? kartenVon(treffer[i]!, releasesByTitle, heute, sort, suche) : new Set(treffer[i]!.map((t) => t.id)).size
     if (p.gruppe === 'schnell') z.schnell[p.schluessel as SchnellId] = n
     else (z[p.gruppe] as Map<string, number>).set(p.schluessel, n)
   }

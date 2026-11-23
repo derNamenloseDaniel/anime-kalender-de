@@ -12,6 +12,8 @@ export interface ZaehlKern {
   gruppiert: boolean
   /** Die gewählte Sortierung: nur „Relevanz" listet laufende Staffeln einer Reihe einzeln (`ordneListe`). */
   sort: string
+  /** Mit Suchtext fasst die Liste keine Staffeln zusammen (`istGruppiert`). */
+  suche: string
 }
 
 /**
@@ -20,8 +22,8 @@ export interface ZaehlKern {
  */
 export function FilterZaehlungsrahmen({ kern, children }: { kern?: ZaehlKern; children: ReactNode }) {
   const { wert } = useZeitscheibe<FilterZaehlung | null>(
-    () => (kern ? zaehleFilterGen(kern.titel, kern.releasesByTitle, todayIso(), kern.gruppiert, kern.sort) : nichts()),
-    [kern?.titel, kern?.releasesByTitle, kern?.gruppiert, kern?.sort],
+    () => (kern ? zaehleFilterGen(kern.titel, kern.releasesByTitle, todayIso(), kern.gruppiert, kern.sort, kern.suche) : nichts()),
+    [kern?.titel, kern?.releasesByTitle, kern?.gruppiert, kern?.sort, kern?.suche],
     null,
   )
   return <FilterZaehlungContext.Provider value={wert ?? undefined}>{children}</FilterZaehlungContext.Provider>

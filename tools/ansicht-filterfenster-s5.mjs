@@ -19,7 +19,7 @@ export function messeS5(datenbank) {
     grund,
     hintergruende,
     streambarDa: !!streambar,
-    streambarHoehe: streambar ? parseFloat(getComputedStyle(streambar, '::after').height) : 0,
+    streambarHoehe: streambar ? streambar.getBoundingClientRect().height : 0,
     plattformName: plattform?.getAttribute('aria-label') ?? plattform?.textContent ?? '',
     plattformZahlSichtbar: !!plattform?.querySelector('[aria-hidden=true].tabular-nums'),
     schalterImFenster,

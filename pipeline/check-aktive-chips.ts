@@ -1,7 +1,7 @@
 /**
  * Die gesetzten Filter der Datenbank als Chips (`web/src/components/filter/AktiveChips.tsx`, Filterkonzept S5, 23.11.2026): der Name nennt den Zustand
  * („Netflix, entfernen" bzw. „… ausgeschlossen, entfernen"), ein Tipp nimmt genau diesen einen Filter zurück, die Tippfläche ist 44 px hoch
- * (`TIPPFLAECHE_HOCH`; gemessen im Browser: `tools/ansicht-filterfenster-s5.mjs`). Mini-DOM wie `check-suchhinweis-lauf.ts`. Aufruf: `npm run check:logic`.
+ * (h-11; gemessen im Browser: `tools/ansicht-filterfenster-s5.mjs`). Mini-DOM wie `check-suchhinweis-lauf.ts`. Aufruf: `npm run check:logic`.
  */
 import { act, createElement as h } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -32,7 +32,7 @@ console.log('\nAktive Chips:')
 pruefe('Name eines Einschlusses: „Netflix entfernen"', namen.includes('Netflix entfernen'), namen)
 pruefe('Name eines Ausschlusses nennt den Zustand: „… ausgeschlossen, entfernen"', namen.some((n) => /ausgeschlossen, entfernen$/.test(n ?? '') && /Disc|DVD/.test(n ?? '')), namen)
 pruefe('Liste mit Rolle `list`', dom.wurzel.finde((k: MiniKnoten) => k.tagName === 'UL' && k.getAttribute('role') === 'list').length === 1)
-pruefe('Tippfläche 44 px hoch (TIPPFLAECHE_HOCH) an jedem Chip', knoepfe.every((k: MiniKnoten) => /after:h-11/.test(k.getAttribute('class') ?? '')), knoepfe.map((k: MiniKnoten) => k.getAttribute('class')))
+pruefe('Knopf 44 px hoch (h-11) an jedem Chip', knoepfe.every((k: MiniKnoten) => /\bh-11\b/.test(k.getAttribute('class') ?? '')), knoepfe.map((k: MiniKnoten) => k.getAttribute('class')))
 
 const netflix = knoepfe.find((k: MiniKnoten) => k.getAttribute('aria-label') === 'Netflix entfernen')!
 klicke(dom.wurzel, netflix)

@@ -251,7 +251,7 @@ function SchnellSchalter({
   /* Einfarbig wie das übrige Fenster, nur durch eine Linie getrennt (E9, 23.11.2026); Chips bleiben grün/rot. */
   return (
     <div className="border-b border-ak-linie px-3 py-3">
-      <Bereich label={label} suche={suche} texte={texte} klasse="[&>div]:gap-y-3">
+      <Bereich label={label} suche={suche} texte={texte} klasse="[&>div]:gap-y-0">
         <SchnellChips t={t} filters={filters} onChange={(next) => set(next)} favoriteCount={favoriteCount} showConfidence={showConfidence} tvAn={tvAn} setTvAn={setTvAn} zeige={(text) => zeigePille(suche, label, text)} zaehlung={zaehlung?.schnell} />
       </Bereich>
     </div>

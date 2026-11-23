@@ -492,11 +492,14 @@ export function Toggle({
   onChange,
   label,
   hint,
+  hoch,
 }: {
   checked: boolean
   onChange: (next: boolean) => void
   label: string
   hint?: string
+  /** Am Handy ist das Etikett selbst 44 px hoch (gemessen wird die Elementbox, nicht ein `::after`). */
+  hoch?: boolean
 }) {
   /*
     **Ein Hinweis ist gekennzeichnet**. Er hängt an einem eigenen ⓘ neben
@@ -504,7 +507,7 @@ export function Toggle({
   */
   const schalter = (
     /* Handy: Trefferfläche 44 px über ::after am umschließenden Pillen-Element (`relative`, siehe db-kopfzeile.tsx); die Pille bleibt 32 px. */
-    <label className={`inline-flex items-center gap-2 text-sm max-sm:after:absolute max-sm:after:inset-x-0 max-sm:after:-inset-y-1.5 max-sm:after:content-[''] ${CLICKABLE}`}>
+    <label className={`inline-flex items-center gap-2 text-sm ${hoch ? 'max-sm:min-h-11' : "max-sm:after:absolute max-sm:after:inset-x-0 max-sm:after:-inset-y-1.5 max-sm:after:content-['']"} ${CLICKABLE}`}>
       <input
         type="checkbox"
         checked={checked}

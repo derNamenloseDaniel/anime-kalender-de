@@ -226,7 +226,7 @@ befuelle({ favorites: '[1,2]' }, [5])
 getScheitert = 1
 const erster = abgleichen('t')
 const zweiter = await abgleichen('t').then(() => 'ok', () => 'abgelehnt')
-await erster.catch(() => undefined)
+await erster
 pruefe('nach einem gescheiterten Abgleich läuft der nächste trotzdem', zweiter === 'ok' && sortiert('favorites') === '[1,2,5]' && JSON.stringify([...serverStand].sort()) === '[1,2,5]', { zweiter, anfragen, lokal: sortiert('favorites'), serverStand })
 /* Prüfer-Auflage A5: anderswo Entferntes verliert sein Merk-Datum, sonst kehrt es nach erneutem Verbinden zurück. */
 befuelle({ favorites: '[1,2]', 'favorites:seit': `{"1":${tag},"2":${tag}}`, favoritenAbgleichBasis: '1,2' }, [1])

@@ -117,11 +117,12 @@ export function setSyncMail(mail: string): void {
 }
 
 /** Sendet die Liste und meldet, ob der Schlüssel noch gilt. */
-export async function pushFavorites(token: string, favorites: number[]): Promise<number> {
+/** `ersetzen` nur nach Abholen und Vereinigen (Abgleich); sonst vereinigt der Dienst mit seinem Stand. */
+export async function pushFavorites(token: string, favorites: number[], ersetzen: boolean): Promise<number> {
   const res = await dienstFetch(`${WORKER_URL}/favorites`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token, favorites, ak: 1 }),
+    body: JSON.stringify({ token, favorites, ak: 1, ersetzen }),
   })
   const body = (await res.json()) as { ok?: boolean; count?: number; error?: string }
   if (res.status === 404) {

@@ -30,6 +30,14 @@ export function schreibeFavoriten(input: unknown, ak: unknown, filter?: unknown)
   return (ak === 1 ? VORSATZ + liste : liste) + (text ? `,${FILTER_MARKE}${text}` : '')
 }
 
+/**
+ * Gespeicherte Liste plus gesendete: Seitenfassungen vor dem 23.11.2026 laden ohne vorheriges Abholen hoch, und ihr
+ * Stand darf nichts löschen, was ein anderes Gerät gemerkt hat (Lehre 242). Nur der Abgleich mit `ersetzen` ersetzt.
+ */
+export function vereinigeGespeichert(gespeichert: string | null | undefined, gesendet: string): string {
+  return schreibeFavoriten([...leseFavoriten(gespeichert), ...leseFavoriten(gesendet)], 1)
+}
+
 /** Zahl der Einträge einer gespeicherten Liste. */
 export function zaehleFavoriten(raw: string): number {
   return leseFavoriten(raw).size

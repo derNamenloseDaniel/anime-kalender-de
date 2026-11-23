@@ -1,16 +1,22 @@
 import { useEffect, useRef } from 'react'
 import { starteTakt } from './favoriten-takt.ts'
 import { ergaenzungBeimErstabgleich, gleicheAb, standText, type AbgleichAnschluss } from './favoriten-vereinigen.ts'
-import { favoritenErgaenzen, favoritenMitDatum, favoritenSetzen, lesFavoriten } from './favorites.ts'
+import { favoritDatumPflegen, favoritenErgaenzen, favoritenMitDatum, favoritenSetzen, lesFavoriten } from './favorites.ts'
 import { getSyncToken, gesendeterStand, merkeGesendet, pullFavorites, pushFavorites, vergissAltenSendestand } from './newsletterSync.ts'
 
 const ENTPRELLUNG_MS = 2500
 
+/** Was ein anderes Gerät entfernt hat, verliert auch sein Merk-Datum — sonst holt die Ergänzung unten es nach erneutem Verbinden zurück. */
+function setzeLokal(ids: Set<number>): void {
+  for (const id of lesFavoriten()) if (!ids.has(id)) favoritDatumPflegen(id, false)
+  favoritenSetzen(ids)
+}
+
 const anschluss = (token: string): AbgleichAnschluss => ({
   hole: () => pullFavorites(token),
-  sende: (ids) => pushFavorites(token, ids),
+  sende: (ids) => pushFavorites(token, ids, true),
   lokal: lesFavoriten,
-  setzeLokal: favoritenSetzen,
+  setzeLokal,
   basis: gesendeterStand,
   merkeBasis: merkeGesendet,
 })

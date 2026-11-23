@@ -153,25 +153,35 @@ console.log('\nFavoriten-Abgleich auf vorhandenem Speicher (echte Module):')
 const speicher = new Map<string, string>()
 let serverStand: number[] = []
 const hochgeladen: number[][] = []
+const ersetzt: unknown[] = []
+const anfragen: string[] = []
+let getScheitert = 0
 let meldungen = 0
 Object.assign(globalThis, {
   localStorage: { getItem: (k: string) => speicher.get(k) ?? null, setItem: (k: string, w: string) => void speicher.set(k, String(w)), removeItem: (k: string) => void speicher.delete(k) },
   window: { dispatchEvent: () => ((meldungen++), true), addEventListener: () => undefined, removeEventListener: () => undefined },
   fetch: async (_url: string, init?: RequestInit) => {
     if (init?.method === 'POST') {
-      const { favorites } = JSON.parse(String(init.body)) as { favorites: number[] }
+      anfragen.push('POST')
+      const { favorites, ersetzen } = JSON.parse(String(init.body)) as { favorites: number[]; ersetzen?: unknown }
       hochgeladen.push(favorites)
-      serverStand = favorites
+      ersetzt.push(ersetzen)
+      serverStand = ersetzen === true ? favorites : [...new Set([...serverStand, ...favorites])]
       return new Response(JSON.stringify({ ok: true, count: favorites.length }))
     }
+    anfragen.push('GET')
+    if (getScheitert > 0 && getScheitert--) throw new Error('Netz weg')
     return new Response(JSON.stringify({ ok: true, favorites: serverStand }))
   },
 })
-const { abgleichen } = await import('../web/src/lib/favoriten-abgleich.ts')
+const { abgleichen, sternGeaendert } = await import('../web/src/lib/favoriten-abgleich.ts')
 const sortiert = (k: string) => JSON.stringify((JSON.parse(speicher.get(k) ?? '[]') as number[]).sort((a, b) => a - b))
 function befuelle(eintraege: Record<string, string>, server: number[]): void {
   speicher.clear()
   hochgeladen.length = 0
+  ersetzt.length = 0
+  anfragen.length = 0
+  getScheitert = 0
   meldungen = 0
   serverStand = server
   for (const [k, w] of Object.entries({ newsletterSyncToken: 't', ...eintraege })) speicher.set(k, w)
@@ -192,4 +202,35 @@ speicher.set('favorites', '[1,3,9]')
 speicher.set('favorites:seit', `{"1":${tag},"3":${tag},"9":${tag}}`)
 await abgleichen('t')
 pruefe('danach Entferntes kommt nicht aus der Datums-Ablage zurück', sortiert('favorites') === '[1,3,9]' && JSON.stringify(serverStand) === '[1,3,9]', { lokal: sortiert('favorites'), serverStand })
+pruefe('der Abgleich sendet mit ersetzen (er hat vorher abgeholt und vereinigt)', ersetzt.length > 0 && ersetzt.every((e) => e === true), ersetzt)
+
+/* Stern-Pfad (Prüfer-Auflage A3): auch die entprellte Sternänderung geht über Kette und Vorbereitung. */
+const echtesSetTimeout = globalThis.setTimeout
+const ruhe = async () => {
+  for (let i = 0; i < 30; i++) await new Promise((fertig) => echtesSetTimeout(fertig, 0))
+}
+befuelle({ favorites: '[9]', 'favorites:seit': `{"1":${tag},"2":${tag},"3":${tag},"9":${tag}}` }, [9])
+const geplant: (() => void)[] = []
+globalThis.setTimeout = ((f: () => void) => (geplant.push(f), 0)) as unknown as typeof setTimeout
+const aufraeumen = sternGeaendert(new Set([9]), {})
+globalThis.setTimeout = echtesSetTimeout
+geplant[0]?.()
+await ruhe()
+pruefe('Sternänderung: geplant, mit Aufräumen, und mit Vorbereitung (Datums-Ablage kommt zurück)', geplant.length === 1 && typeof aufraeumen === 'function' && sortiert('favorites') === '[1,2,3,9]' && JSON.stringify(serverStand) === '[1,2,3,9]', { geplant: geplant.length, lokal: sortiert('favorites'), serverStand })
+
+/* Zwei Abgleiche zugleich (Takt + Stern): nacheinander, und ein gescheiterter hält den nächsten nicht auf. */
+befuelle({ favorites: '[1,2]' }, [5])
+await Promise.all([abgleichen('t'), abgleichen('t')])
+pruefe('zwei Abgleiche zugleich laufen nacheinander (holen, senden, holen; danach gleich, also kein zweites Senden)', anfragen.join() === 'GET,POST,GET', anfragen)
+befuelle({ favorites: '[1,2]' }, [5])
+getScheitert = 1
+const erster = abgleichen('t')
+const zweiter = await abgleichen('t').then(() => 'ok', () => 'abgelehnt')
+await erster.catch(() => undefined)
+pruefe('nach einem gescheiterten Abgleich läuft der nächste trotzdem', zweiter === 'ok' && sortiert('favorites') === '[1,2,5]' && JSON.stringify([...serverStand].sort()) === '[1,2,5]', { zweiter, anfragen, lokal: sortiert('favorites'), serverStand })
+/* Prüfer-Auflage A5: anderswo Entferntes verliert sein Merk-Datum, sonst kehrt es nach erneutem Verbinden zurück. */
+befuelle({ favorites: '[1,2]', 'favorites:seit': `{"1":${tag},"2":${tag}}`, favoritenAbgleichBasis: '1,2' }, [1])
+await abgleichen('t')
+const seitDanach = Object.keys(JSON.parse(speicher.get('favorites:seit') ?? '{}') as object)
+pruefe('anderswo entfernt: Titel und Merk-Datum weg', sortiert('favorites') === '[1]' && JSON.stringify(seitDanach) === '["1"]', { lokal: sortiert('favorites'), seitDanach })
 if (verletzt) process.exit(1)

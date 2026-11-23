@@ -373,40 +373,18 @@ export function NewsletterView({ meta, data }: { meta: DataMeta; data: Dataset }
     setSyncState('sending')
 
     /**
-     * Kommt der Nutzer über einen **Wiederherstellungslink**, ist die Richtung
-     * umgekehrt: Der Browser hat nichts (oder Reste), der Dienst hat alles.
-     * Deshalb wird hier geholt und mit dem Lokalen **vereinigt** statt ersetzt
-     * — wer auf dem neuen Gerät schon etwas gemerkt hat, soll es behalten.
-     * Danach geht die vereinigte Liste zurück, damit beide Seiten gleichstehen.
-     *
-     * Auf dem gewöhnlichen Weg (Bestätigung, Abgleich-Link aus dem Newsletter)
-     * bleibt es beim Schicken: Dort ist der Browser die Quelle der Wahrheit.
+     * Verbinden heißt **immer vereinigen**, nie überschreiben (Daniels Ablauf, 14.08.2026: ein frischer Browser
+     * mit einer Markierung überschrieb per Mail-Link alles auf dem Server). Scheitert das Abholen, wird nichts
+     * gesendet — eine Liste ohne Serverstand würde ihn ersetzen (Lehre 242). Danach hält `useFavoritenAbgleich`
+     * beide Seiten gleich.
      */
-    /**
-     * Verbinden heißt **immer vereinigen**, nie überschreiben.
-     *
-     * Anfangs galt das nur für den Wiederherstellungslink; der gewöhnliche
-     * Abgleich-Link aus der Mail schickte stattdessen die lokale Liste hoch.
-     * Damit zerstörte er den Serverstand, und zwar in genau dem Fall, für den
-     * es ihn gibt (Daniels Ablauf, 14.08.2026): merken, abonnieren, weiter
-     * merken, Browserdaten löschen, neu merken, Link aus einer alten Mail
-     * anklicken. Der frische Browser kennt nur die letzte Markierung — und
-     * überschrieb damit alles, was vorher auf dem Server lag.
-     *
-     * Die Unterscheidung nach `restored` war ohnehin erfunden: Einen Browser
-     * zu verbinden bedeutet in beiden Fällen dasselbe, nämlich dass aus zwei
-     * Listen eine wird. Danach ist der Browser wieder die Quelle der Wahrheit
-     * — Abwählen wirkt also weiterhin, nur eben nicht im Moment des Verbindens.
-     */
-    const arbeit = pullFavorites(token)
-      .catch(() => [] as number[])
-      .then((vomServer) => {
-        const vereint = [...new Set([...favorites, ...vomServer])].sort((a, b) => a - b)
-        // Ergänzen statt umschalten — siehe `favoritenErgaenzen`.
-        favoritenErgaenzen(vomServer)
-        setUebernommen(vomServer.filter((id) => !favorites.has(id)))
-        return pushFavorites(token, vereint)
-      })
+    const arbeit = pullFavorites(token).then((vomServer) => {
+      const vereint = [...new Set([...favorites, ...vomServer])].sort((a, b) => a - b)
+      // Ergänzen statt umschalten — siehe `favoritenErgaenzen`.
+      favoritenErgaenzen(vomServer)
+      setUebernommen(vomServer.filter((id) => !favorites.has(id)))
+      return pushFavorites(token, vereint, false)
+    })
 
     arbeit
       .then((count) => {

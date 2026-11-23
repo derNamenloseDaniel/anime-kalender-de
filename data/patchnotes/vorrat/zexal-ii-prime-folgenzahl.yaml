@@ -1,5 +1,0 @@
-kategorie: bugfix
-text: Zexal II hat bei Prime 73 Folgen
-untertitel: "24 der 97 Prime-Folgen gehören zu Zexal"
-wartetAuf: "Bestandsbau nach diesem PR. Probe: In public/data/releases.json hat der Prime-Termin von Titel 15489 schedule.episodeCount 73 statt 97."
-seit: '2026-11-23'

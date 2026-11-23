@@ -1100,19 +1100,19 @@
   ],
   "sakamoto-days-vol2": [
     {
-      "url": "https://www.anime2you.de/news/1035909/24-blu-ray-termine-verschoben/",
-      "name": "anime2you.de",
-      "gesehenAm": "2026-10-01",
-      "stand": "aktuell",
-      "sagt": "2026-10-02"
-    },
-    {
       "url": "https://www.anisearch.de/article/201861,sakamoto-days-vol-2-4-limited-steelcase-edition-blu-ray",
       "name": "anisearch.de",
       "gesehenAm": "2026-11-23",
       "sagt": "2026-12-11",
+      "stand": "aktuell"
+    },
+    {
+      "url": "https://www.anime2you.de/news/1035909/24-blu-ray-termine-verschoben/",
+      "name": "anime2you.de",
+      "gesehenAm": "2026-10-01",
+      "sagt": "2026-10-02",
       "stand": "ueberholt",
-      "grund": "Termin verschoben auf: 2026-10-02"
+      "grund": "Termin laut aniSearch: 2026-12-11"
     }
   ],
   "blue-exorcist-blue-night-saga-vol1": [

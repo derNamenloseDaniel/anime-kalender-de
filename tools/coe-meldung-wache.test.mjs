@@ -100,6 +100,11 @@ try {
   const rs = pruefeMeldung(w2, [])
   assert.equal(rs.treffer, 1)
   assert.match(rs.meldungen[0], /b\.yml: Schritt „S"/)
+  // Kulisse ohne package.json (Ursache PR 4672, oder-true-wache.test): `npm run` ist nicht aufzulösen, a.yml wird zum Fund.
+  rmSync(join(w2, 'package.json'))
+  const ohnePaket = pruefeMeldung(w2, [])
+  assert.equal(ohnePaket.treffer, 2)
+  assert.match(ohnePaket.meldungen[0], /a\.yml: Schritt „S"/)
 } finally {
   rmSync(w2, { recursive: true, force: true })
 }

@@ -168,10 +168,13 @@ pruefe('ohne bekannte Meldung: aniSearch nennt denselben Tag: unverändert', nac
 pruefe('ohne bekannte Meldung und ohne Quellen-Beleg: bleibt (nie raten)', nachOhne(virgin(), gelesen('2026-10-12T05:00:00Z')) === '2026-10-30')
 pruefe('ohne bekannte Meldung, Lesetag der Quelle fehlt: bleibt', nachOhne(mitLesung('2026-10-30', undefined), gelesen('2026-10-12T05:00:00Z')) === '2026-10-30')
 pruefe('ohne bekannte Meldung: aniSearch-Tag schon vorbei, unserer steht bevor: bleibt', nachOhne(mitLesung('2026-11-20', '2026-10-01'), gelesen('2026-10-12T05:00:00Z', '2026-10-23')) === '2026-11-20')
-const zweiLesungen = { ...mitLesung('2026-10-30', '2026-10-01'), quellen: [
-  { url: A2Y, name: 'anime2you.de', gesehenAm: '2026-10-01', sagt: '2026-10-30', stand: 'aktuell' as const },
-  { url: 'https://x.example/b', name: 'x.example', gesehenAm: '2026-10-20', sagt: '2026-10-30', stand: 'aktuell' as const },
-] } as Release
+const zweiLesungen = {
+  ...mitLesung('2026-10-30', '2026-10-01'),
+  quellen: [
+    { url: A2Y, name: 'anime2you.de', gesehenAm: '2026-10-01', sagt: '2026-10-30', stand: 'aktuell' as const },
+    { url: 'https://x.example/b', name: 'x.example', gesehenAm: '2026-10-20', sagt: '2026-10-30', stand: 'aktuell' as const },
+  ],
+} as Release
 pruefe('ohne bekannte Meldung: die jüngste Lesung unserer Quellen zählt', nachOhne(zweiLesungen, gelesen('2026-10-12T05:00:00Z')) === '2026-10-30')
 const quelleB = (extra: Record<string, unknown>) => ({ url: 'https://x.example/b', name: 'x.example', sagt: '2026-10-30', stand: 'aktuell' as const, ...extra })
 const q1 = { url: A2Y, name: 'anime2you.de', gesehenAm: '2026-10-01', sagt: '2026-10-30', stand: 'aktuell' as const }

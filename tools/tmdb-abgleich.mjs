@@ -9,6 +9,10 @@
  * der Reihe, weil TMDB die Serie unter deren Namen führt; `titleDe` nicht, er stammt teils von TMDB), Start und Folgenzahl
  * aus `public/data/franchises.json`. TMDBs Name ist der deutsche: ein Name ohne Treffer kann auch nur übersetzt sein.
  *
+ * Abrufdatum: jede Abweichung nennt den Stand ihrer TMDB-Quelle (`geholtAm` in `tmdb-folgen.json` für Startdatum/Folgenzahl
+ * der Serie, `fetchedAt` in `tmdb-titles.json` für Name und Filmjahr) und ihr Alter in Tagen gegen den Bau-Stand; ab
+ * `ALT_TAGE` heißt der Stand „alt“ (die Abweichung kann an einem überholten Abruf liegen), ohne Datum „unbekannt“.
+ *
  * Aufruf: node tools/tmdb-abgleich.mjs [--json]
  */
 import { readFileSync } from 'node:fs'
@@ -18,9 +22,23 @@ import { parse } from 'yaml'
 
 const WURZEL = join(fileURLToPath(import.meta.url), '..', '..')
 export const FELDER = ['Name', 'Startdatum', 'Folgenzahl']
+/** Ab so vielen Tagen zwischen Abruf und Bau-Stand gilt ein TMDB-Bestand als alt (laufende Serien holt der Sammler nach 6 Tagen neu). */
+export const ALT_TAGE = 7
 
 const tage = (a, b) => Math.round((Date.parse(a) - Date.parse(b)) / 86_400_000)
 export const normName = (s) => String(s ?? '').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '')
+
+/** Stand einer Quelle: Abrufdatum (`YYYY-MM-DD`), Alter in Tagen gegen `bezug` und Urteil frisch/alt/unbekannt. */
+export function standVon(abruf, bezug) {
+  const tag = String(abruf ?? '').slice(0, 10)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(tag) || !bezug) return { abruf: null, alterTage: null, urteil: 'unbekannt' }
+  const alterTage = tage(String(bezug).slice(0, 10), tag)
+  return { abruf: tag, alterTage, urteil: alterTage >= ALT_TAGE ? 'alt' : 'frisch' }
+}
+
+export function standText(s) {
+  return s.urteil === 'unbekannt' ? 'TMDB-Stand: Alter unbekannt' : `TMDB-Stand ${s.abruf} (${s.alterTage} Tage, ${s.urteil})`
+}
 
 /** Der TMDB-Name stimmt, wenn er (normalisiert) in einem AniList-Namen steckt: Serienname ⊆ „Serienname Staffel 2“. */
 export function nameStimmt(tmdbName, anilistNamen) {
@@ -60,8 +78,9 @@ function tmdbSeite(e, d) {
   const kandidaten = Object.entries(d.tmdbFolgen).filter(([, v]) => v.tmdbId === e.tmdbId)
   const folgen = kandidaten.sort(([, a], [, b]) => (b.geholtAm ?? '').localeCompare(a.geholtAm ?? ''))[0]?.[1]
   const eigen = d.tmdbTitel[e.anilistId]
-  const name = (eigen?.tmdbId === e.tmdbId && eigen.nameDe) || Object.values(d.tmdbTitel).find((v) => v.tmdbId === e.tmdbId && v.nameDe)?.nameDe
-  return { folgen, name, jahr: eigen?.tmdbId === e.tmdbId ? eigen.jahr : undefined }
+  const eigener = eigen?.tmdbId === e.tmdbId ? eigen : undefined
+  const nameQuelle = (eigener?.nameDe && eigener) || Object.values(d.tmdbTitel).find((v) => v.tmdbId === e.tmdbId && v.nameDe)
+  return { folgen, name: nameQuelle?.nameDe, jahr: eigener?.jahr, folgenStand: folgen?.geholtAm, titelStand: eigener?.fetchedAt, nameStand: nameQuelle?.fetchedAt }
 }
 
 /** Eine Handzuordnung → Abweichungen und nicht prüfbare Felder. */
@@ -71,19 +90,19 @@ export function pruefeZuordnung(e, d) {
   const titel = `${a.anzeige ?? e.titel} (AniList ${e.anilistId}, TMDB ${e.tmdbId})`
   const abw = []
   const offen = []
-  const melde = (feld, tmdb, anilist, staffel) => abw.push({ anilistId: e.anilistId, tmdbId: e.tmdbId, titel, feld, tmdb, anilist, ...(staffel ? { staffel } : {}) })
+  const melde = (feld, tmdb, anilist, staffel, abruf) => abw.push({ anilistId: e.anilistId, tmdbId: e.tmdbId, titel, feld, tmdb, anilist, ...(staffel ? { staffel } : {}), stand: standVon(abruf, d.stand) })
 
-  if (t.name) { if (!nameStimmt(t.name, a.namen)) melde('Name', t.name, a.namen[0] ?? '–') }
+  if (t.name) { if (!nameStimmt(t.name, a.namen)) melde('Name', t.name, a.namen[0] ?? '–', undefined, t.nameStand) }
   else offen.push('Name')
 
   const wahl = e.kind === 'tv' && t.folgen ? waehleStaffel(staffelnAus(t.folgen.folgen), a.start) : undefined
   const staffel = wahl && `Staffel ${wahl.s}`
-  if (wahl) { if (wahl.start !== a.start) melde('Startdatum', wahl.start, a.start, staffel) }
-  else if (e.kind === 'movie' && t.jahr && a.start) { if (String(t.jahr) !== a.start.slice(0, 4)) melde('Startdatum', String(t.jahr), a.start) }
+  if (wahl) { if (wahl.start !== a.start) melde('Startdatum', wahl.start, a.start, staffel, t.folgenStand) }
+  else if (e.kind === 'movie' && t.jahr && a.start) { if (String(t.jahr) !== a.start.slice(0, 4)) melde('Startdatum', String(t.jahr), a.start, undefined, t.titelStand) }
   else offen.push('Startdatum')
 
-  if (wahl && a.episoden) { if (wahl.folgen !== a.episoden) melde('Folgenzahl', wahl.folgen, a.episoden, staffel) }
-  else if (e.kind === 'movie' && a.episoden) { if (a.episoden !== 1) melde('Folgenzahl', 1, a.episoden) }
+  if (wahl && a.episoden) { if (wahl.folgen !== a.episoden) melde('Folgenzahl', wahl.folgen, a.episoden, staffel, t.folgenStand) }
+  else if (e.kind === 'movie' && a.episoden) { if (a.episoden !== 1) melde('Folgenzahl', 1, a.episoden, undefined, t.titelStand) }
   else offen.push('Folgenzahl')
 
   return { abweichungen: abw, offen }
@@ -121,8 +140,8 @@ export function ladeDaten(wurzel = WURZEL) {
 function drucke(r, stand) {
   console.log(`Datenstand: Bau ${stand}; ${r.zuordnungen} Handzuordnungen mit TMDB-Kennung`)
   for (const f of FELDER) console.log(`  ${f}: ${r.geprueft[f]} geprüft, ${r.abweichungen.filter((a) => a.feld === f).length} Abweichungen`)
-  console.log('\nAbweichungen (Titel | Feld | TMDB | AniList)')
-  for (const a of r.abweichungen) console.log(`  ${a.titel} | ${a.feld}${a.staffel ? ` (${a.staffel})` : ''} | ${a.tmdb} | ${a.anilist}`)
+  console.log('\nAbweichungen (Titel | Feld | TMDB | AniList | TMDB-Abruf)')
+  for (const a of r.abweichungen) console.log(`  ${a.titel} | ${a.feld}${a.staffel ? ` (${a.staffel})` : ''} | ${a.tmdb} | ${a.anilist} | ${standText(a.stand)}`)
   console.log('\nNicht prüfbar (keine TMDB-Daten im Repo)')
   for (const n of r.nichtPruefbar) console.log(`  ${n.titel} (AniList ${n.anilistId}): ${n.felder.join(', ')}`)
 }

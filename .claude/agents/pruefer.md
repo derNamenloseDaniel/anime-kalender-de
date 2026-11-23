@@ -86,7 +86,7 @@ Jede Regel ist ein Kurzimperativ; Anlass, PR-Nummer, Datum und alter Wortlaut je
 - **K9b Zuvorkommen:** „sofort“ braucht Test mit Seitenaufruf vor jedem Hörer; Hörer-Tests beweisen kein Zuvorkommen, fehlt er, offene Browser-Messung im PR.
 - **K9c Anzeige und Handlung:** eine Funktion; Verdrahtung per Lauf, nie Regex.
 - **K9d Breiten:** Einstieg je 390/1024/1440 px messen.
-- **K9e Speicher gegen Bestand:** zwei Bestandsstände bis in die Ansicht.
+- **K9e Speicher gegen Bestand:** zwei Bestandsstände bis in die Ansicht. Liest neuer Code einen vorhandenen Browser-Schlüssel, fragt der Prüfer, was ein Bestandsnutzer dort *heute* stehen hat, und spielt genau das durch; fehlt der Test auf befülltem Speicher, ist das eine Auflage (K56, Lehre 242: Favoriten gelöscht).
 - **K9f Reihenstaffel:** Fall, in dem Reihen- und Anbieterstaffel auseinanderfallen; Treffer in `staffeln[].angebote` (`data/justwatch-audio.json`).
 - **K9g Zwei Fristen:** beide Wege über die kürzere hinaus.
 - **K9h Entwarnung:** über denselben Helfer wie der Alarm ist Befund.

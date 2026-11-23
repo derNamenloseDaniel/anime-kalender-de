@@ -16,7 +16,9 @@ export type KalenderTermin = {
   imAngebot?: boolean
   tvPremiere?: boolean
 }
-export type KalenderZeile = { zeit: string | null; geschaetzt: boolean; name: string; anbieter: string; folgen: string }
+export type KalenderWeg = { zeit: string | null; geschaetzt: boolean; anbieter: string }
+// `weitere`: dieselben Folgen desselben Titels auf weiteren Wegen (TV-Premiere + Joyn, Daniel 23.11.2026), je mit eigener Uhrzeit.
+export type KalenderZeile = KalenderWeg & { name: string; folgen: string; weitere?: KalenderWeg[] }
 export type KalenderStand = { datum: string; zeilen: KalenderZeile[] }
 export type WocheDatei = { von?: string; bis?: string; events?: KalenderTermin[] }
 
@@ -37,9 +39,11 @@ export function uhrzeitBerlin(ms: number): string {
   return new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(ms))
 }
 
-// Vorbei ist ein Termin, dessen Uhrzeit heute schon verstrichen ist; ohne Uhrzeit nie.
-export const istVorbei = (z: KalenderZeile, datum: string, jetztMs: number): boolean =>
-  !!z.zeit && datum === heuteBerlin(jetztMs) && z.zeit < uhrzeitBerlin(jetztMs)
+// Vorbei ist ein Termin, dessen letzte Uhrzeit heute schon verstrichen ist; ohne Uhrzeit nie.
+export function istVorbei(z: KalenderZeile, datum: string, jetztMs: number): boolean {
+  const letzte = [z.zeit, ...(z.weitere ?? []).map(w => w.zeit)].filter((x): x is string => !!x).sort().pop()
+  return !!z.zeit && !!letzte && datum === heuteBerlin(jetztMs) && letzte < uhrzeitBerlin(jetztMs)
+}
 
 // „62“ → „F62“, „62, 63“ → „F62–63“, getrennte Nummern bis drei einzeln, sonst „n Folgen“; ohne Nummern bei Batch „alle n Folgen“.
 export function folgenText(nummern: number[], batchAnzahl?: number): string {
@@ -70,11 +74,33 @@ export function kalenderHeute(termine: KalenderTermin[], datum: string): Kalende
       folgen: folgenText(nummern, batch),
     }
   })
-  return zeilen.sort((a, b) => (a.zeit ?? '99:99').localeCompare(b.zeit ?? '99:99') || a.name.localeCompare(b.name, 'de') || a.anbieter.localeCompare(b.anbieter, 'de'))
+  return zusammenfassen(zeilen.sort((a, b) => (a.zeit ?? '99:99').localeCompare(b.zeit ?? '99:99') || a.name.localeCompare(b.name, 'de') || a.anbieter.localeCompare(b.anbieter, 'de')))
 }
 
+// Gleicher Titel mit denselben Folgen auf mehreren Wegen wird eine Zeile; der früheste Weg führt, die übrigen stehen in `weitere`.
+export function zusammenfassen(sortiert: KalenderZeile[]): KalenderZeile[] {
+  const erste = new Map<string, KalenderZeile>()
+  const aus: KalenderZeile[] = []
+  for (const z of sortiert) {
+    const k = z.folgen ? `${z.name}|${z.folgen}` : ''
+    const vorher = k ? erste.get(k) : undefined
+    if (vorher) vorher.weitere = [...(vorher.weitere ?? []), { zeit: z.zeit, geschaetzt: z.geschaetzt, anbieter: z.anbieter }]
+    else {
+      if (k) erste.set(k, z)
+      aus.push(z)
+    }
+  }
+  return aus
+}
+
+// „≈18:50 Joyn“; ohne Uhrzeit nur der Anbieter.
+export const wegText = (w: KalenderWeg): string => (w.zeit ? `${w.geschaetzt ? '≈' : ''}${w.zeit} ` : '') + w.anbieter
+
+// Anbieter, weitere Wege mit Uhrzeit, Folgen: „ProSieben MAXX · 18:50 Joyn · F9“.
+export const metaText = (z: KalenderZeile): string => [z.anbieter, ...(z.weitere ?? []).map(wegText), z.folgen].filter(Boolean).join(' · ')
+
 export const kalenderZeilenText = (z: KalenderZeile): string =>
-  [z.zeit ? `${z.geschaetzt ? '≈' : ''}${z.zeit}` : '', z.name].filter(Boolean).join(' ') + ` · ${z.anbieter}` + (z.folgen ? ` · ${z.folgen}` : '')
+  [z.zeit ? `${z.geschaetzt ? '≈' : ''}${z.zeit}` : '', z.name].filter(Boolean).join(' ') + ` · ${metaText(z)}`
 
 // Die Wochen-Datei trägt „heute“, wenn der Tag in ihrer Woche liegt; sonst events.json.
 export const wocheDeckt = (w: WocheDatei, datum: string): boolean => !!w.von && !!w.bis && datum >= w.von && datum <= w.bis

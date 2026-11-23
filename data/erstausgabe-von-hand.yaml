@@ -107,6 +107,14 @@
   publisher: 'ProSieben MAXX'
   sources:
     - https://www.fernsehserien.de/tenkai-knights
+# One Piece Log: Fish-Man Island Saga — Anime2You 03.12.2025: „alle Episoden … als TV-Premiere“, „mit deutscher Vertonung auf ProSieben MAXX“; Anime2You 14.12.2025: „ab 11:10 Uhr laufen alle 21 Episoden … als TV-Premiere“ am 01.01.2026 (Abruf 22.11.2026).
+- anilistId: 183423
+  title: 'One Piece Log: Fish-Man Island Saga'
+  von: '2026-01-01'
+  publisher: 'ProSieben MAXX'
+  sources:
+    - https://www.anime2you.de/news/959660/one-piece-log-auf-prosieben-maxx/
+    - https://www.anime2you.de/news/963512/prosieben-maxx-programm-weihnachten-2025/
 # GITS Arise Pyrophoric Cult — thelostdungeon.de: „28. Juli 2017", Universum Anime, „gute deutsche Synchronisation mit den bekannten Ghost-in-the-Shell-Sprechern"; Disc enthält nur die Pyrophoric-Cult-Fassung (2 Teile).
 - anilistId: 21056
   title: 'Ghost in the Shell: Arise - Pyrophoric Cult'

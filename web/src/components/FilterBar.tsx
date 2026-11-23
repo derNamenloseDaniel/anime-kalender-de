@@ -3,7 +3,7 @@ import type { DataMeta } from '@shared/types.ts'
 import { activeFilterCount, type FilterState } from '../lib/filters.ts'
 import { useLang } from '../lib/i18n.tsx'
 import { FilterDetailsFeld } from './FilterDetails.tsx'
-import { AktiveFilter } from './kalender/AktiveFilter.tsx'
+import { FilterZaehlungsrahmen, type ZaehlKern } from './filter/FilterZaehlungsrahmen.tsx'
 
 /**
  * Die Filterleiste der Datenbank.
@@ -22,6 +22,8 @@ export type FilterBarProps = {
   onChange: (next: FilterState) => void
   showConfidence: boolean
   favoriteCount: number
+  /** Kernbestand für die Zahlen an den Chips (`filter/FilterZaehlungsrahmen.tsx`). */
+  kern?: ZaehlKern
 }
 
 /**
@@ -55,6 +57,7 @@ export function FilterBar({
   onChange,
   showConfidence,
   favoriteCount,
+  kern,
   pille,
   open,
   setOpen,
@@ -68,22 +71,19 @@ export function FilterBar({
       {/* Die Leiste bleibt an ihrer Stelle, der Inhalt klappt darüber auf (Daniel, 04.10.2026). */}
       {open && (
         <div id={DOCK_FELD_ID} className="flex min-h-0 flex-1 flex-col animate-fade-in border-b border-ak-linie">
-          <FilterDetailsFeld
-            meta={meta}
-            filters={filters}
-            onChange={onChange}
-            showConfidence={showConfidence}
-            favoriteCount={favoriteCount}
-          />
+          <FilterZaehlungsrahmen kern={kern}>
+            <FilterDetailsFeld
+              meta={meta}
+              filters={filters}
+              onChange={onChange}
+              showConfidence={showConfidence}
+              favoriteCount={favoriteCount}
+            />
+          </FilterZaehlungsrahmen>
         </div>
       )}
       {/* Auswahl links, Filter-Knopf rechts auf derselben Zeile. */}
       <div className={pille ? 'flex flex-wrap items-end gap-2 p-1.5' : 'flex flex-wrap items-center gap-2 p-1.5'}>
-        {(open || !pille) && (
-          <div className="max-h-[5.5rem] min-w-0 flex-1 overflow-y-auto">
-            <AktiveFilter filters={filters} onChange={onChange} />
-          </div>
-        )}
         <button
           ref={knopfRef}
           data-filter-knopf

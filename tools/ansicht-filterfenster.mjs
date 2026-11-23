@@ -3,6 +3,7 @@
  * fest unter dem Scrollbereich, Tippziele. Aufgerufen von `ansicht-bild.mjs --handy`; die Seite muss die App aus `dist/` ausliefern.
  */
 import { abstandsAbweichungen } from './ansicht-filterfenster-rechner.mjs'
+import { messeS5, s5Abweichungen } from './ansicht-filterfenster-s5.mjs'
 
 const BREITEN = [320, 375, 393, 440]
 const ROUTEN = ['woche', 'datenbank']
@@ -82,8 +83,9 @@ export async function pruefeFilterfenster(seite) {
       await seite.waitForTimeout(1500)
       const m = await seite.evaluate(messeFenster)
       const k = await seite.evaluate(messeKleben)
+      const s5 = await seite.evaluate(messeS5, route === 'datenbank')
       messungen.push({ breite, route, ...m, ...k })
-      alle.push(...abweichungen(`${route} ${breite} px`, m, k))
+      alle.push(...abweichungen(`${route} ${breite} px`, m, k), ...s5Abweichungen(`${route} ${breite} px`, s5))
     }
   }
   return { abweichungen: alle, messungen }

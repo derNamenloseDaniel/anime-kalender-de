@@ -61,7 +61,7 @@ export function AktiveFilter({
   )
 }
 
-function useEintraege(
+export function useEintraege(
   filters: FilterState,
   onChange: (next: FilterState) => void,
   tvAn: boolean | undefined,

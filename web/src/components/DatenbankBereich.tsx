@@ -56,6 +56,7 @@ export function DatenbankBereich(p: DatenbankBereichProps) {
   const { data, route } = p
   const mobil = useMobil()
   const herkunftZaehlung = useMemo(() => zaehleHerkunft(p.quelle), [p.quelle])
+  const kern = useMemo(() => ({ titel: p.quelle, releasesByTitle: data.releasesByTitle }), [p.quelle, data.releasesByTitle])
   const ansicht = (
     <>
       {p.geladen ? (
@@ -79,6 +80,7 @@ export function DatenbankBereich(p: DatenbankBereichProps) {
             filters={route.filters}
             onFiltersChange={p.setFilters}
             onHinweisLoesen={loeseHinweis(p)}
+            kern={kern}
           />
         </SuchfundstellenContext.Provider>
       ) : (
@@ -99,7 +101,7 @@ export function DatenbankBereich(p: DatenbankBereichProps) {
           <SprecherLeiste data={data} filters={route.filters}>{ansicht}</SprecherLeiste>
         ) : (
           <>
-            <SprecherLeiste data={data} filters={route.filters}><FilterBarDock meta={data.meta} filters={route.filters} onChange={p.setFilters} showConfidence favoriteCount={p.favorites.size} /></SprecherLeiste>
+            <SprecherLeiste data={data} filters={route.filters}><FilterBarDock meta={data.meta} filters={route.filters} onChange={p.setFilters} showConfidence favoriteCount={p.favorites.size} kern={kern} /></SprecherLeiste>
             {ansicht}
           </>
         )}

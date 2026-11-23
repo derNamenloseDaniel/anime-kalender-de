@@ -7,10 +7,11 @@ import { DbKopfzeile, DbSchalter } from '../db-kopfzeile.tsx'
 import { SuchHinweis, useHinweisInhalt, type HinweisLoesen } from '../SuchHinweis.tsx'
 import type { Suchhinweis } from '../../lib/suchhinweis.ts'
 import { FilterDetailsFeld } from '../FilterDetails.tsx'
-import { AktiveFilter } from '../kalender/AktiveFilter.tsx'
+import { AktiveChips } from './AktiveChips.tsx'
 import { useMobil } from '../../lib/use-mobil.ts'
 import { useLang } from '../../lib/i18n.tsx'
-import { Abschnitte, FilterFuss, type FilterAbschnitt } from './filter-abschnitte.tsx'
+import { FilterFuss } from './filter-abschnitte.tsx'
+import { FilterZaehlungsrahmen, type ZaehlKern } from './FilterZaehlungsrahmen.tsx'
 import { FilterPopover } from './FilterPopover.tsx'
 import { FilterRund, Werkzeugleiste } from './Werkzeugleiste.tsx'
 
@@ -32,6 +33,8 @@ export interface DbKopfProps {
   /** Der Hinweis auf Treffer ohne deutsche Synchro (`lib/use-suchhinweis.ts`) und was sein Knopf auslöst. */
   hinweis?: Suchhinweis
   onHinweisLoesen: HinweisLoesen
+  /** Der Kernbestand vor dem Filter und seine Releases — daraus die Zahlen an den Chips des Filterfensters. */
+  kern?: ZaehlKern
 }
 
 /** Über dem Raster: am Rechner Schalter und Zählzeile mit Hinweis, am Handy die Werkzeugleiste mit Filterfenster und der Hinweis darunter. */
@@ -39,18 +42,24 @@ export function DbKopfbereich(p: DbKopfProps) {
   const mobil = useMobil()
   const hinweis = { hinweis: p.hinweis, filters: p.filters, ohneSynchro: p.ohneSynchro, onLoesen: p.onHinweisLoesen }
   const hinweisDa = useHinweisInhalt(hinweis) !== null
+  /* Die Schalter und die gesetzten Filter stehen am Handy wie am Rechner über der Liste, nicht mehr im Filterfenster (S5, 23.11.2026). */
+  const schalter = <DbSchalter ohneSynchro={p.ohneSynchro} onOhneSynchroChange={p.onOhneSynchroChange} laedt={p.laedt} grouped={p.grouped} onGroupedChange={p.onGroupedChange} />
+  const chips = <AktiveChips filters={p.filters} onChange={p.onFiltersChange} />
   if (mobil) {
     return (
       <>
         <DbWerkzeug {...p} />
+        {schalter}
+        {chips}
         <SuchHinweis form="darunter" {...hinweis} />
       </>
     )
   }
   return (
     <>
-      <DbSchalter ohneSynchro={p.ohneSynchro} onOhneSynchroChange={p.onOhneSynchroChange} laedt={p.laedt} grouped={p.grouped} onGroupedChange={p.onGroupedChange} />
+      {schalter}
       <DbZaehlzeile ergebnisse={p.ergebnisse} mitSynchro={p.mitSynchro} suche={p.suche} sort={p.sort} onSortChange={p.onSortChange} hinweis={hinweisDa ? <SuchHinweis form="zeile" {...hinweis} /> : undefined} />
+      {chips}
     </>
   )
 }
@@ -61,10 +70,6 @@ function DbWerkzeug(p: DbKopfProps) {
   const pille = useRef<HTMLButtonElement>(null)
   const zu = useCallback(() => setOffen(false), [])
   const anzahl = activeFilterCount(p.filters)
-  const abschnitte: FilterAbschnitt[] = [
-    { id: 'aktiv', inhalt: anzahl ? <AktiveFilter filters={p.filters} onChange={p.onFiltersChange} /> : null },
-    { id: 'anzeige', inhalt: <div className="[&>div]:mx-0 [&>div]:flex-wrap [&>div]:gap-y-3 [&>div]:overflow-visible [&>div]:px-0"><DbSchalter ohneSynchro={p.ohneSynchro} onOhneSynchroChange={p.onOhneSynchroChange} laedt={p.laedt} grouped={p.grouped} onGroupedChange={p.onGroupedChange} /></div> },
-  ]
   return (
     <>
       <Werkzeugleiste>
@@ -75,7 +80,9 @@ function DbWerkzeug(p: DbKopfProps) {
         <DbSortWahl sort={p.sort} onChange={p.onSortChange} suche={!!p.suche.trim()} kompakt />
       </Werkzeugleiste>
       <FilterPopover offen={offen} schliessen={zu} ausloeser={pille} label={t('filter.button')}>
-        <FilterDetailsFeld meta={p.meta} filters={p.filters} onChange={p.onFiltersChange} showConfidence favoriteCount={p.favoriteCount} zwischen={<Abschnitte liste={abschnitte} />} />
+        <FilterZaehlungsrahmen kern={p.kern}>
+          <FilterDetailsFeld meta={p.meta} filters={p.filters} onChange={p.onFiltersChange} showConfidence favoriteCount={p.favoriteCount} />
+        </FilterZaehlungsrahmen>
         <FilterFuss zuruecksetzen={() => p.onFiltersChange({ ...EMPTY_FILTERS, search: p.filters.search })} fertig={zu} />
       </FilterPopover>
     </>

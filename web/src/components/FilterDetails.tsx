@@ -26,6 +26,7 @@ import { useContext, useState } from 'react'
 import { SprecherFilter } from './SprecherFilter.tsx'
 import { TitelNamenContext } from '../lib/sprecher.ts'
 import { HerkunftZaehlungContext } from '../lib/herkunft-zaehlung.ts'
+import { FilterZaehlungContext } from '../lib/filter-zaehlung-kontext.ts'
 import { herkunftListe, herkunftName, HerkunftChip, InfoZeichen } from './filter/herkunft-gruppe.tsx'
 import { STATUS_LABEL_KEY } from './filter/status-etiketten.ts'
 
@@ -58,7 +59,7 @@ function ModusSchalter({ wert, setzen }: { wert: 'und' | 'oder'; setzen: (w: 'un
     </Tooltip>
   )
   return (
-    <span className="ml-1 inline-flex items-center gap-px rounded bg-slate-800/70 p-px">
+    <span className="ml-1 inline-flex items-center gap-px rounded bg-ak-flaeche-2 p-px">
       {knopf('oder', 'egal', 'Mindestens eines der gewählten')}
       {knopf('und', 'alle', 'Alle gewählten zusammen')}
     </span>
@@ -241,16 +242,17 @@ function SchnellSchalter({
   setTvAn?: (an: boolean) => void
   suche?: BereichsSuche
 }) {
+  const zaehlung = useContext(FilterZaehlungContext)
   const label = t('filter.schnell')
   const schluessel = ['favoriten', 'cartoon', 'kostenlos', 'tv', 'disc', 'bestaetigt', 'verfuegbar', 'zweitanbieter']
   const texte = schluessel.map((k) => t(`filter.schnell.${k}` as never))
   /* Das Band gehört zum Bereich: ohne Treffer verschwindet es mit der Überschrift, sonst bliebe ein leerer farbiger Streifen. */
   if (suche && !suche.bereich(label, texte)) return null
-  /* Band über die volle Breite, kein Kasten: hebt die Schnellfilter ab (Mockup „Leiste neu“); Chips bleiben grün/rot. */
+  /* Einfarbig wie das übrige Fenster, nur durch eine Linie getrennt (E9, 23.11.2026); Chips bleiben grün/rot. */
   return (
-    <div className="border-y border-ak-info bg-ak-info-grund px-3 py-3">
+    <div className="border-b border-ak-linie px-3 py-3">
       <Bereich label={label} suche={suche} texte={texte} klasse="[&>div]:gap-y-3">
-        <SchnellChips t={t} filters={filters} onChange={(next) => set(next)} favoriteCount={favoriteCount} showConfidence={showConfidence} tvAn={tvAn} setTvAn={setTvAn} zeige={(text) => zeigePille(suche, label, text)} />
+        <SchnellChips t={t} filters={filters} onChange={(next) => set(next)} favoriteCount={favoriteCount} showConfidence={showConfidence} tvAn={tvAn} setTvAn={setTvAn} zeige={(text) => zeigePille(suche, label, text)} zaehlung={zaehlung?.schnell} />
       </Bereich>
     </div>
   )
@@ -328,6 +330,7 @@ export function FilterDetails({
   const plattformen: PlatformId[] = (platformZaehlung ? nachZahlGeordnet(meta.platforms, platformZaehlung) : meta.platforms).filter((p) => p !== 'disc' && !(setTvAn && p === 'tv'))
   const genreSicht = useGenreSicht(genreListe, visibleGenres, filters, !!suche, t)
   const mitZahl = (n: number | undefined) => (n ? <span className="opacity-70">{n}</span> : null)
+  const zaehlung = useContext(FilterZaehlungContext)
   const plattformLabel = t('filter.platform')
   const sichtbarPlattformen = plattformen.filter((p) => zeigePille(suche, plattformLabel, PLATFORMS[p].name))
   const genre = (
@@ -365,6 +368,7 @@ export function FilterDetails({
             {sichtbarPlattformen.map((p) => (
               <Chip
                 key={p}
+                zahl={zaehlung?.platforms.get(p) ?? (zaehlung ? 0 : undefined)}
                 color={PLATFORMS[p].color}
                 {...chipState('platforms', p)}
                 onClick={() => pick('platforms', p)}
@@ -529,6 +533,7 @@ function Grundgruppen({
   tRelease,
   kalender,
 }: Pick<FilterMehrProps, 't' | 'meta' | 'filters' | 'modusVon2' | 'chipState' | 'pick' | 'suche' | 'set' | 'tRelease'> & { kalender: boolean }) {
+  const zaehlung = useContext(FilterZaehlungContext)
   const statusLabel = t('filter.status')
   const fskLabel = t('filter.fsk')
   const jahrLabel = t('filter.year')
@@ -542,7 +547,7 @@ function Grundgruppen({
 
       <Bereich label={statusLabel} suche={suche} texte={STATUS_OPTIONS.map((s) => t(STATUS_LABEL_KEY[s]))}>
         {STATUS_OPTIONS.filter((s) => zeigePille(suche, statusLabel, t(STATUS_LABEL_KEY[s]))).map((s) => (
-          <Chip key={s} {...chipState('statuses', s)} onClick={() => pick('statuses', s)}>
+          <Chip key={s} zahl={zaehlung?.statuses.get(s) ?? (zaehlung ? 0 : undefined)} {...chipState('statuses', s)} onClick={() => pick('statuses', s)}>
             {t(STATUS_LABEL_KEY[s])}
           </Chip>
         ))}
@@ -590,6 +595,7 @@ function FilterMehr(props: FilterMehrProps) {
 
 /** Release-Art, Sprecher und Herkunft — kleine Gruppen, die im Raster nebeneinander stehen. */
 function ArtSprecherHerkunft({ t, filters, set, chipState, pick, tRelease, modusVon2, suche }: FilterMehrProps) {
+  const zaehlung = useContext(FilterZaehlungContext)
   const artenLabel = t('filter.releaseType')
   /* „Film“ steht oben unter „Film / Serie“ und nicht zweimal auf dem Bildschirm. */
   const arten = (Object.keys(RELEASE_TYPES) as ReleaseType[]).filter((a) => a !== 'movie')
@@ -598,7 +604,7 @@ function ArtSprecherHerkunft({ t, filters, set, chipState, pick, tRelease, modus
     <>
       <Bereich label={artenLabel} suche={suche} texte={arten.map((a) => tRelease(a))} modus={modusVon2('releaseTypes', gewaehlt)}>
         {arten.filter((a) => zeigePille(suche, artenLabel, tRelease(a))).map((type) => (
-          <Chip key={type} color={RELEASE_TYPES[type].color} title={tRelease(type, 'hint')} {...chipState('releaseTypes', type)} onClick={() => pick('releaseTypes', type)}>
+          <Chip key={type} zahl={zaehlung?.releaseTypes.get(type) ?? (zaehlung ? 0 : undefined)} color={RELEASE_TYPES[type].color} title={tRelease(type, 'hint')} {...chipState('releaseTypes', type)} onClick={() => pick('releaseTypes', type)}>
             {tRelease(type)}
           </Chip>
         ))}

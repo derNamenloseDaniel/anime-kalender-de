@@ -61,6 +61,7 @@ export function SchnellChips({
   tvAn,
   setTvAn,
   zeige,
+  zaehlung,
 }: {
   t: Translate
   filters: FilterState
@@ -71,6 +72,8 @@ export function SchnellChips({
   setTvAn?: (an: boolean) => void
   /** Filtert Chips nach der Filtersuche (`zeigePille`). */
   zeige: (text: string) => boolean
+  /** Titel im Kernbestand je Chip (`lib/filter-zaehlung.ts`); fehlt eine Zahl, steht keine am Chip. */
+  zaehlung?: Partial<Record<SchnellId, number>>
 }) {
   return (
     <>
@@ -78,18 +81,20 @@ export function SchnellChips({
         .filter((k) => zeige(k.text))
         .map((k) => {
           const z = schnellZustand(filters, k.id, tvAn)
+          const zahl = zaehlung?.[k.id]
           return (
             <button
               key={k.id}
               type="button"
               aria-pressed={z === 'ja' ? true : z === 'nein' ? 'mixed' : false}
-              aria-label={`${k.text}: ${t(ZUSTAND_TEXT[z ?? 'nichts'])}`}
+              aria-label={`${k.text}: ${t(ZUSTAND_TEXT[z ?? 'nichts'])}${zahl !== undefined ? `, ${t('filter.zahlTitel', { n: zahl.toLocaleString('de-DE') })}` : ''}`}
               onClick={() => schnellAnwenden(filters, k.id, tvAn, onChange, setTvAn)}
-              className={`inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full border px-3 text-[13px] font-bold whitespace-nowrap transition ${TIPPFLAECHE_HOCH} ${STIL[z ?? 'aus']}`}
+              className={`inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full border px-3 text-[13px] font-bold whitespace-nowrap transition ${TIPPFLAECHE_HOCH} ${STIL[z ?? 'aus']} ${zahl === 0 && !z ? 'text-ak-leise!' : ''}`}
             >
               <span aria-hidden="true" className="text-xs">{z === 'ja' ? '✓' : z === 'nein' ? '⊘' : k.zeichen}</span>
               {k.text}
               {k.id === 'favoriten' && favoriteCount ? <span className="font-normal opacity-70">({favoriteCount})</span> : null}
+              {zahl !== undefined ? <span aria-hidden="true" className="font-normal tabular-nums opacity-70">{zahl.toLocaleString('de-DE')}</span> : null}
             </button>
           )
         })}

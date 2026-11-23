@@ -60,7 +60,10 @@ export function Chip({
   color,
   title,
   gross,
+  zahl,
 }: {
+  /** Titel im Kernbestand mit diesem Weg (`lib/filter-zaehlung.ts`); 0 blendet den Chip ab, tippbar bleibt er. */
+  zahl?: number
   /** 44 px hoch (Tippziel) — im Detail-Panel, wo Chips Verweise zum Antippen sind. */
   gross?: boolean
   active?: boolean
@@ -85,6 +88,7 @@ export function Chip({
       className={[
         gross ? 'inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border px-4 text-t3 transition' : 'inline-flex items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold transition max-md:min-h-11 max-md:min-w-11',
         CLICKABLE,
+        zahl === 0 && !active && !excluded ? 'text-ak-leise!' : '',
         excluded
           ? // Rot und durchgestrichen: Ein bloß andersfarbiger Chip würde sich
             // wie eine zweite Auswahl lesen, nicht wie ein Verbot.
@@ -105,7 +109,9 @@ export function Chip({
         <span className="size-2 rounded-full" style={{ background: color }} aria-hidden="true" />
       )}
       {children}
+      {zahl !== undefined && <span aria-hidden="true" className="font-normal tabular-nums opacity-70">{zahl.toLocaleString('de-DE')}</span>}
       {zustandWort && <span className="sr-only">{zustandWort}</span>}
+      {zahl !== undefined && <span className="sr-only">{`, ${t('filter.zahlTitel', { n: zahl.toLocaleString('de-DE') })}`}</span>}
     </button>,
   )
 }

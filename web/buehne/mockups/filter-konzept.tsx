@@ -10,9 +10,10 @@ const UEBERLEGUNGEN = [
   '4 · Ein Film bleibt ein Film, auch auf Crunchyroll: „Crunchyroll + Film" zeigt weiter alle 115 Filme dort.',
   '5 · Nur Totes fällt weg („bestätigt" in der Datenbank, „Jahr" und doppeltes TV im Kalender); sonst gilt überall derselbe Griff.',
   '6 · Die Kachel zeigt nur Wege, die der Filter nicht trifft: Yaiba bei „Disc aus" mit Joyn statt Disc.',
-  '7 · Nichts doppelt: Die Trefferzahl steht schon im Balken bzw. im Listenkopf.',
+  '7 · Nichts doppelt: Die Trefferzahl steht schon im Balken bzw. im Listenkopf; gesetzte Filter stehen als Chips unter der Leiste (Handy eine Zeile zum Scrollen), nicht noch einmal im Fenster.',
+  '7b · Das Filterfenster nennt an Plattform, Art, Status und Schnellchips die Zahl der Titel („Netflix, 14 Titel"); 0 ist abgeblendet, bleibt aber tippbar. „ohne Synchro" und „Staffeln zusammenfassen" stehen am Handy über der Liste, die Schnellfläche ist einfarbig.',
   '8 · Das Push-Abo hängt nur am Kalender: ein Filter in der Datenbank stellt keine Benachrichtigung um.',
-  '9 · Jahr bleibt das Jahr, in dem etwas bei uns erscheint; „verfügbar" meint: kann ich es streamen (nicht „hat Synchro").',
+  '9 · Jahr bleibt das Jahr, in dem etwas bei uns erscheint; „Streambar" meint: kann ich es streamen (nicht „hat Synchro").',
   '10 · Alte Einstellungen bleiben erhalten: Beide Ansichten starten mit der Kopie, nichts springt.',
 ].join('\n')
 

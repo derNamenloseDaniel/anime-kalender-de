@@ -12,7 +12,7 @@ Schritt 3 von 3. Grundlage: [umsetzungsplan.md](umsetzungsplan.md) (Fassung 2) u
 | S2 Leerzustand nennt die Filter | war schon da (Suchhinweis „… ist ausgeblendet durch: …", Bild 4 und 5) | `suchhinweis*.ts` |
 | S3 Einschluss auf gleichem Weg (Plattform, Art, Jahr, Status, kostenlos, `modus`) | gebaut | `wege-filter.ts` |
 | S4 tote Zustände | gebaut (Umbenennung „Streambar" zurückgestellt, siehe Entscheidung 10) | `FilterDetails.tsx`, `schnellfilter.tsx`, `check-filter-ebenen.ts` |
-| S5 aktive Chips, Zahlen an Chips, Schnellfläche, Handy-Werkzeugleiste | **nicht gebaut** (eigener PR nach Daniels Test, Plan Abschnitt 3) | — |
+| S5 aktive Chips, Zahlen an Chips, Schnellfläche, Schalter über der Liste am Handy, „Streambar" | gebaut (23.11.2026) | `filter/AktiveChips.tsx`, `lib/filter-zaehlung.ts`, `filter/FilterZaehlungsrahmen.tsx`, `ansicht-filterfenster-s5.mjs` |
 | S6 Doku, Wächter | gebaut | `docs/wissen/*`, Skills, Agenten |
 
 Umbau und Verhaltensänderung sind getrennte Commits; der Umbau (Weg-Block nach `wege-filter.ts`) ist an 21 Filterzuständen auf `titles.json` (Stichtag 22.11.2026) vorher/nachher identisch (Trefferzahl und Kennungs-Hash).
@@ -49,7 +49,7 @@ Nicht in den Top 5, aber geändert: Im Kalender fehlen „Jahr" und der doppelte
 4. **„kostenlos" im Einschluss** verlangt einen kostenlosen Weg nur zusammen mit gewählten Plattformen; allein bleibt es die Titel-Rechnung (`kostenloseFolgen`).
 5. **Das Mockup hat Fälle mit vorhandenen Bühnen-Titeln** (Yaiba, Attack on Titan, Sakamoto Days, Dan Da Dan, Detektiv Conan): ein Titel steht nur in einem Fall (`buehne-faelle.mjs`). Der Kalender-Auge-Fall legt den Zustand vorab in den flüchtigen Speicher der Zelle.
 6. **Messung:** `buehne:bauen` grün, `buehne:bilder` grün; `buehne:messen` läuft (Exit 0), misst aber nur die Mockups mit Messpunkten (disc-bereich); `filter-konzept` hat keine eigenen Bauteile, daher keine neuen Tippziele.
-7. **Offen (S5):** aktive Chips, Zahlen an Chips, einfarbige Schnellfläche, „ohne Synchro"/„Staffeln zusammenfassen" in der Handy-Leiste, `ModusSchalter` auf `ak-*`. Gebaut wird das nach Daniels Test des Mockups.
+7. **S5 gebaut (23.11.2026):** aktive Chips (Handy eine Zeile, Rechner im Listenkopf), Zahlen an Chips (`filter-zaehlung.ts`, beim Öffnen des Fensters), einfarbige Schnellfläche, „ohne Synchro"/„Staffeln zusammenfassen" stehen am Handy über der Liste (die Werkzeugleiste unten hat keinen Platz dafür), `ModusSchalter` auf `ak-*`.
 8. **Migration:** der alte Schlüssel `vorlieben` wird als Kopie gelesen und verschwindet, sobald beide Ansichten ihren haben; Code entfernen frühestens **31.01.2027**.
 9. **Nebenbefund:** zwei Releases (`auto-544-disc`, `auto-142770-disc`) haben `platform disc`, aber `releaseType movie`; der Disc-Weg zählt sie jetzt als Disc, die Daten bleiben (eigener Auftrag).
 
@@ -57,4 +57,4 @@ Nicht in den Top 5, aber geändert: Im Kalender fehlen „Jahr" und der doppelte
 
 Am ersten Fall (Yaiba live bei „Disc aus", Kalender-Auge ändert die Datenbank nicht), nach etwa fünf Fällen, nach einem Tag, nach einer Woche (Zählprobe gegen die Live-Seite; Zahlen oben als Soll).
 
-10. **Umbenennung „verfügbar" → „Streambar" zurückgestellt:** Die Bühne-Basis (`check:buehne-basis`) vergleicht Tippziele nach Beschriftung; der umbenannte Chip (119 × 32 px, unter 44 px) wäre als neuer Befund rot geworden. Sie kommt mit S5, wenn der Chip auf 44 px Tippfläche wächst.
+10. **„verfügbar" → „Streambar"** kam mit S5 (Tippfläche 44 px über `TIPPFLAECHE_HOCH`).

@@ -1,7 +1,7 @@
 /**
  * Rückrechnung der Chip-Zahlen am Bestand (`public/data`, Filterkonzept S5, 23.11.2026): Jede Zahl des Filterfensters muss der Trefferzahl entsprechen,
  * die `filterTitles` mit genau diesem einen Filter liefert (ungruppiert: Titel, gruppiert: Karten wie `groupByFranchise`). Pflichtfall: `auto-544-disc` hat
- * Plattform disc und Art movie — die Art-Zahl „Disc" zählt ihn mit, wie der Filter (`istDiscWeg`). Liest `public/data`, daher `check:bestand`.
+ * Plattform disc und Art movie — die Art-Zahl „Disc" zählt ihn mit, wie der Filter (`istDiscWeg`). Liest `public/data`.
  * Mutationsprobe: Status-Chips, „kostenlos" oder `istDiscWeg` aus der Zählung nehmen macht die Zeilen rot.
  */
 import { readFileSync } from 'node:fs'

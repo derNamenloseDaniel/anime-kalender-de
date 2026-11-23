@@ -23,7 +23,7 @@ assert.ok(uploadPfade(echtAuf[0].with.path).ein.length >= 2, 'der echte Upload n
 
 // Reine Hilfen.
 assert.equal(gemeinsamerOrdner(['data/cache', 'data/dub-confirmed.yaml']), 'data')
-assert.equal(gemeinsamerOrdner(['data/cache/a', 'data/cache/b']), 'data/cache')
+assert.equal(gemeinsamerOrdner(['data/roh/a', 'data/roh/b']), 'data/roh')
 assert.equal(gemeinsamerOrdner(['data/a/b.yaml']), 'data/a', 'ein Pfad: sein Ordner')
 assert.equal(gemeinsamerOrdner(['data/x', 'extension/y']), '')
 assert.equal(gemeinsamerOrdner(['data/cache', 'data/cachex/y']), 'data', 'Pfadteile, nicht Zeichen')
@@ -34,7 +34,7 @@ const lauf = '${{ github.event.workflow_run.id }}'
 const bauen = (mit = {}) => ({
   jobs: { bau: { steps: [
     { uses: 'actions/upload-artifact@v4', with: { name: 'dist-${{ github.run_id }}', path: 'dist' } },
-    { uses: 'actions/upload-artifact@v4', with: { name: 'bau-eingaben-${{ github.run_id }}', path: 'data/cache\ndata/a.yaml\n!data/cache/frei', ...mit } },
+    { uses: 'actions/upload-artifact@v4', with: { name: 'bau-eingaben-${{ github.run_id }}', path: 'data/roh\ndata/a.yaml\n!data/roh/frei', ...mit } },
     { uses: 'actions/download-artifact@v4', with: { name: 'bau-eingaben-fremd', path: 'x' } },
   ] } },
 })

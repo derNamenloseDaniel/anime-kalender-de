@@ -4,4 +4,4 @@ Neue JustWatch-Daten entfernen in den ersten 28 Tagen nichts von selbst. Diese F
 
 | Titel | Anbieter | Folgerung | Link | JustWatch | seit |
 |---|---|---|---|---|---|
-| [Isekai Onsen Paradise](https://anime-kalender.de/#/datenbank?t=171019) | primevideo (kanal) | kein Deutsch (Kanal-Meldung + JustWatch: Aniverse Amazon Channel — Ton ja) | [öffnen](https://www.amazon.de/gp/video/detail/B0CV9X3HY7) | [JustWatch](https://www.justwatch.com/de/Serie/isekai-onsen-paradise) | 2026-11-04 |
+| [Demon Slayer: Kimetsu no Yaiba - The Movie: Mugen Train](https://anime-kalender.de/#/datenbank?t=112151) | crunchyroll (crunchyroll) | nicht mehr da (Reihe „Demon Slayer: Kimetsu no Yaiba", Werk nicht im Katalog, JustWatch ohne Crunchyroll) | [öffnen](https://www.crunchyroll.com/de/demon-slayer-kimetsu-no-yaiba) | [JustWatch](https://www.justwatch.com/de/Film/Demon-Slayer-Kimetsu-no-Yaiba-Mugen-Train) | 2026-11-23 |

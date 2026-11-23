@@ -64,7 +64,7 @@ console.log('\nTMDB von Hand: reine Funktion')
   // Wächter: jeder Leser von tmdb-titles.json im Bau (pipeline/bau, Quelle der Titelfelder) geht durch den Handvorrang.
   const ohneVorrang = readdirSync('pipeline/bau').filter((f) => f.endsWith('.ts') && /readJson[^\n]*'data\/tmdb-titles\.json'/.test(readFileSync(`pipeline/bau/${f}`, 'utf8')) && !readFileSync(`pipeline/bau/${f}`, 'utf8').includes('mitHandvorrang('))
   pruefe('jeder Leser von tmdb-titles.json im Bau nimmt den Handvorrang', ohneVorrang.length === 0, ohneVorrang)
-  pruefe('ohne: auch ohne Bestandseintrag werden Altfälle gestrichen',!('900403' in leer.banner) && !('900403' in leer.folgen) && !('900403' in leer.poster), leer)
+  pruefe('ohne: auch ohne Bestandseintrag werden Altfälle gestrichen', !('900403' in leer.banner) && !('900403' in leer.folgen) && !('900403' in leer.poster), leer)
 }
 
 console.log('\nTMDB von Hand: Lauf von fetch-tmdb-titles.ts')

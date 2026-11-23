@@ -149,6 +149,7 @@ pipeline/check-cartoon-wege-falten-leer-lauf.ts
 pipeline/check-cartoon-wege-falten.ts
 pipeline/check-cartoon-wege.ts
 pipeline/check-cartoon-zwilling.ts
+pipeline/check-cover-bild-grenze.ts
 pipeline/check-cover-klein-vorschau.ts
 pipeline/check-cover-liste.ts
 pipeline/check-cover-luecken-bau.ts

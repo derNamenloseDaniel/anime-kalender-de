@@ -21,11 +21,13 @@ for (const run of [
   'node tools/probe.test.mjs',
   'node --test tools/a.test.mjs',
   'npx tsc --noEmit -p .',
+  'node --test tools/a.mjs',
   'echo hallo\nnpm run check:x',
 ]) assert.equal(istPruefschritt(run), true, `Prüfung nicht erkannt: ${run}`)
 for (const run of [
   'npx tsx pipeline/termine-pruefen.ts',
   'npm run data:dub-checks',
+  'npm run data:dub-check',
   'npm run data:motn -- --budget 800',
   'npm run data:vorfaelle',
   'node tools/kachel-ecken-messen.mjs --live',
@@ -40,6 +42,7 @@ const doc = (job) => ({ jobs: { a: job } })
 const pruef = { name: 'P', run: 'npm run check:x' }
 assert.deepEqual(findeFunde(doc({ steps: [{ ...pruef, 'continue-on-error': true }] })), [{ art: 'schritt', job: 'a', schritt: 'P' }])
 assert.deepEqual(findeFunde(doc({ steps: [{ ...pruef, 'continue-on-error': '${{ inputs.x }}' }] })).length, 1)
+assert.deepEqual(findeFunde(doc({ steps: [{ run: 'npm run check:y', 'continue-on-error': true }] })), [{ art: 'schritt', job: 'a', schritt: 'npm run check:y' }])
 assert.deepEqual(findeFunde(doc({ steps: [{ ...pruef, 'continue-on-error': false }] })), [])
 assert.deepEqual(findeFunde(doc({ steps: [{ ...pruef, 'continue-on-error': 'false' }] })), [])
 assert.deepEqual(findeFunde(doc({ steps: [pruef] })), [])
@@ -71,8 +74,11 @@ try {
   assert.match(r.meldungen[2], /Ausnahme „Sauber" \(c\.yml\) hat keinen Treffer mehr/)
   // Ausnahme gilt nur für die eigene Datei und nie für Jobs.
   schreibe('d.yml', kopf.replace('    runs-on: x\n', "    runs-on: x\n    continue-on-error: true\n") + schritt('Erlaubt', ''))
-  const j = pruefeContinueOnError(wurzel, [{ datei: 'd.yml', schritt: 'Erlaubt', grund: 'g' }])
+  const j = pruefeContinueOnError(wurzel, [{ datei: 'd.yml', schritt: 'Erlaubt', grund: 'g' }, { datei: 'd.yml', schritt: null, grund: 'g' }])
   assert.ok(j.meldungen.some((m) => /d\.yml: Job "j" enthält Prüfschritte/.test(m)))
+  // Auch die Endung .yaml wird gelesen.
+  schreibe('e.yaml', kopf + schritt('Nur yaml'))
+  assert.ok(pruefeContinueOnError(wurzel, []).meldungen.some((m) => /e\.yaml: Prüfschritt „Nur yaml"/.test(m)))
 } finally {
   rmSync(wurzel, { recursive: true, force: true })
 }

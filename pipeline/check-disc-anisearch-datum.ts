@@ -198,7 +198,7 @@ const nachHistorieUeberholt = (sagt: string): string => {
 }
 pruefe('Bau, Historie: überholte Meldung mit dem Tag des Handeintrags bleibt die Lesung', nachHistorieUeberholt('2026-10-30') === '2026-11-06')
 pruefe('Bau, Historie: überholte Quelle mit anderem Tag gibt keine Aussage', nachHistorieUeberholt('2026-10-20') === '2026-10-30')
-const quelleB =(extra: Record<string, unknown>) => ({ url: 'https://x.example/b', name: 'x.example', sagt: '2026-10-30', stand: 'aktuell' as const, ...extra })
+const quelleB = (extra: Record<string, unknown>) => ({ url: 'https://x.example/b', name: 'x.example', sagt: '2026-10-30', stand: 'aktuell' as const, ...extra })
 const q1 = { url: A2Y, name: 'anime2you.de', gesehenAm: '2026-10-01', sagt: '2026-10-30', stand: 'aktuell' as const }
 const mitQuellen = (...quellen: unknown[]): Release => ({ ...virgin(), quellen } as unknown as Release)
 pruefe('ohne bekannte Meldung: eine Quelle ohne Lesetag nimmt dem Beleg die Aussage', nachOhne(mitQuellen(q1, quelleB({})), gelesen('2026-10-12T05:00:00Z')) === '2026-10-30')

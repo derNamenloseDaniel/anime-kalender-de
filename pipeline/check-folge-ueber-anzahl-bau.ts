@@ -39,7 +39,6 @@ try {
     tmdbTitles: {},
     tvJeTmdb: new Set(),
     toteAdressen: new Set(),
-    netflixOhneKennung: 0,
     anisearch: {},
     verweiseEntfernt: [],
     katalogEintraege: [],

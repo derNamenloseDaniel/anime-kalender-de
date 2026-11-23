@@ -45,7 +45,7 @@ export function fuehreReihenZusammen({ byAniId, byMal, titles, tmdbTitles, anise
     if (extra?.fsk !== undefined && title.fsk === undefined) title.fsk = extra.fsk
   }
 
-  const { netflixOhneKennung } = uebernehmeAnisearchUndDeutscheTitel({ handTitel, titles, anisearch, tmdbTitles, toteAdressen })
+  uebernehmeAnisearchUndDeutscheTitel({ handTitel, titles, anisearch, tmdbTitles, toteAdressen })
 
   const { tvJeTmdb } = uebernehmeTmdbAngebote({ titles, tmdbTitles, toteAdressen })
 
@@ -58,5 +58,5 @@ export function fuehreReihenZusammen({ byAniId, byMal, titles, tmdbTitles, anise
       (a, b) => PLATFORM_PRIORITY.indexOf(a.platform) - PLATFORM_PRIORITY.indexOf(b.platform),
     )
   }
-  return { tvJeTmdb, toteAdressen, netflixOhneKennung }
+  return { tvJeTmdb, toteAdressen }
 }

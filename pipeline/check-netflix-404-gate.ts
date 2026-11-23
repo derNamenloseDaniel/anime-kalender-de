@@ -154,7 +154,6 @@ try {
       ytKanal: {},
       ytKauf: new Set(),
       titles,
-      netflixOhneKennung: 0,
       checksJePlattform: new Map(),
       youtubeBefunde: {},
       belegFuer: () => undefined,

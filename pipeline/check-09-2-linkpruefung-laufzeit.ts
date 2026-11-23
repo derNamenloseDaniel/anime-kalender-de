@@ -80,7 +80,6 @@ try {
     ytKanal: {},
     ytKauf: new Set(),
     titles: hand,
-    netflixOhneKennung: 0,
     checksJePlattform: new Map(),
     youtubeBefunde: {},
     belegFuer: (id) => belege[id] as never,

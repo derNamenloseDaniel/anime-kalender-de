@@ -1,11 +1,11 @@
 {
-  "scrapedAt": "2026-11-23T13:05:00.259Z",
+  "scrapedAt": "2026-11-23T15:02:01.481Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 39,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 7,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 5,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "schon in einem Rubrik-Feed gelesen": 8,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 10,
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 11,
+    "schon in einem Rubrik-Feed gelesen": 7,
     "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 1,
     "Sprachhinweis älter als 45 Tage": 6
   },
@@ -69,6 +69,21 @@
         {
           "iso": "2026-11-30",
           "context": "verschiedene Abo-Optionen bis zu 70 % reduziert angeboten werden. Bis 30. November 2026 Das »Filme & Serien«-Paket, das insgesamt 15 Anime-F"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Konkreter Termin der zweiten »Akane-banashi«-Staffel steht fest",
+      "articleUrl": "https://www.anime2you.de/news/1074988/akane-banashi-staffel-2-termin/",
+      "publishedAt": "2026-11-23",
+      "category": "allgemein",
+      "platforms": [],
+      "dates": [
+        {
+          "iso": "2027-01-09",
+          "context": "»Akane-banashi« wurde heute verkündet, dass die zweite Staffel ab dem 9. Januar 2027 im japanischen Fernsehen ausgestrahlt wird. Wir fassen"
         }
       ],
       "dub": "unklar",
@@ -4391,21 +4406,6 @@
       ],
       "dub": "unklar",
       "alreadyCurated": true
-    },
-    {
-      "articleTitle": "TV-Guide: Anime im deutschen Fernsehen in KW 42/2026",
-      "articleUrl": "https://www.anime2you.de/news/1060030/anime-tv-programm-42-2026/",
-      "publishedAt": "2026-10-12",
-      "category": "allgemein",
-      "platforms": [],
-      "dates": [
-        {
-          "iso": "2026-10-18",
-          "context": "amit ihr keine Sendung verpasst! Premieren und Highlights Vom 12. bis 18. Oktober 2026 gibt es wieder zahlreiche Anime-Premieren und -Highli"
-        }
-      ],
-      "dub": "unklar",
-      "alreadyCurated": false
     },
     {
       "articleTitle": "Termin des zweiten Blu-ray-Volumes der zweiten »Apothecary Diaries«-Staffel + Design",

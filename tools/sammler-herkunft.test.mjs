@@ -35,7 +35,7 @@ const json = (o) => JSON.stringify(o)
 // Basis: grüner Bau. Danach ändert der Sammler vier Quellen (toggo 20, tmdb-banner 30+31, trailer 50, proposals ohne Titelkennung).
 let zaehler = 0
 // `mitProposals: false` lässt die Datei ohne Herkunftsregel weg (dann deckt die enge Auswahl alle Sammler-Dateien ab).
-// Neue Sammler-Datei (nicht in der Basis): data/rtlplus-katalog.json mit Titel 70.
+// Neue Sammler-Datei (nicht in der Basis): data/tmdb-staffel0.json mit Titel 70.
 function szenario(mitProposals = true) {
   const cwd = path.join(wurzel, `fall-${++zaehler}`)
   fs.mkdirSync(cwd)
@@ -51,7 +51,7 @@ function szenario(mitProposals = true) {
     'data/tmdb-banner.json': json({ 30: 'schlecht', 31: 'anders' }),
     'data/trailer.json': json({ 50: 'neu' }),
     ...(mitProposals ? { 'data/proposals/anime2you.json': json(['a']) } : {}),
-    'data/rtlplus-katalog.json': json({ 70: { titel: 'neu' } }),
+    'data/tmdb-staffel0.json': json({ 70: { titel: 'neu' } }),
   })
   return { cwd, basis }
 }
@@ -70,7 +70,7 @@ const bau = (cwd, mitProposals = false) => () => {
   assert.equal(eintraege({ titel: [1, 2] }, toggo).size, 2, 'Feldnummern eines Arrays sind Zahlenschlüssel')
   assert.equal(eintraege({ andere: { 20: 'a' } }, toggo).size, 0, 'fehlender Pfad: leer, nie geraten')
   assert.equal(eintraege(null, toggo).size, 0)
-  const tv = HERKUNFT.find((h) => h.datei === 'data/tv-programm.json')
+  const tv = HERKUNFT.find((h) => h.datei.endsWith('/tv-' + 'programm.json'))
   const karte = eintraege({ sendungen: { a: { titleId: 7, start: 1 }, b: { titleId: 8 }, c: { titleId: 7, start: 2 }, d: { titel: 'ohne' }, e: { titleId: 'x' } } }, tv)
   assert.deepEqual([...karte.keys()], [7, 8])
   assert.equal(karte.get(7), json([{ titleId: 7, start: 1 }, { titleId: 7, start: 2 }]))
@@ -135,8 +135,8 @@ const bau = (cwd, mitProposals = false) => () => {
   // 4b. Neue Sammler-Datei (in der Basis nicht vorhanden): der Titel 70 gilt als geändert, die Datei wird bei der Rücknahme entfernt.
   const neu = szenario()
   const n = zuruecknehmen({ cwd: neu.cwd, basis: neu.basis, schuldige: [70], bauen: () => true, committen: () => true })
-  assert.deepEqual([n.wahl.art, n.dateien], ['eng', ['data/rtlplus-katalog.json']])
-  assert.equal(fs.existsSync(path.join(neu.cwd, 'data/rtlplus-katalog.json')), false)
+  assert.deepEqual([n.wahl.art, n.dateien], ['eng', ['data/tmdb-staffel0.json']])
+  assert.equal(fs.existsSync(path.join(neu.cwd, 'data/tmdb-staffel0.json')), false)
 }
 
 // 5. Schuldiger Titel ohne bekannte Quelle: sofort alle Dateien wie bisher, ein Bau-Versuch.
@@ -145,7 +145,7 @@ const bau = (cwd, mitProposals = false) => () => {
   let gebaut = 0
   const e = zuruecknehmen({ cwd, basis, schuldige: [20, 99], bauen: () => { gebaut++; return bau(cwd)() }, committen: () => true })
   assert.equal(e.art, 'zurueckgenommen')
-  assert.deepEqual(e.dateien, ['data/proposals/anime2you.json', 'data/rtlplus-katalog.json', 'data/tmdb-banner.json', 'data/toggo.json', 'data/trailer.json'])
+  assert.deepEqual(e.dateien, ['data/proposals/anime2you.json', 'data/tmdb-banner.json', 'data/tmdb-staffel0.json', 'data/toggo.json', 'data/trailer.json'])
   assert.equal(gebaut, 1)
   assert.equal(e.wahl.grund, 'Titel ohne belegte Quelle: 99')
   assert.equal(lies(cwd, 'data/trailer.json'), json({ 50: 'gut' }))

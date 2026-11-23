@@ -87,7 +87,7 @@ export function main(args, env = process.env) {
     return 0
   }
   if (befehl !== 'sammeln' || !a || !b) {
-    console.log('Aufruf: node tools/quarantaene.mjs sammeln <prüfprotokoll> <liste.json> | text <meta.json>')
+    console.log('Aufruf: node tools/quarantaene.mjs sammeln <prüfprotokoll> <liste.json> | text <meta.json> | schuldige <prüfprotokoll> [<liste.json>]')
     return 2
   }
   const urteil = entscheide(liesListe(b), liesMarken(readFileSync(a, 'utf8')))

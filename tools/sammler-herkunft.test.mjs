@@ -74,6 +74,13 @@ const bau = (cwd, mitProposals = false) => () => {
   const karte = eintraege({ sendungen: { a: { titleId: 7, start: 1 }, b: { titleId: 8 }, c: { titleId: 7, start: 2 }, d: { titel: 'ohne' }, e: { titleId: 'x' } } }, tv)
   assert.deepEqual([...karte.keys()], [7, 8])
   assert.equal(karte.get(7), json([{ titleId: 7, start: 1 }, { titleId: 7, start: 2 }]))
+  assert.deepEqual([...eintraege({ sendungen: { a: { titleId: 7 }, n: null } }, tv).keys()], [7], 'ein leerer Eintrag bricht das Auslesen nicht')
+  // Jede Regel liest die Kennung 7 an genau der Stelle, die sie nennt, und nirgends sonst.
+  for (const h of HERKUNFT) {
+    const inhalt = h.schluessel ? { 7: 'x' } : { a: { [h.feld]: 7 } }
+    assert.deepEqual([...eintraege(h.unter ? { [h.unter]: inhalt } : inhalt, h).keys()], [7], `${h.datei}: Kennung an der genannten Stelle`)
+    if (h.unter) assert.equal(eintraege(inhalt, h).size, 0, `${h.datei}: Kennung auf der falschen Ebene zählt nicht`)
+  }
 }
 
 // 2. Zuordnung mit Einspeisung: zwei schuldige Titel aus zwei Quellen, unschuldige bleiben draußen, Titel ohne Quelle steht in `unbekannt`.
@@ -116,6 +123,14 @@ const bau = (cwd, mitProposals = false) => () => {
   const zeile = auswahlZeile({ ...eng, zahlAlle: 3, engRot: false })
   assert.equal(zeile, 'Sammler-Zurücknahme Auswahl: eng (2 von 3 Dateien), Grund: 2 schuldige Titel belegt; Zuordnung: 20 → data/toggo.json; 30 → data/tmdb-banner.json; 0 unlesbar; 0 Dateien ohne Herkunftsregel')
   assert.match(auswahlZeile({ ...kaputt, zahlAlle: 3, engRot: true }), /alle \(3 von 3 Dateien\).*1 unlesbar: data\/trailer\.json.*enge Auswahl blieb rot, alle Dateien genommen$/)
+  // Mehrere Namen je Verwerfungspfad stehen alle im Grund und in der Zeile, getrennt wie dokumentiert.
+  assert.equal(waehle({ schuldige: [20, 98, 99], dateien, lies: lese }).grund, 'Titel ohne belegte Quelle: 98, 99')
+  const zwei = waehle({ schuldige: [20], dateien, lies: (d) => { if (d !== 'data/toggo.json') throw new Error('kein JSON'); return lese(d) } })
+  assert.equal(zwei.grund, 'Datei unlesbar: data/tmdb-banner.json, data/trailer.json')
+  assert.match(auswahlZeile({ ...zwei, zahlAlle: 3, engRot: false }), /2 unlesbar: data\/tmdb-banner\.json, data\/trailer\.json/)
+  const doppelt = waehle({ schuldige: [20], dateien: ['data/toggo.json', 'data/trailer.json'], lies: (d) => (d === 'data/toggo.json' ? { alt: { titel: { 20: 1 } }, neu: { titel: { 20: 2 } } } : { alt: { 20: 1 }, neu: { 20: 2 } }) })
+  assert.match(auswahlZeile({ ...doppelt, zahlAlle: 2, engRot: false }), /20 → data\/toggo\.json\+data\/trailer\.json;/)
+  assert.equal(auswahlZeile({ art: 'alle', grund: 'keine Schuldigenliste', zahlAlle: 3, engRot: false }), 'Sammler-Zurücknahme Auswahl: alle (3 von 3 Dateien), Grund: keine Schuldigenliste; Zuordnung: -; 0 unlesbar; 0 Dateien ohne Herkunftsregel')
 }
 
 // 4. Echtes git, enge Rücknahme: nur toggo und tmdb-banner gehen auf Basis zurück; trailer (nur unschuldiger Titel) und proposals bleiben.
@@ -132,6 +147,11 @@ const bau = (cwd, mitProposals = false) => () => {
   assert.equal(lies(cwd, 'data/trailer.json'), json({ 50: 'neu' }), 'Datei ohne schuldigen Titel bleibt beim Sammler-Stand')
   assert.equal(lies(cwd, 'data/proposals/anime2you.json'), json(['a']), 'Datei ohne Herkunftsregel bleibt bei enger Auswahl')
   assert.equal(commits.length, 1)
+  assert.match(commits[0], /^chore\(data\): Sammler-Stand zurückgenommen \([0-9a-f]{8}\)$/)
+  // Ein Titel, dessen Eintrag seit der Basis gleich blieb (21, nur Nachbar 20 änderte sich), ist nicht belegt: alle Dateien.
+  const gleich = szenario()
+  const g = zuruecknehmen({ cwd: gleich.cwd, basis: gleich.basis, schuldige: [21], bauen: () => true, committen: () => true })
+  assert.deepEqual([g.wahl.art, g.wahl.grund, g.dateien.length], ['alle', 'Titel ohne belegte Quelle: 21', 5])
   // 4b. Neue Sammler-Datei (in der Basis nicht vorhanden): der Titel 70 gilt als geändert, die Datei wird bei der Rücknahme entfernt.
   const neu = szenario()
   const n = zuruecknehmen({ cwd: neu.cwd, basis: neu.basis, schuldige: [70], bauen: () => true, committen: () => true })
@@ -173,6 +193,7 @@ const bau = (cwd, mitProposals = false) => () => {
   assert.equal(r.art, 'bleibt-rot')
   assert.equal(r.wahl.engRot, true)
   assert.equal(r.dateien.length, 5)
+  assert.deepEqual(r.ausgelassen, { fremd: [], keinDatenpfad: [], ruecknahmen: 0 })
   assert.equal(git(rot.cwd, 'status', '--porcelain'), '')
   // 6b. Deckt die enge Auswahl schon alle Sammler-Dateien ab, gibt es keinen zweiten Versuch mit derselben Menge.
   const gleich = szenario(false)
@@ -212,7 +233,10 @@ const bau = (cwd, mitProposals = false) => () => {
   const liste = (o) => () => JSON.stringify(o)
   assert.deepEqual(liesSchuldige(env, liste({ laufId: '7', schuldige: [{ titleId: 30 }, { titleId: 20 }, { titleId: 30 }, { titleId: 'x' }] })), { ids: [20, 30], grund: '' })
   assert.match(liesSchuldige(env, () => { throw new Error('ENOENT') }).grund, /^keine Schuldigenliste/)
+  assert.equal(liesSchuldige(env, () => { throw new Error('ENOENT') }).ids, null)
   assert.equal(liesSchuldige(env, () => 'kein json').grund, 'Schuldigenliste unlesbar')
+  assert.equal(liesSchuldige(env, () => 'kein json').ids, null)
+  assert.deepEqual(liesSchuldige(env, liste({ laufId: '7', schuldige: [{ titleId: 10 }, { titleId: 9 }] })).ids, [9, 10], 'Zahlen, nicht Text, sortiert')
   assert.equal(liesSchuldige(env, liste({ laufId: '7' })).grund, 'Schuldigenliste unlesbar', 'fehlendes Feld schuldige')
   assert.deepEqual(liesSchuldige(env, liste({ laufId: '8', schuldige: [{ titleId: 20 }] })), { ids: null, grund: 'Schuldigenliste gehört zu Lauf 8, nicht zu 7' })
   assert.deepEqual(liesSchuldige({ RUNNER_TEMP: '/r' }, liste({ laufId: '8', schuldige: [{ titleId: 20 }] })).ids, null, 'ohne Lauf-Kennung gilt eine fremde nicht')
@@ -232,6 +256,16 @@ const bau = (cwd, mitProposals = false) => () => {
   assert.equal(ablegen.status, 0, ablegen.stderr)
   assert.match(ablegen.stdout, /^Schuldige Titel des Abbruchs: 20 \(toggo-pruefung\), 30 \(banner-pruefung\)\n$/)
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(rt, 'bau-schuldige.json'), 'utf8')).schuldige.map((e) => e.titleId), [20, 30])
+  // Ohne Protokoll: Aufruffehler (Exit 2), keine Datei überschrieben; mit früher zurückgestellten Titeln: deren Eintrag (Prüfung) gewinnt, je Kennung einmal.
+  const ohne = spawnSync(process.execPath, [path.join(hier, 'quarantaene.mjs'), 'schuldige'], { cwd: wurzel, env, encoding: 'utf8', windowsHide: true, timeout: 30000 })
+  assert.equal(ohne.status, 2)
+  assert.match(ohne.stdout, /^Aufruf: node tools\/quarantaene\.mjs sammeln .* \| schuldige <prüfprotokoll> \[<liste\.json>\]\n$/)
+  const vorher = path.join(wurzel, 'quarantaene.json')
+  fs.writeFileSync(vorher, json([{ titleId: 20, pruefung: 'schon-zurueckgestellt', grund: 'g' }, { titleId: 10, pruefung: 'alt', grund: 'g' }]))
+  const mit = spawnSync(process.execPath, [path.join(hier, 'quarantaene.mjs'), 'schuldige', protokoll, vorher], { cwd: wurzel, env, encoding: 'utf8', windowsHide: true, timeout: 30000 })
+  assert.equal(mit.status, 0, mit.stderr)
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(rt, 'bau-schuldige.json'), 'utf8')).schuldige.map((e) => `${e.titleId}:${e.pruefung}`), ['10:alt', '20:schon-zurueckgestellt', '30:banner-pruefung'])
+  spawnSync(process.execPath, [path.join(hier, 'quarantaene.mjs'), 'schuldige', protokoll], { cwd: wurzel, env, encoding: 'utf8', windowsHide: true, timeout: 30000 })
   const fake = path.join(wurzel, 'fake-bau.mjs')
   fs.writeFileSync(fake, [
     "import fs from 'node:fs'",

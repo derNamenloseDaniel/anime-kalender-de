@@ -13,7 +13,7 @@ import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { schuldigenPfad } from './quarantaene.mjs'
 
-/** `unter`: Punktpfad zum Objekt; `schluessel`: dessen Schlüssel sind Titelkennungen; `feld`: dessen Einträge tragen die Kennung in diesem Feld. */
+/** `unter`: Schlüssel des Objekts in der Datei (fehlt: die Datei selbst); `schluessel`: dessen Schlüssel sind Titelkennungen; `feld`: dessen Einträge tragen die Kennung in diesem Feld. */
 export const HERKUNFT = [
   { datei: 'data/toggo.json', unter: 'titel', schluessel: true },
   { datei: 'data/tmdb-staffel0.json', schluessel: true },
@@ -34,7 +34,7 @@ export const HERKUNFT = [
   { datei: 'data/tv-programm.json', unter: 'sendungen', feld: 'titleId' },
 ]
 
-const unter = (json, pfad) => (pfad || '').split('.').filter(Boolean).reduce((o, k) => (o && typeof o === 'object' ? o[k] : undefined), json)
+const unter = (json, schluessel) => (schluessel ? json?.[schluessel] : json)
 
 /** Eintrag je Titelkennung als Text (zum Vergleichen): `Map<Zahl, string>`; eine unerwartete Form ergibt eine leere Karte. */
 export function eintraege(json, form) {
@@ -84,10 +84,10 @@ export function ordneZu({ schuldige, dateien, lies }) {
 
 /**
  * Enge Auswahl nur, wenn jeder schuldige Titel belegt ist und keine Datei unlesbar blieb; sonst alle Sammler-Dateien wie bisher (im Zweifel sicher).
- * @returns {{art: 'eng' | 'alle', grund: string, zuordnung: object | null}}
+ * @returns {{art: 'eng' | 'alle', grund: string, zuordnung?: object}}
  */
 export function waehle({ schuldige, dateien, lies }) {
-  if (!schuldige || schuldige.length === 0) return { art: 'alle', grund: 'keine Schuldigenliste', zuordnung: null }
+  if (!schuldige || schuldige.length === 0) return { art: 'alle', grund: 'keine Schuldigenliste' }
   const zuordnung = ordneZu({ schuldige, dateien, lies })
   if (zuordnung.unbekannt.length) return { art: 'alle', grund: `Titel ohne belegte Quelle: ${zuordnung.unbekannt.join(', ')}`, zuordnung }
   if (zuordnung.unlesbar.length) return { art: 'alle', grund: `Datei unlesbar: ${zuordnung.unlesbar.join(', ')}`, zuordnung }

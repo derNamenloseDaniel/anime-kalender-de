@@ -24,6 +24,7 @@ import { resolve } from 'node:path'
 import { parse } from 'yaml'
 import { OHNE_BEFUND } from './oder-true-ausnahmen.mjs'
 import { pruefe as pruefeOderTrue, sammleFunde, zaehleArten } from './oder-true-wache.mjs'
+import { AUSNAHMEN as COE_AUSNAHMEN, pruefeContinueOnError } from './coe-pruefschritt-wache.mjs'
 
 const DIR = resolve(process.cwd(), '.github/workflows')
 let fehler = 0
@@ -562,6 +563,13 @@ for (const meldung of pruefeOderTrue(process.cwd())) {
 }
 const oderTrueFunde = sammleFunde(process.cwd())
 console.log(`✓ oder-true: ${OHNE_BEFUND.length} Ausnahmen, ${oderTrueFunde.length} Treffer (${zaehleArten(oderTrueFunde)})`)
+
+const coe = pruefeContinueOnError(process.cwd())
+for (const meldung of coe.meldungen) {
+  console.error(meldung)
+  fehler++
+}
+console.log(`✓ coe-pruefschritt: ${COE_AUSNAHMEN.length} Ausnahmen, ${coe.treffer} Treffer`)
 
 if (fehler) {
   console.error(`\n${fehler} Problem(e) in den Workflow-Dateien.`)

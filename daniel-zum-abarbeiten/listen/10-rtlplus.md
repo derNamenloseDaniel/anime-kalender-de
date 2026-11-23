@@ -1,6 +1,6 @@
 # RTL+: Stand der Verweise
 
-Stand: 2026-11-16
+Stand: 2026-11-23
 
 **Die Tonspur sagt RTL+ nicht.** Der `TVSeries`-Block nach schema.org enthält Name,
 Beschreibung, Adresse und Bild — kein `audio`, kein `inLanguage` zur Fassung. Das

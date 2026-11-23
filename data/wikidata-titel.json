@@ -1,5 +1,5 @@
 {
-  "geholtAm": "2026-11-16T05:01:58.339Z",
+  "geholtAm": "2026-11-23T05:02:16.590Z",
   "titel": {
     "65": {
       "malId": 65,
@@ -14,64 +14,6 @@
       "malId": 2108,
       "label": "MegaMan NT Warrior/Staffel 2",
       "verworfen": "Wikipedia-Unterseite, kein Werktitel"
-    },
-    "8100": {
-      "malId": 8100,
-      "label": "Mardock Scramble - The First Compression",
-      "verworfen": "gleich dem vorhandenen Namen"
-    },
-    "10624": {
-      "malId": 10624,
-      "label": "Marudukku sukuranburu: Nenshou"
-    },
-    "14407": {
-      "malId": 14407,
-      "label": "Persona 3 The Movie #1: Spring of Birth",
-      "verworfen": "gleich dem vorhandenen Namen"
-    },
-    "20736": {
-      "malId": 21473,
-      "label": "Persona 3 the Movie: #2 Midsummer Knight's Dream",
-      "verworfen": "gleich dem vorhandenen Namen"
-    },
-    "20737": {
-      "malId": 24543,
-      "label": "Persona 3 the Movie: #3 Falling Down",
-      "verworfen": "gleich dem vorhandenen Namen"
-    },
-    "20802": {
-      "malId": 25687,
-      "label": "Chapter 1 – Reunion",
-      "verworfen": "Reihenkopf oder Name ohne seine Reihe"
-    },
-    "21248": {
-      "malId": 31149,
-      "label": "Persona 3 the Movie: #4 Winter of Rebirth",
-      "verworfen": "gleich dem vorhandenen Namen"
-    },
-    "21500": {
-      "malId": 32108,
-      "label": "Chapter 2 – Determination",
-      "verworfen": "Reihenkopf oder Name ohne seine Reihe"
-    },
-    "21596": {
-      "malId": 32551,
-      "label": "Chapter 3 – Confession",
-      "verworfen": "Reihenkopf oder Name ohne seine Reihe"
-    },
-    "100181": {
-      "malId": 36466,
-      "label": "Chapter 6",
-      "verworfen": "Reihenkopf oder Name ohne seine Reihe"
-    },
-    "101343": {
-      "malId": 37514,
-      "label": "Made in Abyss: Tabidachi no Yoake",
-      "verworfen": "gleich dem vorhandenen Namen"
-    },
-    "103713": {
-      "malId": 40024,
-      "label": "Pretty Guardian Sailor Moon Eternal: Der Film"
     },
     "111852": {
       "malId": 40416,

@@ -135,7 +135,7 @@ export function VoiceCast({ titleId }: { titleId: number }) {
               <dl className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-x-3 gap-y-1 text-t3">
                 {stimmen.roles.map((r) => (
                   <Fragment key={`${r.character}-${r.actor}`}>
-                    <dt className="truncate text-slate-500 dark:text-slate-400" title={r.character}>
+                    <dt className="truncate text-ak-leise" title={r.character}>
                       {r.character}
                     </dt>
                     <dd className="truncate text-slate-700 dark:text-slate-200" title={r.actor}>

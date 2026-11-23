@@ -113,15 +113,42 @@ pruefe('fsk: 0 ist eine Einstufung, kein Mangel', arten(gut(1, { fsk: 0 as never
 pruefe('wertung: Treffer', arten(gut(1, { score: undefined })).join() === 'wertung')
 pruefe('wertung: Titel ohne AniList-Kennung (eigener, nur-aniSearch) hat keine Quelle mit genug Stimmen — belegte Ausnahme, kein offener Mangel', arten(gut(5_000_001, { score: undefined })).join() === 'wertung:keine-quelle-mit-stimmen' && arten(gut(10_000_042, { score: undefined })).join() === 'wertung:keine-quelle-mit-stimmen')
 pruefe('wertung: AniList-Titel ohne Wertung bleibt offen (Quelle vorhanden)', arten(gut(4_999_999, { score: undefined })).join() === 'wertung')
+/* wertung: Ankündigung (AniList NOT_YET_RELEASED, Titel 213457 und 185515) ist Ausnahme, bis ein Nicht-Disc-Termin begonnen hat */
+const wertungArt = (t: Title, k: Kontext) => arten(t, k).filter((a) => a.startsWith('wertung')).join()
+const startAm = (tag: string, ueber: Partial<Release> = {}) => rel({ releaseType: 'batch', schedule: { firstEpisodeDate: tag }, ...ueber })
+pruefe('wertung: Start in der Zukunft (Fool Night) und nur Disc-Termin ohne Jahr (Ririsa 2nd Season): Ausnahme noch-ohne-start', [
+  wertungArt(gut(1, { score: undefined, jpYear: 2026, jpEnd: '2026-11-26' }), mitReleases(startAm('2026-11-26'))),
+  wertungArt(gut(1, { score: undefined, jpYear: undefined, jpEnd: undefined }), mitReleases(startAm('2026-11-20', { platform: 'disc', releaseType: 'disc' }))),
+  wertungArt(gut(1, { score: undefined, jpYear: undefined, jpEnd: undefined }), kontext()),
+  wertungArt(gut(1, { score: undefined, jpYear: undefined, jpEnd: undefined }), mitReleases(startAm('2026-01-01', { platform: 'disc', releaseType: 'disc' }))), // Disc-Termin gilt nicht als Start
+].every((a) => a === 'wertung:noch-ohne-start'))
+pruefe('wertung: Termin begonnen (heute oder früher), Ende vorbei oder Jahr alt: offen', [
+  wertungArt(gut(1, { score: undefined, jpYear: 2026, jpEnd: undefined }), mitReleases(startAm(HEUTE))),
+  wertungArt(gut(1, { score: undefined, jpYear: 2026, jpEnd: undefined }), mitReleases(startAm('2026-11-26'), startAm('2026-10-01', { platform: 'tv', releaseType: 'weekly' }))),
+  wertungArt(gut(1, { score: undefined, jpYear: 2026, jpEnd: '2026-11-15' }), mitReleases(startAm('2026-11-26'))),
+  wertungArt(gut(1, { score: undefined, jpYear: 1999, jpEnd: undefined }), kontext()),
+  wertungArt(gut(1, { score: undefined, jpYear: 2025, jpEnd: undefined }), mitReleases(startAm('2026-11-26'))),
+].every((a) => a === 'wertung'))
+pruefe('wertung: Grenze — Ende heute ist noch Ausnahme, Start heute schon begonnen', wertungArt(gut(1, { score: undefined, jpYear: 2026, jpEnd: HEUTE }), mitReleases(startAm('2026-11-26'))) === 'wertung:noch-ohne-start' && wertungArt(gut(1, { score: undefined, jpYear: 2026, jpEnd: undefined }), mitReleases(startAm(HEUTE))) === 'wertung')
+pruefe('wertung: Termin eines anderen Titels ändert nichts', wertungArt(gut(1, { score: undefined, jpYear: 2026, jpEnd: undefined }), kontext({ releases: new Map([[2, [startAm('2026-01-01')]]]) })) === 'wertung:noch-ohne-start')
 pruefe('studio: Treffer', arten(gut(1, { studios: [] })).join() === 'studio')
 /* aniSearch-Zeile (Kennung ab 10 Mio.) wird aus einem Eintrag gebaut: leeres Studio heißt `st` des Eintrags leer. */
 pruefe('studio: aniSearch-Zeile mit leerem st ist Ausnahme quelle-ohne-studio', [10_000_042, 10_000_043].every((id) => arten(gut(id, { studios: [] })).join() === 'studio:quelle-ohne-studio'))
 pruefe('studio: Titel ohne aniSearch-Eintrag (Eigentitel, AniList) bleibt offen', [5_000_001, 4_999_999, 4_999_998].every((id) => arten(gut(id, { studios: [] })).join() === 'studio'))
+pruefe('genre: aniSearch-Zeile ohne Genre (g leer/Unbestimmt, TMDB-Rückfall ohne Treffer) ist Ausnahme quelle-ohne-genre; AniList-Titel und Eigentitel bleiben offen', [10_000_000, 10_000_042].every((id) => arten(gut(id, { genres: [] })).join() === 'genre:quelle-ohne-genre') && arten(gut(9_999_999, { genres: [] })).join() === 'genre' && arten(gut(5_000_001, { genres: [] })).join() === 'genre')
 pruefe('studio: Grenze — 10 Mio. ist die erste aniSearch-Kennung, 9.999.999 noch nicht; Gruppe bleibt fehlend', arten(gut(10_000_000, { studios: [] })).join() === 'studio:quelle-ohne-studio' && arten(gut(9_999_999, { studios: [] })).join() === 'studio' && REGELN.find((r) => r.art === 'studio')!.gruppe === 'fehlend')
 pruefe('studio: aniSearch-Zeile mit Studio ist kein Mangel', arten(gut(10_000_042, { studios: ['X'] })).length === 0)
 pruefe('genre: Treffer', arten(gut(1, { genres: [] })).join() === 'genre')
 pruefe('laufzeit: Treffer', arten(gut(1, { runtimeMin: undefined })).join() === 'laufzeit')
 pruefe('jahr: Treffer', arten(gut(1, { jpYear: undefined })).join() === 'jahr')
+/* jahr: Ankündigung ohne Startdatum (AniList NOT_YET_RELEASED) ist Ausnahme; Stream oder Nicht-Disc-Termin heben sie auf */
+const ohneJahr = gut(1, { jpYear: undefined, streams: [] })
+const jahrArt = (t: Title, k: Kontext) => arten(t, k).filter((a) => a.startsWith('jahr')).join()
+pruefe('jahr: ohne Stream und Termin: Ausnahme noch-ohne-start', jahrArt(ohneJahr, kontext()) === 'jahr:noch-ohne-start')
+pruefe('jahr: nur ein Disc-Termin: weiter Ausnahme (Titel 185515)', jahrArt(ohneJahr, kontext({ releases: new Map([[1, [rel({ platform: 'disc', releaseType: 'disc' }), rel({ platform: 'disc', releaseType: 'disc' })]]]) })) === 'jahr:noch-ohne-start')
+pruefe('jahr: Stream-Termin vorhanden: offen', jahrArt(ohneJahr, kontext({ releases: new Map([[1, [rel({ platform: 'disc', releaseType: 'disc' }), rel({})]]]) })) === 'jahr')
+pruefe('jahr: Stream am Titel: offen', jahrArt(gut(1, { jpYear: undefined, streams: [{ platform: 'netflix', url: 'u', dub: true }] as Title['streams'] }), kontext()) === 'jahr')
+pruefe('jahr: Termin eines anderen Titels ändert nichts', jahrArt(ohneJahr, kontext({ releases: new Map([[2, [rel({ titleId: 2 })]]]) })) === 'jahr:noch-ohne-start')
 pruefe('sprecher: Treffer mit Synchro', arten(gut(1, { hasVoices: false })).join() === 'sprecher')
 pruefe('sprecher: ohne Synchro zu Recht leer', arten(gut(1, { hasVoices: false, streams: [{ platform: 'netflix', url: 'u', dub: false }] as Title['streams'] })).join() === 'sprecher:ohne-synchro')
 pruefe('kein-weg: Treffer', arten(gut(1, { streams: [], watchLinks: [] })).includes('kein-weg'))

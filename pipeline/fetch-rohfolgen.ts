@@ -14,115 +14,46 @@
  * führt die Fälle mit Grund. Eine offene Frage bleibt damit sichtbar, statt zu
  * einer falschen Antwort zu werden — das ist der ganze Unterschied zu vorher.
  *
+ * Die Zuordnung je Adresse steht in `lib/rohfolgen-titelwahl.ts` (welcher Titel?) und
+ * `lib/rohfolgen-ordnen.ts` (welche Folgen?); hier laufen Abruf, Schleife und Abschluss.
+ *
  * Aufruf: `npx tsx pipeline/fetch-rohfolgen.ts`
  */
 import { resolve } from 'node:path'
 import { log, readJson, ROOT, warn } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
-import { schliesseRohfolgenAb, type Offen } from './lib/rohfolgen-abschluss.ts'
+import { schliesseRohfolgenAb, type Offen, type Zugeordnet } from './lib/rohfolgen-abschluss.ts'
 import { sortiereKanalGruppenAus, type ZugeordneteSeiten } from './lib/kanal-aussortieren.ts'
-import { anbieterFolgeAus } from './lib/folgen-datum.ts'
-import { staffelRiegel } from './lib/staffel-riegel.ts'
 import { leseZugeordnet } from './lib/prime-meldung-riegel.ts'
 import { ladeHandbelege } from './lib/dub-confirmed.ts'
 import { kanalWissen } from './lib/kanal-wissen.ts'
 import { bereinigeAltbestand } from './lib/rohfolgen-staffelmisch.ts'
 import { ladeFremdeMeldungen } from './lib/netflix-fremde-meldung.ts'
-import { belegtDurchStaffel, teileNachNetflixStaffel } from './lib/netflix-staffeln.ts'
+import { teileNachNetflixStaffel } from './lib/netflix-staffeln.ts'
 import {
   animeZugehoerigkeit,
   handbelegAdressen,
   ordneCartoonsZu,
-  restTitel,
   type CartoonFolgenDatei,
 } from './lib/rohfolgen-cartoons.ts'
+import { baueFolgenKarten, baueSuchZuTitel } from './lib/rohfolgen-titelwahl.ts'
+import { bearbeiteAlle } from './lib/rohfolgen-ordnen.ts'
+import type { Rohfolge, TmdbEintrag } from './lib/rohfolgen-zeile.ts'
 import { readFileSync } from 'node:fs'
 import yaml from 'js-yaml'
-import {
-  folgenKern,
-  gruppiereNachAusgabe,
-  type AnbieterFolge,
-  type AsFolgeRoh,
-  type TmdbFolge,
-} from '../shared/folgen-zuordnung.ts'
-import { entscheideZuordnung, probeGeschwister, sammleAnker, tmdbFuerTitel } from '../shared/folgen-anker.ts'
+import { gruppiereNachAusgabe, type AsFolgeRoh } from '../shared/folgen-zuordnung.ts'
+import { sammleAnker, tmdbFuerTitel } from '../shared/folgen-anker.ts'
 import type { Title } from '../shared/types.ts'
 
 const WORKER = process.env.LAUF_WORKER ?? 'https://newsletter.animekalender.workers.dev'
 const TOKEN = process.env.LAUF_TOKEN ?? ''
 
-/** Eine Zeile aus `prime_folge`, so wie der Worker sie ausliefert. */
-/** Die Seite einer Gruppe — nur wenn alle Folgen dieselbe nennen. */
-function seiteDer(liste: { seiten_kennung?: string | null }[]): string | null {
-  const s = new Set(liste.map((f) => f.seiten_kennung ?? ''))
-  return s.size === 1 ? [...s][0] || null : null
-}
-
-interface Rohfolge {
-  id: number
-  url: string
-  asin: string | null
-  gti: string | null
-  nummer: number | null
-  titel: string | null
-  erschienen: string | null
-  dauer_sek: number | null
-  sprachen: string | null
-  untertitel: string | null
-  staffel_text: string | null
-  staffel_nr: number | null
-  gemeldet_am: string
-  titel_id: number | null
-  /*
-    **Wer die Folge gemeldet hat** — seit dem 01.09.2026 nicht mehr nur Prime.
-    Netflix und Disney+ melden auf denselben Weg; der Zuordner behandelt sie
-    gleich, denn seine Anker (Folgentitel, Erstausstrahlung) sind bei allen
-    dieselben. Die Spalte entscheidet nur, welcher Verweis im Bestand gemeint
-    ist, wenn ein Titel bei mehreren Anbietern laeuft.
-  */
-  plattform?: string | null
-  /** Die Seite, auf der gelesen wurde (Migration 030) — `url` ist die Prüflisten-Adresse. */
-  seiten_kennung?: string | null
-  /*
-    Der Serienname aus der Meldung derselben Adresse — der Worker liefert ihn
-    als Unterabfrage mit. Er ist der letzte Anker, wenn unser Bestand die
-    Adresse nicht kennt (Prime legt je Staffel eine eigene an).
-  */
-  serientitel?: string | null
-}
-
-/** Ein Name auf seinen Kern — dieselbe Formel wie in `fetch-pruefungen.ts`. */
-function titelSchluessel(name: string): string {
-  return String(name ?? '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '')
-}
-
-/**
- * Ist dieser Titel der Kopf seiner Reihe — also das, was ein Anbieter
- * „Staffel 1" nennen würde?
- *
- * Gemessen an der japanischen Ausstrahlung: der älteste Eintrag derselben
- * `franchiseId`. Ein Titel ohne Reihe ist für sich genommen der Kopf.
- */
-function istReihenkopf(titel: Title, alle: Title[]): boolean {
-  if (!titel.franchiseId) return true
-  const reihe = alle.filter((t) => t.franchiseId === titel.franchiseId && t.jpYear)
-  if (reihe.length < 2) return true
-  const aeltester = reihe.reduce((a, b) => ((a.jpYear ?? 9999) <= (b.jpYear ?? 9999) ? a : b))
-  return aeltester.id === titel.id
-}
-
-interface TmdbEintrag {
-  tmdbId: number
-  folgen: TmdbFolge[]
-}
-
-async function main(): Promise<void> {
+/** Holt die offenen Rohfolgen; `null`, wenn es nichts zu tun gibt (kein Token, Fehler, leerer Briefkasten). */
+async function holeRohfolgen(): Promise<Rohfolge[] | null> {
   if (!TOKEN) {
     warn('LAUF_TOKEN fehlt — ohne Token gibt der Worker die Rohfolgen nicht heraus.')
     recordSource('rohfolgen', 0, 'kein Token')
-    return
+    return null
   }
 
   /*
@@ -136,14 +67,14 @@ async function main(): Promise<void> {
     Endlos-Lauf, keine Mengenbegrenzung: Bei 5.000 Zeilen je Seite sind das
     100.000 Folgen.
   */
-  let folgen: Rohfolge[] = []
+  const folgen: Rohfolge[] = []
   let nach = 0
   for (let seite = 0; seite < 20; seite++) {
     const antwort = await fetch(`${WORKER}/pruefung?rohfolgen=1&nach=${nach}`, { headers: { Authorization: `Bearer ${TOKEN}` } })
     if (!antwort.ok) {
       warn(`Rohfolgen nicht abrufbar: HTTP ${antwort.status}`)
       recordSource('rohfolgen', 0, `HTTP ${antwort.status}`)
-      return
+      return null
     }
     const teil = (await antwort.json()) as { folgen: Rohfolge[]; weiter?: number | null }
     folgen.push(...teil.folgen)
@@ -161,13 +92,19 @@ async function main(): Promise<void> {
       passiert.
     */
     recordSource('rohfolgen', 0, undefined, undefined, true)
-    return
+    return null
   }
   /* Nach der letzten Seite steht noch eine Fortsetzung aus: die Seitengrenze greift. */
   if (nach) {
     warn('weitere Rohfolgen nicht geholt — die Seitengrenze greift, der nächste Lauf holt sie')
   }
   log(`${folgen.length} Rohfolgen geholt`)
+  return folgen
+}
+
+async function main(): Promise<void> {
+  let folgen = await holeRohfolgen()
+  if (!folgen) return
 
   const titles = readJson<Title[]>('public/data/titles.json', [])
   const tmdbFolgen = readJson<Record<string, TmdbEintrag>>('data/tmdb-folgen.json', {})
@@ -180,22 +117,6 @@ async function main(): Promise<void> {
   const asFolgen = readJson<Record<string, { folgen: AsFolgeRoh[] }>>('data/anisearch-folgen.json', {})
   const asKennung = readJson<Record<string, { anisearchId?: number }>>('data/anisearch.json', {})
 
-  /*
-    Jede Suchadresse, die aus einem unserer Titel entstehen kann — mit allen
-    Einträgen, auf die sie passt. Eine Adresse mit mehr als einem Eintrag wird
-    unten nicht verwendet.
-  */
-  const suchZuTitel = new Map<string, Set<number>>()
-  for (const t of titles) {
-    for (const name of [t.titleDe, t.titleEn, t.titleRomaji]) {
-      if (!name) continue
-      const u = `https://www.amazon.de/s?k=${encodeURIComponent(name)}&i=instant-video`
-      const da = suchZuTitel.get(u) ?? new Set<number>()
-      da.add(t.id)
-      suchZuTitel.set(u, da)
-    }
-  }
-
   const entdoppelt = bereinigeAltbestand(folgen, ladeFremdeMeldungen())
   const veraltet = entdoppelt.veraltet
   if (veraltet.length) {
@@ -206,108 +127,29 @@ async function main(): Promise<void> {
   /* Die Regel, welche Folgen zusammengehören, steht in `shared/folgen-zuordnung.ts`. */
   const jeUrl = gruppiereNachAusgabe(folgen)
 
-  /*
-    **Welcher Titel führt welche Folgentitel — der Anker für den letzten Fall.**
-
-    Gebaut aus beiden Quellen: aniSearch (deutsche Folgentitel, wie unser
-    Bestand aufgeteilt) und TMDB (dieselben aus zweiter Hand). Ein Titel, dessen
-    Folgen die gemeldeten treffen, ist der gesuchte — ganz ohne eine Angabe des
-    Anbieters.
-
-    Gebaut wird die Karte einmal, nicht je Adresse: 510 aniSearch-Titel und 808
-    von TMDB, zusammen rund 17.000 Folgentitel.
-  */
-  const folgenJeTitel = new Map<number, Set<string>>()
-  /**
-   * **Dieselben Folgentitel aus aniSearch allein — der Schiedsrichter bei Gleichstand.**
-   *
-   * TMDB führt Staffeln regelmäßig unter **einer** Serie und hängt alle Folgen
-   * daran; aniSearch legt je Staffel einen eigenen Artikel an. Wo zwei unserer
-   * Titel denselben Namen tragen, trifft die TMDB-Liste deshalb beide gleich gut,
-   * und der Gleichstand ist unauflösbar.
-   *
-   * Gemessen am 02.09.2026 an „Legend of the Galactic Heroes: Die Neue These" —
-   * zwei Einträge mit demselben deutschen und englischen Namen, unterschieden nur
-   * im Romaji (Kaikou gegen Seiran), den Prime nicht führt:
-   *
-   * | Titel | aniSearch trifft „In ewiger Nacht" | TMDB trifft |
-   * |---|---|---|
-   * | 20628 (Kaikou) | **ja** | ja |
-   * | 100780 (Seiran) | nein | ja |
-   *
-   * Die feinere Quelle entscheidet also, und sie hat recht: Die Folge steht in
-   * aniSearch-Artikel 10688, der zu 20628 gehört.
-   */
-  const folgenNurAniSearch = new Map<number, Set<string>>()
-  for (const t of titles) {
-    const menge = new Set<string>()
-    const nurAniSearch = new Set<string>()
-    const asId = asKennung[String(t.id)]?.anisearchId
-    for (const f of asId ? (asFolgen[String(asId)]?.folgen ?? []) : []) {
-      for (const name of [f.de, f.en]) {
-        const k = folgenKern(name)
-        if (k && k.length >= 5) {
-          menge.add(k)
-          nurAniSearch.add(k)
-        }
-      }
-    }
-    for (const f of tmdbFolgen[String(t.id)]?.folgen ?? []) {
-      const k = folgenKern(f.titel)
-      if (k && k.length >= 5) menge.add(k)
-    }
-    if (menge.size) folgenJeTitel.set(t.id, menge)
-    if (nurAniSearch.size) folgenNurAniSearch.set(t.id, nurAniSearch)
-  }
-  /** Wie viele Adressen allein über ihre Folgentitel gefunden wurden. */
-  let ueberFolgentitel = 0
-  let uebersprungenStaffel = 0
-  /** Adressen, deren Sprache belegt ist, deren Folgen aber nicht zuzuordnen waren. */
-  let ohneFolgenzuordnung = 0
-
   const offen: Offen[] = []
   /**
    * Was der Bau am Ende bekommt.
    *
    * `unsere: null` heißt „gilt dem Titel, nicht einer Folge" — der Fall eines
-   * einzigen Eintrags, siehe unten. `asin` ist der eigentliche Ertrag einer
+   * einzigen Eintrags (`lib/rohfolgen-ordnen.ts`). `asin` ist der eigentliche Ertrag einer
    * Meldung von einer **Suchadresse**: Aus ihr wird damit eine echte
    * Titelseite, und die nächste Prüfung beginnt nicht wieder bei der Suche.
+   *
+   * `plattform` sagt, wer gemeldet hat: Der Bau legt daraus den Verweis des richtigen
+   * Anbieters an (bis zum 05.09.2026 stand das Feld nur da, `build.ts` schrieb immer Prime).
    */
-  const zugeordnet: Record<
-    string,
-    {
-      titleId: number
-      asin: string | null
-      /** Die gemeldete Seite, wenn alle Folgen der Gruppe dieselbe nennen. */
-      seite?: string | null
-      /*
-        **Wer gemeldet hat — bis zum 05.09.2026 stand das Feld nur da.**
-
-        `Rohfolge.plattform` gibt es seit dem 01.09.2026, und der Kommentar dort
-        sagt, der Zuordner behandle alle Anbieter gleich. Das stimmt für die
-        Anker (Folgentitel, Erstausstrahlung) und stimmte für nichts danach:
-        Geschrieben wurde in eine Prime-Datei, und `build.ts` legte daraus einen
-        Verweis mit fest verdrahtetem `platform: 'primevideo'` an. Eine
-        Netflix-Meldung wäre dort als Prime-Weg gelandet — ein Verweis, der auf
-        eine Seite zeigt, die es beim genannten Anbieter nicht gibt.
-
-        Aufgefallen ist es beim Nachmessen für „Sammeln und Zuordnen trennen":
-        `plattform` kommt im ganzen Skript genau einmal vor, nämlich in seiner
-        eigenen Deklaration. Derselbe Fehlgriff wie bei `titelId` am 28.08.2026
-        (CLAUDE.md, „Ein neues Feld ist erst eingebaut, wenn es am Ziel
-        angekommen ist") — nur diesmal ohne Meldung, weil bisher ausschließlich
-        Prime gemeldet hat.
-      */
-      plattform: string
-      folgen: { unsere: number | null; sprachen: string[] }[]
-    }
-  > = {}
+  const zugeordnet: Record<string, Zugeordnet> = {}
   /** Die Rohfolgen-Kennungen, die verwertet wurden — sie werden danach abgehakt. */
   const erledigt: number[] = []
-  /** Alle Anker eines Titels: aniSearch, dann TMDB (`shared/folgen-anker.ts`). */
-  const listenFuer = (t: Title) =>
-    sammleAnker(asFolgen[String(asKennung[String(t.id)]?.anisearchId)]?.folgen, tmdbFuerTitel(t, tmdbFolgen), t)
+  const kontext = {
+    titles,
+    suchZuTitel: baueSuchZuTitel(titles),
+    karten: baueFolgenKarten(titles, asKennung, asFolgen, tmdbFolgen),
+    /** Alle Anker eines Titels: aniSearch, dann TMDB (`shared/folgen-anker.ts`). */
+    listenFuer: (t: Title) =>
+      sammleAnker(asFolgen[String(asKennung[String(t.id)]?.anisearchId)]?.folgen, tmdbFuerTitel(t, tmdbFolgen), t),
+  }
   /* Cartoons und Handbeleg-Adressen zuerst: sie stehen nicht in titles.json (F20, 16.10.2026). */
   const cartoonLauf = ordneCartoonsZu(
     jeUrl,
@@ -320,468 +162,16 @@ async function main(): Promise<void> {
   offen.push(...cartoonLauf.offen)
   erledigt.push(...cartoonLauf.erledigt)
   log(`${Object.keys(cartoonLauf.zugeordnet).length} Cartoon-Adressen zugeordnet, ${cartoonLauf.offen.length} offen`)
-  for (const [schluessel, liste] of teileNachNetflixStaffel(cartoonLauf.uebrig, titles, readJson('data/anbieter-staffeln.json', {}))) {
-    /*
-      Der Schlüssel trägt seit dem 30.08.2026 die Ausgabe mit (`url#asin`) —
-      gesucht und gespeichert wird aber unter der Adresse selbst. Sie steht in
-      jeder Zeile der Gruppe, alle tragen dieselbe.
-    */
-    const url = liste[0]!.url
-    /*
-      Welcher unserer Titel gehört zu dieser Adresse? Über den Bestand, nicht über
-      den Namen: Die Adresse steht dort, der Name kann bei Prime jede Form haben.
-    */
-    /*
-      **Die gemeldete Kennung entscheidet, nicht die Adresse.**
-
-      Bis zum 28.08.2026 lief die Zuordnung ueber `titles.streams.url`. Ein
-      Titel ohne Verweis steht dort nicht — und genau die stehen in der
-      Pruefliste. Gemessen: 1 von 67 Adressen zugeordnet, 66-mal „kein Titel
-      zu dieser Adresse".
-
-      Seit Migration 018 traegt jede Rohfolge `titel_id`. Die Adresse bleibt
-      als Rueckfall fuer alles, was vorher gemeldet wurde.
-    */
-    /**
-     * Hat der **Name** genau getroffen (nicht nur als Anfang)? Entscheidet
-     * weiter unten, ob ein Beleg ohne Folgenzuordnung tragfähig ist.
-     */
-    let nameGenau = false
-    const gemeldeteId = liste.find((f) => Number.isFinite(f.titel_id))?.titel_id ?? null
-    /*
-      **Die gemeldete Kennung ist ein Vorschlag — die Folgendaten überstimmen ihn.**
-
-      Amazon tauscht beim Wechsel über das Auswahlfeld den Quelltext nicht aus
-      (siehe `CLAUDE.md`). Die Adresse wandert zur neuen Staffel, die
-      Folgenliste bleibt die der alten — und die Meldung trägt dann die
-      Kennung des **Auftrags** über Folgen, die zu einem anderen Teil gehören.
-
-      Gemessen am 04.09.2026 an „Takagi-san": Die Meldung zeigt auf 107068
-      (Staffel 2, 2019), ihre zwölf Folgen tragen die Termine 08.01. bis
-      26.03.2018 — Staffel 1 (99468). Daniel hat es an der Seite bestätigt und
-      den Weg vorgegeben: „falsche staffel kennung bug kennen wir von früheren
-      extension versionen, ähnliche verweise entsprechend datum der episoden
-      auflösen."
-
-      **Vier Bedingungen, und alle vier müssen halten** — sonst wäre es Raten:
-
-      1. Die Rohfolgen nennen überhaupt ein Jahr (Prime schreibt „8. Jan. 2018").
-      2. Der gemeldete Titel hat ein **anderes** Erstausstrahlungsjahr.
-      3. In **derselben Reihe** gibt es genau **einen** Teil mit diesem Jahr.
-      4. Er hat dieselbe Folgenzahl wie die Meldung.
-
-      Trifft eine nicht zu, bleibt die gemeldete Kennung stehen. Ein zweiter
-      Kandidat, ein fehlendes Jahr oder eine abweichende Folgenzahl heißt: Wir
-      wissen es nicht, und `ordneZu` lässt die Adresse dann offen — das ist die
-      richtige Seite zum Irren.
-    */
-    const jahreDerFolgen = new Set(
-      liste
-        .map((f) => /\b(?:19|20)\d{2}\b/.exec(f.erschienen ?? '')?.[0])
-        .filter((j): j is string => Boolean(j))
-        .map(Number),
-    )
-    let echteId = gemeldeteId
-    const gemeldeterTitel = gemeldeteId ? titles.find((t) => t.id === gemeldeteId) : undefined
-    if (
-      gemeldeterTitel?.franchiseId &&
-      jahreDerFolgen.size === 1 &&
-      gemeldeterTitel.jpYear !== [...jahreDerFolgen][0]
-    ) {
-      const jahr = [...jahreDerFolgen][0]
-      const geschwister = titles.filter(
-        (t) =>
-          t.franchiseId === gemeldeterTitel.franchiseId &&
-          t.id !== gemeldeterTitel.id &&
-          t.jpYear === jahr &&
-          t.episodes === liste.length,
-      )
-      if (geschwister.length === 1) {
-        echteId = geschwister[0]!.id
-        warn(
-          `${url}: gemeldet als ${gemeldeteId} (${gemeldeterTitel.jpYear}), ` +
-            `Folgen tragen ${jahr} — zugeordnet zu ${echteId} (${geschwister[0]!.titleDe ?? geschwister[0]!.titleRomaji})`,
-        )
-      }
-    }
-    const treffer = echteId
-      ? titles.filter((t) => t.id === echteId)
-      : titles.filter((t) => (t.streams ?? []).some((s) => s.url === url || s.seite === url)) ||
-        []
-    /** Kam der Treffer aus dem Bestand selbst — Kennung oder hinterlegte Adresse? */
-    const ausBestand = treffer.length === 1
-    /*
-      **Eine Suchadresse trägt ihre Herkunft im Suchbegriff — sie stammt von uns.**
-
-      `tools/extension-offene-amazon.mjs` baut sie als
-      `amazon.de/s?k=${encodeURIComponent(unserTitel)}&i=instant-video`. Die
-      Rückrichtung ist damit kein Namensabgleich, sondern das Umkehren einer
-      Kodierung: Wer denselben Ausdruck über alle unsere Titel legt, findet
-      genau den einen, aus dem die Adresse entstand.
-
-      **Der Ertrag ist der Grund, warum es das gibt.** Am 29.08.2026 lagen 95
-      Adressen mit **5.435 gemeldeten Folgen** unzugeordnet — Daniels Arbeit von
-      Tagen. 79 davon sind Suchadressen, und **alle 79** lösen sich hierüber
-      auf: 4.398 Folgen.
-
-      **Mehrdeutige bleiben offen.** 69 der 6.461 möglichen Adressen führen auf
-      mehr als einen Eintrag — „Appleseed" gibt es als Film von 1988 und als
-      Serie, „Gantz" zweimal. Dort entscheidet nicht die Adresse, sondern nur
-      eine Meldung mit Kennung; ein Ratespiel wäre schlimmer als ein offener
-      Fall.
-    */
-    if (!treffer.length && suchZuTitel.has(url)) {
-      const ids = suchZuTitel.get(url)!
-      if (ids.size === 1) treffer.push(titles.find((t) => t.id === [...ids][0])!)
-    }
-    /*
-      **Und wo die Adresse nichts trifft, spricht der gemeldete Name.**
-
-      Am 01.09.2026 lagen 795 Rohfolgen auf 50 Adressen unzugeordnet, alle mit
-      „kein Titel zu dieser Adresse". Gemessen an zweien davon: Sie gehören zu
-      „Card Captor Sakura", und der Titel steht im Bestand — nur unter einer
-      **anderen** Prime-Adresse. Prime führt je Staffel eine eigene, unser
-      Bestand kennt eine.
-
-      Der Name ist hier ein **Vorschlag**, kein Beleg, und das ist vertretbar:
-      Was danach kommt, prüft ihn. `ordneZu` legt die gemeldeten Folgen über
-      Folgentitel und Erstausstrahlung; ein Namensvorschlag, dessen Folgen nicht
-      passen, fällt dort durch und bleibt offen. Das ist der Unterschied zu
-      `fetch-pruefungen.ts`, wo ein Namenstreffer direkt ein Urteil setzen
-      würde — dort bleibt er deshalb ein Vorschlag für die Handarbeit.
-
-      **Nur bei genau einem Treffer.** „Cardcaptor Sakura" gibt es fünfmal im
-      Bestand (Serie, zwei Filme, ein Special, „Clear Card Arc"); ohne die
-      Eindeutigkeit wäre das ein Ratespiel.
-    */
-    if (!treffer.length) {
-      const name = liste.find((f) => f.serientitel)?.serientitel ?? null
-      if (name) {
-        /*
-          **Was hinter einem Gedankenstrich steht, ist Daniels Notiz — nicht der Name.**
-
-          Gemeldet am 01.09.2026: „My First Girlfriend Is a Gal — Kauftitel
-          (FSK 16, mit OVA)". Der Zusatz sagt, **welche** Ausgabe er geöffnet
-          hat; unser Bestand führt den Titel ohne ihn. Beide Stufen unten
-          prüfen, ob ein Bestandstitel mit dem gemeldeten Namen **beginnt** —
-          und scheitern hier, weil die Meldung die längere Seite ist.
-
-          Der Schnitt am Gedankenstrich ist deshalb sicher, weil er in echten
-          Titeln nicht vorkommt: **null** der 2.767 Einträge führen ein „ — "
-          in einem ihrer drei Namen (gemessen 05.09.2026). Beim Bindestrich
-          wäre er es nicht — 448 tun es, und „Kuroko's Basketball - Winter Cup
-          Highlights Movie 1" würde zur Serie geschnitten, zu der es nicht
-          gehört.
-        */
-        const k = titelSchluessel(name.split(' — ')[0]!)
-        const passt = (t: Title, genau: boolean) =>
-          [t.titleDe, t.titleEn, t.titleRomaji].some((x) => {
-            if (!x) return false
-            const y = titelSchluessel(x)
-            return genau ? y === k : y.startsWith(k)
-          })
-        /*
-          **Erst genau, dann als Anfang — und nie beides gemischt.**
-
-          Prime nennt die Serie „Das Dschungelbuch", unser Bestand „Das
-          Dschungelbuch: Die Serie"; 26 Folgen lagen deshalb unzugeordnet. Ein
-          Bestandstitel, der mit dem gemeldeten Namen **beginnt**, ist ein
-          brauchbarer Vorschlag — einer, der ihn irgendwo enthält, wäre es
-          nicht: „Gantz" steckt in jedem „Gantz:O".
-
-          Die Stufen bleiben getrennt: Gibt es einen genauen Treffer, gewinnt
-          er, auch wenn drei Titel mit demselben Namen anfangen.
-        */
-        const genau = titles.filter((t) => passt(t, true))
-        const kandidaten = genau.length ? genau : titles.filter((t) => passt(t, false))
-        if (kandidaten.length === 1) {
-          treffer.push(kandidaten[0]!)
-          nameGenau = genau.length === 1
-        }
-      }
-    }
-    /*
-      **Und wenn nicht einmal ein Name da ist, sprechen die Folgentitel selbst.**
-
-      Bei 16 Adressen mit 198 Folgen steht in der Meldung kein Serienname,
-      sondern der Titel der **Folge**: „Kyogre in der Falle!", „Ein beschwingter
-      Kampf!". Über die Adresse und den Namen ist damit nichts zu holen.
-
-      Über die Folgentitel schon — und genau das ist der Anker, den Daniel am
-      01.09.2026 gemeint hat: „einzeln episoden korrekt aus gesammeltem zustand
-      rauspicken und korrekt zuordnen … anhand von verlaesslichen sicheren
-      quellen wie zB anisearch."
-
-      `data/anisearch-folgen.json` führt je Titel die deutschen Folgentitel,
-      `data/tmdb-folgen.json` dieselben aus zweiter Quelle. Wer dort nachsieht,
-      welcher Titel diese Folgen führt, hat die Zuordnung — ohne eine einzige
-      Angabe des Anbieters.
-
-      **Die Schwelle ist hoch, und sie muss es sein.** Ein einzelner Folgentitel
-      kann zufällig doppelt vorkommen („Der Anfang", „Abschied"); erst wenn
-      **mindestens drei** und **mehr als die Hälfte** der gemeldeten Folgen
-      denselben Titel treffen, ist es eine Auskunft. Und nur, wenn kein zweiter
-      Titel gleich viele trifft.
-    */
-    /*
-      **Und derselbe Griff entscheidet, wo zwei Titel eine Adresse teilen.**
-
-      Prime führt „Golden Kamuy" Staffel 1 und 2 unter einer Adresse, beide mit
-      zwölf Folgen — die Adresse allein sagt nicht, welche gemeint ist, und ohne
-      Entscheidung blieben zwölf Folgen liegen. Die Folgentitel sagen es.
-
-      Der Unterschied zum Fall darüber ist nur die Ausgangsmenge: dort **alle**
-      Titel, hier die beiden Kandidaten. Die Schwelle bleibt dieselbe.
-    */
-    if (treffer.length !== 1) {
-      const kerne = liste.map((f) => folgenKern(f.titel)).filter((x) => x && x.length >= 5)
-      if (kerne.length >= 3) {
-        const menge = treffer.length ? treffer.map((t) => t.id) : [...folgenJeTitel.keys()]
-        const punkte = new Map<number, number>()
-        for (const id of menge) {
-          const folgen = folgenJeTitel.get(id)
-          if (!folgen) continue
-          let n = 0
-          for (const k of kerne) if (folgen.has(k)) n++
-          if (n >= 3 && n > kerne.length / 2) punkte.set(id, n)
-        }
-        /*
-          **Bei Gleichstand gewinnt der spezifischere Eintrag.**
-
-          „Pokémon" (die Reihe) und „Pokémon: Die TV-Serie — Sonne & Mond" (die
-          Staffel) treffen dieselben zwölf Folgentitel, denn der Reihen-Eintrag
-          führt alle Folgen aller Staffeln. Ein Gleichstand ist hier also der
-          Normalfall, kein Zweifelsfall — und die Staffel ist die richtige
-          Antwort.
-
-          Entschieden wird über die **Menge**, die ein Titel insgesamt führt:
-          „Sonne & Mond" kennt 146 Folgentitel, „Pokémon" über tausend. Wer
-          dieselben Folgen mit weniger Ballast führt, meint sie genauer.
-
-          Bleibt es auch dann gleich — zwei Titel mit derselben Trefferzahl und
-          derselben Menge —, ist es ein echter Zweifelsfall und bleibt offen.
-        */
-        /*
-          **Bei Punktgleichstand entscheidet zuerst aniSearch, dann die Menge.**
-
-          Treffen zwei Titel gleich viele Folgentitel, liegt das meist an TMDB:
-          Es hängt alle Folgen einer Reihe an jede Staffel. aniSearch trennt sie —
-          wer dort trifft und der andere nicht, ist gemeint. Erst wenn auch das
-          keinen Unterschied macht, entscheidet die Menge (der spezifischere
-          Eintrag führt weniger Folgentitel insgesamt).
-        */
-        const asPunkte = (id: number) => {
-          const f = folgenNurAniSearch.get(id)
-          if (!f) return 0
-          let n = 0
-          for (const k of kerne) if (f.has(k)) n++
-          return n
-        }
-        const sortiert = [...punkte.entries()].sort((a, b) => {
-          if (b[1] !== a[1]) return b[1] - a[1]
-          const as = asPunkte(b[0]) - asPunkte(a[0])
-          if (as !== 0) return as
-          return (folgenJeTitel.get(a[0])?.size ?? 0) - (folgenJeTitel.get(b[0])?.size ?? 0)
-        })
-        const eindeutig =
-          sortiert.length === 1 ||
-          (sortiert.length > 1 &&
-            (sortiert[0]![1] > sortiert[1]![1] ||
-              asPunkte(sortiert[0]![0]) > asPunkte(sortiert[1]![0]) ||
-              (folgenJeTitel.get(sortiert[0]![0])?.size ?? 0) <
-                (folgenJeTitel.get(sortiert[1]![0])?.size ?? 0)))
-        if (eindeutig) {
-          const gefunden = titles.find((t) => t.id === sortiert[0]![0])
-          if (gefunden) {
-            treffer.length = 0
-            treffer.push(gefunden)
-            ueberFolgentitel++
-          }
-        }
-      }
-    }
-    if (treffer.length !== 1) {
-      offen.push({
-        url,
-        titel: restTitel(liste),
-        grund: treffer.length ? `${treffer.length} Titel teilen diese Adresse` : 'kein Titel zu dieser Adresse',
-        folgen: liste.length,
-        /*
-          **Ob die Meldung überhaupt eine Kennung mitbrachte.**
-
-          Ohne sie kann die Zuordnung nur über die Adresse gehen, und die kennt
-          unser Bestand oft nicht — dann ist „nicht zugeordnet" kein Fehler,
-          sondern die Folge einer alten Meldung. Vom 28. bis 31.08.2026 kamen
-          alle 795 Rohfolgen so an (`titelId` lag in der Prüfliste eine Ebene
-          zu tief). Die Zusicherung in `check-logic.ts` unterscheidet daran,
-          ob eine Null Anlass zur Sorge ist.
-        */
-        mitKennung: liste.some((f) => f.titel_id != null),
-      })
-      continue
-    }
-    const titel = treffer[0]!
-
-    /*
-      **Anker suchen: aniSearch, dann TMDB.**
-
-      Bei aniSearch ist die Zuordnung eine Zeile — der Eintrag entspricht unserem
-      Titel, seine Folgen sind unsere Folgen. Bei TMDB muss erst die richtige
-      Staffel gefunden werden, und genau dort ging es schief: Am 28.08.2026 ließ
-      sich **1 von 67** Adressen zuordnen.
-    */
-    /*
-      **Ein einziger Eintrag ist nichts zuzuordnen — er ist der Titel.**
-
-      Prime führt „Halo Legends" als **einen Film**: die neun Kurzfilme, die
-      unser Bestand als neun Folgen kennt, zu einem Stück zusammengeschnitten.
-      Es gibt dort keine Folge 1, der man unsere Folge 1
-      gegenüberstellen könnte, und die Suche nach einer TMDB-Staffel mit neun
-      Folgen musste scheitern.
-
-      **Die Frage, die dieses Projekt stellt, ist trotzdem beantwortet:** Läuft
-      der Titel dort auf Deutsch? Der eine Eintrag nennt seine Tonspuren, und
-      welche unserer Folgen gemeint ist, spielt für die Antwort keine Rolle.
-
-      Der Beleg wird deshalb ohne Folgennummer abgelegt (`unsere: null`) — er
-      gilt dem Titel, nicht einer Folge. Das ist die ehrliche Form: Eine erfundene
-      „Folge 1" wäre eine Behauptung über etwas, das die Seite nicht sagt.
-
-      **Nur bei genau einem Eintrag.** Zwei oder mehr heißen, dass Prime die
-      Sache aufteilt — dann ist die Zuordnung wieder die richtige Frage. 36 der
-      101 offenen Adressen tragen genau einen.
-    */
-    /**
-     * **Eine Meldung, die ihre Staffel nennt, gehört nicht an den Reihenkopf.**
-     *
-     * Daniel am 07.09.2026 an „Date a Live": Er hat alle fünf Staffeln über
-     * eine Prime-Seite gemeldet, und **drei** verschiedene Adressen landeten
-     * unter Titel 15583 — Staffel 1:
-     *
-     *     B0DML22FHP  „laut Adresse Staffel 2"  → 15583
-     *     B0C7LZCS5H  „laut Adresse Staffel 1"  → 15583
-     *     B0DMB2MKZX  „laut Adresse Staffel 3"  → 15583
-     *
-     * Der Grund ist die Zuordnung über den Namen: Amazon nennt jede Staffel
-     * schlicht „Date a Live", und der beste Namenstreffer ist der Reihenkopf.
-     * Staffel 1 bekam dadurch die Adresse von Staffel 2 und mit ihr ein
-     * `dub: true`, das nie für sie belegt war.
-     *
-     * Die Meldung **weiß** es besser — die Erweiterung liest die Staffel aus
-     * der Adresse (`?ref_=atv_dp_season_select_sN`) und schickt sie mit. Ab
-     * Staffel 2 wird ein Reihenkopf-Treffer deshalb verworfen: Lieber keine
-     * Zuordnung als eine falsche, denn eine falsche erzeugt eine Sprachaussage
-     * über den falschen Titel. Ausnahme: die zweite Hälfte eines Einzeltitels
-     * (`staffelRiegel`, mindestens zwei Folgentreffer jenseits der Seitenlänge).
-     *
-     * **Nur ab Staffel 2**, und nur wenn unser Titel wirklich der Kopf ist:
-     * Bei einer einteiligen Reihe ist „Staffel 1" die einzige, und dort ist
-     * der Kopf richtig.
-     */
-    const gemeldeteStaffel = liste[0]?.staffel_nr ?? null
-    const ak = listenFuer(titel)
-    const anbieter: AnbieterFolge[] = liste.map(anbieterFolgeAus)
-    if (staffelRiegel(url, gemeldeteStaffel, istReihenkopf(titel, titles), titel, anbieter, ak.listen)) {
-      uebersprungenStaffel++
-      continue
-    }
-    if (liste.length === 1) {
-      zugeordnet[schluessel] = {
-        titleId: titel.id,
-        plattform: liste[0]!.plattform ?? 'primevideo',
-      seite: seiteDer(liste),
-        asin: liste[0]!.asin ?? null,
-        folgen: [{ unsere: null, sprachen: JSON.parse(liste[0]!.sprachen ?? '[]') as string[] }],
-      }
-      erledigt.push(liste[0]!.id)
-      continue
-    }
-
-    /*
-      **Welche Folge gemeint ist, bleibt offen — welche Sprache, nicht.**
-
-      Prime vergibt bei Kauftiteln eigene Folgennamen und setzt bei allen
-      dasselbe Datum. Gemessen am 05.09.2026 an „My First Girlfriend Is a
-      Gal": elf Folgen, alle „12. Juli 2017", Namen wie „1. Mein erstes Mal
-      mit einer Gal" — aniSearch führt dieselbe Staffel als „Der erste
-      Kniefall", 12.07. bis 13.09. Weder über den Namen noch über das Datum
-      ist da etwas zuzuordnen, und das ist kein Fehler: Es sind schlicht
-      andere Texte.
-
-      Die Frage dieses Projekts hängt nicht daran. Elf Zeilen, jede mit
-      `["Deutsch"]` — dass es die Serie dort auf Deutsch gibt, steht damit
-      fest. Der Beleg wird deshalb wie beim Einzeleintrag oben ohne
-      Folgennummer abgelegt: Er gilt dem Titel.
-
-      **Zwei Bedingungen, sonst bleibt es offen (oder die Geschwister-Probe greift):**
-
-      1. Der Titel muss über die **Kennung, die Adresse oder einen genauen
-         Namenstreffer** gefunden worden sein. Ein Namensanfang oder ein
-         Vorschlag aus den Folgentiteln reicht nicht — bei denen ist die
-         Folgenprüfung die einzige Gegenprobe, und die ist hier gerade
-         durchgefallen.
-      2. **Alle** Zeilen müssen dieselben Tonspuren nennen. Sagen sie
-         Verschiedenes, ist die Auskunft folgenweise — und dann fehlt sie,
-         solange die Folgen nicht zuzuordnen sind.
-    */
-    const sprachen = new Set(liste.map((f) => f.sprachen ?? '[]'))
-    const belastbar = (ausBestand || nameGenau) && sprachen.size === 1
-    const ohneKopf = (t: Title) => gemeldeteStaffel !== null && gemeldeteStaffel > 1 && istReihenkopf(t, titles)
-    const probe = () => probeGeschwister(anbieter, titel, titles, (t) => listenFuer(t).listen, ohneKopf)
-    const wahl = belegtDurchStaffel(schluessel, belastbar, entscheideZuordnung(anbieter, titel, ak, belastbar, probe))
-    if (wahl.art === 'offen') {
-      offen.push({ url, titel: titel.titleDe ?? titel.titleEn ?? null, grund: wahl.grund, folgen: liste.length })
-      continue
-    }
-    if (wahl.art === 'titel') {
-      zugeordnet[schluessel] = {
-        titleId: titel.id,
-        plattform: liste[0]!.plattform ?? 'primevideo',
-      seite: seiteDer(liste),
-        asin: liste.find((f) => f.asin)?.asin ?? null,
-        folgen: [{ unsere: null, sprachen: JSON.parse([...sprachen][0]!) as string[] }],
-      }
-      for (const f of liste) erledigt.push(f.id)
-      ohneFolgenzuordnung++
-      continue
-    }
-    const treffend = wahl.paare.filter((p) => p.unsere !== null)
-
-    zugeordnet[schluessel] = {
-      titleId: wahl.ziel.id,
-      plattform: liste[0]!.plattform ?? 'primevideo',
-      seite: seiteDer(liste),
-      /* Alle Zeilen einer Adresse stammen von derselben Seite — die erste genügt. */
-      asin: liste.find((f) => f.asin)?.asin ?? null,
-      folgen: treffend.map((p) => ({
-        unsere: p.unsere!,
-        sprachen: JSON.parse(liste[p.index]!.sprachen ?? '[]') as string[],
-      })),
-    }
-    /*
-      **Abgehakt wird die ganze Adresse, nicht nur die getroffenen Zeilen.**
-
-      Was von dieser Seite nicht zugeordnet werden konnte, wird es beim nächsten
-      Lauf auch nicht — die Anker sind dieselben. Es offen zu lassen hieße, die
-      Zeilen für immer erneut zu holen; ihr Inhalt steht ohnehin im Archiv der
-      Meldung. Kommt später ein Anker dazu, ist die Meldung neu zu holen, und
-      das ist ein Klick.
-    */
-    for (const f of liste) erledigt.push(f.id)
-  }
+  const anime = bearbeiteAlle(teileNachNetflixStaffel(cartoonLauf.uebrig, titles, readJson('data/anbieter-staffeln.json', {})), kontext)
+  Object.assign(zugeordnet, anime.zugeordnet)
+  offen.push(...anime.offen)
+  erledigt.push(...anime.erledigt)
 
   const bearbeitet = new Set(erledigt)
   const offeneGruppen = [...cartoonLauf.uebrig.values()].filter((liste) => !liste.every((f) => bearbeitet.has(f.id)))
   const bisherZugeordnet = leseZugeordnet<ZugeordneteSeiten[string]>()
   const kanalWeg = sortiereKanalGruppenAus(offeneGruppen, kanalWissen(ladeHandbelege()), bisherZugeordnet)
-  schliesseRohfolgenAb({
-    kanalWeg,
-    zugeordnet,
-    offen,
-    erledigt,
-    veraltet,
-    zaehler: { ueberFolgentitel, uebersprungenStaffel, ohneFolgenzuordnung },
-  })
+  schliesseRohfolgenAb({ kanalWeg, zugeordnet, offen, erledigt, veraltet, zaehler: anime.zaehler })
 }
 
 await main()

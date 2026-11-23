@@ -3413,10 +3413,13 @@ console.log('\nJapanischer Start: so genau wie die Quelle, und angekündigte Tit
   const abruf = readFileSync('pipeline/fetch.ts', 'utf8')
   pruefe('der Reihe geht das genaue, nicht das aufgefüllte Datum mit', /jpStart: t\.jpStart \?\? jpStartAnzeige\.get\(t\.id\)/.test(bau))
   pruefe('ohne Tag bleibt es beim Monat', /if \(!d\.day\) return `\$\{d\.year\}-\$\{p\(d\.month\)\}`/.test(bau))
-  pruefe(
-    'nicht abgeschlossene Titel werden bei jedem Lauf neu geholt',
-    /!cached\[id\] \|\| nochOffen\(cached\[id\]\)/.test(abruf) && /!byAniId\[id\] \|\| nochOffen\(byAniId\[id\]\)/.test(abruf),
-  )
+  const { zuHolen } = await import('./lib/anilist-mangel.ts')
+  const { eintragNochOffen } = await import('./lib/anilist.ts')
+  const voll = { status: 'FINISHED', countryOfOrigin: 'JP', stats: null, averageScore: 70, studios: { nodes: [{ name: 'X' }] }, abgerufen: '2026-11-22' }
+  const speicher = { 1: { ...voll, status: 'RELEASING' }, 2: voll } as unknown as Record<string, import('./lib/anilist-mangel.ts').MitStempel>
+  const geholt = zuHolen(speicher, [1, 2, 3], (m) => eintragNochOffen(m), '2026-11-22')
+  pruefe('nicht abgeschlossene und fehlende Titel werden bei jedem Lauf neu geholt, abgeschlossene nicht', geholt.join() === '1,3', geholt)
+  pruefe('fetch.ts wählt über zuHolen mit nochOffen', /zuHolen\(cached, malIds, nochOffen/.test(abruf) && /zuHolen\(byAniId, alleIds, nochOffen/.test(abruf))
 }
 
 console.log('\nÄhnliche Titel:')
@@ -3555,7 +3558,9 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
     Zusatz „— Kauftitel (FSK 16, mit OVA)") und der Beleg ohne Folgenzuordnung,
     wenn Prime eigene Folgennamen und für alle dasselbe Datum führt.
   */
-  const roh = readFileSync('pipeline/fetch-rohfolgen.ts', 'utf8') + readFileSync('pipeline/lib/rohfolgen-abschluss.ts', 'utf8')
+  const roh = ['pipeline/fetch-rohfolgen.ts', 'pipeline/lib/rohfolgen-titelwahl.ts', 'pipeline/lib/rohfolgen-ordnen.ts', 'pipeline/lib/rohfolgen-abschluss.ts']
+    .map((d) => readFileSync(d, 'utf8'))
+    .join('')
   pruefe(
     'der gemeldete Name wird am Gedankenstrich geschnitten',
     /titelSchluessel\(name\.split\(' — '\)\[0\]!\)/.test(roh),
@@ -4618,11 +4623,6 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
     bau.includes('beiwerk:'),
     'ohne die PARENT-Kante ist bei einer ONA-Reihe alles Hauptserie',
   )
-  pruefe(
-    'eine neue deutsche Folge hebt die Crunchyroll-Frist auf',
-    readFileSync('pipeline/scrape-crunchyroll-dub.ts', 'utf8').includes('neuSeit'),
-    'sonst erfährt die Seite von einer neuen Synchro erst Wochen später',
-  )
   /*
     **Und die aufgehobene Frist braucht einen Lauf, der sie einlöst.**
     Der Fund kommt täglich, `data:cr-dub` lief nur wöchentlich — fünf Tage
@@ -4631,6 +4631,12 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
   */
   {
     const scrape = readFileSync('pipeline/scrape-crunchyroll-dub.ts', 'utf8')
+    const auswahl = readFileSync('pipeline/lib/cr-dub-auswahl.ts', 'utf8')
+    pruefe(
+      'eine neue deutsche Folge hebt die Crunchyroll-Frist auf',
+      auswahl.includes('neuSeit'),
+      'sonst erfährt die Seite von einer neuen Synchro erst Wochen später',
+    )
     const taeglich = readFileSync('.github/workflows/refresh-data.yml', 'utf8')
     pruefe(
       'der tägliche Lauf beurteilt die Neuzugänge selbst',
@@ -4639,7 +4645,7 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
     )
     pruefe(
       '`--nur-neu` filtert die Adressliste, nicht nur die Frist',
-      /if \(NUR_NEU\) \{[\s\S]{0,600}adressen = adressen\.filter/.test(scrape),
+      /if \(o\.nurNeu\) adressen = nurNeuzugaenge\(adressen,/.test(auswahl) && /const treffer = adressen\.filter/.test(auswahl),
       'sonst zieht der tägliche Lauf jede nie geprüfte Serie mit — beim ersten Mal den ganzen Rückstand',
     )
     pruefe(
@@ -5382,7 +5388,7 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
   /* Die Kanal-Gegenprobe fragt jwFrisch: frische Antwort → 1 zur Handprüfung, `check-kanal-gegenprobe-lauf.ts`. */
   pruefe(
     'Crunchyroll-Nachprüfung fragt jwFrisch',
-      (readFileSync('pipeline/fetch-crunchyroll-offene.ts', 'utf8').match(/jwFrisch\(jwEintrag2?, heuteIso\)/g) ?? []).length === 2,
+      (readFileSync('pipeline/lib/cr-offene-urteil.ts', 'utf8').match(/jwFrisch\(jwEintrag2?, ctx\.heuteIso\)/g) ?? []).length === 2,
   )
 }
 /* Handprüfung gegen 404/region: check-09-2-linkpruefung-laufzeit.ts, check-hand-gesehen.ts, check-tote-adressen-lauf.ts; Klammerzusatz im Kanalnamen: check-kanal-namen.ts, Verdrahtung check-kanal-gegenprobe-lauf.ts. */
@@ -5439,7 +5445,7 @@ pruefe(
   )
   pruefe(
     '… und belebt nicht wieder, was ein Handbeleg ohne Adresse für Prime verneint',
-    /if \(handNein\) continue/.test(bau),
+    /if \(handNein\) return false/.test(bau),
   )
   /* Dass die Linkprüfung die Amazon-Seite statt JustWatchs Adresse prüft, läuft in check-links-laufzeit.ts. */
 }

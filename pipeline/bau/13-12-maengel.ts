@@ -56,7 +56,8 @@ function lazyNeinGilt(): Kontext['neinGilt'] {
 /** Die Folgenlisten sind dieselben wie in `08-news-tv.ts`; das Programm liest die Art ganz, nicht nur ab gestern. */
 function tvOhneFolgeLesen(titel: Title[], alle: Release[]): Set<number> {
   const programm = readJson<{ sendungen?: Record<string, TvSendung> }>('data/tv-programm.json', {}).sendungen ?? {}
-  return titelMitSichtungOhneFolge(alle, Object.values(programm), folgenListen(new Map(titel.map((t) => [t.id, t]))))
+  const jeId = new Map(titel.map((t) => [t.id, t]))
+  return titelMitSichtungOhneFolge(alle, Object.values(programm), folgenListen(jeId), jeId)
 }
 
 /** Erzeugt den Kontext der Regeln aus den fertig geschriebenen Dateien. */

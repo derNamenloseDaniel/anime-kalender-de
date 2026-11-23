@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-23T00:19:10.113Z",
+  "stand": "2026-11-23T04:54:01.391Z",
   "verweise": [
     {
       "titleId": 99629,
@@ -455,17 +455,6 @@
     {
       "titleId": 101474,
       "titel": "Overlord III",
-      "plattform": "crunchyroll",
-      "url": "http://www.crunchyroll.com/de/overlord",
-      "seriesId": "G69PZ5PDY",
-      "grund": "deutscher Katalog führt unter dieser Kennung keine einzige Staffel",
-      "geprueftAm": "2026-11-16",
-      "entferntAm": "2026-11-23",
-      "letzterWeg": false
-    },
-    {
-      "titleId": 133845,
-      "titel": "Overlord: The Sacred Kingdom",
       "plattform": "crunchyroll",
       "url": "http://www.crunchyroll.com/de/overlord",
       "seriesId": "G69PZ5PDY",
@@ -4608,7 +4597,7 @@
       "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
       "geprueftAm": null,
       "entferntAm": "2026-11-23",
-      "letzterWeg": true
+      "letzterWeg": false
     },
     {
       "titleId": 603,
@@ -4619,7 +4608,7 @@
       "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
       "geprueftAm": null,
       "entferntAm": "2026-11-23",
-      "letzterWeg": true
+      "letzterWeg": false
     },
     {
       "titleId": 629,
@@ -4735,7 +4724,7 @@
       "titleId": 1140,
       "titel": "Origin: Spirits of the Past",
       "plattform": "crunchyroll",
-      "url": "https://www.crunchyroll.com/de/origin-spirits-of-the-past",
+      "url": "https://www.crunchyroll.com/watch/GWMF804M2/origin-spirits-of-the-past",
       "seriesId": null,
       "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
       "geprueftAm": null,
@@ -6671,7 +6660,7 @@
       "titleId": 117074,
       "titel": "Isekai Quartet the Movie: Another World",
       "plattform": "crunchyroll",
-      "url": "https://www.crunchyroll.com/de/isekai-quartet",
+      "url": "https://www.crunchyroll.com/de/series/GMTE00258378/isekai-quartet-the-movie-another-world",
       "seriesId": null,
       "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
       "geprueftAm": null,
@@ -6808,7 +6797,7 @@
       "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
       "geprueftAm": null,
       "entferntAm": "2026-11-23",
-      "letzterWeg": true
+      "letzterWeg": false
     },
     {
       "titleId": 130298,
@@ -7889,6 +7878,39 @@
       "letzterWeg": false
     },
     {
+      "titleId": 133845,
+      "titel": "Overlord: The Sacred Kingdom",
+      "plattform": "crunchyroll",
+      "url": "http://www.crunchyroll.com/de/overlord",
+      "seriesId": "G69PZ5PDY",
+      "grund": "deutscher Katalog führt unter dieser Kennung keine einzige Staffel",
+      "geprueftAm": "2026-11-16",
+      "entferntAm": "2026-11-23",
+      "letzterWeg": false
+    },
+    {
+      "titleId": 1140,
+      "titel": "Origin: Spirits of the Past",
+      "plattform": "crunchyroll",
+      "url": "https://www.crunchyroll.com/de/origin-spirits-of-the-past",
+      "seriesId": null,
+      "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
+      "geprueftAm": null,
+      "entferntAm": "2026-11-23",
+      "letzterWeg": true
+    },
+    {
+      "titleId": 117074,
+      "titel": "Isekai Quartet the Movie: Another World",
+      "plattform": "crunchyroll",
+      "url": "https://www.crunchyroll.com/de/isekai-quartet",
+      "seriesId": null,
+      "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
+      "geprueftAm": null,
+      "entferntAm": "2026-11-23",
+      "letzterWeg": true
+    },
+    {
       "titleId": 15583,
       "titel": "Date a Live",
       "plattform": "primevideo",
@@ -8047,17 +8069,6 @@
       "titel": "Macross",
       "plattform": "crunchyroll",
       "url": "https://www.crunchyroll.com/robotech",
-      "seriesId": null,
-      "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
-      "geprueftAm": null,
-      "entferntAm": "2026-11-14",
-      "letzterWeg": true
-    },
-    {
-      "titleId": 1140,
-      "titel": "Origin: Spirits of the Past",
-      "plattform": "crunchyroll",
-      "url": "https://www.crunchyroll.com/watch/GWMF804M2/origin-spirits-of-the-past",
       "seriesId": null,
       "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
       "geprueftAm": null,

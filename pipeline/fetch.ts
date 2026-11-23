@@ -9,6 +9,8 @@
  * Aufruf: npm run data:fetch  [-- --force] [-- --skip-anilist]
  */
 import { mediaByMalIds, searchMedia, type AniListMedia, eintragNochOffen, istQuellenAusfall } from './lib/anilist.ts'
+import { MANGEL_GRENZE_KENNUNG, stempeln, zuHolen } from './lib/anilist-mangel.ts'
+import { todayIso } from '../shared/time.ts'
 import { ausAnisearchDubs, ausAnisearchHand } from './lib/anisearch-synchro-ids.ts'
 import { holeAnisearchCover } from './lib/anisearch-cover.ts'
 import { loadCurated, loadSynchroVonHand } from './lib/curated.ts'
@@ -95,14 +97,15 @@ async function main(): Promise<void> {
   */
   const nochOffen = (m: AniListMedia | undefined): boolean => Boolean(m) && eintragNochOffen(m!)
   const cached = readJson<Record<string, AniListMedia>>('data/cache/anilist-media.json', {})
-  const missing = FORCE ? malIds : malIds.filter((id) => !cached[id] || nochOffen(cached[id]))
+  const heute = todayIso() // Berliner Tag wie überall; für den 2-Tage-Abstand genügt er
+  const missing = FORCE ? malIds : zuHolen(cached, malIds, nochOffen, heute)
   log(`AniList: ${missing.length} von ${malIds.length} IDs fehlen im Cache`)
 
   if (!SKIP_ANILIST && missing.length > 0) {
     const fetched = await mediaByMalIds(missing, (done, total) => {
       if (done % 500 === 0 || done === total) log(`  AniList ${done}/${total}`)
     })
-    for (const [malId, media] of fetched) cached[String(malId)] = media
+    for (const [malId, media] of fetched) cached[String(malId)] = stempeln(media, heute)
     writeJson('data/cache/anilist-media.json', cached)
     log(`AniList: ${fetched.size} neue Einträge, ${Object.keys(cached).length} im Cache`)
   }
@@ -153,15 +156,14 @@ async function main(): Promise<void> {
   const byAniId = readJson<Record<string, AniListMedia>>('data/cache/anilist-by-id.json', {})
   /* Titel mit Handbeleg (`data/synchro-von-hand.yaml`) kommen über denselben Weg in den Bestand. */
   const handIds = [...loadSynchroVonHand().map((e) => e.anilistId), ...ausAnisearchDubs(Object.values(cached)), ...ausAnisearchHand(Object.values(cached))]
-  const neededIds = [...new Set([...Object.values(resolved), ...handIds])].filter(
-    (id) => FORCE || !byAniId[id] || nochOffen(byAniId[id]),
-  )
+  const alleIds = [...new Set([...Object.values(resolved), ...handIds])]
+  const neededIds = FORCE ? alleIds : zuHolen(byAniId, alleIds, nochOffen, heute, MANGEL_GRENZE_KENNUNG)
   if (!SKIP_ANILIST && neededIds.length > 0) {
     log(`AniList: ${neededIds.length} kuratierte Titel nachladen`)
     const { mediaById } = await import('./lib/anilist.ts')
     for (const id of neededIds) {
       const m = await mediaById(id)
-      if (m) byAniId[String(id)] = m
+      if (m) byAniId[String(id)] = stempeln(m, heute)
     }
     writeJson('data/cache/anilist-by-id.json', byAniId)
   }

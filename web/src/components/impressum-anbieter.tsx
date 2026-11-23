@@ -18,7 +18,7 @@ export function ImpressumAnbieter() {
             {CONTACT_EMAIL}
           </a>
         </p>
-        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+        <p className="mt-2 text-xs text-ak-leise">
           Dieses Angebot ist ein privates, nicht kommerzielles Fan-Projekt ohne Werbung, ohne
           Affiliate-Links und ohne kostenpflichtige Leistungen.
         </p>

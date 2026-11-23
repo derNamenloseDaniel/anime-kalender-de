@@ -75,7 +75,7 @@ export function istPruefschritt(run) {
 }
 
 /** `continue-on-error` gilt, sobald es nicht ausdrücklich `false` ist (auch als Ausdruck). */
-const geduldet = (wert) => wert !== undefined && wert !== false && String(wert).trim() !== 'false'
+export const geduldet = (wert) => wert !== undefined && wert !== false && String(wert).trim() !== 'false'
 
 /** Alle Funde eines geparsten Workflows: `{ art: 'schritt'|'job', job, schritt }`. */
 export function findeFunde(doc) {

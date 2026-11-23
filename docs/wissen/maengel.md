@@ -539,3 +539,20 @@ Ursache des Stillstands: `fetch.ts` holte abgeschlossene Zwischenspeicher-Eintr�
 ## wertung: die letzten 2 offenen sind Ankündigungen (23.11.2026)
 
 Live gemessen (GraphQL, 23.11.2026): Fool Night (213457) und 2.5-jigen no Ririsa 2nd Season (185515) sind `NOT_YET_RELEASED`, `averageScore` und `meanScore` sind `null` (Fool Night hat 182 Stimmen in `scoreDistribution`, AniList veröffentlicht trotzdem keinen Wert). Kein Codefehler: `anilistWertungAus` braucht eine Zahl und rechnet nichts aus. Neue Ausnahme `noch-ohne-start` (`wertungNochOhneStart`, `pipeline/lib/maengel-regeln.ts`): kein Nicht-Disc-Termin begonnen, Jahr dieses Jahres oder leer, Ende nicht vorbei; sie endet mit dem Start von selbst, dann greift der Rückfall. Erwartung nach dem nächsten Bestandsbau: wertung offen 2 → 0 (+ 2 Ausnahme).
+
+## folgentitel: warum TMDB keine deutschen Titel liefert (23.11.2026, Auftrag „Vorrat folgentitel TMDB“)
+
+Stichprobe 20 von 284 offenen Titeln (Zufall, Startwert 4420), je Titel TMDB live abgefragt (`/tv/{id}?language=de-DE`, `/season/{n}` deutsch und englisch). Die Hochrechnung steht neben der **Volleinordnung aller 284** aus den committeten Dateien (`tmdb-titles.json`, `tmdb-folgen.json`, `tmdbFolgentitel`); beide stimmen im Rahmen der Stichprobe überein.
+
+| Ursache | Stichprobe | alle 284 (gezählt) | Stelle / Befund |
+|---|---|---|---|
+| keine TMDB-Kennung | 8 | 110 (davon 54 OVA/Special/Film-Format, die der Bau ohnehin nicht nutzt) | `tmdb-titles.json` ohne Eintrag; Live-Suche liefert bei 6 von 8 nichts, bei Black Butler und Beyblade Burst Surge nur die Hauptserie (kein Treffer für den Titel selbst) |
+| Kennung da, **nie abgerufen** | 6 | 93 (64 Serienformat ab 6 Folgen, 29 Format/Länge ausgeschlossen) | `fetch-tmdb-folgen.ts` rief nur Titel mit Anbieter oder Dub-Lücke ab (`waehleAbrufe`); Titel ohne beides nie. Simulation von 63 der 64 gegen TMDB live (5000003 ohne Folgendatei, nicht gerechnet): 3 Titel schließen den Mangel (Arjuna 812, Ghost in the Shell Arise 21056, Shaolin Wuzang 102501), Captain Future 2561 gewinnt 2 Folgen; die übrigen 59 haben bei TMDB nur „Folge N“, englische oder japanische Titel |
+| TMDB ohne de-Titel (nur „Folge N“ oder gleich englisch) | 4 (Larva Island ×2, Pac-Man, Saiki K.) | 47 | live bestätigt: 0 deutsche Titel in 26 / 52 / 48 Folgen; nicht behebbar |
+| echte Titel, Bauweg verwirft | 2 (Pokémon 527, Tales of Zestiria 21221) | 16 | Pokémon: 276 Folgen gegen 25 TMDB-Staffeln, keine Summe stimmt; Zestiria: AniList 13 Folgen gegen TMDB 12 + 13 (Folgenzahl-Frage); Einzelfälle, kein gemeinsamer Fehler |
+| Stufe liefert, Liste trotzdem nicht voll | 0 | 17 | AniList zählt eine Folge mehr als TMDB u. Ä. (siehe Rang 8) |
+| Abruf 404 | 0 | 1 | `tmdb-folgen-404.json` |
+
+**Behoben:** Ursache „nie abgerufen“. `abrufLuecke` (`pipeline/lib/tmdb-folgen-luecke.ts`) wählt neben der Dub-Lücke jeden offenen Folgentitel (`unbenannteFolgen`), nur für Serienformat ab sechs Folgen (`fetch-tmdb-folgen.ts`, Aufruf von `waehleAbrufe`). Erwarteter Gewinn: 3 von 284 (1 %), wirksam erst nach dem nächsten TMDB-Lauf; einmalig etwa 64 × 7 Abrufe, danach hat jeder Titel einen Eintrag und fällt aus der Wahl.
+
+**Nicht gewinnbar mit Code:** 110 ohne Kennung (Zuordnung wäre Raten; eine Kennung nur per Hand mit Beleg), 47 ohne deutsche Übersetzung bei TMDB.

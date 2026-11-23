@@ -101,11 +101,12 @@ pruefe('Serie ohne Eintrag im Katalogfund: abgelegt ohne Kennungen', serieAblege
 const nurFehler = new Map<string, CrSerie>([[url, lastBoss({ fehler: 'alt' })]])
 pruefe('Fehlersatz über altem Fehlersatz: der neue wird abgelegt', serieAblegen(nurFehler, url, lastBoss({ fehler: 'neu' }), LB, fundeJeSerie(F1)) === 'abgelegt' && nurFehler.get(url)!.fehler === 'neu')
 
-/* `main()` braucht einen Browser: Quelltext-Befunde für Aufruf und Übergabe als Gürtel zusätzlich zum Lauf oben. */
-const lauf = readFileSync(new URL('./scrape-crunchyroll-dub.ts', import.meta.url), 'utf8')
-pruefe('Dub-Lauf legt die Serie über serieAblegen ab, mit Serienkennung und Katalogfund', lauf.includes("if (serieAblegen(bestand, url, serie, seriesId, neuFolgen) === 'behalten') {\n        gestoert++\n        melden(i, kurz, bestand.get(url)!)"))
-pruefe('Dub-Lauf gibt die Kennungen des Katalogfunds an crFrisch', /crFrisch\(s, \{[^}]*\bneuFolgen,[^}]*\}\)/.test(lauf))
-pruefe('Dub-Lauf liest die Kennungen aus dem Katalogfund', lauf.includes('neuFolgenJeSerie(neuFunde)') && lauf.includes('guid?: string'))
+/* Der Lauf braucht einen Browser: Quelltext-Befunde für Aufruf und Übergabe (`lib/cr-dub-adresse.ts`, `lib/cr-dub-auswahl.ts`) als Gürtel zusätzlich zum Lauf oben. */
+const adresse = readFileSync(new URL('./lib/cr-dub-adresse.ts', import.meta.url), 'utf8')
+const auswahl = readFileSync(new URL('./lib/cr-dub-auswahl.ts', import.meta.url), 'utf8')
+pruefe('Dub-Lauf legt die Serie über serieAblegen ab, mit Serienkennung und Katalogfund', adresse.includes("const behalten = serieAblegen(k.bestand, url, serie, seriesId, k.neuFolgen) === 'behalten'") && adresse.includes('if (behalten) {\n      e.gestoert++\n      k.melden(i, kurz, k.bestand.get(url)!)'))
+pruefe('Dub-Lauf gibt die Kennungen des Katalogfunds an crFrisch', /crFrisch\(s, \{[^}]*\bneuFolgen,[^}]*\}\)/.test(auswahl))
+pruefe('Dub-Lauf liest die Kennungen aus dem Katalogfund', auswahl.includes('neuFolgenJeSerie(neuFunde)') && auswahl.includes('guid?: string'))
 
 console.log(verletzt ? `\n${verletzt} Zusicherung(en) verletzt.` : '\nAlle Zusicherungen halten.')
 process.exit(verletzt ? 1 : 0)

@@ -3,7 +3,7 @@
  * größte Lücke zuerst, Riegel, Probelauf `nurLuecke`. Die erwarteten Werte stehen hier fest, nicht aus dem Modul.
  * Aufruf: `npm run check:logic`.
  */
-import { ABRUFE_JE_TITEL, LUECKE_ABRUFE, LUECKE_LIMIT, dubLuecke, streicheFremdeKennungen, waehleAbrufe, waehleLuecke, type FolgenDatei } from './lib/tmdb-folgen-luecke.ts'
+import { ABRUFE_JE_TITEL, LUECKE_ABRUFE, LUECKE_LIMIT, abrufLuecke, dubLuecke, unbenannteFolgen, streicheFremdeKennungen, waehleAbrufe, waehleLuecke, type FolgenDatei } from './lib/tmdb-folgen-luecke.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -68,6 +68,20 @@ pruefe('Zwei Folgen: regulär fällig', folgen([ke('sy', 2)], false) === 'sy')
 pruefe('Eine Folge: regulär nicht fällig', folgen([ke('sy', 1)], false) === '')
 pruefe('Probelauf: Limit 1', w(true, 1) === 'b')
 pruefe('Probelauf: Titel mit Eintrag fehlt', w(true, 10, { b: alt }) === 'sf,a')
+
+console.log('\nTMDB-Lücke: offener Folgentitel ohne Dub-Bereich')
+const liste = (...t: string[]): FolgenDatei => ({ f: t.map((x, i) => [i + 1, x]) })
+pruefe('ein leerer Titel von dreien', unbenannteFolgen(liste('A', '', 'C'), 3) === 1)
+pruefe('Platzhalter zählt als unbenannt', unbenannteFolgen(liste('A', 'Folge 2', 'C'), 3) === 1)
+pruefe('zu kurze Liste: fehlende Nummern zählen', unbenannteFolgen(liste('A', 'B'), 5) === 3)
+pruefe('Liste voll benannt: 0', unbenannteFolgen(liste('A', 'B'), 2) === 0)
+pruefe('ohne Datei: alle Folgen fehlen', unbenannteFolgen(undefined, 13) === 13)
+pruefe('Folgenzahl 0 (Format ausgeschlossen): nie eine Lücke', unbenannteFolgen(liste('', ''), 0) === 0)
+pruefe('Dub-Lücke geht vor', abrufLuecke(datei([[1, ''], [2, '']], [[1, 1]]), 9) === 1)
+pruefe('ohne Dub-Bereich gilt der offene Folgentitel', abrufLuecke(liste('A', ''), 2) === 1)
+pruefe('voll benannt ohne Dub-Bereich: keine Lücke', abrufLuecke(liste('A', 'B'), 2) === 0)
+const arjuna = ke('812', 13)
+pruefe('Arjuna-Fall: kein Anbieter, kein Dub-Bereich, 1 von 13 offen → wird abgerufen', ids(waehleAbrufe({ alle: [arjuna], bestand: {}, heute: '2026-10-24', alterTage: 30, limit: 10, nurLuecke: false, luecke: (id) => abrufLuecke(liste(...Array.from({ length: 12 }, (_, i) => `T${i}`)), id === '812' ? 13 : 0) })) === '812')
 
 console.log('\nTMDB-Lücke: überholte Kennung')
 const folgenBestand: Record<string, { tmdbId?: number }> = { 1: { tmdbId: 10 }, 2: { tmdbId: 20 }, 3: { tmdbId: 30 } }

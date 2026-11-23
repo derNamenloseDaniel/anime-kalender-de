@@ -8,7 +8,7 @@
 import { readFileSync } from 'node:fs'
 import ts from 'typescript'
 
-const FUNKTION = 'schreibeZusatzdateien'
+const FUNKTION = 'baueReihen'
 
 type Bindung = { name: string; aufruf: string; feld: string }
 const STAFFEL_QUELLE: Bindung = { name: 'staffelQuellen', aufruf: 'alleStaffelQuellen()', feld: 'staffelQuelle' }

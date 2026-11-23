@@ -10,68 +10,6 @@ X-WR-TIMEZONE:Europe/Berlin
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-16#72@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261116T161000Z
-DTEND:20261116T164000Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-16#73@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261116T163500Z
-DTEND:20261116T170500Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:yaiba-samurai-legend-prosieben-maxx@2026-11-16@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261116T172500Z
-DTEND:20261116T175500Z
-SUMMARY:YAIBA: Samurai Legend – Folge 7/24
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:yaiba-samurai-legend-joyn@2026-11-16@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261116T175000Z
-DTEND:20261116T182000Z
-SUMMARY:YAIBA: Samurai Legend – Folge 7/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
-  https://anime-kalender.de/t/15908/
-CATEGORIES:Joyn
-END:VEVENT
-BEGIN:VEVENT
-UID:one-piece-whole-cake-island-prosieben-maxx@2026-11-16@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261116T175000Z
-DTEND:20261116T182000Z
-SUMMARY:ONE PIECE – Folge 786/877
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nGeschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhyth
- mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
- t/12/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-112153-tv-toggo-plus@2026-11-16@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261116T201500Z
-DTEND:20261116T204500Z
-SUMMARY:Pokémon Reisen: Die Serie
-DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/10852/
-CATEGORIES:TOGGO plus
-END:VEVENT
-BEGIN:VEVENT
 UID:auto-223-tv-prosieben-maxx@2026-11-17#74@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261117T154500Z
@@ -431,7 +369,7 @@ DTSTART;VALUE=DATE:20261120
 DTEND;VALUE=DATE:20261121
 SUMMARY:2.5 Dimensional Seduction – Vol. 4 (Disc)
 DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/16410/
+ och nicht bestätigt.\nDetails: https://anime-kalender.de/t/14808/
 CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT

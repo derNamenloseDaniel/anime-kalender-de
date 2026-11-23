@@ -52,7 +52,7 @@ export function wegeVon(t: Title, releases: Release[], heute: string): Weg[] {
     if (w.kind === 'stream') wege.push({ plattform: w.name, art, status, jahr, frei: w.zugang === 'kostenlos', quelle: 'link' })
   }
   /* Die aniSearch-Erstausgabe ist ein Disc-Weg, wenn ihr Verlag Discs herausgibt (F156, 23.11.2026); `istDiscWeg` ist weiter unten definiert, läuft aber erst beim Aufruf. */
-  if (erstausgabeIstDiscWeg(t.deErstausgabe) &&!wege.some(istDiscWeg)) wege.push({ plattform: 'disc', art: 'disc', status, jahr, quelle: 'erstausgabe' })
+  if (erstausgabeIstDiscWeg(t.deErstausgabe) && !wege.some(istDiscWeg)) wege.push({ plattform: 'disc', art: 'disc', status, jahr, quelle: 'erstausgabe' })
   const ergebnis = wege.length || !ohneRelease ? wege : [{ plattform: '', status, jahr, quelle: 'titel' as const }]
   wegeMerker.set(t, { releases, heute, wege: ergebnis })
   return ergebnis

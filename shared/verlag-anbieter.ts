@@ -1,6 +1,6 @@
 import { PLATFORMS, type PlatformId } from './types.ts'
 
-/** Nur diese Verlagsnamen aus aniSearch sind eindeutig ein Streaming-Anbieter; „Crunchyroll", „KSM Anime" & Co. sind Disc-Verlage oder mehrdeutig. */
+/** Nur diese Verlagsnamen aus aniSearch sind eindeutig ein Streaming-Anbieter; „Crunchyroll" bleibt hier mehrdeutig, zählt aber nie als Disc-Verlag (`KEIN_DISC_VERLAG`). */
 export const ANBIETER_VON_VERLAG: Record<string, PlatformId> = {
   'Amazon.com, Inc.': 'primevideo',
   'Netflix, Inc.': 'netflix',

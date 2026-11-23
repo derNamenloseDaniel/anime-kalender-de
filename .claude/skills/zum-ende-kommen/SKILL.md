@@ -1,21 +1,21 @@
 ---
 name: zum-ende-kommen
-description: "Bei „ende“, „zum ende kommen“ (Standard: sanft), „feierabend“, „nichts neues mehr“ (auch mit Uhrzeit): nichts Neues anfangen, Agenten an sauberen Punkt bringen, Laufendes abschließen, aufräumen, Übergabe."
+description: "Bei „zum ende kommen“, „feierabend“, „nichts neues mehr“ (sanft, Standard) und „ende“, „Schluss für heute“ (hart, PC aus), auch mit Uhrzeit: nichts Neues anfangen, Agenten an sauberen Punkt bringen, Laufendes abschließen bzw. stoppen, Übergabe."
 ---
 
 # Zum Ende kommen (Daniel, 18.10.2026)
 
-„Ende“ heißt: **Ende — danach läuft nichts mehr** (Daniel, 05.11.2026: „wenn ende dann ende. dann darf nichts mehr laufen“). Agenten halten an einem sauberen Punkt an, schreiben ihre Übergabe und hören auf; nichts wird „noch fertig“ laufen gelassen. Danach steht eine Übergabe, mit der die nächste Sitzung ohne Nachfragen weitermacht. Die alte Fassung („nichts abwürgen, Laufendes darf fertig werden“) ist aufgehoben; die Abschnitte unten gelten nur noch für ein Ende mit Uhrzeit, bis diese erreicht ist.
+Zwei Modi; in beiden steht am Schluss eine Übergabe, mit der die nächste Sitzung ohne Nachfragen weitermacht.
 
-**„zum ende kommen“ heißt sanft (Standard seit Daniel 23.11.2026 21:45: „mach sanft zum default, damit ich nur zum ende kommen sagen muss“).** Sanft bedeutet:
-- Nichts Neues anfangen und den Wecker stoppen.
+**Sanft ist der Standard: „zum ende kommen“, „feierabend“, „nichts neues mehr“** (Daniel 23.11.2026 21:45: „mach sanft zum default, damit ich nur zum ende kommen sagen muss“).
+- Nichts Neues anfangen, Wecker stoppen (Abschnitt „Was ab jetzt nicht mehr passiert“).
 - Laufende Agenten bekommen sofort die Nachricht, an einem sauberen Punkt anzuhalten: Fertiges mit Nachtrag pushen, Halbfertiges als WIP pushen, Bericht schreiben, aufhören.
-- Ihre Berichte schließe ich noch ab (Nachtrag, Prüfer-„frei“ mergen); Merge-Reihen und Remote-Läufe dürfen auslaufen.
-- Erst wenn alles still ist, steht die Übergabe mit „nichts läuft mehr“.
+- Ihre Berichte schließe ich noch ab (Abschnitt „Was trotzdem zu Ende gebracht wird“); laufende Merge-Reihen und Remote-Läufe dürfen auslaufen.
+- Der Schnitt (unten) läuft sofort, die Übergabe wird danach mit jedem Bericht nachgeführt; „nichts läuft mehr“ steht erst, wenn alles still ist.
 
-Hart (Absätze oben und unten) gilt nur bei „ende“ allein, „Schluss für heute“, „sofort“, „hart“ oder „PC geht aus“: Agenten mit TaskStop beenden, lokal sofort alles stoppen.
+**Hart: „ende“ allein, „Schluss für heute“, „sofort“, „hart“, „PC geht aus“ — der PC wird heruntergefahren** (Daniel 05.11.2026: „wenn ende dann ende. dann darf nichts mehr laufen“). Lokal läuft nichts weiter: Agenten schreiben ihre Übergabe und werden beendet, Merge-Reihen, Monitore und Hintergrundskripte sofort gestoppt (`ps -ef`, Kontrolle: nichts außer der eigenen Shell). „Was trotzdem zu Ende gebracht wird“ gilt nur, soweit es in Minuten erledigt ist; der Rest geht per Schnitt-Schritt 4 remote (GitHub Actions, Cloud) oder bleibt für morgen. Anlass: Eine Merge-Reihe sollte bis 01:34 laufen und blockierte das Git-Update, dazu 62 verwaiste `tail`/`grep`-Monitore.
 
-**„Schluss für heute“ / „ende“ am Abend heißt: der PC wird heruntergefahren (Daniel, 05.11.2026 00:14).** Dann läuft lokal nichts weiter — keine Merge-Reihe, kein Monitor, kein Hintergrundskript. Bauer schreiben ihre Übergabe und hören auf, lokale Reihen und Monitore werden sofort beendet (`ps -ef`, Kontrolle: nichts außer der eigenen Shell). Was über Nacht laufen soll, läuft remote (GitHub Actions, Cloud), sonst morgen. Anlass: Die Merge-Reihe sollte bis 01:34 laufen und blockierte das Git-Update; dazu 62 verwaiste `tail`/`grep`-Monitore seit 09:42.
+**Mit Uhrzeit** („ende 23 uhr“): bis dahin normaler Betrieb, ab der Uhrzeit sanft, außer Daniel sagt hart (Abschnitt „Geplantes Ende“).
 
 ## Was ab jetzt nicht mehr passiert
 
@@ -39,7 +39,7 @@ Hart (Absätze oben und unten) gilt nur bei „ende“ allein, „Schluss für h
    - Vorher prüfen, dass Label und Routine aktiv sind (`gh issue view 4420 --json labels`; Routine per `RemoteTrigger get`). Fehlt eins, einschalten.
    - Ein Kommentar `## Ergänzung (Nacht <Datum>, Übergabe Dirigent <HH:MM>) — ersetzt nichts` per `--body-file`. Die Aufgabenliste des letzten Nachtrags gilt weiter, die Ergänzung ändert sie nie. Inhalt: **A. Angefangenes zuerst.** Je offener PR die Nummer und der Kopf, der Stand (abgenommen, Nachbesserung läuft, Kette rot), die Kommentarkennung der Auflagenliste, wer mergt (Nacht-Merger mit Nachtrag zum Kopf, siehe `tools/nacht-merger-wahl.mjs`) und die Lehre, die nach dem Merge anzuhängen ist. Dazu jeder laufende Cloud-Auftrag mit Name und dem, was er liefert. **B. Neue Aufgaben**, fortlaufend nummeriert, jede mit Pfad und Zeile aus einer Werkzeugausgabe und dem Test, der rot sein muss. **Nicht anfassen:** offene F-Fragen an Daniel.
    - Nachträge nach dem Start gehen als `## Ergänzung` an Issue 4420; das Orchester liest sie beim nächsten Wecken (22.11.2026, `docs/wissen/cloud-orchester.md`, „Ergänzungen und Bauer-Weg“).
-   - Auch eine bereits abgenommene PR, die nur noch auf CI wartet, gehört in A. Der Nacht-Merger nimmt sie mit; die lokale Merge-Wache wird beendet.
+   - Auch eine bereits abgenommene PR, die nur noch auf CI wartet, gehört in A. Der Nacht-Merger nimmt sie mit; eine lokale Merge-Wache endet bei hart sofort, bei sanft darf eine schon laufende Reihe auslaufen.
    - Lokal Gebundenes (Meldungskopie, Worker-Deploy, Edge, Mods) kommt nicht in den Kommentar, sondern als Zeile in `stand.md`.
 5. **Übergabe schreiben:** Memory `project-uebergabe.md` überschreiben (nicht ergänzen), Zeile in `MEMORY.md` mitziehen. Inhalt:
    - Stand mit Datum und Uhrzeit, Daniels Wortlaut, Modus (autonom aus, Ruhemodus);

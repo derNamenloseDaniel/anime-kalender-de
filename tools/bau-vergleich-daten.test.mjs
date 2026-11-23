@@ -103,6 +103,9 @@ try {
   const titel = [{ id: 9_999_999 }, { id: 10_000_000 }, { id: 10_013_418 }, { id: 5 }]
   assert.deepEqual(titelFuerErsatzCache(titel, true).map((t) => t.id), [9_999_999, 5], 'mit Katalog ohne aniSearch-Zeilen')
   assert.equal(titelFuerErsatzCache(titel, false).length, 4, 'ohne Katalog bleiben alle')
+  // Abgeleitete Staffel-Titel (7.000.000–7.999.999) kennt AniList nicht: nie im Ersatz-Cache, mit und ohne Katalog.
+  const mitStaffel = [{ id: 158871 }, { id: 6_999_999 }, { id: 7_000_001 }, { id: 7_999_999 }, { id: 8_000_000 }]
+  for (const mitKatalog of [false, true]) assert.deepEqual(titelFuerErsatzCache(mitStaffel, mitKatalog).map((t) => t.id), [158871, 6_999_999, 8_000_000], 'Staffel-Titel fehlen')
 
   // Ersatz-Cache: entfernte Wege kommen zu den Streams des eigenen Titels zurück, nicht zu fremden, ohne Doppelung.
   const entfernte = [

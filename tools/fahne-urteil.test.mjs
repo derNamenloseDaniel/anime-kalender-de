@@ -1,8 +1,10 @@
-/** Test für tools/fahne-urteil.mjs: einzeilig bis kurzHoehe + Rundung, darüber Umbruch, ungültige Messung rot. Aufruf: node tools/fahne-urteil.test.mjs */
+/** Test für tools/fahne-urteil.mjs (die Browser-Messung dazu: tools/ansicht-fahne.mjs, Mutanten in tools/mutationen/fahne-handy.json):einzeilig bis kurzHoehe + Rundung, darüber Umbruch, ungültige Messung rot. Aufruf: node tools/fahne-urteil.test.mjs */
 import assert from 'node:assert/strict'
+import { BREITEN } from './ansicht-fahne.mjs'
 import { RUNDUNG, urteilFahne } from './fahne-urteil.mjs'
 
 assert.equal(RUNDUNG, 1)
+assert.deepEqual(BREITEN, [360, 375], 'die Messung fährt beide Handybreiten')
 // Fixtures je Rolle mit zwei Gliedern (360 und 375 px; Werte aus PR 4436: 16,5 einzeilig, 31,5 umgebrochen).
 for (const breite of [360, 375]) {
   assert.deepEqual(urteilFahne({ kurzHoehe: 16.5, langHoehe: 16.5, breite }), [], `${breite}: gleiche Höhe ist einzeilig`)

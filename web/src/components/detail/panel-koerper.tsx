@@ -1,7 +1,5 @@
-import type { Dispatch, SetStateAction } from 'react'
 import type { FranchiseMember, Release, Title } from '@shared/types.ts'
-import type { Dataset } from '../../lib/data.ts'
-import type { Translate } from '../../lib/i18n.tsx'
+import { useLang } from '../../lib/i18n.tsx'
 import type { NewsletterVerbindung } from '../../lib/newsletterSync.ts'
 import { Quellenuebersicht } from '../Quellenuebersicht.tsx'
 import { KinoBanner } from './kino.tsx'
@@ -15,33 +13,23 @@ import type { plotVon } from './plot.ts'
 import type { usePanelAntwort } from './panel-antwort.ts'
 import type { useReiheZustand } from './panel-reihe-zustand.ts'
 import type { useReihenWechsel, useDiscAusgaben } from './panel-laden.ts'
+import type { usePanelSynopse } from './panel-synopse.ts'
+import { KEYWORD_PREVIEW } from './hilfen.tsx'
+import type { DetailPanelProps } from './panel-props.ts'
 
-interface PanelKoerperProps {
-  data: Dataset
+interface PanelKoerperProps extends Pick<DetailPanelProps, 'data' | 'favorites' | 'onToggleFavorite' | 'onFilterBy' | 'onOpenTitle'> {
   title: Title
   today: string
-  t: Translate
-  tGenre: (name: string) => string
-  tKeyword: (name: string) => string
   releases: Release[]
   verbindung: NewsletterVerbindung
-  favorites: Set<number>
-  onToggleFavorite: (id: number) => void
-  onFilterBy: (kind: 'genre' | 'keyword', value: string) => void
-  onOpenTitle: (id: number) => void
   /** Alles, was `usePanelAntwort` aus Titel und Terminen ableitet. */
   a: ReturnType<typeof usePanelAntwort>
   discAusgaben: ReturnType<typeof useDiscAusgaben>
   discZuerst: boolean
   plot: ReturnType<typeof plotVon>['plot']
   asZiel: string | undefined
-  keywords: string[]
-  plotOffen: boolean
-  setPlotOffen: Dispatch<SetStateAction<boolean>>
-  allKeywords: boolean
-  setAllKeywords: Dispatch<SetStateAction<boolean>>
-  genresOffen: boolean
-  setGenresOffen: Dispatch<SetStateAction<boolean>>
+  /** Inhaltsangabe und Aufklapp-Zustände (Handlung, Schlagworte, Genres). */
+  s: ReturnType<typeof usePanelSynopse>
   reihenTeile: FranchiseMember[]
   reihenName: string
   reihe: ReturnType<typeof useReiheZustand>
@@ -50,7 +38,9 @@ interface PanelKoerperProps {
 
 /** Alles unter der Bühne des Detail-Panels: Antwortkasten, Handlung, Reihe, Termine, Eckdaten, Quellen. */
 export function PanelKoerper(p: PanelKoerperProps) {
-  const { title, t, today, releases, favorites, verbindung, onToggleFavorite, onFilterBy, a } = p
+  const { t, tGenre, tKeyword } = useLang()
+  const { title, today, releases, favorites, verbindung, onToggleFavorite, onFilterBy, a, s } = p
+  const keywords = s.allKeywords ? title.keywords : title.keywords.slice(0, KEYWORD_PREVIEW)
   return (
     <div className="relative flex flex-col gap-3 px-4 pb-8">
       {/* Die Antwortzeile: erster Block nach der Bühne, immer dieselben vier Zeilen (Gründe: design-regeln.md, „Detail-Panel“). */}
@@ -85,7 +75,7 @@ export function PanelKoerper(p: PanelKoerperProps) {
         data={p.data}
         title={title}
         favorites={favorites}
-        handlung={<HandlungAbschnitt plot={p.plot} t={t} plotOffen={p.plotOffen} setPlotOffen={p.setPlotOffen} />}
+        handlung={<HandlungAbschnitt plot={p.plot} t={t} plotOffen={s.plotOffen} setPlotOffen={s.setPlotOffen} />}
         reihe={
           <ReihenListe
             reihenTeile={p.reihenTeile}
@@ -109,10 +99,10 @@ export function PanelKoerper(p: PanelKoerperProps) {
       <EckdatenAbschnitt
         title={title}
         t={t}
-        genresOffen={p.genresOffen}
+        genresOffen={s.genresOffen}
         onFilterBy={onFilterBy}
-        tGenre={p.tGenre}
-        setGenresOffen={p.setGenresOffen}
+        tGenre={tGenre}
+        setGenresOffen={s.setGenresOffen}
       />
 
       {title.hasVoices && <VoiceCast titleId={title.id} />}
@@ -120,11 +110,11 @@ export function PanelKoerper(p: PanelKoerperProps) {
       <SchlagworteAbschnitt
         title={title}
         t={t}
-        keywords={p.keywords}
+        keywords={keywords}
         onFilterBy={onFilterBy}
-        tKeyword={p.tKeyword}
-        setAllKeywords={p.setAllKeywords}
-        allKeywords={p.allKeywords}
+        tKeyword={tKeyword}
+        setAllKeywords={s.setAllKeywords}
+        allKeywords={s.allKeywords}
       />
 
       <AehnlicheTitel title={title} data={p.data} onOpenTitle={p.onOpenTitle} />

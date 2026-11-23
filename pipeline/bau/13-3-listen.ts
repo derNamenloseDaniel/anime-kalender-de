@@ -1,5 +1,6 @@
 import { readJson, log, writeJson } from '../lib/util.ts'
 import { type MotnDaten, LEER as MOTN_LEER } from '../lib/motn.ts'
+import { mitHandvorrang } from '../lib/tmdb-von-hand.ts'
 import { berichtigeNetflixOverlay } from './13-3-0-netflix-overlay.ts'
 import { ergaenzeWegeAusTmdbUndMotn } from './13-3-1-tmdb-wege.ts'
 import { ergaenzeAngebotSeit } from './13-3-angebot-seit.ts'
@@ -38,9 +39,8 @@ export function schreibeListen({ slim, tmdbTitles, releases, titles, istTot }: {
     { links: {} },
   ).links
   const motnTmdb = readJson<MotnDaten>('data/motn.json', MOTN_LEER).tmdb ?? {}
-  const tmdbZuTitel = readJson<Record<string, { tmdbId?: number; kind?: string }>>(
-    'data/tmdb-titles.json',
-    {},
+  const tmdbZuTitel = mitHandvorrang(
+    readJson<Record<string, { tmdbId?: number; kind?: string }>>('data/tmdb-titles.json', {}),
   )
   /**
    * Netflix: `/browse?jbv=<id>` ist ein Overlay, keine Seite.

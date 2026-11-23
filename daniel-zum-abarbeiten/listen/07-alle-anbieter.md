@@ -42,7 +42,7 @@ Synchro und zweiter ohne, Zeile 4 tot.
 
 | # | Datum | Reihe | Noch zu bestätigen |
 |---|---|---|---|
-| 1 | 2026-10-10 | Demon Slayer: Kimetsu no Yaiba | [Mugen Train Arc](https://www.amazon.de/gp/video/detail/B0HLPQXSLK) · [Entertainment District Arc]() |
+| 1 | 2026-10-10 | Demon Slayer: Kimetsu no Yaiba | [Mugen Train Arc](https://www.amazon.de/gp/video/detail/B0HLPQXSLK) · [Entertainment District Arc](https://www.amazon.de/gp/video/detail/B0D65Q2GCW) |
 | 2 | 2026-10-06 | My Hero Academia | [Vigilantes Staffel 2](https://www.netflix.com/title/82036361) |
 | 3 | 2026-09-26 | Welcome to Demon School! Iruma-kun | [Staffel 4](https://www.disneyplus.com/browse/entity-b042544d-cd7d-40c6-9be4-db79666a1b51) |
 | 4 | 2026-01-01 | There’s No Freaking Way I’ll Be Your Lover! Unless… | [Episoden 13-17](https://www.amazon.de/gp/video/detail/B0F5HDQBTM) |

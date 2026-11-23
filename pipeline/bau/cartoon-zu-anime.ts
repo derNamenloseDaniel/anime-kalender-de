@@ -1,5 +1,6 @@
 import type { StreamLink, Title } from '../../shared/types.ts'
 import { readJson, writeJson, log, warn } from '../lib/util.ts'
+import { mitHandvorrang } from '../lib/tmdb-von-hand.ts'
 import { findeZwillinge, tmdbJeAnimeAus, ZWILLING_AUSNAHMEN } from '../lib/cartoon-zwilling.ts'
 import { alsTitel, type CartoonEintrag } from '../lib/cartoons.ts'
 import { ohneTote } from '../lib/cartoon-aufnahme.ts'
@@ -56,7 +57,7 @@ export function ordneCartoonsZuAnime(): void {
   if (!cartoons.length) return
   const anime = [...readJson<Title[]>(`${OUT}/titles.json`, []), ...readJson<Title[]>(`${OUT}/ohne-synchro.json`, [])]
   const bisher = readJson<[number, number][]>(UMZUG_DATEI, [])
-  const { zwillinge, unsicher } = findeZwillinge(cartoons, anime, tmdbJeAnimeAus(readJson('data/tmdb-titles.json', {})), new Map(bisher))
+  const { zwillinge, unsicher } = findeZwillinge(cartoons, anime, tmdbJeAnimeAus(mitHandvorrang(readJson('data/tmdb-titles.json', {}))), new Map(bisher))
   for (const u of unsicher) {
     if (!(u.cartoonId in ZWILLING_AUSNAHMEN)) warn(`Cartoon ${u.cartoonId} hat Anime-Kandidaten ${u.kandidaten.join(', ')}, aber ${u.grund} — in ZWILLING_AUSNAHMEN begründen`)
   }

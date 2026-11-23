@@ -8,6 +8,7 @@
 import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { istStaffelTitel } from '../shared/staffel-titel.ts'
 
 const DATEN = ['data', ':(exclude)data/cache']
 
@@ -76,8 +77,11 @@ export const ANISEARCH_ID_BASIS = 10_000_000
 /**
  * Titel für den Ersatz-Cache. Mit Katalog fehlen aniSearch-Zeilen: der echte Cache kennt sie nicht, der Bau legt sie
  * aus dem aniSearch-Cache selbst an — eine aufgenommene Zeile erschiene sonst als „verschieden“, obwohl der Bau sie streicht.
+ * Staffel-Titel (`istStaffelTitel`) fehlen immer: sie entstehen erst in der Bau-Phase aus dem Sammeltitel, AniList kennt sie nicht;
+ * als Cache-Eintrag überschrieben sie nach dem Schnitt die frisch geteilten (Riegel „TOGGO-Folgen vorher = nachher“ riss).
  */
-export const titelFuerErsatzCache = (titel, mitKatalog) => (mitKatalog ? titel.filter((t) => t.id < ANISEARCH_ID_BASIS) : titel)
+export const titelFuerErsatzCache = (titel, mitKatalog) =>
+  titel.filter((t) => !istStaffelTitel(t.id) && (!mitKatalog || t.id < ANISEARCH_ID_BASIS))
 
 /**
  * Verweise eines Titels für den Ersatz-Cache: seine Streams plus die in `data/verweise-entfernt.json` entfernten.

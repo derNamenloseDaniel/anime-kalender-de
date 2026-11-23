@@ -42,12 +42,13 @@ export function baueLeiste(ui: any, s: LeisteStand) {
   const { Box, Button } = ui
   return (
     <Box flexDirection="row" alignItems="center" gap={1}>
-      <Button key="agents-oeffnen" plain label={agentenText(s.agenten, s.pruefer)} onPress={s.oeffneAgenten} />
       <Button key="oeffnen" plain label={`Arbeitsliste ${s.jetzt}`} onPress={s.oeffneListe} />
       {ball(ui, 'ball-autonom', !!s.autonomBis, 'success')}
       {ball(ui, 'ball-ruhe', !!s.ruhe, 'warning')}
       {s.ruhe === 'sanft' && s.agenten > 2 ? sanduhr(ui) : null}
       {ball(ui, 'ball-spar', s.spar, 'suggestion')}
+      {/* Agents rechts von den Status-Bällen (Daniel, 23.11.2026) */}
+      <Button key="agents-oeffnen" plain label={agentenText(s.agenten, s.pruefer)} onPress={s.oeffneAgenten} />
     </Box>
   )
 }

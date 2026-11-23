@@ -3,6 +3,8 @@ import { kostenloseFolgen } from '@shared/kostenlos.ts'
 import { CARTOON_KEYWORD, EMPTY_FILTERS, modusVon, type FilterState } from './filters.ts'
 import type { SchnellId } from './schnellfilter.ts'
 import { passtWege } from './wege-filter.ts'
+import { groupByFranchise } from './db-gruppen.ts'
+import { ordneListe } from './db-liste.ts'
 
 /** Wie viele Titel (bei zusammengefassten Staffeln: Karten) des Kernbestands je Chip dieser einen Bedingung genügen. */
 export interface FilterZaehlung {
@@ -38,12 +40,16 @@ const POSTEN: Posten[] = [
   { gruppe: 'schnell', schluessel: 'kostenlos', passt: (t) => !!kostenloseFolgen(t) },
 ]
 
+/** So viele Karten zeigt die Liste für diese Treffer: dieselbe Rechnung wie `DatabaseView` (laufende und kommende Staffeln einer Reihe stehen einzeln, `ordneListe`). */
+const kartenVon = (treffer: Title[], releasesByTitle: Map<number, Release[]>, heute: string, sort: string, suche: string): number =>
+  ordneListe(groupByFranchise(treffer), sort, suche, releasesByTitle, heute).liste.length
+
 /**
  * Zählt den Kernbestand einmal durch und gibt zwischendurch ab, damit das Öffnen des Filterfensters den Hauptfaden nicht blockiert
- * (`useZeitscheibe`). Zusammengefasste Staffeln zählen als eine Karte (Schlüssel wie `groupByFranchise`), denn so viele Karten zeigt die Liste danach.
+ * (`useZeitscheibe`). Zusammengefasste Staffeln zählen so, wie die Liste sie zeigt (`kartenVon`): so viele Karten stehen danach da.
  */
-export function* zaehleFilterGen(kern: Title[], releasesByTitle: Map<number, Release[]>, heute: string, gruppiert = false): Generator<void, FilterZaehlung> {
-  const treffer = POSTEN.map(() => new Set<number>())
+export function* zaehleFilterGen(kern: Title[], releasesByTitle: Map<number, Release[]>, heute: string, gruppiert = false, sort = 'relevanz', suche = ''): Generator<void, FilterZaehlung> {
+  const treffer = POSTEN.map(() => [] as Title[])
   let marke = performance.now()
   for (const t of kern) {
     if (performance.now() - marke > 6) {
@@ -51,16 +57,16 @@ export function* zaehleFilterGen(kern: Title[], releasesByTitle: Map<number, Rel
       marke = performance.now()
     }
     const rs = releasesByTitle.get(t.id) ?? []
-    const karte = gruppiert ? (t.franchiseId ?? t.id) : t.id
     POSTEN.forEach((p, i) => {
-      if (p.passt(t, rs, heute)) treffer[i]!.add(karte)
+      if (p.passt(t, rs, heute)) treffer[i]!.push(t)
     })
   }
   const z: FilterZaehlung = { platforms: new Map(), releaseTypes: new Map(), statuses: new Map(), schnell: {} }
-  POSTEN.forEach((p, i) => {
-    const n = treffer[i]!.size
+  for (const [i, p] of POSTEN.entries()) {
+    if (gruppiert) yield
+    const n = gruppiert ? kartenVon(treffer[i]!, releasesByTitle, heute, sort, suche) : new Set(treffer[i]!.map((t) => t.id)).size
     if (p.gruppe === 'schnell') z.schnell[p.schluessel as SchnellId] = n
     else (z[p.gruppe] as Map<string, number>).set(p.schluessel, n)
-  })
+  }
   return z
 }

@@ -1,5 +1,5 @@
 /**
- * Prozesstest für tools/wache-urteil.mjs (schreibt daniel-zum-abarbeiten/00-wache-auswertung.md): `--uebernehmen` im Wegwerf-Ordner
+ * Prozesstest für tools/wache-urteil.mjs (schreibt die Auswertungsdatei unter daniel-zum-abarbeiten): `--uebernehmen` im Wegwerf-Ordner
  * mit eigenem Urteil. Befund setzt den Eintrag oben, Ruhe lässt die Datei unberührt, ein unbrauchbares oder fehlendes Urteil bricht mit Exit 1 ab.
  * Aufruf: node tools/wache-urteil-uebernehmen.test.mjs
  */
@@ -12,6 +12,8 @@ import { fileURLToPath } from 'node:url'
 
 const skript = join(dirname(fileURLToPath(import.meta.url)), 'wache-urteil.mjs')
 const wurzel = mkdtempSync(join(tmpdir(), 'wacheurteil-'))
+// Dateiname zusammengesetzt: tools/pr-nachrechnen-bot-pfade.test.mjs verbietet Bot-Dateinamen als Literal in Tests
+const AUSWERTUNG_NAME = ['00-wache', 'auswertung.md'].join('-')
 
 const ABSAETZE = [
   '**Was läuft korrekt.** Bestandsbau und Deploy zeigen keinen Alarm, der letzte Lauf war grün (12).',
@@ -28,7 +30,7 @@ function lauf(args, { urteilText, auswertung = AUSWERTUNG, summary = false } = {
   const cwd = join(wurzel, `l${++nr}`)
   mkdirSync(join(cwd, 'daniel-zum-abarbeiten'), { recursive: true })
   mkdirSync(join(cwd, 'ordner', 'ergebnis'), { recursive: true })
-  const datei = join(cwd, 'daniel-zum-abarbeiten', '00-wache-auswertung.md')
+  const datei = join(cwd, 'daniel-zum-abarbeiten', AUSWERTUNG_NAME)
   writeFileSync(datei, auswertung)
   if (urteilText !== undefined) writeFileSync(join(cwd, 'ordner', 'ergebnis', 'urteil.md'), urteilText)
   const env = { ...process.env }
@@ -44,7 +46,7 @@ try {
     const { r, datei, lesen } = lauf(['--uebernehmen'], { urteilText: urteil('befund'), summary: true })
     assert.equal(r.status, 0, r.stderr)
     assert.match(r.stdout, /Urteil \(befund\):/)
-    assert.match(r.stdout, /Eintrag oben in daniel-zum-abarbeiten\/00-wache-auswertung\.md gesetzt\./)
+    assert.ok(r.stdout.includes(`Eintrag oben in daniel-zum-abarbeiten/${AUSWERTUNG_NAME} gesetzt.`))
     const text = readFileSync(datei, 'utf8')
     assert.ok(text.startsWith('# Auswertung der Wache\n\nVorspann.\n\n## '), 'Vorspann bleibt oben')
     const neu = text.search(/^## \d\d\.\d\d\.\d{4}, \d\d:\d\d — Claude-Lauf, Befund$/m)

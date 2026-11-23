@@ -53,4 +53,19 @@ pruefe('Regel zählt genau den Titel mit Sichtung ohne Nummer', mit.length === 1
 pruefe('Regel: Art, Wirkung 2 und Hersteller auto:bau', mit[0]?.art === 'tv-sichtung-ohne-folge' && mit[0]?.wirkung === 2 && mit[0]?.wer === 'auto:bau')
 pruefe('Regel: ohne Sichtung ohne Nummer kein Treffer', zaehleMaengel(titel, kontext(messe([tvTermin('Super RTL')], ['Lied im Nebel'])), regel).length === 0)
 
+// Umhängen wie im Bau: Folgentitel steht nur in der Liste des Geschwistertitels → die Sendung gehört ihm, der Ursprungstitel hat keinen Mangel.
+const [MUTTER, KIND, ANDERE] = [900001, 900002, 900003]
+const reihe = new Map([MUTTER, KIND, ANDERE].map((id) => [id, { id, franchiseId: MUTTER }])) as unknown as Map<number, Title>
+const listen: WikiListen = {
+  [MUTTER]: { seite: 'A', folgen: [{ nr: 1, dt: 'Der alte Hafen am Meer' }] },
+  [KIND]: { seite: 'B', folgen: [{ nr: 1, dt: 'Der Neuanfang der Strohhüte' }] },
+  [ANDERE]: { seite: 'C', folgen: [{ nr: 1, dt: 'Etwas ganz anderes hier' }] },
+}
+const mutterTermin = { titleId: MUTTER, platform: 'tv', sender: 'Super RTL', schedule: { firstEpisodeDate: '2026-09-01' } } as unknown as Release
+const reiheSendung = (folge: string) => ({ ...programm(folge), titleId: MUTTER })
+const reiheMessung = (folge: string) => titelMitSichtungOhneFolge([mutterTermin], [reiheSendung(folge)], listen, reihe)
+pruefe('Umhängen: Folgentitel nur beim Geschwister → Mutter ohne Mangel', !reiheMessung('Serie: Der Neuanfang der Strohhüte').has(MUTTER))
+pruefe('Umhängen: Folgentitel in keiner Liste → Mutter hat den Mangel', reiheMessung('Der Fund im Nirgendwo').has(MUTTER))
+pruefe('Umhängen: Folgentitel in der eigenen Liste → Nummer, kein Mangel', !reiheMessung('Der alte Hafen am Meer').has(MUTTER))
+
 process.exit(verletzt ? 1 : 0)

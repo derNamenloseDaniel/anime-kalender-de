@@ -33,20 +33,20 @@ export function rolleUm(zeile: HTMLElement | null, richtung: 'links' | 'rechts')
 }
 
 /**
- * Kleiner Pfeil im seitlichen Innenabstand der Box neben der Reiterleiste. Die Box ist nur 16 px breit; die Trefferfläche (44 × 44)
- * ragt per `::after` mittig je 14 px nach innen (über den Rand der Leiste) und außen. Der Pfeil steht nur, wenn in seiner
+ * Kleiner Pfeil im seitlichen Innenabstand der Box neben der Reiterleiste. Der Pfeil sitzt 16 px am Rand; der Knopf selbst ist 44 px
+ * breit und ragt mittig je 14 px nach innen (über den Rand der Leiste) und außen, damit die Panel-Messung das Tippziel am Element sieht. Der Pfeil steht nur, wenn in seiner
  * Richtung weitere Reiter liegen: Der Rand des ersten bzw. letzten Reiters wird so nie abgefangen.
  */
 export function ReiterPfeil({ richtung, weitere, beiKlick }: { richtung: 'links' | 'rechts'; weitere: boolean; beiKlick: () => void }) {
   if (!weitere) return null
-  const seite = richtung === 'links' ? 'left-0' : 'right-0'
+  const seite = richtung === 'links' ? '-left-3.5' : '-right-3.5'
   return (
     <button
       type="button"
       aria-label={BESCHRIFTUNG[richtung]}
       data-pfeil={richtung}
       onClick={beiKlick}
-      className={`absolute inset-y-0 z-20 grid w-4 place-items-center text-ak-text after:absolute after:top-1/2 after:left-1/2 after:h-11 after:w-11 after:-translate-x-1/2 after:-translate-y-1/2 after:content-[''] cursor-pointer ${seite}`}
+      className={`absolute inset-y-0 z-20 grid min-h-11 w-11 place-items-center text-ak-text cursor-pointer ${seite}`}
     >
       <svg aria-hidden="true" viewBox="0 0 10 16" className="h-4 w-2.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d={richtung === 'links' ? 'M8 2 2 8l6 6' : 'M2 2l6 6-6 6'} />

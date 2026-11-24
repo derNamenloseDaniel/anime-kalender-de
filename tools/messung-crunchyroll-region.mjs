@@ -45,12 +45,15 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 let abrufe = 0
 const protokoll = []
 
-async function main() {
-  const browser = await chromium.launch()
-  const page = await browser.newPage({ userAgent: CHROME, locale: 'de-DE', viewport: { width: 1280, height: 900 } })
+/**
+ * @typedef {{ status: number, text: string }} Antwort
+ * @typedef {(url: string, opt?: { methode?: string, kopf?: Record<string, string>, koerper?: string }) => Promise<Antwort>} Hole
+ * @typedef {{ bucket: string, policy: string, signature: string, key_pair_id: string }} Signatur
+ */
 
-  /** Ein Aufruf im Kontext der geladenen Seite — ein direkter `fetch` bekommt Cloudflares 403. */
-  const hole = async (url, { methode = 'GET', kopf = {}, koerper } = {}) => {
+/** Ein Aufruf im Kontext der geladenen Seite — ein direkter `fetch` bekommt Cloudflares 403. */
+function erzeugeHole(page) {
+  return async (url, { methode = 'GET', kopf = {}, koerper } = {}) => {
     if (++abrufe > OBERGRENZE) throw new Error(`Obergrenze von ${OBERGRENZE} Abrufen erreicht`)
     const antwort = await page
       .evaluate(
@@ -64,12 +67,10 @@ async function main() {
     await sleep(PAUSE_MS)
     return antwort
   }
+}
 
-  // Aufwärmen: eine Seite laden, damit `fetch` aus dem richtigen Ursprung kommt.
-  await page.goto(AUFWAERM_SEITE, { waitUntil: 'domcontentloaded', timeout: 60000 })
-  await sleep(PAUSE_MS)
-
-  // ── Schritt 1: Was sagt das Token über die Region? ──────────────────────────
+/** Schritt 1: Was sagt das Token über die Region? Liefert das Token. */
+async function holeToken(/** @type {Hole} */ hole) {
   const tokenAntwort = await hole('https://www.crunchyroll.com/auth/v1/token', {
     methode: 'POST',
     kopf: {
@@ -83,28 +84,30 @@ async function main() {
   console.log(tokenAntwort.text)
   const token = JSON.parse(tokenAntwort.text).access_token
   protokoll.push({ versuch: 'POST /auth/v1/token', status: tokenAntwort.status, roh: tokenAntwort.text })
+  return token
+}
 
-  // Dasselbe noch einmal, aber mit deutschen Sprach- und Herkunftsangaben im
-  // Kopf. Wenn die Region am Token hängt, muss sie sich hier zeigen.
-  if (!NUR_NACHFASSEN) {
-    const tokenDe = await hole('https://www.crunchyroll.com/auth/v1/token', {
-      methode: 'POST',
-      kopf: {
-        authorization: 'Basic Y3Jfd2ViOg==',
-        'content-type': 'application/x-www-form-urlencoded',
-        'accept-language': 'de-DE,de;q=0.9',
-        'x-forwarded-for': '85.214.132.117',
-        'cf-ipcountry': 'DE',
-      },
-      koerper: 'grant_type=client_id&device_type=Chrome%20on%20Windows',
-    })
-    console.log('\n=== POST /auth/v1/token (mit Accept-Language/X-Forwarded-For/CF-IPCountry) ===')
-    console.log('HTTP', tokenDe.status)
-    console.log(tokenDe.text)
-    protokoll.push({ versuch: 'POST /auth/v1/token + de-Header', status: tokenDe.status, roh: tokenDe.text })
-  }
+/** Dasselbe Token noch einmal, mit deutschen Sprach- und Herkunftsangaben: Hängt die Region am Token, muss sie sich hier zeigen. */
+async function holeTokenMitDeKopf(/** @type {Hole} */ hole) {
+  const tokenDe = await hole('https://www.crunchyroll.com/auth/v1/token', {
+    methode: 'POST',
+    kopf: {
+      authorization: 'Basic Y3Jfd2ViOg==',
+      'content-type': 'application/x-www-form-urlencoded',
+      'accept-language': 'de-DE,de;q=0.9',
+      'x-forwarded-for': '85.214.132.117',
+      'cf-ipcountry': 'DE',
+    },
+    koerper: 'grant_type=client_id&device_type=Chrome%20on%20Windows',
+  })
+  console.log('\n=== POST /auth/v1/token (mit Accept-Language/X-Forwarded-For/CF-IPCountry) ===')
+  console.log('HTTP', tokenDe.status)
+  console.log(tokenDe.text)
+  protokoll.push({ versuch: 'POST /auth/v1/token + de-Header', status: tokenDe.status, roh: tokenDe.text })
+}
 
-  // ── Schritt 2: der CMS-Bucket aus /index/v2 ────────────────────────────────
+/** Schritt 2: der CMS-Bucket aus /index/v2; `null`, wenn die Antwort keinen nennt. */
+async function holeBucket(/** @type {Hole} */ hole, token) {
   const index = await hole('https://www.crunchyroll.com/index/v2', {
     kopf: { authorization: `Bearer ${token}` },
   })
@@ -113,6 +116,7 @@ async function main() {
   console.log(index.text)
   protokoll.push({ versuch: 'GET /index/v2', status: index.status, roh: index.text })
 
+  /** @type {Signatur | null} */
   let signatur = null
   try {
     const j = JSON.parse(index.text)
@@ -122,8 +126,11 @@ async function main() {
     /* unten als Nichtauskunft sichtbar */
   }
   console.log('\nBucket:', signatur?.bucket ?? '(keiner)')
+  return signatur
+}
 
-  // ── Schritt 3: die Parameter-Matrix am Prüfstein ───────────────────────────
+/** Schritt 3: die Parameter-Matrix am Prüfstein. */
+async function laufeMatrix(/** @type {Hole} */ hole, token) {
   const basis = `https://www.crunchyroll.com/content/v2/cms/series/${SERIE}/seasons`
   const versuche = [
     ['Kontrolle: nur locale', `${basis}?locale=de-DE`, {}],
@@ -142,42 +149,44 @@ async function main() {
     ['Header X-Cr-Country', `${basis}?locale=de-DE`, { 'x-cr-country': 'DE' }],
   ]
 
-  for (const [name, url, kopf] of NUR_NACHFASSEN ? [] : versuche) {
+  for (const [name, url, kopf] of versuche) {
     const a = await hole(url, { kopf: { authorization: `Bearer ${token}`, ...kopf } })
     protokoll.push({ versuch: name, url, kopf, status: a.status, ...pruefstein(a) })
     melde(name, url, kopf, a)
   }
+}
 
-  // ── Schritt 4: der ältere CMS-Pfad mit Land im Bucket ──────────────────────
-  if (signatur) {
-    const sig = `Policy=${encodeURIComponent(signatur.policy)}&Signature=${encodeURIComponent(signatur.signature)}&Key-Pair-Id=${encodeURIComponent(signatur.key_pair_id)}`
-    const eigen = `https://www.crunchyroll.com/cms/v2${signatur.bucket}/seasons?series_id=${SERIE}&locale=de-DE&${sig}`
-    const deutsch = `https://www.crunchyroll.com/cms/v2${String(signatur.bucket).replace(/^\/[A-Z]{2}\//, '/DE/')}/seasons?series_id=${SERIE}&locale=de-DE&${sig}`
-    for (const [name, url] of NUR_NACHFASSEN
-      ? [['CMS v2, eigener Bucket', eigen]]
-      : [
-          ['CMS v2, eigener Bucket', eigen],
-          ['CMS v2, Bucket auf DE gebogen', deutsch],
-        ]) {
-      const a = await hole(url, { kopf: { authorization: `Bearer ${token}` } })
-      // Der ältere Pfad führt je Tonspur eine eigene Staffel — bei „Fairy Tail"
-      // sechs statt drei. Abgeschnitten wäre der Befund „keine deutsche
-      // Staffel" nur die halbe Liste.
-      protokoll.push({ versuch: name, url, status: a.status, ...pruefstein(a), roh: kuerze(a.text, 60000) })
-      melde(name, url, {}, a)
-      /**
-       * Der ältere Pfad antwortet in einer anderen Form.
-       *
-       * `pruefstein()` sucht `data` — das gibt es hier nicht, die Liste heißt
-       * `items`. Ohne diese Ausgabe stand im ersten Lauf „(keine Staffel)", und
-       * das hätte man für einen leeren Katalog halten können statt für ein
-       * anderes Antwortschema.
-       */
-      if (name.includes('eigener')) console.log('  Rohantwort:', kuerze(a.text))
-    }
+/** Schritt 4: der ältere CMS-Pfad mit Land im Bucket. */
+async function laufeAeltererCmsPfad(/** @type {Hole} */ hole, token, /** @type {Signatur} */ signatur) {
+  const sig = `Policy=${encodeURIComponent(signatur.policy)}&Signature=${encodeURIComponent(signatur.signature)}&Key-Pair-Id=${encodeURIComponent(signatur.key_pair_id)}`
+  const eigen = `https://www.crunchyroll.com/cms/v2${signatur.bucket}/seasons?series_id=${SERIE}&locale=de-DE&${sig}`
+  const deutsch = `https://www.crunchyroll.com/cms/v2${String(signatur.bucket).replace(/^\/[A-Z]{2}\//, '/DE/')}/seasons?series_id=${SERIE}&locale=de-DE&${sig}`
+  for (const [name, url] of NUR_NACHFASSEN
+    ? [['CMS v2, eigener Bucket', eigen]]
+    : [
+        ['CMS v2, eigener Bucket', eigen],
+        ['CMS v2, Bucket auf DE gebogen', deutsch],
+      ]) {
+    const a = await hole(url, { kopf: { authorization: `Bearer ${token}` } })
+    // Der ältere Pfad führt je Tonspur eine eigene Staffel — bei „Fairy Tail"
+    // sechs statt drei. Abgeschnitten wäre der Befund „keine deutsche
+    // Staffel" nur die halbe Liste.
+    protokoll.push({ versuch: name, url, status: a.status, ...pruefstein(a), roh: kuerze(a.text, 60000) })
+    melde(name, url, {}, a)
+    /**
+     * Der ältere Pfad antwortet in einer anderen Form.
+     *
+     * `pruefstein()` sucht `data` — das gibt es hier nicht, die Liste heißt
+     * `items`. Ohne diese Ausgabe stand im ersten Lauf „(keine Staffel)", und
+     * das hätte man für einen leeren Katalog halten können statt für ein
+     * anderes Antwortschema.
+     */
+    if (name.includes('eigener')) console.log('  Rohantwort:', kuerze(a.text))
   }
+}
 
-  // ── Schritt 5: was die Serienebene selbst sagt ─────────────────────────────
+/** Schritt 5: was die Serienebene selbst sagt. */
+async function holeSerienebene(/** @type {Hole} */ hole, token) {
   const serie = await hole(`https://www.crunchyroll.com/content/v2/cms/series/${SERIE}?locale=de-DE`, {
     kopf: { authorization: `Bearer ${token}` },
   })
@@ -185,15 +194,17 @@ async function main() {
   console.log('HTTP', serie.status)
   console.log(kuerze(serie.text))
   protokoll.push({ versuch: 'GET /content/v2/cms/series (Serienebene)', status: serie.status, roh: kuerze(serie.text) })
+}
 
-  /**
-   * ── Schritt 6: die Folgenebene, wie sie der Datensatz sieht ────────────────
-   *
-   * Der erste Block von „Fairy Tail" (GYQ4KKN16, 175 Folgen). Hier steht
-   * `eligible_region` — das Feld, an dem der Befund vom 21.08.2026 hängt. Ohne
-   * diesen Abruf wäre der Bericht auf das Archiv angewiesen, und das ist einen
-   * Tag alt.
-   */
+/**
+ * ── Schritt 6: die Folgenebene, wie sie der Datensatz sieht ────────────────
+ *
+ * Der erste Block von „Fairy Tail" (GYQ4KKN16, 175 Folgen). Hier steht
+ * `eligible_region` — das Feld, an dem der Befund vom 21.08.2026 hängt. Ohne
+ * diesen Abruf wäre der Bericht auf das Archiv angewiesen, und das ist einen
+ * Tag alt.
+ */
+async function holeFolgenebene(/** @type {Hole} */ hole, token) {
   const folgen = await hole('https://www.crunchyroll.com/content/v2/cms/seasons/GYQ4KKN16/episodes?locale=de-DE', {
     kopf: { authorization: `Bearer ${token}` },
   })
@@ -209,6 +220,24 @@ async function main() {
     regionen,
     mitDeutsch: deutsche,
   })
+}
+
+async function main() {
+  const browser = await chromium.launch()
+  const page = await browser.newPage({ userAgent: CHROME, locale: 'de-DE', viewport: { width: 1280, height: 900 } })
+  const hole = erzeugeHole(page)
+
+  // Aufwärmen: eine Seite laden, damit `fetch` aus dem richtigen Ursprung kommt.
+  await page.goto(AUFWAERM_SEITE, { waitUntil: 'domcontentloaded', timeout: 60000 })
+  await sleep(PAUSE_MS)
+
+  const token = await holeToken(hole)
+  if (!NUR_NACHFASSEN) await holeTokenMitDeKopf(hole)
+  const signatur = await holeBucket(hole, token)
+  if (!NUR_NACHFASSEN) await laufeMatrix(hole, token)
+  if (signatur) await laufeAeltererCmsPfad(hole, token, signatur)
+  await holeSerienebene(hole, token)
+  await holeFolgenebene(hole, token)
 
   await browser.close()
   writeFileSync('/tmp/messung-crunchyroll-region.json', JSON.stringify(protokoll, null, 2))

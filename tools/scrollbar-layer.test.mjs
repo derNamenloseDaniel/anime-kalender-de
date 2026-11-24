@@ -26,7 +26,7 @@ export function ungelayerteScrollbarRegeln(css) {
         if (kopf.startsWith('@layer')) continue
         // @media/@supports bleiben ungelayert: ihr Inhalt zählt wie oberste Ebene.
         if (kopf.startsWith('@')) treffer.push(...ungelayerteScrollbarRegeln(rumpf.slice(1)))
-        else if (kopf.includes('*') && /scrollbar-(width|color)/.test(rumpf)) treffer.push(kopf)
+        else if (kopf.includes('*') && (/scrollbar-(width|color)/.test(rumpf) || kopf.includes('::-webkit-scrollbar'))) treffer.push(kopf)
       }
     }
   }
@@ -41,13 +41,14 @@ const pruefe = (name, ok) => {
 }
 
 const roh = '/* c */\n* {\n  scrollbar-width: thin;\n}\n*::-webkit-scrollbar { width: 8px; }\n'
-pruefe('Fixture: ungelayerte `*`-Regel wird gefunden', ungelayerteScrollbarRegeln(roh).length === 1)
+pruefe('Fixture: ungelayerte `*`- und `*::-webkit-scrollbar`-Regel werden gefunden', ungelayerteScrollbarRegeln(roh).length === 2)
+pruefe('Fixture: `*::-webkit-scrollbar` allein wird gefunden', ungelayerteScrollbarRegeln('*::-webkit-scrollbar { width: 8px; }').length === 1)
 pruefe('Fixture: dieselbe Regel in @layer base ist frei', ungelayerteScrollbarRegeln(`@layer base {\n${roh}}\n`).length === 0)
-pruefe('Fixture: Regel in @media ist ungelayert und wird gefunden', ungelayerteScrollbarRegeln(`@media screen {\n${roh}}\n`).length === 1)
+pruefe('Fixture: Regel in @media ist ungelayert und wird gefunden', ungelayerteScrollbarRegeln(`@media screen {\n${roh}}\n`).length === 2)
 pruefe('Fixture: Regel für einen Klassennamen ohne `*` bleibt erlaubt', ungelayerteScrollbarRegeln('.pn-filter { scrollbar-width: none; }').length === 0)
 
 const ordner = join(fileURLToPath(new URL('..', import.meta.url)), 'web/src')
-for (const datei of readdirSync(ordner).filter((d) => d.endsWith('.css'))) {
+for (const datei of readdirSync(ordner, { recursive: true }).filter((d) => d.endsWith('.css'))) {
   const hits = ungelayerteScrollbarRegeln(readFileSync(join(ordner, datei), 'utf8'))
   pruefe(`web/src/${datei}: keine ungelayerte Universalregel mit scrollbar-*${hits.length ? ' (' + hits.join(', ') + ')' : ''}`, hits.length === 0)
 }

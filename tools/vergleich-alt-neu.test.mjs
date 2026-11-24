@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { spawnMitLimit } from './kind-mit-limit.mjs'
-import { hashOrdner, vergleicheAltNeu, zaehler } from './vergleich-alt-neu.mjs'
+import { hashOrdner, kanonisch, vergleicheAltNeu, zaehler } from './vergleich-alt-neu.mjs'
 
 const werkzeug = fileURLToPath(new URL('./vergleich-alt-neu.mjs', import.meta.url))
 const git = (repo, ...args) => execFileSync('git', ['-C', repo, '-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { timeout: 30_000, stdio: 'pipe' })
@@ -74,6 +74,22 @@ try {
   // Die Wegwerfdatei bleibt nicht liegen.
   assert.equal(execFileSync('git', ['-C', repo, 'status', '--porcelain'], { encoding: 'utf8', timeout: 30_000 }).includes('.alt-'), false)
 
+  // Eingaben mit Funktionen (`argsFabrik`): nicht klonbar; das Aufrufprotokoll der Attrappe geht in den Vergleich ein.
+  const G = "export function g(opt) {\n  opt.aufrufe.push(1)\n  return [opt.fn(2), opt.fn(3)]\n}\n"
+  writeFileSync(join(repo, 'g.mjs'), G)
+  git(repo, 'add', 'g.mjs')
+  git(repo, 'commit', '-q', '-m', 'g')
+  const fabrik = (name, zweig) => ({ name, zweig, argsFabrik: () => { const aufrufe = []; return [{ aufrufe, fn: (n) => { aufrufe.push(n); return n * 2 } }] } })
+  const gLauf = (neu) => {
+    writeFileSync(join(repo, 'g.mjs'), neu)
+    return vergleicheAltNeu({ datei: 'g.mjs', funktion: 'g', faelle: [fabrik('a', 'x'), fabrik('b', 'x')], ref: 'HEAD', wurzel: repo })
+  }
+  assert.equal((await gLauf(G)).gleich, true)
+  const protokoll = await gLauf(G.replace('opt.fn(3)', 'opt.fn(4)'))
+  assert.deepEqual(protokoll.abweichungen.map((a) => `${a.fall}:${a.was}`), ['a:ergebnis', 'a:eingaben', 'b:ergebnis', 'b:eingaben'])
+  const nurProtokoll = await gLauf(G.replace('  opt.aufrufe.push(1)\n', ''))
+  assert.deepEqual(nurProtokoll.abweichungen.map((a) => `${a.fall}:${a.was}`), ['a:eingaben', 'b:eingaben'])
+
   // Aufruf: Fallmodul, Exit-Codes
   writeFileSync(join(repo, 'faelle.mjs'), `export const faelle = ${JSON.stringify(faelle)}\n`)
   writeFileSync(join(repo, 'f.mjs'), ALT)
@@ -89,6 +105,18 @@ try {
 } finally {
   rmSync(repo, { recursive: true, force: true })
 }
+
+// Kanonische Schreibweise: unterscheidet, was für die Gleichheit zählt
+assert.notEqual(kanonisch({ a: undefined }), kanonisch({}), 'undefined ≠ fehlend')
+assert.notEqual(kanonisch({ a: 1, b: 2 }), kanonisch({ b: 2, a: 1 }), 'Reihenfolge der Schlüssel')
+assert.notEqual(kanonisch({ a: 1, b: 2 }), kanonisch({ a: 1, b: 3 }), 'auch der zweite Schlüssel zählt')
+assert.notEqual(kanonisch(0), kanonisch(-0))
+assert.notEqual(kanonisch('1'), kanonisch(1))
+assert.notEqual(kanonisch(new Map([[1, 'a']])), kanonisch(new Map([[1, 'b']])))
+const geteilt = { x: 1 }
+assert.notEqual(kanonisch([geteilt, geteilt]), kanonisch([{ x: 1 }, { x: 1 }]), 'geteiltes Objekt ≠ zwei gleiche')
+assert.equal(kanonisch([{ x: 1 }, { x: 1 }]), kanonisch([{ x: 1 }, { x: 1 }]))
+assert.equal(kanonisch('ö'), kanonisch('ö'), 'Darstellung der Zeichenkette ohne Einfluss')
 
 // Hilfen
 const z = zaehler()

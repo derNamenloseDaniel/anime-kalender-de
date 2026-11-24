@@ -4,7 +4,7 @@
  * - „Gesehen bis k“ an Staffel N wird durchlaufend `von − 1 + k` (Versatz aus `data/curated/horizonte-staffeln.yaml`), das Maximum gilt;
  *   Favoriten [26469, 14839] werden ein Eintrag. Der Browser schreibt das auf dem Gerät um, das ist nicht umkehrbar.
  * - `uebersetzeVerzeichnis` legt die Dreier aus `zuAk` und Yaml ab (Kulisse mit `kennungen.json` samt `zuAk`).
- * - Jede `alteKennung` jeder `*-staffeln.yaml` zieht in `data/kennungen.json` per `zuAk` auf die Serie um (sonst ist `/t/<alt>/` tot).
+ * - Jede `alteKennung` der Staffel-Yamls, die `ladeStaffelGrenzen()` liest (Pokémon, Horizonte), zieht in der Kennungsdatei per `zuAk` auf die Serie um (sonst ist `/t/<alt>/` tot).
  * Läuft in `check:logic`.
  */
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
@@ -73,8 +73,11 @@ function ohneUmzug(z: KennungsZeile[], grenzen: StaffelGrenzen[]): number[] {
   return grenzen.flatMap((g) => g.staffeln.flatMap((s) => (s.alteKennung === undefined || (je.get(s.alteKennung)?.[3] !== undefined && je.get(s.alteKennung)?.[3] === je.get(g.anilistId)?.[0]) ? [] : [s.alteKennung])))
 }
 const echt = (JSON.parse(readFileSync(join(dirname(HORIZONTE_STAFFELN), '..', 'kennungen.json'), 'utf8')) as { titel: KennungsZeile[] }).titel
-const fehlend = ohneUmzug(echt, ladeStaffelGrenzen())
-pruefe('data/kennungen.json: jede alteKennung der *-staffeln.yaml hat zuAk auf die Serie', fehlend.length === 0, fehlend)
+const echteGrenzen = ladeStaffelGrenzen()
+const alteKennungen = echteGrenzen.flatMap((g) => g.staffeln.flatMap((s) => (s.alteKennung === undefined ? [] : [s.alteKennung])))
+pruefe('echte Staffel-Yamls geladen: Horizonte trägt die alten Kennungen 7000001–7000003 (sonst prüft der Wächter leer)', [7000001, 7000002, 7000003].every((k) => alteKennungen.includes(k)), alteKennungen)
+const fehlend = ohneUmzug(echt, echteGrenzen)
+pruefe('Kennungsdatei: jede alteKennung der Staffel-Yamls (Pokémon, Horizonte) hat zuAk auf die Serie', fehlend.length === 0, fehlend)
 pruefe('Gegenprobe: alte Kennung ohne zuAk wird genannt', JSON.stringify(ohneUmzug([[14839, 158871, 17947], [26469, 7000001, 17947]], [{ anilistId: 158871, staffeln: [{ nr: 1, von: 1, alteKennung: 7000001 }] }])) === '[7000001]')
 pruefe('Gegenprobe: zuAk auf fremde ak wird genannt', JSON.stringify(ohneUmzug([[14839, 158871, 17947], [26469, 7000001, 17947, 5]], [{ anilistId: 158871, staffeln: [{ nr: 1, von: 1, alteKennung: 7000001 }] }])) === '[7000001]')
 

@@ -740,6 +740,7 @@ pipeline/check-unbekannte-seite.ts
 pipeline/check-unsicheres-raus-ast.ts
 pipeline/check-unsicheres-raus.ts
 pipeline/check-urteil-art.ts
+pipeline/check-urteil-frueh.ts
 pipeline/check-urteil-fremde-adresse.ts
 pipeline/check-urteil-spaet.ts
 pipeline/check-urteile-ablauf.ts

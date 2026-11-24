@@ -17,14 +17,18 @@ function ausSammeltitel(sammel: number, titel: Title[]): ReihenReiter[] {
     .map((t) => ({ id: t.id, label: String(t.staffelTitel!.nr), name: anzeigeName(t) }))
 }
 
-/** Hauptstaffeln der Reihe mit der Beschriftung der Reihenliste („Staffel 1–5“ wird „1–5“); sortiert nach Staffelnummer. */
+/**
+ * Hauptstaffeln der Reihe mit der Beschriftung der Reihenliste („Staffel 1–5“ wird „1–5“); sortiert nach Staffelnummer. Eine einzige
+ * Staffel in Teilen („Teil 1“, „Teil 2“) hat Beschriftungen, aber keinen Staffelstand: dann zählt nur die Kennung.
+ */
 function ausHauptstaffeln(teile: FranchiseMember[], reihenName: string): ReihenReiter[] {
   const haupt = hauptstaffeln(teile)
   const stand = staffelStaende(haupt, reihenName)
   const text = staffelBeschriftungen(haupt, reihenName)
+  const nummer = (id: number) => stand.get(id)?.staffel ?? 0
   return haupt
     .filter((m) => text.has(m.id))
-    .sort((a, b) => stand.get(a.id)!.staffel - stand.get(b.id)!.staffel || a.id - b.id)
+    .sort((a, b) => nummer(a.id) - nummer(b.id) || a.id - b.id)
     .map((m) => ({ id: m.id, label: text.get(m.id)!.replace(/^Staffel\s+/, ''), name: m.name }))
 }
 

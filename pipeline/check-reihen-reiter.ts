@@ -43,6 +43,17 @@ const aotTeile = Object.values(aot['franchises.json'] as Record<string, Franchis
 const aotReiter = (id: number) => reihenReiterVon(aotTitel.find((t) => t.id === id)!, aotTeile, 'Attack on Titan', aotTitel)
 pruefe('Attack on Titan: ohne Junior High', JSON.stringify(aotReiter(6282).map((r) => [r.id, r.label])) === '[[6282,"1"],[7496,"2"],[8669,"3 - Teil 1"],[10088,"3 - Teil 2"]]', aotReiter(6282))
 pruefe('Attack on Titan: Final Season ohne Beschriftung öffnet ohne Reiter', aotReiter(10659).length === 0)
+/* Eine Staffel in zwei Teilen (Sakamoto Days ohne den Eintrag 2027): Beschriftung „Teil 1/2“, aber kein Staffelstand. Brach die Bühne (disc-bereich-2). */
+const sk = faelle['sakamoto-days']!
+const skTitel = sk['titles.json'] as Title[]
+const skTeile = (sk['franchises.json'] as Record<string, FranchiseMember[]>)['15940']!.filter((m) => m.id !== 17244)
+let skReiter: unknown
+try {
+  skReiter = reihenReiterVon(skTitel.find((t) => t.id === 15940)!, skTeile, 'Sakamoto Days', skTitel).map((r) => [r.id, r.label])
+} catch (fehler) {
+  skReiter = String(fehler)
+}
+pruefe('Staffel in zwei Teilen ohne Staffelstand: Teil 1, Teil 2 nach Kennung', JSON.stringify(skReiter) === '[[15940,"Teil 1"],[16333,"Teil 2"]]', skReiter)
 
 /* Lage am Stichtag des Mockups (24.11.2026): Horizonte 4 läuft, 1–3 ruhen; Hauptserie 1–5 kommt, 23–25 läuft. */
 const STICHTAG = '2026-11-24'

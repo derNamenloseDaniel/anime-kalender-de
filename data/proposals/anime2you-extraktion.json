@@ -2166,6 +2166,22 @@
       "am": "2026-11-22",
       "vorschlaege": 0
     },
+    "1074597": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1074752": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1074801": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1074889": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
     "1074948": {
       "am": "2026-11-23",
       "vorschlaege": 0,
@@ -2221,6 +2237,14 @@
     "1075182": {
       "am": "2026-11-24",
       "vorschlaege": 1
+    },
+    "1075202": {
+      "am": "2026-11-24",
+      "vorschlaege": 1
+    },
+    "1075475": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
     }
   },
   "vorschlaege": [
@@ -17152,6 +17176,27 @@
       "artikelId": "1073937",
       "artikel": "Episodenanzahl von »A Tale of the Secret Saint« steht fest",
       "quelle": "https://www.anime2you.de/news/1073937/a-tale-of-the-secret-saint-episodenanzahl/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Witch on the Holy Night",
+      "zitat": "In Deutschland, Österreich und der deutschsprachigen Schweiz bringt Crunchyroll den Abendfüller ab dem 26. Januar 2027 mit deutscher Synchronisation sowie im japanischen Originalton mit Untertiteln in die hiesigen Lichtspielhäuser.",
+      "art": "kino",
+      "sprache": "deutsch+omu",
+      "plattform": "kino",
+      "datum": "2027-01-26",
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [],
+      "artikelId": "1075202",
+      "artikel": "»Witch on the Holy Night« erhält eine Fortsetzung + Visual",
+      "quelle": "https://www.anime2you.de/news/1075202/witch-on-the-holy-night-erhaelt-fortsetzung/",
       "veroeffentlicht": "2026-11-24",
       "gelesenAm": "2026-11-24"
     }

@@ -55,7 +55,7 @@ globalThis.fetch = (async (adresse: unknown) => {
   return { ok: Boolean(daten), status: daten ? 200 : 404, json: async () => daten }
 }) as unknown as typeof fetch
 
-/* Die Reiterzeile misst ihre Breite (ResizeObserver) und rollt den gewählten Reiter in die Mitte (querySelector): im Mini-DOM ohne Wirkung. */
+/* Die Reiterzeile misst ihre Breite (ResizeObserver) und rollt den gewählten Reiter (Ref) in die Mitte: im Mini-DOM ohne Wirkung. */
 /* Tastatur: `querySelectorAll('[role="tab"]')` liefert die echten Reiter, `focus()` merkt sich den Knoten. */
 let fokus: MiniKnoten | undefined
 Object.assign(MiniKnoten.prototype, {

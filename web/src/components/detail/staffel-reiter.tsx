@@ -18,9 +18,8 @@ function LageMarke({ lage }: { lage: StaffelLage }) {
   return <span aria-hidden="true" data-lage={lage} className={`absolute top-1.5 right-1.5 size-2 rounded-full ${lage === 'laeuft' ? 'bg-ak-akzent-text' : 'border-[1.5px] border-ak-akzent-text'}`} />
 }
 
-/** Den gewählten Reiter in die Mitte der Zeile rollen. */
-function zeigeGewaehlten(zeile: HTMLElement | null): void {
-  const reiter = zeile?.querySelector<HTMLElement>('[aria-selected="true"]')
+/** Den gewählten Reiter in die Mitte der Zeile rollen; beide kommen als Ref, ohne DOM-Abfrage im Effekt. */
+function zeigeGewaehlten(zeile: HTMLElement | null, reiter: HTMLElement | null): void {
   if (!zeile || !reiter) return
   zeile.scrollLeft = reiter.offsetLeft - (zeile.clientWidth - reiter.offsetWidth) / 2
 }
@@ -42,7 +41,8 @@ export function naechsterReiter(taste: string, aktiv: number, anzahl: number): n
  */
 export function ReiterZeile({ reiter, aktiv, kennung, beiWahl }: { reiter: Reiter[]; aktiv: number; kennung: string; beiWahl: (i: number) => void }) {
   const zeile = useRef<HTMLDivElement>(null)
-  useEffect(() => zeigeGewaehlten(zeile.current), [aktiv])
+  const gewaehlterReiter = useRef<HTMLButtonElement>(null)
+  useEffect(() => zeigeGewaehlten(zeile.current, gewaehlterReiter.current), [aktiv])
   const lage = usePfeilLage(zeile, reiter.length)
   const taste = (e: KeyboardEvent<HTMLDivElement>) => {
     const ziel = naechsterReiter(e.key, aktiv, reiter.length)
@@ -59,6 +59,7 @@ export function ReiterZeile({ reiter, aktiv, kennung, beiWahl }: { reiter: Reite
           return (
             <button
               key={r.nr}
+              ref={gewaehlt ? gewaehlterReiter : undefined}
               type="button"
               role="tab"
               id={`${kennung}-reiter-${r.nr}`}

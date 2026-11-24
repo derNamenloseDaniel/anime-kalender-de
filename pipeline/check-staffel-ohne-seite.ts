@@ -3,7 +3,7 @@
  * `check-staffel-ohne-seite-bestand.ts`. Anlass: The Mighty Nein Staffel 2 (24.11.2026).
  * Aufruf: npx tsx pipeline/check-staffel-ohne-seite.ts
  */
-import { abweichungVonBekannt, staffelnOhneSeite } from './lib/staffel-ohne-seite.ts'
+import { abweichungVonBekannt, bestandUrteil, staffelnOhneSeite } from './lib/staffel-ohne-seite.ts'
 
 let fehler = 0
 function pruefe(name: string, ist: unknown, soll: unknown): void {
@@ -44,6 +44,13 @@ const bek = new Map([['alpha-s2', 'Grund'], ['alt-eintrag', 'Grund']])
 pruefe('Ratsche: neuer Fall und erledigter Eintrag werden getrennt genannt', abweichungVonBekannt(f1, bek), { neu: ['b2'], erledigt: ['alt-eintrag'] })
 pruefe('Ratsche: alles bekannt, nichts erledigt', abweichungVonBekannt(f1.slice(0, 1), new Map([['alpha-s2', 'Grund']])), { neu: [], erledigt: [] })
 pruefe('Ratsche: zwei Termine desselben Release zählen einmal', abweichungVonBekannt([...f1.slice(0, 1), ...f1.slice(0, 1)], new Map()).neu, ['alpha-s2'])
+
+/* Exit-Zweig des Bestandsprüfers: je Meldeart ein Fall (neu / erledigt) und der grüne Gegenfall. */
+const nurNeu = bestandUrteil(f1.slice(0, 1), new Map())
+pruefe('Bestand: nur ein neuer Fall ist rot', [nurNeu.rot, nurNeu.meldungen.length], [true, 1])
+const nurErledigt = bestandUrteil([], new Map([['erfundener-eintrag', 'Grund']]))
+pruefe('Bestand: nur ein erledigter Eintrag ist rot', [nurErledigt.rot, nurErledigt.meldungen], [true, ['FEHLER: erfundener-eintrag steht in BEKANNT, ist aber kein Fall mehr — Eintrag streichen']])
+pruefe('Bestand: alles bekannt ist grün', bestandUrteil(f1.slice(0, 1), new Map([['alpha-s2', 'Grund']])), { rot: false, meldungen: [] })
 
 console.log(`${fehler ? '✖' : '✓'} Staffel ohne Seite: ${fehler} Fehler`)
 process.exit(fehler ? 1 : 0)

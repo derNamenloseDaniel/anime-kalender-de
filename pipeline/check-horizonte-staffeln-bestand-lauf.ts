@@ -15,8 +15,9 @@ const tsx = pathToFileURL(join(REPO, 'node_modules/tsx/dist/esm/index.mjs')).hre
 const SKRIPT = 'pipeline/check-horizonte-staffeln-bestand.ts'
 const ID = 158871
 
-type Termin = { titleId: number; platform: string; episode?: number; staffelFolge?: [number, number] }
-type Kulisse = { wiki?: number[]; toggo?: number[]; datei?: object | null; kopf?: number[] | null; titel?: number[]; termine?: Termin[] }
+type Termin = { titleId: number; platform: string; episode?: number; staffelFolge?: [number, number]; date?: string; time?: string; sender?: string }
+type Sendung = { titleId: number; folge: string; sender: string; start: string }
+type Kulisse = { wiki?: number[]; toggo?: number[]; datei?: object | null; kopf?: number[] | null; titel?: number[]; termine?: Termin[]; sendungen?: Sendung[] }
 const NAMEN = { 1: 'Pokémon Horizonte: Die Serie', 2: 'Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua', 3: 'Pokémon Horizonte: Staffel 3 – Gute Aussichten', 4: 'Pokémon Horizonte: Staffel 4 – Wunder in Sicht' }
 const GUT: Required<Kulisse> = {
   wiki: [45, 44, 47, 23],
@@ -24,6 +25,7 @@ const GUT: Required<Kulisse> = {
   datei: { f: [], de: [], s: [[1, 1, 45], [2, 46, 89], [3, 90, 136], [4, 137]], sn: NAMEN },
   kopf: [137, 137, 1],
   titel: [ID, 20],
+  sendungen: [],
   termine: [
     { titleId: ID, platform: 'tv', episode: 78, staffelFolge: [2, 33] },
     { titleId: ID, platform: 'rtlplus', episode: 137, staffelFolge: [4, 1] },
@@ -31,8 +33,8 @@ const GUT: Required<Kulisse> = {
   ],
 }
 
-/** Folgen je Staffel → Wikipedia-Zeilen mit `st` bzw. TOGGO-Einträge. */
-const wikiFolgen = (je: number[]) => je.flatMap((n) => Array.from({ length: n }, (_, i) => ({ st: i + 1 })))
+/** Folgen je Staffel → Wikipedia-Zeilen mit `st` und eindeutigem Folgentitel („Titel <durchlaufende Folge>“) bzw. TOGGO-Einträge. */
+const wikiFolgen = (je: number[]) => je.flatMap((n) => Array.from({ length: n }, (_, i) => ({ st: i + 1 }))).map((f, i) => ({ ...f, dt: `Titel ${i + 1}` }))
 const toggoFolgen = (je: number[]) => je.flatMap((n, s) => Array.from({ length: n }, (_, i) => ({ staffel: s + 1, folge: i + 1 })))
 
 function lauf(k: Kulisse): { status: number | null; aus: string } {
@@ -43,6 +45,7 @@ function lauf(k: Kulisse): { status: number | null; aus: string } {
     mkdirSync(join(wurzel, 'public/data/folgen'), { recursive: true })
     writeFileSync(join(wurzel, 'data/wikipedia-folgen.json'), JSON.stringify({ titel: k.wiki === undefined && 'wiki' in k ? {} : { [ID]: { folgen: wikiFolgen(w.wiki) } } }))
     writeFileSync(join(wurzel, 'data/toggo.json'), JSON.stringify({ titel: { [ID]: { folgen: toggoFolgen(w.toggo) } } }))
+    writeFileSync(join(wurzel, 'data/tv-programm.json'), JSON.stringify({ sendungen: Object.fromEntries(w.sendungen.map((x, i) => [String(i), x])) }))
     writeFileSync(join(wurzel, 'public/data/titles.json'), JSON.stringify(w.titel.map((id) => ({ id }))))
     writeFileSync(join(wurzel, 'public/data/events.json'), JSON.stringify(w.termine))
     if (w.datei) writeFileSync(join(wurzel, `public/data/folgen/${ID}.json`), JSON.stringify(w.datei))
@@ -81,6 +84,10 @@ fall('Kopfzählung fehlt: rot', { kopf: null }, 1, 'Kopfzählung undefined Folge
 fall('Staffel 4 offen, Kopf ohne Kennzeichen („137 von 137“): rot', { kopf: [137, 137] }, 1, 'Kopfzählung ohne Kennzeichen „Staffel offen“')
 fall('staffelFolge passt nicht zur Folge: rot', { termine: [{ titleId: ID, platform: 'tv', episode: 78, staffelFolge: [3, 33] }] }, 1, 'Termin Folge 78: staffelFolge [3,33], die Grenzen sagen [2,33]')
 fall('Fernsehtermin ohne Staffel: Warnzeile, grün', { termine: [...GUT.termine, { titleId: ID, platform: 'tv', episode: 50 }] }, 0, '⚠ WARNUNG Horizonte-Staffeln: Fernsehtermine: 1 ohne Staffel (1 Termine')
+const tv78: Termin = { titleId: ID, platform: 'tv', episode: 78, date: '2026-11-02', time: '16:00', sender: 'Super RTL' }
+const sendung78: Sendung = { titleId: ID, folge: 'Titel 78', sender: 'Super RTL', start: '2026-11-02T16:00:00+01:00' }
+fall('Fernsehtermin ohne Staffel, Folgentitel eindeutig (Verdrahtung fehlt): rot', { termine: [...GUT.termine, tv78], sendungen: [sendung78] }, 1, `FEHLER: ${ID}: 1 Fernsehtermine ohne staffelFolge, obwohl ihr Folgentitel eindeutig`)
+fall('derselbe Termin mit staffelFolge: grün', { termine: [...GUT.termine, { ...tv78, staffelFolge: [2, 33] }], sendungen: [sendung78] }, 0, 'check-horizonte-staffeln-bestand: ok', '⚠ WARNUNG')
 fall('keine Termine gelesen: rot', { termine: [] }, 1, 'FEHLER: 2 Titel, 0 Termine gelesen')
 
 const bestandsliste = readFileSync(join(REPO, 'tools/check-bestand-liste.txt'), 'utf8').split('\n').map((z) => z.trim())

@@ -56,7 +56,23 @@ globalThis.fetch = (async (adresse: unknown) => {
 }) as unknown as typeof fetch
 
 /* Die Reiterzeile misst ihre Breite (ResizeObserver) und rollt den gewählten Reiter in die Mitte (querySelector): im Mini-DOM ohne Wirkung. */
-Object.assign(MiniKnoten.prototype, { querySelector: () => null, querySelectorAll: () => [] })
+/* Tastatur: `querySelectorAll('[role="tab"]')` liefert die echten Reiter, `focus()` merkt sich den Knoten. */
+let fokus: MiniKnoten | undefined
+Object.assign(MiniKnoten.prototype, {
+  querySelector: () => null,
+  querySelectorAll(this: MiniKnoten, wahl: string) {
+    return wahl.includes('role="tab"') ? this.finde((k) => k.getAttribute('role') === 'tab') : []
+  },
+  focus(this: MiniKnoten) {
+    fokus = this
+  },
+})
+/** Ein Tastendruck wie vom Browser auf `ziel` (erst Erfassungs-, dann Blasenhörer am Wurzelknoten). */
+function druecke(wurzel: MiniKnoten, ziel: MiniKnoten, key: string): void {
+  const e = { type: 'keydown', key, target: ziel, bubbles: true, cancelable: true, defaultPrevented: false, timeStamp: 0, preventDefault() {}, stopPropagation() {} }
+  const hoerer = wurzel.hoerer.get('keydown') ?? []
+  for (const capture of [true, false]) hoerer.filter((h) => h.capture === capture).forEach((h) => h.f(e))
+}
 Object.assign(globalThis, { ResizeObserver: class { observe() {} disconnect() {} } })
 
 type Stand = { text: string; reiter: string[]; gewaehlt: string[]; marken: string[]; abschnitt: string }
@@ -65,7 +81,7 @@ type Stand = { text: string; reiter: string[]; gewaehlt: string[]; marken: strin
  * Rendert den Folgenbereich (über `FolgenMitNachlegern`, damit `releases`/`today` durchgereicht werden), klickt optional einen Reiter,
  * dann den Aufklapp-Knopf, und liefert Text, Reiter, gewählte Reiter, Lage-Marken und die Kopfzeile der Abschnittsbox.
  */
-async function bereich(id: number, reiterText?: string, releases: Release[] = [], mehr: { zu?: boolean; laufzeitImKopf?: boolean; danach?: number } = {}): Promise<Stand> {
+async function bereich(id: number, reiterText?: string, releases: Release[] = [], mehr: { zu?: boolean; laufzeitImKopf?: boolean; danach?: number; tasten?: string[] } = {}): Promise<Stand> {
   const dom = installiereMiniDom({ ...attrappeUhr(), matchMedia: () => ({ matches: false, addEventListener() {}, removeEventListener() {} }) }, () => ({ src: '', srcset: '', sizes: '', decode: () => Promise.resolve() }))
   const wurzel = createRoot(dom.wurzel as unknown as Element)
   const zeige = (titleId: number) => act(async () => wurzel.render(h(FolgenMitNachlegern, { titleId, wege: [], antwort: null as never, releases, today: '2026-11-24', laufzeitImKopf: mehr.laufzeitImKopf })))
@@ -76,6 +92,10 @@ async function bereich(id: number, reiterText?: string, releases: Release[] = []
   if (ziel) await act(async () => klicke(dom.wurzel, ziel))
   /* Titelwechsel im selben Panel: die Wahl des vorigen Titels gilt nicht weiter. */
   if (mehr.danach) await zeige(mehr.danach)
+  for (const taste of mehr.tasten ?? []) {
+    const gewaehlter = reiterKnoepfe().find((k) => k.getAttribute('aria-selected') === 'true')!
+    await act(async () => druecke(dom.wurzel, gewaehlter, taste))
+  }
   await act(async () => Promise.resolve())
   const knopf: MiniKnoten | undefined = dom.wurzel.finde((k) => k.tagName === 'BUTTON' && k.getAttribute('aria-expanded') !== null)[0]
   if (knopf && !mehr.zu) await act(async () => klicke(dom.wurzel, knopf))
@@ -115,6 +135,14 @@ const kopfLaufzeit = await bereich(900503, undefined, [], { laufzeitImKopf: true
 pruefe('Laufzeit schon im Kopf: nicht noch einmal in der Box', !kopfLaufzeit.text.includes('Min. je Folge'))
 const zugeklappt = await bereich(900501, '1', [], { zu: true })
 pruefe('zugeklappt: Kopfzeile ja, Folgen nein', zugeklappt.abschnitt.startsWith('Folge 1–45') && !/Folge 45(?!\d)/.test(zugeklappt.text), zugeklappt.text.slice(-120))
+fokus = undefined
+const rechts = await bereich(900501, '2', [], { tasten: ['ArrowRight'] })
+const fokusText = ((fokus as MiniKnoten | undefined)?.textContent ?? '').trim()
+pruefe('Taste → wählt Staffel 3 und setzt den Fokus dorthin', rechts.gewaehlt.join() === '3' && fokusText === '3', [rechts.gewaehlt, fokusText])
+const rundum = await bereich(900501, '1', [], { tasten: ['ArrowLeft', 'ArrowLeft'] })
+pruefe('Taste ← zweimal von Staffel 1: rundum auf Staffel 3', rundum.gewaehlt.join() === '3', rundum.gewaehlt)
+const ende = await bereich(900501, '1', [], { tasten: ['End', 'Enter'] })
+pruefe('Ende wählt die letzte, andere Tasten nichts', ende.gewaehlt.join() === '4', ende.gewaehlt)
 const gewechselt = await bereich(900501, '1', [], { danach: 900503 })
 pruefe('Titelwechsel: Wahl „1“ des vorigen Titels verfällt, Startreiter 2', gewechselt.gewaehlt.join() === '2', gewechselt.gewaehlt)
 const ohne = await bereich(900502)

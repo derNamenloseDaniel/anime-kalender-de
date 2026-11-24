@@ -301,39 +301,29 @@ async function naechsteStaffel(page: Page, bisher: string): Promise<boolean> {
   return false
 }
 
-export async function serieLesenSeitenanzeige(page: Page, url: string): Promise<CrSerie> {
-  const heute = todayIso()
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
+/** Was die Seite als Erstes zeigt: „nicht mehr verfügbar“ (`weg`), Crunchyrolls 404-Seite (`fehlt`) oder die Audio-Zeile (`audio`). */
+interface Seitenbefund {
+  art: string
+  zeile: string
+}
 
-  /**
-   * Erst warten, bis die Audio-Zeile **da** ist — nicht stur 4,5 Sekunden.
-   *
-   * `domcontentloaded` feuert, sobald das erste HTML geparst ist: vor der
-   * Weiterleitung von der alten Slug-Adresse auf `/series/<id>/` und vor dem
-   * Aufbau der Anwendung. Der feste Schlaf danach traf das Ziel oft nicht, und
-   * dann las der Scraper die Zeile der **vorherigen** Seite.
-   *
-   * Die Zahlen dazu, gemessen am Lauf vom 20.08.2026: Über die Slug-Form fand
-   * er auf nur 12 Prozent der Seiten Deutsch, über die `/series/`-Form auf 39
-   * Prozent. Dieselben Seiten, dreifacher Unterschied — der Verdacht kam von
-   * Daniel („wartet der Scraper evtl. die Weiterleitung nicht ab?"), und er
-   * stimmte.
-   */
-  /**
-   * Auf das Erste warten, was die Seite zu sagen hat — Banner oder Audio-Zeile.
-   *
-   * Beides erscheint erst, wenn die Seite fertig gerendert ist; die Seite wird
-   * mit `domcontentloaded` geladen, und zu dem Zeitpunkt steht keines von
-   * beiden da. Ein erster Versuch am 21.08.2026 fragte den Banner direkt nach
-   * dem Laden ab und fand nie einen — der Abruf lief weiter in den
-   * Zwanzig-Sekunden-Ablauf der Audio-Zeile, genau wie vorher. Aufgefallen ist
-   * es nur, weil Daniel fragte, ob der Lauf überhaupt geprüft sei; zu dem
-   * Zeitpunkt arbeitete er bereits seit zwei Stunden an 594 Seiten für nichts.
-   *
-   * Ein einziges Warten auf beide Möglichkeiten ist die Antwort — und nebenbei
-   * schneller als zwei nacheinander.
-   */
-  const befund = await page
+/** Eine Folgenkachel, wie `staffelZaehlen` sie liest. */
+interface Folgenkachel {
+  nummer: string
+  badge: string
+}
+
+/**
+ * Wartet auf das Erste, was die Seite zu sagen hat — Banner oder Audio-Zeile — und gibt `null` zurück, wenn nach 20 Sekunden
+ * keines da ist.
+ *
+ * Nicht stur 4,5 Sekunden schlafen: `domcontentloaded` feuert vor der Weiterleitung von der Slug-Adresse auf `/series/<id>/`, und
+ * der feste Schlaf las oft die Zeile der **vorherigen** Seite (Lauf vom 20.08.2026: 12 Prozent Deutsch über die Slug-Form, 39
+ * Prozent über `/series/`). Ein einziges Warten auf alle Möglichkeiten ist zudem schneller als eines je Möglichkeit; der
+ * erste Versuch (21.08.2026) fragte den Banner direkt nach dem Laden ab, fand nie einen und lief zwei Stunden für nichts.
+ */
+async function warteAufBefund(page: Page): Promise<Seitenbefund | null> {
+  return page
     .waitForFunction(
       () => {
         const text = document.body.innerText
@@ -350,61 +340,48 @@ export async function serieLesenSeitenanzeige(page: Page, url: string): Promise<
       undefined,
       { timeout: 20000 },
     )
-    .then((h) => h.jsonValue() as Promise<{ art: string; zeile: string }>)
+    .then((h) => h.jsonValue() as Promise<Seitenbefund>)
     .catch(() => null)
+}
 
-  /**
-   * Crunchyroll sagt selbst, dass es die Serie nicht mehr gibt.
-   *
-   * Das ist `available: false` und nicht `dub: false`: Es fehlt das Angebot,
-   * nicht die deutsche Fassung (Daniel, 21.08.2026, an „Dragon Ball" gezeigt).
-   */
-  if (befund?.art === 'weg' || befund?.art === 'fehlt') {
-    /**
-     * Zwei Wege, dasselbe Ergebnis — und der Unterschied gehört trotzdem
-     * festgehalten.
-     *
-     * „Leider sind die Videos dieser Serie nicht mehr verfügbar" heißt: Es gab
-     * ein Angebot, es ist weg. „404 - Seite nicht gefunden" heißt: Diese
-     * Adresse führt ins Nichts, meist eine veraltete Slug-Form aus AniList.
-     * Beides ist `available: false`, aber die Notiz sagt, welches von beidem.
-     *
-     * Die 404-Erkennung kam am 21.08.2026 dazu, nachdem der Reparaturlauf mit
-     * 23 Sekunden je Serie hochgerechnet 216 Minuten gebraucht hätte — bei
-     * einem Timeout von 180. Fünf Stichproben zeigten: immer 1.508 Zeichen,
-     * nie eine Audio-Zeile, nie ein Banner. Es waren Fehlerseiten, und die
-     * stehen nach 250 Millisekunden fest.
-     */
-    return { url, quelle: 'seitenanzeige', nichtVerfuegbar: true, geprueftAm: heute, fehler: befund.zeile.trim() }
+/**
+ * Eine Staffel aus ihren Kacheln.
+ *
+ * Je Folgennummer nur einmal zählen: Crunchyroll führt dieselbe Folge mehrfach auf, und der Wähler hat sogar zwei Einträge mit
+ * derselben Staffel. Wer Kacheln zählt statt Folgennummern, holt sich diese Fehler in den eigenen Datensatz — die
+ * Staffelstruktur bleibt unsere, Crunchyroll liefert hier nur die Tonspur. Kacheln ohne erkennbare Nummer (Filme, Specials)
+ * bekommen einen eigenen Schlüssel, damit sie nicht zu einer verschmelzen.
+ */
+function staffelAusKarten(name: string, karten: Folgenkachel[]): CrStaffel {
+  const jeFolge = new Map<string, Tonspur>()
+  karten.forEach((k, i) => {
+    const schluessel = k.nummer || `#${i}`
+    const ton = tonspurAus(k.badge)
+    // Eine deutsche Fassung schlägt eine fremde: Steht dieselbe Folge zweimal
+    // da, einmal mit und einmal ohne Synchro, gibt es sie deutsch.
+    const bisher = jeFolge.get(schluessel)
+    if (bisher === 'deutsch') return
+    if (bisher === 'fremd' && ton === 'keine') return
+    jeFolge.set(schluessel, ton)
+  })
+  const tonspuren = [...jeFolge.values()]
+  return {
+    name,
+    folgen: jeFolge.size,
+    kacheln: karten.length,
+    deutsch: tonspuren.filter((t) => t === 'deutsch').length,
+    fremd: tonspuren.filter((t) => t === 'fremd').length,
   }
+}
 
-  const audio = befund?.art === 'audio' ? befund.zeile : ''
-
-
-  /**
-   * Keine Zeile heißt **nicht gesehen**, nicht „kein Deutsch".
-   *
-   * Hier stand `deutschImAngebot: false` — ein Fehlschlag als Befund, und damit
-   * genau der Fehler, den dieses Projekt an drei anderen Stellen schon einmal
-   * gemacht hat. Daniel am 20.08.2026: „dann mach dass er erst prüft ob er das
-   * Element überhaupt findet, und dann ‚Nicht gefunden' statt ‚nicht auf
-   * deutsch'."
-   */
-  if (!audio) return { url, quelle: 'seitenanzeige', geprueftAm: heute, fehler: 'keine Audio-Zeile gefunden' }
-
-  // Stufe 1 — und für die meisten Seiten schon das Ende.
-  if (!/\bDeutsch\b/.test(audio)) return { url, quelle: 'seitenanzeige', deutschImAngebot: false, geprueftAm: heute }
-
-  /**
-   * Stufe 2: jede Staffel einzeln zählen.
-   *
-   * Nötig, weil die Audio-Zeile schon dasteht, wenn eine **einzige** Folge
-   * deutsch ist. Bei „That Time I Got Reincarnated as a Slime" fehlt den
-   * letzten beiden Folgen der vierten Staffel die deutsche Fassung, und
-   * einzelne Einträge des Wählers — Filme, OVAs — sind gar nicht vertont.
-   * Ohne das Durchblättern würde aus „ein Teil ist
-   * deutsch" ein „alles ist deutsch".
-   */
+/**
+ * Stufe 2: jede Staffel einzeln zählen.
+ *
+ * Nötig, weil die Audio-Zeile schon dasteht, wenn eine **einzige** Folge deutsch ist (bei „Slime" fehlt den letzten beiden
+ * Folgen der vierten Staffel die deutsche Fassung, Filme und OVAs sind gar nicht vertont). Ohne das Durchblättern würde aus
+ * „ein Teil ist deutsch" ein „alles ist deutsch".
+ */
+async function alleStaffelnZaehlen(page: Page): Promise<CrStaffel[]> {
   const staffeln: CrStaffel[] = []
   const gesehen = new Set<string>()
   for (let runde = 0; runde < 20; runde++) {
@@ -412,42 +389,42 @@ export async function serieLesenSeitenanzeige(page: Page, url: string): Promise<
     const { name, karten } = await staffelZaehlen(page)
     if (gesehen.has(name)) break
     gesehen.add(name)
-
-    /**
-     * Je Folgennummer nur einmal zählen.
-     *
-     * Crunchyroll führt dieselbe Folge mehrfach auf, und es gibt sogar zwei
-     * Einträge im Wähler mit derselben Staffel. Wer
-     * Kacheln zählt statt Folgennummern, holt sich diese Fehler in den eigenen
-     * Datensatz — und genau das soll nicht passieren: Die Staffelstruktur
-     * bleibt unsere, Crunchyroll liefert hier nur die Tonspur.
-     *
-     * Kacheln ohne erkennbare Nummer (Filme, Specials) bekommen einen eigenen
-     * Schlüssel, damit sie nicht alle zu einer verschmelzen.
-     */
-    const jeFolge = new Map<string, Tonspur>()
-    karten.forEach((k, i) => {
-      const schluessel = k.nummer || `#${i}`
-      const ton = tonspurAus(k.badge)
-      // Eine deutsche Fassung schlägt eine fremde: Steht dieselbe Folge zweimal
-      // da, einmal mit und einmal ohne Synchro, gibt es sie deutsch.
-      const bisher = jeFolge.get(schluessel)
-      if (bisher === 'deutsch') return
-      if (bisher === 'fremd' && ton === 'keine') return
-      jeFolge.set(schluessel, ton)
-    })
-    const tonspuren = [...jeFolge.values()]
-    staffeln.push({
-      name,
-      folgen: jeFolge.size,
-      kacheln: karten.length,
-      deutsch: tonspuren.filter((t) => t === 'deutsch').length,
-      fremd: tonspuren.filter((t) => t === 'fremd').length,
-    })
+    staffeln.push(staffelAusKarten(name, karten))
     if (!(await naechsteStaffel(page, name))) break
     await page.evaluate(() => window.scrollTo(0, 0))
   }
+  return staffeln
+}
 
+export async function serieLesenSeitenanzeige(page: Page, url: string): Promise<CrSerie> {
+  const heute = todayIso()
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
+  const befund = await warteAufBefund(page)
+
+  /**
+   * Crunchyroll sagt selbst, dass es die Serie nicht mehr gibt (`weg`) oder die Adresse ins Nichts führt (`fehlt`, meist eine
+   * veraltete Slug-Form aus AniList).
+   *
+   * Beides ist `available: false` und nicht `dub: false`: Es fehlt das Angebot, nicht die deutsche Fassung (Daniel, 21.08.2026,
+   * an „Dragon Ball" gezeigt); die Notiz sagt, welches von beidem. Die 404-Erkennung spart Zeit: Fehlerseiten stehen nach 250
+   * Millisekunden fest, ein Reparaturlauf hätte sonst 216 Minuten gebraucht.
+   */
+  if (befund?.art === 'weg' || befund?.art === 'fehlt') {
+    return { url, quelle: 'seitenanzeige', nichtVerfuegbar: true, geprueftAm: heute, fehler: befund.zeile.trim() }
+  }
+
+  const audio = befund?.art === 'audio' ? befund.zeile : ''
+
+  /**
+   * Keine Zeile heißt **nicht gesehen**, nicht „kein Deutsch" — ein Fehlschlag als Befund wäre genau der Fehler, den dieses
+   * Projekt an drei anderen Stellen schon einmal gemacht hat (Daniel, 20.08.2026).
+   */
+  if (!audio) return { url, quelle: 'seitenanzeige', geprueftAm: heute, fehler: 'keine Audio-Zeile gefunden' }
+
+  // Stufe 1 — und für die meisten Seiten schon das Ende.
+  if (!/\bDeutsch\b/.test(audio)) return { url, quelle: 'seitenanzeige', deutschImAngebot: false, geprueftAm: heute }
+
+  const staffeln = await alleStaffelnZaehlen(page)
   return { url, quelle: 'seitenanzeige', deutschImAngebot: true, staffeln, geprueftAm: heute }
 }
 

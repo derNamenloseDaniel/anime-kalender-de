@@ -7,7 +7,7 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { serialize } from 'node:v8'
 import { spawnMitLimit } from './kind-mit-limit.mjs'
-import { hashOrdner, kanon, vergleicheAltNeu, zaehler } from './vergleich-alt-neu.mjs'
+import { hashOrdner, kanonisch, vergleicheAltNeu, zaehler } from './vergleich-alt-neu.mjs'
 
 const werkzeug = fileURLToPath(new URL('./vergleich-alt-neu.mjs', import.meta.url))
 const git = (repo, ...args) => execFileSync('git', ['-C', repo, '-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { timeout: 30_000, stdio: 'pipe' })
@@ -97,7 +97,7 @@ try {
   const cli = (...a) => spawnMitLimit(process.execPath, [werkzeug, ...a], { cwd: repo, encoding: 'utf8' })
   const ok = cli('f.mjs', 'f', 'faelle.mjs', '--ref', 'HEAD', '--zweige', 'ohne,datei')
   assert.equal(ok.status, 0, ok.stdout + ok.stderr)
-  assert.match(ok.stdout, /2 Fälle.*: gleich\n$/)
+  assert.match(ok.stdout, /2 Fälle.*byte-gleich/)
   writeFileSync(join(repo, 'f.mjs'), ALT.replace("e + '!'", "e + '?'"))
   const rot = cli('f.mjs', 'f', 'faelle.mjs', '--ref', 'HEAD')
   assert.equal(rot.status, 1)
@@ -107,7 +107,7 @@ try {
   rmSync(repo, { recursive: true, force: true })
 }
 
-// kanon: V8-serialize unterscheidet dieselbe Zahl je nach interner Darstellung (Smi gegen Double), kanon nicht
+// kanonisch: V8-serialize unterscheidet dieselbe Zahl je nach interner Darstellung (Smi gegen Double), kanonisch nicht
 const doubleArray = [0.5, 2, 3]
 doubleArray[0] = 1
 const dZahl = [1.5, 2.5]
@@ -117,11 +117,11 @@ const schein = [
 ]
 for (const [a, b] of schein) {
   assert.notEqual(serialize(a).toString('hex'), serialize(b).toString('hex'), 'Vorbedingung: serialize sieht hier einen Scheinunterschied')
-  assert.equal(kanon(a), kanon(b))
+  assert.equal(kanonisch(a), kanonisch(b))
 }
-assert.equal(kanon({ a: 1, b: [2] }), kanon(structuredClone({ a: 1, b: [2] })))
+assert.equal(kanonisch({ a: 1, b: [2] }), kanonisch(structuredClone({ a: 1, b: [2] })))
 
-// kanon: echte Unterschiede, je Art mindestens zwei Glieder
+// kanonisch: echte Unterschiede, je Art mindestens zwei Glieder
 const gleicheVerweise = { x: 1 }
 const ersterVerweis = { x: 1 }
 const zweiterVerweis = { x: 1 }
@@ -142,14 +142,16 @@ const ungleich = {
 }
 for (const [art, paare] of Object.entries(ungleich)) {
   assert.ok(paare.length >= 2, `${art}: mindestens zwei Glieder`)
-  for (const [a, b] of paare) assert.notEqual(kanon(a), kanon(b), `${art}: ${String(a)} gegen ${String(b)} muss ungleich bleiben`)
+  for (const [a, b] of paare) assert.notEqual(kanonisch(a), kanonisch(b), `${art}: ${String(a)} gegen ${String(b)} muss ungleich bleiben`)
 }
-assert.equal(kanon(new Map([[1, new Set([2])]])), kanon(new Map([[1, new Set([2])]])), 'Map/Set gleichen Inhalts sind gleich')
-assert.equal(kanon([NaN, -0, new Date(5)]), kanon([NaN, -0, new Date(5)]))
-assert.equal(kanon({ f() {} }), kanon({ f: () => 1 }), 'Funktionen sind eine Marke (argsFabrik)')
-assert.notEqual(kanon(new Error('a')), kanon(new Error('b')))
-assert.notEqual(kanon(1n), kanon(2n))
-assert.throws(() => kanon([Symbol('x')]), /symbol nicht vergleichbar/)
+assert.equal(kanonisch(new Map([[1, new Set([2])]])), kanonisch(new Map([[1, new Set([2])]])), 'Map/Set gleichen Inhalts sind gleich')
+assert.equal(kanonisch([NaN, -0, new Date(5)]), kanonisch([NaN, -0, new Date(5)]))
+assert.equal(kanonisch({ f() {} }), kanonisch({ f: () => 1 }), 'Funktionen sind eine Marke (argsFabrik)')
+assert.notEqual(kanonisch(new Error('a')), kanonisch(new Error('b')))
+assert.notEqual(kanonisch(1n), kanonisch(2n))
+assert.notEqual(kanonisch(1n), kanonisch(1), 'BigInt ≠ Zahl')
+assert.notEqual(kanonisch(2n), kanonisch(2), 'BigInt ≠ Zahl, zweites Glied')
+assert.equal(kanonisch('ö'), kanonisch('ö'), 'Darstellung der Zeichenkette ohne Einfluss')
 
 // Gesamtweg: eine Fassung, die dieselben Zahlen intern anders hält, ist keine Abweichung; eine mit anderem Wert schon
 const repo2 = neuesRepo()

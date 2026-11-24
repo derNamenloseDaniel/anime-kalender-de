@@ -47,9 +47,9 @@ titel:
   - { id: -94107, serie: city--abenteuer-vse107, beleg: 'Name „LEGO City Abenteuer“ = „City - Abenteuer“; die Figur city--abenteuer führt nur sie und „City: Keine Limits“ (Shorts)' }
   - { id: -65858, serie: nexo-knights--die-ritter-der-zukunft, beleg: 'Name gleich bis auf „LEGO“ und „Die Ritter der Zukunft“; die Figur nexo-knights hat nur diese Serie' }
   - { id: -55924, serie: camp-sumpfgrund-vse110, beleg: 'Camp Lakebottom heißt auf Deutsch „Camp Sumpfgrund“; die Figur camp-sumpfgrund-pty50 hat nur diese Serie' }
-  - { id: 2836, serie: wickie-und-die-starken-maenner-vse287, anlegen: true, beleg: 'Name gleich, 78 Folgen bei TOGGO = 78 Folgen des Titels (AniList); nur im Abo (TOGGO-Katalog ohne freies Fenster, Stand 24.11.2026)' }
   - { id: -16673, serie: die-kleine-prinzessin-vse341, anlegen: true, beleg: 'TOGGOs „Die Kleine Prinzessin“ ist die britische „Little Princess“ (Teddy Gisbert, 4 Staffeln; Quelle fernsehserien.de/kleine-prinzessin), also dieser Cartoon, nicht die Anime-Serie „Prinzessin Sara“ (2547)' }
 # Adressen, die zu einem anderen Titel gehören und deshalb vom Titel genommen werden.
 falsch:
+  - { id: 2836, url: 'https://www.toggo.de/wickie-und-die-starken-maenner-pty553/serien/wickie-und-die-starken-maenner-vse287', beleg: 'TOGGOs Wickie (VSE287) ist die CGI-Serie von 2014: 78 Folgen à 12 min (run_length 744 s), 1 Staffel, Originaltitel der ersten Folge „A Wind that’ll tear the horns off a Viking“. Der Titel ist der Anime von 1974 (25 min, 3 Staffeln); beide haben 78 Folgen, die Folgenzahl unterscheidet nichts (de.wikipedia „Wickie und die starken Männer“ 2014 und 1974)' }
   - { id: 2225, url: 'https://www.toggo.de/heidi-pty555/serien/heidi-vse290', beleg: 'TOGGOs „Heidi“ hat 65 Folgen in 2 Staffeln, die Anime-Serie (1974) 52; `fetch-toggo` ordnet sie nur nach dem Namen zu. Den Link trägt der Cartoon „Heidi“ (-62475)' }
   - { id: 2547, url: 'https://www.toggo.de/die-kleine-prinzessin-pty588', beleg: 'Die Figur gehört zur britischen „Little Princess“ (VSE341, Teddy Gisbert), nicht zur Anime-Serie „Die kleine Prinzessin Sara“ (1985); JustWatch hat beide verwechselt' }

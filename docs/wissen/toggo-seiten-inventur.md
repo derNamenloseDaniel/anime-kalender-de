@@ -2,7 +2,7 @@
 
 Quelle der Serienseiten: Katalog der TOGGO-Schnittstelle (`production-n.toggo.de/api/assetstore/vod/asset?filter=type[series]`, 253 Serien, abgerufen 24.11.2026) gegen `public/data/titles.json` (2929 Titel) und `public/data/cartoons.json` (922 Cartoons) von main. Adressen kürzen `…` zu `…`.
 
-## Anime-Titel (`titles.json`): 13 Titel geändert oder ergänzt
+## Anime-Titel (`titles.json`): 12 Titel geändert oder ergänzt
 
 | Kennung | Titel | bisheriger Link | richtiger Link | Beleg |
 |---|---|---|---|---|
@@ -12,7 +12,6 @@ Quelle der Serienseiten: Katalog der TOGGO-Schnittstelle (`production-n.toggo.de
 | 1564 | Pokémon Advanced Generation | (kein Link) | …/pokemon/serien/pokemon-advanced | deutsche Staffel = season_no der TOGGO-Folgen (`data/curated/toggo-seiten.yaml`) |
 | 1565 | Pokémon: Diamant & Perl | (kein Link) | …/pokemon/serien/pokemon-diamond-and-pearl | deutsche Staffel = season_no der TOGGO-Folgen (`data/curated/toggo-seiten.yaml`) |
 | 2547 | Die kleine Prinzessin Sara | …/die-kleine-prinzessin-pty588 | (entfernt) | Link entfernt: Die Figur gehört zur britischen „Little Princess“ (VSE341, Teddy Gisbert), nicht zur Anime-Serie „Die kleine Prinzessin Sara“ (1985); JustWatch hat beide verwechselt |
-| 2836 | Wickie und die starken Männer | (kein Link) | …/wickie-und-die-starken-maenner-pty553/serien/wickie-und-die-starken-maenner-vse287 | Name gleich, 78 Folgen bei TOGGO = 78 Folgen des Titels (AniList); nur im Abo (TOGGO-Katalog ohne freies Fenster, Stand 24.11.2026) |
 | 14093 | Pokémon: Schwarz & Weiß Staffel 2 | (kein Link) | …/pokemon/serien/pokemon-schwarz--weis-rivalen-des-schicksals | deutsche Staffel = season_no der TOGGO-Folgen (`data/curated/toggo-seiten.yaml`) |
 | 17115 | Pokémon: Schwarz & Weiß Staffel 2 - Epis | (kein Link) | …/pokemon/serien/pokemon-schwarz--weis-abenteuer-in-einal | deutsche Staffel = season_no der TOGGO-Folgen (`data/curated/toggo-seiten.yaml`) |
 | 19291 | Pokémon: Die TV-Serie - XY | (kein Link) | …/pokemon/serien/pokemon--die-tv-serie-xy | deutsche Staffel = season_no der TOGGO-Folgen (`data/curated/toggo-seiten.yaml`) |
@@ -128,5 +127,7 @@ Hauptlink eines Titels = erste Zeile seiner Staffeln.
 - Serienseiten (22 Titel, z. B. Naruto, Beyblade X, Boruto, Pokémon Horizonte) und Filme (22 Pokémon-Filme, alle im Filmkatalog der Schnittstelle) zeigten schon auf die richtige Seite und bleiben.
 - Vier Figurenseiten ohne Serie im Katalog bleiben (benannte Ausnahmen `OHNE_SERIE` im Wächter): Trolls - Die Party geht weiter! (-76205), Disney Junior Music Nursery Rhymes (-84387), Die Tom und Jerry Show (-47480), LEGO Ninjago: Meister des Spinjitzu (-38693; 15 Ninjago-Serien, keine trägt den Namen).
 - Heidi (Anime 2225): TOGGOs „Heidi“ hat 65 Folgen in 2 Staffeln, der Anime 52; der Link steht beim Cartoon „Heidi“ (-62475, in der Liste oben).
+- Wickie und die starken Männer (Anime 2836, 1974, 25 min, 3 Staffeln): TOGGOs Wickie (VSE287) ist die CGI-Serie von 2014 (12 min, 1 Staffel, ebenfalls 78 Folgen); kein Link, Adresse unter `falsch`.
+- Zugang: umgeschriebene und schon aufgelöste TOGGO-Links tragen den Zugang der Serie (frei = kostenloses Fenster, das nicht abgelaufen ist, sonst Abo): Anime 481, 482, 2116, 3972, 20464, 20992 von „kostenlos“ auf „abo“, Pokémon 527 von „kauf“ auf „kostenlos“; bei Cartoons 2 von „kostenlos“ auf „abo“.
 - Dragon Ball Daima (170083) trägt zwei Serienlinks (`…/sammlung/alle-formate/serien/…` aus `data/watch-links.yaml`, `…/serien/…-vse446/` vom Sammler); beide sind Serienseiten, die Doppelung bleibt.
 - Bakugan (177166): `VSE273` fehlt in der Serienliste (Folgenabruf 202 ohne Inhalt) — Link bleibt, siehe `docs/wissen/quellen.md`.

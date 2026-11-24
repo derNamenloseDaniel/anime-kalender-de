@@ -18,21 +18,22 @@ const SERIENSEITE = `${B}/spiel-pty900/serien/spiel-vse900`
 
 /** Drei Serien, die richtige in der Mitte; Antworten der Schnittstelle in der Form der echten (`data.items`). */
 const SERIEN = [
-  { id: 'vse899', u_name: 'anderes-vse899', title: 'Ein anderes Spiel', characters: [{ u_name: 'spiel-pty900' }], fvod_latest_end_date: 1 },
-  { id: 'vse900', u_name: 'spiel-vse900', title: 'Das Spiel', characters: [{ u_name: 'spiel-pty900' }], fvod_latest_end_date: 1 },
-  { id: 'vse901', u_name: 'drittes-vse901', title: 'Ein drittes Spiel', characters: [{ u_name: 'dritte-pty901' }], catchup_latest_end_date: 1 },
+  { id: 'vse899', u_name: 'anderes-vse899', title: 'Ein anderes Spiel', characters: [{ u_name: 'spiel-pty900' }], fvod_latest_end_date: 4102444800 },
+  { id: 'vse900', u_name: 'spiel-vse900', title: 'Das Spiel', characters: [{ u_name: 'spiel-pty900' }], fvod_latest_end_date: 4102444800 },
+  { id: 'vse901', u_name: 'drittes-vse901', title: 'Ein drittes Spiel', characters: [{ u_name: 'dritte-pty901' }], catchup_latest_end_date: 4102444800 },
   { id: 'vse902', u_name: 'viertes-vse902', title: 'Ein viertes Spiel', characters: [{ u_name: 'vierte-pty902' }] },
+  { id: 'vse903', u_name: 'fuenftes-vse903', title: 'Ein fuenftes Spiel', characters: [{ u_name: 'fuenfte-pty903' }], fvod_latest_end_date: 1 },
 ]
 const ATTRAPPE = `
 const antwort = (daten, status = 200) => new Response(JSON.stringify(daten), { status })
 globalThis.fetch = async (url) => {
   if (process.env.TOGGO_STOERUNG && String(url).includes('type[series]')) return antwort({}, 500)
   if (String(url).includes('type[series]')) return antwort({ data: { items: ${JSON.stringify(SERIEN)} } })
-  return antwort({ data: { items: [] } })
+  return antwort({ data: { items: [{ episode_no: 1, season_no: 1, run_length: 1200 }, { episode_no: 1, season_no: 2, run_length: 1400 }, { episode_no: 2, season_no: 2, run_length: 1200 }] } })
 }
 `
 
-function lauf(links: string[], stoerung = false, vorher?: object): { status: number | null; toggo: { katalog?: { uname: string; frei: boolean }[]; titel: Record<string, { adresse?: string }> } } {
+function lauf(links: string[], stoerung = false, vorher?: object): { status: number | null; toggo: { katalog?: { uname: string; frei: boolean }[]; masse?: Record<string, { folgen: number; minuten: number; staffeln: number }>; titel: Record<string, { adresse?: string }> } } {
   const wurzel = mkdtempSync(join(tmpdir(), 'toggo-adresse-'))
   try {
     mkdirSync(join(wurzel, 'data'))
@@ -62,8 +63,9 @@ const mitFigur = lauf([FIGUR])
 pruefe('Figurenseite verlinkt: Adresse = Serienseite', mitFigur.toggo.titel['900001']?.adresse === SERIENSEITE, mitFigur.toggo)
 const mitSerie = lauf([SERIENSEITE])
 pruefe('Serienseite schon verlinkt (der Tag danach): Adresse bleibt', mitSerie.toggo.titel['900001']?.adresse === SERIENSEITE, mitSerie.toggo)
-pruefe('Katalog abgelegt, alle vier Serien', mitSerie.toggo.katalog?.map((s) => s.uname).join(',') === 'anderes-vse899,spiel-vse900,drittes-vse901,viertes-vse902', mitSerie.toggo.katalog)
-pruefe('frei = kostenloses Fenster (fvod oder catchup), sonst nicht', mitSerie.toggo.katalog?.map((s) => s.frei).join(',') === 'true,true,true,false', mitSerie.toggo.katalog)
+pruefe('Katalog abgelegt, alle fünf Serien', mitSerie.toggo.katalog?.map((s) => s.uname).join(',') === 'anderes-vse899,spiel-vse900,drittes-vse901,viertes-vse902,fuenftes-vse903', mitSerie.toggo.katalog)
+pruefe('frei = kostenloses Fenster (fvod oder catchup), das noch läuft; abgelaufen oder keins: nicht', mitSerie.toggo.katalog?.map((s) => s.frei).join(',') === 'true,true,true,false,false', mitSerie.toggo.katalog)
+pruefe('Maße der Serie aus ihren Folgen: 3 Folgen, 20 min (Median), 2 Staffeln', JSON.stringify(mitSerie.toggo.masse?.VSE900) === '{"folgen":3,"minuten":20,"staffeln":2}', mitSerie.toggo.masse)
 const gestern = { geholtAm: '2026-11-23T00:00:00Z', katalog: [{ id: 'VSE1', uname: 'alt-vse1', titel: 'Alt', figuren: [], frei: false }], titel: { 900001: { serie: 'VSE900', adresse: SERIENSEITE, folgen: [] } } }
 const gestoert = lauf([SERIENSEITE], true, gestern)
 pruefe('Störung der Serienliste: Katalog von gestern bleibt', gestoert.status === 0 && gestoert.toggo.katalog?.[0]?.uname === 'alt-vse1', gestoert.toggo.katalog)

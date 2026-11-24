@@ -10,7 +10,7 @@ import type { Title } from '../shared/types.ts'
 import { bestandWarnzeile } from './lib/bestand-warnzeile.ts'
 import { melde } from './lib/quarantaene.ts'
 import { ladeToggoSeiten, loeseToggoSeiten } from './bau/13-1-toggo-seiten.ts'
-import { istToggoAdresse } from './lib/toggo-seiten.ts'
+import { istToggoAdresse, laufzeitPasst, pokemonSeiten, serienName, type SerienMasse } from './lib/toggo-seiten.ts'
 
 /** Figurenseiten, zu denen TOGGO keine Serie führt (Katalog-Stand 24.11.2026): bleiben, wie sie sind. */
 export const OHNE_SERIE: Record<number, string> = {
@@ -19,10 +19,7 @@ export const OHNE_SERIE: Record<number, string> = {
   [-47480]: 'Die Tom und Jerry Show: die Figur „tom-und-jerry“ hat keine Serie im Katalog',
   [-38693]: 'LEGO Ninjago: Meister des Spinjitzu: 15 Ninjago-Serien, keine trägt den Namen des Titels (Sammeltitel über viele Staffeln)',
 }
-/** Titel, die `data/toggo.json` einer Serie zuordnet, ohne dass sie dazugehören. */
-export const OHNE_LINK: Record<number, string> = {
-  2225: 'Heidi (Anime, 52 Folgen) ≠ TOGGOs „Heidi“ (65 Folgen in 2 Staffeln); der Link steht beim Cartoon -62475',
-}
+/* Titel ohne Link, die `data/toggo.json` einer Serie zuordnet, stehen mit Beleg unter `falsch` in `data/curated/toggo-seiten.yaml`. */
 
 const lies = <T>(pfad: string): T | undefined => (existsSync(pfad) ? (JSON.parse(readFileSync(pfad, 'utf8')) as T) : undefined)
 const alsListe = (d: unknown): Title[] => (Array.isArray(d) ? d : ((d as { titles?: Title[] } | undefined)?.titles ?? [])) as Title[]
@@ -32,20 +29,36 @@ const anime = alsListe(lies('public/data/titles.json'))
 const cartoons = alsListe(lies('public/data/cartoons.json'))
 const daten = ladeToggoSeiten()
 const stand = lies<{ falsch: number; fehlend: number }>('tools/toggo-seiten-stand.json') ?? { falsch: 0, fehlend: 0 }
-const toggoTitel = Object.keys(lies<{ titel?: Record<string, unknown> }>('data/toggo.json')?.titel ?? {}).map(Number)
+const toggoDatei = lies<{ titel?: Record<string, unknown>; masse?: Record<string, SerienMasse> }>('data/toggo.json')
+const toggoTitel = Object.keys(toggoDatei?.titel ?? {}).map(Number)
+const OHNE_LINK = new Set(daten.hand.falsch.map((f) => f.id))
+/** Adresse und Zugang jedes TOGGO-Wegs: beides soll der Bau schon richtig geliefert haben. */
+const wegeStand = (t: Title): string => JSON.stringify((t.watchLinks ?? []).filter((w) => istToggoAdresse(w.url)).map((w) => [w.url, w.zugang]))
 
-const vorher = new Map([...anime, ...cartoons].map((t) => [t.id, JSON.stringify(toggoUrls(t))]))
+const vorher = new Map([...anime, ...cartoons].map((t) => [t.id, wegeStand(t)]))
 const kopieAnime = structuredClone(anime)
 const kopieCartoons = structuredClone(cartoons)
 const offen = [...loeseToggoSeiten(kopieAnime, daten, false).offen, ...loeseToggoSeiten(kopieCartoons, daten, true).offen]
 const nachher = [...kopieAnime, ...kopieCartoons]
-const abweichend = nachher.filter((t) => vorher.get(t.id) !== JSON.stringify(toggoUrls(t)))
+const abweichend = nachher.filter((t) => vorher.get(t.id) !== wegeStand(t))
 /* Falsch: ein bestehender Link, den der Bau ändert. Fehlend: ein Titel ohne Link; „fest“ sind die Pokémon-Staffeln und die Handliste, die der Katalog nicht kippt. */
 const falsch = abweichend.filter((t) => vorher.get(t.id) !== '[]')
 const fehlend = abweichend.filter((t) => vorher.get(t.id) === '[]')
 const fest = new Set([...daten.staffeln.keys(), ...daten.hand.titel.filter((h) => h.anlegen).map((h) => h.id)])
-const festFehlend = fehlend.filter((t) => fest.has(t.id))
+/* `tg`: die Detaildatei jedes Pokémon-Titels führt die Staffelseiten, je Staffel mit Serie eine. */
+const ohneTg = anime.filter((t) => {
+  const soll = pokemonSeiten(t.id, daten.staffeln.get(t.id) ?? [], daten.katalog, daten.hand.pokemon).length
+  const datei = soll ? lies<{ tg?: unknown[] }>(`public/data/folgen/${t.id}.json`) : undefined
+  return datei !== undefined && (datei.tg?.length ?? 0) !== soll
+})
+const festFehlend = [...fehlend.filter((t) => fest.has(t.id)), ...ohneTg.filter((t) => !fehlend.some((f) => f.id === t.id))]
 const katalogFehlend = fehlend.filter((t) => !fest.has(t.id))
+/* Laufzeit und Folgen: Titel mit TOGGO-Serienlink gegen die Maße der Serie (Kennung der Serie über den Katalog), unabhängig von `loeseToggoSeiten`. */
+const serienIds = new Map(daten.katalog.map((s) => [s.uname, s.id]))
+const unpassend = anime.filter((t) => {
+  const masse = (t.watchLinks ?? []).map((w) => toggoDatei?.masse?.[serienIds.get(serienName(w.url) ?? '') ?? '']).find(Boolean)
+  return masse !== undefined && !laufzeitPasst(t.runtimeMin, masse.minuten)
+})
 
 let fehler = 0
 const rot = (text: string) => {
@@ -64,11 +77,15 @@ if (festFehlend.length > stand.fehlend) {
   markiere(festFehlend, 'TOGGO-Link fehlt')
   rot(`${festFehlend.length} Pokémon-Staffeltitel oder Handeinträge ohne TOGGO-Link, Stand ${stand.fehlend}, nur sinken: ${ids(festFehlend).join(', ')}`)
 }
+if (unpassend.length) {
+  markiere(unpassend, 'TOGGO-Serie hat eine andere Laufzeit als der Titel')
+  rot(`${unpassend.length} Titel mit einer TOGGO-Serie anderer Laufzeit (Faktor außerhalb 0,6 bis 1,65), Fehlzuordnung (unter „falsch“ in data/curated/toggo-seiten.yaml eintragen): ${ids(unpassend).join(', ')}`)
+}
 /* Katalog und Namen verschieben sich von selbst (neue Serie bei TOGGO): nur Warnung, sonst stünde jeder Sammler-Pull-Request still. */
 if (katalogFehlend.length) console.log(bestandWarnzeile('TOGGO-Seiten', 'Titel ohne TOGGO-Link, den der Bau nach dem Katalog anlegt', ids(katalogFehlend)))
 const ohneSerie = offen.map((o) => Number(o.split(' ')[0])).filter((id) => !OHNE_SERIE[id])
 if (ohneSerie.length) console.log(bestandWarnzeile('TOGGO-Seiten', 'Figurenseiten ohne Serie im Katalog (nicht in OHNE_SERIE)', ohneSerie))
-const ohneLink = toggoTitel.filter((id) => !OHNE_LINK[id] && nachher.some((t) => t.id === id && !toggoUrls(t).length))
+const ohneLink = toggoTitel.filter((id) => !OHNE_LINK.has(id) &&nachher.some((t) => t.id === id && !toggoUrls(t).length))
 if (ohneLink.length) console.log(bestandWarnzeile('TOGGO-Seiten', 'Titel, die TOGGO führt (data/toggo.json), ohne TOGGO-Link', ohneLink))
 console.log(`TOGGO-Seiten: ${anime.length} Titel und ${cartoons.length} Cartoons, Katalog ${daten.katalog.length} Serien, falsch ${falsch.length} (Stand ${stand.falsch}), fest fehlend ${festFehlend.length} (Stand ${stand.fehlend}), Katalog fehlend ${katalogFehlend.length}, ohne Serie ${offen.length}`)
 process.exit(fehler ? 1 : 0)

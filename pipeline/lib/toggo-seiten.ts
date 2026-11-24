@@ -7,7 +7,38 @@
  * die Dateien (`pipeline/bau/13-1-toggo-seiten.ts`).
  */
 import { namensKern } from '../fetch-tv-programm.ts'
+import { toIsoDate } from '../../shared/time.ts'
 import { serienAdresse, type ToggoSerie } from './toggo-serien.ts'
+
+/**
+ * Frei = mindestens ein kostenloses Fenster (`fvod_*`, `catchup_*`), das am Berliner Datum `heute` noch nicht zu Ende ist;
+ * `enden` sind Unix-Sekunden, `null`/fehlend = kein Fenster.
+ */
+export const istFrei = (enden: (number | null | undefined)[], heute: string): boolean =>
+  enden.some((ende) => Boolean(ende) && toIsoDate(new Date(ende! * 1000)) >= heute)
+
+/** Maße einer Serie aus ihren Folgen (`fetch-toggo.ts`): Folgenzahl, mittlere Länge in Minuten, Staffelzahl. */
+export type SerienMasse = { folgen: number; minuten: number; staffeln: number }
+
+/** Folgenzahl, mittlere Länge (Median von `run_length`, Sekunden → Minuten) und Staffelzahl aus den Folgen einer Serie. */
+export function serienMasse(folgen: { season_no?: number; run_length?: number }[]): SerienMasse {
+  const laengen = folgen.map((f) => f.run_length ?? 0).filter((l) => l > 0).sort((a, b) => a - b)
+  const mitte = laengen[Math.floor(laengen.length / 2)] ?? 0
+  return { folgen: folgen.length, minuten: Math.round(mitte / 60), staffeln: new Set(folgen.map((f) => f.season_no ?? 1)).size }
+}
+
+/**
+ * Passt die Laufzeit der TOGGO-Serie zu der des Titels (Faktor 0,6 bis 1,65)? Fehlt eine Seite, gilt es als passend (nicht beurteilbar).
+ * Anlass: Wickie 1974 (25 min) gegen TOGGOs CGI-Serie von 2014 (12 min), beide mit 78 Folgen.
+ */
+export const laufzeitPasst = (titelMinuten: number | undefined, serieMinuten: number | undefined): boolean => {
+  if (!titelMinuten || !serieMinuten) return true
+  const faktor = serieMinuten / titelMinuten
+  return faktor >= 0.6 && faktor <= 1.65
+}
+
+/** Der Name der Serienseite am Ende einer Adresse (`…/serien/<name>`), sonst nichts. */
+export const serienName = (url: string): string | undefined => /\/serien\/([^/?#]+)/.exec(url)?.[1]
 
 /** `frei`: die Serie hat ein kostenloses Fenster (`fvod_*` oder `catchup_*`); sonst gibt es sie nur im Abo. */
 export type KatalogSerie = ToggoSerie & { frei: boolean }
@@ -44,6 +75,9 @@ export const istToggoAdresse = (url: string): boolean => /^https?:\/\/(?:www\.)?
 /** Das einzelne Segment einer Figurenseite (`pokemon`, `yu-gi-oh-pty647`), sonst nichts. */
 export const figurSegment = (url: string): string | undefined =>
   toggoAdressArt(url) === 'figur' ? /^https?:\/\/(?:www\.)?toggo\.de\/([^/?#]+)/i.exec(url)?.[1]?.toLowerCase() : undefined
+
+/** `kostenlos`, wenn die Serie ein freies Fenster hat, sonst `abo`: ein umgeschriebener Link bekommt den Zugang der Serie, nicht den aus JustWatch. */
+export const zugangDerSerie = (s: KatalogSerie): 'kostenlos' | 'abo' => (s.frei ? 'kostenlos' : 'abo')
 
 export const katalogAdresse = (s: KatalogSerie, figur?: string): string => serienAdresse(figur && s.figuren.includes(figur) ? figur : s.figuren[0], s)
 

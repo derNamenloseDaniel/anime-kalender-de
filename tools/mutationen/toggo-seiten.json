@@ -1,75 +1,763 @@
 [
-  { "name": "Kontrolle (unmutiert)", "aenderungen": [], "tests": ["npx tsx pipeline/check-toggo-seiten.ts"] },
-  { "name": "toggoAdressArt: einzelnes Segment zählt nicht als Figurenseite", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "return teile.length === 1 ? 'figur' : 'andere'", "ersetze": "return 'andere'" }] },
-  { "name": "toggoAdressArt: „serien“ ohne Namen danach gilt als Serienseite", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "return i >= 0 && Boolean(teile[i + 1])", "ersetze": "return i >= 0" }] },
-  { "name": "katalogAdresse: immer die erste Figur", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "serienAdresse(figur && s.figuren.includes(figur) ? figur : s.figuren[0], s)", "ersetze": "serienAdresse(s.figuren[0], s)" }] },
-  { "name": "katalogAdresse: jede Figur des Links gilt", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "serienAdresse(figur && s.figuren.includes(figur) ? figur : s.figuren[0], s)", "ersetze": "serienAdresse(figur ?? s.figuren[0], s)" }] },
-  { "name": "serieFuerFigurLink: Handeintrag zählt nicht", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "if (von) return nachUname(katalog, von.serie)", "ersetze": "if (false && von) return nachUname(katalog, von.serie)" }] },
-  { "name": "serieFuerFigurLink: Name zählt nicht (jede Serie der Figur)", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "s.figuren.includes(figur) && kerne.has(serienKern(s.titel))", "ersetze": "s.figuren.includes(figur)" }] },
-  { "name": "serieFuerFigurLink: Figur zählt nicht", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "s.figuren.includes(figur) && kerne.has(serienKern(s.titel))", "ersetze": "kerne.has(serienKern(s.titel))" }] },
-  { "name": "serieFuerFigurLink: erster von mehreren Treffern", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "return treffer.length === 1 ? treffer[0] : undefined", "ersetze": "return treffer[0]" }] },
-  { "name": "serienKern: „Die Serie“ bleibt am Namen", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "namensKern(n).replace(/ die serie$/, '')", "ersetze": "namensKern(n)" }] },
-  { "name": "serienFuerTitelOhneWeg: Handeintrag ohne „anlegen“ gilt", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "const s = h.anlegen && ohneWeg.has(h.id)", "ersetze": "const s = ohneWeg.has(h.id)" }] },
-  { "name": "serienFuerTitelOhneWeg: Handeintrag auch für Titel mit Weg", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "const s = h.anlegen && ohneWeg.has(h.id)", "ersetze": "const s = h.anlegen" }] },
-  { "name": "serienFuerTitelOhneWeg: automatisch auch ohne Schalter", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "if (!automatisch) return aus", "ersetze": "" }] },
-  { "name": "serienFuerTitelOhneWeg: zwei Titel gleichen Namens genügen", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "if (ids.length === 1 && serienGleichenNamens === 1", "ersetze": "if (ids.length >= 1 && serienGleichenNamens === 1" }] },
-  { "name": "serienFuerTitelOhneWeg: zwei gleich heißende Serien genügen", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "serienGleichenNamens === 1 && ohneWeg", "ersetze": "serienGleichenNamens >= 1 && ohneWeg" }] },
-  { "name": "serienFuerTitelOhneWeg: auch Titel mit Weg bekommen eine Serie", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "&& ohneWeg.has(ids[0]!) && !aus.has", "ersetze": "&& !aus.has" }] },
-  { "name": "pokemonSeiten: Titelliste der Staffel zählt nicht", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "if (h.staffel !== nr || (h.titel && !h.titel.includes(id))) continue", "ersetze": "if (h.staffel !== nr) continue" }] },
-  { "name": "pokemonSeiten: Titelliste gilt umgekehrt", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/lib/toggo-seiten.ts", "suche": "(h.titel && !h.titel.includes(id))", "ersetze": "(h.titel && h.titel.includes(id))" }] },
-  { "name": "loeseToggoSeiten: falsche Adresse bleibt", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/bau/13-1-toggo-seiten.ts", "suche": "t.watchLinks.filter((w) => !falsch.includes(w.url))", "ersetze": "t.watchLinks.filter(() => true)" }] },
-  { "name": "loeseToggoSeiten: Serienseite der falschen Staffel bleibt", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/bau/13-1-toggo-seiten.ts", "suche": "['figur', 'andere', 'serie'].includes", "ersetze": "['figur', 'andere'].includes" }] },
-  { "name": "loeseToggoSeiten: Figurenseite wird nicht gelöst", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/bau/13-1-toggo-seiten.ts", "suche": "['figur', 'andere', 'serie'].includes", "ersetze": "['andere', 'serie'].includes" }] },
-  { "name": "loeseToggoSeiten: neuer Weg auch ohne freies Fenster", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/bau/13-1-toggo-seiten.ts", "suche": "if (!wege.length && erste.frei)", "ersetze": "if (!wege.length)" }] },
-  { "name": "loeseToggoSeiten: neuer Weg auch bei vorhandenem Weg", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/bau/13-1-toggo-seiten.ts", "suche": "if (!wege.length && erste.frei)", "ersetze": "if (erste.frei)" }] },
-  { "name": "loeseToggoSeiten: auch Serienseiten gehen durch die Figurenauflösung", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/bau/13-1-toggo-seiten.ts", "suche": "if (toggoAdressArt(w.url) !== 'figur') continue", "ersetze": "" }] },
-  { "name": "loeseToggoSeiten: Zähler ersetzt zählt jede Adresse", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/bau/13-1-toggo-seiten.ts", "suche": "if (w.url !== url) aus.ersetzt++", "ersetze": "aus.ersetzt++" }] },
-  { "name": "neuerWeg: immer kostenlos", "tests": ["npx tsx pipeline/check-toggo-seiten.ts"],
-    "aenderungen": [{ "datei": "pipeline/bau/13-1-toggo-seiten.ts", "suche": "zugang: frei ? 'kostenlos' : 'abo'", "ersetze": "zugang: 'kostenlos'" }] },
-  { "name": "fetch-toggo: Adresse nur bei aufgelöster Figurenseite (alter Fehler)", "tests": ["npx tsx pipeline/check-toggo-adresse-stabil.ts"],
-    "aenderungen": [{ "datei": "pipeline/fetch-toggo.ts", "suche": "if (bekannt) adressen.set(t.id, katalogAdresse(bekannt, figur))", "ersetze": "if (bekannt && figur) adressen.set(t.id, katalogAdresse(bekannt, figur))" }] },
-  { "name": "fetch-toggo: Katalog von gestern bleibt nicht", "tests": ["npx tsx pipeline/check-toggo-adresse-stabil.ts"],
-    "aenderungen": [{ "datei": "pipeline/fetch-toggo.ts", "suche": "katalog: serien.length ? serien : gestern.katalog", "ersetze": "katalog: serien" }] },
-  { "name": "fetch-toggo: Adresse von gestern bleibt nicht", "tests": ["npx tsx pipeline/check-toggo-adresse-stabil.ts"],
-    "aenderungen": [{ "datei": "pipeline/fetch-toggo.ts", "suche": "adressen.get(id) ?? gestern.titel[String(id)]?.adresse", "ersetze": "adressen.get(id)" }] },
-  { "name": "fetch-toggo: frei nur aus fvod", "tests": ["npx tsx pipeline/check-toggo-adresse-stabil.ts"],
-    "aenderungen": [{ "datei": "pipeline/fetch-toggo.ts", "suche": "Boolean(s.fvod_latest_end_date || s.catchup_latest_end_date)", "ersetze": "Boolean(s.fvod_latest_end_date)" }] },
-  { "name": "fetch-toggo: frei nur aus catchup", "tests": ["npx tsx pipeline/check-toggo-adresse-stabil.ts"],
-    "aenderungen": [{ "datei": "pipeline/fetch-toggo.ts", "suche": "Boolean(s.fvod_latest_end_date || s.catchup_latest_end_date)", "ersetze": "Boolean(s.catchup_latest_end_date)" }] },
-  { "name": "Bestand: Ratsche falsch auch bei Gleichstand rot", "tests": ["npx tsx pipeline/check-toggo-seiten-bestand-lauf.ts"],
-    "aenderungen": [{ "datei": "pipeline/check-toggo-seiten-bestand.ts", "suche": "if (falsch.length > stand.falsch)", "ersetze": "if (falsch.length >= stand.falsch)" }] },
-  { "name": "Bestand: Ratsche falsch nie rot", "tests": ["npx tsx pipeline/check-toggo-seiten-bestand-lauf.ts"],
-    "aenderungen": [{ "datei": "pipeline/check-toggo-seiten-bestand.ts", "suche": "if (falsch.length > stand.falsch)", "ersetze": "if (falsch.length > 1000)" }] },
-  { "name": "Bestand: fehlende Pokémon-Titel nie rot", "tests": ["npx tsx pipeline/check-toggo-seiten-bestand-lauf.ts"],
-    "aenderungen": [{ "datei": "pipeline/check-toggo-seiten-bestand.ts", "suche": "if (festFehlend.length > stand.fehlend)", "ersetze": "if (festFehlend.length > 1000)" }] },
-  { "name": "Bestand: fehlende Titel zählen schon bei Gleichstand", "tests": ["npx tsx pipeline/check-toggo-seiten-bestand-lauf.ts"],
-    "aenderungen": [{ "datei": "pipeline/check-toggo-seiten-bestand.ts", "suche": "if (festFehlend.length > stand.fehlend)", "ersetze": "if (festFehlend.length >= stand.fehlend)" }] },
-  { "name": "Bestand: Katalog-Untergrenze zu hoch", "tests": ["npx tsx pipeline/check-toggo-seiten-bestand-lauf.ts"],
-    "aenderungen": [{ "datei": "pipeline/check-toggo-seiten-bestand.ts", "suche": "daten.katalog.length < 100", "ersetze": "daten.katalog.length < 200" }] },
-  { "name": "Bestand: leerer Katalog nicht rot", "tests": ["npx tsx pipeline/check-toggo-seiten-bestand-lauf.ts"],
-    "aenderungen": [{ "datei": "pipeline/check-toggo-seiten-bestand.ts", "suche": "daten.katalog.length < 100", "ersetze": "daten.katalog.length < 0" }] }
+ {
+  "name": "Kontrolle (unmutiert)",
+  "aenderungen": [],
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ]
+ },
+ {
+  "name": "toggoAdressArt: einzelnes Segment zählt nicht als Figurenseite",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "return teile.length === 1 ? 'figur' : 'andere'",
+    "ersetze": "return 'andere'"
+   }
+  ]
+ },
+ {
+  "name": "toggoAdressArt: „serien“ ohne Namen danach gilt als Serienseite",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "return i >= 0 && Boolean(teile[i + 1])",
+    "ersetze": "return i >= 0"
+   }
+  ]
+ },
+ {
+  "name": "katalogAdresse: immer die erste Figur",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "serienAdresse(figur && s.figuren.includes(figur) ? figur : s.figuren[0], s)",
+    "ersetze": "serienAdresse(s.figuren[0], s)"
+   }
+  ]
+ },
+ {
+  "name": "katalogAdresse: jede Figur des Links gilt",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "serienAdresse(figur && s.figuren.includes(figur) ? figur : s.figuren[0], s)",
+    "ersetze": "serienAdresse(figur ?? s.figuren[0], s)"
+   }
+  ]
+ },
+ {
+  "name": "serieFuerFigurLink: Handeintrag zählt nicht",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "if (von) return nachUname(katalog, von.serie)",
+    "ersetze": "if (false && von) return nachUname(katalog, von.serie)"
+   }
+  ]
+ },
+ {
+  "name": "serieFuerFigurLink: Name zählt nicht (jede Serie der Figur)",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "s.figuren.includes(figur) && kerne.has(serienKern(s.titel))",
+    "ersetze": "s.figuren.includes(figur)"
+   }
+  ]
+ },
+ {
+  "name": "serieFuerFigurLink: Figur zählt nicht",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "s.figuren.includes(figur) && kerne.has(serienKern(s.titel))",
+    "ersetze": "kerne.has(serienKern(s.titel))"
+   }
+  ]
+ },
+ {
+  "name": "serieFuerFigurLink: erster von mehreren Treffern",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "return treffer.length === 1 ? treffer[0] : undefined",
+    "ersetze": "return treffer[0]"
+   }
+  ]
+ },
+ {
+  "name": "serienKern: „Die Serie“ bleibt am Namen",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "namensKern(n).replace(/ die serie$/, '')",
+    "ersetze": "namensKern(n)"
+   }
+  ]
+ },
+ {
+  "name": "serienFuerTitelOhneWeg: Handeintrag ohne „anlegen“ gilt",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "const s = h.anlegen && ohneWeg.has(h.id)",
+    "ersetze": "const s = ohneWeg.has(h.id)"
+   }
+  ]
+ },
+ {
+  "name": "serienFuerTitelOhneWeg: Handeintrag auch für Titel mit Weg",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "const s = h.anlegen && ohneWeg.has(h.id)",
+    "ersetze": "const s = h.anlegen"
+   }
+  ]
+ },
+ {
+  "name": "serienFuerTitelOhneWeg: automatisch auch ohne Schalter",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "if (!automatisch) return aus",
+    "ersetze": ""
+   }
+  ]
+ },
+ {
+  "name": "serienFuerTitelOhneWeg: zwei Titel gleichen Namens genügen",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "if (ids.length === 1 && serienGleichenNamens === 1",
+    "ersetze": "if (ids.length >= 1 && serienGleichenNamens === 1"
+   }
+  ]
+ },
+ {
+  "name": "serienFuerTitelOhneWeg: zwei gleich heißende Serien genügen",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "serienGleichenNamens === 1 && ohneWeg",
+    "ersetze": "serienGleichenNamens >= 1 && ohneWeg"
+   }
+  ]
+ },
+ {
+  "name": "serienFuerTitelOhneWeg: auch Titel mit Weg bekommen eine Serie",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "&& ohneWeg.has(ids[0]!) && !aus.has",
+    "ersetze": "&& !aus.has"
+   }
+  ]
+ },
+ {
+  "name": "pokemonSeiten: Titelliste der Staffel zählt nicht",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "if (h.staffel !== nr || (h.titel && !h.titel.includes(id))) continue",
+    "ersetze": "if (h.staffel !== nr) continue"
+   }
+  ]
+ },
+ {
+  "name": "pokemonSeiten: Titelliste gilt umgekehrt",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "(h.titel && !h.titel.includes(id))",
+    "ersetze": "(h.titel && h.titel.includes(id))"
+   }
+  ]
+ },
+ {
+  "name": "loeseToggoSeiten: falsche Adresse bleibt",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/13-1-toggo-seiten.ts",
+    "suche": "t.watchLinks.filter((w) => !falsch.includes(serienName(w.url) ?? w.url))",
+    "ersetze": "t.watchLinks.filter(() => true)"
+   }
+  ]
+ },
+ {
+  "name": "loeseToggoSeiten: Serienseite der falschen Staffel bleibt",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/13-1-toggo-seiten.ts",
+    "suche": "['figur', 'andere', 'serie'].includes",
+    "ersetze": "['figur', 'andere'].includes"
+   }
+  ]
+ },
+ {
+  "name": "loeseToggoSeiten: Figurenseite wird nicht gelöst",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/13-1-toggo-seiten.ts",
+    "suche": "['figur', 'andere', 'serie'].includes",
+    "ersetze": "['andere', 'serie'].includes"
+   }
+  ]
+ },
+ {
+  "name": "loeseToggoSeiten: neuer Weg auch ohne freies Fenster",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/13-1-toggo-seiten.ts",
+    "suche": "if (!wege.length && erste.frei)",
+    "ersetze": "if (!wege.length)"
+   }
+  ]
+ },
+ {
+  "name": "loeseToggoSeiten: neuer Weg auch bei vorhandenem Weg",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/13-1-toggo-seiten.ts",
+    "suche": "if (!wege.length && erste.frei)",
+    "ersetze": "if (erste.frei)"
+   }
+  ]
+ },
+ {
+  "name": "loeseToggoSeiten: auch Serienseiten gehen durch die Figurenauflösung",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/13-1-toggo-seiten.ts",
+    "suche": "if (toggoAdressArt(w.url) !== 'figur') continue",
+    "ersetze": ""
+   }
+  ]
+ },
+ {
+  "name": "loeseToggoSeiten: Zähler ersetzt zählt jede Adresse",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/13-1-toggo-seiten.ts",
+    "suche": "if (w.url !== url) aus.ersetzt++",
+    "ersetze": "aus.ersetzt++"
+   }
+  ]
+ },
+ {
+  "name": "neuerWeg: immer kostenlos",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/13-1-toggo-seiten.ts",
+    "suche": "zugang: frei ? 'kostenlos' : 'abo'",
+    "ersetze": "zugang: 'kostenlos'"
+   }
+  ]
+ },
+ {
+  "name": "fetch-toggo: Adresse nur bei aufgelöster Figurenseite (alter Fehler)",
+  "tests": [
+   "npx tsx pipeline/check-toggo-adresse-stabil.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/fetch-toggo.ts",
+    "suche": "if (bekannt) adressen.set(t.id, katalogAdresse(bekannt, figur))",
+    "ersetze": "if (bekannt && figur) adressen.set(t.id, katalogAdresse(bekannt, figur))"
+   }
+  ]
+ },
+ {
+  "name": "fetch-toggo: Katalog von gestern bleibt nicht",
+  "tests": [
+   "npx tsx pipeline/check-toggo-adresse-stabil.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/fetch-toggo.ts",
+    "suche": "katalog: serien.length ? serien : gestern.katalog",
+    "ersetze": "katalog: serien"
+   }
+  ]
+ },
+ {
+  "name": "fetch-toggo: Adresse von gestern bleibt nicht",
+  "tests": [
+   "npx tsx pipeline/check-toggo-adresse-stabil.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/fetch-toggo.ts",
+    "suche": "adressen.get(id) ?? gestern.titel[String(id)]?.adresse",
+    "ersetze": "adressen.get(id)"
+   }
+  ]
+ },
+ {
+  "name": "fetch-toggo: frei nur aus fvod",
+  "tests": [
+   "npx tsx pipeline/check-toggo-adresse-stabil.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/fetch-toggo.ts",
+    "suche": "istFrei([s.fvod_latest_end_date, s.catchup_latest_end_date], todayIso())",
+    "ersetze": "istFrei([s.fvod_latest_end_date], todayIso())"
+   }
+  ]
+ },
+ {
+  "name": "fetch-toggo: frei nur aus catchup",
+  "tests": [
+   "npx tsx pipeline/check-toggo-adresse-stabil.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/fetch-toggo.ts",
+    "suche": "istFrei([s.fvod_latest_end_date, s.catchup_latest_end_date], todayIso())",
+    "ersetze": "istFrei([s.catchup_latest_end_date], todayIso())"
+   }
+  ]
+ },
+ {
+  "name": "Bestand: Ratsche falsch auch bei Gleichstand rot",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten-bestand-lauf.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/check-toggo-seiten-bestand.ts",
+    "suche": "if (falsch.length > stand.falsch)",
+    "ersetze": "if (falsch.length >= stand.falsch)"
+   }
+  ]
+ },
+ {
+  "name": "Bestand: Ratsche falsch nie rot",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten-bestand-lauf.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/check-toggo-seiten-bestand.ts",
+    "suche": "if (falsch.length > stand.falsch)",
+    "ersetze": "if (falsch.length > 1000)"
+   }
+  ]
+ },
+ {
+  "name": "Bestand: fehlende Pokémon-Titel nie rot",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten-bestand-lauf.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/check-toggo-seiten-bestand.ts",
+    "suche": "if (festFehlend.length > stand.fehlend)",
+    "ersetze": "if (festFehlend.length > 1000)"
+   }
+  ]
+ },
+ {
+  "name": "Bestand: fehlende Titel zählen schon bei Gleichstand",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten-bestand-lauf.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/check-toggo-seiten-bestand.ts",
+    "suche": "if (festFehlend.length > stand.fehlend)",
+    "ersetze": "if (festFehlend.length >= stand.fehlend)"
+   }
+  ]
+ },
+ {
+  "name": "Bestand: Katalog-Untergrenze zu hoch",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten-bestand-lauf.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/check-toggo-seiten-bestand.ts",
+    "suche": "daten.katalog.length < 100",
+    "ersetze": "daten.katalog.length < 200"
+   }
+  ]
+ },
+ {
+  "name": "Bestand: leerer Katalog nicht rot",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten-bestand-lauf.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/check-toggo-seiten-bestand.ts",
+    "suche": "daten.katalog.length < 100",
+    "ersetze": "daten.katalog.length < 0"
+   }
+  ]
+ },
+ {
+  "name": "Verdrahtung: tg wird nicht in die Detaildatei geschrieben",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten-verdrahtung.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/folgen-dateien.ts",
+    "suche": "...toggoStaffelFeld(toggoSeiten, t.id),",
+    "ersetze": ""
+   }
+  ]
+ },
+ {
+  "name": "Verdrahtung: Cartoons ohne automatische Zuordnung",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten-verdrahtung.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/nebendateien.ts",
+    "suche": "setzeToggoSeiten(titel, 'Cartoons', true)",
+    "ersetze": "setzeToggoSeiten(titel, 'Cartoons', false)"
+   }
+  ]
+ },
+ {
+  "name": "Verdrahtung: Cartoons ohne TOGGO-Seiten",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten-verdrahtung.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/nebendateien.ts",
+    "suche": "setzeToggoSeiten(titel, 'Cartoons', true)",
+    "ersetze": ""
+   }
+  ]
+ },
+ {
+  "name": "Verdrahtung: Anime ohne TOGGO-Seiten",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten-verdrahtung.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/13-1-anreichern.ts",
+    "suche": "setzeToggoSeiten(allTitles, 'Anime')",
+    "ersetze": ""
+   }
+  ]
+ },
+ {
+  "name": "Zugang: Serienseite behält den Zugang aus JustWatch",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/13-1-toggo-seiten.ts",
+    "suche": "if (bekannt) w.zugang = zugangDerSerie(bekannt)",
+    "ersetze": ""
+   }
+  ]
+ },
+ {
+  "name": "Zugang: Figurenlink behält den Zugang aus JustWatch",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/13-1-toggo-seiten.ts",
+    "suche": "w.zugang = zugangDerSerie(serie)",
+    "ersetze": ""
+   }
+  ]
+ },
+ {
+  "name": "Zugang: Pokémon-Staffelseite behält den Zugang aus JustWatch",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/13-1-toggo-seiten.ts",
+    "suche": "w.zugang = zugangDerSerie(erste)",
+    "ersetze": ""
+   }
+  ]
+ },
+ {
+  "name": "Zugang: abo und kostenlos vertauscht",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "s.frei ? 'kostenlos' : 'abo'",
+    "ersetze": "s.frei ? 'abo' : 'kostenlos'"
+   }
+  ]
+ },
+ {
+  "name": "Falsch-Liste: nur die genaue Adresse",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/bau/13-1-toggo-seiten.ts",
+    "suche": "!falsch.includes(serienName(w.url) ?? w.url)",
+    "ersetze": "!falsch.includes(w.url)"
+   }
+  ]
+ },
+ {
+  "name": "istFrei: abgelaufenes Fenster zählt",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": ">= heute)",
+    "ersetze": ">= \"0000-00-00\")"
+   }
+  ]
+ },
+ {
+  "name": "istFrei: Ende am heutigen Tag zählt nicht",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": ">= heute)",
+    "ersetze": "> heute)"
+   }
+  ]
+ },
+ {
+  "name": "istFrei: nie frei",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "Boolean(ende) &&",
+    "ersetze": "false &&"
+   }
+  ]
+ },
+ {
+  "name": "fetch: frei ohne Datum (Fenster vorhanden genügt)",
+  "tests": [
+   "npx tsx pipeline/check-toggo-adresse-stabil.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/fetch-toggo.ts",
+    "suche": "istFrei([s.fvod_latest_end_date, s.catchup_latest_end_date], todayIso())",
+    "ersetze": "Boolean(s.fvod_latest_end_date || s.catchup_latest_end_date)"
+   }
+  ]
+ },
+ {
+  "name": "fetch: Maße der Serie nicht abgelegt",
+  "tests": [
+   "npx tsx pipeline/check-toggo-adresse-stabil.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/fetch-toggo.ts",
+    "suche": "ergebnis.masse![serie] = serienMasse(o.data?.items ?? [])",
+    "ersetze": ""
+   }
+  ]
+ },
+ {
+  "name": "Laufzeit: Untergrenze 0,5",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "faktor >= 0.6",
+    "ersetze": "faktor >= 0.5"
+   }
+  ]
+ },
+ {
+  "name": "Laufzeit: Obergrenze 2",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "faktor <= 1.65",
+    "ersetze": "faktor <= 2"
+   }
+  ]
+ },
+ {
+  "name": "Laufzeit: fehlende Seite gilt als unpassend",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "if (!titelMinuten || !serieMinuten) return true",
+    "ersetze": "if (!titelMinuten || !serieMinuten) return false"
+   }
+  ]
+ },
+ {
+  "name": "Maße: letzte Länge statt Median",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "laengen[Math.floor(laengen.length / 2)]",
+    "ersetze": "laengen[laengen.length - 1]"
+   }
+  ]
+ },
+ {
+  "name": "Maße: Staffeln nicht gezählt",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/lib/toggo-seiten.ts",
+    "suche": "new Set(folgen.map((f) => f.season_no ?? 1)).size",
+    "ersetze": "folgen.length"
+   }
+  ]
+ },
+ {
+  "name": "Bestand: Laufzeitprüfung entfällt",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten-bestand-lauf.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/check-toggo-seiten-bestand.ts",
+    "suche": "!laufzeitPasst(t.runtimeMin, masse.minuten)",
+    "ersetze": "false"
+   }
+  ]
+ },
+ {
+  "name": "Bestand: tg-Anzahl wird nicht geprüft",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten-bestand-lauf.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/check-toggo-seiten-bestand.ts",
+    "suche": "(datei.tg?.length ?? 0) !== soll",
+    "ersetze": "false"
+   }
+  ]
+ },
+ {
+  "name": "Bestand: Zugang zählt nicht zur Abweichung",
+  "tests": [
+   "npx tsx pipeline/check-toggo-seiten-bestand-lauf.ts"
+  ],
+  "aenderungen": [
+   {
+    "datei": "pipeline/check-toggo-seiten-bestand.ts",
+    "suche": "[w.url, w.zugang]",
+    "ersetze": "[w.url]"
+   }
+  ]
+ }
 ]

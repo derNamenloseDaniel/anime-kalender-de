@@ -8,7 +8,19 @@ import yaml from 'js-yaml'
 import type { Title, WatchLink } from '../shared/types.ts'
 import { loeseToggoSeiten, toggoStaffelFeld, TOGGO_SEITEN_HAND, type SeitenDaten } from './bau/13-1-toggo-seiten.ts'
 import { ladeStaffelGrenzen, POKEMON_STAFFELN } from './lib/pokemon-staffeln.ts'
-import { figurSegment, katalogAdresse, serieFuerFigurLink, serienFuerTitelOhneWeg, toggoAdressArt, type KatalogSerie, type SeitenHand } from './lib/toggo-seiten.ts'
+import {
+  figurSegment,
+  istFrei,
+  katalogAdresse,
+  laufzeitPasst,
+  serieFuerFigurLink,
+  serienFuerTitelOhneWeg,
+  serienMasse,
+  serienName,
+  toggoAdressArt,
+  type KatalogSerie,
+  type SeitenHand,
+} from './lib/toggo-seiten.ts'
 
 let verletzt = 0
 let faelle = 0
@@ -172,6 +184,38 @@ pruefe('ohne „automatisch“ nur der Handeintrag, und nur für Titel ohne Weg'
 const ohneAuto = [titel(990005, 'Dora', []), titel(990006, 'Ninjago: Aufstieg der Drachen', [])]
 pruefe('ohne „automatisch“ (Anime) legt nur die Handliste Wege an', loeseToggoSeiten(ohneAuto, DATEN, false).angelegt === 0)
 
+console.log('\nZugang, Falsch-Liste, Frei und Laufzeit:')
+const mitZugang = (id: number, namen: string, url: string, zugang: WatchLink['zugang']): Title => ({ id, titleEn: namen, watchLinks: [{ ...weg(url), zugang }] }) as unknown as Title
+const zuAbo = mitZugang(990030, 'Kostenlos auf Abo-Serie', `${B}/wickie-pty1`, 'kostenlos')
+const zuFrei = mitZugang(990031, 'Kauf auf freier Serie', `${B}/pokemon`, 'kauf')
+const zuSerie = mitZugang(990032, 'Serienseite schon da', `${B}/wickie-pty1/serien/wickie-vse12`, 'kostenlos')
+const zuFrisch = mitZugang(990014, 'Pokémon auf Abo-Staffel', `${B}/pokemon`, 'kostenlos')
+const zuReisen = mitZugang(990011, 'Reisen mit Kauf', `${B}/pokemon`, 'kauf')
+loeseToggoSeiten([zuAbo, zuFrei, zuSerie, zuFrisch, zuReisen], { ...DATEN, hand: { ...HAND, titel: [...HAND.titel, { id: 990031, serie: 'pokemon-indigo-liga', beleg: 'Fixture' }, { id: 990030, serie: 'wickie-vse12', beleg: 'Fixture' }] } })
+pruefe('Figurenlink auf Abo-Serie: „kostenlos“ wird „abo“', zuAbo.watchLinks![0]!.zugang === 'abo', zuAbo.watchLinks)
+pruefe('Figurenlink auf freie Serie: „kauf“ wird „kostenlos“', zuFrei.watchLinks![0]!.zugang === 'kostenlos', zuFrei.watchLinks)
+pruefe('Serienseite schon aufgelöst: der Zugang der Serie gilt trotzdem', zuSerie.watchLinks![0]!.zugang === 'abo', zuSerie.watchLinks)
+pruefe('Pokémon-Staffelseite ohne freies Fenster: „abo“', zuFrisch.watchLinks![0]!.zugang === 'abo', zuFrisch.watchLinks)
+pruefe('Pokémon-Staffelseite mit freiem Fenster: „kauf“ wird „kostenlos“', zuReisen.watchLinks![0]!.zugang === 'kostenlos', zuReisen.watchLinks)
+const wickieNeu = titel(990040, 'Wickie CGI', [`${B}/andere-figur-pty9/serien/wickie-vse12`])
+loeseToggoSeiten([wickieNeu], { ...DATEN, hand: { ...HAND, falsch: [{ id: 990040, url: `${B}/wickie-pty1/serien/wickie-vse12`, beleg: 'Fixture' }] } })
+pruefe('Falsch-Liste gilt für die Serie, nicht nur für die genaue Adresse (andere Figur davor)', urls(wickieNeu).length === 0, urls(wickieNeu))
+const andererTitel = titel(990041, 'Anderer Titel', [`${B}/wickie-pty1/serien/wickie-vse12`])
+loeseToggoSeiten([andererTitel], { ...DATEN, hand: { ...HAND, falsch: [{ id: 990040, url: `${B}/wickie-pty1/serien/wickie-vse12`, beleg: 'Fixture' }] } })
+pruefe('Falsch-Liste gilt nur für ihren Titel', urls(andererTitel).length === 1, urls(andererTitel))
+pruefe('serienName: Name am Ende, sonst nichts', serienName(`${B}/x/serien/y-vse1?a=1`) === 'y-vse1' && serienName(`${B}/pokemon`) === undefined)
+const TAG = 1_800_000_000 // 15.01.2027
+pruefe('frei: Fenster, das noch läuft', istFrei([null, TAG], '2026-11-24'))
+pruefe('frei: Fenster, das heute noch endet (Berliner Datum)', istFrei([TAG], '2027-01-15'))
+pruefe('nicht frei: Fenster ist gestern zu Ende', !istFrei([TAG], '2027-01-16'))
+pruefe('nicht frei: kein Fenster / Ende 0', !istFrei([null, undefined, 0], '2026-11-24') && !istFrei([], '2026-11-24'))
+pruefe('Laufzeit: 25 gegen 12 Minuten passt nicht (Wickie 1974 gegen die CGI-Serie)', !laufzeitPasst(25, 12))
+pruefe('Laufzeit: 24 gegen 23 und 25 gegen 15 (Faktor 0,6) passen, 25 gegen 14 nicht', laufzeitPasst(24, 23) && laufzeitPasst(25, 15) && !laufzeitPasst(25, 14))
+pruefe('Laufzeit: obere Grenze 1,65 (20 gegen 33) passt, 20 gegen 34 nicht', laufzeitPasst(20, 33) && !laufzeitPasst(20, 34))
+pruefe('Laufzeit: fehlt eine Seite, ist es nicht beurteilbar (passt)', laufzeitPasst(undefined, 12) && laufzeitPasst(25, 0) && laufzeitPasst(25, undefined))
+pruefe('serienMasse: Folgen, Median in Minuten, Staffeln', JSON.stringify(serienMasse([{ season_no: 1, run_length: 600 }, { season_no: 2, run_length: 744 }, { season_no: 2, run_length: 900 }, { season_no: 3 }])) === '{"folgen":4,"minuten":12,"staffeln":3}')
+pruefe('serienMasse: ohne Folgen alles 0', JSON.stringify(serienMasse([])) === '{"folgen":0,"minuten":0,"staffeln":0}')
+
 console.log('\nHandliste und Staffeln der echten Dateien:')
 const hand = yaml.load(readFileSync(TOGGO_SEITEN_HAND, 'utf8'), { json: false }) as SeitenHand
 const grenzen = ladeStaffelGrenzen(POKEMON_STAFFELN)
@@ -181,6 +225,7 @@ pruefe('es sind genau 25 Staffeln', staffeln.size === 25, staffeln.size)
 pruefe('Staffel 16 hat zwei Serien, beide mit Titelliste', hand.pokemon.filter((h) => h.staffel === 16).length === 2 && hand.pokemon.filter((h) => h.staffel === 16).every((h) => h.titel?.length))
 pruefe('jeder Handeintrag nennt seinen Beleg', hand.titel.every((h) => h.beleg.length > 20) && hand.falsch.every((f) => f.beleg.length > 20))
 pruefe('keine Kennung doppelt in „titel“', new Set(hand.titel.map((h) => h.id)).size === hand.titel.length)
+pruefe('Wickie 2836 (Anime 1974) hat keine Serie in „titel“, die CGI-Serie steht unter „falsch“', !hand.titel.some((h) => h.id === 2836) && hand.falsch.some((f) => f.id === 2836 && /vse287$/.test(f.url)))
 
 console.log(verletzt ? `\n${verletzt} von ${faelle} Zusicherungen zu den TOGGO-Seiten verletzt.` : `\nTOGGO-Seiten: ${faelle} Zusicherungen halten.`)
 process.exit(verletzt ? 1 : 0)

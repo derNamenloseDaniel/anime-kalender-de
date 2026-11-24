@@ -28,7 +28,8 @@
 import { readJson, writeJson, log, warn, sleep } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
 import { figurAusAdresse, serieFuerFigur } from './lib/toggo-serien.ts'
-import { katalogAdresse, type KatalogSerie } from './lib/toggo-seiten.ts'
+import { katalogAdresse, istFrei, serienMasse, type KatalogSerie, type SerienMasse } from './lib/toggo-seiten.ts'
+import { todayIso } from '../shared/time.ts'
 import { namenIndex, titelZuordnen } from './fetch-tv-programm.ts'
 
 const API = 'https://production-n.toggo.de/api/assetstore/vod/asset'
@@ -41,7 +42,7 @@ type Folge = { staffel: number; folge: number; ab: string; bis: string }
  * `adresse`: die Serienseite jedes Titels, den wir einer Serie zuordnen — unabhängig davon, was `titles.json` gerade verlinkt (bis 24.11.2026 kippte
  * sie täglich: stand dort schon die Serienseite, fehlte sie am nächsten Tag). `katalog`: alle Serien der Schnittstelle (`lib/toggo-seiten.ts`).
  */
-export type ToggoDatei = { geholtAm: string; katalog?: KatalogSerie[]; titel: Record<string, { serie: string; adresse?: string; folgen: Folge[] }> }
+export type ToggoDatei = { geholtAm: string; katalog?: KatalogSerie[]; masse?: Record<string, SerienMasse>; titel: Record<string, { serie: string; adresse?: string; folgen: Folge[] }> }
 
 /** Unix-Sekunden → „YYYY-MM-DDTHH:MM" in Berliner Ortszeit. */
 function ortszeit(sek: number): string {
@@ -89,7 +90,7 @@ let serien: KatalogSerie[] = []
         uname: s.u_name!,
         titel: s.title!,
         figuren: (s.characters ?? []).map((c) => (c.u_name ?? '').toLowerCase()),
-        frei: Boolean(s.fvod_latest_end_date || s.catchup_latest_end_date),
+        frei: istFrei([s.fvod_latest_end_date, s.catchup_latest_end_date], todayIso()),
       }))
   } catch (err) {
     warn(`TOGGO-Serienliste: ${err instanceof Error ? err.message : String(err)}`)
@@ -137,7 +138,7 @@ if (adressen.size) log(`TOGGO: ${adressen.size} Serienseite(n) bestimmt`)
 
 /* Ohne Serienliste (Störung) bleibt der Katalog von gestern; eine Störung ist kein Befund. */
 const gestern = readJson<ToggoDatei>(ZIEL, { geholtAm: '', titel: {} })
-const ergebnis: ToggoDatei = { geholtAm: new Date().toISOString(), katalog: serien.length ? serien : gestern.katalog, titel: {} }
+const ergebnis: ToggoDatei = { geholtAm: new Date().toISOString(), katalog: serien.length ? serien : gestern.katalog, masse: {}, titel: {} }
 let fehler = 0
 for (const [serie, ids] of jeSerie) {
   const url = `${API}?expand=false&filter=type[episode]&filter=series_id[${serie}]&sort=episode_no&size=500`
@@ -148,6 +149,7 @@ for (const [serie, ids] of jeSerie) {
       data?: {
         items?: {
           season_no?: number
+          run_length?: number
           episode_no?: number
           title?: string
           catchup_earliest_start_date?: number | null
@@ -158,6 +160,7 @@ for (const [serie, ids] of jeSerie) {
       }
     }
     const folgen: Folge[] = []
+    ergebnis.masse![serie] = serienMasse(o.data?.items ?? [])
     for (const f of o.data?.items ?? []) {
       if (!f.episode_no) continue
       /* Frei ist, was in einem der beiden kostenlosen Fenster liegt — das weitere gewinnt. */
@@ -188,6 +191,7 @@ for (const [serie, ids] of jeSerie) {
     /* Ohne Antwort bleibt der Stand von gestern — eine Störung ist kein Befund. */
     const alt = readJson<ToggoDatei>(ZIEL, { geholtAm: '', titel: {} })
     for (const id of ids) if (alt.titel[String(id)]) ergebnis.titel[String(id)] = alt.titel[String(id)]
+    if (alt.masse?.[serie]) ergebnis.masse![serie] = alt.masse[serie]
   }
   await sleep(1500)
 }

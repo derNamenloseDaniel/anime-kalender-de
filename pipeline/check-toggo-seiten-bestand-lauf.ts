@@ -25,17 +25,26 @@ const grenzen = yaml.load(readFileSync(join(REPO, ...KURATIERT, 'pokemon-staffel
 
 /** Die richtige Seite je Pokémon-Titel: die erste seiner Staffeln, aus der Handliste abgelesen (Staffel 16 nach Titelliste). */
 const richtig = (id: number, nr: number) => `${B}/pokemon/serien/${hand.pokemon.find((h) => h.staffel === nr && (!h.titel || h.titel.includes(id)))!.serie}`
-const titel = (ueberschreibe: Record<number, string | null> = {}) =>
+const titel = (ueberschreibe: Record<number, string | null> = {}, zugang527 = 'kostenlos') =>
   grenzen.titel.map((t) => {
     const url = t.anilistId in ueberschreibe ? ueberschreibe[t.anilistId] : richtig(t.anilistId, t.staffeln[0]!.nr)
-    return { id: t.anilistId, titleEn: `Fixture ${t.anilistId}`, watchLinks: url ? [{ name: 'TOGGO', url, kind: 'stream', zugang: 'kostenlos' }] : [] }
+    return { id: t.anilistId, titleEn: `Fixture ${t.anilistId}`, watchLinks: url ? [{ name: 'TOGGO', url, kind: 'stream', zugang: t.anilistId === 527 ? zugang527 : 'kostenlos' }] : [] }
   })
 const katalog = (leer = false) => (leer ? [] : [
   ...hand.pokemon.map((h, i) => ({ id: `VSE${i}`, uname: h.serie, titel: h.serie, figuren: ['pokemon'], frei: true })),
   ...Array.from({ length: 120 }, (_, i) => ({ id: `VSE9${i}`, uname: `fuell-${i}`, titel: `Fülltitel ${i}`, figuren: [`fuell-${i}`], frei: true })),
 ])
 
-type Kulisse = { pokemon?: Record<number, string | null>; leer?: boolean; stand?: { falsch: number; fehlend: number } }
+type Kulisse = {
+  pokemon?: Record<number, string | null>
+  leer?: boolean
+  stand?: { falsch: number; fehlend: number }
+  zugang527?: string
+  /** Anime-Titel mit 25 Minuten und TOGGO-Link; die Serie dahinter hat laut Maßen so viele Minuten. */
+  laufzeit?: number
+  /** Anzahl der Einträge in `tg` der Detaildatei von 527. */
+  tg?: number
+}
 function lauf(k: Kulisse): { status: number | null; aus: string } {
   const wurzel = mkdtempSync(join(tmpdir(), 'toggo-seiten-bestand-'))
   try {
@@ -43,8 +52,16 @@ function lauf(k: Kulisse): { status: number | null; aus: string } {
     mkdirSync(join(wurzel, 'public/data'), { recursive: true })
     mkdirSync(join(wurzel, 'tools'))
     for (const d of ['toggo-seiten.yaml', 'pokemon-staffeln.yaml']) cpSync(join(REPO, ...KURATIERT, d), join(wurzel, ...KURATIERT, d))
-    writeFileSync(join(wurzel, 'data/toggo.json'), JSON.stringify({ katalog: katalog(k.leer), titel: {} }))
-    writeFileSync(join(wurzel, 'public/data/titles.json'), JSON.stringify(titel(k.pokemon)))
+    const serie = { id: 'VSE777', uname: 'laufzeit-serie', titel: 'Laufzeit Serie', figuren: ['laufzeit-fig'], frei: true }
+    const mitLaufzeit = k.laufzeit !== undefined
+    const toggo = { katalog: [...katalog(k.leer), ...(mitLaufzeit ? [serie] : [])], masse: mitLaufzeit ? { VSE777: { folgen: 78, minuten: k.laufzeit, staffeln: 1 } } : {}, titel: {} }
+    writeFileSync(join(wurzel, 'data/toggo.json'), JSON.stringify(toggo))
+    const laufzeitTitel = { id: 900001, titleEn: 'Laufzeit Fixture', runtimeMin: 25, watchLinks: [{ name: 'TOGGO', url: `${B}/laufzeit-fig/serien/laufzeit-serie`, kind: 'stream', zugang: 'kostenlos' }] }
+    writeFileSync(join(wurzel, 'public/data/titles.json'), JSON.stringify([...titel(k.pokemon, k.zugang527), ...(mitLaufzeit ? [laufzeitTitel] : [])]))
+    if (k.tg !== undefined) {
+      mkdirSync(join(wurzel, 'public/data/folgen'), { recursive: true })
+      writeFileSync(join(wurzel, 'public/data/folgen/527.json'), JSON.stringify({ f: [], de: [], tg: Array.from({ length: k.tg }, (_, i) => [i + 1, `${B}/pokemon/serien/x${i}`]) }))
+    }
     writeFileSync(join(wurzel, 'public/data/cartoons.json'), JSON.stringify([{ id: -900001, titleEn: 'Cartoon Fixture', watchLinks: [] }]))
     writeFileSync(join(wurzel, 'tools/toggo-seiten-stand.json'), JSON.stringify(k.stand ?? { falsch: 0, fehlend: 0 }))
     const r = spawnSync(process.execPath, ['--import', tsx, join(REPO, SKRIPT)], { cwd: wurzel, env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8', timeout: 90_000 })
@@ -72,6 +89,12 @@ fall('Pokémon 527 auf der Seite einer anderen Staffel: rot', { pokemon: { 527: 
 fall('dieselbe Abweichung unter dem Stand (Ratsche): grün', { pokemon: { 527: `${B}/pokemon` }, stand: { falsch: 1, fehlend: 0 } }, 0, 'falsch 1 (Stand 1)', 'FEHLER')
 fall('Pokémon 1564 ohne TOGGO-Link: rot', { pokemon: { 1564: null } }, 1, 'Pokémon-Staffeltitel oder Handeinträge ohne TOGGO-Link, Stand 0, nur sinken: 1564')
 fall('Pokémon 1564 ohne Link unter dem Stand: grün', { pokemon: { 1564: null }, stand: { falsch: 0, fehlend: 1 } }, 0, 'fest fehlend 1 (Stand 1)', 'FEHLER')
+fall('Pokémon 527 mit Zugang „kauf“ auf kostenloser Serie: rot', { zugang527: 'kauf' }, 1, 'Stand 0, nur sinken: 527')
+fall('Titel mit 25 min auf TOGGO-Serie mit 12 min (Wickie 1974 gegen 2014): rot mit Marke', { laufzeit: 12 }, 1, '"titleId":900001,"pruefung":"toggo-seiten"')
+fall('… die Meldung nennt die Laufzeit-Regel', { laufzeit: 12 }, 1, 'TOGGO-Serie anderer Laufzeit (Faktor außerhalb 0,6 bis 1,65), Fehlzuordnung (unter „falsch“ in data/curated/toggo-seiten.yaml eintragen): 900001')
+fall('Titel mit 25 min auf TOGGO-Serie mit 24 min: grün', { laufzeit: 24 }, 0, 'TOGGO-Seiten: 13 Titel', 'FEHLER')
+fall('`tg` von 527 mit 1 statt 5 Staffeln: rot mit Marke', { tg: 1 }, 1, '"titleId":527,"pruefung":"toggo-seiten","grund":"TOGGO-Link fehlt"')
+fall('`tg` von 527 mit allen 5 Staffeln: grün', { tg: 5 }, 0, 'fest fehlend 0 (Stand 0)', 'FEHLER')
 fall('leerer Katalog: rot', { leer: true }, 1, 'TOGGO-Katalog in data/toggo.json hat 0 Serien')
 
 const liste = readFileSync(join(REPO, 'tools/check-bestand-liste.txt'), 'utf8').split('\n')

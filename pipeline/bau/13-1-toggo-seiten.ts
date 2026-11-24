@@ -10,8 +10,10 @@ import {
   pokemonSeiten,
   serieFuerFigurLink,
   serienFuerTitelOhneWeg,
+  serienName,
   staffelAdressen,
   toggoAdressArt,
+  zugangDerSerie,
   type KatalogSerie,
   type SeitenHand,
 } from '../lib/toggo-seiten.ts'
@@ -57,8 +59,8 @@ const toggoWege = (t: Title): WatchLink[] => (t.watchLinks ?? []).filter((w) => 
 export function loeseToggoSeiten(titel: Title[], daten: SeitenDaten, automatisch = false): SeitenErgebnis {
   const aus: SeitenErgebnis = { ersetzt: 0, angelegt: 0, offen: [] }
   for (const t of titel) {
-    const falsch = daten.hand.falsch.filter((f) => f.id === t.id).map((f) => f.url)
-    if (falsch.length && t.watchLinks) t.watchLinks = t.watchLinks.filter((w) => !falsch.includes(w.url))
+    const falsch = daten.hand.falsch.filter((f) => f.id === t.id).map((f) => serienName(f.url) ?? f.url)
+    if (falsch.length && t.watchLinks) t.watchLinks = t.watchLinks.filter((w) => !falsch.includes(serienName(w.url) ?? w.url))
     const staffelSeiten = pokemonSeiten(t.id, daten.staffeln.get(t.id) ?? [], daten.katalog, daten.hand.pokemon)
     const wege = toggoWege(t)
     if (staffelSeiten.length) {
@@ -68,6 +70,7 @@ export function loeseToggoSeiten(titel: Title[], daten: SeitenDaten, automatisch
       for (const w of betroffen) {
         if (w.url !== url) aus.ersetzt++
         w.url = url
+        w.zugang = zugangDerSerie(erste)
       }
       if (!wege.length && erste.frei) {
         haengeAn(t, url, true)
@@ -76,6 +79,9 @@ export function loeseToggoSeiten(titel: Title[], daten: SeitenDaten, automatisch
       continue
     }
     for (const w of wege) {
+      /* Auf einer Serienseite (schon aufgelöst oder von Hand) gilt der Zugang der Serie, nicht der aus JustWatch. */
+      const bekannt = daten.katalog.find((s) => s.uname === serienName(w.url))
+      if (bekannt) w.zugang = zugangDerSerie(bekannt)
       if (toggoAdressArt(w.url) !== 'figur') continue
       const serie = serieFuerFigurLink(w.url, t.id, namenVon(t), daten.katalog, daten.hand.titel)
       if (!serie) {
@@ -83,6 +89,7 @@ export function loeseToggoSeiten(titel: Title[], daten: SeitenDaten, automatisch
         continue
       }
       w.url = katalogAdresse(serie, /toggo\.de\/([^/?#]+)/i.exec(w.url)?.[1]?.toLowerCase())
+      w.zugang = zugangDerSerie(serie)
       aus.ersetzt++
     }
   }

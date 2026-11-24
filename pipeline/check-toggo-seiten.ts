@@ -33,6 +33,8 @@ const KATALOG: KatalogSerie[] = [
   serie('VSE10', 'ninja-a-vse10', 'Ninjago - Aufstieg der Drachen', ['ninjago']),
   serie('VSE11', 'ninja-b-vse11', 'Ninjago - Ein Neustart', ['ninjago']),
   serie('VSE12', 'wickie-vse12', 'Wickie', ['wickie-pty1'], false),
+  serie('VSE13', 'abo-staffel-vse13', 'Pokémon: Nur im Abo', ['pokemon'], false),
+  serie('VSE14', 'zwei-figuren-vse14', 'Zwei Figuren', ['erste-pty1', 'zweite-pty2']),
 ]
 const HAND: SeitenHand = {
   pokemon: [
@@ -42,6 +44,7 @@ const HAND: SeitenHand = {
     { staffel: 16, serie: 'einall-vse6', titel: [903] },
     { staffel: 23, serie: 'pokemon-reisen-die-serie' },
     { staffel: 24, serie: 'pokemon-meister-reisen-die-serie' },
+    { staffel: 30, serie: 'abo-staffel-vse13' },
   ],
   titel: [{ id: 990003, serie: 'wickie-vse12', anlegen: true, beleg: 'Fixture' }],
   falsch: [{ id: 990002, url: 'https://www.toggo.de/die-kleine-prinzessin-pty588', beleg: 'Fixture' }],
@@ -54,6 +57,7 @@ const DATEN: SeitenDaten = {
     [990011, [23, 24]],
     [901, [15, 16]],
     [903, [16]],
+    [990014, [30]],
   ]),
 }
 const weg = (url: string): WatchLink => ({ name: 'TOGGO', url, kind: 'stream', zugang: 'kostenlos' })
@@ -84,6 +88,9 @@ pruefe('zwei Serien einer Figur, keine gleichnamig: keine Zuordnung', serieFuerF
 pruefe('Handeintrag gilt vor dem Namen', serieFuerFigurLink(`${B}/ninjago`, 3, name('Ninjago: Ein Neustart'), KATALOG, [{ id: 3, serie: 'ninja-a-vse10', beleg: 'x' }])?.id === 'VSE10')
 pruefe('Serienseite ist keine Figurenseite: nichts zu lösen', serieFuerFigurLink(`${B}/ninjago/serien/x`, 3, name('Ninjago: Ein Neustart'), KATALOG, []) === undefined)
 pruefe('Adresse nennt die Figur des Links', katalogAdresse(KATALOG[6]!, 'hotel-transsilvanien') === `${B}/hotel-transsilvanien/serien/hotel-serie-vse7`)
+pruefe('Adresse: die zweite Figur der Serie, wenn der Link sie nennt', katalogAdresse(KATALOG[13]!, 'zweite-pty2') === `${B}/zweite-pty2/serien/zwei-figuren-vse14`)
+pruefe('Adresse: ohne Figur im Link die erste der Serie', katalogAdresse(KATALOG[13]!) === `${B}/erste-pty1/serien/zwei-figuren-vse14`)
+pruefe('Adresse: eine Figur, die die Serie nicht führt, gilt nicht', katalogAdresse(KATALOG[13]!, 'fremde') === `${B}/erste-pty1/serien/zwei-figuren-vse14`)
 
 console.log('\nPokémon: eine Seite je Staffel:')
 const pokemon = titel(990010, 'Pokémon (Fixture)', [`${B}/pokemon`])
@@ -100,6 +107,11 @@ pruefe('Staffelnummer 15 ohne Serie in der Handliste: Staffel 16 des Titels (nur
 pruefe('Titel ohne Weg bekommt den Weg (frei)', neuPokemon.watchLinks?.[0]?.zugang === 'kostenlos')
 pruefe('Staffel 16 mit zwei Serien: 903 bekommt die zweite', urls(einall)[0] === `${B}/pokemon/serien/einall-vse6`, urls(einall))
 pruefe('Zähler: 3 Adressen ersetzt, 1 Weg angelegt', e.ersetzt === 3 && e.angelegt === 1, e)
+const nurAbo = titel(990014, 'Nur im Abo (Fixture)', [])
+pruefe('erste Serie ohne freies Fenster: kein neuer Weg für einen Titel ohne Weg', loeseToggoSeiten([nurAbo], DATEN).angelegt === 0 && urls(nurAbo).length === 0, nurAbo.watchLinks)
+const nurAboMitWeg = titel(990014, 'Nur im Abo mit Weg (Fixture)', [`${B}/pokemon`])
+loeseToggoSeiten([nurAboMitWeg], DATEN)
+pruefe('erste Serie ohne freies Fenster: ein vorhandener Weg wird trotzdem gelöst', urls(nurAboMitWeg)[0] === `${B}/pokemon/serien/abo-staffel-vse13`, urls(nurAboMitWeg))
 const nochmal = loeseToggoSeiten([pokemon, reisen, film, neuPokemon, einall], DATEN)
 pruefe('zweiter Lauf ändert nichts', nochmal.ersetzt === 0 && nochmal.angelegt === 0 && urls(neuPokemon).length === 1, nochmal)
 pruefe('Detaildatei: tg je Staffel', JSON.stringify(toggoStaffelFeld(DATEN, 990010)) === `{"tg":[[1,"${B}/pokemon/serien/pokemon-indigo-liga"],[2,"${B}/pokemon/serien/pokemon-orange-liga"]]}`, toggoStaffelFeld(DATEN, 990010))
@@ -122,6 +134,9 @@ pruefe('Handeintrag „anlegen“ legt den Weg an, im Abo nicht „kostenlos“'
 pruefe('zwei Titel gleichen Namens: kein automatischer Weg', urls(cartoons[3]!).length === 0 && urls(cartoons[4]!).length === 0)
 pruefe('Serie mit eindeutigem Namen: automatischer Weg bei „automatisch“', urls(cartoons[5]!)[0] === `${B}/ninjago/serien/ninja-a-vse10`, urls(cartoons[5]!))
 pruefe('Sammelseite ohne passende Serie bleibt, steht in „offen“', urls(cartoons[6]!)[0] === `${B}/ninjago` && c.offen.length === 1, c)
+const mitSerienLink = [titel(990008, 'Hat schon die Serienseite', [`${B}/ninjago/serien/ninja-b-vse11`]), titel(990009, 'Hat einen Film', [`${B}/pokemon/video/film-mov1`])]
+const s = loeseToggoSeiten(mitSerienLink, DATEN, true)
+pruefe('Serienseite und Film bleiben unberührt und stehen nicht in „offen“', s.ersetzt === 0 && s.offen.length === 0 && urls(mitSerienLink[0]!)[0] === `${B}/ninjago/serien/ninja-b-vse11`, s)
 const ohneAuto = [titel(990005, 'Dora', []), titel(990006, 'Ninjago: Aufstieg der Drachen', [])]
 pruefe('ohne „automatisch“ (Anime) legt nur die Handliste Wege an', loeseToggoSeiten(ohneAuto, DATEN, false).angelegt === 0)
 

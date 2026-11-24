@@ -38,6 +38,28 @@ body { margin: 0; font: 14px/1.4 system-ui, sans-serif; background: #e9e9ee; col
   .zelle iframe { flex: none; height: var(--hoehe); }
 }
 
+/* Rückfall im Rahmen ohne Anker (`.eingebettet`, optionen.tsx): Optionen und Beschreibung als Streifen links, die Zellen nutzen die Restbreite;
+   schmal (Handy, wie der Navigator ab 640 px) steht der Streifen eingeklappt über dem Raster. */
+.seite.eingebettet { flex-direction: row; }
+.seite.eingebettet .optionen { flex: none; width: 240px; overflow-y: auto; border-right: 1px solid #8884; }
+.seite.eingebettet .optionen-taste { display: none; }
+.seite.eingebettet .leiste { flex-direction: column; align-items: flex-start; flex-wrap: nowrap; border-bottom: 0; }
+.seite.eingebettet .notiz { max-width: none; padding: 0 16px 12px; }
+.seite.eingebettet .raster { flex: 1 1 0; min-width: 0; overflow: auto; }
+@media (max-width: 640px) {
+  .seite.eingebettet { flex-direction: column; }
+  .seite.eingebettet .optionen { width: auto; border-right: 0; border-bottom: 1px solid #8884; overflow: visible; }
+  .seite.eingebettet .optionen-taste { display: block; width: 100%; padding: 6px 16px; border: 0; background: transparent; color: inherit; font: inherit; font-size: 12px; text-align: left; cursor: pointer; }
+  .seite.eingebettet .optionen-inhalt { display: none; max-height: 60dvh; overflow-y: auto; }
+  .seite.eingebettet .optionen.offen .optionen-inhalt { display: block; }
+}
+
+/* Im Anker der Navigator-Seitenleiste (Schattenbaum, optionen.tsx): Spalte statt Leiste, Titel und Rücklink stehen schon im Navigator. */
+.optionen-schatten { font: 13px/1.4 system-ui, sans-serif; color: inherit; }
+.optionen-schatten .leiste { flex-direction: column; align-items: flex-start; flex-wrap: nowrap; border-bottom: 0; padding: 4px 0; }
+.optionen-schatten .leiste h1, .optionen-schatten .leiste .zurueck { display: none; }
+.optionen-schatten .notiz { max-width: none; padding: 4px 0 0; }
+
 .uebersicht { padding: 16px; }
 .uebersicht h1 { font-size: 18px; margin: 0 0 4px; }
 .uebersicht p { margin: 0 0 12px; opacity: .8; }

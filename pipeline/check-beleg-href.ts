@@ -23,6 +23,7 @@ const ERLAUBT: Record<string, Record<string, string>> = {
   'web/src/components/news-abgeloest.tsx': { 'm.ersetzt.quelle': 'nur nach istLink(m.ersetzt.quelle)' },
   'web/src/components/Quellenuebersicht.tsx': { 'r.url': 'aus terminQuellenJeHost: istLink-gefiltert' },
   'web/src/components/detail/abschnitte.tsx': { 'plot.quelle.url': 'aniSearch-/ANN-Handlungsseite' },
+  'web/src/components/detail/staffel-knoepfe.tsx': { 'z.url': 'tg der Folgenliste: TOGGO-Serienseite aus Katalog/Handliste (pipeline/bau/13-1-toggo-seiten.ts), keine API-Adresse' },
   'web/src/components/detail/antwort-kasten-teile.tsx': { q: 'Quellenliste einer Antwort: Wiki-/Katalogseiten' },
   'web/src/components/detail/termin-offen-karte.tsx': { url: 'Anbieter-Adresse des Titels (Weg in streams), keine Beleg-Quelle', quelle: 'Artikel der Ankündigung aus data/ankuendigungen.yaml (https-Seite)' },
   'web/src/components/detail/flaggen.tsx': { 'verweis.ziel': 'Anbieterseite (Stream, Shop), aus den Wegen des Titels' },

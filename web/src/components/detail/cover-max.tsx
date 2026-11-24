@@ -15,6 +15,8 @@ import { gleichesBild } from './cover-gleich.ts'
  * Leitung gibt es nur die 500er. Das große Bild blendet sich über das kleine, sobald es da ist; fällt es aus, bleibt das kleine.
  * **Nur dasselbe Motiv** (08.10.2026, Ishura): TMDB wählt das größte Plakat, nicht unbedingt das AniList-Bild — vor dem Überblenden prüft
  * `cover-gleich.ts` per dHash, ob beide dasselbe zeigen; sonst bleibt das AniList-Cover (unscharf, aber dasselbe Bild wie im Panel).
+ * **Füllt das Fenster** (Daniel, 24.11.2026): Auch ein kleines Cover (AniList `medium`, 230 px) wird bis an den Rand hochskaliert;
+ * die Spuren `minmax(0,1fr)` (`grid-rows-1`) halten `h-full` im Fenster, sonst wächst die Zeile mit dem Bild.
  */
 export const COVER_MAX_EREIGNIS = 'cover-maximieren'
 const TMDB_BILD = 'https://image.tmdb.org/t/p'
@@ -120,9 +122,9 @@ function CoverSchicht({ bild, label, titel, gr, schliessen, onZu, onKaputt }: {
       aria-modal="true"
       aria-label={`${label}: ${titel}`}
       onClick={(e) => { e.stopPropagation(); onZu() }}
-      className="fixed inset-0 z-[80] grid cursor-zoom-out place-items-center bg-black/90 p-3"
+      className="fixed inset-0 z-[80] grid grid-cols-1 grid-rows-1 cursor-zoom-out place-items-center bg-black/90 p-3"
     >
-      <img src={bild} alt={titel} className={`[grid-area:1/1] max-h-full max-w-full object-contain transition-opacity ${geladen ? 'opacity-0' : ''}`} />
+      <img src={bild} alt={titel} className={`[grid-area:1/1] h-full w-full object-contain transition-opacity ${geladen ? 'opacity-0' : ''}`} />
       <button
         ref={schliessen}
         type="button"
@@ -140,7 +142,7 @@ function CoverSchicht({ bild, label, titel, gr, schliessen, onZu, onKaputt }: {
           decoding="async"
           onLoad={() => setGeladen(true)}
           onError={onKaputt}
-          className={`[grid-area:1/1] max-h-full max-w-full object-contain transition-opacity ${geladen ? '' : 'opacity-0'}`}
+          className={`[grid-area:1/1] h-full w-full object-contain transition-opacity ${geladen ? '' : 'opacity-0'}`}
         />
       )}
     </div>,

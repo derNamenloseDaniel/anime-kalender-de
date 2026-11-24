@@ -6396,10 +6396,7 @@ pruefe(
     kopfName(erste) === 'Erste Staffel' && kopfName(zweite) === 'Erste Staffel',
     `${kopfName(erste)} / ${kopfName(zweite)}`,
   )
-  pruefe(
-    'und die Ansicht sagt der Suche, ob gruppiert wird',
-    /titelFuerAnsichtGen\(quelle, data, filters, today, favorites, grouped(, sprecher\.auswahl)?\)/.test(readFileSync('web/src/lib/app-ansicht.ts', 'utf8')),
-  )
+  // „und die Ansicht sagt der Suche, ob gruppiert wird“ prüft check-wertungsfilter.ts (app-ansicht.ts), hier zählt jede Quelltext-Lesung.
   /*
     **Eine Serie kann Deutsch führen, auch wenn die untersuchte Staffel die japanische ist**
     (29.09.2026, „Dragon Ball Z: Resurrection 'F'"): Der deutsche Katalog nennt auf Serienebene

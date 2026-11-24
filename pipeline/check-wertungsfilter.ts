@@ -120,6 +120,11 @@ pruefe(
   'Aufruf fehlt oder nimmt nicht `!!voll`',
 )
 pruefe(
+  'app-ansicht.ts: die Titelliste sagt der Suche, ob gruppiert wird',
+  /titelFuerAnsichtGen\(quelle, data, filters, today, favorites, grouped(, sprecher\.auswahl)?\)/.test(ansichtQuelle),
+  'Aufruf von titelFuerAnsichtGen ohne `grouped`',
+)
+pruefe(
   'App.tsx: reicht den Ladezustand `voll` an die Kalendertermine weiter',
   appQuelle.includes('useKalenderTermine(data, voll, kalenderFilters'),
   'App ruft useKalenderTermine nicht mit `voll`',

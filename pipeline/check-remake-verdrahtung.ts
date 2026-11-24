@@ -12,7 +12,7 @@ const FUNKTION = 'schreibeZusatzdateien'
 const aufruf = (n: ts.Node | undefined, name: string): n is ts.CallExpression =>
   n !== undefined && ts.isCallExpression(n) && ts.isIdentifier(n.expression) && n.expression.text === name
 
-/** Alle Abweichungen von `writeJson(`${OUT}/franchises.json`, markiereEigeneWerke(markiereRemakes(reihen, <Titel>), mitStaffelTiteln(<Handlisten>, <Titel>)))`. */
+/** Alle Abweichungen von `writeJson(`${OUT}/franchises.json`, markiereEigeneWerke(markiereRemakes(reihen, <Titel>), ladeAlleEigenenWerke()))`. */
 export function verdrahtungsFehler(quelltext: string): string[] {
   const datei = ts.createSourceFile('x.ts', quelltext, ts.ScriptTarget.Latest, true)
   const rumpf = datei.statements.find((s): s is ts.FunctionDeclaration => ts.isFunctionDeclaration(s) && s.name?.text === FUNKTION)?.body
@@ -26,7 +26,7 @@ export function verdrahtungsFehler(quelltext: string): string[] {
   if (schreiber.length !== 1) return [`franchises.json muss genau einmal geschrieben werden (gefunden: ${schreiber.length})`]
   const fehler: string[] = []
   const eigene = schreiber[0]!.arguments[1]
-  if (!aufruf(eigene, 'markiereEigeneWerke') || eigene.arguments.length !== 2 || !aufruf(eigene.arguments[1], 'mitStaffelTiteln')) return ['franchises.json muss aus markiereEigeneWerke(<Reihen>, mitStaffelTiteln(…)) kommen']
+  if (!aufruf(eigene, 'markiereEigeneWerke') || eigene.arguments.length !== 2 || !aufruf(eigene.arguments[1], 'ladeAlleEigenenWerke')) return ['franchises.json muss aus markiereEigeneWerke(<Reihen>, ladeAlleEigenenWerke()) kommen']
   const remakes = eigene.arguments[0]
   if (!aufruf(remakes, 'markiereRemakes')) return ['markiereEigeneWerke muss die Reihen aus markiereRemakes(reihen, <Titel>) bekommen']
   if (remakes.arguments.length !== 2) fehler.push(`markiereRemakes braucht genau Reihen und Titel (gefunden: ${remakes.arguments.length} Argumente)`)
@@ -58,7 +58,7 @@ const abweichungen: [string, string][] = [
   ['leere Titelliste', quelle.replace(AUFRUF, 'markiereRemakes(reihen, [])')],
   ['Titel aus der Bau-Karte statt der ausgelieferten (ohne aniSearch-Kennung)', quelle.replace(AUFRUF, 'markiereRemakes(reihen, [...titles.values()])')],
   ['falsche Reihen', quelle.replace(AUFRUF, 'markiereRemakes({}, fuerReihen)')],
-  ['Staffel-Titel nicht als eigene Werke', quelle.replace(', mitStaffelTiteln(ladeAlleEigenenWerke(), titles.values())', '')],
+  ['Handlisten der eigenen Werke fehlen', quelle.replace('ladeAlleEigenenWerke())', '[])')],
   ['Aufruf mit drittem Argument', quelle.replace(AUFRUF, 'markiereRemakes(reihen, fuerReihen, {})')],
   ['Aufruf außerhalb der Schreibzeile', quelle.replace(AUFRUF, 'reihen').replace('  writeJson(`${OUT}/franchises.json`', `  ${AUFRUF}\n  writeJson(\`\${OUT}/franchises.json\``)],
   ['zweites Schreiben ohne Markierung', quelle.replace('  writeJson(`${OUT}/franchises.json`', '  writeJson(`${OUT}/franchises.json`, reihen)\n  writeJson(`${OUT}/franchises.json`')],

@@ -1,6 +1,3 @@
-/** Ein Staffel-Titel (`staffelTitel`) teilt die Seite seines Sammeltitels (Basis) von Natur aus; er zählt nicht mit. */
-const abgeleitet = (t: { id: number; staffelTitel?: { sammel: number } }): boolean => t.staffelTitel !== undefined && t.staffelTitel.sammel !== t.id
-
 /**
  * **Eine aniSearch-Kennung, die mehrere Titel des Hauptbestands tragen, ist gewollt oder ein Fehler** (Messung 12.10.2026: 42 Kennungen, 117 Titel).
  * aniSearch führt Filmreihen und Serie-samt-Special oft auf einer Seite („Film, 3": Kizumonogatari; „TV-Serie, 30": Wolf's Rain samt OVA), AniList trennt sie.
@@ -8,9 +5,9 @@ const abgeleitet = (t: { id: number; staffelTitel?: { sammel: number } }): boole
  * an diese Kennung — der eine kommt aus der ID-Brücke. Jede andere Gruppe ist neu und ungeklärt: Brücke und Hand widersprechen sich, oder die Brücke hat
  * zwei Titeln dieselbe Seite gegeben. Gibt je Gruppe eine Meldung zurück, leer heißt in Ordnung.
  */
-export function anisearchKennungMehrfach(titel: { id: number; anisearchId?: number; staffelTitel?: { sammel: number } }[], hand: Record<number, number>): string[] {
+export function anisearchKennungMehrfach(titel: { id: number; anisearchId?: number }[], hand: Record<number, number>): string[] {
   const jeKennung = new Map<number, number[]>()
-  for (const t of titel) if (t.anisearchId && !abgeleitet(t)) jeKennung.set(t.anisearchId, [...(jeKennung.get(t.anisearchId) ?? []), t.id])
+  for (const t of titel) if (t.anisearchId) jeKennung.set(t.anisearchId, [...(jeKennung.get(t.anisearchId) ?? []), t.id])
   const fehler: string[] = []
   for (const [kennung, ids] of jeKennung) {
     const ungebunden = ids.filter((id) => hand[id] !== kennung)

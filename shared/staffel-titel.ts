@@ -1,8 +1,8 @@
 /**
- * **Staffel-Titel**: Einträge, die der Bau aus einem AniList-Sammeltitel je deutscher Staffel ableitet (`data/curated/horizonte-staffeln.yaml`,
- * Feld `kennung`; Phase `pipeline/bau/staffel-titel.ts`). Ihre Kennung liegt im Raum 7 bis unter 8 Mio.: über den eigenen Titeln
- * (5 bis unter 6 Mio., `eigene-titel.ts`), unter den Testkennungen (9.000.0xx) und der aniSearch-Basis (10 Mio.); 6 Mio. bleibt frei,
- * weil Prüfungen `6_000_000` als gewöhnliche AniList-Kennung führen.
+ * **Staffel-Titel** (20. bis 24.11.2026): Der Bau schnitt Pokémon Horizonte in einen Titel je deutscher Staffel (Kennungen 7000001–7000003,
+ * `alteKennung` in `data/curated/horizonte-staffeln.yaml`). Seit F157 ist die Serie wieder ein Titel; hier bleibt, was alte Meldungen und
+ * Bau-Vergleiche lesen. Der Raum 7 bis unter 8 Mio. liegt über den eigenen Titeln (5 bis unter 6 Mio.) und unter den Testkennungen und
+ * der aniSearch-Basis (10 Mio.); er wird nicht wieder vergeben.
  */
 export const STAFFEL_ID_BASIS = 7_000_000
 export const STAFFEL_ID_ENDE = 8_000_000
@@ -31,8 +31,8 @@ export function staffelVonTiteln(titel: { id: number; staffelTitel?: { sammel: n
 }
 
 /**
- * Eine Beobachtung zu einem Staffel-Titel (Kennung, Folge in der Staffel) auf den Sammeltitel und seine durchlaufende Folge zurück: Meldungen
- * und Urteile werden vor der Teilung gelesen, dort gibt es nur den Sammeltitel. Ohne Staffel-Angabe bleibt alles, wie es ist. `tag`: Tag der Meldung.
+ * Eine alte Beobachtung zu einem Staffel-Titel (Kennung, Folge in der Staffel) auf die Serie und ihre durchlaufende Folge zurück (Tabelle:
+ * `altStaffelTitel`, `pipeline/lib/staffel-altmeldungen.ts`). Ohne Staffel-Angabe bleibt alles, wie es ist. `tag`: Tag der Meldung.
  */
 export function zurueckAufSammeltitel(titel: number, folge: number, staffelVon: StaffelVon, tag?: string): { titel: number; folge: number } {
   const s = staffelVon(titel, tag, folge)
@@ -40,9 +40,3 @@ export function zurueckAufSammeltitel(titel: number, folge: number, staffelVon: 
   /* Folge 0 meint die ganze Seite (`wegUrteileBereinigen`), keine Nummer. */
   return { titel: s.sammel, folge: folge > 0 ? folge + s.ab - 1 : folge }
 }
-
-/**
- * Unter dieser Kennung liegen die Quelldaten eines Titels (aniSearch, TMDB, Sprecher, Trailer, AniList-Start): bei einer abgeleiteten Staffel
- * die des Sammeltitels, sonst die eigene. Die Quellen kennen nur AniList-Kennungen, die Phase Staffel-Titel schneidet aber vor der Auslieferung.
- */
-export const lesekennung = (t: { id: number; staffelTitel?: { sammel: number } }): number => t.staffelTitel?.sammel ?? t.id

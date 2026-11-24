@@ -1,21 +1,37 @@
 /**
  * Bestandsprüfer: die Staffeln von Pokémon Horizonte (`data/curated/horizonte-staffeln.yaml`) gegen die gesammelten Quellen —
  * de.wikipedia (`data/wikipedia-folgen.json`, Spalte „Folge in der Staffel“) und TOGGO (`data/toggo.json`) — und ihre Wirkung im
- * gebauten Bestand (je Staffel eigene Detaildatei und Kopfzählung unter ihrer Kennung, die offene Staffel mit Kennzeichen). Rot: eine abgeschlossene Staffel zählt in einer
- * Quelle anders, Detaildatei oder Kopf passen nicht. `⚠ WARNUNG` (im Lauf-Log sichtbar): eine Quelle führt eine neue Staffel oder den
- * Titel nicht; ebenso, solange `public/data/titles.json` keine Staffel-Kennung führt (Zeit zwischen Merge und erstem Bestandsbau). Liest relativ zum Arbeitsordner; Prozesstest `check-horizonte-staffeln-bestand-lauf.ts`.
+ * gebauten Bestand. Seit F157 (24.11.2026) ist die Serie **ein** Titel, jede Staffel ein Abschnitt: kein Titel und kein Termin im Raum der
+ * Staffel-Titel (7 bis unter 8 Mio.), die Detaildatei trägt `s` und `sn` wie die Yaml, die Kopfzählung reicht bis zur letzten belegten Folge
+ * (offene Staffel mit Kennzeichen), und jedes `staffelFolge` eines Termins passt zu seiner durchlaufenden Folge. Rot: eine abgeschlossene
+ * Staffel zählt in einer Quelle anders oder der Bestand weicht ab. `⚠ WARNUNG` (im Lauf-Log sichtbar): eine Quelle führt eine neue Staffel
+ * oder den Titel nicht; Fernsehtermine ohne Staffel. Liest relativ zum Arbeitsordner; Prozesstest `check-horizonte-staffeln-bestand-lauf.ts`.
  */
 import { existsSync, readFileSync } from 'node:fs'
-import { HORIZONTE_STAFFELN, abweichungenZurQuelle, folgenJeStaffelAusSt, hoechsteJeStaffel, ladeStaffelGrenzen, letzteFolgen, type StaffelGrenzen } from './lib/pokemon-staffeln.ts'
+import { istStaffelTitel } from '../shared/staffel-titel.ts'
+import { staffelUndFolge } from '../shared/staffel-folge.ts'
+import {
+  HORIZONTE_STAFFELN,
+  abweichungenZurQuelle,
+  folgenJeStaffelAusSt,
+  hoechsteJeStaffel,
+  ladeStaffelGrenzen,
+  letzteFolgen,
+  staffelListen,
+  staffelNamen,
+  type StaffelGrenzen,
+} from './lib/pokemon-staffeln.ts'
 import { bestandWarnzeile } from './lib/bestand-warnzeile.ts'
 import { melde } from './lib/quarantaene.ts'
 
+type Termin = { titleId: number; platform: string; episode?: number; staffelFolge?: [number, number] }
 const lies = <T>(pfad: string): T | undefined => (existsSync(pfad) ? (JSON.parse(readFileSync(pfad, 'utf8')) as T) : undefined)
+const liste = <T>(roh: T[] | Record<string, T[]> | undefined, schluessel: string): T[] => (Array.isArray(roh) ? roh : (roh?.[schluessel] ?? []))
 const wiki = lies<{ titel: Record<string, { folgen: { st?: number }[] }> }>('data/wikipedia-folgen.json')?.titel ?? {}
 const toggo = lies<{ titel: Record<string, { folgen: { staffel: number; folge: number }[] }> }>('data/toggo.json')?.titel ?? {}
 const zaehlung = lies<Record<string, [number, number, 1?]>>('public/data/folgen/zaehlung.json') ?? {}
-const titelDatei = lies<{ id: number }[] | { titles: { id: number }[] }>('public/data/titles.json') ?? []
-const titelIds = new Set((Array.isArray(titelDatei) ? titelDatei : titelDatei.titles).map((t) => t.id))
+const titel = liste(lies<{ id: number }[] | Record<string, { id: number }[]>>('public/data/titles.json'), 'titles')
+const termine = liste(lies<Termin[] | Record<string, Termin[]>>('public/data/events.json'), 'events')
 
 let fehler = 0
 function fehlt(id: number, text: string): void {
@@ -24,28 +40,40 @@ function fehlt(id: number, text: string): void {
   console.error(`FEHLER: ${id}: ${text}`)
 }
 
-/**
- * Die Yaml teilt den Titel (`basis`, Phase Staffel-Titel): je Staffel eigene Detaildatei (außer der offenen Basis-Staffel, die noch keine Folgenliste führt) und
- * Kopfzählung unter der Kennung der Staffel; die offene Staffel trägt das Kennzeichen „Staffel offen“.
- */
-function geteilt(g: StaffelGrenzen): void {
-  /* Zwischenzeit: Die Aktivierung ist gemergt, der Bestandsbau hat die Staffel-Titel aber noch nicht geschrieben. Erst wenn eine Staffel-Kennung im Bestand steht, gilt der ganze Satz. */
-  const eigene = g.staffeln.map((s) => s.kennung).filter((k): k is number => k !== undefined && k !== g.anilistId)
-  if (!eigene.some((k) => titelIds.has(k))) {
-    console.log(bestandWarnzeile('Horizonte-Staffeln: Staffel-Titel', 'Titel noch nicht im Bestand (Bestandsbau nach der Aktivierung steht aus), Detaildateien und Kopfzählung ungeprüft', [g.anilistId]))
-    return
-  }
-  for (const s of g.staffeln) {
-    const kennung = s.kennung ?? g.anilistId
-    const offen = s.offen === true
-    if (!offen && !lies(`public/data/folgen/${kennung}.json`)) fehlt(kennung, `Detaildatei public/data/folgen/${kennung}.json fehlt`)
-    const belegt = offen ? letzteFolgen([g]).get(g.anilistId)! - s.von + 1 : s.bis! - s.von + 1
-    const kopf = zaehlung[kennung]
-    if ((kopf?.[0] ?? 0) < belegt) fehlt(kennung, `Kopfzählung ${kopf?.[0]} Folgen, belegt sind ${belegt}`)
-    if (offen !== (kopf?.[2] === 1)) fehlt(kennung, `Kopfzählung ${offen ? 'ohne' : 'mit'} Kennzeichen „Staffel offen“, die Datei sagt ${offen ? 'offen' : 'abgeschlossen'}`)
-  }
+/** Kein Staffel-Titel mehr im Bestand (F157): weder als Titel noch als Termin. */
+function keineStaffelTitel(): void {
+  for (const t of titel.filter((x) => istStaffelTitel(x.id))) fehlt(t.id, 'Titel im Raum der Staffel-Titel: die Serie ist ein Titel, jede Staffel ein Abschnitt (F157)')
+  for (const id of new Set(termine.filter((e) => istStaffelTitel(e.titleId)).map((e) => e.titleId))) fehlt(id, 'Termin an einem Staffel-Titel')
 }
 
+/** Detaildatei, Kopfzählung und Termine des einen Titels gegen die Yaml. */
+function einTitel(g: StaffelGrenzen): void {
+  const id = g.anilistId
+  const s = staffelListen([g]).get(id)!
+  const datei = lies<{ s?: unknown; sn?: unknown }>(`public/data/folgen/${id}.json`)
+  if (!datei) return fehlt(id, `Detaildatei public/data/folgen/${id}.json fehlt`)
+  if (JSON.stringify(datei.s) !== JSON.stringify(s)) fehlt(id, `Detaildatei: s ${JSON.stringify(datei.s)}, die Yaml sagt ${JSON.stringify(s)}`)
+  const sn = staffelNamen([g]).get(id)
+  if (JSON.stringify(datei.sn) !== JSON.stringify(sn)) fehlt(id, `Detaildatei: sn ${JSON.stringify(datei.sn)}, die Yaml sagt ${JSON.stringify(sn)}`)
+  const offen = g.staffeln.at(-1)!.offen === true
+  const kopf = zaehlung[id]
+  const belegt = letzteFolgen([g]).get(id)!
+  if ((kopf?.[0] ?? 0) < belegt) fehlt(id, `Kopfzählung ${kopf?.[0]} Folgen, belegt sind ${belegt}`)
+  if (offen !== (kopf?.[2] === 1)) fehlt(id, `Kopfzählung ${offen ? 'ohne' : 'mit'} Kennzeichen „Staffel offen“, die Datei sagt ${offen ? 'offen' : 'abgeschlossen'}`)
+  const eigene = termine.filter((e) => e.titleId === id)
+  for (const e of eigene.filter((x) => x.staffelFolge && x.episode !== undefined)) {
+    const soll = staffelUndFolge(s, e.episode!)
+    if (JSON.stringify(soll) !== JSON.stringify(e.staffelFolge)) fehlt(id, `Termin Folge ${e.episode}: staffelFolge ${JSON.stringify(e.staffelFolge)}, die Grenzen sagen ${JSON.stringify(soll)}`)
+  }
+  const ohne = eigene.filter((e) => e.platform === 'tv' && !e.staffelFolge).length
+  if (ohne) console.log(bestandWarnzeile('Horizonte-Staffeln: Fernsehtermine', `ohne Staffel (${ohne} Termine, kein eindeutiger Folgentitel)`, [id]))
+}
+
+if (!titel.length || !termine.length) {
+  console.error(`FEHLER: ${titel.length} Titel, ${termine.length} Termine gelesen (public/data/titles.json, events.json)`)
+  process.exit(1)
+}
+keineStaffelTitel()
 for (const g of ladeStaffelGrenzen(HORIZONTE_STAFFELN)) {
   const id = g.anilistId
   const quellen: [string, (number | undefined)[] | undefined][] = [
@@ -61,7 +89,7 @@ for (const g of ladeStaffelGrenzen(HORIZONTE_STAFFELN)) {
     for (const text of f) fehlt(id, text)
     for (const text of hinweise) console.log(bestandWarnzeile(`Horizonte-Staffeln: ${text}`, 'Titel', [id]))
   }
-  geteilt(g)
+  einTitel(g)
 }
 if (fehler) process.exit(1)
-console.log('check-horizonte-staffeln-bestand: ok')
+console.log(`check-horizonte-staffeln-bestand: ok (${titel.length} Titel, ${termine.length} Termine gelesen)`)

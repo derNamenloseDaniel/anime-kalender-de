@@ -1,15 +1,15 @@
 /**
  * **Eine angekündigte Staffel ohne eigene Seite** (Daniel, 24.11.2026, The Mighty Nein Staffel 2): Ein künftiges Release, dessen erste Folge
  * hinter der Folgenzahl seines Titels liegt, ist eine weitere Staffel, die nur als Termin am Grundtitel hängt. Sie hat dann keine Detailseite,
- * ihre News-Meldung steht an der falschen Staffel und ihr Sprachhinweis an der Seite der ersten. Der Bau schneidet sie über
- * `pipeline/bau/staffel-titel.ts` (Pläne aus `data/curated/pokemon-staffeln.yaml` und `horizonte-staffeln.yaml`) in einen eigenen Titel; hier steht, was übrig bleibt.
+ * ihre News-Meldung steht an der falschen Staffel und ihr Sprachhinweis an der Seite der ersten. Titel mit belegten Staffelgrenzen sind
+ * ausgenommen: Dort ist jede Staffel ein Abschnitt der Seite (F157).
  */
 import type { Release, Title } from '../../shared/types.ts'
 
 export type StaffelOhneSeite = { slug: string; titleId: number; titel: string; ab: number; am: string }
 
 export function staffelnOhneSeite(
-  titles: Pick<Title, 'id' | 'episodes' | 'staffelTitel' | 'titleEn' | 'titleDe'>[],
+  titles: Pick<Title, 'id' | 'episodes' | 'titleEn' | 'titleDe'>[],
   releases: Pick<Release, 'slug' | 'titleId' | 'schedule' | 'widerlegt'>[],
   heute: string,
   mitGrenzen: ReadonlySet<number> = new Set(),
@@ -20,7 +20,7 @@ export function staffelnOhneSeite(
     const ab = r.schedule?.firstEpisodeNumber
     const am = r.schedule?.firstEpisodeDate
     /* Titel mit belegten Staffelgrenzen (`data/curated/*-staffeln.yaml`) führen jede Staffel als Abschnitt ihrer Seite (F157, 24.11.2026). */
-    if (!t || t.staffelTitel || mitGrenzen.has(t.id) || r.widerlegt || ab === undefined || am === undefined) return []
+    if (!t || mitGrenzen.has(t.id) || r.widerlegt || ab === undefined || am === undefined) return []
     if (am < heute || ab < 2 || t.episodes === undefined || ab <= t.episodes) return []
     return [{ slug: r.slug, titleId: t.id, titel: t.titleEn ?? t.titleDe ?? String(t.id), ab, am }]
   })

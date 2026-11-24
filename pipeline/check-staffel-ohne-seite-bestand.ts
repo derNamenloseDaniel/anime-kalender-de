@@ -16,7 +16,7 @@ import { abweichungVonBekannt, bestandUrteil, staffelnOhneSeite } from './lib/st
 import { melde } from './lib/quarantaene.ts'
 import { ladeStaffelGrenzen } from './lib/pokemon-staffeln.ts'
 
-/** Release-Slug → Grund. Cartoons kommen aus `cartoons.json`, der Staffel-Schnitt (`pipeline/bau/staffel-titel.ts`) sieht nur die Titel-Map der Anime. */
+/** Release-Slug → Grund. Cartoons kommen aus `cartoons.json` und haben noch keine Staffelgrenzen-Yaml. */
 const BEKANNT: ReadonlyMap<string, string> = new Map([
   ['the-mighty-nein-s2-primevideo', 'Cartoon (TMDB -219080): Staffel-Schnitt für Cartoons fehlt, Staffel 2 hängt an der Seite von Staffel 1 (Auftrag offen, 24.11.2026)'],
 ])

@@ -17,14 +17,12 @@ const titel = [
   { id: -900002, titleEn: 'Beta', episodes: 8 },
   { id: -900003, titleEn: 'Gamma', episodes: 12 },
   { id: -900004, titleEn: 'Delta', episodes: undefined },
-  { id: 7900005, titleEn: 'Epsilon Staffel 2', episodes: 8, staffelTitel: { sammel: -900001, nr: 2, ab: 9 } },
 ]
 const rel = (slug: string, titleId: number, ab: number | undefined, am: string, extra: object = {}) => ({ slug, titleId, schedule: { firstEpisodeDate: am, firstEpisodeNumber: ab }, ...extra }) as never
 const heute = '2026-11-24'
 
 const s2 = rel('alpha-s2', -900001, 9, '2027-03-24')
 pruefe('Staffel 2 ab Folge 9 hinter 8 Folgen, künftig: Fund', staffelnOhneSeite(titel, [rel('x', -900002, 5, '2027-01-01'), s2, rel('y', -900003, 12, '2027-01-01')], heute).map((f) => f.slug), ['alpha-s2'])
-pruefe('Titel trägt Staffel-Titel (geschnitten): kein Fund', staffelnOhneSeite(titel, [rel('e', 7900005, 9, '2027-03-24')], heute), [])
 pruefe('Titel mit belegten Staffelgrenzen (F157: Staffel als Abschnitt): kein Fund; ein anderer Titel daneben schon', staffelnOhneSeite(titel, [s2, rel('y', -900002, 9, '2027-01-01')], heute, new Set([-900001])).map((f) => f.slug), ['y'])
 pruefe('Erste Folge = Folgenzahl + 1 zählt, = Folgenzahl nicht', staffelnOhneSeite(titel, [rel('a', -900002, 9, '2027-01-01'), rel('b', -900002, 8, '2027-01-01')], heute).map((f) => f.slug), ['a'])
 pruefe('vergangener Termin: kein Fund', staffelnOhneSeite(titel, [rel('alt', -900001, 9, '2026-11-23')], heute), [])

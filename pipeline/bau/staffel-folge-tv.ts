@@ -10,7 +10,6 @@ import type { ReleaseEvent } from '../../shared/types.ts'
 import type { TvSendung } from '../fetch-tv-programm.ts'
 import { HORIZONTE_STAFFELN, ladeStaffelGrenzen, type StaffelGrenzen } from '../lib/pokemon-staffeln.ts'
 import { folgentitelJeSendeplatz, sendeSchluessel, staffelJeFolgentitel, trefferFuer } from '../lib/staffel-termine.ts'
-import type { StaffelPlan } from '../lib/staffel-titel.ts'
 import type { WikiListen } from '../lib/tv-termine.ts'
 import { log, readJson, warn } from '../lib/util.ts'
 
@@ -25,25 +24,16 @@ export function ladeTvStaffelEingaben(): TvStaffelEingaben {
   }
 }
 
-/** Die Grenzen in der Form, die `staffelJeFolgentitel` liest (Staffeln mit `von`/`bis` in durchlaufender Zählung). */
-const planAus = (g: StaffelGrenzen): StaffelPlan => ({
-  sammel: g.anilistId,
-  titel: g.titel ?? String(g.anilistId),
-  basis: g.staffeln[0]!.nr,
-  staffeln: g.staffeln.map((s) => ({ nr: s.nr, von: s.von, ...(s.bis !== undefined ? { bis: s.bis } : {}), kennung: g.anilistId })),
-})
-
 /** Schreibt `staffelFolge` an jeden Fernsehtermin der Titel mit Grenzen, dessen Folgentitel eindeutig einer Staffel zugeordnet ist. */
 export function schreibeTvStaffelFolgen(events: ReleaseEvent[], { grenzen, sendungen, wiki }: TvStaffelEingaben): TvStaffelZaehlung {
   const z: TvStaffelZaehlung = { mit: 0, ohneTreffer: 0, widerspruch: 0 }
   for (const g of grenzen) {
-    const plan = planAus(g)
-    const liste = staffelJeFolgentitel(wiki[String(g.anilistId)]?.folgen ?? [], plan)
+    const liste = staffelJeFolgentitel(wiki[String(g.anilistId)]?.folgen ?? [], g)
     const sendeplatz = folgentitelJeSendeplatz(sendungen, g.anilistId)
     for (const ev of events) {
       if (ev.titleId !== g.anilistId || ev.platform !== 'tv') continue
       const t = trefferFuer(liste, sendeplatz.get(sendeSchluessel(ev.sender ?? '', `${ev.date}T${ev.time ?? ''}`)))
-      const s = t && plan.staffeln.find((x) => x.nr === t.nr)
+      const s = t && g.staffeln.find((x) => x.nr === t.nr)
       if (!t || !s) z.ohneTreffer++
       else if (ev.episode !== undefined && ev.episode !== s.von - 1 + t.folge) z.widerspruch++
       else {

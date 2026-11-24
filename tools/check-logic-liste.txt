@@ -584,6 +584,7 @@ pipeline/check-quelle-ueberholt.ts
 pipeline/check-quellen-ruecknahme.ts
 pipeline/check-quellen-schreiber.ts
 pipeline/check-quittung-sperre.ts
+pipeline/check-reihen-doppelt.ts
 pipeline/check-reihen-namen-rein.ts
 pipeline/check-reihen-namen.ts
 pipeline/check-reihen-spur-hook.ts

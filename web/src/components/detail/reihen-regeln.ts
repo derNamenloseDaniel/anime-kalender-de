@@ -31,9 +31,12 @@ export function kurzName(rest: string, voll: string): string {
   return rest && !istNichtssagend(rest) ? rest : voll
 }
 
-/** Der Zusatz hinter „Staffel N ·": der Rest, bei nichtssagendem Rest der volle Name — außer der Rest ist nur die Staffelnummer selbst. */
-export function zeilenZusatz(nr: Pick<StaffelNummer, 'staffel' | 'eigenerName'>, rest: string, voll: string): string {
-  if (!nr.eigenerName || !rest) return ''
+/**
+ * Der Zusatz hinter „Staffel N ·": der Rest, bei nichtssagendem Rest der volle Name — außer der Rest ist nur die Staffelnummer selbst.
+ * Bleibt er leer, steht `unterschied` da (`reihen-doppelt.ts`: Karten mit gleicher Beschriftung).
+ */
+export function zeilenZusatz(nr: Pick<StaffelNummer, 'staffel' | 'eigenerName'>, rest: string, voll: string, unterschied = ''): string {
+  if (!nr.eigenerName || !rest) return unterschied
   if (!istNichtssagend(rest)) return rest
-  return rest === String(nr.staffel) ? '' : voll
+  return rest === String(nr.staffel) ? unterschied : voll
 }

@@ -2,6 +2,7 @@ import { type FranchiseMember, type Title } from '@shared/types.ts'
 import { hauptstaffeln, nachJahrUndId, staffelBeschriftungen, staffelStaende } from '@shared/titles.ts'
 import { angabenZeile, kuenftig as istKuenftig, teilNamen } from './reihen-teil.ts'
 import { ReihenCover } from './reihen-cover.tsx'
+import { doppelteZusaetzeDerReihe, type FolgenText } from './reihen-doppelt.ts'
 import { ReihenSpur } from './reihen-spur.tsx'
 import { istEingeklappt } from './reihen-regeln.ts'
 import { OhneSynchroSchalter, ReihenKopf } from './reihen-kopf.tsx'
@@ -95,7 +96,9 @@ export function reihenOrdnung(reihenTeile: FranchiseMember[], reihenName: string
   */
   const staffelLabel = staffelBeschriftungen(reihenTeile.filter(istHauptstaffel), reihenName)
   const nummern = staffelStaende(reihenTeile.filter(istHauptstaffel), reihenName)
-  return { kuenftig, istHauptstaffel, gruppen, staffelLabel, nummern }
+  const folgenText: FolgenText = (staffel, von, bis, mitStaffel) => t(mitStaffel ? 'detail.reiheFolgenMitS' : 'detail.reiheFolgen', { staffel, von, bis })
+  const unterschied = doppelteZusaetzeDerReihe(reihenTeile.filter(istHauptstaffel), reihenName, staffelLabel, nummern, folgenText)
+  return { kuenftig, istHauptstaffel, gruppen, staffelLabel, nummern, unterschied }
 }
 
 export type Ordnung = ReturnType<typeof reihenOrdnung>
@@ -112,6 +115,7 @@ export function reihenKarte(m: FranchiseMember, o: Ordnung, p: Pick<ReihenListeP
       gewaehlt={m.id === p.title.id}
       gemerkt={p.favorites.has(m.id)}
       nr={o.nummern.get(m.id)}
+      unterschied={o.unterschied.get(m.id)}
       namen={teilNamen(m, p.reihenName, o.istHauptstaffel(m), o.staffelLabel.get(m.id))}
       angaben={angabenZeile(m, offen, p.t)}
       gesperrt={p.wechselt}

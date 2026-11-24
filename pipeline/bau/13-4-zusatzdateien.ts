@@ -11,7 +11,7 @@ import {
 } from '../../shared/types.ts'
 import { nachAusstrahlung, unterscheidenderZusatz } from '../../shared/titles.ts'
 import { alleStaffelQuellen } from './staffel-quelle.ts'
-import { ladeStaffelGrenzen, staffelEnden } from '../lib/pokemon-staffeln.ts'
+import { geteilteStaffeln, ladeStaffelGrenzen, staffelEnden } from '../lib/pokemon-staffeln.ts'
 import { ANILIST_COVER_BASIS } from '../../shared/mappings.ts'
 import { type AnisearchEintrag } from './01-quellen.ts'
 import { type SynopsisEintrag } from './13-1-anreichern.ts'
@@ -242,6 +242,7 @@ function baueReihen(fuerReihen: ReihenTitel[], imBestand: Set<number>, kontext: 
   /* Die belegte deutsche Staffelangabe (aniSearch) steuert die Beschriftung, nicht den Titel. */
   const staffelQuellen = alleStaffelQuellen()
   const staffelBisse = staffelEnden(ladeStaffelGrenzen())
+  const staffelGeteilt = geteilteStaffeln()
   const elternVon = ladeElternKanten()
   const reihen: Record<number, FranchiseMember[]> = {}
   for (const [key, liste] of gruppiereNachReihe(fuerReihen)) {
@@ -279,6 +280,7 @@ function baueReihen(fuerReihen: ReihenTitel[], imBestand: Set<number>, kontext: 
       /* Die belegte deutsche Staffelangabe — sie entscheidet die Beschriftung. */
       staffelQuelle: staffelQuellen.get(t.id),
       staffelBis: staffelBisse.get(t.id),
+      staffelFolgen: staffelGeteilt.get(t.id),
       /* Hängt er an einem anderen Teil **dieser** Reihe? Eine fremde Elternkante zählt nicht. */
       beiwerk: (elternVon.get(t.id) ?? []).some((e) => sortiert.some((x) => x.id === e)) || undefined,
       // Nur der Dateiname; den Vorsatz hängt `loadFranchises` wieder an.

@@ -6,9 +6,12 @@ import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import yaml from 'js-yaml'
 import type { StaffelZeile } from '../../shared/staffel-folge.ts'
+import type { FranchiseMember } from '../../shared/types.ts'
 import { ROOT } from './util.ts'
 
 export { mitStapelFolgen, type StaffelZeile } from '../../shared/staffel-folge.ts'
+
+type StaffelFolgen = NonNullable<FranchiseMember['staffelFolgen']>
 
 /** `offen`: die laufende letzte Staffel, deren Ende keine Quelle nennt — ohne `bis` und `folgen`. */
 export type StaffelAbschnitt = { nr: number; von: number; bis?: number; folgen?: number; offen?: true; kennung?: number; name?: string }
@@ -34,6 +37,35 @@ export function startStaffeln(grenzen: StaffelGrenzen[]): Map<number, number> {
 export function staffelEnden(grenzen: StaffelGrenzen[]): Map<number, number> {
   const mehrere = grenzen.filter((t) => t.staffeln[t.staffeln.length - 1]!.nr > t.staffeln[0]!.nr)
   return new Map(mehrere.map((t): [number, number] => [t.anilistId, t.staffeln[t.staffeln.length - 1]!.nr]))
+}
+
+/**
+ * Kennung → `[[Staffel, von, bis], …]` der abgeschlossenen Staffeln, die ein zweiter Titel ebenfalls trägt (Pokémon Staffel 15: zwei Titel).
+ * Gezählt wird **innerhalb der deutschen Staffel** (Staffel 16: 1–11, 12–25, 26–45), nicht in der Titelnummer, die in jedem Titel wieder bei 1 beginnt;
+ * die Reihenfolge der Titel in der Datei ist die der Folgen (belegt gegen TMDB: `check-pokemon-staffeln.ts`).
+ * Die Reihenliste nennt damit, welche Folgen der geteilten Staffel eine Karte hat (`reihen-doppelt.ts`).
+ * Je Datei für sich: Horizonte zählt seine Staffeln 1 ff. selbst, das ist nicht die Hauptserie.
+ */
+export function geteilteStaffeln(dateien: string[] = [HORIZONTE_STAFFELN, POKEMON_STAFFELN]): Map<number, StaffelFolgen> {
+  return new Map(dateien.flatMap((datei) => [...geteilteInGrenzen(ladeStaffelGrenzen(datei))]))
+}
+
+export function geteilteInGrenzen(grenzen: StaffelGrenzen[]): Map<number, StaffelFolgen> {
+  const titelJeStaffel = new Map<number, number>()
+  for (const t of grenzen) for (const s of t.staffeln) titelJeStaffel.set(s.nr, (titelJeStaffel.get(s.nr) ?? 0) + 1)
+  const ergebnis = new Map<number, StaffelFolgen>()
+  const davor = new Map<number, number>() // Staffel → Folgen der Titel, die in der Datei vor dem aktuellen stehen
+  for (const t of grenzen) {
+    const zeilen: StaffelFolgen = []
+    for (const s of t.staffeln.filter((x) => x.bis !== undefined && (titelJeStaffel.get(x.nr) ?? 0) > 1)) {
+      const anfang = davor.get(s.nr) ?? 0
+      const ende = anfang + s.bis! - s.von + 1
+      zeilen.push([s.nr, anfang + 1, ende])
+      davor.set(s.nr, ende)
+    }
+    if (zeilen.length) ergebnis.set(t.anilistId, zeilen)
+  }
+  return ergebnis
 }
 
 /** Kennung → `[[Staffel, von, bis], …]` für die Detaildatei des Titels. */

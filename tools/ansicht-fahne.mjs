@@ -10,14 +10,13 @@ import { readFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { urteilFahne } from './fahne-urteil.mjs'
+import { montagDerWoche, urteilFahne, wocheAb } from './fahne-urteil.mjs'
 
 const WURZEL = path.resolve(import.meta.dirname, '..')
 const TYPEN = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.png': 'image/png', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json' }
 const COVER_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300"><rect width="200" height="300" fill="#4a5a80"/></svg>'
 export const BREITEN = [360, 375]
-/** Wochen ab diesem Montag werden nach einer Kachel mit Fahne abgesucht. */
-const ERSTE_WOCHE = Date.UTC(2026, 10, 23)
+/** Ab dem Montag der laufenden Woche (Berlin) werden so viele Wochen nach einer Kachel mit Fahne abgesucht. */
 const WOCHEN_SUCHE = 16
 const FAHNE = 'span[class*="rounded-2xl"][class*="uppercase"][class*="font-extrabold"][class*="leading-tight"]'
 
@@ -84,7 +83,7 @@ async function neueSeite(browser, breite, dist) {
 async function messeBreite(browser, breite, dist) {
   const seite = await neueSeite(browser, breite, dist)
   for (let n = 0; n < WOCHEN_SUCHE; n++) {
-    const datum = new Date(ERSTE_WOCHE + n * 7 * 86_400_000).toISOString().slice(0, 10)
+    const datum = wocheAb(montagDerWoche(Date.now()), n)
     await lade(seite, datum)
     const m = await seite.evaluate(messeFahne, { selektor: FAHNE, kurz: 'Neu', lang: 'Neu bei Prime Video' })
     if (m) {

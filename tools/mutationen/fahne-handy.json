@@ -7,5 +7,9 @@
   { "name": "Fahne: Urteil ohne Umbruchprüfung", "aenderungen": [{ "datei": "tools/fahne-urteil.mjs", "suche": "else if (m.langHoehe > m.kurzHoehe + RUNDUNG)", "ersetze": "else if (false)" }], "tests": ["node tools/fahne-urteil.test.mjs"] },
   { "name": "Fahne: Urteil nimmt Höhe 0 hin", "aenderungen": [{ "datei": "tools/fahne-urteil.mjs", "suche": "if (!(m.kurzHoehe > 0))", "ersetze": "if (false)" }], "tests": ["node tools/fahne-urteil.test.mjs"] },
   { "name": "Fahne: Urteil ohne Schriftprüfung", "aenderungen": [{ "datei": "tools/fahne-urteil.mjs", "suche": "if (m.schriftDa !== true)", "ersetze": "if (false)" }], "tests": ["node tools/fahne-urteil.test.mjs"] },
+  { "name": "Fahne: Wochenstart nach UTC statt Berlin", "aenderungen": [{ "datei": "tools/fahne-urteil.mjs", "suche": "timeZone: 'Europe/Berlin'", "ersetze": "timeZone: 'UTC'" }], "tests": ["node tools/fahne-urteil.test.mjs"] },
+  { "name": "Fahne: Wochenstart Sonntag statt Montag", "aenderungen": [{ "datei": "tools/fahne-urteil.mjs", "suche": "(wochentag + 6) % 7", "ersetze": "wochentag" }], "tests": ["node tools/fahne-urteil.test.mjs"] },
+  { "name": "Fahne: Wochenstart ohne Rückrechnung", "aenderungen": [{ "datei": "tools/fahne-urteil.mjs", "suche": "tagMs - ((wochentag + 6) % 7) * TAG_MS", "ersetze": "tagMs" }], "tests": ["node tools/fahne-urteil.test.mjs"] },
+  { "name": "Fahne: Wochenschritt 6 Tage", "aenderungen": [{ "datei": "tools/fahne-urteil.mjs", "suche": "n * 7 * TAG_MS", "ersetze": "n * 6 * TAG_MS" }], "tests": ["node tools/fahne-urteil.test.mjs"] },
   { "name": "Fahne: Messung nur bei 360 px", "aenderungen": [{ "datei": "tools/ansicht-fahne.mjs", "suche": "BREITEN = [360, 375]", "ersetze": "BREITEN = [360]" }], "tests": ["node tools/fahne-urteil.test.mjs"] }
 ]

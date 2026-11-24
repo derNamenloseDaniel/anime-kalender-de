@@ -1,10 +1,11 @@
 import { createRoot } from 'react-dom/client'
 import { useEffect, useState } from 'react'
 import './rahmen.css'
+import rahmenStil from './rahmen.css?inline'
 import type { FaelleDatei } from './faelle.ts'
 import { geraeteFuer } from './geraete.ts'
 import { Leiste } from './leiste.tsx'
-import { istEingebettet, Optionen } from './optionen.tsx'
+import { Optionen, optionenOrt } from './optionen.tsx'
 import { Raster } from './raster.tsx'
 import { gueltigeZeit } from './zeit-regler.tsx'
 import { ladeMockups } from './mockups-laden.ts'
@@ -69,10 +70,10 @@ function Rahmen({ faelle }: { faelle: FaelleDatei }) {
   if (!def) return <Uebersicht namen={namen} />
   const ersteVariante = Object.keys(def.varianten)[0] ?? ''
   const zustand = mitVorgaben(zustandAus(name, werte), def)
-  const eingebettet = istEingebettet()
+  const [ort] = useState(() => optionenOrt(window))
   return (
-    <div className={eingebettet ? 'seite eingebettet' : 'seite'}>
-      <Optionen eingebettet={eingebettet}>
+    <div className={ort.art === 'streifen' ? 'seite eingebettet' : 'seite'}>
+      <Optionen ort={ort} stil={rahmenStil}>
         <Leiste def={def} zustand={zustand} faelle={namen} />
         {def.varianten[zustand.variante]?.notiz && <p className="notiz">{def.varianten[zustand.variante]!.notiz}</p>}
       </Optionen>

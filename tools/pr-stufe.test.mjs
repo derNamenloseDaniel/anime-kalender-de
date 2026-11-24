@@ -121,6 +121,7 @@ fall2('Umbenennung Test → pipeline → 2', aus(diff('diff --git a/pipeline/bui
 fall2('Symlink-Test → 2', aus(diff('diff --git a/tools/l.test.mjs b/tools/l.test.mjs', 'new file mode 120000', plus)), 2)
 fall2('quotierter Testpfad → 2', aus(diff('diff --git "a/tools/\\303\\274.test.mjs" "b/tools/\\303\\274.test.mjs"', plus)), 2)
 fall('erzeugte Kennzahlen (tage.jsonl + daten.js) → 1', [d('tools/kennzahlen/tage.jsonl', zeilen(3)), d('tools/kennzahlen/daten.js', zeilen(3))], 1)
+fall('erzeugte Kernpunkte (kernpunkte.yaml) → 1', [d('tools/kennzahlen/kernpunkte.yaml', zeilen(93))], 1)
 fall('Kennzahlen-Logik bleibt 2', [d('tools/kennzahlen/kennzahlen-logik.cjs')], 2)
 fall('Kennzahlen mit Logik gemischt → 2', [d('tools/kennzahlen/tage.jsonl'), d('tools/kennzahlen/kennzahlen-logik.cjs')], 2)
 fall('Kennzahlen über 300 Zeilen → 2', [d('tools/kennzahlen/tage.jsonl', zeilen(301))], 2)

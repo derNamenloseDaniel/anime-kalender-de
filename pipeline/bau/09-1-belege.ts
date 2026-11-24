@@ -79,46 +79,6 @@ function setzeDubAusTermin({
 }
 
 /**
- * **Verweise, die kein Sammellauf findet — von Hand belegt.**
- *
- * Die Erweiterung meldet Seiten, die unser Datensatz gar nicht kennt: Ein
- * Anbieter führt denselben Anime unter mehreren Kennungen, und aniSearch
- * nennt nur eine. Solche Meldungen landen in
- * `daniel-zum-abarbeiten/listen/11-meldungen-ohne-zuordnung.md` — und blieben dort
- * liegen, weil es **keinen Weg gab, die Adresse einzutragen**. Am 10.09.2026
- * warteten so 54 Meldungen zu drei Haikyu!!-Staffeln, zwei davon für Titel
- * ohne einen einzigen Prime-Verweis.
- *
- * `data/adn-adressen.yaml` und `data/rtlplus-adressen.yaml` **ersetzen** eine
- * vorhandene Adresse; diese Datei **legt eine an**. Deshalb die dritte.
- *
- * **Der Eintrag urteilt nicht.** Er sagt „dort gibt es diesen Titel", nicht
- * „dort ist er auf Deutsch" — das Sprachurteil kommt weiter aus den
- * Meldungen. Steht die Adresse erst im Datensatz, findet `fetch-pruefungen.ts`
- * sie über `nachUrl` und ordnet die Folgenbefunde zu.
- *
- * Ein Verweis, der schon dasteht, wird nicht verdoppelt: Verglichen wird über
- * denselben Adresskern wie überall.
- */
-function verweiseVonHand(titles: Map<number, Title>) {
-  /** Adresskern → `belegtAm` der von Hand bestätigten Wege (für `handSticht`, 22.09.2026). */
-  return ergaenzeVerweiseVonHand(titles)
-}
-
-/**
- * Was ein Mensch nachgesehen hat, schlägt jede Ableitung.
- *
- * Für YouTube, Netflix, Prime Video, RTL+ und Joyn gibt es keine Quelle, die
- * die Tonspur nennt — 3.021 Verweise standen deshalb dauerhaft auf „🇩🇪 ?".
- * `data/dub-confirmed.yaml` löst das auf dem einzigen Weg, der zum
- * Projektgrundsatz passt: durch tatsächliches Nachsehen. Ein Eintrag dort ist
- * ein Beleg, kein Vorschlag, und gilt deshalb auch gegen ein automatisch
- * gesetztes `true`.
- */
-  // `loadDubChecks()` führt mehrere Zeilen zu einem Verweis bereits zusammen und
-  // lässt dabei den jüngeren Befund gewinnen — hier liegt je Schlüssel genau
-  // einer vor.
-/**
  * **Der Beleg zur Adresse schlägt den Beleg zur Plattform.**
  *
  * `loadDubChecks()` hält seit dem 07.09.2026 je Ausgabe einen eigenen Eintrag
@@ -135,6 +95,16 @@ function verweiseVonHand(titles: Map<number, Title>) {
  * machen darf.
  */
 function belegeJeAdresse({ titles }: Pick<SammleBelegeEingabe, 'titles'>) {
+  /**
+   * Was ein Mensch nachgesehen hat, schlägt jede Ableitung.
+   *
+   * Für YouTube, Netflix, Prime Video, RTL+ und Joyn gibt es keine Quelle, die
+   * die Tonspur nennt — 3.021 Verweise standen deshalb dauerhaft auf „🇩🇪 ?".
+   * `data/dub-confirmed.yaml` löst das auf dem einzigen Weg, der zum
+   * Projektgrundsatz passt: durch tatsächliches Nachsehen. Ein Eintrag dort ist
+   * ein Beleg, kein Vorschlag, und gilt deshalb auch gegen ein automatisch
+   * gesetztes `true`.
+   */
   // `loadDubChecks()` führt mehrere Zeilen zu einem Verweis bereits zusammen und
   // lässt dabei den jüngeren Befund gewinnen — hier liegt je Schlüssel genau
   // einer vor.
@@ -147,24 +117,6 @@ function belegeJeAdresse({ titles }: Pick<SammleBelegeEingabe, 'titles'>) {
   /* Rückwärtsverträglich für die Stellen, die keine Adresse zur Hand haben. */
   return { alleChecks, zugangJeAdresse, kanalJeAdresse, checksJePlattform, belegFuer }
 }
-
-/**
- * **Eine nackte Domain ist kein Weg zu einem Titel.**
- *
- * Gemessen am 07.09.2026: Zwei Crunchyroll-Verweise trugen als Adresse
- * schlicht `https://crunchyroll.com` — einer davon mit großem C, beide ohne
- * Pfad. Sie stammen aus einer Quelle, die statt einer Titelseite ihre eigene
- * Startseite gemeldet hat.
- *
- * Für einen Besucher ist das die schlechteste Art von Verweis: Er sieht aus
- * wie eine Auskunft („dort läuft es"), führt aber auf eine Startseite, auf
- * der er den Titel selbst suchen muss. Ein Fragezeichen wäre ehrlicher
- * gewesen, gar kein Verweis noch mehr.
- *
- * **Ins Gedächtnis kommt das nicht**: Es ist kein belegtes Nein, sondern eine
- * kaputte Adresse. Taucht dieselbe Serie später mit einer echten Adresse auf,
- * soll sie kommen dürfen.
- */
 
 /**
  * **Eine Suchadresse ist kein Weg — auch nicht als Notbehelf.**
@@ -214,6 +166,23 @@ function crWegeRepariert({
   const crAdresseZu = (name: string): string | undefined => crAdresseNachName(crNamen, name)
   const { usNeinWiderlegt, crKatalogDeutsch } = crKatalogUndUsNein({ crDub })
 
+  /**
+   * **Eine nackte Domain ist kein Weg zu einem Titel.**
+   *
+   * Gemessen am 07.09.2026: Zwei Crunchyroll-Verweise trugen als Adresse
+   * schlicht `https://crunchyroll.com` — einer davon mit großem C, beide ohne
+   * Pfad. Sie stammen aus einer Quelle, die statt einer Titelseite ihre eigene
+   * Startseite gemeldet hat.
+   *
+   * Für einen Besucher ist das die schlechteste Art von Verweis: Er sieht aus
+   * wie eine Auskunft („dort läuft es"), führt aber auf eine Startseite, auf
+   * der er den Titel selbst suchen muss. Ein Fragezeichen wäre ehrlicher
+   * gewesen, gar kein Verweis noch mehr.
+   *
+   * **Ins Gedächtnis kommt das nicht**: Es ist kein belegtes Nein, sondern eine
+   * kaputte Adresse. Taucht dieselbe Serie später mit einer echten Adresse auf,
+   * soll sie kommen dürfen.
+   */
   const { beantworteteSuchen, suchOffen } = reparierePfadloseWege({ alleChecks, titles, crAdresseZu })
   return { crAdresseZu, usNeinWiderlegt, crKatalogDeutsch, beantworteteSuchen, suchOffen }
 }
@@ -221,7 +190,30 @@ function crWegeRepariert({
 export function sammleBelege(eingabe: SammleBelegeEingabe) {
   const { titles, tmdbMehrdeutig, tmdbTitles, tvJeTmdb, toteAdressen, crDub } = eingabe
   setzeDubAusTermin(eingabe)
-  const vonHandBelegtAm = verweiseVonHand(titles)
+  /**
+   * **Verweise, die kein Sammellauf findet — von Hand belegt.**
+   *
+   * Die Erweiterung meldet Seiten, die unser Datensatz gar nicht kennt: Ein
+   * Anbieter führt denselben Anime unter mehreren Kennungen, und aniSearch
+   * nennt nur eine. Solche Meldungen landen in
+   * `daniel-zum-abarbeiten/listen/11-meldungen-ohne-zuordnung.md` — und blieben dort
+   * liegen, weil es **keinen Weg gab, die Adresse einzutragen**. Am 10.09.2026
+   * warteten so 54 Meldungen zu drei Haikyu!!-Staffeln, zwei davon für Titel
+   * ohne einen einzigen Prime-Verweis.
+   *
+   * `data/adn-adressen.yaml` und `data/rtlplus-adressen.yaml` **ersetzen** eine
+   * vorhandene Adresse; diese Datei **legt eine an**. Deshalb die dritte.
+   *
+   * **Der Eintrag urteilt nicht.** Er sagt „dort gibt es diesen Titel", nicht
+   * „dort ist er auf Deutsch" — das Sprachurteil kommt weiter aus den
+   * Meldungen. Steht die Adresse erst im Datensatz, findet `fetch-pruefungen.ts`
+   * sie über `nachUrl` und ordnet die Folgenbefunde zu.
+   *
+   * Ein Verweis, der schon dasteht, wird nicht verdoppelt: Verglichen wird über
+   * denselben Adresskern wie überall.
+   */
+  /** Adresskern → `belegtAm` der von Hand bestätigten Wege (für `handSticht`, 22.09.2026). */
+  const vonHandBelegtAm = ergaenzeVerweiseVonHand(titles)
   const { joynZugang } = ergaenzeJoynAusJustwatch({ titles, tmdbMehrdeutig, tmdbTitles, tvJeTmdb, toteAdressen })
   const { alleChecks, zugangJeAdresse, kanalJeAdresse, checksJePlattform, belegFuer } = belegeJeAdresse({ titles })
   const { crAdresseZu, usNeinWiderlegt, crKatalogDeutsch, beantworteteSuchen, suchOffen } = crWegeRepariert({ alleChecks, titles, crDub })

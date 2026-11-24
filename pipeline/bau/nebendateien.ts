@@ -35,6 +35,7 @@ import { markiereCartoonReihenteile } from './reihenteil-markierung.ts'
 import { adnShowsLesen, ergaenzeAdnWege } from './cartoon-adn.ts'
 import { ergaenzeCartoonJoyn } from './cartoon-joyn.ts'
 import { ergaenzeCartoonJwWege } from './cartoon-jw-wege.ts'
+import { setzeToggoSeiten } from './13-1-toggo-seiten.ts'
 import { setzeStaffeln, staffelnAusBelegen } from './cartoon-staffeln.ts'
 import { verteileWege } from './cartoon-wege.ts'
 import { wendeCartoonBelegeAn } from './cartoon-belege.ts'
@@ -200,6 +201,7 @@ export function schreibeCartoons(): void {
   if (jwWege) log(`${jwWege} Cartoon-Bezugswege (Kauf, Leihe, Abo) aus JustWatch ergänzt`)
   const belegt = wendeCartoonBelegeAn(titel, belege)
   if (belegt) log(`${belegt} Cartoon-Verweise mit Handbeleg`)
+  setzeToggoSeiten(titel, 'Cartoons', true)
   setzeTonHinweise(titel, jw, belege)
   const ungeprueft = setzeStaffeln(titel, roh, jw, staffelnAusBelegen(belege))
   kennzeichneCartoonJwSeiten(titel, belege)

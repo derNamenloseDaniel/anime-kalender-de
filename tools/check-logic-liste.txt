@@ -728,6 +728,10 @@ pipeline/check-tmdb-staffel0-liste.ts
 pipeline/check-tmdb-staffel0.ts
 pipeline/check-tmdb-suche.ts
 pipeline/check-tmdb-von-hand-abgeleitet.ts
+pipeline/check-toggo-adresse-stabil.ts
+pipeline/check-toggo-seiten-bestand-lauf.ts
+pipeline/check-toggo-seiten-verdrahtung.ts
+pipeline/check-toggo-seiten.ts
 pipeline/check-tote-adresse-runden.ts
 pipeline/check-tote-adressen-lauf.ts
 pipeline/check-trailer-auswahl.ts

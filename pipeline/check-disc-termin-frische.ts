@@ -28,6 +28,7 @@ const aus = (datum: string) => [{ edition: `Ausgabe ${datum}`, datum }]
 // Alter in vollen Tagen; ohne oder mit kaputtem Zeitstempel null.
 pruefe('Alter: 04:15 am 30.10. sind 24 volle Tage', alterInTagen('2026-10-30T04:15:04.819Z', HEUTE), 24)
 pruefe('Alter 25 Tage', alterInTagen('2026-10-30T00:00:00.000Z', HEUTE), 25)
+pruefe('Alter: „heute“ mit Uhrzeit zählt als Tag', alterInTagen('2026-10-30T00:00:00.000Z', '2026-11-24T23:30:00Z'), 25)
 pruefe('Alter 0', alterInTagen('2026-11-24T00:00:00.000Z', HEUTE), 0)
 pruefe('Alter ohne Stempel', alterInTagen(undefined, HEUTE), null)
 pruefe('Alter kaputt', alterInTagen('gestern', HEUTE), null)
@@ -74,6 +75,18 @@ try {
   pruefe('ohne Disc-Regel: Titel 1 (25 Tage) bleibt draußen', ids(baueWarteschlange(basis)), [3, 2])
   pruefe('mit Disc-Regel: 1 kommt, und zwar vor den Titeln mit Release', ids(baueWarteschlange({ ...basis, discFaellig: disc })), [1, 3, 2])
   pruefe('unter engem limit gewinnt der Disc-Titel', ids(baueWarteschlange({ ...basis, discFaellig: disc, limit: 1 })), [1])
+  // Disc-Titel stehen zwischen Titeln mit Release; unter limit 2 gewinnen beide Disc-Titel, in Eingangsreihenfolge.
+  const viele = {
+    ...basis,
+    ids: { ...basis.ids, 5: 705, 6: 706 },
+    titles: [titel(3), titel(5), titel(2), titel(6), titel(1)],
+    cache: { ...cache, 5: { info: {}, ...stempel(20) }, 6: { info: {}, ...stempel(90) } },
+    releases: [{ titleId: 2 }, { titleId: 3 }, { titleId: 6 }] as Release[],
+    discFaellig: discFaellig(new Set([1, 5]), HEUTE),
+  }
+  for (const asId of [705, 706]) writeFileSync(`${ARCHIV_DIR}/${asId}.html.gz`, '')
+  pruefe('Disc-Titel zwischen Release-Titeln: beide vorn', ids(baueWarteschlange({ ...viele, limit: 2 })), [5, 1])
+  pruefe('danach Titel mit Release in Eingangsreihenfolge', ids(baueWarteschlange(viele)), [5, 1, 3, 2, 6])
   pruefe('frisch gelesener Disc-Titel 4 bleibt draußen', ids(baueWarteschlange({ ...basis, discFaellig: disc })).includes(4), false)
 } finally {
   process.chdir(vorher)
@@ -84,6 +97,7 @@ try {
 const cacheListe = { '1': stempel(25), '3': stempel(2), '4': stempel(400) }
 const liste = unbestaetigteTermine({ '1': aus('2027-04-30'), '2': aus('2026-12-01'), '3': aus('2026-12-01'), '4': aus('2020-01-01') }, cacheListe, HEUTE, 14)
 pruefe('unbestätigt: 1 (25 Tage) und 2 (ohne Stempel)', liste.map((t) => [t.titelId, t.alter]), [[1, 25], [2, null]])
+pruefe('Eintrag trägt Ausgabe und Datum für die Meldung', liste[0], { titelId: 1, edition: 'Ausgabe 2027-04-30', datum: '2027-04-30', alter: 25 })
 pruefe('Grenze: genau 25 Tage bei maxTage 25 ist in Ordnung', unbestaetigteTermine({ '1': aus('2027-04-30') }, cacheListe, HEUTE, 25), [])
 
 // Wächter als Prozess im Wegwerf-Ordner (AK_ROOT), feste Zeit über das Argument.

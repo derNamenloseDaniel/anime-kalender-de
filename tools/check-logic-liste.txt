@@ -222,6 +222,7 @@ pipeline/check-disc-reine-titel.ts
 pipeline/check-disc-suchlinks.ts
 pipeline/check-disc-teil-hinweis.ts
 pipeline/check-disc-teil-verdrahtung.ts
+pipeline/check-disc-termin-frische-lauf.ts
 pipeline/check-disc-termin-frische.ts
 pipeline/check-disc-uebersicht-teile.ts
 pipeline/check-disc-verschiebung-staffel.ts

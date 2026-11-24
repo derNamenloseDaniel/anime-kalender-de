@@ -31,10 +31,8 @@ export function alterInTagen(gelesen: string | undefined, heute: string): number
   return Math.floor((tagesbeginn(heute) - t) / TAG)
 }
 
-const zaehltNoch = (datum: string, heute: string): boolean => {
-  const t = Date.parse(`${datum}T00:00:00Z`)
-  return !Number.isNaN(t) && t >= tagesbeginn(heute) - DISC_RUECKBLICK_TAGE * TAG
-}
+/** Kaputte Daten („2026-10-00") ergeben NaN, und jeder Vergleich damit ist falsch: sie zählen nicht. */
+const zaehltNoch = (datum: string, heute: string): boolean => Date.parse(`${datum}T00:00:00Z`) >= tagesbeginn(heute) - DISC_RUECKBLICK_TAGE * TAG
 
 /** Titel (Schlüssel von `disc-ausgaben.json`) mit mindestens einer Ausgabe von heute minus Rückblick an. */
 export function discTitelMitTermin(ausgaben: Record<string, DiscAusgabeKurz[]>, heute: string): Set<number> {

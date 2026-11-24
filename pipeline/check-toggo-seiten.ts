@@ -35,6 +35,9 @@ const KATALOG: KatalogSerie[] = [
   serie('VSE12', 'wickie-vse12', 'Wickie', ['wickie-pty1'], false),
   serie('VSE13', 'abo-staffel-vse13', 'Pokémon: Nur im Abo', ['pokemon'], false),
   serie('VSE14', 'zwei-figuren-vse14', 'Zwei Figuren', ['erste-pty1', 'zweite-pty2']),
+  serie('VSE15', 'einmalig-vse15', 'Einmalig', ['einmalig-pty3']),
+  serie('VSE16', 'doppelt-a-vse16', 'Doppelt', ['doppelt-pty4']),
+  serie('VSE17', 'doppelt-b-vse17', 'Doppelt', ['doppelt-pty4']),
 ]
 const HAND: SeitenHand = {
   pokemon: [
@@ -46,7 +49,11 @@ const HAND: SeitenHand = {
     { staffel: 24, serie: 'pokemon-meister-reisen-die-serie' },
     { staffel: 30, serie: 'abo-staffel-vse13' },
   ],
-  titel: [{ id: 990003, serie: 'wickie-vse12', anlegen: true, beleg: 'Fixture' }],
+  titel: [
+    { id: 990003, serie: 'wickie-vse12', anlegen: true, beleg: 'Fixture' },
+    { id: 990020, serie: 'dora-vse9', beleg: 'Fixture ohne anlegen' },
+    { id: 990022, serie: 'wickie-vse12', anlegen: true, beleg: 'Fixture, der Titel hat schon einen Weg' },
+  ],
   falsch: [{ id: 990002, url: 'https://www.toggo.de/die-kleine-prinzessin-pty588', beleg: 'Fixture' }],
 }
 const DATEN: SeitenDaten = {
@@ -137,6 +144,21 @@ pruefe('Sammelseite ohne passende Serie bleibt, steht in „offen“', urls(cart
 const mitSerienLink = [titel(990008, 'Hat schon die Serienseite', [`${B}/ninjago/serien/ninja-b-vse11`]), titel(990009, 'Hat einen Film', [`${B}/pokemon/video/film-mov1`])]
 const s = loeseToggoSeiten(mitSerienLink, DATEN, true)
 pruefe('Serienseite und Film bleiben unberührt und stehen nicht in „offen“', s.ersetzt === 0 && s.offen.length === 0 && urls(mitSerienLink[0]!)[0] === `${B}/ninjago/serien/ninja-b-vse11`, s)
+const weitere = [
+  titel(990020, 'Dora ohne Weg, Handeintrag ohne „anlegen“', []),
+  titel(990022, 'Wickie mit Weg', [`${B}/serien/wickie-schon-da-vse12`]),
+  titel(990023, 'Einmalig', [`${B}/einmalig-pty3/serien/einmalig-vse15`]),
+  titel(990024, 'Doppelt', []),
+  titel(990025, 'Hotel Transsilvanien', []),
+]
+loeseToggoSeiten(weitere, DATEN, true)
+pruefe('Handeintrag ohne „anlegen“ legt keinen Weg an', urls(weitere[0]!).length === 0, urls(weitere[0]!))
+pruefe('Handeintrag „anlegen“ bei einem Titel mit Weg: kein zweiter Weg', urls(weitere[1]!).length === 1, urls(weitere[1]!))
+pruefe('Titel mit Weg bekommt nicht zusätzlich die gleichnamige Serie', urls(weitere[2]!).length === 1, urls(weitere[2]!))
+pruefe('zwei Serien gleichen Namens: kein automatischer Weg', urls(weitere[3]!).length === 0, urls(weitere[3]!))
+pruefe('Titel ohne „Die Serie“ trifft „… - Die Serie“', urls(weitere[4]!)[0] === `${B}/hotel-transsilvanien/serien/hotel-serie-vse7`, urls(weitere[4]!))
+pruefe('Titel mit „Die Serie“ trifft die Serie ohne den Zusatz', serieFuerFigurLink(`${B}/erste-pty1`, 1, ['Zwei Figuren: Die Serie'], KATALOG, [])?.id === 'VSE14')
+pruefe('zwei gleichnamige Serien einer Figur: keine Zuordnung über den Namen', serieFuerFigurLink(`${B}/doppelt-pty4`, 1, ['Doppelt'], KATALOG, []) === undefined)
 const ohneAuto = [titel(990005, 'Dora', []), titel(990006, 'Ninjago: Aufstieg der Drachen', [])]
 pruefe('ohne „automatisch“ (Anime) legt nur die Handliste Wege an', loeseToggoSeiten(ohneAuto, DATEN, false).angelegt === 0)
 

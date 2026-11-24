@@ -3,6 +3,9 @@
  * erste Folge hinter der Folgenzahl seines Titels liegt, hängt sonst als bloßer Termin an der Seite der ersten Staffel (`staffelnOhneSeite`):
  * Seite, News-Meldung und Sprachhinweis stehen dann an der falschen Staffel.
  *
+ * Grenze: Erkannt wird nur ein Release mit `schedule.firstEpisodeNumber` an einem Titel mit bekannter `episodes`-Zahl; eine weitere Staffel
+ * ohne Folgennummer bleibt unsichtbar (24.11.2026: 0 Fälle).
+ *
  * Ratsche: `BEKANNT` nennt die Fälle, die es noch gibt, mit Grund. Ein neuer Fall ist rot; ein Eintrag, der kein Fall mehr ist, ist ebenfalls
  * rot (er muss gestrichen werden, die Liste darf nur sinken).
  */

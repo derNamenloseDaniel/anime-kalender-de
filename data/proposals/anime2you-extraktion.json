@@ -2200,6 +2200,19 @@
       "am": "2026-11-23",
       "vorschlaege": 0,
       "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075133": {
+      "am": "2026-11-24",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075170": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1075182": {
+      "am": "2026-11-24",
+      "vorschlaege": 1
     }
   },
   "vorschlaege": [
@@ -17091,6 +17104,27 @@
       "quelle": "https://www.anime2you.de/news/1075044/the-daily-life-of-the-immortal-king-staffel-6-angekuendigt/",
       "veroeffentlicht": "2026-11-23",
       "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Disney Twisted-Wonderland",
+      "zitat": "Die achtteilige Fortsetzung startet am 23. Dezember 2026 auf Disney+.",
+      "art": "start",
+      "sprache": "unklar",
+      "plattform": "disneyplus",
+      "datum": "2026-12-23",
+      "uhrzeit": null,
+      "anbieter": "Disney+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Mittwoch",
+      "warnungen": [],
+      "artikelId": "1075182",
+      "artikel": "Erster Trailer zur zweiten »Disney Twisted-Wonderland«-Staffel",
+      "quelle": "https://www.anime2you.de/news/1075182/disney-twisted-wonderland-staffel-2-erster-trailer/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
     }
   ]
 }

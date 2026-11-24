@@ -8,7 +8,7 @@ import yaml from 'js-yaml'
 import type { Title, WatchLink } from '../shared/types.ts'
 import { loeseToggoSeiten, toggoStaffelFeld, TOGGO_SEITEN_HAND, type SeitenDaten } from './bau/13-1-toggo-seiten.ts'
 import { ladeStaffelGrenzen, POKEMON_STAFFELN } from './lib/pokemon-staffeln.ts'
-import { figurSegment, katalogAdresse, serieFuerFigurLink, toggoAdressArt, type KatalogSerie, type SeitenHand } from './lib/toggo-seiten.ts'
+import { figurSegment, katalogAdresse, serieFuerFigurLink, serienFuerTitelOhneWeg, toggoAdressArt, type KatalogSerie, type SeitenHand } from './lib/toggo-seiten.ts'
 
 let verletzt = 0
 let faelle = 0
@@ -159,6 +159,11 @@ pruefe('zwei Serien gleichen Namens: kein automatischer Weg', urls(weitere[3]!).
 pruefe('Titel ohne „Die Serie“ trifft „… - Die Serie“', urls(weitere[4]!)[0] === `${B}/hotel-transsilvanien/serien/hotel-serie-vse7`, urls(weitere[4]!))
 pruefe('Titel mit „Die Serie“ trifft die Serie ohne den Zusatz', serieFuerFigurLink(`${B}/erste-pty1`, 1, ['Zwei Figuren: Die Serie'], KATALOG, [])?.id === 'VSE14')
 pruefe('zwei gleichnamige Serien einer Figur: keine Zuordnung über den Namen', serieFuerFigurLink(`${B}/doppelt-pty4`, 1, ['Doppelt'], KATALOG, []) === undefined)
+const beide = [{ id: 1, namen: ['Einmalig'] }, { id: 2, namen: ['Wickie'] }]
+const nurEins = serienFuerTitelOhneWeg(beide, new Set([1]), KATALOG, [{ id: 2, serie: 'wickie-vse12', anlegen: true, beleg: 'x' }], true)
+pruefe('Serie nur für Titel ohne Weg: Handeintrag und Name beachten die Liste', nurEins.size === 1 && nurEins.get(1)?.id === 'VSE15', [...nurEins.keys()])
+const nurHand = serienFuerTitelOhneWeg(beide, new Set([2]), KATALOG, [{ id: 2, serie: 'wickie-vse12', anlegen: true, beleg: 'x' }], false)
+pruefe('ohne „automatisch“ nur der Handeintrag, und nur für Titel ohne Weg', nurHand.size === 1 && nurHand.get(2)?.id === 'VSE12' && serienFuerTitelOhneWeg(beide, new Set([1]), KATALOG, [{ id: 2, serie: 'wickie-vse12', anlegen: true, beleg: 'x' }], false).size === 0)
 const ohneAuto = [titel(990005, 'Dora', []), titel(990006, 'Ninjago: Aufstieg der Drachen', [])]
 pruefe('ohne „automatisch“ (Anime) legt nur die Handliste Wege an', loeseToggoSeiten(ohneAuto, DATEN, false).angelegt === 0)
 

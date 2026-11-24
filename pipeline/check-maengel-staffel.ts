@@ -40,6 +40,11 @@ pruefe('fremdes Franchise zählt `adresse-mehrfach`, nicht diese Art', aus([tite
 pruefe('andere Anbieter haben keine Staffelliste: Crunchyroll-Adresse zählt nicht', aus([{ id: 1, episodes: 12, franchiseId: 1, streams: [{ platform: 'crunchyroll', url: 'https://www.crunchyroll.com/series/X' }] }, { id: 2, episodes: 12, franchiseId: 1, streams: [{ platform: 'crunchyroll', url: 'https://www.crunchyroll.com/series/X' }] }] as unknown as Title[], {}) === '')
 pruefe('Sprachvariante der Adresse (`/de/title/…`) und Duplikat desselben Titels', aus([titel(1, 13, '95'), { ...titel(2, 13, '95'), streams: [{ platform: 'netflix', url: 'https://www.netflix.com/de/title/95' }, { platform: 'netflix', url: adresse('95') }] } as unknown as Title], {}) === '1:ohne-bereich,2:ohne-bereich')
 
+const kurz = (a: number, b: number, formatB = 'TV_SHORT') => [titel(1, a, '98', 1, 'TV_SHORT'), titel(2, b, '98', 1, formatB)]
+pruefe('Doppelfolgen nur bei reiner Kurzserie: gemischte Gruppe (TV 13 + TV_SHORT 26 gegen 13 + 13) bleibt Befund', aus(kurz(26, 13, 'TV'), { 98: liste(13, 13) }) === '1:laenger-als-staffel,2:laenger-als-staffel')
+pruefe('Doppelfolgen runden auf: 25 Kurzfolgen sind 13 Netflix-Folgen (passt zu 13), 27 sind 14 (passt nicht zu 13)', aus(kurz(25, 25), { 98: liste(13, 13) }) === '' && aus(kurz(27, 27), { 98: liste(13, 13) }) === '1:laenger-als-staffel,2:laenger-als-staffel')
+pruefe('Befundart bei keiner passenden Zählweise ist die des Katalogs (26 + 26 gegen 13 + 12: länger als Staffel, nicht die halbierte Überlappung)', aus(kurz(26, 26), { 98: liste(13, 12) }) === '1:laenger-als-staffel,2:laenger-als-staffel')
+
 /* Regel in der Tabelle: reine Mengenabfrage, Wirkung und Zuständigkeit wie `adresse-mehrfach` */
 const regel = REGELN.find((r) => r.art === 'staffel-zuordnung')!
 const ohneKontext = { heute: '2026-11-17', staffelZuordnung: new Map([[7, 'ueberlappung']]) } as unknown as Kontext

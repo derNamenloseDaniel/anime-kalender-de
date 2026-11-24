@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import type { DataMeta, PlatformId } from '@shared/types.ts'
 import { WOCHENPROGRAMM_UEBERSICHT } from '@shared/wochenprogramm.ts'
 import { absoluteFeedUrl, type Dataset } from '../lib/data.ts'
-import { useLang } from '../lib/i18n.tsx'
-import { favoritenErgaenzen, useFavorites } from '../lib/favorites.ts'
+import { useLang, type Translate } from '../lib/i18n.tsx'
+import { useFavorites } from '../lib/favorites.ts'
 import { useUebernommeneNamen } from './uebernommene-namen.ts'
 import {
   favoritenFeedAdresse,
@@ -11,9 +11,6 @@ import {
   ladeEinstellungen,
   speichereEinstellungen,
   useNewsletterVerbindung,
-  pullFavorites,
-  pushFavorites, setSyncToken,
-  subscribe,
   type Einstellungen
 } from '../lib/newsletterSync.ts'
 import { AdminPanel, readAdminToken } from './AdminPanel.tsx'
@@ -24,8 +21,9 @@ import { ImpressumAnbieter } from './impressum-anbieter.tsx'
 import { WiederherstellenKasten } from './newsletter-kaesten.tsx'
 import { AnmeldeFormular } from './newsletter-kaesten.tsx'
 import { UebernommenKasten } from './newsletter-kaesten.tsx'
-import { WORKER_URL, Card, PlatformToggleList, type FormState } from './static-bausteine.tsx'
+import { Card, PlatformToggleList } from './static-bausteine.tsx'
 import { FuerApps } from './fuer-apps.tsx'
+import { useAbgleichBeimOeffnen, useAnmeldung, type AbgleichZustand } from './newsletter-zustand.ts'
 
 function CopyField({ value }: { value: string }) {
   const { t } = useLang()
@@ -307,33 +305,62 @@ function AboEinstellungen({ meta, onWechseln, abmeldeState, setAbmeldeState }: {
   )
 }
 
+function SyncHinweise({ abgleich, t }: { abgleich: AbgleichZustand; t: Translate }) {
+  const { welcome, syncState, syncMessage } = abgleich
+  return (
+    <>
+      {welcome && (
+        <div className="rounded-xl border border-ak-gut/40 bg-ak-gut-grund px-4 py-3 text-sm text-ak-gut-text">
+          <strong className="block">{t('news.welcomeTitle')}</strong>
+          {t('news.welcomeBody')}
+        </div>
+      )}
+
+      {syncState !== 'idle' && (
+        <div
+          className={[
+            'rounded-xl border px-4 py-3 text-sm',
+            syncState === 'ok'
+              ? 'border-ak-gut/40 bg-ak-gut-grund text-ak-gut-text'
+              : syncState === 'error'
+                ? 'border-ak-fehler/40 bg-ak-fehler-grund text-ak-fehler-text'
+                : 'border-slate-300 text-slate-500 dark:border-white/15',
+          ].join(' ')}
+        >
+          {syncState === 'sending' ? t('news.syncRunning') : syncMessage}
+        </div>
+      )}
+    </>
+  )
+}
+
+function WarteUndFunktionsKarten({ t }: { t: Translate }) {
+  return (
+    <>
+      <Card>
+        <SectionTitle>{t('news.waitTitle')}</SectionTitle>
+        <p className="text-sm text-slate-600 dark:text-slate-300">{t('news.waitBody')}</p>
+        <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{t('news.waitHow')}</p>
+      </Card>
+
+      <Card>
+        <SectionTitle>{t('news.howTitle')}</SectionTitle>
+        <p className="text-sm text-slate-600 dark:text-slate-300">{t('news.how')}</p>
+      </Card>
+    </>
+  )
+}
+
 export function NewsletterView({ meta, data }: { meta: DataMeta; data: Dataset }) {
   const { t } = useLang()
   const { favorites, toggle: toggleFavorit } = useFavorites()
-  const [email, setEmail] = useState('')
   const [restoreState, setRestoreState] = useState<'idle' | 'sending' | 'done'>('idle')
   /** Formular trotz bestehender Verbindung zeigen — für den Fall eines toten Schlüssels. */
   const [restoreOffen, setRestoreOffen] = useState(false)
   const [abmeldeState, setAbmeldeState] = useState<AbmeldeState>('idle')
-  /**
-   * Was beim Verbinden vom Server dazukam — für die Rückmeldung mit Abwahl.
-   *
-   * Die Vereinigung ist die richtige Vorgabe, aber sie holt auch zurück, was
-   * jemand absichtlich entfernt hatte. Deshalb wird **nach** dem Verbinden
-   * gezeigt, was dazugekommen ist, statt vorher zu fragen: Wer nichts tut, hat
-   * den vollständigen Stand, und wer etwas nicht will, hakt es ab (Daniels
-   * Entscheidung, 14.08.2026, gegen eine eigene Vergleichsseite).
-   */
-  const [uebernommen, setUebernommen] = useState<number[]>([])
-  const namen = useUebernommeneNamen(uebernommen, data)
-  const [frequency, setFrequency] = useState<'daily' | 'weekly'>('weekly')
-  const [platforms, setPlatforms] = useState<PlatformId[]>([])
-  const [consent, setConsent] = useState(false)
-  const [state, setState] = useState<FormState>('idle')
-  const [message, setMessage] = useState('')
-  const [syncState, setSyncState] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
-  const [syncMessage, setSyncMessage] = useState('')
-  const [welcome, setWelcome] = useState(false)
+  const abgleich = useAbgleichBeimOeffnen(favorites, t)
+  const namen = useUebernommeneNamen(abgleich.uebernommen, data)
+  const anmeldung = useAnmeldung(favorites, t)
   const verbindung = useNewsletterVerbindung()
   /**
    * Aus dem **reaktiven** Zustand, nicht aus einem Direktzugriff.
@@ -356,92 +383,6 @@ export function NewsletterView({ meta, data }: { meta: DataMeta; data: Dataset }
   const [adresseWechseln, setAdresseWechseln] = useState(false)
   const adminToken = readAdminToken()
 
-  /**
-   * Zwei Wege führen hierher: die Bestätigungsmail (`welcome=1`) und der
-   * Abgleich-Link aus jeder Digest-Mail. Beide bringen den Schlüssel mit.
-   *
-   * Er wird im Browser hinterlegt — ab da meldet jede Änderung an den
-   * Favoriten sich von selbst, ohne dass jemand einen Link anklicken muss.
-   */
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.hash.split('?')[1] ?? '')
-    const token = params.get('sync')
-    setWelcome(params.get('welcome') === '1')
-    if (!token || !WORKER_URL) return
-
-    setSyncToken(token)
-    setSyncState('sending')
-
-    /**
-     * Kommt der Nutzer über einen **Wiederherstellungslink**, ist die Richtung
-     * umgekehrt: Der Browser hat nichts (oder Reste), der Dienst hat alles.
-     * Deshalb wird hier geholt und mit dem Lokalen **vereinigt** statt ersetzt
-     * — wer auf dem neuen Gerät schon etwas gemerkt hat, soll es behalten.
-     * Danach geht die vereinigte Liste zurück, damit beide Seiten gleichstehen.
-     *
-     * Auf dem gewöhnlichen Weg (Bestätigung, Abgleich-Link aus dem Newsletter)
-     * bleibt es beim Schicken: Dort ist der Browser die Quelle der Wahrheit.
-     */
-    /**
-     * Verbinden heißt **immer vereinigen**, nie überschreiben.
-     *
-     * Anfangs galt das nur für den Wiederherstellungslink; der gewöhnliche
-     * Abgleich-Link aus der Mail schickte stattdessen die lokale Liste hoch.
-     * Damit zerstörte er den Serverstand, und zwar in genau dem Fall, für den
-     * es ihn gibt (Daniels Ablauf, 14.08.2026): merken, abonnieren, weiter
-     * merken, Browserdaten löschen, neu merken, Link aus einer alten Mail
-     * anklicken. Der frische Browser kennt nur die letzte Markierung — und
-     * überschrieb damit alles, was vorher auf dem Server lag.
-     *
-     * Die Unterscheidung nach `restored` war ohnehin erfunden: Einen Browser
-     * zu verbinden bedeutet in beiden Fällen dasselbe, nämlich dass aus zwei
-     * Listen eine wird. Danach ist der Browser wieder die Quelle der Wahrheit
-     * — Abwählen wirkt also weiterhin, nur eben nicht im Moment des Verbindens.
-     */
-    const arbeit = pullFavorites(token)
-      .catch(() => [] as number[])
-      .then((vomServer) => {
-        const vereint = [...new Set([...favorites, ...vomServer])].sort((a, b) => a - b)
-        // Ergänzen statt umschalten — siehe `favoritenErgaenzen`.
-        favoritenErgaenzen(vomServer)
-        setUebernommen(vomServer.filter((id) => !favorites.has(id)))
-        return pushFavorites(token, vereint)
-      })
-
-    arbeit
-      .then((count) => {
-        setSyncState('ok')
-        // Die Meldung sagt, was tatsächlich passiert ist: Kamen Titel vom
-        // Server dazu, ist das die Nachricht — sonst genügt die Gesamtzahl.
-        setSyncMessage(t('news.syncOk', { count }))
-      })
-      .catch((err: Error) => {
-        setSyncState('error')
-        setSyncMessage(err.message)
-      })
-    // Nur beim Öffnen. Spätere Änderungen übernimmt der Abgleich in App.tsx.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!consent) return
-    if (!WORKER_URL) {
-      setState('error')
-      setMessage(t('news.notConnected'))
-      return
-    }
-    setState('sending')
-    try {
-      await subscribe({ email, frequency, platforms, favorites: [...favorites] })
-      setState('ok')
-      setMessage(t('news.ok'))
-    } catch (err) {
-      setState('error')
-      setMessage((err as Error).message)
-    }
-  }
-
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-5">
       <div>
@@ -451,30 +392,10 @@ export function NewsletterView({ meta, data }: { meta: DataMeta; data: Dataset }
 
       {adminToken && <AdminPanel token={adminToken} />}
 
-      {welcome && (
-        <div className="rounded-xl border border-ak-gut/40 bg-ak-gut-grund px-4 py-3 text-sm text-ak-gut-text">
-          <strong className="block">{t('news.welcomeTitle')}</strong>
-          {t('news.welcomeBody')}
-        </div>
-      )}
-
-      {syncState !== 'idle' && (
-        <div
-          className={[
-            'rounded-xl border px-4 py-3 text-sm',
-            syncState === 'ok'
-              ? 'border-ak-gut/40 bg-ak-gut-grund text-ak-gut-text'
-              : syncState === 'error'
-                ? 'border-ak-fehler/40 bg-ak-fehler-grund text-ak-fehler-text'
-                : 'border-slate-300 text-slate-500 dark:border-white/15',
-          ].join(' ')}
-        >
-          {syncState === 'sending' ? t('news.syncRunning') : syncMessage}
-        </div>
-      )}
+      <SyncHinweise abgleich={abgleich} t={t} />
 
       <UebernommenKasten
-        uebernommen={uebernommen}
+        uebernommen={abgleich.uebernommen}
         t={t}
         favorites={favorites}
         toggleFavorit={toggleFavorit}
@@ -496,21 +417,21 @@ export function NewsletterView({ meta, data }: { meta: DataMeta; data: Dataset }
       ) : (
       <Card>
         <AnmeldeFormular
-          submit={submit}
+          submit={anmeldung.submit}
           t={t}
-          email={email}
-          setEmail={setEmail}
-          frequency={frequency}
-          setFrequency={setFrequency}
+          email={anmeldung.email}
+          setEmail={anmeldung.setEmail}
+          frequency={anmeldung.frequency}
+          setFrequency={anmeldung.setFrequency}
           favorites={favorites}
           autoSync={autoSync}
           meta={meta}
-          platforms={platforms}
-          setPlatforms={setPlatforms}
-          consent={consent}
-          setConsent={setConsent}
-          state={state}
-          message={message}
+          platforms={anmeldung.platforms}
+          setPlatforms={anmeldung.setPlatforms}
+          consent={anmeldung.consent}
+          setConsent={anmeldung.setConsent}
+          state={anmeldung.state}
+          message={anmeldung.message}
         />
       </Card>
       )}
@@ -522,20 +443,11 @@ export function NewsletterView({ meta, data }: { meta: DataMeta; data: Dataset }
         setRestoreOffen={setRestoreOffen}
         restoreState={restoreState}
         setRestoreState={setRestoreState}
-        email={email}
-        setEmail={setEmail}
+        email={anmeldung.email}
+        setEmail={anmeldung.setEmail}
       />
 
-      <Card>
-        <SectionTitle>{t('news.waitTitle')}</SectionTitle>
-        <p className="text-sm text-slate-600 dark:text-slate-300">{t('news.waitBody')}</p>
-        <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{t('news.waitHow')}</p>
-      </Card>
-
-      <Card>
-        <SectionTitle>{t('news.howTitle')}</SectionTitle>
-        <p className="text-sm text-slate-600 dark:text-slate-300">{t('news.how')}</p>
-      </Card>
+      <WarteUndFunktionsKarten t={t} />
     </div>
   )
 }

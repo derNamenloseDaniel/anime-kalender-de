@@ -1586,7 +1586,7 @@
     ]
   },
   "katalog": {
-    "inReihen": 12064,
+    "inReihen": 12061,
     "reihen": 3081,
     "pruefliste": [
       {
@@ -5911,7 +5911,7 @@
           {
             "id": 527,
             "name": "Pocket Monsters",
-            "titel": 136
+            "titel": 133
           },
           {
             "id": 145059,

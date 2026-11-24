@@ -24,6 +24,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { gzipSync } from 'node:zlib'
 import { titelAus } from './lib/anisearch-titel.ts'
+import { titelFaellig } from './lib/anisearch-faellig.ts'
 import { bauQuelltext, panelQuelltext, workerQuelltext } from './lib/quelltext.ts'
 import yaml from 'js-yaml'
 import { discSlug, slugify } from './lib/util.ts'
@@ -4422,9 +4423,15 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
   )
 
   const holer = readFileSync('pipeline/fetch-anisearch-titel.ts', 'utf8')
+  /* Die Regel steht in lib/anisearch-faellig.ts: als Lauf geprüft, nicht per Quelltext (Grenze der Textlesungen). */
+  const fristOpt = { jetzt: Date.parse('2026-11-24'), alterTage: 180, parserStand: 3 }
+  const altTag = (quelle: string, tage: number) => ({ fetchedAt: new Date(fristOpt.jetzt - tage * 86_400_000).toISOString(), stand: 3, quelle, synonyme: [] })
   pruefe(
     'die Warteschlange bildet sich über das Alter, nicht über „fehlt noch"',
-    holer.includes('const faellig =') && holer.includes("e.quelle === 'ueberschrift'"),
+    holer.includes('const faellig =') &&
+      [40, 90].every((t) => titelFaellig(altTag('ueberschrift', t), fristOpt)) &&
+      [40, 90].every((t) => !titelFaellig(altTag('sprachblock', t), fristOpt)) &&
+      [5, 20].every((t) => !titelFaellig(altTag('ueberschrift', t), fristOpt)),
     'ein Filter „hole, was fehlt" macht jede Antwort endgültig — auch die falsche',
   )
 }

@@ -1,7 +1,7 @@
 /**
  * Gesamtlauf von `lighthouse-messen.mjs` über `main` mit einer Attrappe für `npx` im PATH (liefert einen festen Lighthouse-Bericht):
  * grün in den Grenzen, rot bei gerissener Grenze, rot bei scheiterndem Lighthouse (nie still grün), Ausgabe-JSON und Zusammenfassung geschrieben;
- * Ratsche gegen HEAD^1 in Wegwerf-Repos: gelockert rot, gleich grün, erster PR grün, kein Elternteil rot.
+ * Ratsche gegen HEAD^1 in Wegwerf-Repos: gelockert rot, in `LOCKERUNGEN` eingetragen grün, anderer Schritt eingetragen rot, gleich grün, erster PR grün, kein Elternteil rot.
  */
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
@@ -85,6 +85,15 @@ try {
   const locker = lauf('locker', 900, { wurzel: ratschenRepo('locker', GRENZEN_TEXT, gelockert), pr: true })
   assert.equal(locker.status, 1, `gelockerte Grenze im PR: Exit 1\n${locker.stdout}`)
   assert.match(locker.stdout, /Ratsche gelockert: pr\/Kalender\/lcp: 2500 → 2600/, 'Lockerung benannt')
+  // Ausnahmeweg: derselbe Schritt mit Eintrag in LOCKERUNGEN ist grün, ein anderer Schritt (2550 eingetragen, 2600 gesetzt) bleibt rot.
+  const eintrag = (auf) => `export const LOCKERUNGEN = [${['pr', 'live'].map((p) => `{ profil: '${p}', seite: 'Kalender', grenze: 'lcp', von: 2500, auf: ${auf}, datum: '2026-11-24', grund: 'Test' },`).join(' ')}`
+  const mitEintrag = (auf) => gelockert.replace('export const LOCKERUNGEN = [', eintrag(auf))
+  assert.notEqual(mitEintrag(2600), gelockert, 'Attrappe: LOCKERUNGEN steht in der Grenzdatei')
+  const erlaubt = lauf('erlaubt', 900, { wurzel: ratschenRepo('erlaubt', GRENZEN_TEXT, mitEintrag(2600)), pr: true })
+  assert.equal(erlaubt.status, 0, `eingetragene Lockerung im PR: grün\n${erlaubt.stdout}`)
+  const anders = lauf('anders', 900, { wurzel: ratschenRepo('anders', GRENZEN_TEXT, mitEintrag(2550)), pr: true })
+  assert.equal(anders.status, 1, 'anderer Schritt eingetragen: Exit 1')
+  assert.match(anders.stdout, /Ratsche gelockert: pr\/Kalender\/lcp: 2500 → 2600/, 'und benannt')
   assert.equal(lauf('gleich', 900, { wurzel: ratschenRepo('gleich', GRENZEN_TEXT, GRENZEN_TEXT), pr: true }).status, 0, 'unverändert im PR: grün')
   assert.equal(lauf('locker-ohne-pr', 900, { wurzel: ratschenRepo('locker2', GRENZEN_TEXT, gelockert) }).status, 0, 'außerhalb eines PR (Tageslauf) keine Ratsche')
   const erst = lauf('erst', 900, { wurzel: ratschenRepo('erst', undefined, GRENZEN_TEXT), pr: true })
@@ -95,4 +104,4 @@ try {
 } finally {
   rmSync(ordner, { recursive: true, force: true })
 }
-console.log('lighthouse-messen: 20 Zusicherungen ✓')
+console.log('lighthouse-messen: 25 Zusicherungen ✓')

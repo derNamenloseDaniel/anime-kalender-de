@@ -1,7 +1,7 @@
 /**
  * Grenzen der Lighthouse-Messung (`lighthouse-messen.mjs`), je Profil (`pr`: Build in der PR-Kette, `live`: anime-kalender.de) und Seite.
  * Obergrenzen: lcp/tbt in ms, cls, bytes (Übertragung gesamt, mit Covern); Untergrenzen: Kategorien in Punkten.
- * Ratsche: eine Grenze darf nur strenger werden (Prüfung gegen main im PR). Herleitung: docs/wissen/betrieb.md, „Lighthouse und Leerlauf als Wächter“.
+ * Ratsche: eine Grenze darf nur strenger werden (Prüfung gegen main im PR), außer der Schritt steht in `LOCKERUNGEN` (unten). Herleitung: docs/wissen/betrieb.md, „Lighthouse und Leerlauf als Wächter“.
  *
  * Basis 18.11.2026, je Median aus 3 Läufen auf CI-Runnern: zwei PR-Läufe gegen dist (44259412724, 44260602007) und drei Live-Läufe (44259410560, 44260603953, 44261473268).
  * Budget LCP ≤ 2500, CLS ≤ 0,1, TBT ≤ 200 wo auf jedem Runner eingehalten; sonst Ratsche = höchster Median × 1,15 (LCP, ±10 %) bzw. × 1,3 (TBT).
@@ -18,13 +18,13 @@ export const SEITEN = {
 
 /**
  * TBT (ms, Obergrenze) und Performance (Punkte, Untergrenze) je Runner-Band (benchmarkIndex; Urteil: `lighthouse-urteil.mjs`, `grenzeFuer`).
- * Basis: 68 Läufe (je Median aus 3 Messungen) vom 20.–21.11.2026, PR-Kette und Nachlauf; Herleitung und Datenpunkte: betrieb.md, „TBT auf den Runner normiert“.
- * Je Band: TBT = höchster Lauf-Median × 1,15 (auf 10 aufgerundet), Performance = niedrigster Lauf-Median − 4.
- * Grundgrenze = schnelle Runner (≥ 3250, n = 24), `-mittel` 2750–3250 (n = 15), `-langsam` darunter (n = 29).
+ * Grundgrenze = schnelle Runner (≥ 3250), `-mittel` 2750–3250, `-langsam` darunter; Herleitung: betrieb.md, „TBT auf den Runner normiert“.
+ * TBT seit 24.11.2026: p99 des Bands × 1,15 (auf 10 aufgerundet) aus 557 Läufen vom 21.11. 01:37 bis 24.11. 15:21 UTC (n = 129–258 je Band;
+ * Bericht daniel-zum-abarbeiten/berichte/tbt-baender-2026-11-24.md). Performance seit 21.11.2026: niedrigster Lauf-Median − 4 aus 68 Läufen.
  */
-const BAND_KALENDER = { tbt: 100, 'tbt-mittel': 150, 'tbt-langsam': 250, performance: 95, 'performance-mittel': 95, 'performance-langsam': 92 }
-const BAND_DATENBANK = { tbt: 540, 'tbt-mittel': 730, 'tbt-langsam': 1320, performance: 59, 'performance-mittel': 55, 'performance-langsam': 48 }
-const BAND_TITEL = { tbt: 760, 'tbt-mittel': 1100, 'tbt-langsam': 1610, performance: 54, 'performance-mittel': 49, 'performance-langsam': 45 }
+const BAND_KALENDER = { tbt: 110, 'tbt-mittel': 170, 'tbt-langsam': 260, performance: 95, 'performance-mittel': 95, 'performance-langsam': 92 }
+const BAND_DATENBANK = { tbt: 680, 'tbt-mittel': 980, 'tbt-langsam': 1420, performance: 59, 'performance-mittel': 55, 'performance-langsam': 48 }
+const BAND_TITEL = { tbt: 1090, 'tbt-mittel': 1210, 'tbt-langsam': 1720, performance: 54, 'performance-mittel': 49, 'performance-langsam': 45 }
 
 /** Beide Profile messen dieselben Seiten; LCP und Bytes lagen höchstens 12 % auseinander, eine gemeinsame Grenze deckt beide. */
 const BASIS_18_11 = {
@@ -51,3 +51,23 @@ export const GRENZEN = {
   pr: BASIS_PR,
   live: BASIS_18_11,
 }
+
+/** Lockerung der TBT-Bänder vom 24.11.2026 in beiden Profilen (sie teilen `BAND_*`). */
+const tbt2411 = (seite, grenze, von, auf) =>
+  ['pr', 'live'].map((profil) => ({ profil, seite, grenze, von, auf, datum: '2026-11-24', grund: '27 Fehlalarme in 557 Läufen, keine Regression; Grenze = p99 × 1,15 (Bericht tbt-baender-2026-11-24.md)' }))
+
+/**
+ * Ausnahmeweg der Ratsche (`gelockert`): eine Grenze darf nur lockerer werden als auf main, wenn genau dieser Schritt
+ * (profil/seite/grenze, von → auf) hier mit Datum und Grund steht. Einträge bleiben als Chronik; nach dem Merge passen sie auf keinen neuen Schritt.
+ */
+export const LOCKERUNGEN = [
+  ...tbt2411('Kalender', 'tbt', 100, 110),
+  ...tbt2411('Kalender', 'tbt-mittel', 150, 170),
+  ...tbt2411('Kalender', 'tbt-langsam', 250, 260),
+  ...tbt2411('Datenbank', 'tbt', 540, 680),
+  ...tbt2411('Datenbank', 'tbt-mittel', 730, 980),
+  ...tbt2411('Datenbank', 'tbt-langsam', 1320, 1420),
+  ...tbt2411('Titel', 'tbt', 760, 1090),
+  ...tbt2411('Titel', 'tbt-mittel', 1100, 1210),
+  ...tbt2411('Titel', 'tbt-langsam', 1610, 1720),
+]

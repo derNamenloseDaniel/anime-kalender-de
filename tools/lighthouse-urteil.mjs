@@ -70,8 +70,11 @@ export function verstoesse(seite, wert, grenze) {
   return aus
 }
 
-/** Ratsche: Grenzen, die gegenüber dem Stand auf main gelockert wurden (Obergrenze höher, Untergrenze tiefer). Ohne Basis keine Prüfung. */
-export function gelockert(neu, alt) {
+/**
+ * Ratsche: Grenzen, die gegenüber dem Stand auf main gelockert wurden (Obergrenze höher, Untergrenze tiefer). Ohne Basis keine Prüfung.
+ * Durch kommt nur ein Schritt, der genau so in `erlaubt` steht (`LOCKERUNGEN` aus `lighthouse-grenzen.mjs`).
+ */
+export function gelockert(neu, alt, erlaubt = []) {
   if (!alt) return []
   const aus = []
   for (const [profil, seiten] of Object.entries(alt)) {
@@ -80,7 +83,7 @@ export function gelockert(neu, alt) {
       for (const [k, g] of Object.entries(grenzen)) {
         const n = neu?.[profil]?.[seite]?.[k]
         if (n === undefined) aus.push(`${profil}/${seite}/${k}: entfernt (main ${g})`)
-        else if (HOECHSTENS.includes(grundname(k)) ? n > g : n < g) aus.push(`${profil}/${seite}/${k}: ${g} → ${n}`)
+        else if ((HOECHSTENS.includes(grundname(k)) ? n > g : n < g) && !erlaubt.some((e) => e.profil === profil && e.seite === seite && e.grenze === k && e.von === g && e.auf === n)) aus.push(`${profil}/${seite}/${k}: ${g} → ${n}`)
       }
     }
   }

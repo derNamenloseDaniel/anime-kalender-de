@@ -140,6 +140,124 @@ export function Meldungen({ titleId }: { titleId: number }) {
  * Das Fragezeichen trägt den Tooltip — auf einem Gerät ohne Mauszeiger ist ein
  * Zeichen zum Antippen der einzige Weg zu einer Erklärung.
  */
+type UebersetzeFn = (k: string, v?: Record<string, string | number>) => string
+
+interface VermerkAuskunftProps {
+  vermerk: VermerkAusgeblieben
+  ausgeblieben: boolean
+  episode?: number
+  anbieter: string
+  anbieterUrl?: string
+  today: string
+  T: UebersetzeFn
+}
+
+const LINK_KLASSE =
+  'text-sky-700 underline decoration-sky-700/30 underline-offset-2 hover:decoration-sky-700 dark:text-sky-300 dark:decoration-sky-300/30'
+
+/*
+  **Wann zuletzt, wann als Nächstes — je Stufe**. Die nächste Recherche rechnet dieselbe Regel aus wie
+  der Lauf (`shared/recherche-plan.ts`); weil GitHub geplante Läufe oft später
+  startet, heißt es „voraussichtlich … ab".
+*/
+function naechsteSuche(vermerk: VermerkAusgeblieben, today: string, T: UebersetzeFn): string | null {
+  const n = naechsteRecherche(vermerk, new Date())
+  if (!n) return null
+  const tag = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Berlin' }).format(n)
+  const zeit = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit' }).format(n)
+  const vorn =
+    tag === today
+      ? T('antwort.relHeute')
+      : tag === addDays(today, 1)
+        ? T('antwort.relMorgen')
+        : T('antwort.amDatum', { datum: formatDate(tag) })
+  return T('antwort.naechsteVoraussichtlich', { tag: vorn, zeit })
+}
+
+function planZeile(vermerk: VermerkAusgeblieben, offen: boolean, today: string, T: UebersetzeFn): string | null {
+  if (!offen) return null
+  const naechste = naechsteSuche(vermerk, today, T)
+  if (vermerk.rechercheAm) {
+    return naechste
+      ? T('antwort.vermerkRechercheZuletzt', { wann: zeitpunktText(vermerk.rechercheAm, today, T), naechste })
+      : T('antwort.vermerkRechercheEnde')
+  }
+  return naechste ? T('antwort.vermerkRechercheStart', { naechste }) : null
+}
+
+/* Die Überschrift nennt nur den neuen Termin — dass die Folge seit dem alten aussteht, steht hier. */
+function ueberfaelligZeile(vermerk: VermerkAusgeblieben, episode: number | undefined, T: UebersetzeFn): string {
+  return T('antwort.vermerkUeberfaellig', {
+    n: episode ?? '',
+    datum: formatDate(String(vermerk.erwartetAm)),
+  })
+}
+
+function pruefZeile(
+  vermerk: VermerkAusgeblieben,
+  anbieter: string,
+  anbieterUrl: string | undefined,
+  today: string,
+  T: UebersetzeFn,
+): ReactNode {
+  const [vor, nach] = T('antwort.vermerkPruefen', { anbieter: '\u0000' }).split('\u0000')
+  return (
+    <>
+      {vor}
+      {anbieterUrl ? (
+        <a href={anbieterUrl} target="_blank" rel="noopener noreferrer" className={LINK_KLASSE}>
+          {anbieter}
+        </a>
+      ) : (
+        anbieter
+      )}
+      {nach}
+      {vermerk.geprueftAm && ` ${T('antwort.vermerkZuletzt', { wann: zeitpunktText(vermerk.geprueftAm, today, T) })}`}
+      {` ${T('antwort.vermerkNaechsterBlick')}`}
+    </>
+  )
+}
+
+function hinweisZeilen(vermerk: VermerkAusgeblieben, offen: boolean, today: string, T: UebersetzeFn): ReactNode[] {
+  if (vermerk.hinweise?.length) {
+    return vermerk.hinweise.map((h) => (
+      <>
+        {T('antwort.vermerkNews', { quelle: h.quelle, datum: formatDate(h.datum.slice(0, 10)) })}{' '}
+        <a href={h.url} target="_blank" rel="noopener noreferrer" className={LINK_KLASSE}>
+          {h.titel}
+        </a>
+      </>
+    ))
+  }
+  if (offen && vermerk.newsGeprueftAm) {
+    return [T('antwort.vermerkNewsLeerStand', { wann: zeitpunktText(vermerk.newsGeprueftAm, today, T) })]
+  }
+  return []
+}
+
+function rechercheZeilen(vermerk: VermerkAusgeblieben, offen: boolean, T: UebersetzeFn): ReactNode[] {
+  if (vermerk.recherche) {
+    return [
+      <>
+        {vermerk.recherche}
+        {vermerk.rechercheQuelle && (
+          <>
+            {' '}
+            <a href={vermerk.rechercheQuelle} target="_blank" rel="noopener noreferrer" className={LINK_KLASSE}>
+              {T('antwort.vermerkQuelle')}
+            </a>
+          </>
+        )}
+      </>,
+    ]
+  }
+  if (offen && vermerk.rechercheAm) {
+    return [T('antwort.vermerkRechercheLeer', { datum: formatDate(vermerk.rechercheAm) })]
+  }
+  return []
+}
+
+
 /**
  * **Was wir zu einer ausgebliebenen Folge wissen — und was wir tun.**
  *
@@ -170,15 +288,7 @@ export function VermerkAuskunft({
   anbieterUrl,
   today,
   T,
-}: {
-  vermerk: VermerkAusgeblieben
-  ausgeblieben: boolean
-  episode?: number
-  anbieter: string
-  anbieterUrl?: string
-  today: string
-  T: (k: string, v?: Record<string, string | number>) => string
-}) {
+}: VermerkAuskunftProps) {
   /*
     **Ein Ersatztermin beendet den Ausfall nicht** (Daniel, 20.09.2026, mit
     Bild): Bei „You and I Are Polar Opposites" Staffel 2 stand nur noch
@@ -194,95 +304,12 @@ export function VermerkAuskunft({
   */
   const offen = !vermerk.erschienenAm
   const ueberfaellig = offen && !ausgeblieben
-  const link = 'text-sky-700 underline decoration-sky-700/30 underline-offset-2 hover:decoration-sky-700 dark:text-sky-300 dark:decoration-sky-300/30'
-  const [vor, nach] = T('antwort.vermerkPruefen', { anbieter: '\u0000' }).split('\u0000')
   const zeilen: ReactNode[] = []
-  /*
-    **Wann zuletzt, wann als Nächstes — je Stufe**. Die nächste Recherche rechnet dieselbe Regel aus wie
-    der Lauf (`shared/recherche-plan.ts`); weil GitHub geplante Läufe oft später
-    startet, heißt es „voraussichtlich … ab".
-  */
-  const naechsteSuche = (): string | null => {
-    const n = naechsteRecherche(vermerk, new Date())
-    if (!n) return null
-    const tag = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Berlin' }).format(n)
-    const zeit = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit' }).format(n)
-    const vorn =
-      tag === today
-        ? T('antwort.relHeute')
-        : tag === addDays(today, 1)
-          ? T('antwort.relMorgen')
-          : T('antwort.amDatum', { datum: formatDate(tag) })
-    return T('antwort.naechsteVoraussichtlich', { tag: vorn, zeit })
-  }
-  const planZeile = (): string | null => {
-    if (!offen) return null
-    const naechste = naechsteSuche()
-    if (vermerk.rechercheAm) {
-      return naechste
-        ? T('antwort.vermerkRechercheZuletzt', { wann: zeitpunktText(vermerk.rechercheAm, today, T), naechste })
-        : T('antwort.vermerkRechercheEnde')
-    }
-    return naechste ? T('antwort.vermerkRechercheStart', { naechste }) : null
-  }
-  /* Die Überschrift nennt nur den neuen Termin — dass die Folge seit dem alten aussteht, steht hier. */
-  if (ueberfaellig && vermerk.erwartetAm) {
-    zeilen.push(
-      T('antwort.vermerkUeberfaellig', {
-        n: episode ?? '',
-        datum: formatDate(String(vermerk.erwartetAm)),
-      }),
-    )
-  }
-  if (offen) {
-    zeilen.push(
-      <>
-        {vor}
-        {anbieterUrl ? (
-          <a href={anbieterUrl} target="_blank" rel="noopener noreferrer" className={link}>
-            {anbieter}
-          </a>
-        ) : (
-          anbieter
-        )}
-        {nach}
-        {vermerk.geprueftAm && ` ${T('antwort.vermerkZuletzt', { wann: zeitpunktText(vermerk.geprueftAm, today, T) })}`}
-        {` ${T('antwort.vermerkNaechsterBlick')}`}
-      </>,
-    )
-  }
-  if (vermerk.hinweise?.length) {
-    for (const h of vermerk.hinweise) {
-      zeilen.push(
-        <>
-          {T('antwort.vermerkNews', { quelle: h.quelle, datum: formatDate(h.datum.slice(0, 10)) })}{' '}
-          <a href={h.url} target="_blank" rel="noopener noreferrer" className={link}>
-            {h.titel}
-          </a>
-        </>,
-      )
-    }
-  } else if (offen && vermerk.newsGeprueftAm) {
-    zeilen.push(T('antwort.vermerkNewsLeerStand', { wann: zeitpunktText(vermerk.newsGeprueftAm, today, T) }))
-  }
-  if (vermerk.recherche) {
-    zeilen.push(
-      <>
-        {vermerk.recherche}
-        {vermerk.rechercheQuelle && (
-          <>
-            {' '}
-            <a href={vermerk.rechercheQuelle} target="_blank" rel="noopener noreferrer" className={link}>
-              {T('antwort.vermerkQuelle')}
-            </a>
-          </>
-        )}
-      </>,
-    )
-  } else if (offen && vermerk.rechercheAm) {
-    zeilen.push(T('antwort.vermerkRechercheLeer', { datum: formatDate(vermerk.rechercheAm) }))
-  }
-  const plan = planZeile()
+  if (ueberfaellig && vermerk.erwartetAm) zeilen.push(ueberfaelligZeile(vermerk, episode, T))
+  if (offen) zeilen.push(pruefZeile(vermerk, anbieter, anbieterUrl, today, T))
+  zeilen.push(...hinweisZeilen(vermerk, offen, today, T))
+  zeilen.push(...rechercheZeilen(vermerk, offen, T))
+  const plan = planZeile(vermerk, offen, today, T)
   if (plan) zeilen.push(plan)
   /* Zum Schluss, was der Leser mitnehmen soll: Der Termin oben ist eine Annahme, und wir bleiben dran. */
   if (ueberfaellig) zeilen.push(T('antwort.vermerkAnnahme'))

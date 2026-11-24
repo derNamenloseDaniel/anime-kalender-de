@@ -4,31 +4,6 @@ import { istLink } from '@shared/quelle.ts'
 import { istEigenerTitel } from '@shared/eigene-titel.ts'
 import { useLang } from '../lib/i18n.tsx'
 
-/**
- * **Woher die Angaben auf dieser Seite stammen — eine Zeile je Quelle.**
- *
- * Daniel am 29.08.2026: „Statt das Quellen an jedem bereich stehen, sollte unten
- * ausklappbar bereich quellen sein, in dem tabellarisch alle bereiche aufgelistet
- * sind und zugehörige quellen beschrieben und verlinkt, wo möglich." Und dazu:
- * „nicht mehrere zeilen für die selbe quelle, 1 quelle -> welche info bereiche
- * werden damit gefüttert."
- *
- * Die Richtung ist damit vorgegeben, und sie ist die richtige: Eine Seite hat
- * drei bis sechs Quellen, aber ein Dutzend Bereiche. Nach Bereichen aufgeteilt
- * stünde dieselbe Adresse fünfmal da.
- *
- * **Was belegt ist und was zugeordnet — der Unterschied steht in der Spalte.**
- * Die Termin-Quellen stehen je Release im Datensatz, mit Adresse und dem Datum,
- * das sie nennen. Für Titel, Cover, Genres und Handlung führt der Datensatz
- * **keine** Herkunft je Feld; sie ergibt sich aus der Pipeline. Ein `titleDe`
- * kann aus vier verschiedenen Quellen stammen — aniSearch-Sprachliste,
- * aniSearch-Titel, Crunchyroll oder TMDB —, je nachdem, welche zuerst etwas
- * hatte.
- *
- * Deshalb behauptet keine Zeile mehr, als nachprüfbar ist: Wo eine Adresse
- * existiert, ist sie verlinkt; wo keine existiert, steht der Name ohne Link
- * statt einer erfundenen Adresse.
- */
 interface QuellenZeile {
   name: string
   url?: string
@@ -110,6 +85,31 @@ function quellenZeilen(
   return [...zusammen.values()]
 }
 
+/**
+ * **Woher die Angaben auf dieser Seite stammen — eine Zeile je Quelle.**
+ *
+ * Daniel am 29.08.2026: „Statt das Quellen an jedem bereich stehen, sollte unten
+ * ausklappbar bereich quellen sein, in dem tabellarisch alle bereiche aufgelistet
+ * sind und zugehörige quellen beschrieben und verlinkt, wo möglich." Und dazu:
+ * „nicht mehrere zeilen für die selbe quelle, 1 quelle -> welche info bereiche
+ * werden damit gefüttert."
+ *
+ * Die Richtung ist damit vorgegeben, und sie ist die richtige: Eine Seite hat
+ * drei bis sechs Quellen, aber ein Dutzend Bereiche. Nach Bereichen aufgeteilt
+ * stünde dieselbe Adresse fünfmal da.
+ *
+ * **Was belegt ist und was zugeordnet — der Unterschied steht in der Spalte.**
+ * Die Termin-Quellen stehen je Release im Datensatz, mit Adresse und dem Datum,
+ * das sie nennen. Für Titel, Cover, Genres und Handlung führt der Datensatz
+ * **keine** Herkunft je Feld; sie ergibt sich aus der Pipeline. Ein `titleDe`
+ * kann aus vier verschiedenen Quellen stammen — aniSearch-Sprachliste,
+ * aniSearch-Titel, Crunchyroll oder TMDB —, je nachdem, welche zuerst etwas
+ * hatte.
+ *
+ * Deshalb behauptet keine Zeile mehr, als nachprüfbar ist: Wo eine Adresse
+ * existiert, ist sie verlinkt; wo keine existiert, steht der Name ohne Link
+ * statt einer erfundenen Adresse.
+ */
 export function Quellenuebersicht({ title, releases, asZiel }: { title: Title; releases: Release[]; asZiel?: string }) {
   const { t } = useLang()
   const [offen, setOffen] = useState(false)

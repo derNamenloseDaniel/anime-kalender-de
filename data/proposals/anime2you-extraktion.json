@@ -2219,6 +2219,10 @@
       "am": "2026-11-23",
       "vorschlaege": 1
     },
+    "1075048": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
     "1075050": {
       "am": "2026-11-24",
       "vorschlaege": 0
@@ -2257,6 +2261,10 @@
     "1075475": {
       "am": "2026-11-24",
       "vorschlaege": 0
+    },
+    "1075500": {
+      "am": "2026-11-24",
+      "vorschlaege": 5
     }
   },
   "vorschlaege": [
@@ -17209,6 +17217,96 @@
       "artikelId": "1075202",
       "artikel": "»Witch on the Holy Night« erhält eine Fortsetzung + Visual",
       "quelle": "https://www.anime2you.de/news/1075202/witch-on-the-holy-night-erhaelt-fortsetzung/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Puella Magi Madoka Magica – Der Film: Walpurgisnacht: Rising",
+      "zitat": "Der neue Sequel-Film »Puella Magi Madoka Magica – Der Film: Walpurgisnacht: Rising« läuft seit dem 24. November 2026 in der japanischen Originalvertonung mit deutschen Untertiteln in den hiesigen Lichtspielhäusern.",
+      "art": "kino",
+      "sprache": "omu",
+      "plattform": "kino",
+      "datum": "2026-11-24",
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [],
+      "artikelId": "1075500",
+      "artikel": "polyband-Aktion: »Madoka Magica«-Komplettbox zum Sonderpreis",
+      "quelle": "https://www.anime2you.de/news/1075500/madoka-magica-komplettbox-zum-sonderpreis/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Rebellion",
+      "zitat": "Die Komplettbox umfasst alle zwölf Episoden der Serie sowie den Fortsetzungsfilm »Rebellion« mit deutscher und japanischer Sprachausgabe.",
+      "art": "sprachfassung",
+      "sprache": "deutsch",
+      "plattform": "disc",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "polyband",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „polyband“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1075500",
+      "artikel": "polyband-Aktion: »Madoka Magica«-Komplettbox zum Sonderpreis",
+      "quelle": "https://www.anime2you.de/news/1075500/madoka-magica-komplettbox-zum-sonderpreis/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Beginnings",
+      "zitat": "Die beiden Recap-Filme »Beginnings« und »Eternal« sind im Originalton mit Untertiteln enthalten.",
+      "art": "sprachfassung",
+      "sprache": "omu",
+      "plattform": "disc",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "polyband",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „polyband“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1075500",
+      "artikel": "polyband-Aktion: »Madoka Magica«-Komplettbox zum Sonderpreis",
+      "quelle": "https://www.anime2you.de/news/1075500/madoka-magica-komplettbox-zum-sonderpreis/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Eternal",
+      "zitat": "Die beiden Recap-Filme »Beginnings« und »Eternal« sind im Originalton mit Untertiteln enthalten.",
+      "art": "sprachfassung",
+      "sprache": "omu",
+      "plattform": "disc",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "polyband",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „polyband“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1075500",
+      "artikel": "polyband-Aktion: »Madoka Magica«-Komplettbox zum Sonderpreis",
+      "quelle": "https://www.anime2you.de/news/1075500/madoka-magica-komplettbox-zum-sonderpreis/",
       "veroeffentlicht": "2026-11-24",
       "gelesenAm": "2026-11-24"
     }

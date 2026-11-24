@@ -2,7 +2,7 @@
  * Vergleichsrahmen für Zerlegungen einer einzelnen exportierten Funktion (Alternative zu `bau-vergleich.mjs`, das den ganzen
  * Bau fährt und dafür `data/cache/` braucht): alte Fassung (Git-Ref, Standard origin/main) und neue Fassung bekommen dieselben,
  * tief kopierten Eingaben; verglichen werden Rückgabe (oder Fehler), die danach veränderten Eingaben und die Dateien, die unter
- * einer `AK_ROOT`-Kulisse entstanden sind, jeweils byte-gleich.
+ * einer `AK_ROOT`-Kulisse entstanden sind, jeweils gleich (Werte in kanonischer Textform `kanon`, nicht V8-`serialize`; Dateien byte-gleich).
  *
  *   node tools/vergleich-alt-neu.mjs <datei> <funktion> <fallmodul> [--ref <ref>] [--zweige a,b]
  *   (für .ts-Dateien: `npx tsx tools/vergleich-alt-neu.mjs …`)
@@ -17,10 +17,35 @@ import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, un
 import { tmpdir } from 'node:os'
 import { basename, dirname, extname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { serialize } from 'node:v8'
 
 const LIMIT_GIT_MS = 30_000
 let laufNr = 0
+
+/**
+ * Kanonische Textform eines Werts für den Vergleich. `v8.serialize` taugt dafür nicht: es schreibt dieselbe Zahl als Smi (`I`)
+ * oder als HeapNumber (`N`, 8 Byte mehr), je nachdem, wie V8 sie intern hält (z. B. in einem Double-Array); alt gegen alt
+ * lieferte so andere Bytes. Hier zählt nur der Wert: Schlüssel- und Array-Reihenfolge, undefined, Löcher, NaN, -0, Date, Map,
+ * Set und geteilte Verweise (zweites Auftreten desselben Objekts wird zur Nummer des ersten) bleiben unterscheidbar.
+ */
+export function kanon(wurzel) {
+  const gesehen = new Map()
+  const geh = (v) => {
+    if (v === undefined) return { $u: 1 }
+    if (v === null) return null
+    if (typeof v === 'string') return `s:${v}`
+    if (typeof v === 'number') return `n:${Object.is(v, -0) ? '-0' : String(v)}`
+    if (typeof v === 'boolean') return `b:${v}`
+    if (typeof v !== 'object') throw new TypeError(`kanon: ${typeof v} nicht vergleichbar`)
+    if (gesehen.has(v)) return { $ref: gesehen.get(v) }
+    gesehen.set(v, gesehen.size)
+    if (v instanceof Date) return { $d: String(v.getTime()) }
+    if (v instanceof Set) return { $set: [...v].map(geh) }
+    if (v instanceof Map) return { $map: [...v].map(([k, w]) => [geh(k), geh(w)]) }
+    if (Array.isArray(v)) return { $a: Array.from(v, (x, i) => (i in v ? geh(x) : { $loch: 1 })) }
+    return { $o: Object.keys(v).map((k) => [k, geh(v[k])]) }
+  }
+  return JSON.stringify(geh(wurzel))
+}
 
 /** Einfache Zählhilfe: wie oft ein Etikett vorkam. */
 export function zaehler() {
@@ -67,7 +92,7 @@ async function ruf(fn, args, dateien) {
     } catch (e) {
       ergebnis = { wirft: String(e?.message ?? e) }
     }
-    return { ergebnis: serialize(ergebnis).toString('hex'), eingaben: serialize(args).toString('hex'), dateien: hashOrdner(kulisse) }
+    return { ergebnis: kanon(ergebnis), eingaben: kanon(args), dateien: hashOrdner(kulisse) }
   } finally {
     if (vorher === undefined) delete process.env.AK_ROOT
     else process.env.AK_ROOT = vorher
@@ -110,7 +135,7 @@ async function main(argv) {
   const r = await vergleicheAltNeu({ datei, funktion, faelle, ref: opt('--ref'), erwarteteZweige: opt('--zweige')?.split(',') ?? [] })
   for (const a of r.abweichungen) console.log(`ABWEICHUNG ${a.fall}: ${a.was}`)
   for (const l of r.luecken) console.log(`LÜCKE: Zweig „${l}“ von keinem Fall erreicht`)
-  console.log(`${faelle.length} Fälle, Abdeckung ${JSON.stringify(r.abdeckung)}: ${r.gleich ? 'byte-gleich' : 'NICHT gleich'}`)
+  console.log(`${faelle.length} Fälle, Abdeckung ${JSON.stringify(r.abdeckung)}: ${r.gleich ? 'gleich' : 'NICHT gleich'}`)
   process.exit(r.gleich ? 0 : 1)
 }
 

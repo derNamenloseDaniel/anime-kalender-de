@@ -16,10 +16,12 @@ const tsx = pathToFileURL(join(REPO, 'node_modules/tsx/dist/esm/index.mjs')).hre
 const SKRIPT = 'pipeline/check-toggo-seiten-bestand.ts'
 const B = 'https://www.toggo.de'
 
+/** Ordner der Handdateien in Teilen: die Wegwerf-Wurzel ist das Ziel, kein Schreibziel der Pipeline (`tools/check-workflows.mjs`). */
+const KURATIERT = ['data', 'curated']
 type Hand = { pokemon: { staffel: number; serie: string; titel?: number[] }[] }
 type Grenzen = { titel: { anilistId: number; staffeln: { nr: number }[] }[] }
-const hand = yaml.load(readFileSync(join(REPO, 'data/curated/toggo-seiten.yaml'), 'utf8')) as Hand
-const grenzen = yaml.load(readFileSync(join(REPO, 'data/curated/pokemon-staffeln.yaml'), 'utf8')) as Grenzen
+const hand = yaml.load(readFileSync(join(REPO, ...KURATIERT, 'toggo-seiten.yaml'), 'utf8')) as Hand
+const grenzen = yaml.load(readFileSync(join(REPO, ...KURATIERT, 'pokemon-staffeln.yaml'), 'utf8')) as Grenzen
 
 /** Die richtige Seite je Pokémon-Titel: die erste seiner Staffeln, aus der Handliste abgelesen (Staffel 16 nach Titelliste). */
 const richtig = (id: number, nr: number) => `${B}/pokemon/serien/${hand.pokemon.find((h) => h.staffel === nr && (!h.titel || h.titel.includes(id)))!.serie}`
@@ -37,10 +39,10 @@ type Kulisse = { pokemon?: Record<number, string | null>; leer?: boolean; stand?
 function lauf(k: Kulisse): { status: number | null; aus: string } {
   const wurzel = mkdtempSync(join(tmpdir(), 'toggo-seiten-bestand-'))
   try {
-    mkdirSync(join(wurzel, 'data/curated'), { recursive: true })
+    mkdirSync(join(wurzel, ...KURATIERT), { recursive: true })
     mkdirSync(join(wurzel, 'public/data'), { recursive: true })
     mkdirSync(join(wurzel, 'tools'))
-    for (const d of ['toggo-seiten.yaml', 'pokemon-staffeln.yaml']) cpSync(join(REPO, 'data/curated', d), join(wurzel, 'data/curated', d))
+    for (const d of ['toggo-seiten.yaml', 'pokemon-staffeln.yaml']) cpSync(join(REPO, ...KURATIERT, d), join(wurzel, ...KURATIERT, d))
     writeFileSync(join(wurzel, 'data/toggo.json'), JSON.stringify({ katalog: katalog(k.leer), titel: {} }))
     writeFileSync(join(wurzel, 'public/data/titles.json'), JSON.stringify(titel(k.pokemon)))
     writeFileSync(join(wurzel, 'public/data/cartoons.json'), JSON.stringify([{ id: -900001, titleEn: 'Cartoon Fixture', watchLinks: [] }]))
@@ -64,6 +66,8 @@ function fall(name: string, k: Kulisse, exit: 0 | 1, zeile: string, ohne?: strin
 console.log('\nTOGGO-Seiten im Bestand (Prozess):')
 fall('alle Pokémon-Titel auf der Seite ihrer ersten Staffel: grün', {}, 0, 'TOGGO-Seiten: 12 Titel und 1 Cartoons, Katalog 146 Serien, falsch 0 (Stand 0), fest fehlend 0', 'FEHLER')
 fall('Pokémon 527 auf der Sammelseite (der Anlass): rot', { pokemon: { 527: `${B}/pokemon` } }, 1, 'FEHLER: 1 Titel mit einem TOGGO-Link, den der Bau noch ändert', 'FEHLER: 0')
+fall('… und der Titel steht als Marke im Protokoll (Bestandsbau stellt ihn zurück)', { pokemon: { 527: `${B}/pokemon` } }, 1, '"titleId":527,"pruefung":"toggo-seiten"')
+fall('Pokémon 1564 ohne Link: Marke im Protokoll', { pokemon: { 1564: null } }, 1, '"titleId":1564,"pruefung":"toggo-seiten"')
 fall('Pokémon 527 auf der Seite einer anderen Staffel: rot', { pokemon: { 527: richtig(1564, 6) } }, 1, 'Stand 0, nur sinken: 527')
 fall('dieselbe Abweichung unter dem Stand (Ratsche): grün', { pokemon: { 527: `${B}/pokemon` }, stand: { falsch: 1, fehlend: 0 } }, 0, 'falsch 1 (Stand 1)', 'FEHLER')
 fall('Pokémon 1564 ohne TOGGO-Link: rot', { pokemon: { 1564: null } }, 1, 'Pokémon-Staffeltitel oder Handeinträge ohne TOGGO-Link, Stand 0, nur sinken: 1564')

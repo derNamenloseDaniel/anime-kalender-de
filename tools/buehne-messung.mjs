@@ -40,6 +40,8 @@ export function tippzieleImRahmen(minimum) {
     const r = traeger.getBoundingClientRect()
     const sichtbar = r.width > 0 && r.height > 0 && stil.visibility !== 'hidden' && stil.display !== 'none'
     if (!sichtbar || stil.display === 'inline' || el.closest('[aria-hidden="true"]')) continue
+    /* Ein deaktiviertes Ziel (`aria-disabled`) nimmt keine Treffer an und ist von WCAG 2.5.8 ausgenommen („inaktiv“). */
+    if (el.closest('[aria-disabled="true"]')) continue
     const w = wirksam(el, traeger, 'w')
     const h = wirksam(el, traeger, 'h')
     if (w < minimum || h < minimum) fehler.push({ schluessel: beschreibung(el), w: Math.round(w), h: Math.round(h) })

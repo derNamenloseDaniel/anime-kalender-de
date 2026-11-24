@@ -222,6 +222,8 @@ pipeline/check-disc-reine-titel.ts
 pipeline/check-disc-suchlinks.ts
 pipeline/check-disc-teil-hinweis.ts
 pipeline/check-disc-teil-verdrahtung.ts
+pipeline/check-disc-termin-frische-lauf.ts
+pipeline/check-disc-termin-frische.ts
 pipeline/check-disc-uebersicht-teile.ts
 pipeline/check-disc-verschiebung-staffel.ts
 pipeline/check-disc-zuordnung.ts
@@ -669,6 +671,7 @@ pipeline/check-stuetzpunkt-ueberholt.ts
 pipeline/check-stumme-quellen.ts
 pipeline/check-such-chip.ts
 pipeline/check-suchadressen-endzustand.ts
+pipeline/check-suche-staffel-angabe.ts
 pipeline/check-suchfeld-arten.ts
 pipeline/check-suchhinweis-bereich.ts
 pipeline/check-suchhinweis-lauf.ts
@@ -743,6 +746,7 @@ pipeline/check-unsicheres-raus-ast.ts
 pipeline/check-unsicheres-raus.ts
 pipeline/check-urteil-art.ts
 pipeline/check-urteil-fremde-adresse.ts
+pipeline/check-urteil-frueh.ts
 pipeline/check-urteil-spaet.ts
 pipeline/check-urteile-ablauf.ts
 pipeline/check-us-nein-adresse.ts

@@ -21,8 +21,8 @@
  * immer eingefroren — derselbe Fehler, den `scrape-crunchyroll-dub.ts` und
  * `fetch-anisearch.ts` am 15.08.2026 gekostet haben. Vorgabe sind 30 Tage;
  * abgeschlossene Staffeln ändern sich nicht mehr, laufende schon. Laufende Serien mit einer
- * erschienenen Folge ohne echten Titel kommen schon nach 6 Tagen wieder, vor den übrigen
- * (`lib/tmdb-folgen-auswahl.ts`).
+ * erschienenen Folge ohne echten Titel und Serien mit angekündigter Folge (Datum ab heute, damit eine Verschiebung vor dem Termin ankommt)
+ * kommen schon nach 6 Tagen wieder, vor den übrigen (`lib/tmdb-folgen-auswahl.ts`).
  *
  * **Lückentitel** (`lib/tmdb-folgen-luecke.ts`): Titel mit Folgen im belegt deutschen Bereich ohne deutschen Titel und ohne Eintrag
  * kommen zuerst dran, auch ohne Anbieter; ohne Dub-Bereich gilt jeder offene Folgentitel (`abrufLuecke`). Der Bau übernimmt daraus nur Titel, die nicht englisch und kein „Folge N" sind (`folgentitel-tmdb.ts`).

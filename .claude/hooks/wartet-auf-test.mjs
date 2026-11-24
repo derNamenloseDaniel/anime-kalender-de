@@ -152,11 +152,12 @@ assert.equal(await lauf({ standPfad: join(wurzel, 'gibt-es-nicht.md'), ms: JETZT
 mkdirSync(join(wurzel, 'w'), { recursive: true })
 const lies = (p) => (p.endsWith('e113.md') ? dateiText('E113', true) : null)
 const aend = () => null
-const jetztMitWarte = `## In Arbeit\n### Jetzt\n- 🔴 [E113 · Gemerkte Titel](${link(dateiE113)})\n### Später\n`
-const m1 = waechter(jetztMitWarte, Date.now(), () => true, lies, aend)
+const STAND_JETZT = berlinEpoche(2026, 11, 24, 12, 0)
+const jetztMitWarte = `## In Arbeit — Stand 24.11.2026 12:00\n### Jetzt\n- 🔴 [E113 · Gemerkte Titel](file:///C:/test/e113.md)\n### Später\n`
+const m1 = waechter(jetztMitWarte, STAND_JETZT, () => true, lies, aend)
 assert.match(m1, /Jetzt: E113 — die Datei sagt „erst handeln, wenn …“/)
 const lies2 = () => dateiText('E113', false)
-assert.ok(!waechter(jetztMitWarte, Date.now(), () => true, lies2, aend).includes('erst handeln'), 'ohne ⚠-Zeile keine Meldung')
+assert.ok(!waechter(jetztMitWarte, STAND_JETZT, () => true, lies2, aend).includes('erst handeln'), 'ohne ⚠-Zeile keine Meldung')
 // Wächter: ⏳-Zeile auf jetzt/…md ohne {wartet}
 const spaeter = (z) => `### Jetzt\n### Später\n${z}\n`
 const ohne = waechter(spaeter('- ⏳ [E95 · Netflix](file:///C:/code/ai/anime-kalender-de/daniel-zum-abarbeiten/jetzt/e95.md) — sobald'), Date.now(), () => true, () => null, aend)

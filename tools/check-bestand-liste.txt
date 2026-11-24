@@ -87,6 +87,7 @@ pipeline/check-saison-deutsch-bestand.ts
 pipeline/check-sammeleintrag-synchro-bestand.ts
 pipeline/check-schwester-shop-bestand.ts
 pipeline/check-shop-wege-falsches-ziel-bestand.ts
+pipeline/check-staffel-ohne-seite-bestand.ts
 pipeline/check-staffel-von-hand-bestand.ts
 pipeline/check-staffelquelle-widerspruch-bestand.ts
 pipeline/check-staffelzaehlung-bestand.ts

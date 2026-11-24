@@ -169,23 +169,38 @@ export function FolgenBereich({ titleId, wege, erschienen, laufzeitImKopf, serie
             </div>
           )}
           {gewaehlt && <p className="pb-1 text-ak-leise">{staffelZeile(gewaehlt)}</p>}
-          <ul className="max-h-64 overflow-y-auto pr-1">
-            {!folgen && <li className="text-ak-leise">Lädt …</li>}
-            {folgen && !folgen.length && <li className="text-ak-leise">Keine Folgentitel bekannt.</li>}
-            {ohneTitel && <li className="pb-1 text-ak-leise">Die Folgentitel liegen noch nicht vor.</li>}
-            {nurSerienbeleg && <li className="pb-1 text-ak-leise">{SERIENBELEG_HINWEIS}</li>}
-            {sichtbar.map(([nr, titel, min]) => (
-              <li key={nr} className="flex items-baseline gap-2 py-px">
-                <span className="w-9 shrink-0 text-right tabular-nums text-ak-leise">{nr}</span>
-                <span className="min-w-0 flex-1 truncate">{titel || (ohneTitel ? '' : '—')}</span>
-                {min ? <span className="shrink-0 tabular-nums text-ak-leise">{min} Min.</span> : null}
-                {deutsch(nr) ? <DeFlagge /> : erschienen !== undefined && nr > erschienen ? <NochNichtErschienen /> : <FolgeOhneFlagge hinweis={liste?.h?.find(([n]) => n === nr)?.[1]} gibtDeutsche={Boolean(liste?.de.length)} />}
-              </li>
-            ))}
-          </ul>
+          <FolgenListe liste={liste} sichtbar={sichtbar} ohneTitel={ohneTitel} nurSerienbeleg={nurSerienbeleg} deutsch={deutsch} erschienen={erschienen} />
         </div>
       )}
     </div>
+  )
+}
+
+/** Die Zeilen der Folgen (Nummer, Titel, Minuten, Flagge) samt Lade- und Leerhinweis. */
+function FolgenListe({ liste, sichtbar, ohneTitel, nurSerienbeleg, deutsch, erschienen }: {
+  liste: Liste | undefined
+  sichtbar: Folge[]
+  ohneTitel: boolean
+  nurSerienbeleg: boolean
+  deutsch: (nr: number) => boolean
+  erschienen: number | undefined
+}) {
+  const folgen = liste?.f
+  return (
+    <ul className="max-h-64 overflow-y-auto pr-1">
+      {!folgen && <li className="text-ak-leise">Lädt …</li>}
+      {folgen && !folgen.length && <li className="text-ak-leise">Keine Folgentitel bekannt.</li>}
+      {ohneTitel && <li className="pb-1 text-ak-leise">Die Folgentitel liegen noch nicht vor.</li>}
+      {nurSerienbeleg && <li className="pb-1 text-ak-leise">{SERIENBELEG_HINWEIS}</li>}
+      {sichtbar.map(([nr, titel, min]) => (
+        <li key={nr} className="flex items-baseline gap-2 py-px">
+          <span className="w-9 shrink-0 text-right tabular-nums text-ak-leise">{nr}</span>
+          <span className="min-w-0 flex-1 truncate">{titel || (ohneTitel ? '' : '—')}</span>
+          {min ? <span className="shrink-0 tabular-nums text-ak-leise">{min} Min.</span> : null}
+          {deutsch(nr) ? <DeFlagge /> : erschienen !== undefined && nr > erschienen ? <NochNichtErschienen /> : <FolgeOhneFlagge hinweis={liste?.h?.find(([n]) => n === nr)?.[1]} gibtDeutsche={Boolean(liste?.de.length)} />}
+        </li>
+      ))}
+    </ul>
   )
 }
 

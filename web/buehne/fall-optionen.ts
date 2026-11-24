@@ -47,6 +47,8 @@ export const OPTIONS_FAELLE: Record<string, { von: string; name: string; optione
   'pokemon-film': { von: 'pokemon-horizonte', name: 'Pokémon: Der Film – Kyurem gegen den Ritter der Redlichkeit', optionen: { titel: 5726 } },
   'pokemon-concierge': { von: 'pokemon-horizonte', name: 'Die Pokémon-Concierge', optionen: { titel: 14945 } },
   'pokemon-sammeltitel': { von: 'pokemon-horizonte', name: 'Pokémon (Staffel 1–5)', optionen: { titel: 483 } },
+  /* Ein Reiter weit rechts in der Pokémon-Hauptserie (Mockup `staffel-abschnitt`, F157). */
+  'pokemon-reisen': { von: 'pokemon-horizonte', name: 'Pokémon Reisen (Staffel 23–25)', optionen: { titel: 10852 } },
   'detektiv-conan-film': { von: 'fernsehtag-detektiv-conan', name: 'Detektiv Conan: Der Magier des letzten Jahrhunderts', optionen: { titel: 690 } },
 }
 

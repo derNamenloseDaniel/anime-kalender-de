@@ -162,6 +162,132 @@ function archiviere(name: string, daten: unknown): void {
   writeFileSync(resolve(ARCHIV, `${name}.json.gz`), gzipSync(JSON.stringify(daten)))
 }
 
+/** Zähler eines Laufs; `anfragen` läuft über beide Änderungsarten weiter, weil das Budget geteilt wird. */
+interface Zaehler {
+  anfragen: number
+  neue: number
+  mitDeutsch: number
+  verschwunden: number
+}
+
+type Gesehen = NonNullable<Bestand['gesehen']>
+
+/**
+ * `series_granularity: episode` ist hier kein Feinschliff, sondern
+ * Bedingung — sonst ist die Tonspur-Angabe eine Serien-Auskunft und
+ * damit für eine laufende Serie schlicht falsch.
+ *
+ * Daniel am 23.08.2026 zu „Lycoris Recoil": „1. staffel auf deutsch,
+ * 2. staffel läuft (neuste folge ist ep6), aber keine einzige auf
+ * deutsch." Die Quelle meldete ohne diesen Parameter `audios: [deu]` —
+ * wahr für Staffel 1, falsch für alles, was gerade läuft. Und genau die
+ * laufenden Staffeln sind das, wofür es diesen Lauf gibt.
+ */
+function aenderungsQuery(art: 'new' | 'removed', von: number, cursor: string | undefined): URLSearchParams {
+  const query = new URLSearchParams({
+    country: 'de',
+    change_type: art,
+    item_type: 'show',
+    show_type: 'series',
+    series_granularity: 'episode',
+    catalogs: KATALOGE,
+    from: String(von),
+    order_direction: 'desc',
+  })
+  if (cursor) query.set('cursor', cursor)
+  return query
+}
+
+/** Trägt die Änderungen einer Seite in `gesehen` ein und zählt, was neu ist. */
+function verbuchePage(art: 'new' | 'removed', antwort: Antwort, gesehen: Gesehen, zaehler: Zaehler): void {
+  for (const c of antwort.changes ?? []) {
+    const show = antwort.shows?.[c.showId]
+    if (!show) continue
+    const optionen = show.streamingOptions?.de ?? []
+    const eintrag = feedEintrag(art, show, c, optionen)
+    const schluessel = `${art}:${c.showId}:${c.service?.id ?? '?'}`
+    if (!gesehen[schluessel]) {
+      zaehler.neue++
+      if (art === 'removed') zaehler.verschwunden++
+    }
+    if (eintrag.deutsch && art === 'new') zaehler.mitDeutsch++
+    gesehen[schluessel] = eintrag
+  }
+}
+
+/** Holt die Seiten einer Änderungsart, solange das Budget dieser Art reicht. */
+async function holeArt(
+  art: 'new' | 'removed',
+  budgetJeArt: number,
+  von: number,
+  monat: string,
+  bestand: Bestand & { verbrauch: Record<string, number>; gesehen: Gesehen },
+  zaehler: Zaehler,
+): Promise<void> {
+  let cursor: string | undefined
+  const grenze = zaehler.anfragen + budgetJeArt
+  while (zaehler.anfragen < grenze) {
+    const antwort = await hole(`/changes?${aenderungsQuery(art, von, cursor)}`)
+    zaehler.anfragen++
+    bestand.verbrauch[monat] = (bestand.verbrauch[monat] ?? 0) + 1
+    if (!antwort) break
+    archiviere(`changes-${art}-${monat}-${zaehler.anfragen}`, antwort)
+    verbuchePage(art, antwort, bestand.gesehen, zaehler)
+
+    if (!antwort.hasMore || !antwort.nextCursor) break
+    cursor = antwort.nextCursor
+    await sleep(400)
+  }
+}
+
+/** Die Menge unserer Titel als TMDB-Kennungen in der Schreibweise der Änderungsquelle (`tv/30991`). */
+function unsereTmdbKennungen(): Set<string> {
+  const tmdbTitel = readJson<Record<string, { tmdbId?: number; kind?: string }>>('data/tmdb-titles.json', {})
+  const unsere = new Set<string>()
+  for (const v of Object.values(tmdbTitel)) {
+    if (v?.tmdbId) unsere.add(`${v.kind ?? 'tv'}/${v.tmdbId}`)
+  }
+  return unsere
+}
+
+/**
+ * Betrifft uns überhaupt etwas davon?
+ *
+ * Der Lauf meldete bisher nur seine eigenen Zahlen — „152 Einträge, 55 mit
+ * deutscher Tonspur" liest sich nach Ertrag, sagt aber nichts darüber, ob
+ * einer davon in diesem Kalender vorkommt. Gemessen am 24.08.2026: 11 der
+ * 152 sind einem unserer Titel zuzuordnen, 5 tragen deutschen Ton, und alle
+ * 5 standen längst im Bestand. Der Ertrag war null.
+ *
+ * Zugeordnet wird über die TMDB-Kennung, und die beiden Seiten schreiben sie
+ * verschieden: `data/tmdb-titles.json` führt `tmdbId: 30991` mit `kind:
+ * 'tv'`, die Änderungsquelle `tmdbId: 'tv/331650'`. Wer das übersieht,
+ * misst sauber null Treffer und hält die Quelle für wertlos.
+ */
+function meldeUnsere(gesehen: Gesehen): void {
+  const unsere = unsereTmdbKennungen()
+  const motnBestand = readJson<{ shows?: Record<string, unknown> }>('data/motn.json', {})
+  let unsereTreffer = 0
+  let unsereMitDeutsch = 0
+  let unsereNeu = 0
+  for (const e of Object.values(gesehen)) {
+    if (!e.tmdbId || !unsere.has(e.tmdbId)) continue
+    unsereTreffer++
+    if (!e.deutsch) continue
+    unsereMitDeutsch++
+    if (!e.imdbId || !motnBestand.shows?.[e.imdbId]) unsereNeu++
+  }
+  log(
+    `Davon in unserem Kalender: ${unsereTreffer} zuzuordnen, ${unsereMitDeutsch} mit deutscher ` +
+      `Tonspur, ${unsereNeu} noch nicht im MOTN-Bestand`,
+  )
+  if (unsereNeu > 0) {
+    // Die Zeile, wegen der dieser Lauf existiert. Sie kam seit dem 23.08.2026 kein einziges Mal — wenn sie kommt, gehört der Titel in den nächsten
+    // Folgenabruf.
+    warn(`${unsereNeu} Titel aus der Änderungsquelle fehlen im MOTN-Bestand — Folgenabruf lohnt`)
+  }
+}
+
 async function main(): Promise<void> {
   if (!SCHLUESSEL) {
     warn('STREAMING_API_KEY fehlt — der Lauf tut nichts. Schlüssel siehe my_secrets.md.')
@@ -174,10 +300,7 @@ async function main(): Promise<void> {
   bestand.gesehen ??= {}
 
   const von = Math.floor(Date.now() / 1000) - TAGE * 86_400
-  let anfragen = 0
-  let neue = 0
-  let mitDeutsch = 0
-  let verschwunden = 0
+  const zaehler: Zaehler = { anfragen: 0, neue: 0, mitDeutsch: 0, verschwunden: 0 }
 
   /**
    * Zwei Änderungsarten — aber nur eine davon darf etwas bewirken.
@@ -216,58 +339,9 @@ async function main(): Promise<void> {
    * Befund.
    */
   const budgetJeArt = Math.max(1, Math.floor(BUDGET / 2))
-
+  const ganz = bestand as Bestand & { verbrauch: Record<string, number>; gesehen: Gesehen }
   for (const art of ['new', 'removed'] as const) {
-    let cursor: string | undefined
-    const grenze = anfragen + budgetJeArt
-    while (anfragen < grenze) {
-      /**
-       * `series_granularity: episode` ist hier kein Feinschliff, sondern
-       * Bedingung — sonst ist die Tonspur-Angabe eine Serien-Auskunft und
-       * damit für eine laufende Serie schlicht falsch.
-       *
-       * Daniel am 23.08.2026 zu „Lycoris Recoil": „1. staffel auf deutsch,
-       * 2. staffel läuft (neuste folge ist ep6), aber keine einzige auf
-       * deutsch." Die Quelle meldete ohne diesen Parameter `audios: [deu]` —
-       * wahr für Staffel 1, falsch für alles, was gerade läuft. Und genau die
-       * laufenden Staffeln sind das, wofür es diesen Lauf gibt.
-       */
-      const query = new URLSearchParams({
-        country: 'de',
-        change_type: art,
-        item_type: 'show',
-        show_type: 'series',
-        series_granularity: 'episode',
-        catalogs: KATALOGE,
-        from: String(von),
-        order_direction: 'desc',
-      })
-      if (cursor) query.set('cursor', cursor)
-
-      const antwort = await hole(`/changes?${query}`)
-      anfragen++
-      bestand.verbrauch[monat] = (bestand.verbrauch[monat] ?? 0) + 1
-      if (!antwort) break
-      archiviere(`changes-${art}-${monat}-${anfragen}`, antwort)
-
-      for (const c of antwort.changes ?? []) {
-        const show = antwort.shows?.[c.showId]
-        if (!show) continue
-        const optionen = show.streamingOptions?.de ?? []
-        const eintrag = feedEintrag(art, show, c, optionen)
-        const schluessel = `${art}:${c.showId}:${c.service?.id ?? '?'}`
-        if (!bestand.gesehen[schluessel]) {
-          neue++
-          if (art === 'removed') verschwunden++
-        }
-        if (eintrag.deutsch && art === 'new') mitDeutsch++
-        bestand.gesehen[schluessel] = eintrag
-      }
-
-      if (!antwort.hasMore || !antwort.nextCursor) break
-      cursor = antwort.nextCursor
-      await sleep(400)
-    }
+    await holeArt(art, budgetJeArt, von, monat, ganz, zaehler)
   }
 
   bestand.fetchedAt = new Date().toISOString()
@@ -279,53 +353,16 @@ async function main(): Promise<void> {
   */
   recordSource(
     'motn-changes',
-    neue,
-    anfragen ? undefined : kontingentLeer ? 'Kontingent erschöpft' : 'keine Anfrage abgesetzt',
-    anfragen,
+    zaehler.neue,
+    zaehler.anfragen ? undefined : kontingentLeer ? 'Kontingent erschöpft' : 'keine Anfrage abgesetzt',
+    zaehler.anfragen,
   )
 
-  /**
-   * Betrifft uns überhaupt etwas davon?
-   *
-   * Der Lauf meldete bisher nur seine eigenen Zahlen — „152 Einträge, 55 mit
-   * deutscher Tonspur" liest sich nach Ertrag, sagt aber nichts darüber, ob
-   * einer davon in diesem Kalender vorkommt. Gemessen am 24.08.2026: 11 der
-   * 152 sind einem unserer Titel zuzuordnen, 5 tragen deutschen Ton, und alle
-   * 5 standen längst im Bestand. Der Ertrag war null.
-   *
-   * Zugeordnet wird über die TMDB-Kennung, und die beiden Seiten schreiben sie
-   * verschieden: `data/tmdb-titles.json` führt `tmdbId: 30991` mit `kind:
-   * 'tv'`, die Änderungsquelle `tmdbId: 'tv/331650'`. Wer das übersieht,
-   * misst sauber null Treffer und hält die Quelle für wertlos.
-   */
-  const tmdbTitel = readJson<Record<string, { tmdbId?: number; kind?: string }>>('data/tmdb-titles.json', {})
-  const unsere = new Set<string>()
-  for (const v of Object.values(tmdbTitel)) {
-    if (v?.tmdbId) unsere.add(`${v.kind ?? 'tv'}/${v.tmdbId}`)
-  }
-  const motnBestand = readJson<{ shows?: Record<string, unknown> }>('data/motn.json', {})
-  let unsereTreffer = 0
-  let unsereMitDeutsch = 0
-  let unsereNeu = 0
-  for (const e of Object.values(bestand.gesehen)) {
-    if (!e.tmdbId || !unsere.has(e.tmdbId)) continue
-    unsereTreffer++
-    if (!e.deutsch) continue
-    unsereMitDeutsch++
-    if (!e.imdbId || !motnBestand.shows?.[e.imdbId]) unsereNeu++
-  }
+  meldeUnsere(ganz.gesehen)
   log(
-    `Davon in unserem Kalender: ${unsereTreffer} zuzuordnen, ${unsereMitDeutsch} mit deutscher ` +
-      `Tonspur, ${unsereNeu} noch nicht im MOTN-Bestand`,
+    `${zaehler.anfragen} Anfragen, ${zaehler.neue} neue Einträge (${zaehler.mitDeutsch} mit deutscher Tonspur, ${zaehler.verschwunden} Entfernungen).`,
   )
-  if (unsereNeu > 0) {
-    // Die Zeile, wegen der dieser Lauf existiert. Sie kam seit dem 23.08.2026
-    // kein einziges Mal — wenn sie kommt, gehört der Titel in den nächsten
-    // Folgenabruf.
-    warn(`${unsereNeu} Titel aus der Änderungsquelle fehlen im MOTN-Bestand — Folgenabruf lohnt`)
-  }
-  log(`${anfragen} Anfragen, ${neue} neue Einträge (${mitDeutsch} mit deutscher Tonspur, ${verschwunden} Entfernungen).`)
-  log(`Verbrauch ${monat}: ${bestand.verbrauch[monat]} (dieser Lauf) — der Monatslauf zählt eigene.`)
+  log(`Verbrauch ${monat}: ${ganz.verbrauch[monat]} (dieser Lauf) — der Monatslauf zählt eigene.`)
 }
 
 void main()

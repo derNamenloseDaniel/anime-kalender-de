@@ -85,6 +85,7 @@ const ABGELEITET: [string, string, number][] = [
   ['pokemon-film', 'pokemon-horizonte', 5726],
   ['pokemon-concierge', 'pokemon-horizonte', 14945],
   ['pokemon-sammeltitel', 'pokemon-horizonte', 483],
+  ['pokemon-reisen', 'pokemon-horizonte', 10852],
   ['detektiv-conan-film', 'fernsehtag-detektiv-conan', 690],
 ]
 for (const [kennung, von, titleId] of ABGELEITET) {
@@ -94,4 +95,4 @@ for (const [kennung, von, titleId] of ABGELEITET) {
 }
 assert.equal((alle['alle']!['titles.json'] as Title[]).filter((x) => x.id === 483).length, 1)
 assert.notEqual(alle['pokemon-horizonte']!.titleId, alle['pokemon-film']!.titleId)
-console.log('buehne-fall-optionen: ok (Felder, Ausgangsfall, Fehlfälle, Fall 86 mit/ohne Beleg, Start auf Disc, Titel-Option, 4 abgeleitete Reihen-Fälle)')
+console.log('buehne-fall-optionen: ok (Felder, Ausgangsfall, Fehlfälle, Fall 86 mit/ohne Beleg, Start auf Disc, Titel-Option, 5 abgeleitete Reihen-Fälle)')

@@ -35,6 +35,8 @@ const ALLE_NAMEN = ['a', 'b', 'c', 'd']
 assert.deepEqual(nachOrt(ALLE_NAMEN, ORT, 'logik', 'pr'), ['a', 'd'], 'pr: alles ohne Nacht-Ort, auch ohne Eintrag und mit Ort pr')
 assert.deepEqual(nachOrt(ALLE_NAMEN, ORT, 'logik', 'pr', (e) => e, ['data/c.txt']), ['a', 'c', 'd'], 'pr mit berührter Lesedatei: c läuft mit, b (ohne liest) nie')
 assert.deepEqual(nachOrt(ALLE_NAMEN, ORT, 'logik', 'pr', (e) => e, ALLE), ['a', 'c', 'd'])
+assert.deepEqual(nachOrt(ALLE_NAMEN, ORT, 'logik', 'pr', (e) => e, ['b']), ['a', 'b', 'd'], 'pr mit berührter eigener Datei: b läuft mit, auch ohne liest')
+assert.deepEqual(nachOrt(['y.test.mjs'], { tests: { 'tools/y.test.mjs': { ort: 'nachts' } } }, 'tests', 'pr', (t) => `tools/${t}`, ['tools/y.test.mjs']), ['y.test.mjs'], 'eigene Datei über die Namensfunktion')
 assert.deepEqual(nachOrt(ALLE_NAMEN, ORT, 'logik', 'nachts', (e) => e, ['data/c.txt']), ['b', 'c'], 'nachts: immer alle Nacht-Einträge')
 assert.deepEqual(nachOrt(ALLE_NAMEN, ORT, 'tests', 'pr'), ALLE_NAMEN, 'Art ohne Einträge: alles im PR')
 assert.deepEqual(nachOrt(['x.test.mjs', 'y.test.mjs'], { tests: { 'tools/y.test.mjs': { ort: 'nachts' } } }, 'tests', 'nachts', (t) => `tools/${t}`), ['y.test.mjs'], 'Name über die Namensfunktion')

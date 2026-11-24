@@ -579,3 +579,25 @@ Stichprobe 20 von 284 offenen Titeln (Zufall, Startwert 4420), je Titel TMDB liv
 - **Dragon Ball Daima 170083** („Dragon Ball Daima plus.rtl.de“): nur Presse (serienjunkies, tvmovie: RTL+ ab Ende September 2026), keine plus.rtl.de-Seite → nicht eingetragen.
 - **Netz:** `primevideo.com` und `www.primevideo.com` lösen in der Cloud nicht auf (WebFetch ENOTFOUND), die Kanalseiten konnten nicht gelesen werden; die Domains müssten in den Netzwerkeinstellungen der Sitzung freigegeben sein. Die Mängelzahl bleibt 5.
 - **Nachtrag 23.11.2026 abends (lokaler Lauf):** RTL+-Sitemap vollständig gelesen, kein Eintrag für Dragon Ball Daima 170083, Pokémon 158870/158869 und Detektiv Conan Film 28 → RTL+-Adresse gibt es dort noch nicht. Trinity Blood, Chrono Crusade und Peter Pan starten laut Anime2You (Artikel 1074092) zwischen 10. und 31.12. bei Aniverse; die Quelle nennt keine Titelseite. Die Adresse kommt mit dem Erscheinen über `uebernehmeBezugswegAdressen`, Nachprüfung 02.01.2027. Eine Ausnahme „noch nicht erschienen“ für die Art lohnt nicht: Anime2You nennt bei anderen Titeln (Gunslinger Girl, Berserk) die Adresse schon vorab.
+
+## `bild-fremdsprachig`: Ursachen der offenen Titel (24.11.2026, Vorrat TMDB)
+
+Gemessen mit `node tools/maengel.mjs` an `origin/main` (Stand `03d199a5`): **508 offen**, 315 Ausnahme (die Rechnung am Datensatz ohne Cache findet 526 offene; die Differenz sind geteilte Filme, die nur der Bau kennt). Bezug: PR 4629 und 4668 (22./23.11.).
+
+**Stichprobe** (20 offene Titel, Zufallsziehung mit Startwert 4420 aus allen 526, TMDB-Abruf je Titel): 15 tragen ein AniList-Banner (7 mit Plakat-Eintrag `null`, 5 mit Staffel- oder Namensplakat `en`, 2 zusätzlich mit Plakat `ja`, 1 zusätzlich AniList-Cover bei einem geteilten Film), 7 ein TMDB-Plakat `ja` (5 ohne Kennung, 2 mit Kennung, bei denen TMDB ein textloses Hochformat führt: I''s Pure tv/43180 mit 1000×1500, Sengoku Night Blood tv/74184 mit 2000×3000); 2 Titel zählen doppelt. Hochrechnung aus der Vollrechnung an allen 526: Banner 357 (68 %), Plakat `ja` 238 (45 %), AniList-Cover 20 (4 %).
+
+**Alle 238 Titel mit Plakat `ja`** wurden zusätzlich gegen TMDB gelesen (nicht nur die Stichprobe):
+
+| Ursache | Titel | Weg |
+|---|---|---|
+| Eintrag mit Kennung aus der alten Folge (ja vor „ohne Sprache“), TMDB hat jetzt textloses (52), englisches (2) oder deutsches (1) Hochformat | 55 | behoben: Nachwahl (s. u.) |
+| Eintrag mit Kennung, TMDB hat nur japanische Plakate; `nurJa` fehlt, weil der Eintrag älter ist als der Beleg | 43 | behoben: Nachwahl setzt `nurJa`, danach Ausnahme |
+| Staffelplakat de/en/ohne vorhanden, Eintrag steht auf `ja` (Staffelsuche nimmt nur Titel ohne Eintrag) | 74 | behoben: Nachwahl |
+| Reihenserie ohne eindeutige Staffel (Beginn ±100 Tage und Folgenzahl ±1): Special 25, OVA 37, ONA 4 | 66 | offen, nur mit Handrecherche |
+| Reihe ohne TMDB-Serie | 0 (im Plakat-Satz), 19 beim Banner | offen |
+
+**Befund PR 4668:** Die Beschreibung nennt 154 geänderte Einträge, in `data/tmdb-poster.json` kamen am Merge-Commit 80 an (Vergleich der Dateistände vor und nach dem Merge); die 74 fehlenden sind genau die Staffelplakat-Fälle oben (Beispiele AniList 20958, 110229: dort steht weiter `ja`, Abruf 11.10.). Ob der Verlust beim Zusammenführen der einzeiligen JSON-Datei geschah, ist nicht belegt.
+
+**Fix am automatischen Weg** (`lib/tmdb-ablauf.ts` `japanischOhneBeleg`, `bilderFaellig`; `lib/tmdb-staffel-wahl.ts`; `fetch-tmdb-poster.ts`): Ein japanisches Plakat ohne `nurJa` wird im nächsten Plakat-Lauf neu abgefragt, auch unter 150 Tagen (mit Kennung per `/images`, ohne Kennung über die Staffelsuche). Ein Eintrag, der nur neu geprüft wird, verliert sein Plakat nicht (`staffelEintrag`). Danach trägt er `nurJa` oder ein lesbares Plakat und wird nie wieder gewählt. Erwartung nach Lauf und Bestandsbau: −172 (55 + 43 + 74), also rund 336 offen; **nicht gemessen**, nur die Wahl gegen TMDB gerechnet. Wächter: `pipeline/check-tmdb-staffel-wahl.ts`.
+
+**Größter Rest: das Banner (357 Titel, nur AniList).** `holeBanner` fragt nur Titel mit Eintrag in `data/tmdb-titles.json` ab; 326 dieser Titel (dazu 19 in Reihen ohne TMDB-Serie) haben keine eigene Kennung, ihre Reihe aber eine TMDB-Serie (Hintergrundbilder gibt es bei TMDB nur je Serie, nicht je Staffel). Ein Übernahmeweg wie `banner-franchise.ts` (Serienbild für Staffeln, die nur ein AniList-Banner tragen) wäre eine Verhaltensänderung an der Bildwahl aller Staffeln und braucht eine eigene Entscheidung; hier nicht gebaut.

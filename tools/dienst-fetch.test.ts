@@ -83,7 +83,9 @@ function aufrufer() {
     pruefe(eigenerSatz.length === 0, `${datei}: kein eigener Satz für den Ausfall, nur DIENST_PAUSE (${eigenerSatz.length})`)
   }
   pruefe(/throw new Error\(DIENST_PAUSE\)/.test(readFileSync('web/src/lib/push.ts', 'utf8')), 'push: Schlüssel fehlt -> DIENST_PAUSE')
-  const seite = readFileSync('web/src/components/StaticViews.tsx', 'utf8')
+  const seite = ['StaticViews.tsx', 'newsletter-zustand.ts']
+    .map((d) => readFileSync(`web/src/components/${d}`, 'utf8'))
+    .join('\n')
   pruefe(!seite.split('\n').some(rohesFetch) && /await subscribe\(/.test(seite), 'StaticViews: Anmeldung über subscribe() statt eigenem fetch')
   const zahl = (readFileSync('web/src/lib/newsletterSync.ts', 'utf8').match(/await dienstFetch\(/g) ?? []).length
   pruefe(zahl === 8, `newsletterSync: alle 8 Aufrufe über dienstFetch (${zahl})`)

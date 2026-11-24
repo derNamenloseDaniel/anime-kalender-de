@@ -346,34 +346,36 @@ const rang: Record<NewsArt, number> = {
   folgen: 5,
 }
 
+type RohMeldung = NewsMeldung & { schluessel: string; fallback: string; titel: Title }
+
+interface Gruppe {
+  am: string
+  wurzel: number
+  teile: DatiertNews[]
+}
+
+const kopf = (t: Title) => ({ titel: t })
+
 /**
- * Baut die Meldungen. `historie` wird dabei **ergänzt** — der Aufrufer schreibt
- * sie zurück, damit das Datum einer Meldung beim nächsten Bau dasselbe bleibt.
+ * Dieselbe Schreibweise wie überall sonst. Ohne die Eindeutschung stand im
+ * Chip „Staffel 3 - Cour 1" neben einem „Staffel 3 - Teil 2" aus derselben
+ * Reihe — die Vereinheitlichung von „Cour"/„Part" lebt in `shared/titles.ts`.
  */
-export function baueNews(
-  titles: Title[],
-  releases: Release[],
-  neuMitSynchro: NeuerTitel[],
-  crNeu: CrNeueFolge[],
-  historie: NewsHistorie,
-  vorherige: NewsEintrag[] = [], omuTitel: Title[] = [], nurOriginalton: ReadonlySet<string> = new Set(), offizielle?: OffizielleMeldung[],
-): NewsEintrag[] {
-  const heute = todayIso()
-  const grenze = addDays(heute, -FENSTER_TAGE)
-  const nachId = new Map(titles.map((t) => [t.id, t]))
-  const roh: (NewsMeldung & { schluessel: string; fallback: string; titel: Title })[] = []
+const name = (t: Title) => eindeutschenStaffel(t.titleDe ?? t.titleEn ?? t.titleRomaji ?? String(t.id))
 
-  const kopf = (t: Title) => ({ titel: t })
+const wurzelVon = (t: Title) => t.franchiseId ?? t.id
 
-  /*
-    1. Erstmals mit deutscher Synchro — **aber erst, wenn man sie an dem Tag auch sehen kann**
-    (Daniel, 19.09.2026, an „Witch on the Holy Night": „neu auf deutsch … sollten nur titel
-    bekommen die an dem tag auch deutsch sind, hier ist es eher eine ankündigung"). Die Synchro
-    war belegt, der Kinostart ist aber erst am 26.01.2027 — das sagt die Meldung „Im Kino" schon.
-    Sichtbar ist Deutsch mit einem Stream mit deutscher Tonspur oder mit einem erreichten Termin
-    (Kino, Disc, TV); die Meldung trägt dann dieses Datum, nicht den Tag, an dem wir die Synchro
-    fanden.
-  */
+/*
+  1. Erstmals mit deutscher Synchro — **aber erst, wenn man sie an dem Tag auch sehen kann**
+  (Daniel, 19.09.2026, an „Witch on the Holy Night": „neu auf deutsch … sollten nur titel
+  bekommen die an dem tag auch deutsch sind, hier ist es eher eine ankündigung"). Die Synchro
+  war belegt, der Kinostart ist aber erst am 26.01.2027 — das sagt die Meldung „Im Kino" schon.
+  Sichtbar ist Deutsch mit einem Stream mit deutscher Tonspur oder mit einem erreichten Termin
+  (Kino, Disc, TV); die Meldung trägt dann dieses Datum, nicht den Tag, an dem wir die Synchro
+  fanden.
+*/
+function neuAufDeutsch(releases: Release[], neuMitSynchro: NeuerTitel[], nachId: Map<number, Title>, heute: string): RohMeldung[] {
+  const roh: RohMeldung[] = []
   for (const n of neuMitSynchro) {
     const t = nachId.get(n.id)
     if (!t) continue
@@ -391,14 +393,19 @@ export function baueNews(
       belege: (erreichtRelease && belegeVonRelease(erreichtRelease)) || undefined, hinweis: neuZeile(t, erreichtRelease, heute), ...neuJahre(t, erreicht ?? n.seit),
     })
   }
+  return roh
+}
 
-  /*
-    1b. **Jetzt auch bei einem weiteren Anbieter auf Deutsch** (18.09.2026,
-    Feature-Vergleich: JustWatch-Watchlist-Alerts). „Wo läuft es" ist bei den meisten
-    Titeln die eigentliche Frage; ein neuer Weg zur Synchro ist deshalb eine Nachricht.
-    Gemeldet wird nur ein **weiterer** Anbieter — der erste ist schon Meldung 1.
-    YouTube bleibt draußen: Dort ist es oft ein einzelnes Probevideo, keine Serie.
-  */
+/*
+  1b. **Jetzt auch bei einem weiteren Anbieter auf Deutsch** (18.09.2026,
+  Feature-Vergleich: JustWatch-Watchlist-Alerts). „Wo läuft es" ist bei den meisten
+  Titeln die eigentliche Frage; ein neuer Weg zur Synchro ist deshalb eine Nachricht.
+  Gemeldet wird nur ein **weiterer** Anbieter — der erste ist schon Meldung 1.
+  YouTube bleibt draußen: Dort ist es oft ein einzelnes Probevideo, keine Serie.
+  Ergänzt `historie.anbieter`.
+*/
+function weitereAnbieter(titles: Title[], historie: NewsHistorie, grenze: string, heute: string): RohMeldung[] {
+  const roh: RohMeldung[] = []
   const saeen = historie.anbieter === undefined
   const anbieterSeit = (historie.anbieter ??= {})
   for (const t of titles) {
@@ -423,8 +430,12 @@ export function baueNews(
       })
     }
   }
+  return roh
+}
 
-  /* 2. Neue deutsche Folgen — je Serie und Tag eine Meldung, nicht je Folge. */
+/** 2. Neue deutsche Folgen — je Serie und Tag eine Meldung, nicht je Folge. */
+function neueFolgen(titles: Title[], releases: Release[], crNeu: CrNeueFolge[], grenze: string): RohMeldung[] {
+  const roh: RohMeldung[] = []
   const jeSerieUndTag = new Map<string, { serie: string; tag: string; nummern: number[] }>()
   for (const f of crNeu) {
     /* Crunchyrolls eigenes Datum als Berliner Tag (00:30 Berlin ist UTC am Vortag), sonst unser Fundtag. */
@@ -459,11 +470,12 @@ export function baueNews(
       quelle: t.streams.find((s) => s.url.includes(serienId))?.url,
     })
   }
+  return roh
+}
 
-  /* 3. Termine: angekündigt, auf Disc, im Kino — und die, die niemand eingehalten hat. */
-  roh.push(...haltPremiereFest(historie, terminMeldungen(releases, nachId, heute)), ...omuMeldungen([...titles, ...omuTitel], releases), ...offizielleMeldungen(titles, offizielle))
-  /* Das Datum: beim ersten Mal gemerkt, danach unverändert. */
-  let datiert: DatiertNews[] = []
+/** Das Datum: beim ersten Mal gemerkt (`historie.zuerst`), danach unverändert; zu alte Meldungen fallen heraus. */
+function datiereMeldungen(roh: RohMeldung[], historie: NewsHistorie, heute: string, grenze: string): DatiertNews[] {
+  const datiert: DatiertNews[] = []
   for (const r of roh) {
     const { schluessel, fallback, ...rest } = r
     const zuerst = historie.zuerst[schluessel] ?? (fallback > heute ? heute : fallback)
@@ -471,27 +483,97 @@ export function baueNews(
     if (zuerst < fensterBeginn(r.art, heute, grenze)) continue
     datiert.push(haltWeitererFest(historie, schluessel, { ...rest, am: zuerst, schluessel }))
   }
+  return datiert
+}
+
+/** Die Gruppen je Tag und Reihe, in der Reihenfolge ihres ersten Auftretens. */
+function gruppiereNachTagUndReihe(datiert: DatiertNews[]): Gruppe[] {
+  const gruppen = new Map<string, Gruppe>()
+  for (const m of datiert) {
+    const schluessel = `${m.am}|${wurzelVon(m.titel)}`
+    const g = gruppen.get(schluessel) ?? { am: m.am, wurzel: wurzelVon(m.titel), teile: [] }
+    g.teile.push(m)
+    gruppen.set(schluessel, g)
+  }
+  return [...gruppen.values()]
+}
+
+/*
+  **Der Teil nennt, was ihn von der Reihe unterscheidet — nicht die Reihe.**
+
+  Unter „Lord of Mysteries" stand „bei Crunchyroll · Lord of Mysteries
+  Specials", blass und hinter dem Anbieter. Der
+  Reihenname steht eine Zeile höher; hier bleibt „Specials".
+*/
+function teilName(teil: Title, kopfName: string): string {
+  const voll = name(teil)
+  const rest = voll.toLowerCase().startsWith(kopfName.toLowerCase())
+    ? voll.slice(kopfName.length).replace(/^[\s:–—-]+/, '').trim()
+    : voll
+  /* Trägt der Rest selbst einen Doppelpunkt („Horizonte: Die Serie“), bleibt der volle Name: „Pokémon: Horizonte: Die Serie“ wäre ein falscher Titel. */
+  return rest && !rest.includes(': ') ? rest : voll
+}
+
+/**
+ * **Der Kopf der Gruppe ist die Reihe, nicht der Teil.**
+ *
+ * Bevorzugt der Titel, dessen Kennung die Reihe selbst ist; gibt es ihn im
+ * Bestand nicht (die Reihe hängt dann an einem Teil), entscheidet der Teil mit
+ * den meisten Meldungen an diesem Tag. Das Cover wird geliehen, wo der Kopf
+ * keines hat — eine Zeile ohne Bild fällt in einer Liste auf.
+ */
+function eintragVon(g: Gruppe, kopfTitel: Map<number, Title>): NewsEintrag {
+  const jeTeil = new Map<number, number>()
+  for (const m of g.teile) jeTeil.set(m.titel.id, (jeTeil.get(m.titel.id) ?? 0) + 1)
+  const haeufigster = [...jeTeil.entries()].sort((a, b) => b[1] - a[1])[0]![0]
+  const kopfT =
+    kopfTitel.get(g.wurzel) ?? g.teile.find((m) => m.titel.id === haeufigster)!.titel
+  const kopfName = name(kopfT)
+  const meldungen: NewsMeldung[] = g.teile
+    .slice()
+    .sort((a, b) => rang[a.art] - rang[b.art] || (a.datum ?? '').localeCompare(b.datum ?? ''))
+    .map((m) => {
+      const { am: _am, titel: teil, schluessel: _s, ...rest } = m
+      return teil.id === kopfT.id ? rest : { ...rest, ...teilFelder(teilName(teil, kopfName), kopfName, teil.id) }
+    })
+  return {
+    am: g.am,
+    titelId: kopfT.id,
+    titel: kopfName,
+    slug: kopfT.slug,
+    cover: kopfT.coverImage ?? g.teile.find((m) => m.titel.coverImage)?.titel.coverImage,
+    meldungen,
+  }
+}
+
+/**
+ * Baut die Meldungen. `historie` wird dabei **ergänzt** — der Aufrufer schreibt
+ * sie zurück, damit das Datum einer Meldung beim nächsten Bau dasselbe bleibt.
+ */
+export function baueNews(
+  titles: Title[],
+  releases: Release[],
+  neuMitSynchro: NeuerTitel[],
+  crNeu: CrNeueFolge[],
+  historie: NewsHistorie,
+  vorherige: NewsEintrag[] = [], omuTitel: Title[] = [], nurOriginalton: ReadonlySet<string> = new Set(), offizielle?: OffizielleMeldung[],
+): NewsEintrag[] {
+  const heute = todayIso()
+  const grenze = addDays(heute, -FENSTER_TAGE)
+  const nachId = new Map(titles.map((t) => [t.id, t]))
+  const roh: RohMeldung[] = [
+    ...neuAufDeutsch(releases, neuMitSynchro, nachId, heute),
+    ...weitereAnbieter(titles, historie, grenze, heute),
+    ...neueFolgen(titles, releases, crNeu, grenze),
+  ]
+
+  /* 3. Termine: angekündigt, auf Disc, im Kino — und die, die niemand eingehalten hat. */
+  roh.push(...haltPremiereFest(historie, terminMeldungen(releases, nachId, heute)), ...omuMeldungen([...titles, ...omuTitel], releases), ...offizielleMeldungen(titles, offizielle))
+  let datiert = datiereMeldungen(roh, historie, heute, grenze)
 
   /* Alte Schlüssel aus dem Gedächtnis werfen — sonst wächst es ohne Ende. */
   vergissAlte(historie, addDays(heute, -400))
 
-  /*
-    **Dieselbe Schreibweise wie überall sonst.** Ohne die Eindeutschung stand im
-    Chip „Staffel 3 - Cour 1" neben einem „Staffel 3 - Teil 2" aus derselben
-    Reihe — die Vereinheitlichung von „Cour"/„Part" lebt in `shared/titles.ts`
-    und wurde hier bisher nicht gerufen.
-  */
-  const name = (t: Title) => eindeutschenStaffel(t.titleDe ?? t.titleEn ?? t.titleRomaji ?? String(t.id))
-
-  /*
-    **Der Kopf der Gruppe ist die Reihe, nicht der Teil.**
-
-    Bevorzugt der Titel, dessen Kennung die Reihe selbst ist; gibt es ihn im
-    Bestand nicht (die Reihe hängt dann an einem Teil), entscheidet der Teil mit
-    den meisten Meldungen an diesem Tag. Das Cover wird geliehen, wo der Kopf
-    keines hat — eine Zeile ohne Bild fällt in einer Liste auf.
-  */
-  const wurzelVon = (t: Title) => t.franchiseId ?? t.id
   const kopfTitel = new Map<number, Title>()
   for (const t of titles) if (wurzelVon(t) === t.id) kopfTitel.set(t.id, t)
 
@@ -499,54 +581,7 @@ export function baueNews(
   datiert.push(...pflegeTerminverlauf({ datiert, nachId, historie, vorherige, name, wurzel: wurzelVon, grenze, heute, nurOriginalton }))
   datiert = haltFelderFest(historie, bereinigeNews(ohneKuenstlicheAnkuendigung(datiert)), vorherige)
 
-  const gruppen = new Map<string, { am: string; wurzel: number; teile: typeof datiert }>()
-  for (const m of datiert) {
-    const schluessel = `${m.am}|${wurzelVon(m.titel)}`
-    const g = gruppen.get(schluessel) ?? { am: m.am, wurzel: wurzelVon(m.titel), teile: [] }
-    g.teile.push(m)
-    gruppen.set(schluessel, g)
-  }
-
-  /*
-    **Der Teil nennt, was ihn von der Reihe unterscheidet — nicht die Reihe.**
-
-    Unter „Lord of Mysteries" stand „bei Crunchyroll · Lord of Mysteries
-    Specials", blass und hinter dem Anbieter. Der
-    Reihenname steht eine Zeile höher; hier bleibt „Specials".
-  */
-  const teilName = (teil: Title, kopf: string) => {
-    const voll = name(teil)
-    const rest = voll.toLowerCase().startsWith(kopf.toLowerCase())
-      ? voll.slice(kopf.length).replace(/^[\s:–—-]+/, '').trim()
-      : voll
-    /* Trägt der Rest selbst einen Doppelpunkt („Horizonte: Die Serie“), bleibt der volle Name: „Pokémon: Horizonte: Die Serie“ wäre ein falscher Titel. */
-    return rest && !rest.includes(': ') ? rest : voll
-  }
-
-  const eintraege: NewsEintrag[] = []
-  for (const g of gruppen.values()) {
-    const jeTeil = new Map<number, number>()
-    for (const m of g.teile) jeTeil.set(m.titel.id, (jeTeil.get(m.titel.id) ?? 0) + 1)
-    const haeufigster = [...jeTeil.entries()].sort((a, b) => b[1] - a[1])[0]![0]
-    const kopfT =
-      kopfTitel.get(g.wurzel) ?? g.teile.find((m) => m.titel.id === haeufigster)!.titel
-    const kopf = name(kopfT)
-    const meldungen: NewsMeldung[] = g.teile
-      .slice()
-      .sort((a, b) => rang[a.art] - rang[b.art] || (a.datum ?? '').localeCompare(b.datum ?? ''))
-      .map((m) => {
-        const { am: _am, titel: teil, schluessel: _s, ...rest } = m
-        return teil.id === kopfT.id ? rest : { ...rest, ...teilFelder(teilName(teil, kopf), kopf, teil.id) }
-      })
-    eintraege.push({
-      am: g.am,
-      titelId: kopfT.id,
-      titel: kopf,
-      slug: kopfT.slug,
-      cover: kopfT.coverImage ?? g.teile.find((m) => m.titel.coverImage)?.titel.coverImage,
-      meldungen,
-    })
-  }
+  const eintraege = gruppiereNachTagUndReihe(datiert).map((g) => eintragVon(g, kopfTitel))
 
   /*
     **Sortiert wird nach Tag, dann nach der wichtigsten Meldung des Eintrags.**

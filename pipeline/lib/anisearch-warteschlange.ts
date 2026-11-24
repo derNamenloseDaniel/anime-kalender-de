@@ -17,8 +17,11 @@ export function baueWarteschlange(e: {
   force: boolean
   limit: number
   veraltet: (eintrag: { fetchedAt?: string }) => boolean
+  /** Titel mit künftiger Disc-Ausgabe, deren Seite für die kurze Frist zu alt ist (`discFaellig`): kommen vor jede andere Auffrischung. */
+  discFaellig?: (id: number, eintrag: { fetchedAt?: string }) => boolean
 }): Title[] {
   const { ids, titles, releases, cache, force: FORCE, limit: LIMIT, veraltet } = e
+  const disc = (id: number): boolean => Boolean(cache[id] && e.discFaellig?.(id, cache[id]))
   // Titel mit Termin zuerst — das sind die, die tatsächlich jemand aufschlägt.
   const withRelease = new Set(releases.map((r) => r.titleId))
   const queue = titles
@@ -67,6 +70,7 @@ export function baueWarteschlange(e: {
         !cache[t.id] ||
         !cache[t.id].info ||
         veraltet(cache[t.id]) ||
+        disc(t.id) ||
         !existsSync(`${ARCHIV_DIR}/${ids[t.id]}.html.gz`),
     )
     /*
@@ -92,6 +96,7 @@ export function baueWarteschlange(e: {
     .sort(
       (a, b) =>
         Number(!cache[b.id]) - Number(!cache[a.id]) ||
+        Number(disc(b.id)) - Number(disc(a.id)) ||
         Number(withRelease.has(b.id)) - Number(withRelease.has(a.id)),
     )
     .slice(0, LIMIT)

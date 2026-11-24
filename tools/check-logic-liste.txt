@@ -149,6 +149,7 @@ pipeline/check-cartoon-wege-falten-leer-lauf.ts
 pipeline/check-cartoon-wege-falten.ts
 pipeline/check-cartoon-wege.ts
 pipeline/check-cartoon-zwilling.ts
+pipeline/check-cover-bild-grenze.ts
 pipeline/check-cover-klein-vorschau.ts
 pipeline/check-cover-liste.ts
 pipeline/check-cover-luecken-bau.ts
@@ -221,6 +222,8 @@ pipeline/check-disc-reine-titel.ts
 pipeline/check-disc-suchlinks.ts
 pipeline/check-disc-teil-hinweis.ts
 pipeline/check-disc-teil-verdrahtung.ts
+pipeline/check-disc-termin-frische-lauf.ts
+pipeline/check-disc-termin-frische.ts
 pipeline/check-disc-uebersicht-teile.ts
 pipeline/check-disc-verschiebung-staffel.ts
 pipeline/check-disc-zuordnung.ts
@@ -275,7 +278,6 @@ pipeline/check-film-serie-filter.ts
 pipeline/check-filter-ebenen.ts
 pipeline/check-filter-genres.ts
 pipeline/check-filter-wege.ts
-pipeline/check-filter-zaehlung-bestand.ts
 pipeline/check-filter-zaehlung.ts
 pipeline/check-filter-zyklus.ts
 pipeline/check-finale-wache.ts
@@ -575,6 +577,7 @@ pipeline/check-qualitaet-rueckgang-lauf.ts
 pipeline/check-qualitaet-verwaiste-lauf.ts
 pipeline/check-quarantaene.ts
 pipeline/check-quelle-ueberholt.ts
+pipeline/check-quellen-ruecknahme.ts
 pipeline/check-quellen-schreiber.ts
 pipeline/check-quittung-sperre.ts
 pipeline/check-reihen-namen-rein.ts
@@ -605,6 +608,7 @@ pipeline/check-sammel-titel.ts
 pipeline/check-sammel-unzugeordnet.ts
 pipeline/check-sammelartikel.ts
 pipeline/check-sammeleintrag-synchro.ts
+pipeline/check-sammle-belege-naht.ts
 pipeline/check-sammler-lesezugriffe-faelle.ts
 pipeline/check-sammler-lesezugriffe-variable.ts
 pipeline/check-sammler-lesezugriffe.ts
@@ -717,6 +721,7 @@ pipeline/check-tmdb-katalog-liste.ts
 pipeline/check-tmdb-katalog.ts
 pipeline/check-tmdb-poster-ohne-lauf.ts
 pipeline/check-tmdb-reihenfremd.ts
+pipeline/check-tmdb-staffel-wahl.ts
 pipeline/check-tmdb-staffel0-eigene-lauf.ts
 pipeline/check-tmdb-staffel0-liste.ts
 pipeline/check-tmdb-staffel0.ts
@@ -797,6 +802,7 @@ tools/ausbleiben-cpu-messen.test.ts
 tools/buehne-entwurf-render.test.ts
 tools/buehne-fall-optionen.test.ts
 tools/buehne-speicher.test.ts
+tools/buehne-staffel-reiter.test.ts
 tools/buehne-start.test.ts
 tools/check-patchnotes-pflicht.mjs
 tools/design-klassen.mjs
@@ -805,6 +811,7 @@ tools/dienst-fetch.test.ts
 tools/effekt-abhaengigkeiten.test.ts
 tools/feste-uhr.test.ts
 tools/haken-lauf.test.ts
+tools/handlung-fakten/ablage.test.ts
 tools/heute-berlin.test.ts
 tools/heute-utc.mjs
 tools/hover-cover-weitere-verhalten.test.tsx

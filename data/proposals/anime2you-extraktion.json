@@ -1382,6 +1382,10 @@
       "am": "2026-11-06",
       "vorschlaege": 0
     },
+    "1068366": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
     "1068385": {
       "am": "2026-11-06",
       "vorschlaege": 0
@@ -2050,6 +2054,10 @@
     "1073915": {
       "am": "2026-11-20",
       "vorschlaege": 0
+    },
+    "1073937": {
+      "am": "2026-11-24",
+      "vorschlaege": 1
     },
     "1073969": {
       "am": "2026-11-20",
@@ -17123,6 +17131,27 @@
       "artikelId": "1075182",
       "artikel": "Erster Trailer zur zweiten »Disney Twisted-Wonderland«-Staffel",
       "quelle": "https://www.anime2you.de/news/1075182/disney-twisted-wonderland-staffel-2-erster-trailer/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "A Tale of the Secret Saint",
+      "zitat": "»A Tale of the Secret Saint« umfasst demnach insgesamt 13 Episoden, die seit dem 3. Oktober 2026 im japanischen Fernsehen ausgestrahlt und bei Crunchyroll im Originalton mit deutschen Untertiteln im Simulcast gezeigt werden.",
+      "art": "start",
+      "sprache": "omu",
+      "plattform": "crunchyroll",
+      "datum": "2026-10-03",
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "13",
+      "unsicher": null,
+      "wochentag": "Samstag",
+      "warnungen": [],
+      "artikelId": "1073937",
+      "artikel": "Episodenanzahl von »A Tale of the Secret Saint« steht fest",
+      "quelle": "https://www.anime2you.de/news/1073937/a-tale-of-the-secret-saint-episodenanzahl/",
       "veroeffentlicht": "2026-11-24",
       "gelesenAm": "2026-11-24"
     }

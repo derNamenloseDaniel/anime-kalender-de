@@ -10,7 +10,7 @@ mockup({
   varianten: {
     A: {
       ersatz: { AntwortKasten: KastenMitTitel, KastenPillen: toggoKastenPillen('A') },
-      notiz: 'Eine TOGGO-Pille bleibt, darunter in ihrer Fläche je Staffel ein Knopf (S1 bis S5, mindestens 44 px) mit der Seite dieser Staffel bei TOGGO. Der Sprachhinweis steht einmal. Netflix, Prime Video und RTL+ führen mit einer Adresse auf den ganzen Titel: eine Pille wie heute. Pokémon (Staffel 1–5): fünf Knöpfe; Pokémon Reisen (Staffel 23–25): drei. Die Adressen sind die der Folgenliste (`tg`), keine ergänzt.',
+      notiz: 'Eine TOGGO-Pille bleibt, überschrieben „TOGGO · Staffel 1–5“ (der Bereich, den dieser Anbieter führt), darunter in ihrer Fläche je Staffel ein Knopf nur mit der Zahl (1 bis 5, Rahmen in der Anbieterfarbe, mindestens 44 px) mit der Seite dieser Staffel bei TOGGO. Der Sprachhinweis steht einmal. Netflix, Prime Video und RTL+ führen mit einer Adresse auf den ganzen Titel: eine Pille wie heute. Pokémon (Staffel 1–5): fünf Knöpfe; Pokémon Reisen (Staffel 23–25): drei. Die Adressen sind die der Folgenliste (`tg`), keine ergänzt.',
     },
     B: {
       ersatz: { AntwortKasten: KastenMitTitel, KastenPillen: toggoKastenPillen('B') },

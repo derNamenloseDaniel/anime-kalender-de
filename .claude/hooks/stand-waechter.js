@@ -1,6 +1,7 @@
 // Wächter für „## In Arbeit“ und „## Als Nächstes“ in stand.md (gehört zu stand-prs.js): zu viele Handzeilen, Kopfzeile ohne frischen Stand, zu viele, zu lange oder icon-lose Zeilen.
 // Der Auto-Block (Marken AUF/ZU) zählt nicht, er pflegt sich selbst.
 const fs = require('node:fs')
+const { punkteOhneJetzt, dateienOhneZeile } = require('./stand-jetzt-luecken.js')
 const MAX_ZEILEN = 20
 const MAX_NAECHSTES = 80
 const MAX_ZEICHEN = 400
@@ -210,9 +211,10 @@ function jetztDateien(text, lies, aenderung) {
   return meldungen
 }
 
-/** Meldungstext oder '' (alles in Ordnung). `existiert` prüft Dateipfade (Standard fs.existsSync), `lies` liest Jetzt-Dateien, `aenderung` liefert deren Änderungszeit. */
-function waechter(text, jetzt, existiert = fs.existsSync, lies = liesDatei, aenderung = aenderungVon) {
-  return [waechterAbschnitte(text, jetzt), ...toteLinks(text, existiert), ...jetztDateien(text, lies, aenderung)].filter(Boolean).join('; ')
+/** Meldungstext oder '' (alles in Ordnung). `existiert` prüft Dateipfade (Standard fs.existsSync), `lies` liest Jetzt-Dateien, `aenderung` liefert deren Änderungszeit, `jetztNamen` die Dateinamen in `daniel-zum-abarbeiten/jetzt/`. */
+function waechter(text, jetzt, existiert = fs.existsSync, lies = liesDatei, aenderung = aenderungVon, jetztNamen = []) {
+  const luecken = [...punkteOhneJetzt(text.split(/\r?\n/), anfang), ...dateienOhneZeile(text, jetztNamen)]
+  return [waechterAbschnitte(text, jetzt), ...toteLinks(text, existiert), ...jetztDateien(text, lies, aenderung), ...luecken].filter(Boolean).join('; ')
 }
 
 /** Meldungen zu den Abschnitten von stand.md als ein Text oder ''. */

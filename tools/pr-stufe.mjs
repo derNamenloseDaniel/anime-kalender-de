@@ -69,7 +69,7 @@ const STUFE_1 = /^(web\/src\/|extension\/|data\/dub-confirmed\.yaml$|data\/curat
 // Testdatei: Name endet auf .test./.spec. mit Skript-Endung (in jedem Ordner).
 const TESTDATEI = /(^|\/)[^/]+\.(test|spec)\.[cm]?[jt]sx?$/
 // Erzeugte Tageskennzahlen (täglicher Kennzahlen-PR): nur diese zwei Dateien, die Logik daneben (kennzahlen-logik.cjs) bleibt 2.
-const KENNZAHLEN_ERZEUGT = /^tools\/kennzahlen\/(tage\.jsonl|daten\.js)$/
+const KENNZAHLEN_ERZEUGT = /^tools\/kennzahlen\/(tage\.jsonl|daten\.js|kernpunkte\.yaml)$/
 const FAKTENZAHL = /\b\d{1,2}:\d{2}\b|\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\.\d{1,2}\.(\d{2,4})?(?!\d)|\b\d+\s*(Folgen?|Episoden?|Staffeln?|Uhr)\b|\b\d{5,}\b/i
 
 /**

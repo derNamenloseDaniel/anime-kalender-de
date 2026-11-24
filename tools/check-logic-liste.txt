@@ -643,6 +643,7 @@ pipeline/check-staffel-des-titels.ts
 pipeline/check-staffel-historie.ts
 pipeline/check-staffel-jahr0.ts
 pipeline/check-staffel-lesekennung.ts
+pipeline/check-staffel-ohne-seite.ts
 pipeline/check-staffel-riegel.ts
 pipeline/check-staffel-synonyme.ts
 pipeline/check-staffel-teil.ts
@@ -730,6 +731,10 @@ pipeline/check-tmdb-staffel0-liste.ts
 pipeline/check-tmdb-staffel0.ts
 pipeline/check-tmdb-suche.ts
 pipeline/check-tmdb-von-hand-abgeleitet.ts
+pipeline/check-toggo-adresse-stabil.ts
+pipeline/check-toggo-seiten-bestand-lauf.ts
+pipeline/check-toggo-seiten-verdrahtung.ts
+pipeline/check-toggo-seiten.ts
 pipeline/check-tote-adresse-runden.ts
 pipeline/check-tote-adressen-lauf.ts
 pipeline/check-trailer-auswahl.ts
@@ -805,6 +810,7 @@ tools/apt-fremdquelle.mjs
 tools/ausbleiben-cpu-messen.test.ts
 tools/buehne-entwurf-render.test.ts
 tools/buehne-fall-optionen.test.ts
+tools/buehne-optionen-ort.test.tsx
 tools/buehne-speicher.test.ts
 tools/buehne-staffel-reiter.test.ts
 tools/buehne-start.test.ts

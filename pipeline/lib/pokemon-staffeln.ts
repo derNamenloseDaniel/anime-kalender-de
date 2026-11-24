@@ -44,7 +44,7 @@ export function staffelEnden(grenzen: StaffelGrenzen[]): Map<number, number> {
  * Die Reihenliste nennt damit, welche Folgen der geteilten Staffel eine Karte hat (`reihen-doppelt.ts`).
  * Je Datei für sich: Horizonte zählt seine Staffeln 1 ff. selbst, das ist nicht die Hauptserie.
  */
-export function geteilteStaffeln(dateien: string[] = [POKEMON_STAFFELN, HORIZONTE_STAFFELN]): Map<number, StaffelFolgen> {
+export function geteilteStaffeln(dateien: string[] = [HORIZONTE_STAFFELN, POKEMON_STAFFELN]): Map<number, StaffelFolgen> {
   return new Map(dateien.flatMap((datei) => [...geteilteInGrenzen(ladeStaffelGrenzen(datei))]))
 }
 

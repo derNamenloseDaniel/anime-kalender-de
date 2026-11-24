@@ -32,9 +32,7 @@ import { englischeTitel, ohneEnglischeTitel } from './folgentitel-englisch.ts'
 import { folgenZeilen } from './folgentitel-zeilen.ts'
 import { eineZeileJeNummer } from './folgen-nummern.ts'
 import { ohneWikiVersatz } from './folgen-wiki-versatz.ts'
-import { sammelSicht, schreibeFolgenEintrag } from './staffel-folgen-schreiben.ts'
-import type { StaffelSammel } from './staffel-titel.ts'
-import { ladeStaffelGrenzen, letzteFolgen, mitStapelFolgen, offeneStaffeln, staffelFeld, staffelListen, zaehleFolgen } from '../lib/pokemon-staffeln.ts'
+import { ladeStaffelGrenzen, letzteFolgen, mitStapelFolgen, offeneStaffeln, staffelFeld, staffelListen, staffelNamen, staffelNamenFeld, zaehleFolgen } from '../lib/pokemon-staffeln.ts'
 import { ladeToggoSeiten, toggoStaffelFeld } from './13-1-toggo-seiten.ts'
 
 interface Folge {
@@ -109,9 +107,7 @@ export function ohneUnuebersetzte(t: Title, f: Folge[] | undefined, asFolgen: Fo
   return ohneEnglischeTitel(f, asDe, englischeTitel(q.kitsu[String(t.id)], q.tmdbFolgen[String(t.id)], asFolgen))
 }
 
-export function schreibeFolgenDateien(nachSchnitt: Title[], releasesNachSchnitt: Release[], staffelSammel: StaffelSammel[] = []): void {
-  const { titel, releases } = sammelSicht(nachSchnitt, releasesNachSchnitt, staffelSammel)
-  const sammelJeId = new Map(staffelSammel.map((s) => [s.plan.sammel, s]))
+export function schreibeFolgenDateien(titel: Title[], releases: Release[]): void {
   const roh = readJson<Record<string, { folgen?: Folge[] }>>('data/anisearch-folgen.json', {})
   const zuordnung = ladeAnisearchAbruf<{ anisearchId?: number }>()
   const wiki = readJson<WikiListe>('data/wikipedia-folgen.json', {}).titel ?? {}
@@ -127,6 +123,7 @@ export function schreibeFolgenDateien(nachSchnitt: Title[], releasesNachSchnitt:
   /* Deutsche Staffelgrenzen innerhalb des Titels (`data/curated/pokemon-staffeln.yaml`, `horizonte-staffeln.yaml`). */
   const grenzen = ladeStaffelGrenzen()
   const staffeln = staffelListen(grenzen)
+  const namen = staffelNamen(grenzen)
   const toggoSeiten = ladeToggoSeiten()
   const letzte = letzteFolgen(grenzen)
   const offen = offeneStaffeln(grenzen)
@@ -157,10 +154,13 @@ export function schreibeFolgenDateien(nachSchnitt: Title[], releasesNachSchnitt:
       de,
       ...(einheitlich ? { min: einheitlich } : {}),
       ...staffelFeld(staffeln, t.id),
+      ...staffelNamenFeld(namen, t.id),
       ...toggoStaffelFeld(toggoSeiten, t.id),
       ...(hinweise.some((h) => h.anilistId === t.id) ? { h: hinweise.filter((h) => h.anilistId === t.id).map((h): [number, string] => [h.folge, h.text]) } : {}),
     }
-    schreibeFolgenEintrag(ordner, t.id, datei, offen.has(t.id) ? [...z, 1] : z, sammelJeId.get(t.id), { index, zaehlung })
+    zaehlung[t.id] = offen.has(t.id) ? [...z, 1] : z
+    writeJson(`${ordner}/${t.id}.json`, datei)
+    index.push(t.id)
     folgenGesamt += f.length
   }
   writeJson(`${ordner}/index.json`, index.sort((a, b) => a - b))

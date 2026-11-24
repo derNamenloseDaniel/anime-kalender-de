@@ -17,6 +17,7 @@ import { ohneVerschobene, verschiebeHinterToggle } from './hinter-toggle.ts'
 import { urteilSchliesstLuecken } from './urteil-schliesst-luecken.ts'
 import { hinweiseAnVerworfenen, ohneOmuTermine } from './omu-ohne-termin.ts'
 import { schreibeStaffelFolgen } from './staffel-folge-termine.ts'
+import { ladeTvStaffelEingaben, meldeTvStaffelFolgen, schreibeTvStaffelFolgen } from './staffel-folge-tv.ts'
 import { ladeStaffelGrenzen, staffelListen } from '../lib/pokemon-staffeln.ts'
 
 /**
@@ -117,6 +118,7 @@ export function rolleTermineAus({ releases, titles, jpStart }: {
   schreibeTvAuskunft(events, releases, titles)
   schreibeKostenlosAuskunft(events, titles)
   log(`Staffel und Folge: ${schreibeStaffelFolgen(events, staffelListen(ladeStaffelGrenzen()))} Termine`)
+  meldeTvStaffelFolgen(schreibeTvStaffelFolgen(events, ladeTvStaffelEingaben()))
   return { events: ohneOmuTermine(ohneVerschobene(events, verschoben), titles), mitStimmen, verschoben }
 }
 

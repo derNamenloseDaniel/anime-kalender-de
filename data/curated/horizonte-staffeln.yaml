@@ -2,8 +2,9 @@
 #
 # Warum: Horizonte ist eine eigene Serie der Reihe Pokémon (`eigenesWerk`, zählt nicht als Staffel 26 ff. der Hauptserie in
 # `pokemon-staffeln.yaml`), AniList führt sie aber als einen Eintrag. Wirkung wie dort (`pipeline/lib/pokemon-staffeln.ts`): die Detaildatei
-# `public/data/folgen/158871.json` trägt `s: [[Staffel, von, bis], …]` (offene Staffel `[Staffel, von]`), `franchises.json` `staffelQuelle` 1
-# und `staffelBis` (letzte Staffel); `folgen/zaehlung.json` zählt bis zur letzten belegten Folge (`zaehleFolgen`).
+# `public/data/folgen/158871.json` trägt `s: [[Staffel, von, bis], …]` (offene Staffel `[Staffel, von]`) und `sn` (Staffelnamen), `franchises.json`
+# `staffelQuelle` 1 und `staffelBis` (letzte Staffel); `folgen/zaehlung.json` zählt bis zur letzten belegten Folge (`zaehleFolgen`). TV-Termine
+# bekommen `staffelFolge` nur über den Folgentitel der Wikipedia-Liste (`pipeline/bau/staffel-folge-tv.ts`).
 #
 # Zählung: von/bis sind die durchlaufenden Folgennummern des Titels — dieselben wie aniSearch (japanische Zählung), die RTL+-Folgenbereiche
 # (`dubRanges` 1–136) und der Termin `pokemon-horizonte-s4-rtlplus` (firstEpisodeNumber 137, `streaming-nachtrag-2026.yaml`).
@@ -37,11 +38,15 @@ gelesen: '2026-11-20'
 titel:
 - anilistId: 158871
   titel: "Pokémon Horizonte"
-  basis: 4
-  # Kein `aktiv:` von Hand: Den Tag, ab dem Meldungen zu 158871 in Staffel 4 zählen (Folge 1 = 137; ältere durchlaufend, Staffel 1: 1–45),
-  # setzt der Bau auf den Tag nach dem ersten ausgelieferten Bestand mit dem Schnitt und hält ihn danach fest (`aktivTag`, `pipeline/lib/staffel-titel.ts`).
+  # Ein Titel, jede Staffel ein Abschnitt (F157, Daniel 24.11.2026): `folgen/158871.json` trägt `s` und die Namen als `sn`.
+  # `alteKennung`: vom 20. bis 24.11.2026 war jede Staffel ein eigener Titel (7000001–7000003). Daraus leiten sich der Versatz für
+  # „gesehen bis“ (`von` − 1) und die Lesart alter Meldungen ab (`pipeline/lib/staffel-altmeldungen.ts`); vergeben wird die Kennung nie wieder.
+  # `staffelzaehlung`: in diesem Fenster zählten Meldungen zu 158871 in Staffel 4 (Folge 1 = 137). `von` ist der Tag aus dem Bestand
+  # (`staffelTitel.aktiv`), `bis` der Tag, an dem dieser Rückbau live ging: der Tag des ersten erfolgreichen Bestandsbaus nach dem Merge,
+  # nicht der Merge-Tag (PLATZHALTER: der Dirigent setzt ihn nach diesem Bau ein).
+  staffelzaehlung: { von: '2026-11-24', bis: '2026-11-25' }
   staffeln:
-    - { nr: 1, von: 1, bis: 45, folgen: 45, kennung: 7000001, name: "Pokémon Horizonte: Die Serie" }
-    - { nr: 2, von: 46, bis: 89, folgen: 44, kennung: 7000002, name: "Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua" }
-    - { nr: 3, von: 90, bis: 136, folgen: 47, kennung: 7000003, name: "Pokémon Horizonte: Staffel 3 – Gute Aussichten" }
+    - { nr: 1, von: 1, bis: 45, folgen: 45, alteKennung: 7000001, name: "Pokémon Horizonte: Die Serie" }
+    - { nr: 2, von: 46, bis: 89, folgen: 44, alteKennung: 7000002, name: "Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua" }
+    - { nr: 3, von: 90, bis: 136, folgen: 47, alteKennung: 7000003, name: "Pokémon Horizonte: Staffel 3 – Gute Aussichten" }
     - { nr: 4, von: 137, offen: true, name: "Pokémon Horizonte: Staffel 4 – Wunder in Sicht" }

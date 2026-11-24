@@ -14,8 +14,9 @@ import type { Release, Title } from '../shared/types.ts'
 import { todayIso } from '../shared/time.ts'
 import { abweichungVonBekannt, bestandUrteil, staffelnOhneSeite } from './lib/staffel-ohne-seite.ts'
 import { melde } from './lib/quarantaene.ts'
+import { ladeStaffelGrenzen } from './lib/pokemon-staffeln.ts'
 
-/** Release-Slug → Grund. Cartoons kommen aus `cartoons.json`, der Staffel-Schnitt (`pipeline/bau/staffel-titel.ts`) sieht nur die Titel-Map der Anime. */
+/** Release-Slug → Grund. Cartoons kommen aus `cartoons.json` und haben noch keine Staffelgrenzen-Yaml. */
 const BEKANNT: ReadonlyMap<string, string> = new Map([
   ['the-mighty-nein-s2-primevideo', 'Cartoon (TMDB -219080): Staffel-Schnitt für Cartoons fehlt, Staffel 2 hängt an der Seite von Staffel 1 (Auftrag offen, 24.11.2026)'],
 ])
@@ -31,7 +32,7 @@ if (!titel.length || !releases.length) {
   console.error(`FEHLER: ${titel.length} Titel, ${releases.length} Releases gelesen`)
   process.exit(1)
 }
-const faelle = staffelnOhneSeite(titel, releases, todayIso())
+const faelle = staffelnOhneSeite(titel, releases, todayIso(), new Set(ladeStaffelGrenzen().map((g) => g.anilistId)))
 const { rot, meldungen } = bestandUrteil(faelle, BEKANNT)
 for (const m of meldungen) console.error(m)
 // Titelmarke: der Bestandsbau stellt nur die betroffenen Titel zurück statt den ganzen Bau zu sperren.

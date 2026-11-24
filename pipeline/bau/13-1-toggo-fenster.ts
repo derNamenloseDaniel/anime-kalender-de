@@ -1,7 +1,5 @@
 import { readJson, log } from '../lib/util.ts'
 import { type Title, type WatchLink } from '../../shared/types.ts'
-import { lesekennung } from '../../shared/staffel-titel.ts'
-import { pruefeToggoVerteilung, toggoFolgenDerStaffel } from '../lib/staffel-titel.ts'
 
 /** TOGGO-Fenster je Folge an die TOGGO-Wege der Titel (aus `schreibeSynopsenUndReichereAn` herausgelöst, Verhalten unverändert). */
 export function setzeToggoFenster(allTitles: Title[]): void {
@@ -19,19 +17,16 @@ export function setzeToggoFenster(allTitles: Title[]): void {
       {},
     ).titel ?? {}
     let mitFenster = 0
-    const verteilt = new Map<number, number>()
     for (const t of allTitles) {
-      const roh = toggo[String(lesekennung(t))]?.folgen
-      if (!roh) continue
-      const folgen = toggoFolgenDerStaffel(roh, t)
-      if (t.staffelTitel) verteilt.set(t.staffelTitel.sammel, (verteilt.get(t.staffelTitel.sammel) ?? 0) + folgen.length)
+      const folgen = toggo[String(t.id)]?.folgen
+      if (!folgen) continue
       const bloecke: NonNullable<WatchLink['toggo']> = []
       for (const f of [...folgen].sort((a, b) => a.staffel - b.staffel || a.folge - b.folge)) {
         const letzter = bloecke[bloecke.length - 1]
         if (letzter && letzter.staffel === f.staffel && letzter.bis === f.folge - 1 && letzter.ab === f.ab && letzter.ende === f.bis) letzter.bis = f.folge
         else bloecke.push({ staffel: f.staffel, von: f.folge, bis: f.folge, ab: f.ab, ende: f.bis })
       }
-      const adresse = toggo[String(lesekennung(t))]?.adresse
+      const adresse = toggo[String(t.id)]?.adresse
       /*
         Kein TOGGO-Weg bekannt, aber die Serie steht im TOGGO-Katalog und hat gerade freie
         Folgen: Weg anlegen. TOGGO zeigt nur deutsche Fassungen.
@@ -46,7 +41,6 @@ export function setzeToggoFenster(allTitles: Title[]): void {
         mitFenster++
       }
     }
-    for (const [sammel, n] of verteilt) pruefeToggoVerteilung(sammel, toggo[String(sammel)]?.folgen.length ?? 0, n)
     if (mitFenster) log(`${mitFenster} TOGGO-Weg(e) mit Abruffenstern je Folge`)
   }
 }

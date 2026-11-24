@@ -58,7 +58,7 @@ const tbt2411 = (seite, grenze, von, auf) =>
 
 /**
  * Ausnahmeweg der Ratsche (`gelockert`): eine Grenze darf nur lockerer werden als auf main, wenn genau dieser Schritt
- * (profil/seite/grenze, von → auf) hier mit Datum und Grund steht. Einträge bleiben als Chronik; nach dem Merge passen sie auf keinen neuen Schritt.
+ * (profil/seite/grenze, von → auf) hier mit Datum und Grund steht. Ein Eintrag gilt 14 Tage ab `datum` (`LOCKERUNG_TAGE`), danach bleibt er nur als Chronik.
  */
 export const LOCKERUNGEN = [
   ...tbt2411('Kalender', 'tbt', 100, 110),

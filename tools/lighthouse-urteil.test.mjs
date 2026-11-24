@@ -77,14 +77,17 @@ assert.deepEqual(gelockert({ pr: { Datenbank: { ...altBand.pr.Datenbank, 'tbt-la
 const schritt = { profil: 'pr', seite: 'Datenbank', grenze: 'tbt-langsam', von: 1320, auf: 1420, datum: '2026-11-24', grund: 'Test' }
 const locker = { pr: { Datenbank: { ...altBand.pr.Datenbank, 'tbt-langsam': 1420 } } }
 assert.deepEqual(gelockert(locker, altBand), ['pr/Datenbank/tbt-langsam: 1320 → 1420'], 'ohne Eintrag: rot (Stand main)')
-assert.deepEqual(gelockert(locker, altBand, [schritt]), [], 'genau dieser Schritt eingetragen: erlaubt')
+const heute = new Date('2026-11-24T18:00:00Z')
+assert.deepEqual(gelockert(locker, altBand, [schritt], heute), [], 'genau dieser Schritt eingetragen: erlaubt')
+assert.deepEqual(gelockert(locker, altBand, [schritt], new Date('2026-12-08T00:00:00Z')), [], 'Eintrag 14 Tage alt: noch erlaubt')
+assert.deepEqual(gelockert(locker, altBand, [schritt], new Date('2026-12-09T00:00:00Z')), ['pr/Datenbank/tbt-langsam: 1320 → 1420'], 'Eintrag älter als 14 Tage: rot (Rückschritt auf denselben Wert)')
 for (const [feld, wert] of [['profil', 'live'], ['seite', 'Titel'], ['grenze', 'tbt'], ['von', 1300], ['auf', 1400]]) {
-  assert.deepEqual(gelockert(locker, altBand, [{ ...schritt, [feld]: wert }]), ['pr/Datenbank/tbt-langsam: 1320 → 1420'], `Eintrag mit anderem ${feld}: rot`)
+  assert.deepEqual(gelockert(locker, altBand, [{ ...schritt, [feld]: wert }], heute), ['pr/Datenbank/tbt-langsam: 1320 → 1420'], `Eintrag mit anderem ${feld}: rot`)
 }
-assert.deepEqual(gelockert({ pr: { Datenbank: { ...altBand.pr.Datenbank, 'tbt-langsam': 1430 } } }, altBand, [schritt]), ['pr/Datenbank/tbt-langsam: 1320 → 1430'], 'weiter als eingetragen: rot')
-assert.deepEqual(gelockert({ pr: { Datenbank: { tbt: 540, performance: 59, 'performance-langsam': 48 } } }, altBand, [schritt]), ['pr/Datenbank/tbt-langsam: entfernt (main 1320)'], 'entfernte Grenze: rot trotz Eintrag')
+assert.deepEqual(gelockert({ pr: { Datenbank: { ...altBand.pr.Datenbank, 'tbt-langsam': 1430 } } }, altBand, [schritt], heute), ['pr/Datenbank/tbt-langsam: 1320 → 1430'], 'weiter als eingetragen: rot')
+assert.deepEqual(gelockert({ pr: { Datenbank: { tbt: 540, performance: 59, 'performance-langsam': 48 } } }, altBand, [schritt], heute), ['pr/Datenbank/tbt-langsam: entfernt (main 1320)'], 'entfernte Grenze: rot trotz Eintrag')
 const main2111 = { pr: { Titel: { tbt: 760, 'tbt-mittel': 1100, 'tbt-langsam': 1610 } }, live: { Kalender: { tbt: 100 } } }
-assert.deepEqual(gelockert(GRENZEN, main2111, LOCKERUNGEN), [], 'Lockerung vom 24.11.2026 steht in LOCKERUNGEN (pr und live)')
+assert.deepEqual(gelockert(GRENZEN, main2111, LOCKERUNGEN, heute), [], 'Lockerung vom 24.11.2026 steht in LOCKERUNGEN (pr und live)')
 assert.equal(gelockert(GRENZEN, main2111).length, 4, 'dieselbe Lockerung ohne LOCKERUNGEN: rot')
 // Alarm 24.11.2026 (Nachlauf 45424597997): Titel TBT 1102 bei benchmark 2754 ist im Band mittel jetzt grün.
 assert.deepEqual(verstoesse('Titel', { ...db, lcp: 14000, bytes: 3459355, tbt: 1102, performance: 50, benchmark: 2754 }, GRENZEN.pr.Titel), [], 'Nachlauf 45424597997: grün')

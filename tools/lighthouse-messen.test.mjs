@@ -86,7 +86,7 @@ try {
   assert.equal(locker.status, 1, `gelockerte Grenze im PR: Exit 1\n${locker.stdout}`)
   assert.match(locker.stdout, /Ratsche gelockert: pr\/Kalender\/lcp: 2500 → 2600/, 'Lockerung benannt')
   // Ausnahmeweg: derselbe Schritt mit Eintrag in LOCKERUNGEN ist grün, ein anderer Schritt (2550 eingetragen, 2600 gesetzt) bleibt rot.
-  const eintrag = (auf) => `export const LOCKERUNGEN = [${['pr', 'live'].map((p) => `{ profil: '${p}', seite: 'Kalender', grenze: 'lcp', von: 2500, auf: ${auf}, datum: '2026-11-24', grund: 'Test' },`).join(' ')}`
+  const eintrag = (auf) => `export const LOCKERUNGEN = [${['pr', 'live'].map((p) => `{ profil: '${p}', seite: 'Kalender', grenze: 'lcp', von: 2500, auf: ${auf}, datum: '${new Date().toISOString().slice(0, 10)}', grund: 'Test' },`).join(' ')}`
   const mitEintrag = (auf) => gelockert.replace('export const LOCKERUNGEN = [', eintrag(auf))
   assert.notEqual(mitEintrag(2600), gelockert, 'Attrappe: LOCKERUNGEN steht in der Grenzdatei')
   const erlaubt = lauf('erlaubt', 900, { wurzel: ratschenRepo('erlaubt', GRENZEN_TEXT, mitEintrag(2600)), pr: true })

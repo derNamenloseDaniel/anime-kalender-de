@@ -72,10 +72,15 @@ export function verstoesse(seite, wert, grenze) {
 
 /**
  * Ratsche: Grenzen, die gegenüber dem Stand auf main gelockert wurden (Obergrenze höher, Untergrenze tiefer). Ohne Basis keine Prüfung.
- * Durch kommt nur ein Schritt, der genau so in `erlaubt` steht (`LOCKERUNGEN` aus `lighthouse-grenzen.mjs`).
+ * Durch kommt nur ein Schritt, der genau so in `erlaubt` steht (`LOCKERUNGEN` aus `lighthouse-grenzen.mjs`) und dessen `datum` höchstens
+ * `LOCKERUNG_TAGE` vor `heute` liegt — ein alter Eintrag ließe sonst einen späteren Rückschritt auf denselben Wert still durch.
  */
-export function gelockert(neu, alt, erlaubt = []) {
+export const LOCKERUNG_TAGE = 14
+
+export function gelockert(neu, alt, erlaubt = [], heute = new Date()) {
   if (!alt) return []
+  const ab = heute.getTime() - LOCKERUNG_TAGE * 86400000
+  erlaubt = erlaubt.filter((e) => Date.parse(e.datum) >= ab)
   const aus = []
   for (const [profil, seiten] of Object.entries(alt)) {
     if (typeof seiten !== 'object' || !seiten) continue

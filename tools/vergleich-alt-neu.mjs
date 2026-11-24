@@ -7,7 +7,9 @@
  *   node tools/vergleich-alt-neu.mjs <datei> <funktion> <fallmodul> [--ref <ref>] [--zweige a,b]
  *   (für .ts-Dateien: `npx tsx tools/vergleich-alt-neu.mjs …`)
  *
- * Das Fallmodul exportiert `faelle`: `[{ name, args: [...] | argsFabrik: () => [...], dateien?: { 'rel/pfad': 'Inhalt' }, zweig?: 'Etikett' }]`
+ * Das Fallmodul exportiert `faelle`: `[{ name, args: [...] | argsFabrik: () => [...], dateien?: { 'rel/pfad': 'Inhalt' }, zweig?: 'Etikett', erwartetWurf?: true }]`
+ * Werfen alte und neue Fassung in einem Fall, ist das rot, außer der Fall trägt `erwartetWurf: true` (der Fehlertext geht dann ins Ergebnis ein).
+ * `AK_ROOT` zeigt schon vor dem Import beider Fassungen auf die Kulisse (eine je Lauf, vor jedem Aufruf geleert).
  * (`argsFabrik` liefert je Lauf frische Eingaben mit Funktionen, die sich nicht klonen lassen).
  * `dateien` füllt die Kulisse vor jedem Aufruf; `zweig` zählt, welche Pfade der Funktion die Fälle erreichen (`--zweige`: jedes
  * genannte Etikett muss mindestens einmal vorkommen, sonst Exit 1). Exit 0 gleich, 1 Abweichung oder Lücke, 2 Aufruf.
@@ -80,27 +82,21 @@ export function kanonisch(w, gesehen = new Map()) {
 }
 
 /** Ein Aufruf unter frischer Kulisse; liefert Bytes von Rückgabe/Fehler und veränderten Eingaben sowie den Kulisse-Hash. */
-async function ruf(fn, args, dateien) {
-  const kulisse = mkdtempSync(join(tmpdir(), 'ak-alt-neu-'))
-  const vorher = process.env.AK_ROOT
-  process.env.AK_ROOT = kulisse
-  try {
-    for (const [rel, inhalt] of Object.entries(dateien ?? {})) {
-      mkdirSync(dirname(join(kulisse, rel)), { recursive: true })
-      writeFileSync(join(kulisse, rel), inhalt)
-    }
-    let ergebnis
-    try {
-      ergebnis = { rueckgabe: await fn(...args) }
-    } catch (e) {
-      ergebnis = { wirft: String(e?.message ?? e) }
-    }
-    return { ergebnis: kanonisch(ergebnis), eingaben: kanonisch(args), dateien: hashOrdner(kulisse) }
-  } finally {
-    if (vorher === undefined) delete process.env.AK_ROOT
-    else process.env.AK_ROOT = vorher
-    rmSync(kulisse, { recursive: true, force: true })
+async function ruf(fn, args, dateien, kulisse) {
+  for (const name of readdirSync(kulisse)) rmSync(join(kulisse, name), { recursive: true, force: true })
+  for (const [rel, inhalt] of Object.entries(dateien ?? {})) {
+    mkdirSync(dirname(join(kulisse, rel)), { recursive: true })
+    writeFileSync(join(kulisse, rel), inhalt)
   }
+  let ergebnis
+  let wirft
+  try {
+    ergebnis = { rueckgabe: await fn(...args) }
+  } catch (e) {
+    wirft = String(e?.message ?? e)
+    ergebnis = { wirft }
+  }
+  return { ergebnis: kanonisch(ergebnis), eingaben: kanonisch(args), dateien: hashOrdner(kulisse), wirft }
 }
 
 /** Vergleicht alt und neu über alle Fälle. `wurzel` ist der Git-Baum, `datei` relativ dazu oder absolut. */
@@ -109,19 +105,28 @@ export async function vergleicheAltNeu({ datei, funktion, faelle, ref = 'origin/
   const weg = schreibeAlt(wurzel, ref, abs)
   const z = zaehler()
   const abweichungen = []
+  // Die Kulisse steht vor dem Import: Module wie `pipeline/lib/util.ts` fixieren `ROOT` beim Import (24.11.2026).
+  const kulisse = mkdtempSync(join(tmpdir(), 'ak-alt-neu-'))
+  const vorher = process.env.AK_ROOT
+  process.env.AK_ROOT = kulisse
   try {
-    const alt = (await import(pathToFileURL(weg).href))[funktion]
-    // Query gegen den Modul-Cache: mehrere Aufrufe im selben Prozess sehen die jeweils aktuelle Datei.
+    // Query gegen den Modul-Cache: mehrere Aufrufe im selben Prozess sehen die jeweils aktuelle Datei und Kulisse.
+    const alt = (await import(`${pathToFileURL(weg).href}?lauf=${++laufNr}`))[funktion]
     const neu = (await import(`${pathToFileURL(abs).href}?lauf=${++laufNr}`))[funktion]
     if (typeof alt !== 'function' || typeof neu !== 'function') throw new Error(`${funktion} ist in alter oder neuer Fassung keine exportierte Funktion`)
     for (const f of faelle) {
       if (f.zweig) z.zaehle(f.zweig)
-      const a = await ruf(alt, frischeArgs(f), f.dateien)
-      const n = await ruf(neu, frischeArgs(f), f.dateien)
+      const a = await ruf(alt, frischeArgs(f), f.dateien, kulisse)
+      const n = await ruf(neu, frischeArgs(f), f.dateien, kulisse)
       for (const was of ['ergebnis', 'eingaben', 'dateien']) if (a[was] !== n[was]) abweichungen.push({ fall: f.name, was })
+      // Werfen beide, sagt „gleich“ nichts über die Absicht: nur ein ausdrücklich erwarteter Wurf zählt als gleich.
+      if (a.wirft !== undefined && n.wirft !== undefined && !f.erwartetWurf) abweichungen.push({ fall: f.name, was: 'wirft in beiden Fassungen', fehler: n.wirft })
     }
   } finally {
     unlinkSync(weg)
+    if (vorher === undefined) delete process.env.AK_ROOT
+    else process.env.AK_ROOT = vorher
+    rmSync(kulisse, { recursive: true, force: true })
   }
   const luecken = erwarteteZweige.filter((e) => z.anzahl(e) === 0)
   return { gleich: abweichungen.length === 0 && luecken.length === 0, abweichungen, luecken, abdeckung: z.alle() }
@@ -136,7 +141,7 @@ async function main(argv) {
   }
   const { faelle } = await import(pathToFileURL(resolve(fallmodul)).href)
   const r = await vergleicheAltNeu({ datei, funktion, faelle, ref: opt('--ref'), erwarteteZweige: opt('--zweige')?.split(',') ?? [] })
-  for (const a of r.abweichungen) console.log(`ABWEICHUNG ${a.fall}: ${a.was}`)
+  for (const a of r.abweichungen) console.log(`ABWEICHUNG ${a.fall}: ${a.was}${a.fehler === undefined ? '' : ` (${a.fehler})`}`)
   for (const l of r.luecken) console.log(`LÜCKE: Zweig „${l}“ von keinem Fall erreicht`)
   console.log(`${faelle.length} Fälle, Abdeckung ${JSON.stringify(r.abdeckung)}: ${r.gleich ? 'byte-gleich' : 'NICHT gleich'}`)
   process.exit(r.gleich ? 0 : 1)

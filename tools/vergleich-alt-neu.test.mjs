@@ -107,6 +107,41 @@ try {
   rmSync(repo, { recursive: true, force: true })
 }
 
+// Wurf in beiden Fassungen ist rot, außer `erwartetWurf`; AK_ROOT gilt schon beim Import (ROOT-Konstante wie in pipeline/lib/util.ts)
+const repo3 = neuesRepo()
+try {
+  const H = "export function h(x) {\n  if (x < 0) throw new Error('negativ ' + x)\n  return x\n}\n"
+  const R = "import { writeFileSync } from 'node:fs'\nimport { join } from 'node:path'\nconst ROOT = process.env.AK_ROOT\nexport function r(x) {\n  writeFileSync(join(ROOT, 'aus.txt'), 'x' + x)\n  return x\n}\n"
+  writeFileSync(join(repo3, 'h.mjs'), H)
+  writeFileSync(join(repo3, 'r.mjs'), R)
+  git(repo3, 'add', '.')
+  git(repo3, 'commit', '-q', '-m', 'h und r')
+  const fall = (name, x, extra = {}) => ({ name, args: [x], ...extra })
+  const lauf3 = (datei, funktion, neu, faelle3) => {
+    writeFileSync(join(repo3, datei), neu)
+    return vergleicheAltNeu({ datei, funktion, faelle: faelle3, ref: 'HEAD', wurzel: repo3 })
+  }
+  const mix = [fall('ok 1', 1), fall('wirft -1', -1), fall('ok 2', 2), fall('wirft -2', -2)]
+  const beide = await lauf3('h.mjs', 'h', H, mix)
+  assert.equal(beide.gleich, false)
+  assert.deepEqual(beide.abweichungen, [
+    { fall: 'wirft -1', was: 'wirft in beiden Fassungen', fehler: 'negativ -1' },
+    { fall: 'wirft -2', was: 'wirft in beiden Fassungen', fehler: 'negativ -2' },
+  ])
+  const erwartet = mix.map((f) => (f.args[0] < 0 ? { ...f, erwartetWurf: true } : f))
+  assert.equal((await lauf3('h.mjs', 'h', H, erwartet)).gleich, true, 'erwarteter Wurf mit gleichem Fehlertext ist gleich')
+  const anderer = await lauf3('h.mjs', 'h', H.replace("'negativ '", "'unter null '"), erwartet)
+  assert.deepEqual(anderer.abweichungen.map((a) => `${a.fall}:${a.was}`), ['wirft -1:ergebnis', 'wirft -2:ergebnis'])
+
+  const rFaelle = [fall('a', 1), fall('b', 2)]
+  assert.equal((await lauf3('r.mjs', 'r', R, rFaelle)).gleich, true, 'Bauphase mit Wurzel-Konstante: AK_ROOT gilt beim Import')
+  const rAnders = await lauf3('r.mjs', 'r', R.replace("'x' + x", "'y' + x"), rFaelle)
+  assert.deepEqual(rAnders.abweichungen.map((a) => `${a.fall}:${a.was}`), ['a:dateien', 'b:dateien'])
+  assert.equal(process.env.AK_ROOT, undefined, 'AK_ROOT wird nach dem Lauf zurückgesetzt')
+} finally {
+  rmSync(repo3, { recursive: true, force: true })
+}
+
 // kanonisch: V8-serialize unterscheidet dieselbe Zahl je nach interner Darstellung (Smi gegen Double), kanonisch nicht
 const doubleArray = [0.5, 2, 3]
 doubleArray[0] = 1

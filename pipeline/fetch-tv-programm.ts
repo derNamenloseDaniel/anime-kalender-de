@@ -310,22 +310,12 @@ export async function rtlProgrammLesen(
   return { sendungen: [], grund: `${grund} nach ${RTL_VERSUCHE} Versuchen` }
 }
 
-export async function main(abruf: typeof fetch = fetch, rtlPause?: () => Promise<void>): Promise<void> {
-  /* Fällt eine Quelle aus, arbeitet die andere weiter — gemeldet wird trotzdem. */
-  const { sendungen, grund } = await rtlProgrammLesen(abruf, rtlPause)
-  if (grund) {
-    warn(`RTL+-Programm: ${grund}`)
-    recordSource('tv-programm', 0, grund)
-    process.exitCode = 1
-  } else {
-    log(`${sendungen.length} Sendungen im RTL+-Programm.`)
-  }
+type SendungsBestand = Record<string, TvSendung>
+type TvDatei = { sendungen?: SendungsBestand; tvdeGeholtAm?: string }
+const TVDE_UA = 'anime-kalender-de (https://anime-kalender.de; einmal am Tag, nur Anime)'
 
-  const namen = namenIndex()
-
-  const datei = readJson<{ sendungen?: Record<string, TvSendung>; tvdeGeholtAm?: string }>(DATEI, {})
-  const bestand = datei.sendungen ?? {}
-  const heute = todayIso()
+/** Schreibt die zugeordneten RTL+-Sendungen in den Bestand; liefert die Zahl neuer Einträge. */
+function rtlUebernehmen(sendungen: ReturnType<typeof sendungenAusSeite>, namen: Map<string, number>, bestand: SendungsBestand, heute: string): number {
   let neu = 0
   for (const s of sendungen) {
     const titleId = titelZuordnen(s.titel, namen)
@@ -343,16 +333,20 @@ export async function main(abruf: typeof fetch = fetch, rtlPause?: () => Promise
     }
     log(`  ${SENDER[code] ?? code} ${s.start.slice(0, 16)} ${s.titel}${s.folge ? ` — ${s.folge}` : ''} → ${titleId}`)
   }
-  /*
-    tv.de: gestern (für die Nacht auf heute) bis in sieben Tagen, je Sender und Tag ein Abruf —
-    und nur **einmal am Tag** (Auflage aus der Recherche), obwohl dieser Lauf stündlich startet.
-  */
+  return neu
+}
+
+/** tv.de-Tagesseiten: gestern (für die Nacht auf heute) bis in sieben Tagen, je Sender und Tag ein Abruf. */
+async function tvdeTagesseiten(
+  abruf: typeof fetch,
+  tage: string[],
+  namen: Map<string, number>,
+  bestand: SendungsBestand,
+  heute: string,
+): Promise<{ seiten: number; gesperrt: boolean; tvde: number; neu: number }> {
   let tvde = 0
-  let tvdeSeiten = 0
-  const tvdeFaellig = datei.tvdeGeholtAm !== heute || process.argv.includes('--tvde')
-  if (!tvdeFaellig) log(`tv.de heute schon geholt (${datei.tvdeGeholtAm}) — übersprungen.`)
-  const tage = Array.from({ length: 9 }, (_, i) => new Date(Date.now() + (i - 1) * 864e5).toISOString().slice(0, 10))
-  const lauf = await tvDeSeitenLesen(abruf, tvdeFaellig ? tage : [], Object.keys(TVDE_SENDER), (slug, tag, html) => {
+  let neu = 0
+  const lauf = await tvDeSeitenLesen(abruf, tage, Object.keys(TVDE_SENDER), (slug, tag, html) => {
     const name = TVDE_SENDER[slug]!
     for (const s of tvDeSendungen(html, tag)) {
       const titleId = titelZuordnen(s.titel, namen)
@@ -372,63 +366,93 @@ export async function main(abruf: typeof fetch = fetch, rtlPause?: () => Promise
       log(`  ${name} ${s.start.slice(0, 16)} ${s.titel}${s.folge ? ` — ${s.folge}` : ''} → ${titleId} (tv.de)`)
     }
   })
-  tvdeSeiten = lauf.seiten
-  const tvdeGesperrt = lauf.gesperrt
-  /* Nachtblöcke: je gesichteter Reihe und Sender einmal die Detailseite mit „Bald im TV". */
-  if (tvdeFaellig && !tvdeGesperrt) {
-    const reihen = new Map<string, { slug: string; kennung: string; titel: string; titleId: number; sender: string }>()
-    for (const [k, v] of Object.entries(bestand)) {
-      const m = /^tvde_([^+]+)\+(\d+)$/.exec(k)
-      if (!m || v.start.slice(0, 10) < heute) continue
-      reihen.set(`${m[1]}|${v.titleId}`, { slug: m[1]!, kennung: m[2]!, titel: v.titel, titleId: v.titleId, sender: v.sender })
-    }
-    let nacht = 0
-    for (const r of reihen.values()) {
-      try {
-        const antwort = await abruf(`https://tv.de/sendung/r/s,${r.kennung}/`, {
-          headers: { 'User-Agent': 'anime-kalender-de (https://anime-kalender.de; einmal am Tag, nur Anime)' },
-        })
-        if (!antwort.ok) throw new Error(`HTTP ${antwort.status}`)
-        tvdeSeiten++
-        for (const s of baldImTv(await antwort.text(), heute, r.titel)) {
-          if (s.sender !== r.sender) continue
-          const kennung = `tvde_${r.slug}+${s.kennung}`
-          if (!bestand[kennung]) {
-            neu++
-            nacht++
-          }
-          bestand[kennung] = {
-            titleId: r.titleId,
-            titel: r.titel,
-            ...(s.folge ? { folge: s.folge } : {}),
-            sender: r.sender,
-            start: s.start,
-            ende: s.ende,
-            gesehenAm: bestand[kennung]?.gesehenAm ?? heute,
-          }
-        }
-      } catch (err) {
-        warn(`tv.de Detailseite ${r.titel}: ${err instanceof Error ? err.message : String(err)}`)
-      }
-      await new Promise((ok) => setTimeout(ok, 1500))
-    }
-    log(`tv.de: ${reihen.size} Detailseiten für die Nacht, ${nacht} Sendungen neu.`)
-  }
-  log(`tv.de: ${tvdeSeiten} Seiten, ${tvde} Anime-Sendungen aus dem Bestand.`)
+  return { seiten: lauf.seiten, gesperrt: lauf.gesperrt, tvde, neu }
+}
 
-  /* 120 Tage reichen für jede Staffel; ältere Sendungen fallen heraus. */
+/** Nachtblöcke: je gesichteter Reihe und Sender einmal die Detailseite mit „Bald im TV". */
+async function tvdeNachtBloecke(abruf: typeof fetch, bestand: SendungsBestand, heute: string): Promise<{ seiten: number; neu: number }> {
+  const reihen = new Map<string, { slug: string; kennung: string; titel: string; titleId: number; sender: string }>()
+  for (const [k, v] of Object.entries(bestand)) {
+    const m = /^tvde_([^+]+)\+(\d+)$/.exec(k)
+    if (!m || v.start.slice(0, 10) < heute) continue
+    reihen.set(`${m[1]}|${v.titleId}`, { slug: m[1]!, kennung: m[2]!, titel: v.titel, titleId: v.titleId, sender: v.sender })
+  }
+  let seiten = 0
+  let nacht = 0
+  for (const r of reihen.values()) {
+    try {
+      const antwort = await abruf(`https://tv.de/sendung/r/s,${r.kennung}/`, { headers: { 'User-Agent': TVDE_UA } })
+      if (!antwort.ok) throw new Error(`HTTP ${antwort.status}`)
+      seiten++
+      for (const s of baldImTv(await antwort.text(), heute, r.titel)) {
+        if (s.sender !== r.sender) continue
+        const kennung = `tvde_${r.slug}+${s.kennung}`
+        if (!bestand[kennung]) nacht++
+        bestand[kennung] = {
+          titleId: r.titleId,
+          titel: r.titel,
+          ...(s.folge ? { folge: s.folge } : {}),
+          sender: r.sender,
+          start: s.start,
+          ende: s.ende,
+          gesehenAm: bestand[kennung]?.gesehenAm ?? heute,
+        }
+      }
+    } catch (err) {
+      warn(`tv.de Detailseite ${r.titel}: ${err instanceof Error ? err.message : String(err)}`)
+    }
+    await new Promise((ok) => setTimeout(ok, 1500))
+  }
+  log(`tv.de: ${reihen.size} Detailseiten für die Nacht, ${nacht} Sendungen neu.`)
+  return { seiten, neu: nacht }
+}
+
+/** 120 Tage reichen für jede Staffel; ältere Sendungen fallen heraus. */
+function aelteresEntfernen(bestand: SendungsBestand): void {
   const grenze = new Date(Date.now() - 120 * 864e5).toISOString().slice(0, 10)
   for (const [k, v] of Object.entries(bestand)) if (v.start.slice(0, 10) < grenze) delete bestand[k]
+}
 
+export async function main(abruf: typeof fetch = fetch, rtlPause?: () => Promise<void>): Promise<void> {
+  /* Fällt eine Quelle aus, arbeitet die andere weiter — gemeldet wird trotzdem. */
+  const { sendungen, grund } = await rtlProgrammLesen(abruf, rtlPause)
+  if (grund) {
+    warn(`RTL+-Programm: ${grund}`)
+    recordSource('tv-programm', 0, grund)
+    process.exitCode = 1
+  } else {
+    log(`${sendungen.length} Sendungen im RTL+-Programm.`)
+  }
+
+  const namen = namenIndex()
+  const datei = readJson<TvDatei>(DATEI, {})
+  const bestand = datei.sendungen ?? {}
+  const heute = todayIso()
+  let neu = rtlUebernehmen(sendungen, namen, bestand, heute)
+  /* tv.de nur **einmal am Tag** (Auflage aus der Recherche), obwohl dieser Lauf stündlich startet. */
+  const tvdeFaellig = datei.tvdeGeholtAm !== heute || process.argv.includes('--tvde')
+  if (!tvdeFaellig) log(`tv.de heute schon geholt (${datei.tvdeGeholtAm}) — übersprungen.`)
+  const tage = Array.from({ length: 9 }, (_, i) => new Date(Date.now() + (i - 1) * 864e5).toISOString().slice(0, 10))
+  const lauf = await tvdeTagesseiten(abruf, tvdeFaellig ? tage : [], namen, bestand, heute)
+  neu += lauf.neu
+  let tvdeSeiten = lauf.seiten
+  if (tvdeFaellig && !lauf.gesperrt) {
+    const nacht = await tvdeNachtBloecke(abruf, bestand, heute)
+    tvdeSeiten += nacht.seiten
+    neu += nacht.neu
+  }
+  log(`tv.de: ${tvdeSeiten} Seiten, ${lauf.tvde} Anime-Sendungen aus dem Bestand.`)
+
+  aelteresEntfernen(bestand)
   log(`${neu} neue Anime-Sendungen, ${Object.keys(bestand).length} im Bestand.`)
   if (TROCKEN) return
   writeJson(DATEI, {
     geholtAm: new Date().toISOString(),
-    tvdeGeholtAm: tvdeMarke(tvdeSeiten, tvdeGesperrt, heute, datei.tvdeGeholtAm),
+    tvdeGeholtAm: tvdeMarke(tvdeSeiten, lauf.gesperrt, heute, datei.tvdeGeholtAm),
     sendungen: bestand,
   })
   if (sendungen.length) recordSource('tv-programm', sendungen.length)
-  if (tvdeFaellig) meldeTvDe(tvde, tvdeSeiten, tvdeGesperrt)
+  if (tvdeFaellig) meldeTvDe(lauf.tvde, tvdeSeiten, lauf.gesperrt)
 }
 
 /** Tagesmarke: nach Erfolg und nach einer Sperre (403) ruht tv.de bis morgen; sonst bleibt die alte stehen. */

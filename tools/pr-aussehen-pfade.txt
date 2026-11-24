@@ -1,5 +1,5 @@
-# Werkzeuge, deren Änderung den Job "aussehen" (PR-Aussehen) in pr-pruefung.yml auslöst: je Zeile ein Pfad ab der Wurzel,
 # LC_ALL=C-sortiert, ohne Regex-Zeichen (der Job maskiert die Punkte). Jeder PR fügt seine Zeile ein; merge=union (.gitattributes)
+# Werkzeuge, deren Änderung den Job "aussehen" (PR-Aussehen) in pr-pruefung.yml auslöst: je Zeile ein Pfad ab der Wurzel,
 # verhindert den Konflikt bei zwei PRs an derselben Stelle. Test: tools/pr-aussehen-pfade.test.mjs.
 tools/abzeichen-urteil.mjs
 tools/aehnlich-kacheln-bild.mjs
@@ -11,6 +11,7 @@ tools/ansicht-details-overlay.mjs
 tools/ansicht-duell.mjs
 tools/ansicht-escape-einzeln.mjs
 tools/ansicht-escape-stapel.mjs
+tools/ansicht-filterfeld-klick.mjs
 tools/ansicht-filterfenster-rechner.mjs
 tools/ansicht-filterfenster-s5.mjs
 tools/ansicht-filterfenster.mjs

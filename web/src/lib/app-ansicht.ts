@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { Title } from '@shared/types.ts'
+import type { ReleaseEvent, Title } from '@shared/types.ts'
 import { addDays, startOfWeek } from '@shared/time.ts'
 import { loadAllTitles, loadCartoons, loadOhneSynchro, loadSynonyme, type Dataset } from './data.ts'
-import { titelFuerAnsichtGen, type FilterState } from './filters.ts'
+import { eventsFuerAnsichtGen, titelFuerAnsichtGen, type FilterState } from './filters.ts'
+import { wertungNurMitVollenDaten } from './filter-wertung.ts'
 import { useSprecherAuswahl } from './sprecher.ts'
 import { titelQuelle } from './titel-quelle.ts'
 import { leeresErgebnis, useZeitscheibe } from './use-zeitscheibe.ts'
@@ -11,8 +12,9 @@ import { coverBild, KACHEL_DICHTE } from './cover.ts'
 import type { AppRoute } from './router.ts'
 import type { Fundstelle } from './search.ts'
 
-/** Die Titelansicht, bevor etwas gerechnet ist. */
+/** Die Titel- und die Terminansicht, bevor etwas gerechnet ist. */
 const LEERE_ANSICHT = { liste: [] as Title[], fundstellen: new Map<string, Fundstelle[]>() }
+const LEERE_TERMINE = { liste: [] as ReleaseEvent[], fundstellen: new Map<string, Fundstelle[]>() }
 
 /** Cover der aktuellen und nächsten Woche für unterwegs sichern — dieselbe Größe wie die Kachel. */
 export function useCoverSicherung(data: Dataset | undefined, today: string): void {
@@ -63,12 +65,26 @@ interface TitelAnsichtEingabe {
   today: string
   favorites: Set<number>
   grouped: boolean
+  setGrouped: (grouped: boolean) => void
   zeigeOhneSynchro: boolean
+  setZeigeOhneSynchro: (an: boolean) => void
   nachgeladen: ReturnType<typeof useNachladeTitel>
 }
 
+/** Was nur die Datenbank braucht. */
+export interface DatenbankEingabe {
+  geladen: boolean
+  titles: { liste: Title[]; fundstellen: Map<string, Fundstelle[]> }
+  quelle: Title[]
+  grouped: boolean
+  onGroupedChange: (grouped: boolean) => void
+  ohneSynchro: boolean
+  onOhneSynchroChange: (an: boolean) => void
+  laedt: boolean
+}
+
 /** Die Titelliste der Datenbank samt Quelle und Sprecher-Auswahl. */
-export function useTitelAnsicht(e: TitelAnsichtEingabe) {
+export function useTitelAnsicht(e: TitelAnsichtEingabe): DatenbankEingabe {
   const { data, filters, today, favorites, grouped, zeigeOhneSynchro } = e
   const { allTitles, ohneSynchro, cartoons } = e.nachgeladen
   const sprecher = useSprecherAuswahl(filters)
@@ -78,5 +94,30 @@ export function useTitelAnsicht(e: TitelAnsichtEingabe) {
     [data, quelle, filters, today, favorites, grouped, sprecher.auswahl],
     LEERE_ANSICHT,
   )
-  return { titles, titelRechnet, quelle, sprecher }
+  return {
+    geladen: !!allTitles,
+    titles,
+    quelle,
+    grouped,
+    onGroupedChange: e.setGrouped,
+    ohneSynchro: zeigeOhneSynchro,
+    onOhneSynchroChange: e.setZeigeOhneSynchro,
+    laedt: (zeigeOhneSynchro && !ohneSynchro) || titelRechnet || sprecher.laedt,
+  }
+}
+
+/** Die Termine von Woche und Monat, gefiltert, samt der Tage für die Datumsauswahl. */
+export function useKalenderTermine(data: Dataset | undefined, voll: Dataset | undefined, kalenderFilters: FilterState, today: string, favorites: Set<number>, tvAus: boolean) {
+  const { wert: events, veraltet: eventsVeraltet } = useZeitscheibe(
+    () => (data ? eventsFuerAnsichtGen(data, wertungNurMitVollenDaten(kalenderFilters, !!voll), today, favorites, tvAus) : leeresErgebnis(LEERE_TERMINE)),
+    [data, kalenderFilters, voll, today, favorites, tvAus],
+    LEERE_TERMINE,
+  )
+  const eventListe = events.liste
+  /* Für die Datumsauswahl: der Bereich aus allen Terminen, die Zählung aus der gefilterten Ansicht. */
+  const termintage = useMemo(
+    () => ({ alle: data ? data.events.map((e) => e.date) : [], sichtbar: eventListe.map((e) => e.date) }),
+    [data, eventListe],
+  )
+  return { eventListe, eventsVeraltet, termintage }
 }

@@ -1,10 +1,9 @@
-import type { ReleaseEvent, Title } from '@shared/types.ts'
+import type { ReleaseEvent } from '@shared/types.ts'
 import { todayIso } from '@shared/time.ts'
+import type { DatenbankEingabe } from '../lib/app-ansicht.ts'
 import type { Dataset } from '../lib/data.ts'
 import { toggleValue, type FilterState } from '../lib/filters.ts'
-import type { AppRoute } from '../lib/router.ts'
-import { buildHash, type ViewId } from '../lib/router.ts'
-import type { Fundstelle } from '../lib/search.ts'
+import { buildHash, type AppRoute, type ViewId } from '../lib/router.ts'
 import { Header } from './Header.tsx'
 import { KalenderBereich } from './kalender/KalenderBereich.tsx'
 import { DatenbankBereichLazy } from './DatenbankBereichLazy.tsx'
@@ -17,20 +16,21 @@ type Navigate = (next: Partial<AppRoute>) => void
 export interface KopfEingabe {
   route: AppRoute
   navigate: Navigate
-  setView: (view: ViewId) => void
   setSuche: (search: string) => void
-  zurSuche: () => void
   favorites: Set<number>
   einstellungen: () => void
 }
 
-/** Der Kopf als Element, nicht als Komponente: Der Aufrufer reicht ihn an `StartGeruest` und die Ansicht, eine Komponentengrenze nähme den Fokus mit (4072). */
+/** Der Kopf als Element, nicht als Komponente: Eine Komponentengrenze hängt ihn neu ein und nimmt den Fokus mit (4072). */
 export function appKopf(k: KopfEingabe) {
   const { route, navigate } = k
+  const setView = (view: ViewId) => navigate({ view, title: undefined, disc: undefined })
+  /* Das Such-Symbol im Kalender: in die Datenbank, mit leerer Suche (der Kopf setzt dort den Fokus). */
+  const zurSuche = () => navigate({ view: 'datenbank', filters: { ...route.filters, search: '' }, title: undefined, disc: undefined })
   return (
     <Header
       view={route.view}
-      onView={k.setView}
+      onView={setView}
       /* Echte Adressen (Mittelklick), mit Basis-Pfad: der neue Tab startet ohne den Titel-Pfad. */
       startHref={`${import.meta.env.BASE_URL}${buildHash({ ...route, view: 'woche', date: todayIso(), title: undefined, disc: undefined })}`}
       hrefFuer={(ziel) => `${import.meta.env.BASE_URL}${buildHash({ ...route, view: ziel, title: undefined, disc: undefined })}`}
@@ -40,7 +40,7 @@ export function appKopf(k: KopfEingabe) {
       }}
       suche={route.filters.search}
       setSuche={k.setSuche}
-      zurSuche={k.zurSuche}
+      zurSuche={zurSuche}
       favorites={k.favorites}
       einstellungen={k.einstellungen}
     />
@@ -68,18 +68,6 @@ export interface InhaltProps extends Merkliste {
   setTvAus: (aus: boolean) => void
   termine: { alle: string[]; sichtbar: string[] }
   datenbank: DatenbankEingabe
-}
-
-/** Was nur die Datenbank braucht. */
-export interface DatenbankEingabe {
-  geladen: boolean
-  titles: { liste: Title[]; fundstellen: Map<string, Fundstelle[]> }
-  quelle: Title[]
-  grouped: boolean
-  onGroupedChange: (grouped: boolean) => void
-  ohneSynchro: boolean
-  onOhneSynchroChange: (an: boolean) => void
-  laedt: boolean
 }
 
 /** Der Hauptteil: Kalender, Datenbank oder eine Seitenansicht. */

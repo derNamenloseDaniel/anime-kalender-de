@@ -1,13 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { EinstellungenLazy } from './components/EinstellungenLazy.tsx'
 import { useStartdaten } from './lib/start-daten.ts'
 import { useEinstellungenOffen } from './lib/einstellungen-offen.ts'
-import { eventsFuerAnsichtGen, type FilterState } from './lib/filters.ts'
+import type { FilterState } from './lib/filters.ts'
 import { useKalenderFilter } from './lib/kalender-filter.ts'
-import { wertungNurMitVollenDaten } from './lib/filter-wertung.ts'
-import { leeresErgebnis, useZeitscheibe } from './lib/use-zeitscheibe.ts'
-import type { Fundstelle } from './lib/search.ts'
-import type { ReleaseEvent } from '@shared/types.ts'
 import { useFavorites, useHidden } from './lib/favorites.ts'
 import { speicherSichern, useNewsletterSync } from './lib/newsletterSync.ts'
 import { useFavoritenAbgleich } from './lib/favoriten-abgleich.ts'
@@ -15,17 +11,13 @@ import { usePushNachfuehren } from './lib/push-nachfuehren.ts'
 import { useRoute, type ViewId } from './lib/router.ts'
 import { useDbSchalter } from './lib/db-schalter.ts'
 import { addDays, addMonths, todayIso } from '@shared/time.ts'
-import { useCoverSicherung, useNachladeTitel, useTitelAnsicht } from './lib/app-ansicht.ts'
+import { useCoverSicherung, useKalenderTermine, useNachladeTitel, useTitelAnsicht } from './lib/app-ansicht.ts'
 import { AppDetail, AppInhalt, appKopf } from './components/AppBereiche.tsx'
 import { InstallDialog } from './components/InstallPrompt.tsx'
 import { DatenFehler } from './components/DatenFehler.tsx'
 import { Footer } from './components/Footer.tsx'
 import { StartGeruest } from './components/StartGeruest.tsx'
 import { useErstesErgebnis } from './lib/erstes-ergebnis.ts'
-
-/** Die Terminansicht, bevor etwas gerechnet ist. */
-const LEERE_TERMINE = { liste: [] as ReleaseEvent[], fundstellen: new Map<string, Fundstelle[]>() }
-
 
 /** Eine Wahl, die im Browser bleibt statt in der Adresse — wer einen Link teilt, teilt nicht seine Vorlieben. */
 function useGemerkterSchalter(schluessel: string, lesen: () => boolean): [boolean, (an: boolean) => void] {
@@ -84,53 +76,28 @@ export default function App() {
   useTastenSpruenge(route, navigate)
   const nachgeladen = useNachladeTitel(data, voll, route, zeigeOhneSynchro)
 
-  const { wert: events, veraltet: eventsVeraltet } = useZeitscheibe(
-    () => (data ? eventsFuerAnsichtGen(data, wertungNurMitVollenDaten(kalenderFilters, !!voll), today, favorites, tvAus) : leeresErgebnis(LEERE_TERMINE)),
-    [data, kalenderFilters, voll, today, favorites, tvAus],
-    LEERE_TERMINE,
-  )
-  const eventListe = events.liste
-  /* Für die Datumsauswahl: der Bereich aus allen Terminen, die Zählung aus der gefilterten Ansicht. */
-  const termintage = useMemo(
-    () => ({ alle: data ? data.events.map((e) => e.date) : [], sichtbar: eventListe.map((e) => e.date) }),
-    [data, eventListe],
-  )
-  const { titles, titelRechnet, quelle, sprecher } = useTitelAnsicht({ data, filters: route.filters, today, favorites, grouped, zeigeOhneSynchro, nachgeladen })
+  const { eventListe, eventsVeraltet, termintage } = useKalenderTermine(data, voll, kalenderFilters, today, favorites, tvAus)
+  const datenbank = useTitelAnsicht({ data, filters: route.filters, today, favorites, grouped, setGrouped, zeigeOhneSynchro, setZeigeOhneSynchro, nachgeladen })
   const kalenderBereit = useErstesErgebnis(!!data, eventsVeraltet)
 
-  const openTitleId = route.title || undefined
-
   const setFilters = (filters: FilterState) => navigate({ filters: { ...filters, search: route.filters.search } })
-  const setView = (view: ViewId) => navigate({ view, title: undefined, disc: undefined })
   /* Gesucht wird nur in der Datenbank; von anderen Seiten aus führt die Suche dorthin. */
   const setSuche = (search: string) =>
     navigate({
       filters: { ...route.filters, search },
       ...(route.view === 'datenbank' || !search ? {} : { view: 'datenbank' as ViewId }),
     })
-  /* Das Such-Symbol im Kalender: in die Datenbank, mit leerer Suche (der Kopf setzt dort den Fokus). */
-  const zurSuche = () => navigate({ view: 'datenbank', filters: { ...route.filters, search: '' }, title: undefined, disc: undefined })
 
   /* Nur ohne Anzeigbares: eine stehende Ansicht (Wochen-Daten) bleibt stehen, auch wenn das Nachladen scheitert. */
   if (error && !data) {
     return <DatenFehler detail={error} onNeuLaden={neuLaden} />
   }
 
-  const kopf = appKopf({ route, navigate, setView, setSuche, zurSuche, favorites, einstellungen: () => setEinstellungenOffen(true) })
+  const kopf = appKopf({ route, navigate, setSuche, favorites, einstellungen: () => setEinstellungenOffen(true) })
 
   if (!data) return StartGeruest({ kopf }) // Funktion statt Element: eine Komponentengrenze hängt den Kopf neu ein und nimmt Fokus mit (4072)
 
   const merkliste = { favorites, hidden, onToggleFavorite: toggle, onToggleHidden: toggleHidden }
-  const datenbank = {
-    geladen: !!nachgeladen.allTitles,
-    titles,
-    quelle,
-    grouped,
-    onGroupedChange: setGrouped,
-    ohneSynchro: zeigeOhneSynchro,
-    onOhneSynchroChange: setZeigeOhneSynchro,
-    laedt: (zeigeOhneSynchro && !nachgeladen.ohneSynchro) || titelRechnet || sprecher.laedt,
-  }
 
   return (
     <div className={`flex min-h-full flex-col ${fussAbstand(route.view)}`}>
@@ -160,7 +127,7 @@ export default function App() {
 
       <InstallDialog />
 
-      {openTitleId !== undefined && voll && <AppDetail {...merkliste} data={data} route={route} navigate={navigate} titleId={openTitleId} />}
+      {!!route.title && voll && <AppDetail {...merkliste} data={data} route={route} navigate={navigate} titleId={route.title} />}
     </div>
   )
 }

@@ -3,19 +3,47 @@ import type { StaffelNummer } from '@shared/titles.ts'
 import { staffelKurz, zeilenZusatz } from './reihen-regeln.ts'
 import { teilNamen } from './reihen-teil.ts'
 
-/** Der letzte Namensabschnitt nach „ - " oder „: " — bei „… Staffel 2 - Episode N" also „Episode N"; eine bloße Staffelangabe sagt nichts. */
+/** Namensabschnitte, die Besuchern nichts sagen („Episode N", „Die Serie"): AniList-Platzhalter statt eines Untertitels. */
+export function istPlatzhalter(abschnitt: string): boolean {
+  return /^(?:(?:Episode|Folge|Part|Teil)\s*(?:\d+|N)|Die Serie|The Series)$/i.test(abschnitt)
+}
+
+/** Der letzte Namensabschnitt nach „ - " oder „: ", der einer Karte etwas sagt; eine bloße Staffelangabe oder ein Platzhalter („Episode N") sagt nichts. */
 export function letzterAbschnitt(voll: string): string {
   const stueck = voll.split(/\s[-–—]\s|:\s/).at(-1)!.trim()
-  return /(?:^|\s)Staffel\s+\d+(?:\s*-\s*Teil\s+\d+)?$/i.test(stueck) ? '' : stueck
+  return /(?:^|\s)Staffel\s+\d+(?:\s*-\s*Teil\s+\d+)?$/i.test(stueck) || istPlatzhalter(stueck) ? '' : stueck
 }
 
 type Eintrag = { id: number; rest: string; voll: string; folgen?: FranchiseMember['staffelFolgen'] }
+/** Text für den Folgenbereich einer geteilten Staffel; `mitStaffel`, wenn die Beschriftung mehrere Staffeln nennt („Staffel 15–16"). */
+export type FolgenText = (staffel: number, von: number, bis: number, mitStaffel: boolean) => string
+
+/** Pro Karte ihr Folgenbereich in `staffel`, nur wenn jede Karte der Gruppe einen belegten hat. */
+function ausFolgen(karten: Eintrag[], staffel: number, nummern: Map<number, StaffelNummer>, text: FolgenText): string[] | undefined {
+  const bereiche = karten.map((e) => e.folgen?.find(([s]) => s === staffel))
+  if (!bereiche.every(Boolean)) return undefined
+  return bereiche.map((b, i) => text(staffel, b![1], b![2], nummern.get(karten[i]!.id)!.bis !== undefined))
+}
+
+/** Pro Karte ihr Namensabschnitt, nur wenn jede Karte einen eigenen hat. */
+function ausNamen(karten: Eintrag[]): string[] | undefined {
+  const abschnitte = karten.map((e) => letzterAbschnitt(e.voll))
+  return abschnitte.every(Boolean) && new Set(abschnitte).size === abschnitte.length ? abschnitte : undefined
+}
 
 /**
- * Tragen zwei Karten derselben Reihe dieselbe Beschriftung („Staffel 16" für drei japanische Teile einer deutschen Staffel), nennt jede den Abschnitt ihres Namens,
- * der sie unterscheidet. Nur wenn alle Karten der Gruppe einen eigenen Abschnitt haben; sonst bleibt es bei der Beschriftung, nichts wird erfunden.
+ * Was Karten einer Staffel unterscheidet: ihr Folgenbereich der geteilten Staffel (belegt in `staffelFolgen`), sonst ihr Namensabschnitt.
+ * Der Folgenbereich geht vor, weil er für jede Karte stimmt; ein Name ist oft nur ein Platzhalter. Nichts davon: nichts erfinden.
  */
-export function doppelteZusaetze(teile: Eintrag[], nummern: Map<number, StaffelNummer>): Map<number, string> {
+function unterscheidung(karten: Eintrag[], staffel: number, nummern: Map<number, StaffelNummer>, text: FolgenText): string[] | undefined {
+  return ausFolgen(karten, staffel, nummern, text) ?? ausNamen(karten)
+}
+
+/**
+ * Tragen zwei Karten derselben Reihe dieselbe Beschriftung („Staffel 16" für drei japanische Teile einer deutschen Staffel), nennt jede, was sie unterscheidet
+ * (`unterscheidung`). Nur wenn alle Karten der Gruppe etwas Eigenes haben; sonst bleibt es bei der Beschriftung.
+ */
+export function doppelteZusaetze(teile: Eintrag[], nummern: Map<number, StaffelNummer>, text: FolgenText): Map<number, string> {
   const gruppen = new Map<string, Eintrag[]>()
   for (const e of teile) {
     const nr = nummern.get(e.id)
@@ -26,19 +54,18 @@ export function doppelteZusaetze(teile: Eintrag[], nummern: Map<number, StaffelN
   const zusaetze = new Map<number, string>()
   for (const gruppe of gruppen.values()) {
     if (gruppe.length < 2) continue
-    const abschnitte = gruppe.map((e) => letzterAbschnitt(e.voll))
-    if (abschnitte.some((a) => !a) || new Set(abschnitte).size !== abschnitte.length) continue
-    gruppe.forEach((e, i) => zusaetze.set(e.id, abschnitte[i]!))
+    const unterschiede = unterscheidung(gruppe, nummern.get(gruppe[0]!.id)!.staffel, nummern, text)
+    if (unterschiede) gruppe.forEach((e, i) => zusaetze.set(e.id, unterschiede[i]!))
   }
   return zusaetze
 }
 
 /**
  * Überschneiden sich die Bereiche zweier Karten („Staffel 14–15", „Staffel 15–16"), steht dieselbe Staffelzahl auf beiden. Tragen mindestens zwei davon keinen eigenen Zusatz,
- * nennt jede ihren Namensabschnitt, sonst — wo `staffelFolgen` es belegt — ihre Folgen der geteilten Staffel („S15: Folge 49–84"); sonst bleiben sie, wie sie sind.
+ * nennt jede, was sie unterscheidet (`unterscheidung`: Folgen der geteilten Staffel, sonst Namensabschnitt); sonst bleiben sie, wie sie sind.
  * Karten mit „Teil N" unterscheiden sich schon, `schon` sind die Zusätze der gleichen Beschriftungen (`doppelteZusaetze`).
  */
-export function ueberlappendeZusaetze(teile: Eintrag[], nummern: Map<number, StaffelNummer>, schon: Map<number, string>): Map<number, string> {
+export function ueberlappendeZusaetze(teile: Eintrag[], nummern: Map<number, StaffelNummer>, schon: Map<number, string>, text: FolgenText): Map<number, string> {
   const jeStaffel = new Map<number, Eintrag[]>()
   for (const e of teile) {
     const nr = nummern.get(e.id)
@@ -50,10 +77,8 @@ export function ueberlappendeZusaetze(teile: Eintrag[], nummern: Map<number, Sta
   for (const [staffel, karten] of [...jeStaffel].sort(([a], [b]) => a - b)) {
     const offen = karten.filter(ohneZusatz)
     if (offen.length < 2) continue
-    const abschnitte = offen.map((e) => letzterAbschnitt(e.voll))
-    const bereiche = offen.map((e) => e.folgen?.find(([s]) => s === staffel))
-    if (abschnitte.every(Boolean) && new Set(abschnitte).size === offen.length) offen.forEach((e, i) => zusaetze.set(e.id, abschnitte[i]!))
-    else if (bereiche.every(Boolean)) offen.forEach((e, i) => zusaetze.set(e.id, `S${staffel}: Folge ${bereiche[i]![1]}–${bereiche[i]![2]}`))
+    const unterschiede = unterscheidung(offen, staffel, nummern, text)
+    if (unterschiede) offen.forEach((e, i) => zusaetze.set(e.id, unterschiede[i]!))
   }
   return zusaetze
 }
@@ -64,8 +89,9 @@ export function doppelteZusaetzeDerReihe(
   reihenName: string,
   staffelLabel: Map<number, string>,
   nummern: Map<number, StaffelNummer>,
+  text: FolgenText,
 ): Map<number, string> {
   const namen = (m: FranchiseMember) => teilNamen(m, reihenName, true, staffelLabel.get(m.id))
   const teile = haupt.map((m) => ({ id: m.id, ...namen(m), folgen: m.staffelFolgen }))
-  return ueberlappendeZusaetze(teile, nummern, doppelteZusaetze(teile, nummern))
+  return ueberlappendeZusaetze(teile, nummern, doppelteZusaetze(teile, nummern, text), text)
 }

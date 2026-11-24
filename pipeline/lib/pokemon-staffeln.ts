@@ -41,6 +41,8 @@ export function staffelEnden(grenzen: StaffelGrenzen[]): Map<number, number> {
 
 /**
  * Kennung → `[[Staffel, von, bis], …]` der abgeschlossenen Staffeln, die ein zweiter Titel ebenfalls trägt (Pokémon Staffel 15: zwei Titel).
+ * Gezählt wird **innerhalb der deutschen Staffel** (Staffel 16: 1–11, 12–25, 26–45), nicht in der Titelnummer, die in jedem Titel wieder bei 1 beginnt;
+ * die Reihenfolge der Titel in der Datei ist die der Folgen (belegt gegen TMDB: `check-pokemon-staffeln.ts`).
  * Die Reihenliste nennt damit, welche Folgen der geteilten Staffel eine Karte hat (`reihen-doppelt.ts`).
  * Je Datei für sich: Horizonte zählt seine Staffeln 1 ff. selbst, das ist nicht die Hauptserie.
  */
@@ -52,8 +54,15 @@ export function geteilteInGrenzen(grenzen: StaffelGrenzen[]): Map<number, Staffe
   const titelJeStaffel = new Map<number, number>()
   for (const t of grenzen) for (const s of t.staffeln) titelJeStaffel.set(s.nr, (titelJeStaffel.get(s.nr) ?? 0) + 1)
   const ergebnis = new Map<number, StaffelFolgen>()
+  const davor = new Map<number, number>() // Staffel → Folgen der Titel, die in der Datei vor dem aktuellen stehen
   for (const t of grenzen) {
-    const zeilen = t.staffeln.filter((s) => s.bis !== undefined && (titelJeStaffel.get(s.nr) ?? 0) > 1).map((s): StaffelFolgen[number] => [s.nr, s.von, s.bis!])
+    const zeilen: StaffelFolgen = []
+    for (const s of t.staffeln.filter((x) => x.bis !== undefined && (titelJeStaffel.get(x.nr) ?? 0) > 1)) {
+      const anfang = davor.get(s.nr) ?? 0
+      const ende = anfang + s.bis! - s.von + 1
+      zeilen.push([s.nr, anfang + 1, ende])
+      davor.set(s.nr, ende)
+    }
     if (zeilen.length) ergebnis.set(t.anilistId, zeilen)
   }
   return ergebnis

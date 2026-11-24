@@ -8,7 +8,9 @@ export function ZeilenName({ nr, rest, voll, kurz, unterschied }: { nr: StaffelN
   return (
     <>
       <b className="font-semibold">{staffelKurz(nr)}</b>
-      {zusatz ? ` · ${zusatz}` : ''}
+      {zusatz ? ' · ' : ''}
+      {/* Der Folgenbereich bricht als Ganzes um, nie mitten in „Folge 12–25“ (Karte 120 px breit). */}
+      {zusatz && zusatz === unterschied ? <span className="whitespace-nowrap">{zusatz}</span> : zusatz}
     </>
   )
 }

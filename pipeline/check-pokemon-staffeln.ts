@@ -114,9 +114,29 @@ pruefe('Fehlende Datei ergibt eine leere Liste', ladeStaffelGrenzen(join(ordner,
 
 /* Geteilte Staffeln (`staffelFolgen` an `franchises.json`): Staffel 15, 16 und 25 stehen in je mehr als einem Titel; Horizonte zählt für sich. */
 const geteilt = geteilteStaffeln([POKEMON_STAFFELN])
-pruefe('Geteilte Staffeln: Titel 9107 trägt Staffel 15 ab Folge 49', JSON.stringify(geteilt.get(9107)) === '[[15,49,84]]', JSON.stringify(geteilt.get(9107)))
-pruefe('Geteilte Staffeln: Titel 14093 trägt Staffel 15 und 16', JSON.stringify(geteilt.get(14093)) === '[[15,1,13],[16,14,24]]', JSON.stringify(geteilt.get(14093)))
-pruefe('Geteilte Staffeln: Staffel 25 in zwei Titeln', geteilt.get(112153)?.[0]?.[0] === 25 && geteilt.get(158870)?.[0]?.[0] === 25)
+const erwartetGeteilt: Record<number, string> = {
+  9107: '[[15,1,36]]',
+  14093: '[[15,37,49],[16,1,11]]',
+  17115: '[[16,12,25]]',
+  17873: '[[16,26,45]]',
+  112153: '[[25,1,46]]',
+  158870: '[[25,47,57]]',
+}
+for (const [id, soll] of Object.entries(erwartetGeteilt)) pruefe(`Geteilte Staffeln: Titel ${id} zählt innerhalb der Staffel ${soll}`, JSON.stringify(geteilt.get(Number(id))) === soll, JSON.stringify(geteilt.get(Number(id))))
+{
+  /* Gegenprobe gegen TMDB: der erste deutsche Folgentitel jedes Teils ist der Titel der Folge, bei der die Zählung innerhalb der Staffel ihn beginnen lässt. */
+  const tmdb = (JSON.parse(readFileSync('data/tmdb-folgen.json', 'utf8')) as Record<string, { folgen: { s: number; e: number; titel: string }[] }>)['527']!.folgen
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9äöüß]/g, '')
+  for (const t of grenzen) {
+    const titel = JSON.parse(readFileSync(`public/data/folgen/${t.anilistId}.json`, 'utf8')) as { f: [number, string][] }
+    for (const [nr, anfang] of geteilt.get(t.anilistId) ?? []) {
+      const von = t.staffeln.find((s) => s.nr === nr)!.von
+      const eigen = titel.f.find(([n]) => n === von)?.[1] ?? ''
+      const fremd = tmdb.find((x) => x.s === nr && x.e === anfang)?.titel ?? ''
+      pruefe(`Geteilte Staffeln: ${t.anilistId} beginnt Staffel ${nr} bei Folge ${anfang} („${eigen}“ gegen TMDB „${fremd}“)`, norm(eigen) === norm(fremd) || fremd.startsWith('Folge '))
+    }
+  }
+}
 pruefe('Geteilte Staffeln: ein Titel allein in seiner Staffel fehlt', !geteilt.has(527) && !geteilt.has(19291))
 pruefe('Geteilte Staffeln: Horizonte (eigene Zählung) teilt nichts mit der Hauptserie', geteilteStaffeln().get(158871) === undefined)
 

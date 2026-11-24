@@ -31,16 +31,28 @@ function antworter(dist) {
   }
 }
 
+/**
+ * Referenzschrift: Liberation Sans hat die Maße von Arial und liegt nahe an Segoe UI und Roboto, den Schriften der Handys. Der CI-Läufer
+ * nähme DejaVu Sans (rund 15 % breiter), bei der jede Fahne dieser Länge umbricht; das sagt nichts über die Seite auf einem Handy.
+ */
+const REFERENZ_CSS = ":root{--ak-schrift-text:'Liberation Sans',Arial,sans-serif!important}"
+
 /** Setzt die erste Fahne auf die Texte, misst die Höhe je Text und stellt den Text wieder her. Läuft im Browser. */
 function messeFahne({ selektor, kurz, lang }) {
   const fahne = document.querySelector(selektor)
   if (!fahne) return null
+  const breiteIn = (rest) => {
+    const c = document.createElement('canvas').getContext('2d')
+    c.font = `800 11px "Liberation Sans", ${rest}`
+    return c.measureText(lang).width
+  }
+  const schriftDa = breiteIn('monospace') === breiteIn('serif')
   const vorher = fahne.textContent
   const hoehe = (text) => {
     fahne.textContent = text
     return Math.round(fahne.getBoundingClientRect().height * 10) / 10
   }
-  const ergebnis = { kurzHoehe: hoehe(kurz), langHoehe: hoehe(lang), spalte: Math.round(fahne.parentElement.getBoundingClientRect().width) }
+  const ergebnis = { schriftDa, kurzHoehe: hoehe(kurz), langHoehe: hoehe(lang), spalte: Math.round(fahne.parentElement.getBoundingClientRect().width) }
   fahne.textContent = vorher
   return ergebnis
 }
@@ -60,6 +72,11 @@ async function neueSeite(browser, breite, dist) {
   })
   const seite = await kontext.newPage()
   await seite.route('**/*', antworter(dist))
+  await seite.addInitScript((css) => {
+    const hang = () => document.documentElement.appendChild(Object.assign(document.createElement('style'), { textContent: css }))
+    if (document.documentElement) hang()
+    else document.addEventListener('DOMContentLoaded', hang)
+  }, REFERENZ_CSS)
   return seite
 }
 

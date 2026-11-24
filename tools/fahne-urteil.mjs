@@ -7,11 +7,13 @@
 export const RUNDUNG = 1
 
 /**
- * `m`: { kurzHoehe (Fahne mit kurzem Text, eine Zeile), langHoehe (Fahne mit „Neu bei Prime Video“), breite (Fensterbreite) }.
+ * `m`: { kurzHoehe (Fahne mit kurzem Text, eine Zeile), langHoehe (Fahne mit „Neu bei Prime Video“), breite (Fensterbreite),
+ * schriftDa (Referenzschrift Liberation Sans ist installiert; sonst misst die Probe mit einer anderen Schrift) }.
  * Gibt die Fehlertexte zurück; leer = die Fahne bleibt einzeilig.
  */
 export function urteilFahne(m) {
   const f = []
+  if (m.schriftDa !== true) f.push(`${m.breite} px: Referenzschrift Liberation Sans fehlt, Messung wäre schriftabhängig`)
   if (!(m.kurzHoehe > 0)) f.push(`${m.breite} px: Fahne mit kurzem Text hat keine Höhe (${m.kurzHoehe}), Messung ungültig`)
   else if (m.langHoehe > m.kurzHoehe + RUNDUNG) f.push(`${m.breite} px: Fahne bricht um (${m.langHoehe} px statt ${m.kurzHoehe} px)`)
   return f

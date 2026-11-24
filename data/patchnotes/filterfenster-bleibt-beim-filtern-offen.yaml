@@ -1,3 +1,3 @@
 kategorie: bugfix
-text: Filterfenster bleibt beim Filtern offen
-untertitel: Auch wenn ein Filter zurückgesetzt wird, in der Datenbank
+text: Filterfenster der Datenbank bleibt beim Filtern offen
+untertitel: Vorher schloss es sich beim dritten Tipp auf einen Filter

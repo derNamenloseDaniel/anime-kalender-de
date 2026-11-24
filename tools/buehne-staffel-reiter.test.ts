@@ -9,6 +9,8 @@ import { fileURLToPath } from 'node:url'
 import type { FranchiseMember, Release, Title } from '../shared/types.ts'
 import { lageVon } from '../web/buehne/mockups/staffel-lage.ts'
 import { reiterVon } from '../web/buehne/mockups/staffel-reiter-liste.ts'
+import '../web/buehne/mockups/staffel-abschnitt.tsx'
+import { mockupMit } from '../web/buehne/register.ts'
 
 const datei = fileURLToPath(new URL('../web/buehne/faelle.json', import.meta.url))
 const faelle = JSON.parse(readFileSync(datei, 'utf8')).faelle as Record<string, Record<string, unknown>>
@@ -57,10 +59,16 @@ assert.equal(reiterVon(offen(10852), teile.slice(0, 0), 'Pokémon', titel).lengt
 // Eine einzelne Horizonte-Staffel ohne Geschwister zeigt keine Reiter.
 assert.equal(reiterVon(offen(14839), teile, 'Pokémon', [offen(14839)]).length, 0, 'ein Reiter allein')
 
-// Zustandsmarke je Reiter am Stichtag des Falls (2026-11-23): Horizonte 4 läuft (RTL+ seit 20.11., Ende offen), 1 bis 3 nicht
-// (die Fernsehreihe hat Folge 136 schon am 21.11. gesendet); Hauptserie: 23–25 läuft, 1–5 kommt (Box), 25 ohne Marke.
-const stichtag = '2026-11-23'
+// Zustandsmarke je Reiter am Stichtag des Mockups (`zeiten` in staffel-abschnitt.tsx, 2026-11-24): Horizonte 4 läuft (RTL+ seit
+// 20.11., Ende offen), 1 bis 3 nicht (die Fernsehreihe hat Folge 136 schon am 21.11. gesendet); Hauptserie: 23–25 läuft, 1–5 kommt
+// (Box), 25 ohne Marke.
+// Der Stichtag kommt aus der angemeldeten Mockup-Definition: fehlt `zeiten`, gilt die Uhr der Bühne (11.10.) und der Test wird rot.
+const erstesZeit = Object.values(mockupMit('staffel-abschnitt')?.zeiten ?? {})[0]
+assert.equal(erstesZeit?.slice(0, 10), '2026-11-24', 'Mockup staffel-abschnitt braucht zeiten auf den 24.11.2026')
+const stichtag = erstesZeit!.slice(0, 10)
 const releases = fall['releases.json'] as Release[]
+// Zur Uhr der Bühne (faelle.heute, 11.10.) wäre Staffel 4 noch angekündigt: darum trägt das Mockup seinen Stichtag selbst.
+assert.equal(lageVon(offen(14839), releases.filter((r) => r.titleId === 14839), '2026-10-11'), 'kommt', 'Staffel 4 vor dem Start')
 const lage = (id: number) => lageVon(offen(id), releases.filter((r) => r.titleId === id), stichtag)
 assert.deepEqual([26469, 26470, 26471, 14839].map(lage), ['sonst', 'sonst', 'sonst', 'laeuft'], 'Horizonte: nur Staffel 4 läuft')
 assert.deepEqual([483, 1349, 10852, 14838].map(lage), ['kommt', 'sonst', 'laeuft', 'sonst'], 'Hauptserie')

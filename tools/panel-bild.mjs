@@ -135,122 +135,132 @@ async function messeUeberlauf(kasten) {
   }))
 }
 
-async function main() {
-  if (!distPruefen(WURZEL)) return
-  const ids = gewaehlteIds()
-
-  const browser = await chromium.launch()
-  const seite = await browser.newPage({ viewport: { width: 560, height: 1200 } })
-
+/**
+  Alles unter der erfundenen Adresse kommt aus `dist/`. Cover und Bilder liegen
+  bei AniList und werden abgewiesen statt geholt — sie sagen nichts über das
+  Layout, kosten aber jedes Mal Zeit und einen fremden Abruf.
+*/
+async function beantworteAnfrage(route) {
+  const url = new URL(route.request().url())
   /*
-    Alles unter der erfundenen Adresse kommt aus `dist/`. Cover und Bilder liegen
-    bei AniList und werden abgewiesen statt geholt — sie sagen nichts über das
-    Layout, kosten aber jedes Mal Zeit und einen fremden Abruf.
+    `about:blank` muss durch — der Sprung dorthin setzt die Anwendung zwischen
+    zwei Titeln zurück. Wurde er mit abgewiesen, blieb die Seite danach in
+    einem Zustand, in dem das Panel nie erschien.
   */
-  await seite.route('**/*', async (route) => {
-    const url = new URL(route.request().url())
-    /*
-      `about:blank` muss durch — der Sprung dorthin setzt die Anwendung zwischen
-      zwei Titeln zurück. Wurde er mit abgewiesen, blieb die Seite danach in
-      einem Zustand, in dem das Panel nie erschien.
-    */
-    if (url.protocol !== 'http:' && url.protocol !== 'https:') return route.continue()
-    /*
-      **Fremde Bilder werden beantwortet, nicht abgewiesen.**
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return route.continue()
+  /*
+    **Fremde Bilder werden beantwortet, nicht abgewiesen.**
 
-      Die Cover liegen bei AniList. Ein `route.abort()` sparte den Abruf, warf
-      aber je Bild einen Konsolenfehler — sechzig Stück in der Datenbank-Ansicht,
-      und die Fehlerzählung dieses Werkzeugs war damit wertlos. Ein
-      Einpunkt-PNG kostet nichts und hält die Konsole sauber für die Fehler, um
-      die es geht.
-    */
-    if (url.hostname !== 'ak.test') {
-      return route.fulfill({ status: 200, contentType: 'image/png', body: EIN_PUNKT })
-    }
-    const rel = url.pathname === '/' ? '/index.html' : url.pathname
-    const datei = path.join(DIST, rel)
-    if (!datei.startsWith(DIST) || !existsSync(datei)) return route.fulfill({ status: 404, body: '' })
-    return route.fulfill({
-      status: 200,
-      contentType: TYPEN[path.extname(datei)] ?? 'application/octet-stream',
-      body: await readFile(datei),
-    })
+    Die Cover liegen bei AniList. Ein `route.abort()` sparte den Abruf, warf
+    aber je Bild einen Konsolenfehler — sechzig Stück in der Datenbank-Ansicht,
+    und die Fehlerzählung dieses Werkzeugs war damit wertlos. Ein
+    Einpunkt-PNG kostet nichts und hält die Konsole sauber für die Fehler, um
+    die es geht.
+  */
+  if (url.hostname !== 'ak.test') {
+    return route.fulfill({ status: 200, contentType: 'image/png', body: EIN_PUNKT })
+  }
+  const rel = url.pathname === '/' ? '/index.html' : url.pathname
+  const datei = path.join(DIST, rel)
+  if (!datei.startsWith(DIST) || !existsSync(datei)) return route.fulfill({ status: 404, body: '' })
+  return route.fulfill({
+    status: 200,
+    contentType: TYPEN[path.extname(datei)] ?? 'application/octet-stream',
+    body: await readFile(datei),
   })
+}
 
-  const hoehen = []
-  const ohneKasten = []
-  for (const id of ids) {
-    for (const thema of ['dunkel', 'hell']) {
-      await seite.emulateMedia({ colorScheme: thema === 'dunkel' ? 'dark' : 'light' })
-      /*
-        Erst auf eine andere Adresse, dann auf die gewünschte: Ein reiner
-        Hash-Wechsel lädt die Seite nicht neu, und die zweite Aufnahme zeigte
-        sonst den Titel der ersten.
-      */
-      await seite.goto('about:blank')
-      /*
-        Über die Datenbank-Ansicht, nicht über den Kalender: Titel ohne Termin
-        stehen nicht in `titles-core.json`, und dort würde das Panel nie
-        erscheinen. Die Datenbank lädt `titles.json` nach — also alle.
-      */
-      await seite.goto(`http://ak.test/#/${WOCHE ? 'woche' : 'datenbank'}?t=${akVon(id)}`, { waitUntil: 'networkidle' })
-      const panel = seite.locator('[data-panel="titel"]')
-      try {
-        await panel.waitFor({ state: 'visible', timeout: 15_000 })
-      } catch {
-        /*
-          Kein Panel heißt fast immer: Der Titel steht nicht im Hauptbestand,
-          sondern in `ohne-synchro.json`. Seit dem 25.09.2026 legt das Werkzeug
-          dann den Schalter „Anime ohne deutsche Synchro" um — wie Daniel es für
-          sein Bild von Magic Knight Rayearth (2026) getan hat — und versucht es
-          erneut. Erst wenn auch das nichts öffnet, sagt es das und geht weiter.
-        */
-        let offen = false
-        const schalter = seite.getByLabel('Anime ohne deutsche Synchro')
-        if (await schalter.count()) {
-          await schalter.first().check({ force: true })
-          try {
-            await panel.waitFor({ state: 'visible', timeout: 15_000 })
-            offen = true
-          } catch {
-            /* Auch dort nicht — dann gibt es den Titel nicht. */
-          }
-        }
-        if (!offen) {
-          console.log(`  – ${id}: kein Panel (weder im Hauptbestand noch unter „ohne Synchro")`)
-          break
-        }
-      }
-      /* Der Kasten — die Antwort auf „wann, wie weit, wo" — trägt die Marke `data-kasten`; ohne Inhalt entfällt er (kasten-leer.tsx). */
-      const kasten = panel.locator('[data-kasten] > section')
-      if (!(await kasten.count())) {
-        if (thema === 'dunkel') ohneKasten.push(id)
-        await panelBild(panel, id, thema)
-        continue
-      }
-      await kasten.waitFor({ state: 'visible', timeout: 15_000 }).then(() => pruefeNichtVorgescrollt(panel, id))
-      const box = await kasten.boundingBox()
-      const ueberlauf = await messeUeberlauf(kasten)
-      if (thema === 'dunkel') {
-        hoehen.push({
-          id,
-          hoehe: Math.round(box?.height ?? 0),
-          ueberlauf: Math.max(ueberlauf.innen - ueberlauf.sichtbar, ueberlauf.raus, ueberlauf.pillen),
-        })
-      }
-      await panelBild(panel, id, thema)
+/**
+  Kein Panel heißt fast immer: Der Titel steht nicht im Hauptbestand,
+  sondern in `ohne-synchro.json`. Seit dem 25.09.2026 legt das Werkzeug
+  dann den Schalter „Anime ohne deutsche Synchro" um — wie Daniel es für
+  sein Bild von Magic Knight Rayearth (2026) getan hat — und versucht es
+  erneut. Erst wenn auch das nichts öffnet, sagt es das und geht weiter.
+*/
+async function oeffneOhneSynchro(seite, panel) {
+  const schalter = seite.getByLabel('Anime ohne deutsche Synchro')
+  if (!(await schalter.count())) return false
+  await schalter.first().check({ force: true })
+  try {
+    await panel.waitFor({ state: 'visible', timeout: 15_000 })
+    return true
+  } catch {
+    /* Auch dort nicht — dann gibt es den Titel nicht. */
+    return false
+  }
+}
+
+/** Öffnet das Panel des Titels in der Wunschfarbgebung; `null` (mit Meldung), wenn es auch über den Schalter nicht erscheint. */
+async function oeffnePanel(seite, id, thema) {
+  await seite.emulateMedia({ colorScheme: thema === 'dunkel' ? 'dark' : 'light' })
+  /*
+    Erst auf eine andere Adresse, dann auf die gewünschte: Ein reiner
+    Hash-Wechsel lädt die Seite nicht neu, und die zweite Aufnahme zeigte
+    sonst den Titel der ersten.
+  */
+  await seite.goto('about:blank')
+  /*
+    Über die Datenbank-Ansicht, nicht über den Kalender: Titel ohne Termin
+    stehen nicht in `titles-core.json`, und dort würde das Panel nie
+    erscheinen. Die Datenbank lädt `titles.json` nach — also alle.
+  */
+  await seite.goto(`http://ak.test/#/${WOCHE ? 'woche' : 'datenbank'}?t=${akVon(id)}`, { waitUntil: 'networkidle' })
+  const panel = seite.locator('[data-panel="titel"]')
+  try {
+    await panel.waitFor({ state: 'visible', timeout: 15_000 })
+  } catch {
+    if (!(await oeffneOhneSynchro(seite, panel))) {
+      console.log(`  – ${id}: kein Panel (weder im Hauptbestand noch unter „ohne Synchro")`)
+      return null
     }
   }
+  return panel
+}
 
-  await schliesse(browser, seite, ids)
+/** Misst und bildet einen Titel in einer Farbgebung ab; `erg` sammelt Höhen (nur dunkel) und Titel ohne Kasten. */
+async function messeTitelInThema(panel, id, thema, erg) {
+  /* Der Kasten — die Antwort auf „wann, wie weit, wo" — trägt die Marke `data-kasten`; ohne Inhalt entfällt er (kasten-leer.tsx). */
+  const kasten = panel.locator('[data-kasten] > section')
+  if (!(await kasten.count())) {
+    if (thema === 'dunkel') erg.ohneKasten.push(id)
+    await panelBild(panel, id, thema)
+    return
+  }
+  await kasten.waitFor({ state: 'visible', timeout: 15_000 }).then(() => pruefeNichtVorgescrollt(panel, id))
+  const box = await kasten.boundingBox()
+  const ueberlauf = await messeUeberlauf(kasten)
+  if (thema === 'dunkel') {
+    erg.hoehen.push({
+      id,
+      hoehe: Math.round(box?.height ?? 0),
+      ueberlauf: Math.max(ueberlauf.innen - ueberlauf.sichtbar, ueberlauf.raus, ueberlauf.pillen),
+    })
+  }
+  await panelBild(panel, id, thema)
+}
 
-  /*
-    Die Mindesthöhe aus `antwort-kasten.tsx` — 11rem (176 px) für Kästen mit Nebenzeile oder Pillen; „fertig"/„film" ohne Nebenzeile darf kleiner sein
-    (Daniel, 07.10.2026). Gemessen 14.10.2026: ein Film ohne Weg (nur Überschrift) ist 70 px hoch (z. B. 760, 997) — die Prüfung gilt für die
-    Standardtitel mit Pillen, nicht für solche Filme.
-  */
-  const MINDEST = 160
+/** Alle Titel, je dunkel und hell; ein Titel ohne Panel wird übersprungen. */
+async function messeAlle(seite, ids) {
+  const erg = { hoehen: [], ohneKasten: [] }
+  for (const id of ids) {
+    for (const thema of ['dunkel', 'hell']) {
+      const panel = await oeffnePanel(seite, id, thema)
+      if (!panel) break
+      await messeTitelInThema(panel, id, thema, erg)
+    }
+  }
+  return erg
+}
 
+/**
+  Die Mindesthöhe aus `antwort-kasten.tsx` — 11rem (176 px) für Kästen mit Nebenzeile oder Pillen; „fertig"/„film" ohne Nebenzeile darf kleiner sein
+  (Daniel, 07.10.2026). Gemessen 14.10.2026: ein Film ohne Weg (nur Überschrift) ist 70 px hoch (z. B. 760, 997) — die Prüfung gilt für die
+  Standardtitel mit Pillen, nicht für solche Filme.
+*/
+const MINDEST = 160
+
+/** Meldet die Höhen und setzt den Exit-Code, wenn etwas hinausragt, zu klein ist oder nichts gemessen wurde. */
+function meldeErgebnis({ hoehen, ohneKasten }, ids) {
   console.log('\nAntwort-Kasten je Titel:')
   for (const h of hoehen) {
     console.log(`  ${h.id}: ${h.hoehe} px${h.ueberlauf > 0 ? `  ✕ ${h.ueberlauf} px ragen hinaus` : ''}`)
@@ -282,6 +292,19 @@ async function main() {
       `\n  ok  alles im Kasten, Mindesthöhe gehalten${einzig.size > 1 ? ` (${einzig.size} Höhen — der Regelfall ist ${MINDEST} px)` : ''}`,
     )
   }
+}
+
+async function main() {
+  if (!distPruefen(WURZEL)) return
+  const ids = gewaehlteIds()
+
+  const browser = await chromium.launch()
+  const seite = await browser.newPage({ viewport: { width: 560, height: 1200 } })
+  await seite.route('**/*', beantworteAnfrage)
+
+  const erg = await messeAlle(seite, ids)
+  await schliesse(browser, seite, ids)
+  meldeErgebnis(erg, ids)
 }
 
 await main()

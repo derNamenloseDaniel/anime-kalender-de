@@ -35,6 +35,8 @@ import { log, readJson, sleep, warn, writeJson } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
 import { ARCHIV_DIR, baueWarteschlange } from './lib/anisearch-warteschlange.ts'
 import { archivLuecken, verbinde, zurueckgestellt, type Auftrag, type WegListe, type Zeile } from './lib/anisearch-archiv-vorrang.ts'
+import { discFaellig, discTitelMitTermin } from './lib/disc-termin-frische.ts'
+import { todayIso } from '../shared/time.ts'
 import { nachFehlern } from './lib/anisearch-sperre.ts'
 import { decode, extractDescription } from './lib/anisearch-handlung.ts'
 import type { Release, Title } from '../shared/types.ts'
@@ -408,120 +410,137 @@ export function extractInfo(html: string): AnisearchInfo | undefined {
   )
   if (issues.length) info.issues = [...new Set(issues)]
 
-  // Die Flaggen der Sprachblöcke tragen `class` vor `alt`; die kleinen Flaggen
-  // in der Webseiten-Zeile umgekehrt. Daran lassen sie sich sauber trennen.
-  const marken = [...section.matchAll(/<img[^>]*class="flag" alt="([^"]+)" title="[^"]*">/g)]
-
-  const grenzen = marken.map((m) => m.index!)
-
-  for (const [i, marke] of marken.entries()) {
-    const block = section.slice(grenzen[i], grenzen[i + 1] ?? section.length)
-    const eintrag: AnisearchLanguage = { language: decode(marke[1]) }
-    const titel = /<strong class="f16">([\s\S]*?)<\/strong>/.exec(block)?.[1]
-    if (titel) eintrag.title = textOf(titel)
-    const nativ = /<\/strong>\s*<div class="grey">([\s\S]*?)<\/div>/.exec(block)?.[1]
-    if (nativ) eintrag.titleNative = textOf(nativ)
-
-    for (const feld of fields(block)) {
-      const wert = textOf(feld.value)
-      if (!wert && feld.key !== 'status') continue
-      switch (feld.label) {
-        case 'Status':
-          eintrag.status = wert.split(' ')[0] || undefined
-          // Das Lautsprecher-Symbol trennt synchronisiert von untertitelt.
-          if (/class="dubbed dubbed-1"/.test(feld.value)) eintrag.dubbed = true
-          break
-        case 'Veröffentlicht':
-          eintrag.released = wert
-          break
-        case 'Publisher':
-          eintrag.publisher = namesOf(feld.value)
-          break
-      }
-    }
-    info.languages.push(eintrag)
-  }
+  info.languages.push(...liesSprachbloecke(section))
 
   // Die allgemeinen Angaben stehen nicht vor dem ersten Sprachblock, sondern
   // im japanischen — Typ, Season und Studio folgen dort auf den Titel. Sie über
   // die ganze Infobox zu suchen ist deshalb nicht nur einfacher, sondern auch
   // haltbarer: Die Labels kommen genau einmal vor, „Studio" lässt sich nicht
   // mit dem blockweisen „Publisher" verwechseln.
-  for (const feld of fields(section)) {
-    const wert = textOf(feld.value)
-    switch (feld.label) {
-      case 'Typ': {
-        // „TV-Serie, 13 (~24 min, Gesamt 5 Std)" — oder mit Warnzeichen
-        // zwischen Komma und Zahl: „TV-Serie, ⚠ 12".
-        //
-        // Die Zahl muss unmittelbar hinter dem Komma gelesen werden, nicht als
-        // letzte Zahl des Feldes: Dahinter stehen bei den meisten Titeln noch
-        // Folgenlänge und Gesamtlaufzeit. Die erste Fassung nahm die letzte
-        // Zahl und fand die Folgenzahl deshalb nur bei den wenigen Titeln
-        // ohne Laufzeitangabe — 3 % statt 97 %.
-        const typ = /^\s*([^,<]+?)\s*,\s*(?:<span[^>]*>[\s\S]*?<\/span>\s*)*(\d+)/.exec(feld.value)
-        info.format = (typ?.[1] ?? wert.split(',')[0]).trim() || undefined
-        if (typ?.[2]) info.episodes = Number(typ[2])
-        if (/data-tooltip="Episodenanzahl[^"]*"/.test(feld.value)) info.episodesEstimated = true
-        // Die Folgenlänge steht als maschinenlesbare Dauer daneben. Sie kostet
-        // nichts und beantwortet die Frage, die nach „wann" als Nächstes kommt.
-        const dauer = /<time datetime="PT(?:(\d+)H)?(?:(\d+)M)?"/.exec(feld.value)
-        if (dauer) {
-          const minuten = Number(dauer[1] ?? 0) * 60 + Number(dauer[2] ?? 0)
-          if (minuten > 0) info.runtimeMinutes = minuten
-        }
-        break
-      }
-      case 'Season':
-        info.season = wert
-        break
-      case 'Studio':
-        info.studios = namesOf(feld.value)
-        break
-      case 'Staff':
-        // „<a>Akio KAZUMI</a> (Direction)" — die Funktion steht hinter dem
-        // Link, nicht darin. Sie mitzunehmen kostet nichts und macht die
-        // Angabe erst brauchbar: Ein Regisseur ist etwas anderes als der
-        // Zeichner der Vorlage.
-        info.staff = [...feld.value.matchAll(/<a [^>]*>([\s\S]*?)<\/a>\s*(?:\(([^)]+)\))?/g)]
-          .map((m) => ({ name: textOf(m[1]), role: m[2] ? decode(m[2]).trim() : undefined }))
-          .filter((p) => p.name)
-        break
-      case 'Adaptiert von':
-        info.adaptedFrom = wert
-        break
-      case 'Ausstrahlung':
-        info.broadcast = wert
-        break
-      case 'Webseite':
-        info.websites = [...feld.value.matchAll(/<a [^>]*href="(https?:\/\/[^"]+)"[^>]*>([\s\S]*?)<\/a>/g)]
-          .map((m) => ({ name: textOf(m[2]), url: decode(m[1]) }))
-          .filter((w) => w.url)
-        break
-    }
-  }
+  for (const feld of fields(section)) setzeKopfFeld(info, feld)
 
   // Synonyme stehen hinter dem letzten Sprachblock und damit außerhalb des
   // Kopfes — deshalb hier über die ganze Infobox.
   const synonyme = fields(section).find((f) => f.label === 'Synonyme')
-  if (synonyme) {
-    /*
-      **Der Wert endet am `</div>`, nicht am Ende der Infobox.**
-
-      Synonyme sind das letzte Feld; `fields()` schneidet erst am nächsten Feld
-      oder am Abschnittsende, und dazwischen steht noch der Knopf „Alle
-      anzeigen". Ohne diesen Schnitt hängt er am **letzten** Synonym — gemessen
-      am 08.09.2026 bei 1.840 von 2.430 Einträgen im Bestand. Aufgefallen ist es
-      nie, weil das Feld bis dahin niemand gelesen hat.
-    */
-    const roh = synonyme.value.split('</div>')[0]!.replace(/<input[\s\S]*$/, '')
-    info.synonyms = textOf(roh)
-      .split(/,\s*/)
-      .map((s) => s.replace(/…mehr$/, '').trim())
-      .filter(Boolean)
-  }
+  if (synonyme) info.synonyms = liesSynonyme(synonyme.value)
 
   return info
+}
+
+/** Je Sprachflagge ein Eintrag; der Block reicht bis zur nächsten Flagge. */
+function liesSprachbloecke(section: string): AnisearchLanguage[] {
+  // Die Flaggen der Sprachblöcke tragen `class` vor `alt`; die kleinen Flaggen
+  // in der Webseiten-Zeile umgekehrt. Daran lassen sie sich sauber trennen.
+  const marken = [...section.matchAll(/<img[^>]*class="flag" alt="([^"]+)" title="[^"]*">/g)]
+  const grenzen = marken.map((m) => m.index!)
+  return marken.map((marke, i) =>
+    liesSprachblock(marke[1], section.slice(grenzen[i], grenzen[i + 1] ?? section.length)),
+  )
+}
+
+/** Titel, Status, Zeitraum und Publisher eines Sprachblocks. */
+function liesSprachblock(sprache: string, block: string): AnisearchLanguage {
+  const eintrag: AnisearchLanguage = { language: decode(sprache) }
+  const titel = /<strong class="f16">([\s\S]*?)<\/strong>/.exec(block)?.[1]
+  if (titel) eintrag.title = textOf(titel)
+  const nativ = /<\/strong>\s*<div class="grey">([\s\S]*?)<\/div>/.exec(block)?.[1]
+  if (nativ) eintrag.titleNative = textOf(nativ)
+
+  for (const feld of fields(block)) {
+    const wert = textOf(feld.value)
+    if (!wert && feld.key !== 'status') continue
+    switch (feld.label) {
+      case 'Status':
+        eintrag.status = wert.split(' ')[0] || undefined
+        // Das Lautsprecher-Symbol trennt synchronisiert von untertitelt.
+        if (/class="dubbed dubbed-1"/.test(feld.value)) eintrag.dubbed = true
+        break
+      case 'Veröffentlicht':
+        eintrag.released = wert
+        break
+      case 'Publisher':
+        eintrag.publisher = namesOf(feld.value)
+        break
+    }
+  }
+  return eintrag
+}
+
+/** Ein allgemeines Feld des Infobox-Kopfes in `info` eintragen. */
+function setzeKopfFeld(info: AnisearchInfo, feld: { label: string; value: string }): void {
+  const wert = textOf(feld.value)
+  switch (feld.label) {
+    case 'Typ':
+      setzeTyp(info, feld.value, wert)
+      break
+    case 'Season':
+      info.season = wert
+      break
+    case 'Studio':
+      info.studios = namesOf(feld.value)
+      break
+    case 'Staff':
+      // „<a>Akio KAZUMI</a> (Direction)" — die Funktion steht hinter dem
+      // Link, nicht darin. Sie mitzunehmen kostet nichts und macht die
+      // Angabe erst brauchbar: Ein Regisseur ist etwas anderes als der
+      // Zeichner der Vorlage.
+      info.staff = [...feld.value.matchAll(/<a [^>]*>([\s\S]*?)<\/a>\s*(?:\(([^)]+)\))?/g)]
+        .map((m) => ({ name: textOf(m[1]), role: m[2] ? decode(m[2]).trim() : undefined }))
+        .filter((p) => p.name)
+      break
+    case 'Adaptiert von':
+      info.adaptedFrom = wert
+      break
+    case 'Ausstrahlung':
+      info.broadcast = wert
+      break
+    case 'Webseite':
+      info.websites = [...feld.value.matchAll(/<a [^>]*href="(https?:\/\/[^"]+)"[^>]*>([\s\S]*?)<\/a>/g)]
+        .map((m) => ({ name: textOf(m[2]), url: decode(m[1]) }))
+        .filter((w) => w.url)
+      break
+  }
+}
+
+/** Format, Folgenzahl und Folgenlänge aus dem Feld „Typ". */
+function setzeTyp(info: AnisearchInfo, rohWert: string, wert: string): void {
+  // „TV-Serie, 13 (~24 min, Gesamt 5 Std)" — oder mit Warnzeichen
+  // zwischen Komma und Zahl: „TV-Serie, ⚠ 12".
+  //
+  // Die Zahl muss unmittelbar hinter dem Komma gelesen werden, nicht als
+  // letzte Zahl des Feldes: Dahinter stehen bei den meisten Titeln noch
+  // Folgenlänge und Gesamtlaufzeit. Die erste Fassung nahm die letzte
+  // Zahl und fand die Folgenzahl deshalb nur bei den wenigen Titeln
+  // ohne Laufzeitangabe — 3 % statt 97 %.
+  const typ = /^\s*([^,<]+?)\s*,\s*(?:<span[^>]*>[\s\S]*?<\/span>\s*)*(\d+)/.exec(rohWert)
+  info.format = (typ?.[1] ?? wert.split(',')[0]).trim() || undefined
+  if (typ?.[2]) info.episodes = Number(typ[2])
+  if (/data-tooltip="Episodenanzahl[^"]*"/.test(rohWert)) info.episodesEstimated = true
+  // Die Folgenlänge steht als maschinenlesbare Dauer daneben. Sie kostet
+  // nichts und beantwortet die Frage, die nach „wann" als Nächstes kommt.
+  const dauer = /<time datetime="PT(?:(\d+)H)?(?:(\d+)M)?"/.exec(rohWert)
+  if (dauer) {
+    const minuten = Number(dauer[1] ?? 0) * 60 + Number(dauer[2] ?? 0)
+    if (minuten > 0) info.runtimeMinutes = minuten
+  }
+}
+
+/** Die Synonyme aus dem Rohwert ihres Feldes. */
+function liesSynonyme(rohWert: string): string[] {
+  /*
+    **Der Wert endet am `</div>`, nicht am Ende der Infobox.**
+
+    Synonyme sind das letzte Feld; `fields()` schneidet erst am nächsten Feld
+    oder am Abschnittsende, und dazwischen steht noch der Knopf „Alle
+    anzeigen". Ohne diesen Schnitt hängt er am **letzten** Synonym — gemessen
+    am 08.09.2026 bei 1.840 von 2.430 Einträgen im Bestand. Aufgefallen ist es
+    nie, weil das Feld bis dahin niemand gelesen hat.
+  */
+  const roh = rohWert.split('</div>')[0]!.replace(/<input[\s\S]*$/, '')
+  return textOf(roh)
+    .split(/,\s*/)
+    .map((s) => s.replace(/…mehr$/, '').trim())
+    .filter(Boolean)
 }
 
 type Abruf =
@@ -645,7 +664,8 @@ async function main(): Promise<void> {
   log(`aniSearch-Lücke vorher: ${zaehle(vorher)}`)
 
   // Vorrang: Archivlücken des Hauptbestands, dann Auffrischung und Neues der ID-Brücke, mit --katalog zuletzt die Lücken des Katalogs.
-  const bisher = baueWarteschlange({ ids: ids.anisearch, titles, releases, cache, force: FORCE, limit: LIMIT, veraltet })
+  const discTitel = discTitelMitTermin(readJson('data/disc-ausgaben.json', {}), todayIso())
+  const bisher = baueWarteschlange({ ids: ids.anisearch, titles, releases, cache, force: FORCE, limit: LIMIT, veraltet, discFaellig: discFaellig(discTitel, todayIso()) })
   const queue = verbinde(
     vorher.haupt,
     bisher.map((t) => ({ asId: ids.anisearch[t.id]!, titelIds: [t.id] })),

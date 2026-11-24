@@ -34,12 +34,13 @@ export function rolleUm(zeile: HTMLElement | null, richtung: 'links' | 'rechts')
 
 /**
  * Kleiner Pfeil im seitlichen Innenabstand der Box neben der Reiterleiste. Die Box ist nur 16 px breit; die Trefferfläche (44 × 44)
- * reicht per `::after` über den Rand der Leiste. Ein deaktivierter Pfeil nimmt keine Treffer an, so bleibt der Reiter darunter bedienbar.
+ * ragt per `::after` mittig je 14 px nach innen (über den Rand der Leiste) und außen. Ein deaktivierter Pfeil ist gedimmt, tut nichts und
+ * behält seine Fläche (sonst wüchse sein Platz bei jedem Wechsel); nur dort überdeckt er 14 px vom Rand des ersten bzw. letzten Reiters.
  */
 export function ReiterPfeil({ richtung, modus, weitere, beiKlick }: { richtung: 'links' | 'rechts'; modus: PfeilModus; weitere: boolean; beiKlick: () => void }) {
   const { sichtbar, aktiv } = pfeilZustandVon(modus, weitere)
   if (!sichtbar) return null
-  const seite = richtung === 'links' ? 'left-0 after:left-0' : 'right-0 after:right-0'
+  const seite = richtung === 'links' ? 'left-0' : 'right-0'
   return (
     <button
       type="button"
@@ -47,7 +48,7 @@ export function ReiterPfeil({ richtung, modus, weitere, beiKlick }: { richtung: 
       aria-disabled={!aktiv}
       data-pfeil={richtung}
       onClick={aktiv ? beiKlick : undefined}
-      className={`absolute inset-y-0 z-20 grid w-4 place-items-center text-ak-text after:absolute after:top-1/2 after:h-11 after:w-11 after:-translate-y-1/2 after:content-[''] ${seite} ${aktiv ? 'cursor-pointer' : 'pointer-events-none opacity-30'}`}
+      className={`absolute inset-y-0 z-20 grid w-4 place-items-center text-ak-text after:absolute after:top-1/2 after:left-1/2 after:h-11 after:w-11 after:-translate-x-1/2 after:-translate-y-1/2 after:content-[''] ${seite} ${aktiv ? 'cursor-pointer' : 'opacity-30'}`}
     >
       <svg aria-hidden="true" viewBox="0 0 10 16" className="h-4 w-2.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d={richtung === 'links' ? 'M8 2 2 8l6 6' : 'M2 2l6 6-6 6'} />

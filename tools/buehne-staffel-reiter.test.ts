@@ -48,6 +48,7 @@ assert.equal(staffelLage(1, 82, true, [termin(40, '2026-11-23')], HEUTE), 'ruht'
 assert.equal(staffelLage(1, 82, true, [termin(83, '2026-11-30')], HEUTE), 'ruht', 'Termin hinter der Staffel')
 assert.equal(staffelLage(83, 118, true, [termin(82, '2026-11-30')], HEUTE), 'ruht', 'Termin vor der Staffel')
 assert.equal(staffelLage(83, 118, false, [termin(118, '2026-11-30')], HEUTE), 'kommt', 'letzte Folge der Staffel, noch keine deutsch')
+assert.equal(staffelLage(83, 118, false, [termin(83, '2026-11-30')], HEUTE), 'kommt', 'erste Folge der Staffel, noch keine deutsch')
 assert.equal(staffelLage(83, undefined, false, [termin(500, '2026-11-30')], HEUTE), 'kommt', 'offene Staffel ohne Ende')
 assert.equal(staffelLage(1, 82, false, [termin(40, '2026-11-30', { firstEpisodeNumber: undefined })], HEUTE), 'ruht', 'Termin ohne Folgennummer')
 const gezaehlt = { ...termin(40, '2026-11-30'), platform: 'tv', tvLetzteSichtung: '2026-11-20' } as unknown as Release
@@ -134,4 +135,4 @@ assert.deepEqual(Object.keys(def.varianten), ['A'])
 assert.deepEqual(def.varianten.A!.ersatz, {}, 'A ohne Ersatz')
 assert.ok(def.faelle.includes('pokemon-sammeltitel'), 'Fall pokemon-sammeltitel bleibt')
 
-console.log('buehne-staffel-reiter: ok (Reiter 5/3/2/0, Lage 13 Fälle, Startreiter 4, Kopfzeile 5, Tastatur 7, Reiterzeile, Pfeile, Mockup)')
+console.log('buehne-staffel-reiter: ok (Reiter 5/3/2/0, Lage 14 Fälle, Startreiter 4, Kopfzeile 5, Tastatur 7, Reiterzeile, Pfeile, Mockup)')

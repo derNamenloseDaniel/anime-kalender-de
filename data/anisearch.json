@@ -9934,7 +9934,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:01:55.506Z"
+    "fetchedAt": "2026-11-24T06:01:31.055Z"
   },
   "135": {
     "anisearchId": 193,
@@ -15189,6 +15189,10 @@
           "url": "https://www.wildbunch-germany.de/movie/chihiros-reise-ins-zauberland"
         },
         {
+          "name": "Cinetopia",
+          "url": "https://www.cinetopia.cl/amy_movie/el-viaje-de-chihiro/"
+        },
+        {
           "name": "Vertigofilms",
           "url": "https://vertigofilms.es/movie/el-viaje-de-chihiro/"
         },
@@ -15198,7 +15202,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:02:02.552Z"
+    "fetchedAt": "2026-11-24T06:01:38.216Z"
   },
   "200": {
     "anisearchId": 2650,
@@ -17579,7 +17583,7 @@
         "Detective Conan"
       ]
     },
-    "fetchedAt": "2026-10-25T04:02:09.688Z"
+    "fetchedAt": "2026-11-24T06:01:45.567Z"
   },
   "236": {
     "anisearchId": 1745,
@@ -35631,7 +35635,8 @@
           "dubbed": true,
           "released": "08.08.2003 - ?",
           "publisher": [
-            "Mediaset S.p.A."
+            "Mediaset S.p.A.",
+            "Dynit SRL"
           ]
         }
       ],
@@ -35682,7 +35687,7 @@
         "Yugi-Oh"
       ]
     },
-    "fetchedAt": "2026-10-25T04:02:16.764Z"
+    "fetchedAt": "2026-11-24T06:01:52.858Z"
   },
   "482": {
     "anisearchId": 2618,
@@ -39546,7 +39551,7 @@
         "Sailormoon"
       ]
     },
-    "fetchedAt": "2026-10-25T04:02:23.749Z"
+    "fetchedAt": "2026-11-24T06:02:00.023Z"
   },
   "531": {
     "anisearchId": 2150,
@@ -40739,7 +40744,7 @@
         "The Venus Wars"
       ]
     },
-    "fetchedAt": "2026-10-25T04:02:30.665Z"
+    "fetchedAt": "2026-11-24T06:02:07.162Z"
   },
   "545": {
     "anisearchId": 3490,
@@ -63842,7 +63847,7 @@
         "Shin Chan"
       ]
     },
-    "fetchedAt": "2026-10-25T04:02:37.630Z"
+    "fetchedAt": "2026-11-24T06:02:14.322Z"
   },
   "967": {
     "anisearchId": 3053,
@@ -107177,7 +107182,7 @@
         "Naruto: Hurricane Chronicles"
       ]
     },
-    "fetchedAt": "2026-10-25T04:02:44.711Z"
+    "fetchedAt": "2026-11-24T06:02:21.670Z"
   },
   "1736": {
     "anisearchId": 3358,
@@ -142744,7 +142749,7 @@
         "Robin Hood The Boyhood Adventures"
       ]
     },
-    "fetchedAt": "2026-10-25T04:02:51.667Z"
+    "fetchedAt": "2026-11-24T06:02:28.818Z"
   },
   "2544": {
     "anisearchId": 3263,
@@ -202749,7 +202754,7 @@
         "Vampire Knight: Season 2"
       ]
     },
-    "fetchedAt": "2026-10-25T04:02:58.608Z"
+    "fetchedAt": "2026-11-24T06:02:35.976Z"
   },
   "4756": {
     "anisearchId": 5375,
@@ -211896,7 +211901,12 @@
   "5231": {
     "anisearchId": 5069,
     "descriptionDe": "Mamoru Endou ist der Kapitän eines Fußballclubs, der kurz davor ist, aufgelöst zu werden. An seiner Schule lässt sich einfach keiner für Fußball begeistern und so bekommt der Club nicht einmal eine ganze Mannschaft zusammen, um gegen die übermächtige Teikoku-Schule antreten zu können. Doch als alle anderen schon fast aufgegeben haben, schöpft ihr Kapitän neue Hoffnung und startet eine Rekrutierungskampagne, denn von dem Spiel gegen Teikoku soll die Existenz des Fußballclubs abhängen … \n\nQuelle: www.anisearch.de/anime/5069",
-    "streams": [],
+    "streams": [
+      {
+        "provider": "amazon-de",
+        "url": "https://www.amazon.de/gp/video/detail/0L6FBMFTTP93YX6YEJBW6VICE7?ref_=atv_dl_rdr"
+      }
+    ],
     "info": {
       "languages": [
         {
@@ -211974,7 +211984,7 @@
         "Inazuma 11"
       ]
     },
-    "fetchedAt": "2026-10-25T04:03:05.556Z"
+    "fetchedAt": "2026-11-24T06:02:43.124Z"
   },
   "5232": {
     "anisearchId": 5267,
@@ -231440,12 +231450,12 @@
     "descriptionDe": "Sechs Monate sind vergangen, seit die »Strike Witches« Gallia in einem erfolgreichen Kampf gegen die Neuroi zurückerobert haben. Nach der Zerstörung des Nests wurde damit begonnen, Gallia wieder zu besiedeln. Doch bald schon erscheint ein noch größeres Nest oberhalb von Venezia und greift die wenigen Einheiten an, die vor Ort zur Verteidigung stationiert sind. Schnell erreicht die Nachricht das Fuso Imperium, woraufhin eine Rettungseinheit zusammengestellt wird, um die Überlebenden zu beschützen. Mio Sakamoto und Yoshika Miyafuji schließen sich diesem Rettungsteam sogleich an. Doch auch eine neue humanoide Form von Neuroi taucht erstmalig auf und scheint mit den Menschen kommunizieren zu wollen. Möchten sie Frieden schließen? \n\nQuelle: www.anisearch.de/anime/5278",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CHMH8ZJS?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/strike-witches"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CHMH8ZJS?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -231475,6 +231485,7 @@
           "language": "Deutsch",
           "title": "Strike Witches 2",
           "status": "Abgeschlossen",
+          "dubbed": true,
           "released": "03.10.2022 - 19.12.2022",
           "publisher": [
             "Crunchyroll",
@@ -231532,7 +231543,7 @@
         "Strike Witches: Season 2"
       ]
     },
-    "fetchedAt": "2026-10-25T04:03:12.480Z"
+    "fetchedAt": "2026-11-24T06:02:50.271Z"
   },
   "6383": {
     "anisearchId": 3060,
@@ -268487,7 +268498,7 @@
           "language": "Deutsch",
           "title": "Inazuma Eleven: The Movie - Team Oger greift an",
           "status": "Zukünftig",
-          "released": "2026",
+          "released": "2027",
           "publisher": [
             "AniMoon Publishing GmbH"
           ]
@@ -268541,7 +268552,7 @@
         "Inazuma Eleven: The Movie - The Ultimate Force Team Ogre Attacks!"
       ]
     },
-    "fetchedAt": "2026-10-25T04:03:19.411Z"
+    "fetchedAt": "2026-11-24T06:02:57.400Z"
   },
   "9040": {
     "anisearchId": 6401,
@@ -274783,7 +274794,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:03:26.347Z"
+    "fetchedAt": "2026-11-24T06:03:04.556Z"
   },
   "9515": {
     "anisearchId": 6511,
@@ -381658,7 +381669,12 @@
   "20623": {
     "anisearchId": 9439,
     "descriptionDe": "In »Parasyte: The Maxim« fallen Behälter mit Aliens auf die Erde und beginnen, die Menschen zu übernehmen und sie als Wirte zu missbrauchen. Einem der Aliens gelingt es aber nur, den rechten Arm eines Menschen zu übernehmen – den von Shin’ichi Izumi. So müssen sie lernen zu koexistieren, während die anderen Aliens der Reihe nach Menschen töten. Shin will sie daran hindern, doch Migi, sein Alien, ist da ganz anderer Ansicht. \n\nQuelle: www.anisearch.de/anime/9439",
-    "streams": [],
+    "streams": [
+      {
+        "provider": "adn-de",
+        "url": "https://animationdigitalnetwork.com/de/video/1354-parasyte-the-maxim"
+      }
+    ],
     "info": {
       "languages": [
         {
@@ -381763,7 +381779,7 @@
         "Parasitic Beasts"
       ]
     },
-    "fetchedAt": "2026-10-25T04:03:33.302Z"
+    "fetchedAt": "2026-11-24T06:03:11.715Z"
   },
   "20624": {
     "anisearchId": 9482,
@@ -394709,7 +394725,7 @@
         "Kangoku Gakuen"
       ]
     },
-    "fetchedAt": "2026-10-25T04:03:40.232Z"
+    "fetchedAt": "2026-11-24T06:03:18.863Z"
   },
   "20808": {
     "anisearchId": 9789,
@@ -448534,10 +448550,6 @@
       {
         "provider": "primevideo-channel-crunchyroll-de",
         "url": "https://www.amazon.de/dp/B0CHLHTT1W?tag=anisearch.de-21"
-      },
-      {
-        "provider": "crunchyroll",
-        "url": "http://www.crunchyroll.com/miss-kobayashis-dragon-maid/episode-1-the-strongest-maid-in-history-tohru-well-she-is-a-dragon-776814?ssid=332108"
       }
     ],
     "info": {
@@ -448641,7 +448653,7 @@
         "The Dragon Maid of Kobayashi-san"
       ]
     },
-    "fetchedAt": "2026-10-25T04:03:47.180Z"
+    "fetchedAt": "2026-11-24T06:03:26.016Z"
   },
   "21777": {
     "anisearchId": 11331,
@@ -465950,13 +465962,17 @@
         {
           "name": "Bclover",
           "url": "https://bclover.jp/"
+        },
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/black-clover/"
         }
       ],
       "synonyms": [
         "Black Clover TV"
       ]
     },
-    "fetchedAt": "2026-10-25T04:03:54.232Z"
+    "fetchedAt": "2026-11-24T06:03:33.314Z"
   },
   "97947": {
     "anisearchId": 10197,
@@ -472159,7 +472175,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:04:01.170Z"
+    "fetchedAt": "2026-11-24T06:03:40.465Z"
   },
   "98332": {
     "anisearchId": 12220,
@@ -490635,7 +490651,7 @@
         "Recommendation of the Wonderful Virtual Life"
       ]
     },
-    "fetchedAt": "2026-10-25T04:04:08.101Z"
+    "fetchedAt": "2026-11-24T06:03:47.614Z"
   },
   "99727": {
     "anisearchId": 12681,
@@ -497823,7 +497839,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:04:15.036Z"
+    "fetchedAt": "2026-11-24T06:03:54.763Z"
   },
   "100400": {
     "anisearchId": 12919,
@@ -518247,10 +518263,6 @@
     "descriptionDe": "Schon seit längst vergangenen Zeiten gibt es Legenden von menschenfressenden Dämonen, die nachts im Wald ihr Unwesen treiben oder gar in fremde Häuser eindringen und die Bewohner verspeisen. Weiterhin wird überliefert, dass deshalb die Demon Slayer durch das Land ziehen, um solch blutdurstige Dämonen zu jagen und die Bevölkerung zu schützen. Für den jungen Tanjirou wird das bald zur Realität.\n\nSeit dem Tod seines Vaters hat Tanjirou es sich als ältester Sohn zur Aufgabe gemacht, seine Familie über Wasser zu halten; trotz des harten Lebens auf einem abgelegenen Berg sind er und seine vielen Geschwister samt ihrer Mutter glücklich. Doch diese Glückseligkeit wird mit einem Mal zerstört, als Tanjirou seine Familie abgeschlachtet vorfindet. Einzig und allein seine Schwester Nezuko scheint noch schwache Lebenszeichen von sich zu geben und obgleich sie sich in einen Dämon verwandelt hat, zeigt sie zudem überraschenderweise noch Zeichen menschlicher Emotionen und Gedanken. Um eine Möglichkeit zu finden, seine Schwester wieder in einen Menschen zu verwandeln, schließt sich Tanjirou der Demon-Slayer-Truppe an. \n\nQuelle: www.anisearch.de/anime/13658",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CG79DT6Y?tag=anisearch.de-21"
-      },
-      {
         "provider": "primevideo-channel-aniverse-de",
         "url": "https://www.amazon.de/dp/B0FTTR1XB9?tag=anisearch.de-21"
       },
@@ -518265,6 +518277,10 @@
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/demon-slayer-kimetsu-no-yaiba"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CG79DT6Y?tag=anisearch.de-21"
       },
       {
         "provider": "rtl-plus",
@@ -518387,7 +518403,7 @@
         "KnY"
       ]
     },
-    "fetchedAt": "2026-10-25T04:04:29.223Z"
+    "fetchedAt": "2026-11-24T06:04:09.218Z"
   },
   "101923": {
     "anisearchId": 11917,
@@ -537244,7 +537260,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:04:21.980Z"
+    "fetchedAt": "2026-11-24T06:04:01.925Z"
   },
   "103872": {
     "anisearchId": 13777,
@@ -559267,7 +559283,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:04:36.149Z"
+    "fetchedAt": "2026-11-24T06:04:16.361Z"
   },
   "107447": {
     "anisearchId": 14144,
@@ -576441,12 +576457,12 @@
     "descriptionDe": "In »Attack on Titan: Final Season«, der vierten und letzten Staffel der Anime-Adaption zu Hajime Isayamas gleichnamigem Manga, folgen wir Eren, Mikasa, Armin und dem Rest des Aufklärungs­trupps ein letztes Mal auf ihren Abenteuern inner- und außerhalb der Mauern ihrer kleinen Welt. Nachdem sie unter Jubel und ermutigenden Rufen in ihre letzte Schlacht aufbrachen, um Mauer Maria und den Shiganshina-Distrikt von den Titanen zurückzuerobern, mussten sie es mit ganzen vier intelligenten Titanen aufnehmen – darunter auch der gefürchtete Tiertitan … Die Schlacht war lang und bitter, doch am Ende konnte der Aufklärungstrupp einen Sieg erringen – einen Sieg für die Menschheit! Mauer Maria wurde geschlossen, Shiganshina ist wieder bewohnbar und die Macht des Kolossalen Titanen liegt nun in den Händen des Aufklärungstrupps!\n\nDer Preis für diesen Sieg war jedoch hoch: Der Trupp wurde auf neun Mitglieder reduziert, Reiner und der Tiertitan konnten entkommen und Levi, Hanji und Co. sahen sich mit einer grausamen Entscheidung konfrontiert: Wen sollte man mit dem Titanenserum retten – Erwin oder Armin? Auch die Antworten, die sie in Erens Keller fanden, machten ihr Schicksal nicht erträglicher, wissen sie doch nun, dass nicht etwa »nur ein paar Titanen« der Feind sind, sondern die ganze Welt und dass ihr wahrer Widersacher weit jenseits ihrer Mauern, auf der anderen Seite des Ozeans, Pläne gegen sie schmiedet … \n\nQuelle: www.anisearch.de/anime/14484",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJ52CXGC?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GR751KNZY/attack-on-titan"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJ52CXGC?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -576565,7 +576581,7 @@
         "Attack on Titan: Staffel 4"
       ]
     },
-    "fetchedAt": "2026-10-25T04:04:43.090Z"
+    "fetchedAt": "2026-11-24T06:04:23.517Z"
   },
   "110287": {
     "anisearchId": 14586,
@@ -587620,12 +587636,12 @@
     "descriptionDe": "Während ihrer Kindheit las Elaina gerne Bücher, vor allem das über die berühmte Hexe Nike, die einst Abenteuer rund um die Welt erlebt hatte. Fest entschlossen, es ihr gleichzutun, lernte sie ohne Unterlass die Kunst der Magie und schaffte es, mit 14 Jahren die bislang jüngste Hexen-Auszubildende von ganz Robetta zu werden. Doch aufgrund ihres Alters und ihrer außergewöhnlichen Talentlage war keine Hexe bereit, sie auszubilden – bis Elaina auf die Hexe Fran traf, die sich schließlich bereiterklärte, ihre Mentorin zu werden.\n\nIhre Ausbildung verlief allerdings nicht so wie erwartet und Elaina musste eine ganze Reihe seltsamer Aufgaben erfüllen, bis sie überhaupt anfing, Magie zu erlernen. Doch eines Tages war es dann so weit: Sie erhielt mit »Aschgraue Hexe« ihren eigenen Titel und kann – nun als vollwertige Hexe – endlich in die Fußstapfen ihres Vorbilds treten.\n\nAuf ihrer Reise begegnet sie diversen Persönlichkeiten, wie zum Beispiel der angehenden Hexe Saya, die partout ihr Examen nicht besteht und Elaina regelrecht nötigt, ihr bei der Vorbereitung zu helfen. Sayas Weg soll den ihrigen noch öfter kreuzen – einen Weg, auf dem Elaina lernen muss, dass die Welt und die Hexerei viele Wunder bereithalten, jedoch auch Schattenseiten haben, die so manche Existenz oder gar Stadt an den Rand des Ruins treiben können. \n\nQuelle: www.anisearch.de/anime/14689",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0C9VSH4XP?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/wandering-witch-the-journey-of-elaina"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0C9VSH4XP?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -587726,7 +587742,7 @@
         "Elainas Reise: The Wandering Witch"
       ]
     },
-    "fetchedAt": "2026-10-25T04:04:50.141Z"
+    "fetchedAt": "2026-11-24T06:04:31.052Z"
   },
   "112612": {
     "anisearchId": 15023,
@@ -600920,12 +600936,12 @@
     "descriptionDe": "Eines Tages waren zehntausende von Spielern – Abenteurer – in der Welt des beliebten Online-Spiels »Elder Tale« gefangen! Verwirrt und auf sich allein gestellt, mussten diese Menschen nun in einer Welt voller Monster und Magie klarkommen. Die Stadt der Abenteurer, Akihabara, stürzte so ins Chaos.\n\nEin introvertierter, junger Mann namens Shiroe war einer dieser Abenteurer und beschloss, mit seiner Gruppe, Akatsuki und Nyanta, die Gilde Log Horizon zu gründen. Darüber hinaus gelang es ihm gemeinsam mit der Tafelrunde den Frieden und die Stabilität in der Stadt wiederherzustellen. Im Mittelpunkt der Allianz steht die Interaktion mit den ursprünglichen Bewohnern der Spielwelt, den Erdlingen, mit Abenteurern, Aristokraten, Kaufleuten und Bürgern, die alle zusammenarbeiten, um Diplomatie zu betreiben.\n\nAkihabara, das kurzweiligen Wohlstand genießt, muss sich mit einer neuen Monsterart, den Genius, auseinandersetzen und zu allem Überfluss sind die Konflikte zwischen dem Adel des Ostens und Westens kurz vor der Eskalation. Die Unzufriedenheit zwischen den Gilden wächst weiter und die Abenteurer kämpfen um Macht. Die Tafelrunde, das Symbol von Einheit unter den Abenteurern, steht vor einer schweren Krise … \n\nQuelle: www.anisearch.de/anime/14905",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CHQ1N24P?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/log-horizon"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CHQ1N24P?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -601019,7 +601035,7 @@
         "Log Horizon: Staffel 3"
       ]
     },
-    "fetchedAt": "2026-10-25T04:04:57.062Z"
+    "fetchedAt": "2026-11-24T06:04:38.194Z"
   },
   "114863": {
     "anisearchId": 10559,
@@ -606244,12 +606260,12 @@
     "descriptionDe": "Yuusuke Yotsuya wurde zusammen mit seinen Klassenkameraden Iu Shindou und Kusue Hakozaki in eine fremde und unbekannte Welt transportiert, die von mythologischen Kreaturen bewohnt wird. Kaum angekommen, treffen sie auf jemanden, der sich Game Master nennt und ihnen eine zeitlich begrenzte Quest auferlegt. Um ihnen bei ihrem Auftrag zu helfen, verleiht er Iu und Kusue auch die Rollen eines Magiers und eines Kriegers, während Yuusuke zufällig die Rolle eines … eines Bauern erhält?!\n\nSo beginnt ein hektisches Leben voller Abenteuer für die drei Schüler, die nun keine andere Wahl haben, als zufällige Quests in dieser Fantasiewelt zu absolvieren, wenn sie am Leben bleiben und die reale Welt vor den Dämonen und Monstern, denen sie begegnen, beschützen wollen. \n\nQuelle: www.anisearch.de/anime/15039",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CGQL44GZ?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/im-standing-on-a-million-lives"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CGQL44GZ?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -606349,7 +606365,7 @@
         "000 lives."
       ]
     },
-    "fetchedAt": "2026-10-25T04:05:04.047Z"
+    "fetchedAt": "2026-11-24T06:04:45.339Z"
   },
   "116246": {
     "anisearchId": 15316,
@@ -619795,12 +619811,12 @@
     "descriptionDe": "Nachdem Catarina Claes alle schlechten Enden, die ihr Otome Game »Fortune Lover« eigentlich für sie als Antagonistin vorgesehen hatte, abwenden konnte, genießt sie nun ihr hoffentlich sorgenfreies Leben. Leider hat sie es nach wie vor nicht völlig verstanden, sich wie ein Mitglied eines feinen Hofes im heiratsfähigen Alter zu benehmen. Stattdessen gräbt sie weiter fröhlich in ihren Beeten herum, lässt sich von potentiellen Heiratskandidaten mit Süßigkeiten füttern und hüpft und summt völlig sorg- und gedankenlos durch die Öffentlichkeit. Da Catarina den ursprünglich geplanten Verlauf der Geschichte und damit auch die möglichen romantischen Entwicklungen in ihrem Umfeld kaum bis gar nicht hat zustande kommen lassen, ist es nun sie selbst, die sowohl die meisten Männer als auch Frauen anzieht … \n\nQuelle: www.anisearch.de/anime/15346",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJRYSM4P?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/my-next-life-as-a-villainess-all-routes-lead-to-doom"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJRYSM4P?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -619916,7 +619932,7 @@
         "My Next Life as a Villainess: Wie überlebe ich in einem Dating-Game? 2"
       ]
     },
-    "fetchedAt": "2026-10-25T04:05:10.967Z"
+    "fetchedAt": "2026-11-24T06:04:52.483Z"
   },
   "120211": {
     "anisearchId": 15339,
@@ -630926,12 +630942,12 @@
     "descriptionDe": "»Fruits Basket« geht in die finale Runde! Nach einem Sommer voller lustiger Erlebnisse müssen Toru, Kyo und Yuki nun wieder in die Schule zurück, um ihren Abschluss zu machen. Das bedeutet leider auch, dass Kyo nicht mehr viel Zeit bleibt, um sich gegen Yuki zu behaupten und seine Wette mit dem Familienoberhaupt Akito zu gewinnen. Falls er es nicht schafft, in diesem letzten Schuljahr gegen Yuki zu siegen, so wird er auf ewig weggesperrt – wie alle vom Geist der Katze Besessenen vor ihm.\n\nGleichzeitig sucht Toru immer noch nach einem Weg, den Fluch der Soumas zu lösen. Obwohl ihr das Treffen mit Kureno gezeigt hat, wie machtlos sie im Gegensatz zu Akito ist, will sie Kyo unbedingt von seinem vorherbestimmten »Schicksal« retten. Doch die uralten Bände, die die Träger der chinesischen Tierkreiszeichen seit Hunderten von Jahren zusammenhalten, beginnen bereits von selbst zu bröckeln … \n\nQuelle: www.anisearch.de/anime/15562",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0GDFC7BL6?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/fruits-basket"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0GDFC7BL6?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -631029,7 +631045,7 @@
         "Fruits Basket Season 3"
       ]
     },
-    "fetchedAt": "2026-10-25T04:05:17.938Z"
+    "fetchedAt": "2026-11-24T06:04:59.625Z"
   },
   "124195": {
     "anisearchId": 15565,
@@ -641535,12 +641551,12 @@
     "descriptionDe": "Eigentlich möchte Denji nichts weiter, als ein friedliches Leben zu führen. Unglücklicherweise muss er vorher erst seinen gigantischen Schuldenberg loswerden. Deswegen macht er im Auftrag der Yakuza gemeinsam mit seinem dämonischen Haustier, Pochita, Jagd auf andere Dämonen, um Geld zu verdienen.\n\nDoch sein Auftraggeber verrät ihn und Denji gerät in einen Hinterhalt. Dabei sollte er eigentlich sterben, aber Pochita rettet ihn im letzten Moment, indem er sich mit dem toten Körper seines Herrchens verbindet. Dadurch erhält Denji nicht nur eine zweite Chance, sondern auch die Fähigkeit, Teile seines Körpers in Kettensägen zu verwandeln. Als Kettensägenteufel kann er nun noch effektiver Dämonen jagen. So zieht er bald schon die Aufmerksamkeit einer Sondereinheit professioneller Dämonenjäger auf sich, die ihn und seine Kräfte nur zu gerne für ihre Zwecke nutzen wollen.",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CHKN2HGQ?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/chainsaw-man"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CHKN2HGQ?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -641642,7 +641658,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:05:24.875Z"
+    "fetchedAt": "2026-11-24T06:05:06.782Z"
   },
   "127253": {
     "anisearchId": 13424,
@@ -647986,7 +648002,7 @@
         "Virgin Road"
       ]
     },
-    "fetchedAt": "2026-10-25T04:05:31.812Z"
+    "fetchedAt": "2026-11-24T06:05:13.924Z"
   },
   "129195": {
     "anisearchId": 15927,
@@ -650547,12 +650563,8 @@
     "descriptionDe": "»Demon Slayer: Kimetsu no Yaiba« geht endlich in die zweite Runde! Im Ewigkeitszug passieren merkwürdige Vorfälle, bei denen viele Menschen einfach spurlos verschwinden. Die »Flammensäule«, Kyoujurou Rengoku, wird schließlich dorthin geschickt, um der Sache auf den Grund zu gehen. Dort trifft er zufällig auf Tanjirou, seine Schwester Nezuko, Zenitsu und Inosuke, die an Bord des Zuges gekommen sind, um Tanjirous »Atem des Feuers« zu besprechen, der Kyoujurous »Atem der Flammen« ziemlich ähnelt. Lange bleibt ihnen dafür allerdings nicht Zeit, denn an Bord des Zuges befindet sich ein Teufel: Enmu, der »Abnehmende Teufelsmond« Nummer 1, bedroht das Leben der Passagiere mit seiner grausigen Teufelskunst.Anmerkung:\n»Demon Slayer: Kimetsu no Yaiba - Mugen Train Arc« zeigt in diesen sieben Folgen die Handlung des Filmes inkl. einer Anime-Original-Folge.",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CK743FPP?tag=anisearch.de-21"
-      },
-      {
-        "provider": "primevideo-channel-aniverse-de",
-        "url": "https://www.amazon.de/dp/B0G1BF9WCR?tag=anisearch.de-21"
+        "provider": "amazon-de",
+        "url": "https://www.amazon.de/gp/video/detail/0L0IXLQ35R1J37OAX7TA6WDPFW?ref_=atv_dl_rdr"
       },
       {
         "provider": "netflix",
@@ -650679,7 +650691,7 @@
         "Demon Slayer : Le train de l’infini (TV)"
       ]
     },
-    "fetchedAt": "2026-10-25T04:07:58.045Z"
+    "fetchedAt": "2026-11-24T06:07:37.188Z"
   },
   "129898": {
     "anisearchId": 15983,
@@ -650835,12 +650847,12 @@
     "descriptionDe": "Hitori Gotoh wird in ihrer Klasse auch »Bocchi-chan« genannt, weil sie ihre Zeit meistens alleine verbringt. Sie liebt Gitarrenmusik über alles und hat vor kurzem angefangen, selber Musik zu machen. Eigentlich hatte sie sich erhofft, so leichter Freunde zu finden und vielleicht sogar in einer Band mitzuspielen, doch bisher ist es ihr noch nicht gelungen, ihre Schüchternheit zu überwinden. Doch dann trifft sie zufällig auf Nijika Ijichi, die Schlagzeugerin der Kessoku Band, die derzeit auf der Suche nach einem neuen Gitarristen ist. Kann Hitoris großer Traum so doch noch wahr werden? \n\nQuelle: www.anisearch.de/anime/15989",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CH3SL829?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/bocchi-the-rock"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CH3SL829?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -650942,7 +650954,7 @@
         "BtR"
       ]
     },
-    "fetchedAt": "2026-10-25T04:05:38.743Z"
+    "fetchedAt": "2026-11-24T06:05:21.070Z"
   },
   "130046": {
     "anisearchId": 20316,
@@ -655519,12 +655531,12 @@
     "descriptionDe": "Die Halbdämonin Setsuna wird von Towa wiedererweckt, die hierzu ein wenig dämonische Energie für die Nutzung des fast vollständig zerstörten Tenseiga einsetzen muss und infolgedessen für eine Weile ohnmächtig wird. Sesshomaru hatte ihnen die beschädigte Klinge zuvor für kurze Zeit überlassen. Während Towa außer Gefecht ist, schmiedet Totosai das mächtige Schwert »Yukari no Tachikiri« aus den Überresten von Setsunas Naginata und übergibt ihr die Waffe. Dies passiert gerade noch rechtzeitig, denn die wiedererweckte Setsuna muss damit sogleich einige Dämonen abwehren, um sich und Towa zu beschützen. Nach dem erfolgreichen Kampf gegen die Dämonen ruht sich die schwer angeschlagene Towa für eine Weile aus, um wieder zu Kräften zu kommen. Doch es dürfte nicht das letzte schwierige Gefecht gewesen sein, das Towa, Setsuna und Moroha in dieser Welt bevorsteht. \n\nQuelle: www.anisearch.de/anime/16074",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CH1L7WQB?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/yashahime-princess-half-demon"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CH1L7WQB?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -655621,7 +655633,7 @@
         "Yashahime: Princess Half-Demon - The Second Act"
       ]
     },
-    "fetchedAt": "2026-10-25T04:05:45.683Z"
+    "fetchedAt": "2026-11-24T06:05:28.205Z"
   },
   "131325": {
     "anisearchId": 18152,
@@ -656788,16 +656800,16 @@
         "url": "https://www.amazon.de/dp/B0BX4DPVG4?tag=anisearch.de-21"
       },
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CK1BYHQH?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/jujutsu-kaisen/jujutsu-kaisen-0-german-dub-unknown-868375"
       },
       {
         "provider": "maxdome",
         "url": "https://store.maxdome.de/jujutsu-kaisen-0-mo44518642"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CK1BYHQH?tag=anisearch.de-21"
       },
       {
         "provider": "disneyplus",
@@ -656918,7 +656930,7 @@
         "Jujutsu Kaisen 0: Städtische Fachoberschule für Magie Tokyo"
       ]
     },
-    "fetchedAt": "2026-10-25T04:05:52.625Z"
+    "fetchedAt": "2026-11-24T06:05:35.352Z"
   },
   "131584": {
     "anisearchId": 16096,
@@ -657239,12 +657251,12 @@
     "descriptionDe": "Im 19. Jahrhundert wächst Paris im Zuge der Industriellen Revolution zu einer modernen Metropole heran. Doch in »The Case Study of Vanitas«, der Adaption des gleichnamigen Mangas aus der Feder von Jun Mochizuki, wird die Prosperität der Hauptstadt von den Taten eines blutsaugenden Serienmörders überschattet, der auch nach seinem neunten Opfer noch nicht gefasst werden konnte.\n\nInmitten der allgemeinen Verunsicherung zieht es Noé, einen jungen Vampir aus dem Hinterland, gen Paris. Von seinem ehemaligen Lehrmeister hat er erfahren, dass die Existenz des sogenannten »Buchs des Vanitas« dort bestätigt worden sei. Bei diesem magischen Schriftstück handelt es sich einem Kindermärchen nach um die Hinterlassenschaft eines Vampirs names Vanitas, der unter einem blauen Vollmond geboren und dafür von seinen Artgenossen verstoßen wurde. Angefüllt mit den Rachegelüsten seines Erschaffers soll das Buch dazu befähigen, Vampire zu verfluchen und in unkontrollierbaren Blutrausch verfallen zu lassen.\n\nAuf dem Weg in die Hauptstadt werden Noé und sein launischer Kater Murr jedoch in einen Zwischenfall auf einem Luftschiff verwickelt. Ein junger Mensch stellt sich ihnen entgegen, der den Namen des verbannten Vampirs trägt und augenscheinlich auch das gesuchte Grimoire mit sich führt … \n\nQuelle: www.anisearch.de/anime/16105",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJN3VGM7?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/the-case-study-of-vanitas"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJN3VGM7?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -657350,7 +657362,7 @@
         "ヴァニタスのカルテ"
       ]
     },
-    "fetchedAt": "2026-10-25T04:05:59.583Z"
+    "fetchedAt": "2026-11-24T06:05:42.497Z"
   },
   "131650": {
     "anisearchId": 20585,
@@ -662585,12 +662597,12 @@
         "url": "https://www.amazon.de/dp/B0B6769X6W?tag=anisearch.de-21"
       },
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CG8R9PCH?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/the-dawn-of-the-witch"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CG8R9PCH?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -662691,7 +662703,7 @@
         "Mahoutsukai Reimeiki"
       ]
     },
-    "fetchedAt": "2026-10-25T04:06:06.536Z"
+    "fetchedAt": "2026-11-24T06:05:49.653Z"
   },
   "133340": {
     "anisearchId": 16357,
@@ -663869,7 +663881,7 @@
         "ドラゴンボール超 スーパーヒーロー"
       ]
     },
-    "fetchedAt": "2026-10-25T04:06:13.651Z"
+    "fetchedAt": "2026-11-24T06:05:56.939Z"
   },
   "133965": {
     "anisearchId": 16277,
@@ -665037,7 +665049,7 @@
         "Lupin III: Una Storia Senza Fine"
       ]
     },
-    "fetchedAt": "2026-10-25T04:06:20.582Z"
+    "fetchedAt": "2026-11-24T06:24:41.028Z"
   },
   "134710": {
     "anisearchId": 16364,
@@ -665256,7 +665268,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:06:27.550Z"
+    "fetchedAt": "2026-11-24T06:06:04.082Z"
   },
   "134761": {
     "anisearchId": 17009,
@@ -665600,12 +665612,12 @@
     "descriptionDe": "Im Paris des 19. Jahrhunderts ist der Vampir Noé Archiviste noch immer auf der Suche nach dem »Buch des Vanitas«. Während der menschliche Arzt Vanitas versucht, Noé von seinem waghalsigen Plan zu überzeugen, die gesamte Vampirrasse zu »heilen«, zögert Noé noch, was als Nächstes zu tun sei.\n\nDoch dann erreicht sie die Nachricht, dass das Biest von Gévaudan wieder aufgetaucht ist. Nun muss der junge Vampir sich auch noch diesem Alptraum aus der Vergangenheit stellen und dabei helfen, den grausamen Fall aufzuklären … \n\nQuelle: www.anisearch.de/anime/16355",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJN3VGM7?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/the-case-study-of-vanitas"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJN3VGM7?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -665717,7 +665729,7 @@
         "The Case Study of Vanitas Part 2"
       ]
     },
-    "fetchedAt": "2026-10-25T04:06:34.518Z"
+    "fetchedAt": "2026-11-24T06:06:11.225Z"
   },
   "135171": {
     "anisearchId": 16426,
@@ -667248,7 +667260,7 @@
         "Saga of Tanya the Evil II"
       ]
     },
-    "fetchedAt": "2026-10-25T04:06:41.488Z"
+    "fetchedAt": "2026-11-24T06:06:18.371Z"
   },
   "135866": {
     "anisearchId": 16392,
@@ -669115,7 +669127,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:06:55.356Z"
+    "fetchedAt": "2026-11-24T06:06:32.655Z"
   },
   "136309": {
     "anisearchId": 16463,
@@ -669484,16 +669496,16 @@
     "descriptionDe": "»Vinland Saga« geht in die zweite Runde und setzt Thorfinns Geschichte fort. Nachdem ihm jemand anderes zuvorgekommen war und er Askeladd letztendlich nicht selbst besiegen konnte, wurde Thorfinn als Sklave verkauft und arbeitet nun im Dienste Ketils auf dessen Farm. Da der Hass, der ihn viele Jahre lang angetrieben hat, inzwischen erloschen ist, wüsste er aber auch gar nichts anderes mehr mit seinem Leben anzufangen. Auf der Farm trifft er auf einen jungen Mann namens Einar, der ein ähnlich schweres Schicksal wie er zu erleiden hatte: Einars einst so friedliches Leben änderte sich schlagartig über Nacht, als in der Nacht Wikinger in sein Dorf einfielen, seine Familie töteten und ihn als Sklaven verkauften. Anders als Thorfinn muss er jedoch erst lernen, was es bedeutet, ein »Sklave« zu sein.\n\nGleichzeitig versucht König Knut von England sein Territorium zu erweitern und gegen Ethelred II. zu siegen, der sich nach König Svens Tod ebenfalls als rechtmäßiger Thronerbe reklamiert hat. Ein weiteres Mal ist England getränkt vom Blut, das während des Kriegschaos fließt … \n\nQuelle: www.anisearch.de/anime/16485",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CHH94HQ2?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/81249833"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GEXH3WKK0/vinland-saga"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CHH94HQ2?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -669601,7 +669613,7 @@
         "Vinland Saga 2nd Season"
       ]
     },
-    "fetchedAt": "2026-10-25T04:07:02.319Z"
+    "fetchedAt": "2026-11-24T06:06:39.802Z"
   },
   "136435": {
     "anisearchId": 16536,
@@ -670560,12 +670572,12 @@
     "descriptionDe": "Kanji Yakutani widmet sein ganzes Leben der medizinischen Forschung, nachdem er seine kleine Schwester durch eine unheilbare Krankheit verloren hat. Diese absolute Hingabe hat jedoch ihren Preis, denn er vernachlässigt dabei seine eigene Gesundheit und stirbt an Überarbeitung im Alter von nur 31 Jahren. Als er erwacht, findet er sich plötzlich im Körper des 10-jährigen Pharma, Sohn der anerkannten Familie De Médicis, wieder. In dieser mittelalterlichen Welt erhalten Adlige den Segen der Götter und er lernt, dass er vom Gott der Medizin gesegnet wurde. Falma entschließt sich, sein Wissen aus dem vorherigen Leben und seine neuen Fähigkeiten zu verwenden, um den schrecklichen Zustand der Medizin in dieser Welt zu verbessern, damit nicht nur Adlige, sondern auch gewöhnliche Bürger eine medizinische Behandlung erhalten können. Kann er sich gegen bestehende dubiose Methoden, Vorurteile und die Pharma-Gilde durchsetzen? \n\nQuelle: www.anisearch.de/anime/16537",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CBMH26KX?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/parallel-world-pharmacy"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CBMH26KX?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -670668,7 +670680,7 @@
         "Alternate World Pharmacy"
       ]
     },
-    "fetchedAt": "2026-10-25T04:07:09.263Z"
+    "fetchedAt": "2026-11-24T06:06:46.949Z"
   },
   "136795": {
     "anisearchId": 16506,
@@ -671232,12 +671244,12 @@
     "descriptionDe": "In »Deep Insanity: The Lost Child« existiert tief unter der Antarktis eine mysteriöse Welt – das Asylum. Menschen, die sich Sleeper nennen, steigen hinab in die Tiefen, um diese Welt und ihre völlig fremdartige Biosphäre zu erforschen, aber auch, um ihre wertvollen Rohstoffe zu erbeuten. Bereits seit geraumer Zeit wird dieser Ort von diesen paramilitärischen Organisationen erkundet und ausgebeutet, dennoch bleibt die Existenz des Asylums den meisten Menschen unbekannt. Nur das sogenannte Randolph-Syndrom drang an die Öffentlichkeit, eine neuartige Krankheit, die bewirkt, dass zuvor gesunde Menschen in einen tiefen, komaähnlichen Schlaf fallen, aus dem sie aus eigener Kraft nicht mehr erwachen können. Doch nicht nur diese Krankheit macht den Erkundungsteams zu schaffen – viele weitere Gefahren lauern im Asylum, welche die Sleeper in Kauf nehmen, um die Geheimnisse des Asylums zu lüften.\n\nDa es bei diesen Expeditionen nicht allzu selten vorkommt, dass Sleeper ihr Leben lassen, wirbt die Organisation Antarctica Front mit einer neuen Masche: Auf großen Bildschirmen mitten in Großstädten laufen Werbespots, die verheißen, man würde etwas Gutes für die Zukunft tun, wenn man besagter Organisation beitritt. Während sich der Sleeper Leslie Blanc bei seiner Kommandantin Vera Rustamova über diese in seinen Augen unverschämte Werbung auslässt, welche die Sleeper angeblich in ein schlechtes Licht rückt, scheint diese allerdings ihre Wirkung zu zeigen; denn schon bald darauf meldet sich Shigure Daniel Kai zum Dienst und proklamiert gleich bei seinem Bewerbungsgespräch, ein Held werden zu wollen! Doch ganz so einfach soll es nicht werden, denn die Gefahren lauern nicht nur da unten in Gestalt von blutrünstigen Monstern, sondern auch außerhalb des Asylums in Form von merkwürdigen Verstrickungen und Verschwörungen, in die Shigure unfreiwillig hineingerät.Anmerkung:\nDieser Titel spielt chronologisch zwischen den Ereignissen des Mangas und des Spiels des Mixed-Media-Projektes »Deep Insanity«.",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CGMW43B7?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G9VHN91K2/deep-insanity-the-lost-child"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CGMW43B7?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -671328,7 +671340,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:06:48.422Z"
+    "fetchedAt": "2026-11-24T06:06:25.520Z"
   },
   "136950": {
     "anisearchId": 15385,
@@ -673441,7 +673453,7 @@
         "Lord of the Mysteries"
       ]
     },
-    "fetchedAt": "2026-10-25T04:07:37.248Z"
+    "fetchedAt": "2026-11-24T06:07:15.531Z"
   },
   "137669": {
     "anisearchId": 16654,
@@ -674820,7 +674832,8 @@
           "dubbed": true,
           "released": "08.10.2022 - 25.03.2023",
           "publisher": [
-            "Crunchyroll"
+            "Crunchyroll",
+            "MediaLink Entertainment Limited"
           ]
         },
         {
@@ -674905,7 +674918,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:07:16.236Z"
+    "fetchedAt": "2026-11-24T06:06:54.092Z"
   },
   "137877": {
     "anisearchId": 16540,
@@ -678388,12 +678401,12 @@
     "descriptionDe": "Nach dem Sieg über Zeref und Acnologia ist Frieden in Fiore eingekehrt. Doch auch in Zeiten wie diesen werden die Magiergilden mit Aufträgen auf Trab gehalten. Für die Bezwinger der bis dato größten Bedrohung der Menschheit kommt da natürlich nur ein ganz bestimmter Auftrag infrage: der legendäre »100-Jahre-Auftrag«! Seit mehr als 100 Jahren konnte noch nie jemand diesen Auftrag erfüllen, nicht einmal Gildarts, Fairy Tails stärkster Magier. So machen sich Natsu, Lucy, Gray, Erza, Wendy, Happy und Carla auf zum nördlich gelegenen Kontinent Guiltina, um sich der Herausforderung zu stellen. Dort treffen sie auf den Magier Elefseria, der nicht nur der Auftraggeber ist, sondern auch der erste Gildenmeister der ältesten Magiergilde der Welt, Magia Dragon. Elefseria macht Natsu und seine Freunde mit dem Inhalt des Auftrages vertraut: Sie sollen die Fünf Götterdrachen von Guiltina versiegeln. Doch das soll sich als kein einfaches Unterfangen erweisen, denn jeder einzelne von ihnen ist Acnologia ebenbürtig!\n\nWährenddessen wird ein neues Mitglied in die Fairy-Tail-Gilde aufgenommen: die Magierin Touka, die ganz vernarrt in Natsu zu sein scheint. Auf die anderen Mitglieder wirkt sie sehr sympathisch, doch nur dem scharfsinnigen Gajeel fällt auf, dass Touka Dinge über die Gilde weiß, die sie eigentlich nicht wissen sollte. Gajeel, Juvia, Levy und Panther Lily gehen der Sache nach … \n\nQuelle: www.anisearch.de/anime/16579",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0D88C7894?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GG5H5XQED/fairy-tail-100-years-quest"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0D88C7894?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -678503,7 +678516,7 @@
         "Fairy Tail: La missione dei 100 anni"
       ]
     },
-    "fetchedAt": "2026-10-25T04:07:30.325Z"
+    "fetchedAt": "2026-11-24T06:07:08.378Z"
   },
   "139170": {
     "anisearchId": 17277,
@@ -678958,7 +678971,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:07:44.174Z"
+    "fetchedAt": "2026-11-24T06:07:22.668Z"
   },
   "139274": {
     "anisearchId": 16592,
@@ -681000,12 +681013,12 @@
     "descriptionDe": "»My Hero Academia« geht bereits in die sechste Runde und setzt so Izuku Midoriyas Weg, der größte Held aller Zeiten zu werden, fort.\n\nMit Tomura Shigaraki an der Spitze hat die Schurkenliga inzwischen die Befreiungsfront übernommen und neu formiert. Der heimlich eingeschleuste Hawks befürchtet das Schlimmste – insbesondere auch deshalb, weil sie in der Vergangenheit einiges an Schaden hinterlassen haben. Doch durch seine harte Arbeit können die Helden sich dieses Mal auf den Kampf vorbereiten! Nun planen sie einen Überraschungsangriff, bei dem sie alles einsetzen, was sie haben. Auch die Schüler der UA-Oberschule werden in den Kampf eingebunden und müssen erneut gegen das Böse antreten. Werden sie es schaffen, gegen die Schurkenliga zu siegen? Immer und immer weiter – Plus Ultra! \n\nQuelle: www.anisearch.de/anime/16609",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJLTMLBT?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "http://www.crunchyroll.com/my-hero-academia-dubs"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJLTMLBT?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -681115,7 +681128,7 @@
         "MHA 6"
       ]
     },
-    "fetchedAt": "2026-10-25T04:07:51.104Z"
+    "fetchedAt": "2026-11-24T06:07:30.045Z"
   },
   "139643": {
     "anisearchId": 16662,
@@ -681775,7 +681788,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:08:04.982Z"
+    "fetchedAt": "2026-11-24T06:24:48.152Z"
   },
   "139806": {
     "anisearchId": 16809,
@@ -691119,10 +691132,6 @@
         "url": "https://www.amazon.de/dp/B0CVBMWXQ9?tag=anisearch.de-21"
       },
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0B8QSHQV8?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/81700392"
       },
@@ -691133,6 +691142,10 @@
       {
         "provider": "maxdome",
         "url": "https://store.maxdome.de/one-piece-film-red-mo44518663"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0B8QSHQV8?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -691241,7 +691254,7 @@
         "One Piece: 14. Film - Red"
       ]
     },
-    "fetchedAt": "2026-10-25T04:08:11.912Z"
+    "fetchedAt": "2026-11-24T06:07:44.331Z"
   },
   "141907": {
     "anisearchId": 16818,
@@ -691725,12 +691738,12 @@
     "descriptionDe": "An Jirou Yakuins Schule gibt es ein besonderes Training, das die Schüler im letzten Jahr durchlaufen müssen und das sie auf ihr späteres Leben vorbereiten soll: Durch ein Zufallsprinzip werden Paare gebildet, die von nun an wie ein Ehepaar zusammenleben sollen. Die Schüler müssen unter den wachsamen Linsen der Überwachungskameras verschiedene Aufgaben bewältigen und Punkte sammeln, um die Prüfung am Ende zu bestehen.\n\nEigentlich hatte Jirou gehofft, mit seinem heimlichen Schwarm Shiori Sakurazaka ein Team zu bilden, stattdessen gerät der zurückhaltende Schüler jedoch an Akari Watanabe, deren Charakter vollkommen gegensätzlich zu seinem ist. Diese wiederum würde sich lieber mit Minami Tenjin zusammentun, in den sie verliebt ist. Als dann auch noch Shiori und Minami als Paar ausgelost werden, scheint der Traum der beiden in weite Ferne zu rücken.",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CHQ53547?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/more-than-a-married-couple-but-not-lovers"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CHQ53547?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -691837,7 +691850,7 @@
         "Koibito Miman."
       ]
     },
-    "fetchedAt": "2026-10-25T04:08:18.969Z"
+    "fetchedAt": "2026-11-24T06:07:51.616Z"
   },
   "141950": {
     "anisearchId": 16987,
@@ -693801,7 +693814,7 @@
         "Seven Swords Dominate"
       ]
     },
-    "fetchedAt": "2026-10-25T04:08:25.937Z"
+    "fetchedAt": "2026-11-24T06:07:58.763Z"
   },
   "142599": {
     "anisearchId": 16907,
@@ -694412,16 +694425,16 @@
     "descriptionDe": "Als die siebzehnjährige Suzume in ihrem Heimatdorf auf Kyushu einem sonderbaren jungen Mann begegnet, der nach »geöffneten Türen« sucht, ahnt sie noch nicht, dass dies der Beginn einer langen Reise wird. Gemeinsam finden sie eine unversehrte Tür inmitten einer Ruine, die alleine dem Schicksal entgehen konnte, welches einst die gesamte Umgebung verheerte. Getrieben von einer Macht, die sie sich nicht erklären kann, legt sie ihre Hand auf den Türgriff und bald darauf beginnen sich Türen in ganz Japan zu öffnen, hinter denen ein schlimmes Unheil lauert. Nun muss sie durch ganz Japan reisen, um die Portale wieder zu verschließen und ein noch größeres Unglück zu verhindern. \n\nQuelle: www.anisearch.de/anime/16928",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CM4629MD?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/81696498"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/watch/GJWU29952/suzume"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CM4629MD?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -694537,7 +694550,7 @@
         "Suzume Locking Up the Doors"
       ]
     },
-    "fetchedAt": "2026-10-25T04:08:32.886Z"
+    "fetchedAt": "2026-11-24T06:08:05.906Z"
   },
   "142794": {
     "anisearchId": 17047,
@@ -694929,12 +694942,12 @@
     "descriptionDe": "Schon seit ihrer Kindheit verbindet Matsuri Kazamaki und Suzu Kanade eine besondere Eigenschaft: Sie können Ayakashi sehen, die für andere Menschen unsichtbar sind und sich von deren Lebensenergie ernähren. Doch als sie in die Oberschule kommen, wird ihr Verhältnis komplizierter, denn während Matsuri in den Ayakashi nichts als eine potenzielle Gefahr sieht, versucht Suzu Verständnis für die fremdartigen Wesen aufzubringen und wird für sie zu einem Medium.\n\nEine zufällige Begegnung mit einer weißen Katze, deren wahre Form der mächtige König der Ayakashi, Shirogane, ist, verändert sich ihr Leben grundlegend. Denn als er versucht, Suzu zu verschlingen, um noch mächtiger zu werden, versiegelt Matsuri ihn. Dafür tritt den Jungen ein Fluch, der ihn in ein Mädchen verwandelt.",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CBFVX3X1?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GZJH3D0X5/ayakashi-triangle"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CBFVX3X1?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -695031,7 +695044,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:08:39.797Z"
+    "fetchedAt": "2026-11-24T06:08:13.049Z"
   },
   "142853": {
     "anisearchId": 16927,
@@ -696878,12 +696891,12 @@
     "descriptionDe": "In dem kleinen Café »Lyco-Reco« im Herzen Tokios gibt es immer viel zu tun. Denn hier können die Kunden nicht nur Getränke und Speisen bestellen, sondern auch noch Dienstleistungen ganz anderer Art. Egal ob es um Hilfe bei der Kindererziehung, Beratung in Liebesdingen oder Fragen um Geschäftliches geht, Mika, der Manager des Cafés, und seine Mitarbeiterinnen versuchen, eine Lösung zu finden, selbst wenn sie sich dabei gegen gefährliche Monster behaupten müssen. \n\nQuelle: www.anisearch.de/anime/16976",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CHNGKF68?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/lycoris-recoil"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CHNGKF68?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -696988,7 +697001,7 @@
         "Lyco Reco"
       ]
     },
-    "fetchedAt": "2026-10-25T04:08:46.743Z"
+    "fetchedAt": "2026-11-24T06:08:20.203Z"
   },
   "143271": {
     "anisearchId": 17002,
@@ -699080,7 +699093,7 @@
         "Sword of the Demon Hunter: Kijin Gentoushou"
       ]
     },
-    "fetchedAt": "2026-10-25T04:07:23.385Z"
+    "fetchedAt": "2026-11-24T06:07:01.236Z"
   },
   "143612": {
     "anisearchId": 17000,
@@ -699784,12 +699797,12 @@
     "descriptionDe": "Das Leben als Gott kann mitunter überaus langweilig sein, weswegen die obersten Götter beschlossen haben, einen großen spielerischen Wettkampf auszutragen, bei dem die besten Menschen gegen die Götter antreten, um sie mit ihren eigenen Waffen zu schlagen. Doch nur würdige Menschen dürfen daran teilnehmen und von ihren Gönnern zu »Aposteln« ernannt werden, die mittels eines »Arise« mächtige Fähigkeiten und Magie erlernen können. Viel Zeit ist seit dem Beginn der Wettkämpfe vergangen, aber keiner hat es bisher geschafft, zehnmal gegen die übermächtigen Geschöpfe zu gewinnen – schließlich sind die launischen Götter nicht gerade leichte Gegner.\n\nDie Menschheit hat inzwischen einen riesigen technologischen Fortschritt erfahren und das »Spiel der Götter« ist zu einem in jedem Winkel gestreamten Medienspektakel geworden, das seinesgleichen sucht. Eines Tages kommt bei einer Expedition ein dünn bekleidetes Mädchen zutage, das in einem Eisblock eingefroren war und schon seit dreitausend Jahren dort geschlummert hat. Der Name dieses Wesens ist Leshea und sie war selbst einst eine Göttin, die inzwischen aber viel von ihren einstigen Fähigkeiten eingebüßt hat. Ihr Wunsch ist es, den besten Spieler ihrer Zeit zu treffen, und als sie schließlich dem Nachwuchstalent Fay begegnet, entwickeln die beiden gemeinsam einen Plan: Sie wollen die Götter herausfordern und den größten Preis gewinnen, den es je gab! \n\nQuelle: www.anisearch.de/anime/17035",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CWB5CDLS?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G0XHWM1Q0/gods-games-we-play"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CWB5CDLS?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -699894,7 +699907,7 @@
         "The Ultimate Game-Battels of a Boy and the Gods"
       ]
     },
-    "fetchedAt": "2026-10-25T04:08:53.676Z"
+    "fetchedAt": "2026-11-24T06:08:27.348Z"
   },
   "144188": {
     "anisearchId": 17039,
@@ -702627,12 +702640,12 @@
     "descriptionDe": "Bisher konnte der Schüler Ittoki Sakuraba ein ganz normales Leben führen. Doch dann wird er plötzlich von einem Ninja des Kouga-Clans angegriffen und alles verändert sich schlagartig. Ittoki erfährt, dass er der neunzehnte, legitime Erbe des Iga-Clans ist, der seit langem einen ebenso erbitterten wie geheimen Krieg gegen die Kouga-Ninjas führt. Nun muss er schnell lernen, was es heißt, ein richtiger Ninja zu werden, denn nur so kann er gegen die Gefahren, die ihn erwarten, bestehen. \n\nQuelle: www.anisearch.de/anime/17156",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0C9SXGFM3?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/shinobi-no-ittoki"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0C9SXGFM3?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -702729,7 +702742,7 @@
         "A Shinobi’s Moment"
       ]
     },
-    "fetchedAt": "2026-10-25T04:09:00.609Z"
+    "fetchedAt": "2026-11-24T06:08:34.486Z"
   },
   "145608": {
     "anisearchId": 17166,
@@ -702931,12 +702944,12 @@
     "descriptionDe": "Der umherziehende Händler Kraft Lawrence lebt davon, seine Waren in den verschiedensten Dörfern zu guten Preisen zu verkaufen. Pasloe ist eines dieser Dörfer. Einst von der weisen Erntegöttin Holo gesegnet, gewinnt es jedoch immer mehr an Eigenständigkeit. Während der Ertrag der Kornfelder stetig zunahm, wurde die weise Göttin zur Legende und Erzählungen über sie tauchen nunmehr in den Sagen des Dorfes auf.\n\nAls Lawrence eines Tages auf seiner Reise wieder durch Pasloe kommt, findet gerade ein Erntedankfest statt, mit dem Holo geehrt wird – doch mehr Tradition als Aberglaube treibt die Dorfbewohner an. Was sich bald als Irrtum herausstellt: In dieser Nacht findet Lawrence in seinem Wagen ein Mädchen mit Ohren und Schwanz, das sich schnell als ebenjene Wolfsgöttin Holo entpuppt. Ihr Wunsch ist es, in ihre alte Heimat im Norden zurückzukehren – und Lawrence soll ihr dabei helfen! Lawrence wiederum könnte ihre Hilfe ebenfalls gut gebrauchen, denn er möchte einen eigenen Laden eröffnen, und dafür könnten ihre Fähigkeiten von großem Nutzen sein. So nimmt das Abenteuer des ungleichen Duos seinen Lauf … \n\nQuelle: www.anisearch.de/anime/17167",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CWYT5TPR?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G1XHJV08M/spice-and-wolf-merchant-meets-the-wise-wolf"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CWYT5TPR?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -703040,7 +703053,7 @@
         "Spice and Wolf Reboot"
       ]
     },
-    "fetchedAt": "2026-10-25T04:09:07.548Z"
+    "fetchedAt": "2026-11-24T06:08:41.642Z"
   },
   "145739": {
     "anisearchId": 17162,
@@ -704934,12 +704947,12 @@
     "descriptionDe": "Asahis ältere Schwester Maya liebt ihren kleinen Bruder über alles und würde ihn niemals alleine zurücklassen. So kommt es auch dazu, dass sie ihm in eine andere Welt folgt, als er nach einem Zusammenstoß mit einem Auto dort landet. Doch Asahi muss schnell feststellen, dass er in diesem Fantasy-Traumland nicht mit nennenswerten Kräften gesegnet wurde, sondern im Gegenteil sogar zu den schwächsten Individuen zählt. Und das, obwohl er sich schon immer gewünscht hat, eines Tages ein Held in einer anderen Welt sein zu können.\n\nAls er von einem bösartigen Monster angegriffen wird, weiß er nicht, wie er sich effektiv zur Wehr setzen soll, und man würde schon fast glauben, dass sein Ende gekommen wäre. Da taucht seine Schwester auf und erledigt die Bestie mühelos. Im Gegensatz zu ihm scheint Maya nämlich mit maßlos übertriebenen Kräften und Fähigkeiten ausgestattet zu sein. Ihren Bruderkomplex hat sie außerdem in die neue Welt mitgenommen, und nachdem sie für Asahi in der alten Welt sogar Selbstmord begangen hat, um weiter bei ihm sein zu können, ist sie nun fest entschlossen, ihn hier vor allen Gefahren zu beschützen. \n\nQuelle: www.anisearch.de/anime/17197",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CKPJTPCQ?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G5PHNM717/my-one-hit-kill-sister"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CKPJTPCQ?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -705040,7 +705053,7 @@
         "One Turn Kill Sister in Another World: I Started Living in Another World with My Older Sister"
       ]
     },
-    "fetchedAt": "2026-10-25T04:09:14.456Z"
+    "fetchedAt": "2026-11-24T06:08:48.776Z"
   },
   "146321": {
     "anisearchId": 17232,
@@ -707705,7 +707718,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:09:21.393Z"
+    "fetchedAt": "2026-11-24T06:08:55.926Z"
   },
   "146859": {
     "anisearchId": 15010,
@@ -709100,7 +709113,7 @@
         "Atelier of Witch Hat: Das Geheimnis der Hexen"
       ]
     },
-    "fetchedAt": "2026-10-25T04:09:28.318Z"
+    "fetchedAt": "2026-11-24T06:09:03.085Z"
   },
   "147133": {
     "anisearchId": 18147,
@@ -710396,7 +710409,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:09:35.250Z"
+    "fetchedAt": "2026-11-24T06:09:10.221Z"
   },
   "147886": {
     "anisearchId": 18017,
@@ -710562,12 +710575,12 @@
     "descriptionDe": "Das Leben von Yukito Urabe findet ein jähes Ende, als sein Vater, ein Sektenführer, ihn bei einem Ritual in das Meer wirft und ertrinken lässt. Doch anstatt wirklich zu sterben, wacht er in einer Anderswelt durch die knetenden Hände einer jungen Dame wieder auf. Aruraru, wie sich die junge Dame nennt, bietet ihm als Entschuldigung an, bei ihr und ihrer Schwester Siruriru unterzukommen. Schnell findet er heraus, dass diese Welt nicht seinen Vorstellungen einer spannenden, abenteuerreichen Fantasy-Welt entspricht. Statt gnadenlosen Kämpfen mit Monstern widmet er hier sein Leben der Viehzucht, der Feldarbeit und dem Fuselbrau. Es ist ein einfaches Leben, doch es gefällt Yukito sehr.\n\nNach einem Monat in der Anderswelt findet Yukito jedoch heraus, dass das Dorf, in dem er lebt, eine »Müllhalde« für von der Gesellschaft verstoßene Außenseiter ist, die sich weigern, in dieser gottlosen Welt auf den Befehl ihres Königs zu sterben. Um die gesellschaftliche Ordnung aufrechtzuerhalten, werden sie dennoch zwangsexekutiert; und für seine Freundin Aruraru und ihre Schwester ist der Zeitpunkt der Exekution gekommen. Bei dem Versuch, die Hinrichtung von ihr zu verhindern, verliert auch er sein Leben.\n\nIn dem Moment seines Todes kommt jedoch seine Göttin Mitama in diese Welt und erweckt die beiden wieder zum Leben. Mit dem Erscheinen der Gottheit beginnt auch Yukitor Arbeit als Missionar in dieser gottlosen Anderswelt. \n\nQuelle: www.anisearch.de/anime/17328",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CKGYY3NV?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GNVHKNP4J/kamikatsu-working-for-god-in-a-godless-world"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CKGYY3NV?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -710671,7 +710684,7 @@
         "KamiKatsu: Meine Leben als Missionar in einer gottlosen Welt"
       ]
     },
-    "fetchedAt": "2026-10-25T04:09:42.177Z"
+    "fetchedAt": "2026-11-24T06:09:17.363Z"
   },
   "148078": {
     "anisearchId": 6050,
@@ -710920,12 +710933,12 @@
     "descriptionDe": "Der große Held Sion Bladan hat mit seinem Schwert Excalibur und mit der Unterstützung seiner loyalen Gefährten das Tor zur Dimension der Dämonen geschlossen und die Welt gerettet. Doch sein angebrachtes Siegel verliert drei Jahre später zusehends an Kraft. Daher bricht Sion auf, um es erneut um jeden Preis zu schließen. Doch auf seiner Reise stürzt er in eine Lochfalle, die der perverse Farmer Touka Scott gegraben hat, um sich vor den Dämonen zu schützen – und der große Held, die Hoffnung der gesamten Menschheit, die letzte Chance, die Angriffe der Monster zu stoppen … ist tot.\n\nTouka hat nicht kommen sehen, dass die Dämonen seinen Köder aus gekochtem Speck verschmähen und das leckere Gericht stattdessen den Helden in den Untergang locken würde. In der Hoffnung, nicht zu sehr für das Ableben von Sion verantwortlich gemacht zu werden, begräbt er den Helden. Die Nekromantin Anri Haynesworth hat jedoch eine Idee, wie das Blatt doch noch gewendet werden könnte. Sie kann Sions Seele zwar nicht in die Welt der Lebenden zurückholen, aber sie schafft es, die Seele des selbstsüchtigen Farmers an den mächtigen Körper des Helden zu binden. Zusammen mit Anri und seiner Kindheitsfreundin Yuna Eunice muss der Farmer sich jetzt anstelle des Helden auf die Reise zum Dämonenportal begeben und die Welt retten. Leider kann Anri aber das Verfallen des Heldenkörpers nicht stoppen, weswegen er bald schon mehr wie ein Zombie aussieht … \n\nQuelle: www.anisearch.de/anime/17334",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJK1V3LK?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G3KHEV09J/the-legendary-hero-is-dead"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJK1V3LK?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -711032,19 +711045,19 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:09:49.091Z"
+    "fetchedAt": "2026-11-24T06:09:24.502Z"
   },
   "148116": {
     "anisearchId": 17335,
     "descriptionDe": "Nach einem langen, blutigen Krieg verschwindet der berüchtigte Iceblade Sorcerer, einer der mächtigsten Kriegshelden des Landes, plötzlich spurlos. Einige Jahre später geht das Gerücht um, dass er nun anfangen soll, an der prestigeträchtigen Arnold-Akademie für Magier zu studieren. Allerdings kennt niemand das wahre Gesicht des mächtigen Zauberers, was seine Mitschüler in Aufruhr versetzt.\n\nAuch Ray White gehört zu den Schülern der Akademie. Auf den ersten Blick scheint an ihm nichts Besonderes zu sein: Sein magisches Talent ist bestenfalls durchschnittlich und er wird aufgrund seiner gewöhnlichen Abstammung von den meisten Eliteschülern abgelehnt. Was niemand ahnt ist, dass er seine wahre Identität geheim hält, um endlich ein normales Leben führen zu können.\n\nDoch bald schon wird er gemeinsam mit seinen neuen Freunden, der stolzen Amelia Rose, dem kräftigen, aber etwas einfältigen Evi Armstrong und der schüchternen Elisa in Intrigen verstrickt, die sein friedliches Leben an der Akademie bedrohen. Die neue Gefahr zwingt ihn dazu, sich den Schatten seiner Vergangenheit zu stellen und zerstört seinen Traum, endlich Frieden zu finden. Wird es ihnen gemeinsam gelingen, dieses Schicksal abzuwenden? \n\nQuelle: www.anisearch.de/anime/17335",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CHN32KR2?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GDKHZEP21/the-iceblade-sorcerer-shall-rule-the-world"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CHN32KR2?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -711149,7 +711162,7 @@
         "Hyouken no Majutsushi ga Sekai wo Suberu"
       ]
     },
-    "fetchedAt": "2026-10-25T04:09:56.067Z"
+    "fetchedAt": "2026-11-24T06:24:55.296Z"
   },
   "148149": {
     "anisearchId": 17336,
@@ -711565,12 +711578,12 @@
     "descriptionDe": "Das Leben von Ryouta Satou meint es nicht gut mit ihm. Er schuftet Tag und Nacht für seine Firma … und stirbt schließlich sogar an Überarbeitung. Doch das ist nicht sein Ende! Statt zu sterben, wird er in einer Fantasywelt wiedergeboren, die einem Videospiel ähnelt. Das Ziel ist es hier, im Level aufzusteigen. Dazu muss man gegen Monster kämpfen oder Dungeons plündern, um an Schätze heranzukommen.\n\nAuch wenn diese Welt wie ein Paradies aussieht, hat Ryouta ein großes Problem: Er kann niemals höher als Level 1 aufsteigen. Doch glücklicherweise besitzt er stattdessen eine seltene Fähigkeit, die es ihm ermöglicht, häufiger seltene Schätze zu finden. Wer braucht also Level, wenn er auch rare Items haben kann?\n\nGemeinsam mit der Abenteurerin Emily Brown macht er sich nun auf den Weg, um in dieser fremden Welt sein Glück zu finden. \n\nQuelle: www.anisearch.de/anime/17364",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0B8QB9YVD?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G1XHJV0VV/my-unique-skill-makes-me-op-even-at-level-1"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0B8QB9YVD?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -711673,7 +711686,7 @@
         "Level 1 with S-rank Drop Rate Is the Strongest"
       ]
     },
-    "fetchedAt": "2026-10-25T04:10:02.989Z"
+    "fetchedAt": "2026-11-24T06:09:31.638Z"
   },
   "148475": {
     "anisearchId": 1140,
@@ -712454,7 +712467,7 @@
         "Kubo-san wa Mob wo Yurusanai"
       ]
     },
-    "fetchedAt": "2026-10-25T04:10:09.949Z"
+    "fetchedAt": "2026-11-24T06:09:38.791Z"
   },
   "148970": {
     "anisearchId": 17445,
@@ -713222,12 +713235,12 @@
     "descriptionDe": "Irgendetwas stimmt mit dem neuen Dienstmädchen Lilith nicht. Davon ist Yuuri, der Sohn ihres reichen Arbeitgebers, fest überzeugt. Sie ist einfach zu attraktiv, ihr Essen zu köstlich und die Art, wie sie ihm jeden Wunsch von den Augen abliest, noch bevor er ihn aussprechen kann, weckt sein Misstrauen. Doch das hält Lilith nicht davon ab, freundlich zu lächeln oder Yuuri wegen seiner Paranoia zu necken … und bald schon entsteht eine ganz besondere Beziehung zwischen den beiden. \n\nQuelle: www.anisearch.de/anime/17385",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CHF9WWWM?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/the-maid-i-hired-recently-is-mysterious"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CHF9WWWM?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -713334,7 +713347,7 @@
         "La sirvienta que contraté es misteriosa"
       ]
     },
-    "fetchedAt": "2026-10-25T04:10:17.072Z"
+    "fetchedAt": "2026-11-24T06:09:45.932Z"
   },
   "149454": {
     "anisearchId": 20586,
@@ -713789,10 +713802,10 @@
   },
   "150075": {
     "anisearchId": 17417,
-    "descriptionDe": "Ein Jahr bevor Kazuma und seine nutzlose Göttin in Erscheinung treten, drückt Megumin zusammen mit ihrer selbst ernannten Rivalin Yunyun die Schulbank. Während Yunyun in der Schule der Crimson Dämonen bereits fortgeschrittene Magie lernt, hat sich Megumin dazu entschlossen, sich ganz und gar der Explosionsmagie hinzugeben. Seitdem sie in ihrer Kindheit von einem mysteriösen Mann mit der ultimativen Angriffsmagie gerettet wurde, widmet sie ihre ganze Zeit dieser einen Magie. Zumindest die Zeit, die sie nicht damit verbringt, Yunyun das Essen zu klauen. Und während Megumin nicht zu Hause ist, unternimmt ihre kleine Schwester Komekko den ein oder anderen Ausflug in den Wald. Auf einem dieser Ausflüge findet sie ein schwarzes Kätzchen, das sie auch gleich mit nach Hause nimmt. Sie ahnt aber nicht, dass diese unscheinbare Katze eine Schlüsselrolle beim Erwachen eines dunklen Gottes spielt … \n\nQuelle: www.anisearch.de/anime/17417",
+    "descriptionDe": "Ein Jahr, bevor Kazuma und seine nutzlose Göttin in Erscheinung treten, drückt Megumin zusammen mit ihrer selbst ernannten Rivalin Yunyun die Schulbank. Während Yunyun in der Schule der Crimson Dämonen bereits fortgeschrittene Magie lernt, hat sich Megumin dazu entschlossen, sich ganz und gar der Explosionsmagie hinzugeben. Seitdem sie in ihrer Kindheit von der mysteriösen Wolbach mit der ultimativen Angriffsmagie gerettet wurde, widmet sie ihre ganze Zeit dieser einen Magie. Zumindest die Zeit, die sie nicht damit verbringt, Yunyun das Essen zu klauen. Und während Megumin nicht zu Hause ist, unternimmt ihre kleine Schwester Komekko den ein oder anderen Ausflug in den Wald. Auf einem dieser Ausflüge findet sie ein schwarzes Kätzchen, das sie auch gleich mit nach Hause nimmt. Sie ahnt aber nicht, dass diese unscheinbare Katze eine Schlüsselrolle beim Erwachen eines dunklen Gottes spielt … \n\nQuelle: www.anisearch.de/anime/17417",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
+        "provider": "amazon-de",
         "url": "https://www.amazon.de/dp/B0B67F43J1?tag=anisearch.de-21"
       },
       {
@@ -713883,8 +713896,8 @@
       "adaptedFrom": "Light Novel",
       "websites": [
         {
-          "name": "Twitter",
-          "url": "https://twitter.com/konosubaanime"
+          "name": "X",
+          "url": "https://x.com/konosubaanime"
         },
         {
           "name": "Konosuba",
@@ -713895,7 +713908,7 @@
         "Megumin: Explosión Maravillosa"
       ]
     },
-    "fetchedAt": "2026-10-25T04:10:24.000Z"
+    "fetchedAt": "2026-11-24T06:09:53.077Z"
   },
   "150077": {
     "anisearchId": 17438,
@@ -715777,12 +715790,12 @@
     "descriptionDe": "In einer fernen Zukunft, in der die Menschheit mehrere Planeten kolonisiert hat – hier lebt der geschickte Revolverheld Vash the Stampede, der dafür bekannt ist, Zerstörung und Chaos zu hinterlassen, wohin er auch geht. Trotz seines Rufes ist Vash ein gutherziger Mensch, der sich dem Schutz unschuldiger Leben verschrieben hat. »Trigun Stampede« folgt ihn auf seinem Weg, auf dem er sich verschiedenen Herausforderungen und Gegnern stellen muss, während er die Wahrheit über seine Vergangenheit und den Grund für seine Taten herausfindet. \n\nQuelle: www.anisearch.de/anime/17448",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CH7M21TC?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GXJHM3PK5/trigun-stampede"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CH7M21TC?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -715892,7 +715905,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:10:30.959Z"
+    "fetchedAt": "2026-11-24T06:10:00.217Z"
   },
   "151063": {
     "anisearchId": 20587,
@@ -718034,12 +718047,12 @@
     "descriptionDe": "Der junge Mash Burnedead lebt in einer Welt, in der Magie als normal betrachtet wird und jene, die keine Magie besitzen, gejagt und ausgerottet werden. Ihre Gene stellen nämlich eine Gefahr für die Welt dar. Unglücklicherweise besitzt Mash selbst keine magischen Kräfte, weshalb sein Ziehvater Regro ihn heimlich in einem Wald großgezogen hat. Tagein, tagaus hat er dort trainiert und seine Muskeln gestählt. Seine Windbeutel-Sucht treibt ihn eines Tages jedoch in die Stadt, wo gemeldet wird, dass er kein magisches Gesichtsmal besitzt.\n\nGlücklicherweise schafft es sein Vater, Mash zu retten und nach Hause zu bringen, doch Brad Coleman und seine Männer sind ihnen auf den Fersen. Die Lage sieht nicht gut aus, weshalb Regro seinem Sohn befiehlt zu fliehen. Doch Mash muss seinen Vater retten – und er schafft es! Durch reine Muskelstärke wehrt er die magischen Angriffe von Brad ab. Kurzerhand beschließt Brad, einen Deal mit ihm einzugehen: Er und seine Männer lassen Mash in Ruhe, wenn er es schafft, in der Easton Magieschule den Titel des »Göttlichen Visionärs« zu erreichen – ein Titel, den nur die Besten der Besten bekommen. So würde ihn die Gesellschaft trotz seiner misslungenen Gene akzeptieren.\n\nDa es nur diesen einen Weg gibt, um endlich seinen Frieden zu haben, nimmt Mash den Deal an. Er schwört sich, jeden einzelnen Zauber zu bezwingen – und das nur durch die Kraft seiner Fäuste! \n\nQuelle: www.anisearch.de/anime/17495",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CH7KMSDY?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GDKHZEP8W/mashle-magic-and-muscles"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CH7KMSDY?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -718059,7 +718072,8 @@
           "released": "07.04.2023 - 30.06.2023",
           "publisher": [
             "Crunchyroll",
-            "Aniplex of America Inc."
+            "Aniplex of America Inc.",
+            "Anime Limited (UK)"
           ]
         },
         {
@@ -718140,7 +718154,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:10:37.943Z"
+    "fetchedAt": "2026-11-24T06:10:07.379Z"
   },
   "151803": {
     "anisearchId": 17507,
@@ -718239,12 +718253,12 @@
     "descriptionDe": "Tomo Aizawa und Junichirou »Jun« Kubuta sind die dicksten »Bros«, die man sich vorstellen kann. Sie zanken und zoffen sich, seit sie klein waren, aber halten sich auch stets gegenseitig den Rücken frei. Das einzige Problem: Tomo ist eigentlich ein Mädchen und in Jun verliebt!\n\nTomo ist in einem Karate-Dojo aufgewachsen und wirkte durch ihre burschikose Art wie jeder andere der Jungs. Erst seit der Mittelschule wird der Unterschied durch die Mädchenuniform bemerkbar. Jedoch selbst als sie Jun ihre Gefühle gesteht, missversteht er ihr Geständnis vollkommen falsch. Nun in der Oberschule will sie ihr Verhältnis endlich ändern und dafür sorgen, dass er sie als Mädchen wahrnimmt. Wird sie es schaffen, die berühmte-berüchtigte »Friendzone« zu verlassen? \n\nQuelle: www.anisearch.de/anime/17497",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CGTTHKBN?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G0XHWM5Q4/tomo-chan-is-a-girl"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CGTTHKBN?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -718346,7 +718360,7 @@
         "Tomo-chan wa Onna no Ko!"
       ]
     },
-    "fetchedAt": "2026-10-25T04:10:44.890Z"
+    "fetchedAt": "2026-11-24T06:10:14.520Z"
   },
   "151807": {
     "anisearchId": 17496,
@@ -718473,12 +718487,12 @@
     "descriptionDe": "Nachdem Rinko Hanasaki von einer unbekannten Person von einem Dach gestoßen wurde und gestorben ist, erhält sie eine zweite Chance in Form eines Lebens in einem Fantasy-Roman. Ihr neues Ich: Raeliana McMillan, die Tochter eines reichen Barons, der erst vor Kurzem durch seinen Ölkonzern einen Adelstitel erhalten hat. Allerdings hat Raeliana ein großes Problem: Sie ist nur ein unwichtiger Nebencharakter. Doch damit nicht genug, denn sie wird im ursprünglichen Roman von ihrem Ehemann umgebracht und stirbt einen tragischen Tod. Damit es dazu nicht kommt, muss sie sich einen Plan ausdenken, doch jeglicher Versuch, ihren noch Verlobten Francis Brooks wegzuekeln, schlägt fehl.\n\nEines Tages trifft Raeliana auf Noah Volstaire Wynknight, den Herzog des Königreichs und Protagonist des Romans, in dem sie wiedergeboren wurde. Sie entschließt sich dazu, diese Gelegenheit nicht verstreichen zu lassen, und schlägt ihm einen Handel vor: Solange er so tut, als wären sie verliebt und hätten vor zu heiraten, sodass Raeliana ihrem scheinbar unausweichlichen Tod verhindern kann, verrät sie nichts über das »königliche Siegel«, das sich in Noahs Besitz findet. An Raeliana interessiert, willigt Noah ein. Hätte Raeliana nur eher gewusst, was für ein zweischneidiges Schwert sie sich ausgesucht hat … \n\nQuelle: www.anisearch.de/anime/17509",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJP8Z668?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GVDHX8Q71/why-raeliana-ended-up-at-the-dukes-mansion"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJP8Z668?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -718583,7 +718597,7 @@
         "Why She Had to Go to the Duke"
       ]
     },
-    "fetchedAt": "2026-10-25T04:10:51.869Z"
+    "fetchedAt": "2026-11-24T06:10:21.669Z"
   },
   "151896": {
     "anisearchId": 17502,
@@ -718705,16 +718719,16 @@
     "descriptionDe": "In der nahen Zukunft haben Virtual Reality Games die klassischen Konsolenspiele abgelöst. Doch neben den gut durchdachten und animierten Meisterwerken gibt es auch jene Spiele, die optisch viel zu bieten haben, deren Story jedoch dermaßen abgedroschen und die Engines unfair sind, sodass sie als »Trash Games« von einem Großteil der Community abgelehnt werden. Und dann gibt es noch jene, die ausschließlich diese miesen Games spielen. Zu ihnen gehört auch der Schüler Rakuro Hizutome. Seine Obsession hat ihm sogar den Namen »Trash-Game-Hunter« eingebracht.\n\nAls er nach dem erfolgreichen Beenden eines besonders schlechten Games auf der Suche nach neuen Herausforderungen ist, weist ihn die Händlerin seines Vertrauens auf das beliebte Online-Rollenspiel »Shangri-La Frontier« hin. Im Gegensatz zu seinen üblichen Spielen wird dieses als »göttliches Spiel« und Meisterwerk gehandelt. Rakuro baut sich also einen auffälligen Charakter mit einer Vogelmaske, überspringt das Tutorial und vertraut auf sein Trash-Spiele-Wissen, um möglichst schnell besser zu werden. Sein Stil unterscheidet sich stark von dem der regulären Spieler und bald schon wird er tiefer in die Geheimnisse des Games verwickelt, als er es für möglich gehalten hätte. \n\nQuelle: www.anisearch.de/anime/17504",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CKM66C9G?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/81727242"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G79H23Z8P/shangri-la-frontier"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CKM66C9G?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -718825,7 +718839,7 @@
         "Shangri-La Frontier: Crappy Game Hunter Challenges God-Tier Game"
       ]
     },
-    "fetchedAt": "2026-10-25T04:10:58.824Z"
+    "fetchedAt": "2026-11-24T06:10:29.031Z"
   },
   "151985": {
     "anisearchId": 20080,
@@ -720734,19 +720748,19 @@
         "Tensei Kizoku no Isekai Boukenroku: Jichou wo Shiranai Kamigami no Shito"
       ]
     },
-    "fetchedAt": "2026-10-25T04:11:05.768Z"
+    "fetchedAt": "2026-11-24T06:10:36.179Z"
   },
   "153339": {
     "anisearchId": 17581,
     "descriptionDe": "Der neunjährige Pastry Mille Morteln hat einen ganz besonderen Traum: Wie in seinem vorherigen Leben möchte er ein berühmter Patissier werden und die besten Torten aller Zeiten kreieren, einen Traum, den er sich damals nicht erfüllen konnte. Unglücklicherweise wurde er als Sohn eines Adeligen in einer magischen Fantasywelt wiedergeboren und muss sich zunächst ganz anderen Herausforderungen stellen. Er muss lernen, zu kämpfen und die sonderbare Magie zu beherrschen, die in ihm schlummert. Nur dann kann er sich endlich wieder seiner Leidenschaft widmen – auch wenn das Schicksal ihm ständig neue Stolpersteine in den Weg zu legen scheint. \n\nQuelle: www.anisearch.de/anime/17581",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CGTHDMWV?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GJ0H7QG2G/sweet-reincarnation"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CGTHDMWV?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -720843,7 +720857,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:11:12.722Z"
+    "fetchedAt": "2026-11-24T06:10:43.314Z"
   },
   "153344": {
     "anisearchId": 17583,
@@ -720955,12 +720969,12 @@
     "descriptionDe": "Ein Mann mittleren Alters, dessen einzige Leidenschaft Münzautomaten waren, findet ein plötzliches, unrühmliches Ende – indem er von genau so einer Maschine erschlagen wird. Nun findet er sich in einer fremden Welt wieder, allerdings nicht als mächtiger Ritter oder Zauberer, sondern als Boxxo, der Münzautomat! Da er weder sprechen noch sich selbstständig fortbewegen kann, glaubt er schon, für immer einsam in dem monsterverseuchten Dungeon festhängen zu müssen, in dem er gelandet ist.\n\nDoch dann findet ihn Lammis, eine junge Abenteurerin, und erkennt, dass durchaus mehr in ihm steckt als eine leblose Maschine. Sie nimmt ihn mit in ihr Dorf, wo er bald schon neue Verbündete kennenlernt und die Welt um sich herum maßgeblich verändert. Denn wenn Boxxo mit Münzen gefüttert wird, kann er immer neue, nützliche Gegenstände bereitstellen, die seinen neuen Kameraden das Leben erleichtern. \n\nQuelle: www.anisearch.de/anime/17582",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CBNKJQJV?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GVDHX8504/reborn-as-a-vending-machine-i-now-wander-the-dungeon"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CBNKJQJV?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -721066,7 +721080,7 @@
         "Jidou Hanbaiki ni Umarekawatta Ore wa Meikyuu wo Samayou"
       ]
     },
-    "fetchedAt": "2026-10-25T04:11:19.667Z"
+    "fetchedAt": "2026-11-24T06:10:50.465Z"
   },
   "153395": {
     "anisearchId": 17527,
@@ -722518,16 +722532,16 @@
     "descriptionDe": "Im Januar 2118 wird ein Schiff des Ministeriums für auswärtige Angelegenheiten durch eine rebellische Organisation, die Peacebreakers, angegriffen. Sie haben es auf die Forschungsunterlagen der Professorin Milicia Stronskaya abgesehen, die auf diesem Schiff eigentlich beschützt werden soll, aber während des Überfalls ermordet wird. Shinya Kogami, einst Mitglied des Amts für Öffentliche Sicherheit (PSB) und danach ein Söldner, arbeitet nun für eine Abteilung des Ministeriums, das Suppressing Action Department (SAD) und will Schlimmstes verhindern, doch dank eines offensichtlich manipulierte Kollegen entkommen die Peacebreakers.\n\nPSB-Chefinspektorin Akane Tsunemori befindet sich mitten in einem Treffen mit ranghohen Regierungsmitgliedern, bei dem es auch um die Ausbreitung des Einflusses des Sibyl-Systems geht, als sie von diesem Vorfall erfährt. Zwar eilt sie unverzüglich zum Ort des Vorfalls, doch kaum ist sie beim Wrack des Schiffes angekommen, wird sie auch schon zurückgepfiffen, schließlich sei das SAD zuständig. Es dauert allerdings nicht lang, bis auch sie erfährt, worum es sich bei dem sogenannten »Stronskaya-Dokument« handelt – und dass die Peacebreakers es vermutlich noch nicht gefunden haben. Es beginnt ein folgenschwerer Wettlauf, denn die Inhalte des Dokuments könnten ganz Japan in seinen Grundfesten erschüttern … \n\nQuelle: www.anisearch.de/anime/17604",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CMR2PG9T?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/watch/GWDU8JMJG/psycho-pass-providence"
       },
       {
         "provider": "maxdome",
         "url": "https://store.maxdome.de/psycho-pass-providence-the-movie-mo45212381"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CMR2PG9T?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -722623,7 +722637,7 @@
         "Psycho-Pass: Providencia"
       ]
     },
-    "fetchedAt": "2026-10-25T04:11:26.615Z"
+    "fetchedAt": "2026-11-24T06:10:57.592Z"
   },
   "153734": {
     "anisearchId": 19907,
@@ -723155,12 +723169,12 @@
     "descriptionDe": "Yuuya Tenjou ist ein übergewichtiger, kleiner, aber sanftmütiger Oberschüler, der in der Schule gemobbt und von seiner Familie gepeinigt wird. Eine große Ausnahme bildet dabei sein Großvater, der sich als einziger um Yuuya kümmert. Als sein Großvater aber eines Tages stirbt, hinterlässt er Yuuya als Alleinerbe sein Haus. Yuuyas Eltern sind davon jedoch wenig begeistert und zwingen ihn von zu Hause auszuziehen und allein im Haus seines Großvaters zu leben. Als sich Yuuya im Haus umsieht, entdeckt er eine seltsame Tür. Als er sie öffnet, findet er dahinter eine andere Welt voller Magie und Monster!\n\nYuuya entschließt sich einen Schritt ins Unbekannte zu machen und erkundet diese fremde Welt. Schnell findet Yuuya heraus, dass er außergewöhnliche Fähigkeiten und Waffen erhalten hat, und so levelt er auf, bis er nahezu unbesiegbar ist. Als Yuuya wieder durch die Tür in seine Welt geht, stellt er fest, dass sich nicht nur sein Aussehen verändert hat, sondern dass er auch auf der Erde übermenschliche Fähigkeiten besitzt. So dauert es nicht lange, bis sich sein Leben für immer verändert … \n\nQuelle: www.anisearch.de/anime/17627",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CBHSQF5C?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GEXH3W49E/i-got-a-cheat-skill-in-another-world-and-became-unrivaled-in-the-real-world-too"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CBHSQF5C?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -723268,7 +723282,7 @@
         "Genjitsu Sekai wo mo Musou Suru: Level Up wa Jinsei wo Kaeta"
       ]
     },
-    "fetchedAt": "2026-10-25T04:11:33.521Z"
+    "fetchedAt": "2026-11-24T06:11:04.743Z"
   },
   "153906": {
     "anisearchId": 17622,
@@ -724519,12 +724533,12 @@
     "descriptionDe": "Nach den Geschehnissen der ersten Staffel ist es Chise Hatori gelungen, sich selbst, Elias Ainsworth und ihre Gabe zu akzeptieren, auch wenn sie mit ihrer Situation noch nicht komplett zufrieden ist. Der letzte große Kampf gegen Cartaphilus war verlustreich und die Bedrohung noch nicht vorbei.\n\nDa erreicht Chise eine Nachricht einer Magierorganisation, die sich »College« nennt und ihr Hilfe bei ihrer magischen Ausbildung anbietet. Unter der British Library existiert eine Geheimgesellschaft der Magier, die sich ebenfalls für das Mädchen interessiert. Wird Chise dort Antworten auf ihre Fragen finden?",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CKRZ97HT?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GRZXQJJ8Y/the-ancient-magus-bride"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CKRZ97HT?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -724628,7 +724642,7 @@
         "Die Braut des Magiers: Staffel 2"
       ]
     },
-    "fetchedAt": "2026-10-25T04:11:40.466Z"
+    "fetchedAt": "2026-11-24T06:11:11.888Z"
   },
   "154384": {
     "anisearchId": 17655,
@@ -725031,12 +725045,12 @@
     "descriptionDe": "Nachdem Hayato Kasukabes Großmutter gestorben war, vermachte sie ihm ihr heruntergekommenes Café. Eigentlich wollte er es mit den dazugehörigen Wohnungen verkaufen, doch dann traf er auf fünf junge Frauen, die in dem Café arbeiteten. Die fünf »Göttinnen« des Cafés sind jedoch verzweifelt, da sie nicht mehr wissen, wo sie wohnen und auch arbeiten sollen. Daher fasst Hayato sich ein Herz und übernimmt die Leitung des Cafés trotz seiner Zweifel. Wird er mit den fünf reizenden Damen klarkommen und zusammen das Café seiner Großmutter vor dem Abriss retten? Oder hat er die falsche Wahl getroffen? \n\nQuelle: www.anisearch.de/anime/17657",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CH9DQJSX?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GQWH0MPQ7/the-caf-terrace-and-its-goddesses"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CH9DQJSX?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -725140,7 +725154,7 @@
         "Goddess Cafe Terrace"
       ]
     },
-    "fetchedAt": "2026-10-25T04:11:47.396Z"
+    "fetchedAt": "2026-11-24T06:11:19.029Z"
   },
   "154454": {
     "anisearchId": 17659,
@@ -725708,16 +725722,16 @@
     "descriptionDe": "Zehn Jahre lang war die Abenteurergruppe um die Elfenmagierin Frieren unterwegs und sie haben es endlich geschafft, den Dämonenkönig zu besiegen. Nun herrscht Frieden im Land und Frieren, der menschliche Schwertkämpfer Himmel, der ebenfalls menschliche Priester Heiter und der Zwerg Eisen verbringen noch einen letzten Abend zusammen, um ihren Sieg zu feiern und über ihre gemeinsame Zeit zu reden. Dabei sehen sie einen Meteorschauer, der alle fünfzig Jahre wiederkehrt. Frieren, der als Elfe ein beinahe unendlich langes Leben bevorsteht, schlägt ihren anderen Gruppenmitgliedern vor, sich in fünfzig Jahren wiederzutreffen, um das Spektakel erneut mitzuerleben. Dann bricht sie alleine auf, um noch mehr starke Zaubersprüche zu lernen.\n\nAllerdings hat Frieren nicht bedacht, dass für Elfen fünfzig Jahre lediglich eine kurze Zeitspanne ist, während ein Menschen- oder Zwergenleben deutlich schneller vergeht. Als sie nach fünfzig Jahren tatsächlich in die Stadt zurückkehrt, wo sie ihre Gefährten zurückgelassen hat, stellt sie erschrocken fest, wie viel sich verändert hat. Heiter, Eisen und Himmel sind uralt geworden – Himmel stirbt kurz darauf sogar. Zum ersten Mal wird der Elfe bewusst, was es heißt, quasi unsterblich zu sein, und sie bereut, wie wenig Zeit sie sich genommen hat, um ihre Mitstreiter besser kennenzulernen. Bevor sie es verhindern kann, drückt Heiter ihr dann auch noch Fern, einen jungen Menschen, aufs Auge, der sie in Zukunft auf ihrer Reise begleiten soll. Da sie ihrem sterbenden Freund seinen letzten Wunsch nicht abschlagen kann, zieht das ungleiche Team gemeinsam los, um nicht nur etwas über die Welt, sondern auch über sich selbst zu lernen. \n\nQuelle: www.anisearch.de/anime/17669",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CLFWXQC4?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/81726714"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GG5H5XQX4/frieren-beyond-journeys-end"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CLFWXQC4?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -725829,7 +725843,7 @@
         "the Final Farewell to the Dead"
       ]
     },
-    "fetchedAt": "2026-10-25T04:11:54.416Z"
+    "fetchedAt": "2026-11-24T06:11:26.313Z"
   },
   "154643": {
     "anisearchId": 17699,
@@ -727060,16 +727074,16 @@
     "descriptionDe": "Die Studentin Akane Kinoshita wurde vor Kurzem von ihrem festen Freund für eine andere Frau versetzt. Das Schlimmste: Er hat sie im Spiel »Forest of Savior« kennengelernt, jenem Spiel, das Akane damals zu spielen begonnen hat, um mit ihrem Freund Zeit verbringen zu können. Wütend und traurig loggt sie sich noch einmal ein, um ihre Wut an Mobs auszulassen, als sie auf Akito Yamada stößt und ein kurzes Gespräch mit ihm führt. Genervt von seinem desinteressierten Charakter beendet sie das Spiel, spielt es jedoch definitiv nicht das letzte Mal!\n\nIn der Nähe soll ein Event stattfinden, bei dem Spieler von FoS wertvolle Ingame-Gegenstände erhalten können. Unglücklicherweise trifft sie dort genau diejenige Person, die sie als Letztes sehen wollte: ihren Exfreund. Und bei dem Versuch, ihm aus dem Weg zu gehen, stößt sie gegen jemanden und fällt. Zufällig ist jene Person genau Akito, den sie sofort an seiner Art zu sprechen erkennt. Obwohl Akito nicht besonders gesprächig ist und sehr schroff wirkt, ist er doch ein freundlicher junger Mann, der ihr aus der Patsche hilft.\n\nAls Prinzessin Ruri, die Leiterin von Akitos Gilde in FoS, Akane schließlich in die Gilde einlädt, kreuzen sich die Wege der beiden immer öfter – sowohl on- als auch offline! Aber auch wenn Akito ein Meister in Videospielen ist, muss er in Sachen Liebe erst etwas aufleveln … \n\nQuelle: www.anisearch.de/anime/17739",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CGX9KK1Z?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/81685150"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GNVHKNPQ7/my-love-story-with-yamada-kun-at-lv999"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CGX9KK1Z?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -727185,7 +727199,7 @@
         "Yamada-kun to Lv999 no Koi wo Suru"
       ]
     },
-    "fetchedAt": "2026-10-25T04:12:01.385Z"
+    "fetchedAt": "2026-11-24T06:11:33.474Z"
   },
   "154966": {
     "anisearchId": 17738,
@@ -729477,12 +729491,12 @@
     "descriptionDe": "In einer nahen Zukunft wurde die Erde nur deshalb vor einem dritten Weltkrieg bewahrt, weil plötzlich weltweit Superhelden auftraten, die die Konflikte im Keim erstickten. Jede Nation hat dabei seinen eigenen Superhelden mit den für das Land typischen Charaktereigenschaften. Japans Superheld ist weiblich und hört auf den Namen Shy. Wie der Name schon sagt, ist sie extrem schüchtern und auch bei der japanischen Bevölkerung nicht so angesehen wie die Superhelden anderer Länder.\n\nIhre übermenschlichen Leistungen sind dabei gar nicht mal als so viel schlechter einzuschätzen als die der anderen Helden, aber wenn man sich nach jedem Einsatz ohne große Worte verzieht, hapert es natürlich an der Außendarstellung – und im Ergebnis auch am Selbstverständnis unserer kleinen Heldin. Allerdings hat sie das Herz am rechten Fleck und dies scheint in einer Zeit, in der Anschläge von seltsam fanatischen Menschen zunehmen, noch eine wichtige Rolle spielen zu können … \n\nQuelle: www.anisearch.de/anime/17761",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CMPF5W91?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GKEH2G0W9/shy"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CMPF5W91?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -729586,7 +729600,7 @@
         "She’s the Hero You’ve Been Waiting For!"
       ]
     },
-    "fetchedAt": "2026-10-25T04:12:08.356Z"
+    "fetchedAt": "2026-11-24T06:11:40.607Z"
   },
   "155399": {
     "anisearchId": 18167,
@@ -729632,12 +729646,12 @@
     "descriptionDe": "Gerade noch freut sich ein Angestellter darüber, seine langersehnte Beförderung erhalten zu haben – doch dann endet sein Leben abrupt, bevor er seinen Triumph genießen kann. Zum Glück ist das Schicksal auf seiner Seite und er reinkarniert in eine fremde Welt.\n\nDort nennt er sich fortan Luciel und schwört sich, seinen nächsten Tod nicht durch Überarbeitung, sondern durch ein wohlverdientes hohes Alter zu erleben. Also nimmt er den risikoarmen Beruf des Heilers auf und bemüht sich, ein friedliches Leben zu führen. Wird es ihm gelingen, sich den Herausforderungen zu stellen und seine Ziele zu erreichen? \n\nQuelle: www.anisearch.de/anime/17767",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CGMKP4B3?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GG5H5XQ24/the-great-cleric"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CGMKP4B3?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -729745,7 +729759,7 @@
         "The Great Cleric: White-Collar Survival in Another World"
       ]
     },
-    "fetchedAt": "2026-10-25T04:12:15.319Z"
+    "fetchedAt": "2026-11-24T06:11:47.755Z"
   },
   "155419": {
     "anisearchId": 17768,
@@ -730919,7 +730933,7 @@
         "Be Stronger! New Saga"
       ]
     },
-    "fetchedAt": "2026-10-25T04:12:22.253Z"
+    "fetchedAt": "2026-11-24T06:11:54.891Z"
   },
   "155890": {
     "anisearchId": 18359,
@@ -732360,7 +732374,7 @@
         "Lastame"
       ]
     },
-    "fetchedAt": "2026-10-25T04:12:29.229Z"
+    "fetchedAt": "2026-11-24T06:12:02.049Z"
   },
   "156059": {
     "anisearchId": 18719,
@@ -732507,12 +732521,12 @@
     "descriptionDe": "»Das Beschwörungsritual hat euch drei Helden zu uns gebracht, um unser Königreich zu retten … Moment! Eins, zwei, drei, vier … wie bitte?!«\n\nTsuyoshi Mukouda, 27 Jahre, Büroangestellter, wird eines Tages gemeinsam mit drei weiteren »Helden« in eine Welt der Schwerter und Magie transportiert. Angeblich sollen sie das Königreich vor einer mysteriösen Gefahr retten. Mukouda ist das ganze jedoch suspekt und er vermutet, schlicht für die Expansionspolitik der Königsfamilie ausgenutzt zu werden.\n\nMit der Ausrede, eigentlich kein Held zu sein, und nur ausgerüstet mit einer Fähigkeit zum Hervorrufen einer Art von »Online-Supermarkt«, verlässt Mukouda den Palast und macht sich auf den Weg, das Königreich schnellstmöglich zu verlassen – auf der Suche nach einem friedlichen Ort, wo er sich niederlassen kann. Womit er jedoch nicht gerechnet hat, ist, wie beliebt die für diese Welt ungewöhnlichen Speisen sind, die er zubereiten kann. Vom Duft angelockt und Geschmack verzückt entschließt der legendäre Wolf Fenrir sein Diener zu werden, um täglich seine Kochkünste genießen zu können. Für Mukouda beginnt damit eine Reise, getrieben von den Launen dieser mythischen Bestie als Händler und Abenteurer, während er die Bewohner dieser Welt mit seinen Kochkünsten ins Staunen versetzt. \n\nQuelle: www.anisearch.de/anime/17802",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0BX4FW2GD?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GG5H5X3EE/campfire-cooking-in-another-world-with-my-absurd-skills"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0BX4FW2GD?tag=anisearch.de-21"
       },
       {
         "provider": "disneyplus",
@@ -732622,7 +732636,7 @@
         "Regarding the Display of an Outrageous Skill Which Has Incredible Powers"
       ]
     },
-    "fetchedAt": "2026-10-25T04:12:36.203Z"
+    "fetchedAt": "2026-11-24T06:12:09.194Z"
   },
   "156075": {
     "anisearchId": 18814,
@@ -733461,7 +733475,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:12:43.136Z"
+    "fetchedAt": "2026-11-24T06:12:16.326Z"
   },
   "156093": {
     "anisearchId": 19435,
@@ -734814,12 +734828,12 @@
     "descriptionDe": "In einer Welt, in der das Erlernen von Magie Leuten von hoher Geburt vorbehalten ist, träumt ein Mann davon, trotz seiner bürgerlichen Herkunft ein mächtiger Magier zu werden. Allerdings stirbt er, bevor er sein Ziel erreichen kann, und spricht im Moment seines Todes den Wunsch aus, als Adeliger wiedergeboren zu werden. Aus irgendeinem Grund wird seine Bitte erhört und er findet sich als neugeborener Sohn der Königsfamilie jenes Herrschers wieder, der einst für seinen Tod verantwortlich war.\n\nAls siebter Sohn hat Prinz Lloyd mit der Thronfolge nichts zu tun und kann sich vollständig dem Studium der Magie widmen. Durch die Erinnerungen an sein früheres Leben lernt er schnell und übertrifft bereits im Alter von zehn Jahren die meisten anderen Magier seiner Zeit. Doch Lloyds Wissensdurst wird ihm zum Verhängnis, als er eines Tages in den verbotenen Teil der Schlossbibliothek einbricht, um ein verbotenes Buch zu lesen, in dem ein finsteres, magisches Wesen gebannt wurde. Wird es ihm gelingen, gegen die Bestie zu bestehen und ihr uraltes Wissen für sich zu beanspruchen, oder hat er seine Fähigkeiten diesmal überschätzt? \n\nQuelle: www.anisearch.de/anime/17810",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CTXV9NGX?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GJ0H7QG4E/i-was-reincarnated-as-the-7th-prince-so-i-can-take-my-time-perfecting-my-magical-ability"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CTXV9NGX?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -734929,7 +734943,7 @@
         "Kimama ni Majutsu wo Kiwamemasu"
       ]
     },
-    "fetchedAt": "2026-10-25T04:12:50.085Z"
+    "fetchedAt": "2026-11-24T06:12:23.467Z"
   },
   "156571": {
     "anisearchId": 17895,
@@ -735544,12 +735558,12 @@
     "descriptionDe": "Im magischen Reich Orduguz werden alle Bewohner mit magischen Fähigkeiten geboren, deren Stärke die Anzahl der vorhandenen »Sterne« angibt. An ihrem fünften Geburtstag wird ein junges Mädchen, so wie alle ihre Altersgenossen, dem ansässigen Priester des Dorfes vorgestellt, um ihre Zauberkräfte zu analysieren. Zum Entsetzen ihrer Familie stellt dieser jedoch fest, dass sie lediglich einen einzigen Skill, den des »Tamers«, besitzt und in dieser Fertigkeit keinen einzigen Stern hat! Sie besitzt zwar vage Erinnerungen an ihr früheres Leben an einem anderen Ort, das hilft ihr jedoch in ihrer jetzigen Situation auch nicht weiter.\n\nEinige Jahre später lebt das Mädchen zurückgezogen im Wald, weil sie von allen Dorfbewohnern gemieden wird. Dort lernt sie völlig alleine und abseits der Zivilisation zu leben. Als ausgerechnet ihr Vater sie verjagen möchte, beschließt sie, von sich aus die Flucht zu ergreifen. Auf ihrer Reise trifft sie nach einiger Zeit einen Schleim, der genauso schwach zu sein scheint wie sie. Da Schleime äußerst wichtig für die Müllentsorgung des Landes sind, werden sie von den Menschen oft hochgeschätzt. Das Mädchen gibt sich selber den Namen Ivy und schafft es, den Schleim Sora trotz ihrer geringen Fähigkeiten an sich zu binden. Bald schon stellt sie fest, dass Sora kein gewöhnlicher Schleim ist, denn mit ihrer Vorliebe für blaue Tränke und speziellen, verborgenen Talenten, könnte es den beiden gelingen, etwas gegen das wachsende Müllproblem des Landes zu unternehmen. \n\nQuelle: www.anisearch.de/anime/17830",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CNS2LR78?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GQWH0M1XK/the-weakest-tamer-began-a-journey-to-pick-up-trash"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CNS2LR78?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -735653,7 +735667,7 @@
         "Saijaku Tamer wa Gomi Hiroi no Tabi wo Hajimemashita."
       ]
     },
-    "fetchedAt": "2026-10-25T04:12:57.016Z"
+    "fetchedAt": "2026-11-24T06:12:30.621Z"
   },
   "156896": {
     "anisearchId": 17829,
@@ -736413,12 +736427,12 @@
     "descriptionDe": "Belle Lablac hat weder ein dichtes Fell noch spitze Ohren oder einen schuppigen Schwanz, und die anthropomorphen Wesen um sie herum vergleichen sie mitunter mit einem »nackten Kobold«, denn sie ist der einzige Mensch in ganz Schwertland. Obwohl sie über unglaubliche Kampffähigkeiten sowie die übernatürliche Kraft verfügt, das riesige Schwert Runding zu führen, ist sie als Außenseiterin aufgewachsen und träumt davon, eines Tages andere Wesen ihrer Art zu treffen. Ihr Ziehvater und Lehrmeister Sian, der sie seit ihrer geheimnisvollen Erscheinung als kleines Kind in der Nähe eines leuchtenden Steinkreises zur Kämpferin ausgebildet hat, rät ihr daher, die Prüfung zur »Nomadin« abzulegen, um das Land verlassen und die Welt bereisen zu können. Das bedeutet aber auch, dass sie von nun an einen Fluch auf ihrem Körper tragen und die Erinnerungen an ihren Meister hinter sich lassen muss. Mit ihrem Schwert als einzigem Freund und Begleiter begibt sie sich so auf die lange Reise zu ihren Wurzeln und den Geheimnissen dieser Welt … \n\nQuelle: www.anisearch.de/anime/17856",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0D3WNYCXZ?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G4PH0WJXN/bye-bye-earth"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0D3WNYCXZ?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -736519,7 +736533,7 @@
         "BBE"
       ]
     },
-    "fetchedAt": "2026-10-25T04:13:03.973Z"
+    "fetchedAt": "2026-11-24T06:12:37.752Z"
   },
   "157397": {
     "anisearchId": 17858,
@@ -738457,16 +738471,16 @@
     "descriptionDe": "Oberschüler Okumura, Vorsitzender des Manga-Clubs seiner Schule, hat schon vor längerer Zeit beschlossen, seine volle Aufmerksamkeit den zweidimensionalen Frauen zu widmen, denn die dreidimensionale Variante hat ihn bisher nur enttäuscht. Seine Mutter verstarb früh, seine Schwester und seine Mitschülerinnen halten ihn für einen Versager-Otaku und seit die älteren Clubmitglieder die Schule verlassen haben, verbringt er die meiste Zeit alleine im Clubraum und träumt von seiner Lieblings-Waifu Lilliel.\n\nDoch eines Tages stört eine fremde Schülerin seine Einsamkeit. Sie stellt sich als Lilysa vor und eröffnet dem überraschten Okumura, dass sie seinem Club beitreten möchte. Dieser ist davon alles andere als begeistert, doch dann entpuppt sich Lilysa als noch größerer Lilliel-Fan als er selber! Ihr größter Traum ist es, die erotischen Outfits ihrer Heldin selber zu tragen, und sie bittet Okumura darum, sie beim Cosplayen zu fotografieren. Auf der Basis ihrer großen Liebe zu demselben fiktionalen Charakter gibt Okumura schließlich nach und erfüllt ihren Wunsch. Dabei taucht jedoch schnell ein weiteres Problem auf, mit dem er so nicht gerechnet hat: Das dreidimensionale Mädchen interessieren ihn nach wie vor nicht, aber wie sieht es mit zweieinhalb-dimensionalen aus? \n\nQuelle: www.anisearch.de/anime/17929",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CW1MQVYB?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GP5HJ845X/25-dimensional-seduction"
       },
       {
         "provider": "adn-de",
         "url": "https://animationdigitalnetwork.de/video/25-dimensional-seduction"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CW1MQVYB?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -738574,7 +738588,7 @@
         "una chica en 2.5D"
       ]
     },
-    "fetchedAt": "2026-10-25T04:13:11.073Z"
+    "fetchedAt": "2026-11-24T06:12:44.890Z"
   },
   "158567": {
     "anisearchId": 20034,
@@ -738960,12 +738974,12 @@
     "descriptionDe": "Die Büroangestellte Rei Ohashi hat eine große Leidenschaft: Sie liebt Otome-Games über alles! Ihr absoluter Lieblingscharakter ist Claire Francoise, die Antagonistin des Spiels »Revolution«. Als sie dann im Körper der Heldin des Spiels, Rae Taylor, wiedergeboren wird, ist sie überglücklich. Nun hat sie endlich die Möglichkeit, ihrem großen Schwarm an der Zauberschule näherzukommen, denn für die eigentlichen Love Interests des Spiels interessiert sie sich nicht. Claire hingegen kann mit dem überschwänglichen Enthusiasmus ihrer Mitschülerin zunächst überhaupt nichts anfangen. Sie ist es gewohnt, von allen gefürchtet zu werden. Dass Rae die Schikanen nicht nur über sich ergehen lässt, sondern sie freudig erwartet, treibt sie fast in den Wahnsinn. Wer von ihnen wird letztendlich die Oberhand gewinnen? \n\nQuelle: www.anisearch.de/anime/17941",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CG88BR31?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GVDHX851V/im-in-love-with-the-villainess"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CG88BR31?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -739072,19 +739086,19 @@
         "I Favor the Villainess."
       ]
     },
-    "fetchedAt": "2026-10-25T04:13:18.037Z"
+    "fetchedAt": "2026-11-24T06:12:52.035Z"
   },
   "158709": {
     "anisearchId": 17933,
     "descriptionDe": "Prinz Oscar hat ein Problem: Als er noch ein Kind war, wurde seine Familie von einer mächtigen Hexe verflucht, sodass keine Frau mehr ein Kind seiner Blutlinie gebären kann, ohne selber zu versterben. Um die Thronfolge zu sichern, macht sich der junge Prinz auf den Weg, um die Hexe Tinasha, die isoliert von der Welt in einem magischen Turm haust, darum zu bitten, den Fluch zu brechen. Um zu ihr zu gelangen, muss er sich zahllosen Kämpfen gegen ihre Dienerkreaturen stellen, und als er endlich das obere Stockwerk erreicht, ist er überrascht, wen er dort vorfindet. Denn Tinasha sieht trotz ihres hohen Alters jung aus und ihre Macht scheint der Hexe, die Oscars Familie verfluchte, ebenbürtig zu sein. Also verlangt er als Belohnung dafür, dass er ihren Turm gemeistert hat, dass sie seine Frau werden soll, denn ihre Macht reicht aus, um den Fluch zu umgehen und das Überleben ihrer eventuellen Kinder sicherzustellen. Damit ist Tinasha jedoch absolut nicht einverstanden und so schließen die beiden einen Pakt: Tinasha soll für ein Jahr mit zu Oscars Schloss kommen und herausfinden, was es mit dem Fluch auf sich hat. Wird es dem Prinzen währenddessen gelingen, das Herz der schönen Hexe zu gewinnen, oder wird der drohende Konflikt sein Reich zuvor in den Untergang führen? \n\nQuelle: www.anisearch.de/anime/17933",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CW15SSH9?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G9VHN9QXQ/unnamed-memory"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CW15SSH9?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -739184,7 +739198,7 @@
         "Unnamed Memory: The Witch of the Azure Moon and the Cursed Prince"
       ]
     },
-    "fetchedAt": "2026-10-25T04:13:24.992Z"
+    "fetchedAt": "2026-11-24T06:12:59.174Z"
   },
   "158791": {
     "anisearchId": 17935,
@@ -739716,7 +739730,7 @@
         "Pokémon (2023)"
       ]
     },
-    "fetchedAt": "2026-10-25T04:13:31.946Z"
+    "fetchedAt": "2026-11-24T06:13:06.307Z"
   },
   "158895": {
     "anisearchId": 17956,
@@ -740086,12 +740100,12 @@
     "descriptionDe": "Einst galt Ron Kamonohashi als eines der vielversprechendsten Talente, die ihren Abschluss an der renommierten Detective Training Academy Blue machten. Seine Fähigkeiten, die einzelnen Beweisstücke und Indizien eines Falls miteinander zu verknüpfen, waren einzigartig und sein unermüdlicher Antrieb, die Welt zu einem besseren Ort zu machen, sorgte dafür, dass er sich in der Welt der Verbrechensbekämpfung schnell einen Namen machte. Doch dann zog er sich aus ungeklärten Ursachen zurück und niemand hörte mehr etwas von ihm.\n\nFünf Jahre später hat der junge Ermittler Totomaru Isshiki einen schweren Stand bei seinen Kollegen im Metropolitan Police Department. Seine Aufklärungsrate ist erschreckend niedrig und seine berufliche Zukunft in Gefahr. Als ein älterer Kollege ihm vorschlägt, Ron Kamonohashi aufzusuchen und ihn um Hilfe beim Lösen der Fälle zu bitten, zögert Totomaru nicht lange. Doch der derangierte, unfreundliche Mann, den er vorfindet, ist zunächst nicht gewillt, seinen alten Arbeitgeber widerspruchslos zu unterstützen. Gleichzeitig reizen die zahlreichen ungelösten Fälle seinen Verstand, der sich nach fünf Jahren Isolation nach Abwechslung sehnt. Langsam entwickelt sich ein Vertrauensverhältnis zwischen ihnen und Totomarus Enthusiasmus beginnt, Ron zu verändern. Wird es ihm gelingen, sich seiner düsteren Vergangenheit zu stellen und seiner Berufung erneut nachzugehen? \n\nQuelle: www.anisearch.de/anime/17954",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CLWYMBKB?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GNVHKN903/ron-kamonohashis-forbidden-deductions"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CLWYMBKB?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -740190,19 +740204,19 @@
         "Ron Kamonohashi: Deranged Detective"
       ]
     },
-    "fetchedAt": "2026-10-25T04:13:38.895Z"
+    "fetchedAt": "2026-11-24T06:13:13.448Z"
   },
   "158927": {
     "anisearchId": 17952,
     "descriptionDe": "»Spy × Family« geht in die zweite Runde und setzt die Geschichte rund um die Scheinfamilie Forger fort! Obwohl Tochter Anya die einzige ist, die wegen ihrer telepathischen Fähigkeiten die wahren Identitäten ihrer »Eltern« kennt, genießt sie das Familienleben in vollen Zügen. Neben all dem Spaß muss jedoch auch Zeit zum Lernen bleiben, da es immer noch heißt, Stella zu verdienen, um Papa Loid bei seiner geheimen Mission zu unterstützen. Doch der hat es in seinem Alltag nicht gerade einfach: Zwischen all seinen zusätzlichen Geheimagenteneinsätzen muss er auch sein Leben als Vater und Ehemann unter einen Hut bringen, um seine Hauptmission nicht zu gefährden – und da gibt es immer wieder kleinere Problemchen. Sei es eine Schusswunde in Yors Hinterteil, die ihr den Tag vermiest, Loid allerdings denken lässt, sie sei seinetwegen schlecht gelaunt, oder der hellsehende Familienhund Bond, der ihn bei einer seiner Missionen stört – langweilig wird es den Forgers nie! \n\nQuelle: www.anisearch.de/anime/17952",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJ5P7PRX?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G4PH0WXVJ/spy-x-family"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJ5P7PRX?tag=anisearch.de-21"
       },
       {
         "provider": "disneyplus",
@@ -740310,16 +740324,12 @@
         "Spy x Family Season 2"
       ]
     },
-    "fetchedAt": "2026-10-25T04:13:45.861Z"
+    "fetchedAt": "2026-11-24T06:13:20.589Z"
   },
   "158928": {
     "anisearchId": 17953,
     "descriptionDe": "Operation Strix ist in Gefahr! Loid Forger, der Topspion von Westalis, hat den Auftrag, Kontakt zu einem hochrangigen Politiker von Ostania herzustellen. Dazu gründet er eine Scheinfamilie mit der Adoptivtochter Anya, die Gedanken lesen kann, Yor, die die Ehefrau spielt, aber eigentlich als Auftragskillerin arbeitet, und Bond, dem Familienhund, der in der Lage ist, die Zukunft vorauszusehen – jeder Einzelne hält seine wahre Identität und seine Fähigkeiten aber vor den anderen geheim.\n\nNun gehen den Vorgesetzten von Loid allerdings die geldlichen Mittel aus und gleichzeitig fehlen ihnen ausreichende Erfolge von Operation Strix. Ein Glück, dass sich auf der Eden-Akademie für Anya die Chance auf einen Stella ergibt. Sammelt man genügend dieser Stellas, wird man zu einem Treffen mit den mächtigsten Leuten von Ostania eingeladen. Das Problem ist nur: Es handelt sich um einen Backwettbewerb und Anyas schulische Leistungen sind mehr schlecht als recht.\n\nAlso beschließt Loid ein wenig nachzuhelfen, denn als Spion kennt er natürlich das Lieblingsdessert des Prüfers, dem Direktor der Eden-Akademie. Damit Anya die perfekte Meremere backen kann, beschließt die Familie, in den Norden nach Frigis zu fahren, wo die Speise ursprünglich herkommt. Während Yor vermutet, dass Loid fremdgeht, und Anya in eine Sache des Militärs hineingezogen wird, muss Loid dafür sorgen, dass alles zugunsten von Operation Strix abläuft.\n\nWird es dem Topspion gelingen, ein weiteres Mal den Frieden zwischen Westalis und Ostania zu sichern? Oder wird die Familie an ihren Geheimnissen zerbrechen? \n\nQuelle: www.anisearch.de/anime/17953",
     "streams": [
-      {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CZBDVM9K?tag=anisearch.de-21"
-      },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/watch/GVWU8N18G/"
@@ -740327,6 +740337,10 @@
       {
         "provider": "joyn",
         "url": "https://www.joyn.de/filme/spy-x-family-code-white"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CZBDVM9K?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -740418,8 +740432,8 @@
       "adaptedFrom": "Manga",
       "websites": [
         {
-          "name": "Twitter",
-          "url": "https://twitter.com/spyfamily_anime"
+          "name": "X",
+          "url": "https://x.com/spyfamily_anime"
         },
         {
           "name": "Spy Family",
@@ -740430,7 +740444,7 @@
         "Gekijouban Spy x Family Code: White"
       ]
     },
-    "fetchedAt": "2026-10-25T04:13:52.783Z"
+    "fetchedAt": "2026-11-24T06:13:27.964Z"
   },
   "158931": {
     "anisearchId": 17955,
@@ -740557,7 +740571,7 @@
         "Blue Exorcist 3"
       ]
     },
-    "fetchedAt": "2026-10-25T04:13:59.698Z"
+    "fetchedAt": "2026-11-24T06:13:35.097Z"
   },
   "158983": {
     "anisearchId": 18844,
@@ -741335,7 +741349,7 @@
         "Trapped in a Dating Sim: The World of Otome Games Is Tough for Mobs 2nd Season"
       ]
     },
-    "fetchedAt": "2026-10-25T04:14:06.665Z"
+    "fetchedAt": "2026-11-24T06:13:42.232Z"
   },
   "159322": {
     "anisearchId": 17934,
@@ -742715,12 +742729,12 @@
     "descriptionDe": "Akira Tendou hasst seine Arbeit. Tatsächlich hasst er sie so sehr, dass er sogar denkt, eine Zombieapokalypse wäre der Himmel auf Erden dagegen. Doch das war nicht immer der Fall: Vor drei Jahren strotze er noch voller Motivation, Hoffnung und Träume. Das alles änderte sich, als er bemerkt, dass es sich bei seiner Firma um einen Ausbeuterbetrieb handelt. Überstunden über Überstunden prägen sein Leben, Schlafmangel und Magengeschwüre gehören zum »Erfolg« dazu und seine Motivation ist dahin. Er würde am liebsten kündigen, doch damit ließe er nur seine Kollegen im Stich.\n\nAls der Fall tatsächlich eintritt und eine Zombieapokalypse ausbricht, freut sich Akira: Endlich muss er nicht mehr arbeiten! Stattdessen kann er jetzt tun und lassen, was er will: ein Filmmarathon mit Bier, kurze Ausflüge oder Fallschirmspringen – alles ist möglich! Deshalb erstellt er nun eine Löffelliste mit 100 Dingen, die er noch machen will, bevor er selbst zu einem Zombie wird. Ob er nur noch einen Tag lebt oder 60 Jahre ist egal, denn eines steht fest: Er will jeden Tag genießen! \n\nQuelle: www.anisearch.de/anime/18071",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJG3W6R5?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GJ0H7QGQK/zom-100-bucket-list-of-the-dead"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJG3W6R5?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -742827,7 +742841,7 @@
         "Zombie 100: Bucket List of the Dead"
       ]
     },
-    "fetchedAt": "2026-10-25T04:14:13.605Z"
+    "fetchedAt": "2026-11-24T06:13:49.378Z"
   },
   "159839": {
     "anisearchId": 18116,
@@ -743924,12 +743938,12 @@
     "descriptionDe": "Eigentlich wollte der Oberschüler Haruto Satou seiner Kindheitsfreundin Hime Nonaka nach zehn langen Jahren endlich seine Liebe gestehen. Doch sie erklärt ihm, dass sie bald schon in ihre Heimat zurückkehren muss. Bevor er darüber allzu traurig sein kann, erfährt er kurze Zeit später eine erschreckende Wahrheit: Hime ist in Wahrheit aus einer Parallelwelt auf die Erde gekommen. Ihr wirklicher Name lautet Prinzessin Crystal Novaty Nokanatica, und um ihr Königreich zu schützen, soll sie einen anderen Prinzen heiraten.\n\nHaruto folgt Hime in ihre Welt und ist auch bei ihrer Hochzeit anwesend. Doch plötzlich taucht ein gefährliches Monster auf, welches das Leben aller Anwesenden bedroht. In ihrer Verzweiflung küsst Hime Haruto und verleiht ihm so die Fähigkeit, zum Ringkönig zu werden und den gefürchteten König von Abyssus zu besiegen, dessen Auferstehung kurz bevor steht. Dazu benötigt Haruto zusätzlich noch die Macht von vier weiteren Prinzessinnen, die er heiraten soll, um sich dem übermächtigen Feind entgegenzustellen. Eine aufregende Reise steht ihm und seinen Gefährtinnen bevor, um das Schicksal ihrer Welt zu verändern. \n\nQuelle: www.anisearch.de/anime/18127",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CQ831TFL?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G79H23ZGP/tales-of-wedding-rings"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CQ831TFL?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -744032,7 +744046,7 @@
         "Wedding Ring Story"
       ]
     },
-    "fetchedAt": "2026-10-25T04:14:20.514Z"
+    "fetchedAt": "2026-11-24T06:13:56.515Z"
   },
   "160442": {
     "anisearchId": 18126,
@@ -745882,16 +745896,16 @@
     "descriptionDe": "Im alten Asien lebt eine junge Frau mit dem Namen Maomao, die als Apothekerin im Rotlichtviertel ihr Leben fristet und ständig nur das Herstellen von Medizin im Kopf hat, um sich so ihr täglich Brot zu verdienen. Ihr Ziel ist es, irgendwann eine Berufung zu finden, bei der sie mit möglichst wenig Arbeit viel Geld verdienen und einen angenehmen Alltag genießen kann – doch dies soll ihr nicht vergönnt sein! So wird sie nämlich kurzerhand aus dem Rotlichtmilieu entführt und gezwungen, als schlichte Dienerin im kaiserlichen Palast zu arbeiten. Dieser Tatbestand gefällt ihr natürlich so überhaupt nicht, weshalb sie sich bereits einen Plan dafür überlegt, wie sie aus dieser misslichen Lage entkommen kann.\n\nDurch Zufall erfährt sie zu dieser Zeit, dass die beiden Söhne des Kaisers offenbar an einer Krankheit leiden, die niemand zu heilen vermag, weshalb sich die selbsternannte Medizinerin im Geheimen diesem Fall annimmt. Trotz aller Versuchungen, anonym zu bleiben, wird sie nach nur kurzer Zeit von Jinshi, dem Vorsteher des kaiserlichen Harems, entlarvt. Dieser erkennt sofort, dass in der 17-Jährigen ein verborgenes Talent schlummert und beschließt, sie als persönliche Medizinerin anzustellen. In dieser neuen Berufung muss sie nun allerlei komplizierte Krankheiten entschlüsseln, die bei weitem nicht alle auf natürliche Art und Weise auftreten. Wird es Maomao also am Ende bewerkstelligen, alle medizinischen Rätsel zu lösen und im Anschluss das von ihr eigentlich gewünschte Leben führen zu können, oder werden ihre Pläne durchkreuzt …? \n\nQuelle: www.anisearch.de/anime/18232",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CM989NDP?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/de/title/81712068"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G3KHEVDJ7/the-apothecary-diaries"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CM989NDP?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -746002,7 +746016,7 @@
         "Die Tagebücher der Apothekerin: Geheimnisse am Kaiserhof"
       ]
     },
-    "fetchedAt": "2026-10-25T04:14:27.622Z"
+    "fetchedAt": "2026-11-24T06:14:03.820Z"
   },
   "161647": {
     "anisearchId": 18233,
@@ -747431,12 +747445,12 @@
     "descriptionDe": "Wenn man einen Blick auf den Mittelschüler Rentarou Aijou wirft, könnte man glatt meinen, er sei die leibhaftige Definition eines Pechvogels: Denn bereits einhundert Mädchen haben den Jüngling abblitzen lassen, und es scheint definitiv nicht so, als würde sich seine Unglückssträhne irgendwann zum Guten wandeln. Da seine Willensstärke, eine Freundin zu finden, langsam aber sicher nachlässt, beschließt er, zu seinem scheinbar allerletzten Mittel zu greifen: Er sucht einen Schrein auf und schüttet den Göttinnen und Göttern sein Herz aus, um möglicherweise himmlische Unterstützung auf der Suche nach einer passenden – beziehungsweise irgendeiner – Lebensgefährtin zu finden. Wie es das Schicksal will, ist zufällig eine Gottheit anwesend, die dem trauernden Jungen helfen möchte. Sie verspricht ihm, dass er schon in naher Zukunft nicht nur auf eine, sondern gleich ganze einhundert Seelenverwandte treffen wird.\n\nObwohl er im ersten Moment zuerst noch große Skepsis gegenüber dem Versprechen verspürt, entscheidet er sich, keine weiteren Gedanken darüber zu verlieren und am nächsten Tag sein – so denkt er vorerst – normales Leben als Oberschüler anzutreten. Doch kaum ist der erste Schultag vorbei, gestehen ihm die beiden Mädchen Hakari Hanazono und Karane Inda auch schon ihre Liebe. Vorerst noch große Freude darüber empfindend, muss er bald feststellen, dass es allerdings auch noch eine zweite und ganz und gar nicht schöne Seite der Medaille gibt: Sollte er zu einer dieser einhundert Mädchen keine Beziehung aufbauen wollen, wird diese nämlich aus dem Leben gerissen werden. Mit diesem faden Beigeschmack muss es Rentarou nun also gelingen, all diese Mädchen glücklich zu machen, wenn er nicht zu einem indirekten Mörder werden möchte. Wird es der frisch gebackene Oberschüler also schaffen, so viele Beziehungen simultan führen zu können? Oder wird er schlussendlich doch Blut an seinen Händen kleben haben? Eine aufregende und zugleich düstere Geschichte über die Liebe beginnt! \n\nQuelle: www.anisearch.de/anime/18267",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CK51HQCM?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GNVHKN933/the-100-girlfriends-who-really-really-really-really-really-love-you"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CK51HQCM?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -747549,7 +747563,7 @@
         "Le 100 ragazze che ti amano tanto tanto tanto tanto tanto"
       ]
     },
-    "fetchedAt": "2026-10-25T04:14:34.575Z"
+    "fetchedAt": "2026-11-24T06:14:10.960Z"
   },
   "162716": {
     "anisearchId": 18285,
@@ -748457,12 +748471,12 @@
     "descriptionDe": "»Ich glaube nicht, dass es unterhaltsam wäre, mich als Freundin zu haben.« Dieser und ähnliche Kommentare sind wohl der Grund dafür, dass die russisch-japanische Schülerin Alisa Mikhailovna Kujou gemeinhin als »einsame Prinzessin« bezeichnet wird und kaum Freunde hat. Die Tatsache, dass sie außerdem noch Klassenbeste und gleichzeitig zudem im Schülerrat als Buchhalterin tätig ist, hilft ihr nicht wirklich dabei, etwas gegen diese Null-Freunde-Politik zu unternehmen.\n\nDennoch gibt es eine Person, gegenüber der Alisa eine bestimmte Emotion fühlt: Mitleid. Bei dieser Person handelt es sich um ihren Mitschüler und Sitznachbarn Masachika Kuze, der sie allerdings alles andere als innere Ruhe verspüren lässt. Dauernd vergisst er seine Schulbücher und schläft auch noch mitten im Unterricht ein! Nach außen hin mag es vielleicht den Anschein haben, dass Masachika Alisas natürlicher Erzfeind ist und sie sich unter keinen Umständen ausstehen können, doch hinter den Kulissen sieht das Ganze schon etwas anders aus: Denn eigentlich bereitet es ihr sogar Freude, ihrem Mitschüler unter die Arme zu greifen. Und gerade weil sie die Stunden mit ihm so sehr genießt, lässt sie ihn sich sogar bei ihrem Spitznamen – nämlich Alya – ansprechen.\n\nTrotz der vielen Zeit, die die beiden miteinander verbringen, gibt es eine Sache, von der Alisa jedoch nichts weiß: Masachika versteht einwandfrei Russisch. Gerade jene Sprache, in der sie immer wieder ihren Gefühlen Worte verleiht. Gerade jene Sprache, in der sie durchgehend Kommentare über ihre Mitschülerinnen und Mitschüler abgibt. Gerade jene Sprache, in der sie auch ihrem Sitznachbarn dauerhaft peinliche Tatsachen preisgibt! Wie wird sich also das Verhältnis zwischen dem silberhaarigen Mädchen und dem Jungen, der sie in Unwissenheit schwelgen lässt, entwickeln …? \n\nQuelle: www.anisearch.de/anime/18275",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0D1TGPGCD?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G1XHJV0XM/alya-sometimes-hides-her-feelings-in-russian"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0D1TGPGCD?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -748565,7 +748579,7 @@
         "The Neighboring Arya-san Who Sometimes Acts Affectionate and Murmuring in Russian"
       ]
     },
-    "fetchedAt": "2026-10-25T04:14:41.551Z"
+    "fetchedAt": "2026-11-24T06:14:18.108Z"
   },
   "162840": {
     "anisearchId": 18270,
@@ -749573,12 +749587,12 @@
     "descriptionDe": "In der fernen Zukunft ist es der Menschheit gelungen, Kontakt zu Alienrassen aufzunehmen. Doch während der erste Kontakt zu den »Besuchern« friedlich verlief, entbrannte kurze Zeit später ein langwieriger Krieg gegen aggressive Aliens, die Ursurpatoren genannt wurden. Nach vielen Jahren wurde der Mars zur letzten Bastion der Menschheit, die sich nur mit Hilfe von Androiden, den Nean, gegen diesen Feind erwehren konnten.\n\nDiese Zeit liegt nun schon lange zurück, und zwischen Menschen und Nean hat sich ein starkes Ungleichgewicht entwickelt. Nean werden diskriminiert und unterdrückt. Dank des Asimovschen Robotergesetz dürfen sie keine Menschen angreifen und benötigen regelmäßige Injektionen mit lebenserhaltendem Inhalt.\n\nIn dieser Welt ist die Androidin Rouge gemeinsam mit ihrer Partnerin Naomi auf einer geheimen Mission unterwegs, um neun Dissidenten zu verfolgen, die der Regierung gefährlich werden können. Werden ihre besonderen Kampffähigkeiten ausreichen, um über diese schier übermächtigen Gegner zu bestehen? \n\nQuelle: www.anisearch.de/anime/18290",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CQJW39ND?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G24H1NWMJ/metallic-rouge"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CQJW39ND?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -749682,7 +749696,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:14:55.452Z"
+    "fetchedAt": "2026-11-24T06:14:32.372Z"
   },
   "162987": {
     "anisearchId": 18300,
@@ -750177,12 +750191,12 @@
     "descriptionDe": "Nikola ist ein normales Mädchen und wohnt in einem friedlichen Dorf, in dem die Menschen von den Früchten der Felder und des Waldes leben. Eines Tages stehen jedoch plötzlich gefährliche »Hoimoidrachen«, die das Gebirge normalerweise nie verlassen, vor ihren Weidegründen. Sie greifen die Menschen zwar nicht direkt an, aber bei ihrem Durchzug wird alles verwüstet. Auch Nikola wäre beinahe zerquetscht worden, hätte der plötzlich auftauchende Abenteurer Haga sie nicht in Sicherheit gezogen. Dieser ist Teil einer elitären und streng geheimen Einheit namens Sucher und möchte die riesenhaften Monster näher erforschen, auch wenn sie ihm selbst ordentlich Angst machen. Denn er widmet sein Leben der Bekämpfung von Krankheiten und der wissenschaftlichen Lösung von Problemen, die seine sonst so harmonische Welt plagen.\n\nObwohl Nikola in ihrem eigenen praktisch monotonen Leben nie Langeweile verspürt hat, ist sie so fasziniert von Haga und seinen Ambitionen, dass sie beschließt, mit ihm zusammen in die weite Welt hinauszugehen … Dabei wird sie nicht nur das eine oder andere Geheimnis über die Natur, sondern auch über sich selbst und ihre neuen Reisegefährten entdecken. \n\nQuelle: www.anisearch.de/anime/18296",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0D5PSRW8N?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G24H1NW30/quality-assurance-in-another-world"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0D5PSRW8N?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -750283,7 +750297,7 @@
         "This World Is Too Imperfect"
       ]
     },
-    "fetchedAt": "2026-10-25T04:15:02.444Z"
+    "fetchedAt": "2026-11-24T06:14:39.506Z"
   },
   "163078": {
     "anisearchId": 18297,
@@ -750839,7 +750853,7 @@
         "Re:Zero - Starting Life in Another World Season 3"
       ]
     },
-    "fetchedAt": "2026-10-25T04:15:09.376Z"
+    "fetchedAt": "2026-11-24T06:14:46.649Z"
   },
   "163135": {
     "anisearchId": 18307,
@@ -751252,16 +751266,16 @@
     "descriptionDe": "Nach schweren Verlusten durch den Angriff der Front zur Befreiung des Paranormalen schwindet das Vertrauen der Bevölkerung in ihre Helden. Um die Lage unter Kontrolle zu bringen, wendet sich All Might an internationale Verbündete – und ruft die mächtigste Heldin der USA, Star and Stripe, nach Japan. Doch ihre Ankunft bleibt nicht unbemerkt: All For One erfährt von ihrem Einsatz und setzt alles daran, sie noch vor dem ersten Schlagabtausch aufzuhalten, um sich ihre einzigartige Fähigkeit einzuverleiben. Während Endeavor, Hawks und Best Jeanist verzweifelt versuchen, rechtzeitig zur Stelle zu sein, trifft Star eine waghalsige Entscheidung – bereit, alles zu riskieren, um ihre Kameraden zu retten.\n\nUnterdessen bereiten sich die Schüler der U.A. Oberschule gemeinsam mit den verbliebenen Profihelden fieberhaft auf die finale Schlacht vor. Jedoch erschüttert ein Schock die Reihen der jungen Helden: Einer von Izukus Mitschülern hat heimlich mit den Gegnern kooperiert. Der Verrat wirft nicht nur Fragen nach Vertrauen und Loyalität auf, sondern entfacht eine hitzige Debatte – dürfen oder sollen selbst Bösewichte gerettet werden?\n\nTrotz innerer Spannungen gelingt es der Heldenseite letztendlich, eine riskante Strategie zu schmieden. Während sich Gut und Böse unaufhaltsam auf die alles entscheidende Konfrontation zubewegen, bleibt Izuku und seinen Freunden kaum Zeit zum Atemholen. Ihre Kräfte sind am Limit – doch das Schicksal der gesamten Gesellschaft liegt nun in ihren Händen. \n\nQuelle: www.anisearch.de/anime/18294",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CWLDY8GW?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/80135674"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G6NQ5DWZ6/my-hero-academia"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CWLDY8GW?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -751373,7 +751387,7 @@
         "My Hero Academia: Stagione 7"
       ]
     },
-    "fetchedAt": "2026-10-25T04:14:48.531Z"
+    "fetchedAt": "2026-11-24T06:14:25.241Z"
   },
   "163140": {
     "anisearchId": 18305,
@@ -751841,7 +751855,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:15:16.331Z"
+    "fetchedAt": "2026-11-24T06:14:53.783Z"
   },
   "163146": {
     "anisearchId": 18315,
@@ -752519,12 +752533,12 @@
     "descriptionDe": "Am liebsten würde Haruka Sakura tagtäglich mit den verschiedensten Leuten einen Streit nach dem anderen vom Zaun brechen, um in eine Schlägerei zu geraten, in der er anschließend seine Fäuste für ihn sprechen lassen kann. Dies ist jedoch nicht so einfach, da er immer noch die Schule besucht und diese einiges an Zeit in Anspruch nimmt. Um dieses »Hobby« sowie seine Verpflichtungen dennoch unter einen Hut zu bringen, entschließt er sich nach Abschluss der Mittelschule, die Fuurin-Oberschule zu besuchen, an der es scheinbar zum Alltag gehört, sich in Prügeleien zu beweisen und anschließend in der Hierarchie, die die Schüler untereinander haben, aufzusteigen. Doch kaum ist sein erster Schultag vorbei, muss er enttäuscht feststellen, dass dies nicht wirklich Fall ist.\n\nDenn anstatt gegeneinander in den Ring zu treten, widmen sich die Schüler viel eher dem Schutz ihrer geliebten Stadt und retten jeden Menschen, der sie um Hilfe bittet. Das alles passt Haruka so gar nicht in den Kram, da er schließlich kein Kleinstadt-Held und von anderen hochgelobt werden möchte. Ihm liegt nur eines am Herzen: Unzählige Kämpfe zu bestreiten und anschließend über all seinen Mitschülern zu stehen, damit er endlich als stärkster Junge von allen gilt! Wird es der Oberschüler also doch irgendwie schaffen, den Zorn anderer Jugendlicher erwecken und sich schlussendlich den Traum eines blutbefleckten Lebens erfüllen zu können? Oder können ihn seine Mitschüler doch noch umstimmen und dafür sorgen, dass er seine Kräfte für das Leben anderer einsetzt? Die actiongeladene Geschichte eines widerspenstigen Oberschülers sowie dessen Wunsch nach Macht und Anerkennung beginnt! \n\nQuelle: www.anisearch.de/anime/18324",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CZCZT8HD?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G3KHEVDPE/wind-breaker"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CZCZT8HD?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -752630,7 +752644,7 @@
         "Windbreaker"
       ]
     },
-    "fetchedAt": "2026-10-25T04:15:23.272Z"
+    "fetchedAt": "2026-11-24T06:15:00.921Z"
   },
   "163275": {
     "anisearchId": 13130,
@@ -752912,7 +752926,7 @@
         "The Quintessential Quintuplets ∽"
       ]
     },
-    "fetchedAt": "2026-10-25T04:15:30.190Z"
+    "fetchedAt": "2026-11-24T06:15:08.053Z"
   },
   "163329": {
     "anisearchId": 18331,
@@ -754334,7 +754348,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:15:37.123Z"
+    "fetchedAt": "2026-11-24T06:15:15.190Z"
   },
   "164226": {
     "anisearchId": 18361,
@@ -755264,12 +755278,12 @@
     "descriptionDe": "Nachdem ein 35-jähriger Büroangestellter an Überarbeitung stirbt, wacht er im Somerforth Empire, einem Land in einer fremden Welt, als Baby wieder auf. Sein Name lautet nun Ars Louvent und dank seiner adeligen Eltern mangelt es ihm an nichts. Und natürlich hat er auch seinen ganz persönlichen Cheat-Skill erhalten, den sonst niemand besitzt: Wenn er eine Person ansieht, kann er deren Statuswerte und Skills ablesen wie in einem Videospiel. Selbst bisher unbekannte Talente bleiben ihm nicht verborgen.\n\nDoch die Situation in seiner neuen Heimat droht, sich dramatisch zuzuspitzen. Durch Misswirtschaft und Korruption steht wahrscheinlich eine Revolution bevor und das friedliche Leben von Ars ist in Gefahr. Also beschließt er, aktiv etwas dafür zu tun, um seine Sicherheit zu gewährleisten. Mit Hilfe seiner Fähigkeit sucht er sich oft unterschätzte Leute mit hohen Statuswerten, die sich ihm anschließen. So findet er bereits in jungen Jahren Rietz Muses, der zu dem unterdrückten Volk der Marca gehört, dessen Werte ihn aber als zukünftig exzellenten Kriegsherrn ausweisen. Und dies ist erst der Beginn seines Kampfes, der nicht nur sein Territorium, sondern das gesamte Land verändern wird. \n\nQuelle: www.anisearch.de/anime/18387",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CYKF28KJ?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GG5H5XQMD/as-a-reincarnated-aristocrat-ill-use-my-appraisal-skill-to-rise-in-the-world"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CYKF28KJ?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -755306,6 +755320,7 @@
           "language": "Spanisch",
           "title": "As a Reincarnated Aristocrat, I’ll Use My Appraisal Skill to Rise in the New World",
           "status": "Abgeschlossen",
+          "dubbed": true,
           "released": "07.04.2024 - 23.06.2024",
           "publisher": [
             "Crunchyroll"
@@ -755371,7 +755386,7 @@
         "Reincarnated as an Aristocrat with an Appraisal Skill"
       ]
     },
-    "fetchedAt": "2026-10-25T04:15:44.049Z"
+    "fetchedAt": "2026-11-24T06:15:22.335Z"
   },
   "164875": {
     "anisearchId": 18389,
@@ -755712,7 +755727,7 @@
         "ベイブレイド X"
       ]
     },
-    "fetchedAt": "2026-10-25T04:17:00.809Z"
+    "fetchedAt": "2026-11-24T06:16:41.164Z"
   },
   "165171": {
     "anisearchId": 18412,
@@ -755919,12 +755934,12 @@
     "descriptionDe": "Nach jahrelanger Abwesenheit kehrt Arajin Tomoshibi in seine Heimatstadt zurück. Für den Neustart in der Oberschule nimmt er sich vor, cool aufzutreten, damit er sich möglichst schnell eine süße Freundin angeln kann. Unglücklicherweise tobt an seiner Schule jedoch ein Bandenkrieg zwischen der Minatokai und dem Siguma Squad, und anstatt hübsche Mädchen findet er sich umgeben von lauter Schlägertypen wieder. Einzig Mahoro Jin scheint seinem Ideal erstaunlich nahe zu sein, doch bevor er sich mit ihr verabreden kann, muss er erst einmal den Schlägergruppen ausweichen, die den Neuling aufmischen wollen.\n\nAls er vor einer erneuten Konfrontation flieht, landet er in einem verlassenen Schrein. Dort ruft er aus Versehen den Dschinn Senya herbei, der ihm anbietet, seinen sehnlichsten Wunsch zu erfüllen. Zunächst können die beiden nicht viel miteinander anfangen: Senya findet, sein neuer »Meister« ist ein Feigling, und Arajins großer Wunsch, seine Jungfräulichkeit zu verlieren, scheint nichts zu sein, wobei ein Dschinn ihm helfen kann. Als Arajins Leben jedoch erneut in Gefahr gerät, gehen sie einen Pakt miteinander ein, was ungeahnte Folgen mit sich bringt. \n\nQuelle: www.anisearch.de/anime/18416",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CP9T1GRL?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G5PHNM985/bucchigiri"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CP9T1GRL?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -756031,7 +756046,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:15:50.983Z"
+    "fetchedAt": "2026-11-24T06:15:29.470Z"
   },
   "165314": {
     "anisearchId": 18422,
@@ -757098,7 +757113,7 @@
         "Map for the Wedding"
       ]
     },
-    "fetchedAt": "2026-10-25T04:16:32.942Z"
+    "fetchedAt": "2026-11-24T06:16:12.359Z"
   },
   "165810": {
     "anisearchId": 18935,
@@ -759308,12 +759323,12 @@
     "descriptionDe": "Nach den Vorfällen des ersten Teils der zweiten Staffel wurde das Magiercollege, das Chise Hatori zurzeit besucht und an dem Elias Ainsworth als Lehrer arbeitet, komplett von der Außenwelt abgeschirmt. Golems patrouillieren die Gänge und es herrscht bei den meisten Schülern ein Gefühl der Verunsicherung. Der zwielichtige Fabio Zaccheroni soll den Schülern dabei helfen, sich zur Not auch ohne Magie zur Wehr zu setzen und die Sprösslinge der traditionellen Magierhäuser werden immer tiefer in die politischen Geschehnisse verwickelt. Philomelas Großmutter versucht, trotz der Distanz Einfluss zu nehmen und das hochgefährliche, gestohlene Zauberbuch bleibt weiterhin verschollen. Gleichzeitig erkranken immer mehr Schüler und Lehrer an der mysteriösen Krankheit, trotz der Abschottung des Colleges. Wird es Chise und ihren neuen Freunden gelingen, die Vorfälle aufzuklären, bevor noch größerer Schaden entsteht? \n\nQuelle: www.anisearch.de/anime/18469",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CKRZ97HT?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GRZXQJJ8Y/the-ancient-magus-bride"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CKRZ97HT?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -759422,7 +759437,7 @@
         "Die Braut des Magiers: Staffel 2 - Teil 2"
       ]
     },
-    "fetchedAt": "2026-10-25T04:15:57.945Z"
+    "fetchedAt": "2026-11-24T06:15:36.628Z"
   },
   "166454": {
     "anisearchId": 21669,
@@ -759708,12 +759723,12 @@
     "descriptionDe": "Nachdem Hayato und die fünf »Göttinnen« das Café Familia mit viel Hingabe erfolgreich wiedereröffnet haben, stehen sie vor einer ernsthaften Herausforderung: Ein nahezu identisches Konkurrenzcafé öffnet seine Türen und ahmt nicht nur die Fähigkeiten und die Arbeitskleidung der Göttinnen nach, sondern übernimmt auch das bewährte Konzept von Familia. Zusätzlich werden hochwertigere Produkte angeboten, was den Druck auf Hayato und die jungen Damen enorm erhöht. Diese bedrohliche Konkurrenz, sorgfältig von Shigehisa Fuwa geplant, könnte das Café aus dem Markt drängen.\n\nKann Hayato mit seinem Team das Erbe seiner Großmutter bewahren und das Café vor dem drohenden Ruin retten? \n\nQuelle: www.anisearch.de/anime/18467",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0D72JZL6K?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GQWH0MPQ7/the-caf-terrace-and-its-goddesses"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0D72JZL6K?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -759826,7 +759841,7 @@
         "The Cafe Terrace and Its Goddesses 2nd Season"
       ]
     },
-    "fetchedAt": "2026-10-25T04:16:05.068Z"
+    "fetchedAt": "2026-11-24T06:15:43.767Z"
   },
   "166492": {
     "anisearchId": 19200,
@@ -760539,12 +760554,12 @@
     "descriptionDe": "Nach ihrem Sieg über Abel Walker und der Magia Lupus haben Mash Burndead und seine Freunde endlich genügend Münzen der Easton-Magierakademie gesammelt, um sich als Kandidaten für die Gottesseher-Prüfung zu qualifizieren. Unglücklicherweise ist nun jedoch öffentlich verkündet worden, dass Mash keine Magie einsetzen kann. Deshalb wird er vor ein Gericht gestellt, das darüber entscheiden soll, ob er hingerichtet werden soll, so wie es sich für einen Magielosen gehört, oder weiter sein Ziel verfolgen darf, ebenfalls ein Gottesseher zu werden. Vor allem Orter Mádl, einer der Gottesseher, möchte ihn beseitigen, da er seiner Meinung nach die kosmische Ordnung der Magierwelt stört.\n\nAm Ende wird jedoch entschieden, dass er sich zunächst im Kampf gegen Innocent Zero beweisen soll, der ein unnatürliches Interesse an Mash gezeigt hat. Mit diesem Ergebnis will sich aber Orter nicht zufriedengeben und setzt den berüchtigten Margarette Macaron auf Mash an. Kurz vor der wichtigen Prüfung, die nicht nur über Mashs Zukunft, sondern über das Schicksal der gesamten Magierwelt entscheiden soll, müssen er und seine Freunde stets wachsam bleiben, damit ihre zahlreichen Feinde sie nicht auf dem falschen Fuß erwischen. \n\nQuelle: www.anisearch.de/anime/18500",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CP3RJC44?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GDKHZEP8W/mashle-magic-and-muscles"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CP3RJC44?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -760651,7 +760666,7 @@
         "Mashle: Magic and Muscles - Staffel 2"
       ]
     },
-    "fetchedAt": "2026-10-25T04:16:12.045Z"
+    "fetchedAt": "2026-11-24T06:15:50.925Z"
   },
   "166611": {
     "anisearchId": 18506,
@@ -760881,7 +760896,7 @@
         "Paradition 2"
       ]
     },
-    "fetchedAt": "2026-10-25T04:16:19.006Z"
+    "fetchedAt": "2026-11-24T06:15:58.059Z"
   },
   "166617": {
     "anisearchId": 18510,
@@ -761583,12 +761598,12 @@
     "descriptionDe": "Yuki Itose unterscheidet sich in den meisten Punkten kaum von anderen Mädchen ihres Alters: Sie liebt es, sich modisch zu kleiden, sich mit ihren Freundinnen zu treffen und einfach das Leben zu genießen. Jedoch gibt es eine Besonderheit, die ihr schon als Neugeborenes mit in die Wiege gelegt wurde: Sie ist gehörlos. Und genau dieser Aspekt ist es, durch den sie hin und wieder in recht unangenehme und verhängnisvollen Situationen gerät. So stand die Studentin eines Wintertages auf ihren Zug wartend am Bahnhof, als sie unerwarteterweise von einem Touristen aus Übersee angesprochen wird, der sie eigentlich nur nach dem Weg fragen wollte. Da Yukis Englischkenntnisse allerdings nicht gerade perfekt sind und sie auch sonst nur in japanischer Zeichensprache oder mit dem Handy kommunizieren kann, weiß sie sich in dieser Situation nicht mehr zu helfen und bittet innerlich um Hilfe.\n\nWie es der Zufall so will, wird sie genau in diesem Moment von einem jungen Mann bemerkt, der sie aus dieser misslichen Lage befreit und sich anschließend als Itsuomi Nagi vorstellt. Wie sich nach einem kurzen Gespräch herausstellt, ist Itsuomi nicht nur in Japanisch und Englisch bewandert, sondern spricht gleich drei Sprachen fließend und bereist außerdem liebend gerne die Welt. Aufgrund dessen, dass sich Yuki zu keiner Zeit wirklich von ihrem Heimatort fortbegeben hat und Itsuomi noch nie mit einer Gehörlosen interagierte, beschließen die beiden, sich ein weiteres Mal zu treffen. Kann diese lodernde Flamme der Liebe also auch die kälteste aller Jahreszeit überstehen? Oder wird sie spätestens der Frühlingswind zum Erlöschen bringen? Eine aufregende Liebesgeschichte zweier Personen, die unterschiedlicher kaum sein könnten, nimmt ihren Lauf. \n\nQuelle: www.anisearch.de/anime/18523",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CQFG2RHB?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GEXH3W2V7/a-sign-of-affection"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CQFG2RHB?tag=anisearch.de-21"
       },
       {
         "provider": "disneyplus",
@@ -761695,7 +761710,7 @@
         "Signos de afecto"
       ]
     },
-    "fetchedAt": "2026-10-25T04:16:25.980Z"
+    "fetchedAt": "2026-11-24T06:16:05.222Z"
   },
   "166828": {
     "anisearchId": 18524,
@@ -762838,7 +762853,7 @@
         "Zangyou wa Iya na no de Boss wo Solo Toubatsu Shiyou to Omoimasu"
       ]
     },
-    "fetchedAt": "2026-10-25T04:16:39.921Z"
+    "fetchedAt": "2026-11-24T06:16:19.519Z"
   },
   "167144": {
     "anisearchId": 18547,
@@ -763221,7 +763236,7 @@
         "Punishment for Brave Hero-9004 Corps Prison Record"
       ]
     },
-    "fetchedAt": "2026-10-25T04:16:46.872Z"
+    "fetchedAt": "2026-11-24T06:16:26.870Z"
   },
   "167336": {
     "anisearchId": 18563,
@@ -765257,7 +765272,7 @@
         "ich bin die Böse!"
       ]
     },
-    "fetchedAt": "2026-10-25T04:16:53.871Z"
+    "fetchedAt": "2026-11-24T06:16:34.034Z"
   },
   "168177": {
     "anisearchId": 21607,
@@ -767616,7 +767631,7 @@
         "Hokuto no Ken (2026)"
       ]
     },
-    "fetchedAt": "2026-10-25T04:17:07.779Z"
+    "fetchedAt": "2026-11-24T06:16:48.315Z"
   },
   "169258": {
     "anisearchId": 18688,
@@ -768559,7 +768574,7 @@
         "My Hero Academia: Season 6 OVA"
       ]
     },
-    "fetchedAt": "2026-10-25T04:17:14.717Z"
+    "fetchedAt": "2026-11-24T06:16:55.439Z"
   },
   "169403": {
     "anisearchId": 19143,
@@ -768600,12 +768615,12 @@
     "descriptionDe": "Tomokui Kanata gehört zu jenen Menschen, die mit besonderen Kräften geboren wurden. Er genießt sein Dasein am oberen Ende der Nahrungskette, bis etwas Unvorhergesehenes passiert: Eine Stalkerin, die er eigentlich für harmlos hielt, tötet ihn aufgrund eines Missverständnisses und setzt so seinem Traum, etwas Großartiges zu erreichen, ein abruptes Ende. Doch das Schicksal erlaubt sich einen Streich mit ihm und schenkt ihm ein zweites Leben – als Goblin, eines der schwächsten und am wenigsten intelligenten Lebewesen überhaupt!\n\nSchon als Baby merkt er, dass er anders ist als seine übrigen Gefährten, denn er hat nicht nur seinen menschlichen Intellekt, sondern auch die Erinnerungen aus seinem vorherigen Leben behalten. Obwohl die Umstände sich massiv verändert haben, ist er nicht bereit einfach so aufzugeben, sondern beschließt, als Goblin Rou seinen Platz an der Spitze zurückzuerobern. \n\nQuelle: www.anisearch.de/anime/18700",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CWPKVYJK?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GNVHKN952/remonster"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CWPKVYJK?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -768709,7 +768724,7 @@
         "Reincarnated: Monster"
       ]
     },
-    "fetchedAt": "2026-10-25T04:17:21.710Z"
+    "fetchedAt": "2026-11-24T06:17:02.602Z"
   },
   "169418": {
     "anisearchId": 18699,
@@ -769038,7 +769053,7 @@
         "Jidou Hanbaiki ni Umarekawatta Ore wa Meikyuu wo Samayou 2 Ki"
       ]
     },
-    "fetchedAt": "2026-10-25T04:17:28.677Z"
+    "fetchedAt": "2026-11-24T06:17:09.737Z"
   },
   "169441": {
     "anisearchId": 18701,
@@ -772770,12 +772785,12 @@
     "descriptionDe": "Seit vielen Jahren wird das magische Königreich Klyrode von Dämonen heimgesucht. Um sich gegen sie zu behaupten, hat der König beschlossen, nicht nur einen, sondern hunderte Helden aus anderen Welten zu beschwören, die mit ihren besonderen Talenten das Land beschützen sollen. Zu ihnen gehört auch Banaza, ein einfacher Händler, der wenig Heldenhaftes an sich hat. Bei der Überprüfung seiner Fähigkeiten stellt sich heraus, dass er tatsächlich keine brauchbaren besitzt, also wird er aus dem Schloss verbannt und muss fortan in einem von Monster verseuchten, weit entfernten Wald leben.\n\nDoch als er von einem Monster angegriffen wird und es zufällig besiegt, steigt er auf Level 2 auf und plötzlich entfalten sich seine versteckten magischen Talente. Mit seiner mächtigen heiligen Magie läutert er das ganze Gebiet und teleportiert sich dann zurück in die Hauptstadt, um als Abenteurer »Flio« ein neues Leben anzufangen. Doch sein Talent bleibt nicht unbemerkt und schon bald findet er sich mitten in einem weltweiten Konflikt wieder, anstatt ein entspanntes Leben als Händler zu führen. \n\nQuelle: www.anisearch.de/anime/18759",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CW872C45?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GEXH3W2PK/chillin-in-another-world-with-level-2-super-cheat-powers"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CW872C45?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -772877,7 +772892,7 @@
         "Chillin Different World Life of the EX-Brave Candidate Was Cheat from Lv 2"
       ]
     },
-    "fetchedAt": "2026-10-25T04:17:35.675Z"
+    "fetchedAt": "2026-11-24T06:17:16.892Z"
   },
   "170156": {
     "anisearchId": 11907,
@@ -774047,7 +774062,7 @@
         "Regarding the Display of an Outrageous Skill Which Has Incredible Powers Season 2"
       ]
     },
-    "fetchedAt": "2026-10-25T04:17:42.666Z"
+    "fetchedAt": "2026-11-24T06:17:24.034Z"
   },
   "170578": {
     "anisearchId": 18810,
@@ -774814,7 +774829,7 @@
         "Ore wa Subete wo “Parry” Suru: Gyaku Kanchigai no Sekai Saikyou wa Boukensha no Yume wo Miru"
       ]
     },
-    "fetchedAt": "2026-10-25T04:17:49.645Z"
+    "fetchedAt": "2026-11-24T06:17:31.192Z"
   },
   "170732": {
     "anisearchId": 18838,
@@ -775445,8 +775460,8 @@
     "descriptionDe": "Akira Masaki, ein Mädchen aus dem heutigen Japan, hat bis jetzt ein ganz normales Leben geführt. Doch in einer schicksalhaften Nacht, in der die Katzen den hell erleuchteten Mond besingen, wird sie plötzlich ohne Vorwarnung in eine andere Welt befördert, in der Zauberer und Menschen nebeneinander existieren. Doch die weisen Zauberer haben sie nicht ohne Grund gerufen, denn Jahr für Jahr müssen sie sich dem Kampf gegen die »Große Kalamität« stellen, den Namen ihres Mondes, der einmal im Jahr herabsteigt und mit der Kraft seiner Magie eine nie enden wollende Verwüstung anrichtet. Nur mit Akiras Hilfe kann die Gefahr erneut abgewendet werden, und so lässt sie sich dazu überreden, mit den hübschen Magiern aus den verschiedenen Ländern dieser Realität, die wie aus einem Fantasyroman entnommen scheinen, zusammenzuarbeiten. Kann sie die jungen Männer als »Weise einer anderen Welt« zum Sieg führen? \n\nQuelle: www.anisearch.de/anime/19244",
     "streams": [
       {
-        "provider": "aniverse",
-        "url": "https://www.amazon.de/dp/B0DRVH7MBP?tag=anisearch.de-21"
+        "provider": "amazon-de",
+        "url": "https://www.amazon.de/dp/B0DQQCJ1WC?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -775471,6 +775486,7 @@
           "language": "Deutsch",
           "title": "Promise of Wizard",
           "status": "Abgeschlossen",
+          "dubbed": true,
           "released": "06.01.2025 - 24.03.2025",
           "publisher": [
             "KSM Anime"
@@ -775540,7 +775556,7 @@
         "Mahoyaku"
       ]
     },
-    "fetchedAt": "2026-10-25T04:17:56.611Z"
+    "fetchedAt": "2026-11-24T06:17:38.319Z"
   },
   "170935": {
     "anisearchId": 18869,
@@ -776190,10 +776206,6 @@
     "descriptionDe": "Auf den ersten Blick haben die schlagkräftige Momo Ayase und der nerdige Einzelgänger Ken Takakura überhaupt nichts gemeinsam, außer dass sie dieselbe Klasse einer Oberschule besuchen. Doch nach einer ziemlich bösartigen Trennung von ihrem ersten festen Freund beschließt sie aus einer Laune heraus, dem Jungen zu helfen, der gnadenlos von seinen Klassenkameraden gemobbt wird. Daraus ergibt sich eine sonderbare Unterhaltung, in der sich herausstellt, dass ihre Differenzen noch tiefliegender sind als zunächst vermutet: Während Ken auf Geschichten über Aliensichtungen und Verschwörungstheorien steht, dafür aber nicht an paranormale Phänomene glaubt, war Momos Großmutter, die sie nach dem Tod ihrer Eltern aufzog, ein Medium und sie glaubt nicht, dass es Außerirdische wirklich gibt.\n\nKurzerhand schließen die beiden einen Pakt, um den jeweils anderen zu überzeugen, im Recht zu sein. Momo besucht ein verlassenes Krankenhaus, das angeblich ein Hotspot für Aliens sein soll, während Ken einen Tunnel aufsucht, wo angeblich ein böser Geist hausen soll. Unglücklicherweise stellen sie recht schnell fest, dass beide Geschichten wahr sind, denn Momo wird zu Reproduktionszwecken von Aliens entführt und Ken von einem uralten Geist verflucht. Zwar gelingt es ihnen im letzten Moment, aus ihrer prekären Lage zu entkommen, doch damit fangen ihre Probleme erst an, denn plötzlich scheint nichts mehr unmöglich zu sein und ihre gesamte Welt wird gehörig auf den Kopf gestellt.Anmerkung:\nDie ersten drei Episoden wurden zusammen mit einem Behind-the-Scenes-Special unter dem Titel »Dan Da Dan: First Encounter« in einigen Ländern vorab im Kino gezeigt. Der reguläre Simulcast begann am 3. Oktober 2024.",
     "streams": [
       {
-        "provider": "crunchyroll-(de)",
-        "url": "https://www.amazon.de/dp/B0DHT9HQHK?tag=anisearch.de-21"
-      },
-      {
         "provider": "amazon-de",
         "url": "https://www.amazon.de/dp/B0DNY9CR87?tag=anisearch.de-21"
       },
@@ -776212,6 +776224,10 @@
       {
         "provider": "adn-de",
         "url": "https://animationdigitalnetwork.com/de/video/1160-dan-da-dan"
+      },
+      {
+        "provider": "crunchyroll-(de)",
+        "url": "https://www.amazon.de/dp/B0DHT9HQHK?tag=anisearch.de-21"
       },
       {
         "provider": "anime-digital-network-(de)",
@@ -776342,7 +776358,7 @@
         "Dan Da Dan: First Encounter"
       ]
     },
-    "fetchedAt": "2026-10-25T04:18:03.597Z"
+    "fetchedAt": "2026-11-24T06:17:45.487Z"
   },
   "171019": {
     "anisearchId": 18892,
@@ -776742,12 +776758,12 @@
     "descriptionDe": "Nachdem der 28-jährige Takumi Kayano aus Versehen von dem Windgott Syl getötet wurde, erhält er die Möglichkeit, in eine Welt, die zu Syls Herrschaftsbereich gehört, transportiert zu werden. Ausgestattet mit einem starken, jungen Körper und etwas Magie findet er sich inmitten eines dichten Waldes wieder, in dem zahlreiche Gefahren lauern. Anstatt wilder Tiere findet Takumi jedoch nach kurzer Zeit zwei kleine Kinder, die schmutzig und verlassen im Unterbusch kauern.\n\nKurzerhand beschließt er, sie in die nächste Stadt mitzunehmen. Da sie keine Namen zu haben scheinen, nennt er sie Allen und Elena. Unterwegs stellt Takumi jedoch schnell fest, dass die beiden viel zu stark für ihr Alter sind und außerdem besondere Kräfte zu besitzen scheinen. Obwohl sie nicht mit ihm sprechen, fassen die beiden Kinder Vertrauen zu ihm; und da dies auch dem Willen des Windgottes zu entsprechen scheint, nimmt er sie mit auf seine Reise. Gemeinsam erkunden sie die fremde Welt und versuchen herauszufinden, was genau sie in diese ungewöhnliche Situation gebracht hat. \n\nQuelle: www.anisearch.de/anime/18887",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0D6QM1T3S?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G79H23ZVX/a-journey-through-another-world-raising-kids-while-adventuring"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0D6QM1T3S?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -776849,7 +776865,7 @@
         "Isekai Yururi Kikou: Raising Children While Being an Adventure"
       ]
     },
-    "fetchedAt": "2026-10-25T04:18:17.555Z"
+    "fetchedAt": "2026-11-24T06:17:59.784Z"
   },
   "171038": {
     "anisearchId": 18888,
@@ -776959,7 +776975,7 @@
         "Nina: Die Sterne sind dein Schicksal"
       ]
     },
-    "fetchedAt": "2026-10-25T04:18:10.576Z"
+    "fetchedAt": "2026-11-24T06:17:52.626Z"
   },
   "171040": {
     "anisearchId": 18901,
@@ -777458,7 +777474,7 @@
         "Honzuki no Gekokujou: Shisho ni Naru Tame ni wa Shudan wo Erande Iraremasen - Ryoushu no Youjo"
       ]
     },
-    "fetchedAt": "2026-10-25T04:18:24.532Z"
+    "fetchedAt": "2026-11-24T06:18:06.929Z"
   },
   "171115": {
     "anisearchId": 18937,
@@ -778525,7 +778541,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:18:31.501Z"
+    "fetchedAt": "2026-11-24T06:18:14.688Z"
   },
   "171630": {
     "anisearchId": 18939,
@@ -778968,12 +778984,12 @@
     "descriptionDe": "Nach den dramatischen Ereignissen rund um die Amalareiks am Nordpol und in Russland scheint zunächst Ruhe in das Leben von Teru Momijiyama eingekehrt zu sein und sie kann sich endlich wieder ihrem »normalen« Leben als Oberschülerin mit den alltäglichen Problemen widmen. Mit neu gewonnenem Selbstbewusstsein plant sie, die friedlichen Tage zu genießen und mehr Zeit mit ihrer Freundin Iko Koishikawa zu verbringen. Doch die heiß ersehnte Ruhe währt nicht lange, denn schon bald lernt sie Ai Tennouji kennen, eine Shinobi-Prinzessin, die aus ihrem Dorf geflohen ist. Bedauerlicherweise bringt Ai einige Probleme mit, die es nun zu lösen gilt. Für Shy und die anderen Helden heißt es: Ausrücken und die Welt retten … wieder einmal! \n\nQuelle: www.anisearch.de/anime/18941",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0D7CF6DBB?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GKEH2G0W9/shy"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0D7CF6DBB?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -779078,7 +779094,7 @@
         "Shy 2nd Season"
       ]
     },
-    "fetchedAt": "2026-10-25T04:18:38.454Z"
+    "fetchedAt": "2026-11-24T06:18:21.836Z"
   },
   "171760": {
     "anisearchId": 5326,
@@ -779380,7 +779396,7 @@
         "Dr. Stone Final Season"
       ]
     },
-    "fetchedAt": "2026-10-25T04:18:45.424Z"
+    "fetchedAt": "2026-11-24T06:18:28.975Z"
   },
   "172187": {
     "anisearchId": 19005,
@@ -780110,7 +780126,7 @@
         "Ron Kamonohashi’s Forbidden Deductions 2nd Season"
       ]
     },
-    "fetchedAt": "2026-10-25T04:18:52.371Z"
+    "fetchedAt": "2026-11-24T06:18:36.121Z"
   },
   "172393": {
     "anisearchId": 19890,
@@ -781196,7 +781212,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:18:59.506Z"
+    "fetchedAt": "2026-11-24T06:18:43.257Z"
   },
   "173174": {
     "anisearchId": 20726,
@@ -782635,12 +782651,12 @@
     "descriptionDe": "Der notorische Einzelgänger Touka wurde von seinen Eltern bereits als Kind im Stich gelassen und war bei seinem Klassenkameraden noch nie allzu beliebt, was ihn nicht gerade zu einem prädestinierten Helden macht. Diese Ansicht vertritt auch die Göttin Vicius, die ihn zusammen mit seinem Klassenkameraden in das Königreich Alion beschworen hat, um mit ihrer Hilfe den großen Dämonenkaiser zu vernichten, der 200 Jahre nach seiner letzten Niederlage zurückgekehrt ist. Während die anderen Jugendlichen mächtige Skills erlangen, hat Touka nur eine E-Rang-Fähigkeit bekommen, die es ihm mit etwas Glück ermöglichen würde, seinen Feinden Statuskrankheiten wie Lähmung oder Gift zuzufügen. Enttäuscht von seinem geringen Potenzial und seinen niedrigen Skillwerten, verbannt ihn die Göttin deswegen in eine von Monstern verseuchte Ruine am Ende der Welt.\n\nAnstatt wie vorgesehen einen hässlichen Tod zu sterben, entdeckt er bei dem verzweifelten Versuch, sich gegen die Ungetüme um ihn herum zu verteidigen, dass seine Fähigkeiten gar nicht so unnütz sind. Durch die vielen Kämpfe steigt sein Level obendrein rasant an und er lernt seine Skills zu kombinieren und weiterzuentwickeln. Nachdem er an diesem trostlosen Ort dem Tod ins Auge geblickt und wider Erwarten überlebt hat, kommt nun seine tief in ihm verborgen gewesene dunkle Seite hervor. Sein neues Ziel ist es, diese »Ruinen der Beseitigung« zu verlassen, die grausame Göttin zu finden und sich für das, was ihm angetan wurde, zu rächen … \n\nQuelle: www.anisearch.de/anime/19024",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0D8J3HVR3?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/G3KHEVD3E/failure-frame-i-became-the-strongest-and-annihilated-everything-with-low-level-spells"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0D8J3HVR3?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -782742,7 +782758,7 @@
         "Hazure Waku no “Joutai Ijou Skill” de Saikyou ni Natta Ore ga Subete wo Juurin Suru made"
       ]
     },
-    "fetchedAt": "2026-10-25T04:19:06.478Z"
+    "fetchedAt": "2026-11-24T06:18:50.420Z"
   },
   "173780": {
     "anisearchId": 19027,
@@ -783702,12 +783718,12 @@
     "descriptionDe": "In einem Land, in dem Menschen mit mächtiger Magie über alle anderen herrschen, regieren die fünf mächtigsten von ihnen über die ganze Welt. An der berühmtesten Magierakademie des Landes kämpfen die Schüler auch untereinander um die Vorherrschaft, denn bereits hier kann sich ihre Zukunft entscheiden. Unter ihnen hat Will Serfort einen besonders schweren Stand, denn obwohl er in der Theorie sehr gut ist, kann er keine Magie wirken. Einzig dadurch, dass er regelmäßig im nahegelegenen Dungeon durch das Besiegen von Monstern Punkte freischaltet, darf er überhaupt an der Akademie bleiben. Nicht nur die Schüler, auch einer der Lehrer mobbt ihn regelmäßig, doch Will ist noch nicht bereit, aufzugeben. Immerhin hat er seiner Kindheitsfreundin versprochen, es bis an die Spitze zu schaffen, damit sich ihre Träume verwirklichen können und sich die unfaire Realität seines Landes ändert. \n\nQuelle: www.anisearch.de/anime/19058",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0D8LN42WL?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GW4HM7WK9/wistoria-wand-and-sword"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0D8LN42WL?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -783764,6 +783780,7 @@
           "language": "Italienisch",
           "title": "Wistoria: Wand and Sword",
           "status": "Abgeschlossen",
+          "dubbed": true,
           "released": "07.07.2024 - 29.09.2024",
           "publisher": [
             "Crunchyroll"
@@ -783814,7 +783831,7 @@
         "Wistoria: Zauberstab & Schwert"
       ]
     },
-    "fetchedAt": "2026-10-25T04:19:13.396Z"
+    "fetchedAt": "2026-11-24T06:18:57.564Z"
   },
   "174596": {
     "anisearchId": 19097,
@@ -783920,12 +783937,12 @@
     "descriptionDe": "Der Oberschüler Yoo Hobin wirkt auf den ersten Blick nicht wie jemand, der etwas Weltbewegendes erreichen kann. Sowohl in der Schule als auch bei seinem Nebenjob wird er gemobbt, jeder Tag bringt neue ungerechte Grausamkeiten mit sich. Doch als er eines Tages aus Versehen den Kameramann des beliebten NewTubers Pakgo anrempelt und verprügelt wird, reißt ihm der Geduldsfaden. Zum ersten Mal überhaupt wehrt er sich gegen die Schläge – vor den Augen tausender begeisterter Zuschauer im Internet.\n\nDas ungewollte Video geht viral und eröffnet dem Jungen so eine lukrative Möglichkeit, die Krankenhausrechnung seiner Mutter zu begleichen. Denn Kameramann Jiksae ist ein gnadenloser Opportunist und weiß genau, wie man aus solchen Videos Kapital schlagen kann. Gemeinsam machen sie sich daran, andere Leute, für die das Quälen ihrer Mitmenschen zum Hobby geworden ist, aufzumischen. Doch ihre Arbeit ist gefährlich, denn die Liste jener, die auf Rache sinnen, wächst mit jedem Video weiter und gefährdet ihre eigene Sicherheit. \n\nQuelle: www.anisearch.de/anime/19064",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CZDKGGC1?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GJ0H7QGME/viral-hit"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CZDKGGC1?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -784025,7 +784042,7 @@
         "Self Taught Fight"
       ]
     },
-    "fetchedAt": "2026-10-25T04:19:20.355Z"
+    "fetchedAt": "2026-11-24T06:19:04.718Z"
   },
   "174654": {
     "anisearchId": 19063,
@@ -785534,7 +785551,7 @@
         "Night of the Living Cat"
       ]
     },
-    "fetchedAt": "2026-10-25T04:19:27.273Z"
+    "fetchedAt": "2026-11-24T06:19:11.862Z"
   },
   "175137": {
     "anisearchId": 19094,
@@ -786242,6 +786259,10 @@
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GMEHME77W/honey-lemon-soda"
+      },
+      {
+        "provider": "disney+",
+        "url": "https://www.disneyplus.com/browse/entity-6985037f-9614-48e7-91f3-ca8a4d7428bb"
       }
     ],
     "info": {
@@ -786339,7 +786360,7 @@
         "HLS"
       ]
     },
-    "fetchedAt": "2026-10-25T04:19:34.244Z"
+    "fetchedAt": "2026-11-24T06:19:19.011Z"
   },
   "175450": {
     "anisearchId": 19089,
@@ -787327,7 +787348,7 @@
         "Call of the Night: Staffel 2"
       ]
     },
-    "fetchedAt": "2026-10-25T04:19:41.184Z"
+    "fetchedAt": "2026-11-24T06:19:26.375Z"
   },
   "175977": {
     "anisearchId": 19125,
@@ -788230,7 +788251,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:19:48.145Z"
+    "fetchedAt": "2026-11-24T06:19:33.539Z"
   },
   "176275": {
     "anisearchId": 19146,
@@ -788723,7 +788744,7 @@
         "Wedding Ring Story 2"
       ]
     },
-    "fetchedAt": "2026-10-25T04:20:02.017Z"
+    "fetchedAt": "2026-11-24T06:19:47.837Z"
   },
   "176299": {
     "anisearchId": 19313,
@@ -788903,7 +788924,7 @@
         "The Pharmacist’s Monologue 2"
       ]
     },
-    "fetchedAt": "2026-10-25T04:19:55.063Z"
+    "fetchedAt": "2026-11-24T06:19:40.684Z"
   },
   "176311": {
     "anisearchId": 19134,
@@ -789017,7 +789038,7 @@
         "Blue Exorcist Season 4"
       ]
     },
-    "fetchedAt": "2026-10-25T04:20:08.923Z"
+    "fetchedAt": "2026-11-24T06:19:54.980Z"
   },
   "176314": {
     "anisearchId": 19129,
@@ -789712,7 +789733,7 @@
         "Solo Leveling : Surge desde las sombras"
       ]
     },
-    "fetchedAt": "2026-10-25T04:20:15.894Z"
+    "fetchedAt": "2026-11-24T06:20:02.148Z"
   },
   "176508": {
     "anisearchId": 19161,
@@ -789842,7 +789863,7 @@
         "Shangri-La Frontier (2024)"
       ]
     },
-    "fetchedAt": "2026-10-25T04:20:22.841Z"
+    "fetchedAt": "2026-11-24T06:20:09.301Z"
   },
   "176509": {
     "anisearchId": 19175,
@@ -789945,7 +789966,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:20:29.743Z"
+    "fetchedAt": "2026-11-24T06:20:16.442Z"
   },
   "176577": {
     "anisearchId": 19102,
@@ -791542,6 +791563,15 @@
           "released": "06.03.2026"
         },
         {
+          "language": "Englisch",
+          "title": "A New Dawn",
+          "status": "Zukünftig",
+          "released": "14.12.2026",
+          "publisher": [
+            "Dazzler Media"
+          ]
+        },
+        {
           "language": "Deutsch",
           "title": "A New Dawn",
           "status": "Abgeschlossen",
@@ -791620,7 +791650,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:20:36.668Z"
+    "fetchedAt": "2026-11-24T06:20:23.576Z"
   },
   "177143": {
     "anisearchId": 6253,
@@ -792724,7 +792754,7 @@
     "descriptionDe": "Auch wenn Shiki Ichinose alles andere als ein gewöhnlicher Jugendlicher ist, wollte er sicherlich eines niemals: den Tod seines Vaters. Doch genau diesen muss er – in gewisser Weise – nun mitverantworten, denn durch Shikis Körper fließt nicht nur menschliches, sondern auch Teufelsblut. Und ebenjene menschenähnlichen Teufel stehen bereits seit einer halben Ewigkeit im Krieg mit den sogenannten »Momotarou«, durch deren Adern – ihrer Meinung nach – das bessere Blut strömt.\n\nUnd genau dieser Konflikt war es, der Shikis Adoptivvater Tsuyoshi, der selbst ein »Momotarou« war, das Leben kosten sollte. Eines Tages schaffte es dieser nämlich nicht mehr, die wahre Identität seines Adoptivsohnes zu verbergen, was die Gegenseite auf den Plan rief, die Shiki beseitigen wollten, bevor das teuflische Blut in ihm erwachen konnte. Im Zuge dieses Ermordungsversuchs opferte sich Tsuyoshi für seinen Sohn und offenbarte ihm die ganze Wahrheit, die er selbst die ganze Zeit über verdrängt hatte.\n\nNachdem Shiki alles erfahren hatte und auch das Herz seines Vaters aufgehört hatte zu schlagen, überkamen ihn plötzlich Rachegefühle und es geschah, was eigentlich nie hätte passieren sollen: Das Teufelsblut in ihm erwachte und er verwandelte sich in ein monströses Wesen, das nur darauf aus war, seinen Vater zu rächen.\n\nAls Naito Mudano, der seines Zeichens Lehrer an einer Schule für Teufelskinder ist, auf diesen Fall aufmerksam wird, beschließt er, Shiki an die Rakshasa-Akademie zu holen, wo er lernen soll, mit seiner neu gewonnenen Macht umzugehen. Doch wird der junge Teufel es schaffen, seine Kräfte zu bändigen? Oder aber wird er – wie bereits in vergangenen Tagen – erneut der Schule verwiesen werden? Eine spannende und dramatische Geschichte über eine neue Ära von Teufelskindern nimmt ihren Lauf! \n\nQuelle: www.anisearch.de/anime/19258",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
+        "provider": "primevideo-channel-aniverse-de",
         "url": "https://www.amazon.de/dp/B0FFRLJ4K6?tag=anisearch.de-21"
       },
       {
@@ -792863,7 +792893,7 @@
         "Togen Anki: Teufelsblut"
       ]
     },
-    "fetchedAt": "2026-10-25T04:20:43.571Z"
+    "fetchedAt": "2026-11-24T06:20:30.729Z"
   },
   "177475": {
     "anisearchId": 19271,
@@ -792956,6 +792986,15 @@
           "publisher": [
             "Animation Digital Network"
           ]
+        },
+        {
+          "language": "Italienisch",
+          "title": "Yaiba",
+          "status": "Zukünftig",
+          "released": "?",
+          "publisher": [
+            "Dynit SRL"
+          ]
         }
       ],
       "format": "TV-Serie",
@@ -793001,7 +793040,7 @@
         "Yaiba 2025"
       ]
     },
-    "fetchedAt": "2026-10-25T04:20:50.505Z"
+    "fetchedAt": "2026-11-24T06:20:37.865Z"
   },
   "177494": {
     "anisearchId": 19219,
@@ -793370,7 +793409,7 @@
         "Someday Will I Be the Greatest Alchemist?"
       ]
     },
-    "fetchedAt": "2026-10-25T04:20:57.401Z"
+    "fetchedAt": "2026-11-24T06:20:45.019Z"
   },
   "177508": {
     "anisearchId": 19290,
@@ -793955,7 +793994,7 @@
         "Hanazakari no Kimitachi he"
       ]
     },
-    "fetchedAt": "2026-10-25T04:21:04.338Z"
+    "fetchedAt": "2026-11-24T06:20:52.159Z"
   },
   "177581": {
     "anisearchId": 19302,
@@ -794614,7 +794653,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:21:11.252Z"
+    "fetchedAt": "2026-11-24T06:20:59.307Z"
   },
   "177680": {
     "anisearchId": 19311,
@@ -795257,7 +795296,7 @@
         "Ghost in the Shell (2026)"
       ]
     },
-    "fetchedAt": "2026-10-25T04:21:18.199Z"
+    "fetchedAt": "2026-11-24T06:21:06.443Z"
   },
   "177704": {
     "anisearchId": 19288,
@@ -795437,7 +795476,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:21:25.120Z"
+    "fetchedAt": "2026-11-24T06:21:13.610Z"
   },
   "177761": {
     "anisearchId": 19310,
@@ -796266,13 +796305,14 @@
         }
       ],
       "synonyms": [
+        "Two Faced Tamon",
         "Which Face Does Tamon Have Now?",
         "Echt jetzt",
         "Tamon?!",
-        "Two Faced Tamon"
+        "Le due facce di Tamon"
       ]
     },
-    "fetchedAt": "2026-10-25T04:21:32.063Z"
+    "fetchedAt": "2026-11-24T06:21:20.750Z"
   },
   "178022": {
     "anisearchId": 19328,
@@ -796481,7 +796521,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:21:38.993Z"
+    "fetchedAt": "2026-11-24T06:21:27.909Z"
   },
   "178031": {
     "anisearchId": 19331,
@@ -797000,7 +797040,7 @@
         "Kimama ni Majutsu wo Kiwamemasu Dai 2 Ki"
       ]
     },
-    "fetchedAt": "2026-10-25T04:21:45.976Z"
+    "fetchedAt": "2026-11-24T06:21:35.061Z"
   },
   "178100": {
     "anisearchId": 19363,
@@ -797815,7 +797855,7 @@
         "I’ll Use My Appraisal Skill to Rise in the World 2"
       ]
     },
-    "fetchedAt": "2026-10-25T04:21:53.099Z"
+    "fetchedAt": "2026-11-24T06:21:42.227Z"
   },
   "178436": {
     "anisearchId": 19751,
@@ -798374,7 +798414,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:22:00.007Z"
+    "fetchedAt": "2026-11-24T06:21:49.363Z"
   },
   "178675": {
     "anisearchId": 19452,
@@ -798579,7 +798619,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:22:06.981Z"
+    "fetchedAt": "2026-11-24T06:21:56.523Z"
   },
   "178701": {
     "anisearchId": 19382,
@@ -799116,7 +799156,7 @@
         "Kaiju No. 8 2nd Season"
       ]
     },
-    "fetchedAt": "2026-10-25T04:22:13.896Z"
+    "fetchedAt": "2026-11-24T06:22:03.662Z"
   },
   "178758": {
     "anisearchId": 19213,
@@ -799561,7 +799601,7 @@
         "La Película Kimetsu no Yaiba: Guardianes de la Noche - La Fortaleza Infinita"
       ]
     },
-    "fetchedAt": "2026-10-25T04:22:20.847Z"
+    "fetchedAt": "2026-11-24T06:22:10.815Z"
   },
   "178789": {
     "anisearchId": 19443,
@@ -800011,7 +800051,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:22:27.804Z"
+    "fetchedAt": "2026-11-24T06:22:17.960Z"
   },
   "178886": {
     "anisearchId": 19456,
@@ -800117,7 +800157,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:22:34.752Z"
+    "fetchedAt": "2026-11-24T06:22:25.325Z"
   },
   "178972": {
     "anisearchId": 19756,
@@ -800258,7 +800298,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:22:48.637Z"
+    "fetchedAt": "2026-11-24T06:22:39.611Z"
   },
   "179062": {
     "anisearchId": 19465,
@@ -800895,7 +800935,7 @@
         "Magic Maker: How to Perform Alternate World Magic"
       ]
     },
-    "fetchedAt": "2026-10-25T04:22:55.617Z"
+    "fetchedAt": "2026-11-24T06:22:46.752Z"
   },
   "179302": {
     "anisearchId": 19469,
@@ -801114,7 +801154,7 @@
         "Rent-a-Girlfriend (Season 4)"
       ]
     },
-    "fetchedAt": "2026-10-25T04:23:02.597Z"
+    "fetchedAt": "2026-11-24T06:22:53.907Z"
   },
   "179408": {
     "anisearchId": 20627,
@@ -802497,7 +802537,7 @@
         "A Couple of Cuckoos (2025)"
       ]
     },
-    "fetchedAt": "2026-10-25T04:23:09.539Z"
+    "fetchedAt": "2026-11-24T06:23:01.035Z"
   },
   "179838": {
     "anisearchId": 19503,
@@ -804013,7 +804053,7 @@
         "Takamine-san"
       ]
     },
-    "fetchedAt": "2026-10-25T04:23:16.512Z"
+    "fetchedAt": "2026-11-24T06:23:08.187Z"
   },
   "179966": {
     "anisearchId": 19506,
@@ -804524,7 +804564,7 @@
         "Kaiju No. 8 Recap"
       ]
     },
-    "fetchedAt": "2026-10-25T04:23:23.445Z"
+    "fetchedAt": "2026-11-24T06:23:15.317Z"
   },
   "179999": {
     "anisearchId": 19512,
@@ -805325,10 +805365,6 @@
         "url": "https://www.amazon.de/dp/B0F2MR8CNF?tag=anisearch.de-21"
       },
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0F1KVL71K?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/81991687"
       },
@@ -805339,6 +805375,10 @@
       {
         "provider": "adn-de",
         "url": "https://animationdigitalnetwork.com/de/video/1272-witch-watch"
+      },
+      {
+        "provider": "primevideo-channel-adn-de",
+        "url": "https://www.amazon.de/dp/B0F1KVL71K?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -805469,7 +805509,7 @@
         "Witch Watch: Watch Party"
       ]
     },
-    "fetchedAt": "2026-10-25T04:23:30.400Z"
+    "fetchedAt": "2026-11-24T06:23:22.477Z"
   },
   "180425": {
     "anisearchId": 19555,
@@ -805696,7 +805736,7 @@
         "Wandance: The Animation"
       ]
     },
-    "fetchedAt": "2026-10-25T04:23:37.325Z"
+    "fetchedAt": "2026-11-24T06:23:29.615Z"
   },
   "180460": {
     "anisearchId": 19556,
@@ -806038,7 +806078,7 @@
         "Wild Final Boss Appeared!"
       ]
     },
-    "fetchedAt": "2026-10-25T04:23:44.271Z"
+    "fetchedAt": "2026-11-24T06:23:36.777Z"
   },
   "180599": {
     "anisearchId": 19602,
@@ -806412,7 +806452,7 @@
         "Classroom of the Elite IV"
       ]
     },
-    "fetchedAt": "2026-10-25T04:23:51.193Z"
+    "fetchedAt": "2026-11-24T06:23:43.910Z"
   },
   "180746": {
     "anisearchId": 19568,
@@ -806536,7 +806576,7 @@
         "Shibou Yuugi de Meshi wo Kuu."
       ]
     },
-    "fetchedAt": "2026-10-25T04:23:58.138Z"
+    "fetchedAt": "2026-11-24T06:23:51.065Z"
   },
   "180794": {
     "anisearchId": 19630,
@@ -808005,7 +808045,7 @@
         "Earth 2nd Season"
       ]
     },
-    "fetchedAt": "2026-10-25T04:24:05.064Z"
+    "fetchedAt": "2026-11-24T06:23:58.196Z"
   },
   "181178": {
     "anisearchId": 17531,
@@ -808519,7 +808559,7 @@
         "Dark Moon: The Blood Altar Animation with Enhypen"
       ]
     },
-    "fetchedAt": "2026-10-25T04:24:18.937Z"
+    "fetchedAt": "2026-11-24T06:24:12.485Z"
   },
   "181444": {
     "anisearchId": 19599,
@@ -808741,7 +808781,7 @@
         "Princesse Puncheuse"
       ]
     },
-    "fetchedAt": "2026-10-25T04:24:12.010Z"
+    "fetchedAt": "2026-11-24T06:24:05.352Z"
   },
   "181449": {
     "anisearchId": 19597,
@@ -809616,7 +809656,7 @@
         "Miss Kobayashi’s Dragon Maid: The Lonely Dragon"
       ]
     },
-    "fetchedAt": "2026-10-25T04:24:25.879Z"
+    "fetchedAt": "2026-11-24T06:24:19.620Z"
   },
   "181841": {
     "anisearchId": 19609,
@@ -810330,7 +810370,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-25T04:24:32.826Z"
+    "fetchedAt": "2026-11-24T06:24:26.756Z"
   },
   "182140": {
     "anisearchId": 5206,
@@ -810803,7 +810843,7 @@
         "TenSura Season 4"
       ]
     },
-    "fetchedAt": "2026-10-25T04:24:39.785Z"
+    "fetchedAt": "2026-11-24T06:24:33.896Z"
   },
   "182206": {
     "anisearchId": 19634,
@@ -823792,7 +823832,7 @@
         "Blue Exorcist 5th Season"
       ]
     },
-    "fetchedAt": "2026-10-25T04:22:41.720Z"
+    "fetchedAt": "2026-11-24T06:22:32.463Z"
   },
   "185887": {
     "anisearchId": 10206,

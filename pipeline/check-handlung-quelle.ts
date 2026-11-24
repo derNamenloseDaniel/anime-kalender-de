@@ -1,9 +1,9 @@
 /**
  * Zusicherung zur Quellenzeile unter der Handlung (24.11.2026): The Mighty Nein zeigte „Quelle: aniSearch" mit Link auf die Startseite,
- * der Text kam von TMDB. Aufruf: `npm run check:logic`.
+ * der Text kam von TMDB. Aufruf: `npm run check:logic`; der Teil am gebauten Bestand steht in `check-handlung-quelle-bestand.ts`.
  */
 import { cartoonHandlung, plotVon } from '../web/src/components/detail/plot.ts'
-import { readdirSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { synopseVon } from './bau/synopse-von.ts'
 import { ausgelieferteCartoons, handlungQuellenFehler } from './lib/handlung-quellen.ts'
 import { unbedingteAufrufe } from './lib/unbedingte-aufrufe.ts'
@@ -46,14 +46,6 @@ const cs = ausgelieferteCartoons([{ id: -1, synopsis: 'a' }, { id: -2, synopsis:
 pruefe('Cartoons: Vereinigung je Kennung einmal, Anime im Kern zählt nicht', JSON.stringify(cs.map((c) => c.id).sort()) === '[-1,-2,-3]', cs)
 pruefe('Cartoons: der Kern gewinnt', cs.find((c) => c.id === -1)?.tmdbId === 1, cs)
 pruefe('Cartoon nur im Kern ohne tmdbId wird gemeldet', handlungQuellenFehler({}, cs).length === 1 && handlungQuellenFehler({}, cs)[0]!.includes('-3'), handlungQuellenFehler({}, cs))
-
-/* A4 am echten Bestand: jede ausgelieferte Handlung ist titelgenau belegt. */
-const lies = <T>(pfad: string): T => JSON.parse(readFileSync(new URL(`../public/data/${pfad}`, import.meta.url), 'utf8')) as T
-const synopsen: Record<string, { de?: string; deSource?: { name: string; url: string } }> = {}
-for (const g of readdirSync(new URL('../public/data/synopses/', import.meta.url))) Object.assign(synopsen, lies(`synopses/${g}`))
-const bestand = handlungQuellenFehler(synopsen, ausgelieferteCartoons(lies<{ id: number }[]>('cartoons.json'), lies<{ id: number }[]>('titles-core.json')))
-pruefe('Bestand: keine Handlung ohne titelgenaue Quelle', bestand.length === 0, bestand.slice(0, 3))
-pruefe('Bestand gelesen (Synopsen vorhanden)', Object.keys(synopsen).length > 1000, Object.keys(synopsen).length)
 
 /* A1: synopseVon — jede Weiche einzeln. */
 const titel = { synopsis: 'English' } as never

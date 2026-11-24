@@ -33,6 +33,7 @@ datei(
   url: https://www.amazon.de/dp/B0BBB00009
   dub: true
   checkedAt: '2026-11-02'
+  note: "Tonspuren: Deutsch — Abos: crunchyrollde, zugang=abo"
 - anilistId: 900004
   platform: primevideo
   url: https://www.amazon.de/gp/video/detail/B0BBB00002
@@ -43,6 +44,7 @@ datei(
   url: https://www.amazon.de/gp/video/detail/B0BBB00008
   dub: true
   checkedAt: '2026-11-02'
+  note: "Tonspuren: Deutsch — Abos: Prime, zugang=kauf"
 - anilistId: 900014
   platform: crunchyroll
   available: false
@@ -67,6 +69,8 @@ datei(
   JSON.stringify({
     900005: { angebote: [{ anbieter: 'Joyn', art: 'ADS', url: 'https://www.joyn.de/serien/jw-5' }] },
     900006: { angebote: [{ anbieter: 'Joyn Plus', art: 'FLATRATE', url: 'https://www.joyn.de/serien/jw-6' }] },
+    900015: { angebote: [{ anbieter: 'Joyn', art: 'ADS', url: 'https://www.joyn.de/filme/jw-15' }] },
+    900016: { angebote: [{ anbieter: 'Joyn', art: 'ADS', url: 'https://www.joyn.de/filme/jw-16' }] },
   }),
 )
 datei(
@@ -75,6 +79,7 @@ datei(
     eintraege: [
       { id: 'GG5H5XQ7D', titel: 'Kaiju No. 8', slug: 'kaiju-no-8', audio: ['de-DE'] },
       { id: 'GKAI00009', titel: 'Kaiju No. 9', slug: 'kaiju-no-9', audio: ['ja-JP'] },
+      { id: 'GDEU00002', titel: 'Zweite Serie', slug: 'zweite-serie', audio: ['de-DE'] },
     ],
   }),
 )
@@ -82,7 +87,7 @@ process.env.AK_ROOT = kulisse
 const { sammleBelege } = await import('./bau/09-1-belege.ts')
 
 const stream = (platform: string, url: string) => ({ platform, url })
-const titel = (id: number, streams: unknown[], titleDe = `Titel ${id}`) => ({ id, slug: `t${id}`, titleDe, format: 'TV', streams }) as unknown as Title
+const titel = (id: number, streams: unknown[], titleDe = `Titel ${id}`, format = 'TV') => ({ id, slug: `t${id}`, titleDe, format, streams }) as unknown as Title
 const eintrag = { time: '18:00', weekday: 0, dates: [], rawTitle: 'x' }
 const ADN = 'https://gw.api.animationdigitalnetwork.com/x'
 const termin = (titleId: number, quelle: string) =>
@@ -104,6 +109,8 @@ const titles = new Map<number, Title>(
     titel(900012, [stream('crunchyroll', 'https://www.crunchyroll.com/')], 'Kaiju No. 9'),
     titel(900013, [stream('crunchyroll', 'https://www.crunchyroll.com')], 'Unbekannte Serie'),
     titel(900014, [stream('crunchyroll', 'https://www.crunchyroll.com')], 'Beantwortete Serie'),
+    titel(900015, [stream('netflix', 'https://www.netflix.com/title/90000015')], 'Special unter TV-Kennung', 'MOVIE'),
+    titel(900016, [stream('netflix', 'https://www.netflix.com/title/90000016')], 'Serie unter TV-Kennung'),
   ].map((t) => [t.id, t]),
 )
 const belege = sammleBelege({
@@ -111,10 +118,10 @@ const belege = sammleBelege({
   titles,
   crBySeriesId: new Map([['CRBBB', { ...eintrag, seriesId: 'CRBBB' }]]),
   tmdbMehrdeutig: new Set<string>(),
-  tmdbTitles: {},
-  tvJeTmdb: new Set<string>(),
+  tmdbTitles: { 900015: { kind: 'tv', tmdbId: 77 }, 900016: { kind: 'tv', tmdbId: 78 } } as never,
+  tvJeTmdb: new Set<string>(['tv77', 'tv78']),
   toteAdressen: new Set<string>(),
-  crDub: { scrapedAt: '', serien: [] } as never,
+  crDub: { scrapedAt: '', serien: [{ url: 'u', seriesId: 'GG5H5XQ7D', katalog: 'de' }] } as never,
 })
 
 const urls = (id: number) => titles.get(id)!.streams.map((s) => s.url)
@@ -131,7 +138,12 @@ pruefe('belegtAm je Adresskern: 2 Einträge', belege.vonHandBelegtAm.size === 2,
 console.log('Joyn aus JustWatch')
 pruefe('900005 bekommt Joyn (kostenlos)', urls(900005)[1] === 'https://www.joyn.de/serien/jw-5' && belege.joynZugang.get('https://www.joyn.de/serien/jw-5') === 'kostenlos', [urls(900005), [...belege.joynZugang]])
 pruefe('900006 bekommt Joyn (Abo)', urls(900006)[1] === 'https://www.joyn.de/serien/jw-6' && belege.joynZugang.get('https://www.joyn.de/serien/jw-6') === 'abo', [...belege.joynZugang])
+pruefe('Special unter TV-Kennung erbt kein Joyn (900015)', urls(900015).length === 1, urls(900015))
+pruefe('Serie unter TV-Kennung bekommt Joyn (900016)', urls(900016)[1] === 'https://www.joyn.de/filme/jw-16', urls(900016))
 console.log('Beleg-Index, zweite Ausgabe')
+pruefe('Zugang je Adresse: abo und kauf', JSON.stringify([...belege.zugangJeAdresse.values()]) === '["abo","kauf"]', [...belege.zugangJeAdresse])
+pruefe('Kanal je Adresse: zwei Adressen, eine mit Zusatzkanal', belege.kanalJeAdresse.size === 2 && [...belege.kanalJeAdresse.values()].filter(Boolean).length === 1, [...belege.kanalJeAdresse])
+pruefe('Belege je Plattform: drei Schlüssel, zwei Belege für 900003', belege.checksJePlattform.size === 3 && belege.checksJePlattform.get('900003|primevideo')?.length === 2, [...belege.checksJePlattform.keys()])
 pruefe('900003 bekommt die zweite Ausgabe mit Deutsch', urls(900003).includes('https://www.amazon.de/dp/B0BBB00009'), urls(900003))
 pruefe('900004 bekommt die zweite Ausgabe mit Deutsch', urls(900004).includes('https://www.amazon.de/gp/video/detail/B0BBB00008'), urls(900004))
 pruefe('belegFuer: Beleg derselben Adresse (900003)', belege.belegFuer(900003, 'primevideo', 'https://www.amazon.de/dp/B0BBB00009', 2)?.dub === true)
@@ -142,11 +154,15 @@ pruefe('900012 bekommt die Serienadresse aus dem Katalog', urls(900012)[0] === '
 pruefe('900014 verliert den pfadlosen Weg, die beantwortete Suche bleibt nicht offen', urls(900014).length === 0)
 pruefe('900013 verliert den pfadlosen Weg, Suche bleibt offen', urls(900013).length === 0 && JSON.stringify(belege.suchOffen.map((s) => s.id)) === '[900013]', belege.suchOffen)
 pruefe('crAdresseZu liefert die Katalogadresse', belege.crAdresseZu('Kaiju No. 8') === 'https://www.crunchyroll.com/de/series/GG5H5XQ7D/kaiju-no-8')
-pruefe('crKatalogDeutsch: nur Einträge mit de-DE', JSON.stringify([...belege.crKatalogDeutsch]) === '["GG5H5XQ7D"]', [...belege.crKatalogDeutsch])
+pruefe('crKatalogDeutsch: nur Einträge mit de-DE', JSON.stringify([...belege.crKatalogDeutsch]) === '["GG5H5XQ7D","GDEU00002"]', [...belege.crKatalogDeutsch])
+const usNein = (seriesId: string) => belege.usNeinWiderlegt({ nichtVerfuegbar: true, katalog: 'us', seriesId })
+pruefe('US-Nein widerlegt, wo der Katalog deutsch führt und kein deutscher Befund vorliegt', usNein('GDEU00002') === true)
+pruefe('US-Nein bleibt, wo ein deutscher Befund vorliegt', usNein('GG5H5XQ7D') === false)
+pruefe('beantwortete Suchen: drei Titel/Anbieter-Paare', belege.beantworteteSuchen.size === 3 && belege.beantworteteSuchen.has('900014|crunchyroll'), [...belege.beantworteteSuchen])
 
 rmSync(kulisse, { recursive: true, force: true })
 if (verletzt) {
   console.error(`check-sammle-belege-naht: ${verletzt} Verstoß/Verstöße`)
   process.exit(1)
 }
-console.log('check-sammle-belege-naht: ok (19 Zusicherungen)')
+console.log('check-sammle-belege-naht: ok (27 Zusicherungen)')

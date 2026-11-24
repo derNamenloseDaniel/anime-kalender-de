@@ -26,6 +26,7 @@ import { schreibeCoverListe } from './lib/cover-liste.ts'
 import { ladeEigeneTitel } from './bau/eigene-titel.ts'
 import { eigeneTmdbZuordnung } from './lib/eigene-tmdb.ts'
 import { waehleStaffel, type TmdbStaffel } from './lib/tmdb-staffel.ts'
+import { staffelAnwaerter, staffelEintrag } from './lib/tmdb-staffel-wahl.ts'
 import { bilderAbzufragen, FRIST_TAGE, streicheBilderUeberFrist } from './lib/tmdb-ablauf.ts'
 import { holeBanner } from './lib/tmdb-banner-abruf.ts'
 import { holeStaffel0 } from './lib/tmdb-staffel0-abruf.ts'
@@ -89,7 +90,8 @@ async function staffelPlakate(apiKey: string, zuordnung: Record<string, { tmdbId
   }
   /* Nur, was der Monitor des letzten Baus ohne Zuordnung führt: die übrigen Reihenmitglieder erscheinen nirgends mit Cover. */
   const gesucht = new Set(readJson<{ id: number; grund: string }[]>('data/cover-klein.json', []).filter((k) => k.grund === 'keine TMDB-Zuordnung').map((k) => k.id))
-  const offen = Object.values(reihen).flat().filter((t) => gesucht.has(t.id) && !ohne.has(t.id) && !(String(t.id) in bestand) && serieVon.has(t.id)).slice(0, limit)
+  const eigeneKennung = (id: number): boolean => Boolean(zuordnung[String(id)]?.tmdbId)
+  const offen = staffelAnwaerter(Object.values(reihen).flat(), { gesucht, ohne, serieVon, eigeneKennung, bestand }).slice(0, limit)
   const staffeln = new Map<number, TmdbStaffel[]>()
   let gefunden = 0
   for (const t of offen) {
@@ -101,12 +103,12 @@ async function staffelPlakate(apiKey: string, zuordnung: Record<string, { tmdbId
       }
       const nummer = waehleStaffel(staffeln.get(serie)!, t.jpStart, t.episodes)
       if (nummer === undefined) {
-        bestand[String(t.id)] = null
+        bestand[String(t.id)] = staffelEintrag(bestand[String(t.id)], undefined)
         continue
       }
       const bilder = await fetchJson<{ posters?: TmdbBild[] }>(`https://api.themoviedb.org/3/tv/${serie}/season/${nummer}/images?include_image_language=ja,null,de,en&api_key=${apiKey}`)
       const wahl = waehlePlakat(bilder.posters ?? [])
-      bestand[String(t.id)] = wahl ? plakatEintrag(wahl) : null
+      bestand[String(t.id)] = staffelEintrag(bestand[String(t.id)], wahl)
       if (wahl) gefunden++
     } catch (e) {
       warn(`TMDB-Staffelplakat ${t.id}: ${(e as Error).message.slice(0, 80)}`)

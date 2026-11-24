@@ -2,7 +2,7 @@
  * Zusicherung (F157, 24.11.2026): **Die Bauschleife schreibt `staffelFolge` an Horizonte-Fernsehtermine** — `rolleTermineAus`
  * (`pipeline/bau/10-termine.ts`) ruft `schreibeTvStaffelFolgen` wirklich auf. Ein Termin am Sendeplatz einer echten Sendung aus
  * `data/tv-programm.json`, deren Folgentitel die Wikipedia-Liste eindeutig zuordnet, läuft durch die ganze Schleife und muss mit
- * Staffel und Folge herauskommen. Läuft in `check:logic`.
+ * Staffel und Folge herauskommen. Läuft in `check:bestand` (liest den gebauten Titel aus `public/data/titles.json`).
  */
 import { spawnSync } from 'node:child_process'
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
@@ -15,22 +15,25 @@ import type { Release, Title } from '../shared/types.ts'
 if (!process.env.AK_ROOT) {
   const repo = join(dirname(fileURLToPath(import.meta.url)), '..')
   const wo = mkdtempSync(join(tmpdir(), 'staffel-folge-tv-schleife-'))
+  let status = 1
   try {
     for (const d of ['data/tv-programm.json', 'data/wikipedia-folgen.json', 'data/curated/horizonte-staffeln.yaml', 'data/curated/pokemon-staffeln.yaml', 'data/kino-ankuendigungen.yaml', 'data/ankuendigungen.yaml', 'data/ohne-synchro-von-hand.yaml']) {
       mkdirSync(dirname(join(wo, d)), { recursive: true })
       cpSync(join(repo, d), join(wo, d))
     }
     const r = spawnSync(process.execPath, [...process.execArgv, fileURLToPath(import.meta.url)], { env: { ...process.env, AK_ROOT: wo }, stdio: 'inherit', timeout: 120_000 })
-    process.exit(r.status ?? 1)
+    status = r.status ?? 1
   } finally {
     rmSync(wo, { recursive: true, force: true })
   }
+  if (status !== 0) console.error(`✖ check-staffel-folge-tv-schleife: Lauf in der Kulisse endete mit ${status}`)
+  process.exit(status)
 }
 const { rolleTermineAus } = await import('./bau/10-termine.ts')
 const { ladeTvStaffelEingaben, schreibeTvStaffelFolgen } = await import('./bau/staffel-folge-tv.ts')
 
 const ID = 158871
-const lies =<T>(datei: string): T => JSON.parse(readFileSync(new URL(`../${datei}`, import.meta.url), 'utf8')) as T
+const lies = <T>(datei: string): T => JSON.parse(readFileSync(new URL(`../${datei}`, import.meta.url), 'utf8')) as T
 const titelRoh = lies<Title[] | { titles: Title[] }>('public/data/titles.json')
 const titel = (Array.isArray(titelRoh) ? titelRoh : titelRoh.titles).find((t) => t.id === ID)
 

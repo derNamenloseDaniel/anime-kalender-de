@@ -759,3 +759,17 @@ export function bereicheMitFolgen(bereiche: DubBereich[], neu: number[]): DubBer
   }
   return raus
 }
+
+/** Lage einer Staffel am Reiter (F157): Punkt = läuft, Ring = kommt, sonst ohne Marke. */
+export type StaffelLage = 'laeuft' | 'kommt' | 'ruht'
+
+/**
+ * Läuft eine Staffel `[von, bis]` (offen: ohne `bis`), kommt sie noch oder ruht sie? Es läuft, was schon eine deutsche Folge hat und
+ * offen ist oder noch einen Termin ab heute mit belegter Folgennummer darin hat; es kommt, was keine hat, aber einen solchen Termin.
+ */
+export function staffelLage(von: number, bis: number | undefined, mitDeutscher: boolean, releases: Release[], today: string): StaffelLage {
+  const drin = (e: ReleaseEvent) => anzeigeFolge(e) && e.episode! >= von && (bis === undefined || e.episode! <= bis)
+  const termin = releases.some((r) => expandEvents(r).some((e) => e.date >= today && drin(e)))
+  if (mitDeutscher) return bis === undefined || termin ? 'laeuft' : 'ruht'
+  return termin ? 'kommt' : 'ruht'
+}

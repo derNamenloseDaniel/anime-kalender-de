@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Messlauf der Reiter-Pfeile (Mockup `staffel-abschnitt`, F157; `web/buehne/mockups/staffel-pfeile.tsx`) im echten Browser:
+ * Messlauf der Reiter-Pfeile (Mockup `staffel-abschnitt`, F157; `web/src/components/detail/staffel-pfeile.tsx`) im echten Browser:
  * Pfeilzustand ganz links / Mitte / ganz rechts, Klick-Sprung höchstens eine Leistenbreite (plus 2 px Snap), Trefferfläche des
  * aktiven Pfeils 44 × 44 und — der Rand des ersten und letzten Reiters wird nie von einem Pfeil (auch nicht von dessen `::after`) abgefangen.
  *
@@ -13,6 +13,8 @@ import { oeffneZellen, starteBuehne } from './buehne-seite.mjs'
 
 /** Der Sprung eines Klicks darf die Leiste um höchstens so viel überschreiten (Rundung, `snap-proximity`). */
 export const SNAP_TOLERANZ = 2
+/** Sichtbare Leistenbreite der Messung in px: schmal genug, dass die fünf Reiter der Pokémon-Hauptserie überstehen. */
+const VERENGT = 120
 
 /** Befunde (Texte) zu einer Messung; leer = in Ordnung. Ohne weitere Reiter in einer Richtung fehlt der Pfeil dort (`fehlt`). */
 export function bewerte(m) {
@@ -52,11 +54,15 @@ function messeFlaeche() {
 async function messe(seite) {
   const zellen = await oeffneZellen(seite, { mockup: 'staffel-abschnitt', variante: 'A', fall: 'pokemon-sammeltitel', teil: 'nachher', zeit: '2026-11-24T10:00:00+01:00' })
   const f = zellen.find((z) => z.schluessel === 'nachher-375-hell').frame
-  const rolle = async (x) => { await f.evaluate((s) => { const e = document.querySelector('[data-staffel-reiter]'); e.scrollLeft = s < 0 ? e.scrollWidth : s }, x); await seite.waitForTimeout(300) }
+  /* Fünf Reiter passen auf 375 px ganz hinein (dann gibt es zu Recht keinen Pfeil); für die Messung wird die Zeile auf 120 px Leiste verengt. */
+  /* Die Reiter stehen im Folgenbereich, unterhalb der ersten Bildschirmhöhe: mittig rollen, sonst trifft `elementFromPoint` nichts. */
+  await f.evaluate((b) => { const e = document.querySelector('[data-staffel-reiter]'); e.parentElement.style.width = `${b}px`; e.scrollIntoView({ block: 'center' }) }, VERENGT + 32)
+  await seite.waitForTimeout(300)
+  const rolle = async (x) => { await f.evaluate((s) => { const e = document.querySelector('[data-staffel-reiter]'); e.scrollLeft = s === 'mitte' ? (e.scrollWidth - e.clientWidth) / 2 : s < 0 ? e.scrollWidth : s }, x); await seite.waitForTimeout(300) }
   const breite = () => f.evaluate(() => document.querySelector('[data-staffel-reiter]').clientWidth)
   const stand = async (x) => { await rolle(x); return f.evaluate(messeStand) }
   const links = await stand(0)
-  const mitte = await stand(211)
+  const mitte = await stand('mitte')
   const rechts = await stand(-1)
   await rolle(0)
   await f.locator('[data-pfeil="rechts"]').click({ position: { x: 8, y: 20 } })

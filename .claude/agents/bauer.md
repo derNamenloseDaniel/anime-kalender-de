@@ -82,6 +82,8 @@ Lokal immer: Tests der berührten Dateien (`npx tsx <test>`) und `npx tsc --noEm
 | Handbeleg entfernt/umgehängt | `node tools/erneut-melden.mjs --pruefen`, bei FEHL `--neu-erzeugen` und alles stagen |
 | vor jedem Push | `node tools/diff-mutanten.mjs` (K1), nach main-Merge `node tools/umfang-pruefen.mjs`, `node tools/skript-aufrufer-wache.mjs`, `node tools/merge-verlust-probe.mjs` |
 
+**Vor dem Abgeben jede Prüfung aus `check:logic` fahren, die eine berührte Datei importiert, auch mittelbar** (`grep -l "<datei>" pipeline/check-*.ts tools/*.test.*`; bei Komponenten unter `detail/` zusätzlich jede Prüfung, die `DetailPanel` rendert), nicht nur die eigenen Tests; Anlass PR 4896, zwei rote Prüfungen nach der Nachbesserung (24.11.2026).
+
 `tools/check-logic-liste.txt` nach dem Eintragen: `grep -v '^#' tools/check-logic-liste.txt | LC_ALL=C sort -c` (auch nach jedem main-Merge).
 
 ## Tests und Wächter

@@ -54,8 +54,8 @@ export function ReiterZeile({ reiter, aktiv, lagen, farbe }: { reiter: Reiter[];
           )
         })}
       </div>
-      <ReiterPfeil richtung="links"weitere={lage.links} beiKlick={() => rolleUm(zeile.current, 'links')} />
-      <ReiterPfeil richtung="rechts"weitere={lage.rechts} beiKlick={() => rolleUm(zeile.current, 'rechts')} />
+      <ReiterPfeil richtung="links" weitere={lage.links} beiKlick={() => rolleUm(zeile.current, 'links')} />
+      <ReiterPfeil richtung="rechts" weitere={lage.rechts} beiKlick={() => rolleUm(zeile.current, 'rechts')} />
     </div>
   )
 }

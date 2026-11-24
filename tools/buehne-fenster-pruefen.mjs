@@ -2,9 +2,10 @@
 /**
  * Prüft, dass die Bühnen-Seite das Fenster füllt, ohne selbst zu scrollen (Navigator-iframe, 785 px hoch), gegen `buehne-dist/`:
  *
- * - 1280×785 und 1728×785, Gerät 375 und „beide": html und body haben keinen Überlauf (`scrollHeight − clientHeight` = 0), und die
- *   Zellen reichen bis zum unteren Rand (Seite füllt das Fenster, `.seite` = 100dvh).
- * - 1280×500, Gerät 375: keine Zelle unter 240 px (Untergrenze); die Seite scrollt dort bewusst.
+ * - 1728×785, Gerät 375: html und body haben keinen Überlauf (`scrollHeight − clientHeight` = 0), und die Zellen reichen bis zum
+ *   unteren Rand (Seite füllt das Fenster, `.seite` = 100dvh). Bei 1280 brechen die Zellen seit der Untergrenze 640 px in zwei
+ *   Reihen um, die Seite scrollt dort bewusst (Daniel, 24.11.2026: Zelle mindestens Handyhöhe).
+ * - 1280×500, Gerät 375: keine Zelle unter 640 px (Untergrenze, mindestens Handyhöhe); die Seite scrollt dort bewusst.
  * - Im hohen Werkzeug-Fenster (`starteBuehne`, 12000 px): jede Zelle hat ihre volle Gerätehöhe (375 → 812, Desktop 1200 → 800), die
  *   Zelle samt Beschriftung ist 834,8 px hoch wie vor dem Umbau (Bildhöhen der `buehne:bilder`), und „beide" ist dort nicht verkleinert.
  *
@@ -38,7 +39,7 @@ async function messe(seite, geraet, breite, hoehe) {
 
 async function pruefeFensterFuellt(seite) {
   for (const geraet of ['375']) {
-    for (const breite of [1280, 1728]) {
+    for (const breite of [1728]) {
       const m = await messe(seite, geraet, breite, 785)
       const wo = `Gerät ${geraet}, ${breite}×785`
       assert.equal(m.html, 0, `${wo}: html scrollt (${m.html} px)`)
@@ -60,7 +61,7 @@ async function pruefeDesktopMindesthoehe(seite) {
 async function pruefeUntergrenze(seite) {
   const m = await messe(seite, '375', 1280, 500)
   const kleinste = Math.min(...m.rahmen.map(Number))
-  assert.ok(kleinste >= 240, `1280×500: eine Zelle ist nur ${kleinste} px hoch (Untergrenze 240)`)
+  assert.ok(kleinste >= 640, `1280×500: eine Zelle ist nur ${kleinste} px hoch (Untergrenze 640)`)
 }
 
 /** Ein mittelhohes Fenster (1728×1300, eine Zeile Handy-Zellen) gibt mehr Platz als die Gerätehöhe: Die Zelle bleibt bei 812 + Beschriftung. */

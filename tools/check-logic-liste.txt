@@ -644,8 +644,8 @@ pipeline/check-staffel-anzeige-bau.ts
 pipeline/check-staffel-anzeige-panel.ts
 pipeline/check-staffel-anzeige.ts
 pipeline/check-staffel-des-titels.ts
-pipeline/check-staffel-folge-tv.ts
 pipeline/check-staffel-folge-tv-schleife.ts
+pipeline/check-staffel-folge-tv.ts
 pipeline/check-staffel-jahr0.ts
 pipeline/check-staffel-ohne-seite.ts
 pipeline/check-staffel-riegel.ts

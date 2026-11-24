@@ -14,6 +14,8 @@ const titel: T[] = [
   { name: 'Dorohedoro' },
   { name: 'Dorohedoro Season 2' },
   { name: '86 EIGHTY-SIX' },
+  { name: 'Attack on Titan' },
+  { name: 'Dr. Stone' },
 ]
 const suche = (q: string): string[] => sucheZweistufig(titel, q, (t) => [t.name], (t) => [t.name]).map((t) => t.name)
 
@@ -47,6 +49,12 @@ pruefe('eine Zahl ohne Staffelwort bleibt Pflicht', suche('Mighty 2'), [])
 pruefe('nur die Angabe: nichts zu streichen', ohneStaffelAngabe('Season 2'), undefined)
 pruefe('Angabe wird gestrichen', ohneStaffelAngabe('The Mighty Nein’ Season 2'), 'the mighty nein')
 pruefe('ohne Angabe: undefined', ohneStaffelAngabe('Mighty Nein'), undefined)
+/* Gewolltes Verhalten: der Rückfall zeigt das Werk auch für eine Staffel, die es (noch) nicht gibt. */
+pruefe('Staffel ohne Termin: Werk statt nichts (Attack on Titan Season 9)', suche('Attack on Titan Season 9'), ['Attack on Titan'])
+pruefe('Staffel ohne Termin: Werk statt nichts (Dr. Stone Season 4)', suche('Dr. Stone Season 4'), ['Dr. Stone'])
+/* Eine Jahreszahl ist keine Staffelnummer (Zahl höchstens zweistellig). */
+pruefe('Season 2024 ist keine Staffelangabe', ohneStaffelAngabe('Mighty Nein Season 2024'), undefined)
+pruefe('Season 2024 findet das Werk nicht', suche('The Mighty Nein Season 2024'), [])
 pruefe('Season ohne Zahl bleibt', ohneStaffelAngabe('Mighty Nein Season'), undefined)
 
 console.log(`${fehler ? '✖' : '✓'} Suche mit Staffelangabe: ${fehler} Fehler`)

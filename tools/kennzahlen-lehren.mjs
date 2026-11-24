@@ -2,13 +2,14 @@
  * Neue Lehren je Tag aus daniel-zum-abarbeiten/berichte/lehren.md (lokal ausgeschlossen, nicht im Repo; Pfad wie bei den Kernpunkten
  * relativ zur Wurzel oder per --lehren=<Datei> an tageskennzahlen.mjs).
  *
- * Ein Eintrag = eine Lehre. Die Datei hat sieben Formen, jede zählt einmal, das Datum steht im Kopf des Eintrags:
+ * Ein Eintrag = eine Lehre. Die Datei hat acht Formen, jede zählt einmal, das Datum steht im Kopf des Eintrags:
  *   - Tabellenzeile `| TT.MM.[JJJJ] | …`  und  Aufzählungspunkt `- TT.MM.[JJJJ] …` oder `- **TT.MM., PR n:** …`   (Jahr 2026: der erste Eintrag ist vom 10.10.2026)
  *   - Aufzählungspunkt mit Kennung davor: `- 1844 Bauer (TT.MM.JJJJ): …`
  *   - `N. **Titel (TT.MM.JJJJ):** …`
  *   - Überschrift `## …` mit Datum `TT.MM.JJJJ`, `JJJJ-MM-TT` oder `TT.MM.`; steht dort nur eine Uhrzeit („## 19:14 — …“) oder gar nichts,
  *     gilt das Datum der letzten datierten Überschrift davor
  *   - `**N. … (TT.MM.JJJJ …)**` (nummerierte Lehren seit November)
+ *   - `**Lehre N — Titel (TT.MM.JJJJ …):** …` (seit Lehre 216, 22.11.2026)
  * Aufzählungspunkte ohne Datum und eingerückte (Unterpunkte eines Eintrags) zählen nie. `unzugeordnet` meldet jede Zeile mit Datum am Anfang, die keiner Form entspricht. Tage vor dem ersten Eintrag haben keine Quelle: sie fehlen (null).
  */
 const VOLL = /(\d{2})\.(\d{2})\.(\d{4})/
@@ -27,10 +28,10 @@ export function datumIn(text) {
 }
 
 // Kopf eines Eintrags ohne Überschrift: Datum (mit oder ohne Jahr) gleich nach `| `/`- ` (auch fett: `- **20.10., PR 1680:**`) oder
-// Kennung davor (`- 1844 Bauer (23.10.2026): …`); Titelzeilen `N. **Titel (TT.MM.JJJJ):**` und `**N. Titel (TT.MM.JJJJ)**` tragen es im Titel.
+// Kennung davor (`- 1844 Bauer (23.10.2026): …`); Titelzeilen `N. **Titel (TT.MM.JJJJ):**` `**N. Titel (TT.MM.JJJJ)**` und `**Lehre N — Titel (TT.MM.JJJJ):**` tragen es im Titel.
 const PUNKT_KOPF = /^(?:\| |- )\**(\d{2}\.\d{2}\.(?:\d{4})?)(?!\d)/
 const KENNUNG_KOPF = /^- \d{4} [^(:]{1,40}\((\d{2}\.\d{2}\.\d{4})/
-const TITEL_ZEILE = /^(?:\*\*\d+\. |\d+\. \*\*)/
+const TITEL_ZEILE = /^(?:\*\*\d+\. |\d+\. \*\*|\*\*Lehre \d+ )/
 
 /** Datum des Eintrags, den die Zeile eröffnet (null: keiner); `letztes` = Datum der letzten datierten Überschrift. */
 function eintragDaten(zeile, letztes) {
@@ -40,7 +41,8 @@ function eintragDaten(zeile, letztes) {
   return kopf ? datumIn(kopf[1]) : null
 }
 
-const DATUM_AM_ANFANG = /^(?:(?:[-|] |\d+\. )?\**(?:\d+\. )?\d{2}\.\d{2}\.(?:\d{4})?(?!\d)|\d{4}-\d{2}-\d{2})/
+// Ein Lehre-Kopf ohne lesbares Datum gilt mit: sonst fällt eine neue Schreibweise still aus der Zählung (23.11.2026: 26 Lehren, Kennzahl 0).
+const DATUM_AM_ANFANG = /^(?:\*\*Lehre \d+ |(?:[-|] |\d+\. )?\**(?:\d+\. )?\d{2}\.\d{2}\.(?:\d{4})?(?!\d)|\d{4}-\d{2}-\d{2})/
 
 /** Gegenprobe: Zeilen mit Datum am Zeilenanfang (ohne Einrückung), die keinem Eintrag zugeordnet wurden; leer = Parser deckt alle Formen. */
 export function unzugeordnet(text) {

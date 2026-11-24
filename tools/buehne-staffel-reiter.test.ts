@@ -16,6 +16,7 @@ import { abschnittZeile, reiterVon, startReiter } from '../web/src/components/de
 import { pfeilLageVon, sprungVon } from '../web/src/components/detail/staffel-pfeile.ts'
 import { ReiterPfeil, rolleUm } from '../web/src/components/detail/staffel-pfeile.tsx'
 import { naechsterReiter, ReiterZeile } from '../web/src/components/detail/staffel-reiter.tsx'
+import { StaffelAbschnitt } from '../web/src/components/detail/staffel-abschnitt.tsx'
 import { mockupMit } from '../web/buehne/register.ts'
 import '../web/buehne/mockups/staffel-abschnitt.tsx'
 
@@ -65,6 +66,9 @@ const halb = abschnitte(483, (nr) => nr <= 150)
 assert.equal(startReiter(reiterVon(halb, [], HEUTE), halb), 2, 'deutsch bis 150: Staffel 3')
 const keine = abschnitte(483, () => false)
 assert.equal(startReiter(reiterVon(keine, [], HEUTE), keine), 0, 'ohne deutsche Folge: Staffel 1')
+// Zwei laufende Staffeln (Nachholtermin in einer alten, neue offen): die erste gewinnt, wie in startReiter festgelegt.
+const zweiLaufend = [{ ...hsReiter[0]! }, { ...hsReiter[1]!, lage: 'laeuft' as const }, { ...hsReiter[2]!, lage: 'laeuft' as const }]
+assert.equal(startReiter(zweiLaufend, hs.slice(0, 3)), 1, 'zwei laufende: die erste')
 
 // Kopfzeile des Abschnitts: Bereich, Folgenzahl, Lage, Synchro in Staffelzählung.
 assert.equal(abschnittZeile(hs[1]!, 'ruht', () => true), 'Folge 83–118 · 36 Folgen · alle auf Deutsch')
@@ -101,6 +105,28 @@ assert.equal((zeile.match(/data-pfeil=/g) ?? []).length, 0, 'vor der Messung kei
 assert.match(zeile, /\[scrollbar-width:none\]/, 'kein Scrollbalken')
 assert.match(zeile, /\[&amp;::-webkit-scrollbar\]:hidden/, 'kein Scrollbalken (WebKit)')
 
+// ARIA-Muster „Tabs“ an der ganzen Box: je Reiter Id, aria-controls auf die Box, Roving-tabIndex; die Box ist tabpanel und nennt den gewählten Reiter.
+const attr = (tag: string, name: string) => new RegExp(`\\s${name}="([^"]*)"`).exec(tag)?.[1]
+const box = renderToStaticMarkup(createElement(StaffelAbschnitt, { reiter: lagen, aktiv: 3, kennung: 'f-1', beiWahl: () => {}, zeile: 'x', kinder: null }))
+const tabs = box.match(/<button[^>]*role="tab"[^>]*>/g) ?? []
+const panel = /<div[^>]*role="tabpanel"[^>]*>/.exec(box)?.[0] ?? ''
+assert.equal(tabs.length, 5, 'Box: 5 Reiter')
+assert.equal(attr(panel, 'id'), 'f-1-abschnitt', 'tabpanel mit Id')
+assert.equal(attr(panel, 'aria-labelledby'), 'f-1-reiter-4', 'tabpanel benannt vom gewählten Reiter')
+assert.deepEqual(tabs.map((t) => attr(t, 'id')), lagen.map((r) => `f-1-reiter-${r.nr}`), 'Id je Reiter')
+assert.deepEqual(tabs.map((t) => attr(t, 'aria-controls')), Array(5).fill('f-1-abschnitt'), 'jeder Reiter steuert die Box')
+assert.deepEqual(tabs.map((t) => attr(t, 'tabindex')), ['-1', '-1', '-1', '0', '-1'], 'Roving-tabIndex: nur der gewählte per Tab')
+
+// Tippfläche mindestens 44 × 44 px (design-regeln.md Abschnitt 13) aus den Tailwind-Klassen: Stufe × 4 px bzw. [n rem] × 16 px.
+const pxVon = (klassen: string, vorsatz: string) => {
+  const m = new RegExp(`(?:^| )${vorsatz}-(?:(\\d+)|\\[([\\d.]+)rem\\])(?= |$)`).exec(klassen)
+  return m ? (m[1] ? Number(m[1]) * 4 : Number(m[2]) * 16) : 0
+}
+for (const t of tabs) {
+  const klassen = attr(t, 'class') ?? ''
+  assert.ok(pxVon(klassen, 'min-h') >= 44 && pxVon(klassen, 'min-w') >= 44, `Reiter-Tippfläche ≥ 44 px: ${klassen}`)
+}
+
 // Pfeile (24.11.2026, Daniel): Lage aus Scrollposition, Gesamtbreite und sichtbarer Breite. Feste Zahlen: Leiste 300 px sichtbar, 722 px breit.
 assert.deepEqual(pfeilLageVon(0, 722, 300), { links: false, rechts: true }, 'ganz links')
 assert.deepEqual(pfeilLageVon(211, 722, 300), { links: true, rechts: true }, 'Mitte')
@@ -118,6 +144,10 @@ assert.match(pfeil('rechts', true), /aria-label="Weitere Staffeln"/)
 assert.equal(pfeil('links', false), '', 'links ohne Reiter links nicht da')
 assert.equal(pfeil('rechts', false), '', 'rechts ohne Reiter rechts nicht da')
 assert.match(pfeil('links', true), /data-pfeil="links"/)
+for (const r of ['links', 'rechts'] as const) {
+  const klassen = attr(pfeil(r, true), 'class') ?? ''
+  assert.ok(pxVon(klassen, 'after:h') >= 44 && pxVon(klassen, 'after:w') >= 44, `Pfeil-Trefferfläche ≥ 44 px: ${klassen}`)
+}
 const aufruf = (richtung: 'links' | 'rechts', clientWidth: number, ruhig: boolean) => {
   const gerufen: ScrollToOptions[] = []
   const welt = globalThis as { matchMedia?: unknown }
@@ -136,4 +166,4 @@ assert.deepEqual(Object.keys(def.varianten), ['A'])
 assert.deepEqual(def.varianten.A!.ersatz, {}, 'A ohne Ersatz')
 assert.ok(def.faelle.includes('pokemon-sammeltitel'), 'Fall pokemon-sammeltitel bleibt')
 
-console.log('buehne-staffel-reiter: ok (Reiter 5/3/2/0, Lage 14 Fälle, Startreiter 4, Kopfzeile 5, Tastatur 7, Reiterzeile, Pfeile, Mockup)')
+console.log('buehne-staffel-reiter: ok (Reiter 5/3/2/0, Lage 14 Fälle, Startreiter 5, Kopfzeile 5, Tastatur 7, Reiterzeile, ARIA-Box, Tippfläche, Pfeile, Mockup)')

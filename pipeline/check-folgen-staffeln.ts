@@ -67,9 +67,11 @@ Object.assign(MiniKnoten.prototype, {
     fokus = this
   },
 })
+/** Tasten, deren Browser-Standard (Pos1/Ende rollen die Seite, Pfeile die Leiste) der Reiter unterdrückt hat. */
+const verhindert: string[] = []
 /** Ein Tastendruck wie vom Browser auf `ziel` (erst Erfassungs-, dann Blasenhörer am Wurzelknoten). */
 function druecke(wurzel: MiniKnoten, ziel: MiniKnoten, key: string): void {
-  const e = { type: 'keydown', key, target: ziel, bubbles: true, cancelable: true, defaultPrevented: false, timeStamp: 0, preventDefault() {}, stopPropagation() {} }
+  const e = { type: 'keydown', key, target: ziel, bubbles: true, cancelable: true, defaultPrevented: false, timeStamp: 0, preventDefault() { verhindert.push(key) }, stopPropagation() {} }
   const hoerer = wurzel.hoerer.get('keydown') ?? []
   for (const capture of [true, false]) hoerer.filter((h) => h.capture === capture).forEach((h) => h.f(e))
 }
@@ -141,10 +143,33 @@ const fokusText = ((fokus as MiniKnoten | undefined)?.textContent ?? '').trim()
 pruefe('Taste → wählt Staffel 3 und setzt den Fokus dorthin', rechts.gewaehlt.join() === '3' && fokusText === '3', [rechts.gewaehlt, fokusText])
 const rundum = await bereich(900501, '1', [], { tasten: ['ArrowLeft', 'ArrowLeft'] })
 pruefe('Taste ← zweimal von Staffel 1: rundum auf Staffel 3', rundum.gewaehlt.join() === '3', rundum.gewaehlt)
+verhindert.length = 0
 const ende = await bereich(900501, '1', [], { tasten: ['End', 'Enter'] })
 pruefe('Ende wählt die letzte, andere Tasten nichts', ende.gewaehlt.join() === '4', ende.gewaehlt)
+pruefe('Ende unterdrückt das Rollen der Seite, Enter bleibt beim Browser', verhindert.join() === 'End', verhindert)
+verhindert.length = 0
+await bereich(900501, '4', [], { tasten: ['Home', 'ArrowLeft', 'Tab'] })
+pruefe('Pos1 und ← unterdrücken den Browser-Standard, Tab nicht', verhindert.join() === 'Home,ArrowLeft', verhindert)
 const gewechselt = await bereich(900501, '1', [], { danach: 900503 })
 pruefe('Titelwechsel: Wahl „1“ des vorigen Titels verfällt, Startreiter 2', gewechselt.gewaehlt.join() === '2', gewechselt.gewaehlt)
+/** Zwei Folgenbereiche zugleich (wie zwei offene Panels): Ids, Bezüge (aria-controls, aria-labelledby) und Klassen der Aufklapp-Knöpfe. */
+async function zweiBereiche(a: number, b: number): Promise<{ ids: string[]; bezuege: string[]; knopfKlassen: string[] }> {
+  const dom = installiereMiniDom({ ...attrappeUhr(), matchMedia: () => ({ matches: false, addEventListener() {}, removeEventListener() {} }) }, () => ({ src: '', srcset: '', sizes: '', decode: () => Promise.resolve() }))
+  const wurzel = createRoot(dom.wurzel as unknown as Element)
+  const teil = (titleId: number) => h(FolgenMitNachlegern, { key: titleId, titleId, wege: [], antwort: null as never, releases: [], today: '2026-11-24' })
+  await act(async () => wurzel.render(h('div', null, teil(a), teil(b))))
+  await act(async () => Promise.resolve())
+  const ids = dom.wurzel.finde((k) => k.getAttribute('id') !== null).map((k) => k.getAttribute('id')!)
+  const bezuege = dom.wurzel.finde((k) => k.getAttribute('aria-controls') !== null || k.getAttribute('aria-labelledby') !== null).map((k) => (k.getAttribute('aria-controls') ?? k.getAttribute('aria-labelledby'))!)
+  const knopfKlassen = dom.wurzel.finde((k) => k.getAttribute('aria-expanded') !== null).map((k) => k.getAttribute('class') ?? '')
+  await act(async () => wurzel.unmount())
+  dom.entferne()
+  return { ids, bezuege, knopfKlassen }
+}
+const zwei = await zweiBereiche(900501, 900503)
+pruefe('zwei Titel: Ids der Reiter und Boxen eindeutig', zwei.ids.length === 9 && new Set(zwei.ids).size === 9, zwei.ids)
+pruefe('zwei Titel: jeder Bezug (aria-controls, aria-labelledby) trifft eine Id', zwei.bezuege.length === 9 && zwei.bezuege.every((b) => zwei.ids.includes(b)), zwei.bezuege)
+pruefe('Aufklapp-Knopf der Box: Tippfläche 44 px hoch (min-h-11)', zwei.knopfKlassen.length === 2 && zwei.knopfKlassen.every((k) => /(^| )min-h-11( |$)/.test(k)), zwei.knopfKlassen)
 const ohne = await bereich(900502)
 pruefe('ohne s: Pakete zu 50 und Kopf mit Listenlänge', ohne.reiter.join() === '1–50,51–100,101–122' && ohne.text.includes('Folgen (122)'), ohne.reiter)
 pruefe('ohne s: keine Staffelzeile, keine Box', !ohne.text.includes('auf Deutsch') && !ohne.abschnitt)

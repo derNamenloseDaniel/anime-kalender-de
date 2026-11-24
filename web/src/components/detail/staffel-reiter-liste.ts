@@ -19,6 +19,7 @@ export function reiterVon(abschnitte: StaffelAbschnitt[], releases: Release[], t
 
 /** Ohne Wahl des Besuchers: die laufende Staffel, sonst die letzte mit deutscher Folge, sonst die erste. */
 export function startReiter(reiter: Reiter[], abschnitte: StaffelAbschnitt[]): number {
+  // Laufen zwei (Nachholtermin in alter Staffel), gewinnt die erste: so beginnt der Besucher dort, wo er zuerst nachholen kann.
   const laufend = reiter.findIndex((r) => r.lage === 'laeuft')
   if (laufend >= 0) return laufend
   return Math.max(0, abschnitte.findLastIndex((a) => a.deutsch > 0))

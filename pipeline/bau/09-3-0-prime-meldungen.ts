@@ -183,14 +183,14 @@ function gemeldeteSeite(plattform: PlatformId, gemeldeteAdresse: string, asin: s
  * einem Handbeleg. Übersprungen statt umgebogen — welche Seite die
  * richtige ist, sagt die Rohfolge nicht.
  */
-function waehleSeite(alleChecks: DubCheck[], eintrag: PrimeMeldung, plattform: PlatformId, seite: string | null): string | null | 'fremd' {
+function waehleSeite(alleChecks: DubCheck[], eintrag: PrimeMeldung, plattform: PlatformId, gemeldet: string | null): string | null | 'fremd' {
   const fremdBelegt = (adresse: string | null): boolean => adresseFremdBelegt(kanalWissen(alleChecks), eintrag.titleId, plattform, adresse)
-  let gewaehlt = seite
+  let seite = gemeldet
   /* Seit Migration 030 kennt die Rohfolge die gemeldete Seite — dann gilt die Meldung ihr. */
-  if (fremdBelegt(gewaehlt) && plattform === 'primevideo' && eintrag.seite) {
-    gewaehlt = amazonTitelAdresse(eintrag.seite)
+  if (fremdBelegt(seite) && plattform === 'primevideo' && eintrag.seite) {
+    seite = amazonTitelAdresse(eintrag.seite)
   }
-  return fremdBelegt(gewaehlt) ? 'fremd' : gewaehlt
+  return fremdBelegt(seite) ? 'fremd' : seite
 }
 
 /**

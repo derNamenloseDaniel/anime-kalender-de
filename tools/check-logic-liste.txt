@@ -607,6 +607,7 @@ pipeline/check-sammel-titel.ts
 pipeline/check-sammel-unzugeordnet.ts
 pipeline/check-sammelartikel.ts
 pipeline/check-sammeleintrag-synchro.ts
+pipeline/check-sammle-belege-naht.ts
 pipeline/check-sammler-lesezugriffe-faelle.ts
 pipeline/check-sammler-lesezugriffe-variable.ts
 pipeline/check-sammler-lesezugriffe.ts

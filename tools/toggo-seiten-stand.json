@@ -1,0 +1,5 @@
+{
+  "_hinweis": "Ratsche für pipeline/check-toggo-seiten-bestand.ts: höchstens so viele Titel mit einem TOGGO-Link, den der Bau noch ändert (falsch), und Pokémon-Staffeltitel/Handeinträge ohne Link (fehlend). Darf nur sinken. Gemessen 24.11.2026 an public/data von main, vor dem ersten Bestandsbau mit der Regel; danach auf 0 setzen.",
+  "falsch": 59,
+  "fehlend": 8
+}

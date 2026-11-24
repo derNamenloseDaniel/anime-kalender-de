@@ -27,7 +27,8 @@
  */
 import { readJson, writeJson, log, warn, sleep } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
-import { figurAusAdresse, serieFuerFigur, serienAdresse, type ToggoSerie } from './lib/toggo-serien.ts'
+import { figurAusAdresse, serieFuerFigur } from './lib/toggo-serien.ts'
+import { katalogAdresse, type KatalogSerie } from './lib/toggo-seiten.ts'
 import { namenIndex, titelZuordnen } from './fetch-tv-programm.ts'
 
 const API = 'https://production-n.toggo.de/api/assetstore/vod/asset'
@@ -36,8 +37,11 @@ const ZIEL = 'data/toggo.json'
 
 type Titel = { id: number; titleDe?: string; titleEn?: string; titleRomaji?: string; watchLinks?: { url?: string }[] }
 type Folge = { staffel: number; folge: number; ab: string; bis: string }
-/** `adresse`: die Serienseite, wenn wir nur die Figurenseite kannten (siehe `lib/toggo-serien.ts`). */
-export type ToggoDatei = { geholtAm: string; titel: Record<string, { serie: string; adresse?: string; folgen: Folge[] }> }
+/**
+ * `adresse`: die Serienseite jedes Titels, den wir einer Serie zuordnen — unabhängig davon, was `titles.json` gerade verlinkt (bis 24.11.2026 kippte
+ * sie täglich: stand dort schon die Serienseite, fehlte sie am nächsten Tag). `katalog`: alle Serien der Schnittstelle (`lib/toggo-seiten.ts`).
+ */
+export type ToggoDatei = { geholtAm: string; katalog?: KatalogSerie[]; titel: Record<string, { serie: string; adresse?: string; folgen: Folge[] }> }
 
 /** Unix-Sekunden → „YYYY-MM-DDTHH:MM" in Berliner Ortszeit. */
 function ortszeit(sek: number): string {
@@ -68,12 +72,16 @@ const adressen = new Map<number, string>()
   findet TOGGO-Serien zu Titeln, für die wir gar keinen TOGGO-Weg kannten (19.09.2026:
   13 von 24 zuordenbaren, darunter Pokémon Horizonte und vier Bakugan-Staffeln).
 */
-let serien: ToggoSerie[] = []
+let serien: KatalogSerie[] = []
 {
   try {
     const r = await fetch(`${API}?expand=false&filter=type[series]&size=500`, { headers: { 'User-Agent': UA } })
     if (!r.ok) throw new Error(`HTTP ${r.status}`)
-    const o = (await r.json()) as { data?: { items?: { id?: string; u_name?: string; title?: string; characters?: { u_name?: string }[] }[] } }
+    const o = (await r.json()) as {
+      data?: {
+        items?: { id?: string; u_name?: string; title?: string; characters?: { u_name?: string }[]; fvod_latest_end_date?: number | null; catchup_latest_end_date?: number | null }[]
+      }
+    }
     serien = (o.data?.items ?? [])
       .filter((s) => s.id && s.u_name && s.title)
       .map((s) => ({
@@ -81,6 +89,7 @@ let serien: ToggoSerie[] = []
         uname: s.u_name!,
         titel: s.title!,
         figuren: (s.characters ?? []).map((c) => (c.u_name ?? '').toLowerCase()),
+        frei: Boolean(s.fvod_latest_end_date || s.catchup_latest_end_date),
       }))
   } catch (err) {
     warn(`TOGGO-Serienliste: ${err instanceof Error ? err.message : String(err)}`)
@@ -92,23 +101,19 @@ for (const t of liste) {
   for (const w of t.watchLinks ?? []) {
     let serie = /toggo\.de\/.*-(vse\d+)(?:[/?#]|$)/i.exec(w.url ?? '')?.[1]?.toUpperCase()
     const figur = figurAusAdresse(w.url ?? '')
-    if (!serie && figur) {
-      const s = serieFuerFigur(serien, figur, [t.titleDe, t.titleEn, t.titleRomaji])
-      if (s) {
-        serie = s.id
-        adressen.set(t.id, serienAdresse(figur, s))
-      }
-    }
+    if (!serie && figur) serie = serieFuerFigur(serien, figur, [t.titleDe, t.titleEn, t.titleRomaji])?.id
     if (!serie) continue
+    const bekannt = serien.find((s) => s.id === serie)
+    if (bekannt) adressen.set(t.id, katalogAdresse(bekannt, figur))
     jeSerie.set(serie, [...new Set([...(jeSerie.get(serie) ?? []), t.id])])
   }
 }
-if (adressen.size) log(`TOGGO: ${adressen.size} Figurenseite(n) auf die Serienseite aufgelöst`)
+if (adressen.size) log(`TOGGO: ${adressen.size} Serienseite(n) bestimmt`)
 
 /* Katalog: jede Serie, die eindeutig zu genau einem Titel passt und umgekehrt. */
 {
   const namen = namenIndex()
-  const jeTitel = new Map<number, ToggoSerie[]>()
+  const jeTitel = new Map<number, KatalogSerie[]>()
   for (const s of serien) {
     const id = titelZuordnen(s.titel, namen)
     if (id) jeTitel.set(id, [...(jeTitel.get(id) ?? []), s])
@@ -124,13 +129,15 @@ if (adressen.size) log(`TOGGO: ${adressen.size} Figurenseite(n) auf die Seriense
     */
     if (schonDa.has(id)) continue
     for (const s of treffer) jeSerie.set(s.id, [...new Set([...(jeSerie.get(s.id) ?? []), id])])
-    adressen.set(id, serienAdresse(treffer[0]!.figuren[0], treffer[0]!))
+    adressen.set(id, katalogAdresse(treffer[0]!))
     neu++
   }
   if (neu) log(`TOGGO: ${neu} Titel über den Katalog gefunden`)
 }
 
-const ergebnis: ToggoDatei = { geholtAm: new Date().toISOString(), titel: {} }
+/* Ohne Serienliste (Störung) bleibt der Katalog von gestern; eine Störung ist kein Befund. */
+const gestern = readJson<ToggoDatei>(ZIEL, { geholtAm: '', titel: {} })
+const ergebnis: ToggoDatei = { geholtAm: new Date().toISOString(), katalog: serien.length ? serien : gestern.katalog, titel: {} }
 let fehler = 0
 for (const [serie, ids] of jeSerie) {
   const url = `${API}?expand=false&filter=type[episode]&filter=series_id[${serie}]&sort=episode_no&size=500`
@@ -169,7 +176,10 @@ for (const [serie, ids] of jeSerie) {
         /* Zweite Serie desselben Titels: Folgen anhängen, die es noch nicht gibt. */
         const schluessel = new Set(da.folgen.map((f) => `${f.staffel}|${f.folge}`))
         da.folgen.push(...folgen.filter((f) => !schluessel.has(`${f.staffel}|${f.folge}`)))
-      } else ergebnis.titel[String(id)] = { serie, ...(adressen.has(id) ? { adresse: adressen.get(id)! } : {}), folgen }
+      } else {
+        const adresse = adressen.get(id) ?? gestern.titel[String(id)]?.adresse
+        ergebnis.titel[String(id)] = { serie, ...(adresse ? { adresse } : {}), folgen }
+      }
     }
     log(`TOGGO ${serie}: ${folgen.length} Folge(n) mit Fenster`)
   } catch (err) {

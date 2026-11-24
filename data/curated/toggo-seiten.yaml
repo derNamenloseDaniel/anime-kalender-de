@@ -1,0 +1,55 @@
+# Von Hand zugeordnete TOGGO-Serienseiten (24.11.2026, Auftrag Dirigent): wo der Katalog der TOGGO-Schnittstelle (`data/toggo.json`, `katalog`)
+# nicht allein genügt. Die Rechnung steht in `pipeline/lib/toggo-seiten.ts`, der Bau in `pipeline/bau/13-1-toggo-seiten.ts`.
+#
+# `pokemon`: die 25 deutschen Staffeln der Hauptserie (`data/curated/pokemon-staffeln.yaml`) sind bei TOGGO je eine eigene Serie. Die Zuordnung
+# Staffel ↔ Serie ist gemessen, nicht geraten: die Folgen jeder Serie tragen `season_no` = deutsche Staffel (Abruf 24.11.2026,
+# `production-n.toggo.de/api/assetstore/vod/asset?filter=type[episode]&filter=series_id[VSE…]`; Staffel 1–25 je genau eine Serie, bei Staffel 16 zwei).
+# Folgen je Serie bei TOGGO, S1–S25: 52, 60, 41, 52, 64, 40, 52, 52, 47, 51, 52, 52, 34, 48, 49, 25+20, 48, 45, 48, 43, 48, 54, 48, 42, 54. Unsere Zählung
+# (TMDB) weicht bei S1 (82), S2 (36), S5 (65), S10, S18, S19 ab — TOGGO führt nicht jede Folge und schneidet S1/S2 anders; die Staffelnummer stimmt.
+# Staffel 16: „Abenteuer in Einal“ (25 Folgen) = 14 + 11 Folgen von 17115 und 14093, „Abenteuer in Einall und darüber hinaus“ (20) = 17873.
+#
+# `titel`: Titel, bei denen der Name allein nicht reicht (`serie` = `u_name` im Katalog; `beleg` sagt, warum diese Serie).
+pokemon:
+  - { staffel: 1, serie: pokemon-indigo-liga }
+  - { staffel: 2, serie: pokemon-orange-liga }
+  - { staffel: 3, serie: pokemon-die-johto-reisen }
+  - { staffel: 4, serie: pokemon-die-johto-liga-champions }
+  - { staffel: 5, serie: pokemon-master-quest }
+  - { staffel: 6, serie: pokemon-advanced }
+  - { staffel: 7, serie: pokemon-advanced-challenge }
+  - { staffel: 8, serie: pokemon-advanced-battle }
+  - { staffel: 9, serie: pokemon-battle-frontier }
+  - { staffel: 10, serie: pokemon-diamond-and-pearl }
+  - { staffel: 11, serie: pokemon-dp-battle-dimension }
+  - { staffel: 12, serie: pokemon-dp-galactic-battles }
+  - { staffel: 13, serie: pokemon-dp-sieger-der-sinnoh-liga }
+  - { staffel: 14, serie: pokemon-schwarz--weis }
+  - { staffel: 15, serie: pokemon-schwarz--weis-rivalen-des-schicksals }
+  - { staffel: 16, serie: pokemon-schwarz--weis-abenteuer-in-einal, titel: [14093, 17115] }
+  - { staffel: 16, serie: pokemon-schwarz--weis-abenteuer-in-einall-und-darueber-hinaus, titel: [17873] }
+  - { staffel: 17, serie: pokemon--die-tv-serie-xy }
+  - { staffel: 18, serie: pokemon--die-tv-serie-xy--erkundungen-in-kalos }
+  - { staffel: 19, serie: pokemon--die-tv-serie-xyz }
+  - { staffel: 20, serie: pokemon--die-tv-serie-sonne--mond }
+  - { staffel: 21, serie: pokemon-sonne--mond--ultra-abenteuer-vse276 }
+  - { staffel: 22, serie: pokemon--die-tv-serie-sonne--mond--ultra-legenden }
+  - { staffel: 23, serie: pokemon-reisen-die-serie }
+  - { staffel: 24, serie: pokemon-meister-reisen-die-serie }
+  - { staffel: 25, serie: pokemon-ultimative-reisen-die-serie-vse224 }
+titel:
+  - { id: 20992, serie: haikyu-vse433, beleg: 'TOGGO führt alle vier Staffeln unter einer Serie (season_no 1–4); Titel „Haikyu!! Zweite Staffel“ = Staffel 2, die Figurenseite haikyu-pty652 hat nur diese Serie' }
+  - { id: -225320, serie: dreamzzz--abenteuer-der-traumwelten-vse255, beleg: 'Name „LEGO DreamZzz“ = „DreamZzz“ bei TOGGO; die Figur dreamzzz-pty529 hat nur diese Serie' }
+  - { id: -218695, serie: friends-das-naechste-kapitel-vse360, beleg: 'Name gleich bis auf „LEGO“; die Figur friends hat nur diese Serie' }
+  - { id: -212989, serie: ninjago--aufstieg-der-drachen-vse256, beleg: 'Name „LEGO Ninjago: Aufstieg der Drachen“ = „Ninjago - Aufstieg der Drachen“' }
+  - { id: -200751, serie: brave-bunnies--hasenbande-unterwegs, beleg: 'deutscher Name „Brave Bunnies - Hasenbande unterwegs“, die Figur brave-bunnies hat nur diese Serie' }
+  - { id: -120161, serie: 100-wolf--die-legende-des-mondsteins, beleg: 'Name „100 Prozent Wolf“ = „100% Wolf“; die Figur 100-wolf hat nur diese Serie' }
+  - { id: -97959, serie: gluecksbaerchis--entdecke-die-magie-vse441, beleg: 'deutscher Name „Glücksbärchis - Entdecke die Magie“ = Care Bears: Unlock the Magic; die Figur hat nur diese Serie' }
+  - { id: -94107, serie: city--abenteuer-vse107, beleg: 'Name „LEGO City Abenteuer“ = „City - Abenteuer“; die Figur city--abenteuer führt nur sie und „City: Keine Limits“ (Shorts)' }
+  - { id: -65858, serie: nexo-knights--die-ritter-der-zukunft, beleg: 'Name gleich bis auf „LEGO“ und „Die Ritter der Zukunft“; die Figur nexo-knights hat nur diese Serie' }
+  - { id: -55924, serie: camp-sumpfgrund-vse110, beleg: 'Camp Lakebottom heißt auf Deutsch „Camp Sumpfgrund“; die Figur camp-sumpfgrund-pty50 hat nur diese Serie' }
+  - { id: 2836, serie: wickie-und-die-starken-maenner-vse287, anlegen: true, beleg: 'Name gleich, 78 Folgen bei TOGGO = 78 Folgen des Titels (AniList); nur im Abo (TOGGO-Katalog ohne freies Fenster, Stand 24.11.2026)' }
+  - { id: -16673, serie: die-kleine-prinzessin-vse341, anlegen: true, beleg: 'TOGGOs „Die Kleine Prinzessin“ ist die britische „Little Princess“ (Teddy Gisbert, 4 Staffeln; Quelle fernsehserien.de/kleine-prinzessin), also dieser Cartoon, nicht die Anime-Serie „Prinzessin Sara“ (2547)' }
+# Adressen, die zu einem anderen Titel gehören und deshalb vom Titel genommen werden.
+falsch:
+  - { id: 2225, url: 'https://www.toggo.de/heidi-pty555/serien/heidi-vse290', beleg: 'TOGGOs „Heidi“ hat 65 Folgen in 2 Staffeln, die Anime-Serie (1974) 52; `fetch-toggo` ordnet sie nur nach dem Namen zu. Den Link trägt der Cartoon „Heidi“ (-62475)' }
+  - { id: 2547, url: 'https://www.toggo.de/die-kleine-prinzessin-pty588', beleg: 'Die Figur gehört zur britischen „Little Princess“ (VSE341, Teddy Gisbert), nicht zur Anime-Serie „Die kleine Prinzessin Sara“ (1985); JustWatch hat beide verwechselt' }

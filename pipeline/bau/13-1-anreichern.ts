@@ -5,6 +5,7 @@ import { richtePrimeWege } from './13-1-prime-richten.ts'
 import { richteTerminAdressen } from './13-1-termin-adressen.ts'
 import { setzeJoynFenster } from './13-1-joyn-fenster.ts'
 import { setzeToggoFenster } from './13-1-toggo-fenster.ts'
+import { setzeToggoSeiten } from './13-1-toggo-seiten.ts'
 import { providerName } from '../../shared/mappings.ts'
 
 /** Handlung je Titel, mit belegter Herkunft der deutschen Fassung. */
@@ -73,6 +74,7 @@ export function schreibeSynopsenUndReichereAn({ allTitles, releases, kanalJeAdre
     {},
   )
   setzeToggoFenster(allTitles)
+  setzeToggoSeiten(allTitles, 'Anime')
 
   setzeJoynFenster(allTitles, releases)
   let gerichtet = richtePrimeWege(allTitles, kanalJeAdresse)

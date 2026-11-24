@@ -1,4 +1,5 @@
 import { bereicheKurz } from '@shared/dub-grenze.ts'
+import { translate } from '../../lib/i18n.tsx'
 import { staffelLage, type StaffelLage } from '@shared/logic.ts'
 import { staffelTeile } from '@shared/staffel-folge.ts'
 import type { Release } from '@shared/types.ts'
@@ -49,6 +50,6 @@ const LAGE_TEXT: Record<StaffelLage, string | undefined> = { laeuft: 'läuft', k
 
 /** Kopfzeile des Abschnitts: „Folge 46–89 · 44 Folgen · alle auf Deutsch“, die offene Staffel „ab Folge 137 · läuft · Deutsch: Fg. 1“. */
 export function abschnittZeile(a: StaffelAbschnitt, lage: StaffelLage, istDeutsch: (nr: number) => boolean): string {
-  const umfang = a.offen ? `ab Folge ${a.von}` : `Folge ${a.von}–${a.bis} · ${a.folgen.length} Folgen`
+  const umfang = a.offen ? `ab Folge ${a.von}` : `Folge ${a.von}–${a.bis} · ${translate('kal.folgen', { n: a.folgen.length })}`
   return [umfang, LAGE_TEXT[lage], synchroText(a, istDeutsch)].filter(Boolean).join(' · ')
 }

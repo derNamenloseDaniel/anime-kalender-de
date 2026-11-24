@@ -77,6 +77,10 @@ assert.equal(abschnittZeile(hs[1]!, 'kommt', () => false), 'Folge 83–118 · 36
 assert.equal(abschnittZeile(hs[0]!, 'ruht', (nr) => nr === 3 || nr === 5 || nr === 6), 'Folge 1–82 · 82 Folgen · Deutsch: Fg. 3, 5–6')
 const offen = staffelAbschnitte([[1, 1, 45], [4, 137]], [], [[1, 137]], (nr) => nr <= 137)
 assert.equal(abschnittZeile(offen[1]!, 'laeuft', (nr) => nr <= 137), 'ab Folge 137 · läuft · Deutsch: Fg. 1')
+// Einzahl: eine Staffel mit einer Folge sagt „1 Folge“, zwei Folgen „2 Folgen“.
+const kurz = staffelAbschnitte([[1, 1, 1], [2, 2, 3]], [], [], () => false)
+assert.equal(abschnittZeile(kurz[0]!, 'ruht', () => false), 'Folge 1–1 · 1 Folge', 'n = 1')
+assert.equal(abschnittZeile(kurz[1]!, 'ruht', () => false), 'Folge 2–3 · 2 Folgen', 'n = 2')
 
 // Tastatur: Pfeiltasten wählen den Nachbarn (rundum), Pos1/Ende den ersten/letzten; andere Tasten nichts.
 assert.equal(naechsterReiter('ArrowRight', 0, 5), 1)
@@ -166,4 +170,4 @@ assert.deepEqual(Object.keys(def.varianten), ['A'])
 assert.deepEqual(def.varianten.A!.ersatz, {}, 'A ohne Ersatz')
 assert.ok(def.faelle.includes('pokemon-sammeltitel'), 'Fall pokemon-sammeltitel bleibt')
 
-console.log('buehne-staffel-reiter: ok (Reiter 5/3/2/0, Lage 14 Fälle, Startreiter 5, Kopfzeile 5, Tastatur 7, Reiterzeile, ARIA-Box, Tippfläche, Pfeile, Mockup)')
+console.log('buehne-staffel-reiter: ok (Reiter 5/3/2/0, Lage 14 Fälle, Startreiter 5, Kopfzeile 7, Tastatur 7, Reiterzeile, ARIA-Box, Tippfläche, Pfeile, Mockup)')

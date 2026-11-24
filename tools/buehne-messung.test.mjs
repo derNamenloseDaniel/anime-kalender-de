@@ -91,6 +91,8 @@ assert.equal(tippziele([kind(etikett, el('INPUT', { breite: 1, hoehe: 1 }))]).le
 assert.equal(tippziele([el('INPUT', { breite: 1, hoehe: 1 })]).length, 1, 'verstecktes Feld ohne Etikett: gemeldet')
 const flach = el('LABEL', { breite: 120, hoehe: 20 })
 assert.equal(tippziele([kind(flach, el('INPUT', { breite: 1, hoehe: 1 }))]).length, 1, 'zu flaches Etikett: gemeldet')
+assert.equal(tippziele([el('BUTTON', { breite: 16, hoehe: 52, marken: ['[aria-disabled="true"]'] })]).length, 0, 'deaktivierter kleiner Knopf (aria-disabled): nicht gemeldet')
+assert.equal(tippziele([el('BUTTON', { breite: 16, hoehe: 52, marken: [] })]).length, 1, 'gleicher Knopf aktiv: gemeldet')
 
 // Kontrast
 assert.equal(kontrast([text({ farbe: SCHWACH })]).length, 1, 'schwacher Text wird gemeldet')

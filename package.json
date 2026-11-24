@@ -173,6 +173,7 @@
     "check:suchhinweis": "npm run buehne:bauen && node tools/suchhinweis-quickfix-pruefen.mjs",
     "check:buehne-basis": "npm run buehne:bauen && node tools/buehne-basis.mjs",
     "check:buehne-fenster": "npm run buehne:bauen && node tools/buehne-fenster-pruefen.mjs",
+    "check:buehne-pfeile": "npm run buehne:bauen && node tools/buehne-pfeile-messen.mjs",
     "check:lighthouse": "node tools/schwer.mjs node tools/lighthouse-messen.mjs --dist dist --profil pr --n 3",
     "check:leerlauf": "node tools/schwer.mjs node tools/leerlauf-tempo.mjs --dist dist",
     "check:filter-tempo": "node tools/filter-tempo.mjs --dist dist --n 2 --grenze 200 --spitze 800 && node tools/bereich-auge-messen.mjs --dist dist",

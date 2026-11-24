@@ -13,7 +13,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { KastenPfeileEinblenden, KastenPfeileImmer } from '../web/buehne/mockups/staffel-abschnitt.tsx'
 import { pfeilLageVon, pfeilZustandVon, sprungVon, type PfeilModus } from '../web/buehne/mockups/staffel-pfeile.ts'
-import { ReiterPfeil } from '../web/buehne/mockups/staffel-pfeile.tsx'
+import { ReiterPfeil, rolleUm } from '../web/buehne/mockups/staffel-pfeile.tsx'
 import { ReiterZeile } from '../web/buehne/mockups/staffel-reiter.tsx'
 import { mockupMit } from '../web/buehne/register.ts'
 
@@ -110,8 +110,23 @@ const pfeil = (richtung: 'links' | 'rechts', modus: PfeilModus, weitere: boolean
 assert.match(pfeil('links', 'immer', true), /aria-label="Vorherige Staffeln"[^>]*aria-disabled="false"/)
 assert.match(pfeil('rechts', 'immer', true), /aria-label="Weitere Staffeln"[^>]*aria-disabled="false"/)
 assert.match(pfeil('rechts', 'immer', false), /aria-label="Weitere Staffeln"[^>]*aria-disabled="true"/)
+assert.match(pfeil('rechts', 'immer', false), /class="[^"]*pointer-events-none/, 'deaktiviert: keine Treffer (auch nicht über ::after)')
+assert.doesNotMatch(pfeil('rechts', 'immer', true), /pointer-events-none/, 'aktiv: nimmt Treffer an')
 assert.equal(pfeil('links', 'einblenden', false), '', 'einblenden: links ohne Reiter links nicht da')
 assert.match(pfeil('links', 'einblenden', true), /data-pfeil="links"/)
+// rolleUm: Attrappe mit clientWidth 300 und aufgezeichnetem scrollBy; links −300, rechts +300, bei „weniger Bewegung“ ohne Animation.
+const aufruf = (richtung: 'links' | 'rechts', clientWidth: number, ruhig: boolean) => {
+  const gerufen: ScrollToOptions[] = []
+  const welt = globalThis as { matchMedia?: unknown }
+  welt.matchMedia = (q: string) => ({ matches: ruhig && q === '(prefers-reduced-motion: reduce)' })
+  rolleUm({ clientWidth, scrollBy: (o: ScrollToOptions) => gerufen.push(o) } as unknown as HTMLElement, richtung)
+  return gerufen
+}
+assert.deepEqual(aufruf('rechts', 300, false), [{ left: 300, behavior: 'smooth' }], 'rechts +300 weich')
+assert.deepEqual(aufruf('links', 300, false), [{ left: -300, behavior: 'smooth' }], 'links -300 weich')
+assert.deepEqual(aufruf('rechts', 437, false), [{ left: 437, behavior: 'smooth' }], 'Sprung folgt der Leistenbreite')
+assert.deepEqual(aufruf('links', 300, true), [{ left: -300, behavior: 'auto' }], 'weniger Bewegung: ohne Animation')
+rolleUm(null, 'links') // ohne Leiste: kein Fehler
 // Die Reiterzeile reicht den Modus an beide Pfeile durch (erster Aufbau ohne Messung: beide
 // deaktiviert; die Lage selbst misst erst der Browser, siehe Bilder im PR).
 const zeile = (modus: PfeilModus) => renderToStaticMarkup(createElement(ReiterZeile, { reiter: reiter(10852), aktiv: 10852, lagen: new Map(), farbe: '', pfeile: modus }))

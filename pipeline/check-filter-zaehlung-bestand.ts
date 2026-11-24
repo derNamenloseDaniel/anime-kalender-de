@@ -7,6 +7,8 @@
 import { readFileSync } from 'node:fs'
 import { PLATFORMS, RELEASE_TYPES, type PlatformId, type Release, type ReleaseType, type Title } from '../shared/types.ts'
 import { todayIso } from '../shared/time.ts'
+import { erstausgabeIstDiscWeg } from '../shared/verlag-anbieter.ts'
+import { melde } from './lib/quarantaene.ts'
 import { EMPTY_FILTERS, filterTitles, type FilterState } from '../web/src/lib/filters.ts'
 import { groupByFranchise } from '../web/src/lib/db-gruppen.ts'
 import { ordneListe } from '../web/src/lib/db-liste.ts'
@@ -66,17 +68,23 @@ for (const [gruppiert, sort, suche] of [[false, 'relevanz', ''], [true, 'relevan
   }
 }
 
-console.log('\nDisc-Zahl unabhängig von der Weg-Logik, direkt aus den Releases (Plattform disc ODER Art disc):')
+console.log('\nDisc-Zahl unabhängig von der Weg-Logik, direkt aus den Releases (Plattform disc ODER Art disc) und der Erstausgabe beim Disc-Verlag (F156):')
 {
   const direkt = new Set<number>()
   for (const [id, rs] of releasesByTitle) if (rs.some((r) => r.platform === 'disc' || r.releaseType === 'disc')) direkt.add(id)
+  for (const t of quelle) if (erstausgabeIstDiscWeg(t.deErstausgabe)) direkt.add(t.id)
   const z = zaehle(false, 'relevanz')
   pruefe(`Art Disc zählt ${direkt.size} Titel`, z.releaseTypes.get('disc') === direkt.size, z.releaseTypes.get('disc'))
   pruefe('Plattform Disc und Schnell-Chip Disc zählen dasselbe', z.platforms.get('disc') === direkt.size && z.schnell.disc === direkt.size, [z.platforms.get('disc'), z.schnell.disc])
+  /* Titelmarke: wer nur auf einer Seite steht, trägt den Widerspruch; der Bau stellt ihn zurück, statt den ganzen Bestand zu sperren. */
+  const perFilter = new Set(filterTitles(quelle, data, { ...EMPTY_FILTERS, releaseTypes: ['disc'] }, heute, new Set()).map((t) => t.id))
+  const abweichend = [...new Set([...direkt, ...perFilter])].filter((id) => direkt.has(id) !== perFilter.has(id))
+  for (const id of abweichend) melde(id, 'filter-zaehlung', 'Disc-Weg laut Releases und laut Filter verschieden')
+  pruefe('Filter „Art Disc" trifft genau diese Titel', abweichend.length === 0, abweichend.slice(0, 10))
 }
 
 console.log('\nPflichtfall: Disc-Plattform mit Art movie')
-/* Nur Beleg: Verschwindet der Titel aus dem Bestand, fällt der Fall weg, der Lauf bleibt grün (kein Titelurteil, steht in `bestand-ohne-marke.json`). */
+/* Nur Beleg: Verschwindet der Titel aus dem Bestand, fällt der Fall weg, der Lauf bleibt grün (kein Titelurteil). */
 if (titel.some((t) => t.id === 544)) {
   pruefe('Titel 544 (auto-544-disc): der Filter „Art Disc" lässt ihn durch', filterTitles(titel, data, { ...EMPTY_FILTERS, releaseTypes: ['disc'] }, heute, new Set()).some((t) => t.id === 544))
 } else console.log('  Titel 544 nicht mehr im Bestand, Pflichtfall entfällt')

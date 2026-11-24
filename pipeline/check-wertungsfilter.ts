@@ -111,12 +111,23 @@ const kaestchen = { ...EMPTY_FILTERS, ohneWertungAus: true }
 pruefe('Kästchen vor dem Nachladen: Kalender nicht leer', kalenderKachelIds(kaestchen, false) === 2, kalenderKachelIds(kaestchen, false))
 pruefe('Schwelle vor dem Nachladen: Kalender nicht leer', kalenderKachelIds({ ...EMPTY_FILTERS, minScore: 70 }, false) === 2)
 pruefe('Kästchen nach dem Nachladen: filtert wie bisher', kalenderKachelIds(kaestchen, true) === 0 && kalenderIds(kaestchen) === '1,2,3,5')
-// Verdrahtung: Der Kalender in App.tsx muss die Regel mit dem echten Ladezustand aufrufen, sonst gilt sie nur hier im Test.
+// Verdrahtung: Der Kalender (app-ansicht.ts, von App.tsx mit `voll` gerufen) muss die Regel mit dem echten Ladezustand aufrufen, sonst gilt sie nur hier im Test.
+const ansichtQuelle = readFileSync(new URL('../web/src/lib/app-ansicht.ts', import.meta.url), 'utf8')
 const appQuelle = readFileSync(new URL('../web/src/App.tsx', import.meta.url), 'utf8')
 pruefe(
-  'App.tsx: Kalender filtert über wertungNurMitVollenDaten mit dem Ladezustand',
-  appQuelle.includes('eventsFuerAnsichtGen(data, wertungNurMitVollenDaten(kalenderFilters, !!voll)'),
+  'app-ansicht.ts: Kalender filtert über wertungNurMitVollenDaten mit dem Ladezustand',
+  ansichtQuelle.includes('eventsFuerAnsichtGen(data, wertungNurMitVollenDaten(kalenderFilters, !!voll)'),
   'Aufruf fehlt oder nimmt nicht `!!voll`',
+)
+pruefe(
+  'app-ansicht.ts: die Titelliste sagt der Suche, ob gruppiert wird',
+  /titelFuerAnsichtGen\(quelle, data, filters, today, favorites, grouped(, sprecher\.auswahl)?\)/.test(ansichtQuelle),
+  'Aufruf von titelFuerAnsichtGen ohne `grouped`',
+)
+pruefe(
+  'App.tsx: reicht den Ladezustand `voll` an die Kalendertermine weiter',
+  appQuelle.includes('useKalenderTermine(data, voll, kalenderFilters'),
+  'App ruft useKalenderTermine nicht mit `voll`',
 )
 pruefe('ohne Wertungsfilter bleibt das Objekt dasselbe (kein neuer Filterzustand je Render)', wertungNurMitVollenDaten(EMPTY_FILTERS, false) === EMPTY_FILTERS)
 pruefe('Vor dem Nachladen bleiben die übrigen Filter erhalten', wertungNurMitVollenDaten({ ...kaestchen, minScore: 70, kostenlosOnly: true }, false).kostenlosOnly === true)

@@ -35,6 +35,7 @@ pipeline/check-eingabe-stand-bestand.ts
 pipeline/check-empfehlung-bestand.ts
 pipeline/check-empfehlung-kern-bestand.ts
 pipeline/check-favoriten-feed-bestand.ts
+pipeline/check-filter-zaehlung-bestand.ts
 pipeline/check-finale-bestand.ts
 pipeline/check-folge-zwoelf-hinweis-bestand.ts
 pipeline/check-folgen-erschienen-bestand.ts

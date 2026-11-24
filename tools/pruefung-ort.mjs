@@ -3,6 +3,7 @@
  * (`.github/workflows/nacht-pruefung.yml`, `npm run check:nachts`). Alles, was dort nicht steht, hat den Ort „pr“. Jede Prüfung hat genau einen Ort:
  * `check:logic` und `tests-alle` lassen die Nacht-Einträge aus, `--nachts` fährt nur sie. Eine Nacht-Prüfung mit `liest` (Repo-Dateien oder Ordner mit `/` am Ende,
  * die sie echt liest) läuft im PR-Ereignis trotzdem mit, sobald der PR eine dieser Dateien ändert (Diff gegen `HEAD^1`, im flachen Klon wird die Basis nachgeladen); lässt sich der Diff nicht lesen, läuft sie mit.
+ * Ändert der PR die Prüfdatei selbst, läuft sie ebenfalls mit (24.11.2026).
  * Das Urteil über die Datei fällt `tools/pr-kette-ort.mjs`. Fehlt die Datei (Wegwerf-Repos der Tests), gibt es keine Nacht-Einträge.
  */
 import { execFileSync } from 'node:child_process'
@@ -45,14 +46,15 @@ export function liestBeruehrtes(eintrag, beruehrt) {
   return beruehrt.some((datei) => liest.some((l) => (l.endsWith('/') ? datei.startsWith(l) : datei === l)))
 }
 
-/** Gehört der Eintrag zum Modus? `pr` = alle ohne Nacht-Ort plus Nacht-Einträge, deren Lesedatei der PR berührt; `nachts` = alle mit Nacht-Ort. */
-function passt(eintrag, modus, beruehrt) {
+/** Gehört der Eintrag zum Modus? `pr` = alle ohne Nacht-Ort plus Nacht-Einträge, deren Lesedatei oder eigene Datei (`datei`) der PR berührt; `nachts` = alle mit Nacht-Ort. */
+function passt(eintrag, modus, beruehrt, datei) {
   const nachts = eintrag?.ort === 'nachts'
-  if (modus === 'pr') return !nachts || liestBeruehrtes(eintrag, beruehrt)
+  /* Eigene Datei geändert → einmal im PR: die Filterzählung (PR 4737) lief nur nachts und las verbotenen Bestand, erst die Nacht wurde rot (24.11.2026). */
+  if (modus === 'pr') return !nachts || liestBeruehrtes(eintrag, beruehrt) || (Array.isArray(beruehrt) && beruehrt.includes(datei))
   return nachts
 }
 
-/** Die Einträge von `liste` zum Modus; `art` = `logik` oder `tests`, `name(eintrag)` = Schlüssel in der Zuordnungsdatei, `beruehrt` = geänderte Dateien des PR (nur Modus `pr`). */
+/** Die Einträge von `liste` zum Modus; `art` = `logik` oder `tests`, `name(eintrag)` = Schlüssel in der Zuordnungsdatei (Repo-Pfad), `beruehrt` = geänderte Dateien des PR (nur Modus `pr`). */
 export function nachOrt(liste, ort, art, modus, name = (e) => e, beruehrt = []) {
-  return liste.filter((e) => passt(ort[art]?.[name(e)], modus, beruehrt))
+  return liste.filter((e) => passt(ort[art]?.[name(e)], modus, beruehrt, name(e)))
 }

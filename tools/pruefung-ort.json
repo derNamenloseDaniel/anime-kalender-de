@@ -1,7 +1,7 @@
 {
   "_hinweis": "Nacht-Einträge (18.11.2026): laufen nicht in der PR-Kette, sondern nachts gegen main (nacht-pruefung.yml). Alles, was hier nicht steht, hat den Ort pr. liest = Repo-Dateien, die die Prüfung echt liest (Spur): ändert ein PR eine davon, läuft sie im PR mit (Entscheidung 18.11.2026; im Deploy laufen Nacht-Prüfungen nicht). Spur der Lesungen: Wegwerf-Probe mit fs-Hook unter bestand-sperre.cjs, 18.11.2026. Wächter: tools/pr-kette-ort.mjs; „erwartet“ nur zusammen mit einem Eintrag ändern.",
   "erwartet": {
-    "logik": 9,
+    "logik": 8,
     "tests": 6
   },
   "logik": {
@@ -21,11 +21,6 @@
         "data/ankuendigungen.yaml"
       ]
     },
-    "pipeline/check-filter-zaehlung-bestand.ts": {
-   "ort": "nachts",
-   "grund": "Rückrechnung der Chip-Zahlen am Bestand, 2 s; der Bestand ändert sich nur durch den Bestandsbau, nicht durch PRs; Neuzugang 23.11.2026, 0 Funde",
-   "beleg": "pipeline/check-filter-zaehlung-bestand.ts Z. 20-27: liest nur public/data/titles.json, titles-core.json, cartoons.json und releases.json (kein data/); rot, wenn eine Chip-Zahl von der Kartenzahl der Seite (filterTitles, dann ordneListe) abweicht"
-  },
   "pipeline/check-fetch-pruefungen-laufzeit.ts": {
       "ort": "nachts",
       "grund": "Prozess gegen Attrappe (meldung-staffel-mock), 181 s, längste Prüfung in check:logic; in 5 Tagen 0 Funde",

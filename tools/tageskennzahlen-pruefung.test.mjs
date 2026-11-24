@@ -77,10 +77,12 @@ const formen = [
   '  - 20.10. eingerückt zählt nicht',
   '- 1844 Bauer ohne Datum: zählt nicht',
   '65. **Titel ohne Datum:** Text vom 12.11.2026 zählt nicht',
+  '**Lehre 222 — Eine Sperre in `belege-entfernt.yaml` zieht die Kanal-Merkliste mit (23.11.2026, PR 4622):** Der Bauer sperrte',
+  '**Lehre 249 — Acht Entscheidungen für Daniel, keine in „Jetzt“ (Daniel 23.11. 22:56):** Fragen standen',
 ].join('\n')
-assert.deepEqual(lehrenJeTag(formen), { '2026-11-13': 1, '2026-10-20': 1, '2026-11-08': 1, '2026-10-23': 2, '2026-10-25': 1, '2026-10-21': 1, '2026-10-18': 1 })
+assert.deepEqual(lehrenJeTag(formen), { '2026-11-13': 1, '2026-10-20': 1, '2026-11-08': 1, '2026-10-23': 2, '2026-10-25': 1, '2026-10-21': 1, '2026-10-18': 1, '2026-11-23': 2 })
 assert.deepEqual(unzugeordnet(formen), [], 'jede Zeile mit Datum am Anfang ist zugeordnet')
-assert.deepEqual(unzugeordnet('25.10.2026 Kopf ohne Aufzählungszeichen\n2026-10-30 12:42 Zeile\n- **Titel** vom 12.11.2026\n  - 20.10. eingerückt\n- 20.10. zugeordnet'), ['25.10.2026 Kopf ohne Aufzählungszeichen', '2026-10-30 12:42 Zeile'], 'neue Form wird gemeldet, Datum mitten in der Zeile oder eingerückt nicht')
+assert.deepEqual(unzugeordnet('25.10.2026 Kopf ohne Aufzählungszeichen\n2026-10-30 12:42 Zeile\n- **Titel** vom 12.11.2026\n  - 20.10. eingerückt\n- 20.10. zugeordnet\n**Lehre 300 — ohne Datum:** Text vom 12.11.2026'), ['25.10.2026 Kopf ohne Aufzählungszeichen', '2026-10-30 12:42 Zeile', '**Lehre 300 — ohne Datum:** Text vom 12.11.2026'], 'neue Form wird gemeldet, Datum mitten in der Zeile oder eingerückt nicht')
 
 // Urteilsformen mit Zusatz im echten Wortlaut (A4): „ok, …“ ist ok, „aendern, …“ ist aendern, gleicher Kopf zweimal ist keine Nachbesserung.
 const ur = (...paare) => urteileJePr(paare.map(([kopf, urteil], i) => z(7, `2026-11-15T10:0${i}:00Z`, kopf, urteil)))

@@ -474,7 +474,6 @@ export function werteLinkpruefungAus({
   ytKanal,
   ytKauf,
   titles,
-  netflixOhneKennung,
   checksJePlattform,
   youtubeBefunde,
   belegFuer,
@@ -485,7 +484,6 @@ export function werteLinkpruefungAus({
   ytKanal: Record<string, string>
   ytKauf: Set<string>
   titles: Map<number, Title>
-  netflixOhneKennung: number
   checksJePlattform: Map<string, DubCheck[]>
   youtubeBefunde: YoutubeBefunde
   belegFuer: BelegFuer
@@ -528,7 +526,7 @@ export function werteLinkpruefungAus({
 
   for (const title of titles.values()) {
     vereinheitlicheNetflixAdressen(title, linkBefunde)
-    netflixOhneKennung += entferneNetflixOhneKennung(title)
+    entferneNetflixOhneKennung(title)
     const abgaenge = filtereVerweise(title, lage, lautPruefungTot)
     setzeEntfernteStreams(title, abgaenge, lage)
     entferneCrunchyrollUeberPrime(title, abgaenge, zaehler)

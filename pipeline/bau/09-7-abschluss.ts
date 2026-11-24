@@ -10,7 +10,7 @@ import { rtlplusWochentermine, type RtlFolge } from '../lib/rtlplus-folgen.ts'
 import { type EntfernterVerweis } from './grundlagen.ts'
 import { type DubCheck } from '../lib/dub-confirmed.ts'
 
-export function schliesseSynchroAb({ titles, verweiseEntfernt, releases, crDub, belegFuer, schreibWurzel }: {
+export interface SynchroAbschlussEingabe {
   titles: Map<number, Title>
   verweiseEntfernt: EntfernterVerweis[]
   releases: Release[]
@@ -18,97 +18,153 @@ export function schliesseSynchroAb({ titles, verweiseEntfernt, releases, crDub, 
   belegFuer: (titleId: number, plattform: PlatformId, url?: string, anzahlWege?: number) => DubCheck | undefined
   /** Wurzel für die Prüflisten der Teilseiten (Test: Wegwerf-Ordner); ohne Angabe die Projektwurzel. */
   schreibWurzel?: string
-}) {
-  /**
-   * **Wer die Staffeln exakt füllt, lässt für einen weiteren keinen Platz.**
-   *
-   * Die Umkehrung der Rechnung vom 10.09.2026: Meldet der Anbieter seine
-   * Staffelaufteilung, und füllen unsere **beurteilten** Titel jede seiner
-   * Staffeln der Reihe nach exakt auf, dann ist dort nichts mehr frei. Ein
-   * Titel derselben Adresse ohne Urteil läuft dort nicht — sein Verweis führt
-   * ins Leere.
-   *
-   * Das ist kein Umkehrschluss aus Schweigen, sondern eine Abzählung: Netflix
-   * zeigt „Sword Art Online" mit 25 und 24 Folgen, unsere ersten beiden Titel
-   * haben genau diese Zahlen und sind belegt. Für die 23 Folgen der beiden
-   * Alicization-Teile ist kein Platz — sie laufen dort wirklich nicht. Dasselbe
-   * bei „Mushoku Tensei": 23 + 25 = 11 + 12 und 13 + 12, der Special mit seiner
-   * einen Folge passt in keine der beiden Staffeln.
-   *
-   * **Drei Bedingungen, alle notwendig**, und zusammen sind sie streng genug:
-   * Die Aufteilung des Anbieters muss vorliegen, die beurteilten Titel müssen
-   * **jede** Staffel exakt füllen, und es darf keiner von ihnen übrig bleiben.
-   * Fehlt eine davon, wird nichts entfernt — das ist der Unterschied zu der
-   * Positionspaarung, die am 22.08.2026 sechs Verweise zu Unrecht gestrichen
-   * hat (siehe CLAUDE.md, „Der Anbieter zählt kumulativ").
-   */
-  {
-    const staffelStruktur = readJson<
-      Record<string, { staffeln?: { seq: number; folgen: number }[] }>
-    >('data/anbieter-staffeln.json', {})
-    const netflixKennung = (u: string): string | null =>
-      /netflix\.com\/(?:[a-z-]+\/)?title\/(\d+)/i.exec(u)?.[1] ?? null
-    const jahrRang = (t: Title): number =>
-      (t.jpYear ?? 0) * 100 + ({ WINTER: 1, SPRING: 2, SUMMER: 3, FALL: 4 }[t.jpSeason ?? ''] ?? 0)
+}
 
-    /* Alle Titel je Netflix-Adresse, in der Reihenfolge ihrer Ausstrahlung. */
-    const jeAdresse = new Map<string, Array<{ title: Title; stream: StreamLink }>>()
-    for (const title of titles.values()) {
-      for (const stream of title.streams ?? []) {
-        const id = netflixKennung(stream.url)
-        if (!id) continue
-        const liste = jeAdresse.get(id) ?? []
-        liste.push({ title, stream })
-        jeAdresse.set(id, liste)
-      }
+type NetflixEintrag = { title: Title; stream: StreamLink }
+type AnbieterStaffeln = Record<string, { staffeln?: { seq: number; folgen: number }[] }>
+
+const netflixKennung = (u: string): string | null =>
+  /netflix\.com\/(?:[a-z-]+\/)?title\/(\d+)/i.exec(u)?.[1] ?? null
+const jahrRang = (t: Title): number =>
+  (t.jpYear ?? 0) * 100 + ({ WINTER: 1, SPRING: 2, SUMMER: 3, FALL: 4 }[t.jpSeason ?? ''] ?? 0)
+
+/* Alle Titel je Netflix-Adresse, in der Reihenfolge ihrer Ausstrahlung. */
+function titelJeNetflixAdresse(titles: Map<number, Title>): Map<string, NetflixEintrag[]> {
+  const jeAdresse = new Map<string, NetflixEintrag[]>()
+  for (const title of titles.values()) {
+    for (const stream of title.streams ?? []) {
+      const id = netflixKennung(stream.url)
+      if (!id) continue
+      const liste = jeAdresse.get(id) ?? []
+      liste.push({ title, stream })
+      jeAdresse.set(id, liste)
     }
-
-    let ohnePlatz = 0
-    for (const [id, liste] of jeAdresse) {
-      const staffeln = staffelStruktur[id]?.staffeln
-      if (!staffeln?.length) continue
-      const offen = liste.filter((e) => e.stream.dub !== true && e.stream.dub !== false)
-      if (!offen.length) continue
-      const sortiert = [...liste].sort((a, b) => jahrRang(a.title) - jahrRang(b.title) || a.title.id - b.title.id)
-      const beurteilt = sortiert.filter((e) => e.stream.dub === true || e.stream.dub === false) // dub-lesart: irgendwie – jeder Weg mit Ja zählt (Menge/Weiche), auch ein abgeleiteter
-
-      let i = 0
-      let fuellt = true
-      for (const st of staffeln) {
-        let summe = 0
-        while (i < beurteilt.length && summe < (st.folgen ?? 0)) {
-          const n = beurteilt[i]!.title.episodes ?? 0
-          if (!n || summe + n > (st.folgen ?? 0)) break
-          summe += n
-          i++
-        }
-        if (summe !== (st.folgen ?? 0)) {
-          fuellt = false
-          break
-        }
-      }
-      if (!fuellt || i !== beurteilt.length) continue
-
-      for (const { title, stream } of offen) {
-        title.streams = title.streams.filter((x) => x !== stream)
-        ohnePlatz++
-        verweiseEntfernt.push({
-          titleId: title.id,
-          titel: title.titleDe ?? title.titleEn ?? title.titleRomaji ?? String(title.id),
-          plattform: stream.platform,
-          url: stream.url,
-          seriesId: null,
-          grund:
-            `der Anbieter führt ${staffeln.map((st) => st.folgen).join(' + ')} Folgen, und die belegten Titel ` +
-            `füllen sie exakt — für ${title.episodes ?? '?'} weitere ist dort kein Platz`,
-          geprueftAm: null,
-          entferntAm: todayIso(),
-          letzterWeg: title.streams.length === 0,
-        })
-      }
-    }
-    if (ohnePlatz) log(`${ohnePlatz} Netflix-Verweise entfernt: die Staffeln des Anbieters sind voll`)
   }
+  return jeAdresse
+}
+
+/** Füllen die beurteilten Titel der Reihe nach jede Staffel des Anbieters exakt, ohne dass einer übrig bleibt? */
+function fuellenStaffelnExakt(beurteilt: NetflixEintrag[], staffeln: { folgen: number }[]): boolean {
+  let i = 0
+  for (const st of staffeln) {
+    let summe = 0
+    while (i < beurteilt.length && summe < (st.folgen ?? 0)) {
+      const n = beurteilt[i]!.title.episodes ?? 0
+      if (!n || summe + n > (st.folgen ?? 0)) break
+      summe += n
+      i++
+    }
+    if (summe !== (st.folgen ?? 0)) return false
+  }
+  return i === beurteilt.length
+}
+
+/** Streicht die offenen Verweise einer vollen Adresse und protokolliert sie; liefert ihre Zahl. */
+function streicheOffeneVerweise(offen: NetflixEintrag[], staffeln: { folgen: number }[], verweiseEntfernt: EntfernterVerweis[]): number {
+  let entfernt = 0
+  for (const { title, stream } of offen) {
+    title.streams = title.streams.filter((x) => x !== stream)
+    entfernt++
+    verweiseEntfernt.push({
+      titleId: title.id,
+      titel: title.titleDe ?? title.titleEn ?? title.titleRomaji ?? String(title.id),
+      plattform: stream.platform,
+      url: stream.url,
+      seriesId: null,
+      grund:
+        `der Anbieter führt ${staffeln.map((st) => st.folgen).join(' + ')} Folgen, und die belegten Titel ` +
+        `füllen sie exakt — für ${title.episodes ?? '?'} weitere ist dort kein Platz`,
+      geprueftAm: null,
+      entferntAm: todayIso(),
+      letzterWeg: title.streams.length === 0,
+    })
+  }
+  return entfernt
+}
+
+/**
+ * **Wer die Staffeln exakt füllt, lässt für einen weiteren keinen Platz.**
+ *
+ * Die Umkehrung der Rechnung vom 10.09.2026: Meldet der Anbieter seine
+ * Staffelaufteilung, und füllen unsere **beurteilten** Titel jede seiner
+ * Staffeln der Reihe nach exakt auf, dann ist dort nichts mehr frei. Ein
+ * Titel derselben Adresse ohne Urteil läuft dort nicht — sein Verweis führt
+ * ins Leere.
+ *
+ * Das ist kein Umkehrschluss aus Schweigen, sondern eine Abzählung: Netflix
+ * zeigt „Sword Art Online" mit 25 und 24 Folgen, unsere ersten beiden Titel
+ * haben genau diese Zahlen und sind belegt. Für die 23 Folgen der beiden
+ * Alicization-Teile ist kein Platz — sie laufen dort wirklich nicht. Dasselbe
+ * bei „Mushoku Tensei": 23 + 25 = 11 + 12 und 13 + 12, der Special mit seiner
+ * einen Folge passt in keine der beiden Staffeln.
+ *
+ * **Drei Bedingungen, alle notwendig**, und zusammen sind sie streng genug:
+ * Die Aufteilung des Anbieters muss vorliegen, die beurteilten Titel müssen
+ * **jede** Staffel exakt füllen, und es darf keiner von ihnen übrig bleiben.
+ * Fehlt eine davon, wird nichts entfernt — das ist der Unterschied zu der
+ * Positionspaarung, die am 22.08.2026 sechs Verweise zu Unrecht gestrichen
+ * hat (siehe CLAUDE.md, „Der Anbieter zählt kumulativ").
+ */
+function entferneVolleNetflixStaffeln(titles: Map<number, Title>, verweiseEntfernt: EntfernterVerweis[]): void {
+  const staffelStruktur = readJson<AnbieterStaffeln>('data/anbieter-staffeln.json', {})
+  let ohnePlatz = 0
+  for (const [id, liste] of titelJeNetflixAdresse(titles)) {
+    const staffeln = staffelStruktur[id]?.staffeln
+    if (!staffeln?.length) continue
+    const offen = liste.filter((e) => e.stream.dub !== true && e.stream.dub !== false)
+    if (!offen.length) continue
+    const sortiert = [...liste].sort((a, b) => jahrRang(a.title) - jahrRang(b.title) || a.title.id - b.title.id)
+    const beurteilt = sortiert.filter((e) => e.stream.dub === true || e.stream.dub === false) // dub-lesart: irgendwie – jeder Weg mit Ja zählt (Menge/Weiche), auch ein abgeleiteter
+    if (!fuellenStaffelnExakt(beurteilt, staffeln)) continue
+    ohnePlatz += streicheOffeneVerweise(offen, staffeln, verweiseEntfernt)
+  }
+  if (ohnePlatz) log(`${ohnePlatz} Netflix-Verweise entfernt: die Staffeln des Anbieters sind voll`)
+}
+
+/**
+ * RTL+-Staffeln, die gerade wöchentlich wachsen (Beyblade X, 19.09.2026). Erst hier: Die
+ * Bedingung „Synchro am RTL+-Weg belegt" liest `dub`, und das steht erst nach den
+ * Handbelegen fest (der erste Bau fand deshalb nichts). Und so kann der Termin nicht
+ * selbst als Beleg in `dubByTitle` einfließen.
+ */
+function ergaenzeRtlWochentermine(titles: Map<number, Title>, releases: Release[]): void {
+  const ausRtl = rtlplusWochentermine(
+    readJson<{ titel?: Record<string, { programm: string; folgen: RtlFolge[] }> }>('data/rtlplus-folgen.json', {}).titel ?? {},
+    titles,
+    releases,
+    todayIso(),
+  )
+  releases.push(...ausRtl)
+  if (ausRtl.length) log(`${ausRtl.length} RTL+-Wochentermine: ${ausRtl.map((r) => r.name).join(', ')}`)
+}
+
+/* kinoheld-Adressen aus der Suche (`fetch-kinoheld.ts`) — der Kino-Banner verlinkt sie. */
+function setzeKinoheldAdressen(releases: Release[]): void {
+  const kinoheld = readJson<Record<string, string>>('data/kinoheld.json', {})
+  for (const r of releases) {
+    const adresse = kinoheld[r.slug]
+    if (r.platform === 'kino' && adresse && !(r.sources ?? []).includes(adresse)) r.sources = [...(r.sources ?? []), adresse]
+  }
+}
+
+function setzeBelegtBis(releases: Release[], titles: Map<number, Title>, belegFuer: SynchroAbschlussEingabe['belegFuer']): void {
+  let belegtBisGesetzt = 0
+  for (const release of releases) {
+    if (release.releaseType !== 'weekly') continue
+    const title = titles.get(release.titleId)
+    const stream = title?.streams.find((s) => s.platform === release.platform && s.dub === true)
+    const bis = Math.max(0, ...(stream?.dubRanges ?? []).filter((r) => r.dub).map((r) => r.to))
+    if (!title || !stream || !bis) continue
+    const am = belegFuer(title.id, stream.platform, stream.url)?.checkedAt?.slice(0, 10)
+    if (!am) continue
+    release.schedule.belegtBis = { folge: bis, am }
+    belegtBisGesetzt++
+  }
+  if (belegtBisGesetzt) log(`${belegtBisGesetzt} Wochenserien mit belegt erschienenen Folgen — dort keine Schätzung mehr`)
+}
+
+export function schliesseSynchroAb({ titles, verweiseEntfernt, releases, crDub, belegFuer, schreibWurzel }: SynchroAbschlussEingabe) {
+  entferneVolleNetflixStaffeln(titles, verweiseEntfernt)
 
   if (verweiseEntfernt.length) {
     const ohneWeg = verweiseEntfernt.filter((e) => e.letzterWeg).length
@@ -144,42 +200,7 @@ export function schliesseSynchroAb({ titles, verweiseEntfernt, releases, crDub, 
   */
   setzeCrBereiche(titles, crDub)
   setzeTeilseiten(titles, crDub, schreibWurzel)
-
-  /*
-    RTL+-Staffeln, die gerade wöchentlich wachsen (Beyblade X, 19.09.2026). Erst hier: Die
-    Bedingung „Synchro am RTL+-Weg belegt" liest `dub`, und das steht erst nach den
-    Handbelegen fest (der erste Bau fand deshalb nichts). Und so kann der Termin nicht
-    selbst als Beleg in `dubByTitle` einfließen.
-  */
-  const ausRtl = rtlplusWochentermine(
-    readJson<{ titel?: Record<string, { programm: string; folgen: RtlFolge[] }> }>('data/rtlplus-folgen.json', {}).titel ?? {},
-    titles,
-    releases,
-    todayIso(),
-  )
-  releases.push(...ausRtl)
-  if (ausRtl.length) log(`${ausRtl.length} RTL+-Wochentermine: ${ausRtl.map((r) => r.name).join(', ')}`)
-
-  /* kinoheld-Adressen aus der Suche (`fetch-kinoheld.ts`) — der Kino-Banner verlinkt sie. */
-  {
-    const kinoheld = readJson<Record<string, string>>('data/kinoheld.json', {})
-    for (const r of releases) {
-      const adresse = kinoheld[r.slug]
-      if (r.platform === 'kino' && adresse && !(r.sources ?? []).includes(adresse)) r.sources = [...(r.sources ?? []), adresse]
-    }
-  }
-
-  let belegtBisGesetzt = 0
-  for (const release of releases) {
-    if (release.releaseType !== 'weekly') continue
-    const title = titles.get(release.titleId)
-    const stream = title?.streams.find((s) => s.platform === release.platform && s.dub === true)
-    const bis = Math.max(0, ...(stream?.dubRanges ?? []).filter((r) => r.dub).map((r) => r.to))
-    if (!title || !stream || !bis) continue
-    const am = belegFuer(title.id, stream.platform, stream.url)?.checkedAt?.slice(0, 10)
-    if (!am) continue
-    release.schedule.belegtBis = { folge: bis, am }
-    belegtBisGesetzt++
-  }
-  if (belegtBisGesetzt) log(`${belegtBisGesetzt} Wochenserien mit belegt erschienenen Folgen — dort keine Schätzung mehr`)
+  ergaenzeRtlWochentermine(titles, releases)
+  setzeKinoheldAdressen(releases)
+  setzeBelegtBis(releases, titles, belegFuer)
 }

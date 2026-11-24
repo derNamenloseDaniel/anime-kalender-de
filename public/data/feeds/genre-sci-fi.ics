@@ -10,36 +10,6 @@ X-WR-TIMEZONE:Europe/Berlin
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:cr-GT00371866@2026-11-16@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261116T153000Z
-DTEND:20261116T160000Z
-SUMMARY:PSYREN – Folge 4/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
- etails: https://anime-kalender.de/t/17232/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-16#72@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261116T161000Z
-DTEND:20261116T164000Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-16#73@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261116T163500Z
-DTEND:20261116T170500Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
 UID:auto-223-tv-prosieben-maxx@2026-11-17#74@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261117T154500Z

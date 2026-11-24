@@ -1,7 +1,6 @@
 import { adressKern, dubKey, adressGleich, type DubCheck } from '../lib/dub-confirmed.ts'
 import { readJson, log } from '../lib/util.ts'
 import { type JwAngebot, gtiAus, amazonGtiWahl } from '../lib/amazon-gti.ts'
-import { stripAffiliate } from '../../shared/mappings.ts'
 import { type StreamLink, type Title } from '../../shared/types.ts'
 import { type AnisearchEintrag } from './01-quellen.ts'
 
@@ -56,15 +55,6 @@ function gtiTitelBilden(jwAngebote: Record<string, { angebote?: JwAngebot[] }>):
   return gtiTitel
 }
 
-function primeNeinBilden(): Set<number | undefined> {
-  return new Set(
-    (readJson<{ verweise?: { titleId?: number; plattform?: string; grund?: string }[] }>('data/verweise-entfernt.json', {})
-      .verweise ?? [])
-      .filter((v) => v.plattform === 'primevideo' && /^belegtes Nein/.test(v.grund ?? ''))
-      .map((v) => v.titleId),
-  )
-}
-
 /**
  * Genau ein Prime-Weg: auf JustWatchs Adresse umstellen, aber nur belegt.
  * `null` heißt: kein Umstellen, nichts zu zählen.
@@ -88,57 +78,6 @@ function stelleUmWennBelegt(
 }
 
 /**
- * Tote Amazon-Adresse eines Titels ohne Prime-Weg ersetzen. Gibt zurück, ob ein Weg entstand.
- *
- * Abgeschaltet am 17.09.2026, 19:05 (`ERSATZ_TOTER_AMAZON_LINKS`): Daniels Gegenprobe von drei
- * ersetzten Links: „Pokémon: Der Film – Weiß" führte auf den Schwester-Film „Schwarz".
- * JustWatch führt den richtigen Film, aber sein Amazon-Angebot trägt die gti des anderen.
- * Ohne alte Seite zum Abgleich fällt das nicht auf; 1 von 3 ist zu viel.
- */
-function belebeToteWiederEin(
-  title: Title,
-  angebote: JwAngebot[],
-  e: Pick<AusgabenEingabe, 'anisearch' | 'lautPruefungTot' | 'checksJePlattform'>,
-  primeNein: Set<number | undefined>,
-): boolean {
-  /*
-    Tote Amazon-Adresse: ein geführter Abgang (dort gab es Deutsch) oder eine
-    aniSearch-Adresse, die die Linkprüfung als tot kennt — die legt der Bau gar
-    nicht erst an. Gemessen am 17.09.2026: 158 Titel ohne Prime-Weg mit toter
-    aniSearch-Adresse, 27 davon mit genau einer gti bei JustWatch.
-  */
-  const abgang = (title.entfernteStreams ?? []).filter((a) => a.platform === 'primevideo')
-  const toteAnisearch = (e.anisearch[String(title.id)]?.streams ?? [])
-    .map((x) => x.url && stripAffiliate(x.url))
-    .filter((u): u is string => Boolean(u && /amazon\.de\/(?:dp|gp\/video\/detail)\//.test(u) && e.lautPruefungTot(u)))
-  const alteSeite = abgang.length === 1 ? abgang[0]!.url : abgang.length ? undefined : toteAnisearch[0]
-  if (!alteSeite) return false
-  /* Ein Handbeleg ohne Adresse („bei Prime nicht zu finden") gilt der ganzen Plattform und schlägt JustWatch. */
-  const handNein = (e.checksJePlattform.get(dubKey(title.id, 'primevideo')) ?? []).some(
-    (c) => !c.url && (c.available === false || c.dub === false),
-  )
-  if (handNein) return false
-  /* Ein belegtes Nein bei Prime (Gedächtnis der entfernten Verweise) gilt auch hier. */
-  if (primeNein.has(title.id)) return false
-  const wahl = amazonGtiWahl(angebote, abgang[0]?.dub)
-  if (!wahl) return false
-  /*
-    Ohne geführten Abgang gab es nie ein Urteil. Dann nur eine Ausgabe, für die
-    JustWatch deutschen Ton nennt — sonst entstünde ein Weg ohne Deutsch (Afro
-    Samurai, Black Cat, A Silent Voice).
-  */
-  if (!abgang.length && !wahl.audio.includes('de')) return false
-  const art = angebote.find((a) => a.url?.includes(wahl.gti))?.art
-  title.streams.push({
-    platform: 'primevideo',
-    url: wahl.url,
-    seite: alteSeite,
-    ...(art ? { zugang: art === 'FLATRATE' ? 'abo' : art === 'FREE' || art === 'ADS' ? 'kostenlos' : 'kauf' } : {}),
-  } as StreamLink)
-  return true
-}
-
-/**
  * **Prime-Verweise zeigen auf JustWatchs gti-Adresse** (Daniel, 17.09.2026, nach dem
  * PoC in `docs/poc-justwatch-amazon.md`: 8 von 8 lebenden Seiten tragen JustWatchs
  * gti, die tote Afro-Samurai-Seite fand ihren Ersatz über die Weiterleitung).
@@ -151,14 +90,11 @@ function belebeToteWiederEin(
  */
 function stelleAufGtiBrueckeUm(e: AusgabenEingabe): void {
   const jwAngebote = readJson<Record<string, { angebote?: JwAngebot[] }>>('data/justwatch-audio.json', {})
-  const ERSATZ_TOTER_AMAZON_LINKS = false
   const gtiBelegt = readJson<Record<string, string>>('data/amazon-gti-belegt.json', {})
   let unbelegt = 0
   const gtiTitel = gtiTitelBilden(jwAngebote)
   const geteilt = (angebote: JwAngebot[]) => angebote.some((a) => (gtiTitel.get(gtiAus(a.url) ?? '')?.size ?? 0) > 1)
-  const primeNein = primeNeinBilden()
   let umgestellt = 0
-  let wiederbelebt = 0
   for (const title of e.titles.values()) {
     if (e.tmdbMehrdeutig.has(String(title.id))) continue
     const angebote = jwAngebote[String(title.id)]?.angebote ?? []
@@ -168,14 +104,9 @@ function stelleAufGtiBrueckeUm(e: AusgabenEingabe): void {
       const ergebnis = stelleUmWennBelegt(prime[0]!, angebote, gtiBelegt)
       if (ergebnis === 'unbelegt') unbelegt++
       if (ergebnis === 'umgestellt') umgestellt++
-      continue
     }
-    if (prime.length) continue
-    if (!ERSATZ_TOTER_AMAZON_LINKS) continue
-    if (belebeToteWiederEin(title, angebote, e, primeNein)) wiederbelebt++
   }
-  if (umgestellt || wiederbelebt)
-    log(`gti-Brücke: ${umgestellt} Prime-Verweise auf JustWatchs Adresse umgestellt, ${wiederbelebt} tote über sie ersetzt`)
+  if (umgestellt) log(`gti-Brücke: ${umgestellt} Prime-Verweise auf JustWatchs Adresse umgestellt, 0 tote über sie ersetzt`)
   if (unbelegt) log(`gti-Brücke: ${unbelegt} Prime-Verweise warten auf eine abgelesene gti`)
 }
 

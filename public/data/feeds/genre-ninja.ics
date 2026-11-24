@@ -10,16 +10,6 @@ X-WR-TIMEZONE:Europe/Berlin
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:auto-128893-tv-prosieben-fun@2026-11-16@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261116T202000Z
-DTEND:20261116T205000Z
-SUMMARY:Hell’s Paradise – Folge 13/13
-DESCRIPTION:Plattform: ProSieben FUN\nRelease-Art: Wöchentlich (Simuldub)\
- nDetails: https://anime-kalender.de/t/12442/
-CATEGORIES:ProSieben FUN
-END:VEVENT
-BEGIN:VEVENT
 UID:naruto-shippuden-the-movie-5-blood-prison-2026-11-19@2026-11-19@anime-k
  alender-de
 DTSTAMP:20200101T000000Z

@@ -27,7 +27,7 @@ const ohneSchraegstrich = (url: string): string => url.replace(/\/$/, '')
  * „staffel 2", „teil 2" aus einem Namen („Tsubasa Chronicle: Staffel 2 - Vol. 1/3", „Strike Witches (Staffel 2) – Vol. 1"), sonst `''`.
  * Dieselbe Nummer in einer anderen Staffel ist eine andere Ware; „Staffel 1" gilt als keine Angabe, fehlt sie nur auf einer Seite sonst, ist es kein Treffer.
  */
-function staffelVon(name: string): string {
+export function staffelVon(name: string): string {
   const m = /\b(staffel|season|teil|part|cour)\s*(\d+)/i.exec(name)
   const art = /^(staffel|season)$/i.test(m?.[1] ?? '') ? 'staffel' : (m?.[1] ?? '').toLowerCase()
   /* aniSearch schreibt „Staffel 1" aus, wo unsere Namen die erste Staffel ohne Angabe lassen (Bocchi the Rock!, Spice and Wolf). */

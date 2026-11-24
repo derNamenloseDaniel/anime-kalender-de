@@ -34,7 +34,6 @@ export function pruefeSynchroJePlattform({
   tmdbTitles,
   tvJeTmdb,
   toteAdressen,
-  netflixOhneKennung,
   anisearch,
   verweiseEntfernt,
   katalogEintraege,
@@ -50,7 +49,6 @@ export function pruefeSynchroJePlattform({
   tmdbTitles: Record<string, TmdbTitelEintrag>
   tvJeTmdb: Set<string>
   toteAdressen: Set<string>
-  netflixOhneKennung: number
   anisearch: Record<string, AnisearchEintrag>
   verweiseEntfernt: EntfernterVerweis[]
   katalogEintraege: KatalogEintrag[]
@@ -62,7 +60,7 @@ export function pruefeSynchroJePlattform({
 }) {
   const crDub = readJson<CrDubData>('data/crunchyroll-dub.json', { scrapedAt: '', serien: [] })
   const belege = sammleBelege({ releases, titles, crBySeriesId, tmdbMehrdeutig, tmdbTitles, tvJeTmdb, toteAdressen, crDub })
-  const pruefung = werteLinkpruefungAus({ ...belege, titles, netflixOhneKennung, vorherTitles })
+  const pruefung = werteLinkpruefungAus({ ...belege, titles, vorherTitles })
   uebernehmePrimeUndCrVorschlaege({ ...belege, ...pruefung, titles, tmdbTitles, anisearch })
   haltePunkt('09-3-prime', titles)
   werteCrunchyrollDubAus({

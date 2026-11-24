@@ -83,6 +83,23 @@ pruefe('Netflix + Disc ausgeschlossen: Ausschluss gilt für die Kandidaten', !bl
 const ohneRelease = titel({ jpYear: 2026 })
 pruefe('Jahr ohne Release: jpYear gilt (wie vorher)', bleibt(ohneRelease, [], ein({ years: [2026] })) && !bleibt(ohneRelease, [], ein({ years: [2025] })))
 
+console.log('\nDisc-Erstausgabe ist ein Disc-Weg (F156, 23.11.2026):')
+const erst = (publisher?: string) => ({ von: '2021-06-26', ...(publisher ? { publisher } : {}) })
+const bandDerGeschwister = titel({ deErstausgabe: erst('peppermint anime GmbH') })
+pruefe('Nur Erstausgabe (peppermint): fällt bei „Disc aus" weg', !bleibt(bandDerGeschwister, [], aus('releaseTypes', ['disc'])))
+pruefe('… und bleibt bei „nur Disc" (Einschluss) sichtbar', bleibt(bandDerGeschwister, [], ein({ releaseTypes: ['disc'] })))
+pruefe('… als Plattform disc aus: ebenfalls weg', !bleibt(bandDerGeschwister, [], aus('platforms', ['disc'])))
+const yaibaErst = titel({ streams: [stream('joyn')], deErstausgabe: erst('Kazé Deutschland') })
+pruefe('Stream und Erstausgabe: bleibt bei „Disc aus" (Yaiba-Fall)', bleibt(yaibaErst, [], aus('releaseTypes', ['disc'])))
+const netflixErst = titel({ deErstausgabe: erst('Netflix, Inc.') })
+pruefe('Erstausgabe bei Netflix als Verlag: kein Weg, bleibt bei „Disc aus"', bleibt(netflixErst, [], aus('releaseTypes', ['disc'])) && wegeVon(netflixErst, [], HEUTE)[0]!.quelle === 'titel')
+const crErst = titel({ deErstausgabe: erst('Crunchyroll') })
+pruefe('Erstausgabe bei Crunchyroll: kein Weg', wegeVon(crErst, [], HEUTE)[0]!.quelle === 'titel')
+const ohneVerlag = titel({ deErstausgabe: erst() })
+pruefe('Erstausgabe ohne Verlag: kein Weg', wegeVon(ohneVerlag, [], HEUTE)[0]!.quelle === 'titel')
+const mitDisc = titel({ deErstausgabe: erst('KSM Anime') })
+pruefe('Erstausgabe neben einem Disc-Release: nur ein Disc-Weg', wegeVon(mitDisc, [release(mitDisc, 'disc', 'disc')], HEUTE).filter(istDiscWeg).length === 1)
+
 if (verletzt) {
   console.error(`\ncheck-filter-wege: ${verletzt} Verletzung(en)`)
   process.exit(1)

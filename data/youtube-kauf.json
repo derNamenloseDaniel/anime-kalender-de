@@ -207,16 +207,20 @@
         "titel": "Das Mädchen mit dem Zauberhaar - Mai Mai Miracle"
       }
     ],
-    "geprueftAm": "2026-10-24"
+    "geprueftAm": "2026-11-24"
   },
   "6372": {
     "aehnlich": [
       {
         "video": "uvVXRDvIVL8",
         "titel": "Eden of the East - The King of Eden"
+      },
+      {
+        "video": "MKg6t7Dic_c",
+        "titel": "Eden of the East - Das verlorene Paradies"
       }
     ],
-    "geprueftAm": "2026-10-24"
+    "geprueftAm": "2026-11-24"
   },
   "6637": {
     "video": "MKg6t7Dic_c",
@@ -250,7 +254,7 @@
         "titel": "Children Who Chase Lost Voices - Die Reise nach Agartha"
       }
     ],
-    "geprueftAm": "2026-10-24"
+    "geprueftAm": "2026-11-24"
   },
   "9917": {
     "video": "b5IwIt0DK9A",
@@ -268,8 +272,9 @@
     "geprueftAm": "2026-09-23"
   },
   "10681": {
-    "ohneTreffer": true,
-    "geprueftAm": "2026-10-24"
+    "video": "daO9LvlAbLQ",
+    "titel": "Blood-C - The Last Dark",
+    "geprueftAm": "2026-11-24"
   },
   "10740": {
     "video": "YHPZ6oNVD9o",
@@ -317,8 +322,9 @@
     "geprueftAm": "2026-09-23"
   },
   "20709": {
-    "ohneTreffer": true,
-    "geprueftAm": "2026-10-24"
+    "video": "pbh7Qv_OYws",
+    "titel": "Miss Hokusai",
+    "geprueftAm": "2026-11-24"
   },
   "21266": {
     "video": "mPlsBjrJSLs",
@@ -346,7 +352,7 @@
         "titel": "Pokémon – Der Film: Volcanion und das Merchanische Wunderwerk"
       }
     ],
-    "geprueftAm": "2026-10-24"
+    "geprueftAm": "2026-11-24"
   },
   "21729": {
     "video": "88fSdX1vmNU",

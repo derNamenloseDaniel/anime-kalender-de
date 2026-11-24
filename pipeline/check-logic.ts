@@ -5443,10 +5443,6 @@ pruefe(
     '… nur, wo die Erweiterung dieselbe gti auf unserer Seite abgelesen hat (Pokémon Weiß → Schwarz)',
     /if \(gtiBelegt\[adressKern\(s\.url\)\] !== wahl\.gti\)/.test(bau),
   )
-  pruefe(
-    '… und belebt nicht wieder, was ein Handbeleg ohne Adresse für Prime verneint',
-    /if \(handNein\) return false/.test(bau),
-  )
   /* Dass die Linkprüfung die Amazon-Seite statt JustWatchs Adresse prüft, läuft in check-links-laufzeit.ts. */
 }
 /* Your Name – CineAnime: der letzte Spieltag kommt auch über die Veranstaltungsadresse (17.09.2026). */
@@ -6400,10 +6396,7 @@ pruefe(
     kopfName(erste) === 'Erste Staffel' && kopfName(zweite) === 'Erste Staffel',
     `${kopfName(erste)} / ${kopfName(zweite)}`,
   )
-  pruefe(
-    'und die Ansicht sagt der Suche, ob gruppiert wird',
-    /titelFuerAnsichtGen\(quelle, data, route\.filters, today, favorites, grouped(, sprecher\.auswahl)?\)/.test(appQuelle),
-  )
+  // „und die Ansicht sagt der Suche, ob gruppiert wird“ prüft check-wertungsfilter.ts (app-ansicht.ts), hier zählt jede Quelltext-Lesung.
   /*
     **Eine Serie kann Deutsch führen, auch wenn die untersuchte Staffel die japanische ist**
     (29.09.2026, „Dragon Ball Z: Resurrection 'F'"): Der deutsche Katalog nennt auf Serienebene

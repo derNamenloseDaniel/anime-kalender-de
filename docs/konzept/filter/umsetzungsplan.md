@@ -37,6 +37,8 @@ Disc-Weg: `platform === 'disc' || art === 'disc'` (B6). Berechnung einmal je Tit
 
 **R3 Ausschluss.** Ein Titel bleibt, wenn er **keinen** Weg hat oder mindestens **einen** Weg, der keinen Ausschluss trifft. Reiner Handel („Disc aus“) fällt weg: 29 von 3.550 (Messung 22.11.2026).
 
+**R3a Disc-Erstausgabe (F156 A, Daniel, 23.11.2026).** Die deutsche Erstausgabe (`deErstausgabe`, aniSearch) ist ein Disc-Weg (`quelle: 'erstausgabe'`), wenn ihr Verlag Discs herausgibt (`erstausgabeIstDiscWeg`, `shared/verlag-anbieter.ts`). Streaming-Anbieter, Sender, Kino-Verleih und fehlender Verlag zählen nicht: der Titel bleibt wegelos und besteht nach R3 jeden Ausschluss. Vorher hatten 913 von 2.929 Titeln mit Erstausgabe gar keinen Weg (z. B. „Das Band der Geschwister“ bei „Disc aus“ sichtbar), nachher 210 (Netflix 187, Crunchyroll 109 …, 290 Erstausgaben ohne Verlag; Messung 23.11.2026). Ein vorhandener Disc-Weg aus einem Release bekommt keinen zweiten.
+
 **R4 Einschluss und gleicher Weg.** Mehrere Weg-Einschlüsse müssen vom **selben** Weg erfüllt werden. Je Dimension gilt ODER (Vorgabe) oder UND (`modus`, B10):
 1. Kandidatenwege = Wege, die alle Ausschlüsse bestehen und in jeder ODER-Dimension einen gewählten Wert tragen;
 2. je UND-Dimension braucht jeder gewählte Wert einen eigenen Zeugen unter den Kandidaten (verschiedene Wege erlaubt);

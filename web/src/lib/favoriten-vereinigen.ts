@@ -20,7 +20,13 @@ export interface AbgleichAnschluss {
   merkeBasis: (text: string) => void
 }
 
-const stand = (ids: Iterable<number>) => [...ids].sort((a, b) => a - b).join(',')
+export const standText = (ids: Iterable<number>): string => [...ids].sort((a, b) => a - b).join(',')
+const stand = standText
+
+/** Ohne Basis (erster Abgleich) kommen die Titel der Datums-Ablage dazu, danach nichts mehr. */
+export function ergaenzungBeimErstabgleich(basis: string | null, mitDatum: number[]): number[] {
+  return basis === null ? mitDatum : []
+}
 
 /**
  * Holt den Serverstand, führt ihn mit dem lokalen zusammen und schickt ihn zurück, wenn er abweicht.
@@ -38,7 +44,7 @@ export async function gleicheAb(a: AbgleichAnschluss): Promise<void> {
   const text = stand(vereint)
   if (text !== stand(server)) await a.sende([...vereint].sort((x, y) => x - y))
   if (stand(a.lokal()) !== stand(lokal)) return
-  // Vor dem lokalen Schreiben, damit `useNewsletterSync` die Änderung nicht noch einmal schickt.
+  // Vor dem lokalen Schreiben, damit der Hook die Änderung nicht noch einmal abgleicht.
   a.merkeBasis(text)
   if (text !== stand(lokal)) a.setzeLokal(vereint)
 }

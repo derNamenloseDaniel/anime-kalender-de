@@ -55,6 +55,27 @@ const BEREICHE: BereichFall[] = [
   { id: 900616, name: 'Ein einzelner Bereich, der nicht bei 1 beginnt, bleibt stehen', kennung: 'BNICHTAB01', episodes: 3, bloecke: [block('S1', 3, 2, 3)], soll: [r(2, 3)] },
 ]
 
+/** Runden 2 bis 5 (Kennung statt Adresse): je Runde mindestens zwei Fälle mit Adressvariante, Folgenzahl, Jahr und Namen. */
+interface RundenFall {
+  name: string
+  kennung: string
+  titel: { id: number; episodes: number; jpYear: number; format?: string; name: string; adresse?: string }[]
+  bloecke: object[]
+  soll: Record<number, boolean | undefined>
+}
+const von1 = (bis: number) => Array.from({ length: bis }, (_, i) => i + 1)
+const RUNDEN: RundenFall[] = [
+  { name: 'Runde 2: durchgezählte Nummern geben beiden Staffeln Deutsch', kennung: 'RNUMMER01', titel: [{ id: 900901, episodes: 3, jpYear: 2019, name: 'Alpha Eins' }, { id: 900902, episodes: 2, jpYear: 2020, name: 'Beta Zwei' }], bloecke: [block('Bl A', 3, 1, 2, 3), block('Bl B', 2, 4, 5)], soll: { 900901: true, 900902: true } },
+  { name: 'Runde 2: dieselbe Kennung unter zwei Adressen kommt zusammen', kennung: 'RNUMMER02', titel: [{ id: 900903, episodes: 2, jpYear: 2019, name: 'Gamma Eins' }, { id: 900904, episodes: 3, jpYear: 2020, name: 'Delta Zwei', adresse: 'http://www.crunchyroll.com/rnummer02' }], bloecke: [block('X1', 2, 1, 2), block('X2', 3, 3, 4, 5)], soll: { 900903: true, 900904: true } },
+  { name: 'Runde 2: eine Staffel ganz ohne deutsche Folgen bekommt Nein', kennung: 'RNUMMER03', titel: [{ id: 900905, episodes: 2, jpYear: 2018, name: 'Epsilon Eins' }, { id: 900906, episodes: 2, jpYear: 2019, name: 'Zeta Zwei' }, { id: 900907, episodes: 2, jpYear: 2020, name: 'Eta Drei' }], bloecke: [block('Y1', 2, 1, 2), block('Y2', 2, 5, 6)], soll: { 900905: true, 900906: false, 900907: true } },
+  { name: 'Runde 3: einzige Serie an der Adresse bekommt Deutsch', kennung: 'RJEBLOCK01', titel: [{ id: 900910, episodes: 12, jpYear: 2020, name: 'Theta Einzel' }], bloecke: [block('Namenlos', 12, ...von1(12))], soll: { 900910: true } },
+  { name: 'Runde 3: zwei OVAs füllen den OVA-Block', kennung: 'RJEBLOCK02', titel: [{ id: 900911, episodes: 1, jpYear: 2020, format: 'OVA', name: 'Iota Sonder' }, { id: 900912, episodes: 1, jpYear: 2021, format: 'OVA', name: 'Kappa Sonder' }], bloecke: [block('OVAs', 2, 1, 2)], soll: { 900911: true, 900912: true } },
+  { name: 'Runde 4: ein Block deckt zwei Staffeln', kennung: 'RKETTE001', titel: [{ id: 900920, episodes: 11, jpYear: 2019, name: 'Lambda Eins' }, { id: 900921, episodes: 11, jpYear: 2019, name: 'My Zwei' }, { id: 900925, episodes: 1, jpYear: 2020, name: 'Pi Sonder' }], bloecke: [block('Kette', 22, ...von1(22)), block('Nachtrag', 1, 1)], soll: { 900920: true, 900921: true, 900925: true } },
+  { name: 'Runde 4: Block 10 deckt zwei, Block 5 die dritte', kennung: 'RKETTE002', titel: [{ id: 900922, episodes: 5, jpYear: 2018, name: 'Ny Eins' }, { id: 900923, episodes: 5, jpYear: 2018, name: 'Xi Zwei' }, { id: 900924, episodes: 5, jpYear: 2019, name: 'Omikron Drei' }], bloecke: [block('Z1', 10, ...von1(10)), block('Z2', 5, ...von1(5))], soll: { 900922: true, 900923: true, 900924: true } },
+  { name: 'Runde 5: Titel und Teil 2 füllen einen Block', kennung: 'RTEILBLO01', titel: [{ id: 900930, episodes: 12, jpYear: 2020, name: 'Aurora Welt' }, { id: 900931, episodes: 12, jpYear: 2021, name: 'Aurora Welt Teil 2' }], bloecke: [block('Aurora Welt', 24, ...von1(24)), block('Alicization', 25, ...von1(24))], soll: { 900930: true, 900931: true } },
+  { name: 'Runde 5: zweites Paar aus Titel und Teil 2', kennung: 'RTEILBLO02', titel: [{ id: 900932, episodes: 6, jpYear: 2020, name: 'Mondlicht Chronik' }, { id: 900933, episodes: 6, jpYear: 2021, name: 'Mondlicht Chronik Teil 2' }], bloecke: [block('Mondlicht Chronik', 12, ...von1(12)), block('Sonnenwende', 13, ...von1(12))], soll: { 900932: true, 900933: true } },
+]
+
 /** Geschwisterblock: Serie mit Titel A (12 Folgen) und einem deutschen Block von 3 Folgen. */
 interface GeschwisterFall {
   /** Kennung der Serie, `A` ist der Titel an der Adresse. */
@@ -123,6 +144,15 @@ try {
     }
     serien.push({ url: adresse(f.kennung), seriesId: f.kennung, katalog: 'de', deutschImAngebot: true, ...f.serie, staffeln: [f.block ?? DREI] })
   }
+  for (const f of RUNDEN) {
+    const urls = new Set<string>()
+    for (const t of f.titel) {
+      const url = t.adresse ?? adresse(f.kennung)
+      urls.add(url)
+      titles.set(t.id, mk(t.id, url, { episodes: t.episodes, jpYear: t.jpYear, format: t.format ?? 'TV', titleEn: t.name, titleRomaji: t.name })[1])
+    }
+    for (const url of urls) serien.push({ url, seriesId: f.kennung, katalog: 'de', deutschImAngebot: true, staffeln: f.bloecke })
+  }
   const crDub = { serien } as unknown as CrDubData
   const nachUrl = new Map<string, Title[]>()
   for (const t of titles.values()) for (const s of t.streams) nachUrl.set(s.url, [...(nachUrl.get(s.url) ?? []), t])
@@ -133,6 +163,7 @@ try {
     const hat = [...new Set(kandidaten)].filter((id) => titles.get(id)?.streams.some((s) => s.platform === 'crunchyroll' && s.url === adresse(f.kennung)))
     erwarte(f.name, hat, f.geht ? [f.geht] : [])
   }
+  for (const f of RUNDEN) for (const t of f.titel) erwarte(`${f.name} (${t.id})`, titles.get(t.id)!.streams[0]!.dub, f.soll[t.id])
   const neu = titles.get(900711)
   erwarte('Katalog-Geschwister: Titel angelegt mit Reihe, englischem Namen und deutschem Weg', [neu?.franchiseId, neu?.titleEn, neu?.streams[0]?.dub], [900710, 'English', true])
   erwarte('Katalog-Geschwister nur mit lateinischem Namen: Anzeige aus dem lateinischen Namen', titles.get(900841)?.titleEn, 'Latin Name')

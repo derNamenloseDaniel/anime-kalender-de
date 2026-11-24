@@ -25,22 +25,33 @@ const ECHT: KalenderTermin[] = [
   T('2026-11-20', { name: 'Morgen', platform: 'netflix', time: '08:00', episode: 1 }),
 ]
 
-test('kalenderHeute: eine Zeile je Titel und Anbieter, Zeit zuerst, ohne Uhrzeit danach; Disc, Im-Angebot, TV ohne Premiere und andere Tage fehlen', () => {
+test('kalenderHeute: eine Zeile je Titel und Folgen (TV-Premiere und Joyn zusammen, beide Uhrzeiten), Zeit zuerst, ohne Uhrzeit danach; Disc, Im-Angebot, TV ohne Premiere und andere Tage fehlen', () => {
   expect(kalenderHeute(ECHT, TAG).map(kalenderZeilenText)).toEqual([
-    '18:25 YAIBA: Samurai Legend · ProSieben MAXX · F9',
-    '18:50 YAIBA: Samurai Legend · Joyn · F9',
+    '18:25 YAIBA: Samurai Legend · ProSieben MAXX · 18:50 Joyn · F9',
     '≈19:05 The Iceblade Sorcerer Shall Rule the World II · Crunchyroll · F4',
     'The Ramparts of Ice: Staffel 2 · Netflix · F8',
   ])
   expect(kalenderHeute(ECHT, '2026-11-21')).toEqual([])
 })
 
-test('kalenderHeute: gleicher Titel bei zwei Sendern bleibt getrennt; timeEstimated zählt wie estimated; Batch ohne Nummer nennt die Zahl', () => {
+test('kalenderHeute: gleicher Titel bei zwei Sendern mit denselben Folgen wird eine Zeile; timeEstimated zählt wie estimated; Batch ohne Nummer nennt die Zahl', () => {
   const z = kalenderHeute(
     [T(TAG, { name: 'A', platform: 'tv', sender: 'X', time: '08:00', timeEstimated: true, episode: 1, tvPremiere: true }), T(TAG, { name: 'A', platform: 'tv', sender: 'Y', time: '07:00', episode: 1, tvPremiere: true }), T(TAG, { name: 'B', platform: 'netflix', releaseType: 'batch', episodeCount: 12 })],
     TAG
   )
-  expect(z.map(kalenderZeilenText)).toEqual(['07:00 A · Y · F1', '≈08:00 A · X · F1', 'B · Netflix · alle 12 Folgen'])
+  expect(z.map(kalenderZeilenText)).toEqual(['07:00 A · Y · ≈08:00 X · F1', 'B · Netflix · alle 12 Folgen'])
+})
+
+test('kalenderHeute: andere Folgen desselben Titels bleiben getrennte Zeilen', () => {
+  const z = kalenderHeute([T(TAG, { name: 'A', platform: 'tv', sender: 'X', time: '08:00', episode: 1, tvPremiere: true }), T(TAG, { name: 'A', platform: 'joyn', time: '09:00', episode: 2 })], TAG)
+  expect(z.map(kalenderZeilenText)).toEqual(['08:00 A · X · F1', '09:00 A · Joyn · F2'])
+})
+
+test('istVorbei: zusammengefasster Termin ist erst nach seiner letzten Uhrzeit vorbei', () => {
+  const jetzt = Date.parse('2026-11-19T17:30:00Z') // 18:30 in Berlin
+  const [yaiba] = kalenderHeute(ECHT, TAG)
+  expect(istVorbei(yaiba!, TAG, jetzt)).toBe(false)
+  expect(istVorbei(yaiba!, TAG, Date.parse('2026-11-19T18:00:00Z'))).toBe(true)
 })
 
 test('istVorbei: verstrichene Uhrzeit des heutigen Berliner Tages; ohne Uhrzeit oder an anderem Tag nie', () => {
@@ -102,7 +113,7 @@ const MITTAG = Date.parse('2026-11-19T11:00:00Z')
 test('ladeKalender: liest nur bei geänderter Datei neu; Tageswechsel zeigt den neuen Tag ohne Lesung', async () => {
   const d = dateien({ [WOCHE_DATEI]: { text: WOCHE(ECHT), mtime: 1 } })
   const cache = {}
-  expect((await ladeKalender(d, MITTAG, cache)).zeilen).toHaveLength(4)
+  expect((await ladeKalender(d, MITTAG, cache)).zeilen).toHaveLength(3)
   await ladeKalender(d, MITTAG, cache)
   expect(d.gelesen).toEqual([WOCHE_DATEI])
   const morgen = await ladeKalender(d, Date.parse('2026-11-19T23:30:00Z'), cache)
@@ -125,7 +136,7 @@ test('ladeKalender: heute außerhalb der Woche → events.json; Lesefehler läss
   expect(await ladeKalender(dateien({ [WOCHE_DATEI]: { text: '', mtime: 1 } }), MITTAG, {})).toEqual({ datum: '2026-11-19', zeilen: [] })
   const kaputt = dateien({})
   const behalten = { [WOCHE_DATEI]: { stempel: '1:1', daten: termineAusDatei(WOCHE(ECHT)) } }
-  expect((await ladeKalender(kaputt, MITTAG, behalten)).zeilen).toHaveLength(4)
+  expect((await ladeKalender(kaputt, MITTAG, behalten)).zeilen).toHaveLength(3)
 })
 
 // Die Test-Uhr startet bei 0: erst auf den Mittag des 19.11.2026 vorstellen, dann starten.
@@ -140,8 +151,8 @@ async function paneMitKalender($: any, on: any, woche: string, start = MITTAG) {
 test('Pane: „Kalender heute“ mit Anzahl, Zeilen, Einklappen; „Gerade in Arbeit“ gibt es nicht', async ($, on) => {
   const { p } = await paneMitKalender($, on, WOCHE(ECHT))
   const z = zeilen(await p.drawn())
-  expect(z).toContain('▾ Kalender heute 4')
-  expect(z).toEqual(expect.arrayContaining(['YAIBA: Samurai Legend', 'ProSieben MAXX · F9', '  18:25']))
+  expect(z).toContain('▾ Kalender heute 3')
+  expect(z).toEqual(expect.arrayContaining(['YAIBA: Samurai Legend', 'ProSieben MAXX · 18:50 Joyn · F9', '  18:25']))
   expect(z).toEqual(expect.arrayContaining(['The Iceblade Sorcerer Shall Rule the World II', 'Crunchyroll · F4', ' ≈19:05']))
   expect(z.join('\n')).not.toContain('Super Wings')
   expect(z.join('\n')).not.toContain('ONE PIECE')
@@ -149,8 +160,8 @@ test('Pane: „Kalender heute“ mit Anzahl, Zeilen, Einklappen; „Gerade in Ar
   expect(z.join('\n')).not.toContain('Naruto')
   await p.press({ key: 'bereich:kalender' })
   const zu = zeilen(await p.drawn())
-  expect(zu).toContain('▸ Kalender heute 4')
-  expect(zu).not.toContain('ProSieben MAXX · F9')
+  expect(zu).toContain('▸ Kalender heute 3')
+  expect(zu).not.toContain('ProSieben MAXX · 18:50 Joyn · F9')
   await p.unmount()
 })
 
@@ -174,11 +185,11 @@ test('Pane: ohne Termine heute kein Bereich', async ($, on) => {
 test('Pane: Änderung der Datei und Tageswechsel erscheinen im Takt, ohne Neustart', async ($, on) => {
   // 22:58 UTC ist in Berlin noch der 19., ab 23:00 UTC der 20.
   const { uhr, p } = await paneMitKalender($, on, WOCHE(ECHT), Date.parse('2026-11-19T22:58:00Z'))
-  expect(zeilen(await p.drawn())).toContain('▾ Kalender heute 4')
+  expect(zeilen(await p.drawn())).toContain('▾ Kalender heute 3')
   kalenderWelt.woche = WOCHE([...ECHT, T(TAG, { name: 'Nachträglich', platform: 'netflix', time: '23:00', episode: 1 })])
   kalenderWelt.mtime = 2
   await uhr.advance(30_000)
-  expect(zeilen(await p.drawn())).toContain('▾ Kalender heute 5')
+  expect(zeilen(await p.drawn())).toContain('▾ Kalender heute 4')
   await uhr.advance(90_000)
   const z = zeilen(await p.drawn())
   expect(z).toContain('▾ Kalender heute 1')

@@ -24,74 +24,20 @@ function q(value: string): string {
   return `"${value.replace(/"/g, '\\"')}"`
 }
 
-function main(): void {
-  const { proposals } = readJson<{ proposals: DiscProposal[] }>(
-    'data/proposals/disc-anisearch.json',
-    { proposals: [] },
-  )
-  if (!proposals.length) {
-    warn('Keine Vorschläge — erst "npm run data:disc-proposals" laufen lassen.')
-    return
-  }
-  const titles = readJson<Title[]>('public/data/titles.json', [])
-  const releases = readJson<Release[]>('public/data/releases.json', [])
-  const titelNach = new Map(titles.map((t) => [t.id, t]))
-  /**
-   * Bekannte Disc-Termine je Anime — als Datumsliste, nicht als Schlüssel.
-   *
-   * Der erste Anlauf verglich `titleId` **und** Datum. Das ging schief: Wird
-   * ein Verkaufsstart verschoben, gilt derselbe Artikel plötzlich als neu, und
-   * der Kalender führt dieselbe Ausgabe zweimal mit verschiedenen Terminen.
-   * Bei 34 übernommenen Terminen entstanden so 25 Doubletten — „The Café
-   * Terrace and Its Goddesses" stand mit dem 07.08. und dem 21.08. da, während
-   * der richtige Termin laut Publisher-Meldung der 04.09. war.
-   */
-  const bekannteTermine = new Map<number, string[]>()
-  for (const r of releases.filter((r) => r.releaseType === 'disc')) {
-    const liste = bekannteTermine.get(r.titleId)
-    if (liste) liste.push(r.schedule.firstEpisodeDate)
-    else bekannteTermine.set(r.titleId, [r.schedule.firstEpisodeDate])
-  }
+/**
+ * Wie nah ein bekannter Termin liegen darf, damit es dieselbe Ausgabe ist.
+ *
+ * Zwei Monate: Verschiebungen um zwei, drei Wochen sind bei Disc-Terminen
+ * die Regel — am 31.07.2026 verschob ein einziger Publisher 21 Titel um
+ * genau diese Spanne. Wer enger prüft, sammelt Doubletten; wer weiter prüft,
+ * verliert echte Folgebände, die oft im Zweimonatstakt erscheinen.
+ */
+const NAH_TAGE = 60
+const tage = (a: string, b: string) =>
+  Math.abs(new Date(a).getTime() - new Date(b).getTime()) / 86_400_000
 
-  /**
-   * Wie nah ein bekannter Termin liegen darf, damit es dieselbe Ausgabe ist.
-   *
-   * Zwei Monate: Verschiebungen um zwei, drei Wochen sind bei Disc-Terminen
-   * die Regel — am 31.07.2026 verschob ein einziger Publisher 21 Titel um
-   * genau diese Spanne. Wer enger prüft, sammelt Doubletten; wer weiter prüft,
-   * verliert echte Folgebände, die oft im Zweimonatstakt erscheinen.
-   */
-  const NAH_TAGE = 60
-  const tage = (a: string, b: string) =>
-    Math.abs(new Date(a).getTime() - new Date(b).getTime()) / 86_400_000
-
-  // Nach Anime und Datum bündeln.
-  const gebuendelt = new Map<string, DiscProposal[]>()
-  let alsDoublette = 0
-  for (const v of proposals) {
-    if ((bekannteTermine.get(v.titleId) ?? []).some((d) => tage(d, v.date) < NAH_TAGE)) {
-      alsDoublette++
-      continue
-    }
-    const key = `${v.titleId}|${v.date}`
-    const liste = gebuendelt.get(key)
-    if (liste) liste.push(v)
-    else gebuendelt.set(key, [v])
-  }
-
-  /**
-   * Namen der Disc-Ausgaben, die schon im Datensatz stehen.
-   *
-   * Die Zeitschwelle allein reicht nicht: „DAN DA DAN – Vol. 3" stand mit dem
-   * 28.08. im Bestand, der Vorschlag nannte den 30.10. — 63 Tage, also knapp
-   * daneben. Dasselbe Produkt bekam so einen zweiten Eintrag. Wo der Name
-   * übereinstimmt, ist es dieselbe Ausgabe, egal wie weit die Termine
-   * auseinanderliegen.
-   */
-  const bekannteNamen = new Set(
-    releases.filter((r) => r.releaseType === 'disc').map((r) => r.name.toLowerCase()),
-  )
-
+/** Zähler und Merker, die über die Gruppen eines Laufs hinweg gelten. */
+interface LaufZustand {
   /**
    * Termine, die dieser Lauf selbst schon geschrieben hat — je Ausgabe.
    *
@@ -107,8 +53,7 @@ function main(): void {
    * unterscheiden sich genau hier („… – Vol. 1" gegen „… – Vol. 2"). Über die
    * Kennung allein würde die Schwelle sie verschlucken.
    */
-  const eigeneTermine = new Map<string, string[]>()
-
+  eigeneTermine: Map<string, string[]>
   /**
    * Vergebene Slugs — ein doppelter wäre eine Adresse für zwei Termine.
    *
@@ -124,94 +69,203 @@ function main(): void {
    * eigenem Kalendereintrag. Der Riegel gilt dem doppelten *Werk*, nicht der
    * doppelten Quelle.
    */
-  const vergebeneSlugs = new Set<string>()
+  vergebeneSlugs: Set<string>
+  alsDoublette: number
+}
 
-  const zeilen: string[] = [
-    '# Disc-Termine aus dem archivierten aniSearch-Bestand.',
-    '#',
-    '# Erzeugt von pipeline/disc-proposals-to-yaml.ts aus data/proposals/disc-anisearch.json.',
-    '# Grundlage ist der Abschnitt „Neuerscheinungen" der jeweiligen aniSearch-Seite; das Datum',
-    '# steht dort maschinenlesbar als data-date. Alle Termine sind angekündigte Verkaufsstarts,',
-    '# deshalb kein `estimated`. Eine Uhrzeit gibt es bei Disc-Veröffentlichungen nicht.',
-    '#',
-    '# Mehrere Editionen am selben Tag sind ein Eintrag — sie stehen zusammengefasst in `edition`.',
+/** Eingaben, die für jede Gruppe gleich bleiben. */
+interface Bestand {
+  titelNach: Map<number, Title>
+  bekannteNamen: Set<string>
+}
+
+/**
+ * Bekannte Disc-Termine je Anime — als Datumsliste, nicht als Schlüssel.
+ *
+ * Der erste Anlauf verglich `titleId` **und** Datum. Das ging schief: Wird
+ * ein Verkaufsstart verschoben, gilt derselbe Artikel plötzlich als neu, und
+ * der Kalender führt dieselbe Ausgabe zweimal mit verschiedenen Terminen.
+ * Bei 34 übernommenen Terminen entstanden so 25 Doubletten — „The Café
+ * Terrace and Its Goddesses" stand mit dem 07.08. und dem 21.08. da, während
+ * der richtige Termin laut Publisher-Meldung der 04.09. war.
+ */
+function bekannteTermineVon(releases: Release[]): Map<number, string[]> {
+  const bekannteTermine = new Map<number, string[]>()
+  for (const r of releases.filter((r) => r.releaseType === 'disc')) {
+    const liste = bekannteTermine.get(r.titleId)
+    if (liste) liste.push(r.schedule.firstEpisodeDate)
+    else bekannteTermine.set(r.titleId, [r.schedule.firstEpisodeDate])
+  }
+  return bekannteTermine
+}
+
+/** Nach Anime und Datum bündeln; zählt Vorschläge zu schon bekannten Terminen. */
+function buendeln(
+  proposals: DiscProposal[],
+  bekannteTermine: Map<number, string[]>,
+): { gebuendelt: Map<string, DiscProposal[]>; alsDoublette: number } {
+  const gebuendelt = new Map<string, DiscProposal[]>()
+  let alsDoublette = 0
+  for (const v of proposals) {
+    if ((bekannteTermine.get(v.titleId) ?? []).some((d) => tage(d, v.date) < NAH_TAGE)) {
+      alsDoublette++
+      continue
+    }
+    const key = `${v.titleId}|${v.date}`
+    const liste = gebuendelt.get(key)
+    if (liste) liste.push(v)
+    else gebuendelt.set(key, [v])
+  }
+  return { gebuendelt, alsDoublette }
+}
+
+/**
+ * Namen der Disc-Ausgaben, die schon im Datensatz stehen.
+ *
+ * Die Zeitschwelle allein reicht nicht: „DAN DA DAN – Vol. 3" stand mit dem
+ * 28.08. im Bestand, der Vorschlag nannte den 30.10. — 63 Tage, also knapp
+ * daneben. Dasselbe Produkt bekam so einen zweiten Eintrag. Wo der Name
+ * übereinstimmt, ist es dieselbe Ausgabe, egal wie weit die Termine
+ * auseinanderliegen.
+ */
+function bekannteNamenVon(releases: Release[]): Set<string> {
+  return new Set(releases.filter((r) => r.releaseType === 'disc').map((r) => r.name.toLowerCase()))
+}
+
+const KOPFZEILEN: string[] = [
+  '# Disc-Termine aus dem archivierten aniSearch-Bestand.',
+  '#',
+  '# Erzeugt von pipeline/disc-proposals-to-yaml.ts aus data/proposals/disc-anisearch.json.',
+  '# Grundlage ist der Abschnitt „Neuerscheinungen" der jeweiligen aniSearch-Seite; das Datum',
+  '# steht dort maschinenlesbar als data-date. Alle Termine sind angekündigte Verkaufsstarts,',
+  '# deshalb kein `estimated`. Eine Uhrzeit gibt es bei Disc-Veröffentlichungen nicht.',
+  '#',
+  '# Mehrere Editionen am selben Tag sind ein Eintrag — sie stehen zusammengefasst in `edition`.',
+  '',
+]
+
+/** Name der Ausgabe samt Bandnummer, aus dem Anime-Titel und der ersten Edition der Gruppe. */
+function ausgabenName(titel: Title, titleId: number, gruppe: DiscProposal[]): string {
+  const basis = titel.titleDe ?? titel.titleEn ?? titel.titleRomaji ?? String(titleId)
+
+  /*
+   * Die Bandnummer gehört in den Namen, nicht nur in die Edition.
+   *
+   * Unser Anime-Eintrag heißt manchmal schon „Virgin Road – Vol. 1", weil
+   * die erste Ausgabe den Titel geprägt hat. Übernimmt man ihn unverändert
+   * für Vol. 2 und Vol. 3, stehen drei Zeilen „Virgin Road – Vol. 1" mit
+   * verschiedenen Terminen im Kalender — formal keine Doublette, für den
+   * Leser aber genau das.
+   */
+  const band = /\bVol\.\s*(\d+)\s*\/\s*\d+/i.exec(gruppe[0].edition)?.[1]
+  return band ? `${basis.replace(/\s*[–-]\s*Vol\.\s*\d+\s*$/i, '')} – Vol. ${band}` : basis
+}
+
+/** Editionsnamen: den gemeinsamen Titelteil abschneiden, damit nicht dreimal der Serienname in der Zeile steht. */
+function editionenVon(gruppe: DiscProposal[]): string[] {
+  return [
+    ...new Set(
+      gruppe.map((g) =>
+        g.edition
+          .replace(/^.*? - /, '')
+          .replace(/\[|\]/g, '')
+          .trim(),
+      ),
+    ),
+  ]
+}
+
+function eintragZeilen(
+  slug: string,
+  titleId: number,
+  name: string,
+  datum: string,
+  editionen: string[],
+  gruppe: DiscProposal[],
+): string[] {
+  return [
+    `- slug: ${slug}`,
+    `  anilistId: ${titleId}`,
+    `  titleDe: ${q(name)}`,
+    '  platform: disc',
+    '  releaseType: disc',
+    ...(gruppe[0].publisher ? [`  publisher: ${q(gruppe[0].publisher)}`] : []),
+    `  edition: ${q(editionen.join(' · '))}`,
+    `  schedule: { firstEpisodeDate: ${q(datum)} }`,
+    `  sources: [${JSON.stringify(gruppe[0].url)}]`, /* Ein Komma in der Adresse teilte sie sonst in zwei Einträge. */
     '',
   ]
+}
 
+/** YAML-Zeilen einer Gruppe, oder null, wenn sie übersprungen wird (Doublette, Slug doppelt, Anime unbekannt). */
+function gruppeZuZeilen(
+  key: string,
+  gruppe: DiscProposal[],
+  bestand: Bestand,
+  zustand: LaufZustand,
+): string[] | null {
+  const [titleIdStr, datum] = key.split('|')
+  const titleId = Number(titleIdStr)
+  const titel = bestand.titelNach.get(titleId)
+  if (!titel) return null
+  const name = ausgabenName(titel, titleId, gruppe)
+  if (bestand.bekannteNamen.has(name.toLowerCase())) {
+    zustand.alsDoublette++
+    return null
+  }
+
+  const editionen = editionenVon(gruppe)
+  const ausgabe = `${titleId}|${name.toLowerCase()}`
+  if ((zustand.eigeneTermine.get(ausgabe) ?? []).some((d) => tage(d, datum) < NAH_TAGE)) {
+    zustand.alsDoublette++
+    return null
+  }
+
+  const slug = discSlug(name, datum)
+  if (zustand.vergebeneSlugs.has(slug)) {
+    warn(`Slug doppelt: ${slug} — Eintrag ${titleId} zum ${datum} ausgelassen`)
+    zustand.alsDoublette++
+    return null
+  }
+  zustand.vergebeneSlugs.add(slug)
+  const eigene = zustand.eigeneTermine.get(ausgabe)
+  if (eigene) eigene.push(datum)
+  else zustand.eigeneTermine.set(ausgabe, [datum])
+
+  return eintragZeilen(slug, titleId, name, datum, editionen, gruppe)
+}
+
+function main(): void {
+  const { proposals } = readJson<{ proposals: DiscProposal[] }>(
+    'data/proposals/disc-anisearch.json',
+    { proposals: [] },
+  )
+  if (!proposals.length) {
+    warn('Keine Vorschläge — erst "npm run data:disc-proposals" laufen lassen.')
+    return
+  }
+  const titles = readJson<Title[]>('public/data/titles.json', [])
+  const releases = readJson<Release[]>('public/data/releases.json', [])
+  const bestand: Bestand = {
+    titelNach: new Map(titles.map((t) => [t.id, t])),
+    bekannteNamen: bekannteNamenVon(releases),
+  }
+  const { gebuendelt, alsDoublette } = buendeln(proposals, bekannteTermineVon(releases))
+  const zustand: LaufZustand = { eigeneTermine: new Map(), vergebeneSlugs: new Set(), alsDoublette }
+
+  const zeilen: string[] = [...KOPFZEILEN]
   let anzahl = 0
   for (const [key, gruppe] of [...gebuendelt.entries()].sort()) {
-    const [titleIdStr, datum] = key.split('|')
-    const titleId = Number(titleIdStr)
-    const titel = titelNach.get(titleId)
-    if (!titel) continue
-    const basis = titel.titleDe ?? titel.titleEn ?? titel.titleRomaji ?? String(titleId)
-
-    /*
-     * Die Bandnummer gehört in den Namen, nicht nur in die Edition.
-     *
-     * Unser Anime-Eintrag heißt manchmal schon „Virgin Road – Vol. 1", weil
-     * die erste Ausgabe den Titel geprägt hat. Übernimmt man ihn unverändert
-     * für Vol. 2 und Vol. 3, stehen drei Zeilen „Virgin Road – Vol. 1" mit
-     * verschiedenen Terminen im Kalender — formal keine Doublette, für den
-     * Leser aber genau das.
-     */
-    const band = /\bVol\.\s*(\d+)\s*\/\s*\d+/i.exec(gruppe[0].edition)?.[1]
-    const name = band
-      ? `${basis.replace(/\s*[–-]\s*Vol\.\s*\d+\s*$/i, '')} – Vol. ${band}`
-      : basis
-    if (bekannteNamen.has(name.toLowerCase())) {
-      alsDoublette++
-      continue
-    }
-
-    // Editionsnamen: den gemeinsamen Titelteil abschneiden, damit nicht dreimal
-    // der Serienname in der Zeile steht.
-    const editionen = [
-      ...new Set(
-        gruppe.map((g) =>
-          g.edition
-            .replace(/^.*? - /, '')
-            .replace(/\[|\]/g, '')
-            .trim(),
-        ),
-      ),
-    ]
-    const ausgabe = `${titleId}|${name.toLowerCase()}`
-    if ((eigeneTermine.get(ausgabe) ?? []).some((d) => tage(d, datum) < NAH_TAGE)) {
-      alsDoublette++
-      continue
-    }
-
-    const slug = discSlug(name, datum)
-    if (vergebeneSlugs.has(slug)) {
-      warn(`Slug doppelt: ${slug} — Eintrag ${titleId} zum ${datum} ausgelassen`)
-      alsDoublette++
-      continue
-    }
-    vergebeneSlugs.add(slug)
-    const eigene = eigeneTermine.get(ausgabe)
-    if (eigene) eigene.push(datum)
-    else eigeneTermine.set(ausgabe, [datum])
-
-    zeilen.push(
-      `- slug: ${slug}`,
-      `  anilistId: ${titleId}`,
-      `  titleDe: ${q(name)}`,
-      '  platform: disc',
-      '  releaseType: disc',
-      ...(gruppe[0].publisher ? [`  publisher: ${q(gruppe[0].publisher)}`] : []),
-      `  edition: ${q(editionen.join(' · '))}`,
-      `  schedule: { firstEpisodeDate: ${q(datum)} }`,
-      `  sources: [${JSON.stringify(gruppe[0].url)}]`, /* Ein Komma in der Adresse teilte sie sonst in zwei Einträge. */
-      '',
-    )
+    const eintrag = gruppeZuZeilen(key, gruppe, bestand, zustand)
+    if (!eintrag) continue
+    zeilen.push(...eintrag)
     anzahl++
   }
 
   writeFileSync(OUT, zeilen.join('\n'), 'utf8')
   log(
     `${anzahl} Disc-Termine nach ${OUT} geschrieben — aus ${proposals.length} Vorschlägen, ` +
-      `${alsDoublette} als bereits bekannte Ausgabe übersprungen`,
+      `${zustand.alsDoublette} als bereits bekannte Ausgabe übersprungen`,
   )
 }
 

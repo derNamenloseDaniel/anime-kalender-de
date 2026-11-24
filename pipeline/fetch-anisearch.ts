@@ -35,6 +35,8 @@ import { log, readJson, sleep, warn, writeJson } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
 import { ARCHIV_DIR, baueWarteschlange } from './lib/anisearch-warteschlange.ts'
 import { archivLuecken, verbinde, zurueckgestellt, type Auftrag, type WegListe, type Zeile } from './lib/anisearch-archiv-vorrang.ts'
+import { discFaellig, discTitelMitTermin } from './lib/disc-termin-frische.ts'
+import { todayIso } from '../shared/time.ts'
 import { nachFehlern } from './lib/anisearch-sperre.ts'
 import { decode, extractDescription } from './lib/anisearch-handlung.ts'
 import type { Release, Title } from '../shared/types.ts'
@@ -645,7 +647,8 @@ async function main(): Promise<void> {
   log(`aniSearch-Lücke vorher: ${zaehle(vorher)}`)
 
   // Vorrang: Archivlücken des Hauptbestands, dann Auffrischung und Neues der ID-Brücke, mit --katalog zuletzt die Lücken des Katalogs.
-  const bisher = baueWarteschlange({ ids: ids.anisearch, titles, releases, cache, force: FORCE, limit: LIMIT, veraltet })
+  const discTitel = discTitelMitTermin(readJson('data/disc-ausgaben.json', {}), todayIso())
+  const bisher = baueWarteschlange({ ids: ids.anisearch, titles, releases, cache, force: FORCE, limit: LIMIT, veraltet, discFaellig: discFaellig(discTitel, todayIso()) })
   const queue = verbinde(
     vorher.haupt,
     bisher.map((t) => ({ asId: ids.anisearch[t.id]!, titelIds: [t.id] })),

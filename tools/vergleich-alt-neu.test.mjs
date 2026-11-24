@@ -75,6 +75,22 @@ try {
   // Die Wegwerfdatei bleibt nicht liegen.
   assert.equal(execFileSync('git', ['-C', repo, 'status', '--porcelain'], { encoding: 'utf8', timeout: 30_000 }).includes('.alt-'), false)
 
+  // Eingaben mit Funktionen (`argsFabrik`): nicht klonbar; das Aufrufprotokoll der Attrappe geht in den Vergleich ein.
+  const G = "export function g(opt) {\n  opt.aufrufe.push(1)\n  return [opt.fn(2), opt.fn(3)]\n}\n"
+  writeFileSync(join(repo, 'g.mjs'), G)
+  git(repo, 'add', 'g.mjs')
+  git(repo, 'commit', '-q', '-m', 'g')
+  const fabrik = (name, zweig) => ({ name, zweig, argsFabrik: () => { const aufrufe = []; return [{ aufrufe, fn: (n) => { aufrufe.push(n); return n * 2 } }] } })
+  const gLauf = (neu) => {
+    writeFileSync(join(repo, 'g.mjs'), neu)
+    return vergleicheAltNeu({ datei: 'g.mjs', funktion: 'g', faelle: [fabrik('a', 'x'), fabrik('b', 'x')], ref: 'HEAD', wurzel: repo })
+  }
+  assert.equal((await gLauf(G)).gleich, true)
+  const protokoll = await gLauf(G.replace('opt.fn(3)', 'opt.fn(4)'))
+  assert.deepEqual(protokoll.abweichungen.map((a) => `${a.fall}:${a.was}`), ['a:ergebnis', 'a:eingaben', 'b:ergebnis', 'b:eingaben'])
+  const nurProtokoll = await gLauf(G.replace('  opt.aufrufe.push(1)\n', ''))
+  assert.deepEqual(nurProtokoll.abweichungen.map((a) => `${a.fall}:${a.was}`), ['a:eingaben', 'b:eingaben'])
+
   // Aufruf: Fallmodul, Exit-Codes
   writeFileSync(join(repo, 'faelle.mjs'), `export const faelle = ${JSON.stringify(faelle)}\n`)
   writeFileSync(join(repo, 'f.mjs'), ALT)
@@ -130,7 +146,9 @@ for (const [art, paare] of Object.entries(ungleich)) {
 }
 assert.equal(kanon(new Map([[1, new Set([2])]])), kanon(new Map([[1, new Set([2])]])), 'Map/Set gleichen Inhalts sind gleich')
 assert.equal(kanon([NaN, -0, new Date(5)]), kanon([NaN, -0, new Date(5)]))
-assert.throws(() => kanon({ f() {} }), /function nicht vergleichbar/)
+assert.equal(kanon({ f() {} }), kanon({ f: () => 1 }), 'Funktionen sind eine Marke (argsFabrik)')
+assert.notEqual(kanon(new Error('a')), kanon(new Error('b')))
+assert.notEqual(kanon(1n), kanon(2n))
 assert.throws(() => kanon([Symbol('x')]), /symbol nicht vergleichbar/)
 
 // Gesamtweg: eine Fassung, die dieselben Zahlen intern anders hält, ist keine Abweichung; eine mit anderem Wert schon

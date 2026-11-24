@@ -249,21 +249,23 @@ function schreibeBestand(bestand: Bestand): void {
   writeJson(DATEI, bestand)
 }
 
-async function main(): Promise<void> {
+const AMAZON = /(^|\.)amazon\./i
+const istAmazonAdresse = (u: string) => AMAZON.test(new URL(u).hostname)
+
+function ladeTitles(): Title[] {
   const roh = JSON.parse(readFileSync('public/data/titles.json', 'utf8')) as unknown
-  const titles = (Array.isArray(roh) ? roh : Object.values(roh as object).find(Array.isArray)) as Title[]
+  return (Array.isArray(roh) ? roh : Object.values(roh as object).find(Array.isArray)) as Title[]
+}
 
-  const bestand = readJson<Bestand>(DATEI, {})
-  const sichere = () => schreibeBestand(bestand)
-
-  /**
-   * Vereinigung aus Datensatz und allem, was je geprüft wurde.
-   *
-   * Ein als tot erkannter Verweis verschwindet aus `titles.json` — käme die
-   * Schlange allein von dort, wäre er nie wieder prüfbar und ein Falschbefund
-   * für immer einer. Genau diesen Fehler hatte `check-youtube.ts` beim ersten
-   * Anlauf am 20.08.2026.
-   */
+/**
+ * Vereinigung aus Datensatz und allem, was je geprüft wurde.
+ *
+ * Ein als tot erkannter Verweis verschwindet aus `titles.json` — käme die
+ * Schlange allein von dort, wäre er nie wieder prüfbar und ein Falschbefund
+ * für immer einer. Genau diesen Fehler hatte `check-youtube.ts` beim ersten
+ * Anlauf am 20.08.2026.
+ */
+function bekannteAdressen(titles: Title[], bestand: Bestand): Set<string> {
   const adressen = new Set<string>(Object.keys(bestand))
   for (const t of titles) {
     /* Nach der gti-Brücke steht die Amazon-Seite in `seite`; geprüft wird sie, nicht JustWatchs Adresse. */
@@ -281,32 +283,37 @@ async function main(): Promise<void> {
      */
     for (const w of t.watchLinks ?? []) if (AMAZON_VIDEO.test(w.url)) adressen.add(w.url)
   }
+  return adressen
+}
 
-  /**
-   * **Die Adresse, die eine Suche ablösen könnte, steht oft gar nicht mehr im
-   * Datensatz** — und wurde deshalb nie geprüft.
-   *
-   * Der Bestand oben kommt aus `titles.json`. Eine aniSearch-Amazon-Adresse
-   * schafft es dorthin aber nur als Kaufweg, und Kaufwege werden im Bau
-   * aussortiert, sobald die Seite tot oder hier gesperrt ist. Was übrig bleibt,
-   * ist die Prime-**Suchadresse** — und die echte Adresse liegt weiter in
-   * `data/anisearch.json`, unsichtbar für diesen Lauf.
-   *
-   * Real am 25.08.2026: „The Ghost in the Shell" (177699) zeigte im Kalender auf
-   * `amazon.de/s?k=THE%20GHOST%20IN%20THE%20SHELL`. Daniel schickte die richtige
-   * Adresse — `amazon.de/gp/video/detail/B0GZD5N2GP`. Dieselbe Kennung stand seit
-   * dem aniSearch-Abruf im Haus: `amazon.de/dp/B0GZD5N2GP`. Sie war nur nie
-   * geprüft worden, und ohne Beleg ersetzt `build.ts` keine Suche — zu Recht,
-   * denn hinter `/dp/` kann auch eine DVD liegen.
-   *
-   * Gemessen am 25.08.2026 über den ganzen Bestand: 167 Suchadressen, für 90
-   * davon führt aniSearch eine echte Amazon-Adresse (33 ungeprüft, 15 belegt
-   * Prime Video, 30 Discs, 12 tot).
-   *
-   * Stand 12.11.2026: Der Block gilt für **alle** aniSearch-Amazon-Adressen, nicht
-   * nur für Titel mit Prime-Suche (u. a. Ragna Crimson B0F1XK58VQ, tot) — je ASIN
-   * einmal, begrenzt je Lauf. Vorrang haben weiter nur die Titel mit Suchadresse.
-   */
+/**
+ * Fällige Adressen in Prüfreihenfolge; ergänzt `adressen` um die aniSearch-Amazon-Adressen.
+ *
+ * **Die Adresse, die eine Suche ablösen könnte, steht oft gar nicht mehr im
+ * Datensatz** — und wurde deshalb nie geprüft.
+ *
+ * Der Bestand oben kommt aus `titles.json`. Eine aniSearch-Amazon-Adresse
+ * schafft es dorthin aber nur als Kaufweg, und Kaufwege werden im Bau
+ * aussortiert, sobald die Seite tot oder hier gesperrt ist. Was übrig bleibt,
+ * ist die Prime-**Suchadresse** — und die echte Adresse liegt weiter in
+ * `data/anisearch.json`, unsichtbar für diesen Lauf.
+ *
+ * Real am 25.08.2026: „The Ghost in the Shell" (177699) zeigte im Kalender auf
+ * `amazon.de/s?k=THE%20GHOST%20IN%20THE%20SHELL`. Daniel schickte die richtige
+ * Adresse — `amazon.de/gp/video/detail/B0GZD5N2GP`. Dieselbe Kennung stand seit
+ * dem aniSearch-Abruf im Haus: `amazon.de/dp/B0GZD5N2GP`. Sie war nur nie
+ * geprüft worden, und ohne Beleg ersetzt `build.ts` keine Suche — zu Recht,
+ * denn hinter `/dp/` kann auch eine DVD liegen.
+ *
+ * Gemessen am 25.08.2026 über den ganzen Bestand: 167 Suchadressen, für 90
+ * davon führt aniSearch eine echte Amazon-Adresse (33 ungeprüft, 15 belegt
+ * Prime Video, 30 Discs, 12 tot).
+ *
+ * Stand 12.11.2026: Der Block gilt für **alle** aniSearch-Amazon-Adressen, nicht
+ * nur für Titel mit Prime-Suche (u. a. Ragna Crimson B0F1XK58VQ, tot) — je ASIN
+ * einmal, begrenzt je Lauf. Vorrang haben weiter nur die Titel mit Suchadresse.
+ */
+function waehleFaellige(titles: Title[], bestand: Bestand, adressen: Set<string>): { offen: string[]; arbeit: string[] } {
   const anisearch = readJson<Record<string, { streams?: Array<{ url?: string }> }>>(
     'data/anisearch.json',
     {},
@@ -333,80 +340,126 @@ async function main(): Promise<void> {
     Adressen sonst nie erreichen — der wöchentliche Lauf prüft 400 von mehreren
     Tausend, und die neuen stehen hinten.
   */
-  const AMAZON = /(^|\.)amazon\./i
-  const arbeit = waehleArbeit(offen, (u) => bestand[u]?.geprueftAm, vorrang, LIMIT, (u) => AMAZON.test(new URL(u).hostname), drosselNachVorlauf(readSourceHealth()['link-check']?.gesperrt))
+  const arbeit = waehleArbeit(offen, (u) => bestand[u]?.geprueftAm, vorrang, LIMIT, istAmazonAdresse, drosselNachVorlauf(readSourceHealth()['link-check']?.gesperrt))
   log(`Verweise: ${adressen.size} bekannt, ${offen.length} fällig, ${arbeit.length} in diesem Lauf.`)
+  return { offen, arbeit }
+}
 
-  /**
-   * **Ab einer Sperre bringt Weiterlaufen nichts — außer einer längeren Sperre.**
-   *
-   * Gemessen am 07.09.2026: Ein Lauf über 1.286 Amazon-Adressen lieferte 552
-   * gute und 116 tote Befunde — und danach **623 mal `unklar` am Stück**. Die
-   * Gegenprobe im Einzelabruf zeigte, woran das lag: Auch eine nachweislich
-   * lebende Adresse (`B0DML22FHP`, „Date a Live II", zuvor 936.253 Zeichen)
-   * kam nur noch als 3.815-Zeichen-Seite ohne Titel zurück. Amazons Bot-Abwehr
-   * hatte nach rund 660 Abrufen zugemacht, und zwar für alles Weitere.
-   *
-   * Ein zweiter Versuch nach ein paar Sekunden half bei keinem von zwölf
-   * Testfällen — die Sperre gilt nicht der einzelnen Anfrage. Also wird
-   * abgebrochen statt weitergeklopft: Die restlichen Adressen bleiben fällig
-   * (`unklar` zählt als ungeprüft) und kommen im nächsten Lauf dran, wenn die
-   * Sperre abgelaufen ist.
-   *
-   * Zwanzig in Folge, nicht fünf: Einzelne Zwischenseiten kommen auch im
-   * gesunden Betrieb vor, eine Serie von zwanzig ist die Abwehr.
-   *
-   * **Die Sperre gilt Amazon, nicht dem Lauf.** Bis zum 17.09.2026 brach sie die
-   * ganze Schleife ab. Vom GitHub-Runner aus sperrt Amazon fast sofort (14.09.:
-   * nach 41 Adressen), und damit blieben seit dem 07.09. auch alle übrigen
-   * Anbieter ungeprüft — zehn Nicht-Amazon-Befunde in zehn Tagen bei über
-   * tausend fälligen. Seitdem werden nach der Sperre nur die Amazon-Adressen
-   * übersprungen; sie bleiben fällig.
-   */
-  const SPERR_SCHWELLE = 20
-  /**
-   * **Die Sperre wird ausgesessen, nicht umgangen** (20.09.2026).
-   *
-   * Bis heute brach der Lauf Amazon endgültig ab, und der Rest blieb für den
-   * nächsten Anlauf liegen. Gemessen ist inzwischen beides, was dafür fehlte:
-   * Sie kommt nach rund 670 Abrufen (668 am 07.09., 669 am 20.09., beide bei
-   * 700 ms). Also: warten, weitermachen, und die zwanzig Adressen aus der
-   * Sperrphase hinten wieder anhängen, damit die Sperre keine Lücke hinterlässt.
-   *
-   * **Wie lange gewartet werden muss, ist gemessen — und es ist mehr, als man
-   * denkt.** Der Lauf vom 20.09.2026, 14:20 bis 15:16, mit 3 s Takt und 15 min
-   * Pause kam nach der ersten Sperre nur noch 20, 20, 20 und 91 Abrufe weit.
-   * Daraus folgt zweierlei: Der **Takt** ist nicht die Stellschraube (700 ms
-   * brachten 669 Abrufe, 3 s brachten 20), sondern die **Menge je Zeitfenster**;
-   * und eine Viertelstunde Ruhe stellt das Kontingent nicht wieder her. Deshalb
-   * steht die Pause auf einer Stunde und der Lauf gibt nach zwei Sperren auf,
-   * statt Amazon weiter zu reizen.
-   *
-   * Nach `--sperren` Sperren in einem Lauf wird Amazon übersprungen; die
-   * Adressen bleiben fällig und kommen im nächsten Schub dran.
-   */
-  const SPERR_PAUSE = zahl('--sperrpause', 3600) * 1000
-  const MAX_SPERREN = zahl('--sperren', 2)
-  let sperren = 0
-  const nachgeholt = new Set<string>()
-  let unklarFolge: string[] = []
-  let inFolgeUnklar = 0
-  let amazonGesperrt = false
-  let uebersprungen = 0
-  const zaehler = { tot: 0, auskuenfte: 0 }
-  let geprueft = 0
-  const wechsel: WechselPaar[] = []
+/**
+ * **Ab einer Sperre bringt Weiterlaufen nichts — außer einer längeren Sperre.**
+ *
+ * Gemessen am 07.09.2026: Ein Lauf über 1.286 Amazon-Adressen lieferte 552
+ * gute und 116 tote Befunde — und danach **623 mal `unklar` am Stück**. Die
+ * Gegenprobe im Einzelabruf zeigte, woran das lag: Auch eine nachweislich
+ * lebende Adresse (`B0DML22FHP`, „Date a Live II", zuvor 936.253 Zeichen)
+ * kam nur noch als 3.815-Zeichen-Seite ohne Titel zurück. Amazons Bot-Abwehr
+ * hatte nach rund 660 Abrufen zugemacht, und zwar für alles Weitere.
+ *
+ * Ein zweiter Versuch nach ein paar Sekunden half bei keinem von zwölf
+ * Testfällen — die Sperre gilt nicht der einzelnen Anfrage. Also wird
+ * abgebrochen statt weitergeklopft: Die restlichen Adressen bleiben fällig
+ * (`unklar` zählt als ungeprüft) und kommen im nächsten Lauf dran, wenn die
+ * Sperre abgelaufen ist.
+ *
+ * Zwanzig in Folge, nicht fünf: Einzelne Zwischenseiten kommen auch im
+ * gesunden Betrieb vor, eine Serie von zwanzig ist die Abwehr.
+ *
+ * **Die Sperre gilt Amazon, nicht dem Lauf.** Bis zum 17.09.2026 brach sie die
+ * ganze Schleife ab. Vom GitHub-Runner aus sperrt Amazon fast sofort (14.09.:
+ * nach 41 Adressen), und damit blieben seit dem 07.09. auch alle übrigen
+ * Anbieter ungeprüft — zehn Nicht-Amazon-Befunde in zehn Tagen bei über
+ * tausend fälligen. Seitdem werden nach der Sperre nur die Amazon-Adressen
+ * übersprungen; sie bleiben fällig.
+ */
+const SPERR_SCHWELLE = 20
+/**
+ * **Die Sperre wird ausgesessen, nicht umgangen** (20.09.2026).
+ *
+ * Bis heute brach der Lauf Amazon endgültig ab, und der Rest blieb für den
+ * nächsten Anlauf liegen. Gemessen ist inzwischen beides, was dafür fehlte:
+ * Sie kommt nach rund 670 Abrufen (668 am 07.09., 669 am 20.09., beide bei
+ * 700 ms). Also: warten, weitermachen, und die zwanzig Adressen aus der
+ * Sperrphase hinten wieder anhängen, damit die Sperre keine Lücke hinterlässt.
+ *
+ * **Wie lange gewartet werden muss, ist gemessen — und es ist mehr, als man
+ * denkt.** Der Lauf vom 20.09.2026, 14:20 bis 15:16, mit 3 s Takt und 15 min
+ * Pause kam nach der ersten Sperre nur noch 20, 20, 20 und 91 Abrufe weit.
+ * Daraus folgt zweierlei: Der **Takt** ist nicht die Stellschraube (700 ms
+ * brachten 669 Abrufe, 3 s brachten 20), sondern die **Menge je Zeitfenster**;
+ * und eine Viertelstunde Ruhe stellt das Kontingent nicht wieder her. Deshalb
+ * steht die Pause auf einer Stunde und der Lauf gibt nach zwei Sperren auf,
+ * statt Amazon weiter zu reizen.
+ *
+ * Nach `--sperren` Sperren in einem Lauf wird Amazon übersprungen; die
+ * Adressen bleiben fällig und kommen im nächsten Schub dran.
+ */
+const SPERR_PAUSE = zahl('--sperrpause', 3600) * 1000
+const MAX_SPERREN = zahl('--sperren', 2)
+
+/** Zählstand der Prüfschleife, über die Schleifendurchläufe hinweg. */
+interface LaufStand {
+  sperren: number
+  nachgeholt: Set<string>
+  unklarFolge: string[]
+  inFolgeUnklar: number
+  amazonGesperrt: boolean
+  uebersprungen: number
+  zaehler: { tot: number; auskuenfte: number }
+  geprueft: number
+  wechsel: WechselPaar[]
   /* Messgröße für die Sperrschwelle: nur Amazon zählt, denn nur Amazon sperrt. */
-  let amazonAbrufe = 0
+  amazonAbrufe: number
+}
+
+/** Bucht eine Reihe von `unklar` bei Amazon als Sperre: Pause und Wiederholung, oder ab der letzten erlaubten Sperre Amazon auslassen. */
+async function reagiereAufSperre(lauf: LaufStand, arbeit: string[], bestand: Bestand, sichere: () => void): Promise<void> {
+  /* Die Zahl, an der sich Takt gegen Menge entscheidet — je Lauf eine Zeile. */
+  warn(`Sperrschwelle gemessen: ${lauf.amazonAbrufe} Amazon-Abrufe bei ${PAUSE} ms Takt.`)
+  if (++lauf.sperren > MAX_SPERREN || !passtInsBudget(START, Date.now(), BUDGET, SPERR_PAUSE)) {
+    warn(`${lauf.sperren - 1} Sperren in einem Lauf — weiter ohne Amazon, der Rest bleibt fällig.`)
+    lauf.amazonGesperrt = true
+  } else {
+    /* Die Adressen aus der Sperrphase sind ungeprüft, nicht unbrauchbar. */
+    const wieder = lauf.unklarFolge.filter((u) => !lauf.nachgeholt.has(u))
+    wieder.forEach((u) => lauf.nachgeholt.add(u))
+    arbeit.push(...wieder)
+    warn(
+      `Amazon sperrt (Sperre ${lauf.sperren} von ${MAX_SPERREN}) — ${SPERR_PAUSE / 60000} min Pause, ${wieder.length} Adressen kommen danach erneut dran.`,
+    )
+    await pauseMitStand(SPERR_PAUSE, bestand, sleep, sichere)
+  }
+  lauf.inFolgeUnklar = 0
+  lauf.unklarFolge = []
+}
+
+/** Führt die Folge `unklar` bei Amazon nach und löst bei `SPERR_SCHWELLE` die Sperrbehandlung aus. */
+async function zaehleUnklar(lauf: LaufStand, url: string, istAmazon: boolean, arbeit: string[], bestand: Bestand, sichere: () => void): Promise<void> {
+  if (istAmazon) lauf.unklarFolge.push(url)
+  if (++lauf.inFolgeUnklar >= SPERR_SCHWELLE) await reagiereAufSperre(lauf, arbeit, bestand, sichere)
+}
+
+async function pruefeArbeit(arbeit: string[], bestand: Bestand, sichere: () => void): Promise<LaufStand> {
+  const lauf: LaufStand = {
+    sperren: 0,
+    nachgeholt: new Set<string>(),
+    unklarFolge: [],
+    inFolgeUnklar: 0,
+    amazonGesperrt: false,
+    uebersprungen: 0,
+    zaehler: { tot: 0, auskuenfte: 0 },
+    geprueft: 0,
+    wechsel: [],
+    amazonAbrufe: 0,
+  }
   for (let i = 0; i < arbeit.length; i++) {
     if (!passtInsBudget(START, Date.now(), BUDGET)) break
     const url = arbeit[i]
-    const istAmazon = AMAZON.test(new URL(url).hostname)
-    if (amazonGesperrt && istAmazon) {
-      uebersprungen++
+    const istAmazon = istAmazonAdresse(url)
+    if (lauf.amazonGesperrt && istAmazon) {
+      lauf.uebersprungen++
       continue
     }
-    if (istAmazon) amazonAbrufe++
+    if (istAmazon) lauf.amazonAbrufe++
     const neu = await pruefe(url)
     /*
       **Eine Nichtauskunft löscht keinen Befund.**
@@ -422,56 +475,50 @@ async function main(): Promise<void> {
       damit die Adresse fällig bleibt. Ein **echter** Befund — 200 mit
       Produktseite, 404, Regionssperre — überschreibt weiterhin alles.
     */
-    nimmBefund(bestand, url, neu, wechsel)
+    nimmBefund(bestand, url, neu, lauf.wechsel)
     if (neu.status === 'unklar') {
-      if (istAmazon) unklarFolge.push(url)
-      if (++inFolgeUnklar >= SPERR_SCHWELLE) {
-        /* Die Zahl, an der sich Takt gegen Menge entscheidet — je Lauf eine Zeile. */
-        warn(`Sperrschwelle gemessen: ${amazonAbrufe} Amazon-Abrufe bei ${PAUSE} ms Takt.`)
-        if (++sperren > MAX_SPERREN || !passtInsBudget(START, Date.now(), BUDGET, SPERR_PAUSE)) {
-          warn(`${sperren - 1} Sperren in einem Lauf — weiter ohne Amazon, der Rest bleibt fällig.`)
-          amazonGesperrt = true
-        } else {
-          /* Die Adressen aus der Sperrphase sind ungeprüft, nicht unbrauchbar. */
-          const wieder = unklarFolge.filter((u) => !nachgeholt.has(u))
-          wieder.forEach((u) => nachgeholt.add(u))
-          arbeit.push(...wieder)
-          warn(
-            `Amazon sperrt (Sperre ${sperren} von ${MAX_SPERREN}) — ${SPERR_PAUSE / 60000} min Pause, ${wieder.length} Adressen kommen danach erneut dran.`,
-          )
-          await pauseMitStand(SPERR_PAUSE, bestand, sleep, sichere)
-        }
-        inFolgeUnklar = 0
-        unklarFolge = []
-      }
+      await zaehleUnklar(lauf, url, istAmazon, arbeit, bestand, sichere)
     } else if (istAmazon) {
-      inFolgeUnklar = 0
-      unklarFolge = []
+      lauf.inFolgeUnklar = 0
+      lauf.unklarFolge = []
     }
     /* Gezählt wird, was dieser Lauf gefunden hat — nicht, was schon dastand. */
-    zaehleBefund(zaehler, neu.status)
-    fortschritt(++geprueft, arbeit.length, zaehler.tot, bestand, log, sichere)
+    zaehleBefund(lauf.zaehler, neu.status)
+    fortschritt(++lauf.geprueft, arbeit.length, lauf.zaehler.tot, bestand, log, sichere)
     await sleep(Math.round(PAUSE * (0.7 + Math.random() * 0.6)))
   }
+  return lauf
+}
 
-  /*
-    **Vor dem Schreiben wird neu eingelesen** (17.09.2026). Der Lauf hält seinen
-    Stand vom Start und schreibt ihn am Ende zurück; läuft daneben ein zweiter,
-    verliert der spätere Schreiber die Befunde des früheren. Genau so sind an
-    diesem Abend 401 Befunde eines Laufs unter 148 eines zweiten verschwunden —
-    derselbe Mechanismus wie bei einem Datenlauf, der auf `main` committet, nur
-    innerhalb einer Datei. Was inzwischen dazukam, bleibt stehen; nur dieser
-    Lauf hat neuere Auskünfte über die Adressen, die er selbst gefragt hat.
-  */
-  meldeWechsel(bestand, wechsel, warn)
+/**
+ * **Vor dem Schreiben wird neu eingelesen** (17.09.2026). Der Lauf hält seinen
+ * Stand vom Start und schreibt ihn am Ende zurück; läuft daneben ein zweiter,
+ * verliert der spätere Schreiber die Befunde des früheren. Genau so sind an
+ * diesem Abend 401 Befunde eines Laufs unter 148 eines zweiten verschwunden —
+ * derselbe Mechanismus wie bei einem Datenlauf, der auf `main` committet, nur
+ * innerhalb einer Datei. Was inzwischen dazukam, bleibt stehen; nur dieser
+ * Lauf hat neuere Auskünfte über die Adressen, die er selbst gefragt hat.
+ */
+function schliesseLauf(lauf: LaufStand, bestand: Bestand, offen: string[], sichere: () => void): void {
+  meldeWechsel(bestand, lauf.wechsel, warn)
   sichere()
   const gesamtTot = Object.values(bestand).filter((b) => istTot(b.status)).length
-  log(`Verweise: ${geprueft} geprüft, ${zaehler.tot} davon unbrauchbar. Im Bestand insgesamt ${gesamtTot} unbrauchbar.`)
-  if (uebersprungen) log(`${uebersprungen} Amazon-Adressen wegen der Sperre übersprungen — sie bleiben fällig.`)
-  if (!geprueft && offen.length) warn('Nichts geprüft, obwohl etwas fällig war — Aufruf prüfen.')
+  log(`Verweise: ${lauf.geprueft} geprüft, ${lauf.zaehler.tot} davon unbrauchbar. Im Bestand insgesamt ${gesamtTot} unbrauchbar.`)
+  if (lauf.uebersprungen) log(`${lauf.uebersprungen} Amazon-Adressen wegen der Sperre übersprungen — sie bleiben fällig.`)
+  if (!lauf.geprueft && offen.length) warn('Nichts geprüft, obwohl etwas fällig war — Aufruf prüfen.')
   /* Nichts faellig ist der Normalfall, sobald alle Adressen geprueft sind —
      kein Grund, den Lauf als stumm zu melden (29.08.2026). */
-  recordSource('link-check', ...linkCheckEnde(geprueft, zaehler.auskuenfte, sperren > 0))
+  recordSource('link-check', ...linkCheckEnde(lauf.geprueft, lauf.zaehler.auskuenfte, lauf.sperren > 0))
+}
+
+async function main(): Promise<void> {
+  const titles = ladeTitles()
+  const bestand = readJson<Bestand>(DATEI, {})
+  const sichere = () => schreibeBestand(bestand)
+  const adressen = bekannteAdressen(titles, bestand)
+  const { offen, arbeit } = waehleFaellige(titles, bestand, adressen)
+  const lauf = await pruefeArbeit(arbeit, bestand, sichere)
+  schliesseLauf(lauf, bestand, offen, sichere)
 }
 
 /** Nach der Linkprüfung: Tonspur der offenen Netflix-Filme. Ein Fehler hier lässt die Linkprüfung nicht scheitern. */

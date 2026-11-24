@@ -7,7 +7,8 @@
  *   node tools/vergleich-alt-neu.mjs <datei> <funktion> <fallmodul> [--ref <ref>] [--zweige a,b]
  *   (für .ts-Dateien: `npx tsx tools/vergleich-alt-neu.mjs …`)
  *
- * Das Fallmodul exportiert `faelle`: `[{ name, args: [...], dateien?: { 'rel/pfad': 'Inhalt' }, zweig?: 'Etikett' }]`.
+ * Das Fallmodul exportiert `faelle`: `[{ name, args: [...] | argsFabrik: () => [...], dateien?: { 'rel/pfad': 'Inhalt' }, zweig?: 'Etikett' }]`
+ * (`argsFabrik` liefert je Lauf frische Eingaben mit Funktionen, die sich nicht klonen lassen).
  * `dateien` füllt die Kulisse vor jedem Aufruf; `zweig` zählt, welche Pfade der Funktion die Fälle erreichen (`--zweige`: jedes
  * genannte Etikett muss mindestens einmal vorkommen, sonst Exit 1). Exit 0 gleich, 1 Abweichung oder Lücke, 2 Aufruf.
  */
@@ -25,7 +26,7 @@ let laufNr = 0
  * Kanonische Textform eines Werts für den Vergleich. `v8.serialize` taugt dafür nicht: es schreibt dieselbe Zahl als Smi (`I`)
  * oder als HeapNumber (`N`, 8 Byte mehr), je nachdem, wie V8 sie intern hält (z. B. in einem Double-Array); alt gegen alt
  * lieferte so andere Bytes. Hier zählt nur der Wert: Schlüssel- und Array-Reihenfolge, undefined, Löcher, NaN, -0, Date, Map,
- * Set und geteilte Verweise (zweites Auftreten desselben Objekts wird zur Nummer des ersten) bleiben unterscheidbar.
+ * Set, Error und geteilte Verweise (zweites Auftreten desselben Objekts wird zur Nummer des ersten) bleiben unterscheidbar.
  */
 export function kanon(wurzel) {
   const gesehen = new Map()
@@ -35,10 +36,13 @@ export function kanon(wurzel) {
     if (typeof v === 'string') return `s:${v}`
     if (typeof v === 'number') return `n:${Object.is(v, -0) ? '-0' : String(v)}`
     if (typeof v === 'boolean') return `b:${v}`
+    if (typeof v === 'function') return { $fn: 1 } // Aufrufprotokoll steht als Feld in der Eingabe der Attrappe (argsFabrik)
+    if (typeof v === 'bigint') return `i:${v}`
     if (typeof v !== 'object') throw new TypeError(`kanon: ${typeof v} nicht vergleichbar`)
     if (gesehen.has(v)) return { $ref: gesehen.get(v) }
     gesehen.set(v, gesehen.size)
     if (v instanceof Date) return { $d: String(v.getTime()) }
+    if (v instanceof Error) return { $e: [geh(v.name), geh(v.message)] }
     if (v instanceof Set) return { $set: [...v].map(geh) }
     if (v instanceof Map) return { $map: [...v].map(([k, w]) => [geh(k), geh(w)]) }
     if (Array.isArray(v)) return { $a: Array.from(v, (x, i) => (i in v ? geh(x) : { $loch: 1 })) }
@@ -74,6 +78,11 @@ function schreibeAlt(wurzel, ref, abs) {
   const weg = join(dirname(abs), `${basename(abs, extname(abs))}.alt-${process.pid}${extname(abs)}`)
   writeFileSync(weg, inhalt)
   return weg
+}
+
+/** Frische Eingaben je Lauf: `argsFabrik` für Aufrufe mit Funktionen (nicht klonbar), sonst tiefe Kopie von `args`. */
+function frischeArgs(f) {
+  return f.argsFabrik ? f.argsFabrik() : structuredClone(f.args)
 }
 
 /** Ein Aufruf unter frischer Kulisse; liefert Bytes von Rückgabe/Fehler und veränderten Eingaben sowie den Kulisse-Hash. */
@@ -113,8 +122,8 @@ export async function vergleicheAltNeu({ datei, funktion, faelle, ref = 'origin/
     if (typeof alt !== 'function' || typeof neu !== 'function') throw new Error(`${funktion} ist in alter oder neuer Fassung keine exportierte Funktion`)
     for (const f of faelle) {
       if (f.zweig) z.zaehle(f.zweig)
-      const a = await ruf(alt, structuredClone(f.args), f.dateien)
-      const n = await ruf(neu, structuredClone(f.args), f.dateien)
+      const a = await ruf(alt, frischeArgs(f), f.dateien)
+      const n = await ruf(neu, frischeArgs(f), f.dateien)
       for (const was of ['ergebnis', 'eingaben', 'dateien']) if (a[was] !== n[was]) abweichungen.push({ fall: f.name, was })
     }
   } finally {

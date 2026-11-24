@@ -61,7 +61,7 @@ export function ReihenUebersicht(p: UebersichtProps) {
   const { offen, umschalten } = useOffeneGruppen(eigene)
   const suchText = reiheSuche.reihe === reihenSchluessel ? reiheSuche.text.trim() : ''
   const ohneOffen = p.reiheOhneOffen === reihenSchluessel
-  const zahlOhne = p.reihenTeile.filter((m) => istEingeklappt(m, title.id)).length
+  const zahlOhne = p.reihenTeile.filter((m) => istEingeklappt(m, title.id) && !p.ohne?.has(m.id)).length
   const zeigen = gezeigteGruppen(o.gruppen, title.id, ohneOffen, suchText)
   const schalter =
     zahlOhne > 0 && !suchText ? (

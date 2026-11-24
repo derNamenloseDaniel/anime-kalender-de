@@ -1,12 +1,18 @@
 import { titleStatus, type StaffelLage } from '@shared/logic.ts'
 import { anzeigeName, hauptstaffeln, staffelBeschriftungen, staffelStaende } from '@shared/titles.ts'
 import type { FranchiseMember, Release, Title } from '@shared/types.ts'
+import { istEingeklappt } from './reihen-regeln.ts'
+import type { Gruppe } from './reihen-uebersicht-regeln.ts'
 
-/** Ein Reihen-Reiter (F157): der Titel, den er öffnet, seine Kurzbeschriftung („4“, „1–5“) und sein Name für Hilfsmittel. */
+/**
+ * Ein Reihen-Reiter (F157): der Titel, den er öffnet, seine Kurzbeschriftung („4“, „1–5“, beim Film die laufende Nummer) und der
+ * volle Titel für Tooltip und Hilfsmittel; `staffel` sagt, ob die Beschriftung eine Staffelnummer ist.
+ */
 export interface ReihenReiter {
   id: number
   label: string
   name: string
+  staffel: boolean
 }
 
 /** Staffeln einer deutschen Staffelteilung (Pokémon Horizonte): Geschwister mit demselben Sammeltitel, nach Staffelnummer. */
@@ -14,7 +20,17 @@ function ausSammeltitel(sammel: number, titel: Title[]): ReihenReiter[] {
   return titel
     .filter((t) => t.staffelTitel?.sammel === sammel)
     .sort((a, b) => a.staffelTitel!.nr - b.staffelTitel!.nr)
-    .map((t) => ({ id: t.id, label: String(t.staffelTitel!.nr), name: anzeigeName(t) }))
+    .map((t) => ({ id: t.id, label: String(t.staffelTitel!.nr), name: anzeigeName(t), staffel: true }))
+}
+
+/**
+ * Die übrigen Teile derselben Gruppe der Reihenliste (Filme, Specials, eigene Serien), in deren Reihenfolge, beschriftet mit der
+ * laufenden Nummer. Teile hinter dem Schalter „ohne Synchro“ bekommen keinen Reiter, sie bleiben in der Reihenliste erreichbar.
+ */
+function ausGruppe(title: Title, gruppen: Gruppe[]): ReihenReiter[] {
+  const gruppe = gruppen.find((g) => g.teile.some((m) => m.id === title.id))
+  const teile = (gruppe?.teile ?? []).filter((m) => !istEingeklappt(m, title.id))
+  return teile.map((m, i) => ({ id: m.id, label: String(i + 1), name: m.name, staffel: false }))
 }
 
 /**
@@ -29,15 +45,17 @@ function ausHauptstaffeln(teile: FranchiseMember[], reihenName: string): ReihenR
   return haupt
     .filter((m) => text.has(m.id))
     .sort((a, b) => nummer(a.id) - nummer(b.id) || a.id - b.id)
-    .map((m) => ({ id: m.id, label: text.get(m.id)!.replace(/^Staffel\s+/, ''), name: m.name }))
+    .map((m) => ({ id: m.id, label: text.get(m.id)!.replace(/^Staffel\s+/, ''), name: m.name, staffel: true }))
 }
 
 /**
- * Die Reiter für den geöffneten Titel: eine Liste nur, wenn er selbst eine Staffel der Reihe ist und es mindestens zwei gibt
- * (ein Film oder Special hat keine Reiter). Alles kommt aus den Daten der Seite, nichts ist ergänzt.
+ * Die Reiter für den geöffneten Titel aus seiner Kategorie der Reihe: Sammeltitel-Staffeln, sonst Hauptstaffeln, sonst seine Gruppe
+ * der Reihenliste (`gruppen`, wie `reihenOrdnung` sie bildet). Eine Liste nur ab zwei Reitern, die den Titel enthalten. Alles kommt
+ * aus den Daten der Seite, nichts ist ergänzt.
  */
-export function reihenReiterVon(title: Title, teile: FranchiseMember[], reihenName: string, titel: Title[]): ReihenReiter[] {
-  const liste = title.staffelTitel ? ausSammeltitel(title.staffelTitel.sammel, titel) : ausHauptstaffeln(teile, reihenName)
+export function reihenReiterVon(title: Title, teile: FranchiseMember[], reihenName: string, titel: Title[], gruppen: Gruppe[]): ReihenReiter[] {
+  const istHaupt = hauptstaffeln(teile).some((m) => m.id === title.id)
+  const liste = title.staffelTitel ? ausSammeltitel(title.staffelTitel.sammel, titel) : istHaupt ? ausHauptstaffeln(teile, reihenName) : ausGruppe(title, gruppen)
   return liste.length >= 2 && liste.some((r) => r.id === title.id) ? liste : []
 }
 

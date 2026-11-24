@@ -24,10 +24,12 @@ export type ReihenListeProps = {
   reiheSuche: { reihe: number; text: string; }
   setReiheOhneOffen: Dispatch<SetStateAction<number | null>>
   setReiheSuche: Dispatch<SetStateAction<{ reihe: number; text: string; }>>
+  /** Titel, die als Reiter am Antwortkasten stehen (F157): sie fehlen in den Gruppen, nichts steht zweimal da. */
+  ohne?: ReadonlySet<number>
 }
 
-/** Wie die Reihe geordnet wird: Hauptstaffeln, Gruppen, Staffelnummern. */
-export function reihenOrdnung(reihenTeile: FranchiseMember[], reihenName: string, t: Translate) {
+/** Wie die Reihe geordnet wird: Hauptstaffeln, Gruppen (ohne die Teile in `ohne`), Staffelnummern. */
+export function reihenOrdnung(reihenTeile: FranchiseMember[], reihenName: string, t: Translate, ohne: ReadonlySet<number> = new Set()) {
   const jahr = new Date().getFullYear()
   const kuenftig = (m: FranchiseMember) => istKuenftig(m, jahr)
   /* Ein Titel ohne Jahr gehört ans Ende: `?? 0` stellte undatierte Kurzformate vor die Serie von 1999 (One Piece, 03.09.2026). */
@@ -89,6 +91,8 @@ export function reihenOrdnung(reihenTeile: FranchiseMember[], reihenName: string
     Number(kuenftig(a)) - Number(kuenftig(b)) || nachJahr(a, b)
   /* Vier Gruppen mit Überschrift (Hauptserie, Beiwerk, Filme), je chronologisch: bei „One Piece" standen 64 Teile in einer Liste. */
   const gruppen = reihenGruppen(reihenTeile, istHauptstaffel, nachStandUndJahr, t)
+    .map((g) => ({ ...g, teile: g.teile.filter((m) => !ohne.has(m.id)) }))
+    .filter((g) => g.teile.length > 0)
 
   /*
     Gezählt wird nur, wo die Nummer etwas unterscheidet: One Piece (ein Eintrag) bleibt ohne „Staffel 1".
@@ -125,8 +129,8 @@ export function reihenKarte(m: FranchiseMember, o: Ordnung, p: Pick<ReihenListeP
 }
 
 /** Der Inhalt der Reihen-Karte:Suche, Schalter und die Gruppen mit ihren Teilen. */
-export function reihenInhalt({ reihenTeile, t, reihenName, title, favorites, wechselt, wechsleZu, reiheOhneOffen, reihenSchluessel, reiheSuche, setReiheOhneOffen, setReiheSuche }: ReihenListeProps) {
-  const o = reihenOrdnung(reihenTeile, reihenName, t)
+export function reihenInhalt({ reihenTeile, t, reihenName, title, favorites, wechselt, wechsleZu, reiheOhneOffen, reihenSchluessel, reiheSuche, setReiheOhneOffen, setReiheSuche, ohne = new Set() }: ReihenListeProps) {
+  const o = reihenOrdnung(reihenTeile, reihenName, t, ohne)
   const { gruppen } = o
   const karte = (m: FranchiseMember) => reihenKarte(m, o, { t, reihenName, title, favorites, wechselt, wechsleZu })
 
@@ -137,7 +141,7 @@ export function reihenInhalt({ reihenTeile, t, reihenName, title, favorites, wec
   const suchText = reiheSuche.reihe === reihenSchluessel ? reiheSuche.text.trim() : ''
   const gefiltert = gezeigteGruppen(gruppen, title.id, ohneOffen, suchText)
   /* Alle Gruppen stehen offen untereinander (Daniel, 20.10.2026), die Zahl am Schalter gilt der ganzen Reihe. */
-  const zahlOhne = reihenTeile.filter(eingeklappt).length
+  const zahlOhne = reihenTeile.filter((m) => eingeklappt(m) && !ohne.has(m.id)).length
   /*
     **Ein Schalter in der Leiste statt einer Zeile unter der Liste** (Daniel,
     19.09.2026: „ohne deutsche synchro ausblenden zeile entfernen und stattdessen

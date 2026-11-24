@@ -1,18 +1,17 @@
 import { createContext, useContext, useEffect, useRef, type KeyboardEvent, type ReactNode } from 'react'
 import type { StaffelLage } from '@shared/logic.ts'
-import type { FranchiseMember } from '@shared/types.ts'
 import type { Dataset } from '../../lib/data.ts'
 import { kastenKlassen, kastenKopfVon, useKastenZustand } from './antwort-kasten-zustand.tsx'
 import type { AntwortKastenProps } from './antwort-kasten-props.ts'
-import { reihenLageVon, reihenReiterVon, type ReihenReiter } from './reihen-reiter-liste.ts'
+import { reihenLageVon, type ReihenReiter } from './reihen-reiter-liste.ts'
 import { ReiterPfeil, rolleUm, usePfeilLage } from './staffel-pfeile.tsx'
 import { Akzentstrich, LAGE_WORT, LageMarke, LEISTE, LEISTE_HUELLE, naechsterReiter, reiterKlassen, zeigeGewaehlten } from './staffel-reiter.tsx'
 
 /** Was die Reiter am Antwortkasten aus dem Panel brauchen; ohne Anbieter (Kasten allein gerendert) stehen keine Reiter. */
 export interface ReihenReiterDaten {
   data: Dataset
-  reihenTeile: FranchiseMember[]
-  reihenName: string
+  /** Die Reiter des geöffneten Titels (`reihenReiterVon`); die Reihenliste lässt genau diese Titel weg. */
+  reiter: ReihenReiter[]
   /** Derselbe Weg wie ein Klick in der Reihenliste (`useReihenWechsel`). */
   wechsleZu: (id: number) => void
 }
@@ -26,7 +25,8 @@ export function kastenFarbe(huelle: string): string {
 }
 
 /**
- * Je Staffel der Reihe ein Reiter mit nur der Nummer über dem Antwortkasten; ein Reiter öffnet den Titel der Staffel. Pfeiltasten,
+ * Je Titel der Kategorie ein Reiter mit nur der Kurzform (Nummer, Bereich) über dem Antwortkasten, der volle Titel steht im Tooltip;
+ * ein Reiter öffnet seinen Titel. Pfeiltasten,
  * Pos1 und Ende setzen nur den Fokus, Eingabe oder Leertaste öffnet: jede Wahl lädt einen anderen Titel.
  */
 export function ReihenReiterZeile(p: { reiter: ReihenReiter[]; aktiv: number; lagen: Map<number, StaffelLage>; farbe: string; kennung: string; beiWahl: (id: number) => void }) {
@@ -45,7 +45,7 @@ export function ReihenReiterZeile(p: { reiter: ReihenReiter[]; aktiv: number; la
   }
   return (
     <div className={LEISTE_HUELLE}>
-      <div ref={zeile} role="tablist" aria-label="Staffeln der Reihe" data-reihen-reiter onKeyDown={taste} className={LEISTE}>
+      <div ref={zeile} role="tablist" aria-label="Titel der Reihe" data-reihen-reiter onKeyDown={taste} className={LEISTE}>
         {reiter.map((r) => {
           const gewaehlt = r.id === aktiv
           const l = lagen.get(r.id) ?? 'ruht'
@@ -59,7 +59,8 @@ export function ReihenReiterZeile(p: { reiter: ReihenReiter[]; aktiv: number; la
               aria-selected={gewaehlt}
               aria-controls={`${kennung}-kasten`}
               tabIndex={gewaehlt ? 0 : -1}
-              aria-label={`Staffel ${r.label}: ${r.name}${LAGE_WORT[l]}`}
+              aria-label={`${r.staffel ? `Staffel ${r.label}: ` : ''}${r.name}${LAGE_WORT[l]}`}
+              title={r.name}
               onClick={() => beiWahl(r.id)}
               className={reiterKlassen(gewaehlt, farbe)}
             >
@@ -83,7 +84,7 @@ export function ReihenReiterAmKasten({ eigenschaften, kasten }: { eigenschaften:
   const z = useKastenZustand({ antwort, title, t, stream, disc, pillenGruppen, terminPillen, discZuerst })
   if (!quelle) return kasten
   const { data } = quelle
-  const reiter = reihenReiterVon(title, quelle.reihenTeile, quelle.reihenName, data.titles)
+  const { reiter } = quelle
   if (reiter.length === 0) return kasten
   const { gedaempft } = kastenKopfVon({ antwort, title, today, T: z.T, releases, ohneSprachbeleg, folgenZahl: z.folgenZahl, staffeln: z.staffeln })
   /* Ein Reiter-Titel, den die Seite nicht kennt (nicht in `titleById`), trägt keine Marke. */

@@ -69,6 +69,8 @@ export interface FranchiseMember {
   staffelQuelle?: number
   /** Letzte deutsche Staffel eines Sammeltitels (Pokémon: `data/curated/pokemon-staffeln.yaml`); nur bei mehr als einer. */
   staffelBis?: number
+  /** Folgenbereich `[Staffel, von, bis]` (Titelnummern) der Staffeln, die ein zweiter Titel der Reihe mitträgt; nur Pokémon (`geteilteStaffeln()`). */
+  staffelFolgen?: [staffel: number, von: number, bis: number][]
   /** Kennung des Originals, wenn dieser Teil eine Neuverfilmung ist; Remake und Folgendes zählen als eigene Linie (`zaehlgruppen()`). */
   remakeVon?: number
 }

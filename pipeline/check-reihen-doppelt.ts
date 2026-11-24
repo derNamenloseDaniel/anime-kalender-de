@@ -42,6 +42,35 @@ console.log('\nPokémon (Staffel 16 in zwei japanischen Teilen):')
   pruefe('Staffel 15–16 und Staffel 1 bleiben unverändert', !z.has(14093) && !z.has(1), [...z])
 }
 
+console.log('\nPokémon (überlappende Bereiche, Staffel 15 und 25):')
+{
+  const mitFolgen = (m: FranchiseMember, staffelFolgen: [number, number, number][]) => ({ ...m, staffelFolgen }) as FranchiseMember
+  const reihe = [
+    teil(1, 'Pokémon', 1997, 1),
+    mitFolgen(teil(9107, 'Pokémon: Schwarz & Weiß', 2010, 14, 15), [[15, 49, 84]]),
+    mitFolgen(teil(14093, 'Pokémon: Schwarz & Weiß Staffel 2', 2012, 15, 16), [[15, 1, 13], [16, 14, 24]]),
+    mitFolgen(teil(17115, 'Pokémon: Schwarz & Weiß Staffel 2 - Episode N', 2013, 16), [[16, 1, 14]]),
+    mitFolgen(teil(17873, 'Pokémon: Schwarz & Weiß - Abenteuer in Einall und darüber hinaus', 2013, 16), [[16, 1, 20]]),
+    mitFolgen(teil(112153, 'Pokémon Reisen: Die Serie', 2019, 23, 25), [[25, 91, 136]]),
+    mitFolgen(teil(158870, 'Pokémon: Abenteuer eines Pokémon-Meisters', 2023, 25), [[25, 1, 11]]),
+  ]
+  const z = zusaetze(reihe, 'Pokémon')
+  pruefe('Staffel 14–15 nennt seine Folgen der Staffel 15', z.get(9107) === 'S15: Folge 49–84', [...z])
+  pruefe('Staffel 15–16 nennt seine Folgen der Staffel 15', z.get(14093) === 'S15: Folge 1–13', [...z])
+  pruefe('Staffel 16 behält seine Namensabschnitte', z.get(17115) === 'Episode N' && z.get(17873) === 'Abenteuer in Einall und darüber hinaus', [...z])
+  pruefe('Staffel 23–25 und 25 nennen ihre Namensabschnitte', z.get(112153) === 'Die Serie' && z.get(158870) === 'Abenteuer eines Pokémon-Meisters', [...z])
+  pruefe('Staffel 1 bleibt unverändert', !z.has(1), [...z])
+  const ohne = zusaetze(reihe.map((m) => ({ ...m, staffelFolgen: undefined }) as FranchiseMember), 'Pokémon')
+  pruefe('Ohne belegten Folgenbereich (und ohne Namensabschnitt) kein erfundener Zusatz', !ohne.has(9107) && !ohne.has(14093), [...ohne])
+}
+
+console.log('\nOhne Überlappung unverändert:')
+{
+  const reihe = [teil(1, 'Reihe', 2000, 1), teil(2, 'Reihe Staffel 2', 2001, 2, 3), teil(3, 'Reihe Staffel 4', 2002, 4), teil(4, 'Reihe Staffel 5', 2003, 5)]
+  const mitFolge = reihe.map((m) => ({ ...m, staffelFolgen: [[2, 1, 12]] }) as unknown as FranchiseMember)
+  pruefe('Angrenzende Bereiche („Staffel 2–3", „Staffel 4") bekommen keinen Zusatz', zusaetze(mitFolge, 'Reihe').size === 0, [...zusaetze(mitFolge, 'Reihe')])
+}
+
 console.log('\nOhne Dublette unverändert:')
 {
   const reihe = [teil(1, 'Reihe', 2000, 1), teil(2, 'Reihe Staffel 2', 2001, 2), teil(3, 'Reihe Staffel 3', 2002, 3)]

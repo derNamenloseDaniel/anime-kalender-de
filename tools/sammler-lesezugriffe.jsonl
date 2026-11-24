@@ -72,3 +72,5 @@
 {"datei":"pipeline/check-tmdb-von-hand-abgeleitet.ts","liest":"data/tmdb-titles.json","grund":"Eigenschaft über den ganzen Bestand: jede Handzeile mit tmdbId steht mit dieser Kennung im Cache nach dem Handvorrang, kein fester Schlüssel"}
 {"datei":"pipeline/check-staffel-folge-tv.ts","liest":"data/tv-programm.json","grund":"echter Fall: jede Horizonte-Sendung bekommt Staffel und Folge über ihren Folgentitel (F157), keine ohne Treffer"}
 {"datei":"pipeline/check-staffel-folge-tv.ts","liest":"data/wikipedia-folgen.json","grund":"echter Fall: Staffel/Folge der Sendung liegt an ihrer Stelle der Episodenliste (Folge in der Staffel)"}
+{"datei":"pipeline/check-staffel-folge-tv-schleife.ts","liest":"data/tv-programm.json","grund":"echter Fall: eine Horizonte-Sendung mit eindeutigem Folgentitel läuft durch rolleTermineAus (F157, A4)"}
+{"datei":"pipeline/check-staffel-folge-tv-schleife.ts","liest":"data/wikipedia-folgen.json","grund":"echter Fall: Folgentitel der Sendung gegen die Episodenliste, Erwartung staffelFolge nach der Schleife (F157, A4)"}

@@ -1,4 +1,4 @@
-Bericht f157-reihen-reiter-nachtrag-2411 (Kopf 700cbe55, PR 4912)
+Bericht f157-reihen-reiter-nachtrag-2411 (Kopf 8ed6c66e, PR 4912)
 
 Ergebnis: Die Reiter an der roten Box zeigen die Titel der Kategorie des geöffneten Titels (Hauptserie unverändert 1–5 … 25, Film 1–24, Specials, eigene Serien). Jeder Reiter trägt nur die Kurzform, der volle Titel steht in title und aria-label. Die Reihenliste zeigt diese Titel nicht mehr, auch nicht in der Schalterzahl. Main ist gemergt.
 Auslegung: Kategorie = Gruppe der Reihenliste. In Gruppen außer der Hauptserie bekommen Teile hinter „ohne Synchro“ keinen Reiter (sie bleiben über den Schalter erreichbar), sonst stimmte die Nummer nicht mit Daniels Film-Beispiel überein (Toho Cinemas 2017). Horizonte nimmt weiter die Sammeltitel-Reiter 1–4.

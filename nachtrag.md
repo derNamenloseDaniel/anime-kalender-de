@@ -1,6 +1,6 @@
-## Nachtrag (Nachbesserung Daniels Nachträge 20:21–20:25, Kopf 700cbe55)
+## Nachtrag (Nachbesserung Daniels Nachträge 20:21–20:25, Kopf 8ed6c66e)
 
-Commits: 331e4e30 (Merge main), 88ee40dc (Verhalten), 700cbe55 (nur Lehre in `.claude/agents/bauer.md`).
+Commits: 331e4e30 (Merge main), 88ee40dc (Verhalten), 700cbe55 (nur Lehre in `.claude/agents/bauer.md`), 8ed6c66e (Patch Note auf 8 Wörter gekürzt).
 
 Zweig mit origin/main gemergt (331e4e30, PR 4907 und 4911). Konflikt in `web/buehne/mockups/staffel-abschnitt.tsx` (notiz): beide Seiten behalten, also Reihen-Reiter und die sn-Namen der Folgen-Reiter.
 
@@ -41,4 +41,4 @@ Den Film-Fall `pokemon-film` hatte die Bühne schon (`fall-optionen.ts`). Er geh
 - Importeure (`grep -l` in `pipeline/check-*.ts`, `tools/*.test.*`), alle mit Exit 0: check-leerer-kasten, -nachlade-vorwaermen, -panel-cover, -panel-eigenes-werk, -panel-reihenfolge, -reihen-spur, -reihen-uebersicht, -staffel-anzeige-panel, -termin-offen-karte, -titelwechsel, -disc-bereich, -folgen-staffeln, -serienbeleg-folgenbereich, -hinweis-anzeige.
 - Bühne: `buehne:bauen` grün, `buehne-bilder --mockup staffel-abschnitt` grün (4 Fälle × 8 Bilder). `buehne:messen` voll (alle 6 Werkzeuge) mit Exit 0: 477 Einheiten ok (vorher 473, dazu 4 neue Zellen aus `pokemon-film`), `buehne-panel-pruefen` 8 Fälle ok.
 - Startbudget: 170.7 KB gzip von 190.0, gleich wie die Basis 331e4e30 (170.7). Die +0.6 KB gegenüber dem ersten Bericht kommen aus main.
-- Patch Note `data/patchnotes/f157-reihen-reiter.yaml` neu: „Staffeln und Filme einer Reihe direkt am Kasten wechseln / Ein Reiter je Titel, der volle Name beim Darüberfahren“. Doku `docs/wissen/datensatz.md` „Reihen-Reiter am Antwortkasten“ nachgeführt.
+- Patch Note `data/patchnotes/f157-reihen-reiter.yaml` neu: „Zwischen Staffeln und Filmen einer Reihe direkt wechseln / Ein Reiter je Titel, der volle Name beim Darüberfahren“. Doku `docs/wissen/datensatz.md` „Reihen-Reiter am Antwortkasten“ nachgeführt.

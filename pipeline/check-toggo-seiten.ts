@@ -162,6 +162,11 @@ pruefe('zwei gleichnamige Serien einer Figur: keine Zuordnung über den Namen', 
 const beide = [{ id: 1, namen: ['Einmalig'] }, { id: 2, namen: ['Wickie'] }]
 const nurEins = serienFuerTitelOhneWeg(beide, new Set([1]), KATALOG, [{ id: 2, serie: 'wickie-vse12', anlegen: true, beleg: 'x' }], true)
 pruefe('Serie nur für Titel ohne Weg: Handeintrag und Name beachten die Liste', nurEins.size === 1 && nurEins.get(1)?.id === 'VSE15', [...nurEins.keys()])
+const kurz = [serie('VSE20', 'mia-vse20', 'Mia', ['mia']), serie('VSE21', 'milo-vse21', 'Milo', ['milo'])]
+const kurzErgebnis = serienFuerTitelOhneWeg([{ id: 5, namen: ['Mia'] }, { id: 6, namen: ['Milo'] }], new Set([5, 6]), kurz, [], true)
+pruefe('Namen unter 4 Zeichen ordnen nichts zu, Namen mit genau 4 schon', !kurzErgebnis.has(5) && kurzErgebnis.get(6)?.id === 'VSE21', [...kurzErgebnis.keys()])
+const handGewinnt = serienFuerTitelOhneWeg([{ id: 7, namen: ['Einmalig'] }], new Set([7]), KATALOG, [{ id: 7, serie: 'wickie-vse12', anlegen: true, beleg: 'x' }], true)
+pruefe('Handeintrag gilt vor dem gleichnamigen Katalogeintrag', handGewinnt.size === 1 && handGewinnt.get(7)?.id === 'VSE12', [...handGewinnt.values()].map((s) => s.id))
 const nurHand = serienFuerTitelOhneWeg(beide, new Set([2]), KATALOG, [{ id: 2, serie: 'wickie-vse12', anlegen: true, beleg: 'x' }], false)
 pruefe('ohne „automatisch“ nur der Handeintrag, und nur für Titel ohne Weg', nurHand.size === 1 && nurHand.get(2)?.id === 'VSE12' && serienFuerTitelOhneWeg(beide, new Set([1]), KATALOG, [{ id: 2, serie: 'wickie-vse12', anlegen: true, beleg: 'x' }], false).size === 0)
 const ohneAuto = [titel(990005, 'Dora', []), titel(990006, 'Ninjago: Aufstieg der Drachen', [])]

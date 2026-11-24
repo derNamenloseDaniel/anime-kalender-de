@@ -20,8 +20,9 @@ export interface Reiter {
 export function kurzeStaffelNamen(sn: Record<string, string> | undefined): Map<number, string> {
   const namen = Object.entries(sn ?? {})
   const erster = namen[0]?.[1] ?? ''
-  const serie = erster.slice(0, erster.indexOf(': ') + 2)
-  const gemeinsam = namen.length > 1 && serie.length > 2 && namen.every(([, n]) => n.startsWith(serie) && n.length > serie.length)
+  const ende = erster.indexOf(': ')
+  const serie = ende > 0 ? erster.slice(0, ende + 2) : ''
+  const gemeinsam = namen.length > 1 && serie !== '' && namen.every(([, n]) => n.startsWith(serie) && n.length > serie.length)
   return new Map(namen.map(([nr, n]) => {
     const ohneSerie = gemeinsam ? n.slice(serie.length) : n
     const vorsatz = `Staffel ${nr} – `

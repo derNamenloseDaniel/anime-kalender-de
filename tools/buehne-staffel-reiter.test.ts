@@ -177,6 +177,7 @@ assert.equal(kurzeStaffelNamen({ 1: 'Serie: Eins' }).get(1), 'Serie: Eins', 'ein
 assert.deepEqual([...kurzeStaffelNamen({ 1: 'A: Eins', 2: 'B: Zwei' }).values()], ['A: Eins', 'B: Zwei'], 'verschiedene Serienteile')
 assert.deepEqual([...kurzeStaffelNamen({ 1: 'A: Eins', 2: 'A: ' }).values()], ['A: Eins', 'A: '], 'Name ohne Rest kürzt keinen')
 assert.deepEqual([...kurzeStaffelNamen({ 1: 'Eins', 2: 'Zwei' }).values()], ['Eins', 'Zwei'], 'ohne „: “ nichts gemeinsam')
+assert.deepEqual([...kurzeStaffelNamen({ 1: ': Eins', 2: ': Zwei' }).values()], [': Eins', ': Zwei'], 'leerer Serienteil kürzt nicht')
 assert.deepEqual([...kurzeStaffelNamen({ 1: 'A: Eins', 2: 'A: Staffel 3 – Drei' }).values()], ['Eins', 'Staffel 3 – Drei'], 'fremde Nummer bleibt')
 assert.deepEqual([...kurzeStaffelNamen({ 1: 'Staffel 1 – ', 2: 'Staffel 2 – Zwei' }).values()], ['Staffel 1 – ', 'Zwei'], 'Vorsatz ohne Rest bleibt')
 assert.equal(kurzeStaffelNamen(undefined).size, 0, 'ohne sn leer')

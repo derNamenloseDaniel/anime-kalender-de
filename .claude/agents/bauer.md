@@ -134,6 +134,7 @@ Lokal immer: Tests der berührten Dateien (`npx tsx <test>`) und `npx tsc --noEm
 ## Oberfläche (K9, K16, K19)
 
 - **Pflicht:** K9, K16, K16b, K19, K31 stehen in `.claude/skills/pruef-technik/bauer-oberflaeche.md`; vor dem ersten Edit an `web/src`, Panel, Kacheln, Bühne oder sichtbarer `extension/`-Oberfläche lesen.
+- **Mockup ist Vorgabe (24.11.2026, F157):** Gebaut wird nach dem Bild des freigegebenen Mockup-Commits (`git show <commit>:web/buehne/mockups/<datei>` samt Bildern), nicht nach `notiz`; das Mockup ändert nur Daniel (Bau-PR darf `ersatz` nur auf `{}` leeren, Wächter `tools/mockup-freigabe-pflicht.mjs`).
 
 ## PR, Nachtrag, Runden (K7, K11, K13)
 

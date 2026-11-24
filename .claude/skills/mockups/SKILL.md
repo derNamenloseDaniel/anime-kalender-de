@@ -23,7 +23,7 @@ Nach dem Umbau wird „Nachher" zur echten Komponente; das Bild muss dem Mockup-
 
 ## Nach dem Bau
 
-Der Mockup-PR wird vor dem Bau-PR gemergt (er hält die Entscheidung fest). Nachbau-Teile (`web/buehne/mockups/*-teile.tsx`), die nach dem Bau nur noch die echte Komponente nachbilden, werden im Bau-PR oder direkt danach gelöscht. Desktop-Standardgerät der Bühne ist „Desktop 512“ (512 px breit, `web/buehne/geraete.ts`).
+Der Mockup-PR wird vor dem Bau-PR gemergt (er hält die Entscheidung fest). Der Bau folgt dem Bild dieses Commits; ein Bau-PR leert höchstens `ersatz` auf `{}`, `titel` und `notiz` ändert nur Daniel (Wächter `tools/mockup-freigabe-pflicht.mjs`, Zeile „Mockup-Änderung freigegeben: <Zitat>“; Anlass PR 4896, 24.11.2026). Nachbau-Teile (`web/buehne/mockups/*-teile.tsx`), die nach dem Bau nur noch die echte Komponente nachbilden, werden im Bau-PR oder direkt danach gelöscht. Desktop-Standardgerät der Bühne ist „Desktop 512“ (512 px breit, `web/buehne/geraete.ts`).
 
 ## Auftragsvorlage für Fable-Entwürfe (Fable entwirft, Sonnet setzt um)
 

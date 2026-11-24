@@ -38,6 +38,13 @@ export function handlungQuellenFehler(synopsen: Record<string, SynopseEintrag>, 
   return fehler
 }
 
+/** Alle ausgelieferten Cartoons: `cartoons.json` und die Cartoons (negative Kennung) im Kern `titles-core.json`, je Kennung einmal; der Kern gewinnt, er ist, was der Kalender zeigt. */
+export function ausgelieferteCartoons<T extends { id: number }>(cartoons: T[], kern: T[]): T[] {
+  const nachId = new Map(cartoons.map((c) => [c.id, c]))
+  for (const t of kern) if (t.id < 0) nachId.set(t.id, t)
+  return [...nachId.values()]
+}
+
 /** Der Bau-Riegel: bricht ab, wenn eine Handlung ohne titelgenaue Quelle ausgeliefert würde. */
 export function riegelHandlungQuellen(synopsen: Record<string, SynopseEintrag>, cartoons: { id: number; tmdbId?: number; synopsis?: string }[]): void {
   brichAbBeiWiderspruch(handlungQuellenFehler(synopsen, cartoons), 'Handlungen ohne titelgenaue Quelle — nichts geschrieben.')

@@ -332,6 +332,7 @@ pipeline/check-handbelege-veraltet-lauf.ts
 pipeline/check-handlung-eigen-hinweis.ts
 pipeline/check-handlung-eigen.ts
 pipeline/check-handlung-quelle.ts
+pipeline/check-handlung-quelle-panel.ts
 pipeline/check-hauptrelease.ts
 pipeline/check-herkunft-je-folge.ts
 pipeline/check-herkunftsfilter.ts

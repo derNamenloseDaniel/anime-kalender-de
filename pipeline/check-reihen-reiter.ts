@@ -7,6 +7,9 @@
 import { readFileSync } from 'node:fs'
 import { act, createElement as h } from 'react'
 import { createRoot } from 'react-dom/client'
+import type { Dataset } from '../web/src/lib/data.ts'
+import { reihenTeileVon } from '../web/src/components/detail/reihen-daten.ts'
+import { reihenNameVon } from '../web/src/components/detail/reihen-namen.ts'
 import type { FranchiseMember, Release, Title } from '../shared/types.ts'
 import { attrappeUhr, ignoriereCss, installiereMiniDom, klicke, type MiniKnoten } from '../tools/mini-dom.ts'
 import { reihenLageVon, reihenReiterVon } from '../web/src/components/detail/reihen-reiter-liste.ts'
@@ -53,6 +56,27 @@ try {
 } catch (fehler) {
   skReiter = String(fehler)
 }
+/* Klasse: jeder Titel jedes Bühnenfalls mit Reihe und Reihenname wie im Panel (`reihenTeileVon`, `reihenNameVon`), Liste und Lage ohne Absturz. */
+const abstuerze: string[] = []
+let gerechnet = 0
+for (const [name, f] of Object.entries(faelle)) {
+  const alle = (f['titles.json'] ?? []) as Title[]
+  const reihen = (f['franchises.json'] ?? {}) as Record<string, FranchiseMember[]>
+  const daten = { titles: alle, titleById: new Map(alle.map((t) => [t.id, t])), releasesByTitle: new Map() } as unknown as Dataset
+  for (const t of alle) {
+    /* Erst ohne geladene `franchises.json` (das Panel rendert zuerst mit leerer Reihe, Teile aus `data.titles`), dann mit. */
+    for (const reihe of [[], reihen[t.franchiseId ?? t.id] ?? []]) {
+      try {
+        const liste = reihenReiterVon(t, reihenTeileVon(t, reihe, daten), reihenNameVon(t, reihe, daten), alle)
+        for (const r of liste) reihenLageVon(daten.titleById.get(r.id) ?? t, [], '2026-11-24')
+        gerechnet++
+      } catch (fehler) {
+        abstuerze.push(`${name}/${t.id}: ${String(fehler).slice(0, 80)}`)
+      }
+    }
+  }
+}
+pruefe(`alle Bühnenfälle ohne Absturz (${gerechnet} Titel-Reihe-Paare)`, gerechnet > 100 && abstuerze.length === 0, abstuerze.slice(0, 5))
 pruefe('Staffel in zwei Teilen ohne Staffelstand: Teil 1, Teil 2 nach Kennung', JSON.stringify(skReiter) === '[[15940,"Teil 1"],[16333,"Teil 2"]]', skReiter)
 
 /* Lage am Stichtag des Mockups (24.11.2026): Horizonte 4 läuft, 1–3 ruhen; Hauptserie 1–5 kommt, 23–25 läuft. */

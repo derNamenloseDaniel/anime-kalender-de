@@ -1,5 +1,5 @@
 import { loadJson } from './data.ts'
-import { adresseHatTitel, adresseNachfolger, umleiteKarte, umleiteListe } from './ak-umleiten.ts'
+import { adresseHatTitel, adresseNachfolger, leseUmleitung, umleiteKarte, umleiteListe, type UmleitungsPaar } from './ak-umleiten.ts'
 
 /**
  * **Zusammengeführte Titel ziehen in gemerkten Listen auf ihren Nachfolger um** (Dubletten, 08.10.2026).
@@ -14,7 +14,7 @@ const KARTEN = ['favorites:seit', 'gesehenBis'] as const
 /** Länger wartet der erste Bildaufbau nicht; was bis dahin fehlt, folgt beim nächsten Laden. */
 const WARTEZEIT_MS = 1500
 
-function anwenden(abbild: Map<number, number>): void {
+function anwenden({ abbild, versatz }: ReturnType<typeof leseUmleitung>): void {
   for (const schluessel of LISTEN) {
     const roh = localStorage.getItem(schluessel)
     const alt: unknown = roh ? JSON.parse(roh) : undefined
@@ -23,7 +23,7 @@ function anwenden(abbild: Map<number, number>): void {
   for (const schluessel of KARTEN) {
     const roh = localStorage.getItem(schluessel)
     const alt: unknown = roh ? JSON.parse(roh) : undefined
-    if (alt && typeof alt === 'object' && !Array.isArray(alt)) localStorage.setItem(schluessel, JSON.stringify(umleiteKarte(alt as Record<string, unknown>, abbild)))
+    if (alt && typeof alt === 'object' && !Array.isArray(alt)) localStorage.setItem(schluessel, JSON.stringify(umleiteKarte(alt as Record<string, unknown>, abbild, schluessel === 'gesehenBis' ? versatz : undefined)))
   }
 }
 
@@ -37,10 +37,11 @@ async function umleiten(): Promise<void> {
   try {
     const mitAdresse = adresseHatTitel(location.pathname, location.hash)
     if (!mitAdresse && ![...LISTEN, ...KARTEN].some((k) => localStorage.getItem(k))) return
-    const paare = await loadJson<[number, number][]>('ak-umleitung.json')
-    if (mitAdresse) adresseUmschreiben(new Map(paare))
+    const paare = await loadJson<UmleitungsPaar[]>('ak-umleitung.json')
+    const umleitung = leseUmleitung(paare)
+    if (mitAdresse) adresseUmschreiben(umleitung.abbild)
     if (paare.length <= Number(localStorage.getItem(MARKE) ?? 0)) return
-    anwenden(new Map(paare))
+    anwenden(umleitung)
     localStorage.setItem(MARKE, String(paare.length))
     localStorage.removeItem('newsletterSyncSent')
   } catch {

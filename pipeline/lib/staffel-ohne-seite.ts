@@ -12,13 +12,15 @@ export function staffelnOhneSeite(
   titles: Pick<Title, 'id' | 'episodes' | 'staffelTitel' | 'titleEn' | 'titleDe'>[],
   releases: Pick<Release, 'slug' | 'titleId' | 'schedule' | 'widerlegt'>[],
   heute: string,
+  mitGrenzen: ReadonlySet<number> = new Set(),
 ): StaffelOhneSeite[] {
   const jeId = new Map(titles.map((t) => [t.id, t]))
   return releases.flatMap((r): StaffelOhneSeite[] => {
     const t = jeId.get(r.titleId)
     const ab = r.schedule?.firstEpisodeNumber
     const am = r.schedule?.firstEpisodeDate
-    if (!t || t.staffelTitel || r.widerlegt || ab === undefined || am === undefined) return []
+    /* Titel mit belegten Staffelgrenzen (`data/curated/*-staffeln.yaml`) führen jede Staffel als Abschnitt ihrer Seite (F157, 24.11.2026). */
+    if (!t || t.staffelTitel || mitGrenzen.has(t.id) || r.widerlegt || ab === undefined || am === undefined) return []
     if (am < heute || ab < 2 || t.episodes === undefined || ab <= t.episodes) return []
     return [{ slug: r.slug, titleId: t.id, titel: t.titleEn ?? t.titleDe ?? String(t.id), ab, am }]
   })

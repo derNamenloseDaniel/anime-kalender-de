@@ -8,6 +8,11 @@
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
+import type { StaffelGrenzen } from './pokemon-staffeln.ts'
+import { ladeGrenzenDatei, mitVersatz, staffelVersatz } from './staffel-versatz.ts'
+
+/** Die Horizonte-Staffeln neben `kennungen.json` (`curated/horizonte-staffeln.yaml`; fehlt sie in einer Kulisse, kein Versatz). */
+const staffelGrenzenNeben = (kennungenPfad: string): StaffelGrenzen[] => ladeGrenzenDatei(join(dirname(kennungenPfad), 'curated', 'horizonte-staffeln.yaml'))
 
 export type AkVon = (anilist: number) => number
 
@@ -188,7 +193,7 @@ export function uebersetzeVerzeichnis(wurzel: string, kennungenPfad: string): { 
   }
   uebersetzeTeildateien(wurzel, akVon)
   schreibe(join(wurzel, 'anilist-ak.json'), zeilen.map((z) => [z[3] ?? z[0], z[1]]))
-  schreibe(join(wurzel, 'ak-umleitung.json'), [...umleitungen(zeilen), ...cartoonUmzug(kennungenPfad, akVon)])
+  schreibe(join(wurzel, 'ak-umleitung.json'), [...mitVersatz(umleitungen(zeilen), staffelVersatz(zeilen, staffelGrenzenNeben(kennungenPfad))), ...cartoonUmzug(kennungenPfad, akVon)])
   return { dateien }
 }
 

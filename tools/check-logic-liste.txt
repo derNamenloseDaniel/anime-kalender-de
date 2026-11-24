@@ -40,6 +40,7 @@ pipeline/check-adresse-kern.ts
 pipeline/check-adressen-schreiben.ts
 pipeline/check-adressen.ts
 pipeline/check-ak-umleitung-lauf.ts
+pipeline/check-ak-umleitung-versatz.ts
 pipeline/check-aktive-chips.ts
 pipeline/check-aktualisierung-verborgen.ts
 pipeline/check-anbieter-eintraege-bestand-lauf.ts
@@ -638,11 +639,13 @@ pipeline/check-sprecher-filter.ts
 pipeline/check-sprung-lage.ts
 pipeline/check-sprung-lesestelle.ts
 pipeline/check-staerkste-seite.ts
+pipeline/check-staffel-altmeldungen.ts
 pipeline/check-staffel-anzeige-bau.ts
 pipeline/check-staffel-anzeige-panel.ts
 pipeline/check-staffel-anzeige.ts
 pipeline/check-staffel-aufrufer.ts
 pipeline/check-staffel-des-titels.ts
+pipeline/check-staffel-folge-tv.ts
 pipeline/check-staffel-historie.ts
 pipeline/check-staffel-jahr0.ts
 pipeline/check-staffel-lesekennung.ts

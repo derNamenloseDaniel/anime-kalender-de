@@ -11,7 +11,7 @@ import {
 } from '../../shared/types.ts'
 import { nachAusstrahlung, unterscheidenderZusatz } from '../../shared/titles.ts'
 import { alleStaffelQuellen } from './staffel-quelle.ts'
-import { geteilteStaffeln, ladeStaffelGrenzen, staffelEnden } from '../lib/pokemon-staffeln.ts'
+import { geteilteStaffeln, ladeStaffelGrenzen, staffelEnden, staffelNamen } from '../lib/pokemon-staffeln.ts'
 import { ANILIST_COVER_BASIS } from '../../shared/mappings.ts'
 import { type AnisearchEintrag } from './01-quellen.ts'
 import { type SynopsisEintrag } from './13-1-anreichern.ts'
@@ -72,8 +72,11 @@ function schreibeSynonyme(titles: Map<number, Title>, anisearch: Record<string, 
       .slice(0, 12)
     if (neu.length) synonyme[id] = neu
   }
+  /* Staffelnamen aus der Yaml zuerst: Die Suche „Gute Aussichten“ findet die Serie, deren Abschnitt so heißt (F157). */
+  const namen = staffelNamen(ladeStaffelGrenzen())
   for (const t of titles.values()) {
-    aufnehmen(t.id, anisearch[lesekennung(t)]?.info?.synonyms, [t.titleDe, t.titleEn, t.titleRomaji, t.titleNative])
+    const eigene = Object.values(namen.get(t.id) ?? {})
+    aufnehmen(t.id, [...eigene, ...(anisearch[lesekennung(t)]?.info?.synonyms ?? [])], [t.titleDe, t.titleEn, t.titleRomaji, t.titleNative])
   }
   for (const [id, e] of Object.entries(katalogTitel)) {
     if (!synonyme[id]) aufnehmen(Number(id), e.synonyme, [])

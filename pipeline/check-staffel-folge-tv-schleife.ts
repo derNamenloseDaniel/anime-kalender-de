@@ -10,6 +10,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Release, Title } from '../shared/types.ts'
+import { melde } from './lib/quarantaene.ts'
 
 /* Die Schleife schreibt nach `data/` (Sprecher-Zählung): Sie läuft gegen eine Kulisse (`AK_ROOT`) mit nur den gelesenen Eingaben. */
 if (!process.env.AK_ROOT) {
@@ -52,6 +53,7 @@ function ersteZuordenbare(): { sender: string; date: string; time: string; staff
 
 const fall = ersteZuordenbare()
 if (!titel || !fall) {
+  melde(ID, 'staffel-folge-tv-schleife', 'keine Horizonte-Sendung mit Staffel und Folge zuordenbar')
   console.error(`✖ check-staffel-folge-tv-schleife: ${titel ? 'keine zuordenbare Horizonte-Sendung in data/tv-programm.json' : `Titel ${ID} fehlt in public/data/titles.json`}`)
   process.exit(1)
 }
@@ -69,6 +71,7 @@ const { events } = rolleTermineAus({ releases: [release], titles: new Map([[ID, 
 const ev = events.find((e) => e.releaseSlug === 'probe-horizonte-tv' && e.platform === 'tv')
 const ok = JSON.stringify(ev?.staffelFolge) === JSON.stringify(fall.staffelFolge)
 if (!ok) {
+  melde(ID, 'staffel-folge-tv-schleife', 'Fernsehtermin kam ohne staffelFolge aus rolleTermineAus')
   console.error(`✖ check-staffel-folge-tv-schleife: Termin ${fall.date} ${fall.time} ${fall.sender} kam ohne staffelFolge ${JSON.stringify(fall.staffelFolge)} aus rolleTermineAus (${JSON.stringify(ev)})`)
   process.exit(1)
 }

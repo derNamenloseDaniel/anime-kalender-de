@@ -275,32 +275,6 @@ function riegel(liste: number[] | undefined): Lauf {
   pruefe('verlust-riegel: fremde Kennung lässt den Verlust stehen', fremd.code === 1 && fremd.aus.includes('ABBRUCH: 2 Titel'), fremd.aus.slice(-600))
 }
 
-/**
- * Befristete Ausnahme (F157, `pipeline/bau/staffel-wegfall.ts`): Vorher 1–7 und die alten Horizonte-Staffeln 7000001–7000003, jetzt
- * `jetzt`. Durch nur, wenn genau diese drei fehlen und jede ihre Zeile in `data/kennungen.json` hat (`zeilen`).
- */
-function staffelRiegel(jetzt: number[], zeilen: number[]): Lauf {
-  const skript = `import { pruefeVerlust } from '${pathToFileURL(join(WURZEL, 'pipeline/bau/verlust-riegel.ts')).href}'\npruefeVerlust(${JSON.stringify(jetzt.map((id) => ({ id })))}, [])\nconsole.log('durch')\n`
-  const vorher = [1, 2, 3, 4, 5, 6, 7, 7000001, 7000002, 7000003]
-  return lauf((wo) => join(wo, 'riegel.mts'), {
-    kopien: ['data/kino-ankuendigungen.yaml', 'data/ankuendigungen.yaml', 'data/ohne-synchro-von-hand.yaml', 'data/curated'],
-    dateien: { 'public/data/titles.json': vorher.map((id) => titel(id)), 'data/kennungen.json': { titel: zeilen.map((id, i) => [26469 + i, id, 17947]) }, 'riegel.mts': skript },
-  })
-}
-{
-  const alle = [7000001, 7000002, 7000003]
-  const drei = staffelRiegel([1, 2, 3, 4, 5, 6, 7], alle)
-  pruefe('verlust-riegel: die drei alten Horizonte-Staffeln dürfen wegfallen', drei.code === 0 && drei.aus.includes('durch'), drei.aus.slice(-600))
-  const vierte = staffelRiegel([1, 2, 3, 4, 5, 6], alle)
-  pruefe('verlust-riegel: eine vierte Kennung bleibt Verlust', vierte.code === 0 && vierte.aus.includes('1 Titel faellt aus dem Datensatz: 7\n'), vierte.aus.slice(-600))
-  const zwei = staffelRiegel([1, 2, 3, 4, 5], alle)
-  pruefe('verlust-riegel: zwei fremde Kennungen neben den Staffeln brechen ab', zwei.code === 1 && zwei.aus.includes('ABBRUCH: 2 Titel'), zwei.aus.slice(-600))
-  const ohneZeile = staffelRiegel([1, 2, 3, 4, 5, 6, 7], [7000001, 7000002])
-  pruefe('verlust-riegel: alte Kennung ohne Kennungszeile (kein Umleitungspaar möglich) bleibt Verlust', ohneZeile.code === 0 && ohneZeile.aus.includes('1 Titel faellt aus dem Datensatz: 7000003'), ohneZeile.aus.slice(-600))
-  const ohneZeilen = staffelRiegel([1, 2, 3, 4, 5, 6, 7], [])
-  pruefe('verlust-riegel: ohne Kennungszeilen bricht der Bau ab', ohneZeilen.code === 1 && ohneZeilen.aus.includes('ABBRUCH: 3 Titel'), ohneZeilen.aus.slice(-600))
-}
-
 // finale-bestand: Beyblade X (Sichtung, -1) und Ramparts of Ice (ohne Folgenzahl, -2) tragen die Marke; ein Finale mit Enddatum (-3) nicht.
 {
   const release = (titleId: number, schedule: object, extra: object = {}) => ({ slug: `f${titleId}`, titleId, platform: 'rtlplus', releaseType: 'weekly', schedule, ...extra })

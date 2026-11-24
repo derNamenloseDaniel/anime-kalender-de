@@ -3,9 +3,6 @@ import { mitAnkuendigung } from './grundlagen.ts'
 import { readJson, warn } from '../lib/util.ts'
 import { ladeQuarantaene } from '../lib/quarantaene.ts'
 import { type Title } from '../../shared/types.ts'
-import type { KennungsZeile } from '../lib/ausgabe-kennung.ts'
-import { HORIZONTE_STAFFELN, ladeStaffelGrenzen } from '../lib/pokemon-staffeln.ts'
-import { erlaubterStaffelWegfall } from './staffel-wegfall.ts'
 
 /**
  * Kein Titel geht verloren — der Build bricht lieber ab.
@@ -48,9 +45,6 @@ export function pruefeVerlust(slim: { id: number }[], verschoben: Title[]): void
     for (const id of umgezogeneKennungen(jetzt, hinterToggle, new Set(verschoben.filter((t) => t.jpStatus === 'NOT_YET_RELEASED' || mitAnkuendigung(t).ankuendigung).map((t) => t.id)))) hinterToggle.add(id)
     // Zurückgestellte Titel (Quarantäne, `11-9-quarantaene.ts`) fehlen absichtlich und stehen in `meta.quarantaene`.
     for (const e of ladeQuarantaene()) hinterToggle.add(e.titleId)
-    // Befristet bis zum Folge-PR mit `zuAk` (F157): die alten Horizonte-Staffel-Titel (`staffel-wegfall.ts`).
-    const kennungen = readJson<{ titel: KennungsZeile[] }>('data/kennungen.json', { titel: [] }).titel
-    for (const id of erlaubterStaffelWegfall(ladeStaffelGrenzen(HORIZONTE_STAFFELN), kennungen)) hinterToggle.add(id)
     const verloren = vorher.filter((id) => !jetzt.has(id) && !hinterToggle.has(id))
     if (verloren.length > ERLAUBTER_VERLUST) {
       warn(

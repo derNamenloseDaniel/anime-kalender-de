@@ -2,6 +2,7 @@
 // Daniel 13.10.2026: „5 max“ war nur Vorsatz, sechs liefen gleichzeitig — jetzt greift die Grenze technisch; seit 13.11.2026 lokal 2.
 // Laufend = Transkript unter <sitzung>/subagents/ endet nicht mit end_turn/Abbruch und wurde in der letzten Stunde geschrieben.
 const fs = require('node:fs')
+const os = require('node:os')
 const path = require('node:path')
 
 // Daniel 13.11.2026: „lokal max 2“, „ohne zeit bereich“, mehr nur als Cloud-Sitzung, „nur wenn sinnvoll parallel“
@@ -32,7 +33,9 @@ function beendet(eintrag) {
 }
 
 /** Laufende Agenten der Sitzung: [{ id, typ, beschreibung }]. Die Mod arbeitsliste zählt für die Leiste nach (mods/arbeitsliste/hooks/agenten.ts): Regeländerung dort nachführen. */
-function laufendeAgenten(ordner, jetzt = Date.now()) {
+function laufendeAgenten(ordner, jetzt = Date.now(), uptimeS = os.uptime()) {
+  // 24.11.2026: Nach einem Container-Neustart endet das Transkript toter Agenten unbeendet und zählte bis FRISCH_MS weiter.
+  const bootMs = jetzt - uptimeS * 1000
   let dateien
   try {
     dateien = fs.readdirSync(ordner).filter((d) => /^agent-.*\.jsonl$/.test(d))
@@ -43,7 +46,8 @@ function laufendeAgenten(ordner, jetzt = Date.now()) {
   for (const d of dateien) {
     const datei = path.join(ordner, d)
     try {
-      if (jetzt - fs.statSync(datei).mtimeMs > FRISCH_MS) continue
+      const mtimeMs = fs.statSync(datei).mtimeMs
+      if (jetzt - mtimeMs > FRISCH_MS || mtimeMs < bootMs) continue
       if (beendet(letzteZeile(datei))) continue
       let meta = {}
       try {

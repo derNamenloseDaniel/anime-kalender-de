@@ -1,39 +1,29 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { Title } from '@shared/types.ts'
-import { useSprecherAuswahl } from './lib/sprecher.ts'
 import { EinstellungenLazy } from './components/EinstellungenLazy.tsx'
-import { loadAllTitles, loadCartoons, loadOhneSynchro, loadSynonyme } from './lib/data.ts'
 import { useStartdaten } from './lib/start-daten.ts'
 import { useEinstellungenOffen } from './lib/einstellungen-offen.ts'
-import { eventsFuerAnsichtGen, titelFuerAnsichtGen, toggleValue, type FilterState } from './lib/filters.ts'
+import { eventsFuerAnsichtGen, type FilterState } from './lib/filters.ts'
 import { useKalenderFilter } from './lib/kalender-filter.ts'
 import { wertungNurMitVollenDaten } from './lib/filter-wertung.ts'
 import { leeresErgebnis, useZeitscheibe } from './lib/use-zeitscheibe.ts'
-import { titelQuelle } from './lib/titel-quelle.ts'
 import type { Fundstelle } from './lib/search.ts'
 import type { ReleaseEvent } from '@shared/types.ts'
 import { useFavorites, useHidden } from './lib/favorites.ts'
 import { speicherSichern, useNewsletterSync } from './lib/newsletterSync.ts'
 import { useFavoritenAbgleich } from './lib/favoriten-abgleich.ts'
 import { usePushNachfuehren } from './lib/push-nachfuehren.ts'
-import { useRoute, buildHash, type ViewId } from './lib/router.ts'
+import { useRoute, type ViewId } from './lib/router.ts'
 import { useDbSchalter } from './lib/db-schalter.ts'
-import { addDays, addMonths, startOfWeek, todayIso } from '@shared/time.ts'
-import { Header } from './components/Header.tsx'
+import { addDays, addMonths, todayIso } from '@shared/time.ts'
+import { useCoverSicherung, useNachladeTitel, useTitelAnsicht } from './lib/app-ansicht.ts'
+import { AppDetail, AppInhalt, appKopf } from './components/AppBereiche.tsx'
 import { InstallDialog } from './components/InstallPrompt.tsx'
-import { SeitenAnsichtLazy } from './components/SeitenAnsichtLazy.tsx'
-import { cacheCoversForOffline } from './lib/pwa.ts'
-import { coverBild, KACHEL_DICHTE } from './lib/cover.ts'
-import { KalenderBereich } from './components/kalender/KalenderBereich.tsx'
-import { DatenbankBereichLazy } from './components/DatenbankBereichLazy.tsx'
-import { DetailPanelLazy } from './components/DetailPanelLazy.tsx'
 import { DatenFehler } from './components/DatenFehler.tsx'
 import { Footer } from './components/Footer.tsx'
-import { StartGeruest, WochenSkelett } from './components/StartGeruest.tsx'
+import { StartGeruest } from './components/StartGeruest.tsx'
 import { useErstesErgebnis } from './lib/erstes-ergebnis.ts'
 
-/** Die Titelansicht, bevor etwas gerechnet ist. */
-const LEERE_ANSICHT = { liste: [] as Title[], fundstellen: new Map<string, Fundstelle[]>() }
+/** Die Terminansicht, bevor etwas gerechnet ist. */
 const LEERE_TERMINE = { liste: [] as ReleaseEvent[], fundstellen: new Map<string, Fundstelle[]>() }
 
 
@@ -71,9 +61,6 @@ function fussAbstand(view: ViewId): string {
 }
 
 export default function App() {
-  const [allTitles, setAllTitles] = useState<Title[]>()
-  const [ohneSynchro, setOhneSynchro] = useState<Title[]>()
-  const [cartoons, setCartoons] = useState<Title[]>()
   const [einstellungenOffen, setEinstellungenOffen] = useEinstellungenOffen()
   /* TV-Termine ausblenden. */
   const [tvAus, setTvAus] = useGemerkterSchalter('tvAus', tvAusGespeichert)
@@ -93,42 +80,9 @@ export default function App() {
   const today = todayIso()
   /* Die Wochenansicht startet aus der kleinen Wochen-Datei; `data` ist bis zum vollen Datensatz (`voll`) nur diese Woche. */
   const { data, voll, error, neuLaden } = useStartdaten(route, today)
-
-  // Cover der aktuellen und nächsten Woche für unterwegs sichern — dieselbe Größe wie die Kachel.
-  useEffect(() => {
-    if (!data) return
-    const from = startOfWeek(today)
-    const to = addDays(from, 13)
-    const urls = data.events
-      .filter((e) => e.date >= from && e.date <= to)
-      .map((e) => coverBild(data.titleById.get(e.titleId)?.coverImage, 160, undefined, KACHEL_DICHTE).src)
-      .filter((url): url is string => Boolean(url))
-    cacheCoversForOffline(urls)
-  }, [data, today])
-
+  useCoverSicherung(data, today)
   useTastenSpruenge(route, navigate)
-
-  // Die vollständige Titelliste kommt erst mit der Datenbank; der Kalender führt nur die Titel mit Termin.
-  useEffect(() => {
-    if (!data || allTitles || route.view !== 'datenbank') return
-    /* Die Synonyme kommen mit — erst danach steht die Liste, damit die Suche sie kennt. */
-    Promise.all([loadAllTitles(data), loadSynonyme()])
-      .then(([alle]) => setAllTitles(alle))
-      .catch(() => setAllTitles(data.titles))
-  }, [data, allTitles, route.view])
-
-  // Die Titel ohne Synchro kommen erst, wenn jemand sie sehen will — und dann genau einmal.
-  useEffect(() => {
-    if (!data || !zeigeOhneSynchro || ohneSynchro) return
-    loadOhneSynchro(data).then(setOhneSynchro)
-  }, [data, zeigeOhneSynchro, ohneSynchro])
-
-  /* Cartoons mit Termin stehen schon im Kern; die übrigen lädt die Seite nur für die Datenbank und für einen direkt geöffneten Cartoon (18.09.2026). */
-  const brauchtCartoons = route.view === 'datenbank' || (route.title !== undefined && !!voll && !voll.titleById.has(route.title))
-  useEffect(() => {
-    if (!data || cartoons || !brauchtCartoons) return
-    loadCartoons(data).then(setCartoons)
-  }, [data, cartoons, brauchtCartoons])
+  const nachgeladen = useNachladeTitel(data, voll, route, zeigeOhneSynchro)
 
   const { wert: events, veraltet: eventsVeraltet } = useZeitscheibe(
     () => (data ? eventsFuerAnsichtGen(data, wertungNurMitVollenDaten(kalenderFilters, !!voll), today, favorites, tvAus) : leeresErgebnis(LEERE_TERMINE)),
@@ -141,13 +95,7 @@ export default function App() {
     () => ({ alle: data ? data.events.map((e) => e.date) : [], sichtbar: eventListe.map((e) => e.date) }),
     [data, eventListe],
   )
-  const sprecher = useSprecherAuswahl(route.filters)
-  const quelle = useMemo(() => titelQuelle(data?.titles ?? [], allTitles, ohneSynchro, zeigeOhneSynchro, cartoons), [data, allTitles, ohneSynchro, zeigeOhneSynchro, cartoons])
-  const { wert: titles, laeuft: titelRechnet } = useZeitscheibe(
-    () => (data ? titelFuerAnsichtGen(quelle, data, route.filters, today, favorites, grouped, sprecher.auswahl) : leeresErgebnis(LEERE_ANSICHT)),
-    [data, quelle, route.filters, today, favorites, grouped, sprecher.auswahl],
-    LEERE_ANSICHT,
-  )
+  const { titles, titelRechnet, quelle, sprecher } = useTitelAnsicht({ data, filters: route.filters, today, favorites, grouped, zeigeOhneSynchro, nachgeladen })
   const kalenderBereit = useErstesErgebnis(!!data, eventsVeraltet)
 
   const openTitleId = route.title || undefined
@@ -168,28 +116,21 @@ export default function App() {
     return <DatenFehler detail={error} onNeuLaden={neuLaden} />
   }
 
-  const kopf = (
-    <Header
-      view={route.view}
-      onView={setView}
-      /* Echte Adressen (Mittelklick), mit Basis-Pfad: der neue Tab startet ohne den Titel-Pfad. */
-      startHref={`${import.meta.env.BASE_URL}${buildHash({ ...route, view: 'woche', date: todayIso(), title: undefined, disc: undefined })}`}
-      hrefFuer={(ziel) => `${import.meta.env.BASE_URL}${buildHash({ ...route, view: ziel, title: undefined, disc: undefined })}`}
-      onStart={() => {
-        navigate({ view: 'woche', date: todayIso(), title: undefined, disc: undefined })
-        window.dispatchEvent(new Event('ak-zu-heute'))
-      }}
-      suche={route.filters.search}
-      setSuche={setSuche}
-      zurSuche={zurSuche}
-      favorites={favorites}
-      einstellungen={() => setEinstellungenOffen(true)}
-    />
-  )
+  const kopf = appKopf({ route, navigate, setView, setSuche, zurSuche, favorites, einstellungen: () => setEinstellungenOffen(true) })
 
   if (!data) return StartGeruest({ kopf }) // Funktion statt Element: eine Komponentengrenze hängt den Kopf neu ein und nimmt Fokus mit (4072)
 
-  const kalender = route.view === 'woche' || route.view === 'monat'
+  const merkliste = { favorites, hidden, onToggleFavorite: toggle, onToggleHidden: toggleHidden }
+  const datenbank = {
+    geladen: !!nachgeladen.allTitles,
+    titles,
+    quelle,
+    grouped,
+    onGroupedChange: setGrouped,
+    ohneSynchro: zeigeOhneSynchro,
+    onOhneSynchroChange: setZeigeOhneSynchro,
+    laedt: (zeigeOhneSynchro && !nachgeladen.ohneSynchro) || titelRechnet || sprecher.laedt,
+  }
 
   return (
     <div className={`flex min-h-full flex-col ${fussAbstand(route.view)}`}>
@@ -198,73 +139,28 @@ export default function App() {
         offen={einstellungenOffen}
         schliessen={() => setEinstellungenOffen(false)}
       />
-
-      <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-6 sm:px-6 lg:px-10">
-        {kalender && !kalenderBereit && <WochenSkelett />}
-        {kalender && kalenderBereit && (
-          <KalenderBereich
-            data={data}
-            route={{ ...route, filters: kalenderFilters }}
-            navigate={kalenderNavigate}
-            events={eventListe}
-            favorites={favorites}
-            hidden={hidden}
-            onToggleFavorite={toggle}
-            onToggleHidden={toggleHidden}
-            tvAn={!tvAus}
-            setTvAn={(an) => setTvAus(!an)}
-            termine={termintage}
-          />
-        )}
-
-        {route.view === 'datenbank' && (
-          <DatenbankBereichLazy
-            data={data}
-            route={route}
-            navigate={navigate}
-            setFilters={setFilters}
-            geladen={!!allTitles}
-            titles={titles}
-            quelle={quelle}
-            grouped={grouped}
-            onGroupedChange={setGrouped}
-            ohneSynchro={zeigeOhneSynchro}
-            onOhneSynchroChange={setZeigeOhneSynchro}
-            laedt={(zeigeOhneSynchro && !ohneSynchro) || titelRechnet || sprecher.laedt}
-            favorites={favorites}
-            hidden={hidden}
-            onToggleFavorite={toggle}
-            onToggleHidden={toggleHidden}
-          />
-        )}
-
-        <SeitenAnsichtLazy route={route} ersetze={ersetze} data={data} favorites={favorites} oeffne={(id: number) => navigate({ title: id })} />
-      </main>
+      <AppInhalt
+        {...merkliste}
+        data={data}
+        route={route}
+        navigate={navigate}
+        ersetze={ersetze}
+        setFilters={setFilters}
+        kalenderFilters={kalenderFilters}
+        kalenderNavigate={kalenderNavigate}
+        kalenderBereit={kalenderBereit}
+        events={eventListe}
+        tvAus={tvAus}
+        setTvAus={setTvAus}
+        termine={termintage}
+        datenbank={datenbank}
+      />
 
       <Footer meta={data.meta} />
 
       <InstallDialog />
 
-      {openTitleId !== undefined && voll && (
-        <DetailPanelLazy
-          data={data}
-          titleId={openTitleId}
-          discZuerst={route.disc}
-          favorites={favorites}
-          hidden={hidden}
-          onToggleFavorite={toggle}
-          onToggleHidden={toggleHidden}
-          onClose={() => navigate({ title: undefined, disc: undefined })}
-          onOpenTitle={(id) => navigate({ title: id, disc: undefined })}
-          onFilterBy={(kind, value) => {
-            const filters =
-              kind === 'genre'
-                ? { ...route.filters, genres: toggleValue(route.filters.genres, value) }
-                : { ...route.filters, keywords: toggleValue(route.filters.keywords, value) }
-            navigate({ filters, title: undefined, disc: undefined, view: 'datenbank' })
-          }}
-        />
-      )}
+      {openTitleId !== undefined && voll && <AppDetail {...merkliste} data={data} route={route} navigate={navigate} titleId={openTitleId} />}
     </div>
   )
 }

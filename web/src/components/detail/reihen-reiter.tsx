@@ -91,11 +91,12 @@ export function ReihenReiterAmKasten({ eigenschaften, kasten }: { eigenschaften:
   const lagen = new Map(reiter.map((r) => [r.id, data.titleById.has(r.id) ? reihenLageVon(data.titleById.get(r.id)!, data.releasesByTitle.get(r.id) ?? [], today) : ('ruht' as const)]))
   const farbe = kastenFarbe(kastenKlassen({ antwort, title, neben: '', gedaempft }))
   const kennung = `reihe-${title.id}`
-  /* Eine Hülle um Reiter und Kasten: der Abstand der Seite zwischen ihren Geschwistern trennt sie nicht. */
+  /* Eine Hülle um Reiter und Kasten: der Abstand der Seite zwischen ihren Geschwistern trennt sie nicht.
+     `data-kasten` am Tabpanel: die Prüfwerkzeuge suchen `[data-kasten] > section`, die Hülle schiebt sich sonst dazwischen. */
   return (
     <div>
       <ReihenReiterZeile reiter={reiter} aktiv={title.id} lagen={lagen} farbe={farbe} kennung={kennung} beiWahl={quelle.wechsleZu} />
-      <div role="tabpanel" id={`${kennung}-kasten`} aria-labelledby={`${kennung}-reiter-${title.id}`}>
+      <div role="tabpanel" data-kasten id={`${kennung}-kasten`} aria-labelledby={`${kennung}-reiter-${title.id}`}>
         {kasten}
       </div>
     </div>

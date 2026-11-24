@@ -41,7 +41,7 @@ async function abschnittFuer(titel: Partial<Title>): Promise<string> {
 const mit = await abschnittFuer({ id: -219080, synopsis: 'Ein Text aus TMDB.', tmdbId: 219080 })
 pruefe('Cartoon mit tmdbId: die Handlung steht da', mit.includes('Ein Text aus TMDB.'), mit)
 pruefe('Cartoon mit tmdbId: Quellenzeile verlinkt die TMDB-Seite des Titels', mit.includes('href="https://www.themoviedb.org/tv/219080"'), mit)
-pruefe('Cartoon mit tmdbId: Anbieter heißt TMDB, nicht aniSearch', mit.includes('TMDB') && !/aniSearch|anisearch/.test(mit), mit)
+pruefe('Cartoon mit tmdbId: Anbieter heißt TMDB, nicht aniSearch', mit.includes('>TMDB ↗<') && !/aniSearch|anisearch/.test(mit), mit)
 
 const ohne = await abschnittFuer({ id: -5, synopsis: 'Ein Text ohne Herkunft.' })
 pruefe('Cartoon ohne tmdbId: die Handlung steht trotzdem da', ohne.includes('Ein Text ohne Herkunft.'), ohne)

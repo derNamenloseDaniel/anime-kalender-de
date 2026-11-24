@@ -1393,6 +1393,17 @@ Daniel hat F157 am 24.11.2026 entschieden („Abschnitt“, Mockup `staffel-absc
 - **Bestand 24.11.2026:** 8 Titel mit mindestens zwei `s`-Zeilen, alle Pokémon (527, 1564, 1565, 9107, 14093, 19291, 97634, 112153). Horizonte (158871) bekommt die Reiter ohne weitere Arbeit, sobald Welle 1a `s` schreibt. Staffelnamen (`sn`) liest die Oberfläche noch nicht.
 - **Wächter:** `pipeline/check-folgen-staffeln.ts` (echte Komponente), `pipeline/check-panel-eigenes-werk.ts` (Reiter im echten `DetailPanel`), `tools/buehne-staffel-reiter.test.ts` (Lage, Startreiter, Kopfzeile, Tastatur, Pfeile an Bühnendaten), Messlauf `tools/buehne-pfeile-messen.mjs` (verengt die Leiste auf 120 px, weil fünf Reiter auf 375 px ganz hineinpassen).
 
+## Reihen-Reiter am Antwortkasten (24.11.2026, F157)
+
+Freigegebenes Mockup-Bild (Commit 47f7bda363, `staffel-abschnitt` Variante A): Über dem Antwortkasten steht je Staffel der **Reihe** ein Karteikarten-Reiter; ein Reiter öffnet den Titel der Staffel auf dem Weg der Reihenliste (`useReihenWechsel`). Die Folgen-Reiter im Folgenbereich (Abschnitt oben) bleiben daneben bestehen; sie wählen nur einen Abschnitt desselben Titels.
+
+- **Liste** (`web/src/components/detail/reihen-reiter-liste.ts`, `reihenReiterVon`): Sammeltitel-Geschwister nach `staffelTitel.nr` (Horizonte 1–4), sonst Hauptstaffeln mit der Beschriftung der Reihenliste ohne „Staffel“ (Hauptserie „1–5“ … „25“, 12 Reiter). Nur wenn der offene Titel selbst dabei ist und es mindestens zwei gibt (Film, Special: keine).
+- **Lage** (`reihenLageVon`, aus `titleStatus`): Punkt = läuft, Ring = kommt; beim Sammeltitel zählt die Fernsehreihe nur, bis ihre Sichtungen das Staffelende (`teilBereich.bis`) erreichen.
+- **Gestalt und Bedienung** (`reihen-reiter.tsx`): teilt Leiste, Reiterklassen, Akzentstrich, Marke und Pfeile mit den Folgen-Reitern (`staffel-reiter.tsx`, `staffel-pfeile.tsx`); der gewählte Reiter trägt Rand und Fläche der Kastenhülle (`kastenKlassen`). ARIA „Tabs“ mit manueller Aktivierung: Pfeiltasten, Pos1, Ende setzen nur den Fokus, Eingabe/Leertaste öffnet (jede Wahl lädt einen anderen Titel). Der Kasten ist das `tabpanel`.
+- **Verdrahtung:** `ReihenReiterKontext` in `DetailPanel.tsx`, gelesen in `kasten-folgen.tsx`; ohne Anbieter (Kasten allein gerendert) keine Reiter.
+- **Nichts entfällt:** am Kasten gab es keine Staffelwahl der Reihe. Die TOGGO-Staffelknöpfe (`staffel-knoepfe.tsx`) sind Absprünge zu Anbieterseiten, die Reihen-Karte (`reihen-karte.tsx`) nennt Filme, Specials und eigene Serien mit, beide bleiben.
+- **Wächter:** `pipeline/check-reihen-reiter.ts` (Liste, Lage, echtes Panel mit Klick und Tastatur), Mutanten `tools/mutationen/reihen-reiter.json`; Bau-PRs, die ein Mockup umschreiben: `tools/mockup-freigabe-pflicht.mjs`.
+
 ## Pokémon Horizonte wieder ein Titel, jede Staffel ein Abschnitt (F157, 24.11.2026)
 
 Daniel, 24.11.2026 12:49 (F157 „Abschnitt“): Lange Serien mit belegten Staffelgrenzen sind **ein** Titel, jede Staffel ist ein Abschnitt seiner Seite. Horizonte (AniList 158871, ak 14839) läuft damit wieder wie die Pokémon-Hauptserie; die Staffel-Titel 7000001–7000003 (20.–24.11.2026, PR 4603) entfallen.

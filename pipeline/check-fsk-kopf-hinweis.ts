@@ -33,6 +33,9 @@ pruefe('ohne FSK: nichts', fskAngabeVon(titel({}), translate) === undefined)
 const unter = unterzeileVon(titel({ fsk: 6, fskQuelle: 'justwatch' }), 'Staffel 23-25', false, translate)
 pruefe('Unterzeile ohne FSK-Text', !/FSK|Anbieter/.test(unter), unter)
 
+const zwei = unterzeileVon(titel({ episodes: 24 }), 'Staffel 2', false, translate)
+pruefe('Unterzeile mit zwei Gliedern: Trenner „ · “', zwei === 'Staffel 2 · 24 Folgen', zwei)
+
 if (verletzt) {
   console.error(`${verletzt} Verstöße`)
   process.exit(1)

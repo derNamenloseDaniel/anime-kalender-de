@@ -312,6 +312,7 @@ pipeline/check-folgenzahl-offen.ts
 pipeline/check-folgenzahl-sichtung.ts
 pipeline/check-fsk-franchise.ts
 pipeline/check-fsk-kopf-hinweis.ts
+pipeline/check-fsk-kopf-render.ts
 pipeline/check-genre-aus-tmdb.ts
 pipeline/check-geteilte-adressen.ts
 pipeline/check-gleiche-adresse.ts

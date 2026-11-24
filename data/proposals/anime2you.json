@@ -1,15 +1,33 @@
 {
-  "scrapedAt": "2026-11-24T04:14:13.902Z",
+  "scrapedAt": "2026-11-24T20:01:42.457Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 39,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 5,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 41,
-    "schon in einem Rubrik-Feed gelesen": 34,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 10,
-    "Sprachhinweis älter als 45 Tage": 8
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 15,
+    "schon in einem Rubrik-Feed gelesen": 8,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 1,
+    "Sprachhinweis älter als 45 Tage": 6
   },
   "proposals": [
+    {
+      "articleTitle": "polyband-Aktion: »Madoka Magica«-Komplettbox zum Sonderpreis",
+      "articleUrl": "https://www.anime2you.de/news/1075500/madoka-magica-komplettbox-zum-sonderpreis/",
+      "publishedAt": "2026-11-24",
+      "category": "disc",
+      "platforms": [
+        "crunchyroll",
+        "kino"
+      ],
+      "dates": [
+        {
+          "iso": "2026-11-30",
+          "context": "abattaktion in seinem Online-Shop gestartet. Wir fassen zusammen. Bis 30. November 2026 Bis zum 30. November 2026 bietet polyband die limiti"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
     {
       "articleTitle": "TV-Guide: Anime im deutschen Fernsehen in KW 48/2026",
       "articleUrl": "https://www.anime2you.de/news/1075001/anime-tv-programm-48-2026/",

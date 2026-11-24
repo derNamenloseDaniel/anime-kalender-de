@@ -579,8 +579,45 @@ export function sucheMitFundstellen<T>(
   return treibe(sucheGen(quelle, suchbegriff, genau, titel, sichtbarerName))
 }
 
-/** Die Suche in Schritten (siehe oben); `yield*` in der Oberfläche, `treibe` für die synchrone Fassung. */
+type SucheErgebnis<T> = { item: T; rang: number; fundstellen: Fundstelle[] }[]
+
+const STAFFEL_WORT = /^(season|staffel|saison)$/
+const ZAHL_WORT = /^\d{1,2}(st|nd|rd|th)?$/
+
+/** Die Suchwörter ohne Staffelangabe („season 2“, „staffel 3“, „2. staffel“); `undefined`, wenn keine dabei war oder nichts übrig bliebe. */
+export function ohneStaffelAngabe(suchbegriff: string): string | undefined {
+  const w = woerter(suchbegriff)
+  const weg = new Set<number>()
+  w.forEach((x, i) => {
+    if (!STAFFEL_WORT.test(x)) return
+    if (ZAHL_WORT.test(w[i + 1] ?? '')) { weg.add(i); weg.add(i + 1) }
+    else if (ZAHL_WORT.test(w[i - 1] ?? '')) { weg.add(i); weg.add(i - 1) }
+  })
+  const rest = w.filter((_, i) => !weg.has(i))
+  return weg.size && rest.length ? rest.join(' ') : undefined
+}
+
+/**
+ * Die Suche mit Rückfall (24.11.2026, „The Mighty Nein Season 2“): Findet der volle Begriff keinen Titel (rang ≤ 2), wird ohne
+ * Staffelangabe noch einmal gesucht — die Staffel steht oft nur als Termin am Werk. Trägt ein Name die Angabe („… Season 2“), gewinnt der volle Begriff.
+ */
 export function* sucheGen<T>(
+  quelle: T[],
+  suchbegriff: string,
+  genau: (item: T) => Suchfeld[],
+  titel: (item: T) => string[],
+  sichtbarerName?: (item: T) => string,
+): Generator<void, SucheErgebnis<T>> {
+  const voll = yield* sucheStufen(quelle, suchbegriff, genau, titel, sichtbarerName)
+  if (voll.some((t) => t.rang <= 2)) return voll
+  const kurz = ohneStaffelAngabe(suchbegriff)
+  if (kurz === undefined) return voll
+  const ohne = yield* sucheStufen(quelle, kurz, genau, titel, sichtbarerName)
+  return ohne.some((t) => t.rang <= 2) ? ohne : voll
+}
+
+/** Die Suche in Schritten (siehe oben); `yield*` in der Oberfläche, `treibe` für die synchrone Fassung. */
+function* sucheStufen<T>(
   quelle: T[],
   suchbegriff: string,
   genau: (item: T) => Suchfeld[],

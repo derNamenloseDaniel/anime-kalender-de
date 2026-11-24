@@ -11,6 +11,7 @@ const titel: T[] = [
   { name: 'The Mighty Nein' },
   { name: 'Re:ZERO -Starting Life in Another World- Season 2' },
   { name: 'Re:ZERO -Starting Life in Another World-' },
+  { name: 'Dorohedoro' },
   { name: 'Dorohedoro Season 2' },
   { name: '86 EIGHTY-SIX' },
 ]
@@ -30,6 +31,8 @@ pruefe('2. Staffel vorangestellt', suche('2. Staffel Mighty Nein'), ['The Mighty
 pruefe('2nd Season', suche('Mighty Nein 2nd Season'), ['The Mighty Nein'])
 pruefe('nur das Werk', suche('The Mighty Nein’'), ['The Mighty Nein'])
 pruefe('trägt ein Name die Angabe, gewinnt er', suche('Dorohedoro Season 2'), ['Dorohedoro Season 2'])
+pruefe('alle Wörter mitten im Namen zählen als Titeltreffer des vollen Begriffs', suche('Season 2 Dorohedoro'), ['Dorohedoro Season 2'])
+pruefe('ohne Angabe genügt ein Treffer mit allen Wörtern mitten im Namen', suche('Nein Mighty Season 2'), ['The Mighty Nein'])
 pruefe('Re:ZERO Season 2 bleibt die Staffel-Karte vorn', suche('Re:Zero Season 2')[0], 'Re:ZERO -Starting Life in Another World- Season 2')
 pruefe('eine Zahl ohne Staffelwort bleibt Pflicht', suche('Mighty 2'), [])
 pruefe('nur die Angabe: nichts zu streichen', ohneStaffelAngabe('Season 2'), undefined)

@@ -21,6 +21,8 @@ Anlass: Der HTML-Nachbau (`mockups/basis/`, `archiv/…/detail-panel.js`) drifte
 
 Nach dem Umbau wird „Nachher" zur echten Komponente; das Bild muss dem Mockup-Bild gleichen — das Mockup ist der spätere Test.
 
+**Vorgabe ist der Freigabe-Commit, nicht die aktuelle Datei (Lehre 270, 24.11.2026):** Ein Bau-PR kann die Mockup-Datei schon umgeschrieben haben (PR 4896 verlegte die F157-Reiter und schrieb das Mockup mit). Vor jeder Aussage „das Mockup zeigt X“ `git log --follow` der Mockup-Datei lesen und den Commit der Freigabe ansehen (bzw. das Bild im Navigator); den Mockup-Teil eines freigegebenen Entwurfs ändert nur Daniel.
+
 ## Nach dem Bau
 
 Der Mockup-PR wird vor dem Bau-PR gemergt (er hält die Entscheidung fest). Der Bau folgt dem Bild dieses Commits; ein Bau-PR leert höchstens `ersatz` auf `{}`, `titel` und `notiz` ändert nur Daniel (Wächter `tools/mockup-freigabe-pflicht.mjs`, Zeile „Mockup-Änderung freigegeben: <Zitat>“; Anlass PR 4896, 24.11.2026). Nachbau-Teile (`web/buehne/mockups/*-teile.tsx`), die nach dem Bau nur noch die echte Komponente nachbilden, werden im Bau-PR oder direkt danach gelöscht. Desktop-Standardgerät der Bühne ist „Desktop 512“ (512 px breit, `web/buehne/geraete.ts`).

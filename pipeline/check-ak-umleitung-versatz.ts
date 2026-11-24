@@ -4,14 +4,15 @@
  * - „Gesehen bis k“ an Staffel N wird durchlaufend `von − 1 + k` (Versatz aus `data/curated/horizonte-staffeln.yaml`), das Maximum gilt;
  *   Favoriten [26469, 14839] werden ein Eintrag. Der Browser schreibt das auf dem Gerät um, das ist nicht umkehrbar.
  * - `uebersetzeVerzeichnis` legt die Dreier aus `zuAk` und Yaml ab (Kulisse mit `kennungen.json` samt `zuAk`).
+ * - Jede `alteKennung` der Staffel-Yamls, die `ladeStaffelGrenzen()` liest (Pokémon, Horizonte), zieht in der Kennungsdatei per `zuAk` auf die Serie um (sonst ist `/t/<alt>/` tot).
  * Läuft in `check:logic`.
  */
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { adresseNachfolger, leseUmleitung, umleiteKarte, umleiteListe, type UmleitungsPaar } from '../web/src/lib/ak-umleiten.ts'
 import { leseFavoriten } from '../worker/src/favoriten-lesen.ts'
-import { HORIZONTE_STAFFELN, ladeStaffelGrenzen } from './lib/pokemon-staffeln.ts'
+import { HORIZONTE_STAFFELN, ladeStaffelGrenzen, type StaffelGrenzen } from './lib/pokemon-staffeln.ts'
 import { mitVersatz, staffelVersatz } from './lib/staffel-versatz.ts'
 import { uebersetzeVerzeichnis, type KennungsZeile } from './lib/ausgabe-kennung.ts'
 
@@ -65,6 +66,20 @@ const abbruch = (z: KennungsZeile[]): string => {
 }
 pruefe('fehlt eine alte Kennung in kennungen.json, bricht es ab und nennt sie (kein stiller Versatz 0)', abbruch([[14839, 158871, 17947]]) === 'Staffel-Versatz: Kennung 7000002 fehlt in data/kennungen.json', abbruch([[14839, 158871, 17947]]))
 pruefe('fehlt die Serie, nennt es die Serie', abbruch([[26470, 7000002, 0], [26471, 7000003, 0]]) === 'Staffel-Versatz: Kennung 158871 fehlt in data/kennungen.json', abbruch([[26470, 7000002, 0], [26471, 7000003, 0]]))
+
+/** Alte Staffel-Kennungen (anilist-Kennung), deren Zeile fehlt oder deren `zuAk` nicht auf die ak der Serie zeigt. */
+function ohneUmzug(z: KennungsZeile[], grenzen: StaffelGrenzen[]): number[] {
+  const je = new Map(z.map((k) => [k[1], k]))
+  return grenzen.flatMap((g) => g.staffeln.flatMap((s) => (s.alteKennung === undefined || (je.get(s.alteKennung)?.[3] !== undefined && je.get(s.alteKennung)?.[3] === je.get(g.anilistId)?.[0]) ? [] : [s.alteKennung])))
+}
+const echt = (JSON.parse(readFileSync(join(dirname(HORIZONTE_STAFFELN), '..', 'kennungen.json'), 'utf8')) as { titel: KennungsZeile[] }).titel
+const echteGrenzen = ladeStaffelGrenzen()
+const alteKennungen = echteGrenzen.flatMap((g) => g.staffeln.flatMap((s) => (s.alteKennung === undefined ? [] : [s.alteKennung])))
+pruefe('echte Staffel-Yamls geladen: Horizonte trägt die alten Kennungen 7000001–7000003 (sonst prüft der Wächter leer)', [7000001, 7000002, 7000003].every((k) => alteKennungen.includes(k)), alteKennungen)
+const fehlend = ohneUmzug(echt, echteGrenzen)
+pruefe('Kennungsdatei: jede alteKennung der Staffel-Yamls (Pokémon, Horizonte) hat zuAk auf die Serie', fehlend.length === 0, fehlend)
+pruefe('Gegenprobe: alte Kennung ohne zuAk wird genannt', JSON.stringify(ohneUmzug([[14839, 158871, 17947], [26469, 7000001, 17947]], [{ anilistId: 158871, staffeln: [{ nr: 1, von: 1, alteKennung: 7000001 }] }])) === '[7000001]')
+pruefe('Gegenprobe: zuAk auf fremde ak wird genannt', JSON.stringify(ohneUmzug([[14839, 158871, 17947], [26469, 7000001, 17947, 5]], [{ anilistId: 158871, staffeln: [{ nr: 1, von: 1, alteKennung: 7000001 }] }])) === '[7000001]')
 
 /* Ende zu Ende: `uebersetzeVerzeichnis` in einer Kulisse. */
 const wurzel = mkdtempSync(join(tmpdir(), 'ak-versatz-'))

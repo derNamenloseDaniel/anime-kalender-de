@@ -5,17 +5,38 @@ import { staffelTeile } from '@shared/staffel-folge.ts'
 import type { Release } from '@shared/types.ts'
 import type { StaffelAbschnitt } from './folgen-staffeln.ts'
 
-/** Ein Reiter (F157): die Staffel, ihre Beschriftung (nur die Nummer) und ihre Lage für die Marke. */
+/** Ein Reiter (F157): die Staffel, ihre Beschriftung (nur die Nummer), ihre Lage für die Marke und, wo belegt, ihr Name. */
 export interface Reiter {
   nr: number
   label: string
   lage: StaffelLage
+  name?: string
+  /** Ungekürzter Name aus `sn` für den Tooltip; die Kurzform `name` steht in der Box. */
+  voll?: string
+}
+
+/**
+ * Staffelnamen ohne das, was das Panel schon zeigt: den allen Namen gemeinsamen Serienteil bis „: “ und „Staffel N – “ der eigenen Nummer.
+ * Der Rest ist ein wörtliches Stück des Namens aus `sn` (`data/curated/*-staffeln.yaml`); Staffeln ohne Eintrag bleiben ohne Namen.
+ */
+export function kurzeStaffelNamen(sn: Record<string, string> | undefined): Map<number, string> {
+  const namen = Object.entries(sn ?? {})
+  const erster = namen[0]?.[1] ?? ''
+  const ende = erster.indexOf(': ')
+  const serie = ende > 0 ? erster.slice(0, ende + 2) : ''
+  const gemeinsam = namen.length > 1 && serie !== '' && namen.every(([, n]) => n.startsWith(serie) && n.length > serie.length)
+  return new Map(namen.map(([nr, n]) => {
+    const ohneSerie = gemeinsam ? n.slice(serie.length) : n
+    const vorsatz = `Staffel ${nr} – `
+    return [Number(nr), ohneSerie.startsWith(vorsatz) && ohneSerie.length > vorsatz.length ? ohneSerie.slice(vorsatz.length) : ohneSerie]
+  }))
 }
 
 /** Je Staffel der Detaildatei (`s`) ein Reiter; unter zwei Staffeln keiner, dann bleibt der Folgenbereich wie er war. */
-export function reiterVon(abschnitte: StaffelAbschnitt[], releases: Release[], today: string): Reiter[] {
+export function reiterVon(abschnitte: StaffelAbschnitt[], releases: Release[], today: string, sn?: Record<string, string>): Reiter[] {
   if (abschnitte.length < 2) return []
-  return abschnitte.map((a) => ({ nr: a.nr, label: String(a.nr), lage: staffelLage(a.von, a.offen ? undefined : a.bis, a.deutsch > 0, releases, today) }))
+  const namen = kurzeStaffelNamen(sn)
+  return abschnitte.map((a) => ({ nr: a.nr, label: String(a.nr), lage: staffelLage(a.von, a.offen ? undefined : a.bis, a.deutsch > 0, releases, today), name: namen.get(a.nr), voll: sn?.[String(a.nr)] }))
 }
 
 /** Ohne Wahl des Besuchers: die laufende Staffel, sonst die letzte mit deutscher Folge, sonst die erste. */

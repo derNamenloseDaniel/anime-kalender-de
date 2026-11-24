@@ -16,7 +16,7 @@ mockup({
     A: {
       ersatz: {},
       notiz: 'An der roten Box: Karteikarten-Reiter für die Staffeln der Reihe sitzen oben am Antwortkasten. Der gewählte Reiter hat die Farbe der Box und geht ohne Kante in sie über; er trägt oben einen Akzentstrich, alle anderen sind ruhig grau. Ein Reiter öffnet die Staffel als eigenen Titel (wie ein Klick in der Reihenliste). Eine laufende Staffel trägt oben rechts einen Punkt, eine, die noch kommt, einen Ring. Pokémon Horizonte hat 4 Reiter, Pokémon (Hauptserie) 12 für die Staffeln 1 bis 25 (ein Eintrag der Daten deckt teils mehrere Staffeln ab, z. B. „1–5“). '
-        + 'Im Folgenbereich: je Staffel der Detaildatei (`s`) ein Reiter mit ihrer Nummer, ab zwei Staffeln; er wählt nur den Abschnitt, nie den Titel. Pokémon (Staffel 1–5): fünf Reiter; Pokémon Reisen: drei (23–25). '
+        + 'Im Folgenbereich: je Staffel der Detaildatei (`s`) ein Reiter mit ihrer Nummer, ab zwei Staffeln; er wählt nur den Abschnitt, nie den Titel. Die Box nennt Folgen, Lage und Synchro der Staffel und klappt ihre Folgen auf; ohne Wahl steht er auf der laufenden Staffel, sonst auf der letzten mit deutscher Folge. Pokémon (Staffel 1–5): fünf Reiter; Pokémon Reisen: drei (23–25). Pokémon Horizonte: vier Reiter; seine Detaildatei trägt die Staffelnamen (`sn`), die Box nennt den Namen der gewählten Staffel ohne Serienteil und „Staffel N –“, der Reiter trägt ihn als zugänglichen Namen. '
         + 'Beide Leisten: Pfeile stehen nur, wenn in ihrer Richtung weitere Reiter liegen; ein Tipp rollt höchstens eine Leistenbreite; kein Scrollbalken.',
     },
   },

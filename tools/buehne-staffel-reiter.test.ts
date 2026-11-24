@@ -12,7 +12,7 @@ import { staffelLage } from '../shared/logic.ts'
 import type { Release } from '../shared/types.ts'
 import type { StaffelZeile } from '../shared/staffel-folge.ts'
 import { staffelAbschnitte } from '../web/src/components/detail/folgen-staffeln.ts'
-import { abschnittZeile, reiterVon, startReiter } from '../web/src/components/detail/staffel-reiter-liste.ts'
+import { abschnittZeile, kurzeStaffelNamen, reiterVon, startReiter } from '../web/src/components/detail/staffel-reiter-liste.ts'
 import { pfeilLageVon, sprungVon } from '../web/src/components/detail/staffel-pfeile.ts'
 import { ReiterPfeil, rolleUm } from '../web/src/components/detail/staffel-pfeile.tsx'
 import { naechsterReiter, ReiterZeile } from '../web/src/components/detail/staffel-reiter.tsx'
@@ -22,7 +22,7 @@ import '../web/buehne/mockups/staffel-abschnitt.tsx'
 
 const datei = fileURLToPath(new URL('../web/buehne/faelle.json', import.meta.url))
 const faelle = JSON.parse(readFileSync(datei, 'utf8')).faelle as Record<string, Record<string, unknown>>
-const folgen = faelle['pokemon-horizonte']!['folgen'] as Record<string, { f: [number, string][]; de: [number, number][]; s?: StaffelZeile[] }>
+const folgen = faelle['pokemon-horizonte']!['folgen'] as Record<string, { f: [number, string][]; de: [number, number][]; s?: StaffelZeile[]; sn?: Record<string, string> }>
 const HEUTE = '2026-11-24'
 const abschnitte = (id: number, istDeutsch?: (nr: number) => boolean) => {
   const l = folgen[String(id)]!
@@ -164,10 +164,37 @@ assert.deepEqual(aufruf('links', 300, false), [{ left: -300, behavior: 'smooth' 
 assert.deepEqual(aufruf('links', 300, true), [{ left: -300, behavior: 'auto' }], 'weniger Bewegung: ohne Animation')
 rolleUm(null, 'links')
 
+// Staffelnamen (`sn`, wörtlich aus horizonte-staffeln.yaml): ohne den Serienteil, den alle Namen teilen, und ohne „Staffel N – “ der eigenen Nummer.
+const hz = folgen['14839']!
+const hzReiter = reiterVon(abschnitte(14839), [], HEUTE, hz.sn)
+assert.deepEqual(hzReiter.map((r) => r.name), ['Die Serie', 'Die Suche nach Laqua', 'Gute Aussichten', 'Wunder in Sicht'], 'Horizonte: Namen')
+assert.deepEqual(hzReiter.map((r) => r.label), ['1', '2', '3', '4'], 'Reiter bleibt die Ziffer')
+assert.ok(hzReiter.every((r) => hz.sn![String(r.nr)]!.endsWith(r.name!)), 'jeder Name ist ein wörtliches Stück des Yaml-Namens')
+assert.deepEqual(reiterVon(abschnitte(14839), [], HEUTE).map((r) => r.name), [undefined, undefined, undefined, undefined], 'ohne sn: kein Name')
+assert.deepEqual(reiterVon(hs, [], HEUTE, { 2: 'Orange-Liga' }).map((r) => r.name), [undefined, 'Orange-Liga', undefined, undefined, undefined], 'nur Staffeln mit Eintrag')
+// Grenzen der Kürzung: ein einzelner Name, verschiedene Serienteile, Name ohne Rest, fremde Staffelnummer bleiben ganz.
+assert.equal(kurzeStaffelNamen({ 1: 'Serie: Eins' }).get(1), 'Serie: Eins', 'ein Name: nichts gemeinsam')
+assert.deepEqual([...kurzeStaffelNamen({ 1: 'A: Eins', 2: 'B: Zwei' }).values()], ['A: Eins', 'B: Zwei'], 'verschiedene Serienteile')
+assert.deepEqual([...kurzeStaffelNamen({ 1: 'A: Eins', 2: 'A: ' }).values()], ['A: Eins', 'A: '], 'Name ohne Rest kürzt keinen')
+assert.deepEqual([...kurzeStaffelNamen({ 1: 'Eins', 2: 'Zwei' }).values()], ['Eins', 'Zwei'], 'ohne „: “ nichts gemeinsam')
+assert.deepEqual([...kurzeStaffelNamen({ 1: 'A: Eins', 2: 'A: Staffel 3 – Drei' }).values()], ['Eins', 'Staffel 3 – Drei'], 'fremde Nummer bleibt')
+assert.deepEqual([...kurzeStaffelNamen({ 1: 'Staffel 1 – ', 2: 'Staffel 2 – Zwei' }).values()], ['Staffel 1 – ', 'Zwei'], 'Vorsatz ohne Rest bleibt')
+assert.equal(kurzeStaffelNamen(undefined).size, 0, 'ohne sn leer')
+// Gerendert: Name in der Box über der Kopfzeile, Reiter-Beschriftung „Staffel N: Name“; ohne Name keine Namenszeile.
+const hzBox = renderToStaticMarkup(createElement(StaffelAbschnitt, { reiter: hzReiter, aktiv: 1, kennung: 'h', beiWahl: () => {}, zeile: 'Kopf', kinder: null }))
+assert.match(hzBox, /<p data-staffel-name="true"[^>]*>Die Suche nach Laqua<\/p><p[^>]*>Kopf<\/p>/, 'Name über der Kopfzeile')
+assert.equal((hzBox.match(/Die Suche nach Laqua/g) ?? []).length, 2, 'Name einmal sichtbar, einmal im aria-label')
+assert.match(hzBox, /aria-label="Staffel 2: Die Suche nach Laqua"/)
+assert.match(hzBox, /aria-label="Staffel 4: Wunder in Sicht"/)
+assert.match(renderToStaticMarkup(createElement(ReiterZeile, { reiter: [{ ...hzReiter[3]!, lage: 'laeuft' }], aktiv: 0, kennung: 'h', beiWahl: () => {} })), /aria-label="Staffel 4: Wunder in Sicht, läuft"/, 'Name vor der Lage')
+const ohneName = renderToStaticMarkup(createElement(StaffelAbschnitt, { reiter: hsReiter, aktiv: 1, kennung: 'h', beiWahl: () => {}, zeile: 'Kopf', kinder: null }))
+assert.doesNotMatch(ohneName, /data-staffel-name/, 'ohne sn keine Namenszeile')
+assert.match(ohneName, /aria-label="Staffel 2"/, 'ohne sn: Beschriftung wie bisher')
+
 // Das Mockup zeigt die echte Komponente (kein Ersatz) am Fall Pokémon-Hauptserie, mit Stichtag 24.11.2026.
 const def = mockupMit('staffel-abschnitt')!
 assert.deepEqual(Object.keys(def.varianten), ['A'])
 assert.deepEqual(def.varianten.A!.ersatz, {}, 'A ohne Ersatz')
 assert.ok(def.faelle.includes('pokemon-sammeltitel'), 'Fall pokemon-sammeltitel bleibt')
 
-console.log('buehne-staffel-reiter: ok (Reiter 5/3/2/0, Lage 14 Fälle, Startreiter 5, Kopfzeile 7, Tastatur 7, Reiterzeile, ARIA-Box, Tippfläche, Pfeile, Mockup)')
+console.log('buehne-staffel-reiter: ok (Reiter 5/3/2/0, Lage 14 Fälle, Startreiter 5, Kopfzeile 7, Namen 17, Tastatur 7, Reiterzeile, ARIA-Box, Tippfläche, Pfeile, Mockup)')

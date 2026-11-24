@@ -31,6 +31,8 @@ interface Liste {
   h?: [number, string][]
   /** Deutsche Staffelgrenzen (`folgen-staffeln.ts`): Reiter je Staffel statt Paketen. */
   s?: StaffelZeile[]
+  /** Staffelnamen wörtlich aus `data/curated/*-staffeln.yaml`: `{ "1": "…" }`, nur für Staffeln mit Namen. */
+  sn?: Record<string, string>
   /** TOGGO-Seite je Staffel: `[Staffelnummer, Adresse]`. */
   tg?: [number, string][]
 }
@@ -154,7 +156,7 @@ export function FolgenBereich({ titleId, wege, erschienen, laufzeitImKopf, serie
   const sichtbar = gewaehlt?.folgen ?? folgen?.slice(paket * PAKET, paket * PAKET + PAKET) ?? []
   const reiter = (i: number) => `${i * PAKET + 1}–${Math.min((i + 1) * PAKET, folgen!.length)}`
   const nurSerienbeleg = serienbelegOhneFolgenbeleg(Boolean(serieBelegt), folgen?.map(([nr]) => nr) ?? [], deutsch)
-  const staffelReiter = reiterVon(staffeln, releases, today)
+  const staffelReiter = reiterVon(staffeln, releases, today, liste?.sn)
   if (staffelReiter.length) {
     const aktiv = wahl ?? startReiter(staffelReiter, staffeln)
     const zeilen = <FolgenListe liste={liste} sichtbar={staffeln[aktiv]!.folgen} ohneTitel={ohneTitel} nurSerienbeleg={nurSerienbeleg} deutsch={deutsch} erschienen={erschienen} />

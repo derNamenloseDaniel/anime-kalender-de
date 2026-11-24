@@ -47,6 +47,8 @@ const LISTEN: Record<string, unknown> = {
   900503: { f: F, de: [[1, 89]], s: S3, min: 24 },
   /* Eine Staffel, länger als die Titelliste (70 gegen 60): Kopf, Folgen und Paketzahl folgen der Staffel. */
   900504: { f: F.slice(0, 60), de: [[1, 10]], s: [[7, 1, 70]] },
+  /* Staffelnamen (`sn`) nur für Staffel 1 und 2: die Box der gewählten Staffel nennt ihren Namen, Staffel 3 bleibt ohne. */
+  900505: { f: F, de: [[1, 89]], s: S3, sn: { 1: 'Reihe: Erster Teil', 2: 'Reihe: Staffel 2 – Zweiter Teil' } },
 }
 globalThis.fetch = (async (adresse: unknown) => {
   const url = String(adresse)
@@ -125,6 +127,9 @@ pruefe('Reiter 1: gewählt, Kopfzeile mit Folgenzahl und Synchro', eins.gewaehlt
 pruefe('Reiter 1: Folgen der Staffel 2 stehen nicht in Staffel 1', !/Folge 46(?!\d)/.test(eins.text) && /Folge 45(?!\d)/.test(eins.text))
 const drei = await bereich(900501, '3')
 pruefe('Reiter 3: Folge 123 ohne Titel bis 136', drei.text.includes('123—') && drei.text.includes('136—') && !drei.text.includes('137—'), drei.text.slice(-120))
+const benannt = await bereich(900505)
+pruefe('sn: Box der gewählten Staffel 2 nennt ihren Namen, Reiter bleibt die Ziffer', benannt.gewaehlt.join() === '2' && benannt.abschnitt === 'Zweiter Teil' && benannt.reiter.join() === '1,2,3', benannt)
+pruefe('sn: Staffel ohne Eintrag ohne Namen', (await bereich(900505, '3')).abschnitt === 'Folge 90–136 · 47 Folgen', 'Staffel 3')
 const zu = await bereich(900503)
 pruefe('geschlossen ohne Termin: letzte deutsche Staffel (2) gewählt, keine Marke', zu.gewaehlt.join() === '2' && zu.marken.length === 0, zu)
 const termin = { slug: 'x', titleId: 900503, platform: 'netflix', releaseType: 'batch', schedule: { firstEpisodeDate: '2026-12-01', firstEpisodeNumber: 100, episodeCount: 1 } } as unknown as Release

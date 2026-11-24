@@ -48,6 +48,10 @@ export function KalenderFilter(p: KalenderFilterProps) {
         onMonat={p.onMonat}
       />
       {filterOffen && (
+        /* Unsichtbarer Schleier unter dem Feld: Ein Klick daneben schließt nur das Feld und erreicht die Karte dahinter nicht. */
+        <div data-schleier aria-hidden="true" onClick={() => setFilterOffen(false)} className="fixed inset-0 z-20" />
+      )}
+      {filterOffen && (
         /* Das Filterfeld steht über der Steuerleiste — dort, wo man es geöffnet hat. Die gewählten
            Filter stehen **im** Feld (`FilterFeld`), nicht mehr als eigene Zeile darüber. */
         <div className="fixed inset-x-2 bottom-[4.5rem] z-30 mx-auto flex max-h-[calc(100dvh-10rem)] max-w-[1180px] flex-col rounded-3xl shadow-[0_24px_60px_rgba(0,0,0,.45)]">

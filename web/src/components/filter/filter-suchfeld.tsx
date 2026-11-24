@@ -19,7 +19,7 @@ export function FilterSuche({
         onChange={(e) => setFilterQuery(e.target.value)}
         placeholder={t('filter.sucheAlle')}
         aria-label={t('filter.sucheAlle')}
-        className="h-10 w-full min-w-0 rounded-lg md:max-w-sm border-2 border-ak-text bg-ak-flaeche px-3 text-xs text-ak-text"
+        className="h-11 w-full min-w-0 rounded-lg md:max-w-sm border-2 border-ak-text bg-ak-flaeche px-3 text-xs text-ak-text"
       />
     </div>
   )

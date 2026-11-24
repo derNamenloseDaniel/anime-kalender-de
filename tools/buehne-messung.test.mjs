@@ -12,6 +12,8 @@ const GRUND = 'rgb(255, 255, 255)'
 function el(tagName, mehr = {}) {
   const e = { tagName, parentElement: null, marken: [], breite: 100, hoehe: 44, text: '', farbe: 'rgb(0, 0, 0)', hg: 'rgba(0, 0, 0, 0)', ...mehr }
   e.getAttribute = () => null
+  e.scrollIntoView = () => { e.imBild = true }
+  e.contains = (k) => { for (; k; k = k.parentElement) if (k === e) return true; return false }
   e.textContent = e.text
   e.getBoundingClientRect = () => ({ width: e.breite, height: e.hoehe, left: 0, top: 0, right: e.breite, bottom: e.hoehe })
   e.closest = (sel) => {
@@ -29,8 +31,9 @@ function stilVon(e) {
   return { display: 'block', visibility: 'visible', backgroundImage: 'none', backgroundColor: e.hg, color: e.farbe, opacity: '1', fontSize: '14px', fontWeight: '400', webkitTextFillColor: e.farbe }
 }
 
-function tippziele(ziele) {
-  globalThis.document = { querySelectorAll: () => ziele }
+/* `trifft`: Welche Elemente die Prüfpunkte treffen; ohne Angabe trifft kein Punkt etwas (nur die Elementbox zählt). */
+function tippziele(ziele, trifft = () => null) {
+  globalThis.document = { querySelectorAll: () => ziele, elementFromPoint: trifft }
   globalThis.getComputedStyle = stilVon
   return tippzieleImRahmen(MIN_TIPPZIEL)
 }
@@ -70,6 +73,19 @@ assert.equal(tippziele([el('BUTTON', { breite: 44, hoehe: 44 })]).length, 0, 'au
 assert.equal(tippziele([el('BUTTON', { breite: 44, hoehe: 43 })]).length, 1, 'ein Pixel zu niedrig: gemeldet')
 assert.equal(tippziele([el('BUTTON', { breite: 30, hoehe: 44 })]).length, 1, 'zu schmal, aber hoch genug: gemeldet')
 assert.equal(tippziele([el('BUTTON', { breite: MIN_TIPPZIEL, hoehe: MIN_TIPPZIEL })]).length, 0, 'genau auf der Grenze: ok')
+/* Wirksame Trefferfläche: Die Erweiterung (`::after`) gehört zum Knopf, ein Nachbar nicht; beide Enden der kurzen Achse müssen treffen. */
+const knopf20 = el('BUTTON', { breite: 93, hoehe: 20 })
+const nachbar = el('BUTTON', { breite: 93, hoehe: 20 })
+assert.equal(tippziele([knopf20], () => knopf20).length, 0, 'Knopf 20 px mit 44-px-Erweiterung: ok')
+assert.equal(tippziele([knopf20], (x, y) => (y < 10 ? knopf20 : nachbar)).length, 1, 'ein Ende trifft den Nachbarn: gemeldet')
+assert.equal(tippziele([knopf20], () => null).length, 1, 'Punkte treffen nichts: gemeldet')
+assert.deepEqual(tippziele([knopf20], (x, y) => (y < 10 ? knopf20 : nachbar)), [{ schluessel: 'button „“', w: 93, h: 20 }], 'gemeldet mit Elementmaß')
+const schmal = el('BUTTON', { breite: 30, hoehe: 44 })
+assert.equal(tippziele([schmal], () => schmal).length, 0, 'schmal, Erweiterung in der Breite: ok')
+/* Außerhalb des Fensters (Punkt trifft nichts) wird erst ins Bild gerollt und dann gemessen. */
+const unten = el('BUTTON', { breite: 93, hoehe: 20 })
+assert.equal(tippziele([unten], () => (unten.imBild ? unten : null)).length, 0, 'unterhalb des Fensters: nach dem Einrollen wirksam 44 px')
+assert.equal(unten.imBild, true, 'eingerollt')
 const etikett = el('LABEL', { breite: 120, hoehe: 44 })
 assert.equal(tippziele([kind(etikett, el('INPUT', { breite: 1, hoehe: 1 }))]).length, 0, 'verstecktes Feld im 44-px-Etikett: ok')
 assert.equal(tippziele([el('INPUT', { breite: 1, hoehe: 1 })]).length, 1, 'verstecktes Feld ohne Etikett: gemeldet')
@@ -86,4 +102,4 @@ for (const marke of [':disabled', '[aria-disabled="true"]', '[data-zustand="aus"
 const wach = el('DIV', { marken: [], hg: GRUND })
 assert.equal(kontrast([kind(wach, text({ farbe: SCHWACH }))]).length, 1, 'aktiver Nachbar: weiter gemeldet')
 
-console.log('ok  buehne-messung: 8 Tippziel-Fälle, 6 Kontrast-Fälle (inkl. versteckte Felder, deaktivierte Elemente)')
+console.log('ok  buehne-messung: 14 Tippziel-Fälle, 6 Kontrast-Fälle (inkl. versteckte Felder, deaktivierte Elemente)')

@@ -17,6 +17,7 @@ import { type AnisearchEintrag } from './01-quellen.ts'
 import { type SynopsisEintrag } from './13-1-anreichern.ts'
 import { type SlimTitel } from './13-2-auslieferung.ts'
 import { ergaenzeCoverGross } from './cover-gross.ts'
+import { ausgelieferteCartoons, riegelHandlungQuellen } from '../lib/handlung-quellen.ts'
 import { ohneBelegteSynchro } from './synchro-belegt.ts'
 import { schreibeSaisonDatei } from './saison-datei.ts'
 import { cartoonsMitReihe, ladeAlleEigenenWerke, markiereEigeneWerke, mitStaffelTiteln } from './cartoon-reihen.ts'
@@ -370,6 +371,7 @@ export function schreibeZusatzdateien({ titles, anisearch, slim, verschoben, rel
   ergaenzeCoverGross(synopses, slim)
   schreibeSaisonDatei(titles, releases)
   schreibeAnisearchOffen(slim)
+  riegelHandlungQuellen(synopses, ausgelieferteCartoons(readJson<Title[]>(`${OUT}/cartoons.json`, []), readJson<Title[]>(`${OUT}/titles-core.json`, [])))
   schreibeSynopsenGruppen(synopses)
   schreibeDiscGruppen(titles)
   /*

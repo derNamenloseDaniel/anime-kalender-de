@@ -670,6 +670,7 @@ pipeline/check-stuetzpunkt-ueberholt.ts
 pipeline/check-stumme-quellen.ts
 pipeline/check-such-chip.ts
 pipeline/check-suchadressen-endzustand.ts
+pipeline/check-suche-staffel-angabe.ts
 pipeline/check-suchfeld-arten.ts
 pipeline/check-suchhinweis-bereich.ts
 pipeline/check-suchhinweis-lauf.ts
@@ -744,6 +745,7 @@ pipeline/check-unsicheres-raus-ast.ts
 pipeline/check-unsicheres-raus.ts
 pipeline/check-urteil-art.ts
 pipeline/check-urteil-fremde-adresse.ts
+pipeline/check-urteil-frueh.ts
 pipeline/check-urteil-spaet.ts
 pipeline/check-urteile-ablauf.ts
 pipeline/check-us-nein-adresse.ts

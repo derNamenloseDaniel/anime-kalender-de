@@ -5,9 +5,10 @@
     "lastCount": 6
   },
   "anime2you": {
-    "lastOk": "2026-11-24T07:03:25.931Z",
-    "lastRun": "2026-11-24T07:03:25.931Z",
-    "lastCount": 55
+    "lastOk": "2026-11-24T08:02:32.108Z",
+    "lastRun": "2026-11-24T09:02:08.437Z",
+    "lastCount": 0,
+    "lastError": "Abruf gescheitert (alle Feeds): https://www.anime2you.de/streaming-news/feed/: HTTP 403"
   },
   "anisearch": {
     "lastOk": "2026-11-24T06:25:01.514Z",
@@ -84,7 +85,7 @@
   },
   "rohfolgen": {
     "lastOk": "2026-11-23T01:08:01.485Z",
-    "lastRun": "2026-11-24T07:35:47.645Z",
+    "lastRun": "2026-11-24T09:24:47.039Z",
     "lastCount": 0
   },
   "anisearch-folgen": {
@@ -113,14 +114,14 @@
     "lastCount": 9
   },
   "vorfaelle": {
-    "lastOk": "2026-11-24T07:35:43.279Z",
-    "lastRun": "2026-11-24T07:35:43.279Z",
+    "lastOk": "2026-11-24T09:24:43.931Z",
+    "lastRun": "2026-11-24T09:24:43.931Z",
     "lastCount": 0,
     "leerSeit": "2026-11-22T22:38:03.853Z"
   },
   "crunchyroll-neu": {
-    "lastOk": "2026-11-24T07:03:03.649Z",
-    "lastRun": "2026-11-24T07:03:03.649Z",
+    "lastOk": "2026-11-24T09:02:01.062Z",
+    "lastRun": "2026-11-24T09:02:01.062Z",
     "lastCount": 208
   },
   "cartoons": {
@@ -139,8 +140,8 @@
     "lastCount": 4
   },
   "tv-programm": {
-    "lastOk": "2026-11-24T07:03:30.092Z",
-    "lastRun": "2026-11-24T07:03:30.092Z",
+    "lastOk": "2026-11-24T09:02:12.459Z",
+    "lastRun": "2026-11-24T09:02:12.459Z",
     "lastCount": 283
   },
   "tv-de": {
@@ -175,8 +176,8 @@
     "lastCount": 3
   },
   "crunchyroll-woche": {
-    "lastOk": "2026-11-24T07:03:01.398Z",
-    "lastRun": "2026-11-24T07:03:01.398Z",
+    "lastOk": "2026-11-24T09:01:59.129Z",
+    "lastRun": "2026-11-24T09:01:59.129Z",
     "lastCount": 63
   },
   "adn-news": {
@@ -185,8 +186,8 @@
     "lastCount": 68
   },
   "messbelege": {
-    "lastOk": "2026-11-24T07:03:28.867Z",
-    "lastRun": "2026-11-24T07:03:28.867Z",
+    "lastOk": "2026-11-24T09:02:11.258Z",
+    "lastRun": "2026-11-24T09:02:11.258Z",
     "lastCount": 0,
     "leerSeit": "2026-11-06T18:01:33.610Z"
   },

@@ -89,7 +89,7 @@ export function rolleTermineAus({ releases, titles, jpStart }: {
     .flatMap(expandEvents)
     .sort(nachTagUndZeit)
 
-  urteilSchliesstLuecken(titles)
+  urteilSchliesstLuecken(titles, releases)
   /**
    * Gegenprobe, bevor irgendetwas geschrieben wird.
    *

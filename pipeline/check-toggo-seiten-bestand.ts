@@ -56,10 +56,14 @@ const ids = (liste: Title[]) => liste.map((t) => t.id)
 const markiere = (liste: Title[], grund: string) => liste.forEach((t) => melde(t.id, 'toggo-seiten', grund))
 if (!anime.length || !cartoons.length) rot(`Bestand nicht gelesen (${anime.length} Titel, ${cartoons.length} Cartoons)`)
 if (daten.katalog.length < 100) rot(`TOGGO-Katalog in data/toggo.json hat ${daten.katalog.length} Serien (erwartet über 100)`)
-if (falsch.length > stand.falsch) markiere(falsch, 'TOGGO-Link nicht auf der genauesten Seite')
-if (falsch.length > stand.falsch) rot(`${falsch.length} Titel mit einem TOGGO-Link, den der Bau noch ändert (Figurenseite, falsche Staffel, falscher Titel), Stand ${stand.falsch}, nur sinken: ${ids(falsch).join(', ')}`)
-if (festFehlend.length > stand.fehlend) markiere(festFehlend, 'TOGGO-Link fehlt')
-if (festFehlend.length > stand.fehlend) rot(`${festFehlend.length} Pokémon-Staffeltitel oder Handeinträge ohne TOGGO-Link, Stand ${stand.fehlend}, nur sinken: ${ids(festFehlend).join(', ')}`)
+if (falsch.length > stand.falsch) {
+  markiere(falsch, 'TOGGO-Link nicht auf der genauesten Seite')
+  rot(`${falsch.length} Titel mit einem TOGGO-Link, den der Bau noch ändert (Figurenseite, falsche Staffel, falscher Titel), Stand ${stand.falsch}, nur sinken: ${ids(falsch).join(', ')}`)
+}
+if (festFehlend.length > stand.fehlend) {
+  markiere(festFehlend, 'TOGGO-Link fehlt')
+  rot(`${festFehlend.length} Pokémon-Staffeltitel oder Handeinträge ohne TOGGO-Link, Stand ${stand.fehlend}, nur sinken: ${ids(festFehlend).join(', ')}`)
+}
 /* Katalog und Namen verschieben sich von selbst (neue Serie bei TOGGO): nur Warnung, sonst stünde jeder Sammler-Pull-Request still. */
 if (katalogFehlend.length) console.log(bestandWarnzeile('TOGGO-Seiten', 'Titel ohne TOGGO-Link, den der Bau nach dem Katalog anlegt', ids(katalogFehlend)))
 const ohneSerie = offen.map((o) => Number(o.split(' ')[0])).filter((id) => !OHNE_SERIE[id])

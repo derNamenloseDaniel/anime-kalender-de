@@ -84,7 +84,7 @@
   },
   "rohfolgen": {
     "lastOk": "2026-11-23T01:08:01.485Z",
-    "lastRun": "2026-11-24T01:57:34.534Z",
+    "lastRun": "2026-11-24T02:38:04.761Z",
     "lastCount": 0
   },
   "anisearch-folgen": {
@@ -113,8 +113,8 @@
     "lastCount": 9
   },
   "vorfaelle": {
-    "lastOk": "2026-11-24T01:57:31.104Z",
-    "lastRun": "2026-11-24T01:57:31.104Z",
+    "lastOk": "2026-11-24T02:38:00.437Z",
+    "lastRun": "2026-11-24T02:38:00.437Z",
     "lastCount": 0,
     "leerSeit": "2026-11-22T22:38:03.853Z"
   },
@@ -180,8 +180,8 @@
     "lastCount": 63
   },
   "adn-news": {
-    "lastOk": "2026-11-23T02:01:00.678Z",
-    "lastRun": "2026-11-23T02:01:00.678Z",
+    "lastOk": "2026-11-24T02:01:15.000Z",
+    "lastRun": "2026-11-24T02:01:15.000Z",
     "lastCount": 68
   },
   "messbelege": {

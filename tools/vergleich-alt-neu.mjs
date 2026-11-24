@@ -7,7 +7,8 @@
  *   node tools/vergleich-alt-neu.mjs <datei> <funktion> <fallmodul> [--ref <ref>] [--zweige a,b]
  *   (für .ts-Dateien: `npx tsx tools/vergleich-alt-neu.mjs …`)
  *
- * Das Fallmodul exportiert `faelle`: `[{ name, args: [...], dateien?: { 'rel/pfad': 'Inhalt' }, zweig?: 'Etikett' }]`.
+ * Das Fallmodul exportiert `faelle`: `[{ name, args: [...] | argsFabrik: () => [...], dateien?: { 'rel/pfad': 'Inhalt' }, zweig?: 'Etikett' }]`
+ * (`argsFabrik` liefert je Lauf frische Eingaben mit Funktionen, die sich nicht klonen lassen).
  * `dateien` füllt die Kulisse vor jedem Aufruf; `zweig` zählt, welche Pfade der Funktion die Fälle erreichen (`--zweige`: jedes
  * genannte Etikett muss mindestens einmal vorkommen, sonst Exit 1). Exit 0 gleich, 1 Abweichung oder Lücke, 2 Aufruf.
  */
@@ -17,7 +18,6 @@ import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, un
 import { tmpdir } from 'node:os'
 import { basename, dirname, extname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { serialize } from 'node:v8'
 
 const LIMIT_GIT_MS = 30_000
 let laufNr = 0
@@ -51,6 +51,34 @@ function schreibeAlt(wurzel, ref, abs) {
   return weg
 }
 
+/** Frische Eingaben je Lauf: `argsFabrik` für Aufrufe mit Funktionen (nicht klonbar), sonst tiefe Kopie von `args`. */
+function frischeArgs(f) {
+  return f.argsFabrik ? f.argsFabrik() : structuredClone(f.args)
+}
+
+/**
+ * Kanonische Schreibweise eines Wertes: Typ-Marken, Einfügereihenfolge, `undefined` ≠ fehlend, geteilte Objekte als `&n`.
+ * Statt `v8.serialize`: dessen Bytes hängen von der inneren Zeichenkettendarstellung (ein-/zweibyte) ab und waren bei
+ * gleichem Inhalt von Lauf zu Lauf verschieden (24.11.2026, baueReleases). Funktionen werden zur Marke; ihr Aufrufprotokoll
+ * steht als Feld in der Eingabe der Attrappe.
+ */
+export function kanonisch(w, gesehen = new Map()) {
+  if (typeof w === 'function') return '[Funktion]'
+  if (typeof w === 'string') return JSON.stringify(w)
+  if (typeof w === 'bigint') return `${w}n`
+  if (typeof w === 'number') return Object.is(w, -0) ? '-0' : String(w)
+  if (w === null || typeof w !== 'object') return String(w)
+  if (gesehen.has(w)) return `&${gesehen.get(w)}`
+  gesehen.set(w, gesehen.size)
+  const k = (x) => kanonisch(x, gesehen)
+  if (Array.isArray(w)) return `[${w.map(k).join(',')}]`
+  if (w instanceof Map) return `Map{${[...w].map(([a, b]) => `${k(a)}=>${k(b)}`).join(',')}}`
+  if (w instanceof Set) return `Set{${[...w].map(k).join(',')}}`
+  if (w instanceof Date) return `Date(${w.getTime()})`
+  if (w instanceof Error) return `Error(${k(w.name)},${k(w.message)})`
+  return `{${Object.entries(w).map(([a, b]) => `${JSON.stringify(a)}:${k(b)}`).join(',')}}`
+}
+
 /** Ein Aufruf unter frischer Kulisse; liefert Bytes von Rückgabe/Fehler und veränderten Eingaben sowie den Kulisse-Hash. */
 async function ruf(fn, args, dateien) {
   const kulisse = mkdtempSync(join(tmpdir(), 'ak-alt-neu-'))
@@ -67,7 +95,7 @@ async function ruf(fn, args, dateien) {
     } catch (e) {
       ergebnis = { wirft: String(e?.message ?? e) }
     }
-    return { ergebnis: serialize(ergebnis).toString('hex'), eingaben: serialize(args).toString('hex'), dateien: hashOrdner(kulisse) }
+    return { ergebnis: kanonisch(ergebnis), eingaben: kanonisch(args), dateien: hashOrdner(kulisse) }
   } finally {
     if (vorher === undefined) delete process.env.AK_ROOT
     else process.env.AK_ROOT = vorher
@@ -88,8 +116,8 @@ export async function vergleicheAltNeu({ datei, funktion, faelle, ref = 'origin/
     if (typeof alt !== 'function' || typeof neu !== 'function') throw new Error(`${funktion} ist in alter oder neuer Fassung keine exportierte Funktion`)
     for (const f of faelle) {
       if (f.zweig) z.zaehle(f.zweig)
-      const a = await ruf(alt, structuredClone(f.args), f.dateien)
-      const n = await ruf(neu, structuredClone(f.args), f.dateien)
+      const a = await ruf(alt, frischeArgs(f), f.dateien)
+      const n = await ruf(neu, frischeArgs(f), f.dateien)
       for (const was of ['ergebnis', 'eingaben', 'dateien']) if (a[was] !== n[was]) abweichungen.push({ fall: f.name, was })
     }
   } finally {

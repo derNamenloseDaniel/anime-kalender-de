@@ -35,19 +35,28 @@ function useStaffelZiele(): StaffelZiel[] | undefined {
   return ziele
 }
 
-const KNOPF = 'inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-ak-flaeche-2 px-3 text-t3 font-semibold tabular-nums text-ak-text transition hover:bg-ak-pille-hover'
+const KNOPF = 'inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border-2 px-3 text-t3 font-semibold tabular-nums text-ak-text transition hover:bg-ak-pille-hover'
+
+/** „1–5“ aus der ersten und letzten Staffel aller Ziele; jeder Anbieter kann einen anderen Bereich führen. */
+const bereich = (ziele: StaffelZiel[]) => {
+  const erste = ziele[0]!.staffeln[0]!
+  const letzte = ziele.at(-1)!.staffeln.at(-1)!
+  return erste === letzte ? String(erste) : `${erste}–${letzte}`
+}
+const nummer = (z: StaffelZiel) => z.label.replace('S', '')
 
 /** A: eine TOGGO-Pille, die Staffelseiten als Knopfreihe in ihrer Fußzeile (die echte Pille kennt `fuss`). */
 function PilleMitKnoepfen({ eig, ziele }: { eig: PilleEigenschaften; ziele: StaffelZiel[] }) {
   return (
     <Pille
       {...eig}
+      name={<>{eig.name} · Staffel {bereich(ziele)}</>}
       url={undefined}
       fuss={
         <div role="group" aria-label="TOGGO, Seite je Staffel" className="flex flex-wrap gap-1">
           {ziele.map((z) => (
-            <a key={z.url} href={z.url} target="_blank" rel="noreferrer noopener" aria-label={`TOGGO, ${z.label.replace('S', 'Staffel ')}`} className={KNOPF}>
-              {z.label}
+            <a key={z.url} href={z.url} target="_blank" rel="noreferrer noopener" aria-label={`TOGGO, Staffel ${nummer(z)}`} className={KNOPF} style={{ borderColor: eig.farbe }}>
+              {nummer(z)}
             </a>
           ))}
         </div>
@@ -61,7 +70,7 @@ function PillenJeStaffel({ eig, ziele }: { eig: PilleEigenschaften; ziele: Staff
   return (
     <div className="flex max-w-full flex-wrap items-start gap-x-2 gap-y-4">
       {ziele.map((z, i) => (
-        <Pille key={z.url} {...eig} url={z.url} unten={z.label.replace('S', 'Staffel ')} status={i === 0 ? eig.status : undefined} />
+        <Pille key={z.url} {...eig} url={z.url} unten={`Staffel ${nummer(z)}`} status={i === 0 ? eig.status : undefined} />
       ))}
     </div>
   )

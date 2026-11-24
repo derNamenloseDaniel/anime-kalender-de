@@ -3,7 +3,7 @@
  * fehlen (die zweite Staffel ist nur ein Termin am Werk). Feste Fixtures, kein Datenbestand.
  * Aufruf: npx tsx pipeline/check-suche-staffel-angabe.ts
  */
-import { ohneStaffelAngabe, sucheZweistufig } from '../web/src/lib/search.ts'
+import { ohneStaffelAngabe, sucheMitFundstellen, sucheZweistufig } from '../web/src/lib/search.ts'
 
 type T = { name: string }
 const titel: T[] = [
@@ -33,6 +33,15 @@ pruefe('nur das Werk', suche('The Mighty Nein’'), ['The Mighty Nein'])
 pruefe('trägt ein Name die Angabe, gewinnt er', suche('Dorohedoro Season 2'), ['Dorohedoro Season 2'])
 pruefe('alle Wörter mitten im Namen zählen als Titeltreffer des vollen Begriffs', suche('Season 2 Dorohedoro'), ['Dorohedoro Season 2'])
 pruefe('ohne Angabe genügt ein Treffer mit allen Wörtern mitten im Namen', suche('Nein Mighty Season 2'), ['The Mighty Nein'])
+/* Der sichtbare Name läuft durch beide Stufen: P trägt den Treffer im sichtbaren Namen, Q in einem Synonym — P steht vorn, obwohl Q zuerst kommt. */
+const paar = [
+  { sicht: 'Anderer Name', namen: ['Anderer Name', 'Mighty Nein Alpha'] },
+  { sicht: 'Mighty Nein Zeta', namen: ['Mighty Nein Zeta'] },
+]
+for (const q of ['Mighty Nein', 'Mighty Nein Season 2']) {
+  const r = sucheMitFundstellen(paar, q, (t) => t.namen.map((text) => ({ art: 'titel' as const, text })), (t) => t.namen, (t) => t.sicht)
+  pruefe(`sichtbarer Name zählt (${q})`, r.map((x) => x.item.sicht), ['Mighty Nein Zeta', 'Anderer Name'])
+}
 pruefe('Re:ZERO Season 2 bleibt die Staffel-Karte vorn', suche('Re:Zero Season 2')[0], 'Re:ZERO -Starting Life in Another World- Season 2')
 pruefe('eine Zahl ohne Staffelwort bleibt Pflicht', suche('Mighty 2'), [])
 pruefe('nur die Angabe: nichts zu streichen', ohneStaffelAngabe('Season 2'), undefined)

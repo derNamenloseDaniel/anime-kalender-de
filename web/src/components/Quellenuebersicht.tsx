@@ -4,6 +4,87 @@ import { istLink } from '@shared/quelle.ts'
 import { istEigenerTitel } from '@shared/eigene-titel.ts'
 import { useLang } from '../lib/i18n.tsx'
 
+interface QuellenZeile {
+  name: string
+  url?: string
+  speist: string
+  anzahl?: number
+}
+
+type Uebersetzer = ReturnType<typeof useLang>['t']
+
+/** Die Tabellenzeilen: je Quelle eine, Termin- und Werkquellen nach Namen zusammengelegt. */
+function quellenZeilen(
+  title: Title,
+  terminQuellen: ReturnType<typeof terminQuellenJeHost>,
+  asZiel: string | undefined,
+  t: Uebersetzer,
+): QuellenZeile[] {
+  const raus: QuellenZeile[] = [
+    ...terminQuellen.map((q) => ({
+      name: ANZEIGENAME[q.host] ?? q.host,
+      url: q.url,
+      speist: t(q.host === NAME_ORIGINAL ? 'quellen.feedOriginal' : 'quellen.feedTermine'),
+      anzahl: q.anzahl,
+    })),
+    ...(title.al && !istEigenerTitel(title.al) ? [{ name: 'AniList', url: `https://anilist.co/anime/${title.al}`, speist: t('quellen.feedWerk') }] : []),
+  ]
+  /*
+    **Verlinkt, wo wir eine Kennung haben.** Daniels Vorgabe vom 29.08.2026:
+    „beschrieben und verlinkt, wo möglich". Die Kennungen lagen im Bestand
+    (2.615 bei aniSearch, 8.876 bei ANN) und erreichten die Seite nie — die
+    Zeile nannte die Quelle und ließ den Leser dann suchen.
+
+    Ohne Kennung bleibt der Name ohne Verweis stehen; eine geratene Adresse
+    wäre schlechter als keine.
+  */
+  if (title.titleDe) {
+    raus.push({
+      name: 'aniSearch',
+      url: asZiel ?? (title.anisearchId ? `https://www.anisearch.de/anime/${title.anisearchId}` : undefined),
+      speist: t('quellen.feedDeutsch'),
+    })
+  }
+  if (title.hasVoices) {
+    raus.push({
+      name: 'Anime News Network',
+      url: title.annId
+        ? `https://www.animenewsnetwork.com/encyclopedia/anime.php?id=${title.annId}`
+        : undefined,
+      speist: t('quellen.feedStimmen'),
+    })
+  }
+  /*
+    **Die Zeile „Anbieter selbst" ist gestrichen**. Sie stand für das, was ohnehin in den Pillen
+    darüber steht — wo
+    ein Titel läuft und in welcher Sprachfassung. Eine Quellenzeile, die auf
+    die Anzeige direkt darüber zeigt, belegt nichts.
+  */
+  if (title.fsk !== undefined) raus.push({ name: 'FSK', speist: t('quellen.feedFsk') })
+  /*
+    **Eine Quelle, eine Zeile** (Daniels Vorgabe vom 29.08.2026, hier verletzt):
+    aniSearch liefert Termine **und** deutsche Titel, und stand deshalb zweimal
+    da — einmal als Terminquelle unter ihrem Hostnamen „anisearch.de", einmal
+    als Titelquelle unter „aniSearch". Am 04.09.2026: „wieso sind anisearch.de
+    und anisearch getrennt in quellen?"
+
+    Zusammengelegt wird über den Namen, nicht über die Adresse: Die Termin-URL
+    zeigt auf einen Artikel, die Titel-URL auf die Werkseite. Beide bleiben
+    erreichbar — die erste gewinnt, weil sie den Beleg trägt.
+  */
+  const zusammen = new Map<string, (typeof raus)[number]>()
+  for (const r of raus) {
+    const da = zusammen.get(r.name)
+    if (!da) zusammen.set(r.name, { ...r })
+    else {
+      if (!da.speist.includes(r.speist)) da.speist += ` · ${r.speist}`
+      da.url ??= r.url
+      if (r.anzahl) da.anzahl = (da.anzahl ?? 0) + r.anzahl
+    }
+  }
+  return [...zusammen.values()]
+}
+
 /**
  * **Woher die Angaben auf dieser Seite stammen — eine Zeile je Quelle.**
  *
@@ -40,72 +121,7 @@ export function Quellenuebersicht({ title, releases, asZiel }: { title: Title; r
     (15.08.2026). Die Zahl dahinter sagt, wie viele es sind.
   */
   const terminQuellen = useMemo(() => terminQuellenJeHost(releases), [releases])
-
-  const zeilen = useMemo(() => {
-    const raus: { name: string; url?: string; speist: string; anzahl?: number }[] = [
-      ...terminQuellen.map((q) => ({
-        name: ANZEIGENAME[q.host] ?? q.host,
-        url: q.url,
-        speist: t(q.host === NAME_ORIGINAL ? 'quellen.feedOriginal' : 'quellen.feedTermine'),
-        anzahl: q.anzahl,
-      })),
-      ...(title.al && !istEigenerTitel(title.al) ? [{ name: 'AniList', url: `https://anilist.co/anime/${title.al}`, speist: t('quellen.feedWerk') }] : []),
-    ]
-    /*
-      **Verlinkt, wo wir eine Kennung haben.** Daniels Vorgabe vom 29.08.2026:
-      „beschrieben und verlinkt, wo möglich". Die Kennungen lagen im Bestand
-      (2.615 bei aniSearch, 8.876 bei ANN) und erreichten die Seite nie — die
-      Zeile nannte die Quelle und ließ den Leser dann suchen.
-
-      Ohne Kennung bleibt der Name ohne Verweis stehen; eine geratene Adresse
-      wäre schlechter als keine.
-    */
-    if (title.titleDe) {
-      raus.push({
-        name: 'aniSearch',
-        url: asZiel ?? (title.anisearchId ? `https://www.anisearch.de/anime/${title.anisearchId}` : undefined),
-        speist: t('quellen.feedDeutsch'),
-      })
-    }
-    if (title.hasVoices) {
-      raus.push({
-        name: 'Anime News Network',
-        url: title.annId
-          ? `https://www.animenewsnetwork.com/encyclopedia/anime.php?id=${title.annId}`
-          : undefined,
-        speist: t('quellen.feedStimmen'),
-      })
-    }
-    /*
-      **Die Zeile „Anbieter selbst" ist gestrichen**. Sie stand für das, was ohnehin in den Pillen
-      darüber steht — wo
-      ein Titel läuft und in welcher Sprachfassung. Eine Quellenzeile, die auf
-      die Anzeige direkt darüber zeigt, belegt nichts.
-    */
-    if (title.fsk !== undefined) raus.push({ name: 'FSK', speist: t('quellen.feedFsk') })
-    /*
-      **Eine Quelle, eine Zeile** (Daniels Vorgabe vom 29.08.2026, hier verletzt):
-      aniSearch liefert Termine **und** deutsche Titel, und stand deshalb zweimal
-      da — einmal als Terminquelle unter ihrem Hostnamen „anisearch.de", einmal
-      als Titelquelle unter „aniSearch". Am 04.09.2026: „wieso sind anisearch.de
-      und anisearch getrennt in quellen?"
-
-      Zusammengelegt wird über den Namen, nicht über die Adresse: Die Termin-URL
-      zeigt auf einen Artikel, die Titel-URL auf die Werkseite. Beide bleiben
-      erreichbar — die erste gewinnt, weil sie den Beleg trägt.
-    */
-    const zusammen = new Map<string, (typeof raus)[number]>()
-    for (const r of raus) {
-      const da = zusammen.get(r.name)
-      if (!da) zusammen.set(r.name, { ...r })
-      else {
-        if (!da.speist.includes(r.speist)) da.speist += ` · ${r.speist}`
-        da.url ??= r.url
-        if (r.anzahl) da.anzahl = (da.anzahl ?? 0) + r.anzahl
-      }
-    }
-    return [...zusammen.values()]
-  }, [terminQuellen, title, t])
+  const zeilen = useMemo(() => quellenZeilen(title, terminQuellen, asZiel, t), [terminQuellen, title, t])
 
   return (
     <div className="mt-2 border-t border-slate-200 pt-2 dark:border-white/10">
@@ -118,43 +134,48 @@ export function Quellenuebersicht({ title, releases, asZiel }: { title: Title; r
         <span aria-hidden>{offen ? '▴' : '▾'}</span>
       </button>
 
-      {offen && (
-        <div className="mt-2 overflow-x-auto">
-          <table className="w-full text-t5">
-            <thead>
-              <tr className="text-left text-slate-400">
-                <th className="pb-1 font-semibold">{t('quellen.colSource')}</th>
-                <th className="pb-1 font-semibold">{t('quellen.colFeeds')}</th>
-              </tr>
-            </thead>
-            <tbody className="align-top">
-              {zeilen.map((r) => (
-                <tr key={r.name} className="border-t border-slate-100 dark:border-white/5">
-                  <td className="py-1 pr-3 whitespace-nowrap">
-                    {r.url ? (
-                      <a
-                        href={r.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sky-700 dark:text-sky-300 hover:underline"
-                      >
-                        {r.name}
-                      </a>
-                    ) : (
-                      <span className="text-slate-600 dark:text-slate-300">{r.name}</span>
-                    )}
-                    {r.anzahl !== undefined && r.anzahl > 1 && (
-                      <span className="ml-1 tabular-nums text-slate-400">×{r.anzahl}</span>
-                    )}
-                  </td>
-                  <td className="py-1 text-ak-leise">{r.speist}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <p className="mt-1.5 text-t5 text-slate-400">{t('quellen.note')}</p>
-        </div>
-      )}
+      {offen && <QuellenTabelle zeilen={zeilen} />}
+    </div>
+  )
+}
+
+function QuellenTabelle({ zeilen }: { zeilen: QuellenZeile[] }) {
+  const { t } = useLang()
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <table className="w-full text-t5">
+        <thead>
+          <tr className="text-left text-slate-400">
+            <th className="pb-1 font-semibold">{t('quellen.colSource')}</th>
+            <th className="pb-1 font-semibold">{t('quellen.colFeeds')}</th>
+          </tr>
+        </thead>
+        <tbody className="align-top">
+          {zeilen.map((r) => (
+            <tr key={r.name} className="border-t border-slate-100 dark:border-white/5">
+              <td className="py-1 pr-3 whitespace-nowrap">
+                {r.url ? (
+                  <a
+                    href={r.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sky-700 dark:text-sky-300 hover:underline"
+                  >
+                    {r.name}
+                  </a>
+                ) : (
+                  <span className="text-slate-600 dark:text-slate-300">{r.name}</span>
+                )}
+                {r.anzahl !== undefined && r.anzahl > 1 && (
+                  <span className="ml-1 tabular-nums text-slate-400">×{r.anzahl}</span>
+                )}
+              </td>
+              <td className="py-1 text-ak-leise">{r.speist}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="mt-1.5 text-t5 text-slate-400">{t('quellen.note')}</p>
     </div>
   )
 }

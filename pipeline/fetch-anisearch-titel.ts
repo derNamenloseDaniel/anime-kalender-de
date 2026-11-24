@@ -27,6 +27,7 @@
  * tragen.
  */
 import { titelAus, type Titelherkunft } from './lib/anisearch-titel.ts'
+import { todayIso } from '../shared/time.ts'
 import { titelFaellig } from './lib/anisearch-faellig.ts'
 import { KENNUNG } from './lib/kennung.ts'
 import { log, readJson, sleep, warn, writeJson } from './lib/util.ts'
@@ -221,8 +222,15 @@ for (const teile of Object.values(
  */
 const ALTER_TAGE = Number(/--alter[= ](\d+)/.exec(process.argv.join(' '))?.[1] ?? 180)
 /* Die Regeln (Nichtauskunft nach 30 Tagen, Synonyme seit 12.09.2026) stehen in `lib/anisearch-faellig.ts`. */
+/* Titel mit künftiger Disc-Ausgabe binnen der Frist kommen früher wieder (`lib/titel-termin-frist.ts`). */
+const ausgaben = readJson<Record<string, { datum: string }[]>>('data/disc-ausgaben.json', {})
 const faellig = (t: { id: number }): boolean =>
-  titelFaellig(bestand[String(t.id)], { jetzt: Date.now(), alterTage: ALTER_TAGE, parserStand: PARSER_STAND })
+  titelFaellig(bestand[String(t.id)], {
+    jetzt: Date.now(),
+    alterTage: ALTER_TAGE,
+    parserStand: PARSER_STAND,
+    termin: { heute: todayIso(), tage: (ausgaben[String(t.id)] ?? []).map((a) => a.datum) },
+  })
 
 const warteschlange = ohne
   .filter((t) => bruecke[String(t.id)] && faellig(t))

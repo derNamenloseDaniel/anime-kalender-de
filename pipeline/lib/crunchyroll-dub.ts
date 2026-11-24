@@ -206,6 +206,107 @@ function ohneDeutschesAngebot(serie: CrSerie, unsere: Title[], bloecke: number):
   }))
 }
 
+/**
+ * Weniger Einträge als Blöcke: der Reihenweg ist versperrt (Gun Gale Online: die
+ * Summe ging am falschen Block auf, 21.08.2026), aber nicht jede Auskunft ist verloren.
+ *
+ * Gilt die Folgenzahl eines Eintrags **nur** für vollständig deutsche Blöcke, ist
+ * gleichgültig, welcher gemeint ist (KONOSUBA `10/10 10/10 2/2 1/1 0/13`, 89 Serien
+ * am 22.08.2026). Verlangt: (1) sie trifft einen vollständig deutschen Block, (2) kein
+ * nicht durchgehend deutscher Block trägt dieselbe Zahl. Ein `dub: false` entsteht hier
+ * nie — eine Zahl nur an undeutschen Blöcken hieße bloß, dass wir den deutschen nicht sehen.
+ *
+ * Jeder Eintrag steht für sich (seit 23.08.2026; Food Wars: die mehrdeutige Dreizehn
+ * darf das Urteil der Zwölf nicht kosten).
+ */
+function urteileOhneReihenfolge(staffeln: CrStaffel[], unsere: Title[]): Urteil[] {
+  // Crunchyroll zählt Specials mit: `12/13` ist zwölf deutsche Folgen plus ein Special
+  // ohne Synchro (Food Wars Staffel 4, 23.08.2026). Die deutsche Zahl gilt nur bei Rest ≤ 2.
+  const deutscheGroessen = new Set<number>()
+  for (const s of staffeln) {
+    if (s.folgen <= 0 || s.deutsch <= 0) continue
+    if (s.deutsch === s.folgen) deutscheGroessen.add(s.folgen)
+    else if (s.folgen - s.deutsch <= 2) deutscheGroessen.add(s.deutsch)
+  }
+  // Verdächtig ist die volle Zahl jedes nicht durchgehend deutschen Blocks: `12/13` blockiert die Dreizehn.
+  const verdaechtig = new Set(
+    staffeln.filter((s) => s.folgen > 0 && s.deutsch < s.folgen).map((s) => s.folgen),
+  )
+  const eindeutig: Urteil[] = []
+  for (const t of unsere) {
+    const n = t.episodes ?? 0
+    if (!n || !deutscheGroessen.has(n) || verdaechtig.has(n)) continue
+    eindeutig.push({
+      titleId: t.id,
+      dub: true,
+      grund: `${n} Folgen treffen nur vollständig deutsche Blöcke`,
+    })
+  }
+  return eindeutig
+}
+
+/**
+ * Sammelt Einträge ab `zeiger`, bis eine der beiden gültigen Summen des Blocks erreicht ist.
+ *
+ * Nicht allein auf `block.folgen` zulaufen: Food Wars Staffel 4 hat dreizehn Einträge, zwölf
+ * deutsch — unsere Zwölf-Folgen-Staffel wäre sonst nie ein Treffer (23.08.2026).
+ */
+function sammleBisSumme(block: CrStaffel, sortiert: Title[], zeiger: number): { summe: number; laenge: number } {
+  let summe = 0
+  let laenge = 0
+  while (
+    zeiger + laenge < sortiert.length &&
+    summe < block.folgen &&
+    !(block.deutsch > 0 && block.deutsch < block.folgen && summe === block.deutsch)
+  ) {
+    summe += sortiert[zeiger + laenge].episodes ?? 0
+    laenge++
+  }
+  return { summe, laenge }
+}
+
+/**
+ * Passt die Summe auf den Block? Zwei gültige Summen, weil `block.folgen` Specials, PVs und
+ * Behind-the-Scenes mitzählt (Food Wars S4 13/12, Free! S1 14 mit zwei PV; Daniel 23.08.2026).
+ * `deutsch` zählt nur bei kleinem Rest (≤ 2); sonst läge die Grenze wieder im Ungewissen.
+ */
+function summePasst(block: CrStaffel, summe: number): { passt: boolean; ueberDeutsch: boolean } {
+  const rest = block.folgen - block.deutsch
+  const ueberDeutsch = block.deutsch > 0 && summe === block.deutsch && rest > 0 && rest <= 2
+  return { passt: summe === block.folgen || ueberDeutsch, ueberDeutsch }
+}
+
+/**
+ * Legt unsere Einträge der Reihe nach an die Blöcke an; Summen müssen **exakt** aufgehen.
+ *
+ * Geht ein Block nicht auf, ist die **ganze Reihe** hinfällig (`return []`, kein `continue`):
+ * Fruits Basket führt dort „(2019)" 0/25, „Staffel 2" 25/25, „The Final Season" 13/13, uns fehlt
+ * Staffel 1 — die Reihe legte unsere zweite Staffel an den ersten Block und lieferte `dub: false`
+ * für eine deutsche Staffel. Bleiben Einträge übrig, war die Reihe zu kurz: dann gilt nichts.
+ * Teilweise deutsche Blöcke bleiben ohne Urteil.
+ */
+function urteileNachReihenfolge(staffeln: CrStaffel[], unsere: Title[]): Urteil[] {
+  const sortiert = unsere.slice().sort((a, b) => (a.jpYear ?? 0) - (b.jpYear ?? 0) || a.id - b.id)
+  const urteile: Urteil[] = []
+  let zeiger = 0
+  for (const block of staffeln) {
+    if (zeiger >= sortiert.length) break
+    const { summe, laenge } = sammleBisSumme(block, sortiert, zeiger)
+    const { passt, ueberDeutsch } = summePasst(block, summe)
+    if (!passt || laenge === 0) return []
+    // `ueberDeutsch`: unsere Einträge decken genau die deutschen Folgen, der kleine Rest sind Specials ohne Synchro.
+    const gruppe = sortiert.slice(zeiger, zeiger + laenge)
+    if (block.deutsch === block.folgen || ueberDeutsch) {
+      for (const t of gruppe) urteile.push({ titleId: t.id, dub: true, grund: `„${block.name}" vollständig deutsch` })
+    } else if (block.deutsch === 0) {
+      for (const t of gruppe) urteile.push({ titleId: t.id, dub: false, grund: `„${block.name}" ohne deutsche Folge` })
+    }
+    zeiger += laenge
+  }
+  if (zeiger < sortiert.length) return []
+  return urteile
+}
+
 export function beurteile(serie: CrSerie, unsere: Title[]): Urteil[] {
   if (!unsere.length) return []
 
@@ -226,207 +327,9 @@ export function beurteile(serie: CrSerie, unsere: Title[]): Urteil[] {
   const vollstaendig = staffeln.every((s) => s.folgen > 0 && s.deutsch === s.folgen)
   if (vollstaendig) return vollstaendigDeutsch(serie, staffeln, unsere)
 
-  /**
-   * Gemischter Fall: unsere Einträge der Reihe nach an die Blöcke anlegen.
-   *
-   * Gerechnet wird über die Folgenzahl, wie bei ADN — nur dass hier die Blöcke
-   * fremd sind und nicht angefasst werden dürfen. Ein Block wird nur dann einem
-   * oder mehreren unserer Einträge zugeschlagen, wenn deren Folgenzahlen sich
-   * **exakt** auf seine Folgenzahl summieren. Alles andere bleibt offen: Bei
-   * einem Block, der zu 15 von 17 Folgen deutsch ist, entscheidet die genaue
-   * Grenze darüber, ob unsere Staffel 4 vollständig deutsch ist oder nicht —
-   * und diese Grenze lässt sich aus Summen nicht erraten.
-   */
-  /**
-   * Die Reihe muss vorne anfangen, sonst wird nicht gerechnet.
-   *
-   * Das Anlegen unserer Einträge an die Blöcke beginnt beim ersten Block — es
-   * unterstellt also, dass unsere Liste dieselbe Reihe von vorn abbildet. Haben
-   * wir **weniger** Einträge als Crunchyroll Blöcke, stimmt das nicht mehr, und
-   * die Folgenzahl allein merkt es nicht: Unter der Adresse
-   * `sword-art-online-alternative-gun-gale-online` führt Crunchyroll zwei
-   * Blöcke zu je zwölf Folgen, „Gun Gale Online" (keine deutsche Folge) und
-   * „Gun Gale Online II" (vollständig deutsch). Unser einziger Eintrag unter
-   * dieser Adresse ist **die zweite** Staffel, ebenfalls zwölf Folgen — die
-   * Summe ging auf, und sie ging am falschen Block auf. Herausgekommen wäre
-   * „Gun Gale Online II ohne deutsche Folge" für eine Staffel, die
-   * durchgehend deutsch ist (21.08.2026).
-   *
-   * Vorher fiel das nicht auf, weil die Serienseite alle Blöcke als
-   * vollständig deutsch las und damit Fall 2 zog. Die genauere Auskunft der
-   * Content-API legt die Lücke frei.
-   */
-  if (unsere.length < staffeln.length) {
-    /**
-     * Weniger Einträge als Blöcke — der Reihenweg ist versperrt, aber nicht
-     * jede Auskunft ist damit verloren.
-     *
-     * **Der Anlass:** Für KONOSUBA führt Crunchyroll fünf
-     * Blöcke — `10/10  10/10  2/2  1/1  0/13` —, wir haben unter dieser Adresse
-     * zwei Einträge zu je zehn Folgen. Die Reihenzuordnung stieg oben aus, und
-     * heraus kam „unbekannt" für eine Serie, deren Staffeln 1 und 2 dort
-     * vollständig deutsch laufen. Sein Urteil: „wieso sagen wir unbekannt?
-     * Unser Crunchy Auth Lauf müsste alle korrekt erfassen… sehr ärgerlich."
-     * Betroffen waren **89 Serien** im Bestand vom 22.08.2026.
-     *
-     * **Warum das hier trotzdem sicher geht**, obwohl die Reihenfolge unbekannt
-     * ist: Wenn die Folgenzahl eines Eintrags **nur** bei vollständig deutschen
-     * Blöcken vorkommt, ist es gleichgültig, welcher dieser Blöcke gemeint ist —
-     * das Urteil lautet so oder so `true`. Verlangt werden deshalb zwei Dinge:
-     *
-     *  1. Die Folgenzahl trifft **genau** einen vollständig deutschen Block.
-     *  2. **Kein** Block ohne deutsche Fassung trägt dieselbe Folgenzahl.
-     *
-     * Punkt 2 ist die Lehre aus „Gun Gale Online" (siehe oben): Dort stehen
-     * zwei Blöcke zu je zwölf Folgen nebeneinander, einer deutsch, einer nicht.
-     * Genau dieser Fall fällt hier durch — die Zahl zwölf käme auf beiden
-     * Seiten vor, also bleibt es stumm.
-     *
-     * Ein `dub: false` entsteht auf diesem Weg **nie**. Dass eine Folgenzahl
-     * nur bei undeutschen Blöcken vorkommt, hieße bloß, dass wir den passenden
-     * deutschen Block nicht sehen — kein Beleg für eine fehlende Synchro.
-     */
-    /**
-     * Zwei Größen je Block, weil Crunchyroll Specials mitzählt.
-     *
-     * Ein Block mit `12/13` ist zwölf deutsche Folgen plus ein Special ohne
-     * Synchro (Daniel, 23.08.2026, an Food Wars Staffel 4 belegt). Für unsere
-     * Zwölf-Folgen-Staffel ist **zwölf** die passende Zahl, nicht dreizehn.
-     * Aufgenommen wird die deutsche Zahl nur bei kleinem Rest — höchstens zwei
-     * Einträge —, sonst wäre es eine halb synchronisierte Staffel und die
-     * Grenze läge wieder im Ungewissen.
-     */
-    const deutscheGroessen = new Set<number>()
-    for (const s of staffeln) {
-      if (s.folgen <= 0 || s.deutsch <= 0) continue
-      if (s.deutsch === s.folgen) deutscheGroessen.add(s.folgen)
-      else if (s.folgen - s.deutsch <= 2) deutscheGroessen.add(s.deutsch)
-    }
-    /**
-     * Verdächtig ist jede Größe, die auch an einem Block hängt, der **nicht**
-     * durchgehend deutsch ist. Gezählt wird dort die volle Zahl: Ein Block mit
-     * `12/13` blockiert die Dreizehn, denn ein Dreizehn-Folgen-Eintrag könnte
-     * dieser Block sein — und dann wäre er nicht vollständig deutsch.
-     */
-    const verdaechtig = new Set(
-      staffeln.filter((s) => s.folgen > 0 && s.deutsch < s.folgen).map((s) => s.folgen),
-    )
-    /**
-     * Jeder Eintrag steht für sich.
-     *
-     * Bis zum 23.08.2026 stieg diese Schleife beim ersten Eintrag aus, der nicht
-     * passte, und verwarf damit auch die Urteile der übrigen. Das ist unnötig
-     * streng: Die Prüfung „trifft nur deutsche Blöcke" gilt je Eintrag, sie
-     * hängt nicht an den Nachbarn. Bei Food Wars kostete es das Urteil für die
-     * Zwölf-Folgen-Staffel, weil die Dreizehn daneben mehrdeutig war.
-     */
-    const eindeutig: Urteil[] = []
-    for (const t of unsere) {
-      const n = t.episodes ?? 0
-      if (!n || !deutscheGroessen.has(n) || verdaechtig.has(n)) continue
-      eindeutig.push({
-        titleId: t.id,
-        dub: true,
-        grund: `${n} Folgen treffen nur vollständig deutsche Blöcke`,
-      })
-    }
-    return eindeutig
-  }
-
-  const sortiert = unsere.slice().sort((a, b) => (a.jpYear ?? 0) - (b.jpYear ?? 0) || a.id - b.id)
-  const urteile: Urteil[] = []
-  let zeiger = 0
-  for (const block of staffeln) {
-    if (zeiger >= sortiert.length) break
-    /**
-     * Gesammelt wird, bis eine der beiden gültigen Summen erreicht ist.
-     *
-     * Bis zum 23.08.2026 lief die Schleife allein auf `block.folgen` zu. Bei
-     * Food Wars Staffel 4 — dreizehn Einträge, zwölf davon deutsch — war unser
-     * Eintrag mit zwölf Folgen damit nie ein Treffer: Die Schleife sah `12 < 13`,
-     * nahm die nächste Staffel dazu und landete bei 25. Der Block ging nicht auf,
-     * und nach der Regel oben fiel die ganze Reihe.
-     */
-    let summe = 0
-    let laenge = 0
-    while (
-      zeiger + laenge < sortiert.length &&
-      summe < block.folgen &&
-      !(block.deutsch > 0 && block.deutsch < block.folgen && summe === block.deutsch)
-    ) {
-      summe += sortiert[zeiger + laenge].episodes ?? 0
-      laenge++
-    }
-    /**
-     * Geht ein Block nicht auf, ist die **ganze Reihe** hinfällig — nicht nur
-     * dieser eine Schritt.
-     *
-     * Ein `continue` ließe die bereits erzeugten Urteile stehen und den Zeiger
-     * weiterlaufen. Das setzte voraus, dass alles davor richtig zugeordnet war — und genau das
-     * ist nicht gesichert, wenn irgendwo eine Zahl nicht passt.
-     *
-     * **Der Fall, der es zeigt (Fruits Basket, gefunden über die Stichprobe in
-     * `check-quellen.ts`):** Crunchyroll führt dort drei Blöcke — „Fruits Basket
-     * (2019)" mit 0/25 deutsch, „Staffel 2" mit 25/25 und „The Final Season" mit
-     * 13/13. Wir haben ebenfalls drei Einträge, aber der erste davon ist bereits
-     * **die zweite Staffel** (25 Folgen, 2020); für Staffel 1 fehlt uns der
-     * Crunchyroll-Verweis. Die Reihe legt unseren „2nd Season" also an den
-     * ersten Block an, die Summe geht auf — und heraus kommt `dub: false` für
-     * eine Staffel, die dort vollständig deutsch läuft. Der Verweis wäre damit
-     * **entfernt** worden.
-     *
-     * Die Zählsperre `unsere.length < staffeln.length` fängt das nicht: Hier
-     * stehen drei Einträge gegen drei Blöcke. Erst der zweite Block fliegt auf
-     * (13 + 1 = 14 statt 25) — und dieses Auffliegen muss rückwirkend gelten.
-     *
-     * Dass der Fehler bisher nicht sichtbar wurde, lag allein daran, dass eine
-     * frühere Quelle im Build bereits `dub: true` gesetzt hatte und
-     * Crunchyroll deshalb übersprungen wurde. Ein Fehler, der nur durch die
-     * Reihenfolge anderer Quellen gedeckt ist, ist kein behobener Fehler.
-     */
-    /**
-     * Zwei gültige Summen, weil Crunchyroll mehr zählt als Folgen.
-     *
-     * `block.folgen` enthält **Specials, PVs und Behind-the-Scenes** — Einträge,
-     * die dort in der Folgenliste stehen, aber keine regulären Folgen sind.
-     * Daniels Prüfung vom 23.08.2026 an drei Serien:
-     *
-     * | Serie | Crunchyroll | tatsächlich |
-     * |---|---|---|
-     * | Food Wars, Staffel 4 | 13 Einträge, 12 deutsch | 12 Folgen + Special „E-EX Hinter den Kulissen" (doppelte Laufzeit, ohne Synchro) |
-     * | Free!, Staffel 1 | 14 Einträge, 0 deutsch | 12 Folgen + zwei PV |
-     * | Golden Kamuy | 49 Einträge, 49 deutsch | unsere Staffeln 1–4 zusammen (12+12+12+13) |
-     *
-     * Unsere Folgenzahl trifft deshalb mal `folgen` und mal `deutsch`. Beide
-     * werden zugelassen — aber `deutsch` nur, wenn der Rest **klein** ist:
-     * Höchstens zwei nicht-deutsche Einträge, sonst wäre es kein Special-Anhang,
-     * sondern eine halb synchronisierte Staffel, und dort liegt die Grenze
-     * zwischen deutsch und nicht wieder im Ungewissen.
-     */
-    const restEinträge = block.folgen - block.deutsch
-    const passtUeberDeutsch = block.deutsch > 0 && summe === block.deutsch && restEinträge > 0 && restEinträge <= 2
-    if ((summe !== block.folgen && !passtUeberDeutsch) || laenge === 0) return []
-    // Nur eindeutige Blöcke: entweder ganz deutsch oder gar nicht.
-    // `passtUeberDeutsch` heißt: Unsere Einträge decken genau die deutschen
-    // Folgen ab, der kleine Rest sind Specials ohne Synchro.
-    if (block.deutsch === block.folgen || passtUeberDeutsch) {
-      for (const t of sortiert.slice(zeiger, zeiger + laenge)) {
-        urteile.push({ titleId: t.id, dub: true, grund: `„${block.name}" vollständig deutsch` })
-      }
-    } else if (block.deutsch === 0) {
-      for (const t of sortiert.slice(zeiger, zeiger + laenge)) {
-        urteile.push({ titleId: t.id, dub: false, grund: `„${block.name}" ohne deutsche Folge` })
-      }
-    }
-    // Teilweise vertretene Blöcke bleiben bewusst ohne Urteil.
-    zeiger += laenge
-  }
-  /**
-   * Bleiben eigene Einträge übrig, war die Reihe zu kurz — dieselbe Unsicherheit
-   * wie oben, nur am anderen Ende. Dann gilt nichts.
-   */
-  if (zeiger < sortiert.length) return []
-  return urteile
+  // Gemischter Fall. Die Reihe muss vorne anfangen: mit weniger Einträgen als Blöcken wird nicht der Reihe nach gerechnet.
+  if (unsere.length < staffeln.length) return urteileOhneReihenfolge(staffeln, unsere)
+  return urteileNachReihenfolge(staffeln, unsere)
 }
 
 /**

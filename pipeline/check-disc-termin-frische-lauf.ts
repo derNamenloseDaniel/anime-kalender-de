@@ -14,30 +14,37 @@ const wurzel = mkdtempSync(join(tmpdir(), 'ak-disc-frische-lauf-'))
 let fehler = 0
 try {
   for (const d of ['data/anisearch-raw', 'public/data']) mkdirSync(join(wurzel, d), { recursive: true })
-  const schreibe = (pfad: string, inhalt: unknown) => writeFileSync(join(wurzel, pfad), typeof inhalt === 'string' ? inhalt : JSON.stringify(inhalt))
+  const schreibe = (pfad: string, inhalt: unknown) => writeFileSync(join(wurzel, pfad), JSON.stringify(inhalt))
   for (const asId of [701, 702, 703]) writeFileSync(join(wurzel, `data/anisearch-raw/${asId}.html.gz`), '')
-  const alt = { info: {}, fetchedAt: '2000-01-01T00:00:00.000Z' }
-  schreibe('data/anime-ids.json', { updatedAt: '2999-01-01T00:00:00.000Z', anisearch: { 1: 701, 2: 702, 3: 703 } })
-  schreibe('public/data/titles.json', [{ id: 1 }, { id: 2 }, { id: 3 }])
-  schreibe('public/data/releases.json', [])
-  schreibe('public/data/ohne-synchro.json', [])
-  schreibe('data/anisearch.json', { 1: alt, 2: alt, 3: alt })
-  schreibe('data/disc-ausgaben.json', { 1: [{ edition: 'Zukunft', datum: '2999-12-31' }], 2: [{ edition: 'Vergangen', datum: '2000-01-01' }] })
   const attrappe = join(wurzel, 'attrappe.mjs')
   writeFileSync(attrappe, "globalThis.fetch = async () => new Response('', { status: 404 })\n")
-  const r = spawnSync(
-    process.execPath,
-    ['--import', pathToFileURL(attrappe).href, '--import', 'tsx', join(vorher, 'pipeline/fetch-anisearch.ts'), '--limit', '5', '--alter', '100000'],
-    { cwd: vorher, env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8', timeout: 90_000, windowsHide: true },
-  )
-  const aus = `${r.stdout}${r.stderr}`
-  const pruefe = (text: string, ok: boolean) => {
-    if (ok) return
-    fehler++
-    console.error(`FEHLER ${text}\n${aus.slice(-600)}`)
+  const alt = { info: {}, fetchedAt: '2000-01-01T00:00:00.000Z' }
+  const ausgaben = { 1: [{ edition: 'Zukunft', datum: '2999-12-31' }], 2: [{ edition: 'Vergangen', datum: '2000-01-01' }] }
+
+  /** Ein Lauf auf frischem Stand (der Lauf schreibt `anisearch.json` um); `null` lässt `disc-ausgaben.json` weg. */
+  function lauf(args: string[], disc: unknown) {
+    schreibe('data/anime-ids.json', { updatedAt: '2999-01-01T00:00:00.000Z', anisearch: { 1: 701, 2: 702, 3: 703 } })
+    schreibe('public/data/titles.json', [{ id: 1 }, { id: 2 }, { id: 3 }])
+    schreibe('public/data/releases.json', [])
+    schreibe('public/data/ohne-synchro.json', [])
+    schreibe('data/anisearch.json', { 1: alt, 2: alt, 3: alt })
+    for (const alte of ['data/disc-ausgaben.json', 'data/anisearch-archiv-weg.json']) rmSync(join(wurzel, alte), { force: true })
+    if (disc) schreibe('data/disc-ausgaben.json', disc)
+    const r = spawnSync(
+      process.execPath,
+      ['--import', pathToFileURL(attrappe).href, '--import', 'tsx', join(vorher, 'pipeline/fetch-anisearch.ts'), '--alter', '100000', ...args],
+      { cwd: vorher, env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8', timeout: 90_000, windowsHide: true },
+    )
+    return { status: r.status, aus: `${r.stdout}${r.stderr}` }
   }
-  pruefe(`Exit 0 (war ${r.status})`, r.status === 0)
-  pruefe('genau eine Seite wird geholt (Titel 1, künftige Ausgabe)', /aniSearch: 1 Seiten werden geholt/.test(aus))
+  const pruefe = (text: string, l: { status: number | null; aus: string }, soll: RegExp) => {
+    if (l.status === 0 && soll.test(l.aus)) return
+    fehler++
+    console.error(`FEHLER ${text} (Exit ${l.status}, erwartet ${soll})\n${l.aus.slice(-600)}`)
+  }
+  pruefe('genau eine Seite (Titel 1, künftige Ausgabe)', lauf(['--limit', '5'], ausgaben), /aniSearch: 1 Seiten werden geholt/)
+  pruefe('ohne disc-ausgaben.json läuft der Lauf weiter, nichts fällig', lauf(['--limit', '5'], null), /nichts nachzuladen/)
+  pruefe('force holt alle drei, limit schneidet auf zwei', lauf(['--force', '--limit', '2'], ausgaben), /aniSearch: 2 Seiten werden geholt/)
 } finally {
   rmSync(wurzel, { recursive: true, force: true })
 }

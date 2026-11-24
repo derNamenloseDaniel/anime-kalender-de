@@ -26,7 +26,7 @@
   { "name": "11-2-2 Gedächtnis-Schlüssel vertauscht", "datei": "pipeline/bau/11-2-2-wege-ohne-weg.ts", "suche": "`${v.titleId}|${v.plattform}`", "ersetze": "`${v.plattform}|${v.titleId}`" },
   { "name": "11-2-2 Titel ohne Weg gilt nicht als leer", "datei": "pipeline/bau/11-2-2-wege-ohne-weg.ts", "suche": "const leer = !da.plattformen.size && [...da.namen]", "ersetze": "const leer = false && [...da.namen]" },
   { "name": "11-2 Aufruf ohne Gedächtnis", "datei": "pipeline/bau/11-2-justwatch.ts", "suche": "entfernt: entfernteVerweise(),", "ersetze": "entfernt: new Set<string>()," },
-  { "name": "tmdb-faellig Fehlschlag von vor der Regel nicht in der Auswahl", "datei": "pipeline/lib/tmdb-faellig.ts", "suche": " || filmNeusucheFaellig(t.id, e, o)) return true", "ersetze": ") return true" },
+  { "name": "tmdb-faellig Fehlschlag von vor der Regel nicht in der Auswahl", "datei": "pipeline/lib/tmdb-faellig.ts", "suche": " || filmNeusucheFaellig(t.id, e, o) || nah(t.id)) return true", "ersetze": " || nah(t.id)) return true", "zeile": 43 },
   { "name": "tmdb-faellig Vorrang in der Sortierung entfällt", "datei": "pipeline/lib/tmdb-faellig.ts", "suche": "Number(filmNeusucheFaellig(b.id, cache[b.id], o)) - Number(filmNeusucheFaellig(a.id, cache[a.id], o)) ||", "ersetze": "" },
   { "name": "tmdb-faellig Vorrang umgekehrt", "datei": "pipeline/lib/tmdb-faellig.ts", "suche": "Number(filmNeusucheFaellig(b.id, cache[b.id], o)) - Number(filmNeusucheFaellig(a.id, cache[a.id], o))", "ersetze": "Number(filmNeusucheFaellig(a.id, cache[a.id], o)) - Number(filmNeusucheFaellig(b.id, cache[b.id], o))" },
   { "name": "tmdb-faellig Vorrang vor tote Kennungen", "datei": "pipeline/lib/tmdb-faellig.ts", "suche": "Number(tot(b)) - Number(tot(a)) ||", "ersetze": "" },

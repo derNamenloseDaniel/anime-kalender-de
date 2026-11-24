@@ -816,6 +816,7 @@ tools/buehne-optionen-ort.test.tsx
 tools/buehne-speicher.test.ts
 tools/buehne-staffel-reiter.test.ts
 tools/buehne-start.test.ts
+tools/buehne-toggo-pillen.test.ts
 tools/buehne-zellenhoehe.test.ts
 tools/check-patchnotes-pflicht.mjs
 tools/design-klassen.mjs

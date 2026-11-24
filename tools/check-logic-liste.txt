@@ -835,6 +835,7 @@ tools/quellen-leer.test.ts
 tools/quelltext-lesungen.mjs
 tools/quittung-nach-commit-waechter.mjs
 tools/sammler-pruefschritt-waechter.mjs
+tools/scrollbar-layer.test.mjs
 tools/skript-aufrufer-wache.mjs
 tools/start-pruefung-wacht.mjs
 tools/stumme-pfade.mjs

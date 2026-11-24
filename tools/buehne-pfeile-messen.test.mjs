@@ -2,36 +2,32 @@
 import assert from 'node:assert/strict'
 import { bewerte, exitVon, lauf } from './buehne-pfeile-messen.mjs'
 
-const gut = (v) => ({
-  links: { pfeilL: v === 'A' ? 'fehlt' : 'aus', pfeilR: 'an', rand: 'reiter' },
+const gut = () => ({
+  links: { pfeilL: 'fehlt', pfeilR: 'an', rand: 'reiter' },
   mitte: { pfeilL: 'an', pfeilR: 'an' },
-  rechts: { pfeilL: 'an', pfeilR: v === 'A' ? 'fehlt' : 'aus', rand: 'reiter' },
+  rechts: { pfeilL: 'an', pfeilR: 'fehlt', rand: 'reiter' },
   klick: { c: 300, nachRechts: 301, nachLinks: 0 },
   flaeche: { oben: true, unten: true, seitlich: true },
-  aus: { rolltNach: 0 },
 })
-const mit = (v, pfad, wert) => {
-  const m = gut(v)
+const mit = (pfad, wert) => {
+  const m = gut()
   const [a, b] = pfad.split('.')
   m[a][b] = wert
   return m
 }
 
-for (const v of ['A', 'B']) assert.deepEqual(bewerte(v, gut(v)), [], `${v}: gute Messung ohne Befund`)
+assert.deepEqual(bewerte(gut()), [], 'gute Messung ohne Befund')
 // Je Prüfung ein roter Fall.
-assert.equal(bewerte('A', mit('A', 'links.pfeilL', 'an')).length, 1, 'A: Pfeil links ganz links müsste fehlen')
-assert.equal(bewerte('B', mit('B', 'links.pfeilL', 'fehlt')).length, 1, 'B: Pfeil links ganz links müsste gedimmt stehen')
-assert.equal(bewerte('B', mit('B', 'rechts.pfeilR', 'an')).length, 1, 'B: Pfeil rechts ganz rechts müsste gedimmt sein')
-assert.equal(bewerte('A', mit('A', 'mitte.pfeilR', 'fehlt')).length, 1, 'Mitte: beide Pfeile')
-assert.equal(bewerte('A', mit('A', 'klick.nachRechts', 302)).length, 0, 'Klick: 2 px Snap sind erlaubt')
-assert.equal(bewerte('A', mit('A', 'klick.nachRechts', 303)).length, 1, 'Klick: 3 px über der Leiste ist zu weit')
-assert.equal(bewerte('A', mit('A', 'klick.nachRechts', 100)).length, 1, 'Klick: rollt zu wenig')
-assert.equal(bewerte('A', mit('A', 'klick.nachLinks', 301)).length, 1, 'Klick links rollt nicht zurück')
-assert.equal(bewerte('B', mit('B', 'links.rand', 'pfeil links')).length, 1, 'Rand des ersten Reiters fängt der Pfeil ab')
-assert.equal(bewerte('A', mit('A', 'rechts.rand', 'pfeil rechts')).length, 1, 'Rand des letzten Reiters fängt der Pfeil ab')
-assert.equal(bewerte('A', mit('A', 'flaeche.seitlich', false)).length, 1, 'Trefferfläche zu schmal')
-assert.equal(bewerte('B', mit('B', 'aus.rolltNach', 40)).length, 1, 'B: deaktivierter Pfeil rollt')
-assert.equal(bewerte('A', mit('A', 'aus.rolltNach', 40)).length, 0, 'A hat keinen deaktivierten Pfeil')
+assert.equal(bewerte(mit('links.pfeilL', 'an')).length, 1, 'Pfeil links ganz links müsste fehlen')
+assert.equal(bewerte(mit('rechts.pfeilR', 'an')).length, 1, 'Pfeil rechts ganz rechts müsste fehlen')
+assert.equal(bewerte(mit('mitte.pfeilR', 'fehlt')).length, 1, 'Mitte: beide Pfeile')
+assert.equal(bewerte(mit('klick.nachRechts', 302)).length, 0, 'Klick: 2 px Snap sind erlaubt')
+assert.equal(bewerte(mit('klick.nachRechts', 303)).length, 1, 'Klick: 3 px über der Leiste ist zu weit')
+assert.equal(bewerte(mit('klick.nachRechts', 100)).length, 1, 'Klick: rollt zu wenig')
+assert.equal(bewerte(mit('klick.nachLinks', 301)).length, 1, 'Klick links rollt nicht zurück')
+assert.equal(bewerte(mit('links.rand', 'pfeil links')).length, 1, 'Rand des ersten Reiters fängt der Pfeil ab')
+assert.equal(bewerte(mit('rechts.rand', 'pfeil rechts')).length, 1, 'Rand des letzten Reiters fängt der Pfeil ab')
+assert.equal(bewerte(mit('flaeche.seitlich', false)).length, 1, 'Trefferfläche zu schmal')
 
 // Exit-Code: Messlauf 0 auch bei Befunden, streng 1 nur mit Befund.
 assert.equal(exitVon(3, false), 0, 'Messlauf mit Befunden: Exit 0')
@@ -43,4 +39,4 @@ const attrappe = async () => ({ browser: { close: async () => { zu++ } }, seite:
 await assert.rejects(lauf({ starte: attrappe, ausgabe: () => {} }), /Bühne fehlt/)
 assert.equal(zu, 1, 'Browser nach Abbruch geschlossen')
 
-console.log('buehne-pfeile-messen: ok (13 Bewertungsfälle, 3 Exit-Fälle, Abbruch schließt den Browser)')
+console.log('buehne-pfeile-messen: ok (10 Bewertungsfälle, 3 Exit-Fälle, Abbruch schließt den Browser)')

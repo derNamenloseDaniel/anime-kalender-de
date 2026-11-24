@@ -11,8 +11,8 @@ import { lageVon } from '../web/buehne/mockups/staffel-lage.ts'
 import { reiterVon } from '../web/buehne/mockups/staffel-reiter-liste.ts'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { KastenPfeileEinblenden, KastenPfeileImmer } from '../web/buehne/mockups/staffel-abschnitt.tsx'
-import { pfeilLageVon, pfeilZustandVon, sprungVon, type PfeilModus } from '../web/buehne/mockups/staffel-pfeile.ts'
+import { KastenMitReitern } from '../web/buehne/mockups/staffel-abschnitt.tsx'
+import { pfeilLageVon, sprungVon } from '../web/buehne/mockups/staffel-pfeile.ts'
 import { ReiterPfeil, rolleUm } from '../web/buehne/mockups/staffel-pfeile.tsx'
 import { ReiterZeile } from '../web/buehne/mockups/staffel-reiter.tsx'
 import { mockupMit } from '../web/buehne/register.ts'
@@ -100,20 +100,14 @@ assert.deepEqual(pfeilLageVon(420, 722, 300), { links: true, rechts: true }, '2 
 // Ein Klick rollt um genau die sichtbare Breite, links negativ.
 assert.equal(sprungVon('rechts', 300), 300, 'Sprung rechts');
 assert.equal(sprungVon('links', 437), -437, 'Sprung links');
-// Einblenden: Pfeil nur mit weiteren Reitern; Immer: Pfeil immer, aktiv nur mit weiteren Reitern.
-assert.deepEqual(pfeilZustandVon('einblenden', true), { sichtbar: true, aktiv: true })
-assert.deepEqual(pfeilZustandVon('einblenden', false), { sichtbar: false, aktiv: false })
-assert.deepEqual(pfeilZustandVon('immer', true), { sichtbar: true, aktiv: true })
-assert.deepEqual(pfeilZustandVon('immer', false), { sichtbar: true, aktiv: false })
-// Gerenderter Pfeil: Beschriftung, deaktiviert nur ohne weitere Reiter, in „einblenden“ ohne weitere Reiter gar nicht da.
-const pfeil = (richtung: 'links' | 'rechts', modus: PfeilModus, weitere: boolean) => renderToStaticMarkup(createElement(ReiterPfeil, { richtung, modus, weitere, beiKlick: () => {} }))
-assert.match(pfeil('links', 'immer', true), /aria-label="Vorherige Staffeln"[^>]*aria-disabled="false"/)
-assert.match(pfeil('rechts', 'immer', true), /aria-label="Weitere Staffeln"[^>]*aria-disabled="false"/)
-assert.match(pfeil('rechts', 'immer', false), /aria-label="Weitere Staffeln"[^>]*aria-disabled="true"/)
-assert.match(pfeil('rechts', 'immer', false), /class="[^"]*pointer-events-none/, 'deaktiviert: keine Treffer (auch nicht über ::after)')
-assert.doesNotMatch(pfeil('rechts', 'immer', true), /pointer-events-none/, 'aktiv: nimmt Treffer an')
-assert.equal(pfeil('links', 'einblenden', false), '', 'einblenden: links ohne Reiter links nicht da')
-assert.match(pfeil('links', 'einblenden', true), /data-pfeil="links"/)
+// Gerenderter Pfeil: Beschriftung; ohne weitere Reiter in seiner Richtung gar nicht da.
+const pfeil = (richtung: 'links' | 'rechts', weitere: boolean) => renderToStaticMarkup(createElement(ReiterPfeil, { richtung, weitere, beiKlick: () => {} }))
+assert.match(pfeil('links', true), /aria-label="Vorherige Staffeln"/)
+assert.match(pfeil('rechts', true), /aria-label="Weitere Staffeln"/)
+assert.doesNotMatch(pfeil('rechts', true), /aria-disabled|pointer-events-none/, 'kein gedimmter Pfeil mehr')
+assert.equal(pfeil('links', false), '', 'links ohne Reiter links nicht da')
+assert.equal(pfeil('rechts', false), '', 'rechts ohne Reiter rechts nicht da')
+assert.match(pfeil('links', true), /data-pfeil="links"/)
 // rolleUm: Attrappe mit clientWidth 300 und aufgezeichnetem scrollBy; links −300, rechts +300, bei „weniger Bewegung“ ohne Animation.
 const aufruf = (richtung: 'links' | 'rechts', clientWidth: number, ruhig: boolean) => {
   const gerufen: ScrollToOptions[] = []
@@ -127,16 +121,13 @@ assert.deepEqual(aufruf('links', 300, false), [{ left: -300, behavior: 'smooth' 
 assert.deepEqual(aufruf('rechts', 437, false), [{ left: 437, behavior: 'smooth' }], 'Sprung folgt der Leistenbreite')
 assert.deepEqual(aufruf('links', 300, true), [{ left: -300, behavior: 'auto' }], 'weniger Bewegung: ohne Animation')
 rolleUm(null, 'links') // ohne Leiste: kein Fehler
-// Die Reiterzeile reicht den Modus an beide Pfeile durch (erster Aufbau ohne Messung: beide
-// deaktiviert; die Lage selbst misst erst der Browser, siehe Bilder im PR).
-const zeile = (modus: PfeilModus) => renderToStaticMarkup(createElement(ReiterZeile, { reiter: reiter(10852), aktiv: 10852, lagen: new Map(), farbe: '', pfeile: modus }))
-assert.equal((zeile('immer').match(/data-pfeil=/g) ?? []).length, 2, 'immer: beide Pfeile in der Zeile')
-assert.equal((zeile('einblenden').match(/data-pfeil=/g) ?? []).length, 0, 'einblenden: vor der Messung kein Pfeil')
-assert.equal((zeile('immer').match(/<button/g) ?? []).length, 12 + 2, '12 Reiter plus 2 Pfeile')
-// Die beiden Varianten des einen Mockups tauschen verschiedene Kästen (A einblenden, B immer).
+// Die Reiterzeile zeigt vor der Messung keinen Pfeil; die Lage selbst misst erst der Browser, siehe Bilder im PR.
+const zeile = renderToStaticMarkup(createElement(ReiterZeile, { reiter: reiter(10852), aktiv: 10852, lagen: new Map(), farbe: '' }))
+assert.equal((zeile.match(/data-pfeil=/g) ?? []).length, 0, 'vor der Messung kein Pfeil')
+assert.equal((zeile.match(/<button/g) ?? []).length, 12, '12 Reiter')
+// Das Mockup hat genau eine Nachher-Fassung (A); Variante B (Pfeile immer, gedimmt) ist entfernt (Daniel, 24.11.2026).
 const varianten = mockupMit('staffel-abschnitt')!.varianten
-assert.deepEqual(Object.keys(varianten), ['A', 'B'])
-assert.equal(varianten.A!.ersatz.AntwortKasten, KastenPfeileEinblenden, 'A: einblenden')
-assert.equal(varianten.B!.ersatz.AntwortKasten, KastenPfeileImmer, 'B: immer')
+assert.deepEqual(Object.keys(varianten), ['A'])
+assert.equal(varianten.A!.ersatz.AntwortKasten, KastenMitReitern, 'A: Kasten mit Reitern')
 
-console.log('buehne-staffel-reiter: ok (Horizonte 4, Pokémon 12, Attack on Titan 4 ohne Junior High, Film/Special/leer/allein 0, Pfeile A/B)')
+console.log('buehne-staffel-reiter: ok (Horizonte 4, Pokémon 12, Attack on Titan 4 ohne Junior High, Film/Special/leer/allein 0, Pfeile)')

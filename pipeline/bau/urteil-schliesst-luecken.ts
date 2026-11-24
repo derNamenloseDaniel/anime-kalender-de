@@ -19,16 +19,19 @@ import { urteilDarfBelegen } from '../lib/urteil-weg.ts'
  * Ein Urteil „kein deutsch" setzt hier nichts: Ein Nein entfernt Wege, und das gehört zu
  * Schritt 2, wenn die Gegenproben dafür stehen.
  */
-export function urteilSchliesstLuecken(titles: Map<number, Title>): void {
+export function urteilSchliesstLuecken(titles: Map<number, Title>, releases: Release[]): void {
   const jaJeWeg = urteilJaJeWeg()
   /* Auch das Urteil beruht auf Amazons Sprachangabe; auf einem Kanal-Titel ist sie kein Beleg (`lib/kanal-titel.ts`). */
   const kanal = kanalAdressenOhneBeleg(ladeKanalWissen())
+  /* Tragen alle Termine des Anbieters eine Sprachkennzeichnung, bricht `deutschNurAusSpracheTermin` jedes Ja ab (Demon Slayer Mugen Train, Prime, 24.11.2026). */
+  const gekennzeichnet = alleTermineGekennzeichnet(releases)
   let ausUrteil = 0
   for (const title of titles.values()) {
     for (const stream of title.streams ?? []) {
       if (stream.dub !== undefined) continue
       if (!jaJeWeg.has(`${title.id}|${stream.platform}`)) continue
       if (stream.platform === 'primevideo' && kanal.has(kanalSchluessel(title.id, stream.url))) continue
+      if (gekennzeichnet.has(`${title.id}|${stream.platform}`)) continue
       stream.dub = true
       ausUrteil++
     }

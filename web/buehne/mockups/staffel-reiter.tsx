@@ -7,7 +7,6 @@ import { TitelWechselKontext } from '../titel-wechsel.ts'
 import { lageVon, type Lage } from './staffel-lage.ts'
 import { reiterVon, type Reiter } from './staffel-reiter-liste.ts'
 import { ReiterPfeil, rolleUm, usePfeilLage } from './staffel-pfeile.tsx'
-import type { PfeilModus } from './staffel-pfeile.ts'
 
 type KastenEigenschaften = ComponentProps<typeof AntwortKastenMitMarke>
 
@@ -36,7 +35,7 @@ function zeigeGewaehlten(zeile: HTMLElement | null): void {
 }
 
 /** Je Staffel ein Reiter mit nur der Nummer; wischt nativ, die Beschriftung für Hilfsmittel nennt den Titel. Seitlich Platz für die Rundung des Kastens. */
-export function ReiterZeile({ reiter, aktiv, lagen, farbe, pfeile }: { reiter: Reiter[]; aktiv: number; lagen: Map<number, Lage>; farbe: string; pfeile: PfeilModus }) {
+export function ReiterZeile({ reiter, aktiv, lagen, farbe }: { reiter: Reiter[]; aktiv: number; lagen: Map<number, Lage>; farbe: string }) {
   const wechsle = useContext(TitelWechselKontext)
   const zeile = useRef<HTMLDivElement>(null)
   useEffect(() => zeigeGewaehlten(zeile.current), [aktiv])
@@ -55,14 +54,14 @@ export function ReiterZeile({ reiter, aktiv, lagen, farbe, pfeile }: { reiter: R
           )
         })}
       </div>
-      <ReiterPfeil richtung="links" modus={pfeile} weitere={lage.links} beiKlick={() => rolleUm(zeile.current, 'links')} />
-      <ReiterPfeil richtung="rechts" modus={pfeile} weitere={lage.rechts} beiKlick={() => rolleUm(zeile.current, 'rechts')} />
+      <ReiterPfeil richtung="links" weitere={lage.links} beiKlick={() => rolleUm(zeile.current, 'links')} />
+      <ReiterPfeil richtung="rechts" weitere={lage.rechts} beiKlick={() => rolleUm(zeile.current, 'rechts')} />
     </div>
   )
 }
 
 /** Reiter über dem echten Kasten; die Hülle des Kastens (und damit die Farbe) kennt dieselbe Rechnung wie `AntwortKasten`. */
-export function ReiterUeberKasten({ data, eigenschaften, kasten, pfeile }: { data: Dataset; eigenschaften: KastenEigenschaften; kasten: ReactNode; pfeile: PfeilModus }) {
+export function ReiterUeberKasten({ data, eigenschaften, kasten }: { data: Dataset; eigenschaften: KastenEigenschaften; kasten: ReactNode }) {
   const { title, antwort, t, today, releases = [], ohneSprachbeleg, stream = [], disc = [], pillenGruppen = new Map(), terminPillen = [], discZuerst = false } = eigenschaften
   const { reihenTeile, reihenName } = usePanelReihe(title, data)
   const z = useKastenZustand({ antwort, title, t, stream, disc, pillenGruppen, terminPillen, discZuerst })
@@ -75,7 +74,7 @@ export function ReiterUeberKasten({ data, eigenschaften, kasten, pfeile }: { dat
   /* Eine Hülle um Reiter und Kasten: der Abstand der Seite zwischen ihren Geschwistern trennt sie nicht. */
   return (
     <div>
-      <ReiterZeile reiter={reiter} aktiv={title.id} lagen={lagen} farbe={farbe} pfeile={pfeile} />
+      <ReiterZeile reiter={reiter} aktiv={title.id} lagen={lagen} farbe={farbe} />
       {kasten}
     </div>
   )

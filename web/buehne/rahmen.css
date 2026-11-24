@@ -15,7 +15,8 @@ body { margin: 0; font: 14px/1.4 system-ui, sans-serif; background: #e9e9ee; col
 /*
   Die Seite füllt genau das Fenster: Die Zellen teilen sich die Höhe unter der Leiste, höchstens bis zur Gerätehöhe (--hoehe an der
   Zelle, siehe raster.tsx) — so gibt es bei 900 px Fensterhöhe keinen Seiten-Scrollbalken. Die App in der Zelle scrollt für sich.
-  Untergrenze 240 px, damit viele Zeilen nicht zu Schlitzen werden. Bei Gerät „beide" (acht Zellen, bis 1200 px breit) reichen
+  Handy-Zellen nie unter 610 px (über 600, Puffer für die CI-Schriften: 640 ließ 1728×785 dort 14 px scrollen) (Daniel, 24.11.2026: bei 720 px Fensterhöhe waren sie 240 px und schnitten das Panel ab); die Seite
+  scrollt dann, statt die Zellen zu quetschen. Bei Gerät „beide" (acht Zellen, bis 1200 px breit) reichen
   die nicht in ein Fenster unter 1400 px Höhe: Dort verkleinert `zoom` die Rahmen auf die Hälfte — die App darin behält ihre echte
   Breite (Media-Queries sehen 375/1200 px), nur die Darstellung schrumpft. Werkzeuge mit hohem Fenster (12000 px) sehen 1:1.
   22,8 px = Beschriftung (12 px × 1,4) plus 6 px Abstand wie vor dem Umbau, damit die Bilder gleich hoch bleiben.
@@ -24,7 +25,7 @@ body { margin: 0; font: 14px/1.4 system-ui, sans-serif; background: #e9e9ee; col
 .raster { display: flex; flex-wrap: wrap; flex: 1 1 0; min-height: 0; gap: 20px; padding: 16px; align-items: stretch; }
 .zelle { margin: 0; display: flex; flex-direction: column; max-height: calc(var(--hoehe) * var(--zoom, 1) + 22.8px); }
 .zelle figcaption { font-size: 12px; margin: 0 0 6px; opacity: .75; }
-.zelle iframe { display: block; flex: 1 1 0; min-height: 240px; border: 0; outline: 1px solid #8886; background: transparent; }
+.zelle iframe { display: block; flex: 1 1 0; min-height: 610px; border: 0; outline: 1px solid #8886; background: transparent; }
 /* Desktop-Rahmen nie unter Gerätehöhe (Daniel, 22.11.2026: bei „beide" waren sie nur ~240 px hoch); die Seite scrollt dann. */
 .zelle.desktop { min-height: calc(var(--hoehe) * var(--zoom, 1) + 22.8px); }
 .zelle.desktop iframe { min-height: 0; }

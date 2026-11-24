@@ -43,6 +43,10 @@ pruefe('Maximum: vorhandene 60 an 14839 schlägt Staffel 2 „5“ (= 50)', gese
 pruefe('Maximum: Staffel 3 „5“ (= 94) schlägt vorhandene 20, Reihenfolge egal', gesehen({ 26471: 5, 14839: 20 }) === '{"14839":94}' && gesehen({ 14839: 20, 26471: 5 }) === '{"14839":94}')
 pruefe('der Wert an der Serie selbst bekommt keinen Versatz', gesehen({ 14839: 7 }) === '{"14839":7}')
 pruefe('ohne Versatz-Abbild (Tage, „gemerkt seit“) bleibt der Wert', JSON.stringify(umleiteKarte({ 26470: '2026-11-21' }, abbild)) === '{"14839":"2026-11-21"}')
+pruefe('Staffel 2 „1“ → 46, „0“ (nichts gesehen) bleibt 0', gesehen({ 26470: 1 }) === '{"14839":46}' && gesehen({ 26470: 0 }) === '{"14839":0}', gesehen({ 26470: 1 }), gesehen({ 26470: 0 }))
+pruefe('ohne Versatz-Abbild: Zahlen nur umgeleitet', JSON.stringify(umleiteKarte({ 26470: 5 }, abbild)) === '{"14839":5}')
+pruefe('Tage mit Versatz-Abbild bleiben Tage', JSON.stringify(umleiteKarte({ 26470: '2026-11-21' }, abbild, versatz)) === '{"14839":"2026-11-21"}')
+pruefe('Wert an einer Kennung ohne Umleitung bekommt keinen Versatz', JSON.stringify(umleiteKarte({ 9: 5 }, abbild, new Map([[9, 45]]))) === '{"9":5}')
 pruefe('Favoriten [26469, 14839] → ein Eintrag (neuer Weg)', JSON.stringify(umleiteListe([26469, 14839], abbild)) === '[14839]')
 
 /* Versatz aus der Yaml (nicht hart codiert): Kennungszeilen wie `data/kennungen.json` nach dem Folge-PR mit `zuAk`. */
@@ -51,13 +55,16 @@ const v = staffelVersatz(zeilen, ladeStaffelGrenzen(HORIZONTE_STAFFELN))
 const paare = mitVersatz([[26469, 14839], [26470, 14839], [26471, 14839], [5, 6]], v)
 pruefe('Yaml: Staffel 2 Versatz 45, Staffel 3 Versatz 89, Staffel 1 und fremde Paare ohne', JSON.stringify(paare) === '[[26469,14839],[26470,14839,45],[26471,14839,89],[5,6]]', paare)
 pruefe('Versatz nur, wenn das Paar auf die Serie zeigt', JSON.stringify(mitVersatz([[26470, 99]], v)) === '[[26470,99]]')
-let wirft = false
-try {
-  staffelVersatz([[14839, 158871, 17947]], ladeStaffelGrenzen(HORIZONTE_STAFFELN))
-} catch {
-  wirft = true
+const abbruch = (z: KennungsZeile[]): string => {
+  try {
+    staffelVersatz(z, ladeStaffelGrenzen(HORIZONTE_STAFFELN))
+    return ''
+  } catch (e) {
+    return (e as Error).message
+  }
 }
-pruefe('fehlt eine alte Kennung in kennungen.json, bricht es ab (kein stiller Versatz 0)', wirft)
+pruefe('fehlt eine alte Kennung in kennungen.json, bricht es ab und nennt sie (kein stiller Versatz 0)', abbruch([[14839, 158871, 17947]]) === 'Staffel-Versatz: Kennung 7000002 fehlt in data/kennungen.json', abbruch([[14839, 158871, 17947]]))
+pruefe('fehlt die Serie, nennt es die Serie', abbruch([[26470, 7000002, 0], [26471, 7000003, 0]]) === 'Staffel-Versatz: Kennung 158871 fehlt in data/kennungen.json', abbruch([[26470, 7000002, 0], [26471, 7000003, 0]]))
 
 /* Ende zu Ende: `uebersetzeVerzeichnis` in einer Kulisse. */
 const wurzel = mkdtempSync(join(tmpdir(), 'ak-versatz-'))
@@ -66,9 +73,11 @@ try {
   mkdirSync(join(wurzel, 'aus'))
   cpSync(HORIZONTE_STAFFELN, join(wurzel, 'daten', 'curated', 'horizonte-staffeln.yaml'))
   writeFileSync(join(wurzel, 'daten', 'kennungen.json'), JSON.stringify({ titel: zeilen }))
+  writeFileSync(join(wurzel, 'daten', 'cartoon-umzug.json'), JSON.stringify([[-9, 21]]))
   uebersetzeVerzeichnis(join(wurzel, 'aus'), join(wurzel, 'daten', 'kennungen.json'))
   const datei = readFileSync(join(wurzel, 'aus', 'ak-umleitung.json'), 'utf8')
-  pruefe('ak-umleitung.json: [[26469,14839],[26470,14839,45],[26471,14839,89],[5,6]]', JSON.stringify(JSON.parse(datei)) === '[[26469,14839],[26470,14839,45],[26471,14839,89],[5,6]]', datei)
+  pruefe('ak-umleitung.json: Dreier aus Yaml, dahinter der Cartoon-Umzug', JSON.stringify(JSON.parse(datei)) === '[[26469,14839],[26470,14839,45],[26471,14839,89],[5,6],[-9,6]]', datei)
+  rmSync(join(wurzel, 'daten', 'cartoon-umzug.json'))
   rmSync(join(wurzel, 'daten', 'curated'), { recursive: true })
   uebersetzeVerzeichnis(join(wurzel, 'aus'), join(wurzel, 'daten', 'kennungen.json'))
   pruefe('ohne Yaml neben kennungen.json: Paare ohne Versatz', JSON.stringify(JSON.parse(readFileSync(join(wurzel, 'aus', 'ak-umleitung.json'), 'utf8'))) === '[[26469,14839],[26470,14839],[26471,14839],[5,6]]')

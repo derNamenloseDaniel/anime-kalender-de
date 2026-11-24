@@ -63,8 +63,12 @@ assert.equal(versatz.speicher.get('gesehenBis'), '{"14839":94}', 'Versatz: Staff
 assert.equal(versatz.speicher.get('favorites'), '[14839]', 'Versatz: Favoriten [26469, 14839] → ein Eintrag')
 assert.equal(versatz.speicher.get('favorites:seit'), '{"14839":"2026-11-21"}', 'Versatz: Tage bekommen keinen Versatz')
 assert.equal(versatz.speicher.get('kennung:umleitung'), '3', 'Versatz: Marke zählt die Paare')
+const kaputt = await lauf('/', '', '', { gesehenBis: '[5]', 'favorites:seit': 'null' }, HORIZONTE)
+assert.equal(kaputt.speicher.get('gesehenBis'), '[5]', 'Versatz: eine Liste statt Karte bleibt unangetastet')
+assert.equal(kaputt.speicher.get('favorites:seit'), 'null', 'Versatz: null bleibt unangetastet')
+assert.equal(kaputt.speicher.get('kennung:umleitung'), '3', 'Versatz: kaputte Karten brechen das Umschreiben nicht ab')
 const zweiter = await lauf('/', '', '', { gesehenBis: '{"14839":94}', 'kennung:umleitung': '3' }, HORIZONTE)
 assert.equal(zweiter.speicher.get('gesehenBis'), '{"14839":94}', 'Versatz: zweiter Lauf ändert nichts mehr')
 
-console.log('check-ak-umleitung-lauf: 9 Fälle grün (Pfad, Basis-Präfix, Hash, Cartoon, unbekannt, fremd, Liste, Versatz, zweiter Lauf)')
+console.log('check-ak-umleitung-lauf: 10 Fälle grün (Pfad, Basis-Präfix, Hash, Cartoon, unbekannt, fremd, Liste, Versatz, kaputte Karte, zweiter Lauf)')
 process.exit(0)

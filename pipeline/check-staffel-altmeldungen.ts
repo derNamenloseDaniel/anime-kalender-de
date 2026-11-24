@@ -21,7 +21,7 @@ const grenzen = ladeStaffelGrenzen(HORIZONTE_STAFFELN)
 const tabelle = altStaffelTitel(grenzen)
 const echt = grenzen.find((g) => g.anilistId === 158871)!
 const BIS = echt.staffelzaehlung!.bis
-pruefe('Tabelle: 7000001–7000003 und die Serie mit Fenster', JSON.stringify(tabelle.map((t) => [t.id, t.staffelTitel.ab])) === '[[7000001,1],[7000002,46],[7000003,90],[158871,137]]', tabelle)
+pruefe('Tabelle: 7000001–7000003 und die Serie mit Fenster', JSON.stringify(tabelle) === JSON.stringify([{ id: 7000001, staffelTitel: { sammel: 158871, ab: 1 } }, { id: 7000002, staffelTitel: { sammel: 158871, ab: 46 } }, { id: 7000003, staffelTitel: { sammel: 158871, ab: 90 } }, { id: 158871, staffelTitel: { sammel: 158871, ab: 137, aktiv: '2026-11-24', bis: BIS, laengste: 47 } }]), tabelle)
 pruefe('Fenster der Staffelzählung beginnt am 24.11.2026, längste Staffel 47', tabelle[3]!.staffelTitel.aktiv === '2026-11-24' && tabelle[3]!.staffelTitel.laengste === 47)
 
 const von = staffelVonTiteln(tabelle)
@@ -34,6 +34,10 @@ pruefe('Serie im Fenster, Nummer über der längsten Staffel: durchlaufend', z(1
 pruefe('Serie vor dem Fenster: durchlaufend', z(158871, 1, '2026-11-23') === '{"titel":158871,"folge":1}')
 pruefe('Serie am Tag `bis` (Rückbau live): wieder durchlaufend', z(158871, 1, BIS) === '{"titel":158871,"folge":1}')
 pruefe('gewöhnlicher Titel unverändert', z(20, 3, '2026-11-24') === '{"titel":20,"folge":3}')
+pruefe('Serie ohne Tag der Meldung: durchlaufend', z(158871, 1) === '{"titel":158871,"folge":1}')
+const ohneAktiv = staffelVonTiteln([{ id: 900591, staffelTitel: { sammel: 900591, ab: 10 } }])
+pruefe('Serie ohne Fenster (`aktiv`): durchlaufend', zurueckAufSammeltitel(900591, 1, ohneAktiv, '2026-11-24').folge === 1)
+pruefe('Kulisse ohne `staffelzaehlung`: nur die alten Kennungen, keine Zeile für die Serie', JSON.stringify(altStaffelTitel([{ anilistId: 900582, staffeln: [{ nr: 1, von: 1, bis: 5, alteKennung: 7900002 }, { nr: 2, von: 6, offen: true }] }]).map((t) => t.id)) === '[7900002]')
 
 /* Gleiche Lesart mit Grenzen aus einer Kulisse: der Versatz folgt der Yaml, nicht einer festen Zahl. */
 const kulisse: StaffelGrenzen[] = [{ anilistId: 900581, staffelzaehlung: { von: '2026-01-10', bis: '2026-01-12' }, staffeln: [{ nr: 1, von: 1, bis: 10, alteKennung: 7900001 }, { nr: 2, von: 11, offen: true }] }]

@@ -1382,6 +1382,10 @@
       "am": "2026-11-06",
       "vorschlaege": 0
     },
+    "1068366": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
     "1068385": {
       "am": "2026-11-06",
       "vorschlaege": 0
@@ -2051,6 +2055,10 @@
       "am": "2026-11-20",
       "vorschlaege": 0
     },
+    "1073937": {
+      "am": "2026-11-24",
+      "vorschlaege": 1
+    },
     "1073969": {
       "am": "2026-11-20",
       "vorschlaege": 2
@@ -2158,6 +2166,30 @@
       "am": "2026-11-22",
       "vorschlaege": 0
     },
+    "1074597": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1074655": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1074697": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1074752": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1074801": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1074889": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
     "1074948": {
       "am": "2026-11-23",
       "vorschlaege": 0,
@@ -2187,6 +2219,14 @@
       "am": "2026-11-23",
       "vorschlaege": 1
     },
+    "1075048": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1075050": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
     "1075066": {
       "am": "2026-11-23",
       "vorschlaege": 0,
@@ -2200,6 +2240,31 @@
       "am": "2026-11-23",
       "vorschlaege": 0,
       "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075133": {
+      "am": "2026-11-24",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075170": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1075182": {
+      "am": "2026-11-24",
+      "vorschlaege": 1
+    },
+    "1075202": {
+      "am": "2026-11-24",
+      "vorschlaege": 1
+    },
+    "1075475": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1075500": {
+      "am": "2026-11-24",
+      "vorschlaege": 5
     }
   },
   "vorschlaege": [
@@ -17091,6 +17156,159 @@
       "quelle": "https://www.anime2you.de/news/1075044/the-daily-life-of-the-immortal-king-staffel-6-angekuendigt/",
       "veroeffentlicht": "2026-11-23",
       "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Disney Twisted-Wonderland",
+      "zitat": "Die achtteilige Fortsetzung startet am 23. Dezember 2026 auf Disney+.",
+      "art": "start",
+      "sprache": "unklar",
+      "plattform": "disneyplus",
+      "datum": "2026-12-23",
+      "uhrzeit": null,
+      "anbieter": "Disney+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Mittwoch",
+      "warnungen": [],
+      "artikelId": "1075182",
+      "artikel": "Erster Trailer zur zweiten »Disney Twisted-Wonderland«-Staffel",
+      "quelle": "https://www.anime2you.de/news/1075182/disney-twisted-wonderland-staffel-2-erster-trailer/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "A Tale of the Secret Saint",
+      "zitat": "»A Tale of the Secret Saint« umfasst demnach insgesamt 13 Episoden, die seit dem 3. Oktober 2026 im japanischen Fernsehen ausgestrahlt und bei Crunchyroll im Originalton mit deutschen Untertiteln im Simulcast gezeigt werden.",
+      "art": "start",
+      "sprache": "omu",
+      "plattform": "crunchyroll",
+      "datum": "2026-10-03",
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "13",
+      "unsicher": null,
+      "wochentag": "Samstag",
+      "warnungen": [],
+      "artikelId": "1073937",
+      "artikel": "Episodenanzahl von »A Tale of the Secret Saint« steht fest",
+      "quelle": "https://www.anime2you.de/news/1073937/a-tale-of-the-secret-saint-episodenanzahl/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Witch on the Holy Night",
+      "zitat": "In Deutschland, Österreich und der deutschsprachigen Schweiz bringt Crunchyroll den Abendfüller ab dem 26. Januar 2027 mit deutscher Synchronisation sowie im japanischen Originalton mit Untertiteln in die hiesigen Lichtspielhäuser.",
+      "art": "kino",
+      "sprache": "deutsch+omu",
+      "plattform": "kino",
+      "datum": "2027-01-26",
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [],
+      "artikelId": "1075202",
+      "artikel": "»Witch on the Holy Night« erhält eine Fortsetzung + Visual",
+      "quelle": "https://www.anime2you.de/news/1075202/witch-on-the-holy-night-erhaelt-fortsetzung/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Puella Magi Madoka Magica – Der Film: Walpurgisnacht: Rising",
+      "zitat": "Der neue Sequel-Film »Puella Magi Madoka Magica – Der Film: Walpurgisnacht: Rising« läuft seit dem 24. November 2026 in der japanischen Originalvertonung mit deutschen Untertiteln in den hiesigen Lichtspielhäusern.",
+      "art": "kino",
+      "sprache": "omu",
+      "plattform": "kino",
+      "datum": "2026-11-24",
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [],
+      "artikelId": "1075500",
+      "artikel": "polyband-Aktion: »Madoka Magica«-Komplettbox zum Sonderpreis",
+      "quelle": "https://www.anime2you.de/news/1075500/madoka-magica-komplettbox-zum-sonderpreis/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Rebellion",
+      "zitat": "Die Komplettbox umfasst alle zwölf Episoden der Serie sowie den Fortsetzungsfilm »Rebellion« mit deutscher und japanischer Sprachausgabe.",
+      "art": "sprachfassung",
+      "sprache": "deutsch",
+      "plattform": "disc",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "polyband",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „polyband“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1075500",
+      "artikel": "polyband-Aktion: »Madoka Magica«-Komplettbox zum Sonderpreis",
+      "quelle": "https://www.anime2you.de/news/1075500/madoka-magica-komplettbox-zum-sonderpreis/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Beginnings",
+      "zitat": "Die beiden Recap-Filme »Beginnings« und »Eternal« sind im Originalton mit Untertiteln enthalten.",
+      "art": "sprachfassung",
+      "sprache": "omu",
+      "plattform": "disc",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "polyband",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „polyband“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1075500",
+      "artikel": "polyband-Aktion: »Madoka Magica«-Komplettbox zum Sonderpreis",
+      "quelle": "https://www.anime2you.de/news/1075500/madoka-magica-komplettbox-zum-sonderpreis/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Eternal",
+      "zitat": "Die beiden Recap-Filme »Beginnings« und »Eternal« sind im Originalton mit Untertiteln enthalten.",
+      "art": "sprachfassung",
+      "sprache": "omu",
+      "plattform": "disc",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "polyband",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „polyband“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1075500",
+      "artikel": "polyband-Aktion: »Madoka Magica«-Komplettbox zum Sonderpreis",
+      "quelle": "https://www.anime2you.de/news/1075500/madoka-magica-komplettbox-zum-sonderpreis/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
     }
   ]
 }

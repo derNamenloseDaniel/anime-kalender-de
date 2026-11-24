@@ -13,6 +13,15 @@ export const titelGestartet = (t: Pick<Title, 'jpStart' | 'jpStatus' | 'jpYear'>
 const KURZ = 100
 export const aussagekraeftig = (s: Synopsis | undefined): s is Synopsis => Boolean(s?.de || (s?.en && s.en.trim().length >= KURZ))
 
+/**
+ * Cartoons tragen ihre Handlung im Titel; sie stammt aus TMDB, die Quelle ist die Seite des Titels dort.
+ * Ohne `tmdbId` gibt es keine Quelle — nie eine Startseite oder einen geratenen Anbieter (24.11.2026, The Mighty Nein).
+ */
+export function cartoonHandlung(t: Pick<Title, 'synopsis' | 'tmdbId'>): Synopsis | undefined {
+  if (!t.synopsis) return undefined
+  return { de: t.synopsis, ...(t.tmdbId ? { deSource: { name: 'themoviedb.org', url: `https://www.themoviedb.org/tv/${t.tmdbId}` } } : {}) }
+}
+
 export function plotVon({ synopsis, anilistId, ersatz, erschienen }: {
   synopsis: Synopsis | undefined
   /** Ist der Titel schon erschienen? Dann heißt der Hinweis nicht „Noch nicht erschienen". */
@@ -25,7 +34,7 @@ export function plotVon({ synopsis, anilistId, ersatz, erschienen }: {
       return {
         text: synopsis.de,
         fallback: false,
-        quelle: synopsis.deSource ?? { name: 'anisearch.de', url: 'https://www.anisearch.de/' },
+        quelle: synopsis.deSource,
         eigen: synopsis.eigen,
       }
     }
@@ -46,7 +55,7 @@ export function plotVon({ synopsis, anilistId, ersatz, erschienen }: {
       erschienen,
       eigen: ersatz.plot.de ? ersatz.plot.eigen : undefined,
       quelle: ersatz.plot.de
-        ? (ersatz.plot.deSource ?? { name: 'anisearch.de', url: 'https://www.anisearch.de/' })
+        ? ersatz.plot.deSource
         : { name: 'anilist.co', url: ersatz.von.al ? `https://anilist.co/anime/${ersatz.von.al}` : 'https://anilist.co/' },
     }
   })()
@@ -57,7 +66,7 @@ export function plotVon({ synopsis, anilistId, ersatz, erschienen }: {
  * Die aniSearch-Adresse mit Slug für den Link des Titels, nur aus **dessen eigener** Beschreibung. Eine aus der Reihe geliehene
  * (`vonTeil`) trägt die Adresse des anderen Teils; sie bleibt Quellenangabe dieses Textes, nie der Link des Titels (Gachiakuta S2, 10.10.2026).
  */
-export function eigenerAsZiel(plot: { vonTeil?: unknown; quelle: { url: string } } | undefined, asUrl: string | undefined): string | undefined {
-  const eigen = plot && !plot.vonTeil && plot.quelle.url.includes('anisearch.de/anime/')
-  return eigen ? plot.quelle.url : asUrl
+export function eigenerAsZiel(plot: { vonTeil?: unknown; quelle?: { url: string } } | undefined, asUrl: string | undefined): string | undefined {
+  const eigen = plot && !plot.vonTeil && plot.quelle?.url.includes('anisearch.de/anime/')
+  return eigen ? plot.quelle!.url : asUrl
 }

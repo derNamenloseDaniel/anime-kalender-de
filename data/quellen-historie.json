@@ -5322,46 +5322,58 @@
   ],
   "black-clover-s2-crunchyroll": [
     {
+      "url": "https://www.crunchyroll.com/de/news/seasonal-lineup/2026/10/5/crunchyroll-wochenprogramm-herbst-2026",
+      "name": "Crunchyroll News",
+      "gesehenAm": "2026-11-24",
+      "stand": "aktuell"
+    },
+    {
       "url": "https://www.crunchyroll.com/de/news/latest/2026/6/15/black-clover-staffel-2-premiere-oktober-2026",
       "name": "Crunchyroll News",
       "gesehenAm": "2026-10-01",
-      "stand": "aktuell",
-      "sagt": "2026-10-03"
+      "stand": "ueberholt",
+      "sagt": "2026-10-03",
+      "grund": "Termin: 2026-11-28"
     },
     {
       "url": "https://anilist.co/anime/195604",
       "name": "anilist.co",
       "gesehenAm": "2026-10-01",
-      "stand": "aktuell",
-      "sagt": "2026-10-03"
+      "stand": "ueberholt",
+      "sagt": "2026-10-03",
+      "grund": "Termin: 2026-11-28"
     },
     {
       "url": "https://www.anime2you.de/news/1047190/black-clover-second-season-termin/",
       "name": "anime2you.de",
       "gesehenAm": "2026-10-01",
-      "stand": "aktuell",
-      "sagt": "2026-10-03"
+      "stand": "ueberholt",
+      "sagt": "2026-10-03",
+      "grund": "Termin: 2026-11-28"
     },
     {
       "url": "https://www.crunchyroll.com/news/latest/2026/6/15/black-clover-season-2-anime-october-2026-release-date-director",
       "name": "Crunchyroll News",
       "gesehenAm": "2026-10-01",
-      "stand": "aktuell",
-      "sagt": "2026-10-03"
+      "stand": "ueberholt",
+      "sagt": "2026-10-03",
+      "grund": "Termin: 2026-11-28"
     },
     {
       "url": "https://www.crunchyroll.com/de/news/seasonal-lineup/2026/9/15/crunchyroll-deutsche-synchros-herbst-2026",
       "name": "Crunchyroll News",
       "gesehenAm": "2026-10-01",
-      "stand": "aktuell",
-      "sagt": "2026-10-03"
+      "stand": "ueberholt",
+      "sagt": "2026-10-03",
+      "grund": "Termin: 2026-11-28"
     },
     {
       "url": "https://www.crunchyroll.com/de/news/seasonal-lineup/2026/9/15/crunchyroll-anime-lineup-herbst-2026",
       "name": "Crunchyroll News",
       "gesehenAm": "2026-10-01",
-      "stand": "aktuell",
-      "sagt": "2026-10-03"
+      "stand": "ueberholt",
+      "sagt": "2026-10-03",
+      "grund": "Termin: 2026-11-28"
     }
   ],
   "cr-GG5H5XQ7D": [
@@ -8817,6 +8829,12 @@
   ],
   "black-clover-s2-crunchyroll-synchro": [
     {
+      "url": "https://www.crunchyroll.com/de/news/seasonal-lineup/2026/10/5/crunchyroll-wochenprogramm-herbst-2026",
+      "name": "Crunchyroll News",
+      "gesehenAm": "2026-11-24",
+      "stand": "aktuell"
+    },
+    {
       "url": "https://www.crunchyroll.com/de/series/GRE50KV36",
       "name": "crunchyroll.com",
       "gesehenAm": "2026-11-07",
@@ -9063,6 +9081,12 @@
     }
   ],
   "the-mighty-nein-s2-primevideo": [
+    {
+      "url": "https://de.wikipedia.org/wiki/The_Mighty_Nein",
+      "name": "de.wikipedia.org",
+      "gesehenAm": "2026-11-24",
+      "stand": "aktuell"
+    },
     {
       "url": "https://www.tvinsider.com/1303804/the-mighty-nein-season-2-premiere-date-details/",
       "name": "tvinsider.com",

@@ -6,14 +6,18 @@ import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import yaml from 'js-yaml'
 import type { StaffelZeile } from '../../shared/staffel-folge.ts'
+import type { FranchiseMember } from '../../shared/types.ts'
 import { ROOT } from './util.ts'
 
 export { mitStapelFolgen, type StaffelZeile } from '../../shared/staffel-folge.ts'
 
+type StaffelFolgen = NonNullable<FranchiseMember['staffelFolgen']>
+
 /** `offen`: die laufende letzte Staffel, deren Ende keine Quelle nennt — ohne `bis` und `folgen`. */
-export type StaffelAbschnitt = { nr: number; von: number; bis?: number; folgen?: number; offen?: true; kennung?: number; name?: string }
-/** `basis` und `kennung`: der Bau schneidet den Titel in einen Titel je Staffel (`pipeline/lib/staffel-titel.ts`). */
-export type StaffelGrenzen = { anilistId: number; titel?: string; basis?: number; aktiv?: string; staffeln: StaffelAbschnitt[] }
+/** `alteKennung`: die Kennung, unter der die Staffel vom 20. bis 24.11.2026 ein eigener Titel war (Horizonte; Versatz und alte Meldungen). */
+export type StaffelAbschnitt = { nr: number; von: number; bis?: number; folgen?: number; offen?: true; alteKennung?: number; name?: string }
+/** `staffelzaehlung`: Fenster, in dem Meldungen in der Zählung der letzten Staffel galten (Horizonte-Yaml). */
+export type StaffelGrenzen = { anilistId: number; titel?: string; staffelzaehlung?: { von: string; bis: string }; staffeln: StaffelAbschnitt[] }
 
 export const POKEMON_STAFFELN = resolve(ROOT, 'data/curated/pokemon-staffeln.yaml')
 export const HORIZONTE_STAFFELN = resolve(ROOT, 'data/curated/horizonte-staffeln.yaml')
@@ -36,9 +40,53 @@ export function staffelEnden(grenzen: StaffelGrenzen[]): Map<number, number> {
   return new Map(mehrere.map((t): [number, number] => [t.anilistId, t.staffeln[t.staffeln.length - 1]!.nr]))
 }
 
+/**
+ * Kennung → `[[Staffel, von, bis], …]` der abgeschlossenen Staffeln, die ein zweiter Titel ebenfalls trägt (Pokémon Staffel 15: zwei Titel).
+ * Gezählt wird **innerhalb der deutschen Staffel** (Staffel 16: 1–11, 12–25, 26–45), nicht in der Titelnummer, die in jedem Titel wieder bei 1 beginnt;
+ * die Reihenfolge der Titel in der Datei ist die der Folgen (belegt gegen TMDB: `check-pokemon-staffeln.ts`).
+ * Die Reihenliste nennt damit, welche Folgen der geteilten Staffel eine Karte hat (`reihen-doppelt.ts`).
+ * Je Datei für sich: Horizonte zählt seine Staffeln 1 ff. selbst, das ist nicht die Hauptserie.
+ */
+export function geteilteStaffeln(dateien: string[] = [HORIZONTE_STAFFELN, POKEMON_STAFFELN]): Map<number, StaffelFolgen> {
+  return new Map(dateien.flatMap((datei) => [...geteilteInGrenzen(ladeStaffelGrenzen(datei))]))
+}
+
+export function geteilteInGrenzen(grenzen: StaffelGrenzen[]): Map<number, StaffelFolgen> {
+  const titelJeStaffel = new Map<number, number>()
+  for (const t of grenzen) for (const s of t.staffeln) titelJeStaffel.set(s.nr, (titelJeStaffel.get(s.nr) ?? 0) + 1)
+  const ergebnis = new Map<number, StaffelFolgen>()
+  const davor = new Map<number, number>() // Staffel → Folgen der Titel, die in der Datei vor dem aktuellen stehen
+  for (const t of grenzen) {
+    const zeilen: StaffelFolgen = []
+    for (const s of t.staffeln.filter((x) => x.bis !== undefined && (titelJeStaffel.get(x.nr) ?? 0) > 1)) {
+      const anfang = davor.get(s.nr) ?? 0
+      const ende = anfang + s.bis! - s.von + 1
+      zeilen.push([s.nr, anfang + 1, ende])
+      davor.set(s.nr, ende)
+    }
+    if (zeilen.length) ergebnis.set(t.anilistId, zeilen)
+  }
+  return ergebnis
+}
+
 /** Kennung → `[[Staffel, von, bis], …]` für die Detaildatei des Titels. */
 export function staffelListen(grenzen: StaffelGrenzen[]): Map<number, StaffelZeile[]> {
   return new Map(grenzen.map((t) => [t.anilistId, t.staffeln.map((s): StaffelZeile => (s.bis === undefined ? [s.nr, s.von] : [s.nr, s.von, s.bis]))]))
+}
+
+/** Kennung → Staffelnamen (`{ "2": "…" }`), wörtlich aus der Yaml; nur Titel, deren Yaml Namen führt. */
+export function staffelNamen(grenzen: StaffelGrenzen[]): Map<number, Record<string, string>> {
+  return new Map(
+    grenzen.flatMap((t) => {
+      const mitName = t.staffeln.filter((s) => s.name)
+      return mitName.length ? [[t.anilistId, Object.fromEntries(mitName.map((s) => [String(s.nr), s.name!]))] as const] : []
+    }),
+  )
+}
+
+/** Das Feld `sn` der Detaildatei (Staffelnamen), leer ohne Namen. */
+export function staffelNamenFeld(namen: Map<number, Record<string, string>>, id: number): { sn?: Record<string, string> } {
+  return namen.has(id) ? { sn: namen.get(id) } : {}
 }
 
 /** Das Feld `s` der Detaildatei eines Titels (leer, wenn die Datei ihn nicht führt). */

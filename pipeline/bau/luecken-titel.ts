@@ -13,11 +13,11 @@ export const LUECKEN = 'data/luecken-titel.json'
 const FELDER = { t: 'titleDe', j: 'jahr', c: 'cover', m: 'mal', b: 'beschreibung' } as const
 type Kuerzel = keyof typeof FELDER
 type Klasse = 'hb' | 'kat' | 'zeilen'
-type Titel = { id: number; titleDe?: string; jpYear?: number | null; coverImage?: string; malId?: number; staffelTitel?: unknown }
+type Titel = { id: number; titleDe?: string; jpYear?: number | null; coverImage?: string; malId?: number }
 type Beschreibungen = Record<number, { de?: string; en?: string }>
 
 /**
- * Die Kürzel der Felder, die dem Titel fehlen; bei einer aniSearch-Zeile zählt die MAL-Kennung des Eintrags (die Zeile selbst trägt keine); ein Staffel-Titel trägt sie nur an der Basis.
+ * Die Kürzel der Felder, die dem Titel fehlen; bei einer aniSearch-Zeile zählt die MAL-Kennung des Eintrags (die Zeile selbst trägt keine).
  * Beschreibungen gibt es nur für den Hauptbestand (`beschreibungen`); der Katalog trägt bewusst keine, sonst stünde fast jeder Katalogtitel auf der Liste.
  */
 export function fehlendes(t: Titel, beschreibungen: Beschreibungen | undefined, malDerZeile: number | undefined): string {
@@ -26,7 +26,7 @@ export function fehlendes(t: Titel, beschreibungen: Beschreibungen | undefined, 
     t: !t.titleDe,
     j: !t.jpYear,
     c: !t.coverImage,
-    m: !(zeile ? malDerZeile : t.malId ?? t.staffelTitel),
+    m: !(zeile ? malDerZeile : t.malId),
     b: beschreibungen !== undefined && !(beschreibungen[t.id]?.de || beschreibungen[t.id]?.en),
   }
   return (Object.keys(fehlt) as Kuerzel[]).filter((k) => fehlt[k]).join('')

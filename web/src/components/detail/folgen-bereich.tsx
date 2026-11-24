@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { loadJson } from '../../lib/data.ts'
 import { gemerkt } from '../../lib/lade-neuversuch.ts'
 import { Tooltip } from '../ui.tsx'
@@ -7,6 +7,11 @@ import { folgeIstDeutsch } from './stream-bereiche.ts'
 import { SERIENBELEG_HINWEIS, serienbelegOhneFolgenbeleg } from '@shared/folgen-flagge.ts'
 import { staffelAbschnitte, staffelZeile, type StaffelZeile } from './folgen-staffeln.ts'
 import type { FolgenZaehlung } from './antwort-regeln.ts'
+import { staffelZiele, type StaffelZiel } from '../../lib/staffel-ziele.ts'
+import { todayIso } from '@shared/time.ts'
+import type { Release } from '@shared/types.ts'
+import { abschnittZeile, reiterVon, startReiter } from './staffel-reiter-liste.ts'
+import { StaffelAbschnitt } from './staffel-abschnitt.tsx'
 
 /**
  * **Die Folgenliste im Antwortkasten** (Daniel, 04.10.2026): Ein Pfeil klappt sie auf, der Kasten wächst mit,
@@ -26,6 +31,10 @@ interface Liste {
   h?: [number, string][]
   /** Deutsche Staffelgrenzen (`folgen-staffeln.ts`): Reiter je Staffel statt Paketen. */
   s?: StaffelZeile[]
+  /** Staffelnamen wörtlich aus `data/curated/*-staffeln.yaml`: `{ "1": "…" }`, nur für Staffeln mit Namen. */
+  sn?: Record<string, string>
+  /** TOGGO-Seite je Staffel: `[Staffelnummer, Adresse]`. */
+  tg?: [number, string][]
 }
 
 const PAKET = 50
@@ -67,6 +76,23 @@ export function useStaffelGrenzen(titleId: number): StaffelZeile[] | undefined {
   return s
 }
 
+/** Die TOGGO-Seiten je Staffel (`tg` der Folgenliste), solange sie verschieden sind; ohne Liste oder bei einer Adresse nichts. */
+export function useStaffelZiele(titleId: number): StaffelZiel[] | undefined {
+  const [ziele, setZiele] = useState<StaffelZiel[]>()
+  useEffect(() => {
+    setZiele(undefined)
+    let aktiv = true
+    void holeVerzeichnis()
+      .then((v) => (v.has(titleId) ? holeListe(titleId) : null))
+      .then((l) => aktiv && setZiele(l ? staffelZiele(l.tg) : undefined))
+      .catch(() => aktiv && setZiele(undefined))
+    return () => {
+      aktiv = false
+    }
+  }, [titleId])
+  return ziele
+}
+
 let zaehlungen: Promise<Record<string, FolgenZaehlung>> | undefined
 /** `[alle Folgen, Folgen mit deutscher Synchro]` aus `folgen/zaehlung.json` — für die Überschrift, wo AniList keine Folgenzahl führt. */
 export function useFolgenZaehlung(titleId: number): FolgenZaehlung | undefined {
@@ -87,18 +113,25 @@ export function useKopfZahlen(titleId: number): { folgenZahl: FolgenZaehlung | u
   return { folgenZahl: useFolgenZaehlung(titleId), staffeln: useStaffelGrenzen(titleId) }
 }
 
-/** `laufzeitImKopf`: Die Laufzeit steht schon im Kopf des Panels — dann nicht noch einmal (mit anderem Wert) im Kasten. */
-export function FolgenBereich({ titleId, wege, erschienen, laufzeitImKopf, serieBelegt }: { titleId: number; wege: { from: number; to: number }[]; erschienen?: number; laufzeitImKopf?: boolean; serieBelegt?: boolean }) {
+const HUELLE = 'mt-2 border-t border-slate-300 pt-1.5 text-t4 text-slate-700 dark:border-white/10 dark:text-slate-200'
+
+/**
+ * `laufzeitImKopf`: Die Laufzeit steht schon im Kopf des Panels — dann nicht noch einmal (mit anderem Wert) im Kasten.
+ * Ab zwei Staffeln in `s` stehen Reiter an einer Abschnittsbox (F157, `staffel-abschnitt.tsx`); `releases` und `today` geben ihre Lage.
+ */
+export function FolgenBereich({ titleId, wege, erschienen, laufzeitImKopf, serieBelegt, releases = [], today = todayIso() }: { titleId: number; wege: { from: number; to: number }[]; erschienen?: number; laufzeitImKopf?: boolean; serieBelegt?: boolean; releases?: Release[]; today?: string }) {
   const [gibtEs, setGibtEs] = useState(false)
   const [offen, setOffen] = useState(false)
   const [liste, setListe] = useState<Liste>()
   const [paket, setPaket] = useState(0)
+  const [wahl, setWahl] = useState<number>()
   useEffect(() => {
     let aktiv = true
     setGibtEs(false)
     setOffen(false)
     setListe(undefined)
     setPaket(0)
+    setWahl(undefined)
     void holeVerzeichnis().then((s) => aktiv && setGibtEs(s.has(titleId)))
     return () => {
       aktiv = false
@@ -121,10 +154,21 @@ export function FolgenBereich({ titleId, wege, erschienen, laufzeitImKopf, serie
   const anzahl = staffeln.length ? staffeln[staffeln.length - 1]!.bis : folgen?.length
   const pakete = staffeln.length || (folgen ? Math.ceil(folgen.length / PAKET) : 0)
   const sichtbar = gewaehlt?.folgen ?? folgen?.slice(paket * PAKET, paket * PAKET + PAKET) ?? []
-  const reiter = (i: number) => (staffeln[i] ? `Staffel ${staffeln[i]!.nr}` : `${i * PAKET + 1}–${Math.min((i + 1) * PAKET, folgen!.length)}`)
+  const reiter = (i: number) => `${i * PAKET + 1}–${Math.min((i + 1) * PAKET, folgen!.length)}`
   const nurSerienbeleg = serienbelegOhneFolgenbeleg(Boolean(serieBelegt), folgen?.map(([nr]) => nr) ?? [], deutsch)
+  const staffelReiter = reiterVon(staffeln, releases, today, liste?.sn)
+  if (staffelReiter.length) {
+    const aktiv = wahl ?? startReiter(staffelReiter, staffeln)
+    const zeilen = <FolgenListe liste={liste} sichtbar={staffeln[aktiv]!.folgen} ohneTitel={ohneTitel} nurSerienbeleg={nurSerienbeleg} deutsch={deutsch} erschienen={erschienen} />
+    const klappe = <FolgenKlappe offen={offen} umschalten={() => setOffen((o) => !o)} min={laufzeitImKopf ? undefined : liste?.min} zeilen={zeilen} />
+    return (
+      <div className={HUELLE}>
+        <StaffelAbschnitt reiter={staffelReiter} aktiv={aktiv} kennung={`folgen-${titleId}`} beiWahl={setWahl} zeile={abschnittZeile(staffeln[aktiv]!, staffelReiter[aktiv]!.lage, deutsch)} kinder={klappe} />
+      </div>
+    )
+  }
   return (
-    <div className="mt-2 border-t border-slate-300 pt-1.5 text-t4 text-slate-700 dark:border-white/10 dark:text-slate-200">
+    <div className={HUELLE}>
       <button type="button" onClick={() => setOffen((o) => !o)} aria-expanded={offen} className="flex min-h-11 w-full cursor-pointer items-center gap-1.5 text-left text-t3 font-semibold">
         <span aria-hidden className={`inline-block transition-transform ${offen ? 'rotate-90' : ''}`}>▸</span>
         Folgen{anzahl !== undefined ? ` (${anzahl})` : ''}
@@ -149,23 +193,52 @@ export function FolgenBereich({ titleId, wege, erschienen, laufzeitImKopf, serie
             </div>
           )}
           {gewaehlt && <p className="pb-1 text-ak-leise">{staffelZeile(gewaehlt)}</p>}
-          <ul className="max-h-64 overflow-y-auto pr-1">
-            {!folgen && <li className="text-ak-leise">Lädt …</li>}
-            {folgen && !folgen.length && <li className="text-ak-leise">Keine Folgentitel bekannt.</li>}
-            {ohneTitel && <li className="pb-1 text-ak-leise">Die Folgentitel liegen noch nicht vor.</li>}
-            {nurSerienbeleg && <li className="pb-1 text-ak-leise">{SERIENBELEG_HINWEIS}</li>}
-            {sichtbar.map(([nr, titel, min]) => (
-              <li key={nr} className="flex items-baseline gap-2 py-px">
-                <span className="w-9 shrink-0 text-right tabular-nums text-ak-leise">{nr}</span>
-                <span className="min-w-0 flex-1 truncate">{titel || (ohneTitel ? '' : '—')}</span>
-                {min ? <span className="shrink-0 tabular-nums text-ak-leise">{min} Min.</span> : null}
-                {deutsch(nr) ? <DeFlagge /> : erschienen !== undefined && nr > erschienen ? <NochNichtErschienen /> : <FolgeOhneFlagge hinweis={liste?.h?.find(([n]) => n === nr)?.[1]} gibtDeutsche={Boolean(liste?.de.length)} />}
-              </li>
-            ))}
-          </ul>
+          <FolgenListe liste={liste} sichtbar={sichtbar} ohneTitel={ohneTitel} nurSerienbeleg={nurSerienbeleg} deutsch={deutsch} erschienen={erschienen} />
         </div>
       )}
     </div>
+  )
+}
+
+/** Im Abschnitt einer Staffel klappt der Knopf nur ihre Folgen auf; ihre Zahl steht schon in der Kopfzeile des Abschnitts. */
+function FolgenKlappe({ offen, umschalten, min, zeilen }: { offen: boolean; umschalten: () => void; min?: number; zeilen: ReactNode }) {
+  return (
+    <>
+      <button type="button" onClick={umschalten} aria-expanded={offen} className="flex min-h-11 w-full cursor-pointer items-center gap-1.5 text-left text-t3 font-semibold">
+        <span aria-hidden className={`inline-block transition-transform ${offen ? 'rotate-90' : ''}`}>▸</span>
+        Folgen
+        {min ? <span className="font-normal text-ak-leise">· ~{min} Min. je Folge</span> : null}
+      </button>
+      {offen && zeilen}
+    </>
+  )
+}
+
+/** Die Zeilen der Folgen (Nummer, Titel, Minuten, Flagge) samt Lade- und Leerhinweis. */
+function FolgenListe({ liste, sichtbar, ohneTitel, nurSerienbeleg, deutsch, erschienen }: {
+  liste: Liste | undefined
+  sichtbar: Folge[]
+  ohneTitel: boolean
+  nurSerienbeleg: boolean
+  deutsch: (nr: number) => boolean
+  erschienen: number | undefined
+}) {
+  const folgen = liste?.f
+  return (
+    <ul className="max-h-64 overflow-y-auto pr-1">
+      {!folgen && <li className="text-ak-leise">Lädt …</li>}
+      {folgen && !folgen.length && <li className="text-ak-leise">Keine Folgentitel bekannt.</li>}
+      {ohneTitel && <li className="pb-1 text-ak-leise">Die Folgentitel liegen noch nicht vor.</li>}
+      {nurSerienbeleg && <li className="pb-1 text-ak-leise">{SERIENBELEG_HINWEIS}</li>}
+      {sichtbar.map(([nr, titel, min]) => (
+        <li key={nr} className="flex items-baseline gap-2 py-px">
+          <span className="w-9 shrink-0 text-right tabular-nums text-ak-leise">{nr}</span>
+          <span className="min-w-0 flex-1 truncate">{titel || (ohneTitel ? '' : '—')}</span>
+          {min ? <span className="shrink-0 tabular-nums text-ak-leise">{min} Min.</span> : null}
+          {deutsch(nr) ? <DeFlagge /> : erschienen !== undefined && nr > erschienen ? <NochNichtErschienen /> : <FolgeOhneFlagge hinweis={liste?.h?.find(([n]) => n === nr)?.[1]} gibtDeutsche={Boolean(liste?.de.length)} />}
+        </li>
+      ))}
+    </ul>
   )
 }
 

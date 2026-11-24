@@ -95,7 +95,7 @@ UID:black-clover-s2-crunchyroll-synchro@2026-11-21@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261121T160000Z
 DTEND:20261121T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 3/≈12
+SUMMARY:Black Clover – Staffel 2 – Folge 3/≈174
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
  etails: https://anime-kalender.de/t/16920/
 CATEGORIES:Crunchyroll
@@ -229,15 +229,36 @@ DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nGeschät
 CATEGORIES:Joyn
 END:VEVENT
 BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2026-11-28@anime-kalender-de
+UID:black-clover-s2-crunchyroll@2026-11-28@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261128T160000Z
 DTEND:20261128T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 4/≈12
+SUMMARY:Black Clover – Staffel 2 – Folge 174/174 (OmU)
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
+ lton mit deutschen Untertiteln\, keine deutsche Synchro.\nDetails: https:/
+ /anime-kalender.de/t/16920/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll-synchro@2026-11-28#4@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261128T160000Z
+DTEND:20261128T163000Z
+SUMMARY:Black Clover – Staffel 2 – Folge 4–173/≈174
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
   oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
  6920/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll-synchro@2026-11-28#174@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261128T160000Z
+DTEND:20261128T163000Z
+SUMMARY:Black Clover – Staffel 2 – Folge 174/≈174
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
+ etails: https://anime-kalender.de/t/16920/
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
@@ -400,18 +421,6 @@ DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nAuf Deuts
 CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2026-12-05@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261205T160000Z
-DTEND:20261205T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 5/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
 UID:das-band-der-unterwelt-netflix@2026-12-05@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261205
@@ -528,18 +537,6 @@ DESCRIPTION:Plattform: Prime Video\nRelease-Art: Katalogtitel\nIm Angebot s
 CATEGORIES:Prime Video
 END:VEVENT
 BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2026-12-12@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261212T160000Z
-DTEND:20261212T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 6/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
 UID:das-band-der-unterwelt-netflix@2026-12-12@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261212
@@ -580,54 +577,6 @@ DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
 CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2026-12-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261219T160000Z
-DTEND:20261219T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 7/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2026-12-26@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261226T160000Z
-DTEND:20261226T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 8/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2027-01-02@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20270102T160000Z
-DTEND:20270102T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 9/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2027-01-09@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20270109T160000Z
-DTEND:20270109T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 10/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
 UID:sailor-moon-super-s-2026-12-04@2027-01-15@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20270115
@@ -639,30 +588,6 @@ DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nAuf Deuts
  Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: htt
  ps://anime-kalender.de/t/1095/
 CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2027-01-16@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20270116T160000Z
-DTEND:20270116T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 11/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2027-01-23@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20270123T160000Z
-DTEND:20270123T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 12/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:black-butler-emerald-witch-vol1@2027-01-31@anime-kalender-de

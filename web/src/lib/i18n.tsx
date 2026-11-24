@@ -223,6 +223,9 @@ const TEXTE = {
   // steht im Hinweis. „Bisher" fehlt bewusst: Wir wissen nicht, ob eine kommt.
   'detail.folgenKurz': '{n} Fg.',
   'detail.folgenBereich': 'Fg. {bereich}',
+  // Unterscheidet Karten mit gleicher Staffelzahl (Pokémon: drei Teile der Staffel 16); Zählung innerhalb der deutschen Staffel.
+  'detail.reiheFolgen': 'Folge {von}–{bis}',
+  'detail.reiheFolgenMitS': 'S{staffel} Folge {von}–{bis}',
   // **Der Ersatz sagt, wessen Handlung dasteht.** Ohne den Namen liest jemand
   // die Handlung von Staffel 1 und hält sie für die von Staffel 3.
   // Zwei Termine, keiner belegbar — beide anzeigen statt einen zu verschweigen

@@ -8,7 +8,6 @@ import { synopseVon } from './synopse-von.ts'
 import { archivTexte } from '../lib/anisearch-archiv-text.ts'
 import { type AnisearchEintrag, type TmdbTitelEintrag } from './01-quellen.ts'
 import { type SynopsisEintrag } from './13-1-anreichern.ts'
-import { lesekennung } from '../../shared/staffel-titel.ts'
 
 /** Ein Titel, wie er ausgeliefert wird (`titles.json`). */
 export type SlimTitel = ReturnType<typeof baueAuslieferung>['slim'][number]
@@ -41,7 +40,7 @@ export function baueAuslieferung({
   const kennungen = anisearchKennungen(allTitles.map((t) => ({ id: t.id, mal: t.malId })))
   const archiv = archivTexte(kennungen, (id) => !!anisearch[id]?.descriptionDe || !!tmdbTitles[id]?.overviewDe)
   const slim = allTitles.map((t) => {
-    const q = lesekennung(t)
+    const q = t.id
     const ausAnisearch = anisearch[q]?.descriptionDe ?? archiv.get(q)
     const ausTmdb = tmdbTitles[q]
     const asId = kennungen.get(q)

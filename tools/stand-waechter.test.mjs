@@ -4,7 +4,7 @@
  * Feste Zeit, Wegwerf-Dateien unter os.tmpdir().
  */
 import assert from 'node:assert/strict'
-import { existsSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -13,6 +13,7 @@ const require = createRequire(import.meta.url)
 const w = require(join(import.meta.dirname, '..', '.claude', 'hooks', 'stand-waechter.js'))
 const h = require(join(import.meta.dirname, '..', '.claude', 'hooks', 'stand-prs.js'))
 
+const { jetztOrdnerDateien } = require(join(import.meta.dirname, '..', '.claude', 'hooks', 'stand-jetzt-luecken.js'))
 const AUF = h.AUF
 const ZU = h.ZU
 const STUNDE = 3600000
@@ -302,4 +303,39 @@ assert.equal(w.waechter(jetztStand([E8, '**F7 lose Zeile** — [Datei](file:///C
 assert.equal(w.waechter(jetztStand('- 🟠 **F7 Frage**'), JETZT, () => true, () => 'kaputt'), '', 'Zeile ohne Link: keine Meldung')
 assert.equal(w.waechter(jetztStand(ZEILE), JETZT, () => true, () => null), '', 'Datei nicht lesbar: keine Meldung')
 assert.equal(w.waechter(jetztStand(ZEILE.replace('jetzt-f7.md', 'jetzt-f7.txt')), JETZT, () => true, () => 'kaputt'), '', 'kein .md-Link: keine Meldung')
+// Daniel-Punkte ohne Jetzt-Zeile (Lehre 249): Marke unter „In Arbeit“/„Als Nächstes“ braucht eine Zeile unter Jetzt/Später
+const JETZT_F12 = '- 🟠 **F12 Frage** {eigen · normal · - · 01.10.}'
+const SPAET_E14 = '- 🔵 **E14 Handgriff** {eigen · normal · - · 01.10.}'
+const mitPunkten = (arbeit, naechstes, todoZusatz = '') => ['# Stand', '## Daniel-Todo', '### Jetzt', JETZT_F12, todoZusatz, '### Später', SPAET_E14, '', `## In Arbeit${FRISCH}`, ...arbeit, '', '## Als Nächstes', ...naechstes, ...hand(3, '🔵 '), ''].join('\n')
+const OHNE_JETZT = (titel) => `Daniel-Punkt ohne Jetzt-Zeile: ${titel} — Jetzt-Zeile anlegen oder Marke streichen (kein Daniel-Punkt)`
+assert.equal(w.waechter(mitPunkten([], ['- 🔵 **Alpha** wartet: Daniel', '- 🔵 **Beta** E-Zeile folgt', '- 🔵 **Gamma** läuft']), JETZT), [OHNE_JETZT('Alpha'), OHNE_JETZT('Beta')].join('; '), 'Marken ohne Kennung: immer melden')
+assert.equal(w.waechter(mitPunkten(['- 🔵 **Delta** wartet: Daniel'], ['- ⏳ **F13 Neu** offen']), JETZT), [OHNE_JETZT('Delta'), OHNE_JETZT('F13 Neu')].join('; '), 'In Arbeit und Als Nächstes, ⏳ mit unbekannter Kennung')
+assert.equal(w.waechter(mitPunkten([], ['- ⏳ **F12 Bekannt** offen', '- ⏳ E14 Später bekannt']), JETZT), '', '⏳ mit Kennung unter Jetzt oder Später: still')
+assert.equal(w.waechter(mitPunkten([], ['- ⏳ **E15 Fehlt** offen', '- ⏳ **F12 Bekannt** offen']), JETZT), OHNE_JETZT('E15 Fehlt'), 'nur die unbekannte Kennung')
+assert.equal(w.waechter(mitPunkten([], ['- ⏳ **F14 Falscher Buchstabe**']), JETZT), OHNE_JETZT('F14 Falscher Buchstabe'), 'E14 deckt F14 nicht')
+assert.equal(w.waechter(mitPunkten([], ['- 🔵 **Eps** wartet auf Daniel nicht']), JETZT), '', 'ohne Marke: still')
+assert.equal(w.waechter(mitPunkten([], [], '- 🟠 **F20 Warten** — wartet: Daniel {eigen · normal · - · 01.10.}'), JETZT), '', 'Marke innerhalb Daniel-Todo zählt nicht')
+assert.equal(w.waechter(mitPunkten([AUF, '- PR #1 wartet: Daniel', ZU], []), JETZT), '', 'Auto-Block zählt nicht')
+assert.equal(w.waechter(mitPunkten(['  - eingerückt wartet: Daniel', 'Fließtext E-Zeile folgt'], []), JETZT), '', 'nur Listenzeilen')
+assert.equal(w.waechter(mitPunkten([], ['- 🔵 **Alpha** wartet: Daniel']).split('\n').join('\r\n'), JETZT), OHNE_JETZT('Alpha'), 'CRLF')
+assert.equal(w.waechter(['## In Arbeit' + FRISCH, '- 🔵 **Solo** E-Zeile folgt'].join('\n'), JETZT), OHNE_JETZT('Solo'), 'ohne Daniel-Todo-Abschnitt')
+// Jetzt-Dateien ohne Zeile in stand.md
+const JD = (n) => `Jetzt-Datei ohne Zeile in stand.md: ${n} — eintragen oder erledigt- voranstellen`
+const standMit = mitPunkten(['- 🔵 **x** siehe f12-frage.md und F7%20Frage.md und G 8 Wort.md'], [])
+const imOrdner = ['f12-frage.md', 'f99-neu.md', 'F7 Frage.md', 'G 8 Wort.md', 'e5-lose.md', 'erledigt-f1.md', 'notiz.txt']
+assert.equal(w.waechter(standMit, JETZT, () => true, undefined, undefined, imOrdner), [JD('f99-neu.md'), JD('e5-lose.md')].join('; '), 'zwei Dateien ohne Eintrag, mit Eintrag (auch %20), erledigt- und .txt still')
+assert.equal(w.waechter(standMit, JETZT, () => true, undefined, undefined, ['f12-frage.md', 'erledigt-a.md']), '', 'alle eingetragen oder erledigt')
+assert.equal(w.waechter(standMit, JETZT, () => true), '', 'ohne Ordnerliste: keine Dateimeldung')
+{
+  const ordner = mkdtempSync(join(tmpdir(), 'stand-jetzt-'))
+  mkdirSync(join(ordner, 'archiv'))
+  mkdirSync(join(ordner, 'ordner.md'))
+  writeFileSync(join(ordner, 'archiv', 'unter.md'), 'x')
+  writeFileSync(join(ordner, 'a.md'), 'x')
+  writeFileSync(join(ordner, 'erledigt-b.md'), 'x')
+  assert.deepEqual(jetztOrdnerDateien(ordner).sort(), ['a.md', 'erledigt-b.md'], 'Unterordner zählen nicht (auch nicht ein Ordner namens *.md)')
+  assert.deepEqual(w.waechter('## In Arbeit' + FRISCH, JETZT, () => true, undefined, undefined, jetztOrdnerDateien(ordner)), JD('a.md'), 'echter Ordner: nur a.md')
+  assert.deepEqual(jetztOrdnerDateien(join(ordner, 'fehlt')), [], 'fehlender Ordner')
+  rmSync(ordner, { recursive: true, force: true })
+}
 console.log('stand-waechter.test: ok (tote Datei-Links: tot/lebend, %20, Anker, Dubletten, http, Reihenfolge, echtes Dateisystem; Jetzt-Dateien: Kennung, Reihenfolge, Pflichtabschnitte je einmal, Archiv optional, ohne Link, Link-Ziel, Nicht-Listenzeile)')

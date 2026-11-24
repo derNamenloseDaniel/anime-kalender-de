@@ -276,3 +276,7 @@ Die langen Kommentare aus dem JSX von `DetailPanel.tsx` stehen hier; der Körper
 - **Quellen gesammelt unten (29.08.2026):** Die Zeile „Metadaten von AniList · MAL …“ nannte eine Quelle von sechs und war nicht klickbar.
 - **Bühnenbild ist das Cover (24.08.2026):** alle 2.762 Titel haben ein Cover, nur 2.111 ein Banner (651 leere Verläufe); kein Banner-Rückfall von einem Reihenteil.
 - **Staffel 1 heißt „Staffel 1“ (Daniel, 02.09.2026, Apothekerin):** Die Nummer wird gezählt (`staffelBeschriftungen()`, nur Staffeln, chronologisch nach japanischer Ausstrahlung), nicht geraten; bei nur einer Staffel entfällt die Zeile.
+
+## Ungelayerte Regeln schlagen jede Utility (24.11.2026)
+
+In Tailwind v4 liegen Utilities in `@layer utilities`; jede ungelayerte Regel gewinnt dagegen, auch ein `*`. Die globale Scrollbar-Regel (`scrollbar-width: thin`) stand ungelayert und machte `[scrollbar-width:none]` an Staffel-Reitern, Kopfzeile, Chips, News und Reihen-Spur wirkungslos (gemessen: alle `thin`; nach dem Umzug in `@layer base` `none`, Kontrolle ohne Klasse `thin`). Wächter: `tools/scrollbar-layer.test.mjs`. Weitere ungelayerte Element-Regeln (nur gelistet): `header { transition }` unter 768 px, `footer p a` im Tippziel-Modus, `select option`, `*` bei reduzierter Bewegung (`!important`, gewollt).

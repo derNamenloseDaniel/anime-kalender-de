@@ -56,6 +56,8 @@ export const FAELLE = [
   /* Große Reihen (20.11.2026, für die echte Übersicht): Pokémon (66 gezeigte Teile; die Fälle pokemon-film, -concierge, -sammeltitel und detektiv-conan-film sind abgeleitet, `fall-optionen.ts`) und Gundam (52 Teile, nur 4 gezeigt: bleibt Spur). */
   { slug: 'pokemon-horizonte', name: 'Pokémon Horizonte (große Reihe)', titel: 158871 },
   { slug: 'gundam-hathaway', name: 'Mobile Suit Gundam Hathaway (52 Teile, 4 gezeigt)', titel: 105595 },
+  /* Prime nur zum Kauf/zur Leihe neben Abo-Weg (Mockup `kalender-wuensche-bereiche`, 23.11.2026): Akira mit Joyn-Abo, Prime und YouTube zum Kauf. */
+  { slug: 'akira', name: 'Akira (Film: Joyn im Abo, Prime und YouTube zum Kauf)', titel: 47 },
 ]
 
 /**

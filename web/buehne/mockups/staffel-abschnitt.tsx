@@ -1,25 +1,18 @@
-import type { ComponentProps } from 'react'
-import { AntwortKastenMitMarke } from '../../src/components/detail/kasten-marke.tsx'
-import { useDatensatz } from '../ausschnitte/datensatz.ts'
 import { mockup } from '../register.ts'
-import { ReiterUeberKasten } from './staffel-reiter.tsx'
 
-/** Der echte Antwortkasten, mit den Staffel-Reitern der Reihe direkt darüber (ohne Staffeln: unverändert). */
-function KastenMitReitern(eigenschaften: ComponentProps<typeof AntwortKastenMitMarke>) {
-  const data = useDatensatz()
-  const kasten = <AntwortKastenMitMarke {...eigenschaften} />
-  return data ? <ReiterUeberKasten data={data} eigenschaften={eigenschaften} kasten={kasten} /> : kasten
-}
-
+/** Entschieden (F157, 24.11.2026): Variante A. Seit dem Bau ist sie die echte Komponente (`web/src/components/detail/staffel-abschnitt.tsx`), das Mockup zeigt sie ohne Ersatz und dient als Bildvergleich. */
 mockup({
   name: 'staffel-abschnitt',
-  titel: 'Staffel-Reiter an der roten Box (F157), nur echte Daten',
+  titel: 'Staffel-Reiter an der Abschnittsbox (F157), nur echte Daten',
   ausschnitt: 'detailpanel',
-  faelle: ['pokemon-horizonte', 'pokemon-sammeltitel', 'pokemon-reisen'],
+  faelle: ['pokemon-sammeltitel', 'pokemon-reisen', 'pokemon-horizonte'],
+  zeiten: { '24.11. 10:00': '2026-11-24T10:00:00+01:00' },
   varianten: {
     A: {
-      ersatz: { AntwortKasten: KastenMitReitern },
-      notiz: 'Karteikarten-Reiter hängen oben an der Box, links das Wort „Staffeln“. Der gewählte Reiter ist Teil der Box; ein Klick öffnet die Staffel mit ihrem Cover, ihrer Handlung und ihren Daten. Wo eine Staffel läuft, ist ihr Reiter gefüllt und trägt einen Punkt. Alle Reiter, Titel und Zahlen sind echte Daten: Pokémon Horizonte hat 4 Staffeln, Pokémon (Hauptserie) 12 Reiter für die Staffeln 1 bis 25 (ein Eintrag der Daten deckt teils mehrere Staffeln ab, z. B. „1–5“). Eine Reihe mit mehr Staffelteilen gibt es im Datensatz nicht.',
+      ersatz: {},
+      notiz: 'Im Folgenbereich steht je Staffel der Detaildatei (`s`) ein Reiter mit ihrer Nummer, ab zwei Staffeln. Der gewählte Reiter hat die Farbe der Box und geht ohne Kante in sie über; die Box nennt Folgen, Lage und Synchro der Staffel und klappt ihre Folgen auf. '
+        + 'Ein Reiter wählt nur den Abschnitt, er wechselt nie den Titel. Ohne Wahl steht er auf der laufenden Staffel, sonst auf der letzten mit deutscher Folge. Pfeile stehen nur, wenn in ihrer Richtung weitere Reiter liegen; kein Scrollbalken. '
+        + 'Pokémon (Staffel 1–5): fünf Reiter; Pokémon Reisen: drei (23–25). Pokémon Horizonte: vier Reiter; seine Detaildatei trägt die Staffelnamen (`sn`), die Box nennt den Namen der gewählten Staffel ohne Serienteil und „Staffel N –“, der Reiter trägt ihn als zugänglichen Namen.',
     },
   },
 })

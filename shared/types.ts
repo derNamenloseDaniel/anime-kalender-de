@@ -444,9 +444,8 @@ export interface Title {
   /** Eigene Serie der Reihe (Spin-off, Handliste), keine Staffel; wie `FranchiseMember.eigenesWerk`. */
   eigenesWerk?: true
   /**
-   * Staffel-Titel (`shared/staffel-titel.ts`): `sammel` = AniList-Kennung des Sammeltitels, aus dem der Bau ihn geschnitten hat
-   * (`pipeline/bau/staffel-titel.ts`), `nr` = deutsche Staffel, `ab` = ihre erste Folge in der durchlaufenden Zählung des Sammeltitels.
-   * `al` der Ausgabe zeigt auf `sammel` (die Staffel hat keine eigene AniList-Seite); Meldungen zur Staffel bildet `zurueckAufSammeltitel` ab.
+   * Staffel-Titel vom 20. bis 24.11.2026 (`shared/staffel-titel.ts`): `sammel` = AniList-Kennung der Serie, `nr` = deutsche Staffel, `ab` = erste
+   * Folge in der durchlaufenden Zählung. Der Bau erzeugt keine mehr (F157); es lesen nur noch die Mockups der Bühne (`web/buehne/mockups/staffel-*`, Welle 1c).
    */
   staffelTitel?: { sammel: number; nr: number; ab: number; aktiv?: string; laengste?: number }
   genres: string[]

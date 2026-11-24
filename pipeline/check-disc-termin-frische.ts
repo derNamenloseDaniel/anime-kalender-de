@@ -87,6 +87,10 @@ try {
   for (const asId of [705, 706]) writeFileSync(`${ARCHIV_DIR}/${asId}.html.gz`, '')
   pruefe('Disc-Titel zwischen Release-Titeln: beide vorn', ids(baueWarteschlange({ ...viele, limit: 2 })), [5, 1])
   pruefe('danach Titel mit Release in Eingangsreihenfolge', ids(baueWarteschlange(viele)), [5, 1, 3, 2, 6])
+  // Disc-Titel 7 ohne Cache-Eintrag: `discFaellig` darf nie mit `undefined` gerufen werden; Neue stehen vor den Disc-Titeln.
+  // Zwei davon, damit der Vergleich nach `!cache` bis zur Disc-Regel kommt.
+  const ohneEintrag = { ...viele, ids: { ...viele.ids, 7: 707, 8: 708 }, titles: [...viele.titles, titel(7), titel(8)], discFaellig: discFaellig(new Set([1, 5, 7, 8]), HEUTE) }
+  pruefe('Disc-Titel ohne Cache-Eintrag: kein Wurf, kommen als neu zuerst', ids(baueWarteschlange(ohneEintrag)), [7, 8, 5, 1, 3, 2, 6])
   pruefe('frisch gelesener Disc-Titel 4 bleibt draußen', ids(baueWarteschlange({ ...basis, discFaellig: disc })).includes(4), false)
 } finally {
   process.chdir(vorher)

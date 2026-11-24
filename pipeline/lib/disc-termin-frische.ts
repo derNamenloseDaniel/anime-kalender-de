@@ -1,10 +1,8 @@
 /**
  * **Künftige Disc-Termine werden schneller neu gelesen als der Rest** (24.11.2026).
  *
- * Anlass: Die Seite nannte für „Pokémon: Staffel 23-25 - Reisen - Limited Edition" den 18.12.2026, aniSearch und Amazon nennen
- * den 30.04.2027. Der Termin stammt aus dem Abschnitt „Neuerscheinungen" der Titelseite (`data/disc-ausgaben.json`, Schlüssel 112153),
- * und diese Seite wird nur alle 30 Tage neu geholt (`TITEL_MAX_AGE_DAYS`); gelesen am 30.10., geändert danach. Gemessen am
- * 24.11.2026: 212 von 221 Ausgaben mit Datum ab 25.10. hingen an einer Seite, die 15 bis 30 Tage alt war.
+ * Der Termin steht auf der aniSearch-Titelseite, die sonst nur alle 30 Tage neu kommt (`TITEL_MAX_AGE_DAYS`). Anlass (Pokémon-Reisen),
+ * Messung und Last: `docs/wissen/quellen.md`, Abschnitt „Künftige Disc-Termine" (24.11.2026).
  */
 
 export interface DiscAusgabeKurz {
@@ -12,7 +10,7 @@ export interface DiscAusgabeKurz {
   datum: string
 }
 
-/** Titel mit Termin neu holen, wenn die Seite älter ist (Tage). Bei 86 Titeln mit künftiger Ausgabe sind das rund 12 Seiten am Tag. */
+/** Titel mit Termin neu holen, wenn die Seite älter ist (Tage). 142 Titel (Stand 24.11.2026, 30 Tage Rückblick) sind rund 20 Seiten am Tag. */
 export const DISC_FRIST_TAGE = 7
 /** Eine Ausgabe zählt noch, wenn ihr Datum höchstens so viele Tage zurückliegt: Verschiebungen kurz nach dem Termin und Lieferverzug. */
 export const DISC_RUECKBLICK_TAGE = 30

@@ -7,6 +7,7 @@
 import { readFileSync } from 'node:fs'
 import { PLATFORMS, RELEASE_TYPES, type PlatformId, type Release, type ReleaseType, type Title } from '../shared/types.ts'
 import { todayIso } from '../shared/time.ts'
+import { erstausgabeIstDiscWeg } from '../shared/verlag-anbieter.ts'
 import { EMPTY_FILTERS, filterTitles, type FilterState } from '../web/src/lib/filters.ts'
 import { groupByFranchise } from '../web/src/lib/db-gruppen.ts'
 import { ordneListe } from '../web/src/lib/db-liste.ts'
@@ -66,10 +67,11 @@ for (const [gruppiert, sort, suche] of [[false, 'relevanz', ''], [true, 'relevan
   }
 }
 
-console.log('\nDisc-Zahl unabhängig von der Weg-Logik, direkt aus den Releases (Plattform disc ODER Art disc):')
+console.log('\nDisc-Zahl unabhängig von der Weg-Logik, direkt aus den Releases (Plattform disc ODER Art disc) und der Erstausgabe beim Disc-Verlag (F156):')
 {
   const direkt = new Set<number>()
   for (const [id, rs] of releasesByTitle) if (rs.some((r) => r.platform === 'disc' || r.releaseType === 'disc')) direkt.add(id)
+  for (const t of quelle) if (erstausgabeIstDiscWeg(t.deErstausgabe)) direkt.add(t.id)
   const z = zaehle(false, 'relevanz')
   pruefe(`Art Disc zählt ${direkt.size} Titel`, z.releaseTypes.get('disc') === direkt.size, z.releaseTypes.get('disc'))
   pruefe('Plattform Disc und Schnell-Chip Disc zählen dasselbe', z.platforms.get('disc') === direkt.size && z.schnell.disc === direkt.size, [z.platforms.get('disc'), z.schnell.disc])

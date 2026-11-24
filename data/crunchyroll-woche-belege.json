@@ -772,5 +772,41 @@
       0.21861111111111112,
       0.12265917602996254
     ]
+  },
+  "GRE50KV36|174|174|2026-11-28|17:00": {
+    "seriesId": "GRE50KV36",
+    "titel": "Black Clover (Staffel 2)",
+    "von": 174,
+    "bis": 174,
+    "datum": "2026-11-28",
+    "zeit": "17:00",
+    "artikel": "https://www.crunchyroll.com/de/news/seasonal-lineup/2026/10/5/crunchyroll-wochenprogramm-herbst-2026",
+    "erstmalsAm": "2026-11-24T12:02:09.731Z",
+    "bild": "www.crunchyroll.com/wochenprogramm/gre50kv36/2026-11-28-f174-2026-11-24-12-02.webp",
+    "bildAm": "2026-11-24T12:02:09.731Z",
+    "markierung": [
+      0.021111111111111112,
+      0.8710550045085663,
+      0.21861111111111112,
+      0.11812443642921551
+    ]
+  },
+  "G4PH0WX5J|6|6|2026-11-29|11:00": {
+    "seriesId": "G4PH0WX5J",
+    "titel": "Aoashi Staffel 2",
+    "von": 6,
+    "bis": 6,
+    "datum": "2026-11-29",
+    "zeit": "11:00",
+    "artikel": "https://www.crunchyroll.com/de/news/seasonal-lineup/2026/10/5/crunchyroll-wochenprogramm-herbst-2026",
+    "erstmalsAm": "2026-11-24T12:02:09.731Z",
+    "bild": "www.crunchyroll.com/wochenprogramm/g4ph0wx5j/2026-11-29-f6-2026-11-24-12-02.webp",
+    "bildAm": "2026-11-24T12:02:09.731Z",
+    "markierung": [
+      0.2675,
+      0.6697459584295612,
+      0.21861111111111112,
+      0.302540415704388
+    ]
   }
 }

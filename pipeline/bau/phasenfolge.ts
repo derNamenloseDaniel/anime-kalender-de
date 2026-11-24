@@ -50,7 +50,7 @@ export function bauePhasenfolge(quellen: ReturnType<typeof ladeQuellen>): Phasen
 
   const { titles, jpStart, jpStartAnzeige } = baueTitelGemessen(quellen) // baueTitel plus Messung aniSearch gegen AniList (nichts wird ausgeliefert)
   haltePunkt('02-titel', titles)
-  const { tvJeTmdb, toteAdressen, netflixOhneKennung } = fuehreReihenZusammen({
+  const { tvJeTmdb, toteAdressen } = fuehreReihenZusammen({
     byAniId,
     byMal,
     titles,
@@ -89,7 +89,6 @@ export function bauePhasenfolge(quellen: ReturnType<typeof ladeQuellen>): Phasen
     tmdbTitles,
     tvJeTmdb,
     toteAdressen,
-    netflixOhneKennung,
     anisearch,
     verweiseEntfernt,
     katalogEintraege: cr.katalogEintraege,

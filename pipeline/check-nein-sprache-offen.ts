@@ -70,7 +70,6 @@ console.log('\nVerdrahtung in Bauphase 9 (echter Auslöser: Trinity Seven, Anive
       tmdbTitles: {},
       tvJeTmdb: new Set(),
       toteAdressen: new Set(),
-      netflixOhneKennung: 0,
       anisearch: {},
       verweiseEntfernt: [],
       katalogEintraege: [],

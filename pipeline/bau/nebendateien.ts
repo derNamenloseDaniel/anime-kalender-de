@@ -1,4 +1,7 @@
-import { writeJson, readJson, log, warn } from '../lib/util.ts'
+import { writeJson, readJson, log, warn, ROOT } from '../lib/util.ts'
+import { resolve } from 'node:path'
+import { ladeBelegeEntfernt } from '../lib/belege-entfernt.ts'
+import { ohneWiderlegte } from '../lib/quellen-ruecknahme.ts'
 import { ladeAnisearchAbruf } from '../lib/anisearch-verworfen.ts'
 import { namensIndex } from './ohne-synchro-namen.ts'
 import { STAND_ZEILE, writeTextStand } from '../lib/stand-halten.ts'
@@ -397,6 +400,7 @@ export function quellenPflegen(releases: Release[]): void {
   const lesungen = readJson<BelegGedaechtnis>('data/beleg-lesungen.json', {})
   const heute = todayIso()
   const lesetag = ladeAdnLesetage()
+  const entfernt = ladeBelegeEntfernt(resolve(ROOT, 'data/belege-entfernt.yaml'))
 
   for (const release of releases) {
     const termin = release.schedule.firstEpisodeDate
@@ -417,7 +421,7 @@ export function quellenPflegen(releases: Release[]): void {
     const neu = behalteLesetag(mitLesetag(release, roh, lesetag), historie[release.slug] ?? [], termin)
 
     const aktuelleAdressen = new Set(neu.map((q) => q.url))
-    const alt = ohneFehlzuordnung(historie[release.slug] ?? [], neu).map((q) => {
+    const alt = ohneFehlzuordnung(ohneWiderlegte(historie[release.slug] ?? [], release.titleId, entfernt), neu).map((q) => {
       if (aktuelleAdressen.has(q.url)) return q
       /**
        * Die Quelle steht nicht mehr hinter dem geltenden Termin. Ob sie

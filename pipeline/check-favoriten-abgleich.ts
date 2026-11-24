@@ -134,7 +134,7 @@ pruefe('Hook nutzt starteTakt und gleicheAb mit der echten Abholung und Sendung'
 const sync = readFileSync(new URL('../web/src/lib/newsletterSync.ts', import.meta.url), 'utf8')
 pruefe('Basis liegt nicht im alten Sendestand-Schlüssel (dort stand der letzte Upload, nicht der gemeinsame Stand)', /gesendeterStand = \(\)[^\n]*getItem\(BASIS_KEY\)/.test(sync) && !/BASIS_KEY = 'newsletterSyncSent'/.test(sync))
 /* Ein Hochladen ohne vorheriges Abholen überschreibt, was ein anderes Gerät gemerkt hat. Erlaubt: der Abgleich und der Mail-Link (vereinigt vorher). */
-const erlaubt = new Set(['lib/favoriten-abgleich.ts', 'lib/newsletterSync.ts', 'components/StaticViews.tsx'])
+const erlaubt = new Set(['lib/favoriten-abgleich.ts', 'lib/newsletterSync.ts', 'components/newsletter-zustand.ts'])
 const wurzel = new URL('../web/src/', import.meta.url)
 const fremd = (readdirSync(wurzel, { recursive: true }) as string[])
   .map((d) => d.replaceAll('\\', '/'))

@@ -67,7 +67,7 @@ function bauePrimeWege(zeilen: string[], zugeordnet: string, startWege: string[]
   const titel = { id: 1735, slug: 'naruto-shippuden', streams: wege } as unknown as Title
   const titles = new Map<number, Title>([[1735, titel]])
   const belege = sammleBelege({ releases: [] as Release[], titles, crBySeriesId: new Map(), tmdbMehrdeutig: new Set(), tmdbTitles: {}, tvJeTmdb: new Set(), toteAdressen: new Set(), crDub: { scrapedAt: '', serien: [] } as never })
-  const pruefung = werteLinkpruefungAus({ ...belege, titles, netflixOhneKennung: 0, vorherTitles: [] })
+  const pruefung = werteLinkpruefungAus({ ...belege, titles, vorherTitles: [] })
   uebernehmePrimeUndCrVorschlaege({ ...belege, ...pruefung, titles, tmdbTitles: {}, anisearch: {} })
   return titel.streams.filter((s) => s.platform === 'primevideo')
 }

@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-23",
+  "stand": "2026-11-24",
   "eintraege": [
     {
       "titel": "Expelled from Paradise: Liberated from Paradise",
@@ -49,13 +49,6 @@
       "anbieter": "primevideo",
       "start": "2026-11-20",
       "seit": "2026-11-08"
-    },
-    {
-      "titel": "2.5 Dimensional Seduction",
-      "id": 185515,
-      "anbieter": "disc",
-      "start": "2026-11-20",
-      "seit": "2026-11-18"
     },
     {
       "titel": "Soukou Kihei Votoms: Haiiro no Hexe",
@@ -136,6 +129,13 @@
     }
   ],
   "abgeloest": [
+    {
+      "titel": "2.5 Dimensional Seduction",
+      "id": 185515,
+      "anbieter": "disc",
+      "start": "2026-11-20",
+      "seit": "2026-11-18"
+    },
     {
       "titel": "CARDFIGHT!! VANGUARD Divinez: Parallactic Fate",
       "id": 214536,

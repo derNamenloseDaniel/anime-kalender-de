@@ -64,6 +64,7 @@ const kontext = {
 }
 kontext.globalThis = kontext
 vm.createContext(kontext)
+vm.runInContext(readFileSync(resolve(__dirname, 'netflix-erinnern.js'), 'utf8'), kontext)
 vm.runInContext(readFileSync(resolve(__dirname, 'netflix-liste-ansicht.js'), 'utf8'), kontext)
 /* Feste Uhr für den Standardwert `jetzt` (ohne Angabe liest der Kopf `Date.now`). */
 vm.runInContext(`Date.now = () => ${JETZT}`, kontext)
@@ -304,6 +305,19 @@ const knopf = (wurzel, text) => finde(wurzel, (el) => el.tagName === 'BUTTON' &&
 
   const standard = baue({ jetzt: undefined })
   pruefe('ohne `jetzt` gilt die Uhr des Browsers', standard.kopf.kinder[0].kinder[1].textContent === 'nächste Übernahme: 12:23', standard.kopf.kinder[0].kinder[1].textContent)
+}
+
+{
+  /* Standardfrist (Daniel, 22.11.2026): „zurück bis“ ohne Datum von Netflix nennt die 7 Tage dazu; mit Datum und bei anderen Gründen nicht. */
+  const zellenZu = (grund) => {
+    const zeile = { id: '90', titel: 'Fan Letter', grund, bis: JETZT + 7 * 86400000, am: JETZT }
+    const t = baue({ zurueck: [zeile] }).tabelle
+    return finde(t, (el) => el.tagName === 'TD' && el.className === 'ak-zurueck-bis')[0]
+  }
+  const ohne = zellenZu('Erinnern-Knopf ohne Datum')
+  pruefe('Zeile ohne Datum von Netflix: „zurück bis“ nennt die 7-Tage-Frist', /\(7 Tage\)$/.test(ohne.textContent), ohne.textContent)
+  pruefe('Zeile mit Datum von Netflix: kein Zusatz', !/Tage/.test(zellenZu('Erinnern-Knopf mit Datum (19.11.)').textContent))
+  pruefe('Zeile mit anderem Grund: kein Zusatz', !/Tage/.test(zellenZu('Netflix zeigt ihn nicht (E103)').textContent))
 }
 
 console.log(fehler.length ? `\n✗ ${fehler.length} Fehler` : '\n✓ netflix-liste-ansicht: alle Zusicherungen halten')

@@ -917,3 +917,7 @@ Gruppiert nach Kennung (K1, K5l …); Regeln ohne Kennung unter ihrem alten Absc
 ### pruefer: Kennung K2e
 
 - [P139] **K2e Handbeleg-Block zu Titel mit Lücken (Lehre 128, 17.11.2026, PR 4096):** Wer einen Block zu einem Titel mit Lücken-Bereichen ergänzt, hält die Ausgabe von `ladeHandbelege()` bzw. `dubRanges` in `titles.json` vorher gegen nachher (One Piece: Folge 492 wurde deutsch).
+
+### bauer: Kennung K56
+
+- [B311] **K56 Gespeicherter Nutzerzustand (Lehre 242, 23.11.2026, PR 4763):** Der Favoriten-Abgleich las den alten Schlüssel `newsletterSyncSent` als neue Abgleich-Basis; nach dem Update löschte der erste Abgleich am PC alle Favoriten, die das Handy nicht kannte. Neue Bedeutung bekommt einen neuen Schlüssel; Tests laufen mit echten Modulen auf befülltem Speicher (Stand vor dem Update), dazu ein Rotbeleg gegen den alten Weg. Alte Seitenfassungen, die weiter blind hochladen, gehören ins Bedrohungsmodell (der Worker vereinigt ohne `ersetzen`).

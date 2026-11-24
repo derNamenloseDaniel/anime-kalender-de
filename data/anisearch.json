@@ -555,7 +555,7 @@
         "Eyeshield21"
       ]
     },
-    "fetchedAt": "2026-10-25T04:01:34.128Z"
+    "fetchedAt": "2026-11-24T04:01:52.632Z"
   },
   "16": {
     "anisearchId": 2542,
@@ -985,7 +985,8 @@
             "Crunchyroll S.A.S.",
             "Rose Entertainment",
             "Panini UK, Ltd.",
-            "Crunchyroll"
+            "Crunchyroll",
+            "Selecta Visión S.L.U."
           ]
         },
         {
@@ -1047,6 +1048,10 @@
         {
           "name": "TV Tokyo",
           "url": "https://www.tv-tokyo.co.jp/anime/naruto/"
+        },
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/naruto/"
         }
       ],
       "synonyms": [
@@ -1055,16 +1060,12 @@
         "Phénomène Naruto"
       ]
     },
-    "fetchedAt": "2026-10-25T04:01:41.234Z"
+    "fetchedAt": "2026-11-24T04:01:59.715Z"
   },
   "21": {
     "anisearchId": 2227,
     "descriptionDe": "Reichtum, Macht und Ruhm. Der Mann, der sich dies alles erkämpft hatte, war Gold Roger, der König der Piraten. Als er hingerichtet wurde, waren seine letzten Worte: „Ihr wollt meinen Schatz? Den könnt ihr haben! Sucht ihn doch! Irgendwo habe ich den größten Schatz der Welt versteckt.“ Dieser Schatz ist das One Piece und er liegt irgendwo auf der Grandline. Damit brach das große Piratenzeitalter an …\n\nMonkey D. Ruffy ist 17 Jahre alt und hat ein großes Ziel: Er will König der Piraten werden und den Schatz „One Piece“ finden! Ruffy hat besondere Kräfte durch die Teufelsfrucht „GumGum“ erhalten und ist ein Gummimensch. Sein Traum wurde angefeuert durch den Piraten Shanks, der ihm einst das Leben rettete und Ruffy kurz vor seiner Abreise seinen, ihm sehr wichtigen, Strohhut schenkte. Zunächst muss er also eine Mannschaft und ein Schiff finden … Gesagt, getan! Mit dem starken Schwertkämpfer Zorro, dem Lügenbold Usopp, der hübschen Diebin Nami, dem Meisterkoch Sanji und später auch dem Elch Chopper und einigen weiteren Gefährten schafft er sich ein zwar merkwürdiges, doch gelungenes Team. Die nun entstandene Strohhutpiratenbande hat aber viel Ärger mit ihrem durchgeknallten Gummikapitän, doch das ist längst nicht das einzige Problem, denn viele Fieslinge stellen sich der Bande in den Weg. Da wären zum Beispiel Käpt’n Black, der Usopps Dorf vernichten will, Arlong, der Schuld an Namis düsterer Vergangenheit ist, aber auch die Marine wird sehr schnell aktiv und will die Strohhutbande schnappen …Anmerkung:\nZu Beginn wurde der Anime im damals üblichen 4:3-Format produziert. Seit Folge 207 (31. Oktober 2004) wird die Serie im 16:9-Format produziert.",
     "streams": [
-      {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CGVXJW1Q?tag=anisearch.de-21"
-      },
       {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/80107103"
@@ -1072,6 +1073,10 @@
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/one-piece"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CGVXJW1Q?tag=anisearch.de-21"
       },
       {
         "provider": "adn-de",
@@ -1227,7 +1232,7 @@
         "OneP"
       ]
     },
-    "fetchedAt": "2026-10-25T04:01:48.397Z"
+    "fetchedAt": "2026-11-24T04:02:06.896Z"
   },
   "22": {
     "anisearchId": 823,

@@ -6,6 +6,8 @@ import { alsTitel, type CartoonEintrag } from '../lib/cartoons.ts'
 import { ohneTote } from '../lib/cartoon-aufnahme.ts'
 import { verschiebungenAnwenden } from '../lib/disc-verschiebungen.ts'
 import { discIndexLaden } from '../lib/disc-ean.ts'
+import { discAufGeschwisterUmhaengen } from '../lib/disc-geschwister.ts'
+import type { DiscAusgabe } from '../lib/disc-termin.ts'
 import { aniSearchDatumAnwenden, veroeffentlichungstage } from '../lib/disc-anisearch-datum.ts'
 import { vorschlaegeAusAllenSammelartikeln } from '../lib/sammelartikel.ts'
 import { schreibeUnzugeordnet } from '../lib/sammel-unzugeordnet.ts'
@@ -56,6 +58,8 @@ export function ergaenzeTermineAusNewsUndTv({ titles, releases }: {
   melde(`${nurOmu.length} Anime2You-Meldungen nennen nur Originalton mit Untertiteln — kein deutscher Termin daraus${nurOmu.length ? `: ${nurOmu.map((v) => v.articleTitle).join(' | ')}` : ''}`)
   schreibeNurOriginalton(nurOmu)
   schreibeUnzugeordnet(sammelV, ausMeldungen, abgedeckt, verluste)
+  const umgehaengt = discAufGeschwisterUmhaengen(releases, titles, discIndexLaden().ausgaben as Record<string, DiscAusgabe[]>)
+  if (umgehaengt.length) log(`${umgehaengt.length} Disc-Termine an die Staffel umgehängt, deren Ausgabe sie führt: ${umgehaengt.map((v) => `${v.name} (${v.von} → ${v.nach})`).join(', ')}`)
   const verschoben = verschiebungenAnwenden(releases, rohVorschlaege.proposals ?? [], todayIso(), titles, discIndexLaden())
   if (verschoben.length) log(`${verschoben.length} Disc-Termine laut Anime2You verschoben: ${verschoben.map((v) => `${v.name} (${v.von} → ${v.nach})`).join(', ')}`)
   const neuerBeiAniSearch = aniSearchDatumAnwenden(releases, discIndexLaden(), veroeffentlichungstage(rohVorschlaege.proposals ?? []), todayIso(), quellenHistorieLaden())

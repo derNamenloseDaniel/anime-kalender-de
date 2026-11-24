@@ -57,7 +57,6 @@ function wegBleibt(zeilen: string[]): boolean {
     ytKanal: {},
     ytKauf: new Set(),
     titles,
-    netflixOhneKennung: 0,
     checksJePlattform: new Map(),
     youtubeBefunde: {},
     belegFuer: (id, plattform) => (id === 140960 && plattform === 'disneyplus' ? check : undefined),

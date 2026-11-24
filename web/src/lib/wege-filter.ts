@@ -1,5 +1,6 @@
 import type { PlatformId, Release, ReleaseStatus, ReleaseType, Title } from '@shared/types.ts'
 import { releaseStatus, titleStatus } from '@shared/logic.ts'
+import { erstausgabeIstDiscWeg } from '@shared/verlag-anbieter.ts'
 import type { FilterState, ModusFeld } from './filters.ts'
 
 /**
@@ -22,7 +23,7 @@ export interface Weg {
   /** Der Zugang ist kostenlos (Stream oder Stream-Link). */
   frei?: boolean
   /** `titel`: Platzhalter für Titel ganz ohne Weg, trägt nur Jahr und Status des Titels. */
-  quelle: 'release' | 'stream' | 'link' | 'titel'
+  quelle: 'release' | 'stream' | 'link' | 'titel' | 'erstausgabe'
 }
 
 const wegeMerker = new WeakMap<Title, { releases: Release[]; heute: string; wege: Weg[] }>()
@@ -50,6 +51,8 @@ export function wegeVon(t: Title, releases: Release[], heute: string): Weg[] {
   for (const w of t.watchLinks ?? []) {
     if (w.kind === 'stream') wege.push({ plattform: w.name, art, status, jahr, frei: w.zugang === 'kostenlos', quelle: 'link' })
   }
+  /* Die aniSearch-Erstausgabe ist ein Disc-Weg, wenn ihr Verlag Discs herausgibt (F156, 23.11.2026); `istDiscWeg` ist weiter unten definiert, läuft aber erst beim Aufruf. */
+  if (erstausgabeIstDiscWeg(t.deErstausgabe) && !wege.some(istDiscWeg)) wege.push({ plattform: 'disc', art: 'disc', status, jahr, quelle: 'erstausgabe' })
   const ergebnis = wege.length || !ohneRelease ? wege : [{ plattform: '', status, jahr, quelle: 'titel' as const }]
   wegeMerker.set(t, { releases, heute, wege: ergebnis })
   return ergebnis

@@ -28,6 +28,7 @@ import { installiereLinuxSchrift } from './linux-schrift.mjs'
 import { pruefeFilterfenster } from './ansicht-filterfenster.mjs'
 import { pruefeFilterfensterRechner } from './ansicht-filterfenster-rechner.mjs'
 import { pruefeEscapeStapel } from './ansicht-escape-stapel.mjs'
+import { pruefeKlickDaneben } from './ansicht-filterfeld-klick.mjs'
 import { pruefeFilterknopf } from './ansicht-filterknopf.mjs'
 import { pruefeSuchIconFokus, pruefeSuchIconTastatur } from './ansicht-such-icon-fokus.mjs'
 import { pruefeTrefferprobe } from './ansicht-trefferprobe.mjs'
@@ -37,6 +38,7 @@ import { pruefeStatusfarben } from './ansicht-statusfarben.mjs'
 import { distPruefen } from './dist-frisch.mjs'
 import { pruefeTvReihe, meldeTvReihe } from './ansicht-tv-reihe.mjs'
 import { pruefeSaisonChip, meldeSaisonChip } from './ansicht-saison-chip.mjs'
+import { pruefeFahne, meldeFahne } from './ansicht-fahne.mjs'
 import { eckenFehler } from './ecken-urteil.mjs'
 import { messeDuell } from './ansicht-duell.mjs'
 import { messeDetailsOverlay } from './ansicht-details-overlay.mjs'
@@ -481,6 +483,19 @@ async function meldeSuchIconFokus() {
   return r.abweichungen.length + t.abweichungen.length > 0
 }
 
+/** Klick neben das Filterfeld der Woche schließt nur das Feld, ohne die Karte dahinter zu öffnen; wahr, wenn rot. */
+async function meldeKlickDaneben() {
+  const browser = await chromium.launch()
+  try {
+    const r = await pruefeKlickDaneben(browser, antworteAusDist)
+    console.log(`\nKlick neben das Filterfeld der Woche (1366 px): ${r.abweichungen.length ? '' : 'ok'}`)
+    for (const l of r.abweichungen) console.log(`  ✕ ${l}`)
+    return r.abweichungen.length > 0
+  } finally {
+    await browser.close()
+  }
+}
+
 /** Escape in gestapelten Ebenen (Detail-Panel + Quellen, Trailer, Cover): schließt genau die oberste; wahr, wenn rot. */
 async function meldeEscapeStapel() {
   const r = await pruefeEscapeStapel(chromium, antworteAusDist)
@@ -505,6 +520,7 @@ async function meldeZusatzpruefungen(seite, ansichten, handy) {
   if (!handy && ansichten.includes('datenbank') && (await meldeEscapeStapel())) rot = true
   if (!handy && ansichten.includes('datenbank') && (await meldeSuchIconFokus())) rot = true
   if (!handy && ansichten.includes('woche') && (await meldeHoverCover())) rot = true
+  if (!handy && ansichten.includes('woche') && (await meldeKlickDaneben())) rot = true
   if (!handy && ansichten.includes('entdecken') && (await meldeEmpfehlung())) rot = true
   if (!handy && ansichten.includes('entdecken') && (await meldeZuruecksetzen())) rot = true
   if (handy && ['woche', 'monat', 'datenbank'].every((a) => ansichten.includes(a))) {
@@ -524,6 +540,7 @@ async function meldeZusatzpruefungen(seite, ansichten, handy) {
     if (await meldeAbzeichen({ chromium, antworte: antworteAusDist, dist: DIST, lesePixel: lesePixelPng })) rot = true
     if (await meldeTerminKarte({ chromium, antworte: antworteAusDist, dist: DIST, lesePixel: lesePixelPng })) rot = true
     if (meldeSaisonChip(await pruefeSaisonChip(DIST))) rot = true
+    if (meldeFahne(await pruefeFahne(DIST))) rot = true
   }
   return rot
 }

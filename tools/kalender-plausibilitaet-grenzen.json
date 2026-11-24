@@ -6,7 +6,7 @@
     "spracheOffenTrotzMeldung": 0,
     "ereignisOhneNews": 0,
     "terminOhneBeleg": 0,
-    "primeOhneTitelseite": 2
+    "primeOhneTitelseite": 1
   },
   "bekannt": {
     "erschienenOhneTermin": [],
@@ -15,7 +15,6 @@
     "ereignisOhneNews": [],
     "terminOhneBeleg": [],
     "primeOhneTitelseite": [
-      "demon-slayer-entertainment-district-arc-primevideo",
       "yu-gi-oh-s1-primevideo"
     ]
   }

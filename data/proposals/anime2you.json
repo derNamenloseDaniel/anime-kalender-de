@@ -1,13 +1,13 @@
 {
-  "scrapedAt": "2026-11-23T15:02:01.481Z",
+  "scrapedAt": "2026-11-24T04:14:13.902Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 7,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 39,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 5,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 11,
-    "schon in einem Rubrik-Feed gelesen": 7,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 1,
-    "Sprachhinweis älter als 45 Tage": 6
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 41,
+    "schon in einem Rubrik-Feed gelesen": 34,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 10,
+    "Sprachhinweis älter als 45 Tage": 8
   },
   "proposals": [
     {
@@ -464,7 +464,7 @@
           "folgen": 24
         }
       ],
-      "sammelGelesen": "2026-11-21"
+      "sammelGelesen": "2026-11-24"
     },
     {
       "articleTitle": "Netflix nimmt »Call of the Night« in sein Programm auf",
@@ -1135,7 +1135,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-21"
+      "sammelGelesen": "2026-11-24"
     },
     {
       "articleTitle": "Black Friday 2026: Erste große Anime-Rabattaktionen gestartet",
@@ -2092,7 +2092,7 @@
           "folgen": 13
         }
       ],
-      "sammelGelesen": "2026-11-21"
+      "sammelGelesen": "2026-11-24"
     },
     {
       "articleTitle": "ProSieben MAXX zeigt »Wandering Witch: Elainas Reise« als TV-Premiere",
@@ -2434,7 +2434,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-21"
+      "sammelGelesen": "2026-11-24"
     },
     {
       "articleTitle": "Neue Anime-Katalogtitel im November 2026 bei aniverse",
@@ -2559,7 +2559,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-21"
+      "sammelGelesen": "2026-11-24"
     },
     {
       "articleTitle": "Zwei Anime-Neuzugänge auf Deutsch bei Crunchyroll",
@@ -2597,7 +2597,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-21"
+      "sammelGelesen": "2026-11-24"
     },
     {
       "articleTitle": "Crunchyroll zeigt dritte »Mashle«-Staffel im Simulcast",

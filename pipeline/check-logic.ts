@@ -6398,7 +6398,7 @@ pruefe(
   )
   pruefe(
     'und die Ansicht sagt der Suche, ob gruppiert wird',
-    /titelFuerAnsichtGen\(quelle, data, route\.filters, today, favorites, grouped(, sprecher\.auswahl)?\)/.test(appQuelle),
+    /titelFuerAnsichtGen\(quelle, data, filters, today, favorites, grouped(, sprecher\.auswahl)?\)/.test(readFileSync('web/src/lib/app-ansicht.ts', 'utf8')),
   )
   /*
     **Eine Serie kann Deutsch führen, auch wenn die untersuchte Staffel die japanische ist**

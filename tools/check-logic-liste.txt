@@ -221,6 +221,7 @@ pipeline/check-disc-handlinks.ts
 pipeline/check-disc-kaufweg-auto.ts
 pipeline/check-disc-reine-titel.ts
 pipeline/check-disc-suchlinks.ts
+pipeline/check-disc-nachlese.ts
 pipeline/check-disc-teil-hinweis.ts
 pipeline/check-disc-teil-verdrahtung.ts
 pipeline/check-disc-termin-frische-lauf.ts

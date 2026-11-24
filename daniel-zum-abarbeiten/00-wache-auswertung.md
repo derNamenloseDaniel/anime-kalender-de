@@ -1019,3 +1019,13 @@ wer die Ursache dann noch kennt, hat Glück. Deshalb diese Datei.
 **Wo sind echte Risiken und Lücken?** Nicht gemessen, warum die Prüfung erst im Bau 04:41 rot wurde: `30c9280d` (04:20) hatte den Titel mit vier Kaufwegen (Apple TV, MagentaTV, maxdome, Videoload), alle `dubRanges` Folge 1 deutsch. `titles.json` trägt `dubAbgeleitet` nicht, die Eingabe (Lauf `2ab2ff41`, 04:35 „Tagesquellen gesammelt“: u. a. `justwatch-audio.json`, `motn-changes.json`) ist nicht nachgestellt. Offen ist, ob die Annahme (Telekom-Weg) zu Recht allein steht oder ein anderer Weg seinen Beleg verlor. Der Titel kommt erst zurück, wenn die Prüfung grün ist; die Wache sieht das nicht von selbst.
 
 **Was läuft komplett falsch?** Nichts Belegbares: kein Fehlerschritt, der Lauf ist absichtlich rot. Kein Pull Request, da keine Codeursache gemessen ist.
+
+## 24.11.2026 — Wache meldet „3 Titel weniger“ (Lauf 45464447514, Issue #4902)
+
+**Was läuft korrekt.** Die Wache hat den Abgang im Bestandsbau 18:30 gefunden (Titel −3, Verweise −3, Urteile −3): Pokémon Horizonte: Die Serie (7000001), Staffel 2 (7000002), Staffel 3 (7000003) sind weg. Ursache ist PR 4897 (`94755919`, im Lauf-`headSha` enthalten): Horizonte ist wieder ein Titel (158871), Staffeln sind Abschnitte. Die Wache hat die drei Wege als „verschoben“ (rtlplus → 158871) erklärt (ℹ); der Lauf ist absichtlich rot (`exit 1`).
+
+**Wo ist Verbesserungspotenzial?** `titelAbgang` (`pipeline/lib/bestand-delta.ts:216`) erklärt Zusammenlegungen nur über `zuAk` in `kennungen.json`. Der PR setzt `zuAk` bewusst erst im Folge-PR nach dem ersten Bestandsbau (Rohan-Regel, `datensatz.md`); in diesem Fenster ist ein gewollter Umbau für die Wache rot. Die Umleitungspaare stehen schon in `ak-umleitung.json` und könnten sie erklären.
+
+**Wo sind echte Risiken und Lücken?** Solange `zuAk` fehlt, führen die alten Adressen der drei Staffel-Titel ins Leere (gemerkte Titel, versandte Links). Der Folge-PR war in `status.md` nicht als eigene Zeile geführt.
+
+**Was läuft komplett falsch?** Nichts: kein Datenverlust, kein Codefehler, kein Pull Request.

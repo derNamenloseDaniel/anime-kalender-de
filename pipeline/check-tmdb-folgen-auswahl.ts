@@ -3,7 +3,7 @@
  * Aufruf: `npm run check:logic`.
  */
 import { addDays, diffDays } from '../shared/time.ts'
-import { frischFaellig, grundFaellig, versatzTage, waehleFaellige, type BestandKurz, type FolgeKurz } from './lib/tmdb-folgen-auswahl.ts'
+import { frischFaellig, grundFaellig, terminFaellig, versatzTage, waehleFaellige, type BestandKurz, type FolgeKurz } from './lib/tmdb-folgen-auswahl.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -33,6 +33,18 @@ pruefe('Folge genau 21 Tage alt zählt', frischFaellig(bestand('2026-10-01', fol
 pruefe('Folge 22 Tage alt zählt nicht', !frischFaellig(bestand('2026-10-01', folge(2, 'Folge 2', '2026-10-02')), heute))
 pruefe('Staffel 0 zählt nicht', !frischFaellig(bestand('2026-10-16', folge(2, 'Folge 2', '2026-10-15', { s: 0 })), heute))
 
+console.log('\nTMDB-Folgen: angekündigte Folge')
+const kuenftig = (geholt: string, datum: string | null, rest: Partial<FolgeKurz> = {}): BestandKurz => bestand(geholt, echt, folge(2, 'Das Ende', datum, rest))
+pruefe('Folge morgen, Abruf 6 Tage alt: fällig', terminFaellig(kuenftig('2026-10-18', '2026-10-25'), heute))
+pruefe('Folge morgen, Abruf 5 Tage alt: nicht fällig', !terminFaellig(kuenftig('2026-10-19', '2026-10-25'), heute))
+pruefe('Folge heute zählt (Grenze)', terminFaellig(kuenftig('2026-10-18', heute), heute))
+pruefe('Folge gestern zählt nicht', !terminFaellig(kuenftig('2026-10-18', '2026-10-23'), heute))
+pruefe('Folge ohne Datum zählt nicht', !terminFaellig(kuenftig('2026-10-18', null), heute))
+pruefe('Staffel 0 zählt nicht', !terminFaellig(kuenftig('2026-10-18', '2026-10-25', { s: 0 }), heute))
+pruefe('Folge in 300 Tagen zählt', terminFaellig(kuenftig('2026-10-18', '2027-08-20'), heute))
+pruefe('Termin in der Mitte der Liste', terminFaellig(bestand('2026-10-18', echt, folge(2, 'Das Ende', '2026-10-25'), folge(3, 'Zugabe', '2026-10-11')), heute))
+pruefe('ohne Abruf-Eintrag keine Aussage der Terminregel', !terminFaellig(bestand('2026-10-18'), heute))
+
 console.log('\nTMDB-Folgen: Grundfrist')
 pruefe('nie geholt', grundFaellig(undefined, heute, 30))
 pruefe('29 Tage alt, alles bekannt', !grundFaellig(bestand('2026-09-25', echt), heute, 30))
@@ -55,6 +67,11 @@ pruefe('frisch zuerst, dann Rest, ruhige fehlen', ids(waehleFaellige(eingabe, b,
 pruefe('Limit 1 behält den frischen', ids(waehleFaellige(eingabe, b, heute, 30, 1)) === 'neu')
 pruefe('Limit 2', ids(waehleFaellige(eingabe, b, heute, 30, 2)) === 'neu,alt1')
 pruefe('Grundfrist des Aufrufs gilt auch in der Auswahl', ids(waehleFaellige([k('alt1'), k('ruhig')], b, heute, 60, 5)) === '')
+const mitTermin: Record<string, BestandKurz> = { ...b, termin: kuenftig('2026-10-17', '2026-11-02'), spaeter: kuenftig('2026-10-19', '2026-11-02') }
+const eingabeTermin = [k('alt1'), k('spaeter'), k('termin'), k('neu')]
+pruefe('Titel mit Termin kommt mit den frischen vor dem Rest, in Katalogreihenfolge', ids(waehleFaellige(eingabeTermin, mitTermin, heute, 30, 10)) === 'termin,neu,alt1', ids(waehleFaellige(eingabeTermin, mitTermin, heute, 30, 10)))
+pruefe('Limit 1 behält den Titel mit Termin vor dem Grundfälligen', ids(waehleFaellige([k('alt1'), k('termin')], mitTermin, heute, 30, 1)) === 'termin')
+pruefe('Termin-Titel mit Abruf unter 6 Tagen kommt nicht', ids(waehleFaellige([k('spaeter')], mitTermin, heute, 30, 5)) === '')
 pruefe('frischer Titel mit Alter über Grundfrist erscheint einmal', ids(waehleFaellige([k('x')], { x: bestand('2026-09-01', folge(2, 'Folge 2', '2026-10-15')) }, heute, 30, 5)) === 'x')
 
 console.log('\nTMDB-Folgen: Welle zerfällt in Wochenportionen')

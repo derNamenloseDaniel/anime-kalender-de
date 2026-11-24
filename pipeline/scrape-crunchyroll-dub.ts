@@ -301,7 +301,7 @@ async function naechsteStaffel(page: Page, bisher: string): Promise<boolean> {
   return false
 }
 
-async function serieLesenSeitenanzeige(page: Page, url: string): Promise<CrSerie> {
+export async function serieLesenSeitenanzeige(page: Page, url: string): Promise<CrSerie> {
   const heute = todayIso()
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
 

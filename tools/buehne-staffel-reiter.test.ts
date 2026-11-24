@@ -14,6 +14,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { KastenPfeileEinblenden, KastenPfeileImmer } from '../web/buehne/mockups/staffel-abschnitt.tsx'
 import { pfeilLageVon, pfeilZustandVon, sprungVon, type PfeilModus } from '../web/buehne/mockups/staffel-pfeile.ts'
 import { ReiterPfeil } from '../web/buehne/mockups/staffel-pfeile.tsx'
+import { ReiterZeile } from '../web/buehne/mockups/staffel-reiter.tsx'
 import { mockupMit } from '../web/buehne/register.ts'
 
 const datei = fileURLToPath(new URL('../web/buehne/faelle.json', import.meta.url))
@@ -111,6 +112,12 @@ assert.match(pfeil('rechts', 'immer', true), /aria-label="Weitere Staffeln"[^>]*
 assert.match(pfeil('rechts', 'immer', false), /aria-label="Weitere Staffeln"[^>]*aria-disabled="true"/)
 assert.equal(pfeil('links', 'einblenden', false), '', 'einblenden: links ohne Reiter links nicht da')
 assert.match(pfeil('links', 'einblenden', true), /data-pfeil="links"/)
+// Die Reiterzeile reicht den Modus an beide Pfeile durch (erster Aufbau ohne Messung: beide
+// deaktiviert; die Lage selbst misst erst der Browser, siehe Bilder im PR).
+const zeile = (modus: PfeilModus) => renderToStaticMarkup(createElement(ReiterZeile, { reiter: reiter(10852), aktiv: 10852, lagen: new Map(), farbe: '', pfeile: modus }))
+assert.equal((zeile('immer').match(/data-pfeil=/g) ?? []).length, 2, 'immer: beide Pfeile in der Zeile')
+assert.equal((zeile('einblenden').match(/data-pfeil=/g) ?? []).length, 0, 'einblenden: vor der Messung kein Pfeil')
+assert.equal((zeile('immer').match(/<button/g) ?? []).length, 12 + 2, '12 Reiter plus 2 Pfeile')
 // Die beiden Varianten des einen Mockups tauschen verschiedene Kästen (A einblenden, B immer).
 const varianten = mockupMit('staffel-abschnitt')!.varianten
 assert.deepEqual(Object.keys(varianten), ['A', 'B'])

@@ -36,7 +36,7 @@ function zeigeGewaehlten(zeile: HTMLElement | null): void {
 }
 
 /** Je Staffel ein Reiter mit nur der Nummer; wischt nativ, die Beschriftung für Hilfsmittel nennt den Titel. Seitlich Platz für die Rundung des Kastens. */
-function ReiterZeile({ reiter, aktiv, lagen, farbe, pfeile }: { reiter: Reiter[]; aktiv: number; lagen: Map<number, Lage>; farbe: string; pfeile: PfeilModus }) {
+export function ReiterZeile({ reiter, aktiv, lagen, farbe, pfeile }: { reiter: Reiter[]; aktiv: number; lagen: Map<number, Lage>; farbe: string; pfeile: PfeilModus }) {
   const wechsle = useContext(TitelWechselKontext)
   const zeile = useRef<HTMLDivElement>(null)
   useEffect(() => zeigeGewaehlten(zeile.current), [aktiv])

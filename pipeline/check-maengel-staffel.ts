@@ -11,14 +11,18 @@ function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
 }
 
 const adresse = (id: string) => `https://www.netflix.com/title/${id}`
-const titel = (id: number, episodes: number, kennung: string, franchiseId = 1): Title =>
-  ({ id, episodes, franchiseId, streams: [{ platform: 'netflix', url: adresse(kennung) }] }) as unknown as Title
+const titel = (id: number, episodes: number, kennung: string, franchiseId = 1, format = 'TV'): Title =>
+  ({ id, episodes, franchiseId, format, streams: [{ platform: 'netflix', url: adresse(kennung) }] }) as unknown as Title
 const liste = (...folgen: number[]) => ({ staffeln: folgen.map((f) => ({ folgen: f })) })
 const aus = (t: Title[], s: AnbieterStaffeln, start: Record<number, string> = {}) => [...staffelZuordnung(t, s, (i) => start[i])].map(([i, b]) => `${i}:${b}`).join()
 
-pruefe('überlappung (80063153): 25 + 25 + 1 + 25 Folgen in drei Staffeln zu 25 → alle vier Titel', aus([titel(11771, 25, '80063153'), titel(16894, 25, '80063153'), titel(16916, 1, '80063153'), titel(20725, 25, '80063153')], { 80063153: liste(25, 25, 25) }) === '11771:ueberlappung,16894:ueberlappung,16916:ueberlappung,20725:ueberlappung')
+const kuroko = (special: string) => [titel(11771, 25, '80063153'), titel(16894, 25, '80063153'), titel(16916, 1, '80063153', 1, special), titel(20725, 25, '80063153')]
+pruefe('Special (80063153, Kuroko): 25 + 25 + 25 + Tip Off (SPECIAL, 1 Folge) in drei Staffeln zu 25 → kein Befund, Netflix zählt das Special nicht', aus(kuroko('SPECIAL'), { 80063153: liste(25, 25, 25) }) === '')
+pruefe('Special entlastet nur ein Special: dasselbe als TV → überlappung; ein Special zählt nicht über die Staffeln hinaus', aus(kuroko('TV'), { 80063153: liste(25, 25, 25) }) === '11771:ueberlappung,16894:ueberlappung,16916:ueberlappung,20725:ueberlappung' && aus([...kuroko('SPECIAL'), titel(9, 1, '80063153')], { 80063153: liste(25, 25, 25) }) !== '')
 pruefe('überlappung: genau eine Folge zu viel trifft, genau passend nicht', aus([titel(1, 13, '91'), titel(2, 13, '91')], { 91: liste(13, 12) }) === '1:ueberlappung,2:ueberlappung' && aus([titel(1, 13, '91'), titel(2, 12, '91')], { 91: liste(13, 12) }) === '')
-pruefe('länger als Staffel (81099976): 26 und 26 Folgen, Staffeln 13 + 13', aus([titel(188066, 26, '81099976'), titel(188067, 26, '81099976')], { 81099976: liste(13, 13) }) === '188066:laenger-als-staffel,188067:laenger-als-staffel')
+const titipo = (format: string) => [titel(188066, 26, '81099976', 1, format), titel(188067, 26, '81099976', 1, format)]
+pruefe('Doppelfolgen (81099976, Titipo): zwei TV_SHORT zu 26 Folgen (11 min), Netflix 13 + 13 (je rund 24 min) → kein Befund', aus(titipo('TV_SHORT'), { 81099976: liste(13, 13) }) === '')
+pruefe('länger als Staffel: dieselben Zahlen als TV (keine Kurzserie) bleiben Befund; TV_SHORT, das auch halbiert nicht passt, ebenso', aus(titipo('TV'), { 81099976: liste(13, 13) }) === '188066:laenger-als-staffel,188067:laenger-als-staffel' && aus(titipo('TV_SHORT'), { 81099976: liste(10, 10) }) === '188066:laenger-als-staffel,188067:laenger-als-staffel')
 pruefe('länger als Staffel: gleich lang wie die größte Staffel trifft nicht, eine mehr trifft', aus([titel(1, 25, '91'), titel(2, 1, '91')], { 91: liste(25, 1) }) === '' && aus([titel(1, 26, '91'), titel(2, 1, '91')], { 91: liste(25, 1) }) === '1:laenger-als-staffel,2:laenger-als-staffel')
 pruefe('ohne Bereich (80097594): keine Staffelliste, fehlender Eintrag und leere Liste', aus([titel(21665, 12, '80097594'), titel(102498, 6, '80097594')], {}) === '21665:ohne-bereich,102498:ohne-bereich' && aus([titel(1, 12, '92'), titel(2, 6, '92')], { 92: { staffeln: [] } }) === '1:ohne-bereich,2:ohne-bereich')
 const blueBox = [titel(170942, 25, '81663323'), titel(189123, 12, '81663323')]

@@ -227,6 +227,12 @@ Grenzen der Messung: Die Staffelliste ist ein Stand (`gemeldetAm`); ein Titel oh
 
 - **Mängelart gegen Anbieterstand (Lehre 127, 17.11.2026, PR 4094):** Eine Mängelart, die gegen einen Anbieterstand misst (Staffelliste), nimmt laufende Titel aus (Steel Ball Run war Falschalarm); Stichproben brauchen eine zweite Quelle.
 
+### Die 6 offenen Fälle waren Messfehler (24.11.2026)
+
+- **Kuroko’s Basketball (80063153, 4 Titel):** Netflix führt 3 Staffeln zu 25 (75 Folgen; [netzwelt](https://www.netzwelt.de/serien/kurokos-basketball/index.html): 3 Staffeln, 75 Episoden). Tip Off (16916) ist ein Special (Folge 22.5, 22.02.2013, [MAL 16916](https://myanimelist.net/anime/16916), [ANN: Crunchyroll führt die OVA-Folgen als eigene Einträge](https://animenewsnetwork.com/news/2015-11-30/crunchyroll-adds-kuroko-basketball-ova-episodes-to-catalog/.95956)), keine Folge einer Staffel. Die Summe 76 > 75 kam nur durch das Special; die Zuordnung der drei Staffeln stimmt.
+- **Titipo (81099976, 2 Titel):** Der Katalog zählt 26 + 26 Folgen zu je 11 min (AniList, `TV_SHORT`), Netflix 2 Staffeln zu 13 Folgen zu je rund 24 min ([familie.de](https://www.familie.de/artikel/alle-einsteigen-in-den-zug-kinderserien-fuer-kleine-bahnfans--fj937x46hj): zwei Staffeln mit je 13 Folgen; TV Guide zählt 26 Teile je Staffel). Netflix fasst zwei Kurzfolgen zu einer; die Zuordnung stimmt.
+- **Regel (`zaehlweisen`/`befundVon` in `maengel-staffel.ts`):** Ein Befund besteht nur, wenn keine Zählweise passt: Katalog, ohne Specials (`SPECIAL`), bei ausschließlich `TV_SHORT`-Titeln die halbierten Folgenzahlen. Daten unverändert; das Register (`data/maengel.json`) schreibt der nächste Bestandsbau.
+
 ## Block 3: „laufend“ ohne Weg (17.11.2026)
 
 - **Befund:** `laufend` im Register heißt nur „kein Ende (`jpEnd`) bekannt“ (`maengel.mjs`), nicht „läuft“; von 33 solchen Titeln der obersten Wirkung trugen 6 `kein-weg`. Zwei davon waren zu Unrecht offen: Witch on the Holy Night (Kinostart 26.01.2027 mit Synchro laut Anime2You, der Kino-Termin ist der Weg) und Princess Principal: Crown Handler Chapter 5/6 (kein Erscheinungsdatum, kein Termin, nichts, worauf ein Weg zeigen könnte).

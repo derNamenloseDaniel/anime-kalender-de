@@ -133,23 +133,40 @@ class ArchivQuelle implements CrQuelle {
   }
 }
 
-async function main(): Promise<void> {
-  // Ohne Abruf braucht es kein Paket — der Bucket steht im Archiv.
-  const zugang = ARCHIV ? undefined : await beschaffeZugang()
-  if (zugang) log(`Zugangspaket für ${zugang.land}, Bucket ${zugang.bucket}, gültig bis ${zugang.gueltig_bis}`)
-  else log('Aus dem Archiv gerechnet — kein einziger Abruf.')
-  const cms = zugang ? new CrunchyrollCms(zugang, PAUSE_MS) : undefined
+interface Urteile {
+  ja: number
+  nein: number
+}
 
+interface Zeile {
+  id: string
+  name: string
+  alt: Befund
+  neu: Befund
+  altDeutsch: number
+  neuDeutsch: number
+  altUrteile: Urteile
+  neuUrteile: Urteile
+  widerspruch?: string
+}
+
+interface Bestandssicht {
+  bestand: CrDubData
+  /** Je Serienkennung ein Eintrag — der Bestand ist nach Adresse geschlüsselt. */
+  jeSerie: Map<string, CrSerie>
+  /** Alle unsere Adressen zu einer Kennung — an ihnen hängen die Verweise. */
+  adressenJeSerie: Map<string, string[]>
+  titelJeAdresse: Map<string, Title[]>
+}
+
+function bestandLesen(): Bestandssicht {
   const titles = readJson<Title[]>('public/data/titles.json', [])
   const bestand = readJson<CrDubData>('data/crunchyroll-dub.json', { scrapedAt: '', serien: [] })
-
-  /** Je Serienkennung ein Eintrag — der Bestand ist nach Adresse geschlüsselt. */
   const jeSerie = new Map<string, CrSerie>()
   for (const s of bestand.serien) {
     if (!s.seriesId || jeSerie.has(s.seriesId)) continue
     jeSerie.set(s.seriesId, s)
   }
-  /** Alle unsere Adressen zu einer Kennung — an ihnen hängen die Verweise. */
   const adressenJeSerie = new Map<string, string[]>()
   for (const s of bestand.serien) {
     if (!s.seriesId) continue
@@ -162,8 +179,11 @@ async function main(): Promise<void> {
       titelJeAdresse.set(stream.url, [...(titelJeAdresse.get(stream.url) ?? []), t])
     }
   }
+  return { bestand, jeSerie, adressenJeSerie, titelJeAdresse }
+}
 
-  // Geschichtet ziehen: je Topf so viele, wie sein Anteil hergibt.
+/** Geschichtet ziehen: je Topf so viele, wie sein Anteil hergibt. */
+function stichprobeZiehen(jeSerie: Map<string, CrSerie>): string[] {
   const toepfe = new Map<Befund, string[]>()
   for (const [id, s] of jeSerie) {
     const b = befundVon(s)
@@ -175,100 +195,119 @@ async function main(): Promise<void> {
     const anteil = Math.round((ids.length / gesamt) * LIMIT)
     stichprobe.push(...jedeKte(ids.slice().sort(), Math.min(anteil, LIMIT - stichprobe.length)))
   }
-  log(`${gesamt} Serien im Bestand, ${stichprobe.length} in der Stichprobe`)
+  return stichprobe
+}
 
-  /** Zählt, wie viele Verweise ein belegtes Urteil bekommen. */
-  const urteileZu = (serie: CrSerie): { ja: number; nein: number } => {
-    let ja = 0
-    let nein = 0
-    for (const url of adressenJeSerie.get(serie.seriesId ?? '') ?? []) {
-      for (const u of beurteile({ ...serie, url }, titelJeAdresse.get(url) ?? [])) {
-        if (u.dub) ja++
-        else nein++
-      }
+/** Zählt, wie viele Verweise ein belegtes Urteil bekommen. */
+function urteileZu(serie: CrSerie, sicht: Bestandssicht): Urteile {
+  let ja = 0
+  let nein = 0
+  for (const url of sicht.adressenJeSerie.get(serie.seriesId ?? '') ?? []) {
+    for (const u of beurteile({ ...serie, url }, sicht.titelJeAdresse.get(url) ?? [])) {
+      if (u.dub) ja++
+      else nein++
     }
-    return { ja, nein }
   }
+  return { ja, nein }
+}
 
-  const zeilen: {
-    id: string
-    name: string
-    alt: Befund
-    neu: Befund
-    altDeutsch: number
-    neuDeutsch: number
-    altUrteile: { ja: number; nein: number }
-    neuUrteile: { ja: number; nein: number }
-    widerspruch?: string
-  }[] = []
+async function serieMessen(id: string, cms: CrunchyrollCms | undefined, sicht: Bestandssicht): Promise<Zeile> {
+  const alt = sicht.jeSerie.get(id) as CrSerie
+  // Kein Seitenaufruf: Der Browser bliebe für eine Messung ungenutzt teuer,
+  // und „nicht verfügbar" ist hier nicht die Frage.
+  const neu = await serieLesen(cms ?? new ArchivQuelle(id, 'de'), alt.url, id)
+  // Der Slug der Adresse, nicht der Staffelname: Der heißt oft „Staffel 1"
+  // und sagt dann nichts darüber, um welche Serie es geht.
+  const slug = alt.url.split(/[?#]/)[0].replace(/\/$/, '').split('/').pop() ?? id
+  const name = /^[A-Z0-9]{8,}$/.test(slug) ? (neu.staffeln?.[0]?.name ?? id) : slug
+  const zaehle = (s: CrSerie) => (s.staffeln ?? []).reduce((n, st) => n + st.deutsch, 0)
+  return {
+    id,
+    name,
+    alt: befundVon(alt),
+    neu: befundVon(neu),
+    altDeutsch: zaehle(alt),
+    neuDeutsch: zaehle(neu),
+    altUrteile: urteileZu(alt, sicht),
+    neuUrteile: urteileZu(neu, sicht),
+    widerspruch: neu.namensWiderspruch,
+  }
+}
 
+async function alleMessen(
+  stichprobe: string[],
+  cms: CrunchyrollCms | undefined,
+  sicht: Bestandssicht,
+): Promise<Zeile[]> {
+  const zeilen: Zeile[] = []
   for (const [i, id] of stichprobe.entries()) {
-    const alt = jeSerie.get(id) as CrSerie
-    // Kein Seitenaufruf: Der Browser bliebe für eine Messung ungenutzt teuer,
-    // und „nicht verfügbar" ist hier nicht die Frage.
-    const neu = await serieLesen(cms ?? new ArchivQuelle(id, 'de'), alt.url, id)
-    // Der Slug der Adresse, nicht der Staffelname: Der heißt oft „Staffel 1"
-    // und sagt dann nichts darüber, um welche Serie es geht.
-    const slug = alt.url.split(/[?#]/)[0].replace(/\/$/, '').split('/').pop() ?? id
-    const name = /^[A-Z0-9]{8,}$/.test(slug) ? (neu.staffeln?.[0]?.name ?? id) : slug
-    const zaehle = (s: CrSerie) => (s.staffeln ?? []).reduce((n, st) => n + st.deutsch, 0)
-    zeilen.push({
-      id,
-      name,
-      alt: befundVon(alt),
-      neu: befundVon(neu),
-      altDeutsch: zaehle(alt),
-      neuDeutsch: zaehle(neu),
-      altUrteile: urteileZu(alt),
-      neuUrteile: urteileZu(neu),
-      widerspruch: neu.namensWiderspruch,
-    })
-    const z = zeilen[zeilen.length - 1]
+    const z = await serieMessen(id, cms, sicht)
+    zeilen.push(z)
     log(
-      `  ${i + 1}/${stichprobe.length} ${z.alt} → ${z.neu}  ${name.slice(0, 44)} ` +
+      `  ${i + 1}/${stichprobe.length} ${z.alt} → ${z.neu}  ${z.name.slice(0, 44)} ` +
         `(${z.altDeutsch} → ${z.neuDeutsch} deutsche Folgen)`,
     )
   }
+  return zeilen
+}
 
-  // ───────────────────────────── Auswertung ─────────────────────────────
+const BEFUNDE: Befund[] = ['kein Deutsch', 'Deutsch', 'nicht verfügbar', 'nicht im Katalog', 'keine Auskunft']
 
+function kreuztabelle(zeilen: Zeile[]): string[] {
   const kreuz = new Map<string, number>()
   for (const z of zeilen) kreuz.set(`${z.alt}|${z.neu}`, (kreuz.get(`${z.alt}|${z.neu}`) ?? 0) + 1)
-  const befunde: Befund[] = ['kein Deutsch', 'Deutsch', 'nicht verfügbar', 'nicht im Katalog', 'keine Auskunft']
+  const k: string[] = []
+  k.push(`| bisher \\ jetzt | ${BEFUNDE.join(' | ')} | Summe |`)
+  k.push(`|---|${BEFUNDE.map(() => '---').join('|')}|---|`)
+  for (const a of BEFUNDE) {
+    const zeile = BEFUNDE.map((b) => kreuz.get(`${a}|${b}`) ?? 0)
+    if (!zeile.some(Boolean)) continue
+    k.push(`| **${a}** | ${zeile.join(' | ')} | ${zeile.reduce((x, y) => x + y, 0)} |`)
+  }
+  return k
+}
 
-  const belastbarVorher = zeilen.reduce((n, z) => n + z.altUrteile.ja + z.altUrteile.nein, 0)
-  const belastbarNachher = zeilen.reduce((n, z) => n + z.neuUrteile.ja + z.neuUrteile.nein, 0)
-  const gedreht = zeilen.filter((z) => z.alt === 'kein Deutsch' && z.neu === 'Deutsch')
-  const keinDeutschAlt = zeilen.filter((z) => z.alt === 'kein Deutsch')
-  const nichtImKatalog = zeilen.filter((z) => z.neu === 'nicht im Katalog')
-
+function serienTabelle(zeilen: Zeile[]): string[] {
   const t: string[] = []
   t.push('| Serie | bisher (US) | jetzt (DE) | deutsche Folgen | belegte Verweise |')
   t.push('|---|---|---|---|---|')
   for (const z of zeilen.slice().sort((a, b) => a.alt.localeCompare(b.alt) || a.name.localeCompare(b.name))) {
-    const v = (u: { ja: number; nein: number }) => `${u.ja}✓/${u.nein}✕`
+    const v = (u: Urteile) => `${u.ja}✓/${u.nein}✕`
     t.push(
       `| ${z.name.replace(/\|/g, '/')} | ${z.alt} | ${z.neu}${z.alt !== z.neu ? ' **↺**' : ''} | ` +
         `${z.altDeutsch} → ${z.neuDeutsch} | ${v(z.altUrteile)} → ${v(z.neuUrteile)} |`,
     )
   }
+  return t
+}
 
-  const k: string[] = []
-  k.push(`| bisher \\ jetzt | ${befunde.join(' | ')} | Summe |`)
-  k.push(`|---|${befunde.map(() => '---').join('|')}|---|`)
-  for (const a of befunde) {
-    const zeile = befunde.map((b) => kreuz.get(`${a}|${b}`) ?? 0)
-    if (!zeile.some(Boolean)) continue
-    k.push(`| **${a}** | ${zeile.join(' | ')} | ${zeile.reduce((x, y) => x + y, 0)} |`)
+interface Kennzahlen {
+  belastbarVorher: number
+  belastbarNachher: number
+  gedreht: Zeile[]
+  keinDeutschAlt: Zeile[]
+}
+
+function kennzahlen(zeilen: Zeile[]): Kennzahlen {
+  return {
+    belastbarVorher: zeilen.reduce((n, z) => n + z.altUrteile.ja + z.altUrteile.nein, 0),
+    belastbarNachher: zeilen.reduce((n, z) => n + z.neuUrteile.ja + z.neuUrteile.nein, 0),
+    gedreht: zeilen.filter((z) => z.alt === 'kein Deutsch' && z.neu === 'Deutsch'),
+    keinDeutschAlt: zeilen.filter((z) => z.alt === 'kein Deutsch'),
   }
+}
 
+function berichtBauen(zeilen: Zeile[], sicht: Bestandssicht, kz: Kennzahlen): string {
+  const { belastbarVorher, belastbarNachher, gedreht, keinDeutschAlt } = kz
+  const gesamt = sicht.jeSerie.size
+  const nichtImKatalog = zeilen.filter((z) => z.neu === 'nicht im Katalog')
   const widersprueche = zeilen.filter((z) => z.widerspruch)
-  const bericht = [
+  return [
     '# Der deutsche Katalog gegen den alten Bestand — Stichprobe von ' + zeilen.length + ' Serien',
     '',
     `Gemessen am ${todayIso()} mit \`npx tsx pipeline/messung-cr-katalog.ts\`,`,
     `Bucket \`/DE/M2/-\`, ${PAUSE_MS} ms Pause zwischen den Abrufen. Der alte Stand stammt aus`,
-    `\`data/crunchyroll-dub.json\` (Lauf vom ${bestand.scrapedAt.slice(0, 10)}, US-Katalog).`,
+    `\`data/crunchyroll-dub.json\` (Lauf vom ${sicht.bestand.scrapedAt.slice(0, 10)}, US-Katalog).`,
     '',
     `Die Stichprobe ist **geschichtet und systematisch** gezogen: ${gesamt} Serien des Bestands nach`,
     'bisherigem Befund gruppiert, je Gruppe anteilig jede k-te Kennung. Keine Zufallszahl, keine',
@@ -276,7 +315,7 @@ async function main(): Promise<void> {
     '',
     '## Was sich verschiebt',
     '',
-    ...k,
+    ...kreuztabelle(zeilen),
     '',
     `**${gedreht.length} von ${keinDeutschAlt.length}** Serien, die bisher als „kein Deutsch" galten, führen im`,
     `deutschen Katalog eine deutsche Fassung — ${keinDeutschAlt.length ? Math.round((gedreht.length / keinDeutschAlt.length) * 100) : 0} Prozent.`,
@@ -300,15 +339,30 @@ async function main(): Promise<void> {
     '',
     '## Jede Serie einzeln',
     '',
-    ...t,
+    ...serienTabelle(zeilen),
     '',
   ].join('\n')
+}
+
+async function main(): Promise<void> {
+  // Ohne Abruf braucht es kein Paket — der Bucket steht im Archiv.
+  const zugang = ARCHIV ? undefined : await beschaffeZugang()
+  if (zugang) log(`Zugangspaket für ${zugang.land}, Bucket ${zugang.bucket}, gültig bis ${zugang.gueltig_bis}`)
+  else log('Aus dem Archiv gerechnet — kein einziger Abruf.')
+  const cms = zugang ? new CrunchyrollCms(zugang, PAUSE_MS) : undefined
+
+  const sicht = bestandLesen()
+  const stichprobe = stichprobeZiehen(sicht.jeSerie)
+  log(`${sicht.jeSerie.size} Serien im Bestand, ${stichprobe.length} in der Stichprobe`)
+
+  const zeilen = await alleMessen(stichprobe, cms, sicht)
+  const kz = kennzahlen(zeilen)
 
   const pfad = resolve(ROOT, 'docs/messung-crunchyroll-de-katalog.md')
-  writeFileSync(pfad, bericht)
+  writeFileSync(pfad, berichtBauen(zeilen, sicht, kz))
   log(`\nBericht in docs/messung-crunchyroll-de-katalog.md`)
-  log(`${gedreht.length} von ${keinDeutschAlt.length} „kein Deutsch" haben in Wahrheit eine deutsche Fassung`)
-  log(`belegte Verweise: ${belastbarVorher} → ${belastbarNachher}`)
+  log(`${kz.gedreht.length} von ${kz.keinDeutschAlt.length} „kein Deutsch" haben in Wahrheit eine deutsche Fassung`)
+  log(`belegte Verweise: ${kz.belastbarVorher} → ${kz.belastbarNachher}`)
 }
 
 main().catch((err) => {

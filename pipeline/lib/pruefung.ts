@@ -79,161 +79,188 @@ export function pruefeErgebnis(
   }
 
   for (const r of releases) {
-    const at = `"${r.slug}"`
-    const s = r.schedule
-
-    if (!r.sources?.length) fehler.push(`${at}: keine Quelle angegeben`)
-
-    /**
-     * Ein Slug wird zu einer Adresse und zu einem Ordnernamen.
-     *
-     * Aus `Release.slug` entsteht `/r/<slug>/` — eine echte Datei im Bauwerk, ein
-     * Eintrag in der Sitemap, ein geteilter Link. Ein Leerzeichen wird darin zu
-     * `%20`, ein Doppelpunkt ist unter Windows überhaupt kein Dateiname.
-     *
-     * Am 17.08.2026 kam One Piece in den ADN-Katalog, dessen Staffeln „Saga 1 :
-     * East Blue" heißen. Der Slug lautete `adn-561-sSaga 1 : East Blue-20190520`,
-     * und der Bau der Teilen-Seiten brach mit `ENOENT` ab — eine Fehlermeldung,
-     * die nach einem fehlenden Ordner klingt und nichts über die Ursache sagt.
-     * Hier fällt es künftig mit Namen und Grund auf.
-     *
-     * **Großbuchstaben sind erlaubt**, auch wenn sie unschön sind: Die
-     * Crunchyroll-Slugs tragen deren Kennung im Original (`cr-GT00371857`), und
-     * das sind 21 live erreichbare Adressen. Eine Prüfung, die sie verbietet,
-     * verbietet nicht einen Fehler, sondern den Bestand.
-     */
-    if (!/^[A-Za-z0-9._-]+$/.test(r.slug)) {
-      fehler.push(`${at}: der Slug enthält Zeichen, die in einer Adresse nichts zu suchen haben`)
-    }
-
-    if (s.lastEpisodeDate && s.lastEpisodeDate < s.firstEpisodeDate) {
-      fehler.push(`${at}: lastEpisodeDate ${s.lastEpisodeDate} liegt vor firstEpisodeDate ${s.firstEpisodeDate}`)
-    }
-
-    /**
-     * Der Prüfsatz, der den ganzen Fehler gefunden hätte.
-     *
-     * `expandEvents` las das Enddatum nicht, `releaseStatus` schon. Der
-     * Datensatz behauptete deshalb gleichzeitig „abgeschlossen seit Juli 2025"
-     * und „nächste Folge nächsten Mittwoch".
-     */
-    for (const e of eventsProSlug.get(r.slug) ?? []) {
-      if (s.lastEpisodeDate && e.date > s.lastEpisodeDate) {
-        fehler.push(
-          `${at}: Termin ${e.date} (Folge ${e.episode ?? '?'}) liegt nach dem belegten Ende ${s.lastEpisodeDate}`,
-        )
-        break
-      }
-    }
-
-    /**
-     * Die Staffel war fertig, bevor wir ihre erste Folge gesehen haben.
-     *
-     * In einem Satz der Widerspruch, an dem „Wistoria: Wand and Sword Staffel
-     * 2" am 21.08.2026 hing: zwölf Termine vom 08.02. bis 26.04.2026 im
-     * Datensatz, während der Kalender die Folgen 17 bis 24 zwischen dem 31.05.
-     * und dem 19.07.2026 belegt hatte. Crunchyroll zählt die Reihe durch,
-     * AniList je Staffel — die Rückrechnung ab Folge 1 landete drei Monate zu
-     * früh, und keiner der acht belegten Termine stand noch drin.
-     *
-     * Eine Beobachtung ist der eine Punkt, an dem der Sendeplan die
-     * Wirklichkeit berührt. Läuft die Terminliste vollständig an ihr vorbei,
-     * ist nicht die Beobachtung falsch, sondern alles, was daraus gerechnet
-     * wurde.
-     */
-    const beobachtet = Object.values(s.observed ?? {}).filter(Boolean).sort()
-    const termine = (eventsProSlug.get(r.slug) ?? []).map((e) => e.date).sort()
-    if (beobachtet.length && termine.length && termine[termine.length - 1] < beobachtet[0]) {
-      fehler.push(
-        `${at}: letzter Termin ${termine[termine.length - 1]} liegt vor der frühesten belegten ` +
-          `Beobachtung ${beobachtet[0]} — die Staffel wäre fertig gewesen, bevor wir ihre erste Folge gesehen haben`,
-      )
-    }
-
-    const title = titles.get(r.titleId)
-    if (title?.episodes && s.episodeCount) {
-      const diff = s.episodeCount - title.episodes
-      if (
-        folgenzahlUeberWerk(s.episodeCount, title.episodes) &&
-        // Ein Release, das ausdrücklich mitten in der Zählung einsetzt oder das
-        // seine Abweichung selbst erklärt, ist kein Verdachtsfall. „Steel Ball
-        // Run – 2nd & 3rd STAGE" deckt elf Folgen ab, während der
-        // AniList-Eintrag der Auftaktfolge auf 1 steht — beides stimmt.
-        !s.firstEpisodeNumber &&
-        (!r.note && !r.hinweis && !r.herkunft)
-      ) {
-        fehler.push(
-          `${at}: ${s.episodeCount} Folgen für "${title.titleRomaji ?? title.id}", der ${title.episodes} hat — ` +
-            `das sieht nach mehreren Staffeln in einem Eintrag aus`,
-        )
-      } else if (diff > 0 && !s.episodeCountAssumed && !s.firstEpisodeNumber && (!r.note && !r.hinweis && !r.herkunft)) {
-        // Nur nach oben: Ein Release, das einen Teil einer langen Serie
-        // abdeckt (Disney+ zeigt Naruto in Staffelpaketen), nennt zu Recht
-        // weniger Folgen als der Gesamteintrag.
-        warnungen.push(
-          `${at}: ${s.episodeCount} Folgen gegen ${title.episodes} laut AniList ("${title.titleRomaji ?? title.id}")`,
-        )
-      }
-    }
+    const eventsDerRelease = eventsProSlug.get(r.slug) ?? []
+    grundlagenFehler(r, eventsDerRelease, fehler)
+    beobachtungFehler(r, eventsDerRelease, fehler)
+    folgenzahlMeldungen(r, titles, fehler, warnungen)
 
     const ende = lastEpisodeDate(r)
     if (ende && ende > addDays(heute, FERNE_ZUKUNFT_TAGE)) {
-      warnungen.push(`${at}: letzter Termin ${ende} liegt mehr als eineinhalb Jahre in der Zukunft`)
+      warnungen.push(`"${r.slug}": letzter Termin ${ende} liegt mehr als eineinhalb Jahre in der Zukunft`)
     }
   }
 
-  /**
-   * Zwei Releases, die denselben Anime auf derselben Plattform mit
-   * unterschiedlicher Folgenzahl führen, können nicht beide stimmen.
-   *
-   * Real am 12.08.2026 beim ersten Reparaturversuch: „Sailor Moon" stand
-   * zweimal auf AniList 530, einmal mit 46 und einmal mit 42 Folgen — die
-   * zweite ADN-Staffel war mangels exakter Zuordnung auf den Serientitel
-   * zurückgefallen.
-   *
-   * Zwei Ausnahmen, beide berechtigt: **Discs** — mehrere Ausgaben desselben
-   * Werks sind dort der Normalfall — und Releases mit `firstEpisodeNumber`,
-   * die ausdrücklich nur einen Abschnitt abdecken.
-   *
-   * Ausschlaggebend ist nicht, dass die Zahlen verschieden sind, sondern dass
-   * sie **zusammen nicht in das Werk passen**: Disney+ zeigt Yu-Gi-Oh in
-   * Paketen zu 48 und 40 Folgen — beides Teile derselben 224-teiligen Serie
-   * und damit kein Widerspruch. 46 und 42 Folgen für einen 46-teiligen Anime
-   * dagegen können nicht beide stimmen.
-   */
-  const nachTitelUndPlattform = new Map<string, Release[]>()
-  for (const r of releases) {
-    /* Fernsehen wiederholt dieselben Folgen (Daima: Erstausstrahlung, dann Sa/So) — kein Widerspruch. */
-    if (r.titleId < 0 || r.platform === 'disc' || r.platform === 'tv' || r.schedule.firstEpisodeNumber) continue
-    if (!(r.schedule.episodeCount ?? 0)) continue
-    const key = `${r.titleId}|${r.platform}`
-    const liste = nachTitelUndPlattform.get(key) ?? []
-    liste.push(r)
-    nachTitelUndPlattform.set(key, liste)
-  }
-  for (const [key, liste] of nachTitelUndPlattform) {
-    if (liste.length < 2) continue
-    const summe = liste.reduce((n, r) => n + (r.schedule.episodeCount ?? 0), 0)
-    const gesamt = titles.get(liste[0].titleId)?.episodes
-    if (gesamt && summe > gesamt) {
-      fehler.push(
-        `Anime ${key.split('|')[0]} ("${titles.get(liste[0].titleId)?.titleRomaji ?? '?'}") auf ${key.split('|')[1]}: ` +
-          `zusammen ${summe} Folgen bei ${gesamt} vorhandenen — ` +
-          liste.map((r) => `${r.slug}=${r.schedule.episodeCount}`).join(', '),
-      )
-    }
-  }
-
-  /* Ein Weg auf TMDB trägt seine Kennzeichnung — sonst liest er sich als Anbieteradresse. */
-  for (const t of titles.values())
-    for (const w of t.watchLinks ?? [])
-      if (/themoviedb\.org/.test(w.url) && !w.ueberTmdb)
-        fehler.push(`Anime ${t.id}: Bezugsweg „${w.name}" zeigt auf TMDB, ohne als „über TMDB" gekennzeichnet zu sein`)
+  folgenzahlWiderspruch(releases, titles, fehler)
+  tmdbOhneKennzeichnung(titles, fehler)
 
   const schluss = schlussPruefung(releases, events, titles, heute, discQuellen)
   return { fehler: [...fehler, ...schluss.fehler], warnungen: [...warnungen, ...schluss.warnungen] }
 }
 
+/** Quelle, Slug, Enddatum und Termine nach dem belegten Ende einer Release (Fehler). */
+function grundlagenFehler(r: Release, eventsDerRelease: ReleaseEvent[], fehler: string[]): void {
+  const at = `"${r.slug}"`
+  const s = r.schedule
+
+  if (!r.sources?.length) fehler.push(`${at}: keine Quelle angegeben`)
+
+  /**
+   * Ein Slug wird zu einer Adresse und zu einem Ordnernamen.
+   *
+   * Aus `Release.slug` entsteht `/r/<slug>/` — eine echte Datei im Bauwerk, ein
+   * Eintrag in der Sitemap, ein geteilter Link. Ein Leerzeichen wird darin zu
+   * `%20`, ein Doppelpunkt ist unter Windows überhaupt kein Dateiname.
+   *
+   * Am 17.08.2026 kam One Piece in den ADN-Katalog, dessen Staffeln „Saga 1 :
+   * East Blue" heißen. Der Slug lautete `adn-561-sSaga 1 : East Blue-20190520`,
+   * und der Bau der Teilen-Seiten brach mit `ENOENT` ab — eine Fehlermeldung,
+   * die nach einem fehlenden Ordner klingt und nichts über die Ursache sagt.
+   * Hier fällt es künftig mit Namen und Grund auf.
+   *
+   * **Großbuchstaben sind erlaubt**, auch wenn sie unschön sind: Die
+   * Crunchyroll-Slugs tragen deren Kennung im Original (`cr-GT00371857`), und
+   * das sind 21 live erreichbare Adressen. Eine Prüfung, die sie verbietet,
+   * verbietet nicht einen Fehler, sondern den Bestand.
+   */
+  if (!/^[A-Za-z0-9._-]+$/.test(r.slug)) {
+    fehler.push(`${at}: der Slug enthält Zeichen, die in einer Adresse nichts zu suchen haben`)
+  }
+
+  if (s.lastEpisodeDate && s.lastEpisodeDate < s.firstEpisodeDate) {
+    fehler.push(`${at}: lastEpisodeDate ${s.lastEpisodeDate} liegt vor firstEpisodeDate ${s.firstEpisodeDate}`)
+  }
+
+  /**
+   * Der Prüfsatz, der den ganzen Fehler gefunden hätte.
+   *
+   * `expandEvents` las das Enddatum nicht, `releaseStatus` schon. Der
+   * Datensatz behauptete deshalb gleichzeitig „abgeschlossen seit Juli 2025"
+   * und „nächste Folge nächsten Mittwoch".
+   */
+  for (const e of eventsDerRelease) {
+    if (s.lastEpisodeDate && e.date > s.lastEpisodeDate) {
+      fehler.push(
+        `${at}: Termin ${e.date} (Folge ${e.episode ?? '?'}) liegt nach dem belegten Ende ${s.lastEpisodeDate}`,
+      )
+      break
+    }
+  }
+}
+
+/** Die letzte Terminzeile liegt vor der frühesten Beobachtung (Fehler). */
+function beobachtungFehler(r: Release, eventsDerRelease: ReleaseEvent[], fehler: string[]): void {
+  const at = `"${r.slug}"`
+  const s = r.schedule
+
+  /**
+   * Die Staffel war fertig, bevor wir ihre erste Folge gesehen haben.
+   *
+   * In einem Satz der Widerspruch, an dem „Wistoria: Wand and Sword Staffel
+   * 2" am 21.08.2026 hing: zwölf Termine vom 08.02. bis 26.04.2026 im
+   * Datensatz, während der Kalender die Folgen 17 bis 24 zwischen dem 31.05.
+   * und dem 19.07.2026 belegt hatte. Crunchyroll zählt die Reihe durch,
+   * AniList je Staffel — die Rückrechnung ab Folge 1 landete drei Monate zu
+   * früh, und keiner der acht belegten Termine stand noch drin.
+   *
+   * Eine Beobachtung ist der eine Punkt, an dem der Sendeplan die
+   * Wirklichkeit berührt. Läuft die Terminliste vollständig an ihr vorbei,
+   * ist nicht die Beobachtung falsch, sondern alles, was daraus gerechnet
+   * wurde.
+   */
+  const beobachtet = Object.values(s.observed ?? {}).filter(Boolean).sort()
+  const termine = eventsDerRelease.map((e) => e.date).sort()
+  if (beobachtet.length && termine.length && termine[termine.length - 1] < beobachtet[0]) {
+    fehler.push(
+      `${at}: letzter Termin ${termine[termine.length - 1]} liegt vor der frühesten belegten ` +
+        `Beobachtung ${beobachtet[0]} — die Staffel wäre fertig gewesen, bevor wir ihre erste Folge gesehen haben`,
+    )
+  }
+}
+
+/** Folgenzahl der Release gegen die des Werks: Fehler bei mehreren Staffeln in einem Eintrag, Warnung bei Abweichung nach oben. */
+function folgenzahlMeldungen(r: Release, titles: Map<number, Title>, fehler: string[], warnungen: string[]): void {
+  const at = `"${r.slug}"`
+  const s = r.schedule
+
+  const title = titles.get(r.titleId)
+  if (title?.episodes && s.episodeCount) {
+    const diff = s.episodeCount - title.episodes
+    if (
+      folgenzahlUeberWerk(s.episodeCount, title.episodes) &&
+      // Ein Release, das ausdrücklich mitten in der Zählung einsetzt oder das
+      // seine Abweichung selbst erklärt, ist kein Verdachtsfall. „Steel Ball
+      // Run – 2nd & 3rd STAGE" deckt elf Folgen ab, während der
+      // AniList-Eintrag der Auftaktfolge auf 1 steht — beides stimmt.
+      !s.firstEpisodeNumber &&
+      (!r.note && !r.hinweis && !r.herkunft)
+    ) {
+      fehler.push(
+        `${at}: ${s.episodeCount} Folgen für "${title.titleRomaji ?? title.id}", der ${title.episodes} hat — ` +
+          `das sieht nach mehreren Staffeln in einem Eintrag aus`,
+      )
+    } else if (diff > 0 && !s.episodeCountAssumed && !s.firstEpisodeNumber && (!r.note && !r.hinweis && !r.herkunft)) {
+      // Nur nach oben: Ein Release, das einen Teil einer langen Serie
+      // abdeckt (Disney+ zeigt Naruto in Staffelpaketen), nennt zu Recht
+      // weniger Folgen als der Gesamteintrag.
+      warnungen.push(
+        `${at}: ${s.episodeCount} Folgen gegen ${title.episodes} laut AniList ("${title.titleRomaji ?? title.id}")`,
+      )
+    }
+  }
+}
+
+/**
+ * Zwei Releases, die denselben Anime auf derselben Plattform mit
+ * unterschiedlicher Folgenzahl führen, können nicht beide stimmen.
+ *
+ * Real am 12.08.2026 beim ersten Reparaturversuch: „Sailor Moon" stand
+ * zweimal auf AniList 530, einmal mit 46 und einmal mit 42 Folgen — die
+ * zweite ADN-Staffel war mangels exakter Zuordnung auf den Serientitel
+ * zurückgefallen.
+ *
+ * Zwei Ausnahmen, beide berechtigt: **Discs** — mehrere Ausgaben desselben
+ * Werks sind dort der Normalfall — und Releases mit `firstEpisodeNumber`,
+ * die ausdrücklich nur einen Abschnitt abdecken.
+ *
+ * Ausschlaggebend ist nicht, dass die Zahlen verschieden sind, sondern dass
+ * sie **zusammen nicht in das Werk passen**: Disney+ zeigt Yu-Gi-Oh in
+ * Paketen zu 48 und 40 Folgen — beides Teile derselben 224-teiligen Serie
+ * und damit kein Widerspruch. 46 und 42 Folgen für einen 46-teiligen Anime
+ * dagegen können nicht beide stimmen.
+ */
+/** Release-Paare auf derselben Plattform, deren Folgenzahlen zusammen nicht ins Werk passen (Fehler). */
+function folgenzahlWiderspruch(releases: Release[], titles: Map<number, Title>, fehler: string[]): void {
+const nachTitelUndPlattform = new Map<string, Release[]>()
+for (const r of releases) {
+  /* Fernsehen wiederholt dieselben Folgen (Daima: Erstausstrahlung, dann Sa/So) — kein Widerspruch. */
+  if (r.titleId < 0 || r.platform === 'disc' || r.platform === 'tv' || r.schedule.firstEpisodeNumber) continue
+  if (!(r.schedule.episodeCount ?? 0)) continue
+  const key = `${r.titleId}|${r.platform}`
+  const liste = nachTitelUndPlattform.get(key) ?? []
+  liste.push(r)
+  nachTitelUndPlattform.set(key, liste)
+}
+for (const [key, liste] of nachTitelUndPlattform) {
+  if (liste.length < 2) continue
+  const summe = liste.reduce((n, r) => n + (r.schedule.episodeCount ?? 0), 0)
+  const gesamt = titles.get(liste[0].titleId)?.episodes
+  if (gesamt && summe > gesamt) {
+    fehler.push(
+      `Anime ${key.split('|')[0]} ("${titles.get(liste[0].titleId)?.titleRomaji ?? '?'}") auf ${key.split('|')[1]}: ` +
+        `zusammen ${summe} Folgen bei ${gesamt} vorhandenen — ` +
+        liste.map((r) => `${r.slug}=${r.schedule.episodeCount}`).join(', '),
+    )
+  }
+}
+}
+
+/** Ein Weg auf TMDB trägt seine Kennzeichnung — sonst liest er sich als Anbieteradresse (Fehler). */
+function tmdbOhneKennzeichnung(titles: Map<number, Title>, fehler: string[]): void {
+for (const t of titles.values())
+  for (const w of t.watchLinks ?? [])
+    if (/themoviedb\.org/.test(w.url) && !w.ueberTmdb)
+      fehler.push(`Anime ${t.id}: Bezugsweg „${w.name}" zeigt auf TMDB, ohne als „über TMDB" gekennzeichnet zu sein`)
+}
 /** Die Prüfungen am Ende von `pruefeErgebnis`, die nicht je Release laufen (eigene Funktion, damit jene nicht wächst). */
 function schlussFehler(releases: Release[], events: ReleaseEvent[], titles: Map<number, Title>, heute: string, discQuellen?: DiscPruefQuellen): string[] {
   return [

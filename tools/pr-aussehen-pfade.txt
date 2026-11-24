@@ -42,6 +42,7 @@ tools/buehne-messung.mjs
 tools/buehne-name-kappung.mjs
 tools/buehne-name-pruefen.mjs
 tools/buehne-panel-pruefen.mjs
+tools/buehne-pfeile-messen.mjs
 tools/buehne-seite.mjs
 tools/buehne-umfang.mjs
 tools/buehne-zustand-pruefen.mjs

@@ -321,8 +321,8 @@ assert.equal(w.waechter(mitPunkten([], ['- 🔵 **Alpha** wartet: Daniel']).spli
 assert.equal(w.waechter(['## In Arbeit' + FRISCH, '- 🔵 **Solo** E-Zeile folgt'].join('\n'), JETZT), OHNE_JETZT('Solo'), 'ohne Daniel-Todo-Abschnitt')
 // Jetzt-Dateien ohne Zeile in stand.md
 const JD = (n) => `Jetzt-Datei ohne Zeile in stand.md: ${n} — eintragen oder erledigt- voranstellen`
-const standMit = mitPunkten(['- 🔵 **x** siehe f12-frage.md und F7%20Frage.md'], [])
-const imOrdner = ['f12-frage.md', 'f99-neu.md', 'F7 Frage.md', 'e5-lose.md', 'erledigt-f1.md', 'notiz.txt']
+const standMit = mitPunkten(['- 🔵 **x** siehe f12-frage.md und F7%20Frage.md und G 8 Wort.md'], [])
+const imOrdner = ['f12-frage.md', 'f99-neu.md', 'F7 Frage.md', 'G 8 Wort.md', 'e5-lose.md', 'erledigt-f1.md', 'notiz.txt']
 assert.equal(w.waechter(standMit, JETZT, () => true, undefined, undefined, imOrdner), [JD('f99-neu.md'), JD('e5-lose.md')].join('; '), 'zwei Dateien ohne Eintrag, mit Eintrag (auch %20), erledigt- und .txt still')
 assert.equal(w.waechter(standMit, JETZT, () => true, undefined, undefined, ['f12-frage.md', 'erledigt-a.md']), '', 'alle eingetragen oder erledigt')
 assert.equal(w.waechter(standMit, JETZT, () => true), '', 'ohne Ordnerliste: keine Dateimeldung')

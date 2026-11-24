@@ -112,3 +112,5 @@ Ergänzt die Klasse K1 in `bauer.md`/`pruefer.md`; Anlässe stehen in `lehren.md
 **Wächter über Reihenfolge oder Anwesenheit: jede geordnete Karte ist im Testfall Pflicht (Lehre 166, PR 4384, 20.11.2026):** Eine Prüfung „falls vorhanden“ (`neu < 0` geduldet) lief seit PR 4365 leer durch, weil der Fall keine Neuigkeit hatte; je Karte ein Fall, in dem sie fehlt und der Wächter rot wird.
 
 **Neue Abweisungsregel in einem Sammler (PR 4724, 23.11.2026):** Sie braucht einen Kulissenlauf durch den echten Abrufweg (Fetch-Attrappe, Fälle mit und ohne vorhandenen Befund, über die Nachfrage, Gegenfall knapp innerhalb der Grenze) plus einen Log-Zähler mit Namen; der Unit-Test der Hilfsfunktion allein deckt die Verdrahtung nicht (Mutant `Hilfsfunktion(...)` zu `false` überlebte alle Tests), und ohne Namen im Log bleibt eine falsche Abweisung unsichtbar.
+
+**Neuer optionaler Rückruf-Parameter in einer Warteschlange (PR 4854, 24.11.2026):** Pflichtmutant ist der Fall „Eintrag fehlt“ (`undefined`) mit mindestens zwei solchen Titeln, damit der Vergleich nach dem ersten Sortierschlüssel bis zum Rückruf kommt (Mutant `cache[id] &&` entfernt überlebte mit einem einzelnen Titel).

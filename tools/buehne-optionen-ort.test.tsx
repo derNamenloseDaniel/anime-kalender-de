@@ -1,7 +1,7 @@
 /**
  * Test der Optionen-Ablage der Bühne (`web/buehne/optionen.tsx`): Anker im Navigator → `anker`; kein Anker, fremder Ursprung
  * oder kein Rahmen → `streifen` bzw. `oben`; die beiden Rückfälle rendern wie vorher (Streifen mit Taste, oben ohne Hülle).
- * Das Einsetzen in den Anker selbst misst `tools/buehne-seitenleiste-pruefen.mjs` im Browser.
+ * Das Einsetzen in den Anker selbst belegt `test/beleg-seitenleiste.mjs` im ticket-board (Playwright, von Hand; noch kein Wächter in der Kette).
  */
 import assert from 'node:assert/strict'
 import { renderToString } from 'react-dom/server'

@@ -117,5 +117,24 @@ for (let runde = 0; runde < 10; runde++) {
   else process.env.CLAUDE_CODE_REMOTE = vorher
 }
 
-console.log(fehler ? `${fehler} ROT` : 'agenten-grenze-test: alles grün (10 Parallelrunden, Prüfer, Verfall, Ersetzung, Remote zuerst)')
+// 8) Neustart (24.11.2026): Transkript vor dem Rechnerstart geschrieben = Agent tot, zählt nicht; danach geschrieben zählt.
+{
+  const { laufendeAgenten } = createRequire(import.meta.url)(hook)
+  const s = neueSitzung()
+  const jetzt = Date.now()
+  const schreibe = (id, vorSekunden) => {
+    const d = path.join(s.sub, `agent-${id}.jsonl`)
+    fs.writeFileSync(d, JSON.stringify({ type: 'assistant', message: { stop_reason: 'end_turn' } }) + '\n')
+    fs.writeFileSync(path.join(s.sub, `agent-${id}.meta.json`), JSON.stringify({ agentType: 'bauer', description: id }))
+    const t = (jetzt - vorSekunden * 1000) / 1000
+    fs.utimesSync(d, t, t)
+  }
+  schreibe('vor', 600) // vor 10 min geschrieben
+  schreibe('nach', 120) // vor 2 min geschrieben
+  const ids = (uptimeS) => laufendeAgenten(s.sub, jetzt, uptimeS).map((a) => a.id).sort().join(',')
+  pruef('Rechner seit 5 min an: Datei von vor 10 min tot, von vor 2 min lebt', ids(300) === 'nach')
+  pruef('Rechner seit 1 Tag an: beide zählen (wartender Agent bleibt)', ids(86400) === 'nach,vor')
+}
+
+console.log(fehler ? `${fehler} ROT` : 'agenten-grenze-test: alles grün (10 Parallelrunden, Prüfer, Verfall, Ersetzung, Remote zuerst, Neustart)')
 process.exit(fehler ? 1 : 0)

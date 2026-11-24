@@ -258,40 +258,7 @@ function SchnellSchalter({
   )
 }
 
-/**
- * **Was gerade greift, steht als entfernbarer Streifen darüber** — siehe
- * `kalender/AktiveFilter.tsx` (Kalender) bzw. `FilterBar.tsx` (Datenbank).
- */
-export function FilterDetails({
-  t,
-  modusVon2,
-  filters,
-  meta,
-  set,
-  chipState,
-  pick,
-  showConfidence,
-  showAllProviders,
-  setShowAllProviders,
-  tRelease,
-  visibleGenres,
-  tGenre,
-  shownKeywords,
-  tKeyword,
-  hiddenKeywordCount,
-  setAllKeywords,
-  allKeywords,
-  matchingKeywords,
-  favoriteCount,
-  tvAn,
-  setTvAn,
-  filterQuery,
-  setFilterQuery,
-  platformZaehlung,
-  genreListe,
-  genreZaehlung,
-  zwischen,
-}: {
+interface FilterDetailsProps {
   t: Translate
   modusVon2: (feld: ModusFeld, anzahl: number) => { anzahl: number; wert: 'und' | 'oder'; setzen: (w: 'und' | 'oder') => void }
   filters: FilterState
@@ -324,84 +291,118 @@ export function FilterDetails({
   genreZaehlung?: Map<string, number>
   /** Nur der Kalender: der Streifen der aktiven Filter zwischen Schnell und Gruppen, im Scrollbereich unter dem Suchfeld. */
   zwischen?: ReactNode
+}
+
+/** Die Plattform-Gruppe: „Meine Anbieter“ und ein Chip je Plattform, mit der Zahl des Zeitraums. */
+function PlattformGruppe({ label, suche, plattformen, filters, meta, set, modus, chipState, pick, platformZaehlung }: {
+  label: string
+  suche?: BereichsSuche
+  plattformen: PlatformId[]
+  filters: FilterState
+  meta: DataMeta
+  set: (patch: Partial<FilterState>) => void
+  modus: { anzahl: number; wert: 'und' | 'oder'; setzen: (w: 'und' | 'oder') => void }
+  chipState: FilterDetailsProps['chipState']
+  pick: FilterDetailsProps['pick']
+  platformZaehlung?: Map<PlatformId, number>
 }) {
-  const [mehr, setMehr] = useState(false)
-  const suche = bereichsSuche(filterQuery)
-  const plattformen: PlatformId[] = (platformZaehlung ? nachZahlGeordnet(meta.platforms, platformZaehlung) : meta.platforms).filter((p) => p !== 'disc' && !(setTvAn && p === 'tv'))
-  const genreSicht = useGenreSicht(genreListe, visibleGenres, filters, !!suche, t)
   const mitZahl = (n: number | undefined) => (n ? <span className="opacity-70">{n}</span> : null)
   const zaehlung = useContext(FilterZaehlungContext)
-  const plattformLabel = t('filter.platform')
-  const sichtbarPlattformen = plattformen.filter((p) => zeigePille(suche, plattformLabel, PLATFORMS[p].name))
+  const sichtbarPlattformen = plattformen.filter((p) => zeigePille(suche, label, PLATFORMS[p].name))
+  return (
+    <Bereich
+      label={label} klasse="sm:col-span-2"
+      suche={suche}
+      texte={plattformen.map((p) => PLATFORMS[p].name)}
+      modus={modus}
+    >
+      <MeineAnbieter
+        aktuell={filters.platforms}
+        verfuegbar={meta.platforms}
+        setzen={(platforms) => set({ platforms })}
+      />
+      {sichtbarPlattformen.map((p) => (
+        <Chip
+          key={p}
+          zahl={zaehlung?.platforms.get(p) ?? (zaehlung ? 0 : undefined)}
+          color={PLATFORMS[p].color}
+          {...chipState('platforms', p)}
+          onClick={() => pick('platforms', p)}
+        >
+          {PLATFORMS[p].name} {mitZahl(platformZaehlung?.get(p))}
+        </Chip>
+      ))}
+    </Bereich>
+  )
+}
+
+/**
+ * **Was gerade greift, steht als entfernbarer Streifen darüber** — siehe
+ * `kalender/AktiveFilter.tsx` (Kalender) bzw. `FilterBar.tsx` (Datenbank).
+ */
+export function FilterDetails(p: FilterDetailsProps) {
+  const [mehr, setMehr] = useState(false)
+  const suche = bereichsSuche(p.filterQuery)
+  const plattformen: PlatformId[] = (p.platformZaehlung ? nachZahlGeordnet(p.meta.platforms, p.platformZaehlung) : p.meta.platforms).filter((x) => x !== 'disc' && !(p.setTvAn && x === 'tv'))
+  const genreSicht = useGenreSicht(p.genreListe, p.visibleGenres, p.filters, !!suche, p.t)
   const genre = (
-    <GenreGruppe t={t} suche={suche} genreSicht={genreSicht} tGenre={tGenre} modus={modusVon2('genres', filters.genres.length)} chipState={chipState} pick={pick} zaehlung={genreZaehlung} />
+    <GenreGruppe t={p.t} suche={suche} genreSicht={genreSicht} tGenre={p.tGenre} modus={p.modusVon2('genres', p.filters.genres.length)} chipState={p.chipState} pick={p.pick} zaehlung={p.genreZaehlung} />
   )
   return (
     <>
       <div data-filter-scroll tabIndex={-1} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-      <FilterSuche t={t} filterQuery={filterQuery} setFilterQuery={setFilterQuery} />
+      <FilterSuche t={p.t} filterQuery={p.filterQuery} setFilterQuery={p.setFilterQuery} />
       <SchnellSchalter
-        t={t}
-        filters={filters}
-        set={set}
-        favoriteCount={favoriteCount}
-        showConfidence={showConfidence}
-        tvAn={tvAn}
-        setTvAn={setTvAn}
+        t={p.t}
+        filters={p.filters}
+        set={p.set}
+        favoriteCount={p.favoriteCount}
+        showConfidence={p.showConfidence}
+        tvAn={p.tvAn}
+        setTvAn={p.setTvAn}
         suche={suche}
       />
-      {zwischen}
+      {p.zwischen}
       {/* Ein Rahmen: das Fenster. Die Gruppen trennen Überschriften; weitere (etwa „Herkunft") reihen sich im Raster ein. */}
       <div className="px-3 py-2.5">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Bereich
-            label={plattformLabel} klasse="sm:col-span-2"
+          <PlattformGruppe
+            label={p.t('filter.platform')}
             suche={suche}
-            texte={plattformen.map((p) => PLATFORMS[p].name)}
-            modus={modusVon2('platforms', filters.platforms.length)}
-          >
-            <MeineAnbieter
-              aktuell={filters.platforms}
-              verfuegbar={meta.platforms}
-              setzen={(platforms) => set({ platforms })}
-            />
-            {sichtbarPlattformen.map((p) => (
-              <Chip
-                key={p}
-                zahl={zaehlung?.platforms.get(p) ?? (zaehlung ? 0 : undefined)}
-                color={PLATFORMS[p].color}
-                {...chipState('platforms', p)}
-                onClick={() => pick('platforms', p)}
-              >
-                {PLATFORMS[p].name} {mitZahl(platformZaehlung?.get(p))}
-              </Chip>
-            ))}
-          </Bereich>
-          <Grundgruppen t={t} meta={meta} filters={filters} modusVon2={modusVon2} chipState={chipState} pick={pick} suche={suche} set={set} tRelease={tRelease} kalender={Boolean(setTvAn)} />
+            plattformen={plattformen}
+            filters={p.filters}
+            meta={p.meta}
+            set={p.set}
+            modus={p.modusVon2('platforms', p.filters.platforms.length)}
+            chipState={p.chipState}
+            pick={p.pick}
+            platformZaehlung={p.platformZaehlung}
+          />
+          <Grundgruppen t={p.t} meta={p.meta} filters={p.filters} modusVon2={p.modusVon2} chipState={p.chipState} pick={p.pick} suche={suche} set={p.set} tRelease={p.tRelease} kalender={Boolean(p.setTvAn)} />
         </div>
 
-        {!suche && <MehrKnopf t={t} mehr={mehr} setMehr={setMehr} />}
+        {!suche && <MehrKnopf t={p.t} mehr={mehr} setMehr={setMehr} />}
         {/* **Auch die Filter hinter „mehr Filter" werden durchsucht**:
             Während gesucht wird, klappt die Fläche auf, damit ein Treffer nicht verborgen bleibt. */}
         {(mehr || suche) && (
           <FilterMehr
-            t={t}
-            meta={meta}
-            filters={filters}
-            showConfidence={showConfidence}
-            modusVon2={modusVon2}
-            chipState={chipState}
-            pick={pick}
-            set={set}
-            tRelease={tRelease}
-            tKeyword={tKeyword}
-            showAllProviders={showAllProviders}
-            setShowAllProviders={setShowAllProviders}
-            shownKeywords={shownKeywords}
-            hiddenKeywordCount={hiddenKeywordCount}
-            setAllKeywords={setAllKeywords}
-            allKeywords={allKeywords}
-            matchingKeywords={matchingKeywords}
+            t={p.t}
+            meta={p.meta}
+            filters={p.filters}
+            showConfidence={p.showConfidence}
+            modusVon2={p.modusVon2}
+            chipState={p.chipState}
+            pick={p.pick}
+            set={p.set}
+            tRelease={p.tRelease}
+            tKeyword={p.tKeyword}
+            showAllProviders={p.showAllProviders}
+            setShowAllProviders={p.setShowAllProviders}
+            shownKeywords={p.shownKeywords}
+            hiddenKeywordCount={p.hiddenKeywordCount}
+            setAllKeywords={p.setAllKeywords}
+            allKeywords={p.allKeywords}
+            matchingKeywords={p.matchingKeywords}
             suche={suche}
             genre={genre}
           />

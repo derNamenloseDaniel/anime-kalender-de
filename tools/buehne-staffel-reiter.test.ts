@@ -9,6 +9,13 @@ import { fileURLToPath } from 'node:url'
 import type { FranchiseMember, Release, Title } from '../shared/types.ts'
 import { lageVon } from '../web/buehne/mockups/staffel-lage.ts'
 import { reiterVon } from '../web/buehne/mockups/staffel-reiter-liste.ts'
+import { createElement } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { KastenPfeileEinblenden, KastenPfeileImmer } from '../web/buehne/mockups/staffel-abschnitt.tsx'
+import { pfeilLageVon, pfeilZustandVon, sprungVon, type PfeilModus } from '../web/buehne/mockups/staffel-pfeile.ts'
+import { ReiterPfeil, rolleUm } from '../web/buehne/mockups/staffel-pfeile.tsx'
+import { ReiterZeile } from '../web/buehne/mockups/staffel-reiter.tsx'
+import { mockupMit } from '../web/buehne/register.ts'
 
 const datei = fileURLToPath(new URL('../web/buehne/faelle.json', import.meta.url))
 const faelle = JSON.parse(readFileSync(datei, 'utf8')).faelle as Record<string, Record<string, unknown>>
@@ -57,10 +64,16 @@ assert.equal(reiterVon(offen(10852), teile.slice(0, 0), 'Pokémon', titel).lengt
 // Eine einzelne Horizonte-Staffel ohne Geschwister zeigt keine Reiter.
 assert.equal(reiterVon(offen(14839), teile, 'Pokémon', [offen(14839)]).length, 0, 'ein Reiter allein')
 
-// Zustandsmarke je Reiter am Stichtag des Falls (2026-11-23): Horizonte 4 läuft (RTL+ seit 20.11., Ende offen), 1 bis 3 nicht
-// (die Fernsehreihe hat Folge 136 schon am 21.11. gesendet); Hauptserie: 23–25 läuft, 1–5 kommt (Box), 25 ohne Marke.
-const stichtag = '2026-11-23'
+// Zustandsmarke je Reiter am Stichtag des Mockups (`zeiten` in staffel-abschnitt.tsx, 2026-11-24): Horizonte 4 läuft (RTL+ seit
+// 20.11., Ende offen), 1 bis 3 nicht (die Fernsehreihe hat Folge 136 schon am 21.11. gesendet); Hauptserie: 23–25 läuft, 1–5 kommt
+// (Box), 25 ohne Marke.
+// Der Stichtag kommt aus der angemeldeten Mockup-Definition: fehlt `zeiten`, gilt die Uhr der Bühne (11.10.) und der Test wird rot.
+const erstesZeit = Object.values(mockupMit('staffel-abschnitt')?.zeiten ?? {})[0]
+assert.equal(erstesZeit?.slice(0, 10), '2026-11-24', 'Mockup staffel-abschnitt braucht zeiten auf den 24.11.2026')
+const stichtag = erstesZeit!.slice(0, 10)
 const releases = fall['releases.json'] as Release[]
+// Zur Uhr der Bühne (faelle.heute, 11.10.) wäre Staffel 4 noch angekündigt: darum trägt das Mockup seinen Stichtag selbst.
+assert.equal(lageVon(offen(14839), releases.filter((r) => r.titleId === 14839), '2026-10-11'), 'kommt', 'Staffel 4 vor dem Start')
 const lage = (id: number) => lageVon(offen(id), releases.filter((r) => r.titleId === id), stichtag)
 assert.deepEqual([26469, 26470, 26471, 14839].map(lage), ['sonst', 'sonst', 'sonst', 'laeuft'], 'Horizonte: nur Staffel 4 läuft')
 assert.deepEqual([483, 1349, 10852, 14838].map(lage), ['kommt', 'sonst', 'laeuft', 'sonst'], 'Hauptserie')
@@ -74,4 +87,56 @@ assert.equal(lageVon(haupt, releases.filter((r) => r.titleId === 10852), stichta
 // Titel mit bekannter Folgenzahl und abgelaufenem Plan bleibt „sonst“ (Ende offen gilt nur ohne Folgenzahl).
 assert.equal(lageVon({ ...offen(14839), episodes: 12 }, releases.filter((r) => r.titleId === 14839), stichtag), 'sonst', 'Staffel 4 mit Folgenzahl')
 
-console.log('buehne-staffel-reiter: ok (Horizonte 4, Pokémon 12, Attack on Titan 4 ohne Junior High, Film/Special/leer/allein 0)')
+// Pfeile (24.11.2026, Daniel): Lage aus Scrollposition, Gesamtbreite und sichtbarer Breite. Feste Zahlen: Leiste 300 px sichtbar, 722 px breit (Pokémon-Hauptserie auf dem Handy).
+assert.deepEqual(pfeilLageVon(0, 722, 300), { links: false, rechts: true }, 'ganz links')
+assert.deepEqual(pfeilLageVon(211, 722, 300), { links: true, rechts: true }, 'Mitte')
+assert.deepEqual(pfeilLageVon(422, 722, 300), { links: true, rechts: false }, 'ganz rechts');
+assert.deepEqual(pfeilLageVon(0, 300, 300), { links: false, rechts: false }, 'passt ganz hinein');
+// Bruchteile von Pixeln (Zoom) öffnen keinen Pfeil; ab 2 px Rest schon.
+assert.deepEqual(pfeilLageVon(1, 722, 300), { links: false, rechts: true }, '1 px links ist noch ganz links');
+assert.deepEqual(pfeilLageVon(2, 722, 300), { links: true, rechts: true }, '2 px links sind schon Reiter links');
+assert.deepEqual(pfeilLageVon(421, 722, 300), { links: true, rechts: false }, '1 px Rest rechts ist noch ganz rechts');
+assert.deepEqual(pfeilLageVon(420, 722, 300), { links: true, rechts: true }, '2 px Rest rechts sind schon Reiter rechts');
+// Ein Klick rollt um genau die sichtbare Breite, links negativ.
+assert.equal(sprungVon('rechts', 300), 300, 'Sprung rechts');
+assert.equal(sprungVon('links', 437), -437, 'Sprung links');
+// Einblenden: Pfeil nur mit weiteren Reitern; Immer: Pfeil immer, aktiv nur mit weiteren Reitern.
+assert.deepEqual(pfeilZustandVon('einblenden', true), { sichtbar: true, aktiv: true })
+assert.deepEqual(pfeilZustandVon('einblenden', false), { sichtbar: false, aktiv: false })
+assert.deepEqual(pfeilZustandVon('immer', true), { sichtbar: true, aktiv: true })
+assert.deepEqual(pfeilZustandVon('immer', false), { sichtbar: true, aktiv: false })
+// Gerenderter Pfeil: Beschriftung, deaktiviert nur ohne weitere Reiter, in „einblenden“ ohne weitere Reiter gar nicht da.
+const pfeil = (richtung: 'links' | 'rechts', modus: PfeilModus, weitere: boolean) => renderToStaticMarkup(createElement(ReiterPfeil, { richtung, modus, weitere, beiKlick: () => {} }))
+assert.match(pfeil('links', 'immer', true), /aria-label="Vorherige Staffeln"[^>]*aria-disabled="false"/)
+assert.match(pfeil('rechts', 'immer', true), /aria-label="Weitere Staffeln"[^>]*aria-disabled="false"/)
+assert.match(pfeil('rechts', 'immer', false), /aria-label="Weitere Staffeln"[^>]*aria-disabled="true"/)
+assert.match(pfeil('rechts', 'immer', false), /class="[^"]*pointer-events-none/, 'deaktiviert: keine Treffer (auch nicht über ::after)')
+assert.doesNotMatch(pfeil('rechts', 'immer', true), /pointer-events-none/, 'aktiv: nimmt Treffer an')
+assert.equal(pfeil('links', 'einblenden', false), '', 'einblenden: links ohne Reiter links nicht da')
+assert.match(pfeil('links', 'einblenden', true), /data-pfeil="links"/)
+// rolleUm: Attrappe mit clientWidth 300 und aufgezeichnetem scrollBy; links −300, rechts +300, bei „weniger Bewegung“ ohne Animation.
+const aufruf = (richtung: 'links' | 'rechts', clientWidth: number, ruhig: boolean) => {
+  const gerufen: ScrollToOptions[] = []
+  const welt = globalThis as { matchMedia?: unknown }
+  welt.matchMedia = (q: string) => ({ matches: ruhig && q === '(prefers-reduced-motion: reduce)' })
+  rolleUm({ clientWidth, scrollBy: (o: ScrollToOptions) => gerufen.push(o) } as unknown as HTMLElement, richtung)
+  return gerufen
+}
+assert.deepEqual(aufruf('rechts', 300, false), [{ left: 300, behavior: 'smooth' }], 'rechts +300 weich')
+assert.deepEqual(aufruf('links', 300, false), [{ left: -300, behavior: 'smooth' }], 'links -300 weich')
+assert.deepEqual(aufruf('rechts', 437, false), [{ left: 437, behavior: 'smooth' }], 'Sprung folgt der Leistenbreite')
+assert.deepEqual(aufruf('links', 300, true), [{ left: -300, behavior: 'auto' }], 'weniger Bewegung: ohne Animation')
+rolleUm(null, 'links') // ohne Leiste: kein Fehler
+// Die Reiterzeile reicht den Modus an beide Pfeile durch (erster Aufbau ohne Messung: beide
+// deaktiviert; die Lage selbst misst erst der Browser, siehe Bilder im PR).
+const zeile = (modus: PfeilModus) => renderToStaticMarkup(createElement(ReiterZeile, { reiter: reiter(10852), aktiv: 10852, lagen: new Map(), farbe: '', pfeile: modus }))
+assert.equal((zeile('immer').match(/data-pfeil=/g) ?? []).length, 2, 'immer: beide Pfeile in der Zeile')
+assert.equal((zeile('einblenden').match(/data-pfeil=/g) ?? []).length, 0, 'einblenden: vor der Messung kein Pfeil')
+assert.equal((zeile('immer').match(/<button/g) ?? []).length, 12 + 2, '12 Reiter plus 2 Pfeile')
+// Die beiden Varianten des einen Mockups tauschen verschiedene Kästen (A einblenden, B immer).
+const varianten = mockupMit('staffel-abschnitt')!.varianten
+assert.deepEqual(Object.keys(varianten), ['A', 'B'])
+assert.equal(varianten.A!.ersatz.AntwortKasten, KastenPfeileEinblenden, 'A: einblenden')
+assert.equal(varianten.B!.ersatz.AntwortKasten, KastenPfeileImmer, 'B: immer')
+
+console.log('buehne-staffel-reiter: ok (Horizonte 4, Pokémon 12, Attack on Titan 4 ohne Junior High, Film/Special/leer/allein 0, Pfeile A/B)')

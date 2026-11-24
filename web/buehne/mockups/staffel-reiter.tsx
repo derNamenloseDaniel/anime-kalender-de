@@ -6,6 +6,8 @@ import { usePanelReihe } from '../../src/components/detail/panel-reihe-namen.ts'
 import { TitelWechselKontext } from '../titel-wechsel.ts'
 import { lageVon, type Lage } from './staffel-lage.ts'
 import { reiterVon, type Reiter } from './staffel-reiter-liste.ts'
+import { ReiterPfeil, rolleUm, usePfeilLage } from './staffel-pfeile.tsx'
+import type { PfeilModus } from './staffel-pfeile.ts'
 
 type KastenEigenschaften = ComponentProps<typeof AntwortKastenMitMarke>
 
@@ -14,12 +16,16 @@ function kastenFarbe(huelle: string): string {
   return huelle.split(' ').filter((k) => /^(dark:)?(border|bg)-/.test(k)).join(' ')
 }
 
-function reiterKlassen(lage: Lage, gewaehlt: boolean, kasten: string): string {
+function reiterKlassen(gewaehlt: boolean, kasten: string): string {
   const basis = 'relative grid shrink-0 cursor-pointer snap-center place-items-center rounded-t-xl border border-b-0 px-3 text-t3 tabular-nums'
-  if (gewaehlt) return `${basis} z-10 -mb-px min-h-[3.25rem] min-w-12 pb-px font-bold ${kasten} ${lage === 'laeuft' ? 'text-ak-akzent-text' : 'text-ak-text'}`
-  const hoehe = 'min-h-11 min-w-11'
-  if (lage === 'laeuft') return `${basis} ${hoehe} border-ak-akzent bg-ak-akzent font-bold text-ak-auf-akzent`
-  return `${basis} ${hoehe} ${lage === 'kommt' ? 'border-dashed' : ''} border-ak-rand bg-ak-flaeche-2 font-semibold text-ak-leise`
+  if (gewaehlt) return `${basis} z-10 -mb-px min-h-[3.25rem] min-w-12 pb-px font-bold text-ak-text ${kasten}`
+  return `${basis} min-h-11 min-w-11 border-ak-rand bg-ak-flaeche-2 font-semibold text-ak-leise`
+}
+
+/** Marke oben rechts, unabhängig von der Wahl: gefüllter Punkt = läuft, Ring = kommt noch. */
+function LageMarke({ lage }: { lage: Lage }) {
+  if (lage === 'sonst') return null
+  return <span aria-hidden="true" data-lage={lage} className={`absolute top-1.5 right-1.5 size-2 rounded-full ${lage === 'laeuft' ? 'bg-ak-akzent-text' : 'border-[1.5px] border-ak-akzent-text'}`} />
 }
 
 /** Den gewählten Reiter in die Mitte der Zeile rollen. */
@@ -29,31 +35,34 @@ function zeigeGewaehlten(zeile: HTMLElement | null): void {
   zeile.scrollLeft = reiter.offsetLeft - (zeile.clientWidth - reiter.offsetWidth) / 2
 }
 
-/** „Staffeln“ links, daneben je Staffel ein Reiter mit nur der Nummer; wischt nativ, Beschriftung für Hilfsmittel nennt den Titel. */
-function ReiterZeile({ reiter, aktiv, lagen, farbe }: { reiter: Reiter[]; aktiv: number; lagen: Map<number, Lage>; farbe: string }) {
+/** Je Staffel ein Reiter mit nur der Nummer; wischt nativ, die Beschriftung für Hilfsmittel nennt den Titel. Seitlich Platz für die Rundung des Kastens. */
+export function ReiterZeile({ reiter, aktiv, lagen, farbe, pfeile }: { reiter: Reiter[]; aktiv: number; lagen: Map<number, Lage>; farbe: string; pfeile: PfeilModus }) {
   const wechsle = useContext(TitelWechselKontext)
   const zeile = useRef<HTMLDivElement>(null)
   useEffect(() => zeigeGewaehlten(zeile.current), [aktiv])
+  const lage = usePfeilLage(zeile, reiter.length)
   return (
-    <div className="relative z-10 -mb-px flex items-end gap-2 pr-4">
-      <span className="shrink-0 pb-2.5 text-t3 font-bold text-ak-text">Staffeln</span>
-      <div ref={zeile} role="group" aria-label="Staffeln" data-staffel-reiter className="flex min-w-0 flex-1 snap-x snap-proximity items-end gap-1 overflow-x-auto pb-px [scrollbar-width:none] pointer-fine:[scrollbar-width:thin] [&::-webkit-scrollbar]:hidden">
+    <div className="relative z-10 -mb-px px-4">
+      <div ref={zeile} role="group" aria-label="Staffeln" data-staffel-reiter className="flex snap-x snap-proximity items-end gap-1 overflow-x-auto pb-px [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {reiter.map((r) => {
-          const lage = lagen.get(r.id) ?? 'sonst'
+          const gewaehlt = r.id === aktiv
           return (
-            <button key={r.id} type="button" aria-current={r.id === aktiv} aria-label={`Staffel ${r.label}: ${r.name}`} onClick={() => wechsle(r.id)} className={reiterKlassen(lage, r.id === aktiv, farbe)}>
+            <button key={r.id} type="button" aria-current={gewaehlt} aria-label={`Staffel ${r.label}: ${r.name}`} onClick={() => wechsle(r.id)} className={reiterKlassen(gewaehlt, farbe)}>
+              {gewaehlt && <span aria-hidden="true" className="absolute inset-x-3 top-0 h-[3px] rounded-b-full bg-ak-akzent" />}
               {r.label}
-              {lage === 'laeuft' && <span aria-hidden="true" className={`absolute top-1 right-1 size-1.5 rounded-full ${r.id === aktiv ? 'bg-ak-akzent' : 'bg-ak-auf-akzent'}`} />}
+              <LageMarke lage={lagen.get(r.id) ?? 'sonst'} />
             </button>
           )
         })}
       </div>
+      <ReiterPfeil richtung="links" modus={pfeile} weitere={lage.links} beiKlick={() => rolleUm(zeile.current, 'links')} />
+      <ReiterPfeil richtung="rechts" modus={pfeile} weitere={lage.rechts} beiKlick={() => rolleUm(zeile.current, 'rechts')} />
     </div>
   )
 }
 
 /** Reiter über dem echten Kasten; die Hülle des Kastens (und damit die Farbe) kennt dieselbe Rechnung wie `AntwortKasten`. */
-export function ReiterUeberKasten({ data, eigenschaften, kasten }: { data: Dataset; eigenschaften: KastenEigenschaften; kasten: ReactNode }) {
+export function ReiterUeberKasten({ data, eigenschaften, kasten, pfeile }: { data: Dataset; eigenschaften: KastenEigenschaften; kasten: ReactNode; pfeile: PfeilModus }) {
   const { title, antwort, t, today, releases = [], ohneSprachbeleg, stream = [], disc = [], pillenGruppen = new Map(), terminPillen = [], discZuerst = false } = eigenschaften
   const { reihenTeile, reihenName } = usePanelReihe(title, data)
   const z = useKastenZustand({ antwort, title, t, stream, disc, pillenGruppen, terminPillen, discZuerst })
@@ -63,10 +72,11 @@ export function ReiterUeberKasten({ data, eigenschaften, kasten }: { data: Datas
   const lagen = new Map(reiter.map((r) => [r.id, data.titleById.has(r.id) ? lageVon(data.titleById.get(r.id)!, data.releasesByTitle.get(r.id) ?? [], today) : 'sonst']))
   const farbe = kastenFarbe(kastenKlassen({ antwort, title, neben: '', gedaempft }))
   if (reiter.length === 0) return kasten
+  /* Eine Hülle um Reiter und Kasten: der Abstand der Seite zwischen ihren Geschwistern trennt sie nicht. */
   return (
-    <>
-      <ReiterZeile reiter={reiter} aktiv={title.id} lagen={lagen} farbe={farbe} />
+    <div>
+      <ReiterZeile reiter={reiter} aktiv={title.id} lagen={lagen} farbe={farbe} pfeile={pfeile} />
       {kasten}
-    </>
+    </div>
   )
 }

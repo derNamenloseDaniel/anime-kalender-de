@@ -44,6 +44,7 @@ const kurz = (a: number, b: number, formatB = 'TV_SHORT') => [titel(1, a, '98', 
 pruefe('Doppelfolgen nur bei reiner Kurzserie: gemischte Gruppe (TV 13 + TV_SHORT 26 gegen 13 + 13) bleibt Befund', aus(kurz(26, 13, 'TV'), { 98: liste(13, 13) }) === '1:laenger-als-staffel,2:laenger-als-staffel')
 pruefe('Doppelfolgen runden auf: 25 Kurzfolgen sind 13 Netflix-Folgen (passt zu 13), 27 sind 14 (passt nicht zu 13)', aus(kurz(25, 25), { 98: liste(13, 13) }) === '' && aus(kurz(27, 27), { 98: liste(13, 13) }) === '1:laenger-als-staffel,2:laenger-als-staffel')
 pruefe('Befundart bei keiner passenden Zählweise ist die des Katalogs (26 + 26 gegen 13 + 12: länger als Staffel, nicht die halbierte Überlappung)', aus(kurz(26, 26), { 98: liste(13, 12) }) === '1:laenger-als-staffel,2:laenger-als-staffel')
+pruefe('Befundart mit Special in der Gruppe: passt keine Zählweise, gilt die des Katalogs (30er-Special > größte Staffel 13 → länger als Staffel; ohne Special wäre es Überlappung)', aus([titel(1, 12, '99'), titel(2, 12, '99'), titel(3, 30, '99', 1, 'SPECIAL')], { 99: liste(13, 5) }) === '1:laenger-als-staffel,2:laenger-als-staffel,3:laenger-als-staffel')
 
 /* Regel in der Tabelle: reine Mengenabfrage, Wirkung und Zuständigkeit wie `adresse-mehrfach` */
 const regel = REGELN.find((r) => r.art === 'staffel-zuordnung')!

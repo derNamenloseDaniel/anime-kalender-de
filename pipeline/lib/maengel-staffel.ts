@@ -14,8 +14,8 @@ export const letzterNetflixStart = (releases: Release[]): string | undefined =>
 const netflixKennung = (url: string): string | undefined => /netflix\.com\/(?:[a-z-]+\/)?title\/(\d+)/i.exec(url)?.[1]
 
 /**
- * Folgenzahlen der Titel einer Adresse, wie der Anbieter sie zählen kann; die erste Zählweise ist die des Katalogs. Netflix zählt ein Special nicht als Folge
- * einer Staffel (Kuroko: Tip Off, Folge 22.5, Netflix führt 3 × 25) und fasst bei reinen Kurzserien zwei Folgen zu einer (Titipo: 11 min je Katalogfolge,
+ * Folgenzahlen der Titel einer Adresse, wie der Anbieter sie zählen kann; die erste Zählweise ist die des Katalogs. Die Netflix-Staffelliste enthält kein Special
+ * (Kuroko: Tip Off, Folge 22.5, die Liste führt 3 × 25; sein Ort bei Netflix ist unbelegt) und Netflix fasst bei reinen Kurzserien zwei Folgen zu einer (Titipo: 11 min je Katalogfolge,
  * rund 24 min je Netflix-Folge, 13 + 13 gegen 26 + 26; Stand 24.11.2026).
  */
 function zaehlweisen(ts: Title[]): number[][] {

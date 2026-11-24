@@ -668,22 +668,19 @@ export function beurteileTeilblock(serie: CrSerie, unsere: Title[]): Urteil[] {
   return raus
 }
 
-export function beurteileJeBlock(serie: CrSerie, unsere: Title[]): Urteil[] {
-  const bloecke = serie.staffeln ?? []
-  if (!bloecke.length) return []
+/*
+  Gekürzt wird auf Kleinbuchstaben und Ziffern. „PSYCHO-PASS 3: First
+  Inspector" und „PSYCHO-PASS 3 FIRST INSPECTOR" sind danach dasselbe; die
+  Zusätze „(German Dub)" und „(Dt. Opening)" fallen weg, weil sie über die
+  Tonspur reden, nicht über den Titel.
+*/
+const kurzBlock = (t: string | undefined | null) =>
+  (t ?? '')
+    .toLowerCase()
+    .replace(/\((german dub|dt\. opening|deutscher dub)\)/g, '')
+    .replace(/[^a-z0-9]/g, '')
 
-  /*
-    Gekürzt wird auf Kleinbuchstaben und Ziffern. „PSYCHO-PASS 3: First
-    Inspector" und „PSYCHO-PASS 3 FIRST INSPECTOR" sind danach dasselbe; die
-    Zusätze „(German Dub)" und „(Dt. Opening)" fallen weg, weil sie über die
-    Tonspur reden, nicht über den Titel.
-  */
-  const kurz = (t: string | undefined | null) =>
-    (t ?? '')
-      .toLowerCase()
-      .replace(/\((german dub|dt\. opening|deutscher dub)\)/g, '')
-      .replace(/[^a-z0-9]/g, '')
-
+function urteilEinzigeSerie(bloecke: CrStaffel[], unsere: Title[]): Urteil[] | null {
   /**
    * **Eine einzelne Serie an der Adresse braucht keinen Namensvergleich.**
    *
@@ -721,7 +718,10 @@ export function beurteileJeBlock(serie: CrSerie, unsere: Title[]): Urteil[] {
       ]
     }
   }
+  return null
+}
 
+function urteileSonderblock(bloecke: CrStaffel[], unsere: Title[]): Urteil[] {
   const raus: Urteil[] = []
 
   /*
@@ -761,6 +761,11 @@ export function beurteileJeBlock(serie: CrSerie, unsere: Title[]): Urteil[] {
       }
     }
   }
+  return raus
+}
+
+function urteileFilme(serie: CrSerie, bloecke: CrStaffel[], unsere: Title[], bisher: Urteil[]): Urteil[] {
+  const raus: Urteil[] = []
 
   /*
     **Ein Film mit eigenem Block wird über ihn beurteilt — auch verneinend.**
@@ -780,9 +785,9 @@ export function beurteileJeBlock(serie: CrSerie, unsere: Title[]): Urteil[] {
   */
   if (serie.katalog === 'de') {
     for (const film of unsere.filter((t) => t.format === 'MOVIE')) {
-      if (raus.some((u) => u.titleId === film.id)) continue
-      const namen = [film.titleRomaji, film.titleEn, film.titleDe].map(kurz).filter((n) => n.length >= 4)
-      const eigener = bloecke.filter((b) => namen.includes(kurz(b.name)))
+      if (bisher.some((u) => u.titleId === film.id) || raus.some((u) => u.titleId === film.id)) continue
+      const namen = [film.titleRomaji, film.titleEn, film.titleDe].map(kurzBlock).filter((n) => n.length >= 4)
+      const eigener = bloecke.filter((b) => namen.includes(kurzBlock(b.name)))
       if (eigener.length !== 1) continue
       const block = eigener[0]!
       const deutsch = block.deutscheFolgen?.length ?? block.deutsch ?? 0
@@ -794,85 +799,78 @@ export function beurteileJeBlock(serie: CrSerie, unsere: Title[]): Urteil[] {
       })
     }
   }
+  return raus
+}
+
+function urteilNachName(serie: CrSerie, bloecke: CrStaffel[], titel: Title): Urteil | null {
+  const namen = [titel.titleRomaji, titel.titleEn, titel.titleDe].map(kurzBlock).filter((n) => n.length >= 4)
+  if (!namen.length) return null
+
+  /*
+    **Nur exakte Gleichheit — ein Präfix reicht nicht.** Sonst erbte jedes
+    Special das Urteil seiner Hauptserie („Sword Art Online EXTRA EDITION" den
+    Block „Sword Art Online"); es ist ein eigenes Werk mit eigener Tonspur-Frage.
+    Was sich im Zusatz unterscheidet, fällt heraus — die richtige Seite zum Irren.
+  */
+  const treffer = bloecke.filter((b) => {
+    const bn = kurzBlock(b.name)
+    if (bn.length < 4) return false
+    return namen.some((n) => bn === n)
+  })
+  if (!treffer.length) return null
+  /* Passen zwei Blöcke gleich gut, ist die Zuordnung mehrdeutig. */
+  if (treffer.length > 1) return null
+  const block = treffer[0]!
+  const deutsch = block.deutscheFolgen?.length ?? block.deutsch ?? 0
+  /* Auch über den Namen nicht, wenn die deutschen Folgen hinter unserem Ende liegen (Captain Tsubasa). */
+  if (deutsch > 0 && deutscheFolgenNachDemEnde([block], titel.episodes)) return null
+  if (deutsch > 0) {
+    return {
+      titleId: titel.id,
+      dub: true,
+      grund: `Block „${block.name}“: ${deutsch} deutsche Folgen, ueber den Namen zugeordnet`,
+    }
+  }
+  /**
+   * **Und der gleichnamige Block ohne deutsche Folge belegt das Nein.**
+   *
+   * Freigegeben von Daniel am 30.08.2026 (Beispiele „Fruits Basket", „Bofuri").
+   * Gleicher Beleggrad wie bei `beurteile()`: Der **deutsche** Katalog kennt
+   * den Block und führt keine deutsche Fassung. Bedingungen:
+   *
+   * - `katalog === 'de'` — aus dem US-Katalog belegt ein fehlendes `de-DE` nichts.
+   * - Name exakt gleich (oben geprüft).
+   * - **Folgenzahl exakt gleich**: ein gleichnamiger Block kann eine andere
+   *   Ausgabe derselben Serie sein; dann wird nichts behauptet.
+   *
+   * Ein Nein entfernt den Verweis, deshalb die strengste Prüfung des Laufs.
+   */
+  if (serie.katalog !== 'de') return null
+  if (!titel.episodes || !block.folgen || titel.episodes !== block.folgen) return null
+  return {
+    titleId: titel.id,
+    dub: false,
+    grund:
+      `Block „${block.name}“ im deutschen Katalog: ${block.folgen} Folgen wie unser Eintrag, ` +
+      `keine davon deutsch`,
+  }
+}
+
+export function beurteileJeBlock(serie: CrSerie, unsere: Title[]): Urteil[] {
+  const bloecke = serie.staffeln ?? []
+  if (!bloecke.length) return []
+
+  const einzige = urteilEinzigeSerie(bloecke, unsere)
+  if (einzige) return einzige
+
+  const raus: Urteil[] = urteileSonderblock(bloecke, unsere)
+  raus.push(...urteileFilme(serie, bloecke, unsere, raus))
 
   for (const titel of unsere) {
     /* Wer schon über den Sonderblock beurteilt ist, wird nicht zweimal gewertet. */
     if (raus.some((u) => u.titleId === titel.id)) continue
-    const namen = [titel.titleRomaji, titel.titleEn, titel.titleDe].map(kurz).filter((n) => n.length >= 4)
-    if (!namen.length) continue
-
-    /*
-      **Nur exakte Gleichheit — ein Präfix reicht nicht.**
-
-      Der erste Anlauf ließ auch gelten, dass unser Titel mit dem Blocknamen
-      beginnt. Damit erbte jedes Special das Urteil seiner Hauptserie: „Sword
-      Art Online EXTRA EDITION" bekam den Block „Sword Art Online", „Miss
-      Kobayashi’s Dragon Maid: Valentines and Hot Springs" den der Serie.
-      Beide sind eigene Werke mit eigener Tonspur-Frage.
-
-      Nach der Bereinigung bleibt genug übrig: „Durarara!!" und „Durarara
-      (German Dub)" sind gleich, „High School DxD HERO" und „High School DxD
-      Hero" auch. Was sich im Zusatz unterscheidet, fällt heraus — und das ist
-      die richtige Seite zum Irren.
-    */
-    const treffer = bloecke.filter((b) => {
-      const bn = kurz(b.name)
-      if (bn.length < 4) return false
-      return namen.some((n) => bn === n)
-    })
-    /*
-      Genau einer muss passen. Bei „PSYCHO-PASS" passt auch „PSYCHO-PASS 2" auf
-      den Präfix — deshalb gewinnt der Block mit der größten Übereinstimmung,
-      und nur wenn er allein an der Spitze steht.
-    */
-    if (!treffer.length) continue
-    /* Passen zwei Blöcke gleich gut, ist die Zuordnung mehrdeutig. */
-    if (treffer.length > 1) continue
-    const block = treffer[0]
-    const deutsch = block.deutscheFolgen?.length ?? block.deutsch ?? 0
-    /* Auch über den Namen nicht, wenn die deutschen Folgen hinter unserem Ende liegen (Captain Tsubasa). */
-    if (deutsch > 0 && deutscheFolgenNachDemEnde([block], titel.episodes)) continue
-    if (deutsch > 0) {
-      raus.push({
-        titleId: titel.id,
-        dub: true,
-        grund: `Block „${block.name}“: ${deutsch} deutsche Folgen, ueber den Namen zugeordnet`,
-      })
-      continue
-    }
-    /**
-     * **Und der gleichnamige Block ohne deutsche Folge belegt das Nein.**
-     *
-     * Freigegeben von Daniel am 30.08.2026, mit der Folgenzahl als Bedingung.
-     * Der Beleggrad ist derselbe, den `beurteile()` für ganze Serien längst
-     * nutzt: Der **deutsche** Katalog kennt den Block und führt keine deutsche
-     * Fassung. Zwei Fälle standen dafür seit dem 29.08. offen — „Fruits Basket"
-     * (25 Folgen) und „Bofuri" (12), beide mit gleichnamigem Block und null
-     * deutschen Folgen.
-     *
-     * **Drei Bedingungen, und jede hat ihren Grund:**
-     *
-     * - `katalog === 'de'` — aus dem US-Katalog belegt ein fehlendes `de-DE`
-     *   nichts (CLAUDE.md, „Fairy Tail" trägt dort nur `ja-JP, en-US`).
-     * - **Name exakt gleich**, geprüft eine Ebene höher: ein Präfix erbte sonst
-     *   das Urteil der Hauptserie an jedes Special.
-     * - **Folgenzahl exakt gleich** — Daniels Bedingung. Ein gleichnamiger
-     *   Block kann eine andere Ausgabe derselben Serie sein (der ältere
-     *   CMS-Pfad legt je Tonspur einen an); stimmt die Zahl nicht, ist es nicht
-     *   derselbe Umfang, und dann wird nichts behauptet.
-     *
-     * Ein Nein entfernt den Verweis. Deshalb steht hier die strengste Prüfung
-     * des ganzen Laufs, und deshalb hat sie eine Freigabe gebraucht.
-     */
-    if (serie.katalog !== 'de') continue
-    if (!titel.episodes || !block.folgen || titel.episodes !== block.folgen) continue
-    raus.push({
-      titleId: titel.id,
-      dub: false,
-      grund:
-        `Block „${block.name}“ im deutschen Katalog: ${block.folgen} Folgen wie unser Eintrag, ` +
-        `keine davon deutsch`,
-    })
+    const urteil = urteilNachName(serie, bloecke, titel)
+    if (urteil) raus.push(urteil)
   }
   return raus
 }

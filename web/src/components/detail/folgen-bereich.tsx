@@ -7,6 +7,7 @@ import { folgeIstDeutsch } from './stream-bereiche.ts'
 import { SERIENBELEG_HINWEIS, serienbelegOhneFolgenbeleg } from '@shared/folgen-flagge.ts'
 import { staffelAbschnitte, staffelZeile, type StaffelZeile } from './folgen-staffeln.ts'
 import type { FolgenZaehlung } from './antwort-regeln.ts'
+import { staffelZiele, type StaffelZiel } from '../../lib/staffel-ziele.ts'
 
 /**
  * **Die Folgenliste im Antwortkasten** (Daniel, 04.10.2026): Ein Pfeil klappt sie auf, der Kasten wächst mit,
@@ -26,6 +27,8 @@ interface Liste {
   h?: [number, string][]
   /** Deutsche Staffelgrenzen (`folgen-staffeln.ts`): Reiter je Staffel statt Paketen. */
   s?: StaffelZeile[]
+  /** TOGGO-Seite je Staffel: `[Staffelnummer, Adresse]`. */
+  tg?: [number, string][]
 }
 
 const PAKET = 50
@@ -65,6 +68,23 @@ export function useStaffelGrenzen(titleId: number): StaffelZeile[] | undefined {
     }
   }, [titleId])
   return s
+}
+
+/** Die TOGGO-Seiten je Staffel (`tg` der Folgenliste), solange sie verschieden sind; ohne Liste oder bei einer Adresse nichts. */
+export function useStaffelZiele(titleId: number): StaffelZiel[] | undefined {
+  const [ziele, setZiele] = useState<StaffelZiel[]>()
+  useEffect(() => {
+    setZiele(undefined)
+    let aktiv = true
+    void holeVerzeichnis()
+      .then((v) => (v.has(titleId) ? holeListe(titleId) : null))
+      .then((l) => aktiv && setZiele(l ? staffelZiele(l.tg) : undefined))
+      .catch(() => aktiv && setZiele(undefined))
+    return () => {
+      aktiv = false
+    }
+  }, [titleId])
+  return ziele
 }
 
 let zaehlungen: Promise<Record<string, FolgenZaehlung>> | undefined

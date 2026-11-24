@@ -125,7 +125,7 @@ pruefe('Wächter: 15 Tage warnt, bleibt grün', [warn.status, warn.aus.includes(
 const grenze = waechter(60)
 pruefe('Wächter: 60 Tage nur Warnung', grenze.status, 0)
 const rot = waechter(61)
-pruefe('Wächter: 61 Tage rot', [rot.status, rot.aus.includes('VERSTÖSSE: 1')], [1, true])
+pruefe('Wächter: 61 Tage rot, mit Titelmarke', [rot.status, rot.aus.includes('VERSTÖSSE: 1'), rot.aus.includes('disc-termin-frische')], [1, true, true])
 const ohne = waechter(null)
 pruefe('Wächter: ohne Stempel nur Warnung', [ohne.status, ohne.aus.includes('⚠ WARNUNG')], [0, true])
 

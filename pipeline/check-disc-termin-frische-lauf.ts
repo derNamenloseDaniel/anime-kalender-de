@@ -28,8 +28,8 @@ try {
     schreibe('public/data/releases.json', [])
     schreibe('public/data/ohne-synchro.json', [])
     schreibe('data/anisearch.json', { 1: alt, 2: alt, 3: alt })
-    for (const alte of ['data/disc-ausgaben.json', 'data/anisearch-archiv-weg.json']) rmSync(join(wurzel, alte), { force: true })
-    if (disc) schreibe('data/disc-ausgaben.json', disc)
+    for (const alte of ['disc-ausgaben.json', 'anisearch-archiv-weg.json']) rmSync(join(wurzel, 'data', alte), { force: true })
+    if (disc) schreibe(join('data', 'disc-ausgaben.json'), disc)
     const r = spawnSync(
       process.execPath,
       ['--import', pathToFileURL(attrappe).href, '--import', 'tsx', join(vorher, 'pipeline/fetch-anisearch.ts'), '--alter', '100000', ...args],

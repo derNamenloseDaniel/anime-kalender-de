@@ -5,6 +5,7 @@
  */
 import { readJson } from './lib/util.ts'
 import { bestandWarnzeile } from './lib/bestand-warnzeile.ts'
+import { melde } from './lib/quarantaene.ts'
 import { DISC_FEHLER_TAGE, DISC_WARN_TAGE, unbestaetigteTermine, type DiscAusgabeKurz } from './lib/disc-termin-frische.ts'
 import { todayIso } from '../shared/time.ts'
 
@@ -24,6 +25,7 @@ if (weich.length) {
   console.log(bestandWarnzeile(`Disc-Termin seit über ${DISC_WARN_TAGE} Tagen nicht neu gelesen`, 'Titel', [...new Set(weich.map((t) => t.titelId))]))
 }
 for (const t of hart) {
+  melde(t.titelId, 'disc-termin-frische', `Titelseite seit ${t.alter} Tagen nicht gelesen`)
   console.error(`FEHLER: Disc „${t.edition}" (${t.datum}), Titel ${t.titelId}: Titelseite seit ${t.alter} Tagen nicht gelesen (Grenze ${DISC_FEHLER_TAGE})`)
 }
 console.log(`Disc-Termine: ${alle.length} Ausgaben mit Datum ab heute minus 30 Tage auf Seiten über ${DISC_WARN_TAGE} Tage, davon ${hart.length} rot`)

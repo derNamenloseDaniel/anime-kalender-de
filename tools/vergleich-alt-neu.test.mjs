@@ -138,6 +138,18 @@ try {
   const rAnders = await lauf3('r.mjs', 'r', R.replace("'x' + x", "'y' + x"), rFaelle)
   assert.deepEqual(rAnders.abweichungen.map((a) => `${a.fall}:${a.was}`), ['a:dateien', 'b:dateien'])
   assert.equal(process.env.AK_ROOT, undefined, 'AK_ROOT wird nach dem Lauf zurückgesetzt')
+
+  // `dateien` füllt die Kulisse (auch in Unterordnern); Reste des vorigen Falls sind weg
+  const D = "import { existsSync, readFileSync, writeFileSync } from 'node:fs'\nimport { join } from 'node:path'\nexport function d(x) {\n  const alt = existsSync(join(process.env.AK_ROOT, 'rest.txt'))\n  writeFileSync(join(process.env.AK_ROOT, 'rest.txt'), 'r')\n  return [alt, readFileSync(join(process.env.AK_ROOT, 'u/ein.txt'), 'utf8') + x]\n}\n"
+  writeFileSync(join(repo3, 'd.mjs'), D)
+  git(repo3, 'add', 'd.mjs')
+  git(repo3, 'commit', '-q', '-m', 'd')
+  const dFaelle = [fall('p', 1, { dateien: { 'u/ein.txt': 'P' } }), fall('q', 2, { dateien: { 'u/ein.txt': 'Q' } })]
+  assert.equal((await lauf3('d.mjs', 'd', D, dFaelle)).gleich, true)
+  const dAnders = await lauf3('d.mjs', 'd', D.replace("'utf8') + x", "'utf8') + x + x"), dFaelle)
+  assert.deepEqual(dAnders.abweichungen.map((a) => `${a.fall}:${a.was}`), ['p:ergebnis', 'q:ergebnis'])
+  const dRest = await lauf3('d.mjs', 'd', D.replace("const alt = existsSync(join(process.env.AK_ROOT, 'rest.txt'))", 'const alt = false'), dFaelle)
+  assert.equal(dRest.gleich, true, 'die Kulisse ist vor jedem Aufruf leer: „rest.txt“ des Vorfalls ist weg, also immer false')
 } finally {
   rmSync(repo3, { recursive: true, force: true })
 }

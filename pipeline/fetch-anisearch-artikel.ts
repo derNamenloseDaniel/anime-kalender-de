@@ -11,6 +11,7 @@
  * Aufruf: `tsx pipeline/fetch-anisearch-artikel.ts [--limit N]`
  */
 import { artikelAus, type Artikel } from './lib/anisearch-artikel.ts'
+import { artikelFaellig } from './lib/anisearch-faellig.ts'
 import { KENNUNG } from './lib/kennung.ts'
 import { log, readJson, sleep, warn, writeJson } from './lib/util.ts'
 
@@ -55,11 +56,8 @@ for (const [titelId, liste] of Object.entries(ausgaben)) {
   }
 }
 
-const faellig = (nr: string): boolean => {
-  const e = bestand[nr]
-  if (!e || e.stand < PARSER_STAND) return true
-  return (Date.now() - Date.parse(e.fetchedAt)) / 86_400_000 >= ALTER_TAGE
-}
+const faellig = (nr: string): boolean =>
+  artikelFaellig(bestand[nr], { jetzt: Date.now(), alterTage: ALTER_TAGE, parserStand: PARSER_STAND })
 
 const warteschlange = [...artikel.entries()]
   .filter(([nr]) => faellig(nr))

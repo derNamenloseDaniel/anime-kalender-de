@@ -11,6 +11,8 @@ export interface Reiter {
   label: string
   lage: StaffelLage
   name?: string
+  /** Ungekürzter Name aus `sn` für den Tooltip; die Kurzform `name` steht in der Box. */
+  voll?: string
 }
 
 /**
@@ -34,7 +36,7 @@ export function kurzeStaffelNamen(sn: Record<string, string> | undefined): Map<n
 export function reiterVon(abschnitte: StaffelAbschnitt[], releases: Release[], today: string, sn?: Record<string, string>): Reiter[] {
   if (abschnitte.length < 2) return []
   const namen = kurzeStaffelNamen(sn)
-  return abschnitte.map((a) => ({ nr: a.nr, label: String(a.nr), lage: staffelLage(a.von, a.offen ? undefined : a.bis, a.deutsch > 0, releases, today), name: namen.get(a.nr) }))
+  return abschnitte.map((a) => ({ nr: a.nr, label: String(a.nr), lage: staffelLage(a.von, a.offen ? undefined : a.bis, a.deutsch > 0, releases, today), name: namen.get(a.nr), voll: sn?.[String(a.nr)] }))
 }
 
 /** Ohne Wahl des Besuchers: die laufende Staffel, sonst die letzte mit deutscher Folge, sonst die erste. */

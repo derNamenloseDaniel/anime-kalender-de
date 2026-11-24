@@ -67,6 +67,7 @@ export function ReiterZeile({ reiter, aktiv, kennung, beiWahl }: { reiter: Reite
               aria-controls={`${kennung}-abschnitt`}
               tabIndex={gewaehlt ? 0 : -1}
               aria-label={`Staffel ${r.label}${r.name ? `: ${r.name}` : ''}${LAGE_WORT[r.lage]}`}
+              title={r.voll ?? `Staffel ${r.label}`}
               onClick={() => beiWahl(i)}
               className={reiterKlassen(gewaehlt)}
             >

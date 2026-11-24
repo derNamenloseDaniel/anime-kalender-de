@@ -172,6 +172,12 @@ assert.deepEqual(hzReiter.map((r) => r.label), ['1', '2', '3', '4'], 'Reiter ble
 assert.ok(hzReiter.every((r) => hz.sn![String(r.nr)]!.endsWith(r.name!)), 'jeder Name ist ein wörtliches Stück des Yaml-Namens')
 assert.deepEqual(reiterVon(abschnitte(14839), [], HEUTE).map((r) => r.name), [undefined, undefined, undefined, undefined], 'ohne sn: kein Name')
 assert.deepEqual(reiterVon(hs, [], HEUTE, { 2: 'Orange-Liga' }).map((r) => r.name), [undefined, 'Orange-Liga', undefined, undefined, undefined], 'nur Staffeln mit Eintrag')
+// Tooltip (Daniel 24.11. 20:25): der Reiter trägt den ungekürzten Yaml-Namen als title, ohne Namen „Staffel N“.
+assert.deepEqual(hzReiter.map((r) => r.voll), ['1', '2', '3', '4'].map((nr) => hz.sn![nr]), 'Horizonte: voller Name')
+const hzZeile = renderToStaticMarkup(createElement(ReiterZeile, { reiter: hzReiter, aktiv: 0, kennung: 'hz', beiWahl: () => {} }))
+for (const nr of ['1', '2', '3', '4']) assert.ok(hzZeile.includes(`title="${hz.sn![nr]}"`), `Tooltip Staffel ${nr}: ${hz.sn![nr]}`)
+assert.match(zeile, /title="Staffel 1"/, 'ohne sn: Tooltip „Staffel N“')
+assert.equal((zeile.match(/ title="/g) ?? []).length, 5, 'jeder Reiter hat einen Tooltip')
 // Grenzen der Kürzung: ein einzelner Name, verschiedene Serienteile, Name ohne Rest, fremde Staffelnummer bleiben ganz.
 assert.equal(kurzeStaffelNamen({ 1: 'Serie: Eins' }).get(1), 'Serie: Eins', 'ein Name: nichts gemeinsam')
 assert.deepEqual([...kurzeStaffelNamen({ 1: 'A: Eins', 2: 'B: Zwei' }).values()], ['A: Eins', 'B: Zwei'], 'verschiedene Serienteile')
@@ -184,7 +190,7 @@ assert.equal(kurzeStaffelNamen(undefined).size, 0, 'ohne sn leer')
 // Gerendert: Name in der Box über der Kopfzeile, Reiter-Beschriftung „Staffel N: Name“; ohne Name keine Namenszeile.
 const hzBox = renderToStaticMarkup(createElement(StaffelAbschnitt, { reiter: hzReiter, aktiv: 1, kennung: 'h', beiWahl: () => {}, zeile: 'Kopf', kinder: null }))
 assert.match(hzBox, /<p data-staffel-name="true"[^>]*>Die Suche nach Laqua<\/p><p[^>]*>Kopf<\/p>/, 'Name über der Kopfzeile')
-assert.equal((hzBox.match(/Die Suche nach Laqua/g) ?? []).length, 2, 'Name einmal sichtbar, einmal im aria-label')
+assert.equal((hzBox.match(/Die Suche nach Laqua/g) ?? []).length, 3, 'Name einmal sichtbar, im aria-label und im Tooltip (title, nur beim Hover)')
 assert.match(hzBox, /aria-label="Staffel 2: Die Suche nach Laqua"/)
 assert.match(hzBox, /aria-label="Staffel 4: Wunder in Sicht"/)
 assert.match(renderToStaticMarkup(createElement(ReiterZeile, { reiter: [{ ...hzReiter[3]!, lage: 'laeuft' }], aktiv: 0, kennung: 'h', beiWahl: () => {} })), /aria-label="Staffel 4: Wunder in Sicht, läuft"/, 'Name vor der Lage')

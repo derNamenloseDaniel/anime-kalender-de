@@ -43,7 +43,7 @@ export function useKastenZustand(p: Required<Pick<AntwortKastenProps, 'stream' |
   const beides = streamPillen.length > 0 && disc.length > 0
   /* Der Umschalter zeigt nur Seiten mit Pillen; eine einzelne bleibt als Etikett (Kaufpille = „Disc"). */
   const aktivDisc = beides ? zeigeDisc : streamPillen.length === 0
-  const pillen = aktivDisc ? disc : mitStaffelKnoepfen(streamPillen, staffelZiele, t as unknown as Uebersetzer)
+  const pillen = aktivDisc ? disc : mitStaffelKnoepfen(streamPillen, staffelZiele)
   const T = t as unknown as Uebersetzer
   /*
     **Kostenlos ist ein eigener Bereich** (Daniel, 19.09.2026: „trenn die bereiche, sodass es

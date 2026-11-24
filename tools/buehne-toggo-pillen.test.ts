@@ -37,11 +37,10 @@ assert.deepEqual(gemischt.map((z) => [z.nummer, z.url]), [['15–16', 'https://x
 assert.deepEqual(staffelSpanne(gemischt), { von: 15, bis: 16 })
 
 // Die Pille: nur die TOGGO-Pille wird zur Knopffläche (gleicher key), alles andere bleibt dieselbe Instanz.
-const t = ((k: string, v?: Record<string, string | number>) => (k === 'detail.staffelBereich' ? `Staffel ${v!.von}–${v!.bis}` : `Staffel ${v!.n}`)) as never
 const toggo = createElement(Pille, { key: 'sw-TOGGO-https://x', name: 'TOGGO', farbe: '#ff0066', url: 'https://www.toggo.de/pokemon' })
 const netflix = createElement(Pille, { key: 'sw-Netflix-https://n', name: 'Netflix', url: 'https://www.netflix.com/x' })
-assert.equal(mitStaffelKnoepfen([toggo, netflix], undefined, t)[0], toggo)
-const neu = mitStaffelKnoepfen([toggo, netflix], sammel, t)
+assert.equal(mitStaffelKnoepfen([toggo, netflix], undefined)[0], toggo)
+const neu = mitStaffelKnoepfen([toggo, netflix], sammel)
 assert.equal(neu[1], netflix)
 assert.equal((neu[0] as { key: string }).key, 'sw-TOGGO-https://x')
 const html = renderToStaticMarkup(createElement('div', null, neu))
@@ -50,7 +49,14 @@ assert.equal((html.match(/min-h-11/g) ?? []).length, 5)
 assert.match(html, /aria-label="TOGGO, Staffel 3"/)
 assert.match(html, /href="https:\/\/www\.toggo\.de\/pokemon\/serien\/pokemon-die-johto-reisen"[^>]*target="_blank"/)
 assert.doesNotMatch(html, /href="https:\/\/www\.toggo\.de\/pokemon"/)
-assert.match(renderToStaticMarkup(createElement('div', null, mitStaffelKnoepfen([toggo], gemischt, t))), /aria-label="TOGGO, Staffel 15–16"/)
+// Jeder der fünf Knöpfe: Fremdlink ohne Referrer/Opener, Rahmen in der Anbieterfarbe (der Pille).
+const knoepfe = html.match(/<a [^>]*min-h-11[^>]*>/g) ?? []
+assert.equal(knoepfe.length, 5)
+for (const k of knoepfe) {
+  assert.match(k, /rel="noreferrer noopener"/)
+  assert.match(k, /style="[^"]*border-color:\s*#ff0066/)
+}
+assert.match(renderToStaticMarkup(createElement('div', null, mitStaffelKnoepfen([toggo], gemischt))), /aria-label="TOGGO, Staffel 15–16"/)
 
 // Das Mockup ist angemeldet, eine Variante (A, entschieden F158), beide Fälle gibt es.
 await import('../web/buehne/mockups/toggo-pillen.tsx')

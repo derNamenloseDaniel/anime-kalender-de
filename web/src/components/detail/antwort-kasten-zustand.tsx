@@ -1,6 +1,7 @@
 import { type ReactNode, useState } from 'react'
 import { ankuendigungOhneTermin } from '@shared/ankuendigung.ts'
-import { useKopfZahlen } from './folgen-bereich.tsx'
+import { useKopfZahlen, useStaffelZiele } from './folgen-bereich.tsx'
+import { mitStaffelKnoepfen } from './staffel-knoepfe.tsx'
 import { gruppeVon as gruppeVonPille, sichtbareStreamPillen } from './stream-pillen.ts'
 import { erstausgabeAlsNeuigkeit } from './antwort-regeln.ts'
 import { abstandImSatz } from '../../lib/abstand.ts'
@@ -24,6 +25,7 @@ export function useKastenZustand(p: Required<Pick<AntwortKastenProps, 'stream' |
     kostet keine Höhe mehr.
   */
   const [zeigeDisc, setZeigeDisc] = useState(discZuerst); const { folgenZahl, staffeln } = useKopfZahlen(title.id)
+  const staffelZiele = useStaffelZiele(title.id)
   /*
     **Wo noch nichts erschienen ist, gibt es nichts zu sehen.**
 
@@ -41,7 +43,7 @@ export function useKastenZustand(p: Required<Pick<AntwortKastenProps, 'stream' |
   const beides = streamPillen.length > 0 && disc.length > 0
   /* Der Umschalter zeigt nur Seiten mit Pillen; eine einzelne bleibt als Etikett (Kaufpille = „Disc"). */
   const aktivDisc = beides ? zeigeDisc : streamPillen.length === 0
-  const pillen = aktivDisc ? disc : streamPillen
+  const pillen = aktivDisc ? disc : mitStaffelKnoepfen(streamPillen, staffelZiele)
   const T = t as unknown as Uebersetzer
   /*
     **Kostenlos ist ein eigener Bereich** (Daniel, 19.09.2026: „trenn die bereiche, sodass es

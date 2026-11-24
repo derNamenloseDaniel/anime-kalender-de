@@ -83,18 +83,28 @@ export const ERNEUERN_JE_LAUF = 800
  */
 export const NEU_JE_LAUF = 400
 
-type Bild = { inhaltAm?: string } | null
+type Bild = { inhaltAm?: string; l?: string | null; nurJa?: true } | null
+
+/**
+ * Ein japanisches Plakat ohne Beleg `nurJa`: gewählt in der alten Folge (ja vor „ohne Sprache“, bis 21.11.2026). Ob TMDB inzwischen ein lesbares hat,
+ * sagt nur ein neuer Abruf; danach trägt der Eintrag `nurJa` oder ist ersetzt und fällt hier heraus (gemessen 24.11.2026: 55 von 98 hätten eins).
+ */
+export const japanischOhneBeleg = (e: Bild | undefined): boolean => !!e && e.l === 'ja' && !e.nurJa
 
 /**
  * Was am Bildbestand fällig ist: `erneuern` (hat eine Zuordnung, wird neu abgefragt) und `entfernen` (keine Zuordnung, die der Lauf neu abfragen könnte:
  * die Namens- und Staffelsuche holt es wieder). Beides nur für Einträge über der Grenze, die älteste zuerst; `null` („TMDB hat keins") trägt kein Bild.
+ * Ein japanisches Plakat ohne Beleg (`japanischOhneBeleg`) wird auch unter der Grenze erneuert, aber nie entfernt: ohne Zuordnung wählt die Staffelsuche neu.
  */
 export function bilderFaellig(bestand: Record<string, Bild>, hatZuordnung: (id: string) => boolean, jetzt: Date): { erneuern: string[]; entfernen: string[] } {
-  const alt = Object.entries(bestand)
-    .filter((e): e is [string, { inhaltAm?: string }] => e[1] !== null && istAbgelaufen(e[1].inhaltAm, jetzt))
+  const abgelaufen = (e: NonNullable<Bild>): boolean => istAbgelaufen(e.inhaltAm, jetzt)
+  const faellig = Object.entries(bestand)
+    .filter((e): e is [string, NonNullable<Bild>] => e[1] !== null && (abgelaufen(e[1]) || japanischOhneBeleg(e[1])))
     .sort(([, a], [, b]) => (a.inhaltAm ?? '').localeCompare(b.inhaltAm ?? ''))
-    .map(([id]) => id)
-  return { erneuern: alt.filter(hatZuordnung).slice(0, ERNEUERN_JE_LAUF), entfernen: alt.filter((id) => !hatZuordnung(id)) }
+  return {
+    erneuern: faellig.map(([id]) => id).filter(hatZuordnung).slice(0, ERNEUERN_JE_LAUF),
+    entfernen: faellig.filter(([id, e]) => abgelaufen(e) && !hatZuordnung(id)).map(([id]) => id),
+  }
 }
 
 type Zuordnung = Record<string, { tmdbId?: number; kind?: string }>

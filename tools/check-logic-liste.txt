@@ -718,6 +718,7 @@ pipeline/check-tmdb-katalog-liste.ts
 pipeline/check-tmdb-katalog.ts
 pipeline/check-tmdb-poster-ohne-lauf.ts
 pipeline/check-tmdb-reihenfremd.ts
+pipeline/check-tmdb-staffel-wahl.ts
 pipeline/check-tmdb-staffel0-eigene-lauf.ts
 pipeline/check-tmdb-staffel0-liste.ts
 pipeline/check-tmdb-staffel0.ts

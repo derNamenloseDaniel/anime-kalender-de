@@ -214,7 +214,7 @@ pruefe('Laufzeit: 24 gegen 23 und 25 gegen 15 (Faktor 0,6) passen, 25 gegen 14 n
 pruefe('Laufzeit: obere Grenze 1,65 (20 gegen 33) passt, 20 gegen 34 nicht', laufzeitPasst(20, 33) && !laufzeitPasst(20, 34))
 pruefe('Laufzeit: fehlt eine Seite, ist es nicht beurteilbar (passt)', laufzeitPasst(undefined, 12) && laufzeitPasst(25, 0) && laufzeitPasst(25, undefined))
 pruefe('serienMasse: Folgen, Median in Minuten, Staffeln', JSON.stringify(serienMasse([{ season_no: 1, run_length: 600 }, { season_no: 2, run_length: 744 }, { season_no: 2, run_length: 900 }, { season_no: 3 }])) === '{"folgen":4,"minuten":12,"staffeln":3}')
-pruefe('serienMasse: Folgen ohne Länge zählen als Folge, nicht in den Median; ohne Staffelnummer = Staffel 1', JSON.stringify(serienMasse([{ run_length: 600 }, { run_length: 700 }, { run_length: 900 }, { season_no: 1 }, {}])) === '{"folgen":5,"minuten":12,"staffeln":1}')
+pruefe('serienMasse: Folgen ohne Länge zählen als Folge, nicht in den Median; ohne Staffelnummer = Staffel 1', JSON.stringify(serienMasse([{ run_length: 600 }, { run_length: 700 }, { run_length: 900 }, { run_length: 1200 }, { season_no: 1 }, {}])) === '{"folgen":6,"minuten":15,"staffeln":1}')
 pruefe('serienMasse: ohne Folgen alles 0', JSON.stringify(serienMasse([])) === '{"folgen":0,"minuten":0,"staffeln":0}')
 
 console.log('\nHandliste und Staffeln der echten Dateien:')

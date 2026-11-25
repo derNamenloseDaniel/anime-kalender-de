@@ -237,4 +237,23 @@ try {
 } finally {
   rmSync(leer, { recursive: true, force: true })
 }
+// Sonde: Funktionen in der Rückgabe sind sonst nur eine Marke; die Sonde macht ihr Verhalten vergleichbar
+const repo4 = neuesRepo()
+try {
+  const S = 'export function s(n) {\n  return { hat: (x) => x === n }\n}\n'
+  writeFileSync(join(repo4, 's.mjs'), S)
+  git(repo4, 'add', 's.mjs')
+  git(repo4, 'commit', '-q', '-m', 's')
+  const sFaelle = [1, 2].map((n) => ({ name: `n${n}`, args: [n], sonde: (r) => [r.hat(1), r.hat(2)] }))
+  const sLauf = (neu) => {
+    writeFileSync(join(repo4, 's.mjs'), neu)
+    return vergleicheAltNeu({ datei: 's.mjs', funktion: 's', faelle: sFaelle, ref: 'HEAD', wurzel: repo4 })
+  }
+  assert.equal((await sLauf(S)).gleich, true)
+  const sAnders = await sLauf(S.replace('x === n', 'x !== n'))
+  assert.deepEqual(sAnders.abweichungen.map((a) => `${a.fall}:${a.was}`), ['n1:ergebnis', 'n2:ergebnis'])
+} finally {
+  rmSync(repo4, { recursive: true, force: true })
+}
+
 console.log('vergleich-alt-neu.test: grün')

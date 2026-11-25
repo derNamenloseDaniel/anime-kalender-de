@@ -2265,6 +2265,33 @@
     "1075500": {
       "am": "2026-11-24",
       "vorschlaege": 5
+    },
+    "1075561": {
+      "am": "2026-11-25",
+      "vorschlaege": 0
+    },
+    "1075625": {
+      "am": "2026-11-25",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075664": {
+      "am": "2026-11-25",
+      "vorschlaege": 0
+    },
+    "1075675": {
+      "am": "2026-11-25",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075698": {
+      "am": "2026-11-25",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1076014": {
+      "am": "2026-11-25",
+      "vorschlaege": 2
     }
   },
   "vorschlaege": [
@@ -17309,6 +17336,48 @@
       "quelle": "https://www.anime2you.de/news/1075500/madoka-magica-komplettbox-zum-sonderpreis/",
       "veroeffentlicht": "2026-11-24",
       "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Even the Student Council Has Its Holes!",
+      "zitat": "Die neunte Episode von »Even the Student Council Has Its Holes!« wird demzufolge nicht wir ursprünglich geplant am 28. November 2026, sondern erst am 5. Dezember 2026 im japanischen Fernsehen sowie bei ADN und aniverse im Simulcast gezeigt.",
+      "art": "pause",
+      "sprache": "unklar",
+      "plattform": "adn",
+      "datum": "2026-12-05",
+      "uhrzeit": null,
+      "anbieter": "ADN",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "9",
+      "unsicher": null,
+      "wochentag": "Samstag",
+      "warnungen": [],
+      "artikelId": "1076014",
+      "artikel": "Nächste »Even the Student Council Has Its Holes!«-Episode verschoben",
+      "quelle": "https://www.anime2you.de/news/1076014/even-the-student-council-has-its-holes-episode-9-verschoben/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "Even the Student Council Has Its Holes!",
+      "zitat": "Die neunte Episode von »Even the Student Council Has Its Holes!« wird demzufolge nicht wir ursprünglich geplant am 28. November 2026, sondern erst am 5. Dezember 2026 im japanischen Fernsehen sowie bei ADN und aniverse im Simulcast gezeigt.",
+      "art": "pause",
+      "sprache": "unklar",
+      "plattform": "aniverse",
+      "datum": "2026-12-05",
+      "uhrzeit": null,
+      "anbieter": "aniverse",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "9",
+      "unsicher": null,
+      "wochentag": "Samstag",
+      "warnungen": [],
+      "artikelId": "1076014",
+      "artikel": "Nächste »Even the Student Council Has Its Holes!«-Episode verschoben",
+      "quelle": "https://www.anime2you.de/news/1076014/even-the-student-council-has-its-holes-episode-9-verschoben/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
     }
   ]
 }

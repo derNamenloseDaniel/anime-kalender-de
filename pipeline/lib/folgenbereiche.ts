@@ -313,6 +313,11 @@ function ordneNachStaffellisteAbEins(
     }
   }
 
+  return entscheideNachReihe(sortiert, unsere)
+}
+
+/** Position gegen Position paaren und entscheiden, ob die Reihe eine Zuordnung trägt. */
+function entscheideNachReihe(sortiert: AnbieterStaffel[], unsere: Staffeleintrag[]): Zuordnung {
   const { paare, abweichungen } = paareNachReihe(sortiert, unsere)
 
   /**

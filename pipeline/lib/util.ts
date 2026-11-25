@@ -82,9 +82,9 @@ export function writeText(path: string, text: string): void {
   }
 }
 
-/** Adresse für Meldungen: Wert von api_key, key und token (TMDB, YouTube) ersetzt, sonst steht der Schlüssel im öffentlichen CI-Log. */
+/** Adresse für Meldungen: Wert von api_key, apikey, key, token, access_token und client_secret ersetzt, sonst steht der Schlüssel im öffentlichen CI-Log. */
 export function maskiereSchluessel(url: string): string {
-  return url.replace(/([?&](?:api_key|key|token)=)[^&\s]+/gi, '$1***')
+  return url.replace(/([?&](?:api_?key|key|(?:access_)?token|client_secret)=)[^&\s]+/gi, '$1***')
 }
 
 /** fetch mit Retry und exponentiellem Backoff; respektiert Retry-After. */

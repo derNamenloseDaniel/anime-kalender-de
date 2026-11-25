@@ -414,9 +414,9 @@
     - https://www.filmstarts.de/kritiken/281604.html
 
 - id: 10017229
-  titleDe: "Pacific Rim: The Black - Staffel 2"
+  titleDe: "Pacific Rim: The Black"
   geprueftAm: "2026-11-25"
-  note: "Netflix-Staffel 2 (19.04.2022, 7 Folgen): Moviepilot und fernsehserien.de führen sie unter dem Originaltitel mit Staffelzusatz, einen eigenen deutschen Titel gibt es nicht. Staffel 1 steht bei uns als 10015835."
+  note: "Netflix-Staffel 2 (19.04.2022, 7 Folgen): Moviepilot und fernsehserien.de führen sie unter dem Originaltitel mit Staffelzusatz, beide nennen keinen abweichenden deutschen Titel. Der Werktitel trägt keine Staffelnummer (werkTitel() schneidet sie ab), daher gleich wie Staffel 1 (10015835)."
   quellen:
     - https://www.moviepilot.de/serie/pacific-rim-the-animated-series/staffel/2
     - https://www.fernsehserien.de/pacific-rim-the-black/episodenguide/staffel-2/42268
@@ -424,7 +424,7 @@
 - id: 111852
   titleDe: "Date A Bullet: Dead or Bullet"
   geprueftAm: "2026-11-25"
-  note: "Die deutsche Fassung (AniMoon) fasst beide Teile zu „Date A Bullet - The Movie“ zusammen; de.wikipedia und Anime2You nennen den Teil unverändert „Dead or Bullet“, einen eigenen deutschen Titel gibt es nicht."
+  note: "Die deutsche Fassung (AniMoon) fasst beide Teile zu „Date A Bullet - The Movie“ zusammen; de.wikipedia und Anime2You nennen den Teil unverändert „Dead or Bullet“; beide Seiten nennen keinen abweichenden deutschen Titel."
   quellen:
     - https://de.wikipedia.org/wiki/Dead_or_Bullet
     - https://www.anime2you.de/news/496297/date-a-bullet-kinotermin/
@@ -432,7 +432,7 @@
 - id: 121034
   titleDe: "Date A Bullet: Nightmare or Queen"
   geprueftAm: "2026-11-25"
-  note: "Zweiter Teil des deutschen Kinofilms „Date A Bullet - The Movie“ (AniMoon); de.wikipedia führt ihn als „Nightmare or Queen“, einen eigenen deutschen Titel gibt es nicht."
+  note: "Zweiter Teil des deutschen Kinofilms „Date A Bullet - The Movie“ (AniMoon); de.wikipedia führt ihn als „Nightmare or Queen“; die Seiten (de.wikipedia, Anime2You) nennen keinen abweichenden deutschen Titel."
   quellen:
     - https://de.wikipedia.org/wiki/Dead_or_Bullet
     - https://www.anime2you.de/news/496297/date-a-bullet-kinotermin/

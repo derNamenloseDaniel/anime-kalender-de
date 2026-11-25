@@ -259,70 +259,73 @@ function baueSandkasten(host, pfad) {
 
 /* Als Modul geladen (Vergleichsrahmen) gibt es nur den Sandkasten; den Lauf startet allein der Aufruf per Kommandozeile. */
 module.exports = { baueSandkasten }
-if (require.main !== module) return
 
-console.log('Jedes Content-Skript einmal laden:\n')
+function ladelauf() {
+  console.log('Jedes Content-Skript einmal laden:\n')
 
-for (const datei of SKRIPTE) {
-  if (!existsSync(datei)) {
-    console.log(`  – ${datei} — gibt es nicht (mehr)`)
-    continue
+  for (const datei of SKRIPTE) {
+    if (!existsSync(datei)) {
+      console.log(`  – ${datei} — gibt es nicht (mehr)`)
+      continue
+    }
+    /*
+      **Vorgeladen wird, was das Manifest vorlädt.**
+
+      Seit dem 10.09.2026 steht das gemeinsame Kastengerüst in `box.js`, und die
+      drei Melder rufen seine Funktionen. Im Browser liegen alle Dateien einer
+      `content_scripts`-Gruppe im selben Scope; wer hier nur die eine Datei lädt,
+      misst einen Zustand, den es nicht gibt — und bekommt „akBox is not defined"
+      für Code, der im Browser einwandfrei läuft.
+
+      Gelesen wird die Reihenfolge aus dem Manifest selbst, nicht aus einer
+      zweiten Liste hier: Zwei Listen laufen auseinander, und die im Manifest ist
+      die, nach der Chrome sich richtet.
+    */
+    const vorlauf = manifestGruppe(datei)
+      .map((n) => readFileSync('extension/' + n, 'utf8'))
+      .join(String.fromCharCode(10))
+    const quelle = vorlauf + String.fromCharCode(10) + readFileSync(datei, 'utf8')
+    /* Die Seite, auf der das Skript wirklich läuft — sonst steigt es sofort aus. */
+    const host = datei.includes('amazon')
+      ? 'www.amazon.de'
+      : datei.includes('disney')
+        ? 'www.disneyplus.com'
+        : datei.includes('adn')
+          ? 'animationdigitalnetwork.com'
+          : 'www.netflix.com'
+    const pfade = {
+      'www.amazon.de': '/gp/video/detail/B0DJYJBNWF',
+      'animationdigitalnetwork.com': '/de/video/1375-dorohedoro',
+    }
+    const pfad = pfade[host] ?? '/title/82757009'
+    try {
+      vm.runInContext(quelle, vm.createContext(Object.assign(baueSandkasten(host, pfad), speicherAttrappen())), { filename: datei, timeout: 10_000 })
+      console.log(`  ✓ ${datei}`)
+    } catch (e) {
+      console.log(`  ✗ ${datei} — ${e.message}`)
+      fehler.push(`${datei}: ${e.message}`)
+    }
   }
-  /*
-    **Vorgeladen wird, was das Manifest vorlädt.**
 
-    Seit dem 10.09.2026 steht das gemeinsame Kastengerüst in `box.js`, und die
-    drei Melder rufen seine Funktionen. Im Browser liegen alle Dateien einer
-    `content_scripts`-Gruppe im selben Scope; wer hier nur die eine Datei lädt,
-    misst einen Zustand, den es nicht gibt — und bekommt „akBox is not defined"
-    für Code, der im Browser einwandfrei läuft.
+  /* Netflix-Artikelseiten (Tudum) sind keine Titelseiten — dort darf keine Leiste stehen (Daniel, 04.10.2026). */
+  {
+    const manifest = JSON.parse(readFileSync('extension/manifest.json', 'utf8'))
+    const netflix = (manifest.content_scripts ?? []).filter((g) => (g.matches ?? []).some((m) => m.includes('netflix.com')))
+    const ohneAusschluss = netflix.filter((g) => !(g.exclude_matches ?? []).includes('https://www.netflix.com/tudum/*'))
+    if (!netflix.length || ohneAusschluss.length) {
+      console.log('  ✗ Netflix-Content-Skripte schließen /tudum/* nicht aus')
+      fehler.push('manifest.json: Netflix-Skripte ohne exclude_matches für /tudum/*')
+    } else {
+      console.log('  ✓ Netflix-Content-Skripte schließen /tudum/* aus')
+    }
+  }
 
-    Gelesen wird die Reihenfolge aus dem Manifest selbst, nicht aus einer
-    zweiten Liste hier: Zwei Listen laufen auseinander, und die im Manifest ist
-    die, nach der Chrome sich richtet.
-  */
-  const vorlauf = manifestGruppe(datei)
-    .map((n) => readFileSync('extension/' + n, 'utf8'))
-    .join(String.fromCharCode(10))
-  const quelle = vorlauf + String.fromCharCode(10) + readFileSync(datei, 'utf8')
-  /* Die Seite, auf der das Skript wirklich läuft — sonst steigt es sofort aus. */
-  const host = datei.includes('amazon')
-    ? 'www.amazon.de'
-    : datei.includes('disney')
-      ? 'www.disneyplus.com'
-      : datei.includes('adn')
-        ? 'animationdigitalnetwork.com'
-        : 'www.netflix.com'
-  const pfade = {
-    'www.amazon.de': '/gp/video/detail/B0DJYJBNWF',
-    'animationdigitalnetwork.com': '/de/video/1375-dorohedoro',
+  console.log('')
+  if (fehler.length) {
+    console.error(`${fehler.length} Skript(e) laufen beim Laden auf einen Fehler.`)
+    process.exit(1)
   }
-  const pfad = pfade[host] ?? '/title/82757009'
-  try {
-    vm.runInContext(quelle, vm.createContext(Object.assign(baueSandkasten(host, pfad), speicherAttrappen())), { filename: datei, timeout: 10_000 })
-    console.log(`  ✓ ${datei}`)
-  } catch (e) {
-    console.log(`  ✗ ${datei} — ${e.message}`)
-    fehler.push(`${datei}: ${e.message}`)
-  }
+  console.log('Alle Content-Skripte laden durch.')
 }
 
-/* Netflix-Artikelseiten (Tudum) sind keine Titelseiten — dort darf keine Leiste stehen (Daniel, 04.10.2026). */
-{
-  const manifest = JSON.parse(readFileSync('extension/manifest.json', 'utf8'))
-  const netflix = (manifest.content_scripts ?? []).filter((g) => (g.matches ?? []).some((m) => m.includes('netflix.com')))
-  const ohneAusschluss = netflix.filter((g) => !(g.exclude_matches ?? []).includes('https://www.netflix.com/tudum/*'))
-  if (!netflix.length || ohneAusschluss.length) {
-    console.log('  ✗ Netflix-Content-Skripte schließen /tudum/* nicht aus')
-    fehler.push('manifest.json: Netflix-Skripte ohne exclude_matches für /tudum/*')
-  } else {
-    console.log('  ✓ Netflix-Content-Skripte schließen /tudum/* aus')
-  }
-}
-
-console.log('')
-if (fehler.length) {
-  console.error(`${fehler.length} Skript(e) laufen beim Laden auf einen Fehler.`)
-  process.exit(1)
-}
-console.log('Alle Content-Skripte laden durch.')
+if (require.main === module) ladelauf()

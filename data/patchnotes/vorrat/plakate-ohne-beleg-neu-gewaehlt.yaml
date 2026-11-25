@@ -1,0 +1,5 @@
+kategorie: feature
+text: Weitere Titel zeigen Plakate ohne japanische Schrift
+untertitel: Auf Deutsch oder Englisch, wo es ein solches Plakat gibt
+wartetAuf: "Plakat-Lauf (TMDB) und Bestandsbau nach PR 4790 (gemergt 24.11.). Probe: node tools/maengel.mjs zeigt bei bild-fremdsprachig weniger als 508 (Stand 23. bis 25.11. unverändert 508, PR 4790 erwartet 172 weniger, nicht gemessen). Vor der Freigabe die Zahl der geänderten Cover zählen und in den Text setzen. Ändert sich nach dem Lauf nichts, wird der Eintrag gelöscht."
+seit: '2026-11-25'

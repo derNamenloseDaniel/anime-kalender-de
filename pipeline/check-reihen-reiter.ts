@@ -123,10 +123,12 @@ const releases = fall['releases.json'] as Release[]
 const von = (id: number) => releases.filter((r) => r.titleId === id)
 const lage = (id: number) => reihenLageVon(offen(id), von(id), STICHTAG)
 pruefe('Horizonte läuft', lage(14839) === 'laeuft', lage(14839))
+pruefe('Horizonte vor dem Start (2022) kommt', reihenLageVon(offen(14839), von(14839), '2022-01-01') === 'kommt', reihenLageVon(offen(14839), von(14839), '2022-01-01'))
 pruefe('Hauptserie: 1–5 kommt, 23–25 läuft', [483, 1349, 10852, 14838].map(lage).join() === 'kommt,ruht,laeuft,ruht', [483, 1349, 10852, 14838].map(lage))
 const gesichtet = (bis: number) => von(14839).map((r) => ({ ...r, schedule: { ...r.schedule, observed: { [bis - 1]: '2026-11-20', [bis]: '2026-11-21' } } }))
 pruefe('Sichtung vor dem Staffelende: Staffel 1 und 2 laufen', reihenLageVon(st1, gesichtet(20), STICHTAG) === 'laeuft' && reihenLageVon(st2, gesichtet(20), STICHTAG) === 'laeuft')
 pruefe('Sichtung über das Ende von Staffel 1 hinaus: Staffel 1 läuft nicht mehr, Staffel 2 schon', [st1, st2].map((s) => reihenLageVon(s, gesichtet(60), STICHTAG)).join() !== 'laeuft,laeuft' && reihenLageVon(st2, gesichtet(60), STICHTAG) === 'laeuft', [st1, st2].map((s) => reihenLageVon(s, gesichtet(60), STICHTAG)))
+pruefe('Sichtung genau bis zur letzten Folge von Staffel 1: Staffel 1 läuft nicht mehr', reihenLageVon(st1, gesichtet(45), STICHTAG) !== 'laeuft' && reihenLageVon(st2, gesichtet(45), STICHTAG) === 'laeuft', [st1, st2].map((s) => reihenLageVon(s, gesichtet(45), STICHTAG)))
 const kurz = { ...offen(10852), streams: [{ platform: 'netflix', url: 'https://x.invalid', dub: true, teilBereich: { von: 1, bis: 2 } }] } as Title
 pruefe('ohne Sammeltitel filtert keine Sichtung', reihenLageVon(kurz, von(10852), STICHTAG) === 'laeuft')
 pruefe('Plan vorbei: mit bekannter Folgenzahl ruht, ohne läuft', reihenLageVon({ ...offen(8464), episodes: 12 }, von(8464), STICHTAG) === 'ruht' && reihenLageVon({ ...offen(8464), episodes: undefined }, von(8464), STICHTAG) === 'laeuft')
@@ -244,6 +246,9 @@ const filmLabels = film.tabs.map(text)
 pruefe('Film der Reihe: Reiter der Filme 1..n, gewählt Nr. 16', film.leiste?.getAttribute('role') === 'tablist' && filmLabels.join() === filmLabels.map((_, i) => i + 1).join() && filmLabels.length === reiter(5726).length && film.tabs[15]?.getAttribute('aria-selected') === 'true', filmLabels)
 pruefe('Film: Tooltip und aria-label tragen den vollen Titel, ohne „Staffel“', film.tabs[0]?.getAttribute('title') === 'Pokémon: Der Film - Mewtu gegen Mew' && film.tabs[0]?.getAttribute('aria-label') === 'Pokémon: Der Film - Mewtu gegen Mew', [film.tabs[0]?.getAttribute('title'), film.tabs[0]?.getAttribute('aria-label')])
 pruefe('Film: Filme fehlen in der Reihenliste, die übrigen Gruppen bleiben', gruppenZahl() === 'Hauptserie=12,Eigene Serien=7,Specials & OVAs=23', gruppenZahl())
+const hauptPanel = await zeige(10852)
+const hauptAria = hauptPanel.tabs[0]?.getAttribute('aria-label') ?? ''
+pruefe('Hauptserie: aria-label nennt Staffel und Titel', hauptAria.startsWith(`Staffel ${text(hauptPanel.tabs[0]!)}: ${hauptPanel.tabs[0]!.getAttribute('title')}`), hauptAria)
 /* Ein Titel ohne Reihe (eigene Kennung, keine Reihenteile): keine Leiste, kein tabpanel um den Kasten. */
 const allein = { ...offen(5726), id: 990001, franchiseId: 990001, titleDe: 'Ohne Reihe', titleEn: 'Ohne Reihe', titleRomaji: 'Ohne Reihe' } as Title
 const ohneReihe = await zeige(990001, { ...data, titles: [allein], titleById: new Map([[allein.id, allein]]), releasesByTitle: new Map() })
@@ -255,4 +260,4 @@ if (verletzt) {
   console.error(`\n${verletzt} Zusicherung(en) verletzt.`)
   process.exit(1)
 }
-console.log('check-reihen-reiter: ok (Liste je Kategorie: Horizonte/Hauptserie/Filme/Specials/AoT, Kurzform und keine Doppelung in allen Bühnenfällen, Lage 7 Fälle, echtes Panel: ARIA, Tooltip, Tastatur, Klick öffnet Titel, Reihenliste ohne Reiter-Titel)')
+console.log('check-reihen-reiter: ok (Liste je Kategorie: Horizonte/Hauptserie/Filme/Specials/AoT, Kurzform und keine Doppelung in allen Bühnenfällen, Lage 9 Fälle, echtes Panel: ARIA, Tooltip, Tastatur, Klick öffnet Titel, Reihenliste ohne Reiter-Titel)')

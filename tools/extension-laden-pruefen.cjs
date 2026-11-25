@@ -148,32 +148,66 @@ function speicherAttrappen() {
   return { localStorage: speicher(), sessionStorage: speicher() }
 }
 
-function baueSandkasten(host, pfad) {
+function baueDokument() {
   const body = machElement('body')
   const html = machElement('html')
+  return {
+    documentElement: html,
+    body,
+    head: machElement('head'),
+    createElement: (tag) => machElement(tag),
+    createTextNode: (t) => ({ textContent: t }),
+    querySelector: () => null,
+    querySelectorAll: () => [],
+    addEventListener() {},
+    removeEventListener() {},
+    getElementById: () => null,
+    elementFromPoint: () => null,
+    dispatchEvent: () => true,
+    hidden: false,
+    visibilityState: 'visible',
+    readyState: 'complete',
+  }
+}
+
+/** `disney-leser.js` hängt sich in XHR ein, um die Playback-Antwort mitzulesen. */
+function baueXhrAttrappe() {
+  return class {
+    open() {}
+    send() {}
+    setRequestHeader() {}
+    addEventListener() {}
+    get readyState() { return 4 }
+    get status() { return 200 }
+    get responseText() { return '' }
+  }
+}
+
+function baueChromeAttrappe() {
+  return {
+    storage: {
+      local: { get: async () => ({}), set: async () => undefined, remove: async () => undefined },
+      /* Die Optionsseite legt das Token in `sync` ab, nicht in `local`. */
+      sync: { get: async () => ({}), set: async () => undefined, remove: async () => undefined },
+      onChanged: { addListener() {} },
+    },
+    runtime: {
+      id: 'test',
+      sendMessage: async () => undefined,
+      onMessage: { addListener() {} },
+      getURL: (p) => `chrome-extension://test/${p}`,
+    },
+  }
+}
+
+function baueSandkasten(host, pfad) {
   const s = {
     globalThis: null,
     AK_OFFENE_AMAZON: [],
     AK_OFFENE_NETFLIX: [],
     AK_OFFENE_DISNEY: [],
     location: { hostname: host, pathname: pfad, search: '', href: `https://${host}${pfad}` },
-    document: {
-      documentElement: html,
-      body,
-      head: machElement('head'),
-      createElement: (tag) => machElement(tag),
-      createTextNode: (t) => ({ textContent: t }),
-      querySelector: () => null,
-      querySelectorAll: () => [],
-      addEventListener() {},
-      removeEventListener() {},
-      getElementById: () => null,
-      elementFromPoint: () => null,
-      dispatchEvent: () => true,
-      hidden: false,
-      visibilityState: 'visible',
-      readyState: 'complete',
-    },
+    document: baueDokument(),
     navigator: { userAgent: 'node', clipboard: { writeText: async () => undefined } },
     console: { log() {}, warn() {}, error() {}, info() {}, table() {}, groupCollapsed() {}, groupEnd() {} },
     setTimeout: () => 0,
@@ -211,33 +245,11 @@ function baueSandkasten(host, pfad) {
     dispatchEvent: () => true,
     /* Die Leser reichen ihren Fund per `postMessage` an das Content-Skript weiter. */
     postMessage() {},
-    /* `disney-leser.js` hängt sich in XHR ein, um die Playback-Antwort mitzulesen. */
-    XMLHttpRequest: class {
-      open() {}
-      send() {}
-      setRequestHeader() {}
-      addEventListener() {}
-      get readyState() { return 4 }
-      get status() { return 200 }
-      get responseText() { return '' }
-    },
+    XMLHttpRequest: baueXhrAttrappe(),
     XMLHttpRequestEventTarget: class {},
     TextEncoder,
     TextDecoder,
-    chrome: {
-      storage: {
-        local: { get: async () => ({}), set: async () => undefined, remove: async () => undefined },
-        /* Die Optionsseite legt das Token in `sync` ab, nicht in `local`. */
-        sync: { get: async () => ({}), set: async () => undefined, remove: async () => undefined },
-        onChanged: { addListener() {} },
-      },
-      runtime: {
-        id: 'test',
-        sendMessage: async () => undefined,
-        onMessage: { addListener() {} },
-        getURL: (p) => `chrome-extension://test/${p}`,
-      },
-    },
+    chrome: baueChromeAttrappe(),
   }
   s.globalThis = s
   s.self = s

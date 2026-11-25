@@ -22,10 +22,10 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { todayIso } from '../shared/time.ts'
 
-const wurzel = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const wurzel = process.env.AK_ROOT ?? resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const args = process.argv.slice(2)
 const LIMIT = Number(args[args.indexOf('--limit') + 1]) || 120
 
@@ -61,7 +61,7 @@ const kurz = (t) =>
     .replace(/\((german dub|dt\. opening|deutscher dub)\)/g, '')
     .replace(/[^a-z0-9]/g, '')
 
-async function main() {
+export async function main() {
   const vorschlaege = JSON.parse(readFileSync(resolve(wurzel, 'data/anbieter-vorschlaege.json'), 'utf8'))
   const titel = JSON.parse(readFileSync(resolve(wurzel, 'public/data/titles.json'), 'utf8'))
   const arr = Array.isArray(titel) ? titel : (titel.titles ?? Object.values(titel))
@@ -89,7 +89,7 @@ async function main() {
   if (land !== 'DE') {
     console.error(`Abbruch: Crunchyroll antwortet als "${land}", nicht als DE.`)
     console.error('Dieser Lauf muss von einer deutschen Leitung kommen — sonst kommt der US-Katalog.')
-    process.exit(1)
+    return 1
   }
   console.log(`${offen.length} Vorschläge, Katalog ${land}`)
 
@@ -143,4 +143,4 @@ async function main() {
   console.log(`Bestand jetzt ${Object.keys(bestand).length}`)
 }
 
-await main()
+if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) process.exit((await main()) ?? 0)

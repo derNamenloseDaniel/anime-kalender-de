@@ -150,16 +150,14 @@ async function deutscherKinostart(
   return kino.find((d) => d.datum >= jetzt) ?? kino.at(-1) ?? null
 }
 
-async function main(): Promise<void> {
-  if (!SCHLUESSEL) {
-    warn('TMDB_API_KEY fehlt — Kinostarts werden nicht geholt.')
-    return
-  }
+/** Eine Seite `discover/movie`, in der Form, wie TMDB sie liefert. */
+interface DiscoverSeite {
+  results?: Array<{ id: number; title?: string; original_title?: string }>
+  total_pages?: number
+}
 
-  const von = heute()
-  const bis = inMonaten(MONATE)
-  log(`TMDB-Kinostarts: suche japanische Animationsfilme mit DE-Start ${von} bis ${bis}`)
-
+/** Sammelt japanische Animationsfilme mit deutschem Kinostart im Fenster (höchstens 5 Seiten). */
+async function sucheKinofilme(von: string, bis: string): Promise<Fund[]> {
   const funde: Fund[] = []
   const gesehen = new Set<number>()
 
@@ -174,7 +172,7 @@ async function main(): Promise<void> {
       with_original_language: 'ja',
       sort_by: 'primary_release_date.asc',
       page: String(seite),
-    })) as { results?: Array<{ id: number; title?: string; original_title?: string }>; total_pages?: number }
+    })) as DiscoverSeite
 
     for (const r of treffer.results ?? []) {
       if (gesehen.has(r.id)) continue
@@ -194,33 +192,35 @@ async function main(): Promise<void> {
     }
     if (seite >= (treffer.total_pages ?? 1)) break
   }
+  return funde
+}
 
-  /**
-   * Zuordnung über die Brücke, die das Projekt schon führt.
-   *
-   * `data/tmdb-titles.json` hält je AniList-Titel die TMDB-Kennung. Sie ist
-   * gepflegt und geprüft — eine zweite, eigene Namenssuche daneben wäre eine
-   * zweite Fehlerquelle für dieselbe Frage.
-   */
+/**
+ * Zuordnung über die Brücke, die das Projekt schon führt.
+ *
+ * `data/tmdb-titles.json` hält je AniList-Titel die TMDB-Kennung. Sie ist
+ * gepflegt und geprüft — eine zweite, eigene Namenssuche daneben wäre eine
+ * zweite Fehlerquelle für dieselbe Frage.
+ *
+ * Zweite Stufe: der **exakt** gleiche Titel.
+ *
+ * Die Brücke deckt nur ab, was schon einmal zugeordnet wurde — für einen
+ * neuen Kinofilm steht dort `{"miss": true}`, und genau die neuen sind hier
+ * die interessanten. „ALL YOU NEED IS KILL" stand am 25.08.2026 im Bestand,
+ * ohne dass die Brücke ihn kannte.
+ *
+ * **Exakt heißt exakt**, nach Kleinschreibung und ohne Satzzeichen. Kein
+ * Ähnlichkeitsmaß: Bei Anime-Reihen unterscheiden sich Titel oft nur durch
+ * ein Wort, und ein falsch zugeordneter Kinostart wandert als Termin in den
+ * Kalender. Wer nicht exakt trifft, bleibt „nicht zugeordnet" und wird von
+ * Hand angesehen — das ist der billigere Fehler.
+ */
+function ordneAnilistZu(funde: Fund[]): void {
   const tmdbZuTitel = readJson<Record<string, { tmdbId?: number }>>('data/tmdb-titles.json', {})
   const anilistJeTmdb = new Map<number, number>()
   for (const [anilist, e] of Object.entries(tmdbZuTitel)) {
     if (e?.tmdbId) anilistJeTmdb.set(e.tmdbId, Number(anilist))
   }
-  /**
-   * Zweite Stufe: der **exakt** gleiche Titel.
-   *
-   * Die Brücke oben deckt nur ab, was schon einmal zugeordnet wurde — für einen
-   * neuen Kinofilm steht dort `{"miss": true}`, und genau die neuen sind hier
-   * die interessanten. „ALL YOU NEED IS KILL" stand am 25.08.2026 im Bestand,
-   * ohne dass die Brücke ihn kannte.
-   *
-   * **Exakt heißt exakt**, nach Kleinschreibung und ohne Satzzeichen. Kein
-   * Ähnlichkeitsmaß: Bei Anime-Reihen unterscheiden sich Titel oft nur durch
-   * ein Wort, und ein falsch zugeordneter Kinostart wandert als Termin in den
-   * Kalender. Wer nicht exakt trifft, bleibt „nicht zugeordnet" und wird von
-   * Hand angesehen — das ist der billigere Fehler.
-   */
   const schlicht = (s: string): string =>
     s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
   const jeTitel = new Map<string, number>()
@@ -246,10 +246,9 @@ async function main(): Promise<void> {
       }
     }
   }
+}
 
-  funde.sort((a, b) => a.kinostart.localeCompare(b.kinostart))
-  writeJson(ZIEL, { geholtAm: new Date().toISOString(), fenster: { von, bis }, funde })
-
+function meldeFunde(funde: Fund[]): void {
   /** Welche Funde noch in keinem Release stehen — das ist die eigentliche Ausbeute. */
   const titles = readJson<Title[]>('public/data/titles.json', [])
   const bekannt = new Set(titles.map((t) => t.id))
@@ -267,7 +266,25 @@ async function main(): Promise<void> {
   for (const f of funde) {
     log(`  ${f.kinostart}  ${f.titel.slice(0, 46).padEnd(48)} ${f.anilistId ? `AniList ${f.anilistId}` : '— nicht zugeordnet'}`)
   }
+}
 
+async function main(): Promise<void> {
+  if (!SCHLUESSEL) {
+    warn('TMDB_API_KEY fehlt — Kinostarts werden nicht geholt.')
+    return
+  }
+
+  const von = heute()
+  const bis = inMonaten(MONATE)
+  log(`TMDB-Kinostarts: suche japanische Animationsfilme mit DE-Start ${von} bis ${bis}`)
+
+  const funde = await sucheKinofilme(von, bis)
+  ordneAnilistZu(funde)
+
+  funde.sort((a, b) => a.kinostart.localeCompare(b.kinostart))
+  writeJson(ZIEL, { geholtAm: new Date().toISOString(), fenster: { von, bis }, funde })
+
+  meldeFunde(funde)
   recordSource('tmdb-kino', funde.length, funde.length ? undefined : 'keine Kinostarts im Fenster')
 }
 

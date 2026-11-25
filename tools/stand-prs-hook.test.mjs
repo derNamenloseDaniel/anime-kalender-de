@@ -347,6 +347,15 @@ try {
   const ra = JSON.parse(pa.stdout)
   assert.equal(ra.erfolg, true, pa.stdout)
   assert.equal(ra.warnung, undefined, 'ohne Mod-Datei keine Kennzeichen-Meldung')
+  // Jetzt-Ordner neben stand.md: nur die offene, nicht genannte Datei wird gemeldet (Lehre 249)
+  const jetztOrdner = join(ordner, 'allein', 'jetzt')
+  mkdirSync(join(jetztOrdner, 'archiv'), { recursive: true })
+  for (const n of ['f1-offen.md', 'f2-genannt.md', 'erledigt-f3.md']) writeFileSync(join(jetztOrdner, n), 'x')
+  writeFileSync(join(jetztOrdner, 'archiv', 'f4-unter.md'), 'x')
+  writeFileSync(dateiAllein, '## In Arbeit (Stand 08.11.2026 12:00)\n- Hand ohne Kennzeichen, Datei f2-genannt.md\n')
+  const pj = spawnSync(process.execPath, [skript], { encoding: 'utf8', timeout: 20000, windowsHide: true, env: { ...process.env, LEER: leerAntwort, LAUF_ENV: JSON.stringify({ STAND_PRS_DATEI: dateiAllein, STAND_PRS_ZUSTAND: join(ordner, 'allein', 'z2.json') }) } })
+  assert.equal(pj.status, 0, pj.stderr)
+  assert.equal(JSON.parse(pj.stdout).warnung, 'Jetzt-Datei ohne Zeile in stand.md: f1-offen.md — eintragen oder erledigt- voranstellen', 'Lauf meldet die Jetzt-Datei ohne Zeile')
 } finally {
   rmSync(ordner, { recursive: true, force: true })
 }

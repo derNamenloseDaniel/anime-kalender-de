@@ -1,7 +1,7 @@
 /**
  * Der echte Lauf von `fetch-tmdb-folgen.ts` gegen eine Kulisse (`AK_ROOT`, Attrappe `tools/tmdb-folgen-mock.mjs`, feste Uhr 24.10.2026):
- * Bei `--limit 3` kommt die laufende Serie mit titelloser Folge zuerst, dann die Grundfälligen in Katalogreihenfolge; die ruhige
- * Serie und der Rest hinter dem Limit bleiben unberührt. Fängt, wenn die Auswahl nicht aufgerufen wird oder falsche Daten bekommt.
+ * Bei `--limit 4` kommen die laufende Serie mit titelloser Folge und die mit angekündigter Folge (Abruf ≥ 6 Tage alt) zuerst, dann die
+ * Grundfälligen in Katalogreihenfolge; die ruhige Serie, die frisch geholte mit Termin und der Rest hinter dem Limit bleiben unberührt. Fängt, wenn die Auswahl nicht aufgerufen wird oder falsche Daten bekommt.
  * Aufruf: `npm run check:logic`.
  */
 import { spawnSync } from 'node:child_process'
@@ -20,13 +20,16 @@ const folge = (e: number, name: string, datum: string) => ({ s: 1, e, titel: nam
 const eintrag = (tmdbId: number, geholtAm: string, ...folgen: ReturnType<typeof folge>[]) => ({ tmdbId, geholtAm, staffeln: 1, folgen })
 
 // Katalog (Grundfrist 50 Tage plus Versatz 7/14 Tage für 900001/900006): 900001 alt (65), 900002 noch frisch (44), 900003 ruhig (echte Titel, 8), 900004 laufend mit Platzhalter, 900005 nie geholt, 900006 alt, hinter dem Limit.
-const katalog = [900001, 900002, 900003, 900004, 900005, 900006].map(titel)
+// 900007: angekündigte Folge (25.10.), Abruf 8 Tage alt: kommt nach `frisch`, vor den Grundfälligen. 900008: gleiche Folge, Abruf erst 5 Tage alt: bleibt liegen.
+const katalog = [900001, 900002, 900003, 900004, 900005, 900006, 900007, 900008].map(titel)
 const bestand = {
   900001: eintrag(1001, '2026-08-20', folge(1, 'Der Anfang', '2026-08-20')),
   900002: eintrag(1002, '2026-09-10', folge(1, 'Der Anfang', '2026-08-20')),
   900003: eintrag(1003, '2026-10-16', folge(1, 'Der Anfang', '2026-10-15')),
   900004: eintrag(1004, '2026-10-16', folge(1, 'Der Anfang', '2026-10-10'), folge(2, 'Folge 2', '2026-10-15')),
   900006: eintrag(1006, '2026-08-20', folge(1, 'Der Anfang', '2026-08-20')),
+  900007: eintrag(1007, '2026-10-16', folge(1, 'Der Anfang', '2026-10-10'), folge(2, 'Das Ende', '2026-10-25')),
+  900008: eintrag(1008, '2026-10-19', folge(1, 'Der Anfang', '2026-10-10'), folge(2, 'Das Ende', '2026-10-25')),
 }
 const tmdbTitles = Object.fromEntries(katalog.map((t) => [String(t.id), { tmdbId: t.id - 899000, kind: 'tv' }]))
 
@@ -42,17 +45,17 @@ writeFileSync(join(kulisse, 'abrufe.txt'), '')
 
 const fehler: string[] = []
 try {
-  const lauf = spawnSync(process.execPath, [tsx, '--import', mock, join(wurzel, 'pipeline/fetch-tmdb-folgen.ts'), '--limit', '3', '--alter', '50'], {
+  const lauf = spawnSync(process.execPath, [tsx, '--import', mock, join(wurzel, 'pipeline/fetch-tmdb-folgen.ts'), '--limit', '4', '--alter', '50'], {
     cwd: wurzel,
     encoding: 'utf8',
     env: { ...process.env, AK_ROOT: kulisse, TMDB_API_KEY: 'test' },
   })
   if (lauf.status !== 0) fehler.push(`Lauf endet mit ${lauf.status}: ${lauf.stderr.slice(-300)}`)
   const abrufe = readFileSync(join(kulisse, 'abrufe.txt'), 'utf8').trim().split('\n').join(',')
-  if (abrufe !== '1004,1001,1005') fehler.push(`Abrufreihenfolge ${abrufe}, erwartet 1004,1001,1005`)
+  if (abrufe !== '1004,1007,1001,1005') fehler.push(`Abrufreihenfolge ${abrufe}, erwartet 1004,1007,1001,1005`)
   const neu = JSON.parse(readFileSync(join(kulisse, 'data/tmdb-folgen.json'), 'utf8')) as Record<string, { geholtAm: string }>
   const stand = Object.fromEntries(Object.entries(neu).map(([k, v]) => [k, v.geholtAm]))
-  const erwartet = { 900001: '2026-10-24', 900002: '2026-09-10', 900003: '2026-10-16', 900004: '2026-10-24', 900005: '2026-10-24', 900006: '2026-08-20' }
+  const erwartet = { 900001: '2026-10-24', 900002: '2026-09-10', 900003: '2026-10-16', 900004: '2026-10-24', 900005: '2026-10-24', 900006: '2026-08-20', 900007: '2026-10-24', 900008: '2026-10-19' }
   if (JSON.stringify(stand) !== JSON.stringify(erwartet)) fehler.push(`Stand ${JSON.stringify(stand)}, erwartet ${JSON.stringify(erwartet)}`)
 } catch (e) {
   fehler.push(`Ergebnis nicht lesbar: ${(e as Error).message}`)
@@ -63,4 +66,4 @@ if (fehler.length) {
   console.error(`FEHL check-tmdb-folgen-lauf: ${fehler.join('; ')}`)
   process.exit(1)
 }
-console.log('check-tmdb-folgen-lauf: laufende Serie zuerst, Limit 3 gehalten, ruhige und überzählige Titel unberührt.')
+console.log('check-tmdb-folgen-lauf: laufende Serie und angekündigte Folge zuerst, Limit 4 gehalten, ruhige und überzählige Titel unberührt.')

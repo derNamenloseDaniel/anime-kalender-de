@@ -234,6 +234,13 @@ pr_anlegen() {
     echo "::warning::gh pr create fehlgeschlagen (Versuch $versuch von 3): $letzter"
     [ "$versuch" -lt 3 ] && sleep $((5 + RANDOM % 10))
   done
+  # Auch der dritte Versuch kann trotz 502 angelegt haben (Läufe 45650281762 und 45650286140, 25.11.2026).
+  vorhanden="$(gh pr list --head "$ZWEIG" --state open --json url -q '.[0].url' 2>/dev/null)" || vorhanden=""
+  if [ -n "$vorhanden" ]; then
+    PR="$vorhanden"
+    echo "PR zum Zweig $ZWEIG besteht nach dem letzten Versuch schon."
+    return 0
+  fi
   echo "::error::Der Pull Request konnte nach drei Versuchen nicht angelegt werden: $letzter"
   return 1
 }
@@ -286,6 +293,7 @@ pause_s() { sleep $(($1 * ${QUELLEN_PAUSE_FAKTOR:-100} / 100)); }
 # „Base branch was modified": kurze Pause, höchstens 6 Versuche. 5xx: Pausen 15/30/60/120 s (~4 min); ein 502 kann den Merge trotzdem vollzogen haben, darum vor jedem neuen Versuch den Zustand lesen.
 pr_mergen() {
   local abgelehnt=0 serverfehler_nr=0 ausgabe pausen=(15 30 60 120)
+  MERGE_GRUND=""
   while :; do
     if ausgabe="$(gh pr merge "$ZWEIG" --squash --admin --delete-branch --subject "$NACHRICHT" 2>&1)"; then
       printf '%s\n' "$ausgabe"
@@ -293,9 +301,10 @@ pr_mergen() {
       exit 0
     fi
     printf '%s\n' "$ausgabe"
+    MERGE_GRUND="$(printf '%s' "$ausgabe" | tr '\n' ' ' | cut -c1-300)"
     if serverfehler "$ausgabe"; then
       [ "$serverfehler_nr" -lt "${#pausen[@]}" ] || return 1
-      echo "::notice::Merge: GitHub-Serverfehler, nächster Versuch nach ${pausen[$serverfehler_nr]} s."
+      echo "::notice::Merge: GitHub-Serverfehler ($MERGE_GRUND), nächster Versuch nach ${pausen[$serverfehler_nr]} s."
       pause_s "${pausen[$serverfehler_nr]}"
       serverfehler_nr=$((serverfehler_nr + 1))
       if [ "$(gh pr view "$ZWEIG" --json state -q .state 2>/dev/null || true)" = "MERGED" ]; then
@@ -306,7 +315,7 @@ pr_mergen() {
       continue
     fi
     abgelehnt=$((abgelehnt + 1))
-    echo "::notice::Merge-Versuch $abgelehnt von 6 abgelehnt — main hat sich bewegt, neuer Versuch."
+    echo "::notice::Merge-Versuch $abgelehnt von 6 abgelehnt: $MERGE_GRUND — neuer Versuch."
     [ "$abgelehnt" -lt 6 ] || return 1
     sleep $((3 + RANDOM % 8))
     # Die Mergebarkeit gegen den neuen Stand abwarten, bevor es weitergeht (ein echter Konflikt beendet die Schleife).
@@ -331,7 +340,7 @@ if [ "$ZUSTAND" = "MERGEABLE" ]; then
   pr_mergen || true
   if [ "$ZUSTAND" = "MERGEABLE" ]; then
     # Rot statt Warnung: Ein mergebarer Daten-Pull-Request, der offen bleibt, würde sonst still liegen (claude-daten-merge holt ihn nach).
-    echo "::error::Pull Request $NUMMER ist mergebar, der Merge scheiterte (sechs Ablehnungen oder GitHub-Serverfehler über ~4 min; Ruleset/Bypass der App prüfen)."
+    echo "::error::Pull Request $NUMMER ist mergebar, der Merge scheiterte (sechs Ablehnungen oder GitHub-Serverfehler über ~4 min), zuletzt: $MERGE_GRUND (Ruleset/Bypass der App prüfen)."
     melde "gemerged=false"
     exit 1
   fi

@@ -15,6 +15,7 @@ const path = require('node:path')
 const { execFileSync } = require('node:child_process')
 const B = require('./stand-prs-block.js')
 const { waechter, LEER } = require('./stand-waechter.js')
+const { jetztOrdnerDateien } = require('./stand-jetzt-luecken.js')
 const { vorratErledigt } = require('./vorrat-erledigt.js')
 // Fehlt die Mod-Datei (Hook allein installiert), entfällt nur die Kennzeichen-Meldung; die PR-Block-Pflege läuft weiter.
 let kennzeichenMeldung = () => ''
@@ -266,7 +267,8 @@ function aktualisiere({ datei, gh, jetzt, erfolg }) {
     if (r.fehler) return { ergebnis: `nicht geschrieben: ${r.fehler}`, laut: true }
     const v = frisch.gemergt ? vorratErledigt({ ordner: path.join(path.dirname(datei), 'vorrat'), text: r.text, istGemergt: istGemergtFn(gh, frisch) }) : { text: r.text, zeilen: [] }
     const neu = v.text.split('\n').join(eol)
-    const warnung = [waechter(v.text, jetzt), kennzeichenMeldung(v.text)].filter(Boolean).join('; ')
+    const jetztNamen = jetztOrdnerDateien(path.join(path.dirname(datei), 'jetzt'))
+    const warnung = [waechter(v.text, jetzt, undefined, undefined, undefined, jetztNamen), kennzeichenMeldung(v.text)].filter(Boolean).join('; ')
     const zusatz = { ...(warnung ? { warnung } : {}), ...(v.zeilen.length ? { umbenannt: v.zeilen } : {}) }
     const fertig = frisch.fehler ? { ergebnis: `veraltet: ${frisch.fehler}`, laut: true, ...zusatz } : null
     if (neu === vorher) return fertig ?? { ergebnis: 'unverändert', erfolg: true, ...zusatz }

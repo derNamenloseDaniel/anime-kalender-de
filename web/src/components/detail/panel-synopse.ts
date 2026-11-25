@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Title } from '@shared/types.ts'
+import { cartoonHandlung } from './plot.ts'
 import { loadSynopsis, type Synopsis } from '../../lib/data.ts'
 
 /** Die Inhaltsangabe des Titels samt den Aufklapp-Zuständen; Schlagworte und Handlung fallen beim Titelwechsel zurück. */
@@ -15,7 +16,7 @@ export function usePanelSynopse(titleId: number, title: Title | undefined) {
     setSynopsis(undefined)
     /* Cartoons (negative Kennung) tragen ihre Beschreibung im Titel — für sie gibt es keine Gruppendatei (16.09.2026). */
     if (titleId < 0) {
-      setSynopsis(title?.synopsis ? { de: title.synopsis } : undefined)
+      setSynopsis(title ? cartoonHandlung(title) : undefined)
     } else {
       loadSynopsis(titleId)
         .then((s) => {
@@ -28,7 +29,7 @@ export function usePanelSynopse(titleId: number, title: Title | undefined) {
     return () => {
       alive = false
     }
-  }, [titleId, title?.synopsis])
+  }, [titleId, title?.synopsis, title?.tmdbId])
 
   return { synopsis, allKeywords, setAllKeywords, plotOffen, setPlotOffen, genresOffen, setGenresOffen }
 }

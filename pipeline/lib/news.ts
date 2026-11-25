@@ -45,7 +45,6 @@ import { ankuendigungJahre, neuJahre, neuZeile } from './news-neu-zeile.ts'
 import { haltFelderFest, type FesteFelder } from './news-felder-fest.ts'
 import { haltPremiereFest, haltWeitererFest, vergissAlte } from './news-einfrieren.ts'
 import { premiereBelegtTv } from '../../shared/premiere.ts'
-import { geerbterAnbieterTag } from './staffel-historie.ts'
 
 /** Wie lange eine Meldung auf der Seite steht. */
 const FENSTER_TAGE = 120
@@ -412,7 +411,7 @@ function weitereAnbieter(titles: Title[], historie: NewsHistorie, grenze: string
     const wege = anbieterMitDeutsch(t)
     for (const p of wege) {
       const k = `${t.id}:${p}`
-      if (!(k in anbieterSeit)) anbieterSeit[k] = geerbterAnbieterTag(anbieterSeit, t, p) ?? (saeen ? '0000-00-00' : heute)
+      if (!(k in anbieterSeit)) anbieterSeit[k] = saeen ? '0000-00-00' : heute
     }
     for (const p of wege) {
       const seit = anbieterSeit[`${t.id}:${p}`]!

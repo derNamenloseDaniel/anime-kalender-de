@@ -1,24 +1,24 @@
 {
   "stand": {
-    "cache/anilist-katalog": "2026-11-24T04:04:20.530Z",
+    "cache/anilist-katalog": "2026-11-25T04:07:04.174Z",
     "adn-catalog": "2026-11-23T05:44:16.971Z",
-    "adn-news": "2026-11-24T02:01:15.001Z",
-    "adn": "2026-11-24T04:10:05.968Z",
+    "adn-news": "2026-11-25T02:02:13.296Z",
+    "adn": "2026-11-25T04:10:39.527Z",
     "anime-ids": "2026-11-21T04:01:10.645Z",
     "ann-ids": "2026-11-23T05:08:36.461Z",
     "cinestar": "2026-11-23T05:02:15.433Z",
     "cr-katalog-de": "2026-09-09T17:26:33.450Z",
-    "crunchyroll-dub": "2026-11-23T05:19:15.506Z",
-    "crunchyroll-neu": "2026-11-24T04:04:26.030Z",
-    "crunchyroll-series-ids": "2026-11-23T05:19:15.533Z",
-    "crunchyroll-woche": "2026-11-24T04:01:29.730Z",
+    "crunchyroll-dub": "2026-11-25T17:01:40.411Z",
+    "crunchyroll-neu": "2026-11-25T20:01:51.181Z",
+    "crunchyroll-series-ids": "2026-11-25T17:01:40.445Z",
+    "crunchyroll-woche": "2026-11-25T20:01:43.221Z",
     "crunchyroll": "2026-10-21T20:02:22.931Z",
-    "motn-changes": "2026-11-24T04:10:09.656Z",
+    "motn-changes": "2026-11-25T04:10:43.055Z",
     "motn": "2026-11-07T04:03:57.029Z",
     "rtlplus-folgen": "2026-11-23T05:06:43.152Z",
-    "toggo": "2026-11-24T04:10:14.857Z",
-    "tv-programm": "2026-11-24T04:01:57.901Z",
-    "wikipedia-folgen": "2026-11-24T04:10:58.815Z"
+    "toggo": "2026-11-25T04:10:47.391Z",
+    "tv-programm": "2026-11-25T20:02:13.575Z",
+    "wikipedia-folgen": "2026-11-25T04:11:31.626Z"
   },
   "zurueck": []
 }

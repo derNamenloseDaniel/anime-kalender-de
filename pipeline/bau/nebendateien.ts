@@ -15,7 +15,7 @@ import { mitLaufzeit } from '../lib/anisearch-felder.ts'
 import { type KatalogEintrag } from '../lib/anilist.ts'
 import { ladeKatalogEintraege } from '../lib/katalog-eingefroren.ts'
 import { ohneZurueckgestellte } from '../lib/quarantaene.ts'
-import { katalogNamen, ladeAnisearchTitel } from './katalog-namen.ts'
+import { type AnisearchTitel, katalogNamen, ladeAnisearchTitel } from './katalog-namen.ts'
 import { ANILIST_COVER_BASIS } from '../../shared/mappings.ts'
 import { coverFuer } from './cover-regel.ts'
 import { bewertungNachRegel, mitProduktFeldern } from './produkt-regel.ts'
@@ -35,6 +35,7 @@ import { markiereCartoonReihenteile } from './reihenteil-markierung.ts'
 import { adnShowsLesen, ergaenzeAdnWege } from './cartoon-adn.ts'
 import { ergaenzeCartoonJoyn } from './cartoon-joyn.ts'
 import { ergaenzeCartoonJwWege } from './cartoon-jw-wege.ts'
+import { setzeToggoSeiten } from './13-1-toggo-seiten.ts'
 import { setzeStaffeln, staffelnAusBelegen } from './cartoon-staffeln.ts'
 import { verteileWege } from './cartoon-wege.ts'
 import { wendeCartoonBelegeAn } from './cartoon-belege.ts'
@@ -46,7 +47,6 @@ import { anisearchKennungen } from './anisearch-kennung.ts'
 import { katalogSammeltitel } from './mal-teilung.ts'
 import { ohneWerkDubletten } from './werk-doppelt-bau.ts'
 import { anisearchKatalogReihenQuelle as anisearchKatalogReihen } from './anisearch-reihen-rein-bau.ts'
-import { geerbterSeitTag } from '../lib/staffel-historie.ts'
 
 /**
  * Schreibt die Anime **ohne** belegte deutsche Synchro als eigene Datei.
@@ -200,6 +200,7 @@ export function schreibeCartoons(): void {
   if (jwWege) log(`${jwWege} Cartoon-Bezugswege (Kauf, Leihe, Abo) aus JustWatch ergänzt`)
   const belegt = wendeCartoonBelegeAn(titel, belege)
   if (belegt) log(`${belegt} Cartoon-Verweise mit Handbeleg`)
+  setzeToggoSeiten(titel, 'Cartoons', true)
   setzeTonHinweise(titel, jw, belege)
   const ungeprueft = setzeStaffeln(titel, roh, jw, staffelnAusBelegen(belege))
   kennzeichneCartoonJwSeiten(titel, belege)
@@ -251,6 +252,53 @@ export function anisearchDublettenAbziehen(bekannt: Map<number, number>, verscho
   return urteil
 }
 
+/** Der Titel eines Katalogeintrags ohne Synchro, wie `ohne-synchro.json` ihn führt; `reihenId`: seine Reihe (eigene Kennung, wenn er allein steht), `reihenName`: deren deutscher Name. */
+function katalogTitelOhneSynchro(e: KatalogEintrag, anisearch: AnisearchTitel | undefined, reihenName: string | undefined, reihenId: number | undefined, anisearchId: number | undefined) {
+  const namen = katalogNamen(e, anisearch, reihenName)
+  return {
+    id: e.id, malId: e.mal,
+    ...namen,
+    /* Die Kennung geht mit, sonst führt der aniSearch-Verweis ins Leere; zugeordnet wird sie in `anisearch-kennung.ts`. */
+    anisearchId,
+    titleNative: e.t[2] ?? undefined,
+    format: e.format ?? undefined,
+    episodes: e.folgen ?? undefined,
+    jpYear: e.jahr ?? undefined,
+    /* Der Termin, soweit AniList ihn kennt — bei Ankündigungen das Einzige, was dasteht. */
+    jpStart: e.start ?? undefined,
+    jpStatus: e.status ?? undefined,
+    genres: e.genres,
+    /**
+     * **Ohne** Adressvorsatz — der wird erst im Browser angehängt. Bei
+     * achtzehntausend Titeln spart das über ein Megabyte an Ladelast.
+     *
+     * Gekürzt wird hier und nicht beim Abrufen, obwohl es dort naheläge:
+     * Der Zwischenspeicher überdauert viele Läufe, und Einträge aus einem
+     * früheren Lauf tragen noch die volle Adresse. Beim Bauen greift die
+     * Kürzung dagegen auf jeden Eintrag, auch auf alte. Passt der Vorsatz
+     * nicht (AniList liefert gelegentlich einen anderen Hostnamen), bleibt
+     * die Adresse unangetastet — der Browser erkennt das am `http`.
+     */
+    coverImage: coverFuer(e.id, e.cover?.startsWith(ANILIST_COVER_BASIS) ? e.cover.slice(ANILIST_COVER_BASIS.length) : (e.cover ?? undefined)),
+    ...bewertungNachRegel({}, anisearchId),
+    /**
+     * Fehlt, wenn der Titel allein steht — dann greift in der Oberfläche
+     * ohnehin der Rückfall auf die eigene Kennung, und die Zahl wäre
+     * fünfzehntausendmal umsonst übertragen.
+     */
+    franchiseId: reihenId === e.id ? undefined : reihenId,
+    /**
+     * `low` ist hier keine schwache Angabe, sondern die einzig ehrliche:
+     * Es gibt nichts zu belegen. Das Feld ist Pflicht, weil dieselbe
+     * Oberfläche beide Sorten anzeigt.
+     */
+    dubConfidence: 'low' as const,
+    ohneSynchro: true,
+    ...(e.land ? { land: e.land } : {}),
+    ...kinoFeld(e.id),
+  }
+}
+
 export function schreibeOhneSynchro(
   bekannt: Map<number, number>,
   verschoben: Title[] = [],
@@ -290,51 +338,7 @@ export function schreibeOhneSynchro(
   const reihe = anisearchKatalogReihen(reihenFuerKatalog(eintraege, bekannt), eintraege, bekannt, verschoben, kennungen, dubletten)
   const ohne = eintraege
     .filter((e) => !bekannt.has(e.id) && !dubletten.katalogWeg.has(e.id))
-    .map((e) => {
-      const namen = katalogNamen(e, ausAnisearch[String(e.id)], deutscheReihe.get(reihe.get(e.id) ?? e.id))
-      return {
-        id: e.id, malId: e.mal,
-        ...namen,
-        /* Die Kennung geht mit, sonst führt der aniSearch-Verweis ins Leere; zugeordnet wird sie in `anisearch-kennung.ts`. */
-        anisearchId: kennungen.get(e.id),
-        titleNative: e.t[2] ?? undefined,
-        format: e.format ?? undefined,
-        episodes: e.folgen ?? undefined,
-        jpYear: e.jahr ?? undefined,
-        /* Der Termin, soweit AniList ihn kennt — bei Ankündigungen das Einzige, was dasteht. */
-        jpStart: e.start ?? undefined,
-        jpStatus: e.status ?? undefined,
-        genres: e.genres,
-        /**
-         * **Ohne** Adressvorsatz — der wird erst im Browser angehängt. Bei
-         * achtzehntausend Titeln spart das über ein Megabyte an Ladelast.
-         *
-         * Gekürzt wird hier und nicht beim Abrufen, obwohl es dort naheläge:
-         * Der Zwischenspeicher überdauert viele Läufe, und Einträge aus einem
-         * früheren Lauf tragen noch die volle Adresse. Beim Bauen greift die
-         * Kürzung dagegen auf jeden Eintrag, auch auf alte. Passt der Vorsatz
-         * nicht (AniList liefert gelegentlich einen anderen Hostnamen), bleibt
-         * die Adresse unangetastet — der Browser erkennt das am `http`.
-         */
-        coverImage: coverFuer(e.id, e.cover?.startsWith(ANILIST_COVER_BASIS) ? e.cover.slice(ANILIST_COVER_BASIS.length) : (e.cover ?? undefined)),
-        ...bewertungNachRegel({}, kennungen.get(e.id)),
-        /**
-         * Fehlt, wenn der Titel allein steht — dann greift in der Oberfläche
-         * ohnehin der Rückfall auf die eigene Kennung, und die Zahl wäre
-         * fünfzehntausendmal umsonst übertragen.
-         */
-        franchiseId: reihe.get(e.id) === e.id ? undefined : reihe.get(e.id),
-        /**
-         * `low` ist hier keine schwache Angabe, sondern die einzig ehrliche:
-         * Es gibt nichts zu belegen. Das Feld ist Pflicht, weil dieselbe
-         * Oberfläche beide Sorten anzeigt.
-         */
-        dubConfidence: 'low' as const,
-        ohneSynchro: true,
-        ...(e.land ? { land: e.land } : {}),
-        ...kinoFeld(e.id),
-      }
-    })
+    .map((e) => katalogTitelOhneSynchro(e, ausAnisearch[String(e.id)], deutscheReihe.get(reihe.get(e.id) ?? e.id), reihe.get(e.id), kennungen.get(e.id)))
 
   /* Wer aus dem Hauptbestand verschoben wurde, muss hier ankommen, auch wenn der Katalog ihn nicht führt (ein Vorfilter verschiebt, er löscht nicht; „Xiao Mao Diao Yu", 17.08.2026). */
   const vorhanden = new Set(ohne.map((t) => t.id))
@@ -530,38 +534,76 @@ export function ersterTerminMitGrund(releases: Release[], titles: Title[]): Map<
   return ersterDeutscherTermin(zaehlende, titles)
 }
 
-export function schreibeNeuMitSynchro(titles: Title[], releases: Release[]): void {
-  const HISTORIE = 'data/synchro-historie.json'
-  /** Wie lange ein Zugang als „neu" gilt. */
-  const FENSTER_TAGE = 60
+const SYNCHRO_HISTORIE = 'data/synchro-historie.json'
+/** Wie lange ein Zugang als „neu" gilt. */
+const FENSTER_TAGE = 60
 
-  /**
-   * `angelegtAm` ist keine Zierde, sondern die Sperre gegen eine Massenmail.
-   *
-   * Ohne sie war der Fehler unmittelbar da (gemessen 13.08.2026): Der erste
-   * Lauf schreibt für **alle** 2.753 Titel das heutige Datum. Der zweite Lauf
-   * sieht 2.753 Einträge, die jünger als 60 Tage sind, und hält jeden einzelnen
-   * für einen Neuzugang — jeder Abonnent bekäme eine Mail über Serien, die er
-   * längst kennt. Der Vergleich mit `angelegtAm` nimmt genau diesen
-   * Ausgangsstand dauerhaft aus der Meldung heraus.
-   *
-   * Ein Titel, der zufällig am selben Tag wirklich neu dazukommt, fällt damit
-   * einmalig unter den Tisch. Das ist der richtige Tausch: eine verpasste
-   * Meldung gegen tausende falsche.
-   */
-  interface Historie {
-    angelegtAm: string
-    seit: Record<string, string>
-  }
+/**
+ * `angelegtAm` ist keine Zierde, sondern die Sperre gegen eine Massenmail.
+ *
+ * Ohne sie war der Fehler unmittelbar da (gemessen 13.08.2026): Der erste
+ * Lauf schreibt für **alle** 2.753 Titel das heutige Datum. Der zweite Lauf
+ * sieht 2.753 Einträge, die jünger als 60 Tage sind, und hält jeden einzelnen
+ * für einen Neuzugang — jeder Abonnent bekäme eine Mail über Serien, die er
+ * längst kennt. Der Vergleich mit `angelegtAm` nimmt genau diesen
+ * Ausgangsstand dauerhaft aus der Meldung heraus.
+ *
+ * Ein Titel, der zufällig am selben Tag wirklich neu dazukommt, fällt damit
+ * einmalig unter den Tisch. Das ist der richtige Tausch: eine verpasste
+ * Meldung gegen tausende falsche.
+ */
+interface SynchroHistorie {
+  angelegtAm: string
+  seit: Record<string, string>
+}
 
-  const heute = todayIso()
-  const historie = readJson<Historie>(HISTORIE, { angelegtAm: heute, seit: {} })
+interface NeuMitSynchro {
+  id: number
+  name: string
+  slug: string
+  seit: string
+  termin: string | undefined
+  franchiseId: number | undefined
+  jahr: number | null
+}
+
+/** Liest die Historie, trägt unbekannte Titel mit ihrem Starttag nach und schreibt sie zurück. */
+function fuehreSynchroHistorie(titles: Title[], heute: string): { historie: SynchroHistorie; erstlauf: boolean } {
+  const historie = readJson<SynchroHistorie>(SYNCHRO_HISTORIE, { angelegtAm: heute, seit: {} })
   const erstlauf = Object.keys(historie.seit).length === 0
 
   for (const t of titles) {
-    if (!historie.seit[t.id]) historie.seit[t.id] = geerbterSeitTag(historie.seit, t) ?? heute
+    if (!historie.seit[t.id]) historie.seit[t.id] = heute
   }
-  writeJson(HISTORIE, historie, true)
+  writeJson(SYNCHRO_HISTORIE, historie, true)
+  return { historie, erstlauf }
+}
+
+/** Welcher Titel zu welcher Reihe gehört (schlank für den Worker); gibt die Zahl der Einträge zurück. */
+function schreibeReihenZuordnung(titles: Title[]): number {
+  /**
+   * **Welcher Titel zu welcher Reihe gehoert — schlank, fuer den Worker.**
+   *
+   * Der Hinweis auf Neues aus gemerkten Reihen braucht zu jedem gemerkten
+   * Titel seine Reihe. In `titles.json` steht sie, aber die Datei ist 2,6 MB
+   * gross und wird vom Worker bei jedem Versandlauf geladen — das waere
+   * dieselbe Sorte Verschwendung, die dieses Projekt an anderer Stelle
+   * vermeidet.
+   *
+   * Hier stehen nur zwei Zahlen je Titel. Bei 2.763 Titeln sind das rund
+   * 40 KB, und die Datei aendert sich nur, wenn ein Titel dazukommt.
+   */
+  const reihen: Record<string, { f: number; j: number | null }> = {}
+  for (const t of titles) {
+    if (t.franchiseId) reihen[t.id] = { f: t.franchiseId, j: t.jpYear ?? null }
+  }
+  writeJson(`${OUT}/reihen.json`, reihen)
+  return Object.keys(reihen).length
+}
+
+export function schreibeNeuMitSynchro(titles: Title[], releases: Release[]): void {
+  const heute = todayIso()
+  const { historie, erstlauf } = fuehreSynchroHistorie(titles, heute)
 
   if (erstlauf) {
     log(`Synchro-Historie angelegt: ${titles.length} Titel als Ausgangsstand, keine Neuzugänge gemeldet`)
@@ -570,7 +612,16 @@ export function schreibeNeuMitSynchro(titles: Title[], releases: Release[]): voi
   }
 
   const ersterTermin = ersterTerminMitGrund(releases, titles)
+  const neu = neuMitSynchro(titles, historie, ersterTermin, heute)
 
+  writeJson(`${OUT}/neu-mit-synchro.json`, neu)
+
+  log(`Reihen-Zuordnung: ${schreibeReihenZuordnung(titles)} Titel`)
+  log(`Neu mit deutscher Synchro (${FENSTER_TAGE} Tage): ${neu.length} Titel`)
+}
+
+/** Die Neuzugänge des Fensters mit belegter deutscher Synchro, jüngste zuerst. */
+function neuMitSynchro(titles: Title[], historie: SynchroHistorie, ersterTermin: Map<number, string>, heute: string): NeuMitSynchro[] {
   const grenze = addDays(heute, -FENSTER_TAGE)
   /*
     **„Neu im Bestand" ist nicht „neu auf Deutsch".**
@@ -630,25 +681,5 @@ export function schreibeNeuMitSynchro(titles: Title[], releases: Release[]): voi
     }))
     .sort((a, b) => b.seit.localeCompare(a.seit))
 
-  writeJson(`${OUT}/neu-mit-synchro.json`, neu)
-
-  /**
-   * **Welcher Titel zu welcher Reihe gehoert — schlank, fuer den Worker.**
-   *
-   * Der Hinweis auf Neues aus gemerkten Reihen braucht zu jedem gemerkten
-   * Titel seine Reihe. In `titles.json` steht sie, aber die Datei ist 2,6 MB
-   * gross und wird vom Worker bei jedem Versandlauf geladen — das waere
-   * dieselbe Sorte Verschwendung, die dieses Projekt an anderer Stelle
-   * vermeidet.
-   *
-   * Hier stehen nur zwei Zahlen je Titel. Bei 2.763 Titeln sind das rund
-   * 40 KB, und die Datei aendert sich nur, wenn ein Titel dazukommt.
-   */
-  const reihen: Record<string, { f: number; j: number | null }> = {}
-  for (const t of titles) {
-    if (t.franchiseId) reihen[t.id] = { f: t.franchiseId, j: t.jpYear ?? null }
-  }
-  writeJson(`${OUT}/reihen.json`, reihen)
-  log(`Reihen-Zuordnung: ${Object.keys(reihen).length} Titel`)
-  log(`Neu mit deutscher Synchro (${FENSTER_TAGE} Tage): ${neu.length} Titel`)
+  return neu
 }

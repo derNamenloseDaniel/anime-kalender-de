@@ -1,6 +1,6 @@
 # Wache — Bestand und Briefkasten
 
-**⚠ Auffälligkeit** · letzter Befund vom 22.11.2026 um 16:18 Uhr
+**⚠ Auffälligkeit** · letzter Befund vom 25.11.2026 um 18:58 Uhr
 
 Diese Zeile nennt den letzten **Befund**, nicht den letzten Lauf: Seit dem 26.09.2026 wird nur noch
 ein Befund committet (Daniel: „Behalten, still bei Ruhe"). Ob die Wache täglich läuft, steht in
@@ -19,25 +19,29 @@ komisch vorkam. Das soll ihm keiner mehr abverlangen.
 
 ## Was aufgefallen ist
 
-- 1 Titel weniger
+- 3 Titel weniger
 
 ## Bestand — die letzten 24 Stunden
 
 ```
-36 Läufe in den letzten 1 Tagen (2528 insgesamt)
+52 Läufe in den letzten 1 Tagen (2689 insgesamt)
 
-21.11., 18:10  Bestand — zusammenführ   releases +1, termine +1
-21.11., 23:38  Bestand — zusammenführ   mitUrteil +1, ohneUrteil -1, titelMitSynchro +1
-21.11., 23:58  Bestand — zusammenführ   releases +1, termine +11
-22.11., 00:11  Bestand — zusammenführ   releases -1, termine -1
-22.11., 00:59  Bestand — zusammenführ   mitUrteil +1, ohneUrteil -1, titelMitSynchro +1
-22.11., 04:48  --ersetzen               titel -1, verweise +1, ohneUrteil +1
-            ⚠  1 Titel weniger
-               • Grisaia: Phantom Trigger THE ANIMATION - Stargazer (120892) · Titel entfernt
-22.11., 13:37  --ersetzen               releases +1, termine +1
+24.11., 18:30  Bestand — zusammenführ   titel -3, verweise -3, mitUrteil -3, titelMitSynchro -3, releases -4
+            ℹ  erklärt, nicht rot: 3 Titel ohne Synchro-Beleg, weil ihr Weg an einen anderen Titel ging; rtlplus: Weg verschoben – Pokémon Horizonte: Die Serie (7000001): https://plus.rtl.de/pokemon-horizonte-die-serie-p_10142 → Pokémon Horizonte (158871); rtlplus: Weg verschoben – Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua (7000002): https://plus.rtl.de/pokemon-horizonte-die-serie-p_10142 → Pokémon Horizonte (158871); rtlplus: Weg verschoben – Pokémon Horizonte: Staffel 3 – Gute Aussichten (7000003): https://plus.rtl.de/pokemon-horizonte-die-serie-p_10142 → Pokémon Horizonte (158871)
+            ⚠  3 Titel weniger
+               • Pokémon Horizonte: Die Serie (7000001) · Titel entfernt
+               • Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua (7000002) · Titel entfernt
+               • Pokémon Horizonte: Staffel 3 – Gute Aussichten (7000003) · Titel entfernt
+24.11., 19:10  Bestand — zusammenführ   termine +2
+25.11., 00:00  Bestand — zusammenführ   verweise +2, ohneUrteil +2
+25.11., 06:22  Bestand — zusammenführ   termine +7
+25.11., 15:11  Bestand — zusammenführ   verweise +1, ohneUrteil +1
+25.11., 16:36  Bestand — zusammenführ   verweise +1, ohneUrteil +1
+25.11., 17:07  Bestand — zusammenführ   verweise +1, mitUrteil +1, titelMitSynchro +1
+25.11., 17:22  Bestand — zusammenführ   releases +1, termine +1
 
-Stand jetzt: 2925 Titel, 2298 Urteile, 153 offen
-Über den Zeitraum: Titel -1, Urteile +2, offen -1
+Stand jetzt: 2926 Titel, 2314 Urteile, 151 offen
+Über den Zeitraum: Titel -3, Urteile -2, offen +4
 
 ⚠  1 Lauf/Läufe mit Auffälligkeiten — siehe oben.
 ```
@@ -46,23 +50,23 @@ Stand jetzt: 2925 Titel, 2298 Urteile, 153 offen
 
 ```
 Briefkasten: 4080 Meldungen auf 230 Adressen (primevideo 514, adn 133, disneyplus 2217, netflix 1216)
-Liste daniel-zum-abarbeiten/listen/11-meldungen-ohne-zuordnung.md: 427 Adressen
+Liste daniel-zum-abarbeiten/listen/11-meldungen-ohne-zuordnung.md: 426 Adressen
 Zurückgestellt (data/meldungen-zurueckgestellt.json): 0 Adressen im Briefkasten
 Alle Adressen sind gelistet.
 Übernahme: zuletzt 2026-11-22T14:10:34.036Z (data/meldungen-uebernahme.json)
-✓ refresh-hourly.yml: letzter Erfolg vor 0 h (Frist 3 h)
-✓ refresh-data.yml: letzter Erfolg vor 11 h (Frist 36 h)
-✓ refresh-weekly.yml: letzter Erfolg vor 154 h (Frist 336 h)
-✓ daten-auf-abruf.yml: letzter Erfolg vor 6 h (Frist 36 h)
-✓ anisearch-katalog.yml: letzter Erfolg vor 9 h (Frist 36 h)
-✓ tonspuren-monatlich.yml: letzter Erfolg vor 371 h (Frist 1008 h)
+✓ refresh-hourly.yml: letzter Erfolg vor 1 h (Frist 3 h)
+✓ refresh-data.yml: letzter Erfolg vor 14 h (Frist 36 h)
+✓ refresh-weekly.yml: letzter Erfolg vor 61 h (Frist 336 h)
+✓ daten-auf-abruf.yml: letzter Erfolg vor 7 h (Frist 36 h)
+✓ anisearch-katalog.yml: letzter Erfolg vor 12 h (Frist 36 h)
+✓ tonspuren-monatlich.yml: letzter Erfolg vor 446 h (Frist 1008 h)
 ✓ bestand-bauen.yml: letzter Erfolg vor 1 h (Frist 18 h)
-✓ d1-verbrauch.yml: letzter Erfolg vor 24 h (Frist 48 h)
-✓ claude-anime2you-extraktion.yml: letzter Erfolg vor 0 h (Frist 3 h)
-✓ claude-wache-urteil.yml: letzter Erfolg vor 6 h (Frist 36 h)
-✓ claude-verpasst-recherche.yml: letzter Erfolg vor 4 h (Frist 36 h)
-✓ claude-daten-merge.yml: letzter Erfolg vor 0 h (Frist 48 h)
-✓ GITHUB_WECKER_TOKEN: letzter Start durch den Wecker vor 0 h
+✓ d1-verbrauch.yml: letzter Erfolg vor 23 h (Frist 48 h)
+✓ claude-anime2you-extraktion.yml: letzter Erfolg vor 1 h (Frist 3 h)
+✓ claude-wache-urteil.yml: letzter Erfolg vor 9 h (Frist 36 h)
+✓ claude-verpasst-recherche.yml: letzter Erfolg vor 7 h (Frist 36 h)
+✓ claude-daten-merge.yml: letzter Erfolg vor 1 h (Frist 48 h)
+✓ GITHUB_WECKER_TOKEN: letzter Start durch den Wecker vor 1 h
 ℹ Ablaufdatum unbekannt (gueltigBis leer): CLAUDE_CODE_OAUTH_TOKEN, LAUF_TOKEN, CR_ZUGANG, ANISEARCH_TOKEN, TMDB_API_KEY, YOUTUBE_API_KEY, STREAMING_API_KEY, SERPER_API_KEY, DATEN_APP_KEY, DISCORD_WEBHOOK, CLOUDFLARE_API_TOKEN, CLOUDFLARE_ANALYTICS_TOKEN, NACHT_MERGER_TOKEN, GITHUB_WECKER_TOKEN, MAIL_API_KEY, WEICHE_TOKEN — Daniel liest es einmal im Konto ab und trägt es ins Register ein.
 
 Zugänge unauffällig.
@@ -77,7 +81,7 @@ Serien, für die keine Termine entstanden — je Grund, mit der Veränderung sei
  229  Blöcke und Titel verschieden viele (±0)
   45  Folgenzahl geht nicht auf (±0)
    4  deutscher Termin vor der japanischen Ausstrahlung (±0)
-(Vergleich mit dem Stand vom 2026-11-21)
+(Vergleich mit dem Stand vom 2026-11-24)
 ```
 
 ## Tagebuch
@@ -86,6 +90,8 @@ Die letzten 60 Läufe. Älteres hat seinen Zweck erfüllt.
 
 | Zeitpunkt | Titel / Urteile / offen | Veränderung | Befund |
 |---|---|---|---|
+| 25.11.2026 18:58 | 2926 / 2314 / 151 | Titel -3, Urteile -2, offen +4 | 3 Titel weniger |
+| 24.11.2026 19:54 | 2926 / 2313 / 147 | Titel -3, Urteile -3, offen 0 | 3 Titel weniger |
 | 22.11.2026 16:18 | 2925 / 2298 / 153 | Titel -1, Urteile +2, offen -1 | 1 Titel weniger |
 | 18.11.2026 17:28 | 2925 / 2278 / 334 | Titel +1, Urteile +137, offen +30 | Patch Notes: anisearch-ende-nur-belegt liegt seit 2026-11-10 im Vorrat (wartet auf: Bestandsbau nach PR 3211 — jpEnd in aniSearch-Spalte und -Titeln nur bei belegtem Ende) – prüfen, ob die Wirkung live ist, dann freigeben; 4 Urteile verloren (3 weitere sind begründet entfernt) (4 weitere durch Kanal-Titel herabgestuft); 2 Titel ohne Synchro-Beleg (3 weitere durch Kanal-Titel herabgestuft) (1 weitere durch verschobenen Weg); disneyplus: 4 Synchro-Belege weniger; disneyplus: fehlt Black Clover (97940): https://www.disneyplus.com/browse/entity-484054dc-6486-477a-a31a-87163fbbb65a (link-check: {"status":200,"geprueftAm":"2026-11-09"}); disneyplus: fehlt Jujutsu Kaisen 0 (131573): https://www.disneyplus.com/browse/entity-7c74ce17-ce8d-42d7-b2b5-afc0db501194 (link-check: {"status":200,"geprueftAm":"2026-10-26"}); disneyplus: fehlt Demon Slayer: Kimetsu no Yaiba - Infinity Castle (178788): https://www.disneyplus.com/browse/entity-b8b65a37-0205-4771-bd07-24b5c4406034 (link-check: {"status":200,"geprueftAm":"2026-10-26"}); disneyplus: fehlt Star Wars: Visionen präsentiert - Die neunte Jedi (213847): https://www.disneyplus.com/de-de/browse/entity-921588f0-9a3b-4cd6-80d6-0a7cc9ed388a (link-check: {"status":200,"geprueftAm":"2026-11-09"}) |
 | 17.11.2026 17:54 | 2924 / 2141 / 303 | Titel +1, Urteile +1, offen -19 | 1 Titel weniger |

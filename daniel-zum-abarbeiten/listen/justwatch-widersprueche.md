@@ -15,14 +15,14 @@ JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine
 |---|---|---|---|---|
 | crunchyroll | 7 | 0 | 0.0 % | Flagge |
 | disneyplus | 14 | 0 | 0.0 % | Flagge |
-| primevideo | 142 | 0 | 0.0 % | Flagge |
+| primevideo | 141 | 0 | 0.0 % | Flagge |
 
 ### Widersprüche (0)
 
 | Titel | Anbieter | Adresse | JustWatch | Gemessen |
 |---|---|---|---|---|
 
-### Kandidaten für neue Wege (810)
+### Kandidaten für neue Wege (811)
 
 JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „Weg ohne Kennung“: ein Weg zum Anbieter steht, seine Adresse trägt aber keine Seitenkennung.
 
@@ -441,7 +441,7 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | Penguin Highway (101249) | Amazon Video | amazon:amzn1.dv.gti.02b91611-b461-cebf-e7f2-a7b47fe4bb51 | ja |
 | Boogiepop and Others (101283) | Aniverse Amazon Channel | amazon:amzn1.dv.gti.7aa5b3b8-12dd-4703-bef1-340fd628e659 | ja |
 | Die Welt in allen Farben: Iroduku (101316) | Aniverse Amazon Channel | amazon:amzn1.dv.gti.e587021e-1402-459e-b3fe-415f901b7191 | ja |
-| Black Fox (101317) | Crunchyroll | crunchyroll:G7PU4V40E | ja |
+| Black Fox (101317) | Crunchyroll | crunchyroll:GK9U3DDED | ja |
 | W’z (101337) | Amazon Prime Video | amazon:amzn1.dv.gti.862dcaff-9396-4498-bdcb-70ff93699d38 | ja |
 | Made in Abyss: Gefährten der Dämmerung (101344) | CineMix+ Amazon Channel | amazon:amzn1.dv.gti.18b83256-a558-424b-beb0-9f6bcffb0fe5 | ja |
 | Dororo (101347) | Amazon Prime Video | amazon:amzn1.dv.gti.89e7a785-27e3-495d-a485-532a8de222a4 | ja |
@@ -468,6 +468,7 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | Rascal Does Not Dream of a Dreaming Girl (104157) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.f0b9cb08-1c69-0163-d099-7dd0726e135c | nein |
 | Shikizakura (105119) | Aniverse Amazon Channel | amazon:amzn1.dv.gti.dc808391-6da1-4564-82aa-bb9e4fc5e187 | ja |
 | The Relative Worlds (104562) | Amazon Prime Video | amazon:amzn1.dv.gti.0a286973-21b7-4d9b-afe0-c5e1f020d1d4 | ja |
+| Ride Your Wave (105018) | Crunchyroll | crunchyroll:GMKUXZ287 | ja |
 | Darwin’s Game (105190) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.ff7803bf-9b4c-46aa-beee-abb5e2ccd76c | nein |
 | Cautious Hero: The Hero Is Overpowered but Overly Cautious (105156) | Crunchyroll | crunchyroll:G0DUN55JZ | ja |
 | Cautious Hero: The Hero Is Overpowered but Overly Cautious (105156) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.f95890b6-492d-4b5d-a31f-0a13c14f3b34 | nein |
@@ -625,7 +626,7 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | Shinobi no Ittoki (145604) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.c9d9bf3e-016b-41d4-bc40-187e8f06c68d | nein |
 | NieR:Automata Ver1.1a (145665) | Crunchyroll | crunchyroll:G50UZ5VDM | ja |
 | NieR:Automata Ver1.1a (145665) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.96f14089-6dde-4e53-9e32-bd6eddfa0e17 | ja |
-| Spice and Wolf: Merchant Meets the Wise Wolf (145728) | Crunchyroll | crunchyroll:G7PU3P5GE | nein |
+| Spice and Wolf: Merchant Meets the Wise Wolf (145728) | Crunchyroll | crunchyroll:GWDU7V9ZK | nein |
 | Spice and Wolf: Merchant Meets the Wise Wolf (145728) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.ace6b3ba-9d82-49c9-883d-da10bb274f0a | nein |
 | I’ve Somehow Gotten Stronger When I Improved My Farm-Related Skills (145815) | Aniverse Amazon Channel | amazon:amzn1.dv.gti.b8512336-9f32-41be-a161-33c8e306f8af | ja |
 | Vermeil in Gold (146210) | Aniverse Amazon Channel | amazon:amzn1.dv.gti.d1b34ba3-3cdd-472a-839b-c7500015a14f | ja |
@@ -843,9 +844,9 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 <!-- cartoons:start -->
 ## Cartoons
 
-Flagge „Deutsch“: 3 Wege, nur Hinweis: 0.
+Flagge „Deutsch“: 4 Wege, nur Hinweis: 0.
 
-JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine Flagge): mehrere Staffeln 143, Mehrteiler 1.
+JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine Flagge): mehrere Staffeln 144, Mehrteiler 1.
 
 | Anbieter | mit eigener Messung | Widersprüche | Anteil | Anzeige |
 |---|---|---|---|---|
@@ -857,7 +858,7 @@ JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine
 | Titel | Anbieter | Adresse | JustWatch | Gemessen |
 |---|---|---|---|---|
 
-### Kandidaten für neue Wege (68)
+### Kandidaten für neue Wege (67)
 
 JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „Weg ohne Kennung“: ein Weg zum Anbieter steht, seine Adresse trägt aber keine Seitenkennung.
 
@@ -881,7 +882,6 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | BE@RBRICK (-225303) | Apple TV Amazon Channel | amazon:amzn1.dv.gti.387eb37d-cca3-4098-af7e-c34980fab667 | nein |
 | The Mighty Nein (-219080) | Amazon Prime Video | amazon:amzn1.dv.gti.1e1f0f92-d306-414e-9ef8-f6b16e200ae4 | ja |
 | E.B. White's Charlotte's Web (-205192) | HBO Max Amazon Channel | amazon:amzn1.dv.gti.0bfe70b2-ed24-4f82-8be6-f02162673c32 | nein |
-| Mermaid Magic – Die magische Welt der Meerjungfrauen (-231725) | Amazon Prime Video | amazon:amzn1.dv.gti.7e7d159f-8489-404b-be00-2c658f9ceaec | nein |
 | Barney's World (-226126) | HBO Max Amazon Channel | amazon:amzn1.dv.gti.d7d9baf5-0360-4c40-adc8-5a41455c58dc | nein |
 | Creature Commandos (-219543) | HBO Max Amazon Channel | amazon:amzn1.dv.gti.215e4f90-cd45-4927-a7c3-1992f752defe | nein |
 | Silly Sundays (-225753) | HBO Max Amazon Channel | amazon:amzn1.dv.gti.ca2c343c-debd-4459-92db-ee1a90704595 | nein |
@@ -894,7 +894,7 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | Santa Inc. (-103214) | Lionsgate+ Amazon Channel | amazon:amzn1.dv.gti.229ba2f4-85bb-48a1-8c2b-7e7a03d4a2f3 | nein |
 | The Gumball Chronicles (-133529) | HBO Max Amazon Channel | amazon:amzn1.dv.gti.02bbed9d-726c-632d-e712-c40bb0d6a326 | nein |
 | Pikwik Pack (-128072) | RTL+ Max Amazon Channel | amazon:amzn1.dv.gti.bae7771e-831b-4fa6-8bab-25b8564031b3 | nein |
-| 100 Prozent Wolf - Die Legende des Mondsteins (-120161) | RTL+ Max Amazon Channel | amazon:amzn1.dv.gti.eda7de62-f24b-4e5e-942e-b1d7bac03037 | nein |
+| 100 % Wolf - Die Legende des Mondsteins (-120161) | RTL+ Max Amazon Channel | amazon:amzn1.dv.gti.eda7de62-f24b-4e5e-942e-b1d7bac03037 | nein |
 | Onyx Equinox (-99777) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.3c467fa5-a8ee-4f6b-845d-9b9735dc446f | nein |
 | Adventure Time: Ferne Länder (-94810) | HBO Max Amazon Channel | amazon:amzn1.dv.gti.1e7f3228-c946-482d-ac94-86791c2935ac | nein |
 | Talking Tom Heroes: Suddenly Super (-208313) | Amazon Prime Video | amazon:amzn1.dv.gti.0eba6d76-ed99-baa1-9625-01b9104cea8f | ja |

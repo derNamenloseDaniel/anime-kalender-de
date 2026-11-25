@@ -273,18 +273,21 @@ html:not(.dark) {
   --buehne-links-aus: rgba(255, 255, 255, 0);
 }
 
-/* Dezente Scrollbars, damit die Wochenspalten nicht ausfransen. */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
-}
-*::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-*::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.35);
-  border-radius: 4px;
+/* Dezente Scrollbars, damit die Wochenspalten nicht ausfransen. Im Layer `base`, sonst schlägt die
+   ungelayerte Regel jede Utility (`[scrollbar-width:none]` wirkte nie). */
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.35);
+    border-radius: 4px;
+  }
 }
 
 @keyframes fade-in {

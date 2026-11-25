@@ -1,6 +1,6 @@
 ---
 name: autonomer-modus
-description: "Wenn Daniel selbstständiges Arbeiten über einen Zeitraum aufträgt („autonomer modus bis 20 uhr\"): zuerst Wecker stellen, Ablauf je Wachphase, Arbeitsquellen, Rückfragegrenzen."
+description: "Wenn Daniel selbstständiges Arbeiten über einen Zeitraum aufträgt („autonomer modus bis 20 uhr\"), auch bei „start“ allein oder „weiter, autonomen modus starten“ (Morgenstart, Ende 23:30): zuerst Wecker stellen, Ablauf je Wachphase, Arbeitsquellen, Rückfragegrenzen."
 ---
 
 # Autonomer Modus: der erste Handgriff ist der Wecker
@@ -33,6 +33,7 @@ Noch vor jeder Recherche, jedem Werkzeugaufruf zur Sache, jeder Planung:
    wenn Daniel keine andere Endzeit nennt; nicht nachfragen. Nennt er eine, gilt seine. Auch
    bei „weiter“ in einer neuen Sitzung mit Übergabe „Autonomer Modus“ wird der Modus mit
    diesem Ende gestartet. Ein autonomer Modus ohne Ende gibt es nie.
+   **„start“ allein ist der Morgenstart** (Daniel, 24.11.2026: „das ‚weiter. autonomen modus starten‘ was ich jeden morgen sage, soll auch mit ‚start‘ funktionieren“). Er bedeutet dasselbe wie „weiter, autonomen Modus starten“: Ende 23:30, Orchester ablösen, Nachtbericht auswerten (`docs/wissen/cloud-orchester.md`), dann nach Rang (`node tools/naechster.mjs`). Es startet nur die Schleife, nie einen Server oder Dauerlauf.
 2. **Prüfen, ob schon eine Schleife läuft** (`TaskList`). Zwei Schleifen auf denselben Auftrag
    wecken doppelt und arbeiten gegeneinander.
 3. **Marker schreiben:** Endzeit (ISO, mit Offset) in `~/.claude/autonomer-modus/<Sitzungs-ID>.txt` (Sitzungs-ID = Name des Scratchpad-Ordners bzw. der Transkript-Datei; je Sitzung ein Marker, damit Routinen und andere Sitzungen nicht mitlaufen — Daniel, 14.10.2026)

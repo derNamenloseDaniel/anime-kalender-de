@@ -2,7 +2,6 @@ import { readJson, writeJson, log, clearDir } from '../lib/util.ts'
 import { OUT } from './grundlagen.ts'
 import { schreibeOhneSynchro, schreibeNeuMitSynchro, schreibeMeldungen } from './nebendateien.ts'
 import { schreibeFolgenDateien } from './folgen-dateien.ts'
-import { type StaffelSammel } from './staffel-titel.ts'
 import {
   SYNOPSIS_GROUPS,
   type DiscAusgabe,
@@ -11,19 +10,19 @@ import {
 } from '../../shared/types.ts'
 import { nachAusstrahlung, unterscheidenderZusatz } from '../../shared/titles.ts'
 import { alleStaffelQuellen } from './staffel-quelle.ts'
-import { ladeStaffelGrenzen, staffelEnden } from '../lib/pokemon-staffeln.ts'
+import { geteilteStaffeln, ladeStaffelGrenzen, staffelEnden, staffelNamen } from '../lib/pokemon-staffeln.ts'
 import { ANILIST_COVER_BASIS } from '../../shared/mappings.ts'
 import { type AnisearchEintrag } from './01-quellen.ts'
 import { type SynopsisEintrag } from './13-1-anreichern.ts'
 import { type SlimTitel } from './13-2-auslieferung.ts'
 import { ergaenzeCoverGross } from './cover-gross.ts'
+import { ausgelieferteCartoons, riegelHandlungQuellen } from '../lib/handlung-quellen.ts'
 import { ohneBelegteSynchro } from './synchro-belegt.ts'
 import { schreibeSaisonDatei } from './saison-datei.ts'
-import { cartoonsMitReihe, ladeAlleEigenenWerke, markiereEigeneWerke, mitStaffelTiteln } from './cartoon-reihen.ts'
+import { cartoonsMitReihe, ladeAlleEigenenWerke, markiereEigeneWerke } from './cartoon-reihen.ts'
 import { markiereRemakes } from './remake-von.ts'
 import { schreibeAnisearchOffen } from './anisearch-kennung.ts'
 import { ladeKatalogEintraege } from '../lib/katalog-eingefroren.ts'
-import { lesekennung } from '../../shared/staffel-titel.ts'
 
 /** Eingaben von `schreibeZusatzdateien`. */
 export interface ZusatzEingabe {
@@ -34,7 +33,6 @@ export interface ZusatzEingabe {
   releases: Release[]
   synopses: Record<number, SynopsisEintrag>
   jpStartAnzeige: Map<number, string>
-  staffelSammel?: StaffelSammel[]
 }
 
 /** Ein Titel, wie die Reihen ihn führen: ausgeliefert, Cartoon oder Katalogtitel (`ohneSynchro`). */
@@ -71,8 +69,11 @@ function schreibeSynonyme(titles: Map<number, Title>, anisearch: Record<string, 
       .slice(0, 12)
     if (neu.length) synonyme[id] = neu
   }
+  /* Staffelnamen aus der Yaml zuerst: Die Suche „Gute Aussichten“ findet die Serie, deren Abschnitt so heißt (F157). */
+  const namen = staffelNamen(ladeStaffelGrenzen())
   for (const t of titles.values()) {
-    aufnehmen(t.id, anisearch[lesekennung(t)]?.info?.synonyms, [t.titleDe, t.titleEn, t.titleRomaji, t.titleNative])
+    const eigene = Object.values(namen.get(t.id) ?? {})
+    aufnehmen(t.id, [...eigene, ...(anisearch[t.id]?.info?.synonyms ?? [])], [t.titleDe, t.titleEn, t.titleRomaji, t.titleNative])
   }
   for (const [id, e] of Object.entries(katalogTitel)) {
     if (!synonyme[id]) aufnehmen(Number(id), e.synonyme, [])
@@ -241,6 +242,7 @@ function baueReihen(fuerReihen: ReihenTitel[], imBestand: Set<number>, kontext: 
   /* Die belegte deutsche Staffelangabe (aniSearch) steuert die Beschriftung, nicht den Titel. */
   const staffelQuellen = alleStaffelQuellen()
   const staffelBisse = staffelEnden(ladeStaffelGrenzen())
+  const staffelGeteilt = geteilteStaffeln()
   const elternVon = ladeElternKanten()
   const reihen: Record<number, FranchiseMember[]> = {}
   for (const [key, liste] of gruppiereNachReihe(fuerReihen)) {
@@ -271,13 +273,14 @@ function baueReihen(fuerReihen: ReihenTitel[], imBestand: Set<number>, kontext: 
         Datum, die auf der Seite sichtbar sind: „Lord of Mysteries Specials"
         zeigte im Panel nur sein Format, obwohl AniList den 20.06.2026 führt.
       */
-      jpStart: t.jpStart ?? jpStartAnzeige.get(lesekennung(t)),
+      jpStart: t.jpStart ?? jpStartAnzeige.get(t.id),
       jpStatus: t.jpStatus,
       deStart: deStart.get(t.id),
       ohneSynchro: (t as { ohneSynchro?: boolean }).ohneSynchro || ohneBelegteSynchro(t, releases) || undefined,
       /* Die belegte deutsche Staffelangabe — sie entscheidet die Beschriftung. */
       staffelQuelle: staffelQuellen.get(t.id),
       staffelBis: staffelBisse.get(t.id),
+      staffelFolgen: staffelGeteilt.get(t.id),
       /* Hängt er an einem anderen Teil **dieser** Reihe? Eine fremde Elternkante zählt nicht. */
       beiwerk: (elternVon.get(t.id) ?? []).some((e) => sortiert.some((x) => x.id === e)) || undefined,
       // Nur der Dateiname; den Vorsatz hängt `loadFranchises` wieder an.
@@ -354,7 +357,7 @@ function setzeKinoEnden(releases: Release[]): void {
   if (kinoEnden) log(`${kinoEnden} Kino-Release(s) mit belegtem letzten Spieltag`)
 }
 
-export function schreibeZusatzdateien({ titles, anisearch, slim, verschoben, releases, synopses, jpStartAnzeige, staffelSammel = [] }: ZusatzEingabe): void {
+export function schreibeZusatzdateien({ titles, anisearch, slim, verschoben, releases, synopses, jpStartAnzeige }: ZusatzEingabe): void {
   schreibeSynonyme(titles, anisearch)
   // Kennung → Reihe: das Erste sortiert die schon gepflegten Titel aus, das
   // Zweite hält Reihen zusammen, die über die Grenze der beiden Bestände gehen.
@@ -366,10 +369,11 @@ export function schreibeZusatzdateien({ titles, anisearch, slim, verschoben, rel
     new Set(releases.map((r) => r.titleId)),
   )
   schreibeNeuMitSynchro(slim, releases)
-  schreibeFolgenDateien([...titles.values()], releases, staffelSammel)
+  schreibeFolgenDateien([...titles.values()], releases)
   ergaenzeCoverGross(synopses, slim)
   schreibeSaisonDatei(titles, releases)
   schreibeAnisearchOffen(slim)
+  riegelHandlungQuellen(synopses, ausgelieferteCartoons(readJson<Title[]>(`${OUT}/cartoons.json`, []), readJson<Title[]>(`${OUT}/titles-core.json`, [])))
   schreibeSynopsenGruppen(synopses)
   schreibeDiscGruppen(titles)
   /*
@@ -404,7 +408,7 @@ export function schreibeZusatzdateien({ titles, anisearch, slim, verschoben, rel
   const imBestand = new Set([...slim, ...cartoons].map((t) => t.id))
   const fuerReihen: ReihenTitel[] = [...slim, ...cartoons, ...ausKatalog.filter((t) => !imBestand.has(t.id)).map((t) => ({ ...t, ohneSynchro: true }))]
   const reihen = baueReihen(fuerReihen, imBestand, { releases, jpStartAnzeige, deStart })
-  writeJson(`${OUT}/franchises.json`, markiereEigeneWerke(markiereRemakes(reihen, fuerReihen), mitStaffelTiteln(ladeAlleEigenenWerke(), titles.values())))
+  writeJson(`${OUT}/franchises.json`, markiereEigeneWerke(markiereRemakes(reihen, fuerReihen), ladeAlleEigenenWerke()))
   log(`${Object.keys(reihen).length} Reihen mit mehr als einem Eintrag geschrieben`)
 
   schreibeMeldungen(slim)

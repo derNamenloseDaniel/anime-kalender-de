@@ -146,24 +146,33 @@ case "$1 $2" in
   "pr create") echo x >> "$D/create-aufrufe"
     if [ "$(wc -l < "$D/create-aufrufe")" -le "$(cat "$D/create-fehler")" ]; then echo "HTTP 502: Bad Gateway (Versuch $(wc -l < "$D/create-aufrufe"))" >&2; exit 1; fi
     echo "https://github.com/x/y/pull/99" ;;
-  "pr list") [ -f "$D/schon-da" ] && echo "https://github.com/x/y/pull/88"; exit 0 ;;
-  "pr view") echo "MERGEABLE" ;;
-  "pr merge") exit 0 ;;
+  "pr list") [ -f "$D/schon-da" ] && echo "https://github.com/x/y/pull/88"
+    if [ -f "$D/da-ab" ] && [ "$(wc -l < "$D/create-aufrufe")" -ge "$(cat "$D/da-ab")" ]; then echo "https://github.com/x/y/pull/77"; fi
+    exit 0 ;;
+  "pr view") case "$*" in *state*) [ -f "$D/view-fehler" ] && exit 1; echo OPEN ;; *) echo MERGEABLE ;; esac ;;
+  "pr merge") echo x >> "$D/merge-aufrufe"
+    if [ -f "$D/merge-fehler" ] && [ "$(wc -l < "$D/merge-aufrufe")" -le "$(cat "$D/merge-fehler")" ]; then echo "HTTP 502: Bad Gateway (Merge $(wc -l < "$D/merge-aufrufe"))" >&2; exit 1; fi
+    exit 0 ;;
 esac
 `,
   )
   chmodSync(join(bin2, 'gh'), 0o755)
   chmodSync(join(bin2, 'sleep'), 0o755)
-  const anlegen = (nr, fehlerAnzahl, schonDa = false) => {
+  const anlegen = (nr, fehlerAnzahl, schonDa = false, daAb = 0, mergeFehler = 0) => {
     writeFileSync(join(bin2, 'create-fehler'), String(fehlerAnzahl))
     writeFileSync(join(bin2, 'create-aufrufe'), '')
+    writeFileSync(join(bin2, 'merge-aufrufe'), '')
     rmSync(join(bin2, 'schon-da'), { force: true })
+    rmSync(join(bin2, 'da-ab'), { force: true })
+    rmSync(join(bin2, 'merge-fehler'), { force: true })
+    if (daAb) writeFileSync(join(bin2, 'da-ab'), String(daAb))
+    if (mergeFehler) writeFileSync(join(bin2, 'merge-fehler'), String(mergeFehler))
     if (schonDa) writeFileSync(join(bin2, 'schon-da'), '')
     writeFileSync(join(lauf, 'data/cinestar.json'), `{"anlegen":${nr}}`)
     const aus = join(dir, `ausgabe-${nr}.txt`)
     writeFileSync(aus, '')
     const res = sh(lauf, `PATH="${posix(bin2)}:$PATH" GITHUB_OUTPUT="${posix(aus)}" GITHUB_RUN_ID=8${nr} QUELLEN_PRUEFBEFEHL=true bash tools/quellen-pr.sh "chore(data): anlegen ${nr}"`, {})
-    return { ...res, aufrufe: readFileSync(join(bin2, 'create-aufrufe'), 'utf8').split('\n').filter(Boolean).length, ausgabe: readFileSync(aus, 'utf8') }
+    return { ...res, merges: readFileSync(join(bin2, 'merge-aufrufe'), 'utf8').split('\n').filter(Boolean).length, aufrufe: readFileSync(join(bin2, 'create-aufrufe'), 'utf8').split('\n').filter(Boolean).length, ausgabe: readFileSync(aus, 'utf8') }
   }
   const zweimal = anlegen(1, 2)
   pruefe('PR-Anlegen: zwei Fehlversuche, der dritte gelingt', zweimal.status === 0 && zweimal.aufrufe === 3 && /pr=99/.test(zweimal.ausgabe), `${zweimal.status} ${zweimal.aufrufe} ${zweimal.out.slice(-300)}`)
@@ -172,6 +181,19 @@ esac
   pruefe('PR-Anlegen: ein trotz Fehler entstandener PR wird übernommen, kein zweites create', schonDa.status === 0 && schonDa.aufrufe === 1 && /pr=88/.test(schonDa.ausgabe), `${schonDa.status} ${schonDa.aufrufe} ${schonDa.ausgabe}`)
   const dreimal = anlegen(3, 3)
   pruefe('PR-Anlegen: drei Fehlversuche enden rot mit ::error:: und letztem Text', dreimal.status !== 0 && dreimal.aufrufe === 3 && /::error::.*nach drei Versuchen.*Bad Gateway \(Versuch 3\)/.test(dreimal.out), `${dreimal.status} ${dreimal.aufrufe} ${dreimal.out.slice(-300)}`)
+  // 502 beim dritten create, der PR entstand trotzdem (Läufe 45650281762 und 45650286140, 25.11.2026): übernehmen statt ::error::.
+  const letzter = anlegen(4, 3, false, 3)
+  pruefe('PR-Anlegen: nach dem dritten Fehlversuch wird ein entstandener PR übernommen und gemergt', letzter.status === 0 && letzter.aufrufe === 3 && /pr=77/.test(letzter.ausgabe) && /gemerged=true/.test(letzter.ausgabe) && !/::error::/.test(letzter.out), `${letzter.status} ${letzter.aufrufe} ${letzter.ausgabe} ${letzter.out.slice(-300)}`)
+  // 502 beim Merge: der echte Grund steht im Log, nicht „main hat sich bewegt“ (auch im Rot-Zweig nach erschöpften Pausen).
+  const mergeEinmal = anlegen(5, 0, false, 0, 1)
+  pruefe('Merge: ein 502 wird mit seinem Text gemeldet, nicht als „main hat sich bewegt“', mergeEinmal.status === 0 && mergeEinmal.merges === 2 && /Serverfehler \(HTTP 502: Bad Gateway \(Merge 1\)\)/.test(mergeEinmal.out) && !/main hat sich bewegt/.test(mergeEinmal.out) && /gemerged=true/.test(mergeEinmal.ausgabe), `${mergeEinmal.status} ${mergeEinmal.merges} ${mergeEinmal.out.slice(-400)}`)
+  const mergeImmer = anlegen(6, 0, false, 0, 99)
+  pruefe('Merge: dauerhaft 502 endet rot nach fünf Versuchen, der echte Grund steht im ::error::', mergeImmer.status !== 0 && mergeImmer.merges === 5 && /::error::.*zuletzt: HTTP 502: Bad Gateway \(Merge 5\)/.test(mergeImmer.out) && /gemerged=false/.test(mergeImmer.ausgabe) && /pr=99/.test(mergeImmer.ausgabe), `${mergeImmer.status} ${mergeImmer.merges} ${mergeImmer.out.slice(-400)}`)
+  // Die Zustandsabfrage vor dem nächsten Versuch scheitert selbst (leere Antwort): kein gemerged=true aus dem Nichts, es wird weiter versucht.
+  writeFileSync(join(bin2, 'view-fehler'), '')
+  const abfrageWeg = anlegen(7, 0, false, 0, 99)
+  pruefe('Merge: scheiternde Zustandsabfrage gilt nicht als gemergt, alle fünf Versuche laufen, rot', abfrageWeg.status !== 0 && abfrageWeg.merges === 5 && /gemerged=false/.test(abfrageWeg.ausgabe) && !/gemerged=true/.test(abfrageWeg.ausgabe), `${abfrageWeg.status} ${abfrageWeg.merges} ${abfrageWeg.out.slice(-300)}`)
+  rmSync(join(bin2, 'view-fehler'), { force: true })
 
   // `gh pr merge` scheitert mit GitHub-5xx (Lauf 45650281762, 25.11.2026: über 2 Minuten 502/„Something went wrong"): wachsende Pausen, vor jedem neuen Versuch Zustand lesen;
   // „Base branch was modified" bleibt bei kurzen Pausen und sechs Versuchen.

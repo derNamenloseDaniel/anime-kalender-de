@@ -87,9 +87,3 @@ export function markiereEigeneWerke(reihen: Record<number, FranchiseMember[]>, e
   for (const id of eigene) if (!gesehen.has(id)) warn(`${EIGENE_DATEI} / ${SPINOFF_DATEI}: ${id} steht in keiner Reihe`)
   return reihen
 }
-
-/** Die Handlisten samt den Staffel-Titeln (`staffelTitel`), die der Bau aus einem gelisteten Sammeltitel schneidet: Sie sind ebenso eigene Werke. */
-export function mitStaffelTiteln(eintraege: EigeneSerien[], titel: Iterable<{ id: number; staffelTitel?: { sammel: number } }>): EigeneSerien[] {
-  const staffeln = [...titel].filter((t) => t.staffelTitel)
-  return eintraege.map((e) => ({ ...e, ids: [...e.ids, ...staffeln.filter((t) => e.ids.includes(t.staffelTitel!.sammel) && !e.ids.includes(t.id)).map((t) => t.id)] }))
-}

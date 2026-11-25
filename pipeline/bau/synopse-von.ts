@@ -19,15 +19,12 @@ export function synopseVon({ t, asId, ausAnisearch, ausTmdb, trenneQuelle }: {
   if (ausAnisearch) {
     const { text, url } = trenneQuelle(ausAnisearch)
     eintrag.de = text
-    eintrag.deSource = { name: 'anisearch.de', url: url ? anisearchKanonisch(url) : (anisearchSeite(asId) ?? 'https://www.anisearch.de/') }
+    // Ohne Titel-Adresse keine Quelle statt der Startseite; der Wächter (`handlungQuellenFehler`) meldet den Fall.
+    const adresse = url ? anisearchKanonisch(url) : anisearchSeite(asId)
+    if (adresse) eintrag.deSource = { name: 'anisearch.de', url: adresse }
   } else if (ausTmdb?.overviewDe) {
     eintrag.de = ausTmdb.overviewDe
-    eintrag.deSource = {
-      name: 'themoviedb.org',
-      url: ausTmdb.tmdbId
-        ? `https://www.themoviedb.org/${ausTmdb.kind === 'movie' ? 'movie' : 'tv'}/${ausTmdb.tmdbId}`
-        : 'https://www.themoviedb.org/',
-    }
+    if (ausTmdb.tmdbId) eintrag.deSource = { name: 'themoviedb.org', url: `https://www.themoviedb.org/${ausTmdb.kind === 'movie' ? 'movie' : 'tv'}/${ausTmdb.tmdbId}` }
   }
   if (!ausAnisearch && asId !== undefined) eintrag.asUrl = anisearchSeite(asId)
   return eintrag

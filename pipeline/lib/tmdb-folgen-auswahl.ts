@@ -32,6 +32,15 @@ export function frischFaellig(alt: BestandKurz, heute: string): boolean {
   return alt.folgen.some((f) => f.s >= 1 && !!f.datum && f.datum <= heute && f.datum >= addDays(heute, -FENSTER_TAGE) && !hatEchtenTitel(f))
 }
 
+/**
+ * Angekündigte Folge (Datum heute oder später): TMDB trägt Verschiebungen laufend nach, die Grundfrist von 30 Tagen käme nach dem Termin.
+ * Gleiche Frist wie bei Disc-Terminen (`disc-termin-frische.ts`, 7 Tage), hier 6 wegen des Wochenlaufs (bei `> 7` fiele jeder zweite Lauf aus).
+ */
+export function terminFaellig(alt: BestandKurz, heute: string): boolean {
+  if (diffDays(alt.geholtAm, heute) < FRISCH_TAGE) return false
+  return alt.folgen.some((f) => f.s >= 1 && !!f.datum && f.datum >= heute)
+}
+
 /** Zusatztage der Grundfrist: 0/7/14/21 je Kennung mod 4, damit eine Welle gleich alter Abrufe in Wochenportionen zerfällt. Später statt früher, damit kein Titel öfter als alle `alterTage` kommt; eine nicht numerische Kennung bekommt 0. */
 export function versatzTage(id: string | undefined): number {
   const n = Number(id)
@@ -52,7 +61,7 @@ export function waehleFaellige<T extends { id: string }>(
   const rest: T[] = []
   for (const k of kandidaten) {
     const alt = bestand[k.id]
-    if (alt && frischFaellig(alt, heute)) frisch.push(k)
+    if (alt && (frischFaellig(alt, heute) || terminFaellig(alt, heute))) frisch.push(k)
     else if (grundFaellig(alt, heute, alterTage, k.id)) rest.push(k)
   }
   return [...frisch, ...rest].slice(0, limit)

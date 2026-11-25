@@ -24,6 +24,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { gzipSync } from 'node:zlib'
 import { titelAus } from './lib/anisearch-titel.ts'
+import { titelFaellig } from './lib/anisearch-faellig.ts'
 import { bauQuelltext, panelQuelltext, workerQuelltext } from './lib/quelltext.ts'
 import yaml from 'js-yaml'
 import { discSlug, slugify } from './lib/util.ts'
@@ -3411,7 +3412,7 @@ console.log('\nJapanischer Start: so genau wie die Quelle, und angekündigte Tit
 {
   const bau = bauQuelltext()
   const abruf = readFileSync('pipeline/fetch.ts', 'utf8')
-  pruefe('der Reihe geht das genaue, nicht das aufgefüllte Datum mit', /jpStart: t\.jpStart \?\? jpStartAnzeige\.get\(lesekennung\(t\)\)/.test(bau))
+  pruefe('der Reihe geht das genaue, nicht das aufgefüllte Datum mit', /jpStart: t\.jpStart \?\? jpStartAnzeige\.get\(t\.id\)/.test(bau))
   pruefe('ohne Tag bleibt es beim Monat', /if \(!d\.day\) return `\$\{d\.year\}-\$\{p\(d\.month\)\}`/.test(bau))
   const { zuHolen } = await import('./lib/anilist-mangel.ts')
   const { eintragNochOffen } = await import('./lib/anilist.ts')
@@ -3741,7 +3742,8 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
   */
   pruefe(
     'ein verneinender Handbeleg sperrt den Anbieter',
-    bau.includes('if (beleg && (beleg.dub !== true || beleg.available === false)) continue'),
+    bau.includes('if (beleg && (beleg.dub !== true || beleg.available === false)) continue') &&
+      bau.includes('if (beleg && (beleg.dub !== true || beleg.available === false)) return true'),
     'am 25.08.2026 hat ein Lauf so fünf geprüfte Neins überschrieben',
   )
   pruefe(
@@ -3751,7 +3753,7 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
   )
   pruefe(
     'bei Amazon zählt nur, was als Video belegt ist',
-    bau.includes("if (ziel === 'primevideo' && linkBefunde[url]?.prime !== true) continue"),
+    bau.includes("if (ziel === 'primevideo' && linkBefunde[url]?.prime !== true) return true"),
     'hinter /dp/ kann eine DVD liegen — eine Disc als Stream wäre schlimmer als kein Weg',
   )
   /*
@@ -4309,7 +4311,7 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
   )
   pruefe(
     'späte Ergänzungen legen keine laut Linkprüfung tote Adresse an',
-    (bau.match(/if \(lautPruefungTot\(url\)\) continue/g) ?? []).length >= 2,
+    (bau.match(/if \(lautPruefungTot\(url\)\) continue|return lautPruefungTot\(url\)/g) ?? []).length >= 2,
     'sonst stehen 404-Adressen ohne Sprachurteil im Datensatz (sechs Joyn-Verweise, 20.08.–17.09.2026)',
   )
   pruefe(
@@ -4422,9 +4424,15 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
   )
 
   const holer = readFileSync('pipeline/fetch-anisearch-titel.ts', 'utf8')
+  /* Die Regel steht in lib/anisearch-faellig.ts: als Lauf geprüft, nicht per Quelltext (Grenze der Textlesungen). */
+  const fristOpt = { jetzt: Date.parse('2026-11-24'), alterTage: 180, parserStand: 3 }
+  const altTag = (quelle: string, tage: number) => ({ fetchedAt: new Date(fristOpt.jetzt - tage * 86_400_000).toISOString(), stand: 3, quelle, synonyme: [] })
   pruefe(
     'die Warteschlange bildet sich über das Alter, nicht über „fehlt noch"',
-    holer.includes('const faellig =') && holer.includes("e.quelle === 'ueberschrift'"),
+    holer.includes('const faellig =') &&
+      [40, 90].every((t) => titelFaellig(altTag('ueberschrift', t), fristOpt)) &&
+      [40, 90].every((t) => !titelFaellig(altTag('sprachblock', t), fristOpt)) &&
+      [5, 20].every((t) => !titelFaellig(altTag('ueberschrift', t), fristOpt)),
     'ein Filter „hole, was fehlt" macht jede Antwort endgültig — auch die falsche',
   )
 }
@@ -6021,7 +6029,7 @@ pruefe(
   const suchfeldQuelle = readFileSync('web/src/components/Suchfeld.tsx', 'utf8')
   const headerQuelle = readFileSync('web/src/components/Header.tsx', 'utf8')
   const kopfSucheQuelle = readFileSync('web/src/components/kopf-suche.tsx', 'utf8')
-  const uiQuelle = readFileSync('web/src/components/ui.tsx', 'utf8')
+  const uiQuelle = ['ui.tsx', 'tooltip-blase.tsx'].map((d) => readFileSync(`web/src/components/${d}`, 'utf8')).join('\n')
   pruefe(
     'das Fragezeichen sitzt im Feld rechts',
     /relative flex w-full items-center/.test(suchfeldQuelle) &&

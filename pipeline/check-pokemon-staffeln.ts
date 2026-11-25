@@ -10,7 +10,7 @@ import { join } from 'node:path'
 import { hauptstaffeln, staffelBeschriftungen, staffelSpanne, staffelStaende } from '../shared/titles.ts'
 import { ladeAlleEigenenWerke, markiereEigeneWerke } from './bau/cartoon-reihen.ts'
 import { alleStaffelQuellen } from './bau/staffel-quelle.ts'
-import { POKEMON_STAFFELN, fehlerInGrenzen, ladeStaffelGrenzen, staffelFeld, staffelEnden, staffelListen, startStaffeln } from './lib/pokemon-staffeln.ts'
+import { POKEMON_STAFFELN, fehlerInGrenzen, geteilteStaffeln, ladeStaffelGrenzen, staffelFeld, staffelEnden, staffelListen, startStaffeln } from './lib/pokemon-staffeln.ts'
 
 let fehler = 0
 function pruefe(name: string, ok: boolean, info = ''): void {
@@ -111,6 +111,20 @@ const probe = join(ordner, 'probe.yaml')
 writeFileSync(probe, 'titel:\n  - { anilistId: 1, staffeln: [] }\n  - { anilistId: 2, staffeln: [{ nr: 1, von: 1, bis: 3, folgen: 3 }] }\n  - { anilistId: 3 }\n')
 pruefe('Titel ohne Staffeln fallen beim Laden weg', ladeStaffelGrenzen(probe).map((t) => t.anilistId).join() === '2')
 pruefe('Fehlende Datei ergibt eine leere Liste', ladeStaffelGrenzen(join(ordner, 'gibt-es-nicht.yaml')).length === 0)
+
+/* Geteilte Staffeln (`staffelFolgen` an `franchises.json`): Staffel 15, 16 und 25 stehen in je mehr als einem Titel; Horizonte zählt für sich. */
+const geteilt = geteilteStaffeln([POKEMON_STAFFELN])
+const erwartetGeteilt: Record<number, string> = {
+  9107: '[[15,1,36]]',
+  14093: '[[15,37,49],[16,1,11]]',
+  17115: '[[16,12,25]]',
+  17873: '[[16,26,45]]',
+  112153: '[[25,1,46]]',
+  158870: '[[25,47,57]]',
+}
+for (const [id, soll] of Object.entries(erwartetGeteilt)) pruefe(`Geteilte Staffeln: Titel ${id} zählt innerhalb der Staffel ${soll}`, JSON.stringify(geteilt.get(Number(id))) === soll, JSON.stringify(geteilt.get(Number(id))))
+pruefe('Geteilte Staffeln: ein Titel allein in seiner Staffel fehlt', !geteilt.has(527) && !geteilt.has(19291))
+pruefe('Geteilte Staffeln: Horizonte (eigene Zählung) teilt nichts mit der Hauptserie', geteilteStaffeln().get(158871) === undefined)
 
 if (fehler) process.exit(1)
 console.log('check-pokemon-staffeln: ok')

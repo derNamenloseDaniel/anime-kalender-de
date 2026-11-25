@@ -94,13 +94,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2026-11-25@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261125T163000Z
-DTEND:20261125T170000Z
+DTSTART:20261125T151500Z
+DTEND:20261125T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 5/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6013/
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
+ etails: https://anime-kalender.de/t/16013/
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
@@ -144,8 +142,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2026-12-02@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261202T163000Z
-DTEND:20261202T170000Z
+DTSTART:20261202T151500Z
+DTEND:20261202T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 6/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -255,8 +253,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2026-12-09@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261209T163000Z
-DTEND:20261209T170000Z
+DTSTART:20261209T151500Z
+DTEND:20261209T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 7/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -292,8 +290,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2026-12-16@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261216T163000Z
-DTEND:20261216T170000Z
+DTSTART:20261216T151500Z
+DTEND:20261216T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 8/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -302,10 +300,10 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
-UID:virgin-road-vol2@2026-12-17@anime-kalender-de
+UID:virgin-road-vol2@2026-12-18@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261217
-DTEND;VALUE=DATE:20261218
+DTSTART;VALUE=DATE:20261218
+DTEND;VALUE=DATE:20261219
 SUMMARY:Virgin Road – Vol. 2 (Disc)
 DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
  och nicht bestätigt.\nDetails: https://anime-kalender.de/t/12466/
@@ -339,8 +337,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2026-12-23@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261223T163000Z
-DTEND:20261223T170000Z
+DTSTART:20261223T151500Z
+DTEND:20261223T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 9/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -376,8 +374,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2026-12-30@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261230T163000Z
-DTEND:20261230T170000Z
+DTSTART:20261230T151500Z
+DTEND:20261230T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 10/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -400,8 +398,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2027-01-06@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20270106T163000Z
-DTEND:20270106T170000Z
+DTSTART:20270106T151500Z
+DTEND:20270106T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 11/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -412,8 +410,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2027-01-13@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20270113T163000Z
-DTEND:20270113T170000Z
+DTSTART:20270113T151500Z
+DTEND:20270113T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 12/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus

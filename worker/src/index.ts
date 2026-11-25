@@ -401,57 +401,63 @@ async function handleNetzfund(request: Request, env: Env): Promise<Response> {
  * anders lief als vorgesehen — nicht jede geprüfte Folge.
  */
 async function handleVorfall(request: Request, env: Env): Promise<Response> {
-  const offen = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-  const antwort = (body: unknown, status = 200) =>
-    new Response(JSON.stringify(body), { status, headers: offen })
+  if (request.method === 'GET') return vorfallLesen(request, env)
+  if (request.method === 'DELETE') return vorfallLoeschen(request, env)
+  if (request.method !== 'POST') return vorfallAntwort({ error: 'GET, POST oder DELETE erwartet' }, 405)
+  return vorfallMelden(request, env)
+}
 
-  if (request.method === 'GET') {
-    const token = tokenAusKopf(request)
-    if (!env.LAUF_TOKEN || !tokenGleich(token, env.LAUF_TOKEN)) return antwort({ error: 'Nicht erlaubt' }, 403)
-    const { results } = await env.DB.prepare(
-      `SELECT id, plattform, art, url, reihe, folge_nr, staffel, text, version, gemeldet_am
+const VORFALL_KOPF = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+const vorfallAntwort = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), { status, headers: VORFALL_KOPF })
+
+const vorfallErlaubt = (request: Request, env: Env) =>
+  Boolean(env.LAUF_TOKEN) && tokenGleich(tokenAusKopf(request), env.LAUF_TOKEN)
+
+async function vorfallLesen(request: Request, env: Env): Promise<Response> {
+  if (!vorfallErlaubt(request, env)) return vorfallAntwort({ error: 'Nicht erlaubt' }, 403)
+  const { results } = await env.DB.prepare(
+    `SELECT id, plattform, art, url, reihe, folge_nr, staffel, text, version, gemeldet_am
          FROM vorfall ORDER BY gemeldet_am DESC LIMIT 500`,
-    ).all()
-    return antwort({ vorfaelle: results ?? [] })
-  }
+  ).all()
+  return vorfallAntwort({ vorfaelle: results ?? [] })
+}
 
-  /*
-    **Löschen gehört dazu.** Ein abgeholter Vorfall, der liegen bleibt, taucht
-    beim nächsten Lauf wieder auf und sieht aus wie ein neuer — dieselbe Falle,
-    die `/pruefung` mit seinem DELETE vermeidet.
-  */
-  if (request.method === 'DELETE') {
-    const token = tokenAusKopf(request)
-    if (!env.LAUF_TOKEN || !tokenGleich(token, env.LAUF_TOKEN)) return antwort({ error: 'Nicht erlaubt' }, 403)
-    let ids: number[] = []
-    try {
-      const daten = (await request.json()) as { ids?: unknown }
-      ids = Array.isArray(daten.ids) ? daten.ids.map(Number).filter(Number.isFinite) : []
-    } catch {
-      return antwort({ error: 'Kein gültiges JSON' }, 400)
-    }
-    if (!ids.length) return antwort({ ok: true, geloescht: 0 })
-    const platzhalter = ids.map((_, i) => `?${i + 1}`).join(', ')
-    await env.DB.prepare(`DELETE FROM vorfall WHERE id IN (${platzhalter})`)
-      .bind(...ids)
-      .run()
-    return antwort({ ok: true, geloescht: ids.length })
+/*
+  **Löschen gehört dazu.** Ein abgeholter Vorfall, der liegen bleibt, taucht
+  beim nächsten Lauf wieder auf und sieht aus wie ein neuer — dieselbe Falle,
+  die `/pruefung` mit seinem DELETE vermeidet.
+*/
+async function vorfallLoeschen(request: Request, env: Env): Promise<Response> {
+  if (!vorfallErlaubt(request, env)) return vorfallAntwort({ error: 'Nicht erlaubt' }, 403)
+  let ids: number[] = []
+  try {
+    const daten = (await request.json()) as { ids?: unknown }
+    ids = Array.isArray(daten.ids) ? daten.ids.map(Number).filter(Number.isFinite) : []
+  } catch {
+    return vorfallAntwort({ error: 'Kein gültiges JSON' }, 400)
   }
+  if (!ids.length) return vorfallAntwort({ ok: true, geloescht: 0 })
+  const platzhalter = ids.map((_, i) => `?${i + 1}`).join(', ')
+  await env.DB.prepare(`DELETE FROM vorfall WHERE id IN (${platzhalter})`)
+    .bind(...ids)
+    .run()
+  return vorfallAntwort({ ok: true, geloescht: ids.length })
+}
 
-  if (request.method !== 'POST') return antwort({ error: 'GET, POST oder DELETE erwartet' }, 405)
-  const token = tokenAusKopf(request)
-  if (!env.LAUF_TOKEN || !tokenGleich(token, env.LAUF_TOKEN)) return antwort({ error: 'Nicht erlaubt' }, 403)
+async function vorfallMelden(request: Request, env: Env): Promise<Response> {
+  if (!vorfallErlaubt(request, env)) return vorfallAntwort({ error: 'Nicht erlaubt' }, 403)
 
   let daten: Record<string, unknown>
   try {
     daten = (await request.json()) as Record<string, unknown>
   } catch {
-    return antwort({ error: 'Kein gültiges JSON' }, 400)
+    return vorfallAntwort({ error: 'Kein gültiges JSON' }, 400)
   }
 
   const art = String(daten.art ?? '').slice(0, 40)
   const plattform = String(daten.plattform ?? '').slice(0, 20)
-  if (!art || !plattform) return antwort({ error: 'art und plattform fehlen' }, 400)
+  if (!art || !plattform) return vorfallAntwort({ error: 'art und plattform fehlen' }, 400)
 
   /*
     **Dieselbe Sache am selben Tag zählt einmal.** Ein Durchlauf über zwölf
@@ -466,7 +472,7 @@ async function handleVorfall(request: Request, env: Env): Promise<Response> {
   )
     .bind(art, plattform, String(daten.url ?? '').slice(0, 500), tag)
     .first()
-  if (schon) return antwort({ ok: true, doppelt: true })
+  if (schon) return vorfallAntwort({ ok: true, doppelt: true })
 
   await env.DB.prepare(
     `INSERT INTO vorfall (plattform, art, url, reihe, folge_nr, staffel, text, version, gemeldet_am)
@@ -486,7 +492,7 @@ async function handleVorfall(request: Request, env: Env): Promise<Response> {
     .run()
 
   const anzahl = await env.DB.prepare('SELECT COUNT(*) AS n FROM vorfall').first<{ n: number }>()
-  return antwort({ ok: true, vorfaelle: anzahl?.n ?? 0 })
+  return vorfallAntwort({ ok: true, vorfaelle: anzahl?.n ?? 0 })
 }
 
 async function verteile(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {

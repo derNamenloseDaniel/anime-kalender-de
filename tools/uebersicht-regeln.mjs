@@ -42,7 +42,7 @@ export function alterVon(e, jetzt) {
     const d = datenImText(e.kopf, jetzt)[0]
     if (!d) return null
     // Ein Termin ohne Jahr liegt im nächstgelegenen Jahr (auch in der Zukunft).
-    const tage = (d.jahrlos ? [d.j - 1, d.j, d.j + 1] : [d.j]).map((j) => tageBis({ ...d, j }, jetzt)).reduce((a, b) => (Math.abs(b) < Math.abs(a) ? b : a))
+    const tage = (d.jahrlos ? [d.j, d.j + 1] : [d.j]).map((j) => tageBis({ ...d, j }, jetzt)).reduce((a, b) => (Math.abs(b) < Math.abs(a) ? b : a))
     return { art: 'faellig', tage, rot: tage >= ROT_AB_TAGEN }
   }
   const daten = e.k ? [{ j: ohneJahr(e.k.tag, e.k.monat, jetzt), m: e.k.monat, d: e.k.tag }] : datenImText(e.kopf, jetzt)

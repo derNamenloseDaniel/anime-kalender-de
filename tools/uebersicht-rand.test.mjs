@@ -38,7 +38,9 @@ assert.deepEqual(alterVon({ k: null, kopf: 'a 2026-11-20 b 2026-11-22 c 2026-12-
 
 // Daten im Text: Monats- und Tagesgrenzen, jahrlos am Stichtag
 const dt = (t) => datenImText(t, JETZT).map((d) => `${d.j}-${d.m}-${d.d}`)
-assert.deepEqual(dt('31.12.2026 01.01.2026 32.01.2026 15.13.2026 00.05.2026'), ['2026-12-31', '2026-1-1'])
+assert.deepEqual(dt('31.12.2026 01.01.2026 32.01.2026 15.13.2026 00.05.2026 15.00.2026'), ['2026-12-31', '2026-1-1'])
+assert.equal(alterVon({ k: null, kopf: 'x 20.11. y', icon: null }, JETZT)?.tage, 5, 'jahrloses Datum im Kopf ohne Kennzeichen')
+assert.equal(blockiertGrund({ wartet: null, icon: null }, `wartet ${'y'.repeat(200)}`).length, 90)
 assert.deepEqual(dt('25.11. 26.11.'), ['2026-11-25', '2025-11-26'])
 assert.deepEqual(dt('x1.2.2026 v1.2.3 1.12.11.2026'), [])
 

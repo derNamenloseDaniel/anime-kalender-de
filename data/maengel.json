@@ -25,7 +25,7 @@
     "termin-geschaetzt-ohne-weg": {"wirkung":2,"wer":"hand:synchro-belegen","offen":2,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0},
     "folgenzahl-widerspruch": {"wirkung":2,"wer":"hand:synchro-belegen","offen":17,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":10},
     "adresse-mehrfach": {"wirkung":3,"wer":"hand:synchro-belegen","offen":0,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":462},
-    "staffel-zuordnung": {"wirkung":2,"wer":"hand:synchro-belegen","offen":0,"neu":0,"behoben":2,"rueckfall":0,"ausnahme":29},
+    "staffel-zuordnung": {"wirkung":2,"wer":"hand:synchro-belegen","offen":0,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":29},
     "herkunft-fremder-titel": {"wirkung":3,"wer":"auto:bau","offen":0,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0},
     "weg-ohne-adresse": {"wirkung":3,"wer":"auto:anbieterkalender","offen":3,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0},
     "tv-sichtung-ohne-folge": {"wirkung":2,"wer":"auto:bau","offen":8,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0}

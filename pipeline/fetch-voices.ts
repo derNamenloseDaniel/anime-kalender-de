@@ -22,6 +22,7 @@
  * Aufruf: npm run data:voices [-- --limit 400] [-- --force]
  */
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { pathToFileURL } from 'node:url'
 import { germanVoicesFor, type VoiceRole } from './lib/anilist.ts'
 import { log, readJson, warn } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
@@ -66,7 +67,7 @@ function hatAnisearchRollen(pfad: string): boolean {
   }
 }
 
-async function main(): Promise<void> {
+export async function main(): Promise<void> {
   const titles = readJson<Title[]>('public/data/titles.json', [])
   const releases = readJson<Release[]>('public/data/releases.json', [])
   if (!titles.length) {
@@ -162,7 +163,10 @@ async function main(): Promise<void> {
   )
 }
 
-main().catch((err) => {
-  console.error(err)
-  process.exit(1)
-})
+// Nur beim Direktstart: der Vergleichsrahmen (tools/vergleich-alt-neu.mjs) importiert `main`, ohne Netz zu rufen.
+if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+  main().catch((err) => {
+    console.error(err)
+    process.exit(1)
+  })
+}

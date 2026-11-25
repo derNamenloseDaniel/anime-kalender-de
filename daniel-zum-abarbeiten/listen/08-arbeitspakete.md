@@ -1,6 +1,6 @@
 # Arbeitspakete: Wo läuft es wirklich auf Deutsch?
 
-Stand 2026-11-25 · **16 offene Verweise** in **15 Zeilen**,
+Stand 2026-11-25 · **17 offene Verweise** in **16 Zeilen**,
 aufgeteilt in **1 Pakete** zu je 20.
 
 Erzeugt von `npm run data:dub-checks`, **nicht von Hand pflegen**. Derselbe Bestand wie in
@@ -31,7 +31,7 @@ Mehrere Einträge in einer Zeile werden mit Punkt getrennt in derselben Reihenfo
 beantwortet (`1.0` = erster ja, zweiter nein). Eine einzelne Angabe gilt für alle Einträge
 der Zeile. Beispiel für ein ganzes Paket: `1-x 2-1 3-1.0 4-x`.
 
-## Paket 1 — Zeilen 1 bis 15
+## Paket 1 — Zeilen 1 bis 16
 
 | # | Anbieter | Reihe | Noch zu bestätigen |
 |---|---|---|---|
@@ -44,9 +44,10 @@ der Zeile. Beispiel für ein ganzes Paket: `1-x 2-1 3-1.0 4-x`.
 | 7 | Pluto TV | Dr. Stone | [Hauptserie](https://pluto.tv/gsa/shows/dr-stone/) |
 | 8 | Prime Video | Black Butler | [Hauptserie](https://watch.amazon.de/detail?gti=amzn1.dv.gti.6aad68c8-1e46-46e9-be1e-3d4de43488a5) |
 | 9 | Prime Video | Demon Slayer: Kimetsu no Yaiba | [Mugen Train Arc](https://www.amazon.de/gp/video/detail/0L0IXLQ35R1J37OAX7TA6WDPFW) · [Entertainment District Arc](https://www.amazon.de/gp/video/detail/B0D65Q2GCW) |
-| 10 | Netflix | My Hero Academia | [Vigilantes Staffel 2](https://www.netflix.com/title/82036361) |
-| 11 | Prime Video | Ikki Tousen: Dragon Girls | [Hauptserie](https://watch.amazon.de/detail?gti=amzn1.dv.gti.1374d3dd-9d96-4d41-b0f8-38932f0c9145) |
-| 12 | Prime Video | There’s No Freaking Way I’ll Be Your Lover! Unless… | [Episoden 13-17](https://www.amazon.de/gp/video/detail/B0F5HDQBTM) |
-| 13 | Prime Video | Detektiv Conan | [Der Flashback des Einäugigen](https://watch.amazon.de/detail?gti=amzn1.dv.gti.caba97c6-120e-4294-bc60-f1ce999c941e) |
-| 14 | Prime Video | Made in Abyss | [Die Reise beginnt](https://watch.amazon.de/detail?gti=amzn1.dv.gti.39d00227-3d19-4bc7-9759-57c324715cb3) |
-| 15 | Prime Video | Code Geass: Lelouch of the Rebellion | [Überschreitung](https://watch.amazon.de/detail?gti=amzn1.dv.gti.d6bb7dff-f1d9-2164-4efe-b91aff5a4433) |
+| 10 | Netflix | Call of the Night | [Hauptserie](https://www.netflix.com/title/81621036) |
+| 11 | Netflix | My Hero Academia | [Vigilantes Staffel 2](https://www.netflix.com/title/82036361) |
+| 12 | Prime Video | Ikki Tousen: Dragon Girls | [Hauptserie](https://watch.amazon.de/detail?gti=amzn1.dv.gti.1374d3dd-9d96-4d41-b0f8-38932f0c9145) |
+| 13 | Prime Video | There’s No Freaking Way I’ll Be Your Lover! Unless… | [Episoden 13-17](https://www.amazon.de/gp/video/detail/B0F5HDQBTM) |
+| 14 | Prime Video | Detektiv Conan | [Der Flashback des Einäugigen](https://watch.amazon.de/detail?gti=amzn1.dv.gti.caba97c6-120e-4294-bc60-f1ce999c941e) |
+| 15 | Prime Video | Made in Abyss | [Die Reise beginnt](https://watch.amazon.de/detail?gti=amzn1.dv.gti.39d00227-3d19-4bc7-9759-57c324715cb3) |
+| 16 | Prime Video | Code Geass: Lelouch of the Rebellion | [Überschreitung](https://watch.amazon.de/detail?gti=amzn1.dv.gti.d6bb7dff-f1d9-2164-4efe-b91aff5a4433) |

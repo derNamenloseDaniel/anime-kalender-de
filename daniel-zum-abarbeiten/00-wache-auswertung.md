@@ -5,6 +5,17 @@ verliert. Sie kann nicht wissen, **warum** — hier steht es. Neue Auswertungen
 kommen oben dazu, ältere bleiben stehen: An der Reihe zeigt sich, ob eine Lücke
 wiederkehrt.
 
+## 25.11.2026, 18:58 — Claude-Lauf, Befund (Lauf 45670228329, Issue #5031)
+
+**Was läuft korrekt.** Die gemeldeten „3 Titel weniger“ sind der Bestandsbau vom 24.11. um 18:30 (Pokémon Horizonte 7000001–7000003, Weg zu 158871 verschoben, vom Delta als „erklärt“ notiert). Das `zuAk` für 26469–26471 → 14839 steht seit dem 25.11. 09:08 in `data/kennungen.json` (Commit f373f1b2); seitdem zeigt das Wache-Dossier keinen weiteren Titelverlust (Stand 2926).
+
+**Wo ist Verbesserungspotenzial?** Die Wache wertet ein 24-Stunden-Fenster, in dem der Lauf vom 24.11. 18:30 noch liegt; ein Abgang bleibt so bis zu einem Tag ⚠, obwohl die Ursache behoben ist. Sie liest `zuAk` nur für Abgänge im selben Bau, nicht rückwirkend gegen den heutigen Stand.
+
+**Wo sind echte Risiken und Lücken?** Keine neue: Ein echter Verlust bliebe am Titelzähler sichtbar. Der Abgang meldet vor dem `zuAk` rot und wird erst danach still; das ist der gewollte Weg „erst nach dem Bestandsbau eintragen“ (`data/anisearch-seiten-aufgenommen.yaml`).
+
+**Was läuft komplett falsch?** Nichts. Kein Code-Fehler, kein Quellenausfall, kein PR nötig. Der Befund fällt mit dem Lauf vom 26.11. aus dem Fenster; zu prüfen bleibt genau das (Wache 26.11. ohne ⚠).
+
+
 ## 25.11.2026, 10:10 — Claude-Lauf, Befund
 
 **Was läuft korrekt.** Bestandsbau, Deploy, Nachtprüfung und Nachlauf zeigen keinen Alarm, letzter grüner Bestandsbau-Lauf heute um 08:08 Uhr (12). „PR-Prüfkette" schlug in den letzten 48 Stunden nur 2x fehl, beide Male vollständig mit Branch und Lauf benannt (`cloud/zerlegen-sandkasten`, `cloud/zerlegen-tooltip`) (01) — anders als an den Vortagen, an denen Fehlschläge nur teilweise einem Branch zuzuordnen waren (10); „Nachlauf auf main" und „Mutationsprobe" zeigen in diesem Zeitraum erstmals seit Tagen keinen einzigen Fehlschlag mehr (01), nach wiederholten Meldungen am 17., 19.–24.11. (10). Quelle `anime2you` hat sich erholt: heute 0 Tage alt, 50 Treffer, nachdem gestern ein Abruffehler HTTP 403 gemeldet war (06, 10). Briefkasten zeigt weiterhin alle 230 Adressen gelistet, 0 zurückgestellt (03); Zugänge und Workflow-Fristen liegen unauffällig (04, 11). Der im Delta gemeldete Verlust von 3 Titeln (02, 11) ist durch den Bestandsbau selbst erklärt: die drei Pokémon-Horizonte-Einträge wurden wegen verschobenem rtlplus-Weg in den Sammeltitel 158871 zusammengeführt, kein stiller Verlust.

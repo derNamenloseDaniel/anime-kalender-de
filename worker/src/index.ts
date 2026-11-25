@@ -400,7 +400,7 @@ async function handleNetzfund(request: Request, env: Env): Promise<Response> {
  * **Was hier nicht landet:** der normale Ablauf. Ein Vorfall ist etwas, das
  * anders lief als vorgesehen — nicht jede geprüfte Folge.
  */
-async function handleVorfall(request: Request, env: Env): Promise<Response> {
+export async function handleVorfall(request: Request, env: Env): Promise<Response> {
   const offen = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
   const antwort = (body: unknown, status = 200) =>
     new Response(JSON.stringify(body), { status, headers: offen })

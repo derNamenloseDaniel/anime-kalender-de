@@ -560,23 +560,20 @@ async function katalogLauf(): Promise<void> {
   }
 }
 
-async function main(): Promise<void> {
-  log(wegZeile(WEG))
-  await holeAdnNews()
-  if (args.includes('--laufend')) return laufendLauf()
-  if (args.includes('--refresh')) {
-    const shows = await refreshCatalog()
-    if (!shows.length) return
-    writeJson(
-      'data/adn-catalog.json',
-      { scrapedAt: new Date().toISOString(), window: { from: '', to: '' }, shows } satisfies AdnData,
-      true,
-    )
-    log(`ADN-Auffrischung: ${shows.length} Serien aktualisiert`)
-    return
-  }
-  if (args.includes('--catalog')) return katalogLauf()
+/** Durchgang `--refresh`: bekannte Katalogserien neu holen und den Katalog schreiben. */
+async function auffrischLauf(): Promise<void> {
+  const shows = await refreshCatalog()
+  if (!shows.length) return
+  writeJson(
+    'data/adn-catalog.json',
+    { scrapedAt: new Date().toISOString(), window: { from: '', to: '' }, shows } satisfies AdnData,
+    true,
+  )
+  log(`ADN-Auffrischung: ${shows.length} Serien aktualisiert`)
+}
 
+/** Standarddurchgang: Kalender von `FROM` bis `TO` Tag für Tag abrufen, `data/adn.json` schreiben. */
+async function kalenderLauf(): Promise<void> {
   const today = todayIso()
   const from = addDays(today, FROM)
   const to = addDays(today, TO)
@@ -641,6 +638,15 @@ async function main(): Promise<void> {
         `ab ${first.date} ${first.time}, ${show.episodes.length} Folgen${span ? ` über ${span} Tage` : ''}`,
     )
   }
+}
+
+export async function main(argumente: readonly string[] = args): Promise<void> {
+  log(wegZeile(WEG))
+  await holeAdnNews()
+  if (argumente.includes('--laufend')) return laufendLauf()
+  if (argumente.includes('--refresh')) return auffrischLauf()
+  if (argumente.includes('--catalog')) return katalogLauf()
+  return kalenderLauf()
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

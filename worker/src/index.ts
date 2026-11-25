@@ -15,14 +15,11 @@ import { sichereSchnellmessung } from './schnellmesser.ts'
 import { handleVerlauf } from './verlauf.ts'
 import { ladeKennungen } from './favoriten-kennung.ts'
 import { anbieterName, type PlatformId, type Release, type ReleaseEvent } from '../../shared/types.ts'
-import { addDays, weekdayIndex } from '../../shared/time.ts'
+import { addDays } from '../../shared/time.ts'
 import { handleFavoritenFeed } from './favoriten-feed.ts'
-import { sendeUndZaehle, tagesstand } from './mail-zaehler.ts'
-import { checkAllSites, confirmOutages } from './monitor.ts'
-import { schreibeStaende, schreibeVerlauf } from './monitor-speicher.ts'
-import { ladeMesswerte } from './monitor-statistik.ts'
+import { tagesstand } from './mail-zaehler.ts'
+import { istWochenSlot, meldeStoerung, meldeWoche, pruefeMitNachpruefung, schreibeLauf, type MeldeKontext } from './monitor-lauf.ts'
 import {
-  BRAND, outageMail, weeklyStatusMail,
   type NeuMitSynchro,
   type ReleaseLink
 } from './templates.ts'
@@ -243,68 +240,9 @@ export async function runMonitor(
   force?: 'alert' | 'weekly',
 ): Promise<string> {
   const { hour, iso } = berlinParts(now)
-  const ersterLauf = await checkAllSites()
-
-  // Rote Seiten sofort nachprüfen, statt bis zum nächsten Stundenlauf zu warten.
-  // Erst was auch danach noch schweigt, gilt als Störung — und der Stand in der
-  // Datenbank ist dann schon der bestätigte, damit `/status` und das
-  // Admin-Panel keinen Aussetzer als Ausfall zeigen.
-  const bestaetigt = await confirmOutages(ersterLauf.filter((r) => !r.ok))
-  const bestaetigteUrls = new Set(bestaetigt.map((r) => r.site.url))
-  const results = ersterLauf.map((r) => {
-    if (r.ok || bestaetigteUrls.has(r.site.url)) return r
-    // Hat sich beim Nachprüfen erholt: als erreichbar führen, aber den Grund
-    // behalten — im Wochenbericht ist „war kurz weg" eine nützliche Auskunft.
-    return { ...r, ok: true, reason: `kurzzeitig: ${r.reason ?? 'nicht erreichbar'}` }
-  })
+  const { ersterLauf, results } = await pruefeMitNachpruefung()
   const nowIso = now.toISOString()
-
-  // Vorherige Stände laden, um „seit wann weg" beantworten zu können.
-  const { results: previous } = await env.DB.prepare(
-    'SELECT url, last_ok_at, fail_streak FROM site_status',
-  ).all<{ url: string; last_ok_at: string | null; fail_streak: number }>()
-  const before = new Map((previous ?? []).map((row) => [row.url, row]))
-
-  const lines = results.map((r) => {
-    const old = before.get(r.site.url)
-    return {
-      name: r.site.name,
-      url: r.site.url,
-      ok: r.ok,
-      reason: r.reason,
-      ms: r.ms,
-      downSince: r.ok ? undefined : (old?.last_ok_at ?? undefined),
-      // Derselbe Wert, der gleich in die Datenbank geschrieben wird — hier
-      // schon gebraucht, weil die Alarmschwelle daran hängt.
-      failStreak: r.ok ? 0 : (old?.fail_streak ?? 0) + 1,
-    }
-  })
-
-  await schreibeStaende(
-    env.DB,
-    results,
-    lines.map((l) => l.failStreak),
-    new Map([...before].map(([url, row]) => [url, row.last_ok_at])),
-    nowIso,
-  )
-  await schreibeVerlauf(env.DB, results, nowIso)
-
-  // Seiten, die aus SITES entfernt wurden, blieben als Zeile stehen und damit
-  // auf ihrem letzten Stand — meist rot, weil sie ja wegen eines Fehlers
-  // herausgenommen wurden. In /status und im Admin-Panel sah das aus wie eine
-  // dauerhafte Störung, obwohl gar nichts mehr geprüft wird.
-  const known = results.map((r) => r.site.url)
-  // Die Wächter-Liste ist fest im Code, leer werden kann sie nur durch einen
-  // Fehler — dann aber würde `NOT IN ()` als SQL-Syntaxfehler den ganzen Lauf
-  // abbrechen und aus einem Versehen einen Ausfall der Überwachung machen.
-  // Und ein Aufräumen ohne bekannte Seiten hieße: alles löschen.
-  if (known.length) {
-    await env.DB.prepare(
-      `DELETE FROM site_status WHERE url NOT IN (${known.map((_, i) => `?${i + 1}`).join(', ')})`,
-    )
-      .bind(...known)
-      .run()
-  }
+  const lines = await schreibeLauf(env.DB, results, nowIso)
 
   // `results` trägt bereits das Ergebnis nach der Nachprüfung — was hier rot
   // ist, war es über anderthalb Minuten und drei Versuche hinweg.
@@ -324,58 +262,17 @@ export async function runMonitor(
     `${confirmed.length}/${lines.length} gestört` +
       (erholt ? `, ${erholt} nur kurzzeitig (beim Nachprüfen wieder erreichbar)` : ''),
   ]
+  const kontext: MeldeKontext = { env, to, lines, confirmed, iso, nowIso, force }
 
-  // --- Störungsmeldung, höchstens einmal am Tag ------------------------------
+  // Störungsmeldung, höchstens einmal am Tag.
   if (confirmed.length > 0 || force === 'alert') {
-    const key = `alert:${iso}`
-    const already = force ? null : await env.DB.prepare('SELECT run_key FROM send_log WHERE run_key = ?1').bind(key).first()
-    if (already) {
-      log.push('Störungsmail heute bereits verschickt')
-    } else {
-      // Ohne bestätigte Störung kann nur ein erzwungener Lauf hier landen —
-      // dann geht eine Testmail mit der ersten Seite als Beispiel hinaus, und
-      // die Vorlage benennt das auch so.
-      const report = confirmed.length ? confirmed : lines.slice(0, 1)
-      const mail = outageMail(report, lines.length, env.SITE_URL, lines.length - confirmed.length)
-      await sendeUndZaehle(env, { to, ...mail, fromName: BRAND.monitor.name })
-      if (!force) {
-        await env.DB.prepare(
-          'INSERT OR REPLACE INTO send_log (run_key, sent_at, recipients) VALUES (?1, ?2, 1)',
-        )
-          .bind(key, nowIso)
-          .run()
-      }
-      log.push('Störungsmail verschickt')
-    }
+    log.push(await meldeStoerung(kontext))
   } else if (erholt > 0) {
     log.push(`${erholt} kurzzeitig rot, beim Nachprüfen wieder erreichbar — keine Mail`)
   }
 
-  // --- Wochenübersicht, montags ---------------------------------------------
-  const sendHour = Number(env.SEND_HOUR_BERLIN || '7')
-  const isWeeklySlot = weekdayIndex(iso) === 0 && hour === sendHour
-  if (isWeeklySlot || force === 'weekly') {
-    // Kalenderwoche als Schlüssel: so kommt die Mail auch dann genau einmal,
-    // wenn der Cron in derselben Stunde mehrfach feuert.
-    const [y, m, d] = iso.split('-').map(Number)
-    const week = Math.floor((Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 1)) / (7 * 86400000)) + 1
-    const key = `weekly-status:${y}-W${String(week).padStart(2, '0')}`
-    const already = force ? null : await env.DB.prepare('SELECT run_key FROM send_log WHERE run_key = ?1').bind(key).first()
-    if (already) {
-      log.push('Wochenübersicht diese Woche bereits verschickt')
-    } else {
-      const mail = weeklyStatusMail(lines, env.SITE_URL, await ladeMesswerte(env.DB, nowIso))
-      await sendeUndZaehle(env, { to, ...mail, fromName: BRAND.monitor.name })
-      if (!force) {
-        await env.DB.prepare(
-          'INSERT OR REPLACE INTO send_log (run_key, sent_at, recipients) VALUES (?1, ?2, 1)',
-        )
-          .bind(key, nowIso)
-          .run()
-      }
-      log.push('Wochenübersicht verschickt')
-    }
-  }
+  // Wochenübersicht, montags.
+  if (istWochenSlot(env, iso, hour, force)) log.push(await meldeWoche(kontext))
 
   return log.join('; ')
 }

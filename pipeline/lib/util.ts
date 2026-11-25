@@ -82,6 +82,11 @@ export function writeText(path: string, text: string): void {
   }
 }
 
+/** Adresse für Meldungen: Wert von api_key, key und token (TMDB, YouTube) ersetzt, sonst steht der Schlüssel im öffentlichen CI-Log. */
+export function maskiereSchluessel(url: string): string {
+  return url.replace(/([?&](?:api_key|key|token)=)[^&\s]+/gi, '$1***')
+}
+
 /** fetch mit Retry und exponentiellem Backoff; respektiert Retry-After. */
 export async function fetchJson<T>(
   url: string,
@@ -90,14 +95,14 @@ export async function fetchJson<T>(
 ): Promise<T> {
   const res = await fetch(url, init)
   if (res.status === 429 || res.status >= 500) {
-    if (attempt >= 5) throw new Error(`${res.status} nach ${attempt} Versuchen: ${url}`)
+    if (attempt >= 5) throw new Error(`${res.status} nach ${attempt} Versuchen: ${maskiereSchluessel(url)}`)
     const retryAfter = Number(res.headers.get('retry-after') ?? 0)
     const waitMs = retryAfter > 0 ? retryAfter * 1000 : 2 ** attempt * 1000
-    warn(`${res.status} — warte ${waitMs} ms und versuche erneut (${url.slice(0, 60)})`)
+    warn(`${res.status} — warte ${waitMs} ms und versuche erneut (${maskiereSchluessel(url).slice(0, 60)})`)
     await sleep(waitMs)
     return fetchJson<T>(url, init, attempt + 1)
   }
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}: ${url}`)
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}: ${maskiereSchluessel(url)}`)
   return (await res.json()) as T
 }
 

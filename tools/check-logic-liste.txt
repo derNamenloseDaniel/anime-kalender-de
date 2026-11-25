@@ -622,6 +622,7 @@ pipeline/check-sammle-belege-naht.ts
 pipeline/check-sammler-lesezugriffe-faelle.ts
 pipeline/check-sammler-lesezugriffe-variable.ts
 pipeline/check-sammler-lesezugriffe.ts
+pipeline/check-schluessel-maskiert.ts
 pipeline/check-schwester-shop.ts
 pipeline/check-screenshot-wiederholen.ts
 pipeline/check-seite-nicht-werk.ts

@@ -234,6 +234,13 @@ pr_anlegen() {
     echo "::warning::gh pr create fehlgeschlagen (Versuch $versuch von 3): $letzter"
     [ "$versuch" -lt 3 ] && sleep $((5 + RANDOM % 10))
   done
+  # Auch der dritte Versuch kann trotz 502 angelegt haben (Läufe 45650281762 und 45650286140, 25.11.2026).
+  vorhanden="$(gh pr list --head "$ZWEIG" --state open --json url -q '.[0].url' 2>/dev/null)" || vorhanden=""
+  if [ -n "$vorhanden" ]; then
+    PR="$vorhanden"
+    echo "PR zum Zweig $ZWEIG besteht nach dem letzten Versuch schon."
+    return 0
+  fi
   echo "::error::Der Pull Request konnte nach drei Versuchen nicht angelegt werden: $letzter"
   return 1
 }
@@ -284,11 +291,13 @@ if [ "$ZUSTAND" = "MERGEABLE" ]; then
   # **Mehrere Versuche**: Mit parallelen Sammlern (seit 05.10.2026) bewegt sich `main` oft genau zwischen Mergebarkeits-Prüfung und Merge — GitHub antwortet dann
   # „Base branch was modified. Review and try the merge again." Ein Pull Request, der deshalb offen bliebe, wartete auf den Claude-Lauf (und dessen Kontingent).
   for merge_versuch in 1 2 3 4 5 6; do
-    if gh pr merge "$ZWEIG" --squash --admin --delete-branch --subject "$NACHRICHT" 2>&1; then
+    if merge_aus="$(gh pr merge "$ZWEIG" --squash --admin --delete-branch --subject "$NACHRICHT" 2>&1)"; then
+      printf '%s\n' "$merge_aus"
       melde "gemerged=true"
       exit 0
     fi
-    echo "::notice::Merge-Versuch $merge_versuch von 6 abgelehnt — main hat sich bewegt, neuer Versuch."
+    merge_grund="$(printf '%s' "$merge_aus" | tr '\n' ' ' | cut -c1-300)"
+    echo "::notice::Merge-Versuch $merge_versuch von 6 abgelehnt: $merge_grund — neuer Versuch."
     sleep $((3 + RANDOM % 8))
     # Die Mergebarkeit gegen den neuen Stand abwarten, bevor es weitergeht (ein echter Konflikt beendet die Schleife).
     for _ in $(seq 1 10); do
@@ -300,7 +309,7 @@ if [ "$ZUSTAND" = "MERGEABLE" ]; then
   done
   if [ "$ZUSTAND" = "MERGEABLE" ]; then
     # Rot statt Warnung: Ein mergebarer Daten-Pull-Request, der offen bleibt, würde sonst still liegen (claude-daten-merge holt ihn nach).
-    echo "::error::Pull Request $NUMMER ist mergebar, der Merge scheiterte sechsmal (Ruleset/Bypass der App prüfen)."
+    echo "::error::Pull Request $NUMMER ist mergebar, der Merge scheiterte sechsmal, zuletzt: $merge_grund (Ruleset/Bypass der App prüfen)."
     melde "gemerged=false"
     exit 1
   fi

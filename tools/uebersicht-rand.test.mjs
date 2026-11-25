@@ -290,6 +290,8 @@ assert.deepEqual([gedeckelt.liste.length, gedeckelt.vollstaendig], [2500, false]
 const lies = (zeilen) => leseStand(zeilen.join('\n'))
 assert.equal(lies(['## In Arbeit', `- ${'a'.repeat(14)} 🔴 **X**`]).inArbeit[0].icon, null)
 assert.equal(lies(['## In Arbeit', '- 🔴 **X**']).inArbeit[0].icon, '🔴')
+assert.equal(lies(['## In Arbeit', '- ab 🔴 **X**']).inArbeit[0].icon, '🔴', 'Icon an Stelle 3 bis 12 zählt')
+assert.deepEqual(lies(['## In Arbeit', '- **A**', '## Als Nächstes', '  Notiz zu Nächstes']).inArbeit[0].notizen, [], 'neuer Abschnitt löst die Notiz vom letzten Eintrag')
 assert.deepEqual(lies(['## In Arbeit', '- **A**', '## Fremd', '  Notiz zu Fremd']).inArbeit[0].notizen, [])
 assert.deepEqual(lies(['## Daniel-Todo', '### Jetzt', '- **A**', '### Später', '  Notiz zu Später']).jetzt[0].notizen, [])
 assert.deepEqual(lies(['## In Arbeit', '- **A**', '- **Autonomer Modus** an', '  Notiz zum Modus']).inArbeit[0].notizen, [])

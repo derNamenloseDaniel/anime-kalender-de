@@ -4,7 +4,8 @@
  * gh-Runner `ghAusfuehren` gegen ein Node-Kind. Fester Zeitpunkt, Wegwerf-Ordner unter os.tmpdir().
  */
 import assert from 'node:assert/strict'
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -151,6 +152,71 @@ try {
   rmSync(ordner, { recursive: true, force: true })
 }
 
+// main: gh-Fehler je Schritt als Warnung mit erster Ursache, Zeitstempel im Zwischenspeicher, Dateien trotzdem geschrieben
+const ordner2 = mkdtempSync(join(tmpdir(), 'uebersicht-ausgabe-'))
+const warn2 = []
+const alt3 = console.error
+const altLog3 = console.log
+try {
+  console.error = (t) => warn2.push(String(t))
+  console.log = () => {}
+  const stand = join(ordner2, 'stand.md')
+  writeFileSync(stand, TEXT)
+  assert.equal(main([stand, '--jetzt', '2026-11-25T12:00:00Z'], 0, () => (b, a) => { if (a[0] === 'pr') throw new Error('boom\nzweite Zeile'); return a[1] === 'graphql' ? antwortMitPr() : '' }), 0)
+  assert.deepEqual(warn2, ['Warnung: gh offene PRs: boom'])
+  assert.equal(JSON.parse(readFileSync(join(ordner2, '.uebersicht-cache.json'), 'utf8'))[900001].abgerufen, JETZT)
+  assert.ok(readFileSync(join(ordner2, 'uebersicht.md'), 'utf8').includes('# Übersicht'))
+} finally {
+  console.error = alt3
+  console.log = altLog3
+  rmSync(ordner2, { recursive: true, force: true })
+}
+function antwortMitPr() {
+  return JSON.stringify({ data: { repository: { n900001: { __typename: 'PullRequest', author: { login: 'x' }, state: 'OPEN', labels: { nodes: [] } } } } })
+}
+
+// Kindprozess ohne gh im PATH und ohne --jetzt: Warnungen, beide Dateien, echte Uhr
+const ordner3 = mkdtempSync(join(tmpdir(), 'uebersicht-ausgabe-'))
+try {
+  writeFileSync(join(ordner3, 'stand.md'), TEXT)
+  const leer = join(ordner3, 'leer')
+  mkdirSync(leer)
+  const kind = spawnSync(process.execPath, [join(import.meta.dirname, 'uebersicht.mjs'), join(ordner3, 'stand.md')], { encoding: 'utf8', timeout: 60_000, windowsHide: true, env: { ...process.env, PATH: leer, Path: leer } })
+  assert.equal(kind.status, 0, kind.stderr)
+  assert.match(kind.stderr, /Warnung: gh nicht verfügbar: [^\n]+\nWarnung: ohne gh: keine PR-Labels, keine PR-Zahlen\n$/)
+  assert.match(readFileSync(join(ordner3, 'uebersicht.md'), 'utf8'), /^# Übersicht\n\nErzeugt 20(2[6-9]|[3-9]\d)-\d\d-\d\dT/)
+  assert.match(kind.stdout, /^Übersicht: 5 Einträge, Labels /)
+} finally {
+  rmSync(ordner3, { recursive: true, force: true })
+}
+
+// Listen ohne Komma-Trenner (join ohne Argument), beide Badges, Ziel-Knopf „Alle Ziele“ gedrückt, Klammern im Linktext, höchstens 15 PRs
+const zwei = baueModell('## In Arbeit\n- **P** {eigen · hoch · Daten · 20.11.} PR 900001 PR 900002 [a [b](https://x/1)\n- **Q** {eigen · hoch · Daten · 20.11.}\n- **R** {eigen · hoch · Code · 20.11.}\n## Als Nächstes\n- **S** {eigen · hoch · Code · 20.11.}', JETZT, { prDaten: { 900001: { ...PR1, labels: ['orchester'], abnahmeDirigent: true }, 900002: PR1 } })
+const offene = Array.from({ length: 16 }, (_, i) => ({ number: 900500 + i, title: `O${i}`, createdAt: '2026-11-25T11:00:00Z', labels: [] }))
+const kZwei = kennzahlen(zwei, { offene: { liste: offene, abgeschnitten: false }, merges: { liste: [{ mergedAt: '2026-11-24T08:00:00Z', labels: [], autor: 'x' }, { mergedAt: '2026-11-25T08:00:00Z', labels: [], autor: 'x' }], vollstaendig: true } }, JETZT)
+const htmlZwei = htmlVon(zwei, kZwei)
+const koerperZwei = htmlZwei.slice(htmlZwei.indexOf('<body>'), htmlZwei.indexOf('<script>'))
+assert.ok(!/>,</.test(koerperZwei) && !koerperZwei.includes(',<'), 'keine Kommas zwischen den Elementen')
+assert.ok(koerperZwei.includes('<span class="badge lokal">💻 lokal</span> <span class="badge nacht">🌙 nacht</span>'))
+assert.ok(koerperZwei.includes('data-feld="ziel" data-wert="alle" aria-pressed="true">Alle Ziele</button>') && !koerperZwei.includes('data-wert="Daten" aria-pressed="true"'))
+assert.ok(koerperZwei.includes('<tr><td>2026-11-25</td><td>1</td><td>0</td><td>0</td></tr><tr><td>2026-11-24</td>'))
+const mdZwei = markdownVon(zwei, kZwei)
+assert.ok(mdZwei.includes('[a b](https://x/1)'), 'eckige Klammern im Linktext fallen weg')
+assert.equal(mdZwei.split('\n').filter((z) => z.startsWith('- PR 9005')).length, 15)
+assert.ok(mdZwei.includes('- PR 900500 — 1 h — O0\n- PR 900501 — 1 h — O1\n'))
+assert.ok(mdZwei.includes('| 2026-11-25 | 1 | 0 | 0 |\n| 2026-11-24 | 1 | 0 | 0 |\n'))
+assert.ok(mdZwei.includes('💻 lokal 🌙 nacht'), 'zwei Labels mit Leerzeichen')
+assert.ok(mdZwei.includes('Offene PRs: 16\n- PR 900500'))
+assert.ok(mdZwei.includes('\n\nMerges je Tag\n| Tag |'))
+
+// Streichkandidaten stehen in Dateireihenfolge, auch wenn „Als Nächstes“ vor „In Arbeit“ steht
+const umgekehrt = baueModell('## Als Nächstes\n- **N** {eigen · normal · Code · 01.11.} PR 900401\n## In Arbeit\n- **I** {eigen · normal · Code · 01.11.} PR 900402', JETZT, { prDaten: { 900401: PR1, 900402: PR1 } })
+assert.deepEqual(umgekehrt.streichkandidaten.map((e) => e.titel), ['N', 'I'])
+const undatiert = baueModell('## Neu und live testbar\n- [2026-11-24 10:00] **Mit Datum**\n- **Ohne Datum**\n- [2026-11-24 09:00] **Gleich alt**', JETZT, null)
+assert.deepEqual(undatiert.abschnitte.find((a) => a.id === 'neuLive').gruppen[0].themen[0].eintraege.map((e) => e.titel), ['Mit Datum', 'Gleich alt', 'Ohne Datum'])
+const undatiert2 = baueModell('## Neu und live testbar\n- **Ohne Datum**\n- [2026-11-24 10:00] **Mit Datum**', JETZT, null)
+assert.deepEqual(undatiert2.abschnitte.find((a) => a.id === 'neuLive').gruppen[0].themen[0].eintraege.map((e) => e.titel), ['Mit Datum', 'Ohne Datum'])
+
 // Echter Runner: Node als „gh“; Ausgabe, geschlossene stdin, Frist, fehlendes Programm
 const lauf = ghAusfuehren(process.execPath)
 assert.equal(typeof lauf, 'function')
@@ -166,5 +232,6 @@ try {
 } finally {
   console.error = alt2
 }
-assert.match(fehler[0], /^Warnung: gh nicht verfügbar: /)
+assert.match(fehler[0], /^Warnung: gh nicht verfügbar: [^\n]*gibt-es-nicht-uebersicht-4711[^\n]*$/)
+assert.equal(lauf(process.execPath, ['-e', 'process.stdout.write("a".repeat(3_000_000))'], { timeout: 30_000 }).length, 3_000_000, 'große Ausgaben (GraphQL-Antworten) passen durch')
 console.log('uebersicht-ausgabe.test.mjs: ok')

@@ -313,6 +313,24 @@ export function ImpressumView() {
         <p>Daniel Zaiser, Anschrift wie oben.</p>
       </div>
 
+      <ImpressumHaftung />
+
+      <ImpressumQuellen />
+
+      <div>
+        <h2 className="font-semibold text-slate-800 dark:text-slate-100">Streitschlichtung</h2>
+        <p>
+          Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer
+          Verbraucherschlichtungsstelle teilzunehmen.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function ImpressumHaftung() {
+  return (
+    <>
       <div>
         <h2 className="font-semibold text-slate-800 dark:text-slate-100">Haftung für Inhalte</h2>
         <p>
@@ -340,60 +358,56 @@ export function ImpressumView() {
           Termindaten unter CC BY 4.0 (<a className="underline" href="#/abo">Hinweise für Webseiten und Apps</a>).
         </p>
       </div>
+    </>
+  )
+}
 
-      <div>
-        <h2 className="font-semibold text-slate-800 dark:text-slate-100">Datenquellen</h2>
-        <ul className="ml-4 list-disc space-y-0.5">
-          <li>
-            Metadaten: <a className="underline" href="https://anilist.co">AniList</a>; Bewertung und Schlagworte: <a className="underline" href="https://www.anisearch.de">aniSearch</a>; Folgentitel und Folgenlängen, wo keine andere Quelle sie hat: <a className="underline" href="https://kitsu.app">Kitsu</a>
-          </li>
-          <li>
-            FSK, Cover- und Vorschaubilder: <a className="underline" href="https://www.themoviedb.org">TMDB</a> (ohne TMDB-Bild: AniList) — diese Seite nutzt die
-            TMDB-API, ist aber weder von TMDB unterstützt noch zertifiziert <img src="/icons/tmdb.svg" alt="TMDB" width="137" height="18" loading="lazy" className="mt-1 block" /></li>
-          <li>
-            Wo ein Titel läuft und was er kostet:{' '}
-            <a className="underline" href="https://www.justwatch.com">JustWatch</a>, über die TMDB-API
-          </li>
-          <li>
-            Tonspuren bei Netflix, Prime Video und Disney+:{' '}
-            <a className="underline" href="https://www.movieofthenight.com/about/api">
-              Streaming Availability API
-            </a>{' '}
-            von Movie of the Night
-          </li>
-          <li>
-            Sendezeiten:{' '}
-            <a className="underline" href={WOCHENPROGRAMM_UEBERSICHT}>Crunchyroll-Wochenprogramm</a>
-          </li>
-          {/*
-            **aniSearch mit voller Rolle und Link** (16.09.2026).
+function ImpressumQuellen() {
+  return (
+    <div>
+      <h2 className="font-semibold text-slate-800 dark:text-slate-100">Datenquellen</h2>
+      <ul className="ml-4 list-disc space-y-0.5">
+        <li>
+          Metadaten: <a className="underline" href="https://anilist.co">AniList</a>; Bewertung und Schlagworte: <a className="underline" href="https://www.anisearch.de">aniSearch</a>; Folgentitel und Folgenlängen, wo keine andere Quelle sie hat: <a className="underline" href="https://kitsu.app">Kitsu</a>
+        </li>
+        <li>
+          FSK, Cover- und Vorschaubilder: <a className="underline" href="https://www.themoviedb.org">TMDB</a> (ohne TMDB-Bild: AniList) — diese Seite nutzt die
+          TMDB-API, ist aber weder von TMDB unterstützt noch zertifiziert <img src="/icons/tmdb.svg" alt="TMDB" width="137" height="18" loading="lazy" className="mt-1 block" /></li>
+        <li>
+          Wo ein Titel läuft und was er kostet:{' '}
+          <a className="underline" href="https://www.justwatch.com">JustWatch</a>, über die TMDB-API
+        </li>
+        <li>
+          Tonspuren bei Netflix, Prime Video und Disney+:{' '}
+          <a className="underline" href="https://www.movieofthenight.com/about/api">
+            Streaming Availability API
+          </a>{' '}
+          von Movie of the Night
+        </li>
+        <li>
+          Sendezeiten:{' '}
+          <a className="underline" href={WOCHENPROGRAMM_UEBERSICHT}>Crunchyroll-Wochenprogramm</a>
+        </li>
+        {/*
+          **aniSearch mit voller Rolle und Link** (16.09.2026).
 
-            Hier stand nur „Termine: aniSearch, Anime2You" — ohne Link und ohne
-            die beiden Angaben, für die wir aniSearch tatsächlich am meisten
-            nutzen: deutsche Titel und Inhaltsangaben. aniSearch hat genau das
-            angemerkt, und der Punkt trifft: Die Quellenseite (#/quellen) führt
-            beides seit Längerem, das Impressum nicht.
-          */}
-          <li>
-            Deutsche Titel, Inhaltsangaben, Bezugsquellen, Cover:{' '}
-            <a className="underline" href="https://www.anisearch.de">aniSearch</a>
-          </li>
-          <li>
-            Termine:{' '}
-            <a className="underline" href="https://www.anisearch.de">aniSearch</a>,{' '}
-            <a className="underline" href="https://www.anime2you.de">Anime2You</a> — Quelle je
-            Eintrag im Detail-Panel verlinkt
-          </li>
-        </ul>
-      </div>
-
-      <div>
-        <h2 className="font-semibold text-slate-800 dark:text-slate-100">Streitschlichtung</h2>
-        <p>
-          Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer
-          Verbraucherschlichtungsstelle teilzunehmen.
-        </p>
-      </div>
+          Hier stand nur „Termine: aniSearch, Anime2You" — ohne Link und ohne
+          die beiden Angaben, für die wir aniSearch tatsächlich am meisten
+          nutzen: deutsche Titel und Inhaltsangaben. aniSearch hat genau das
+          angemerkt, und der Punkt trifft: Die Quellenseite (#/quellen) führt
+          beides seit Längerem, das Impressum nicht.
+        */}
+        <li>
+          Deutsche Titel, Inhaltsangaben, Bezugsquellen, Cover:{' '}
+          <a className="underline" href="https://www.anisearch.de">aniSearch</a>
+        </li>
+        <li>
+          Termine:{' '}
+          <a className="underline" href="https://www.anisearch.de">aniSearch</a>,{' '}
+          <a className="underline" href="https://www.anime2you.de">Anime2You</a> — Quelle je
+          Eintrag im Detail-Panel verlinkt
+        </li>
+      </ul>
     </div>
   )
 }

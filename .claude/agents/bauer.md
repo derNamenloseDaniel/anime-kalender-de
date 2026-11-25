@@ -71,7 +71,7 @@ Lokal immer: Tests der berührten Dateien (`npx tsx <test>`) und `npx tsc --noEm
 | neuer `catch`, `|| true`/`|| echo` | `node tools/stumme-pfade.mjs` |
 | Test mit `spawnSync`/`execFileSync` | nach dem Commit `tools/pr-vorpruefung.mjs` (fährt `tools/test-kind-frist.mjs`) |
 | Test mit Browser (`launch`, `newPage`) | `node tools/test-netz-wache.mjs` (Ausnahmen nur in `tools/test-netz-ausnahmen.json`) |
-| Test neu/geändert | `node tools/uhr-in-tests.mjs` (darf nur sinken); jede Prüfung aus `check-logic-liste.txt` lokal mit der Sperre der Kette: `NODE_OPTIONS="--require ./tools/bestand-sperre.cjs" npx tsx <test>` (ohne sie fiel ein `public/data`-Leser erst in der CI auf, PR 5018, 25.11.2026) |
+| Test neu/geändert | `node tools/uhr-in-tests.mjs` (darf nur sinken); jede Prüfung aus `check-logic-liste.txt` lokal mit der Sperre der Kette: `NODE_OPTIONS="--require ./tools/bestand-sperre.cjs" npx tsx <test>` (ohne sie fiel ein `public/data`-Leser erst in der CI auf, PR 5018, 25.11.2026); neuer Eintrag in `check-bestand-liste.txt`: Titel per `melde()`/`meldeVerletzte()` melden und `node tools/bestand-marken.test.mjs` fahren (PR 5018 fiel daran ein zweites Mal) |
 | `tools/mutationen/` oder Anker | `node tools/mutationsanker-ohne-tests.test.mjs` |
 | neuer `*-bestand.ts` | `node tools/bestand-verstoss-zeile.test.mjs`, `node tools/bestand-marken.test.mjs` |
 | `extension/` (zählt bei `umfang-pruefen`) | `node tools/extension-tests.mjs`, Einzeldatei `node --require extension/test-kontext.cjs <datei>`; Merge berührt sie: `node tools/extension-laden-pruefen.cjs` |

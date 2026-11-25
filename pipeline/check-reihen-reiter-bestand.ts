@@ -10,6 +10,7 @@ import { reihenTeileVon } from '../web/src/components/detail/reihen-daten.ts'
 import { reihenNameVon } from '../web/src/components/detail/reihen-namen.ts'
 import { reihenReiterVon } from '../web/src/components/detail/reihen-reiter-liste.ts'
 import { reihenOrdnung } from '../web/src/components/detail/reihen-inhalt.tsx'
+import { melde } from './lib/quarantaene.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -32,7 +33,9 @@ for (const t of titel) {
   const [teile, name] = [reihenTeileVon(t, reihe, daten), reihenNameVon(t, reihe, daten)]
   const marken = reihenReiterVon(t, teile, name, titel, gruppenVon(teile, name)).map((r) => r.label)
   if (marken.length) listen++
-  if (new Set(marken).size < marken.length) doppelte.push(`${t.id}: ${marken.join()}`)
+  if (new Set(marken).size === marken.length) continue
+  doppelte.push(`${t.id}: ${marken.join()}`)
+  melde(t.id, 'reihen-reiter-bestand', 'Reiterliste trägt dieselbe Beschriftung zweimal')
 }
 pruefe(`Bestand (${listen} Reiterlisten): keine doppelte Beschriftung`, listen > 100 && doppelte.length === 0, doppelte.slice(0, 3))
 

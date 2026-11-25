@@ -8,13 +8,14 @@ import { ausCacheFuer } from './cache-kurz.ts'
 import { tokenAusKopf, tokenGleich } from './lauf-token.ts'
 import { beantworteZurueck } from './pruefung-zurueck-route.ts'
 
-export async function handlePruefung(request: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
-  const offen = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-  }
-  const antwort = (body: unknown, status = 200) =>
-    new Response(JSON.stringify(body), { status, headers: offen })
+type Antwort = (body: unknown, status?: number) => Response
+
+async function handleSchreiben(request: Request, env: Env, antwort: Antwort, ctx?: ExecutionContext): Promise<Response> {
+  const token = tokenAusKopf(request)
+  if (!env.LAUF_TOKEN || !tokenGleich(token, env.LAUF_TOKEN)) return nichtErlaubt(antwort)
+  const zurueck = new URL(request.url).searchParams.get('zurueck') === '1'
+  return await (zurueck ? beantworteZurueck({ request, env, antwort }) : speichereMitProtokoll({ request, antwort, token, env, ctx }))
+}
 
   /**
    * **Gelesene Zeilen sind das Kontingent — also wird nicht zweimal dasselbe gelesen.**
@@ -80,6 +81,12 @@ export async function handlePruefung(request: Request, env: Env, ctx?: Execution
    * (`WHERE uebernommen = 0`), nicht die ganze Tabelle — das ist der
    * Unterschied zu `?zaehlen=1`.
    */
+export async function handlePruefung(request: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
+  const offen = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+  }
+  const antwort: Antwort = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: offen })
   const ausCache = ausCacheFuer(request, ctx)
 
   if (request.method === 'GET') {
@@ -92,8 +99,5 @@ export async function handlePruefung(request: Request, env: Env, ctx?: Execution
 
   if (request.method !== 'POST') return antwort({ error: 'GET, POST oder DELETE erwartet' }, 405)
 
-  const token = tokenAusKopf(request)
-  if (!env.LAUF_TOKEN || !tokenGleich(token, env.LAUF_TOKEN)) return nichtErlaubt(antwort)
-  const zurueck = new URL(request.url).searchParams.get('zurueck') === '1'
-  return await (zurueck ? beantworteZurueck({ request, env, antwort }) : speichereMitProtokoll({ request, antwort, token, env, ctx }))
+  return await handleSchreiben(request, env, antwort, ctx)
 }

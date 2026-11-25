@@ -17,7 +17,7 @@ import { reihenTeileVon } from '../web/src/components/detail/reihen-daten.ts'
 import { reihenNameVon } from '../web/src/components/detail/reihen-namen.ts'
 import type { FranchiseMember, Release, Title } from '../shared/types.ts'
 import { attrappeUhr, ignoriereCss, installiereMiniDom, klicke, type MiniKnoten } from '../tools/mini-dom.ts'
-import { reihenLageVon, reihenReiterVon } from '../web/src/components/detail/reihen-reiter-liste.ts'
+import { eindeutigeBeschriftung, reihenLageVon, reihenReiterVon } from '../web/src/components/detail/reihen-reiter-liste.ts'
 import { reihenOrdnung } from '../web/src/components/detail/reihen-inhalt.tsx'
 
 /** Die Gruppen der Reihenliste, wie das Panel sie den Reitern gibt (Überschriften als Schlüssel). */
@@ -41,7 +41,7 @@ const reiter = (id: number) => reihenReiterVon(offen(id), teile, 'Pokémon', tit
    Hauptserie 12 Einträge mit Bereichen. */
 pruefe('Horizonte: Reiter der eigenen Serien, Horizonte Nr. 5', JSON.stringify(reiter(14839).map((r) => [r.id, r.label])) === '[[6974,"1"],[8284,"2"],[13332,"3"],[13782,"4"],[14839,"5"],[14945,"6"],[15715,"7"]]', reiter(14839))
 const haupt = reiter(483).map((r) => r.label).join()
-pruefe('Hauptserie: 12 Reiter ohne „Staffel“, nach Nummer', haupt === '1–5,6–9,10–13,14–15,15–16,16,16,17–18,19,20–22,23–25,25', haupt)
+pruefe('Hauptserie: 12 Reiter ohne „Staffel“, nach Nummer', haupt === '1–5,6–9,10–13,14–15,15–16,16a,16b,17–18,19,20–22,23–25,25', haupt)
 pruefe('Hauptserie: Ids in Staffelfolge', reiter(10852).map((r) => r.id).join() === '483,1349,1350,4745,5979,6415,6563,6802,7798,8283,10852,14838', reiter(10852).map((r) => r.id))
 pruefe('Name am Reiter ist der Titel der Daten', reiter(14839)[4]!.name === 'Pokémon Horizonte' && reiter(483)[1]!.name === 'Pokémon Advanced Generation', [reiter(14839)[4]!.name, reiter(483)[1]!.name])
 /* Deutsche Staffelteilung als Sammeltitel: seit der Zusammenlegung ohne Bühnenfall, daher aus Horizonte nachgestellt. */
@@ -79,7 +79,7 @@ try {
  * Klasse zum Nachtrag (Daniel 24.11.2026 20:21–20:25), je Titel-Reihe-Paar: Reiter tragen nur die Kurzform, der volle Titel steht im
  * Namen; kein Reiter-Titel steht noch in der Reihenliste, und jeder Teil der Reihe bleibt erreichbar (Reiter oder Liste).
  */
-const KURZFORM = /^(\d+(–\d+)?( - Teil \d+)?|Teil \d+)$/
+const KURZFORM = /^(\d+[a-z]?(–\d+)?( - Teil \d+)?|Teil \d+)$/
 const nachtragFehler: string[] = []
 function klasseNachtrag(wo: string, liste: ReturnType<typeof reihenReiterVon>, rTeile: FranchiseMember[], rName: string): void {
   const ids = new Set(liste.map((r) => r.id))
@@ -115,6 +115,8 @@ for (const [name, f] of Object.entries(faelle)) {
 }
 pruefe(`alle Bühnenfälle ohne Absturz (${gerechnet} Titel-Reihe-Paare)`, gerechnet > 100 && abstuerze.length === 0, abstuerze.slice(0, 5))
 pruefe('alle Bühnenfälle: Kurzform, kein Titel in Reiter und Reihenliste, keiner unerreichbar', nachtragFehler.length === 0, nachtragFehler.slice(0, 5))
+const rohe = (labels: string[]) => labels.map((label, i) => ({ id: i + 1, label, name: `T${i + 1}`, staffel: true }))
+pruefe('Eindeutigkeit: gleiche Beschriftung a, b in Listenreihenfolge; einmalige und Überlappung bleiben', eindeutigeBeschriftung(rohe(['14–15', '15–16', '16', '16', '25', '16'])).map((r) => r.label).join() === '14–15,15–16,16a,16b,25,16c')
 pruefe('Staffel in zwei Teilen ohne Staffelstand: Teil 1, Teil 2 nach Kennung', JSON.stringify(skReiter) === '[[15940,"Teil 1"],[16333,"Teil 2"]]', skReiter)
 
 /* Lage am Stichtag des Mockups (24.11.2026): Horizonte läuft; Hauptserie 1–5 kommt, 23–25 läuft. */

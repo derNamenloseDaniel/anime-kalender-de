@@ -34,6 +34,34 @@ export interface DbKarteProps {
   staffel?: string
 }
 
+interface AusgeblendeteKarteProps {
+  main: Title
+  onToggleHidden: (id: number) => void
+}
+
+function AusgeblendeteKarte({ main, onToggleHidden }: AusgeblendeteKarteProps) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-ak-rand bg-ak-grund p-3 text-center">
+      <span className="line-clamp-3 text-xs italic text-ak-sehr-leise">{anzeigeName(main)}</span>
+      <HideEye hidden onToggle={() => onToggleHidden(main.id)} />
+    </div>
+  )
+}
+
+function kartenKlassen(keinDub: boolean, favorite: boolean): string {
+  return [
+    'group flex cursor-pointer flex-col overflow-hidden rounded-xl text-left transition',
+    keinDub ? 'border border-dashed' : 'border',
+    favorite
+      ? 'border-ak-favorit/70 shadow-[0_0_0_1px_color-mix(in_srgb,var(--ak-favorit)_30%,transparent)]'
+      : keinDub
+        ? 'border-ak-sehr-leise/60 hover:border-ak-leise'
+        : 'border-ak-rand hover:border-ak-leise',
+    keinDub ? 'bg-ak-grund hover:shadow-md' : 'bg-ak-flaeche hover:shadow-lg',
+    'has-[.ak-oeffnen:focus-visible]:outline-2 has-[.ak-oeffnen:focus-visible]:outline-offset-2 has-[.ak-oeffnen:focus-visible]:outline-ak-fokus',
+  ].join(' ')
+}
+
 /** Eine Kachel der Datenbank (oder, ausgeblendet, ihr Platzhalter). */
 export function DbKarte({ main, members, data, today, grouped, favorites, hidden, onToggleFavorite, onToggleHidden, onOpenTitle, share, copiedSlug, gruppe, ab, titelId, staffel, ausgeschlossen }: DbKarteProps) {
   const { t } = useLang()
@@ -64,31 +92,11 @@ export function DbKarte({ main, members, data, today, grouped, favorites, hidden
   const keinDub = members.every(istOhneBelegteSynchro)
   const teilbar = teilbarerSlug(main)
 
-  if (isHidden) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-ak-rand bg-ak-grund p-3 text-center">
-        <span className="line-clamp-3 text-xs italic text-ak-sehr-leise">{anzeigeName(main)}</span>
-        <HideEye hidden onToggle={() => onToggleHidden(main.id)} />
-      </div>
-    )
-  }
+  if (isHidden) return <AusgeblendeteKarte main={main} onToggleHidden={onToggleHidden} />
 
   return (
     /* Kein Knopf aus Knöpfen: wie die Kalenderkarte (EventCard, 18.09.2026). */
-    <div
-      onClick={() => onOpenTitle(titelId ?? main.id)}
-      className={[
-        'group flex cursor-pointer flex-col overflow-hidden rounded-xl text-left transition',
-        keinDub ? 'border border-dashed' : 'border',
-        favorite
-          ? 'border-ak-favorit/70 shadow-[0_0_0_1px_color-mix(in_srgb,var(--ak-favorit)_30%,transparent)]'
-          : keinDub
-            ? 'border-ak-sehr-leise/60 hover:border-ak-leise'
-            : 'border-ak-rand hover:border-ak-leise',
-        keinDub ? 'bg-ak-grund hover:shadow-md' : 'bg-ak-flaeche hover:shadow-lg',
-        'has-[.ak-oeffnen:focus-visible]:outline-2 has-[.ak-oeffnen:focus-visible]:outline-offset-2 has-[.ak-oeffnen:focus-visible]:outline-ak-fokus',
-      ].join(' ')}
-    >
+    <div onClick={() => onOpenTitle(titelId ?? main.id)} className={kartenKlassen(keinDub, favorite)}>
       <button
         type="button"
         className="ak-oeffnen sr-only"

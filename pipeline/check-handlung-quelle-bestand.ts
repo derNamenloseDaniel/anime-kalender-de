@@ -26,4 +26,5 @@ for (const f of bestand) {
 pruefe('Bestand: keine Handlung ohne titelgenaue Quelle', bestand.length === 0, bestand.slice(0, 3))
 pruefe('Bestand gelesen (Synopsen vorhanden)', Object.keys(synopsen).length > 1000, Object.keys(synopsen).length)
 
+console.log(`VERSTÖSSE: ${verletzt}`)
 if (verletzt) process.exit(1)

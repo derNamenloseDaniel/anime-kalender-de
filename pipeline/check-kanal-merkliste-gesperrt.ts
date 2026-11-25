@@ -26,11 +26,13 @@ function main(): number {
   const datei = join(ROOT, 'data', 'kanal-seiten.json')
   if (!existsSync(datei)) {
     console.error('✖ data/kanal-seiten.json fehlt')
+    console.log('VERSTÖSSE: 1')
     return 1
   }
   const merkliste = JSON.parse(readFileSync(datei, 'utf8')) as Zeile[]
   const treffer = gesperrteZeilen(merkliste, ladeBelegeEntfernt(join(ROOT, 'data', 'belege-entfernt.yaml')))
   for (const t of treffer) console.error(`✖ Merkliste führt gesperrte Seite: ${t}`)
+  console.log(`VERSTÖSSE: ${treffer.length}`)
   if (treffer.length > 0) return 1
   console.log(`✓ Kanal-Merkliste: ${merkliste.length} Zeilen, 0 gesperrt`)
   return 0

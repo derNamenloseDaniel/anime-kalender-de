@@ -50,10 +50,11 @@ export function erzeuge(text, jetzt, ausfuehren, cache, warne) {
   return { markdown: markdownVon(modell, k), html: htmlVon(modell, k), modell, k }
 }
 
-function ghAusfuehren() {
+/** Runner für `befehl, args, optionen` (stdin zu, windowsHide) oder null, wenn `programm` nicht startet. */
+export function ghAusfuehren(programm = 'gh') {
   const lauf = (befehl, args, opt) => execFileSync(befehl, args, { encoding: 'utf8', windowsHide: true, maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'], ...opt })
   try {
-    lauf('gh', ['--version'], { timeout: 10_000 })
+    lauf(programm, ['--version'], { timeout: 10_000 })
     return lauf
   } catch (fehler) {
     console.error(`Warnung: gh nicht verfügbar: ${String(fehler.message).split('\n')[0]}`)
@@ -71,7 +72,8 @@ function leseCache(pfad) {
   }
 }
 
-export function main(argv, jetztStandard) {
+/** `ghLauf` liefert den gh-Runner (Test: Attrappe) oder null. */
+export function main(argv, jetztStandard, ghLauf = ghAusfuehren) {
   const wert = (name) => (argv.includes(name) ? argv[argv.indexOf(name) + 1] : undefined)
   const stand = argv.find((a, i) => !a.startsWith('--') && argv[i - 1] !== '--jetzt') ?? STAND
   if (!existsSync(stand)) {
@@ -79,7 +81,7 @@ export function main(argv, jetztStandard) {
     return 1
   }
   const jetzt = wert('--jetzt') ? Date.parse(wert('--jetzt')) : jetztStandard
-  const ausfuehren = argv.includes('--ohne-gh') ? null : ghAusfuehren()
+  const ausfuehren = argv.includes('--ohne-gh') ? null : ghLauf()
   if (!ausfuehren) console.error('Warnung: ohne gh: keine PR-Labels, keine PR-Zahlen')
   const cachePfad = join(dirname(stand), '.uebersicht-cache.json')
   const cache = leseCache(cachePfad)

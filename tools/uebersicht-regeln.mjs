@@ -65,7 +65,7 @@ const THEMEN = [
   ['Pipeline und Betrieb', /(?<!\p{L})(pipeline|bestandsbau|sammler|workflow|deploy|pr-kette|kette\b|ci-|ci\b|bau\b|lauf|läufe|ausbleiben|wache|worker)/iu],
   ['Erweiterung und Quellen', /(?<!\p{L})(erweiterung|durchgang|netflix|prime|crunchyroll|anisearch|justwatch|tmdb|quelle|joyn|disney)/iu],
   ['Web und Oberfläche', /(?<!\p{L})(detail-panel|kalender|filter|mockup|woche|layout|handy|anzeige|navigator|suche|panel|cover|ics\b|reiter|bühne|gestaltung)/iu],
-  ['Titel und Franchise', /(?<!\p{L})(staffel|folge|handlung|disc|termin|synchro|franchise|horizonte|mängel|stumme|beyblade|pokémon|titel\b)/iu],
+  ['Titel und Franchise', /(?<!\p{L})(staffel|folge|handlung|disc|synchro|franchise|horizonte|mängel|stumme|beyblade|pokémon|titel\b)/iu],
 ]
 
 /** Themengruppe aus dem Titel: nur bei genau einem Treffer, sonst „Sonstiges“ (keine erfundene Zuordnung). */

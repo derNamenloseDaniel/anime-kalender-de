@@ -9,7 +9,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { REPO, holeMerges, holeOffene } from './uebersicht-gh.mjs'
+import { REPO, holeMerges, holeOffene, holePrDaten } from './uebersicht-gh.mjs'
 import { eintragHtml, esc, htmlVon } from './uebersicht-html.mjs'
 import { kennzahlen } from './uebersicht-kopf.mjs'
 import { alterText, labelText, markdownVon } from './uebersicht-md.mjs'
@@ -250,4 +250,63 @@ try {
 } finally {
   rmSync(ordner, { recursive: true, force: true })
 }
+
+// gh-PR-Daten: Form der Einträge, Abfragetext, Blockgrößen, Frischegrenze
+const antwortNach = (query) => {
+  const repo = {}
+  for (const x of query.matchAll(/n(\d+): issueOrPullRequest/g)) {
+    repo[`n${x[1]}`] = x[1] === '900300' ? null : { __typename: 'PullRequest', author: { login: 'a-login' }, state: 'OPEN', labels: { nodes: [{ name: 'l1' }, { name: 'l2' }] } }
+  }
+  return JSON.stringify({ data: { repository: repo } })
+}
+const queries = []
+const gq = (b, a, o) => {
+  assert.deepEqual([b, a.slice(0, 3), o], ['gh', ['api', 'graphql', '-f'], { timeout: 60_000 }])
+  queries.push(a[3])
+  return antwortNach(a[3])
+}
+const speicher = {}
+const nums = Array.from({ length: 45 }, (_, i) => 900200 + i)
+holePrDaten(gq, [...nums, 900300], speicher, JETZT)
+const erste = queries[0].match(/issueOrPullRequest/g).length
+assert.deepEqual([queries.length, erste, queries[1].match(/issueOrPullRequest/g).length], [2, 40, 6])
+assert.ok(queries[0].startsWith('query=query { repository(owner: "derNamenloseDaniel", name: "anime-kalender-de") { n900200: issueOrPullRequest(number: 900200) { __typename ... on PullRequest { author { login } state labels(first: 20) { nodes { name } } } } n900201: '))
+assert.deepEqual(speicher[900200], { typ: 'PullRequest', autor: 'a-login', labels: ['l1', 'l2'], offen: true, gemergt: false, abnahmeDirigent: false, abgerufen: JETZT })
+assert.deepEqual(speicher[900300], { typ: 'unbekannt', autor: null, labels: [], offen: false, abnahmeDirigent: false, abgerufen: JETZT })
+const n0 = queries.length
+holePrDaten(gq, nums, speicher, JETZT + 599_999)
+assert.equal(queries.length, n0, 'offener PR noch frisch')
+holePrDaten(gq, nums, speicher, JETZT + 600_000)
+assert.equal(queries.length, n0 + 2, 'offener PR nach 10 min neu')
+assert.equal(Object.keys(holePrDaten(gq, [900200, 900999], {}, JETZT)).length, 2)
+const mitGrenze = JSON.stringify({ number: 1, mergedAt: '2026-11-25T10:00:00Z', updatedAt: '2026-11-18T23:00:00Z', labels: [], autor: 'x' })
+let grenzSeiten = 0
+holeMerges(() => { grenzSeiten += 1; return grenzSeiten === 1 ? Array.from({ length: 100 }, () => mitGrenze).join('\n') : '' }, VON)
+assert.equal(grenzSeiten, 2, 'Seite, deren letzte Aktualisierung genau am Fensterbeginn liegt, geht weiter')
+const gedeckelt = holeMerges(() => seitenZeilen(100, '2026-11-25T10:00:00Z'), VON)
+assert.deepEqual([gedeckelt.liste.length, gedeckelt.vollstaendig], [2500, false])
+
+// Zeilenlesen: Icon nur am Anfang, Rücksetzen von Notizen und Auto-Block, strengere Einrückungsregel
+const lies = (zeilen) => leseStand(zeilen.join('\n'))
+assert.equal(lies(['## In Arbeit', `- ${'a'.repeat(14)} 🔴 **X**`]).inArbeit[0].icon, null)
+assert.equal(lies(['## In Arbeit', '- 🔴 **X**']).inArbeit[0].icon, '🔴')
+assert.deepEqual(lies(['## In Arbeit', '- **A**', '## Fremd', '  Notiz zu Fremd']).inArbeit[0].notizen, [])
+assert.deepEqual(lies(['## Daniel-Todo', '### Jetzt', '- **A**', '### Später', '  Notiz zu Später']).jetzt[0].notizen, [])
+assert.deepEqual(lies(['## In Arbeit', '- **A**', '- **Autonomer Modus** an', '  Notiz zum Modus']).inArbeit[0].notizen, [])
+assert.deepEqual(lies(['## In Arbeit', '- **A**', '  Notiz {eigen · hoch · Code · 01.11.}', '  - ohne Kennzeichen']).inArbeit.map((e) => e.notizen.length), [2])
+assert.deepEqual(lies(['## In Arbeit', '<!-- pr-zeilen', '- **Auto**', '## Als Nächstes', '- **B**']).naechstes.map((e) => e.titel), ['B'], 'Überschrift beendet den Auto-Block')
+
+// Modell: Zielnamen, Kürzungen, Abschnittswahl, Neu live ohne Datum, nächster Punkt nach Eingang
+const alleZiele = baueModell(['## Als Nächstes', ...['Daten', 'Autonomie', 'Code', 'Live5', '-'].map((z) => `- **${z}-Punkt** {eigen · normal · ${z} · 01.11.}`)].join('\n'), JETZT, null)
+assert.deepEqual(alleZiele.abschnitte.find((a) => a.id === 'naechstes').gruppen.map((g) => [g.ziel, g.name]), [['Daten', 'Volle Daten'], ['Autonomie', 'Autonomie'], ['Code', 'Fehlerfrei (Code)'], ['Live5', 'Schnell live'], ['-', 'Ohne Ziel']])
+const lang = baueModell(['## In Arbeit', `- **L** {eigen · normal · Code · 01.11.} ${'wort '.repeat(100)}${Array.from({ length: 10 }, (_, i) => `[L${i}](https://l/${i})`).join(' ')}`].join('\n'), JETZT, null)
+assert.equal(eintraege(lang, 'inArbeit')[0].kopf.length, 400)
+assert.equal(eintraege(lang, 'inArbeit')[0].links.length, 8)
+const bleibt = baueModell('## Daniel-Todo\n### Jetzt\n- 🔴 **J** {wartet: x}\n## Neu und live testbar\n- [2026-11-24 10:00] **N** wartet auf nichts', JETZT, null)
+assert.deepEqual([eintraege(bleibt, 'jetzt').length, eintraege(bleibt, 'neuLive').length, eintraege(bleibt, 'blockiert').length], [1, 1, 0])
+const undatiert = baueModell('## Neu und live testbar\n- **Ohne Datum**\n- [2026-11-24 10:00] **Mit Datum**\n- [2026-11-24 09:00] **Gleich alt**', JETZT, null)
+assert.deepEqual(eintraege(undatiert, 'neuLive').map((e) => e.titel), ['Mit Datum', 'Gleich alt', 'Ohne Datum'])
+const aeltester = baueModell('## Als Nächstes\n- **Neuer** {eigen · normal · Code · 05.11.}\n- **Älterer** {eigen · normal · Code · 03.11.}', JETZT, null)
+assert.equal(eintraege(aeltester, 'naechstes').find((e) => e.naechster).titel, 'Älterer')
+assert.deepEqual(kennzahlen(alleZiele, null, JETZT).abschnitte.map((a) => a.titel), ['Jetzt für Daniel', 'In Arbeit', 'Blockiert / wartet', 'Als Nächstes', 'Später (Daniel)', 'Neu live'])
 console.log('uebersicht-rand.test.mjs: ok')

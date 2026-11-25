@@ -25,7 +25,7 @@ function zeile(e) {
 
 function gruppeText(g) {
   const aus = []
-  if (g.ziel) aus.push(`### ${g.name} (${g.ziel})`)
+  if (g.ziel) aus.push(`### ${g.name}`)
   for (const t of g.themen) {
     if (t.thema) aus.push(`#### ${t.thema}`)
     aus.push(...t.eintraege.map(zeile), '')

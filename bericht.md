@@ -8,3 +8,7 @@
 - Unerwartet: GitHub meldete meist „GraphQL: Something went wrong while executing your query“ ohne „502“; die Erkennung musste das mitnehmen.
 - Vorschlag: `gh pr create` (3 Versuche, 5–15 s) bekommt dieselbe 5xx-Geduld, wenn es wieder auftritt; hier nicht angefasst.
 - Veraltet: nichts. Nicht gefahren: `check:vor-commit`; kein PR angelegt (Dirigent).
+
+
+## Nachbesserung R1 (25.11.2026)
+Basis origin/main 8ce0a8dd5e7867becdd61d6aab2b84215ff98af9, 2026-11-25 21:08:13 +0000; Details in nachtrag.md. Fix-Zweig Kopf 4140d86cc.

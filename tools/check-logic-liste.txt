@@ -315,6 +315,7 @@ pipeline/check-folgenzahl-sichtung.ts
 pipeline/check-fsk-franchise.ts
 pipeline/check-fsk-kopf-hinweis.ts
 pipeline/check-fsk-kopf-render.ts
+pipeline/check-geheimnis-testlauf.ts
 pipeline/check-genre-aus-tmdb.ts
 pipeline/check-geteilte-adressen.ts
 pipeline/check-gleiche-adresse.ts
@@ -621,6 +622,7 @@ pipeline/check-sammle-belege-naht.ts
 pipeline/check-sammler-lesezugriffe-faelle.ts
 pipeline/check-sammler-lesezugriffe-variable.ts
 pipeline/check-sammler-lesezugriffe.ts
+pipeline/check-schluessel-maskiert.ts
 pipeline/check-schwester-shop.ts
 pipeline/check-screenshot-wiederholen.ts
 pipeline/check-seite-nicht-werk.ts

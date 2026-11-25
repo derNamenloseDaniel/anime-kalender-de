@@ -21,12 +21,15 @@ function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
   console.error(`  ✖ ${name}${gefunden === undefined ? '' : ` — gefunden: ${JSON.stringify(gefunden)}`}`)
 }
 const BASIS = 10_000_000
+/** Seiten, die der Bestandsbau noch führt (25.11.2026, Bastard Teil 2, Stone Ocean Teil 3, Lupin Zeiten): `zuAk` kommt erst im Folge-PR (sonst trägt die Bauprobe dieselbe ak doppelt, PR 3015). */
+const ZUAK_FOLGT = new Set([16648, 17505, 17775])
 
 console.log('\nEchte Datei: Kishibe Rohan, Flavors of Youth, Baki Hanma:')
 pruefe('die Handdatei nimmt 13343 und 14752 in 21778 auf', aufgenommeneSeiten[13343] === 21778 && aufgenommeneSeiten[14752] === 21778)
 pruefe('die Handdatei nimmt 13418 und 13419 in 101231 auf', aufgenommeneSeiten[13418] === 101231 && aufgenommeneSeiten[13419] === 101231)
 pruefe('die Handdatei nimmt 18616 in 146646 auf', aufgenommeneSeiten[18616] === 146646)
-pruefe('genau diese fünf Seiten gehen auf', Object.keys(aufgenommeneSeiten).length === 5, aufgenommeneSeiten)
+pruefe('die Handdatei nimmt 17505 in 144677, 17775 in 146722 und 16648 in 134623 auf (Bastard Teil 2, Stone Ocean Teil 3, Lupin Zeiten)', aufgenommeneSeiten[17505] === 144677 && aufgenommeneSeiten[17775] === 146722 && aufgenommeneSeiten[16648] === 134623)
+pruefe('genau diese acht Seiten gehen auf', Object.keys(aufgenommeneSeiten).length === 8, aufgenommeneSeiten)
 
 console.log('\nAlte Adressen leiten auf den aufnehmenden Titel (echte data/kennungen.json):')
 {
@@ -34,6 +37,10 @@ console.log('\nAlte Adressen leiten auf den aufnehmenden Titel (echte data/kennu
   for (const [seite, ziel] of Object.entries(aufgenommeneSeiten)) {
     const zielAk = zeilen.find((z) => z[1] === ziel)?.[0]
     const alt = zeilen.find((z) => z[1] === BASIS + Number(seite) && z[2] === Number(seite))
+    if (ZUAK_FOLGT.has(Number(seite))) {
+      pruefe(`Seite ${seite}: zuAk folgt im Folge-PR nach dem Bestandsbau (Zeile da, noch ohne zuAk; dann aus ZUAK_FOLGT streichen)`, alt !== undefined && alt[3] === undefined, alt)
+      continue
+    }
     pruefe(`Seite ${seite}: die alte Zeile hat zuAk = ak von ${ziel}`, zielAk !== undefined && alt !== undefined && alt[3] === zielAk, { zielAk, alt })
   }
 }
@@ -63,6 +70,10 @@ console.log('\nAnlegen der aniSearch-Zeilen (echte Einträge):')
   pruefe('stehen 101231 und 146646 im Bestand, haben 13418, 13419 und 18616 keine Zeile', !flavors.has(BASIS + 13418) && !flavors.has(BASIS + 13419) && !flavors.has(BASIS + 18616))
   pruefe('Gegenprobe: nur 101231 im Bestand, bleibt 18616 eine Zeile', zeilen([101231]).has(BASIS + 18616) && !zeilen([101231]).has(BASIS + 13418))
   pruefe('Gegenprobe: nur 146646 im Bestand, bleiben 13418 und 13419 Zeilen', zeilen([146646]).has(BASIS + 13418) && zeilen([146646]).has(BASIS + 13419) && !zeilen([146646]).has(BASIS + 18616))
+  const teile = zeilen([144677, 146722, 134623])
+  pruefe('stehen 144677, 146722 und 134623 im Bestand, haben 17505, 17775 und 16648 keine Zeile', !teile.has(BASIS + 17505) && !teile.has(BASIS + 17775) && !teile.has(BASIS + 16648))
+  pruefe('Gegenprobe: ohne diese Titel bleiben 17505, 17775 und 16648 Zeilen', ohne.has(BASIS + 17505) && ohne.has(BASIS + 17775) && ohne.has(BASIS + 16648))
+  pruefe('Gegenprobe: nur 144677 im Bestand, bleiben 17775 und 16648 Zeilen', zeilen([144677]).has(BASIS + 17775) && zeilen([144677]).has(BASIS + 16648) && !zeilen([144677]).has(BASIS + 17505))
 }
 
 console.log('\nBaue den Titel wirklich (baueTitel):')

@@ -485,22 +485,35 @@ export async function main(args: string[] = process.argv.slice(2), welt: Welt = 
  * Quelle, die je Folge antwortet.
  */
 export function liste(titles: Title[], bestand: Record<string, Befund>): void {
-  /* JustWatchs Anbietername → unsere Kennung. Nur was eindeutig ist. */
-  const NAMEN: [RegExp, string][] = [
-    [/^crunchyroll$/i, 'crunchyroll'],
-    [/^netflix/i, 'netflix'],
-    [/^amazon prime video/i, 'primevideo'],
-    [/^animation digital network$/i, 'adn'],
-    [/^wow$|^rtl\+|^joyn/i, 'sonstige'],
-  ]
+  const zeilen = tonspurZeilen(titles, bestand)
+  const mitAussage = zeilen.length
+  const ohneWeg = ohneWegZeilen(titles, bestand)
+  mkdirSync('daniel-zum-abarbeiten/listen', { recursive: true })
+  writeFileSync(
+    'daniel-zum-abarbeiten/listen/16-justwatch-tonspuren.md',
+    `${[...listenKopf(mitAussage), ...zeilen, ...ohneWegAbschnitt(ohneWeg)].join('\n')}\n`,
+  )
+  log(`JustWatch: ${mitAussage} offene Verweise mit Tonspur-Angabe → daniel-zum-abarbeiten/listen/16-justwatch-tonspuren.md`)
+}
+
+/* JustWatchs Anbietername → unsere Kennung. Nur was eindeutig ist. */
+const ANBIETER_NAMEN: [RegExp, string][] = [
+  [/^crunchyroll$/i, 'crunchyroll'],
+  [/^netflix/i, 'netflix'],
+  [/^amazon prime video/i, 'primevideo'],
+  [/^animation digital network$/i, 'adn'],
+  [/^wow$|^rtl\+|^joyn/i, 'sonstige'],
+]
+
+/** Eine Tabellenzeile je offenem Verweis (Stream ohne `dub`), zu dem JustWatch eine Tonspur nennt. */
+function tonspurZeilen(titles: Title[], bestand: Record<string, Befund>): string[] {
   const zeilen: string[] = []
-  let mitAussage = 0
   for (const t of titles) {
     const b = bestand[String(t.id)]
     if (!b || b.ohneTreffer || !b.angebote.length) continue
     for (const s of t.streams ?? []) {
       if (s.dub !== undefined) continue
-      const passend = b.angebote.filter((a) => NAMEN.find(([re]) => re.test(a.anbieter))?.[1] === s.platform)
+      const passend = b.angebote.filter((a) => ANBIETER_NAMEN.find(([re]) => re.test(a.anbieter))?.[1] === s.platform)
       if (!passend.length) continue
       const audio = [...new Set(passend.flatMap((a) => a.audio))]
       const unter = [...new Set(passend.flatMap((a) => a.untertitel))]
@@ -513,16 +526,19 @@ export function liste(titles: Title[], bestand: Record<string, Befund>): void {
       zeilen.push(
         `| [${t.titleDe ?? t.titleRomaji}](https://anime-kalender.de/#/datenbank?t=${t.id}) | ${s.platform} | ${urteil} | \`${audio.join(', ')}\` | [JustWatch](https://www.justwatch.com${b.jwPfad}) |`,
       )
-      mitAussage++
     }
   }
-  /*
-    **Zweiter Abschnitt: Titel ganz ohne Bezugsweg.**
+  return zeilen
+}
 
-    243 Titel im Hauptbestand haben keinen einzigen Weg (07.09.2026) — für sie
-    beantwortet der Kalender Punkt 4 des Projektziels gar nicht („Nicht nur
-    wann, auch wo"). Wo JustWatch ein Angebot kennt, steht hier die Adresse.
-  */
+/*
+  **Zweiter Abschnitt: Titel ganz ohne Bezugsweg.**
+
+  243 Titel im Hauptbestand haben keinen einzigen Weg (07.09.2026) — für sie
+  beantwortet der Kalender Punkt 4 des Projektziels gar nicht („Nicht nur
+  wann, auch wo"). Wo JustWatch ein Angebot kennt, steht hier die Adresse.
+*/
+function ohneWegZeilen(titles: Title[], bestand: Record<string, Befund>): string[] {
   const ohneWeg: string[] = []
   for (const t of titles) {
     if ((t.streams ?? []).length || (t.watchLinks ?? []).length) continue
@@ -541,8 +557,11 @@ export function liste(titles: Title[], bestand: Record<string, Befund>): void {
         .join(', ')} |`,
     )
   }
+  return ohneWeg
+}
 
-  const kopf = [
+function listenKopf(mitAussage: number): string[] {
+  return [
     '# Was JustWatch zu offenen Verweisen sagt',
     '',
     `Stand: ${todayIso()}. Erzeugt von \`npm run data:justwatch\`.`,
@@ -557,8 +576,10 @@ export function liste(titles: Title[], bestand: Record<string, Befund>): void {
     '| Titel | Anbieter | JustWatch sagt | Tonspuren | Quelle |',
     '|---|---|---|---|---|',
   ]
-  mkdirSync('daniel-zum-abarbeiten/listen', { recursive: true })
-  const zweiter = ohneWeg.length
+}
+
+function ohneWegAbschnitt(ohneWeg: string[]): string[] {
+  return ohneWeg.length
     ? [
         '',
         '## Titel ganz ohne Bezugsweg',
@@ -572,11 +593,6 @@ export function liste(titles: Title[], bestand: Record<string, Befund>): void {
         ...ohneWeg,
       ]
     : []
-  writeFileSync(
-    'daniel-zum-abarbeiten/listen/16-justwatch-tonspuren.md',
-    `${[...kopf, ...zeilen, ...zweiter].join('\n')}\n`,
-  )
-  log(`JustWatch: ${mitAussage} offene Verweise mit Tonspur-Angabe → daniel-zum-abarbeiten/listen/16-justwatch-tonspuren.md`)
 }
 
 /* `?nur-laden` am Import-Pfad: Tests holen `main` und rufen es selbst mit ihrer Welt auf. `AK_NUR_LADEN` gilt für den Vergleichsrahmen (`tools/vergleich-alt-neu.mjs`), der den Pfad nicht ändern kann. */

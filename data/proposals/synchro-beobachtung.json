@@ -79,13 +79,6 @@
       "seit": "2026-11-08"
     },
     {
-      "titel": "Bocchi the Rock!",
-      "id": 130003,
-      "anbieter": "disc",
-      "start": "2026-12-04",
-      "seit": "2026-11-08"
-    },
-    {
       "titel": "Nukitashi: Welcome to Love Island!",
       "id": 174188,
       "anbieter": "disc",
@@ -112,6 +105,13 @@
       "anbieter": "unbekannt",
       "start": "2026-12-17",
       "seit": "2026-11-17"
+    },
+    {
+      "titel": "Bocchi the Rock!",
+      "id": 130003,
+      "anbieter": "disc",
+      "start": "2026-12-18",
+      "seit": "2026-11-08"
     },
     {
       "titel": "Bitte zieh dich an, Takamine!",

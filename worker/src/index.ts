@@ -577,7 +577,7 @@ async function gesundheit(env: Env, ctx: ExecutionContext): Promise<Response> {
   return json(env, { ok: true, activeSubscribers: count?.n ?? 0, heute: await tagesstand(env), newsletter: await digestStand(env, new Date()) })
 }
 
-export async function verteile(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+async function verteile(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url)
 
     if (request.method === 'OPTIONS') return optionenAntwort(url, env)

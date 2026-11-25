@@ -219,7 +219,7 @@ assert.equal(mAufruf[0][1][2], '--jq')
 assert.deepEqual(mAufruf[0][2], { timeout: 60_000 })
 let seiten = 0
 holeMerges(() => { seiten += 1; return seitenZeilen(100, '2026-11-25T10:00:00Z') }, VON)
-assert.equal(seiten, 25, 'höchstens 25 Seiten')
+assert.equal(seiten, 15, 'höchstens 15 Seiten (REST-Kontingent)')
 assert.equal(holeMerges(() => seitenZeilen(99, '2026-11-25T10:00:00Z'), VON).liste.length, 99)
 const grenze = JSON.stringify({ number: 1, mergedAt: '2026-11-18T23:00:00Z', updatedAt: '2026-11-18T23:00:00Z', labels: [], autor: 'x' })
 assert.equal(holeMerges(() => grenze, VON).liste.length, 1, 'Merge genau am Fensterbeginn zählt')
@@ -297,7 +297,7 @@ let grenzSeiten = 0
 holeMerges(() => { grenzSeiten += 1; return grenzSeiten === 1 ? Array.from({ length: 100 }, () => mitGrenze).join('\n') : '' }, VON)
 assert.equal(grenzSeiten, 2, 'Seite, deren letzte Aktualisierung genau am Fensterbeginn liegt, geht weiter')
 const gedeckelt = holeMerges(() => seitenZeilen(100, '2026-11-25T10:00:00Z'), VON)
-assert.deepEqual([gedeckelt.liste.length, gedeckelt.vollstaendig], [2500, false])
+assert.deepEqual([gedeckelt.liste.length, gedeckelt.vollstaendig], [1500, false])
 
 // Zeilenlesen: Icon nur am Anfang, Rücksetzen von Notizen und Auto-Block, strengere Einrückungsregel
 const lies = (zeilen) => leseStand(zeilen.join('\n'))

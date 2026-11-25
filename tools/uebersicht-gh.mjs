@@ -8,7 +8,7 @@ import { hatAbnahmeDirigent } from './uebersicht-regeln.mjs'
 export const REPO = 'derNamenloseDaniel/anime-kalender-de'
 const FRIST_MS = 60_000
 const BLOCK = 40
-const MAX_SEITEN = 25
+const MAX_SEITEN = 15
 const OFFEN_LIMIT = 200
 const CACHE_OFFEN_MS = 600_000
 

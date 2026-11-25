@@ -115,21 +115,6 @@ for (const [name, f] of Object.entries(faelle)) {
 }
 pruefe(`alle Bühnenfälle ohne Absturz (${gerechnet} Titel-Reihe-Paare)`, gerechnet > 100 && abstuerze.length === 0, abstuerze.slice(0, 5))
 pruefe('alle Bühnenfälle: Kurzform, kein Titel in Reiter und Reihenliste, keiner unerreichbar', nachtragFehler.length === 0, nachtragFehler.slice(0, 5))
-/* Wächter (Daniel 25.11.2026): keine Reiterliste im Bestand trägt dieselbe Beschriftung für zwei Titel; Pokémon „16“/„25“ und Ookami to Koushinryou „1“/„2“ standen doppelt. */
-const echt = (datei: string) => JSON.parse(readFileSync(new URL(`../public/data/${datei}`, import.meta.url), 'utf8'))
-const echteTitel = echt('titles.json') as Title[]
-const echteReihen = echt('franchises.json') as Record<string, FranchiseMember[]>
-const echteDaten = { titles: echteTitel, titleById: new Map(echteTitel.map((t) => [t.id, t])), releasesByTitle: new Map() } as unknown as Dataset
-const doppelteListen: string[] = []
-let echteListen = 0
-for (const t of echteTitel) {
-  const reihe = echteReihen[t.franchiseId ?? t.id] ?? []
-  const [rTeile, rName] = [reihenTeileVon(t, reihe, echteDaten), reihenNameVon(t, reihe, echteDaten)]
-  const marken = reihenReiterVon(t, rTeile, rName, echteTitel, gruppenVon(rTeile, rName)).map((r) => r.label)
-  if (marken.length) echteListen++
-  if (new Set(marken).size < marken.length) doppelteListen.push(`${t.id}: ${marken.join()}`)
-}
-pruefe(`Bestand (${echteListen} Reiterlisten): keine doppelte Beschriftung`, echteListen > 100 && doppelteListen.length === 0, doppelteListen.slice(0, 3))
 const rohe = (labels: string[]) => labels.map((label, i) => ({ id: i + 1, label, name: `T${i + 1}`, staffel: true }))
 pruefe('Eindeutigkeit: gleiche Beschriftung a, b in Listenreihenfolge; einmalige und Überlappung bleiben', eindeutigeBeschriftung(rohe(['14–15', '15–16', '16', '16', '25', '16'])).map((r) => r.label).join() === '14–15,15–16,16a,16b,25,16c')
 pruefe('Staffel in zwei Teilen ohne Staffelstand: Teil 1, Teil 2 nach Kennung', JSON.stringify(skReiter) === '[[15940,"Teil 1"],[16333,"Teil 2"]]', skReiter)

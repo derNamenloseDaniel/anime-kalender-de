@@ -19,6 +19,7 @@
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { SYNOPSIS_GROUPS, anbieterName, type Release, type Title } from '../shared/types.ts'
 import { todayIso } from '../shared/time.ts'
 import { ROOT, log, readJson } from './lib/util.ts'
@@ -222,7 +223,7 @@ function terminZeile(release: Release, titel: Title | undefined, adresse: string
   )
 }
 
-function schreibeUebersicht(
+export function schreibeUebersicht(
   releases: Release[],
   titleById: Map<number, Title>,
   belegt: number,
@@ -422,4 +423,5 @@ function writeSitemap(titel: { slug: string; lastmod?: string }[], verzeichnis: 
   log(`sitemap.xml mit ${urls.length} Adressen und robots.txt geschrieben`)
 }
 
-main()
+// Nur als Skript starten: der Vergleichsrahmen (`tools/vergleich-alt-neu.mjs`) importiert die Datei, ohne zu bauen.
+if (process.argv[1] === fileURLToPath(import.meta.url)) main()

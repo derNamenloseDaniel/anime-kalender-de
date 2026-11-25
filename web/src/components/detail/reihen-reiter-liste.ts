@@ -48,6 +48,19 @@ function ausHauptstaffeln(teile: FranchiseMember[], reihenName: string): ReihenR
     .map((m) => ({ id: m.id, label: text.get(m.id)!.replace(/^Staffel\s+/, ''), name: m.name, staffel: true }))
 }
 
+/** Gleiche Kurzbeschriftungen verschiedener Titel (zwei „16“, zwei „1“) bekommen in Listenreihenfolge a, b, …; einmalige bleiben. */
+export function eindeutigeBeschriftung(liste: ReihenReiter[]): ReihenReiter[] {
+  const zahl = new Map<string, number>()
+  for (const r of liste) zahl.set(r.label, (zahl.get(r.label) ?? 0) + 1)
+  const lauf = new Map<string, number>()
+  return liste.map((r) => {
+    if (zahl.get(r.label) === 1) return r
+    const i = lauf.get(r.label) ?? 0
+    lauf.set(r.label, i + 1)
+    return { ...r, label: r.label + String.fromCharCode(97 + i) }
+  })
+}
+
 /**
  * Die Reiter für den geöffneten Titel aus seiner Kategorie der Reihe: Sammeltitel-Staffeln, sonst Hauptstaffeln, sonst seine Gruppe
  * der Reihenliste (`gruppen`, wie `reihenOrdnung` sie bildet). Eine Liste nur ab zwei Reitern, die den Titel enthalten. Alles kommt
@@ -56,7 +69,7 @@ function ausHauptstaffeln(teile: FranchiseMember[], reihenName: string): ReihenR
 export function reihenReiterVon(title: Title, teile: FranchiseMember[], reihenName: string, titel: Title[], gruppen: Gruppe[]): ReihenReiter[] {
   const istHaupt = hauptstaffeln(teile).some((m) => m.id === title.id)
   const liste = title.staffelTitel ? ausSammeltitel(title.staffelTitel.sammel, titel) : istHaupt ? ausHauptstaffeln(teile, reihenName) : ausGruppe(title, gruppen)
-  return liste.length >= 2 && liste.some((r) => r.id === title.id) ? liste : []
+  return liste.length >= 2 && liste.some((r) => r.id === title.id) ? eindeutigeBeschriftung(liste) : []
 }
 
 /** Letzte Folge der Staffel nach den Verweisen der Anbieter (`teilBereich.bis`); ohne Angabe 0. */

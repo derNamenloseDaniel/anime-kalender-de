@@ -560,11 +560,11 @@ async function katalogLauf(): Promise<void> {
   }
 }
 
-async function main(): Promise<void> {
+export async function main(argumente: readonly string[] = args): Promise<void> {
   log(wegZeile(WEG))
   await holeAdnNews()
-  if (args.includes('--laufend')) return laufendLauf()
-  if (args.includes('--refresh')) {
+  if (argumente.includes('--laufend')) return laufendLauf()
+  if (argumente.includes('--refresh')) {
     const shows = await refreshCatalog()
     if (!shows.length) return
     writeJson(
@@ -575,7 +575,7 @@ async function main(): Promise<void> {
     log(`ADN-Auffrischung: ${shows.length} Serien aktualisiert`)
     return
   }
-  if (args.includes('--catalog')) return katalogLauf()
+  if (argumente.includes('--catalog')) return katalogLauf()
 
   const today = todayIso()
   const from = addDays(today, FROM)

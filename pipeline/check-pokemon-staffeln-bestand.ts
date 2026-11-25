@@ -31,5 +31,6 @@ for (const g of ladeStaffelGrenzen(POKEMON_STAFFELN)) {
     console.error(`FEHLER: Geteilte Staffeln: ${g.anilistId} beginnt Staffel ${nr} bei Folge ${anfang} („${eigen}“ gegen TMDB „${fremd}“)`)
   }
 }
+console.log(`VERSTÖSSE: ${fehler}`)
 if (fehler) process.exit(1)
 console.log('check-pokemon-staffeln-bestand: ok')

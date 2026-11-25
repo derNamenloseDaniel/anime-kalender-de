@@ -53,6 +53,7 @@ function ersteZuordenbare(): { sender: string; date: string; time: string; staff
 
 const fall = ersteZuordenbare()
 if (!titel || !fall) {
+  console.log('VERSTÖSSE: 1')
   melde(ID, 'staffel-folge-tv-schleife', 'keine Horizonte-Sendung mit Staffel und Folge zuordenbar')
   console.error(`✖ check-staffel-folge-tv-schleife: ${titel ? 'keine zuordenbare Horizonte-Sendung in data/tv-programm.json' : `Titel ${ID} fehlt in public/data/titles.json`}`)
   process.exit(1)
@@ -70,6 +71,7 @@ const release = {
 const { events } = rolleTermineAus({ releases: [release], titles: new Map([[ID, titel]]), jpStart: new Map() })
 const ev = events.find((e) => e.releaseSlug === 'probe-horizonte-tv' && e.platform === 'tv')
 const ok = JSON.stringify(ev?.staffelFolge) === JSON.stringify(fall.staffelFolge)
+console.log(`VERSTÖSSE: ${ok ? 0 : 1}`)
 if (!ok) {
   melde(ID, 'staffel-folge-tv-schleife', 'Fernsehtermin kam ohne staffelFolge aus rolleTermineAus')
   console.error(`✖ check-staffel-folge-tv-schleife: Termin ${fall.date} ${fall.time} ${fall.sender} kam ohne staffelFolge ${JSON.stringify(fall.staffelFolge)} aus rolleTermineAus (${JSON.stringify(ev)})`)

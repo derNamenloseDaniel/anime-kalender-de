@@ -30,4 +30,5 @@ pruefe('Jede Sammelseite hat noch einen Treffer (sonst aus SAMMELSEITEN streiche
 pruefe('Jede Sammelseite nennt ihren Grund', Object.values(SAMMELSEITEN).every((s) => s.grund.length > 20))
 
 console.log(verletzt ? `\n${verletzt} Zusicherung(en) verletzt.` : `\ncheck-handbeleg-fremde-adresse-bestand: ${ausgenommen.length} Sammelseiten-Belege, keine fremde Adresse offen.`)
+console.log(`VERSTÖSSE: ${verletzt}`)
 process.exit(verletzt ? 1 : 0)

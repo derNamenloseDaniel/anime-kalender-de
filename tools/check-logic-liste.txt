@@ -590,6 +590,7 @@ pipeline/check-quittung-sperre.ts
 pipeline/check-reihen-doppelt.ts
 pipeline/check-reihen-namen-rein.ts
 pipeline/check-reihen-namen.ts
+pipeline/check-reihen-reiter.ts
 pipeline/check-reihen-spur-hook.ts
 pipeline/check-reihen-spur.ts
 pipeline/check-reihen-teilname.ts
@@ -838,6 +839,7 @@ tools/link-anisearch-amazon.test.ts
 tools/link-check-ende.test.ts
 tools/link-check-zeitbudget.test.ts
 tools/link-faelligkeit.test.ts
+tools/mockup-freigabe-pflicht.mjs
 tools/quarantaene-pruefungen.test.ts
 tools/quellen-gesundheit.test.ts
 tools/quellen-leer.test.ts

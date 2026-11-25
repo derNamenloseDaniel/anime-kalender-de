@@ -150,7 +150,7 @@ assert.equal(pfeil('rechts', false), '', 'rechts ohne Reiter rechts nicht da')
 assert.match(pfeil('links', true), /data-pfeil="links"/)
 for (const r of ['links', 'rechts'] as const) {
   const klassen = attr(pfeil(r, true), 'class') ?? ''
-  assert.ok(pxVon(klassen, 'after:h') >= 44 && pxVon(klassen, 'after:w') >= 44, `Pfeil-Trefferfläche ≥ 44 px: ${klassen}`)
+  assert.ok(pxVon(klassen, 'min-h') >= 44 && pxVon(klassen, 'w') >= 44, `Pfeil-Trefferfläche ≥ 44 px: ${klassen}`)
 }
 const aufruf = (richtung: 'links' | 'rechts', clientWidth: number, ruhig: boolean) => {
   const gerufen: ScrollToOptions[] = []

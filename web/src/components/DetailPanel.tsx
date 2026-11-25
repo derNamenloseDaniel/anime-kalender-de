@@ -19,6 +19,9 @@ import { usePanelAntwort } from './detail/panel-antwort.ts'
 import { usePanelSynopse } from './detail/panel-synopse.ts'
 import { useReiheZustand } from './detail/panel-reihe-zustand.ts'
 import { PanelKoerper } from './detail/panel-koerper.tsx'
+import { ReihenReiterKontext } from './detail/reihen-reiter.tsx'
+import { reihenReiterVon } from './detail/reihen-reiter-liste.ts'
+import { reihenOrdnung } from './detail/reihen-inhalt.tsx'
 import type { DetailPanelProps } from './detail/panel-props.ts'
 
 export function DetailPanel({
@@ -88,10 +91,13 @@ export function DetailPanel({
           kinoRelease={a.kinoRelease}
           asZiel={asZiel}
         />
-        <PanelKoerper
-          {...{ data, title, today, releases, verbindung, favorites, onToggleFavorite, onFilterBy, onOpenTitle }}
-          {...{ a, s, discAusgaben, discZuerst, plot, asZiel, reihenTeile, reihenName, reihe, wechsel }}
-        />
+        {/* Reiter der Kategorie am Antwortkasten (F157): ein Reiter öffnet den Titel auf demselben Weg wie die Reihenliste, die ihn dafür nicht mehr zeigt. */}
+        <ReihenReiterKontext.Provider value={{ data, reiter: reihenReiterVon(title, reihenTeile, reihenName, data.titles, reihenOrdnung(reihenTeile, reihenName, t).gruppen), wechsleZu: wechsel.wechsleZu }}>
+          <PanelKoerper
+            {...{ data, title, today, releases, verbindung, favorites, onToggleFavorite, onFilterBy, onOpenTitle }}
+            {...{ a, s, discAusgaben, discZuerst, plot, asZiel, reihenTeile, reihenName, reihe, wechsel }}
+          />
+        </ReihenReiterKontext.Provider>
       </div>
     </>
   )

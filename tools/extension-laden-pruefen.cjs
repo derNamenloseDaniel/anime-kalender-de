@@ -245,6 +245,10 @@ function baueSandkasten(host, pfad) {
   return s
 }
 
+/* Als Modul geladen (Vergleichsrahmen) gibt es nur den Sandkasten; den Lauf startet allein der Aufruf per Kommandozeile. */
+module.exports = { baueSandkasten }
+if (require.main !== module) return
+
 console.log('Jedes Content-Skript einmal laden:\n')
 
 for (const datei of SKRIPTE) {

@@ -3,11 +3,10 @@ import { useUeberlaeuft } from '../lib/use-ueberlaeuft.ts'
 import { type NewsArt, type NewsEintrag } from '@shared/types.ts'
 import { feedUrl, loadNews, type Dataset } from '../lib/data.ts'
 import { useLang } from '../lib/i18n.tsx'
-import { ohneAusgeblendete } from '../lib/ecchi.ts'
-import { coverBild } from '../lib/cover.ts'
 import { datumKurz } from '../lib/news-text.ts'
 import { todayIso, addDays } from '@shared/time.ts'
-import { KinoPlakette } from './news-kachel.tsx'
+import { KinoKarte } from './kino-karte.tsx'
+import { kinoFilme } from '../lib/kino-filme.ts'
 import { PatchnotesKnopf } from './PatchnotesKnopf.tsx'
 import { AELTERE_SCHRITT_TAGE } from '../lib/news-gruppen.ts'
 import { NewsFilterKnoepfe } from './news-eintrag.tsx'
@@ -16,14 +15,6 @@ import { useNewsListe } from '../lib/use-news-liste.ts'
 import { useNewsAufklappen } from '../lib/use-news-aufklappen.ts'
 import { Ladeplatz } from './Ladeplatz.tsx'
 
-
-/*
-  **Wie lange ein Film zurück noch mitläuft.** Ohne belegten letzten Spieltag
-  (`cinemaUntil`, aus dem Kinoprogramm) wissen wir nicht, ob er noch läuft. Vier
-  Wochen nach dem Start deckt die übliche Auswertung ab; die Karte nennt dann den
-  Start, nicht „läuft noch".
-*/
-const KINO_RUECKBLICK_TAGE = 28
 
 /**
  * **Karussell für Kinofilme, die gerade laufen oder bald starten** (Daniel,
@@ -43,28 +34,7 @@ export function KinoKarussell({
   const { t } = useLang()
   const leiste = useRef<HTMLUListElement>(null); const ueberlaeuft = useUeberlaeuft(leiste, data)
   const heute = todayIso()
-  const filme = useMemo(() => {
-    const ab = addDays(heute, -KINO_RUECKBLICK_TAGE)
-    const jeTitel = new Map<number, { titelId: number; start: string; bis?: string }>()
-    for (const r of data.releases) {
-      if (r.platform !== 'kino') continue
-      const start = r.schedule?.firstEpisodeDate
-      if (!start) continue
-      if (r.cinemaUntil ? r.cinemaUntil < heute : start < ab) continue
-      const bisher = jeTitel.get(r.titleId)
-      /* Mehrere Kinotermine eines Titels: ein laufender vor einem kommenden, sonst der nähere. */
-      if (bisher) {
-        const lief = bisher.start < heute
-        const laeuft = start < heute
-        const besser = laeuft !== lief ? laeuft : laeuft ? start > bisher.start : start < bisher.start
-        if (!besser) continue
-      }
-      jeTitel.set(r.titleId, { titelId: r.titleId, start, bis: r.cinemaUntil })
-    }
-    const laufend = [...jeTitel.values()].filter((f) => f.start < heute).sort((a, b) => b.start.localeCompare(a.start))
-    const kommend = [...jeTitel.values()].filter((f) => f.start >= heute).sort((a, b) => a.start.localeCompare(b.start))
-    return ohneAusgeblendete([...laufend, ...kommend].filter((f) => data.titleById.has(f.titelId)), data.titleById)
-  }, [data, heute])
+  const filme = useMemo(() => kinoFilme(data, heute), [data, heute])
 
   if (!filme.length) return null
 
@@ -101,41 +71,9 @@ export function KinoKarussell({
         </div>
       </div>
       <ul ref={leiste} data-kino="" className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:thin]">
-        {filme.map((f) => {
-          const titel = data.titleById.get(f.titelId)!
-          const name = titel.titleDe ?? titel.titleEn ?? titel.titleRomaji ?? ''
-          const kommt = f.start >= heute
-          /* Eine Einzelvorstellung (letzter Spieltag = Start) läuft „am", nicht „ab" (Your Name, CineAnime). */
-          const zeile = kommt
-            ? t(f.bis === f.start ? 'news.kino.am' : 'news.kino.ab', { d: kurz(f.start) })
-            : f.bis
-              ? t('news.kino.bis', { d: kurz(f.bis) })
-              : t('news.kino.start', { d: kurz(f.start) })
-          return (
-            <li key={f.titelId} className="w-28 shrink-0 snap-start">
-              <button
-                type="button"
-                onClick={() => oeffne(f.titelId)}
-                className="group flex w-full flex-col gap-1 text-left"
-              >
-                <span className="relative block aspect-[2/3] w-full overflow-hidden rounded bg-slate-200 dark:bg-slate-800">
-                  {titel.coverImage && (
-                    <img
-                      {...coverBild(titel.coverImage, 150)}
-                      alt=""
-                      loading="lazy"
-                      className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                    />
-                  )}
-                  <KinoPlakette kommt={kommt} text={zeile} />
-                </span>
-                <span className="line-clamp-2 text-xs font-medium text-slate-800 group-hover:underline dark:text-slate-100">
-                  {name}
-                </span>
-              </button>
-            </li>
-          )
-        })}
+        {filme.map((f) => (
+          <KinoKarte key={f.titelId} film={f} data={data} heute={heute} oeffne={oeffne} kurz={kurz} t={t} />
+        ))}
       </ul>
     </div>
   )

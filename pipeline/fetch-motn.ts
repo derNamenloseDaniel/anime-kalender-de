@@ -39,6 +39,7 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { gzipSync } from 'node:zlib'
 import { createHash } from 'node:crypto'
 import { loadEnv, log, readJson, ROOT, sleep, slugify, warn, writeJson } from './lib/util.ts'
@@ -404,7 +405,7 @@ function kontrollmenge(titles: Title[]): Set<number> {
   return ids
 }
 
-async function main(): Promise<void> {
+export async function main(): Promise<void> {
   if (!SCHLUESSEL) {
     // Kein Abbruch mit Fehlercode: In einem Lauf ohne hinterlegten Schlüssel
     // ist das kein Defekt, sondern eine fehlende Konfiguration. Der Bestand
@@ -501,7 +502,10 @@ async function main(): Promise<void> {
   )
 }
 
-main().catch((err) => {
-  console.error(err)
-  process.exit(1)
-})
+// Nur beim Direktstart: der Vergleichsrahmen (`tools/vergleich-alt-neu.mjs`) importiert `main` und darf den Abruf nicht auslösen.
+if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+  main().catch((err) => {
+    console.error(err)
+    process.exit(1)
+  })
+}

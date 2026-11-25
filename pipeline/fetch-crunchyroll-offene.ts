@@ -45,6 +45,7 @@
  *
  * Aufruf: npx tsx pipeline/fetch-crunchyroll-offene.ts [--limit 40] [--trocken]
  */
+import { pathToFileURL } from 'node:url'
 import type { Title } from '../shared/types.ts'
 import { log, readJson, sleep, warn, writeJson } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
@@ -286,5 +287,4 @@ function slugTeileVon(url: string): string[] {
   }
 }
 
-
-await main()
+if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) await main()

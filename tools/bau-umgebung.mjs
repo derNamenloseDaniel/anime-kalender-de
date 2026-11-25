@@ -42,3 +42,26 @@ export function ohneCiToken(env = process.env) {
   for (const name of CI_TOKEN_VARIABLEN) delete kopie[name]
   return kopie
 }
+
+/**
+ * Schlüssel und Tokens der Datenläufe (Secrets der Workflows). Ein Testlauf, der `fetch.ts` oder einen Sammler mit `...process.env` startet,
+ * erbt sie sonst: die Fehlermeldung enthält die TMDB-Adresse samt `api_key` und landet im öffentlichen CI-Log (Nachtbericht 25.11.2026,
+ * `pipeline/check-anilist-mangel-lauf.ts`). `check:logic` und `tests-alle` entfernen sie für jede Prüfung; wer einen Schlüssel braucht, setzt ihn selbst.
+ */
+export const GEHEIMNIS_VARIABLEN = [
+  'ANISEARCH_TOKEN',
+  'CLOUDFLARE_API_TOKEN',
+  'CR_WEICHE_TOKEN',
+  'MERGER_TOKEN_DA',
+  'SERPER_API_KEY',
+  'STREAMING_API_KEY',
+  'TMDB_API_KEY',
+  'YOUTUBE_API_KEY',
+]
+
+/** Kopie von `env` ohne die Schlüssel der Datenläufe. */
+export function ohneGeheimnisse(env = process.env) {
+  const kopie = { ...env }
+  for (const name of GEHEIMNIS_VARIABLEN) delete kopie[name]
+  return kopie
+}

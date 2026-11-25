@@ -1,0 +1,11 @@
+# Nachtrag R1 – sammler-502-geduld (PR 5042)
+
+Basis: origin/main 8ce0a8dd5e7867becdd61d6aab2b84215ff98af9 (2026-11-25 21:08 UTC), Merge-Commit 4140d86cc (kein Rebase, kein Force-Push). Hinweis: Das Klon war flach; `git fetch --unshallow origin` war nötig, sonst „unrelated histories“.
+
+1. **Merge + Konflikte:** `quellen-pr.sh`: `pr_mergen` (5xx-Pausen) bleibt, dazu aus #5036 der echte Grund als globales `MERGE_GRUND` (Notice bei 5xx und bei Ablehnung, `::error::` mit „zuletzt: …“, auch nach erschöpften 5xx-Pausen). `merge_aus`/`merge_grund` entfallen (ersetzt). `gh pr list --head`-Check in `pr_anlegen` unverändert erhalten. Wächter (`mergen` = `gh pr merge "$ZWEIG"`) und dessen Test: Seite des Zweigs, da `pr_mergen` die Stelle trägt. Mutationsanker in `tools/mutationen/quellen-pr-anlegen.json` nachgezogen (`$MERGE_GRUND`). Test: Fälle aus #5036 angepasst (502 → „Serverfehler (HTTP 502 …)“; dauerhaft 502 = 5 Versuche, `::error::` enthält „zuletzt: HTTP 502: Bad Gateway (Merge 5)“).
+2. **Zustandsabfrage scheitert:** neuer Test „scheiternde Zustandsabfrage gilt nicht als gemergt“ (`pr view --json state` exit 1 → leer): alle fünf Versuche laufen, `gemerged=false`, kein `gemerged=true`. Mutant `= "MERGED"` → `!= "OPEN"` → Test rot (✗ nur dieser).
+3. **Prüferpunkt 3 (serverfehler()-Muster):** Hinweis, keine Auflage, unverändert. Punkt 5 (Laufzeit +4 min): keine Aktion. Punkte 6–7: Tests erneut gefahren.
+4. **Läufe:** `quellen-pr.test.mjs` grün (~4 min), `sammler-pruefschritt-waechter.test.mjs` ok, `tsc --noEmit -p .` leer, eslint auf geänderten Tests sauber, `mutationsanker --diff`: 0 tot.
+5. **Mutationsprobe (je einzeln, `quellen-pr.test.mjs`):** M1 Grund im 5xx-Rot-Zweig geleert (`{ MERGE_GRUND=""; return 1; }`) → rot; M2 leere Abfrage als gemergt → rot. Beide in `tools/mutationen/quellen-pr-anlegen.json` aufgenommen (Gesamtliste nicht vollständig gefahren, nur die zwei neuen).
+
+Rückblick: gut – Merge-Auflösung mit `MERGE_GRUND` global ist kleiner als zwei Variablen. Schlecht – flacher Klon kostete einen Umweg. Unerwartet – ein Heredoc-Skript mit Backslash blockt der Hook. Vorschlag – im Bauer-Start „bei Merge-Konflikt-Aufträgen zuerst `git fetch --unshallow`“ notieren.

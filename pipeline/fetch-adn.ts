@@ -17,6 +17,7 @@
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { gunzipSync } from 'node:zlib'
 import { addDays, diffDays, todayIso } from '../shared/time.ts'
 import { log, readJson, ROOT, sleep, warn, writeJson } from './lib/util.ts'
@@ -255,7 +256,7 @@ async function sammleSerienliste(): Promise<Map<number, AdnListenEintrag>> {
   return nachId
 }
 
-async function fetchCatalog(): Promise<{ shows: AdnShow[]; auskunft: KatalogAuskunft }> {
+export async function fetchCatalog(): Promise<{ shows: AdnShow[]; auskunft: KatalogAuskunft }> {
   const nachId = await sammleSerienliste()
   /**
    * Was wir schon einmal gesehen haben, wird wieder gefragt.
@@ -635,13 +636,15 @@ async function main(): Promise<void> {
   }
 }
 
-main()
-  .then(() => {
-    const bilanz = riegelBilanz(verworfen.length, gefragt.length)
-    log(bilanz.zeile)
-    if (bilanz.rot) process.exitCode = 1
-  })
-  .catch((err) => {
-    console.error(err)
-    process.exit(1)
-  })
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main()
+    .then(() => {
+      const bilanz = riegelBilanz(verworfen.length, gefragt.length)
+      log(bilanz.zeile)
+      if (bilanz.rot) process.exitCode = 1
+    })
+    .catch((err) => {
+      console.error(err)
+      process.exit(1)
+    })
+}

@@ -1,6 +1,6 @@
 import { test, expect } from 'claude-code/testing'
 
-import { BAND, starte } from './testhilfe'
+import { BAND, dateiWelt, starte } from './testhilfe'
 import { UEBERSICHT_FRIST_MS, UEBERSICHT_HTML, UEBERSICHT_LOG, UEBERSICHT_SKRIPT, UEBERSICHT_VERSTECKT, erzeugeUndOeffne } from './uebersicht'
 
 const START = ['wscript.exe', '//B', '//NoLogo', UEBERSICHT_VERSTECKT, UEBERSICHT_SKRIPT, UEBERSICHT_LOG]
@@ -95,12 +95,13 @@ test('Leiste: scheitert das Erzeugen, zeigt der Knopf den Fehler als Toast und �
   const gestartet: string[][] = []
   const hinweise: string[] = []
   on('ui.toast', (_$, e) => { hinweise.push(String((e as { text?: string }).text)); return { value: undefined } as never })
+  dateiWelt['.uebersicht-log.txt'] = 'stand.md fehlt: Y\nzweite'
   on('process.run', (_$, e) => { gestartet.push([...(e as { argv: string[] }).argv]); return { value: { exitCode: 1, stdout: '', stderr: '' } } as never })
   await $.session.start({ cwd: 'C:/x', surface: 'terminal', isInteractive: true })
   const band = await $.ui.mount({ ...BAND, surface: 'terminal' })
   await band.press({ key: 'uebersicht-oeffnen' })
   await new Promise(r => setTimeout(r, 50))
   expect(gestartet).toEqual([START])
-  expect(hinweise).toEqual(['Übersicht fehlgeschlagen: Exit 1'])
+  expect(hinweise).toEqual(['Übersicht fehlgeschlagen: stand.md fehlt: Y'])
   await band.unmount()
 })

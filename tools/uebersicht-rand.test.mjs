@@ -14,9 +14,9 @@ import { eintragHtml, esc, htmlVon } from './uebersicht-html.mjs'
 import { kennzahlen } from './uebersicht-kopf.mjs'
 import { alterText, labelText, markdownVon } from './uebersicht-md.mjs'
 import { baueModell } from './uebersicht-modell.mjs'
-import { alterVon, blockiertGrund, datenImText, grundText, markenVon, prBelege } from './uebersicht-regeln.mjs'
+import { alterVon, blockiertGrund, datenImText, grundText, markenVon, offenesWort, prBelege } from './uebersicht-regeln.mjs'
 import { leseStand, linksVon, titelVon } from './uebersicht-stand.mjs'
-import { erzeuge } from './uebersicht.mjs'
+import { begrenzt, erzeuge } from './uebersicht.mjs'
 
 const JETZT = Date.parse('2026-11-25T12:00:00Z')
 const seit = (tag, monat) => alterVon({ k: { tag, monat }, kopf: '', icon: null }, JETZT)
@@ -391,4 +391,40 @@ assert.deepEqual(neu('- [2026-11-24 10:00] **Fett** — [Seite](https://a/1)'), 
 assert.deepEqual(neu(`- 2026-11-24 ${'x'.repeat(150)} — [Seite](https://a/1)`), [`2026-11-24 ${'x'.repeat(88)}…`], 'Zeile ohne Datumsklammer, auf 100 Zeichen gekürzt')
 assert.deepEqual(neu('- [2026-11-24] Nur Datum — [Seite](https://a/1)'), ['Nur Datum'])
 assert.equal(titelVon('- [2026-11-24 10:00] [Seite](https://a/1)'), 'Seite', 'andere Abschnitte behalten den Linktext')
+
+// Randfälle der PR-Erkennung: Fenster, Nachbar-PR, Duplikate, lange Link-Adressen
+assert.deepEqual(pb('PR 900001 ' + 'a'.repeat(62) + 'gemergt'), { beleg: [900001], geliefert: [900001] }, 'gemergt endet genau bei 70 Zeichen')
+assert.deepEqual(pb('PR 900001 ' + 'a'.repeat(63) + 'gemergt'), { beleg: [], geliefert: [] }, 'ein Zeichen weiter zählt nicht')
+assert.deepEqual(pb('PR 900001 und PR 900002 gemergt'), { beleg: [900002], geliefert: [900002] }, 'gemergt gehört dem nächsten PR, nicht dem davor')
+assert.deepEqual(pb('PR 900001 gemergt, PR 900001 gemergt', 'PR 900001 eingereicht'), { beleg: [900001], geliefert: [900001] }, 'jede Nummer einmal')
+assert.deepEqual(pb('[PR 900001](https://example.org/' + 'a'.repeat(90) + ') gemergt'), { beleg: [900001], geliefert: [900001] }, 'die Link-Adresse zählt nicht ins Fenster')
+assert.equal(offenesWort(['alles gut', 'bleibt offen']), 'offen')
+assert.equal(offenesWort(['alles gut']), null)
+assert.equal(offenesWort(['(a) eins', '(c) drei']), '(a)…(b)')
+
+// Labels: Datenbot, Issue und unbekannte Nummer geben nichts (je allein)
+const einLabel = (daten) => eintraege(baueModell(`## In Arbeit\n- **Eins** ${KZ}: PR 900401 gemergt`, JETZT, { prDaten: daten }), 'inArbeit')[0].labels
+assert.deepEqual(einLabel({ 900401: PR([], { autor: 'anime-kalender-daten' }) }), [], 'Datenbot')
+assert.deepEqual(einLabel({ 900401: { typ: 'Issue', autor: 'x', labels: [] } }), [], 'Issue')
+assert.deepEqual(einLabel({}), [], 'unbekannte Nummer')
+assert.deepEqual(einLabel({ 900401: PR([]) }), ['lokal'], 'Kontrolle')
+
+// Neu-live-Titel: leere Zeile, Längengrenze
+assert.deepEqual(neu('- [2026-11-24 10:00]'), ['[2026-11-24 10:00]'], 'nur das Datum: die Zeile selbst')
+assert.deepEqual(neu(`- [2026-11-24 10:00] ${'y'.repeat(100)} — [Seite](https://a/1)`), ['y'.repeat(100)], 'genau 100 Zeichen bleiben')
+assert.deepEqual(neu(`- [2026-11-24 10:00] ${'y'.repeat(101)} — [Seite](https://a/1)`), [`${'y'.repeat(99)}…`], '101 Zeichen werden gekürzt')
+
+// Gesamtfrist: Restzeit 1 ms läuft noch, Optionen gehen durch, ein Abruf, der an der Frist abbricht, gilt als Frist
+assert.equal(begrenzt((b, a, o) => o.timeout, 1001, () => 1000)('gh', [], {}), 1)
+assert.deepEqual(begrenzt((b, a, o) => o, 1000, () => 0)('gh', [], { maxBuffer: 5, timeout: 5000 }), { maxBuffer: 5, timeout: 1000 }, 'weitere Optionen bleiben, Frist wird gekürzt')
+const bis = (zeit) => {
+  let uhr = 0
+  const w = []
+  const abbruch = (b, a) => { uhr = zeit; throw Object.assign(new Error('ETIMEDOUT'), { code: 'ETIMEDOUT' }) }
+  const r = erzeuge('## In Arbeit\n- **A** {eigen · hoch · Daten · 20.11.} PR 900001 gemergt', JETZT, abbruch, {}, (x) => w.push(x), () => uhr, 75_000)
+  return { w, md: r.markdown }
+}
+assert.deepEqual(bis(75_000).w, ['gh: Gesamtfrist abgelaufen, Rest entfällt'], 'Abruf endet genau an der Frist')
+assert.ok(bis(75_000).md.includes('GitHub-Daten fehlen (Frist)'))
+assert.deepEqual(bis(74_999).w, ['gh PR-Labels: ETIMEDOUT', 'gh offene PRs: ETIMEDOUT', 'gh Merges: ETIMEDOUT'], 'knapp vor der Frist ist es ein gewöhnlicher Fehler')
 console.log('uebersicht-rand.test.mjs: ok')

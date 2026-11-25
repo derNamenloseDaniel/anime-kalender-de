@@ -495,22 +495,98 @@ async function vorfallMelden(request: Request, env: Env): Promise<Response> {
   return vorfallAntwort({ ok: true, vorfaelle: anzahl?.n ?? 0 })
 }
 
+function optionenAntwort(url: URL, env: Env): Response {
+  // Der Laufstatus wird auch aus einer Datei gelesen (Ursprung `null`) — daher `*` für diese Pfade.
+  if (OFFENE_PFADE.includes(url.pathname)) {
+    return new Response(null, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, X-Lauf-Token',
+      },
+    })
+  }
+  return new Response(null, { headers: cors(env) })
+}
+
+/* Der Service Worker holt beim Push den Text ab — einmal, danach ist er weg. */
+async function pushNachricht(request: Request, env: Env): Promise<Response> {
+  const endpoint = new URL(request.url).searchParams.get('endpoint') ?? ''
+  const zeile = await env.DB.prepare('SELECT offen, offen_ziel FROM push_abo WHERE endpoint = ?1')
+    .bind(endpoint)
+    .first<{ offen: string | null; offen_ziel: string | null }>()
+  if (zeile?.offen)
+    await env.DB.prepare('UPDATE push_abo SET offen = NULL, offen_ziel = NULL WHERE endpoint = ?1')
+      .bind(endpoint)
+      .run()
+  /* Das Ziel steht seit dem 23.09.2026 daneben: Eine einzelne Meldung öffnet ihr Panel. */
+  return json(env, { text: zeile?.offen ?? null, ziel: zeile?.offen_ziel ?? null })
+}
+
+async function debugDigest(request: Request, env: Env, url: URL): Promise<Response> {
+  // Versand von Hand auslösen. Nur mit dem Secret DEBUG_TOKEN; ohne Secret abgeschaltet.
+  const token = tokenAusKopf(request)
+  if (!env.DEBUG_TOKEN || !tokenGleich(token, env.DEBUG_TOKEN)) {
+    return json(env, { error: 'Nicht erlaubt' }, 403)
+  }
+  const frequency = url.searchParams.get('frequency') === 'weekly' ? 'weekly' : 'daily'
+  try {
+    const result = await runDigest(env, new Date(), frequency)
+    return json(env, { ok: true, result })
+  } catch (err) {
+    // Ohne Auffangnetz quittiert Cloudflare das mit einem nackten
+    // „error code: 1101", aus dem niemand die Ursache erkennt.
+    return json(env, { ok: false, error: (err as Error).message }, 500)
+  }
+}
+
+async function debugMonitor(request: Request, env: Env, url: URL): Promise<Response> {
+  if (!env.DEBUG_TOKEN || !tokenGleich(tokenAusKopf(request), env.DEBUG_TOKEN)) return json(env, { error: 'Nicht erlaubt' }, 403)
+  const mode = url.searchParams.get('mail')
+  try {
+    const result = await runMonitor(
+      env,
+      new Date(),
+      mode === 'alert' || mode === 'weekly' ? mode : undefined,
+    )
+    return json(env, { ok: true, result })
+  } catch (err) {
+    return json(env, { ok: false, error: (err as Error).message }, 500)
+  }
+}
+
+async function statusAntwort(env: Env): Promise<Response> {
+  const { results } = await env.DB.prepare(
+    'SELECT name, url, ok, status, ms, reason, checked_at, last_ok_at, fail_streak FROM site_status ORDER BY ok, name',
+  ).all()
+  return json(env, { sites: results ?? [] })
+}
+
+/*
+  **Der Kanal, auf dem die Statusanzeige zuhört.** Kein Token: Hier fließt nur die Nachricht
+  „es hat sich etwas geändert", keine Daten — die holt die Anzeige über ihre Endpunkte.
+*/
+async function ereignisKanal(request: Request, env: Env): Promise<Response> {
+  if (!env.EREIGNISSE) return json(env, { error: 'Kein Ereignis-Kanal eingerichtet' }, 501)
+  if (request.headers.get('Upgrade') !== 'websocket') {
+    return json(env, { error: 'WebSocket erwartet' }, 426)
+  }
+  const stub = env.EREIGNISSE.get(env.EREIGNISSE.idFromName('status'))
+  return stub.fetch(request)
+}
+
+async function gesundheit(env: Env, ctx: ExecutionContext): Promise<Response> {
+  ctx.waitUntil(sichereSchnellmessung(env.SCHNELLMESSER).catch(() => {})) // stellt den Taktgeber der Schnellmessung sicher
+  const count = await env.DB.prepare(
+    "SELECT COUNT(*) AS n FROM subscribers WHERE status = 'active'",
+  ).first<{ n: number }>()
+  return json(env, { ok: true, activeSubscribers: count?.n ?? 0, heute: await tagesstand(env), newsletter: await digestStand(env, new Date()) })
+}
+
 async function verteile(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url)
 
-    if (request.method === 'OPTIONS') {
-      // Der Laufstatus wird auch aus einer Datei gelesen (Ursprung `null`) — daher `*` für diese Pfade.
-      if (OFFENE_PFADE.includes(url.pathname)) {
-        return new Response(null, {
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, X-Lauf-Token',
-          },
-        })
-      }
-      return new Response(null, { headers: cors(env) })
-    }
+    if (request.method === 'OPTIONS') return optionenAntwort(url, env)
 
     switch (url.pathname) {
       case '/subscribe':
@@ -544,19 +620,8 @@ async function verteile(request: Request, env: Env, ctx: ExecutionContext): Prom
       case '/push/abo':
         if (request.method !== 'POST') return json(env, { error: 'POST erwartet' }, 405)
         return handlePushAbo(request, env, imRahmen, (body, status) => json(env, body, status))
-      case '/push/nachricht': {
-        /* Der Service Worker holt beim Push den Text ab — einmal, danach ist er weg. */
-        const endpoint = new URL(request.url).searchParams.get('endpoint') ?? ''
-        const zeile = await env.DB.prepare('SELECT offen, offen_ziel FROM push_abo WHERE endpoint = ?1')
-          .bind(endpoint)
-          .first<{ offen: string | null; offen_ziel: string | null }>()
-        if (zeile?.offen)
-          await env.DB.prepare('UPDATE push_abo SET offen = NULL, offen_ziel = NULL WHERE endpoint = ?1')
-            .bind(endpoint)
-            .run()
-        /* Das Ziel steht seit dem 23.09.2026 daneben: Eine einzelne Meldung öffnet ihr Panel. */
-        return json(env, { text: zeile?.offen ?? null, ziel: zeile?.offen_ziel ?? null })
-      }
+      case '/push/nachricht':
+        return pushNachricht(request, env)
       case '/feed-token':
         if (request.method !== 'POST') return json(env, { error: 'POST erwartet' }, 405)
         return handleFeedToken(request, env)
@@ -573,42 +638,12 @@ async function verteile(request: Request, env: Env, ctx: ExecutionContext): Prom
         // Der Umstell-Knopf aus der Mail. Setzt den Rhythmus und verbindet den
         // Browser gleich mit — ein Klick, beide Wirkungen.
         return handleRhythmus(request, env)
-      case '/debug/digest': {
-        // Versand von Hand auslösen. Nur mit dem Secret DEBUG_TOKEN; ohne Secret abgeschaltet.
-        const token = tokenAusKopf(request)
-        if (!env.DEBUG_TOKEN || !tokenGleich(token, env.DEBUG_TOKEN)) {
-          return json(env, { error: 'Nicht erlaubt' }, 403)
-        }
-        const frequency = url.searchParams.get('frequency') === 'weekly' ? 'weekly' : 'daily'
-        try {
-          const result = await runDigest(env, new Date(), frequency)
-          return json(env, { ok: true, result })
-        } catch (err) {
-          // Ohne Auffangnetz quittiert Cloudflare das mit einem nackten
-          // „error code: 1101", aus dem niemand die Ursache erkennt.
-          return json(env, { ok: false, error: (err as Error).message }, 500)
-        }
-      }
-      case '/debug/monitor': {
-        if (!env.DEBUG_TOKEN || !tokenGleich(tokenAusKopf(request), env.DEBUG_TOKEN)) return json(env, { error: 'Nicht erlaubt' }, 403)
-        const mode = url.searchParams.get('mail')
-        try {
-          const result = await runMonitor(
-            env,
-            new Date(),
-            mode === 'alert' || mode === 'weekly' ? mode : undefined,
-          )
-          return json(env, { ok: true, result })
-        } catch (err) {
-          return json(env, { ok: false, error: (err as Error).message }, 500)
-        }
-      }
-      case '/status': {
-        const { results } = await env.DB.prepare(
-          'SELECT name, url, ok, status, ms, reason, checked_at, last_ok_at, fail_streak FROM site_status ORDER BY ok, name',
-        ).all()
-        return json(env, { sites: results ?? [] })
-      }
+      case '/debug/digest':
+        return debugDigest(request, env, url)
+      case '/debug/monitor':
+        return debugMonitor(request, env, url)
+      case '/status':
+        return statusAntwort(env)
       case '/verlauf':
         return json(env, await handleVerlauf(env))
       case '/cr-zugang':
@@ -623,30 +658,15 @@ async function verteile(request: Request, env: Env, ctx: ExecutionContext): Prom
       */
       case '/vorfall':
         return handleVorfall(request, env)
-      /*
-        **Der Kanal, auf dem die Statusanzeige zuhört.** Kein Token: Hier fließt nur die Nachricht
-        „es hat sich etwas geändert", keine Daten — die holt die Anzeige über ihre Endpunkte.
-      */
-      case '/ereignisse': {
-        if (!env.EREIGNISSE) return json(env, { error: 'Kein Ereignis-Kanal eingerichtet' }, 501)
-        if (request.headers.get('Upgrade') !== 'websocket') {
-          return json(env, { error: 'WebSocket erwartet' }, 426)
-        }
-        const stub = env.EREIGNISSE.get(env.EREIGNISSE.idFromName('status'))
-        return stub.fetch(request)
-      }
+      case '/ereignisse':
+        return ereignisKanal(request, env)
       case '/pruefung': {
         return await handlePruefung(request, env, ctx)
       }
       case '/lauf':
         return handleLauf(request, env, ctx)
-      case '/health': {
-        ctx.waitUntil(sichereSchnellmessung(env.SCHNELLMESSER).catch(() => {})) // stellt den Taktgeber der Schnellmessung sicher
-        const count = await env.DB.prepare(
-          "SELECT COUNT(*) AS n FROM subscribers WHERE status = 'active'",
-        ).first<{ n: number }>()
-        return json(env, { ok: true, activeSubscribers: count?.n ?? 0, heute: await tagesstand(env), newsletter: await digestStand(env, new Date()) })
-      }
+      case '/health':
+        return gesundheit(env, ctx)
       default:
         return json(env, { error: 'Unbekannter Pfad' }, 404)
     }

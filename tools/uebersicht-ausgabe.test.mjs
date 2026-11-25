@@ -209,6 +209,38 @@ assert.ok(mdZwei.includes('💻 lokal 🌙 nacht'), 'zwei Labels mit Leerzeichen
 assert.ok(mdZwei.includes('Offene PRs: 16\n- PR 900500'))
 assert.ok(mdZwei.includes('\n\nMerges je Tag\n| Tag |'))
 
+// Kopf mit gh Zeile für Zeile (Soll aus der Absicht: Zahlen je Abschnitt, Label-Zählung, offene PRs ältester zuerst höchstens 15, Merges 7 Tage)
+const kopfSoll = [
+  '# Übersicht', '', 'Erzeugt 2026-11-25T12:00:00.000Z aus stand.md (einzige Wahrheit, nicht von Hand ändern).', '',
+  '| Abschnitt | Punkte |', '|---|---|', '| Jetzt für Daniel | 0 |', '| In Arbeit | 3 |', '| Blockiert / wartet | 0 |', '| Als Nächstes | 1 |', '| Später (Daniel) | 0 |', '| Neu live | 0 |', '',
+  'Labels offene Punkte: 💻 lokal 0 · 🌙 nacht 0 · beide 1 · ohne Beleg 3', '',
+  'Offene PRs: 16',
+  ...Array.from({ length: 15 }, (_, i) => `- PR ${900500 + i} — 1 h — O${i}${i === 0 ? ' [a, b]' : ''}`), '',
+  'Merges je Tag', '| Tag | 💻 lokal | 🌙 nacht | Datenbot |', '|---|---|---|---|',
+  '| 2026-11-25 | 1 | 0 | 0 |', '| 2026-11-24 | 1 | 0 | 0 |', '| 2026-11-23 | 0 | 0 | 0 |', '| 2026-11-22 | 0 | 0 | 0 |', '| 2026-11-21 | 0 | 0 | 0 |', '| 2026-11-20 | 0 | 0 | 0 |', '| 2026-11-19 | 0 | 0 | 0 |', '',
+  '## Streichkandidaten (1)',
+]
+const offene2 = offene.map((o, i) => (i === 0 ? { ...o, labels: ['a', 'b'] } : o))
+const kopfIst = markdownVon(zwei, kennzahlen(zwei, { offene: { liste: offene2, abgeschnitten: false }, merges: { liste: [{ mergedAt: '2026-11-24T08:00:00Z', labels: [], autor: 'x' }, { mergedAt: '2026-11-25T08:00:00Z', labels: [], autor: 'x' }], vollstaendig: true } }, JETZT)).split('\n')
+assert.deepEqual(kopfIst.slice(0, kopfSoll.length), kopfSoll)
+
+// Streichkandidaten: Abschnitt Zeile für Zeile, Listen im HTML ohne Trenner, mehrere Themen je Ziel
+const drei = baueModell('## In Arbeit\n- **Skill Eins** {eigen · hoch · Daten · 20.11.} PR 900601\n- **Staffel Zwei** {eigen · hoch · Daten · 20.11.} PR 900602\n- **Nichts Drei** {eigen · hoch · Daten · 20.11.} PR 900603', JETZT, { prDaten: { 900601: PR1, 900602: PR1, 900603: PR1 } })
+const mdDrei = markdownVon(drei, kennzahlen(drei, null, JETZT))
+assert.equal(mdDrei.slice(mdDrei.indexOf('## Streichkandidaten'), mdDrei.indexOf('## Jetzt für Daniel')), [
+  '## Streichkandidaten (3)', '',
+  'Alle PR-Links gemergt, kein „offen“, kein 📅/⏳. Die Zeilen stehen weiter in ihrem Abschnitt.', '',
+  '- **Skill Eins** 💻 lokal ❗ seit 5 Tagen (eigen · hoch)',
+  '- **Staffel Zwei** 💻 lokal ❗ seit 5 Tagen (eigen · hoch)',
+  '- **Nichts Drei** 💻 lokal ❗ seit 5 Tagen (eigen · hoch)', '', '',
+].join('\n'))
+assert.ok(mdDrei.includes('#### Titel und Franchise\n- **Staffel Zwei**'))
+const htmlDrei = htmlVon(drei, kennzahlen(drei, null, JETZT))
+assert.ok(!htmlDrei.includes('</li>,') && !htmlDrei.includes('</details>,') && !htmlDrei.includes('</ul>,'), 'keine Kommas zwischen Themen und Zeilen')
+assert.equal((htmlDrei.match(/<details class="thema" open>/g) ?? []).length, 3)
+assert.equal((htmlDrei.match(/<li class="e"/g) ?? []).length, 6, 'drei Zeilen im Abschnitt, drei bei den Streichkandidaten')
+assert.ok(htmlDrei.includes('<details class="abschnitt" id="a-streichen"><summary><h2>Streichkandidaten</h2> <span class="zahl" data-zahl>(3)</span></summary><p class="detail mu">Alle PR-Links gemergt, kein „offen“, kein 📅/⏳. Die Zeilen stehen weiter in ihrem Abschnitt.</p><ul class="liste" style="padding:0 14px"><li class="e"'))
+
 // Streichkandidaten stehen in Dateireihenfolge, auch wenn „Als Nächstes“ vor „In Arbeit“ steht
 const umgekehrt = baueModell('## Als Nächstes\n- **N** {eigen · normal · Code · 01.11.} PR 900401\n## In Arbeit\n- **I** {eigen · normal · Code · 01.11.} PR 900402', JETZT, { prDaten: { 900401: PR1, 900402: PR1 } })
 assert.deepEqual(umgekehrt.streichkandidaten.map((e) => e.titel), ['N', 'I'])

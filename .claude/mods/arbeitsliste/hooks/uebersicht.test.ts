@@ -54,11 +54,39 @@ test('Übersicht: Doppelklick startet nur einen Lauf, danach geht es wieder', as
 test('Leiste: Knopf „Übersicht“ startet das Erzeugen und danach den Browser über den echten Host-Aufruf', async ($, on) => {
   starte(on, null, [], true)
   const gestartet: string[][] = []
-  on('process.run', (_$, e) => { gestartet.push([...(e as { argv: string[] }).argv]); return { value: { exitCode: 0, stdout: '', stderr: '' } } as never })
+  const fristen: Array<number | undefined> = []
+  on('process.run', (_$, e) => {
+    const ev = e as { argv: string[]; init?: { timeoutMs?: number } }
+    gestartet.push([...ev.argv])
+    fristen.push(ev.init?.timeoutMs)
+    return { value: { exitCode: 0, stdout: '', stderr: '' } } as never
+  })
   await $.session.start({ cwd: 'C:/x', surface: 'terminal', isInteractive: true })
   const band = await $.ui.mount({ ...BAND, surface: 'terminal' })
   await band.press({ key: 'uebersicht-oeffnen' })
   await new Promise(r => setTimeout(r, 50))
   expect(gestartet).toEqual([['node', UEBERSICHT_SKRIPT], ['explorer.exe', UEBERSICHT_HTML]])
+  expect(fristen[0]).toBe(UEBERSICHT_FRIST_MS)
   await band.unmount()
+})
+
+test('Leiste: scheitert das Erzeugen, zeigt der Knopf den Fehler als Toast und öffnet nichts', async ($, on) => {
+  starte(on, null, [], true)
+  const gestartet: string[][] = []
+  const hinweise: string[] = []
+  on('ui.toast', (_$, e) => { hinweise.push(String((e as { text?: string }).text)); return { value: undefined } as never })
+  on('process.run', (_$, e) => { gestartet.push([...(e as { argv: string[] }).argv]); return { value: { exitCode: 1, stdout: '', stderr: 'stand.md fehlt: X' } } as never })
+  await $.session.start({ cwd: 'C:/x', surface: 'terminal', isInteractive: true })
+  const band = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  await band.press({ key: 'uebersicht-oeffnen' })
+  await new Promise(r => setTimeout(r, 50))
+  expect(gestartet).toEqual([['node', UEBERSICHT_SKRIPT]])
+  expect(hinweise).toEqual(['Übersicht fehlgeschlagen: stand.md fehlt: X'])
+  await band.unmount()
+})
+
+test('Übersicht: der Toast kürzt die Fehlerzeile auf 120 Zeichen', async () => {
+  const a = attrappe([{ exitCode: 1, stderr: 'x'.repeat(300) }])
+  await erzeugeUndOeffne(a.deps)
+  expect(a.toasts).toEqual([`Übersicht fehlgeschlagen: ${'x'.repeat(120)}`])
 })

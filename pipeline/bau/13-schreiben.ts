@@ -32,23 +32,8 @@ import { schliesseSpaeteLuecken } from './urteil-schliesst-luecken.ts'
 import { log } from '../lib/util.ts'
 import { type IstTot } from '../lib/adresse-tot.ts'
 
-export function schreibeDatensatz({
-  allTitles,
-  releases,
-  kanalJeAdresse,
-  motnTon,
-  anisearch,
-  tmdbTitles,
-  mitStimmen,
-  verschoben,
-  verweiseEntfernt,
-  titles,
-  jpStartAnzeige,
-  events,
-  istTot,
-  suchOffen,
-  meta,
-}: {
+/** Eingaben der Schreibphase; der Bau reicht sie aus den früheren Phasen durch. */
+export interface DatensatzEingaben {
   allTitles: Title[]
   releases: Release[]
   kanalJeAdresse: Map<string, string | undefined>
@@ -66,7 +51,25 @@ export function schreibeDatensatz({
   /** Suchadressen, die der Bau entfernt hat; die Liste entsteht erst hier, im Endzustand. */
   suchOffen: OffeneSuche[]
   meta: DataMeta
-}) {
+}
+
+export function schreibeDatensatz({
+  allTitles,
+  releases,
+  kanalJeAdresse,
+  motnTon,
+  anisearch,
+  tmdbTitles,
+  mitStimmen,
+  verschoben,
+  verweiseEntfernt,
+  titles,
+  jpStartAnzeige,
+  events,
+  istTot,
+  suchOffen,
+  meta,
+}: DatensatzEingaben) {
   /* Der vorige Bestand muss vor dem ersten Schreiben von titles.json gelesen werden (`13-3-listen`). */
   const bekannteSeiten = bekannteSeitenAusBestand()
   const { trenneQuelle, synopses, annKennungen, trailer } = schreibeSynopsenUndReichereAn({

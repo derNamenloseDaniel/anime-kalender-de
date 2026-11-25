@@ -40,16 +40,16 @@ function verweisZiel(quelle: { provider?: string; url?: string }): { ziel: Platf
 }
 
 /** Crunchyroll-Verweise auf tote Serien oder Adressen bleiben draußen. */
-function crVerweisTot(url: string, e: Pick<WegeAusAnisearchEingabe, 'adressKern' | 'toteCrSerien' | 'toteCrAdressen'>): boolean {
+function crVerweisTot(url: string, { adressKern, toteCrSerien, toteCrAdressen }: Pick<WegeAusAnisearchEingabe, 'adressKern' | 'toteCrSerien' | 'toteCrAdressen'>): boolean {
   /* Die Kennung entscheidet, nicht die Schreibweise der Adresse — siehe `toteCrSerien`. */
   const kennung = /\/series\/([A-Z0-9]+)/.exec(url)?.[1]
-  if (kennung && e.toteCrSerien.has(kennung)) return true
+  if (kennung && toteCrSerien.has(kennung)) return true
   /* Und wo keine Kennung steht, entscheidet die Adresse — siehe `toteCrAdressen`. */
-  return e.toteCrAdressen.has(e.adressKern(url))
+  return toteCrAdressen.has(adressKern(url))
 }
 
 /** Ob ein Handbeleg, der Linkbefund oder die Linkprüfung den Verweis draußen hält. */
-function belegHaeltDraussen(title: Title, ziel: PlatformId, url: string, e: Pick<WegeAusAnisearchEingabe, 'belegFuer' | 'linkBefunde' | 'lautPruefungTot'>): boolean {
+function belegHaeltDraussen(title: Title, ziel: PlatformId, url: string, { belegFuer, linkBefunde, lautPruefungTot }: Pick<WegeAusAnisearchEingabe, 'belegFuer' | 'linkBefunde' | 'lautPruefungTot'>): boolean {
   /*
     **Ein verneinender Handbeleg hält den Verweis draußen — ein bejahender
     nicht.**
@@ -67,10 +67,10 @@ function belegHaeltDraussen(title: Title, ziel: PlatformId, url: string, e: Pick
     den ganzen Bestand gemessen ist das **der einzige** Fall (1 von 1.092
     bejahenden Handbelegen), die Änderung ist also so eng wie ihr Anlass.
   */
-  const beleg = e.belegFuer(title.id, ziel, url)
+  const beleg = belegFuer(title.id, ziel, url)
   if (beleg && (beleg.dub !== true || beleg.available === false)) return true
-  if (ziel === 'primevideo' && e.linkBefunde[url]?.prime !== true) return true
-  return e.lautPruefungTot(url)
+  if (ziel === 'primevideo' && linkBefunde[url]?.prime !== true) return true
+  return lautPruefungTot(url)
 }
 
 /** Der Weg, den `quelle` dem Titel ergänzen darf, oder nichts, wenn eine Weiche ihn draußen hält. */
@@ -81,10 +81,11 @@ function wegAusQuelle(
   vorhanden: Set<PlatformId>,
   e: WegeAusAnisearchEingabe,
 ): { platform: PlatformId; url: string } | undefined {
+  const { adressKern, frueherEntfernt } = e
   const { ziel, url } = verweisZiel(quelle)
   if (!ziel || !url) return undefined
   if (vorhanden.has(ziel)) return undefined
-  if (bekannt.has(e.adressKern(url)) || e.frueherEntfernt.has(e.adressKern(url), title.id)) return undefined
+  if (bekannt.has(adressKern(url)) || frueherEntfernt.has(adressKern(url), title.id)) return undefined
   if (ziel === 'crunchyroll' && crVerweisTot(url, e)) return undefined
   if (belegHaeltDraussen(title, ziel, url, e)) return undefined
   return { platform: ziel, url }

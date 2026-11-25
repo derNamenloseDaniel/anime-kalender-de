@@ -5,6 +5,7 @@
  */
 import { findeAuffaelliges, type Kennzahlen } from './bestand-delta.ts'
 import type { HistorieZeile } from './historie-zeilen.ts'
+import { jetztUmgeleitet } from './bestand-verschoben.ts'
 
 export interface Pendel {
   /** Erste und letzte Zeile des Pendelns (Indizes in der Zeilenliste). */
@@ -103,8 +104,24 @@ function gespeicherteZeile(zeilen: HistorieZeile[], i: number): Ereignis {
   return { art: 'zeile', zeile: zeilen[i], auffaellig: [], erklaert: [...erklaert, ...spaeter], netto: false }
 }
 
-/** Die Zeilen der Historie als Ereignisse: Pendeln als eines, die Zeile nach dem Pendeln netto gegen den Stand davor, alle anderen wie gespeichert. */
-export function ereignisse(zeilen: HistorieZeile[]): Ereignis[] {
+/**
+ * „N Titel weniger“, deren fehlende Kennungen (`titelWeg`) `kennungen` inzwischen per `zuAk` umleitet, sind gewollt zusammengelegt: Der Bestandsbau
+ * kennt `zuAk` erst im Folge-PR (docs/wissen/datensatz.md), die Zeile blieb deshalb unerklärt. Nie mehr erklärt, als die Zeile als „weniger“ meldet.
+ */
+export function mitNachtraeglichemZuAk(e: Ereignis, kennungen: number[][]): Ereignis {
+  if (e.art !== 'zeile' || !Array.isArray(e.zeile.titelWeg)) return e
+  const rest = e.auffaellig.findIndex((a) => /^\d+ Titel weniger$/.test(a))
+  if (rest < 0) return e
+  const ids = jetztUmgeleitet(e.zeile.titelWeg as number[], kennungen).slice(0, parseInt(e.auffaellig[rest], 10))
+  if (!ids.length) return e
+  const bleibt = parseInt(e.auffaellig[rest], 10) - ids.length
+  const auffaellig = e.auffaellig.filter((_, i) => i !== rest)
+  if (bleibt > 0) auffaellig.splice(rest, 0, `${bleibt} Titel weniger`)
+  return { ...e, auffaellig, erklaert: [...e.erklaert, `${ids.length} Titel zusammengelegt (zuAk nachträglich eingetragen): ${ids.join(', ')}`] }
+}
+
+/** Die Zeilen der Historie als Ereignisse: Pendeln als eines, die Zeile nach dem Pendeln netto gegen den Stand davor, alle anderen wie gespeichert; `kennungen` (data/kennungen.json) erklärt nachträglich umgeleitete Titel. */
+export function ereignisse(zeilen: HistorieZeile[], kennungen: number[][] = []): Ereignis[] {
   const pendel = findePendel(zeilen)
   const aus: Ereignis[] = []
   let i = 0
@@ -122,7 +139,7 @@ export function ereignisse(zeilen: HistorieZeile[]): Ereignis[] {
       const b = findeAuffaelliges(kz(zeilen[i]), kz(zeilen[bezug]))
       aus.push({ art: 'zeile', zeile: zeilen[i], auffaellig: b.auffaellig, erklaert: b.erklaert, netto: true })
     } else {
-      aus.push(gespeicherteZeile(zeilen, i))
+      aus.push(mitNachtraeglichemZuAk(gespeicherteZeile(zeilen, i), kennungen))
     }
     i++
   }

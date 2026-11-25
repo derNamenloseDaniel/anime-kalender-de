@@ -405,47 +405,40 @@ function kontrollmenge(titles: Title[]): Set<number> {
   return ids
 }
 
-export async function main(): Promise<void> {
-  if (!SCHLUESSEL) {
-    // Kein Abbruch mit Fehlercode: In einem Lauf ohne hinterlegten Schlüssel
-    // ist das kein Defekt, sondern eine fehlende Konfiguration. Der Bestand
-    // bleibt unangetastet, und der Build kommt ohne diese Quelle aus.
-    warn('STREAMING_API_KEY fehlt — kein Abruf. Der vorhandene Bestand bleibt unverändert.')
-    return
-  }
-
-  const titles = readJson<Title[]>('public/data/titles.json', [])
-  const tmdbTitel = readJson<Record<string, { tmdbId?: number; kind?: string }>>('data/tmdb-titles.json', {})
-  const tmdbKey = (t: Title): string | undefined => {
+/** Titel-ID → TMDB-Schlüssel (`art/kennung`), soweit `data/tmdb-titles.json` beides kennt. */
+function tmdbSchluesselVon(tmdbTitel: Record<string, { tmdbId?: number; kind?: string }>): (t: Title) => string | undefined {
+  return (t) => {
     const e = tmdbTitel[String(t.id)]
     return e?.tmdbId && e.kind ? `${e.kind}/${e.tmdbId}` : undefined
   }
+}
 
-  /**
-   * Wen wir überhaupt fragen: Titel mit einem Verweis auf einen der Dienste,
-   * deren Sprachfassung wir noch nicht kennen.
-   *
-   * Nach `dub === undefined` **und** nach Alter — der Alterfilter steckt in
-   * `titelsuche` und `nachTmdb`. Hier steht nur, wen die Quelle beantworten
-   * könnte.
-   */
-  const offen = titles.filter((t) =>
+/**
+ * Wen wir überhaupt fragen: Titel mit einem Verweis auf einen der Dienste,
+ * deren Sprachfassung wir noch nicht kennen.
+ *
+ * Nach `dub === undefined` **und** nach Alter — der Alterfilter steckt in
+ * `titelsuche` und `nachTmdb`. Hier steht nur, wen die Quelle beantworten
+ * könnte.
+ */
+function offeneTitel(titles: Title[]): Title[] {
+  return titles.filter((t) =>
     t.streams.some((s) => s.dub === undefined && (s.platform === 'netflix' || s.platform === 'primevideo' || s.platform === 'disneyplus')),
   )
-  log(`${offen.length} Titel mit offener Sprachangabe bei Netflix, Prime Video oder Disney+`)
+}
 
-  /**
-   * Die Kontrollmenge kommt **vor** dem Rest in die Warteschlange.
-   *
-   * Sie ist der Grund, warum überhaupt etwas übernommen werden darf: Ohne
-   * Serien, für die wir unabhängig wissen, ob es eine deutsche Fassung gibt,
-   * misst `check-motn.ts` nichts. Stünde sie hinten, entschiede das Budget
-   * darüber, ob die Messung stattfindet — und ein Lauf ohne Messung ist ein Lauf
-   * ohne Erlaubnis.
-   */
-  const kontrolle = kontrollmenge(titles)
-  log(`Kontrollmenge: ${kontrolle.size} Titel mit unabhängigem Beleg`)
-
+/**
+ * Die TMDB-Schlüssel in Abrufreihenfolge, je Schlüssel einmal.
+ *
+ * Die Kontrollmenge kommt **vor** dem Rest in die Warteschlange.
+ *
+ * Sie ist der Grund, warum überhaupt etwas übernommen werden darf: Ohne
+ * Serien, für die wir unabhängig wissen, ob es eine deutsche Fassung gibt,
+ * misst `check-motn.ts` nichts. Stünde sie hinten, entschiede das Budget
+ * darüber, ob die Messung stattfindet — und ein Lauf ohne Messung ist ein Lauf
+ * ohne Erlaubnis.
+ */
+function abrufSchluessel(titles: Title[], offen: Title[], kontrolle: Set<number>, tmdbKey: (t: Title) => string | undefined): string[] {
   const nutzen = (t: Title) => (kontrolle.has(t.id) ? 1_000_000 : 0) + (t.episodes ?? 0)
   const schluessel: string[] = []
   const gesehen = new Set<string>()
@@ -455,7 +448,17 @@ export async function main(): Promise<void> {
     gesehen.add(key)
     schluessel.push(key)
   }
+  return schluessel
+}
 
+interface PhasenZahlen {
+  ausTmdb: number
+  ausKatalog: number
+  ausSuche: number
+}
+
+/** Die drei Abrufphasen nacheinander; wie viele Serien jede in den Bestand gebracht hat. */
+async function laufePhasen(titles: Title[], offen: Title[], schluessel: string[], tmdbKey: (t: Title) => string | undefined): Promise<PhasenZahlen> {
   let ausTmdb = 0
   if (!NUR_TITEL && !NUR_KATALOG) {
     log('Phase 0 — Direktabruf über die TMDB-Kennung')
@@ -474,23 +477,18 @@ export async function main(): Promise<void> {
       offen.filter((t) => !tmdbKey(t)),
     )
   }
+  return { ausTmdb, ausKatalog, ausSuche }
+}
 
-  daten.fetchedAt = new Date().toISOString()
-  writeJson('data/motn.json', daten, true)
-  recordSource('motn', Object.keys(daten.shows).length, anfragen ? undefined : 'keine Anfrage abgesetzt')
-
-  log(
-    `Fertig. ${Object.keys(daten.shows).length} Serien im Bestand ` +
-      `(${ausTmdb} über die TMDB-Kennung, ${ausKatalog} aus dem Katalog, ${ausSuche} über die Titelsuche).`,
-  )
-  /**
-   * Die Quelle zuerst, unsere Buchhaltung dahinter.
-   *
-   * Am 23.08.2026 standen die Zeilen andersherum: „962 im Monat von 1.000",
-   * darunter „Die Quelle meldet 0 als Rest". Wer nur die erste Zeile liest,
-   * hält 38 Anfragen für frei, die es nicht gibt — unser Zähler kennt nur die
-   * Läufe, die er selbst gesehen hat.
-   */
+/**
+ * Die Quelle zuerst, unsere Buchhaltung dahinter.
+ *
+ * Am 23.08.2026 standen die Zeilen andersherum: „962 im Monat von 1.000",
+ * darunter „Die Quelle meldet 0 als Rest". Wer nur die erste Zeile liest,
+ * hält 38 Anfragen für frei, die es nicht gibt — unser Zähler kennt nur die
+ * Läufe, die er selbst gesehen hat.
+ */
+function meldeKontingent(): void {
   if (Number.isFinite(uebrig)) {
     log(`Kontingent laut Quelle: ${uebrig} Anfragen übrig — das ist die maßgebliche Zahl.`)
   }
@@ -500,6 +498,37 @@ export async function main(): Promise<void> {
         ? ` — weicht um ${Math.abs(1000 - (daten.verbrauch[monat] ?? 0) - uebrig)} von der Quelle ab.`
         : '.'),
   )
+}
+
+export async function main(): Promise<void> {
+  if (!SCHLUESSEL) {
+    // Kein Abbruch mit Fehlercode: In einem Lauf ohne hinterlegten Schlüssel
+    // ist das kein Defekt, sondern eine fehlende Konfiguration. Der Bestand
+    // bleibt unangetastet, und der Build kommt ohne diese Quelle aus.
+    warn('STREAMING_API_KEY fehlt — kein Abruf. Der vorhandene Bestand bleibt unverändert.')
+    return
+  }
+
+  const titles = readJson<Title[]>('public/data/titles.json', [])
+  const tmdbKey = tmdbSchluesselVon(readJson<Record<string, { tmdbId?: number; kind?: string }>>('data/tmdb-titles.json', {}))
+
+  const offen = offeneTitel(titles)
+  log(`${offen.length} Titel mit offener Sprachangabe bei Netflix, Prime Video oder Disney+`)
+
+  const kontrolle = kontrollmenge(titles)
+  log(`Kontrollmenge: ${kontrolle.size} Titel mit unabhängigem Beleg`)
+
+  const { ausTmdb, ausKatalog, ausSuche } = await laufePhasen(titles, offen, abrufSchluessel(titles, offen, kontrolle, tmdbKey), tmdbKey)
+
+  daten.fetchedAt = new Date().toISOString()
+  writeJson('data/motn.json', daten, true)
+  recordSource('motn', Object.keys(daten.shows).length, anfragen ? undefined : 'keine Anfrage abgesetzt')
+
+  log(
+    `Fertig. ${Object.keys(daten.shows).length} Serien im Bestand ` +
+      `(${ausTmdb} über die TMDB-Kennung, ${ausKatalog} aus dem Katalog, ${ausSuche} über die Titelsuche).`,
+  )
+  meldeKontingent()
 }
 
 // Nur beim Direktstart: der Vergleichsrahmen (`tools/vergleich-alt-neu.mjs`) importiert `main` und darf den Abruf nicht auslösen.

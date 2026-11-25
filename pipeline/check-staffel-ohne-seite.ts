@@ -33,6 +33,11 @@ pruefe('widerlegtes Release: kein Fund', staffelnOhneSeite(titel, [rel('w', -900
 pruefe('Release eines unbekannten Titels: kein Fund', staffelnOhneSeite(titel, [rel('u', -999999, 9, '2027-03-24')], heute), [])
 pruefe('Fund nennt Titel, Folge und Tag', staffelnOhneSeite(titel, [s2], heute), [{ slug: 'alpha-s2', titleId: -900001, titel: 'Alpha', ab: 9, am: '2027-03-24' }])
 
+const mitStaffeln = [{ id: -900009, titleEn: 'Theta', episodes: 16, staffeln: [{ nr: 1, folgen: 8 }, { nr: 2, folgen: 8, start: '2027-03-24' }] }, { id: -900010, titleEn: 'Iota', episodes: 8, staffeln: [{ nr: 1, folgen: 8 }] }, { id: -900011, titleEn: 'Kappa', episodes: 16, staffeln: [{ nr: 1, folgen: 16 }] }]
+pruefe('Folgenzahl 16 aus Staffeln 8+8: Release ab Folge 9 ist ein Fund (Blindheit 25.11.2026)', staffelnOhneSeite(mitStaffeln, [rel('t2', -900009, 9, '2027-03-24')], heute).map((f) => f.slug), ['t2'])
+pruefe('alter Stand (eine Staffel, 8 Folgen): Release ab Folge 9 ist ebenfalls ein Fund', staffelnOhneSeite(mitStaffeln, [rel('i2', -900010, 9, '2027-03-24')], heute).map((f) => f.slug), ['i2'])
+pruefe('Staffel 1 mit 16 Folgen: Release ab Folge 9 ist kein Fund, ab Folge 17 schon', staffelnOhneSeite(mitStaffeln, [rel('k1', -900011, 9, '2027-03-24'), rel('k2', -900011, 17, '2027-03-24')], heute).map((f) => f.slug), ['k2'])
+
 const klein = [{ id: -900006, titleEn: undefined, titleDe: undefined, episodes: 1 }, { id: -900007, titleEn: undefined, titleDe: 'Zeta', episodes: 0 }, { id: -900008, titleEn: 'Eta', titleDe: 'Zeta', episodes: 1 }]
 pruefe('erste Folge 2 hinter 1 Folge: Fund; Name fällt auf Kennung zurück', staffelnOhneSeite(klein, [rel('k', -900006, 2, '2027-01-01')], heute).map((f) => f.titel), ['-900006'])
 pruefe('erste Folge 1 hinter 0 Folgen: kein Fund (erste Staffel)', staffelnOhneSeite(klein, [rel('n', -900007, 1, '2027-01-01')], heute), [])

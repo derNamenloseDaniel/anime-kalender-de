@@ -84,3 +84,15 @@ export function zaehleFehlerAusgaenge(quelltext, dateiname = 'x.ts') {
   besuche(quelle)
   return n
 }
+
+/** Gibt der Quelltext irgendwo die Schlusszeile `VERSTÖSSE: <n>` aus, die `zaehleVerstoesse` (tools/pr-bestand-zaehlen.mjs) liest? */
+export function druecktVerstoessZeile(quelltext, dateiname = 'x.ts') {
+  const quelle = ts.createSourceFile(dateiname, quelltext, ts.ScriptTarget.Latest, true)
+  let gefunden = false
+  const besuche = (k) => {
+    if (istAusgabe(k) && /^VERSTÖSSE: /.test(literalKopf(k.arguments[0]) ?? '')) gefunden = true
+    if (!gefunden) ts.forEachChild(k, besuche)
+  }
+  besuche(quelle)
+  return gefunden
+}

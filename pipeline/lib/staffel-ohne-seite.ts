@@ -8,8 +8,11 @@ import type { Release, Title } from '../../shared/types.ts'
 
 export type StaffelOhneSeite = { slug: string; titleId: number; titel: string; ab: number; am: string }
 
+/** Folgen, die die Seite des Titels trägt: bei Cartoons mit TMDB-Staffeln die der ersten Staffel (die Gesamtzahl wächst mit jeder angekündigten Staffel, 25.11.2026), sonst `episodes`. */
+const seitenFolgen = (t: Pick<Title, 'episodes' | 'staffeln'>): number | undefined => t.staffeln?.[0]?.folgen ?? t.episodes
+
 export function staffelnOhneSeite(
-  titles: Pick<Title, 'id' | 'episodes' | 'titleEn' | 'titleDe'>[],
+  titles: Pick<Title, 'id' | 'episodes' | 'staffeln' | 'titleEn' | 'titleDe'>[],
   releases: Pick<Release, 'slug' | 'titleId' | 'schedule' | 'widerlegt'>[],
   heute: string,
   mitGrenzen: ReadonlySet<number> = new Set(),
@@ -21,7 +24,8 @@ export function staffelnOhneSeite(
     const am = r.schedule?.firstEpisodeDate
     /* Titel mit belegten Staffelgrenzen (`data/curated/*-staffeln.yaml`) führen jede Staffel als Abschnitt ihrer Seite (F157, 24.11.2026). */
     if (!t || mitGrenzen.has(t.id) || r.widerlegt || ab === undefined || am === undefined) return []
-    if (am < heute || ab < 2 || t.episodes === undefined || ab <= t.episodes) return []
+    const folgen = seitenFolgen(t)
+    if (am < heute || ab < 2 || folgen === undefined || ab <= folgen) return []
     return [{ slug: r.slug, titleId: t.id, titel: t.titleEn ?? t.titleDe ?? String(t.id), ab, am }]
   })
 }

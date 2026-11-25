@@ -4,14 +4,14 @@
  * aus dem Speicher, kein Netz. Ohne Playwright-Browser „übersprungen“ (tools/browser-weiche.mjs).
  */
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { chromium } from 'playwright'
 
 import { browserDa } from './browser-weiche.mjs'
 import { htmlVon } from './uebersicht-html.mjs'
 import { kennzahlen } from './uebersicht-kopf.mjs'
 import { baueModell } from './uebersicht-modell.mjs'
-
-if (!browserDa('uebersicht-filter.test', chromium)) process.exit()
 
 const JETZT = Date.parse('2026-11-25T12:00:00Z')
 const TEXT = [
@@ -27,6 +27,9 @@ const TEXT = [
 const PR = (labels, extra = {}) => ({ typ: 'PullRequest', autor: 'x', labels, offen: true, gemergt: false, abnahmeDirigent: false, ...extra })
 const modell = baueModell(TEXT, JETZT, { prDaten: { 900001: PR(['orchester'], { abnahmeDirigent: true }), 900002: PR(['orchester']), 900003: PR([]) } })
 const html = htmlVon(modell, kennzahlen(modell, null, JETZT))
+// Die Seite trägt genau das Skript der Datei (nicht eine Kopie): der Browserlauf unten prüft dieses Skript.
+assert.ok(html.includes(`<script>${readFileSync(join(import.meta.dirname, 'uebersicht-seite.js'), 'utf8')}</script>`))
+if (!browserDa('uebersicht-filter.test', chromium)) process.exit()
 
 const browser = await chromium.launch()
 try {

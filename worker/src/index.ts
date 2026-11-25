@@ -489,7 +489,7 @@ async function handleVorfall(request: Request, env: Env): Promise<Response> {
   return antwort({ ok: true, vorfaelle: anzahl?.n ?? 0 })
 }
 
-async function verteile(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+export async function verteile(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url)
 
     if (request.method === 'OPTIONS') {

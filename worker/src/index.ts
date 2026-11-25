@@ -400,7 +400,7 @@ async function handleNetzfund(request: Request, env: Env): Promise<Response> {
  * **Was hier nicht landet:** der normale Ablauf. Ein Vorfall ist etwas, das
  * anders lief als vorgesehen — nicht jede geprüfte Folge.
  */
-export async function handleVorfall(request: Request, env: Env): Promise<Response> {
+async function handleVorfall(request: Request, env: Env): Promise<Response> {
   if (request.method === 'GET') return vorfallLesen(request, env)
   if (request.method === 'DELETE') return vorfallLoeschen(request, env)
   if (request.method !== 'POST') return vorfallAntwort({ error: 'GET, POST oder DELETE erwartet' }, 405)

@@ -68,7 +68,7 @@ erwarte('Prüfung fährt etwas anderes', (s) => { s.skripte['quellen-pruefen.sh'
 const ROT_BLOCK = 'if [ "$PRUEF_ROT" = 1 ]; then\n  # Das Label'
 erwarte('quellen-pr.sh: Rot-Zweig steht vor dem Anlegen', (s) => { s.skripte[PR] = `${ROT_BLOCK}\n${ohne(s.skripte[PR], ROT_BLOCK)}` }, /Reihenfolge muss sein/)
 erwarte('quellen-pr.sh: Rot-Zweig steht erst nach dem Merge', (s) => { s.skripte[PR] = `${ohne(s.skripte[PR], ROT_BLOCK)}\n${ROT_BLOCK}` }, /Reihenfolge muss sein/)
-erwarte('quellen-pr.sh: gh pr merge steht vor dem Anlegen', (s) => { s.skripte[PR] = `if gh pr merge x\n${s.skripte[PR]}` }, /Reihenfolge muss sein/)
+erwarte('quellen-pr.sh: gh pr merge steht vor dem Anlegen', (s) => { s.skripte[PR] = `merge_aus="$(gh pr merge x)"\n${s.skripte[PR]}` }, /Reihenfolge muss sein/)
 erwarte('quellen-pr.sh: zweites gh pr create', (s) => { s.skripte[PR] += '\ngh pr create --fill\n' }, /genau ein gh pr create/)
 erwarte('quellen-pr.sh: zweites gh pr create als gh pr new', (s) => { s.skripte[PR] += '\ngh pr new --fill\n' }, /genau ein gh pr create/)
 erwarte('quellen-pr.sh: zweites gh pr merge', (s) => { s.skripte[PR] += '\ngh  pr merge 1 --admin\n' }, /genau ein gh pr merge/)

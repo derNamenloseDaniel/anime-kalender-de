@@ -47,6 +47,13 @@ export function zusammengelegteTitel(vorher: Kurz[], jetzt: Kurz[], kennungen: K
   return vorher.filter((t) => !imHaupt.has(t.id) && umgeleitet.has(t.id)).map((t) => anzeigeName(t))
 }
 
+/** Kennungen aus `weg` (gespeicherte `titelWeg` einer Historie-Zeile), die `kennungen` jetzt auf einen Nachfolger umleitet (`zuAk` folgt dem Bestandsbau im nächsten PR); das Ziel muss im Bestand existieren. */
+export function jetztUmgeleitet(weg: number[], kennungen: Kennung[]): number[] {
+  const aks = new Set(kennungen.map((z) => z[0]))
+  const umgeleitet = new Set(kennungen.filter((z) => z[3] !== undefined && aks.has(z[3])).map((z) => z[1]))
+  return weg.filter((id) => umgeleitet.has(id))
+}
+
 /** Kennungen (höchstens `grenze`) der Titel, die seit dem vorigen Hauptbestand fehlen; für die Historie-Zeile, damit ein Verlust ohne Diff auffindbar ist. */
 export function fehlendeTitelIds(vorher: Kurz[], jetzt: Kurz[], grenze = 10): number[] {
   const imHaupt = new Set(jetzt.map((t) => t.id))

@@ -55,15 +55,8 @@ function vonHandErbetene(wurzel, plattform, raus) {
   }
 }
 
-/**
- * Offene Verdachtsfälle je Anbieter, als Menge von AniList-Kennungen.
- *
- * @param {string} wurzel Repo-Wurzel
- * @param {string} plattform `netflix`, `primevideo`, `disneyplus`
- * @returns {Map<number, {von: number, bis: number, seit: string}>}
- */
-export function verdachtsfaelleBisher(wurzel, plattform) {
-  const raus = new Map()
+/** Erste Quelle: offene Einträge aus `data/tonspur-verdacht.json`. */
+function ausTonspurVerdacht(wurzel, plattform, raus) {
   try {
     const roh = JSON.parse(readFileSync(resolve(wurzel, 'data/tonspur-verdacht.json'), 'utf8'))
     for (const v of Array.isArray(roh) ? roh : []) {
@@ -73,22 +66,25 @@ export function verdachtsfaelleBisher(wurzel, plattform) {
   } catch {
     /* Ohne Datei gibt es keine Verdachtsfälle — die Liste bleibt, wie sie war. */
   }
-  /**
-   * **Zweite Quelle: Kanal-Meldungen, denen JustWatch widerspricht.**
-   *
-   * `pipeline/kanal-gegenprobe.ts` macht aus einer Kanal-Meldung ohne Deutsch
-   * plus einer schweigenden zweiten Quelle ein belegtes Nein. Findet JustWatch
-   * dort aber **deutschen Ton**, ist die Meldung ein Falschnegativ — der Fall, vor dem CLAUDE.md
-   * warnt: Ohne Kanal-Abo zeigt Amazon die deutsche Tonspur gar nicht (14 von 45 solcher Meldungen
-   * waren am 07.09.2026 falsch).
-   *
-   * Solche Titel gehören zurück auf die Prüfliste: ein Urteil, dem eine Quelle widerspricht.
-   *
-   * **Eigene Datei, nicht `tonspur-verdacht.json`:** Die schreibt ein anderer
-   * Lauf komplett neu, und ein Eintrag darin wäre beim nächsten Durchgang weg —
-   * dieselbe Falle, die am 09.09.2026 schon `data/adn-adressen.yaml` erwischt
-   * hat.
-   */
+}
+
+/**
+ * **Zweite Quelle: Kanal-Meldungen, denen JustWatch widerspricht.**
+ *
+ * `pipeline/kanal-gegenprobe.ts` macht aus einer Kanal-Meldung ohne Deutsch
+ * plus einer schweigenden zweiten Quelle ein belegtes Nein. Findet JustWatch
+ * dort aber **deutschen Ton**, ist die Meldung ein Falschnegativ — der Fall, vor dem CLAUDE.md
+ * warnt: Ohne Kanal-Abo zeigt Amazon die deutsche Tonspur gar nicht (14 von 45 solcher Meldungen
+ * waren am 07.09.2026 falsch).
+ *
+ * Solche Titel gehören zurück auf die Prüfliste: ein Urteil, dem eine Quelle widerspricht.
+ *
+ * **Eigene Datei, nicht `tonspur-verdacht.json`:** Die schreibt ein anderer
+ * Lauf komplett neu, und ein Eintrag darin wäre beim nächsten Durchgang weg —
+ * dieselbe Falle, die am 09.09.2026 schon `data/adn-adressen.yaml` erwischt
+ * hat.
+ */
+function ausKanalWiderspruch(wurzel, plattform, raus) {
   try {
     const roh = JSON.parse(readFileSync(resolve(wurzel, 'data/kanal-widerspruch.json'), 'utf8'))
     for (const v of Array.isArray(roh?.faelle) ? roh.faelle : []) {
@@ -103,17 +99,20 @@ export function verdachtsfaelleBisher(wurzel, plattform) {
   } catch {
     /* Noch kein Lauf, keine Widersprüche. */
   }
-  /**
-   * **Dritte Quelle: Belege, deren Folgen über den Titel hinausreichen.**
-   *
-   * Ein Handbeleg „Folge 1–22" an einem Titel mit 21 Folgen trägt die Zählung des Anbieters, nicht
-   * unsere (FGO Babylonia: Netflix zählt Episode 0 mit). Aufgelöst wird das über die Folgentitel —
-   * und die schickt die Erweiterung nur für Seiten, die über die Prüfliste geöffnet werden. Am
-   * 13.09.2026 standen acht solcher Belege seit Tagen als „wartet auf Folgentitel" im Footer.
-   *
-   * Gerechnet wird dasselbe wie in `check:logic` — ist ein Fall zugeordnet, fällt er dort heraus
-   * und damit hier von selbst von der Liste.
-   */
+}
+
+/**
+ * **Dritte Quelle: Belege, deren Folgen über den Titel hinausreichen.**
+ *
+ * Ein Handbeleg „Folge 1–22" an einem Titel mit 21 Folgen trägt die Zählung des Anbieters, nicht
+ * unsere (FGO Babylonia: Netflix zählt Episode 0 mit). Aufgelöst wird das über die Folgentitel —
+ * und die schickt die Erweiterung nur für Seiten, die über die Prüfliste geöffnet werden. Am
+ * 13.09.2026 standen acht solcher Belege seit Tagen als „wartet auf Folgentitel" im Footer.
+ *
+ * Gerechnet wird dasselbe wie in `check:logic` — ist ein Fall zugeordnet, fällt er dort heraus
+ * und damit hier von selbst von der Liste.
+ */
+function ausAnbieterZaehlung(wurzel, plattform, raus) {
   try {
     const titel = JSON.parse(readFileSync(resolve(wurzel, 'public/data/titles.json'), 'utf8'))
     const folgen = new Map((Array.isArray(titel) ? titel : Object.values(titel)).map((t) => [t.id, t.episodes ?? 0]))
@@ -139,7 +138,10 @@ export function verdachtsfaelleBisher(wurzel, plattform) {
   } catch {
     /* Ohne Titel oder Belege gibt es nichts zu vergleichen. */
   }
-  vonHandErbetene(wurzel, plattform, raus)
+}
+
+/** Fünfte Quelle: laufende Synchro (`laufendeSynchro`), nur für Titel ohne früheren Fall. */
+function ausLaufenderSynchro(wurzel, plattform, raus) {
   try {
     const titel = JSON.parse(readFileSync(resolve(wurzel, 'public/data/titles.json'), 'utf8'))
     const belege = yaml.load(readFileSync(resolve(wurzel, 'data/dub-confirmed.yaml'), 'utf8')) ?? []
@@ -150,6 +152,22 @@ export function verdachtsfaelleBisher(wurzel, plattform) {
   } catch {
     /* Ohne Titel oder Belege gibt es nichts nachzusehen. */
   }
+}
+
+/**
+ * Offene Verdachtsfälle je Anbieter, als Menge von AniList-Kennungen.
+ *
+ * @param {string} wurzel Repo-Wurzel
+ * @param {string} plattform `netflix`, `primevideo`, `disneyplus`
+ * @returns {Map<number, {von: number, bis: number, seit: string}>}
+ */
+export function verdachtsfaelleBisher(wurzel, plattform) {
+  const raus = new Map()
+  ausTonspurVerdacht(wurzel, plattform, raus)
+  ausKanalWiderspruch(wurzel, plattform, raus)
+  ausAnbieterZaehlung(wurzel, plattform, raus)
+  vonHandErbetene(wurzel, plattform, raus)
+  ausLaufenderSynchro(wurzel, plattform, raus)
   for (const [id, fall] of justwatchWiderspruch(wurzel, plattform)) if (!raus.has(id)) raus.set(id, fall)
   return raus
 }

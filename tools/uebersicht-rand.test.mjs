@@ -14,7 +14,7 @@ import { eintragHtml, esc, htmlVon } from './uebersicht-html.mjs'
 import { kennzahlen } from './uebersicht-kopf.mjs'
 import { alterText, labelText, markdownVon } from './uebersicht-md.mjs'
 import { baueModell } from './uebersicht-modell.mjs'
-import { alterVon, blockiertGrund, datenImText, markenVon, prNummern } from './uebersicht-regeln.mjs'
+import { alterVon, blockiertGrund, datenImText, grundText, markenVon, prBelege } from './uebersicht-regeln.mjs'
 import { leseStand, linksVon, titelVon } from './uebersicht-stand.mjs'
 import { erzeuge } from './uebersicht.mjs'
 
@@ -41,7 +41,8 @@ const dt = (t) => datenImText(t, JETZT).map((d) => `${d.j}-${d.m}-${d.d}`)
 assert.deepEqual(dt('31.12.2026 01.01.2026 32.01.2026 15.13.2026 00.05.2026 15.00.2026'), ['2026-12-31', '2026-1-1'])
 assert.equal(alterVon({ k: null, kopf: 'x 20.11. y', icon: null }, JETZT)?.tage, 5, 'jahrloses Datum im Kopf ohne Kennzeichen')
 assert.equal(blockiertGrund({ wartet: null, icon: null }, `wartet ${'y'.repeat(200)}`).length, 90)
-assert.deepEqual(dt('25.11. 26.11.'), ['2026-11-25', '2025-11-26'])
+assert.deepEqual(dt('25.11. 26.11.'), ['2026-11-25', '2026-11-26'], 'jahrlos trägt das laufende Jahr, kein Zurückrollen')
+assert.deepEqual(dt('29.02. 29.02.2028 29.02.2027 31.04.2026'), ['2028-2-29'], 'ungültige Daten fallen weg, auch 29.02. im Nichtschaltjahr')
 assert.deepEqual(dt('x1.2.2026 v1.2.3 1.12.11.2026'), [])
 
 // Blockiert-Grund: Wort in den ersten 220 Zeichen, Textstück ab dem Treffer, Rückfälle je Icon
@@ -56,8 +57,20 @@ assert.equal(blockiertGrund({ wartet: null, icon: null }, 'Wartezeit, erwartet, 
 assert.equal(blockiertGrund({ wartet: null, icon: '🔵' }, 'nichts'), null)
 
 // PR-Nummern und Marken
-assert.deepEqual(prNummern(['[PR 900001](https://x/pull/900002) PR #900003 PRs 900001 PR 12 PR 1234567 pull/99']), [900001, 900002, 900003])
-assert.deepEqual(prNummern(['PR 100', 'PR 999999']), [100, 999999])
+const pb = (...t) => prBelege(t)
+assert.deepEqual(pb('PR 900001 gemergt, PR 900002 eingereicht 19:45, PR 900003 läuft, PR 900004 Prüfer läuft, PR 900005 ohne Wort'), { beleg: [900001, 900002, 900003, 900004], geliefert: [900001] })
+assert.deepEqual(pb('[PR 900001](https://x/pull/900009) gemergt 18:05', 'gemergt: PR 900002', 'eingereicht ([PR 900003](https://x/pull/900003)', 'PR #900004 gemergt PRs 900005 gemergt'), { beleg: [900001, 900002, 900003, 900004, 900005], geliefert: [900001, 900002, 900004, 900005] })
+assert.deepEqual(pb('PR 12 gemergt PR 1234567 gemergt'), { beleg: [], geliefert: [] }, 'nur drei bis sechs Ziffern')
+assert.deepEqual(pb('PR 100 gemergt', 'PR 999999 gemergt'), { beleg: [100, 999999], geliefert: [100, 999999] })
+assert.deepEqual(pb('PR 900001 gemergt. PR 900002 danach offen'), { beleg: [900001], geliefert: [900001] }, 'der Satzpunkt trennt: gemergt gilt nur für den Satz davor')
+assert.deepEqual(pb('PR 900001 ' + 'x '.repeat(40) + 'gemergt'), { beleg: [], geliefert: [] }, 'gemergt weiter als 70 Zeichen hinter dem PR zählt nicht')
+assert.deepEqual(pb('{läuft: PR 900001 gemergt} PR 900002'), { beleg: [], geliefert: [] }, 'Stempel in geschweiften Klammern werden ignoriert')
+// Fehlfälle der echten stand.md vom 25.11., als erfundene, gleich gebaute Zeilen: Messquelle, Ursache, Vorschlag, Herkunft
+assert.deepEqual(pb('Bühne-Basis braucht 1157 s, Ansichten 847 s (gemessen vom Bauer, PR 900101). Dasselbe Muster wie dort.'), { beleg: [], geliefert: [] })
+assert.deepEqual(pb('Basis 12–21 ms je Lauf; Messer kostet nach PR 900102 noch ≈ +4 ms und ist seit 21.11. an.'), { beleg: [], geliefert: [] })
+assert.deepEqual(pb('Vorschlag Bauer Push-Filter (PR 900103): nur `tvAus` bleibt nach Neuladen.'), { beleg: [], geliefert: [] })
+assert.deepEqual(pb('aus PR 900104 gemergt (Berserk, Ghost): Nummer gegen Reihenposition.'), { beleg: [], geliefert: [] })
+assert.deepEqual(pb('Ursache PR 900105 gemergt; Herkunft PR 900106 gemergt; Messung PR 900107 läuft'), { beleg: [], geliefert: [] })
 assert.deepEqual([...markenVon(['a @nacht', 'b x@lokal @nacht.', 'c /@lokal @lokalx'])].sort(), ['nacht'])
 assert.deepEqual([...markenVon(['(@lokal)', '@nacht'])].sort(), ['lokal', 'nacht'])
 
@@ -93,7 +106,7 @@ assert.deepEqual(leseStand('## Neu und live testbar\n- [2026-11-24 10:00] **A** 
 // Modell: vollständige Eintragsform, Sortierung ohne Rang, Thema-Reihenfolge, Neu live, Zählung
 const STAND = [
   '## In Arbeit',
-  '- 🟠 **Daten Eins** {eigen · hoch · Daten · 20.11.} PR 900001 [PR 900002](https://github.com/o/r/pull/900002)',
+  '- 🟠 **Daten Eins** {eigen · hoch · Daten · 20.11.} PR 900001 gemergt [PR 900002](https://github.com/o/r/pull/900002) gemergt',
   '  Notiz',
   '## Daniel-Todo',
   '### Jetzt',
@@ -115,7 +128,7 @@ const m = baueModell(STAND.join('\n'), JETZT, { prDaten: { 900001: PR(['orcheste
 assert.deepEqual(eintraege(m, 'inArbeit')[0], {
   nr: 2,
   titel: 'Daten Eins',
-  kopf: '🟠 Daten Eins PR 900001 PR 900002',
+  kopf: '🟠 Daten Eins PR 900001 gemergt PR 900002 gemergt',
   notizen: 1,
   eltern: null,
   herkunft: 'inArbeit',
@@ -181,7 +194,7 @@ const e1 = eintraege(m, 'inArbeit')[0]
 const zeileHtml = eintragHtml({ ...e1, naechster: true, links: [{ text: 'A', href: 'javascript:alert(1)' }, { text: 'B', href: 'https://b/1' }], grund: 'Lieferung', eltern: 'Vater' })
 assert.ok(zeileHtml.includes('data-labels="lokal nacht" data-ziel="Daten"') && zeileHtml.includes('<span class="next">▶ nächster</span>'))
 assert.ok(zeileHtml.includes('<span class="alt rot">seit 5 Tagen</span>') || zeileHtml.includes('<span class="alt rot">❗ seit 5 Tagen</span>'))
-assert.ok(zeileHtml.includes('<span class="badge nacht">🌙 nacht</span>') && zeileHtml.includes('<p><b>wartet:</b> Lieferung</p>') && zeileHtml.includes('gehört zu: Vater'))
+assert.ok(zeileHtml.includes('<span class="badge nacht">🌙 nacht</span>') && zeileHtml.includes('<p>wartet: Lieferung</p>') && zeileHtml.includes('gehört zu: Vater'))
 assert.ok(zeileHtml.includes('A · <a href="https://b/1">B</a>') && !zeileHtml.includes('javascript:'))
 assert.ok(zeileHtml.includes('Label-Beleg: PR 900001: orchester; PR 900001: Abnahme Dirigent; PR 900002: ohne orchester'))
 assert.ok(!eintragHtml({ ...e1, alter: { art: 'seit', tage: 1, rot: false } }).includes('alt rot'))
@@ -213,7 +226,7 @@ assert.equal(holeMerges(() => grenze, VON).liste.length, 1, 'Merge genau am Fens
 assert.equal(holeMerges(() => grenze.replace('"mergedAt":"2026-11-18T23:00:00Z"', '"mergedAt":null'), VON).liste.length, 0, 'geschlossen ohne Merge zählt nicht')
 
 // erzeuge, Erfolgsweg: gh liefert alles; Labels, PR-Zahlen, Merges stehen in beiden Ausgaben
-const TEXT = '## In Arbeit\n- 🟠 **Daten Eins** {eigen · hoch · Daten · 20.11.} PR 900001\n- 🟠 **Zwei** {eigen · hoch · Daten · 21.11.}\n'
+const TEXT = '## In Arbeit\n- 🟠 **Daten Eins** {eigen · hoch · Daten · 20.11.} PR 900001 eingereicht\n- 🟠 **Zwei** {eigen · hoch · Daten · 21.11.}\n'
 const gAufrufe = []
 const attrappe = (b, a, o) => {
   gAufrufe.push([b, ...a.slice(0, 2)].join(' ').slice(0, 60))
@@ -311,4 +324,71 @@ assert.deepEqual(eintraege(undatiert, 'neuLive').map((e) => e.titel), ['Mit Datu
 const aeltester = baueModell('## Als Nächstes\n- **Neuer** {eigen · normal · Code · 05.11.}\n- **Älterer** {eigen · normal · Code · 03.11.}', JETZT, null)
 assert.equal(eintraege(aeltester, 'naechstes').find((e) => e.naechster).titel, 'Älterer')
 assert.deepEqual(kennzahlen(alleZiele, null, JETZT).abschnitte.map((a) => a.titel), ['Jetzt für Daniel', 'In Arbeit', 'Blockiert / wartet', 'Als Nächstes', 'Später (Daniel)', 'Neu live'])
+
+// A1 Streichkandidaten: nur PRs, die der Satz als gemergt nennt; Fehlfälle der echten stand.md als erfundene, gleich gebaute Zeilen
+const alleGemergt = Object.fromEntries(Array.from({ length: 12 }, (_, i) => [900100 + i, PR([])]))
+const kandidat = (...zeilen) => baueModell(`## Als Nächstes\n${zeilen.join('\n')}`, JETZT, { prDaten: alleGemergt }).streichkandidaten.map((e) => e.titel)
+const KZ = '{eigen · normal · Code · 20.11.}'
+assert.deepEqual(kandidat(`- **Messquelle** ${KZ}: Basis braucht 1157 s (gemessen vom Bauer, PR 900101). Dasselbe Muster wie dort.`), [], 'Messquelle ist keine Lieferung')
+assert.deepEqual(kandidat(`- **Ursache** ${KZ}: Basis 12 ms je Lauf; der Messer kostet nach PR 900102 noch ≈ +4 ms und ist seit 21.11. an.`), [], 'Ursache ist keine Lieferung')
+assert.deepEqual(kandidat(`- **Vorschlag** ${KZ}: Vorschlag Bauer Push-Filter (PR 900103): nur tvAus bleibt nach Neuladen.`), [], 'Vorschlag ist keine Lieferung')
+assert.deepEqual(kandidat(`- **Herkunft** ${KZ}: aus PR 900104 (Berserk, Ghost): Nummer gegen Reihenposition.`), [], 'Herkunft ist keine Lieferung')
+assert.deepEqual(kandidat(`- **Sperre** ${KZ}: Hook gemergt ([PR 900105](https://x/pull/900105)); Skript auch nicht im Hintergrund (PR 900106 gemergt); Prüfung nach fünf Aufträgen und am 22.11.: kein Volllauf mehr lokal?`), [], 'Prüfung offen')
+assert.deepEqual(kandidat(`- **Aussteht** ${KZ}: Hook gemergt (PR 900105); die Prüfung steht aus.`), [], 'steht aus')
+assert.deepEqual(kandidat(`- **Nein** ${KZ}: Sperre widerlegt → [PR 900107](https://x/pull/900107) gemergt 18:57 (S1 zurück), nach Deploy live prüfen; Nebenwirkung im Blick`), [], 'nach Deploy prüfen')
+assert.deepEqual(kandidat(`- **Notiz** ${KZ}: [PR 900107](https://x/pull/900107) gemergt (S1 zurück)\n  Notiz: auf alle ausdehnen`), [], 'offene Notiz unter der Zeile')
+assert.deepEqual(kandidat(`- **Fertig** ${KZ}: Fix [PR 900108](https://x/pull/900108) gemergt 18:05.`), ['Fertig'], 'Kontrolle: ausdrückliche Lieferung')
+assert.deepEqual(kandidat(`- **Gemischt** ${KZ}: aus PR 900104 entstanden, Fix PR 900108 gemergt.`), ['Gemischt'], 'Herkunft daneben stört nicht')
+for (const wort of ['offen', 'Rest', 'Reste', 'danach', 'vorher', 'zählen', 'prüfen', 'Prüfung', 'steht aus', 'ausdehnen', 'nachmessen', 'noch', 'Folgepunkte', 'später', 'geplant', 'beobachten', 'im Blick', 'wie ist das?', 'live nach Bestandsbau', 'nächster Schritt: abbauen', 'nach G4: Eingang', 'T2 entworfen', 'Sammelzeile']) {
+  assert.deepEqual(kandidat(`- **Wort** ${KZ}: PR 900109 gemergt, ${wort}`), [], `offenes Wort „${wort}“`)
+}
+assert.deepEqual(kandidat(`- **Wort** ${KZ}: PR 900109 gemergt, alles live gemessen`), ['Wort'])
+assert.deepEqual(kandidat(`- **Teile** ${KZ}: (b) PR 900109 gemergt 12.11. 10:33; (a) Start der Probe, (c) Fehler im Schritt`), [], 'Sammelzeile mit Teilen (a) und (c): ein PR erledigt nur (b)')
+assert.deepEqual(kandidat(`- **Ein Teil** ${KZ}: (b) PR 900109 gemergt 12.11. 10:33`), ['Ein Teil'], 'ein einzelner Teilbuchstabe macht keine Sammelzeile')
+assert.deepEqual(kandidat(`- 📅 **Termin** ${KZ}: PR 900109 gemergt`, `- ⏳ **Wartend** ${KZ}: PR 900109 gemergt`, `- **Ohne PR** ${KZ}: fertig`), [], '📅, ⏳ und Zeilen ohne PR sind nie Kandidaten')
+assert.deepEqual(kandidat(`- **Zwei** ${KZ}: PR 900109 gemergt, PR 900111 gemergt`), ['Zwei'])
+assert.deepEqual(baueModell(`## Als Nächstes\n- **Zwei** ${KZ}: PR 900109 gemergt, PR 900111 gemergt`, JETZT, { prDaten: { ...alleGemergt, 900111: PR([], { offen: true, gemergt: false }) } }).streichkandidaten, [], 'ein genannter PR noch offen')
+assert.deepEqual(baueModell(`## Als Nächstes\n- **Fremd** ${KZ}: PR 900109 gemergt`, JETZT, { prDaten: { 900109: { typ: 'Issue', labels: [], gemergt: true } } }).streichkandidaten, [], 'Nummer ist kein PR')
+assert.deepEqual(baueModell(`## Daniel-Todo\n### Später\n- **Fertig** PR 900109 gemergt`, JETZT, { prDaten: alleGemergt }).streichkandidaten, [], 'nur In Arbeit und Als Nächstes')
+
+// A2 Labels: nur PRs, die die Zeile als Lieferung oder laufend nennt; Historie zählt nicht (Mängelregister-Fall)
+const historie = Array.from({ length: 30 }, (_, i) => `PR ${900300 + i}`).join(', ')
+const nachtPr = (extra = {}) => PR(['orchester'], extra)
+const prDatenHist = { ...Object.fromEntries(Array.from({ length: 30 }, (_, i) => [900300 + i, nachtPr()])), 900330: nachtPr(), 900331: PR([]) }
+const hist = baueModell(`## In Arbeit\n- **Register** ${KZ}: Historie ${historie} und zuletzt PR 900330 gemergt, PR 900331 eingereicht`, JETZT, { prDaten: prDatenHist })
+const regEintrag = eintraege(hist, 'inArbeit')[0]
+assert.deepEqual(regEintrag.prs, [900330, 900331])
+assert.deepEqual(regEintrag.labels, ['lokal', 'nacht'])
+assert.deepEqual(regEintrag.labelQuellen, ['PR 900330: orchester', 'PR 900331: ohne orchester'])
+assert.deepEqual(eintraege(baueModell(`## In Arbeit\n- **Nur Historie** ${KZ}: Historie ${historie}`, JETZT, { prDaten: prDatenHist }), 'inArbeit')[0].labels, [], 'Verlauf allein gibt kein Label')
+
+// A4 Alter: Termine ohne Jahr, Zukunft nie ein Alter, ungültiges Datum
+assert.equal(alterVon({ k: null, kopf: 'fertig bis 31.12. abgeben', icon: null }, JETZT), null, 'jahrloses Datum in der Zukunft ist nie ein Alter')
+assert.deepEqual(alterVon({ k: null, kopf: '📅 31.12. x', icon: '📅' }, JETZT), { art: 'faellig', tage: -36, rot: false })
+assert.deepEqual(termin('📅 27.05. x'), { art: 'faellig', tage: 182, rot: true }, '182 Tage zurück: noch überfällig')
+assert.deepEqual(termin('📅 26.05. x'), { art: 'faellig', tage: -182, rot: false }, '183 Tage zurück: nächstes Jahr')
+assert.deepEqual(termin('📅 30.12. x'), { art: 'faellig', tage: -35, rot: false })
+assert.deepEqual(alterVon({ k: null, kopf: '📅 30.12. x', icon: '📅' }, Date.parse('2026-01-05T12:00:00Z')), { art: 'faellig', tage: 6, rot: true }, 'Termin im Vorjahr, sechs Tage her')
+assert.deepEqual(alterVon({ k: null, kopf: '📅 29.02. x', icon: '📅' }, Date.parse('2028-03-05T12:00:00Z')), { art: 'faellig', tage: 5, rot: true }, '29.02. im Schaltjahr gilt')
+assert.equal(termin('📅 29.02. x'), null, '29.02. im Nichtschaltjahr ist ungültig, kein Rollen auf den 1. März')
+assert.equal(alterVon({ k: { tag: 29, monat: 2 }, kopf: '', icon: null }, JETZT), null, 'ungültiger Eingang fällt weg')
+assert.deepEqual(termin('📅 15.11.2025 x'), { art: 'faellig', tage: 375, rot: true }, 'mit Jahr gilt das Datum wörtlich')
+
+// A7 Wartegrund und Neu-live-Titel
+assert.equal(grundText('wartet'), 'wartet')
+assert.equal(grundText('blockiert'), 'blockiert')
+assert.equal(grundText('wartet auf DNS'), 'wartet auf DNS')
+assert.equal(grundText('Blockiert durch X'), 'Blockiert durch X')
+assert.equal(grundText('Daniel'), 'wartet: Daniel')
+const ohneGrund = markdownVon(baueModell('## Daniel-Todo\n### Später\n- ⏳ **Leer** nichts weiter\n- 🚫 **Gesperrt** nichts weiter\n- ⏳ **Satz** Rückmeldung, wartet auf Daniel', JETZT, null), kennzahlen(baueModell('', JETZT, null), null, JETZT))
+assert.ok(ohneGrund.includes('- **Leer** — wartet\n') && ohneGrund.includes('- **Gesperrt** — blockiert\n') && ohneGrund.includes('- **Satz** — wartet auf Daniel\n'))
+assert.ok(!ohneGrund.includes('wartet: wartet') && !ohneGrund.includes('wartet: blockiert'))
+const neu = (z) => eintraege(baueModell(`## Neu und live testbar\n${z}`, JETZT, null), 'neuLive').map((e) => e.titel)
+assert.deepEqual(neu('- [2026-11-24 10:00] Abo-Seite hat den Abschnitt „Lizenz“ — [Seite](https://a/1)'), ['Abo-Seite hat den Abschnitt „Lizenz“'])
+assert.deepEqual(neu('- [2026-11-24 10:00] Geteilte Links zeigen das Cover ([Titel](https://a/1))'), ['Geteilte Links zeigen das Cover'])
+assert.deepEqual(neu('- [2026-11-24 10:00] [Startseite](https://a/1)'), ['Startseite'], 'ohne Text davor bleibt der Linktext')
+assert.deepEqual(neu('- [2026-11-24 10:00] **Fett** — [Seite](https://a/1)'), ['Fett'])
+assert.deepEqual(neu(`- 2026-11-24 ${'x'.repeat(150)} — [Seite](https://a/1)`), [`2026-11-24 ${'x'.repeat(88)}…`], 'Zeile ohne Datumsklammer, auf 100 Zeichen gekürzt')
+assert.deepEqual(neu('- [2026-11-24] Nur Datum — [Seite](https://a/1)'), ['Nur Datum'])
+assert.equal(titelVon('- [2026-11-24 10:00] [Seite](https://a/1)'), 'Seite', 'andere Abschnitte behalten den Linktext')
 console.log('uebersicht-rand.test.mjs: ok')

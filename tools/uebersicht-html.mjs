@@ -6,7 +6,8 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { ZIEL_NAMEN, ZIELE } from './uebersicht-modell.mjs'
-import { alterText, labelText } from './uebersicht-md.mjs'
+import { GH_FEHLT, LABEL_HINWEIS, STREICH_HINWEIS, alterText, labelText } from './uebersicht-md.mjs'
+import { grundText } from './uebersicht-regeln.mjs'
 
 const CSS = readFileSync(join(import.meta.dirname, 'uebersicht-seite.css'), 'utf8')
 const JS = readFileSync(join(import.meta.dirname, 'uebersicht-seite.js'), 'utf8')
@@ -25,7 +26,7 @@ export function eintragHtml(e) {
   const text = `${e.titel} ${e.kopf}`.toLowerCase()
   const badges = e.labels.map((l) => `<span class="badge ${l}">${esc(labelText([l]))}</span>`).join(' ')
   const alt = e.alter ? `<span class="alt${e.alter.rot ? ' rot' : ''}">${esc(alterText(e.alter))}</span>` : ''
-  const grund = e.grund ? `<p><b>wartet:</b> ${esc(e.grund)}</p>` : ''
+  const grund = e.grund ? `<p>${esc(grundText(e.grund))}</p>` : ''
   const quellen = e.labelQuellen.length ? `<p class="mu">Label-Beleg: ${esc(e.labelQuellen.join('; '))}</p>` : ''
   const eltern = e.eltern ? `<p class="mu">gehört zu: ${esc(e.eltern)}</p>` : ''
   const links = e.links.length ? `<p>${e.links.map(linkHtml).join(' · ')}</p>` : ''
@@ -53,7 +54,7 @@ function abschnittHtml(a) {
 
 function streichHtml(liste) {
   if (!liste.length) return ''
-  const hinweis = '<p class="detail mu">Alle PR-Links gemergt, kein „offen“, kein 📅/⏳. Die Zeilen stehen weiter in ihrem Abschnitt.</p>'
+  const hinweis = `<p class="detail mu">${esc(STREICH_HINWEIS)}</p>`
   return `<details class="abschnitt" id="a-streichen"><summary><h2>Streichkandidaten</h2> <span class="zahl" data-zahl>(${liste.length})</span></summary>${hinweis}<ul class="liste" style="padding:0 14px">${liste.map(eintragHtml).join('')}</ul></details>`
 }
 
@@ -61,15 +62,16 @@ function karten(k) {
   const l = k.labels
   const aus = k.abschnitte.filter((a) => a.id !== 'neuLive').map((a) => `<div class="karte"><b>${a.anzahl}</b><small>${esc(a.titel)}</small></div>`)
   aus.push(`<div class="karte"><b>${l.lokal} · ${l.nacht} · ${l.beide}</b><small>lokal · nacht · beide (ohne Beleg ${l.offen})</small></div>`)
+  if (k.merges) aus.push(`<div class="karte"><b>${k.merges.summe.nacht + k.merges.summe.lokal + k.merges.summe.daten}</b><small>Merges 7 Tage: nacht ${k.merges.summe.nacht} · lokal ${k.merges.summe.lokal} · Datenbot ${k.merges.summe.daten}</small></div>`)
   if (k.prs) aus.push(`<div class="karte"><b>${k.prs.abgeschnitten ? '≥ ' : ''}${k.prs.liste.length}</b><small>offene PRs, ältester ${k.prs.liste[0]?.stunden ?? 0} h</small></div>`)
   return `<div class="kopf">${aus.join('')}</div>`
 }
 
 function mergesHtml(k) {
-  if (!k.merges) return '<p class="mu">GitHub nicht erreichbar: PR- und Merge-Zahlen sowie PR-Labels entfallen.</p>'
+  if (!k.merges) return `<p class="mu">${esc(k.ghText ?? GH_FEHLT)}</p>`
   const zeilen = k.merges.tage.map((t) => `<tr><td>${esc(t.tag)}</td><td>${t.lokal}</td><td>${t.nacht}</td><td>${t.daten}</td></tr>`).join('')
   const warn = k.merges.vollstaendig ? '' : ' (unvollständig: Seitengrenze erreicht)'
-  return `<details class="abschnitt"><summary><h2>Merges je Tag</h2> <span class="zahl">${warn}</span></summary><div class="detail"><table><tr><th>Tag</th><th>💻 lokal</th><th>🌙 nacht</th><th>Datenbot</th></tr>${zeilen}</table></div></details>`
+  return `<details class="abschnitt" open><summary><h2>Merges je Tag</h2> <span class="zahl">${warn}</span></summary><div class="detail"><table><tr><th>Tag</th><th>💻 lokal</th><th>🌙 nacht</th><th>Datenbot</th></tr>${zeilen}</table></div></details>`
 }
 
 function knopf(feld, wert, text, an) {
@@ -89,6 +91,6 @@ export function htmlVon(modell, k) {
   const abschnitte = modell.abschnitte.map(abschnittHtml)
   return `<!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="${csp}"><title>Übersicht</title><style>${CSS}</style></head>
-<body><main><h1>Übersicht</h1><p class="mu">Erzeugt ${esc(stand)} UTC aus stand.md (einzige Wahrheit; nicht von Hand ändern).</p>${karten(k)}${mergesHtml(k)}${leiste()}${streichHtml(modell.streichkandidaten)}${abschnitte.join('')}</main><script>${JS}</script></body></html>
+<body><main><h1>Übersicht</h1><p class="mu">Erzeugt ${esc(stand)} UTC aus stand.md (einzige Wahrheit; nicht von Hand ändern).</p><p class="mu">${esc(LABEL_HINWEIS)}</p>${karten(k)}${mergesHtml(k)}${leiste()}${streichHtml(modell.streichkandidaten)}${abschnitte.join('')}</main><script>${JS}</script></body></html>
 `
 }

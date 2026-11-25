@@ -230,7 +230,7 @@ function zeichneLeiste($: EngineInterface, e: any, daten: LeistenDaten, start: n
     ...stand,
     oeffneAgenten: () => void togglePane($, PANE, 'Arbeitsliste'),
     oeffneListe: () => void togglePane($, PANE, 'Arbeitsliste'),
-    oeffneUebersicht: () => void erzeugeUndOeffne({ lauf: (argv, o) => $.process.run(argv, o), toast: t => $.ui.toast(t) }),
+    oeffneUebersicht: () => void erzeugeUndOeffne({ lauf: (argv, o) => $.process.run(argv, o), lies: async p => (await $.fs.read(p)) as string, toast: t => $.ui.toast(t) }),
   })
   letzteLeiste = { schluessel, element }
   return element

@@ -5,7 +5,8 @@
  *   node tools/uebersicht.mjs [<stand.md>] [--jetzt <ISO-Zeit>] [--ohne-gh]
  *
  * Mit gh (offene PRs, Merges 7 Tage, PR-Labels und Abnahme-Kommentare, Zwischenspeicher `.uebersicht-cache.json` neben stand.md);
- * ohne gh oder bei einem gh-Fehler entstehen beide Dateien trotzdem (Warnung auf stderr, dann ohne PR-Labels).
+ * ohne gh oder bei einem gh-Fehler entstehen beide Dateien trotzdem (Warnung auf stderr, dann ohne PR-Labels). Alle gh-Abrufe
+ * zusammen dürfen höchstens 75 s dauern (GESAMT_FRIST_MS); danach entfallen die GitHub-Teile mit dem Hinweis „GitHub-Daten fehlen (Frist)“.
  * Exit 0 bei geschriebenen Dateien, 1 wenn stand.md fehlt.
  */
 import { execFileSync } from 'node:child_process'
@@ -18,35 +19,57 @@ import { htmlVon } from './uebersicht-html.mjs'
 import { kennzahlen } from './uebersicht-kopf.mjs'
 import { markdownVon } from './uebersicht-md.mjs'
 import { baueModell } from './uebersicht-modell.mjs'
+import { tagBerlin, tagPlus, tagesBeginnMs } from './tageskennzahlen-rechnen.mjs'
 
 const STAND = 'C:/code/ai/anime-kalender-de/daniel-zum-abarbeiten/stand.md'
 const FENSTER_TAGE = 7
+/** Gesamtfrist aller gh-Abrufe; unter der 90-s-Frist des Knopfs (UEBERSICHT_FRIST_MS in der Mod), damit das Skript selbst sauber endet. */
+export const GESAMT_FRIST_MS = 75_000
 
-/** Netzlose Teile zuerst, dann gh; jeder gh-Fehler wird zur Warnung mit der ersten Ursache, nie zum Abbruch. */
-export function holeGh(nummern, ausfuehren, cache, jetzt, warne) {
-  const gh = { prDaten: {}, offene: null, merges: null }
+class FristAbgelaufen extends Error {}
+
+/** gh-Runner, der jeden Aufruf auf die Restzeit bis `ende` (ms, Uhr `uhr`) kürzt und danach nicht mehr startet. */
+export function begrenzt(ausfuehren, ende, uhr) {
+  return (befehl, args, opt) => {
+    const rest = ende - uhr()
+    if (rest <= 0) throw new FristAbgelaufen('Gesamtfrist abgelaufen')
+    return ausfuehren(befehl, args, { ...opt, timeout: Math.min(opt?.timeout ?? rest, rest) })
+  }
+}
+
+/** Netzlose Teile zuerst, dann gh; jeder gh-Fehler wird zur Warnung mit der ersten Ursache, nie zum Abbruch; abgelaufene Frist: `frist` true, Rest entfällt. */
+export function holeGh(nummern, ausfuehren, cache, jetzt, warne, ende, uhr) {
+  const lauf = begrenzt(ausfuehren, ende, uhr)
+  const gh = { prDaten: {}, offene: null, merges: null, frist: false }
+  const von = tagesBeginnMs(tagPlus(tagBerlin(jetzt), 1 - FENSTER_TAGE))
   const schritte = [
-    ['PR-Labels', () => { gh.prDaten = holePrDaten(ausfuehren, nummern, cache, jetzt) }],
-    ['offene PRs', () => { gh.offene = holeOffene(ausfuehren) }],
-    ['Merges', () => { gh.merges = holeMerges(ausfuehren, jetzt - FENSTER_TAGE * 86_400_000) }],
+    ['PR-Labels', () => { gh.prDaten = holePrDaten(lauf, nummern, cache, jetzt) }],
+    ['offene PRs', () => { gh.offene = holeOffene(lauf) }],
+    ['Merges', () => { gh.merges = holeMerges(lauf, von) }],
   ]
   for (const [name, f] of schritte) {
     try {
       f()
     } catch (fehler) {
+      if (fehler instanceof FristAbgelaufen || uhr() >= ende) {
+        gh.frist = true
+        warne('gh: Gesamtfrist abgelaufen, Rest entfällt')
+        break
+      }
       warne(`gh ${name}: ${String(fehler.stderr || fehler.message).split('\n')[0]}`)
     }
   }
   return gh
 }
 
-/** `{markdown, html}` aus dem Text; `ausfuehren` null = ohne gh. */
-export function erzeuge(text, jetzt, ausfuehren, cache, warne) {
+/** `{markdown, html}` aus dem Text; `ausfuehren` null = ohne gh; `uhr` und `fristMs` für die Gesamtfrist der gh-Abrufe. */
+export function erzeuge(text, jetzt, ausfuehren, cache, warne, uhr = Date.now, fristMs = GESAMT_FRIST_MS) {
   const erst = baueModell(text, jetzt, null)
   const nummern = [...new Set(erst.abschnitte.flatMap((a) => a.gruppen.flatMap((g) => g.themen.flatMap((t) => t.eintraege.flatMap((e) => e.prs)))))]
-  const gh = ausfuehren ? holeGh(nummern, ausfuehren, cache, jetzt, warne) : null
+  const geholt = ausfuehren ? holeGh(nummern, ausfuehren, cache, jetzt, warne, uhr() + fristMs, uhr) : null
+  const gh = geholt?.frist ? null : geholt
   const modell = gh ? baueModell(text, jetzt, gh) : erst
-  const k = kennzahlen(modell, gh, jetzt)
+  const k = kennzahlen(modell, gh, jetzt, Boolean(geholt?.frist))
   return { markdown: markdownVon(modell, k), html: htmlVon(modell, k), modell, k }
 }
 

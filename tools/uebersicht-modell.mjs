@@ -4,7 +4,7 @@
  * Beide Ausgaben (Markdown, HTML) lesen dieses eine Modell.
  */
 import { auswerten, rangliste } from '../.claude/mods/arbeitsliste/hooks/stand-kennzeichen.mjs'
-import { alterVon, blockiertGrund, istStreichkandidat, labelsVon, markenVon, prNummern, themaVon } from './uebersicht-regeln.mjs'
+import { alterVon, blockiertGrund, istStreichkandidat, labelsVon, markenVon, prBelege, themaVon } from './uebersicht-regeln.mjs'
 import { bereinigt, leseStand, linksVon } from './uebersicht-stand.mjs'
 
 export const ZIELE = ['Daten', 'Autonomie', 'Code', 'Live5', '-']
@@ -33,7 +33,7 @@ function ranglisteVon(alle, jetzt) {
 function eintragVon(e, ctx) {
   const texte = [e.kopf, ...e.notizen]
   const kopfText = bereinigt(e.kopf)
-  const nummern = prNummern(texte)
+  const { beleg: nummern, geliefert } = prBelege(texte)
   const marken = markenVon(texte)
   const { labels, quellen } = labelsVon(nummern, marken, ctx.prDaten)
   const rang = ctx.rang.get(e)
@@ -56,7 +56,7 @@ function eintragVon(e, ctx) {
     grund: blockiertGrund(e, kopfText),
     thema: themaVon(e.titel),
     naechster: ctx.naechsterNr === e.nr,
-    streichen: istStreichkandidat(e.abschnitt, texte, nummern, ctx.prDaten, blockiertGrund(e, kopfText)),
+    streichen: istStreichkandidat(e.abschnitt, [kopfText, ...e.notizen], geliefert, ctx.prDaten, blockiertGrund(e, kopfText)),
     sortier: rang ?? 1000 + (ICON_RANG[e.icon] ?? 5),
   }
 }

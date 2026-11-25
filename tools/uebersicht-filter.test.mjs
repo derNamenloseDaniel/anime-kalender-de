@@ -16,9 +16,9 @@ import { baueModell } from './uebersicht-modell.mjs'
 const JETZT = Date.parse('2026-11-25T12:00:00Z')
 const TEXT = [
   '## In Arbeit',
-  '- **Anton** {eigen · hoch · Daten · 20.11.} PR 900001',
-  '- **Berta** {eigen · normal · Daten · 20.11.} PR 900002',
-  '- **Cäsar** {eigen · normal · Code · 20.11.} PR 900003',
+  '- **Anton** {eigen · hoch · Daten · 20.11.} PR 900001 eingereicht',
+  '- **Berta** {eigen · normal · Daten · 20.11.} PR 900002 eingereicht',
+  '- **Cäsar** {eigen · normal · Code · 20.11.} PR 900003 eingereicht',
   '- **Dora** {eigen · normal · Code · 20.11.}',
   '## Als Nächstes',
   '- **Emil** {auftrag · hoch · Autonomie · 20.11.} @nacht',
@@ -82,7 +82,7 @@ try {
   await knopf('label', 'alle')
   await seite.fill('#suche', '  ')
   assert.equal((await sichtbar()).length, 6, 'Leerzeichen sind keine Suche')
-  await seite.fill('#suche', 'pr 900002')
+  await seite.fill('#suche', 'pr 900002 eingereicht')
   assert.deepEqual(await sichtbar(), ['Berta'], 'Suche im Kopftext, nicht nur im Titel')
   await seite.fill('#suche', '')
   assert.equal((await sichtbar()).length, 6)

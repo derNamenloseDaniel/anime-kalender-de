@@ -15,6 +15,16 @@ const ABSCHNITTE = [
 const ICONS = ['🔴', '🟠', '🔵', '📅', '⏳', '🚫']
 const AUTONOM = /^autonomer modus\b/i
 
+/** Neu-live-Titel: Fett-Titel, sonst der Text nach dem Datum bis vor „ — [Link]“ bzw. „([Link]“ (nie nur der Linktext wie „Seite“), höchstens 100 Zeichen, sonst die Zeile selbst. */
+export function neuLiveTitel(kopf) {
+  const fett = /\*\*(.+?)\*\*/.exec(kopf)
+  if (fett) return fett[1]
+  const ohneDatum = kopf.replace(/^- (?:\[\d{4}-\d\d-\d\d(?: \d\d:\d\d)?\]\s*)?/, '')
+  const text = ohneDatum.split(/\s+—\s+\[|\s*\(\[/)[0].replace(/\[([^\]]+)\]\([^)]*\)/g, (_, x) => x).trim()
+  if (!text) return titelVon(kopf)
+  return text.length > 100 ? `${text.slice(0, 99)}…` : text
+}
+
 /** Fett-Titel, sonst Text des ersten Links, sonst die ersten 70 Zeichen ohne Icon und Größenmarke. */
 export function titelVon(kopf) {
   const fett = /\*\*(.+?)\*\*/.exec(kopf)
@@ -66,7 +76,7 @@ function neuerEintrag(kopf, nr, abschnitt, eltern) {
     eltern,
     kopf,
     notizen: [],
-    titel: titelVon(kopf),
+    titel: abschnitt === 'neuLive' ? neuLiveTitel(kopf) : titelVon(kopf),
     icon: iconVon(kopf),
     groesse: /\[(klein|mittel)\]/.exec(kopf)?.[1] ?? null,
     k: k.ok ? k : null,

@@ -13,15 +13,17 @@ import { htmlVon } from './uebersicht-html.mjs'
 import { kennzahlen } from './uebersicht-kopf.mjs'
 import { markdownVon } from './uebersicht-md.mjs'
 import { baueModell } from './uebersicht-modell.mjs'
-import { ghAusfuehren, main } from './uebersicht.mjs'
+import { GESAMT_FRIST_MS, begrenzt, erzeuge, ghAusfuehren, main } from './uebersicht.mjs'
 
 const JETZT = Date.parse('2026-11-25T12:00:00Z')
+const HINWEIS = 'Labels: Nur PRs, die die Zeile als gemergt, eingereicht, laufend oder im Prüfer nennt, bestimmen lokal und nacht; Verlauf und Herkunft zählen nicht, ein Nachtrag der lokalen Sitzung ist nicht erkennbar.'
+const STREICH = 'Zeile nennt PRs ausdrücklich als gemergt (alle gemergt), ohne offenen Satz, 📅, ⏳ oder Wartegrund. Die Zeilen stehen weiter in ihrem Abschnitt.'
 const TEXT = [
   '## Daniel-Todo',
   '### Später',
   '- 📅 **Termin** 27.11.',
   '## In Arbeit',
-  '- 🟠 **Eins | zwei** {eigen · hoch · Daten · 24.11.} PR 900001 [Bericht](file:///C:/b.md) [PR 900002](https://github.com/o/r/pull/900002) [A](https://a/1) [B](https://a/2)',
+  '- 🟠 **Eins | zwei** {eigen · hoch · Daten · 24.11.} PR 900001 gemergt [Bericht](file:///C:/b.md) [PR 900002](https://github.com/o/r/pull/900002) gemergt [A](https://a/1) [B](https://a/2)',
   '- **Zwei** {eigen · normal · Code · 21.11. · wartet: Daniel}',
   '## Als Nächstes',
   '- **Drei** {auftrag · hoch · Daten · 20.11.} @nacht',
@@ -36,6 +38,8 @@ assert.equal(markdownVon(m, k), [
   '# Übersicht',
   '',
   'Erzeugt 2026-11-25T12:00:00.000Z aus stand.md (einzige Wahrheit, nicht von Hand ändern).',
+  '',
+  HINWEIS,
   '',
   '| Abschnitt | Punkte |',
   '|---|---|',
@@ -93,10 +97,10 @@ teil('<button type="button" class="f" data-feld="label" data-wert="alle" aria-pr
 teil('data-wert="-" aria-pressed="false">Ohne Ziel</button></div><input type="search" id="suche" placeholder="Suchen …" aria-label="Suchen">')
 teil('<details class="abschnitt" id="a-jetzt" open><summary><h2>Jetzt für Daniel</h2> <span class="zahl" data-zahl>(0)</span></summary><p class="leer">Keine Einträge.</p></details>')
 teil('<details class="abschnitt" id="a-neuLive"><summary><h2>Neu live</h2> <span class="zahl" data-zahl>(1)</span></summary><ul class="liste"><li class="e" data-labels="" data-ziel="-"')
-teil('<details class="ziel" open><summary><h3 style="display:inline">Volle Daten</h3> <span class="zahl" data-zahl>(1)</span></summary><details class="thema" open><summary>Sonstiges <span class="zahl" data-zahl>(1)</span></summary><ul class="liste"><li class="e" data-labels="lokal" data-ziel="Daten" data-text="eins | zwei 🟠 eins | zwei pr 900001 bericht pr 900002 a b">')
+teil('<details class="ziel" open><summary><h3 style="display:inline">Volle Daten</h3> <span class="zahl" data-zahl>(1)</span></summary><details class="thema" open><summary>Sonstiges <span class="zahl" data-zahl>(1)</span></summary><ul class="liste"><li class="e" data-labels="lokal" data-ziel="Daten" data-text="eins | zwei 🟠 eins | zwei pr 900001 gemergt bericht pr 900002 gemergt a b">')
 teil('<summary><span class="titel">Eins | zwei</span> <span class="badge lokal">💻 lokal</span> <span class="alt">seit 1 Tag</span> <span class="prio">eigen · hoch</span></summary>')
-teil('<div class="detail"><p>🟠 Eins | zwei PR 900001 Bericht PR 900002 A B</p><p class="mu">Label-Beleg: PR 900001: ohne orchester</p><p><a href="file:///C:/b.md">Bericht</a> · <a href="https://github.com/o/r/pull/900002">PR 900002</a> · <a href="https://a/1">A</a> · <a href="https://a/2">B</a></p></div>')
-teil('<div class="detail"><p>Zwei</p><p><b>wartet:</b> Daniel</p></div>')
+teil('<div class="detail"><p>🟠 Eins | zwei PR 900001 gemergt Bericht PR 900002 gemergt A B</p><p class="mu">Label-Beleg: PR 900001: ohne orchester</p><p><a href="file:///C:/b.md">Bericht</a> · <a href="https://github.com/o/r/pull/900002">PR 900002</a> · <a href="https://a/1">A</a> · <a href="https://a/2">B</a></p></div>')
+teil('<div class="detail"><p>Zwei</p><p>wartet: Daniel</p></div>')
 teil('<span class="next">▶ nächster</span> <span class="titel">Drei</span> <span class="badge nacht">🌙 nacht</span> <span class="alt rot">❗ seit 5 Tagen</span> <span class="prio">auftrag · hoch</span>')
 teil('<span class="titel">Termin</span>  <span class="alt">fällig in 2 Tagen</span></summary>')
 assert.ok(html.indexOf('id="a-jetzt"') < html.indexOf('id="a-inArbeit"') && html.indexOf('id="a-inArbeit"') < html.indexOf('id="a-blockiert"') && html.indexOf('id="a-blockiert"') < html.indexOf('id="a-naechstes"') && html.indexOf('id="a-naechstes"') < html.indexOf('id="a-spaeter"') && html.indexOf('id="a-spaeter"') < html.indexOf('id="a-neuLive"'))
@@ -104,7 +108,7 @@ assert.ok(html.startsWith('<!doctype html>\n<html lang="de">') && html.includes(
 assert.ok(html.endsWith('</script></body></html>\n'))
 // Mit gh: Merges und Warnhinweis als eigene Karte
 const mitGh = htmlVon(m, kennzahlen(m, { offene: { liste: [], abgeschnitten: false }, merges: { liste: [{ mergedAt: '2026-11-25T08:00:00Z', labels: [], autor: 'x' }], vollstaendig: true } }, JETZT))
-assert.ok(mitGh.includes('<details class="abschnitt"><summary><h2>Merges je Tag</h2> <span class="zahl"></span></summary><div class="detail"><table><tr><th>Tag</th><th>💻 lokal</th><th>🌙 nacht</th><th>Datenbot</th></tr><tr><td>2026-11-25</td><td>1</td><td>0</td><td>0</td></tr>'))
+assert.ok(mitGh.includes('<details class="abschnitt" open><summary><h2>Merges je Tag</h2> <span class="zahl"></span></summary><div class="detail"><table><tr><th>Tag</th><th>💻 lokal</th><th>🌙 nacht</th><th>Datenbot</th></tr><tr><td>2026-11-25</td><td>1</td><td>0</td><td>0</td></tr>'))
 assert.ok(mitGh.includes('<b>0</b><small>offene PRs, ältester 0 h</small>'))
 
 // main mit gh-Attrappe: schreibt Zwischenspeicher, zweiter Lauf fragt abgeschlossene PRs nicht erneut, kaputter Speicher wird ersetzt
@@ -191,7 +195,7 @@ try {
 }
 
 // Listen ohne Komma-Trenner (join ohne Argument), beide Badges, Ziel-Knopf „Alle Ziele“ gedrückt, Klammern im Linktext, höchstens 15 PRs
-const zwei = baueModell('## In Arbeit\n- **P** {eigen · hoch · Daten · 20.11.} PR 900001 PR 900002 [a [b](https://x/1)\n- **Q** {eigen · hoch · Daten · 20.11.}\n- **R** {eigen · hoch · Code · 20.11.}\n## Als Nächstes\n- **S** {eigen · hoch · Code · 20.11.}', JETZT, { prDaten: { 900001: { ...PR1, labels: ['orchester'], abnahmeDirigent: true }, 900002: PR1 } })
+const zwei = baueModell('## In Arbeit\n- **P** {eigen · hoch · Daten · 20.11.} PR 900001 gemergt PR 900002 gemergt [a [b](https://x/1)\n- **Q** {eigen · hoch · Daten · 20.11.}\n- **R** {eigen · hoch · Code · 20.11.}\n## Als Nächstes\n- **S** {eigen · hoch · Code · 20.11.}', JETZT, { prDaten: { 900001: { ...PR1, labels: ['orchester'], abnahmeDirigent: true }, 900002: PR1 } })
 const offene = Array.from({ length: 16 }, (_, i) => ({ number: 900500 + i, title: `O${i}`, createdAt: '2026-11-25T11:00:00Z', labels: [] }))
 const kZwei = kennzahlen(zwei, { offene: { liste: offene, abgeschnitten: false }, merges: { liste: [{ mergedAt: '2026-11-24T08:00:00Z', labels: [], autor: 'x' }, { mergedAt: '2026-11-25T08:00:00Z', labels: [], autor: 'x' }], vollstaendig: true } }, JETZT)
 const htmlZwei = htmlVon(zwei, kZwei)
@@ -211,11 +215,12 @@ assert.ok(mdZwei.includes('\n\nMerges je Tag\n| Tag |'))
 
 // Kopf mit gh Zeile für Zeile (Soll aus der Absicht: Zahlen je Abschnitt, Label-Zählung, offene PRs ältester zuerst höchstens 15, Merges 7 Tage)
 const kopfSoll = [
-  '# Übersicht', '', 'Erzeugt 2026-11-25T12:00:00.000Z aus stand.md (einzige Wahrheit, nicht von Hand ändern).', '',
+  '# Übersicht', '', 'Erzeugt 2026-11-25T12:00:00.000Z aus stand.md (einzige Wahrheit, nicht von Hand ändern).', '', HINWEIS, '',
   '| Abschnitt | Punkte |', '|---|---|', '| Jetzt für Daniel | 0 |', '| In Arbeit | 3 |', '| Blockiert / wartet | 0 |', '| Als Nächstes | 1 |', '| Später (Daniel) | 0 |', '| Neu live | 0 |', '',
   'Labels offene Punkte: 💻 lokal 0 · 🌙 nacht 0 · beide 1 · ohne Beleg 3', '',
   'Offene PRs: 16',
   ...Array.from({ length: 15 }, (_, i) => `- PR ${900500 + i} — 1 h — O${i}${i === 0 ? ' [a, b]' : ''}`), '',
+  'Merges 7 Tage: nacht 0 · lokal 2 · Datenbot 0', '',
   'Merges je Tag', '| Tag | 💻 lokal | 🌙 nacht | Datenbot |', '|---|---|---|---|',
   '| 2026-11-25 | 1 | 0 | 0 |', '| 2026-11-24 | 1 | 0 | 0 |', '| 2026-11-23 | 0 | 0 | 0 |', '| 2026-11-22 | 0 | 0 | 0 |', '| 2026-11-21 | 0 | 0 | 0 |', '| 2026-11-20 | 0 | 0 | 0 |', '| 2026-11-19 | 0 | 0 | 0 |', '',
   '## Streichkandidaten (1)',
@@ -225,11 +230,11 @@ const kopfIst = markdownVon(zwei, kennzahlen(zwei, { offene: { liste: offene2, a
 assert.deepEqual(kopfIst.slice(0, kopfSoll.length), kopfSoll)
 
 // Streichkandidaten: Abschnitt Zeile für Zeile, Listen im HTML ohne Trenner, mehrere Themen je Ziel
-const drei = baueModell('## In Arbeit\n- **Skill Eins** {eigen · hoch · Daten · 20.11.} PR 900601\n- **Staffel Zwei** {eigen · hoch · Daten · 20.11.} PR 900602\n- **Nichts Drei** {eigen · hoch · Daten · 20.11.} PR 900603', JETZT, { prDaten: { 900601: PR1, 900602: PR1, 900603: PR1 } })
+const drei = baueModell('## In Arbeit\n- **Skill Eins** {eigen · hoch · Daten · 20.11.} PR 900601 gemergt\n- **Staffel Zwei** {eigen · hoch · Daten · 20.11.} PR 900602 gemergt\n- **Nichts Drei** {eigen · hoch · Daten · 20.11.} PR 900603 gemergt', JETZT, { prDaten: { 900601: PR1, 900602: PR1, 900603: PR1 } })
 const mdDrei = markdownVon(drei, kennzahlen(drei, null, JETZT))
 assert.equal(mdDrei.slice(mdDrei.indexOf('## Streichkandidaten'), mdDrei.indexOf('## Jetzt für Daniel')), [
   '## Streichkandidaten (3)', '',
-  'Alle PR-Links gemergt, kein „offen“, kein 📅/⏳. Die Zeilen stehen weiter in ihrem Abschnitt.', '',
+  STREICH, '',
   '- **Skill Eins** 💻 lokal ❗ seit 5 Tagen (eigen · hoch)',
   '- **Staffel Zwei** 💻 lokal ❗ seit 5 Tagen (eigen · hoch)',
   '- **Nichts Drei** 💻 lokal ❗ seit 5 Tagen (eigen · hoch)', '', '',
@@ -239,15 +244,81 @@ const htmlDrei = htmlVon(drei, kennzahlen(drei, null, JETZT))
 assert.ok(!htmlDrei.includes('</li>,') && !htmlDrei.includes('</details>,') && !htmlDrei.includes('</ul>,'), 'keine Kommas zwischen Themen und Zeilen')
 assert.equal((htmlDrei.match(/<details class="thema" open>/g) ?? []).length, 3)
 assert.equal((htmlDrei.match(/<li class="e"/g) ?? []).length, 6, 'drei Zeilen im Abschnitt, drei bei den Streichkandidaten')
-assert.ok(htmlDrei.includes('<details class="abschnitt" id="a-streichen"><summary><h2>Streichkandidaten</h2> <span class="zahl" data-zahl>(3)</span></summary><p class="detail mu">Alle PR-Links gemergt, kein „offen“, kein 📅/⏳. Die Zeilen stehen weiter in ihrem Abschnitt.</p><ul class="liste" style="padding:0 14px"><li class="e"'))
+assert.ok(htmlDrei.includes('<details class="abschnitt" id="a-streichen"><summary><h2>Streichkandidaten</h2> <span class="zahl" data-zahl>(3)</span></summary><p class="detail mu">' + STREICH + '</p><ul class="liste" style="padding:0 14px"><li class="e"'))
 
 // Streichkandidaten stehen in Dateireihenfolge, auch wenn „Als Nächstes“ vor „In Arbeit“ steht
-const umgekehrt = baueModell('## Als Nächstes\n- **N** {eigen · normal · Code · 01.11.} PR 900401\n## In Arbeit\n- **I** {eigen · normal · Code · 01.11.} PR 900402', JETZT, { prDaten: { 900401: PR1, 900402: PR1 } })
+const umgekehrt = baueModell('## Als Nächstes\n- **N** {eigen · normal · Code · 01.11.} PR 900401 gemergt\n## In Arbeit\n- **I** {eigen · normal · Code · 01.11.} PR 900402 gemergt', JETZT, { prDaten: { 900401: PR1, 900402: PR1 } })
 assert.deepEqual(umgekehrt.streichkandidaten.map((e) => e.titel), ['N', 'I'])
 const undatiert = baueModell('## Neu und live testbar\n- [2026-11-24 10:00] **Mit Datum**\n- **Ohne Datum**\n- [2026-11-24 09:00] **Gleich alt**', JETZT, null)
 assert.deepEqual(undatiert.abschnitte.find((a) => a.id === 'neuLive').gruppen[0].themen[0].eintraege.map((e) => e.titel), ['Mit Datum', 'Gleich alt', 'Ohne Datum'])
 const undatiert2 = baueModell('## Neu und live testbar\n- **Ohne Datum**\n- [2026-11-24 10:00] **Mit Datum**', JETZT, null)
 assert.deepEqual(undatiert2.abschnitte.find((a) => a.id === 'neuLive').gruppen[0].themen[0].eintraege.map((e) => e.titel), ['Mit Datum', 'Ohne Datum'])
+
+// A3 Merges: Kachel mit Summe, Abschnitt offen, Berliner Tagesgrenze (18.11. 23:30 UTC ist schon der 19.11.)
+const mergesListe = [
+  { mergedAt: '2026-11-25T08:00:00Z', labels: [], autor: 'x' },
+  { mergedAt: '2026-11-18T23:30:00Z', labels: ['orchester'], autor: 'x' },
+  { mergedAt: '2026-11-18T22:30:00Z', labels: [], autor: 'x' },
+  { mergedAt: '2026-11-25T09:00:00Z', labels: [], autor: 'anime-kalender-daten[bot]' },
+]
+const kMerges = kennzahlen(m, { offene: { liste: [], abgeschnitten: false }, merges: { liste: mergesListe, vollstaendig: true } }, JETZT)
+assert.deepEqual(kMerges.merges.summe, { lokal: 1, nacht: 1, daten: 1 })
+assert.deepEqual(kMerges.merges.tage.at(-1), { tag: '2026-11-19', lokal: 0, nacht: 1, daten: 0 })
+const htmlMerges = htmlVon(m, kMerges)
+assert.ok(htmlMerges.includes('<div class="karte"><b>3</b><small>Merges 7 Tage: nacht 1 · lokal 1 · Datenbot 1</small></div>'))
+assert.ok(htmlMerges.includes('<details class="abschnitt" open><summary><h2>Merges je Tag</h2>'))
+assert.ok(markdownVon(m, kMerges).includes('\nMerges 7 Tage: nacht 1 · lokal 1 · Datenbot 1\n\nMerges je Tag\n'))
+assert.ok(!html.includes('Merges 7 Tage'), 'ohne GitHub keine Merge-Kachel')
+
+// A6 Gesamtfrist: abgelaufen heißt Übersicht ohne GitHub-Teile mit Hinweis, kein Fehler; jeder Abruf wird auf die Restzeit gekürzt
+{
+  let uhrZeit = 0
+  const gesehen = []
+  const langsam = (b, a, o) => {
+    gesehen.push(o.timeout)
+    uhrZeit += 40_000
+    if (a[0] === 'pr') return '[]'
+    return a[1] === 'graphql' ? JSON.stringify({ data: { repository: {} } }) : ''
+  }
+  const w = []
+  const f = erzeuge(TEXT, JETZT, langsam, {}, (x) => w.push(x), () => uhrZeit, 75_000)
+  assert.deepEqual(gesehen, [60_000, 35_000], 'zweiter Abruf auf die Restzeit gekürzt, dritter nicht mehr gestartet')
+  assert.deepEqual(w, ['gh: Gesamtfrist abgelaufen, Rest entfällt'])
+  assert.ok(f.markdown.includes('_GitHub-Daten fehlen (Frist): PR- und Merge-Zahlen sowie PR-Labels entfallen._'))
+  assert.ok(f.html.includes('<p class="mu">GitHub-Daten fehlen (Frist): PR- und Merge-Zahlen sowie PR-Labels entfallen.</p>'))
+  assert.ok(!f.markdown.includes('Offene PRs') && f.k.prs === null && f.k.merges === null)
+  assert.ok(f.markdown.includes('## In Arbeit (1)'), 'Übersicht selbst ist vollständig')
+  const kurz = []
+  uhrZeit = 0
+  erzeuge(TEXT, JETZT, (b, a, o) => { kurz.push(o.timeout); return a[0] === 'pr' ? '[]' : (a[1] === 'graphql' ? JSON.stringify({ data: { repository: {} } }) : '') }, {}, () => {}, () => uhrZeit, 30_000)
+  assert.deepEqual(kurz, [30_000, 30_000, 30_000], 'Frist unter 60 s kürzt jeden Abruf')
+  assert.throws(() => begrenzt(() => 'x', 1000, () => 1000)('gh', [], {}), /Gesamtfrist/, 'genau am Ende wird nichts mehr gestartet')
+  assert.equal(begrenzt((b, a, o) => o.timeout, 1000, () => 400)('gh', [], undefined), 600, 'ohne eigene Frist gilt die Restzeit')
+  assert.equal(GESAMT_FRIST_MS, 75_000)
+}
+
+// A8 .gitignore: erzeugte Dateien mit echten Aufgaben nie im öffentlichen Repo
+const ignoriert = readFileSync(join(import.meta.dirname, '..', '.gitignore'), 'utf8').split('\n')
+for (const pfad of ['uebersicht.md', 'uebersicht.html', 'bilder/', '.uebersicht-cache.json', '.uebersicht-log.txt']) assert.ok(ignoriert.includes('daniel-zum-abarbeiten/' + pfad), pfad)
+
+// A5 Versteckter Start (tools/uebersicht-versteckt.vbs): Exit-Code und stderr-Log des Skripts kommen durch, wscript wartet
+const vbs = join(import.meta.dirname, 'uebersicht-versteckt.vbs')
+assert.match(readFileSync(vbs, 'utf8'), /WScript\.Quit sh\.Run\(befehl, 0, True\)/, 'Fensterstil 0 und warten')
+if (process.platform === 'win32') {
+  const ordner4 = mkdtempSync(join(tmpdir(), 'uebersicht-vbs-'))
+  try {
+    writeFileSync(join(ordner4, 'a.mjs'), 'console.error("fehler eins\\nzwei"); process.exit(7)')
+    writeFileSync(join(ordner4, 'b.mjs'), 'process.exit(0)')
+    const fehl = spawnSync('wscript.exe', ['//B', '//NoLogo', vbs, join(ordner4, 'a.mjs'), join(ordner4, 'a.log')], { encoding: 'utf8', timeout: 60_000, windowsHide: true })
+    assert.equal(fehl.status, 7, 'Exit-Code des Skripts bleibt erhalten')
+    assert.match(readFileSync(join(ordner4, 'a.log'), 'utf8'), /^fehler eins\r?\nzwei/)
+    const gut = spawnSync('wscript.exe', ['//B', '//NoLogo', vbs, join(ordner4, 'b.mjs'), join(ordner4, 'b.log')], { encoding: 'utf8', timeout: 60_000, windowsHide: true })
+    assert.equal(gut.status, 0)
+    assert.equal(readFileSync(join(ordner4, 'b.log'), 'utf8'), '')
+  } finally {
+    rmSync(ordner4, { recursive: true, force: true })
+  }
+} else console.log('wscript-Lauf übersprungen (nur Windows)')
 
 // Echter Runner: Node als „gh“; Ausgabe, geschlossene stdin, Frist, fehlendes Programm
 const lauf = ghAusfuehren(process.execPath)

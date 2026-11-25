@@ -30,8 +30,8 @@ concurrency:
 
 jobs:
   suche:
-    # Nur nach grünem Bestandsbau (main ist dann wieder in Ordnung); von Hand jederzeit.
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    # Nur nach grünem Bestandsbau auf main (dann ist main wieder in Ordnung; ein Handlauf auf einem anderen Zweig zählt nicht); von Hand jederzeit.
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -60,6 +60,8 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+          # Kein Token in .git/config: der Lauf führt tsx auf dem PR-Stand aus; git fetch braucht keins (öffentliches Repo), gh bekommt GH_TOKEN.
+          persist-credentials: false
 
       - uses: actions/setup-node@v4
         with:

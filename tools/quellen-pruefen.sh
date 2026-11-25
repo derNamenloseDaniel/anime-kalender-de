@@ -58,7 +58,7 @@ quellen_pruefen_dateien() {
     rest=$((ende - SECONDS))
     if [ "$rest" -le 0 ]; then echo "Basis nicht prüfbar: Frist von ${frist} s vor ${datei} erreicht."; return 0; fi
     status=0
-    CI=true timeout "$rest" env -u GH_TOKEN -u GITHUB_TOKEN npx --no-install tsx "$datei" >&2 || status=$?
+    CI=true timeout "$rest" env -u GH_TOKEN -u GITHUB_TOKEN npx --no-install tsx "$datei" >&2 </dev/null || status=$?
     case "$status" in
       0) ;;
       124) echo "Basis nicht prüfbar: ${datei} brauchte länger als die Frist von ${frist} s."; return 0 ;;

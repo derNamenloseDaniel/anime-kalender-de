@@ -69,7 +69,7 @@ try {
   const bin = join(ordner, 'bin')
   mkdirSync(bin)
   writeFileSync(join(bin, 'npx'), '#!/bin/bash\n[ "$1 $2" = "--no-install tsx" ] || exit 99\nexec bash "$3"\n', { mode: 0o755 })
-  const dateien = { 'rot.ts': 'exit 1', 'gruen.ts': 'exit 0', 'haengt.ts': 'sleep 30', 'startet-nicht.ts': 'exit 127' }
+  const dateien = { 'rot.ts': 'exit 1', 'gruen.ts': 'exit 0', 'liest.ts': 'cat >/dev/null', 'haengt.ts': 'sleep 30', 'startet-nicht.ts': 'exit 127' }
   const repoMitDateien = (name, ohneModule = false) => {
     const r = repo(name, false)
     for (const [datei, inhalt] of Object.entries(dateien)) writeFileSync(join(r, datei), `${inhalt}\n`)
@@ -98,6 +98,8 @@ try {
   assert.equal(neu(e, '  - gruen.ts'), '  - gruen.ts\n', 'auf main grün → neu')
   assert.equal(neu(e, '  - gibt-es-nicht.ts'), '  - gibt-es-nicht.ts\n', 'nicht auf main → neu')
   assert.equal(neu(e, '  - rot.ts\n  - gruen.ts'), '  - gruen.ts\n', 'gemischt: nur die neue bleibt')
+  // Eine Prüfdatei, die stdin liest, darf die folgenden Zeilen der Liste nicht verschlucken (Prüfer PR 5021, A1).
+  assert.equal(neu(e, '  - liest.ts\n  - rot.ts'), '  - liest.ts\n', 'stdin-Leser vor roter Datei: rot.ts läuft trotzdem')
 
   // Basis nicht prüfbar (Frist, Start, Module fehlen): alles bleibt rot, der Grund steht als erste Zeile.
   const frist = neu(e, '  - haengt.ts\n  - rot.ts', '1')
@@ -108,7 +110,7 @@ try {
   // Eine Frist-Zeile des Funds selbst (keine Liste) bleibt unverändert und ohne Vergleich.
   assert.equal(neu(e, 'Die Prüfung brauchte länger als 600 s und wurde abgebrochen.'), 'Die Prüfung brauchte länger als 600 s und wurde abgebrochen.\n')
 
-  console.log('quellen-pruefen-main: 11 Fälle grün (rot, grün, ohne main, Ordner fehlt, je Datei rot/grün/fehlt/gemischt, Frist, Start, Module).')
+  console.log('quellen-pruefen-main: 12 Fälle grün (rot, grün, ohne main, Ordner fehlt, je Datei rot/grün/fehlt/gemischt/stdin, Frist, Start, Module).')
 } finally {
   rmSync(ordner, { recursive: true, force: true })
 }

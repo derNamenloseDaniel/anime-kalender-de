@@ -66,8 +66,8 @@ export function DbKarte({ main, members, data, today, grouped, favorites, hidden
 
   if (isHidden) {
     return (
-      <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-100/60 p-3 text-center dark:border-white/15 dark:bg-white/[0.02]">
-        <span className="line-clamp-3 text-xs italic text-slate-400 dark:text-slate-500">{anzeigeName(main)}</span>
+      <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-ak-rand bg-ak-grund p-3 text-center">
+        <span className="line-clamp-3 text-xs italic text-ak-sehr-leise">{anzeigeName(main)}</span>
         <HideEye hidden onToggle={() => onToggleHidden(main.id)} />
       </div>
     )
@@ -82,10 +82,8 @@ export function DbKarte({ main, members, data, today, grouped, favorites, hidden
         keinDub ? 'border border-dashed' : 'border',
         favorite
           ? 'border-ak-favorit/70 shadow-[0_0_0_1px_color-mix(in_srgb,var(--ak-favorit)_30%,transparent)]'
-          : keinDub
-            ? 'border-slate-400/60 hover:border-ak-leise dark:border-white/25'
-            : 'border-slate-200 hover:border-ak-leise dark:border-white/10',
-        keinDub ? 'bg-slate-100/70 hover:shadow-md dark:bg-white/[0.015]' : 'bg-white hover:shadow-lg dark:bg-white/[0.03]',
+          : 'border-ak-rand hover:border-ak-leise',
+        keinDub ? 'bg-ak-grund hover:shadow-md' : 'bg-ak-flaeche hover:shadow-lg',
         'has-[.ak-oeffnen:focus-visible]:outline-2 has-[.ak-oeffnen:focus-visible]:outline-offset-2 has-[.ak-oeffnen:focus-visible]:outline-ak-fokus',
       ].join(' ')}
     >
@@ -99,7 +97,7 @@ export function DbKarte({ main, members, data, today, grouped, favorites, hidden
       >
         {t('card.details', { titel: anzeigeName(main) })}
       </button>
-      <div className="relative aspect-[2/3] overflow-hidden bg-slate-200 dark:bg-white/5">
+      <div className="relative aspect-[2/3] overflow-hidden bg-ak-flaeche-2">
         <KartenCover
           main={main}
           keinDub={keinDub}

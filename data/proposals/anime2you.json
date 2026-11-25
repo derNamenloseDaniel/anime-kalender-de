@@ -1,12 +1,12 @@
 {
-  "scrapedAt": "2026-11-25T18:03:52.880Z",
+  "scrapedAt": "2026-11-25T23:01:34.618Z",
   "verworfen": {
     "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 4,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 12,
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 13,
     "schon in einem Rubrik-Feed gelesen": 10,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 2,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 1,
     "Sprachhinweis älter als 45 Tage": 6
   },
   "proposals": [
@@ -571,10 +571,6 @@
         "netflix"
       ],
       "dates": [
-        {
-          "iso": "2026-11-25",
-          "context": "026 Die erste Staffel von »Call of the Night« steht demzufolge ab dem 25. November 2026 bei Netflix auf Abruf zur Verfügung. Details zu den"
-        },
         {
           "month": "2026-11",
           "context": "ng von »Call of the Night« in sein Programm auf. Wir fassen zusammen. Ab November 2026 Die erste Staffel von »Call of the Night« steht demzu"

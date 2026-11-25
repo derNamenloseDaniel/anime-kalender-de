@@ -18,6 +18,8 @@ export type FaelligOptionen = {
    * Fehlschläge von vor der Film-Nachsuche (`vor`, ISO-Zeit) für Titel, die ein Film sein könnten (`ids`): sie kommen nach den toten Kennungen
    * und vor allem anderen dran, denn nur sie profitieren von der neuen Regel; ein Wochenlauf mit Limit 400 wäre sonst Wochen am Rückstau.
    */
+  /** Eintrag mit künftigem Kinostart binnen der Grundfrist (`terminNahFaellig`): kommt früher wieder und vor den übrigen. */
+  terminNah?: (e: Eintrag) => boolean
   filmNeusuche?: { ids: ReadonlySet<number>; vor: string }
 }
 
@@ -27,9 +29,10 @@ function filmNeusucheFaellig(id: number, e: Eintrag | undefined, o: FaelligOptio
   return !!f && f.ids.has(id) && !!e && !e.tmdbId && (e.fetchedAt ?? '') < f.vor
 }
 
-/** Die Titel, die dieser Lauf neu abfragt: tote Kennungen zuerst, dann ältester Abruf zuerst, nie geholte ganz vorn. */
+/** Die Titel, die dieser Lauf neu abfragt: tote Kennungen zuerst, dann Kinostart binnen der Frist, dann ältester Abruf zuerst, nie geholte ganz vorn. */
 export function faelligeTitel<T extends { id: number }>(titles: T[], cache: Record<string, Eintrag>, o: FaelligOptionen): T[] {
   /* Tote Kennungen zuerst: sie liefern nichts, solange sie stehen, und ein kleines Limit trifft sie sicher. */
+  const nah = (id: number): boolean => !!cache[id] && !!o.terminNah?.(cache[id])
   const tot = (t: { id: number }): boolean => neusucheFaellig(o.tot?.[String(t.id)], cache[t.id])
   return titles
     .filter((t) => {
@@ -37,7 +40,7 @@ export function faelligeTitel<T extends { id: number }>(titles: T[], cache: Reco
       if (o.handIds.has(t.id)) return false
       const e = cache[t.id]
       if (o.nurOhneEintrag) return !e
-      if (o.force || !e || kinoFehlt(e) || tot(t) || filmNeusucheFaellig(t.id, e, o)) return true
+      if (o.force || !e || kinoFehlt(e) || tot(t) || filmNeusucheFaellig(t.id, e, o) || nah(t.id)) return true
       /* Ohne Genre zählt wie ein Fehlschlag: bald wieder, aber nicht in jedem Lauf (dauerhaft scheiternder Detailabruf). */
       return (e.fetchedAt ?? '') < (e.tmdbId && !genreFehlt(e) ? o.grenze : o.grenzeFehlschlag)
     })
@@ -45,6 +48,7 @@ export function faelligeTitel<T extends { id: number }>(titles: T[], cache: Reco
       (a, b) =>
         Number(tot(b)) - Number(tot(a)) ||
         Number(filmNeusucheFaellig(b.id, cache[b.id], o)) - Number(filmNeusucheFaellig(a.id, cache[a.id], o)) ||
+        Number(nah(b.id)) - Number(nah(a.id)) ||
         (cache[a.id]?.fetchedAt ?? '').localeCompare(cache[b.id]?.fetchedAt ?? ''),
     )
 }

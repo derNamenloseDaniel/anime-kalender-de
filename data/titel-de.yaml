@@ -380,3 +380,59 @@
   quellen:
     - https://www.anime2you.de/news/866645/netflix-entfernt-cyborg-009-call-of-justice/
     - https://de.wikipedia.org/wiki/Cyborg_009
+
+- id: 87481
+  titleDe: "Cyborg 009: Call of Justice 1"
+  geprueftAm: "2026-11-25"
+  note: "Wie Teil 2 und 3 (87482, 87483): der deutsche Titel ist der englische (Netflix, 12 Folgen aus drei Filmen); die Zählung „1“ stammt aus unserem Titel."
+  quellen:
+    - https://www.anime2you.de/news/866645/netflix-entfernt-cyborg-009-call-of-justice/
+    - https://de.wikipedia.org/wiki/Cyborg_009
+
+- id: 15201
+  titleDe: "Code Geass: Akito the Exiled - From the Memories of Hatred"
+  geprueftAm: "2026-11-25"
+  note: "Die deutschen Anbieter-Seiten führen OVA 4 als „From the Memories of Hatred“ (Prime Video DE und Apple TV DE: „Code Geass: Akito the Exiled 4 - From the Memories of Hatred“; OFDb ebenso); nur die KSM-Gesamtausgabe schreibt „Memories of Hatred“. Gleiche Form wie die Teile 1–3 (8888, 15197, 15199)."
+  quellen:
+    - https://www.primevideo.com/-/de/detail/Code-Geass-Akito-the-Exiled-4---From-the-Memories-of-Hatred---OVA/0GWI6KUP5WZPQ5L7YYU1B76SYG
+    - https://tv.apple.com/de/movie/code-geass-akito-the-exiled-4---from-the-memories-of-hatred---ova/umc.cmc.1x0l3n8yt36sbaals80f2xkcf
+
+- id: 104382
+  titleDe: "Psycho-Pass: Sinners of the System Case 2 - First Guardian"
+  geprueftAm: "2026-11-25"
+  note: "Filmdienst und FILMSTARTS führen den Film in Deutschland mit diesem Titel (Verweistitel „Case 2 - First Guardian“, Kazé-Trilogie auf Blu-ray)."
+  quellen:
+    - https://www.filmdienst.de/film/details/614632/psycho-pass-sinners-of-the-system
+    - https://www.filmstarts.de/kritiken/281603.html
+
+- id: 104990
+  titleDe: "Psycho-Pass: Sinners of the System Case 3 - Jenseits von Liebe und Hass"
+  geprueftAm: "2026-11-25"
+  note: "Deutscher Untertitel laut Filmdienst (Verweistitel „Case 3 - Jenseits von Liebe und Hass“), FILMSTARTS, Geek Germany und Prime Video DE."
+  quellen:
+    - https://www.filmdienst.de/film/details/614632/psycho-pass-sinners-of-the-system
+    - https://www.filmstarts.de/kritiken/281604.html
+
+- id: 10017229
+  titleDe: "Pacific Rim: The Black - Staffel 2"
+  geprueftAm: "2026-11-25"
+  note: "Netflix-Staffel 2 (19.04.2022, 7 Folgen): Moviepilot und fernsehserien.de führen sie unter dem Originaltitel mit Staffelzusatz, einen eigenen deutschen Titel gibt es nicht. Staffel 1 steht bei uns als 10015835."
+  quellen:
+    - https://www.moviepilot.de/serie/pacific-rim-the-animated-series/staffel/2
+    - https://www.fernsehserien.de/pacific-rim-the-black/episodenguide/staffel-2/42268
+
+- id: 111852
+  titleDe: "Date A Bullet: Dead or Bullet"
+  geprueftAm: "2026-11-25"
+  note: "Die deutsche Fassung (AniMoon) fasst beide Teile zu „Date A Bullet - The Movie“ zusammen; de.wikipedia und Anime2You nennen den Teil unverändert „Dead or Bullet“, einen eigenen deutschen Titel gibt es nicht."
+  quellen:
+    - https://de.wikipedia.org/wiki/Dead_or_Bullet
+    - https://www.anime2you.de/news/496297/date-a-bullet-kinotermin/
+
+- id: 121034
+  titleDe: "Date A Bullet: Nightmare or Queen"
+  geprueftAm: "2026-11-25"
+  note: "Zweiter Teil des deutschen Kinofilms „Date A Bullet - The Movie“ (AniMoon); de.wikipedia führt ihn als „Nightmare or Queen“, einen eigenen deutschen Titel gibt es nicht."
+  quellen:
+    - https://de.wikipedia.org/wiki/Dead_or_Bullet
+    - https://www.anime2you.de/news/496297/date-a-bullet-kinotermin/

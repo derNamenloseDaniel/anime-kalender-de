@@ -1,0 +1,7 @@
+# Bericht maengel-abbau-2511
+
+- Belegt und eingetragen: 7 Titel (Cyborg 009 CoJ 1, Code Geass Akito 4, Psycho-Pass Case 2/3, Pacific Rim The Black S2, Date A Bullet 1/2) — Ziel 8 knapp verfehlt. Vorher/nachher: Bau in der Cloud nicht möglich (`data/cache/` leer); `check:logic` und `tsc --noEmit` grün, `maengel.mjs` nach dem Bestandsbau messen.
+- Offen, Call of the Night: Suche „Call of the Night Netflix 25. November Synchronisation deutsch“ — Anime2You 1073645: „Details zu den angebotenen Sprachfassungen sind … noch offen“; nudlaug.eu und Netflix-Seiten nicht erreichbar.
+- Offen: Afro Samurai Movie (Steelbook 18.12.2026 enthält Serie + Resurrection, nicht den Film 2007); Akito Picture Drama 109002 („Code Geass Akito Picture Drama deutsch“: nichts); Beyblade Burst/Bakugan Evolutions/Baby Shark (joyn.de, fernsehserien.de, Prime-Seiten nicht erreichbar, Suchtreffer ohne Sprachangabe).
+- Auffällig: Rozen Maiden: Träumend (65) trägt Tokyopop-Synchro; aniSearch nennt die Synchro „begonnen, nie veröffentlicht“ — prüfen, eventuell Erstausgabe falsch.
+- Gut: Anime2You-Suchwerkzeug liefert belegbare Sprachstellen. Schlecht: Anbieter-Hosts (joyn, fernsehserien, Prime) in der Cloud gesperrt, die W3-Liste besteht überwiegend aus Altbestand ohne aktuellen Weg. Unerwartet: 87481 hatte schon ein Netflix-Nein, es fehlte nur die Erstausgabe. Vorschlag: lokaler Bauer mit freiem Netz für Beyblade/Bakugan/Baby Shark.

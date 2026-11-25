@@ -51,6 +51,7 @@ Ziel (Daniel, 08.10.2026): Daten aktuell halten und Neuigkeiten einarbeiten, ohn
 
 
 ### In Arbeit
+- [ ] Bestandsbau rot 25.11. (#5010, 1 SP): `check-reihen-reiter.ts` (PR 4912) erwartete Horizonte als 4 Sammeltitel, die F157 (24.11. 12:49) wieder zu einem Titel machte; Check auf den Ein-Titel-Stand umgestellt (PR „Behebt #5010“). Prüfen: nächster Bestandsbau grün.
 - [ ] Wache 24.11. (#4902, 1 SP): „3 Titel weniger“ = gewollte Zusammenlegung Pokémon Horizonte (PR 4897), kein Verlust. Offen: Folge-PR mit `zuAk` für 7000001–7000003 nach dem Bestandsbau (dann erklärt die Wache es selbst). Auswertung: daniel-zum-abarbeiten/00-wache-auswertung.md
 - [ ] Wache 22.11.: Titel 120892 (Grisaia Stargazer) in Quarantäne `telekom-annahme` (Bau 557e551a, 04:48); Ursache der roten Prüfung nicht gemessen, Wache sollte `meta.quarantaene` als erklärt lesen. 2 SP. Auswertung: daniel-zum-abarbeiten/00-wache-auswertung.md, Issue #4584.
 - Wache 18.11. (#4222, 2 SP): 4 Disney+-Urteile (17.11. 17:10) und ADN Kill La Kill (18.11. 04:29) verloren, Quelle nicht gemessen; link-check steht auf 200. Auswertung in `daniel-zum-abarbeiten/00-wache-auswertung.md`, offen: Meldequelle je Titel klären.

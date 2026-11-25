@@ -153,18 +153,8 @@ export function VoiceCast({ titleId }: { titleId: number }) {
   )
 }
 
-/**
- * Ähnliche Titel — aufgeklappt, einklappbar, geladen erst im Bild.
- *
- * Daniel am 15.09.2026: „aber einklappbar", dann „per default aufklappen".
- * Die Rechnung braucht den ganzen Hauptbestand (`titles.json`, mehrere
- * Megabyte). Geholt wird er deshalb erst, wenn der Bereich ins Bild scrollt —
- * wer das Panel oben liest und schließt, lädt nichts. Die gemeinsamen Merkmale
- * stehen je Zeile dabei, damit nachzulesen ist, warum ein Titel vorkommt.
- */
-export function AehnlicheTitel({ title, data, onOpenTitle }: { title: Title; data: Dataset; onOpenTitle: (id: number) => void }) {
-  const { t, tGenre, tKeyword } = useLang()
-  const [open, setOpen] = useState(true)
+/** Lädt die Vergleichsliste erst im Bild und rechnet die Vorschläge. */
+function useAehnlicheListe(title: Title, data: Dataset, open: boolean) {
   const [imBild, setImBild] = useState(false)
   /* Die Vergleichsliste gehört zu ihrer Art (Anime oder Cartoon): Wechselt das Panel ohne
      Neumontage von einem zum anderen, wäre die alte Liste die falsche (18.09.2026). */
@@ -200,6 +190,22 @@ export function AehnlicheTitel({ title, data, onOpenTitle }: { title: Title; dat
   }, [open, imBild, alle, data, westlich])
 
   const vorschlaege = useMemo(() => (open && alle ? aehnlicheTitel(title, alle) : []), [open, alle, title])
+  return { imBild, bereich, alle, vorschlaege }
+}
+
+/**
+ * Ähnliche Titel — aufgeklappt, einklappbar, geladen erst im Bild.
+ *
+ * Daniel am 15.09.2026: „aber einklappbar", dann „per default aufklappen".
+ * Die Rechnung braucht den ganzen Hauptbestand (`titles.json`, mehrere
+ * Megabyte). Geholt wird er deshalb erst, wenn der Bereich ins Bild scrollt —
+ * wer das Panel oben liest und schließt, lädt nichts. Die gemeinsamen Merkmale
+ * stehen je Zeile dabei, damit nachzulesen ist, warum ein Titel vorkommt.
+ */
+export function AehnlicheTitel({ title, data, onOpenTitle }: { title: Title; data: Dataset; onOpenTitle: (id: number) => void }) {
+  const { t, tGenre, tKeyword } = useLang()
+  const [open, setOpen] = useState(true)
+  const { imBild, bereich, alle, vorschlaege } = useAehnlicheListe(title, data, open)
   const merkmalName = (m: string) => (m.startsWith('g:') ? tGenre(m.slice(2)) : tKeyword(m.slice(2)))
 
   return (

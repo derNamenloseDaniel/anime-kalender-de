@@ -86,6 +86,7 @@ function einTitel(g: StaffelGrenzen): void {
 
 if (!titel.length || !termine.length) {
   console.error(`FEHLER: ${titel.length} Titel, ${termine.length} Termine gelesen (public/data/titles.json, events.json)`)
+  console.log('VERSTÖSSE: 1')
   process.exit(1)
 }
 keineStaffelTitel()
@@ -106,5 +107,6 @@ for (const g of ladeStaffelGrenzen(HORIZONTE_STAFFELN)) {
   }
   einTitel(g)
 }
+console.log(`VERSTÖSSE: ${fehler}`)
 if (fehler) process.exit(1)
 console.log(`check-horizonte-staffeln-bestand: ok (${titel.length} Titel, ${termine.length} Termine gelesen)`)

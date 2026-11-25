@@ -88,4 +88,5 @@ if (ohneSerie.length) console.log(bestandWarnzeile('TOGGO-Seiten', 'Figurenseite
 const ohneLink = toggoTitel.filter((id) => !OHNE_LINK.has(id) &&nachher.some((t) => t.id === id && !toggoUrls(t).length))
 if (ohneLink.length) console.log(bestandWarnzeile('TOGGO-Seiten', 'Titel, die TOGGO führt (data/toggo.json), ohne TOGGO-Link', ohneLink))
 console.log(`TOGGO-Seiten: ${anime.length} Titel und ${cartoons.length} Cartoons, Katalog ${daten.katalog.length} Serien, falsch ${falsch.length} (Stand ${stand.falsch}), fest fehlend ${festFehlend.length} (Stand ${stand.fehlend}), Katalog fehlend ${katalogFehlend.length}, ohne Serie ${offen.length}`)
+console.log(`VERSTÖSSE: ${fehler}`)
 process.exit(fehler ? 1 : 0)

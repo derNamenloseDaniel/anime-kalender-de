@@ -42,4 +42,5 @@ pruefe('Jede Zeile der Bekannt-Liste hat noch einen Treffer (sonst aus data/zuor
 pruefe('Die Bekannt-Liste ist nicht doppelt und sortiert', bekannt.length === new Set(bekannt).size && bekannt.join('\n') === [...bekannt].sort().join('\n'))
 
 console.log(verletzt ? `\n${verletzt} Zusicherung(en) verletzt.` : `\ncheck-zuordnung-fremd-bestand: ${treffer.length} Altfälle bekannt, keine neue fremde Adresse.`)
+console.log(`VERSTÖSSE: ${verletzt}`)
 process.exit(verletzt ? 1 : 0)

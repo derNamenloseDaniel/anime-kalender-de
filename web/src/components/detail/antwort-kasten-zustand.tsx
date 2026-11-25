@@ -83,7 +83,7 @@ export function kastenKopfVon(w: KopfWunsch) {
   const relativImSatz = (datum: string): string => abstandImSatz(today, datum, T)
   /** Was hervorgehoben wird, trägt die Akzentfarbe des Kastens. */
   const betont = (text: string): ReactNode => (
-    <span className="text-sky-700 dark:text-sky-300">{text}</span>
+    <span className="text-ak-akzent-text">{text}</span>
   )
 
   /*
@@ -127,7 +127,7 @@ export function kastenKlassen({ antwort, title, neben, gedaempft }: Pick<Antwort
     */
     `relative flex ${((antwort.art === 'fertig' || antwort.art === 'film') && !neben) || ankuendigungOhneTermin(title, antwort.art) ? '' : 'min-h-[11rem]'} flex-col rounded-2xl border p-4`,
     gedaempft
-      ? 'border-slate-200 bg-[#f8fafc] [--kasten:#f8fafc] dark:border-white/10 dark:bg-[#111623] dark:[--kasten:#111623]'
-      : 'border-[#f6cfc3] bg-[#fff6f3] [--kasten:#fff6f3] dark:border-[#4a2a24] dark:bg-[#1a1416] dark:[--kasten:#1a1416]',
+      ? 'border-ak-linie bg-ak-flaeche [--kasten:var(--ak-flaeche)]'
+      : 'border-ak-akzent/20 bg-ak-heute [--kasten:var(--ak-heute)]',
   ].join(' ')
 }

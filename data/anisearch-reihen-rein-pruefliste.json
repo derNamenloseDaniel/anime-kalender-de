@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-24",
+  "stand": "2026-11-25",
   "bestand": {
     "inReihen": 3029,
     "reihen": 819,
@@ -1586,7 +1586,7 @@
     ]
   },
   "katalog": {
-    "inReihen": 12061,
+    "inReihen": 12062,
     "reihen": 3081,
     "pruefliste": [
       {
@@ -3946,7 +3946,7 @@
           {
             "id": 163571,
             "name": "BanG Dream! It's MyGO!!!!!",
-            "titel": 11
+            "titel": 10
           }
         ],
         "alleinstehende": [],
@@ -5644,7 +5644,7 @@
           {
             "id": 130003,
             "name": "Bocchi the Rock!",
-            "titel": 4
+            "titel": 5
           }
         ],
         "alleinstehende": [],

@@ -35,7 +35,7 @@ export function NewsEintragInhalt({ umschalten, e, auf, erste, t, arten, sortier
         <NewsCover e={e} />
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           {/* Zeile 1: der Titel, allein — er ist, wonach man die Liste überfliegt. */}
-          <span className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{e.titel}</span>
+          <span className="truncate text-sm font-semibold text-ak-text">{e.titel}</span>
           {/*
             Zeile 2: der Teil, falls die Meldung einen bestimmten meint.
 
@@ -56,7 +56,7 @@ export function NewsEintragInhalt({ umschalten, e, auf, erste, t, arten, sortier
             die Untergrenze, nicht die Obergrenze.
           */}
           {erste.teil && erste.teil !== e.titel ? (
-            <span className="min-w-0 max-w-full self-start truncate rounded border border-slate-300 px-1 py-px text-[11px] font-medium text-slate-600 dark:border-slate-600 dark:text-slate-300">
+            <span className="min-w-0 max-w-full self-start truncate rounded border border-ak-rand px-1 py-px text-[11px] font-medium text-ak-leise">
               {erste.teil}
             </span>
           ) : (
@@ -86,7 +86,7 @@ export function NewsEintragInhalt({ umschalten, e, auf, erste, t, arten, sortier
           </span>
         </span>
         <span
-          className={`shrink-0 pr-1 text-slate-400 transition-transform ${auf ? 'rotate-90' : ''} ${
+          className={`shrink-0 pr-1 text-ak-sehr-leise transition-transform ${auf ? 'rotate-90' : ''} ${
             e.meldungen.length > 1 ? '' : 'opacity-45'
           }`}
           aria-hidden="true"
@@ -96,7 +96,7 @@ export function NewsEintragInhalt({ umschalten, e, auf, erste, t, arten, sortier
       </button>
 
       {auf && (
-        <ul className="mb-1.5 ml-10 space-y-0.5 border-l border-slate-200 pl-3 dark:border-slate-700">
+        <ul className="mb-1.5 ml-10 space-y-0.5 border-l border-ak-linie pl-3">
           {sortiert.map((m, i) => (
             <MeldungZeile
               key={`${m.art}-${m.datum ?? ''}-${m.von ?? ''}-${i}`}
@@ -198,15 +198,15 @@ function MeldungZeile({
             {artLabel(m)}
           </span>
           {m.teil && m.teil !== reihe && (
-            <span className="min-w-0 shrink truncate rounded border border-slate-300 px-1 py-px text-[11px] font-medium text-slate-600 dark:border-slate-600 dark:text-slate-300">
+            <span className="min-w-0 shrink truncate rounded border border-ak-rand px-1 py-px text-[11px] font-medium text-ak-leise">
               {m.teil}
             </span>
           )}
           <span
             className={`min-w-0 flex-1 basis-40 text-xs ${
               m.ersetzt || m.zurueckgezogen
-                ? 'text-slate-400 line-through dark:text-slate-500'
-                : 'text-slate-600 dark:text-slate-300'
+                ? 'text-ak-sehr-leise line-through'
+                : 'text-ak-leise'
             }`}
           >
             {newsSatz(m, am)}
@@ -218,7 +218,7 @@ function MeldungZeile({
       </div>
       {/* Der Vermerk erscheint **beim Aufklappen** unter der Meldung — in der Übersicht bleibt der
           Satz kurz. */}
-      {m.hinweis && <p className="pb-1 pl-2 pr-2 text-[11px] text-slate-400 dark:text-slate-500">{m.abschnitte?.length ? <NachtragText kurz={m.hinweis} abschnitte={m.abschnitte} /> : <Klapptext text={m.hinweis} />}</p>}
+      {m.hinweis && <p className="pb-1 pl-2 pr-2 text-[11px] text-ak-sehr-leise">{m.abschnitte?.length ? <NachtragText kurz={m.hinweis} abschnitte={m.abschnitte} /> : <Klapptext text={m.hinweis} />}</p>}
       {staende && <VerlaufZeilen staende={staende} />}
     </li>
   )

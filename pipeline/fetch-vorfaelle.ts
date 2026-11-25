@@ -62,6 +62,57 @@ const ERKLAERUNG: Record<string, string> = {
     'Ende eines Netflix-Durchgangs: besucht, gemessen, wartet auf Übernahme, übersprungen. Misst er viele besuchte Titel nie, steht es hier.',
 }
 
+/** Die Vorfälle vom Worker; `null`, wenn der Abruf scheiterte (Befund steht dann schon in Log und Quellenstand). */
+async function holeVorfaelle(): Promise<Vorfall[] | null> {
+  const antwort = await fetch(`${WORKER}/vorfall`, { headers: { Authorization: `Bearer ${TOKEN}` } })
+  if (!antwort.ok) {
+    warn(`Vorfälle nicht abrufbar: HTTP ${antwort.status}`)
+    if (!TROCKEN) recordSource('vorfaelle', 0, `HTTP ${antwort.status}`)
+    return null
+  }
+  const daten = (await antwort.json()) as { vorfaelle?: Vorfall[] }
+  return daten.vorfaelle ?? []
+}
+
+/** Gruppiert nach Art — die Häufigkeit ist die eigentliche Auskunft. */
+function gruppiereNachArt(alle: Vorfall[]): Map<string, Vorfall[]> {
+  const jeArt = new Map<string, Vorfall[]>()
+  for (const v of alle) jeArt.set(v.art, [...(jeArt.get(v.art) ?? []), v])
+  return jeArt
+}
+
+/** Die Berichtszeilen: Kopf, dann je Art (häufigste zuerst) eine Tabelle mit höchstens 40 Zeilen. */
+function baueBericht(anzahl: number, jeArt: Map<string, Vorfall[]>): string[] {
+  const zeilen = [
+    '# Vorfälle aus der Erweiterung',
+    '',
+    'Was der Browser-Erweiterung aufgefallen ist, seit dieser Lauf zuletzt gelesen hat.',
+    'Bis zum 10.09.2026 stand das in der Browserkonsole — also an einer Stelle, die',
+    'niemand liest: Daniel schaut dort nicht hin, und der Agent kommt gar nicht daran.',
+    '',
+    `Stand: ${new Date().toISOString().slice(0, 16).replace('T', ' ')} · ${anzahl} Vorfall/Vorfälle`,
+    '',
+    '**Ein Vorfall ist nicht zwingend ein Fehler.** „Keine Tonspur gelesen" ist ein',
+    'vorgesehener Fall — interessant wird er erst durch seine Häufigkeit.',
+    '',
+  ]
+
+  for (const [art, liste] of [...jeArt].sort((a, b) => b[1].length - a[1].length)) {
+    zeilen.push(`## ${art} — ${liste.length}×`, '')
+    if (ERKLAERUNG[art]) zeilen.push(ERKLAERUNG[art], '')
+    zeilen.push('| Wann | Plattform | Reihe | Folge | Was | Version |', '|---|---|---|---|---|---|')
+    for (const v of liste.slice(0, 40)) {
+      zeilen.push(
+        `| ${v.gemeldet_am.slice(0, 16).replace('T', ' ')} | ${v.plattform} | ${v.reihe ?? '—'} | ` +
+          `${v.folge_nr ?? '—'} | ${(v.text ?? '').replace(/\|/g, '\\|')} | ${v.version ?? '—'} |`,
+      )
+    }
+    if (liste.length > 40) zeilen.push(`| … | | | | ${liste.length - 40} weitere | |`)
+    zeilen.push('')
+  }
+  return zeilen
+}
+
 export async function main(): Promise<void> {
   if (!TOKEN) {
     warn('LAUF_TOKEN fehlt — ohne das Token gibt der Worker die Vorfälle nicht heraus.')
@@ -72,14 +123,8 @@ export async function main(): Promise<void> {
     return
   }
 
-  const antwort = await fetch(`${WORKER}/vorfall`, { headers: { Authorization: `Bearer ${TOKEN}` } })
-  if (!antwort.ok) {
-    warn(`Vorfälle nicht abrufbar: HTTP ${antwort.status}`)
-    if (!TROCKEN) recordSource('vorfaelle', 0, `HTTP ${antwort.status}`)
-    return
-  }
-  const daten = (await antwort.json()) as { vorfaelle?: Vorfall[] }
-  const alle = daten.vorfaelle ?? []
+  const alle = await holeVorfaelle()
+  if (!alle) return
   log(`${alle.length} Vorfall/Vorfälle abgeholt.`)
 
   const ziel = resolve(ROOT, 'daniel-zum-abarbeiten/listen/17-vorfaelle.md')
@@ -102,37 +147,8 @@ export async function main(): Promise<void> {
     return
   }
 
-  /* Gruppiert nach Art — die Häufigkeit ist die eigentliche Auskunft. */
-  const jeArt = new Map<string, Vorfall[]>()
-  for (const v of alle) jeArt.set(v.art, [...(jeArt.get(v.art) ?? []), v])
-
-  const zeilen = [
-    '# Vorfälle aus der Erweiterung',
-    '',
-    'Was der Browser-Erweiterung aufgefallen ist, seit dieser Lauf zuletzt gelesen hat.',
-    'Bis zum 10.09.2026 stand das in der Browserkonsole — also an einer Stelle, die',
-    'niemand liest: Daniel schaut dort nicht hin, und der Agent kommt gar nicht daran.',
-    '',
-    `Stand: ${new Date().toISOString().slice(0, 16).replace('T', ' ')} · ${alle.length} Vorfall/Vorfälle`,
-    '',
-    '**Ein Vorfall ist nicht zwingend ein Fehler.** „Keine Tonspur gelesen" ist ein',
-    'vorgesehener Fall — interessant wird er erst durch seine Häufigkeit.',
-    '',
-  ]
-
-  for (const [art, liste] of [...jeArt].sort((a, b) => b[1].length - a[1].length)) {
-    zeilen.push(`## ${art} — ${liste.length}×`, '')
-    if (ERKLAERUNG[art]) zeilen.push(ERKLAERUNG[art], '')
-    zeilen.push('| Wann | Plattform | Reihe | Folge | Was | Version |', '|---|---|---|---|---|---|')
-    for (const v of liste.slice(0, 40)) {
-      zeilen.push(
-        `| ${v.gemeldet_am.slice(0, 16).replace('T', ' ')} | ${v.plattform} | ${v.reihe ?? '—'} | ` +
-          `${v.folge_nr ?? '—'} | ${(v.text ?? '').replace(/\|/g, '\\|')} | ${v.version ?? '—'} |`,
-      )
-    }
-    if (liste.length > 40) zeilen.push(`| … | | | | ${liste.length - 40} weitere | |`)
-    zeilen.push('')
-  }
+  const jeArt = gruppiereNachArt(alle)
+  const zeilen = baueBericht(alle.length, jeArt)
 
   if (TROCKEN) {
     console.log(zeilen.join('\n'))

@@ -15,7 +15,7 @@ import { mitLaufzeit } from '../lib/anisearch-felder.ts'
 import { type KatalogEintrag } from '../lib/anilist.ts'
 import { ladeKatalogEintraege } from '../lib/katalog-eingefroren.ts'
 import { ohneZurueckgestellte } from '../lib/quarantaene.ts'
-import { katalogNamen, ladeAnisearchTitel } from './katalog-namen.ts'
+import { type AnisearchTitel, katalogNamen, ladeAnisearchTitel } from './katalog-namen.ts'
 import { ANILIST_COVER_BASIS } from '../../shared/mappings.ts'
 import { coverFuer } from './cover-regel.ts'
 import { bewertungNachRegel, mitProduktFeldern } from './produkt-regel.ts'
@@ -252,6 +252,53 @@ export function anisearchDublettenAbziehen(bekannt: Map<number, number>, verscho
   return urteil
 }
 
+/** Der Titel eines Katalogeintrags ohne Synchro, wie `ohne-synchro.json` ihn führt; `reihenId`: seine Reihe (eigene Kennung, wenn er allein steht), `reihenName`: deren deutscher Name. */
+function katalogTitelOhneSynchro(e: KatalogEintrag, anisearch: AnisearchTitel | undefined, reihenName: string | undefined, reihenId: number | undefined, anisearchId: number | undefined) {
+  const namen = katalogNamen(e, anisearch, reihenName)
+  return {
+    id: e.id, malId: e.mal,
+    ...namen,
+    /* Die Kennung geht mit, sonst führt der aniSearch-Verweis ins Leere; zugeordnet wird sie in `anisearch-kennung.ts`. */
+    anisearchId,
+    titleNative: e.t[2] ?? undefined,
+    format: e.format ?? undefined,
+    episodes: e.folgen ?? undefined,
+    jpYear: e.jahr ?? undefined,
+    /* Der Termin, soweit AniList ihn kennt — bei Ankündigungen das Einzige, was dasteht. */
+    jpStart: e.start ?? undefined,
+    jpStatus: e.status ?? undefined,
+    genres: e.genres,
+    /**
+     * **Ohne** Adressvorsatz — der wird erst im Browser angehängt. Bei
+     * achtzehntausend Titeln spart das über ein Megabyte an Ladelast.
+     *
+     * Gekürzt wird hier und nicht beim Abrufen, obwohl es dort naheläge:
+     * Der Zwischenspeicher überdauert viele Läufe, und Einträge aus einem
+     * früheren Lauf tragen noch die volle Adresse. Beim Bauen greift die
+     * Kürzung dagegen auf jeden Eintrag, auch auf alte. Passt der Vorsatz
+     * nicht (AniList liefert gelegentlich einen anderen Hostnamen), bleibt
+     * die Adresse unangetastet — der Browser erkennt das am `http`.
+     */
+    coverImage: coverFuer(e.id, e.cover?.startsWith(ANILIST_COVER_BASIS) ? e.cover.slice(ANILIST_COVER_BASIS.length) : (e.cover ?? undefined)),
+    ...bewertungNachRegel({}, anisearchId),
+    /**
+     * Fehlt, wenn der Titel allein steht — dann greift in der Oberfläche
+     * ohnehin der Rückfall auf die eigene Kennung, und die Zahl wäre
+     * fünfzehntausendmal umsonst übertragen.
+     */
+    franchiseId: reihenId === e.id ? undefined : reihenId,
+    /**
+     * `low` ist hier keine schwache Angabe, sondern die einzig ehrliche:
+     * Es gibt nichts zu belegen. Das Feld ist Pflicht, weil dieselbe
+     * Oberfläche beide Sorten anzeigt.
+     */
+    dubConfidence: 'low' as const,
+    ohneSynchro: true,
+    ...(e.land ? { land: e.land } : {}),
+    ...kinoFeld(e.id),
+  }
+}
+
 export function schreibeOhneSynchro(
   bekannt: Map<number, number>,
   verschoben: Title[] = [],
@@ -291,51 +338,7 @@ export function schreibeOhneSynchro(
   const reihe = anisearchKatalogReihen(reihenFuerKatalog(eintraege, bekannt), eintraege, bekannt, verschoben, kennungen, dubletten)
   const ohne = eintraege
     .filter((e) => !bekannt.has(e.id) && !dubletten.katalogWeg.has(e.id))
-    .map((e) => {
-      const namen = katalogNamen(e, ausAnisearch[String(e.id)], deutscheReihe.get(reihe.get(e.id) ?? e.id))
-      return {
-        id: e.id, malId: e.mal,
-        ...namen,
-        /* Die Kennung geht mit, sonst führt der aniSearch-Verweis ins Leere; zugeordnet wird sie in `anisearch-kennung.ts`. */
-        anisearchId: kennungen.get(e.id),
-        titleNative: e.t[2] ?? undefined,
-        format: e.format ?? undefined,
-        episodes: e.folgen ?? undefined,
-        jpYear: e.jahr ?? undefined,
-        /* Der Termin, soweit AniList ihn kennt — bei Ankündigungen das Einzige, was dasteht. */
-        jpStart: e.start ?? undefined,
-        jpStatus: e.status ?? undefined,
-        genres: e.genres,
-        /**
-         * **Ohne** Adressvorsatz — der wird erst im Browser angehängt. Bei
-         * achtzehntausend Titeln spart das über ein Megabyte an Ladelast.
-         *
-         * Gekürzt wird hier und nicht beim Abrufen, obwohl es dort naheläge:
-         * Der Zwischenspeicher überdauert viele Läufe, und Einträge aus einem
-         * früheren Lauf tragen noch die volle Adresse. Beim Bauen greift die
-         * Kürzung dagegen auf jeden Eintrag, auch auf alte. Passt der Vorsatz
-         * nicht (AniList liefert gelegentlich einen anderen Hostnamen), bleibt
-         * die Adresse unangetastet — der Browser erkennt das am `http`.
-         */
-        coverImage: coverFuer(e.id, e.cover?.startsWith(ANILIST_COVER_BASIS) ? e.cover.slice(ANILIST_COVER_BASIS.length) : (e.cover ?? undefined)),
-        ...bewertungNachRegel({}, kennungen.get(e.id)),
-        /**
-         * Fehlt, wenn der Titel allein steht — dann greift in der Oberfläche
-         * ohnehin der Rückfall auf die eigene Kennung, und die Zahl wäre
-         * fünfzehntausendmal umsonst übertragen.
-         */
-        franchiseId: reihe.get(e.id) === e.id ? undefined : reihe.get(e.id),
-        /**
-         * `low` ist hier keine schwache Angabe, sondern die einzig ehrliche:
-         * Es gibt nichts zu belegen. Das Feld ist Pflicht, weil dieselbe
-         * Oberfläche beide Sorten anzeigt.
-         */
-        dubConfidence: 'low' as const,
-        ohneSynchro: true,
-        ...(e.land ? { land: e.land } : {}),
-        ...kinoFeld(e.id),
-      }
-    })
+    .map((e) => katalogTitelOhneSynchro(e, ausAnisearch[String(e.id)], deutscheReihe.get(reihe.get(e.id) ?? e.id), reihe.get(e.id), kennungen.get(e.id)))
 
   /* Wer aus dem Hauptbestand verschoben wurde, muss hier ankommen, auch wenn der Katalog ihn nicht führt (ein Vorfilter verschiebt, er löscht nicht; „Xiao Mao Diao Yu", 17.08.2026). */
   const vorhanden = new Set(ohne.map((t) => t.id))

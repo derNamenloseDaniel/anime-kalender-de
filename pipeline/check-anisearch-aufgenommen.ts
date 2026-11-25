@@ -21,8 +21,8 @@ function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
   console.error(`  ✖ ${name}${gefunden === undefined ? '' : ` — gefunden: ${JSON.stringify(gefunden)}`}`)
 }
 const BASIS = 10_000_000
-/** Seiten, die der Bestandsbau noch führt (25.11.2026, Bastard Teil 2, Stone Ocean Teil 3, Lupin Zeiten): `zuAk` kommt erst im Folge-PR (sonst trägt die Bauprobe dieselbe ak doppelt, PR 3015). */
-const ZUAK_FOLGT = new Set([16648, 17505, 17775])
+/** Seiten, die der Bestandsbau noch führt und deren `zuAk` im Folge-PR kommt (sonst trägt die Bauprobe dieselbe ak doppelt, PR 3015); leer seit 25.11.2026 (Bastard Teil 2, Stone Ocean Teil 3, Lupin Zeiten). */
+const ZUAK_FOLGT = new Set<number>()
 
 console.log('\nEchte Datei: Kishibe Rohan, Flavors of Youth, Baki Hanma:')
 pruefe('die Handdatei nimmt 13343 und 14752 in 21778 auf', aufgenommeneSeiten[13343] === 21778 && aufgenommeneSeiten[14752] === 21778)

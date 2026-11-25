@@ -1,9 +1,14 @@
 [
-  { "name": "Kontrolle unmutiert", "aenderungen": [] },
-  { "name": "nur zwei Versuche", "datei": "tools/quellen-pr.sh", "suche": "for versuch in 1 2 3; do\n    if [ \"$versuch\" -gt 1 ]", "ersetze": "for versuch in 1 2; do\n    if [ \"$versuch\" -gt 1 ]" },
-  { "name": "Blick auf bestehenden PR entfernt", "datei": "tools/quellen-pr.sh", "suche": "if [ \"$versuch\" -gt 1 ]; then", "ersetze": "if [ \"$versuch\" -gt 99 ]; then" },
-  { "name": "Blick auf bestehenden PR schon im ersten Versuch", "datei": "tools/quellen-pr.sh", "suche": "if [ \"$versuch\" -gt 1 ]; then", "ersetze": "if [ \"$versuch\" -gt 0 ]; then" },
-  { "name": "Fehlschlag wird nicht weitergegeben", "datei": "tools/quellen-pr.sh", "suche": "pr_anlegen || exit 1", "ersetze": "pr_anlegen || true" },
-  { "name": "Fehlertext nicht ausgegeben", "datei": "tools/quellen-pr.sh", "suche": "(Versuch $versuch von 3): $letzter\"", "ersetze": "(Versuch $versuch von 3)\"" },
-  { "name": "::error:: ohne letzten Text", "datei": "tools/quellen-pr.sh", "suche": "nach drei Versuchen nicht angelegt werden: $letzter\"", "ersetze": "nach drei Versuchen nicht angelegt werden.\"" },
-  { "name": "bestehender PR nicht übernommen", "datei": "tools/quellen-pr.sh", "suche": "        PR=\"$vorhanden\"\n", "ersetze": "        PR=\"\"\n" }]
+  {"name":"Kontrolle unmutiert","aenderungen":[]},
+  {"name":"nur zwei Versuche","datei":"tools/quellen-pr.sh","suche":"for versuch in 1 2 3; do\n    if [ \"$versuch\" -gt 1 ]","ersetze":"for versuch in 1 2; do\n    if [ \"$versuch\" -gt 1 ]"},
+  {"name":"Blick auf bestehenden PR entfernt","datei":"tools/quellen-pr.sh","suche":"if [ \"$versuch\" -gt 1 ]; then","ersetze":"if [ \"$versuch\" -gt 99 ]; then"},
+  {"name":"Blick auf bestehenden PR schon im ersten Versuch","datei":"tools/quellen-pr.sh","suche":"if [ \"$versuch\" -gt 1 ]; then","ersetze":"if [ \"$versuch\" -gt 0 ]; then"},
+  {"name":"Fehlschlag wird nicht weitergegeben","datei":"tools/quellen-pr.sh","suche":"pr_anlegen || exit 1","ersetze":"pr_anlegen || true"},
+  {"name":"Fehlertext nicht ausgegeben","datei":"tools/quellen-pr.sh","suche":"(Versuch $versuch von 3): $letzter\"","ersetze":"(Versuch $versuch von 3)\""},
+  {"name":"::error:: ohne letzten Text","datei":"tools/quellen-pr.sh","suche":"nach drei Versuchen nicht angelegt werden: $letzter\"","ersetze":"nach drei Versuchen nicht angelegt werden.\""},
+  {"name":"bestehender PR nicht übernommen","datei":"tools/quellen-pr.sh","suche":"        PR=\"$vorhanden\"\n","ersetze":"        PR=\"\"\n"},
+  {"name":"Nachsehen nach dem letzten Versuch: Rückgabe 1","datei":"tools/quellen-pr.sh","suche":"besteht nach dem letzten Versuch schon.\"\n    return 0","ersetze":"besteht nach dem letzten Versuch schon.\"\n    return 1","tests":["node tools/quellen-pr.test.mjs"]},
+  {"name":"Nachsehen nach dem letzten Versuch: PR nicht übernommen","datei":"tools/quellen-pr.sh","suche":"    PR=\"$vorhanden\"\n    echo \"PR zum Zweig $ZWEIG besteht nach","ersetze":"    PR=\"\"\n    echo \"PR zum Zweig $ZWEIG besteht nach","tests":["node tools/quellen-pr.test.mjs"]},
+  {"name":"Nachsehen nach dem letzten Versuch entfällt","datei":"tools/quellen-pr.sh","suche":"  if [ -n \"$vorhanden\" ]; then\n    PR=\"$vorhanden\"\n    echo \"PR zum Zweig $ZWEIG besteht nach","ersetze":"  if [ -n \"\" ]; then\n    PR=\"$vorhanden\"\n    echo \"PR zum Zweig $ZWEIG besteht nach","tests":["node tools/quellen-pr.test.mjs"]},
+  {"name":"Merge-Meldung ohne echten Grund","datei":"tools/quellen-pr.sh","suche":"abgelehnt: $merge_grund — neuer Versuch.","ersetze":"abgelehnt — main hat sich bewegt, neuer Versuch.","tests":["node tools/quellen-pr.test.mjs"]},
+  {"name":"Merge-::error:: ohne letzten Grund","datei":"tools/quellen-pr.sh","suche":"zuletzt: $merge_grund (Ruleset","ersetze":"(Ruleset","tests":["node tools/quellen-pr.test.mjs"]}]

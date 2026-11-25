@@ -56,7 +56,7 @@ export function KinoKarussell({
             type="button"
             onClick={() => blaettern(-1)}
             aria-label={t('news.kino.zurueck')}
-            className="rounded border border-slate-300 px-2 text-sm text-slate-600 hover:bg-ak-flaeche-2 dark:border-slate-600 dark:text-slate-300"
+            className="rounded border border-ak-rand px-2 text-sm text-ak-leise hover:bg-ak-flaeche-2"
           >
             ‹
           </button>
@@ -64,7 +64,7 @@ export function KinoKarussell({
             type="button"
             onClick={() => blaettern(1)}
             aria-label={t('news.kino.weiter')}
-            className="rounded border border-slate-300 px-2 text-sm text-slate-600 hover:bg-ak-flaeche-2 dark:border-slate-600 dark:text-slate-300"
+            className="rounded border border-ak-rand px-2 text-sm text-ak-leise hover:bg-ak-flaeche-2"
           >
             ›
           </button>
@@ -144,7 +144,7 @@ export function NewsView({ data, oeffne }: { data: Dataset; oeffne: (titelId: nu
   return (
     <section className="mx-auto w-full max-w-5xl px-3 py-4">
       <div className="mb-2 flex items-baseline justify-between gap-3">
-        <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
+        <h1 className="text-lg font-semibold text-ak-text">
           {t('news.titel')} <span className="text-xs font-normal text-ak-leise">· {t('news.seit', { datum: datumKurz(grenze) })}</span>
         </h1>
         <a href={feedUrl('news.xml')} className="ak-tz text-xs text-ak-leise underline-offset-2 hover:underline" title={t('news.rssHint')}>
@@ -182,7 +182,7 @@ export function NewsView({ data, oeffne }: { data: Dataset; oeffne: (titelId: nu
         <button
           type="button"
           onClick={() => setAeltereTage((n) => n + AELTERE_SCHRITT_TAGE)}
-          className="mt-1 w-full rounded-lg border border-slate-200 py-2 text-sm text-slate-600 transition hover:bg-ak-flaeche-2 dark:border-slate-700 dark:text-slate-300"
+          className="mt-1 w-full rounded-lg border border-ak-rand py-2 text-sm text-ak-leise transition hover:bg-ak-flaeche-2"
         >
           {t('news.aeltere', { datum: datumKurz(addDays(grenze, -AELTERE_SCHRITT_TAGE)) })}
         </button>

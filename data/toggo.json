@@ -1,5 +1,5 @@
 {
-  "geholtAm": "2026-11-24T09:06:56.166Z",
+  "geholtAm": "2026-11-25T04:04:57.683Z",
   "katalog": [
     {
       "id": "VSE179",
@@ -52,15 +52,6 @@
       "titel": "Moka & Cherry - Immer unterwegs",
       "figuren": [
         "moka--cherry"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE14",
-      "uname": "chuggington--die-loks-sind-los",
-      "titel": "Chuggington - Die Loks sind los!",
-      "figuren": [
-        "chuggington"
       ],
       "frei": true
     },
@@ -119,74 +110,11 @@
       "frei": false
     },
     {
-      "id": "VSE67",
-      "uname": "die-supermonster-vse67",
-      "titel": "Die Supermonster",
-      "figuren": [
-        "die-supermonster"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE27",
-      "uname": "die-supermonster--monstertiere",
-      "titel": "Die Supermonster - Monstertiere",
-      "figuren": [
-        "die-supermonster"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE62",
-      "uname": "bo-flo--co--familie-und-so",
-      "titel": "Bo, Flo & Co. - Familie und so",
-      "figuren": [
-        "bo-flo--co"
-      ],
-      "frei": true
-    },
-    {
       "id": "VSE49",
       "uname": "scooby-doo-und-wer-bist-du-vse49",
       "titel": "Scooby-Doo und wer bist Du?",
       "figuren": [
         "scooby-doo-pty178"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE54",
-      "uname": "cocomelon-vse54",
-      "titel": "CoComelon",
-      "figuren": [
-        "cocomelon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE295",
-      "uname": "cocomelon--dance-party-vse295",
-      "titel": "CoComelon - Dance Party",
-      "figuren": [
-        "cocomelon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE261",
-      "uname": "cocomelon--spiel-mit-uns-vse261",
-      "titel": "CoComelon - Spiel mit uns",
-      "figuren": [
-        "cocomelon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE42",
-      "uname": "kingdom-force-vse42",
-      "titel": "Kingdom Force",
-      "figuren": [
-        "kingdom-force"
       ],
       "frei": true
     },
@@ -227,24 +155,6 @@
       "frei": true
     },
     {
-      "id": "VSE28",
-      "uname": "pikwik-pack-vse28",
-      "titel": "Pikwik Pack",
-      "figuren": [
-        "pikwik-pack"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE31",
-      "uname": "idefix-und-die-unbeugsamen",
-      "titel": "Idefix und die Unbeugsamen",
-      "figuren": [
-        "idefix"
-      ],
-      "frei": true
-    },
-    {
       "id": "VSE120",
       "uname": "familie-fox--die-geheimnishueter",
       "titel": "Familie Fox - Die Geheimnishüter",
@@ -263,74 +173,11 @@
       "frei": true
     },
     {
-      "id": "VSE212",
-      "uname": "mighty-express--superschnelle-zugfreunde-shorts",
-      "titel": "Mighty Express - Kurze Clips",
-      "figuren": [
-        "mighty-express"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE26",
-      "uname": "mighty-express--superschnelle-zugfreunde",
-      "titel": "Mighty Express - Superschnelle Zugfreunde",
-      "figuren": [
-        "mighty-express"
-      ],
-      "frei": true
-    },
-    {
       "id": "VSE23",
       "uname": "gustavs-welt-vse23",
       "titel": "Gustavs Welt",
       "figuren": [
         "gustavs-welt"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE303",
-      "uname": "voll-zu-spaet-vse303",
-      "titel": "Voll zu spät!",
-      "figuren": [
-        "voll-zu-spaet"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE21",
-      "uname": "caillou-vse21",
-      "titel": "Caillou",
-      "figuren": [
-        "caillou"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE370",
-      "uname": "caillou-vse370",
-      "titel": "Caillou",
-      "figuren": [
-        "caillou"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE25",
-      "uname": "bob-der-baumeister-vse25",
-      "titel": "Bob der Baumeister",
-      "figuren": [
-        "bob-der-baumeister"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE73",
-      "uname": "bob-der-baumeister--kurze-clips",
-      "titel": "Bob der Baumeister - Kurze Clips",
-      "figuren": [
-        "bob-der-baumeister"
       ],
       "frei": true
     },
@@ -362,65 +209,11 @@
       "frei": true
     },
     {
-      "id": "VSE262",
-      "uname": "barbie--ein-verborgener-zauber-vse262",
-      "titel": "Barbie - Ein verborgener Zauber",
-      "figuren": [
-        "barbie"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE207",
-      "uname": "barbie-im-doppelpack--musikclips",
-      "titel": "Barbie - Musikclips",
-      "figuren": [
-        "barbie"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE204",
-      "uname": "barbie-im-doppelpack",
-      "titel": "Barbie im Doppelpack",
-      "figuren": [
-        "barbie"
-      ],
-      "frei": true
-    },
-    {
       "id": "VSE307",
       "uname": "ranger-rob-vse307",
       "titel": "Ranger Rob",
       "figuren": [
         "ranger-rob"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE173",
-      "uname": "super-wings-vse173",
-      "titel": "Super Wings",
-      "figuren": [
-        "super-wings"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE13",
-      "uname": "benjamin-bluemchen-vse13",
-      "titel": "Benjamin Blümchen",
-      "figuren": [
-        "benjamin-bluemchen"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE393",
-      "uname": "benjamin-bluemchen-vse393",
-      "titel": "Benjamin Blümchen",
-      "figuren": [
-        "benjamin-bluemchen"
       ],
       "frei": true
     },
@@ -551,38 +344,11 @@
       "frei": true
     },
     {
-      "id": "VSE302",
-      "uname": "paw-patrol--helfer-auf-vier-pfoten-vse302",
-      "titel": "PAW Patrol - Helfer auf vier Pfoten",
-      "figuren": [
-        "paw-patrol"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE101",
-      "uname": "paw-patrol--kurze-clips",
-      "titel": "PAW Patrol - Kurze Clips",
-      "figuren": [
-        "paw-patrol"
-      ],
-      "frei": true
-    },
-    {
       "id": "VSE110",
       "uname": "camp-sumpfgrund-vse110",
       "titel": "Camp Sumpfgrund",
       "figuren": [
         "camp-sumpfgrund-pty50"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE99",
-      "uname": "gigantosaurus-vse99",
-      "titel": "Gigantosaurus",
-      "figuren": [
-        "gigantosaurus"
       ],
       "frei": true
     },
@@ -596,69 +362,6 @@
       "frei": true
     },
     {
-      "id": "VSE249",
-      "uname": "10-jahre-woozle-goozle-vse249",
-      "titel": "10 Jahre Woozle Goozle",
-      "figuren": [
-        "woozle-goozle"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE48",
-      "uname": "frag-woozle--die-antworten",
-      "titel": "Frag Woozle! - Die Antworten",
-      "figuren": [
-        "woozle-goozle"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE65",
-      "uname": "froehliche-woonachten-vse65",
-      "titel": "Fröhliche Woonachten!",
-      "figuren": [
-        "woozle-goozle"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE274",
-      "uname": "woozle--die-serie-vse274",
-      "titel": "Woozle - Die Serie",
-      "figuren": [
-        "woozle-goozle"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE29",
-      "uname": "woozle-goozle-vse29",
-      "titel": "Woozle Goozle",
-      "figuren": [
-        "woozle-goozle"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE268",
-      "uname": "woozle-goozle--kurze-clips-vse268",
-      "titel": "Woozle Goozle - Kurze Clips",
-      "figuren": [
-        "woozle-goozle"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE181",
-      "uname": "woozle-goozle-und-die-weltentdecker",
-      "titel": "Woozle Goozle und die Weltentdecker",
-      "figuren": [
-        "woozle-goozle"
-      ],
-      "frei": true
-    },
-    {
       "id": "VSE397",
       "uname": "simon-vse397",
       "titel": "Simon",
@@ -666,42 +369,6 @@
         "simon-pty626"
       ],
       "frei": false
-    },
-    {
-      "id": "VSE236",
-      "uname": "dragons--die-9-welten-vse236",
-      "titel": "Dragons - Die 9 Welten",
-      "figuren": [
-        "dragons"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE238",
-      "uname": "dragons--die-9-welten-kurze-clips-vse238",
-      "titel": "Dragons - Die 9 Welten Kurze Clips",
-      "figuren": [
-        "dragons"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE391",
-      "uname": "willkommen-bei-den-echten-louds-vse391",
-      "titel": "Willkommen bei den echten Louds",
-      "figuren": [
-        "willkommen-bei-den-echten-louds-pty619"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE394",
-      "uname": "dragons--die-jungen-drachenretter-vse394",
-      "titel": "Dragons - Die jungen Drachenretter",
-      "figuren": [
-        "dragons--die-jungen-drachenretter-helden-der-luefte-pty623"
-      ],
-      "frei": true
     },
     {
       "id": "VSE378",
@@ -884,290 +551,11 @@
       "frei": false
     },
     {
-      "id": "VSE82",
-      "uname": "pokemon--die-tv-serie-xyz",
-      "titel": "Pokémon - Die TV Serie: XYZ",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE50",
-      "uname": "pokemon--die-tv-serie-sonne--mond",
-      "titel": "Pokémon - Die TV-Serie: Sonne & Mond",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE163",
-      "uname": "pokemon--die-tv-serie-sonne--mond--ultra-legenden",
-      "titel": "Pokémon - Die TV-Serie: Sonne & Mond - Ultra-Legenden",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE97",
-      "uname": "pokemon--die-tv-serie-xy--erkundungen-in-kalos",
-      "titel": "Pokémon - Die TV-Serie: XY - Erkundungen in Kalos",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE292",
-      "uname": "pokemon-horizonte-die-serie-vse292",
-      "titel": "Pokémon Horizonte: Die Serie",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE41",
-      "uname": "pokemon-meister-reisen-die-serie",
-      "titel": "Pokémon Meister-Reisen: Die Serie",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE81",
-      "uname": "pokemon-reisen-die-serie",
-      "titel": "Pokémon Reisen: Die Serie",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE127",
-      "uname": "pokemon-schwarz--weis-abenteuer-in-einal",
-      "titel": "Pokémon Schwarz & Weiß: Abenteuer in Einal",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE126",
-      "uname": "pokemon-schwarz--weis-abenteuer-in-einall-und-darueber-hinaus",
-      "titel": "Pokémon Schwarz & Weiß: Abenteuer in Einall und darüber hinaus",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE128",
-      "uname": "pokemon-schwarz--weis-rivalen-des-schicksals",
-      "titel": "Pokémon Schwarz & Weiß: Rivalen des Schicksals",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE224",
-      "uname": "pokemon-ultimative-reisen-die-serie-vse224",
-      "titel": "Pokémon Ultimative Reisen",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE95",
-      "uname": "pokemon-advanced",
-      "titel": "Pokémon: Advanced",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE93",
-      "uname": "pokemon-advanced-battle",
-      "titel": "Pokémon: Advanced Battle",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE94",
-      "uname": "pokemon-advanced-challenge",
-      "titel": "Pokémon: Advanced Challenge",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE92",
-      "uname": "pokemon-battle-frontier",
-      "titel": "Pokémon: Battle Frontier",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE124",
-      "uname": "pokemon-diamond-and-pearl",
-      "titel": "Pokémon: Diamond and Pearl",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE186",
-      "uname": "pokemon-die-johto-liga-champions",
-      "titel": "Pokémon: Die Johto Liga Champions",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE187",
-      "uname": "pokemon-die-johto-reisen",
-      "titel": "Pokémon: Die Johto Reisen",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE121",
-      "uname": "pokemon-dp-battle-dimension",
-      "titel": "Pokémon: DP Battle Dimension",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE117",
-      "uname": "pokemon-dp-galactic-battles",
-      "titel": "Pokémon: DP Galactic Battles",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE116",
-      "uname": "pokemon-dp-sieger-der-sinnoh-liga",
-      "titel": "Pokémon: DP Sieger der Sinnoh-Liga",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE125",
-      "uname": "pokemon-indigo-liga",
-      "titel": "Pokémon: Indigo Liga",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE184",
-      "uname": "pokemon-master-quest",
-      "titel": "Pokémon: Master Quest",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE185",
-      "uname": "pokemon-orange-liga",
-      "titel": "Pokémon: Orange Liga",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE122",
-      "uname": "pokemon-schwarz--weis",
-      "titel": "Pokémon: Schwarz & Weiß",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE276",
-      "uname": "pokemon-sonne--mond--ultra-abenteuer-vse276",
-      "titel": "Pokémon: Sonne & Mond - Ultra-Abenteuer",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE105",
-      "uname": "pokemon--die-tv-serie-xy",
-      "titel": "Pokémon: XY",
-      "figuren": [
-        "pokemon"
-      ],
-      "frei": true
-    },
-    {
       "id": "VSE326",
       "uname": "simsalagrimm-vse326",
       "titel": "SimsalaGrimm",
       "figuren": [
         "simsalagrimm-pty572"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE324",
-      "uname": "dance-academy--tanz-deinen-traum-vse324",
-      "titel": "Dance Academy - Tanz Deinen Traum",
-      "figuren": [
-        "dance-academy--tanz-deinen-traum-pty570"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE328",
-      "uname": "h2o--abenteuer-meerjungfrau-vse328",
-      "titel": "H2O - Abenteuer Meerjungfrau",
-      "figuren": [
-        "h2o-pty573"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE327",
-      "uname": "h2o--ploetzlich-meerjungfrau-vse327",
-      "titel": "H2O - Plötzlich Meerjungfrau",
-      "figuren": [
-        "h2o-pty573"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE338",
-      "uname": "mako--einfach-meerjungfrau-vse338",
-      "titel": "Mako - Einfach Meerjungfrau",
-      "figuren": [
-        "h2o-pty573"
       ],
       "frei": false
     },
@@ -1181,92 +569,11 @@
       "frei": true
     },
     {
-      "id": "VSE294",
-      "uname": "rubble--crew-vse294",
-      "titel": "Rubble & Crew",
-      "figuren": [
-        "rubble--crew-pty561"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE305",
-      "uname": "rubble--crew--die-besten-momente-vse305",
-      "titel": "Rubble & Crew - Die besten Momente",
-      "figuren": [
-        "rubble--crew-pty561"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE413",
-      "uname": "rubble--crew--kurze-clips-vse413",
-      "titel": "Rubble & Crew - Kurze Clips",
-      "figuren": [
-        "rubble--crew-pty561"
-      ],
-      "frei": true
-    },
-    {
       "id": "VSE293",
       "uname": "billy--der-cowboy-hamster-vse293",
       "titel": "Billy - Der Cowboy Hamster",
       "figuren": [
         "billy--der-cowboy-hamster-pty559"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE309",
-      "uname": "kurze-geschichten-aus-der-unicorn-academy-vse309",
-      "titel": "Kurze Geschichten aus der Unicorn Academy",
-      "figuren": [
-        "unicorn-academy-pty562"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE376",
-      "uname": "unicorn-academy-vse376",
-      "titel": "Unicorn Academy",
-      "figuren": [
-        "unicorn-academy-pty562"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE377",
-      "uname": "unicorn-academy--wie-alles-begann-vse377",
-      "titel": "Unicorn Academy - Wie alles begann",
-      "figuren": [
-        "unicorn-academy-pty562"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE387",
-      "uname": "unicorn-academy-songs-vse387",
-      "titel": "Unicorn Academy Songs",
-      "figuren": [
-        "unicorn-academy-pty562"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE425",
-      "uname": "unicorn-academy-ein-legendaerer-sommer-vse425",
-      "titel": "Unicorn Academy: Ein legendärer Sommer",
-      "figuren": [
-        "unicorn-academy-pty562"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE457",
-      "uname": "unicorn-academy-wintersonnenwende-vse457",
-      "titel": "Unicorn Academy: Wintersonnenwende",
-      "figuren": [
-        "unicorn-academy-pty562"
       ],
       "frei": true
     },
@@ -1316,47 +623,11 @@
       "frei": false
     },
     {
-      "id": "VSE280",
-      "uname": "neue-geschichten-vom-pumuckl-vse280",
-      "titel": "Neue Geschichten vom Pumuckl",
-      "figuren": [
-        "neue-geschichten-vom-pumuckl-pty541"
-      ],
-      "frei": true
-    },
-    {
       "id": "VSE270",
       "uname": "baby-born-vse270",
       "titel": "BABY born",
       "figuren": [
         "baby-born-pty537"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE272",
-      "uname": "batwheels-vse272",
-      "titel": "Batwheels",
-      "figuren": [
-        "batwheels-pty539"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE271",
-      "uname": "monster-loving-maniacs-vse271",
-      "titel": "Monster Loving Maniacs",
-      "figuren": [
-        "monster-loving-maniacs-pty538"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE275",
-      "uname": "monster-high-vse275",
-      "titel": "Monster High",
-      "figuren": [
-        "monster-high-pty536"
       ],
       "frei": true
     },
@@ -1379,15 +650,6 @@
       "frei": true
     },
     {
-      "id": "VSE255",
-      "uname": "dreamzzz--abenteuer-der-traumwelten-vse255",
-      "titel": "DreamZzz",
-      "figuren": [
-        "dreamzzz-pty529"
-      ],
-      "frei": true
-    },
-    {
       "id": "VSE254",
       "uname": "haus-anubis-das-vse254",
       "titel": "Das Haus Anubis",
@@ -1406,29 +668,11 @@
       "frei": true
     },
     {
-      "id": "VSE246",
-      "uname": "kruemelmonsters-foodie-truck-mit-steffen-henssler-vse246",
-      "titel": "Krümelmonsters Foodie Truck mit Steffen Henssler",
-      "figuren": [
-        "kruemelmonsters-foodie-truck"
-      ],
-      "frei": true
-    },
-    {
       "id": "VSE243",
       "uname": "smash-vse243",
       "titel": "S.M.A.S.H!",
       "figuren": [
         "smash-pty523"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE242",
-      "uname": "sesame-streets-mecha-builders-vse242",
-      "titel": "Sesame Street's Mecha Builders",
-      "figuren": [
-        "sesame-streets-mecha-builders-pty522"
       ],
       "frei": true
     },
@@ -1474,24 +718,6 @@
       "titel": "Karate Schaf",
       "figuren": [
         "karate-schaf"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE197",
-      "uname": "dino-ranch-vse197",
-      "titel": "Dino Ranch",
-      "figuren": [
-        "dino-ranch"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE203",
-      "uname": "dino-ranch-charaktere",
-      "titel": "Dino Ranch Shorts",
-      "figuren": [
-        "dino-ranch"
       ],
       "frei": true
     },
@@ -1573,213 +799,6 @@
       "titel": "Nexo Knights - Die Ritter der Zukunft",
       "figuren": [
         "nexo-knights"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE315",
-      "uname": "alvinnn-und-die-chipmunks-vse315",
-      "titel": "ALVINNN!!! und die Chipmunks",
-      "figuren": [
-        "alvinnn-und-die-chipmunks"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE74",
-      "uname": "ninjago--abenteuer-in-neuen-welten",
-      "titel": "Ninjago - Abenteuer in neuen Welten",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE256",
-      "uname": "ninjago--aufstieg-der-drachen-vse256",
-      "titel": "Ninjago - Aufstieg der Drachen",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE136",
-      "uname": "ninjago--das-jahr-der-schlangen",
-      "titel": "Ninjago - Das Jahr der Schlangen",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE139",
-      "uname": "ninjago--die-meister-der-zeit",
-      "titel": "Ninjago - Die Meister der Zeit",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE210",
-      "uname": "ninjago--die-rueckkehr",
-      "titel": "Ninjago - Die Rückkehr",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE135",
-      "uname": "ninjago--ein-neustart",
-      "titel": "Ninjago - Ein Neustart",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE253",
-      "uname": "ninjago--entschluesselt-vse253",
-      "titel": "Ninjago - Entschlüsselt",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE140",
-      "uname": "ninjago--garmadons-motorrad-gang",
-      "titel": "Ninjago - Garmadons Motorrad-Gang",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE59",
-      "uname": "ninjago--geheimnis-der-tiefe",
-      "titel": "Ninjago - Geheimnis der Tiefe",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE168",
-      "uname": "ninjago--im-land-der-drachen",
-      "titel": "Ninjago - Im Land der Drachen",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE383",
-      "uname": "ninjago--kurze-clips-vse383",
-      "titel": "Ninjago - Kurze Clips",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE141",
-      "uname": "ninjago--luftpiraten",
-      "titel": "Ninjago - Luftpiraten",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE143",
-      "uname": "ninjago--morro",
-      "titel": "Ninjago - Morro",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE165",
-      "uname": "ninjago--rueckkehr-der-oni",
-      "titel": "Ninjago - Rückkehr der Oni",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE159",
-      "uname": "ninjago--verbotenes-spinjitzu",
-      "titel": "Ninjago - Verbotenes Spinjitzu",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE152",
-      "uname": "ninjago--wettkampf-der-elemente",
-      "titel": "Ninjago - Wettkampf der Elemente",
-      "figuren": [
-        "ninjago"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE320",
-      "uname": "grizzy--die-lemminge-vse320",
-      "titel": "Grizzy & die Lemminge",
-      "figuren": [
-        "grizzy--die-lemminge"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE231",
-      "uname": "grizzy--die-lemminge--kurze-clips-vse231",
-      "titel": "Grizzy & die Lemminge - Kurze Clips",
-      "figuren": [
-        "grizzy--die-lemminge"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE314",
-      "uname": "angelo-vse314",
-      "titel": "Angelo!",
-      "figuren": [
-        "angelo"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE458",
-      "uname": "angelos-tipps-vse458",
-      "titel": "Angelos Tipps",
-      "figuren": [
-        "angelo"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE362",
-      "uname": "die-patrick-star-show-vse362",
-      "titel": "Die Patrick Star Show",
-      "figuren": [
-        "spongebob-schwammkopf"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE282",
-      "uname": "spongebob-schwammkopf-vse282",
-      "titel": "SpongeBob Schwammkopf",
-      "figuren": [
-        "spongebob-schwammkopf"
       ],
       "frei": true
     },
@@ -2081,6 +1100,492 @@
       "frei": true
     },
     {
+      "id": "VSE396",
+      "uname": "die-thundermans-vse396",
+      "titel": "Die Thundermans",
+      "figuren": [
+        "die-thundermans-pty625"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE451",
+      "uname": "die-thundermans-undercover-vse451",
+      "titel": "Die Thundermans: Undercover",
+      "figuren": [
+        "die-thundermans-pty625"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE47",
+      "uname": "100-wolf--die-legende-des-mondsteins",
+      "titel": "100% Wolf",
+      "figuren": [
+        "100-wolf"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE449",
+      "uname": "baby-lemminge-vse449",
+      "titel": "Baby Lemminge",
+      "figuren": [
+        "baby-lemminge-pty678"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE21",
+      "uname": "caillou-vse21",
+      "titel": "Caillou",
+      "figuren": [
+        "caillou"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE370",
+      "uname": "caillou-vse370",
+      "titel": "Caillou",
+      "figuren": [
+        "caillou"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE328",
+      "uname": "h2o--abenteuer-meerjungfrau-vse328",
+      "titel": "H2O - Abenteuer Meerjungfrau",
+      "figuren": [
+        "h2o-pty573"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE327",
+      "uname": "h2o--ploetzlich-meerjungfrau-vse327",
+      "titel": "H2O - Plötzlich Meerjungfrau",
+      "figuren": [
+        "h2o-pty573"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE338",
+      "uname": "mako--einfach-meerjungfrau-vse338",
+      "titel": "Mako - Einfach Meerjungfrau",
+      "figuren": [
+        "h2o-pty573"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE246",
+      "uname": "kruemelmonsters-foodie-truck-mit-steffen-henssler-vse246",
+      "titel": "Krümelmonsters Foodie Truck mit Steffen Henssler",
+      "figuren": [
+        "kruemelmonsters-foodie-truck"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE324",
+      "uname": "dance-academy--tanz-deinen-traum-vse324",
+      "titel": "Dance Academy - Tanz Deinen Traum",
+      "figuren": [
+        "dance-academy--tanz-deinen-traum-pty570"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE249",
+      "uname": "10-jahre-woozle-goozle-vse249",
+      "titel": "10 Jahre Woozle Goozle",
+      "figuren": [
+        "woozle-goozle"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE48",
+      "uname": "frag-woozle--die-antworten",
+      "titel": "Frag Woozle! - Die Antworten",
+      "figuren": [
+        "woozle-goozle"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE65",
+      "uname": "froehliche-woonachten-vse65",
+      "titel": "Fröhliche Woonachten!",
+      "figuren": [
+        "woozle-goozle"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE274",
+      "uname": "woozle--die-serie-vse274",
+      "titel": "Woozle - Die Serie",
+      "figuren": [
+        "woozle-goozle"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE29",
+      "uname": "woozle-goozle-vse29",
+      "titel": "Woozle Goozle",
+      "figuren": [
+        "woozle-goozle"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE268",
+      "uname": "woozle-goozle--kurze-clips-vse268",
+      "titel": "Woozle Goozle - Kurze Clips",
+      "figuren": [
+        "woozle-goozle"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE181",
+      "uname": "woozle-goozle-und-die-weltentdecker",
+      "titel": "Woozle Goozle und die Weltentdecker",
+      "figuren": [
+        "woozle-goozle"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE362",
+      "uname": "die-patrick-star-show-vse362",
+      "titel": "Die Patrick Star Show",
+      "figuren": [
+        "spongebob-schwammkopf"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE282",
+      "uname": "spongebob-schwammkopf-vse282",
+      "titel": "SpongeBob Schwammkopf",
+      "figuren": [
+        "spongebob-schwammkopf"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE394",
+      "uname": "dragons--die-jungen-drachenretter-vse394",
+      "titel": "Dragons - Die jungen Drachenretter",
+      "figuren": [
+        "dragons--die-jungen-drachenretter-helden-der-luefte-pty623"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE13",
+      "uname": "benjamin-bluemchen-vse13",
+      "titel": "Benjamin Blümchen",
+      "figuren": [
+        "benjamin-bluemchen"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE393",
+      "uname": "benjamin-bluemchen-vse393",
+      "titel": "Benjamin Blümchen",
+      "figuren": [
+        "benjamin-bluemchen"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE272",
+      "uname": "batwheels-vse272",
+      "titel": "Batwheels",
+      "figuren": [
+        "batwheels-pty539"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE294",
+      "uname": "rubble--crew-vse294",
+      "titel": "Rubble & Crew",
+      "figuren": [
+        "rubble--crew-pty561"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE305",
+      "uname": "rubble--crew--die-besten-momente-vse305",
+      "titel": "Rubble & Crew - Die besten Momente",
+      "figuren": [
+        "rubble--crew-pty561"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE413",
+      "uname": "rubble--crew--kurze-clips-vse413",
+      "titel": "Rubble & Crew - Kurze Clips",
+      "figuren": [
+        "rubble--crew-pty561"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE236",
+      "uname": "dragons--die-9-welten-vse236",
+      "titel": "Dragons - Die 9 Welten",
+      "figuren": [
+        "dragons"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE238",
+      "uname": "dragons--die-9-welten-kurze-clips-vse238",
+      "titel": "Dragons - Die 9 Welten Kurze Clips",
+      "figuren": [
+        "dragons"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE99",
+      "uname": "gigantosaurus-vse99",
+      "titel": "Gigantosaurus",
+      "figuren": [
+        "gigantosaurus"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE173",
+      "uname": "super-wings-vse173",
+      "titel": "Super Wings",
+      "figuren": [
+        "super-wings"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE212",
+      "uname": "mighty-express--superschnelle-zugfreunde-shorts",
+      "titel": "Mighty Express - Kurze Clips",
+      "figuren": [
+        "mighty-express"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE26",
+      "uname": "mighty-express--superschnelle-zugfreunde",
+      "titel": "Mighty Express - Superschnelle Zugfreunde",
+      "figuren": [
+        "mighty-express"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE309",
+      "uname": "kurze-geschichten-aus-der-unicorn-academy-vse309",
+      "titel": "Kurze Geschichten aus der Unicorn Academy",
+      "figuren": [
+        "unicorn-academy-pty562"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE376",
+      "uname": "unicorn-academy-vse376",
+      "titel": "Unicorn Academy",
+      "figuren": [
+        "unicorn-academy-pty562"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE377",
+      "uname": "unicorn-academy--wie-alles-begann-vse377",
+      "titel": "Unicorn Academy - Wie alles begann",
+      "figuren": [
+        "unicorn-academy-pty562"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE387",
+      "uname": "unicorn-academy-songs-vse387",
+      "titel": "Unicorn Academy Songs",
+      "figuren": [
+        "unicorn-academy-pty562"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE425",
+      "uname": "unicorn-academy-ein-legendaerer-sommer-vse425",
+      "titel": "Unicorn Academy: Ein legendärer Sommer",
+      "figuren": [
+        "unicorn-academy-pty562"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE457",
+      "uname": "unicorn-academy-wintersonnenwende-vse457",
+      "titel": "Unicorn Academy: Wintersonnenwende",
+      "figuren": [
+        "unicorn-academy-pty562"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE271",
+      "uname": "monster-loving-maniacs-vse271",
+      "titel": "Monster Loving Maniacs",
+      "figuren": [
+        "monster-loving-maniacs-pty538"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE31",
+      "uname": "idefix-und-die-unbeugsamen",
+      "titel": "Idefix und die Unbeugsamen",
+      "figuren": [
+        "idefix"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE255",
+      "uname": "dreamzzz--abenteuer-der-traumwelten-vse255",
+      "titel": "DreamZzz",
+      "figuren": [
+        "dreamzzz-pty529"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE275",
+      "uname": "monster-high-vse275",
+      "titel": "Monster High",
+      "figuren": [
+        "monster-high-pty536"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE391",
+      "uname": "willkommen-bei-den-echten-louds-vse391",
+      "titel": "Willkommen bei den echten Louds",
+      "figuren": [
+        "willkommen-bei-den-echten-louds-pty619"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE22",
+      "uname": "peppa-pig-vse22",
+      "titel": "Peppa Pig",
+      "figuren": [
+        "peppa-pig"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE322",
+      "uname": "peppa-pig--kurze-clips-vse322",
+      "titel": "Peppa Pig - Kurze Clips",
+      "figuren": [
+        "peppa-pig"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE25",
+      "uname": "bob-der-baumeister-vse25",
+      "titel": "Bob der Baumeister",
+      "figuren": [
+        "bob-der-baumeister"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE73",
+      "uname": "bob-der-baumeister--kurze-clips",
+      "titel": "Bob der Baumeister - Kurze Clips",
+      "figuren": [
+        "bob-der-baumeister"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE67",
+      "uname": "die-supermonster-vse67",
+      "titel": "Die Supermonster",
+      "figuren": [
+        "die-supermonster"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE27",
+      "uname": "die-supermonster--monstertiere",
+      "titel": "Die Supermonster - Monstertiere",
+      "figuren": [
+        "die-supermonster"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE280",
+      "uname": "neue-geschichten-vom-pumuckl-vse280",
+      "titel": "Neue Geschichten vom Pumuckl",
+      "figuren": [
+        "neue-geschichten-vom-pumuckl-pty541"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE262",
+      "uname": "barbie--ein-verborgener-zauber-vse262",
+      "titel": "Barbie - Ein verborgener Zauber",
+      "figuren": [
+        "barbie"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE207",
+      "uname": "barbie-im-doppelpack--musikclips",
+      "titel": "Barbie - Musikclips",
+      "figuren": [
+        "barbie"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE204",
+      "uname": "barbie-im-doppelpack",
+      "titel": "Barbie im Doppelpack",
+      "figuren": [
+        "barbie"
+      ],
+      "frei": true
+    },
+    {
       "id": "VSE439",
       "uname": "toggo-liga-songs-vse439",
       "titel": "TOGGO Liga Songs",
@@ -2108,11 +1613,11 @@
       "frei": false
     },
     {
-      "id": "VSE47",
-      "uname": "100-wolf--die-legende-des-mondsteins",
-      "titel": "100% Wolf",
+      "id": "VSE14",
+      "uname": "chuggington--die-loks-sind-los",
+      "titel": "Chuggington - Die Loks sind los!",
       "figuren": [
-        "100-wolf"
+        "chuggington"
       ],
       "frei": true
     },
@@ -2126,29 +1631,245 @@
       "frei": true
     },
     {
-      "id": "VSE396",
-      "uname": "die-thundermans-vse396",
-      "titel": "Die Thundermans",
+      "id": "VSE82",
+      "uname": "pokemon--die-tv-serie-xyz",
+      "titel": "Pokémon - Die TV Serie: XYZ",
       "figuren": [
-        "die-thundermans-pty625"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE451",
-      "uname": "die-thundermans-undercover-vse451",
-      "titel": "Die Thundermans: Undercover",
-      "figuren": [
-        "die-thundermans-pty625"
+        "pokemon"
       ],
       "frei": true
     },
     {
-      "id": "VSE449",
-      "uname": "baby-lemminge-vse449",
-      "titel": "Baby Lemminge",
+      "id": "VSE50",
+      "uname": "pokemon--die-tv-serie-sonne--mond",
+      "titel": "Pokémon - Die TV-Serie: Sonne & Mond",
       "figuren": [
-        "baby-lemminge-pty678"
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE163",
+      "uname": "pokemon--die-tv-serie-sonne--mond--ultra-legenden",
+      "titel": "Pokémon - Die TV-Serie: Sonne & Mond - Ultra-Legenden",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE97",
+      "uname": "pokemon--die-tv-serie-xy--erkundungen-in-kalos",
+      "titel": "Pokémon - Die TV-Serie: XY - Erkundungen in Kalos",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE292",
+      "uname": "pokemon-horizonte-die-serie-vse292",
+      "titel": "Pokémon Horizonte: Die Serie",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE41",
+      "uname": "pokemon-meister-reisen-die-serie",
+      "titel": "Pokémon Meister-Reisen: Die Serie",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE81",
+      "uname": "pokemon-reisen-die-serie",
+      "titel": "Pokémon Reisen: Die Serie",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE127",
+      "uname": "pokemon-schwarz--weis-abenteuer-in-einal",
+      "titel": "Pokémon Schwarz & Weiß: Abenteuer in Einal",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE126",
+      "uname": "pokemon-schwarz--weis-abenteuer-in-einall-und-darueber-hinaus",
+      "titel": "Pokémon Schwarz & Weiß: Abenteuer in Einall und darüber hinaus",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE128",
+      "uname": "pokemon-schwarz--weis-rivalen-des-schicksals",
+      "titel": "Pokémon Schwarz & Weiß: Rivalen des Schicksals",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE224",
+      "uname": "pokemon-ultimative-reisen-die-serie-vse224",
+      "titel": "Pokémon Ultimative Reisen",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE95",
+      "uname": "pokemon-advanced",
+      "titel": "Pokémon: Advanced",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE93",
+      "uname": "pokemon-advanced-battle",
+      "titel": "Pokémon: Advanced Battle",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE94",
+      "uname": "pokemon-advanced-challenge",
+      "titel": "Pokémon: Advanced Challenge",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE92",
+      "uname": "pokemon-battle-frontier",
+      "titel": "Pokémon: Battle Frontier",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE124",
+      "uname": "pokemon-diamond-and-pearl",
+      "titel": "Pokémon: Diamond and Pearl",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE186",
+      "uname": "pokemon-die-johto-liga-champions",
+      "titel": "Pokémon: Die Johto Liga Champions",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE187",
+      "uname": "pokemon-die-johto-reisen",
+      "titel": "Pokémon: Die Johto Reisen",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE121",
+      "uname": "pokemon-dp-battle-dimension",
+      "titel": "Pokémon: DP Battle Dimension",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE117",
+      "uname": "pokemon-dp-galactic-battles",
+      "titel": "Pokémon: DP Galactic Battles",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE116",
+      "uname": "pokemon-dp-sieger-der-sinnoh-liga",
+      "titel": "Pokémon: DP Sieger der Sinnoh-Liga",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE125",
+      "uname": "pokemon-indigo-liga",
+      "titel": "Pokémon: Indigo Liga",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE184",
+      "uname": "pokemon-master-quest",
+      "titel": "Pokémon: Master Quest",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE185",
+      "uname": "pokemon-orange-liga",
+      "titel": "Pokémon: Orange Liga",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE122",
+      "uname": "pokemon-schwarz--weis",
+      "titel": "Pokémon: Schwarz & Weiß",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE276",
+      "uname": "pokemon-sonne--mond--ultra-abenteuer-vse276",
+      "titel": "Pokémon: Sonne & Mond - Ultra-Abenteuer",
+      "figuren": [
+        "pokemon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE105",
+      "uname": "pokemon--die-tv-serie-xy",
+      "titel": "Pokémon: XY",
+      "figuren": [
+        "pokemon"
       ],
       "frei": true
     },
@@ -2261,20 +1982,299 @@
       "frei": true
     },
     {
-      "id": "VSE22",
-      "uname": "peppa-pig-vse22",
-      "titel": "Peppa Pig",
+      "id": "VSE74",
+      "uname": "ninjago--abenteuer-in-neuen-welten",
+      "titel": "Ninjago - Abenteuer in neuen Welten",
       "figuren": [
-        "peppa-pig"
+        "ninjago"
       ],
       "frei": true
     },
     {
-      "id": "VSE322",
-      "uname": "peppa-pig--kurze-clips-vse322",
-      "titel": "Peppa Pig - Kurze Clips",
+      "id": "VSE256",
+      "uname": "ninjago--aufstieg-der-drachen-vse256",
+      "titel": "Ninjago - Aufstieg der Drachen",
       "figuren": [
-        "peppa-pig"
+        "ninjago"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE136",
+      "uname": "ninjago--das-jahr-der-schlangen",
+      "titel": "Ninjago - Das Jahr der Schlangen",
+      "figuren": [
+        "ninjago"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE139",
+      "uname": "ninjago--die-meister-der-zeit",
+      "titel": "Ninjago - Die Meister der Zeit",
+      "figuren": [
+        "ninjago"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE210",
+      "uname": "ninjago--die-rueckkehr",
+      "titel": "Ninjago - Die Rückkehr",
+      "figuren": [
+        "ninjago"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE135",
+      "uname": "ninjago--ein-neustart",
+      "titel": "Ninjago - Ein Neustart",
+      "figuren": [
+        "ninjago"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE253",
+      "uname": "ninjago--entschluesselt-vse253",
+      "titel": "Ninjago - Entschlüsselt",
+      "figuren": [
+        "ninjago"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE140",
+      "uname": "ninjago--garmadons-motorrad-gang",
+      "titel": "Ninjago - Garmadons Motorrad-Gang",
+      "figuren": [
+        "ninjago"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE59",
+      "uname": "ninjago--geheimnis-der-tiefe",
+      "titel": "Ninjago - Geheimnis der Tiefe",
+      "figuren": [
+        "ninjago"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE168",
+      "uname": "ninjago--im-land-der-drachen",
+      "titel": "Ninjago - Im Land der Drachen",
+      "figuren": [
+        "ninjago"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE383",
+      "uname": "ninjago--kurze-clips-vse383",
+      "titel": "Ninjago - Kurze Clips",
+      "figuren": [
+        "ninjago"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE141",
+      "uname": "ninjago--luftpiraten",
+      "titel": "Ninjago - Luftpiraten",
+      "figuren": [
+        "ninjago"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE143",
+      "uname": "ninjago--morro",
+      "titel": "Ninjago - Morro",
+      "figuren": [
+        "ninjago"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE165",
+      "uname": "ninjago--rueckkehr-der-oni",
+      "titel": "Ninjago - Rückkehr der Oni",
+      "figuren": [
+        "ninjago"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE159",
+      "uname": "ninjago--verbotenes-spinjitzu",
+      "titel": "Ninjago - Verbotenes Spinjitzu",
+      "figuren": [
+        "ninjago"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE152",
+      "uname": "ninjago--wettkampf-der-elemente",
+      "titel": "Ninjago - Wettkampf der Elemente",
+      "figuren": [
+        "ninjago"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE314",
+      "uname": "angelo-vse314",
+      "titel": "Angelo!",
+      "figuren": [
+        "angelo"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE458",
+      "uname": "angelos-tipps-vse458",
+      "titel": "Angelos Tipps",
+      "figuren": [
+        "angelo"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE315",
+      "uname": "alvinnn-und-die-chipmunks-vse315",
+      "titel": "ALVINNN!!! und die Chipmunks",
+      "figuren": [
+        "alvinnn-und-die-chipmunks"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE303",
+      "uname": "voll-zu-spaet-vse303",
+      "titel": "Voll zu spät!",
+      "figuren": [
+        "voll-zu-spaet"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE42",
+      "uname": "kingdom-force-vse42",
+      "titel": "Kingdom Force",
+      "figuren": [
+        "kingdom-force"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE28",
+      "uname": "pikwik-pack-vse28",
+      "titel": "Pikwik Pack",
+      "figuren": [
+        "pikwik-pack"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE62",
+      "uname": "bo-flo--co--familie-und-so",
+      "titel": "Bo, Flo & Co. - Familie und so",
+      "figuren": [
+        "bo-flo--co"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE197",
+      "uname": "dino-ranch-vse197",
+      "titel": "Dino Ranch",
+      "figuren": [
+        "dino-ranch"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE203",
+      "uname": "dino-ranch-charaktere",
+      "titel": "Dino Ranch Shorts",
+      "figuren": [
+        "dino-ranch"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE242",
+      "uname": "sesame-streets-mecha-builders-vse242",
+      "titel": "Sesame Street's Mecha Builders",
+      "figuren": [
+        "sesame-streets-mecha-builders-pty522"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE302",
+      "uname": "paw-patrol--helfer-auf-vier-pfoten-vse302",
+      "titel": "PAW Patrol - Helfer auf vier Pfoten",
+      "figuren": [
+        "paw-patrol"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE101",
+      "uname": "paw-patrol--kurze-clips",
+      "titel": "PAW Patrol - Kurze Clips",
+      "figuren": [
+        "paw-patrol"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE320",
+      "uname": "grizzy--die-lemminge-vse320",
+      "titel": "Grizzy & die Lemminge",
+      "figuren": [
+        "grizzy--die-lemminge"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE231",
+      "uname": "grizzy--die-lemminge--kurze-clips-vse231",
+      "titel": "Grizzy & die Lemminge - Kurze Clips",
+      "figuren": [
+        "grizzy--die-lemminge"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE54",
+      "uname": "cocomelon-vse54",
+      "titel": "CoComelon",
+      "figuren": [
+        "cocomelon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE295",
+      "uname": "cocomelon--dance-party-vse295",
+      "titel": "CoComelon - Dance Party",
+      "figuren": [
+        "cocomelon"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE261",
+      "uname": "cocomelon--spiel-mit-uns-vse261",
+      "titel": "CoComelon - Spiel mit uns",
+      "figuren": [
+        "cocomelon"
       ],
       "frei": true
     }
@@ -2325,6 +2325,11 @@
       "minuten": 3,
       "staffeln": 5
     },
+    "VSE224": {
+      "folgen": 54,
+      "minuten": 20,
+      "staffeln": 1
+    },
     "VSE292": {
       "folgen": 137,
       "minuten": 21,
@@ -2355,6 +2360,16 @@
       "minuten": 12,
       "staffeln": 9
     },
+    "VSE290": {
+      "folgen": 65,
+      "minuten": 22,
+      "staffeln": 2
+    },
+    "VSE287": {
+      "folgen": 78,
+      "minuten": 12,
+      "staffeln": 1
+    },
     "VSE82": {
       "folgen": 48,
       "minuten": 21,
@@ -2383,16 +2398,6 @@
     "VSE122": {
       "folgen": 48,
       "minuten": 21,
-      "staffeln": 1
-    },
-    "VSE290": {
-      "folgen": 65,
-      "minuten": 22,
-      "staffeln": 2
-    },
-    "VSE287": {
-      "folgen": 78,
-      "minuten": 12,
       "staffeln": 1
     }
   },
@@ -3280,6 +3285,11 @@
       ]
     },
     "20464": {
+      "serie": "VSE433",
+      "adresse": "https://www.toggo.de/haikyu-pty652/serien/haikyu-vse433",
+      "folgen": []
+    },
+    "20992": {
       "serie": "VSE433",
       "adresse": "https://www.toggo.de/haikyu-pty652/serien/haikyu-vse433",
       "folgen": []
@@ -4574,6 +4584,336 @@
         }
       ]
     },
+    "158870": {
+      "serie": "VSE224",
+      "adresse": "https://www.toggo.de/pokemon/serien/pokemon-ultimative-reisen-die-serie-vse224",
+      "folgen": [
+        {
+          "staffel": 25,
+          "folge": 1,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 2,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 3,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 4,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 5,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 6,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 7,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 8,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 9,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 10,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 11,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 12,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 13,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 14,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 15,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 16,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 17,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 18,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 19,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 20,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 21,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 22,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 23,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 24,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 25,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 26,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 27,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 28,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 29,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 30,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 31,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 32,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 33,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 34,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 35,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 36,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 37,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 38,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 39,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 40,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 41,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 42,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 43,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 44,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 45,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 46,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 47,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 48,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 49,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 50,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 51,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 52,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 53,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        },
+        {
+          "staffel": 25,
+          "folge": 54,
+          "ab": "2025-10-01T00:00",
+          "bis": "2027-09-30T23:59"
+        }
+      ]
+    },
     "158871": {
       "serie": "VSE292",
       "adresse": "https://www.toggo.de/pokemon/serien/pokemon-horizonte-die-serie-vse292",
@@ -4585,10 +4925,10 @@
           "bis": "2026-12-31T23:59"
         },
         {
-          "staffel": 4,
+          "staffel": 2,
           "folge": 1,
-          "ab": "2026-11-27T00:00",
-          "bis": "2027-12-31T23:59"
+          "ab": "2025-02-21T00:00",
+          "bis": "2026-12-31T23:59"
         },
         {
           "staffel": 3,
@@ -4597,10 +4937,10 @@
           "bis": "2027-12-31T23:59"
         },
         {
-          "staffel": 2,
+          "staffel": 4,
           "folge": 1,
-          "ab": "2025-02-21T00:00",
-          "bis": "2026-12-31T23:59"
+          "ab": "2026-11-27T00:00",
+          "bis": "2027-12-31T23:59"
         },
         {
           "staffel": 1,
@@ -4609,16 +4949,16 @@
           "bis": "2026-12-31T23:59"
         },
         {
-          "staffel": 3,
-          "folge": 2,
-          "ab": "2026-01-02T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
           "staffel": 2,
           "folge": 2,
           "ab": "2025-02-28T00:00",
           "bis": "2026-12-31T23:59"
+        },
+        {
+          "staffel": 3,
+          "folge": 2,
+          "ab": "2026-01-02T00:00",
+          "bis": "2027-12-31T23:59"
         },
         {
           "staffel": 1,
@@ -4645,21 +4985,27 @@
           "bis": "2026-12-31T23:59"
         },
         {
-          "staffel": 3,
-          "folge": 4,
-          "ab": "2026-01-16T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
           "staffel": 2,
           "folge": 4,
           "ab": "2025-03-14T00:00",
           "bis": "2026-12-31T23:59"
         },
         {
+          "staffel": 3,
+          "folge": 4,
+          "ab": "2026-01-16T00:00",
+          "bis": "2027-12-31T23:59"
+        },
+        {
           "staffel": 1,
           "folge": 5,
           "ab": "2025-10-01T00:00",
+          "bis": "2026-12-31T23:59"
+        },
+        {
+          "staffel": 2,
+          "folge": 5,
+          "ab": "2025-03-21T00:00",
           "bis": "2026-12-31T23:59"
         },
         {
@@ -4669,15 +5015,15 @@
           "bis": "2027-12-31T23:59"
         },
         {
-          "staffel": 2,
-          "folge": 5,
-          "ab": "2025-03-21T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
           "staffel": 1,
           "folge": 6,
           "ab": "2025-10-01T00:00",
+          "bis": "2026-12-31T23:59"
+        },
+        {
+          "staffel": 2,
+          "folge": 6,
+          "ab": "2025-03-28T00:00",
           "bis": "2026-12-31T23:59"
         },
         {
@@ -4685,12 +5031,6 @@
           "folge": 6,
           "ab": "2026-02-06T00:00",
           "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 6,
-          "ab": "2025-03-28T00:00",
-          "bis": "2026-12-31T23:59"
         },
         {
           "staffel": 1,
@@ -4717,16 +5057,16 @@
           "bis": "2026-12-31T23:59"
         },
         {
-          "staffel": 3,
-          "folge": 8,
-          "ab": "2026-02-20T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
           "staffel": 2,
           "folge": 8,
           "ab": "2025-04-11T00:00",
           "bis": "2026-12-31T23:59"
+        },
+        {
+          "staffel": 3,
+          "folge": 8,
+          "ab": "2026-02-20T00:00",
+          "bis": "2027-12-31T23:59"
         },
         {
           "staffel": 1,
@@ -4765,12 +5105,6 @@
           "bis": "2027-12-31T23:59"
         },
         {
-          "staffel": 3,
-          "folge": 11,
-          "ab": "2026-03-13T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
           "staffel": 1,
           "folge": 11,
           "ab": "2025-10-01T00:00",
@@ -4783,15 +5117,21 @@
           "bis": "2026-12-31T23:59"
         },
         {
-          "staffel": 2,
-          "folge": 12,
-          "ab": "2025-05-09T00:00",
-          "bis": "2026-12-31T23:59"
+          "staffel": 3,
+          "folge": 11,
+          "ab": "2026-03-13T00:00",
+          "bis": "2027-12-31T23:59"
         },
         {
           "staffel": 1,
           "folge": 12,
           "ab": "2025-10-01T00:00",
+          "bis": "2026-12-31T23:59"
+        },
+        {
+          "staffel": 2,
+          "folge": 12,
+          "ab": "2025-05-09T00:00",
           "bis": "2026-12-31T23:59"
         },
         {
@@ -4891,15 +5231,15 @@
           "bis": "2027-12-31T23:59"
         },
         {
-          "staffel": 2,
-          "folge": 18,
-          "ab": "2025-06-20T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
           "staffel": 1,
           "folge": 18,
           "ab": "2025-10-01T00:00",
+          "bis": "2026-12-31T23:59"
+        },
+        {
+          "staffel": 2,
+          "folge": 18,
+          "ab": "2025-06-20T00:00",
           "bis": "2026-12-31T23:59"
         },
         {
@@ -4927,12 +5267,6 @@
           "bis": "2027-12-31T23:59"
         },
         {
-          "staffel": 3,
-          "folge": 20,
-          "ab": "2026-05-15T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
           "staffel": 1,
           "folge": 20,
           "ab": "2025-10-01T00:00",
@@ -4946,8 +5280,8 @@
         },
         {
           "staffel": 3,
-          "folge": 21,
-          "ab": "2026-05-22T00:00",
+          "folge": 20,
+          "ab": "2026-05-15T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -4963,9 +5297,21 @@
           "bis": "2026-12-31T23:59"
         },
         {
+          "staffel": 3,
+          "folge": 21,
+          "ab": "2026-05-22T00:00",
+          "bis": "2027-12-31T23:59"
+        },
+        {
           "staffel": 1,
           "folge": 22,
           "ab": "2025-10-01T00:00",
+          "bis": "2026-12-31T23:59"
+        },
+        {
+          "staffel": 2,
+          "folge": 22,
+          "ab": "2025-07-18T00:00",
           "bis": "2026-12-31T23:59"
         },
         {
@@ -4975,9 +5321,9 @@
           "bis": "2027-12-31T23:59"
         },
         {
-          "staffel": 2,
-          "folge": 22,
-          "ab": "2025-07-18T00:00",
+          "staffel": 1,
+          "folge": 23,
+          "ab": "2025-10-01T00:00",
           "bis": "2026-12-31T23:59"
         },
         {
@@ -4987,16 +5333,16 @@
           "bis": "2026-12-31T23:59"
         },
         {
-          "staffel": 1,
-          "folge": 23,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
           "staffel": 3,
           "folge": 23,
           "ab": "2026-06-05T00:00",
           "bis": "2027-12-31T23:59"
+        },
+        {
+          "staffel": 1,
+          "folge": 24,
+          "ab": "2025-10-01T00:00",
+          "bis": "2026-12-31T23:59"
         },
         {
           "staffel": 2,
@@ -5012,7 +5358,7 @@
         },
         {
           "staffel": 1,
-          "folge": 24,
+          "folge": 25,
           "ab": "2025-10-01T00:00",
           "bis": "2026-12-31T23:59"
         },
@@ -5027,12 +5373,6 @@
           "folge": 25,
           "ab": "2026-06-19T00:00",
           "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 25,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
         },
         {
           "staffel": 1,
@@ -5089,10 +5429,10 @@
           "bis": "2027-12-31T23:59"
         },
         {
-          "staffel": 3,
+          "staffel": 1,
           "folge": 29,
-          "ab": "2026-07-17T00:00",
-          "bis": "2027-12-31T23:59"
+          "ab": "2024-08-30T00:00",
+          "bis": "2026-12-31T23:59"
         },
         {
           "staffel": 2,
@@ -5101,22 +5441,10 @@
           "bis": "2026-12-31T23:59"
         },
         {
-          "staffel": 1,
-          "folge": 29,
-          "ab": "2024-08-30T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
           "staffel": 3,
-          "folge": 30,
-          "ab": "2026-07-24T00:00",
+          "folge": 29,
+          "ab": "2026-07-17T00:00",
           "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 30,
-          "ab": "2025-09-12T00:00",
-          "bis": "2026-12-31T23:59"
         },
         {
           "staffel": 1,
@@ -5125,9 +5453,15 @@
           "bis": "2026-12-31T23:59"
         },
         {
+          "staffel": 2,
+          "folge": 30,
+          "ab": "2025-09-12T00:00",
+          "bis": "2026-12-31T23:59"
+        },
+        {
           "staffel": 3,
-          "folge": 31,
-          "ab": "2026-07-31T00:00",
+          "folge": 30,
+          "ab": "2026-07-24T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -5144,8 +5478,8 @@
         },
         {
           "staffel": 3,
-          "folge": 32,
-          "ab": "2026-08-07T00:00",
+          "folge": 31,
+          "ab": "2026-07-31T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -5162,8 +5496,8 @@
         },
         {
           "staffel": 3,
-          "folge": 33,
-          "ab": "2026-08-14T00:00",
+          "folge": 32,
+          "ab": "2026-08-07T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -5179,16 +5513,16 @@
           "bis": "2026-12-31T23:59"
         },
         {
+          "staffel": 3,
+          "folge": 33,
+          "ab": "2026-08-14T00:00",
+          "bis": "2027-12-31T23:59"
+        },
+        {
           "staffel": 1,
           "folge": 34,
           "ab": "2024-09-20T00:00",
           "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 34,
-          "ab": "2026-08-21T00:00",
-          "bis": "2027-12-31T23:59"
         },
         {
           "staffel": 2,
@@ -5198,8 +5532,8 @@
         },
         {
           "staffel": 3,
-          "folge": 35,
-          "ab": "2026-08-28T00:00",
+          "folge": 34,
+          "ab": "2026-08-21T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -5216,8 +5550,8 @@
         },
         {
           "staffel": 3,
-          "folge": 36,
-          "ab": "2026-09-04T00:00",
+          "folge": 35,
+          "ab": "2026-08-28T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -5231,6 +5565,12 @@
           "folge": 36,
           "ab": "2025-10-24T00:00",
           "bis": "2026-12-31T23:59"
+        },
+        {
+          "staffel": 3,
+          "folge": 36,
+          "ab": "2026-09-04T00:00",
+          "bis": "2027-12-31T23:59"
         },
         {
           "staffel": 1,
@@ -5293,12 +5633,6 @@
           "bis": "2026-12-31T23:59"
         },
         {
-          "staffel": 3,
-          "folge": 40,
-          "ab": "2026-10-02T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
           "staffel": 2,
           "folge": 40,
           "ab": "2025-11-21T00:00",
@@ -5306,8 +5640,8 @@
         },
         {
           "staffel": 3,
-          "folge": 41,
-          "ab": "2026-10-09T00:00",
+          "folge": 40,
+          "ab": "2026-10-02T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -5323,6 +5657,18 @@
           "bis": "2026-12-31T23:59"
         },
         {
+          "staffel": 3,
+          "folge": 41,
+          "ab": "2026-10-09T00:00",
+          "bis": "2027-12-31T23:59"
+        },
+        {
+          "staffel": 1,
+          "folge": 42,
+          "ab": "2024-10-18T00:00",
+          "bis": "2026-12-31T23:59"
+        },
+        {
           "staffel": 2,
           "folge": 42,
           "ab": "2025-12-05T00:00",
@@ -5333,12 +5679,6 @@
           "folge": 42,
           "ab": "2026-10-16T00:00",
           "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 42,
-          "ab": "2024-10-18T00:00",
-          "bis": "2026-12-31T23:59"
         },
         {
           "staffel": 1,
@@ -5377,16 +5717,16 @@
           "bis": "2027-12-31T23:59"
         },
         {
-          "staffel": 3,
-          "folge": 45,
-          "ab": "2026-11-06T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
           "staffel": 1,
           "folge": 45,
           "ab": "2024-10-25T00:00",
           "bis": "2026-12-31T23:59"
+        },
+        {
+          "staffel": 3,
+          "folge": 45,
+          "ab": "2026-11-06T00:00",
+          "bis": "2027-12-31T23:59"
         },
         {
           "staffel": 3,
@@ -6732,2496 +7072,18 @@
         }
       ]
     },
-    "7000001": {
-      "serie": "VSE292",
-      "adresse": "https://www.toggo.de/pokemon/serien/pokemon-horizonte-die-serie-vse292",
-      "folgen": [
-        {
-          "staffel": 1,
-          "folge": 1,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 4,
-          "folge": 1,
-          "ab": "2026-11-27T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 1,
-          "ab": "2026-01-02T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 1,
-          "ab": "2025-02-21T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 2,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 2,
-          "ab": "2026-01-02T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 2,
-          "ab": "2025-02-28T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 3,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 3,
-          "ab": "2025-03-07T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 3,
-          "ab": "2026-01-09T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 4,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 4,
-          "ab": "2026-01-16T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 4,
-          "ab": "2025-03-14T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 5,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 5,
-          "ab": "2026-01-30T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 5,
-          "ab": "2025-03-21T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 6,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 6,
-          "ab": "2026-02-06T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 6,
-          "ab": "2025-03-28T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 7,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 7,
-          "ab": "2025-04-04T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 7,
-          "ab": "2026-02-13T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 8,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 8,
-          "ab": "2026-02-20T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 8,
-          "ab": "2025-04-11T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 9,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 9,
-          "ab": "2025-04-18T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 9,
-          "ab": "2026-02-27T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 10,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 10,
-          "ab": "2025-04-25T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 10,
-          "ab": "2026-03-06T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 11,
-          "ab": "2026-03-13T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 11,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 11,
-          "ab": "2025-05-02T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 12,
-          "ab": "2025-05-09T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 12,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 12,
-          "ab": "2026-03-20T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 13,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 13,
-          "ab": "2025-05-16T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 13,
-          "ab": "2026-03-27T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 14,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 14,
-          "ab": "2025-05-23T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 14,
-          "ab": "2026-04-03T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 15,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 15,
-          "ab": "2025-05-30T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 15,
-          "ab": "2026-04-10T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 16,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 16,
-          "ab": "2025-06-06T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 16,
-          "ab": "2026-04-17T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 17,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 17,
-          "ab": "2025-06-13T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 17,
-          "ab": "2026-04-24T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 18,
-          "ab": "2025-06-20T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 18,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 18,
-          "ab": "2026-05-01T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 19,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 19,
-          "ab": "2025-06-27T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 19,
-          "ab": "2026-05-08T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 20,
-          "ab": "2026-05-15T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 20,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 20,
-          "ab": "2025-07-04T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 21,
-          "ab": "2026-05-22T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 21,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 21,
-          "ab": "2025-07-11T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 22,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 22,
-          "ab": "2026-05-29T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 22,
-          "ab": "2025-07-18T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 23,
-          "ab": "2025-07-25T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 23,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 23,
-          "ab": "2026-06-05T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 24,
-          "ab": "2025-08-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 24,
-          "ab": "2026-06-12T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 24,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 25,
-          "ab": "2025-08-08T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 25,
-          "ab": "2026-06-19T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 25,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 26,
-          "ab": "2024-08-23T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 26,
-          "ab": "2025-08-15T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 26,
-          "ab": "2026-06-26T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 27,
-          "ab": "2024-08-23T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 27,
-          "ab": "2025-08-22T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 27,
-          "ab": "2026-07-03T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 28,
-          "ab": "2024-08-30T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 28,
-          "ab": "2025-08-29T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 28,
-          "ab": "2026-07-10T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 29,
-          "ab": "2026-07-17T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 29,
-          "ab": "2025-09-05T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 29,
-          "ab": "2024-08-30T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 30,
-          "ab": "2026-07-24T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 30,
-          "ab": "2025-09-12T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 30,
-          "ab": "2024-09-06T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 31,
-          "ab": "2026-07-31T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 31,
-          "ab": "2024-09-06T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 31,
-          "ab": "2025-09-19T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 32,
-          "ab": "2026-08-07T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 32,
-          "ab": "2024-09-13T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 32,
-          "ab": "2025-09-26T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 33,
-          "ab": "2026-08-14T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 33,
-          "ab": "2024-09-13T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 33,
-          "ab": "2025-10-03T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 34,
-          "ab": "2024-09-20T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 34,
-          "ab": "2026-08-21T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 34,
-          "ab": "2025-10-10T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 35,
-          "ab": "2026-08-28T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 35,
-          "ab": "2024-09-20T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 35,
-          "ab": "2025-10-17T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 36,
-          "ab": "2026-09-04T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 36,
-          "ab": "2024-09-27T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 36,
-          "ab": "2025-10-24T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 37,
-          "ab": "2024-09-27T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 37,
-          "ab": "2025-10-31T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 37,
-          "ab": "2026-09-11T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 38,
-          "ab": "2024-10-04T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 38,
-          "ab": "2025-11-07T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 38,
-          "ab": "2026-09-18T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 39,
-          "ab": "2024-10-04T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 39,
-          "ab": "2025-11-14T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 39,
-          "ab": "2026-09-25T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 40,
-          "ab": "2024-10-11T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 40,
-          "ab": "2026-10-02T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 40,
-          "ab": "2025-11-21T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 41,
-          "ab": "2026-10-09T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 41,
-          "ab": "2024-10-11T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 41,
-          "ab": "2025-11-28T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 42,
-          "ab": "2025-12-05T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 42,
-          "ab": "2026-10-16T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 42,
-          "ab": "2024-10-18T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 43,
-          "ab": "2024-10-18T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 43,
-          "ab": "2025-12-12T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 43,
-          "ab": "2026-10-23T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 44,
-          "ab": "2024-10-25T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 44,
-          "ab": "2025-12-19T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 44,
-          "ab": "2026-10-30T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 45,
-          "ab": "2026-11-06T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 45,
-          "ab": "2024-10-25T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 46,
-          "ab": "2026-11-13T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 47,
-          "ab": "2026-11-20T00:00",
-          "bis": "2027-12-31T23:59"
-        }
-      ]
-    },
-    "7000002": {
-      "serie": "VSE292",
-      "adresse": "https://www.toggo.de/pokemon/serien/pokemon-horizonte-die-serie-vse292",
-      "folgen": [
-        {
-          "staffel": 1,
-          "folge": 1,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 4,
-          "folge": 1,
-          "ab": "2026-11-27T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 1,
-          "ab": "2026-01-02T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 1,
-          "ab": "2025-02-21T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 2,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 2,
-          "ab": "2026-01-02T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 2,
-          "ab": "2025-02-28T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 3,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 3,
-          "ab": "2025-03-07T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 3,
-          "ab": "2026-01-09T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 4,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 4,
-          "ab": "2026-01-16T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 4,
-          "ab": "2025-03-14T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 5,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 5,
-          "ab": "2026-01-30T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 5,
-          "ab": "2025-03-21T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 6,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 6,
-          "ab": "2026-02-06T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 6,
-          "ab": "2025-03-28T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 7,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 7,
-          "ab": "2025-04-04T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 7,
-          "ab": "2026-02-13T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 8,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 8,
-          "ab": "2026-02-20T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 8,
-          "ab": "2025-04-11T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 9,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 9,
-          "ab": "2025-04-18T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 9,
-          "ab": "2026-02-27T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 10,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 10,
-          "ab": "2025-04-25T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 10,
-          "ab": "2026-03-06T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 11,
-          "ab": "2026-03-13T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 11,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 11,
-          "ab": "2025-05-02T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 12,
-          "ab": "2025-05-09T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 12,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 12,
-          "ab": "2026-03-20T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 13,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 13,
-          "ab": "2025-05-16T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 13,
-          "ab": "2026-03-27T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 14,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 14,
-          "ab": "2025-05-23T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 14,
-          "ab": "2026-04-03T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 15,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 15,
-          "ab": "2025-05-30T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 15,
-          "ab": "2026-04-10T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 16,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 16,
-          "ab": "2025-06-06T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 16,
-          "ab": "2026-04-17T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 17,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 17,
-          "ab": "2025-06-13T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 17,
-          "ab": "2026-04-24T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 18,
-          "ab": "2025-06-20T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 18,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 18,
-          "ab": "2026-05-01T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 19,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 19,
-          "ab": "2025-06-27T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 19,
-          "ab": "2026-05-08T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 20,
-          "ab": "2026-05-15T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 20,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 20,
-          "ab": "2025-07-04T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 21,
-          "ab": "2026-05-22T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 21,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 21,
-          "ab": "2025-07-11T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 22,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 22,
-          "ab": "2026-05-29T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 22,
-          "ab": "2025-07-18T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 23,
-          "ab": "2025-07-25T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 23,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 23,
-          "ab": "2026-06-05T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 24,
-          "ab": "2025-08-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 24,
-          "ab": "2026-06-12T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 24,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 25,
-          "ab": "2025-08-08T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 25,
-          "ab": "2026-06-19T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 25,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 26,
-          "ab": "2024-08-23T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 26,
-          "ab": "2025-08-15T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 26,
-          "ab": "2026-06-26T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 27,
-          "ab": "2024-08-23T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 27,
-          "ab": "2025-08-22T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 27,
-          "ab": "2026-07-03T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 28,
-          "ab": "2024-08-30T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 28,
-          "ab": "2025-08-29T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 28,
-          "ab": "2026-07-10T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 29,
-          "ab": "2026-07-17T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 29,
-          "ab": "2025-09-05T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 29,
-          "ab": "2024-08-30T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 30,
-          "ab": "2026-07-24T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 30,
-          "ab": "2025-09-12T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 30,
-          "ab": "2024-09-06T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 31,
-          "ab": "2026-07-31T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 31,
-          "ab": "2024-09-06T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 31,
-          "ab": "2025-09-19T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 32,
-          "ab": "2026-08-07T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 32,
-          "ab": "2024-09-13T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 32,
-          "ab": "2025-09-26T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 33,
-          "ab": "2026-08-14T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 33,
-          "ab": "2024-09-13T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 33,
-          "ab": "2025-10-03T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 34,
-          "ab": "2024-09-20T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 34,
-          "ab": "2026-08-21T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 34,
-          "ab": "2025-10-10T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 35,
-          "ab": "2026-08-28T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 35,
-          "ab": "2024-09-20T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 35,
-          "ab": "2025-10-17T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 36,
-          "ab": "2026-09-04T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 36,
-          "ab": "2024-09-27T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 36,
-          "ab": "2025-10-24T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 37,
-          "ab": "2024-09-27T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 37,
-          "ab": "2025-10-31T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 37,
-          "ab": "2026-09-11T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 38,
-          "ab": "2024-10-04T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 38,
-          "ab": "2025-11-07T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 38,
-          "ab": "2026-09-18T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 39,
-          "ab": "2024-10-04T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 39,
-          "ab": "2025-11-14T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 39,
-          "ab": "2026-09-25T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 40,
-          "ab": "2024-10-11T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 40,
-          "ab": "2026-10-02T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 40,
-          "ab": "2025-11-21T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 41,
-          "ab": "2026-10-09T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 41,
-          "ab": "2024-10-11T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 41,
-          "ab": "2025-11-28T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 42,
-          "ab": "2025-12-05T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 42,
-          "ab": "2026-10-16T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 42,
-          "ab": "2024-10-18T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 43,
-          "ab": "2024-10-18T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 43,
-          "ab": "2025-12-12T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 43,
-          "ab": "2026-10-23T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 44,
-          "ab": "2024-10-25T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 44,
-          "ab": "2025-12-19T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 44,
-          "ab": "2026-10-30T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 45,
-          "ab": "2026-11-06T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 45,
-          "ab": "2024-10-25T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 46,
-          "ab": "2026-11-13T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 47,
-          "ab": "2026-11-20T00:00",
-          "bis": "2027-12-31T23:59"
-        }
-      ]
-    },
-    "7000003": {
-      "serie": "VSE292",
-      "adresse": "https://www.toggo.de/pokemon/serien/pokemon-horizonte-die-serie-vse292",
-      "folgen": [
-        {
-          "staffel": 1,
-          "folge": 1,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 4,
-          "folge": 1,
-          "ab": "2026-11-27T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 1,
-          "ab": "2026-01-02T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 1,
-          "ab": "2025-02-21T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 2,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 2,
-          "ab": "2026-01-02T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 2,
-          "ab": "2025-02-28T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 3,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 3,
-          "ab": "2025-03-07T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 3,
-          "ab": "2026-01-09T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 4,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 4,
-          "ab": "2026-01-16T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 4,
-          "ab": "2025-03-14T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 5,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 5,
-          "ab": "2026-01-30T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 5,
-          "ab": "2025-03-21T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 6,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 6,
-          "ab": "2026-02-06T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 6,
-          "ab": "2025-03-28T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 7,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 7,
-          "ab": "2025-04-04T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 7,
-          "ab": "2026-02-13T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 8,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 8,
-          "ab": "2026-02-20T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 8,
-          "ab": "2025-04-11T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 9,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 9,
-          "ab": "2025-04-18T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 9,
-          "ab": "2026-02-27T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 10,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 10,
-          "ab": "2025-04-25T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 10,
-          "ab": "2026-03-06T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 11,
-          "ab": "2026-03-13T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 11,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 11,
-          "ab": "2025-05-02T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 12,
-          "ab": "2025-05-09T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 12,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 12,
-          "ab": "2026-03-20T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 13,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 13,
-          "ab": "2025-05-16T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 13,
-          "ab": "2026-03-27T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 14,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 14,
-          "ab": "2025-05-23T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 14,
-          "ab": "2026-04-03T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 15,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 15,
-          "ab": "2025-05-30T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 15,
-          "ab": "2026-04-10T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 16,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 16,
-          "ab": "2025-06-06T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 16,
-          "ab": "2026-04-17T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 17,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 17,
-          "ab": "2025-06-13T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 17,
-          "ab": "2026-04-24T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 18,
-          "ab": "2025-06-20T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 18,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 18,
-          "ab": "2026-05-01T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 19,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 19,
-          "ab": "2025-06-27T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 19,
-          "ab": "2026-05-08T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 20,
-          "ab": "2026-05-15T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 20,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 20,
-          "ab": "2025-07-04T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 21,
-          "ab": "2026-05-22T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 21,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 21,
-          "ab": "2025-07-11T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 22,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 22,
-          "ab": "2026-05-29T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 22,
-          "ab": "2025-07-18T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 23,
-          "ab": "2025-07-25T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 23,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 23,
-          "ab": "2026-06-05T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 24,
-          "ab": "2025-08-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 24,
-          "ab": "2026-06-12T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 24,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 25,
-          "ab": "2025-08-08T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 25,
-          "ab": "2026-06-19T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 25,
-          "ab": "2025-10-01T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 26,
-          "ab": "2024-08-23T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 26,
-          "ab": "2025-08-15T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 26,
-          "ab": "2026-06-26T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 27,
-          "ab": "2024-08-23T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 27,
-          "ab": "2025-08-22T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 27,
-          "ab": "2026-07-03T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 28,
-          "ab": "2024-08-30T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 28,
-          "ab": "2025-08-29T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 28,
-          "ab": "2026-07-10T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 29,
-          "ab": "2026-07-17T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 29,
-          "ab": "2025-09-05T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 29,
-          "ab": "2024-08-30T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 30,
-          "ab": "2026-07-24T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 30,
-          "ab": "2025-09-12T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 30,
-          "ab": "2024-09-06T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 31,
-          "ab": "2026-07-31T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 31,
-          "ab": "2024-09-06T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 31,
-          "ab": "2025-09-19T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 32,
-          "ab": "2026-08-07T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 32,
-          "ab": "2024-09-13T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 32,
-          "ab": "2025-09-26T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 33,
-          "ab": "2026-08-14T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 33,
-          "ab": "2024-09-13T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 33,
-          "ab": "2025-10-03T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 34,
-          "ab": "2024-09-20T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 34,
-          "ab": "2026-08-21T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 34,
-          "ab": "2025-10-10T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 35,
-          "ab": "2026-08-28T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 35,
-          "ab": "2024-09-20T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 35,
-          "ab": "2025-10-17T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 36,
-          "ab": "2026-09-04T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 36,
-          "ab": "2024-09-27T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 36,
-          "ab": "2025-10-24T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 37,
-          "ab": "2024-09-27T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 37,
-          "ab": "2025-10-31T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 37,
-          "ab": "2026-09-11T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 38,
-          "ab": "2024-10-04T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 38,
-          "ab": "2025-11-07T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 38,
-          "ab": "2026-09-18T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 39,
-          "ab": "2024-10-04T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 39,
-          "ab": "2025-11-14T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 39,
-          "ab": "2026-09-25T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 40,
-          "ab": "2024-10-11T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 40,
-          "ab": "2026-10-02T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 40,
-          "ab": "2025-11-21T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 41,
-          "ab": "2026-10-09T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 41,
-          "ab": "2024-10-11T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 41,
-          "ab": "2025-11-28T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 42,
-          "ab": "2025-12-05T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 42,
-          "ab": "2026-10-16T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 42,
-          "ab": "2024-10-18T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 43,
-          "ab": "2024-10-18T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 43,
-          "ab": "2025-12-12T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 43,
-          "ab": "2026-10-23T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 44,
-          "ab": "2024-10-25T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 44,
-          "ab": "2025-12-19T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 44,
-          "ab": "2026-10-30T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 45,
-          "ab": "2026-11-06T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 45,
-          "ab": "2024-10-25T00:00",
-          "bis": "2026-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 46,
-          "ab": "2026-11-13T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 47,
-          "ab": "2026-11-20T00:00",
-          "bis": "2027-12-31T23:59"
-        }
-      ]
-    },
     "10012621": {
       "serie": "VSE173",
       "adresse": "https://www.toggo.de/super-wings/serien/super-wings-vse173",
       "folgen": [
         {
           "staffel": 3,
+          "folge": 1,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 4,
           "folge": 1,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -9251,19 +7113,25 @@
           "bis": "2031-01-19T23:59"
         },
         {
-          "staffel": 4,
-          "folge": 1,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
           "staffel": 9,
           "folge": 1,
           "ab": "2026-04-13T00:00",
           "bis": "2032-03-31T23:59"
         },
         {
+          "staffel": 2,
+          "folge": 2,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
           "staffel": 3,
+          "folge": 2,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 4,
           "folge": 2,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -9281,10 +7149,10 @@
           "bis": "2028-08-11T23:59"
         },
         {
-          "staffel": 4,
+          "staffel": 7,
           "folge": 2,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
+          "ab": "2024-04-05T00:00",
+          "bis": "2029-09-28T23:59"
         },
         {
           "staffel": 9,
@@ -9294,18 +7162,6 @@
         },
         {
           "staffel": 2,
-          "folge": 2,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 2,
-          "ab": "2024-04-05T00:00",
-          "bis": "2029-09-28T23:59"
-        },
-        {
-          "staffel": 2,
           "folge": 3,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -9315,12 +7171,6 @@
           "folge": 3,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 3,
-          "ab": "2024-04-05T00:00",
-          "bis": "2029-09-28T23:59"
         },
         {
           "staffel": 4,
@@ -9339,6 +7189,12 @@
           "folge": 3,
           "ab": "2023-03-10T00:00",
           "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 3,
+          "ab": "2024-04-05T00:00",
+          "bis": "2029-09-28T23:59"
         },
         {
           "staffel": 9,
@@ -9365,40 +7221,28 @@
           "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 7,
-          "folge": 4,
-          "ab": "2024-04-05T00:00",
-          "bis": "2029-09-28T23:59"
-        },
-        {
-          "staffel": 6,
-          "folge": 4,
-          "ab": "2023-03-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
           "staffel": 5,
           "folge": 4,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 9,
-          "folge": 4,
-          "ab": "2026-04-16T00:00",
-          "bis": "2032-03-31T23:59"
-        },
-        {
           "staffel": 6,
-          "folge": 5,
+          "folge": 4,
           "ab": "2023-03-10T00:00",
           "bis": "2028-08-11T23:59"
         },
         {
-          "staffel": 4,
-          "folge": 5,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
+          "staffel": 7,
+          "folge": 4,
+          "ab": "2024-04-05T00:00",
+          "bis": "2029-09-28T23:59"
+        },
+        {
+          "staffel": 9,
+          "folge": 4,
+          "ab": "2026-04-16T00:00",
+          "bis": "2032-03-31T23:59"
         },
         {
           "staffel": 2,
@@ -9413,10 +7257,22 @@
           "bis": "2027-07-02T23:59"
         },
         {
+          "staffel": 4,
+          "folge": 5,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
           "staffel": 5,
           "folge": 5,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 6,
+          "folge": 5,
+          "ab": "2023-03-10T00:00",
+          "bis": "2028-08-11T23:59"
         },
         {
           "staffel": 7,
@@ -9431,7 +7287,19 @@
           "bis": "2032-03-31T23:59"
         },
         {
+          "staffel": 2,
+          "folge": 6,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
           "staffel": 3,
+          "folge": 6,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 4,
           "folge": 6,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -9441,6 +7309,12 @@
           "folge": 6,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 6,
+          "folge": 6,
+          "ab": "2023-03-10T00:00",
+          "bis": "2028-08-11T23:59"
         },
         {
           "staffel": 7,
@@ -9455,31 +7329,25 @@
           "bis": "2031-01-19T23:59"
         },
         {
-          "staffel": 4,
-          "folge": 6,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 6,
-          "folge": 6,
-          "ab": "2023-03-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 6,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
           "staffel": 9,
           "folge": 6,
           "ab": "2026-04-20T00:00",
           "bis": "2032-03-31T23:59"
         },
         {
+          "staffel": 2,
+          "folge": 7,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
           "staffel": 3,
+          "folge": 7,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 4,
           "folge": 7,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -9491,16 +7359,22 @@
           "bis": "2027-07-02T23:59"
         },
         {
+          "staffel": 6,
+          "folge": 7,
+          "ab": "2023-03-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 7,
+          "ab": "2024-04-05T00:00",
+          "bis": "2029-09-28T23:59"
+        },
+        {
           "staffel": 8,
           "folge": 7,
           "ab": "2025-01-17T00:00",
           "bis": "2031-01-19T23:59"
-        },
-        {
-          "staffel": 4,
-          "folge": 7,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
         },
         {
           "staffel": 9,
@@ -9510,27 +7384,39 @@
         },
         {
           "staffel": 2,
-          "folge": 7,
+          "folge": 8,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 6,
-          "folge": 7,
-          "ab": "2023-03-10T00:00",
-          "bis": "2028-08-11T23:59"
+          "staffel": 3,
+          "folge": 8,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 7,
-          "folge": 7,
-          "ab": "2024-04-05T00:00",
-          "bis": "2029-09-28T23:59"
+          "staffel": 4,
+          "folge": 8,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
         },
         {
           "staffel": 5,
           "folge": 8,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 6,
+          "folge": 8,
+          "ab": "2023-03-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 8,
+          "ab": "2024-04-05T00:00",
+          "bis": "2029-09-28T23:59"
         },
         {
           "staffel": 8,
@@ -9546,36 +7432,12 @@
         },
         {
           "staffel": 2,
-          "folge": 8,
+          "folge": 9,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
         },
         {
           "staffel": 3,
-          "folge": 8,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 4,
-          "folge": 8,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 6,
-          "folge": 8,
-          "ab": "2023-03-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 8,
-          "ab": "2024-04-05T00:00",
-          "bis": "2029-09-28T23:59"
-        },
-        {
-          "staffel": 2,
           "folge": 9,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -9587,16 +7449,22 @@
           "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 7,
+          "staffel": 5,
           "folge": 9,
-          "ab": "2024-04-05T00:00",
-          "bis": "2029-09-28T23:59"
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
         },
         {
           "staffel": 6,
           "folge": 9,
           "ab": "2023-03-10T00:00",
           "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 9,
+          "ab": "2024-04-05T00:00",
+          "bis": "2029-09-28T23:59"
         },
         {
           "staffel": 8,
@@ -9611,25 +7479,25 @@
           "bis": "2032-03-31T23:59"
         },
         {
-          "staffel": 3,
-          "folge": 9,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 5,
-          "folge": 9,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
           "staffel": 2,
           "folge": 10,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
         },
         {
+          "staffel": 3,
+          "folge": 10,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
           "staffel": 4,
+          "folge": 10,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 5,
           "folge": 10,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -9645,6 +7513,12 @@
           "folge": 10,
           "ab": "2024-04-05T00:00",
           "bis": "2029-09-28T23:59"
+        },
+        {
+          "staffel": 8,
+          "folge": 10,
+          "ab": "2025-01-17T00:00",
+          "bis": "2031-01-19T23:59"
         },
         {
           "staffel": 9,
@@ -9653,24 +7527,6 @@
           "bis": "2032-03-31T23:59"
         },
         {
-          "staffel": 3,
-          "folge": 10,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 5,
-          "folge": 10,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 8,
-          "folge": 10,
-          "ab": "2025-01-17T00:00",
-          "bis": "2031-01-19T23:59"
-        },
-        {
           "staffel": 2,
           "folge": 11,
           "ab": "2024-01-01T00:00",
@@ -9689,22 +7545,10 @@
           "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 8,
-          "folge": 11,
-          "ab": "2025-01-17T00:00",
-          "bis": "2031-01-19T23:59"
-        },
-        {
           "staffel": 5,
           "folge": 11,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 9,
-          "folge": 11,
-          "ab": "2026-04-27T00:00",
-          "bis": "2032-03-31T23:59"
         },
         {
           "staffel": 6,
@@ -9719,7 +7563,37 @@
           "bis": "2029-09-28T23:59"
         },
         {
+          "staffel": 8,
+          "folge": 11,
+          "ab": "2025-01-17T00:00",
+          "bis": "2031-01-19T23:59"
+        },
+        {
+          "staffel": 9,
+          "folge": 11,
+          "ab": "2026-04-27T00:00",
+          "bis": "2032-03-31T23:59"
+        },
+        {
+          "staffel": 2,
+          "folge": 12,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 3,
+          "folge": 12,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
           "staffel": 4,
+          "folge": 12,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 5,
           "folge": 12,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -9750,24 +7624,18 @@
         },
         {
           "staffel": 2,
-          "folge": 12,
+          "folge": 13,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
         },
         {
           "staffel": 3,
-          "folge": 12,
+          "folge": 13,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 5,
-          "folge": 12,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 3,
+          "staffel": 4,
           "folge": 13,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -9789,6 +7657,12 @@
           "folge": 13,
           "ab": "2024-04-05T00:00",
           "bis": "2029-09-28T23:59"
+        },
+        {
+          "staffel": 8,
+          "folge": 13,
+          "ab": "2025-01-17T00:00",
+          "bis": "2031-01-19T23:59"
         },
         {
           "staffel": 9,
@@ -9798,24 +7672,18 @@
         },
         {
           "staffel": 2,
-          "folge": 13,
+          "folge": 14,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 3,
+          "folge": 14,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
         },
         {
           "staffel": 4,
-          "folge": 13,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 8,
-          "folge": 13,
-          "ab": "2025-01-17T00:00",
-          "bis": "2031-01-19T23:59"
-        },
-        {
-          "staffel": 3,
           "folge": 14,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -9831,6 +7699,18 @@
           "folge": 14,
           "ab": "2023-03-10T00:00",
           "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 14,
+          "ab": "2024-04-05T00:00",
+          "bis": "2029-09-28T23:59"
+        },
+        {
+          "staffel": 8,
+          "folge": 14,
+          "ab": "2025-01-17T00:00",
+          "bis": "2031-01-19T23:59"
         },
         {
           "staffel": 9,
@@ -9840,48 +7720,12 @@
         },
         {
           "staffel": 2,
-          "folge": 14,
+          "folge": 15,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 4,
-          "folge": 14,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 8,
-          "folge": 14,
-          "ab": "2025-01-17T00:00",
-          "bis": "2031-01-19T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 14,
-          "ab": "2024-04-05T00:00",
-          "bis": "2029-09-28T23:59"
         },
         {
           "staffel": 3,
-          "folge": 15,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 6,
-          "folge": 15,
-          "ab": "2023-03-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 15,
-          "ab": "2024-04-05T00:00",
-          "bis": "2029-09-28T23:59"
-        },
-        {
-          "staffel": 2,
           "folge": 15,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -9897,6 +7741,18 @@
           "folge": 15,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 6,
+          "folge": 15,
+          "ab": "2023-03-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 15,
+          "ab": "2024-04-05T00:00",
+          "bis": "2029-09-28T23:59"
         },
         {
           "staffel": 8,
@@ -9911,10 +7767,10 @@
           "bis": "2032-03-31T23:59"
         },
         {
-          "staffel": 7,
+          "staffel": 2,
           "folge": 16,
-          "ab": "2024-04-05T00:00",
-          "bis": "2029-09-28T23:59"
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
         },
         {
           "staffel": 3,
@@ -9927,6 +7783,30 @@
           "folge": 16,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 5,
+          "folge": 16,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 6,
+          "folge": 16,
+          "ab": "2023-03-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 16,
+          "ab": "2024-04-05T00:00",
+          "bis": "2029-09-28T23:59"
+        },
+        {
+          "staffel": 8,
+          "folge": 16,
+          "ab": "2025-01-17T00:00",
+          "bis": "2031-01-19T23:59"
         },
         {
           "staffel": 9,
@@ -9936,39 +7816,9 @@
         },
         {
           "staffel": 2,
-          "folge": 16,
+          "folge": 17,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 5,
-          "folge": 16,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 6,
-          "folge": 16,
-          "ab": "2023-03-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 8,
-          "folge": 16,
-          "ab": "2025-01-17T00:00",
-          "bis": "2031-01-19T23:59"
-        },
-        {
-          "staffel": 6,
-          "folge": 17,
-          "ab": "2023-03-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 17,
-          "ab": "2024-04-05T00:00",
-          "bis": "2029-09-28T23:59"
         },
         {
           "staffel": 3,
@@ -9983,22 +7833,28 @@
           "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 8,
-          "folge": 17,
-          "ab": "2025-01-17T00:00",
-          "bis": "2031-01-19T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 17,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
           "staffel": 5,
           "folge": 17,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 6,
+          "folge": 17,
+          "ab": "2023-03-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 17,
+          "ab": "2024-04-05T00:00",
+          "bis": "2029-09-28T23:59"
+        },
+        {
+          "staffel": 8,
+          "folge": 17,
+          "ab": "2025-01-17T00:00",
+          "bis": "2031-01-19T23:59"
         },
         {
           "staffel": 9,
@@ -10007,16 +7863,10 @@
           "bis": "2032-03-31T23:59"
         },
         {
-          "staffel": 6,
+          "staffel": 2,
           "folge": 18,
-          "ab": "2023-03-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 18,
-          "ab": "2024-04-05T00:00",
-          "bis": "2029-09-28T23:59"
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
         },
         {
           "staffel": 3,
@@ -10035,6 +7885,24 @@
           "folge": 18,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 6,
+          "folge": 18,
+          "ab": "2023-03-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 18,
+          "ab": "2024-04-05T00:00",
+          "bis": "2029-09-28T23:59"
+        },
+        {
+          "staffel": 8,
+          "folge": 18,
+          "ab": "2025-01-17T00:00",
+          "bis": "2031-01-19T23:59"
         },
         {
           "staffel": 9,
@@ -10044,42 +7912,18 @@
         },
         {
           "staffel": 2,
-          "folge": 18,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 8,
-          "folge": 18,
-          "ab": "2025-01-17T00:00",
-          "bis": "2031-01-19T23:59"
-        },
-        {
-          "staffel": 2,
           "folge": 19,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 19,
-          "ab": "2024-04-05T00:00",
-          "bis": "2029-09-28T23:59"
-        },
-        {
-          "staffel": 4,
-          "folge": 19,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 8,
-          "folge": 19,
-          "ab": "2025-01-17T00:00",
-          "bis": "2031-01-19T23:59"
         },
         {
           "staffel": 3,
+          "folge": 19,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 4,
           "folge": 19,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -10095,6 +7939,18 @@
           "folge": 19,
           "ab": "2023-03-10T00:00",
           "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 19,
+          "ab": "2024-04-05T00:00",
+          "bis": "2029-09-28T23:59"
+        },
+        {
+          "staffel": 8,
+          "folge": 19,
+          "ab": "2025-01-17T00:00",
+          "bis": "2031-01-19T23:59"
         },
         {
           "staffel": 9,
@@ -10115,18 +7971,6 @@
           "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 6,
-          "folge": 20,
-          "ab": "2023-03-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 20,
-          "ab": "2024-04-05T00:00",
-          "bis": "2029-09-28T23:59"
-        },
-        {
           "staffel": 4,
           "folge": 20,
           "ab": "2024-01-01T00:00",
@@ -10137,6 +7981,18 @@
           "folge": 20,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 6,
+          "folge": 20,
+          "ab": "2023-03-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 20,
+          "ab": "2024-04-05T00:00",
+          "bis": "2029-09-28T23:59"
         },
         {
           "staffel": 8,
@@ -10157,16 +8013,10 @@
           "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 6,
+          "staffel": 3,
           "folge": 21,
-          "ab": "2023-11-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 21,
-          "ab": "2024-10-25T00:00",
-          "bis": "2029-09-28T23:59"
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
         },
         {
           "staffel": 4,
@@ -10181,18 +8031,24 @@
           "bis": "2027-07-02T23:59"
         },
         {
+          "staffel": 6,
+          "folge": 21,
+          "ab": "2023-11-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 21,
+          "ab": "2024-10-25T00:00",
+          "bis": "2029-09-28T23:59"
+        },
+        {
           "staffel": 8,
           "folge": 21,
           "ab": "2025-08-29T00:00",
           "bis": "2031-01-19T23:59"
         },
         {
-          "staffel": 3,
-          "folge": 21,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
           "staffel": 9,
           "folge": 21,
           "ab": "2026-10-16T00:00",
@@ -10205,16 +8061,10 @@
           "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 6,
+          "staffel": 3,
           "folge": 22,
-          "ab": "2023-11-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 22,
-          "ab": "2024-10-25T00:00",
-          "bis": "2029-09-28T23:59"
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
         },
         {
           "staffel": 4,
@@ -10229,48 +8079,30 @@
           "bis": "2027-07-02T23:59"
         },
         {
+          "staffel": 6,
+          "folge": 22,
+          "ab": "2023-11-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 22,
+          "ab": "2024-10-25T00:00",
+          "bis": "2029-09-28T23:59"
+        },
+        {
           "staffel": 8,
           "folge": 22,
           "ab": "2025-08-29T00:00",
           "bis": "2031-01-19T23:59"
         },
         {
-          "staffel": 3,
-          "folge": 22,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
           "staffel": 9,
           "folge": 22,
           "ab": "2026-10-16T00:00",
           "bis": "2032-03-31T23:59"
         },
         {
-          "staffel": 5,
-          "folge": 23,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 6,
-          "folge": 23,
-          "ab": "2023-11-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 23,
-          "ab": "2024-10-25T00:00",
-          "bis": "2029-09-28T23:59"
-        },
-        {
-          "staffel": 9,
-          "folge": 23,
-          "ab": "2026-10-16T00:00",
-          "bis": "2032-03-31T23:59"
-        },
-        {
           "staffel": 2,
           "folge": 23,
           "ab": "2024-01-01T00:00",
@@ -10289,16 +8121,34 @@
           "bis": "2027-07-02T23:59"
         },
         {
+          "staffel": 5,
+          "folge": 23,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 6,
+          "folge": 23,
+          "ab": "2023-11-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 23,
+          "ab": "2024-10-25T00:00",
+          "bis": "2029-09-28T23:59"
+        },
+        {
           "staffel": 8,
           "folge": 23,
           "ab": "2025-08-29T00:00",
           "bis": "2031-01-19T23:59"
         },
         {
-          "staffel": 8,
-          "folge": 24,
-          "ab": "2025-08-29T00:00",
-          "bis": "2031-01-19T23:59"
+          "staffel": 9,
+          "folge": 23,
+          "ab": "2026-10-16T00:00",
+          "bis": "2032-03-31T23:59"
         },
         {
           "staffel": 2,
@@ -10337,6 +8187,12 @@
           "bis": "2029-09-28T23:59"
         },
         {
+          "staffel": 8,
+          "folge": 24,
+          "ab": "2025-08-29T00:00",
+          "bis": "2031-01-19T23:59"
+        },
+        {
           "staffel": 9,
           "folge": 24,
           "ab": "2026-10-16T00:00",
@@ -10349,22 +8205,10 @@
           "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 6,
-          "folge": 25,
-          "ab": "2023-11-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
           "staffel": 3,
           "folge": 25,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 8,
-          "folge": 25,
-          "ab": "2025-08-29T00:00",
-          "bis": "2031-01-19T23:59"
         },
         {
           "staffel": 4,
@@ -10379,19 +8223,49 @@
           "bis": "2027-07-02T23:59"
         },
         {
+          "staffel": 6,
+          "folge": 25,
+          "ab": "2023-11-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
           "staffel": 7,
           "folge": 25,
           "ab": "2024-10-25T00:00",
           "bis": "2029-09-28T23:59"
         },
         {
+          "staffel": 8,
+          "folge": 25,
+          "ab": "2025-08-29T00:00",
+          "bis": "2031-01-19T23:59"
+        },
+        {
           "staffel": 9,
           "folge": 25,
           "ab": "2026-10-16T00:00",
           "bis": "2032-03-31T23:59"
         },
         {
+          "staffel": 2,
+          "folge": 26,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
           "staffel": 3,
+          "folge": 26,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 4,
+          "folge": 26,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 5,
           "folge": 26,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -10415,28 +8289,28 @@
           "bis": "2031-01-19T23:59"
         },
         {
-          "staffel": 2,
+          "staffel": 9,
           "folge": 26,
+          "ab": "2026-10-16T00:00",
+          "bis": "2032-03-31T23:59"
+        },
+        {
+          "staffel": 2,
+          "folge": 27,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 3,
+          "folge": 27,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
         },
         {
           "staffel": 4,
-          "folge": 26,
+          "folge": 27,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 5,
-          "folge": 26,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 9,
-          "folge": 26,
-          "ab": "2026-10-16T00:00",
-          "bis": "2032-03-31T23:59"
         },
         {
           "staffel": 5,
@@ -10463,24 +8337,6 @@
           "bis": "2031-01-19T23:59"
         },
         {
-          "staffel": 2,
-          "folge": 27,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 27,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 4,
-          "folge": 27,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
           "staffel": 9,
           "folge": 27,
           "ab": "2026-10-16T00:00",
@@ -10488,6 +8344,12 @@
         },
         {
           "staffel": 2,
+          "folge": 28,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 3,
           "folge": 28,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -10523,12 +8385,6 @@
           "bis": "2031-01-19T23:59"
         },
         {
-          "staffel": 3,
-          "folge": 28,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
           "staffel": 9,
           "folge": 28,
           "ab": "2026-10-16T00:00",
@@ -10541,18 +8397,6 @@
           "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 6,
-          "folge": 29,
-          "ab": "2023-11-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 29,
-          "ab": "2024-10-25T00:00",
-          "bis": "2029-09-28T23:59"
-        },
-        {
           "staffel": 3,
           "folge": 29,
           "ab": "2024-01-01T00:00",
@@ -10571,6 +8415,18 @@
           "bis": "2027-07-02T23:59"
         },
         {
+          "staffel": 6,
+          "folge": 29,
+          "ab": "2023-11-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 29,
+          "ab": "2024-10-25T00:00",
+          "bis": "2029-09-28T23:59"
+        },
+        {
           "staffel": 8,
           "folge": 29,
           "ab": "2025-08-29T00:00",
@@ -10583,7 +8439,7 @@
           "bis": "2032-03-31T23:59"
         },
         {
-          "staffel": 5,
+          "staffel": 2,
           "folge": 30,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -10595,22 +8451,22 @@
           "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 6,
-          "folge": 30,
-          "ab": "2023-11-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 30,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
           "staffel": 4,
           "folge": 30,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 5,
+          "folge": 30,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 6,
+          "folge": 30,
+          "ab": "2023-11-10T00:00",
+          "bis": "2028-08-11T23:59"
         },
         {
           "staffel": 7,
@@ -10631,6 +8487,12 @@
           "bis": "2032-03-31T23:59"
         },
         {
+          "staffel": 2,
+          "folge": 31,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
           "staffel": 3,
           "folge": 31,
           "ab": "2024-01-01T00:00",
@@ -10655,30 +8517,30 @@
           "bis": "2028-08-11T23:59"
         },
         {
-          "staffel": 8,
-          "folge": 31,
-          "ab": "2025-08-29T00:00",
-          "bis": "2031-01-19T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 31,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 9,
-          "folge": 31,
-          "ab": "2026-10-16T00:00",
-          "bis": "2032-03-31T23:59"
-        },
-        {
           "staffel": 7,
           "folge": 31,
           "ab": "2024-10-25T00:00",
           "bis": "2029-09-28T23:59"
         },
         {
+          "staffel": 8,
+          "folge": 31,
+          "ab": "2025-08-29T00:00",
+          "bis": "2031-01-19T23:59"
+        },
+        {
+          "staffel": 9,
+          "folge": 31,
+          "ab": "2026-10-16T00:00",
+          "bis": "2032-03-31T23:59"
+        },
+        {
+          "staffel": 2,
+          "folge": 32,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
           "staffel": 3,
           "folge": 32,
           "ab": "2024-01-01T00:00",
@@ -10697,6 +8559,12 @@
           "bis": "2027-07-02T23:59"
         },
         {
+          "staffel": 6,
+          "folge": 32,
+          "ab": "2023-11-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
           "staffel": 7,
           "folge": 32,
           "ab": "2024-10-25T00:00",
@@ -10709,22 +8577,16 @@
           "bis": "2031-01-19T23:59"
         },
         {
-          "staffel": 2,
-          "folge": 32,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 6,
-          "folge": 32,
-          "ab": "2023-11-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
           "staffel": 9,
           "folge": 32,
           "ab": "2026-10-16T00:00",
           "bis": "2032-03-31T23:59"
+        },
+        {
+          "staffel": 2,
+          "folge": 33,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
         },
         {
           "staffel": 3,
@@ -10745,6 +8607,18 @@
           "bis": "2027-07-02T23:59"
         },
         {
+          "staffel": 6,
+          "folge": 33,
+          "ab": "2023-11-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 33,
+          "ab": "2024-10-25T00:00",
+          "bis": "2029-09-28T23:59"
+        },
+        {
           "staffel": 8,
           "folge": 33,
           "ab": "2025-08-29T00:00",
@@ -10758,30 +8632,12 @@
         },
         {
           "staffel": 2,
-          "folge": 33,
+          "folge": 34,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 6,
-          "folge": 33,
-          "ab": "2023-11-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 33,
-          "ab": "2024-10-25T00:00",
-          "bis": "2029-09-28T23:59"
-        },
-        {
-          "staffel": 6,
-          "folge": 34,
-          "ab": "2023-11-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 2,
+          "staffel": 3,
           "folge": 34,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -10799,22 +8655,22 @@
           "bis": "2027-07-02T23:59"
         },
         {
-          "staffel": 8,
+          "staffel": 6,
           "folge": 34,
-          "ab": "2025-08-29T00:00",
-          "bis": "2031-01-19T23:59"
-        },
-        {
-          "staffel": 3,
-          "folge": 34,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
+          "ab": "2023-11-10T00:00",
+          "bis": "2028-08-11T23:59"
         },
         {
           "staffel": 7,
           "folge": 34,
           "ab": "2024-10-25T00:00",
           "bis": "2029-09-28T23:59"
+        },
+        {
+          "staffel": 8,
+          "folge": 34,
+          "ab": "2025-08-29T00:00",
+          "bis": "2031-01-19T23:59"
         },
         {
           "staffel": 9,
@@ -10835,6 +8691,12 @@
           "bis": "2027-07-02T23:59"
         },
         {
+          "staffel": 4,
+          "folge": 35,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
           "staffel": 5,
           "folge": 35,
           "ab": "2024-01-01T00:00",
@@ -10857,48 +8719,12 @@
           "folge": 35,
           "ab": "2025-08-29T00:00",
           "bis": "2031-01-19T23:59"
-        },
-        {
-          "staffel": 4,
-          "folge": 35,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
         },
         {
           "staffel": 9,
           "folge": 35,
           "ab": "2026-10-16T00:00",
           "bis": "2032-03-31T23:59"
-        },
-        {
-          "staffel": 6,
-          "folge": 36,
-          "ab": "2023-11-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 4,
-          "folge": 36,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 5,
-          "folge": 36,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 8,
-          "folge": 36,
-          "ab": "2025-08-29T00:00",
-          "bis": "2031-01-19T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 36,
-          "ab": "2024-10-25T00:00",
-          "bis": "2029-09-28T23:59"
         },
         {
           "staffel": 2,
@@ -10913,10 +8739,46 @@
           "bis": "2027-07-02T23:59"
         },
         {
+          "staffel": 4,
+          "folge": 36,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 5,
+          "folge": 36,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 6,
+          "folge": 36,
+          "ab": "2023-11-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 36,
+          "ab": "2024-10-25T00:00",
+          "bis": "2029-09-28T23:59"
+        },
+        {
+          "staffel": 8,
+          "folge": 36,
+          "ab": "2025-08-29T00:00",
+          "bis": "2031-01-19T23:59"
+        },
+        {
           "staffel": 9,
           "folge": 36,
           "ab": "2026-10-16T00:00",
           "bis": "2032-03-31T23:59"
+        },
+        {
+          "staffel": 2,
+          "folge": 37,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
         },
         {
           "staffel": 3,
@@ -10949,12 +8811,6 @@
           "bis": "2029-09-28T23:59"
         },
         {
-          "staffel": 2,
-          "folge": 37,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
           "staffel": 8,
           "folge": 37,
           "ab": "2025-08-29T00:00",
@@ -10965,36 +8821,6 @@
           "folge": 37,
           "ab": "2026-10-16T00:00",
           "bis": "2032-03-31T23:59"
-        },
-        {
-          "staffel": 4,
-          "folge": 38,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 6,
-          "folge": 38,
-          "ab": "2023-11-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 9,
-          "folge": 38,
-          "ab": "2026-10-16T00:00",
-          "bis": "2032-03-31T23:59"
-        },
-        {
-          "staffel": 7,
-          "folge": 38,
-          "ab": "2024-10-25T00:00",
-          "bis": "2029-09-28T23:59"
-        },
-        {
-          "staffel": 8,
-          "folge": 38,
-          "ab": "2025-08-29T00:00",
-          "bis": "2031-01-19T23:59"
         },
         {
           "staffel": 2,
@@ -11009,13 +8835,55 @@
           "bis": "2027-07-02T23:59"
         },
         {
+          "staffel": 4,
+          "folge": 38,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
           "staffel": 5,
           "folge": 38,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
         },
         {
+          "staffel": 6,
+          "folge": 38,
+          "ab": "2023-11-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
+          "staffel": 7,
+          "folge": 38,
+          "ab": "2024-10-25T00:00",
+          "bis": "2029-09-28T23:59"
+        },
+        {
+          "staffel": 8,
+          "folge": 38,
+          "ab": "2025-08-29T00:00",
+          "bis": "2031-01-19T23:59"
+        },
+        {
+          "staffel": 9,
+          "folge": 38,
+          "ab": "2026-10-16T00:00",
+          "bis": "2032-03-31T23:59"
+        },
+        {
           "staffel": 2,
+          "folge": 39,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 3,
+          "folge": 39,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 4,
           "folge": 39,
           "ab": "2024-01-01T00:00",
           "bis": "2027-07-02T23:59"
@@ -11039,46 +8907,16 @@
           "bis": "2029-09-28T23:59"
         },
         {
-          "staffel": 3,
+          "staffel": 8,
           "folge": 39,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 4,
-          "folge": 39,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
+          "ab": "2025-08-29T00:00",
+          "bis": "2031-01-19T23:59"
         },
         {
           "staffel": 9,
           "folge": 39,
           "ab": "2026-10-16T00:00",
           "bis": "2032-03-31T23:59"
-        },
-        {
-          "staffel": 8,
-          "folge": 39,
-          "ab": "2025-08-29T00:00",
-          "bis": "2031-01-19T23:59"
-        },
-        {
-          "staffel": 5,
-          "folge": 40,
-          "ab": "2024-01-01T00:00",
-          "bis": "2027-07-02T23:59"
-        },
-        {
-          "staffel": 6,
-          "folge": 40,
-          "ab": "2023-11-10T00:00",
-          "bis": "2028-08-11T23:59"
-        },
-        {
-          "staffel": 8,
-          "folge": 40,
-          "ab": "2025-08-29T00:00",
-          "bis": "2031-01-19T23:59"
         },
         {
           "staffel": 3,
@@ -11093,10 +8931,28 @@
           "bis": "2027-07-02T23:59"
         },
         {
+          "staffel": 5,
+          "folge": 40,
+          "ab": "2024-01-01T00:00",
+          "bis": "2027-07-02T23:59"
+        },
+        {
+          "staffel": 6,
+          "folge": 40,
+          "ab": "2023-11-10T00:00",
+          "bis": "2028-08-11T23:59"
+        },
+        {
           "staffel": 7,
           "folge": 40,
           "ab": "2024-10-25T00:00",
           "bis": "2029-09-28T23:59"
+        },
+        {
+          "staffel": 8,
+          "folge": 40,
+          "ab": "2025-08-29T00:00",
+          "bis": "2031-01-19T23:59"
         },
         {
           "staffel": 9,

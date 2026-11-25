@@ -7,6 +7,7 @@ import { BALD_MIN, DRINGEND_MIN, abstandMin, detailZeile, inKurz, sortiereRegeln
 import type { Regel } from './regelmaessig'
 import { baueLeiste } from './leiste'
 import type { LeisteStand } from './leiste'
+import { erzeugeUndOeffne } from './uebersicht'
 import { LOG, MESS_MARKER, haengeAn, messDauer, messStart, unterschied } from './messung'
 import { kopierText } from './kopieren'
 import { istPruefer } from './pruefer'
@@ -78,7 +79,7 @@ let letzterStatus: string | undefined
 let letzteLeiste: { schluessel: string; element: unknown } | null = null
 // Angezeigte Werte der Leiste: der Hintergrund hält sie aktuell, der Render liest nur diese Variable (kein await,
 // kein State-Abo). Ein Abo auf einen häufig geschriebenen Zustand zeichnete die Leiste bei jedem Schritt neu (Flackern, 11.10.2026).
-type LeistenDaten = Omit<LeisteStand, 'oeffneAgenten' | 'oeffneListe'>
+type LeistenDaten = Omit<LeisteStand, 'oeffneAgenten' | 'oeffneListe' | 'oeffneUebersicht'>
 let leistenDaten: LeistenDaten | null = null
 let leistenSchluessel = ''
 let leistenTimer: Timer | null = null
@@ -229,6 +230,7 @@ function zeichneLeiste($: EngineInterface, e: any, daten: LeistenDaten, start: n
     ...stand,
     oeffneAgenten: () => void togglePane($, PANE, 'Arbeitsliste'),
     oeffneListe: () => void togglePane($, PANE, 'Arbeitsliste'),
+    oeffneUebersicht: () => void erzeugeUndOeffne({ lauf: (argv, o) => $.process.run(argv, o), toast: t => $.ui.toast(t) }),
   })
   letzteLeiste = { schluessel, element }
   return element

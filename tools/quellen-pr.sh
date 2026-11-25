@@ -263,6 +263,17 @@ if [ "$PRUEF_ROT" = 1 ]; then
   exit 0
 fi
 
+# GitHub berechnet die Mergebarkeit asynchron. Direkt nach dem Anlegen steht
+# dort „UNKNOWN"; wer das als Konflikt liest, stößt bei jedem Lauf einen
+# Reparatur-Auftrag an, der nichts zu reparieren hat.
+ZUSTAND="UNKNOWN"
+for _ in $(seq 1 20); do
+  ZUSTAND="$(gh pr view "$ZWEIG" --json mergeable -q .mergeable 2>/dev/null || echo UNKNOWN)"
+  [ "$ZUSTAND" != "UNKNOWN" ] && break
+  sleep 3
+done
+echo "Mergebarkeit: $ZUSTAND"
+
 # Antwort eines GitHub-Serverfehlers (5xx): GitHub war gestört, der Merge nicht „abgelehnt" (Lauf 45650281762, 25.11.2026: über 2 Minuten 502 und „Something went wrong").
 serverfehler() {
   printf '%s' "$1" | grep -qiE 'HTTP 50[0-9]|status code: 50[0-9]|Bad Gateway|Service Unavailable|Gateway Time-?out|Server Error|Something went wrong while executing'
@@ -307,17 +318,6 @@ pr_mergen() {
     [ "$ZUSTAND" = "MERGEABLE" ] || return 1
   done
 }
-
-# GitHub berechnet die Mergebarkeit asynchron. Direkt nach dem Anlegen steht
-# dort „UNKNOWN"; wer das als Konflikt liest, stößt bei jedem Lauf einen
-# Reparatur-Auftrag an, der nichts zu reparieren hat.
-ZUSTAND="UNKNOWN"
-for _ in $(seq 1 20); do
-  ZUSTAND="$(gh pr view "$ZWEIG" --json mergeable -q .mergeable 2>/dev/null || echo UNKNOWN)"
-  [ "$ZUSTAND" != "UNKNOWN" ] && break
-  sleep 3
-done
-echo "Mergebarkeit: $ZUSTAND"
 
 if [ "$ZUSTAND" = "MERGEABLE" ]; then
   # `--squash`, damit auf `main` ein Commit je Lauf steht statt eines

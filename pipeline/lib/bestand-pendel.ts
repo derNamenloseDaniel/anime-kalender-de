@@ -106,13 +106,16 @@ function gespeicherteZeile(zeilen: HistorieZeile[], i: number): Ereignis {
 
 /**
  * „N Titel weniger“, deren fehlende Kennungen (`titelWeg`) `kennungen` inzwischen per `zuAk` umleitet, sind gewollt zusammengelegt: Der Bestandsbau
- * kennt `zuAk` erst im Folge-PR (docs/wissen/datensatz.md), die Zeile blieb deshalb unerklärt. Nie mehr erklärt, als die Zeile als „weniger“ meldet.
+ * kennt `zuAk` erst im Folge-PR (docs/wissen/datensatz.md), die Zeile blieb deshalb unerklärt. Nie mehr erklärt, als die Zeile als „weniger“ meldet;
+ * `titelWeg` enthält auch die Titel, die der Bau schon als zusammengelegt abzog (nur deren Anzahl steht in `erklaert`): Sie zählen nicht doppelt.
  */
 export function mitNachtraeglichemZuAk(e: Ereignis, kennungen: number[][]): Ereignis {
   if (e.art !== 'zeile' || !Array.isArray(e.zeile.titelWeg)) return e
   const rest = e.auffaellig.findIndex((a) => /^\d+ Titel weniger$/.test(a))
   if (rest < 0) return e
-  const ids = jetztUmgeleitet(e.zeile.titelWeg as number[], kennungen).slice(0, parseInt(e.auffaellig[rest], 10))
+  const schonErklaert = e.erklaert.reduce((n, t) => n + parseInt(/^(\d+) Titel zusammengelegt \(zuAk\)/.exec(t)?.[1] ?? '0', 10), 0)
+  const umgeleitet = jetztUmgeleitet(e.zeile.titelWeg as number[], kennungen)
+  const ids = umgeleitet.slice(0, Math.max(0, Math.min(parseInt(e.auffaellig[rest], 10), umgeleitet.length - schonErklaert)))
   if (!ids.length) return e
   const bleibt = parseInt(e.auffaellig[rest], 10) - ids.length
   const auffaellig = e.auffaellig.filter((_, i) => i !== rest)

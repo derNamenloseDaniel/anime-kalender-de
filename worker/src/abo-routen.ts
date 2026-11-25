@@ -7,21 +7,39 @@ import { confirmMail, restoreMail, page } from './templates.ts'
 import { sendeUndZaehle } from './mail-zaehler.ts'
 import { fehlerLog } from './werte.ts'
 
+type AnmeldeNutzlast = { email?: string; frequency?: string; platforms?: string[]; favorites?: number[]; ak?: number }
+type Anmeldung = { email: string; frequency: 'daily' | 'weekly'; platforms: string; favorites: ReturnType<typeof schreibeFavoriten> }
+
 export async function handleSubscribe(request: Request, env: Env): Promise<Response> {
-  let payload: { email?: string; frequency?: string; platforms?: string[]; favorites?: number[]; ak?: number }
+  let payload: AnmeldeNutzlast
   try {
     payload = await request.json()
   } catch {
     return json(env, { error: 'Ungültige Anfrage.' }, 400)
   }
 
+  const anmeldung = leseAnmeldung(payload)
+  const { email } = anmeldung
+
+  if (!EMAIL_RE.test(email)) return json(env, { error: 'Diese E-Mail-Adresse sieht nicht gültig aus.' }, 400)
+
+  const { confirmToken, aenderungAmAktiven } = await speichereAnmeldung(request, env, anmeldung)
+  return sendeBestaetigung(request, env, email, confirmToken, aenderungAmAktiven)
+}
+
+function leseAnmeldung(payload: AnmeldeNutzlast): Anmeldung {
   const email = (payload.email ?? '').trim().toLowerCase()
   const frequency = payload.frequency === 'daily' ? 'daily' : 'weekly'
   const platforms = (payload.platforms ?? []).filter((p) => /^[a-z]+$/.test(p)).join(',')
   const favorites = schreibeFavoriten(payload.favorites, payload.ak)
+  return { email, frequency, platforms, favorites }
+}
 
-  if (!EMAIL_RE.test(email)) return json(env, { error: 'Diese E-Mail-Adresse sieht nicht gültig aus.' }, 400)
-
+async function speichereAnmeldung(
+  request: Request,
+  env: Env,
+  { email, frequency, platforms, favorites }: Anmeldung,
+): Promise<{ confirmToken: string; aenderungAmAktiven: boolean }> {
   const confirmToken = crypto.randomUUID()
   const unsubToken = crypto.randomUUID()
   const prefToken = crypto.randomUUID()
@@ -92,7 +110,16 @@ export async function handleSubscribe(request: Request, env: Env): Promise<Respo
       )
       .run()
   }
+  return { confirmToken, aenderungAmAktiven }
+}
 
+async function sendeBestaetigung(
+  request: Request,
+  env: Env,
+  email: string,
+  confirmToken: string,
+  aenderungAmAktiven: boolean,
+): Promise<Response> {
   const confirmUrl = `${baseUrl(request)}/confirm?token=${confirmToken}`
   const mail = confirmMail(confirmUrl, aenderungAmAktiven)
   try {

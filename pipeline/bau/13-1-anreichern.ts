@@ -78,6 +78,18 @@ export function schreibeSynopsenUndReichereAn({ allTitles, releases, kanalJeAdre
 
   setzeJoynFenster(allTitles, releases)
   let gerichtet = richtePrimeWege(allTitles, kanalJeAdresse)
+  const amazon = richteAmazonWege(allTitles)
+  gerichtet += amazon.gerichtet
+  const kanalBenannt = amazon.kanalBenannt
+  if (kanalBenannt) log(`${kanalBenannt} Kanal-Wege mit Amazon-Adresse als „Amazon Prime (Kanal)" benannt`)
+  gerichtet += richteTerminAdressen(releases, allTitles)
+  if (gerichtet) log(`${gerichtet} Prime-Verweise auf die Video-Adresse gerichtet`)
+  return { trenneQuelle, synopses, annKennungen, trailer }
+}
+
+/** Amazon-Wege der Titel richten und benennen; zählt gerichtete Adressen und benannte Kanäle. */
+function richteAmazonWege(allTitles: Title[]): { gerichtet: number; kanalBenannt: number } {
+  let gerichtet = 0
   let kanalBenannt = 0
   for (const t of allTitles) {
     /*
@@ -108,8 +120,5 @@ export function schreibeSynopsenUndReichereAn({ allTitles, releases, kanalJeAdre
       kanalBenannt++
     }
   }
-  if (kanalBenannt) log(`${kanalBenannt} Kanal-Wege mit Amazon-Adresse als „Amazon Prime (Kanal)" benannt`)
-  gerichtet += richteTerminAdressen(releases, allTitles)
-  if (gerichtet) log(`${gerichtet} Prime-Verweise auf die Video-Adresse gerichtet`)
-  return { trenneQuelle, synopses, annKennungen, trailer }
+  return { gerichtet, kanalBenannt }
 }

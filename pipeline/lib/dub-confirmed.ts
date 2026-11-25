@@ -161,6 +161,61 @@ export function handJaSchluessel(checks: DubCheck[]): Set<string> {
   return new Set(checks.filter((c) => c.dub === true && !c.kanalOhneBeleg).map((c) => `${c.anilistId}|${c.platform}`))
 }
 
+/**
+ * **Eine Lücke aus einer Kanal-Meldung ist ein Nein aus einem Kanal — und das
+ * belegt nichts** (17.09.2026).
+ *
+ * `fetch-pruefungen.ts` lässt eine Kanal-Meldung ohne jedes Deutsch aus, eine
+ * gemischte schreibt es mit allen Bereichen. Auf Prime-Seiten über den
+ * Crunchyroll-Kanal entstanden so Zickzack-Belege: Mob Psycho 100 III „ohne
+ * Deutsch 1, 6, 8, 10", One Punch Man „4, 9", Haikyu!! „18–19, 21, 24–25",
+ * während Crunchyroll und Netflix dieselben Staffeln vollständig deutsch
+ * führen. Gemessen: 10 Belege mit Lücken zwischen deutschen Folgen, 8 davon
+ * Kanal-Titel. Die Lücken fallen hier weg; die Folgen gelten als nicht
+ * erfasst, das Ja bleibt. Die Rohmeldung steht unverändert in der Datei.
+ */
+function ohneKanalLuecken(eintrag: DubCheck): DubCheck {
+  const kanalMitLuecken =
+    /Kanal-Titel/.test(eintrag?.note ?? '') &&
+    Boolean(eintrag?.dubRanges?.some((r) => r.dub)) &&
+    Boolean(eintrag?.dubRanges?.some((r) => !r.dub))
+  const item = kanalMitLuecken ? { ...eintrag, dubRanges: eintrag.dubRanges!.filter((r) => r.dub) } : eintrag
+  return item
+}
+
+/**
+ * Ein halb ausgefüllter Eintrag ist gefährlicher als keiner: Er nimmt den
+ * Verweis aus der Prüfliste, ohne etwas zu belegen. Deshalb hier laut
+ * meckern statt still überspringen.
+ *
+ * **Ein Eintrag, der nur eine Adresse trägt, ist aber nicht halb** — er
+ * beantwortet eine andere Frage: *wo* die Staffel läuft, nicht *ob* sie
+ * deutschen Ton hat. Bei My Hero Academia meldete Netflix seine sieben
+ * Staffeln samt Längen, unser Datensatz kannte für fünf davon keinen
+ * Verweis (22.08.2026). Diese fünf Adressen zu verwerfen, weil niemand die
+ * Tonspur geprüft hat, hätte die Auskunft weggeworfen, die tatsächlich
+ * vorlag. Die Synchro bleibt dann schlicht ungeprüft — wie vorher.
+ */
+function eintragGenuegt(item: DubCheck): boolean {
+  const traegtEtwas =
+    typeof item?.dub === 'boolean' || item?.available === false || Boolean(item?.url)
+  if (!item?.anilistId || !traegtEtwas) {
+    warn(
+      `dub-confirmed.yaml: Eintrag braucht dub: true/false, available: false oder eine url — übersprungen (${JSON.stringify(item)})`,
+    )
+    return false
+  }
+  if (!(item.platform in PLATFORMS)) {
+    warn(`dub-confirmed.yaml: unbekannte Plattform "${item.platform}" bei ${item.anilistId}`)
+    return false
+  }
+  if (!item.checkedAt) {
+    warn(`dub-confirmed.yaml: ${item.anilistId}/${item.platform} ohne checkedAt`)
+    return false
+  }
+  return true
+}
+
 export function ladeHandbelege(): DubCheck[] {
   if (!existsSync(DATEI)) return []
   const raw = yaml.load(readFileSync(DATEI, 'utf8'))
@@ -169,53 +224,8 @@ export function ladeHandbelege(): DubCheck[] {
   // Schlüssel (Titel, Plattform, Adresskern) → Platz in `out`; ein Suchlauf je Eintrag war quadratisch.
   const stelle = new Map<string, number>()
   for (const eintrag of (raw as DubCheck[]).filter((e) => !istEinzelneBrowserTotmeldung(e)).map(ohneKanalSprache)) {
-    /**
-     * **Eine Lücke aus einer Kanal-Meldung ist ein Nein aus einem Kanal — und das
-     * belegt nichts** (17.09.2026).
-     *
-     * `fetch-pruefungen.ts` lässt eine Kanal-Meldung ohne jedes Deutsch aus, eine
-     * gemischte schreibt es mit allen Bereichen. Auf Prime-Seiten über den
-     * Crunchyroll-Kanal entstanden so Zickzack-Belege: Mob Psycho 100 III „ohne
-     * Deutsch 1, 6, 8, 10", One Punch Man „4, 9", Haikyu!! „18–19, 21, 24–25",
-     * während Crunchyroll und Netflix dieselben Staffeln vollständig deutsch
-     * führen. Gemessen: 10 Belege mit Lücken zwischen deutschen Folgen, 8 davon
-     * Kanal-Titel. Die Lücken fallen hier weg; die Folgen gelten als nicht
-     * erfasst, das Ja bleibt. Die Rohmeldung steht unverändert in der Datei.
-     */
-    const kanalMitLuecken =
-      /Kanal-Titel/.test(eintrag?.note ?? '') &&
-      Boolean(eintrag?.dubRanges?.some((r) => r.dub)) &&
-      Boolean(eintrag?.dubRanges?.some((r) => !r.dub))
-    const item = kanalMitLuecken ? { ...eintrag, dubRanges: eintrag.dubRanges!.filter((r) => r.dub) } : eintrag
-    /**
-     * Ein halb ausgefüllter Eintrag ist gefährlicher als keiner: Er nimmt den
-     * Verweis aus der Prüfliste, ohne etwas zu belegen. Deshalb hier laut
-     * meckern statt still überspringen.
-     *
-     * **Ein Eintrag, der nur eine Adresse trägt, ist aber nicht halb** — er
-     * beantwortet eine andere Frage: *wo* die Staffel läuft, nicht *ob* sie
-     * deutschen Ton hat. Bei My Hero Academia meldete Netflix seine sieben
-     * Staffeln samt Längen, unser Datensatz kannte für fünf davon keinen
-     * Verweis (22.08.2026). Diese fünf Adressen zu verwerfen, weil niemand die
-     * Tonspur geprüft hat, hätte die Auskunft weggeworfen, die tatsächlich
-     * vorlag. Die Synchro bleibt dann schlicht ungeprüft — wie vorher.
-     */
-    const traegtEtwas =
-      typeof item?.dub === 'boolean' || item?.available === false || Boolean(item?.url)
-    if (!item?.anilistId || !traegtEtwas) {
-      warn(
-        `dub-confirmed.yaml: Eintrag braucht dub: true/false, available: false oder eine url — übersprungen (${JSON.stringify(item)})`,
-      )
-      continue
-    }
-    if (!(item.platform in PLATFORMS)) {
-      warn(`dub-confirmed.yaml: unbekannte Plattform "${item.platform}" bei ${item.anilistId}`)
-      continue
-    }
-    if (!item.checkedAt) {
-      warn(`dub-confirmed.yaml: ${item.anilistId}/${item.platform} ohne checkedAt`)
-      continue
-    }
+    const item = ohneKanalLuecken(eintrag)
+    if (!eintragGenuegt(item)) continue
     /**
      * **Zwei Ausgaben sind zwei Belege — verschmolzen wird nur, was dieselbe
      * Adresse meint.**

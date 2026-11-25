@@ -1,18 +1,18 @@
 {
-  "stand": "2026-11-24",
+  "stand": "2026-11-25",
   "deckung": {
-    "titel": 20716,
-    "mitSeite": 16343,
+    "titel": 20717,
+    "mitSeite": 16346,
     "ohneSeite": 8,
-    "ohneAnisearchKennung": 3093,
+    "ohneAnisearchKennung": 3091,
     "ohneReferenz": 1272,
-    "seitenImArchiv": 17547,
-    "kanten": 18610
+    "seitenImArchiv": 17550,
+    "kanten": 18616
   },
   "gesamt": {
-    "titel": 16343,
-    "gleich": 14003,
-    "fehlen": 901,
+    "titel": 16346,
+    "gleich": 14005,
+    "fehlen": 902,
     "zusaetzlich": 1322,
     "gemischt": 117
   },
@@ -24,16 +24,16 @@
     "gemischt": 16
   },
   "haelfteA": {
-    "titel": 7471,
-    "gleich": 6340,
+    "titel": 7470,
+    "gleich": 6339,
     "fehlen": 314,
     "zusaetzlich": 707,
     "gemischt": 110
   },
   "haelfteB": {
-    "titel": 8872,
-    "gleich": 7663,
-    "fehlen": 587,
+    "titel": 8876,
+    "gleich": 7666,
+    "fehlen": 588,
     "zusaetzlich": 615,
     "gemischt": 7
   },
@@ -126,7 +126,7 @@
       {
         "id": 21355,
         "name": "Re:Zero kara Hajimeru Isekai Seikatsu",
-        "titel": 14,
+        "titel": 15,
         "referenz": 1,
         "anisearch": 2
       },

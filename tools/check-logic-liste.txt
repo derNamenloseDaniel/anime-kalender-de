@@ -415,6 +415,7 @@ pipeline/check-kanal-start.ts
 pipeline/check-kanal-verlust.ts
 pipeline/check-kapitel-katalog.ts
 pipeline/check-kapitel-shop-wege.ts
+pipeline/check-kasten-hinweis.ts
 pipeline/check-katalog-eingefroren.ts
 pipeline/check-katalog-release.ts
 pipeline/check-katalogstart-kasten.ts
@@ -589,6 +590,7 @@ pipeline/check-quittung-sperre.ts
 pipeline/check-reihen-doppelt.ts
 pipeline/check-reihen-namen-rein.ts
 pipeline/check-reihen-namen.ts
+pipeline/check-reihen-reiter.ts
 pipeline/check-reihen-spur-hook.ts
 pipeline/check-reihen-spur.ts
 pipeline/check-reihen-teilname.ts
@@ -775,6 +777,7 @@ pipeline/check-weg-adresse-bezugsweg.ts
 pipeline/check-weg-aus-meldung.ts
 pipeline/check-weg-massenabgang.ts
 pipeline/check-weg-nein-gti.ts
+pipeline/check-weg-unten.ts
 pipeline/check-weg-widerspruch.ts
 pipeline/check-wege-aus-terminen.ts
 pipeline/check-wege-je-anbieter.ts
@@ -836,6 +839,7 @@ tools/link-anisearch-amazon.test.ts
 tools/link-check-ende.test.ts
 tools/link-check-zeitbudget.test.ts
 tools/link-faelligkeit.test.ts
+tools/mockup-freigabe-pflicht.mjs
 tools/quarantaene-pruefungen.test.ts
 tools/quellen-gesundheit.test.ts
 tools/quellen-leer.test.ts

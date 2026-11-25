@@ -9,7 +9,7 @@ Antworten steht in [07-alle-anbieter.md](07-alle-anbieter.md).
 
 | # | Datum | Reihe | Noch zu bestätigen |
 |---|---|---|---|
-| 1 | 2026-10-10 | Demon Slayer: Kimetsu no Yaiba | [Mugen Train Arc](https://www.amazon.de/gp/video/detail/B0HLPQXSLK) · [Entertainment District Arc](https://www.amazon.de/gp/video/detail/B0D65Q2GCW) |
+| 1 | 2026-10-10 | Demon Slayer: Kimetsu no Yaiba | [Mugen Train Arc](https://www.amazon.de/gp/video/detail/0L0IXLQ35R1J37OAX7TA6WDPFW) · [Entertainment District Arc](https://www.amazon.de/gp/video/detail/B0D65Q2GCW) |
 | 2 | 2026-01-01 | There’s No Freaking Way I’ll Be Your Lover! Unless… | [Episoden 13-17](https://www.amazon.de/gp/video/detail/B0F5HDQBTM) |
 | 3 | 2020-06-26 | Titipo: Der kleine Zug | [Titipo Titipo 2](https://www.amazon.de/gp/video/detail/B0FVF9T7ZP) |
 | 4 | 2019-01-04 | Made in Abyss | [Die Reise beginnt](https://watch.amazon.de/detail?gti=amzn1.dv.gti.39d00227-3d19-4bc7-9759-57c324715cb3) |

@@ -219,6 +219,7 @@ pipeline/check-disc-geschwister.ts
 pipeline/check-disc-haendler-weg.ts
 pipeline/check-disc-handlinks.ts
 pipeline/check-disc-kaufweg-auto.ts
+pipeline/check-disc-nachlese.ts
 pipeline/check-disc-reine-titel.ts
 pipeline/check-disc-suchlinks.ts
 pipeline/check-disc-teil-hinweis.ts
@@ -700,6 +701,7 @@ pipeline/check-termine-observed-lauf.ts
 pipeline/check-termine-uebersicht.ts
 pipeline/check-termine-woche-lauf.ts
 pipeline/check-titel-namen.ts
+pipeline/check-titel-termin-frist.ts
 pipeline/check-titel-vor-eintrag.ts
 pipeline/check-titel-vorschau.ts
 pipeline/check-titelwechsel.ts

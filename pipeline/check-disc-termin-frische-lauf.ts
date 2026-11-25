@@ -43,6 +43,7 @@ try {
     console.error(`FEHLER ${text} (Exit ${l.status}, erwartet ${soll})\n${l.aus.slice(-600)}`)
   }
   pruefe('genau eine Seite (Titel 1, künftige Ausgabe)', lauf(['--limit', '5'], ausgaben), /aniSearch: 1 Seiten werden geholt/)
+  pruefe('Katalogtitel ohne Eintrag (künftige Ausgabe) wird nachgelesen', lauf(['--limit', '5'], { 10000704: ausgaben[1] }), /aniSearch: 1 Seiten werden geholt/)
   pruefe('ohne disc-ausgaben.json läuft der Lauf weiter, nichts fällig', lauf(['--limit', '5'], null), /nichts nachzuladen/)
   pruefe('force holt alle drei, limit schneidet auf zwei', lauf(['--force', '--limit', '2'], ausgaben), /aniSearch: 2 Seiten werden geholt/)
 } finally {

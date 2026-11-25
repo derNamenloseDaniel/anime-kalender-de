@@ -36,6 +36,7 @@ import { recordSource } from './lib/health.ts'
 import { ARCHIV_DIR, baueWarteschlange } from './lib/anisearch-warteschlange.ts'
 import { archivLuecken, verbinde, zurueckgestellt, type Auftrag, type WegListe, type Zeile } from './lib/anisearch-archiv-vorrang.ts'
 import { discFaellig, discTitelMitTermin } from './lib/disc-termin-frische.ts'
+import { discNachlese } from './lib/disc-nachlese.ts'
 import { todayIso } from '../shared/time.ts'
 import { nachFehlern } from './lib/anisearch-sperre.ts'
 import { decode, extractDescription } from './lib/anisearch-handlung.ts'
@@ -668,6 +669,7 @@ async function main(): Promise<void> {
   const bisher = baueWarteschlange({ ids: ids.anisearch, titles, releases, cache, force: FORCE, limit: LIMIT, veraltet, discFaellig: discFaellig(discTitel, todayIso()) })
   const queue = verbinde(
     vorher.haupt,
+    discNachlese(discTitel, cache, ids.anisearch).auftraege,
     bisher.map((t) => ({ asId: ids.anisearch[t.id]!, titelIds: [t.id] })),
     args.includes('--katalog') ? vorher.katalog : [],
   )

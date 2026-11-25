@@ -256,8 +256,9 @@ async function sammleSerienliste(): Promise<Map<number, AdnListenEintrag>> {
   return nachId
 }
 
-export async function fetchCatalog(): Promise<{ shows: AdnShow[]; auskunft: KatalogAuskunft }> {
-  const nachId = await sammleSerienliste()
+type FruehereSerie = { id: number; title: string; originalTitle?: string; age?: string }
+
+function sammleFruehere(nachId: Map<number, AdnListenEintrag>): Map<number, FruehereSerie> {
   /**
    * Was wir schon einmal gesehen haben, wird wieder gefragt.
    *
@@ -283,7 +284,7 @@ export async function fetchCatalog(): Promise<{ shows: AdnShow[]; auskunft: Kata
    * ADN eine Serie aus dem Angebot — weil eine Lizenz ausläuft —, liefert der
    * Abruf kein `vde` mehr, und sie fällt heraus.
    */
-  const zusaetzlich = new Map<number, { id: number; title: string; originalTitle?: string; age?: string }>()
+  const zusaetzlich = new Map<number, FruehereSerie>()
   for (const s of readJson<AdnData>('data/adn-catalog.json', { scrapedAt: '', window: { from: '', to: '' }, shows: [] }).shows) {
     if (!nachId.has(s.showId)) zusaetzlich.set(s.showId, { id: s.showId, title: s.title, originalTitle: s.originalTitle, age: s.age })
   }
@@ -296,6 +297,12 @@ export async function fetchCatalog(): Promise<{ shows: AdnShow[]; auskunft: Kata
       if (kopf) zusaetzlich.set(id, kopf)
     }
   }
+  return zusaetzlich
+}
+
+export async function fetchCatalog(): Promise<{ shows: AdnShow[]; auskunft: KatalogAuskunft }> {
+  const nachId = await sammleSerienliste()
+  const zusaetzlich = sammleFruehere(nachId)
 
   /**
    * **Die ältesten zuerst, und nur so viele wie erlaubt.**

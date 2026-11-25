@@ -1,8 +1,8 @@
 {
   "stand": "2026-11-25",
   "deckung": {
-    "titel": 20717,
-    "mitSeite": 16346,
+    "titel": 20714,
+    "mitSeite": 16343,
     "ohneSeite": 8,
     "ohneAnisearchKennung": 3091,
     "ohneReferenz": 1272,
@@ -10,29 +10,29 @@
     "kanten": 18616
   },
   "gesamt": {
-    "titel": 16346,
-    "gleich": 14005,
+    "titel": 16343,
+    "gleich": 14003,
     "fehlen": 902,
-    "zusaetzlich": 1322,
+    "zusaetzlich": 1321,
     "gemischt": 117
   },
   "hauptbestand": {
-    "titel": 2877,
-    "gleich": 2290,
+    "titel": 2874,
+    "gleich": 2288,
     "fehlen": 327,
-    "zusaetzlich": 244,
+    "zusaetzlich": 243,
     "gemischt": 16
   },
   "haelfteA": {
-    "titel": 7470,
-    "gleich": 6339,
+    "titel": 7468,
+    "gleich": 6338,
     "fehlen": 314,
-    "zusaetzlich": 707,
+    "zusaetzlich": 706,
     "gemischt": 110
   },
   "haelfteB": {
-    "titel": 8876,
-    "gleich": 7666,
+    "titel": 8875,
+    "gleich": 7665,
     "fehlen": 588,
     "zusaetzlich": 615,
     "gemischt": 7
@@ -198,7 +198,7 @@
       {
         "id": 1412,
         "name": "Lupin III",
-        "titel": 60,
+        "titel": 59,
         "referenz": 3,
         "anisearch": 1
       },

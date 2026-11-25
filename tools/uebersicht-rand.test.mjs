@@ -139,6 +139,7 @@ assert.deepEqual(eintraege(m, 'inArbeit')[0], {
   labels: ['lokal', 'nacht'],
   labelQuellen: ['PR 900001: orchester', 'PR 900001: Abnahme Dirigent', 'PR 900002: ohne orchester'],
   prs: [900001, 900002],
+  genannt: [900001, 900002],
   links: [{ text: 'PR 900002', href: 'https://github.com/o/r/pull/900002' }],
   alter: { art: 'seit', tage: 5, rot: true },
   grund: null,
@@ -350,6 +351,17 @@ assert.deepEqual(kandidat(`- **Zwei** ${KZ}: PR 900109 gemergt, PR 900111 gemerg
 assert.deepEqual(baueModell(`## Als Nächstes\n- **Zwei** ${KZ}: PR 900109 gemergt, PR 900111 gemergt`, JETZT, { prDaten: { ...alleGemergt, 900111: PR([], { offen: true, gemergt: false }) } }).streichkandidaten, [], 'ein genannter PR noch offen')
 assert.deepEqual(baueModell(`## Als Nächstes\n- **Fremd** ${KZ}: PR 900109 gemergt`, JETZT, { prDaten: { 900109: { typ: 'Issue', labels: [], gemergt: true } } }).streichkandidaten, [], 'Nummer ist kein PR')
 assert.deepEqual(baueModell(`## Daniel-Todo\n### Später\n- **Fertig** PR 900109 gemergt`, JETZT, { prDaten: alleGemergt }).streichkandidaten, [], 'nur In Arbeit und Als Nächstes')
+
+// Runde 2: jeder in der Zeile genannte PR muss gemergt sein (offen, Entwurf, unbekannt, auch ohne Wort im Satz)
+const mitOffen = (zeile, offen = PR([], { offen: true, gemergt: false })) => baueModell(`## Als Nächstes\n- **Z** ${KZ}: ${zeile}`, JETZT, { prDaten: { 900109: PR([]), 900110: offen } }).streichkandidaten.map((e) => e.titel)
+assert.deepEqual(mitOffen('PR 900109 gemergt, PR 900110 eingereicht'), [], 'gemergt plus eingereicht (noch offen)')
+assert.deepEqual(mitOffen('PR 900109 gemergt, PR 900110 eingereicht', PR([], { offen: false, gemergt: false })), [], 'Entwurf oder geschlossen ist nicht gemergt')
+assert.deepEqual(mitOffen('PR 900109 gemergt, PR 900111 eingereicht'), [], 'unbekannter PR (nicht abrufbar)')
+assert.deepEqual(mitOffen('PR 900109 gemergt, die mobile Variante kommt mit PR 900110'), [], 'PR ohne Wort im Satz, noch offen')
+assert.deepEqual(mitOffen('PR 900109 gemergt, die mobile Variante kommt mit PR 900110', PR([])), ['Z'], 'Kontrolle: derselbe Satz, PR gemergt')
+// Grenze (bewusst nicht per Wortliste gelöst): ein gemergter PR und ein offener Rest nur im Text, ohne offenes Wort, bleibt Kandidat
+assert.deepEqual(mitOffen('PR 900109 gemergt, der Bau der übrigen Titel fehlt'), ['Z'], 'Grenze: „fehlt“ ohne offenes Stichwort wird nicht erkannt')
+assert.deepEqual(mitOffen('PR 900109 gemergt, Wirkung an echten Läufen unbekannt'), ['Z'], 'Grenze: „unbekannt“ ohne offenes Stichwort wird nicht erkannt')
 
 // A2 Labels: nur PRs, die die Zeile als Lieferung oder laufend nennt; Historie zählt nicht (Mängelregister-Fall)
 const historie = Array.from({ length: 30 }, (_, i) => `PR ${900300 + i}`).join(', ')

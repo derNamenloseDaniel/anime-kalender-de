@@ -4,7 +4,7 @@
  * Beide Ausgaben (Markdown, HTML) lesen dieses eine Modell.
  */
 import { auswerten, rangliste } from '../.claude/mods/arbeitsliste/hooks/stand-kennzeichen.mjs'
-import { alterVon, blockiertGrund, istStreichkandidat, labelsVon, markenVon, prBelege, themaVon } from './uebersicht-regeln.mjs'
+import { alterVon, blockiertGrund, istStreichkandidat, labelsVon, markenVon, prBelege, prGenannt, themaVon } from './uebersicht-regeln.mjs'
 import { bereinigt, leseStand, linksVon } from './uebersicht-stand.mjs'
 
 export const ZIELE = ['Daten', 'Autonomie', 'Code', 'Live5', '-']
@@ -34,6 +34,7 @@ function eintragVon(e, ctx) {
   const texte = [e.kopf, ...e.notizen]
   const kopfText = bereinigt(e.kopf)
   const { beleg: nummern, geliefert } = prBelege(texte)
+  const genannt = prGenannt(texte)
   const marken = markenVon(texte)
   const { labels, quellen } = labelsVon(nummern, marken, ctx.prDaten)
   const rang = ctx.rang.get(e)
@@ -51,12 +52,13 @@ function eintragVon(e, ctx) {
     labels,
     labelQuellen: quellen,
     prs: nummern,
+    genannt,
     links: linksVon(texte).slice(0, 8),
     alter: alterVon(e, ctx.jetzt),
     grund: blockiertGrund(e, kopfText),
     thema: themaVon(e.titel),
     naechster: ctx.naechsterNr === e.nr,
-    streichen: istStreichkandidat(e.abschnitt, [kopfText, ...e.notizen], geliefert, ctx.prDaten, blockiertGrund(e, kopfText)),
+    streichen: istStreichkandidat(e.abschnitt, [kopfText, ...e.notizen], geliefert, genannt, ctx.prDaten, blockiertGrund(e, kopfText)),
     sortier: rang ?? 1000 + (ICON_RANG[e.icon] ?? 5),
   }
 }

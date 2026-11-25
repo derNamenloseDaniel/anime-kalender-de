@@ -65,7 +65,7 @@ export function holeGh(nummern, ausfuehren, cache, jetzt, warne, ende, uhr) {
 /** `{markdown, html}` aus dem Text; `ausfuehren` null = ohne gh; `uhr` und `fristMs` für die Gesamtfrist der gh-Abrufe. */
 export function erzeuge(text, jetzt, ausfuehren, cache, warne, uhr = Date.now, fristMs = GESAMT_FRIST_MS) {
   const erst = baueModell(text, jetzt, null)
-  const nummern = [...new Set(erst.abschnitte.flatMap((a) => a.gruppen.flatMap((g) => g.themen.flatMap((t) => t.eintraege.flatMap((e) => e.prs)))))]
+  const nummern = [...new Set(erst.abschnitte.flatMap((a) => a.gruppen.flatMap((g) => g.themen.flatMap((t) => t.eintraege.flatMap((e) => [...e.prs, ...e.genannt])))))]
   const geholt = ausfuehren ? holeGh(nummern, ausfuehren, cache, jetzt, warne, uhr() + fristMs, uhr) : null
   const gh = geholt?.frist ? null : geholt
   const modell = gh ? baueModell(text, jetzt, gh) : erst

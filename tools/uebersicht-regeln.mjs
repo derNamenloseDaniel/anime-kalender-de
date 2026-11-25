@@ -117,6 +117,13 @@ function ohneAuszeichnung(t) {
   return t.replace(/\[([^\]]*)\]\((?:https?|file):[^)]*\)/g, (_, x) => x).replace(/\{[^}]*\}/g, ' ')
 }
 
+/** Alle PR-Nummern, die die Zeile irgendwie nennt (auch Herkunft, Ursache, „kommt mit PR N“), dreistellig und länger, ohne Doppelte. */
+export function prGenannt(texte) {
+  const aus = new Set()
+  for (const roh of texte) for (const m of ohneAuszeichnung(roh).matchAll(/\bPRs?\s+#?(\d{3,6})\b/g)) aus.add(+m[1])
+  return [...aus]
+}
+
 /**
  * PR-Nummern, die die Zeile ausdrücklich nennt: `beleg` = im Satz dahinter (höchstens 70 Zeichen, bis zum nächsten PR oder
  * Satzende) oder direkt davor „gemergt“, „eingereicht“, „läuft“ oder „Prüfer“; `geliefert` = „gemergt“. Herkunfts-, Ursachen-,
@@ -182,13 +189,14 @@ const TEILE = /\([a-e]\)[\s\S]*\([a-e]\)/
 
 /**
  * Streichkandidat: Zeile aus In Arbeit/Als Nächstes, die mindestens einen PR ausdrücklich als gemergt nennt (`geliefert`),
- * alle diese PRs sind laut GitHub gemergt, der Text (Kopf ohne Kennzeichen, Notizen) hat keinen offenen Satz (`OFFEN`)
+ * alle in der Zeile genannten PRs sind laut GitHub gemergt, der Text (Kopf ohne Kennzeichen, Notizen) hat keinen offenen Satz (`OFFEN`)
  * und die Zeile hat keinen Wartegrund. Ein PR ohne „gemergt“ im Satz (Herkunft, Ursache, Messung, Vorschlag) zählt nicht.
  * Die Zeile bleibt in ihrem Abschnitt; die Liste ist nur ein Hinweis.
  */
-export function istStreichkandidat(herkunft, texte, geliefert, prDaten, grund) {
+export function istStreichkandidat(herkunft, texte, geliefert, genannt, prDaten, grund) {
   if (grund || (herkunft !== 'inArbeit' && herkunft !== 'naechstes')) return false
-  if (!geliefert.length || geliefert.some((n) => prDaten[n]?.typ !== 'PullRequest' || !prDaten[n].gemergt)) return false
+  // Jeder in der Zeile genannte PR (auch „kommt mit PR N“) muss gemergt sein: offen, Entwurf oder unbekannt heißt nicht erledigt.
+  if (!geliefert.length || [...new Set([...geliefert, ...genannt])].some((n) => prDaten[n]?.typ !== 'PullRequest' || !prDaten[n].gemergt)) return false
   return offenesWort(texte) === null
 }
 

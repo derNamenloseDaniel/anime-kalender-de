@@ -9253,11 +9253,17 @@
   ],
   "auto-141391-netflix": [
     {
+      "url": "https://www.justwatch.com/de/Serie/Call-of-the-Night",
+      "name": "justwatch.com",
+      "gesehenAm": "2026-11-25",
+      "stand": "aktuell"
+    },
+    {
       "url": "https://www.anime2you.de/news/1073645/call-of-the-night-bald-auf-netflix/",
       "name": "anime2you.de",
       "gesehenAm": "2026-11-19",
-      "sagt": "2026-11-25",
-      "stand": "aktuell"
+      "stand": "aktuell",
+      "sagt": "2026-11-25"
     }
   ],
   "pokemon-horizonte-s4-rtlplus": [

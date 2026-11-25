@@ -1865,6 +1865,10 @@
       "am": "2026-11-18",
       "vorschlaege": 0
     },
+    "1072379": {
+      "am": "2026-11-25",
+      "vorschlaege": 1
+    },
     "1072410": {
       "am": "2026-11-17",
       "vorschlaege": 2
@@ -2288,6 +2292,23 @@
       "am": "2026-11-25",
       "vorschlaege": 0,
       "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075748": {
+      "am": "2026-11-25",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075784": {
+      "am": "2026-11-25",
+      "vorschlaege": 1
+    },
+    "1075834": {
+      "am": "2026-11-25",
+      "vorschlaege": 0
+    },
+    "1075866": {
+      "am": "2026-11-25",
+      "vorschlaege": 2
     },
     "1076014": {
       "am": "2026-11-25",
@@ -17376,6 +17397,92 @@
       "artikelId": "1076014",
       "artikel": "Nächste »Even the Student Council Has Its Holes!«-Episode verschoben",
       "quelle": "https://www.anime2you.de/news/1076014/even-the-student-council-has-its-holes-episode-9-verschoben/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "One Punch Man",
+      "zitat": "»One Punch Man« – Staffel 1 und 2 Episoden: 24 (komplett) Sprache: Deutsch, Japanisch (UT) Stream: Disney+",
+      "art": "start",
+      "sprache": "deutsch+omu",
+      "plattform": "disneyplus",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Disney+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "24",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1075866",
+      "artikel": "Disney+ nimmt zwei Anime-Neuzugänge ins Programm",
+      "quelle": "https://www.anime2you.de/news/1075866/disney-plus-one-punch-man-ab-sofort/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "Naruto Shippuden",
+      "zitat": "»Naruto Shippuden« – Staffel 4 Episoden: 52 Sprache: Deutsch, Japanisch (UT) Stream: Disney+",
+      "art": "start",
+      "sprache": "deutsch+omu",
+      "plattform": "disneyplus",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Disney+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "52",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1075866",
+      "artikel": "Disney+ nimmt zwei Anime-Neuzugänge ins Programm",
+      "quelle": "https://www.anime2you.de/news/1075866/disney-plus-one-punch-man-ab-sofort/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "Frieren: Beyond Journey's End",
+      "zitat": "Eine dritte Staffel startet im Oktober 2027.",
+      "art": "ankuendigung",
+      "sprache": "unklar",
+      "plattform": null,
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1072379",
+      "artikel": "Sieben neue Plüschanhänger zu »Frieren« vorgestellt",
+      "quelle": "https://www.anime2you.de/news/1072379/sieben-frieren-plueschanhaenger/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "Infinite Stratos",
+      "zitat": "Die beiden Staffeln von »Infinite Stratos« werden am 22. Januar 2027 jeweils als eigene Blu-ray-Komplettbox veröffentlicht. Sowohl die erste als auch die zweite Staffelbox enthält jeweils alle zwölf Episoden sowie eine OVA mit deutscher und japanischer Sprachausgabe.",
+      "art": "disc",
+      "sprache": "deutsch",
+      "plattform": "disc",
+      "datum": "2027-01-22",
+      "uhrzeit": null,
+      "anbieter": "polyband anime",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "zwölf Episoden sowie eine OVA (je Staffel)",
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „polyband anime“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1075784",
+      "artikel": "»Infinite Stratos« erscheint in zwei neuen Blu-ray-Staffelboxen + Design",
+      "quelle": "https://www.anime2you.de/news/1075784/infinite-stratos-neue-blu-ray-staffelboxen/",
       "veroeffentlicht": "2026-11-25",
       "gelesenAm": "2026-11-25"
     }

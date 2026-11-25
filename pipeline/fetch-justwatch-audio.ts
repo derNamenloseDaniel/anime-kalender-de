@@ -39,7 +39,6 @@
  *     npx tsx pipeline/fetch-justwatch-audio.ts [--limit 50] [--alter 20]
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
 import yaml from 'js-yaml'
 import { fetchJson, log, readJson, sleep, warn, writeJson } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
@@ -580,5 +579,5 @@ export function liste(titles: Title[], bestand: Record<string, Befund>): void {
   log(`JustWatch: ${mitAussage} offene Verweise mit Tonspur-Angabe → daniel-zum-abarbeiten/listen/16-justwatch-tonspuren.md`)
 }
 
-/* Nur der Direktstart ruft `main`: Tests (`?nur-laden`) und der Vergleichsrahmen laden das Modul und rufen selbst auf. */
-if (process.argv[1] === fileURLToPath(import.meta.url)) await main()
+/* `?nur-laden` am Import-Pfad: Tests holen `main` und rufen es selbst mit ihrer Welt auf. `AK_NUR_LADEN` gilt für den Vergleichsrahmen (`tools/vergleich-alt-neu.mjs`), der den Pfad nicht ändern kann. */
+if (!import.meta.url.endsWith('?nur-laden') && !process.env.AK_NUR_LADEN) await main()

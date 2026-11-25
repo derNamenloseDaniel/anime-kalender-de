@@ -117,13 +117,16 @@ async function holeToken(): Promise<string> {
   return j.access_token
 }
 
-export async function main(): Promise<void> {
-  const token = await holeToken()
-  const hol = async (u: string): Promise<{ status: number; body: unknown }> => {
+function machHol(token: string): Kontext['hol'] {
+  return async (u: string): Promise<{ status: number; body: unknown }> => {
     const r = await crFetch(u, { headers: { Authorization: `Bearer ${token}`, 'User-Agent': UA } })
     return { status: r.status, body: await r.json().catch(() => null) }
   }
+}
 
+/** Liest Titel, Katalog, aniSearch und JustWatch und baut den Kontext für `beurteile`. */
+function ladeKontext(token: string): Kontext {
+  const hol = machHol(token)
   const roh = readJson<Title[] | Record<string, Title>>('public/data/titles.json', [])
   const titles = (Array.isArray(roh) ? roh : Object.values(roh)) as Title[]
   const katalog =
@@ -155,10 +158,11 @@ export async function main(): Promise<void> {
   const zurHand: Handpruefung[] = []
   const katalogNachSlug = new Map(katalog.filter((e) => e.slug).map((e) => [slugKern(String(e.slug)), e]))
   log(`Katalog: ${katalog.length} Einträge, davon ${katalogNachSlug.size} mit Slug.`)
-  const ctx: Kontext = { hol, titles, katalogNachId, katalogNachSlug, anisearch, justwatch, heuteIso, zurHand }
+  return { hol, titles, katalogNachId, katalogNachSlug, anisearch, justwatch, heuteIso, zurHand }
+}
 
-
-  /* Die offenen Verweise — Adresse, Werk und was wir über das Werk wissen. */
+/* Die offenen Verweise — Adresse, Werk und was wir über das Werk wissen. */
+function sammleOffene(titles: Title[]): { url: string; titel: Title }[] {
   const offen: { url: string; titel: Title }[] = []
   for (const t of titles) {
     if (IDS && !IDS.has(t.id)) continue
@@ -168,11 +172,15 @@ export async function main(): Promise<void> {
       offen.push({ url: s.url, titel: t })
     }
   }
-  log(`${offen.length} Crunchyroll-Verweise ohne Sprachurteil.`)
+  return offen
+}
 
-  const bestand = readJson<Record<string, Befund>>(DATEI, {})
-  const arbeit = LIMIT > 0 ? offen.slice(0, LIMIT) : offen
-
+/** Beurteilt jeden Verweis der Reihe nach (700 ms Pause dazwischen), trägt den Befund in `bestand` ein und zählt die Herkünfte. */
+async function beurteileAlle(
+  ctx: Kontext,
+  arbeit: { url: string; titel: Title }[],
+  bestand: Record<string, Befund>,
+): Promise<Record<Befund['herkunft'], number>> {
   const zaehler = { video: 0, katalog: 0, tot: 0, offen: 0 }
   for (const { url, titel } of arbeit) {
     const befund = await beurteile(ctx, url, titel)
@@ -184,6 +192,18 @@ export async function main(): Promise<void> {
     )
     await sleep(700)
   }
+  return zaehler
+}
+
+export async function main(): Promise<void> {
+  const token = await holeToken()
+  const ctx = ladeKontext(token)
+  const offen = sammleOffene(ctx.titles)
+  log(`${offen.length} Crunchyroll-Verweise ohne Sprachurteil.`)
+
+  const bestand = readJson<Record<string, Befund>>(DATEI, {})
+  const arbeit = LIMIT > 0 ? offen.slice(0, LIMIT) : offen
+  const zaehler = await beurteileAlle(ctx, arbeit, bestand)
 
   log('')
   log(
@@ -196,7 +216,7 @@ export async function main(): Promise<void> {
     return
   }
   writeJson(DATEI, bestand)
-  handpruefungSchreiben('crunchyroll', zurHand, false, heuteIso)
+  handpruefungSchreiben('crunchyroll', ctx.zurHand, false, ctx.heuteIso)
   recordSource('crunchyroll-offene', arbeit.length, undefined, undefined, true)
 }
 

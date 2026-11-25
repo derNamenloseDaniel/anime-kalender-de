@@ -415,6 +415,7 @@ pipeline/check-kanal-start.ts
 pipeline/check-kanal-verlust.ts
 pipeline/check-kapitel-katalog.ts
 pipeline/check-kapitel-shop-wege.ts
+pipeline/check-kasten-hinweis.ts
 pipeline/check-katalog-eingefroren.ts
 pipeline/check-katalog-release.ts
 pipeline/check-katalogstart-kasten.ts

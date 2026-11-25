@@ -31,7 +31,7 @@ erneut_befund() {
   git worktree add --detach --quiet "$dir/pr" FETCH_HEAD >&2 || { rm -rf "$dir"; return 1; }
   if [ -e "$WURZEL/node_modules" ]; then ln -s "$WURZEL/node_modules" "$dir/pr/node_modules"; fi
   if ! git -C "$dir/pr" -c user.name=pruefung -c user.email=pruefung@localhost merge --no-edit --quiet origin/main >&2; then
-    git -C "$dir/pr" merge --abort >&2 || true
+    git -C "$dir/pr" merge --abort >&2
     befund=konflikt
   elif grund="$(cd "$dir/pr" && quellen_pruefen)"; then
     befund=gruen
@@ -40,7 +40,7 @@ erneut_befund() {
     if [ -n "$text" ]; then befund=neu; else befund=gleich; fi
   fi
   rm -f "$dir/pr/node_modules"
-  git worktree remove --force "$dir/pr" >&2 || true
+  git worktree remove --force "$dir/pr" >&2
   rm -rf "$dir"
   printf '%s\n%s\n' "$befund" "$text"
 }
@@ -72,7 +72,7 @@ erneut_pr() {
   if [ "$entscheidung" = freigeben ]; then
     # Erst der Titel (er entscheidet, ob der Merge den PR nimmt), das Label ist eine Zugabe.
     gh pr edit "$nr" --title "$(node "$WURZEL/tools/rote-sammler-erneut.mjs" ohne-marke "$titel")" > /dev/null || { rm -f "$datei"; return 1; }
-    gh pr edit "$nr" --remove-label "$LABEL_ROT" > /dev/null 2>&1 || true
+    gh pr edit "$nr" --remove-label "$LABEL_ROT" > /dev/null 2>&1 || echo "::warning::PR $nr: Label $LABEL_ROT nicht entfernt (Zugabe, der Titel entscheidet)."
     FREIGEGEBEN="${FREIGEGEBEN:+$FREIGEGEBEN }$nr"
   fi
   kommentar_setzen "$nr" "$datei" || { echo "::warning::PR $nr: Hinweis konnte nicht gesetzt werden."; rm -f "$datei"; return 1; }

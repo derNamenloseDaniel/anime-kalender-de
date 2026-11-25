@@ -14,7 +14,7 @@ const skript = join(dirname(fileURLToPath(import.meta.url)), 'quellen-pruefen.sh
 const ordner = mkdtempSync(join(tmpdir(), 'quellen-pruefen-main-'))
 const posix = (p) => p.replace(/\\/g, '/')
 
-const git = (cwd, ...args) => spawnSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { cwd, encoding: 'utf8', windowsHide: true })
+const git = (cwd, ...args) => spawnSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { cwd, encoding: 'utf8', windowsHide: true, timeout: 60_000 })
 
 /** Repo mit (mitMain) oder ohne `origin/main`; liefert den Arbeitsordner. */
 function repo(name, mitMain) {
@@ -31,6 +31,7 @@ function main(cwd, befehl, vorher = '') {
     cwd,
     encoding: 'utf8',
     windowsHide: true,
+    timeout: 120_000,
     env: { ...process.env, QUELLEN_PRUEFBEFEHL: befehl },
   })
   return { status: r.status, out: r.stdout, err: r.stderr }
@@ -84,6 +85,7 @@ try {
       cwd,
       encoding: 'utf8',
       windowsHide: true,
+      timeout: 120_000,
       env: { ...process.env, PATH: `${posix(bin)}:${process.env.PATH}`, FUND: fund, QUELLEN_PRUEFFRIST: frist, QUELLEN_PRUEFBEFEHL: '' },
     })
     assert.equal(r.status, 0, r.stderr)

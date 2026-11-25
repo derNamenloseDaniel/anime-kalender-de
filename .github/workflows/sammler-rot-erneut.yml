@@ -1,0 +1,88 @@
+name: Sammler-PRs neu prüfen
+
+# Marke „[Prüfung rot]“ fällt von selbst (25.11.2026).
+#
+# Ein Sammler-PR, dessen Datenprüfung beim Einreichen rot war, bleibt markiert liegen (`tools/quellen-pr.sh`). War main dabei selbst rot, lag er
+# auch nach der Reparatur noch da: PR 4979 neun Stunden, PR 5013 bis zum Konflikt mit main. Dieser Lauf prüft jeden markierten PR neu, sobald der
+# Bestandsbau wieder grün ist (`tools/rote-sammler-erneut.sh`: PR-Stand mit aktuellem main zusammengeführt, dieselbe Prüfung wie beim Einreichen).
+# Keine neuen Fehler → Marke und Label weg, dann nimmt `claude-daten-merge.yml` den PR mit (mergt, löst Konflikte). Sonst bleibt alles, der Grund im Hinweis wird aktualisiert.
+#
+# Warum ein eigener Workflow statt eines Schritts im Bestandsbau: Der Bau ist auf main ausgecheckt und committet; ein zweiter Checkout samt Prüfung
+# dort verlängerte den kritischen Pfad (Deploy) um Minuten und teilte dessen Rot. Hier kostet der Normalfall (nichts markiert) nur den Suchjob.
+# Nur GITHUB_TOKEN (Kommentar, Titel, Label, Anstoß des Merge-Laufs): Das App-Token, das am Ruleset vorbei mergt, sieht dieser Lauf nie
+# (`tools/app-token-sperre.mjs`); gemergt wird erst im Merge-Lauf.
+
+on:
+  workflow_run:
+    workflows:
+      - 'Bestand — zusammenführen und bauen'
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: sammler-rot-erneut
+  cancel-in-progress: false
+
+jobs:
+  suche:
+    # Nur nach grünem Bestandsbau (main ist dann wieder in Ordnung); von Hand jederzeit.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      nummern: ${{ steps.suche.outputs.nummern }}
+    steps:
+      - id: suche
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Wie `claude-daten-merge.yml`: nur PRs der App aus ihrem Zweig `daten/…`, keine Forks. Nur sie führen Daten ohne Code; fremde PRs prüft die Kette.
+          NUMMERN="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --limit 100 --json number,headRefName,author,isCrossRepository,title \
+            --jq '[.[] | select(.title | startswith("[Prüfung rot]")) | select(.headRefName | startswith("daten/")) | select(.author.login == "app/anime-kalender-daten" and .isCrossRepository == false) | .number] | join(" ")')"
+          echo "nummern=$NUMMERN" >> "$GITHUB_OUTPUT"
+          echo "Markierte Sammler-PRs: ${NUMMERN:-keine}"
+
+  pruefen:
+    needs: suche
+    if: needs.suche.outputs.nummern != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      freigegeben: ${{ steps.erneut.outputs.freigegeben }}
+    steps:
+      # Voller Verlauf: Der Zweig des PR wird lokal mit main zusammengeführt.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Markierte PRs neu prüfen
+        id: erneut
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUMMERN: ${{ needs.suche.outputs.nummern }}
+        run: bash tools/rote-sammler-erneut.sh $NUMMERN
+
+  # Der Merge-Lauf holt Konfliktfreies nach (`nachholen`) und löst Konflikte (`zusammenfuehren`); ein Workflow mit GITHUB_TOKEN löst keine weiteren aus, `workflow_dispatch` schon.
+  merge-anstossen:
+    needs: pruefen
+    if: ${{ !cancelled() && needs.pruefen.outputs.freigegeben != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Daten-Merge anstoßen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run claude-daten-merge.yml --repo "$GITHUB_REPOSITORY" --ref main

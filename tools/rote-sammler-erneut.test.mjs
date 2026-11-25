@@ -41,7 +41,7 @@ pruefe('Marke, Label und Kennung stehen in Skript, Einreicher und Modul gleich',
 const KOPIEN = ['rote-sammler-erneut.sh', 'rote-sammler-erneut.mjs', 'rote-sammler-prs.mjs', 'kind-mit-limit.mjs', 'quellen-pruefen.sh']
 const GIT = ['-c', 'user.name=t', '-c', 'user.email=t@t']
 const git = (cwd, ...args) => {
-  const r = spawnSync('git', [...GIT, ...args], { cwd, encoding: 'utf8', windowsHide: true })
+  const r = spawnSync('git', [...GIT, ...args], { cwd, encoding: 'utf8', windowsHide: true, timeout: 60_000 })
   assert.equal(r.status, 0, `${args.join(' ')}: ${r.stderr}`)
   return r.stdout
 }
@@ -98,6 +98,7 @@ function szenario({ pruefung, titel = `${MARKE} chore(data): Test`, pr = 'v2', m
       cwd: lauf,
       encoding: 'utf8',
       windowsHide: true,
+      timeout: 120_000,
       env: {
         ...process.env,
         PATH: `${posix(bin)}:${process.env.PATH}`,

@@ -25,6 +25,7 @@
  */
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { log, warn, ROOT } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
 import { merkeZumQuittieren, quittiereGemerkte, VORFAELLE_LOESCHEN } from './lib/spaeter-quittieren.ts'
@@ -32,7 +33,6 @@ import { schalterOderAbbruch } from './lib/schalter.ts'
 
 const WORKER = process.env.LAUF_WORKER ?? 'https://newsletter.animekalender.workers.dev'
 const TOKEN = process.env.LAUF_TOKEN ?? ''
-schalterOderAbbruch(['--trocken', '--nur-loeschen'])
 const TROCKEN = process.argv.includes('--trocken')
 
 interface Vorfall {
@@ -62,7 +62,7 @@ const ERKLAERUNG: Record<string, string> = {
     'Ende eines Netflix-Durchgangs: besucht, gemessen, wartet auf Übernahme, übersprungen. Misst er viele besuchte Titel nie, steht es hier.',
 }
 
-async function main(): Promise<void> {
+export async function main(): Promise<void> {
   if (!TOKEN) {
     warn('LAUF_TOKEN fehlt — ohne das Token gibt der Worker die Vorfälle nicht heraus.')
     return
@@ -153,4 +153,8 @@ async function main(): Promise<void> {
   recordSource('vorfaelle', alle.length, undefined, undefined, true)
 }
 
-await main()
+// Nur beim Direktstart: der Vergleichsrahmen (tools/vergleich-alt-neu.mjs) importiert `main`, ohne Netz zu rufen.
+if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+  schalterOderAbbruch(['--trocken', '--nur-loeschen'])
+  await main()
+}

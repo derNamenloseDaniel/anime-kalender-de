@@ -39,6 +39,7 @@
  *     npx tsx pipeline/fetch-justwatch-audio.ts [--limit 50] [--alter 20]
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import yaml from 'js-yaml'
 import { fetchJson, log, readJson, sleep, warn, writeJson } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
@@ -484,7 +485,7 @@ export async function main(args: string[] = process.argv.slice(2), welt: Welt = 
  * JustWatch etwas?** Nicht mehr — das Urteil bleibt bei Daniel oder bei einer
  * Quelle, die je Folge antwortet.
  */
-function liste(titles: Title[], bestand: Record<string, Befund>): void {
+export function liste(titles: Title[], bestand: Record<string, Befund>): void {
   /* JustWatchs Anbietername → unsere Kennung. Nur was eindeutig ist. */
   const NAMEN: [RegExp, string][] = [
     [/^crunchyroll$/i, 'crunchyroll'],
@@ -579,5 +580,5 @@ function liste(titles: Title[], bestand: Record<string, Befund>): void {
   log(`JustWatch: ${mitAussage} offene Verweise mit Tonspur-Angabe → daniel-zum-abarbeiten/listen/16-justwatch-tonspuren.md`)
 }
 
-/* `?nur-laden` am Import-Pfad: Tests holen `main` und rufen es selbst mit ihrer Welt auf. */
-if (!import.meta.url.endsWith('?nur-laden')) await main()
+/* Nur der Direktstart ruft `main`: Tests (`?nur-laden`) und der Vergleichsrahmen laden das Modul und rufen selbst auf. */
+if (process.argv[1] === fileURLToPath(import.meta.url)) await main()

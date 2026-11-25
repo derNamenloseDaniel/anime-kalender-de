@@ -6,6 +6,93 @@ import type { Dispatch, SetStateAction } from 'react'
 import { requestRestore } from '../lib/newsletterSync.ts'
 import { type AbmeldeState } from './AboBeenden.tsx'
 
+interface GeraetVerbundenProps {
+  t: Translate
+  abmeldeState: AbmeldeState
+  setRestoreOffen: Dispatch<SetStateAction<boolean>>
+}
+
+function GeraetVerbunden({ t, abmeldeState, setRestoreOffen }: GeraetVerbundenProps) {
+  return (
+    <>
+      {abmeldeState !== 'weg' && (
+        <p className="rounded-lg bg-ak-gut-grund px-3 py-2 text-sm text-ak-gut-text">
+          ✓ {t('news.restoreConnected')}
+        </p>
+      )}
+      <div className="mt-3 flex flex-col items-start gap-3">
+        <button
+          type="button"
+          onClick={() => setRestoreOffen(true)}
+          className="cursor-pointer rounded-full border border-ak-rand bg-ak-flaeche-2 px-3 py-1.5 text-[13px] font-semibold text-ak-text transition hover:border-ak-leise"
+        >
+          {t('news.restoreAnyway')}
+        </button>
+        {/*
+          Abmelden direkt hier — bisher musste man dafür eine alte Mail
+          heraussuchen, weil der Abmeldelink am `unsub_token` hängt und
+          die Seite nur den `pref_token` kennt.
+
+          Zweistufig, weil Löschen nicht umkehrbar ist: Der erste Klick
+          fragt, der zweite handelt. Kein Dialogfenster — die Frage steht
+          an derselben Stelle, an der auch der Knopf stand.
+        */}
+        {abmeldeState === 'weg' && <span className="text-[13px] text-ak-leise">{t('news.unsubDone')}</span>}
+      </div>
+    </>
+  )
+}
+
+interface RestoreFormularProps {
+  t: Translate
+  restoreState: 'idle' | 'sending' | 'done'
+  setRestoreState: Dispatch<SetStateAction<'idle' | 'sending' | 'done'>>
+  email: string
+  setEmail: Dispatch<SetStateAction<string>>
+}
+
+function RestoreFormular({ t, restoreState, setRestoreState, email, setEmail }: RestoreFormularProps) {
+  return (
+    <>
+      <p className="text-sm text-slate-600 dark:text-slate-300">{t('news.restoreBody')}</p>
+      {restoreState === 'done' ? (
+        <p className="mt-3 rounded-lg bg-ak-gut-grund px-3 py-2 text-sm text-ak-gut-text">
+          {t('news.restoreSent')}
+        </p>
+      ) : (
+        <form
+          className="mt-3 flex flex-wrap gap-2"
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (!WORKER_URL || restoreState === 'sending') return
+            setRestoreState('sending')
+            // Auch ein Fehlschlag endet in derselben Anzeige: Der Nutzer soll
+            // aus der Antwort nichts über fremde Adressen schließen können.
+            requestRestore(email).finally(() => setRestoreState('done'))
+          }}
+        >
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder={t('news.email')}
+            className="min-w-0 flex-1 rounded-lg border border-ak-rand bg-ak-flaeche px-3 py-2 text-sm"
+          />
+          <button
+            type="submit"
+            disabled={restoreState === 'sending' || !WORKER_URL}
+            className="cursor-pointer rounded-lg bg-ak-flaeche-2 px-4 py-2 text-sm font-medium text-ak-text transition hover:bg-ak-flaeche-3 disabled:cursor-default disabled:opacity-45"
+          >
+            {restoreState === 'sending' ? t('news.sending') : t('news.restoreSubmit')}
+          </button>
+        </form>
+      )}
+      <p className="mt-2 text-[13px] text-ak-leise">{t('news.restoreSafety')}</p>
+    </>
+  )
+}
+
 export function WiederherstellenKasten({ t, zeigeGeraet, abmeldeState, setRestoreOffen, restoreState, setRestoreState, email, setEmail }: {
   t: Translate
   zeigeGeraet: boolean
@@ -56,73 +143,175 @@ export function WiederherstellenKasten({ t, zeigeGeraet, abmeldeState, setRestor
           Link der einzige Weg zurück.
         */}
         {zeigeGeraet ? (
-          <>
-            {abmeldeState !== 'weg' && (
-              <p className="rounded-lg bg-ak-gut-grund px-3 py-2 text-sm text-ak-gut-text">
-                ✓ {t('news.restoreConnected')}
-              </p>
-            )}
-            <div className="mt-3 flex flex-col items-start gap-3">
-              <button
-                type="button"
-                onClick={() => setRestoreOffen(true)}
-                className="cursor-pointer rounded-full border border-ak-rand bg-ak-flaeche-2 px-3 py-1.5 text-[13px] font-semibold text-ak-text transition hover:border-ak-leise"
-              >
-                {t('news.restoreAnyway')}
-              </button>
-              {/*
-                Abmelden direkt hier — bisher musste man dafür eine alte Mail
-                heraussuchen, weil der Abmeldelink am `unsub_token` hängt und
-                die Seite nur den `pref_token` kennt.
-
-                Zweistufig, weil Löschen nicht umkehrbar ist: Der erste Klick
-                fragt, der zweite handelt. Kein Dialogfenster — die Frage steht
-                an derselben Stelle, an der auch der Knopf stand.
-              */}
-              {abmeldeState === 'weg' && <span className="text-[13px] text-ak-leise">{t('news.unsubDone')}</span>}
-            </div>
-          </>
+          <GeraetVerbunden t={t} abmeldeState={abmeldeState} setRestoreOffen={setRestoreOffen} />
         ) : (
-          <>
-        <p className="text-sm text-slate-600 dark:text-slate-300">{t('news.restoreBody')}</p>
-        {restoreState === 'done' ? (
-          <p className="mt-3 rounded-lg bg-ak-gut-grund px-3 py-2 text-sm text-ak-gut-text">
-            {t('news.restoreSent')}
-          </p>
-        ) : (
-          <form
-            className="mt-3 flex flex-wrap gap-2"
-            onSubmit={(e) => {
-              e.preventDefault()
-              if (!WORKER_URL || restoreState === 'sending') return
-              setRestoreState('sending')
-              // Auch ein Fehlschlag endet in derselben Anzeige: Der Nutzer soll
-              // aus der Antwort nichts über fremde Adressen schließen können.
-              requestRestore(email).finally(() => setRestoreState('done'))
-            }}
-          >
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t('news.email')}
-              className="min-w-0 flex-1 rounded-lg border border-ak-rand bg-ak-flaeche px-3 py-2 text-sm"
-            />
-            <button
-              type="submit"
-              disabled={restoreState === 'sending' || !WORKER_URL}
-              className="cursor-pointer rounded-lg bg-ak-flaeche-2 px-4 py-2 text-sm font-medium text-ak-text transition hover:bg-ak-flaeche-3 disabled:cursor-default disabled:opacity-45"
-            >
-              {restoreState === 'sending' ? t('news.sending') : t('news.restoreSubmit')}
-            </button>
-          </form>
-        )}
-        <p className="mt-2 text-[13px] text-ak-leise">{t('news.restoreSafety')}</p>
-          </>
+          <RestoreFormular
+            t={t}
+            restoreState={restoreState}
+            setRestoreState={setRestoreState}
+            email={email}
+            setEmail={setEmail}
+          />
         )}
       </Card>
     </>
+  )
+}
+
+interface HaeufigkeitProps {
+  t: Translate
+  frequency: 'weekly' | 'daily'
+  setFrequency: Dispatch<SetStateAction<'weekly' | 'daily'>>
+}
+
+function HaeufigkeitWahl({ t, frequency, setFrequency }: HaeufigkeitProps) {
+  return (
+    <fieldset className="flex flex-col gap-1 text-sm">
+      <legend className="mb-1 font-medium text-slate-700 dark:text-slate-200">{t('news.frequency')}</legend>
+      <div className="flex gap-2">
+        {(
+          [
+            ['weekly', t('news.weekly'), t('news.weeklyHint')],
+            ['daily', t('news.daily'), t('news.dailyHint')],
+          ] as const
+        ).map(([value, label, hint]) => (
+          <label
+            key={value}
+            className={[
+              'flex-1 cursor-pointer rounded-lg border p-3 transition',
+              frequency === value
+                ? 'border-sky-400 bg-sky-400/10'
+                : 'border-ak-rand hover:border-ak-leise',
+            ].join(' ')}
+          >
+            <input
+              type="radio"
+              name="frequency"
+              className="sr-only"
+              checked={frequency === value}
+              onChange={() => setFrequency(value)}
+            />
+            <span className="block font-medium text-slate-800 dark:text-slate-100">{label}</span>
+            <span className="block text-xs text-ak-leise">{hint}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  )
+}
+
+interface FavoritenInfoProps {
+  t: Translate
+  favorites: Set<number>
+  autoSync: boolean
+}
+
+function FavoritenInfo({ t, favorites, autoSync }: FavoritenInfoProps) {
+  return (
+    <div className="rounded-lg border border-ak-rand px-3 py-2.5 text-sm">
+      <p className="font-medium text-slate-700 dark:text-slate-200">
+        ★ {t('news.favorites', { count: favorites.size })}
+      </p>
+      <p className="mt-0.5 text-xs text-ak-leise">
+        {favorites.size > 0 ? t('news.favoritesHint') : t('news.favoritesNone')}
+      </p>
+      {/*
+        Die Gegenprobe zum grünen Häkchen.
+
+        Bisher stand hier nur die gute Nachricht: „Änderungen werden ab
+        jetzt selbsttätig übernommen", wenn dieser Browser einen
+        Abgleich-Schlüssel hat. Fehlte er, stand **nichts** — und wer
+        anderswo abonniert und hier Titel merkt, erfuhr nie, dass sie den
+        Versand gar nicht erreichen (Daniels Frage, 14.08.2026: „ist auch
+        gesichert, dass der Newsletter das mitbekommt?").
+
+        Nur bei vorhandenen Favoriten, und im Konjunktiv: Wer sich hier
+        gerade erst anmeldet, schickt seine Favoriten mit dem Formular mit
+        — für den wäre der Hinweis eine Warnung vor nichts.
+      */}
+      {autoSync ? (
+        <p className="mt-1 text-xs text-ak-gut-text">✓ {t('news.autoSync')}</p>
+      ) : favorites.size > 0 ? (
+        <p className="mt-1 text-xs text-ak-warnung-text">{t('news.noSyncYet')}</p>
+      ) : null}
+    </div>
+  )
+}
+
+interface PlattformWahlProps {
+  t: Translate
+  meta: DataMeta
+  platforms: PlatformId[]
+  setPlatforms: Dispatch<SetStateAction<PlatformId[]>>
+}
+
+function PlattformWahl({ t, meta, platforms, setPlatforms }: PlattformWahlProps) {
+  return (
+    <fieldset>
+      <legend className="mb-1.5 text-sm font-medium text-slate-700 dark:text-slate-200">
+        {t('news.platforms')} <span className="font-normal text-ak-sehr-leise">{t('news.platformsHint')}</span>
+      </legend>
+      <PlatformToggleList
+        platforms={meta.platforms}
+        selected={platforms}
+        onToggle={(p) =>
+          setPlatforms(platforms.includes(p) ? platforms.filter((x) => x !== p) : [...platforms, p])
+        }
+      />
+    </fieldset>
+  )
+}
+
+interface EinwilligungProps {
+  t: Translate
+  consent: boolean
+  setConsent: Dispatch<SetStateAction<boolean>>
+}
+
+function EinwilligungFeld({ t, consent, setConsent }: EinwilligungProps) {
+  return (
+    <label className="flex cursor-pointer items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
+      <input
+        type="checkbox"
+        checked={consent}
+        onChange={(e) => setConsent(e.target.checked)}
+        className="mt-0.5 cursor-pointer"
+        required
+      />
+      <span>
+        {t('news.consent')}{' '}
+        <a className="underline" href="#/datenschutz">
+          {t('news.privacy')}
+        </a>
+      </span>
+    </label>
+  )
+}
+
+interface SendenZeileProps {
+  t: Translate
+  consent: boolean
+  state: FormState
+  message: string
+}
+
+function SendenZeile({ t, consent, state, message }: SendenZeileProps) {
+  return (
+    <div className="flex items-center gap-3">
+      <Button variant="primary" type="submit" disabled={state === 'sending' || !consent}>
+        {state === 'sending' ? t('news.sending') : t('news.submit')}
+      </Button>
+      {state !== 'idle' && (
+        <span
+          className={[
+            'text-sm',
+            state === 'ok' ? 'text-ak-gut-text' : state === 'error' ? 'text-ak-fehler-text' : 'text-ak-sehr-leise',
+          ].join(' ')}
+        >
+          {message}
+        </span>
+      )}
+    </div>
   )
 }
 
@@ -158,110 +347,11 @@ export function AnmeldeFormular({ submit, t, email, setEmail, frequency, setFreq
           />
         </label>
 
-        <fieldset className="flex flex-col gap-1 text-sm">
-          <legend className="mb-1 font-medium text-slate-700 dark:text-slate-200">{t('news.frequency')}</legend>
-          <div className="flex gap-2">
-            {(
-              [
-                ['weekly', t('news.weekly'), t('news.weeklyHint')],
-                ['daily', t('news.daily'), t('news.dailyHint')],
-              ] as const
-            ).map(([value, label, hint]) => (
-              <label
-                key={value}
-                className={[
-                  'flex-1 cursor-pointer rounded-lg border p-3 transition',
-                  frequency === value
-                    ? 'border-sky-400 bg-sky-400/10'
-                    : 'border-ak-rand hover:border-ak-leise',
-                ].join(' ')}
-              >
-                <input
-                  type="radio"
-                  name="frequency"
-                  className="sr-only"
-                  checked={frequency === value}
-                  onChange={() => setFrequency(value)}
-                />
-                <span className="block font-medium text-slate-800 dark:text-slate-100">{label}</span>
-                <span className="block text-xs text-ak-leise">{hint}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
-
-        <div className="rounded-lg border border-ak-rand px-3 py-2.5 text-sm">
-          <p className="font-medium text-slate-700 dark:text-slate-200">
-            ★ {t('news.favorites', { count: favorites.size })}
-          </p>
-          <p className="mt-0.5 text-xs text-ak-leise">
-            {favorites.size > 0 ? t('news.favoritesHint') : t('news.favoritesNone')}
-          </p>
-          {/*
-            Die Gegenprobe zum grünen Häkchen.
-
-            Bisher stand hier nur die gute Nachricht: „Änderungen werden ab
-            jetzt selbsttätig übernommen", wenn dieser Browser einen
-            Abgleich-Schlüssel hat. Fehlte er, stand **nichts** — und wer
-            anderswo abonniert und hier Titel merkt, erfuhr nie, dass sie den
-            Versand gar nicht erreichen (Daniels Frage, 14.08.2026: „ist auch
-            gesichert, dass der Newsletter das mitbekommt?").
-
-            Nur bei vorhandenen Favoriten, und im Konjunktiv: Wer sich hier
-            gerade erst anmeldet, schickt seine Favoriten mit dem Formular mit
-            — für den wäre der Hinweis eine Warnung vor nichts.
-          */}
-          {autoSync ? (
-            <p className="mt-1 text-xs text-ak-gut-text">✓ {t('news.autoSync')}</p>
-          ) : favorites.size > 0 ? (
-            <p className="mt-1 text-xs text-ak-warnung-text">{t('news.noSyncYet')}</p>
-          ) : null}
-        </div>
-
-        <fieldset>
-          <legend className="mb-1.5 text-sm font-medium text-slate-700 dark:text-slate-200">
-            {t('news.platforms')} <span className="font-normal text-ak-sehr-leise">{t('news.platformsHint')}</span>
-          </legend>
-          <PlatformToggleList
-            platforms={meta.platforms}
-            selected={platforms}
-            onToggle={(p) =>
-              setPlatforms(platforms.includes(p) ? platforms.filter((x) => x !== p) : [...platforms, p])
-            }
-          />
-        </fieldset>
-
-        <label className="flex cursor-pointer items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
-          <input
-            type="checkbox"
-            checked={consent}
-            onChange={(e) => setConsent(e.target.checked)}
-            className="mt-0.5 cursor-pointer"
-            required
-          />
-          <span>
-            {t('news.consent')}{' '}
-            <a className="underline" href="#/datenschutz">
-              {t('news.privacy')}
-            </a>
-          </span>
-        </label>
-
-        <div className="flex items-center gap-3">
-          <Button variant="primary" type="submit" disabled={state === 'sending' || !consent}>
-            {state === 'sending' ? t('news.sending') : t('news.submit')}
-          </Button>
-          {state !== 'idle' && (
-            <span
-              className={[
-                'text-sm',
-                state === 'ok' ? 'text-ak-gut-text' : state === 'error' ? 'text-ak-fehler-text' : 'text-ak-sehr-leise',
-              ].join(' ')}
-            >
-              {message}
-            </span>
-          )}
-        </div>
+        <HaeufigkeitWahl t={t} frequency={frequency} setFrequency={setFrequency} />
+        <FavoritenInfo t={t} favorites={favorites} autoSync={autoSync} />
+        <PlattformWahl t={t} meta={meta} platforms={platforms} setPlatforms={setPlatforms} />
+        <EinwilligungFeld t={t} consent={consent} setConsent={setConsent} />
+        <SendenZeile t={t} consent={consent} state={state} message={message} />
       </form>
     </>
   )

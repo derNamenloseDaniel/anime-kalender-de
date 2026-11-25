@@ -190,3 +190,36 @@
   note: "Deutsche Tonspur (DTS-HD MA 2.0 Stereo)."
   schedule: { firstEpisodeDate: "2022-02-07" }
   sources: ["https://www.ofdb.de/fassung/357953,475821,x/"]
+
+# Calimero (1974), UFA Kids (Mängel-Abbau 25.11.2026): Termine laut zeichentrickserien.de/dvd/calimero.htm (Calimero 1 am 25.10.2006, 2 am 26.02.2007, 3 am 17.03.2008); OFDb führt DVD 1 (Folge 1-4) und DVD 2 (Folge 5-8) mit deutscher Tonspur.
+- slug: calimero-dvd-1-2006-10-25
+  anilistId: 2827
+  titleDe: "Calimero"
+  platform: disc
+  releaseType: disc
+  publisher: "UFA Kids"
+  edition: "DVD 1 (Folge 1-4)"
+  note: "Deutsche Tonspur (Dolby Digital 1.0 Mono)."
+  schedule: { firstEpisodeDate: "2006-10-25" }
+  sources: ["https://www.zeichentrickserien.de/dvd/calimero.htm", "https://www.ofdb.de/fassung/21585,211036,Calimero/"]
+
+- slug: calimero-dvd-2-2007-02-26
+  anilistId: 2827
+  titleDe: "Calimero"
+  platform: disc
+  releaseType: disc
+  publisher: "UFA Kids"
+  edition: "DVD 2 (Folge 5-8)"
+  note: "Deutsche Tonspur (Dolby Digital 1.0 Mono)."
+  schedule: { firstEpisodeDate: "2007-02-26" }
+  sources: ["https://www.zeichentrickserien.de/dvd/calimero.htm", "https://www.ofdb.de/fassung/21585,211037,Calimero/"]
+
+- slug: calimero-dvd-3-2008-03-17
+  anilistId: 2827
+  titleDe: "Calimero"
+  platform: disc
+  releaseType: disc
+  publisher: "UFA Kids"
+  edition: "DVD 3"
+  schedule: { firstEpisodeDate: "2008-03-17" }
+  sources: ["https://www.zeichentrickserien.de/dvd/calimero.htm"]

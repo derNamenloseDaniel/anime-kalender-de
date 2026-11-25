@@ -23,7 +23,7 @@
  *     die Notiz ist Pflicht, die Lauf-ID steht in `<Worker>?verlauf=<Art>` (Feld lauf_id).
  */
 import { abbruchText, ghStapel, mitLimit } from './kind-mit-limit.mjs'
-import { abgelaufenZeile, bekanntZeile, ladeBekannte, wendeBekannteAn } from './bekannte-warnungen.mjs'
+import { ladeBekannte, nimmBekannteAb } from './bekannte-warnungen.mjs'
 import { eintragZu, erledigtArgumente, findeRotenLauf, holeLaeufe, holeVerlauf, letzteDatenAenderung, roteArten, stillstand, STILLSTAND_GRENZE_STUNDEN, verlaufsZeile } from './laeufe-abruf.mjs'
 import { haengerWache } from './job-haenger.mjs'
 import { rotAlarmText } from './bestand-rot-alarm.mjs'
@@ -166,17 +166,17 @@ async function main() {
 }
 
 /** Bekannte Warnungen (`tools/bekannte-warnungen.json`) abnehmen, alle anderen weiter zeigen; abgelaufene Einträge melden. */
-async function bekannteAbnehmen(warnungen) {
-  const { bekannt, abgelaufen } = wendeBekannteAn(ladeBekannte(), warnungen, Date.now())
-  const bekannteWarnungen = new Set(bekannt.map((b) => b.warnung))
-  for (const w of warnungen) if (!bekannteWarnungen.has(w)) console.log(verlaufsZeile(w.r, w.notiz))
-  for (const { warnung, eintrag } of bekannt) {
-    const zusatz = TROCKEN ? ' (trocken, nicht abgenommen)' : !TOKEN ? ' (LAUF_TOKEN fehlt, nicht abgenommen)' : ''
-    console.log(bekanntZeile(eintrag) + zusatz)
-    if (!TROCKEN && TOKEN) await setzeErledigt(warnung.laufId, `bekannt bis ${eintrag.bis}: ${eintrag.notiz}`)
-  }
-  for (const e of abgelaufen) console.log(abgelaufenZeile(e))
-}
+const bekannteAbnehmen = (warnungen) =>
+  nimmBekannteAb({
+    eintraege: ladeBekannte(),
+    warnungen,
+    jetztMs: Date.now(),
+    trocken: TROCKEN,
+    token: TOKEN,
+    senden: setzeErledigt,
+    zeigeWarnung: (w, rest) => verlaufsZeile(w.r, rest),
+    log: console.log,
+  })
 
 async function laeufePruefen(erledigt) {
   const { liste, verlauf, meldung } = await holeLaeufe(fetch, WORKER)

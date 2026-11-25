@@ -1,13 +1,13 @@
 {
-  "scrapedAt": "2026-11-24T23:01:43.328Z",
+  "scrapedAt": "2026-11-25T04:14:30.570Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 42,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 5,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 15,
-    "schon in einem Rubrik-Feed gelesen": 8,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 1,
-    "Sprachhinweis älter als 45 Tage": 6
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 43,
+    "schon in einem Rubrik-Feed gelesen": 34,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
+    "Sprachhinweis älter als 45 Tage": 8
   },
   "proposals": [
     {
@@ -1351,7 +1351,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-22"
+      "sammelGelesen": "2026-11-25"
     },
     {
       "articleTitle": "Neun Disc-Neuheiten ab sofort im AKIBA PASS SHOP vorbestellbar",
@@ -1460,7 +1460,7 @@
           "folgen": 25
         }
       ],
-      "sammelGelesen": "2026-11-22"
+      "sammelGelesen": "2026-11-25"
     },
     {
       "articleTitle": "Große Anime-Rabattaktion mit Serien und Filmen bei Amazon gestartet",
@@ -1866,7 +1866,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-22"
+      "sammelGelesen": "2026-11-25"
     },
     {
       "articleTitle": "Erster Trailer zum Netflix-Anime »Fool Night« + Visual",
@@ -2178,7 +2178,7 @@
           "folgen": 13
         }
       ],
-      "sammelGelesen": "2026-11-22"
+      "sammelGelesen": "2026-11-25"
     },
     {
       "articleTitle": "Sieben Disc-Neuheiten ab sofort im AKIBA PASS SHOP vorbestellbar",
@@ -2329,10 +2329,6 @@
       ],
       "dates": [
         {
-          "iso": "2026-11-24",
-          "context": "sgabe als auch im Originalton mit Untertiteln zur Verfügung steht. Am 24. November 2026 werden die […] Der Beitrag Disney+ kündigt zwei An"
-        },
-        {
           "month": "2026-11",
           "context": "er 2026 an Der Streaming-Dienst Disney+ erweitert sein Anime-Programm im November 2026 um zwei neue Serien. Wir fassen die Details zusammen."
         }
@@ -2358,7 +2354,7 @@
           "folgen": 24
         }
       ],
-      "sammelGelesen": "2026-11-22"
+      "sammelGelesen": "2026-11-25"
     },
     {
       "articleTitle": "19,99 Euro pro Staffel: polyband startet große »Pokémon«-Rabattaktion",
@@ -2538,7 +2534,7 @@
           "folgen": 12
         }
       ],
-      "sammelGelesen": "2026-11-22"
+      "sammelGelesen": "2026-11-25"
     },
     {
       "articleTitle": "Disney+ nimmt zwei Anime-Neuzugänge ins Programm",

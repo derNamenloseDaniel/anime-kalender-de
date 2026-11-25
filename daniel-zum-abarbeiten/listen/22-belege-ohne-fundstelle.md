@@ -1,4 +1,4 @@
-# Belege ohne Fundstelle (42)
+# Belege ohne Fundstelle (43)
 
 Je Adresse die Titel, für die die letzte Lesung keine Zeile mit Titel und Termin gefunden hat (Fundstelle nur außerhalb des Bildausschnitts zählt nicht; Adressen ohne zugeordneten Titel und aniSearch-Kurzadressen neben ihrer Slug-Form fehlen). Von Hand prüfen: steht der Name im Seitentext, hat das Lesen die Marke verloren (der Lauf meldet es als Warnung „stehen im Seitentext, haben aber keine Marke“); sonst nennt der Artikel den Titel oder den Termin nicht, oder in verschiedenen Zeilen. Fehlt eines davon, ist der Beleg hinfällig und der Termin braucht eine andere Quelle.
 
@@ -15,7 +15,7 @@ Je Adresse die Titel, für die die letzte Lesung keine Zeile mit Titel und Termi
 - https://news.animationdigitalnetwork.com/de/2026/06/29/maedchen-mit-toedlichen-waffen-gunslinger-girl-jetzt-bei-adn/ (gelesen 2026-10-29) — Gunslinger Girl -Il Teatrino- (3231)
 - https://news.animationdigitalnetwork.com/de/2026/08/17/love-lies-jetzt-im-stream-bei-adn-dystopisches-romance-drama/ (gelesen 2026-10-29) — Love and Lies (98320)
 - https://news.animationdigitalnetwork.com/de/2026/06/01/sailor-moon-sailor-stars-staffel-5-im-stream-bei-adn/ (gelesen 2026-10-29) — Sailor Moon: Das Mädchen mit den Zauberkräften (530), Bishoujo Senshi Sailor Moon R (740), Bishoujo Senshi Sailor Moon S (532), Bishoujo Senshi Sailor Moon SuperS (1239)
-- https://de.wikipedia.org/wiki/Pok%C3%A9mon_(Anime)/Horizonte (gelesen 2026-11-23) — Pokémon Horizonte: Staffel 4 – Wunder in Sicht (158871), Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua (7000002), Pokémon Horizonte: Staffel 3 – Gute Aussichten (7000003), Pokémon Horizonte: Die Serie (7000001)
+- https://de.wikipedia.org/wiki/Pok%C3%A9mon_(Anime)/Horizonte (gelesen 2026-11-23) — Pokémon Horizonte – Staffel 4 (158871)
 - https://de.wikipedia.org/wiki/Detektiv_Conan/Episodenliste (gelesen 2026-11-16) — Detective Conan (235)
 - https://de.wikipedia.org/wiki/Dragon_Ball/Episodenliste (gelesen 2026-11-16) — Dragon Ball (223)
 - https://www.kinoheld.de/film/your-name-gestern-heute-und-fuer-immer (gelesen 2026-11-02) — Your Name. Gestern, heute und für immer (21519)
@@ -43,4 +43,5 @@ Je Adresse die Titel, für die die letzte Lesung keine Zeile mit Titel und Termi
 - https://de.wikipedia.org/wiki/My_Hero_Academia/Episodenliste (gelesen 2026-11-16) — My Hero Academia Staffel 6 (139630)
 - https://news.animationdigitalnetwork.com/de/2026/11/16/witch-watch-staffel-2-ausstrahlung-in-2027-manga-beendet/ (gelesen 2026-11-17) — Witch Watch (180367)
 - https://www.anime2you.de/news/1062132/disc-neuheiten-november-2026/ (gelesen 2026-11-19) — Master Detective Ron Kamonohashi – Staffel 2 – Vol. 2 (172355)
-- https://www.anime2you.de/news/1073600/netflix-anime-neu-im-dezember-2026/ (gelesen 2026-11-22) — Ranma 1/2 (2024) 3rd Season (209872)
+- https://www.anime2you.de/news/1073600/netflix-anime-neu-im-dezember-2026/ (gelesen 2026-11-25) — Ranma 1/2 (2024) 3rd Season (209872)
+- https://de.wikipedia.org/wiki/The_Mighty_Nein (gelesen 2026-11-25) — The Mighty Nein (-219080)

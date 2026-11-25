@@ -113,7 +113,7 @@ export function useKopfZahlen(titleId: number): { folgenZahl: FolgenZaehlung | u
   return { folgenZahl: useFolgenZaehlung(titleId), staffeln: useStaffelGrenzen(titleId) }
 }
 
-const HUELLE = 'mt-2 border-t border-slate-300 pt-1.5 text-t4 text-slate-700 dark:border-white/10 dark:text-slate-200'
+const HUELLE = 'mt-2 border-t border-ak-rand pt-1.5 text-t4 text-ak-text'
 
 /**
  * `laufzeitImKopf`: Die Laufzeit steht schon im Kopf des Panels — dann nicht noch einmal (mit anderem Wert) im Kasten.
@@ -185,7 +185,7 @@ export function FolgenBereich({ titleId, wege, erschienen, laufzeitImKopf, serie
                   role="tab"
                   aria-selected={i === paket}
                   onClick={() => setPaket(i)}
-                  className={`min-h-11 min-w-11 cursor-pointer rounded px-2 tabular-nums ${i === paket ? 'bg-slate-300 font-bold dark:bg-white/20' : 'bg-ak-flaeche-2 text-slate-700 hover:bg-ak-flaeche-3 dark:text-slate-300'}`}
+                  className={`min-h-11 min-w-11 cursor-pointer rounded px-2 tabular-nums ${i === paket ? 'bg-ak-gewaehlt font-bold text-ak-auf-gewaehlt' : 'bg-ak-flaeche-2 text-ak-text hover:bg-ak-flaeche-3'}`}
                 >
                   {reiter(i)}
                 </button>
@@ -270,7 +270,7 @@ function FolgeOhneFlagge({ hinweis, gibtDeutsche }: { hinweis?: string; gibtDeut
       <span
         role="img"
         aria-label={hinweis ?? 'Keine deutsche Synchro belegt'}
-        className={`${marke} ${hinweis ? 'border-ak-fehler text-ak-fehler-text' : 'border-slate-400 text-slate-500 dark:border-slate-500 dark:text-slate-400'}`}
+        className={`${marke} ${hinweis ? 'border-ak-fehler text-ak-fehler-text' : 'border-ak-sehr-leise text-ak-leise'}`}
       >
         {hinweis ? '✕' : '?'}
       </span>

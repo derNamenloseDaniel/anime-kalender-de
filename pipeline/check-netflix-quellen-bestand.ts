@@ -22,6 +22,7 @@ export function main(titelPfad: string, anisearchPfad: string, justwatchPfad: st
   for (const f of geteilt.offen) {
     console.log(`  ⚠ WARNUNG Netflix-Kennung: Titel ${f.id} nennt ${JSON.stringify(f.kennungen)} — auf die Prüfliste (node tools/erneut-melden.mjs ${f.id}:netflix)`)
   }
+  console.log('VERSTÖSSE: 0')
   return 0
 }
 

@@ -1990,14 +1990,14 @@ Offen: rote Seiten kosten Nachprüfung und Störungsmail. Resend Free schickt 10
 
 | Route (Datei:Zeile) | Cache | gelesen lokal |
 |---|---|---|
-| `?token=` offene, alle (`pruefung-lesen.ts:128`) | neu R2, 5 min nach Marke | 1.002 (Produktion ~36.000) |
+| `?token=` offene, alle (`pruefung-lesen.ts:142`) | neu R2, 5 min nach Marke | 1.002 (Produktion ~36.000) |
 | `?token=&plattform=primevideo` | neu R2 | 4.269 |
-| `?zaehlen=1` (`pruefung-lesen.ts:97`, `pruefung-zaehlen.ts`) | Edge 2 h je Rechenzentrum | 61.315 |
-| `?stand=1` (`pruefung-lesen.ts:78`) | Edge 5 min | 43.513 |
-| `?rohfolgen=1&namen=1` (`pruefung-lesen.ts:93`) | Edge | 35.601 |
+| `?zaehlen=1` (`pruefung-lesen.ts:51`, `pruefung-zaehlen.ts`) | Edge 2 h je Rechenzentrum | 61.315 |
+| `?stand=1` (`pruefung-lesen.ts:45`) | Edge 5 min | 43.513 |
+| `?rohfolgen=1&namen=1` (`pruefung-lesen.ts:115`) | Edge | 35.601 |
 | `?rohfolgen=1` Seite 1 | Edge | 11.101 |
-| `?alle=1` Seite 1 (`pruefung-lesen.ts:123`) | R2 | 10.000 |
-| `?gemeldet=<url>` (`pruefung-lesen.ts:55`) | Edge 30 min | 2 |
+| `?alle=1` Seite 1 (`pruefung-lesen.ts:137`) | R2 | 10.000 |
+| `?gemeldet=<url>` (`pruefung-lesen.ts:26`) | Edge 30 min | 2 |
 | `/verlauf` (`verlauf.ts:9`), `/lauf` (`lauf.ts:41`, `:163`) | – | 1–4 |
 | `/status` (`index.ts:1543`, `site_status`), `/health` (`index.ts:1580`) | – | Tabellengröße (Dutzende) bzw. aktive Abonnenten |
 

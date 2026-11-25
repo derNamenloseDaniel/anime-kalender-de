@@ -49,7 +49,7 @@ export function Meldungen({ titleId }: { titleId: number }) {
       <button
         type="button"
         onClick={() => setOffen((o) => !o)}
-        className="-my-3 inline-flex min-h-11 cursor-pointer items-center text-t4 text-sky-700 hover:underline dark:text-sky-300"
+        className="-my-3 inline-flex min-h-11 cursor-pointer items-center text-t4 text-ak-link hover:underline"
       >
         {offen ? t('detail.newsHide') : t('detail.newsShow', { count: liste.length })}
       </button>
@@ -60,7 +60,7 @@ export function Meldungen({ titleId }: { titleId: number }) {
         {liste.map((m) => (
           <li
             key={m.quelle.url}
-            className="rounded border-l-2 border-sky-500/50 bg-slate-500/5 py-1.5 pl-2 pr-2 text-t4"
+            className="rounded border-l-2 border-ak-akzent/50 bg-ak-leise/5 py-1.5 pl-2 pr-2 text-t4"
           >
             <a
               href={m.quelle.url}
@@ -75,7 +75,7 @@ export function Meldungen({ titleId }: { titleId: number }) {
                 „… {m.zitat} …"
               </p>
             )}
-            <p className="mt-1 text-t5 text-slate-400">
+            <p className="mt-1 text-t5 text-ak-leise">
               {m.quelle.name} · {formatDate(m.datum)}
             </p>
           </li>
@@ -153,7 +153,7 @@ interface VermerkAuskunftProps {
 }
 
 const LINK_KLASSE =
-  'text-sky-700 underline decoration-sky-700/30 underline-offset-2 hover:decoration-sky-700 dark:text-sky-300 dark:decoration-sky-300/30'
+  'text-ak-link underline decoration-ak-link/30 underline-offset-2 hover:decoration-ak-link'
 
 /*
   **Wann zuletzt, wann als Nächstes — je Stufe**. Die nächste Recherche rechnet dieselbe Regel aus wie
@@ -315,7 +315,7 @@ export function VermerkAuskunft({
   if (ueberfaellig) zeilen.push(T('antwort.vermerkAnnahme'))
   if (!zeilen.length) return null
   return (
-    <div className="mt-2 space-y-0.5 border-t border-slate-200/70 pt-1.5 text-t5 text-slate-600 dark:border-white/10 dark:text-slate-300">
+    <div className="mt-2 space-y-0.5 border-t border-ak-linie pt-1.5 text-t5 text-ak-leise">
       {zeilen.map((z, i) => (
         <p key={i}>{z}</p>
       ))}

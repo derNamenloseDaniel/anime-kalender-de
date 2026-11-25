@@ -1,0 +1,4 @@
+[ {"name":"Kontrolle","aenderungen":[],"tests":["npx tsx pipeline/check-weg-unten.ts"]},
+{"name":"wegUnten: nurFolge-Zweig aus","aenderungen":[{"datei":"web/src/components/detail/wege-zeilen.tsx","suche":"if (g.eintraege[0].nurFolge) return t(","ersetze":"if (false && g.eintraege[0].nurFolge) return t("}],"tests":["npx tsx pipeline/check-weg-unten.ts"]},
+{"name":"wegUnten: Verweis dub === true gedreht","aenderungen":[{"datei":"web/src/components/detail/wege-zeilen.tsx","suche":"return verweis?.dub === true ?","ersetze":"return verweis?.dub !== true ?"}],"tests":["npx tsx pipeline/check-weg-unten.ts"]}
+]

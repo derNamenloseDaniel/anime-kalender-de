@@ -6029,7 +6029,7 @@ pruefe(
   const suchfeldQuelle = readFileSync('web/src/components/Suchfeld.tsx', 'utf8')
   const headerQuelle = readFileSync('web/src/components/Header.tsx', 'utf8')
   const kopfSucheQuelle = readFileSync('web/src/components/kopf-suche.tsx', 'utf8')
-  const uiQuelle = readFileSync('web/src/components/ui.tsx', 'utf8')
+  const uiQuelle = ['ui.tsx', 'tooltip-blase.tsx'].map((d) => readFileSync(`web/src/components/${d}`, 'utf8')).join('\n')
   pruefe(
     'das Fragezeichen sitzt im Feld rechts',
     /relative flex w-full items-center/.test(suchfeldQuelle) &&

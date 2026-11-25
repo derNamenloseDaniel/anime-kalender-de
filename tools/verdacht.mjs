@@ -62,7 +62,7 @@ function vonHandErbetene(wurzel, plattform, raus) {
  * @param {string} plattform `netflix`, `primevideo`, `disneyplus`
  * @returns {Map<number, {von: number, bis: number, seit: string}>}
  */
-function verdachtsfaelleBisher(wurzel, plattform) {
+export function verdachtsfaelleBisher(wurzel, plattform) {
   const raus = new Map()
   try {
     const roh = JSON.parse(readFileSync(resolve(wurzel, 'data/tonspur-verdacht.json'), 'utf8'))

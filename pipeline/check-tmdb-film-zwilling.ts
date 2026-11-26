@@ -41,6 +41,9 @@ pruefe('Zwilling plus ein dritter Titel: alle drei verlieren den Film', dritter.
 const fremd = mehrdeutigeFilmzuordnungen({ '777': spycies, '10014868': spycies }, bruecke)
 pruefe('aniSearch-Zeile, deren Seite ein Titel außerhalb der Gruppe trägt, zählt mit', fremd.size === 2, fremd)
 
+const grenze = mehrdeutigeFilmzuordnungen({ '4': spycies, '10000000': spycies }, new Map([['4', '0']]))
+pruefe('Grenze: 10 000 000 ist schon eine aniSearch-Zeile (Seite 0)', grenze.size === 0, grenze)
+
 const ohne = mehrdeutigeFilmzuordnungen({ '163696': spycies, '10014868': spycies })
 pruefe('ohne Brücke bleibt die alte Regel', ohne.size === 2, ohne)
 
@@ -61,6 +64,9 @@ try {
     '15197': akito,
   }
   writeFileSync(join(wurzel, 'data', 'tmdb-titles.json'), JSON.stringify(titel))
+  const { ladeGeteilteFilme } = await import('./lib/tmdb-eindeutig.ts')
+  const rueckfall = ladeGeteilteFilme(titel)
+  pruefe('Rückfall ohne Bau-Datei (Bestandsprüfung) nimmt dieselbe Brücke', [...rueckfall].sort().join() === '15197,8888', rueckfall)
   const { ladeQuellen } = await import('./bau/01-quellen.ts')
   const { tmdbTitles, tmdbMehrdeutig } = ladeQuellen()
   pruefe('Spycies (Abruf-Brücke) und Rohirrim (Handdatei) behalten FSK 6 und 12', tmdbTitles['163696']?.fsk === 6 && tmdbTitles['185613']?.fsk === 12, tmdbMehrdeutig)
@@ -69,4 +75,4 @@ try {
   rmSync(wurzel, { recursive: true, force: true })
 }
 if (verletzt) process.exit(1)
-console.log('TMDB-Film-Zwilling: 8 Zusicherungen ✓')
+console.log('TMDB-Film-Zwilling: 10 Zusicherungen ✓')

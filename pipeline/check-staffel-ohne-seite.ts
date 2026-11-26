@@ -40,7 +40,7 @@ pruefe('Staffel 1 mit 16 Folgen: Release ab Folge 9 ist kein Fund, ab Folge 17 s
 
 /* Zusammengelegte Staffeln (Ein-Titel-Form, ohne `basis`): jede spätere Staffel mit eigener Ankündigung ist ein Fund (F157, 26.11.2026). */
 const hz: StaffelGrenzeKurz = { anilistId: -900020, titel: 'Omega', staffeln: [{ nr: 1, von: 1 }, { nr: 2, von: 46 }, { nr: 3, von: 90 }, { nr: 4, von: 137, offen: true }] }
-const omega = [{ id: -900020, titleEn: 'Omega', episodes: undefined }]
+const omega = [{ id: -900020, titleEn: 'Omega EN', titleDe: 'Omega DE' }]
 const slugs = (g: StaffelGrenzeKurz[], r: never[]) => zusammengelegteStaffeln(g, omega, r, heute).map((f) => f.slug)
 pruefe('zusammengelegt: laufende offene Staffel 4 (Termin vergangen) ist ein Fund', slugs([hz], [rel('s4', -900020, 137, '2026-11-20')]), ['s4'])
 pruefe('zusammengelegt: künftiger Termin in abgeschlossener Staffel 2 ist ein Fund', slugs([hz], [rel('s2', -900020, 46, '2027-01-01')]), ['s2'])
@@ -52,6 +52,11 @@ pruefe('zusammengelegt: eine einzige Staffel: kein Fund', slugs([{ ...hz, staffe
 pruefe('zusammengelegt: widerlegt oder ohne Folgennummer: kein Fund', slugs([hz], [rel('w', -900020, 137, '2027-01-01', { widerlegt: { am: '2026-11-20', grund: 'x', gemeldet: true } }), rel('n', -900020, undefined, '2027-01-01')]), [])
 pruefe('zusammengelegt: Release eines anderen Titels: kein Fund', slugs([hz], [rel('f', -900021, 137, '2027-01-01')]), [])
 pruefe('zusammengelegt: Titel unbekannt, Name aus der Yaml', zusammengelegteStaffeln([hz], [], [rel('s4', -900020, 137, '2027-01-01')], heute)[0]!.titel, 'Omega')
+pruefe('zusammengelegt: Name: englischer vor deutschem vor Yaml; ein Titel mit anderer Kennung zählt nicht', [zusammengelegteStaffeln([hz], omega, [rel('s4', -900020, 137, '2027-01-01')], heute)[0]!.titel, zusammengelegteStaffeln([hz], [{ id: -900020, titleEn: undefined, titleDe: 'Omega DE' }], [rel('s4', -900020, 137, '2027-01-01')], heute)[0]!.titel, zusammengelegteStaffeln([hz], [{ id: -900099, titleEn: 'Fremd', titleDe: undefined }], [rel('s4', -900020, 137, '2027-01-01')], heute)[0]!.titel], ['Omega EN', 'Omega DE', 'Omega'])
+pruefe('zusammengelegt: der Fund trägt Release, Titel, Folge und Tag', zusammengelegteStaffeln([hz], omega, [rel('s4', -900020, 137, '2027-01-01')], heute), [{ slug: 's4', titleId: -900020, titel: 'Omega EN', ab: 137, am: '2027-01-01' }])
+pruefe('zusammengelegt: Termin heute in abgeschlossener Staffel zählt noch', slugs([hz], [rel('h', -900020, 50, heute)]), ['h'])
+pruefe('zusammengelegt: Folge vor der ersten Staffel: kein Fund, kein Absturz', slugs([hz], [rel('null', -900020, 0, '2027-01-01')]), [])
+pruefe('zusammengelegt: zwei Staffeln genügen, eine allein ergibt nie einen Fund', [slugs([{ ...hz, staffeln: [{ nr: 1, von: 1 }, { nr: 2, von: 10 }] }], [rel('z', -900020, 10, '2027-01-01')]), slugs([{ ...hz, staffeln: [{ nr: 1, von: 1, offen: true }] }], [rel('e', -900020, 5, '2026-01-01')])], [['z'], []])
 
 const klein = [{ id: -900006, titleEn: undefined, titleDe: undefined, episodes: 1 }, { id: -900007, titleEn: undefined, titleDe: 'Zeta', episodes: 0 }, { id: -900008, titleEn: 'Eta', titleDe: 'Zeta', episodes: 1 }]
 pruefe('erste Folge 2 hinter 1 Folge: Fund; Name fällt auf Kennung zurück', staffelnOhneSeite(klein, [rel('k', -900006, 2, '2027-01-01')], heute).map((f) => f.titel), ['-900006'])

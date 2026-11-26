@@ -62,7 +62,7 @@ export function zusammengelegteStaffeln(
 ): StaffelOhneSeite[] {
   const jeId = new Map(titles.map((t) => [t.id, t]))
   return grenzen.flatMap((g) => {
-    if (g.basis !== undefined || g.staffeln.length < 2) return []
+    if (g.basis !== undefined) return []
     const t = jeId.get(g.anilistId)
     return releases.flatMap((r): StaffelOhneSeite[] => {
       const ab = r.schedule?.firstEpisodeNumber

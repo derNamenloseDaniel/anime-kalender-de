@@ -46,7 +46,7 @@ export type Antwort =
       gesamt?: number
       /** Die Zahl ist die Folgenzahl des Werks, nicht am Weg belegt — „≈“ im Kasten. */
       gesamtAbgeleitet?: boolean
-      /** Katalogstart ohne Uhrzeit am Starttag: da, aber Zeitpunkt offen — Kasten sagt "heute, genaue Uhrzeit unbekannt". */
+      /** Katalogstart ohne Uhrzeit am Starttag: Kasten sagt "Alle N Folgen da", ohne Uhrzeit-Zusatz. */
       heuteOffen?: boolean
     }
   /** Belegt ist nur ein Teil — die Zahl sagt welcher. */

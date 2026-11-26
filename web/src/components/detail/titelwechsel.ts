@@ -51,9 +51,9 @@ export function useTitelwechsel(titleId: number, title: Title | undefined, mitTe
   const tab = title ? tabTitel(title, mitTermin) : undefined
   useEffect(() => {
     if (tab === undefined) return
-    document.title = tab
+    document.title = tab // title-ok: Tabtitel
     return () => {
-      document.title = GRUNDTITEL
+      document.title = GRUNDTITEL // title-ok: Tabtitel
     }
   }, [tab])
 }

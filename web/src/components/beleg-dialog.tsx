@@ -8,7 +8,7 @@ import { useEscape } from '../lib/escape.ts'
 import { useSeiteGesperrt } from '../lib/use-seite-gesperrt.ts'
 import { istSammelartikel } from '../lib/sammel-belege.ts'
 import { quellenLabel } from './news-belege.tsx'
-import { Ladeanzeige } from './ui.tsx'
+import { Ladeanzeige, Tooltip } from './ui.tsx'
 
 /** **Das Beleg-Bild** an einer Quelle; öffentlich lesbar (Daniel, 04.10.2026). Der archivierte Text (HTML) bleibt privat (Daniel, 05.10.2026). */
 const WORKER = import.meta.env?.VITE_NEWSLETTER_API ?? ''
@@ -25,15 +25,16 @@ export function QuellenKnopf({ belege, betreff }: { belege: NewsBeleg[]; betreff
   const text = belege.length > 1 ? `${wort === 'Beleg' ? 'Belege' : 'Quellen'} ${belege.length}` : wort
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOffen(true)}
-        title={belege.map(quellenLabel).join(' · ')}
-        className="-my-2.5 ml-auto inline-flex min-h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center px-1 text-t4 text-slate-600 underline underline-offset-2 hover:text-ak-text dark:text-slate-300"
-      >
-        {archiv ? '▣ ' : ''}
-        {text}
-      </button>
+      <Tooltip text={belege.map(quellenLabel).join(' · ')} seite="unten" className="-my-2.5 ml-auto shrink-0">
+        <button
+          type="button"
+          onClick={() => setOffen(true)}
+          className="inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center px-1 text-t4 text-slate-600 underline underline-offset-2 hover:text-ak-text dark:text-slate-300"
+        >
+          {archiv ? '▣ ' : ''}
+          {text}
+        </button>
+      </Tooltip>
       {offen && <BelegDialog belege={belege} betreff={betreff} zu={() => setOffen(false)} />}
     </>
   )

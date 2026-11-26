@@ -28,20 +28,10 @@ export function fskQuelleFehler(titles: Iterable<Title>, tmdbFsk: (id: number) =
   return fehler
 }
 
-/**
- * **Titel ohne FSK-Freigabe bekommen JustWatchs Altersangabe — als Anbieter-Einstufung gekennzeichnet.**
- *
- * JustWatch ist keine Freigabestelle: Bei 3 von 10 Doppelten wich der Wert von der FSK ab (Recherche
- * 08.10.2026). Deshalb nur als Rückfall, mit `fskQuelle: 'justwatch'`; ein vorhandener Wert (TMDB, ADN,
- * Hand) bleibt und eine Abweichung wird gezählt. Zugeordnet wird über die TMDB-Kennung im Befund,
- * mehrdeutige Zuordnungen fallen weg wie bei den Wegen. Läuft nach dem Bau der Termine und Releases,
- * damit diese weiter nur Freigaben tragen.
- */
-export function uebernehmeFskAusJustwatch({ titles, tmdbMehrdeutig }: {
-  titles: Map<number, Title>
-  tmdbMehrdeutig: Set<string>
-}): void {
-  const jw = readJson<Record<string, { ohneTreffer?: boolean; altersangabe?: string | null }>>('data/justwatch-audio.json', {})
+export type JwBefund = { ohneTreffer?: boolean; altersangabe?: string | null }
+
+/** Die Schleife von `uebernehmeFskAusJustwatch`: setzt `fsk`/`fskQuelle` an Titeln ohne Freigabe und zählt, was sie verwirft. */
+export function setzeFskAusBefunden(titles: Map<number, Title>, jw: Record<string, JwBefund>, tmdbMehrdeutig: Set<string>): { gesetzt: number; abweichend: number; verworfen: number } {
   let gesetzt = 0
   let abweichend = 0
   let verworfen = 0
@@ -60,6 +50,24 @@ export function uebernehmeFskAusJustwatch({ titles, tmdbMehrdeutig }: {
       gesetzt++
     } else if (title.fsk !== stufe) abweichend++
   }
+  return { gesetzt, abweichend, verworfen }
+}
+
+/**
+ * **Titel ohne FSK-Freigabe bekommen JustWatchs Altersangabe — als Anbieter-Einstufung gekennzeichnet.**
+ *
+ * JustWatch ist keine Freigabestelle: Bei 3 von 10 Doppelten wich der Wert von der FSK ab (Recherche
+ * 08.10.2026). Deshalb nur als Rückfall, mit `fskQuelle: 'justwatch'`; ein vorhandener Wert (TMDB, ADN,
+ * Hand) bleibt und eine Abweichung wird gezählt. Zugeordnet wird über die TMDB-Kennung im Befund,
+ * mehrdeutige Zuordnungen fallen weg wie bei den Wegen. Läuft nach dem Bau der Termine und Releases,
+ * damit diese weiter nur Freigaben tragen.
+ */
+export function uebernehmeFskAusJustwatch({ titles, tmdbMehrdeutig }: {
+  titles: Map<number, Title>
+  tmdbMehrdeutig: Set<string>
+}): void {
+  const jw = readJson<Record<string, JwBefund>>('data/justwatch-audio.json', {})
+  const { gesetzt, abweichend, verworfen } = setzeFskAusBefunden(titles, jw, tmdbMehrdeutig)
   const tmdb = mitHandvorrang(readJson<Record<string, { fsk?: Fsk }>>('data/tmdb-titles.json', {}))
   const fehler = fskQuelleFehler(titles.values(), (id) => tmdb[String(id)]?.fsk)
   if (fehler.length) throw new Error(`FSK aus JustWatch widerspricht der Zusicherung:\n${fehler.slice(0, 10).join('\n')}`)

@@ -10,6 +10,7 @@ import { reihenTeileVon } from '../web/src/components/detail/reihen-daten.ts'
 import { reihenNameVon } from '../web/src/components/detail/reihen-namen.ts'
 import { reihenReiterVon } from '../web/src/components/detail/reihen-reiter-liste.ts'
 import { reihenOrdnung } from '../web/src/components/detail/reihen-inhalt.tsx'
+import { todayIso } from '../shared/time.ts'
 import { melde } from './lib/quarantaene.ts'
 
 let verletzt = 0
@@ -26,12 +27,14 @@ const echt = (datei: string) => JSON.parse(readFileSync(`public/data/${datei}`, 
 const titel = echt('titles.json') as Title[]
 const reihen = echt('franchises.json') as Record<string, FranchiseMember[]>
 const daten = { titles: titel, titleById: new Map(titel.map((t) => [t.id, t])), releasesByTitle: new Map() } as unknown as Dataset
+/* Bestand: der echte Tag, wie das Panel ihn nimmt. */
+const heute = todayIso()
 const doppelte: string[] = []
 let listen = 0
 for (const t of titel) {
   const reihe = reihen[t.franchiseId ?? t.id] ?? []
   const [teile, name] = [reihenTeileVon(t, reihe, daten), reihenNameVon(t, reihe, daten)]
-  const marken = reihenReiterVon(t, teile, name, titel, gruppenVon(teile, name)).map((r) => r.label)
+  const marken = reihenReiterVon(t, teile, name, titel, gruppenVon(teile, name), heute).map((r) => r.label)
   if (marken.length) listen++
   if (new Set(marken).size === marken.length) continue
   doppelte.push(`${t.id}: ${marken.join()}`)

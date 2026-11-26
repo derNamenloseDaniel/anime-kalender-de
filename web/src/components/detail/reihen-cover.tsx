@@ -67,8 +67,6 @@ function CoverFlaeche({ m, t, offen, gemerkt, gewaehlt, ohneDe }: Pick<CoverProp
       ref={huelle}
       className={[
         'relative block aspect-[2/3] w-[120px] overflow-hidden rounded-lg bg-ak-flaeche-2',
-        ohneDe ? 'opacity-55' : '',
-        offen ? 'opacity-70' : '',
         gewaehlt ? 'outline-2 outline-ak-akzent' : offen ? 'outline-1 -outline-offset-1 outline-dashed outline-ak-leise' : '',
       ].join(' ')}
     >
@@ -80,7 +78,7 @@ function CoverFlaeche({ m, t, offen, gemerkt, gewaehlt, ohneDe }: Pick<CoverProp
           alt=""
           loading="lazy"
           decoding="async"
-          className="size-full object-cover"
+          className={['size-full object-cover', ohneDe ? 'opacity-55' : offen ? 'opacity-70' : ''].join(' ')}
         />
       )}
       {gemerkt && (

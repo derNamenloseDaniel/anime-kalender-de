@@ -7,6 +7,7 @@ import { type Voices, loadVoices, type Dataset, loadCartoons, loadAllTitles } fr
 import { aehnlicheTitel } from '@shared/aehnlich.ts'
 import { coverBild } from '../../lib/cover.ts'
 import { useHoverCover } from '../kalender/HoverCover.tsx'
+import { Tooltip } from '../ui.tsx'
 
 /**
  * Alle weiteren Schreibweisen eines Titels — eingeklappt, an einer Stelle.
@@ -135,11 +136,15 @@ export function VoiceCast({ titleId }: { titleId: number }) {
               <dl className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-x-3 gap-y-1 text-t3">
                 {stimmen.roles.map((r) => (
                   <Fragment key={`${r.character}-${r.actor}`}>
-                    <dt className="truncate text-ak-leise" title={r.character}>
-                      {r.character}
+                    <dt className="min-w-0 text-ak-leise">
+                      <Tooltip text={r.character} seite="unten" fuellend ohneTabHalt>
+                        <span className="truncate">{r.character}</span>
+                      </Tooltip>
                     </dt>
-                    <dd className="truncate text-ak-text" title={r.actor}>
-                      {r.actor}
+                    <dd className="min-w-0 text-ak-text">
+                      <Tooltip text={r.actor} seite="unten" fuellend ohneTabHalt>
+                        <span className="truncate">{r.actor}</span>
+                      </Tooltip>
                     </dd>
                   </Fragment>
                 ))}

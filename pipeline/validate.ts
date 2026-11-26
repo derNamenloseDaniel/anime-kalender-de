@@ -5,6 +5,7 @@ import yaml from 'js-yaml'
 import { loadCurated } from './lib/curated.ts'
 import { dubFeldFehler } from './lib/dub-aus-terminen.ts'
 import { zeitMeldungen } from './lib/sichtungsfenster.ts'
+import { fskVonHandFehler, ladeFskVonHand } from './lib/fsk-von-hand.ts'
 import { todayIso } from '../shared/time.ts'
 import { ROOT } from './lib/util.ts'
 import { log } from './lib/util.ts'
@@ -85,6 +86,8 @@ function main(): void {
       errors.push(`${datei}: ${(err as Error).message.split('\n')[0]}`)
     }
   }
+
+  errors.push(...fskVonHandFehler(ladeFskVonHand()))
 
   if (errors.length) {
     for (const err of errors) console.error('  ✖', err)

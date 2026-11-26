@@ -793,6 +793,7 @@ pipeline/check-weg-unten.ts
 pipeline/check-weg-widerspruch.ts
 pipeline/check-wege-aus-terminen.ts
 pipeline/check-wege-je-anbieter.ts
+pipeline/check-wege-stellen-istot.ts
 pipeline/check-werbetarif-weg.ts
 pipeline/check-werk-doppelt.ts
 pipeline/check-wertungsfilter.ts

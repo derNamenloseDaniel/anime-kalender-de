@@ -142,6 +142,8 @@ console.log('Pille: breit nur auf Wunsch')
   const d = await zeige(fall, () => [], [['Vol. 1/1', 'b', 't', '2025-01-10', 900450]], [h(Pille, { key: 'p', name: 'Probeshop', url: 'https://beispiel.invalid/shop' })])
   const klasse = d.klassenVon(/^Probeshop$/)[0] ?? ''
   pruefe('eine Pille ohne „breit“ bleibt inline (Stream- und Kaufweg-Pillen)', /inline-flex max-w-full/.test(klasse) && !/flex-1|rounded-b-none/.test(klasse), klasse)
+  const spalten = d.wurzel.finde((k) => k.tagName === 'SPAN' && /flex min-w-0 flex-col/.test(k.getAttribute('class') ?? '')).map((k) => [k.textContent.slice(0, 6), /(^| )flex-1( |$)/.test(k.getAttribute('class') ?? '')])
+  pruefe('die Textspalte der breiten Pille füllt den Rest (das Ziel steht rechts), die der schmalen nicht', JSON.stringify(spalten) === JSON.stringify([['Vol. 1', true], ['Probes', false]]), spalten)
   pruefe('die Disc-Pille daneben ist breit, ohne Fußzeilen-Form', /flex-1/.test(d.pillen()[0]!.klasse) && !/rounded-b-none|inline-flex/.test(d.pillen()[0]!.klasse), d.pillen()[0]!.klasse)
   await d.abbau()
 }

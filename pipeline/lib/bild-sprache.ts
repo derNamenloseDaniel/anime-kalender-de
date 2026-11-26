@@ -12,8 +12,8 @@ export function alsLookup<T>(roh: Record<string, T | null>, gilt: Record<string,
 }
 
 /**
- * Titel ohne TMDB-Serie (Suche ohne Treffer, `miss` ohne Kennung) haben nie einen Banner-Abruf (`holeBanner` fragt nur Titel mit Kennung):
- * „nie gesucht“ ist für sie falsch, TMDB hat kein Banner (`null`). Ein vorhandener Eintrag gewinnt.
+ * Titel, für die von Hand belegt ist, dass TMDB sie nicht führt (`ohne: true` in `data/tmdb-von-hand.yaml`), haben nie einen Banner-Abruf (`holeBanner` fragt nur Titel mit Kennung):
+ * „nie gesucht“ ist für sie falsch, TMDB hat kein Banner (`null`). Ein vorhandener Eintrag gewinnt. Ein `miss` ohne Kennung genügt nicht: er heißt nur „Namensabgleich fand nichts“ oder „Suche scheiterte“.
  */
 export function bannerOhneTmdbSerie<T>(banner: BildLookup<T>, ohneSerie: ReadonlySet<number>): BildLookup<T> {
   return (id) => {

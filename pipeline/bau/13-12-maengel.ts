@@ -17,7 +17,7 @@ import { MAENGEL_DATEI, schreibeFort, serialisiere, type Register } from '../lib
 import { BANNER_DATEI } from '../lib/tmdb-banner.ts'
 import { ohneGeteilteFilme } from '../lib/tmdb-eindeutig.ts'
 import { alsLookup, bannerOhneTmdbSerie, type BildLookup, type PlakatWahl } from '../lib/bild-sprache.ts'
-import { mitHandvorrang } from '../lib/tmdb-von-hand.ts'
+import { ohneKennungen } from '../lib/tmdb-von-hand.ts'
 
 const OUT = 'public/data'
 
@@ -40,17 +40,11 @@ function bildBestand<T>(datei: string, was: string): BildLookup<T> {
   return alsLookup(roh, ohneGeteilteFilme(roh, was))
 }
 
-/** Kennungen, bei denen die TMDB-Suche keine Serie fand (mit Handvorrang wie der Bau). */
-function titelOhneTmdbSerie(): Set<number> {
-  const tmdb = mitHandvorrang(readJson<Record<string, { miss?: boolean; tmdbId?: number }>>('data/tmdb-titles.json', {}))
-  return new Set(Object.entries(tmdb).filter(([, e]) => e.miss && !e.tmdbId).map(([id]) => Number(id)))
-}
-
 /** Die Bildbestände von TMDB (gewähltes Plakat mit Sprache, Banner) für `banner` und `bild-fremdsprachig`. */
 function bildLeser(): Pick<Kontext, 'plakat' | 'banner'> {
   return {
     plakat: bildBestand<PlakatWahl>('data/tmdb-poster.json', 'Plakate (Bildsprache)'),
-    banner: bannerOhneTmdbSerie(bildBestand<{ p: string }>(BANNER_DATEI, 'Banner (Bildsprache)'), titelOhneTmdbSerie()),
+    banner: bannerOhneTmdbSerie(bildBestand<{ p: string }>(BANNER_DATEI, 'Banner (Bildsprache)'), ohneKennungen()),
   }
 }
 

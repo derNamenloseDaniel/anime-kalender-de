@@ -1,5 +1,6 @@
 /** Prüft `lib/trailer-label.ts` (Zuordnung deutscher Label-Trailer) an Fixtures und dem echten Fall 156040 — kein Netz. */
 import { readJson } from './lib/util.ts'
+import { ladeTrailerHand } from './lib/trailer-hand.ts'
 import {
   istDeutschesVideo,
   staffelNummer,
@@ -63,6 +64,11 @@ pruefe('drei Jahre nach Erstausgabe sind noch im Fenster', deJahr.funde.has(7))
 console.log('Wahl unter mehreren Videos')
 const mehr = wahl([foo], [v('t1', 'DRAGON QUEST SAGA | Teaser | Deutsch', '2026-09-01'), v('t2', 'DRAGON QUEST SAGA | Trailer | Deutsch', '2026-05-01'), v('t3', 'DRAGON QUEST SAGA | Trailer | Deutsch', '2026-07-01')])
 pruefe('Trailer vor Teaser, dann der jüngste', mehr.funde.get(1)?.video === 't3', [...mehr.funde])
+
+console.log('Handtrailer')
+const hand = ladeTrailerHand()
+pruefe('156040 steht in trailer-hand.yaml mit n5yRD1JypBU, deutsch', hand['156040']?.video === 'n5yRD1JypBU' && hand['156040']?.sprache === 'de', hand['156040'])
+pruefe('jeder Handeintrag gehört zu einem Titel im Datensatz', Object.keys(hand).every((id) => readJson<{ id: number }[]>('public/data/titles.json', []).some((t) => String(t.id) === id)))
 
 console.log('Logzeile')
 pruefe('nennt nur Gründe mit Treffern', verwerfungenText(clip.verworfen) === '1× kein-trailer, 1× kein-treffer', verwerfungenText(clip.verworfen))

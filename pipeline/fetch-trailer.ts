@@ -60,6 +60,8 @@ import { todayIso } from '../shared/time.ts'
 import type { EmpfehlungsDatei } from '../shared/empfehlung-pool.ts'
 import { tmdbArt, tmdbVideosUrl, trailerKandidaten } from './lib/trailer-auswahl.ts'
 import { RIEGEL_JE_LAUF, SPEICHERN_ALLE, arbeiteInStuecken, lageVon, waehleDran, type Versuche } from './lib/trailer-lauf.ts'
+import { AUSFALL, ladeLabelKanaele, loeseKanaeleAuf, type KanalStand } from './lib/trailer-label-kanaele.ts'
+import { uebernehmeLabel, verwerfungenText } from './lib/trailer-label.ts'
 import { pathToFileURL } from 'node:url'
 
 /**
@@ -91,6 +93,7 @@ interface Titel {
   titleRomaji?: string
   format?: string
   jpYear?: number
+  deErstausgabe?: { von?: string }
 }
 
 interface TmdbEintrag {
@@ -120,7 +123,7 @@ export interface TrailerEintrag {
    */
   sprache: 'de' | 'en' | 'ja'
   /** Woher die Zuordnung stammt — `kanal`, `kinocheck` (TMDB-Kennung) oder `tmdb`. */
-  herkunft: 'kanal' | 'kinocheck' | 'tmdb'
+  herkunft: 'kanal' | 'kinocheck' | 'tmdb' | 'label'
   gefundenAm: string
   /** Wann die Adresse zuletzt erreichbar war. */
   geprueftAm?: string
@@ -204,16 +207,18 @@ async function holeAntwort(url: string): Promise<unknown> {
   }
 }
 
-/** Der Index beider Kanäle, einmal am Tag geholt. */
-async function kanalIndex(schluessel: string): Promise<Video[]> {
-  const cache = readJson<{ geholtAm?: string; videos?: Video[] }>('data/cache/kinocheck-kanal.json', {})
-  if (cache.geholtAm === heute() && cache.videos?.length) {
+/** Der Index aller Kanäle (KinoCheck, Crunchyroll, Label-Kanäle), einmal am Tag geholt; ein neuer Kanal entwertet den Zwischenspeicher. */
+async function kanalIndex(schluessel: string, label: { name: string; uploads: string }[]): Promise<Video[]> {
+  const kanaele = [...KANAELE, ...label]
+  const schluesselKanaele = kanaele.map((k) => k.uploads).join(',')
+  const cache = readJson<{ geholtAm?: string; kanaele?: string; videos?: Video[] }>('data/cache/kinocheck-kanal.json', {})
+  if (cache.geholtAm === heute() && cache.videos?.length && cache.kanaele === schluesselKanaele) {
     log(`${cache.videos.length} Kanalvideos aus dem Zwischenspeicher`)
     return cache.videos
   }
 
   const videos: Video[] = []
-  for (const kanal of KANAELE) {
+  for (const kanal of kanaele) {
     let seite: string | undefined
     let gezaehlt = 0
     do {
@@ -244,7 +249,7 @@ async function kanalIndex(schluessel: string): Promise<Video[]> {
     log(`  ${kanal.name}: ${gezaehlt} Videos`)
   }
 
-  writeJson('data/cache/kinocheck-kanal.json', { geholtAm: heute(), videos })
+  writeJson('data/cache/kinocheck-kanal.json', { geholtAm: heute(), kanaele: schluesselKanaele, videos })
   log(`${videos.length} Videos im Kanalindex`)
   return videos
 }
@@ -440,6 +445,40 @@ async function frageSchnittstellen(
   return auskunft
 }
 
+/**
+ * **Label-Kanäle** (KSM Anime u. a.): Kanäle auflösen, Index holen, deutsche Trailer an alle Titel hängen.
+ * Der Abgleich ist lokal und kostet nichts, also läuft er über den ganzen Bestand und nicht nur über `dran`.
+ * Gibt den Index für Weg 1 zurück.
+ */
+async function ladeIndexMitLabel(
+  schluessel: string | undefined,
+  titles: Titel[],
+  bestand: Record<string, TrailerEintrag>,
+): Promise<Video[]> {
+  if (!schluessel) {
+    warn('Kein YOUTUBE_API_KEY — kein Kanalindex und keine Adressprüfung.')
+    return []
+  }
+  const stand = readJson<KanalStand>('data/trailer-label-kanaele.json', {})
+  const kanaele = ladeLabelKanaele()
+  const hole = async (url: string): Promise<unknown> => {
+    const antwort = await holeAntwort(url)
+    return antwort === FEHLER ? AUSFALL : antwort
+  }
+  const aufgeloest = await loeseKanaeleAuf(kanaele, stand, heute(), schluessel, hole)
+  if (aufgeloest.geaendert) writeJson('data/trailer-label-kanaele.json', stand, true)
+  if (aufgeloest.nichtGefunden.length) warn(`Kanal nicht gefunden: ${aufgeloest.nichtGefunden.join(', ')}`)
+  if (aufgeloest.ausgefallen.length) warn(`Kanal-Abfrage ausgefallen (nicht gestempelt): ${aufgeloest.ausgefallen.join(', ')}`)
+  const index = await kanalIndex(schluessel, aufgeloest.playlists)
+  /* KinoCheck ist ein Kinokanal: seine Trailer gehören Filmen und bleiben bei Weg 1 (nur Filme); Label-Kanäle gelten für alle Formate. */
+  const label = uebernehmeLabel(titles, bestand, index.filter((v) => !v.kanal.startsWith('KinoCheck')), heute())
+  log(
+    `Label-Trailer: ${label.neu} neu, ${label.ersetzt} statt eines nicht deutschen · ${aufgeloest.playlists.length} von ${kanaele.length} ` +
+      `Label-Kanälen · verworfen: ${verwerfungenText(label.verworfen)}`,
+  )
+  return index
+}
+
 /** `riegel` und `speichernAlle` nur für die Probe; im Betrieb gelten `RIEGEL_JE_LAUF` und `SPEICHERN_ALLE`. */
 export async function main(opt: { riegel?: number; speichernAlle?: number } = {}): Promise<void> {
   const schluessel = process.env.YOUTUBE_API_KEY
@@ -459,6 +498,7 @@ export async function main(opt: { riegel?: number; speichernAlle?: number } = {}
 
   /* Zuerst aufräumen: Ein toter Eintrag soll in derselben Runde neu gesucht werden. */
   const weg = schluessel ? await pruefeAdressen(bestand, schluessel) : 0
+  const index = await ladeIndexMitLabel(schluessel, titles, bestand)
 
   /*
     **Wiedervorlage:** Wer keinen **deutschen** Trailer hat, kommt wieder dran.
@@ -474,9 +514,6 @@ export async function main(opt: { riegel?: number; speichernAlle?: number } = {}
     return
   }
   let ausKanal = 0
-
-  const index = schluessel ? await kanalIndex(schluessel) : []
-  if (!schluessel) warn('Kein YOUTUBE_API_KEY — kein Kanalindex und keine Adressprüfung.')
 
   for (const titel of dran.filter((t) => t.format === 'MOVIE')) {
     const fund = ausIndex(titel, index, tmdb[String(titel.id)]?.nameDe)

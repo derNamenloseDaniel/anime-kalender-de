@@ -1,0 +1,16 @@
+# Deutsche Label-Kanäle, deren Trailer der Trailerlauf (`pipeline/fetch-trailer.ts`) an Titel mit Synchro hängt
+# (26.11.2026, Fehlermeldung zu „The Most Heretical Last Boss Queen“). Crunchyroll Deutschland und KinoCheck
+# stehen schon im Kanalindex (`KANAELE` in `fetch-trailer.ts`) und lesen dieselbe Zuordnung.
+# `name`: Kanalname wörtlich wie bei YouTube; der Lauf löst die Kennung über die API auf und nimmt nur einen Kanal,
+# dessen Name genau so lautet. Stimmt ein Name nicht, steht er im Lauflog unter „Kanal nicht gefunden“ und wird
+# nach 30 Tagen erneut gesucht — dann hier den Namen berichtigen.
+# `beispielVideo`: ein echtes Video des Kanals (löst für 1 statt 100 Einheiten auf).
+# Videos mit OmU/Sub/GerSub/JapDub im Titel verwirft der Abgleich auch auf Kanälen, die beides hochladen (peppermint).
+kanaele:
+  - name: KSM Anime
+    beispielVideo: n5yRD1JypBU
+  - name: peppermint anime
+  - name: Universum Anime
+  - name: Anime House
+  - name: AniMoon
+  - name: ADN

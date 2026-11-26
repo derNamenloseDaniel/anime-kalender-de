@@ -171,3 +171,23 @@ function pruefeVideo(v: LabelVideo, idx: Map<string, LabelTitel[]>): Verwerfung 
 export function verwerfungenText(v: Verwerfungen): string {
   return VERWERFUNGEN.filter((g) => v[g]).map((g) => `${v[g]}× ${g}`).join(', ') || 'keine'
 }
+
+/** Setzt die Funde in den Bestand: ein deutscher Eintrag bleibt, ein englischer/japanischer/fehlender wird ersetzt. */
+export function uebernehmeLabel(
+  titel: LabelTitel[],
+  bestand: Record<string, { sprache?: string }>,
+  videos: LabelVideo[],
+  heute: string,
+): { neu: number; ersetzt: number; verworfen: Verwerfungen } {
+  const { funde, verworfen } = waehleLabelTrailer(titel, videos, heute)
+  let neu = 0
+  let ersetzt = 0
+  for (const [id, fund] of funde) {
+    const alt = bestand[String(id)]
+    if (alt?.sprache === 'de') continue
+    if (alt) ersetzt++
+    else neu++
+    bestand[String(id)] = fund
+  }
+  return { neu, ersetzt, verworfen }
+}

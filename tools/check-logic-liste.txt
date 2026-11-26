@@ -700,7 +700,6 @@ pipeline/check-tmdb-404-neusuche.ts
 pipeline/check-tmdb-ablauf.ts
 pipeline/check-tmdb-angebote-kopie.ts
 pipeline/check-tmdb-film-suche.ts
-pipeline/check-tmdb-suchfehler.ts
 pipeline/check-tmdb-film-vorrang-lauf.ts
 pipeline/check-tmdb-folgen-404-lauf.ts
 pipeline/check-tmdb-folgen-404.ts
@@ -725,6 +724,7 @@ pipeline/check-tmdb-staffel0-eigene-lauf.ts
 pipeline/check-tmdb-staffel0-liste.ts
 pipeline/check-tmdb-staffel0.ts
 pipeline/check-tmdb-suche.ts
+pipeline/check-tmdb-suchfehler.ts
 pipeline/check-tmdb-von-hand-abgeleitet.ts
 pipeline/check-tote-adresse-runden.ts
 pipeline/check-tote-adressen-lauf.ts

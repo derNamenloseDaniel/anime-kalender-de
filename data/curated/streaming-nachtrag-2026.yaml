@@ -265,3 +265,32 @@
     - https://plus.rtl.de/pokemon-horizonte-die-serie-p_10142/video/eine-welt-voller-abenteuer-c_2211265
     - https://www.anime2you.de/news/1067953/pokemon-horizonte-staffel-4-toggo-start/
     - https://de.wikipedia.org/wiki/Pok%C3%A9mon_(Anime)/Horizonte
+
+# Berserk (1997) bei aniverse, Prime Video Channel (26.11.2026): Amazon und aniverse teilen die 25 Folgen in zwei Teile. Kein Katalogtitel trägt „Part 2“, deshalb von Hand;
+# Teil 2 = unsere Folgen 14–25 (Handbeleg B0FKZM9J6V in dub-confirmed.yaml, aniSearch-News 60167: „Folgen 14-25“). Keine Uhrzeit: der Artikel nennt nur den Tag.
+# Anime2You 1074092 (20.11.2026): „24. Dezember: »Berserk« – Part 2 · Episoden: 12 (komplett) · Sprache: Deutsch, Japanisch (UT) · Stream: Prime Video“.
+- slug: berserk-1997-part2-primevideo
+  anilistId: 33
+  titleDe: "Berserk – Part 2"
+  platform: primevideo
+  kanal: Aniverse
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-12-24", firstEpisodeNumber: 14, episodeCount: 12 }
+  hinweis: "Folgen 14–25 ab 24.12.2026 über den Prime-Kanal aniverse."
+  sources:
+    - https://www.anime2you.de/news/1074092/aniverse-dezember-2026-neuzugaenge/
+    - https://www.anisearch.de/news/anime/60167,aniverse-monatsuebersicht-dezember-2026
+
+# Anime2You 1056322 (aniverse Oktober 2026): „1. Oktober: »Berserk« – Part 1 · Episoden: 13 · Sprache: Deutsch · aniverse“ (gelesen aus data/proposals/anime2you.json, Sammelzeile).
+- slug: berserk-1997-part1-primevideo
+  anilistId: 33
+  titleDe: "Berserk – Part 1"
+  platform: primevideo
+  kanal: Aniverse
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-10-01", firstEpisodeNumber: 1, episodeCount: 13 }
+  hinweis: "Folgen 1–13 seit 01.10.2026 über den Prime-Kanal aniverse."
+  sources:
+    - https://www.anime2you.de/news/1056322/aniverse-oktober-2026-neuzugaenge/

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import { quellBaum } from './quell-baum.ts'
 
-const erwartet = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], { encoding: 'utf8' }).trim()
+const erwartet = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], { encoding: 'utf8', timeout: 30_000 }).trim()
 assert.match(erwartet, /^[0-9a-f]{40,64}$/)
 assert.equal(quellBaum(), erwartet)
 

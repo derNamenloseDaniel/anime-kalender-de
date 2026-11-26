@@ -29,19 +29,22 @@ console.log('\nbeobachteteFolgen')
 const obs = beobachteteFolgen(dorohedoro)
 pruefe('Mehrfachstart: 11 Folgen belegt, 1–3 am 01.04.', Object.keys(obs ?? {}).length === 11 && obs?.[3] === '2026-04-01' && obs?.[11] === '2026-05-27', obs)
 pruefe('Wochentakt ohne Mehrfachtag: nichts nötig', beobachteteFolgen(dorohedoro.slice(2)) === undefined)
+const wiederholung = folge(13, '2026-04-08')
+pruefe('Folge an zwei Tagen (Wiederholung hinten): der frühere Tag gilt', beobachteteFolgen([...dorohedoro, wiederholung])?.[1] === '2026-04-01')
+pruefe('Folge an zwei Tagen (Wiederholung vorn): der frühere Tag gilt', beobachteteFolgen([wiederholung, ...dorohedoro])?.[1] === '2026-04-01')
 pruefe('Folge ohne Nummer: nichts behaupten', beobachteteFolgen([{ ...folge(1, '2026-04-01'), episode: undefined }, folge(2, '2026-04-01')]) === undefined)
 
 console.log('\nTermine')
-const bau = (rhythm: string): Release =>
+const bau = (rhythm: string, liste: AdnEpisode[] = dorohedoro): Release =>
   adnRelease({
     lauf: { artikelProShow: new Map() },
     show: { showId: 1375, title: 'Dorohedoro', fromCatalog: false },
-    block: { rhythm, episodes: dorohedoro },
+    block: { rhythm, episodes: liste },
     abschnitt: { title: undefined, adnVon: 13, adnBis: 23 },
     zuordnung: { teile: [], unscharf: false },
-    folgen: dorohedoro,
-    first: dorohedoro[0],
-    letzte: dorohedoro.at(-1),
+    folgen: liste,
+    first: liste[0],
+    letzte: liste.at(-1),
     slug: 'adn-1375',
     anzeigename: 'Dorohedoro: Staffel 2',
   } as never)
@@ -53,6 +56,11 @@ pruefe('11 Termine wie episodeCount', termine.length === 11, termine.length)
 pruefe('Finale Folge 11 am 27.05.', termine.at(-1)?.episode === 11 && termine.at(-1)?.date === '2026-05-27', termine.at(-1))
 const ohne = expandEvents({ ...release, schedule: { ...release.schedule, observed: undefined } } as Release)
 pruefe('Gegenprobe: ohne Beleg weiter nur 9 Termine (die main-Fassung)', ohne.length === 9, ohne.length)
+
+/* ADNs Kalendertag gilt auch für noch nicht erschienene Folgen als belegt (Sendeplan), nicht als Schätzung. */
+const kuenftig = bau('weekly', dorohedoro.map((e) => ({ ...e, date: e.date.replace('2026', '2099') })))
+const kuenftigeTermine = expandEvents(kuenftig)
+pruefe('Zukunftstermine: 11 Termine, keiner geschätzt', kuenftigeTermine.length === 11 && !kuenftigeTermine.some((t) => t.estimated), kuenftigeTermine.filter((t) => t.estimated).length)
 
 if (fehler) {
   console.error(`\n${fehler} Prüfung(en) fehlgeschlagen`)

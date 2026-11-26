@@ -265,6 +265,7 @@ export function adnRelease(a: {
       time: first.time,
       episodeCount: anzahl,
       lastEpisodeDate: letzte.date,
+      /* ADNs Kalendertag gilt als Beleg, auch für noch nicht erschienene Folgen (Sendeplan, nicht Rechnung). */
       observed: block.rhythm === 'weekly' ? beobachteteFolgen(folgen) : undefined,
     },
     year: Number(first.date.slice(0, 4)),

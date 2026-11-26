@@ -6,8 +6,8 @@ import { ROOT } from './util.ts'
  * deren Soll-Liste derselbe Bau schreibt, bestätigt sich sonst selbst: Streicht der Bau einen Eintrag aus Liste und Ausgabe zugleich,
  * bleibt sie grün. Gegen den Vorstand fällt dieser Abgang auf.
  */
-const git = (...a: string[]): string =>
-  execFileSync(process.env.GIT_EXE ?? 'git', a, { cwd: ROOT, encoding: 'utf8', maxBuffer: 1 << 30, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] })
+const git = (wurzel: string, ...a: string[]): string =>
+  execFileSync(process.env.GIT_EXE ?? 'git', a, { cwd: wurzel, encoding: 'utf8', maxBuffer: 1 << 30, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] })
 
 /** `--vorstand <ref>` aus den Argumenten, sonst `HEAD`. */
 export function vorstandRef(argv: string[]): string {
@@ -16,9 +16,9 @@ export function vorstandRef(argv: string[]): string {
 }
 
 /** JSON-Datei (Pfad ab Repo-Wurzel) im Vorstand; `undefined`, wenn es sie dort nicht gab. Wirft bei unbekanntem Stand oder kaputtem Inhalt. */
-export function leseVorstandJson<T>(pfad: string, ref: string): T | undefined {
-  if (!git('ls-tree', ref, '--', pfad).trim()) return undefined
-  return JSON.parse(git('show', `${ref}:${pfad}`)) as T
+export function leseVorstandJson<T>(pfad: string, ref: string, wurzel = ROOT): T | undefined {
+  if (!git(wurzel, 'ls-tree', ref, '--', pfad).trim()) return undefined
+  return JSON.parse(git(wurzel, 'show', `${ref}:${pfad}`)) as T
 }
 
 /**

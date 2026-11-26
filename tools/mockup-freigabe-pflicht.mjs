@@ -14,6 +14,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
 import { ghApiJson } from './kind-mit-limit.mjs'
+import { leseKommentare } from './patchnotes-kommentar.mjs'
 import { ladeBasis } from './pr-basis.mjs'
 
 const MOCKUP = /^web\/buehne\/mockups\/[^/]+\.tsx$/
@@ -95,17 +96,12 @@ export function bewerte({ aenderungen, lies, beschreibung }) {
 }
 
 /** Beschreibung samt Kommentaren von Autor und Berechtigten (die Freigabe kann nachgereicht werden); Abruffehler: nur die Beschreibung. */
-export function beschreibungMitKommentaren(pr, repo, api = ghApiJson) {
+export function beschreibungMitKommentaren(pr, repo, api = ghApiJson, env = process.env) {
   const beschreibung = pr.body ?? ''
-  if (!repo || !pr.number) return beschreibung
-  try {
-    const kommentare = api(['--paginate', '--slurp', `repos/${repo}/issues/${pr.number}/comments`]).flat()
-    const zaehlt = (k) => k.user?.login === pr.user?.login || VERTRAUT.has(k.author_association)
-    return [beschreibung, ...kommentare.filter(zaehlt).map((k) => k.body ?? '')].join('\n')
-  } catch (fehler) {
-    console.error(`  ⚠ Mockup-Freigabe: Kommentare nicht lesbar, es gilt die Beschreibung (${String(fehler.message).split('\n')[0]})`)
-    return beschreibung
-  }
+  const kommentare = leseKommentare(pr, repo, api, env, 'Mockup-Freigabe')
+  if (!kommentare.length) return beschreibung
+  const zaehlt = (k) => k.user?.login === pr.user?.login || VERTRAUT.has(k.author_association)
+  return [beschreibung, ...kommentare.filter(zaehlt).map((k) => k.body ?? '')].join('\n')
 }
 
 const ALT = "mockup({ name: 'x', titel: 'T', varianten: { A: { ersatz: { AntwortKasten: K }, notiz: 'n' } } })"

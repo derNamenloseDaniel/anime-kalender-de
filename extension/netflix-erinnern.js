@@ -94,6 +94,13 @@ globalThis.akNetflixDatumKurz = (text) => {
   return m ? `${Number(t[1])}.${m}.` : null
 }
 
+/** Der Termin „Ab 10. Dezember“ im Text, unabhängig von der Schreibung des „Ab“; nur mit lesbarem Monat, sonst `null` (26.11.2026, Banana Fish). */
+globalThis.akNetflixTerminLesen = (text) => {
+  const t = /\bab\s+(\d{1,2}\.\s*[A-Za-zÄÖÜäöü]+(?:\s+\d{4})?)/i.exec(String(text ?? ''))
+  const termin = t ? t[1].replace(/\s+/g, ' ').trim() : null
+  return termin && globalThis.akNetflixDatumKurz(termin) ? termin : null
+}
+
 /**
  * Der Grund einer Zurückstellung wegen des Erinnern-Knopfes (18.11.2026, Daniel: „wenn Netflix ein Datum nennt, muss das auch der Grund sein").
  * Das Datum steht im Grund, und `zurueckBis` liest es von dort: Grund und „zurück bis" kommen aus derselben Messung. Die Klammer lässt

@@ -87,7 +87,7 @@ export const TEXTE_KALENDER = {
   'kal.katalogVermutlichHinweis': 'Vermutlich erscheint die ganze Staffel an diesem Tag auf einmal; eine Quelle sagt es nicht ausdrücklich.',
   'kal.katalogAlleVermutlich': 'Vermutlich alle {n} Folgen auf einmal',
   'fachwort.omu': 'Originalton mit deutschen Untertiteln — keine deutsche Synchro',
-  'kal.omu': 'OmU', 'kal.synchroOffen': 'Synchro offen', 'kal.synchroOffenHinweis': 'Der Termin ist belegt, eine deutsche Synchro nicht.',
+  'kal.synchroOffen': 'Synchro offen', 'kal.synchroOffenHinweis': 'Der Termin ist belegt, eine deutsche Synchro nicht.',
   'kal.undWeitere': 'und {n} weitere',
 
   /* Der Chip heißt, was er **tut** — vorher „Fernsehen zeigen" und leuchtete, solange das

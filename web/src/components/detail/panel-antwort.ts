@@ -10,6 +10,7 @@ import { lueckeOhneAnbieter } from './folgen-ohne-anbieter.ts'
 import { dubZeilenVon } from './dub-zeilen.ts'
 import { berechneAntwortMitDeFolgen } from './antwort-de-folgen.ts'
 import { sortiereNachZugang } from './wege-sortieren.ts'
+import { sichtbareTermine, sichtbareWege } from './wege-sichtbar.ts'
 import { kastenNotizVon, wegeHinweisVon } from './kasten-hinweise.ts'
 import { useReleaseSichten } from './release-sichten.ts'
 
@@ -41,10 +42,11 @@ export function usePanelAntwort({ title, releases, today, synopsis, favorites, v
    * kommentarlos aus der Anzeige.
    */
   const sortiertNachZugang = useMemo(() => {
-    return sortiereNachZugang({ title })
-  }, [title])
+    return title ? sichtbareWege(sortiereNachZugang({ title }), title, releases) : sortiereNachZugang({ title })
+  }, [title, releases])
   const { discReleases, releaseJePlattform, kinoRelease } = useReleaseSichten(releases, today)
-  const terminReleases = useTerminReleases(releases, title, kinoRelease?.slug, today)
+  const alleTermine = useTerminReleases(releases, title, kinoRelease?.slug, today)
+  const terminReleases = useMemo(() => sichtbareTermine(alleTermine, sortiertNachZugang, today), [alleTermine, sortiertNachZugang, today])
   /* Führt der Titel den Anbieter schon als Link, steht dort dessen Pille; der Termin allein erst vor der ersten Folge. */
   const streamReleases = useMemo(
     () => terminReleases.filter((r) => !(title?.streams ?? []).some((s) => s.platform === r.platform)),

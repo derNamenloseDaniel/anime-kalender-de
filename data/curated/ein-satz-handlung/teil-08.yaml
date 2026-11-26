@@ -453,7 +453,7 @@
   geprueftAm: 2026-11-26
 - id: 104382
   satz: "Im Sommer 2112 nimmt Pilot Teppei Sugo an einem Militäreinsatz in Okinawa teil, und drei Monate später greift eine Drohne das Verteidigungsministerium an."
-  quellen: [anilist]
+  quellen: [anilist, fandom]
   geprueftAm: 2026-11-26
 - id: 104454
   satz: "Ein rätselhafter Knopf versetzt die Figuren aus Re:Zero, Overlord, KonoSuba und Tanya the Evil in eine weitere Welt, wo sie gemeinsam die Schulbank drücken."
@@ -587,4 +587,386 @@
 - id: 106509
   satz: "In fünf Bonusgeschichten aus der Monsternation Tempest veranstaltet Rimuru unter anderem ein Sumo-Turnier, damit seine Untertanen etwas Zerstreuung haben."
   quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 106625
+  satz: "Karasuno hat sich für das Nationalturnier qualifiziert, und während Kageyama und Tsukishima zu Trainingslagern eingeladen werden, fühlt sich Hinata abgehängt."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 106893
+  satz: "In San-Teresa, wo sich vor 15 Jahren der Zugang zu einer Fantasiewelt auftat, muss Polizist Kei Matoba mit der Ritterin Tilarna aus jener Welt ermitteln."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 106896
+  satz: "Obwohl Masayoshi Shido seine Taten gestanden hat, ändert sich die Gesellschaft nicht, und Ren und die Phantom Thieves stellen sich ihrem größten Gegner."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 106967
+  satz: "Die Freundinnen Homi, Ren und Yua erleben ihren Schulalltag, den die Serie mit besonderem Blick auf ihre Strumpfhosen zeigt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107012
+  satz: "Am Tag vor ihrem Geburtstag trifft die schüchterne Akane im Laden ihrer Tante den Alchemisten Hippokrates, der sie als Retterin in eine fremde Welt mitnimmt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107068
+  satz: "Mittelschüler Nishikata versucht weiter vergeblich, seine Sitznachbarin Takagi einmal hereinzulegen, die ihn Tag für Tag gekonnt aufzieht."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107202
+  satz: "Haruka und Makoto beginnen ihr Studium in Tokio und begegnen ihrem Kindheitsfreund Ikuya wieder, dessen neuer Freund Hiyori sie jedoch fernhalten will."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107203
+  satz: "Haruka, Rin und Ikuya reisen als Vertreter Japans zum Wettkampf nach Sydney, wo Haruka auf den unnahbaren Champion Albert Wåhlander trifft."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107208
+  satz: "Oarai setzt in Runde eins des Winter-Raupenkettencups das Gefecht mit der Freien Schule BC fort, deren innerer Streit offenbar nur gespielt war."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107226
+  satz: "Die naschfreudige Oberschülerin Hibiki Sakura sorgt sich um ihre Figur, meldet sich im Fitnessstudio an und trainiert dort mit ihrer Mitschülerin Akemi."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107313
+  satz: "Fujiko Mine hütet den herzkranken Gene, dessen Vater Randy seinem Arbeitgeber ein Vermögen gestohlen hat, und flieht mit dem Jungen vor einem Auftragskiller."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107351
+  satz: "Ein Fernsehbeitrag im Dokumentarstil stellt die Oberschulteams des Frühlingsturniers vor und lässt Spieler wie Oikawa, Kageyama und Kuroo zu Wort kommen."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 107371
+  satz: "Eine junge Frau erwacht ohne Gedächtnis in einem Dorf von Schlangenfängern und sucht mit dem jungen Xuan nach ihrer Herkunft, wobei sich beide näherkommen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107420
+  satz: "Reiji Mukudori steigt kurz vor dem Studium in Infinite Dendrogram ein, ein VRMMO für alle fünf Sinne, und entdeckt mit Hilfe seines älteren Bruders dessen Welt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107625
+  satz: "Der wortkarge Cherry, der sich in Haikus ausdrückt, trifft im Einkaufszentrum Smile, die ihre Zahnspange hinter einer Maske versteckt, und beide nähern sich an."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107660
+  satz: "An der Cherryton-Akademie, wo ein Mord Fleisch- und Pflanzenfresser entzweit, verliebt sich der sanfte Grauwolf Legoshi in das Zwergkaninchen Haru."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107663
+  satz: "Im Jahr 2061 werden neun Schüler beim Planeten-Camp von einer Lichtkugel 5012 Lichtjahre weit ins All geschleudert und finden dort ein verlassenes Raumschiff."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107693
+  satz: "Der 14-jährige Iruma Suzuki wird von seinen Eltern an einen Dämon verkauft, der ihn als Enkel adoptiert und auf die Dämonenschule schickt, deren Rektor er ist."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107717
+  satz: "Nach dem Streit mit Tohrus Vater kehrt bei Kobayashi und ihrer Drachen-Maid Tohru wieder Alltag ein, bis ein neuer Drache Kobayashi bedroht."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 107727
+  satz: "Als Kotona angegriffen wird, landen ihre Freunde Yuu und Haru in einer anderen Welt und pendeln nun zwischen Realität und Ni no Kuni, um ihr Leben zu retten."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107905
+  satz: "Ryuka sucht nach Jahren der Sklaverei auf den Spuren seines getöteten Vaters nach seiner von Monstern entführten Mutter."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 107961
+  satz: "Keiki Kiryuu findet einen anonymen Liebesbrief samt Höschen und sucht die Absenderin unter vier Mädchen, die alle ein perverses Geheimnis hüten."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108241
+  satz: "Shuuichi Kagaya verwandelt sich mitunter in ein Monster in Kuscheltiergestalt und gerät mit der geheimnisvollen Clair in einen Kampf von Monstern um Münzen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108260
+  satz: "Die erwachsen gewordenen Digiritter um Tai erfahren, dass ihre Zeit mit den Partnerdigimon bald endet, während das Digimon Eosmon anderen das Bewusstsein raubt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108266
+  satz: "Kazuya ist nun offiziell Exorzist von Kamioka und gründet mit Kiriha und seinen Klassenkameraden einen Club, der übernatürlichen Vorfällen nachgeht."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 108307
+  satz: "Die neuen Inspektoren Arata Shindou und Kei Mikhail Ignatov untersuchen ein verunglücktes Schiff mit Einwanderern und stoßen dahinter auf verborgene Absichten."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 108353
+  satz: "Staaten und Armeen jagen den gefährlichen Artefakten einer uralten Hochkultur nach, und die Organisation ARCAM soll sie vor falschem Zugriff bewahren."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108356
+  satz: "Ein Drache brennt Ethans Dorf nieder, tötet seine schwangere Frau und raubt ihm das Herz, woraufhin Ethan als „Arisen“ zurückkehrt und Rache sucht."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108357
+  satz: "Im Krieg zwischen Menschen und Vampiren suchen das Mädchen Momo und die Vampirkönigin Fine gemeinsam das „Paradies“, wo beide Völker friedlich leben sollen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108388
+  satz: "Sieben geniale Oberschüler landen nach einem Flugzeugabsturz in einer Fantasywelt und krempeln sie mit ihrem Können mühelos um."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108430
+  satz: "Ritsuka Uenoyama repariert die Gitarre des stillen Mafuyu Satou, der ihm danach nicht mehr von der Seite weicht und dessen Stimme Ritsukas Musikliebe neu weckt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108450
+  satz: "Die Crew des Luftschiffs Queen Zaza jagt unter Lebensgefahr Drachen und zieht von Hafen zu Hafen, um deren Fleisch und andere Schätze zu verkaufen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108463
+  satz: "Die Oberschülerin Nene Yashiro ruft in der Mädchentoilette den Schulgeist Hanako-san, der Wünsche erfüllen soll, doch der Geist ist ganz anders als gedacht."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 108465
+  satz: "Ein 34-jähriger Arbeitsloser stirbt bei einem Unfall und wird mit all seinen Erinnerungen in einer Welt der Magie als Rudeus Greyrat wiedergeboren."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108478
+  satz: "Juuzou Inui, ein Cyborg mit einer Pistole als Kopf und ohne Erinnerung, lebt nach dem Krieg davon, Fälle rund um andere Extender zu lösen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108487
+  satz: "Die schüchterne Misuzu Moritani kann für drei Minuten die Zeit stoppen, doch ausgerechnet ihre Mitschülerin Haruka ist dagegen immun."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108489
+  satz: "Hachiman, Yukino und Yui organisieren mit dem Service Club einen Abschlussball und müssen dabei endlich ihre Gefühle füreinander in Worte fassen."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 108511
+  satz: "Rimurus Bund Jura-Tempest wächst weiter und knüpft Kontakt zum Tierreich Eurazania, während die Spannungen zwischen Monstern und Menschen zunehmen."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 108522
+  satz: "Der vergiftete, todkranke Baki wird von Retsu nach China gebracht, wo beim nur alle 100 Jahre stattfindenden Raitai-Turnier der stärkste Kämpfer gekürt wird."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 108553
+  satz: "Die Klasse 1a betreibt ohne Lehrer eine Heldenagentur auf der abgelegenen Insel Nabu, bis Schurken einfallen und den kleinen Katsuma jagen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108554
+  satz: "In einem Tokio voller Elfen, Zwerge und Vampire bekämpft die Polizei-Sondereinheit Tokunana die Organisation Nine, die im Namen der Drachen Verbrechen begeht."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108577
+  satz: "Akane blieb vor 13 Jahren wegen ihrer kleinen Schwester Aoi im Bergstädtchen, statt mit Gitarrist Shinnosuke fortzugehen, dessen jüngeres Ich nun auftaucht."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108581
+  satz: "1996 sind Haruo, Akira und Koharu im zweiten Oberschuljahr, lieben noch immer Arcade-Spiele und müssen sich über ihre Gefühle füreinander klar werden."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 108598
+  satz: "Nach einem Krieg im 19. Jahrhundert steigt der junge Levius, der mit einer Armprothese kämpft, unter Anleitung seines Onkels ins brutale mechanische Boxen ein."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108623
+  satz: "Goblin Slayer soll für die Schwertjungfer eine in verschneiten Bergen verschollene Kämpferin finden und stößt dort auf ein riesiges Goblin-Nest."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108626
+  satz: "Im Tokio von 2036 garantiert Nanotechnik 120 Jahre Leben ohne Krankheit, und Youzou Ooba schließt sich einer Motorradgang an, die ins Zentrum vordringen will."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108631
+  satz: "Die weiße Blutzelle U-1146 und die rote Blutzelle AE3803 schützen weiter den Körper vor Erregern und Verletzungen und treffen auf einen kleinen Thrombozyten."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108632
+  satz: "Kaum hat Subaru den Weißen Wal und Betelgeuse besiegt und Emilia wiedergesehen, erfährt er, dass Rem aus der Erinnerung der Welt gelöscht wurde."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 108725
+  satz: "Emma, Ray und die anderen Kinder sind aus Grace Field House geflohen und kämpfen sich, von Dämonen gejagt, mit Minervas Hinweis durch die fremde Außenwelt."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 108759
+  satz: "Sechs Monate nach dem Sieg über Administrator pflegt Alice in ihrem Heimatdorf Rulid den seelisch gebrochenen Kirito und hat selbst den Kampfwillen verloren."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 108815
+  satz: "Punisher stört eine Geheimmission von Black Widow und muss auf Befehl von Nick Fury mit ihr die Terrororganisation Leviathan stoppen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108852
+  satz: "Dan und seine Freunde von den „Awesome Ones“ entdecken beim Videodreh die Kampfkreaturen Bakugan, und Dan findet in Drago seinen Partner."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108853
+  satz: "Nachwuchs-Blader Drum Kouryuu sieht, wie der Bey von Valt Aoi golden aufleuchtet, und will mit seinem Ace Dragon selbst der Beste der Welt werden."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 108928
+  satz: "Die Zehn Gebote sind zurückgeschlagen, doch Camelot bleibt von Dämonen besetzt, und die Seven Deadly Sins müssen sich für den Gegenschlag erst sammeln."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 108945
+  satz: "Nebengeschichten zeigen unter anderem Atomic Samurai und Bang beim Angeln und Genos, der nach einem versehentlichen Schlag Saitamas sein Gedächtnis verliert."
+  quellen: [anisearch]
+  geprueftAm: 2026-11-26
+- id: 108972
+  satz: "Alienjäger Dandy sucht mit Roboter QT und dem Katzenalien Meow im All nach unregistrierten Arten, um Belohnungen zu kassieren, und scheitert meist."
+  quellen: [eigen]
+  geprueftAm: 2026-11-26
+  umfang: reihe
+- id: 108981
+  satz: "Die jungen Spieler Muscheng Su und Xiu Ye wollen mit dem Online-Spiel Glory ihr Geld verdienen und treten im Team Excellent Era bei der ersten Profiliga an."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 108987
+  satz: "Das Mädchen Memempu will Marker werden und zieht mit Gagumber, einem früheren Marker, ins gefährliche Labyrinth außerhalb der unterirdischen Kolonien."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 109002
+  satz: "Der verstoßene britannische Prinz Lelouch lebt als Schüler im besetzten Japan, das nun Area 11 heißt, und will das Reich seines Vaters zu Fall bringen."
+  quellen: [eigen]
+  geprueftAm: 2026-11-26
+  umfang: reihe
+- id: 109020
+  satz: "Rikuo Uozumi jobbt nach dem Studium ziellos in einem Laden, wo ihn Haru mit ihrem Raben besucht, während auch seine frühere Mitschülerin Shinako auftaucht."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 109085
+  satz: "In kurzen Bonusfolgen geraten die Zellen in Situationen aus der Arbeitswelt, von Quizshow-Auftritten über Beratungsgespräche bis zu Mobbing durch Vorgesetzte."
+  quellen: [anisearch]
+  geprueftAm: 2026-11-26
+- id: 109190
+  satz: "Violet Evergarden soll in einem Mädcheninternat die widerwillige Isabella York auf ihr Leben als Adlige vorbereiten, die sich dort wie gefangen fühlt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 109217
+  satz: "In der längst menschenleeren Roboterstadt Eden finden zwei Ernteroboter ein Menschenbaby namens Sara und ziehen es heimlich groß."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 109261
+  satz: "Fuutaro Uesugi muss die Fünflinge durch die nächsten Prüfungen bringen und wird dabei immer tiefer in ihr Privatleben und ihre Gefühle verstrickt."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 109321
+  satz: "Der wegen seines Aussehens gefürchtete Einzelgänger Takuma Akutsu soll laut Odin die Welt retten und bekommt dafür dessen Töchter, neun Walküren, zur Seite."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 109418
+  satz: "Wenige Tage nach dem Kampf gegen Akechi findet Ren in einem Rätselheft dessen Notiz „Beweis der Gerechtigkeit“ und streift grübelnd durch die Winterstadt."
+  quellen: [eigen, anilist]
+  geprueftAm: 2026-11-26
+- id: 109586
+  satz: "Im Jahr 2125 verwandelt die Krankheit Cagaster Menschen in Rieseninsekten, und Kammerjäger Kidou bekommt von einem Sterbenden dessen Tochter Ilie anvertraut."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 109639
+  satz: "Sobald Naoko Watanabe allzu wütend wird, wird aus der Schülerin das feuerspeiende Dinosauriermädchen Gauko, das mit Freunden und Aliens Abenteuer erlebt."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 109819
+  satz: "Mob, Reigen und Serizawa fahren zu einer heißen Quelle in der Zebra-Präfektur, wo sie nebenbei unheimlichen Vorfällen nachgehen sollen."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 109911
+  satz: "Ultraman verbündet sich mit Seven, Ace, Zoffy, Jack und Taro, und gemeinsam stellen sich die sechs Krieger einer neuen außerirdischen Bedrohung."
+  quellen: [anilist]
+  geprueftAm: 2026-11-26
+- id: 109946
+  satz: "Um sein Idol Heat vor tödlichen Spielschulden zu retten, trommelt Johnny Bolt Superschurken für einen letzten Raubzug bei einem mächtigen Gangsterboss zusammen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 109963
+  satz: "Im großen Team-Shokugeki treten Souma und die Rebellen gegen Azami und die Elite 10 an, und vom Ausgang hängt die Zukunft der Gastronomie in Japan ab."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 109979
+  satz: "Nach dem Tod seiner Mutter im Krieg zieht Mahito aufs Land zur neuen Frau seines Vaters, wo ihn ein sprechender Graureiher zu einem geheimnisvollen Turm lockt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 110178
+  satz: "Die Helden aus KonoSuba, Re:Zero, Overlord und Tanya the Evil drücken weiter gemeinsam die Schulbank, und nun stößt der Shield Hero mit Raphtalia und Filo dazu."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 110224
+  satz: "Der Töpfer Aws mit dunkler Vergangenheit schließt sich den wenigen Verteidigern Mekkas an, als Abrahas Heer die Stadt versklaven und die Kaaba zerstören will."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 110229
+  satz: "Nach dem Sommerfest büffelt Nariyuki Yuiga weiter mit seinen Schützlingen, deren Gefühle für ihn in Aufruhr sind, auf die Aufnahmeprüfungen hin."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 110265
+  satz: "Am Valentinstag trifft sich Ren Amamiya nacheinander mit mehreren ihm nahestehenden Frauen, etwa Ann und Futaba, und bekommt von jeder Schokolade."
+  quellen: [eigen]
+  geprueftAm: 2026-11-26
+- id: 110277
+  satz: "Vier Jahre nachdem der Aufklärungstrupp das Meer erreicht hat, droht ein Krieg zwischen Marley und den Eldiern, und Eren ist verschwunden."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 110349
+  satz: "Der Trickbetrüger Makoto Edamura will einen französischen Touristen ausnehmen, wird aber selbst reingelegt und landet durch Laurent Thierry in Los Angeles."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 110350
+  satz: "Der geniale Detektiv Sakaido taucht mit dem Mizuhanome-System ins Unterbewusstsein von Mördern ein und jagt John Walker, der Serienmörder erschafft."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 110353
+  satz: "Das Tanker-Mädchen Natsume, das in der mobilen Festung Deca-Dence davon träumt, gegen die Gadoll zu kämpfen, trifft den mürrischen Ex-Krieger Kaburagi."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 110354
+  satz: "Die Schülerin Michiru wird plötzlich zum Tanuki-Tiermenschen, flieht nach Anima City und sucht dort mit dem Wolfsmenschen Shirou nach Antworten."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 110355
+  satz: "Nach dem Fiasko im Abashiri-Gefängnis zieht Asirpa getrennt von Sugimoto Richtung russische Grenze, und Sugimoto setzt alles daran, sie wiederzufinden."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 110364
+  satz: "Als die Geisterarmee des bösen Betrayus einfällt, erweist sich Pac als prophezeiter Geisterfresser und verteidigt Pac World gemeinsam mit Spiral und Cyli."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 110413
+  satz: "Meisterdieb Lupin III. will mit der jungen Laetitia das Tagebuch des Archäologen Bresson stehlen, das zu einem Schatz führen soll, den einst die Nazis suchten."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 110547
+  satz: "Im Florenz des frühen 16. Jahrhunderts verlässt die adlige Arte ihr Zuhause, um gegen alle Widerstände einer Männerdomäne Malerin zu werden."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 110686
+  satz: "Der Fall um die LIVE Corporation ist ungelöst, ihr Vorsitzender nach einem Flugzeugunglück verschwunden, und beim SSC übernimmt Douglas Coates die Leitung."
+  quellen: [anisearch]
+  geprueftAm: 2026-11-26
+- id: 110732
+  satz: "Im Jahr 2199 steht die Erde vor der Vernichtung durch Gamilas, und das Raumschlachtschiff Yamato bricht zum fernen Planeten Iscandar auf, um Rettung zu holen."
+  quellen: [anisearch, tmdb]
+  geprueftAm: 2026-11-26
+- id: 110733
+  satz: "Nach einem gefloppten Arena-Konzert ist die Zombie-Idolgruppe Franchouchou verschuldet und jobbt nebenher, während Manager Koutarou seinen Kummer ertränkt."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 110810
+  satz: "Rin Namiki zieht aus ihrem Fischerdorf nach Tokio, um wie ihre verstorbene Mutter Jet Racing zu betreiben, Jetski-Rennen in Zweierteams mit Wasserpistolen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 110851
+  satz: "Der Arzt Romani Archaman betreut in Chaldea die junge Mash Kyrielight, deren Weg vom Experiment als Zehnjährige bis zum Aufbruch nach Babylonia erzählt wird."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 110857
+  satz: "Nach der Trennung von Tadano verpulvert Retsuko ihr Erspartes in einem VR-Spiel und muss ihre Schulden heimlich bei einer Underground-Idolgruppe abarbeiten."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 111015
+  satz: "In einer kälter werdenden Dinosaurierwelt freunden sich die kleine Punon, die nicht fliegen kann, und der fleischlos lebende Tyrano an und suchen das Paradies."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 111048
+  satz: "Im Kengan Annihilation Tournament kämpft Ouma Tokita für Kazuo Yamashita weiter, obwohl ihn sein Sieg in Runde eins körperlich schwer gezeichnet hat."
+  quellen: [anisearch]
+  geprueftAm: 2026-11-26
+- id: 111131
+  satz: "Die Freundschaftsroboterin Sam sucht nach einem Angriff auf Bodica ihren besten Freund Prinz Kelby und reist mit Wartungsbot Casey und Outlaw Philly the Kid."
+  quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26

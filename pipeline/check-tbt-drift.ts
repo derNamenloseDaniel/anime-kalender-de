@@ -81,7 +81,7 @@ pruefe('Tabelle: zwei Tage reichen nicht', [...new Set(pruefeDrift(echt, Date.pa
 
 const datei = process.argv[2]
 if (datei) {
-  const jetzt = process.argv[3] ? Date.parse(process.argv[3]) : Date.now()
+  const jetzt = process.argv[3] ? Date.parse(process.argv[3]) : Date.now() // uhr-echt: Auswertung echter Läufe bis jetzt
   for (const b of pruefeDrift(leseLaeufe(readFileSync(datei, 'utf8')), jetzt)) {
     const zahl = b.stufe === 'zu-wenig' ? `Läufe ${b.n[0]}/${b.n[1]}` : `${b.vorher} → ${b.jetzt} ms (${(b.anteil * 100).toFixed(1)} %)`
     console.log(`${b.stufe.toUpperCase().padEnd(8)} ${b.seite} / ${b.band}: ${zahl}`)

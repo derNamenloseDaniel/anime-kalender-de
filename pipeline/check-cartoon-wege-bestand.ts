@@ -12,6 +12,8 @@ import { jwKennzeichnungFehler } from './lib/jw-seite.ts'
 import { adnShowJeCartoon, adnShowsLesen } from './bau/cartoon-adn.ts'
 import type { CartoonEintrag } from './lib/cartoons.ts'
 import type { StreamLink, Title } from '../shared/types.ts'
+import { cartoonsGegenVorstand } from './lib/cartoon-staffeln-vorstand.ts'
+import { vorstandRef } from './lib/vorstand-abgang.ts'
 
 let fehler = 0
 function pruefe(name: string, ok: boolean, info = ''): void {
@@ -46,6 +48,8 @@ function pruefeBestand(titelListe: Title[]): void {
   pruefe('Bestand: Häkchen je Staffel nennt Folgenbereiche, die in der Staffel liegen', teilHaken.every(({ s }) => s.dubRanges?.length && s.dubRanges.every((r) => r.from >= s.teilBereich!.von && r.to <= s.teilBereich!.bis)))
   const falsch = alleWege.filter(({ t, s }) => jwKennzeichnungFehler(t.staffelnQuelle, s))
   pruefe('Bestand: JustWatch-Kennzeichnung (Flagge an der Seite, Staffel-Hinweis nur bei JustWatch-Staffeln)', falsch.length === 0, falsch.slice(0, 5).map(({ t, s }) => `${t.id} ${s.platform}: ${jwKennzeichnungFehler(t.staffelnQuelle, s)}`).join('; '))
+  // Die Prüfliste schreibt derselbe Bau; was er aus Liste und Verteilung zugleich streicht, fällt nur gegen den Vorstand auf.
+  for (const zeile of cartoonsGegenVorstand('wege', PRUEFLISTE, vorstandRef(process.argv.slice(2)))) pruefe('Bestand gegen Vorstand:', false, zeile)
 }
 
 const OUT = 'public/data/cartoons.json'

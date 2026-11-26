@@ -34,6 +34,10 @@ function lauf(k: Kulisse): { exit: number | null; text: string } {
   const wurzel = mkdtempSync(join(tmpdir(), 'cartoon-wege-'))
   try {
     for (const d of ['data/curated', 'public/data']) mkdirSync(join(wurzel, d), { recursive: true })
+    // Die Wache liest den Vorstand aus Git; ein Stand ohne Bestandsdateien lässt diesen Teil leer (Fälle: check-cartoon-staffeln-vorstand.ts).
+    for (const a of [['init', '-q'], ['commit', '-q', '--allow-empty', '-m', 'leer']]) {
+      spawnSync(process.env.GIT_EXE ?? 'git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...a], { cwd: wurzel, windowsHide: true })
+    }
     const roh = { '-5': { id: -5, ...(k.adnId ? { adnId: k.adnId } : {}) }, '-6': { id: -6 } }
     writeFileSync(join(wurzel, 'data/cartoons.json'), JSON.stringify(roh))
     const show = { showId: 7, title: 'x', url: k.url, episodes: k.episodes }

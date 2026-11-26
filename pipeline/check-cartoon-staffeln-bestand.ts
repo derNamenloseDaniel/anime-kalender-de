@@ -8,6 +8,8 @@ import { readJson } from './lib/util.ts'
 import { summe, SUMMEN_TOLERANZ } from './lib/cartoon-staffeln.ts'
 import { PRUEFLISTE, type StaffelPruefung } from './bau/cartoon-staffeln.ts'
 import type { Title } from '../shared/types.ts'
+import { cartoonsGegenVorstand } from './lib/cartoon-staffeln-vorstand.ts'
+import { vorstandRef } from './lib/vorstand-abgang.ts'
 
 let fehler = 0
 function pruefe(name: string, ok: boolean, info = ''): void {
@@ -29,6 +31,8 @@ if (existsSync(OUT)) {
   // Ein Handbeleg ist selbst die Prüfung.
   const abweichend = mit.filter((t) => t.staffelnQuelle !== 'handbeleg' && t.episodes &&Math.abs(summe(t.staffeln!) - t.episodes) > SUMMEN_TOLERANZ && !liste.has(t.id))
   pruefe('Bestand: Staffelsumme passt zur Gesamtfolgenzahl (±3) oder der Titel steht auf der Prüfliste', abweichend.length === 0, abweichend.map((t) => t.id).slice(0, 10).join())
+  // Die Prüfliste schreibt derselbe Bau; was er aus Liste und Staffeln zugleich streicht, fällt nur gegen den Vorstand auf.
+  for (const zeile of cartoonsGegenVorstand('staffeln', PRUEFLISTE, vorstandRef(process.argv.slice(2)))) pruefe('Bestand gegen Vorstand:', false, zeile)
 }
 
 if (fehler) {

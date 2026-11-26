@@ -141,6 +141,7 @@ pipeline/check-cartoon-jw-wege-bau.ts
 pipeline/check-cartoon-pruefregeln.ts
 pipeline/check-cartoon-reihen.ts
 pipeline/check-cartoon-reihenteil-bau.ts
+pipeline/check-cartoon-staffeln-vorstand.ts
 pipeline/check-cartoon-staffeln.ts
 pipeline/check-cartoon-ton.ts
 pipeline/check-cartoon-tote-bau.ts

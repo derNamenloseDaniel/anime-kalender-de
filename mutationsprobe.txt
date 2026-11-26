@@ -1,0 +1,109 @@
+--- Kontrolle unmutiert
+
+GRÜN           Kontrolle unmutiert (alle Tests grün)
+--- nur zwei Versuche
+@@ tools/quellen-pr.sh:220
+- for versuch in 1 2 3; do
+-     if [ "$versuch" -gt 1 ]
++ for versuch in 1 2; do
++     if [ "$versuch" -gt 1 ]
+rot            nur zwei Versuche (Exit 1)
+--- Blick auf bestehenden PR entfernt
+@@ tools/quellen-pr.sh:221
+- if [ "$versuch" -gt 1 ]; then
++ if [ "$versuch" -gt 99 ]; then
+rot            Blick auf bestehenden PR entfernt (Exit 1)
+--- Blick auf bestehenden PR schon im ersten Versuch
+@@ tools/quellen-pr.sh:221
+- if [ "$versuch" -gt 1 ]; then
++ if [ "$versuch" -gt 0 ]; then
+rot            Blick auf bestehenden PR schon im ersten Versuch (Exit 1)
+--- Fehlschlag wird nicht weitergegeben
+@@ tools/quellen-pr.sh:248
+- pr_anlegen || exit 1
++ pr_anlegen || true
+rot            Fehlschlag wird nicht weitergegeben (Exit 1)
+--- Fehlertext nicht ausgegeben
+@@ tools/quellen-pr.sh:234
+- (Versuch $versuch von 3): $letzter"
++ (Versuch $versuch von 3)"
+rot            Fehlertext nicht ausgegeben (Exit 1)
+--- ::error:: ohne letzten Text
+@@ tools/quellen-pr.sh:244
+- nach drei Versuchen nicht angelegt werden: $letzter"
++ nach drei Versuchen nicht angelegt werden."
+rot            ::error:: ohne letzten Text (Exit 1)
+--- bestehender PR nicht übernommen
+@@ tools/quellen-pr.sh:224
+-         PR="$vorhanden"
+- 
++         PR=""
++ 
+rot            bestehender PR nicht übernommen (Exit 1)
+--- Nachsehen nach dem letzten Versuch: Rückgabe 1
+@@ tools/quellen-pr.sh:241
+- besteht nach dem letzten Versuch schon."
+-     return 0
++ besteht nach dem letzten Versuch schon."
++     return 1
+rot            Nachsehen nach dem letzten Versuch: Rückgabe 1 (Exit 1)
+--- Nachsehen nach dem letzten Versuch: PR nicht übernommen
+@@ tools/quellen-pr.sh:240
+-     PR="$vorhanden"
+-     echo "PR zum Zweig $ZWEIG besteht nach
++     PR=""
++     echo "PR zum Zweig $ZWEIG besteht nach
+rot            Nachsehen nach dem letzten Versuch: PR nicht übernommen (Exit 1)
+--- Nachsehen nach dem letzten Versuch entfällt
+@@ tools/quellen-pr.sh:239
+-   if [ -n "$vorhanden" ]; then
+-     PR="$vorhanden"
+-     echo "PR zum Zweig $ZWEIG besteht nach
++   if [ -n "" ]; then
++     PR="$vorhanden"
++     echo "PR zum Zweig $ZWEIG besteht nach
+rot            Nachsehen nach dem letzten Versuch entfällt (Exit 1)
+--- Merge-Meldung ohne echten Grund
+@@ tools/quellen-pr.sh:319
+- abgelehnt: $MERGE_GRUND — neuer Versuch.
++ abgelehnt — main hat sich bewegt, neuer Versuch.
+GRÜN           Merge-Meldung ohne echten Grund (alle Tests grün)
+--- Merge-::error:: ohne letzten Grund
+@@ tools/quellen-pr.sh:344
+- zuletzt: $MERGE_GRUND (Ruleset
++ (Ruleset
+rot            Merge-::error:: ohne letzten Grund (Exit 1)
+--- 5xx-Rot-Zweig ohne Grund
+@@ tools/quellen-pr.sh:306
+- [ "$serverfehler_nr" -lt "${#pausen[@]}" ] || return 1
++ [ "$serverfehler_nr" -lt "${#pausen[@]}" ] || { MERGE_GRUND=""; return 1; }
+rot            5xx-Rot-Zweig ohne Grund (Exit 1)
+--- leere Zustandsabfrage gilt als gemergt
+@@ tools/quellen-pr.sh:311
+- if [ "$zustand" = "MERGED" ]
++ if [ "$zustand" != "OPEN" ]
+rot            leere Zustandsabfrage gilt als gemergt (Exit 1)
+
+| Nr | Mutant | Dateien | Urteil | fangender Test |
+|---|---|---|---|---|
+| 1 | Kontrolle unmutiert | - | GRÜN (alle Tests grün) |  |
+| 2 | nur zwei Versuche | tools/quellen-pr.sh | rot (Exit 1) | node tools/quellen-pr.test.mjs |
+| 3 | Blick auf bestehenden PR entfernt | tools/quellen-pr.sh | rot (Exit 1) | node tools/quellen-pr.test.mjs |
+| 4 | Blick auf bestehenden PR schon im ersten Versuch | tools/quellen-pr.sh | rot (Exit 1) | node tools/quellen-pr.test.mjs |
+| 5 | Fehlschlag wird nicht weitergegeben | tools/quellen-pr.sh | rot (Exit 1) | node tools/quellen-pr.test.mjs |
+| 6 | Fehlertext nicht ausgegeben | tools/quellen-pr.sh | rot (Exit 1) | node tools/quellen-pr.test.mjs |
+| 7 | ::error:: ohne letzten Text | tools/quellen-pr.sh | rot (Exit 1) | node tools/quellen-pr.test.mjs |
+| 8 | bestehender PR nicht übernommen | tools/quellen-pr.sh | rot (Exit 1) | node tools/quellen-pr.test.mjs |
+| 9 | Nachsehen nach dem letzten Versuch: Rückgabe 1 | tools/quellen-pr.sh | rot (Exit 1) | node tools/quellen-pr.test.mjs |
+| 10 | Nachsehen nach dem letzten Versuch: PR nicht übernommen | tools/quellen-pr.sh | rot (Exit 1) | node tools/quellen-pr.test.mjs |
+| 11 | Nachsehen nach dem letzten Versuch entfällt | tools/quellen-pr.sh | rot (Exit 1) | node tools/quellen-pr.test.mjs |
+| 12 | Merge-Meldung ohne echten Grund | tools/quellen-pr.sh | GRÜN (alle Tests grün) |  |
+| 13 | Merge-::error:: ohne letzten Grund | tools/quellen-pr.sh | rot (Exit 1) | node tools/quellen-pr.test.mjs |
+| 14 | 5xx-Rot-Zweig ohne Grund | tools/quellen-pr.sh | rot (Exit 1) | node tools/quellen-pr.test.mjs |
+| 15 | leere Zustandsabfrage gilt als gemergt | tools/quellen-pr.sh | rot (Exit 1) | node tools/quellen-pr.test.mjs |
+
+mutationslaeufer: 13 rot, 1 überlebt, 0 Anker nicht gefunden, 0 mehrdeutig, 0 wirkungslos, 15 gesamt
+Überlebende: 1 von 14
+ENDE 1
+
+--- Nachlauf: überlebender Mutant „Merge-Meldung ohne echten Grund“ nach neuem Testfall (quellen-pr.test.mjs, Commit 1b01eee74), einzeln gefahren: rot (Exit 1 des Tests, Läufer Exit 0).

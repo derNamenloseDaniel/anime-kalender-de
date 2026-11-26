@@ -17,6 +17,7 @@ const releases = lies<Release>('releases.json')
 const titel = [...kern, ...lies<Title>('cartoons.json').filter((c) => !kern.some((k) => k.id === c.id))]
 if (!kern.length || !releases.length) {
   console.error(`FEHLER: ${kern.length} Titel, ${releases.length} Releases gelesen`)
+  console.log('VERSTÖSSE: 1')
   process.exit(1)
 }
 const faelle = davorOhneBeleg(titel, releases, todayIso())
@@ -24,5 +25,6 @@ for (const f of faelle) {
   console.error(`${f.titel}: Folgen ${f.fehlen.join(', ')} liegen vor dem ersten Termin ohne Beleg`)
   melde(f.titleId, 'folgen-vor-start', `Folgen ${f.fehlen[0]}–${f.fehlen[f.fehlen.length - 1]} vor dem ersten Termin ohne Beleg`)
 }
+console.log(`VERSTÖSSE: ${faelle.length}`)
 if (faelle.length) process.exit(1)
 console.log(`check-folgen-vor-start-bestand: ok (${titel.length} Titel, ${releases.length} Releases, 0 Titel mit unbelegten Folgen vor dem ersten Termin)`)

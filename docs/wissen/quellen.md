@@ -4570,3 +4570,16 @@ Anlass: Pokémon Staffel 1–5 (`t/483`) verlinkte `toggo.de/pokemon`, eine Samm
 - **Termin je Sammler:** `fetch-tmdb-titles.ts` (60 Tage): künftiger Kinostart in `kinoDe`, solche Titel stehen vor den übrigen Fälligen. `fetch-anisearch-titel.ts` (180): Disc-Ausgabe des Titels in `data/disc-ausgaben.json`. `fetch-anisearch-artikel.ts` (180): Datum der Ausgabe, deren Adresse die Artikelnummer trägt. Die aniSearch-Titelseite trägt selbst keinen Termin (siehe oben); die Disc-Ausgabe ist der Anlass, einen geänderten deutschen Namen vor dem Erscheinen zu sehen.
 - **Last (Messung 24.11.2026, echte Funktionen auf dem Bestand):** TMDB 1 Eintrag zusätzlich, aniSearch-Titel 1 zusätzlich (561 sind ohnehin fällig), aniSearch-Artikel 105 zusätzlich, rund 11 Minuten bei 6 Sekunden Takt; im Beharrungszustand wöchentlich dieselbe Größe.
 - **Fälligkeit der aniSearch-Lesungen** steht seit diesem Umbau in `pipeline/lib/anisearch-faellig.ts` (Ausgabe gleich, 0 Abweichungen auf 4.579 Titel- und 9.353 Artikeleinträgen).
+
+
+## Fristen der Titel-Sammler gegen die Änderungshäufigkeit (26.11.2026, Auftrag reste-funde-2411)
+
+**Messung:** Alle Fassungen von `data/tmdb-titles.json` (33 Commits, ab 07.08.), `anisearch-titel.json` (31, ab 31.08.) und `anisearch-artikel.json` (24, ab 03.10.) über die REST-API geholt; je Eintrag jeder Neuabruf (anderes `fetchedAt`) verglichen, ohne `fetchedAt`, `stand`, `inhaltAm`.
+- **TMDB (60 Tage):** 6.104 Neuabrufe; ohne Neuzuordnung (gleiche `tmdbId`/`miss`) änderten sich Inhaltsfelder bei 0 % der Abrufe unter 30 Tagen, 44 % bei 30–59 Tagen (fast nur `kinoDe` 667, `offers` 444, `providers` 149) und 27 % bei 60–89 Tagen. Handlung und FSK (`overviewDe` 45, `fsk` 19) ändern sich bei 1,2 % der Neuabrufe. → 60 Tage bleiben; Anbieter und Kino kommen aus eigenen Läufen.
+- **aniSearch-Titel (180 Tage):** 13.024 Neuabrufe; bei gleichem `stand` änderte sich `titel` in 30 (0,2 %), `synonyme` in 14; `quelle`/`englisch` (1.689/1.002) sind Verbesserungen der eigenen Zuordnung, keine Änderung der Quelle. Nach 30–59 Tagen nur 1,1 % geändert. → 180 Tage bleiben; die Messspanne reicht nur bis 86 Tage, 90 Tage verdoppelten die Last für ≈ 0,2 %.
+- **aniSearch-Artikel (180 Tage):** 104 Neuabrufe, 4 geändert (3,8 %; `ean`, `audio`, `untertitel`), Spanne nur 53 Tage, zu wenig für eine Aussage. → 180 Tage bleiben, ab Januar 2027 neu messen.
+- **Disc-Termine** (die einzige zeitkritische Angabe) lesen die Titelseiten ohnehin alle 7 Tage (`DISC_FRIST_TAGE`).
+
+## Katalogtitel mit Disc-Termin ohne `anisearch.json`-Eintrag (26.11.2026)
+
+Gezählt am Bestand: 2.924 Titel, 269 ohne Eintrag (155 Katalogtitel ab 10.000.000, 114 AniList-Titel); 248 davon mit Disc/Kauf-Weg. **Ursache:** Katalogtitel stehen per Bauart nie in `anisearch.json` (nur AniList-Schlüssel). Geschlossen seit PR 4854 (`lib/disc-nachlese.ts`, `check-disc-ohne-lesequelle-bestand`): Heute 149 Titel mit frischem oder künftigem Termin, 3 davon ohne Eintrag (11635, 13220, 18543) werden nachgelesen, 0 ohne Lesequelle. Alle 248 haben eine aniSearch-Kennung und eine archivierte Seite.

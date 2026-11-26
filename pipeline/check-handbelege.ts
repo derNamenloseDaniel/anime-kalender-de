@@ -227,7 +227,7 @@ log(`Handprüfungen: ${belege.length} Einträge auf ${jeVerweis.size} Verweise`)
 log(`  im Datensatz bestätigt : ${bestaetigt}`)
 log(`  korrekt entfernt       : ${entferntWieVorgesehen}`)
 log(`  uneindeutig (Bereiche) : ${uneindeutig} — nicht bewertet`)
-log(`  Nein überholt (Kanal-Termin) : ${neinUeberholt} — nicht bewertet`)
+log(`  Nein überholt (sicherer Termin) : ${neinUeberholt} — nicht bewertet`)
 
 if (fehler.length) {
   warn(`${fehler.length} Handprüfungen werden vom Datensatz nicht wiedergegeben:`)

@@ -75,7 +75,6 @@
   satz: "Kurze Zwischenspiele zeigen, wie die Tachikoma, die denkenden Kampfpanzer von Sektion 9, ihren Alltag verbringen."
   quellen: [eigen, anilist]
   geprueftAm: 2026-11-26
-  umfang: reihe
 - id: 11005
   satz: "Der schüchterne Schüler Shinta trifft die Halbvampirin Lilith aus Rumänien und erfährt, dass er als letzter Nachkomme des Romuald-Clans ein Vampirjäger ist."
   quellen: [anisearch, tmdb, anilist]
@@ -629,6 +628,10 @@
   satz: "Ein Bambussammler findet in einem leuchtenden Halm ein winziges Mädchen, das rasch heranwächst, als Prinzessin Kaguya erzogen wird und alle Freier abweist."
   quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26
+- id: 16678
+  satz: "Pikachu und seine Freunde sind zu einer Feier bei Evoli und dessen Entwicklungen eingeladen und verbringen den Tag mit ihnen."
+  quellen: [anilist, fandom]
+  geprueftAm: 2026-11-26
 - id: 16680
   satz: "Eine Gruppe heimatloser Genesect baut ihr Nest mitten in einer Metropole und bedroht damit das Umspannwerk, sodass Ash und Pikachu eingreifen müssen."
   quellen: [anisearch, tmdb, anilist]
@@ -690,7 +693,7 @@
   quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26
 - id: 17831
-  satz: "Bücherfan Kazuhito stirbt, als er bei einem Überfall eine Frau rettet, und wird als Dackel wiedergeboren, der bei seiner scherenschwingenden Lieblingsautorin lebt."
+  satz: "Bücherfan Kazuhito stirbt, als er bei einem Überfall eine Frau rettet, und wird als Dackel seiner scherenschwingenden Lieblingsautorin wiedergeboren."
   quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26
 - id: 17873
@@ -714,7 +717,7 @@
   quellen: [anisearch, anilist]
   geprueftAm: 2026-11-26
 - id: 18115
-  satz: "Die Wege von Aladdin, Alibaba und Morgiana trennen sich, und Aladdin reist allein nach Magnostadt, um seine Magie zu schulen und Al-Thamen nachzuspüren."
+  satz: "Aladdin trennt sich von Alibaba und Morgiana und reist allein nach Magnostadt, um seine Magie zu schulen und Al-Thamen nachzuspüren."
   quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26
 - id: 18153
@@ -808,4 +811,160 @@
 - id: 19191
   satz: "Motoko Kusanagi untersteht nun Aramaki und wirbt Leute für ihre künftige Abteilung 9 an, während jemand die Logicomas hackt."
   quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 19193
+  satz: "Motoko und Batou tarnen sich als Liebespaar, um eine Terrorgruppe zu stoppen, während Togusa im Mordfall eines Mannes mit Beinprothese ermittelt."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 19195
+  satz: "Als Einsatzkräfte plötzlich auf Bürger schießen, jagen Motoko Kusanagi und ihr Team den Hacker Fire-Starter und stoßen auf ein Mädchen inmitten von Leichen."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 19255
+  satz: "Kurze Bonusfolgen ohne Bezug zur Serienhandlung bringen die Figuren in allerlei freizügige Situationen."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 19291
+  satz: "Ash und Pikachu reisen in die Kalos-Region, freunden sich mit Arenaleiter Citro, dessen Schwester Heureka und Serena an und erkunden die Mega-Entwicklung."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 19365
+  satz: "Das Model Masayoshi Hazama bekämpft ohne jede Superkraft als Held Samurai Flamenco das Böse, und der Polizist Hidenori Goto kommt ihm auf die Schliche."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 19429
+  satz: "In der Kurogumi-Klasse der Myoujou-Akademie jagen lauter Auftragsmörderinnen Haru Ichinose, doch die Neue, Tokaku Azuma, entwickelt Gefühle für sie."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 19603
+  satz: "Der Schüler Shirou Emiya wird Zeuge, wie zwei Servants kämpfen, und gerät so selbst in das Ringen der Magier um den Heiligen Gral."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 19671
+  satz: "Mini-Episoden rund um den Schwimmklub, etwa über Makotos Sorgen, die Suche nach Mitgliedern und Reis Sprungtraining."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 19815
+  satz: "Die genialen Stubenhocker-Geschwister Sora und Shiro werden von einem »Gott« in eine Welt gerufen, in der Spiele alles entscheiden, sogar Landesgrenzen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 19951
+  satz: "Kurz vor der Battle-Olympiade befreien die »Schatten« ihren von Netero versiegelten Anführer Jed und wollen alle Hunter töten, was auch Gon und Killua trifft."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 19957
+  satz: "Huckleberry Finn lebt in einem Fass am Dorfrand, vereitelt mit dem Sklaven Jim einen Überfall auf die Witwe Douglas und flieht mit ihm, als sein Vater kommt."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 19959
+  satz: "In der zweiten Staffel reist die Familie Barbapapa um die Welt und erlebt dabei viele neue Abenteuer."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 20021
+  satz: "Während Kirito in einer Besprechung auf seine Abenteuer zurückblickt, bringen Asuna und die anderen Lyfa für eine Unterwasserquest das Schwimmen bei."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 20057
+  satz: "Alienjäger Dandy fliegt mit dem Roboter QT und dem Katzenwesen Meow durchs All, um als Erster neue Spezies zu entdecken und die Prämie zu kassieren."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20159
+  satz: "Der Junge Red erhält von Professor Eich sein erstes Pokémon, bricht als Rivale von Blau zu seiner Reise auf und bekommt es mit Team Rocket zu tun."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20442
+  satz: "Die Hexe Bayonetta erwachte vor 20 Jahren ohne Gedächtnis und kämpft sich durch Heerscharen von Engeln, um ihre Vergangenheit zusammenzusetzen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20447
+  satz: "Der schreinlose Gott Yato verdingt sich als Mietgott, und die Schülerin Hiyori, die ihn vor einem Auto retten will, verliert seither immer wieder ihre Seele."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20455
+  satz: "Sonico spielt Gitarre in einer Band, studiert und arbeitet nebenbei als Model, behütet von ihrem Manager Kitamura mit der Dämonenmaske."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20457
+  satz: "Der Schüler Rentarou kämpft als Mitglied der Civil Security gegen die Gastrea, die die Menschheit fast ausgelöscht haben, und soll Tokios Zerstörung verhindern."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20458
+  satz: "An der Magie-Oberschule landet die begabte Miyuki Shiba bei den privilegierten »Blüten«, ihr Bruder Tatsuya dagegen in der abschätzig behandelten Gras-Klasse."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20461
+  satz: "Im Frankreich Ludwigs XV. wird Lia de Beaumont tot in einem Sarg aus der Seine geborgen, und ihr Bruder D’Eon tritt der Geheimpolizei bei, um sie zu rächen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20462
+  satz: "Der arbeitslose Ex-Soldat Toru trifft im Wald die Magierin Chaika, die einen Sarg mit sich herumschleppt, und wird samt Schwester Akari von ihr angeheuert."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20464
+  satz: "Shoyo Hinata eifert dem »Kleinen Titan« nach, verliert sein einziges Mittelschulspiel haushoch gegen Tobio Kageyama und geht an die Karasuno-Oberschule."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20467
+  satz: "Einen Monat nach dem Versiegeln der Class-Karten gerät Illyas Magie beim Reinigen der Ley-Linien außer Kontrolle, und plötzlich steht ein Ebenbild vor ihr."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20474
+  satz: "Jotaro Kujo, 17 Jahre alt, entdeckt seine Kraft, den »Stand«, und reist mit Großvater Joseph Joestar nach Kairo, um Dio zu stellen und seine Mutter zu retten."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 20485
+  satz: "Aoi hat ihre Höhenangst weitgehend überwunden und will mit Hinata, Kokona und Kaede einen knapp zwei Kilometer hohen Berg mit Blick auf den Fuji besteigen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20496
+  satz: "Der ausgerissene Mittelschüler Asuta trifft während einer Ausgangssperre die kleine Kate Hoshimiya, die mit ihrer Organisation Zvezda die Welt erobern will."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20506
+  satz: "In einer vom Untergang bedrohten Welt tritt Escha Malier ihren Dienst als Alchemistin in Colset an und muss sich mit dem neuen Kollegen Logy zusammenraufen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20513
+  satz: "Akane Tsunemori kennt die Wahrheit über das Sybil-System, dient ihm dennoch weiter und trifft auf einen Gegner, der es in seinen Grundfesten erschüttern will."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 20514
+  satz: "Als ausländische Terroristen das Sybil-System in Japan von innen angreifen, reist Akane Tsunemori nach Shambala Float, wo das System gerade eingeführt wurde."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20515
+  satz: "Der Katzenroboter Doraemon kommt aus der Zukunft, um dem glücklosen Jungen Nobita beizustehen, etwa dabei, das Herz von Shizuka zu gewinnen."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20519
+  satz: "Im letzten Schuljahr denkt Tamako nur an ihren Baton-Auftritt, während Kindheitsfreund Mochizou studieren will und seine Gefühle für sie ans Licht kommen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20520
+  satz: "Der schüchterne Izumi Sena aus einer Star-Familie will Mangaka werden und trifft beim Neudreh eines Werbespots Ryouma wieder, der ihn für ein Mädchen hielt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20521
+  satz: "Nice und Murasaki, zwei Träger seltener Minimum-Kräfte, führen in Yokohama die Detektei Hamatora und geraten an einen Serienmörder, der Minimum Holder tötet."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20527
+  satz: "Kaori Fujimiya vergisst jeden Montag alle Erinnerungen an ihre Freunde, doch ihr Mitschüler Yuuki Hase freundet sich Woche für Woche neu mit ihr an."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20534
+  satz: "Ryouta fühlt sich schuldig am Tod seiner Kindheitsfreundin Kuroneko, bis eine neue Mitschülerin auftaucht, die ihr gleicht und einem Labor entflohen ist."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20540
+  satz: "Nach dem Untergang der Takeda kehren die Sanada-Brüder Nobuyuki und Yukimura heim, bauen die Burg Ueda und geraten mit Ieyasu Tokugawa in Konflikt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20546
+  satz: "Bei der Eröffnung des Bell Tree Towers wird vor Conans Augen ein Mann erschossen, und er jagt einen Scharfschützen, der ganz Tokio in Angst versetzt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 20552
+  satz: "Der 14-jährige Yuya Sakaki will sein Publikum mit Action-Duellen begeistern und tritt in einem Showduell gegen den amtierenden Champion an."
+  quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26

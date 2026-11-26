@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import yaml from 'js-yaml'
 import type { Title } from '../../shared/types.ts'
-import { log, readJson, ROOT } from '../lib/util.ts'
+import { log, readJson, ROOT, warn } from '../lib/util.ts'
 import type { SprecherDatei } from '../lib/wikipedia-sprecher-sammeln.ts'
 import { wikipediaAdresse } from '../lib/wikipedia-sprecher-seite.ts'
 import type { SprecherZeile } from '../lib/wikipedia-sprecher.ts'
@@ -96,7 +96,8 @@ function liesDatei(id: number): VoiceDatei | undefined {
   if (!existsSync(pfad)) return undefined
   try {
     return JSON.parse(readFileSync(pfad, 'utf8')) as VoiceDatei
-  } catch {
+  } catch (e) {
+    warn(`Sprecher aus Wikipedia: ${pfad} unlesbar (${e instanceof Error ? e.message : String(e)}), wird neu geschrieben`)
     return undefined
   }
 }

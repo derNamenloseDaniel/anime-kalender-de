@@ -25,6 +25,7 @@ function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
 }
 
 const HEUTE = '2026-11-26'
+const NACH_START = '2027-03-25'
 const JETZT = new Date('2026-11-26T12:00:00Z')
 const echteAbfrage = globalThis.fetch
 globalThis.fetch = (async () => ({ ok: false, status: 404, json: async () => ({}) })) as unknown as typeof fetch
@@ -43,13 +44,13 @@ const titel = (id: number, episodes: number, dubBis?: number): Title =>
 const abwurf = (id: number, ab: number, anzahl: number, art = 'batch'): Release =>
   ({ slug: `p${id}-s2`, titleId: id, name: 'Probe', platform: 'primevideo', releaseType: art, year: 2027, sources: ['https://example.org/a'], schedule: { firstEpisodeDate: '2027-03-24', firstEpisodeNumber: ab, episodeCount: anzahl } }) as unknown as Release
 
-async function kastenText(t: Title, rs: Release[]): Promise<string> {
+async function kastenText(t: Title, rs: Release[], tag = HEUTE): Promise<string> {
   const uhr = attrappeUhr()
   const dom = installiereMiniDom({ ...uhr, matchMedia: () => ({ matches: false, addEventListener() {}, removeEventListener() {} }) }, () => ({ src: '', srcset: '', sizes: '', decode: () => Promise.resolve() }))
-  const antwort = berechneAntwort({ title: t, releases: rs, today: HEUTE, jetzt: JETZT })!
+  const antwort = berechneAntwort({ title: t, releases: rs, today: tag, jetzt: tag === HEUTE ? JETZT : new Date(`${tag}T12:00:00Z`) })!
   const wurzel = createRoot(dom.wurzel as unknown as Element)
   await act(async () => {
-    wurzel.render(h(AntwortKasten, { antwort, title: t, t: translate as never, today: HEUTE, releases: rs }))
+    wurzel.render(h(AntwortKasten, { antwort, title: t, t: translate as never, today: tag, releases: rs }))
   })
   await act(async () => {
     await Promise.resolve()
@@ -67,6 +68,10 @@ pruefe('Mighty Nein: „8 von 16 Folgen erschienen“', nein.includes('8 von 16 
 pruefe('Mighty Nein: Kopf „Folgen 9–16“, nicht „Alle 16 Folgen“', nein.includes('Folgen 9–16') && !nein.includes('Alle 16 Folgen'), nein)
 pruefe('Mighty Nein: nicht „0 von 16“', !nein.includes('0 von 16'), nein)
 
+/* Nach dem Abwurf sind alle 16 da: die 8 Folgen davor zählen mit, der Kasten schreibt nicht „8“. */
+const danach = await kastenText(titel(900401, 16, 8), [abwurf(900401, 9, 8)], NACH_START)
+pruefe('Mighty Nein nach dem 24.03.2027: 16 Folgen, nicht 8', danach.includes('16') && !/\b8 Folgen/.test(danach), danach)
+
 /* Ohne Beleg für 1–8 wird nichts behauptet: weder „8 von 16“ noch „Alle 16“. */
 const ohneBeleg = await kastenText({ ...titel(900402, 16), streams: [{ platform: 'primevideo', url: 'https://x/p' }] } as Title, [abwurf(900402, 9, 8)])
 pruefe('ohne Beleg für Folgen davor: kein „8 von 16“, kein „Alle 16“, Kopf „Folgen 9–16“', !ohneBeleg.includes('8 von 16') && !ohneBeleg.includes('Alle 16 Folgen') && ohneBeleg.includes('Folgen 9–16'), ohneBeleg)
@@ -79,6 +84,9 @@ pruefe('Termin reicht eine Folge über die Zahl hinaus: zählt nicht', folgenVor
 pruefe('ohne Folgenzahl: nichts', folgenVorDemStart([abwurf(900404, 9, 8)], new Set([1, 2, 3, 4, 5, 6, 7, 8]), undefined) === 0)
 pruefe('nur belegte Folgen zählen', folgenVorDemStart([abwurf(900404, 9, 8)], new Set([1, 2, 3]), 16) === 3)
 pruefe('Disc-Termin gilt nicht als Start', folgenVorDemStart([{ ...abwurf(900404, 9, 8), releaseType: 'disc' } as Release], new Set([1, 2]), 16) === 0)
+const ohneAnzahl = { ...abwurf(900404, 9, 8), schedule: { firstEpisodeDate: '2027-03-24', firstEpisodeNumber: 9 } } as Release
+pruefe('Termin ohne Folgenzahl zählt als eine Folge: Ende 9 liegt hinter 8, innerhalb von 9', folgenVorDemStart([ohneAnzahl], new Set([1, 2, 3, 4, 5, 6, 7, 8]), 8) === 0 && folgenVorDemStart([ohneAnzahl], new Set([1, 2, 3, 4, 5, 6, 7, 8]), 9) === 8)
+pruefe('Folge außerhalb davor (0 und die erste Terminfolge) zählt nicht', folgenVorDemStart([abwurf(900404, 9, 8)], new Set([0, 9]), 16) === 0)
 pruefe('Start bei Folge 1: nichts davor', folgenVorDemStart([abwurf(900404, 1, 8)], new Set([1, 2]), 16) === 0)
 pruefe('abwurfBereich: 9–16, nicht bei Folge 1, nicht ohne Anzahl', JSON.stringify([abwurfBereich(abwurf(900405, 9, 8)), abwurfBereich(abwurf(900405, 1, 8)), abwurfBereich({ ...abwurf(900405, 9, 8), schedule: { firstEpisodeDate: '2027-03-24', firstEpisodeNumber: 9 } } as Release)]) === '[[9,16],null,null]')
 

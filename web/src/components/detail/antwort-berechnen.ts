@@ -225,7 +225,7 @@ export function berechneAntwort({ title, releases, today, jetzt }: AntwortEingab
     return { art: 'teilweise' as const, raus: teilOhneZahl ? undefined : belegteFolgen, gesamt, gesamtBelegt: gesamtIstBelegt(title, fuerKopf, gesamt), restBelegt }
   }
   if (hatSynchro || titleStatus(releases, today, title) === 'erschienen') {
-    return fertigAntwort(rausMitDavor || gesamt, gesamt, vereint.size, alleEvents, today, releases)
+    return fertigAntwort(raus || gesamt, gesamt, vereint.size, alleEvents, today, releases)
   }
   return { art: 'ohne' as const, gesamt }
 }

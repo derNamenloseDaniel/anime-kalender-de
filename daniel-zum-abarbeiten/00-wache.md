@@ -1,6 +1,6 @@
 # Wache — Bestand und Briefkasten
 
-**⚠ Auffälligkeit** · letzter Befund vom 25.11.2026 um 18:58 Uhr
+**⚠ Auffälligkeit** · letzter Befund vom 26.11.2026 um 18:44 Uhr
 
 Diese Zeile nennt den letzten **Befund**, nicht den letzten Lauf: Seit dem 26.09.2026 wird nur noch
 ein Befund committet (Daniel: „Behalten, still bei Ruhe"). Ob die Wache täglich läuft, steht in
@@ -17,33 +17,21 @@ Disney-Meldungen wurden zu einem einzigen Eintrag abgehakt, 216
 One-Piece-Meldungen verschwanden ganz. Gefunden hat es Daniel, weil ihm eine Zahl
 komisch vorkam. Das soll ihm keiner mehr abverlangen.
 
-## Was aufgefallen ist
-
-- 3 Titel weniger
-
 ## Bestand — die letzten 24 Stunden
 
 ```
-52 Läufe in den letzten 1 Tagen (2689 insgesamt)
+32 Läufe in den letzten 1 Tagen (2721 insgesamt)
 
-24.11., 18:30  Bestand — zusammenführ   titel -3, verweise -3, mitUrteil -3, titelMitSynchro -3, releases -4
-            ℹ  erklärt, nicht rot: 3 Titel ohne Synchro-Beleg, weil ihr Weg an einen anderen Titel ging; rtlplus: Weg verschoben – Pokémon Horizonte: Die Serie (7000001): https://plus.rtl.de/pokemon-horizonte-die-serie-p_10142 → Pokémon Horizonte (158871); rtlplus: Weg verschoben – Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua (7000002): https://plus.rtl.de/pokemon-horizonte-die-serie-p_10142 → Pokémon Horizonte (158871); rtlplus: Weg verschoben – Pokémon Horizonte: Staffel 3 – Gute Aussichten (7000003): https://plus.rtl.de/pokemon-horizonte-die-serie-p_10142 → Pokémon Horizonte (158871)
-            ⚠  3 Titel weniger
-               • Pokémon Horizonte: Die Serie (7000001) · Titel entfernt
-               • Pokémon Horizonte: Staffel 2 – Die Suche nach Laqua (7000002) · Titel entfernt
-               • Pokémon Horizonte: Staffel 3 – Gute Aussichten (7000003) · Titel entfernt
-24.11., 19:10  Bestand — zusammenführ   termine +2
-25.11., 00:00  Bestand — zusammenführ   verweise +2, ohneUrteil +2
-25.11., 06:22  Bestand — zusammenführ   termine +7
-25.11., 15:11  Bestand — zusammenführ   verweise +1, ohneUrteil +1
-25.11., 16:36  Bestand — zusammenführ   verweise +1, ohneUrteil +1
-25.11., 17:07  Bestand — zusammenführ   verweise +1, mitUrteil +1, titelMitSynchro +1
-25.11., 17:22  Bestand — zusammenführ   releases +1, termine +1
+25.11., 18:07  Bestand — zusammenführ   titel -3, verweise -1, mitUrteil -1, titelMitSynchro -1
+            ℹ  erklärt, nicht rot: 1 Titel ohne Synchro-Beleg, weil ihr Weg an einen anderen Titel ging; netflix: Weg verschoben – Bastard!! Der Gott der Zerstörung: Teil 2 (10017505): https://www.netflix.com/title/81281582 → Bastard!! Der Gott der Zerstörung (144677); 3 Titel zusammengelegt (zuAk nachträglich eingetragen): 10016648, 10017505, 10017775
+25.11., 23:09  Bestand — zusammenführ   verweise +1, ohneUrteil +1, releases +1, termine +1
+26.11., 04:25  --ersetzen               titel +1
+26.11., 04:29  Bestand — zusammenführ   verweise +2, mitUrteil +1, ohneUrteil +1
+26.11., 05:12  Bestand — zusammenführ   verweise +2, ohneUrteil +2, releases +1, termine +8
+26.11., 12:17  Bestand — zusammenführ   mitUrteil +2, ohneUrteil -2, titelMitSynchro +1
 
-Stand jetzt: 2926 Titel, 2314 Urteile, 151 offen
-Über den Zeitraum: Titel -3, Urteile -2, offen +4
-
-⚠  1 Lauf/Läufe mit Auffälligkeiten — siehe oben.
+Stand jetzt: 2924 Titel, 2316 Urteile, 153 offen
+Über den Zeitraum: Titel +1, Urteile +3, offen +2
 ```
 
 ## Briefkasten
@@ -53,23 +41,23 @@ Briefkasten: 4080 Meldungen auf 230 Adressen (primevideo 514, adn 133, disneyplu
 Liste daniel-zum-abarbeiten/listen/11-meldungen-ohne-zuordnung.md: 426 Adressen
 Zurückgestellt (data/meldungen-zurueckgestellt.json): 0 Adressen im Briefkasten
 Alle Adressen sind gelistet.
-Übernahme: zuletzt 2026-11-22T14:10:34.036Z (data/meldungen-uebernahme.json)
+Übernahme: zuletzt 2026-11-26T12:10:07.078Z (data/meldungen-uebernahme.json)
 ✓ refresh-hourly.yml: letzter Erfolg vor 1 h (Frist 3 h)
 ✓ refresh-data.yml: letzter Erfolg vor 14 h (Frist 36 h)
-✓ refresh-weekly.yml: letzter Erfolg vor 61 h (Frist 336 h)
+✓ refresh-weekly.yml: letzter Erfolg vor 85 h (Frist 336 h)
 ✓ daten-auf-abruf.yml: letzter Erfolg vor 7 h (Frist 36 h)
 ✓ anisearch-katalog.yml: letzter Erfolg vor 12 h (Frist 36 h)
-✓ tonspuren-monatlich.yml: letzter Erfolg vor 446 h (Frist 1008 h)
+✓ tonspuren-monatlich.yml: letzter Erfolg vor 470 h (Frist 1008 h)
 ✓ bestand-bauen.yml: letzter Erfolg vor 1 h (Frist 18 h)
-✓ d1-verbrauch.yml: letzter Erfolg vor 23 h (Frist 48 h)
-✓ claude-anime2you-extraktion.yml: letzter Erfolg vor 1 h (Frist 3 h)
+✓ d1-verbrauch.yml: letzter Erfolg vor 24 h (Frist 48 h)
+✗ claude-anime2you-extraktion.yml: letzter Erfolg vor 4 h (Frist 3 h)
 ✓ claude-wache-urteil.yml: letzter Erfolg vor 9 h (Frist 36 h)
 ✓ claude-verpasst-recherche.yml: letzter Erfolg vor 7 h (Frist 36 h)
 ✓ claude-daten-merge.yml: letzter Erfolg vor 1 h (Frist 48 h)
 ✓ GITHUB_WECKER_TOKEN: letzter Start durch den Wecker vor 1 h
 ℹ Ablaufdatum unbekannt (gueltigBis leer): CLAUDE_CODE_OAUTH_TOKEN, LAUF_TOKEN, CR_ZUGANG, ANISEARCH_TOKEN, TMDB_API_KEY, YOUTUBE_API_KEY, STREAMING_API_KEY, SERPER_API_KEY, DATEN_APP_KEY, DISCORD_WEBHOOK, CLOUDFLARE_API_TOKEN, CLOUDFLARE_ANALYTICS_TOKEN, NACHT_MERGER_TOKEN, GITHUB_WECKER_TOKEN, MAIL_API_KEY, WEICHE_TOKEN — Daniel liest es einmal im Konto ab und trägt es ins Register ein.
 
-Zugänge unauffällig.
+1 Befund(e) bei den Zugängen.
 ```
 
 ## Von den Ableitungen verworfen
@@ -81,7 +69,7 @@ Serien, für die keine Termine entstanden — je Grund, mit der Veränderung sei
  229  Blöcke und Titel verschieden viele (±0)
   45  Folgenzahl geht nicht auf (±0)
    4  deutscher Termin vor der japanischen Ausstrahlung (±0)
-(Vergleich mit dem Stand vom 2026-11-24)
+(Vergleich mit dem Stand vom 2026-11-25)
 ```
 
 ## Tagebuch
@@ -90,6 +78,7 @@ Die letzten 60 Läufe. Älteres hat seinen Zweck erfüllt.
 
 | Zeitpunkt | Titel / Urteile / offen | Veränderung | Befund |
 |---|---|---|---|
+| 26.11.2026 18:44 | 2924 / 2316 / 153 | Titel +1, Urteile +3, offen +2 | Auffälligkeit |
 | 25.11.2026 18:58 | 2926 / 2314 / 151 | Titel -3, Urteile -2, offen +4 | 3 Titel weniger |
 | 24.11.2026 19:54 | 2926 / 2313 / 147 | Titel -3, Urteile -3, offen 0 | 3 Titel weniger |
 | 22.11.2026 16:18 | 2925 / 2298 / 153 | Titel -1, Urteile +2, offen -1 | 1 Titel weniger |

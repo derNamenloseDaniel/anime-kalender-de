@@ -21,12 +21,11 @@ function eigenschaftEntfernt(node) {
   return [{ art: `Objekt-Eigenschaft entfernt ${name}`, von: node.getStart(), bis: node.end, ersetze: '...{}' }]
 }
 
-/** Leerer Wert derselben Art für ein nicht leeres Zeichenketten-, Listen- oder Objektliteral, sonst null. */
+/** Leerer Wert derselben Art für ein nicht leeres Zeichenketten-, Listen- oder Objektliteral, sonst undefined. */
 function leererWert(i) {
   if ((ts.isStringLiteral(i) || ts.isNoSubstitutionTemplateLiteral(i)) && i.text !== '') return '""'
   if (ts.isArrayLiteralExpression(i) && i.elements.length) return '[]'
   if (ts.isObjectLiteralExpression(i) && i.properties.length) return '{}'
-  return null
 }
 
 /** Vorgabewert eines Funktionsparameters wird 0 und, bei nicht leerem Literal, leer (`"x"` → `""`); 0 allein ändert die Art, ein typtreuer Test fängt es zu leicht. */

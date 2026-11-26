@@ -8,6 +8,7 @@ import { ladePatchnotes } from '../lib/patchnotes.ts'
 import { PT } from '../lib/patchnotes-texte.ts'
 import { PatchFilter, PatchKopf, PatchTagBlock, SCHLIESS_MS, fokusfalle, useWischen } from './patchnotes-teile.tsx'
 import { tageVon, type Filter } from '../lib/patchnotes-tage.ts'
+import { useFlaechenHinweis } from './hinweis-flaeche.tsx'
 import '../patchnotes.css'
 
 /**
@@ -22,6 +23,7 @@ export default function PatchnotesDialog({ laden, beiZu }: { laden: Promise<Patc
   const panel = useRef<HTMLDivElement>(null)
   const titel = useRef<HTMLHeadingElement>(null)
   const listeEl = useRef<HTMLDivElement>(null)
+  const hinweis = useFlaechenHinweis()
 
   useEffect(() => {
     let aktuell = true
@@ -64,7 +66,8 @@ export default function PatchnotesDialog({ laden, beiZu }: { laden: Promise<Patc
           <PatchKopf neuester={alle[0]?.datum} titel={titel} schliessen={zu} />
         </div>
         <PatchFilter filter={filter} setze={(f) => (setFilter(f), listeEl.current?.scrollTo({ top: 0 }))} zaehl={zaehl} />
-        <div ref={listeEl} className="pn-liste">
+        <div ref={listeEl} className="pn-liste" {...hinweis.handler}>
+          {hinweis.blase}
           {liste === undefined && <div className="pn-leer" role="status">{PT.laden}</div>}
           {liste === 'fehler' && (
             <div className="pn-leer" role="alert">

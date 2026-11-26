@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react'
 import { MitFachwoertern } from '../fachwort.tsx'
+import { mitHinweis } from '../ui.tsx'
 import { type Release, type Title, PLATFORMS } from '@shared/types.ts'
 import { istAusgeblieben } from '@shared/logic.ts'
 import { VermerkAuskunft } from './vermerk.tsx'
@@ -57,8 +58,8 @@ export function KastenKopfblock(p: KopfblockProps) {
       />
       </div>
       {neben && (
-        <p className="mt-0.5 text-t4 text-ak-leise" title={nebenTitel}>
-          <MitFachwoertern text={neben} />
+        <p className="mt-0.5 text-t4 text-ak-leise">
+          {mitHinweis(nebenTitel, 'unten', <MitFachwoertern text={neben} />)}
         </p>
       )}
 

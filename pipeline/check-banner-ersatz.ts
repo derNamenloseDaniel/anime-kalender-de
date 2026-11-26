@@ -38,6 +38,14 @@ pruefe('Spender behält sein Banner ohne Kennzeichnung', kopf.bannerImage === TM
 pruefe('Rückgabe: genau die Ersetzten', ids.join() === '2,3,4', ids)
 pruefe('Mangel bild-fremdsprachig: ersetztes Banner zählt nicht mehr', fremdeBilder(staffel, () => undefined, () => undefined).length === 0)
 
+// Mehrere Spender in der Reihe: der nächstliegende nach Jahr gilt, auch wenn er vor dem letzten steht.
+{
+  const [a, b] = [titel(81, { franchiseId: 8, jpYear: 2000, bannerImage: TM }), titel(82, { franchiseId: 8, jpYear: 2015, bannerImage: TM })]
+  const c = titel(83, { franchiseId: 8, jpYear: 2001, bannerImage: AL })
+  franchise.ersetzeAnilistBanner(karte(a, b, c))
+  pruefe('zwei Spender: der nächstliegende nach Jahr', c.bannerVon === 81, c)
+}
+
 // Verdrahtung: der Wege-Abschluss ruft den Ersatz auf (Vorbild `check-banner-franchise.ts`).
 {
   suchadressenInTemp()

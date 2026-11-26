@@ -85,7 +85,7 @@ Die Reihe bildet Staffeln aus AniList-Kennungen (`hauptstaffeln()` und `staffelS
 wenigen langen Sammeleinträgen; die deutschen Staffelgrenzen stehen nur in `tmdb-folgen.json` (`s` je Folge) und kommen weder in `titles.json` noch in die Reihenkarte.
 Das ist keine Pipeline-Regel, die Staffeln verwirft oder zusammenlegt: Eine Stichprobe über alle Folgensummen zeigt, dass jede Folge einem Titel gehört.
 Ein kleinster Fix ohne neues Feld gibt es darum nicht: Er bräuchte (a) Staffelgrenzen je Sammeltitel aus TMDB (belegt, vorhanden), (b) deutsche Staffelnamen
-und Starttermine aus pokewiki/fernsehserien (hier nicht erreichbar), (c) eine Darstellung in der Reihenkarte („Staffel 14–16“ statt „Staffel 4“).
+und Starttermine aus pokewiki/bisafans (fernsehserien.de nur mit Genehmigung, `quellen.md`), (c) eine Darstellung in der Reihenkarte („Staffel 14–16“ statt „Staffel 4“).
 Sicherer Bauweg: `data/pokemon-staffeln.yaml` mit `{titel, staffeln: [{nr, folgen, tmdb, deutscherName?, start?, quelle}]}`, nur mit Quelle je Zeile, gelesen von
 `staffelStaende()` für die Beschriftung; Test: vorher „Staffel 4 von 13“, nachher „Staffeln 14–16 von 25“.
 
@@ -97,7 +97,7 @@ Sicherer Bauweg: `data/pokemon-staffeln.yaml` mit `{titel, staffeln: [{nr, folge
 
 ## Offene Liste (nächster Lauf, mit Zugriff auf die Wikis)
 
-1. Deutsche Staffelnamen und TV-Starttermine für Staffel 1–25 aus pokewiki.de/bisafans.de und fernsehserien.de lesen (je Staffel eine Zeile mit URL und Abrufdatum).
+1. Deutsche Staffelnamen und TV-Starttermine für Staffel 1–25 aus pokewiki.de/bisafans.de lesen (fernsehserien.de/wunschliste.de nur mit schriftlicher Genehmigung, `quellen.md`) (je Staffel eine Zeile mit URL und Abrufdatum).
 2. `data/pokemon-staffeln.yaml` und Leser in `staffelStaende()` bauen (siehe Ursache), mit Test vorher rot, nachher grün.
 3. Horizonte: Teile und Folgenzahl von Netflix-API/AniList prüfen (L2, L6); Reisen-TV-Release (L3) an die richtige Staffel hängen.
 4. L4: TV-Premiere von XY und Sonne & Mond belegen, sonst `erstausgabe-von-hand.yaml` mit Quelle.

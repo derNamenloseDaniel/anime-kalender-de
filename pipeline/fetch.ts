@@ -70,19 +70,10 @@ async function holeTmdb(curated: ReturnType<typeof loadCurated>, resolved: Recor
   log(`TMDB: ${done} neue Abfragen, ${Object.keys(tmdbCache).length} im Cache`)
 }
 
-/** Ob AniList in diesem Lauf ausgefallen ist — dann fehlen Metadaten, nicht mehr. */
-let anilistAus = false
+const nochOffen = (m: AniListMedia | undefined): boolean => Boolean(m) && eintragNochOffen(m!)
 
-async function main(): Promise<void> {
-  loadEnv()
-
-  // 1. Dub-Liste
-  const confidence = await fetchDubList()
-  const malIds = Object.keys(confidence).map(Number)
-  writeJson('data/cache/dub-confidence.json', confidence)
-  log(`Insgesamt ${malIds.length} MAL-IDs mit deutscher Synchro`)
-
-  // 2. AniList-Metadaten
+/** Schritt 2: AniList-Metadaten zu den MAL-IDs der Dub-Liste; liefert den (ergänzten) Zwischenspeicher. */
+async function holeAnilistMetadaten(malIds: number[], heute: string): Promise<Record<string, AniListMedia>> {
   /*
     **Was noch nicht abgeschlossen ist, wird bei jedem Lauf neu geholt.**
 
@@ -95,9 +86,7 @@ async function main(): Promise<void> {
     Abgeschlossene und abgesetzte Titel ändern sich nicht mehr und bleiben im
     Speicher. Auch ein Eintrag ohne Herkunftsland (Abruf vor dem 09.10.2026) oder ohne Stimmenverteilung (vor dem 22.11.2026) wird einmal neu geholt.
   */
-  const nochOffen = (m: AniListMedia | undefined): boolean => Boolean(m) && eintragNochOffen(m!)
   const cached = readJson<Record<string, AniListMedia>>('data/cache/anilist-media.json', {})
-  const heute = todayIso() // Berliner Tag wie überall; für den 2-Tage-Abstand genügt er
   const missing = FORCE ? malIds : zuHolen(cached, malIds, nochOffen, heute)
   log(`AniList: ${missing.length} von ${malIds.length} IDs fehlen im Cache`)
 
@@ -109,12 +98,18 @@ async function main(): Promise<void> {
     writeJson('data/cache/anilist-media.json', cached)
     log(`AniList: ${fetched.size} neue Einträge, ${Object.keys(cached).length} im Cache`)
   }
+  return cached
+}
 
-  // 3. Kuratierte Einträge auflösen — Ergebnis bleibt im Repo, damit die Suche
-  //    nicht bei jedem Lauf erneut läuft und Treffer stabil bleiben.
-  const curated = loadCurated()
+/**
+ * Schritt 3: kuratierte Einträge auflösen — Ergebnis bleibt im Repo, damit die Suche
+ * nicht bei jedem Lauf erneut läuft und Treffer stabil bleiben.
+ * `ausgefallen`: AniList war während der Auflösung nicht erreichbar.
+ */
+async function loeseKuratierteAuf(curated: ReturnType<typeof loadCurated>): Promise<{ resolved: Record<string, number>; ausgefallen: boolean }> {
   const resolved = readJson<Record<string, number>>('data/curated-ids.json', {})
   let newResolutions = 0
+  let ausgefallen = false
   for (const entry of curated) {
     if (entry.anilistId) {
       resolved[entry.slug] = entry.anilistId
@@ -139,7 +134,7 @@ async function main(): Promise<void> {
     } catch (err) {
       if (!istQuellenAusfall(err)) throw err
       warn(`AniList ist gerade nicht erreichbar — Auflösung übersprungen (${(err as Error).message})`)
-      anilistAus = true
+      ausgefallen = true
       break
     }
     if (hit?.id) {
@@ -151,8 +146,11 @@ async function main(): Promise<void> {
     }
   }
   if (newResolutions > 0) writeJson('data/curated-ids.json', resolved, true)
+  return { resolved, ausgefallen }
+}
 
-  // AniList-Daten der kuratierten Titel nachladen, falls sie nicht über MAL kamen.
+/** AniList-Daten der kuratierten Titel nachladen, falls sie nicht über MAL kamen. */
+async function holeKuratierteNach(cached: Record<string, AniListMedia>, resolved: Record<string, number>, heute: string): Promise<Record<string, AniListMedia>> {
   const byAniId = readJson<Record<string, AniListMedia>>('data/cache/anilist-by-id.json', {})
   /* Titel mit Handbeleg (`data/synchro-von-hand.yaml`) kommen über denselben Weg in den Bestand. */
   const handIds = [...loadSynchroVonHand().map((e) => e.anilistId), ...ausAnisearchDubs(Object.values(cached)), ...ausAnisearchHand(Object.values(cached))]
@@ -167,6 +165,25 @@ async function main(): Promise<void> {
     }
     writeJson('data/cache/anilist-by-id.json', byAniId)
   }
+  return byAniId
+}
+
+async function main(): Promise<void> {
+  loadEnv()
+
+  // 1. Dub-Liste
+  const confidence = await fetchDubList()
+  const malIds = Object.keys(confidence).map(Number)
+  writeJson('data/cache/dub-confidence.json', confidence)
+  log(`Insgesamt ${malIds.length} MAL-IDs mit deutscher Synchro`)
+
+  const heute = todayIso() // Berliner Tag wie überall; für den 2-Tage-Abstand genügt er
+  const cached = await holeAnilistMetadaten(malIds, heute) // 2.
+  const curated = loadCurated()
+  const aufloesung = await loeseKuratierteAuf(curated) // 3.
+  const { resolved } = aufloesung
+  let anilistAus = aufloesung.ausgefallen
+  const byAniId = await holeKuratierteNach(cached, resolved, heute)
 
   if (!SKIP_ANILIST && !anilistAus) anilistAus = await holeAnisearchCover(cached, byAniId)
 

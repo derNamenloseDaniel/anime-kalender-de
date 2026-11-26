@@ -67,9 +67,14 @@ export function roteArten(verlauf, letzterGruen = new Map(), jetztMs = Date.now(
   return rote
 }
 
-/** Notiz des Verlaufseintrags, der zu `r` (Eintrag aus `roteArten`) gehört; leer, wenn er nicht gefunden wird. */
+/** Verlaufseintrag, der zu `r` (Eintrag aus `roteArten`) gehört; `undefined`, wenn er nicht gefunden wird. */
+export function eintragZu(eintraege, r) {
+  return eintraege.find((e) => e.gemeldet_am === r.am && e.zustand === r.zustand)
+}
+
+/** Notiz dieses Eintrags; leer, wenn er nicht gefunden wird. */
 export function notizZu(eintraege, r) {
-  return eintraege.find((e) => e.gemeldet_am === r.am && e.zustand === r.zustand)?.notiz ?? ''
+  return eintragZu(eintraege, r)?.notiz ?? ''
 }
 
 const NOTIZ_MAX = 160

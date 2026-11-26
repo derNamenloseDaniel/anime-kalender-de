@@ -11,6 +11,8 @@
  * Aufruf: `tsx pipeline/fetch-anisearch-artikel.ts [--limit N]`
  */
 import { artikelAus, type Artikel } from './lib/anisearch-artikel.ts'
+import { todayIso } from '../shared/time.ts'
+import { artikelFaellig } from './lib/anisearch-faellig.ts'
 import { KENNUNG } from './lib/kennung.ts'
 import { log, readJson, sleep, warn, writeJson } from './lib/util.ts'
 
@@ -31,6 +33,7 @@ interface Eintrag extends Artikel {
 }
 interface Ausgabe {
   url?: string
+  datum?: string
 }
 
 const bestand = readJson<Record<string, Eintrag>>(ZIEL, {})
@@ -44,22 +47,25 @@ const mitMarke = (titelId: string): boolean =>
   !!anisearch[titelId]?.info?.languages?.some((l) => l.language === 'Deutsch' && l.dubbed)
 
 /** Artikelnummer → (Adresse, vordringlich). Vordringlich: mindestens ein Titel ohne Marke. */
-const artikel = new Map<string, { url: string; vorn: boolean }>()
+const artikel = new Map<string, { url: string; vorn: boolean; datum?: string }>()
 for (const [titelId, liste] of Object.entries(ausgaben)) {
   const vorn = !mitMarke(titelId)
   for (const a of liste) {
     const nr = /\/article\/(\d+),/.exec(a.url ?? '')?.[1]
     if (!nr || !a.url) continue
     const alt = artikel.get(nr)
-    artikel.set(nr, { url: a.url, vorn: vorn || !!alt?.vorn })
+    artikel.set(nr, { url: a.url, vorn: vorn || !!alt?.vorn, datum: a.datum })
   }
 }
 
-const faellig = (nr: string): boolean => {
-  const e = bestand[nr]
-  if (!e || e.stand < PARSER_STAND) return true
-  return (Date.now() - Date.parse(e.fetchedAt)) / 86_400_000 >= ALTER_TAGE
-}
+/* Artikel einer künftigen Ausgabe binnen der Frist kommen früher wieder: Tonspur und Inhalt werden oft erst vor dem Termin nachgetragen. */
+const faellig = (nr: string): boolean =>
+  artikelFaellig(bestand[nr], {
+    jetzt: Date.now(),
+    alterTage: ALTER_TAGE,
+    parserStand: PARSER_STAND,
+    termin: { heute: todayIso(), tage: [artikel.get(nr)?.datum ?? ''] },
+  })
 
 const warteschlange = [...artikel.entries()]
   .filter(([nr]) => faellig(nr))

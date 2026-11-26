@@ -39,6 +39,7 @@ export function terminPillen(rs: Release[], title: Title, releases: Release[], t
 }
 
 type Sortiert = ReturnType<typeof sortiereNachZugang>
+type StreamWeg = Sortiert[number]['streamWege'][number]
 type FolgenAngabeFuer = (s: { platform?: string; url?: string; nurFolge?: number; dubRanges?: StreamLink['dubRanges']; dub?: boolean; fenster?: StreamLink['fenster'] } | undefined) => string
 
 /** Die Zeilen unter „Stream" im Antwortkasten (Anbieter, Ausgaben ohne Deutsch, Bezugswege, Termine, TV). */
@@ -249,32 +250,34 @@ function streamWegPillen({ sortiertNachZugang, title, t, folgenAngabeFuer }: {
           gar nichts. Die Angabe steht am Weg, weil sie zu ihm
           gehört, nicht zum Titel.
         */
-        /*
-          **Eine Folgenzahl nur, wo die deutsche Fassung an diesem Weg belegt ist.**
-
-          „Amazon Prime (Crunchyroll) · 100 Fg." stand über „Dragon Quest: The
-          Adventure of Dai" — der Kanal führt die Serie nur auf Japanisch (Daniel,
-          16.09.2026, mit Bild; Crunchyrolls deutscher Katalog: 0 von 101 Folgen
-          deutsch). Die Zahl stammte aus der Titelregel von `folgenAngabeFuer()`,
-          die für Verweise mit `dub: true` gemessen war und hier ohne jeden Verweis
-          griff. 160 Titel zeigten so eine Stream-Pille mit Folgenzahl, ohne dass
-          dort Deutsch belegt war.
-
-          Ohne Urteil also keine Zahl — und rechts das Zeichen, das der Kommentar
-          darüber schon lange versprach: „DE ?", die ehrliche Antwort.
-        */
-        unten={(() => {
-          if (istToggo(g.eintraege[0].url))
-            return toggoAngabe((title.watchLinks ?? []).find((w) => w.url === g.eintraege[0].url)?.toggo)
-          if (g.eintraege[0].nurFolge) return t('detail.nurFolge', { n: g.eintraege[0].nurFolge })
-          if (g.eintraege[0].dubRanges?.length && !istAnnahme(g.eintraege[0])) return folgenAngabeFuer({ dubRanges: g.eintraege[0].dubRanges, url: g.eintraege[0].url, nurFolge: g.eintraege[0].nurFolge }) || undefined
-          const verweis = (title.streams ?? []).find((x) => x.url === g.eintraege[0].url)
-          return verweis?.dub === true ? folgenAngabeFuer(verweis) || undefined : undefined
-        })()}
+        unten={wegUnten(g, title, t, folgenAngabeFuer)}
         status={<DubStatus art={streamWegStatus(g, title)} />}
       />
     )),
   )
+}
+
+/*
+  **Eine Folgenzahl nur, wo die deutsche Fassung an diesem Weg belegt ist.**
+
+  „Amazon Prime (Crunchyroll) · 100 Fg." stand über „Dragon Quest: The
+  Adventure of Dai" — der Kanal führt die Serie nur auf Japanisch (Daniel,
+  16.09.2026, mit Bild; Crunchyrolls deutscher Katalog: 0 von 101 Folgen
+  deutsch). Die Zahl stammte aus der Titelregel von `folgenAngabeFuer()`,
+  die für Verweise mit `dub: true` gemessen war und hier ohne jeden Verweis
+  griff. 160 Titel zeigten so eine Stream-Pille mit Folgenzahl, ohne dass
+  dort Deutsch belegt war.
+
+  Ohne Urteil also keine Zahl — und rechts das Zeichen, das der Kommentar
+  darüber schon lange versprach: „DE ?", die ehrliche Antwort.
+*/
+function wegUnten(g: StreamWeg, title: Title, t: Translate, folgenAngabeFuer: FolgenAngabeFuer): string | undefined {
+  if (istToggo(g.eintraege[0].url))
+    return toggoAngabe((title.watchLinks ?? []).find((w) => w.url === g.eintraege[0].url)?.toggo)
+  if (g.eintraege[0].nurFolge) return t('detail.nurFolge', { n: g.eintraege[0].nurFolge })
+  if (g.eintraege[0].dubRanges?.length && !istAnnahme(g.eintraege[0])) return folgenAngabeFuer({ dubRanges: g.eintraege[0].dubRanges, url: g.eintraege[0].url, nurFolge: g.eintraege[0].nurFolge }) || undefined
+  const verweis = (title.streams ?? []).find((x) => x.url === g.eintraege[0].url)
+  return verweis?.dub === true ? folgenAngabeFuer(verweis) || undefined : undefined
 }
 
 /** Die Kaufweg-Pillen unter „Disc": eine Pille je Shop; die aniSearch-Ausgaben ersetzen die eine aniSearch-Pille, sobald sie geladen sind. */

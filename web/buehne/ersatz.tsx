@@ -10,6 +10,8 @@ import type { Pille } from '../src/components/detail/pille.tsx'
 import type { LiveLink } from '../src/components/detail/live-link.tsx'
 import type { discZeilen } from '../src/components/detail/wege-zeilen.tsx'
 import type { AntwortKastenMitMarke } from '../src/components/detail/kasten-marke.tsx'
+import type { KastenPillen } from '../src/components/detail/antwort-kasten-teile.tsx'
+import type { KalenderBereich } from '../src/components/kalender/KalenderBereich.tsx'
 import type { ReihenListe } from '../src/components/detail/reihen-liste.tsx'
 
 /** Die Zeilen unter „Disc“ als Bauteil: dieselben Angaben, die `discZeilen()` bekommt. */
@@ -33,6 +35,10 @@ export interface Ersatz {
   LiveLink: ComponentType<ComponentProps<typeof LiveLink>>
   /** Die Reihen-Karte samt Inhalt (Mockup `reihen-box`). */
   ReihenListe: ComponentType<ComponentProps<typeof ReihenListe>>
+  /** Die Wege-Pillen unter dem Antwortkasten samt Bereichsüberschriften (Mockup `kalender-wuensche-bereiche`). */
+  KastenPillen: ComponentType<ComponentProps<typeof KastenPillen>>
+  /** Der Kalender (Kopf, Filter, Woche oder Monat) als Bauteil (Mockup `kalender-wischen`). */
+  KalenderBereich: ComponentType<ComponentProps<typeof KalenderBereich>>
 }
 
 export const ErsatzKontext = createContext<Partial<Ersatz>>({})

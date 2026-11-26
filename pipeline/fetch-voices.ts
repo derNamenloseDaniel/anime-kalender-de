@@ -22,6 +22,7 @@
  * Aufruf: npm run data:voices [-- --limit 400] [-- --force]
  */
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { pathToFileURL } from 'node:url'
 import { germanVoicesFor, type VoiceRole } from './lib/anilist.ts'
 import { log, readJson, warn } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
@@ -66,7 +67,62 @@ function hatAnisearchRollen(pfad: string): boolean {
   }
 }
 
-async function main(): Promise<void> {
+/** Titel mit Termin zuerst: Das sind die, die gerade jemand aufschlägt. */
+function baueWarteschlange(titles: Title[], releases: Release[]): Title[] {
+  const mitTermin = new Set(releases.map((r) => r.titleId))
+  return titles
+    .filter((t) => {
+      if (FORCE) return true
+      const pfad = `${OUT}/${t.id}.json`
+      return !existsSync(pfad) || (alter(pfad) > MAX_AGE_TAGE && !hatAnisearchRollen(pfad))
+    })
+    .sort((a, b) => Number(mitTermin.has(b.id)) - Number(mitTermin.has(a.id)))
+    .slice(0, LIMIT)
+}
+
+interface Zaehlung {
+  geschrieben: number
+  leer: number
+  /** Wie oft eine leere Antwort belegte Rollen stehen ließ. */
+  behalten: number
+}
+
+/** Schreibt die Antworten eines Blocks, eine Datei je Titel. */
+function schreibeBlock(block: Title[], gefunden: Map<number, VoiceRole[]>): Zaehlung {
+  const z: Zaehlung = { geschrieben: 0, leer: 0, behalten: 0 }
+  for (const title of block) {
+    const rollen = gefunden.get(title.id) ?? []
+    // Auch das Nichts festhalten — sonst fragt jeder Lauf dieselben Titel
+    // erneut ab, bei denen AniList schlicht keine deutschen Stimmen führt.
+    /*
+      **Ein Ausfall löscht keine belegten Rollen** (17.09.2026). Ein gescheitertes
+      AniList-Bündel liefert eine leere Liste; sie über belegte Sprechrollen zu
+      schreiben nähme dem Titel die Auskunft „eine deutsche Fassung gab es".
+    */
+    const pfad = `${OUT}/${title.id}.json`
+    if (!rollen.length && existsSync(pfad)) {
+      try {
+        if ((JSON.parse(readFileSync(pfad, 'utf8')) as VoiceFile).roles?.length) {
+          z.behalten++
+          continue
+        }
+      } catch {
+        /* Unlesbar — dann darf die leere Fassung sie ersetzen. */
+      }
+    }
+    const datei: VoiceFile = {
+      titleId: title.id,
+      updatedAt: new Date().toISOString(),
+      roles: rollen,
+    }
+    writeFileSync(pfad, JSON.stringify(datei))
+    if (rollen.length) z.geschrieben++
+    else z.leer++
+  }
+  return z
+}
+
+export async function main(): Promise<void> {
   const titles = readJson<Title[]>('public/data/titles.json', [])
   const releases = readJson<Release[]>('public/data/releases.json', [])
   if (!titles.length) {
@@ -75,16 +131,7 @@ async function main(): Promise<void> {
   }
   if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true })
 
-  // Titel mit Termin zuerst: Das sind die, die gerade jemand aufschlägt.
-  const mitTermin = new Set(releases.map((r) => r.titleId))
-  const queue = titles
-    .filter((t) => {
-      if (FORCE) return true
-      const pfad = `${OUT}/${t.id}.json`
-      return !existsSync(pfad) || (alter(pfad) > MAX_AGE_TAGE && !hatAnisearchRollen(pfad))
-    })
-    .sort((a, b) => Number(mitTermin.has(b.id)) - Number(mitTermin.has(a.id)))
-    .slice(0, LIMIT)
+  const queue = baueWarteschlange(titles, releases)
 
   if (!queue.length) {
     log('Sprecher: nichts nachzuladen.')
@@ -96,7 +143,6 @@ async function main(): Promise<void> {
 
   let geschrieben = 0
   let leer = 0
-  /* Wie oft eine leere Antwort belegte Rollen stehen ließ. */
   let behalten = 0
 
   /**
@@ -110,36 +156,10 @@ async function main(): Promise<void> {
   for (let i = 0; i < queue.length; i += BLOCK) {
     const block = queue.slice(i, i + BLOCK)
     const gefunden = await germanVoicesFor(block.map((t) => t.id))
-
-    for (const title of block) {
-      const rollen = gefunden.get(title.id) ?? []
-      // Auch das Nichts festhalten — sonst fragt jeder Lauf dieselben Titel
-      // erneut ab, bei denen AniList schlicht keine deutschen Stimmen führt.
-      /*
-        **Ein Ausfall löscht keine belegten Rollen** (17.09.2026). Ein gescheitertes
-        AniList-Bündel liefert eine leere Liste; sie über belegte Sprechrollen zu
-        schreiben nähme dem Titel die Auskunft „eine deutsche Fassung gab es".
-      */
-      const pfad = `${OUT}/${title.id}.json`
-      if (!rollen.length && existsSync(pfad)) {
-        try {
-          if ((JSON.parse(readFileSync(pfad, 'utf8')) as VoiceFile).roles?.length) {
-            behalten++
-            continue
-          }
-        } catch {
-          /* Unlesbar — dann darf die leere Fassung sie ersetzen. */
-        }
-      }
-      const datei: VoiceFile = {
-        titleId: title.id,
-        updatedAt: new Date().toISOString(),
-        roles: rollen,
-      }
-      writeFileSync(pfad, JSON.stringify(datei))
-      if (rollen.length) geschrieben++
-      else leer++
-    }
+    const z = schreibeBlock(block, gefunden)
+    geschrieben += z.geschrieben
+    leer += z.leer
+    behalten += z.behalten
     log(`  ${Math.min(i + BLOCK, queue.length)}/${queue.length} — ${geschrieben} mit Stimmen`)
   }
 
@@ -162,7 +182,10 @@ async function main(): Promise<void> {
   )
 }
 
-main().catch((err) => {
-  console.error(err)
-  process.exit(1)
-})
+// Nur beim Direktstart: der Vergleichsrahmen (tools/vergleich-alt-neu.mjs) importiert `main`, ohne Netz zu rufen.
+if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+  main().catch((err) => {
+    console.error(err)
+    process.exit(1)
+  })
+}

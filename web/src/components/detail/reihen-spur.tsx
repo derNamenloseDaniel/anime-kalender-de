@@ -13,7 +13,7 @@ function PfeilKnopf({ richtung, label, aus, spurId, onClick }: { richtung: '‹'
       aria-controls={spurId}
       disabled={aus}
       onClick={onClick}
-      className="min-h-11 min-w-11 cursor-pointer rounded-lg text-xl leading-none text-ak-text hover:bg-ak-flaeche-2 focus-visible:outline-2 focus-visible:outline-ak-fokus disabled:cursor-default disabled:opacity-45 disabled:hover:bg-transparent"
+      className="min-h-11 min-w-11 cursor-pointer rounded-lg text-t2 leading-none text-ak-text hover:bg-ak-flaeche-2 focus-visible:outline-2 focus-visible:outline-ak-fokus disabled:cursor-default disabled:opacity-45 disabled:hover:bg-transparent"
     >
       <span aria-hidden="true">{richtung}</span>
     </button>

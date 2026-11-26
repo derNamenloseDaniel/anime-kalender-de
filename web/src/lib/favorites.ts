@@ -99,6 +99,9 @@ function seitLesen(): Record<string, string> {
   }
 }
 
+/** Kennungen mit Merk-Datum; der Abgleich überschreibt diese Ablage nie (`favoritenSetzen` lässt sie stehen). */
+export const favoritenMitDatum = (): number[] => Object.keys(seitLesen()).map(Number).filter(Number.isInteger)
+
 /** Wann dieser Titel gemerkt wurde — `undefined`, wenn es aus der Zeit davor stammt. */
 export function favoritSeit(id: number): string | undefined {
   return seitLesen()[String(id)]

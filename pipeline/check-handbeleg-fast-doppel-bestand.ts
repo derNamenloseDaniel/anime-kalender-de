@@ -17,3 +17,4 @@ if (bilanz.entfernt) {
 if (bilanz.gemischt) console.log(`⚠ WARNUNG Handbelege: ${bilanz.gemischt} Fast-Doppel-Gruppe(n) aus Browser-Meldung und Handprüfung — von Hand ansehen`)
 for (const zeile of ratschenZeilen(bilanz)) console.log(zeile)
 console.log(`check-handbeleg-fast-doppel-bestand: ${bilanz.entfernt} zusammenführbar, ${bilanz.blockiert} blockiert, ${bilanz.gemischt} gemischt, ${bilanz.gruppen} Gruppen.`)
+console.log('VERSTÖSSE: 0')

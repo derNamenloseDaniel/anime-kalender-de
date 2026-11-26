@@ -74,22 +74,25 @@ export async function liefereRohfolgen({ request, env, antwort, ausCache }: {
       }, FRIST_NAMEN_MS)
       const seite = (s: Seite) => ({ folgen: s.zeilen, weiter: s.weiter })
       if (new URL(request.url).searchParams.get('alle') === '1') return ausSpeicher(env, `alle-${Number.isFinite(nach) ? nach : 0}`, async () => seite(await alleRohfolgen(env, nach)))
-      return ausSpeicher(env, `offen-${Number.isFinite(nach) ? nach : 0}`, async () => {
-      const { zeilen, weiter } = await offeneRohfolgen(env, nach)
-      /*
-        **Der Serienname kommt aus der Meldung derselben Adresse.**
+      return ausSpeicher(env, `offen-${Number.isFinite(nach) ? nach : 0}`, async () => offeneMitSerientitel(env, nach))
+}
 
-        `meldung_id` steht in `prime_folge`, wurde aber nie gefüllt (bei allen 795 offenen Zeilen leer,
-        gemessen 01.09.2026). Der Weg über die Adresse trägt trotzdem: Zu jeder Rohfolge gibt es eine
-        Meldung unter derselben URL, und die kennt den Namen. Gebraucht wird er, wo unser Bestand die
-        Adresse nicht führt — Prime legt je Staffel eine eigene an, wir kennen eine.
-      */
-      const titel = await serientitelJeAdresse(env, zeilen.map((z) => z.url))
-      return {
-        folgen: zeilen.map((z) => ({ ...z, serientitel: titel.get(z.url) ?? null })),
-        /* Ist die Seite voll, steht die Fortsetzung dabei — sonst ausdrücklich null. Eine Gesamtzahl
-           gibt es nicht mehr: das `COUNT(*)` las je Seite alle offenen Zeilen (1,39 Mio. am Tag, 12.10.2026). */
-        weiter,
-      }
-      })
+/** Eine Seite offener Rohfolgen samt Serientitel je Adresse (der Auszug `offen-*`). */
+async function offeneMitSerientitel(env: Env, nach: number) {
+  const { zeilen, weiter } = await offeneRohfolgen(env, nach)
+  /*
+    **Der Serienname kommt aus der Meldung derselben Adresse.**
+
+    `meldung_id` steht in `prime_folge`, wurde aber nie gefüllt (bei allen 795 offenen Zeilen leer,
+    gemessen 01.09.2026). Der Weg über die Adresse trägt trotzdem: Zu jeder Rohfolge gibt es eine
+    Meldung unter derselben URL, und die kennt den Namen. Gebraucht wird er, wo unser Bestand die
+    Adresse nicht führt — Prime legt je Staffel eine eigene an, wir kennen eine.
+  */
+  const titel = await serientitelJeAdresse(env, zeilen.map((z) => z.url))
+  return {
+    folgen: zeilen.map((z) => ({ ...z, serientitel: titel.get(z.url) ?? null })),
+    /* Ist die Seite voll, steht die Fortsetzung dabei — sonst ausdrücklich null. Eine Gesamtzahl
+       gibt es nicht mehr: das `COUNT(*)` las je Seite alle offenen Zeilen (1,39 Mio. am Tag, 12.10.2026). */
+    weiter,
+  }
 }

@@ -1,0 +1,47 @@
+# Offizielle FSK-Freigaben von Hand belegt (Mangel `fsk`, Auftrag 26.11.2026). Eingelesen von `pipeline/lib/fsk-von-hand.ts`.
+# Nur Freigaben der deutschen Disc/VHS oder der FSK-Datenbank, nie Streaming-Altersangaben (die stehen als `fskQuelle: justwatch`).
+# Mehrere deutsche Ausgaben mit verschiedener Freigabe: die höchste, alle stehen im Beleg. Ein Zusammenschnitt zählt nur,
+# wenn er die deutsche Erstausgabe des Titels ist. Der Bau setzt die Zeile nur an Titeln ohne Freigabe (TMDB/Termin geht vor).
+
+- anilistId: 2827
+  titel: "Calimero"
+  fsk: 0
+  art: disc
+  beleg: "OFDb: Calimero (1974), DVD UFA Kids (Folge 1-4) und (Folge 5-8), je FSK o.A., ungekürzt, deutscher Ton."
+  sources:
+    - "https://www.ofdb.de/fassung/21585,211036,Calimero/"
+    - "https://www.ofdb.de/fassung/21585,211037,Calimero/"
+
+- anilistId: 4073
+  titel: "Angriff der Dino Monster"
+  fsk: 12
+  art: disc
+  beleg: "OFDb: Video E.A.T. Mediengruppe (deutsche Erstausgabe, Zusammenschnitt aus 4 Folgen), FSK 12, ungekürzt; spätere DVD Maritim Pictures/AL!VE 2017 FSK 6."
+  sources:
+    - "https://www.ofdb.de/fassung/51712,107036,Angriff-der-Dino-Monster/"
+    - "https://www.ofdb.de/fassung/51712,469702,Angriff-der-Dino-Monster/"
+
+- anilistId: 3444
+  titel: "Ultraman / Ultraman schlägt zurück"
+  fsk: 12
+  art: disc
+  beleg: "Händlerangabe eBay: Betamax „Ultraman schlägt zurück – Teil 2“, Silwa Video (deutsche Erstausgabe), FSK-Einstufung 12; spätere VHS E.A.T. „Das Erwachen der Polar-Saurier“ laut Amazon FSK 6."
+  sources:
+    - "https://www.ebay.de/itm/293604120889"
+    - "https://www.amazon.de/Erwachen-Polar-Saurier-Polarsaurier-Ultraman-schl%C3%A4gt/dp/B001BAZXL4"
+
+- anilistId: 1023
+  titel: "Wolf's Rain OVA"
+  fsk: 16
+  art: disc
+  beleg: "Amazon.de: „Wolf's Rain Vol. 8“ (Amaray, Nipponart, 29.08.2005) mit den OVA-Folgen 27-30, deutscher Ton, freigegeben ab 16."
+  sources:
+    - "https://www.amazon.de/Wolfs-Rain-Vol-08-Anime/dp/B0009W4LOU"
+
+- anilistId: 7314
+  titel: "Yona Yona Pinguin"
+  fsk: 6
+  art: disc
+  beleg: "Amazon.de: DVD „Yona Yona Pinguin – Die Legende des Pinguins“, Universal Pictures Germany (deutsche Erstausgabe 14.04.2011), freigegeben ab 6."
+  sources:
+    - "https://www.amazon.de/-/en/Yona-Pinguin-Die-Legende-Pinguins/dp/B004HJIXLS"

@@ -1,5 +1,5 @@
 {
-  "geholtAm": "2026-11-26T03:27:56.657Z",
+  "geholtAm": "2026-11-26T04:13:27.479Z",
   "katalog": [
     {
       "id": "VSE88",
@@ -227,15 +227,6 @@
       "frei": true
     },
     {
-      "id": "VSE123",
-      "uname": "mister-maker-vse123",
-      "titel": "Mister Maker",
-      "figuren": [
-        "mister-maker"
-      ],
-      "frei": true
-    },
-    {
       "id": "VSE326",
       "uname": "simsalagrimm-vse326",
       "titel": "SimsalaGrimm",
@@ -243,6 +234,15 @@
         "simsalagrimm-pty572"
       ],
       "frei": false
+    },
+    {
+      "id": "VSE123",
+      "uname": "mister-maker-vse123",
+      "titel": "Mister Maker",
+      "figuren": [
+        "mister-maker"
+      ],
+      "frei": true
     },
     {
       "id": "VSE385",
@@ -317,6 +317,15 @@
       "frei": true
     },
     {
+      "id": "VSE246",
+      "uname": "kruemelmonsters-foodie-truck-mit-steffen-henssler-vse246",
+      "titel": "Krümelmonsters Foodie Truck mit Steffen Henssler",
+      "figuren": [
+        "kruemelmonsters-foodie-truck"
+      ],
+      "frei": true
+    },
+    {
       "id": "VSE42",
       "uname": "kingdom-force-vse42",
       "titel": "Kingdom Force",
@@ -331,15 +340,6 @@
       "titel": "Weihnachtsmann & Co. KG",
       "figuren": [
         "weihnachtsmann--co-kg-pty220"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE246",
-      "uname": "kruemelmonsters-foodie-truck-mit-steffen-henssler-vse246",
-      "titel": "Krümelmonsters Foodie Truck mit Steffen Henssler",
-      "figuren": [
-        "kruemelmonsters-foodie-truck"
       ],
       "frei": true
     },
@@ -497,15 +497,6 @@
       "frei": true
     },
     {
-      "id": "VSE277",
-      "uname": "mystic--das-geheimnis-von-kauri-point-vse277",
-      "titel": "Mystic - Das Geheimnis von Kauri Point",
-      "figuren": [
-        "mystic--das-geheimnis-von-kauri-point-pty540"
-      ],
-      "frei": false
-    },
-    {
       "id": "VSE99",
       "uname": "gigantosaurus-vse99",
       "titel": "Gigantosaurus",
@@ -513,6 +504,15 @@
         "gigantosaurus"
       ],
       "frei": true
+    },
+    {
+      "id": "VSE277",
+      "uname": "mystic--das-geheimnis-von-kauri-point-vse277",
+      "titel": "Mystic - Das Geheimnis von Kauri Point",
+      "figuren": [
+        "mystic--das-geheimnis-von-kauri-point-pty540"
+      ],
+      "frei": false
     },
     {
       "id": "VSE17",
@@ -848,13 +848,22 @@
       "frei": true
     },
     {
-      "id": "VSE328",
-      "uname": "h2o--abenteuer-meerjungfrau-vse328",
-      "titel": "H2O - Abenteuer Meerjungfrau",
+      "id": "VSE450",
+      "uname": "witch-detectives-vse450",
+      "titel": "Witch Detectives",
       "figuren": [
-        "h2o-pty573"
+        "witch-detectives-pty679"
       ],
-      "frei": false
+      "frei": true
+    },
+    {
+      "id": "VSE151",
+      "uname": "nexo-knights--die-ritter-der-zukunft",
+      "titel": "Nexo Knights - Die Ritter der Zukunft",
+      "figuren": [
+        "nexo-knights"
+      ],
+      "frei": true
     },
     {
       "id": "VSE327",
@@ -875,22 +884,22 @@
       "frei": false
     },
     {
-      "id": "VSE450",
-      "uname": "witch-detectives-vse450",
-      "titel": "Witch Detectives",
+      "id": "VSE328",
+      "uname": "h2o--abenteuer-meerjungfrau-vse328",
+      "titel": "H2O - Abenteuer Meerjungfrau",
       "figuren": [
-        "witch-detectives-pty679"
+        "h2o-pty573"
       ],
-      "frei": true
+      "frei": false
     },
     {
-      "id": "VSE151",
-      "uname": "nexo-knights--die-ritter-der-zukunft",
-      "titel": "Nexo Knights - Die Ritter der Zukunft",
+      "id": "VSE349",
+      "uname": "sherlock-yack--der-zoodetektiv-vse349",
+      "titel": "Sherlock Yack - Der Zoodetektiv",
       "figuren": [
-        "nexo-knights"
+        "sherlock-yack--der-zoodetektiv-pty597"
       ],
-      "frei": true
+      "frei": false
     },
     {
       "id": "VSE25",
@@ -909,15 +918,6 @@
         "bob-der-baumeister"
       ],
       "frei": true
-    },
-    {
-      "id": "VSE349",
-      "uname": "sherlock-yack--der-zoodetektiv-vse349",
-      "titel": "Sherlock Yack - Der Zoodetektiv",
-      "figuren": [
-        "sherlock-yack--der-zoodetektiv-pty597"
-      ],
-      "frei": false
     },
     {
       "id": "VSE429",
@@ -965,11 +965,11 @@
       "frei": true
     },
     {
-      "id": "VSE378",
-      "uname": "die-abenteuer-der-teenage-mutant-ninja-turtles-vse378",
-      "titel": "Die Abenteuer der Teenage Mutant Ninja Turtles",
+      "id": "VSE280",
+      "uname": "neue-geschichten-vom-pumuckl-vse280",
+      "titel": "Neue Geschichten vom Pumuckl",
       "figuren": [
-        "teenage-mutant-ninja-turtles-pty612"
+        "neue-geschichten-vom-pumuckl-pty541"
       ],
       "frei": true
     },
@@ -983,11 +983,11 @@
       "frei": true
     },
     {
-      "id": "VSE280",
-      "uname": "neue-geschichten-vom-pumuckl-vse280",
-      "titel": "Neue Geschichten vom Pumuckl",
+      "id": "VSE378",
+      "uname": "die-abenteuer-der-teenage-mutant-ninja-turtles-vse378",
+      "titel": "Die Abenteuer der Teenage Mutant Ninja Turtles",
       "figuren": [
-        "neue-geschichten-vom-pumuckl-pty541"
+        "teenage-mutant-ninja-turtles-pty612"
       ],
       "frei": true
     },
@@ -5747,6 +5747,12 @@
       "adresse": "https://www.toggo.de/beyblade-x-pty605/serien/beyblade-x-vse359",
       "folgen": [
         {
+          "staffel": 1,
+          "folge": 1,
+          "ab": "2024-12-06T00:00",
+          "bis": "2027-12-31T23:59"
+        },
+        {
           "staffel": 2,
           "folge": 1,
           "ab": "2025-09-05T00:00",
@@ -5760,7 +5766,7 @@
         },
         {
           "staffel": 1,
-          "folge": 1,
+          "folge": 2,
           "ab": "2024-12-06T00:00",
           "bis": "2027-12-31T23:59"
         },
@@ -5778,7 +5784,7 @@
         },
         {
           "staffel": 1,
-          "folge": 2,
+          "folge": 3,
           "ab": "2024-12-06T00:00",
           "bis": "2027-12-31T23:59"
         },
@@ -5796,8 +5802,8 @@
         },
         {
           "staffel": 1,
-          "folge": 3,
-          "ab": "2024-12-06T00:00",
+          "folge": 4,
+          "ab": "2024-12-13T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -5814,7 +5820,7 @@
         },
         {
           "staffel": 1,
-          "folge": 4,
+          "folge": 5,
           "ab": "2024-12-13T00:00",
           "bis": "2027-12-31T23:59"
         },
@@ -5832,7 +5838,7 @@
         },
         {
           "staffel": 1,
-          "folge": 5,
+          "folge": 6,
           "ab": "2024-12-13T00:00",
           "bis": "2027-12-31T23:59"
         },
@@ -5850,7 +5856,7 @@
         },
         {
           "staffel": 1,
-          "folge": 6,
+          "folge": 7,
           "ab": "2024-12-13T00:00",
           "bis": "2027-12-31T23:59"
         },
@@ -5868,8 +5874,8 @@
         },
         {
           "staffel": 1,
-          "folge": 7,
-          "ab": "2024-12-13T00:00",
+          "folge": 8,
+          "ab": "2025-01-03T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -5886,7 +5892,7 @@
         },
         {
           "staffel": 1,
-          "folge": 8,
+          "folge": 9,
           "ab": "2025-01-03T00:00",
           "bis": "2027-12-31T23:59"
         },
@@ -5904,8 +5910,8 @@
         },
         {
           "staffel": 1,
-          "folge": 9,
-          "ab": "2025-01-03T00:00",
+          "folge": 10,
+          "ab": "2025-01-10T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -5922,7 +5928,7 @@
         },
         {
           "staffel": 1,
-          "folge": 10,
+          "folge": 11,
           "ab": "2025-01-10T00:00",
           "bis": "2027-12-31T23:59"
         },
@@ -5940,8 +5946,8 @@
         },
         {
           "staffel": 1,
-          "folge": 11,
-          "ab": "2025-01-10T00:00",
+          "folge": 12,
+          "ab": "2025-01-17T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -5958,7 +5964,7 @@
         },
         {
           "staffel": 1,
-          "folge": 12,
+          "folge": 13,
           "ab": "2025-01-17T00:00",
           "bis": "2027-12-31T23:59"
         },
@@ -5976,8 +5982,8 @@
         },
         {
           "staffel": 1,
-          "folge": 13,
-          "ab": "2025-01-17T00:00",
+          "folge": 14,
+          "ab": "2025-01-24T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -5994,7 +6000,7 @@
         },
         {
           "staffel": 1,
-          "folge": 14,
+          "folge": 15,
           "ab": "2025-01-24T00:00",
           "bis": "2027-12-31T23:59"
         },
@@ -6012,7 +6018,7 @@
         },
         {
           "staffel": 1,
-          "folge": 15,
+          "folge": 16,
           "ab": "2025-01-24T00:00",
           "bis": "2027-12-31T23:59"
         },
@@ -6030,8 +6036,8 @@
         },
         {
           "staffel": 1,
-          "folge": 16,
-          "ab": "2025-01-24T00:00",
+          "folge": 17,
+          "ab": "2025-01-31T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -6048,7 +6054,7 @@
         },
         {
           "staffel": 1,
-          "folge": 17,
+          "folge": 18,
           "ab": "2025-01-31T00:00",
           "bis": "2027-12-31T23:59"
         },
@@ -6066,8 +6072,8 @@
         },
         {
           "staffel": 1,
-          "folge": 18,
-          "ab": "2025-01-31T00:00",
+          "folge": 19,
+          "ab": "2025-02-07T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -6084,7 +6090,7 @@
         },
         {
           "staffel": 1,
-          "folge": 19,
+          "folge": 20,
           "ab": "2025-02-07T00:00",
           "bis": "2027-12-31T23:59"
         },
@@ -6102,8 +6108,8 @@
         },
         {
           "staffel": 1,
-          "folge": 20,
-          "ab": "2025-02-07T00:00",
+          "folge": 21,
+          "ab": "2025-02-14T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -6120,7 +6126,7 @@
         },
         {
           "staffel": 1,
-          "folge": 21,
+          "folge": 22,
           "ab": "2025-02-14T00:00",
           "bis": "2027-12-31T23:59"
         },
@@ -6138,8 +6144,8 @@
         },
         {
           "staffel": 1,
-          "folge": 22,
-          "ab": "2025-02-14T00:00",
+          "folge": 23,
+          "ab": "2025-02-21T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -6156,8 +6162,8 @@
         },
         {
           "staffel": 1,
-          "folge": 23,
-          "ab": "2025-02-21T00:00",
+          "folge": 24,
+          "ab": "2025-02-28T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -6174,7 +6180,7 @@
         },
         {
           "staffel": 1,
-          "folge": 24,
+          "folge": 25,
           "ab": "2025-02-28T00:00",
           "bis": "2027-12-31T23:59"
         },
@@ -6192,8 +6198,8 @@
         },
         {
           "staffel": 1,
-          "folge": 25,
-          "ab": "2025-02-28T00:00",
+          "folge": 26,
+          "ab": "2025-03-07T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
@@ -6210,25 +6216,13 @@
         },
         {
           "staffel": 1,
-          "folge": 26,
-          "ab": "2025-03-07T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 2,
-          "folge": 27,
-          "ab": "2025-12-05T00:00",
-          "bis": "2027-12-31T23:59"
-        },
-        {
-          "staffel": 1,
           "folge": 27,
           "ab": "2025-03-07T00:00",
           "bis": "2027-12-31T23:59"
         },
         {
           "staffel": 2,
-          "folge": 28,
+          "folge": 27,
           "ab": "2025-12-05T00:00",
           "bis": "2027-12-31T23:59"
         },
@@ -6236,6 +6230,12 @@
           "staffel": 1,
           "folge": 28,
           "ab": "2025-03-14T00:00",
+          "bis": "2027-12-31T23:59"
+        },
+        {
+          "staffel": 2,
+          "folge": 28,
+          "ab": "2025-12-05T00:00",
           "bis": "2027-12-31T23:59"
         },
         {

@@ -1,6 +1,6 @@
 {
   "format": 2,
-  "stand": "2026-11-25",
+  "stand": "2026-11-26",
   "hinweis": "Vorschlagsmodus: nur gelesen, nie übernommen — docs/wissen/sammelartikel-poc.md (Abschnitt „Vorschlagslauf\"). Schreiber: pipeline/fetch-sammelartikel.ts",
   "aussagen": [
     {
@@ -12302,6 +12302,86 @@
           "hatSynchroBelege": true
         },
         "inhaltZeichen": 318
+      }
+    },
+    {
+      "id": "https://www.anime2you.de/news/1075866/disney-plus-one-punch-man-ab-sofort/|One Punch Man|Staffel 1 und 2|start|disneyplus",
+      "erstGesehen": "2026-11-26",
+      "fingerabdruck": "d55730e1e644",
+      "offenOderUnklar": true,
+      "ergebnis": {
+        "quelle": {
+          "url": "https://www.anime2you.de/news/1075866/disney-plus-one-punch-man-ab-sofort/",
+          "veroeffentlicht": "2026-11-25",
+          "leser": "anime2you-sammel"
+        },
+        "titel": "One Punch Man",
+        "zusatz": "Staffel 1 und 2",
+        "art": "start",
+        "plattformen": [
+          "disneyplus"
+        ],
+        "datum": "2026-11-25",
+        "datumBedeutung": "tag-der-meldung",
+        "deutsch": "ja",
+        "folgen": 24,
+        "konfidenz": 0.8,
+        "gruende": [
+          "Sprache: Deutsch, Japanisch (UT)",
+          "„ab sofort\" = Tag der Meldung"
+        ],
+        "zitat": "»One Punch Man« – Staffel 1 und 2\nEpisoden: 24 (komplett)\nSprache: Deutsch, Japanisch (UT)\nStream: Disney+",
+        "zuordnung": {
+          "anilistId": 21087,
+          "name": "One Punch Man",
+          "wie": "name-genau",
+          "abstandTage": 4069,
+          "vorbehalt": "Zusatz „Staffel 1 und 2\" nicht aufgelöst"
+        },
+        "bestand": {
+          "status": "neu",
+          "hatSynchroBelege": true
+        },
+        "inhaltZeichen": 417
+      }
+    },
+    {
+      "id": "https://www.anime2you.de/news/1075866/disney-plus-one-punch-man-ab-sofort/|Naruto Shippuden|Staffel 4|start|disneyplus",
+      "erstGesehen": "2026-11-26",
+      "fingerabdruck": "2a8cca6a20db",
+      "offenOderUnklar": false,
+      "ergebnis": {
+        "quelle": {
+          "url": "https://www.anime2you.de/news/1075866/disney-plus-one-punch-man-ab-sofort/",
+          "veroeffentlicht": "2026-11-25",
+          "leser": "anime2you-sammel"
+        },
+        "titel": "Naruto Shippuden",
+        "zusatz": "Staffel 4",
+        "art": "start",
+        "plattformen": [
+          "disneyplus"
+        ],
+        "datum": "2026-11-25",
+        "datumBedeutung": "tag-der-meldung",
+        "deutsch": "ja",
+        "konfidenz": 0.8,
+        "gruende": [
+          "Sprache: Deutsch, Japanisch (UT)",
+          "„ab sofort\" = Tag der Meldung"
+        ],
+        "zitat": "»Naruto Shippuden« – Staffel 4\nEpisoden: 52\nSprache: Deutsch, Japanisch (UT)\nStream: Disney+",
+        "zuordnung": {
+          "anilistId": 10659,
+          "name": "Naruto Shippuden: The OVA - Naruto, ein Genie und drei Wünsche",
+          "wie": "name-teil",
+          "abstandTage": 5961
+        },
+        "bestand": {
+          "status": "neu",
+          "hatSynchroBelege": true
+        },
+        "inhaltZeichen": 360
       }
     }
   ]

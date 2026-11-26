@@ -1,13 +1,13 @@
 {
-  "scrapedAt": "2026-11-25T23:01:34.618Z",
+  "scrapedAt": "2026-11-26T04:17:13.063Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 42,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 4,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 13,
-    "schon in einem Rubrik-Feed gelesen": 10,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 1,
-    "Sprachhinweis älter als 45 Tage": 6
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 43,
+    "schon in einem Rubrik-Feed gelesen": 34,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
+    "Sprachhinweis älter als 45 Tage": 8
   },
   "proposals": [
     {
@@ -20,7 +20,33 @@
       ],
       "dates": [],
       "dub": "ja",
-      "alreadyCurated": false
+      "alreadyCurated": false,
+      "sammel": [
+        {
+          "titel": "One Punch Man",
+          "zusatz": "Staffel 1 und 2",
+          "deutsch": true,
+          "woechentlich": false,
+          "stream": [
+            "Disney+"
+          ],
+          "folgen": 24,
+          "datum": "2026-11-25",
+          "datumGeschaetzt": true
+        },
+        {
+          "titel": "Naruto Shippuden",
+          "zusatz": "Staffel 4",
+          "deutsch": true,
+          "woechentlich": false,
+          "stream": [
+            "Disney+"
+          ],
+          "datum": "2026-11-25",
+          "datumGeschaetzt": true
+        }
+      ],
+      "sammelGelesen": "2026-11-26"
     },
     {
       "articleTitle": "Black-Friday-Deal: Bis zu 59 % Rabatt auf AniMoon-Blu-rays bei Amazon",
@@ -774,7 +800,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-23"
+      "sammelGelesen": "2026-11-26"
     },
     {
       "articleTitle": "Tickets für »KPop Demon Hunters«-Konzerttour ab Freitag erhältlich",
@@ -829,7 +855,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-23"
+      "sammelGelesen": "2026-11-26"
     },
     {
       "articleTitle": "AKIBA PASS SHOP startet Black Friday Sale mit über 1.000 Produkten",
@@ -1309,7 +1335,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-23"
+      "sammelGelesen": "2026-11-26"
     },
     {
       "articleTitle": "AniMoon startet große Black-Weeks-Aktion mit 26 % Rabatt",
@@ -1717,7 +1743,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-23"
+      "sammelGelesen": "2026-11-26"
     },
     {
       "articleTitle": "ProSieben MAXX startet zweiten werktäglichen Anime-Block",
@@ -2055,7 +2081,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-23"
+      "sammelGelesen": "2026-11-26"
     },
     {
       "articleTitle": "Design der neuen »Neon Genesis Evangelion«-Komplettbox + Extras",
@@ -3423,7 +3449,7 @@
           "edition": "limited-edition sammelschuber"
         }
       ],
-      "discGelesen": "2026-11-23"
+      "discGelesen": "2026-11-26"
     },
     {
       "articleTitle": "Zwei Synchro-Neuzugänge ab sofort auf Crunchyroll verfügbar",

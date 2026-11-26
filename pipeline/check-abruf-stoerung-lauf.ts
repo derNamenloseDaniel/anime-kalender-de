@@ -42,7 +42,8 @@ function lauf(skript: string, dateien: Record<string, unknown>, stub: string, ar
     const uhr = pathToFileURL(join(REPO, 'tools', 'feste-uhr.ts')).href
     const ziel = pathToFileURL(join(REPO, 'pipeline', skript)).href
     const huelle = join(wurzel, 'huelle.mts')
-    const kopf = `import { festeUhr } from '${uhr}'\nfesteUhr('${JETZT}')\nglobalThis.setTimeout = ((f) => { f(); return 0 }) as typeof setTimeout\n`
+    // argv[1] zeigt auf das Ziel, damit dessen Direktstart-Wächter (fetch-voices.ts) in der Hülle anspringt.
+    const kopf = `import { festeUhr } from '${uhr}'\nfesteUhr('${JETZT}')\nprocess.argv[1] = ${JSON.stringify(join(REPO, 'pipeline', skript))}\nglobalThis.setTimeout = ((f) => { f(); return 0 }) as typeof setTimeout\n`
     writeFileSync(huelle, `${kopf}globalThis.fetch = ${stub}\nawait import('${ziel}')\n`)
     const tsx = join(REPO, 'node_modules', 'tsx', 'dist', 'cli.mjs')
     const r = spawnSync(process.execPath, [tsx, huelle, ...args], {

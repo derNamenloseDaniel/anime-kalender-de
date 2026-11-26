@@ -22,6 +22,8 @@ import { nachAbruf, streicheAbgelaufenes, STREICH_TAGE } from './lib/tmdb-ablauf
 import { FILMSUCHE_SEIT, koennteFilmSein, lookup } from './lib/tmdb-titel-lookup.ts'
 import { uebernimmVonHand, type Abgeleitet, type VonHandEintrag } from './lib/tmdb-von-hand.ts'
 import { faelligeTitel } from './lib/tmdb-faellig.ts'
+import { terminNahFaellig } from './lib/titel-termin-frist.ts'
+import { todayIso } from '../shared/time.ts'
 import { raeumeStaffel0Auf } from './lib/tmdb-staffel0-eigene.ts'
 import type { Vermerk404 } from './lib/tmdb-folgen-404.ts'
 import { readFileSync } from 'node:fs'
@@ -151,6 +153,7 @@ function faelligFuerLauf(titles: Title[], cache: Record<string, TmdbTitle>, hand
     force: FORCE,
     grenze,
     grenzeFehlschlag: new Date(Date.now() - 7 * 86400_000).toISOString(),
+    terminNah: (e) => terminNahFaellig(e.fetchedAt, e.kinoDe, todayIso(), ALTER_TAGE),
     tot: readJson<Record<string, Vermerk404>>('data/tmdb-folgen-404.json', {}),
     filmNeusuche: { ids: new Set(titles.filter(koennteFilmSein).map((t) => t.id)), vor: FILMSUCHE_SEIT },
   })

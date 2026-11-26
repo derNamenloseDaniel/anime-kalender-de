@@ -3,7 +3,7 @@
  * (`setzeToggoFenster`, `schreibeNeuMitSynchro`, `baueAuslieferung`), in der Kulisse (`AK_ROOT`) und druckt, was sie geschrieben haben.
  * Aufruf: `<modus>`: `toggo` | `toggo-fremd` | `seit` | `auslieferung` | `eingaben-festgehalten` | `eingaben-leer`.
  */
-import { mkdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Release, Title } from '../../shared/types.ts'
 
@@ -72,7 +72,17 @@ async function auslieferung(): Promise<void> {
 
 /** Der echte Lader der Phase (`ladeStaffelEingaben`) mit einem ausgelieferten Bestand in der Kulisse: druckt `aktiv` je Plan. */
 async function eingaben(festgehalten: boolean): Promise<void> {
-  symlinkSync(new URL('../../data', import.meta.url).pathname, join(WURZEL, 'data'))
+  /* Eigene Staffel-Yaml statt der echten: der Fall hängt nicht daran, ob die echte Yaml gerade einen Schnitt führt (Name zusammengesetzt, s. o.). */
+  schreibeText(['data', 'curated', 'horizonte-staffeln.yaml'].join('/'), [
+    'titel:',
+    `  - anilistId: ${SAMMEL}`,
+    '    titel: Probe',
+    '    basis: 2',
+    '    staffeln:',
+    '      - { nr: 1, von: 1, bis: 45, kennung: 7000001 }',
+    '      - { nr: 2, von: 46, offen: true }',
+    '',
+  ].join('\n'))
   schreibe('public/data/titles.json', { titles: festgehalten ? [{ id: SAMMEL, staffelTitel: { sammel: SAMMEL, nr: 4, ab: 137, aktiv: '2026-11-20' } }] : [] })
   const { ladeStaffelEingaben } = await import('../bau/staffel-titel.ts')
   console.log(JSON.stringify(ladeStaffelEingaben().plaene.map((p) => p.aktiv)))

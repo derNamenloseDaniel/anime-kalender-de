@@ -1,5 +1,14 @@
-/** Reine Umschreibung gemerkter Titel nach `ak-umleitung.json` (`[alt, neu]`); getrennt von `ak-umleitung.ts`, damit `check:logic` sie ohne Browser prüft. */
+/** Reine Umschreibung gemerkter Titel nach `ak-umleitung.json` (`[alt, neu]` oder `[alt, neu, versatz]`); getrennt von `ak-umleitung.ts`, damit `check:logic` sie ohne Browser prüft. */
 type Abbild = Map<number, number>
+export type UmleitungsPaar = [number, number] | [number, number, number]
+
+/** Die Datei als Abbild alt → neu und als Versatz alt → Folgen davor (nur Paare mit drittem Element). */
+export function leseUmleitung(paare: UmleitungsPaar[]): { abbild: Abbild; versatz: Abbild } {
+  return {
+    abbild: new Map(paare.map((p): [number, number] => [p[0], p[1]])),
+    versatz: new Map(paare.flatMap((p): [number, number][] => (p[2] ? [[p[0], p[2]]] : []))),
+  }
+}
 
 export function umleiteListe(alt: unknown[], abbild: Abbild): number[] {
   const neu = alt.filter((id): id is number => typeof id === 'number').map((id) => abbild.get(id) ?? id)
@@ -25,11 +34,15 @@ export function adresseNachfolger(pfad: string, hash: string, abbild: Abbild): {
   }
 }
 
-/** Treffen zwei Einträge zusammen, gilt bei Zahlen (gesehen bis Folge) der größere, bei Tagen (gemerkt seit) der frühere Wert. */
-export function umleiteKarte(alt: Record<string, unknown>, abbild: Abbild): Record<string, unknown> {
+/**
+ * Treffen zwei Einträge zusammen, gilt bei Zahlen (gesehen bis Folge) der größere, bei Tagen (gemerkt seit) der frühere Wert.
+ * `versatz` (alte Staffel-Kennung → Folgen davor, drittes Element in `ak-umleitung.json`): „gesehen bis k“ wird durchlaufend `versatz + k`.
+ */
+export function umleiteKarte(alt: Record<string, unknown>, abbild: Abbild, versatz: Abbild = new Map()): Record<string, unknown> {
   const neu: Record<string, unknown> = {}
-  for (const [id, wert] of Object.entries(alt)) {
+  for (const [id, roh] of Object.entries(alt)) {
     const ziel = String(abbild.get(Number(id)) ?? id)
+    const wert = typeof roh === 'number' && roh > 0 && abbild.has(Number(id)) ? roh + (versatz.get(Number(id)) ?? 0) : roh
     const bisher = neu[ziel]
     const besser = typeof wert === 'number' && typeof bisher === 'number' ? wert > bisher : String(wert) < String(bisher)
     if (!(ziel in neu) || besser) neu[ziel] = wert

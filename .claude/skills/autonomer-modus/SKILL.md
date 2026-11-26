@@ -1,6 +1,6 @@
 ---
 name: autonomer-modus
-description: "Wenn Daniel selbstständiges Arbeiten über einen Zeitraum aufträgt („autonomer modus bis 20 uhr\"): zuerst Wecker stellen, Ablauf je Wachphase, Arbeitsquellen, Rückfragegrenzen."
+description: "Wenn Daniel selbstständiges Arbeiten über einen Zeitraum aufträgt („autonomer modus bis 20 uhr\"), auch bei „start“ allein oder „weiter, autonomen modus starten“ (Morgenstart, Ende 23:30): zuerst Wecker stellen, Ablauf je Wachphase, Arbeitsquellen, Rückfragegrenzen."
 ---
 
 # Autonomer Modus: der erste Handgriff ist der Wecker
@@ -33,6 +33,7 @@ Noch vor jeder Recherche, jedem Werkzeugaufruf zur Sache, jeder Planung:
    wenn Daniel keine andere Endzeit nennt; nicht nachfragen. Nennt er eine, gilt seine. Auch
    bei „weiter“ in einer neuen Sitzung mit Übergabe „Autonomer Modus“ wird der Modus mit
    diesem Ende gestartet. Ein autonomer Modus ohne Ende gibt es nie.
+   **„start“ allein ist der Morgenstart** (Daniel, 24.11.2026: „das ‚weiter. autonomen modus starten‘ was ich jeden morgen sage, soll auch mit ‚start‘ funktionieren“). Er bedeutet dasselbe wie „weiter, autonomen Modus starten“: Ende 23:30, Orchester ablösen, Nachtbericht auswerten (`docs/wissen/cloud-orchester.md`), dann nach Rang (`node tools/naechster.mjs`). Es startet nur die Schleife, nie einen Server oder Dauerlauf.
 2. **Prüfen, ob schon eine Schleife läuft** (`TaskList`). Zwei Schleifen auf denselben Auftrag
    wecken doppelt und arbeiten gegeneinander.
 3. **Marker schreiben:** Endzeit (ISO, mit Offset) in `~/.claude/autonomer-modus/<Sitzungs-ID>.txt` (Sitzungs-ID = Name des Scratchpad-Ordners bzw. der Transkript-Datei; je Sitzung ein Marker, damit Routinen und andere Sitzungen nicht mitlaufen — Daniel, 14.10.2026)
@@ -71,7 +72,7 @@ Immer in dieser Reihenfolge:
      gefahren: Was es **nicht** von selbst abnimmt, ist genau das, was ich mir ansehen muss.
      Auch eine Warnung („WARNUNG im Verlauf …“, bis 16.11.2026 „ROT im Verlauf … warnung“) bekommt in derselben Wachphase einen
      Besitzer (Analyst oder Fix) — der Wochenlauf stand 6 Tage gelb, jede Wachphase sah ihn,
-     keine handelte (18.10.2026). Ist sie geprüft und schon behoben, der nächste grüne Lauf aber noch Tage entfernt: mit `node C:/code/ai/__assets/tools/mit-lauf-token.mjs laeufe-aufraeumen C:/code/ai/anime-kalender-de --erledigt <lauf_id> --notiz "behoben durch …, Nachprüfung <Datum>"` abnehmen und die Nachprüfung als 📅 eintragen (23.10.2026).
+     keine handelte (18.10.2026). Ist sie geprüft und schon behoben, der nächste grüne Lauf aber noch Tage entfernt: mit `node C:/code/ai/__assets/tools/mit-lauf-token.mjs laeufe-aufraeumen C:/code/ai/anime-kalender-de --erledigt <lauf_id> --notiz "behoben durch …, Nachprüfung <Datum>"` abnehmen und die Nachprüfung als 📅 eintragen (23.10.2026); kommt sie mit jedem Lauf wieder: Eintrag in `tools/bekannte-warnungen.json` mit `bis` = Nachprüftermin als UTC-Tag, inklusive (26.11.2026); abgenommen wird nur, wenn jedes ` · `-Segment der Warnung bekannt ist.
    - **Auswertungs-PRs der Wache lesen, nicht nur mergen (16.11.2026):** Ein offener Punkt unter „echte Risiken und Lücken“ bekommt in derselben Wachphase einen Besitzer (Demon Slayer stand elf Stunden ohne Deutsch).
    - **Uhrzeiten (16.11.2026):** Jede Uhrzeit in `stand.md`, Lehren und Antworten stammt aus `date`, `merged_at` oder dem Systemzeit-Vermerk.
    - **Abbau-Block (16.11.2026):** Je Wachphase `node tools/maengel.mjs --top 20`, solange kein Abbau-PR offen ist.

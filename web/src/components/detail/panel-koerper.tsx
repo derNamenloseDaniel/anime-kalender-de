@@ -82,10 +82,8 @@ export function PanelKoerper(p: PanelKoerperProps) {
             favorites={favorites}
             wechselt={p.wechsel.wechselt}
             wechsleZu={p.wechsel.wechsleZu}
-            reiheOhneOffen={p.reihe.reiheOhneOffen}
             reihenSchluessel={p.reihe.reihenSchluessel}
             reiheSuche={p.reihe.reiheSuche}
-            setReiheOhneOffen={p.reihe.setReiheOhneOffen}
             setReiheSuche={p.reihe.setReiheSuche}
           />
         }

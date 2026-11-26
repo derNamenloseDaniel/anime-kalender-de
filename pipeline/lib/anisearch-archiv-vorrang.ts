@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs'
 import { ARCHIV_DIR } from './anisearch-warteschlange.ts'
 
 /** Titel, die nur bei aniSearch stehen, tragen `10.000.000 + aniSearch-Kennung` (`bau/anisearch-titel.ts`). */
-const ANISEARCH_AB = 10_000_000
+export const ANISEARCH_AB = 10_000_000
 const TAG_MS = 86_400_000
 /** So lange gilt eine Auskunft „Seite gibt es nicht" (HTTP 404/410) bzw. „Seite ohne Archivabschnitte" (200), bevor erneut gefragt wird. */
 const WEG_TAGE = { 404: 60, 410: 60, 200: 14 } as const

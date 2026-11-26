@@ -1,5 +1,4 @@
 import type { FranchiseMember } from '@shared/types.ts'
-import { istEingeklappt } from './reihen-regeln.ts'
 
 export type Gruppe = { titel: string; teile: FranchiseMember[] }
 
@@ -9,15 +8,13 @@ export const GROSSE_GRUPPE = 12
 const suchKern = (x: string) => x.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
 
 /**
- * Die Gruppen, wie sie gerade zu sehen sind: mit Suchtext alle Treffer, sonst nur die Teile, die der Schalter
- * „ohne Synchro“ zeigt; leere Gruppen fallen weg. Jede Zahl der Reihen-Karte kommt hierher, damit Zahl und Liste nie
- * auseinanderlaufen.
+ * Die Gruppen, wie sie gerade zu sehen sind: ohne Suchtext alle Teile (auch ohne Synchro), mit Suchtext die Treffer;
+ * leere Gruppen fallen weg. Jede Zahl der Reihen-Karte kommt hierher, damit Zahl und Liste nie auseinanderlaufen.
  */
-export function gezeigteGruppen(gruppen: Gruppe[], titelId: number, ohneOffen: boolean, suchText: string): Gruppe[] {
+export function gezeigteGruppen(gruppen: Gruppe[], suchText: string): Gruppe[] {
   const passt = (m: FranchiseMember) => suchKern(`${m.name} ${m.jpYear ?? ''}`).includes(suchKern(suchText))
-  const sichtbar = (m: FranchiseMember) => ohneOffen || !istEingeklappt(m, titelId)
   return gruppen
-    .map((g) => ({ ...g, teile: g.teile.filter((m) => (suchText ? passt(m) : sichtbar(m))) }))
+    .map((g) => ({ ...g, teile: g.teile.filter((m) => !suchText || passt(m)) }))
     .filter((g) => g.teile.length > 0)
 }
 
@@ -26,9 +23,9 @@ export function gezeigteZahl(gruppen: Gruppe[]): number {
   return gruppen.reduce((summe, g) => summe + g.teile.length, 0)
 }
 
-/** Groß ist eine Reihe, wenn eine Gruppe ohne Schalter über 12 Teile zeigt; der Schalter ändert die Form nicht. */
-export function istGrosseReihe(gruppen: Gruppe[], titelId: number): boolean {
-  return gezeigteGruppen(gruppen, titelId, false, '').some((g) => g.teile.length > GROSSE_GRUPPE)
+/** Groß ist eine Reihe, wenn eine Gruppe über 12 Teile zeigt. */
+export function istGrosseReihe(gruppen: Gruppe[]): boolean {
+  return gruppen.some((g) => g.teile.length > GROSSE_GRUPPE)
 }
 
 /** Titel der Gruppe, die den Teil enthält. */

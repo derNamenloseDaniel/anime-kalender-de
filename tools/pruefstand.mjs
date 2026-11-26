@@ -170,7 +170,42 @@ const ANBIETER = [
   },
 ]
 
-const stand = ANBIETER.map((a) => {
+/** Verweise der Titel auf einen Anbieter: mit Titelseite (`gesamt`) und ohne (`ohneSeite`). */
+function zaehleStreams(a) {
+  let gesamt = 0
+  let ohneSeite = 0
+  for (const t of titel) {
+    for (const s of t.streams ?? []) {
+      if (s.platform !== a.plattform) continue
+      if (a.kennung(s.seite ?? s.url ?? '')) gesamt++
+      else ohneSeite++
+    }
+  }
+  return { gesamt, ohneSeite }
+}
+
+/** Die Prüfziele eines Anbieters aus seiner sortierten Liste. */
+function zieleVon(a, liste) {
+  return liste
+    .filter(([, wert]) => a.offene(wert) > 0)
+    /* Alle Ziele, nicht 25 (14.09.2026) — die Erweiterung liest ihr „offen" daraus. */
+    .map(([schluessel, wert]) => {
+      /*
+        **Die offenen Staffeln gehören ans Ziel** (22.09.2026). Der Worker strich ein Ziel, sobald
+        unter seiner Adresse irgendetwas gemeldet war — Dr. STONE verschwand nach Staffel 1 aus der
+        Prüfliste, obwohl Staffel 2 offen war. Nur Listen in Netflix-Zählung: Dort ist `nr` dieselbe
+        Zahl, die der Player als `staffel` meldet.
+      */
+      const staffeln =
+        wert?.laut === 'anbieter-gerechnet'
+          ? [...new Set((wert.staffeln ?? []).filter((st) => st.offen && !st.film).map((st) => Number(st.nr)))].filter(Number.isFinite)
+          : []
+      return zielVon(a.ziel(schluessel, wert), wert, staffeln)
+    })
+    .filter((z) => z.url)
+}
+
+function standVon(a) {
   const liste = sortiereListe(Object.entries(listeLesen(a.datei, a.global)), titel, a.plattform)
   const offen = liste.reduce((n, [, wert]) => n + a.offene(wert), 0)
 
@@ -190,15 +225,8 @@ const stand = ANBIETER.map((a) => {
     Eine geschönte Zahl ist schlimmer als eine unbequeme: Sie behauptet
     Erledigtes, das niemand erledigt hat.
   */
-  let gesamt = 0
-  let ohneSeite = 0
-  for (const t of titel) {
-    for (const s of t.streams ?? []) {
-      if (s.platform !== a.plattform) continue
-      if (a.kennung(s.seite ?? s.url ?? '')) gesamt++
-      else ohneSeite++
-    }
-  }
+  const { gesamt, ohneSeite: ohneSeiteTitel } = zaehleStreams(a)
+  let ohneSeite = ohneSeiteTitel
 
   /*
     **Mehrere Ziele, nicht eines.**
@@ -210,23 +238,7 @@ const stand = ANBIETER.map((a) => {
 
     Fünfundzwanzig reichen für eine Sitzung und halten die Datei klein.
   */
-  const ziele = liste
-    .filter(([, wert]) => a.offene(wert) > 0)
-    /* Alle Ziele, nicht 25 (14.09.2026) — die Erweiterung liest ihr „offen" daraus. */
-    .map(([schluessel, wert]) => {
-      /*
-        **Die offenen Staffeln gehören ans Ziel** (22.09.2026). Der Worker strich ein Ziel, sobald
-        unter seiner Adresse irgendetwas gemeldet war — Dr. STONE verschwand nach Staffel 1 aus der
-        Prüfliste, obwohl Staffel 2 offen war. Nur Listen in Netflix-Zählung: Dort ist `nr` dieselbe
-        Zahl, die der Player als `staffel` meldet.
-      */
-      const staffeln =
-        wert?.laut === 'anbieter-gerechnet'
-          ? [...new Set((wert.staffeln ?? []).filter((st) => st.offen && !st.film).map((st) => Number(st.nr)))].filter(Number.isFinite)
-          : []
-      return zielVon(a.ziel(schluessel, wert), wert, staffeln)
-    })
-    .filter((z) => z.url)
+  const ziele = zieleVon(a, liste)
 
   /*
     Wo es eine Suchliste gibt, ist sie die Wahrheit über die Suchaufträge — die
@@ -256,7 +268,9 @@ const stand = ANBIETER.map((a) => {
     /* Der Name des ersten offenen Eintrags — er steht als Titel am Knopf. */
     naechster: wert?.titel ?? null,
   }
-})
+}
+
+const stand = ANBIETER.map(standVon)
 
 /* Die höchste Folge laut Datensatz je Kennung (4.24.21) — die Erweiterung vergleicht sie mit der Plattform. */
 ANBIETER.forEach((a, i) => {

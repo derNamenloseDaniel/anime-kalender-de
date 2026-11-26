@@ -118,8 +118,12 @@ console.log('Folgenkarte: die Folgenliste geht nicht in den Kasten, sondern in d
 {
   const { KastenMitFolgenKarte } = await import('../web/src/components/detail/kasten-folgen.tsx')
   const baum = KastenMitFolgenKarte({ folgen: 'FOLGEN', antwort: { art: 'fertig' } } as never) as { props: { children: Array<{ props: Record<string, unknown> }> } }
-  const [kasten, karte] = baum.props.children
-  pruefe('der Kasten bekommt keine Folgenliste', kasten!.props.folgen === undefined && kasten!.props.antwort !== undefined, Object.keys(kasten!.props))
+  const [huelle, karte] = baum.props.children
+  /* Der Kasten steht in der Hülle der Reihen-Reiter (F157): sie bekommt dieselben Eigenschaften und den Kasten als Element. */
+  const kasten = huelle!.props.kasten as { props: Record<string, unknown> }
+  const eigenschaften = huelle!.props.eigenschaften as Record<string, unknown>
+  pruefe('der Kasten bekommt keine Folgenliste', kasten.props.folgen === undefined && kasten.props.antwort !== undefined, Object.keys(kasten.props))
+  pruefe('die Reiter-Hülle bekommt keine Folgenliste', eigenschaften.folgen === undefined && eigenschaften.antwort !== undefined, Object.keys(eigenschaften))
   pruefe('die Karte trägt die Folgenliste und die Marke', karte!.props.children === 'FOLGEN' && karte!.props['data-folgen-karte'] === true, karte!.props)
 }
 

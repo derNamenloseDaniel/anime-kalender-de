@@ -65,6 +65,7 @@ pruefe('Lücken: gewöhnlicher Titel ohne MAL-Kennung bleibt eine Lücke', ohneM
 
 const eigene = mitStaffelTiteln([{ ids: [158871, 5], grund: 'g', quelle: 'https://x' }], [{ id: 7000001, staffelTitel: { sammel: 158871 } }, { id: 158871, staffelTitel: { sammel: 158871 } }, { id: 7000009, staffelTitel: { sammel: 99 } }, { id: 20 }])
 pruefe('Eigene Werke: Staffel-Titel eines gelisteten Sammeltitels zählen mit, ohne Doppelte', JSON.stringify(eigene[0]!.ids) === '[158871,5,7000001]', JSON.stringify(eigene))
+pruefe('Eigene Werke: Grund und Quelle des Eintrags bleiben', eigene[0]!.grund === 'g' && eigene[0]!.quelle === 'https://x', JSON.stringify(eigene))
 
 /* Die echten Aufrufer: Sammeltitel 158871 mit Quelldaten, Staffel 1 (7000001) und Basis (158871) als Staffel-Titel. */
 const staffelTitel = (id: number, nr: number, ab: number, extra: object = {}) => ({ id, titleDe: `T${id}`, slug: `t-${id}`, franchiseId: 158871, jpYear: 2023, streams: [], keywords: [], genres: [], staffelTitel: { sammel: 158871, nr, ab }, ...extra }) as unknown as Title

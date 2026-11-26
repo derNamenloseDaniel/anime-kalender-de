@@ -2,6 +2,7 @@
 // statt eines JSON-Stacktraces, und dass `laeufe-aufraeumen.mjs --trocken` dabei mit Exit 0 endet. Kein Netz, kein Token.
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
+import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { erledigtArgumente, findeRotenLauf, holeLaeufe, letzteDatenAenderung, notizZu, roteArten, stillstand, STILLSTAND_GRENZE_STUNDEN, verlaufsZeile } from './laeufe-abruf.mjs'
 
@@ -242,3 +243,37 @@ assert.equal(
 )
 assert.equal(notizZu([{ gemeldet_am: 'x', zustand: 'warnung', notiz: 'a' }, { gemeldet_am: warnArt.am, zustand: 'warnung', notiz: WARN_NOTIZ }], warnArt), WARN_NOTIZ)
 assert.equal(notizZu([], warnArt), '')
+
+// Bekannte Warnungen im ganzen Werkzeug (Kulisse mit POST-Aufzeichnung, eingefrorene Uhr 26.11.2026). Ohne `gh` im PATH
+// scheitern dessen Aufrufe sofort statt nach je Sekunden am Proxy (lokal ~28 s je Start), und jeder Start hat ein Zeitlimit.
+const BEKANNT_STILLSTAND = 'Mängel Stillstand: seit 2026-11-22: 1 gestiegen (Arten: Logzeile MAENGEL_STILLSTAND_ARTEN) — gestiegen: sprecher'
+const bekanntLauf = (notiz, args = [], opt = {}) => {
+  const einzel = { lauf_id: 'w1', zustand: 'warnung', gemeldet_am: T(2), notiz, ...opt.eintrag }
+  const stub =
+    `Date.now=()=>Date.parse("${opt.jetzt ?? '2026-11-26T00:00:00Z'}");` +
+    `globalThis.fetch=async(u,o)=>{u=String(u);if(o&&o.method==="POST"){console.log("POST "+o.headers["X-Lauf-Token"]+" "+o.body);return new Response("{}",{status:200})}` +
+    `return new Response(u.includes("?verlauf=")?${JSON.stringify(JSON.stringify({ laeufe: [einzel] }))}:${JSON.stringify(JSON.stringify({ laeufe: [], verlauf: { Bestandsbau: [eintrag('warnung', T(2))] } }))},{status:200})}`
+  return spawnSync(process.execPath, ['--import', `data:text/javascript,${encodeURIComponent(stub)}`, werkzeug, ...args], {
+    encoding: 'utf8',
+    timeout: 60_000,
+    env: { PATH: dirname(process.execPath), LAUF_TOKEN: 'T0K', ...opt.env },
+  })
+}
+const posts = (r) => r.stdout.match(/^POST /gm)?.length ?? 0
+const passend = bekanntLauf(BEKANNT_STILLSTAND)
+assert.equal(passend.status, 0, passend.stderr)
+assert.equal(posts(passend), 1, 'passende Warnung mit Token: genau ein POST')
+assert.match(passend.stdout, /^POST T0K \{"lauf_id":"w1","zustand":"erledigt","notiz":"bekannt bis 2026-11-30: sprecher /m)
+assert.doesNotMatch(passend.stdout, /WARNUNG im Verlauf/)
+assert.equal(posts(bekanntLauf(BEKANNT_STILLSTAND, ['--trocken'])), 0, '--trocken: kein POST')
+const fremd = bekanntLauf(`Datenqualität hart rot: Klammer · ${BEKANNT_STILLSTAND}`)
+assert.equal(posts(fremd), 0, 'fremde Warnung davor: kein POST')
+assert.match(fremd.stdout, /^WARNUNG im Verlauf: Bestandsbau .*Datenqualität hart rot: Klammer$/m)
+assert.equal(posts(bekanntLauf(BEKANNT_STILLSTAND, [], { eintrag: { lauf_id: undefined } })), 0, 'ohne lauf_id: kein POST')
+// Abgelaufener Eintrag (nach dem 30.11.): gemeldet, auch ohne passende Warnung; die Warnung selbst bleibt sichtbar.
+const abgelaufen = bekanntLauf('Crunchyroll-Folgen ohne Termin (2): Last Boss #1', [], { jetzt: '2026-12-01T00:00:00Z' })
+assert.match(abgelaufen.stdout, /^abgelaufen: Bestandsbau /m)
+assert.match(abgelaufen.stdout, /^WARNUNG im Verlauf: /m)
+assert.equal(posts(abgelaufen), 0)
+assert.equal(posts(bekanntLauf(BEKANNT_STILLSTAND, [], { jetzt: '2026-12-01T00:00:00Z' })), 0, 'nach bis: kein POST')
+console.log('laeufe-abruf bekannte Warnungen: ok')

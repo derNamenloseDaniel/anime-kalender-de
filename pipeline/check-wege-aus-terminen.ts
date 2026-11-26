@@ -134,7 +134,14 @@ pruefe('neben einem Termin ohne Kanal (43) entsteht der Weg aus dem Kanal-Termin
   const spy = [termin(140960, 'disneyplus', { schedule: { firstEpisodeDate: '2026-10-04' } })]
   const nv = nein(140960, { platform: 'disneyplus', available: false, checkedAt: '2026-08-26' })
   const ja = (am: string) => nein(140960, { platform: 'disneyplus', dub: true, checkedAt: am })
-  pruefe('ein jüngerer Ja-Beleg hat das Nein schon abgelöst (Spy × Family 140960), ein älterer nicht', ueberholteNeins([nv, ja('2026-10-16')], spy, '2026-11-26').size === 0 && ueberholteNeins([nv, ja('2026-08-01')], spy, '2026-11-26').size === 1)
+  pruefe('ein jüngerer Ja-Beleg hat das Nein schon abgelöst (Spy × Family 140960), ein älterer oder taggleicher nicht', ueberholteNeins([nv, ja('2026-10-16')], spy, '2026-11-26').size === 0 && ueberholteNeins([nv, ja('2026-08-01')], spy, '2026-11-26').size === 1 && ueberholteNeins([nv, ja('2026-08-26')], spy, '2026-11-26').size === 1)
+  pruefe('ein Termin, der heute beginnt, überholt schon', ueberholteNeins([nv], spy, '2026-10-04').size === 1 && ueberholteNeins([nv], spy, '2026-10-03').size === 0)
+}
+{
+  const t46 = new Map([[46, titel(46)]])
+  const zwei = [kanalTermin(46, '2026-10-08'), kanalTermin(46, '2026-10-09', { slug: 'zweiter-46', kanal: 'Crunchyroll' })]
+  ergaenzeWegeAusTerminen({ titles: t46, releases: zwei, istTot: () => false, verweiseEntfernt: [], belegFuer: () => undefined })
+  pruefe('zwei Kanal-Termine ohne Adresse (46): der erste bleibt', t46.get(46)!.streams.length === 1 && t46.get(46)!.streams[0]!.kanal === 'Aniverse', JSON.stringify(t46.get(46)!.streams))
 }
 pruefe('ohne Handbeleg gibt es nichts zu überholen (40); ein Nein, das älter als nur der spätere Termin ist, gilt dem früheren (41)', !ueberholt.has('40|primevideo') && !ueberholt.has('41|primevideo'))
 

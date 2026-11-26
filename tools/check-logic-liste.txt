@@ -111,7 +111,6 @@ pipeline/check-beleg-anbieter.ts
 pipeline/check-beleg-api-web.ts
 pipeline/check-beleg-api.ts
 pipeline/check-beleg-bis-anker.ts
-pipeline/check-vor-beobachtung.ts
 pipeline/check-beleg-fremd-zugeordnet.ts
 pipeline/check-beleg-fundstelle-hinweis.ts
 pipeline/check-beleg-href.ts
@@ -781,6 +780,7 @@ pipeline/check-verweis-grund-region.ts
 pipeline/check-verweis-ziel.ts
 pipeline/check-verweise-gedaechtnis.ts
 pipeline/check-verweise-von-hand.ts
+pipeline/check-vor-beobachtung.ts
 pipeline/check-vorfaelle-ablauf.ts
 pipeline/check-vorlieben-getrennt.ts
 pipeline/check-vorlieben.ts

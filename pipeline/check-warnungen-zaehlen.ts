@@ -63,11 +63,37 @@ pruefe(
   z3,
 )
 
+const arten20 = Array.from({ length: MAX_ARTEN }, (_, i) => `⚠ WARNUNG Z${i}: x`)
+setzeWarnungenZurueck()
+arten20.forEach((z) => zaehleWarnung(z))
+pruefe('genau 20 Arten: kein „weitere“', !warnungsZusammenfassung().includes('weitere'), warnungsZusammenfassung())
+setzeWarnungenZurueck()
+arten20.concat('⚠ WARNUNG Z99: x').forEach((z) => zaehleWarnung(z))
+pruefe('21 Arten: „… 1 weitere Arten“', warnungsZusammenfassung().endsWith('; … 1 weitere Arten'), warnungsZusammenfassung())
+setzeWarnungenZurueck()
+for (const z of ['⚠ WARNUNG b: 1', '⚠ WARNUNG a: 1', '⚠ WARNUNG c: 1', '⚠ WARNUNG c: 2']) zaehleWarnung(z)
+pruefe('Gleichstand: alphabetisch', warnungsZusammenfassung().endsWith('2× c; 1× a; 1× b'), warnungsZusammenfassung())
+const lang40 = 'L'.repeat(40)
+pruefe('Art: Doppelpunkt nach genau 40 Zeichen gilt', artDerWarnung(`⚠ WARNUNG ${lang40}: x`) === lang40)
+pruefe('Art: Doppelpunkt nach 41 Zeichen gilt nicht (drei Wörter, auf 40 gekappt)', artDerWarnung(`⚠ WARNUNG ${lang40}L: x`) === lang40)
+pruefe('Art: lange drei Wörter auf 40 gekappt', artDerWarnung(`WARNUNG ${'a'.repeat(30)} ${'b'.repeat(30)} c`)?.length === 40)
+setzeWarnungenZurueck()
+const gelogt: string[] = []
+const alt = console.log
+console.log = (...a: unknown[]) => void gelogt.push(a.join(' '))
+try { meldeWarnungen(undefined) } finally { console.log = alt }
+pruefe('Logzeile mit Präfix „[pipeline]“', gelogt.length === 1 && gelogt[0] === '[pipeline] Warnungen im Bau: 0', gelogt)
+process.env.GITHUB_STEP_SUMMARY = join(tmpdir(), `warnungen-env-${process.pid}.md`)
+stumm(() => meldeWarnungen())
+pruefe('GITHUB_STEP_SUMMARY aus der Umgebung wird beschrieben', readFileSync(process.env.GITHUB_STEP_SUMMARY, 'utf8') === 'Warnungen im Bau: 0\n\n')
+rmSync(process.env.GITHUB_STEP_SUMMARY, { force: true })
+delete process.env.GITHUB_STEP_SUMMARY
+
 const ordner = mkdtempSync(join(tmpdir(), 'warnungen-'))
 const datei = join(ordner, 'summary.md')
 stumm(() => meldeWarnungen(datei))
 const inhalt = readFileSync(datei, 'utf8')
-pruefe('Step Summary bekommt die Zeile', inhalt.startsWith(`Warnungen im Bau: ${gesamt}`), inhalt.slice(0, 40))
+pruefe('Step Summary bekommt die Zeile', inhalt.startsWith('Warnungen im Bau: '), inhalt.slice(0, 40))
 rmSync(ordner, { recursive: true, force: true })
 
 console.log(`check-warnungen-zaehlen: ${faelle} Zusicherungen, ${fehler} Fehler`)

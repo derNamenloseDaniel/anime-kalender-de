@@ -1,0 +1,5 @@
+kategorie: bugfix
+text: A Wild Last Boss Appeared! Staffel 2 führt direkt zur Prime-Video-Seite
+untertitel: Über den Crunchyroll-Kanal bei Prime Video
+wartetAuf: "Bestandsbau nach dem Merge. Probe: public/data/titles.json, Titel 204389, Prime-Weg trägt https://www.amazon.de/gp/video/detail/0OPTCDPN7UYNAUNUCD1KACDL6P; node tools/maengel.mjs zeigt weg-ohne-adresse für 204389 nicht mehr offen."
+seit: '2026-11-27'

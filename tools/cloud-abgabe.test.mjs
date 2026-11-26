@@ -49,7 +49,8 @@ function welt({ zweige = {}, dateien = {}, prs = {}, kommentare = {}, labels = {
       log.push(['kommentar', nr, text])
       kommentare[nr] = [...(kommentare[nr] ?? []), text]
     },
-    stufe: () => stufe,
+    // Stufe nur für die PR-Nummern dieser Welt (50, 61, 77): wer die Nummer nicht durchreicht, bekommt 9
+    stufe: (nr) => ([50, 61, 77].includes(nr) ? stufe : 9),
     labels: (nr) => [...(labels[nr] ?? [])],
     labelAnlegen: (n) => log.push(['labelAnlegen', n]),
     labelSetzen: (nr, n) => {
@@ -165,7 +166,24 @@ exit2('kein Titel und kein PR', standard({ dateien: { 'prtext/foo': { 'pr.md': '
 exit2('kein prtext-Zweig', welt(), ['fix/foo'], /kein prtext-Zweig/)
 exit2('leerer Auftrag', welt(), ['prtext/'], /kein prtext-Zweig/)
 exit2('kein Argument', welt(), [], /Aufruf/)
+{
+  const w = welt()
+  lauf([], w)
+  gleich('kein Argument: genau die Aufruf-Zeile, nichts weiter', aufrufe(w, 'zeile').map((e) => e[1]), ['Aufruf: node tools/cloud-abgabe.mjs <prtext/auftrag>'])
+}
+exit2('Zeichen im Zweignamen', welt(), ['prtext/a b'], /kein prtext-Zweig/)
+exit2('Code-Zweig fehlt: beide Kandidaten genannt', welt({ dateien: { 'prtext/foo-r1': { 'pr.md': PR_MD, 'bericht.md': BERICHT } } }), ['prtext/foo-r1'], /gesucht: fix\/foo-r1, fix\/foo\)/)
 exit2('Abruffehler der Welt', new Proxy(standard(), { get: (z, n) => (n === 'zweigSha' ? () => { throw new Error('HTTP 500') } : z[n]) }), ['prtext/foo'], /HTTP 500/)
+
+// --- Protokollzeile und Stufe 2 ---------------------------------------------------------------------------------------
+gleich('Zeile neuer PR', abgabe('prtext/foo', standard({ stufe: 2 })), 'PR angelegt #77 (fix/foo, Kopf aaaaaaa): Nachtrag geschrieben; Label stufe-2')
+gleich('Zeile offener PR, Nachtrag lag vor', abgabe('prtext/foo', standard({ prs: { 'fix/foo': 50 }, kommentare: { 50: [`${nachtragKopf(SHA_A)}\nx`] } })), 'offener PR #50 (fix/foo, Kopf aaaaaaa): Nachtrag lag schon vor; Label stufe-1')
+gleich('Zeile ohne Bericht', abgabe('prtext/foo', standard({ dateien: { 'prtext/foo': { 'pr.md': PR_MD, 'bericht.md': '  \n' } } })), 'PR angelegt #77 (fix/foo, Kopf aaaaaaa): ohne bericht.md; Label stufe-1')
+{
+  const w = standard({ stufe: 2 })
+  lauf(['prtext/foo'], w)
+  gleich('Stufe 2: Label stufe-2', aufrufe(w, 'labelSetzen'), [['labelSetzen', 77, 'stufe-2']])
+}
 
 // --- doppelter Push ---------------------------------------------------------------------------------------------------
 {
@@ -198,7 +216,7 @@ exit2('Abruffehler der Welt', new Proxy(standard(), { get: (z, n) => (n === 'zwe
   const w = standard({ prs, anlegenSchlaegtFehl: true })
   let lesen = 0
   const offen = w.offenerPr
-  w.offenerPr = (z) => (++lesen === 1 ? offen(z) : { nummer: 61 })
+  w.offenerPr = (z) => (++lesen === 1 ? offen(z) : z === 'fix/foo' ? { nummer: 61 } : null)
   gleich('422 beim Anlegen: Exit 0', lauf(['prtext/foo'], w), 0)
   pruefe('422: Nachtrag am PR 61 statt zweitem PR', aufrufe(w, 'kommentar')[0]?.[1] === 61)
   const w2 = standard({ anlegenSchlaegtFehl: true })

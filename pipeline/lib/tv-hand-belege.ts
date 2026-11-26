@@ -8,7 +8,7 @@ import { releasesAusTvProgramm, type WikiListen } from './tv-termine.ts'
  */
 function schattenAbStart(hand: Release, start: string, sendungen: TvSendung[], titles: Map<number, Title>, wiki: WikiListen): Release | undefined {
   const sender = (hand.sender ?? '').toLowerCase()
-  const ab = sendungen.filter((s) => s.titleId === hand.titleId && s.sender.toLowerCase() === sender && s.start.slice(0, 10) >= start)
+  const ab = sendungen.filter((s) => hand.titleId === s.titleId && s.sender.toLowerCase() === sender && s.start.slice(0, 10) >= start)
   return releasesAusTvProgramm(ab, titles, [], wiki).find((r) => r.folgenBelegt)
 }
 

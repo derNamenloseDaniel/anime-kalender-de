@@ -2153,6 +2153,28 @@
         "date": "2026-11-07",
         "episode": 2
       }
+    },
+    "black clover (s2)": {
+      "time": "17:00",
+      "weekday": 5,
+      "dates": [
+        "2026-11-28"
+      ],
+      "rawTitle": "Black Clover (Staffel 2)",
+      "seriesId": "GRE50KV36",
+      "seriesUrl": "https://www.crunchyroll.com/de/series/GRE50KV36",
+      "observations": [
+        {
+          "date": "2026-11-28",
+          "episode": 174,
+          "quelle": "woche"
+        }
+      ],
+      "weeklyConfirmed": false,
+      "earliest": {
+        "date": "2026-11-28",
+        "episode": 174
+      }
     }
   },
   "slots": [

@@ -82,7 +82,7 @@ pruefe(
 */
 pruefe(quelle.includes('export const WARTEND_SEKUNDEN = 7200'), 'die wartenden Meldungen halten 7200 Sekunden (12.10.2026, vorher 1800)')
 pruefe(
-  quelle.includes('async () => antwort(await leseGemeldet(env, fuer)),\n        GEMELDET_SEKUNDEN,'),
+  /async \(\) => antwort\(await leseGemeldet\(env, fuer\)\),\n\s+GEMELDET_SEKUNDEN,/.test(quelle),
   '?gemeldet=<Adresse> hält GEMELDET_SEKUNDEN je Adresse',
 )
 pruefe(quelle.includes('export const GEMELDET_SEKUNDEN = 1800'), '... und das sind 1800 Sekunden')

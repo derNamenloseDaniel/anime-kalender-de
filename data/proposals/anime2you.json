@@ -1,15 +1,188 @@
 {
-  "scrapedAt": "2026-11-24T04:14:13.902Z",
+  "scrapedAt": "2026-11-26T17:01:46.021Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 39,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 8,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 5,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 41,
-    "schon in einem Rubrik-Feed gelesen": 34,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 10,
-    "Sprachhinweis älter als 45 Tage": 8
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 14,
+    "schon in einem Rubrik-Feed gelesen": 9,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 1,
+    "Sprachhinweis älter als 45 Tage": 6
   },
   "proposals": [
+    {
+      "articleTitle": "Design der acht DVD-Generationsboxen zu »Pokémon« vorgestellt",
+      "articleUrl": "https://www.anime2you.de/news/1076238/pokemon-dvd-generationsboxen-design/",
+      "publishedAt": "2026-11-26",
+      "category": "disc",
+      "platforms": [
+        "disc"
+      ],
+      "dates": [
+        {
+          "iso": "2026-12-18",
+          "context": "alle 25 Staffeln der ursprünglichen TV-Serie und sollen zwischen dem 18. Dezember 2026 und dem 25. Juni 2027 im monatlichen Rhythmus […]"
+        },
+        {
+          "iso": "2027-06-25",
+          "context": "rünglichen TV-Serie und sollen zwischen dem 18. Dezember 2026 und dem 25. Juni 2027 im monatlichen Rhythmus […] Der Beitrag Design der ach"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Black Friday: Zahlreiche Anime von Crunchyroll bei Amazon reduziert",
+      "articleUrl": "https://www.anime2you.de/news/1076213/amazon-black-friday-crunchyroll-angebote/",
+      "publishedAt": "2026-11-26",
+      "category": "disc",
+      "platforms": [
+        "crunchyroll"
+      ],
+      "dates": [
+        {
+          "iso": "2026-11-30",
+          "context": "r euch zusammengestellt. Zahlreiche Crunchyroll-Angebote Noch bis zum 30. November 2026 können sich Anime-Fans unter anderem die Collector’s"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Netflix ergänzt sein Anime-Angebot um zwei neue Serien",
+      "articleUrl": "https://www.anime2you.de/news/1076269/netflix-fool-night-und-mehr/",
+      "publishedAt": "2026-11-26",
+      "category": "streaming",
+      "platforms": [
+        "netflix"
+      ],
+      "dates": [],
+      "dub": "ja",
+      "hinweis": "sprache",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Disney+ nimmt zwei Anime-Neuzugänge ins Programm",
+      "articleUrl": "https://www.anime2you.de/news/1075866/disney-plus-one-punch-man-ab-sofort/",
+      "publishedAt": "2026-11-25",
+      "category": "streaming",
+      "platforms": [
+        "disneyplus"
+      ],
+      "dates": [],
+      "dub": "ja",
+      "alreadyCurated": false,
+      "sammel": [
+        {
+          "titel": "One Punch Man",
+          "zusatz": "Staffel 1 und 2",
+          "deutsch": true,
+          "woechentlich": false,
+          "stream": [
+            "Disney+"
+          ],
+          "folgen": 24,
+          "datum": "2026-11-25",
+          "datumGeschaetzt": true
+        },
+        {
+          "titel": "Naruto Shippuden",
+          "zusatz": "Staffel 4",
+          "deutsch": true,
+          "woechentlich": false,
+          "stream": [
+            "Disney+"
+          ],
+          "datum": "2026-11-25",
+          "datumGeschaetzt": true
+        }
+      ],
+      "sammelGelesen": "2026-11-26"
+    },
+    {
+      "articleTitle": "Black-Friday-Deal: Bis zu 59 % Rabatt auf AniMoon-Blu-rays bei Amazon",
+      "articleUrl": "https://www.anime2you.de/news/1075834/amazon-black-friday-animoon-angebote/",
+      "publishedAt": "2026-11-25",
+      "category": "disc",
+      "platforms": [],
+      "dates": [
+        {
+          "iso": "2026-11-30",
+          "context": "ighlights für euch herausgesucht. Zahlreiche AniMoon-Angebote Bis zum 30. November 2026 können sich Anime-Fans unter anderem die Komplettbox"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "»Infinite Stratos« erscheint in zwei neuen Blu-ray-Staffelboxen + Design",
+      "articleUrl": "https://www.anime2you.de/news/1075784/infinite-stratos-neue-blu-ray-staffelboxen/",
+      "publishedAt": "2026-11-25",
+      "category": "disc",
+      "platforms": [
+        "disc"
+      ],
+      "dates": [
+        {
+          "iso": "2027-01-22",
+          "context": "e im Januar 2027 Die beiden Staffeln von »Infinite Stratos« werden am 22. Januar 2027 jeweils als eigene Blu-ray-Komplettbox veröffentlicht."
+        },
+        {
+          "month": "2027-01",
+          "context": "Komplettboxen auf Blu-ray in den Handel. Wir fassen zusammen. Release im Januar 2027 Die beiden Staffeln von »Infinite Stratos« werden am 22"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Black-Friday-Aktion: waipu.tv reduziert Abo-Preise um 50 %",
+      "articleUrl": "https://www.anime2you.de/news/1075561/black-friday-aktion-waipu-tv/",
+      "publishedAt": "2026-11-25",
+      "category": "disc",
+      "platforms": [],
+      "dates": [
+        {
+          "iso": "2026-11-30",
+          "context": "Rahmen verschiedene Abo-Optionen 50 % reduziert angeboten werden. Bis 30. November 2026 Zu den bis zum 30. November 2026 verfügbaren Angebot"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Sieben neue Plüschanhänger zu »Frieren« vorgestellt",
+      "articleUrl": "https://www.anime2you.de/news/1072379/sieben-frieren-plueschanhaenger/",
+      "publishedAt": "2026-11-25",
+      "category": "allgemein",
+      "platforms": [],
+      "dates": [
+        {
+          "month": "2026-12",
+          "context": "rden können. Erste Bilder findet ihr unten in diesem Artikel. Release im Dezember 2026 Die neue »Blind Box«-Kollektion zu »Frieren« umfasst"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Nur für kurze Zeit: »Madoka Magica«-Komplettbox zum Sonderpreis",
+      "articleUrl": "https://www.anime2you.de/news/1075500/madoka-magica-komplettbox-zum-sonderpreis/",
+      "publishedAt": "2026-11-24",
+      "category": "disc",
+      "platforms": [
+        "crunchyroll",
+        "kino"
+      ],
+      "dates": [
+        {
+          "iso": "2026-11-30",
+          "context": "abattaktion in seinem Online-Shop gestartet. Wir fassen zusammen. Bis 30. November 2026 Bis zum 30. November 2026 bietet polyband die limiti"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
     {
       "articleTitle": "TV-Guide: Anime im deutschen Fernsehen in KW 48/2026",
       "articleUrl": "https://www.anime2you.de/news/1075001/anime-tv-programm-48-2026/",
@@ -476,16 +649,12 @@
       ],
       "dates": [
         {
-          "iso": "2026-11-25",
-          "context": "026 Die erste Staffel von »Call of the Night« steht demzufolge ab dem 25. November 2026 bei Netflix auf Abruf zur Verfügung. Details zu den"
-        },
-        {
           "month": "2026-11",
           "context": "ng von »Call of the Night« in sein Programm auf. Wir fassen zusammen. Ab November 2026 Die erste Staffel von »Call of the Night« steht demzu"
         }
       ],
       "dub": "unklar",
-      "alreadyCurated": false
+      "alreadyCurated": true
     },
     {
       "articleTitle": "Termin der fünften Blu-ray-Box von »Dragon Ball Z« + Vorbestellung",
@@ -682,7 +851,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-23"
+      "sammelGelesen": "2026-11-26"
     },
     {
       "articleTitle": "Tickets für »KPop Demon Hunters«-Konzerttour ab Freitag erhältlich",
@@ -737,7 +906,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-23"
+      "sammelGelesen": "2026-11-26"
     },
     {
       "articleTitle": "AKIBA PASS SHOP startet Black Friday Sale mit über 1.000 Produkten",
@@ -1217,7 +1386,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-23"
+      "sammelGelesen": "2026-11-26"
     },
     {
       "articleTitle": "AniMoon startet große Black-Weeks-Aktion mit 26 % Rabatt",
@@ -1333,7 +1502,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-22"
+      "sammelGelesen": "2026-11-25"
     },
     {
       "articleTitle": "Neun Disc-Neuheiten ab sofort im AKIBA PASS SHOP vorbestellbar",
@@ -1442,7 +1611,7 @@
           "folgen": 25
         }
       ],
-      "sammelGelesen": "2026-11-22"
+      "sammelGelesen": "2026-11-25"
     },
     {
       "articleTitle": "Große Anime-Rabattaktion mit Serien und Filmen bei Amazon gestartet",
@@ -1625,7 +1794,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-23"
+      "sammelGelesen": "2026-11-26"
     },
     {
       "articleTitle": "ProSieben MAXX startet zweiten werktäglichen Anime-Block",
@@ -1848,7 +2017,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-22"
+      "sammelGelesen": "2026-11-25"
     },
     {
       "articleTitle": "Erster Trailer zum Netflix-Anime »Fool Night« + Visual",
@@ -1963,7 +2132,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-23"
+      "sammelGelesen": "2026-11-26"
     },
     {
       "articleTitle": "Design der neuen »Neon Genesis Evangelion«-Komplettbox + Extras",
@@ -2160,7 +2329,7 @@
           "folgen": 13
         }
       ],
-      "sammelGelesen": "2026-11-22"
+      "sammelGelesen": "2026-11-25"
     },
     {
       "articleTitle": "Sieben Disc-Neuheiten ab sofort im AKIBA PASS SHOP vorbestellbar",
@@ -2311,10 +2480,6 @@
       ],
       "dates": [
         {
-          "iso": "2026-11-24",
-          "context": "sgabe als auch im Originalton mit Untertiteln zur Verfügung steht. Am 24. November 2026 werden die […] Der Beitrag Disney+ kündigt zwei An"
-        },
-        {
           "month": "2026-11",
           "context": "er 2026 an Der Streaming-Dienst Disney+ erweitert sein Anime-Programm im November 2026 um zwei neue Serien. Wir fassen die Details zusammen."
         }
@@ -2340,7 +2505,7 @@
           "folgen": 24
         }
       ],
-      "sammelGelesen": "2026-11-22"
+      "sammelGelesen": "2026-11-25"
     },
     {
       "articleTitle": "19,99 Euro pro Staffel: polyband startet große »Pokémon«-Rabattaktion",
@@ -2520,7 +2685,7 @@
           "folgen": 12
         }
       ],
-      "sammelGelesen": "2026-11-22"
+      "sammelGelesen": "2026-11-25"
     },
     {
       "articleTitle": "Disney+ nimmt zwei Anime-Neuzugänge ins Programm",
@@ -3335,7 +3500,7 @@
           "edition": "limited-edition sammelschuber"
         }
       ],
-      "discGelesen": "2026-11-23"
+      "discGelesen": "2026-11-26"
     },
     {
       "articleTitle": "Zwei Synchro-Neuzugänge ab sofort auf Crunchyroll verfügbar",
@@ -6089,10 +6254,6 @@
       ],
       "dates": [
         {
-          "iso": "2026-11-24",
-          "context": "la Magi Madoka Magica – Der Film: Walpurgisnacht: Rising« wird ab dem 24. November 2026 in der japanischen Originalvertonung mit deutschen U"
-        },
-        {
           "month": "2026-11",
           "context": "ierten »Madoka Magica«-Films enthüllt. Wir fassen zusammen. Kinostart im November 2026 Der Sequel-Film mit dem Titel »Puella Magi Madoka Mag"
         }
@@ -8797,10 +8958,6 @@
         "kino"
       ],
       "dates": [
-        {
-          "iso": "2026-11-24",
-          "context": "doka Magica the Movie – Walpurgisnacht: Rising« startet demzufolge am 24. November 2026 in […] Der Beitrag Crunchyroll bringt neuen »Madok"
-        },
         {
           "month": "2026-11",
           "context": "wenigen Monaten ins Kino bringen wird. Wir fassen zusammen. Kinostart im November 2026 Der Fortsetzungsfilm »Puella Magi Madoka Magica the M"

@@ -1,5 +1,7 @@
 # Synchro-Recherche der 208 Titel ohne Beleg (06.10.2026)
 
+> Stand 25.11.2026: fernsehserien.de und wunschliste.de sind nur mit schriftlicher Genehmigung nutzbar (`quellen.md`); die Angaben von dort in diesem Bericht sind Hinweise, keine Belege.
+
 Anlass: 208 Titel im Hauptbestand hatten weder einen Stream mit belegter Synchro noch ein Release noch eine Erstausgabe-Marke (`status.md`, „Gaps im Bestand").
 Vier Subagenten haben je 52 Titel gegen synchronkartei.de, fernsehserien.de, Wikipedia, Händler und Anime2You geprüft. Berichte sind Modellausgabe: Die Einträge in
 `data/erstausgabe-von-hand.yaml` (51) und `data/ohne-synchro-von-hand.yaml` (7) wurden nur übernommen, wo die Quelle stichprobenartig am Original gelesen wurde.

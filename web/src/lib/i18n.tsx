@@ -223,6 +223,9 @@ const TEXTE = {
   // steht im Hinweis. „Bisher" fehlt bewusst: Wir wissen nicht, ob eine kommt.
   'detail.folgenKurz': '{n} Fg.',
   'detail.folgenBereich': 'Fg. {bereich}',
+  // Unterscheidet Karten mit gleicher Staffelzahl (Pokémon: drei Teile der Staffel 16); Zählung innerhalb der deutschen Staffel.
+  'detail.reiheFolgen': 'Folge {von}–{bis}',
+  'detail.reiheFolgenMitS': 'S{staffel} Folge {von}–{bis}',
   // **Der Ersatz sagt, wessen Handlung dasteht.** Ohne den Namen liest jemand
   // die Handlung von Staffel 1 und hält sie für die von Staffel 3.
   // Zwei Termine, keiner belegbar — beide anzeigen statt einen zu verschweigen
@@ -269,6 +272,7 @@ const TEXTE = {
     „Erste Folge … · Wöchentlich · letzte Folge". Für `available-from` ist weder
     das eine noch das andere wahr — es kommt der ganze Block.
   */
+  'antwort.abwurfFolgen': 'Folgen {von}–{bis}',
   'antwort.alleFolgen': 'Alle {count} Folgen', 'antwort.alleFolgenOhneZahl': 'Alle Folgen',
   // Nur noch diese eine steht aus.
   // Ohne relative Angabe (Kino, Angebot) trägt das Datum allein.

@@ -5,6 +5,7 @@ import { richtePrimeWege } from './13-1-prime-richten.ts'
 import { richteTerminAdressen } from './13-1-termin-adressen.ts'
 import { setzeJoynFenster } from './13-1-joyn-fenster.ts'
 import { setzeToggoFenster } from './13-1-toggo-fenster.ts'
+import { setzeToggoSeiten } from './13-1-toggo-seiten.ts'
 import { providerName } from '../../shared/mappings.ts'
 
 /** Handlung je Titel, mit belegter Herkunft der deutschen Fassung. */
@@ -73,9 +74,22 @@ export function schreibeSynopsenUndReichereAn({ allTitles, releases, kanalJeAdre
     {},
   )
   setzeToggoFenster(allTitles)
+  setzeToggoSeiten(allTitles, 'Anime')
 
   setzeJoynFenster(allTitles, releases)
   let gerichtet = richtePrimeWege(allTitles, kanalJeAdresse)
+  const amazon = richteAmazonWege(allTitles)
+  gerichtet += amazon.gerichtet
+  const kanalBenannt = amazon.kanalBenannt
+  if (kanalBenannt) log(`${kanalBenannt} Kanal-Wege mit Amazon-Adresse als „Amazon Prime (Kanal)" benannt`)
+  gerichtet += richteTerminAdressen(releases, allTitles)
+  if (gerichtet) log(`${gerichtet} Prime-Verweise auf die Video-Adresse gerichtet`)
+  return { trenneQuelle, synopses, annKennungen, trailer }
+}
+
+/** Amazon-Wege der Titel richten und benennen; zählt gerichtete Adressen und benannte Kanäle. */
+function richteAmazonWege(allTitles: Title[]): { gerichtet: number; kanalBenannt: number } {
+  let gerichtet = 0
   let kanalBenannt = 0
   for (const t of allTitles) {
     /*
@@ -106,8 +120,5 @@ export function schreibeSynopsenUndReichereAn({ allTitles, releases, kanalJeAdre
       kanalBenannt++
     }
   }
-  if (kanalBenannt) log(`${kanalBenannt} Kanal-Wege mit Amazon-Adresse als „Amazon Prime (Kanal)" benannt`)
-  gerichtet += richteTerminAdressen(releases, allTitles)
-  if (gerichtet) log(`${gerichtet} Prime-Verweise auf die Video-Adresse gerichtet`)
-  return { trenneQuelle, synopses, annKennungen, trailer }
+  return { gerichtet, kanalBenannt }
 }

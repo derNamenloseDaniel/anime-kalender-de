@@ -70,9 +70,17 @@ export function verstoesse(seite, wert, grenze) {
   return aus
 }
 
-/** Ratsche: Grenzen, die gegenüber dem Stand auf main gelockert wurden (Obergrenze höher, Untergrenze tiefer). Ohne Basis keine Prüfung. */
-export function gelockert(neu, alt) {
+/**
+ * Ratsche: Grenzen, die gegenüber dem Stand auf main gelockert wurden (Obergrenze höher, Untergrenze tiefer). Ohne Basis keine Prüfung.
+ * Durch kommt nur ein Schritt, der genau so in `erlaubt` steht (`LOCKERUNGEN` aus `lighthouse-grenzen.mjs`) und dessen `datum` höchstens
+ * `LOCKERUNG_TAGE` vor `heute` liegt — ein alter Eintrag ließe sonst einen späteren Rückschritt auf denselben Wert still durch.
+ */
+export const LOCKERUNG_TAGE = 14
+
+export function gelockert(neu, alt, erlaubt = [], heute = new Date()) {
   if (!alt) return []
+  const ab = heute.getTime() - LOCKERUNG_TAGE * 86400000
+  erlaubt = erlaubt.filter((e) => Date.parse(e.datum) >= ab)
   const aus = []
   for (const [profil, seiten] of Object.entries(alt)) {
     if (typeof seiten !== 'object' || !seiten) continue
@@ -80,7 +88,7 @@ export function gelockert(neu, alt) {
       for (const [k, g] of Object.entries(grenzen)) {
         const n = neu?.[profil]?.[seite]?.[k]
         if (n === undefined) aus.push(`${profil}/${seite}/${k}: entfernt (main ${g})`)
-        else if (HOECHSTENS.includes(grundname(k)) ? n > g : n < g) aus.push(`${profil}/${seite}/${k}: ${g} → ${n}`)
+        else if ((HOECHSTENS.includes(grundname(k)) ? n > g : n < g) && !erlaubt.some((e) => e.profil === profil && e.seite === seite && e.grenze === k && e.von === g && e.auf === n)) aus.push(`${profil}/${seite}/${k}: ${g} → ${n}`)
       }
     }
   }

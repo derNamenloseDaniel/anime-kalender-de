@@ -6,6 +6,7 @@ import { useLang } from '../lib/i18n.tsx'
 import { datumKurz } from '../lib/news-text.ts'
 import { todayIso, addDays } from '@shared/time.ts'
 import { KinoKarte } from './kino-karte.tsx'
+import { Tooltip } from './ui.tsx'
 import { kinoFilme } from '../lib/kino-filme.ts'
 import { PatchnotesKnopf } from './PatchnotesKnopf.tsx'
 import { AELTERE_SCHRITT_TAGE } from '../lib/news-gruppen.ts'
@@ -147,9 +148,11 @@ export function NewsView({ data, oeffne }: { data: Dataset; oeffne: (titelId: nu
         <h1 className="text-lg font-semibold text-ak-text">
           {t('news.titel')} <span className="text-xs font-normal text-ak-leise">· {t('news.seit', { datum: datumKurz(grenze) })}</span>
         </h1>
-        <a href={feedUrl('news.xml')} className="ak-tz text-xs text-ak-leise underline-offset-2 hover:underline" title={t('news.rssHint')}>
-          RSS
-        </a>
+        <Tooltip text={t('news.rssHint')} seite="unten">
+          <a href={feedUrl('news.xml')} className="ak-tz text-xs text-ak-leise underline-offset-2 hover:underline">
+            RSS
+          </a>
+        </Tooltip>
       </div>
       <PatchnotesKnopf stand={data.meta.patchnotesStand} />
       <KinoKarussell data={data} oeffne={oeffne} />

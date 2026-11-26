@@ -198,6 +198,7 @@ pipeline/check-cr-teilseiten-bestand-kulisse.ts
 pipeline/check-cr-teilseiten.ts
 pipeline/check-cr-termine-neu.ts
 pipeline/check-cr-us-nein-adresse.ts
+pipeline/check-cr-zaehlung.ts
 pipeline/check-cr-zeit-katalog.ts
 pipeline/check-cr-zeit-woche.ts
 pipeline/check-datei-kennungen.ts
@@ -618,6 +619,7 @@ pipeline/check-saison-deutsch.ts
 pipeline/check-saison-karte-chip.ts
 pipeline/check-saison-termin.ts
 pipeline/check-sammel-erste-folgen.ts
+pipeline/check-sammel-part.ts
 pipeline/check-sammel-titel.ts
 pipeline/check-sammel-unzugeordnet.ts
 pipeline/check-sammelartikel.ts
@@ -751,6 +753,7 @@ pipeline/check-toggo-adresse-stabil.ts
 pipeline/check-toggo-seiten-bestand-lauf.ts
 pipeline/check-toggo-seiten-verdrahtung.ts
 pipeline/check-toggo-seiten.ts
+pipeline/check-tooltip-bedienung.ts
 pipeline/check-tote-adresse-runden.ts
 pipeline/check-tote-adressen-lauf.ts
 pipeline/check-trailer-auswahl.ts
@@ -863,6 +866,7 @@ tools/stumme-pfade.mjs
 tools/suchhinweis-filter.test.ts
 tools/suchhinweis-karten.test.ts
 tools/test-netz-wache.mjs
+tools/title-tooltips.mjs
 tools/uhr-in-tests.mjs
 tools/web-hosting.test.ts
 tools/web-push-voll.test.ts

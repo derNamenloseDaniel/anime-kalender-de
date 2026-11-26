@@ -8,6 +8,7 @@ import { ausgebliebenBis } from './antwort-kasten.tsx'
 import { type Title, type Release, type ReleaseEvent } from '@shared/types.ts'
 import { jpErschienen, KINO_LAND } from './kino.tsx'
 import { addDays } from '@shared/time.ts'
+import { abwurfBereich } from './antwort-davor.ts'
 
 /** Die Antwort für einen Film (aus `berechneAntwort` herausgelöst). */
 export function filmAntwort({ title, releases, today, hatSynchro, raus, gesamt }: {
@@ -123,6 +124,7 @@ export function kuenftigeAntwort({ kuenftig, hatSynchro, title, raus, today, rel
     sendetage: releases.find((r) => r.slug === n.releaseSlug)?.schedule.wochentage,
     /* Komplettabwurf (`available-from`): kein Wochentakt — siehe `antwort-kasten.tsx`. */
     komplett: releases.find((r) => r.slug === n.releaseSlug)?.releaseType !== 'weekly',
+    abwurfFolgen: releases.find((r) => r.slug === n.releaseSlug)?.releaseType !== 'weekly' ? abwurfBereich(releases.find((r) => r.slug === n.releaseSlug)) : undefined,
     sichtung: n.sichtung,
     offenesEnde: Boolean(releases.find((r) => r.slug === n.releaseSlug)?.tvLetzteSichtung),
     verschobenVon: istAusgeblieben(n)

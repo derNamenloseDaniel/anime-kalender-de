@@ -6,6 +6,7 @@ import { anisearchKennungen } from './anisearch-kennung.ts'
 import { VOICES_DIR } from './grundlagen.ts'
 import { sammleSchreibweisen } from './sprecher-namen.ts'
 import { fuehreZusammen, type AnisearchRolle, type Rolle } from './sprecher-zusammen.ts'
+import { ergaenzeWikipediaSprecher } from './sprecher-wikipedia.ts'
 
 /**
  * Bauphase „Sprecher aus aniSearch" (Stufe D der AniList-Ablösung, 11.10.2026): schreibt vor `rolleTermineAus` die
@@ -42,7 +43,10 @@ export interface Messung {
   rollenBehalten: number
 }
 
-const quelleVon = (r: Rolle): Quelle => r.von ?? 'anilist'
+const quelleVon = (r: Rolle): Quelle => {
+  if (r.von === 'wikipedia') throw new Error('Sprecher: Wikipedia-Rolle in der aniSearch-Zählung (liesDateien filtert sie)')
+  return r.von ?? 'anilist'
+}
 
 export function zaehle(dateien: Iterable<Rolle[]>): Zaehlung {
   const z: Zaehlung = { anilist: { titel: 0, rollen: 0 }, ann: { titel: 0, rollen: 0 }, anisearch: { titel: 0, rollen: 0 }, titelGesamt: 0 }
@@ -61,7 +65,8 @@ function liesDateien(): Map<number, VoiceDatei> {
     if (!name.endsWith('.json')) continue
     try {
       const d = JSON.parse(readFileSync(`${VOICES_DIR}/${name}`, 'utf8')) as VoiceDatei
-      aus.set(d.titleId, d)
+      // Wikipedia-Rollen leitet die Phase danach jedes Mal neu ab; hier zählen sie weder als Bestand noch als Verlust.
+      aus.set(d.titleId, { ...d, roles: (d.roles ?? []).filter((r) => r.von !== 'wikipedia') })
     } catch {
       /* Kaputte Datei: der nächste Sprecher-Lauf schreibt sie neu. */
     }
@@ -126,5 +131,5 @@ function schreibeQuellenZaehlung(m: Messung): void {
 export function sprecherRollen({ titles }: { titles: Map<number, Title> }): Set<number> {
   const { messung, mitStimmen } = uebernehmeAnisearchSprecher({ titles })
   schreibeQuellenZaehlung(messung)
-  return mitStimmen
+  return ergaenzeWikipediaSprecher({ titles, mitStimmen }).mitStimmen
 }

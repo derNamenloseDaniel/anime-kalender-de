@@ -1,0 +1,11 @@
+Auftrag handlung-satz-einbinden: fertig, Zweig `feat/handlung-satz-einbinden` gepusht (kein PR angelegt, Auftrag verbietet es).
+- Lader `pipeline/lib/handlung-satz.ts` (Ordner `data/curated/ein-satz-handlung/*.yaml`, fehlend = leer), Bauphase `pipeline/bau/handlung-satz-einbinden.ts` hinter den eigenen Handlungstexten, schreibt `satz` (+ `satzReihe`) in die Synopsen-Gruppe.
+- Prüfung: `check-handlung-satz.ts` (check:logic, Fixture-Ordner mit Doppel und zu langem Satz) und `check-handlung-satz-bestand.ts` (check:bestand: Titel, Satz ≠ Titel, 5-Wort-Nähe gegen ausgelieferte de/en).
+- Basis rot: Test gegen main = ERR_MODULE_NOT_FOUND, Exit 1; mit der Änderung Exit 0.
+- tsc, check:umfang, Mutationsanker, check-workflows, uhr-in-tests, stumme-pfade grün; Vorprüfung grün.
+- Typ-Felder `satz`/`satzReihe` in `SynopsisEintrag` und web `Synopsis`; keine Anzeige.
+- Rückblick gut: `vergleiche`/`istBestanden` aus der Faktenwerkzeug-Nähe ließen sich ohne Umbau wiederverwenden.
+- Rückblick schlecht: Klon flach, `pr-vorpruefung` fand keine Merge-Basis; `git fetch --deepen=1000 origin` löste es.
+- Rückblick unerwartet: `handlung-eigen-einbinden.ts` gibt es schon (Volltexte), „hinter“ im Auftrag als Reihenfolge gelesen; YAML liest `geprueftAm` als Date, der Lader akzeptiert beides; Quellen/Datum werden nicht ausgeliefert.
+- Vorschlag: `tools/handlung-naehe.ts` führt beim Import `main` aus, die Nähe-Funktionen liegen in `handlung-fakten/naehe.ts`; die Bestandsprüfung dort ist nur ein Warnweg, bei Bedarf als Verstoß schärfen.
+- Veraltet: `pr-vorpruefung.mjs`/`bauer.md` sagen nichts zur flachen Cloud-Kopie (Merge-Basis).

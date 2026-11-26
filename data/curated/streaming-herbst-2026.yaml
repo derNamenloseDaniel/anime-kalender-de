@@ -60,6 +60,8 @@
   anilistId: 195604
   titleDe: "Black Clover – Staffel 2"
   platform: crunchyroll
+  # Crunchyroll zählt durch: Katalog `nummer` 171 = `laufend` 1 (Folge 1 der Staffel); Kalender-Folge 174 ist Staffel-Folge 4.
+  crZaehlungAb: 171
   releaseType: weekly
   schedule:
     firstEpisodeDate: "2026-11-07"

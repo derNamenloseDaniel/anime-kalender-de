@@ -198,6 +198,7 @@ pipeline/check-cr-teilseiten-bestand-kulisse.ts
 pipeline/check-cr-teilseiten.ts
 pipeline/check-cr-termine-neu.ts
 pipeline/check-cr-us-nein-adresse.ts
+pipeline/check-cr-zaehlung.ts
 pipeline/check-cr-zeit-katalog.ts
 pipeline/check-cr-zeit-woche.ts
 pipeline/check-datei-kennungen.ts
@@ -617,6 +618,7 @@ pipeline/check-saison-deutsch.ts
 pipeline/check-saison-karte-chip.ts
 pipeline/check-saison-termin.ts
 pipeline/check-sammel-erste-folgen.ts
+pipeline/check-sammel-part.ts
 pipeline/check-sammel-titel.ts
 pipeline/check-sammel-unzugeordnet.ts
 pipeline/check-sammelartikel.ts

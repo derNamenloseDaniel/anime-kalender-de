@@ -10,9 +10,9 @@ import { fehlerLog } from './werte.ts'
  *
  * Fällt der Wecker aus, merkt es `wecker-wache.yml` (GitHub-Cron als zweite, unabhängige Linie) und startet überfällige Läufe selbst.
  */
-const STANDARD_REPO = 'derNamenloseDaniel/anime-kalender-de'
+export const STANDARD_REPO = 'derNamenloseDaniel/anime-kalender-de'
 
-const KOPF = (env: Env) => ({
+export const KOPF = (env: Env) => ({
   Authorization: `Bearer ${env.GITHUB_WECKER_TOKEN}`,
   Accept: 'application/vnd.github+json',
   'User-Agent': 'anime-kalender-wecker',
@@ -20,7 +20,7 @@ const KOPF = (env: Env) => ({
 })
 
 /** Die letzten Läufe dieses Workflows (neuester zuerst); `null`, wenn die API nicht antwortet (der Stunden-Cron startet dann trotzdem, der 5-Minuten-Cron nicht). */
-async function letzteLaeufe(env: Env, repo: string, workflow: string): Promise<LaufStand[] | null> {
+export async function letzteLaeufe(env: Env, repo: string, workflow: string): Promise<LaufStand[] | null> {
   const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/${workflow}/runs?per_page=10`, { headers: KOPF(env) })
   if (!r.ok) return null
   return ((await r.json()) as { workflow_runs?: LaufStand[] }).workflow_runs ?? []

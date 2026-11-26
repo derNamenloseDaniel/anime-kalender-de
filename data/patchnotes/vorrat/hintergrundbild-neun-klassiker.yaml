@@ -1,5 +1,0 @@
-kategorie: bugfix
-text: Hintergrundbilder für neun ältere Serien und Filme
-untertitel: Etwa Regina Regenbogen und Willy Fog
-wartetAuf: "TMDB-Lauf (Plakat/Banner, 30.11.) und Bestandsbau nach PR 5078: neun Handkennungen in data/tmdb-von-hand.yaml. Probe: node tools/maengel.mjs zeigt bei banner höchstens 22 statt 31 offene Titel. Vor der Freigabe die Zahl der neuen Banner zählen; ändert sich nichts, wird der Eintrag gelöscht."
-seit: '2026-11-26'

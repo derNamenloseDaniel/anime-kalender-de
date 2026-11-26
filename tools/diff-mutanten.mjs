@@ -12,8 +12,8 @@
  * Je Datei läuft eine Sonde mit (wirft beim Laden): bleibt sie grün, lädt der Test die Datei nicht → Abbruch, Exit 2, kein „Überlebt“ (19.11.2026).
  * Test je Datei: `<name>.test.(mjs|cjs|ts|tsx)` neben der Datei, sonst `pipeline/check-<name>.ts`; ohne Test keine Läuferfahrt.
  * Mutantenarten: Vergleich getauscht, Grenze ±1, && ↔ ||, ?:-Zweige vertauscht, Zahl 0/1, Aufruf entfernt, Argumente getauscht;
- * feste Klassen (21.11.2026, diff-mutanten-klassen.mjs): Objekt-Eigenschaft entfernt, Parameter-Vorgabe → 0, Zuweisung im Callback
- * entfernt, Parameter am Aufrufort entfernt, throw → if (false).
+ * feste Klassen (diff-mutanten-klassen.mjs, Liste im Skill pruef-technik): Objekt-Eigenschaft entfernt, Parameter-Vorgabe → 0/leer,
+ * Zuweisung im Callback entfernt, Parameter am Aufrufort entfernt, throw → if (false), Anweisung → if (false).
  */
 import { execFileSync, spawnSync } from 'node:child_process'
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'

@@ -6,7 +6,8 @@
     "spracheOffenTrotzMeldung": 0,
     "ereignisOhneNews": 0,
     "terminOhneBeleg": 0,
-    "primeOhneTitelseite": 1
+    "primeOhneTitelseite": 1,
+    "hinweisGegenTermin": 1
   },
   "bekannt": {
     "erschienenOhneTermin": [],
@@ -16,6 +17,9 @@
     "terminOhneBeleg": [],
     "primeOhneTitelseite": [
       "yu-gi-oh-s1-primevideo"
+    ],
+    "hinweisGegenTermin": [
+      "tokyo-revengers-s3-disneyplus|Hinweis nennt samstags, kein Termin liegt darauf"
     ]
   }
 }

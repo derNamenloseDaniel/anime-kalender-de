@@ -10,17 +10,6 @@ X-WR-TIMEZONE:Europe/Berlin
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:auto-20701-primevideo@2026-11-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261119
-DTEND;VALUE=DATE:20261120
-SUMMARY:Wolf Girl & Black Prince (neu bei Prime Video)
-DESCRIPTION:Plattform: Prime Video\nRelease-Art: Katalogtitel\nIm Angebot s
- eit diesem Tag – nicht der Erscheinungstag der deutschen Fassung.\nUhrze
- it noch nicht bestätigt.\nDetails: https://anime-kalender.de/t/7252/
-CATEGORIES:Prime Video
-END:VEVENT
-BEGIN:VEVENT
 UID:devils-crest-primevideo@2026-11-20@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261120
@@ -258,6 +247,17 @@ DESCRIPTION:Plattform: Prime Video\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
   oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
  7554/
+CATEGORIES:Prime Video
+END:VEVENT
+BEGIN:VEVENT
+UID:berserk-1997-part2-primevideo@2026-12-24@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261224
+DTEND;VALUE=DATE:20261225
+SUMMARY:Berserk – Teil 2 (neu bei Prime Video)
+DESCRIPTION:Plattform: Prime Video\nRelease-Art: Katalogtitel\nIm Angebot s
+ eit diesem Tag – nicht der Erscheinungstag der deutschen Fassung.\nUhrze
+ it noch nicht bestätigt.\nDetails: https://anime-kalender.de/t/24/
 CATEGORIES:Prime Video
 END:VEVENT
 BEGIN:VEVENT

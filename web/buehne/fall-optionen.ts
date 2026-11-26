@@ -25,6 +25,7 @@ const DISC_FAELLE: Record<string, { von: string; name: string; optionen: FallOpt
     ['86', '86'],
     ['fernsehtag-detektiv-conan', 'Detektiv Conan'],
     ['one-piece', 'One Piece'],
+    ['last-boss-queen', 'The Most Heretical Last Boss Queen'],
   ].map(([von, name]) => [`${von}-disc`, { von, name: `${name} – Panel auf „Disc“`, optionen: { start: 'disc' } }]),
 )
 

@@ -58,6 +58,8 @@ export const FAELLE = [
   { slug: 'gundam-hathaway', name: 'Mobile Suit Gundam Hathaway (52 Teile, 4 gezeigt)', titel: 105595 },
   /* Prime nur zum Kauf/zur Leihe neben Abo-Weg (Mockup `kalender-wuensche-bereiche`, 23.11.2026): Akira mit Joyn-Abo, Prime und YouTube zum Kauf. */
   { slug: 'akira', name: 'Akira (Film: Joyn im Abo, Prime und YouTube zum Kauf)', titel: 47 },
+  /* Dieselbe Box einmal als aniSearch-Ausgabe, einmal als Termin ohne Artikelbezug (Mockup `disc-bereich-3`, 26.11.2026). */
+  { slug: 'last-boss-queen', name: 'The Most Heretical Last Boss Queen (eine Box, zwei Quellen)', titel: 156040 },
 ]
 
 /**

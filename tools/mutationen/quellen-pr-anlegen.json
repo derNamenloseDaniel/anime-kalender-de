@@ -13,4 +13,4 @@
   {"name":"Merge-Meldung ohne echten Grund","datei":"tools/quellen-pr.sh","suche":"abgelehnt: $MERGE_GRUND — neuer Versuch.","ersetze":"abgelehnt — main hat sich bewegt, neuer Versuch.","tests":["node tools/quellen-pr.test.mjs"]},
   {"name":"Merge-::error:: ohne letzten Grund","datei":"tools/quellen-pr.sh","suche":"zuletzt: $MERGE_GRUND (Ruleset","ersetze":"(Ruleset","tests":["node tools/quellen-pr.test.mjs"]},
   {"name":"5xx-Rot-Zweig ohne Grund","datei":"tools/quellen-pr.sh","suche":"[ \"$serverfehler_nr\" -lt \"${#pausen[@]}\" ] || return 1","ersetze":"[ \"$serverfehler_nr\" -lt \"${#pausen[@]}\" ] || { MERGE_GRUND=\"\"; return 1; }","tests":["node tools/quellen-pr.test.mjs"]},
-  {"name":"leere Zustandsabfrage gilt als gemergt","datei":"tools/quellen-pr.sh","suche":"-q .state 2>/dev/null || true)\" = \"MERGED\" ]","ersetze":"-q .state 2>/dev/null || true)\" != \"OPEN\" ]","tests":["node tools/quellen-pr.test.mjs"]}]
+  {"name":"leere Zustandsabfrage gilt als gemergt","datei":"tools/quellen-pr.sh","suche":"if [ \"$zustand\" = \"MERGED\" ]","ersetze":"if [ \"$zustand\" != \"OPEN\" ]","tests":["node tools/quellen-pr.test.mjs"]}]

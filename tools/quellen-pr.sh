@@ -292,7 +292,7 @@ pause_s() { sleep $(($1 * ${QUELLEN_PAUSE_FAKTOR:-100} / 100)); }
 # Mergt den PR und setzt ZUSTAND (Mergebarkeit nach der letzten Ablehnung); gelingt er, steht `gemerged=true` und das Skript endet. Rückgabe 1 = nicht gemergt.
 # „Base branch was modified": kurze Pause, höchstens 6 Versuche. 5xx: Pausen 15/30/60/120 s (~4 min); ein 502 kann den Merge trotzdem vollzogen haben, darum vor jedem neuen Versuch den Zustand lesen.
 pr_mergen() {
-  local abgelehnt=0 serverfehler_nr=0 ausgabe pausen=(15 30 60 120)
+  local abgelehnt=0 serverfehler_nr=0 zustand ausgabe pausen=(15 30 60 120)
   MERGE_GRUND=""
   while :; do
     if ausgabe="$(gh pr merge "$ZWEIG" --squash --admin --delete-branch --subject "$NACHRICHT" 2>&1)"; then
@@ -307,7 +307,8 @@ pr_mergen() {
       echo "::notice::Merge: GitHub-Serverfehler ($MERGE_GRUND), nächster Versuch nach ${pausen[$serverfehler_nr]} s."
       pause_s "${pausen[$serverfehler_nr]}"
       serverfehler_nr=$((serverfehler_nr + 1))
-      if [ "$(gh pr view "$ZWEIG" --json state -q .state 2>/dev/null || true)" = "MERGED" ]; then
+      zustand="$(gh pr view "$ZWEIG" --json state -q .state 2>/dev/null)" || zustand=""
+      if [ "$zustand" = "MERGED" ]; then
         echo "Pull Request ist trotz Serverfehler gemergt."
         melde "gemerged=true"
         exit 0
@@ -337,7 +338,7 @@ if [ "$ZUSTAND" = "MERGEABLE" ]; then
   #
   # **Mehrere Versuche** (`pr_mergen`): Mit parallelen Sammlern (seit 05.10.2026) bewegt sich `main` oft genau zwischen Mergebarkeits-Prüfung und Merge — GitHub antwortet dann
   # „Base branch was modified. Review and try the merge again." Ein Pull Request, der deshalb offen bliebe, wartete auf den Claude-Lauf (und dessen Kontingent).
-  pr_mergen || true
+  if ! pr_mergen; then echo "::notice::Merge nicht gelungen (Rückgabe 1), Mergebarkeit: $ZUSTAND — Fehlerblock folgt."; fi
   if [ "$ZUSTAND" = "MERGEABLE" ]; then
     # Rot statt Warnung: Ein mergebarer Daten-Pull-Request, der offen bleibt, würde sonst still liegen (claude-daten-merge holt ihn nach).
     echo "::error::Pull Request $NUMMER ist mergebar, der Merge scheiterte (sechs Ablehnungen oder GitHub-Serverfehler über ~4 min), zuletzt: $MERGE_GRUND (Ruleset/Bypass der App prüfen)."

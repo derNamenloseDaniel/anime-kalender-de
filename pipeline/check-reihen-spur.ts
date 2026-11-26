@@ -154,9 +154,11 @@ pruefe('gesperrt: Karte aus', tabKnopf(kartenHtml({ gesperrt: true })).includes(
 pruefe('nicht gesperrt: Karte an', !tabKnopf(kartenHtml({ gesperrt: false })).includes('disabled=""'))
 
 /* „Ohne Synchro“ gilt nur für Erschienenes; ein kommender Teil trägt kein ✕ und ist nicht gedämpft. */
-const ohneSynchro = teil(900004, 'Ohne', { ohneSynchro: true })
+const ohneSynchro = teil(900004, 'Ohne', { ohneSynchro: true, cover: 'https://ak.test/cover/medium/o.jpg' })
 pruefe('erschienen ohne Synchro: Marke', kartenHtml({ offen: false }, ohneSynchro).includes('🇩🇪 ✕'))
-pruefe('erschienen ohne Synchro: gedämpft', kartenHtml({ offen: false }, ohneSynchro).includes('opacity-55'))
+pruefe('erschienen ohne Synchro: Bild gedämpft', /<img[^>]*class="[^"]*opacity-55/.test(kartenHtml({ offen: false }, ohneSynchro)))
+/* Nur das Bild wird blass: eine gedämpfte Hülle zog die Marke darin auf 3,02:1 Kontrast (PR-Aussehen, 26.11.2026). */
+pruefe('erschienen ohne Synchro: Hülle der Marke nicht gedämpft', !/<span[^>]*class="[^"]*aspect-\[2\/3\][^"]*opacity-/.test(kartenHtml({ offen: false }, ohneSynchro)))
 pruefe('kommend ohne Synchro: keine Marke', !kartenHtml({ offen: true }, ohneSynchro).includes('🇩🇪 ✕'))
 pruefe('kommend ohne Synchro: nicht gedämpft', !kartenHtml({ offen: true }, ohneSynchro).includes('opacity-55'))
 pruefe('mit Synchro: weder Marke noch gedämpft', !kartenHtml({}, teil(900005, 'Mit')).includes('🇩🇪 ✕'))

@@ -19,10 +19,11 @@ export function kuenftig(m: Pick<FranchiseMember, 'ohneSynchro' | 'jpStatus' | '
 
 /**
  * Ein Teil ohne belegte deutsche Synchro, der schon erschienen sein sollte: die Karte trägt „🇩🇪 ✕“, der Reiter einen gestrichelten Rand.
- * Ein künftiger oder geplanter Teil ist kein Befund, er trägt „Geplant“ (`SynchroMarke`; Daniel, 10.10.2026).
+ * Ein künftiger oder geplanter Teil ist kein Befund, er trägt „Geplant“ (`SynchroMarke`; Daniel, 10.10.2026). Jahr und Starttermin
+ * messen sich an `today` (ISO-Tag), nie an der Uhr.
  */
-export function ohneDeutscheSynchro(m: Pick<FranchiseMember, 'ohneSynchro' | 'jpStart' | 'jpStatus' | 'jpYear'>, jahr: number): boolean {
-  return Boolean(m.ohneSynchro) && !kuenftig(m, jahr) && !erscheintErst(m)
+export function ohneDeutscheSynchro(m: Pick<FranchiseMember, 'ohneSynchro' | 'jpStart' | 'jpStatus' | 'jpYear'>, today: string): boolean {
+  return Boolean(m.ohneSynchro) && !kuenftig(m, Number(today.slice(0, 4))) && !erscheintErst(m, today)
 }
 
 /**

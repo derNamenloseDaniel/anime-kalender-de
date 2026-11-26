@@ -1,5 +1,7 @@
 import type { Release, ReleaseEvent } from './types.ts'
 import { anzeigeFolge, expandEvents, type StaffelLage } from './logic.ts'
+import { istAusgeblieben } from './termin-zustand.ts'
+import { mediumAus } from './disc-medium.ts'
 
 /** Der früheste künftige Termin, aus dem die Marke am Reiter folgt (Tooltip: „○ = Blu-ray Vol. 2 am 15.01.2027 (≈)“). */
 export interface LageGrund {
@@ -14,14 +16,28 @@ export interface LageGrund {
 
 export type LageMitGrund = { lage: StaffelLage; grund?: LageGrund }
 
-/** Der früheste Termin ab `today` unter `ereignisse` (Release, Ereignis) als Grund; ohne Termin `undefined`. */
+/** Der früheste Termin ab `today` unter `ereignisse` (Release, Ereignis) als Grund; ein ausgebliebener zählt nicht. Ohne Termin `undefined`. */
 export function fruehesterTermin(ereignisse: { r: Release; e: ReleaseEvent }[], today: string): LageGrund | undefined {
-  const [erster] = ereignisse.filter(({ e }) => e.date >= today).sort((a, b) => a.e.date.localeCompare(b.e.date))
+  const [erster] = ereignisse.filter(({ e }) => e.date >= today && !istAusgeblieben(e)).sort((a, b) => a.e.date.localeCompare(b.e.date))
   if (!erster) return undefined
   const { r, e } = erster
-  const teil = /(Vol\.\s*\d+|Box\s*\d+)/i.exec(r.name)?.[1]
-  const disc = e.platform === 'disc' ? [r.edition ?? 'Disc', teil].filter(Boolean).join(' ') : undefined
+  const disc = e.platform === 'disc' ? discKurz(r) : undefined
   return { date: e.date, episode: e.episode, platform: e.platform, sender: e.sender, estimated: Boolean(e.estimated), disc }
+}
+
+const ART = /\b(Gesamtausgabe|Komplettbox|Staffelbox|Complete Box|Filmbox|Trilogie)/i
+const TEIL = /\b((?:Vol\.|Box)\s*\d+)/i
+
+/**
+ * Die Disc kurz: Medium, Art und Teil („Blu-ray Vol. 2“, „DVD + BD Box 1“, „Blu-ray Gesamtausgabe“), nie die ganze Editionsangabe
+ * (die nennt dieselbe Ausgabe oft zweimal). Ohne Edition zählt die übernommene Schlagzeile in `herkunft`; ohne jede Angabe „Disc“.
+ */
+export function discKurz(r: Pick<Release, 'name' | 'edition' | 'herkunft'>): string {
+  const schlagzeile = /„([^“"]+)/.exec(r.herkunft ?? '')?.[1]
+  const angabe = r.edition ?? schlagzeile ?? ''
+  const art = ART.exec(angabe)?.[1]
+  const teil = TEIL.exec(r.name)?.[1] ?? TEIL.exec(angabe)?.[1]
+  return [mediumAus(angabe), art && art[0]!.toUpperCase() + art.slice(1), teil].filter(Boolean).join(' ') || 'Disc'
 }
 
 /**

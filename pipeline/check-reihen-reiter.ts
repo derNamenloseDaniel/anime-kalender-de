@@ -35,7 +35,9 @@ const fall = faelle['pokemon-horizonte']!
 const titel = fall['titles.json'] as Title[]
 const teile = (fall['franchises.json'] as Record<string, FranchiseMember[]>)['483']!
 const offen = (id: number) => titel.find((t) => t.id === id)!
-const reiter = (id: number) => reihenReiterVon(offen(id), teile, 'Pokémon', titel, gruppenVon(teile, 'Pokémon'))
+/* Fester Tag statt Uhr: ob ein Teil ohne Synchro schon erschienen ist (Wild Card 2027 geplant), misst sich an ihm. */
+const HEUTE = '2026-11-26'
+const reiter = (id: number) => reihenReiterVon(offen(id), teile, 'Pokémon', titel, gruppenVon(teile, 'Pokémon'), HEUTE)
 
 /* Liste: Horizonte ist seit der Zusammenlegung (PR 4906/4920) ein Titel mit Staffel-Abschnitten, Reiter seiner Gruppe „Eigene Serien“;
    Hauptserie 12 Einträge mit Bereichen. */
@@ -49,19 +51,19 @@ pruefe('Name am Reiter ist der Titel der Daten', reiter(14839)[4]!.name === 'Pok
 const staffel = (id: number, nr: number, bis: number) =>
   ({ ...offen(14839), id, titleDe: `Horizonte Staffel ${nr}`, staffelTitel: { sammel: 14839, nr, ab: 1 }, streams: [{ platform: 'netflix', url: 'https://x.invalid', dub: true, teilBereich: { von: 1, bis } }] }) as Title
 const [st2, st1] = [staffel(990102, 2, 89), staffel(990101, 1, 45)]
-pruefe('zwei Staffeln sind schon Reiter, Folge nach Nummer', reihenReiterVon(st2, teile, 'Pokémon', [st2, st1], []).map((r) => `${r.id}:${r.label}`).join() === '990101:1,990102:2')
-pruefe('eine Staffel allein: keine Reiter', reihenReiterVon(st2, teile, 'Pokémon', [st2], []).length === 0)
+pruefe('zwei Staffeln sind schon Reiter, Folge nach Nummer', reihenReiterVon(st2, teile, 'Pokémon', [st2, st1], [], HEUTE).map((r) => `${r.id}:${r.label}`).join() === '990101:1,990102:2')
+pruefe('eine Staffel allein: keine Reiter', reihenReiterVon(st2, teile, 'Pokémon', [st2], [], HEUTE).length === 0)
 /* Teilstaffeln am Reiter kurz (Daniel, 26.11.2026): „Staffel 3 - Teil 1“ → „3.1“, Spannen und Einzelstaffeln wie bisher. */
 pruefe('Reiter-Kurzform: Teilstaffel 3.1 und 3.2, Staffel 3, Spanne 1–5, Teil ohne Staffelnummer', [reiterKurzform('Staffel 3 - Teil 1'), reiterKurzform('Staffel 3 - Teil 2'), reiterKurzform('Staffel 3'), reiterKurzform('Staffel 1–5'), reiterKurzform('Teil 1'), reiterKurzform('Staffel 12 - Teil 10')].join('|') === '3.1|3.2|3|1–5|Teil 1|12.10')
 const teilGlied = (id: number, name: string, jpYear: number) => ({ id, name, format: 'TV', jpYear, episodes: 12, jpStatus: 'FINISHED' }) as FranchiseMember
 const teilStaffeln = [teilGlied(900901, 'Reihe', 2020), teilGlied(900902, 'Reihe Staffel 2', 2021), teilGlied(900903, 'Reihe Staffel 3 Teil 1', 2022), teilGlied(900904, 'Reihe Staffel 3 Teil 2', 2023)]
-pruefe('Hauptserie mit Teilstaffeln: Reiter 1, 2, 3.1, 3.2, der Name bleibt lang', JSON.stringify(reihenReiterVon({ id: 900901 } as Title, teilStaffeln, 'Reihe', [], []).map((r) => [r.label, r.name])) === '[["1","Reihe"],["2","Reihe Staffel 2"],["3.1","Reihe Staffel 3 Teil 1"],["3.2","Reihe Staffel 3 Teil 2"]]')
+pruefe('Hauptserie mit Teilstaffeln: Reiter 1, 2, 3.1, 3.2, der Name bleibt lang', JSON.stringify(reihenReiterVon({ id: 900901 } as Title, teilStaffeln, 'Reihe', [], [], HEUTE).map((r) => [r.label, r.name])) === '[["1","Reihe"],["2","Reihe Staffel 2"],["3.1","Reihe Staffel 3 Teil 1"],["3.2","Reihe Staffel 3 Teil 2"]]')
 pruefe('Reiter-Kurzform: nur am Ende, mit Zusatz bleibt es', reiterKurzform('Staffel 3 - Teil 1 Zusatz') === '3 - Teil 1 Zusatz')
 /* Reiter ohne Synchro (26.11.2026): auch Hauptstaffeln und Sammeltitel-Staffeln tragen das Flag, erschienen vorausgesetzt. */
 const ohneSt = { ...st2, ohneSynchro: true, jpStatus: 'FINISHED' } as Title
-pruefe('Sammeltitel-Staffel ohne Synchro: Reiter trägt ohneSynchro, die andere nicht', reihenReiterVon(ohneSt, teile, 'Pokémon', [ohneSt, st1], []).map((r) => `${r.id}:${r.ohneSynchro}`).join() === '990101:false,990102:true')
+pruefe('Sammeltitel-Staffel ohne Synchro: Reiter trägt ohneSynchro, die andere nicht', reihenReiterVon(ohneSt, teile, 'Pokémon', [ohneSt, st1], [], HEUTE).map((r) => `${r.id}:${r.ohneSynchro}`).join() === '990101:false,990102:true')
 const teileOhne = teile.map((m) => (m.id === 1349 ? { ...m, ohneSynchro: true, jpStatus: 'FINISHED' } : m)) as FranchiseMember[]
-pruefe('Hauptserie: Staffel ohne Synchro trägt ohneSynchro, alle anderen nicht', reihenReiterVon(offen(483), teileOhne, 'Pokémon', titel, gruppenVon(teileOhne, 'Pokémon')).filter((r) => r.ohneSynchro).map((r) => r.id).join() === '1349')
+pruefe('Hauptserie: Staffel ohne Synchro trägt ohneSynchro, alle anderen nicht', reihenReiterVon(offen(483), teileOhne, 'Pokémon', titel, gruppenVon(teileOhne, 'Pokémon'), HEUTE).filter((r) => r.ohneSynchro).map((r) => r.id).join() === '1349')
 /* Nachtrag Daniel 24.11.2026 20:21/20:24: Reiter je Kategorie der Reihe, Filme mit laufender Nummer (Mewtu gegen Mew = 1 …). */
 const filme = reiter(5726)
 pruefe('Film: Reiter der Filme 1..n in Reihenfolge der Reihenliste', filme.map((r) => r.label).join() === filme.map((_, i) => i + 1).join() && filme.slice(0, 4).map((r) => r.id).join() === '484,981,982,983', filme.map((r) => [r.id, r.label]))
@@ -71,12 +73,12 @@ pruefe('Film: Toho Cinemas (ohne Synchro, erschienen) hat einen Reiter mit ohneS
 pruefe('Film: genau ein Film mit Synchro-Flag ist nicht ohneSynchro, der geöffnete Mewtu-Film', filme.find((r) => r.id === 484)?.ohneSynchro === false)
 pruefe('Hauptserie zeigt nur Hauptserie, kein Film', reiter(483).every((r) => teile.find((m) => m.id === r.id)?.format === 'TV' && r.staffel), reiter(483))
 pruefe('Special: Reiter der Specials, Film nicht darunter', reiter(1315).length > 1 && reiter(1315).every((r) => !r.staffel && teile.find((m) => m.id === r.id)?.format !== 'MOVIE'), reiter(1315).length)
-pruefe('Film ohne Gruppen (Reihe noch nicht geordnet): keine Reiter', reihenReiterVon(offen(5726), teile, 'Pokémon', titel, []).length === 0)
-pruefe('ohne Reihe: keine Reiter', reihenReiterVon(offen(10852), [], 'Pokémon', titel, []).length === 0)
+pruefe('Film ohne Gruppen (Reihe noch nicht geordnet): keine Reiter', reihenReiterVon(offen(5726), teile, 'Pokémon', titel, [], HEUTE).length === 0)
+pruefe('ohne Reihe: keine Reiter', reihenReiterVon(offen(10852), [], 'Pokémon', titel, [], HEUTE).length === 0)
 const aot = faelle['attack-on-titan']!
 const aotTitel = aot['titles.json'] as Title[]
 const aotTeile = Object.values(aot['franchises.json'] as Record<string, FranchiseMember[]>)[0]!
-const aotReiter = (id: number) => reihenReiterVon(aotTitel.find((t) => t.id === id)!, aotTeile, 'Attack on Titan', aotTitel, gruppenVon(aotTeile, 'Attack on Titan'))
+const aotReiter = (id: number) => reihenReiterVon(aotTitel.find((t) => t.id === id)!, aotTeile, 'Attack on Titan', aotTitel, gruppenVon(aotTeile, 'Attack on Titan'), HEUTE)
 pruefe('Attack on Titan: ohne Junior High', JSON.stringify(aotReiter(6282).map((r) => [r.id, r.label])) === '[[6282,"1"],[7496,"2"],[8669,"3.1"],[10088,"3.2"]]', aotReiter(6282))
 pruefe('Attack on Titan: Final Season ohne Beschriftung öffnet ohne Reiter', aotReiter(10659).length === 0)
 /* Eine Staffel in zwei Teilen (Sakamoto Days ohne den Eintrag 2027): Beschriftung „Teil 1/2“, aber kein Staffelstand. Brach die Bühne (disc-bereich-2). */
@@ -85,7 +87,7 @@ const skTitel = sk['titles.json'] as Title[]
 const skTeile = (sk['franchises.json'] as Record<string, FranchiseMember[]>)['15940']!.filter((m) => m.id !== 17244)
 let skReiter: unknown
 try {
-  skReiter = reihenReiterVon(skTitel.find((t) => t.id === 15940)!, skTeile, 'Sakamoto Days', skTitel, gruppenVon(skTeile, 'Sakamoto Days')).map((r) => [r.id, r.label])
+  skReiter = reihenReiterVon(skTitel.find((t) => t.id === 15940)!, skTeile, 'Sakamoto Days', skTitel, gruppenVon(skTeile, 'Sakamoto Days'), HEUTE).map((r) => [r.id, r.label])
 } catch (fehler) {
   skReiter = String(fehler)
 }
@@ -117,7 +119,7 @@ for (const [name, f] of Object.entries(faelle)) {
     for (const reihe of [[], reihen[t.franchiseId ?? t.id] ?? []]) {
       try {
         const [rTeile, rName] = [reihenTeileVon(t, reihe, daten), reihenNameVon(t, reihe, daten)]
-        const liste = reihenReiterVon(t, rTeile, rName, alle, gruppenVon(rTeile, rName))
+        const liste = reihenReiterVon(t, rTeile, rName, alle, gruppenVon(rTeile, rName), HEUTE)
         for (const r of liste) reihenLageVon(daten.titleById.get(r.id) ?? t, [], '2026-11-24')
         klasseNachtrag(`${name}/${t.id}`, liste, rTeile, rName)
         gerechnet++

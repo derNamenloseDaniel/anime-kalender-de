@@ -45,3 +45,32 @@ export function bestandUrteil(faelle: StaffelOhneSeite[], bekannt: ReadonlyMap<s
   ]
   return { rot: neu.length > 0 || erledigt.length > 0, meldungen }
 }
+
+/**
+ * **Zusammengelegte Staffeln mit eigener Ankündigung** (Daniel, F157, 24.11.2026: „jede Staffel ist ein eigener Titel“): Ein Titel mit
+ * belegten Staffelgrenzen, aber ohne `basis` (Ein-Titel-Form), führt jede Staffel nur als Abschnitt. Ein Release, dessen erste Folge in
+ * einer späteren Staffel liegt und die noch kommt (Termin ab heute) oder läuft (`offen`), hat dann keine eigene Seite. Die Folgenzahl des
+ * Titels ist hier nicht nötig: Die Grenzen der Yaml sagen, wo die Staffel beginnt.
+ */
+export type StaffelGrenzeKurz = { anilistId: number; titel?: string; basis?: number; staffeln: { nr: number; von: number; offen?: true }[] }
+
+export function zusammengelegteStaffeln(
+  grenzen: StaffelGrenzeKurz[],
+  titles: Pick<Title, 'id' | 'titleEn' | 'titleDe'>[],
+  releases: Pick<Release, 'slug' | 'titleId' | 'schedule' | 'widerlegt'>[],
+  heute: string,
+): StaffelOhneSeite[] {
+  const jeId = new Map(titles.map((t) => [t.id, t]))
+  return grenzen.flatMap((g) => {
+    if (g.basis !== undefined || g.staffeln.length < 2) return []
+    const t = jeId.get(g.anilistId)
+    return releases.flatMap((r): StaffelOhneSeite[] => {
+      const ab = r.schedule?.firstEpisodeNumber
+      const am = r.schedule?.firstEpisodeDate
+      if (r.titleId !== g.anilistId || r.widerlegt || ab === undefined || am === undefined) return []
+      const s = [...g.staffeln].reverse().find((x) => ab >= x.von)
+      if (!s || s.nr === g.staffeln[0]!.nr || (am < heute && !s.offen)) return []
+      return [{ slug: r.slug, titleId: g.anilistId, titel: t?.titleEn ?? t?.titleDe ?? g.titel ?? String(g.anilistId), ab, am }]
+    })
+  })
+}

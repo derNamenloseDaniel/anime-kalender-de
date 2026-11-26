@@ -12,13 +12,14 @@
 import { readFileSync } from 'node:fs'
 import type { Release, Title } from '../shared/types.ts'
 import { todayIso } from '../shared/time.ts'
-import { abweichungVonBekannt, bestandUrteil, staffelnOhneSeite } from './lib/staffel-ohne-seite.ts'
+import { abweichungVonBekannt, bestandUrteil, staffelnOhneSeite, zusammengelegteStaffeln } from './lib/staffel-ohne-seite.ts'
 import { melde } from './lib/quarantaene.ts'
 import { ladeStaffelGrenzen } from './lib/pokemon-staffeln.ts'
 
-/** Release-Slug → Grund. Cartoons kommen aus `cartoons.json` und haben noch keine Staffelgrenzen-Yaml. */
+/** Release-Slug → Grund. Cartoons kommen aus `cartoons.json` und haben noch keine Staffelgrenzen-Yaml; Titel mit Grenzen ohne `basis` meldet `zusammengelegteStaffeln`. */
 const BEKANNT: ReadonlyMap<string, string> = new Map([
   ['the-mighty-nein-s2-primevideo', 'Cartoon (TMDB -219080): Staffel-Schnitt für Cartoons fehlt, Staffel 2 hängt an der Seite von Staffel 1 (Auftrag offen, 24.11.2026)'],
+  ['pokemon-horizonte-s4-rtlplus', 'Horizonte Staffel 4 ist noch Abschnitt von 158871: `basis` und `kennung` in horizonte-staffeln.yaml brauchen einen Bestandsbau (Cloud kann nicht bauen, 26.11.2026)'],
 ])
 
 const lies = <T>(datei: string, schluessel: string): T[] => {
@@ -32,7 +33,11 @@ if (!titel.length || !releases.length) {
   console.error(`FEHLER: ${titel.length} Titel, ${releases.length} Releases gelesen`)
   process.exit(1)
 }
-const faelle = staffelnOhneSeite(titel, releases, todayIso(), new Set(ladeStaffelGrenzen().map((g) => g.anilistId)))
+const grenzen = ladeStaffelGrenzen()
+const faelle = [
+  ...staffelnOhneSeite(titel, releases, todayIso(), new Set(grenzen.map((g) => g.anilistId))),
+  ...zusammengelegteStaffeln(grenzen, titel, releases, todayIso()),
+]
 const { rot, meldungen } = bestandUrteil(faelle, BEKANNT)
 for (const m of meldungen) console.error(m)
 // Titelmarke: der Bestandsbau stellt nur die betroffenen Titel zurück statt den ganzen Bau zu sperren.

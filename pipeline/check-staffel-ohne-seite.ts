@@ -3,7 +3,7 @@
  * `check-staffel-ohne-seite-bestand.ts`. Anlass: The Mighty Nein Staffel 2 (24.11.2026).
  * Aufruf: npx tsx pipeline/check-staffel-ohne-seite.ts
  */
-import { abweichungVonBekannt, bestandUrteil, staffelnOhneSeite } from './lib/staffel-ohne-seite.ts'
+import { abweichungVonBekannt, bestandUrteil, staffelnOhneSeite, zusammengelegteStaffeln, type StaffelGrenzeKurz } from './lib/staffel-ohne-seite.ts'
 
 let fehler = 0
 function pruefe(name: string, ist: unknown, soll: unknown): void {
@@ -37,6 +37,21 @@ const mitStaffeln = [{ id: -900009, titleEn: 'Theta', episodes: 16, staffeln: [{
 pruefe('Folgenzahl 16 aus Staffeln 8+8: Release ab Folge 9 ist ein Fund (Blindheit 25.11.2026)', staffelnOhneSeite(mitStaffeln, [rel('t2', -900009, 9, '2027-03-24')], heute).map((f) => f.slug), ['t2'])
 pruefe('alter Stand (eine Staffel, 8 Folgen): Release ab Folge 9 ist ebenfalls ein Fund', staffelnOhneSeite(mitStaffeln, [rel('i2', -900010, 9, '2027-03-24')], heute).map((f) => f.slug), ['i2'])
 pruefe('Staffel 1 mit 16 Folgen: Release ab Folge 9 ist kein Fund, ab Folge 17 schon', staffelnOhneSeite(mitStaffeln, [rel('k1', -900011, 9, '2027-03-24'), rel('k2', -900011, 17, '2027-03-24')], heute).map((f) => f.slug), ['k2'])
+
+/* Zusammengelegte Staffeln (Ein-Titel-Form, ohne `basis`): jede spätere Staffel mit eigener Ankündigung ist ein Fund (F157, 26.11.2026). */
+const hz: StaffelGrenzeKurz = { anilistId: -900020, titel: 'Omega', staffeln: [{ nr: 1, von: 1 }, { nr: 2, von: 46 }, { nr: 3, von: 90 }, { nr: 4, von: 137, offen: true }] }
+const omega = [{ id: -900020, titleEn: 'Omega', episodes: undefined }]
+const slugs = (g: StaffelGrenzeKurz[], r: never[]) => zusammengelegteStaffeln(g, omega, r, heute).map((f) => f.slug)
+pruefe('zusammengelegt: laufende offene Staffel 4 (Termin vergangen) ist ein Fund', slugs([hz], [rel('s4', -900020, 137, '2026-11-20')]), ['s4'])
+pruefe('zusammengelegt: künftiger Termin in abgeschlossener Staffel 2 ist ein Fund', slugs([hz], [rel('s2', -900020, 46, '2027-01-01')]), ['s2'])
+pruefe('zusammengelegt: vergangener Termin in abgeschlossener Staffel: kein Fund', slugs([hz], [rel('alt', -900020, 50, '2026-01-01')]), [])
+pruefe('zusammengelegt: Termin der ersten Staffel (auch ab Folge 45): kein Fund', slugs([hz], [rel('e', -900020, 45, '2027-01-01'), rel('e1', -900020, 1, '2027-01-01')]), [])
+pruefe('zusammengelegt: Folge 136 gehört zu Staffel 3, 137 zu Staffel 4', slugs([hz], [rel('a', -900020, 136, '2027-01-01'), rel('b', -900020, 137, '2027-01-01')]), ['a', 'b'])
+pruefe('zusammengelegt: mit `basis` ist jede Staffel ein eigener Titel, kein Fund', slugs([{ ...hz, basis: 4 }], [rel('s4', -900020, 137, '2026-11-20')]), [])
+pruefe('zusammengelegt: eine einzige Staffel: kein Fund', slugs([{ ...hz, staffeln: [{ nr: 1, von: 1 }] }], [rel('x', -900020, 50, '2027-01-01')]), [])
+pruefe('zusammengelegt: widerlegt oder ohne Folgennummer: kein Fund', slugs([hz], [rel('w', -900020, 137, '2027-01-01', { widerlegt: { am: '2026-11-20', grund: 'x', gemeldet: true } }), rel('n', -900020, undefined, '2027-01-01')]), [])
+pruefe('zusammengelegt: Release eines anderen Titels: kein Fund', slugs([hz], [rel('f', -900021, 137, '2027-01-01')]), [])
+pruefe('zusammengelegt: Titel unbekannt, Name aus der Yaml', zusammengelegteStaffeln([hz], [], [rel('s4', -900020, 137, '2027-01-01')], heute)[0]!.titel, 'Omega')
 
 const klein = [{ id: -900006, titleEn: undefined, titleDe: undefined, episodes: 1 }, { id: -900007, titleEn: undefined, titleDe: 'Zeta', episodes: 0 }, { id: -900008, titleEn: 'Eta', titleDe: 'Zeta', episodes: 1 }]
 pruefe('erste Folge 2 hinter 1 Folge: Fund; Name fällt auf Kennung zurück', staffelnOhneSeite(klein, [rel('k', -900006, 2, '2027-01-01')], heute).map((f) => f.titel), ['-900006'])

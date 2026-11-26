@@ -602,6 +602,16 @@ DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
 CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GDKHZEP21@2026-11-26@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261126T170000Z
+DTEND:20261126T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 5/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
+ etails: https://anime-kalender.de/t/17631/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:yaiba-samurai-legend-prosieben-maxx@2026-11-26@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261126T172500Z
@@ -635,18 +645,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GDKHZEP21@2026-11-26@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261126T180000Z
-DTEND:20261126T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 5/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:auto-112153-tv-toggo-plus@2026-11-26@anime-kalender-de
@@ -966,6 +964,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GDKHZEP21@2026-12-03@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261203T170000Z
+DTEND:20261203T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 6/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7631/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:yaiba-samurai-legend-prosieben-maxx@2026-12-03@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261203T172500Z
@@ -999,18 +1009,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GDKHZEP21@2026-12-03@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261203T180000Z
-DTEND:20261203T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 6/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:auto-133845-primevideo@2026-12-03@anime-kalender-de
@@ -1346,6 +1344,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GDKHZEP21@2026-12-10@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261210T170000Z
+DTEND:20261210T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 7/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7631/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:yaiba-samurai-legend-prosieben-maxx@2026-12-10@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261210T172500Z
@@ -1379,18 +1389,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GDKHZEP21@2026-12-10@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261210T180000Z
-DTEND:20261210T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 7/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:auto-1313-disc@2026-12-10@anime-kalender-de
@@ -1538,6 +1536,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GDKHZEP21@2026-12-17@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261217T170000Z
+DTEND:20261217T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 8/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7631/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2026-12-17@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261217T175000Z
@@ -1548,18 +1558,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GDKHZEP21@2026-12-17@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261217T180000Z
-DTEND:20261217T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 8/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2026-12-18@anime-kalender-de
@@ -1758,6 +1756,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GDKHZEP21@2026-12-24@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261224T170000Z
+DTEND:20261224T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 9/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7631/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2026-12-24@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261224T175000Z
@@ -1768,18 +1778,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GDKHZEP21@2026-12-24@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261224T180000Z
-DTEND:20261224T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 9/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:auto-1638-primevideo@2026-12-24@anime-kalender-de
@@ -1903,6 +1901,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GDKHZEP21@2026-12-31@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261231T170000Z
+DTEND:20261231T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 10/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7631/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2026-12-31@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261231T175000Z
@@ -1913,18 +1923,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GDKHZEP21@2026-12-31@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261231T180000Z
-DTEND:20261231T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 10/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2027-01-01@anime-kalender-de
@@ -2037,6 +2035,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GDKHZEP21@2027-01-07@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20270107T170000Z
+DTEND:20270107T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 11/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7631/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2027-01-07@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20270107T175000Z
@@ -2047,18 +2057,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GDKHZEP21@2027-01-07@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20270107T180000Z
-DTEND:20270107T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 11/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2027-01-08@anime-kalender-de
@@ -2146,6 +2144,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GDKHZEP21@2027-01-14@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20270114T170000Z
+DTEND:20270114T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 12/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7631/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2027-01-14@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20270114T175000Z
@@ -2156,18 +2166,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GDKHZEP21@2027-01-14@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20270114T180000Z
-DTEND:20270114T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 12/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2027-01-15@anime-kalender-de

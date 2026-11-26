@@ -39,7 +39,7 @@ export function berechneBlasenPosition(a: DOMRect, b: DOMRect, seite: 'oben' | '
 export function useBlasenPosition(
   offen: boolean,
   seite: 'oben' | 'unten',
-  anker: RefObject<HTMLSpanElement | null>,
+  anker: RefObject<HTMLElement | null>,
   blase: RefObject<HTMLSpanElement | null>,
 ) {
   const [pos, setPos] = useState<{ left: number; top: number }>()

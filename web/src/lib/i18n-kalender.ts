@@ -18,7 +18,6 @@ export const TEXTE_KALENDER = {
   // Neuverfilmung einer Serie der Reihe samt ihren Fortsetzungen; zählt für sich (Yaiba 2025).
   'detail.gruppeNeuverfilmung': 'Neuverfilmung',
   // Original noch nicht erschienen (Reihenliste, Datenbankkarte).
-  // Kurzfassung am Schalter der Reihenliste (einzeilige Kopfzeile); der volle Satz steht in `detail.reiheOhneSchalter` als Tooltip.
   'kopf.startseite': 'Anime-Kalender DE — zur aktuellen Woche',
   'kopf.suche': 'Anime suchen',
   'kopf.sucheOeffnen': 'Suche öffnen',

@@ -1,6 +1,6 @@
 import { bereicheKurz } from '@shared/dub-grenze.ts'
 import { translate } from '../../lib/i18n.tsx'
-import { staffelLage, type StaffelLage } from '@shared/logic.ts'
+import { staffelLageMitGrund, type LageGrund, type StaffelLage } from '@shared/logic.ts'
 import { staffelTeile } from '@shared/staffel-folge.ts'
 import type { Release } from '@shared/types.ts'
 import type { StaffelAbschnitt } from './folgen-staffeln.ts'
@@ -10,6 +10,8 @@ export interface Reiter {
   nr: number
   label: string
   lage: StaffelLage
+  /** Der Termin, der die Marke auslöst (Tooltip). */
+  grund?: LageGrund
   name?: string
   /** Ungekürzter Name aus `sn` für den Tooltip; die Kurzform `name` steht in der Box. */
   voll?: string
@@ -36,7 +38,7 @@ export function kurzeStaffelNamen(sn: Record<string, string> | undefined): Map<n
 export function reiterVon(abschnitte: StaffelAbschnitt[], releases: Release[], today: string, sn?: Record<string, string>): Reiter[] {
   if (abschnitte.length < 2) return []
   const namen = kurzeStaffelNamen(sn)
-  return abschnitte.map((a) => ({ nr: a.nr, label: String(a.nr), lage: staffelLage(a.von, a.offen ? undefined : a.bis, a.deutsch > 0, releases, today), name: namen.get(a.nr), voll: sn?.[String(a.nr)] }))
+  return abschnitte.map((a) => ({ nr: a.nr, label: String(a.nr), ...staffelLageMitGrund(a.von, a.offen ? undefined : a.bis, a.deutsch > 0, releases, today), name: namen.get(a.nr), voll: sn?.[String(a.nr)] }))
 }
 
 /** Ohne Wahl des Besuchers: die laufende Staffel, sonst die letzte mit deutscher Folge, sonst die erste. */

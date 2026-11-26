@@ -1,7 +1,11 @@
 import { useEffect, useRef, type KeyboardEvent } from 'react'
-import type { StaffelLage } from '@shared/logic.ts'
+import type { LageGrund, LageMitGrund, StaffelLage } from '@shared/logic.ts'
+import { formatDate } from '@shared/time.ts'
+import { anbieterName } from '@shared/types.ts'
+import { useLang, type Translate } from '../../lib/i18n.tsx'
 import type { Reiter } from './staffel-reiter-liste.ts'
 import { ReiterPfeil, rolleUm, usePfeilLage } from './staffel-pfeile.tsx'
+import { useReiterBlase } from './reiter-blase.tsx'
 
 /** Farbe der Abschnittsbox; der gewählte Reiter trägt sie auch und geht so ohne Kante in die Box über. */
 export const ABSCHNITT_FARBE = 'border-ak-rand bg-ak-flaeche'
@@ -36,6 +40,28 @@ export function zeigeGewaehlten(zeile: HTMLElement | null, reiter: HTMLElement |
 
 export const LAGE_WORT: Record<StaffelLage, string> = { laeuft: ', läuft', kommt: ', kommt', ruht: '' }
 
+/** Was kommt: „Blu-ray Vol. 2“, „Folge 1 bei Crunchyroll“ oder nur der Anbieter. */
+function terminWas(g: LageGrund, t: Translate): string {
+  if (g.disc) return g.disc
+  const anbieter = anbieterName(g.platform, g.sender)
+  return g.episode ? t('detail.reiterFolge', { n: g.episode, anbieter }) : anbieter
+}
+
+/** Die Zeile zur Marke: „● = läuft, Folge 6 bei Crunchyroll am 27.11.2026“, „○ = Blu-ray Vol. 2 am 15.01.2027 (≈)“; ohne Marke leer. */
+export function lageZeile(m: LageMitGrund, t: Translate): string {
+  if (m.lage === 'ruht') return ''
+  const g = m.grund
+  const datum = g ? `${formatDate(g.date)}${g.estimated ? ' (≈)' : ''}` : ''
+  const was = g ? terminWas(g, t) : ''
+  if (m.lage === 'laeuft') return g ? t('detail.reiterLaeuftTermin', { was, datum }) : t('detail.reiterLaeuft')
+  return g ? t('detail.reiterKommtTermin', { was, datum }) : t('detail.reiterKommt')
+}
+
+/** Tooltip eines Reiters: der Titel, darunter die Zeile zur Marke und bei gestricheltem Rand „gestrichelt = …“. */
+export function reiterTitel(titel: string, lage: LageMitGrund, t: Translate, ohneSynchro = false): string {
+  return [titel, lageZeile(lage, t), ohneSynchro ? t('detail.reiterOhneSynchro') : ''].filter(Boolean).join('\n')
+}
+
 /** Pfeiltasten, Pos1 und Ende wählen den Nachbarn bzw. ersten/letzten Reiter (Muster „Tabs“ mit sofortiger Wahl). */
 export function naechsterReiter(taste: string, aktiv: number, anzahl: number): number | undefined {
   if (taste === 'ArrowRight') return (aktiv + 1) % anzahl
@@ -50,10 +76,12 @@ export function naechsterReiter(taste: string, aktiv: number, anzahl: number): n
  * Reiter. Ein Reiter wählt nur den Abschnitt, er wechselt nie den Titel. `kennung` macht die Ids je Titel eindeutig.
  */
 export function ReiterZeile({ reiter, aktiv, kennung, beiWahl }: { reiter: Reiter[]; aktiv: number; kennung: string; beiWahl: (i: number) => void }) {
+  const { t } = useLang()
   const zeile = useRef<HTMLDivElement>(null)
   const gewaehlterReiter = useRef<HTMLButtonElement>(null)
   useEffect(() => zeigeGewaehlten(zeile.current, gewaehlterReiter.current), [aktiv])
   const lage = usePfeilLage(zeile, reiter.length)
+  const blase = useReiterBlase((i) => (reiter[i] ? reiterTitel(reiter[i].voll ?? `Staffel ${reiter[i].label}`, reiter[i], t) : ''))
   const taste = (e: KeyboardEvent<HTMLDivElement>) => {
     const ziel = naechsterReiter(e.key, aktiv, reiter.length)
     if (ziel === undefined) return
@@ -77,7 +105,7 @@ export function ReiterZeile({ reiter, aktiv, kennung, beiWahl }: { reiter: Reite
               aria-controls={`${kennung}-abschnitt`}
               tabIndex={gewaehlt ? 0 : -1}
               aria-label={`Staffel ${r.label}${r.name ? `: ${r.name}` : ''}${LAGE_WORT[r.lage]}`}
-              title={r.voll ?? `Staffel ${r.label}`}
+              {...blase.an(i)}
               onClick={() => beiWahl(i)}
               className={reiterKlassen(gewaehlt)}
             >
@@ -90,6 +118,7 @@ export function ReiterZeile({ reiter, aktiv, kennung, beiWahl }: { reiter: Reite
       </div>
       <ReiterPfeil richtung="links" weitere={lage.links} beiKlick={() => rolleUm(zeile.current, 'links')} />
       <ReiterPfeil richtung="rechts" weitere={lage.rechts} beiKlick={() => rolleUm(zeile.current, 'rechts')} />
+      {blase.blase}
     </div>
   )
 }

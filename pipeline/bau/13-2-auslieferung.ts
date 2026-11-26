@@ -8,6 +8,7 @@ import { synopseVon } from './synopse-von.ts'
 import { archivTexte } from '../lib/anisearch-archiv-text.ts'
 import { type AnisearchEintrag, type TmdbTitelEintrag } from './01-quellen.ts'
 import { type SynopsisEintrag } from './13-1-anreichern.ts'
+import { lesekennung } from '../../shared/staffel-titel.ts'
 
 /** Ein Titel, wie er ausgeliefert wird (`titles.json`). */
 export type SlimTitel = ReturnType<typeof baueAuslieferung>['slim'][number]
@@ -41,7 +42,7 @@ function trailerFeld(q: number, trailer: SlimKontext['trailer']) {
 
 /** Ein Titel in Auslieferungsform; legt nebenbei seine Synopse in `synopses` ab. */
 function slimTitel(t: Title, k: SlimKontext) {
-  const q = t.id
+  const q = lesekennung(t)
   const ausAnisearch = k.anisearch[q]?.descriptionDe ?? k.archiv.get(q)
   const ausTmdb = k.tmdbTitles[q]
   const asId = k.kennungen.get(q)

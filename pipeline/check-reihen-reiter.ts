@@ -11,13 +11,14 @@ import { createRoot } from 'react-dom/client'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { useLang } from '../web/src/lib/i18n.tsx'
 import { ReihenListe } from '../web/src/components/detail/reihen-liste.tsx'
-import { ReihenReiterKontext } from '../web/src/components/detail/reihen-reiter.tsx'
+import { kastenFarbe, ReihenReiterKontext, ReihenReiterZeile } from '../web/src/components/detail/reihen-reiter.tsx'
 import type { Dataset } from '../web/src/lib/data.ts'
 import { reihenTeileVon } from '../web/src/components/detail/reihen-daten.ts'
 import { reihenNameVon } from '../web/src/components/detail/reihen-namen.ts'
 import type { FranchiseMember, Release, Title } from '../shared/types.ts'
-import { attrappeUhr, ignoriereCss, installiereMiniDom, klicke, type MiniKnoten } from '../tools/mini-dom.ts'
-import { eindeutigeBeschriftung, reihenLageVon, reihenReiterVon } from '../web/src/components/detail/reihen-reiter-liste.ts'
+import { attrappeUhr, feuere, ignoriereCss, installiereMiniDom, klicke, type MiniKnoten } from '../tools/mini-dom.ts'
+import { festeUhr } from '../tools/feste-uhr.ts'
+import { eindeutigeBeschriftung, reihenLageVon, reihenReiterVon, reiterKurzform } from '../web/src/components/detail/reihen-reiter-liste.ts'
 import { reihenOrdnung } from '../web/src/components/detail/reihen-inhalt.tsx'
 
 /** Die Gruppen der Reihenliste, wie das Panel sie den Reitern gibt (Überschriften als Schlüssel). */
@@ -35,11 +36,14 @@ const fall = faelle['pokemon-horizonte']!
 const titel = fall['titles.json'] as Title[]
 const teile = (fall['franchises.json'] as Record<string, FranchiseMember[]>)['483']!
 const offen = (id: number) => titel.find((t) => t.id === id)!
-const reiter = (id: number) => reihenReiterVon(offen(id), teile, 'Pokémon', titel, gruppenVon(teile, 'Pokémon'))
+/* Fester Tag statt Uhr: ob ein Teil ohne Synchro schon erschienen ist (Wild Card 2027 geplant), misst sich an ihm. */
+const HEUTE = '2026-11-26'
+const reiter = (id: number) => reihenReiterVon(offen(id), teile, 'Pokémon', titel, gruppenVon(teile, 'Pokémon'), HEUTE)
 
 /* Liste: Horizonte ist seit der Zusammenlegung (PR 4906/4920) ein Titel mit Staffel-Abschnitten, Reiter seiner Gruppe „Eigene Serien“;
    Hauptserie 12 Einträge mit Bereichen. */
-pruefe('Horizonte: Reiter der eigenen Serien, Horizonte Nr. 5', JSON.stringify(reiter(14839).map((r) => [r.id, r.label])) === '[[6974,"1"],[8284,"2"],[13332,"3"],[13782,"4"],[14839,"5"],[14945,"6"],[15715,"7"]]', reiter(14839))
+pruefe('Horizonte: Reiter der eigenen Serien, Horizonte Nr. 5', JSON.stringify(reiter(14839).map((r) => [r.id, r.label])) === '[[6974,"1"],[8284,"2"],[13332,"3"],[13782,"4"],[14839,"5"],[14945,"6"],[24736,"7"],[15715,"8"]]', reiter(14839))
+pruefe('Horizonte: Reiter 7 (chinesischer Donghua ohne Synchro) trägt ohneSynchro, die übrigen nicht', reiter(14839).filter((r) => r.ohneSynchro).map((r) => r.id).join() === '24736', reiter(14839).filter((r) => r.ohneSynchro).map((r) => r.id))
 const haupt = reiter(483).map((r) => r.label).join()
 pruefe('Hauptserie: 12 Reiter ohne „Staffel“, nach Nummer', haupt === '1–5,6–9,10–13,14–15,15–16,16a,16b,17–18,19,20–22,23–25,25', haupt)
 pruefe('Hauptserie: Ids in Staffelfolge', reiter(10852).map((r) => r.id).join() === '483,1349,1350,4745,5979,6415,6563,6802,7798,8283,10852,14838', reiter(10852).map((r) => r.id))
@@ -48,22 +52,35 @@ pruefe('Name am Reiter ist der Titel der Daten', reiter(14839)[4]!.name === 'Pok
 const staffel = (id: number, nr: number, bis: number) =>
   ({ ...offen(14839), id, titleDe: `Horizonte Staffel ${nr}`, staffelTitel: { sammel: 14839, nr, ab: 1 }, streams: [{ platform: 'netflix', url: 'https://x.invalid', dub: true, teilBereich: { von: 1, bis } }] }) as Title
 const [st2, st1] = [staffel(990102, 2, 89), staffel(990101, 1, 45)]
-pruefe('zwei Staffeln sind schon Reiter, Folge nach Nummer', reihenReiterVon(st2, teile, 'Pokémon', [st2, st1], []).map((r) => `${r.id}:${r.label}`).join() === '990101:1,990102:2')
-pruefe('eine Staffel allein: keine Reiter', reihenReiterVon(st2, teile, 'Pokémon', [st2], []).length === 0)
+pruefe('zwei Staffeln sind schon Reiter, Folge nach Nummer', reihenReiterVon(st2, teile, 'Pokémon', [st2, st1], [], HEUTE).map((r) => `${r.id}:${r.label}`).join() === '990101:1,990102:2')
+pruefe('eine Staffel allein: keine Reiter', reihenReiterVon(st2, teile, 'Pokémon', [st2], [], HEUTE).length === 0)
+/* Teilstaffeln am Reiter kurz (Daniel, 26.11.2026): „Staffel 3 - Teil 1“ → „3.1“, Spannen und Einzelstaffeln wie bisher. */
+pruefe('Reiter-Kurzform: Teilstaffel 3.1 und 3.2, Staffel 3, Spanne 1–5, Teil ohne Staffelnummer', [reiterKurzform('Staffel 3 - Teil 1'), reiterKurzform('Staffel 3 - Teil 2'), reiterKurzform('Staffel 3'), reiterKurzform('Staffel 1–5'), reiterKurzform('Teil 1'), reiterKurzform('Staffel 12 - Teil 10')].join('|') === '3.1|3.2|3|1–5|Teil 1|12.10')
+const teilGlied = (id: number, name: string, jpYear: number) => ({ id, name, format: 'TV', jpYear, episodes: 12, jpStatus: 'FINISHED' }) as FranchiseMember
+const teilStaffeln = [teilGlied(900901, 'Reihe', 2020), teilGlied(900902, 'Reihe Staffel 2', 2021), teilGlied(900903, 'Reihe Staffel 3 Teil 1', 2022), teilGlied(900904, 'Reihe Staffel 3 Teil 2', 2023)]
+pruefe('Hauptserie mit Teilstaffeln: Reiter 1, 2, 3.1, 3.2, der Name bleibt lang', JSON.stringify(reihenReiterVon({ id: 900901 } as Title, teilStaffeln, 'Reihe', [], [], HEUTE).map((r) => [r.label, r.name])) === '[["1","Reihe"],["2","Reihe Staffel 2"],["3.1","Reihe Staffel 3 Teil 1"],["3.2","Reihe Staffel 3 Teil 2"]]')
+pruefe('Reiter-Kurzform: nur am Ende, mit Zusatz bleibt es', reiterKurzform('Staffel 3 - Teil 1 Zusatz') === '3 - Teil 1 Zusatz')
+/* Reiter ohne Synchro (26.11.2026): auch Hauptstaffeln und Sammeltitel-Staffeln tragen das Flag, erschienen vorausgesetzt. */
+const ohneSt = { ...st2, ohneSynchro: true, jpStatus: 'FINISHED' } as Title
+pruefe('Sammeltitel-Staffel ohne Synchro: Reiter trägt ohneSynchro, die andere nicht', reihenReiterVon(ohneSt, teile, 'Pokémon', [ohneSt, st1], [], HEUTE).map((r) => `${r.id}:${r.ohneSynchro}`).join() === '990101:false,990102:true')
+const teileOhne = teile.map((m) => (m.id === 1349 ? { ...m, ohneSynchro: true, jpStatus: 'FINISHED' } : m)) as FranchiseMember[]
+pruefe('Hauptserie: Staffel ohne Synchro trägt ohneSynchro, alle anderen nicht', reihenReiterVon(offen(483), teileOhne, 'Pokémon', titel, gruppenVon(teileOhne, 'Pokémon'), HEUTE).filter((r) => r.ohneSynchro).map((r) => r.id).join() === '1349')
 /* Nachtrag Daniel 24.11.2026 20:21/20:24: Reiter je Kategorie der Reihe, Filme mit laufender Nummer (Mewtu gegen Mew = 1 …). */
 const filme = reiter(5726)
 pruefe('Film: Reiter der Filme 1..n in Reihenfolge der Reihenliste', filme.map((r) => r.label).join() === filme.map((_, i) => i + 1).join() && filme.slice(0, 4).map((r) => r.id).join() === '484,981,982,983', filme.map((r) => [r.id, r.label]))
 pruefe('Film: Namen wie in Daniels Beispiel, nur Filme', filme[1]!.name === 'Pokémon 2: Die Macht des Einzelnen' && filme.every((r) => teile.find((m) => m.id === r.id)?.format === 'MOVIE'), filme.slice(0, 4).map((r) => r.name))
-pruefe('Film: ohne Teile hinter „ohne Synchro“ (Toho Cinemas, Wild Card 2027)', !filme.some((r) => r.id === 10719 || r.id === 17885), filme.map((r) => r.id))
+/* Seit 26.11.2026 gibt es keinen Schalter mehr: auch Teile ohne Synchro haben einen Reiter; gestrichelt nur, wenn erschienen (Wild Card 2027 ist „geplant“). */
+pruefe('Film: Toho Cinemas (ohne Synchro, erschienen) hat einen Reiter mit ohneSynchro, Wild Card 2027 (geplant) einen ohne', filme.find((r) => r.id === 10719)?.ohneSynchro === true && filme.find((r) => r.id === 17885)?.ohneSynchro === false, filme.map((r) => [r.id, r.ohneSynchro]))
+pruefe('Film: genau ein Film mit Synchro-Flag ist nicht ohneSynchro, der geöffnete Mewtu-Film', filme.find((r) => r.id === 484)?.ohneSynchro === false)
 pruefe('Hauptserie zeigt nur Hauptserie, kein Film', reiter(483).every((r) => teile.find((m) => m.id === r.id)?.format === 'TV' && r.staffel), reiter(483))
 pruefe('Special: Reiter der Specials, Film nicht darunter', reiter(1315).length > 1 && reiter(1315).every((r) => !r.staffel && teile.find((m) => m.id === r.id)?.format !== 'MOVIE'), reiter(1315).length)
-pruefe('Film ohne Gruppen (Reihe noch nicht geordnet): keine Reiter', reihenReiterVon(offen(5726), teile, 'Pokémon', titel, []).length === 0)
-pruefe('ohne Reihe: keine Reiter', reihenReiterVon(offen(10852), [], 'Pokémon', titel, []).length === 0)
+pruefe('Film ohne Gruppen (Reihe noch nicht geordnet): keine Reiter', reihenReiterVon(offen(5726), teile, 'Pokémon', titel, [], HEUTE).length === 0)
+pruefe('ohne Reihe: keine Reiter', reihenReiterVon(offen(10852), [], 'Pokémon', titel, [], HEUTE).length === 0)
 const aot = faelle['attack-on-titan']!
 const aotTitel = aot['titles.json'] as Title[]
 const aotTeile = Object.values(aot['franchises.json'] as Record<string, FranchiseMember[]>)[0]!
-const aotReiter = (id: number) => reihenReiterVon(aotTitel.find((t) => t.id === id)!, aotTeile, 'Attack on Titan', aotTitel, gruppenVon(aotTeile, 'Attack on Titan'))
-pruefe('Attack on Titan: ohne Junior High', JSON.stringify(aotReiter(6282).map((r) => [r.id, r.label])) === '[[6282,"1"],[7496,"2"],[8669,"3 - Teil 1"],[10088,"3 - Teil 2"]]', aotReiter(6282))
+const aotReiter = (id: number) => reihenReiterVon(aotTitel.find((t) => t.id === id)!, aotTeile, 'Attack on Titan', aotTitel, gruppenVon(aotTeile, 'Attack on Titan'), HEUTE)
+pruefe('Attack on Titan: ohne Junior High', JSON.stringify(aotReiter(6282).map((r) => [r.id, r.label])) === '[[6282,"1"],[7496,"2"],[8669,"3.1"],[10088,"3.2"]]', aotReiter(6282))
 pruefe('Attack on Titan: Final Season ohne Beschriftung öffnet ohne Reiter', aotReiter(10659).length === 0)
 /* Eine Staffel in zwei Teilen (Sakamoto Days ohne den Eintrag 2027): Beschriftung „Teil 1/2“, aber kein Staffelstand. Brach die Bühne (disc-bereich-2). */
 const sk = faelle['sakamoto-days']!
@@ -71,7 +88,7 @@ const skTitel = sk['titles.json'] as Title[]
 const skTeile = (sk['franchises.json'] as Record<string, FranchiseMember[]>)['15940']!.filter((m) => m.id !== 17244)
 let skReiter: unknown
 try {
-  skReiter = reihenReiterVon(skTitel.find((t) => t.id === 15940)!, skTeile, 'Sakamoto Days', skTitel, gruppenVon(skTeile, 'Sakamoto Days')).map((r) => [r.id, r.label])
+  skReiter = reihenReiterVon(skTitel.find((t) => t.id === 15940)!, skTeile, 'Sakamoto Days', skTitel, gruppenVon(skTeile, 'Sakamoto Days'), HEUTE).map((r) => [r.id, r.label])
 } catch (fehler) {
   skReiter = String(fehler)
 }
@@ -79,7 +96,7 @@ try {
  * Klasse zum Nachtrag (Daniel 24.11.2026 20:21–20:25), je Titel-Reihe-Paar: Reiter tragen nur die Kurzform, der volle Titel steht im
  * Namen; kein Reiter-Titel steht noch in der Reihenliste, und jeder Teil der Reihe bleibt erreichbar (Reiter oder Liste).
  */
-const KURZFORM = /^(\d+[a-z]?(–\d+)?( - Teil \d+)?|Teil \d+)$/
+const KURZFORM = /^(\d+[a-z]?(–\d+)?(\.\d+)?|Teil \d+)$/
 const nachtragFehler: string[] = []
 function klasseNachtrag(wo: string, liste: ReturnType<typeof reihenReiterVon>, rTeile: FranchiseMember[], rName: string): void {
   const ids = new Set(liste.map((r) => r.id))
@@ -103,7 +120,7 @@ for (const [name, f] of Object.entries(faelle)) {
     for (const reihe of [[], reihen[t.franchiseId ?? t.id] ?? []]) {
       try {
         const [rTeile, rName] = [reihenTeileVon(t, reihe, daten), reihenNameVon(t, reihe, daten)]
-        const liste = reihenReiterVon(t, rTeile, rName, alle, gruppenVon(rTeile, rName))
+        const liste = reihenReiterVon(t, rTeile, rName, alle, gruppenVon(rTeile, rName), HEUTE)
         for (const r of liste) reihenLageVon(daten.titleById.get(r.id) ?? t, [], '2026-11-24')
         klasseNachtrag(`${name}/${t.id}`, liste, rTeile, rName)
         gerechnet++
@@ -115,7 +132,7 @@ for (const [name, f] of Object.entries(faelle)) {
 }
 pruefe(`alle Bühnenfälle ohne Absturz (${gerechnet} Titel-Reihe-Paare)`, gerechnet > 100 && abstuerze.length === 0, abstuerze.slice(0, 5))
 pruefe('alle Bühnenfälle: Kurzform, kein Titel in Reiter und Reihenliste, keiner unerreichbar', nachtragFehler.length === 0, nachtragFehler.slice(0, 5))
-const rohe = (labels: string[]) => labels.map((label, i) => ({ id: i + 1, label, name: `T${i + 1}`, staffel: true }))
+const rohe = (labels: string[]) => labels.map((label, i) => ({ id: i + 1, label, name: `T${i + 1}`, staffel: true, ohneSynchro: false }))
 pruefe('Eindeutigkeit: gleiche Beschriftung a, b in Listenreihenfolge; einmalige und Überlappung bleiben', eindeutigeBeschriftung(rohe(['14–15', '15–16', '16', '16', '25', '16'])).map((r) => r.label).join() === '14–15,15–16,16a,16b,25,16c')
 pruefe('Staffel in zwei Teilen ohne Staffelstand: Teil 1, Teil 2 nach Kennung', JSON.stringify(skReiter) === '[[15940,"Teil 1"],[16333,"Teil 2"]]', skReiter)
 
@@ -138,20 +155,31 @@ pruefe('Plan vorbei: mit bekannter Folgenzahl ruht, ohne läuft', reihenLageVon(
 /* Reihenliste mit Reitern am Kasten (statisch): Reiter-Titel zählen nicht am Schalter „ohne Synchro“, ohne übrige Teile keine Karte. */
 const glied = (id: number, mehr: Partial<FranchiseMember> = {}) => ({ id, name: `Reihe ${id}`, format: 'TV', jpYear: 2000 + (id % 100), episodes: 12, ...mehr }) as FranchiseMember
 function listeMitReitern(teileListe: FranchiseMember[], reiterIds: number[]): string {
-  const reiterListe = reiterIds.map((id) => ({ id, label: String(id), name: `Reihe ${id}`, staffel: true }))
+  const reiterListe = reiterIds.map((id) => ({ id, label: String(id), name: `Reihe ${id}`, staffel: true, ohneSynchro: false }))
   const liste = () => {
     const { t } = useLang()
     const eigenschaften = { reihenTeile: teileListe, t, reihenName: 'Reihe', title: { id: reiterIds[0] } as Title, favorites: new Set<number>(), wechselt: false, wechsleZu() {} }
-    const zustand = { reiheOhneOffen: null, reihenSchluessel: 1, reiheSuche: { reihe: 1, text: '' }, setReiheOhneOffen() {}, setReiheSuche() {} }
+    const zustand = { reihenSchluessel: 1, reiheSuche: { reihe: 1, text: '' }, setReiheSuche() {} }
     return h(ReihenListe, { ...eigenschaften, ...zustand })
   }
   return renderToStaticMarkup(h(ReihenReiterKontext.Provider, { value: { data: {} as Dataset, reiter: reiterListe, wechsleZu() {} } }, h(liste)))
 }
 const kleineReihe = [glied(900001), glied(900002, { ohneSynchro: true }), glied(900003, { format: 'MOVIE', episodes: 1 }), glied(900004, { format: 'MOVIE', episodes: 1 })]
-pruefe('Spur: Schalter zählt den Reiter-Titel ohne Synchro nicht', !listeMitReitern(kleineReihe, [900001, 900002]).includes('type="checkbox"') && listeMitReitern(kleineReihe, [900001]).includes('type="checkbox"'))
+pruefe('Spur: kein Schalter mehr, der Teil ohne Synchro steht immer in der Liste (nicht, wenn er Reiter ist)', !listeMitReitern(kleineReihe, [900001]).includes('type="checkbox"') && listeMitReitern(kleineReihe, [900001]).includes('data-reihe-teil="900002"') && !listeMitReitern(kleineReihe, [900001, 900002]).includes('data-reihe-teil="900002"'))
 const grosseReihe = [...kleineReihe, ...Array.from({ length: 13 }, (_, i) => glied(900010 + i, { format: 'MOVIE', episodes: 1 }))]
-pruefe('Übersicht: Schalter zählt den Reiter-Titel ohne Synchro nicht', listeMitReitern(grosseReihe, [900001]).includes('data-reihe-uebersicht') && !listeMitReitern(grosseReihe, [900001, 900002]).includes('type="checkbox"'))
+pruefe('Übersicht: kein Schalter mehr', listeMitReitern(grosseReihe, [900001]).includes('data-reihe-uebersicht') && !listeMitReitern(grosseReihe, [900001]).includes('type="checkbox"'))
 pruefe('alle Teile als Reiter: keine Reihen-Karte', listeMitReitern(kleineReihe, [900001, 900002, 900003, 900004]) === '' && listeMitReitern(kleineReihe, [900001, 900002]) !== '')
+
+/* Reiterzeile allein (statisch): 900101 läuft, 900102 ohne Synchro und gewählt, 900103 ohne Synchro; nur 900101 steht in `lagen`. */
+const zeileReiter = [900101, 900102, 900103].map((id) => ({ id, label: String(id - 900100), name: `Reihe ${id}`, staffel: true, ohneSynchro: id !== 900101 }))
+const zeilenHtml = renderToStaticMarkup(h(ReihenReiterZeile, { reiter: zeileReiter, aktiv: 900102, lagen: new Map([[900101, { lage: 'laeuft' as const }]]), farbe: 'bg-ak-test-kasten border-ak-akzent', kennung: 'z', beiWahl() {} }))
+const knopf = (id: number) => new RegExp(`<button[^>]*id="z-reiter-${id}"[^>]*>(.*?)</button>`).exec(zeilenHtml)
+const klassenVon = (id: number) => (/class="([^"]*)"/.exec(knopf(id)?.[0] ?? '')?.[1] ?? '').split(' ')
+const labelVon = (id: number) => /aria-label="([^"]*)"/.exec(knopf(id)?.[0] ?? '')?.[1]
+pruefe('Reiterzeile: gewählter Teil ohne Synchro trägt die Kastenfläche, gestrichelt, groß', ['bg-ak-test-kasten', 'border-dashed', 'border-ak-sehr-leise', 'min-h-[3.25rem]'].every((k) => klassenVon(900102).includes(k)) && !klassenVon(900102).includes('border-ak-akzent'), klassenVon(900102))
+pruefe('Reiterzeile: nicht gewählter Teil ohne Synchro grau und gestrichelt, ohne Kastenfläche', ['bg-ak-flaeche-2', 'border-dashed', 'min-h-11'].every((k) => klassenVon(900103).includes(k)) && !klassenVon(900103).includes('bg-ak-test-kasten'), klassenVon(900103))
+pruefe('Reiterzeile: Marke und „läuft“ nur am Reiter mit Lage, ohne Eintrag in lagen ruht er', (knopf(900101)?.[1] ?? '').includes('data-lage="laeuft"') && !/data-lage/.test(`${knopf(900102)?.[1]}${knopf(900103)?.[1]}`), [knopf(900101)?.[1], knopf(900102)?.[1]])
+pruefe('Reiterzeile: aria-label mit Lage und ohne Synchro, nichts Leeres angehängt', [labelVon(900101), labelVon(900102)].join('|') === 'Staffel 1: Reihe 900101, läuft|Staffel 2: Reihe 900102, ohne deutsche Synchro', [labelVon(900101), labelVon(900102)])
 
 /* Echtes Panel: Attrappen für Speicher, Beobachter, Adresse; `franchises.json` aus dem Fall, alles andere 404. */
 const speicher = new Map<string, string>()
@@ -171,11 +199,13 @@ Object.assign(globalThis, {
 })
 ignoriereCss()
 const { DetailPanel } = await import('../web/src/components/DetailPanel.tsx')
+/* Das Panel nimmt `today` aus der Uhr: fest auf den Stichtag der Liste oben. */
+const echteUhr = festeUhr(`${HEUTE}T12:00:00Z`)
 
 let fokus: MiniKnoten | undefined
 const verhindert: string[] = []
 const dom = installiereMiniDom(
-  { ...attrappeUhr(), matchMedia: () => ({ matches: false, addEventListener() {}, removeEventListener() {} }), location: ort, scrollTo() {}, innerWidth: 400, getComputedStyle: () => ({}) } as never,
+  { ...attrappeUhr(), matchMedia: () => ({ matches: false, addEventListener() {}, removeEventListener() {} }), location: ort, scrollTo() {}, innerWidth: 400, innerHeight: 800, getComputedStyle: () => ({}) } as never,
   () => ({}),
 )
 Object.assign(document, { querySelector: () => null, querySelectorAll: () => [], title: 'Start' })
@@ -190,6 +220,7 @@ Object.assign(knotenArt, {
   focus(this: MiniKnoten) {
     fokus = this
   },
+  getBoundingClientRect: () => ({ left: 0, top: 300, right: 44, bottom: 344, width: 44, height: 44 }),
 })
 const wurzel = createRoot(dom.wurzel as unknown as Element)
 const geoeffnet: number[] = []
@@ -206,8 +237,8 @@ async function zeige(id: number, d: object = data) {
 const text = (k: MiniKnoten) => (k.textContent ?? '').trim()
 
 const hz = await zeige(14839)
-pruefe('Panel Horizonte: Leiste mit role=tablist und 7 Reitern der eigenen Serien', hz.leiste?.getAttribute('role') === 'tablist' && hz.tabs.map(text).join() === '1,2,3,4,5,6,7', hz.tabs.map(text))
-pruefe('gewählt ist der offene Titel (5), nur er per Tab erreichbar', hz.tabs.map((k) => `${k.getAttribute('aria-selected')}/${k.getAttribute('tabindex')}`).join() === 'false/-1,false/-1,false/-1,false/-1,true/0,false/-1,false/-1')
+pruefe('Panel Horizonte: Leiste mit role=tablist und 8 Reitern der eigenen Serien', hz.leiste?.getAttribute('role') === 'tablist' && hz.tabs.map(text).join() === '1,2,3,4,5,6,7,8', hz.tabs.map(text))
+pruefe('gewählt ist der offene Titel (5), nur er per Tab erreichbar', hz.tabs.map((k) => `${k.getAttribute('aria-selected')}/${k.getAttribute('tabindex')}`).join() === 'false/-1,false/-1,false/-1,false/-1,true/0,false/-1,false/-1,false/-1')
 pruefe('Kasten ist das tabpanel des gewählten Reiters', hz.panel?.getAttribute('aria-labelledby') === 'reihe-14839-reiter-14839' && hz.tabs.every((k) => k.getAttribute('aria-controls') === 'reihe-14839-kasten'))
 pruefe('Kasten steht im tabpanel', (hz.panel?.finde((k) => k.tagName === 'SECTION').length ?? 0) === 1)
 pruefe('Beschriftung ohne Staffelnummer nennt nur den Titel', hz.tabs[1]?.getAttribute('aria-label') === 'Pokémon-Generationen', hz.tabs[1]?.getAttribute('aria-label'))
@@ -221,7 +252,7 @@ const pxVon = (klassen: string, vorsatz: string) => {
   return m ? (m[1] ? Number(m[1]) * 4 : Number(m[2]) * 16) : 0
 }
 pruefe('Tippfläche jedes Reiters ≥ 44 × 44 px', hz.tabs.every((k) => pxVon(klasse(k), 'min-h') >= 44 && pxVon(klasse(k), 'min-w') >= 44), hz.tabs.map(klasse))
-pruefe('Akzentstrich nur am gewählten Reiter', hz.tabs.map((k) => k.finde((x) => klasse(x).split(' ').includes('bg-ak-akzent')).length).join() === '0,0,0,0,1,0,0')
+pruefe('Akzentstrich nur am gewählten Reiter', hz.tabs.map((k) => k.finde((x) => klasse(x).split(' ').includes('bg-ak-akzent')).length).join() === '0,0,0,0,1,0,0,0')
 pruefe('kein Scrollbalken, vor der Messung kein Pfeil', klasse(hz.leiste).includes('[scrollbar-width:none]') && klasse(hz.leiste).includes('[&::-webkit-scrollbar]:hidden') && dom.wurzel.finde((k) => k.getAttribute('data-pfeil') !== null).length === 0)
 fokus = undefined
 const druecke = (ziel: MiniKnoten, key: string) => {
@@ -238,26 +269,61 @@ pruefe('Pos1 fokussiert Reiter 1 und unterdrückt das Seitenrollen', fokus !== u
 await act(async () => klicke(dom.wurzel, hz.tabs[1]!))
 pruefe('Klick auf Reiter 2 öffnet Pokémon-Generationen über den Weg der Reihenliste', geoeffnet.join() === '8284', geoeffnet)
 
-pruefe('Tooltip: voller Titel am Reiter (title)', hz.tabs.map((k) => k.getAttribute('title')).join('|') === reiter(14839).map((r) => r.name).join('|'), hz.tabs.map((k) => k.getAttribute('title')))
+/* Tooltip: kein `title` je Reiter, die Blase entsteht beim Zeigen (`reiter-blase.tsx`; Verhalten in check-reiter-blase.ts). */
+const html = dom.wurzel.parentNode!
+async function blasenText(k: MiniKnoten | undefined): Promise<string> {
+  if (!k) return ''
+  await act(async () => feuere(dom.wurzel, 'mouseover', k))
+  const inhalt = html.finde((x) => x.getAttribute('role') === 'tooltip').map((x) => x.textContent).join('|')
+  await act(async () => feuere(dom.wurzel, 'mouseout', k))
+  return inhalt
+}
+const ersteZeile = (s: string) => s.split('\n')[0]
+const hzBlasen: string[] = []
+for (const k of hz.tabs) hzBlasen.push(await blasenText(k))
+pruefe('Tooltip: kein title, die Blase nennt den vollen Titel (erste Zeile)', hz.tabs.every((k) => k.getAttribute('title') === null) && hzBlasen.map(ersteZeile).join('|') === reiter(14839).map((r) => r.name).join('|'), hzBlasen)
+pruefe('Tooltip: Reiter ohne Synchro erklärt den gestrichelten Rand in der letzten Zeile', (hzBlasen[6] ?? '').endsWith('\ngestrichelt = ohne deutsche Synchro') && !(hzBlasen[0] ?? '').includes('gestrichelt'), hzBlasen[6])
+pruefe('Tooltip: der offene Titel läuft (Punkt), ohne künftigen Termin keine Zeitangabe', hzBlasen[4] === 'Pokémon Horizonte\n● = läuft', hzBlasen[4])
 /* Reihenliste: große Reihe als Übersicht; Gruppen mit Zahl (`data-reihe-gruppe`), die Reiter-Titel fehlen in ihrer Gruppe. */
 const gruppenZahl = () => dom.wurzel.finde((k) => k.getAttribute('data-reihe-gruppe') !== null).map((k) => `${k.getAttribute('data-reihe-gruppe')}=${text(k).replace(/\D+/g, '')}`).join()
-pruefe('Horizonte: Eigene Serien ganz als Reiter, fehlen in der Liste; Hauptserie und Filme ganz', gruppenZahl() === 'Hauptserie=12,Filme=24,Specials & OVAs=23', gruppenZahl())
+pruefe('Horizonte: Eigene Serien ganz als Reiter, fehlen in der Liste; Hauptserie und Filme ganz', gruppenZahl() === 'Hauptserie=12,Filme=26,Specials & OVAs=86', gruppenZahl())
+/* Der Donghua ohne Synchro hat einen gestrichelten Reiter, kein anderer (Nr. 7 von 8). */
+pruefe('Horizonte: nur Reiter 7 ist gestrichelt und trägt es im aria-label', hz.tabs.map((k) => klasse(k).split(' ').includes('border-dashed')).join() === 'false,false,false,false,false,false,true,false' && (hz.tabs[6]?.getAttribute('aria-label') ?? '').endsWith(', ohne deutsche Synchro'), hz.tabs.map((k) => klasse(k)))
 
 const film = await zeige(5726)
 const filmLabels = film.tabs.map(text)
 pruefe('Film der Reihe: Reiter der Filme 1..n, gewählt Nr. 16', film.leiste?.getAttribute('role') === 'tablist' && filmLabels.join() === filmLabels.map((_, i) => i + 1).join() && filmLabels.length === reiter(5726).length && film.tabs[15]?.getAttribute('aria-selected') === 'true', filmLabels)
-pruefe('Film: Tooltip und aria-label tragen den vollen Titel, ohne „Staffel“', film.tabs[0]?.getAttribute('title') === 'Pokémon: Der Film - Mewtu gegen Mew' && film.tabs[0]?.getAttribute('aria-label') === 'Pokémon: Der Film - Mewtu gegen Mew', [film.tabs[0]?.getAttribute('title'), film.tabs[0]?.getAttribute('aria-label')])
-pruefe('Film: Filme fehlen in der Reihenliste, die übrigen Gruppen bleiben', gruppenZahl() === 'Hauptserie=12,Eigene Serien=7,Specials & OVAs=23', gruppenZahl())
+const mewtu = await blasenText(film.tabs[0])
+pruefe('Film: Tooltip und aria-label tragen den vollen Titel, ohne „Staffel“', mewtu === 'Pokémon: Der Film - Mewtu gegen Mew' && film.tabs[0]?.getAttribute('aria-label') === 'Pokémon: Der Film - Mewtu gegen Mew', [mewtu, film.tabs[0]?.getAttribute('aria-label')])
+pruefe('Film: Filme fehlen in der Reihenliste, die übrigen Gruppen bleiben', gruppenZahl() === 'Hauptserie=12,Eigene Serien=8,Specials & OVAs=86', gruppenZahl())
+/* Reiter über den Namen im aria-label (dahinter höchstens „, läuft“ u. ä.). */
+const reiterVon = (name: string) =>
+  film.tabs.find((k) => {
+    const l = k.getAttribute('aria-label') ?? ''
+    return l === name || l.startsWith(`${name},`)
+  })
+const [toho, wildCard] = [reiterVon('Toho Cinemas x Pokémon GO'), reiterVon('Pokémon: Wild Card')]
+pruefe('Film: Reiter ohne Synchro ist gestrichelt und nennt es im aria-label', klasse(toho).split(' ').includes('border-dashed') && toho?.getAttribute('aria-label') === 'Toho Cinemas x Pokémon GO, ohne deutsche Synchro', [klasse(toho), toho?.getAttribute('aria-label')])
+pruefe('Film: gestrichelter Rand in ak-sehr-leise statt ak-rand (Kontrast der Striche)', klasse(toho).split(' ').includes('border-ak-sehr-leise') && !klasse(toho).split(' ').includes('border-ak-rand'), klasse(toho))
+pruefe('Film: geplanter Reiter (Wild Card 2027) und gewählter Reiter nicht gestrichelt', wildCard !== undefined && !klasse(wildCard).split(' ').includes('border-dashed') && !(wildCard.getAttribute('aria-label') ?? '').includes('ohne deutsche Synchro') && !klasse(film.tabs[15]).split(' ').includes('border-dashed'), [klasse(wildCard), wildCard?.getAttribute('aria-label')])
+pruefe('Film: nur Reiter ohne Synchro gestrichelt (Toho Cinemas, sonst keiner mit Synchro)', film.tabs.filter((k) => klasse(k).split(' ').includes('border-dashed')).length === film.tabs.filter((k) => (k.getAttribute('aria-label') ?? '').endsWith('ohne deutsche Synchro')).length && film.tabs.filter((k) => klasse(k).split(' ').includes('border-dashed')).length >= 1)
 const hauptPanel = await zeige(10852)
 const hauptAria = hauptPanel.tabs[0]?.getAttribute('aria-label') ?? ''
-pruefe('Hauptserie: aria-label nennt Staffel und Titel', hauptAria.startsWith(`Staffel ${text(hauptPanel.tabs[0]!)}: ${hauptPanel.tabs[0]!.getAttribute('title')}`), hauptAria)
+const hauptBlase = await blasenText(hauptPanel.tabs[0])
+pruefe('Hauptserie: aria-label nennt Staffel und Titel', hauptAria.startsWith(`Staffel ${text(hauptPanel.tabs[0]!)}: ${ersteZeile(hauptBlase)}`), hauptAria)
+/* Der Grund der Marke kommt aus den Lagen am Kasten (`ReihenReiterAmKasten`): die erste Serie kommt mit der DVD am 27.11.2026. */
+pruefe('Hauptserie: Reiter 1–5 nennt Titel und Grund des Rings', text(hauptPanel.tabs[0]!) === '1–5' && hauptBlase === 'Pokémon\n○ = DVD am 27.11.2026', hauptBlase)
 /* Ein Titel ohne Reihe (eigene Kennung, keine Reihenteile): keine Leiste, kein tabpanel um den Kasten. */
 const allein = { ...offen(5726), id: 990001, franchiseId: 990001, titleDe: 'Ohne Reihe', titleEn: 'Ohne Reihe', titleRomaji: 'Ohne Reihe' } as Title
 const ohneReihe = await zeige(990001, { ...data, titles: [allein], titleById: new Map([[allein.id, allein]]), releasesByTitle: new Map() })
 pruefe('Titel ohne Reihe: keine Reihen-Reiter, kein tabpanel', ohneReihe.leiste === undefined && ohneReihe.panel === undefined)
+/* Der gewählte Reiter trägt Fläche und Randfarbe des Kastens, auch die mit Dunkelthema-Vorsatz; Abstand, Rundung und Randbreite bleiben am Kasten. */
+const farbe = kastenFarbe('rounded-lg p-3 bg-ak-flaeche dark:bg-ak-flaeche-2 border border-ak-rand dark:border-ak-akzent')
+pruefe('kastenFarbe: Fläche und Randfarbe samt dark:-Klassen, ohne Abstand und Rundung', farbe === 'bg-ak-flaeche dark:bg-ak-flaeche-2 border-ak-rand dark:border-ak-akzent', farbe)
 
 await act(async () => wurzel.unmount())
 dom.entferne()
+echteUhr()
 if (verletzt) {
   console.error(`\n${verletzt} Zusicherung(en) verletzt.`)
   process.exit(1)

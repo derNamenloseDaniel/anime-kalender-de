@@ -601,6 +601,8 @@ pipeline/check-reihen-traeger.ts
 pipeline/check-reihen-uebersicht.ts
 pipeline/check-reihen-zeile-spanne.ts
 pipeline/check-reinids-grund.ts
+pipeline/check-reiter-blase.ts
+pipeline/check-reiter-lage-grund.ts
 pipeline/check-release-ohne-quelle.ts
 pipeline/check-remake-verdrahtung.ts
 pipeline/check-remake-zaehlung-bestand-lauf.ts
@@ -649,13 +651,18 @@ pipeline/check-staffel-altmeldungen.ts
 pipeline/check-staffel-anzeige-bau.ts
 pipeline/check-staffel-anzeige-panel.ts
 pipeline/check-staffel-anzeige.ts
+pipeline/check-staffel-aufrufer.ts
 pipeline/check-staffel-des-titels.ts
 pipeline/check-staffel-folge-tv.ts
+pipeline/check-staffel-historie.ts
 pipeline/check-staffel-jahr0.ts
+pipeline/check-staffel-lesekennung.ts
 pipeline/check-staffel-ohne-seite.ts
 pipeline/check-staffel-riegel.ts
 pipeline/check-staffel-synonyme.ts
 pipeline/check-staffel-teil.ts
+pipeline/check-staffel-titel-termine.ts
+pipeline/check-staffel-titel.ts
 pipeline/check-staffel-verdrahtung.ts
 pipeline/check-staffel-von-hand-ablauf.ts
 pipeline/check-staffel-von-hand.ts

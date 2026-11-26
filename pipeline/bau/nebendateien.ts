@@ -47,6 +47,7 @@ import { anisearchKennungen } from './anisearch-kennung.ts'
 import { katalogSammeltitel } from './mal-teilung.ts'
 import { ohneWerkDubletten } from './werk-doppelt-bau.ts'
 import { anisearchKatalogReihenQuelle as anisearchKatalogReihen } from './anisearch-reihen-rein-bau.ts'
+import { geerbterSeitTag } from '../lib/staffel-historie.ts'
 
 /**
  * Schreibt die Anime **ohne** belegte deutsche Synchro als eigene Datei.
@@ -573,7 +574,7 @@ function fuehreSynchroHistorie(titles: Title[], heute: string): { historie: Sync
   const erstlauf = Object.keys(historie.seit).length === 0
 
   for (const t of titles) {
-    if (!historie.seit[t.id]) historie.seit[t.id] = heute
+    if (!historie.seit[t.id]) historie.seit[t.id] = geerbterSeitTag(historie.seit, t) ?? heute
   }
   writeJson(SYNCHRO_HISTORIE, historie, true)
   return { historie, erstlauf }

@@ -41,7 +41,7 @@ const num = (v: unknown, ak: AkVon) => (typeof v === 'number' ? ak(v) : v)
 function titel(t: Record<string, unknown>, ak: AkVon): Record<string, unknown> {
   const id = t.id as number
   if (typeof id !== 'number' || id < 0) return t
-  /* Ein Staffel-Titel (bis 24.11.2026, `shared/staffel-titel.ts`) hat keine eigene AniList-Seite: der Verweis zeigt auf die Serie. Steht nur noch im Bestand bis zum ersten Bau nach F157. */
+  /* Ein Staffel-Titel hat keine eigene AniList-Seite: der Quellenverweis zeigt auf den Sammeltitel (`staffel-titel.ts`). */
   const sammel = (t.staffelTitel as { sammel?: unknown } | undefined)?.sammel
   const neu: Record<string, unknown> = { ...t, id: ak(id), al: typeof sammel === 'number' ? sammel : id }
   if (typeof t.franchiseId === 'number') neu.franchiseId = ak(t.franchiseId)

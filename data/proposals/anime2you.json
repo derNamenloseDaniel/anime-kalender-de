@@ -1,15 +1,66 @@
 {
-  "scrapedAt": "2026-11-26T04:17:13.063Z",
+  "scrapedAt": "2026-11-26T17:01:46.021Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 42,
-    "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 4,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 8,
+    "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 5,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 43,
-    "schon in einem Rubrik-Feed gelesen": 34,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
-    "Sprachhinweis älter als 45 Tage": 8
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 14,
+    "schon in einem Rubrik-Feed gelesen": 9,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 1,
+    "Sprachhinweis älter als 45 Tage": 6
   },
   "proposals": [
+    {
+      "articleTitle": "Design der acht DVD-Generationsboxen zu »Pokémon« vorgestellt",
+      "articleUrl": "https://www.anime2you.de/news/1076238/pokemon-dvd-generationsboxen-design/",
+      "publishedAt": "2026-11-26",
+      "category": "disc",
+      "platforms": [
+        "disc"
+      ],
+      "dates": [
+        {
+          "iso": "2026-12-18",
+          "context": "alle 25 Staffeln der ursprünglichen TV-Serie und sollen zwischen dem 18. Dezember 2026 und dem 25. Juni 2027 im monatlichen Rhythmus […]"
+        },
+        {
+          "iso": "2027-06-25",
+          "context": "rünglichen TV-Serie und sollen zwischen dem 18. Dezember 2026 und dem 25. Juni 2027 im monatlichen Rhythmus […] Der Beitrag Design der ach"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Black Friday: Zahlreiche Anime von Crunchyroll bei Amazon reduziert",
+      "articleUrl": "https://www.anime2you.de/news/1076213/amazon-black-friday-crunchyroll-angebote/",
+      "publishedAt": "2026-11-26",
+      "category": "disc",
+      "platforms": [
+        "crunchyroll"
+      ],
+      "dates": [
+        {
+          "iso": "2026-11-30",
+          "context": "r euch zusammengestellt. Zahlreiche Crunchyroll-Angebote Noch bis zum 30. November 2026 können sich Anime-Fans unter anderem die Collector’s"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Netflix ergänzt sein Anime-Angebot um zwei neue Serien",
+      "articleUrl": "https://www.anime2you.de/news/1076269/netflix-fool-night-und-mehr/",
+      "publishedAt": "2026-11-26",
+      "category": "streaming",
+      "platforms": [
+        "netflix"
+      ],
+      "dates": [],
+      "dub": "ja",
+      "hinweis": "sprache",
+      "alreadyCurated": false
+    },
     {
       "articleTitle": "Disney+ nimmt zwei Anime-Neuzugänge ins Programm",
       "articleUrl": "https://www.anime2you.de/news/1075866/disney-plus-one-punch-man-ab-sofort/",

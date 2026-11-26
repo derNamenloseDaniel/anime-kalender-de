@@ -143,6 +143,16 @@ export function klicke(wurzel: MiniKnoten, ziel: MiniKnoten): void {
   loese(wurzel, 'click', ziel)
 }
 
+/**
+ * Ein beliebiges Ereignis `art` an `ziel` wie vom Browser (Erfassungs-, dann Blasenhörer am Wurzelknoten). Zeigen und Wegzeigen sind
+ * `mouseover`/`mouseout` mit `relatedTarget: null` (von außerhalb des Fensters): daraus macht React `onMouseEnter`/`onMouseLeave`.
+ */
+export function feuere(wurzel: MiniKnoten, art: string, ziel: MiniKnoten): void {
+  const e = { type: art, target: ziel, relatedTarget: null, bubbles: true, cancelable: true, defaultPrevented: false, timeStamp: 0, preventDefault() {}, stopPropagation() {} }
+  const hoerer = wurzel.hoerer.get(art) ?? []
+  for (const capture of [true, false]) hoerer.filter((h) => h.capture === capture).forEach((h) => h.f(e))
+}
+
 /** Tippt `text` in `feld`: setzt Wert (und Art) und löst `input` wie vom Browser aus (erst Erfassungs-, dann Blasenhörer am Wurzelknoten). */
 export function tippe(wurzel: MiniKnoten, feld: MiniKnoten, text: string, art = 'search'): void {
   Object.assign(feld, { value: text, type: art })

@@ -171,6 +171,10 @@
   satz: "Der Mangazeichner Rohan Kishibe gerät auf der Suche nach Stoff für seine Werke in Unheimliches, etwa in ein Bergdorf plötzlich reicher Villenbesitzer."
   quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26
+- id: 21783
+  satz: "Fox und sein Team aus Falco, Peppy und Slippy verteidigen Corneria gegen die Roboterarmee von Andross, den General Pepper einst verbannt hat."
+  quellen: [fandom]
+  geprueftAm: 2026-11-26
 - id: 21788
   satz: "Statt für die Uni-Aufnahmeprüfung zu lernen, schläft Kokone ständig ein und erlebt im Traumreich Heartland Abenteuer, die auf Geheimnisse ihrer Familie deuten."
   quellen: [anisearch, tmdb, anilist]
@@ -220,7 +224,7 @@
   quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26
 - id: 21833
-  satz: "Im Japan von 1918 pfeift der 17-jährige Wildfang Benio Hanamura auf Traditionen und will sich ihre Liebe selbst suchen, doch die Familie hat andere Pläne."
+  satz: "Im Japan von 1918 pfeift die 17-jährige Benio Hanamura, ein Wildfang, auf Traditionen und will sich ihre Liebe selbst suchen, doch die Familie hat andere Pläne."
   quellen: [tmdb, anilist]
   geprueftAm: 2026-11-26
 - id: 21838
@@ -233,7 +237,7 @@
   geprueftAm: 2026-11-26
 - id: 21852
   satz: "Der Pechvogel Rito traut sich nie, Haruna seine Gefühle zu gestehen, als die Alien-Prinzessin Lala vor einer Zwangsheirat flieht und in sein Leben platzt."
-  quellen: [eigen, anilist]
+  quellen: [eigen]
   geprueftAm: 2026-11-26
   umfang: reihe
 - id: 21855
@@ -889,7 +893,7 @@
   quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26
 - id: 100658
-  satz: "Sinbad erfährt, wie Galip, der Lehrling eines Königs, dessen friedliches Reich mit Zauberkraft zerstörte, während die Wunderlampe den Weg zum Wundertor weist."
+  satz: "Sinbads Gefährtin erzählt, wie Galip, der Lehrling ihres Vaters, ihr friedliches Königreich mit Zauberei zerstörte, und die Wunderlampe weist zum Wundertor."
   quellen: [anilist]
   geprueftAm: 2026-11-26
 - id: 100663

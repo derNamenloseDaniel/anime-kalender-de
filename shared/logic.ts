@@ -323,9 +323,13 @@ function terminGeschaetzt(
   return lastAnchor || (nurStartBelegt && episode > first) ? true : s.estimated
 }
 
-/** Liegt eine beobachtete Folge hinter dieser? Dann ist sie erschienen, auch wenn ihr Tag nur zurückgerechnet ist. */
-function vorBeobachteterFolge(s: NonNullable<Release['schedule']>, episode: number): boolean {
-  return Object.keys(s.observed ?? {}).some((k) => Number(k) > episode)
+/**
+ * Liegt eine beobachtete Folge hinter dieser, mit späterem Tag? Dann ist sie erschienen, auch wenn ihr Tag nur
+ * zurückgerechnet ist. Der Tagvergleich fängt eine Beobachtung in fremder Zählung ab (Black Clover S2: „174“ =
+ * 171 + 3 am 28.11. liegt nicht hinter Folge 5–173, 26.11.2026).
+ */
+function vorBeobachteterFolge(s: NonNullable<Release['schedule']>, date: string): boolean {
+  return Object.values(s.observed ?? {}).some((tag) => tag > date)
 }
 
 /** Uhrzeit aus dem Plan; eine festgelegte, nicht gemessene trägt `timeEstimated` („≈"). */
@@ -493,7 +497,7 @@ function folgenTermine(release: Release, s: Plan, base: TerminBasis, skips: Set<
       episode,
       ...gesamtzahl(s, last),
       estimated: geschaetzt,
-      ...(geschaetzt && vorBeobachteterFolge(s, episode) ? { vorBeobachtung: true } : {}),
+      ...(geschaetzt && vorBeobachteterFolge(s, date) ? { vorBeobachtung: true } : {}),
       /*
         **Nur der Tag, an dem wirklich nichts kam, trägt den Vermerk.**
 

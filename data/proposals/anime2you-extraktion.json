@@ -2330,6 +2330,15 @@
     "1076120": {
       "am": "2026-11-25",
       "vorschlaege": 0
+    },
+    "1076228": {
+      "am": "2026-11-26",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1076238": {
+      "am": "2026-11-26",
+      "vorschlaege": 1
     }
   },
   "vorschlaege": [
@@ -17607,6 +17616,29 @@
       "quelle": "https://www.anime2you.de/news/1076080/sieben-anime-im-rennen-fuer-oscars-2027/",
       "veroeffentlicht": "2026-11-25",
       "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "Pokémon",
+      "zitat": "Die auf jeweils 777 Exemplare limitierten Komplettboxen enthalten zusammen alle 25 Staffeln der ursprünglichen TV-Serie und sollen zwischen dem 18. Dezember 2026 und dem 25. Juni 2027 im monatlichen Rhythmus veröffentlicht werden.",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2026-12-18",
+      "uhrzeit": null,
+      "anbieter": "polyband anime",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": "Acht Generationsboxen erscheinen laut Artikel im monatlichen Rhythmus bis 25. Juni 2027, hier nur der erste Termin erfasst; zugleich letzte Disc-Veröffentlichungen des Franchise von polyband, da die Lizenz nicht mehr verlängert wird.",
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „polyband anime“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076238",
+      "artikel": "Design der acht DVD-Generationsboxen zu »Pokémon« vorgestellt",
+      "quelle": "https://www.anime2you.de/news/1076238/pokemon-dvd-generationsboxen-design/",
+      "veroeffentlicht": "2026-11-26",
+      "gelesenAm": "2026-11-26"
     }
   ]
 }

@@ -26,7 +26,7 @@ function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
 
 const KLASSEN = ['empf-aktion-gesehen']
 const LAPTOP = '@media (min-width: 1001px) and (max-height: 800px)'
-const MITTE = '.empf-galerie .empf-aktionen button:nth-child(2) { white-space: nowrap; }'
+const MITTE = '.empf-galerie .empf-aktionen .empf-knopf-mitte { white-space: nowrap; }'
 
 console.log('Fixture-CSS: verbergende Regeln')
 const verbergen: Array<[string, string, boolean]> = [
@@ -39,7 +39,7 @@ const verbergen: Array<[string, string, boolean]> = [
   ['i in der Reihe', '.empf-aktionen i { display: none !important; }', true],
   ['Kinder der Reihe', '.empf-aktionen > * { display: none; }', true],
   ['Schrift auf null', '.empf-aktionen button { font-size: 0; }', true],
-  ['Breite null', '.empf-aktionen button:nth-child(2) { width: 0; }', true],
+  ['Breite null', '.empf-aktionen .empf-knopf-mitte { width: 0; }', true],
   ['span der Galerie', '.empf-galerie span { display: none; }', true],
   ['in der Laptop-Lage', `${LAPTOP} { .empf-aktionen span { display: none; } }`, true],
   ['harmlose Regel einer anderen Stelle', '.empf-details { display: none; }', false],
@@ -52,7 +52,7 @@ for (const [name, css, erwartet] of verbergen) {
 console.log('Fixture-CSS: Regel der Laptop-Reihe im Block')
 const laptop: Array<[string, string, boolean]> = [
   ['im Laptop-Block', `${LAPTOP} { ${MITTE} }`, true],
-  ['Block mit anderem Leerraum', '@media (min-width:1001px) and (max-height:800px) {\n  .empf-galerie .empf-aktionen button:nth-child(2) { white-space: nowrap; }\n}', true],
+  ['Block mit anderem Leerraum', '@media (min-width:1001px) and (max-height:800px) {\n  .empf-galerie .empf-aktionen .empf-knopf-mitte { white-space: nowrap; }\n}', true],
   ['neben anderen Regeln im Block', `${LAPTOP} { .a { color: red; } ${MITTE} .b { color: red; } }`, true],
   ['ohne Block', MITTE, false],
   ['anderer Block (nur Breite)', `@media (min-width: 1001px) { ${MITTE} }`, false],

@@ -6,12 +6,16 @@
  * Titel im Hauptbestand ohne Cover und ohne Eintrag in der Handliste `data/cover-ohne-bekannt.json` → herabgestufte Warnzeile (Posteingang), Exit 0.
  * Rot bei fehlender oder kaputter Lückenliste und bei **veralteten** Einträgen (Kennung steht drauf, hat aber ein Cover): Der Bau schreibt die Liste selbst
  * (`bau/13-11-cover-luecken.ts`), ein veralteter Eintrag heißt also, dass dieser Schritt nicht lief oder falsch rechnet. Test: `check-cover-luecken-wache.ts`.
+ * Rot auch bei **Cover-Verlust gegen den Vorstand** (zuletzt eingecheckter Stand, `--vorstand <ref>`): Eine Kennung hatte überall ein Cover und hat
+ * jetzt irgendwo keins. Neue Kennungen ohne Bild zählen nicht (Test: `check-cover-luecken-vorstand.ts`).
  */
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { HERABGESTUFT } from './lib/bestand-warnzeile.ts'
 import { coverOhneImHauptbestand, pruefeCoverLuecken } from './lib/cover-luecken.ts'
+import { coverStandImVorstand, coverVerlust, type CoverStand } from './lib/cover-luecken-vorstand.ts'
+import { vorstandRef } from './lib/vorstand-abgang.ts'
 
 const lies = (pfad: string): unknown => JSON.parse(readFileSync(pfad, 'utf8'))
 const kennungen = (liste: number[]): string => `${liste.slice(0, 10).join(', ')}${liste.length > 10 ? ', …' : ''}`
@@ -28,7 +32,18 @@ export function hauptbestandOhneCover(haupt: Parameters<typeof coverOhneImHauptb
   return zeilen
 }
 
-export function main(wurzel: string): number {
+/** Cover-Verlust gegen den Vorstand als Fehlerzeile; ein nicht lesbarer Vorstand ist selbst ein Fehler (Nichtauskunft ist kein „gleich“). */
+function verlustGegenVorstand(wurzel: string, ref: string, jetzt: CoverStand): string | undefined {
+  let verlust: string[]
+  try {
+    verlust = coverVerlust(coverStandImVorstand(ref, wurzel), jetzt)
+  } catch (e) {
+    return `Vorstand ${ref} nicht lesbar: ${(e as Error).message.split('\n')[0]}`
+  }
+  if (verlust.length) return `Cover-Verlust gegen den Vorstand ${ref}: ${verlust.length} Kennung(en) hatten überall ein Cover und haben jetzt keins (Bildquelle des Baus prüfen): ${kennungen(verlust.map(Number))}`
+}
+
+export function main(wurzel: string, ref = 'HEAD'): number {
   const listePfad = join(wurzel, 'data/cover-luecken.json')
   let luecken: Record<string, string>
   try {
@@ -47,6 +62,12 @@ export function main(wurzel: string): number {
     console.error(`VERSTÖSSE: ${r.veraltet.length}`)
     return 1
   }
+  const verlust = verlustGegenVorstand(wurzel, ref, { reihen: daten('franchises.json'), datenbank: [...(daten('titles.json') as []), ...(daten('ohne-synchro.json') as [])] })
+  if (verlust) {
+    console.error(`  ✖ ${verlust}`)
+    console.error('VERSTÖSSE: 1')
+    return 1
+  }
   const bekannt = existsSync(join(wurzel, 'data/cover-ohne-bekannt.json')) ? (lies(join(wurzel, 'data/cover-ohne-bekannt.json')) as Record<string, string>) : {}
   for (const zeile of hauptbestandOhneCover(daten('titles.json') as [], bekannt)) console.log(`  ${zeile}`)
   if (!r.fehlt.length) console.log(`  ✓ Cover: jeder Eintrag hat ein Cover oder steht auf der Lückenliste (${Object.keys(luecken).length} Lücken)`)
@@ -55,5 +76,6 @@ export function main(wurzel: string): number {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  process.exit(main(process.argv[2] ?? fileURLToPath(new URL('..', import.meta.url))))
+  const ort = process.argv[2]?.startsWith('--') ? undefined : process.argv[2]
+  process.exit(main(ort ?? fileURLToPath(new URL('..', import.meta.url)), vorstandRef(process.argv.slice(2))))
 }

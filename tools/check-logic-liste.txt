@@ -155,6 +155,7 @@ pipeline/check-cover-bild-grenze.ts
 pipeline/check-cover-klein-vorschau.ts
 pipeline/check-cover-liste.ts
 pipeline/check-cover-luecken-bau.ts
+pipeline/check-cover-luecken-vorstand.ts
 pipeline/check-cover-luecken-wache.ts
 pipeline/check-cover-masse-poster-lauf.ts
 pipeline/check-cover-quelle.ts

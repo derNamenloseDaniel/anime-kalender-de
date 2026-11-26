@@ -43,6 +43,10 @@ function prozess(name: string, liste: string | null, reihenDatei: unknown, titel
   const wurzel = join(ordner, name)
   mkdirSync(join(wurzel, 'data'), { recursive: true })
   mkdirSync(join(wurzel, 'public/data'), { recursive: true })
+  // Die Wache liest den Vorstand aus Git; ein Stand ohne Bestandsdateien lässt diesen Teil leer (Fälle: check-cover-luecken-vorstand.ts).
+  for (const a of [['init', '-q'], ['commit', '-q', '--allow-empty', '-m', 'leer']]) {
+    spawnSync(process.env.GIT_EXE ?? 'git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...a], { cwd: wurzel, windowsHide: true })
+  }
   if (liste !== null) writeFileSync(join(wurzel, 'data', 'cover-luecken.json'), liste)
   if (bekannt !== null) writeFileSync(join(wurzel, 'data', 'cover-ohne-bekannt.json'), bekannt)
   writeFileSync(join(wurzel, 'public', 'data', 'franchises.json'), JSON.stringify(reihenDatei))

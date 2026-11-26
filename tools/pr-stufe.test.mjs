@@ -125,6 +125,11 @@ fall('erzeugte Kernpunkte (kernpunkte.yaml) → 1', [d('tools/kennzahlen/kernpun
 fall('Kennzahlen-Logik bleibt 2', [d('tools/kennzahlen/kennzahlen-logik.cjs')], 2)
 fall('Kennzahlen mit Logik gemischt → 2', [d('tools/kennzahlen/tage.jsonl'), d('tools/kennzahlen/kennzahlen-logik.cjs')], 2)
 fall('Kennzahlen über 300 Zeilen → 2', [d('tools/kennzahlen/tage.jsonl', zeilen(301))], 2)
+// Neue Prüfungen sind nie schwächer als der Code, den sie prüfen (pipeline/check-*.ts hat keine Herabstufungsregel).
+fall('neue pipeline/check-*.ts → 2', [d('pipeline/check-neu.ts', zeilen(40))], 2)
+fall('check-*.ts mit eigenem Test → 2', [d('pipeline/check-neu.ts'), d('pipeline/check-neu.test.ts')], 2)
+fall('check-*.ts mit Kennzahlen gemischt → 2', [d('pipeline/check-neu.ts'), d('tools/kennzahlen/tage.jsonl')], 2)
+fall('check-*.ts mit UI-Logik gemischt → 2', [d('pipeline/check-neu.ts'), d('web/src/components/Liste.tsx')], 2)
 
 if (fehler.length) {
   console.error(`\n${fehler.length} Fälle fehlgeschlagen`)

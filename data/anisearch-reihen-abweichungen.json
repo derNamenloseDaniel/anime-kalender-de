@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-25",
+  "stand": "2026-11-26",
   "deckung": {
     "titel": 20714,
     "mitSeite": 16343,
@@ -17,22 +17,22 @@
     "gemischt": 117
   },
   "hauptbestand": {
-    "titel": 2874,
-    "gleich": 2288,
+    "titel": 2875,
+    "gleich": 2289,
     "fehlen": 327,
     "zusaetzlich": 243,
     "gemischt": 16
   },
   "haelfteA": {
-    "titel": 7468,
-    "gleich": 6338,
+    "titel": 7464,
+    "gleich": 6334,
     "fehlen": 314,
     "zusaetzlich": 706,
     "gemischt": 110
   },
   "haelfteB": {
-    "titel": 8875,
-    "gleich": 7665,
+    "titel": 8879,
+    "gleich": 7669,
     "fehlen": 588,
     "zusaetzlich": 615,
     "gemischt": 7

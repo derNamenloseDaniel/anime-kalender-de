@@ -112,17 +112,30 @@ const termineAlt = [
 ]
 const titelAlt = new Map([14713, 102836, 103631, 20801, 43].map((id) => [id, titel(id)]))
 const ueberholt = ueberholteNeins(belegeAlt, termineAlt, '2026-11-17')
-pruefe('überholtes Nein: Kamisama Kiss und 43 (Nein älter als der Kanal-Termin), sonst keiner', [...ueberholt].sort().join() === '14713|primevideo,43|primevideo', [...ueberholt].join())
+pruefe('überholtes Nein: Kuroko, Kamisama Kiss und 43 (Nein älter als der Termin, mit oder ohne Kanal), sonst keiner', [...ueberholt].sort().join() === '102836|primevideo,14713|primevideo,43|primevideo', [...ueberholt].join())
 ergaenzeWegeAusTerminen({ titles: titelAlt, releases: termineAlt, istTot: () => false, verweiseEntfernt: [], belegFuer: (id) => belegeAlt.find((b) => b.anilistId === id), nein: ueberholt })
 const wegAlt = (id: number) => titelAlt.get(id)!.streams
 pruefe('Kamisama Kiss: Weg mit Kanal, ohne Adresse, ohne Tonurteil', wegAlt(14713).length === 1 && wegAlt(14713)[0]!.kanal === 'Aniverse' && wegAlt(14713)[0]!.url === '' && wegAlt(14713)[0]!.dub === undefined && wegAlt(14713)[0]!.herkunft === 'termin', JSON.stringify(wegAlt(14713)))
-pruefe('Kuroko: ohne Kanal bleibt das Nein (kein Weg ohne Adresse und Ton)', wegAlt(102836).length === 0)
+pruefe('Kuroko: Nachtrag-Termin ohne Kanal überholt das ältere Nein, Weg ohne Adresse und ohne Tonurteil', wegAlt(102836).length === 1 && wegAlt(102836)[0]!.url === '' && wegAlt(102836)[0]!.dub === undefined && wegAlt(102836)[0]!.herkunft === 'termin' && !wegAlt(102836)[0]!.kanal, JSON.stringify(wegAlt(102836)))
 pruefe('Trinity Seven: „ohne deutschen Ton“ bleibt, auch bei jüngerem Termin', wegAlt(103631).length === 0)
 pruefe('Nein jünger als der Termin gilt weiter', wegAlt(20801).length === 0)
 pruefe('ein Ja-Beleg (42) ist kein überholtes Nein', !ueberholt.has('42|primevideo'))
 pruefe('ein erst kommender Termin (44, Call of the Night: 20.11.) überholt das Nein noch nicht', !ueberholt.has('44|primevideo'))
 const weg43 = titelAlt.get(43)!.streams
 pruefe('neben einem Termin ohne Kanal (43) entsteht der Weg aus dem Kanal-Termin, mit Kanal', weg43.length === 1 && weg43[0]!.kanal === 'Aniverse', JSON.stringify(weg43))
+{
+  const t45 = new Map([[45, titel(45)]])
+  const umgekehrt = [termin(45, 'primevideo', { platformUrl: PRIME_SUCHE, schedule: { firstEpisodeDate: '2026-09-13' } }), kanalTermin(45, '2026-10-08')]
+  ergaenzeWegeAusTerminen({ titles: t45, releases: umgekehrt, istTot: () => false, verweiseEntfernt: [], belegFuer: () => nein(45, { available: false }), nein: ueberholteNeins([nein(45, { available: false })], umgekehrt, '2026-11-17') })
+  const w = t45.get(45)!.streams
+  pruefe('Termin ohne Kanal vor dem Kanal-Termin (45): der Weg trägt trotzdem den Kanal', w.length === 1 && w[0]!.kanal === 'Aniverse', JSON.stringify(w))
+}
+{
+  const spy = [termin(140960, 'disneyplus', { schedule: { firstEpisodeDate: '2026-10-04' } })]
+  const nv = nein(140960, { platform: 'disneyplus', available: false, checkedAt: '2026-08-26' })
+  const ja = (am: string) => nein(140960, { platform: 'disneyplus', dub: true, checkedAt: am })
+  pruefe('ein jüngerer Ja-Beleg hat das Nein schon abgelöst (Spy × Family 140960), ein älterer nicht', ueberholteNeins([nv, ja('2026-10-16')], spy, '2026-11-26').size === 0 && ueberholteNeins([nv, ja('2026-08-01')], spy, '2026-11-26').size === 1)
+}
 pruefe('ohne Handbeleg gibt es nichts zu überholen (40); ein Nein, das älter als nur der spätere Termin ist, gilt dem früheren (41)', !ueberholt.has('40|primevideo') && !ueberholt.has('41|primevideo'))
 
 if (fehler) process.exit(1)

@@ -74,11 +74,11 @@ pruefe('Netzfehler ohne alten Stand: keine Seite, gemeldet', !('Neu' in erg.date
 pruefe('Seite nicht mehr in der Handliste fällt weg, frische bleibt', !('Entfernt' in erg.datei.seiten) && erg.datei.seiten.Frisch === alt.seiten.Frisch)
 pruefe('Abrufzahl', erg.abrufe === 4, erg.abrufe)
 pruefe('Textform ist gültiges JSON mit demselben Inhalt', JSON.stringify(JSON.parse(alsText(erg.datei))) === JSON.stringify(erg.datei))
-const zwei = await sammle(['Z'], { seiten: {} }, async () => ({ status: 200, text: zweiZeilen }), heute, async () => undefined)
+const zwei = await sammle(['Z', 'Leer'], { seiten: {} }, async (s) => ({ status: 200, text: s === 'Z' ? zweiZeilen : 'kein Abschnitt' }), heute, async () => undefined)
 pruefe(
-  'Textform: eine Tabellenzeile je Textzeile',
+  'Textform: eine Tabellenzeile je Textzeile, eine Seite je Block',
   alsText(zwei.datei) ===
-    '{\n  "seiten": {\n    "Z": { "abgerufen": "2026-11-27", "abschnitt": "Synchronisation", "zeilen": [\n      {"rolle":"Held","deutsch":[{"sprecher":"Anna Alt","zusatz":null}]},\n      {"rolle":"Freund","deutsch":[{"sprecher":"Bernd Bar","zusatz":null}]}\n    ] }\n  }\n}\n',
+    '{\n  "seiten": {\n    "Z": { "abgerufen": "2026-11-27", "abschnitt": "Synchronisation", "zeilen": [\n      {"rolle":"Held","deutsch":[{"sprecher":"Anna Alt","zusatz":null}]},\n      {"rolle":"Freund","deutsch":[{"sprecher":"Bernd Bar","zusatz":null}]}\n    ] },\n    "Leer": { "abgerufen": "2026-11-27", "abschnitt": null, "zeilen": [] }\n  }\n}\n',
   alsText(zwei.datei),
 )
 const keinFehler = await sammle(['S'], { seiten: {} }, async () => Promise.reject('nur Text'), heute, async () => undefined)
@@ -134,6 +134,18 @@ const datei = JSON.parse(readFileSync(join(wurzel, 'data', 'wikipedia-sprecher.j
 pruefe('main schreibt die Sammlung', Object.keys(datei.seiten).join('|') === 'Serie A|Serie B' && datei.seiten['Serie A']?.zeilen.length === 1, datei)
 pruefe('Quelle grün mit Zahl der Seiten mit Tabelle', typeof gesundheit().lastOk === 'string' && gesundheit().lastCount === 2 && gesundheit().lastError === undefined, gesundheit())
 pruefe('Zusammenfassung', ausgabe.includes('[pipeline] Wikipedia-Sprecher: 2 Seiten in der Handliste, 2 abgerufen, 0 gestört, 2 mit deutscher Tabelle → data/wikipedia-sprecher.json'), ausgabe)
+
+// Seiten ohne deutsche Tabelle: der Abruf hat gearbeitet (grün), ein zweiter Lauf am selben Tag holt nichts und bleibt grün.
+rmSync(join(wurzel, 'data', 'wikipedia-sprecher.json'))
+rmSync(join(wurzel, 'data', 'source-health.json'))
+await main(async () => ({ status: 200, text: 'kein Abschnitt' }), async () => undefined)
+const ersterOk = gesundheit().lastOk
+pruefe('gelungene Abrufe ohne Tabelle: grün', typeof ersterOk === 'string' && gesundheit().lastCount === 0, gesundheit())
+await new Promise((r) => setTimeout(r, 5))
+await main(async () => {
+  throw new Error('darf nicht abrufen')
+}, async () => undefined)
+pruefe('nichts zu holen und nichts mit Tabelle: trotzdem grün', typeof gesundheit().lastOk === 'string' && gesundheit().lastOk !== ersterOk, gesundheit())
 
 // Als Skript: der Startblock ruft main (leere Handliste, kein Abruf).
 writeFileSync(join(wurzel, 'data', 'wikipedia-sprecher-seiten.yaml'), '[]\n')

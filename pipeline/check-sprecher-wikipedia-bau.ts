@@ -24,7 +24,7 @@ const voices = join(wurzel, 'public', 'data', 'voices')
 mkdirSync(voices, { recursive: true })
 mkdirSync(join(wurzel, 'data'), { recursive: true })
 const schreibe = (pfad: string, inhalt: unknown): void => writeFileSync(join(wurzel, pfad), typeof inhalt === 'string' ? inhalt : JSON.stringify(inhalt))
-const lies = (id: number): { roles: { character: string; actor: string; von?: string }[]; updatedAt: string; wikipedia?: { seite: string; url: string; unsicher?: string } } | undefined =>
+const lies = (id: number): { titleId: number; roles: { character: string; actor: string; von?: string }[]; updatedAt: string; wikipedia?: { seite: string; url: string; unsicher?: string } } | undefined =>
   existsSync(join(voices, `${id}.json`)) ? JSON.parse(readFileSync(join(voices, `${id}.json`), 'utf8')) : undefined
 
 schreibe(
@@ -115,7 +115,7 @@ pruefe('Seite ohne deutsche Spalte: keine Datei', lies(900009) === undefined)
 pruefe('Sprechermerker genau für die Titel mit Rollen (auch AniList ohne Ziel)', [...mit].sort().join(',') === '900001,900002,900004,900006,900007,900010,900012', [...mit])
 pruefe('unsicher mit nur abgeleiteter Synchro: keine Datei', lies(900011) === undefined, lies(900011))
 pruefe('Titel ohne Ziel: Wikipedia-Rest und Vermerk weg, AniList-Rolle bleibt', JSON.stringify(lies(900010)?.roles) === '[{"character":"Held","actor":"Ida Igel"}]' && !lies(900010)?.wikipedia, lies(900010))
-pruefe('unlesbare Sprecherdatei wird gemeldet und neu geschrieben', lies(900012)?.wikipedia?.seite === 'Serie A' && zeilen.some((z) => z.includes('900012.json unlesbar')), zeilen)
+pruefe('unlesbare Sprecherdatei wird gemeldet und neu geschrieben', lies(900012)?.wikipedia?.seite === 'Serie A' && zeilen.some((z) => z.includes('900012.json unlesbar (SyntaxError:') && z.includes('JSON')), zeilen)
 pruefe('Doppelte Tabellenzeile ergibt eine Rolle (900001 oben: zwei Rollen)', lies(900001)?.roles.length === 2)
 pruefe(
   'Zählzeile der Phase',
@@ -144,12 +144,12 @@ console.log('\nSprecher aus Wikipedia: aniSearch kommt dazu')
 schreibe('data/anisearch-sprecher.json', { '42': { de: [{ figur: 'Held', sprecher: 'Hanna Hut' }] }, '43': { de: [{ figur: 'Held', sprecher: 'Hanna Hut' }] } })
 sprecherRollen({ titles })
 pruefe('aniSearch ersetzt die Wikipedia-Rollen ganz', JSON.stringify(lies(900001)?.roles) === JSON.stringify([{ character: 'Held', actor: 'Hanna Hut', von: 'anisearch' }]) && !lies(900001)?.wikipedia, lies(900001))
-pruefe('aniSearch-Phase behält die AniList-Rolle mit anderem Sprecher', JSON.stringify(lies(900010)?.roles) === '[{"character":"Held","actor":"Hanna Hut","von":"anisearch"},{"character":"Held","actor":"Ida Igel"}]', lies(900010))
+pruefe('aniSearch-Phase behält die AniList-Rolle mit anderem Sprecher, Kennung und Datum der Datei', lies(900010)?.titleId === 900010 && lies(900010)?.updatedAt === '2026-03-03' && JSON.stringify(lies(900010)?.roles) === '[{"character":"Held","actor":"Hanna Hut","von":"anisearch"},{"character":"Held","actor":"Ida Igel"}]', lies(900010))
 
 console.log('\nSprecher aus Wikipedia: Sammlung fehlt (Bau vor dem ersten Sammellauf)')
 rmSync(join(wurzel, 'data', 'wikipedia-sprecher.json'))
 const ohne = sprecherRollen({ titles })
-pruefe('ohne Sammlung: kein Abbruch, Wikipedia-Rollen fallen weg', JSON.stringify(lies(900002)?.roles) === '[]' && !ohne.has(900002) && ohne.has(900004), lies(900002))
+pruefe('ohne Sammlung: kein Abbruch, Wikipedia-Rollen fallen weg', JSON.stringify(lies(900002)?.roles) === '[]' && !ohne.has(900002) && ohne.has(900004) && ohne.has(900010), lies(900002))
 
 rmSync(wurzel, { recursive: true, force: true })
 if (verletzt) {

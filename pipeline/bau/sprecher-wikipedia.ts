@@ -101,7 +101,7 @@ function liesDatei(id: number): VoiceDatei | undefined {
   try {
     return JSON.parse(readFileSync(pfad, 'utf8')) as VoiceDatei
   } catch (e) {
-    warn(`Sprecher aus Wikipedia: ${pfad} unlesbar (${e instanceof Error ? e.message : String(e)}), wird neu geschrieben`)
+    warn(`Sprecher aus Wikipedia: ${pfad} unlesbar (${String(e)}), wird neu geschrieben`)
     return undefined
   }
 }

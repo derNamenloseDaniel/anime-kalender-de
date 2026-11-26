@@ -41,7 +41,10 @@ const gefragt: string[] = []
 const echtFetch = globalThis.fetch
 globalThis.fetch = (async (u: string) => (gefragt.push(String(u)), new Response(JSON.stringify(datei), { status: 200 }))) as typeof fetch
 const geladen = await loadVoices(900001)
+globalThis.fetch = (async () => new Response('', { status: 404 })) as typeof fetch
+const fehlt = await loadVoices(900002)
 globalThis.fetch = echtFetch
+pruefe('loadVoices: fehlende Datei heißt „keine Rollen“, kein Fehler', JSON.stringify(fehlt) === '{"roles":[]}', fehlt)
 pruefe('loadVoices reicht Rollen, annUrl und wikipedia durch', JSON.stringify(geladen) === JSON.stringify({ roles: datei.roles, annUrl: 'https://a', wikipedia: datei.wikipedia }) && gefragt.some((u) => u.includes('voices/900001.json')), [geladen, gefragt])
 
 if (verletzt) {

@@ -1,0 +1,10 @@
+## Nachtrag (Cloud-Nachbesserung Runde 1, 5115)
+
+Zweig `fix/kalender-n1-n2-geschaetzt`, Commit 74bfaefa6 (nach Merge von origin/main). `check-logic-alle` 860/860 grün, `tsc --noEmit -p .` grün.
+
+- A1: umgesetzt - neuer Fall in `check-vor-beobachtung.ts` (Beobachtung Folge 3 und 6: Folge 3 ohne `estimated` trägt kein `vorBeobachtung`, Folge 1–2 tragen es). Beleg: Mutant `geschaetzt && vorBeobachteterFolge` → `vorBeobachteterFolge` gibt Exit 1 (vorher Exit 0).
+- A2: umgesetzt - `ergaenzungGeschaetzt` getestet: ergänzte Folge 1–5 vor beobachteter Folge 6 → false, ergänzte Folge 7 → true. Beleg: Mutant ohne `!e.vorBeobachtung` gibt Exit 1.
+- A3: umgesetzt - die Nummernbedingung `Number(k) > episode` war redundant (die beobachtete Folge selbst ist durch `observed[episode]` nie `estimated`, eine frühere Folge mit späterem Tag ist unmöglich) und fiel weg; `vorBeobachteterFolge(s, date)` vergleicht nur noch den Tag. Die Grenze `tag > date` hat einen Test (Black-Clover-Fall, gleicher Tag); Mutant `>=` gibt Exit 1.
+- A4: umgesetzt - Patch-Notes-Eintrag `data/patchnotes/erschienene-folgen-ohne-ungefaehr-zeichen.yaml` („Erschienene Folgen zeigen kein „ungefähr“ mehr“, 6 Wörter), Kategorie bugfix.
+- A5: umgesetzt - `docs/wissen/datensatz.md`, Abschnitt Snowball Earth (belegtBis): `firstEpisodeNumber` > 1 und `vorBeobachtung` nachgeführt.
+- A6: umgesetzt - Befund: `observed[174] = 2026-11-28` entsteht nicht in `data/curated`, sondern im Bau aus dem Crunchyroll-Katalog; 174 = 171 + 3 ist die Folge 4 der Staffel in Crunchyroll-Gesamtzählung (Folge 1 der Staffel = 171), also kein Beleg für Folge 4–173. Die Pille am 28.11. wäre mit der alten Regel falsch gewesen. Fix im Code: `vorBeobachtung` nur, wenn die beobachtete Folge einen späteren Tag hat als die geprüfte Folge; Folge 4–173 liegen auf 28.11. oder später. Beleg: Testfall „fremde Zählung“, Zählung über `public/data/releases.json`: black-clover 170 → 0, thunder-3 5, auto-189123-netflix 2. Die Mischzählung in den Beobachtungen selbst ist eine eigene Datenfrage (nicht Teil dieses PR).

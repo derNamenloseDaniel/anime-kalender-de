@@ -1,3 +1,4 @@
 kategorie: feature
-text: Reihe zeigt alle Teile, auch ohne Synchro
-untertitel: Reiter ohne deutsche Synchro tragen einen gestrichelten Rand
+text: Reihe im Detail-Panel zeigt immer alle Teile
+untertitel: Ohne Schalter; Reiter ohne deutsche Synchro sind gestrichelt umrandet
+highlight: true

@@ -111,7 +111,7 @@ function idsMitWikipedia(): number[] {
 }
 
 /** Schreibt die Wikipedia-Rollen; Rückgabe: Titel mit Rollen danach (ergänzt `mitStimmen`). */
-export function ergaenzeWikipediaSprecher({ titles, mitStimmen }: { titles: Map<number, Title>; mitStimmen: Set<number> }): { mitStimmen: Set<number>; zaehlung: Zaehlung } {
+export function ergaenzeWikipediaSprecher({ titles, mitStimmen }: { titles: Map<number, Title>; mitStimmen: Set<number> }): Set<number> {
   const ziele = zieleAusHandliste(yaml.load(readFileSync(join(ROOT, HANDLISTE), 'utf8')) as Parameters<typeof zieleAusHandliste>[0])
   const sammlung = readJson<SprecherDatei>(SAMMLUNG, { seiten: {} })
   const jeId = new Map(ziele.map((z) => [z.id, z]))
@@ -130,7 +130,6 @@ export function ergaenzeWikipediaSprecher({ titles, mitStimmen }: { titles: Map<
     const neu = wendeAn(datei, ziel, rollen, synchroBelegt(t), seite?.abgerufen ?? '')
     if (neu && JSON.stringify(neu) !== JSON.stringify(datei)) writeFileSync(`${VOICES_DIR}/${id}.json`, JSON.stringify(neu))
     if (neu?.roles.length) aus.add(id)
-    else aus.delete(id)
     if (!ziel) continue
     if (neu?.wikipedia) {
       z.titel++
@@ -143,5 +142,5 @@ export function ergaenzeWikipediaSprecher({ titles, mitStimmen }: { titles: Map<
     `Sprecher aus Wikipedia: ${z.titel} Titel (${z.unsicher} ≈ unsicher); übergangen: ${z.andereQuelle} mit anderer Quelle, ` +
       `${z.ohneSynchroBeleg} unsicher ohne Synchrobeleg, ${z.ohneRollen} ohne Rollen, ${z.ohneTitel} ohne Titel`,
   )
-  return { mitStimmen: aus, zaehlung: z }
+  return aus
 }

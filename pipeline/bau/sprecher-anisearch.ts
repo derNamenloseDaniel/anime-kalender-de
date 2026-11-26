@@ -131,5 +131,5 @@ function schreibeQuellenZaehlung(m: Messung): void {
 export function sprecherRollen({ titles }: { titles: Map<number, Title> }): Set<number> {
   const { messung, mitStimmen } = uebernehmeAnisearchSprecher({ titles })
   schreibeQuellenZaehlung(messung)
-  return ergaenzeWikipediaSprecher({ titles, mitStimmen }).mitStimmen
+  return ergaenzeWikipediaSprecher({ titles, mitStimmen })
 }

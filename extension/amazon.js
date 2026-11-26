@@ -2766,7 +2766,7 @@ const speicherSchreiben = (werte) => globalThis.akKontext.schreiben(werte)
     const gesuchteStaffel = staffelImTitel(auftrag.titel)
     const staffelPasst = (t) => staffelImTitel(t.titel) === gesuchteStaffel
     const genau = gleichNamig.filter((t) => typPasst(t) && staffelPasst(t))
-    if (genau.length) return { art: 'genau', treffer: genau }
+    if (genau.length) return { art: 'genau', treffer: genau, namensgleich: gleichNamig }
     /*
       Gleicher Name, falscher Typ — das ist kein Treffer, sondern der
       Nachbar: der Film zur gesuchten Serie oder umgekehrt.
@@ -3790,7 +3790,7 @@ const speicherSchreiben = (werte) => globalThis.akKontext.schreiben(werte)
          * Eintrag sind; der Kasten bot nur „Anderes Werk" an. Seit 31.10.2026 sind alle angehakt und
          * Daniel nimmt ab, was fremd ist („Sword Art Online" gegen „… Alicization").
          */
-        ...(nurAehnlich ? auswahlGruppe(auftrag, gefunden) : []),
+        ...(nurAehnlich ? auswahlGruppe(auftrag, { treffer: befund.treffer }) : []),
         /*
           **Ein Titel mit Zusatz findet oft nichts, der Haupttitel schon.**
 
@@ -3997,7 +3997,7 @@ const speicherSchreiben = (werte) => globalThis.akKontext.schreiben(werte)
       auftrag.titel,
       folgen,
       ...begriffZeile,
-      ...auswahlGruppe(auftrag, gefunden),
+      ...auswahlGruppe(auftrag, { treffer: befund.namensgleich ?? befund.treffer }),
       /* Auch eine gefundene Karte kann die falsche sein (31.08.2026, „Ronja Räubertochter"); gemeldet wird unter der Suchadresse. */
       istGemeldet(auftrag.suchUrl)
         ? kastenZeile('ak-such-fertig', 'gemeldet ✓')
@@ -4073,13 +4073,13 @@ const speicherSchreiben = (werte) => globalThis.akKontext.schreiben(werte)
       Die Trennlinie ist der **Name**. Trägt der Seitentitel den Auftragstitel
       (oder umgekehrt), ist es dieselbe Sache in einer anderen Ausgabe — dann
       warnt der Kasten. Haben beide nichts gemeinsam, ist es ein fremdes Werk,
-      und der Auftrag hat hier nichts zu suchen.
+      und der Auftrag hat hier nichts zu suchen (Suchbegriffe zählen als Name mit: Prime führt Serien oft englisch).
     */
-    if (andereSeite) {
+    if (andereSeite || !auftrag.zielAsin) {
       try {
-        const a = titelKern(auftrag.titel ?? '')
+        const namen = [auftrag.titel, ...['suchbegriff', 'suchbegriffEn'].map((k) => suchliste[auftrag.suchUrl]?.[k])].map((n) => titelKern(n ?? '')).filter(Boolean)
         const b = titelKern(seitenTitel() ?? '')
-        if (a && b && !a.includes(b) && !b.includes(a)) return false
+        if (b && namen.length && namen.every((a) => !a.includes(b) && !b.includes(a))) return false
       } catch {
         /* Ohne Titel bleibt es beim bisherigen Verhalten: warnen statt ausblenden. */
       }
@@ -7729,8 +7729,7 @@ const speicherSchreiben = (werte) => globalThis.akKontext.schreiben(werte)
             Nur baute ihn danach niemand neu, und der Kasten war ganz weg
             („wo ist die extension?"). Beide Bauer gehören hierher.
           */
-          if (location.pathname === '/s' || location.pathname.startsWith('/s/')) zeigeSuchhinweis()
-          else zeigeAuftragshinweis()
+          globalThis.akPrimeKastenNeu(alterHinweis, kastenAdresse(), location.pathname, { suche: zeigeSuchhinweis, titel: zeigeAuftragshinweis, huelle: () => kastenSkelett().classList.add('ak-nur-huelle') })
         } catch {
           /* Ohne Auftrag gibt es nichts zu zeigen — der alte Kasten ist trotzdem weg. */
         }

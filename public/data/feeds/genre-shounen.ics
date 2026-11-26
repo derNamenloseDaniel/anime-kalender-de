@@ -10,177 +10,6 @@ X-WR-TIMEZONE:Europe/Berlin
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:auto-139630-tv-prosieben-maxx@2026-11-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261119T154000Z
-DTEND:20261119T161000Z
-SUMMARY:My Hero Academia Staffel 6 – Folge 2
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/13453/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-19#78@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261119T160500Z
-DTEND:20261119T163500Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-19#79@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261119T163000Z
-DTEND:20261119T170000Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:yaiba-samurai-legend-prosieben-maxx@2026-11-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261119T172500Z
-DTEND:20261119T175500Z
-SUMMARY:YAIBA: Samurai Legend – Folge 9/24
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:yaiba-samurai-legend-joyn@2026-11-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261119T175000Z
-DTEND:20261119T182000Z
-SUMMARY:YAIBA: Samurai Legend – Folge 9/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
-  https://anime-kalender.de/t/15908/
-CATEGORIES:Joyn
-END:VEVENT
-BEGIN:VEVENT
-UID:one-piece-whole-cake-island-prosieben-maxx@2026-11-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261119T175000Z
-DTEND:20261119T182000Z
-SUMMARY:ONE PIECE – Folge 788/877
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nGeschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhyth
- mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
- t/12/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:naruto-shippuden-the-movie-5-blood-prison-2026-11-19@2026-11-19@anime-k
- alender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261119
-DTEND;VALUE=DATE:20261120
-SUMMARY:Naruto Shippuden: The Movie 5 - Blood Prison (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/5290/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
-UID:naruto-shippuden-the-ova-naruto-ein-genie-und-drei-wuensche-2026-11-19@
- 2026-11-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261119
-DTEND;VALUE=DATE:20261120
-SUMMARY:Naruto Shippuden: The OVA - Naruto\, ein Genie und drei Wünsche (D
- isc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/5311/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
-UID:naruto-shippuden-flammende-chunin-pruefung-naruto-gegen-konohamaru-2026
- -11-19@2026-11-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261119
-DTEND;VALUE=DATE:20261120
-SUMMARY:Naruto Shippuden: Flammende Chunin-Prüfung - Naruto gegen Konohama
- ru! (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/5318/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
-UID:road-to-ninja-naruto-the-movie-2026-11-19@2026-11-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261119
-DTEND;VALUE=DATE:20261120
-SUMMARY:Road to Ninja: Naruto the Movie (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/5917/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
-UID:the-last-naruto-the-movie-2026-11-19@2026-11-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261119
-DTEND;VALUE=DATE:20261120
-SUMMARY:The Last: Naruto the Movie (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/6377/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
-UID:boruto-naruto-the-movie-2026-11-19@2026-11-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261119
-DTEND;VALUE=DATE:20261120
-SUMMARY:Boruto: Naruto the Movie (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/7680/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
-UID:naruto-shippuden-the-movie-2026-11-19@2026-11-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261119
-DTEND;VALUE=DATE:20261120
-SUMMARY:Naruto Shippuden: The Movie (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/2068/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
-UID:naruto-shippuden-the-movie-bonds-2026-11-19@2026-11-19@anime-kalender-d
- e
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261119
-DTEND;VALUE=DATE:20261120
-SUMMARY:Naruto Shippuden: The Movie - Bonds (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/3147/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
-UID:naruto-shippuden-the-movie-die-erben-des-willens-des-feuers-2026-11-19@
- 2026-11-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261119
-DTEND;VALUE=DATE:20261120
-SUMMARY:Naruto Shippuden: The Movie - Die Erben des Willens des Feuers (Dis
- c)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/3822/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
-UID:naruto-shippuden-the-movie-4-the-lost-tower-2026-11-19@2026-11-19@anime
- -kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261119
-DTEND;VALUE=DATE:20261120
-SUMMARY:Naruto Shippuden: The Movie 4 - The Lost Tower (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/4476/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
 UID:auto-139630-tv-prosieben-maxx@2026-11-20@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261120T154500Z
@@ -388,7 +217,7 @@ UID:black-clover-s2-crunchyroll-synchro@2026-11-21@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261121T160000Z
 DTEND:20261121T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 3/≈174
+SUMMARY:Black Clover – Staffel 2 – Folge 3/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
  etails: https://anime-kalender.de/t/16920/
 CATEGORIES:Crunchyroll
@@ -404,6 +233,19 @@ DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nUhrze
  r Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: h
  ttps://anime-kalender.de/t/17567/
 CATEGORIES:Netflix
+END:VEVENT
+BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll@2026-11-21@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261121
+DTEND;VALUE=DATE:20261122
+SUMMARY:Black Clover – Staffel 2 – Folge 8/≈12 (OmU)
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
+ lton mit deutschen Untertiteln\, keine deutsche Synchro.\nUhrzeit noch nic
+ ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
+ dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
+ e-kalender.de/t/16920/
+CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:das-band-der-unterwelt-netflix@2026-11-21@anime-kalender-de
@@ -627,34 +469,11 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll@2026-11-28@anime-kalender-de
+UID:black-clover-s2-crunchyroll-synchro@2026-11-28@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261128T160000Z
 DTEND:20261128T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 174/174 (OmU)
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
- lton mit deutschen Untertiteln\, keine deutsche Synchro.\nDetails: https:/
- /anime-kalender.de/t/16920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2026-11-28#4@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261128T160000Z
-DTEND:20261128T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 4–173/≈174
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2026-11-28#174@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261128T160000Z
-DTEND:20261128T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 174/≈174
+SUMMARY:Black Clover – Staffel 2 – Folge 4/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
  etails: https://anime-kalender.de/t/16920/
 CATEGORIES:Crunchyroll
@@ -670,6 +489,19 @@ DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nUhrze
  r Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: h
  ttps://anime-kalender.de/t/17567/
 CATEGORIES:Netflix
+END:VEVENT
+BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll@2026-11-28@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261128
+DTEND;VALUE=DATE:20261129
+SUMMARY:Black Clover – Staffel 2 – Folge 9/≈12 (OmU)
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
+ lton mit deutschen Untertiteln\, keine deutsche Synchro.\nUhrzeit noch nic
+ ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
+ dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
+ e-kalender.de/t/16920/
+CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:das-band-der-unterwelt-netflix@2026-11-28@anime-kalender-de
@@ -929,6 +761,18 @@ DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
 CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll-synchro@2026-12-05@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261205T160000Z
+DTEND:20261205T163000Z
+SUMMARY:Black Clover – Staffel 2 – Folge 5/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 6920/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:ranma-s3-netflix@2026-12-05@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261205
@@ -939,6 +783,19 @@ DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nUhrze
  r Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: h
  ttps://anime-kalender.de/t/17567/
 CATEGORIES:Netflix
+END:VEVENT
+BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll@2026-12-05@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261205
+DTEND;VALUE=DATE:20261206
+SUMMARY:Black Clover – Staffel 2 – Folge 10/≈12 (OmU)
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
+ lton mit deutschen Untertiteln\, keine deutsche Synchro.\nUhrzeit noch nic
+ ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
+ dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
+ e-kalender.de/t/16920/
+CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:das-band-der-unterwelt-netflix@2026-12-05@anime-kalender-de
@@ -1163,6 +1020,18 @@ DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
 CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll-synchro@2026-12-12@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261212T160000Z
+DTEND:20261212T163000Z
+SUMMARY:Black Clover – Staffel 2 – Folge 6/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 6920/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:ranma-s3-netflix@2026-12-12@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261212
@@ -1173,6 +1042,19 @@ DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nUhrze
  r Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: h
  ttps://anime-kalender.de/t/17567/
 CATEGORIES:Netflix
+END:VEVENT
+BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll@2026-12-12@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261212
+DTEND;VALUE=DATE:20261213
+SUMMARY:Black Clover – Staffel 2 – Folge 11/≈12 (OmU)
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
+ lton mit deutschen Untertiteln\, keine deutsche Synchro.\nUhrzeit noch nic
+ ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
+ dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
+ e-kalender.de/t/16920/
+CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:das-band-der-unterwelt-netflix@2026-12-12@anime-kalender-de
@@ -1304,6 +1186,18 @@ DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
 CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll-synchro@2026-12-19@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261219T160000Z
+DTEND:20261219T163000Z
+SUMMARY:Black Clover – Staffel 2 – Folge 7/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 6920/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:ranma-s3-netflix@2026-12-19@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261219
@@ -1314,6 +1208,19 @@ DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nUhrze
  r Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: h
  ttps://anime-kalender.de/t/17567/
 CATEGORIES:Netflix
+END:VEVENT
+BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll@2026-12-19@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261219
+DTEND;VALUE=DATE:20261220
+SUMMARY:Black Clover – Staffel 2 – Folge 12/≈12 (OmU)
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
+ lton mit deutschen Untertiteln\, keine deutsche Synchro.\nUhrzeit noch nic
+ ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
+ dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
+ e-kalender.de/t/16920/
+CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00371866@2026-12-21@anime-kalender-de
@@ -1400,6 +1307,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll-synchro@2026-12-26@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261226T160000Z
+DTEND:20261226T163000Z
+SUMMARY:Black Clover – Staffel 2 – Folge 8/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 6920/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:cr-GT00371866@2026-12-28@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261228T153000Z
@@ -1472,6 +1391,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll-synchro@2027-01-02@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20270102T160000Z
+DTEND:20270102T163000Z
+SUMMARY:Black Clover – Staffel 2 – Folge 9/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 6920/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:cr-GT00371866@2027-01-04@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20270104T153000Z
@@ -1542,6 +1473,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
+END:VEVENT
+BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll-synchro@2027-01-09@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20270109T160000Z
+DTEND:20270109T163000Z
+SUMMARY:Black Clover – Staffel 2 – Folge 10/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 6920/
+CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00371866@2027-01-11@anime-kalender-de
@@ -1702,6 +1645,18 @@ DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
 CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll-synchro@2027-01-16@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20270116T160000Z
+DTEND:20270116T163000Z
+SUMMARY:Black Clover – Staffel 2 – Folge 11/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 6920/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:cr-GT00371866@2027-01-18@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20270118T153000Z
@@ -1772,6 +1727,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
+END:VEVENT
+BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll-synchro@2027-01-23@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20270123T160000Z
+DTEND:20270123T163000Z
+SUMMARY:Black Clover – Staffel 2 – Folge 12/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 6920/
+CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2027-01-25@anime-kalender-de

@@ -13,8 +13,9 @@ import { HOECHSTENS } from './news.ts'
 import { ausloeserZeile } from './ausloeser-zeilen.ts'
 import { alleTermineGekennzeichnet } from './pruefung.ts'
 import { urteilDarfBelegen } from './urteil-weg.ts'
+import { hinweisGegenTermin } from './kalender-hinweis-termin.ts'
 
-export const REGELN = ['erschienenOhneTermin', 'schaetzungNachEnde', 'spracheOffenTrotzMeldung', 'ereignisOhneNews', 'terminOhneBeleg', 'primeOhneTitelseite'] as const
+export const REGELN = ['erschienenOhneTermin', 'schaetzungNachEnde', 'spracheOffenTrotzMeldung', 'ereignisOhneNews', 'terminOhneBeleg', 'primeOhneTitelseite', 'hinweisGegenTermin'] as const
 export type Regel = (typeof REGELN)[number]
 
 /** Ein Treffer: der Titel (für den Panel-Link) und ein Satz, der den Widerspruch nennt; `schluessel` bleibt über Läufe gleich. */
@@ -212,6 +213,7 @@ const PRUEFUNG: Record<Regel, (b: Bestand) => Treffer[]> = {
   ereignisOhneNews,
   terminOhneBeleg,
   primeOhneTitelseite,
+  hinweisGegenTermin,
 }
 
 export function plausibilitaet(b: Bestand): Record<Regel, Treffer[]> {

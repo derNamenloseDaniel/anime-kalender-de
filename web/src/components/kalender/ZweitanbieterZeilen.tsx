@@ -6,6 +6,7 @@ import { coverBild } from '../../lib/cover.ts'
 import { useLang, type Translate } from '../../lib/i18n.tsx'
 import { nurFolge } from './Marken.tsx'
 import { useHoverCover } from './HoverCover.tsx'
+import { Tooltip } from '../ui.tsx'
 
 type ZweitTermin = ReleaseEvent & { zweitanbieter: Zweitanbieter }
 
@@ -39,9 +40,9 @@ function ZweitZeile({
       {versteckt ? (
         <span className="block px-2 py-1 text-[13px] text-ak-sehr-leise italic">{ev.name}</span>
       ) : (
+        <Tooltip text={hinweis(ev, t)} seite="unten" fuellend>
         <button
           type="button"
-          title={hinweis(ev, t)}
           onClick={() => onOpen(ev.releaseSlug, ev.date)}
           className="grid min-h-11 w-full cursor-pointer grid-cols-[28px_minmax(0,1fr)] items-center gap-2.5 rounded-xl border border-ak-linie bg-ak-flaeche px-2 py-1.5 text-left transition hover:bg-ak-flaeche-2"
         >
@@ -57,6 +58,7 @@ function ZweitZeile({
             <span>{t('kal.zweitSatz', { anbieter, erster: PLATFORMS[ev.zweitanbieter.erster].name })}</span>
           </span>
         </button>
+        </Tooltip>
       )}
       {vorschau}
     </li>

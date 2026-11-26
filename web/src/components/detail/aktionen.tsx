@@ -4,6 +4,7 @@ import { teilbarerSlug } from '@shared/teilen.ts'
 import type { Title } from '@shared/types.ts'
 import { useShare } from '../../lib/share.ts'
 import type { Translate } from '../../lib/i18n.tsx'
+import { Tooltip } from '../ui.tsx'
 
 const KNOPF =
   'inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-slate-300 px-3.5 text-t3 font-semibold text-ak-text transition hover:bg-ak-flaeche-2 dark:border-white/20'
@@ -66,9 +67,11 @@ export function PanelAktionen({ title, favorites, onToggleFavorite, onToggleHidd
           {t(copiedSlug === title.slug ? 'kopf.kopiert' : 'detail.share')}
         </button>
       )}
-      <button type="button" onClick={() => onToggleHidden(title.id)} aria-label={t('kopf.ausblenden')} title={t('kopf.ausblenden')} className={KNOPF_ZEICHEN}>
-        <Auge />
-      </button>
+      <Tooltip text={t('kopf.ausblenden')} seite="unten">
+        <button type="button" onClick={() => onToggleHidden(title.id)} aria-label={t('kopf.ausblenden')} className={KNOPF_ZEICHEN}>
+          <Auge />
+        </button>
+      </Tooltip>
       {trailer}
     </div>
   )

@@ -3,7 +3,7 @@
 - Zweig `daten/handlung-satz-teil-03`, eine neue Datei `data/curated/ein-satz-handlung/teil-03.yaml`, sonst nichts geändert.
 - Sätze: 244 von 244 Titeln (ids 1889–4087). Lücken: 0. `umfang: reihe`: 0 (jede Fortsetzung, jeder Film und jede OVA hatte eine Quelle zum eigenen Teil).
 - Quellenfamilien: 154× anisearch+tmdb+anilist, 75× anisearch+anilist, 5× anisearch+tmdb, 2× tmdb+anilist, 1× tmdb+fandom; nur eine Familie bei 7 Titeln (2226, 2237, 2905, 3444, 3812 nur anisearch; 3760, 3823 nur anilist).
-- Nähe (5-Wort-Abschnitt gegen alle Quelltexte je Titel, `vergleiche()` aus `tools/handlung-fakten/naehe.ts`): vorher 32 Titel mit Treffer, nachher 0. Länge > 160: vorher 71 Sätze, nachher 0. YAML liest dieselben 244 Sätze zurück.
+- Nähe (5-Wort-Abschnitt gegen alle Quelltexte je Titel, `vergleiche()` aus `tools/handlung-fakten/naehe.ts`): vorher 32 Titel mit Treffer, nachher 0. Länge > 160: nachher 0 (vorher nicht gezählt). YAML liest dieselben 244 Sätze zurück.
 - `tools/handlung-naehe.ts` selbst nicht genutzt: es liest Faktenkarten je Titel, die es für diese Titel nicht gibt; der Vergleich daraus läuft im Scratch-Skript.
 - Stichprobe 10 zufällige Sätze (Seed 2611: 1904, 2041, 2313, 2332, 2558, 2577, 2913, 3024, 3110, 3810): 10 von 10 treffen Kern und richtigen Teil (1904 zweite Reihe mit Karin statt Akane, 2558 Fortsetzung, 2313 Film). Anmerkung 2313: „schwarzer Regen“ nach TMDB, aniSearch schreibt „Staub“.
 - TMDB-Text gehört bei Filmen, OVAs und Folgestaffeln oft zur Hauptserie (z. B. 1889, 1904, 2961, 2962); dort ist tmdb nicht als Quelle gezählt.

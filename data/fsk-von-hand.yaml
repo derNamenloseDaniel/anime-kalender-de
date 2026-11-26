@@ -45,3 +45,11 @@
   beleg: "Amazon.de: DVD „Yona Yona Pinguin – Die Legende des Pinguins“, Universal Pictures Germany (deutsche Erstausgabe 14.04.2011), freigegeben ab 6."
   sources:
     - "https://www.amazon.de/-/en/Yona-Pinguin-Die-Legende-Pinguins/dp/B004HJIXLS"
+
+- anilistId: 10011080
+  titel: "Der Glückselefant: Khans großes Abenteuer"
+  fsk: 6
+  art: disc
+  beleg: "Amazon.de: DVD „Der Glückselefant – Khans grosses Abenteuer“, erschienen 26.03.2010 (deutsche Erstausgabe), ab 6; filmdienst: „FSK: ab 6“, DVD-Anbieter Senator."
+  sources:
+    - "https://www.amazon.de/-/en/Gl%C3%BCckselefant-Khans-grosses-Abenteuer/dp/B00378JNP0"

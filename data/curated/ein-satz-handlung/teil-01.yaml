@@ -352,7 +352,7 @@
   quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26
 - id: 249
-  satz: "Schülerin Kagome wird an ihrem 15. Geburtstag durch einen Brunnen ins feudale Japan gezogen und trifft dort Inuyasha, einen Halbdämon, der das Shikon-Juwel begehrt."
+  satz: "Kagome wird an ihrem 15. Geburtstag durch einen Brunnen ins feudale Japan gezogen und trifft dort Inuyasha, einen Halbdämon, der das Shikon-Juwel begehrt."
   quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26
 - id: 256
@@ -478,4 +478,164 @@
 - id: 351
   satz: "Doremi und ihre Freundinnen erhalten ihre Hexenkräfte zurück und sollen im Auftrag der Königin das Hexenbaby Hana-chan großziehen, die künftige Thronfolgerin."
   quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 355
+  satz: "Der Oberschüler Yuuji Sakai sieht, wie ein Monster Menschen die Lebensenergie raubt, und begegnet einem rothaarigen Mädchen, das er Shana nennt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 365
+  satz: "Die New Yorker Polizisten Dee Laytner und Ryo MacLain machen gemeinsam Urlaub in England, wo Dee seinem Partner endlich näherkommen will."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 366
+  satz: "Nachdem ein Erdbeben weite Teile der Welt im Meer versenkt hat, birgt Aika Sumeragi Wertvolles aus den Ruinen und soll das mysteriöse Lagu finden."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 371
+  satz: "Sakura gewinnt eine Reise nach Hongkong, wird dort von unheimlichen Träumen verfolgt und in eine Phantomwelt gelockt, wo eine fremde Macht nach ihr ruft."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 372
+  satz: "Während der Vorbereitungen zum Nadeshiko-Fest bricht das Siegel einer weiteren Karte, die Brücken und Sakuras Karten eine um die andere verschwinden lässt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 377
+  satz: "Die Oberschülerinnen Lisa und Lorna stoppen in der Zukunft mit alten Benzinautos entgleiste Computerautos und bekommen mit Souichi einen frechen Kollegen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 380
+  satz: "Ein Jahr nach den Abenteuern im Buch wird Tamahome, der Miaka in ihre Welt gefolgt war, plötzlich dorthin zurückgerissen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 381
+  satz: "Miaka und der als Taka wiedergeborene Tamahome reisen erneut ins Reich des Buches, um Takas verlorene Erinnerungen wiederzufinden."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 384
+  satz: "Kei Kurono stirbt beim Versuch, einen Obdachlosen von den U-Bahn-Gleisen zu retten, und erwacht mit anderen Toten in einem Raum mit einer schwarzen Kugel."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 385
+  satz: "Seit einer Katastrophe, die alle Computer lahmlegte, sind die Geschwister Tatsuya und Kiyoko als Kinder des Verantwortlichen geächtet und hoch verschuldet."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 387
+  satz: "Ein Mädchen schlüpft ohne Erinnerung aus einem Kokon, erhält graue Flügel, einen Heiligenschein und den Namen Rakka und lebt fortan in einer ummauerten Stadt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 389
+  satz: "In Shinjuku mordet der abtrünnige Stadtbeschützer Eko, weshalb Yurine Otoha zum neuen Karas beruft, der ihn aufhalten soll."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 392
+  satz: "Der 14-jährige Schulschläger Yusuke Urameshi stirbt, als er ein Kind vor einem Auto rettet, womit in der Geisterwelt niemand gerechnet hatte."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 393
+  satz: "Die lebensmüde Schülerin Hitomi Kanzaki wird von Lord Folken in die Welt Gaea geholt, wo man sie für die prophezeite Flügelgöttin hält."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 395
+  satz: "Kei Kurono und Masaru Kato haben die ersten Einsätze der schwarzen Kugel Gantz überlebt und wissen nun, dass sie jederzeit erneut gerufen werden können."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 401
+  satz: "Kenshin lebt mit Kaoru und dem gemeinsamen Sohn in Frieden, doch sein Gewissen treibt ihn erneut auf Wanderschaft, während Kaoru auf ihn wartet."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 405
+  satz: "Im Jahr 1966 wird die wie eine Schülerin wirkende Vampirin Saya auf einen US-Stützpunkt in Japan geschickt, um dort blutsaugende Bestien zu töten."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 412
+  satz: "Der 14-jährige Millionär Yoshitaka Nakabayashi stellt die ausgerissenen Schwestern Izumi und Mitsuki als Dienstmädchen ein und nutzt ihre Notlage schamlos aus."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 415
+  satz: "In kurzen Episoden zeigt der Film den chaotischen Alltag der Familie Yamada um Vater Takashi, die vergessliche Mutter Matsuko und Großmutter Shige."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 416
+  satz: "Im Italien der Zwanzigerjahre jagt der in ein Schwein verwandelte Fliegerheld Porco Rosso über der Adria als Kopfgeldjäger Luftpiraten."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 417
+  satz: "Die Akolythin Yufa und der Schwertkämpfer Roan ziehen durch die Welt Rune Midgard, erkunden mit neuen Gefährten Verliese und stoßen auf ein dunkles Geheimnis."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 418
+  satz: "Das Mädchen Lychee taucht mit ihrem Elefanten Jasmin bei Ranma auf, um mit dem alten Happosai abzurechnen, als auch noch Prinz Kirin erscheint."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 420
+  satz: "Als die Organisation ARCAM im Ararat-Gebirge die Arche Noah findet, soll ihr Agent Yu Ominae das Artefakt vor dem Zugriff einer US-Militäreinheit schützen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 430
+  satz: "Im München von 1923 forscht der in unsere Welt verschlagene Edward Elric ohne Alchemie an Raketen, um zu seinem Bruder Alphonse heimzukehren."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 431
+  satz: "Die junge Hutmacherin Sophie wird von einer eifersüchtigen Hexe zur Greisin verflucht und findet Zuflucht im wandelnden Schloss des Zauberers Hauro."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 433
+  satz: "In einem geteilten Japan wollen Hiroki, Takuya und ihre Mitschülerin Sayuri zu einem rätselhaften Turm fliegen, bis Sayuri plötzlich verschwindet."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 437
+  satz: "Popsängerin Mima Kirigoe verlässt ihre Gruppe, um Schauspielerin zu werden, und wird daraufhin bedroht, während Wahn und Wirklichkeit verschwimmen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 438
+  satz: "Reiji wird in Los Angeles Zeuge eines Auftragsmords, verliert sein Gedächtnis und wird an der Seite der Killerin Eins selbst zum Attentäter ausgebildet."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 441
+  satz: "Utena Tenjou ist neu an der Ohtori-Akademie, begegnet dort ihrer Jugendliebe Touga und gerät durch einen Rosenring in Duelle um ihre Mitschülerin Anthy."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 442
+  satz: "Naruto, Sakura und Sasuke sollen mit Kakashi die widerspenstige Schauspielerin Yukie Fujikaze zu Dreharbeiten ins Land des Schnees eskortieren."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 448
+  satz: "Souichirou soll durch ein Spezialtraining stark genug werden, um Mitsuomi zu schlagen, läuft aber davon, während Aya ihre Schwester Maya herausfordert."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 449
+  satz: "Als die Insel Houraijima nach 50 Jahren wieder auftaucht, müssen Inuyasha, seine Gefährten und Sesshoumaru die vier angreifenden Shitoushin-Götter bezwingen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 450
+  satz: "Kaum ist Naraku besiegt und die Gruppe um Inuyasha geht eigene Wege, versucht die Mondgöttin Kaguya aus ihrem Gefängnis zu entkommen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 451
+  satz: "Das dämonische Schwert Sou’unga, einst im Besitz von Inuyashas Vater, taucht am Higurashi-Schrein auf und ergreift Besitz von Inuyasha."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 452
+  satz: "Menomaru, Sohn eines einst von Inuyashas Vater versiegelten Dämons, erwacht und belegt Kagome und Kirara mit einem Bann, um die Macht seines Vaters zu erlangen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 457
+  satz: "Der umherreisende Mushi-Meister Ginko hilft Menschen, die mit den rätselhaften, überall lebenden Wesen namens Mushi in Berührung gekommen sind."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 459
+  satz: "Ruffy und seine Mannschaft suchen den Goldschatz des legendären Piraten Woonan und bekommen es dabei mit dem furchteinflößenden El Drago zu tun."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 460
+  satz: "Der Strohhutbande wird das Schiff gestohlen, und mit zwei Diebesbrüdern nimmt Ruffy es auf der Uhrwerksinsel mit den Piraten auf, die auch Nami entführt haben."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 461
+  satz: "Auf einer Insel voller seltsamer Tiere wird Chopper zu deren König ernannt, während Jäger es auf die Hörner der Tiere abgesehen haben."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 462
+  satz: "Aus Geldnot melden sich Ruffy und seine Crew zum Piratenrennen Dead End an, hinter dem der frühere Marineoffizier Gasparde eine Intrige spinnt."
+  quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26

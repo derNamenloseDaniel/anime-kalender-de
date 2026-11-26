@@ -221,9 +221,11 @@ pruefe('im Bau: der Titel einer anderen Kennung bekommt die Hand nicht', mitFrem
 const rtlVorHand = mitFremdTiteln(beyblade, zeilen, { ...leer, rtlplus: { '165159': rtlBeyblade }, hand: { '165159': new Map([[66, 'Von Hand']]) } })
 pruefe('im Bau: RTL+ geht der Hand voran', rtlVorHand?.find((x) => x.nr === 66)?.de === 'Etwas Fesselndes')
 /* Miraculous (10011124): die Liste trägt nur die 17 echten TMDB-Titel; die Hand für Folgen ohne Zeile ging verloren (26.11.2026). */
-const handLuecke = new Map([[2, 'Zwei'], [4, 'Vier'], [9, 'Neun']])
+const handLuecke = new Map([[2, 'Zwei'], [3, 'Drei von Hand'], [4, 'Vier'], [9, 'Neun']])
 const vierFolgen = { ...probe, id: 900003, episodes: 4 } as Title
-const mitHandLuecke = mitFremdTiteln(vierFolgen, [{ nr: 1, de: 'Eins' }, { nr: 3, de: 'Drei' }], { ...leer, hand: { '900003': handLuecke } })
+const kitsuVier = { k: 1, f: [[1, 'a', 21], [2, 'b', 21], [3, 'c', 21], [4, 'd', 21]] as [number, string, number][] }
+const mitHandLuecke = mitFremdTiteln(vierFolgen, [{ nr: 1, de: 'Eins' }, { nr: 3, de: 'Drei' }], { ...leer, hand: { '900003': handLuecke }, kitsu: { '900003': kitsuVier } })
+pruefe('im Bau: Kitsu-Minuten gelten auch für die von der Hand angelegten Zeilen (Folge 2, 4)', mitHandLuecke?.every((x) => x.minuten === 21) === true, mitHandLuecke)
 pruefe('im Bau: die Hand legt die Zeilen 2 und 4 an, die Liste ist wieder 1 bis 4 in Reihenfolge', mitHandLuecke?.map((x) => `${x.nr}:${x.de}`).join() === '1:Eins,2:Zwei,3:Drei,4:Vier', mitHandLuecke)
 pruefe('im Bau: eine Handfolge über der Folgenzahl (9 bei 4) legt keine Zeile an', !mitHandLuecke?.some((x) => x.nr === 9))
 pruefe('im Bau: ohne bekannte Folgenzahl legt die Hand keine Zeile an', mitFremdTiteln({ ...probe, id: 900003 } as Title, [{ nr: 1, de: 'Eins' }, { nr: 3, de: 'Drei' }], { ...leer, hand: { '900003': handLuecke } })?.length === 2)

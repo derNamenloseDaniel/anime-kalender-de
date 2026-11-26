@@ -151,6 +151,35 @@ console.log('Varianten: Randfälle')
   pruefe('kompaktDatum: mit und ohne Tag', kompaktDatum('2025-12-12') === '12.12.25' && kompaktDatum('2026-09-00') === 'Sep 26')
 }
 
+console.log('Ausgaben: Termin ohne Artikelbezug und aniSearch-Artikel am selben Tag sind eine Ausgabe')
+{
+  const { discAusgabenVon } = await import('../web/src/components/detail/disc-ausgaben.ts')
+  const { variantenVon } = await import('../web/src/components/detail/disc-varianten.ts')
+  const titel = { id: 900310, titleRomaji: 'Probetitel' } as Title
+  const termin = (slug: string, datum: string, edition: string, sources: string[] = ['https://beispiel.invalid/news']): Release =>
+    ({ slug, titleId: 900310, name: 'Probetitel – Staffel 1', platform: 'disc', releaseType: 'disc', edition, buyUrl: `https://www.amazon.de/s?k=402062865401${slug.length}`, schedule: { firstEpisodeDate: datum }, sources }) as Release
+  const gesamt: DiscAusgabe = ['Gesamtausgabe', 'b', 'g', '2026-09-03', 900311]
+  const zeilen = (ausgaben: DiscAusgabe[], termine: Release[]) => discAusgabenVon(ausgaben, termine, titel)
+  const eins = zeilen([gesamt], [termin('box', '2026-09-03', 'Complete Box, Blu-ray')])
+  pruefe('gleicher Tag, gleiches Format, je genau einer: eine Zeile', eins.length === 1, eins.map((a) => a.schluessel))
+  pruefe('… mit Artikel, Termin und Händler', eins[0]!.artikel.b === 900311 && eins[0]!.release?.slug === 'box' && /amazon/.test(eins[0]!.shopUrl ?? ''), eins[0])
+  const v = variantenVon(eins, 'Probetitel')
+  pruefe('… die Variante heißt „Gesamtausgabe“ und steht unter Gesamtausgaben', v.length === 1 && v[0]!.name === 'Gesamtausgabe' && v[0]!.art === 'gesamt', v.map((x) => [x.name, x.art]))
+  pruefe('anderer Tag: zwei Zeilen', zeilen([gesamt], [termin('box', '2026-09-04', 'Complete Box, Blu-ray')]).length === 2)
+  pruefe('anderes Format: zwei Zeilen', zeilen([gesamt], [termin('box', '2026-09-03', 'Complete Box, DVD')]).length === 2)
+  pruefe('Termin ohne Datum: zwei Zeilen', zeilen([['Gesamtausgabe', 'b', 'g', '', 900311]], [termin('box', '', 'Complete Box, Blu-ray')]).length === 2)
+  const zweiArtikel = zeilen([gesamt, ['Gesamtausgabe: Limited', 'b', 'g', '2026-09-03', 900312]], [termin('box', '2026-09-03', 'Complete Box, Blu-ray')])
+  pruefe('zwei Artikel am Tag: nicht eindeutig, der Termin bleibt eine eigene Zeile', zweiArtikel.length === 3, zweiArtikel.map((a) => a.schluessel))
+  const zweiTermine = zeilen([gesamt], [termin('box', '2026-09-03', 'Complete Box, Blu-ray'), termin('limited', '2026-09-03', 'Limited Edition, Blu-ray')])
+  pruefe('zwei lose Termine am Tag: nicht eindeutig, drei Zeilen', zweiTermine.length === 3, zweiTermine.map((a) => a.schluessel))
+  const band = (name: string): Release => ({ ...termin('band', '2026-09-03', 'Limited Edition, Blu-ray'), name })
+  pruefe('„Vol. 2“ am Tag der Gesamtausgabe ist nicht die Gesamtausgabe (Dan Da Dan, 30.10.2026)', zeilen([gesamt], [band('Probetitel – Vol. 2')]).length === 2)
+  pruefe('„Vol. 2“ ist nicht „Vol. 3/3“', zeilen([['Vol. 3/3: Limited Edition', 'b', 't', '2026-09-03', 900313]], [band('Probetitel – Vol. 2')]).length === 2)
+  pruefe('„Box 9“ ist „Box 09“', zeilen([['Box 09', 'b', 't', '2026-09-03', 900314]], [band('Probetitel – Box 9')]).length === 1)
+  const mitBezug = zeilen([gesamt], [termin('lose', '2026-09-03', 'Complete Box, Blu-ray'), termin('bezug', '2026-09-03', 'Limited Edition, Blu-ray', ['https://www.anisearch.de/article/900311'])])
+  pruefe('ein Artikel, den ein anderer Termin nennt, ist nicht frei: der Bezug gewinnt, der lose Termin bleibt eigen', mitBezug.length === 2 && mitBezug.find((a) => a.artikel.b === 900311)?.release?.slug === 'bezug', mitBezug.map((a) => [a.schluessel, a.release?.slug]))
+}
+
 if (verletzt) {
   console.error(`\n${verletzt} Zusicherung(en) verletzt.`)
   process.exit(1)

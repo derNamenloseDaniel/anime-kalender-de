@@ -23,7 +23,7 @@ export interface Variante {
   schluessel: string
   art: Art
   nummer?: number
-  /** Erste Spalte, kurz: „Box 1“, „Vol. 3“, „Gesamt“ — ohne Reihentitel. */
+  /** Erste Spalte, kurz: „Box 1“, „Vol. 3“, „Gesamtausgabe“ — ohne Reihentitel. */
   name: string
   /** Edition in zwei, drei Wörtern: „Steelcase“, „Limited + Schuber“, „30th Anniversary“. */
   edition: string
@@ -70,10 +70,11 @@ function editionRoh(a: Ausgabe): string {
   return klammer ?? quelle.replace(NUMMER_TEIL, ' ').replace(/^\s*Gesamtausgabe:?/i, ' ')
 }
 
-/** „Vol. 3“, „Box 1“, „Gesamt“; ohne Nummer der Name des Eintrags ohne Reihentitel, Klammern und Kopfzeichen („Sammelschuber“). */
+/** „Vol. 3“, „Box 1“, „Gesamtausgabe“; ohne Nummer der Name des Eintrags ohne Reihentitel, Klammern und Kopfzeichen („Sammelschuber“). */
 function kurzName(art: Art, nummer: number | undefined, a: Ausgabe, titel: string): string {
   const roh = a.release ? a.release.name : a.name
-  if (/^Gesamtausgabe/i.test(roh)) return 'Gesamt'
+  /* Auch der Termin einer Gesamtausgabe („… – Staffel 1“, Complete Box) heißt wie der aniSearch-Artikel, dem er zugeordnet ist. */
+  if (/^Gesamtausgabe/i.test(roh) || (art === 'gesamt' && /^Gesamtausgabe/i.test(a.name))) return 'Gesamtausgabe'
   if (nummer !== undefined) return `${art === 'box' ? 'Box' : art === 'film' ? 'Film' : 'Vol.'} ${nummer}`
   const ohneTitel = roh.replace(new RegExp(titel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), '')
   return ohneTitel.replace(/\([^)]*\)/g, '').replace(/^[\s–:-]+|[\s–:-]+$/g, '').trim() || 'Ausgabe'

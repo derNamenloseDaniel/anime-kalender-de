@@ -3,8 +3,8 @@
  * nennt den frühesten künftigen Termin. Alle Fälle bauen ihre Titel und Releases selbst und übergeben einen festen Stichtag.
  * Aufruf: `npm run check:logic`.
  */
-import type { Release, Title } from '../shared/types.ts'
-import { staffelLageMitGrund } from '../shared/logic.ts'
+import type { Release, ReleaseEvent, Title } from '../shared/types.ts'
+import { fruehesterTermin, staffelLageMitGrund } from '../shared/logic.ts'
 
 const { useLang } = await import('../web/src/lib/i18n.tsx')
 const { reihenLageMitGrund, reihenLageVon } = await import('../web/src/components/detail/reihen-reiter-liste.ts')
@@ -40,6 +40,10 @@ gleich('Marke und Grund gleich: reihenLageVon sagt dasselbe', reihenLageVon(tite
 /* Nur Vol. 1 in der Zukunft, belegt: ohne ≈, früheste von zwei künftigen gewinnt. */
 const zwei = reihenLageMitGrund(titel(), [abgeschlossen(), disc(2, '2027-01-15', true), disc(1, '2026-12-05', false)], HEUTE)
 gleich('zwei künftige Discs: die frühere, belegt ohne ≈', lageZeile(zwei, t), '○ = Blu-ray Vol. 1 am 05.12.2026')
+
+/* Grenze: ein Termin am Stichtag selbst zählt, einer am Vortag nicht. */
+const ereignis = (datum: string) => ({ r: disc(1, datum, false), e: { date: datum, platform: 'disc' } as ReleaseEvent })
+gleich('Termin am Stichtag zählt, am Vortag nicht', [fruehesterTermin([ereignis(HEUTE)], HEUTE)?.date, fruehesterTermin([ereignis('2026-11-25')], HEUTE)], [HEUTE, undefined])
 
 /* Ruht: Stream komplett, nichts kommt → keine Marke, keine Zeile. */
 const ruht = reihenLageMitGrund(titel(), [abgeschlossen()], HEUTE)

@@ -14,3 +14,4 @@
 - unerwartet: Keine Prüfung kennt die Abdeckung „Synchro mit deutschem Trailer“; Weg 1 war aus gutem Grund (KinoCheck = Kinokanal) filmgebunden, ein bestehender Test hielt das fest und führte zur Trennung KinoCheck/Label.
 - Vorschlag: Kennzahl „Synchro ohne deutschen Trailer“ mit Ratsche; Kanalnamen nach dem ersten Lauf berichtigen; Folgeschritt TMDB-Videoliste für Serien (Ansatz B).
 - veraltet: der Kopfkommentar „Wer abgefragt wird … Serien gehen nur über Weg 2 und 3“ (ergänzt, nicht entfernt).
+Nachbesserung: Merge von main (Historie entschallowt, Konflikt quellen.md beide Abschnitte behalten), Patchnote trailer-label-kanaele-fuer-serien ergänzt, Dateipfad der Laufausgabe aus dem PR-Text entfernt; Vorprüfung ohne ✖.

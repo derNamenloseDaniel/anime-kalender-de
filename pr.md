@@ -1,5 +1,7 @@
 <!-- titel: Trailer: deutsche Label-Kanäle (KSM Anime u. a.) für alle Titel mit Synchro -->
 
+Auftrag: trailer-label-kanaele
+
 ## Plan (tragend, vor dem Bau)
 
 **Untergrenze (einfachster Weg):** ein Handeintrag je Titel. Geht für 156040, löst aber keinen der übrigen Fälle. Ist als Sofortfix mit drin (`data/curated/trailer-hand.yaml`, im Bau vor `data/trailer.json`).
@@ -18,6 +20,7 @@
 
 - **Ursache (a):** `pipeline/fetch-trailer.ts` (Kopfkommentar, `KANAELE`, `trailerKandidaten` in `lib/trailer-auswahl.ts:5`): Trailer nur aus KinoCheck-Kanälen, KinoCheck-API, TMDB; abgefragt nur Filme und Entdecken-Einstiege; Weg 1 (`ausIndex`) nur `format === 'MOVIE'` und nur exakter Name.
 - **Fix (c):** `data/curated/trailer-label-kanaele.yaml` (Kanalname, optional `beispielVideo`) → `lib/trailer-label-kanaele.ts` löst die Uploads-Playlist per API auf (nie geraten: Beispielvideo oder Kanalsuche mit genau gleichem Namen; Ausfall wird nicht gestempelt) → Index → `lib/trailer-label.ts` gleicht gegen **alle** Titel ab. Riegel: `bewerteTreffer` über de/en/romaji, Videoname muss in der Schreibweise vollständig stehen, Gleichstand = mehrdeutig; Videotitel nennt Deutsch/German/dt./Synchro und weder OmU/Sub/GerSub/JapDub; Staffel gleich; Jahr −1/+3 um jp. Ausstrahlung/deutsche Erstausgabe. Deutscher Label-Trailer ersetzt en/ja, ein deutscher Bestand bleibt. KinoCheck-Videos bleiben bei Weg 1 (Kinokanal, nur Filme). Jede Verwerfung ist gezählt: Logzeile „Label-Trailer: n neu, n ersetzt · k von m Label-Kanälen · verworfen: …“; nicht aufgelöste Kanäle stehen als Warnung im Log.
+- **Patch Notes:** `data/patchnotes/trailer-label-kanaele-fuer-serien.yaml` (Nutzen: deutsche Trailer der Anime-Labels jetzt auch für Serien).
 - **Sofortfix 156040:** `n5yRD1JypBU` im Handweg (`data/curated/trailer-hand.yaml`, Beleg Daniel 26.11.2026) und über den neuen Weg beim ersten echten Lauf. Live nach dem nächsten Bestandsbau.
 - Der Abgleich läuft vor der Wiedervorlage (`dran`): er kostet nichts und darf nicht an den 30-Tage-Stempeln hängen.
 
@@ -26,7 +29,7 @@
 - `pipeline/check-trailer-label.ts`: echter Titel 156040 + KSM-Videotitel; Sprachriegel (OmU/German Sub/JapDub GerSub/Untertitel/English); Namensauszug; Staffel 1/2; Elysium-Jahr; Gleichstand; Deckung (Naruto ≠ Naruto Shippuden); Fensterränder; Übernahme in den Bestand; Handtrailer-Datei.
 - `pipeline/check-trailer-lauf.ts` (Fall A7, `main()` gegen Wegwerf-Verzeichnis): Serie bekommt KSM-Trailer statt englischem TMDB-Trailer, OmU nicht, kein TMDB-Abruf für den Treffer, Kennung aus der API, Fehlversuch-Stempel, ausgefallene Abfrage ohne Stempel, zweiter Lauf löst nichts neu auf.
 - **Mutationsprobe** (11 Mutanten an `trailer-label.ts`: OmU-Riegel, Jahresfenster, Fensterrand +3→+9, Staffelriegel, mehrdeutig, Deckung, Schwelle, Trailer-Pflicht, Bestand bleibt, Rang Teaser, jüngster→ältester): 3 überlebten im ersten Durchgang (Fensterrand, Deckung, Bestand), dafür je ein Test ergänzt; Zweitlauf **0 überlebt** (Rang-Mutant im Zweitlauf durch einen abgebrochenen Vorlauf nicht angewendet, im Erstlauf gefangen).
-- `npx tsc --noEmit -p .`, `node tools/umfang-pruefen.mjs`, `check-sammler-lesezugriffe`, `check-workflows`, `uhr-in-tests`, `stumme-pfade`, `mutationsanker-alle` grün. Neue Dateien in `tools/quellen-liste.sh` (`data/trailer-label-kanaele.json`), `check-logic-liste.txt`, `sammler-lesezugriffe.jsonl`, `pr-nachrechnen-bot-erzeugt.mjs`.
+- `npx tsc --noEmit -p .`, `node tools/umfang-pruefen.mjs`, `check-sammler-lesezugriffe`, `check-workflows`, `uhr-in-tests`, `stumme-pfade`, `mutationsanker-alle` grün. Neue Dateien in `tools/quellen-liste.sh` (die Laufausgabe trailer-label-kanaele, JSON, entsteht beim ersten Lauf), `check-logic-liste.txt`, `sammler-lesezugriffe.jsonl`, `pr-nachrechnen-bot-erzeugt.mjs`.
 
 ## Nicht geprüft / nach dem Merge
 

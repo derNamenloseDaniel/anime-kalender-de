@@ -1,4 +1,4 @@
-import { useId, useRef, useState, type FocusEvent, type MouseEvent, type RefObject } from 'react'
+import { useEffect, useId, useRef, useState, type FocusEvent, type MouseEvent, type RefObject } from 'react'
 import { TooltipBlase, useBlasenPosition } from '../tooltip-blase.tsx'
 import { fokusZeigtBlase, mausZeigtBlase, useEinzigeBlase } from '../tooltip-einzeln.ts'
 
@@ -28,6 +28,15 @@ export function useReiterBlase(text: (schluessel: number) => string) {
     setOffen(undefined)
   }
   useEinzigeBlase(offen !== undefined, zu)
+  /* Nach einem Fingertipp kommt kein `mouseout`: Ein Tipp außerhalb des Reiters schließt (wie beim `Tooltip`). */
+  useEffect(() => {
+    if (offen === undefined) return
+    const draussen = (e: Event) => {
+      if (!anker.current?.contains(e.target as Node)) zu()
+    }
+    document.addEventListener('pointerdown', draussen, true)
+    return () => document.removeEventListener('pointerdown', draussen, true)
+  })
   const auf = (schluessel: number, el: HTMLElement) => {
     anker.current = el
     setOffen(schluessel)

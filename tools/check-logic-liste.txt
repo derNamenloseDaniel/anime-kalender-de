@@ -784,6 +784,7 @@ pipeline/check-verweise-von-hand.ts
 pipeline/check-vorfaelle-ablauf.ts
 pipeline/check-vorlieben-getrennt.ts
 pipeline/check-vorlieben.ts
+pipeline/check-warnungen-zaehlen.ts
 pipeline/check-weg-adresse-bezugsweg.ts
 pipeline/check-weg-aus-meldung.ts
 pipeline/check-weg-massenabgang.ts

@@ -627,3 +627,25 @@ Der Cloud-Block (PR 5016) kam an Anbieter-Seiten nicht heran; lokal je Titel ein
 - **Nicht aus der Cloud erreichbar:** ofdb.de, zeichentrickserien.de, justwatch.com, primevideo.com (DNS); Dienste und Termine kamen aus Suchtreffern, nicht aus Abrufen der Seite.
 - **Offen, gesucht ohne Beleg:** Astro Boy 1980 (3044; „Astro Boy 1980 Kuraoka DVD“: 2000 nur 6 Folgen auf VHS, aniSearch „Canceled“); Angel, das Blumenmädchen (2230; „Hana no Ko Lunlun DVD“: nur VHS); Blinki (3834; nur 6 Folgen auf Video); Alle meine Freunde (2568; keine DVD/Stream gefunden); Buschbabies (2913; keine); Angriff der Dino Monster (4073; „Aizenborg EAT Medien DVD“: nichts); City Hunter 2 (1471; Kazé-DVDs nur Filme/Specials, „City Hunter 2 DVD deutsch“); Choppy (3024; nur der Zusammenschnitt „Der Engel und der Prinz“, Picture Lake 30.05.2014 — anderes Werk, kein Weg für die Serie).
 - **Demon Slayer Band der Geschwister / Treffen der Säulen (10014215, 10016195):** Prime Video seit 01.12.2021 mit deutscher Sprachausgabe (Anime2You 529267); Giga und JustWatch nennen heute kein deutsches Angebot, deshalb kein Weg eingetragen. Wiedervorlage: Prime-Seite prüfen, sobald `primevideo.com` erreichbar ist.
+
+## folgentitel, auto:tmdb: warum 283 offen bleiben (26.11.2026, Auftrag maengel-folgentitel)
+
+Einordnung aller 283 offenen Titel (Stand `data/maengel.json` 24.11.2026) gegen `tmdb-titles.json`, `tmdb-folgen.json`, `tmdb-folgen-404.json` (Zählskript im Scratchpad, nur Dateien, kein Netz):
+
+| Klasse | Titel | Befund |
+|---|---|---|
+| A Format/Länge ausgeschlossen (OVA, Special, Film, unter 6 Folgen) | 99 | `tmdbFolgentitel` nimmt nur TV/TV_SHORT/ONA ab 6 Folgen, Absicht |
+| B keine TMDB-Kennung | 47 | Zuordnung nur von Hand mit Beleg (`tmdb-von-hand.yaml`) |
+| C Kennung, **nie abgerufen** (+1 mit 404) | 71 + 1 | Ursache am 23.11. geschlossen (`abrufLuecke`); Simulation mit der echten `waehleAbrufe` an `main`: **72 Titel** kommen beim nächsten Wochenlauf dran (`LUECKE_LIMIT` 128), danach hängt es nur noch an TMDB |
+| D keine TMDB-Staffel mit unserer Folgenzahl | 16 | Folgenzahl-Frage (AniList zählt anders), keine Titelfrage |
+| E Staffel passt, TMDB nur „Folge N“ oder englisch | 28 | nicht behebbar |
+| F Staffel passt, TMDB teils gleich englisch (Lücken) | 18 | siehe unten |
+| G Staffel passt, alle Titel echt, trotzdem offen | 3 | 10005217, 10005293 (Rang 8: `original_name` fehlt im Abruf), 19603 nicht untersucht |
+
+**F: warum `echterTitel` nicht lockerer werden darf.** Ein Titel gleich dem englischen gilt als nicht übersetzt. Bei Eigennamen stimmt das nicht (Miraculous: Lady WiFi, Timebreaker, Rogercop …), aber derselbe Befund steht auf Englisch-Rückfällen: Yu-Gi-Oh! GX Folge 156 „Judai Revived!? A Brand New Journey“ neben Folge 47 „Chazz-anova“. Beide sind in `tmdb-folgen.json` nicht zu unterscheiden; eine Regel „unter x % gleich englisch bleibt stehen“ ließe englische Titel als deutsche durch (Gegenprobe `ohneEnglischeTitel` greift erst ab 90 %). Darum bleibt die Stufe; wo ein Eigenname gemeint ist, belegt eine zweite Quelle den Titel von Hand (`folgentitel-hand.yaml`, hier de.wikipedia-Episodenliste, Feld DT; Nummern nur, wenn die vorhandenen Titel dort unter derselben Nummer stehen).
+
+**Echter Code-Fehler, gefunden beim Eintragen:** `mitFremdTiteln` füllte die Handzuordnung mit `mitCrTiteln`, und das füllt nur vorhandene Zeilen. Eine Liste, die nur aus den echten TMDB-Titeln besteht (Miraculous: 17 von 26 Zeilen), verlor jede Handfolge ohne Zeile still. Neu: `mitHandTiteln` (`folgentitel-hand.ts`) legt Zeilen bis zur Folgenzahl an. Bestand: alle 95 vorhandenen Handeinträge haben eine Zeile in `folgen/<id>.json` (92 gleicher Titel, 3 mit Titel einer früheren Stufe), die Änderung betrifft sie nicht. Simulation mit den echten Bau-Funktionen: 10011124 17 → 26, 10014481 22 → 26, 10004750 24 → 26 benannte Folgen; erwartet 283 → 280 offen nach dem nächsten Bestandsbau.
+
+**Miraculous Staffel 2 und 4 nicht eingetragen (Reihenfolge):** Die Wikipedia-Liste zählt anders als unsere Dateien. Staffel 2: Wikipedia Nr. 1 ist „Eine böse Weihnachtsüberraschung“ (bei TMDB Staffel 0), unsere 15 Titel stehen dort alle eine Nummer später (0 von 15 gleich). Staffel 4: 21 von 24 vorhandenen Titeln stehen unter anderer Nummer. Fehlende Folgen: S2 10 von 25, S4 Nr. 4 „Mr. Pigeon 72“ und Nr. 10. Ohne geklärte Reihenfolge (deutsche Erstausstrahlung gegen Produktionsreihenfolge) wäre jede Nummer geraten. Staffel 1 und 3 stimmen Nummer für Nummer (13 + 4 Formatabweichungen von 17, 22 von 22).
+
+**Quellenlage:** fernsehserien.de ist für `folgentitel-hand.yaml` ausgeschlossen (Kopf der Datei, Anfrage seit 12.11. offen), deshalb nicht benutzt. Wikipedia-Listen gibt es nicht für Mech Cadets, Wandance, Pacific Rim: The Black, Iruma-kun, Tales of Zestiria (HTTP 404 bzw. Seite ohne Liste, 26.11.2026).

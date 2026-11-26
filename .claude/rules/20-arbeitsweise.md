@@ -92,4 +92,4 @@ Auftrag über einen Zeitraum braucht als Erstes einen Wecker (Skill `autonomer-m
 unter `### Jetzt` in `stand.md`, verlinkt auf eine eigene kleine Datei mit genau dem, was er für
 diesen einen Punkt braucht (Optionen und Empfehlung bzw. Klickanleitung, nie ein langer Bericht), Daniel
 beantwortet sie asynchron; ist er gerade da, frage ich zusätzlich direkt im Chat (14.10.2026); bis dahin arbeite ich mit der Empfehlung weiter, wo das umkehrbar ist,
-sonst an anderem. Fragen nur, wenn die Antwort sinnvoll „nein“ lauten könnte.
+sonst an anderem. Fragen nur, wenn die Antwort sinnvoll „nein“ lauten könnte. Eine Antwort, die bei mehreren Optionen keine nennt, ist keine Entscheidung: zurückfragen, nicht deuten (F157, 26.11.2026).

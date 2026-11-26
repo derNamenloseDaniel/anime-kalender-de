@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
- * SessionStart: Kind-Sitzungen (Resume, Kompaktieren) starten mit leerem CLAUDE_CODE_PLUGIN_DIRS,
- * die Mod `arbeitsliste` fehlt dann unbemerkt (10.11., 16.11., 17.11.2026). Der Hook hängt sie über
- * eine Junction in dev-mods/<session_id> ein und stößt die Ordnerüberwachung per touch an.
+ * SessionStart: Kind-Sitzungen starten mit leerem CLAUDE_CODE_PLUGIN_DIRS, die Mod `arbeitsliste`
+ * fehlt dann unbemerkt (16.11.2026 belegt: Sitzungsstart). Der Hook hängt sie über eine Junction in
+ * dev-mods/<session_id> ein und stößt die Ordnerüberwachung per touch an. Nach Kompaktieren repariert
+ * er still: die Variable ist dort auch leer, die Leiste aber sichtbar (26.11.2026), die Meldung wäre falsch.
  * Fehler bleiben still (Exit 0).
  */
 const fs = require('fs');
@@ -37,9 +38,13 @@ function einhaengen(sessionId, env) {
 function pruefen(eingabe, env) {
   if (env.CLAUDE_CODE_PLUGIN_DIRS) return '';
   try {
-    const id = JSON.parse(eingabe || '{}').session_id;
+    const daten = JSON.parse(eingabe || '{}');
+    const id = daten.session_id;
     if (!id || /[\\/]|\.\./.test(String(id))) return '';
-    return einhaengen(String(id), env) ? MELDUNG : '';
+    const eingehaengt = einhaengen(String(id), env);
+    // Kompaktieren: Reparatur bleibt (falls die Leiste doch fehlt), nur die Meldung entfällt.
+    if (daten.source === 'compact') return '';
+    return eingehaengt ? MELDUNG : '';
   } catch {
     return '';
   }

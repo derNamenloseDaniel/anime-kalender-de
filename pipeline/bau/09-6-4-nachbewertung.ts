@@ -8,90 +8,103 @@ import { beurteileMitTeilDeutsch } from '../lib/cr-teil-deutsch.ts'
 import { beurteileAdnVerweis, type AdnArchiv } from '../lib/adn-sprachen.ts'
 import { type EntfernterVerweis } from './grundlagen.ts'
 
+type Stream = Title['streams'][number]
+type BelegFuer = (titleId: number, plattform: PlatformId, url?: string, anzahlWege?: number) => DubCheck | undefined
+type AdnSchaerfen = (titleId: number, stream: { platform: string; url: string; }) => boolean
+
+/** `true`, wenn ein Handbeleg den Weg beurteilt hat (dann ist für ihn nichts weiter zu tun). */
+function wendeHandbelegAn(title: Title, stream: Stream, belegFuer: BelegFuer): boolean {
+  /*
+    **Der Handbeleg zuerst — er ist der Grund, warum dieser Weg hier steht.**
+
+    Seit dem 06.09.2026 legt die Ergänzung einen Verweis an, wenn ein
+    Handbeleg ihn bejaht. Die Runde, die Handbelege anwendet, läuft aber
+    weiter oben; der frisch entstandene Weg trug deshalb `dub: undefined`,
+    obwohl die Antwort in derselben Datei stand. Bei „Sword Art Online II"
+    hieß das: Netflix-Weg da, kein Urteil daran, und die Auskunft „🇩🇪 ?"
+    für Folgen, die Daniel selbst gemessen hat.
+
+    Dieselbe Lehre wie beim Rest dieses Blocks — wer unten ergänzt, muss
+    unten auch beurteilen.
+  */
+  const handBeleg = belegFuer(title.id, stream.platform, stream.url, (title.streams ?? []).filter((x) => x.platform === stream.platform).length)
+  if (handBeleg?.dub === undefined) return false
+  stream.dub = handBeleg.dub
+  if (handBeleg.dubRanges?.length) {
+    stream.dubRanges = handBeleg.dubRanges.map((r) => ({ from: r.from, to: r.to, dub: r.dub }))
+  }
+  return true
+}
+
+function beurteileCrunchyrollWeg(title: Title, stream: Stream, crOffeneBefunde: Record<string, OffenerBefund>, crSerienJeKennung: Map<string, CrSerie[]>, crNachUrl: Map<string, CrSerie>): void {
+  /**
+   * **Auch `crunchyroll-offene.json` gehört hierher — sonst bleibt das
+   * Urteil im Bestand liegen.**
+   *
+   * `crNachUrl` kennt nur, was der wöchentliche Lauf geprüft hat. Die
+   * Adressen, die aniSearch hier gerade ergänzt hat, stehen dort selten:
+   * `fruits-basket`, `the-promised-neverland`,
+   * `watch/GE00266947DEDE/…` — für alle drei lag am 10.09.2026 ein
+   * fertiges Urteil in der Datei (zweimal `false`, einmal `true`), und
+   * alle drei standen trotzdem auf „🇩🇪 ?".
+   *
+   * Der Block, der diese Datei anwendet, läuft rund 800 Zeilen weiter
+   * oben — also bevor es diese Verweise gibt. Dieselbe Lehre wie im
+   * Absatz darüber, nur eine Quelle weiter.
+   */
+  const ausOffenen = crOffeneBefunde[stream.url]
+  if (typeof ausOffenen?.dub === 'boolean' && !neinUeberholtMitLog(ausOffenen, crSerienJeKennung, title)) {
+    stream.dub = ausOffenen.dub
+    return
+  }
+  const serie = crNachUrl.get(stream.url)
+  if (!serie) return
+  const kapitelUrteil = kapitelImBlock(serie, title)
+  if (kapitelUrteil !== undefined) {
+    stream.dub = kapitelUrteil
+    return
+  }
+  for (const urteil of beurteileMitTeilDeutsch(serie, [title])) {
+    if (urteil.titleId !== title.id) continue
+    stream.dub = urteil.dub
+    if (urteil.dubRanges) stream.dubRanges = urteil.dubRanges
+  }
+}
+
+function beurteileAdnWeg(title: Title, stream: Stream, adnArchiv: AdnArchiv, adnStreamSchaerfen: AdnSchaerfen): void {
+  /*
+    **Erst schärfen, dann beurteilen.**
+
+    Ein hier ergänzter ADN-Verweis trägt die Adresse, die aniSearch
+    führt — oft `animationdigitalnetwork.de/video/<slug>` ohne
+    Serienkennung, teils mit französischem Namensteil
+    (`50-nuances-de-gras`). `beurteileAdnVerweis` findet dazu nichts,
+    und der Verweis bleibt bei „🇩🇪 ?".
+
+    Die Schärfung oben läuft, bevor dieser Block überhaupt Verweise
+    anlegt. Gemessen am 07.09.2026 blieben deshalb sieben Verweise
+    stumm — sechs davon mit einer Kennung, die seit dem Vortag in
+    `data/adn-adressen.yaml` steht.
+  */
+  adnStreamSchaerfen(title.id, stream)
+  const befund = beurteileAdnVerweis(stream.url, adnArchiv)
+  if (befund.dub !== undefined) stream.dub = befund.dub
+}
+
 export function beurteileFrischeWege({ title, belegFuer, crOffeneBefunde, crSerienJeKennung, crNachUrl, adnArchiv, adnStreamSchaerfen }: {
   title: Title
-  belegFuer: (titleId: number, plattform: PlatformId, url?: string, anzahlWege?: number) => DubCheck | undefined
+  belegFuer: BelegFuer
   crOffeneBefunde: Record<string, OffenerBefund>
   crSerienJeKennung: Map<string, CrSerie[]>
   crNachUrl: Map<string, CrSerie>
   adnArchiv: AdnArchiv
-  adnStreamSchaerfen: (titleId: number, stream: { platform: string; url: string; }) => boolean
+  adnStreamSchaerfen: AdnSchaerfen
 }) {
   for (const stream of title.streams) {
     if (stream.dub !== undefined) continue
-    /*
-      **Der Handbeleg zuerst — er ist der Grund, warum dieser Weg hier steht.**
-
-      Seit dem 06.09.2026 legt die Ergänzung einen Verweis an, wenn ein
-      Handbeleg ihn bejaht. Die Runde, die Handbelege anwendet, läuft aber
-      weiter oben; der frisch entstandene Weg trug deshalb `dub: undefined`,
-      obwohl die Antwort in derselben Datei stand. Bei „Sword Art Online II"
-      hieß das: Netflix-Weg da, kein Urteil daran, und die Auskunft „🇩🇪 ?"
-      für Folgen, die Daniel selbst gemessen hat.
-
-      Dieselbe Lehre wie beim Rest dieses Blocks — wer unten ergänzt, muss
-      unten auch beurteilen.
-    */
-    const handBeleg = belegFuer(title.id, stream.platform, stream.url, (title.streams ?? []).filter((x) => x.platform === stream.platform).length)
-    if (handBeleg?.dub !== undefined) {
-      stream.dub = handBeleg.dub
-      if (handBeleg.dubRanges?.length) {
-        stream.dubRanges = handBeleg.dubRanges.map((r) => ({ from: r.from, to: r.to, dub: r.dub }))
-      }
-      continue
-    }
-    if (stream.platform === 'crunchyroll') {
-      /**
-       * **Auch `crunchyroll-offene.json` gehört hierher — sonst bleibt das
-       * Urteil im Bestand liegen.**
-       *
-       * `crNachUrl` kennt nur, was der wöchentliche Lauf geprüft hat. Die
-       * Adressen, die aniSearch hier gerade ergänzt hat, stehen dort selten:
-       * `fruits-basket`, `the-promised-neverland`,
-       * `watch/GE00266947DEDE/…` — für alle drei lag am 10.09.2026 ein
-       * fertiges Urteil in der Datei (zweimal `false`, einmal `true`), und
-       * alle drei standen trotzdem auf „🇩🇪 ?".
-       *
-       * Der Block, der diese Datei anwendet, läuft rund 800 Zeilen weiter
-       * oben — also bevor es diese Verweise gibt. Dieselbe Lehre wie im
-       * Absatz darüber, nur eine Quelle weiter.
-       */
-      const ausOffenen = crOffeneBefunde[stream.url]
-      if (typeof ausOffenen?.dub === 'boolean' && !neinUeberholtMitLog(ausOffenen, crSerienJeKennung, title)) {
-        stream.dub = ausOffenen.dub
-        continue
-      }
-      const serie = crNachUrl.get(stream.url)
-      if (!serie) continue
-      const kapitelUrteil = kapitelImBlock(serie, title)
-      if (kapitelUrteil !== undefined) {
-        stream.dub = kapitelUrteil
-        continue
-      }
-      for (const urteil of beurteileMitTeilDeutsch(serie, [title])) {
-        if (urteil.titleId !== title.id) continue
-        stream.dub = urteil.dub
-        if (urteil.dubRanges) stream.dubRanges = urteil.dubRanges
-      }
-    } else if (stream.platform === 'adn' && adnArchiv.serien.size) {
-      /*
-        **Erst schärfen, dann beurteilen.**
-
-        Ein hier ergänzter ADN-Verweis trägt die Adresse, die aniSearch
-        führt — oft `animationdigitalnetwork.de/video/<slug>` ohne
-        Serienkennung, teils mit französischem Namensteil
-        (`50-nuances-de-gras`). `beurteileAdnVerweis` findet dazu nichts,
-        und der Verweis bleibt bei „🇩🇪 ?".
-
-        Die Schärfung oben läuft, bevor dieser Block überhaupt Verweise
-        anlegt. Gemessen am 07.09.2026 blieben deshalb sieben Verweise
-        stumm — sechs davon mit einer Kennung, die seit dem Vortag in
-        `data/adn-adressen.yaml` steht.
-      */
-      adnStreamSchaerfen(title.id, stream)
-      const befund = beurteileAdnVerweis(stream.url, adnArchiv)
-      if (befund.dub !== undefined) stream.dub = befund.dub
-    }
+    if (wendeHandbelegAn(title, stream, belegFuer)) continue
+    if (stream.platform === 'crunchyroll') beurteileCrunchyrollWeg(title, stream, crOffeneBefunde, crSerienJeKennung, crNachUrl)
+    else if (stream.platform === 'adn' && adnArchiv.serien.size) beurteileAdnWeg(title, stream, adnArchiv, adnStreamSchaerfen)
   }
 }
 

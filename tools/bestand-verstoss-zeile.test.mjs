@@ -8,7 +8,10 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { restSkripte } from './pr-bestand-vergleich.mjs'
-import { findeStummeAusgaenge, zaehleFehlerAusgaenge } from './bestand-verstoss-zeile.mjs'
+import { druecktVerstoessZeile, findeStummeAusgaenge, zaehleFehlerAusgaenge } from './bestand-verstoss-zeile.mjs'
+
+/** Prüfungen ohne Schlusszeile `VERSTÖSSE: <n>` (25.11.2026): nur sinken. Fehlt sie, ist `zaehleOderMelde` NaN und der PR rot trotz gleichem Stand wie main. */
+const BEKANNT = ['pipeline/check-staffel-ohne-seite-bestand.ts']
 
 const wurzel = join(dirname(fileURLToPath(import.meta.url)), '..')
 const lies = (rel) => readFileSync(join(wurzel, rel), 'utf8')
@@ -51,6 +54,11 @@ assert.deepEqual(stumm("console.log('✖ schlecht')\nprocess.exit(1)"), [], 'Feh
 assert.deepEqual(stumm('console.log(`  ${marke} Text`)\nprocess.exit(1)'), [], 'Zeile mit Platzhalter am Anfang zählt')
 assert.deepEqual(stumm('console.log(zeile)\nprocess.exit(1)'), [], 'nicht literale Zeile zählt')
 assert.deepEqual(stumm("console.log()\nprocess.exit(1)"), [], 'Aufruf ohne Argument ist eine Ausgabe')
+assert.equal(druecktVerstoessZeile("console.log('VERSTÖSSE: 0')"), true, 'Zeichenkette')
+assert.equal(druecktVerstoessZeile('console.log(`VERSTÖSSE: ${n}`)'), true, 'Schablone')
+assert.equal(druecktVerstoessZeile("console.log('ok')"), false, 'ohne Zeile')
+assert.equal(druecktVerstoessZeile("const t = 'VERSTÖSSE: 0'"), false, 'Text ohne Ausgabe zählt nicht')
+assert.equal(druecktVerstoessZeile("console.log('  VERSTÖSSE: 0')"), false, 'eingerückt liest der Zähler nicht')
 assert.equal(zaehleFehlerAusgaenge("process.exit(0)\nconsole.log('x')"), 0)
 assert.equal(zaehleFehlerAusgaenge('process.exit(1)\nprocess.exitCode = 2'), 2)
 
@@ -74,6 +82,13 @@ for (const datei of pruefungen) {
   assert.ok(ausgaenge > 0, `${datei}: kein Fehlerausgang (process.exit/exitCode) gefunden; Ausnahme mit Grund in OHNE_AUSGANG eintragen`)
   assert.deepEqual(stumm(text), [], `${datei}: Fehlerausgang ohne vorherige Verstoßzeile (Zeilen ${stumm(text)})`)
 }
+// Schlusszeile `VERSTÖSSE: <n>` (Ratsche BEKANNT: nur sinken).
+for (const datei of pruefungen) {
+  const hat = druecktVerstoessZeile(lies(datei), datei)
+  if (BEKANNT.includes(datei)) assert.equal(hat, false, `${datei}: druckt jetzt „VERSTÖSSE: <n>“ (aus BEKANNT streichen)`)
+  else assert.ok(hat, `${datei}: druckt keine Zeile „VERSTÖSSE: <n>“ (console.log(\`VERSTÖSSE: \${n}\`) auf jedem Ausgang)`)
+}
+for (const datei of BEKANNT) assert.ok(pruefungen.includes(datei), `${datei}: steht in BEKANNT, ist aber keine Bestandsprüfung (streichen)`)
 for (const datei of Object.keys(OHNE_AUSGANG)) assert.ok(pruefungen.includes(datei), `${datei}: Ausnahme ohne Bestandsprüfung (Eintrag streichen)`)
 
 // Am echten Skript: ohne seine Fehlerzeilen wird dieselbe Datei stumm.

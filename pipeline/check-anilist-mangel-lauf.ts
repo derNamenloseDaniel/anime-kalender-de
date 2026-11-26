@@ -7,6 +7,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { ohneGeheimnisse } from '../tools/bau-umgebung.mjs'
 
 const wurzel = mkdtempSync(join(tmpdir(), 'ak-anilist-mangel-'))
 mkdirSync(join(wurzel, 'data', 'cache'), { recursive: true })
@@ -57,7 +58,7 @@ writeFileSync(join(wurzel, 'data', 'cache', 'anilist-by-id.json'), JSON.stringif
 }))
 
 const lauf = spawnSync(process.execPath, ['--import', 'tsx', '--import', pathToFileURL(attrappe).href, 'pipeline/fetch.ts'], {
-  env: { ...process.env, AK_ROOT: wurzel },
+  env: { ...ohneGeheimnisse(), AK_ROOT: wurzel },
   encoding: 'utf8',
   timeout: 100_000,
   windowsHide: true,

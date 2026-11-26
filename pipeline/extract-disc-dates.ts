@@ -82,10 +82,34 @@ function istDisc(titel: string): string | undefined {
   return undefined
 }
 
-function main(): void {
+/** Was `main` aus Datensatz und Archiv liest. */
+interface Eingaben {
+  titles: Title[]
+  releases: Release[]
+  anisearch: Record<string, AnisearchEintrag>
+}
+
+/** Ergebnis einer Durchsicht: Vorschläge samt den Zählern für die Ausgabe. */
+interface Durchsicht {
+  vorschlaege: DiscProposal[]
+  geprüft: number
+  verworfen: number
+  /** Ausgaben mit Landesflagge — US, UK, FR. Nicht unsere Baustelle. */
+  auslaendisch: number
+}
+
+/** Ein Eintrag der Neuerscheinungen, vorgefiltert auf Datum und Bezeichnung. */
+interface Eintrag {
+  datum: string
+  block: string
+  edition: string
+}
+
+/** Liest die Eingaben; ohne Archiv oder Titel gibt es nichts zu tun. */
+function ladeEingaben(): Eingaben | undefined {
   if (!existsSync(ARCHIV)) {
     warn(`Kein Archiv unter ${ARCHIV} — erst "npm run data:anisearch" laufen lassen.`)
-    return
+    return undefined
   }
 
   const titles = readJson<Title[]>('public/data/titles.json', [])
@@ -93,24 +117,81 @@ function main(): void {
   const anisearch = readJson<Record<string, AnisearchEintrag>>('data/anisearch.json', {})
   if (!titles.length) {
     warn('Keine Titel — erst "npm run data:build" laufen lassen.')
-    return
+    return undefined
   }
+  return { titles, releases, anisearch }
+}
 
-  // Archiv ist nach aniSearch-Kennung abgelegt, unser Datensatz nach AniList.
+/** Archiv ist nach aniSearch-Kennung abgelegt, unser Datensatz nach AniList. */
+function anisearchZuTitel(anisearch: Record<string, AnisearchEintrag>): Map<number, string> {
   const nachAnisearchId = new Map<number, string>()
   for (const [titleId, eintrag] of Object.entries(anisearch)) {
     if (eintrag.anisearchId) nachAnisearchId.set(eintrag.anisearchId, titleId)
   }
+  return nachAnisearchId
+}
+
+/** Die `<section id="items">` einer archivierten Seite, falls sie eine hat. */
+function leseAbschnitt(datei: string): string | undefined {
+  const html = gunzipSync(readFileSync(`${ARCHIV}/${datei}`)).toString('utf8')
+  const start = html.indexOf('<section id="items"')
+  if (start < 0) return undefined
+  return html.slice(start, html.indexOf('</section>', start))
+}
+
+/** Die künftigen, datierten und benannten Einträge eines Abschnitts. */
+function* kuenftigeEintraege(abschnitt: string, heute: string): Generator<Eintrag> {
+  for (const m of abschnitt.matchAll(
+    /<li class="merch\d+[^"]*" data-date="([^"]*)">([\s\S]*?)<\/li>/g,
+  )) {
+    const [, datum, block] = m
+    // Nur Künftiges. Was erschienen ist, hilft einem Kalender nicht mehr.
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(datum) || datum < heute) continue
+    /*
+      **Der 31.12. ist bei aniSearch kein Termin, sondern ein Jahr.**
+
+      Wo ein Verlag nur „2026" angekündigt hat, trägt der Eintrag den letzten
+      Tag des Jahres. Am 29.08.2026 betraf das vier von 61 Vorschlägen —
+      Bleach, Bleach TYBW, Dragon Ball Z und „Mein Nachbar Totoro", allesamt
+      Reihen mit einer nächsten Box ohne Datum. Im Kalender stünde daraus die
+      Behauptung, Totoro erscheine am Silvestertag.
+
+      Der Handel veröffentlicht mittwochs und freitags; ein echter
+      Verkaufsstart am 31.12. ist die Ausnahme, die diese Sperre zu Recht
+      mitnimmt — lieber ein Termin zu wenig als ein erfundener.
+    */
+    if (datum.endsWith('-12-31')) continue
+    const edition = /<span class="title">([^<]*)</.exec(block)?.[1]?.trim()
+    if (!edition) continue
+    yield { datum, block, edition }
+  }
+}
+
+/**
+ * Ausländische Ausgaben erkennen.
+ *
+ * aniSearch markiert sie mit einem Flaggenbild im Block
+ * (`<img … class="flag" alt="us">`); **deutsche Ausgaben tragen keine
+ * Flagge**. Das ist keine Vermutung, sondern am Archiv abgelesen: Bei
+ * „My Hero Academia: Vigilantes" steht die deutsche Gesamtausgabe vom
+ * 04.09. ohne Flagge, daneben zwei gleichnamige `Season 1 [Blu-ray]` mit
+ * `alt="us"` (08.09.) und `alt="gb"` (14.09.).
+ *
+ * Ein Kalender für deutsche Synchronfassungen hat für die keinen
+ * Verwendungszweck — schlimmer noch, sie erzeugen Widersprüche zu
+ * korrekten deutschen Terminen und kosten Prüfzeit von Hand.
+ */
+const hatFlagge = (block: string): boolean => /class="flag"[^>]*alt="([a-z]{2})"/.test(block)
+
+/** Durchsucht das Archiv und sammelt die deutschen Disc-Vorschläge. */
+function sammleVorschlaege({ titles, releases, anisearch }: Eingaben): Durchsicht {
+  const nachAnisearchId = anisearchZuTitel(anisearch)
   const titelNach = new Map(titles.map((t) => [t.id, t]))
   // Zu welchen Anime steht schon ein Disc-Termin im Datensatz?
   const mitDisc = new Set(releases.filter((r) => r.releaseType === 'disc').map((r) => r.titleId))
 
   const heute = todayIso()
-  const vorschlaege: DiscProposal[] = []
-  let geprüft = 0
-  let verworfen = 0
-  /** Ausgaben mit Landesflagge — US, UK, FR. Nicht unsere Baustelle. */
-  let auslaendisch = 0
+  const d: Durchsicht = { vorschlaege: [], geprüft: 0, verworfen: 0, auslaendisch: 0 }
 
   for (const datei of readdirSync(ARCHIV)) {
     if (!datei.endsWith('.html.gz')) continue
@@ -119,63 +200,24 @@ function main(): void {
     const anime = titelNach.get(titleId)
     if (!anime) continue
 
-    const html = gunzipSync(readFileSync(`${ARCHIV}/${datei}`)).toString('utf8')
-    const start = html.indexOf('<section id="items"')
-    if (start < 0) continue
-    const abschnitt = html.slice(start, html.indexOf('</section>', start))
+    const abschnitt = leseAbschnitt(datei)
+    if (abschnitt === undefined) continue
 
     const de = anisearch[titleId]?.info?.languages?.find((l) => l.language === 'Deutsch')
 
-    for (const m of abschnitt.matchAll(
-      /<li class="merch\d+[^"]*" data-date="([^"]*)">([\s\S]*?)<\/li>/g,
-    )) {
-      const [, datum, block] = m
-      // Nur Künftiges. Was erschienen ist, hilft einem Kalender nicht mehr.
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(datum) || datum < heute) continue
-      /*
-        **Der 31.12. ist bei aniSearch kein Termin, sondern ein Jahr.**
-
-        Wo ein Verlag nur „2026" angekündigt hat, trägt der Eintrag den letzten
-        Tag des Jahres. Am 29.08.2026 betraf das vier von 61 Vorschlägen —
-        Bleach, Bleach TYBW, Dragon Ball Z und „Mein Nachbar Totoro", allesamt
-        Reihen mit einer nächsten Box ohne Datum. Im Kalender stünde daraus die
-        Behauptung, Totoro erscheine am Silvestertag.
-
-        Der Handel veröffentlicht mittwochs und freitags; ein echter
-        Verkaufsstart am 31.12. ist die Ausnahme, die diese Sperre zu Recht
-        mitnimmt — lieber ein Termin zu wenig als ein erfundener.
-      */
-      if (datum.endsWith('-12-31')) continue
-      const edition = /<span class="title">([^<]*)</.exec(block)?.[1]?.trim()
-      if (!edition) continue
-      geprüft++
-
-      /**
-       * Ausländische Ausgaben verwerfen.
-       *
-       * aniSearch markiert sie mit einem Flaggenbild im Block
-       * (`<img … class="flag" alt="us">`); **deutsche Ausgaben tragen keine
-       * Flagge**. Das ist keine Vermutung, sondern am Archiv abgelesen: Bei
-       * „My Hero Academia: Vigilantes" steht die deutsche Gesamtausgabe vom
-       * 04.09. ohne Flagge, daneben zwei gleichnamige `Season 1 [Blu-ray]` mit
-       * `alt="us"` (08.09.) und `alt="gb"` (14.09.).
-       *
-       * Ein Kalender für deutsche Synchronfassungen hat für die keinen
-       * Verwendungszweck — schlimmer noch, sie erzeugen Widersprüche zu
-       * korrekten deutschen Terminen und kosten Prüfzeit von Hand.
-       */
-      const flagge = /class="flag"[^>]*alt="([a-z]{2})"/.exec(block)?.[1]
-      if (flagge) {
-        auslaendisch++
+    for (const { datum, block, edition } of kuenftigeEintraege(abschnitt, heute)) {
+      d.geprüft++
+      if (hatFlagge(block)) {
+        d.auslaendisch++
         continue
       }
       const grund = istDisc(edition)
       if (!grund) {
-        verworfen++
+        d.verworfen++
         continue
       }
       const pfad = /data-href="(article\/[^"]+)"/.exec(block)?.[1]
-      vorschlaege.push({
+      d.vorschlaege.push({
         titleId,
         anime: anime.titleDe ?? anime.titleEn ?? anime.titleRomaji ?? String(titleId),
         edition,
@@ -187,14 +229,12 @@ function main(): void {
       })
     }
   }
+  return d
+}
 
-  vorschlaege.sort((a, b) => a.date.localeCompare(b.date) || a.anime.localeCompare(b.anime))
-  writeJson(
-    'data/proposals/disc-anisearch.json',
-    { scrapedAt: new Date().toISOString(), quelle: ARCHIV, proposals: vorschlaege },
-    true,
-  )
-
+/** Meldet Zahlen und die ersten Ausgaben, die der Datensatz noch nicht kennt. */
+function berichte(d: Durchsicht, releases: Release[]): void {
+  const { vorschlaege, geprüft, verworfen, auslaendisch } = d
   // Was davon steht noch nicht im Datensatz? Verglichen wird Anime **und**
   // Datum: Zu einem Anime können mehrere Ausgaben gehören, und derselbe Anime
   // mit einem anderen Termin ist ein neuer Eintrag.
@@ -219,6 +259,20 @@ function main(): void {
   for (const v of neue.slice(0, 12)) {
     log(`  ${v.date}  ${v.anime.slice(0, 24).padEnd(26)} ${v.edition.slice(0, 44)}`)
   }
+}
+
+function main(): void {
+  const eingaben = ladeEingaben()
+  if (!eingaben) return
+
+  const durchsicht = sammleVorschlaege(eingaben)
+  durchsicht.vorschlaege.sort((a, b) => a.date.localeCompare(b.date) || a.anime.localeCompare(b.anime))
+  writeJson(
+    'data/proposals/disc-anisearch.json',
+    { scrapedAt: new Date().toISOString(), quelle: ARCHIV, proposals: durchsicht.vorschlaege },
+    true,
+  )
+  berichte(durchsicht, eingaben.releases)
 }
 
 main()

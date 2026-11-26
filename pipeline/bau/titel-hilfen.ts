@@ -15,6 +15,113 @@ import { addDays } from '../../shared/time.ts'
 import { type CrunchyrollEntry } from '../lib/crunchyroll.ts'
 import { type CuratedEntry } from '../lib/curated.ts'
 
+/** Union-Find über Kennungen; die kleinere Kennung wird Wurzel. */
+interface Gruppen {
+  parent: Map<number, number>
+  find: (id: number) => number
+  union: (a: number, b: number) => void
+}
+
+function neueGruppen(): Gruppen {
+  const parent = new Map<number, number>()
+  const find = (id: number): number => {
+    let root = id
+    while (parent.get(root) !== undefined && parent.get(root) !== root) root = parent.get(root)!
+    let cur = id
+    while (parent.get(cur) !== undefined && parent.get(cur) !== cur) {
+      const next = parent.get(cur)!
+      parent.set(cur, root)
+      cur = next
+    }
+    return root
+  }
+  const union = (a: number, b: number) => {
+    const ra = find(a)
+    const rb = find(b)
+    if (ra === rb) return
+    // Kleinere Kennung gewinnt — in aller Regel die erste Staffel.
+    if (ra < rb) parent.set(rb, ra)
+    else parent.set(ra, rb)
+  }
+  return { parent, find, union }
+}
+
+/**
+  **Ein Crossover verbindet keine Reihen — auch im Katalog nicht.**
+
+  Der gepflegte Bestand kennt die Regel seit dem 12.08.2026: Wer zwei
+  `PARENT`-Kanten trägt, gehört zu zwei Werken und darf ihre Reihen nicht
+  zusammenziehen. Der Katalog kannte sie nicht — dort standen bis zum
+  03.09.2026 nur die Kennungen der Nachbarn, nicht die Art der Kante.
+
+  Was das gekostet hat, stand an dem Tag im Panel: „Dragon Ball: Annecy
+  Festival 60th Anniversary" hängt an Dragon Ball Super **und** am
+  One-Piece-Beitrag desselben Festivals. Über diese eine Kante standen **elf
+  Dragon-Ball-Titel** in der One-Piece-Reihe, und weil zwei davon ONAs sind
+  (also als Staffeln zählen), war One Piece selbst plötzlich „Staffel 4".
+
+  **Der Eintrag fällt nicht weg**, er verbindet nur nichts: Seine Kanten
+  bleiben ungenutzt, und er erbt später die Reihe seines ersten Elternteils.
+*/
+function crossoverKandidaten(eintraege: KatalogEintrag[]): Map<number, number[]> {
+  const kandidaten = new Map<number, number[]>()
+  for (const e of eintraege) {
+    if ((e.eltern?.length ?? 0) >= 2) kandidaten.set(e.id, e.eltern!)
+  }
+  return kandidaten
+}
+
+function verbindeKatalogKanten(g: Gruppen, eintraege: KatalogEintrag[], kandidaten: Map<number, number[]>): void {
+  const { parent, union } = g
+  for (const e of eintraege) {
+    parent.set(e.id, parent.get(e.id) ?? e.id)
+    if (kandidaten.has(e.id)) continue
+    for (const anderer of e.rel ?? []) {
+      if (kandidaten.has(anderer)) continue
+      parent.set(anderer, parent.get(anderer) ?? anderer)
+      union(e.id, anderer)
+    }
+  }
+}
+
+/** Die fertigen Reihen des gepflegten Bestands mit einhängen. */
+function haengeBestandEin(g: Gruppen, bekannt: Map<number, number>): void {
+  const { parent, union } = g
+  for (const [id, franchiseId] of bekannt) {
+    parent.set(id, parent.get(id) ?? id)
+    parent.set(franchiseId, parent.get(franchiseId) ?? franchiseId)
+    union(id, franchiseId)
+  }
+}
+
+/** Je Gruppe die Kennung des gepflegten Bestands, falls es dort eine gibt. */
+function kennungenAusBestand(g: Gruppen, bekannt: Map<number, number>): Map<number, number> {
+  const ausBestand = new Map<number, number>()
+  for (const [id, franchiseId] of bekannt) {
+    const wurzel = g.find(id)
+    const bisher = ausBestand.get(wurzel)
+    if (bisher === undefined || franchiseId < bisher) ausBestand.set(wurzel, franchiseId)
+  }
+  return ausBestand
+}
+
+/**
+  Ein Crossover erbt die Reihe seines **ersten** Elternteils — dieselbe Regel
+  wie im gepflegten Bestand. Verworfen wird er nicht: Er ist ein Werk und
+  gehört in eine Reihe, nur eben in genau eine.
+*/
+function crossoverErbtErsteReihe(g: Gruppen, kandidaten: Map<number, number[]>): void {
+  const { parent, find } = g
+  for (const [id, eltern] of kandidaten) {
+    parent.set(id, parent.get(id) ?? id)
+    const erster = eltern[0]
+    if (erster !== undefined) {
+      parent.set(erster, parent.get(erster) ?? erster)
+      parent.set(find(id), find(erster))
+    }
+  }
+}
+
 /**
  * Reihen über den **gesamten** AniList-Katalog, nicht nur über den Bestand.
  *
@@ -39,90 +146,16 @@ export function reihenFuerKatalog(
   eintraege: KatalogEintrag[],
   bekannt: Map<number, number>,
 ): Map<number, number> {
-  const parent = new Map<number, number>()
-  const find = (id: number): number => {
-    let root = id
-    while (parent.get(root) !== undefined && parent.get(root) !== root) root = parent.get(root)!
-    let cur = id
-    while (parent.get(cur) !== undefined && parent.get(cur) !== cur) {
-      const next = parent.get(cur)!
-      parent.set(cur, root)
-      cur = next
-    }
-    return root
-  }
-  const union = (a: number, b: number) => {
-    const ra = find(a)
-    const rb = find(b)
-    if (ra === rb) return
-    // Kleinere Kennung gewinnt — in aller Regel die erste Staffel.
-    if (ra < rb) parent.set(rb, ra)
-    else parent.set(ra, rb)
-  }
-
-  /*
-    **Ein Crossover verbindet keine Reihen — auch im Katalog nicht.**
-
-    Der gepflegte Bestand kennt die Regel seit dem 12.08.2026: Wer zwei
-    `PARENT`-Kanten trägt, gehört zu zwei Werken und darf ihre Reihen nicht
-    zusammenziehen. Der Katalog kannte sie nicht — dort standen bis zum
-    03.09.2026 nur die Kennungen der Nachbarn, nicht die Art der Kante.
-
-    Was das gekostet hat, stand an dem Tag im Panel: „Dragon Ball: Annecy
-    Festival 60th Anniversary" hängt an Dragon Ball Super **und** am
-    One-Piece-Beitrag desselben Festivals. Über diese eine Kante standen **elf
-    Dragon-Ball-Titel** in der One-Piece-Reihe, und weil zwei davon ONAs sind
-    (also als Staffeln zählen), war One Piece selbst plötzlich „Staffel 4".
-
-    **Der Eintrag fällt nicht weg**, er verbindet nur nichts: Seine Kanten
-    bleiben ungenutzt, und er erbt unten die Reihe seines ersten Elternteils.
-  */
-  const kandidaten = new Map<number, number[]>()
-  for (const e of eintraege) {
-    if ((e.eltern?.length ?? 0) >= 2) kandidaten.set(e.id, e.eltern!)
-  }
-
-  for (const e of eintraege) {
-    parent.set(e.id, parent.get(e.id) ?? e.id)
-    if (kandidaten.has(e.id)) continue
-    for (const anderer of e.rel ?? []) {
-      if (kandidaten.has(anderer)) continue
-      parent.set(anderer, parent.get(anderer) ?? anderer)
-      union(e.id, anderer)
-    }
-  }
-  // Die fertigen Reihen des gepflegten Bestands mit einhängen.
-  for (const [id, franchiseId] of bekannt) {
-    parent.set(id, parent.get(id) ?? id)
-    parent.set(franchiseId, parent.get(franchiseId) ?? franchiseId)
-    union(id, franchiseId)
-  }
-
-  // Je Gruppe die Kennung des gepflegten Bestands, falls es dort eine gibt.
-  const ausBestand = new Map<number, number>()
-  for (const [id, franchiseId] of bekannt) {
-    const wurzel = find(id)
-    const bisher = ausBestand.get(wurzel)
-    if (bisher === undefined || franchiseId < bisher) ausBestand.set(wurzel, franchiseId)
-  }
-
-  /*
-    Ein Crossover erbt die Reihe seines **ersten** Elternteils — dieselbe Regel
-    wie im gepflegten Bestand. Verworfen wird er nicht: Er ist ein Werk und
-    gehört in eine Reihe, nur eben in genau eine.
-  */
-  for (const [id, eltern] of kandidaten) {
-    parent.set(id, parent.get(id) ?? id)
-    const erster = eltern[0]
-    if (erster !== undefined) {
-      parent.set(erster, parent.get(erster) ?? erster)
-      parent.set(find(id), find(erster))
-    }
-  }
+  const g = neueGruppen()
+  const kandidaten = crossoverKandidaten(eintraege)
+  verbindeKatalogKanten(g, eintraege, kandidaten)
+  haengeBestandEin(g, bekannt)
+  const ausBestand = kennungenAusBestand(g, bekannt)
+  crossoverErbtErsteReihe(g, kandidaten)
 
   const reihe = new Map<number, number>()
   for (const e of eintraege) {
-    const wurzel = find(e.id)
+    const wurzel = g.find(e.id)
     reihe.set(e.id, ausBestand.get(wurzel) ?? wurzel)
   }
   return reihe

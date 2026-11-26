@@ -13,7 +13,7 @@ import { VerlaufZeilen } from './news-verlauf.tsx'
 import type { Translate } from '../lib/i18n.tsx'
 import { NewsCover } from './news-kachel.tsx'
 
-export function NewsEintragInhalt({ umschalten, e, auf, erste, t, arten, sortiert, oeffne, verlaeufe }: {
+interface NewsEintragInhaltProps {
   umschalten: (e: NewsEintrag) => void
   e: NewsEintrag
   auf: boolean
@@ -23,93 +23,103 @@ export function NewsEintragInhalt({ umschalten, e, auf, erste, t, arten, sortier
   sortiert: NewsMeldung[]
   oeffne: (titelId: number) => void
   verlaeufe: Verlaeufe
-}) {
+}
+
+export function NewsEintragInhalt({ umschalten, e, auf, erste, t, arten, sortiert, oeffne, verlaeufe }: NewsEintragInhaltProps) {
   return (
     <>
-      <button
-        type="button"
-        onClick={() => umschalten(e)}
-        aria-expanded={e.meldungen.length > 1 ? auf : undefined}
-        className="flex w-full items-center gap-2.5 py-1.5 text-left hover:bg-ak-flaeche-2"
-      >
-        <NewsCover e={e} />
-        <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-          {/* Zeile 1: der Titel, allein — er ist, wonach man die Liste überfliegt. */}
-          <span className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{e.titel}</span>
-          {/*
-            Zeile 2: der Teil, falls die Meldung einen bestimmten meint.
-
-            **Der Teil steht am Titel, nicht hinter dem Anbieter.** „bei
-            Crunchyroll · Lord of Mysteries Specials" las sich wie eine
-            Fußnote zum Anbieter — die Meldung betrifft aber genau diesen
-            Teil und **nicht** die Hauptserie. Ohne
-            Teil steht hier die Kurzform.
-          */}
-          {/* Heißt der Teil wie die Zeile darüber, sagt er nichts Neues (15.09.2026, Bildprüfung). */}
-          {/*
-            **`max-w-full` neben `self-start`, sonst schneidet `truncate` nichts ab.**
-
-            In einer Flex-Spalte heißt `self-start` „so breit wie dein Inhalt" — die
-            Plakette wuchs damit auf 474 px in einem 375 px breiten Fenster, und die
-            News-Seite bekam auf dem Handy 177 px Überbreite (gemessen 16.09.2026,
-            `check:ansichten --handy` war rot). `min-w-0` allein hilft nicht: Es senkt
-            die Untergrenze, nicht die Obergrenze.
-          */}
-          {erste.teil && erste.teil !== e.titel ? (
-            <span className="min-w-0 max-w-full self-start truncate rounded border border-slate-300 px-1 py-px text-[11px] font-medium text-slate-600 dark:border-slate-600 dark:text-slate-300">
-              {erste.teil}
-            </span>
-          ) : (
-            <span className="truncate text-xs text-ak-leise">
-              {newsKurz(erste)}
-              {e.meldungen.length > 1 && (
-                <span> · {t('news.weitere', { n: e.meldungen.length - 1 })}</span>
-              )}
-            </span>
-          )}
-          {/* Zeile 3: die Arten als Chips, mit Teil davor die Kurzform. */}
-          <span className="flex min-w-0 items-center gap-1">
-            {arten.map(([a, n]) => (
-              <span key={a} className={`shrink-0 rounded px-1.5 py-px text-[11px] ${NEWS_FARBE[a]}`}>
-                {t(`news.art.${a}`)}
-                {n > 1 && <span className="ml-1 tabular-nums">{n}</span>}
-              </span>
-            ))}
-            {erste.teil && erste.teil !== e.titel && (
-              <span className="min-w-0 truncate text-xs text-ak-leise">
-                {newsKurz(erste)}
-                {e.meldungen.length > 1 && (
-                  <span> · {t('news.weitere', { n: e.meldungen.length - 1 })}</span>
-                )}
-              </span>
-            )}
-          </span>
-        </span>
-        <span
-          className={`shrink-0 pr-1 text-slate-400 transition-transform ${auf ? 'rotate-90' : ''} ${
-            e.meldungen.length > 1 ? '' : 'opacity-45'
-          }`}
-          aria-hidden="true"
-        >
-          ›
-        </span>
-      </button>
-
-      {auf && (
-        <ul className="mb-1.5 ml-10 space-y-0.5 border-l border-slate-200 pl-3 dark:border-slate-700">
-          {sortiert.map((m, i) => (
-            <MeldungZeile
-              key={`${m.art}-${m.datum ?? ''}-${m.von ?? ''}-${i}`}
-              m={m}
-              reihe={e.titel}
-              am={e.am}
-              oeffne={() => oeffne(m.teilId ?? e.titelId)}
-              staende={verlaeufe.vorgaenger.get(m)}
-            />
-          ))}
-        </ul>
-      )}
+      <NewsEintragKopf umschalten={umschalten} e={e} auf={auf} erste={erste} t={t} arten={arten} />
+      {auf && <NewsMeldungsListe e={e} sortiert={sortiert} oeffne={oeffne} verlaeufe={verlaeufe} />}
     </>
+  )
+}
+
+function NewsEintragKopf({ umschalten, e, auf, erste, t, arten }: Pick<NewsEintragInhaltProps, 'umschalten' | 'e' | 'auf' | 'erste' | 't' | 'arten'>) {
+  return (
+    <button
+      type="button"
+      onClick={() => umschalten(e)}
+      aria-expanded={e.meldungen.length > 1 ? auf : undefined}
+      className="flex w-full items-center gap-2.5 py-1.5 text-left hover:bg-ak-flaeche-2"
+    >
+      <NewsCover e={e} />
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        {/* Zeile 1: der Titel, allein — er ist, wonach man die Liste überfliegt. */}
+        <span className="truncate text-sm font-semibold text-ak-text">{e.titel}</span>
+        {/*
+          Zeile 2: der Teil, falls die Meldung einen bestimmten meint.
+
+          **Der Teil steht am Titel, nicht hinter dem Anbieter.** „bei
+          Crunchyroll · Lord of Mysteries Specials" las sich wie eine
+          Fußnote zum Anbieter — die Meldung betrifft aber genau diesen
+          Teil und **nicht** die Hauptserie. Ohne
+          Teil steht hier die Kurzform.
+        */}
+        {/* Heißt der Teil wie die Zeile darüber, sagt er nichts Neues (15.09.2026, Bildprüfung). */}
+        {/*
+          **`max-w-full` neben `self-start`, sonst schneidet `truncate` nichts ab.**
+
+          In einer Flex-Spalte heißt `self-start` „so breit wie dein Inhalt" — die
+          Plakette wuchs damit auf 474 px in einem 375 px breiten Fenster, und die
+          News-Seite bekam auf dem Handy 177 px Überbreite (gemessen 16.09.2026,
+          `check:ansichten --handy` war rot). `min-w-0` allein hilft nicht: Es senkt
+          die Untergrenze, nicht die Obergrenze.
+        */}
+        {erste.teil && erste.teil !== e.titel ? (
+          <span className="min-w-0 max-w-full self-start truncate rounded border border-ak-rand px-1 py-px text-[11px] font-medium text-ak-leise">
+            {erste.teil}
+          </span>
+        ) : (
+          <KurzForm klasse="truncate text-xs text-ak-leise" e={e} erste={erste} t={t} />
+        )}
+        {/* Zeile 3: die Arten als Chips, mit Teil davor die Kurzform. */}
+        <span className="flex min-w-0 items-center gap-1">
+          {arten.map(([a, n]) => (
+            <span key={a} className={`shrink-0 rounded px-1.5 py-px text-[11px] ${NEWS_FARBE[a]}`}>
+              {t(`news.art.${a}`)}
+              {n > 1 && <span className="ml-1 tabular-nums">{n}</span>}
+            </span>
+          ))}
+          {erste.teil && erste.teil !== e.titel && (
+            <KurzForm klasse="min-w-0 truncate text-xs text-ak-leise" e={e} erste={erste} t={t} />
+          )}
+        </span>
+      </span>
+      <span
+        className={`shrink-0 pr-1 text-ak-sehr-leise transition-transform ${auf ? 'rotate-90' : ''} ${
+          e.meldungen.length > 1 ? '' : 'opacity-45'
+        }`}
+        aria-hidden="true"
+      >
+        ›
+      </span>
+    </button>
+  )
+}
+
+function KurzForm({ klasse, e, erste, t }: { klasse: string; e: NewsEintrag; erste: NewsMeldung; t: Translate }) {
+  return (
+    <span className={klasse}>
+      {newsKurz(erste)}
+      {e.meldungen.length > 1 && <span> · {t('news.weitere', { n: e.meldungen.length - 1 })}</span>}
+    </span>
+  )
+}
+
+function NewsMeldungsListe({ e, sortiert, oeffne, verlaeufe }: Pick<NewsEintragInhaltProps, 'e' | 'sortiert' | 'oeffne' | 'verlaeufe'>) {
+  return (
+    <ul className="mb-1.5 ml-10 space-y-0.5 border-l border-ak-linie pl-3">
+      {sortiert.map((m, i) => (
+        <MeldungZeile
+          key={`${m.art}-${m.datum ?? ''}-${m.von ?? ''}-${i}`}
+          m={m}
+          reihe={e.titel}
+          am={e.am}
+          oeffne={() => oeffne(m.teilId ?? e.titelId)}
+          staende={verlaeufe.vorgaenger.get(m)}
+        />
+      ))}
+    </ul>
   )
 }
 
@@ -198,15 +208,15 @@ function MeldungZeile({
             {artLabel(m)}
           </span>
           {m.teil && m.teil !== reihe && (
-            <span className="min-w-0 shrink truncate rounded border border-slate-300 px-1 py-px text-[11px] font-medium text-slate-600 dark:border-slate-600 dark:text-slate-300">
+            <span className="min-w-0 shrink truncate rounded border border-ak-rand px-1 py-px text-[11px] font-medium text-ak-leise">
               {m.teil}
             </span>
           )}
           <span
             className={`min-w-0 flex-1 basis-40 text-xs ${
               m.ersetzt || m.zurueckgezogen
-                ? 'text-slate-400 line-through dark:text-slate-500'
-                : 'text-slate-600 dark:text-slate-300'
+                ? 'text-ak-sehr-leise line-through'
+                : 'text-ak-leise'
             }`}
           >
             {newsSatz(m, am)}
@@ -218,7 +228,7 @@ function MeldungZeile({
       </div>
       {/* Der Vermerk erscheint **beim Aufklappen** unter der Meldung — in der Übersicht bleibt der
           Satz kurz. */}
-      {m.hinweis && <p className="pb-1 pl-2 pr-2 text-[11px] text-slate-400 dark:text-slate-500">{m.abschnitte?.length ? <NachtragText kurz={m.hinweis} abschnitte={m.abschnitte} /> : <Klapptext text={m.hinweis} />}</p>}
+      {m.hinweis && <p className="pb-1 pl-2 pr-2 text-[11px] text-ak-sehr-leise">{m.abschnitte?.length ? <NachtragText kurz={m.hinweis} abschnitte={m.abschnitte} /> : <Klapptext text={m.hinweis} />}</p>}
       {staende && <VerlaufZeilen staende={staende} />}
     </li>
   )

@@ -558,6 +558,32 @@ for (const datei of readdirSync(DIR).filter((f) => f.endsWith('.yml'))) {
   }
 }
 
+/*
+  Jeder Workflow-`name:` steht in `LAUF_ARTEN` (worker/src/lauf-sql.ts) und umgekehrt (25.11.2026): dieselbe
+  Regel wie in `check-logic.ts` (ohne Ausnahmen), hier früh, weil sie dort erst nach ~8 min auffiel (PR 5021).
+*/
+{
+  const text = readFileSync(resolve(process.cwd(), 'worker/src/lauf-sql.ts'), 'utf8')
+  const liste = /export const LAUF_ARTEN = \[([\s\S]*?)\]/.exec(text)?.[1] ?? ''
+  const arten = [...liste.matchAll(/'((?:[^'\\]|\\.)*)'/g)].map((m) => m[1])
+  const namen = readdirSync(DIR)
+    .filter((f) => f.endsWith('.yml') || f.endsWith('.yaml'))
+    .map((f) => [f, /^name:\s*(.+)$/m.exec(readFileSync(resolve(DIR, f), 'utf8'))?.[1]?.trim()]) // wie check-logic; kaputtes YAML meldet die Schleife oben
+    .filter(([, n]) => n)
+  for (const [datei, name] of namen.filter(([, n]) => !arten.includes(n))) {
+    console.error(`✗ ${datei}: Workflow „${name}" fehlt in LAUF_ARTEN (worker/src/lauf-sql.ts) — die Übersicht zeigt keine Kachel`)
+    fehler++
+  }
+  for (const art of arten.filter((a) => !namen.some(([, n]) => n === a))) {
+    console.error(`✗ LAUF_ARTEN (worker/src/lauf-sql.ts) nennt „${art}", aber kein Workflow trägt diesen \`name:\``)
+    fehler++
+  }
+  if (!arten.length) {
+    console.error('✗ LAUF_ARTEN in worker/src/lauf-sql.ts nicht lesbar (leer oder umbenannt)')
+    fehler++
+  }
+}
+
 for (const meldung of pruefeOderTrue(process.cwd())) {
   console.error(meldung)
   fehler++

@@ -19,6 +19,8 @@ import { adressIndex, artDerMeldung, folgenDerMeldung, meldungGrund, nameIndex, 
 import { beobachtungenAusRohfolgen, fremdNach, type RohFolge } from './lib/urteil-rohfolgen.ts'
 import type { Title } from '../shared/types.ts'
 import { beobachtungenDerSpanne, staffelVonJeMeldung } from './lib/urteil-spanne.ts'
+import { altStaffelTitel } from './lib/staffel-altmeldungen.ts'
+import { HORIZONTE_STAFFELN, ladeStaffelGrenzen } from './lib/pokemon-staffeln.ts'
 import { adressKern } from './lib/dub-confirmed.ts'
 import type { FolgenZuordnung } from './lib/folgen-je-folge.ts'
 
@@ -151,7 +153,8 @@ async function main() {
   const titelListe = readJson<Title[] | { titles: Title[] }>('public/data/titles.json', [])
   const titelAlle = Array.isArray(titelListe) ? titelListe : titelListe.titles
   const einzel = new Set(titelAlle.filter((t) => t.format === 'MOVIE' || t.episodes === 1).map((t) => t.id))
-  const staffelVon = staffelVonJeMeldung(titelAlle)
+  /* Alte Meldungen zu den Staffel-Titeln (20.–24.11.2026) über die feste Tabelle der Yaml, nicht über gebaute Titel (F157). */
+  const staffelVon = staffelVonJeMeldung(altStaffelTitel(ladeStaffelGrenzen(HORIZONTE_STAFFELN)))
   const { nachAdresse, staffelKandidaten, nachName, reiheVon } = meldungsZuordnung(titelAlle)
   const beobachtungen = beobachtungenAusRohfolgen(rohfolgen, zuordnung, kanalAdresse, fremdNach(nachAdresse))
   const verworfen: Record<string, number> = {}

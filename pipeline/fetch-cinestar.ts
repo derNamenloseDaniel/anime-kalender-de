@@ -154,35 +154,32 @@ interface Sammlung {
   detailLink?: string
 }
 
-async function main(): Promise<void> {
-  const kinos = alsListe<Kino>(await holeJson('/api/cinema/'))
-  if (!kinos.length) {
-    warn('CineStar: keine Kinoliste erhalten.')
-    return
-  }
-  log(`CineStar: ${kinos.length} Standorte`)
+interface Kandidat {
+  id: number
+  woerter: string[]
+}
 
-  const titles = readJson<Title[]>('public/data/titles.json', [])
-  /**
-   * Zugeordnet wird **wortweise**, nicht über den ganzen Namen.
-   *
-   * CineStar ergänzt die Reihennummer und den Reihennamen: „Detektiv Conan
-   * **Film 29**: Der gefallene Engel des Highways **– CineAnime**". Unser Titel
-   * heißt „Detektiv Conan: Der gefallene Engel des Highways". Ein Vergleich der
-   * ganzen Zeichenketten findet das nie.
-   *
-   * Verlangt wird deshalb, dass **alle** bedeutungstragenden Wörter unseres
-   * Titels im CineStar-Titel vorkommen. Die Gegenrichtung wäre falsch — der
-   * Zusatz steht dort, nicht bei uns. Und mehrdeutige Namen fallen ganz heraus:
-   * Ein falsch zugeordneter Kinotermin ist schlimmer als keiner.
-   */
-  const FUELL = new Set(['der', 'die', 'das', 'und', 'von', 'the', 'des', 'dem', 'ein', 'eine'])
-  const zerlege = (s: string): string[] =>
-    schlicht(s)
-      .split(' ')
-      .filter((w) => w.length > 2 && !FUELL.has(w))
+/**
+ * Zugeordnet wird **wortweise**, nicht über den ganzen Namen.
+ *
+ * CineStar ergänzt die Reihennummer und den Reihennamen: „Detektiv Conan
+ * **Film 29**: Der gefallene Engel des Highways **– CineAnime**". Unser Titel
+ * heißt „Detektiv Conan: Der gefallene Engel des Highways". Ein Vergleich der
+ * ganzen Zeichenketten findet das nie.
+ *
+ * Verlangt wird deshalb, dass **alle** bedeutungstragenden Wörter unseres
+ * Titels im CineStar-Titel vorkommen. Die Gegenrichtung wäre falsch — der
+ * Zusatz steht dort, nicht bei uns. Und mehrdeutige Namen fallen ganz heraus:
+ * Ein falsch zugeordneter Kinotermin ist schlimmer als keiner.
+ */
+const FUELL = new Set(['der', 'die', 'das', 'und', 'von', 'the', 'des', 'dem', 'ein', 'eine'])
+const zerlege = (s: string): string[] =>
+  schlicht(s)
+    .split(' ')
+    .filter((w) => w.length > 2 && !FUELL.has(w))
 
-  const kandidaten: Array<{ id: number; woerter: string[] }> = []
+function baueKandidaten(titles: Title[]): Kandidat[] {
+  const kandidaten: Kandidat[] = []
   for (const t of titles) {
     for (const n of [t.titleDe, t.titleEn, t.titleRomaji]) {
       if (!n) continue
@@ -197,29 +194,85 @@ async function main(): Promise<void> {
       if (woerter.length >= 3) kandidaten.push({ id: t.id, woerter })
     }
   }
+  return kandidaten
+}
+
+/**
+ * Der eindeutige Treffer zu einem CineStar-Titel, sonst `undefined`.
+ *
+ * Zwei Bedingungen, und beide sind nötig:
+ *
+ * 1. **Wortgleichheit, nicht Teilzeichenkette.** `includes` lässt „sunny" in
+ *    „sunnydancer" durchgehen; verglichen werden deshalb ganze Wörter.
+ * 2. **Höchstens drei zusätzliche Wörter** auf CineStar-Seite. Der Zusatz
+ *    dort ist „Film 29" oder „– CineAnime"; wer mehr braucht, um zu passen,
+ *    passt nicht.
+ */
+function ordneZu(kandidaten: Kandidat[], titel: string): number | undefined {
+  const csWoerter = new Set(zerlege(titel))
+  const treffer = new Set<number>()
+  for (const k of kandidaten) {
+    if (!k.woerter.every((w) => csWoerter.has(w))) continue
+    if (csWoerter.size - k.woerter.length > 3) continue
+    treffer.add(k.id)
+  }
+  return treffer.size === 1 ? [...treffer][0] : undefined
+}
+
+/** Trägt die Vorstellungen eines Films in seine Sammlung ein. */
+function trageVorstellungen(bestand: Sammlung, vorstellungen: Vorstellung[], stadt: string): void {
+  for (const s of vorstellungen) {
+    const tag = (s.datetime ?? '').slice(0, 10)
+    if (!tag) continue
+    const fassung = fassungAus(s.attributes)
+    const eintrag = (bestand.tage[tag] ??= { fassungen: {}, staedte: [] })
+    eintrag.fassungen[fassung] = (eintrag.fassungen[fassung] ?? 0) + 1
+    if (!eintrag.staedte.includes(stadt)) eintrag.staedte.push(stadt)
+  }
+}
+
+/** Nimmt einen Film eines Standorts in `filme` auf, wenn er passt. */
+function nimmFilmAuf(
+  filme: Map<string, Sammlung>,
+  f: CsFilm,
+  stadt: string,
+  kandidaten: Kandidat[],
+): void {
+  const titel = f.title ?? ''
+  if (!titel) return
+  const attribute = Array.isArray(f.attributes) ? f.attributes : Object.values(f.attributes ?? {})
+  const cineAnime = attribute.includes('ZGP_CINEANIME')
+
+  const schluessel = schlicht(titel)
+  const anilistId = ordneZu(kandidaten, titel)
 
   /**
-   * Der eindeutige Treffer zu einem CineStar-Titel, sonst `undefined`.
+   * Aufgenommen wird, was **entweder** zur Anime-Reihe gehört **oder**
+   * einem unserer Titel entspricht.
    *
-   * Zwei Bedingungen, und beide sind nötig:
-   *
-   * 1. **Wortgleichheit, nicht Teilzeichenkette.** `includes` lässt „sunny" in
-   *    „sunnydancer" durchgehen; verglichen werden deshalb ganze Wörter.
-   * 2. **Höchstens drei zusätzliche Wörter** auf CineStar-Seite. Der Zusatz
-   *    dort ist „Film 29" oder „– CineAnime"; wer mehr braucht, um zu passen,
-   *    passt nicht.
+   * Nur `ZGP_CINEANIME` zu nehmen wäre zu eng — nicht jeder Anime-Film
+   * läuft unter der Reihe. Nur den Titelabgleich zu nehmen wäre zu eng in
+   * die andere Richtung: Ein Film, den wir noch nicht führen, ist genau
+   * der interessante Fund.
    */
-  const ordneZu = (titel: string): number | undefined => {
-    const csWoerter = new Set(zerlege(titel))
-    const treffer = new Set<number>()
-    for (const k of kandidaten) {
-      if (!k.woerter.every((w) => csWoerter.has(w))) continue
-      if (csWoerter.size - k.woerter.length > 3) continue
-      treffer.add(k.id)
-    }
-    return treffer.size === 1 ? [...treffer][0] : undefined
-  }
+  if (!cineAnime && !anilistId) return
 
+  const bestand =
+    filme.get(schluessel) ??
+    ({ titel, anilistId, tage: {}, staedte: [], cineAnime, detailLink: f.detailLink } as Sammlung)
+  bestand.cineAnime = bestand.cineAnime || cineAnime
+  if (anilistId && !bestand.anilistId) bestand.anilistId = anilistId
+  if (!bestand.staedte.includes(stadt)) bestand.staedte.push(stadt)
+
+  trageVorstellungen(bestand, f.showtimes ?? [], stadt)
+  filme.set(schluessel, bestand)
+}
+
+/** Ruft alle Standorte nacheinander ab; `fehler` zählt die nicht erreichbaren. */
+async function sammleStandorte(
+  kinos: Kino[],
+  kandidaten: Kandidat[],
+): Promise<{ filme: Map<string, Sammlung>; fehler: number }> {
   const filme = new Map<string, Sammlung>()
   let fehler = 0
 
@@ -232,50 +285,14 @@ async function main(): Promise<void> {
     }
     const stadt = kino.city ?? kino.name ?? String(kino.id)
 
-    for (const f of alsListe<CsFilm>(daten)) {
-      const titel = f.title ?? ''
-      if (!titel) continue
-      const attribute = Array.isArray(f.attributes)
-        ? f.attributes
-        : Object.values(f.attributes ?? {})
-      const cineAnime = attribute.includes('ZGP_CINEANIME')
-
-      const schluessel = schlicht(titel)
-      const anilistId = ordneZu(titel)
-
-      /**
-       * Aufgenommen wird, was **entweder** zur Anime-Reihe gehört **oder**
-       * einem unserer Titel entspricht.
-       *
-       * Nur `ZGP_CINEANIME` zu nehmen wäre zu eng — nicht jeder Anime-Film
-       * läuft unter der Reihe. Nur den Titelabgleich zu nehmen wäre zu eng in
-       * die andere Richtung: Ein Film, den wir noch nicht führen, ist genau
-       * der interessante Fund.
-       */
-      if (!cineAnime && !anilistId) continue
-
-      const bestand =
-        filme.get(schluessel) ??
-        ({ titel, anilistId, tage: {}, staedte: [], cineAnime, detailLink: f.detailLink } as Sammlung)
-      bestand.cineAnime = bestand.cineAnime || cineAnime
-      if (anilistId && !bestand.anilistId) bestand.anilistId = anilistId
-      if (!bestand.staedte.includes(stadt)) bestand.staedte.push(stadt)
-
-      for (const s of f.showtimes ?? []) {
-        const tag = (s.datetime ?? '').slice(0, 10)
-        if (!tag) continue
-        const fassung = fassungAus(s.attributes)
-        const eintrag = (bestand.tage[tag] ??= { fassungen: {}, staedte: [] })
-        eintrag.fassungen[fassung] = (eintrag.fassungen[fassung] ?? 0) + 1
-        if (!eintrag.staedte.includes(stadt)) eintrag.staedte.push(stadt)
-      }
-      filme.set(schluessel, bestand)
-    }
+    for (const f of alsListe<CsFilm>(daten)) nimmFilmAuf(filme, f, stadt, kandidaten)
     if ((i + 1) % 15 === 0) log(`  ${i + 1}/${kinos.length} Standorte`)
   }
+  return { filme, fehler }
+}
 
-  /** Was schon gelaufen ist, hilft dem Kalender nicht mehr. */
-  const heute = todayIso()
+/** Was schon gelaufen ist, hilft dem Kalender nicht mehr. */
+function nurKuenftige(filme: Map<string, Sammlung>, heute: string): Record<string, Sammlung> {
   const ergebnis: Record<string, Sammlung> = {}
   for (const [k, v] of filme) {
     const kuenftig = Object.keys(v.tage).filter((t) => t >= heute)
@@ -286,9 +303,10 @@ async function main(): Promise<void> {
       staedte: v.staedte.sort(),
     }
   }
+  return ergebnis
+}
 
-  writeJson(ZIEL, { geholtAm: new Date().toISOString(), standorte: kinos.length, filme: ergebnis })
-
+function meldeErgebnis(ergebnis: Record<string, Sammlung>, fehler: number): void {
   const mitDeutsch = Object.values(ergebnis).filter((f) =>
     Object.values(f.tage).some((t) => t.fassungen.deutsch),
   ).length
@@ -305,6 +323,25 @@ async function main(): Promise<void> {
         `${f.staedte.length} Städte${f.anilistId ? ` · AniList ${f.anilistId}` : ''}`,
     )
   }
+}
+
+async function main(): Promise<void> {
+  const kinos = alsListe<Kino>(await holeJson('/api/cinema/'))
+  if (!kinos.length) {
+    warn('CineStar: keine Kinoliste erhalten.')
+    return
+  }
+  log(`CineStar: ${kinos.length} Standorte`)
+
+  const titles = readJson<Title[]>('public/data/titles.json', [])
+  const kandidaten = baueKandidaten(titles)
+
+  const { filme, fehler } = await sammleStandorte(kinos, kandidaten)
+  const ergebnis = nurKuenftige(filme, todayIso())
+
+  writeJson(ZIEL, { geholtAm: new Date().toISOString(), standorte: kinos.length, filme: ergebnis })
+
+  meldeErgebnis(ergebnis, fehler)
 
   recordSource('cinestar', Object.keys(ergebnis).length)
 }

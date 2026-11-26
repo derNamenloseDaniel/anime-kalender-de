@@ -1,3 +1,4 @@
 kategorie: feature
-text: Datenbank zeigt gesetzte Filter als Chips
-untertitel: Tipp entfernt den Filter; „verfügbar“ heißt jetzt „Streambar“
+text: Filter in der Datenbank zeigen ihre Trefferzahl
+untertitel: Gesetzte Filter stehen über der Liste; „verfügbar“ heißt jetzt „Streambar“
+highlight: true

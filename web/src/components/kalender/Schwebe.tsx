@@ -11,14 +11,42 @@ import { sichtbareBreite } from '../../lib/sichtbare-breite.ts'
  * schließt sie beim Verlassen erst nach einer kurzen Frist — lang genug, um mit der Maus vom
  * Auslöser in die Karte zu wechseln. Per Portal am `body`, damit kein `overflow` sie abschneidet.
  */
-export function Schwebe({
-  inhalt,
-  children,
-  art = 'zeigen',
-  breite = 320,
-  className = '',
-  label,
-}: {
+export function Schwebe({ inhalt, children, art = 'zeigen', breite = 320, className = '', label }: SchwebeProps) {
+  const { anker, karte, id, offen, fest, pos, betreten, verlassen, umschalten, schliessen, setOffen } = useSchwebe(art)
+
+  return (
+    <span
+      ref={anker}
+      className={`relative ${className}`}
+      onMouseEnter={betreten}
+      onMouseLeave={verlassen}
+      onFocus={betreten}
+      onBlur={(e) => !fest && !e.currentTarget.contains(e.relatedTarget as Node) && !karte.current?.contains(e.relatedTarget as Node) && setOffen(false)}
+      /* Klicks in der Karte kommen über das Portal hier an — sie schalten nicht um. */
+      onClick={(e) => !karte.current?.contains(e.target as Node) && umschalten()}
+      aria-describedby={offen && art === 'zeigen' ? id : undefined}
+    >
+      {mitZustand(children, art !== 'zeigen', offen, id)}
+      {offen && (
+        <SchwebeKarte
+          karte={karte}
+          id={id}
+          art={art}
+          label={label}
+          breite={breite}
+          pos={pos}
+          betreten={betreten}
+          verlassen={verlassen}
+          schliessen={schliessen}
+        >
+          {inhalt}
+        </SchwebeKarte>
+      )}
+    </span>
+  )
+}
+
+interface SchwebeProps {
   inhalt: ReactNode
   children: ReactNode
   art?: 'zeigen' | 'klick' | 'beides'
@@ -26,7 +54,16 @@ export function Schwebe({
   className?: string
   /** Name der Karte für Vorlesende. */
   label?: string
-}) {
+}
+
+interface KartenPos {
+  left: number
+  top: number
+  maxHeight: number
+}
+
+/** Zustand, Fristen und Ereignisse der Schwebe; Hook-Reihenfolge gehört zur Komponente. */
+function useSchwebe(art: NonNullable<SchwebeProps['art']>) {
   const [offen, setOffen] = useState(false)
   const [fest, setFest] = useState(false)
   const anker = useRef<HTMLSpanElement>(null)
@@ -38,10 +75,11 @@ export function Schwebe({
   const pos = useKartenPosition(offen, anker, karte)
   const zeigen = art !== 'klick'
 
-  useSchliessen(offen, anker, karte, stumm, () => {
+  const schliessen = () => {
     setFest(false)
     setOffen(false)
-  })
+  }
+  useSchliessen(offen, anker, karte, stumm, schliessen)
 
   /* Per Klick geöffnet, bekommt die Karte den Fokus: Sie hängt am Ende des `body`, mit Tab käme man nie hinein. */
   useEffect(() => {
@@ -66,43 +104,43 @@ export function Schwebe({
     if (fest) return
     zu.current = window.setTimeout(() => setOffen(false), 140)
   }
+  return { anker, karte, id, offen, fest, pos, betreten, verlassen, umschalten, schliessen, setOffen }
+}
 
-  return (
-    <span
-      ref={anker}
-      className={`relative ${className}`}
+interface SchwebeKarteProps {
+  children: ReactNode
+  karte: React.RefObject<HTMLDivElement | null>
+  id: string
+  art: NonNullable<SchwebeProps['art']>
+  label?: string
+  breite: number
+  pos: KartenPos | undefined
+  betreten: () => void
+  verlassen: () => void
+  schliessen: () => void
+}
+
+/** Die Karte selbst, per Portal am `body`. */
+function SchwebeKarte({ children, karte, id, art, label, breite, pos, betreten, verlassen, schliessen }: SchwebeKarteProps) {
+  return createPortal(
+    <div
+      ref={karte}
+      id={id}
+      role={art === 'zeigen' ? 'tooltip' : 'dialog'}
+      aria-label={label}
       onMouseEnter={betreten}
       onMouseLeave={verlassen}
-      onFocus={betreten}
-      onBlur={(e) => !fest && !e.currentTarget.contains(e.relatedTarget as Node) && !karte.current?.contains(e.relatedTarget as Node) && setOffen(false)}
-      /* Klicks in der Karte kommen über das Portal hier an — sie schalten nicht um. */
-      onClick={(e) => !karte.current?.contains(e.target as Node) && umschalten()}
-      aria-describedby={offen && art === 'zeigen' ? id : undefined}
+      /* Ein Eintrag mit `data-schliesst` führt woandershin — dann hat die Karte ihren Zweck erfüllt. */
+      onClick={(e) => {
+        if (!(e.target as HTMLElement).closest('[data-schliesst]')) return
+        schliessen()
+      }}
+      style={{ width: `min(${breite}px, calc(100vw - 16px))`, ...(pos ?? { left: -9999, top: 0 }) }}
+      className="fixed z-50 overflow-y-auto overscroll-contain rounded-2xl border border-ak-rand bg-ak-flaeche p-2 text-ak-text shadow-[0_18px_40px_rgba(0,0,0,.45)]"
     >
-      {mitZustand(children, art !== 'zeigen', offen, id)}
-      {offen &&
-        createPortal(
-          <div
-            ref={karte}
-            id={id}
-            role={art === 'zeigen' ? 'tooltip' : 'dialog'}
-            aria-label={label}
-            onMouseEnter={betreten}
-            onMouseLeave={verlassen}
-            /* Ein Eintrag mit `data-schliesst` führt woandershin — dann hat die Karte ihren Zweck erfüllt. */
-            onClick={(e) => {
-              if (!(e.target as HTMLElement).closest('[data-schliesst]')) return
-              setFest(false)
-              setOffen(false)
-            }}
-            style={{ width: `min(${breite}px, calc(100vw - 16px))`, ...(pos ?? { left: -9999, top: 0 }) }}
-            className="fixed z-50 overflow-y-auto overscroll-contain rounded-2xl border border-ak-rand bg-ak-flaeche p-2 text-ak-text shadow-[0_18px_40px_rgba(0,0,0,.45)]"
-          >
-            {inhalt}
-          </div>,
-          document.body,
-        )}
-    </span>
+      {children}
+    </div>,
+    document.body,
   )
 }
 
@@ -115,7 +153,7 @@ function useKartenPosition(
   anker: React.RefObject<HTMLSpanElement | null>,
   karte: React.RefObject<HTMLDivElement | null>,
 ) {
-  const [pos, setPos] = useState<{ left: number; top: number; maxHeight: number }>()
+  const [pos, setPos] = useState<KartenPos>()
   useLayoutEffect(() => {
     if (!offen) {
       setPos(undefined)

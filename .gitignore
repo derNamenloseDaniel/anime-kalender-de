@@ -50,3 +50,10 @@ cover-ausgabe/
 
 # Lagebuch des Dirigenten (nur lokal, Laufstand der Hauptsitzung)
 .claude/dirigent/
+
+# Gesamtübersicht aus stand.md (erzeugt, echte Aufgaben, nie im Repo; tools/uebersicht.mjs)
+daniel-zum-abarbeiten/uebersicht.md
+daniel-zum-abarbeiten/uebersicht.html
+daniel-zum-abarbeiten/bilder/
+daniel-zum-abarbeiten/.uebersicht-cache.json
+daniel-zum-abarbeiten/.uebersicht-log.txt

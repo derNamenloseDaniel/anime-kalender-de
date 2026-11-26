@@ -24,6 +24,8 @@ const WEICHEN = [
   { importeur: '/web/src/components/detail/termin-zeile.tsx', quelle: './pille.tsx', ziel: './weichen/pille.tsx' },
   { importeur: '/web/src/components/detail/termin-zeile.tsx', quelle: './live-link.tsx', ziel: './weichen/live-link.tsx' },
   { importeur: '/web/src/components/detail/kasten-folgen.tsx', quelle: './kasten-marke.tsx', ziel: './weichen/kasten-marke.tsx' },
+  { importeur: '/web/src/components/detail/antwort-kasten.tsx', quelle: './antwort-kasten-teile.tsx', ziel: './weichen/antwort-kasten-teile.tsx' },
+  { importeur: '/web/src/App.tsx', quelle: './components/kalender/KalenderBereich.tsx', ziel: './weichen/kalender-bereich.tsx' },
 ]
 
 export function buehnenWeichen(): Plugin {

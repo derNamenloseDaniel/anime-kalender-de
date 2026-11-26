@@ -88,7 +88,7 @@ try {
   const STILL = 'MAENGEL_STILLSTAND seit 2026-11-18: 7 auto-Arten ohne Abbau, 5 gestiegen (Arten: Logzeile MAENGEL_STILLSTAND_ARTEN)\nMAENGEL_STILLSTAND_ARTEN ohne Abbau: fsk 1230→1222 (auto:justwatch)\n'
   const steht = lauf({ npmAusgabe: STILL + MAENGEL_NEU, exit: 0, vorher: 'Anderes' })
   const stillEnv = steht.env.split('\n')
-  assert.equal(stillEnv.at(-1), 'STILLSTAND_WARNUNG=Mängel Stillstand: seit 2026-11-18: 7 auto-Arten ohne Abbau, 5 gestiegen (Arten: Logzeile MAENGEL_STILLSTAND_ARTEN)', 'Stillstand kommt als eigene Variable, nur die Kurzzeile')
+  assert.equal(stillEnv.at(-1), 'STILLSTAND_WARNUNG=Mängel Stillstand: seit 2026-11-18: 7 auto-Arten ohne Abbau, 5 gestiegen (Arten: Logzeile MAENGEL_STILLSTAND_ARTEN) — ohne Abbau: fsk', 'Stillstand kommt als eigene Variable: Kurzzeile und Artnamen ohne Zahlen')
   assert.ok(!stillEnv.some((z) => z.startsWith('DATEN_WARNUNG=') && z.includes('Stillstand')), 'Stillstand steht nicht mitten in der DATEN_WARNUNG')
   const stehtHart = lauf({ npmAusgabe: MAENGEL_NEU + STILL + '[pipeline] ⚠  verwaisteTermine: 2 — das darf nicht vorkommen\n', exit: 1 })
   assert.equal(stehtHart.env.split('\n').filter((z) => z.startsWith('DATEN_WARNUNG=')).at(-1), 'DATEN_WARNUNG=Mängel neu: fsk: 12 (1, 2, 3, …); banner: 1 (7) · Datenqualität hart rot: verwaisteTermine: 2', 'harte Zeile folgt direkt auf die Mängel, Stillstand drängt sich nicht dazwischen')

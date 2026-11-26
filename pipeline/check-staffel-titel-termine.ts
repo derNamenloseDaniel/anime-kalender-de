@@ -107,6 +107,12 @@ pruefe('Staffel-2-Release: ab Folge 2, 2 Folgen, Beobachtungen in Staffelzählun
 pruefe('Staffel-2-Release: Folgen belegt, Wikipedia in den Quellen, Zahl der Sendungen', r2.folgenBelegt === true && (r2.sources ?? []).length === 1 && /\(2 Sendungen gesichtet\)/.test(r2.herkunft ?? ''), JSON.stringify(r2))
 const mitQuelle = teileTermine([tvRelease], events.slice(0, 2), { ...plan, quelle: 'https://de.wikipedia.org/wiki/X' }, sendeplatz, jeTitel)
 pruefe('Quelle der Liste steht in sources', mitQuelle.releases[0]!.sources!.includes('https://de.wikipedia.org/wiki/X'))
+pruefe('Staffel-2-Release: Herkunft nennt die Episodenliste', (r2.herkunft ?? '').endsWith('Staffel und Folge aus der Episodenliste der Wikipedia.'), r2.herkunft)
+/* Zwei Sendungen derselben Folge am selben Tag, spätere zuerst geliefert: die frühere Uhrzeit zählt. */
+const amTag = folgentitelJeSendeplatz([sendung('2026-10-05', '18:00', NAMEN[1]!), sendung('2026-10-05', '16:05', NAMEN[1]!)], SAMMEL)
+const zweiAmTag = teileTermine([tvRelease], [ev('2026-10-05', '18:00', 1, { id: 'spaet' }), ev('2026-10-05', '16:05', 1, { id: 'frueh' })], plan, amTag, jeTitel)
+const tagRel = zweiAmTag.releases.find((r) => r.slug === 'auto-7000001-tv-super-rtl')
+pruefe('gleicher Tag: Sendungen nach Uhrzeit geordnet, die frühere ist die Beobachtung', tagRel?.schedule.time === '16:05', JSON.stringify(zweiAmTag.releases.map((r) => [r.slug, r.schedule])))
 const r1 = rel('auto-7000001-tv-super-rtl')!
 pruefe('angehängte Sendung wandert mit, Nummer in Staffelzählung', JSON.stringify(r1.sendungen) === '[{"start":"2026-09-22T16:15","ende":"2026-09-22T16:45","folge":"Feliospa mit Herzz","nr":2}]', JSON.stringify(r1.sendungen))
 const basisTv = rel(`auto-${SAMMEL}-tv-super-rtl`)!

@@ -18,6 +18,7 @@ import { stempelWarnungAusDatei } from './patchnotes-stempel-alter.mjs'
 import { vorratWarnungenAusOrdner } from './patchnotes-vorrat-alter.mjs'
 
 const DATEI = 'data/bestand-historie.jsonl'
+const KENNUNGEN = 'data/kennungen.json'
 const args = process.argv.slice(2)
 const TAGE = Number(args[args.indexOf('--tage') + 1]) || 2
 const ALLES = args.includes('--alles')
@@ -64,7 +65,8 @@ const vz = (n) => (n > 0 ? `+${n}` : String(n))
 console.log(`${jung.length} Läufe in den letzten ${TAGE} Tagen (${zeilen.length} insgesamt)\n`)
 
 /* Pendeln zwischen zwei Ständen ist ein Befund; die Zeile danach zählt netto gegen den Stand davor (pipeline/lib/bestand-pendel.ts). */
-const sichtbar = ereignisse(zeilen).filter((e) => Date.parse(e.art === 'pendel' ? e.zeitpunkt : e.zeile.zeitpunkt) >= grenze)
+const kennungen = existsSync(KENNUNGEN) ? (JSON.parse(readFileSync(KENNUNGEN, 'utf8')).titel ?? []) : []
+const sichtbar = ereignisse(zeilen, kennungen).filter((e) => Date.parse(e.art === 'pendel' ? e.zeitpunkt : e.zeile.zeitpunkt) >= grenze)
 let gezeigt = 0
 for (const e of sichtbar) {
   if (e.art === 'pendel') {

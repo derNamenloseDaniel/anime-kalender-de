@@ -17,7 +17,7 @@ import { reihenTeileVon } from '../web/src/components/detail/reihen-daten.ts'
 import { reihenNameVon } from '../web/src/components/detail/reihen-namen.ts'
 import type { FranchiseMember, Release, Title } from '../shared/types.ts'
 import { attrappeUhr, ignoriereCss, installiereMiniDom, klicke, type MiniKnoten } from '../tools/mini-dom.ts'
-import { eindeutigeBeschriftung, reihenLageVon, reihenReiterVon } from '../web/src/components/detail/reihen-reiter-liste.ts'
+import { eindeutigeBeschriftung, reihenLageVon, reihenReiterVon, reiterKurzform } from '../web/src/components/detail/reihen-reiter-liste.ts'
 import { reihenOrdnung } from '../web/src/components/detail/reihen-inhalt.tsx'
 
 /** Die Gruppen der Reihenliste, wie das Panel sie den Reitern gibt (Überschriften als Schlüssel). */
@@ -51,6 +51,12 @@ const staffel = (id: number, nr: number, bis: number) =>
 const [st2, st1] = [staffel(990102, 2, 89), staffel(990101, 1, 45)]
 pruefe('zwei Staffeln sind schon Reiter, Folge nach Nummer', reihenReiterVon(st2, teile, 'Pokémon', [st2, st1], []).map((r) => `${r.id}:${r.label}`).join() === '990101:1,990102:2')
 pruefe('eine Staffel allein: keine Reiter', reihenReiterVon(st2, teile, 'Pokémon', [st2], []).length === 0)
+/* Teilstaffeln am Reiter kurz (Daniel, 26.11.2026): „Staffel 3 - Teil 1“ → „3.1“, Spannen und Einzelstaffeln wie bisher. */
+pruefe('Reiter-Kurzform: Teilstaffel 3.1 und 3.2, Staffel 3, Spanne 1–5, Teil ohne Staffelnummer', [reiterKurzform('Staffel 3 - Teil 1'), reiterKurzform('Staffel 3 - Teil 2'), reiterKurzform('Staffel 3'), reiterKurzform('Staffel 1–5'), reiterKurzform('Teil 1'), reiterKurzform('Staffel 12 - Teil 10')].join('|') === '3.1|3.2|3|1–5|Teil 1|12.10')
+const teilGlied = (id: number, name: string, jpYear: number) => ({ id, name, format: 'TV', jpYear, episodes: 12, jpStatus: 'FINISHED' }) as FranchiseMember
+const teilStaffeln = [teilGlied(900901, 'Reihe', 2020), teilGlied(900902, 'Reihe Staffel 2', 2021), teilGlied(900903, 'Reihe Staffel 3 Teil 1', 2022), teilGlied(900904, 'Reihe Staffel 3 Teil 2', 2023)]
+pruefe('Hauptserie mit Teilstaffeln: Reiter 1, 2, 3.1, 3.2, der Name bleibt lang', JSON.stringify(reihenReiterVon({ id: 900901 } as Title, teilStaffeln, 'Reihe', [], []).map((r) => [r.label, r.name])) === '[["1","Reihe"],["2","Reihe Staffel 2"],["3.1","Reihe Staffel 3 Teil 1"],["3.2","Reihe Staffel 3 Teil 2"]]')
+pruefe('Reiter-Kurzform: nur am Ende, mit Zusatz bleibt es', reiterKurzform('Staffel 3 - Teil 1 Zusatz') === '3 - Teil 1 Zusatz')
 /* Reiter ohne Synchro (26.11.2026): auch Hauptstaffeln und Sammeltitel-Staffeln tragen das Flag, erschienen vorausgesetzt. */
 const ohneSt = { ...st2, ohneSynchro: true, jpStatus: 'FINISHED' } as Title
 pruefe('Sammeltitel-Staffel ohne Synchro: Reiter trägt ohneSynchro, die andere nicht', reihenReiterVon(ohneSt, teile, 'Pokémon', [ohneSt, st1], []).map((r) => `${r.id}:${r.ohneSynchro}`).join() === '990101:false,990102:true')
@@ -71,7 +77,7 @@ const aot = faelle['attack-on-titan']!
 const aotTitel = aot['titles.json'] as Title[]
 const aotTeile = Object.values(aot['franchises.json'] as Record<string, FranchiseMember[]>)[0]!
 const aotReiter = (id: number) => reihenReiterVon(aotTitel.find((t) => t.id === id)!, aotTeile, 'Attack on Titan', aotTitel, gruppenVon(aotTeile, 'Attack on Titan'))
-pruefe('Attack on Titan: ohne Junior High', JSON.stringify(aotReiter(6282).map((r) => [r.id, r.label])) === '[[6282,"1"],[7496,"2"],[8669,"3 - Teil 1"],[10088,"3 - Teil 2"]]', aotReiter(6282))
+pruefe('Attack on Titan: ohne Junior High', JSON.stringify(aotReiter(6282).map((r) => [r.id, r.label])) === '[[6282,"1"],[7496,"2"],[8669,"3.1"],[10088,"3.2"]]', aotReiter(6282))
 pruefe('Attack on Titan: Final Season ohne Beschriftung öffnet ohne Reiter', aotReiter(10659).length === 0)
 /* Eine Staffel in zwei Teilen (Sakamoto Days ohne den Eintrag 2027): Beschriftung „Teil 1/2“, aber kein Staffelstand. Brach die Bühne (disc-bereich-2). */
 const sk = faelle['sakamoto-days']!
@@ -87,7 +93,7 @@ try {
  * Klasse zum Nachtrag (Daniel 24.11.2026 20:21–20:25), je Titel-Reihe-Paar: Reiter tragen nur die Kurzform, der volle Titel steht im
  * Namen; kein Reiter-Titel steht noch in der Reihenliste, und jeder Teil der Reihe bleibt erreichbar (Reiter oder Liste).
  */
-const KURZFORM = /^(\d+[a-z]?(–\d+)?( - Teil \d+)?|Teil \d+)$/
+const KURZFORM = /^(\d+[a-z]?(–\d+)?(\.\d+)?|Teil \d+)$/
 const nachtragFehler: string[] = []
 function klasseNachtrag(wo: string, liste: ReturnType<typeof reihenReiterVon>, rTeile: FranchiseMember[], rName: string): void {
   const ids = new Set(liste.map((r) => r.id))

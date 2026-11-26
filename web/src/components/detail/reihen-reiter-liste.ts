@@ -36,6 +36,11 @@ function ausGruppe(title: Title, gruppen: Gruppe[]): ReihenReiter[] {
   return (gruppe?.teile ?? []).map((m, i) => ({ id: m.id, label: String(i + 1), name: m.name, staffel: false, ohneSynchro: ohneDeutscheSynchro(m, dieseJahr()) }))
 }
 
+/** „Staffel 3 - Teil 2“ wird am Reiter „3.2“, „Staffel 1–5“ „1–5“; Reihenliste und Tooltip behalten den langen Namen. */
+export function reiterKurzform(beschriftung: string): string {
+  return beschriftung.replace(/^Staffel\s+/, '').replace(/\s*-\s*Teil\s+(\d+)$/, '.$1')
+}
+
 /**
  * Hauptstaffeln der Reihe mit der Beschriftung der Reihenliste („Staffel 1–5“ wird „1–5“); sortiert nach Staffelnummer. Eine einzige
  * Staffel in Teilen („Teil 1“, „Teil 2“) hat Beschriftungen, aber keinen Staffelstand: dann zählt nur die Kennung.
@@ -48,7 +53,7 @@ function ausHauptstaffeln(teile: FranchiseMember[], reihenName: string): ReihenR
   return haupt
     .filter((m) => text.has(m.id))
     .sort((a, b) => nummer(a.id) - nummer(b.id) || a.id - b.id)
-    .map((m) => ({ id: m.id, label: text.get(m.id)!.replace(/^Staffel\s+/, ''), name: m.name, staffel: true, ohneSynchro: ohneDeutscheSynchro(m, dieseJahr()) }))
+    .map((m) => ({ id: m.id, label: reiterKurzform(text.get(m.id)!), name: m.name, staffel: true, ohneSynchro: ohneDeutscheSynchro(m, dieseJahr()) }))
 }
 
 /** Gleiche Kurzbeschriftungen verschiedener Titel (zwei „16“, zwei „1“) bekommen in Listenreihenfolge a, b, …; einmalige bleiben. */

@@ -28,10 +28,10 @@ Fälle: `last-boss-queen-disc` (neu, Anlass), `trigun-stampede-disc` (1), `dan-d
 
 | | A – Pillen (gewählt) | B – offene Matrix mit Kaufspalte | C – Karten zu zweit |
 |---|---|---|---|
-| Detektiv Conan, Handy 375 dunkel | ![A](bilder/mockup-fernsehtag-detektiv-conan-disc-A-375-dunkel.png) | ![B](bilder/mockup-fernsehtag-detektiv-conan-disc-B-375-dunkel.png) | ![C](bilder/mockup-fernsehtag-detektiv-conan-disc-C-375-dunkel.png) |
-| Detektiv Conan, Desktop 512 hell | ![A](bilder/mockup-fernsehtag-detektiv-conan-disc-A-512-hell.png) | ![B](bilder/mockup-fernsehtag-detektiv-conan-disc-B-512-hell.png) | ![C](bilder/mockup-fernsehtag-detektiv-conan-disc-C-512-hell.png) |
-| Last Boss Queen, Handy 375 dunkel | ![A](bilder/mockup-last-boss-queen-disc-A-375-dunkel.png) | ![B](bilder/mockup-last-boss-queen-disc-B-375-dunkel.png) | ![C](bilder/mockup-last-boss-queen-disc-C-375-dunkel.png) |
-| Last Boss Queen, Desktop 512 hell | ![A](bilder/mockup-last-boss-queen-disc-A-512-hell.png) | ![B](bilder/mockup-last-boss-queen-disc-B-512-hell.png) | ![C](bilder/mockup-last-boss-queen-disc-C-512-hell.png) |
+| Detektiv Conan, Handy 375 dunkel | ![A](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/mockup-fernsehtag-detektiv-conan-disc-A-375-dunkel.png) | ![B](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/mockup-fernsehtag-detektiv-conan-disc-B-375-dunkel.png) | ![C](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/mockup-fernsehtag-detektiv-conan-disc-C-375-dunkel.png) |
+| Detektiv Conan, Desktop 512 hell | ![A](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/mockup-fernsehtag-detektiv-conan-disc-A-512-hell.png) | ![B](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/mockup-fernsehtag-detektiv-conan-disc-B-512-hell.png) | ![C](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/mockup-fernsehtag-detektiv-conan-disc-C-512-hell.png) |
+| Last Boss Queen, Handy 375 dunkel | ![A](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/mockup-last-boss-queen-disc-A-375-dunkel.png) | ![B](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/mockup-last-boss-queen-disc-B-375-dunkel.png) | ![C](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/mockup-last-boss-queen-disc-C-375-dunkel.png) |
+| Last Boss Queen, Desktop 512 hell | ![A](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/mockup-last-boss-queen-disc-A-512-hell.png) | ![B](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/mockup-last-boss-queen-disc-B-512-hell.png) | ![C](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/mockup-last-boss-queen-disc-C-512-hell.png) |
 
 Die Mockup-Bilder entstanden vor dem Dubletten-Fix und zeigen bei Last Boss Queen deshalb noch zwei Einträge; die Nachher-Bilder unten zeigen den gebauten Stand.
 
@@ -45,39 +45,39 @@ Handy 390 × 844 (`isMobile`, `hasTouch`), Desktop 1600 × 900; Playwright gegen
 
 | | Vorher | Nachher |
 |---|---|---|
-| Handy dunkel | ![](bilder/vorher-156040-handy-dunkel.png) | ![](bilder/nachher-156040-handy-dunkel.png) |
-| Handy hell | ![](bilder/vorher-156040-handy-hell.png) | ![](bilder/nachher-156040-handy-hell.png) |
-| Desktop dunkel | ![](bilder/vorher-156040-desktop-dunkel.png) | ![](bilder/nachher-156040-desktop-dunkel.png) |
-| Desktop hell | ![](bilder/vorher-156040-desktop-hell.png) | ![](bilder/nachher-156040-desktop-hell.png) |
-| Ganze Ansicht, Handy dunkel | ![](bilder/vorher-156040-handy-dunkel-ganz.png) | ![](bilder/nachher-156040-handy-dunkel-ganz.png) |
-| Ganze Ansicht, Desktop hell | ![](bilder/vorher-156040-desktop-hell-ganz.png) | ![](bilder/nachher-156040-desktop-hell-ganz.png) |
+| Handy dunkel | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-156040-handy-dunkel.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-156040-handy-dunkel.png) |
+| Handy hell | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-156040-handy-hell.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-156040-handy-hell.png) |
+| Desktop dunkel | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-156040-desktop-dunkel.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-156040-desktop-dunkel.png) |
+| Desktop hell | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-156040-desktop-hell.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-156040-desktop-hell.png) |
+| Ganze Ansicht, Handy dunkel | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-156040-handy-dunkel-ganz.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-156040-handy-dunkel-ganz.png) |
+| Ganze Ansicht, Desktop hell | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-156040-desktop-hell-ganz.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-156040-desktop-hell-ganz.png) |
 
 **Detektiv Conan (19 Varianten, eine Gruppe)**
 
 | | Vorher | Nachher |
 |---|---|---|
-| Handy dunkel | ![](bilder/vorher-235-handy-dunkel.png) | ![](bilder/nachher-235-handy-dunkel.png) |
-| Handy hell | ![](bilder/vorher-235-handy-hell.png) | ![](bilder/nachher-235-handy-hell.png) |
-| Desktop dunkel | ![](bilder/vorher-235-desktop-dunkel.png) | ![](bilder/nachher-235-desktop-dunkel.png) |
-| Desktop hell | ![](bilder/vorher-235-desktop-hell.png) | ![](bilder/nachher-235-desktop-hell.png) |
+| Handy dunkel | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-235-handy-dunkel.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-235-handy-dunkel.png) |
+| Handy hell | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-235-handy-hell.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-235-handy-hell.png) |
+| Desktop dunkel | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-235-desktop-dunkel.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-235-desktop-dunkel.png) |
+| Desktop hell | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-235-desktop-hell.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-235-desktop-hell.png) |
 
 **Dan Da Dan (Gesamtausgabe + Volumes + Sonstiges)**
 
 | | Vorher | Nachher |
 |---|---|---|
-| Handy dunkel | ![](bilder/vorher-171018-handy-dunkel.png) | ![](bilder/nachher-171018-handy-dunkel.png) |
-| Handy hell | ![](bilder/vorher-171018-handy-hell.png) | ![](bilder/nachher-171018-handy-hell.png) |
-| Desktop dunkel | ![](bilder/vorher-171018-desktop-dunkel.png) | ![](bilder/nachher-171018-desktop-dunkel.png) |
-| Desktop hell | ![](bilder/vorher-171018-desktop-hell.png) | ![](bilder/nachher-171018-desktop-hell.png) |
+| Handy dunkel | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-171018-handy-dunkel.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-171018-handy-dunkel.png) |
+| Handy hell | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-171018-handy-hell.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-171018-handy-hell.png) |
+| Desktop dunkel | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-171018-desktop-dunkel.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-171018-desktop-dunkel.png) |
+| Desktop hell | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-171018-desktop-hell.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-171018-desktop-hell.png) |
 
 **Sakamoto Days (Volumes, zwei kommende mit Kalenderknopf)**
 
 | | Vorher | Nachher |
 |---|---|---|
-| Handy dunkel | ![](bilder/vorher-177709-handy-dunkel.png) | ![](bilder/nachher-177709-handy-dunkel.png) |
-| Handy hell | ![](bilder/vorher-177709-handy-hell.png) | ![](bilder/nachher-177709-handy-hell.png) |
-| Desktop dunkel | ![](bilder/vorher-177709-desktop-dunkel.png) | ![](bilder/nachher-177709-desktop-dunkel.png) |
-| Desktop hell | ![](bilder/vorher-177709-desktop-hell.png) | ![](bilder/nachher-177709-desktop-hell.png) |
+| Handy dunkel | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-177709-handy-dunkel.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-177709-handy-dunkel.png) |
+| Handy hell | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-177709-handy-hell.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-177709-handy-hell.png) |
+| Desktop dunkel | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-177709-desktop-dunkel.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-177709-desktop-dunkel.png) |
+| Desktop hell | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/vorher-177709-desktop-hell.png) | ![](https://raw.githubusercontent.com/derNamenloseDaniel/anime-kalender-de/prtext/disc-bereich-sichtbar/bilder/nachher-177709-desktop-hell.png) |
 
 Was auf den Bildern zu sehen ist: Vorher graue Matrixzeilen mit 11-px-Daten, kein Link, zugeklappte Einzelgruppe. Nachher je Ausgabe eine Pille in der Fläche der Stream-Pillen, Ziel in Akzentfarbe rechts (am Handy rutscht „Details bei aniSearch ↗“ unter Format und Datum, statt den Namen zu quetschen), Kalenderknopf rund neben kommenden Ausgaben.
 

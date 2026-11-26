@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-11-26T21:09:59.281Z",
+  "generatedAt": "2026-11-26T23:25:52.266Z",
   "titleCount": 2924,
-  "belegtCount": 2636,
-  "releaseCount": 926,
-  "eventCount": 4831,
+  "belegtCount": 2637,
+  "releaseCount": 929,
+  "eventCount": 4683,
   "genres": [
     "Action",
     "Adventure",
@@ -303,7 +303,7 @@
     2009,
     2008
   ],
-  "patchnotesStand": "2026-11-26",
+  "patchnotesStand": "2026-11-27",
   "attribution": [
     "Dub-Daten: MyDubList (https://mydublist.com) — CC BY 4.0",
     "Metadaten: AniList (https://anilist.co)",

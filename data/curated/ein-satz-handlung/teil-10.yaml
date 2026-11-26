@@ -464,7 +464,7 @@
   quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26
 - id: 148080
-  satz: "Oberschüler Hiiragi schlägt keine Bitte ab, bis ihn an einem verschneiten Sommertag Tsumugi, ein Mädchen vom Volk der Oni, auf die Suche nach ihrer Mutter mitnimmt."
+  satz: "Schüler Hiiragi schlägt keine Bitte ab, bis ihn an einem verschneiten Sommertag Tsumugi vom Volk der Oni auf die Suche nach ihrer Mutter mitnimmt."
   quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26
 - id: 148109
@@ -627,4 +627,166 @@
 - id: 153687
   satz: "Im Januar 2118 töten die Peacebreakers auf einem Schiff Professorin Stronskaya wegen ihrer Forschung, und Akane Tsunemori ermittelt wieder mit Shinya Kogami."
   quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 153791
+  satz: "Die kurze Bonusfolge malt humorvoll aus, wie Prushkas Kindheit mit Vater Bondrewd in einer ganz gewöhnlichen Forschungsstation hätte aussehen können."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 153800
+  satz: "Während der Krieg mit Orochis Monster-Vereinigung tobt, die ein Kind als Geisel hält, entkommt der schwer verletzte Heldenjäger Garou den Helden."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 153845
+  satz: "Der gemobbte Yuuya Tenjou erbt das Haus seines Großvaters und findet dort eine Tür in eine magische Welt, deren Schätze und Fähigkeiten er mitnehmen kann."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 153906
+  satz: "Nachdem ein Dämon seine Mutter Jun getötet hat, schwört Jin Kazama Rache und strebt nach Macht, was ihn zum Turnier King of Iron Fist führt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 153930
+  satz: "Anzu Hoshino liebt nur Videospiele, Schokolade und ihre Katze, bis ein magisches Wesen ihr all das nimmt und sie mit attraktiven Jungs umgibt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 154064
+  satz: "Der geniale, aber erfolglos gewordene Wissenschaftler Akira erschafft sich mit der Androidin No. 0 eine künstliche Freundin, die sein Leben verändert."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 154116
+  satz: "Fuuko Izumo bringt jedem Unglück, der sie berührt, und trifft den unsterblichen Andy, der sich von ihrer Fähigkeit endlich einen echten Tod erhofft."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 154364
+  satz: "Chise Hatori erhält eine Einladung des College, einer geheimen Magiergemeinschaft unter der British Library, die ihr Hilfe bei ihrer Ausbildung anbietet."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 154392
+  satz: "Marie Antoinette kommt als Braut des Thronfolgers nach Versailles und trifft Gardekapitän Oscar François de Jarjayes, der sich als Frau entpuppt."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 154412
+  satz: "Hayato Kasukabe erbt das marode Café seiner Großmutter und will es verkaufen, bis ihn die fünf dort lebenden jungen Frauen überreden, es weiterzuführen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 154473
+  satz: "Auf dem Weg zum nächsten Labyrinth erfährt Hajime, dass Soldaten des Hoelscher-Imperiums Sheas Haulia-Stamm verschleppt haben, und bricht zur Rettung auf."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 154587
+  satz: "Nach dem Sieg über den Dämonenkönig überlebt die Elfenmagierin Frieren ihre Gefährten um Jahrzehnte und will nach dem Tod eines Freundes die Menschen verstehen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 154745
+  satz: "Kazuya sammelt per Crowdfunding Geld für einen Film mit seiner Mietfreundin Chizuru, damit deren Großmutter sie noch auf der Leinwand erlebt."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 154768
+  satz: "Der schüchterne Wakana Gojo fertigt weiter Cosplays für die lebensfrohe Marin Kitagawa, und mit neuen Cosplay-Freunden wächst ihre gemeinsame Welt."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 154924
+  satz: "Die Diebesschwestern von Cat’s Eye und Meisterdieb Lupin III jagen denselben Gemälden nach, die den Schwestern Hinweise auf ihren vermissten Vater geben sollen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 154965
+  satz: "Nach ihrer Trennung lässt Studentin Akane Kinoshita im Onlinespiel Dampf ab und lernt dort den wortkargen Akito Yamada kennen, der nur das Spiel im Kopf hat."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 154967
+  satz: "Sakutas lange ans Haus gebundene Schwester Kaede möchte an die Oberschule ihres Bruders wechseln, und er unterstützt sie bei diesem schweren Schritt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 154982
+  satz: "Ex-Yakuza Tatsu schmeißt weiter mit vollem Ernst den Haushalt und engagiert sich nun auch im Nachbarschaftsverein und in der örtlichen Frauengruppe."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 154983
+  satz: "Haida hat nach dem Skandal um geschönte Gewinne seinen Job verloren und weiß als Arbeitsloser nicht weiter, was auch sein Verhältnis zu Retsuko belastet."
+  quellen: [anisearch]
+  geprueftAm: 2026-11-26
+- id: 154999
+  satz: "Im Kyoto der Heian-Zeit lernt der Hofbeamte Hiromasa Minamoto den eigenwilligen Onmyoji Seimei Abe kennen und löst mit ihm Fälle um Dämonen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 155015
+  satz: "Zu Beginn der Edo-Zeit zieht der gealterte Miyamoto Musashi mit dem dämonischen Oni-Handschuh aus, um mit einigen Samurai die Genma zu bezwingen."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 155089
+  satz: "Der Bestienjäger Jiiro rettet das verfolgte Mädchen Kumi, und gemeinsam stoßen sie in einer Welt riesiger Kyojuu auf ein geheimes Experiment."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 155168
+  satz: "Emi hadert mit ihrer Rolle als Heldin, seit sie ihren Vater am Leben weiß, und als Sadao sie aufheitern will, wird er plötzlich wegteleportiert."
+  quellen: [anisearch]
+  geprueftAm: 2026-11-26
+- id: 155211
+  satz: "Bell und Liu landen schwer verwundet in den tiefsten Ebenen des Dungeons, während ihre Freunde einen Bossgegner besiegen müssen, um sie zu retten."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 155389
+  satz: "Seit Superhelden einen dritten Weltkrieg verhindert haben, hat jedes Land seinen eigenen, und Japans Heldin Shy ist trotz großer Kraft extrem schüchtern."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 155418
+  satz: "Ein Angestellter stirbt kurz nach seiner Beförderung, wird als Heiler Luciel wiedergeboren und will diesmal in Ruhe alt werden, gerät aber in hartes Training."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 155645
+  satz: "Lum, Tochter des Oni-Anführers, hält sich für die Verlobte des Schürzenjägers Ataru Moroboshi und stellt mit vielen schrägen Figuren sein Leben auf den Kopf."
+  quellen: [eigen, anilist]
+  geprueftAm: 2026-11-26
+  umfang: reihe
+- id: 155838
+  satz: "Schwertkämpfer Kyle besiegt den Dämonenkönig, stirbt beinahe und wird von einem roten Kristall vier Jahre zurückgeschickt, um die Tragödie nun zu verhindern."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 156001
+  satz: "Kurze Mini-Folgen zeigen die Figuren aus The Eminence in Shadow um Cid Kagenou, der insgeheim die Organisation Shadow Garden anführt."
+  quellen: [eigen, anilist]
+  geprueftAm: 2026-11-26
+  umfang: reihe
+- id: 156040
+  satz: "Kronprinzessin Pride Royal Ivy erkennt mit acht Jahren, dass sie die Endgegnerin eines Otome-Games ist, und will fortan eine gute Herrscherin werden."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 156067
+  satz: "Büroangestellter Mukouda wird versehentlich mit drei Helden in eine Fantasywelt beschworen, zieht allein los und bestellt per Skill moderne Lebensmittel."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 156092
+  satz: "Weil das Vertrauen der Menschen Helden ihre Kräfte verleiht, kann der gekündigte Lin Ling die Identität des toten Helden Nice annehmen, dem er gleicht."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 156415
+  satz: "Ein Magier ohne Talent und Herkunft stirbt und wird als siebter Prinz Lloyd mit starkem magischem Blut wiedergeboren, sodass er sich ganz der Magie widmen kann."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 156822
+  satz: "Rimuru ist nach dem Sieg über Clayman offiziell Dämonenkönig und plant zur Eröffnung von Tempest ein Fest, um Bürger zu gewinnen und sich der Welt vorzustellen."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 156841
+  satz: "Vor der Insel Hachijojima geht die Polizeianlage Pacific Buoy mit weltweiter Gesichtserkennung in Betrieb, während Conan dort auf Sonokos Einladung Ferien macht."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 156891
+  satz: "Ivy wird als sternlose Tamerin aus ihrem Dorf verstoßen, schlägt sich mit Müllsammeln durch und zieht mit dem schwachen Schleim Sora auf Reisen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 156896
+  satz: "An der ADEN Academy für virtuelle Künstler eifert die tollpatschige Miracle ihrem verschwundenen Idol Kizuna AI nach."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 157198
+  satz: "Der Nekromant Leichengott rettet sich im Kampf gegen einen Helden per Wiedergeburtszauber und erwacht als Junge Polka Shinoyama im heutigen Shibuya."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 157371
+  satz: "Belle Lablac lebt als einziger Mensch in einer Welt voller Tierwesen und zieht mit dem Riesenschwert Runding los, um ihre Herkunft und ihresgleichen zu finden."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 157397
+  satz: "Wataru Sajou gibt seine aufdringliche Schwärmerei für Aika Natsukawa auf und hält Abstand, woraufhin sie sich über ihre eigenen Gefühle klar werden muss."
+  quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26

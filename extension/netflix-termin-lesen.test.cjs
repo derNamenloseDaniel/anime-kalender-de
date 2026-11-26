@@ -53,6 +53,12 @@ const alle = [
   ['„ab 16. Jahren“ allein ist kein Datum', 'ab 16. Jahren', null],
   ['„Ab 31.13.“ unmöglicher Monat', 'Ab 31.13.', null],
   ['„Ab 10.12“ ohne Schlusspunkt ist keins', 'Ab 10.12 Uhr', null],
+  ['Grenze: 1.1.', 'Ab 1.1.', '1. Januar'],
+  ['Grenze: 31.12.', 'Ab 31.12.', '31. Dezember'],
+  ['Grenze: Tag 0', 'Ab 0.12.', null],
+  ['Grenze: Tag 32', 'Ab 32.12.', null],
+  ['Grenze: Monat 0', 'Ab 10.0.', null],
+  ['Grenze: Monat 13', 'Ab 10.13.', null],
 ]
 for (const [name, text, soll] of alle) pruefe(name, datum(text) === soll, datum(text))
 pruefe('Dialog geht vor Seitentext (Billboard im Body zählt nicht)', datum('Ab 10. Dezember', 'Ab 1. Januar') === '10. Dezember')

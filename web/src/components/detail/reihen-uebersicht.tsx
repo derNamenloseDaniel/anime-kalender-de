@@ -1,18 +1,16 @@
-import { useEffect, useId, useState, type ReactNode } from 'react'
+import { useEffect, useId, useState } from 'react'
 import type { Translate } from '../../lib/i18n.tsx'
 import { AufklappKopf } from './aufklapp-kopf.tsx'
 import { PanelKarte, StapelZeichen } from './panel-karte.tsx'
 import { reihenKarte, type Ordnung, type ReihenListeProps } from './reihen-inhalt.tsx'
 import { ReihenSpur } from './reihen-spur.tsx'
 import { reihenStand } from './reihen-karte.tsx'
-import { OhneSynchroSchalter } from './reihen-kopf.tsx'
-import { istEingeklappt } from './reihen-regeln.ts'
 import { gezeigteGruppen, gezeigteZahl, gruppeVon, type Gruppe } from './reihen-uebersicht-regeln.ts'
 
 type UebersichtProps = ReihenListeProps & { o: Ordnung }
 
-/** Suche über die ganze Breite, der Schalter darunter: nebeneinander blieb vom Suchfeld bei 390 px nur „In der“ übrig. */
-function UebersichtKopf({ t, suche, onSuche, schalter }: { t: Translate; suche: string; onSuche: (text: string) => void; schalter: ReactNode }) {
+/** Suche über die ganze Breite. */
+function UebersichtKopf({ t, suche, onSuche }: { t: Translate; suche: string; onSuche: (text: string) => void }) {
   return (
     <div className="mb-1 flex flex-col gap-1">
       <input
@@ -23,7 +21,6 @@ function UebersichtKopf({ t, suche, onSuche, schalter }: { t: Translate; suche: 
         aria-label={t('detail.reiheSuche')}
         className="h-11 w-full rounded-lg border border-ak-rand bg-transparent px-3 text-t3"
       />
-      {schalter && <div className="flex">{schalter}</div>}
     </div>
   )
 }
@@ -52,7 +49,7 @@ function useOffeneGruppen(eigene: string | undefined) {
 
 /**
  * **Große Reihen als Übersicht** (Daniel, F148, 20.11.2026): Gruppen mit Zahl, offen nur die des geöffneten Titels.
- * Zahl am Kopf, Zahl je Gruppe und Liste kommen aus denselben `gezeigteGruppen` — live zählte der Kopf auch Teile hinter dem Schalter.
+ * Zahl am Kopf, Zahl je Gruppe und Liste kommen aus denselben `gezeigteGruppen`.
  */
 export function ReihenUebersicht(p: UebersichtProps) {
   const { t, o, title, reihenSchluessel, reiheSuche } = p
@@ -60,20 +57,14 @@ export function ReihenUebersicht(p: UebersichtProps) {
   const eigene = gruppeVon(o.gruppen, title.id)
   const { offen, umschalten } = useOffeneGruppen(eigene)
   const suchText = reiheSuche.reihe === reihenSchluessel ? reiheSuche.text.trim() : ''
-  const ohneOffen = p.reiheOhneOffen === reihenSchluessel
-  const zahlOhne = p.reihenTeile.filter((m) => istEingeklappt(m, title.id) && !p.ohne?.has(m.id)).length
-  const zeigen = gezeigteGruppen(o.gruppen, title.id, ohneOffen, suchText)
-  const schalter =
-    zahlOhne > 0 && !suchText ? (
-      <OhneSynchroSchalter t={t} zahl={zahlOhne} ohneOffen={ohneOffen} onChange={() => p.setReiheOhneOffen(ohneOffen ? null : reihenSchluessel)} />
-    ) : null
+  const zeigen = gezeigteGruppen(o.gruppen, suchText)
   /* Der Stand steht nur bei einer Hauptstaffel; „25 Staffeln“ neben einer Gruppe mit 12 Einträgen widerspräche der Zahl. */
   const stand = o.nummern.has(title.id) ? reihenStand(p.reihenTeile, p.reihenName, title.id, t) : ''
   return (
     <PanelKarte symbol={<StapelZeichen />} titel={t('detail.reihe')} zaehler={gezeigteZahl(zeigen)} akzent="info">
       {stand && <p className="-mt-1.5 mb-2 pl-[38px] text-t5 text-ak-text/75">{stand}</p>}
       <div data-reihe-liste data-reihe-uebersicht className="p-0.5">
-        <UebersichtKopf t={t} suche={suchText ? reiheSuche.text : ''} onSuche={(text) => p.setReiheSuche({ reihe: reihenSchluessel, text })} schalter={schalter} />
+        <UebersichtKopf t={t} suche={suchText ? reiheSuche.text : ''} onSuche={(text) => p.setReiheSuche({ reihe: reihenSchluessel, text })} />
         {!zeigen.length && <span className="px-1 py-2 text-t4 text-ak-leise">{t('detail.reiheKeinTreffer')}</span>}
         {zeigen.map((g, i) => {
           const auf = Boolean(suchText) || offen.includes(g.titel)

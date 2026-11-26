@@ -64,7 +64,7 @@ console.log('\nWerktitel gegen Teiltitel')
     [t.titleEn, t.titleRomaji].some((s) => new RegExp(`(part|teil|vol\\.?|volume)\\s*${nr}\\s*$`, 'i').test(s ?? ''))
   const mitTeilnummer = alleTitel.filter((t) => {
     const m = /[–—-]\s*(staffel|season|vol\.?|teil|part)\s*(\d+)\s*$/i.exec(t.titleDe ?? '')
-    return m && !nummerImEintrag(t, m[2]!)
+    return m && !nummerImEintrag(t, m[2]!) && !t.staffelTitel /* die Staffelnummer ist hier der Name aus der Yaml (Staffel-Titel) */
   })
   pruefe(
     'kein Titel traegt die Nummer eines seiner Teile im Namen',

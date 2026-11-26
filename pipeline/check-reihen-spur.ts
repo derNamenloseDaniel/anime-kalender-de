@@ -154,9 +154,11 @@ pruefe('gesperrt: Karte aus', tabKnopf(kartenHtml({ gesperrt: true })).includes(
 pruefe('nicht gesperrt: Karte an', !tabKnopf(kartenHtml({ gesperrt: false })).includes('disabled=""'))
 
 /* „Ohne Synchro“ gilt nur für Erschienenes; ein kommender Teil trägt kein ✕ und ist nicht gedämpft. */
-const ohneSynchro = teil(900004, 'Ohne', { ohneSynchro: true })
+const ohneSynchro = teil(900004, 'Ohne', { ohneSynchro: true, cover: 'https://ak.test/cover/medium/o.jpg' })
 pruefe('erschienen ohne Synchro: Marke', kartenHtml({ offen: false }, ohneSynchro).includes('🇩🇪 ✕'))
-pruefe('erschienen ohne Synchro: gedämpft', kartenHtml({ offen: false }, ohneSynchro).includes('opacity-55'))
+pruefe('erschienen ohne Synchro: Bild gedämpft', /<img[^>]*class="[^"]*opacity-55/.test(kartenHtml({ offen: false }, ohneSynchro)))
+/* Nur das Bild wird blass: eine gedämpfte Hülle zog die Marke darin auf 3,02:1 Kontrast (PR-Aussehen, 26.11.2026). */
+pruefe('erschienen ohne Synchro: Hülle der Marke nicht gedämpft', !/<span[^>]*class="[^"]*aspect-\[2\/3\][^"]*opacity-/.test(kartenHtml({ offen: false }, ohneSynchro)))
 pruefe('kommend ohne Synchro: keine Marke', !kartenHtml({ offen: true }, ohneSynchro).includes('🇩🇪 ✕'))
 pruefe('kommend ohne Synchro: nicht gedämpft', !kartenHtml({ offen: true }, ohneSynchro).includes('opacity-55'))
 pruefe('mit Synchro: weder Marke noch gedämpft', !kartenHtml({}, teil(900005, 'Mit')).includes('🇩🇪 ✕'))
@@ -212,7 +214,7 @@ const reihe: FranchiseMember[] = [
   teil(900015, 'Reihe Special', { jpYear: 2021, format: 'SPECIAL', episodes: 1, beiwerk: true }),
 ]
 const titel = (id: number) => ({ id }) as Title
-function liste(teile: FranchiseMember[], gewaehlt: number, mehr: { suche?: string; ohneOffen?: boolean } = {}): string {
+function liste(teile: FranchiseMember[], gewaehlt: number, mehr: { suche?: string } = {}): string {
   return renderToStaticMarkup(
     createElement(ReihenListe, {
       reihenTeile: teile,
@@ -222,10 +224,8 @@ function liste(teile: FranchiseMember[], gewaehlt: number, mehr: { suche?: strin
       favorites: new Set<number>(),
       wechselt: false,
       wechsleZu: () => {},
-      reiheOhneOffen: mehr.ohneOffen ? 1 : null,
       reihenSchluessel: 1,
       reiheSuche: { reihe: 1, text: mehr.suche ?? '' },
-      setReiheOhneOffen: () => {},
       setReiheSuche: () => {},
     }),
   )
@@ -247,10 +247,9 @@ pruefe('Reihe aus zwei Filmen: keine Pfeile', !nurFilm.includes('Weitere Teile')
 const keinTreffer = liste(reihe, 900012, { suche: 'zzzz' })
 gleich('Suche ohne Treffer: keine Zeile', zaehle(keinTreffer, 'role="tablist"'), 0)
 const alleOhne = liste([teil(900021, 'Reihe', { ohneSynchro: true }), teil(900022, 'Reihe Staffel 2', { ohneSynchro: true }), teil(900023, 'Reihe Staffel 3', { ohneSynchro: true })], 900099)
-gleich('nur Teile ohne Synchro, keiner gewählt: keine Zeile', zaehle(alleOhne, 'role="tablist"'), 0)
-pruefe('nur Teile ohne Synchro: Hinweis auf den Schalter', alleOhne.includes('Schalter'), alleOhne.slice(0, 200))
-const alleOhneOffen = liste([teil(900021, 'Reihe', { ohneSynchro: true }), teil(900022, 'Reihe Staffel 2', { ohneSynchro: true })], 900099, { ohneOffen: true })
-gleich('Schalter an: beide Teile da', zaehle(alleOhneOffen, 'role="tab"'), 2)
+gleich('nur Teile ohne Synchro, keiner gewählt: eine Zeile mit drei Karten', [zaehle(alleOhne, 'role="tablist"'), zaehle(alleOhne, 'role="tab"')], [1, 3])
+pruefe('Teile ohne Synchro: kein Schalter und kein Hinweis darauf', !alleOhne.includes('type="checkbox"') && !alleOhne.includes('Schalter'), alleOhne.slice(0, 200))
+pruefe('Teile ohne Synchro tragen ihre Marke in der Liste', zaehle(alleOhne, '🇩🇪 ✕') === 3, zaehle(alleOhne, '🇩🇪 ✕'))
 
 /* Pfeile nach Inhaltsänderung (Daniel, 24.10.2026): schrumpft nur der Inhalt, meldet der ResizeObserver nichts — die Messung hängt am MutationObserver. */
 type Fake = { rueckruf: () => void; ziel?: unknown; optionen?: unknown; getrennt: boolean }

@@ -74,7 +74,6 @@ tools/panel-abschnitt.mjs
 tools/panel-bild.mjs
 tools/panel-messen-browser.mjs
 tools/panel-messen.mjs
-tools/panel-reihe-schalter.mjs
 tools/panel-sperre.mjs
 tools/panel-sprung.mjs
 tools/panel-zurueck.mjs

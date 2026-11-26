@@ -10,8 +10,15 @@ import { zeitGeschaetzt } from './zeit-text.ts'
 
 const PRODID = '-//anime-kalender-de//Anime-Kalender DE//DE'
 
+/** TEXT nach RFC 5545 §3.3.11; ein einzelnes CR zählt als Zeilenumbruch, übrige Steuerzeichen (außer Tab) entfallen. */
 function esc(value: string): string {
-  return value.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n')
+  return value
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\r\n|\r|\n/g, '\\n')
+    // eslint-disable-next-line no-control-regex -- Steuerzeichen sind genau der Gegenstand
+    .replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, '')
 }
 
 /**

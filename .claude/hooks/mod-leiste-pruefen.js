@@ -37,7 +37,10 @@ function einhaengen(sessionId, env) {
 function pruefen(eingabe, env) {
   if (env.CLAUDE_CODE_PLUGIN_DIRS) return '';
   try {
-    const id = JSON.parse(eingabe || '{}').session_id;
+    const daten = JSON.parse(eingabe || '{}');
+    // Kompaktieren läuft im selben Prozess, die Mod bleibt geladen (26.11.2026: Fehlmeldung trotz sichtbarer Leiste).
+    if (daten.source === 'compact') return '';
+    const id = daten.session_id;
     if (!id || /[\\/]|\.\./.test(String(id))) return '';
     return einhaengen(String(id), env) ? MELDUNG : '';
   } catch {

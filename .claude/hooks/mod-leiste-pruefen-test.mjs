@@ -26,11 +26,13 @@ try {
   assert.ok(statSync(manifest).mtimeMs > alt.getTime() + 1000, 'plugin.json berührt')
 
   assert.equal(pruefen(eingabe, env), MELDUNG, 'zweiter Lauf: Junction vorhanden, trotzdem Meldung')
+  assert.equal(pruefen(JSON.stringify({ session_id: 'abc', source: 'compact' }), env), '', 'Kompaktieren: still')
+  assert.equal(pruefen(JSON.stringify({ session_id: 'abc', source: 'resume' }), env), MELDUNG, 'Resume: Meldung')
   assert.equal(pruefen('kaputt', env), '', 'kaputte Eingabe: still')
   assert.equal(pruefen('{}', env), '', 'ohne session_id: still')
   assert.equal(pruefen(JSON.stringify({ session_id: '../x' }), env), '', 'Pfadtrick: still')
   assert.equal(pruefen(eingabe, { ...env, CLAUDE_PROJECT_DIR: join(wurzel, 'leer') }), '', 'Mod fehlt: still')
-  console.log('mod-leiste-pruefen-test: 8 Fälle grün')
+  console.log('mod-leiste-pruefen-test: 10 Fälle grün')
 } finally {
   rmSync(wurzel, { recursive: true, force: true })
 }

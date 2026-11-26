@@ -41,6 +41,23 @@ const grundVon = (text) => kontext.akNetflixErinnernGrund(datum(text))
 pruefe('Grund trägt das Datum (nicht „ohne Datum“)', grundVon('Ab 10. Dezember') === 'Erinnern-Knopf mit Datum (10.12.)', grundVon('Ab 10. Dezember'))
 pruefe('Grund bei „ab“ klein ebenso', grundVon('ab 10. Dezember') === 'Erinnern-Knopf mit Datum (10.12.)', grundVon('ab 10. Dezember'))
 
+/* Nachbesserung R1: ein erster Treffer ohne Monat darf den echten Termin nicht verdecken */
+const alle = [
+  ['„Ab 12. Folge“ vor dem Termin', 'Ab 12. Folge Spannend. Ab 10. Dezember', '10. Dezember'],
+  ['„Ab 3. Staffel, Ab 10. Dezember“', 'Ab 3. Staffel, Ab 10. Dezember', '10. Dezember'],
+  ['„ab 16. Jahren“ davor (Zeilenumbruch)', 'ab 16. Jahren \nAb 10. Dezember', '10. Dezember'],
+  ['Dialog mit Billboard-Vorlauf', 'Banana Fish\nAb 16. Jahren · Ab 2. Folge\nAb 10. Dezember\nErinnern', '10. Dezember'],
+  ['„Ab 10.12.“ rein numerisch', 'Banana Fish Ab 10.12. Erinnern', '10. Dezember'],
+  ['„ab 10.12.2026“ mit Jahr', 'ab 10.12.2026', '10. Dezember 2026'],
+  ['„Ab 16.“ allein ist kein Datum', 'Ab 16. Erinnern', null],
+  ['„ab 16. Jahren“ allein ist kein Datum', 'ab 16. Jahren', null],
+  ['„Ab 31.13.“ unmöglicher Monat', 'Ab 31.13.', null],
+  ['„Ab 10.12“ ohne Schlusspunkt ist keins', 'Ab 10.12 Uhr', null],
+]
+for (const [name, text, soll] of alle) pruefe(name, datum(text) === soll, datum(text))
+pruefe('Dialog geht vor Seitentext (Billboard im Body zählt nicht)', datum('Ab 10. Dezember', 'Ab 1. Januar') === '10. Dezember')
+pruefe('Grund bei numerischem Termin trägt das Datum', grundVon('Ab 10.12.') === 'Erinnern-Knopf mit Datum (10.12.)', grundVon('Ab 10.12.'))
+
 /* Frist: bis 10.12. 00:00 Berlin (Winterzeit = 09.12. 23:00 UTC), nicht 7 Tage ab 26.11. */
 const JETZT = Date.UTC(2026, 10, 26, 18, 42)
 const bis = kontext.akZurueckBis(grundVon('ab 10. Dezember'), kontext.akNetflixDatumKurz('10. Dezember'), JETZT)

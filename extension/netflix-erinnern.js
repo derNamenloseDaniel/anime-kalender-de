@@ -94,11 +94,21 @@ globalThis.akNetflixDatumKurz = (text) => {
   return m ? `${Number(t[1])}.${m}.` : null
 }
 
-/** Der Termin „Ab 10. Dezember“ im Text, unabhängig von der Schreibung des „Ab“; nur mit lesbarem Monat, sonst `null` (26.11.2026, Banana Fish). */
+const ERINNERN_MONATSNAMEN = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']
+
+/** „Ab 10.12." / „ab 10.12.2026" → „10. Dezember" / „10. Dezember 2026" (Schreibung der übrigen Termine, das Jahr bestimmt die Pipeline); Unmögliches → `null`. */
+const terminNumerisch = (t, mo, j) => (t >= 1 && t <= 31 && mo >= 1 && mo <= 12 ? `${t}. ${ERINNERN_MONATSNAMEN[mo - 1]}${j ? ` ${j}` : ''}` : null)
+
+/**
+ * Der Termin „Ab 10. Dezember“ im Text, unabhängig von der Schreibung des „Ab“; nur mit lesbarem Monat, sonst `null` (26.11.2026, Banana Fish).
+ * Alle „ab <Zahl>.“-Stellen werden durchgegangen, die erste mit lesbarem Monat zählt („Ab 12. Folge … Ab 10. Dezember“; „ab 16.“ allein bleibt kein Datum).
+ */
 globalThis.akNetflixTerminLesen = (text) => {
-  const t = /\bab\s+(\d{1,2}\.\s*[A-Za-zÄÖÜäöü]+(?:\s+\d{4})?)/i.exec(String(text ?? ''))
-  const termin = t ? t[1].replace(/\s+/g, ' ').trim() : null
-  return termin && globalThis.akNetflixDatumKurz(termin) ? termin : null
+  for (const t of String(text ?? '').matchAll(/\bab\s+(\d{1,2})\.(?:(\d{1,2})\.(?:\s*(\d{4})|(?!\d))|\s*([A-Za-zÄÖÜäöü]+)(?:\s+(\d{4}))?)/gi)) {
+    const termin = t[2] ? terminNumerisch(Number(t[1]), Number(t[2]), t[3]) : `${t[1]}. ${t[4]}${t[5] ? ` ${t[5]}` : ''}`
+    if (termin && globalThis.akNetflixDatumKurz(termin)) return termin
+  }
+  return null
 }
 
 /**

@@ -252,13 +252,13 @@ pruefe('Urteile: Spanne 0 (ganze Seite) bleibt 0', beobachtungenDerSpanne(7_000_
     writeFileSync(join(wurzel, 'data', 'kino-ankuendigungen.yaml'), '[]\n')
     /* Staffelgrenzen der Kulisse (`ladeStaffelGrenzen`): ohne sie kennt der Bau keinen Stapel-Termin für den Titel (`letzteFolgen`). */
     mkdirSync(join(wurzel, 'data', 'curated'), { recursive: true })
-    writeFileSync(join(wurzel, 'data', 'curated', 'horizonte-staffeln.yaml'), 'titel:\n- anilistId: 900501\n  basis: 2\n  staffeln:\n    - { nr: 1, von: 1, bis: 3, folgen: 3, kennung: 7000001 }\n    - { nr: 2, von: 4, offen: true }\n')
+    writeFileSync(join(wurzel, 'data', 'curated', 'horizonte-staffeln.yaml'), 'titel:\n- anilistId: 900501\n  basis: 2\n  staffeln:\n    - { nr: 1, von: 1, bis: 3, folgen: 3, kennung: 7000001 }\n    - { nr: 2, von: 4, offen: true }\n- anilistId: 900502\n  staffeln:\n    - { nr: 1, von: 1, offen: true }\n')
     const tsx = createRequire(import.meta.url).resolve('tsx/cli')
     const lauf = spawnSync(process.execPath, [tsx, fileURLToPath(new URL('./lib/kulisse-staffel-folgen.ts', import.meta.url))], { env: { ...process.env, AK_ROOT: wurzel }, encoding: 'utf8', windowsHide: true, timeout: 120_000 })
     const aus = JSON.parse(lauf.stdout.trim().split('\n').at(-1) || '{}') as { index?: number[]; zaehlung?: Record<string, number[]>; dateien?: Record<string, { f: unknown[][]; de: number[][]; s?: unknown }> }
     pruefe('Folgenliste im Bau: Sammeltitel geteilt (Staffel 1 und Basis), gewöhnlicher Titel wie bisher', lauf.status === 0 && aus.index?.join() === '900501,900502,7000001', `${lauf.status} ${aus.index} ${lauf.stderr.slice(-300)}`)
     pruefe('Folgenliste im Bau: Staffel 1 drei Zeilen, Basis zwei ab 1, deutsch aus den Wegen des Sammeltitels', aus.dateien?.['7000001']?.f.length === 3 && JSON.stringify(aus.dateien?.['900501']?.f.map((z) => z[0])) === '[1,2]' && JSON.stringify(aus.dateien?.['900501']?.de) === '[[1,2]]' && JSON.stringify(aus.dateien?.['7000001']?.de) === '[[1,3]]', JSON.stringify(aus.dateien))
-    pruefe('Folgenliste im Bau: Zählung je Staffel, offene Basis mit dritter Stelle', JSON.stringify(aus.zaehlung) === '{"900501":[2,2,1],"900502":[2,0],"7000001":[3,3]}', JSON.stringify(aus.zaehlung))
+    pruefe('Folgenliste im Bau: Zählung je Staffel, offene Basis und offener gewöhnlicher Titel mit dritter Stelle', JSON.stringify(aus.zaehlung) === '{"900501":[2,2,1],"900502":[2,0,1],"7000001":[3,3]}', JSON.stringify(aus.zaehlung))
     pruefe('Folgenliste im Bau: Hinweis nur am Titel, der einen hat; beim Sammeltitel in die Staffel umgezählt (Folge 5 → Basis Folge 2)', !JSON.stringify(aus.dateien?.['900502']).includes('"h"') && JSON.stringify(aus.dateien?.['900501']).includes('"h":[[2,"Fünf"]]') && !JSON.stringify(aus.dateien?.['7000001']).includes('"h"'), JSON.stringify(aus.dateien))
   } finally {
     rmSync(wurzel, { recursive: true, force: true })

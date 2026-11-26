@@ -8,10 +8,14 @@ type JwBefunde = Record<string, { angebote?: { anbieter?: string; url?: string }
 type MitWegen = { id: number; streams?: { platform: string }[] }
 export type Ausnahme = { id: number; grund: string }
 
+/** Erste Joyn-Adresse, die JustWatch für den Titel nennt (der Beleg der Lücke), sonst undefined. */
+export function joynBeleg(jw: JwBefunde, id: number): string | undefined {
+  return (jw[String(id)]?.angebote ?? []).find((a) => a.url && /joyn/i.test(a.anbieter ?? ''))?.url
+}
+
 /** Kennungen der Titel mit JustWatch-Joyn-Angebot (mit Adresse) ohne Joyn-Weg, in der Reihenfolge der Titel. */
 export function joynLuecken(titel: MitWegen[], jw: JwBefunde): number[] {
-  const hatAngebot = (id: number): boolean => (jw[String(id)]?.angebote ?? []).some((a) => a.url && /joyn/i.test(a.anbieter ?? ''))
-  return titel.filter((t) => hatAngebot(t.id) && !(t.streams ?? []).some((s) => s.platform === 'joyn')).map((t) => t.id)
+  return titel.filter((t) => joynBeleg(jw, t.id) && !(t.streams ?? []).some((s) => s.platform === 'joyn')).map((t) => t.id)
 }
 
 /** `offen`: Lücken ohne Ausnahme; `veraltet`: Ausnahmen, deren Lücke nicht mehr besteht (die Liste darf nur schrumpfen, also raus damit). */

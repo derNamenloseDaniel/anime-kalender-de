@@ -70,6 +70,7 @@ pipeline/check-kachel-buendel-bestand.ts
 pipeline/check-kalender-plausibilitaet-bestand.ts
 pipeline/check-katalog-eingefroren-bestand.ts
 pipeline/check-katalog-release-bestand.ts
+pipeline/check-kein-weg-trotz-quelle-bestand.ts
 pipeline/check-logic-bestand.ts
 pipeline/check-mal-dubletten-bestand.ts
 pipeline/check-meldungen-ohne-release-bestand.ts

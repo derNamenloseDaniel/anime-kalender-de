@@ -58,6 +58,10 @@ function lauf(wurzel: string, titles: unknown[], pruefliste: unknown[]): { statu
 console.log('\nBestandsprüfung geteilter Crunchyroll-Seiten gegen eine Kulisse:')
 const wurzel = mkdtempSync(join(tmpdir(), 'cr-teilseiten-bestand-'))
 try {
+  // Die Wache liest den Vorstand aus Git; ein Stand ohne Bestandsdateien lässt diesen Teil leer (Fälle dazu: check-teilseiten-vorstand.ts).
+  for (const a of [['init', '-q'], ['commit', '-q', '--allow-empty', '-m', 'leer']]) {
+    spawnSync(process.env.GIT_EXE ?? 'git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...a], { cwd: wurzel, windowsHide: true })
+  }
   const eintrag = { titleId: 900003, titel: 'K', url: URL_S, grund: 'g' }
   const gut = lauf(wurzel, titel([{ from: 1, to: 1 }], null), [])
   pruefe('Folgenzahl offen, Bereich 1-1 auf der belegten Folge: grün', gut.status === 0, gut.aus)

@@ -11,6 +11,8 @@ import { bereicheBelegt, belegteFolgen } from './lib/cr-bereiche-belegt.ts'
 import { staffelDesTitels } from './bau/widerlegung-staffel.ts'
 import type { CrDubData } from './lib/crunchyroll-dub.ts'
 import type { Title } from '../shared/types.ts'
+import { teilseitenGegenVorstand } from './lib/teilseiten-vorstand.ts'
+import { vorstandRef } from './lib/vorstand-abgang.ts'
 
 let fehler = 0
 function pruefe(name: string, ok: boolean, info: unknown = ''): void {
@@ -33,6 +35,8 @@ if (existsSync(OUT)) {
   const fremd = liste.filter((p) => !(titel.has(p.titleId) || katalog.has(p.titleId)) || !p.grund.length)
   pruefe('Bestand: die Prüfliste nennt nur vorhandene Titel mit Grund', fremd.length === 0, fremd.map((p) => p.titleId).slice(0, 10).join())
   pruefe('Bestand: kein Titel steht mit Bereich und auf der Prüfliste', liste.every((p) => !crGeteilt.some(({ t, s }) => t.id === p.titleId && s.url === p.url)))
+  // Die Prüfliste schreibt derselbe Bau; was er aus Liste und Bereichen zugleich streicht, fällt nur gegen den Vorstand auf.
+  for (const zeile of teilseitenGegenVorstand('crunchyroll', PRUEFLISTE, vorstandRef(process.argv.slice(2)))) pruefe('Bestand gegen Vorstand:', false, zeile)
 }
 
 if (fehler) {

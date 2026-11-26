@@ -8,6 +8,8 @@ import { readJson } from './lib/util.ts'
 import { PRIME_PRUEFLISTE } from './bau/09-7-prime-teilseiten.ts'
 import type { TeilseitenPruefung } from './lib/teilseiten.ts'
 import type { Title } from '../shared/types.ts'
+import { teilseitenGegenVorstand } from './lib/teilseiten-vorstand.ts'
+import { vorstandRef } from './lib/vorstand-abgang.ts'
 
 let fehler = 0
 function pruefe(name: string, ok: boolean, info: unknown = ''): void {
@@ -28,6 +30,8 @@ if (existsSync(OUT)) {
   const katalog = new Set(Object.values(readJson<Record<string, { id: number }[]>>('public/data/franchises.json', {})).flatMap((r) => r.map((g) => g.id)))
   pruefe('Bestand: die Prüfliste nennt nur vorhandene Titel mit Grund', liste.every((p) => (titel.has(p.titleId) || katalog.has(p.titleId)) && p.grund.length > 0))
   pruefe('Bestand: kein Titel steht mit Bereich und auf der Prüfliste', liste.every((p) => !geteilt.some(({ t, s }) => t.id === p.titleId && s.url === p.url)))
+  // Die Prüfliste schreibt derselbe Bau; was er aus Liste und Bereichen zugleich streicht, fällt nur gegen den Vorstand auf.
+  for (const zeile of teilseitenGegenVorstand('primevideo', PRIME_PRUEFLISTE, vorstandRef(process.argv.slice(2)))) pruefe('Bestand gegen Vorstand:', false, zeile)
 }
 
 if (fehler) {

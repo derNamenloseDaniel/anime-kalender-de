@@ -36,6 +36,7 @@ import { DIGEST_CRON, versendeDigest } from './digest-versand.ts'
 import { berlinParts, fehlerLog, jetztIso } from './werte.ts'
 import { handlePruefung } from './pruefung.ts'
 import { loadNews } from './news-quelle.ts'
+import { termineQuelle } from './termine-quelle.ts'
 import { weitereAusNews } from '../../shared/news-weitere.ts'
 import { handleLauf } from './lauf.ts'
 import { handleCrZugang } from './cr-zugang.ts'
@@ -766,7 +767,8 @@ export default {
       ctx.waitUntil(digestMitLog(env, now))
       return
     }
-    const termine = einmal(() => loadEvents(env)) // eine Ladung der Termindatei für Push und Messer
+    const quelle = termineQuelle(env, now, () => loadEvents(env), () => loadNews(env)) // kleine Bau-Datei statt 1,7 MB parsen (CPU-Limit 10 ms)
+    const termine = einmal(quelle.termine) // eine Ladung für Push und Messer
     if (event.cron === PUSH_CRON) return ctx.waitUntil(Promise.all([starteSchnelleLaeufe(env, now).catch((e) => fehlerLog('[wecker]', e)), pushSchnellMitLog(env, now, termine), ausbleibenMitLog(env, now, termine)]))
     ctx.waitUntil(sichereSchnellmessung(env.SCHNELLMESSER).catch((e) => fehlerLog('[schnell]', e))); ctx.waitUntil(loescheAbgelaufenes(env, now)) // Löschfristen der Datenschutzerklärung
     ctx.waitUntil(starteFaelligeLaeufe(env, now).catch((e) => fehlerLog('[wecker]', e))) // Newsletter und Überwachung laufen getrennt, fällt eines aus, laufen die anderen weiter
@@ -783,7 +785,7 @@ export default {
         .catch((err) => fehlerLog('[land] fehlgeschlagen', err)),
     )
     ctx.waitUntil(
-      pushStuendlich(env, now, () => loadEvents(env), () => loadNews(env))
+      pushStuendlich(env, now, termine, quelle.weitere)
         .then((msg) => console.log(`[push] ${msg}`))
         .catch((err) => fehlerLog('[push] fehlgeschlagen', err)),
     )

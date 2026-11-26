@@ -78,6 +78,11 @@ export function uebersetzeDatei(name: string, daten: unknown, ak: AkVon): unknow
       const mitTitelId = (r: Record<string, unknown>) => ({ ...r, titleId: num(r.titleId, ak) })
       return { ...w, titles: liste(w.titles, (t) => titel(t, ak)), releases: liste(w.releases, mitTitelId), events: liste(w.events, mitTitelId) }
     }
+    /* Ausschnitt von events.json und news.json für den Worker: Termine mit `titleId`, „Jetzt auch bei“ mit `id` (Titel- oder Teilkennung wie in news.json). */
+    case 'worker-termine.json': {
+      const w = daten as { termine: unknown; weitere: unknown }
+      return { ...w, termine: liste(w.termine, (r) => ({ ...r, titleId: num(r.titleId, ak) })), weitere: liste(w.weitere, (n) => ({ ...n, id: num(n.id, ak) })) }
+    }
     case 'meldungen.json':
       return liste(daten, (m) => ({ ...m, titleId: num(m.titleId, ak) }))
     /* Pool für „Was gucke ich als Nächstes?“: Einstiege tragen die Titelkennung, `reihe` führt Kennung → Kennung des Einstiegs. */

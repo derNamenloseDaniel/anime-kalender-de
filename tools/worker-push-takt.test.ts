@@ -13,7 +13,8 @@ import worker from '../worker/src/index.ts'
 import { pushFaellig } from '../worker/src/push-takt.ts'
 import { pushIstErschienen, pushVersand } from '../worker/src/push.ts'
 import { istErschienen } from '../shared/logic.ts'
-import type { ReleaseEvent } from '../shared/types.ts'
+import type { NewsEintrag, ReleaseEvent } from '../shared/types.ts'
+import { schneideWorkerTermine } from '../shared/worker-termine.ts'
 import { fetchAttrappe, neueDatenbank, testEnv, zaehler, zaehlerZurueck } from './worker-unteraufrufe-attrappe.ts'
 
 let fehler = 0
@@ -63,6 +64,11 @@ async function umgebung(db: DatabaseSync, ereignisse: ReleaseEvent[], favoriten:
     if (url.endsWith('data/events.json')) {
       zaehler.fetch++
       return new Response(JSON.stringify(ereignisse), { status: 200 })
+    }
+    /* Die kleine Bau-Datei, die der Cron liest (die vollen Dateien sind der Rückfall, `tools/worker-termine.test.ts`). */
+    if (url.endsWith('data/worker-termine.json')) {
+      zaehler.fetch++
+      return new Response(JSON.stringify(schneideWorkerTermine(ereignisse, meldungen as NewsEintrag[], '2026-11-05')), { status: 200 })
     }
     return basis(e, init)
   }) as typeof fetch
@@ -137,7 +143,7 @@ async function ohneTermin() {
   const env = await umgebung(db, [YAIBA], 'ak:177476')
   await takt({ ...env, GITHUB_WECKER_TOKEN: undefined } as typeof env, FUENF, utc('17:05')) // ohne Wecker-Token: gemessen wird nur der Push-Takt (der Wecker kostet je Aufruf 1 GET, alle 20 min 1 POST)
   pruefe(zaehler.d1 === 0 && zaehler.sql.length === 0, `keine D1-Anweisung (${zaehler.d1})`)
-  pruefe(zaehler.fetch === 1, `ein Abruf (die Termindatei), keine Meldungen und kein Monitor (${zaehler.fetch})`)
+  pruefe(zaehler.fetch === 1, `ein Abruf (die kleine Termindatei), keine Meldungen und kein Monitor (${zaehler.fetch})`)
   pruefe(zaehler.objekt === 0 && zaehler.einzelmails === 0, 'Schnellmesser und Mail bleiben aus')
   await takt(env, FUENF, utc('17:25'))
   pruefe(zaehler.d1 > 0 && pushZeiten.length === 1, `im Takt mit Termin wird D1 berührt (${zaehler.d1} Aufrufe) und gepusht`)

@@ -65,6 +65,17 @@ function eigeneFaelle(liste: Liste): string[] {
   erwarte('Zuweisung an watchLinks', pruefeQuelltext('pipeline/bau/neu.ts', zweite, {}), /neue ungeprüfte Stelle/)
   const nurFilter = 'export function f(t: { streams: { u: string }[] }) { t.streams = t.streams.filter((s) => s.u) }'
   erwarte('nur Wegnehmen ist keine Stelle', pruefeQuelltext('pipeline/bau/neu.ts', nurFilter, {}), null)
+  const gleich = (name: string, ist: unknown, soll: unknown) => {
+    if (JSON.stringify(ist) !== JSON.stringify(soll)) fehler.push(`Wächter-Selbsttest „${name}“: ${JSON.stringify(ist)} statt ${JSON.stringify(soll)}`)
+  }
+  const stellen = (text: string) => findeWegeStellen('x.ts', text).map((s) => `${s.schluessel}@${s.zeile}`)
+  gleich('Pfeilfunktion und Zeile', stellen('\nexport const f = (t: { streams: unknown[] }) => {\n  t.streams.push(1)\n}'), ['x.ts::f@3'])
+  gleich('Alias auf watchLinks', stellen('function g(t: { watchLinks?: unknown[] }) {\n  const w = t.watchLinks ?? []\n  w.push(1)\n}'), ['x.ts::g@3'])
+  gleich('Alias ohne Wege-Feld', stellen('function g(t: { id: number }) {\n  const w = [t.id]\n  w.push(1)\n}'), [])
+  gleich('splice(i, 1) nimmt nur weg', stellen('function h(t: { streams: unknown[] }) { t.streams.splice(0, 1) }'), [])
+  gleich('splice(i, 0, x) legt an', stellen('function h(t: { streams: unknown[] }) { t.streams.splice(0, 0, 1) }'), ['x.ts::h@1'])
+  gleich('zwei Stellen einer Funktion', zusammenfassen(findeWegeStellen('x.ts', 'function k(t: { streams: unknown[] }) {\n  t.streams.push(1)\n  t.streams.unshift(2)\n}')).get('x.ts::k'), { anzahl: 2, fragen: [], zeilen: [2, 3] })
+  gleich('Parameter zählt nicht als Benutzung', zusammenfassen(findeWegeStellen('x.ts', 'function m(t: { streams: unknown[] }, istTot: (u: string) => boolean) { t.streams.push(1) }')).get('x.ts::m')?.fragen, [])
   return fehler
 }
 

@@ -28,6 +28,8 @@ export interface CuratedEntry {
   note?: string
   /** Kurzer Hinweis für Besucher, wird ausgeliefert (kein Personenname); `note` bleibt intern. */
   hinweis?: string
+  /** Siehe `Release.kanal` — nur bei `platform: primevideo`, wo die Quelle genau einen Zusatzkanal nennt. */
+  kanal?: string
   /** Siehe `Release.netflixOriginal`. */
   netflixOriginal?: boolean
   /** Siehe `Release.sprache` — ein Termin ohne belegte deutsche Synchro (Kinostart nur OmU). */
@@ -72,6 +74,7 @@ export function kuratierteZusaetze(entry: CuratedEntry): Partial<Release> {
     ...(entry.hinweis ? { hinweis: entry.hinweis } : {}),
     ...(entry.nachtrag ? { nachtrag: entry.nachtrag } : {}),
     ...(entry.rhythmus ? { rhythmus: entry.rhythmus } : {}),
+    ...(entry.kanal && entry.platform === 'primevideo' ? { kanal: entry.kanal } : {}),
     ...(entry.netflixOriginal ? { netflixOriginal: true } : {}),
     ...(entry.sprache ? { sprache: entry.sprache } : {}),
     ...(entry.schnitt ? { schnitt: entry.schnitt } : {}),

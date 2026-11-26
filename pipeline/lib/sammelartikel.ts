@@ -186,9 +186,11 @@ const ANBIETER: Record<string, string> = {
 /**
  * Zusätze, die keine einzelne Staffel benennen — dort wäre jede Zuordnung geraten: „Sonderfolgen"
  * (My Happy Marriage landete so an Staffel 1), „Staffel 1 und 2" (MHA Vigilantes landete am
- * Haupt-MHA), „Part 1" (Berserk 1997 oder 2016?).
+ * Haupt-MHA), „Part 1 und 2". Ein einzelnes „Part N“ gehört nicht hierher (`EINZELNER_PART`).
  */
 const UNKLARER_TEIL = /sonderfolge|special|ova|oad|film|movie|part|teil|\bund\b|episode\s*\d+\s*bis/i
+/** Genau „Part N“/„Teil N“: den Teil entscheidet `releasesAus` am Namen (`teil-hinweis.ts`); findet er keinen, steht die Zeile in `nicht-zugeordnet.json`, statt hier still zu fallen (Berserk Part 2, 26.11.2026). */
+const EINZELNER_PART = /^\s*(?:part|teil)\s*0*\d{1,2}\s*$/i
 
 /** Alle gelesenen Sammelartikel als einzelne Vorschläge; der Anbieter der Überschrift gilt, wo der Eintrag keinen nennt. */
 export function vorschlaegeAusAllenSammelartikeln(vorschlaege: Vorschlag[]): Vorschlag[] {
@@ -205,7 +207,7 @@ export type SammelVerwurf = 'kein deutscher Ton' | 'kein Starttag' | 'Staffel un
 export function sammelVerwurf(e: SammelEintrag, anbieterDesArtikels?: string): SammelVerwurf | undefined {
   if (!e.deutsch) return 'kein deutscher Ton'
   if (!e.datum) return 'kein Starttag'
-  if (e.zusatz && UNKLARER_TEIL.test(e.zusatz)) return 'Staffel unklar'
+  if (e.zusatz && UNKLARER_TEIL.test(e.zusatz) && !EINZELNER_PART.test(e.zusatz)) return 'Staffel unklar'
   return sammelAnbieter(e, anbieterDesArtikels).length ? undefined : 'kein Anbieter'
 }
 

@@ -3,7 +3,7 @@
  * die Tests oft durchlassen. Je Klasse eine Funktion `(node, q) => [{ art, von, bis, ersetze }]`; Offsets liegen
  * immer innerhalb von `node`, damit `mutantenListe` Anker und Ersatz aus dem Knotentext bilden kann.
  *   Objekt-Eigenschaft entfernt   `{ a: 1, b }` → `{ ...{}, b }`   (je Eigenschaft; bleibt gültig ohne Kommaarbeit)
- *   Parameter-Vorgabe → 0         `(x = []) =>` → `(x = 0) =>`
+ *   Parameter-Vorgabe → 0 / leer  `(x = [1]) =>` → `(x = 0) =>` und `(x = []) =>` (leer nur bei nicht leerem Text-/Listen-/Objektliteral)
  *   Zuweisung im Callback entfernt  `cb(() => { s = 1 })` → `void 0`
  *   Parameter am Aufrufort entfernt `f(a, b)` → `f(b)` und `f(a)`
  *   throw e → if (false)          `throw e;` → `{ if (false) throw e; }`
@@ -21,11 +21,24 @@ function eigenschaftEntfernt(node) {
   return [{ art: `Objekt-Eigenschaft entfernt ${name}`, von: node.getStart(), bis: node.end, ersetze: '...{}' }]
 }
 
-/** Vorgabewert eines Funktionsparameters wird 0. */
+/** Leerer Wert derselben Art für ein nicht leeres Zeichenketten-, Listen- oder Objektliteral, sonst null. */
+function leererWert(i) {
+  if ((ts.isStringLiteral(i) || ts.isNoSubstitutionTemplateLiteral(i)) && i.text !== '') return '""'
+  if (ts.isArrayLiteralExpression(i) && i.elements.length) return '[]'
+  if (ts.isObjectLiteralExpression(i) && i.properties.length) return '{}'
+  return null
+}
+
+/** Vorgabewert eines Funktionsparameters wird 0 und, bei nicht leerem Literal, leer (`"x"` → `""`); 0 allein ändert die Art, ein typtreuer Test fängt es zu leicht. */
 function vorgabeNull(node) {
   if (!ts.isParameter(node) || !node.initializer) return []
   const i = node.initializer
-  return [{ art: `Parameter-Vorgabe → 0 ${node.name.getText()}`, von: i.getStart(), bis: i.end, ersetze: '0' }]
+  const name = node.name.getText()
+  const leer = leererWert(i)
+  return [
+    { art: `Parameter-Vorgabe → 0 ${name}`, von: i.getStart(), bis: i.end, ersetze: '0' },
+    ...(leer ? [{ art: `Parameter-Vorgabe → leer ${name}`, von: i.getStart(), bis: i.end, ersetze: leer }] : []),
+  ]
 }
 
 const istZuweisung = (n) => ts.isBinaryExpression(n) && n.operatorToken.kind >= K.FirstAssignment && n.operatorToken.kind <= K.LastAssignment

@@ -40,6 +40,11 @@ pruefe(`${V}: zwei Vorgaben ergeben zwei Mutanten`, mutiert('const g = (a = {}, 
 pruefe(`${V}: Vorgabe 0 ist kein Mutant`, mutiert('const g = (a = 0) => a', 'Parameter-Vorgabe → 0').length === 0)
 pruefe(`${V}: Parameter ohne Vorgabe, Variable mit Wert erzeugen nichts`, mutiert('const g = (a) => a\nconst h = 5', 'Parameter-Vorgabe → 0').length === 0)
 pruefe(`${V}: Mutanten bleiben gültig`, mutiert('const g = (a = [], b = {}) => a', 'Parameter-Vorgabe → 0').every(gueltig))
+const KV = 'Parameter-Vorgabe → leer'
+pruefe(`${V}: Zeichenkette, Liste, Objekt, Template → leerer Wert gleicher Art`, gleich(mutiert('const g = (s = "x", l = [1], o = { a: 1 }, t = `y`) => s', KV), ['const g = (s = "", l = [1], o = { a: 1 }, t = `y`) => s', 'const g = (s = "x", l = [], o = { a: 1 }, t = `y`) => s', 'const g = (s = "x", l = [1], o = {}, t = `y`) => s', 'const g = (s = "x", l = [1], o = { a: 1 }, t = "") => s']))
+pruefe(`${V}: schon leere Vorgabe, Zahl und Bezeichner erzeugen keinen Leer-Mutanten`, mutiert('const g = (s = "", l = [], o = {}, n = 5, v = x) => s', KV).length === 0)
+pruefe(`${V}: Name trägt den Parameternamen`, mutantenListe('a.mjs', 'const g = (s = "x") => s', new Set([1])).some((m) => m.name === 'a.mjs:1 Parameter-Vorgabe → leer s'))
+pruefe(`${V}: Leer-Mutanten bleiben gültig`, mutiert('function f(s = "x", l = [1, 2], o = { a }) {}', KV).every(gueltig))
 
 // 3 Zuweisung im Callback entfernt
 const Z = 'callback'

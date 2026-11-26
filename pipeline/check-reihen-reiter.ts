@@ -11,7 +11,7 @@ import { createRoot } from 'react-dom/client'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { useLang } from '../web/src/lib/i18n.tsx'
 import { ReihenListe } from '../web/src/components/detail/reihen-liste.tsx'
-import { ReihenReiterKontext } from '../web/src/components/detail/reihen-reiter.tsx'
+import { kastenFarbe, ReihenReiterKontext } from '../web/src/components/detail/reihen-reiter.tsx'
 import type { Dataset } from '../web/src/lib/data.ts'
 import { reihenTeileVon } from '../web/src/components/detail/reihen-daten.ts'
 import { reihenNameVon } from '../web/src/components/detail/reihen-namen.ts'
@@ -306,6 +306,9 @@ pruefe('Hauptserie: Reiter 1–5 nennt Titel und Grund des Rings', text(hauptPan
 const allein = { ...offen(5726), id: 990001, franchiseId: 990001, titleDe: 'Ohne Reihe', titleEn: 'Ohne Reihe', titleRomaji: 'Ohne Reihe' } as Title
 const ohneReihe = await zeige(990001, { ...data, titles: [allein], titleById: new Map([[allein.id, allein]]), releasesByTitle: new Map() })
 pruefe('Titel ohne Reihe: keine Reihen-Reiter, kein tabpanel', ohneReihe.leiste === undefined && ohneReihe.panel === undefined)
+/* Der gewählte Reiter trägt Fläche und Randfarbe des Kastens, auch die mit Dunkelthema-Vorsatz; Abstand, Rundung und Randbreite bleiben am Kasten. */
+const farbe = kastenFarbe('rounded-lg p-3 bg-ak-flaeche dark:bg-ak-flaeche-2 border border-ak-rand dark:border-ak-akzent')
+pruefe('kastenFarbe: Fläche und Randfarbe samt dark:-Klassen, ohne Abstand und Rundung', farbe === 'bg-ak-flaeche dark:bg-ak-flaeche-2 border-ak-rand dark:border-ak-akzent', farbe)
 
 await act(async () => wurzel.unmount())
 dom.entferne()

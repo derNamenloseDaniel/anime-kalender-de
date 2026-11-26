@@ -8156,7 +8156,7 @@ console.log('\nBeleg: Fundstelle, Banner, Handlung:')
     pruefe('Reihen-Reiter: beendeter Teil ohne Synchro zählt, auch mit spätem Jahr', ohneDeutscheSynchro({ ohneSynchro: true, jpStatus: 'FINISHED', jpYear: 2099 }, T))
     /* Der Tag kommt aus dem Argument, nie aus der Uhr: am 01.01.2025 ist ein Start am 01.06.2025 noch geplant, an jedem späteren Tag nicht. */
     pruefe('Reihen-Reiter: Start nach dem Stichtag ist geplant, am Tag danach erschienen', !ohneDeutscheSynchro({ ohneSynchro: true, jpStart: '2025-06-01' }, '2025-01-01') && ohneDeutscheSynchro({ ohneSynchro: true, jpStart: '2025-06-01' }, '2025-06-02'))
-    pruefe('Reihen-Reiter: Jahr aus dem Stichtag (2024: Teil von 2025 ist geplant)', !ohneDeutscheSynchro({ ohneSynchro: true, jpYear: 2025 }, '2024-03-01'))
+    pruefe('Reihen-Reiter: Jahr aus dem Stichtag (2024: Teile von 2025 und 2024 sind geplant, egal was die Uhr sagt)', !ohneDeutscheSynchro({ ohneSynchro: true, jpYear: 2025 }, '2024-03-01') && !ohneDeutscheSynchro({ ohneSynchro: true, jpYear: 2024 }, '2024-03-01'))
   }
   pruefe('Folgenliste: bei „fertig" zählt raus (Ereignisse) nicht als Folgennummer (One Piece: 10)', erschieneneFuerFolgenliste({ art: 'fertig', raus: 10 }) === undefined && erschieneneFuerFolgenliste({ art: 'laeuft', raus: 5 }) === 5 && erschieneneFuerFolgenliste(undefined) === undefined)
   pruefe('manime.de-News und Collectors-Junkies-Beiträge werden gelesen, deren Startseiten nicht', istArtikel('https://www.manime.de/news/rtl-toggo-zensiert-dragon-ball-daima/0064225/') && istArtikel('https://collectors-junkies.com/code-geass-lelouch-of-the-rebellion-staffel-12-gesamtausgabe-auf-blu-ray-ab-september-2026/') && !istArtikel('https://collectors-junkies.com/') && !istArtikel('https://www.manime.de/'))

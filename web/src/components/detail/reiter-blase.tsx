@@ -34,7 +34,7 @@ export function useReiterBlase(text: (schluessel: number) => string) {
   }
   const inhalt = offen === undefined ? '' : text(offen)
   const an = (schluessel: number) => ({
-    'aria-describedby': inhalt && offen === schluessel ? blasenId : undefined,
+    'aria-describedby': offen === schluessel ? blasenId : undefined,
     onMouseEnter: (e: MouseEvent<HTMLElement>) => !perTouch.current && auf(schluessel, e.currentTarget),
     onMouseLeave: zu,
     onFocus: (e: FocusEvent<HTMLElement>) => fokusZeigtBlase(e.currentTarget) && auf(schluessel, e.currentTarget),

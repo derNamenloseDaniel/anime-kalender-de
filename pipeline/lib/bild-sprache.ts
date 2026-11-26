@@ -11,6 +11,17 @@ export function alsLookup<T>(roh: Record<string, T | null>, gilt: Record<string,
   return (id) => (String(id) in roh && !(String(id) in gilt) ? null : gilt[String(id)])
 }
 
+/**
+ * Titel ohne TMDB-Serie (Suche ohne Treffer, `miss` ohne Kennung) haben nie einen Banner-Abruf (`holeBanner` fragt nur Titel mit Kennung):
+ * „nie gesucht“ ist für sie falsch, TMDB hat kein Banner (`null`). Ein vorhandener Eintrag gewinnt.
+ */
+export function bannerOhneTmdbSerie<T>(banner: BildLookup<T>, ohneSerie: ReadonlySet<number>): BildLookup<T> {
+  return (id) => {
+    const eintrag = banner(id)
+    return eintrag === undefined && ohneSerie.has(id) ? null : eintrag
+  }
+}
+
 /** Grund, warum ein Bild mit fremder Schrift zu Recht steht. */
 export const KEINE_LESBARE = 'keine-lesbare-fassung'
 

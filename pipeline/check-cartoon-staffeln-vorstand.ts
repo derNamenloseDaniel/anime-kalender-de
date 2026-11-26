@@ -71,7 +71,7 @@ try {
   // Staffeln: Bau streicht Staffeln von -900003 (nicht gelistet) bzw. Staffeln und Listeneintrag von -900002.
   schreibe([cartoon(-900001, 2, true), cartoon(-900002, 2), cartoon(-900003, 0)], [eintrag(-900002)])
   const ohneStaffeln = staffeln()
-  pruefe('Staffeln: Bau streicht Staffeln eines Titels, der bleibt → rot', ohneStaffeln.code === 1 && ohneStaffeln.aus.includes('-900003'), ohneStaffeln.aus)
+  pruefe('Staffeln: Bau streicht Staffeln eines Titels, der bleibt → rot', ohneStaffeln.code === 1 && ohneStaffeln.aus.includes('-900003') && ohneStaffeln.aus.includes('hatten im Vorstand HEAD Staffeln oder'), ohneStaffeln.aus)
   schreibe([cartoon(-900001, 2, true), cartoon(-900002, 0), cartoon(-900003, 1)], [])
   const beides = staffeln()
   pruefe('Staffeln: Soll und Ist zugleich gestrichen → rot', beides.code === 1 && beides.aus.includes('-900002'), beides.aus)
@@ -81,7 +81,7 @@ try {
   // Wege: Bau hebt die Verteilung von -900001 auf, ohne den Titel auf die Liste zu setzen (Soll und Ist zugleich ohne ihn).
   schreibe([cartoon(-900001, 2), cartoon(-900002, 2), cartoon(-900003, 1)], [eintrag(-900002)])
   const ganzWeg = wege()
-  pruefe('Wege: Verteilung aufgehoben, Titel mit zwei Staffeln nicht gelistet → rot', ganzWeg.code === 1 && ganzWeg.aus.includes('-900001'), ganzWeg.aus)
+  pruefe('Wege: Verteilung aufgehoben, Titel mit zwei Staffeln nicht gelistet → rot', ganzWeg.code === 1 && ganzWeg.aus.includes('-900001') && ganzWeg.aus.includes('hatten im Vorstand HEAD verteilte Wege'), ganzWeg.aus)
   schreibe([cartoon(-900001, 2), cartoon(-900002, 2), cartoon(-900003, 1)], [eintrag(-900001), eintrag(-900002)])
   pruefe('Wege: Verteilung aufgehoben, Titel steht jetzt auf der Liste → grün', wege().code === 0, wege().aus)
   schreibe([cartoon(-900001, 2, true), cartoon(-900002, 2), cartoon(-900003, 1)], [])
@@ -94,7 +94,7 @@ try {
 
   for (const [name, f] of [['Staffel', staffeln], ['Wege', wege]] as const) {
     const fremd = f('--vorstand', 'gibtsnicht')
-    pruefe(`${name}-Wache: Vorstand nicht lesbar → rot`, fremd.code === 1 && fremd.aus.includes('Vorstand'), fremd.aus)
+    pruefe(`${name}-Wache: Vorstand nicht lesbar → rot`, fremd.code === 1 && fremd.aus.includes('Vorstand gibtsnicht nicht lesbar'), fremd.aus)
   }
 } finally {
   rmSync(wurzel, { recursive: true, force: true })

@@ -24,13 +24,11 @@ export function coverVerlust(vorher: CoverStand, jetzt: CoverStand): string[] {
   return abgaengeOhneGrund(kennungen(vorher).mitCover, j.mitCover, (k) => !j.alle.has(k))
 }
 
-const liste = <T>(roh: T[] | Record<string, T> | undefined): T[] => (Array.isArray(roh) ? roh : Object.values(roh ?? {}))
-
 /** Der Stand im Vorstand `ref` unter `wurzel`; wirft bei unbekanntem Stand oder kaputtem Inhalt. */
 export function coverStandImVorstand(ref: string, wurzel: string): CoverStand {
   const lies = <T>(name: string) => leseVorstandJson<T>(`public/data/${name}`, ref, wurzel)
   return {
     reihen: lies<Record<string, Eintrag[]>>('franchises.json') ?? {},
-    datenbank: [...liste(lies<Eintrag[]>('titles.json')), ...liste(lies<Eintrag[] | Record<string, Eintrag>>('ohne-synchro.json'))],
+    datenbank: [...(lies<Eintrag[]>('titles.json') ?? []), ...(lies<Eintrag[]>('ohne-synchro.json') ?? [])],
   }
 }

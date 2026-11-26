@@ -74,6 +74,10 @@ try {
   const teil = lauf()
   pruefe('Kennung verliert das Cover nur in der Reihe, Datenbank behält es → rot', teil.code === 1 && teil.aus.includes('900001'), teil.aus)
 
+  schreibe({ ...VORSTAND, reihen: { '900001': [{ id: 900002, cover: bild }] }, titel: [{ id: 900001 }, { id: 900003 }], luecken: { ...VORSTAND.luecken, '900001': 'ohne-quelle' } })
+  const haupt = lauf()
+  pruefe('Hauptbestand: Titel verliert sein Cover (Reihe ohne ihn) → rot mit Kennung', haupt.code === 1 && haupt.aus.includes('900001'), haupt.aus)
+
   schreibe({ ...VORSTAND, ohne: [...VORSTAND.ohne, { id: 900006 }], luecken: { ...VORSTAND.luecken, '900006': 'nicht-abgerufen' } })
   pruefe('neue Kennung ohne Cover auf der Lückenliste → grün', lauf().code === 0, lauf().aus)
 

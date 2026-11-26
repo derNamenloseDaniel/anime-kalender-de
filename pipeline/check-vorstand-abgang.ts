@@ -27,6 +27,7 @@ pruefe('Freigabe nimmt nur die Schlüssel der eigenen Wache heraus', ohneFreigab
 pruefe('Wache ohne Freigaben: alles bleibt', ohneFreigabe(['b', 'd'], 'w3', frei), ['b', 'd'])
 
 pruefe('--vorstand <ref>', vorstandRef(['x', '--vorstand', 'HEAD^1']), 'HEAD^1')
+pruefe('--vorstand als erstes Argument', vorstandRef(['--vorstand', 'HEAD~2']), 'HEAD~2')
 pruefe('ohne --vorstand: HEAD', vorstandRef(['x']), 'HEAD')
 pruefe('--vorstand ohne Wert: HEAD', vorstandRef(['--vorstand']), 'HEAD')
 

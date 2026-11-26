@@ -81,6 +81,16 @@ try {
   schreibe([wurzelTitel, glied(10_900_001, true)], [glied(10_900_002, true)])
   const fremd = lauf('--vorstand', 'gibtsnicht')
   pruefe('Vorstand nicht lesbar → rot', fremd.code === 1 && fremd.aus.includes('Vorstand gibtsnicht nicht lesbar'), fremd.aus)
+
+  // Zweiter Vorstand: ein AniList-Glied (900002) und das kleinste aniSearch-Glied (10 000 000) in der Reihe.
+  schreibe([wurzelTitel, glied(900_002, true), glied(10_000_000, true)], [])
+  git('add', '.')
+  git('commit', '-q', '-m', 'vorstand 2')
+  schreibe([wurzelTitel, glied(900_002, false), glied(10_000_000, true)], [])
+  pruefe('AniList-Titel verliert die Reihe → nicht Sache dieser Wache, grün', lauf().code === 0, lauf().aus)
+  schreibe([wurzelTitel, glied(900_002, true), glied(10_000_000, false)], [])
+  const grenze = lauf()
+  pruefe('kleinste aniSearch-Kennung 10000000 verliert die Reihe → rot', grenze.code === 1 && grenze.aus.includes('10000000'), grenze.aus)
 } finally {
   rmSync(wurzel, { recursive: true, force: true })
 }

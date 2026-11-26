@@ -21,13 +21,12 @@ export function reihenAbgaenge(vorher: Pick<Title, 'id' | 'franchiseId'>[], jetz
 }
 
 type Zeile = Pick<Title, 'id' | 'franchiseId'>
-const liste = (roh: Zeile[] | Record<string, Zeile> | undefined): Zeile[] => (Array.isArray(roh) ? roh : Object.values(roh ?? {}))
 
 /** Die Wache am echten Bestand (`titles.json` + `ohne-synchro.json`): Fehlerzeilen gegen den Vorstand `ref`; ein nicht lesbarer Vorstand ist selbst ein Fehler. */
 export function reihenGegenVorstand(ref: string): string[] {
-  const bestand = (lies: (pfad: string) => Zeile[] | Record<string, Zeile> | undefined): Zeile[] => [
-    ...liste(lies('public/data/titles.json')),
-    ...liste(lies('public/data/ohne-synchro.json')),
+  const bestand = (lies: (pfad: string) => Zeile[] | undefined): Zeile[] => [
+    ...(lies('public/data/titles.json') ?? []),
+    ...(lies('public/data/ohne-synchro.json') ?? []),
   ]
   let vorher: Zeile[]
   try {

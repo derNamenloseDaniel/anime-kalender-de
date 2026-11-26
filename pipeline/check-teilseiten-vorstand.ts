@@ -95,7 +95,7 @@ for (const p of PLATTFORMEN) {
 
     schreibe(titel([{}, {}]), [])
     const fremd = lauf('--vorstand', 'gibtsnicht')
-    pruefe(`${p.plattform}: Vorstand nicht lesbar → rot`, fremd.code === 1 && fremd.aus.includes('Vorstand'), fremd.aus)
+    pruefe(`${p.plattform}: Vorstand nicht lesbar → rot`, fremd.code === 1 && fremd.aus.includes('Vorstand gibtsnicht nicht lesbar'), fremd.aus)
   } finally {
     rmSync(wurzel, { recursive: true, force: true })
   }

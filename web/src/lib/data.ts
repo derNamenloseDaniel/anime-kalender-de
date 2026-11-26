@@ -336,7 +336,7 @@ export interface VoiceRole {
    * die die Angaben zeigt. Ohne dieses Feld liesse sich nicht sagen, ob der
    * Link ueberhaupt faellig ist.
    */
-  von?: 'ann' | 'anisearch'
+  von?: 'ann' | 'anisearch' | 'wikipedia'
 }
 
 /** Die Sprecherliste eines Titels samt Herkunft. */
@@ -344,6 +344,8 @@ export interface Voices {
   roles: VoiceRole[]
   /** Adresse des ANN-Encyclopedia-Eintrags, wenn von dort Rollen stammen. */
   annUrl?: string
+  /** de.wikipedia-Seite der Rollen (CC BY-SA: Quelle mit Link); `unsicher` = Tabelle nennt diesen Teil nicht. */
+  wikipedia?: { seite: string; url: string; unsicher?: string }
 }
 
 const voiceCache = new Map<number, Promise<Voices>>()
@@ -362,8 +364,8 @@ const voiceCache = new Map<number, Promise<Voices>>()
 export function loadVoices(titleId: number): Promise<Voices> {
   let geladen = voiceCache.get(titleId)
   if (!geladen) {
-    geladen = loadJson<{ roles?: VoiceRole[]; annUrl?: string }>(`voices/${titleId}.json`)
-      .then((d) => ({ roles: d.roles ?? [], annUrl: d.annUrl }))
+    geladen = loadJson<{ roles?: VoiceRole[]; annUrl?: string; wikipedia?: Voices['wikipedia'] }>(`voices/${titleId}.json`)
+      .then((d) => ({ roles: d.roles ?? [], annUrl: d.annUrl, wikipedia: d.wikipedia }))
       .catch(() => ({ roles: [] }))
     voiceCache.set(titleId, geladen)
   }

@@ -7215,6 +7215,16 @@ pruefe(
   pruefe('Staffelstart: Folge 2 ist keiner', !istStaffelstart(ev('w', 2), data))
   pruefe('Staffelstart: geteilter Start zählt ab firstEpisodeNumber', istStaffelstart(ev('teil2', 13), data) && !istStaffelstart(ev('teil2', 1), data))
   pruefe('Staffelstart: „im Angebot seit" ist kein Start', !istStaffelstart(ev('katalog', 1), data))
+  /* N4 (26.11.2026): „Folge 1 sofort, Rest wöchentlich" — Folge 2 desselben Titels beim selben Anbieter ist kein Start. */
+  data.releaseBySlug.set('sofort-f1', rel('sofort-f1', { titleId: 7, releaseType: 'batch', schedule: { firstEpisodeDate: '2026-10-05', episodeCount: 1 } }))
+  data.releaseBySlug.set('sofort-rest', rel('sofort-rest', { titleId: 7, schedule: { firstEpisodeDate: '2026-10-10', firstEpisodeNumber: 2, episodeCount: 11 } }))
+  data.releaseBySlug.set('sonst-teil2', rel('sonst-teil2', { titleId: 8, platform: 'netflix', schedule: { firstEpisodeDate: '2026-10-10', firstEpisodeNumber: 13 } }))
+  data.releaseBySlug.set('sonst-f1', rel('sonst-f1', { titleId: 8, platform: 'crunchyroll', schedule: { firstEpisodeDate: '2026-04-01' } }))
+  data.releaseBySlug.set('nr5', rel('nr5', { titleId: 9, schedule: { firstEpisodeDate: '2026-04-01', firstEpisodeNumber: 5 } }))
+  data.releaseBySlug.set('nr1', rel('nr1', { titleId: 9, schedule: { firstEpisodeDate: '2026-10-10' } }))
+  pruefe('Staffelstart N4: früherer Release mit höherer Startnummer verhindert keinen Start', istStaffelstart(ev('nr1', 1, { titleId: 9 }), data))
+  pruefe('Staffelstart N4: frühere Folge beim selben Anbieter → kein Start', !istStaffelstart(ev('sofort-rest', 2, { titleId: 7 }), data))
+  pruefe('Staffelstart N4: frühere Folge bei einem anderen Anbieter ändert nichts', istStaffelstart(ev('sonst-teil2', 13, { titleId: 8, platform: 'netflix' }), data))
   pruefe('Staffelstart: Fernsehen fragt tvPremiere(), nicht diese Regel', !istStaffelstart(ev('w', 1, { platform: 'tv' }), data))
   /* Staffelfinale (26.09.2026): letzte Folge nur bei belegter Folgenzahl — eine geratene macht kein Finale. */
   data.releaseBySlug.set('geraten', rel('geraten', { schedule: { firstEpisodeDate: '2026-10-01', episodeCountAssumed: true } }))

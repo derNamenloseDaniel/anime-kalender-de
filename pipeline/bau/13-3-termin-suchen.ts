@@ -26,11 +26,17 @@ export function offeneTerminSuchen(releases: Release[], titles: Title[]): Offene
 
 /**
  * Wächter-Kern (Daniel, 26.11.2026: „jeder Suchlink führt direkt auf die Seite oder steht auf der Suchauftragsliste“): Prime-Pillen des fertigen Bestands,
- * die in die Suche führen und weder einen Direktlink desselben Kanals haben (`adresseDesWegs`) noch auf der Liste stehen (`auftragsIds`).
+ * die in die Suche führen und weder einen Direktlink desselben Kanals haben (`adresseDesWegs`) noch auf der Liste stehen (`auftragsIds`). Titel mit Prime-Handbeleg (`geprueft`) legt die Erweiterung nicht erneut vor: sie zählen als `ungeklaert` (Ratsche im Aufrufer), nicht als Verstoß.
  */
-export function suchlinksOhneAusweg(releases: Release[], titles: Title[], auftragsIds: ReadonlySet<number>): string[] {
+export function suchlinksOhneAusweg(
+  releases: Release[],
+  titles: Title[],
+  auftragsIds: ReadonlySet<number>,
+  geprueft: ReadonlySet<number> = new Set(),
+): { probleme: string[]; ungeklaert: number[] } {
   const titelNachId = new Map(titles.map((t) => [t.id, t]))
   const probleme: string[] = []
+  const ungeklaert: number[] = []
   for (const r of releases) {
     if (r.platform !== 'primevideo' || r.releaseType === 'disc' || r.buyUrl) continue
     if (r.platformUrl && !istKeineTitelseite(r.platformUrl)) continue
@@ -38,7 +44,9 @@ export function suchlinksOhneAusweg(releases: Release[], titles: Title[], auftra
     if (!titel) continue
     const direkt = adresseDesWegs(r, titel)
     if (direkt) probleme.push(`${r.slug}: Pille führt in die Suche, der Direktlink desselben Kanals liegt vor (${direkt})`)
-    else if (!auftragsIds.has(r.titleId)) probleme.push(`${r.slug}: Pille führt in die Suche, Titel ${r.titleId} steht auf keiner Suchauftragsliste`)
+    else if (auftragsIds.has(r.titleId)) continue
+    else if (geprueft.has(r.titleId)) ungeklaert.push(r.titleId)
+    else probleme.push(`${r.slug}: Pille führt in die Suche, Titel ${r.titleId} steht auf keiner Suchauftragsliste`)
   }
-  return probleme
+  return { probleme, ungeklaert }
 }

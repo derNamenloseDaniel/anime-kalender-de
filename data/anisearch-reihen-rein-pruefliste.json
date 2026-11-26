@@ -1,8 +1,8 @@
 {
-  "stand": "2026-11-25",
+  "stand": "2026-11-26",
   "bestand": {
-    "inReihen": 3026,
-    "reihen": 819,
+    "inReihen": 3028,
+    "reihen": 820,
     "pruefliste": [
       {
         "art": "verschmilzt",
@@ -1586,8 +1586,8 @@
     ]
   },
   "katalog": {
-    "inReihen": 12060,
-    "reihen": 3081,
+    "inReihen": 12063,
+    "reihen": 3067,
     "pruefliste": [
       {
         "art": "verschmilzt",
@@ -1707,23 +1707,6 @@
         ],
         "alleinstehende": [],
         "beispiel": "Mashin Eiyuuden Wataru —?→ Mashin Eiyuuden Wataru: Shichi Kon no Ryuujinmaru"
-      },
-      {
-        "art": "verschmilzt",
-        "reihen": [
-          {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 21506,
-            "name": "Mahoutsukai Precure!",
-            "titel": 3
-          }
-        ],
-        "alleinstehende": [],
-        "beispiel": "Futari wa Precure —?→ Mahoutsukai Precure!"
       },
       {
         "art": "verschmilzt",
@@ -4067,25 +4050,6 @@
         "art": "mehrdeutig",
         "reihen": [
           {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 105857,
-            "name": "Star☆Twinkle Precure",
-            "titel": 2
-          }
-        ],
-        "alleinstehende": [
-          "Precure Miracle Leap: Minna to no Fushigi na Ichinichi"
-        ],
-        "beispiel": ""
-      },
-      {
-        "art": "mehrdeutig",
-        "reihen": [
-          {
             "id": 97765,
             "name": "Cinderella Girls Gekijou",
             "titel": 9
@@ -4787,23 +4751,6 @@
         "art": "universum",
         "reihen": [
           {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 98059,
-            "name": "Kirakira☆Precure a la Mode",
-            "titel": 2
-          }
-        ],
-        "alleinstehende": [],
-        "beispiel": "Kirakira☆Precure a la Mode —Gemeinsames Universum→ Futari wa Precure"
-      },
-      {
-        "art": "universum",
-        "reihen": [
-          {
             "id": 97863,
             "name": "Hajimete no Gal",
             "titel": 2
@@ -5212,23 +5159,6 @@
         "art": "universum",
         "reihen": [
           {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 105857,
-            "name": "Star☆Twinkle Precure",
-            "titel": 2
-          }
-        ],
-        "alleinstehende": [],
-        "beispiel": "Star☆Twinkle Precure —Gemeinsames Universum→ Futari wa Precure"
-      },
-      {
-        "art": "universum",
-        "reihen": [
-          {
             "id": 266,
             "name": "Gunparade March: Arata Naru Kougunka",
             "titel": 1
@@ -5360,23 +5290,6 @@
         ],
         "alleinstehende": [],
         "beispiel": "Love Live! Nijigasaki Gakuen School Idol Doukoukai —Gemeinsames Universum→ Love Live! School idol project"
-      },
-      {
-        "art": "universum",
-        "reihen": [
-          {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 112748,
-            "name": "Healin' Good♥Precure",
-            "titel": 2
-          }
-        ],
-        "alleinstehende": [],
-        "beispiel": "Healin' Good♥Precure —Gemeinsames Universum→ Futari wa Precure"
       },
       {
         "art": "universum",
@@ -5603,23 +5516,6 @@
         "art": "universum",
         "reihen": [
           {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 126905,
-            "name": "Tropical-Rouge! Precure",
-            "titel": 2
-          }
-        ],
-        "alleinstehende": [],
-        "beispiel": "Tropical-Rouge! Precure —Gemeinsames Universum→ Futari wa Precure"
-      },
-      {
-        "art": "universum",
-        "reihen": [
-          {
             "id": 356,
             "name": "Fate/stay night",
             "titel": 63
@@ -5666,23 +5562,6 @@
         ],
         "alleinstehende": [],
         "beispiel": "Holy Knight Light —Gemeinsames Universum→ Arknights: Reimei Zensou"
-      },
-      {
-        "art": "universum",
-        "reihen": [
-          {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 1534,
-            "name": "Futari wa Precure: Splash☆Star",
-            "titel": 8
-          }
-        ],
-        "alleinstehende": [],
-        "beispiel": "Futari wa Precure: Splash☆Star —Gemeinsames Universum→ Futari wa Precure"
       },
       {
         "art": "universum",
@@ -5824,23 +5703,6 @@
         "art": "universum",
         "reihen": [
           {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 142080,
-            "name": "Delicious Party♡Precure",
-            "titel": 3
-          }
-        ],
-        "alleinstehende": [],
-        "beispiel": "Delicious Party♡Precure —Gemeinsames Universum→ Futari wa Precure"
-      },
-      {
-        "art": "universum",
-        "reihen": [
-          {
             "id": 196,
             "name": "Onegai☆Twins",
             "titel": 2
@@ -5960,23 +5822,6 @@
         "art": "universum",
         "reihen": [
           {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 157883,
-            "name": "Hirogaru Sky! Precure",
-            "titel": 1
-          }
-        ],
-        "alleinstehende": [],
-        "beispiel": "Hirogaru Sky! Precure —Gemeinsames Universum→ Futari wa Precure"
-      },
-      {
-        "art": "universum",
-        "reihen": [
-          {
             "id": 288,
             "name": "Bakuten Shoot Beyblade",
             "titel": 4
@@ -6057,40 +5902,6 @@
         ],
         "alleinstehende": [],
         "beispiel": "Shingetsutan Tsukihime —Gemeinsames Universum→ Fate/stay night"
-      },
-      {
-        "art": "universum",
-        "reihen": [
-          {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 169403,
-            "name": "Wonderful Precure! The Movie! Dokidoki♡Game no Sekai de Daibouken!",
-            "titel": 2
-          }
-        ],
-        "alleinstehende": [],
-        "beispiel": "Wonderful Precure! —Gemeinsames Universum→ Futari wa Precure"
-      },
-      {
-        "art": "universum",
-        "reihen": [
-          {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 5684,
-            "name": "Fresh Precure!",
-            "titel": 2
-          }
-        ],
-        "alleinstehende": [],
-        "beispiel": "Fresh Precure! —Gemeinsames Universum→ Futari wa Precure"
       },
       {
         "art": "universum",
@@ -6198,23 +6009,6 @@
         "art": "universum",
         "reihen": [
           {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 183414,
-            "name": "Kimi to Idol Precure♪ Omatase! Kimi ni Todokeru KirakkiLive!",
-            "titel": 2
-          }
-        ],
-        "alleinstehende": [],
-        "beispiel": "Kimi to Idol Precure♪ —Gemeinsames Universum→ Futari wa Precure"
-      },
-      {
-        "art": "universum",
-        "reihen": [
-          {
             "id": 184951,
             "name": "Seihantai na Kimi to Boku",
             "titel": 2
@@ -6261,23 +6055,6 @@
         ],
         "alleinstehende": [],
         "beispiel": "Love Live! Hasunosora Jogakuin School Idol Club: Bloom Garden Party —Gemeinsames Universum→ Love Live! School idol project"
-      },
-      {
-        "art": "universum",
-        "reihen": [
-          {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 198654,
-            "name": "Meitantei Precure! Fushigi na Niwa to Futari no Himitsu",
-            "titel": 2
-          }
-        ],
-        "alleinstehende": [],
-        "beispiel": "Meitantei Precure! —Gemeinsames Universum→ Futari wa Precure"
       },
       {
         "art": "universum",
@@ -6404,24 +6181,7 @@
           {
             "id": 603,
             "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 20577,
-            "name": "HappinessCharge Precure!",
-            "titel": 2
-          }
-        ],
-        "alleinstehende": [],
-        "beispiel": "Futari wa Precure —Gemeinsames Universum→ HappinessCharge Precure!"
-      },
-      {
-        "art": "universum",
-        "reihen": [
-          {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
+            "titel": 48
           },
           {
             "id": 16419,
@@ -6438,7 +6198,7 @@
           {
             "id": 603,
             "name": "Futari wa Precure",
-            "titel": 9
+            "titel": 48
           },
           {
             "id": 12191,
@@ -6448,40 +6208,6 @@
         ],
         "alleinstehende": [],
         "beispiel": "Futari wa Precure —Gemeinsames Universum→ Smile Precure!"
-      },
-      {
-        "art": "universum",
-        "reihen": [
-          {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 9893,
-            "name": "Suite Precure♪",
-            "titel": 2
-          }
-        ],
-        "alleinstehende": [],
-        "beispiel": "Futari wa Precure —Gemeinsames Universum→ Suite Precure♪"
-      },
-      {
-        "art": "universum",
-        "reihen": [
-          {
-            "id": 603,
-            "name": "Futari wa Precure",
-            "titel": 9
-          },
-          {
-            "id": 7645,
-            "name": "Heartcatch Precure!",
-            "titel": 2
-          }
-        ],
-        "alleinstehende": [],
-        "beispiel": "Futari wa Precure —Gemeinsames Universum→ Heartcatch Precure!"
       },
       {
         "art": "universum",

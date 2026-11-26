@@ -10,36 +10,6 @@ X-WR-TIMEZONE:Europe/Berlin
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:auto-158871-tv-super-rtl@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T151500Z
-DTEND:20261118T154500Z
-SUMMARY:Pokémon Horizonte – Folge 34
-DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
- ails: https://anime-kalender.de/t/14839/
-CATEGORIES:Super RTL
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-158871-tv-toggo-plus@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T161500Z
-DTEND:20261118T164500Z
-SUMMARY:Pokémon Horizonte – Folge 34
-DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/14839/
-CATEGORIES:TOGGO plus
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-112153-tv-toggo-plus@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T201500Z
-DTEND:20261118T204500Z
-SUMMARY:Pokémon Reisen: Die Serie
-DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/10852/
-CATEGORIES:TOGGO plus
-END:VEVENT
-BEGIN:VEVENT
 UID:auto-158871-tv-super-rtl@2026-11-19@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261119T151500Z
@@ -225,6 +195,36 @@ UID:auto-112153-tv-toggo-plus@2026-11-25@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261125T201500Z
 DTEND:20261125T204500Z
+SUMMARY:Pokémon Reisen: Die Serie
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/10852/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-158871-tv-super-rtl@2026-11-26@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261126T151500Z
+DTEND:20261126T154500Z
+SUMMARY:Pokémon Horizonte – Folge 40
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/14839/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-158871-tv-toggo-plus@2026-11-26@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261126T161500Z
+DTEND:20261126T164500Z
+SUMMARY:Pokémon Horizonte – Folge 40
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/14839/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-112153-tv-toggo-plus@2026-11-26@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261126T201500Z
+DTEND:20261126T204500Z
 SUMMARY:Pokémon Reisen: Die Serie
 DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
  tails: https://anime-kalender.de/t/10852/

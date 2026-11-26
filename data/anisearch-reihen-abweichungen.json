@@ -1,47 +1,47 @@
 {
-  "stand": "2026-11-25",
+  "stand": "2026-11-26",
   "deckung": {
-    "titel": 20714,
+    "titel": 20717,
     "mitSeite": 16343,
     "ohneSeite": 8,
-    "ohneAnisearchKennung": 3091,
+    "ohneAnisearchKennung": 3094,
     "ohneReferenz": 1272,
     "seitenImArchiv": 17550,
     "kanten": 18616
   },
   "gesamt": {
     "titel": 16343,
-    "gleich": 14003,
-    "fehlen": 902,
-    "zusaetzlich": 1321,
+    "gleich": 13980,
+    "fehlen": 947,
+    "zusaetzlich": 1299,
     "gemischt": 117
   },
   "hauptbestand": {
-    "titel": 2874,
-    "gleich": 2288,
-    "fehlen": 327,
-    "zusaetzlich": 243,
+    "titel": 2875,
+    "gleich": 2289,
+    "fehlen": 328,
+    "zusaetzlich": 242,
     "gemischt": 16
   },
   "haelfteA": {
-    "titel": 7468,
-    "gleich": 6338,
+    "titel": 7447,
+    "gleich": 6328,
     "fehlen": 314,
-    "zusaetzlich": 706,
+    "zusaetzlich": 695,
     "gemischt": 110
   },
   "haelfteB": {
-    "titel": 8875,
-    "gleich": 7665,
-    "fehlen": 588,
-    "zusaetzlich": 615,
+    "titel": 8896,
+    "gleich": 7652,
+    "fehlen": 633,
+    "zusaetzlich": 604,
     "gemischt": 7
   },
   "cluster": {
-    "einzel": 5762,
-    "gleich": 2454,
-    "zerlegt": 102,
-    "verschmilzt": 105,
+    "einzel": 5761,
+    "gleich": 2443,
+    "zerlegt": 103,
+    "verschmilzt": 104,
     "gemischt": 10
   },
   "beispiele": {
@@ -59,6 +59,13 @@
         "titel": 83,
         "referenz": 1,
         "anisearch": 2
+      },
+      {
+        "id": 603,
+        "name": "Futari wa Precure",
+        "titel": 45,
+        "referenz": 1,
+        "anisearch": 13
       },
       {
         "id": 1685,
@@ -178,13 +185,6 @@
         "titel": 11,
         "referenz": 1,
         "anisearch": 5
-      },
-      {
-        "id": 30,
-        "name": "Shin Seiki Evangelion",
-        "titel": 10,
-        "referenz": 1,
-        "anisearch": 2
       }
     ],
     "verschmilzt": [
@@ -280,13 +280,6 @@
         "anisearch": 1
       },
       {
-        "id": 603,
-        "name": "Futari wa Precure",
-        "titel": 22,
-        "referenz": 4,
-        "anisearch": 1
-      },
-      {
         "id": 967,
         "name": "Hokuto no Ken",
         "titel": 22,
@@ -326,6 +319,13 @@
         "name": "Monster Strike",
         "titel": 19,
         "referenz": 2,
+        "anisearch": 1
+      },
+      {
+        "id": 87435,
+        "name": "BanG Dream!",
+        "titel": 19,
+        "referenz": 3,
         "anisearch": 1
       }
     ],

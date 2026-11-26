@@ -4,6 +4,7 @@ import { ladeTrailerHand } from './lib/trailer-hand.ts'
 import {
   istDeutschesVideo,
   staffelNummer,
+  uebernehmeLabel,
   verwerfungenText,
   videoName,
   waehleLabelTrailer,
@@ -60,6 +61,22 @@ const clip = wahl([foo], [v('a7', 'DRAGON QUEST SAGA | Folge 1 | Deutsch'), v('a
 pruefe('Folge ist kein Trailer; fremder Name trifft nichts', clip.verworfen['kein-trailer'] === 1 && clip.verworfen['kein-treffer'] === 1, clip.verworfen)
 const deJahr = wahl([{ id: 7, titleEn: 'Late Show', jpYear: 2023, deErstausgabe: { von: '2023-08-10' } }], [v('a9', 'LATE SHOW | Trailer | Deutsch', '2026-08-13')])
 pruefe('drei Jahre nach Erstausgabe sind noch im Fenster', deJahr.funde.has(7))
+
+const spaet = wahl([{ id: 8, titleEn: 'Late Show', jpYear: 2023 }], [v('b1', 'LATE SHOW | Trailer | Deutsch', '2027-01-01')])
+pruefe('vier Jahre nach der Ausstrahlung liegen außerhalb des Fensters', spaet.funde.size === 0 && spaet.verworfen.jahr === 1, spaet.verworfen)
+const mehrWorte = wahl([{ id: 9, titleEn: 'Dragon Quest Saga', jpYear: 2024 }], [v('b2', 'DRAGON QUEST SAGA DAWN | Trailer | Deutsch', '2024-05-01')])
+pruefe('Videoname mit zusätzlichem Wort deckt den Titel nicht (kein-treffer)', mehrWorte.funde.size === 0 && mehrWorte.verworfen['kein-treffer'] === 1, mehrWorte.verworfen)
+
+console.log('Übernahme in den Bestand')
+const bestand: Record<string, { sprache?: string; video?: string }> = { '1': { sprache: 'de', video: 'alt-de' }, '2': { sprache: 'en', video: 'alt-en' } }
+const ue = uebernehmeLabel(
+  [{ id: 1, titleEn: 'Dragon Quest Saga', jpYear: 2024 }, { id: 2, titleEn: 'Silver Garden Tales', jpYear: 2024 }, { id: 3, titleEn: 'Crimson Harbor Stories', jpYear: 2024 }],
+  bestand,
+  [v('c1', 'DRAGON QUEST SAGA | Trailer | Deutsch', '2024-05-01'), v('c2', 'SILVER GARDEN TALES | Trailer | Deutsch', '2024-05-01'), v('c3', 'CRIMSON HARBOR STORIES | Trailer | Deutsch', '2024-05-01')],
+  HEUTE,
+)
+pruefe('ein deutscher Eintrag bleibt', bestand['1']?.video === 'alt-de', bestand['1'])
+pruefe('ein englischer wird ersetzt, ein fehlender neu gesetzt', bestand['2']?.video === 'c2' && bestand['3']?.video === 'c3' && ue.ersetzt === 1 && ue.neu === 1, ue)
 
 console.log('Wahl unter mehreren Videos')
 const mehr = wahl([foo], [v('t1', 'DRAGON QUEST SAGA | Teaser | Deutsch', '2026-09-01'), v('t2', 'DRAGON QUEST SAGA | Trailer | Deutsch', '2026-05-01'), v('t3', 'DRAGON QUEST SAGA | Trailer | Deutsch', '2026-07-01')])

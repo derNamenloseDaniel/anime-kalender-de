@@ -12,6 +12,11 @@
  * **Wer abgefragt wird:** Filme und die Einstiege des Entdecken-Pools (`empfehlung.json`),
  * also auch Fernsehserien (Daniel, 26.10.2026). Serien gehen nur über Weg 2 und 3.
  *
+ * **Label-Kanäle vorab, für alle Titel (26.11.2026).** KSM Anime, peppermint u. a. (`data/curated/trailer-label-kanaele.yaml`)
+ * laden deutsche Trailer zu Serien hoch, die weder KinoCheck noch TMDB führen („The Most Heretical Last Boss Queen“).
+ * Ihr Index wird mit dem der Kanäle unten geholt und lokal gegen den **ganzen** Bestand abgeglichen
+ * (`lib/trailer-label.ts`); ein deutscher Fund ersetzt einen englischen oder japanischen. KinoCheck bleibt bei Weg 1 (Filme).
+ *
  * **Drei Wege, in dieser Reihenfolge — und die Reihenfolge ist gemessen.**
  *
  * 1. **Der Kanalindex.** KinoCheck betreibt zwei deutsche Kanäle, und welcher

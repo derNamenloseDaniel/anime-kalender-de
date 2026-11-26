@@ -37592,6 +37592,7 @@
   available: false
   seiteNichtWerk: true
   checkedAt: '2026-10-28'
+  nachgemessenAm: '2026-11-26'
   note: "Daniels Urteil vom 13.09. gilt weiter: Die Seite ist die Hauptserie als Kauftitel, nicht das Special. Die Tonspurmessung vom 16.10. (12 Folgen) liest dieselbe Hauptserie und widerlegt das nicht."
 # --- Aus dem Browser gemeldet, abgeholt am 2026-10-28 ---
 
@@ -39609,6 +39610,7 @@
   url: https://www.amazon.de/gp/video/detail/B09M19FLBJ
   available: false
   checkedAt: '2026-11-11'
+  nachgemessenAm: '2026-11-26'
   note: "Amazon-Seite B09M19FLBJ: alle 0 Folgen geprüft, 5 in der Region gesperrt, Abos: keine Angabe, gti=amzn1.dv.gti.cd1d5cbf-afea-4c0b-aa99-176cf2cb1f06, regionsperre=laut Seite nicht mehr im Abo"
 - anilistId: -61751
   title: "King Julien"
@@ -39936,7 +39938,7 @@
   platform: primevideo
   url: https://www.amazon.de/gp/video/detail/B0F923DJJ9
   dub: false
-  checkedAt: '2026-11-15'
+  checkedAt: '2026-11-26'
   note: "Tonspuren: 日本語 — Amazon-Seite B0F923DJJ9: alle 12 Folgen geprüft, Abos: Prime, aniversede, zugang=abo, gti=amzn1.dv.gti.03b49366-0767-46f7-91dc-9fa95cd48518"
 - anilistId: 101348
   title: "Vinland Saga"
@@ -41699,7 +41701,7 @@
   url: https://www.amazon.de/dp/B0DJKGJQ7K
   dub: false
   checkedAt: '2026-09-09'
-  nachgemessenAm: '2026-11-20'
+  nachgemessenAm: '2026-11-26'
   zweiteQuelle: "JustWatch 2026-09-07: Anime Digital Network Amazon Channel — Ton ja, Deutsch nur als Untertitel"
   note: "Zwei Quellen ohne deutschen Ton: die Kanal-Meldung aus der Erweiterung (für sich kein Beleg, siehe CLAUDE.md) und JustWatch mit 1 Angebot(en), deren Tonspuren belegt sind und Deutsch nicht enthalten."
 # --- Aus dem Browser gemeldet, abgeholt am 2026-11-20 ---
@@ -41719,14 +41721,14 @@
   platform: primevideo
   url: https://www.amazon.de/gp/video/detail/B0FJGFB2FZ
   dub: false
-  checkedAt: '2026-10-24'
+  checkedAt: '2026-11-26'
   note: "Amazon-Seite B0FJGFB2FZ: alle 2 Folgen geprüft, 24 in der Region gesperrt, Abos: keine Angabe, gti=amzn1.dv.gti.2cd353e8-5d28-4ebb-b09f-197ffbabf075, regionsperre=laut Seite nicht mehr im Abo"
 - anilistId: 111790
   title: "Haikyu!! An Land vs. In der Luft / Der ”Weg” des Balls"
   platform: primevideo
   url: https://www.amazon.de/gp/video/detail/B0FJ741RY1
   dub: false
-  checkedAt: '2026-10-24'
+  checkedAt: '2026-11-26'
   note: "Amazon-Seite B0FJ741RY1: alle 3 Folgen geprüft, 24 in der Region gesperrt, Abos: keine Angabe, gti=amzn1.dv.gti.9c6c7e4c-cd9b-49da-9403-059c9e1f79cc, regionsperre=laut Seite nicht mehr im Abo"
 # --- Aus dem Browser gemeldet, abgeholt am 2026-11-21 ---
 
@@ -41772,7 +41774,6 @@
   checkedAt: '2026-11-22'
   note: "Nicht auf der Netflix-Seite gemessen, sondern Meldung von Anime2You (Artikel 1056287, anime2you.de/news/1056287/netflix-yamada-kun-synchro-und-mehr/): Staffel 2, Folge 1 am 01.10.2026 bei Netflix, Simulcast jeden Donnerstag, Sprache: Deutsch, Japanisch (UT); gleiche Angabe für November (1062641) und Dezember (1073600). Netflix-Adresse aus dem Netflix-Link im Artikel 1056287. Welche Folgen deutsch vorliegen, ist nicht je Folge belegt."
   zweiteQuelle: "Anime2You 2026-10-01: Die erste Episode der zweiten Staffel von »The Ramparts of Ice« ist bei Netflix verfügbar, Simulcast jeden Donnerstag, Sprache Deutsch, Japanisch (UT). — https://www.anime2you.de/news/1056287/netflix-yamada-kun-synchro-und-mehr/"
-
 # --- Kanal-Meldungen mit zweiter Quelle belegt, 2026-11-23 ---
 - anilistId: 171019
   title: "Isekai Onsen Paradise"
@@ -41808,7 +41809,6 @@
   dub: true
   checkedAt: '2026-11-23'
   note: "Anime2You 03.11.2026 (anime2you.de/news/1066831/joyn-25-anime-neuzugaenge/): „Zorros Geheimnis Laufzeit: 88 Minuten Sprache: Deutsch Stream: Joyn, Prime Video“; Einzelseite nicht gefunden, die Websuche führt den Film in der Joyn-Mediathek aniverse (Adresse ist die Mediathek, nicht der Film)."
-
 # --- Aus dem Browser gemeldet, abgeholt am 2026-11-26 ---
 
 - anilistId: 213457
@@ -41818,7 +41818,6 @@
   dub: true
   checkedAt: '2026-11-26'
   note: "Folgen 1–12 mit deutschem Ton — Tonspuren: de|Deutsch, ja|Japanisch [Original], it|Italienisch, fr|Französisch, es-ES|Spanisch (Spanien), en|Englisch, ar|Arabisch, fil|Filipino, hi|Hindi, ko|Koreanisch, pt-BR|Portugiesisch (Brasilien), es|Spanisch (Lateinamerika), ta|Tamil, te|Telugu, th|Thailändisch — Gemessen in der Randprobe — gemessen: Folge 1 und 12, dazwischen nicht geprüft — Folge 12: Passionsblume"
-
 - anilistId: 141391
   title: "Call of the Night"
   platform: netflix
@@ -41826,3 +41825,480 @@
   dub: true
   checkedAt: '2026-11-26'
   note: "Folgen 1–13 mit deutschem Ton — Tonspuren: de|Deutsch, ja|Japanisch [Original] — Gemessen in der Randprobe — gemessen: Folge 1 und 13, dazwischen nicht geprüft — Folge 13: Die dreizehnte Nacht: Lass uns zusammen sein"
+# --- Aus dem Browser gemeldet, abgeholt am 2026-11-26 ---
+
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/0FHLUKQCL9UWI28QKL6DZP7N9Z
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, Deutsch Dialogue Boost: Medium, Deutsch Dialogue Boost: High — Amazon-Seite 0FHLUKQCL9UWI28QKL6DZP7N9Z: alle 13 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.c2e871fb-3f17-4bd0-b43b-7b206f92144a"
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09BBMYLPZ
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, Deutsch Dialogue Boost: Medium, Deutsch Dialogue Boost: High — Amazon-Seite B09BBMYLPZ: alle 13 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.cd2e5d62-7a4f-4f4c-9e7c-4ef21f715e75"
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09B5JH5FM
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, Deutsch Dialogue Boost: Medium, Deutsch Dialogue Boost: High — Amazon-Seite B09B5JH5FM: alle 13 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.c2e871fb-3f17-4bd0-b43b-7b206f92144a"
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09BG9KHG2
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B09BG9KHG2: alle 13 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.162d1f77-2ee4-4813-9622-d9ae4feda5bd"
+- anilistId: 116674
+  title: "Bleach: Thousand-Year Blood War"
+  platform: disneyplus
+  url: https://www.disneyplus.com/de-de/series/bleach-thousand-year-blood-war/4Afet1Q421gy
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Folgen 1–13 mit deutschem Ton — Tonspuren: de, en, es-419, ja, pt-BR — Widersprüchliche Meldungen zu Folge 10"
+- anilistId: 159322
+  title: "Bleach: Thousand-Year Blood War"
+  platform: disneyplus
+  url: https://www.disneyplus.com/de-de/series/bleach-thousand-year-blood-war/4Afet1Q421gy
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Folgen 1–13 mit deutschem Ton — Tonspuren: de, en, es-419, ja, pt-BR — Widersprüchliche Meldungen zu Folge 10"
+- anilistId: 169755
+  title: "Bleach: Thousand-Year Blood War"
+  platform: disneyplus
+  url: https://www.disneyplus.com/de-de/series/bleach-thousand-year-blood-war/4Afet1Q421gy
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Folgen 1–14 mit deutschem Ton — Tonspuren: de, en, es-419, ja, pt-BR — Widersprüchliche Meldungen zu Folge 10"
+- anilistId: 185874
+  title: "Bleach: Thousand-Year Blood War - The Calamity"
+  platform: disneyplus
+  url: https://www.disneyplus.com/de-de/series/bleach-thousand-year-blood-war/4Afet1Q421gy
+  dub: true
+  dubRanges:
+    - from: 1
+      to: 9
+      dub: true
+      checked: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    - from: 10
+      to: 10
+      dub: false
+      checked: [10]
+  checkedAt: '2026-11-26'
+  note: "Folgen 1–9 mit deutschem Ton, Folge 10 ohne deutschen Ton — Tonspuren: de, en, es-419, ja, pt-BR — Widersprüchliche Meldungen zu Folge 10"
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09BT92PV4
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B09BT92PV4: alle 13 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.2c987476-59d6-4d19-b4ea-f4b81ebffabf"
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09BYF9TS2
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B09BYF9TS2: alle 12 Folgen geprüft, 1 in der Region gesperrt, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.f6caa757-15d5-41df-95da-ee0567954c0d"
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09C2LQFNW
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B09C2LQFNW: alle 13 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.deb92a1e-64e6-4437-97df-1a9b135a68a8"
+- anilistId: -331999
+  title: "Disney Sidekick Adventures"
+  platform: disneyplus
+  url: https://www.disneyplus.com/browse/entity-6037d617-2654-40c0-8d8c-3ac8384ca4cd
+  dub: true
+  dubRanges:
+    - from: 1
+      to: 1
+      dub: false
+      checked: [1]
+    - from: 2
+      to: 2
+      dub: true
+      checked: [2]
+    - from: 3
+      to: 5
+      dub: false
+      checked: [3, 4, 5]
+  checkedAt: '2026-11-26'
+  note: "Folge 1 ohne deutschen Ton, Folge 2 mit deutschem Ton, Folgen 3–5 ohne deutschen Ton — Tonspuren: en"
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09C13VRKN
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B09C13VRKN: alle 13 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.a1753520-7de5-490b-b4b4-3363a6ab9e64"
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09C2LB55W
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B09C2LB55W: alle 13 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.b3676579-9e77-4b46-a9af-97f90cdcdedf"
+- anilistId: 158898
+  title: "Mission: Yozakura Family"
+  platform: disneyplus
+  url: https://www.disneyplus.com/de-de/series/mission-yozakura-family/fiCVxc9GZNVm
+  dub: false
+  checkedAt: '2026-11-26'
+  note: "Folgen 1–27 ohne deutschen Ton — Tonspuren: ja — Widersprüchliche Meldungen zu Folge 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 9, 12"
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09C148HDL
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B09C148HDL: alle 13 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.583935ad-5188-4449-9f92-1134b293b61d"
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09C14514C
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B09C14514C: alle 13 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.d8f449d5-07c4-4ea5-bc1e-d90093b16d8a"
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09C13ZK7J
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B09C13ZK7J: alle 13 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.e210f858-d72a-4519-94bf-4b507e8cee19"
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09CFKMTNS
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B09CFKMTNS: alle 12 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.c861c728-4fdc-434e-9237-35b15e7677f1"
+- anilistId: 21459
+  title: "My Hero Academia"
+  platform: disneyplus
+  url: https://www.disneyplus.com/browse/entity-6c1cfdcd-a3b1-428a-8fe9-aa917d5b6371
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Folgen 1–13 mit deutschem Ton — Tonspuren: de, en, es-419, es-ES, fr-FR, it, ja, pt-BR"
+- anilistId: 21856
+  title: "My Hero Academia 2"
+  platform: disneyplus
+  url: https://www.disneyplus.com/browse/entity-6c1cfdcd-a3b1-428a-8fe9-aa917d5b6371
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Folgen 1–25 mit deutschem Ton — Tonspuren: de, en, es-419, es-ES, fr-FR, it, ja, pt-BR"
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09CFNWS52
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B09CFNWS52: alle 12 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.f8241791-747d-4548-8227-31d08c9c83a7"
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09CF4B3DJ
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B09CF4B3DJ: alle 12 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.06beedb5-50b8-4db0-8172-60141232a0c2"
+- anilistId: 10330
+  title: "Bakugan: Mechtanium Surge"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09CFNWHZ7
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B09CFNWHZ7: alle 10 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.636b7ae1-949f-41a4-a990-92cf75e4a735"
+- anilistId: 603
+  title: "Pretty Cure"
+  platform: disneyplus
+  url: https://www.disneyplus.com/de-de/browse/entity-1d36fbbe-0a91-468e-ac73-8d51337195fa
+  available: false
+  checkedAt: '2026-11-26'
+  note: "Disney+ meldet: nicht in deinem Gebiet verfügbar"
+- anilistId: 101812
+  title: "Code Geass: Lelouch of the Rebellion - Überschreitung"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/0RV9KL75ZO0QYHQQHSSK54PP9V
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite 0RV9KL75ZO0QYHQQHSSK54PP9V: alle 1 Folge geprüft, Abos: keine Angabe, zugang=kauf_oder_leihe, gti=amzn1.dv.gti.d6bb7dff-f1d9-2164-4efe-b91aff5a4433"
+- anilistId: 142329
+  title: "Demon Slayer: Kimetsu no Yaiba - Entertainment District Arc"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0D65Q2GCW
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, English, Español (España), Español (Latinoamérica), Français, Italiano, Português (Brasil), 日本語 — Amazon-Seite B0D65Q2GCW: alle 11 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.9d99d851-0bc5-43d2-9c1a-9d4184a9f362"
+- anilistId: 129874
+  title: "Demon Slayer: Kimetsu no Yaiba - Mugen Train Arc"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/0L0IXLQ35R1J37OAX7TA6WDPFW
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, English, Español (España), Español (Latinoamérica), Français, Italiano, Português (Brasil), 日本語 — Amazon-Seite 0L0IXLQ35R1J37OAX7TA6WDPFW: alle 7 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.662690df-a157-4434-bfd6-cf4f76a0cb6a"
+- anilistId: 185212
+  title: "Detektiv Conan: Der Flashback des Einäugigen"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/0R5OL3W3JCYROA0UIFTPKYRHNI
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite 0R5OL3W3JCYROA0UIFTPKYRHNI: alle 1 Folge geprüft, Abos: keine Angabe, zugang=kauf_oder_leihe, gti=amzn1.dv.gti.caba97c6-120e-4294-bc60-f1ce999c941e"
+- anilistId: 21698
+  title: "Haikyu!! Karasuno vs. Shiratorizawa"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0FJZP9BK5
+  available: false
+  checkedAt: '2026-11-26'
+  note: "Amazon-Seite B0FJZP9BK5: alle 0 Folgen geprüft, 11 in der Region gesperrt, Abos: keine Angabe, gti=amzn1.dv.gti.f258a729-c5d4-4ba2-a227-17d80b96bb0d, regionsperre=laut Seite nicht mehr im Abo"
+- anilistId: 111790
+  title: "Haikyu!! An Land vs. In der Luft / Der ”Weg” des Balls"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0FK8MW87N
+  dub: false
+  checkedAt: '2026-11-26'
+  note: "Amazon-Seite B0FK8MW87N: alle 2 Folgen geprüft, 24 in der Region gesperrt, Abos: keine Angabe, gti=amzn1.dv.gti.338fff59-4470-4a8c-9fed-92f795a83d52, regionsperre=laut Seite nicht mehr im Abo"
+- anilistId: 1889
+  title: "Higurashi no Naku Koro ni Kai"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B09M19FLBJ
+  available: false
+  checkedAt: '2026-11-26'
+  note: "Amazon-Seite B09M19FLBJ: alle 0 Folgen geprüft, 5 in der Region gesperrt, Abos: keine Angabe, gti=amzn1.dv.gti.cd1d5cbf-afea-4c0b-aa99-176cf2cb1f06, regionsperre=laut Seite nicht mehr im Abo"
+- anilistId: 138103
+  title: "How Heavy Are the Dumbbells You Lift? Gnadenlose Trainingsstunde"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0CZSMKH71
+  dub: true
+  kanalMessung: ja
+  checkedAt: '2026-11-26'
+  note: "Folgen 1–2 mit deutschem Ton — Tonspuren: Deutsch, 日本語 — Amazon-Seite B0CZSMKH71: alle 12 Folgen geprüft, Abos: crunchyrollde, zugang=abo_und_kauf, gti=amzn1.dv.gti.f4b3e3f4-cecb-4243-981a-3443b567d7d5 — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 179998
+  title: "Kaiju No. 8: Mission Recon"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/0NVO8VKQP20JT2HXFGNP9PZRU2
+  dub: true
+  kanalMessung: ja
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, English, Español (Latinoamérica), Português (Brasil), Русский, 日本語 — Amazon-Seite 0NVO8VKQP20JT2HXFGNP9PZRU2: alle 1 Folge geprüft, Abos: crunchyrollde, zugang=abo_und_kauf, gti=amzn1.dv.gti.935bdd53-5e65-4f19-82fd-2772c12644aa — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 101343
+  title: "Made in Abyss: Die Reise beginnt"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/0IKTOP3CWF4SPB3YHLJI1D3R1V
+  dub: true
+  kanalMessung: ja
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite 0IKTOP3CWF4SPB3YHLJI1D3R1V: alle 1 Folge geprüft, Abos: cinemixplusde, zugang=abo_und_kauf, gti=amzn1.dv.gti.39d00227-3d19-4bc7-9759-57c324715cb3 — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: -231725
+  title: "Mermaid Magic – Die magische Welt der Meerjungfrauen"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/0MN6Y741JPY1D8IQREIFMK85PO
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, English — Amazon-Seite 0MN6Y741JPY1D8IQREIFMK85PO: alle 10 Folgen geprüft, Abos: Prime, zugang=abo, gti=amzn1.dv.gti.e0e9a3e4-733c-4acd-9df8-a3bbddb362ab"
+- anilistId: 181839
+  title: "Miss Kobayashi’s Dragon Maid: Ein einsamer Drache sehnt sich nach Liebe"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/0GYCZV1T5AVQF0YBI5BBID1439
+  dub: true
+  kanalMessung: ja
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, Deutsch [Audiobeschreibung], English, English [Audio Description], Español (Latinoamérica), Español (Latinoamérica) [descripción de audio], Français, Português (Brasil), Português (Brasil) [Descrição do áudio], 日本語 — Amazon-Seite 0GYCZV1T5AVQF0YBI5BBID1439: alle 1 Folge geprüft, Abos: crunchyrollde, zugang=abo_und_kauf, gti=amzn1.dv.gti.1e61a3d8-44c3-4dc0-ae7c-5c655deceff5 — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: -228436
+  title: "Vida the Vet"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/0GMFUN7998R35BJJ6EKD95L6TN
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite 0GMFUN7998R35BJJ6EKD95L6TN: alle 26 Folgen geprüft, Abos: Prime, kixi, zugang=abo, gti=amzn1.dv.gti.a91ca096-75df-4d42-846e-20ae4ef3466c"
+- anilistId: 8841
+  title: "Is This a Zombie?"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0BYY9NN5D
+  dub: true
+  kanalMessung: ja
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, 日本語 — Amazon-Seite B0BYY9NN5D: alle 12 Folgen geprüft, Abos: aniversede, zugang=abo_und_kauf, gti=amzn1.dv.gti.a84a1651-e4ad-4acd-9cb5-65244cf12438 — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 8841
+  title: "Is This a Zombie?"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0B8TN9LSJ
+  dub: true
+  kanalMessung: ja
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, 日本語 — Amazon-Seite B0B8TN9LSJ: alle 12 Folgen geprüft, Abos: aniversede, zugang=abo_und_kauf, gti=amzn1.dv.gti.a84a1651-e4ad-4acd-9cb5-65244cf12438 — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 2994
+  title: "Death Note: Relight - Visions of a God"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0FVDZ286F
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B0FVDZ286F: alle 1 Folge geprüft, Abos: keine Angabe, zugang=kauf_oder_leihe, gti=amzn1.dv.gti.babbfa53-abfc-1014-f305-a36c84de80e6"
+- anilistId: 2994
+  title: "Death Note: Relight - Visions of a God"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0FWYWSS3M
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B0FWYWSS3M: alle 1 Folge geprüft, Abos: keine Angabe, zugang=kauf_oder_leihe, gti=amzn1.dv.gti.54bbf9d8-9ab5-3d9b-9475-92f0dfb9ae1f"
+- anilistId: 173388
+  title: "Plus-Sized Elf"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0DJM2FGH6
+  kanalMessung: nein
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: 日本語 — Amazon-Seite B0DJM2FGH6: alle 14 Folgen geprüft, Abos: animedigitalde, zugang=abo, gti=amzn1.dv.gti.80371ca4-41ed-4d74-83b8-f4711ead3c4c — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 21311
+  title: "Bungo Stray Dogs"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0CGQ5H216
+  kanalMessung: nein
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: English, Español (Latinoamérica), Français, Português (Brasil), 日本語 — Amazon-Seite B0CGQ5H216: alle 12 Folgen geprüft, Abos: crunchyrollde, zugang=abo, gti=amzn1.dv.gti.9eb75d22-6a80-a9ba-d4d2-5154c680de69 — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 21311
+  title: "Bungo Stray Dogs"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0825L839L
+  kanalMessung: nein
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: English, Español (Latinoamérica), Français, Português (Brasil), 日本語 — Amazon-Seite B0825L839L: alle 12 Folgen geprüft, Abos: crunchyrollde, zugang=abo, gti=amzn1.dv.gti.9eb75d22-6a80-a9ba-d4d2-5154c680de69 — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 21679
+  title: "Bungo Stray Dogs 2"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B083TD7BTR
+  kanalMessung: nein
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: English, Español (Latinoamérica), Français, Português (Brasil), Русский, 日本語 — Amazon-Seite B083TD7BTR: alle 12 Folgen geprüft, 2 in der Region gesperrt, Abos: crunchyrollde, zugang=abo, gti=amzn1.dv.gti.70b7d0fd-0eed-3317-2aa2-3f50deebecd4, regionsperre=laut Seite nicht mehr im Abo — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 141249
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0B8TWC3LQ
+  kanalMessung: nein
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: English, Español (Latinoamérica), Français, Português (Brasil), 日本語 — Amazon-Seite B0B8TWC3LQ: alle 13 Folgen geprüft, Abos: crunchyrollde, zugang=abo, gti=amzn1.dv.gti.7465fee8-af38-489a-83b3-17875cc89ae0 — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 163263
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0CG7649Q4
+  kanalMessung: nein
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: English, Español (Latinoamérica), Français, Português (Brasil), 日本語 — Amazon-Seite B0CG7649Q4: alle 11 Folgen geprüft, Abos: crunchyrollde, zugang=abo, gti=amzn1.dv.gti.d4fa5a3e-9bb3-4bac-8f04-1b5d7ea1a2ff — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 21741
+  title: "Touken Ranbu: Hanamaru"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0FQXKKXQW
+  dub: true
+  kanalMessung: ja
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, 日本語 — Amazon-Seite B0FQXKKXQW: alle 12 Folgen geprüft, Abos: aniversede, FVOD, zugang=abo, gti=amzn1.dv.gti.f4f9641f-50da-4291-9c29-d961570c8ba3 — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 101280
+  title: "Meine Wiedergeburt als Schleim in einer anderen Welt"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0CGWV6RK8
+  dub: true
+  kanalMessung: ja
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, English, Español (España), Español (Latinoamérica), Français, Italiano, Português (Brasil), Русский, 日本語 — Amazon-Seite B0CGWV6RK8: alle 24 Folgen geprüft, Abos: crunchyrollde, zugang=abo, gti=amzn1.dv.gti.9b8cdaa9-b976-4fd8-a199-27d205ef544d — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 108511
+  title: "Meine Wiedergeburt als Schleim in einer anderen Welt: Staffel 2"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0CJC11GRB
+  dub: true
+  kanalMessung: ja
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, English, Español (España), Español (Latinoamérica), Français, Italiano, Português (Brasil), Русский, 日本語 — Amazon-Seite B0CJC11GRB: alle 24 Folgen geprüft, Abos: crunchyrollde, zugang=abo, gti=amzn1.dv.gti.e61ea435-04cd-4822-9626-eefbcbd6d30f — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 116742
+  title: "Meine Wiedergeburt als Schleim in einer anderen Welt: Staffel 2"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0CJC11GRB
+  dub: true
+  kanalMessung: ja
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, English, Español (España), Español (Latinoamérica), Français, Italiano, Português (Brasil), Русский, 日本語 — Amazon-Seite B0CJC11GRB: alle 24 Folgen geprüft, Abos: crunchyrollde, zugang=abo, gti=amzn1.dv.gti.e61ea435-04cd-4822-9626-eefbcbd6d30f — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 156822
+  title: "Meine Wiedergeburt als Schleim in einer anderen Welt: Staffel 3"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0CVS8488Z
+  dub: true
+  kanalMessung: ja
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, English, Español (España), Español (Latinoamérica), Français, Italiano, Português (Brasil), 日本語 — Amazon-Seite B0CVS8488Z: alle 24 Folgen geprüft, Abos: crunchyrollde, zugang=abo, gti=amzn1.dv.gti.2138a7da-f72f-4a2e-82d7-085254cf3ed8 — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 101280
+  title: "Meine Wiedergeburt als Schleim in einer anderen Welt"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0F18NRYM3
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B0F18NRYM3: alle 25 Folgen geprüft, Abos: keine Angabe, zugang=kauf, gti=amzn1.dv.gti.91108088-0324-4709-836d-439668091c05"
+- anilistId: 146206
+  title: "The Saint’s Magic Power Is Omnipotent: Staffel 2"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0DHYH7HJ6
+  kanalMessung: nein
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: English, Español (Latinoamérica), Português (Brasil), 日本語 — Amazon-Seite B0DHYH7HJ6: alle 12 Folgen geprüft, Abos: crunchyrollde, zugang=abo, gti=amzn1.dv.gti.d9d35d90-f9cc-425f-a006-ddb4f14c7a0b — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 123802
+  title: "The Saint’s Magic Power Is Omnipotent"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0GXWMYWXZ
+  available: false
+  checkedAt: '2026-11-26'
+  note: "Amazon-Seite B0GXWMYWXZ: alle 0 Folgen geprüft, 12 in der Region gesperrt, Abos: keine Angabe, gti=amzn1.dv.gti.5486e9f4-caf9-45e5-bc46-5fefa8e53dfb, regionsperre=laut Seite nicht mehr im Abo"
+- anilistId: 146206
+  title: "The Saint’s Magic Power Is Omnipotent: Staffel 2"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0DJWX81BR
+  kanalMessung: nein
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: English, Español (Latinoamérica), Português (Brasil), 日本語 — Amazon-Seite B0DJWX81BR: alle 12 Folgen geprüft, Abos: crunchyrollde, zugang=abo, gti=amzn1.dv.gti.d9d35d90-f9cc-425f-a006-ddb4f14c7a0b — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 123802
+  title: "The Saint’s Magic Power Is Omnipotent"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0B8SLRX6J
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, Deutsch Dialogue Boost: Medium, Deutsch Dialogue Boost: High — Amazon-Seite B0B8SLRX6J: alle 12 Folgen geprüft, Abos: keine Angabe, zugang=kauf, gti=amzn1.dv.gti.658a3d09-4fdf-4081-a1db-cca040f09748"
+- anilistId: 123802
+  title: "The Saint’s Magic Power Is Omnipotent"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0B8SSCFX5
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch, Deutsch Dialogue Boost: Medium, Deutsch Dialogue Boost: High — Amazon-Seite B0B8SSCFX5: alle 12 Folgen geprüft, Abos: keine Angabe, zugang=kauf, gti=amzn1.dv.gti.658a3d09-4fdf-4081-a1db-cca040f09748"
+- anilistId: 1412
+  title: "Lupin III.: Part 1"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0DTN9NW75
+  dub: true
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B0DTN9NW75: alle 23 Folgen geprüft, Abos: keine Angabe, zugang=kauf, gti=amzn1.dv.gti.f21f1c1b-c716-4dd8-926c-b91fb82fb899"
+- anilistId: 10011569
+  title: "Prinz Ribbit: Ein Frosch auf Umwegen!"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0DJ4FCM5H
+  dub: true
+  kanalMessung: ja
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B0DJ4FCM5H: alle 1 Folge geprüft, Abos: kixi, zugang=abo, gti=amzn1.dv.gti.173ef223-b562-4f1a-a361-f8a85f8ba18d — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 10012621
+  title: "Super Wings"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0FNRXM2SV
+  dub: true
+  kanalMessung: ja
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B0FNRXM2SV: alle 50 Folgen geprüft, Abos: rtlde, zugang=abo, gti=amzn1.dv.gti.9e5e9f3d-831e-4239-b4cd-00424a452b5c — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"
+- anilistId: 10017352
+  title: "Super Wings: Staffel 6"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0FRK3VX2K
+  dub: true
+  kanalMessung: ja
+  checkedAt: '2026-11-26'
+  note: "Tonspuren: Deutsch — Amazon-Seite B0FRK3VX2K: alle 40 Folgen geprüft, Abos: rtlde, zugang=abo, gti=amzn1.dv.gti.39bed340-ec47-45dc-ad5f-74603735d586 — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg"

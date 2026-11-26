@@ -1,12 +1,12 @@
 {
- "erzeugtAm": "2026-11-26T12:18:03.012Z",
+ "erzeugtAm": "2026-11-26T19:24:09.198Z",
  "anbieter": [
   {
    "name": "Amazon",
    "plattform": "primevideo",
-   "gemeldet": 988,
-   "gesamt": 1029,
-   "offen": 41,
+   "gemeldet": 1017,
+   "gesamt": 1046,
+   "offen": 29,
    "ohneSeite": 2,
    "suchAdressen": [
     "https://www.amazon.de/s?k=The%20Birth%20Of%20Kitaro%20-%20Das%20Geheimnis%20von%20Gegege&i=instant-video",
@@ -35,7 +35,7 @@
      "titel": "Meine Wiedergeburt als Schleim in einer anderen Welt: Staffel 4 (That Time I Got Reincarnated as a Slime Season 4)"
     },
     {
-     "url": "https://watch.amazon.de/detail?gti=amzn1.dv.gti.935bdd53-5e65-4f19-82fd-2772c12644aa",
+     "url": "https://www.amazon.de/gp/video/detail/B0FCQJPR5S",
      "titel": "Kaiju No. 8: Mission Recon"
     },
     {
@@ -43,20 +43,8 @@
      "titel": "Yandere Dark Elf: She Chased Me All the Way from Another World!"
     },
     {
-     "url": "https://watch.amazon.de/detail?gti=amzn1.dv.gti.1e61a3d8-44c3-4dc0-ae7c-5c655deceff5",
+     "url": "https://www.amazon.de/gp/video/detail/B0H11D41SV",
      "titel": "Miss Kobayashi’s Dragon Maid: Ein einsamer Drache sehnt sich nach Liebe (Miss Kobayashi's Dragon Maid: A lonely dragon wants to be loved)"
-    },
-    {
-     "url": "https://watch.amazon.de/detail?gti=amzn1.dv.gti.caba97c6-120e-4294-bc60-f1ce999c941e",
-     "titel": "Detektiv Conan: Der Flashback des Einäugigen (Detective Conan: One-Eyed Flashback)"
-    },
-    {
-     "url": "https://www.amazon.de/gp/video/detail/B0F923DJJ9",
-     "titel": "The Most Heretical Last Boss Queen: From Villainess to Savior"
-    },
-    {
-     "url": "https://www.amazon.de/gp/video/detail/B0D65Q2GCW",
-     "titel": "Demon Slayer: Kimetsu no Yaiba - Entertainment District Arc (Demon Slayer: Kimetsu no Yaiba Entertainment District Arc)"
     },
     {
      "url": "https://www.amazon.de/gp/video/detail/B0CJRZY5ND",
@@ -75,24 +63,8 @@
      "titel": "Golden Kamuy 4 (Golden Kamuy Season 4)"
     },
     {
-     "url": "https://www.amazon.de/gp/video/detail/0L0IXLQ35R1J37OAX7TA6WDPFW",
-     "titel": "Demon Slayer: Kimetsu no Yaiba - Mugen Train Arc (Demon Slayer: Kimetsu no Yaiba Mugen Train Arc)"
-    },
-    {
-     "url": "https://www.amazon.de/gp/video/detail/B0FJ741RY1",
-     "titel": "Haikyu!! An Land vs. In der Luft / Der ”Weg” des Balls (HAIKYU!! LAND VS. AIR)"
-    },
-    {
-     "url": "https://watch.amazon.de/detail?gti=amzn1.dv.gti.39d00227-3d19-4bc7-9759-57c324715cb3",
+     "url": "https://www.amazon.de/gp/video/detail/B098JKZFBH",
      "titel": "Made in Abyss: Die Reise beginnt (Made in Abyss: Journey's Dawn)"
-    },
-    {
-     "url": "https://www.amazon.de/gp/video/detail/B0CZSMKH71",
-     "titel": "How Heavy Are the Dumbbells You Lift? Gnadenlose Trainingsstunde (How Heavy Are the Dumbbells You Lift?: Silverman Gym Intense Training Course)"
-    },
-    {
-     "url": "https://watch.amazon.de/detail?gti=amzn1.dv.gti.d6bb7dff-f1d9-2164-4efe-b91aff5a4433",
-     "titel": "Code Geass: Lelouch of the Rebellion - Überschreitung (Code Geass: Lelouch of the Rebellion II - Transgression)"
     },
     {
      "url": "https://www.amazon.de/gp/video/detail/B0CHP5RVPL",
@@ -107,10 +79,6 @@
      "titel": "Die rothaarige Schneeprinzessin: Staffel 2 (Snow White with the Red Hair Season 2)"
     },
     {
-     "url": "https://www.amazon.de/gp/video/detail/B0FJZP9BK5",
-     "titel": "Haikyu!! Karasuno vs. Shiratorizawa (HAIKYU!! 3rd Season)"
-    },
-    {
      "url": "https://www.amazon.de/gp/video/detail/B0B6R47YQ3",
      "titel": "Kuroko’s Basketball: 3rd Season (Kuroko's Basketball 3)"
     },
@@ -121,10 +89,6 @@
     {
      "url": "https://www.amazon.de/gp/video/detail/B09ZJW8HGH",
      "titel": "Kuroko’s Basketball: 2nd Season (Kuroko's Basketball 2)"
-    },
-    {
-     "url": "https://watch.amazon.de/detail?gti=amzn1.dv.gti.05a1129f-4c35-4e68-ba66-88466758e697",
-     "titel": "Bakugan: Mechtanium Surge"
     },
     {
      "url": "https://watch.amazon.de/detail?gti=amzn1.dv.gti.6aad68c8-1e46-46e9-be1e-3d4de43488a5",
@@ -145,16 +109,6 @@
     {
      "url": "https://www.amazon.de/gp/video/detail/B0F3GCF61R",
      "titel": "Future Boy Conan"
-    },
-    {
-     "url": "https://watch.amazon.de/detail?gti=amzn1.dv.gti.7e7d159f-8489-404b-be00-2c658f9ceaec",
-     "titel": "Mermaid Magic – Die magische Welt der Meerjungfrauen (Mermaid Magic)",
-     "hinweis": "Staffeln unklar: TMDB zählt 20 Folgen insgesamt, der Anbieter kann sie anders schneiden"
-    },
-    {
-     "url": "https://watch.amazon.de/detail?gti=amzn1.dv.gti.18c9c892-e0f2-4d86-abb9-fb560765cecb",
-     "titel": "Vida the Vet",
-     "hinweis": "Staffeln unklar: TMDB zählt 104 Folgen insgesamt, der Anbieter kann sie anders schneiden"
     },
     {
      "url": "https://watch.amazon.de/detail?gti=amzn1.dv.gti.44b69da7-d905-017f-c691-54059237c2a9",
@@ -290,6 +244,7 @@
     "B0BYXM4XD2": 12,
     "B0H348BY3J": 12,
     "B0GFC11F2R": 13,
+    "B0B8SLRX6J": 12,
     "0FJOQHOAFIXXM8S33J6VVL4AHQ": 12,
     "B0CWF24FSQ": 12,
     "B0B6GH3ZK4": 20,
@@ -307,6 +262,7 @@
     "B0H4C7LCXK": 24,
     "B08KYJSFPC": 12,
     "B0DZ2ZDJNV": 28,
+    "B0CVS8488Z": 24,
     "B0CWKZ91KX": 21,
     "B0DHVD768H": 14,
     "B0CYFKT276": 13,
@@ -325,6 +281,7 @@
     "B0FMQS7651": 12,
     "B0D8Z7K7Y3": 12,
     "B0GYFVBMRM": 16,
+    "0GYCZV1T5AVQF0YBI5BBID1439": 1,
     "B0F2GXP162": 13,
     "B0GDGLLYLS": 24,
     "B0FJ7GC6S6": 10,
@@ -779,9 +736,9 @@
   {
    "name": "Disney+",
    "plattform": "disneyplus",
-   "gemeldet": 183,
-   "gesamt": 344,
-   "offen": 161,
+   "gemeldet": 185,
+   "gesamt": 342,
+   "offen": 157,
    "ohneSeite": 13,
    "ziel": "https://www.disneyplus.com/browse/entity-faa35b37-3287-4a7c-9d42-a3a5f9ad9185",
    "ziele": [
@@ -816,30 +773,12 @@
      "hinweis": "Staffeln unklar: TMDB zählt 88 Folgen insgesamt, der Anbieter kann sie anders schneiden"
     },
     {
-     "url": "https://www.disneyplus.com/de-de/series/bleach-thousand-year-blood-war/4Afet1Q421gy",
-     "titel": "Bleach: Thousand-Year Blood War",
-     "seit": "2026-11-25"
-    },
-    {
      "url": "https://www.disneyplus.com/browse/entity-b042544d-cd7d-40c6-9be4-db79666a1b51",
      "titel": "Welcome to Demon School! Iruma-kun"
     },
     {
-     "url": "https://www.disneyplus.com/de-de/series/mission-yozakura-family/fiCVxc9GZNVm",
-     "titel": "Mission: Yozakura Family"
-    },
-    {
      "url": "https://www.disneyplus.com/browse/entity-6c1cfdcd-a3b1-428a-8fe9-aa917d5b6371",
      "titel": "My Hero Academia"
-    },
-    {
-     "url": "https://www.disneyplus.com/de-de/browse/entity-1d36fbbe-0a91-468e-ac73-8d51337195fa",
-     "titel": "Pretty Cure"
-    },
-    {
-     "url": "https://www.disneyplus.com/browse/entity-6037d617-2654-40c0-8d8c-3ac8384ca4cd",
-     "titel": "Disney Sidekick Adventures",
-     "hinweis": "Staffeln unklar: TMDB zählt 5 Folgen insgesamt, der Anbieter kann sie anders schneiden"
     },
     {
      "url": "https://www.disneyplus.com/browse/entity-dc471806-a107-436c-9bec-0e4455c7249c",

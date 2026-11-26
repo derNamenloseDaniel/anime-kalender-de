@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-25T23:09:15.800Z",
+  "stand": "2026-11-26T19:23:41.837Z",
   "verweise": [
     {
       "titleId": 99629,
@@ -4597,7 +4597,7 @@
       "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
       "geprueftAm": null,
       "entferntAm": "2026-11-26",
-      "letzterWeg": false
+      "letzterWeg": true
     },
     {
       "titleId": 603,
@@ -4608,7 +4608,7 @@
       "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
       "geprueftAm": null,
       "entferntAm": "2026-11-26",
-      "letzterWeg": false
+      "letzterWeg": true
     },
     {
       "titleId": 629,
@@ -5686,7 +5686,7 @@
       "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
       "geprueftAm": null,
       "entferntAm": "2026-11-26",
-      "letzterWeg": true
+      "letzterWeg": false
     },
     {
       "titleId": 21361,
@@ -6484,7 +6484,7 @@
       "titleId": 111790,
       "titel": "Haikyu!! An Land vs. In der Luft / Der ”Weg” des Balls",
       "plattform": "primevideo",
-      "url": "https://www.amazon.de/gp/video/detail/B0FJ741RY1",
+      "url": "https://www.amazon.de/gp/video/detail/B0FK8MW87N",
       "seriesId": null,
       "grund": "belegtes Nein: laut Seite in dieser Region nicht mehr im Angebot (keine Aussage zur Tonspur)",
       "geprueftAm": null,
@@ -7112,6 +7112,17 @@
       "titel": "2.5 Dimensional Seduction",
       "plattform": "adn",
       "url": "https://animationdigitalnetwork.de/video/25-dimensional-seduction",
+      "seriesId": null,
+      "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
+      "geprueftAm": null,
+      "entferntAm": "2026-11-26",
+      "letzterWeg": true
+    },
+    {
+      "titleId": 158898,
+      "titel": "Mission: Yozakura Family",
+      "plattform": "disneyplus",
+      "url": "https://www.disneyplus.com/de-de/series/mission-yozakura-family/fiCVxc9GZNVm",
       "seriesId": null,
       "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
       "geprueftAm": null,
@@ -7895,6 +7906,17 @@
       "url": "https://www.netflix.com/title/80987039",
       "seriesId": null,
       "grund": "der Anbieter führt 23 + 25 Folgen, und die belegten Titel füllen sie exakt — für 1 weitere ist dort kein Platz",
+      "geprueftAm": null,
+      "entferntAm": "2026-11-26",
+      "letzterWeg": false
+    },
+    {
+      "titleId": 111790,
+      "titel": "Haikyu!! An Land vs. In der Luft / Der ”Weg” des Balls",
+      "plattform": "primevideo",
+      "url": "https://www.amazon.de/gp/video/detail/B0FJ741RY1",
+      "seriesId": null,
+      "grund": "belegtes Nein: laut Seite in dieser Region nicht mehr im Angebot (keine Aussage zur Tonspur)",
       "geprueftAm": null,
       "entferntAm": "2026-11-26",
       "letzterWeg": false
@@ -9210,6 +9232,17 @@
     }
   ],
   "belegWege": [
+    {
+      "titleId": 603,
+      "titel": "Pretty Cure",
+      "plattform": "disneyplus",
+      "url": "https://www.disneyplus.com/de-de/browse/entity-1d36fbbe-0a91-468e-ac73-8d51337195fa",
+      "seriesId": null,
+      "grund": "Handbeleg available: false (2026-11-26): Disney+ meldet: nicht in deinem Gebiet verfügbar",
+      "geprueftAm": "2026-11-26",
+      "entferntAm": "2026-11-26",
+      "letzterWeg": true
+    },
     {
       "titleId": 175914,
       "titel": "Call of the Night: Staffel 2",

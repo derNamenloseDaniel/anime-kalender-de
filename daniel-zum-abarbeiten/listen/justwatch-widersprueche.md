@@ -7,9 +7,9 @@ Abschnitt „JustWatch-Ton je Seite“. Unsere Messung (Handbeleg, Meldung der E
 <!-- anime:start -->
 ## Anime
 
-Flagge „Deutsch“: 58 Wege, nur Hinweis: 1.
+Flagge „Deutsch“: 53 Wege, nur Hinweis: 1.
 
-JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine Flagge): mehrere Staffeln 15, Mehrteiler 14.
+JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine Flagge): mehrere Staffeln 15, Mehrteiler 13.
 
 | Anbieter | mit eigener Messung | Widersprüche | Anteil | Anzeige |
 |---|---|---|---|---|
@@ -22,7 +22,7 @@ JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine
 | Titel | Anbieter | Adresse | JustWatch | Gemessen |
 |---|---|---|---|---|
 
-### Kandidaten für neue Wege (809)
+### Kandidaten für neue Wege (814)
 
 JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „Weg ohne Kennung“: ein Weg zum Anbieter steht, seine Adresse trägt aber keine Seitenkennung.
 
@@ -386,6 +386,7 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | Detektiv Conan: Der purpurrote Liebesbrief (98222) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.40bac615-755d-a58b-2710-b3055435ed81 | ja |
 | Detektiv Conan: Der purpurrote Liebesbrief (98222) | Amazon Video | amazon:amzn1.dv.gti.76bbf9d7-f175-5ffb-1909-e35858275d89 | ja |
 | Code Geass: Lelouch of the Rebellion - Initiation (101811) | Amazon Video | amazon:amzn1.dv.gti.b0bb7dff-f320-0490-8aec-76f307a1f81d | ja |
+| Code Geass: Lelouch of the Rebellion - Überschreitung (101812) | Amazon Video | amazon:amzn1.dv.gti.d6bb7dff-f1d9-2164-4efe-b91aff5a4433 | ja |
 | Code Geass: Lelouch of the Rebellion - Verherrlichung (101813) | Amazon Video | amazon:amzn1.dv.gti.88bb7e12-4a26-732f-eb5b-37733d139471 | ja |
 | Death March to the Parallel World Rhapsody (97907) | Crunchyroll | crunchyroll:GZ7UVJNGW | ja |
 | Death March to the Parallel World Rhapsody (97907) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.d2a8f9c6-efec-4a29-babf-1826e48db86f | nein |
@@ -443,6 +444,7 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | Die Welt in allen Farben: Iroduku (101316) | Aniverse Amazon Channel | amazon:amzn1.dv.gti.e587021e-1402-459e-b3fe-415f901b7191 | ja |
 | Black Fox (101317) | Crunchyroll | crunchyroll:GK9U3DDED | ja |
 | W’z (101337) | Amazon Prime Video | amazon:amzn1.dv.gti.862dcaff-9396-4498-bdcb-70ff93699d38 | ja |
+| Made in Abyss: Die Reise beginnt (101343) | CineMix+ Amazon Channel | amazon:amzn1.dv.gti.39d00227-3d19-4bc7-9759-57c324715cb3 | ja |
 | Made in Abyss: Gefährten der Dämmerung (101344) | CineMix+ Amazon Channel | amazon:amzn1.dv.gti.18b83256-a558-424b-beb0-9f6bcffb0fe5 | ja |
 | Dororo (101347) | Amazon Prime Video | amazon:amzn1.dv.gti.89e7a785-27e3-495d-a485-532a8de222a4 | ja |
 | Pet (101350) | Amazon Prime Video | amazon:amzn1.dv.gti.27dae5e4-5cc2-457d-b882-0814a6f68b21 | ja |
@@ -751,6 +753,7 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | Magic Maker: How to Make Magic in Another World (179297) | Crunchyroll | crunchyroll:G31UVE8MN | nein |
 | Magic Maker: How to Make Magic in Another World (179297) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.199ebb49-1369-4e3f-9634-997124a1f2af | nein |
 | Sanda (179302) | Amazon Prime Video | amazon:amzn1.dv.gti.d05a91a0-99e3-4a8b-9ff0-3da3341f1128 | ja |
+| Kaiju No. 8: Mission Recon (179998) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.935bdd53-5e65-4f19-82fd-2772c12644aa | ja |
 | Witch Watch (180367) | Crunchyroll | crunchyroll:GJWUQ177W | nein |
 | Witch Watch (180367) | Aniverse Amazon Channel | amazon:amzn1.dv.gti.9063c137-e64a-4785-aa61-d087f82bb1ae | nein |
 | Witch Watch (180367) | Anime Digital Network Amazon Channel | amazon:amzn1.dv.gti.3cefe368-0d6f-4f75-9f0d-124e7e60243c | nein |
@@ -762,6 +765,7 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | Dark Moon: The Blood Altar (181443) | Crunchyroll | crunchyroll:GE00366126ES419 | nein |
 | Dark Moon: The Blood Altar (181443) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.233082bf-86cf-4248-a368-093ace5947b0 | nein |
 | Miss Kobayashi’s Dragon Maid: Ein einsamer Drache sehnt sich nach Liebe (181839) | Crunchyroll | crunchyroll:GMEE00351664ENUS | nein |
+| Miss Kobayashi’s Dragon Maid: Ein einsamer Drache sehnt sich nach Liebe (181839) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.1e61a3d8-44c3-4dc0-ae7c-5c655deceff5 | ja |
 | City The Animation (181841) | Amazon Prime Video | amazon:amzn1.dv.gti.8c1f778c-d940-4c50-895a-f498c55101f3 | ja |
 | The Gorilla God’s Go-To Girl (182060) | Crunchyroll | crunchyroll:G2XUNV10P | nein |
 | The Gorilla God’s Go-To Girl (182060) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.21dd6325-b528-4448-b468-a320d3f84786 | nein |
@@ -781,6 +785,7 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | My Gift Lvl 9999 Unlimited Gacha: Backstabbed in a Backwater Dungeon, I’m Out for Revenge! (184322) | Aniverse Amazon Channel | amazon:amzn1.dv.gti.6b8f34d3-e84b-4b8b-9437-3b39ea8bb67e | nein |
 | Cat’s Eye: Ein Supertrio (184718) | Disney Plus | disney:entity-94d70c2e-5ded-45bc-907a-8eb6a654d7f3 | nein |
 | The After-Dinner Mysteries (184989) | Amazon Prime Video | amazon:amzn1.dv.gti.791957df-f3b5-4986-8eb5-d366996f3866 | ja |
+| Detektiv Conan: Der Flashback des Einäugigen (185212) | Amazon Video | amazon:amzn1.dv.gti.caba97c6-120e-4294-bc60-f1ce999c941e | ja |
 | Mobile Suit Gundam GQuuuuuuX (185213) | Amazon Prime Video | amazon:amzn1.dv.gti.f5ad8a9d-f1e5-4d09-934b-6d462852c8e3 | ja |
 | Alice im Wunderland: Dive in Wonderland (186181) | Anime Digital Network Amazon Channel | amazon:amzn1.dv.gti.c916af87-7d88-4180-afae-d285303cf578 | nein |
 | Reborn as a Space Mercenary: I Woke Up Piloting the Strongest Starship! (186541) | Crunchyroll | crunchyroll:GE00389229FRFR | nein |
@@ -842,13 +847,13 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 <!-- cartoons:start -->
 ## Cartoons
 
-Flagge „Deutsch“: 4 Wege, nur Hinweis: 0.
+Flagge „Deutsch“: 2 Wege, nur Hinweis: 0.
 
-JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine Flagge): mehrere Staffeln 144, Mehrteiler 1.
+JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine Flagge): mehrere Staffeln 143, Mehrteiler 1.
 
 | Anbieter | mit eigener Messung | Widersprüche | Anteil | Anzeige |
 |---|---|---|---|---|
-| disneyplus | 53 | 0 | 0.0 % | Flagge |
+| disneyplus | 54 | 0 | 0.0 % | Flagge |
 | primevideo | 13 | 0 | 0.0 % | Flagge |
 
 ### Widersprüche (0)
@@ -856,7 +861,7 @@ JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine
 | Titel | Anbieter | Adresse | JustWatch | Gemessen |
 |---|---|---|---|---|
 
-### Kandidaten für neue Wege (67)
+### Kandidaten für neue Wege (68)
 
 JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „Weg ohne Kennung“: ein Weg zum Anbieter steht, seine Adresse trägt aber keine Seitenkennung.
 
@@ -880,6 +885,7 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | BE@RBRICK (-225303) | Apple TV Amazon Channel | amazon:amzn1.dv.gti.387eb37d-cca3-4098-af7e-c34980fab667 | nein |
 | The Mighty Nein (-219080) | Amazon Prime Video | amazon:amzn1.dv.gti.1e1f0f92-d306-414e-9ef8-f6b16e200ae4 | ja |
 | E.B. White's Charlotte's Web (-205192) | HBO Max Amazon Channel | amazon:amzn1.dv.gti.0bfe70b2-ed24-4f82-8be6-f02162673c32 | nein |
+| Mermaid Magic – Die magische Welt der Meerjungfrauen (-231725) | Amazon Prime Video | amazon:amzn1.dv.gti.7e7d159f-8489-404b-be00-2c658f9ceaec | ja |
 | Barney's World (-226126) | HBO Max Amazon Channel | amazon:amzn1.dv.gti.d7d9baf5-0360-4c40-adc8-5a41455c58dc | nein |
 | Creature Commandos (-219543) | HBO Max Amazon Channel | amazon:amzn1.dv.gti.215e4f90-cd45-4927-a7c3-1992f752defe | nein |
 | Silly Sundays (-225753) | HBO Max Amazon Channel | amazon:amzn1.dv.gti.ca2c343c-debd-4459-92db-ee1a90704595 | nein |

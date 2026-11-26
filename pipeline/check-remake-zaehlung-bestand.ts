@@ -12,6 +12,8 @@ import { abweichungVomBekannten, doppelteNummern, remakeMitOriginalInGruppe, war
 import { BEKANNT_DOPPELT_OHNE_REMAKE, BEKANNT_HOECHSTENS } from './lib/remake-zaehlung-bekannt.ts'
 import { ratschenWarnzeilen } from './lib/hoechstens-ratsche.ts'
 import { melde } from './lib/quarantaene.ts'
+import { remakeGegenVorstand } from './lib/remake-vorstand.ts'
+import { vorstandRef } from './lib/vorstand-abgang.ts'
 
 /** Der Anlassfall: Yaiba (2025) ist die Neuverfilmung von Legendary Brave Swordsman Yaiba (1993) — laut Handliste. */
 const YAIBA = { remake: 177476, original: 2335 }
@@ -55,6 +57,9 @@ console.log('\nNeuverfilmungen und Zählgruppen im ausgelieferten Datensatz:')
   const ohneRemake = new Set(doppelt.filter((d) => !d.mitRemake).map((d) => `${d.reihe}|${d.nummer}`))
   for (const zeile of ratschenWarnzeilen('Zählung', [...ohneRemake], BEKANNT_HOECHSTENS)) console.log(zeile)
 
+  // Oben markiert die Wache mit `markiereRemakes` wie der Bau; ein Fehler darin träfe beide. Der Vorstand ist davon unabhängig.
+  const gegenVorstand = remakeGegenVorstand(vorstandRef(process.argv.slice(2)))
+  pruefe('Keine Neuverfilmung verliert gegen den Vorstand ihre Markierung', gegenVorstand.length === 0, gegenVorstand)
   const imBestand = Object.values(roh).flat().filter((m) => m.remakeVon !== undefined).length
   if (imBestand !== neuverfilmungen.length) console.log(`  ⚠ WARNUNG Zählung: franchises.json trägt remakeVon an ${imBestand} statt ${neuverfilmungen.length} Teilen — der nächste Bestandsbau schreibt sie, sonst fehlt die Verdrahtung in 13-4-zusatzdateien.ts`)
 }

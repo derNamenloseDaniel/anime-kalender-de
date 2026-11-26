@@ -610,6 +610,7 @@ pipeline/check-reiter-blase.ts
 pipeline/check-reiter-lage-grund.ts
 pipeline/check-release-ohne-quelle.ts
 pipeline/check-remake-verdrahtung.ts
+pipeline/check-remake-vorstand.ts
 pipeline/check-remake-zaehlung-bestand-lauf.ts
 pipeline/check-remake-zaehlung-pipeline.ts
 pipeline/check-remake-zaehlung.ts

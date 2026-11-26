@@ -23,7 +23,8 @@ const lauf = (offen: number[], kuratiert: KuratierterEintrag[], belege: DubCheck
   keinWegTrotzQuelle({ offen: new Set(offen), releases, kuratiert: [{ datei: 'streaming-nachtrag-2026.yaml', eintraege: kuratiert }], belege, neinGilt: baueNeinGilt(belege), heute: HEUTE })
 
 const kuroko = lauf([102836], [eintrag(102836, 'primevideo', '2026-09-13')], [beleg(102836, { available: false })])
-pruefe('Kuroko: Nachtrag-Termin nach dem Nein, Titel ohne Weg offen: rot mit Datei und Slug', kuroko.length === 1 && kuroko[0]!.rot && kuroko[0]!.quelle === 'streaming-nachtrag-2026.yaml s102836-primevideo', kuroko)
+pruefe('Kuroko: Nachtrag-Termin nach dem Nein, Titel ohne Weg offen: rot mit Titel, Anbieter, Datei und Slug', JSON.stringify(kuroko) === JSON.stringify([{ titleId: 102836, platform: 'primevideo', quelle: 'streaming-nachtrag-2026.yaml s102836-primevideo', rot: true }]), kuroko)
+pruefe('ein Termin genau heute ist begonnen', lauf([1], [eintrag(1, 'netflix', HEUTE)]).length === 1)
 pruefe('ein Nein jünger als der Termin entschuldigt', lauf([102836], [eintrag(102836, 'primevideo', '2026-09-13')], [beleg(102836, { available: false, checkedAt: '2026-09-20' })]).length === 0)
 pruefe('ein „ohne deutschen Ton“ entschuldigt unabhängig vom Datum', lauf([1], [eintrag(1, 'primevideo', '2026-09-13')], [beleg(1, { dub: false })]).length === 0)
 pruefe('Kino, Fernsehen und Disc sind kein Weg', lauf([1], [eintrag(1, 'kino', '2026-09-13'), eintrag(1, 'tv', '2026-09-13'), eintrag(1, 'disc', '2026-09-13', { releaseType: 'disc' })]).length === 0)
@@ -32,8 +33,12 @@ pruefe('ein Titel mit Weg (nicht offen) zählt nicht', lauf([], [eintrag(1, 'net
 const gebaut = lauf([7], [], [], [{ ...eintrag(7, 'crunchyroll', '2026-10-01'), titleId: 7, slug: 'cr-7' } as unknown as Release])
 pruefe('ein gebauter Termin in releases.json zählt ebenso', gebaut.length === 1 && gebaut[0]!.quelle === 'releases.json cr-7', gebaut)
 const ja = lauf([9], [], [beleg(9, { available: false }), beleg(9, { dub: true, checkedAt: '2026-11-01' })])
-pruefe('jüngster Handbeleg „deutsch“ ohne Weg: nur Warnung', ja.length === 1 && !ja[0]!.rot, ja)
+pruefe('jüngster Handbeleg „deutsch“ ohne Weg: nur Warnung, mit Titel, Anbieter und Datum', JSON.stringify(ja) === JSON.stringify([{ titleId: 9, platform: 'primevideo', quelle: 'dub-confirmed.yaml 2026-11-01', rot: false }]), ja)
 pruefe('ein jüngeres Nein nach dem Ja: keine Warnung', lauf([9], [], [beleg(9, { dub: true, checkedAt: '2026-08-01' }), beleg(9, { available: false })]).length === 0)
+const fremd = lauf([9], [], [beleg(9, { dub: true, checkedAt: '2026-08-01' }), beleg(9, { platform: 'netflix', available: false }), beleg(8, { available: false })])
+pruefe('ein jüngeres Nein bei anderem Anbieter oder Titel löscht das Ja nicht', fremd.length === 1 && fremd[0]!.platform === 'primevideo', fremd)
+pruefe('das jüngere Ja gilt auch, wenn es in der Datei vor dem älteren Nein steht', lauf([9], [], [beleg(9, { dub: true, checkedAt: '2026-11-01' }), beleg(9, { available: false })]).length === 1)
+pruefe('am selben Tag gilt der spätere Eintrag (Ja nach Nein: Warnung, Nein nach Ja: keine)', lauf([9], [], [beleg(9, { available: false }), beleg(9, { dub: true })]).length === 1 && lauf([9], [], [beleg(9, { dub: true }), beleg(9, { available: false })]).length === 0)
 const doppelt = lauf([5], [eintrag(5, 'netflix', '2026-09-01')], [beleg(5, { platform: 'netflix', dub: true })])
 pruefe('Termin und Ja-Beleg zum selben Anbieter: ein roter Fund', doppelt.length === 1 && doppelt[0]!.rot, doppelt)
 

@@ -36,7 +36,7 @@ export function keinWegTrotzQuelle(a: {
     const k = dubKey(b.anilistId, b.platform)
     if (a.offen.has(b.anilistId) && b.dub === true && b.available !== false && !funde.has(k)) funde.set(k, { titleId: b.anilistId, platform: b.platform, quelle: `dub-confirmed.yaml ${b.checkedAt}`, rot: false })
   }
-  return [...funde.values()].sort((x, y) => x.titleId - y.titleId || x.platform.localeCompare(y.platform))
+  return [...funde.values()]
 }
 
 /** Je Titel und Anbieter der jüngste Handbeleg. */

@@ -212,7 +212,7 @@ const reihe: FranchiseMember[] = [
   teil(900015, 'Reihe Special', { jpYear: 2021, format: 'SPECIAL', episodes: 1, beiwerk: true }),
 ]
 const titel = (id: number) => ({ id }) as Title
-function liste(teile: FranchiseMember[], gewaehlt: number, mehr: { suche?: string; ohneOffen?: boolean } = {}): string {
+function liste(teile: FranchiseMember[], gewaehlt: number, mehr: { suche?: string } = {}): string {
   return renderToStaticMarkup(
     createElement(ReihenListe, {
       reihenTeile: teile,
@@ -222,10 +222,8 @@ function liste(teile: FranchiseMember[], gewaehlt: number, mehr: { suche?: strin
       favorites: new Set<number>(),
       wechselt: false,
       wechsleZu: () => {},
-      reiheOhneOffen: mehr.ohneOffen ? 1 : null,
       reihenSchluessel: 1,
       reiheSuche: { reihe: 1, text: mehr.suche ?? '' },
-      setReiheOhneOffen: () => {},
       setReiheSuche: () => {},
     }),
   )
@@ -247,10 +245,9 @@ pruefe('Reihe aus zwei Filmen: keine Pfeile', !nurFilm.includes('Weitere Teile')
 const keinTreffer = liste(reihe, 900012, { suche: 'zzzz' })
 gleich('Suche ohne Treffer: keine Zeile', zaehle(keinTreffer, 'role="tablist"'), 0)
 const alleOhne = liste([teil(900021, 'Reihe', { ohneSynchro: true }), teil(900022, 'Reihe Staffel 2', { ohneSynchro: true }), teil(900023, 'Reihe Staffel 3', { ohneSynchro: true })], 900099)
-gleich('nur Teile ohne Synchro, keiner gewählt: keine Zeile', zaehle(alleOhne, 'role="tablist"'), 0)
-pruefe('nur Teile ohne Synchro: Hinweis auf den Schalter', alleOhne.includes('Schalter'), alleOhne.slice(0, 200))
-const alleOhneOffen = liste([teil(900021, 'Reihe', { ohneSynchro: true }), teil(900022, 'Reihe Staffel 2', { ohneSynchro: true })], 900099, { ohneOffen: true })
-gleich('Schalter an: beide Teile da', zaehle(alleOhneOffen, 'role="tab"'), 2)
+gleich('nur Teile ohne Synchro, keiner gewählt: eine Zeile mit drei Karten', [zaehle(alleOhne, 'role="tablist"'), zaehle(alleOhne, 'role="tab"')], [1, 3])
+pruefe('Teile ohne Synchro: kein Schalter und kein Hinweis darauf', !alleOhne.includes('type="checkbox"') && !alleOhne.includes('Schalter'), alleOhne.slice(0, 200))
+pruefe('Teile ohne Synchro tragen ihre Marke in der Liste', zaehle(alleOhne, '🇩🇪 ✕') === 3, zaehle(alleOhne, '🇩🇪 ✕'))
 
 /* Pfeile nach Inhaltsänderung (Daniel, 24.10.2026): schrumpft nur der Inhalt, meldet der ResizeObserver nichts — die Messung hängt am MutationObserver. */
 type Fake = { rueckruf: () => void; ziel?: unknown; optionen?: unknown; getrennt: boolean }

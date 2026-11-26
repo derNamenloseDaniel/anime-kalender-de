@@ -1,36 +1,39 @@
 import { titleStatus, type StaffelLage } from '@shared/logic.ts'
 import { anzeigeName, hauptstaffeln, staffelBeschriftungen, staffelStaende } from '@shared/titles.ts'
 import type { FranchiseMember, Release, Title } from '@shared/types.ts'
-import { istEingeklappt } from './reihen-regeln.ts'
+import { ohneDeutscheSynchro } from './reihen-teil.ts'
 import type { Gruppe } from './reihen-uebersicht-regeln.ts'
 
 /**
  * Ein Reihen-Reiter (F157): der Titel, den er öffnet, seine Kurzbeschriftung („4“, „1–5“, beim Film die laufende Nummer) und der
- * volle Titel für Tooltip und Hilfsmittel; `staffel` sagt, ob die Beschriftung eine Staffelnummer ist.
+ * volle Titel für Tooltip und Hilfsmittel; `staffel` sagt, ob die Beschriftung eine Staffelnummer ist, `ohneSynchro`, ob der Teil
+ * ohne deutsche Synchro erschienen ist (gestrichelter Rand; ein geplanter Teil zählt nicht).
  */
 export interface ReihenReiter {
   id: number
   label: string
   name: string
   staffel: boolean
+  ohneSynchro: boolean
 }
+
+const dieseJahr = () => new Date().getFullYear()
 
 /** Staffeln einer deutschen Staffelteilung (Pokémon Horizonte): Geschwister mit demselben Sammeltitel, nach Staffelnummer. */
 function ausSammeltitel(sammel: number, titel: Title[]): ReihenReiter[] {
   return titel
     .filter((t) => t.staffelTitel?.sammel === sammel)
     .sort((a, b) => a.staffelTitel!.nr - b.staffelTitel!.nr)
-    .map((t) => ({ id: t.id, label: String(t.staffelTitel!.nr), name: anzeigeName(t), staffel: true }))
+    .map((t) => ({ id: t.id, label: String(t.staffelTitel!.nr), name: anzeigeName(t), staffel: true, ohneSynchro: ohneDeutscheSynchro(t, dieseJahr()) }))
 }
 
 /**
  * Die übrigen Teile derselben Gruppe der Reihenliste (Filme, Specials, eigene Serien), in deren Reihenfolge, beschriftet mit der
- * laufenden Nummer. Teile hinter dem Schalter „ohne Synchro“ bekommen keinen Reiter, sie bleiben in der Reihenliste erreichbar.
+ * laufenden Nummer; auch Teile ohne Synchro bekommen einen Reiter.
  */
 function ausGruppe(title: Title, gruppen: Gruppe[]): ReihenReiter[] {
   const gruppe = gruppen.find((g) => g.teile.some((m) => m.id === title.id))
-  const teile = (gruppe?.teile ?? []).filter((m) => !istEingeklappt(m, title.id))
-  return teile.map((m, i) => ({ id: m.id, label: String(i + 1), name: m.name, staffel: false }))
+  return (gruppe?.teile ?? []).map((m, i) => ({ id: m.id, label: String(i + 1), name: m.name, staffel: false, ohneSynchro: ohneDeutscheSynchro(m, dieseJahr()) }))
 }
 
 /**
@@ -45,7 +48,7 @@ function ausHauptstaffeln(teile: FranchiseMember[], reihenName: string): ReihenR
   return haupt
     .filter((m) => text.has(m.id))
     .sort((a, b) => nummer(a.id) - nummer(b.id) || a.id - b.id)
-    .map((m) => ({ id: m.id, label: text.get(m.id)!.replace(/^Staffel\s+/, ''), name: m.name, staffel: true }))
+    .map((m) => ({ id: m.id, label: text.get(m.id)!.replace(/^Staffel\s+/, ''), name: m.name, staffel: true, ohneSynchro: ohneDeutscheSynchro(m, dieseJahr()) }))
 }
 
 /** Gleiche Kurzbeschriftungen verschiedener Titel (zwei „16“, zwei „1“) bekommen in Listenreihenfolge a, b, …; einmalige bleiben. */

@@ -580,8 +580,6 @@ export const TEXTE_SPAET = {
   'empf.zurueckZum': 'zurück zum',
   'geplant.marke': 'Geplant',
   'geplant.hinweis': 'Das Original ist noch nicht erschienen',
-  'detail.reiheOhneSchalterKurz': 'Teile ohne Synchro zeigen ({n})',
-  'detail.reiheNurOhne': 'Alle übrigen Teile sind ohne Synchro oder geplant — der Schalter blendet sie ein.',
   'detail.neuigkeiten': 'Neuigkeiten',
   'detail.neuigkeitenAlle': 'Alle {n} Meldungen',
   'detail.staffelVon': 'Staffel {n} von {von}',

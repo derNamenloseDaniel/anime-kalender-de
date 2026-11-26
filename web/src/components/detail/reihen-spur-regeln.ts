@@ -79,7 +79,7 @@ type BeobachterKlasse = new (rueckruf: () => void) => { observe: (el: Element, o
 
 /**
  * Meldet `messen` (ein Frame später), wenn die Spur scrollt, ihre Breite ändert oder Karten hinzukommen/wegfallen.
- * Letzteres braucht den MutationObserver: schrumpft nur der Inhalt (Schalter „Teile ohne Synchro“ aus), bleibt die Breite der Spur gleich
+ * Letzteres braucht den MutationObserver: schrumpft nur der Inhalt (Suchtext), bleibt die Breite der Spur gleich
  * und der ResizeObserver schwiege (Daniel, 24.10.2026). Rückgabe: Aufräumfunktion.
  */
 export function verfolgeSpur(

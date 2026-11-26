@@ -16,6 +16,9 @@ export interface ReihenReiterDaten {
   wechsleZu: (id: number) => void
 }
 
+/** Hinter dem Namen im `aria-label`: Der gestrichelte Rand sagt es nur dem Auge. */
+export const OHNE_SYNCHRO_WORT = ', ohne deutsche Synchro'
+
 export const ReihenReiterKontext = createContext<ReihenReiterDaten | null>(null)
 
 /** Farbe und Rand aus den Klassen der Kastenhülle (`kastenKlassen`): der gewählte Reiter trägt dieselben, so wächst er aus dem Kasten. */
@@ -59,10 +62,10 @@ export function ReihenReiterZeile(p: { reiter: ReihenReiter[]; aktiv: number; la
               aria-selected={gewaehlt}
               aria-controls={`${kennung}-kasten`}
               tabIndex={gewaehlt ? 0 : -1}
-              aria-label={`${r.staffel ? `Staffel ${r.label}: ` : ''}${r.name}${LAGE_WORT[l]}`}
+              aria-label={`${r.staffel ? `Staffel ${r.label}: ` : ''}${r.name}${LAGE_WORT[l]}${r.ohneSynchro ? OHNE_SYNCHRO_WORT : ''}`}
               title={r.name}
               onClick={() => beiWahl(r.id)}
-              className={reiterKlassen(gewaehlt, farbe)}
+              className={`${reiterKlassen(gewaehlt, farbe)}${r.ohneSynchro ? ' border-dashed' : ''}`}
             >
               {gewaehlt && <Akzentstrich />}
               {r.label}

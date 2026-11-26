@@ -13,8 +13,8 @@ import { fileURLToPath } from 'node:url'
 const werkzeug = join(dirname(fileURLToPath(import.meta.url)), 'title-tooltips.mjs')
 const ordner = mkdtempSync(join(tmpdir(), 'title-tooltips-'))
 
-const lauf = (quelle, grenzen, ...optionen) => spawnSync(process.execPath, [werkzeug, '--quelle', quelle, '--grenzen', grenzen, ...optionen], { encoding: 'utf8', windowsHide: true })
-const git = (wurzel, ...args) => spawnSync('git', ['-C', wurzel, ...args], { encoding: 'utf8', windowsHide: true })
+const lauf = (quelle, grenzen, ...optionen) => spawnSync(process.execPath, [werkzeug, '--quelle', quelle, '--grenzen', grenzen, ...optionen], { encoding: 'utf8', windowsHide: true, timeout: 30000 })
+const git = (wurzel, ...args) => spawnSync('git', ['-C', wurzel, ...args], { encoding: 'utf8', windowsHide: true, timeout: 30000 })
 
 function baum(name, dateien) {
   const wurzel = join(ordner, name)

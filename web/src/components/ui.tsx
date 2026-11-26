@@ -1,4 +1,4 @@
-import { cloneElement, isValidElement, useEffect, useId, useRef, useState, type MouseEvent, type ReactElement, type ReactNode, type RefObject } from 'react'
+import { Children, cloneElement, isValidElement, useEffect, useId, useRef, useState, type MouseEvent, type ReactElement, type ReactNode, type RefObject } from 'react'
 import { FSK_COLORS, PLATFORMS, RELEASE_TYPES, anbieterName } from '@shared/types.ts'
 import type { Fsk, PlatformId, ReleaseStatus, ReleaseType } from '@shared/types.ts'
 import { useLang, type TranslationKey } from '../lib/i18n.tsx'
@@ -562,6 +562,20 @@ interface TooltipProps {
   ohneTabHalt?: boolean
 }
 
+const STEUERELEMENTE = new Set(['a', 'button', 'input', 'select', 'textarea'])
+
+/** Ein Steuerelement selbst (nicht seine Hülle): bekommt den `aria-describedby`-Verweis auf die Blase. */
+function kindIstSteuerelement(kind: ReactNode): kind is ReactElement<{ 'aria-describedby'?: string }> {
+  return isValidElement(kind) && typeof kind.type === 'string' && STEUERELEMENTE.has(kind.type)
+}
+
+/** Das Kind nimmt Tipp und Fokus selbst an (Steuerelement, `tabIndex` oder eine Hülle wie `<label>` darum) - dann darf die Hülle den ersten Tipp nicht schlucken. */
+export function kindIstBedienbar(kind: ReactNode): boolean {
+  if (!isValidElement<{ tabIndex?: number; children?: ReactNode }>(kind)) return false
+  if (kindIstSteuerelement(kind) || kind.props.tabIndex !== undefined) return true
+  return kind.type === 'label' && Children.toArray(kind.props.children).some(kindIstBedienbar)
+}
+
 /**
  * Ein Hinweis, der zur Seite gehört — nicht der des Betriebssystems.
  *
@@ -622,7 +636,8 @@ export function Tooltip({
   const anker = useRef<HTMLSpanElement>(null)
   const blase = useRef<HTMLSpanElement>(null)
   const zuTimer = useRef<number>(undefined)
-  const tipp = useTippVerhalten(anker, offen, () => setOffen(false), Boolean(eigenerFokus ?? (isValidElement(children) && (children.type === 'a' || children.type === 'button'))))
+  const kindFokus = eigenerFokus ?? kindIstBedienbar(children)
+  const tipp = useTippVerhalten(anker, offen, () => setOffen(false), kindFokus)
   /**
    * Kennung, mit der der Auslöser auf seine Blase zeigt.
    *
@@ -632,8 +647,7 @@ export function Tooltip({
    * und davon gibt es auf der Startseite über zweihundert.
    */
   const blasenId = useId()
-  /* Ein Knopf oder Link ist selbst Tab-Halt: Er bekommt den Verweis auf die Blase, die Hülle keinen zweiten Halt. */
-  const kindFokus = eigenerFokus ?? (isValidElement(children) && (children.type === 'a' || children.type === 'button'))
+  /* Ein Knopf, Link oder Feld ist selbst Tab-Halt: Es bekommt den Verweis auf die Blase, die Hülle keinen zweiten Halt. */
   const verweis = offen ? blasenId : undefined
   const pos = useBlasenPosition(offen, seite, anker, blase)
 
@@ -665,8 +679,8 @@ export function Tooltip({
           unterstrichen ? 'cursor-help underline decoration-dotted underline-offset-2' : '',
         ].join(' ')}
       >
-        {kindFokus && isValidElement(children)
-          ? cloneElement(children as ReactElement<{ 'aria-describedby'?: string }>, { 'aria-describedby': verweis })
+        {kindFokus && kindIstSteuerelement(children)
+          ? cloneElement(children, { 'aria-describedby': verweis })
           : children}
       </span>
       {offen && text && <TooltipBlase blase={blase} blasenId={blasenId} pos={pos} mitSpitze={mitSpitze} text={text} />}

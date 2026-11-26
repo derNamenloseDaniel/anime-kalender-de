@@ -862,3 +862,4 @@ tools/web-push-voll.test.ts
 tools/werkzeug-ohne-test-wache.mjs
 tools/workflow-abbruch-waechter.mjs
 tools/workflow-ohne-pakete.mjs
+pipeline/check-tooltip-bedienung.ts

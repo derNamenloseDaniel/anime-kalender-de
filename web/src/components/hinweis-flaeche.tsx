@@ -18,6 +18,15 @@ export function useFlaechenHinweis() {
   const zu = useCallback(() => setStand(undefined), [])
   useEinzigeBlase(Boolean(stand), zu)
   const pos = useBlasenPosition(Boolean(stand), 'unten', anker, blase)
+  const touchTimer = useRef<number>(undefined)
+  /* Beim Abbau laufen keine Zeitgeber weiter (sonst setzt der Schließ-Timer Zustand einer entfernten Fläche). */
+  useEffect(
+    () => () => {
+      window.clearTimeout(zuTimer.current)
+      window.clearTimeout(touchTimer.current)
+    },
+    [],
+  )
 
   useEffect(() => {
     if (!stand) return
@@ -42,7 +51,8 @@ export function useFlaechenHinweis() {
     /* Auf dem Handy gibt es kein Überfahren: Antippen zeigt die Blase drei Sekunden, wie beim `Tooltip`. */
     onTouchStart: (e: TouchEvent) => {
       perTouch.current = true
-      window.setTimeout(() => (perTouch.current = false), 1000)
+      window.clearTimeout(touchTimer.current)
+      touchTimer.current = window.setTimeout(() => (perTouch.current = false), 1000)
       if (!zeige(e)) return
       window.clearTimeout(zuTimer.current)
       zuTimer.current = window.setTimeout(zu, 3000)

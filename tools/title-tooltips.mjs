@@ -36,15 +36,29 @@ function quelldateien(quelle) {
 const istKleinerName = (tag) => ts.isIdentifier(tag) && /^[a-z]/.test(tag.text)
 const istTitelName = (n) => (ts.isIdentifier(n) || ts.isStringLiteralLike(n)) && n.text === 'title'
 
-/** Native Element mit `title`-Attribut, `x.title = …` oder `setAttribute('title', …)`. */
+/** Objektliteral mit einer Eigenschaft `title` (`{ title }`, `{ title: x }`, `{ 'title': x }`). */
+const hatTitelEigenschaft = (o) =>
+  o !== undefined && ts.isObjectLiteralExpression(o) && o.properties.some((p) => p.name !== undefined && istTitelName(p.name))
+
+/** `createElement('x', { title })` / `React.createElement(…)` mit kleingeschriebenem Namen als erstem Argument. */
+function istCreateElementMitTitel(n) {
+  const name = ts.isIdentifier(n.expression) ? n.expression.text : ts.isPropertyAccessExpression(n.expression) ? n.expression.name.text : ''
+  const [tag, props] = n.arguments
+  return name === 'createElement' && tag !== undefined && ts.isStringLiteralLike(tag) && /^[a-z]/.test(tag.text) && hatTitelEigenschaft(props)
+}
+
+/** Native Element mit `title`-Attribut (auch per Spread eines Objektliterals), `x.title = …`, `x['title'] = …`, `setAttribute('title', …)` oder `createElement('x', { title })`. */
 function istTitelTooltip(n) {
   if (ts.isJsxAttribute(n) && istTitelName(n.name)) {
     const element = n.parent.parent
     return istKleinerName(element.tagName)
   }
+  if (ts.isJsxSpreadAttribute(n)) return istKleinerName(n.parent.parent.tagName) && hatTitelEigenschaft(n.expression)
   if (ts.isBinaryExpression(n) && n.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
+    if (ts.isElementAccessExpression(n.left)) return ts.isStringLiteralLike(n.left.argumentExpression) && n.left.argumentExpression.text === 'title'
     return ts.isPropertyAccessExpression(n.left) && n.left.name.text === 'title'
   }
+  if (ts.isCallExpression(n) && istCreateElementMitTitel(n)) return true
   if (ts.isCallExpression(n) && ts.isPropertyAccessExpression(n.expression) && n.expression.name.text === 'setAttribute') {
     const [name] = n.arguments
     return name !== undefined && ts.isStringLiteralLike(name) && name.text === 'title'
@@ -87,6 +101,22 @@ export function fundstellen(quelle) {
   return quelldateien(quelle).flatMap((pfad) => stellenInQuelle(pfad, readFileSync(join(quelle, pfad), 'utf8')))
 }
 
+/** SVG-`<title>` als Kind (Name für Screenreader, kein Tooltip der App): erlaubt, aber eigens gezählt (`pfad:zeile`). */
+export function svgTitelInQuelle(pfad, text) {
+  const sf = ts.createSourceFile(pfad, text, ts.ScriptTarget.Latest, true, pfad.endsWith('x') ? ts.ScriptKind.TSX : ts.ScriptKind.TS)
+  const funde = []
+  const besuche = (n) => {
+    if (ts.isJsxElement(n) && ts.isIdentifier(n.openingElement.tagName) && n.openingElement.tagName.text === 'title') {
+      funde.push(`${pfad}:${sf.getLineAndCharacterOfPosition(n.getStart(sf)).line + 1}`)
+    }
+    ts.forEachChild(n, besuche)
+  }
+  besuche(sf)
+  return funde
+}
+
+const svgTitel = (quelle) => quelldateien(quelle).flatMap((pfad) => svgTitelInQuelle(pfad, readFileSync(join(quelle, pfad), 'utf8')))
+
 function argument(name, vorgabe) {
   const i = process.argv.indexOf(name)
   return i >= 0 ? resolve(process.argv[i + 1]) : vorgabe
@@ -120,7 +150,7 @@ export function main() {
     console.log(`Grenze auf ${funde.length} gesetzt.`)
     return 0
   }
-  console.log(`title-Tooltips in Ordnung: ${funde.length} Vorkommen, höchstens ${erlaubt} erlaubt.`)
+  console.log(`title-Tooltips in Ordnung: ${funde.length} Vorkommen, höchstens ${erlaubt} erlaubt; SVG-<title> (erlaubt, eigene Zählung): ${svgTitel(quelle).length}.`)
   return 0
 }
 

@@ -41,19 +41,19 @@ function Vorschlag({ k, titel, istFavorit, aktionen }: { k: Kandidat; titel?: Ti
         {k.ab !== undefined && <span className="empf-name absolute inset-x-0 bottom-0 px-2 pb-1.5 pt-5 text-left text-[11px] leading-tight">{t('empf.staffel', { n: k.ab })}</span>}
       </button>
       <div className="empf-aktionen flex flex-col gap-1">
-        <Tooltip text={t('empf.favorit')} seite="unten" fuellend>
+        <Tooltip text={t('empf.favorit')} seite="unten" fuellend className="empf-huelle-schmal">
           <button type="button" aria-pressed={istFavorit} aria-label={t('empf.favorit')} onClick={() => aktionen.favorit(k.id)} className={`${ZEILE} ${istFavorit ? 'border-ak-favorit-rand' : ''}`}>
             <i className="w-[18px] text-center not-italic text-ak-favorit-text">★</i>
             <span className="empf-aktion-text">{t('empf.favorit')}</span>
           </button>
         </Tooltip>
-        <Tooltip text={t('empf.gesehen')} seite="unten" fuellend>
-          <button type="button" aria-label={t('empf.gesehen')} onClick={() => aktionen.gesehen(k.id)} className={ZEILE}>
+        <Tooltip text={t('empf.gesehen')} seite="unten" fuellend className="empf-huelle-mitte">
+          <button type="button" aria-label={t('empf.gesehen')} onClick={() => aktionen.gesehen(k.id)} className={`${ZEILE} empf-knopf-mitte`}>
             <i className="w-[18px] text-center not-italic text-ak-gut-text">✓</i>
             <span className="empf-aktion-gesehen">{t('empf.gesehen')}</span>
           </button>
         </Tooltip>
-        <Tooltip text={t('empf.nein')} seite="unten" fuellend>
+        <Tooltip text={t('empf.nein')} seite="unten" fuellend className="empf-huelle-schmal">
           <button type="button" aria-label={t('empf.nein')} onClick={() => aktionen.nein(k.id)} className={ZEILE}>
             <i className="w-[18px] text-center not-italic text-ak-fehler-text">✕</i>
             <span className="empf-aktion-text">{t('empf.nein')}</span>

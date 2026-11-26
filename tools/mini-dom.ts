@@ -129,11 +129,18 @@ export function installiereMiniDom(fenster: MiniFenster, neuesBild: () => unknow
   }
 }
 
-/** Ein Klick wie vom Browser: erst Erfassungs-, dann Blasenhörer am Wurzelknoten, `target` ist `ziel`. */
-export function klicke(wurzel: MiniKnoten, ziel: MiniKnoten): void {
-  const e = { type: 'click', target: ziel, bubbles: true, cancelable: true, defaultPrevented: false, timeStamp: 0, preventDefault() {}, stopPropagation() {} }
-  const hoerer = wurzel.hoerer.get('click') ?? []
+/** Ein Ereignis wie vom Browser: erst Erfassungs-, dann Blasenhörer am Wurzelknoten, `target` ist `ziel`; gibt zurück, ob jemand `preventDefault` rief. */
+export function loese(wurzel: MiniKnoten, typ: string, ziel: MiniKnoten, mehr: object = {}): boolean {
+  let verhindert = false
+  const e = { ...mehr, type: typ, target: ziel, bubbles: true, cancelable: true, defaultPrevented: false, timeStamp: 0, preventDefault() { verhindert = true }, stopPropagation() {} }
+  const hoerer = wurzel.hoerer.get(typ) ?? []
   for (const capture of [true, false]) hoerer.filter((h) => h.capture === capture).forEach((h) => h.f(e))
+  return verhindert
+}
+
+/** Ein Klick wie vom Browser. */
+export function klicke(wurzel: MiniKnoten, ziel: MiniKnoten): void {
+  loese(wurzel, 'click', ziel)
 }
 
 /** Tippt `text` in `feld`: setzt Wert (und Art) und löst `input` wie vom Browser aus (erst Erfassungs-, dann Blasenhörer am Wurzelknoten). */

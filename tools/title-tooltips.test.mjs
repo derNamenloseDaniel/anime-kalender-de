@@ -57,6 +57,24 @@ assert.deepEqual(funde('const a = <button aria-label="x" data-hinweis="x" />'), 
 assert.deepEqual(funde('const a = <button title="x" />', 'web/src/a.test.tsx'), [])
 assert.deepEqual(funde('const a = <button title="x" />', 'tools/a.tsx'), [])
 
+// Weitere Wege zum nativen Tooltip: Spread eines Objektliterals, createElement, `x['title'] =`.
+assert.deepEqual(funde('const a = <button {...{ title: "x" }} />'), ['web/src/a.tsx:1'])
+assert.deepEqual(funde('const t = "x"\nconst a = <button {...{ title: t }}>a</button>'), ['web/src/a.tsx:2'])
+assert.deepEqual(funde('const a = <Button {...{ title: "x" }} />'), [])
+assert.deepEqual(funde('const a = <button {...{ id: "x" }} />'), [])
+assert.deepEqual(funde("const a = React.createElement('button', { title: 'x' })"), ['web/src/a.tsx:1'])
+assert.deepEqual(funde("const a = createElement('a', { href: '#', 'title': t })"), ['web/src/a.tsx:1'])
+assert.deepEqual(funde('const a = createElement("a", { title })'), ['web/src/a.tsx:1'])
+assert.deepEqual(funde("const a = createElement(Komponente, { title: 'x' })"), [])
+assert.deepEqual(funde("const a = createElement('a', { href: '#' })"), [])
+assert.deepEqual(funde("el['title'] = 'x'", 'web/src/a.ts'), ['web/src/a.ts:1'])
+assert.deepEqual(funde("el['id'] = 'x'", 'web/src/a.ts'), [])
+
+// SVG-<title> als Kind bleibt erlaubt, wird aber eigens gezählt.
+const svg = lauf(baum('svg', { 'web/src/a.tsx': 'const a = <svg><title>Name</title></svg>\nconst b = <svg><title>Zwei</title></svg>' }), grenzen(0))
+assert.equal(svg.status, 0, svg.stderr)
+assert.match(svg.stdout, /0 Vorkommen.*SVG-<title>.*: 2\./)
+
 // `title-ok:` nimmt die Zeile aus, aber nur als Kommentar mit Grund.
 assert.deepEqual(funde('const a = <iframe title="x" /> // title-ok: Name des iframe'), [])
 assert.deepEqual(funde('const a = <iframe\n  title="x" // title-ok: Name des iframe\n/>'), [])

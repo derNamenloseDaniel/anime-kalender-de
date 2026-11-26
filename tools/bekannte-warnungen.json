@@ -1,0 +1,8 @@
+[
+  {
+    "workflow": "Bestandsbau",
+    "muster": "Mängel Stillstand:.*— gestiegen: sprecher$",
+    "bis": "2026-11-30",
+    "notiz": "sprecher 351→356 bekannt, Besitzer Wochenlauf 30.11."
+  }
+]

@@ -281,23 +281,43 @@ for _ in $(seq 1 20); do
 done
 echo "Mergebarkeit: $ZUSTAND"
 
-if [ "$ZUSTAND" = "MERGEABLE" ]; then
-  # `--squash`, damit auf `main` ein Commit je Lauf steht statt eines
-  # Merge-Commits mit Anhang. `--admin` ist hier der Bypass der App im Ruleset
-  # `main-pruefweg`: Ohne das Flag weigert sich `gh` schon vor dem Aufruf, sobald
-  # der Pull Request auf eine Freigabe wartet (Lauf 38135294637, 11.10.2026).
-  # Ein Konflikt scheitert trotzdem.
-  #
-  # **Mehrere Versuche**: Mit parallelen Sammlern (seit 05.10.2026) bewegt sich `main` oft genau zwischen Mergebarkeits-Prüfung und Merge — GitHub antwortet dann
-  # „Base branch was modified. Review and try the merge again." Ein Pull Request, der deshalb offen bliebe, wartete auf den Claude-Lauf (und dessen Kontingent).
-  for merge_versuch in 1 2 3 4 5 6; do
-    if merge_aus="$(gh pr merge "$ZWEIG" --squash --admin --delete-branch --subject "$NACHRICHT" 2>&1)"; then
-      printf '%s\n' "$merge_aus"
+# Antwort eines GitHub-Serverfehlers (5xx): GitHub war gestört, der Merge nicht „abgelehnt" (Lauf 45650281762, 25.11.2026: über 2 Minuten 502 und „Something went wrong").
+serverfehler() {
+  printf '%s' "$1" | grep -qiE 'HTTP 50[0-9]|status code: 50[0-9]|Bad Gateway|Service Unavailable|Gateway Time-?out|Server Error|Something went wrong while executing'
+}
+
+# Pause in Sekunden; QUELLEN_PAUSE_FAKTOR (Prozent, Standard 100) stellt sie im Test herunter.
+pause_s() { sleep $(($1 * ${QUELLEN_PAUSE_FAKTOR:-100} / 100)); }
+
+# Mergt den PR und setzt ZUSTAND (Mergebarkeit nach der letzten Ablehnung); gelingt er, steht `gemerged=true` und das Skript endet. Rückgabe 1 = nicht gemergt.
+# „Base branch was modified": kurze Pause, höchstens 6 Versuche. 5xx: Pausen 15/30/60/120 s (~4 min); ein 502 kann den Merge trotzdem vollzogen haben, darum vor jedem neuen Versuch den Zustand lesen.
+pr_mergen() {
+  local abgelehnt=0 serverfehler_nr=0 zustand ausgabe pausen=(15 30 60 120)
+  MERGE_GRUND=""
+  while :; do
+    if ausgabe="$(gh pr merge "$ZWEIG" --squash --admin --delete-branch --subject "$NACHRICHT" 2>&1)"; then
+      printf '%s\n' "$ausgabe"
       melde "gemerged=true"
       exit 0
     fi
-    merge_grund="$(printf '%s' "$merge_aus" | tr '\n' ' ' | cut -c1-300)"
-    echo "::notice::Merge-Versuch $merge_versuch von 6 abgelehnt: $merge_grund — neuer Versuch."
+    printf '%s\n' "$ausgabe"
+    MERGE_GRUND="$(printf '%s' "$ausgabe" | tr '\n' ' ' | cut -c1-300)"
+    if serverfehler "$ausgabe"; then
+      [ "$serverfehler_nr" -lt "${#pausen[@]}" ] || return 1
+      echo "::notice::Merge: GitHub-Serverfehler ($MERGE_GRUND), nächster Versuch nach ${pausen[$serverfehler_nr]} s."
+      pause_s "${pausen[$serverfehler_nr]}"
+      serverfehler_nr=$((serverfehler_nr + 1))
+      zustand="$(gh pr view "$ZWEIG" --json state -q .state 2>/dev/null)" || zustand=""
+      if [ "$zustand" = "MERGED" ]; then
+        echo "Pull Request ist trotz Serverfehler gemergt."
+        melde "gemerged=true"
+        exit 0
+      fi
+      continue
+    fi
+    abgelehnt=$((abgelehnt + 1))
+    echo "::notice::Merge-Versuch $abgelehnt von 6 abgelehnt: $MERGE_GRUND — neuer Versuch."
+    [ "$abgelehnt" -lt 6 ] || return 1
     sleep $((3 + RANDOM % 8))
     # Die Mergebarkeit gegen den neuen Stand abwarten, bevor es weitergeht (ein echter Konflikt beendet die Schleife).
     for _ in $(seq 1 10); do
@@ -305,11 +325,23 @@ if [ "$ZUSTAND" = "MERGEABLE" ]; then
       [ "$ZUSTAND" != "UNKNOWN" ] && break
       sleep 2
     done
-    [ "$ZUSTAND" = "MERGEABLE" ] || break
+    [ "$ZUSTAND" = "MERGEABLE" ] || return 1
   done
+}
+
+if [ "$ZUSTAND" = "MERGEABLE" ]; then
+  # `--squash`, damit auf `main` ein Commit je Lauf steht statt eines
+  # Merge-Commits mit Anhang. `--admin` ist hier der Bypass der App im Ruleset
+  # `main-pruefweg`: Ohne das Flag weigert sich `gh` schon vor dem Aufruf, sobald
+  # der Pull Request auf eine Freigabe wartet (Lauf 38135294637, 11.10.2026).
+  # Ein Konflikt scheitert trotzdem.
+  #
+  # **Mehrere Versuche** (`pr_mergen`): Mit parallelen Sammlern (seit 05.10.2026) bewegt sich `main` oft genau zwischen Mergebarkeits-Prüfung und Merge — GitHub antwortet dann
+  # „Base branch was modified. Review and try the merge again." Ein Pull Request, der deshalb offen bliebe, wartete auf den Claude-Lauf (und dessen Kontingent).
+  if ! pr_mergen; then echo "::notice::Merge nicht gelungen (Rückgabe 1), Mergebarkeit: $ZUSTAND — Fehlerblock folgt."; fi
   if [ "$ZUSTAND" = "MERGEABLE" ]; then
     # Rot statt Warnung: Ein mergebarer Daten-Pull-Request, der offen bleibt, würde sonst still liegen (claude-daten-merge holt ihn nach).
-    echo "::error::Pull Request $NUMMER ist mergebar, der Merge scheiterte sechsmal, zuletzt: $merge_grund (Ruleset/Bypass der App prüfen)."
+    echo "::error::Pull Request $NUMMER ist mergebar, der Merge scheiterte (sechs Ablehnungen oder GitHub-Serverfehler über ~4 min), zuletzt: $MERGE_GRUND (Ruleset/Bypass der App prüfen)."
     melde "gemerged=false"
     exit 1
   fi

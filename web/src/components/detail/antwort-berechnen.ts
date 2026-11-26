@@ -5,6 +5,7 @@ import { dubAbdeckung } from '@shared/dub-grenze.ts'
 import { type Title, type Release, type ReleaseEvent } from '@shared/types.ts'
 import { belegteBereiche, zaehleErschienenJeAnbieter, ohneSchonErschienene, angekuendigteLaenge, fertigAntwort, gesamtIstBelegt, kopfReleases } from './antwort-regeln.ts'
 import { filmAntwort, kuenftigeAntwort } from './antwort-zweige.ts'
+import { folgenVorDemStart } from './antwort-davor.ts'
 
 /** `jetzt` ist die Uhr für „erschienen“ (`istErschienen`); Pflicht, damit kein Test mit festem `today` an der echten Uhr hängt. */
 type AntwortEingabe = { title: Title | undefined; releases: Release[]; today: string; jetzt: Date }
@@ -120,7 +121,7 @@ function gesamtFolgen(title: Title, fuerKopf: Release[], alleEvents: ReleaseEven
   und Death Note standen als „36 von 145" neben „ADN 145 Fg. ✓". Die Vorsicht aus Kill Blue
   gilt weiter für laufende Serien.
 */
-function belegendeStreams(title: Title, today: string) {
+export function belegendeStreams(title: Title, today: string) {
   const mitUrteil = (title.streams ?? []).filter((s) => s.dub === true)
   const abgeschlossenFuerKasten = title.jpEnd
     ? title.jpEnd < today
@@ -149,7 +150,7 @@ function restIstBelegt(mitUrteil: Title['streams'] & object, gesamt: number | un
   ✓", der Kasten „13 von 25 Folgen", weil er je Weg das Maximum nahm. Gezählt wird über
   eine Menge, damit sich überlappende Bereiche zweier Anbieter nicht doppelt zählen.
 */
-function vereinteFolgen(title: Title, belegen: NonNullable<Title['streams']>, gesamt: number | undefined): Set<number> {
+export function vereinteFolgen(title: Title, belegen: NonNullable<Title['streams']>, gesamt: number | undefined): Set<number> {
   const vereint = new Set<number>()
   for (const r of [
     ...belegen.flatMap((s) => s.dubRanges ?? []),
@@ -207,10 +208,11 @@ export function berechneAntwort({ title, releases, today, jetzt }: AntwortEingab
   }
   const gesamt = gesamtFolgen(title, fuerKopf, alleEvents)
   const { vereint, vollstaendig, teilOhneZahl, belegteFolgen, restBelegt, abgeschlossenFuerKasten } = dubBelegung({ title, today, hatSynchro, gesamt })
+  const rausMitDavor = raus + folgenVorDemStart(fuerKopf, vereint, gesamt)
 
   /* Kino und Stream eines Films gehören in einen Kasten — `film-termine.ts`. */
   if (kuenftig.length > 0) {
-    return kuenftigeAntwort({ kuenftig, hatSynchro, title, raus, today, releases, vollstaendig, abgeschlossenFuerKasten, alleEvents, jetzt, gesamt, vereint, ohneDisc, offen })
+    return kuenftigeAntwort({ kuenftig, hatSynchro, title, raus: rausMitDavor, today, releases, vollstaendig, abgeschlossenFuerKasten, alleEvents, jetzt, gesamt, vereint, ohneDisc, offen })
   }
   if (title.format === 'MOVIE') {
     return filmAntwort({ title, releases, today, hatSynchro, raus, gesamt })

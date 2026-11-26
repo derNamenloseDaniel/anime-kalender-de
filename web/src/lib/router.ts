@@ -367,7 +367,7 @@ export function setzeTabTitelQuelle(quelle: ((id: number) => string | undefined)
 export function titelNachEintrag(alt: Pick<AppRoute, 'title'>, neu: Pick<AppRoute, 'title'>, dok: { title: string } | undefined, quelle = tabTitelFuer): void {
   if (!neu.title || neu.title === alt.title || !dok) return
   const name = quelle?.(neu.title)
-  if (name) dok.title = name
+  if (name) dok.title = name // title-ok: Tabtitel
 }
 
 /** Ein Navigationsschritt auf der Adressleiste: Panel öffnen/schließen, Ansicht wechseln. */

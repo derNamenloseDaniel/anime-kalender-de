@@ -2,9 +2,9 @@ import { type FranchiseMember, type Title } from '@shared/types.ts'
 import { hauptstaffeln, nachJahrUndId, staffelBeschriftungen, staffelStaende } from '@shared/titles.ts'
 import { angabenZeile, kuenftig as istKuenftig, teilNamen } from './reihen-teil.ts'
 import { ReihenCover } from './reihen-cover.tsx'
+import { doppelteZusaetzeDerReihe, type FolgenText } from './reihen-doppelt.ts'
 import { ReihenSpur } from './reihen-spur.tsx'
-import { istEingeklappt } from './reihen-regeln.ts'
-import { OhneSynchroSchalter, ReihenKopf } from './reihen-kopf.tsx'
+import { ReihenKopf } from './reihen-kopf.tsx'
 import { reihenGruppen } from './reihen-gruppen.ts'
 import { gezeigteGruppen } from './reihen-uebersicht-regeln.ts'
 import type { Translate } from '../../lib/i18n.tsx'
@@ -18,15 +18,15 @@ export type ReihenListeProps = {
   favorites: Set<number>
   wechselt: boolean
   wechsleZu: (id: number) => void
-  reiheOhneOffen: number | null
   reihenSchluessel: number
   reiheSuche: { reihe: number; text: string; }
-  setReiheOhneOffen: Dispatch<SetStateAction<number | null>>
   setReiheSuche: Dispatch<SetStateAction<{ reihe: number; text: string; }>>
+  /** Titel, die als Reiter am Antwortkasten stehen (F157): sie fehlen in den Gruppen, nichts steht zweimal da. */
+  ohne?: ReadonlySet<number>
 }
 
-/** Wie die Reihe geordnet wird: Hauptstaffeln, Gruppen, Staffelnummern. */
-export function reihenOrdnung(reihenTeile: FranchiseMember[], reihenName: string, t: Translate) {
+/** Wie die Reihe geordnet wird: Hauptstaffeln, Gruppen (ohne die Teile in `ohne`), Staffelnummern. */
+export function reihenOrdnung(reihenTeile: FranchiseMember[], reihenName: string, t: Translate, ohne: ReadonlySet<number> = new Set()) {
   const jahr = new Date().getFullYear()
   const kuenftig = (m: FranchiseMember) => istKuenftig(m, jahr)
   /* Ein Titel ohne Jahr gehört ans Ende: `?? 0` stellte undatierte Kurzformate vor die Serie von 1999 (One Piece, 03.09.2026). */
@@ -88,6 +88,8 @@ export function reihenOrdnung(reihenTeile: FranchiseMember[], reihenName: string
     Number(kuenftig(a)) - Number(kuenftig(b)) || nachJahr(a, b)
   /* Vier Gruppen mit Überschrift (Hauptserie, Beiwerk, Filme), je chronologisch: bei „One Piece" standen 64 Teile in einer Liste. */
   const gruppen = reihenGruppen(reihenTeile, istHauptstaffel, nachStandUndJahr, t)
+    .map((g) => ({ ...g, teile: g.teile.filter((m) => !ohne.has(m.id)) }))
+    .filter((g) => g.teile.length > 0)
 
   /*
     Gezählt wird nur, wo die Nummer etwas unterscheidet: One Piece (ein Eintrag) bleibt ohne „Staffel 1".
@@ -95,7 +97,9 @@ export function reihenOrdnung(reihenTeile: FranchiseMember[], reihenName: string
   */
   const staffelLabel = staffelBeschriftungen(reihenTeile.filter(istHauptstaffel), reihenName)
   const nummern = staffelStaende(reihenTeile.filter(istHauptstaffel), reihenName)
-  return { kuenftig, istHauptstaffel, gruppen, staffelLabel, nummern }
+  const folgenText: FolgenText = (staffel, von, bis, mitStaffel) => t(mitStaffel ? 'detail.reiheFolgenMitS' : 'detail.reiheFolgen', { staffel, von, bis })
+  const unterschied = doppelteZusaetzeDerReihe(reihenTeile.filter(istHauptstaffel), reihenName, staffelLabel, nummern, folgenText)
+  return { kuenftig, istHauptstaffel, gruppen, staffelLabel, nummern, unterschied }
 }
 
 export type Ordnung = ReturnType<typeof reihenOrdnung>
@@ -112,6 +116,7 @@ export function reihenKarte(m: FranchiseMember, o: Ordnung, p: Pick<ReihenListeP
       gewaehlt={m.id === p.title.id}
       gemerkt={p.favorites.has(m.id)}
       nr={o.nummern.get(m.id)}
+      unterschied={o.unterschied.get(m.id)}
       namen={teilNamen(m, p.reihenName, o.istHauptstaffel(m), o.staffelLabel.get(m.id))}
       angaben={angabenZeile(m, offen, p.t)}
       gesperrt={p.wechselt}
@@ -121,48 +126,19 @@ export function reihenKarte(m: FranchiseMember, o: Ordnung, p: Pick<ReihenListeP
 }
 
 /** Der Inhalt der Reihen-Karte:Suche, Schalter und die Gruppen mit ihren Teilen. */
-export function reihenInhalt({ reihenTeile, t, reihenName, title, favorites, wechselt, wechsleZu, reiheOhneOffen, reihenSchluessel, reiheSuche, setReiheOhneOffen, setReiheSuche }: ReihenListeProps) {
-  const o = reihenOrdnung(reihenTeile, reihenName, t)
+export function reihenInhalt({ reihenTeile, t, reihenName, title, favorites, wechselt, wechsleZu, reihenSchluessel, reiheSuche, setReiheSuche, ohne = new Set() }: ReihenListeProps) {
+  const o = reihenOrdnung(reihenTeile, reihenName, t, ohne)
   const { gruppen } = o
   const karte = (m: FranchiseMember) => reihenKarte(m, o, { t, reihenName, title, favorites, wechselt, wechsleZu })
 
-  /* Teile ohne belegte deutsche Synchro sind eingeklappt — nur der gewählte Teil bleibt sichtbar (`reihen-regeln.ts`). */
-  const ohneOffen = reiheOhneOffen === reihenSchluessel
-  const eingeklappt = (m: FranchiseMember) => istEingeklappt(m, title.id)
   const lang = reihenTeile.length >= 15
   const suchText = reiheSuche.reihe === reihenSchluessel ? reiheSuche.text.trim() : ''
-  const gefiltert = gezeigteGruppen(gruppen, title.id, ohneOffen, suchText)
-  /* Alle Gruppen stehen offen untereinander (Daniel, 20.10.2026), die Zahl am Schalter gilt der ganzen Reihe. */
-  const zahlOhne = reihenTeile.filter(eingeklappt).length
-  /*
-    **Ein Schalter in der Leiste statt einer Zeile unter der Liste** (Daniel,
-    19.09.2026: „ohne deutsche synchro ausblenden zeile entfernen und stattdessen
-    toggle oben in die leiste … default toggle state auf ausgeblendet").
-  */
-  const ohneSchalter =
-    zahlOhne > 0 && !suchText ? (
-      <OhneSynchroSchalter
-        t={t}
-        zahl={zahlOhne}
-        ohneOffen={ohneOffen}
-        onChange={() => setReiheOhneOffen(ohneOffen ? null : reihenSchluessel)}
-      />
-    ) : null
+  const gefiltert = gezeigteGruppen(gruppen, suchText)
 
   return (
     <div className="flex flex-col gap-0.5">
-      {lang && (
-        <ReihenKopf
-          t={t}
-          suche={suchText ? reiheSuche.text : ''}
-          onSuche={(text) => setReiheSuche({ reihe: reihenSchluessel, text })}
-          schalter={ohneSchalter}
-        />
-      )}
-      {!lang && ohneSchalter && <div className="mb-1 flex">{ohneSchalter}</div>}
-      {!gefiltert.length && (
-        <span className="px-1 py-2 text-t4 text-ak-leise">{t(!suchText && zahlOhne > 0 ? 'detail.reiheNurOhne' : 'detail.reiheKeinTreffer')}</span>
-      )}
+      {lang && <ReihenKopf t={t} suche={suchText ? reiheSuche.text : ''} onSuche={(text) => setReiheSuche({ reihe: reihenSchluessel, text })} />}
+      {!gefiltert.length && <span className="px-1 py-2 text-t4 text-ak-leise">{t('detail.reiheKeinTreffer')}</span>}
       {gefiltert.map((g, i) => (
         <ReihenSpur key={g.titel} titel={g.titel} gewaehltId={title.id} erste={i === 0} t={t}>
           {g.teile.map(karte)}

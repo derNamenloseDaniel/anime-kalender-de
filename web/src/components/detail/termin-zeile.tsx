@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { anbieterName, PLATFORMS, type Release } from '@shared/types.ts'
 import { formatDate } from '@shared/time.ts'
+import { mediumAus } from '@shared/disc-medium.ts'
 import { expandEvents, istErschienen, merkbareTermine } from '@shared/logic.ts'
 import { Tooltip } from '../ui.tsx'
 import { useLang, type Translate } from '../../lib/i18n.tsx'
@@ -71,21 +72,6 @@ function kuerzeUmTitel(name: string, titel?: string): string {
   */
   if (!rest || rest.length < 3 || /^\d+$/.test(rest)) return name
   return rest
-}
-
-/**
- * **Das Medium aus der Editionsangabe** — „Limited Steelbook Edition, Blu-ray"
- * trägt es am Ende, andere Ausgaben mittendrin. Gesucht wird deshalb im ganzen
- * Text, und die genauere Angabe gewinnt: „DVD & Blu-ray" ist beides.
- */
-function mediumAus(edition?: string): string | undefined {
-  if (!edition) return undefined
-  const bd = /blu-?ray/i.test(edition)
-  const dvd = /\bdvd\b/i.test(edition)
-  if (bd && dvd) return 'DVD + BD'
-  if (bd) return 'Blu-ray'
-  if (dvd) return 'DVD'
-  return undefined
 }
 
 /** Der Händlername aus der Adresse — „amazon.de" wird zu „Amazon". */

@@ -68,6 +68,11 @@ runs:
       shell: bash
       env:
         FUND: ${{ inputs.fund }}
+        PR_NUMMER: ${{ steps.pr.outputs.pr }}
       run: |
-        echo "::error::Der Pull Request konnte nicht angelegt werden. Der Fund liegt als Artefakt „fund-${FUND}“ bereit — „Fund nachliefern“ spielt ihn ein."
+        if [ -n "$PR_NUMMER" ]; then
+          echo "::error::Pull Request $PR_NUMMER angelegt, Merge gescheitert (Grund in den Meldungen des Schritts davor). Der Fund liegt als Artefakt „fund-${FUND}“ bereit."
+        else
+          echo "::error::Der Pull Request konnte nicht angelegt werden. Der Fund liegt als Artefakt „fund-${FUND}“ bereit — „Fund nachliefern“ spielt ihn ein."
+        fi
         exit 1

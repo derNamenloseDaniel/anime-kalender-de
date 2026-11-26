@@ -4409,5 +4409,33 @@
   "pokemon-horizonte-s4-rtlplus": {
     "tmdbId": 220150
   },
-  "ranma-s3-netflix": {}
+  "ranma-s3-netflix": {},
+  "auto-141391-netflix": {
+    "tmdbId": 138357,
+    "fsk": 16,
+    "justwatchUrl": "https://www.themoviedb.org/tv/138357-yofukashinouta/watch?locale=DE",
+    "offers": [
+      {
+        "name": "Aniverse Amazon Channel",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Animation Digital Network",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Anime Digital Network Amazon Channel",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Amazon Video",
+        "kind": "buy"
+      }
+    ],
+    "providers": [
+      "primevideo",
+      "adn"
+    ],
+    "inhaltAm": "2026-11-26"
+  }
 }

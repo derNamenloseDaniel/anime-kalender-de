@@ -129,10 +129,27 @@ export function installiereMiniDom(fenster: MiniFenster, neuesBild: () => unknow
   }
 }
 
-/** Ein Klick wie vom Browser: erst Erfassungs-, dann Blasenhörer am Wurzelknoten, `target` ist `ziel`. */
+/** Ein Ereignis wie vom Browser: erst Erfassungs-, dann Blasenhörer am Wurzelknoten, `target` ist `ziel`; gibt zurück, ob jemand `preventDefault` rief. */
+export function loese(wurzel: MiniKnoten, typ: string, ziel: MiniKnoten, mehr: object = {}): boolean {
+  let verhindert = false
+  const e = { ...mehr, type: typ, target: ziel, bubbles: true, cancelable: true, defaultPrevented: false, timeStamp: 0, preventDefault() { verhindert = true }, stopPropagation() {} }
+  const hoerer = wurzel.hoerer.get(typ) ?? []
+  for (const capture of [true, false]) hoerer.filter((h) => h.capture === capture).forEach((h) => h.f(e))
+  return verhindert
+}
+
+/** Ein Klick wie vom Browser. */
 export function klicke(wurzel: MiniKnoten, ziel: MiniKnoten): void {
-  const e = { type: 'click', target: ziel, bubbles: true, cancelable: true, defaultPrevented: false, timeStamp: 0, preventDefault() {}, stopPropagation() {} }
-  const hoerer = wurzel.hoerer.get('click') ?? []
+  loese(wurzel, 'click', ziel)
+}
+
+/**
+ * Ein beliebiges Ereignis `art` an `ziel` wie vom Browser (Erfassungs-, dann Blasenhörer am Wurzelknoten). Zeigen und Wegzeigen sind
+ * `mouseover`/`mouseout` mit `relatedTarget: null` (von außerhalb des Fensters): daraus macht React `onMouseEnter`/`onMouseLeave`.
+ */
+export function feuere(wurzel: MiniKnoten, art: string, ziel: MiniKnoten): void {
+  const e = { type: art, target: ziel, relatedTarget: null, bubbles: true, cancelable: true, defaultPrevented: false, timeStamp: 0, preventDefault() {}, stopPropagation() {} }
+  const hoerer = wurzel.hoerer.get(art) ?? []
   for (const capture of [true, false]) hoerer.filter((h) => h.capture === capture).forEach((h) => h.f(e))
 }
 

@@ -98,7 +98,7 @@ function pruefeSkripte({ prSh, pruefenSh, bauSh }) {
   const aufruf = prSh.indexOf('quellen_pruefen)"')
   const bauprobe = prSh.indexOf('quellen_bauprobe)" || PRUEF_ROT=1')
   const anlegen = prSh.indexOf('pr_anlegen || exit 1')
-  const mergen = prSh.indexOf('if gh pr merge')
+  const mergen = prSh.indexOf('gh pr merge "$ZWEIG"')
   const rotZweig = prSh.indexOf('if [ "$PRUEF_ROT" = 1 ]; then\n  # Das Label')
   /* Bei i = 0 ist der Vergleich mit undefined falsch: die erste Stelle hat keinen Vorgänger. */
   const reihe = [quelle, aufruf, bauprobe, anlegen, rotZweig, mergen]

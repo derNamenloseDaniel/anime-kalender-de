@@ -91,6 +91,22 @@ try {
   const nurProtokoll = await gLauf(G.replace('  opt.aufrufe.push(1)\n', ''))
   assert.deepEqual(nurProtokoll.abweichungen.map((a) => `${a.fall}:${a.was}`), ['a:eingaben', 'b:eingaben'])
 
+  // `aufruf`: Funktion, die eine Funktion liefert; verglichen werden deren Ergebnisse (ohne `aufruf` bliebe nur die Marke „[Funktion]“)
+  const K = 'export function k(basis) {\n  return (n) => basis + n\n}\n'
+  writeFileSync(join(repo, 'k.mjs'), K)
+  git(repo, 'add', 'k.mjs')
+  git(repo, 'commit', '-q', '-m', 'k')
+  const kFall = (name, basis) => ({ name, args: [basis], aufruf: (fn, [b]) => [fn(b)(1), fn(b)(2)] })
+  const kLauf = (neu, faelleK = [kFall('a', 10), kFall('b', 20)]) => {
+    writeFileSync(join(repo, 'k.mjs'), neu)
+    return vergleicheAltNeu({ datei: 'k.mjs', funktion: 'k', faelle: faelleK, ref: 'HEAD', wurzel: repo })
+  }
+  assert.equal((await kLauf(K)).gleich, true)
+  const kAnders = await kLauf(K.replace('basis + n', 'basis - n'))
+  assert.deepEqual(kAnders.abweichungen.map((a) => `${a.fall}:${a.was}`), ['a:ergebnis', 'b:ergebnis'])
+  const ohneAufruf = await kLauf(K.replace('basis + n', 'basis - n'), [{ name: 'c', args: [10] }, { name: 'd', args: [20] }])
+  assert.equal(ohneAufruf.gleich, true, 'Vorbedingung: ohne `aufruf` sieht der Vergleich nur die Marke')
+
   // Aufruf: Fallmodul, Exit-Codes
   writeFileSync(join(repo, 'faelle.mjs'), `export const faelle = ${JSON.stringify(faelle)}\n`)
   writeFileSync(join(repo, 'f.mjs'), ALT)

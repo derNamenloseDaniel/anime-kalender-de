@@ -32,6 +32,7 @@ import {
   nameNenntDeutsch,
   staffelAuszaehlen,
   type CrApiObjekt,
+  type CrApiStaffel,
   type CrQuelle,
   type CrunchyrollSeiten,
 } from './crunchyroll-api.ts'
@@ -132,6 +133,149 @@ async function deutscheTermine(quelle: CrQuelle, guids: string[], archiv: unknow
   return termine
 }
 
+/** Rohantworten einer Serie, wie `archiviere` sie ablegt. */
+interface CrArchiv {
+  seriesId: string
+  url: string
+  katalog?: string
+  holtAm: string
+  seasons: unknown
+  episodes: Record<string, unknown>
+  objects: unknown[]
+}
+
+/** Eine Staffelliste, die nicht antwortet, und eine leere sind zwei verschiedene Auskünfte. */
+type StaffelListe = NonNullable<Awaited<ReturnType<CrQuelle['staffeln']>>>
+type FolgenListe = NonNullable<Awaited<ReturnType<CrQuelle['folgen']>>>
+
+function archivKopf(quelle: CrQuelle, url: string, seriesId: string, staffelAntwort: StaffelListe): CrArchiv {
+  return {
+    seriesId,
+    url,
+    // Auch im Inhalt, nicht nur im Dateinamen: Wer das Archiv einliest, soll
+    // die Region am Datensatz selbst ablesen können und nicht am Pfad.
+    katalog: quelle.katalog,
+    holtAm: new Date().toISOString(),
+    seasons: JSON.parse(staffelAntwort.roh),
+    episodes: {},
+    objects: [],
+  }
+}
+
+/**
+ * Eine Kennung ohne Staffeln ist für sich genommen eine **Nichtauskunft**.
+ *
+ * Was daraus wird, entscheidet die Seite — und nur sie. Der Abgleich am
+ * 21.08.2026 zeigte, dass beide dasselbe meinen: „Durarara!!", „Nisekoi" und
+ * „91 Days" liefern `total: 0`, und auf ihrer Seite steht „Leider sind die
+ * Videos dieser Serie nicht mehr verfügbar." Genommen wird trotzdem die
+ * Seite, nicht die Zahl.
+ */
+async function leereStaffelliste(
+  quelle: CrQuelle,
+  kopf: CrSerie,
+  archiv: CrArchiv,
+  seiten?: () => Promise<CrunchyrollSeiten>,
+): Promise<CrSerie> {
+  archiviere(archiv.seriesId, quelle, archiv)
+  if (!seiten) return { ...kopf, fehler: KEINE_STAFFEL }
+  const befund = await (await seiten()).seitenBefund(archiv.url, true)
+  if (befund.art) return { ...kopf, nichtVerfuegbar: true, fehler: befund.zeile }
+  return { ...kopf, fehler: KEINE_STAFFEL }
+}
+
+/** Eine Staffel samt Auszählung und deutschen Terminen; schreibt die Folgenantwort ins Archiv. */
+async function staffelLesen(
+  quelle: CrQuelle,
+  st: CrApiStaffel,
+  folgenAntwort: FolgenListe,
+  archiv: CrArchiv,
+): Promise<CrStaffel> {
+  archiv.episodes[st.id] = JSON.parse(folgenAntwort.roh)
+
+  const { jeFolge, deutscheFolgen } = staffelAuszaehlen(folgenAntwort.data)
+  const tonspuren = [...jeFolge.values()]
+  const termine = deutscheFolgen.length
+    ? await deutscheTermine(
+        quelle,
+        deutscheFolgen.map((f) => f.guid),
+        archiv.objects,
+      )
+    : new Map<string, string>()
+  return {
+    name: st.title || `Staffel ${st.season_number ?? '?'}`,
+    staffelId: st.id,
+    folgen: jeFolge.size,
+    kacheln: folgenAntwort.data.length,
+    deutsch: tonspuren.filter((t) => t === 'deutsch').length,
+    fremd: tonspuren.filter((t) => t === 'fremd').length,
+    deutscheFassung: hatDeutsch(st.versions),
+    deutscheFolgen: deutscheFolgen.length
+      ? deutscheFolgen.map((f) => ({ ...f, verfuegbarAb: termine.get(f.guid) }))
+      : undefined,
+  }
+}
+
+/**
+ * Je Tonspur eine eigene Staffel — das führt nur der ältere CMS-Pfad.
+ *
+ * Ungefiltert zählte „Fairy Tail" 452 Folgen in fünf Blöcken statt 277 in
+ * drei, und `beurteile()` legte unsere Staffeln an Blöcken an, die dieselben
+ * Folgen zweimal führen. Die Begründung für die Auswahl steht bei
+ * `hauptStaffeln()`.
+ */
+async function staffelnLesen(
+  quelle: CrQuelle,
+  staffelAntwort: StaffelListe,
+  archiv: CrArchiv,
+): Promise<{ staffeln: CrStaffel[]; unvollstaendig: boolean }> {
+  const staffeln: CrStaffel[] = []
+  const gesehen = new Set<string>()
+  for (const st of hauptStaffeln(staffelAntwort.data)) {
+    if (gesehen.has(st.id)) continue
+    gesehen.add(st.id)
+
+    const folgenAntwort = await quelle.folgen(st.id)
+    /**
+     * Eine Staffel, die nicht antwortet, macht die **ganze** Serie unbrauchbar.
+     *
+     * `beurteile()` rechnet Blocksummen gegen unsere Staffeln; eine fehlende
+     * Staffel verschöbe jede Zuordnung danach. Und „alle Blöcke vollständig
+     * deutsch" wäre bei einem fehlenden Block schlicht falsch. Lieber gar keine
+     * Aussage als eine aus lückenhafter Grundlage.
+     */
+    if (!folgenAntwort) return { staffeln, unvollstaendig: true }
+    staffeln.push(await staffelLesen(quelle, st, folgenAntwort, archiv))
+  }
+  return { staffeln, unvollstaendig: false }
+}
+
+/**
+ * Der Staffelname ist die Kontrolle, nicht der Beleg.
+ *
+ * Bei älteren Titeln trägt die Synchronfassung einen eigenen Block mit der
+ * Fassung im Namen: „Fairy Tail (German Dub)", Slug `-german-dub`. Wo das so
+ * ist und `versions` dasselbe sagt, bestätigen sich beide.
+ *
+ * **Ein fehlender Namenszusatz ist dagegen kein Widerspruch**, sondern
+ * Schweigen — und zwar der Regelfall. Gemessen am 22.08.2026 an 20 Serien mit
+ * belegter deutscher Fassung: Bei neueren Titeln heißen **alle** neun
+ * Sprachblöcke gleich („Staffel 1", „Tower of God"), die Fassung steht nur in
+ * `audio_locale` und `versions`. Acht der 20 hätten so als Widerspruch
+ * gegolten, ohne dass irgendetwas widersprüchlich wäre.
+ *
+ * Festgehalten wird deshalb nur die eine Richtung, in der wirklich zwei
+ * Aussagen kollidieren: Ein Name nennt die deutsche Fassung, `versions` kennt
+ * sie nicht. Dann **gewinnt `versions`** — ein Titel ist Redaktion, eine
+ * Fassungsliste ist Bestand —, und der Fall gehört in den Bericht.
+ */
+function namensWiderspruchVon(staffelAntwort: StaffelListe, deutschImAngebot: boolean): string | undefined {
+  const imNamen = staffelAntwort.data.some((st) => nameNenntDeutsch(st.title, st.slug_title))
+  return imNamen && !deutschImAngebot
+    ? 'ein Staffelname nennt die deutsche Fassung, versions führt kein de-DE'
+    : undefined
+}
+
 /**
  * Liest eine Serie über eine der beiden Schnittstellen.
  *
@@ -153,124 +297,15 @@ export async function serieLesen(
   const staffelAntwort = await quelle.staffeln(seriesId)
   if (!staffelAntwort) return { ...kopf, fehler: 'Content-API hat auf die Staffelliste nicht geantwortet' }
 
-  const archiv: {
-    seriesId: string
-    url: string
-    katalog?: string
-    holtAm: string
-    seasons: unknown
-    episodes: Record<string, unknown>
-    objects: unknown[]
-  } = {
-    seriesId,
-    url,
-    // Auch im Inhalt, nicht nur im Dateinamen: Wer das Archiv einliest, soll
-    // die Region am Datensatz selbst ablesen können und nicht am Pfad.
-    katalog: quelle.katalog,
-    holtAm: new Date().toISOString(),
-    seasons: JSON.parse(staffelAntwort.roh),
-    episodes: {},
-    objects: [],
-  }
+  const archiv = archivKopf(quelle, url, seriesId, staffelAntwort)
+  if (!staffelAntwort.data.length) return leereStaffelliste(quelle, kopf, archiv, seiten)
 
-  /**
-   * Eine Kennung ohne Staffeln ist für sich genommen eine **Nichtauskunft**.
-   *
-   * Was daraus wird, entscheidet die Seite — und nur sie. Der Abgleich am
-   * 21.08.2026 zeigte, dass beide dasselbe meinen: „Durarara!!", „Nisekoi" und
-   * „91 Days" liefern `total: 0`, und auf ihrer Seite steht „Leider sind die
-   * Videos dieser Serie nicht mehr verfügbar." Genommen wird trotzdem die
-   * Seite, nicht die Zahl.
-   */
-  if (!staffelAntwort.data.length) {
-    archiviere(seriesId, quelle, archiv)
-    if (!seiten) return { ...kopf, fehler: KEINE_STAFFEL }
-    const befund = await (await seiten()).seitenBefund(url, true)
-    if (befund.art) return { ...kopf, nichtVerfuegbar: true, fehler: befund.zeile }
-    return { ...kopf, fehler: KEINE_STAFFEL }
-  }
-
-  const staffeln: CrStaffel[] = []
-  const gesehen = new Set<string>()
-  let unvollstaendig = false
-  /**
-   * Je Tonspur eine eigene Staffel — das führt nur der ältere CMS-Pfad.
-   *
-   * Ungefiltert zählte „Fairy Tail" 452 Folgen in fünf Blöcken statt 277 in
-   * drei, und `beurteile()` legte unsere Staffeln an Blöcken an, die dieselben
-   * Folgen zweimal führen. Die Begründung für die Auswahl steht bei
-   * `hauptStaffeln()`.
-   */
-  for (const st of hauptStaffeln(staffelAntwort.data)) {
-    if (gesehen.has(st.id)) continue
-    gesehen.add(st.id)
-
-    const folgenAntwort = await quelle.folgen(st.id)
-    /**
-     * Eine Staffel, die nicht antwortet, macht die **ganze** Serie unbrauchbar.
-     *
-     * `beurteile()` rechnet Blocksummen gegen unsere Staffeln; eine fehlende
-     * Staffel verschöbe jede Zuordnung danach. Und „alle Blöcke vollständig
-     * deutsch" wäre bei einem fehlenden Block schlicht falsch. Lieber gar keine
-     * Aussage als eine aus lückenhafter Grundlage.
-     */
-    if (!folgenAntwort) {
-      unvollstaendig = true
-      break
-    }
-    archiv.episodes[st.id] = JSON.parse(folgenAntwort.roh)
-
-    const { jeFolge, deutscheFolgen } = staffelAuszaehlen(folgenAntwort.data)
-    const tonspuren = [...jeFolge.values()]
-    const termine = deutscheFolgen.length
-      ? await deutscheTermine(
-          quelle,
-          deutscheFolgen.map((f) => f.guid),
-          archiv.objects,
-        )
-      : new Map<string, string>()
-    staffeln.push({
-      name: st.title || `Staffel ${st.season_number ?? '?'}`,
-      staffelId: st.id,
-      folgen: jeFolge.size,
-      kacheln: folgenAntwort.data.length,
-      deutsch: tonspuren.filter((t) => t === 'deutsch').length,
-      fremd: tonspuren.filter((t) => t === 'fremd').length,
-      deutscheFassung: hatDeutsch(st.versions),
-      deutscheFolgen: deutscheFolgen.length
-        ? deutscheFolgen.map((f) => ({ ...f, verfuegbarAb: termine.get(f.guid) }))
-        : undefined,
-    })
-  }
+  const { staffeln, unvollstaendig } = await staffelnLesen(quelle, staffelAntwort, archiv)
   archiviere(seriesId, quelle, archiv)
 
   const deutschImAngebot =
     staffelAntwort.data.some((st) => hatDeutsch(st.versions)) || staffeln.some((s) => s.deutsch > 0)
-
-  /**
-   * Der Staffelname ist die Kontrolle, nicht der Beleg.
-   *
-   * Bei älteren Titeln trägt die Synchronfassung einen eigenen Block mit der
-   * Fassung im Namen: „Fairy Tail (German Dub)", Slug `-german-dub`. Wo das so
-   * ist und `versions` dasselbe sagt, bestätigen sich beide.
-   *
-   * **Ein fehlender Namenszusatz ist dagegen kein Widerspruch**, sondern
-   * Schweigen — und zwar der Regelfall. Gemessen am 22.08.2026 an 20 Serien mit
-   * belegter deutscher Fassung: Bei neueren Titeln heißen **alle** neun
-   * Sprachblöcke gleich („Staffel 1", „Tower of God"), die Fassung steht nur in
-   * `audio_locale` und `versions`. Acht der 20 hätten so als Widerspruch
-   * gegolten, ohne dass irgendetwas widersprüchlich wäre.
-   *
-   * Festgehalten wird deshalb nur die eine Richtung, in der wirklich zwei
-   * Aussagen kollidieren: Ein Name nennt die deutsche Fassung, `versions` kennt
-   * sie nicht. Dann **gewinnt `versions`** — ein Titel ist Redaktion, eine
-   * Fassungsliste ist Bestand —, und der Fall gehört in den Bericht.
-   */
-  const imNamen = staffelAntwort.data.some((st) => nameNenntDeutsch(st.title, st.slug_title))
-  const namensWiderspruch =
-    imNamen && !deutschImAngebot
-      ? 'ein Staffelname nennt die deutsche Fassung, versions führt kein de-DE'
-      : undefined
+  const namensWiderspruch = namensWiderspruchVon(staffelAntwort, deutschImAngebot)
 
   if (unvollstaendig) {
     return {

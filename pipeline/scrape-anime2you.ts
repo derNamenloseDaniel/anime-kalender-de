@@ -19,7 +19,7 @@
  *
  * Aufruf: npx tsx pipeline/scrape-anime2you.ts
  */
-import { findDates, parseFeed, type FoundDate } from './lib/feed.ts'
+import { findDates, parseFeed, type FeedItem, type FoundDate } from './lib/feed.ts'
 import { log, readJson, sleep, warn, writeJson } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
 import { sendezeiten, type Sendezeit } from './lib/sendezeit.ts'
@@ -359,19 +359,115 @@ function meldeLauf(all: Proposal[], verworfen: Map<string, number>): void {
   }
 }
 
-async function main(): Promise<void> {
-  // Welche Artikel sind schon eingearbeitet? Ihre Adresse steht in einer Handdatei (Termine, Ankündigungen, Erstausgaben, Belege).
-  const curatedSources = eingearbeiteteAdressen()
-
-  const today = todayIso()
-  const proposals: Proposal[] = []
+/** Zustand eines Laufs, den die Bewertung einer Meldung liest und fortschreibt. */
+interface LaufStand {
+  curatedSources: Set<string>
+  today: string
   /** Wie viele Volltexte dieser Lauf schon geholt hat — siehe HOECHSTENS_VOLLTEXTE. */
-  let volltexte = 0
+  volltexte: number
   /** Jeder Verwerfungspfad des Laufs mit Grund und Anzahl — ein stiller Ausfall fiele sonst erst im Kalender auf. */
+  verwirf: (grund: string) => void
+  gesehen: Set<string>
+  bekannt: Map<string, Proposal>
+}
+
+/**
+ * Sendezeit nachholen, solange das Kontingent reicht. Der Volltext ist der einzige Ort, an dem sie steht — und nur
+ * bei Streaming-Meldungen ist sie überhaupt eine Frage: Eine Disc erscheint im Laden.
+ */
+async function holeZeiten(item: FeedItem, kategorie: string, platforms: PlatformId[], text: string, lauf: LaufStand): Promise<Sendezeit[] | undefined> {
+  let zeiten: Sendezeit[] | undefined = LEICHT ? lauf.bekannt.get(item.link)?.zeiten : undefined
+  if (
+    volltextNoetig(LEICHT, lauf.bekannt, item.link) &&
+    lauf.volltexte < HOECHSTENS_VOLLTEXTE &&
+    kategorie === 'streaming' &&
+    platforms.length > 0 &&
+    START_SIGNAL.test(text)
+  ) {
+    lauf.volltexte++
+    const voll = await artikelText(item.link)
+    await sleep(1500)
+    const gefunden = voll ? sendezeiten(voll) : []
+    if (gefunden.length) zeiten = gefunden
+  }
+  return zeiten
+}
+
+/** Bewertet eine Feed-Meldung: ein Vorschlag, oder `undefined` mit gezähltem Verwerfungsgrund. */
+async function bewerteMeldung(item: FeedItem, kategorie: string, lauf: LaufStand): Promise<Proposal | undefined> {
+  if (lauf.gesehen.has(item.link)) {
+    lauf.verwirf('schon in einem Rubrik-Feed gelesen')
+    return undefined
+  }
+  lauf.gesehen.add(item.link)
+  const text = `${item.title}\n${item.content}`
+  const dates = findDates(text, item.publishedAt)
+  // Nur was in der Zukunft liegt oder gerade erst war, ist ein Termin-
+  // Kandidat. Rückblicke auf japanische Ausstrahlungen sind es nicht.
+  const relevant = dates.filter((d) => (d.iso ?? `${d.month}-31`) >= lauf.today)
+  const platforms = PLATFORM_HINTS.filter((h) => h.pattern.test(text)).map((h) => h.platform)
+  const dub = dubBefund(text)
+
+  // Pausen nur melden, wenn die deutsche Fassung gemeint sein kann. Ohne
+  // diese Bedingung überwiegen japanische Ausstrahlungen bei weitem: In der
+  // Messung vom 12.08.2026 trugen 62 Artikel ein Pausensignal, aber nur
+  // vier einen Bezug zur deutschen Fassung. Wer die übrigen 58 mitliest,
+  // hört nach der zweiten Woche auf, die Liste anzusehen.
+  const pause =
+    dub !== 'unklar' || platforms.length
+      ? PAUSE_HINTS.find((p) => p.pattern.test(text))?.art
+      : undefined
+
+  const zeiten = await holeZeiten(item, kategorie, platforms, text, lauf)
+
+  // Ein Vorschlag braucht einen künftigen Termin — außer er meldet eine
+  // Pause oder eine Sendezeit. „Die Serie pausiert bis auf Weiteres" nennt
+  // kein Datum und ändert den Kalender trotzdem; „seit heute, weitere
+  // Folgen jeden Samstag um 18:00 Uhr" nennt ein vergangenes und trägt die
+  // einzige Uhrzeitangabe, die es zu dieser Serie gibt.
+  /*
+    **Ein Anbieter-Sammelartikel bleibt auch ohne Datum im Auszug.** Der Feed-Auszug endet vor der Liste: „Disney+
+    kündigt sechs weitere Anime-Neuzugänge an" (24.09.2026) nennt im Auszug keinen Tag und fiel hier durch — samt
+    SPY x FAMILY, Shield Hero, One Piece und fünf weiteren Starts, die danach im Kalender fehlten. Die Einträge mit
+    Datum und Sprache liest erst `sammelartikelNachholen` aus dem ganzen Artikel.
+  */
+  const sammelartikel = kategorie === 'streaming' && ANBIETER_SAMMELARTIKEL.test(item.title)
+  /* Eine Aussage zur deutschen Sprachfassung genügt auch ohne Tag („ab sofort mit deutscher Synchronisation“): Sie geht als Hinweis in die Ausgabe, einen Termin erfindet niemand. */
+  const sprache = dub === 'ja' && !relevant.length && !pause && !zeiten && !sammelartikel
+  const grund = verwerfensgrund(kategorie, deutschlandBezug(text, dub), Boolean(relevant.length || pause || zeiten || sammelartikel || sprache))
+  if (grund) {
+    lauf.verwirf(grund)
+    return undefined
+  }
+
+  return {
+    articleTitle: item.title,
+    articleUrl: item.link,
+    publishedAt: item.publishedAt,
+    category: kategorie,
+    platforms,
+    dates: relevant,
+    dub,
+    ...(pause ? { pause } : {}),
+    ...(zeiten ? { zeiten } : {}),
+    ...(sprache ? { hinweis: 'sprache' as const } : {}),
+    alreadyCurated: lauf.curatedSources.has(item.link.replace(/\/$/, '')),
+  }
+}
+
+async function main(): Promise<void> {
   const verworfen = new Map<string, number>()
-  const verwirf = (grund: string): void => void verworfen.set(grund, (verworfen.get(grund) ?? 0) + 1)
-  const gesehen = new Set<string>()
-  const bekannt = new Map(readJson<{ proposals: Proposal[] }>(VORSCHLAEGE, { proposals: [] }).proposals.map((p) => [p.articleUrl, p] as const))
+  const lauf: LaufStand = {
+    // Welche Artikel sind schon eingearbeitet? Ihre Adresse steht in einer Handdatei (Termine, Ankündigungen, Erstausgaben, Belege).
+    curatedSources: eingearbeiteteAdressen(),
+    today: todayIso(),
+    volltexte: 0,
+    verwirf: (grund) => void verworfen.set(grund, (verworfen.get(grund) ?? 0) + 1),
+    gesehen: new Set<string>(),
+    bekannt: new Map(readJson<{ proposals: Proposal[] }>(VORSCHLAEGE, { proposals: [] }).proposals.map((p) => [p.articleUrl, p] as const)),
+  }
+  const { curatedSources, today, verwirf } = lauf
+  const proposals: Proposal[] = []
 
   for (const feed of FEEDS) {
     const xml = await fetchText(feed.url, abrufFehler)
@@ -380,80 +476,8 @@ async function main(): Promise<void> {
     log(`Anime2You ${feed.category}: ${items.length} Meldungen`)
 
     for (const item of items) {
-      if (gesehen.has(item.link)) {
-        verwirf('schon in einem Rubrik-Feed gelesen')
-        continue
-      }
-      gesehen.add(item.link)
-      const text = `${item.title}\n${item.content}`
-      const dates = findDates(text, item.publishedAt)
-      // Nur was in der Zukunft liegt oder gerade erst war, ist ein Termin-
-      // Kandidat. Rückblicke auf japanische Ausstrahlungen sind es nicht.
-      const relevant = dates.filter((d) => (d.iso ?? `${d.month}-31`) >= today)
-      const platforms = PLATFORM_HINTS.filter((h) => h.pattern.test(text)).map((h) => h.platform)
-      const dub = dubBefund(text)
-
-      // Pausen nur melden, wenn die deutsche Fassung gemeint sein kann. Ohne
-      // diese Bedingung überwiegen japanische Ausstrahlungen bei weitem: In der
-      // Messung vom 12.08.2026 trugen 62 Artikel ein Pausensignal, aber nur
-      // vier einen Bezug zur deutschen Fassung. Wer die übrigen 58 mitliest,
-      // hört nach der zweiten Woche auf, die Liste anzusehen.
-      const pause =
-        dub !== 'unklar' || platforms.length
-          ? PAUSE_HINTS.find((p) => p.pattern.test(text))?.art
-          : undefined
-
-      // Sendezeit nachholen, solange das Kontingent reicht. Der Volltext ist
-      // der einzige Ort, an dem sie steht — und nur bei Streaming-Meldungen
-      // ist sie überhaupt eine Frage: Eine Disc erscheint im Laden.
-      let zeiten: Sendezeit[] | undefined = LEICHT ? bekannt.get(item.link)?.zeiten : undefined
-      if (
-        volltextNoetig(LEICHT, bekannt, item.link) &&
-        volltexte < HOECHSTENS_VOLLTEXTE &&
-        feed.category === 'streaming' &&
-        platforms.length > 0 &&
-        START_SIGNAL.test(text)
-      ) {
-        volltexte++
-        const voll = await artikelText(item.link)
-        await sleep(1500)
-        const gefunden = voll ? sendezeiten(voll) : []
-        if (gefunden.length) zeiten = gefunden
-      }
-
-      // Ein Vorschlag braucht einen künftigen Termin — außer er meldet eine
-      // Pause oder eine Sendezeit. „Die Serie pausiert bis auf Weiteres" nennt
-      // kein Datum und ändert den Kalender trotzdem; „seit heute, weitere
-      // Folgen jeden Samstag um 18:00 Uhr" nennt ein vergangenes und trägt die
-      // einzige Uhrzeitangabe, die es zu dieser Serie gibt.
-      /*
-        **Ein Anbieter-Sammelartikel bleibt auch ohne Datum im Auszug.** Der Feed-Auszug endet vor der Liste: „Disney+
-        kündigt sechs weitere Anime-Neuzugänge an" (24.09.2026) nennt im Auszug keinen Tag und fiel hier durch — samt
-        SPY x FAMILY, Shield Hero, One Piece und fünf weiteren Starts, die danach im Kalender fehlten. Die Einträge mit
-        Datum und Sprache liest erst `sammelartikelNachholen` aus dem ganzen Artikel.
-      */
-      const sammelartikel = feed.category === 'streaming' && ANBIETER_SAMMELARTIKEL.test(item.title)
-      /* Eine Aussage zur deutschen Sprachfassung genügt auch ohne Tag („ab sofort mit deutscher Synchronisation“): Sie geht als Hinweis in die Ausgabe, einen Termin erfindet niemand. */
-      const sprache = dub === 'ja' && !relevant.length && !pause && !zeiten && !sammelartikel
-      const grund = verwerfensgrund(feed.category, deutschlandBezug(text, dub), Boolean(relevant.length || pause || zeiten || sammelartikel || sprache))
-      if (grund) {
-        verwirf(grund)
-        continue
-      }
-
-      proposals.push({
-        articleTitle: item.title,
-        articleUrl: item.link,
-        publishedAt: item.publishedAt,
-        category: feed.category,
-        platforms,
-        dates: relevant,
-        dub,
-        ...(pause ? { pause } : {}),
-        ...(zeiten ? { zeiten } : {}),
-        ...(sprache ? { hinweis: 'sprache' as const } : {}),
-        alreadyCurated: curatedSources.has(item.link.replace(/\/$/, '')),
-      })
+      const vorschlag = await bewerteMeldung(item, feed.category, lauf)
+      if (vorschlag) proposals.push(vorschlag)
     }
     await sleep(1200)
   }
@@ -470,7 +494,7 @@ async function main(): Promise<void> {
 
   await schreibeVorschlaege(all, verworfen, today)
   meldeLauf(all, verworfen)
-  meldeSendezeiten(all, volltexte)
+  meldeSendezeiten(all, lauf.volltexte)
 }
 
 main().catch((err) => {

@@ -46,7 +46,7 @@ export function EckdatenAbschnitt({ title, t, genresOffen, onFilterBy, tGenre, s
 }
 
 /** Anbietername wie auf der Quelle selbst: aus der Adresse („anisearch.de") wird „aniSearch". */
-const quelleLabel = (name: string): string => (name === 'anisearch.de' ? 'aniSearch' : name === 'anilist.co' ? 'AniList' : name)
+const quelleLabel = (name: string): string => (name === 'anisearch.de' ? 'aniSearch' : name === 'anilist.co' ? 'AniList' : name === 'themoviedb.org' ? 'TMDB' : name)
 
 export function HandlungAbschnitt({ plot, t, plotOffen, setPlotOffen }: {
   plot: ReturnType<typeof plotVon>['plot']
@@ -102,14 +102,14 @@ export function HandlungAbschnitt({ plot, t, plotOffen, setPlotOffen }: {
             )}
             {plot.eigen ? (
               <EigeneQuellenZeile eigen={plot.eigen} t={t} />
-            ) : (
+            ) : plot.quelle ? (
               <span className="text-t4 text-slate-600 dark:text-slate-400">
                 {t('detail.plotQuelle')}{' '}
                 <a href={plot.quelle.url} target="_blank" rel="noopener noreferrer" className="-my-3 inline-flex min-h-11 items-center underline decoration-slate-400/50 underline-offset-2 hover:text-ak-text">
                   {quelleLabel(plot.quelle.name)} ↗
                 </a>
               </span>
-            )}
+            ) : null}
           </div>
         </PanelKarte>
       )}

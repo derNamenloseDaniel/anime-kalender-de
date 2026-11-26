@@ -1,5 +1,0 @@
-kategorie: bugfix
-text: Mehr Plakate auf Deutsch oder Englisch
-untertitel: Etwa Pokémon – Der Film und Made in Abyss
-wartetAuf: "Bestandsbau nach PR 4629. Probe: node tools/maengel.mjs zeigt bei bild-fremdsprachig statt 541 höchstens 524 offene Titel; public/data/titles.json trägt für die 12 neu gewählten Plakate ein geändertes coverImage. Ändert sich nichts, wird der Eintrag gelöscht."
-seit: '2026-11-22'

@@ -13,6 +13,65 @@ import { lesekennung } from '../../shared/staffel-titel.ts'
 /** Ein Titel, wie er ausgeliefert wird (`titles.json`). */
 export type SlimTitel = ReturnType<typeof baueAuslieferung>['slim'][number]
 
+/** Was `slimTitel` je Titel aus den Quellen nachschlägt. */
+interface SlimKontext {
+  anisearch: Record<string, AnisearchEintrag>
+  tmdbTitles: Record<string, TmdbTitelEintrag>
+  trenneQuelle: (text: string) => { text: string; url?: string; }
+  synopses: Record<number, SynopsisEintrag>
+  mitStimmen: Set<number>
+  annKennungen: Record<string, number>
+  trailer: Record<string, { video: string; titel: string; sprache?: 'de' | 'en' | 'ja'; }>
+  kennungen: ReturnType<typeof anisearchKennungen>
+  archiv: ReturnType<typeof archivTexte>
+}
+
+/** Der Trailer-Block des Titels, falls einer belegt ist. */
+function trailerFeld(q: number, trailer: SlimKontext['trailer']) {
+  const eintrag = trailer[String(q)]
+  if (!eintrag) return {}
+  return {
+    trailer: {
+      video: eintrag.video,
+      titel: eintrag.titel,
+      /* Ältere Einträge kannten das Feld nicht — sie stammen aus der deutschen Erstfassung. */
+      sprache: eintrag.sprache ?? ('de' as const),
+    },
+  }
+}
+
+/** Ein Titel in Auslieferungsform; legt nebenbei seine Synopse in `synopses` ab. */
+function slimTitel(t: Title, k: SlimKontext) {
+  const q = lesekennung(t)
+  const ausAnisearch = k.anisearch[q]?.descriptionDe ?? k.archiv.get(q)
+  const ausTmdb = k.tmdbTitles[q]
+  const asId = k.kennungen.get(q)
+  const synopse = synopseVon({ t, asId, ausAnisearch, ausTmdb, trenneQuelle: k.trenneQuelle })
+  if (synopse) k.synopses[t.id] = synopse
+  const { synopsis: _drop, jpStartTag: _jpStart, ...rest } = t
+  /*
+    **Die Kennungen der Quellen gehören an den Titel.**
+
+    Sie kosten je Titel wenige Bytes und beantworten eine Frage, die die
+    Quellenübersicht sonst offen lässt: „und wo steht das?". aniSearch führt
+    den deutschen Titel und die Beschreibung, ANN die deutschen Sprechrollen —
+    beide Kennungen lagen im Bestand und erreichten die Seite nie.
+
+    `annId` nur, wo auch Stimmen belegt sind: Ohne sie führt der Verweis auf
+    eine Seite, die zu unserer Frage nichts sagt.
+  */
+  const annId = k.mitStimmen.has(q) ? k.annKennungen[String(q)] : undefined
+  return {
+    ...rest,
+    ...(k.mitStimmen.has(q) ? { hasVoices: true as const } : {}),
+    ...(Number.isFinite(asId) ? { anisearchId: asId } : {}),
+    ...(Number.isFinite(annId) ? { annId } : {}),
+    /* Nur die beiden Felder, die die Oberfläche braucht — Herkunft und Prüfdatum bleiben in der Quelle. */
+    ...trailerFeld(q, k.trailer),
+    ...kinoFeld(t.id),
+  }
+}
+
 export function baueAuslieferung({
   allTitles,
   anisearch,
@@ -40,45 +99,8 @@ export function baueAuslieferung({
 }) {
   const kennungen = anisearchKennungen(allTitles.map((t) => ({ id: t.id, mal: t.malId })))
   const archiv = archivTexte(kennungen, (id) => !!anisearch[id]?.descriptionDe || !!tmdbTitles[id]?.overviewDe)
-  const slim = allTitles.map((t) => {
-    const q = lesekennung(t)
-    const ausAnisearch = anisearch[q]?.descriptionDe ?? archiv.get(q)
-    const ausTmdb = tmdbTitles[q]
-    const asId = kennungen.get(q)
-    const synopse = synopseVon({ t, asId, ausAnisearch, ausTmdb, trenneQuelle })
-    if (synopse) synopses[t.id] = synopse
-    const { synopsis: _drop, jpStartTag: _jpStart, ...rest } = t
-    /*
-      **Die Kennungen der Quellen gehören an den Titel.**
-
-      Sie kosten je Titel wenige Bytes und beantworten eine Frage, die die
-      Quellenübersicht sonst offen lässt: „und wo steht das?". aniSearch führt
-      den deutschen Titel und die Beschreibung, ANN die deutschen Sprechrollen —
-      beide Kennungen lagen im Bestand und erreichten die Seite nie.
-
-      `annId` nur, wo auch Stimmen belegt sind: Ohne sie führt der Verweis auf
-      eine Seite, die zu unserer Frage nichts sagt.
-    */
-    const annId = mitStimmen.has(q) ? annKennungen[String(q)] : undefined
-    return {
-      ...rest,
-      ...(mitStimmen.has(q) ? { hasVoices: true as const } : {}),
-      ...(Number.isFinite(asId) ? { anisearchId: asId } : {}),
-      ...(Number.isFinite(annId) ? { annId } : {}),
-      /* Nur die beiden Felder, die die Oberfläche braucht — Herkunft und Prüfdatum bleiben in der Quelle. */
-      ...(trailer[String(q)]
-        ? {
-            trailer: {
-              video: trailer[String(q)]!.video,
-              titel: trailer[String(q)]!.titel,
-              /* Ältere Einträge kannten das Feld nicht — sie stammen aus der deutschen Erstfassung. */
-              sprache: trailer[String(q)]!.sprache ?? ('de' as const),
-            },
-          }
-        : {}),
-      ...kinoFeld(t.id),
-    }
-  })
+  const kontext: SlimKontext = { anisearch, tmdbTitles, trenneQuelle, synopses, mitStimmen, annKennungen, trailer, kennungen, archiv }
+  const slim = allTitles.map((t) => slimTitel(t, kontext))
 
   // Der Kalender braucht nur die Titel, zu denen es einen Termin gibt. Die
   // vollständige Liste (mehrere Megabyte) lädt erst die Datenbank-Ansicht nach.

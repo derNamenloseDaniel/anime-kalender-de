@@ -82,7 +82,6 @@
   "tools/quellen-gesundheit.test.ts": 4,
   "tools/quellen-pr-pruefung.test.mjs": 3,
   "tools/quellen-pr.test.mjs": 1,
-  "tools/quellen-pruefen-main.test.mjs": 2,
   "tools/quittung-nach-commit-waechter.test.mjs": 1,
   "tools/quittung-umgehungen.test.mjs": 1,
   "tools/rote-sammler-prs.test.mjs": 2,

@@ -23,7 +23,8 @@ function lade(datei: string): string {
   return gunzipSync(readFileSync(`${ARCHIV}/${datei}`)).toString('utf8')
 }
 
-function main(): void {
+/** Archivdateien oder Abbruch mit Exit 1, wenn das Archiv fehlt oder leer ist. */
+function archivDateien(): string[] {
   if (!existsSync(ARCHIV)) {
     console.error(`Kein Archiv unter ${ARCHIV} — erst "npm run data:anisearch" laufen lassen.`)
     process.exit(1)
@@ -33,23 +34,26 @@ function main(): void {
     console.error('Archiv ist leer.')
     process.exit(1)
   }
+  return alle
+}
 
-  const gewuenscht = process.argv[2]
-  if (gewuenscht) {
-    const datei = `${gewuenscht}.html.gz`
-    if (!alle.includes(datei)) {
-      console.error(`${gewuenscht} liegt nicht im Archiv.`)
-      process.exit(1)
-    }
-    console.log(JSON.stringify(extractInfo(lade(datei)), null, 2))
-    return
+function zeigeEinzelseite(alle: string[], gewuenscht: string): void {
+  const datei = `${gewuenscht}.html.gz`
+  if (!alle.includes(datei)) {
+    console.error(`${gewuenscht} liegt nicht im Archiv.`)
+    process.exit(1)
   }
+  console.log(JSON.stringify(extractInfo(lade(datei)), null, 2))
+}
 
-  // Gleichmäßig über den Bestand verteilt statt die ersten n — sonst prüft man
-  // immer dieselbe Ecke des Alphabets.
+// Gleichmäßig über den Bestand verteilt statt die ersten n — sonst prüft man
+// immer dieselbe Ecke des Alphabets.
+function waehleProbe(alle: string[]): string[] {
   const schritt = Math.max(1, Math.floor(alle.length / STICHPROBE))
-  const probe = alle.filter((_, i) => i % schritt === 0).slice(0, STICHPROBE)
+  return alle.filter((_, i) => i % schritt === 0).slice(0, STICHPROBE)
+}
 
+function zaehleProbe(probe: string[]): { zaehler: Record<string, number>; leer: string[] } {
   const zaehler = {
     format: 0,
     episodes: 0,
@@ -82,26 +86,31 @@ function main(): void {
     if (de) zaehler.deutsch++
     if (de?.dubbed) zaehler.dubbed++
   }
+  return { zaehler, leer }
+}
 
-  console.log(`Stichprobe: ${probe.length} von ${alle.length} archivierten Seiten\n`)
+function druckeZaehler(zaehler: Record<string, number>, probe: string[], gesamt: number): void {
+  console.log(`Stichprobe: ${probe.length} von ${gesamt} archivierten Seiten\n`)
   for (const [feld, treffer] of Object.entries(zaehler)) {
     const anteil = Math.round((treffer / probe.length) * 100)
     console.log(`  ${feld.padEnd(18)} ${String(treffer).padStart(3)}  ${anteil}%`)
   }
+}
 
-  // Format und Folgenzahl stehen auf praktisch jeder Seite. Fehlen sie
-  // reihenweise, hat aniSearch die Struktur geändert und der Parser greift ins
-  // Leere — ohne einen Fehler zu werfen.
-  //
-  // Die Folgenzahl steht hier, weil genau sie schon einmal still danebenlag:
-  // Eine Regex nahm die letzte Zahl des Feldes und traf damit die Laufzeit
-  // statt der Folgenzahl. Erkannt wurden 3 % statt 100 % — und die erste
-  // Fassung dieser Prüfung hätte das durchgewinkt, weil sie nur aufs Format
-  // sah. Eine Schwelle taugt nur für das, was sie tatsächlich beobachtet.
+// Format und Folgenzahl stehen auf praktisch jeder Seite. Fehlen sie
+// reihenweise, hat aniSearch die Struktur geändert und der Parser greift ins
+// Leere — ohne einen Fehler zu werfen.
+//
+// Die Folgenzahl steht hier, weil genau sie schon einmal still danebenlag:
+// Eine Regex nahm die letzte Zahl des Feldes und traf damit die Laufzeit
+// statt der Folgenzahl. Erkannt wurden 3 % statt 100 % — und die erste
+// Fassung dieser Prüfung hätte das durchgewinkt, weil sie nur aufs Format
+// sah. Eine Schwelle taugt nur für das, was sie tatsächlich beobachtet.
+function pruefeSchwellen(zaehler: Record<string, number>, leer: string[], anzahl: number): void {
   const schwellen: [string, number, number][] = [
-    ['Format', zaehler.format / probe.length, 0.9],
-    ['Folgenzahl', zaehler.episodes / probe.length, 0.8],
-    ['deutscher Block', zaehler.deutsch / probe.length, 0.9],
+    ['Format', zaehler.format / anzahl, 0.9],
+    ['Folgenzahl', zaehler.episodes / anzahl, 0.8],
+    ['deutscher Block', zaehler.deutsch / anzahl, 0.9],
   ]
   const gerissen = schwellen.filter(([, ist, soll]) => ist < soll)
   if (leer.length || gerissen.length) {
@@ -115,6 +124,19 @@ function main(): void {
     process.exit(1)
   }
   console.log('\nParser greift.')
+}
+
+function main(): void {
+  const alle = archivDateien()
+  const gewuenscht = process.argv[2]
+  if (gewuenscht) {
+    zeigeEinzelseite(alle, gewuenscht)
+    return
+  }
+  const probe = waehleProbe(alle)
+  const { zaehler, leer } = zaehleProbe(probe)
+  druckeZaehler(zaehler, probe, alle.length)
+  pruefeSchwellen(zaehler, leer, probe.length)
 }
 
 main()

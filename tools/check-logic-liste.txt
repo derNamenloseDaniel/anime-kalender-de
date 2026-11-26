@@ -564,6 +564,8 @@ pipeline/check-prime-seite-ohne-weg-bestand-lauf.ts
 pipeline/check-prime-seite-richten.ts
 pipeline/check-prime-seiten-sperre.ts
 pipeline/check-prime-suchadresse-tot.ts
+pipeline/check-prime-suchlink-bestand.ts
+pipeline/check-prime-suchlink-direkt.ts
 pipeline/check-prime-teilseiten-kanal.ts
 pipeline/check-prime-teilseiten.ts
 pipeline/check-prime-zugeordnet-jw.ts

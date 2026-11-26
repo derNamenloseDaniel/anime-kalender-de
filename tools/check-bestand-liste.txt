@@ -103,6 +103,7 @@ pipeline/check-telekom-annahme-bestand.ts
 pipeline/check-tmdb-ablauf-bestand.ts
 pipeline/check-tmdb-hauptserie-bestand.ts
 pipeline/check-toggo-seiten-bestand.ts
+pipeline/check-trailer-label.ts
 pipeline/check-verweise-von-hand-bestand.ts
 pipeline/check-woche-groesse-bestand.ts
 pipeline/check-wochen-datei-bestand.ts

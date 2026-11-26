@@ -36,7 +36,8 @@ export function useReiterBlase(text: (schluessel: number) => string) {
   const an = (schluessel: number) => ({
     'aria-describedby': offen === schluessel ? blasenId : undefined,
     onMouseEnter: (e: MouseEvent<HTMLElement>) => !perTouch.current && auf(schluessel, e.currentTarget),
-    onMouseLeave: zu,
+    /* Nach einem Fingertipp schickt der Browser ein nachgemachtes `mouseout`, sobald das Panel neu steht: das schließt nicht, die Frist tut es. */
+    onMouseLeave: () => !perTouch.current && zu(),
     onFocus: (e: FocusEvent<HTMLElement>) => fokusZeigtBlase(e.currentTarget) && auf(schluessel, e.currentTarget),
     onBlur: zu,
     onTouchStart: () => void (perTouch.current = true),

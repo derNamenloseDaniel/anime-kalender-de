@@ -82,7 +82,7 @@ export function DiscBereich({ title, today, discAusgaben, discReleases, kaufwege
   const kopf = [alle.length > 1 ? t('disc.varianten', { n: alle.length }) : '', discReleases.map((r) => r.publisher).find(Boolean) ?? ''].filter(Boolean).join(' · ')
   return (
     <div className="flex w-full flex-col gap-2">
-      {kopf && <div className="text-t5 font-bold uppercase tracking-[.08em] text-ak-leise">{kopf}</div>}
+      {kopf && <div data-disc-kopf className="text-t5 font-bold uppercase tracking-[.08em] text-ak-leise">{kopf}</div>}
       {gruppen.map((g) => (
         /* Die aniSearch-Ausgaben kommen nach den Terminen; mit dem Schlüssel greift der Startzustand auch dann. */
         <Gruppe key={`${g.art}-${startOffen(alle, g.art)}`} art={g.art} liste={g.liste} kopf={gruppen.length > 1} offen={startOffen(alle, g.art)} today={today} />

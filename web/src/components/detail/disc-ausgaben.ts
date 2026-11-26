@@ -90,7 +90,8 @@ function amSelbenTag(r: Release, ausgaben: Ausgabe[], lose: Release[]): Ausgabe 
   if (!datum) return undefined
   const formate = formateAus(r.edition)
   const passt = (tag: string, andere: Format[]) => tag === datum && andere.some((f) => formate.includes(f))
-  const artikel = ausgaben.filter((a) => !a.release && Object.keys(a.artikel).length > 0 && passt(a.datum, a.formate) && gleicherBand(r, a))
+  /* Ohne Termin ist nur ein aniSearch-Artikel: Jede Zeile aus einem Termin trägt ihn. */
+  const artikel = ausgaben.filter((a) => !a.release && passt(a.datum, a.formate) && gleicherBand(r, a))
   const termine = lose.filter((l) => passt(terminDatum(l), formateAus(l.edition)))
   return artikel.length === 1 && termine.length === 1 ? artikel[0] : undefined
 }

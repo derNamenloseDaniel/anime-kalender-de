@@ -6,7 +6,7 @@
  * Fälle wörtlich aus der Bühne (`web/buehne/faelle.json`): Dan Da Dan, Detektiv Conan, Sakamoto Days, Last Boss Queen. Aufruf: `npm run check:logic`.
  */
 import { readFileSync } from 'node:fs'
-import { act, createElement as h } from 'react'
+import { act, createElement as h, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import type { DiscAusgabe, Release, Title } from '../shared/types.ts'
 import { attrappeUhr, ignoriereCss, installiereMiniDom, klicke, type MiniKnoten } from '../tools/mini-dom.ts'
@@ -30,14 +30,14 @@ const faelle = (JSON.parse(readFileSync(new URL('../web/buehne/faelle.json', imp
 /** Der Zeitpunkt der Bühne: weit genug vor den Terminen der Fälle, damit „kommend“ stabil bleibt. */
 const HEUTE = '2026-10-11'
 
-async function zeige(fall: Fall, aender?: (r: Release[]) => Release[], ausgaben?: DiscAusgabe[]) {
+async function zeige(fall: Fall, aender?: (r: Release[]) => Release[], ausgaben?: DiscAusgabe[], kaufwege: ReactNode[] = []) {
   const uhr = attrappeUhr()
   const dom = installiereMiniDom({ ...uhr, matchMedia: () => ({ matches: false, addEventListener() {}, removeEventListener() {} }) }, () => ({}))
   const title = fall['titles.json'].find((t) => t.id === fall.titleId) ?? ({ id: fall.titleId } as Title)
   const releases = fall['releases.json'].filter((r) => r.releaseType === 'disc')
   const wurzel = createRoot(dom.wurzel as unknown as Element)
   await act(async () => {
-    wurzel.render(h(DiscBereich, { title, today: HEUTE, discAusgaben: ausgaben ?? Object.values(fall.disc).flat(), discReleases: aender ? aender(releases) : releases, kaufwege: [] }))
+    wurzel.render(h(DiscBereich, { title, today: HEUTE, discAusgaben: ausgaben ?? Object.values(fall.disc).flat(), discReleases: aender ? aender(releases) : releases, kaufwege }))
   })
   const knopf = (text: RegExp) => dom.wurzel.finde((k) => k.tagName === 'BUTTON' && text.test(k.textContent))[0]
   return {
@@ -49,7 +49,16 @@ async function zeige(fall: Fall, aender?: (r: Release[]) => Release[], ausgaben?
     pillen: () =>
       dom.wurzel
         .finde((k) => k.getAttribute('data-disc-variante') !== null)
-        .map((k) => ({ text: k.textContent, href: k.finde((a) => a.tagName === 'A')[0]?.getAttribute('href') ?? null, merken: k.finde((b) => b.tagName === 'BUTTON').length })),
+        .map((k) => ({
+          text: k.textContent,
+          href: k.finde((a) => a.tagName === 'A')[0]?.getAttribute('href') ?? null,
+          merken: k.finde((b) => b.tagName === 'BUTTON').length,
+          klasse: k.finde((a) => a.tagName === 'A')[0]?.getAttribute('class') ?? '',
+          /** Klasse des Datums („ab …“ bzw. „seit …“). */
+          datumKlasse: k.finde((s) => s.tagName === 'SPAN' && /^(ab|seit) \d/.test(s.textContent))[0]?.getAttribute('class') ?? '',
+        })),
+    kopf: () => dom.wurzel.finde((k) => k.getAttribute('data-disc-kopf') !== null).map((k) => k.textContent),
+    klassenVon: (text: RegExp) => dom.wurzel.finde((k) => k.tagName === 'A' && text.test(k.textContent)).map((k) => k.getAttribute('class') ?? ''),
     knoepfe: () => dom.wurzel.finde((k) => k.tagName === 'BUTTON'),
     /** Zahl der sichtbaren Pillen einer Gruppe (`data-disc-gruppe`). */
     inGruppe: (art: string) => dom.wurzel.finde((k) => k.getAttribute('data-disc-gruppe') === art)[0]?.finde((k) => k.getAttribute('data-disc-variante') !== null).length ?? 0,
@@ -66,14 +75,19 @@ console.log('Disc-Bereich: Dan Da Dan (Gesamtausgabe, Volumes)')
   pruefe('die Gruppe mit einem Eintrag hat keinen Klappknopf, nur ihren Namen', d.knopf(/^Gesamtausgaben/) === undefined && /Gesamtausgaben/.test(d.text()), d.knoepfe().map((k) => k.textContent))
   const offen = d.pillen()
   pruefe('… und ihre Pille steht ohne Tipp da, mit dem aniSearch-Artikel als Ziel („Details bei aniSearch“)', offen.length === 1 && /^Gesamtausgabe/.test(offen[0]!.text) && /anisearch\.de\/article\/214677$/.test(offen[0]!.href ?? '') && /Details bei aniSearch/.test(offen[0]!.text), offen)
-  pruefe('Format als Marke und „ab“ für Kommendes', /Blu-rayDVDab 30\.10\.26/.test(offen[0]!.text), offen[0]!.text)
+  pruefe('Format als Marke und „ab“ für Kommendes, Edition mit „ · “ hinter dem Namen', /^Gesamtausgabe · LimitedBlu-rayDVDab 30\.10\.26/.test(offen[0]!.text), offen[0]!.text)
+  pruefe('Kommendes steht in Akzent und fett', /font-bold/.test(offen[0]!.datumKlasse) && /text-ak-akzent-text/.test(offen[0]!.datumKlasse), offen[0]!.datumKlasse)
+  pruefe('die Gruppe mit einem Eintrag nennt keine Zahl („· 1“)', !/Gesamtausgaben\s*·/.test(d.text()), d.text().slice(0, 60))
+  pruefe('die Pille füllt die Zeile (flex-1), nicht inline wie eine Stream-Pille', /(^| )flex-1( |$)/.test(offen[0]!.klasse) && !/inline-flex/.test(offen[0]!.klasse), offen[0]!.klasse)
   const vol = d.knopf(/^Volumes/)
-  pruefe('Volumes (mehrere) zugeklappt, Zahl und Jahre am Kopf', vol?.getAttribute('aria-expanded') === 'false' && /Volumes\s*· \d+ · 20\d\d/.test(vol.textContent), vol?.textContent)
+  pruefe('Volumes (mehrere) zugeklappt, Zahl und Jahre am Kopf, Pfeil nach unten', vol?.getAttribute('aria-expanded') === 'false' && /Volumes\s*· \d+ · 20\d\d.*▾$/.test(vol.textContent), vol?.textContent)
   pruefe('zugeklappte Volumes zeigen keine Pille', !/Vol\. 3/.test(d.text()))
   await d.klick(vol)
   const alle = d.pillen()
   const vol3 = alle.filter((p) => /^Vol\. 3/.test(p.text))
-  pruefe('ein Tipp auf Volumes zeigt die Pillen', vol3.length > 0, alle.map((p) => p.text))
+  pruefe('ein Tipp auf Volumes zeigt die Pillen, der Pfeil zeigt nach oben', vol3.length > 0 && /▴$/.test(d.knopf(/^Volumes/)!.textContent), alle.map((p) => p.text))
+  const erschienen = alle.find((p) => /seit \d/.test(p.text))
+  pruefe('Erschienenes steht leise, ohne Akzent', erschienen !== undefined && !/font-bold|akzent/.test(erschienen.datumKlasse), erschienen?.datumKlasse)
   pruefe('jede Pille mit Händler führt ohne weiteren Tipp dorthin: Namenssuche heißt „Bei Amazon suchen“', vol3.some((p) => /amazon\.de\/s\?k=/.test(p.href ?? '') && /Bei Amazon suchen/.test(p.text)), vol3)
   pruefe('keine Pille ohne Ziel', alle.every((p) => p.href), alle.filter((p) => !p.href))
   pruefe('Kalenderknopf nur an Kommendem mit Termin', alle.some((p) => p.merken === 1) && alle.filter((p) => /seit \d/.test(p.text) && !/ab \d/.test(p.text)).every((p) => p.merken === 0), alle.map((p) => [p.text, p.merken]))
@@ -99,7 +113,36 @@ console.log('Disc-Bereich: Sakamoto Days (nur Volumes)')
 {
   const d = await zeige(faelle['sakamoto-days']!)
   pruefe('eine einzige Gruppe hat keinen Kopf und klappt nicht: alle Pillen stehen da', d.knopf(/^Volumes/) === undefined && !/Volumes/.test(d.text()) && d.pillen().length > 1, d.text().slice(0, 80))
-  pruefe('ab zwei Varianten steht die Zahl am Kopf', /^\d+ Varianten/.test(d.text()), d.text().slice(0, 40))
+  pruefe('ab zwei Varianten steht die Zahl am Kopf, der Verlag mit „ · “ dahinter', d.kopf().length === 1 && /^\d+ Varianten · Netflix, Inc\.$/.test(d.kopf()[0]!), d.kopf())
+  await d.abbau()
+}
+
+console.log('Disc-Bereich: Grenze der langen Liste und leerer Kopf')
+{
+  const fall = faelle['sakamoto-days']!
+  const baende = (n: number): DiscAusgabe[] => Array.from({ length: n }, (_, i) => [`Vol. ${i + 1}/${n}`, 'b', 't', `2025-0${(i % 9) + 1}-10`, 900400 + i] as DiscAusgabe)
+  const acht = await zeige(fall, () => [], baende(8))
+  pruefe('acht Varianten stehen alle da, ohne Knopf', acht.pillen().length === 8 && acht.knoepfe().length === 0, acht.pillen().length)
+  await acht.abbau()
+  const neun = await zeige(fall, () => [], baende(9))
+  pruefe('neun Varianten: sechs und „Alle 9 anzeigen“', neun.pillen().length === 6 && neun.knopf(/^Alle 9 anzeigen/) !== undefined, neun.pillen().length)
+  await neun.abbau()
+  const stream = h('a', { key: 'k', href: 'https://beispiel.invalid/shop', className: 'probe-kaufweg' }, 'Shop')
+  const eine = await zeige(fall, () => [], baende(1), [stream])
+  pruefe('eine Variante ohne Verlag: kein Kopf, auch kein leerer', eine.kopf().length === 0 && /^Vol\. 1/.test(eine.text()), eine.text())
+  pruefe('ohne Edition folgt dem Namen gleich das Format, kein „ · “', /^Vol\. 1Blu-rayseit 10\.01\.25/.test(eine.pillen()[0]!.text), eine.pillen()[0]!.text)
+  pruefe('die übrigen Kaufwege der Seite stehen unter den Varianten', eine.klassenVon(/^Shop$/).join() === 'probe-kaufweg' && /Shop$/.test(eine.text()), eine.text())
+  await eine.abbau()
+}
+
+console.log('Pille: breit nur auf Wunsch')
+{
+  const { Pille } = await import('../web/src/components/detail/pille.tsx')
+  const fall = faelle['sakamoto-days']!
+  const d = await zeige(fall, () => [], [['Vol. 1/1', 'b', 't', '2025-01-10', 900450]], [h(Pille, { key: 'p', name: 'Probeshop', url: 'https://beispiel.invalid/shop' })])
+  const klasse = d.klassenVon(/^Probeshop$/)[0] ?? ''
+  pruefe('eine Pille ohne „breit“ bleibt inline (Stream- und Kaufweg-Pillen)', /inline-flex max-w-full/.test(klasse) && !/flex-1|rounded-b-none/.test(klasse), klasse)
+  pruefe('die Disc-Pille daneben ist breit, ohne Fußzeilen-Form', /flex-1/.test(d.pillen()[0]!.klasse) && !/rounded-b-none|inline-flex/.test(d.pillen()[0]!.klasse), d.pillen()[0]!.klasse)
   await d.abbau()
 }
 
@@ -180,6 +223,9 @@ console.log('Varianten: Randfälle')
   const eanLink = { name: 'Amazon', url: 'https://www.amazon.de/s?k=4020628654016' }
   const seite = { name: 'Amazon', url: 'https://www.amazon.de/dp/B0CJ3GKPHF' }
   pruefe('zielVon: Produktseite vor EAN-Suche vor Namenssuche, gleich in welcher Reihenfolge', zielVon(v({ haendler: [suche, eanLink, seite] }))?.url === seite.url && zielVon(v({ haendler: [suche, eanLink] }))?.url === eanLink.url && zielVon(v({ haendler: [suche] }))?.haendler === 'Amazon')
+  const reihen = [[seite, suche], [suche, seite], [eanLink, suche], [suche, eanLink], [seite, eanLink, suche], [eanLink, seite], [eanLink, suche, seite]]
+  const beste = reihen.map((haendler) => zielVon(v({ haendler }))?.url)
+  pruefe('zielVon: jede Reihenfolge liefert den genauesten Link', JSON.stringify(beste) === JSON.stringify([seite.url, seite.url, eanLink.url, eanLink.url, seite.url, seite.url, seite.url]), beste)
   pruefe('zielVon: ohne Händler der aniSearch-Artikel, ohne Händlernamen', JSON.stringify(zielVon(v({ quelle: artikel.quelle }))) === JSON.stringify({ url: artikel.quelle }))
   pruefe('zielVon: Händler schlägt den Artikel; ohne beides kein Ziel', zielVon(v({ haendler: [suche], quelle: artikel.quelle }))?.url === suche.url && zielVon(v({})) === undefined)
   pruefe('formateJeDatum: gleiches Datum zusammen, verschiedene getrennt, in Formatreihenfolge', JSON.stringify(formateJeDatum(v({ formate: ['b', 'd', 'u'], datumJe: { b: '2026-11-13', d: '2026-11-20', u: '2026-11-13' } }))) === JSON.stringify([{ datum: '2026-11-13', formate: ['b', 'u'] }, { datum: '2026-11-20', formate: ['d'] }]))
@@ -200,7 +246,14 @@ console.log('Ausgaben: Termin ohne Artikelbezug und aniSearch-Artikel am selben 
   pruefe('… mit Artikel, Termin und Händler', eins[0]!.artikel.b === 900311 && eins[0]!.release?.slug === 'box' && /amazon/.test(eins[0]!.shopUrl ?? ''), eins[0])
   const v = variantenVon(eins, 'Probetitel')
   pruefe('… die Variante heißt „Gesamtausgabe“ und steht unter Gesamtausgaben', v.length === 1 && v[0]!.name === 'Gesamtausgabe' && v[0]!.art === 'gesamt', v.map((x) => [x.name, x.art]))
-  pruefe('anderer Tag: zwei Zeilen', zeilen([gesamt], [termin('box', '2026-09-04', 'Complete Box, Blu-ray')]).length === 2)
+  const andererTag = zeilen([gesamt], [termin('box', '2026-09-04', 'Complete Box, Blu-ray')])
+  pruefe('anderer Tag: zwei Zeilen, jede mit ihrem Datum', andererTag.map((a) => a.datum).join() === '2026-09-03,2026-09-04', andererTag.map((a) => a.datum))
+  const zweiFormate = zeilen([gesamt], [termin('dvd', '2026-09-03', 'Complete Box, DVD'), termin('bluray', '2026-09-03', 'Complete Box, Blu-ray')])
+  pruefe('DVD- und Blu-ray-Termin am Tag eines Blu-ray-Artikels: nur der Blu-ray-Termin ist der Artikel, die DVD bleibt eigen', zweiFormate.length === 2 && zweiFormate.find((a) => a.artikel.b === 900311)?.release?.slug === 'bluray', zweiFormate.map((a) => [a.schluessel, a.release?.slug]))
+  const komplett = variantenVon(zeilen([['Komplettset', 'b', 'g', '2026-09-03', 900315]], []), 'Probetitel')
+  pruefe('eine Gesamtausgabe mit eigenem Namen („Komplettset“) behält ihn', komplett[0]!.name === 'Komplettset' && komplett[0]!.art === 'gesamt', komplett.map((x) => x.name))
+  const mitNamen = variantenVon(zeilen([['Komplettset', 'b', 'g', '2026-09-03', 900315]], [{ ...termin('ga', '2026-09-03', 'Blu-ray', ['https://www.anisearch.de/article/900315']), name: 'Gesamtausgabe – Sammleredition' }]), 'Probetitel')
+  pruefe('ein Termin namens „Gesamtausgabe …“ heißt „Gesamtausgabe“, auch wenn der Artikel anders heißt', mitNamen.length === 1 && mitNamen[0]!.name === 'Gesamtausgabe', mitNamen.map((x) => x.name))
   pruefe('anderes Format: zwei Zeilen', zeilen([gesamt], [termin('box', '2026-09-03', 'Complete Box, DVD')]).length === 2)
   pruefe('Termin ohne Datum: zwei Zeilen', zeilen([['Gesamtausgabe', 'b', 'g', '', 900311]], [termin('box', '', 'Complete Box, Blu-ray')]).length === 2)
   const zweiArtikel = zeilen([gesamt, ['Gesamtausgabe: Limited', 'b', 'g', '2026-09-03', 900312]], [termin('box', '2026-09-03', 'Complete Box, Blu-ray')])

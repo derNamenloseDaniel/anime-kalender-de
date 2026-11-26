@@ -1,5 +1,5 @@
 {
- "erzeugtAm": "2026-11-26T04:41:16.676Z",
+ "erzeugtAm": "2026-11-26T12:18:03.012Z",
  "anbieter": [
   {
    "name": "Amazon",
@@ -342,9 +342,9 @@
   {
    "name": "Netflix",
    "plattform": "netflix",
-   "gemeldet": 773,
+   "gemeldet": 774,
    "gesamt": 914,
-   "offen": 141,
+   "offen": 140,
    "ohneSeite": 15,
    "ziel": "https://www.netflix.com/title/81608820",
    "ziele": [
@@ -404,10 +404,6 @@
      "staffeln": [
       1
      ]
-    },
-    {
-     "url": "https://www.netflix.com/title/81621036",
-     "titel": "Call of the Night"
     },
     {
      "url": "https://www.netflix.com/title/81717895",

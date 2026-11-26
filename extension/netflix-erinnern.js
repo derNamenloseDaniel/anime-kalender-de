@@ -97,7 +97,10 @@ globalThis.akNetflixDatumKurz = (text) => {
 const ERINNERN_MONATSNAMEN = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']
 
 /** „Ab 10.12." / „ab 10.12.2026" → „10. Dezember" / „10. Dezember 2026" (Schreibung der übrigen Termine, das Jahr bestimmt die Pipeline); Unmögliches → `null`. */
-const terminNumerisch = (t, mo, j) => (t >= 1 && t <= 31 && mo >= 1 && mo <= 12 ? `${t}. ${ERINNERN_MONATSNAMEN[mo - 1]}${j ? ` ${j}` : ''}` : null)
+const terminNumerisch = (t, mo, j) => {
+  const monat = ERINNERN_MONATSNAMEN[mo - 1]
+  return t >= 1 && t <= 31 && monat ? `${t}. ${monat}${j ? ` ${j}` : ''}` : null
+}
 
 /**
  * Der Termin „Ab 10. Dezember“ im Text, unabhängig von der Schreibung des „Ab“; nur mit lesbarem Monat, sonst `null` (26.11.2026, Banana Fish).

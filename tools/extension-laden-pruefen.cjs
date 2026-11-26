@@ -148,32 +148,66 @@ function speicherAttrappen() {
   return { localStorage: speicher(), sessionStorage: speicher() }
 }
 
-function baueSandkasten(host, pfad) {
+function baueDokument() {
   const body = machElement('body')
   const html = machElement('html')
+  return {
+    documentElement: html,
+    body,
+    head: machElement('head'),
+    createElement: (tag) => machElement(tag),
+    createTextNode: (t) => ({ textContent: t }),
+    querySelector: () => null,
+    querySelectorAll: () => [],
+    addEventListener() {},
+    removeEventListener() {},
+    getElementById: () => null,
+    elementFromPoint: () => null,
+    dispatchEvent: () => true,
+    hidden: false,
+    visibilityState: 'visible',
+    readyState: 'complete',
+  }
+}
+
+/** `disney-leser.js` hängt sich in XHR ein, um die Playback-Antwort mitzulesen. */
+function baueXhrAttrappe() {
+  return class {
+    open() {}
+    send() {}
+    setRequestHeader() {}
+    addEventListener() {}
+    get readyState() { return 4 }
+    get status() { return 200 }
+    get responseText() { return '' }
+  }
+}
+
+function baueChromeAttrappe() {
+  return {
+    storage: {
+      local: { get: async () => ({}), set: async () => undefined, remove: async () => undefined },
+      /* Die Optionsseite legt das Token in `sync` ab, nicht in `local`. */
+      sync: { get: async () => ({}), set: async () => undefined, remove: async () => undefined },
+      onChanged: { addListener() {} },
+    },
+    runtime: {
+      id: 'test',
+      sendMessage: async () => undefined,
+      onMessage: { addListener() {} },
+      getURL: (p) => `chrome-extension://test/${p}`,
+    },
+  }
+}
+
+function baueSandkasten(host, pfad) {
   const s = {
     globalThis: null,
     AK_OFFENE_AMAZON: [],
     AK_OFFENE_NETFLIX: [],
     AK_OFFENE_DISNEY: [],
     location: { hostname: host, pathname: pfad, search: '', href: `https://${host}${pfad}` },
-    document: {
-      documentElement: html,
-      body,
-      head: machElement('head'),
-      createElement: (tag) => machElement(tag),
-      createTextNode: (t) => ({ textContent: t }),
-      querySelector: () => null,
-      querySelectorAll: () => [],
-      addEventListener() {},
-      removeEventListener() {},
-      getElementById: () => null,
-      elementFromPoint: () => null,
-      dispatchEvent: () => true,
-      hidden: false,
-      visibilityState: 'visible',
-      readyState: 'complete',
-    },
+    document: baueDokument(),
     navigator: { userAgent: 'node', clipboard: { writeText: async () => undefined } },
     console: { log() {}, warn() {}, error() {}, info() {}, table() {}, groupCollapsed() {}, groupEnd() {} },
     setTimeout: () => 0,
@@ -211,33 +245,11 @@ function baueSandkasten(host, pfad) {
     dispatchEvent: () => true,
     /* Die Leser reichen ihren Fund per `postMessage` an das Content-Skript weiter. */
     postMessage() {},
-    /* `disney-leser.js` hängt sich in XHR ein, um die Playback-Antwort mitzulesen. */
-    XMLHttpRequest: class {
-      open() {}
-      send() {}
-      setRequestHeader() {}
-      addEventListener() {}
-      get readyState() { return 4 }
-      get status() { return 200 }
-      get responseText() { return '' }
-    },
+    XMLHttpRequest: baueXhrAttrappe(),
     XMLHttpRequestEventTarget: class {},
     TextEncoder,
     TextDecoder,
-    chrome: {
-      storage: {
-        local: { get: async () => ({}), set: async () => undefined, remove: async () => undefined },
-        /* Die Optionsseite legt das Token in `sync` ab, nicht in `local`. */
-        sync: { get: async () => ({}), set: async () => undefined, remove: async () => undefined },
-        onChanged: { addListener() {} },
-      },
-      runtime: {
-        id: 'test',
-        sendMessage: async () => undefined,
-        onMessage: { addListener() {} },
-        getURL: (p) => `chrome-extension://test/${p}`,
-      },
-    },
+    chrome: baueChromeAttrappe(),
   }
   s.globalThis = s
   s.self = s
@@ -245,68 +257,75 @@ function baueSandkasten(host, pfad) {
   return s
 }
 
-console.log('Jedes Content-Skript einmal laden:\n')
+/* Als Modul geladen (Vergleichsrahmen) gibt es nur den Sandkasten; den Lauf startet allein der Aufruf per Kommandozeile. */
+module.exports = { baueSandkasten }
 
-for (const datei of SKRIPTE) {
-  if (!existsSync(datei)) {
-    console.log(`  – ${datei} — gibt es nicht (mehr)`)
-    continue
-  }
-  /*
-    **Vorgeladen wird, was das Manifest vorlädt.**
+function ladelauf() {
+  console.log('Jedes Content-Skript einmal laden:\n')
 
-    Seit dem 10.09.2026 steht das gemeinsame Kastengerüst in `box.js`, und die
-    drei Melder rufen seine Funktionen. Im Browser liegen alle Dateien einer
-    `content_scripts`-Gruppe im selben Scope; wer hier nur die eine Datei lädt,
-    misst einen Zustand, den es nicht gibt — und bekommt „akBox is not defined"
-    für Code, der im Browser einwandfrei läuft.
+  for (const datei of SKRIPTE) {
+    if (!existsSync(datei)) {
+      console.log(`  – ${datei} — gibt es nicht (mehr)`)
+      continue
+    }
+    /*
+      **Vorgeladen wird, was das Manifest vorlädt.**
 
-    Gelesen wird die Reihenfolge aus dem Manifest selbst, nicht aus einer
-    zweiten Liste hier: Zwei Listen laufen auseinander, und die im Manifest ist
-    die, nach der Chrome sich richtet.
-  */
-  const vorlauf = manifestGruppe(datei)
-    .map((n) => readFileSync('extension/' + n, 'utf8'))
-    .join(String.fromCharCode(10))
-  const quelle = vorlauf + String.fromCharCode(10) + readFileSync(datei, 'utf8')
-  /* Die Seite, auf der das Skript wirklich läuft — sonst steigt es sofort aus. */
-  const host = datei.includes('amazon')
-    ? 'www.amazon.de'
-    : datei.includes('disney')
-      ? 'www.disneyplus.com'
-      : datei.includes('adn')
-        ? 'animationdigitalnetwork.com'
-        : 'www.netflix.com'
-  const pfade = {
-    'www.amazon.de': '/gp/video/detail/B0DJYJBNWF',
-    'animationdigitalnetwork.com': '/de/video/1375-dorohedoro',
+      Seit dem 10.09.2026 steht das gemeinsame Kastengerüst in `box.js`, und die
+      drei Melder rufen seine Funktionen. Im Browser liegen alle Dateien einer
+      `content_scripts`-Gruppe im selben Scope; wer hier nur die eine Datei lädt,
+      misst einen Zustand, den es nicht gibt — und bekommt „akBox is not defined"
+      für Code, der im Browser einwandfrei läuft.
+
+      Gelesen wird die Reihenfolge aus dem Manifest selbst, nicht aus einer
+      zweiten Liste hier: Zwei Listen laufen auseinander, und die im Manifest ist
+      die, nach der Chrome sich richtet.
+    */
+    const vorlauf = manifestGruppe(datei)
+      .map((n) => readFileSync('extension/' + n, 'utf8'))
+      .join(String.fromCharCode(10))
+    const quelle = vorlauf + String.fromCharCode(10) + readFileSync(datei, 'utf8')
+    /* Die Seite, auf der das Skript wirklich läuft — sonst steigt es sofort aus. */
+    const host = datei.includes('amazon')
+      ? 'www.amazon.de'
+      : datei.includes('disney')
+        ? 'www.disneyplus.com'
+        : datei.includes('adn')
+          ? 'animationdigitalnetwork.com'
+          : 'www.netflix.com'
+    const pfade = {
+      'www.amazon.de': '/gp/video/detail/B0DJYJBNWF',
+      'animationdigitalnetwork.com': '/de/video/1375-dorohedoro',
+    }
+    const pfad = pfade[host] ?? '/title/82757009'
+    try {
+      vm.runInContext(quelle, vm.createContext(Object.assign(baueSandkasten(host, pfad), speicherAttrappen())), { filename: datei, timeout: 10_000 })
+      console.log(`  ✓ ${datei}`)
+    } catch (e) {
+      console.log(`  ✗ ${datei} — ${e.message}`)
+      fehler.push(`${datei}: ${e.message}`)
+    }
   }
-  const pfad = pfade[host] ?? '/title/82757009'
-  try {
-    vm.runInContext(quelle, vm.createContext(Object.assign(baueSandkasten(host, pfad), speicherAttrappen())), { filename: datei, timeout: 10_000 })
-    console.log(`  ✓ ${datei}`)
-  } catch (e) {
-    console.log(`  ✗ ${datei} — ${e.message}`)
-    fehler.push(`${datei}: ${e.message}`)
+
+  /* Netflix-Artikelseiten (Tudum) sind keine Titelseiten — dort darf keine Leiste stehen (Daniel, 04.10.2026). */
+  {
+    const manifest = JSON.parse(readFileSync('extension/manifest.json', 'utf8'))
+    const netflix = (manifest.content_scripts ?? []).filter((g) => (g.matches ?? []).some((m) => m.includes('netflix.com')))
+    const ohneAusschluss = netflix.filter((g) => !(g.exclude_matches ?? []).includes('https://www.netflix.com/tudum/*'))
+    if (!netflix.length || ohneAusschluss.length) {
+      console.log('  ✗ Netflix-Content-Skripte schließen /tudum/* nicht aus')
+      fehler.push('manifest.json: Netflix-Skripte ohne exclude_matches für /tudum/*')
+    } else {
+      console.log('  ✓ Netflix-Content-Skripte schließen /tudum/* aus')
+    }
   }
+
+  console.log('')
+  if (fehler.length) {
+    console.error(`${fehler.length} Skript(e) laufen beim Laden auf einen Fehler.`)
+    process.exit(1)
+  }
+  console.log('Alle Content-Skripte laden durch.')
 }
 
-/* Netflix-Artikelseiten (Tudum) sind keine Titelseiten — dort darf keine Leiste stehen (Daniel, 04.10.2026). */
-{
-  const manifest = JSON.parse(readFileSync('extension/manifest.json', 'utf8'))
-  const netflix = (manifest.content_scripts ?? []).filter((g) => (g.matches ?? []).some((m) => m.includes('netflix.com')))
-  const ohneAusschluss = netflix.filter((g) => !(g.exclude_matches ?? []).includes('https://www.netflix.com/tudum/*'))
-  if (!netflix.length || ohneAusschluss.length) {
-    console.log('  ✗ Netflix-Content-Skripte schließen /tudum/* nicht aus')
-    fehler.push('manifest.json: Netflix-Skripte ohne exclude_matches für /tudum/*')
-  } else {
-    console.log('  ✓ Netflix-Content-Skripte schließen /tudum/* aus')
-  }
-}
-
-console.log('')
-if (fehler.length) {
-  console.error(`${fehler.length} Skript(e) laufen beim Laden auf einen Fehler.`)
-  process.exit(1)
-}
-console.log('Alle Content-Skripte laden durch.')
+if (require.main === module) ladelauf()

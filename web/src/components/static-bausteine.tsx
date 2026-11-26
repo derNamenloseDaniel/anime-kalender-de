@@ -4,7 +4,7 @@ export const WORKER_URL = import.meta.env.VITE_NEWSLETTER_API ?? ''
 
 export function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white/70 p-5 dark:border-white/10 dark:bg-white/[0.03]">
+    <div className="rounded-xl border border-ak-rand bg-ak-flaeche p-5">
       {children}
     </div>
   )
@@ -33,8 +33,8 @@ export function PlatformToggleList({
           className={[
             'ak-tz cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition',
             isAll
-              ? 'border-transparent bg-slate-100 text-slate-900'
-              : 'border-slate-300/70 text-slate-600 dark:border-white/15 dark:text-slate-300',
+              ? 'border-ak-gut bg-ak-gut-grund text-ak-text'
+              : 'border-ak-rand text-ak-leise',
           ].join(' ')}
         >
           {allLabel}
@@ -50,8 +50,8 @@ export function PlatformToggleList({
             className={[
               'ak-tz cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition',
               active
-                ? 'border-transparent bg-slate-100 text-slate-900'
-                : 'border-slate-300/70 text-slate-600 hover:border-ak-leise dark:border-white/15 dark:text-slate-300',
+                ? 'border-ak-gut bg-ak-gut-grund text-ak-text'
+                : 'border-ak-rand text-ak-leise hover:border-ak-leise',
             ].join(' ')}
           >
             {PLATFORMS[p].name}

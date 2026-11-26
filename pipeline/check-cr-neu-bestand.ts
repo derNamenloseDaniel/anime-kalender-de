@@ -42,6 +42,7 @@ export function main(wurzel: string, heute: string): number {
   const neuPfad = `${wurzel}/data/crunchyroll-neu.json`
   if (!existsSync(neuPfad)) {
     console.log('  ✓ Crunchyroll-Neuheiten: keine Datei, nichts zu prüfen')
+    console.log('VERSTÖSSE: 0')
     return 0
   }
   try {
@@ -57,13 +58,16 @@ export function main(wurzel: string, heute: string): number {
     const fremd = unbekannteCrSerien(neu.folgen, titles, heute, kennungVon)
     if (!fehlt.length && !fremd.length) {
       console.log('  ✓ Crunchyroll-Neuheiten: jede deutsche Folge der letzten 10 Tage hat ihren Termin, jede Serie einen Titel')
+      console.log('VERSTÖSSE: 0')
       return 0
     }
     if (fremd.length) console.log(serienWarnzeile(fremd))
     meldeFehlende(fehlt)
+    console.log('VERSTÖSSE: 0')
     return 0
   } catch (e) {
     console.error(`  ✖ Crunchyroll-Neuheiten: nicht lesbar (${(e as Error).message})`)
+    console.log('VERSTÖSSE: 1')
     return 1
   }
 }

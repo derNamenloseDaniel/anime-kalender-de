@@ -17,7 +17,7 @@ class Beobachter {
   disconnect() {}
 }
 const lager = { getItem: (k: string) => speicher.get(k) ?? null, setItem: (k: string, w: string) => void speicher.set(k, w), removeItem: (k: string) => void speicher.delete(k) }
-Object.assign(globalThis, { IntersectionObserver: Beobachter, history: { replaceState() {}, pushState() {}, state: null }, location: ort, localStorage: lager, sessionStorage: lager })
+Object.assign(globalThis, { IntersectionObserver: Beobachter, ResizeObserver: Beobachter, history: { replaceState() {}, pushState() {}, state: null }, location: ort, localStorage: lager, sessionStorage: lager })
 
 /* 900431 mit Grenzen, 900432 Liste ohne `s`, 900433 ohne Verzeichniseintrag (Liste läge da, wird aber nie gefragt). */
 const S = [[1, 1, 45], [2, 46, 89], [3, 90, 136], [4, 137]]

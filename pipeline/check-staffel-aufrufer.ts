@@ -8,7 +8,7 @@ import { spawnSync } from 'node:child_process'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { createRequire } from 'node:module'
 import type { Title } from '../shared/types.ts'
 import { baueNews, type NewsHistorie } from './lib/news.ts'
@@ -22,7 +22,8 @@ function pruefe(name: string, ok: boolean, info = ''): void {
   console.error(`✖ ${name}${info ? ` — ${info}` : ''}`)
 }
 
-const tsx = createRequire(import.meta.url).resolve('tsx/esm')
+/* Als Datei-URL: `--import C:\…` scheitert unter Windows (ERR_UNSUPPORTED_ESM_URL_SCHEME). */
+const tsx = pathToFileURL(createRequire(import.meta.url).resolve('tsx/esm')).href
 function kind(modus: string): { status: number | null; aus: string; fehler: string } {
   const wurzel = mkdtempSync(join(tmpdir(), 'staffel-aufrufer-'))
   try {

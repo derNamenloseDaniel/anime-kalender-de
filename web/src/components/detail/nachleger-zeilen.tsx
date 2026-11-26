@@ -26,7 +26,7 @@ export function FolgenMitNachlegern({ titleId, wege, antwort, releases, today, l
           {nachlegerText(n)}
         </p>
       ))}
-      <FolgenBereich titleId={titleId} wege={wege} erschienen={erschieneneFuerFolgenliste(antwort)} laufzeitImKopf={laufzeitImKopf} serieBelegt={serieBelegt} />
+      <FolgenBereich titleId={titleId} wege={wege} erschienen={erschieneneFuerFolgenliste(antwort)} laufzeitImKopf={laufzeitImKopf} serieBelegt={serieBelegt} releases={releases} today={today} />
     </>
   )
 }

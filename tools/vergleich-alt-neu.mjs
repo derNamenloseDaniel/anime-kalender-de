@@ -10,7 +10,8 @@
  * Das Fallmodul exportiert `faelle`: `[{ name, args: [...] | argsFabrik: () => [...], dateien?: { 'rel/pfad': 'Inhalt' }, zweig?: 'Etikett', erwartetWurf?: true }]`
  * Werfen alte und neue Fassung in einem Fall, ist das rot, außer der Fall trägt `erwartetWurf: true` (der Fehlertext geht dann ins Ergebnis ein).
  * `AK_ROOT` zeigt schon vor dem Import beider Fassungen auf die Kulisse (eine je Lauf, vor jedem Aufruf geleert).
- * (`argsFabrik` liefert je Lauf frische Eingaben mit Funktionen, die sich nicht klonen lassen).
+ * (`argsFabrik` liefert je Lauf frische Eingaben mit Funktionen, die sich nicht klonen lassen). `aufruf: (fn, args) => …` ersetzt
+ * `fn(...args)`, z. B. für eine Funktion, die selbst eine Funktion liefert: der Fall ruft sie auf und gibt deren Ergebnisse zurück.
  * `dateien` füllt die Kulisse vor jedem Aufruf; `zweig` zählt, welche Pfade der Funktion die Fälle erreichen (`--zweige`: jedes
  * genannte Etikett muss mindestens einmal vorkommen, sonst Exit 1). Exit 0 gleich, 1 Abweichung oder Lücke, 2 Aufruf.
  */
@@ -82,7 +83,7 @@ export function kanonisch(w, gesehen = new Map()) {
 }
 
 /** Ein Aufruf unter frischer Kulisse; liefert Bytes von Rückgabe/Fehler und veränderten Eingaben sowie den Kulisse-Hash. */
-async function ruf(fn, args, dateien, kulisse) {
+async function ruf(fn, args, dateien, kulisse, aufruf) {
   for (const name of readdirSync(kulisse)) rmSync(join(kulisse, name), { recursive: true, force: true })
   for (const [rel, inhalt] of Object.entries(dateien ?? {})) {
     mkdirSync(dirname(join(kulisse, rel)), { recursive: true })
@@ -91,7 +92,7 @@ async function ruf(fn, args, dateien, kulisse) {
   let ergebnis
   let wirft
   try {
-    ergebnis = { rueckgabe: await fn(...args) }
+    ergebnis = { rueckgabe: aufruf ? await aufruf(fn, args) : await fn(...args) }
   } catch (e) {
     wirft = String(e?.message ?? e)
     ergebnis = { wirft }
@@ -116,8 +117,8 @@ export async function vergleicheAltNeu({ datei, funktion, faelle, ref = 'origin/
     if (typeof alt !== 'function' || typeof neu !== 'function') throw new Error(`${funktion} ist in alter oder neuer Fassung keine exportierte Funktion`)
     for (const f of faelle) {
       if (f.zweig) z.zaehle(f.zweig)
-      const a = await ruf(alt, frischeArgs(f), f.dateien, kulisse)
-      const n = await ruf(neu, frischeArgs(f), f.dateien, kulisse)
+      const a = await ruf(alt, frischeArgs(f), f.dateien, kulisse, f.aufruf)
+      const n = await ruf(neu, frischeArgs(f), f.dateien, kulisse, f.aufruf)
       for (const was of ['ergebnis', 'eingaben', 'dateien']) if (a[was] !== n[was]) abweichungen.push({ fall: f.name, was })
       // Werfen beide, sagt „gleich“ nichts über die Absicht: nur ein ausdrücklich erwarteter Wurf zählt als gleich.
       if (a.wirft !== undefined && n.wirft !== undefined && !f.erwartetWurf) abweichungen.push({ fall: f.name, was: 'wirft in beiden Fassungen', fehler: n.wirft })

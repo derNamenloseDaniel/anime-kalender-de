@@ -70,7 +70,7 @@ function VoiceQuellen({ stimmen }: { stimmen: Voices }) {
   const { t } = useLang()
   const namen = [stimmen.roles.some((r) => r.von === 'anisearch') && 'aniSearch', stimmen.roles.some((r) => !r.von) && 'AniList'].filter(Boolean)
   return (
-    <p className="mt-2 text-t5 text-slate-400">
+    <p className="mt-2 text-t5 text-ak-leise">
       {t('detail.voicesSource')} {namen.join(', ')}
       {stimmen.annUrl && (
         <>
@@ -127,9 +127,9 @@ export function VoiceCast({ titleId }: { titleId: number }) {
       {open && (
         <div className="mt-2">
           {stimmen === undefined ? (
-            <p className="text-t3 text-slate-400">{t('detail.voicesLoading')}</p>
+            <p className="text-t3 text-ak-leise">{t('detail.voicesLoading')}</p>
           ) : stimmen.roles.length === 0 ? (
-            <p className="text-t3 text-slate-400">{t('detail.voicesNone')}</p>
+            <p className="text-t3 text-ak-leise">{t('detail.voicesNone')}</p>
           ) : (
             <>
               <dl className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-x-3 gap-y-1 text-t3">
@@ -138,7 +138,7 @@ export function VoiceCast({ titleId }: { titleId: number }) {
                     <dt className="truncate text-ak-leise" title={r.character}>
                       {r.character}
                     </dt>
-                    <dd className="truncate text-slate-700 dark:text-slate-200" title={r.actor}>
+                    <dd className="truncate text-ak-text" title={r.actor}>
                       {r.actor}
                     </dd>
                   </Fragment>
@@ -153,18 +153,8 @@ export function VoiceCast({ titleId }: { titleId: number }) {
   )
 }
 
-/**
- * Ähnliche Titel — aufgeklappt, einklappbar, geladen erst im Bild.
- *
- * Daniel am 15.09.2026: „aber einklappbar", dann „per default aufklappen".
- * Die Rechnung braucht den ganzen Hauptbestand (`titles.json`, mehrere
- * Megabyte). Geholt wird er deshalb erst, wenn der Bereich ins Bild scrollt —
- * wer das Panel oben liest und schließt, lädt nichts. Die gemeinsamen Merkmale
- * stehen je Zeile dabei, damit nachzulesen ist, warum ein Titel vorkommt.
- */
-export function AehnlicheTitel({ title, data, onOpenTitle }: { title: Title; data: Dataset; onOpenTitle: (id: number) => void }) {
-  const { t, tGenre, tKeyword } = useLang()
-  const [open, setOpen] = useState(true)
+/** Lädt die Vergleichsliste erst im Bild und rechnet die Vorschläge. */
+function useAehnlicheListe(title: Title, data: Dataset, open: boolean) {
   const [imBild, setImBild] = useState(false)
   /* Die Vergleichsliste gehört zu ihrer Art (Anime oder Cartoon): Wechselt das Panel ohne
      Neumontage von einem zum anderen, wäre die alte Liste die falsche (18.09.2026). */
@@ -200,6 +190,22 @@ export function AehnlicheTitel({ title, data, onOpenTitle }: { title: Title; dat
   }, [open, imBild, alle, data, westlich])
 
   const vorschlaege = useMemo(() => (open && alle ? aehnlicheTitel(title, alle) : []), [open, alle, title])
+  return { imBild, bereich, alle, vorschlaege }
+}
+
+/**
+ * Ähnliche Titel — aufgeklappt, einklappbar, geladen erst im Bild.
+ *
+ * Daniel am 15.09.2026: „aber einklappbar", dann „per default aufklappen".
+ * Die Rechnung braucht den ganzen Hauptbestand (`titles.json`, mehrere
+ * Megabyte). Geholt wird er deshalb erst, wenn der Bereich ins Bild scrollt —
+ * wer das Panel oben liest und schließt, lädt nichts. Die gemeinsamen Merkmale
+ * stehen je Zeile dabei, damit nachzulesen ist, warum ein Titel vorkommt.
+ */
+export function AehnlicheTitel({ title, data, onOpenTitle }: { title: Title; data: Dataset; onOpenTitle: (id: number) => void }) {
+  const { t, tGenre, tKeyword } = useLang()
+  const [open, setOpen] = useState(true)
+  const { imBild, bereich, alle, vorschlaege } = useAehnlicheListe(title, data, open)
   const merkmalName = (m: string) => (m.startsWith('g:') ? tGenre(m.slice(2)) : tKeyword(m.slice(2)))
 
   return (
@@ -212,9 +218,9 @@ export function AehnlicheTitel({ title, data, onOpenTitle }: { title: Title; dat
         <div className="mt-2">
           {alle === undefined ? (
             /* Vor dem Sichtbarwerden lädt noch nichts — dann steht hier nur Platz, keine Ladeanzeige (08.10.2026). */
-            imBild ? <p className="text-t3 text-slate-400">{t('detail.aehnlichLaedt')}</p> : <div className="h-6" aria-hidden />
+            imBild ? <p className="text-t3 text-ak-leise">{t('detail.aehnlichLaedt')}</p> : <div className="h-6" aria-hidden />
           ) : vorschlaege.length === 0 ? (
-            <p className="text-t3 text-slate-400">{t('detail.aehnlichKeine')}</p>
+            <p className="text-t3 text-ak-leise">{t('detail.aehnlichKeine')}</p>
           ) : (
             /*
               **Kacheln statt Zeilen — das Bild und die Gemeinsamkeit lösen den Klick aus.**
@@ -270,11 +276,11 @@ export function AehnlicheKachel({ v, onOpenTitle, merkmalName }: { v: ReturnType
             className="aspect-[2/3] w-[88px] shrink-0 self-start rounded-md object-cover shadow-sm"
           />
         ) : (
-          <span className="aspect-[2/3] w-[88px] shrink-0 self-start rounded-md bg-slate-200 dark:bg-white/10" />
+          <span className="aspect-[2/3] w-[88px] shrink-0 self-start rounded-md bg-ak-flaeche-3" />
         )}
         {/* Name oben, Chips darunter im Fluss; die Kachel wächst, statt dass Chips den Titel überdecken. */}
         <span className="flex min-w-0 flex-1 flex-col justify-between gap-1 py-0.5">
-          <span className="line-clamp-3 text-t3 font-semibold text-slate-700 dark:text-slate-200">
+          <span className="line-clamp-3 text-t3 font-semibold text-ak-text">
             {anzeigeName(v.title)}
           </span>
           <span className="flex flex-wrap gap-1">
@@ -283,8 +289,8 @@ export function AehnlicheKachel({ v, onOpenTitle, merkmalName }: { v: ReturnType
                 key={m}
                 className={
                   m.startsWith('g:')
-                    ? 'rounded bg-sky-500/10 px-1.5 py-px text-t5 font-semibold text-sky-700 dark:bg-sky-400/15 dark:text-sky-300'
-                    : 'rounded bg-slate-500/10 px-1.5 py-px text-t5 text-slate-600 dark:bg-white/10 dark:text-slate-300'
+                    ? 'rounded bg-ak-akzent/6 px-1.5 py-px text-t5 font-semibold text-ak-akzent-text'
+                    : 'rounded bg-ak-flaeche-3 px-1.5 py-px text-t5 text-ak-leise'
                 }
               >
                 {merkmalName(m)}

@@ -27,6 +27,8 @@
  * tragen.
  */
 import { titelAus, type Titelherkunft } from './lib/anisearch-titel.ts'
+import { todayIso } from '../shared/time.ts'
+import { titelFaellig } from './lib/anisearch-faellig.ts'
 import { KENNUNG } from './lib/kennung.ts'
 import { log, readJson, sleep, warn, writeJson } from './lib/util.ts'
 
@@ -219,28 +221,16 @@ for (const teile of Object.values(
  * kommt nur über die Frist wieder dran.
  */
 const ALTER_TAGE = Number(/--alter[= ](\d+)/.exec(process.argv.join(' '))?.[1] ?? 180)
-/**
- * **Eine Nichtauskunft kommt nach 30 Tagen wieder dran, nicht in jedem Lauf.** Ohne Frist standen
- * 990 frisch geholte Einträge ohne deutschen Namen stets vorn in der Warteschlange, und jeder Block
- * holte sie erneut — am 27.09.2026 holte Block 2 die 400 Seiten von Block 1 noch einmal, der
- * Rückstand (2.163 mit altem Ausleser) sank kaum. Eine Seite ohne deutschen Namen ändert sich selten.
- */
-const OHNE_NAMEN_TAGE = 30
-const faellig = (t: { id: number }): boolean => {
-  const e = bestand[String(t.id)]
-  if (!e) return true
-  if ((e.stand ?? 1) < PARSER_STAND) return true
-  const tage = (Date.now() - Date.parse(e.fetchedAt)) / 86_400_000
-  if ((!e.quelle || e.quelle === 'ueberschrift') && !(tage < OHNE_NAMEN_TAGE)) return true
-  /*
-    Synonyme werden erst seit dem 12.09.2026 mitgespeichert — und sie tragen oft den
-    deutschen Namen, wo es keinen Sprachblock gibt („Die Tagebücher der Apothekerin: Der
-    Film"). 2.331 ältere Einträge hätten sie über die 180-Tage-Frist nie bekommen
-    (gemessen 16.09.2026, nach Daniels Hinweis auf japanische Titel im Panel).
-  */
-  if (!e.synonyme && e.fetchedAt < '2026-09-12') return true
-  return !(tage < ALTER_TAGE)
-}
+/* Die Regeln (Nichtauskunft nach 30 Tagen, Synonyme seit 12.09.2026) stehen in `lib/anisearch-faellig.ts`. */
+/* Titel mit künftiger Disc-Ausgabe binnen der Frist kommen früher wieder (`lib/titel-termin-frist.ts`). */
+const ausgaben = readJson<Record<string, { datum: string }[]>>('data/disc-ausgaben.json', {})
+const faellig = (t: { id: number }): boolean =>
+  titelFaellig(bestand[String(t.id)], {
+    jetzt: Date.now(),
+    alterTage: ALTER_TAGE,
+    parserStand: PARSER_STAND,
+    termin: { heute: todayIso(), tage: (ausgaben[String(t.id)] ?? []).map((a) => a.datum) },
+  })
 
 const warteschlange = ohne
   .filter((t) => bruecke[String(t.id)] && faellig(t))

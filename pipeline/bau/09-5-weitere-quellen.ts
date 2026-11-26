@@ -4,7 +4,7 @@ import { type MotnDaten, LEER as MOTN_LEER } from '../lib/motn.ts'
 import { werteMotnAus } from './09-5-1-motn-uebernahme.ts'
 import { todayIso } from '../../shared/time.ts'
 import type { AdnData } from '../lib/adn.ts'
-import { adnAdresseSchaerfen, adnFolgenAdresse, ladeAdnArchiv } from '../lib/adn-sprachen.ts'
+import { type AdnArchiv, adnAdresseSchaerfen, adnFolgenAdresse, ladeAdnArchiv } from '../lib/adn-sprachen.ts'
 import { type Release, type Title } from '../../shared/types.ts'
 import { type EntfernterVerweis } from './grundlagen.ts'
 import { entferneVerweiseMitNein, regionGesperrteWege } from './verweis-grund.ts'
@@ -15,18 +15,26 @@ import { schaerfeAdnAdressen } from './09-5-2-adn-adressen.ts'
 import { belegeAdnAusArchiv, belegeAdnUeberKatalog, stelleAdnFolgenverweiseUm } from './09-5-2-adn-belege.ts'
 import { stelleRtlAdressenUm } from './09-5-3-rtl-adressen.ts'
 
-export function werteWeitereQuellenAus({ releases, titles, adnKatalog, adnVerweiseErgaenzt, verweiseEntfernt, schreibWurzel }: {
+interface WeitereQuellenEingabe {
   releases: Release[]
   titles: Map<number, Title>
   schreibWurzel?: string
   adnKatalog: AdnData
   adnVerweiseErgaenzt: number
   verweiseEntfernt: EntfernterVerweis[]
-}) {
-  uebernehmeAnisearchErstausgabe({ releases, titles })
+}
 
-  ergaenzeErstausgabeAusWikiUndHand({ titles })
+type AdnAdressen = ReturnType<typeof schaerfeAdnAdressen>
+type AdnStreamSchaerfer = (titleId: number, stream: { platform: string; url: string }) => boolean
 
+interface WeitereQuellenErgebnis {
+  adnArchiv: AdnArchiv
+  adnStreamSchaerfen: AdnStreamSchaerfer
+  motnBelege: number
+  motnTon: Set<string>
+}
+
+function uebernehmeMotnTon({ releases, titles }: Pick<WeitereQuellenEingabe, 'releases' | 'titles'>) {
   /**
    * Deutsche Tonspuren von der Streaming Availability API — nur Netflix.
    *
@@ -51,32 +59,16 @@ export function werteWeitereQuellenAus({ releases, titles, adnKatalog, adnVerwei
    *     Haus. Prime Video und Disney+ werden geholt und ausgewiesen, aber nicht
    *     übernommen, solange die Kontrollmessung sie nicht trägt.
    */
-  const { motnBelege, motnTon } = werteMotnAus({
+  return werteMotnAus({
     motn: readJson<MotnDaten>('data/motn.json', MOTN_LEER),
     tmdbTitles: mitHandvorrang(readJson('data/tmdb-titles.json', {})),
     titles,
     releases,
     heute: todayIso(),
   })
+}
 
-  /**
-   * Was ADN uns längst gesagt hat — nachgelesen im eigenen Archiv.
-   *
-   * ADN nennt je Folge die Sprachen (`vde` = deutsche Synchro, `vostde` =
-   * Untertitel), und die Rohantworten liegen seit dem 11.08.2026 unter
-   * `data/adn-raw/`. Ein `dub: true` entstand daraus bisher aber nur auf einem
-   * Umweg: über einen **Release**. Wo kein Termin herauskam — Katalogtitel,
-   * Filme, OVAs —, blieb der Verweis bei „🇩🇪 ?", obwohl die Auskunft im Haus lag
-   * (am 21.08.2026 bei 63 von 161 ADN-Verweisen).
-   *
-   * Wie eng ausgewertet wird und warum das keine menschliche Prüfung ersetzt,
-   * steht in `lib/adn-sprachen.ts`. Hier zählt nur die Reihenfolge: Der Block
-   * läuft **nach** `dub-confirmed.yaml` und rührt nur an, was noch `undefined`
-   * ist. Ein Beispiel dafür, warum das nicht anders geht, ist KILL BLUE — der
-   * Verweis trägt `dub: true` aus einer Anime2You-Meldung über eine Synchro ab
-   * dem 24.08.2026, während das Archiv vom 21.08. zu Recht zwölf Folgen ohne
-   * `vde` führt. Beide Angaben stimmen; die jüngere gewinnt.
-   */
+function setzeJoynPauschal(titles: Map<number, Title>): void {
   /**
    * **Joyn ist ein deutscher Anbieter — dort läuft nichts auf Japanisch.**
    *
@@ -97,25 +89,24 @@ export function werteWeitereQuellenAus({ releases, titles, adnKatalog, adnVerwei
    */
   const joynJa = setzeJoynDeutsch(titles.values())
   if (joynZeile(titles.values(), joynJa)) log(joynZeile(titles.values(), joynJa))
+}
 
-  const { ausRelease, adnAdressen, katalogKennung, adnStaffeln } = schaerfeAdnAdressen({ adnKatalog, releases, titles, adnVerweiseErgaenzt })
-  stelleRtlAdressenUm({ titles })
-
-  /**
-   * **Dieselbe Schärfung noch einmal, für alles, was später dazukommt.**
-   *
-   * Die Runde oben läuft, bevor `build.ts` ganz unten die Anbieter aus
-   * aniSearch ergänzt. Ein ADN-Verweis, der dort entsteht, wird von ihr nie
-   * berührt — er behält seine Slug-Adresse, `beurteileAdnVerweis` findet
-   * nichts im Archiv, und der Verweis bleibt bei „🇩🇪 ?".
-   *
-   * Gemessen am 07.09.2026: **sieben** solche Verweise, darunter sechs, deren
-   * Kennung seit dem 06.09. in `data/adn-adressen.yaml` steht — die Datei war
-   * gepflegt und wirkungslos. Das ist derselbe Fehlgriff wie beim Handbeleg
-   * einen Tag zuvor: **Wer unten ergänzt, muss unten auch schärfen und
-   * beurteilen.**
-   */
-  const adnStreamSchaerfen = (titleId: number, stream: { platform: string; url: string }): boolean => {
+/**
+ * **Dieselbe Schärfung noch einmal, für alles, was später dazukommt.**
+ *
+ * Die Runde oben läuft, bevor `build.ts` ganz unten die Anbieter aus
+ * aniSearch ergänzt. Ein ADN-Verweis, der dort entsteht, wird von ihr nie
+ * berührt — er behält seine Slug-Adresse, `beurteileAdnVerweis` findet
+ * nichts im Archiv, und der Verweis bleibt bei „🇩🇪 ?".
+ *
+ * Gemessen am 07.09.2026: **sieben** solche Verweise, darunter sechs, deren
+ * Kennung seit dem 06.09. in `data/adn-adressen.yaml` steht — die Datei war
+ * gepflegt und wirkungslos. Das ist derselbe Fehlgriff wie beim Handbeleg
+ * einen Tag zuvor: **Wer unten ergänzt, muss unten auch schärfen und
+ * beurteilen.**
+ */
+function baueAdnStreamSchaerfer({ ausRelease, adnAdressen, katalogKennung, adnStaffeln, adnArchiv }: AdnAdressen & { adnArchiv: AdnArchiv }): AdnStreamSchaerfer {
+  return (titleId, stream) => {
     if (stream.platform !== 'adn') return false
     const ausSlug = ausRelease.get(titleId) ?? undefined
     const kennung = adnAdressen[titleId] ?? katalogKennung.get(titleId) ?? ausSlug?.show
@@ -127,14 +118,37 @@ export function werteWeitereQuellenAus({ releases, titles, adnKatalog, adnVerwei
     stream.url = neu
     return true
   }
+}
 
+function belegeAdnAusGedaechtnis({ titles, schreibWurzel }: Pick<WeitereQuellenEingabe, 'titles' | 'schreibWurzel'>): AdnArchiv {
+  /**
+   * Was ADN uns längst gesagt hat — nachgelesen im eigenen Archiv.
+   *
+   * ADN nennt je Folge die Sprachen (`vde` = deutsche Synchro, `vostde` =
+   * Untertitel), und die Rohantworten liegen seit dem 11.08.2026 unter
+   * `data/adn-raw/`. Ein `dub: true` entstand daraus bisher aber nur auf einem
+   * Umweg: über einen **Release**. Wo kein Termin herauskam — Katalogtitel,
+   * Filme, OVAs —, blieb der Verweis bei „🇩🇪 ?", obwohl die Auskunft im Haus lag
+   * (am 21.08.2026 bei 63 von 161 ADN-Verweisen).
+   *
+   * Wie eng ausgewertet wird und warum das keine menschliche Prüfung ersetzt,
+   * steht in `lib/adn-sprachen.ts`. Hier zählt nur die Reihenfolge: Der Block
+   * läuft **nach** `dub-confirmed.yaml` und rührt nur an, was noch `undefined`
+   * ist. Ein Beispiel dafür, warum das nicht anders geht, ist KILL BLUE — der
+   * Verweis trägt `dub: true` aus einer Anime2You-Meldung über eine Synchro ab
+   * dem 24.08.2026, während das Archiv vom 21.08. zu Recht zwölf Folgen ohne
+   * `vde` führt. Beide Angaben stimmen; die jüngere gewinnt.
+   */
   // Das Gedächtnis schreibt nur der Bau; Checks geben eine Kulisse als `schreibWurzel` vor.
   const adnArchiv = ladeAdnArchiv({ pflegen: true, schreibWurzel })
   stelleAdnFolgenverweiseUm({ titles, adnArchiv })
   belegeAdnAusArchiv({ adnArchiv, titles })
 
   belegeAdnUeberKatalog({ titles })
+  return adnArchiv
+}
 
+function entferneVerweiseOhneDeutsch({ titles, verweiseEntfernt }: Pick<WeitereQuellenEingabe, 'titles' | 'verweiseEntfernt'>): void {
   /**
    * Anbieter ohne deutsche Synchro fliegen ganz raus.
    *
@@ -158,5 +172,17 @@ export function werteWeitereQuellenAus({ releases, titles, adnKatalog, adnVerwei
     // zu denen niemand die Tonspur belegt. Sie bleiben unangetastet.
   }
   if (ohneDeutsch) log(`${ohneDeutsch} Verweise ohne deutsche Synchro entfernt`)
+}
+
+export function werteWeitereQuellenAus({ releases, titles, adnKatalog, adnVerweiseErgaenzt, verweiseEntfernt, schreibWurzel }: WeitereQuellenEingabe): WeitereQuellenErgebnis {
+  uebernehmeAnisearchErstausgabe({ releases, titles })
+  ergaenzeErstausgabeAusWikiUndHand({ titles })
+  const { motnBelege, motnTon } = uebernehmeMotnTon({ releases, titles })
+  setzeJoynPauschal(titles)
+  const adnAdressen = schaerfeAdnAdressen({ adnKatalog, releases, titles, adnVerweiseErgaenzt })
+  stelleRtlAdressenUm({ titles })
+  const adnArchiv = belegeAdnAusGedaechtnis({ titles, schreibWurzel })
+  const adnStreamSchaerfen = baueAdnStreamSchaerfer({ ...adnAdressen, adnArchiv })
+  entferneVerweiseOhneDeutsch({ titles, verweiseEntfernt })
   return { adnArchiv, adnStreamSchaerfen, motnBelege, motnTon }
 }

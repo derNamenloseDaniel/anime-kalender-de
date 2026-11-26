@@ -1,7 +1,8 @@
 import { beiBannerKlick, beiCoverKlick, CoverMaximieren, coverVorwaermen } from './cover-max.tsx'
 import { anzeigeName } from '@shared/titles.ts'
 import { TrailerKino } from './kino.tsx'
-import { metaVon, unterzeileVon } from './kopf-texte.ts'
+import { fskAngabeVon, metaVon, unterzeileVon } from './kopf-texte.ts'
+import { Tooltip } from '../ui.tsx'
 import { WeitereTitel } from './weitere.tsx'
 import { Flaggen } from './flaggen.tsx'
 import { PanelAktionen } from './aktionen.tsx'
@@ -33,6 +34,7 @@ export function PanelBuehne({ reihenName, teilName, reihenTeile, buehnenBild, gr
 }) {
   const teil = reihenTeile.length > 1 && teilName !== reihenName ? teilName : undefined
   const unter = unterzeileVon(title, teil, folgenImKasten, t)
+  const fsk = fskAngabeVon(title, t)
   const meta = metaVon(title, eigenerTeil, t)
   return (
     <>
@@ -54,7 +56,14 @@ export function PanelBuehne({ reihenName, teilName, reihenTeile, buehnenBild, gr
           <h2 title={reihenName} className="line-clamp-2 text-t1 font-bold text-ak-text">
             {reihenName}
           </h2>
-          {unter && <p className="mt-1 text-t3 text-ak-leise">{unter}</p>}
+          {(unter || fsk) && (
+            <p className="mt-1 text-t3 text-ak-leise">
+              {unter}
+              {unter && fsk ? ' · ' : ''}
+              {/* Wirksame Fläche 24 px (WCAG 2.5.8): darunter steht erst die Metazeile, kein anderes Ziel im 24-px-Kreis. */}
+              {fsk && (fsk.hinweis ? <Tooltip text={fsk.hinweis} unterstrichen>{fsk.text}</Tooltip> : fsk.text)}
+            </p>
+          )}
           <div className="mt-1 text-t4 text-ak-leise">
             {meta ? `${meta} · ` : ''}
             <WeitereTitel title={title} />

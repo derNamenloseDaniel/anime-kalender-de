@@ -23,6 +23,7 @@ const MODULE = [
   ['daniel-dateien.mjs', async (i) => (await import('./daniel-dateien.mjs')).lauf(i)],
   ['prozess-waechter.js', async () => require(join(H, 'prozess-waechter.js')).meldung()],
   ['ende-termin.mjs', async () => (await import('./ende-termin.mjs')).meldung()],
+  ['wartet-auf.mjs', async () => (await import('./wartet-auf.mjs')).meldung('prompt')],
   ['software-updates.js', async () => (await import('./software-updates.mjs')).meldung()],
 ]
 

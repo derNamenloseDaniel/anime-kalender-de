@@ -1,4 +1,5 @@
 import type { FranchiseMember } from '@shared/types.ts'
+import { erscheintErst } from '@shared/logic.ts'
 import { eindeutschenStaffel } from '@shared/titles.ts'
 import { FORMAT_DE } from '@shared/mappings.ts'
 import type { Translate } from '../../lib/i18n.tsx'
@@ -9,11 +10,20 @@ import { kurzName } from './reihen-regeln.ts'
  * Der Jahresvergleich ist nur der Rückfall für Einträge ohne Status und irrt am Jahreswechsel; ein Teil ohne Synchro, der dieses Jahr anfängt,
  * zählt ebenfalls dazu („Staffel 3 — Teil 1“ beginnt am 02.10.2026 und stand mit `jpYear > jahr` bei den erschienenen).
  */
-export function kuenftig(m: FranchiseMember, jahr: number): boolean {
+export function kuenftig(m: Pick<FranchiseMember, 'ohneSynchro' | 'jpStatus' | 'jpYear'>, jahr: number): boolean {
   return (
     m.jpStatus === 'NOT_YET_RELEASED' ||
     (m.jpStatus !== 'FINISHED' && ((m.jpYear ?? 0) > jahr || (Boolean(m.ohneSynchro) && (m.jpYear ?? 0) >= jahr)))
   )
+}
+
+/**
+ * Ein Teil ohne belegte deutsche Synchro, der schon erschienen sein sollte: die Karte trägt „🇩🇪 ✕“, der Reiter einen gestrichelten Rand.
+ * Ein künftiger oder geplanter Teil ist kein Befund, er trägt „Geplant“ (`SynchroMarke`; Daniel, 10.10.2026). Jahr und Starttermin
+ * messen sich an `today` (ISO-Tag), nie an der Uhr.
+ */
+export function ohneDeutscheSynchro(m: Pick<FranchiseMember, 'ohneSynchro' | 'jpStart' | 'jpStatus' | 'jpYear'>, today: string): boolean {
+  return Boolean(m.ohneSynchro) && !kuenftig(m, Number(today.slice(0, 4))) && !erscheintErst(m, today)
 }
 
 /**

@@ -19,3 +19,11 @@
 # Baki Hanma Staffel 2 (Netflix title/81236338: eine Staffel mit 27 Folgen, Deutsch 1–27). AniList 146646 führt 27 Folgen; 17241 (Teil 1) ist am Titel gebunden,
 # 18616 (Teil 2, 14 Folgen, Netflix 24.08.2023) liegt im Titel: dessen jpEnd ist 2023-08-24, der Start (Teil 1) der 26.07.2023.
 18616: 146646
+
+# Teile, die AniList im Titel mitzählt (Anlass 25.11.2026: PR 5026 gab Bastard Teil 2 einen Netflix-Weg, `staffel-zuordnung` meldete Überlappung auf 81281582).
+# Bastard!! (Netflix title/81281582, St. 1 = 24 Folgen): AniList 144677 führt 24 Folgen, 17505 (Teil 2, 11 Folgen, Netflix 15.09.2022) liegt darin.
+17505: 144677
+# JoJo Stone Ocean (Netflix title/80179831): AniList 146722 führt 26 Folgen und endet am 01.12.2022; 17775 (Teil 3, 14 Folgen, 01.12.2022) liegt darin, 17246 (Teil 2) ist die Seite des Titels.
+17775: 146722
+# Lupin III. Part 6: AniList 134623 führt 25 Folgen ab 10.10.2021 (24 Folgen plus Folge 0); 16648 (Zeiten, Folge 0, TV-Spezial, 10.10.2021) liegt darin.
+16648: 134623

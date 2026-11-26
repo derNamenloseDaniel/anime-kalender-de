@@ -136,6 +136,7 @@ try {
   cpSync(join(echt, 'pipeline'), join(welt, 'pipeline'), { recursive: true })
   cpSync(join(echt, 'package.json'), join(welt, 'package.json')) // coe-meldung löst `npm run <skript>` über package.json auf
   cpSync(join(echt, 'tools'), join(welt, 'tools'), { recursive: true, filter: (q) => !q.endsWith('.test.mjs') })
+  cpSync(join(echt, 'worker/src/lauf-sql.ts'), join(welt, 'worker/src/lauf-sql.ts')) // check-workflows gleicht Workflow-Namen mit LAUF_ARTEN ab
   const fahre = () => spawnSync(process.execPath, [join(tools, 'check-workflows.mjs')], { cwd: welt, encoding: 'utf8', windowsHide: true })
   const gruen = fahre()
   assert.equal(gruen.status, 0, gruen.stderr)

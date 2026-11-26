@@ -13,7 +13,7 @@ test('Leiste: zwei Knöpfe mit Zahlen, zwei leere Bälle, eine Zeile', async ($,
   expect((await band.find({ key: 'oeffnen' }))?.props.label).toBe('Arbeitsliste 4')
   const reihe = { s: '' }
   zeilen(await band.drawn(), [], reihe)
-  expect(reihe.s).toBe('Arbeitsliste 4○○○Agents 3')
+  expect(reihe.s).toBe('Arbeitsliste 4Übersicht○○○Agents 3')
   const baum = JSON.stringify(await band.drawn())
   expect(baum).toContain('{"color":"success"},"children":["○"]')
   expect(baum).toContain('{"color":"warning"},"children":["○"]')
@@ -42,7 +42,7 @@ test('Autonomer Modus an: erster Ball der Leiste gefüllt', async ($, on) => {
   const band = await $.ui.mount({ ...BAND, surface: 'terminal' })
   const reihe = { s: '' }
   zeilen(await band.drawn(), [], reihe)
-  expect(reihe.s).toBe('Arbeitsliste 0◉○○Agents 0')
+  expect(reihe.s).toBe('Arbeitsliste 0Übersicht◉○○Agents 0')
   await band.unmount()
 })
 
@@ -53,7 +53,7 @@ test('Autonomer Modus: Marker einer fremden Sitzung oder die alte globale Datei 
   const band = await $.ui.mount({ ...BAND, surface: 'terminal' })
   const reihe = { s: '' }
   zeilen(await band.drawn(), [], reihe)
-  expect(reihe.s).toBe('Arbeitsliste 0○○○Agents 0')
+  expect(reihe.s).toBe('Arbeitsliste 0Übersicht○○○Agents 0')
   await band.unmount()
 })
 
@@ -74,7 +74,7 @@ test('Leiste: Ruhemodus sanft zeigt die Sanduhr, solange mehr als 2 Agenten lauf
   const band = await $.ui.mount({ ...BAND, surface: 'desktop' })
   const reihe = { s: '' }
   zeilen(await band.drawn(), [], reihe)
-  expect(reihe.s).toBe('Arbeitsliste 0○◉⧗○Agents 3')
+  expect(reihe.s).toBe('Arbeitsliste 0Übersicht○◉⧗○Agents 3')
   await band.unmount()
 })
 
@@ -84,7 +84,7 @@ test('Leiste: Ruhemodus sanft ohne Sanduhr, sobald höchstens 2 Agenten laufen',
   const band = await $.ui.mount({ ...BAND, surface: 'desktop' })
   const reihe = { s: '' }
   zeilen(await band.drawn(), [], reihe)
-  expect(reihe.s).toBe('Arbeitsliste 0○◉○Agents 2')
+  expect(reihe.s).toBe('Arbeitsliste 0Übersicht○◉○Agents 2')
   await band.unmount()
 })
 
@@ -94,7 +94,7 @@ test('Leiste: Ruhemodus sanft zählt Prüfer nicht — 2 Agenten und 2 Prüfer o
   const band = await $.ui.mount({ ...BAND, surface: 'desktop' })
   const reihe = { s: '' }
   zeilen(await band.drawn(), [], reihe)
-  expect(reihe.s).toBe('Arbeitsliste 0○◉○Agents 2+2')
+  expect(reihe.s).toBe('Arbeitsliste 0Übersicht○◉○Agents 2+2')
   await band.unmount()
 })
 
@@ -104,7 +104,7 @@ test('Leiste: Markerdatei „hart“ zeigt keine Sanduhr', async ($, on) => {
   const band = await $.ui.mount({ ...BAND, surface: 'desktop' })
   const reihe = { s: '' }
   zeilen(await band.drawn(), [], reihe)
-  expect(reihe.s).toBe('Arbeitsliste 0○◉○Agents 3')
+  expect(reihe.s).toBe('Arbeitsliste 0Übersicht○◉○Agents 3')
   await band.unmount()
 })
 
@@ -114,7 +114,7 @@ test('Leiste: leere Markerdatei gilt als sanft, bei 3 Agenten steht die Sanduhr'
   const band = await $.ui.mount({ ...BAND, surface: 'desktop' })
   const reihe = { s: '' }
   zeilen(await band.drawn(), [], reihe)
-  expect(reihe.s).toBe('Arbeitsliste 0○◉⧗○Agents 3')
+  expect(reihe.s).toBe('Arbeitsliste 0Übersicht○◉⧗○Agents 3')
   await band.unmount()
 })
 
@@ -126,7 +126,7 @@ test('Leiste auf dem Desktop: Textzeichen statt Bilder, gefüllt = an, leer = au
   const band = await $.ui.mount({ ...BAND, surface: 'desktop' })
   const reihe = { s: '' }
   zeilen(await band.drawn(), [], reihe)
-  expect(reihe.s).toBe('Arbeitsliste 0◉○○Agents 0')
+  expect(reihe.s).toBe('Arbeitsliste 0Übersicht◉○○Agents 0')
   const baum = JSON.stringify(await band.drawn())
   expect(baum).not.toContain('"Svg"')
   expect(baum).toContain('{"color":"success"},"children":["◉"]')
@@ -718,7 +718,7 @@ test('Leiste: Sparmodus an ist der dritte Ball gefüllt', async ($, on) => {
   const band = await $.ui.mount({ ...BAND, surface: 'terminal' })
   const reihe = { s: '' }
   zeilen(await band.drawn(), [], reihe)
-  expect(reihe.s).toBe('Arbeitsliste 0○○◉Agents 0')
+  expect(reihe.s).toBe('Arbeitsliste 0Übersicht○○◉Agents 0')
   await band.unmount()
 })
 

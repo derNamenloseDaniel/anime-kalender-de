@@ -1,0 +1,22 @@
+[
+ { "name": "Ausnahmeweg entfernt (jede Lockerung rot)", "datei": "tools/lighthouse-urteil.mjs", "suche": " && !erlaubt.some((e) => e.profil === profil && e.seite === seite && e.grenze === k && e.von === g && e.auf === n)", "ersetze": "", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "some statt every (leere Liste erlaubt alles)", "datei": "tools/lighthouse-urteil.mjs", "suche": "!erlaubt.some((e)", "ersetze": "!erlaubt.every((e)", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "Profil nicht verglichen", "datei": "tools/lighthouse-urteil.mjs", "suche": "e.profil === profil", "ersetze": "true", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "Seite nicht verglichen", "datei": "tools/lighthouse-urteil.mjs", "suche": "e.seite === seite", "ersetze": "true", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "Grenze nicht verglichen", "datei": "tools/lighthouse-urteil.mjs", "suche": "e.grenze === k", "ersetze": "true", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "von nicht verglichen", "datei": "tools/lighthouse-urteil.mjs", "suche": "e.von === g", "ersetze": "true", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "auf nicht verglichen", "datei": "tools/lighthouse-urteil.mjs", "suche": "e.auf === n", "ersetze": "true", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "auf: weiter als eingetragen erlaubt", "datei": "tools/lighthouse-urteil.mjs", "suche": "e.auf === n", "ersetze": "e.auf <= n", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "Verdrahtung: LOCKERUNGEN nicht übergeben", "datei": "tools/lighthouse-messen.mjs", "suche": "await grenzenAufMain(), LOCKERUNGEN)", "ersetze": "await grenzenAufMain())", "tests": ["node tools/lighthouse-messen.test.mjs"] },
+ { "name": "Liste: nur Profil pr eingetragen", "datei": "tools/lighthouse-grenzen.mjs", "suche": "['pr', 'live'].map((profil)", "ersetze": "['pr'].map((profil)", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "Liste: Titel mittel falscher Schritt", "datei": "tools/lighthouse-grenzen.mjs", "suche": "tbt2411('Titel', 'tbt-mittel', 1100, 1210)", "ersetze": "tbt2411('Titel', 'tbt-mittel', 1100, 1200)", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "Band Titel mittel wieder 1100 (Alarm 45424597997 rot)", "datei": "tools/lighthouse-grenzen.mjs", "suche": "'tbt-mittel': 1210", "ersetze": "'tbt-mittel': 1100", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "Band Datenbank langsam 1420 -> 1430", "datei": "tools/lighthouse-grenzen.mjs", "suche": "'tbt-langsam': 1420", "ersetze": "'tbt-langsam': 1430", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "Band Datenbank schnell 680 -> 690", "datei": "tools/lighthouse-grenzen.mjs", "suche": "tbt: 680,", "ersetze": "tbt: 690,", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "Band Datenbank mittel 980 -> 990", "datei": "tools/lighthouse-grenzen.mjs", "suche": "'tbt-mittel': 980", "ersetze": "'tbt-mittel': 990", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "Verfall entfernt (alter Eintrag gilt ewig)", "datei": "tools/lighthouse-urteil.mjs", "suche": "  erlaubt = erlaubt.filter((e) => Date.parse(e.datum) >= ab)\n", "ersetze": "", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "Verfall: Grenze > statt >=", "datei": "tools/lighthouse-urteil.mjs", "suche": "Date.parse(e.datum) >= ab", "ersetze": "Date.parse(e.datum) > ab", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "Verfall: 15 statt 14 Tage", "datei": "tools/lighthouse-urteil.mjs", "suche": "LOCKERUNG_TAGE = 14", "ersetze": "LOCKERUNG_TAGE = 15", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "Verfall: 13 statt 14 Tage", "datei": "tools/lighthouse-urteil.mjs", "suche": "LOCKERUNG_TAGE = 14", "ersetze": "LOCKERUNG_TAGE = 13", "tests": ["node tools/lighthouse-urteil.test.mjs"] },
+ { "name": "Kontrolle", "aenderungen": [], "tests": ["node tools/lighthouse-urteil.test.mjs", "node tools/lighthouse-messen.test.mjs"] }
+]

@@ -22,10 +22,10 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { todayIso } from '../shared/time.ts'
 
-const wurzel = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const wurzel = process.env.AK_ROOT ?? resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const args = process.argv.slice(2)
 const LIMIT = Number(args[args.indexOf('--limit') + 1]) || 120
 
@@ -61,7 +61,7 @@ const kurz = (t) =>
     .replace(/\((german dub|dt\. opening|deutscher dub)\)/g, '')
     .replace(/[^a-z0-9]/g, '')
 
-async function main() {
+function ladeEingaben() {
   const vorschlaege = JSON.parse(readFileSync(resolve(wurzel, 'data/anbieter-vorschlaege.json'), 'utf8'))
   const titel = JSON.parse(readFileSync(resolve(wurzel, 'public/data/titles.json'), 'utf8'))
   const arr = Array.isArray(titel) ? titel : (titel.titles ?? Object.values(titel))
@@ -74,6 +74,41 @@ async function main() {
       return {}
     }
   })()
+  return { vorschlaege, jeId, bestand }
+}
+
+async function sucheTreffer(zugang, t) {
+  /*
+    Vier Schreibweisen, dieselbe Reihenfolge wie bei TMDB: Was zuerst trifft,
+    gewinnt. Der japanische Titel steht hinten — er trifft selten, aber wenn,
+    dann eindeutig.
+  */
+  const namen = [t?.titleDe, t?.titleEn, t?.titleRomaji, t?.titleNative].filter(Boolean)
+  for (const n of namen) {
+    const items = await suche(zugang, n)
+    await schlaf(350)
+    const genau = items.find((i) => kurz(i.title) === kurz(n))
+    if (genau) return genau
+  }
+  return null
+}
+
+function eintragFuer(v, treffer) {
+  if (!treffer) return { titel: v.titel, gefunden: false, geprueftAm: todayIso() }
+  const spuren = treffer.series_metadata?.audio_locales ?? []
+  return {
+    titel: v.titel,
+    gefunden: true,
+    seriesId: treffer.id,
+    crTitel: treffer.title,
+    spuren,
+    deutsch: spuren.includes('de-DE'),
+    geprueftAm: todayIso(),
+  }
+}
+
+export async function main() {
+  const { vorschlaege, jeId, bestand } = ladeEingaben()
 
   const offen = vorschlaege
     .filter((v) => v.anbieter?.includes('crunchyroll'))
@@ -89,7 +124,7 @@ async function main() {
   if (land !== 'DE') {
     console.error(`Abbruch: Crunchyroll antwortet als "${land}", nicht als DE.`)
     console.error('Dieser Lauf muss von einer deutschen Leitung kommen — sonst kommt der US-Katalog.')
-    process.exit(1)
+    return 1
   }
   console.log(`${offen.length} Vorschläge, Katalog ${land}`)
 
@@ -97,42 +132,10 @@ async function main() {
   let ohneTreffer = 0
 
   for (const v of offen) {
-    const t = jeId.get(v.id)
-    /*
-      Vier Schreibweisen, dieselbe Reihenfolge wie bei TMDB: Was zuerst trifft,
-      gewinnt. Der japanische Titel steht hinten — er trifft selten, aber wenn,
-      dann eindeutig.
-    */
-    const namen = [t?.titleDe, t?.titleEn, t?.titleRomaji, t?.titleNative].filter(Boolean)
-    let treffer = null
-    for (const n of namen) {
-      const items = await suche(zugang, n)
-      await schlaf(350)
-      const genau = items.find((i) => kurz(i.title) === kurz(n))
-      if (genau) {
-        treffer = genau
-        break
-      }
-    }
-
-    if (!treffer) {
-      bestand[v.id] = { titel: v.titel, gefunden: false, geprueftAm: todayIso() }
-      ohneTreffer++
-      continue
-    }
-
-    const spuren = treffer.series_metadata?.audio_locales ?? []
-    const deutsch = spuren.includes('de-DE')
-    if (deutsch) mitDeutsch++
-    bestand[v.id] = {
-      titel: v.titel,
-      gefunden: true,
-      seriesId: treffer.id,
-      crTitel: treffer.title,
-      spuren,
-      deutsch,
-      geprueftAm: todayIso(),
-    }
+    const treffer = await sucheTreffer(zugang, jeId.get(v.id))
+    bestand[v.id] = eintragFuer(v, treffer)
+    if (!treffer) ohneTreffer++
+    else if (bestand[v.id].deutsch) mitDeutsch++
   }
 
   writeFileSync(resolve(wurzel, 'data/cr-vorschlaege.json'), JSON.stringify(bestand, null, 2) + '\n')
@@ -143,4 +146,4 @@ async function main() {
   console.log(`Bestand jetzt ${Object.keys(bestand).length}`)
 }
 
-await main()
+if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) process.exit((await main()) ?? 0)

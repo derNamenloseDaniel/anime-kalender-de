@@ -43,7 +43,7 @@ async function pruefeStufe3(): Promise<void> {
   const { urteilSchliesstLuecken, schliesseSpaeteLuecken } = await import('./bau/urteil-schliesst-luecken.ts')
   const jetzt = () => [titel(9301, dp('B0SEITE001')), titel(9302, dp('B0SEITE002')), titel(9303, dp('B0ADRESSE3'))]
   const frueh = jetzt()
-  urteilSchliesstLuecken(new Map(frueh.map((t) => [t.id, t])))
+  urteilSchliesstLuecken(new Map(frueh.map((t) => [t.id, t])), [])
   pruefe('Stufe 3: Kanal-Seite nur in der Liste (Adresse ≠ Seite) bekommt kein Ja', frueh[0]!.streams[0]!.dub !== true, frueh[0]!.streams[0])
   pruefe('Stufe 3: Kanal-Seite nur in der Liste (Adresse = Seite) bekommt kein Ja', frueh[2]!.streams[0]!.dub !== true, frueh[2]!.streams[0])
   pruefe('Stufe 3: Gegenprobe ohne Listeneintrag bekommt das Ja', frueh[1]!.streams[0]!.dub === true, frueh[1]!.streams[0])

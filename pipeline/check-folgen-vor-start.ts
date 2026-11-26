@@ -91,6 +91,11 @@ const titel3 = [titel(900411, 16, 8), titel(900412, 16, 4), titel(900413, 16, 8)
 const rs3 = [abwurf(900411, 9, 8), abwurf(900412, 9, 8), abwurf(900413, 9, 8)]
 pruefe('Bestand: nur der Titel mit Lücke im Beleg wird gemeldet, mit den fehlenden Folgen 5–8', JSON.stringify(davorOhneBeleg(titel3, rs3, HEUTE)) === JSON.stringify([{ titleId: 900412, titel: 'Probe 900412', fehlen: [5, 6, 7, 8] }]), davorOhneBeleg(titel3, rs3, HEUTE))
 pruefe('Bestand: ohne Beleg gemeldet, widerlegter Termin nicht', davorOhneBeleg([titel(900414, 16)], [{ ...abwurf(900414, 9, 8), widerlegt: { am: '2026-11-01', grund: 'x', quelle: 'https://x' } } as unknown as Release], HEUTE).length === 0 && davorOhneBeleg([titel(900414, 16)], [abwurf(900414, 9, 8)], HEUTE).length === 1)
+/* Zwei Termine am selben Titel: die Folgen davor sind vom früheren gedeckt (Beyblade-Art), und ein Titel ohne Namen meldet seine Kennung. */
+const zwei = [abwurf(900415, 1, 8), { ...abwurf(900415, 9, 8), slug: 'p900415-zweiter' } as Release]
+pruefe('Bestand: früherer Termin ab Folge 1 deckt die Folgen davor (zwei Termine, Reihenfolge egal)', davorOhneBeleg([titel(900415, 16)], zwei, HEUTE).length === 0 && davorOhneBeleg([titel(900415, 16)], [...zwei].reverse(), HEUTE).length === 0)
+const ohneNamen = { ...titel(900416, 16), titleEn: undefined } as unknown as Title
+pruefe('Bestand: Titel ohne Namen meldet die Kennung als Namen', davorOhneBeleg([ohneNamen], [abwurf(900416, 9, 8)], HEUTE)[0]?.titel === '900416')
 
 globalThis.fetch = echteAbfrage
 if (verletzt) {

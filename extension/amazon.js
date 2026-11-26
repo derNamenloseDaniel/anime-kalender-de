@@ -4073,13 +4073,13 @@ const speicherSchreiben = (werte) => globalThis.akKontext.schreiben(werte)
       Die Trennlinie ist der **Name**. Trägt der Seitentitel den Auftragstitel
       (oder umgekehrt), ist es dieselbe Sache in einer anderen Ausgabe — dann
       warnt der Kasten. Haben beide nichts gemeinsam, ist es ein fremdes Werk,
-      und der Auftrag hat hier nichts zu suchen.
+      und der Auftrag hat hier nichts zu suchen (Suchbegriffe zählen als Name mit: Prime führt Serien oft englisch).
     */
     if (andereSeite || !auftrag.zielAsin) {
       try {
-        const a = titelKern(auftrag.titel ?? '')
+        const namen = [auftrag.titel, ...['suchbegriff', 'suchbegriffEn'].map((k) => suchliste[auftrag.suchUrl]?.[k])].map((n) => titelKern(n ?? '')).filter(Boolean)
         const b = titelKern(seitenTitel() ?? '')
-        if (a && b && !a.includes(b) && !b.includes(a)) return false
+        if (b && namen.length && namen.every((a) => !a.includes(b) && !b.includes(a))) return false
       } catch {
         /* Ohne Titel bleibt es beim bisherigen Verhalten: warnen statt ausblenden. */
       }

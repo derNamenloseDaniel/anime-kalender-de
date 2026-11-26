@@ -1,0 +1,4 @@
+- Befund 1 (YAML-Doppelpunkt in `text`) -> Wert in einfache Anführungszeichen gesetzt; Beleg: js-yaml lädt die Datei, `check-katalogstart-kasten` und `check-katalogstart-tag` grün, `tsc --noEmit` grün.
+- Befund 2 (Mutationsprobe nur behauptet) -> Kette läuft nach dem YAML-Fix erneut; `check-katalogstart-kasten` lokal 11/11 grün, im Kettenlog zu prüfen.
+- Nit (irreführender Testname) -> umbenannt in „Kopfzeile „Alle 6 Folgen da““.
+- Lehre: Jede neue YAML-Datei mit Text einmal durch js-yaml laden, bevor sie gepusht wird; Doppelpunkt im Plain-Scalar bricht den Web-Bau und färbt die ganze Kette rot.

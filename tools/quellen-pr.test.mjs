@@ -242,6 +242,7 @@ esac
   pruefe('Merge: QUELLEN_PAUSE_FAKTOR=0 stellt die 5xx-Pause auf 0 s', ohnePause.aufrufe === 2 && /^0$/m.test(readFileSync(join(bin3, 'pausen'), 'utf8')), readFileSync(join(bin3, 'pausen'), 'utf8'))
   const basis = mergen(6, { fehler: 99, meldung: 'GraphQL: Base branch was modified. Review and try the merge again.' })
   pruefe('Merge: „Base branch was modified" bleibt kurz: sechs Versuche, keine Pause ab 15 s', basis.status !== 0 && basis.aufrufe === 6 && !/(^|,)(15|30|60|120)(,|$)/.test(basis.pausen) && /Merge-Versuch 6 von 6 abgelehnt/.test(basis.out), `${basis.status} ${basis.aufrufe} ${basis.pausen}`)
+  pruefe('Merge: die Meldung der Nicht-5xx-Ablehnung nennt den echten Grund', /abgelehnt: GraphQL: Base branch was modified/.test(basis.out), basis.out.slice(-300))
   const nachBasis = mergen(7, { fehler: 2, meldung: 'GraphQL: Base branch was modified. Review and try the merge again.' })
   pruefe('Merge: zweimal „Base branch was modified", dann Erfolg', nachBasis.aufrufe === 3 && /gemerged=true/.test(nachBasis.ausgabe), `${nachBasis.aufrufe} ${nachBasis.out.slice(-200)}`)
 

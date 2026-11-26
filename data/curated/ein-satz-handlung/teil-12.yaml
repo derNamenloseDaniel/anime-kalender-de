@@ -164,8 +164,167 @@
   satz: "Ein Jahr nach seiner Wiedergeburt als Verkaufsautomat stellt sich Boxxo mit seinen Freunden im Dungeon weiter dem Jenseitskönig und dessen Gefolge entgegen."
   quellen: [anisearch, anilist]
   geprueftAm: 2026-11-26
+- id: 198946
+  satz: "Während eines Waffenstillstands gehen Clen und Alicia als Schüler an die Magieakademie Solsein, um dort Dlells verborgenes Labor aufzuspüren."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 199029
+  satz: "Beim Familienausflug ins Thermalbad will Kazuya die Scheinbeziehung mit Mietfreundin Chizuru beenden, doch seine Ex Mami lässt die Lüge vor allen platzen."
+  quellen: [anilist, eigen]
+  geprueftAm: 2026-11-26
+- id: 199112
+  satz: "Renako schuldet zwei Mitschülerinnen noch die Antwort auf ihre Liebesgeständnisse und hilft erst einmal Freundin Kaho bei einem Cosplay-Event."
+  quellen: [anilist]
+  geprueftAm: 2026-11-26
+- id: 199221
+  satz: "Die geeinte Menschheit will mit Senkuu zum Mond, um dort Whyman, den Urheber der Versteinerung, zu stellen, obwohl ihre Technik bei der Steinzeit neu begann."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 199448
+  satz: "Über dem grauen Nebel leitet Klein Moretti als The Fool den Tarot-Club, als ihn ein Gebet von Derrick Berg aus der sonnenlosen City of Silver erreicht."
+  quellen: [anilist]
+  geprueftAm: 2026-11-26
+- id: 199547
+  satz: "Giftmeister und Auftragskiller Hikaru Gero muss heiraten, um seine Schwester vor einer Zwangsmutterschaft zu bewahren, und holt sich Hilfe bei Schwindlerin Mei."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 200637
+  satz: "Rentarous Schicksalsbegegnungen geraten durcheinander, und mit Cousine Chiyo, Naddy, Yamame, Momiji, Yaku und Kishika wächst seine Schar an Freundinnen."
+  quellen: [anisearch]
+  geprueftAm: 2026-11-26
+- id: 201903
+  satz: "Die 17-jährige Iroha nimmt widerwillig die Mondprinzessin Kaguya auf, die mit ihr in der VR-Welt Tsukuyomi als Streamer-Idol auftreten will."
+  quellen: [anisearch, tmdb]
+  geprueftAm: 2026-11-26
 - id: 202390
   satz: "Damit Momo doch noch einen Studienplatz bekommt, tritt Team Ōarai mit ihr als Kommandantin beim Winter-Raupenketten-Cup an."
   quellen: [tmdb, anilist]
   geprueftAm: 2026-11-26
   umfang: reihe
+- id: 202420
+  satz: "Schneewittchen flieht mit den roten Zauberschuhen der Hexe Regina und trifft sieben in grüne Zwerge verwandelte Prinzen, die ihren Fluch brechen wollen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 202955
+  satz: "Im London des frühen zwanzigsten Jahrhunderts muss die Japanerin Lili Ichijouin in sechs Monaten die Beste ihrer Kunstakademie werden, trotz Rivale Kit Church."
+  quellen: [anisearch, tmdb]
+  geprueftAm: 2026-11-26
+- id: 203275
+  satz: "Der Sechstklässler Yuuma Ashihara und seine Zwillingsschwester Sawa spielen das VRMMORPG Actual Magic, als es mit der Wirklichkeit verschmilzt und tödlich wird."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 204011
+  satz: "Oberschüler Ageha Yoshina findet eine rote Telefonkarte, sucht seine verschwundene Kindheitsfreundin Sakurako Amamiya und gerät ins tödliche Spiel um Psyren."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 204066
+  satz: "An Halloween riegelt ein Schleier Shibuya ab, Fluchmagier wollen Satoru Gojo versiegeln, und später soll Yuta Okkotsu im Culling Game Yuuji Itadori hinrichten."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 204356
+  satz: "Nach All For Ones Fall bilden Izuku und Ochako als Lehrer junge Helden aus und spüren bei einer Feier für Shouto, dass sie mehr verbindet als Freundschaft."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 204389
+  satz: "Lufas hat vier der zwölf Himmelssterne zurückgewonnen und will das Szenario der Göttin vereiteln, während Scorpius den Angriff aufs Zwergenland Blutgang plant."
+  quellen: [anisearch]
+  geprueftAm: 2026-11-26
+- id: 204431
+  satz: "Gen Narumi führt die erste Einheit, zockt aber lieber Videospiele und schwänzt Meetings, statt zu üben, und doch will ihn in seiner Truppe keiner missen."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 204584
+  satz: "Die Spionin Ange sollte Prinzessin Charlotte ersetzen, der sie gleicht, verbündet sich aber mit ihr und prüft mit dem Team White Pigeon den Spion Bishop."
+  quellen: [tmdb, eigen]
+  geprueftAm: 2026-11-26
+  umfang: reihe
+- id: 204585
+  satz: "Ange und Prinzessin Charlotte, die sich gleichen, spionieren gemeinsam im Team White Pigeon, während das Königreich seine Abwehr verstärkt."
+  quellen: [tmdb, eigen]
+  geprueftAm: 2026-11-26
+  umfang: reihe
+- id: 204949
+  satz: "Sechs Straffällige sollen als gemeinnützige Arbeit einen Zug reinigen, der sich dann unerwartet in Bewegung setzt und alle ins Chaos stürzt."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 205909
+  satz: "Die herzkranke Adelstochter Satoko Kirigaya wird entführt und rettet sich, indem sie dem Auftragsmörder Shinpei die Ehe verspricht, was dieser sehr ernst nimmt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 206914
+  satz: "Im nach Atomkrieg und Katastrophen dreigeteilten Japan will der frühere Landwirtschaftsbeamte Aoteru Misumi das Land als Stratege wieder einen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 206919
+  satz: "Kater Tom bewacht als Neuling ein Museum, jagt dort Jerry und öffnet dabei ungewollt ein Portal, das beide in ein China längst vergangener Zeit versetzt."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 207141
+  satz: "Das Katzenmädchen Yaniko Satou raucht Kette, ist pleite, schuldet Miete und haust im Müll, während ihre kleine Schwester Imoko und Freunde auf sie aufpassen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 207254
+  satz: "Pyontaro und zwei Freunde folgen seiner entführten Schwester Futaba durch eine Disc in eine von Aliens besetzte Parallelwelt und sind dort superstark."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 208352
+  satz: "Die Engel Tetsuo Tanba und Misaki Kurogane vom Team Dandelion sollen ruhelose Seelen ins Jenseits befördern, lösen aber lieber erst deren letzte Sorgen."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 209499
+  satz: "Auftragsmörder Nagi liegt meist im Koma und erwacht nur bei Mordlust in seinem bewaffneten Rollstuhl, weshalb Schwester Shizuka ihm gefährliche Gegner sucht."
+  quellen: [eigen, anilist]
+  geprueftAm: 2026-11-26
+- id: 209669
+  satz: "Nakatsu ringt mit seinen Gefühlen für den vermeintlichen Mitschüler Mizuki und bekommt ein Geständnis von Komari, während Mizuki an ihrer Nähe zu Sano zweifelt."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 209872
+  satz: "Ranma und Akane bekommen es mit weiteren Rivalen zu tun: Cologne trainiert Ryouga, ein Streit um Kekse eskaliert und Shampoo heckt neue Pläne aus."
+  quellen: [anilist, eigen]
+  geprueftAm: 2026-11-26
+- id: 209961
+  satz: "Yuki, die mit Todesspielen ihr Geld verdient, landet für die Runde Cloudy Beach an einem trüben Strand, wo erfahrene Spielerinnen antreten und die Psyche zählt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 210031
+  satz: "Ein halbes Jahr nach ihrem Zusammenkommen planen Miyu Suzuki und Yusuke Tani Weihnachten und Neujahr zu zweit, während ihre Freunde mit eigenen Gefühlen hadern."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 210032
+  satz: "Der gelangweilte Arenachampion Baki Hanma bekommt einen neuen Gegner, als die Regierung den Schwertmeister Musashi Miyamoto klont."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+  umfang: reihe
+- id: 210482
+  satz: "Auf der zweiten Etappe des Rennens durchqueren Johnny Joestar und Gyro Zeppeli eine Wüste mit dem gefürchteten Gebiet Devil's Palm, wo sich Unheilvolles häuft."
+  quellen: [anilist, eigen]
+  geprueftAm: 2026-11-26
+- id: 211308
+  satz: "Prinzessin Sapphire verlor ihre Heimat Silverland an das Unheil Nergal, fand in Goldland Zuflucht und greift zum Schwert, als Nergal auch dort erscheint."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 211711
+  satz: "Eri, inzwischen Oberschülerin, steht vor ihrem ersten Straßenauftritt als Musikerin und wendet sich damit an Izuku Midoriya, der Lehrer und wieder Held ist."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 212503
+  satz: "Ray White, insgeheim der Iceblade Sorcerer, tritt im neuen Schuljahr mit seinem Team bei einem Wettkampf rivalisierender Magierschulen an."
+  quellen: [anilist, eigen]
+  geprueftAm: 2026-11-26
+- id: 212799
+  satz: "Die sieben Söhne der Generalin Baribara, Ritter des Reichs Marronnier, ziehen als Gesandte in die Nachbarländer und träumen von der Rettung einer Prinzessin."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 212888
+  satz: "Im VR-Spiel Satisfy wird der glücklose Krieger Grid durch ein seltenes Item zum Erben eines legendären Schmieds und fertigt fortan mächtige Ausrüstung."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 213457
+  satz: "Unter ewiger Wolkendecke schwindet der Sauerstoff, und Toshiro Kamiya erwägt, sich für Geld in eine Pflanze verwandeln zu lassen, da seine Mutter krank ist."
+  quellen: [eigen, anilist]
+  geprueftAm: 2026-11-26
+- id: 213805
+  satz: "Nach dem Schulfest ringt die verschlossene Koyuki mit ihren Gefühlen für Minato, um den auch die jüngere Momoka wirbt, und Miki bangt um ihre Nähe zu Yota."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26

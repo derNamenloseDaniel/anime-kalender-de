@@ -1,6 +1,6 @@
 # Arbeitspakete: Wo läuft es wirklich auf Deutsch?
 
-Stand 2026-11-26 · **19 offene Verweise** in **18 Zeilen**,
+Stand 2026-11-26 · **21 offene Verweise** in **20 Zeilen**,
 aufgeteilt in **1 Pakete** zu je 20.
 
 Erzeugt von `npm run data:dub-checks`, **nicht von Hand pflegen**. Derselbe Bestand wie in
@@ -31,7 +31,7 @@ Mehrere Einträge in einer Zeile werden mit Punkt getrennt in derselben Reihenfo
 beantwortet (`1.0` = erster ja, zweiter nein). Eine einzelne Angabe gilt für alle Einträge
 der Zeile. Beispiel für ein ganzes Paket: `1-x 2-1 3-1.0 4-x`.
 
-## Paket 1 — Zeilen 1 bis 18
+## Paket 1 — Zeilen 1 bis 20
 
 | # | Anbieter | Reihe | Noch zu bestätigen |
 |---|---|---|---|
@@ -51,5 +51,7 @@ der Zeile. Beispiel für ein ganzes Paket: `1-x 2-1 3-1.0 4-x`.
 | 14 | Netflix | Fool Night | [Hauptserie](https://www.netflix.com/title/81991076) |
 | 15 | Prime Video | There’s No Freaking Way I’ll Be Your Lover! Unless… | [Episoden 13-17](https://www.amazon.de/gp/video/detail/B0F5HDQBTM) |
 | 16 | Prime Video | Detektiv Conan | [Der Flashback des Einäugigen](https://watch.amazon.de/detail?gti=amzn1.dv.gti.caba97c6-120e-4294-bc60-f1ce999c941e) |
-| 17 | Prime Video | Made in Abyss | [Die Reise beginnt](https://watch.amazon.de/detail?gti=amzn1.dv.gti.39d00227-3d19-4bc7-9759-57c324715cb3) |
-| 18 | Prime Video | Code Geass: Lelouch of the Rebellion | [Überschreitung](https://watch.amazon.de/detail?gti=amzn1.dv.gti.d6bb7dff-f1d9-2164-4efe-b91aff5a4433) |
+| 17 | Prime Video | Miss Kobayashi’s Dragon Maid | [Ein einsamer Drache sehnt sich nach Liebe](https://watch.amazon.de/detail?gti=amzn1.dv.gti.1e61a3d8-44c3-4dc0-ae7c-5c655deceff5) |
+| 18 | Prime Video | Kaiju No. 8 | [Mission Recon](https://watch.amazon.de/detail?gti=amzn1.dv.gti.935bdd53-5e65-4f19-82fd-2772c12644aa) |
+| 19 | Prime Video | Made in Abyss | [Die Reise beginnt](https://watch.amazon.de/detail?gti=amzn1.dv.gti.39d00227-3d19-4bc7-9759-57c324715cb3) |
+| 20 | Prime Video | Code Geass: Lelouch of the Rebellion | [Überschreitung](https://watch.amazon.de/detail?gti=amzn1.dv.gti.d6bb7dff-f1d9-2164-4efe-b91aff5a4433) |

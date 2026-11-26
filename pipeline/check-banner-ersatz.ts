@@ -46,6 +46,23 @@ pruefe('Mangel bild-fremdsprachig: ersetztes Banner zählt nicht mehr', fremdeBi
   pruefe('zwei Spender: der nächstliegende nach Jahr', c.bannerVon === 81, c)
 }
 
+// Eigenes TMDB-Banner in einer Reihe mit Spender: bleibt, wird nicht durch das eines anderen Teils ersetzt.
+{
+  const eigen = 'https://image.tmdb.org/t/p/w1280/eigen-reihe.jpg'
+  const [a, b] = [titel(101, { franchiseId: 10, jpYear: 2000, bannerImage: TM }), titel(102, { franchiseId: 10, jpYear: 2010, bannerImage: eigen })]
+  franchise.ersetzeAnilistBanner(karte(a, b))
+  pruefe('eigenes TMDB-Banner neben einem Spender bleibt', b.bannerImage === eigen && b.bannerVon === undefined, b)
+}
+
+// Keine Ketten: ein übernommenes TMDB-Banner spendet nicht, auch wenn sein Titel jahresnäher liegt.
+{
+  const a = titel(111, { franchiseId: 11, jpYear: 2000, bannerImage: TM })
+  const b = titel(112, { franchiseId: 11, jpYear: 2014, bannerImage: TM, bannerVon: 111 })
+  const c = titel(113, { franchiseId: 11, jpYear: 2015, bannerImage: AL })
+  franchise.ersetzeAnilistBanner(karte(a, b, c))
+  pruefe('übernommenes TMDB-Banner ist kein Spender', c.bannerVon === 111, c)
+}
+
 // Verdrahtung: der Wege-Abschluss ruft den Ersatz auf (Vorbild `check-banner-franchise.ts`).
 {
   suchadressenInTemp()

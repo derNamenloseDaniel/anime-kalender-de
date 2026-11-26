@@ -19,7 +19,7 @@ const NETFLIX = 'https://www.netflix.com/title/1'
 const titel = (streams: Title['streams'], extra: Partial<Title> = {}): Title => ({ id: 7, streams, ...extra }) as unknown as Title
 const termin = (extra: Partial<Release> = {}): Release =>
   ({ slug: 's', name: 'Probe', titleId: 7, platform: 'netflix', platformUrl: NETFLIX, automatisch: true, releaseType: 'batch', sprache: 'offen', hinweis: NOTIZ, schedule: { firstEpisodeDate: '2026-11-25' }, sources: ['https://a/'], ...extra }) as unknown as Release
-const lauf = (r: Release, t: Title) => klaereDeutschBelegteTermine([r], new Map([[7, t]]))
+const lauf = (r: Release, t: Title) => klaereDeutschBelegteTermine([r], new Map([[7, t]]), new Set(['https://a/']))
 const belegt = titel([{ platform: 'netflix', url: NETFLIX, dub: true }])
 
 console.log('\nBelegtes Deutsch:')
@@ -62,14 +62,23 @@ console.log('\nNetflix-Eigenproduktion:')
   pruefe('Lizenztitel (kein Original) bekommt kein dub', lizenz.dub === undefined)
 }
 
+console.log('\nQuelle ohne Synchro-Zusage (Fool Night):')
+{
+  const r = termin()
+  const ohneZusage = klaereDeutschBelegteTermine([r], new Map([[7, belegt]]), new Set())
+  pruefe('automatischer Termin, Quelle ohne Zusage: bleibt „offen“ samt Hinweis', ohneZusage.length === 0 && r.sprache === 'offen' && r.hinweis === NOTIZ, r)
+  const hand = termin({ automatisch: undefined })
+  pruefe('Handtermin braucht keine Quellenzusage', klaereDeutschBelegteTermine([hand], new Map([[7, belegt]]), new Set()).length === 1 && hand.sprache === undefined)
+}
+
 console.log('\nWächter:')
 {
-  pruefe('findet offen trotz Beleg', deutschBelegtTrotzOffen([termin()], new Map([[7, belegt]])).length === 1)
+  pruefe('findet offen trotz Beleg', deutschBelegtTrotzOffen([termin({ automatisch: undefined })], new Map([[7, belegt]])).length === 1 && deutschBelegtTrotzOffen([termin()], new Map([[7, belegt]])).length === 0)
   const sauber = termin()
   lauf(sauber, belegt)
   pruefe('nach dem Klären nichts mehr', deutschBelegtTrotzOffen([sauber], new Map([[7, belegt]])).length === 0)
   pruefe('omu ist keine Unsicherheit: kein Fund', deutschBelegtTrotzOffen([termin({ sprache: 'omu' })], new Map([[7, belegt]])).length === 0)
-  pruefe('ohne Beleg kein Fund', deutschBelegtTrotzOffen([termin()], new Map([[7, titel([])]])).length === 0)
+  pruefe('ohne Beleg kein Fund', deutschBelegtTrotzOffen([termin({ automatisch: undefined })], new Map([[7, titel([])]])).length === 0)
 }
 
 if (verletzt) {

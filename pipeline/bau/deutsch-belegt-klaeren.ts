@@ -1,4 +1,7 @@
-import { log } from '../lib/util.ts'
+import { log, readJson } from '../lib/util.ts'
+import { spracheDerMeldung } from '../lib/sprachbefund.ts'
+import { vorschlaegeAusAllenSammelartikeln } from '../lib/sammelartikel.ts'
+import type { Vorschlag } from '../lib/meldungen.ts'
 import { istDeutschBelegt, istSprachNotiz, kennung, netflixOriginalMitSynchro } from '../lib/deutsch-belegt.ts'
 import { type Release, type Title } from '../../shared/types.ts'
 
@@ -7,9 +10,17 @@ import { type Release, type Title } from '../../shared/types.ts'
  * Die Meldung, die den Termin anlegte, kannte die Sprache nicht (`sprache: 'offen'` samt Hinweis „ob mit deutscher Synchro …“); später belegte die
  * Netflix-Erweiterung den deutschen Ton an derselben Adresse, und der Termin sagte weiter „Synchro offen“, das Panel zugleich „Deutsch“.
  * Räumt `sprache: 'offen'` und die Hinweise aus `SPRACH_NOTIZEN` ab; Termine mit `sprache: 'omu'` bleiben, ebenso jeder andere Hinweistext.
+ * **Ein automatischer Termin behält „Synchro offen“, wo seine Quelle keine deutsche Synchro zusagt** (`autoReleaseWidersprueche`: nichts behaupten, was die Quelle
+ * nicht sagt; Fool Night 213457): dort genügt der Weg am Titel nicht, der Termin selbst bleibt gekennzeichnet.
  * Setzt außerdem den Weg einer Netflix-Eigenproduktion auf `dub: true`, wo er nur geteilt, aber nicht belegt war. Läuft vor den Ereignissen (Phase 10).
  */
-export function klaereDeutschBelegteTermine(releases: Release[], titles: Map<number, Title>): string[] {
+/** Adressen der Anime2You-Meldungen (Einzel- und Sammelartikel), die eine deutsche Synchro zusagen. */
+export function adressenMitSynchroZusage(): Set<string> {
+  const roh = readJson<{ proposals?: Vorschlag[] }>('data/proposals/anime2you.json', {}).proposals ?? []
+  return new Set([...roh, ...vorschlaegeAusAllenSammelartikeln(roh)].filter((v) => spracheDerMeldung(v) === 'ja').map((v) => v.articleUrl))
+}
+
+export function klaereDeutschBelegteTermine(releases: Release[], titles: Map<number, Title>, zusagen: Set<string>): string[] {
   const geklaert: string[] = []
   for (const r of releases) {
     const title = titles.get(r.titleId)
@@ -19,6 +30,7 @@ export function klaereDeutschBelegteTermine(releases: Release[], titles: Map<num
       if (weg) weg.dub = true
     }
     if (r.sprache === 'omu' || !istDeutschBelegt(r, title) || (r.sprache !== 'offen' && !istSprachNotiz(r))) continue
+    if (r.automatisch && !zusagen.has(r.sources[0] ?? '')) continue
     if (r.sprache === 'offen') delete r.sprache
     if (istSprachNotiz(r)) delete r.hinweis
     geklaert.push(r.slug)

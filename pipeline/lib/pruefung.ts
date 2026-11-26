@@ -26,6 +26,7 @@ import { discTerminFehler, type DiscPruefQuellen } from './disc-anisearch-datum.
 import { sichtungsZeilen } from './sichtungsfenster.ts'
 import { crWegDoppelt } from './cr-doppelter-weg.ts'
 import { deutschBelegtTrotzOffen } from './deutsch-belegt.ts'
+import { crAbsoluteZaehlungFehler } from './cr-zaehlung.ts'
 
 export interface Pruefergebnis {
   fehler: string[]
@@ -92,6 +93,7 @@ export function pruefeErgebnis(
   }
 
   folgenzahlWiderspruch(releases, titles, fehler)
+  fehler.push(...crAbsoluteZaehlungFehler(releases, titles))
   tmdbOhneKennzeichnung(titles, fehler)
 
   const schluss = schlussPruefung(releases, events, titles, heute, discQuellen)

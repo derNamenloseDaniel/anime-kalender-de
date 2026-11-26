@@ -19,9 +19,9 @@ export const istDeutschBelegt = (r: Release, title: Title | undefined): boolean 
 /** Der Hinweis stammt aus `SPRACH_NOTIZEN`: „ob mit deutscher Synchro …“, von der Meldung gesetzt. */
 export const istSprachNotiz = (r: Release): boolean => r.hinweis !== undefined && SPRACH_NOTIZEN.includes(r.hinweis)
 
-/** Wächter: Termine, die bei belegtem Deutsch noch „Synchro offen“ oder den Unsicherheits-Hinweis tragen (26.11.2026: Call of the Night). */
+/** Wächter: Termine von Hand (automatische prüft `autoReleaseWidersprueche` gegen ihre Quelle), die bei belegtem Deutsch noch „Synchro offen“ oder den Unsicherheits-Hinweis tragen (26.11.2026: Call of the Night). */
 export function deutschBelegtTrotzOffen(releases: Release[], titles: Map<number, Title>): string[] {
   return releases
-    .filter((r) => r.sprache !== 'omu' && istDeutschBelegt(r, titles.get(r.titleId)) && (r.sprache === 'offen' || istSprachNotiz(r)))
+    .filter((r) => !r.automatisch && r.sprache !== 'omu' && istDeutschBelegt(r, titles.get(r.titleId)) && (r.sprache === 'offen' || istSprachNotiz(r)))
     .map((r) => `"${r.slug}": Deutsch ist belegt, der Termin trägt trotzdem „Synchro offen“ oder den Hinweis „ob mit deutscher Synchro …“`)
 }

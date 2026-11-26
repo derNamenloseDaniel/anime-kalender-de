@@ -6,7 +6,7 @@
  */
 import type { ReleaseEvent } from '../shared/types.ts'
 import { buildIcs } from '../shared/ics.ts'
-import { ICS_REGELN, pruefeIcs } from '../shared/ics-pruefung.ts'
+import { ICS_REGELN, leererZaehler, pruefeIcs, summiere } from '../shared/ics-pruefung.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -52,10 +52,27 @@ function schlechteDateien(): void {
     ['kopf-fehlt', ok.replace('VERSION:2.0\r\n', ''), 'VERSION'],
   ]
   for (const [regel, text, was] of kaputt) pruefe(`${regel} (${was})`, pruefeIcs(text)[regel as (typeof ICS_REGELN)[number]] > 0)
+  pruefe('kopf-fehlt (BEGIN:VCALENDAR nicht zuerst)', pruefeIcs('X:y\r\n' + ok)['kopf-fehlt'] > 0)
   pruefe('Positivprobe: gültige Datei ohne Befund', ICS_REGELN.every((r) => pruefeIcs(ok)[r] === 0), pruefeIcs(ok))
+}
+
+function gueltigeSonderformen(): void {
+  console.log('\nGültige Sonderformen bleiben ohne Befund:')
+  const ok = buildIcs([ev('X')])
+  const frei = (text: string): boolean => ICS_REGELN.every((r) => pruefeIcs(text)[r] === 0)
+  pruefe('Falz mit Leerzeichen setzt „\\“ und „,“ zu einer Maskierung zusammen', frei(ok.replace('SUMMARY:X', 'SUMMARY:a\\\r\n ,b')))
+  pruefe('Falz mit Tabulator gilt ebenso', frei(ok.replace('SUMMARY:X', 'SUMMARY:a\\\r\n\t,b')))
+  pruefe('gültige URL', frei(ok.replace('END:VEVENT', 'URL:https://anime-kalender.de/t/1/\r\nEND:VEVENT')))
+  pruefe('Datei ohne letztes CRLF', frei(ok.slice(0, -2)))
+  pruefe('UID außerhalb eines VEVENT zählt nicht als doppelt', frei(ok.replace('VERSION:2.0', 'UID:k\r\nUID:k\r\nVERSION:2.0')))
+  pruefe('VALARM-Felder gelten nicht für den Termin', frei(buildIcs([ev('X')], { erinnerung: true })))
+  const a = pruefeIcs(ok.replace('SUMMARY:X', 'SUMMARY:a,b'))
+  const summe = summiere([a, a, leererZaehler()])
+  pruefe('summiere addiert je Regel', summe['text-unmaskiert'] === 2 * a['text-unmaskiert'] && summe['kopf-fehlt'] === 0, summe)
 }
 
 guteDatei()
 schlechteDateien()
+gueltigeSonderformen()
 console.log(verletzt ? `\n${verletzt} Zusicherung(en) verletzt.` : '\nICS RFC 5545: alle Zusicherungen halten.')
 process.exit(verletzt ? 1 : 0)

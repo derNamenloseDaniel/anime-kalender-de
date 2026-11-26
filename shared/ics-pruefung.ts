@@ -27,16 +27,6 @@ const TEXT_FELDER = new Set(['SUMMARY', 'DESCRIPTION', 'CATEGORIES', 'X-WR-CALNA
 export const leererZaehler = (): IcsZaehler => Object.fromEntries(ICS_REGELN.map((r) => [r, 0])) as IcsZaehler
 
 const utf8 = new TextEncoder()
-const streng = new TextDecoder('utf-8', { fatal: true })
-
-function istGueltigesUtf8(bytes: Uint8Array): boolean {
-  try {
-    streng.decode(bytes)
-    return true
-  } catch {
-    return false
-  }
-}
 
 /** Ein TEXT-Wert ist maskiert, wenn kein `;`/`,` allein steht und jeder Backslash `\\ \; \, \n \N` einleitet. */
 function textUnmaskiert(wert: string): boolean {
@@ -48,18 +38,16 @@ const STEUERZEICHEN = /[\u0000-\u0008\u000b-\u001f\u007f]/
 
 function pruefeZeilenform(text: string, z: IcsZaehler): string[] {
   z['zeilenende-nicht-crlf'] += (text.match(/(?<!\r)\n/g) ?? []).length
-  const physisch = text.split('\r\n')
-  if (physisch.at(-1) === '') physisch.pop()
   const logisch: string[] = []
-  for (const zeile of physisch) {
+  for (const zeile of text.split('\r\n')) {
     const bytes = utf8.encode(zeile)
     if (bytes.length > 75) z['zeile-ueber-75-oktette']++
     if (zeile.startsWith(' ') || zeile.startsWith('\t')) {
       if (!logisch.length) z['falz-ohne-vorgaenger']++
       else logisch[logisch.length - 1] += zeile.slice(1)
     } else logisch.push(zeile)
-    /* Ein mitten im Zeichen getrenntes UTF-8 zeigt sich schon an der einzelnen physischen Zeile. */
-    if (!istGueltigesUtf8(bytes) || zeile.includes('�')) z['utf8-zerrissen']++
+    /* Ein mitten im Zeichen getrenntes UTF-8 liest die Datei als Ersatzzeichen. */
+    if (zeile.includes('�')) z['utf8-zerrissen']++
   }
   return logisch
 }
@@ -97,8 +85,7 @@ function pruefeInhalt(logisch: string[], z: IcsZaehler): void {
       if (wert === 'VEVENT' && termin) pruefeTermin(termin, z)
       if (wert === 'VEVENT') termin = null
     } else {
-      /* Felder des VALARM zählen nicht zum Termin (dessen DESCRIPTION wäre sonst ein zweites). */
-      if (termin && tiefe.at(-1) === 'VEVENT') termin.add(name)
+      termin?.add(name)
       if (name === 'UID' && termin) {
         if (uids.has(wert)) z['uid-doppelt']++
         uids.add(wert)
@@ -107,8 +94,7 @@ function pruefeInhalt(logisch: string[], z: IcsZaehler): void {
     }
   }
   if (tiefe.length) z['klammern-unausgeglichen']++
-  const kopf = logisch.slice(0, 3).join('\n')
-  if (logisch[0] !== 'BEGIN:VCALENDAR' || !kopf.includes('VERSION:2.0') || !logisch.some((l) => l.startsWith('PRODID:'))) z['kopf-fehlt']++
+  if (logisch[0] !== 'BEGIN:VCALENDAR' || !logisch.includes('VERSION:2.0') || !logisch.some((l) => l.startsWith('PRODID:'))) z['kopf-fehlt']++
 }
 
 export function pruefeIcs(text: string): IcsZaehler {

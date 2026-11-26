@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs'
 import yaml from 'js-yaml'
+import { mitCrTiteln } from './folgentitel-cr.ts'
 import { istPlatzhalter } from './folgentitel-zeilen.ts'
 
 /**
@@ -45,4 +46,17 @@ export function ladeHandTitel(pfad: string): Record<string, Map<number, string>>
   const je: Record<string, Map<number, string>> = {}
   for (const e of eintraege as HandEintrag[]) (je[String(e.anilistId)] ??= new Map()).set(e.folge, e.titel)
   return je
+}
+
+/**
+ * Die Hand füllt die Lücken der Liste und legt für Handfolgen **ohne Zeile** eine an (Folgennummer 1 bis Folgenzahl): Eine Liste aus TMDB-Titeln
+ * trägt nur Zeilen mit echtem Titel, und `mitCrTiteln` füllt nur vorhandene Zeilen — die Handfolge verschwand dort still (Miraculous, 26.11.2026).
+ * Ohne bekannte Folgenzahl gibt es keine neuen Zeilen.
+ */
+export function mitHandTiteln<T extends { nr: number; de?: string }>(f: T[] | undefined, hand: Map<number, string> | undefined, folgenzahl: number | undefined): T[] | undefined {
+  const gefuellt = mitCrTiteln(f as never, hand) as T[] | undefined
+  if (!hand || !folgenzahl) return gefuellt
+  const da = new Set((gefuellt ?? []).map((x) => x.nr))
+  const neu = [...hand].filter(([nr, de]) => !da.has(nr) && nr <= folgenzahl && !istPlatzhalter(de)).map(([nr, de]) => ({ nr, de }) as T)
+  return neu.length ? [...(gefuellt ?? []), ...neu].sort((a, b) => a.nr - b.nr) : gefuellt
 }

@@ -9,10 +9,9 @@ const MAX_ZEILEN = 20
 /** Fehlende Folgennummern zwischen der kleinsten und größten beobachteten Nummer. */
 export function luecken(observed) {
   const nummern = Object.keys(observed ?? {}).map(Number).filter(Number.isInteger)
-  if (nummern.length < 2) return []
   const da = new Set(nummern)
   const fehlt = []
-  for (let n = Math.min(...nummern) + 1; n < Math.max(...nummern); n++) if (!da.has(n)) fehlt.push(n)
+  for (let n = Math.min(...nummern); n < Math.max(...nummern); n++) if (!da.has(n)) fehlt.push(n)
   return fehlt
 }
 

@@ -743,6 +743,7 @@ pipeline/check-toggo-adresse-stabil.ts
 pipeline/check-toggo-seiten-bestand-lauf.ts
 pipeline/check-toggo-seiten-verdrahtung.ts
 pipeline/check-toggo-seiten.ts
+pipeline/check-tooltip-bedienung.ts
 pipeline/check-tote-adresse-runden.ts
 pipeline/check-tote-adressen-lauf.ts
 pipeline/check-trailer-auswahl.ts
@@ -862,4 +863,3 @@ tools/web-push-voll.test.ts
 tools/werkzeug-ohne-test-wache.mjs
 tools/workflow-abbruch-waechter.mjs
 tools/workflow-ohne-pakete.mjs
-pipeline/check-tooltip-bedienung.ts

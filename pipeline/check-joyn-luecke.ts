@@ -52,7 +52,7 @@ writeFileSync(
 
 try {
   const { schreibeCartoons } = await import('./bau/nebendateien.ts')
-  const { joynLuecken, ordneAusnahmen } = await import('./lib/joyn-luecke.ts')
+  const { beschreibeLuecke, joynLuecken, ordneAusnahmen } = await import('./lib/joyn-luecke.ts')
   const { behalteNurHandbelegteWege, joynAdressenVonJw } = await import('./lib/handbeleg-weg.ts')
   schreibeCartoons()
   const aus = JSON.parse(readFileSync(join(wurzel, 'public', 'data', 'cartoons.json'), 'utf8')) as { id: number; streams: StreamLink[] }[]
@@ -101,6 +101,10 @@ try {
   const bestand = [{ id: 1, streams: [] }, { id: 2, streams: [{ platform: 'joyn' }] }, { id: 3 }, { id: 4 }, { id: 5, streams: [{ platform: 'netflix' }] }]
   erwarte('Lückenregel: nur Joyn-Angebot mit Adresse und ohne Joyn-Weg', JSON.stringify(joynLuecken(bestand, jwMix)) === '[1]', joynLuecken(bestand, jwMix))
   erwarte('Lückenregel: negative Cartoon-Kennung zählt', JSON.stringify(joynLuecken([{ id: -7 }], { '-7': jwMix[1] })) === '[-7]', '')
+  const zeile = beschreibeLuecke({ id: 1, titleEn: 'Erfunden', titleDe: 'Erfunden DE' }, jwMix)
+  erwarte('Meldezeile: AniList-ID, deutscher Titel und JustWatch-Adresse', zeile === 'Titel 1 „Erfunden DE“ — JustWatch: https://www.joyn.de/x', zeile)
+  const zeileEn = beschreibeLuecke({ id: 3, titleEn: 'Nur EN' }, jwMix)
+  erwarte('Meldezeile: englischer Titel als Ersatz, Angebot ohne Adresse ist kein Beleg', zeileEn === 'Titel 3 „Nur EN“ — JustWatch: kein Beleg', zeileEn)
   const o = ordneAusnahmen([1, 2, 3], [{ id: 2, grund: 'x' }, { id: 9, grund: 'y' }])
   erwarte('Ausnahmen: offen sind Lücken ohne Eintrag, veraltet Einträge ohne Lücke', JSON.stringify(o) === '{"offen":[1,3],"veraltet":[9]}', o)
   const liste = JSON.parse(readFileSync(join(process.cwd(), 'data', 'joyn-luecke-ausnahmen.json'), 'utf8')) as { id: number; grund: string }[]

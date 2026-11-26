@@ -27,7 +27,7 @@
   { "name": "luecke: Ausnahme macht offen", "datei": "pipeline/lib/joyn-luecke.ts", "suche": "luecken.filter((id) => !erlaubt.has(id))", "ersetze": "luecken.filter((id) => erlaubt.has(id))", "tests": ["npx tsx pipeline/check-joyn-luecke.ts"] },
   { "name": "luecke: veraltet vertauscht", "datei": "pipeline/lib/joyn-luecke.ts", "suche": ".filter((id) => !lueckenSet.has(id))", "ersetze": ".filter((id) => lueckenSet.has(id))", "tests": ["npx tsx pipeline/check-joyn-luecke.ts"] },
   { "name": "bestand: Ausnahmen ignoriert", "datei": "pipeline/check-joyn-luecke-bestand.ts", "suche": "ordneAusnahmen(luecken, ausnahmen)", "ersetze": "ordneAusnahmen(luecken, [])", "tests": ["npx tsx pipeline/check-joyn-luecke-lauf.ts"] },
-  { "name": "bestand: Cartoons nicht gelesen", "datei": "pipeline/check-joyn-luecke-bestand.ts", "suche": ", ...lies<{ id: number; streams?: { platform: string }[] }[]>('public/data/cartoons.json')", "ersetze": "", "tests": ["npx tsx pipeline/check-joyn-luecke-lauf.ts"] },
-  { "name": "bestand: keine Warnzeile für offene", "datei": "pipeline/check-joyn-luecke-bestand.ts", "suche": "offen.slice(0, 10)", "ersetze": "offen.slice(0, 0)", "tests": ["npx tsx pipeline/check-joyn-luecke-lauf.ts"] },
+  { "name": "bestand: Cartoons nicht gelesen", "datei": "pipeline/check-joyn-luecke-bestand.ts", "suche": ", ...lies<Eintrag[]>('public/data/cartoons.json')", "ersetze": "", "tests": ["npx tsx pipeline/check-joyn-luecke-lauf.ts"] },
+  { "name": "bestand: keine Warnzeile für offene", "datei": "pipeline/check-joyn-luecke-bestand.ts", "suche": "for (const id of offen)", "ersetze": "for (const id of [] as number[])", "tests": ["npx tsx pipeline/check-joyn-luecke-lauf.ts"] },
   { "name": "bestand: keine Warnzeile für veraltete", "datei": "pipeline/check-joyn-luecke-bestand.ts", "suche": "for (const id of veraltet)", "ersetze": "for (const id of [] as number[])", "tests": ["npx tsx pipeline/check-joyn-luecke-lauf.ts"] }
 ]

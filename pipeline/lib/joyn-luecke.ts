@@ -18,6 +18,11 @@ export function joynLuecken(titel: MitWegen[], jw: JwBefunde): number[] {
   return titel.filter((t) => joynBeleg(jw, t.id) && !(t.streams ?? []).some((s) => s.platform === 'joyn')).map((t) => t.id)
 }
 
+/** Meldezeile einer Lücke: AniList-ID (Cartoons negativ), Titel und JustWatch-Beleg, damit die Ursache ohne Nachschlagen prüfbar ist. */
+export function beschreibeLuecke(t: MitWegen & { titleDe?: string; titleEn?: string; titleRomaji?: string }, jw: JwBefunde): string {
+  return `Titel ${t.id} „${t.titleDe ?? t.titleEn ?? t.titleRomaji ?? '?'}“ — JustWatch: ${joynBeleg(jw, t.id) ?? 'kein Beleg'}`
+}
+
 /** `offen`: Lücken ohne Ausnahme; `veraltet`: Ausnahmen, deren Lücke nicht mehr besteht (die Liste darf nur schrumpfen, also raus damit). */
 export function ordneAusnahmen(luecken: number[], ausnahmen: Ausnahme[]): { offen: number[]; veraltet: number[] } {
   const erlaubt = new Set(ausnahmen.map((a) => a.id))

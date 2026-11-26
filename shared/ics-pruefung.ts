@@ -74,7 +74,6 @@ function pruefeInhalt(logisch: string[], z: IcsZaehler): void {
   let termin: Set<string> | null = null
   for (const zeile of logisch) {
     const doppel = zeile.indexOf(':')
-    if (doppel < 0) continue
     const name = zeile.slice(0, doppel).split(';')[0]!.toUpperCase()
     const wert = zeile.slice(doppel + 1)
     if (name === 'BEGIN') {

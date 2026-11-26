@@ -65,6 +65,8 @@ function gueltigeSonderformen(): void {
   pruefe('gültige URL', frei(ok.replace('END:VEVENT', 'URL:https://anime-kalender.de/t/1/\r\nEND:VEVENT')))
   pruefe('Datei ohne letztes CRLF', frei(ok.slice(0, -2)))
   pruefe('UID außerhalb eines VEVENT zählt nicht als doppelt', frei(ok.replace('VERSION:2.0', 'UID:k\r\nUID:k\r\nVERSION:2.0')))
+  pruefe('Termin ohne Uhrzeit (DTSTART;VALUE=DATE)', frei(buildIcs([ev('X', 1, { time: undefined })])))
+  pruefe('UID nach dem Ende eines VEVENT zählt nicht als doppelt', frei(ok.replace('END:VCALENDAR', `${/UID:[^\r]*\r\n/.exec(ok)![0]}END:VCALENDAR`)))
   pruefe('VALARM-Felder gelten nicht für den Termin', frei(buildIcs([ev('X')], { erinnerung: true })))
   const a = pruefeIcs(ok.replace('SUMMARY:X', 'SUMMARY:a,b'))
   const summe = summiere([a, a, leererZaehler()])

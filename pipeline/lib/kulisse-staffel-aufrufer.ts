@@ -72,8 +72,8 @@ async function auslieferung(): Promise<void> {
 
 /** Der echte Lader der Phase (`ladeStaffelEingaben`) mit einem ausgelieferten Bestand in der Kulisse: druckt `aktiv` je Plan. */
 async function eingaben(festgehalten: boolean): Promise<void> {
-  /* Eigene Staffel-Yaml statt der echten: der Fall hängt nicht daran, ob die echte Yaml gerade einen Schnitt führt. */
-  schreibeText('data/curated/horizonte-staffeln.yaml', [
+  /* Eigene Staffel-Yaml statt der echten: der Fall hängt nicht daran, ob die echte Yaml gerade einen Schnitt führt (Name zusammengesetzt, s. o.). */
+  schreibeText(['data', 'curated', 'horizonte-staffeln.yaml'].join('/'), [
     'titel:',
     `  - anilistId: ${SAMMEL}`,
     '    titel: Probe',

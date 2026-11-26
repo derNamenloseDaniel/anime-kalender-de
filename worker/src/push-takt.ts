@@ -2,7 +2,7 @@ import type { NewsEintrag, ReleaseEvent } from '../../shared/types.ts'
 import type { PushEreignis } from './push-text.ts'
 import { imTagesfenster } from './push-fenster.ts'
 import { pushIstErschienen, pushVersand, type PushEnv } from './push.ts'
-import { weitereAusNews } from './news-quelle.ts'
+import { weitereAusNews } from '../../shared/news-weitere.ts'
 import { fehlerLog } from './werte.ts'
 
 /**

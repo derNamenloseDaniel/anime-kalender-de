@@ -7,7 +7,6 @@
  * bisher.
  */
 import type { NewsEintrag } from '../../shared/types.ts'
-import { anbieterName, type PlatformId } from '../../shared/types.ts'
 import type { Env } from './env.ts'
 import { fehlerLog } from './werte.ts'
 
@@ -21,20 +20,6 @@ export async function loadNews(env: Env): Promise<NewsEintrag[]> {
     fehlerLog('News nicht abrufbar', err)
     return []
   }
-}
-
-/** „Jetzt auch bei X" aus derselben Liste: je Titel und weiterem Anbieter ein Eintrag. */
-export function weitereAusNews(eintraege: NewsEintrag[]): { id: number; name: string; anbieter: string; am: string }[] {
-  return eintraege.flatMap((e) =>
-    e.meldungen
-      .filter((m) => m.art === 'neu' && m.weiterer && m.platform)
-      .map((m) => ({
-        id: m.teilId ?? e.titelId,
-        name: m.teil ? `${e.titel} – ${m.teil}` : e.titel,
-        anbieter: anbieterName(m.platform as PlatformId),
-        am: e.am.slice(0, 10),
-      })),
-  )
 }
 
 /**

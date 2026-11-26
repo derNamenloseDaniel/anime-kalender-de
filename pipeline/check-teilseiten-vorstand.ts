@@ -24,7 +24,7 @@ const PLATTFORMEN = [
   { wache: 'check-prime-teilseiten-bestand.ts', plattform: 'primevideo', liste: 'data/prime-teilseiten-pruefliste.json', url: 'https://www.amazon.de/gp/video/detail/BKULISSE' },
 ] as const
 
-type Weg = { bereich?: boolean; dub?: boolean } | undefined
+type Weg = { bereich?: boolean; dub?: boolean; allein?: boolean } | undefined
 
 for (const p of PLATTFORMEN) {
   /** Zwei Titel auf derselben Seite (je zwei Glieder je Rolle); `wege[i]` beschreibt den Weg von Titel 900001 + i, `undefined` = kein Weg. */
@@ -33,7 +33,7 @@ for (const p of PLATTFORMEN) {
       id: 900001 + i,
       titleDe: `K${i + 1}`,
       episodes: 12,
-      streams: w ? [{ platform: p.plattform, url: p.url, dub: w.dub ?? true, sharedWith: 2, dubRanges: w.bereich ? [{ from: 1, to: 12, dub: true }] : undefined }] : [],
+      streams: w ? [{ platform: p.plattform, url: p.url, dub: w.dub ?? true, sharedWith: w.allein ? undefined : 2, dubRanges: w.bereich ? [{ from: 1, to: 12, dub: true }] : undefined }] : [],
     }))
   const eintrag = (titleId: number) => ({ titleId, titel: 'K', url: p.url, grund: 'g' })
 
@@ -84,6 +84,14 @@ for (const p of PLATTFORMEN) {
 
     schreibe(titel([undefined, { dub: false }]), [])
     pruefe(`${p.plattform}: Weg entfällt bzw. ohne Ja → kein Bereich nötig, grün`, lauf().code === 0, lauf().aus)
+
+    // Die Seite ist nicht mehr geteilt: Titel 1 behält den Bereich, Titel 2 verlässt die Liste ohne Bereich (SAO Alternative II, Dorohedoro).
+    schreibe(titel([{ bereich: true, allein: true }, { allein: true }]), [])
+    pruefe(`${p.plattform}: Seite nicht mehr geteilt → kein Bereich nötig, grün`, lauf().code === 0, lauf().aus)
+
+    schreibe(titel([{ allein: true }, {}]), [eintrag(900002)])
+    const alleinOhne = lauf()
+    pruefe(`${p.plattform}: Seite nicht mehr geteilt, nur Titel 1 verliert den Bereich → grün`, alleinOhne.code === 0, alleinOhne.aus)
 
     schreibe(titel([{}, {}]), [])
     const fremd = lauf('--vorstand', 'gibtsnicht')

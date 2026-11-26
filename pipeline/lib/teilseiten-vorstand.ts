@@ -13,21 +13,22 @@ export interface TeilseitenStand {
 
 const schluessel = (titleId: number, url: string): string => `${titleId}|${url}`
 
-/** Titel und Adresse, die geführt sind: auf der Prüfliste oder als geteilter Weg mit Folgenbereich. */
+/** Titel und Adresse, die geführt sind: auf der Prüfliste oder als Weg mit Folgenbereich. */
 function gefuehrt(stand: TeilseitenStand, plattform: string): Set<string> {
   const mitBereich = stand.titles.flatMap((t) =>
-    t.streams.filter((s) => s.platform === plattform && s.sharedWith && s.dubRanges?.length).map((s) => schluessel(t.id, s.url)),
+    t.streams.filter((s) => s.platform === plattform && s.dubRanges?.length).map((s) => schluessel(t.id, s.url)),
   )
   return new Set([...stand.liste.map((p) => schluessel(p.titleId, p.url)), ...mitBereich])
 }
 
 /**
  * Titel und Adresse, die im Vorstand Bereich oder Prüflisten-Eintrag hatten und jetzt keins von beiden, obwohl der Titel dort noch
- * einen Weg mit Ja führt. Verliert der Titel den Weg (oder verlässt den Hauptbestand), braucht er keinen Bereich mehr.
+ * einen geteilten Weg mit Ja führt. Verliert der Titel den Weg oder den Hauptbestand oder ist die Seite nicht mehr geteilt, braucht er
+ * keinen Bereich mehr (16./17.11.2026: Sword Art Online Alternative II, Dorohedoro).
  */
 export function teilseitenAbgaenge(vorher: TeilseitenStand, jetzt: TeilseitenStand, plattform: string): string[] {
   const offen = new Set(
-    jetzt.titles.flatMap((t) => t.streams.filter((s) => s.platform === plattform && s.dub === true).map((s) => schluessel(t.id, s.url))),
+    jetzt.titles.flatMap((t) => t.streams.filter((s) => s.platform === plattform && s.dub === true && s.sharedWith).map((s) => schluessel(t.id, s.url))),
   )
   return abgaengeOhneGrund(gefuehrt(vorher, plattform), gefuehrt(jetzt, plattform), (k) => !offen.has(k))
 }

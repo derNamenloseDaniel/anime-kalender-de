@@ -767,7 +767,7 @@
   quellen: [anisearch, anilist]
   geprueftAm: 2026-11-26
 - id: 156841
-  satz: "Vor der Insel Hachijojima geht die Polizeianlage Pacific Buoy mit weltweiter Gesichtserkennung in Betrieb, während Conan dort auf Sonokos Einladung Ferien macht."
+  satz: "Vor der Insel Hachijojima geht die Polizeianlage Pacific Buoy mit weltweiter Gesichtserkennung in Betrieb, während Conan dort auf Sonokos Einladung urlaubt."
   quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26
 - id: 156891
@@ -788,5 +788,174 @@
   geprueftAm: 2026-11-26
 - id: 157397
   satz: "Wataru Sajou gibt seine aufdringliche Schwärmerei für Aika Natsukawa auf und hält Abstand, woraufhin sie sich über ihre eigenen Gefühle klar werden muss."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 157960
+  satz: "In einer zerfallenen Zukunft nimmt Schrotthändler Gear mit dem Roboter Qu-0213 und dem Zocker White Bear einen Diebstahl an, woraufhin Auftragsmörder sie jagen."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 158028
+  satz: "Yogiri Takatou verschläft, wie seine Mitschüler in eine fremde Welt geraten, und schlägt sich dort mit Tomochika dank seiner Soforttod-Fähigkeit durch."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 158166
+  satz: "Oberschülerin Totsuko sieht die Gefühle anderer als Farben und gründet mit ihrer Mitschülerin Kimi und dem stillen Musikliebhaber Rui eine Band."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 158417
+  satz: "Die längst besiegten Monster müssen jede Woche in gestellten Schaukämpfen gegen die Dragon Rangers verlieren, bis Kämpfer D dieses Theater beenden will."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 158539
+  satz: "Der gemobbte Park Hyung-Seok wechselt nach Seoul an eine neue Schule und führt fortan ein Doppelleben in zwei völlig gegensätzlichen Körpern."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 158559
+  satz: "Okumura leitet den Manga-Club und schwärmt nur für die 2D-Figur Lilliel, bis die Cosplayerin Ririsa beitritt und genau diese Figur verkörpern will."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 158641
+  satz: "Karin, elf Jahre alt, wird von ihrem Vater beim Großvater in einem Landtempel zurückgelassen, wo die faule Riesen-Geisterkatze Anzu auf sie aufpassen soll."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 158704
+  satz: "Büroangestellte Rei Ohashi wird als Heldin Rae Taylor in ihrem liebsten Otome-Game wiedergeboren und umwirbt statt der Prinzen die Antagonistin Claire."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 158709
+  satz: "Prinz Oscar erklimmt den Turm der Hexe Tinasha, um einen Fluch auf seiner Blutlinie zu brechen, und bittet sie kurzerhand, seine Frau zu werden."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 158869
+  satz: "Auf dem Weg zu seinem Vater wird Ash von Team Rocket um Pikachu gebracht und trifft bei der Suche den geheimnisvollen Jungen Haruto."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 158870
+  satz: "In den letzten Folgen mit Ash und Pikachu als Hauptfiguren ziehen die beiden noch einmal durch die Welt und treffen frühere Weggefährten wieder."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 158871
+  satz: "Liko aus Paldea gerät wegen des rätselhaften Anhängers ihrer Großmutter ins Visier der Explorers und geht mit ihrem Felori und dem Jungen Rory auf Reisen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+  umfang: reihe
+- id: 158926
+  satz: "Der einst geniale, nun zurückgezogene Detektiv Ron Kamonohashi darf nicht mehr ermitteln, bis ihn Polizist Totomaru Isshiki bei einer Mordserie um Hilfe bittet."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 158927
+  satz: "Anya büffelt für weitere Stella, Loid pendelt zwischen Agenteneinsätzen, und auf Yor wartet ein Auftrag auf einem Kreuzfahrtschiff."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 158928
+  satz: "Um Operation Strix zu retten, fährt Loid mit der Scheinfamilie Forger in den Winterurlaub, wo sich Anya versehentlich in eine brisante Sache verstrickt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 158931
+  satz: "Kaum ist der Unreine König besiegt, bemerkt Rin Okumura, dass plötzlich gewöhnliche Menschen wie sein Mitschüler Godaiin Dämonen sehen können."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 159309
+  satz: "Leon ist inzwischen Baron und mit Olivia und Angelica befreundet, doch seine Eingriffe verbiegen die Spielhandlung und ziehen ihn in eine Verschwörung."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 159322
+  satz: "Vor der Entscheidungsschlacht gegen Yhwach und seine Sternritter muss sich Ichigo einem gefährlichen Spezialtraining stellen, um ihm gewachsen zu sein."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 159831
+  satz: "Der ausgebrannte Angestellte Akira Tendou fühlt sich durch eine Zombieapokalypse von seiner Ausbeuterfirma befreit und arbeitet eine Liste mit 100 Wünschen ab."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 159926
+  satz: "Zwei Jahre nach dem Fall von Schloss Metallicana und dem Verschwinden Dark Schneiders terrorisiert Kall-Su mit seinen Generälen weiter den Kontinent."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 160389
+  satz: "Haruto Satou folgt seiner Kindheitsfreundin Hime in ihre Heimatwelt, platzt in ihre Hochzeit und wird durch einen Kuss selbst ihr Bräutigam und Ringkönig."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 160831
+  satz: "Im Sommer 1989 geraten die Sechstklässler Boco, Joe und Junichi in Tokio in den Angriff der Gyaos und werden von der riesigen Schildkröte Gamera beschützt."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 161441
+  satz: "Leon Kennedy sucht einen entführten Wissenschaftler, Chris Redfield untersucht einen Zombie-Ausbruch in San Francisco, und beide Spuren führen nach Alcatraz."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 161474
+  satz: "Kurz vor Mais Schulabschluss begegnet Sakuta am Strand einem Mädchen, das wie Mai als Kind aussieht, und seine lange kranke Mutter möchte Kaede wiedersehen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 161476
+  satz: "Nach dem Tod des Dämonenkönigs ringen übermächtige Halbgötter, darunter ein Meisterfechter und ein überschallschneller Speerkämpfer, um den Heldentitel."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 161645
+  satz: "Die Apothekerin Maomao wird entführt und muss als Dienerin am Kaiserhof arbeiten, wo sie rätselhafte Erkrankungen aufklärt und dem Beamten Jinshi auffällt."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 161802
+  satz: "Rimuru schleust sich als Satoru ins Königreich Coleus ein, wo Kronprinz Sauzer mit Prinz Aslan um den Thron streitet und Dämonen Ränke schmieden."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 161964
+  satz: "Cid Kagenou und Shadow Garden ermitteln in der gesetzlosen Stadt, wo drei Herrscher regieren und unter rotem Mond eine Vampirkönigin zu erwachen droht."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 162147
+  satz: "Die vom Pech verfolgte Haru fängt als Concierge in einem Inselresort für Pokémon an und kümmert sich dort um das Wohl der Pokémon-Gäste."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 162291
+  satz: "Tristan trifft erstmals seit ihrem tragischen Unfall wieder auf Lancelot und muss seine inneren Dämonen bezwingen, um das Leben seiner Mutter zu retten."
+  quellen: [tmdb, anilist, eigen]
+  geprueftAm: 2026-11-26
+- id: 162669
+  satz: "Jahrhunderte nach dem Kampf gegen die Klopfer erwacht der unsterbliche Fushi in der modernen Welt und genießt den Frieden, bis neue Schatten aufziehen."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 162670
+  satz: "Mit Platin und Salpetersäure kann Senkuu auf Treasure Island die versteinerten Kameraden befreien und den Krieg gegen das Versteinerungs-Königreich eröffnen."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 162694
+  satz: "Nach hundert Körben erfährt Rentarou Aijou vom Liebesgott, dass ihm an der Oberschule hundert Seelenverwandte begegnen, die ohne erwiderte Liebe sterben müssen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 162780
+  satz: "Magical-Girl-Fan Utena Hiiragi wird von einem Maskottchen verwandelt, landet jedoch auf der Seite der Schurken und findet Gefallen daran, ihre Idole zu quälen."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 162803
+  satz: "Nachdem Polka Shinoyama seine Magie öffentlich zeigen musste, wollen Fremde ihn als wiedergeborenen Nekromanten enttarnen, und ihm wird ein Mord angehängt."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 162804
+  satz: "Die unnahbare Klassenbeste Alya flüstert ihrem Sitznachbarn Masachika Kuze ihre wahren Gefühle auf Russisch zu, ohne zu ahnen, dass er sie versteht."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 162904
+  satz: "Die lebhafte Totto-chan fliegt von der Grundschule und kommt an die Tomoe Gakuen, wo Schulleiter Kobayashi in alten Eisenbahnwaggons freiheitlich unterrichtet."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 162985
+  satz: "Die Androidin Rouge Redstar reist mit Ermittlerin Naomi Orthmann zum Mars, um die Immortal Nine aufzuspüren, die sich gegen die Gesellschaft erheben."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 162987
+  satz: "Mafuyus Kindheitsfreunde Shizusumi Yagi und Hiiragi Kashima stehen mit ihrer Band vorm Debüt, und als ein Gitarrist ausfällt, bittet Hiiragi Ritsuka um Hilfe."
+  quellen: [tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 162989
+  satz: "Keigo Sayama versteckt sich seit einem Vorfall in der Mittelschule hinter einer Gesichtsmaske und weckt das Interesse des beliebten Tsuzuru Saikawa."
+  quellen: [anisearch, tmdb, anilist]
+  geprueftAm: 2026-11-26
+- id: 163024
+  satz: "Japans neue Jugendauswahl sammelt in Testspielen in Deutschland Erfahrung für die Junioren-WM in Frankreich, während der verletzte Tsubasa vorerst fehlt."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
+- id: 163077
+  satz: "Dorfmädchen Nikola wird bei einem Drachendurchzug vom Abenteurer Haga gerettet, der zur geheimen Einheit der Sucher gehört und Missstände der Welt erforscht."
   quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26

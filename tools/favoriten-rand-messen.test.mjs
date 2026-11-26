@@ -5,6 +5,7 @@ import { beruehrungen, gleicheMasse } from './favoriten-rand-messen.mjs'
 const kachel = (i, x, aussen = 0) => ({ i, x, y: 0, w: 100, h: 100, aussen })
 assert.deepEqual(beruehrungen([kachel(0, 0), kachel(1, 110)]), [], 'Abstand 10 px, kein Außenmaß: keine Berührung')
 assert.deepEqual(beruehrungen([kachel(0, 0, 11), kachel(1, 110)]), [[0, 1]], 'Außenmaß 11 px erreicht die Nachbarkachel (nur in eine Richtung)')
+assert.deepEqual(beruehrungen([kachel(0, 110, 11), kachel(1, 0)]), [[0, 1]], 'Außenmaß reicht auch nach links')
 assert.deepEqual(beruehrungen([kachel(0, 0), kachel(1, 90)]), [[0, 1], [1, 0]], 'Überlappung: beide Richtungen')
 assert.deepEqual(beruehrungen([kachel(0, 0, 10), kachel(1, 110)]), [], 'genau am Rand zählt nicht')
 assert.deepEqual(beruehrungen([kachel(0, 0)]), [], 'eine Kachel berührt sich nicht selbst')

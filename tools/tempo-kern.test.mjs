@@ -32,6 +32,7 @@ try {
   assert.equal((await lauf(`${BASIS}x.unbekannt`)).fulfill.contentType, 'application/octet-stream', 'unbekannte Endung')
   assert.equal((await lauf(`${BASIS}fehlt.js`)).weiter, true, 'fehlende Datei geht ins Netz')
   assert.equal((await lauf(`${BASIS}ohne-endung`)).weiter, true, 'Pfad ohne Endung geht ins Netz (Cover u. a.)')
+  assert.equal((await lauf(`${BASIS}data`)).weiter, true, 'ein Ordner ohne Endung wird nicht gelesen')
 } finally {
   rmSync(dist, { recursive: true, force: true })
 }

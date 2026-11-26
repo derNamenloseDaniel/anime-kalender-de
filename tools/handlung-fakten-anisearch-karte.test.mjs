@@ -14,7 +14,7 @@ const html = `<html><head><title>Beispiel-Anime - Anime | aniSearch</title></hea
 <section id="description">
 <div lang="de" class="textblock">Eine ausreichend lange Beschreibung der Handlung mit mehr als vierzig Zeichen. Source: irgendwer</div>
 <div lang="en" class="textblock">Du kennst diesen Anime? Dann schreibe eine Beschreibung dazu, bitte jetzt gleich.</div>
-<div lang="fr" class="textblock">kurz</div>
+<div lang="fr" class="textblock">zu kurzer Text</div>
 </section></body></html>`
 
 const f = leseFakten(html, 77)

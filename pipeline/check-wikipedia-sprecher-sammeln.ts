@@ -100,8 +100,9 @@ const zurueck = (): void => {
   console.log = echtLog
   console.warn = echtWarn
 }
-const gesundheit = () => JSON.parse(readFileSync(join(wurzel, 'data', 'source-health.json'), 'utf8'))['wikipedia-sprecher'] as { lastOk?: string; lastCount: number; lastError?: string }
+const gesundheit = () => readSourceHealth()['wikipedia-sprecher'] as { lastOk?: string; lastCount: number; lastError?: string }
 const { main } = await import('./fetch-wikipedia-sprecher.ts')
+const { readSourceHealth } = await import('./lib/health.ts')
 
 // Alles gestört, keine alte Sammlung: der Lauf ist rot.
 mitschreiben()
@@ -137,10 +138,11 @@ pruefe('Zusammenfassung', ausgabe.includes('[pipeline] Wikipedia-Sprecher: 2 Sei
 
 // Seiten ohne deutsche Tabelle: der Abruf hat gearbeitet (grün), ein zweiter Lauf am selben Tag holt nichts und bleibt grün.
 rmSync(join(wurzel, 'data', 'wikipedia-sprecher.json'))
-rmSync(join(wurzel, 'data', 'source-health.json'))
+const vorherOk = gesundheit().lastOk
+await new Promise((r) => setTimeout(r, 5))
 await main(async () => ({ status: 200, text: 'kein Abschnitt' }), async () => undefined)
 const ersterOk = gesundheit().lastOk
-pruefe('gelungene Abrufe ohne Tabelle: grün', typeof ersterOk === 'string' && gesundheit().lastCount === 0, gesundheit())
+pruefe('gelungene Abrufe ohne Tabelle: grün', typeof ersterOk === 'string' && ersterOk !== vorherOk && gesundheit().lastCount === 0, gesundheit())
 await new Promise((r) => setTimeout(r, 5))
 await main(async () => {
   throw new Error('darf nicht abrufen')

@@ -36943,6 +36943,38 @@
     "fetchedAt": "2026-10-10T05:04:19.443Z",
     "stand": 1
   },
+  "14293": {
+    "ean": "7630017547767",
+    "audio": [
+      "Japanisch",
+      "Deutsch"
+    ],
+    "untertitel": [
+      "Deutsch"
+    ],
+    "publisher": "peppermint anime GmbH",
+    "umfang": "Bundle / Komplettset",
+    "medium": "DVD",
+    "enthalten": [
+      {
+        "anisearchId": 16573,
+        "typ": "TV-Spezial",
+        "folgen": 4
+      },
+      {
+        "anisearchId": 15130,
+        "typ": "TV-Serie",
+        "folgen": 8
+      },
+      {
+        "anisearchId": 13854,
+        "typ": "TV-Serie",
+        "folgen": 13
+      }
+    ],
+    "fetchedAt": "2026-11-26T07:06:57.114Z",
+    "stand": 1
+  },
   "14304": {
     "ean": "7630017544957",
     "audio": [
@@ -37154,6 +37186,28 @@
       }
     ],
     "fetchedAt": "2026-10-06T05:40:29.530Z",
+    "stand": 1
+  },
+  "14318": {
+    "ean": "7630017547484",
+    "audio": [
+      "Japanisch",
+      "Deutsch"
+    ],
+    "untertitel": [
+      "Deutsch"
+    ],
+    "publisher": "Crunchyroll",
+    "umfang": "Staffel / Gesamtausgabe",
+    "medium": "DVD",
+    "enthalten": [
+      {
+        "anisearchId": 17952,
+        "typ": "TV-Serie",
+        "folgen": 12
+      }
+    ],
+    "fetchedAt": "2026-11-26T07:07:29.160Z",
     "stand": 1
   },
   "14322": {
@@ -37469,6 +37523,38 @@
       }
     ],
     "fetchedAt": "2026-10-09T05:44:28.079Z",
+    "stand": 1
+  },
+  "14389": {
+    "ean": "7630017547378",
+    "audio": [
+      "Japanisch",
+      "Deutsch"
+    ],
+    "untertitel": [
+      "Deutsch"
+    ],
+    "publisher": "Crunchyroll",
+    "umfang": "Staffel / Gesamtausgabe",
+    "medium": "DVD",
+    "enthalten": [
+      {
+        "anisearchId": 16785,
+        "typ": "Bonus",
+        "folgen": 1
+      },
+      {
+        "anisearchId": 15862,
+        "typ": "TV-Serie",
+        "folgen": 12
+      },
+      {
+        "anisearchId": 14254,
+        "typ": "TV-Serie",
+        "folgen": 11
+      }
+    ],
+    "fetchedAt": "2026-11-26T07:07:09.981Z",
     "stand": 1
   },
   "14390": {
@@ -207851,6 +207937,94 @@
     "fetchedAt": "2026-11-25T07:21:05.890Z",
     "stand": 1
   },
+  "222667": {
+    "ean": "7630017547750",
+    "audio": [
+      "Japanisch",
+      "Deutsch"
+    ],
+    "untertitel": [
+      "Deutsch"
+    ],
+    "publisher": "peppermint anime GmbH",
+    "umfang": "Bundle / Komplettset",
+    "medium": "Blu-ray",
+    "enthalten": [
+      {
+        "anisearchId": 16573,
+        "typ": "TV-Spezial",
+        "folgen": 4
+      },
+      {
+        "anisearchId": 15130,
+        "typ": "TV-Serie",
+        "folgen": 8
+      },
+      {
+        "anisearchId": 13854,
+        "typ": "TV-Serie",
+        "folgen": 13
+      }
+    ],
+    "fetchedAt": "2026-11-26T07:06:50.669Z",
+    "stand": 1
+  },
+  "223176": {
+    "publisher": "peppermint anime GmbH",
+    "umfang": "Einzelnes Vol.",
+    "medium": "Blu-ray",
+    "enthalten": [
+      {
+        "anisearchId": 19132,
+        "typ": "TV-Serie",
+        "folgen": 12
+      }
+    ],
+    "fetchedAt": "2026-11-26T07:06:31.499Z",
+    "stand": 1
+  },
+  "223177": {
+    "publisher": "peppermint anime GmbH",
+    "umfang": "Einzelnes Vol.",
+    "medium": "Blu-ray",
+    "enthalten": [
+      {
+        "anisearchId": 19132,
+        "typ": "TV-Serie",
+        "folgen": 12
+      }
+    ],
+    "fetchedAt": "2026-11-26T07:06:37.894Z",
+    "stand": 1
+  },
+  "223178": {
+    "publisher": "peppermint anime GmbH",
+    "umfang": "Einzelnes Vol.",
+    "medium": "Blu-ray",
+    "enthalten": [
+      {
+        "anisearchId": 19132,
+        "typ": "TV-Serie",
+        "folgen": 12
+      }
+    ],
+    "fetchedAt": "2026-11-26T07:06:25.060Z",
+    "stand": 1
+  },
+  "223179": {
+    "publisher": "peppermint anime GmbH",
+    "umfang": "Einzelnes Vol.",
+    "medium": "Blu-ray",
+    "enthalten": [
+      {
+        "anisearchId": 19132,
+        "typ": "TV-Serie",
+        "folgen": 12
+      }
+    ],
+    "fetchedAt": "2026-11-26T07:06:18.735Z",
+    "stand": 1
+  },
   "223181": {
     "ean": "4020628525781",
     "audio": [
@@ -207913,6 +208087,43 @@
     "fetchedAt": "2026-11-25T07:19:52.697Z",
     "stand": 1
   },
+  "223308": {
+    "ean": "0816726020488",
+    "publisher": "Sentai",
+    "umfang": "Staffel / Gesamtausgabe",
+    "medium": "Blu-ray",
+    "enthalten": [
+      {
+        "anisearchId": 19497,
+        "typ": "TV-Serie",
+        "folgen": 13
+      }
+    ],
+    "fetchedAt": "2026-11-26T07:06:44.218Z",
+    "stand": 1
+  },
+  "223313": {
+    "ean": "7630017543776",
+    "audio": [
+      "Japanisch",
+      "Deutsch"
+    ],
+    "untertitel": [
+      "Deutsch"
+    ],
+    "publisher": "Crunchyroll",
+    "umfang": "Staffel / Gesamtausgabe",
+    "medium": "Blu-ray",
+    "enthalten": [
+      {
+        "anisearchId": 18521,
+        "typ": "Web",
+        "folgen": 24
+      }
+    ],
+    "fetchedAt": "2026-11-26T07:07:16.306Z",
+    "stand": 1
+  },
   "223314": {
     "ean": "7630017532756",
     "audio": [
@@ -207957,6 +208168,50 @@
     "fetchedAt": "2026-11-25T07:21:12.587Z",
     "stand": 1
   },
+  "223316": {
+    "ean": "7630017545749",
+    "audio": [
+      "Japanisch",
+      "Deutsch"
+    ],
+    "untertitel": [
+      "Deutsch"
+    ],
+    "publisher": "Crunchyroll",
+    "umfang": "Staffel / Gesamtausgabe",
+    "medium": "Blu-ray",
+    "enthalten": [
+      {
+        "anisearchId": 18809,
+        "typ": "TV-Serie",
+        "folgen": 12
+      }
+    ],
+    "fetchedAt": "2026-11-26T07:07:35.482Z",
+    "stand": 1
+  },
+  "223317": {
+    "ean": "7630017547477",
+    "audio": [
+      "Japanisch",
+      "Deutsch"
+    ],
+    "untertitel": [
+      "Deutsch"
+    ],
+    "publisher": "Crunchyroll",
+    "umfang": "Staffel / Gesamtausgabe",
+    "medium": "Blu-ray",
+    "enthalten": [
+      {
+        "anisearchId": 17952,
+        "typ": "TV-Serie",
+        "folgen": 12
+      }
+    ],
+    "fetchedAt": "2026-11-26T07:07:22.731Z",
+    "stand": 1
+  },
   "223318": {
     "ean": "7630017542564",
     "audio": [
@@ -207999,6 +208254,38 @@
       }
     ],
     "fetchedAt": "2026-11-25T07:28:24.491Z",
+    "stand": 1
+  },
+  "223343": {
+    "ean": "7630017547361",
+    "audio": [
+      "Japanisch",
+      "Deutsch"
+    ],
+    "untertitel": [
+      "Deutsch"
+    ],
+    "publisher": "Crunchyroll",
+    "umfang": "Staffel / Gesamtausgabe",
+    "medium": "Blu-ray",
+    "enthalten": [
+      {
+        "anisearchId": 16785,
+        "typ": "Bonus",
+        "folgen": 1
+      },
+      {
+        "anisearchId": 15862,
+        "typ": "TV-Serie",
+        "folgen": 12
+      },
+      {
+        "anisearchId": 14254,
+        "typ": "TV-Serie",
+        "folgen": 11
+      }
+    ],
+    "fetchedAt": "2026-11-26T07:07:03.537Z",
     "stand": 1
   },
   "223346": {

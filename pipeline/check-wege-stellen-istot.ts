@@ -75,6 +75,7 @@ function eigeneFaelle(liste: Liste): string[] {
   gleich('splice(i, 1) nimmt nur weg', stellen('function h(t: { streams: unknown[] }) { t.streams.splice(0, 1) }'), [])
   gleich('splice(i, 0, x) legt an', stellen('function h(t: { streams: unknown[] }) { t.streams.splice(0, 0, 1) }'), ['x.ts::h@1'])
   gleich('zwei Stellen einer Funktion', zusammenfassen(findeWegeStellen('x.ts', 'function k(t: { streams: unknown[] }) {\n  t.streams.push(1)\n  t.streams.unshift(2)\n}')).get('x.ts::k'), { anzahl: 2, fragen: [], zeilen: [2, 3] })
+  gleich('Variable mit Wert ist keine Funktion', stellen('const a = 5\nlet z: number\nconst t: { streams: unknown[] } = { streams: [] }\nt.streams.push(a)'), ['x.ts::(Modul)@4'])
   gleich('Parameter zählt nicht als Benutzung', zusammenfassen(findeWegeStellen('x.ts', 'function m(t: { streams: unknown[] }, istTot: (u: string) => boolean) { t.streams.push(1) }')).get('x.ts::m')?.fragen, [])
   return fehler
 }

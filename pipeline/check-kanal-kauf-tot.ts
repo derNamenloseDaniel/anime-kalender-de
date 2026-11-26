@@ -38,7 +38,7 @@ ergaenzeKanalUndKaufWege({
   anisearch: { 3: quellen(BEKANNT), 4: quellen(WEG), 5: { streams: [{ provider: 'primevideo-channel-crunchyroll-de', url: KANAL }] } as unknown as AnisearchEintrag },
   checks: new Map(),
   adressKern: (u) => u,
-  frueherEntfernt: { has: (k) => k === WEG },
+  frueherEntfernt: { has: (k, id) => k === WEG && id === 4 },
   lautPruefungTot: () => false,
 })
 

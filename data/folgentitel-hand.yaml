@@ -2,7 +2,7 @@
 # Die Titel sind aus TMDB (de), ADN und Crunchyroll de-DE übernommen (Agentenlauf im Auftrag, 01.11.2026), nicht von einem Menschen gegengelesen; die Fundstelle steht je Eintrag.
 # Die Stufe füllt nur Lücken: ein Titel aus aniSearch, Crunchyroll, RTL+ oder TMDB bleibt. Pflichtfelder je Eintrag: anilistId, folge, titel, quelle
 # (`handFehler` in `pipeline/bau/folgentitel-hand.ts` lässt den Bau bei fehlendem Feld oder doppelter Folge scheitern, `check:logic` liest die Datei ebenfalls).
-# Erlaubte Quellen: RTL+, Crunchyroll, ADN, TMDB de; nicht fernsehserien.de, aniSearch-Seiten, Netflix-Serienseiten.
+# Erlaubte Quellen: RTL+, Crunchyroll, ADN, TMDB de, de.wikipedia (Episodenliste, Feld DT); nicht fernsehserien.de, aniSearch-Seiten, Netflix-Serienseiten.
 # Wo TMDB einen Eigennamen deutsch und englisch gleich führt (der Bau wertet das als „nicht übersetzt"), belegt die de.wikipedia-Episodenliste (Feld DT) den deutschen Titel; die Nummer gilt nur, wenn die schon vorhandenen Titel dort unter derselben Nummer stehen (Auftrag maengel-folgentitel, 26.11.2026).
 # Rest ohne Quelle: `data/folgentitel-offen.json` und `docs/wissen/folgentitel-quellen.md`, Abschnitt „Lückenfolgen im deutschen Bereich schließen und halten".
 

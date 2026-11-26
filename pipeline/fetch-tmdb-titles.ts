@@ -85,6 +85,8 @@ export interface TmdbTitle {
   genreIds?: number[]
   /** Nichts gefunden. Kein Dauerzustand: Nach `--alter` Tagen wird erneut gesucht. */
   miss?: true
+  /** Mindestens eine Suche scheiterte (Netz, 5xx, 429), keine fand etwas: kein Befund „kein Treffer“, der Titel ist im nächsten Lauf wieder fällig. */
+  suchfehler?: true
   /** Wann dieser Eintrag zuletzt von TMDB geholt wurde (ISO-Datum). */
   fetchedAt?: string
   /** Wann der TMDB-Inhalt zuletzt von TMDB kam (`lib/tmdb-ablauf.ts`); ein Fehltreffer setzt nur `fetchedAt`. */

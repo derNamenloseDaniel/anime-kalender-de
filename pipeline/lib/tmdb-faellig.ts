@@ -2,7 +2,7 @@ import { genreFehlt } from './tmdb-genre.ts'
 import { kinoFehlt } from './tmdb-kino-zuletzt.ts'
 import { neusucheFaellig, type Vermerk404 } from './tmdb-folgen-404.ts'
 
-type Eintrag = { tmdbId?: number; kind?: string; genreIds?: number[]; kinoDe?: string[]; fetchedAt?: string }
+type Eintrag = { tmdbId?: number; kind?: string; suchfehler?: true; genreIds?: number[]; kinoDe?: string[]; fetchedAt?: string }
 
 export type FaelligOptionen = {
   handIds: Set<number>
@@ -37,7 +37,7 @@ export function faelligeTitel<T extends { id: number }>(titles: T[], cache: Reco
       if (o.handIds.has(t.id)) return false
       const e = cache[t.id]
       if (o.nurOhneEintrag) return !e
-      if (o.force || !e || kinoFehlt(e) || tot(t) || filmNeusucheFaellig(t.id, e, o)) return true
+      if (o.force || !e || e.suchfehler || kinoFehlt(e) || tot(t) || filmNeusucheFaellig(t.id, e, o)) return true
       /* Ohne Genre zählt wie ein Fehlschlag: bald wieder, aber nicht in jedem Lauf (dauerhaft scheiternder Detailabruf). */
       return (e.fetchedAt ?? '') < (e.tmdbId && !genreFehlt(e) ? o.grenze : o.grenzeFehlschlag)
     })

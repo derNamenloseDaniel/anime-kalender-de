@@ -2,11 +2,13 @@
  * Wächter: Joyn-Folgen, Takt und Finale folgen dem belegten TV-Sendeplan, ohne „≈“ (Yaiba, 26.11.2026).
  * Fixtures, festes „heute“: kein Datensatz, keine Uhr. Aufruf: npx tsx pipeline/check-joyn-folgen-aus-tv.ts
  */
+import { readFileSync } from 'node:fs'
 import { expandEvents } from '../shared/logic.ts'
 import { leiteJoynAusTv } from './bau/13-1-joyn-aus-tv.ts'
 import { joynHinterTv, belegvermerkImHinweis } from './lib/joyn-folgen-aus-tv.ts'
 import { joynAngabe } from '../web/src/lib/joyn.ts'
 import type { Release } from '../shared/types.ts'
+import { unbedingteAufrufe } from './lib/unbedingte-aufrufe.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -29,8 +31,8 @@ const fehlerVorher = joynHinterTv(vorher, evVorher, HEUTE)
 pruefe('ohne Ableitung: Wächter meldet geschätzte Joyn-Folgen und zu wenige erschienene', fehlerVorher.length === 2, fehlerVorher)
 
 const rs = bestand()
+const abgeleitet = leiteJoynAusTv(rs)
 const ev = events(rs)
-const abgeleitet = leiteJoynAusTv(rs, ev)
 pruefe('Joyn-Termin mit TV-Partner wird abgeleitet', abgeleitet.join() === 'joyn', abgeleitet)
 const joynEv = ev.filter((e) => e.releaseSlug === 'joyn')
 pruefe('kein ≈ an Joyn-Folge 3–24', joynEv.every((e) => !e.estimated), joynEv.filter((e) => e.estimated).length)
@@ -41,11 +43,11 @@ pruefe('Wächter schweigt nach der Ableitung', joynHinterTv(rs, ev, HEUTE).lengt
 
 const ohnePlan = bestand()
 delete ohnePlan[0]!.schedule.sendeplanBelegt
-pruefe('TV ohne belegten Plan: keine Ableitung, kein Wächter-Alarm', leiteJoynAusTv(ohnePlan, events(ohnePlan)).length === 0 && joynHinterTv(ohnePlan, events(ohnePlan), HEUTE).length === 0)
+pruefe('TV ohne belegten Plan: keine Ableitung, kein Wächter-Alarm', leiteJoynAusTv(ohnePlan).length === 0 && joynHinterTv(ohnePlan, events(ohnePlan), HEUTE).length === 0)
 
 const andererSender = bestand()
 andererSender[0]!.sender = 'RTL'
-pruefe('Sender ohne Joyn-Muster: keine Ableitung', leiteJoynAusTv(andererSender, events(andererSender)).length === 0)
+pruefe('Sender ohne Joyn-Muster: keine Ableitung', leiteJoynAusTv(andererSender).length === 0)
 
 const mitVermerk = bestand()
 mitVermerk[0]!.hinweis = 'Nach der TV-Ausstrahlung auf Joyn (seit 05.11.2026 belegt).'
@@ -56,6 +58,17 @@ pruefe('„nicht belegt“ ohne Datum bleibt erlaubt', belegvermerkImHinweis(mit
 const fenster = (geschaetzt: boolean) => [{ nr: 1, ab: '2026-11-05T18:50', ende: '2026-12-04T23:59', ...(geschaetzt ? { geschaetzt: true as const } : {}) }]
 pruefe('Pille ohne geschätztes Fenster: kein ≈', joynAngabe(fenster(false), '2026-11-26T20:40') === 'Fg. 1', joynAngabe(fenster(false), '2026-11-26T20:40'))
 pruefe('Pille mit geschätztem Fenster: ≈', joynAngabe(fenster(true), '2026-11-26T20:40') === '≈ Fg. 1', joynAngabe(fenster(true), '2026-11-26T20:40'))
+
+/* Verdrahtung: Phase 10 leitet ab, bevor die Ereignisse aufgefaltet und von pruefeErgebnis geprüft werden. */
+const termine = readFileSync(new URL('./bau/10-termine.ts', import.meta.url), 'utf8')
+const aufrufe = unbedingteAufrufe(termine, 'rolleTermineAus')
+const stelle = (name: string): number => aufrufe.find((x) => x.name === name)?.stelle ?? -1
+pruefe(
+  '10-termine: leiteJoynAusTv(releases) vor pruefeErgebnis',
+  aufrufe.find((x) => x.name === 'leiteJoynAusTv')?.args.join('|') === 'releases' && stelle('leiteJoynAusTv') >= 0 && stelle('leiteJoynAusTv') < stelle('pruefeErgebnis'),
+  aufrufe.map((x) => x.stelle + ':' + x.name + '(' + x.args.join(',') + ')'),
+)
+pruefe('13-schreiben ruft die Ableitung nicht mehr (zu spät für den Wächter)', !readFileSync(new URL('./bau/13-schreiben.ts', import.meta.url), 'utf8').includes('leiteJoynAusTv'))
 
 if (verletzt) {
   console.error(`${verletzt} Prüfung(en) verletzt`)

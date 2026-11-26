@@ -1,6 +1,5 @@
-import { expandEvents } from '../../shared/logic.ts'
 import { JOYN_SENDER } from '../lib/joyn-sender-luecke.ts'
-import type { Release, ReleaseEvent } from '../../shared/types.ts'
+import type { Release } from '../../shared/types.ts'
 
 /*
   **Joyn zeigt die Folgen nach der Ausstrahlung des TV-Senders — bestätigt, kein „≈“** (Daniel, 26.11.2026, Yaiba:
@@ -8,10 +7,10 @@ import type { Release, ReleaseEvent } from '../../shared/types.ts'
 
   Hat ein Joyn-Wochentermin einen TV-Partner (gleicher Titel, Sender der ProSieben-Gruppe) mit belegtem Sendeplan
   (`sendeplanBelegt`), übernimmt er dessen Sendetage, Pausen und die Belegung; die Uhrzeit bleibt die des Joyn-Termins
-  (Abruf ab Sendeende). Die Ereignisse stehen schon aus Phase 10; nur `estimated` der gleichen `id` wird nachgezogen.
+  (Abruf ab Sendeende). Läuft in Phase 10 vor dem Auffalten der Ereignisse und vor `pruefeErgebnis` (dessen Wächter
+  `joynHinterTv` sonst vor der Ableitung rot sähe, PR-Datenbau 26.11.2026).
 */
-export function leiteJoynAusTv(releases: Release[], events: ReleaseEvent[]): string[] {
-  const ereignisNachId = new Map(events.map((e) => [e.id, e]))
+export function leiteJoynAusTv(releases: Release[]): string[] {
   const abgeleitet: string[] = []
   for (const joyn of releases) {
     if (joyn.platform !== 'joyn' || joyn.releaseType !== 'weekly') continue
@@ -28,10 +27,6 @@ export function leiteJoynAusTv(releases: Release[], events: ReleaseEvent[]): str
     joyn.schedule.sendeplanBelegt = true
     joyn.schedule.wochentage = tv.schedule.wochentage
     joyn.schedule.skipDates = tv.schedule.skipDates
-    for (const neu of expandEvents(joyn)) {
-      const alt = ereignisNachId.get(neu.id)
-      if (alt && neu.estimated === undefined) delete alt.estimated
-    }
     abgeleitet.push(joyn.slug)
   }
   return abgeleitet

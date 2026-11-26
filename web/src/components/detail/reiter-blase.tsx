@@ -3,7 +3,7 @@ import { TooltipBlase, useBlasenPosition } from '../tooltip-blase.tsx'
 import { fokusZeigtBlase, useEinzigeBlase } from '../tooltip-einzeln.ts'
 
 /** So lange steht die Blase nach einem Fingertipp, wie beim `Tooltip` (19.09.2026). */
-export const TIPP_DAUER = 3000
+const TIPP_DAUER = 3000
 
 /** Die Blase des offenen Reiters; `key` je Reiter misst sie bei jedem Wechsel neu. */
 function ReiterBlasenInhalt({ anker, id, text }: { anker: RefObject<HTMLElement | null>; id: string; text: string }) {

@@ -11,7 +11,7 @@ import { createRoot } from 'react-dom/client'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { useLang } from '../web/src/lib/i18n.tsx'
 import { ReihenListe } from '../web/src/components/detail/reihen-liste.tsx'
-import { kastenFarbe, ReihenReiterKontext } from '../web/src/components/detail/reihen-reiter.tsx'
+import { kastenFarbe, ReihenReiterKontext, ReihenReiterZeile } from '../web/src/components/detail/reihen-reiter.tsx'
 import type { Dataset } from '../web/src/lib/data.ts'
 import { reihenTeileVon } from '../web/src/components/detail/reihen-daten.ts'
 import { reihenNameVon } from '../web/src/components/detail/reihen-namen.ts'
@@ -169,6 +169,17 @@ pruefe('Spur: kein Schalter mehr, der Teil ohne Synchro steht immer in der Liste
 const grosseReihe = [...kleineReihe, ...Array.from({ length: 13 }, (_, i) => glied(900010 + i, { format: 'MOVIE', episodes: 1 }))]
 pruefe('Übersicht: kein Schalter mehr', listeMitReitern(grosseReihe, [900001]).includes('data-reihe-uebersicht') && !listeMitReitern(grosseReihe, [900001]).includes('type="checkbox"'))
 pruefe('alle Teile als Reiter: keine Reihen-Karte', listeMitReitern(kleineReihe, [900001, 900002, 900003, 900004]) === '' && listeMitReitern(kleineReihe, [900001, 900002]) !== '')
+
+/* Reiterzeile allein (statisch): 900101 läuft, 900102 ohne Synchro und gewählt, 900103 ohne Synchro; nur 900101 steht in `lagen`. */
+const zeileReiter = [900101, 900102, 900103].map((id) => ({ id, label: String(id - 900100), name: `Reihe ${id}`, staffel: true, ohneSynchro: id !== 900101 }))
+const zeilenHtml = renderToStaticMarkup(h(ReihenReiterZeile, { reiter: zeileReiter, aktiv: 900102, lagen: new Map([[900101, { lage: 'laeuft' as const }]]), farbe: 'bg-ak-test-kasten border-ak-akzent', kennung: 'z', beiWahl() {} }))
+const knopf = (id: number) => new RegExp(`<button[^>]*id="z-reiter-${id}"[^>]*>(.*?)</button>`).exec(zeilenHtml)
+const klassenVon = (id: number) => (/class="([^"]*)"/.exec(knopf(id)?.[0] ?? '')?.[1] ?? '').split(' ')
+const labelVon = (id: number) => /aria-label="([^"]*)"/.exec(knopf(id)?.[0] ?? '')?.[1]
+pruefe('Reiterzeile: gewählter Teil ohne Synchro trägt die Kastenfläche, gestrichelt, groß', ['bg-ak-test-kasten', 'border-dashed', 'border-ak-sehr-leise', 'min-h-[3.25rem]'].every((k) => klassenVon(900102).includes(k)) && !klassenVon(900102).includes('border-ak-akzent'), klassenVon(900102))
+pruefe('Reiterzeile: nicht gewählter Teil ohne Synchro grau und gestrichelt, ohne Kastenfläche', ['bg-ak-flaeche-2', 'border-dashed', 'min-h-11'].every((k) => klassenVon(900103).includes(k)) && !klassenVon(900103).includes('bg-ak-test-kasten'), klassenVon(900103))
+pruefe('Reiterzeile: Marke und „läuft“ nur am Reiter mit Lage, ohne Eintrag in lagen ruht er', (knopf(900101)?.[1] ?? '').includes('data-lage="laeuft"') && !/data-lage/.test(`${knopf(900102)?.[1]}${knopf(900103)?.[1]}`), [knopf(900101)?.[1], knopf(900102)?.[1]])
+pruefe('Reiterzeile: aria-label mit Lage und ohne Synchro, nichts Leeres angehängt', [labelVon(900101), labelVon(900102)].join('|') === 'Staffel 1: Reihe 900101, läuft|Staffel 2: Reihe 900102, ohne deutsche Synchro', [labelVon(900101), labelVon(900102)])
 
 /* Echtes Panel: Attrappen für Speicher, Beobachter, Adresse; `franchises.json` aus dem Fall, alles andere 404. */
 const speicher = new Map<string, string>()

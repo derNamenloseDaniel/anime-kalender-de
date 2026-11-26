@@ -43,7 +43,7 @@ globalThis.akPrimeUebersprungenDazu = (lauf, eintragKennung, text) => {
 */
 globalThis.akPrimeSpurKuerzen = (spur, max = 80, fehlerMax = 200) => {
   const ausnahmen = spur.filter((e, i) => i < spur.length - max && e.ok === false)
-  const abgelegt = new Set(ausnahmen.slice(0, Math.max(0, ausnahmen.length + Math.min(max, spur.length) - fehlerMax)))
+  const abgelegt = new Set(ausnahmen.slice(0, Math.max(0, ausnahmen.length + max - fehlerMax)))
   return spur.filter((e, i) => (i >= spur.length - max || e.ok === false) && !abgelegt.has(e))
 }
 

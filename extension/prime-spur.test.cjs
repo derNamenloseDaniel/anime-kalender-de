@@ -39,5 +39,8 @@ const fehler = eintraege(1000).map((e) => ({ ...e, ok: false }))
 const f = kuerzen(fehler)
 pruefe('Fehler wachsen nicht ins Endlose: höchstens 200 Fehler, die jüngsten bleiben', f.length === 200 && f[0].nr === 800 && f[199].nr === 999, [f.length, f[0]?.nr])
 
+const unter = eintraege(180).map((e, i) => ({ ...e, ok: i >= 100 }))
+pruefe('100 alte Fehler plus 80 jüngste liegen unter der Grenze → nichts fällt heraus', kuerzen(unter).length === 180, kuerzen(unter).length)
+
 if (rot) process.exit(1)
 console.log('prime-spur: grün')

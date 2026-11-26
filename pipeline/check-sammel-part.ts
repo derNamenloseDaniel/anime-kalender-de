@@ -4,6 +4,7 @@
  * Wörtliche Zeile aus `data/proposals/anime2you.json`, Katalogtitel erfunden bis auf Berserk (33). Läuft in `check:logic`.
  */
 import type { Title } from '../shared/types.ts'
+import { kuratierteZusaetze, type CuratedEntry } from './lib/curated.ts'
 import { leereVerluste, releasesAus } from './lib/meldungen.ts'
 import { sammelVerwurf, vorschlaegeAusSammelartikel, type SammelEintrag } from './lib/sammelartikel.ts'
 import { unzugeordnet } from './lib/sammel-unzugeordnet.ts'
@@ -45,6 +46,11 @@ const reihe = katalog(
 )
 const mitTeil = releasesAus(vorschlaegeAusSammelartikel(artikel, [zeile('Dr. Test', 'Part 2')], 'primevideo', 'Aniverse'), reihe, [], '2026-11-26')
 pruefe('Titel „Part 2“ in der Reihe: der Termin gehört ihm', mitTeil.length === 1 && mitTeil[0]?.titleId === 6 && mitTeil[0].schedule.firstEpisodeDate === '2026-12-24', mitTeil)
+
+/* Der Handeintrag für einen Teil, den kein Titel trägt (Berserk Part 2), nennt den Prime-Kanal: `kanal` kommt am Release an, nur bei Prime. */
+const hand = { slug: 'x', platform: 'primevideo', releaseType: 'batch', kanal: 'Aniverse' } as CuratedEntry
+pruefe('Kuratiert: Prime-Kanal wandert ins Release', kuratierteZusaetze(hand).kanal === 'Aniverse', kuratierteZusaetze(hand))
+pruefe('Kuratiert: Kanal bei anderem Anbieter wandert nicht', kuratierteZusaetze({ ...hand, platform: 'netflix' }).kanal === undefined)
 
 if (fehler) {
   console.error(`${fehler} Prüfung(en) fehlgeschlagen`)

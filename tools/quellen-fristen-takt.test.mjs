@@ -113,6 +113,7 @@ const TAEGLICH = {
   cartoons: 4,
   trailer: 4,
   'wikipedia-folgen': 4,
+  'wikipedia-sprecher': 4,
 }
 const WOCHE = ['adn-catalog', 'anisearch-eintraege', 'crunchyroll-dub', 'justwatch-audio', 'motn-changes']
 // Quelle aus der Cloud gesperrt (tv.de, HTTP 403 seit 06.11.2026): bewusst lange Frist, Alarm erst bei 60 Tagen.

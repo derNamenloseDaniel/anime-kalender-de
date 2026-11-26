@@ -1,5 +1,5 @@
 /**
- * Sprechertabelle aus dem Wikitext eines de.wikipedia-Abschnitts „Synchronisation“ (Vorstufe, noch ohne Bau-Anschluss).
+ * Sprechertabelle aus dem Wikitext eines de.wikipedia-Abschnitts „Synchronisation“ (Sammler `fetch-wikipedia-sprecher.ts`, Bau `bau/sprecher-wikipedia.ts`).
  * Quelle: de.wikipedia, Lizenz CC BY-SA 4.0 (Quellennennung mit Link auf die Versionsgeschichte der Seite).
  * Gelesen werden Wikitext-Tabellen mit einer Spalte „Deutsch…“ in der Kopfzeile (auch zweizeiliger Kopf mit
  * rowspan/colspan, mehrere deutsche Spalten je Fassung). Datenzellen gelten als eine Spalte je Zelle.

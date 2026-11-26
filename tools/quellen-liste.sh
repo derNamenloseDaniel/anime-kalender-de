@@ -328,6 +328,8 @@ QUELLEN=(
   # Folgennummern und deutsche Erstausstrahlung aus den Episodenlisten der de.wikipedia,
   # für die im TV-Programm gesichteten Titel (19.09.2026, `pipeline/fetch-wikipedia-folgen.ts`).
   data/wikipedia-folgen.json
+  # Sprechertabellen der Handliste data/wikipedia-sprecher-seiten.yaml (26.11.2026, `pipeline/fetch-wikipedia-sprecher.ts`, je Seite einmal je Woche).
+  data/wikipedia-sprecher.json
   # Staffel, Nummer und RTL+-Start je Folge für TV-Serien ohne Wikipedia-Liste
   # (19.09.2026, `pipeline/fetch-rtlplus-folgen.ts`, wöchentlich).
   data/rtlplus-folgen.json

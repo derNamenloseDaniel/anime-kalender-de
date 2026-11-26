@@ -121,6 +121,7 @@ export const ERZEUGTE_DATEIEN = [
   'wiedervorlage.json',
   'wikidata-titel.json',
   'wikipedia-folgen.json',
+  'wikipedia-sprecher.json',
   'youtube-check.json',
   'youtube-kauf.json',
 ]

@@ -11,6 +11,7 @@ import { dubZeilenVon } from './dub-zeilen.ts'
 import { berechneAntwortMitDeFolgen } from './antwort-de-folgen.ts'
 import { sortiereNachZugang } from './wege-sortieren.ts'
 import { sichtbareTermine, sichtbareWege } from './wege-sichtbar.ts'
+import { ohneSprachbelegFuer } from './legende-zeilen.ts'
 import { kastenNotizVon, wegeHinweisVon } from './kasten-hinweise.ts'
 import { useReleaseSichten } from './release-sichten.ts'
 
@@ -43,18 +44,19 @@ function useWegeSichten({ title, releases, today }: Pick<PanelAntwortEingabe, 't
    * stehen:** Was hier fehlt, fällt aus allen Gruppen und verschwindet
    * kommentarlos aus der Anzeige.
    */
-  const sortiertNachZugang = useMemo(() => {
-    return title ? sichtbareWege(sortiereNachZugang({ title }), title, releases) : sortiereNachZugang({ title })
-  }, [title, releases])
+  const alleWege = useMemo(() => sortiereNachZugang({ title }), [title])
+  const sortiertNachZugang = useMemo(() => (title ? sichtbareWege(alleWege, title, releases) : alleWege), [alleWege, title, releases])
+  /* Der Kopf sagt „Sprache offen“ / „nur Untertitel“ nach allen Wegen des Titels, auch nach denen, die als Pille entfallen. */
+  const ohneSprachbeleg = useMemo(() => (title ? ohneSprachbelegFuer(alleWege, title, releases) : undefined), [alleWege, title, releases])
   const { discReleases, releaseJePlattform, kinoRelease } = useReleaseSichten(releases, today)
   const alleTermine = useTerminReleases(releases, title, kinoRelease?.slug, today)
-  const terminReleases = useMemo(() => sichtbareTermine(alleTermine, sortiertNachZugang, today), [alleTermine, sortiertNachZugang, today])
+  const terminReleases = useMemo(() => sichtbareTermine(alleTermine, sortiertNachZugang), [alleTermine, sortiertNachZugang])
   /* Führt der Titel den Anbieter schon als Link, steht dort dessen Pille; der Termin allein erst vor der ersten Folge. */
   const streamReleases = useMemo(
     () => terminReleases.filter((r) => !(title?.streams ?? []).some((s) => s.platform === r.platform)),
     [terminReleases, title],
   )
-  return { sortiertNachZugang, discReleases, releaseJePlattform, kinoRelease, terminReleases, streamReleases }
+  return { sortiertNachZugang, ohneSprachbeleg, discReleases, releaseJePlattform, kinoRelease, terminReleases, streamReleases }
 }
 
 /**

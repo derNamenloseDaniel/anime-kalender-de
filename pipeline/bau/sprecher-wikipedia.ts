@@ -59,18 +59,22 @@ export function zieleAusHandliste(liste: { seite: string; titel: Omit<WikipediaZ
   return liste.flatMap((e) => e.titel.map((t) => ({ ...t, seite: e.seite })))
 }
 
-/** Rollen eines Ziels: nur Stimmen seiner Fassung; ein weiterer Zusatz („ab Staffel 3“) bleibt am Namen. */
+/**
+ * Rollen eines Ziels: nur Stimmen seiner Fassung. Ein weiterer Zusatz („ab Staffel 3“, auch ein Klammerzusatz am Namen wie
+ * „Matthias Klie (Staffel 1)“) wandert an die Figur, damit die Sprecher-Suche einen Namen nicht in mehrere spaltet.
+ */
 export function rollenFuer(zeilen: SprecherZeile[], fassung?: string): Rolle[] {
   const aus: Rolle[] = []
   const gesehen = new Set<string>()
   for (const z of zeilen) {
     for (const d of z.deutsch) {
       if (fassung && !d.zusatz?.includes(fassung)) continue
-      const rest = (d.zusatz ?? '').replace(fassung ?? '', '').replace(/^[,\s]+|[,\s]+$/g, '')
-      const actor = rest ? `${d.sprecher} (${rest})` : d.sprecher
-      if (gesehen.has(`${z.rolle}|${actor}`)) continue
-      gesehen.add(`${z.rolle}|${actor}`)
-      aus.push({ character: z.rolle, actor, von: 'wikipedia' })
+      const [, actor, klammer] = /^(.*?)(?:\s*\(([^()]*)\))?$/.exec(d.sprecher)!
+      const rest = [(d.zusatz ?? '').replace(fassung ?? '', ''), klammer ?? ''].map((s) => s.replace(/^[,\s]+|[,\s]+$/g, '')).filter(Boolean).join(', ')
+      const character = rest ? `${z.rolle} (${rest})` : z.rolle
+      if (gesehen.has(`${character}|${actor}`)) continue
+      gesehen.add(`${character}|${actor}`)
+      aus.push({ character, actor: actor!, von: 'wikipedia' })
     }
   }
   return aus

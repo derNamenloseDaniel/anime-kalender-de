@@ -33,7 +33,8 @@ export async function main(abruf = async (seite: string) => {
   writeText(ZIEL, alsText(datei))
   for (const s of stoerungen) warn(`Wikipedia-Sprecher ${s}`)
   const mitTabelle = Object.values(datei.seiten).filter((s) => s.zeilen.length).length
-  recordSource('wikipedia-sprecher', mitTabelle, stoerungen.length ? `${stoerungen.length} von ${abrufe} Abrufen gestört` : undefined, abrufe, abrufe === 0)
+  // Gearbeitet hat nur ein gelungener Abruf: ein Lauf, in dem jeder Abruf scheitert, ist nicht grün.
+  recordSource('wikipedia-sprecher', mitTabelle, stoerungen.length ? `${stoerungen.length} von ${abrufe} Abrufen gestört` : undefined, abrufe - stoerungen.length, abrufe === 0)
   log(`Wikipedia-Sprecher: ${liste.length} Seiten in der Handliste, ${abrufe} abgerufen, ${stoerungen.length} gestört, ${mitTabelle} mit deutscher Tabelle → ${ZIEL}`)
 }
 

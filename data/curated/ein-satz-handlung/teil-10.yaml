@@ -839,6 +839,10 @@
   quellen: [anisearch, tmdb, anilist]
   geprueftAm: 2026-11-26
   umfang: reihe
+- id: 158898
+  satz: "Der scheue Taiyou Asano erfährt, dass seine Kindheitsfreundin Mutsumi aus einer Spionfamilie stammt, und heiratet sie, um ihrem mordlustigen Bruder zu entgehen."
+  quellen: [anisearch, anilist]
+  geprueftAm: 2026-11-26
 - id: 158926
   satz: "Der einst geniale, nun zurückgezogene Detektiv Ron Kamonohashi darf nicht mehr ermitteln, bis ihn Polizist Totomaru Isshiki bei einer Mordserie um Hilfe bittet."
   quellen: [anisearch, tmdb, anilist]

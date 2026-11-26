@@ -10,6 +10,6 @@
 ## Rückblick
 - gut: Wächter nennt die zu streichenden Zeilen selbst; Mutationsskript fand 3 Lücken sofort.
 - schlecht: `git fetch` nur des Auftragszweigs ließ `origin/main` im flachen Klon veraltet („no merge base“); erst `fetch --unshallow` half.
-- unerwartet: `.d.mts`-Dateien zählen als Werkzeuge in der Liste (≈ 30 Einträge), ein Test dafür wäre sinnlos.
+- unerwartet: `.d.mts`-Dateien zählen als Werkzeuge in der Liste (17 Einträge), ein Test dafür wäre sinnlos.
 - Vorschlag: `.d.mts` in `istWerkzeug` ausnehmen wie `.d.ts`; Rang der meistgenutzten Werkzeuge ohne Test (poc-urteil, ladezeiten-messen) braucht Browser-Fixtures.
 - veraltet: Auftragstext „175 von 504“ — Stand heute 144 von 573.

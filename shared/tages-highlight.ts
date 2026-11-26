@@ -7,8 +7,9 @@
  * Beliebtheitsfeld; wer eines einführt, ersetzt den Slug-Vergleich (Stand 26.11.2026).
  *
  * Nur belegte Termine: Termin mit `sources`, nicht fortgeschrieben (`estimated`), keine TV-Sichtung, keine
- * ausgebliebene Folge, keine TV-Wiederholung, nicht OmU und kein Titel mit schwacher Synchro-Stufe (`low`).
- * Discs zählen nicht: sie „erscheinen" nicht als Ereignis des Tages.
+ * ausgebliebene Folge, kein Fernsehen (`tvPremiere` rechnet erst der Bau, hier fehlt es: Wiederholung nicht ausschließbar), keine Sprachangabe am Release (`omu`/`offen`: Synchro nicht
+ * belegt) und kein Titel mit schwacher Synchro-Stufe (`low`). Discs (Typ oder Plattform) zählen nicht.
+ * `movie` ist Kino- oder Streamstart: „im Kino" nur bei Plattform `kino`, sonst „Film auf <Anbieter>".
  */
 import { anbieterName, type DubConfidence, type Release, type ReleaseEvent, type Title } from './types.ts'
 import { expandEvents } from './logic.ts'
@@ -28,7 +29,7 @@ export interface Tageshighlight {
 const DUB_RANG: Record<DubConfidence, number> = { low: 0, normal: 1, high: 2, 'very-high': 3 }
 
 function zaehlbar(e: ReleaseEvent): boolean {
-  return !e.estimated && !e.sichtung && !istAusgeblieben(e) && e.tvPremiere !== false
+  return !e.estimated && !e.sichtung && !istAusgeblieben(e)
 }
 
 function rangVon(release: Release, e: ReleaseEvent): number {
@@ -38,18 +39,18 @@ function rangVon(release: Release, e: ReleaseEvent): number {
   return e.episode === 1 ? 2 : 1
 }
 
-/** Folgenzahl nur, wenn belegt (Termin oder Titel), nie die fortgeschriebene. */
-function folgenzahl(release: Release, titel: Title): number | undefined {
+/** Folgenzahl nur aus der Angabe dieses Releases, nie fortgeschrieben, nie `titel.episodes` (kann mehrere Staffeln zählen). */
+export function folgenzahl(release: Release): number | undefined {
   if (release.schedule.episodeCountAssumed) return undefined
-  return release.schedule.episodeCount ?? titel.episodes ?? undefined
+  return release.schedule.episodeCount ?? undefined
 }
 
-function folgeText(release: Release, titel: Title, events: ReleaseEvent[], e: ReleaseEvent): string {
-  if (release.releaseType === 'movie') return 'Kinostart'
+function folgeText(release: Release, events: ReleaseEvent[], e: ReleaseEvent): string {
+  if (release.releaseType === 'movie') return release.platform === 'kino' ? 'Kinostart' : 'Film'
   if (release.releaseType === 'batch') {
     if (release.dateMeaning === 'available-from') return 'Neu im Angebot'
-    const n = folgenzahl(release, titel)
-    return n ? `Alle ${n} Folgen` : 'Alle Folgen'
+    const n = folgenzahl(release)
+    return n && n >= 2 ? `Alle ${n} Folgen` : 'Neu'
   }
   if (e.episode == null) return 'Neue Folge'
   const bis = folgenblockBis(events, e)
@@ -61,11 +62,11 @@ export function waehleTageshighlight(releases: Release[], titelVon: Map<number, 
   let bester: (Tageshighlight & { dub: number }) | undefined
   for (const release of releases) {
     const titel = titelVon.get(release.titleId)
-    if (!titel || !release.sources?.length || release.sprache === 'omu' || release.releaseType === 'disc' || titel.dubConfidence === 'low') continue
+    if (!titel || !release.sources?.length || release.sprache || release.releaseType === 'disc' || release.platform === 'disc' || release.platform === 'unbekannt' || release.platform === 'tv' || titel.dubConfidence === 'low') continue
     const events = expandEvents(release)
     const e = events.find((x) => x.date === heute && zaehlbar(x))
     if (!e) continue
-    const kandidat = { release, titleId: titel.id, rang: rangVon(release, e), dub: DUB_RANG[titel.dubConfidence], folge: folgeText(release, titel, events, e), ort: release.releaseType === 'movie' ? 'im Kino' : `auf ${anbieterName(release.platform, release.sender)}` }
+    const kandidat = { release, titleId: titel.id, rang: rangVon(release, e), dub: DUB_RANG[titel.dubConfidence], folge: folgeText(release, events, e), ort: release.platform === 'kino' ? 'im Kino' : `auf ${anbieterName(release.platform, release.sender)}` }
     if (!bester || vorn(kandidat, bester)) bester = kandidat
   }
   if (!bester) return undefined

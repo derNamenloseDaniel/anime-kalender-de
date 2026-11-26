@@ -22,7 +22,7 @@ import { OG_FASSUNG } from './lib/og-fassung.ts'
 import { terminKopf } from './lib/og-termin.ts'
 import { SCHAETZ_DATEI, liesSchaetzListe, neuWegenSchaetzung, nurVorhandene, schreibSchaetzListe } from './lib/og-schaetz.ts'
 import { mussNeuZeichnen, standardKarte, standardKennung } from './lib/og-standard.ts'
-import { schreibeTagesbild } from './lib/og-tag.ts'
+import { baueTagesbild } from './lib/og-tag.ts'
 
 const OUT_DIR = resolve(ROOT, 'public/og')
 const COVER_CACHE = resolve(ROOT, 'data/cache/covers')
@@ -121,9 +121,7 @@ async function main(): Promise<void> {
 
   // --- Bild des Tages (wichtigstes Release, `shared/tages-highlight.ts`) --------
   if (!NUR) {
-    const von = Date.now()
-    const h = await schreibeTagesbild(releases, titleById, today, OUT_DIR, loadCover, process.argv.includes('--tag-neu'))
-    log(h ? `Tagesbild ${today}: ${h.release.name} (${h.folge} ${h.ort}, ${Date.now() - von} ms)` : `Tagesbild ${today}: kein belegtes Release, Markenbild bleibt`)
+    await baueTagesbild(releases, titleById, today, OUT_DIR, loadCover, process.argv.includes('--tag-neu'), { log, warn })
   }
 
   log(`${written} Vorschaubilder erzeugt, ${releases.length} Releases insgesamt`)

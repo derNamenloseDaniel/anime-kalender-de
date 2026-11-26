@@ -105,6 +105,11 @@ try {
   erwarte('Meldezeile: AniList-ID, deutscher Titel und JustWatch-Adresse', zeile === 'Titel 1 „Erfunden DE“ — JustWatch: https://www.joyn.de/x', zeile)
   const zeileEn = beschreibeLuecke({ id: 3, titleEn: 'Nur EN' }, jwMix)
   erwarte('Meldezeile: englischer Titel als Ersatz, Angebot ohne Adresse ist kein Beleg', zeileEn === 'Titel 3 „Nur EN“ — JustWatch: kein Beleg', zeileEn)
+  const nachFremd = { 6: jwBefund([joyn('https://www.netflix.com/title/6', 'FLATRATE', 'Netflix'), joyn('https://www.joyn.de/z', 'ADS', 'Joyn Plus')]) }
+  const zeileFremd = beschreibeLuecke({ id: 6, titleEn: 'Fremd zuerst' }, nachFremd)
+  erwarte('Meldezeile: Beleg ist die Joyn-Adresse, nicht das erste fremde Angebot', zeileFremd.endsWith('JustWatch: https://www.joyn.de/z'), zeileFremd)
+  const ohneDannMit = { 7: jwBefund([{ anbieter: 'Joyn' }, joyn('https://www.joyn.de/w', 'ADS')]) }
+  erwarte('Beleg: Joyn-Angebot ohne Adresse wird übersprungen, das mit Adresse zählt', joynLuecken([{ id: 7 }], ohneDannMit).join() === '7', joynLuecken([{ id: 7 }], ohneDannMit))
   const o = ordneAusnahmen([1, 2, 3], [{ id: 2, grund: 'x' }, { id: 9, grund: 'y' }])
   erwarte('Ausnahmen: offen sind Lücken ohne Eintrag, veraltet Einträge ohne Lücke', JSON.stringify(o) === '{"offen":[1,3],"veraltet":[9]}', o)
   const liste = JSON.parse(readFileSync(join(process.cwd(), 'data', 'joyn-luecke-ausnahmen.json'), 'utf8')) as { id: number; grund: string }[]

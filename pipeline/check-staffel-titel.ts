@@ -188,6 +188,9 @@ pruefe('Staffel 1 (abgeleitet) rechnet unabhängig vom Tag zurück', zurueckAufS
 pruefe('Spanne der Basis ab `aktiv` → 137.. (Beobachtungen tragen den Tag)', JSON.stringify(beobachtungenDerSpanne(SAMMEL, { von: 1, bis: 2 }, { anbieter: 'rtlplus', vorhanden: 'ja', tonDe: 'ja', art: 'seite', tag: '2026-11-24', kanal: false } as never, mitAktiv).map((b) => b.folge)) === '[137,138]')
 /* Befund 4 des Prüfers (PR 4603): `aktiv` hängt nicht vom Merge-Tag ab, und durchlaufend gezählte Meldungen nach `aktiv` bleiben durchlaufend. */
 pruefe('laengsteStaffel: 47 (Staffel 3), die offene zählt nicht', laengsteStaffel(planAktiv) === 47 && titelAktiv[3]!.staffelTitel?.laengste === 47 && titelAktiv.slice(0, 3).every((t) => t.staffelTitel?.laengste === undefined), JSON.stringify(titelAktiv[3]!.staffelTitel))
+pruefe('laengsteStaffel: nur eine offene Staffel → 0', laengsteStaffel({ ...planAktiv, staffeln: [{ nr: 1, von: 1, kennung: SAMMEL }] }) === 0)
+const [basisMitName] = staffelPlaene([{ ...GRENZEN, basis: 3, staffeln: GRENZEN.staffeln.slice(0, 3).map((s) => (s.nr === 3 ? { ...s, kennung: undefined, name: 'Probe drei' } : s)) }])
+pruefe('Plan: Basis-Staffel behält bis und Namen', JSON.stringify(basisMitName!.staffeln[2]) === JSON.stringify({ nr: 3, von: 90, bis: 136, kennung: SAMMEL, name: 'Probe drei' }), JSON.stringify(basisMitName!.staffeln[2]))
 const gebaut = [{ id: SAMMEL, staffelTitel: { aktiv: '2026-11-23' } }, { id: 20 }]
 pruefe('aktivTag: erster Bestand mit dem Schnitt → Tag nach dem Bau, unabhängig vom Merge-Tag', aktivTag([{ id: SAMMEL }], SAMMEL, '2026-12-05') === '2026-12-06' && aktivTag([], SAMMEL, '2026-11-22') === '2026-11-23')
 pruefe('aktivTag: steht der Schnitt schon im Bestand, bleibt sein Tag (kein Wandern bei jedem Bau)', aktivTag(gebaut, SAMMEL, '2026-12-05') === '2026-11-23')

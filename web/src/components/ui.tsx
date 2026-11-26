@@ -20,7 +20,7 @@ const CLICKABLE = 'cursor-pointer'
  * gibt keine Stelle, die beim nächsten Mal vergessen wird (Daniel, 12.08.2026:
  * „keine default web tooltips … überall nutzen").
  */
-function mitHinweis(text: string | undefined, seite: 'oben' | 'unten', kind: ReactNode): ReactNode {
+export function mitHinweis(text: string | undefined, seite: 'oben' | 'unten', kind: ReactNode): ReactNode {
   return text ? (
     <Tooltip text={text} seite={seite}>
       {kind}
@@ -556,6 +556,10 @@ interface TooltipProps {
   /** Für die Hülle, wenn sie im Flex-Layout den Platz des Kinds einnimmt (`ml-auto`, `shrink-0`). */
   className?: string
   mitSpitze?: boolean
+  /** Hülle und Auslöser füllen die Breite des Behälters (Zeilen, abgeschnittener Text) statt nur ihren Inhalt. */
+  fuellend?: boolean
+  /** Der Auslöser ist kein Tab-Halt (Text, dessen Inhalt ohnehin im DOM steht); Maus und Antippen öffnen die Blase. */
+  ohneTabHalt?: boolean
 }
 
 /**
@@ -611,6 +615,8 @@ export function Tooltip({
   eigenerFokus,
   className = '',
   mitSpitze,
+  fuellend,
+  ohneTabHalt,
 }: TooltipProps) {
   const [offen, setOffen] = useState(false)
   const anker = useRef<HTMLSpanElement>(null)
@@ -634,7 +640,7 @@ export function Tooltip({
   return (
     <span
       ref={anker}
-      className={`relative inline-flex items-center ${className}`}
+      className={`relative ${fuellend ? 'flex w-full min-w-0' : 'inline-flex'} items-center ${className}`}
       onMouseEnter={() => !tipp.nachAntippen() && setOffen(true)}
       onMouseLeave={() => setOffen(false)}
       onFocus={(e) => !tipp.nachAntippen() && fokusZeigtBlase(e.target) && setOffen(true)}
@@ -649,13 +655,13 @@ export function Tooltip({
       onClickCapture={tipp.beimKlick}
     >
       <span
-        tabIndex={kindFokus ? undefined : 0}
+        tabIndex={kindFokus || ohneTabHalt ? undefined : 0}
         /* Der Auslöser zeigt auf seine Blase (kein `role="note"`); ohne `tabIndex` erreicht sie nur, wer eine Maus hat. */
         aria-describedby={kindFokus ? undefined : verweis}
         /* `inline-flex`: Die Hülle nimmt die Höhe ihres Kinds, nicht die der Zeile — sonst stehen Plaketten versetzt. */
         className={[
           /* Mit `kindFokus` ist das Kind der Auslöser (z. B. ein Knopf) und bringt seine eigene Trefferfläche mit; ein `::after` der Hülle läge sonst über ihm und finge den Klick ab (Heute-Knopf, 08.10.2026). */
-          `inline-flex items-center rounded-sm ${kindFokus ? '' : TREFFER_24_MIN}`,
+          `${fuellend ? 'flex w-full min-w-0' : 'inline-flex'} items-center rounded-sm ${kindFokus || ohneTabHalt ? '' : TREFFER_24_MIN}`,
           unterstrichen ? 'cursor-help underline decoration-dotted underline-offset-2' : '',
         ].join(' ')}
       >

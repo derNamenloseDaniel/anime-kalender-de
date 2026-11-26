@@ -280,3 +280,7 @@ Die langen Kommentare aus dem JSX von `DetailPanel.tsx` stehen hier; der Körper
 ## Ungelayerte Regeln schlagen jede Utility (24.11.2026)
 
 In Tailwind v4 liegen Utilities in `@layer utilities`; jede ungelayerte Regel gewinnt dagegen, auch ein `*`. Die globale Scrollbar-Regel (`scrollbar-width: thin`) stand ungelayert und machte `[scrollbar-width:none]` an Staffel-Reitern, Kopfzeile, Chips, News und Reihen-Spur wirkungslos (gemessen: alle `thin`; nach dem Umzug in `@layer base` `none`, Kontrolle ohne Klasse `thin`). Wächter: `tools/scrollbar-layer.test.mjs`. Weitere ungelayerte Element-Regeln (nur gelistet): `header { transition }` unter 768 px, `footer p a` im Tippziel-Modus, `select option`, `*` bei reduzierter Bewegung (`!important`, gewollt).
+
+## Hinweise: eigener Tooltip statt `title` (26.11.2026, Daniel)
+
+Kein natives `title` als Hover-Tooltip in `web/src`: `<Tooltip>` (`ui.tsx`; `Button`/`Chip` reichen ihr `title` schon durch, `mitHinweis()` hüllt nur bei vorhandenem Text). `fuellend` für Zeilen und abgeschnittenen Text, `ohneTabHalt` für Text ohne eigenen Fokus. Lange Listen (Patchnotes, über 500 Einträge): `data-hinweis="Text"` und `useFlaechenHinweis()` (`hinweis-flaeche.tsx`), ein Zustand und eine Blase für die ganze Fläche. Icon-Knopf behält `aria-label`; Knöpfe zeigen auf Touch keine Blase vor dem Klick (iOS schluckt sonst den ersten Tipp). Wächter `tools/title-tooltips.mjs` (Grenze sinkt nur; iframe-Name und Tabtitel mit `title-ok: Grund`).

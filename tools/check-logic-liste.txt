@@ -854,6 +854,7 @@ tools/stumme-pfade.mjs
 tools/suchhinweis-filter.test.ts
 tools/suchhinweis-karten.test.ts
 tools/test-netz-wache.mjs
+tools/title-tooltips.mjs
 tools/uhr-in-tests.mjs
 tools/web-hosting.test.ts
 tools/web-push-voll.test.ts

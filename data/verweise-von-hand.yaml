@@ -411,3 +411,21 @@
   belegtAm: '2026-11-20'
   zugang: abo
   beleg: 'plus.rtl.de (Abruf 20.11.2026, HTTP 200): TVSeries „Pokémon Horizonte: Die Serie“, Staffelwähler mit totalItems 45 (Staffel 1), 44 (Staffel 2), 47 (Staffel 3) und 1 (Staffel 4) = die deutschen Staffelgrößen der Wikipedia-Episodenliste und der TOGGO-Schnittstelle (data/toggo.json, Serie VSE292: 45, 44, 47); Folge 1 der Staffel 4 („Eine Welt voller Abenteuer“, availabilityStarts 2026-11-20, Abo)'
+
+# Bakugan: Evolutions (146885) und Geogan Rising (131096) bei RTL+ (24.11.2026): beide standen seit dem Katalogabgleich vom 30.08.2026 in
+# data/rtlplus-katalog.json (Gattung „video“, kein Hörbuch), aber ohne Weg im Titel (kein-weg). Sprachurteil offen wie bei Armored Alliance:
+# der Katalog belegt das Führen des Titels, nicht die Sprache, und die Folgenlisten sind nicht gelesen.
+- anilistId: 146885
+  title: "Bakugan: Evolutions"
+  platform: rtlplus
+  url: https://plus.rtl.de/bakugan-evolutions-p_8016
+  belegtAm: '2026-11-24'
+  zugang: abo
+  beleg: 'RTL+-Programm-Sitemap, abgeglichen am 30.08.2026 (data/rtlplus-katalog.json, Eintrag 146885, Gattung „video“): Seitentitel „Bakugan: Evolutions“, Slug bakugan-evolutions-p_8016. Direktabruf am 24.11.2026 nicht möglich (plus.rtl.de ist aus dieser Sitzung gesperrt); Wortlaut und Sprache nicht gelesen'
+- anilistId: 131096
+  title: "Bakugan: Geogan Rising"
+  platform: rtlplus
+  url: https://plus.rtl.de/bakugan-geogan-rising-p_5148
+  belegtAm: '2026-11-24'
+  zugang: abo
+  beleg: 'RTL+-Programm-Sitemap, abgeglichen am 30.08.2026 (data/rtlplus-katalog.json, Eintrag 131096, Gattung „video“): Seitentitel „Bakugan: Geogan Rising“, Slug bakugan-geogan-rising-p_5148. Direktabruf am 24.11.2026 nicht möglich (plus.rtl.de ist aus dieser Sitzung gesperrt); Wortlaut und Sprache nicht gelesen'

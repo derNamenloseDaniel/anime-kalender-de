@@ -50,4 +50,5 @@ fremd += pruefeLuecken('.')
 fremd += pruefeStaffelQuote('.')
 
 console.log(`check-folgentitel-sprache-bestand: ${fremd ? `${fremd} Fehler` : 'ok'} (${listen} Folgenlisten, ${titel} deutsche Titel, 0 fremdsprachige erlaubt)`)
+console.log(`VERSTÖSSE: ${fremd}`)
 process.exit(fremd ? 1 : 0)

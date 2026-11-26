@@ -19,6 +19,11 @@ symlinkSync(join(wurzel, 'pipeline'), join(temp, 'pipeline'), 'junction')
 symlinkSync(join(wurzel, 'node_modules'), join(temp, 'node_modules'), 'junction')
 cpSync(join(wurzel, 'tools'), join(temp, 'tools'), { recursive: true, filter: (q) => !/[\\/]tools[\\/](testdaten|archiv)$/.test(q) })
 cpSync(join(wurzel, 'package.json'), join(temp, 'package.json'))
+mkdirSync(join(temp, 'worker/src'), { recursive: true })
+const artenDatei = join(temp, 'worker/src/lauf-sql.ts')
+cpSync(join(wurzel, 'worker/src/lauf-sql.ts'), artenDatei)
+let artenText = readFileSync(artenDatei, 'utf8')
+const ARTEN_KOPF = 'export const LAUF_ARTEN = ['
 const werkzeug = join(temp, 'tools/check-workflows.mjs')
 const probe = join(temp, '.github/workflows/zz-probe.yml')
 
@@ -34,6 +39,8 @@ function lauf(inhalt) {
   faelle++
   if (inhalt === null) rmSync(probe, { force: true })
   else writeFileSync(probe, inhalt)
+  // Die Probe heißt „Probe": Sie steht nur in der Arten-Liste, solange ihre Datei liegt.
+  writeFileSync(artenDatei, inhalt === null ? artenText : artenText.replace(ARTEN_KOPF, `${ARTEN_KOPF}\n  'Probe',`))
   const r = spawnSync(process.execPath, [werkzeug], { cwd: temp, encoding: 'utf8', timeout: 60000 })
   assert.ok(r.status !== null, `Werkzeug lief nicht bis zum Ende: ${r.error ?? r.stderr}`)
   return r
@@ -127,6 +134,13 @@ try {
   )
   rot('Ausnahme ohne Treffer', null, /Ausnahme „Messung gegen die eigenen Belege" \(tonspuren-monatlich\.yml\) hat keinen Treffer mehr/)
   zurueck()
+  // Workflows ↔ LAUF_ARTEN: Änderung am Text der Arten-Liste, in beide Richtungen.
+  const echteArt = /LAUF_ARTEN = \[\s*'([^']+)'/.exec(artenText)[1]
+  artenText = artenText.replace(`'${echteArt}',`, '')
+  rot('Workflow fehlt in LAUF_ARTEN', null, new RegExp(`Workflow „${echteArt}" fehlt in LAUF_ARTEN`))
+  artenText = readFileSync(join(wurzel, 'worker/src/lauf-sql.ts'), 'utf8').replace(ARTEN_KOPF, `${ARTEN_KOPF}\n  'Zz Geist',`)
+  rot('LAUF_ARTEN nennt Workflow ohne Datei', null, /LAUF_ARTEN .* nennt „Zz Geist", aber kein Workflow/)
+  artenText = readFileSync(join(wurzel, 'worker/src/lauf-sql.ts'), 'utf8')
   gut('Kopien zurückgesetzt', null)
 } finally {
   unlinkSync(join(temp, 'pipeline'))

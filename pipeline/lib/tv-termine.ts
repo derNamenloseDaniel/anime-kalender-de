@@ -271,6 +271,142 @@ function sichtungsZahl(n: number): { episodeCount: number; episodeCountAssumed: 
   return { episodeCount: n, episodeCountAssumed: true, episodeCountNurGesichtet: true }
 }
 
+/** Gruppen je Titel und Sender; der Handtermin ersetzt die Sichtungen erst ab seinem Start, davor bleiben sie stehen (One Piece, 10.10.2026). */
+function gruppiereSendungen(sendungen: TvSendung[], titles: Map<number, Title>, belegt: Map<string, string>): Map<string, TvSendung[]> {
+  const gruppen = new Map<string, TvSendung[]>()
+  for (const s of sendungen) {
+    const k = `${s.titleId}|${s.sender.toLowerCase()}`
+    if (!titles.has(s.titleId) || berlinTag(s.start) >= (belegt.get(k) ?? '9999')) continue
+    gruppen.set(k, [...(gruppen.get(k) ?? []), s])
+  }
+  return gruppen
+}
+
+/** Erste deutsche Veröffentlichung je Folgentitel (EAD bzw. RTL+-Start) — für „Premiere/Wiederholung". */
+function erstJeFolgenKern(wikiListe: WikiListen[string] | undefined): Map<string, string> {
+  return new Map(
+    (wikiListe?.folgen ?? []).flatMap((f) => {
+      const d = f.ead ?? (f as { ab?: string }).ab
+      return d ? [[folgenKern(f.dt), d.slice(0, 10)] as const] : []
+    }),
+  )
+}
+
+/** Ergebnis der Nummerierung einer Gruppe: Zieltitel, Folgen je Nummer und ob die Nummern aus der Liste stammen. */
+interface Nummerierung {
+  title: Title
+  mitWiki: boolean
+  sichtungen: TvSendung[]
+  observed: Record<number, string>
+  zeitJeFolge: Record<number, string>
+  ersteDeutsch: Record<number, string>
+  ab: number
+  n: number
+}
+
+/** Nummern aus der Episodenliste — nur wenn jede Sichtung darin steht; sonst zählt jeder neue Folgentitel. */
+function nummeriereGruppe(
+  liste: TvSendung[],
+  titles: Map<number, Title>,
+  belegt: Map<string, string>,
+  gruppen: Map<string, unknown>,
+  wikiListe: WikiListen[string] | undefined,
+): Nummerierung {
+  const erste = liste[0]!
+  let title = titles.get(erste.titleId)!
+  const nummern = wikiListe?.folgen.length ? nummernNachTitel(wikiListe.folgen, !wikiListe.url) : undefined
+  const zugeordnet = liste.map((s) => (s.folge ? nummerFuer(nummern, s.folge) : undefined))
+  const erstJeKern = erstJeFolgenKern(wikiListe)
+  const ersteDeutsch: Record<number, string> = {}
+  let mitWiki = zugeordnet.every((x) => x !== undefined)
+  let versatz = 0
+  if (mitWiki && title.episodes && Math.max(...(zugeordnet as number[])) > title.episodes) {
+    const platz = spaetereStaffel(title, Math.min(...(zugeordnet as number[])), Math.max(...(zugeordnet as number[])), titles)
+    if (platz && zielFrei(`${platz.title.id}|${erste.sender.toLowerCase()}`, belegt, gruppen)) {
+      title = platz.title
+      versatz = platz.versatz
+    } else mitWiki = false
+  }
+  const observed: Record<number, string> = {}
+  const zeitJeFolge: Record<number, string> = {}
+  /* Ein Kinofilm läuft mehrmals, bleibt aber ein Werk: spätere Sendungen sind Wiederholungen (stehen unter `sendungen`), keine Folge 2. */
+  const sichtungen = !mitWiki && istEinzelfilm(title) ? [erste] : liste
+  let n = 0
+  let ab = 1
+  if (mitWiki) {
+    liste.forEach((s, i) => {
+      const nr = zugeordnet[i]! - versatz
+      if (observed[nr]) return
+      observed[nr] = berlinTag(s.start)
+      zeitJeFolge[nr] = berlinZeit(s.start)
+      const erst = s.folge ? erstJeKern.get(folgenKern(s.folge)) : undefined
+      if (erst) ersteDeutsch[nr] = erst
+    })
+    const nrn = Object.keys(observed).map(Number)
+    ab = Math.min(...nrn)
+    n = Math.max(...nrn) - ab + 1
+  } else {
+    n = zaehleOhneListe(sichtungen, observed, zeitJeFolge)
+  }
+  return { title, mitWiki, sichtungen, observed, zeitJeFolge, ersteDeutsch, ab, n }
+}
+
+/** Herkunftstext und Quellen: tv.de für die Sender aus `TVDE_SENDER`, sonst das RTL+-Programm; mit Liste kommt ihre Seite hinzu. */
+function herkunftUndQuellen(
+  liste: TvSendung[],
+  mitWiki: boolean,
+  wikiListe: WikiListen[string] | undefined,
+): { herkunft: string; sources: string[] } {
+  const erste = liste[0]!
+  const tvde = TVDE_NACH_NAME.get(erste.sender.toLowerCase())
+  const nr = !mitWiki ? '' : ` Folgennummern aus ${wikiListe!.url ? wikiListe!.seite : 'der Episodenliste der Wikipedia'}.`
+  const wikiQuelle = !mitWiki ? [] : [wikiListe!.url ?? `https://de.wikipedia.org/wiki/${encodeURI(wikiListe!.seite.replace(/ /g, '_'))}`]
+  return tvde
+    ? {
+        herkunft: `Automatisch aus dem TV-Programm von tv.de (${liste.length} Sendungen gesichtet).${nr}`,
+        sources: [tvdeSendeplatz(tvde, erste.start, (erste as { kennung?: string }).kennung), ...wikiQuelle],
+      }
+    : {
+        herkunft: `Automatisch aus dem TV-Programm von RTL+ (${liste.length} Sendungen gesichtet).${nr}`,
+        sources: ['https://plus.rtl.de/tv-programm', ...wikiQuelle],
+      }
+}
+
+/** Der Termin einer Gruppe nach Start sortierter Sendungen. */
+function tvReleaseAusGruppe(
+  liste: TvSendung[],
+  nm: Nummerierung,
+  wikiListe: WikiListen[string] | undefined,
+): Release {
+  const { title, mitWiki, sichtungen, observed, zeitJeFolge, ersteDeutsch, ab, n } = nm
+  const erste = liste[0]!
+  /* Die Uhrzeit nur, wenn alle Sendungen um dieselbe liefen. */
+  const zeiten = new Set(sichtungen.map((s) => berlinZeit(s.start)))
+  const name = title.titleDe ?? title.titleEn ?? title.titleRomaji ?? erste.titel
+  return {
+    slug: `auto-${title.id}-tv-${slugTeil(erste.sender)}`,
+    titleId: title.id,
+    name,
+    platform: 'tv',
+    sender: erste.sender,
+    releaseType: 'weekly',
+    schedule: {
+      firstEpisodeDate: berlinTag(erste.start),
+      /* Eine Uhrzeit für alle, sonst je Folge. */
+      ...(zeiten.size === 1 ? { time: [...zeiten][0] } : { zeiten: zeitJeFolge }),
+      ...(ab > 1 ? { firstEpisodeNumber: ab } : {}),
+      ...sichtungsZahl(n),
+      observed,
+    },
+    tvLetzteSichtung: berlinTag(liste[liste.length - 1]!.start),
+    ...(mitWiki ? { folgenBelegt: true } : {}),
+    ...(mitWiki && Object.keys(ersteDeutsch).length ? { ersteDeutsch } : {}),
+    year: Number(erste.start.slice(0, 4)),
+    ...herkunftUndQuellen(liste, mitWiki, wikiListe),
+    automatisch: true,
+  }
+}
+
 export function releasesAusTvProgramm(
   sendungen: TvSendung[],
   titles: Map<number, Title>,
@@ -279,100 +415,12 @@ export function releasesAusTvProgramm(
 ): Release[] {
   sendungen = sendungNeuZuordnen(sendungen, titles, wiki)
   const belegt = handStart(vorhanden)
-  const gruppen = new Map<string, TvSendung[]>()
-  for (const s of sendungen) {
-    const k = `${s.titleId}|${s.sender.toLowerCase()}`
-    /* Der Handtermin ersetzt die Sichtungen erst ab seinem Start; davor bleiben sie stehen (One Piece, 10.10.2026). */
-    if (!titles.has(s.titleId) || berlinTag(s.start) >= (belegt.get(k) ?? '9999')) continue
-    gruppen.set(k, [...(gruppen.get(k) ?? []), s])
-  }
+  const gruppen = gruppiereSendungen(sendungen, titles, belegt)
   const aus: Release[] = []
   for (const liste of gruppen.values()) {
     liste.sort((a, b) => a.start.localeCompare(b.start))
-    const erste = liste[0]!
-    let title = titles.get(erste.titleId)!
-    /* Nummern aus der Episodenliste — nur wenn jede Sichtung darin steht. */
-    const wikiListe = wiki[String(erste.titleId)]
-    const nummern = wikiListe?.folgen.length ? nummernNachTitel(wikiListe.folgen, !wikiListe.url) : undefined
-    const zugeordnet = liste.map((s) => (s.folge ? nummerFuer(nummern, s.folge) : undefined))
-    /* Erste deutsche Veröffentlichung je Folgentitel (EAD bzw. RTL+-Start) — für „Premiere/Wiederholung". */
-    const erstJeKern = new Map(
-      (wikiListe?.folgen ?? []).flatMap((f) => {
-        const d = f.ead ?? (f as { ab?: string }).ab
-        return d ? [[folgenKern(f.dt), d.slice(0, 10)] as const] : []
-      }),
-    )
-    const ersteDeutsch: Record<number, string> = {}
-    let mitWiki = zugeordnet.every((x) => x !== undefined)
-    let versatz = 0
-    if (mitWiki && title.episodes && Math.max(...(zugeordnet as number[])) > title.episodes) {
-      const platz = spaetereStaffel(title, Math.min(...(zugeordnet as number[])), Math.max(...(zugeordnet as number[])), titles)
-      if (platz && zielFrei(`${platz.title.id}|${erste.sender.toLowerCase()}`, belegt, gruppen)) {
-        title = platz.title
-        versatz = platz.versatz
-      } else mitWiki = false
-    }
-    const observed: Record<number, string> = {}
-    const zeitJeFolge: Record<number, string> = {}
-    /* Ein Kinofilm läuft mehrmals, bleibt aber ein Werk: spätere Sendungen sind Wiederholungen (stehen unter `sendungen`), keine Folge 2. */
-    const sichtungen = !mitWiki && istEinzelfilm(title) ? [erste] : liste
-    let n = 0
-    let ab = 1
-    if (mitWiki) {
-      liste.forEach((s, i) => {
-        const nr = zugeordnet[i]! - versatz
-        if (observed[nr]) return
-        observed[nr] = berlinTag(s.start)
-        zeitJeFolge[nr] = berlinZeit(s.start)
-        const erst = s.folge ? erstJeKern.get(folgenKern(s.folge)) : undefined
-        if (erst) ersteDeutsch[nr] = erst
-      })
-      const nrn = Object.keys(observed).map(Number)
-      ab = Math.min(...nrn)
-      n = Math.max(...nrn) - ab + 1
-    } else {
-      n = zaehleOhneListe(sichtungen, observed, zeitJeFolge)
-    }
-    /* Die Uhrzeit nur, wenn alle Sendungen um dieselbe liefen. */
-    const zeiten = new Set(sichtungen.map((s) => berlinZeit(s.start)))
-    const name = title.titleDe ?? title.titleEn ?? title.titleRomaji ?? erste.titel
-    aus.push({
-      slug: `auto-${title.id}-tv-${slugTeil(erste.sender)}`,
-      titleId: title.id,
-      name,
-      platform: 'tv',
-      sender: erste.sender,
-      releaseType: 'weekly',
-      schedule: {
-        firstEpisodeDate: berlinTag(erste.start),
-        /* Eine Uhrzeit für alle, sonst je Folge. */
-        ...(zeiten.size === 1 ? { time: [...zeiten][0] } : { zeiten: zeitJeFolge }),
-        ...(ab > 1 ? { firstEpisodeNumber: ab } : {}),
-        ...sichtungsZahl(n),
-        observed,
-      },
-      tvLetzteSichtung: berlinTag(liste[liste.length - 1]!.start),
-      ...(mitWiki ? { folgenBelegt: true } : {}),
-      ...(mitWiki && Object.keys(ersteDeutsch).length ? { ersteDeutsch } : {}),
-      year: Number(erste.start.slice(0, 4)),
-      ...(() => {
-        const tvde = TVDE_NACH_NAME.get(erste.sender.toLowerCase())
-        const nr = !mitWiki ? '' : ` Folgennummern aus ${wikiListe!.url ? wikiListe!.seite : 'der Episodenliste der Wikipedia'}.`
-        const wikiQuelle = !mitWiki
-          ? []
-          : [wikiListe!.url ?? `https://de.wikipedia.org/wiki/${encodeURI(wikiListe!.seite.replace(/ /g, '_'))}`]
-        return tvde
-          ? {
-              herkunft: `Automatisch aus dem TV-Programm von tv.de (${liste.length} Sendungen gesichtet).${nr}`,
-              sources: [tvdeSendeplatz(tvde, erste.start, (erste as { kennung?: string }).kennung), ...wikiQuelle],
-            }
-          : {
-              herkunft: `Automatisch aus dem TV-Programm von RTL+ (${liste.length} Sendungen gesichtet).${nr}`,
-              sources: ['https://plus.rtl.de/tv-programm', ...wikiQuelle],
-            }
-      })(),
-      automatisch: true,
-    })
+    const wikiListe = wiki[String(liste[0]!.titleId)]
+    aus.push(tvReleaseAusGruppe(liste, nummeriereGruppe(liste, titles, belegt, gruppen, wikiListe), wikiListe))
   }
   return einzigeJeSlug(aus)
 }

@@ -1382,6 +1382,10 @@
       "am": "2026-11-06",
       "vorschlaege": 0
     },
+    "1068366": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
     "1068385": {
       "am": "2026-11-06",
       "vorschlaege": 0
@@ -1861,6 +1865,10 @@
       "am": "2026-11-18",
       "vorschlaege": 0
     },
+    "1072379": {
+      "am": "2026-11-25",
+      "vorschlaege": 1
+    },
     "1072410": {
       "am": "2026-11-17",
       "vorschlaege": 2
@@ -2051,6 +2059,10 @@
       "am": "2026-11-20",
       "vorschlaege": 0
     },
+    "1073937": {
+      "am": "2026-11-24",
+      "vorschlaege": 1
+    },
     "1073969": {
       "am": "2026-11-20",
       "vorschlaege": 2
@@ -2158,6 +2170,30 @@
       "am": "2026-11-22",
       "vorschlaege": 0
     },
+    "1074597": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1074655": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1074697": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1074752": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1074801": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1074889": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
     "1074948": {
       "am": "2026-11-23",
       "vorschlaege": 0,
@@ -2187,6 +2223,14 @@
       "am": "2026-11-23",
       "vorschlaege": 1
     },
+    "1075048": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1075050": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
     "1075066": {
       "am": "2026-11-23",
       "vorschlaege": 0,
@@ -2200,6 +2244,141 @@
       "am": "2026-11-23",
       "vorschlaege": 0,
       "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075133": {
+      "am": "2026-11-24",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075170": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1075182": {
+      "am": "2026-11-24",
+      "vorschlaege": 1
+    },
+    "1075202": {
+      "am": "2026-11-24",
+      "vorschlaege": 1
+    },
+    "1075475": {
+      "am": "2026-11-24",
+      "vorschlaege": 0
+    },
+    "1075500": {
+      "am": "2026-11-24",
+      "vorschlaege": 5
+    },
+    "1075561": {
+      "am": "2026-11-25",
+      "vorschlaege": 0
+    },
+    "1075625": {
+      "am": "2026-11-25",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075627": {
+      "am": "2026-11-26",
+      "vorschlaege": 0
+    },
+    "1075664": {
+      "am": "2026-11-25",
+      "vorschlaege": 0
+    },
+    "1075675": {
+      "am": "2026-11-25",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075698": {
+      "am": "2026-11-25",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075701": {
+      "am": "2026-11-26",
+      "vorschlaege": 1
+    },
+    "1075742": {
+      "am": "2026-11-25",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075748": {
+      "am": "2026-11-25",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1075784": {
+      "am": "2026-11-25",
+      "vorschlaege": 1
+    },
+    "1075834": {
+      "am": "2026-11-25",
+      "vorschlaege": 0
+    },
+    "1075853": {
+      "am": "2026-11-26",
+      "vorschlaege": 1
+    },
+    "1075866": {
+      "am": "2026-11-25",
+      "vorschlaege": 2
+    },
+    "1075936": {
+      "am": "2026-11-26",
+      "vorschlaege": 0
+    },
+    "1075970": {
+      "am": "2026-11-26",
+      "vorschlaege": 0
+    },
+    "1076014": {
+      "am": "2026-11-25",
+      "vorschlaege": 2
+    },
+    "1076034": {
+      "am": "2026-11-25",
+      "vorschlaege": 0
+    },
+    "1076080": {
+      "am": "2026-11-25",
+      "vorschlaege": 5
+    },
+    "1076120": {
+      "am": "2026-11-25",
+      "vorschlaege": 0
+    },
+    "1076213": {
+      "am": "2026-11-26",
+      "vorschlaege": 0
+    },
+    "1076228": {
+      "am": "2026-11-26",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1076238": {
+      "am": "2026-11-26",
+      "vorschlaege": 1
+    },
+    "1076257": {
+      "am": "2026-11-26",
+      "vorschlaege": 6
+    },
+    "1076269": {
+      "am": "2026-11-26",
+      "vorschlaege": 2
+    },
+    "1076406": {
+      "am": "2026-11-26",
+      "vorschlaege": 0
+    },
+    "1076464": {
+      "am": "2026-11-26",
+      "vorschlaege": 0
     }
   },
   "vorschlaege": [
@@ -17091,6 +17270,646 @@
       "quelle": "https://www.anime2you.de/news/1075044/the-daily-life-of-the-immortal-king-staffel-6-angekuendigt/",
       "veroeffentlicht": "2026-11-23",
       "gelesenAm": "2026-11-23"
+    },
+    {
+      "titel": "Disney Twisted-Wonderland",
+      "zitat": "Die achtteilige Fortsetzung startet am 23. Dezember 2026 auf Disney+.",
+      "art": "start",
+      "sprache": "unklar",
+      "plattform": "disneyplus",
+      "datum": "2026-12-23",
+      "uhrzeit": null,
+      "anbieter": "Disney+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Mittwoch",
+      "warnungen": [],
+      "artikelId": "1075182",
+      "artikel": "Erster Trailer zur zweiten »Disney Twisted-Wonderland«-Staffel",
+      "quelle": "https://www.anime2you.de/news/1075182/disney-twisted-wonderland-staffel-2-erster-trailer/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "A Tale of the Secret Saint",
+      "zitat": "»A Tale of the Secret Saint« umfasst demnach insgesamt 13 Episoden, die seit dem 3. Oktober 2026 im japanischen Fernsehen ausgestrahlt und bei Crunchyroll im Originalton mit deutschen Untertiteln im Simulcast gezeigt werden.",
+      "art": "start",
+      "sprache": "omu",
+      "plattform": "crunchyroll",
+      "datum": "2026-10-03",
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "13",
+      "unsicher": null,
+      "wochentag": "Samstag",
+      "warnungen": [],
+      "artikelId": "1073937",
+      "artikel": "Episodenanzahl von »A Tale of the Secret Saint« steht fest",
+      "quelle": "https://www.anime2you.de/news/1073937/a-tale-of-the-secret-saint-episodenanzahl/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Witch on the Holy Night",
+      "zitat": "In Deutschland, Österreich und der deutschsprachigen Schweiz bringt Crunchyroll den Abendfüller ab dem 26. Januar 2027 mit deutscher Synchronisation sowie im japanischen Originalton mit Untertiteln in die hiesigen Lichtspielhäuser.",
+      "art": "kino",
+      "sprache": "deutsch+omu",
+      "plattform": "kino",
+      "datum": "2027-01-26",
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [],
+      "artikelId": "1075202",
+      "artikel": "»Witch on the Holy Night« erhält eine Fortsetzung + Visual",
+      "quelle": "https://www.anime2you.de/news/1075202/witch-on-the-holy-night-erhaelt-fortsetzung/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Puella Magi Madoka Magica – Der Film: Walpurgisnacht: Rising",
+      "zitat": "Der neue Sequel-Film »Puella Magi Madoka Magica – Der Film: Walpurgisnacht: Rising« läuft seit dem 24. November 2026 in der japanischen Originalvertonung mit deutschen Untertiteln in den hiesigen Lichtspielhäusern.",
+      "art": "kino",
+      "sprache": "omu",
+      "plattform": "kino",
+      "datum": "2026-11-24",
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [],
+      "artikelId": "1075500",
+      "artikel": "polyband-Aktion: »Madoka Magica«-Komplettbox zum Sonderpreis",
+      "quelle": "https://www.anime2you.de/news/1075500/madoka-magica-komplettbox-zum-sonderpreis/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Rebellion",
+      "zitat": "Die Komplettbox umfasst alle zwölf Episoden der Serie sowie den Fortsetzungsfilm »Rebellion« mit deutscher und japanischer Sprachausgabe.",
+      "art": "sprachfassung",
+      "sprache": "deutsch",
+      "plattform": "disc",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "polyband",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „polyband“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1075500",
+      "artikel": "polyband-Aktion: »Madoka Magica«-Komplettbox zum Sonderpreis",
+      "quelle": "https://www.anime2you.de/news/1075500/madoka-magica-komplettbox-zum-sonderpreis/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Beginnings",
+      "zitat": "Die beiden Recap-Filme »Beginnings« und »Eternal« sind im Originalton mit Untertiteln enthalten.",
+      "art": "sprachfassung",
+      "sprache": "omu",
+      "plattform": "disc",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "polyband",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „polyband“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1075500",
+      "artikel": "polyband-Aktion: »Madoka Magica«-Komplettbox zum Sonderpreis",
+      "quelle": "https://www.anime2you.de/news/1075500/madoka-magica-komplettbox-zum-sonderpreis/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Eternal",
+      "zitat": "Die beiden Recap-Filme »Beginnings« und »Eternal« sind im Originalton mit Untertiteln enthalten.",
+      "art": "sprachfassung",
+      "sprache": "omu",
+      "plattform": "disc",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "polyband",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „polyband“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1075500",
+      "artikel": "polyband-Aktion: »Madoka Magica«-Komplettbox zum Sonderpreis",
+      "quelle": "https://www.anime2you.de/news/1075500/madoka-magica-komplettbox-zum-sonderpreis/",
+      "veroeffentlicht": "2026-11-24",
+      "gelesenAm": "2026-11-24"
+    },
+    {
+      "titel": "Even the Student Council Has Its Holes!",
+      "zitat": "Die neunte Episode von »Even the Student Council Has Its Holes!« wird demzufolge nicht wir ursprünglich geplant am 28. November 2026, sondern erst am 5. Dezember 2026 im japanischen Fernsehen sowie bei ADN und aniverse im Simulcast gezeigt.",
+      "art": "pause",
+      "sprache": "unklar",
+      "plattform": "adn",
+      "datum": "2026-12-05",
+      "uhrzeit": null,
+      "anbieter": "ADN",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "9",
+      "unsicher": null,
+      "wochentag": "Samstag",
+      "warnungen": [],
+      "artikelId": "1076014",
+      "artikel": "Nächste »Even the Student Council Has Its Holes!«-Episode verschoben",
+      "quelle": "https://www.anime2you.de/news/1076014/even-the-student-council-has-its-holes-episode-9-verschoben/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "Even the Student Council Has Its Holes!",
+      "zitat": "Die neunte Episode von »Even the Student Council Has Its Holes!« wird demzufolge nicht wir ursprünglich geplant am 28. November 2026, sondern erst am 5. Dezember 2026 im japanischen Fernsehen sowie bei ADN und aniverse im Simulcast gezeigt.",
+      "art": "pause",
+      "sprache": "unklar",
+      "plattform": "aniverse",
+      "datum": "2026-12-05",
+      "uhrzeit": null,
+      "anbieter": "aniverse",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "9",
+      "unsicher": null,
+      "wochentag": "Samstag",
+      "warnungen": [],
+      "artikelId": "1076014",
+      "artikel": "Nächste »Even the Student Council Has Its Holes!«-Episode verschoben",
+      "quelle": "https://www.anime2you.de/news/1076014/even-the-student-council-has-its-holes-episode-9-verschoben/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "One Punch Man",
+      "zitat": "»One Punch Man« – Staffel 1 und 2 Episoden: 24 (komplett) Sprache: Deutsch, Japanisch (UT) Stream: Disney+",
+      "art": "start",
+      "sprache": "deutsch+omu",
+      "plattform": "disneyplus",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Disney+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "24",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1075866",
+      "artikel": "Disney+ nimmt zwei Anime-Neuzugänge ins Programm",
+      "quelle": "https://www.anime2you.de/news/1075866/disney-plus-one-punch-man-ab-sofort/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "Naruto Shippuden",
+      "zitat": "»Naruto Shippuden« – Staffel 4 Episoden: 52 Sprache: Deutsch, Japanisch (UT) Stream: Disney+",
+      "art": "start",
+      "sprache": "deutsch+omu",
+      "plattform": "disneyplus",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Disney+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "52",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1075866",
+      "artikel": "Disney+ nimmt zwei Anime-Neuzugänge ins Programm",
+      "quelle": "https://www.anime2you.de/news/1075866/disney-plus-one-punch-man-ab-sofort/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "Frieren: Beyond Journey's End",
+      "zitat": "Eine dritte Staffel startet im Oktober 2027.",
+      "art": "ankuendigung",
+      "sprache": "unklar",
+      "plattform": null,
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1072379",
+      "artikel": "Sieben neue Plüschanhänger zu »Frieren« vorgestellt",
+      "quelle": "https://www.anime2you.de/news/1072379/sieben-frieren-plueschanhaenger/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "Infinite Stratos",
+      "zitat": "Die beiden Staffeln von »Infinite Stratos« werden am 22. Januar 2027 jeweils als eigene Blu-ray-Komplettbox veröffentlicht. Sowohl die erste als auch die zweite Staffelbox enthält jeweils alle zwölf Episoden sowie eine OVA mit deutscher und japanischer Sprachausgabe.",
+      "art": "disc",
+      "sprache": "deutsch",
+      "plattform": "disc",
+      "datum": "2027-01-22",
+      "uhrzeit": null,
+      "anbieter": "polyband anime",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "zwölf Episoden sowie eine OVA (je Staffel)",
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „polyband anime“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1075784",
+      "artikel": "»Infinite Stratos« erscheint in zwei neuen Blu-ray-Staffelboxen + Design",
+      "quelle": "https://www.anime2you.de/news/1075784/infinite-stratos-neue-blu-ray-staffelboxen/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "All You Need Is Kill",
+      "zitat": "All You Need Is Kill (Anime-Film von STUDIO 4°C; deutscher Kinostart am 29. September 2026 durch KSM Anime)",
+      "art": "kino",
+      "sprache": "unklar",
+      "plattform": "kino",
+      "datum": "2026-09-29",
+      "uhrzeit": null,
+      "anbieter": "KSM Anime",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [],
+      "artikelId": "1076080",
+      "artikel": "Oscars 2027: Sieben Anime-Filme haben Chance auf begehrten Preis",
+      "quelle": "https://www.anime2you.de/news/1076080/sieben-anime-im-rennen-fuer-oscars-2027/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "Cosmic Princess Kaguya!",
+      "zitat": "Cosmic Princess Kaguya! (Original-Film von Studio Chromato und Studio Colorido; seit 22. Januar 2026 auf Netflix)",
+      "art": "start",
+      "sprache": "unklar",
+      "plattform": "netflix",
+      "datum": "2026-01-22",
+      "uhrzeit": null,
+      "anbieter": "Netflix",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": "„seit“ kann Katalogaufnahme statt Starttag meinen.",
+      "wochentag": "Donnerstag",
+      "warnungen": [],
+      "artikelId": "1076080",
+      "artikel": "Oscars 2027: Sieben Anime-Filme haben Chance auf begehrten Preis",
+      "quelle": "https://www.anime2you.de/news/1076080/sieben-anime-im-rennen-fuer-oscars-2027/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "Die letzte Blüte",
+      "zitat": "Die letzte Blüte (Original-Film von Studio CLAP; Disc-Release durch KSM Anime am 28. Januar 2027)",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2027-01-28",
+      "uhrzeit": null,
+      "anbieter": "KSM Anime",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [],
+      "artikelId": "1076080",
+      "artikel": "Oscars 2027: Sieben Anime-Filme haben Chance auf begehrten Preis",
+      "quelle": "https://www.anime2you.de/news/1076080/sieben-anime-im-rennen-fuer-oscars-2027/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "Mobile Suit Gundam Hathaway: The Sorcery of Nymph Circe",
+      "zitat": "Mobile Suit Gundam Hathaway: The Sorcery of Nymph Circe (Zweiter Teil der »Gundam Hathaway«-Trilogie von Sunrise; seit 31. August 2026 auf Netflix)",
+      "art": "start",
+      "sprache": "unklar",
+      "plattform": "netflix",
+      "datum": "2026-08-31",
+      "uhrzeit": null,
+      "anbieter": "Netflix",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": "„seit“ kann Katalogaufnahme statt Starttag meinen.",
+      "wochentag": "Montag",
+      "warnungen": [],
+      "artikelId": "1076080",
+      "artikel": "Oscars 2027: Sieben Anime-Filme haben Chance auf begehrten Preis",
+      "quelle": "https://www.anime2you.de/news/1076080/sieben-anime-im-rennen-fuer-oscars-2027/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "The Ribbon Hero",
+      "zitat": "The Ribbon Hero (Animationsfilm von OUTLINE; seit 8. August 2026 auf Netflix)",
+      "art": "start",
+      "sprache": "unklar",
+      "plattform": "netflix",
+      "datum": "2026-08-08",
+      "uhrzeit": null,
+      "anbieter": "Netflix",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": "„seit“ kann Katalogaufnahme statt Starttag meinen.",
+      "wochentag": "Samstag",
+      "warnungen": [],
+      "artikelId": "1076080",
+      "artikel": "Oscars 2027: Sieben Anime-Filme haben Chance auf begehrten Preis",
+      "quelle": "https://www.anime2you.de/news/1076080/sieben-anime-im-rennen-fuer-oscars-2027/",
+      "veroeffentlicht": "2026-11-25",
+      "gelesenAm": "2026-11-25"
+    },
+    {
+      "titel": "Pokémon",
+      "zitat": "Die auf jeweils 777 Exemplare limitierten Komplettboxen enthalten zusammen alle 25 Staffeln der ursprünglichen TV-Serie und sollen zwischen dem 18. Dezember 2026 und dem 25. Juni 2027 im monatlichen Rhythmus veröffentlicht werden.",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2026-12-18",
+      "uhrzeit": null,
+      "anbieter": "polyband anime",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": "Acht Generationsboxen erscheinen laut Artikel im monatlichen Rhythmus bis 25. Juni 2027, hier nur der erste Termin erfasst; zugleich letzte Disc-Veröffentlichungen des Franchise von polyband, da die Lizenz nicht mehr verlängert wird.",
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „polyband anime“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076238",
+      "artikel": "Design der acht DVD-Generationsboxen zu »Pokémon« vorgestellt",
+      "quelle": "https://www.anime2you.de/news/1076238/pokemon-dvd-generationsboxen-design/",
+      "veroeffentlicht": "2026-11-26",
+      "gelesenAm": "2026-11-26"
+    },
+    {
+      "titel": "Star Wars: Visionen – Die neunte Jedi",
+      "zitat": "»Star Wars: Visionen – Die neunte Jedi« entstand im Studio Production I.G unter der Regie von Shunsuke Tada, während Kenji Kamiyama als Chief Director fungierte. Die achtteilige Serie knüpft an die beiden zuvor veröffentlichten Kurzfilme an und steht seit dem 5. August 2026 bei Disney+ auf Abruf zur Verfügung.",
+      "art": "start",
+      "sprache": "unklar",
+      "plattform": "disneyplus",
+      "datum": "2026-08-05",
+      "uhrzeit": null,
+      "anbieter": "Disney+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "8",
+      "unsicher": null,
+      "wochentag": "Mittwoch",
+      "warnungen": [],
+      "artikelId": "1075853",
+      "artikel": "Regisseur: »Star Wars«-Anime führte zu Konflikten mit Lucasfilm",
+      "quelle": "https://www.anime2you.de/news/1075853/star-wars-anime-konflikte-mit-lucasfilm/",
+      "veroeffentlicht": "2026-11-26",
+      "gelesenAm": "2026-11-26"
+    },
+    {
+      "titel": "One Piece: Die Schlacht von Alabasta",
+      "zitat": "Mit der dritten Staffel, die den Titel »One Piece: Die Schlacht von Alabasta« trägt, soll im Laufe des Jahres 2027 die Alabasta-Saga abgeschlossen werden.",
+      "art": "ankuendigung",
+      "sprache": "unklar",
+      "plattform": "netflix",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Netflix",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „Netflix“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „netflix“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1075701",
+      "artikel": "»One Piece«-Schöpfer plant offenbar vorzeitiges Ende der Netflix-Serie",
+      "quelle": "https://www.anime2you.de/news/1075701/one-piece-vorzeitiges-ende-der-netflix-serie/",
+      "veroeffentlicht": "2026-11-26",
+      "gelesenAm": "2026-11-26"
+    },
+    {
+      "titel": "Call of the Night",
+      "zitat": "»Call of the Night« – Staffel 1 Episoden: 13 (komplett) Sprache: Deutsch, Japanisch (UT)",
+      "art": "start",
+      "sprache": "deutsch+omu",
+      "plattform": "netflix",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Netflix",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "13",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „Netflix“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „netflix“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076269",
+      "artikel": "Netflix ergänzt sein Anime-Angebot um zwei neue Serien",
+      "quelle": "https://www.anime2you.de/news/1076269/netflix-fool-night-und-mehr/",
+      "veroeffentlicht": "2026-11-26",
+      "gelesenAm": "2026-11-26"
+    },
+    {
+      "titel": "Fool Night",
+      "zitat": "»Fool Night« Episoden: 12 (komplett) Sprache: Deutsch, Japanisch (UT)",
+      "art": "start",
+      "sprache": "deutsch+omu",
+      "plattform": "netflix",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Netflix",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "12",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „Netflix“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „netflix“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076269",
+      "artikel": "Netflix ergänzt sein Anime-Angebot um zwei neue Serien",
+      "quelle": "https://www.anime2you.de/news/1076269/netflix-fool-night-und-mehr/",
+      "veroeffentlicht": "2026-11-26",
+      "gelesenAm": "2026-11-26"
+    },
+    {
+      "titel": "Arte",
+      "zitat": "Arte (Komplettbox) 29.01. Blu-ray",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2027-01-29",
+      "uhrzeit": null,
+      "anbieter": "polyband",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „polyband“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076257",
+      "artikel": "Sechs Disc-Neuheiten von polyband im AKIBA PASS SHOP vorbestellbar",
+      "quelle": "https://www.anime2you.de/news/1076257/akiba-pass-shop-sechs-polyband-neuheiten/",
+      "veroeffentlicht": "2026-11-26",
+      "gelesenAm": "2026-11-26"
+    },
+    {
+      "titel": "Infinite Stratos – Staffel 1",
+      "zitat": "Infinite Stratos – Staffel 1 (Komplettbox) 29.01. Blu-ray",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2027-01-29",
+      "uhrzeit": null,
+      "anbieter": "polyband",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „polyband“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076257",
+      "artikel": "Sechs Disc-Neuheiten von polyband im AKIBA PASS SHOP vorbestellbar",
+      "quelle": "https://www.anime2you.de/news/1076257/akiba-pass-shop-sechs-polyband-neuheiten/",
+      "veroeffentlicht": "2026-11-26",
+      "gelesenAm": "2026-11-26"
+    },
+    {
+      "titel": "Infinite Stratos – Staffel 2",
+      "zitat": "Infinite Stratos – Staffel 2 (Komplettbox) 29.01. Blu-ray",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2027-01-29",
+      "uhrzeit": null,
+      "anbieter": "polyband",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „polyband“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076257",
+      "artikel": "Sechs Disc-Neuheiten von polyband im AKIBA PASS SHOP vorbestellbar",
+      "quelle": "https://www.anime2you.de/news/1076257/akiba-pass-shop-sechs-polyband-neuheiten/",
+      "veroeffentlicht": "2026-11-26",
+      "gelesenAm": "2026-11-26"
+    },
+    {
+      "titel": "Kill Blue",
+      "zitat": "Kill Blue – Vol. 1 (Limited Edition mit Sammelschuber und Magnet-Sticker) 29.01. Blu-ray",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2027-01-29",
+      "uhrzeit": null,
+      "anbieter": "polyband",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "1",
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „polyband“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076257",
+      "artikel": "Sechs Disc-Neuheiten von polyband im AKIBA PASS SHOP vorbestellbar",
+      "quelle": "https://www.anime2you.de/news/1076257/akiba-pass-shop-sechs-polyband-neuheiten/",
+      "veroeffentlicht": "2026-11-26",
+      "gelesenAm": "2026-11-26"
+    },
+    {
+      "titel": "SHIBOYUGI: Das Phantom-Mädchen im Spiel des Todes",
+      "zitat": "SHIBOYUGI: Das Phantom-Mädchen im Spiel des Todes – Vol. 1 (Limited Edition mit Sammelschuber) 29.01. Blu-ray",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2027-01-29",
+      "uhrzeit": null,
+      "anbieter": "polyband",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "1",
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „polyband“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076257",
+      "artikel": "Sechs Disc-Neuheiten von polyband im AKIBA PASS SHOP vorbestellbar",
+      "quelle": "https://www.anime2you.de/news/1076257/akiba-pass-shop-sechs-polyband-neuheiten/",
+      "veroeffentlicht": "2026-11-26",
+      "gelesenAm": "2026-11-26"
+    },
+    {
+      "titel": "Shin Chan",
+      "zitat": "Shin Chan – Boxset mit Vol. 9–12 (Limited Edition) 27.11. DVD",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2026-11-27",
+      "uhrzeit": null,
+      "anbieter": "polyband",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "9–12",
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „polyband“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076257",
+      "artikel": "Sechs Disc-Neuheiten von polyband im AKIBA PASS SHOP vorbestellbar",
+      "quelle": "https://www.anime2you.de/news/1076257/akiba-pass-shop-sechs-polyband-neuheiten/",
+      "veroeffentlicht": "2026-11-26",
+      "gelesenAm": "2026-11-26"
     }
   ]
 }

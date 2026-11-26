@@ -1,4 +1,4 @@
-import { useEffect, useRef, useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from 'react'
 import { dienstFetch } from './dienstFetch.ts'
 
 /**
@@ -19,10 +19,11 @@ import { dienstFetch } from './dienstFetch.ts'
  * vorher ging der Abgleich nur vom Gerät zum Server, das zweite Gerät veraltete).
  */
 const TOKEN_KEY = 'newsletterSyncToken'
-const SENT_KEY = 'newsletterSyncSent'
+/* Eigener Schlüssel: der alte `newsletterSyncSent` war der letzte Upload dieses Geräts, nicht der gemeinsame Stand (23.11.2026). */
+const BASIS_KEY = 'favoritenAbgleichBasis'
+const ALT_SENT_KEY = 'newsletterSyncSent'
 const MAIL_KEY = 'newsletterMail'
 const WORKER_URL = import.meta.env?.VITE_NEWSLETTER_API ?? ''
-const DEBOUNCE_MS = 2500
 
 /**
  * Der Verbindungszustand als **globaler** Wert, nicht als Einzelabfrage.
@@ -88,12 +89,14 @@ export function setSyncToken(token: string): void {
 }
 
 /** Stand des letzten erfolgreichen Abgleichs (Basis der Vereinigung); `null` = noch nie. */
-export const gesendeterStand = (): string | null => localStorage.getItem(SENT_KEY)
-export const merkeGesendet = (text: string): void => localStorage.setItem(SENT_KEY, text)
+export const gesendeterStand = (): string | null => localStorage.getItem(BASIS_KEY)
+export const merkeGesendet = (text: string): void => localStorage.setItem(BASIS_KEY, text)
+export const vergissAltenSendestand = (): void => localStorage.removeItem(ALT_SENT_KEY)
 
 export function clearSyncToken(): void {
   localStorage.removeItem(TOKEN_KEY)
-  localStorage.removeItem(SENT_KEY)
+  localStorage.removeItem(BASIS_KEY)
+  localStorage.removeItem(ALT_SENT_KEY)
   localStorage.removeItem(MAIL_KEY)
   melden()
 }
@@ -114,11 +117,12 @@ export function setSyncMail(mail: string): void {
 }
 
 /** Sendet die Liste und meldet, ob der Schlüssel noch gilt. */
-export async function pushFavorites(token: string, favorites: number[]): Promise<number> {
+/** `ersetzen` nur nach Abholen und Vereinigen (Abgleich); sonst vereinigt der Dienst mit seinem Stand. */
+export async function pushFavorites(token: string, favorites: number[], ersetzen: boolean): Promise<number> {
   const res = await dienstFetch(`${WORKER_URL}/favorites`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token, favorites, ak: 1 }),
+    body: JSON.stringify({ token, favorites, ak: 1, ersetzen }),
   })
   const body = (await res.json()) as { ok?: boolean; count?: number; error?: string }
   if (res.status === 404) {
@@ -217,39 +221,6 @@ export async function unsubscribeByToken(token: string): Promise<void> {
  */
 export function speicherSichern(): void {
   void navigator.storage?.persist?.().catch(() => undefined)
-}
-
-/**
- * Überträgt Änderungen an den Favoriten selbsttätig — verzögert, damit
- * mehrere Klicks hintereinander eine Anfrage ergeben statt fünf.
- */
-export function useNewsletterSync(favorites: Set<number>): void {
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
-
-  useEffect(() => {
-    if (!WORKER_URL) return
-    const token = getSyncToken()
-    if (!token) return
-
-    const payload = [...favorites].sort((a, b) => a - b)
-    const fingerprint = payload.join(',')
-    // Kein Netzwerkverkehr, wenn sich nichts geändert hat — das trifft beim
-    // Laden der Seite auf jeden Fall zu.
-    if (localStorage.getItem(SENT_KEY) === fingerprint) return
-
-    clearTimeout(timer.current)
-    timer.current = setTimeout(() => {
-      pushFavorites(token, payload)
-        .then(() => localStorage.setItem(SENT_KEY, fingerprint))
-        .catch(() => {
-          // Stiller Fehlschlag ist hier richtig: Der Nutzer hat einen Stern
-          // gesetzt, nicht den Newsletter bedient. Beim nächsten Versuch
-          // klappt es, und die Mail trägt ohnehin einen Abgleich-Link.
-        })
-    }, DEBOUNCE_MS)
-
-    return () => clearTimeout(timer.current)
-  }, [favorites])
 }
 
 /** Die Einstellungen eines verbundenen Abos. */

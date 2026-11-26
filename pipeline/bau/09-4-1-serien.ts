@@ -49,6 +49,70 @@ function gehoertZurSerie(stream: Title['streams'][number], serie: CrSerie, title
   )
 }
 
+/** Eingabe von `ordneCrSerienZu`. */
+interface CrSerienEingabe {
+  titles: Map<number, Title>
+  crDub: CrDubData
+  usNeinWiderlegt: (serie: { nichtVerfuegbar?: boolean; katalog?: string; seriesId?: string | null; }) => boolean
+  verweiseEntfernt: EntfernterVerweis[]
+}
+
+/** Alle Crunchyroll-Verweise des Datensatzes nach Adresse. */
+function indexiereCrVerweise(titles: Map<number, Title>): Map<string, Title[]> {
+  const nachUrl = new Map<string, Title[]>()
+  for (const title of titles.values()) {
+    for (const stream of title.streams) {
+      if (stream.platform !== 'crunchyroll') continue
+      const liste = nachUrl.get(stream.url) ?? []
+      liste.push(title)
+      nachUrl.set(stream.url, liste)
+    }
+  }
+  return nachUrl
+}
+
+/** Entfernt die Verweise der Serie aus allen betroffenen Titeln und protokolliert sie; liefert die Zahl der entfernten Verweise. */
+function entferneVerweiseDerSerie(serie: CrSerie, nachUrl: Map<string, Title[]>, deutschJa: Set<string>, verweiseEntfernt: EntfernterVerweis[]): number {
+  let verschwunden = 0
+  for (const title of betroffeneTitel(nachUrl, serie)) {
+    const vorher = title.streams.length
+    title.streams = title.streams.filter((s) => !gehoertZurSerie(s, serie, title.id, deutschJa))
+    const weg = vorher - title.streams.length
+    verschwunden += weg
+    if (weg) {
+      verweiseEntfernt.push({
+        titleId: title.id,
+        titel: title.titleDe ?? title.titleEn ?? title.titleRomaji ?? String(title.id),
+        plattform: 'crunchyroll',
+        url: serie.url,
+        seriesId: serie.seriesId ?? null,
+        grund: serie.nichtVerfuegbar
+          ? 'Crunchyroll meldet: Videos dieser Serie nicht mehr verfügbar'
+          : 'deutscher Katalog führt unter dieser Kennung keine einzige Staffel',
+        geprueftAm: serie.geprueftAm ?? null,
+        entferntAm: todayIso(),
+        /* Bleibt der Titel danach ganz ohne Weg? Das gehoert ins Protokoll. */
+        letzterWeg: title.streams.length === 0,
+      })
+    }
+  }
+  return verschwunden
+}
+
+/** Trägt die Urteile der lebenden Serie an den Verweisen ein, die noch kein `dub` haben; liefert die Zahl der belegten Verweise. */
+function belegeVerweiseDerSerie(serie: CrSerie, nachUrl: Map<string, Title[]>, titles: Map<number, Title>): number {
+  let belegt = 0
+  for (const urteil of beurteileMitTeilDeutsch(serie, nachUrl.get(serie.url) ?? [])) {
+    const title = titles.get(urteil.titleId)
+    const stream = title?.streams.find((s) => s.platform === 'crunchyroll' && s.url === serie.url)
+    if (!stream || stream.dub !== undefined) continue
+    stream.dub = urteil.dub
+    if (urteil.dubRanges) stream.dubRanges = urteil.dubRanges
+    belegt++
+  }
+  return belegt
+}
+
 /**
  * Was entfernt wurde, und warum — der Datenbestand behält es.
  *
@@ -62,21 +126,8 @@ function gehoertZurSerie(stream: Title['streams'][number], serie: CrSerie, title
  * und Prüfdatum (`verweiseEntfernt`, auf Funktionsebene, auch spätere
  * Entfernungen schreiben hinein), ausgeliefert wird er nicht.
  */
-export function ordneCrSerienZu({ titles, crDub, usNeinWiderlegt, verweiseEntfernt }: {
-  titles: Map<number, Title>
-  crDub: CrDubData
-  usNeinWiderlegt: (serie: { nichtVerfuegbar?: boolean; katalog?: string; seriesId?: string | null; }) => boolean
-  verweiseEntfernt: EntfernterVerweis[]
-}) {
-    const nachUrl = new Map<string, Title[]>()
-    for (const title of titles.values()) {
-      for (const stream of title.streams) {
-        if (stream.platform !== 'crunchyroll') continue
-        const liste = nachUrl.get(stream.url) ?? []
-        liste.push(title)
-        nachUrl.set(stream.url, liste)
-      }
-    }
+export function ordneCrSerienZu({ titles, crDub, usNeinWiderlegt, verweiseEntfernt }: CrSerienEingabe) {
+    const nachUrl = indexiereCrVerweise(titles)
     const deutschJa = deutschBelegtSerie(crDub)
     let belegt = 0
     let verschwunden = 0
@@ -137,38 +188,10 @@ export function ordneCrSerienZu({ titles, crDub, usNeinWiderlegt, verweiseEntfer
         continue
       }
       if (serie.nichtVerfuegbar || ohneBlock) {
-        for (const title of betroffeneTitel(nachUrl, serie)) {
-          const vorher = title.streams.length
-          title.streams = title.streams.filter((s) => !gehoertZurSerie(s, serie, title.id, deutschJa))
-          const weg = vorher - title.streams.length
-          verschwunden += weg
-          if (weg) {
-            verweiseEntfernt.push({
-              titleId: title.id,
-              titel: title.titleDe ?? title.titleEn ?? title.titleRomaji ?? String(title.id),
-              plattform: 'crunchyroll',
-              url: serie.url,
-              seriesId: serie.seriesId ?? null,
-              grund: serie.nichtVerfuegbar
-                ? 'Crunchyroll meldet: Videos dieser Serie nicht mehr verfügbar'
-                : 'deutscher Katalog führt unter dieser Kennung keine einzige Staffel',
-              geprueftAm: serie.geprueftAm ?? null,
-              entferntAm: todayIso(),
-              /* Bleibt der Titel danach ganz ohne Weg? Das gehoert ins Protokoll. */
-              letzterWeg: title.streams.length === 0,
-            })
-          }
-        }
+        verschwunden += entferneVerweiseDerSerie(serie, nachUrl, deutschJa, verweiseEntfernt)
         continue
       }
-      for (const urteil of beurteileMitTeilDeutsch(serie, nachUrl.get(serie.url) ?? [])) {
-        const title = titles.get(urteil.titleId)
-        const stream = title?.streams.find((s) => s.platform === 'crunchyroll' && s.url === serie.url)
-        if (!stream || stream.dub !== undefined) continue
-        stream.dub = urteil.dub
-        if (urteil.dubRanges) stream.dubRanges = urteil.dubRanges
-        belegt++
-      }
+      belegt += belegeVerweiseDerSerie(serie, nachUrl, titles)
     }
   return { nachUrl, belegt, verschwunden, usNeinOffen }
 }

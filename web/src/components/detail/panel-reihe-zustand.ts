@@ -9,6 +9,5 @@ import type { FranchiseMember } from '@shared/types.ts'
 export function useReiheZustand(reihenTeile: FranchiseMember[]) {
   const reihenSchluessel = reihenTeile[0]?.id ?? 0
   const [reiheSuche, setReiheSuche] = useState<{ reihe: number; text: string }>({ reihe: 0, text: '' })
-  const [reiheOhneOffen, setReiheOhneOffen] = useState<number | null>(null)
-  return { reihenSchluessel, reiheSuche, setReiheSuche, reiheOhneOffen, setReiheOhneOffen }
+  return { reihenSchluessel, reiheSuche, setReiheSuche }
 }

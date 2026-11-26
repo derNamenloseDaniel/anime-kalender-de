@@ -58,7 +58,7 @@ quellen_aufsetzen() {
       case "$datei" in
         data/dub-confirmed.yaml)
           if [ -e "$datei" ]; then
-            node tools/dub-belege-vereinen.mjs "$datei" "$rettung/files/$datei" || {
+            node tools/dub-belege-vereinen.mjs "$datei" "$rettung/files/$datei" </dev/null || {
               echo "FEHLER: dub-belege-vereinen ist gescheitert — eigene Belege wären verloren." >&2
               return 1
             }
@@ -68,7 +68,7 @@ quellen_aufsetzen() {
           ;;
         data/source-health.json)
           if [ -e "$datei" ]; then
-            node tools/health-vereinen.mjs "$datei" "$rettung/files/$datei"
+            node tools/health-vereinen.mjs "$datei" "$rettung/files/$datei" </dev/null
           else
             cp "$rettung/files/$datei" "$datei"
           fi

@@ -1,27 +1,45 @@
 /** Abo-Routen des Newsletter-Dienstes: Anmeldung, Bestätigung, Abgleich, Wiederherstellung, Einstellungen, Abmeldung. */
 import { type Env } from './env.ts'
 import { json, baseUrl } from './antwort.ts'
-import { schreibeFavoriten, leseFavoriten, ladeKennungen, zaehleFavoriten } from './favoriten-kennung.ts'
+import { schreibeFavoriten, leseFavoriten, ladeKennungen, vereinigeGespeichert, zaehleFavoriten } from './favoriten-kennung.ts'
 import { EMAIL_RE } from './anmelde-schutz.ts'
 import { confirmMail, restoreMail, page } from './templates.ts'
 import { sendeUndZaehle } from './mail-zaehler.ts'
 import { fehlerLog } from './werte.ts'
 
+type AnmeldeNutzlast = { email?: string; frequency?: string; platforms?: string[]; favorites?: number[]; ak?: number }
+type Anmeldung = { email: string; frequency: 'daily' | 'weekly'; platforms: string; favorites: ReturnType<typeof schreibeFavoriten> }
+
 export async function handleSubscribe(request: Request, env: Env): Promise<Response> {
-  let payload: { email?: string; frequency?: string; platforms?: string[]; favorites?: number[]; ak?: number }
+  let payload: AnmeldeNutzlast
   try {
     payload = await request.json()
   } catch {
     return json(env, { error: 'Ungültige Anfrage.' }, 400)
   }
 
+  const anmeldung = leseAnmeldung(payload)
+  const { email } = anmeldung
+
+  if (!EMAIL_RE.test(email)) return json(env, { error: 'Diese E-Mail-Adresse sieht nicht gültig aus.' }, 400)
+
+  const { confirmToken, aenderungAmAktiven } = await speichereAnmeldung(request, env, anmeldung)
+  return sendeBestaetigung(request, env, email, confirmToken, aenderungAmAktiven)
+}
+
+function leseAnmeldung(payload: AnmeldeNutzlast): Anmeldung {
   const email = (payload.email ?? '').trim().toLowerCase()
   const frequency = payload.frequency === 'daily' ? 'daily' : 'weekly'
   const platforms = (payload.platforms ?? []).filter((p) => /^[a-z]+$/.test(p)).join(',')
   const favorites = schreibeFavoriten(payload.favorites, payload.ak)
+  return { email, frequency, platforms, favorites }
+}
 
-  if (!EMAIL_RE.test(email)) return json(env, { error: 'Diese E-Mail-Adresse sieht nicht gültig aus.' }, 400)
-
+async function speichereAnmeldung(
+  request: Request,
+  env: Env,
+  { email, frequency, platforms, favorites }: Anmeldung,
+): Promise<{ confirmToken: string; aenderungAmAktiven: boolean }> {
   const confirmToken = crypto.randomUUID()
   const unsubToken = crypto.randomUUID()
   const prefToken = crypto.randomUUID()
@@ -92,7 +110,16 @@ export async function handleSubscribe(request: Request, env: Env): Promise<Respo
       )
       .run()
   }
+  return { confirmToken, aenderungAmAktiven }
+}
 
+async function sendeBestaetigung(
+  request: Request,
+  env: Env,
+  email: string,
+  confirmToken: string,
+  aenderungAmAktiven: boolean,
+): Promise<Response> {
   const confirmUrl = `${baseUrl(request)}/confirm?token=${confirmToken}`
   const mail = confirmMail(confirmUrl, aenderungAmAktiven)
   try {
@@ -470,9 +497,17 @@ export async function handleFavoritesGet(request: Request, env: Env): Promise<Re
  * Nötig, weil die Favoriten im Browser des Nutzers liegen und sich dort
  * jederzeit ändern, ohne dass der Dienst davon erfährt. Jede Mail trägt einen
  * Link hierher; die Seite schickt beim Öffnen ihren aktuellen Stand.
+ * Ersetzt wird nur mit `ersetzen: true` (Abgleich nach Abholen); sonst wird vereinigt.
  */
+async function gespeicherteFavoriten(env: Env, token: string): Promise<string | undefined> {
+  const row = await env.DB.prepare("SELECT favorites FROM subscribers WHERE pref_token = ?1 AND status = 'active'")
+    .bind(token)
+    .first<{ favorites: string }>()
+  return row?.favorites
+}
+
 export async function handleFavorites(request: Request, env: Env): Promise<Response> {
-  let payload: { token?: string; favorites?: number[]; ak?: number }
+  let payload: { token?: string; favorites?: number[]; ak?: number; ersetzen?: boolean }
   try {
     payload = await request.json()
   } catch {
@@ -483,7 +518,8 @@ export async function handleFavorites(request: Request, env: Env): Promise<Respo
   if (!token) return json(env, { error: 'Kein Abgleich-Schlüssel übergeben.' }, 400)
   if (!(await schluesselErneuert(env, token))) return json(env, { error: SCHLUESSEL_UNGUELTIG }, 404)
 
-  const favorites = schreibeFavoriten(payload.favorites, payload.ak)
+  const gesendet = schreibeFavoriten(payload.favorites, payload.ak)
+  const favorites = payload.ersetzen === true ? gesendet : vereinigeGespeichert(await gespeicherteFavoriten(env, token), gesendet)
   const result = await env.DB.prepare(
     "UPDATE subscribers SET favorites = ?1, favorites_at = ?2 WHERE pref_token = ?3 AND status = 'active'",
   )

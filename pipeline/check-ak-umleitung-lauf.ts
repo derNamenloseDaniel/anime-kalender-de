@@ -6,10 +6,10 @@ import assert from 'node:assert/strict'
 
 type Aufruf = { state: unknown; titel: string; adresse: string }
 const g = globalThis as Record<string, unknown>
-const PAARE: [number, number][] = [[5, 9], [-3, -7]]
+const PAARE: number[][] = [[5, 9], [-3, -7]]
 
 /** Setzt die Attrappen, lässt `akUmleitung()` laufen und liefert die replaceState-Aufrufe und die fetch-Adressen. */
-async function lauf(pfad: string, search: string, hash: string, gemerkt: Record<string, string> = {}) {
+async function lauf(pfad: string, search: string, hash: string, gemerkt: Record<string, string> = {}, paare: number[][] = PAARE) {
   const aufrufe: Aufruf[] = []
   const abrufe: string[] = []
   const speicher = new Map(Object.entries(gemerkt))
@@ -22,11 +22,11 @@ async function lauf(pfad: string, search: string, hash: string, gemerkt: Record<
   }
   g.fetch = async (u: string) => {
     abrufe.push(String(u))
-    return { ok: true, status: 200, json: async () => PAARE }
+    return { ok: true, status: 200, json: async () => paare }
   }
   const { akUmleitung } = await import('../web/src/lib/ak-umleitung.ts')
   await akUmleitung()
-  return { aufrufe, abrufe }
+  return { aufrufe, abrufe, speicher }
 }
 
 const pfad = await lauf('/t/5/', '?x=1&y=2', '')
@@ -56,5 +56,19 @@ const liste = await lauf('/', '', '', { favorites: '[5]' })
 assert.equal(liste.aufrufe.length, 0, 'gemerkte Liste: Adresse bleibt')
 assert.equal(liste.abrufe.length, 1, 'gemerkte Liste: Datei wird gelesen')
 
-console.log('check-ak-umleitung-lauf: 7 Fälle grün (Pfad, Basis-Präfix, Hash, Cartoon, unbekannt, fremd, Liste)')
+/* F157: Paare mit Versatz (Horizonte-Staffeln) auf befülltem Speicher; „gesehen bis“ zählt durchlaufend, Favoriten ohne Doppel. */
+const HORIZONTE = [[26469, 14839], [26470, 14839, 45], [26471, 14839, 89]]
+const versatz = await lauf('/', '', '', { gesehenBis: '{"26470":5,"14839":3,"26471":5}', favorites: '[26469,14839]', 'favorites:seit': '{"26470":"2026-11-21"}' }, HORIZONTE)
+assert.equal(versatz.speicher.get('gesehenBis'), '{"14839":94}', 'Versatz: Staffel 2 „5“ = 50, Staffel 3 „5“ = 94, vorhandene 3 — das Maximum bleibt')
+assert.equal(versatz.speicher.get('favorites'), '[14839]', 'Versatz: Favoriten [26469, 14839] → ein Eintrag')
+assert.equal(versatz.speicher.get('favorites:seit'), '{"14839":"2026-11-21"}', 'Versatz: Tage bekommen keinen Versatz')
+assert.equal(versatz.speicher.get('kennung:umleitung'), '3', 'Versatz: Marke zählt die Paare')
+const kaputt = await lauf('/', '', '', { gesehenBis: '[5]', 'favorites:seit': 'null' }, HORIZONTE)
+assert.equal(kaputt.speicher.get('gesehenBis'), '[5]', 'Versatz: eine Liste statt Karte bleibt unangetastet')
+assert.equal(kaputt.speicher.get('favorites:seit'), 'null', 'Versatz: null bleibt unangetastet')
+assert.equal(kaputt.speicher.get('kennung:umleitung'), '3', 'Versatz: kaputte Karten brechen das Umschreiben nicht ab')
+const zweiter = await lauf('/', '', '', { gesehenBis: '{"14839":94}', 'kennung:umleitung': '3' }, HORIZONTE)
+assert.equal(zweiter.speicher.get('gesehenBis'), '{"14839":94}', 'Versatz: zweiter Lauf ändert nichts mehr')
+
+console.log('check-ak-umleitung-lauf: 10 Fälle grün (Pfad, Basis-Präfix, Hash, Cartoon, unbekannt, fremd, Liste, Versatz, kaputte Karte, zweiter Lauf)')
 process.exit(0)

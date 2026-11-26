@@ -15,14 +15,11 @@ import { sichereSchnellmessung } from './schnellmesser.ts'
 import { handleVerlauf } from './verlauf.ts'
 import { ladeKennungen } from './favoriten-kennung.ts'
 import { anbieterName, type PlatformId, type Release, type ReleaseEvent } from '../../shared/types.ts'
-import { addDays, weekdayIndex } from '../../shared/time.ts'
+import { addDays } from '../../shared/time.ts'
 import { handleFavoritenFeed } from './favoriten-feed.ts'
-import { sendeUndZaehle, tagesstand } from './mail-zaehler.ts'
-import { checkAllSites, confirmOutages } from './monitor.ts'
-import { schreibeStaende, schreibeVerlauf } from './monitor-speicher.ts'
-import { ladeMesswerte } from './monitor-statistik.ts'
+import { tagesstand } from './mail-zaehler.ts'
+import { istWochenSlot, meldeStoerung, meldeWoche, pruefeMitNachpruefung, schreibeLauf, type MeldeKontext } from './monitor-lauf.ts'
 import {
-  BRAND, outageMail, weeklyStatusMail,
   type NeuMitSynchro,
   type ReleaseLink
 } from './templates.ts'
@@ -245,68 +242,9 @@ export async function runMonitor(
   force?: 'alert' | 'weekly',
 ): Promise<string> {
   const { hour, iso } = berlinParts(now)
-  const ersterLauf = await checkAllSites()
-
-  // Rote Seiten sofort nachprüfen, statt bis zum nächsten Stundenlauf zu warten.
-  // Erst was auch danach noch schweigt, gilt als Störung — und der Stand in der
-  // Datenbank ist dann schon der bestätigte, damit `/status` und das
-  // Admin-Panel keinen Aussetzer als Ausfall zeigen.
-  const bestaetigt = await confirmOutages(ersterLauf.filter((r) => !r.ok))
-  const bestaetigteUrls = new Set(bestaetigt.map((r) => r.site.url))
-  const results = ersterLauf.map((r) => {
-    if (r.ok || bestaetigteUrls.has(r.site.url)) return r
-    // Hat sich beim Nachprüfen erholt: als erreichbar führen, aber den Grund
-    // behalten — im Wochenbericht ist „war kurz weg" eine nützliche Auskunft.
-    return { ...r, ok: true, reason: `kurzzeitig: ${r.reason ?? 'nicht erreichbar'}` }
-  })
+  const { ersterLauf, results } = await pruefeMitNachpruefung()
   const nowIso = now.toISOString()
-
-  // Vorherige Stände laden, um „seit wann weg" beantworten zu können.
-  const { results: previous } = await env.DB.prepare(
-    'SELECT url, last_ok_at, fail_streak FROM site_status',
-  ).all<{ url: string; last_ok_at: string | null; fail_streak: number }>()
-  const before = new Map((previous ?? []).map((row) => [row.url, row]))
-
-  const lines = results.map((r) => {
-    const old = before.get(r.site.url)
-    return {
-      name: r.site.name,
-      url: r.site.url,
-      ok: r.ok,
-      reason: r.reason,
-      ms: r.ms,
-      downSince: r.ok ? undefined : (old?.last_ok_at ?? undefined),
-      // Derselbe Wert, der gleich in die Datenbank geschrieben wird — hier
-      // schon gebraucht, weil die Alarmschwelle daran hängt.
-      failStreak: r.ok ? 0 : (old?.fail_streak ?? 0) + 1,
-    }
-  })
-
-  await schreibeStaende(
-    env.DB,
-    results,
-    lines.map((l) => l.failStreak),
-    new Map([...before].map(([url, row]) => [url, row.last_ok_at])),
-    nowIso,
-  )
-  await schreibeVerlauf(env.DB, results, nowIso)
-
-  // Seiten, die aus SITES entfernt wurden, blieben als Zeile stehen und damit
-  // auf ihrem letzten Stand — meist rot, weil sie ja wegen eines Fehlers
-  // herausgenommen wurden. In /status und im Admin-Panel sah das aus wie eine
-  // dauerhafte Störung, obwohl gar nichts mehr geprüft wird.
-  const known = results.map((r) => r.site.url)
-  // Die Wächter-Liste ist fest im Code, leer werden kann sie nur durch einen
-  // Fehler — dann aber würde `NOT IN ()` als SQL-Syntaxfehler den ganzen Lauf
-  // abbrechen und aus einem Versehen einen Ausfall der Überwachung machen.
-  // Und ein Aufräumen ohne bekannte Seiten hieße: alles löschen.
-  if (known.length) {
-    await env.DB.prepare(
-      `DELETE FROM site_status WHERE url NOT IN (${known.map((_, i) => `?${i + 1}`).join(', ')})`,
-    )
-      .bind(...known)
-      .run()
-  }
+  const lines = await schreibeLauf(env.DB, results, nowIso)
 
   // `results` trägt bereits das Ergebnis nach der Nachprüfung — was hier rot
   // ist, war es über anderthalb Minuten und drei Versuche hinweg.
@@ -326,58 +264,17 @@ export async function runMonitor(
     `${confirmed.length}/${lines.length} gestört` +
       (erholt ? `, ${erholt} nur kurzzeitig (beim Nachprüfen wieder erreichbar)` : ''),
   ]
+  const kontext: MeldeKontext = { env, to, lines, confirmed, iso, nowIso, force }
 
-  // --- Störungsmeldung, höchstens einmal am Tag ------------------------------
+  // Störungsmeldung, höchstens einmal am Tag.
   if (confirmed.length > 0 || force === 'alert') {
-    const key = `alert:${iso}`
-    const already = force ? null : await env.DB.prepare('SELECT run_key FROM send_log WHERE run_key = ?1').bind(key).first()
-    if (already) {
-      log.push('Störungsmail heute bereits verschickt')
-    } else {
-      // Ohne bestätigte Störung kann nur ein erzwungener Lauf hier landen —
-      // dann geht eine Testmail mit der ersten Seite als Beispiel hinaus, und
-      // die Vorlage benennt das auch so.
-      const report = confirmed.length ? confirmed : lines.slice(0, 1)
-      const mail = outageMail(report, lines.length, env.SITE_URL, lines.length - confirmed.length)
-      await sendeUndZaehle(env, { to, ...mail, fromName: BRAND.monitor.name })
-      if (!force) {
-        await env.DB.prepare(
-          'INSERT OR REPLACE INTO send_log (run_key, sent_at, recipients) VALUES (?1, ?2, 1)',
-        )
-          .bind(key, nowIso)
-          .run()
-      }
-      log.push('Störungsmail verschickt')
-    }
+    log.push(await meldeStoerung(kontext))
   } else if (erholt > 0) {
     log.push(`${erholt} kurzzeitig rot, beim Nachprüfen wieder erreichbar — keine Mail`)
   }
 
-  // --- Wochenübersicht, montags ---------------------------------------------
-  const sendHour = Number(env.SEND_HOUR_BERLIN || '7')
-  const isWeeklySlot = weekdayIndex(iso) === 0 && hour === sendHour
-  if (isWeeklySlot || force === 'weekly') {
-    // Kalenderwoche als Schlüssel: so kommt die Mail auch dann genau einmal,
-    // wenn der Cron in derselben Stunde mehrfach feuert.
-    const [y, m, d] = iso.split('-').map(Number)
-    const week = Math.floor((Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 1)) / (7 * 86400000)) + 1
-    const key = `weekly-status:${y}-W${String(week).padStart(2, '0')}`
-    const already = force ? null : await env.DB.prepare('SELECT run_key FROM send_log WHERE run_key = ?1').bind(key).first()
-    if (already) {
-      log.push('Wochenübersicht diese Woche bereits verschickt')
-    } else {
-      const mail = weeklyStatusMail(lines, env.SITE_URL, await ladeMesswerte(env.DB, nowIso))
-      await sendeUndZaehle(env, { to, ...mail, fromName: BRAND.monitor.name })
-      if (!force) {
-        await env.DB.prepare(
-          'INSERT OR REPLACE INTO send_log (run_key, sent_at, recipients) VALUES (?1, ?2, 1)',
-        )
-          .bind(key, nowIso)
-          .run()
-      }
-      log.push('Wochenübersicht verschickt')
-    }
-  }
+  // Wochenübersicht, montags.
+  if (istWochenSlot(env, iso, hour, force)) log.push(await meldeWoche(kontext))
 
   return log.join('; ')
 }
@@ -506,57 +403,63 @@ async function handleNetzfund(request: Request, env: Env): Promise<Response> {
  * anders lief als vorgesehen — nicht jede geprüfte Folge.
  */
 async function handleVorfall(request: Request, env: Env): Promise<Response> {
-  const offen = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-  const antwort = (body: unknown, status = 200) =>
-    new Response(JSON.stringify(body), { status, headers: offen })
+  if (request.method === 'GET') return vorfallLesen(request, env)
+  if (request.method === 'DELETE') return vorfallLoeschen(request, env)
+  if (request.method !== 'POST') return vorfallAntwort({ error: 'GET, POST oder DELETE erwartet' }, 405)
+  return vorfallMelden(request, env)
+}
 
-  if (request.method === 'GET') {
-    const token = tokenAusKopf(request)
-    if (!env.LAUF_TOKEN || !tokenGleich(token, env.LAUF_TOKEN)) return antwort({ error: 'Nicht erlaubt' }, 403)
-    const { results } = await env.DB.prepare(
-      `SELECT id, plattform, art, url, reihe, folge_nr, staffel, text, version, gemeldet_am
+const VORFALL_KOPF = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+const vorfallAntwort = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), { status, headers: VORFALL_KOPF })
+
+const vorfallErlaubt = (request: Request, env: Env) =>
+  Boolean(env.LAUF_TOKEN) && tokenGleich(tokenAusKopf(request), env.LAUF_TOKEN)
+
+async function vorfallLesen(request: Request, env: Env): Promise<Response> {
+  if (!vorfallErlaubt(request, env)) return vorfallAntwort({ error: 'Nicht erlaubt' }, 403)
+  const { results } = await env.DB.prepare(
+    `SELECT id, plattform, art, url, reihe, folge_nr, staffel, text, version, gemeldet_am
          FROM vorfall ORDER BY gemeldet_am DESC LIMIT 500`,
-    ).all()
-    return antwort({ vorfaelle: results ?? [] })
-  }
+  ).all()
+  return vorfallAntwort({ vorfaelle: results ?? [] })
+}
 
-  /*
-    **Löschen gehört dazu.** Ein abgeholter Vorfall, der liegen bleibt, taucht
-    beim nächsten Lauf wieder auf und sieht aus wie ein neuer — dieselbe Falle,
-    die `/pruefung` mit seinem DELETE vermeidet.
-  */
-  if (request.method === 'DELETE') {
-    const token = tokenAusKopf(request)
-    if (!env.LAUF_TOKEN || !tokenGleich(token, env.LAUF_TOKEN)) return antwort({ error: 'Nicht erlaubt' }, 403)
-    let ids: number[] = []
-    try {
-      const daten = (await request.json()) as { ids?: unknown }
-      ids = Array.isArray(daten.ids) ? daten.ids.map(Number).filter(Number.isFinite) : []
-    } catch {
-      return antwort({ error: 'Kein gültiges JSON' }, 400)
-    }
-    if (!ids.length) return antwort({ ok: true, geloescht: 0 })
-    const platzhalter = ids.map((_, i) => `?${i + 1}`).join(', ')
-    await env.DB.prepare(`DELETE FROM vorfall WHERE id IN (${platzhalter})`)
-      .bind(...ids)
-      .run()
-    return antwort({ ok: true, geloescht: ids.length })
+/*
+  **Löschen gehört dazu.** Ein abgeholter Vorfall, der liegen bleibt, taucht
+  beim nächsten Lauf wieder auf und sieht aus wie ein neuer — dieselbe Falle,
+  die `/pruefung` mit seinem DELETE vermeidet.
+*/
+async function vorfallLoeschen(request: Request, env: Env): Promise<Response> {
+  if (!vorfallErlaubt(request, env)) return vorfallAntwort({ error: 'Nicht erlaubt' }, 403)
+  let ids: number[] = []
+  try {
+    const daten = (await request.json()) as { ids?: unknown }
+    ids = Array.isArray(daten.ids) ? daten.ids.map(Number).filter(Number.isFinite) : []
+  } catch {
+    return vorfallAntwort({ error: 'Kein gültiges JSON' }, 400)
   }
+  if (!ids.length) return vorfallAntwort({ ok: true, geloescht: 0 })
+  const platzhalter = ids.map((_, i) => `?${i + 1}`).join(', ')
+  await env.DB.prepare(`DELETE FROM vorfall WHERE id IN (${platzhalter})`)
+    .bind(...ids)
+    .run()
+  return vorfallAntwort({ ok: true, geloescht: ids.length })
+}
 
-  if (request.method !== 'POST') return antwort({ error: 'GET, POST oder DELETE erwartet' }, 405)
-  const token = tokenAusKopf(request)
-  if (!env.LAUF_TOKEN || !tokenGleich(token, env.LAUF_TOKEN)) return antwort({ error: 'Nicht erlaubt' }, 403)
+async function vorfallMelden(request: Request, env: Env): Promise<Response> {
+  if (!vorfallErlaubt(request, env)) return vorfallAntwort({ error: 'Nicht erlaubt' }, 403)
 
   let daten: Record<string, unknown>
   try {
     daten = (await request.json()) as Record<string, unknown>
   } catch {
-    return antwort({ error: 'Kein gültiges JSON' }, 400)
+    return vorfallAntwort({ error: 'Kein gültiges JSON' }, 400)
   }
 
   const art = String(daten.art ?? '').slice(0, 40)
   const plattform = String(daten.plattform ?? '').slice(0, 20)
-  if (!art || !plattform) return antwort({ error: 'art und plattform fehlen' }, 400)
+  if (!art || !plattform) return vorfallAntwort({ error: 'art und plattform fehlen' }, 400)
 
   /*
     **Dieselbe Sache am selben Tag zählt einmal.** Ein Durchlauf über zwölf
@@ -571,7 +474,7 @@ async function handleVorfall(request: Request, env: Env): Promise<Response> {
   )
     .bind(art, plattform, String(daten.url ?? '').slice(0, 500), tag)
     .first()
-  if (schon) return antwort({ ok: true, doppelt: true })
+  if (schon) return vorfallAntwort({ ok: true, doppelt: true })
 
   await env.DB.prepare(
     `INSERT INTO vorfall (plattform, art, url, reihe, folge_nr, staffel, text, version, gemeldet_am)
@@ -591,25 +494,101 @@ async function handleVorfall(request: Request, env: Env): Promise<Response> {
     .run()
 
   const anzahl = await env.DB.prepare('SELECT COUNT(*) AS n FROM vorfall').first<{ n: number }>()
-  return antwort({ ok: true, vorfaelle: anzahl?.n ?? 0 })
+  return vorfallAntwort({ ok: true, vorfaelle: anzahl?.n ?? 0 })
+}
+
+function optionenAntwort(url: URL, env: Env): Response {
+  // Der Laufstatus wird auch aus einer Datei gelesen (Ursprung `null`) — daher `*` für diese Pfade.
+  if (OFFENE_PFADE.includes(url.pathname)) {
+    return new Response(null, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, X-Lauf-Token',
+      },
+    })
+  }
+  return new Response(null, { headers: cors(env) })
+}
+
+/* Der Service Worker holt beim Push den Text ab — einmal, danach ist er weg. */
+async function pushNachricht(request: Request, env: Env): Promise<Response> {
+  const endpoint = new URL(request.url).searchParams.get('endpoint') ?? ''
+  const zeile = await env.DB.prepare('SELECT offen, offen_ziel FROM push_abo WHERE endpoint = ?1')
+    .bind(endpoint)
+    .first<{ offen: string | null; offen_ziel: string | null }>()
+  if (zeile?.offen)
+    await env.DB.prepare('UPDATE push_abo SET offen = NULL, offen_ziel = NULL WHERE endpoint = ?1')
+      .bind(endpoint)
+      .run()
+  /* Das Ziel steht seit dem 23.09.2026 daneben: Eine einzelne Meldung öffnet ihr Panel. */
+  return json(env, { text: zeile?.offen ?? null, ziel: zeile?.offen_ziel ?? null })
+}
+
+async function debugDigest(request: Request, env: Env, url: URL): Promise<Response> {
+  // Versand von Hand auslösen. Nur mit dem Secret DEBUG_TOKEN; ohne Secret abgeschaltet.
+  const token = tokenAusKopf(request)
+  if (!env.DEBUG_TOKEN || !tokenGleich(token, env.DEBUG_TOKEN)) {
+    return json(env, { error: 'Nicht erlaubt' }, 403)
+  }
+  const frequency = url.searchParams.get('frequency') === 'weekly' ? 'weekly' : 'daily'
+  try {
+    const result = await runDigest(env, new Date(), frequency)
+    return json(env, { ok: true, result })
+  } catch (err) {
+    // Ohne Auffangnetz quittiert Cloudflare das mit einem nackten
+    // „error code: 1101", aus dem niemand die Ursache erkennt.
+    return json(env, { ok: false, error: (err as Error).message }, 500)
+  }
+}
+
+async function debugMonitor(request: Request, env: Env, url: URL): Promise<Response> {
+  if (!env.DEBUG_TOKEN || !tokenGleich(tokenAusKopf(request), env.DEBUG_TOKEN)) return json(env, { error: 'Nicht erlaubt' }, 403)
+  const mode = url.searchParams.get('mail')
+  try {
+    const result = await runMonitor(
+      env,
+      new Date(),
+      mode === 'alert' || mode === 'weekly' ? mode : undefined,
+    )
+    return json(env, { ok: true, result })
+  } catch (err) {
+    return json(env, { ok: false, error: (err as Error).message }, 500)
+  }
+}
+
+async function statusAntwort(env: Env): Promise<Response> {
+  const { results } = await env.DB.prepare(
+    'SELECT name, url, ok, status, ms, reason, checked_at, last_ok_at, fail_streak FROM site_status ORDER BY ok, name',
+  ).all()
+  return json(env, { sites: results ?? [] })
+}
+
+/*
+  **Der Kanal, auf dem die Statusanzeige zuhört.** Kein Token: Hier fließt nur die Nachricht
+  „es hat sich etwas geändert", keine Daten — die holt die Anzeige über ihre Endpunkte.
+*/
+async function ereignisKanal(request: Request, env: Env): Promise<Response> {
+  if (!env.EREIGNISSE) return json(env, { error: 'Kein Ereignis-Kanal eingerichtet' }, 501)
+  if (request.headers.get('Upgrade') !== 'websocket') {
+    return json(env, { error: 'WebSocket erwartet' }, 426)
+  }
+  const stub = env.EREIGNISSE.get(env.EREIGNISSE.idFromName('status'))
+  return stub.fetch(request)
+}
+
+async function gesundheit(env: Env, ctx: ExecutionContext): Promise<Response> {
+  ctx.waitUntil(sichereSchnellmessung(env.SCHNELLMESSER).catch(() => {})) // stellt den Taktgeber der Schnellmessung sicher
+  const count = await env.DB.prepare(
+    "SELECT COUNT(*) AS n FROM subscribers WHERE status = 'active'",
+  ).first<{ n: number }>()
+  return json(env, { ok: true, activeSubscribers: count?.n ?? 0, heute: await tagesstand(env), newsletter: await digestStand(env, new Date()) })
 }
 
 async function verteile(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url)
 
-    if (request.method === 'OPTIONS') {
-      // Der Laufstatus wird auch aus einer Datei gelesen (Ursprung `null`) — daher `*` für diese Pfade.
-      if (OFFENE_PFADE.includes(url.pathname)) {
-        return new Response(null, {
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, X-Lauf-Token',
-          },
-        })
-      }
-      return new Response(null, { headers: cors(env) })
-    }
+    if (request.method === 'OPTIONS') return optionenAntwort(url, env)
 
     switch (url.pathname) {
       case '/subscribe':
@@ -643,19 +622,8 @@ async function verteile(request: Request, env: Env, ctx: ExecutionContext): Prom
       case '/push/abo':
         if (request.method !== 'POST') return json(env, { error: 'POST erwartet' }, 405)
         return handlePushAbo(request, env, imRahmen, (body, status) => json(env, body, status))
-      case '/push/nachricht': {
-        /* Der Service Worker holt beim Push den Text ab — einmal, danach ist er weg. */
-        const endpoint = new URL(request.url).searchParams.get('endpoint') ?? ''
-        const zeile = await env.DB.prepare('SELECT offen, offen_ziel FROM push_abo WHERE endpoint = ?1')
-          .bind(endpoint)
-          .first<{ offen: string | null; offen_ziel: string | null }>()
-        if (zeile?.offen)
-          await env.DB.prepare('UPDATE push_abo SET offen = NULL, offen_ziel = NULL WHERE endpoint = ?1')
-            .bind(endpoint)
-            .run()
-        /* Das Ziel steht seit dem 23.09.2026 daneben: Eine einzelne Meldung öffnet ihr Panel. */
-        return json(env, { text: zeile?.offen ?? null, ziel: zeile?.offen_ziel ?? null })
-      }
+      case '/push/nachricht':
+        return pushNachricht(request, env)
       case '/feed-token':
         if (request.method !== 'POST') return json(env, { error: 'POST erwartet' }, 405)
         return handleFeedToken(request, env)
@@ -672,42 +640,12 @@ async function verteile(request: Request, env: Env, ctx: ExecutionContext): Prom
         // Der Umstell-Knopf aus der Mail. Setzt den Rhythmus und verbindet den
         // Browser gleich mit — ein Klick, beide Wirkungen.
         return handleRhythmus(request, env)
-      case '/debug/digest': {
-        // Versand von Hand auslösen. Nur mit dem Secret DEBUG_TOKEN; ohne Secret abgeschaltet.
-        const token = tokenAusKopf(request)
-        if (!env.DEBUG_TOKEN || !tokenGleich(token, env.DEBUG_TOKEN)) {
-          return json(env, { error: 'Nicht erlaubt' }, 403)
-        }
-        const frequency = url.searchParams.get('frequency') === 'weekly' ? 'weekly' : 'daily'
-        try {
-          const result = await runDigest(env, new Date(), frequency)
-          return json(env, { ok: true, result })
-        } catch (err) {
-          // Ohne Auffangnetz quittiert Cloudflare das mit einem nackten
-          // „error code: 1101", aus dem niemand die Ursache erkennt.
-          return json(env, { ok: false, error: (err as Error).message }, 500)
-        }
-      }
-      case '/debug/monitor': {
-        if (!env.DEBUG_TOKEN || !tokenGleich(tokenAusKopf(request), env.DEBUG_TOKEN)) return json(env, { error: 'Nicht erlaubt' }, 403)
-        const mode = url.searchParams.get('mail')
-        try {
-          const result = await runMonitor(
-            env,
-            new Date(),
-            mode === 'alert' || mode === 'weekly' ? mode : undefined,
-          )
-          return json(env, { ok: true, result })
-        } catch (err) {
-          return json(env, { ok: false, error: (err as Error).message }, 500)
-        }
-      }
-      case '/status': {
-        const { results } = await env.DB.prepare(
-          'SELECT name, url, ok, status, ms, reason, checked_at, last_ok_at, fail_streak FROM site_status ORDER BY ok, name',
-        ).all()
-        return json(env, { sites: results ?? [] })
-      }
+      case '/debug/digest':
+        return debugDigest(request, env, url)
+      case '/debug/monitor':
+        return debugMonitor(request, env, url)
+      case '/status':
+        return statusAntwort(env)
       case '/verlauf':
         return json(env, await handleVerlauf(env))
       case '/cr-zugang':
@@ -722,30 +660,15 @@ async function verteile(request: Request, env: Env, ctx: ExecutionContext): Prom
       */
       case '/vorfall':
         return handleVorfall(request, env)
-      /*
-        **Der Kanal, auf dem die Statusanzeige zuhört.** Kein Token: Hier fließt nur die Nachricht
-        „es hat sich etwas geändert", keine Daten — die holt die Anzeige über ihre Endpunkte.
-      */
-      case '/ereignisse': {
-        if (!env.EREIGNISSE) return json(env, { error: 'Kein Ereignis-Kanal eingerichtet' }, 501)
-        if (request.headers.get('Upgrade') !== 'websocket') {
-          return json(env, { error: 'WebSocket erwartet' }, 426)
-        }
-        const stub = env.EREIGNISSE.get(env.EREIGNISSE.idFromName('status'))
-        return stub.fetch(request)
-      }
+      case '/ereignisse':
+        return ereignisKanal(request, env)
       case '/pruefung': {
         return await handlePruefung(request, env, ctx)
       }
       case '/lauf':
         return handleLauf(request, env, ctx)
-      case '/health': {
-        ctx.waitUntil(sichereSchnellmessung(env.SCHNELLMESSER).catch(() => {})) // stellt den Taktgeber der Schnellmessung sicher
-        const count = await env.DB.prepare(
-          "SELECT COUNT(*) AS n FROM subscribers WHERE status = 'active'",
-        ).first<{ n: number }>()
-        return json(env, { ok: true, activeSubscribers: count?.n ?? 0, heute: await tagesstand(env), newsletter: await digestStand(env, new Date()) })
-      }
+      case '/health':
+        return gesundheit(env, ctx)
       default:
         return json(env, { error: 'Unbekannter Pfad' }, 404)
     }

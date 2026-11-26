@@ -29,7 +29,9 @@ pipeline/check-deutsche-folgenzahl-bestand.ts
 pipeline/check-disc-anisearch-bestand.ts
 pipeline/check-disc-archiv-bestand.ts
 pipeline/check-disc-handlinks-bestand.ts
+pipeline/check-disc-ohne-lesequelle-bestand.ts
 pipeline/check-disc-suchlinks-bestand.ts
+pipeline/check-disc-termin-frische-bestand.ts
 pipeline/check-eigene-titel-bestand.ts
 pipeline/check-eingabe-stand-bestand.ts
 pipeline/check-empfehlung-bestand.ts
@@ -40,6 +42,7 @@ pipeline/check-finale-bestand.ts
 pipeline/check-folge-zwoelf-hinweis-bestand.ts
 pipeline/check-folgen-erschienen-bestand.ts
 pipeline/check-folgen-nummern-bestand.ts
+pipeline/check-folgen-vor-start-bestand.ts
 pipeline/check-folgenflaggen-bestand.ts
 pipeline/check-folgentitel-sprache-bestand.ts
 pipeline/check-folgenzahl-kennzeichnung-bestand.ts
@@ -50,6 +53,7 @@ pipeline/check-handbeleg-note-asin-bestand.ts
 pipeline/check-handbeleg-notizseite-bestand.ts
 pipeline/check-handbeleg-staffelzaehlung-bestand.ts
 pipeline/check-handlung-eigen-bestand.ts
+pipeline/check-handlung-quelle-bestand.ts
 pipeline/check-herkunftsland-bestand.ts
 pipeline/check-horizonte-staffeln-bestand.ts
 pipeline/check-interne-angaben-bestand.ts
@@ -80,12 +84,15 @@ pipeline/check-pokemon-staffeln-bestand.ts
 pipeline/check-prime-gleiche-gti-bestand.ts
 pipeline/check-prime-teilseiten-bestand.ts
 pipeline/check-reihen-namen-bestand.ts
+pipeline/check-reihen-reiter-bestand.ts
 pipeline/check-reihen-teilname-bestand.ts
 pipeline/check-remake-zaehlung-bestand.ts
 pipeline/check-saison-deutsch-bestand.ts
 pipeline/check-sammeleintrag-synchro-bestand.ts
 pipeline/check-schwester-shop-bestand.ts
 pipeline/check-shop-wege-falsches-ziel-bestand.ts
+pipeline/check-staffel-folge-tv-schleife.ts
+pipeline/check-staffel-ohne-seite-bestand.ts
 pipeline/check-staffel-von-hand-bestand.ts
 pipeline/check-staffelquelle-widerspruch-bestand.ts
 pipeline/check-staffelzaehlung-bestand.ts
@@ -95,6 +102,7 @@ pipeline/check-synchro-widerspruch-bestand.ts
 pipeline/check-telekom-annahme-bestand.ts
 pipeline/check-tmdb-ablauf-bestand.ts
 pipeline/check-tmdb-hauptserie-bestand.ts
+pipeline/check-toggo-seiten-bestand.ts
 pipeline/check-verweise-von-hand-bestand.ts
 pipeline/check-woche-groesse-bestand.ts
 pipeline/check-wochen-datei-bestand.ts

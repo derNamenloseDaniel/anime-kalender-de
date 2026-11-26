@@ -1,0 +1,5 @@
+# Nachtrag zur Prüfung (Kopf 1545caf82)
+
+- Befund 1 (PR-Datenbau rot, `joynHinterTv` schlägt an) -> Ursache: Der Wächter läuft in `pruefeErgebnis` (Phase 10, `10-termine.ts`), `leiteJoynAusTv` lief erst in Phase 13 und kam zu spät; jetzt ruft Phase 10 die Ableitung vor dem Auffalten der Ereignisse und vor `pruefeErgebnis`, `13-schreiben.ts` ruft sie nicht mehr (Commit 805f612df). Beleg: check-joyn-folgen-aus-tv, check-joyn-hand-tv, check-joyn-termine-belegt grün, `tsc --noEmit -p .` ohne Fehler, check:logic 858/858 grün; der volle Datenbau ist lokal nicht möglich (kein data/cache), der PR-Datenbau muss ihn bestätigen.
+- Befund 2 (Verdrahtungstest fehlt) -> `check-joyn-folgen-aus-tv.ts` liest `rolleTermineAus` über `unbedingteAufrufe` und verlangt `leiteJoynAusTv(releases)` vor `pruefeErgebnis` sowie keinen Aufruf mehr in `13-schreiben.ts`; Beleg: Test grün.
+- Lehre: Ein Wächter in `pruefeErgebnis` sieht nur, was Phase 10 bis dahin abgeleitet hat; Ableitungen, die ihn zufriedenstellen sollen, gehören davor, und der Test muss die Reihenfolge am Aufrufer prüfen, nicht nur die Funktion an Fixtures.

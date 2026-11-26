@@ -17,15 +17,15 @@ export type StaffelVon = (id: number, tag?: string, folge?: number) => { sammel:
  * Kennung → Sammeltitel und erste Folge. Die Basis-Staffel trägt die Kennung des Sammeltitels: Meldungen mit dieser Kennung zählen bis zur
  * Aktivierung (`aktiv`, verglichen mit dem Tag der Meldung) durchlaufend und bleiben unverändert; ab `aktiv` zählen sie in der Staffel der
  * Basis (Folge 1 = `ab`), außer die Nummer übersteigt die längste Staffel (`laengste`): Dann kann sie nur durchlaufend gezählt sein (eine
- * Erweiterung mit altem Auftrag meldet auch nach `aktiv` so). Ohne `aktiv` bleibt die Basis unverändert.
+ * Erweiterung mit altem Auftrag meldet auch nach `aktiv` so). Ohne `aktiv` bleibt die Basis unverändert; ab `bis` (Rückbau, F157) wieder durchlaufend.
  */
-export function staffelVonTiteln(titel: { id: number; staffelTitel?: { sammel: number; ab: number; aktiv?: string; laengste?: number } }[]): StaffelVon {
+export function staffelVonTiteln(titel: { id: number; staffelTitel?: { sammel: number; ab: number; aktiv?: string; bis?: string; laengste?: number } }[]): StaffelVon {
   const je = new Map(titel.flatMap((t) => (t.staffelTitel ? [[t.id, t.staffelTitel] as const] : [])))
   return (id, tag, folge) => {
     const s = je.get(id)
     if (!s) return undefined
     if (s.sammel !== id) return s
-    if (!s.aktiv || tag === undefined || tag < s.aktiv) return undefined
+    if (!s.aktiv || tag === undefined || tag < s.aktiv || (s.bis !== undefined && tag >= s.bis)) return undefined
     return folge !== undefined && s.laengste !== undefined && folge > s.laengste ? undefined : s
   }
 }

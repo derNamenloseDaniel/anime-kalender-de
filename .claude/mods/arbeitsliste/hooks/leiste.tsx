@@ -15,6 +15,8 @@ export type LeisteStand = {
   spar: boolean
   oeffneAgenten: () => void
   oeffneListe: () => void
+  // Erzeugt die Gesamtübersicht (uebersicht.ts) und öffnet sie im Browser.
+  oeffneUebersicht: () => void
 }
 
 // Gefüllt = an, leer = aus.
@@ -43,6 +45,7 @@ export function baueLeiste(ui: any, s: LeisteStand) {
   return (
     <Box flexDirection="row" alignItems="center" gap={1}>
       <Button key="oeffnen" plain label={`Arbeitsliste ${s.jetzt}`} onPress={s.oeffneListe} />
+      <Button key="uebersicht-oeffnen" plain label="Übersicht" onPress={s.oeffneUebersicht} />
       {ball(ui, 'ball-autonom', !!s.autonomBis, 'success')}
       {ball(ui, 'ball-ruhe', !!s.ruhe, 'warning')}
       {s.ruhe === 'sanft' && s.agenten > 2 ? sanduhr(ui) : null}

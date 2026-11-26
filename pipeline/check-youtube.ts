@@ -173,33 +173,34 @@ async function pruefeVideo(id: string): Promise<Befund> {
   }
 }
 
+/** Was ein Durchgang über die Warteschlange gezählt hat. */
+interface Zaehler {
+  geprueft: number
+  stoerung: number
+  leer: number
+}
 
-async function main(): Promise<void> {
-  if (!KEY) {
-    warn('YOUTUBE_API_KEY fehlt — ohne Schlüssel lässt sich nichts prüfen.')
-    process.exit(1)
-  }
-
+function ladeTitel(): Title[] {
   const roh = JSON.parse(readFileSync('public/data/titles.json', 'utf8')) as unknown
-  const titles = (Array.isArray(roh) ? roh : Object.values(roh as object).find(Array.isArray)) as Title[]
+  return (Array.isArray(roh) ? roh : Object.values(roh as object).find(Array.isArray)) as Title[]
+}
 
-  const bestand = readJson<Bestand>(DATEI, {})
-
-  /**
-   * Die Warteschlange ist die **Vereinigung**, nicht der aktuelle Datensatz.
-   *
-   * Ein Verweis, den dieser Lauf als tot erfasst, wird vom Build aus
-   * `titles.json` entfernt — und stünde beim nächsten Mal nicht mehr in der
-   * Liste, aus der sich die Warteschlange bildet. Er käme also nie wieder dran,
-   * und ein Falschbefund wäre für immer einer.
-   *
-   * Genau davor warnt der Abschnitt „Ein Abruf, der nur ergänzt, veraltet
-   * zwangsläufig" in `CLAUDE.md`, und ich bin am 20.08.2026 beim ersten Anlauf
-   * hineingelaufen. Deshalb: alles, was je geprüft wurde, bleibt in der Schlange
-   * — die Wiedervorlage entscheidet über das Alter, nicht über „schon
-   * beantwortet". Kommt eine Lizenz zurück, findet der nächste Lauf es, und der
-   * Build nimmt den Verweis von selbst wieder auf.
-   */
+/**
+ * Die Warteschlange ist die **Vereinigung**, nicht der aktuelle Datensatz.
+ *
+ * Ein Verweis, den dieser Lauf als tot erfasst, wird vom Build aus
+ * `titles.json` entfernt — und stünde beim nächsten Mal nicht mehr in der
+ * Liste, aus der sich die Warteschlange bildet. Er käme also nie wieder dran,
+ * und ein Falschbefund wäre für immer einer.
+ *
+ * Genau davor warnt der Abschnitt „Ein Abruf, der nur ergänzt, veraltet
+ * zwangsläufig" in `CLAUDE.md`, und ich bin am 20.08.2026 beim ersten Anlauf
+ * hineingelaufen. Deshalb: alles, was je geprüft wurde, bleibt in der Schlange
+ * — die Wiedervorlage entscheidet über das Alter, nicht über „schon
+ * beantwortet". Kommt eine Lizenz zurück, findet der nächste Lauf es, und der
+ * Build nimmt den Verweis von selbst wieder auf.
+ */
+function waehleArbeit(bestand: Bestand, titles: Title[]): string[] {
   const adressen = new Set<string>(Object.keys(bestand))
   for (const t of titles) for (const s of t.streams ?? []) if (s.platform === 'youtube') adressen.add(s.url)
   const grenze = new Date(Date.now() - ALTER * 86_400_000).toISOString().slice(0, 10)
@@ -216,82 +217,111 @@ async function main(): Promise<void> {
   })
   const arbeit = LIMIT > 0 ? offen.slice(0, LIMIT) : offen
   log(`YouTube: ${adressen.size} Adressen, ${offen.length} fällig, ${arbeit.length} in diesem Lauf.`)
+  return arbeit
+}
 
-  let geprueft = 0
-  let stoerung = 0
-  let leer = 0
+/** Befund für eine Adresse, die ohne Abruf feststeht (Kanal) oder abgerufen wird. */
+async function befundFuer(url: string, typ: Befund['art']): Promise<Befund> {
+  if (typ === 'kanal') {
+    // Ein Kanal ist keine Folgenliste. Was dort liegt, sagt nichts darüber,
+    // ob **dieser** Titel abrufbar ist — erfasst, aber nicht bewertet.
+    return { art: 'kanal', gesamt: 0, inDE: 0, geprueftAm: heute(), grund: 'Kanal, keine Folgenliste' }
+  }
+  if (typ === 'playlist') {
+    const id = playlistId(url)
+    return id
+      ? await pruefePlaylist(id)
+      : { art: 'playlist', gesamt: 0, inDE: 0, geprueftAm: heute(), grund: 'keine Playlist-Kennung in der Adresse' }
+  }
+  const id = videoId(url)
+  return id
+    ? await pruefeVideo(id)
+    : { art: 'video', gesamt: 0, inDE: 0, geprueftAm: heute(), grund: 'keine Video-Kennung in der Adresse' }
+}
+
+/** Prüft eine Adresse und trägt den Befund ein; gibt zurück, was sie zu `leer` und `stoerung` beiträgt. */
+async function pruefeAdresse(url: string, typ: Befund['art'], bestand: Bestand): Promise<Pick<Zaehler, 'leer' | 'stoerung'>> {
+  try {
+    bestand[url] = await befundFuer(url, typ)
+    const leer = typ !== 'kanal' && bestand[url].inDE === 0 && !bestand[url].unklar ? 1 : 0
+    return { leer, stoerung: 0 }
+  } catch (err) {
+    const grund = (err as { grund?: string }).grund ?? (err as Error).message
+    // „playlistNotFound" und „videoNotFound" sind Befunde, keine Störungen.
+    const weg = /notFound/i.test(grund)
+    if (weg) {
+      bestand[url] = { art: typ, gesamt: 0, inDE: 0, geprueftAm: heute(), grund }
+      return { leer: 1, stoerung: 0 }
+    }
+    /*
+      **Eine Störung überschreibt keinen guten Befund** (17.09.2026). Ein
+      Kontingentfehler schrieb bis dahin `inDE: 0`, und der nächste Bau warf
+      den Verweis heraus — ohne dass jemand nachgesehen hätte.
+    */
+    const vorher = bestand[url]
+    if (!vorher || vorher.unklar) bestand[url] = { art: typ, gesamt: 0, inDE: 0, geprueftAm: heute(), grund, unklar: true }
+    warn(`YouTube ${url}: ${grund}`)
+    return { leer: 0, stoerung: 1 }
+  }
+}
+
+async function pruefeAlle(arbeit: string[], bestand: Bestand): Promise<Zaehler> {
+  const z: Zaehler = { geprueft: 0, stoerung: 0, leer: 0 }
   for (const url of arbeit) {
     const typ = art(url)
     if (!typ) continue
-    try {
-      if (typ === 'kanal') {
-        // Ein Kanal ist keine Folgenliste. Was dort liegt, sagt nichts darüber,
-        // ob **dieser** Titel abrufbar ist — erfasst, aber nicht bewertet.
-        bestand[url] = { art: 'kanal', gesamt: 0, inDE: 0, geprueftAm: heute(), grund: 'Kanal, keine Folgenliste' }
-      } else if (typ === 'playlist') {
-        const id = playlistId(url)
-        bestand[url] = id
-          ? await pruefePlaylist(id)
-          : { art: 'playlist', gesamt: 0, inDE: 0, geprueftAm: heute(), grund: 'keine Playlist-Kennung in der Adresse' }
-      } else {
-        const id = videoId(url)
-        bestand[url] = id
-          ? await pruefeVideo(id)
-          : { art: 'video', gesamt: 0, inDE: 0, geprueftAm: heute(), grund: 'keine Video-Kennung in der Adresse' }
-      }
-      if (typ !== 'kanal' && bestand[url].inDE === 0 && !bestand[url].unklar) leer++
-    } catch (err) {
-      const grund = (err as { grund?: string }).grund ?? (err as Error).message
-      // „playlistNotFound" und „videoNotFound" sind Befunde, keine Störungen.
-      const weg = /notFound/i.test(grund)
-      if (weg) {
-        bestand[url] = { art: typ, gesamt: 0, inDE: 0, geprueftAm: heute(), grund }
-        leer++
-      } else {
-        /*
-          **Eine Störung überschreibt keinen guten Befund** (17.09.2026). Ein
-          Kontingentfehler schrieb bis dahin `inDE: 0`, und der nächste Bau warf
-          den Verweis heraus — ohne dass jemand nachgesehen hätte.
-        */
-        const vorher = bestand[url]
-        if (!vorher || vorher.unklar) bestand[url] = { art: typ, gesamt: 0, inDE: 0, geprueftAm: heute(), grund, unklar: true }
-        stoerung++
-        warn(`YouTube ${url}: ${grund}`)
-      }
-    }
-    if (++geprueft % 50 === 0) log(`  ${geprueft}/${arbeit.length} — ${leer} ohne abrufbares Video`)
+    const beitrag = await pruefeAdresse(url, typ, bestand)
+    z.leer += beitrag.leer
+    z.stoerung += beitrag.stoerung
+    if (++z.geprueft % 50 === 0) log(`  ${z.geprueft}/${arbeit.length} — ${z.leer} ohne abrufbares Video`)
     await sleep(150)
   }
+  return z
+}
 
-  /*
-    **Plausibilität vor dem Schreiben** (17.09.2026, nach dem Muster von
-    `fetch-justwatch-audio.ts`). Ein Kontingent- oder Netzausfall trifft alle
-    Abfragen gleichzeitig; ohne diesen Riegel stünde danach eine Datei voller
-    Nullbefunde, aus der der Bau Verweise entfernt.
+/*
+  **Plausibilität vor dem Schreiben** (17.09.2026, nach dem Muster von
+  `fetch-justwatch-audio.ts`). Ein Kontingent- oder Netzausfall trifft alle
+  Abfragen gleichzeitig; ohne diesen Riegel stünde danach eine Datei voller
+  Nullbefunde, aus der der Bau Verweise entfernt.
 
-    **Gezählt werden nur Störungen** (23.09.2026, Issue #215). Der Riegel zählte auch `leer`
-    mit — das sind **beantwortete** Abfragen mit dem Ergebnis „in Deutschland gesperrt", und
-    das ist bei Anime auf YouTube der Normalfall: 362 von 514 Verweisen (70 %) stehen so schon
-    im Bestand. Der Lauf vom 21.09.2026 maß 363 von 514 — derselbe Zustand, und trotzdem hielt
-    ihn der Riegel für unplausibel und schrieb nichts. Da dieser Zweig auch `recordSource()`
-    überspringt, fror `lastOk` ein, und nach neun Tagen brach der Bestandslauf an der
-    Schweigen-Prüfung ab (Lauf 35855024971).
+  **Gezählt werden nur Störungen** (23.09.2026, Issue #215). Der Riegel zählte auch `leer`
+  mit — das sind **beantwortete** Abfragen mit dem Ergebnis „in Deutschland gesperrt", und
+  das ist bei Anime auf YouTube der Normalfall: 362 von 514 Verweisen (70 %) stehen so schon
+  im Bestand. Der Lauf vom 21.09.2026 maß 363 von 514 — derselbe Zustand, und trotzdem hielt
+  ihn der Riegel für unplausibel und schrieb nichts. Da dieser Zweig auch `recordSource()`
+  überspringt, fror `lastOk` ein, und nach neun Tagen brach der Bestandslauf an der
+  Schweigen-Prüfung ab (Lauf 35855024971).
 
-    Eine Störung ist das Gegenteil davon: keine Antwort. Genau davor schützt der Riegel, und
-    nur die zählt er jetzt.
-  */
-  if (riegelGreift(geprueft, stoerung)) {
-    warn(`YouTube: ${stoerung} Störungen bei ${geprueft} Abfragen — unplausibel, nichts geschrieben.`)
+  Eine Störung ist das Gegenteil davon: keine Antwort. Genau davor schützt der Riegel, und
+  nur die zählt er jetzt.
+*/
+function schreibeErgebnis(bestand: Bestand, z: Zaehler): void {
+  if (riegelGreift(z.geprueft, z.stoerung)) {
+    warn(`YouTube: ${z.stoerung} Störungen bei ${z.geprueft} Abfragen — unplausibel, nichts geschrieben.`)
     return
   }
   writeJson(DATEI, bestand)
   const tot = Object.values(bestand).filter((b) => b.art !== 'kanal' && b.inDE === 0 && !b.unklar).length
-  log(`YouTube: ${geprueft} geprüft, davon ${leer} ohne abrufbares Video. Im Bestand insgesamt ${tot} tote Verweise.`)
+  log(`YouTube: ${z.geprueft} geprüft, davon ${z.leer} ohne abrufbares Video. Im Bestand insgesamt ${tot} tote Verweise.`)
   /*
     Nichts zu prüfen ist der Normalfall, sobald alle Verweise durch sind — und
     kein Grund, den ganzen Tageslauf abzubrechen (29.08.2026, zweimal).
   */
-  recordSource('youtube-check', geprueft, undefined, undefined, true)
+  recordSource('youtube-check', z.geprueft, undefined, undefined, true)
+}
+
+async function main(): Promise<void> {
+  if (!KEY) {
+    warn('YOUTUBE_API_KEY fehlt — ohne Schlüssel lässt sich nichts prüfen.')
+    process.exit(1)
+  }
+
+  const titles = ladeTitel()
+  const bestand = readJson<Bestand>(DATEI, {})
+  const arbeit = waehleArbeit(bestand, titles)
+  const z = await pruefeAlle(arbeit, bestand)
+  schreibeErgebnis(bestand, z)
 }
 
 main().catch((err) => {

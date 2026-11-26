@@ -1,7 +1,7 @@
 /**
  * Zusicherungen für die Reihen-Übersicht großer Reihen (Daniel, F148, 20.11.2026): eingeklappte Gruppen mit Zahl, offen nur die
  * Gruppe des geöffneten Titels, jede offene Gruppe eine waagerechte Spur mit Karussell-Covern. Kern ist „Zahl = Liste“:
- * live zählte der Kopf auch Teile hinter dem Schalter. Gerendert wird das echte `ReihenListe` im Mini-DOM; Klicks laufen über die
+ * live zählte der Kopf auch Teile hinter dem (inzwischen entfernten) Schalter. Gerendert wird das echte `ReihenListe` im Mini-DOM; Klicks laufen über die
  * echten Knöpfe. Aufruf: `npm run check:logic`.
  */
 import { act, createElement as h } from 'react'
@@ -30,7 +30,7 @@ const teil = (id: number, name: string, mehr: Partial<FranchiseMember> = {}): Fr
 const film = (n: number, mehr: Partial<FranchiseMember> = {}) => teil(900200 + n, `Reihe: Film ${n}`, { format: 'MOVIE', episodes: 1, jpYear: 2000 + n, ...mehr })
 const filme = (anzahl: number, ohne: number[] = []) => Array.from({ length: anzahl }, (_, i) => film(i + 1, ohne.includes(i + 1) ? { ohneSynchro: true } : {}))
 
-/* Große Reihe: 3 Staffeln, 15 Filme (14 und 15 ohne Synchro), 4 Specials (eins ohne Synchro). Ohne Schalter sind es 3 + 13 + 3 = 19. */
+/* Große Reihe: 3 Staffeln, 15 Filme (14 und 15 ohne Synchro), 4 Specials (eins ohne Synchro). Alle 22 stehen da: 3 + 15 + 4. */
 const GROSS: FranchiseMember[] = [
   teil(900101, 'Reihe', { jpYear: 1999, cover: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx900101.jpg' }),
   teil(900102, 'Reihe Staffel 2', { jpYear: 2003 }),
@@ -42,12 +42,12 @@ const GROSS: FranchiseMember[] = [
   teil(900304, 'Reihe Special 4', { format: 'OVA', episodes: 1, jpYear: 2005, ohneSynchro: true }),
 ]
 
-/* Regeln: Größe hängt am sichtbaren Stand ohne Schalter. */
+/* Regeln: Größe hängt an der größten Gruppe, Teile ohne Synchro zählen mit. */
 const gruppen = (anzahl: number, ohne: number[] = []) => [{ titel: 'Filme', teile: filme(anzahl, ohne) }]
-pruefe('12 Filme: keine große Reihe', !istGrosseReihe(gruppen(12), 900201))
-pruefe('13 Filme: große Reihe', istGrosseReihe(gruppen(13), 900201))
-pruefe('13 Filme, einer ohne Synchro: 12 sichtbar, keine große Reihe', !istGrosseReihe(gruppen(13, [13]), 900201))
-pruefe('13 Filme, der ohne Synchro ist geöffnet: große Reihe', istGrosseReihe(gruppen(13, [13]), 900213))
+pruefe('12 Filme: keine große Reihe', !istGrosseReihe(gruppen(12)))
+pruefe('13 Filme: große Reihe', istGrosseReihe(gruppen(13)))
+pruefe('13 Filme, einer ohne Synchro: große Reihe', istGrosseReihe(gruppen(13, [13])))
+pruefe('12 Filme, einer ohne Synchro: keine große Reihe', !istGrosseReihe(gruppen(12, [12])))
 gleich('Gruppe des Teils', gruppeVon([{ titel: 'A', teile: filme(2) }, { titel: 'B', teile: [teil(900301, 'x')] }], 900301), 'B')
 gleich('Teil in keiner Gruppe', gruppeVon([{ titel: 'A', teile: filme(2) }], 900999), undefined)
 
@@ -61,8 +61,8 @@ Object.assign(MiniKnoten.prototype, {
 /* Auch die Messung der Spur braucht Frame-Aufrufe; ohne Layout im Mini-DOM laufen sie ins Leere. */
 Object.assign(globalThis, { requestAnimationFrame: () => 0, cancelAnimationFrame: () => {} })
 
-type Stand = { titel: number; ohneOffen?: boolean; suche?: string; gemerkt?: number[]; wechselt?: boolean }
-const aufrufe = { wechsel: [] as number[], ohne: [] as unknown[], suche: [] as unknown[] }
+type Stand = { titel: number; suche?: string; gemerkt?: number[]; wechselt?: boolean }
+const aufrufe = { wechsel: [] as number[], suche: [] as unknown[] }
 function props(teile: FranchiseMember[], s: Stand) {
   return {
     reihenTeile: teile,
@@ -72,17 +72,15 @@ function props(teile: FranchiseMember[], s: Stand) {
     favorites: new Set<number>(s.gemerkt ?? []),
     wechselt: s.wechselt ?? false,
     wechsleZu: (id: number) => void aufrufe.wechsel.push(id),
-    reiheOhneOffen: s.ohneOffen ? 1 : null,
     reihenSchluessel: 1,
     reiheSuche: { reihe: 1, text: s.suche ?? '' },
-    setReiheOhneOffen: (v: unknown) => void aufrufe.ohne.push(v),
     setReiheSuche: (v: unknown) => void aufrufe.suche.push(v),
   }
 }
 
-/* Erst statisch (läuft auch gegen die Spur, die im Mini-DOM nicht misst): Kopfzahl = sichtbare Teile, nicht alle 22. */
+/* Erst statisch (läuft auch gegen die Spur, die im Mini-DOM nicht misst): Kopfzahl = alle 22 Teile. */
 const statisch = renderToStaticMarkup(h(ReihenListe, props(GROSS, { titel: 900102 })))
-gleich('statisch: Kopfzahl 19 (3 + 13 + 3, ohne Teile hinter dem Schalter)', /tabular-nums text-ak-text">(\d+)</.exec(statisch)?.[1], '19')
+gleich('statisch: Kopfzahl 22 (3 + 15 + 4, auch Teile ohne Synchro)', /tabular-nums text-ak-text">(\d+)</.exec(statisch)?.[1], '22')
 pruefe('statisch: große Reihe als Übersicht', statisch.includes('data-reihe-uebersicht'))
 pruefe('statisch: Hauptserie von Anfang an offen, Filme zu', statisch.includes('data-reihe-teil="900102"') && !statisch.includes('data-reihe-teil="900201"'))
 if (!statisch.includes('data-reihe-uebersicht')) {
@@ -132,12 +130,10 @@ async function oeffne(teile: FranchiseMember[], s: Stand) {
       img: ['src', 'width', 'height', 'sizes'].map((n) => li.finde((k) => k.localName === 'img')[0]?.attribute.get(n) ?? null),
     }
   }
-  /* Eine Hülle mit genau `flex` hat nur der Schalter unter dem Suchfeld. */
-  const schalterHuellen = () => dom.wurzel.finde((k) => klasse(k) === 'flex').length
+  const schalter = () => dom.wurzel.finde((k) => k.localName === 'input' && k.attribute.get('type') === 'checkbox').length
   /* Handler direkt über die React-Props des Knotens: das Mini-DOM kennt kein `change`-Ereignis. */
   const handler = (k: MiniKnoten) => Object.entries(k).find(([s]) => s.startsWith('__reactProps'))?.[1] as { onChange: (e: unknown) => void }
   const suchfeld = () => dom.wurzel.finde((k) => k.localName === 'input' && k.attribute.has('placeholder'))[0]! as MiniKnoten & { value?: string }
-  const schalterFeld = () => dom.wurzel.finde((k) => k.localName === 'label')[0]!.finde((k) => k.localName === 'input')[0]!
   const kopfVon = (titel: string) => gruppenKnoten().find((g) => g.attribute.get('data-reihe-gruppe') === titel)!.finde((k) => k.attribute.has('aria-expanded'))[0]!
   return {
     lage,
@@ -146,12 +142,10 @@ async function oeffne(teile: FranchiseMember[], s: Stand) {
     klickeGruppe: (titel: string) => act(async () => klicke(dom.wurzel, kopfVon(titel))),
     klickeTeil: (id: number) =>
       act(async () => klicke(dom.wurzel, dom.wurzel.finde((k) => k.attribute.get('data-reihe-teil') === String(id))[0]!)),
-    schalterText: () => dom.wurzel.finde((k) => k.localName === 'label' && k.finde((x) => x.localName === 'input').length > 0)[0]?.textContent ?? '',
     zeile,
-    schalterHuellen,
+    schalter,
     sucheWert: () => suchfeld().value ?? '',
     tippe: (text: string) => act(async () => handler(suchfeld()).onChange({ target: { value: text } })),
-    schalterUm: () => act(async () => handler(schalterFeld()).onChange({ target: schalterFeld() })),
     ende: async () => {
       await act(async () => wurzel.unmount())
       dom.entferne()
@@ -170,11 +164,11 @@ function zahlGleichListe(fall: string, l: Awaited<ReturnType<Awaited<ReturnType<
 }
 const kurz = (l: Awaited<ReturnType<Awaited<ReturnType<typeof oeffne>>['lage']>>) => l.gruppe.map((g) => [g.titel, g.zahl, g.offen ? g.zeilen.length : '-'])
 
-/* Staffel geöffnet: nur die Hauptserie offen; der Kopf zählt 19, nicht alle 22 Teile. */
+/* Staffel geöffnet: nur die Hauptserie offen; der Kopf zählt alle 22 Teile. */
 const a = await oeffne(GROSS, { titel: 900102 })
 pruefe('große Reihe: Übersicht statt Spur', a.lage().uebersicht)
-gleich('Staffel geöffnet: Gruppen, Zahlen, offene Zeilen', kurz(a.lage()), [['Hauptserie', 3, 3], ['Filme', 13, '-'], ['Specials & OVAs', 3, '-']])
-gleich('Staffel geöffnet: Kopf zählt nur Gezeigtes (19 statt 22)', a.lage().kopfZahl, 19)
+gleich('Staffel geöffnet: Gruppen, Zahlen, offene Zeilen', kurz(a.lage()), [['Hauptserie', 3, 3], ['Filme', 15, '-'], ['Specials & OVAs', 4, '-']])
+gleich('Staffel geöffnet: Kopf zählt alle 22', a.lage().kopfZahl, 22)
 zahlGleichListe('Staffel geöffnet', a.lage())
 gleich('Staffel geöffnet: Stand über der Liste', a.lage().stand, 'Staffel 2 von 3')
 gleich('Karte des geöffneten Teils: gewählt, fett', [a.zeile(900102)?.aktuell, a.zeile(900102)?.name.includes('font-semibold')], ['true', true])
@@ -186,32 +180,25 @@ gleich('Karte: gewählter Teil ruhig, anderer klickbar', [knopfMerkmale(900102),
 gleich('Cover der ersten Staffel: Karussell-Größe 120 × 180', a.zeile(900101)?.img.slice(1), ['120', '180', '120px'])
 gleich('Cover-Hülle einer erschienenen Karte mit Synchro: weder blass noch gestrichelt', ['opacity-55', 'outline-dashed'].map((c) => a.zeile(900101)?.huelle.includes(c)), [false, false])
 pruefe('Karten stehen in einer waagerechten Spur', a.lage().spuren === 1, a.lage().spuren)
-gleich('Schalter steht in seiner Hülle unter dem Suchfeld', a.schalterHuellen(), 1)
+gleich('kein Schalter „ohne Synchro“ mehr', a.schalter(), 0)
 pruefe('kein Wechsel: kein Ladehinweis', !(a.text() ?? '').includes('Wird geladen'))
-await a.schalterUm()
-gleich('Schalter umgelegt: setzt die Reihe', aufrufe.ohne, [1])
 await a.klickeGruppe('Filme')
-gleich('Filme aufgeklappt: alle 13 Karten', a.lage().gruppe[1]!.zeilen.length, 13)
+gleich('Filme aufgeklappt: alle 15 Karten', a.lage().gruppe[1]!.zeilen.length, 15)
 zahlGleichListe('Filme aufgeklappt', a.lage())
 await a.klickeGruppe('Hauptserie')
 gleich('Hauptserie zugeklappt', a.lage().gruppe[0]!.offen, false)
 zahlGleichListe('Hauptserie zugeklappt', a.lage())
-pruefe('Schalter nennt die 3 Teile dahinter', /3/.test(a.schalterText()), a.schalterText())
-await a.zeige({ titel: 900102, ohneOffen: true })
-gleich('Schalter an: 3 + 15 + 4, Kopf 22', [kurz(a.lage()).map((g) => g[1]), a.lage().kopfZahl], [[3, 15, 4], 22])
-zahlGleichListe('Schalter an', a.lage())
-gleich('Schalter an: Film 14 ohne Synchro blass, Film 1 nicht', [a.zeile(900214)?.name.includes('opacity-75'), a.zeile(900201)?.name.includes('opacity-75')], [true, false])
-gleich('Schalter an: Cover von Film 14 blass, nicht gestrichelt', ['opacity-55', 'outline-dashed'].map((c) => a.zeile(900214)?.huelle.includes(c)), [true, false])
-await a.schalterUm()
-gleich('Schalter wieder aus: setzt null', aufrufe.ohne, [1, null])
+gleich('3 + 15 + 4, Kopf 22', [kurz(a.lage()).map((g) => g[1]), a.lage().kopfZahl], [[3, 15, 4], 22])
+gleich('Film 14 ohne Synchro blass, Film 1 nicht', [a.zeile(900214)?.name.includes('opacity-75'), a.zeile(900201)?.name.includes('opacity-75')], [true, false])
+gleich('Cover-Hülle von Film 14 weder blass (Marke bleibt lesbar) noch gestrichelt', ['opacity-55', 'outline-dashed'].map((c) => a.zeile(900214)?.huelle.includes(c)), [false, false])
 await a.zeige({ titel: 900207 })
 gleich('Wechsel auf Film 7: Filme bleibt offen, Hauptserie bleibt zu', a.lage().gruppe.map((g) => g.offen), [false, true, false])
 await a.ende()
 
-/* Film geöffnet: nur Filme offen, alle 13 Karten in einer Spur; Klick auf den geöffneten Film tut nichts. */
+/* Film geöffnet: nur Filme offen, alle 15 Karten in einer Spur; Klick auf den geöffneten Film tut nichts. */
 const b = await oeffne(GROSS, { titel: 900207 })
 gleich('Film 7: nur Filme offen', b.lage().gruppe.map((g) => g.offen), [false, true, false])
-gleich('Film 7: alle 13 Karten, kein Fenster', b.lage().gruppe[1]!.zeilen.length, 13)
+gleich('Film 7: alle 15 Karten, kein Fenster', b.lage().gruppe[1]!.zeilen.length, 15)
 gleich('Film geöffnet: kein Staffelstand', b.lage().stand, null)
 await b.klickeTeil(900208)
 await b.klickeTeil(900207)
@@ -219,13 +206,13 @@ gleich('Klick auf Film 8 wechselt, der geöffnete Film 7 tut nichts', aufrufe.we
 zahlGleichListe('Film 7', b.lage())
 await b.ende()
 
-/* Ein Teil ohne Synchro ist geöffnet: er zählt mit, der Rest bleibt hinter dem Schalter. */
+/* Ein Teil ohne Synchro ist geöffnet: alle Filme stehen da. */
 const e = await oeffne(GROSS, { titel: 900214 })
-gleich('Film 14 ohne Synchro geöffnet: Filme 14, alle 14 Karten', [e.lage().gruppe[1]!.zahl, e.lage().gruppe[1]!.zeilen.length], [14, 14])
+gleich('Film 14 ohne Synchro geöffnet: Filme 15, alle 15 Karten', [e.lage().gruppe[1]!.zahl, e.lage().gruppe[1]!.zeilen.length], [15, 15])
 zahlGleichListe('Film 14 geöffnet', e.lage())
 await e.ende()
 
-/* Suche: alle Treffer, auch hinter dem Schalter, alle Gruppen offen, kein Fenster. */
+/* Suche: alle Treffer, alle Gruppen offen, kein Fenster. */
 const f = await oeffne(GROSS, { titel: 900207, suche: 'film 1' })
 gleich('Suche „film 1“: nur Filme, 1 und 10–15', [kurz(f.lage()), f.lage().gruppe[0]?.zeilen], [[['Filme', 7, 7]], [1, 10, 11, 12, 13, 14, 15]])
 zahlGleichListe('Suche', f.lage())
@@ -239,23 +226,18 @@ gleich('Suche ohne Treffer: keine Gruppe, keine Kopfzahl', [f.lage().gruppe.leng
 pruefe('Suche ohne Treffer: Hinweis', (f.text() ?? '').includes('Kein Teil passt'))
 await f.ende()
 
-/* Suche mit mehr als 12 Treffern in der Gruppe des geöffneten Films: alle Treffer, kein Schalter. */
+/* Suche mit mehr als 12 Treffern in der Gruppe des geöffneten Films: alle Treffer. */
 const g2 = await oeffne(GROSS, { titel: 900207, suche: 'film' })
 gleich('Suche „film“: 15 Karten', kurz(g2.lage()), [['Filme', 15, 15]])
-gleich('Suche: kein Schalter', g2.schalterText(), '')
 zahlGleichListe('Suche über 12', g2.lage())
 await g2.ende()
 
-/* Gruppe des geöffneten Teils mit genau 12 sichtbaren Teilen; Pokémon Horizonte (Hauptserie 12) liegt hier. */
+/* Gruppe des geöffneten Teils mit 13 Teilen, einer davon ohne Synchro: alle 13 Karten. */
 const special = (i: number) => teil(900300 + i, `Reihe Special ${i}`, { format: 'OVA', episodes: 1, jpYear: 2000 + i, ...(i === 13 ? { ohneSynchro: true } : {}) })
 const GROSS2 = [teil(900101, 'Reihe'), ...filme(13), ...Array.from({ length: 13 }, (_, i) => special(i + 1))]
 const g3 = await oeffne(GROSS2, { titel: 900305 })
-gleich('12 Specials, Special 5 geöffnet: 12 Karten', [g3.lage().gruppe[2]?.zahl, g3.lage().gruppe[2]?.zeilen.length], [12, 12])
-pruefe('genau ein Teil hinter dem Schalter: Schalter nennt 1', /\b1\b/.test(g3.schalterText()), g3.schalterText())
+gleich('13 Specials, Special 5 geöffnet: 13 Karten', [g3.lage().gruppe[2]?.zahl, g3.lage().gruppe[2]?.zeilen.length], [13, 13])
 await g3.ende()
-const g4 = await oeffne(GROSS2, { titel: 900313 })
-gleich('der einzige Teil ohne Synchro ist geöffnet: kein Schalter, keine leere Hülle', [g4.schalterText(), g4.schalterHuellen()], ['', 0])
-await g4.ende()
 
 /* Wechsel auf einen Teil einer zugeklappten Gruppe (auch: Gruppe ändert sich beim Nachladen): offen ist nur seine Gruppe (F148). */
 const w = await oeffne(GROSS, { titel: 900102 })
@@ -277,11 +259,10 @@ gleich('Stand: nur Filme, leer', reihenStand(filme(2), 'Reihe', 900201, t), '')
 /* Kleine Reihe (12 Filme) bleibt Spur — Gegenprobe zur Grenze; die Spur misst im Browser, darum hier statisch. */
 const klein = renderToStaticMarkup(h(ReihenListe, props([teil(900101, 'Reihe'), ...filme(12)], { titel: 900101 })))
 pruefe('12 Filme: Spur, keine Übersicht', klein.includes('role="tab"') && !klein.includes('data-reihe-uebersicht'))
-/* Spur-Kopf: zählt die gezeigten Zeilen — fünf Teile, drei ohne Synchro hinter dem Schalter: Kopf 2; mit Schalter 5; Suchtext „Film 4“ 1 (Befund 21.11.2026: Noragami Kopf 5, Liste 2). */
+/* Spur-Kopf: zählt die gezeigten Zeilen — fünf Teile, drei ohne Synchro: Kopf 5; Suchtext „Film 4“ 1 (Befund 21.11.2026: Noragami Kopf 5, Liste 2). */
 const kopfSpur = (s: Stand) => /tabular-nums text-ak-text">(\d+)</.exec(renderToStaticMarkup(h(ReihenListe, props([teil(900101, 'Reihe'), ...filme(4, [2, 3, 4])], s))))?.[1]
-gleich('Spur-Kopf: gezeigte Zeilen, nicht alle Teile', kopfSpur({ titel: 900101 }), '2')
-gleich('Spur-Kopf mit Schalter „ohne Synchro“: alle 5', kopfSpur({ titel: 900101, ohneOffen: true }), '5')
-gleich('Spur-Kopf mit Suchtext: Treffer', kopfSpur({ titel: 900101, ohneOffen: true, suche: 'Film 4' }), '1')
+gleich('Spur-Kopf: alle 5 Teile, auch ohne Synchro', kopfSpur({ titel: 900101 }), '5')
+gleich('Spur-Kopf mit Suchtext: Treffer', kopfSpur({ titel: 900101, suche: 'Film 4' }), '1')
 const kleinLaedt = renderToStaticMarkup(h(ReihenListe, props([teil(900101, 'Reihe'), ...filme(12)], { titel: 900101, wechselt: true })))
 gleich('Spur: Ladehinweis nur während des Wechsels', [klein.includes('Wird geladen'), kleinLaedt.includes('Wird geladen')], [false, true])
 
@@ -289,4 +270,4 @@ if (verletzt > 0) {
   console.error(`\n${verletzt} Prüfung(en) verletzt`)
   process.exit(1)
 }
-console.log('\ncheck-reihen-uebersicht: Grenze 12, Zahl = Liste (Kopf, Gruppen, Schalter, Suche), Aufklappen, Spur je offene Gruppe, Grenze genau 12, Stand, Zeilen, Laden, Schalter und Suche ✓')
+console.log('\ncheck-reihen-uebersicht: Grenze 12, Zahl = Liste (Kopf, Gruppen, Suche), Aufklappen, Spur je offene Gruppe, Grenze genau 12, Stand, Zeilen, Laden und Suche ✓')

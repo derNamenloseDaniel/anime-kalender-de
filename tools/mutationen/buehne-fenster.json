@@ -1,6 +1,6 @@
 [
  { "name": "100dvh entfernt", "datei": "web/buehne/rahmen.css", "suche": "flex-direction: column; height: 100dvh; }", "ersetze": "flex-direction: column; }" },
- { "name": "min-height 240 entfernt", "datei": "web/buehne/rahmen.css", "suche": "flex: 1 1 0; min-height: 240px; border: 0;", "ersetze": "flex: 1 1 0; border: 0;" },
+ { "name": "min-height 610 entfernt", "datei": "web/buehne/rahmen.css", "suche": "flex: 1 1 0; min-height: 610px; border: 0;", "ersetze": "flex: 1 1 0; border: 0;" },
  { "name": "max-height der Zelle entfernt", "datei": "web/buehne/rahmen.css", "suche": " max-height: calc(var(--hoehe) * var(--zoom, 1) + 22.8px); }", "ersetze": " }" },
  { "name": "Viewport 12000 auf 900", "datei": "tools/buehne-seite.mjs", "suche": "viewport: { width: 1400, height: 12000 } })", "ersetze": "viewport: { width: 1400, height: 900 } })" },
  { "name": "Zoom von beide entfernt", "datei": "web/buehne/rahmen.css", "suche": "  .raster.beide iframe { zoom: var(--zoom); }", "ersetze": "" },

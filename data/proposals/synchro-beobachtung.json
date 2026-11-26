@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-24",
+  "stand": "2026-11-26",
   "eintraege": [
     {
       "titel": "Expelled from Paradise: Liberated from Paradise",
@@ -37,20 +37,6 @@
       "seit": "2026-11-08"
     },
     {
-      "titel": "Call of the Night: Staffel 2",
-      "id": 175914,
-      "anbieter": "disc",
-      "start": "2026-11-20",
-      "seit": "2026-11-08"
-    },
-    {
-      "titel": "Call of the Night: Staffel 2",
-      "id": 175914,
-      "anbieter": "primevideo",
-      "start": "2026-11-20",
-      "seit": "2026-11-08"
-    },
-    {
       "titel": "Soukou Kihei Votoms: Haiiro no Hexe",
       "id": 206163,
       "anbieter": "unbekannt",
@@ -76,13 +62,6 @@
       "id": 212539,
       "anbieter": "unbekannt",
       "start": "2026-11-27",
-      "seit": "2026-11-08"
-    },
-    {
-      "titel": "Bocchi the Rock!",
-      "id": 130003,
-      "anbieter": "disc",
-      "start": "2026-12-04",
       "seit": "2026-11-08"
     },
     {
@@ -114,6 +93,13 @@
       "seit": "2026-11-17"
     },
     {
+      "titel": "Bocchi the Rock!",
+      "id": 130003,
+      "anbieter": "disc",
+      "start": "2026-12-18",
+      "seit": "2026-11-08"
+    },
+    {
       "titel": "Bitte zieh dich an, Takamine!",
       "id": 179965,
       "anbieter": "disc",
@@ -136,6 +122,13 @@
     }
   ],
   "abgeloest": [
+    {
+      "titel": "Call of the Night: Staffel 2",
+      "id": 175914,
+      "anbieter": "disc",
+      "start": "2026-11-20",
+      "seit": "2026-11-08"
+    },
     {
       "titel": "2.5 Dimensional Seduction",
       "id": 185515,

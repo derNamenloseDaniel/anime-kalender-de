@@ -14,8 +14,7 @@ import { sichtbareTermine, sichtbareWege } from './wege-sichtbar.ts'
 import { kastenNotizVon, wegeHinweisVon } from './kasten-hinweise.ts'
 import { useReleaseSichten } from './release-sichten.ts'
 
-/** Alles, was der Antwortkasten und die Wege des Panels aus Titel und Terminen ableiten. */
-export function usePanelAntwort({ title, releases, today, synopsis, favorites, verbindung, t }: {
+interface PanelAntwortEingabe {
   title: Title | undefined
   releases: Release[]
   today: string
@@ -23,7 +22,10 @@ export function usePanelAntwort({ title, releases, today, synopsis, favorites, v
   favorites: Set<number>
   verbindung: NewsletterVerbindung
   t: Translate
-}) {
+}
+
+/** Die Sichten auf Titel und Termine, nach denen die Wege des Panels gegliedert sind. */
+function useWegeSichten({ title, releases, today }: Pick<PanelAntwortEingabe, 'title' | 'releases' | 'today'>) {
   /**
    * Streaming, aufgeteilt nach dem, was es kostet.
    *
@@ -52,6 +54,58 @@ export function usePanelAntwort({ title, releases, today, synopsis, favorites, v
     () => terminReleases.filter((r) => !(title?.streams ?? []).some((s) => s.platform === r.platform)),
     [terminReleases, title],
   )
+  return { sortiertNachZugang, discReleases, releaseJePlattform, kinoRelease, terminReleases, streamReleases }
+}
+
+/**
+ * Die Antwort auf die Frage, wegen der jemand dieses Panel öffnet.
+ *
+ * *Wann kommt die nächste Folge, wie weit bin ich, wo kann ich gucken.* Bis
+ * zum 24.08.2026 standen die Bausteine dafür verstreut: `Start`, `Folgen` und
+ * `Nächste Folge` in drei Zeilen eines Kastens, der als vierter Block kam —
+ * nach Bildergalerie, Bewertung und sechs Genre-Chips. Wer die Antwort wollte,
+ * musste sie sich zusammensetzen.
+ *
+ * Hier entsteht sie als **ein** Satz, aus denselben Terminen, die auch die
+ * Liste darunter füllt. Vier Fälle, und jeder bekommt dieselben vier Zeilen —
+ * Überschrift, Nebenzeile, Balken, Zählzeile. Ungleich hohe Kästen ließen beim
+ * Wechseln des Reihenteils alles darunter springen (Daniel, 24.08.2026:
+ * „solche element verrückungen sollten möglichst vermieden werden").
+ *
+ * Der vierte Fall ist der Film: 697 der 2.762 Titel. Ein Folgenzähler ergibt
+ * dort keinen Sinn, und ein Balken, der immer voll ist, misst nichts. Statt
+ * seiner stehen drei Angaben, die es bei einem Film wirklich gibt.
+ */
+function useAntwortKasten(
+  { title, releases, today, synopsis, favorites, verbindung, t }: PanelAntwortEingabe,
+  { releaseJePlattform, streamReleases }: Pick<ReturnType<typeof useWegeSichten>, 'releaseJePlattform' | 'streamReleases'>,
+) {
+  const antwort = useMemo(() => {
+    return berechneAntwortMitDeFolgen({ title, releases, today, deFolgen: synopsis?.deFolgen })
+    // `today` steht in der Abhängigkeitsliste, weil `titleStatus` es benutzt.
+  }, [title, releases, today, synopsis?.deFolgen])
+
+  const wegeHinweis = wegeHinweisVon({ title, antwort, favorites, verbindung, releases, today, t })
+
+  const tvVorbei = useTvVorbei(wegeHinweis, streamReleases, releases, today)
+
+  const kastenNotiz = useMemo(() => kastenNotizVon(releases, today), [releases, today])
+
+  /* Welche Folgen bei keinem bekannten Anbieter liegen — Begründung in `lueckeOhneAnbieter`. */
+  const folgenLuecke = useMemo(
+    () => lueckeOhneAnbieter({ title, antwort, releaseJePlattform, today }),
+    [title, antwort, releaseJePlattform, today],
+  )
+  /* Zeigt der Kasten eine Zählzeile („2 von 13 Folgen erschienen", „Alle 24 Folgen"), steht die Folgenzahl nicht noch einmal auf dem Cover. */
+  const folgenImKasten =
+    (antwort?.art === 'laeuft' && Boolean(antwort.gesamt)) || (antwort?.art === 'fertig' && (antwort.gesamt ?? 0) > 1) || antwort?.art === 'teilweise'
+  return { antwort, wegeHinweis, tvVorbei, kastenNotiz, folgenLuecke, folgenImKasten }
+}
+
+/** Alles, was der Antwortkasten und die Wege des Panels aus Titel und Terminen ableiten. */
+export function usePanelAntwort(eingabe: PanelAntwortEingabe) {
+  const { title, releases, today, t } = eingabe
+  const sichten = useWegeSichten(eingabe)
 
   /*
     **Die Pille nennt, wie viele Folgen es dort gibt.**
@@ -87,61 +141,7 @@ export function usePanelAntwort({ title, releases, today, synopsis, favorites, v
    */
   const dubZeilen = dubZeilenVon({ title, t, releases, today })
   /* Die Folgenangabe kommt aus `detail/folgen-angabe.ts` (Zerlegung, 29.09.2026) — einmal gebunden. */
-  const folgenAngabeFuer = folgenAuskunft({ releases, title, t, releaseJePlattform, today })
+  const folgenAngabeFuer = folgenAuskunft({ releases, title, t, releaseJePlattform: sichten.releaseJePlattform, today })
 
-  /**
-   * Die Antwort auf die Frage, wegen der jemand dieses Panel öffnet.
-   *
-   * *Wann kommt die nächste Folge, wie weit bin ich, wo kann ich gucken.* Bis
-   * zum 24.08.2026 standen die Bausteine dafür verstreut: `Start`, `Folgen` und
-   * `Nächste Folge` in drei Zeilen eines Kastens, der als vierter Block kam —
-   * nach Bildergalerie, Bewertung und sechs Genre-Chips. Wer die Antwort wollte,
-   * musste sie sich zusammensetzen.
-   *
-   * Hier entsteht sie als **ein** Satz, aus denselben Terminen, die auch die
-   * Liste darunter füllt. Vier Fälle, und jeder bekommt dieselben vier Zeilen —
-   * Überschrift, Nebenzeile, Balken, Zählzeile. Ungleich hohe Kästen ließen beim
-   * Wechseln des Reihenteils alles darunter springen (Daniel, 24.08.2026:
-   * „solche element verrückungen sollten möglichst vermieden werden").
-   *
-   * Der vierte Fall ist der Film: 697 der 2.762 Titel. Ein Folgenzähler ergibt
-   * dort keinen Sinn, und ein Balken, der immer voll ist, misst nichts. Statt
-   * seiner stehen drei Angaben, die es bei einem Film wirklich gibt.
-   */
-  const antwort = useMemo(() => {
-    return berechneAntwortMitDeFolgen({ title, releases, today, deFolgen: synopsis?.deFolgen })
-    // `today` steht in der Abhängigkeitsliste, weil `titleStatus` es benutzt.
-  }, [title, releases, today, synopsis?.deFolgen])
-
-  const wegeHinweis = wegeHinweisVon({ title, antwort, favorites, verbindung, releases, today, t })
-
-  const tvVorbei = useTvVorbei(wegeHinweis, streamReleases, releases, today)
-
-  const kastenNotiz = useMemo(() => kastenNotizVon(releases, today), [releases, today])
-
-  /* Welche Folgen bei keinem bekannten Anbieter liegen — Begründung in `lueckeOhneAnbieter`. */
-  const folgenLuecke = useMemo(
-    () => lueckeOhneAnbieter({ title, antwort, releaseJePlattform, today }),
-    [title, antwort, releaseJePlattform, today],
-  )
-  /* Zeigt der Kasten eine Zählzeile („2 von 13 Folgen erschienen", „Alle 24 Folgen"), steht die Folgenzahl nicht noch einmal auf dem Cover. */
-  const folgenImKasten =
-    (antwort?.art === 'laeuft' && Boolean(antwort.gesamt)) || (antwort?.art === 'fertig' && (antwort.gesamt ?? 0) > 1) || antwort?.art === 'teilweise'
-
-  return {
-    sortiertNachZugang,
-    discReleases,
-    releaseJePlattform,
-    kinoRelease,
-    terminReleases,
-    streamReleases,
-    dubZeilen,
-    folgenAngabeFuer,
-    antwort,
-    wegeHinweis,
-    tvVorbei,
-    kastenNotiz,
-    folgenLuecke,
-    folgenImKasten,
-  }
+  return { ...sichten, dubZeilen, folgenAngabeFuer, ...useAntwortKasten(eingabe, sichten) }
 }

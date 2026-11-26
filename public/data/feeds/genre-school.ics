@@ -10,17 +10,6 @@ X-WR-TIMEZONE:Europe/Berlin
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:adn-1218@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T080000Z
-DTEND:20261118T083000Z
-SUMMARY:Kill la Kill (neu bei ADN)
-DESCRIPTION:Plattform: ADN\nRelease-Art: Katalogtitel\nIm Angebot seit dies
- em Tag – nicht der Erscheinungstag der deutschen Fassung.\nDetails: http
- s://anime-kalender.de/t/6710/
-CATEGORIES:ADN
-END:VEVENT
-BEGIN:VEVENT
 UID:cr-GDKHZEP21@2026-11-19@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261119T180000Z
@@ -159,13 +148,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GDKHZEP21@2026-11-26@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261126T180000Z
-DTEND:20261126T183000Z
+DTSTART:20261126T170000Z
+DTEND:20261126T173000Z
 SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 5/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
+ etails: https://anime-kalender.de/t/17631/
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
@@ -225,8 +212,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GDKHZEP21@2026-12-03@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261203T180000Z
-DTEND:20261203T183000Z
+DTSTART:20261203T170000Z
+DTEND:20261203T173000Z
 SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 6/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -302,8 +289,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GDKHZEP21@2026-12-10@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261210T180000Z
-DTEND:20261210T183000Z
+DTSTART:20261210T170000Z
+DTEND:20261210T173000Z
 SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 7/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -358,8 +345,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GDKHZEP21@2026-12-17@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261217T180000Z
-DTEND:20261217T183000Z
+DTSTART:20261217T170000Z
+DTEND:20261217T173000Z
 SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 8/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -472,8 +459,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GDKHZEP21@2026-12-24@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261224T180000Z
-DTEND:20261224T183000Z
+DTSTART:20261224T170000Z
+DTEND:20261224T173000Z
 SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 9/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -494,8 +481,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GDKHZEP21@2026-12-31@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261231T180000Z
-DTEND:20261231T183000Z
+DTSTART:20261231T170000Z
+DTEND:20261231T173000Z
 SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 10/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -506,8 +493,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GDKHZEP21@2027-01-07@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20270107T180000Z
-DTEND:20270107T183000Z
+DTSTART:20270107T170000Z
+DTEND:20270107T173000Z
 SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 11/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -518,8 +505,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GDKHZEP21@2027-01-14@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20270114T180000Z
-DTEND:20270114T183000Z
+DTSTART:20270114T170000Z
+DTEND:20270114T173000Z
 SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 12/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -535,6 +522,16 @@ DTEND;VALUE=DATE:20270116
 SUMMARY:Bitte zieh dich an\, Takamine! – Vol. 2 (Disc)
 DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
  och nicht bestätigt.\nDetails: https://anime-kalender.de/t/16104/
+CATEGORIES:DVD / Blu-ray
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-9041-disc@2027-01-22@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20270122
+DTEND;VALUE=DATE:20270123
+SUMMARY:Infinite Stratos (Disc)
+DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
+ och nicht bestätigt.\nDetails: https://anime-kalender.de/t/4725/
 CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT

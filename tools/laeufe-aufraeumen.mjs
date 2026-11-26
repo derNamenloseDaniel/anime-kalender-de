@@ -23,7 +23,8 @@
  *     die Notiz ist Pflicht, die Lauf-ID steht in `<Worker>?verlauf=<Art>` (Feld lauf_id).
  */
 import { abbruchText, ghStapel, mitLimit } from './kind-mit-limit.mjs'
-import { erledigtArgumente, findeRotenLauf, holeLaeufe, holeVerlauf, letzteDatenAenderung, notizZu, roteArten, stillstand, STILLSTAND_GRENZE_STUNDEN, verlaufsZeile } from './laeufe-abruf.mjs'
+import { ladeBekannte, nimmBekannteAb } from './bekannte-warnungen.mjs'
+import { eintragZu, erledigtArgumente, findeRotenLauf, holeLaeufe, holeVerlauf, letzteDatenAenderung, roteArten, stillstand, STILLSTAND_GRENZE_STUNDEN, verlaufsZeile } from './laeufe-abruf.mjs'
 import { haengerWache } from './job-haenger.mjs'
 import { rotAlarmText } from './bestand-rot-alarm.mjs'
 import { alarmZeilenMitFixPrs } from './fix-pr-hinweis.mjs'
@@ -164,6 +165,19 @@ async function main() {
   }
 }
 
+/** Bekannte Warnungen (`tools/bekannte-warnungen.json`) abnehmen, alle anderen weiter zeigen; abgelaufene Einträge melden. */
+const bekannteAbnehmen = (warnungen) =>
+  nimmBekannteAb({
+    eintraege: ladeBekannte(),
+    warnungen,
+    jetztMs: Date.now(),
+    trocken: TROCKEN,
+    token: TOKEN,
+    senden: setzeErledigt,
+    zeigeWarnung: (w, rest) => verlaufsZeile(w.r, rest),
+    log: console.log,
+  })
+
 async function laeufePruefen(erledigt) {
   const { liste, verlauf, meldung } = await holeLaeufe(fetch, WORKER)
   if (meldung) {
@@ -177,11 +191,14 @@ async function laeufePruefen(erledigt) {
   // Rote Läufe stehen seit 28.09.2026 nur im Verlauf, nicht in `liste` (18.10.2026: elf Stunden Stillstand bei „0 rot“).
   // Je Workflow der jüngste erfolgreiche Lauf — der Prüfstein für „überholt".
   const letzterGruen = letzterGruenJe(new Set([...roteArten(verlauf).map((r) => r.art), ...rote.map((l) => l.workflow)]))
+  const warnungen = []
   for (const r of roteArten(verlauf, letzterGruen)) {
     // Die Notiz (Warntext der Lauf-Meldung) steht nur im Verlauf der Art, nicht in der Übersicht: ein Abruf je Warnung.
-    const notiz = r.zustand === 'warnung' ? notizZu((await holeVerlauf(fetch, WORKER, r.art)).laeufe, r) : ''
-    console.log(verlaufsZeile(r, notiz))
+    const eintrag = r.zustand === 'warnung' ? eintragZu((await holeVerlauf(fetch, WORKER, r.art)).laeufe, r) : undefined
+    if (eintrag) warnungen.push({ workflow: r.art, notiz: eintrag.notiz ?? '', laufId: eintrag.lauf_id, r })
+    else console.log(verlaufsZeile(r))
   }
+  await bekannteAbnehmen(warnungen)
   if (!rote.length) return
 
   let abgenommen = 0

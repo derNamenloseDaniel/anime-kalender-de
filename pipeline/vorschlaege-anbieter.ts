@@ -46,41 +46,77 @@ interface Vorschlag {
   unsicher?: string
 }
 
-function main(): void {
-  const titles = readJson<Title[]>('public/data/titles.json', [])
-  const tmdb = readJson<Record<string, { providers?: PlatformId[]; kind?: string; jahr?: number }>>(
-    'data/tmdb-titles.json',
-    {},
-  )
 
-  /*
-    Wer in `dub-confirmed.yaml` steht, wurde bereits angesehen — dort steht auch
-    das Nein. Ein Vorschlag für ihn wäre die Bitte, dieselbe Arbeit noch einmal
-    zu machen.
-  */
-  const yaml = readFileSync('data/dub-confirmed.yaml', 'utf8')
-  /*
-    **Geprüft wird ein Titel bei einem Anbieter, nicht ein Titel.**
+type TmdbEintrag = { providers?: PlatformId[]; kind?: string; jahr?: number }
 
-    Der Filter las bis zum 29.08.2026 nur die `anilistId` und sperrte damit
-    jeden Vorschlag zu diesem Titel, egal für welche Plattform. Gemessen: 27 von
-    83 Titeln mit belegten deutschen Sprechrollen und ganz ohne Weg fielen so
-    heraus.
+/*
+  Wer in `dub-confirmed.yaml` steht, wurde bereits angesehen — dort steht auch
+  das Nein. Ein Vorschlag für ihn wäre die Bitte, dieselbe Arbeit noch einmal
+  zu machen.
 
-    „Fullmetal Alchemist" ist der Fall zum Anfassen: geprüft wurde **Netflix**
-    (Titelseite ohne abspielbare Folge), TMDB nennt **Prime**. Der Beleg für den
-    einen Anbieter sagt über den anderen nichts — und der Titel zeigt seit der
-    Crunchyroll-Bereinigung gar keinen Weg mehr.
+  **Geprüft wird ein Titel bei einem Anbieter, nicht ein Titel.**
 
-    Gesperrt wird deshalb das Paar aus Kennung und Plattform.
-  */
-  const geprueft = new Set()
+  Der Filter las bis zum 29.08.2026 nur die `anilistId` und sperrte damit
+  jeden Vorschlag zu diesem Titel, egal für welche Plattform. Gemessen: 27 von
+  83 Titeln mit belegten deutschen Sprechrollen und ganz ohne Weg fielen so
+  heraus.
+
+  „Fullmetal Alchemist" ist der Fall zum Anfassen: geprüft wurde **Netflix**
+  (Titelseite ohne abspielbare Folge), TMDB nennt **Prime**. Der Beleg für den
+  einen Anbieter sagt über den anderen nichts — und der Titel zeigt seit der
+  Crunchyroll-Bereinigung gar keinen Weg mehr.
+
+  Gesperrt wird deshalb das Paar aus Kennung und Plattform.
+*/
+function geprueftePaare(yaml: string): Set<string> {
+  const geprueft = new Set<string>()
   for (const block of yaml.split(/\n(?=- anilistId:)/)) {
     const id = /anilistId:\s*(\d+)/.exec(block)?.[1]
     const plattform = /\n\s*platform:\s*(\S+)/.exec(block)?.[1]
     if (id && plattform) geprueft.add(`${id}|${plattform}`)
   }
+  return geprueft
+}
 
+/*
+  **Passt der TMDB-Treffer überhaupt zu unserem Eintrag?**
+
+  Gemessen am 29.08.2026: Unsere OVA 20779 („Beyond the Boundary —
+  Morgendämmerung", 1 Folge, 2014) wurde auf die **TV-Serie** TMDB 61695
+  abgebildet. Deren Anbieter — ADN und Prime — landeten damit als Vorschlag
+  in der Prüfliste, und Daniel suchte bei Prime nach einer OVA, für die dort
+  nie etwas stand. Dreizehn der 185 Vorschläge sind von dieser Art.
+
+  Zwei Prüfungen, beide einfach und beide gegen einen belegten Fall:
+
+  - **Format:** Ein Film bei uns, eine Serie bei TMDB (oder umgekehrt) — dann
+    gelten die Anbieter nicht dem, was wir suchen.
+  - **Jahr:** Fünf Jahre Abstand oder mehr. „Elysium" ist bei uns ein
+    koreanischer Film von 2003, die Suche führt auf den Hollywood-Film von
+    2013.
+
+  Der Vorschlag bleibt trotzdem in der Liste, nur hinten und mit Vermerk. Ein
+  TMDB-Treffer auf die Serie ist ein schwacher Hinweis, aber kein Unsinn:
+  Läuft die Serie bei Prime, liegt die OVA vielleicht daneben.
+*/
+function unsicherheitsGruende(t: Title, e: TmdbEintrag | undefined): string[] {
+  const unsFilm = t.format === 'MOVIE'
+  const unsNeben = t.format === 'OVA' || t.format === 'SPECIAL' || t.format === 'ONA'
+  const gruende: string[] = []
+  if (e?.kind && ((unsFilm && e.kind !== 'movie') || (unsNeben && e.kind === 'tv'))) {
+    gruende.push(`TMDB kennt nur die Serie, wir führen ${t.format}`)
+  }
+  if (e?.jahr && t.jpYear && Math.abs(e.jahr - t.jpYear) >= 5) {
+    gruende.push(`TMDB-Treffer von ${e.jahr}, unser Eintrag von ${t.jpYear}`)
+  }
+  return gruende
+}
+
+function sammleVorschlaege(
+  titles: Title[],
+  tmdb: Record<string, TmdbEintrag>,
+  geprueft: Set<string>,
+): Vorschlag[] {
   const vorschlaege: Vorschlag[] = []
   for (const t of titles) {
     if ((t.streams ?? []).length > 0) continue
@@ -89,37 +125,7 @@ function main(): void {
       (p) => !geprueft.has(`${t.id}|${p}`),
     )
     if (!anbieter.length) continue
-    /*
-      **Passt der TMDB-Treffer überhaupt zu unserem Eintrag?**
-
-      Gemessen am 29.08.2026: Unsere OVA 20779 („Beyond the Boundary —
-      Morgendämmerung", 1 Folge, 2014) wurde auf die **TV-Serie** TMDB 61695
-      abgebildet. Deren Anbieter — ADN und Prime — landeten damit als Vorschlag
-      in der Prüfliste, und Daniel suchte bei Prime nach einer OVA, für die dort
-      nie etwas stand. Dreizehn der 185 Vorschläge sind von dieser Art.
-
-      Zwei Prüfungen, beide einfach und beide gegen einen belegten Fall:
-
-      - **Format:** Ein Film bei uns, eine Serie bei TMDB (oder umgekehrt) — dann
-        gelten die Anbieter nicht dem, was wir suchen.
-      - **Jahr:** Fünf Jahre Abstand oder mehr. „Elysium" ist bei uns ein
-        koreanischer Film von 2003, die Suche führt auf den Hollywood-Film von
-        2013.
-
-      Der Vorschlag bleibt trotzdem in der Liste, nur hinten und mit Vermerk. Ein
-      TMDB-Treffer auf die Serie ist ein schwacher Hinweis, aber kein Unsinn:
-      Läuft die Serie bei Prime, liegt die OVA vielleicht daneben.
-    */
-    const e = tmdb[String(t.id)]
-    const unsFilm = t.format === 'MOVIE'
-    const unsNeben = t.format === 'OVA' || t.format === 'SPECIAL' || t.format === 'ONA'
-    const gruende: string[] = []
-    if (e?.kind && ((unsFilm && e.kind !== 'movie') || (unsNeben && e.kind === 'tv'))) {
-      gruende.push(`TMDB kennt nur die Serie, wir führen ${t.format}`)
-    }
-    if (e?.jahr && t.jpYear && Math.abs(e.jahr - t.jpYear) >= 5) {
-      gruende.push(`TMDB-Treffer von ${e.jahr}, unser Eintrag von ${t.jpYear}`)
-    }
+    const gruende = unsicherheitsGruende(t, tmdb[String(t.id)])
 
     vorschlaege.push({
       id: t.id,
@@ -132,21 +138,24 @@ function main(): void {
       ...(gruende.length ? { unsicher: gruende.join('; ') } : {}),
     })
   }
+  return vorschlaege
+}
 
-  /*
-    Nach Aussicht sortiert: Wo ANN deutsche Sprecher belegt, ist die Suche
-    lohnender als dort, wo nur ein Anbieter vermutet wird. Innerhalb dessen
-    zuerst die Serien — eine gefundene Serie bringt mehr Folgen als ein Film.
-  */
+/*
+  Nach Aussicht sortiert: Wo ANN deutsche Sprecher belegt, ist die Suche
+  lohnender als dort, wo nur ein Anbieter vermutet wird. Innerhalb dessen
+  zuerst die Serien — eine gefundene Serie bringt mehr Folgen als ein Film.
+*/
+function sortiereNachAussicht(vorschlaege: Vorschlag[]): void {
   vorschlaege.sort((a, b) => {
     /* Unsichere ganz nach hinten — sie kosten dieselbe Zeit und bringen weniger. */
     if (Boolean(a.unsicher) !== Boolean(b.unsicher)) return a.unsicher ? 1 : -1
     if (a.sprechrollen !== b.sprechrollen) return a.sprechrollen ? -1 : 1
     return (b.folgen ?? 0) - (a.folgen ?? 0)
   })
+}
 
-  writeJson('data/anbieter-vorschlaege.json', vorschlaege)
-
+function meldeZusammenfassung(vorschlaege: Vorschlag[]): void {
   const jeAnbieter: Record<string, number> = {}
   for (const v of vorschlaege) for (const a of v.anbieter) jeAnbieter[a] = (jeAnbieter[a] ?? 0) + 1
   const mitRollen = vorschlaege.filter((v) => v.sprechrollen).length
@@ -159,6 +168,17 @@ function main(): void {
         .map(([a, n]) => `${a} ${n}`)
         .join(', '),
   )
+}
+
+function main(): void {
+  const titles = readJson<Title[]>('public/data/titles.json', [])
+  const tmdb = readJson<Record<string, TmdbEintrag>>('data/tmdb-titles.json', {})
+  const geprueft = geprueftePaare(readFileSync('data/dub-confirmed.yaml', 'utf8'))
+
+  const vorschlaege = sammleVorschlaege(titles, tmdb, geprueft)
+  sortiereNachAussicht(vorschlaege)
+  writeJson('data/anbieter-vorschlaege.json', vorschlaege)
+  meldeZusammenfassung(vorschlaege)
 }
 
 main()

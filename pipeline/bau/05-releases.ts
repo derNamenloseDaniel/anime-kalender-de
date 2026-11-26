@@ -210,6 +210,44 @@ function releaseAusTeilen(t: ReleaseTeile): Release {
   }
 }
 
+interface EintragVorbereitung {
+  titleId: number | undefined
+  title: Title | undefined
+  angekuendigt: Ankuendigung | undefined
+  sources: string[]
+  schedule: Schedule
+  verpasst: ReturnType<typeof verpasstAmTermin>
+}
+
+/** Titel, Quellen, Termin und Folgenzahl eines kuratierten Eintrags — alles, was vor der Plattform-Weiche feststeht. */
+function bereiteEintragVor(
+  entry: CuratedEntry,
+  plan: KuratierterPlan,
+  { curatedIds, titles, anisearchEpisodes }: Pick<ReleaseEingaben, 'curatedIds' | 'titles' | 'anisearchEpisodes'>,
+  ankuendigungen: Map<number, Ankuendigung>,
+): EintragVorbereitung {
+  const titleId = entry.anilistId ?? curatedIds[entry.slug]
+  const title = titleId ? titles.get(titleId) : undefined
+  if (!title) warn(`"${entry.slug}": kein AniList-Titel verknüpft — läuft ohne Metadaten`)
+  const angekuendigt = titleId ? ankuendigungen.get(titleId) : undefined
+
+  const { sources, schedule } = quellenUndTermin([...(entry.sources ?? []), ...(angekuendigt?.quellen ?? [])], title?.anisearchId, plan, (n) => warn(`"${entry.slug}": ${n} Quelle(n) gehören nicht zum Titel — nicht übernommen`))
+  /* Der angekündigte Tag schlägt eine Schätzung (`bau/ankuendigungs-termin.ts`). */
+  const angekuendigterTag = angekuendigterTermin({ platform: entry.platform, schedule }, angekuendigt)
+  if (angekuendigterTag) schedule.firstEpisodeDate = angekuendigterTag
+  /*
+    **Was der Anbieter nicht eingehalten hat, steht am Termin.**
+    Die Aufbereitung steht in `bau/verpasst-am-termin.ts`.
+  */
+  const verpasst = verpasstAmTermin(entry.slug, verpassteTermine, schedule.firstEpisodeDate)
+  if (verpasst) schedule.verpasst = verpasst
+  const releaseYear = Number(plan.firstEpisodeDate.slice(0, 4))
+  if (!schedule.episodeCount && entry.releaseType === 'weekly') {
+    ergaenzeFolgenzahl(entry, schedule, title, releaseYear, anisearchEpisodes)
+  }
+  return { titleId, title, angekuendigt, sources, schedule, verpasst }
+}
+
 export function baueReleases({
   curated,
   curatedIds,
@@ -254,26 +292,8 @@ export function baueReleases({
     }
     seenSlugs.add(entry.slug)
 
-    const titleId = entry.anilistId ?? curatedIds[entry.slug]
-    const title = titleId ? titles.get(titleId) : undefined
-    if (!title) warn(`"${entry.slug}": kein AniList-Titel verknüpft — läuft ohne Metadaten`)
-    const angekuendigt = titleId ? ankuendigungen.get(titleId) : undefined
-
+    const { titleId, title, angekuendigt, sources, schedule, verpasst } = bereiteEintragVor(entry, entry.schedule, { curatedIds, titles, anisearchEpisodes }, ankuendigungen)
     const info = tmdb[entry.slug]
-    const { sources, schedule } = quellenUndTermin([...(entry.sources ?? []), ...(angekuendigt?.quellen ?? [])], title?.anisearchId, entry.schedule, (n) => warn(`"${entry.slug}": ${n} Quelle(n) gehören nicht zum Titel — nicht übernommen`))
-    /* Der angekündigte Tag schlägt eine Schätzung (`bau/ankuendigungs-termin.ts`). */
-    const angekuendigterTag = angekuendigterTermin({ platform: entry.platform, schedule }, angekuendigt)
-    if (angekuendigterTag) schedule.firstEpisodeDate = angekuendigterTag
-    /*
-      **Was der Anbieter nicht eingehalten hat, steht am Termin.**
-      Die Aufbereitung steht in `bau/verpasst-am-termin.ts`.
-    */
-    const verpasst = verpasstAmTermin(entry.slug, verpassteTermine, schedule.firstEpisodeDate)
-    if (verpasst) schedule.verpasst = verpasst
-    const releaseYear = Number(entry.schedule.firstEpisodeDate.slice(0, 4))
-    if (!schedule.episodeCount && entry.releaseType === 'weekly') {
-      ergaenzeFolgenzahl(entry, schedule, title, releaseYear, anisearchEpisodes)
-    }
 
     const name = entry.titleDe ?? title?.titleEn ?? title?.titleRomaji ?? entry.slug
     const fsk = entry.fsk ?? info?.fsk ?? title?.fsk

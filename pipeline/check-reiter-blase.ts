@@ -103,6 +103,14 @@ pruefe('nach 3000 ms zu', blasen().length === 0)
 await los('mouseover', a3)
 pruefe('nach einem Tipp öffnet das nachgereichte Zeigen nichts', blasen().length === 0)
 
+/* Tipp außerhalb schließt die getippte Blase sofort (kein `mouseout` nach einem Fingertipp). */
+await los('touchstart', a2)
+await act(async () => klicke(dom.wurzel, a2))
+await act(async () => feuere(dom.wurzel.ownerDocument as MiniKnoten, 'pointerdown', a2))
+pruefe('Tipp auf den offenen Reiter schließt nicht', blasen().length === 1)
+await act(async () => feuere(dom.wurzel.ownerDocument as MiniKnoten, 'pointerdown', dom.wurzel))
+pruefe('Tipp außerhalb schließt die Blase', blasen().length === 0)
+
 /* Schließt etwas anderes die getippte Blase, fällt ihre Frist weg: sonst schlösse sie später die nächste (hier per Tastatur). */
 await los('touchstart', a2)
 await act(async () => klicke(dom.wurzel, a2))

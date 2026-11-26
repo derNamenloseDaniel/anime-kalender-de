@@ -16,9 +16,18 @@ export function wirksameBeschreibung(beschreibung, kommentare, autor) {
   return zeilen.filter(Boolean).at(-1)?.trim() ?? beschreibung
 }
 
+/** Warntext, wenn das PR-Ereignis läuft, der Kommentar-Ausweg aber keinen Zugang hat (sonst gälte still nur die Beschreibung); sonst null. */
+export function zugangsWarnung(env = process.env) {
+  if (env.GITHUB_EVENT_NAME !== 'pull_request') return null
+  const fehlt = [env.GITHUB_REPOSITORY ? null : 'GITHUB_REPOSITORY', env.GH_TOKEN || env.GITHUB_TOKEN ? null : 'GH_TOKEN'].filter(Boolean)
+  return fehlt.length ? `⚠ Patch-Notes-Kommentar: ${fehlt.join(' und ')} fehlt im PR-Ereignis, es gilt nur die Beschreibung (Kommentar „Patch Notes: …“ wirkt nicht)` : null
+}
+
 /** Wie `wirksameBeschreibung`, die Kommentare kommen aus `api(args)` (GitHub-API); ein Abruffehler lässt die Beschreibung gelten. */
-export function beschreibungMitKommentaren(pr, repo, api = ghApiJson) {
+export function beschreibungMitKommentaren(pr, repo, api = ghApiJson, env = process.env) {
   const beschreibung = pr.body ?? ''
+  const warnung = zugangsWarnung(env)
+  if (warnung) console.error(`  ${warnung}`)
   if (!repo || !pr.number) return beschreibung
   try {
     const kommentare = api(['--paginate', '--slurp', `repos/${repo}/issues/${pr.number}/comments`]).flat()

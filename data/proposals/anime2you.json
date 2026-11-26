@@ -1,15 +1,36 @@
 {
-  "scrapedAt": "2026-11-26T04:17:13.063Z",
+  "scrapedAt": "2026-11-26T14:02:27.729Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 42,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 4,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 43,
-    "schon in einem Rubrik-Feed gelesen": 34,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
-    "Sprachhinweis älter als 45 Tage": 8
+    "schon in einem Rubrik-Feed gelesen": 10,
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 13,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 1,
+    "Sprachhinweis älter als 45 Tage": 6
   },
   "proposals": [
+    {
+      "articleTitle": "Design der acht DVD-Generationsboxen zu »Pokémon« vorgestellt",
+      "articleUrl": "https://www.anime2you.de/news/1076238/pokemon-dvd-generationsboxen-design/",
+      "publishedAt": "2026-11-26",
+      "category": "disc",
+      "platforms": [
+        "disc"
+      ],
+      "dates": [
+        {
+          "iso": "2026-12-18",
+          "context": "alle 25 Staffeln der ursprünglichen TV-Serie und sollen zwischen dem 18. Dezember 2026 und dem 25. Juni 2027 im monatlichen Rhythmus […]"
+        },
+        {
+          "iso": "2027-06-25",
+          "context": "rünglichen TV-Serie und sollen zwischen dem 18. Dezember 2026 und dem 25. Juni 2027 im monatlichen Rhythmus […] Der Beitrag Design der ach"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
     {
       "articleTitle": "Disney+ nimmt zwei Anime-Neuzugänge ins Programm",
       "articleUrl": "https://www.anime2you.de/news/1075866/disney-plus-one-punch-man-ab-sofort/",

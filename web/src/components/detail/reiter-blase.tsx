@@ -1,6 +1,6 @@
 import { useId, useRef, useState, type FocusEvent, type MouseEvent, type RefObject } from 'react'
 import { TooltipBlase, useBlasenPosition } from '../tooltip-blase.tsx'
-import { fokusZeigtBlase, useEinzigeBlase } from '../tooltip-einzeln.ts'
+import { fokusZeigtBlase, mausZeigtBlase, useEinzigeBlase } from '../tooltip-einzeln.ts'
 
 /** So lange steht die Blase nach einem Fingertipp, wie beim `Tooltip` (19.09.2026). */
 const TIPP_DAUER = 3000
@@ -35,7 +35,7 @@ export function useReiterBlase(text: (schluessel: number) => string) {
   const inhalt = offen === undefined ? '' : text(offen)
   const an = (schluessel: number) => ({
     'aria-describedby': offen === schluessel ? blasenId : undefined,
-    onMouseEnter: (e: MouseEvent<HTMLElement>) => !perTouch.current && auf(schluessel, e.currentTarget),
+    onMouseEnter: (e: MouseEvent<HTMLElement>) => !perTouch.current && mausZeigtBlase() && auf(schluessel, e.currentTarget),
     /* Nach einem Fingertipp schickt der Browser ein nachgemachtes `mouseout`, sobald das Panel neu steht: das schließt nicht, die Frist tut es. */
     onMouseLeave: () => !perTouch.current && zu(),
     onFocus: (e: FocusEvent<HTMLElement>) => fokusZeigtBlase(e.currentTarget) && auf(schluessel, e.currentTarget),

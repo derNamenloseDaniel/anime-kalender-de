@@ -86,6 +86,11 @@ const vorher = blasen()
 await drueckeEscape()
 pruefe('Escape schließt die offene Blase des Tooltip', vorher > 0 && blasen() === 0, { vorher, nachher: blasen() })
 
+/* Ein Zeiger, der gleich nach einem Escape wieder über dem Auslöser liegt (Fenster zu), öffnet keine Blase, die das nächste Escape fräße. */
+await act(async () => void huelle?.hoerer.get('mouseenter')?.forEach((x) => x.f({ target: anker })))
+pruefe('Zeiger unmittelbar nach Escape öffnet keine Blase', blasen() === 0, blasen())
+await new Promise((fertig) => setTimeout(fertig, 350))
+
 /* Blase über einem Dialog: das erste Escape schließt nur die Blase (WCAG 1.4.13), das zweite den Dialog. */
 let dialogZu = 0
 function Dialog() {

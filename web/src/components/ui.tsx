@@ -5,7 +5,7 @@ import { useLang, type TranslationKey } from '../lib/i18n.tsx'
 import { plakettenStil } from '../lib/kontrast.ts'
 import { TIPPFLAECHE, TREFFER_24, TREFFER_24_MIN } from './detail/tippziel.ts'
 import { PILLE_JA, PILLE_NEIN, ZUSTAND_TEXT } from './filter/pille-zustand.ts'
-import { fokusZeigtBlase, useEinzigeBlase } from './tooltip-einzeln.ts'
+import { fokusZeigtBlase, mausZeigtBlase, useEinzigeBlase } from './tooltip-einzeln.ts'
 import { TooltipBlase, useBlasenPosition } from './tooltip-blase.tsx'
 
 /** Gemeinsamer Fokus- und Zeigerstil aller anklickbaren Elemente. */
@@ -655,7 +655,7 @@ export function Tooltip({
     <span
       ref={anker}
       className={`relative ${fuellend ? 'flex w-full min-w-0' : 'inline-flex'} items-center ${className}`}
-      onMouseEnter={() => !tipp.nachAntippen() && setOffen(true)}
+      onMouseEnter={() => !tipp.nachAntippen() && mausZeigtBlase() && setOffen(true)}
       onMouseLeave={() => setOffen(false)}
       onFocus={(e) => !tipp.nachAntippen() && fokusZeigtBlase(e.target) && setOffen(true)}
       onBlur={() => setOffen(false)}

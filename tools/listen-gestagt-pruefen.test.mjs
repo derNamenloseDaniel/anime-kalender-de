@@ -8,6 +8,15 @@ import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSy
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 
+import { gestagteListen, listenRot } from './listen-gestagt-pruefen.mjs'
+
+// Auswahl und Prüfung ohne Prozess: Fake-`git` liefert die gestagten Namen und den Index-Text.
+const fake = (namen, texte) => (...a) => (a[0] === 'diff' ? namen.join('\0') : texte[a[1].slice(1)])
+const auswahl = ['tools/check-logic-liste.txt', 'tools/check-bestand-liste.txt', 'tools/check-logic-liste-ausnahmen.txt', 'tools/x/check-logic-liste.txt', 'tools/check-logic-liste.txt.bak', 'pipeline/check-a.ts']
+assert.deepEqual(gestagteListen(fake(auswahl, {})), ['tools/check-logic-liste.txt', 'tools/check-bestand-liste.txt'], 'nur echte Prüflisten')
+assert.deepEqual(listenRot(fake(['tools/check-logic-liste.txt'], { 'tools/check-logic-liste.txt': 'a\nb\n' })), [])
+assert.match(listenRot(fake(['tools/check-logic-liste.txt'], { 'tools/check-logic-liste.txt': 'b\na\n' }))[0], /check-logic-liste\.txt muss alphabetisch sortiert sein/)
+
 const tools = import.meta.dirname
 const wurzel = mkdtempSync(path.join(tmpdir(), 'listen-gestagt-'))
 const git = (...args) => execFileSync('git', ['-C', wurzel, '-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'core.autocrlf=false', ...args], { encoding: 'utf8', windowsHide: true, timeout: 30000 })
@@ -34,6 +43,7 @@ try {
   const unsortiert = lauf()
   assert.equal(unsortiert.status, 1, unsortiert.stderr)
   assert.match(unsortiert.stderr, /check-b\.ts steht zu früh/, 'zu früh stehender Eintrag wird genannt')
+  assert.match(unsortiert.stderr, /listen-gestagt-pruefen: Commit angehalten \(1 Fehler\):\n {2}✖ /, 'Kopfzeile mit Zahl, dann die Fehler')
 
   schreibe('tools/check-logic-liste.txt', ['pipeline/check-a.ts', 'pipeline/check-b.ts', 'pipeline/check-b.ts'])
   git('add', 'tools/check-logic-liste.txt')

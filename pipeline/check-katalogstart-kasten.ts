@@ -67,7 +67,7 @@ pruefe('00:30 ohne Uhrzeit: Netflix-Pille samt Sprachhinweis sichtbar', nachts.t
 pruefe('00:30 ohne Uhrzeit: keine Fortschrittsleiste', !nachts.balken)
 
 const abends = await kasten('2026-11-03', '2026-11-03T21:00:00Z')
-pruefe('22:00 ohne Uhrzeit: weiter die Zwischenform', abends.text.includes('Alle 6 Folgen da'), abends.text)
+pruefe('22:00 ohne Uhrzeit: Kopfzeile „Alle 6 Folgen da“', abends.text.includes('Alle 6 Folgen da'), abends.text)
 
 const folgetag = await kasten('2026-11-04', '2026-11-04T10:00:00Z')
 pruefe('Folgetag: „Alle 6 Folgen auf Deutsch“, ohne „genaue Uhrzeit unbekannt“', folgetag.text.includes('Alle 6 Folgen auf Deutsch') && !folgetag.text.includes('genaue Uhrzeit unbekannt'), folgetag.text)

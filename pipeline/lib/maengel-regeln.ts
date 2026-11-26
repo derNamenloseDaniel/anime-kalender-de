@@ -76,6 +76,8 @@ const luecke = (kuerzel: string) => (t: Title): boolean => fehlendes(t, undefine
  * `jpEnd` bleibt offen (Mängelregister, PR 4046). Der Wochentakt-Start überbrückt die Lücke zwischen zwei Folgen.
  */
 function laeuftNoch(t: Title, k: Kontext): boolean {
+  /* Eine Staffel aus einem Sammeltitel (`staffelTitel`) ohne Folgenzahl ist die offene, laufende Staffel (Yaml `offen`). */
+  if (t.staffelTitel && !t.episodes) return true
   if (t.jpEnd) return t.jpEnd >= k.heute
   if (t.jpStatus === 'FINISHED' || t.jpStatus === 'CANCELLED') return false
   if (t.jpStatus === 'RELEASING' || !t.jpYear || t.jpYear >= Number(k.heute.slice(0, 4))) return true

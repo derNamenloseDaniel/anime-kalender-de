@@ -1,6 +1,6 @@
 /**
  * Die Beobachtungen einer Meldung: eine je Folge ihrer Spanne. Eine Meldung zu einem Staffel-Titel (`shared/staffel-titel.ts`) gilt dem
- * Sammeltitel mit durchlaufender Folge (Tabelle der alten Kennungen: `pipeline/lib/staffel-altmeldungen.ts`).
+ * Sammeltitel mit durchlaufender Folge, denn der Bau liest die Urteile vor dem Schnitt (`pipeline/bau/staffel-titel.ts`).
  */
 import { type StaffelVon, staffelVonTiteln, zurueckAufSammeltitel } from '../../shared/staffel-titel.ts'
 import type { UrteilBeobachtung } from './urteil-je-folge.ts'

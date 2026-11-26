@@ -62,6 +62,7 @@ const wirft = (sts: number[]): string => {
 }
 pruefe('Liste beginnt Staffel 2 schon bei Folge 2 (Yaml: Staffel 1 bis 2): Abbruch mit Stelle', wirft([1, 1, 2, 3]).includes('Wikipedia-Folge 2'), wirft([1, 1, 2, 3]))
 pruefe('Liste zählt bei Folge 3 weiter Staffel 1 (Yaml: Staffel 2 ab 3): Abbruch mit Stelle', wirft([1, 2, 3, 4]).includes('Wikipedia-Folge 3'), wirft([1, 2, 3, 4]))
+pruefe('Abbruch nennt die Kennung des Titels', wirft([1, 1, 2, 3]).startsWith('Staffel-Titel 900571: '), wirft([1, 1, 2, 3]))
 pruefe('passende Liste: kein Abbruch', wirft([1, 2, 1, 2]) === '')
 
 /* Die Logzeile: Warnung nur mit Terminen ohne Staffel. */

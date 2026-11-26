@@ -2,6 +2,7 @@
 import { formatDate, monthName } from '@shared/time.ts'
 import type { Dispatch, SetStateAction } from 'react'
 import type { Translate } from '../lib/i18n.tsx'
+import { Tooltip } from './ui.tsx'
 
 export function SprungFuss({ kopfKnopf, springe, von, t, heute, bis }: {
   kopfKnopf: string
@@ -13,15 +14,19 @@ export function SprungFuss({ kopfKnopf, springe, von, t, heute, bis }: {
 }) {
   return (
     <>
-      <button type="button" className={kopfKnopf + ' text-[11px]'} onClick={() => springe(von)} title={t('sprung.ersterTitel')}>
-        ⇤ {formatDate(von)}
-      </button>
+      <Tooltip text={t('sprung.ersterTitel')} seite="unten">
+        <button type="button" className={kopfKnopf + ' text-[11px]'} onClick={() => springe(von)}>
+          ⇤ {formatDate(von)}
+        </button>
+      </Tooltip>
       <button type="button" className={kopfKnopf + ' text-[11px] font-medium'} onClick={() => springe(heute)}>
         {t('nav.today')}
       </button>
-      <button type="button" className={kopfKnopf + ' text-[11px]'} onClick={() => springe(bis)} title={t('sprung.letzterTitel')}>
-        {formatDate(bis)} ⇥
-      </button>
+      <Tooltip text={t('sprung.letzterTitel')} seite="unten">
+        <button type="button" className={kopfKnopf + ' text-[11px]'} onClick={() => springe(bis)}>
+          {formatDate(bis)} ⇥
+        </button>
+      </Tooltip>
     </>
   )
 }

@@ -18,34 +18,40 @@ export type Gemeldet = {
   gedeckt?: Set<string>
 }
 
-export function rechneAnbieter(roh: unknown, gemeldet: Gemeldet) {
-  const a = roh as {
-    name: string
-    plattform: string
-    offen: number
-    gesamt: number
-    gemeldet: number
-    ohneSeite?: number
-    suchAdressen?: string[]
-    ziele?: { url: string; titel: string; staffeln?: number[]; seit?: string }[]
-  }
-  const unterwegs = gemeldet.unterwegs.get(a.plattform) ?? new Set<string>()
-  const schonGemeldet = gemeldet.seitPruefstand.get(a.plattform) ?? new Set<string>()
-  /*
-    **Dieselbe Regel wie `istErledigt()` in `extension/disney.js`** (11.10.2026). Erledigt ist eine
-    Adresse, unter der seit dem Prüfstand gemeldet wurde, oder die im Briefkasten auf die Übernahme
-    wartet — der Bau kennt diese Meldung noch nicht. Eine Wiedervorlage (`seit`) braucht dagegen eine
-    Meldung seit dem Prüfstand (die Erweiterung rechnet mit `pruefstandAm`, `akGemeldetSeit`); eine
-    ältere Meldung hat sie ja gerade erst wieder aufgemacht („7 statt 9").
-  */
-  const adresseErledigt = (url: string, seit?: string) =>
-    schonGemeldet.has(url) || (!seit && unterwegs.has(url))
-  /*
-    **Nennt das Ziel seine offenen Staffeln, ist es erst erledigt, wenn jede gemeldet ist**
-    (22.09.2026). Sonst verschwand Dr. STONE nach der Meldung von Staffel 1 bis zur nächsten
-    Übernahme aus der Prüfliste, obwohl Staffel 2 offen war. Ziele ohne Staffelangabe bleiben bei der Adresse.
-  */
-  const offeneZiele = (a.ziele ?? []).filter((z) => {
+type Ziel = { url: string; titel: string; staffeln?: number[]; seit?: string }
+
+/** Ein Anbieter, wie der Prüfstand ihn schickt (nur die hier gelesenen Felder). */
+type AnbieterRoh = {
+  name: string
+  plattform: string
+  offen: number
+  gesamt: number
+  gemeldet: number
+  ohneSeite?: number
+  suchAdressen?: string[]
+  ziele?: Ziel[]
+}
+
+type ErledigtPruefung = (url: string, seit?: string) => boolean
+
+/**
+ * **Dieselbe Regel wie `istErledigt()` in `extension/disney.js`** (11.10.2026). Erledigt ist eine
+ * Adresse, unter der seit dem Prüfstand gemeldet wurde, oder die im Briefkasten auf die Übernahme
+ * wartet — der Bau kennt diese Meldung noch nicht. Eine Wiedervorlage (`seit`) braucht dagegen eine
+ * Meldung seit dem Prüfstand (die Erweiterung rechnet mit `pruefstandAm`, `akGemeldetSeit`); eine
+ * ältere Meldung hat sie ja gerade erst wieder aufgemacht („7 statt 9").
+ */
+function adresseErledigtRegel(unterwegs: Set<string>, schonGemeldet: Set<string>): ErledigtPruefung {
+  return (url, seit) => schonGemeldet.has(url) || (!seit && unterwegs.has(url))
+}
+
+/**
+ * **Nennt das Ziel seine offenen Staffeln, ist es erst erledigt, wenn jede gemeldet ist**
+ * (22.09.2026). Sonst verschwand Dr. STONE nach der Meldung von Staffel 1 bis zur nächsten
+ * Übernahme aus der Prüfliste, obwohl Staffel 2 offen war. Ziele ohne Staffelangabe bleiben bei der Adresse.
+ */
+function offeneTitelseiten(ziele: Ziel[], gemeldet: Gemeldet, adresseErledigt: ErledigtPruefung): Ziel[] {
+  return ziele.filter((z) => {
     if (gemeldet.gedeckt?.has(z.url)) return false
     if (!adresseErledigt(z.url, z.seit)) return true
     if (!z.staffeln?.length) return false
@@ -55,7 +61,10 @@ export function rechneAnbieter(roh: unknown, gemeldet: Gemeldet) {
     ]
     return !z.staffeln.every((nr) => gemeldeteStaffeln.includes(nr))
   })
-  /* Die Adressen dieses Anbieters, die als erledigt zählen — nur solche, die auch in der Zahl `offen` stecken. */
+}
+
+/* Die Adressen dieses Anbieters, die als erledigt zählen — nur solche, die auch in der Zahl `offen` stecken. */
+function erledigteAdressenVon(a: AnbieterRoh, adresseErledigt: ErledigtPruefung): Set<string> {
   const erledigteAdressen = new Set<string>()
   for (const z of a.ziele ?? []) {
     if (adresseErledigt(z.url, z.seit)) erledigteAdressen.add(z.url)
@@ -63,27 +72,38 @@ export function rechneAnbieter(roh: unknown, gemeldet: Gemeldet) {
   for (const u of a.suchAdressen ?? []) {
     if (adresseErledigt(u)) erledigteAdressen.add(u)
   }
-  /**
-   * **Eine Suchadresse ist auch ein Ziel.**
-   *
-   * Daniel am 31.08.2026: „pill click in status app doesn't open next
-   * item in prüfliste, it just opens storefront." Zu Recht — bei Prime
-   * waren alle 100 offenen Aufträge Suchadressen, und die standen nur als
-   * **Zahl** in `ohneSeite`. `ziele` blieb leer, `ziel` null, und die
-   * Anzeige fiel auf die Startseite zurück.
-   *
-   * Die Adressen liegen längst vor — der Prüfstand schickt sie seit dem
-   * 30.08.2026 als `suchAdressen` mit, damit hier die gemeldeten
-   * abgezogen werden können. Sie hinten anzuhängen kostet nichts und gibt
-   * der Pille ein Ziel: die nächste Suche, die noch niemand erledigt hat.
-   *
-   * Titelseiten stehen davor: Dort liest die Erweiterung selbst, bei
-   * einer Suche muss der Treffer erst herausgesucht werden.
-   */
-  const offeneSuchen = (a.suchAdressen ?? [])
-    .filter((u) => !adresseErledigt(u))
-    .map((u) => ({ url: u, titel: '' }))
-  const alleZiele = [...offeneZiele, ...offeneSuchen]
+  return erledigteAdressen
+}
+
+/**
+ * **Eine Suchadresse ist auch ein Ziel.**
+ *
+ * Daniel am 31.08.2026: „pill click in status app doesn't open next
+ * item in prüfliste, it just opens storefront." Zu Recht — bei Prime
+ * waren alle 100 offenen Aufträge Suchadressen, und die standen nur als
+ * **Zahl** in `ohneSeite`. `ziele` blieb leer, `ziel` null, und die
+ * Anzeige fiel auf die Startseite zurück.
+ *
+ * Die Adressen liegen längst vor — der Prüfstand schickt sie seit dem
+ * 30.08.2026 als `suchAdressen` mit, damit hier die gemeldeten
+ * abgezogen werden können. Sie hinten anzuhängen kostet nichts und gibt
+ * der Pille ein Ziel: die nächste Suche, die noch niemand erledigt hat.
+ *
+ * Titelseiten stehen davor: Dort liest die Erweiterung selbst, bei
+ * einer Suche muss der Treffer erst herausgesucht werden.
+ */
+function offeneSuchen(a: AnbieterRoh, adresseErledigt: ErledigtPruefung): Ziel[] {
+  return (a.suchAdressen ?? []).filter((u) => !adresseErledigt(u)).map((u) => ({ url: u, titel: '' }))
+}
+
+export function rechneAnbieter(roh: unknown, gemeldet: Gemeldet) {
+  const a = roh as AnbieterRoh
+  const unterwegs = gemeldet.unterwegs.get(a.plattform) ?? new Set<string>()
+  const schonGemeldet = gemeldet.seitPruefstand.get(a.plattform) ?? new Set<string>()
+  const adresseErledigt = adresseErledigtRegel(unterwegs, schonGemeldet)
+  const offeneZiele = offeneTitelseiten(a.ziele ?? [], gemeldet, adresseErledigt)
+  const erledigteAdressen = erledigteAdressenVon(a, adresseErledigt)
+  const alleZiele = [...offeneZiele, ...offeneSuchen(a, adresseErledigt)]
   return {
     name: a.name,
     plattform: a.plattform,

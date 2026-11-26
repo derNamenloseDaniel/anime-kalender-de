@@ -4,6 +4,74 @@ import { log } from '../lib/util.ts'
 import { type Title, type PlatformId } from '../../shared/types.ts'
 import { type AnisearchEintrag } from './01-quellen.ts'
 
+type Linkbefunde = Record<string, { status: number | string; prime?: boolean; geprueftAm?: string; }>
+
+function istBelegt(linkBefunde: Linkbefunde, u: string | undefined): u is string {
+  if (!u) return false
+  const b = linkBefunde[u]
+  return b?.prime === true && b.status === 200
+}
+
+/**
+ * **Die zweite Quelle für „diese Seite gibt es": Daniels eigene Notiz.**
+ *
+ * Der Riegel darüber verlangt einen Link-Befund mit Status 200. Den gibt es
+ * für Amazon nur in Losen — der Prüflauf kommt nach rund 660 Abrufen in die
+ * Abwehr und bucht danach `unklar` (623 Adressen am 07.09.2026). Deshalb
+ * stand am 10.09.2026 für 33 Titel eine Amazon-**Suche** im Kalender,
+ * obwohl aniSearch die Titelseite kennt und Daniel sie beim Prüfen selbst
+ * offen hatte.
+ *
+ * Genau das ist der Beleg: Seine Notiz nennt die Kennung, auf der er
+ * nachgesehen hat („Amazon-Seite B0F2GXP162 … Seitenadresse: B0DXS2THFS").
+ * Steht **dieselbe** Kennung auch in aniSearchs Quellenliste, haben zwei
+ * unabhängige Stellen dieselbe Seite genannt — ein Mensch mit der Seite vor
+ * Augen schlägt einen HTTP-Statuscode.
+ *
+ * Gemessen: 19 der 33 tragen das. Die übrigen 14 bleiben bei der Suche —
+ * entweder kennt aniSearch keine Kennung (7) oder die Notiz nennt eine
+ * andere Seite als aniSearch (7), und dann entscheidet nichts.
+ */
+function adresseAusNotiz(title: Title, checksJePlattform: Map<string, DubCheck[]>, anisearch: Record<string, AnisearchEintrag>): string | undefined {
+  const notizen = (checksJePlattform.get(dubKey(title.id, 'primevideo')) ?? [])
+    .map((c) => c.note ?? '')
+    .join(' ')
+  if (!notizen) return undefined
+  for (const quelle of anisearch[title.id]?.streams ?? []) {
+    const kennung = /amazon\.[a-z.]+\/(?:dp|gp\/video\/detail)\/([A-Z0-9]{10,})/i.exec(
+      String(quelle.url ?? ''),
+    )?.[1]
+    if (kennung && notizen.includes(kennung)) return amazonTitelAdresse(kennung)
+  }
+  return undefined
+}
+
+/*
+  **Gesucht wird in zwei Beständen, nicht in einem.**
+
+  Bis zum 25.08.2026 sah dieser Block nur in `watchLinks` nach. Dorthin schafft
+  es eine aniSearch-Amazon-Adresse aber nur als Kaufweg — und Kaufwege werden
+  weiter oben aussortiert, sobald die Seite tot oder hier gesperrt ist. Für
+  „The Ghost in the Shell" blieb dadurch die Suchadresse stehen, obwohl
+  `amazon.de/dp/B0GZD5N2GP` seit dem aniSearch-Abruf im Haus lag; Daniel
+  schickte genau diese Kennung von Hand („führt beim klick auf ‚bei prime
+  ansehen' auf die suchseite statt hierhin").
+
+  Der zweite Bestand ist deshalb `data/anisearch.json` selbst. Die Bedingung
+  bleibt dieselbe und ist der ganze Punkt: **belegt** ein Prime-Video-Eintrag,
+  Status 200. Hinter `/dp/` kann auch eine DVD liegen, und eine Disc als Stream
+  auszugeben wäre schlimmer als eine Suche.
+*/
+function findeEchteAdresse(title: Title, linkBefunde: Linkbefunde, checksJePlattform: Map<string, DubCheck[]>, anisearch: Record<string, AnisearchEintrag>): string | undefined {
+  return (
+    (title.watchLinks ?? []).find((w) => istBelegt(linkBefunde, w.url))?.url ??
+    (anisearch[title.id]?.streams ?? [])
+      .map((s) => s.url?.split('?')[0])
+      .find((u) => istBelegt(linkBefunde, u)) ??
+    adresseAusNotiz(title, checksJePlattform, anisearch)
+  )
+}
+
 /**
  * Ein Suchlink weicht der echten Produktseite.
  *
@@ -22,25 +90,9 @@ import { type AnisearchEintrag } from './01-quellen.ts'
  * Ersetzt wird deshalb nur, was **belegt** ein Prime-Video-Eintrag ist und
  * mit 200 antwortet. Alles andere bleibt die Suche.
  */
-/*
-  **Gesucht wird in zwei Beständen, nicht in einem.**
-
-  Bis zum 25.08.2026 sah dieser Block nur in `watchLinks` nach. Dorthin schafft
-  es eine aniSearch-Amazon-Adresse aber nur als Kaufweg — und Kaufwege werden
-  weiter oben aussortiert, sobald die Seite tot oder hier gesperrt ist. Für
-  „The Ghost in the Shell" blieb dadurch die Suchadresse stehen, obwohl
-  `amazon.de/dp/B0GZD5N2GP` seit dem aniSearch-Abruf im Haus lag; Daniel
-  schickte genau diese Kennung von Hand („führt beim klick auf ‚bei prime
-  ansehen' auf die suchseite statt hierhin").
-
-  Der zweite Bestand ist deshalb `data/anisearch.json` selbst. Die Bedingung
-  bleibt dieselbe und ist der ganze Punkt: **belegt** ein Prime-Video-Eintrag,
-  Status 200. Hinter `/dp/` kann auch eine DVD liegen, und eine Disc als Stream
-  auszugeben wäre schlimmer als eine Suche.
-*/
 export function ersetzePrimeSuchlinks({ titles, linkBefunde, checksJePlattform, anisearch, lautPruefungTot, belegFuer }: {
   titles: Map<number, Title>
-  linkBefunde: Record<string, { status: number | string; prime?: boolean; geprueftAm?: string; }>
+  linkBefunde: Linkbefunde
   checksJePlattform: Map<string, DubCheck[]>
   anisearch: Record<string, AnisearchEintrag>
   lautPruefungTot: (url: string) => boolean
@@ -50,53 +102,10 @@ export function ersetzePrimeSuchlinks({ titles, linkBefunde, checksJePlattform, 
   for (const title of titles.values()) {
     const prime = title.streams.find((s) => s.platform === 'primevideo')
     if (!prime || !/amazon\.[a-z.]+\/s\?/.test(prime.url)) continue
-    const belegt = (u: string | undefined): u is string => {
-      if (!u) return false
-      const b = linkBefunde[u]
-      return b?.prime === true && b.status === 200
-    }
-    /**
-     * **Die zweite Quelle für „diese Seite gibt es": Daniels eigene Notiz.**
-     *
-     * Der Riegel darüber verlangt einen Link-Befund mit Status 200. Den gibt es
-     * für Amazon nur in Losen — der Prüflauf kommt nach rund 660 Abrufen in die
-     * Abwehr und bucht danach `unklar` (623 Adressen am 07.09.2026). Deshalb
-     * stand am 10.09.2026 für 33 Titel eine Amazon-**Suche** im Kalender,
-     * obwohl aniSearch die Titelseite kennt und Daniel sie beim Prüfen selbst
-     * offen hatte.
-     *
-     * Genau das ist der Beleg: Seine Notiz nennt die Kennung, auf der er
-     * nachgesehen hat („Amazon-Seite B0F2GXP162 … Seitenadresse: B0DXS2THFS").
-     * Steht **dieselbe** Kennung auch in aniSearchs Quellenliste, haben zwei
-     * unabhängige Stellen dieselbe Seite genannt — ein Mensch mit der Seite vor
-     * Augen schlägt einen HTTP-Statuscode.
-     *
-     * Gemessen: 19 der 33 tragen das. Die übrigen 14 bleiben bei der Suche —
-     * entweder kennt aniSearch keine Kennung (7) oder die Notiz nennt eine
-     * andere Seite als aniSearch (7), und dann entscheidet nichts.
-     */
-    const ausNotiz = (): string | undefined => {
-      const notizen = (checksJePlattform.get(dubKey(title.id, 'primevideo')) ?? [])
-        .map((c) => c.note ?? '')
-        .join(' ')
-      if (!notizen) return undefined
-      for (const quelle of anisearch[title.id]?.streams ?? []) {
-        const kennung = /amazon\.[a-z.]+\/(?:dp|gp\/video\/detail)\/([A-Z0-9]{10,})/i.exec(
-          String(quelle.url ?? ''),
-        )?.[1]
-        if (kennung && notizen.includes(kennung)) return amazonTitelAdresse(kennung)
-      }
-      return undefined
-    }
-    const echt =
-      (title.watchLinks ?? []).find((w) => belegt(w.url))?.url ??
-      (anisearch[title.id]?.streams ?? [])
-        .map((s) => s.url?.split('?')[0])
-        .find((u) => belegt(u)) ??
-      ausNotiz()
+    const echt = findeEchteAdresse(title, linkBefunde, checksJePlattform, anisearch)
     /*
       **Auch hier keine Adresse, die die Linkprüfung als tot kennt** (18.09.2026,
-      Mob Psycho 100 und Horimiya). `ausNotiz()` baut die Adresse aus der Kennung
+      Mob Psycho 100 und Horimiya). `adresseAusNotiz()` baut die Adresse aus der Kennung
       neu (`amazonTitelAdresse`) und fragt dabei nicht nach, ob sie noch lebt.
       Ein zweiter, per `verweise-von-hand.yaml` angelegter Verweis auf dieselbe
       — lebende — Kennung wurde danach als Dublette verworfen, und übrig blieb

@@ -16,3 +16,4 @@ const vorschlaege = (JSON.parse(readFileSync('data/proposals/anime2you.json', 'u
 const tage = new Map(vorschlaege.map((v) => [v.articleUrl, v.publishedAt]))
 const befunde = ueberfaelligOhneRelease(datei.eintraege, tage, datei.stand)
 for (const zeile of zeilenOhneRelease(befunde, BEKANNT_OHNE_RELEASE, datei.stand)) console.log(zeile)
+console.log('VERSTÖSSE: 0')

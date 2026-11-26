@@ -1,5 +1,0 @@
-kategorie: bugfix
-text: Staffel-Cover jetzt auf Deutsch oder Englisch
-untertitel: Etwa Attack on Titan Staffel 2 und Psycho-Pass 2
-wartetAuf: "Bestandsbau nach diesem PR. Probe: node tools/maengel.mjs zeigt bei bild-fremdsprachig höchstens 80 offene Titel weniger als vorher; public/data/titles.json trägt für die neu gewählten Staffelplakate ein geändertes coverImage. Ändert sich nichts, wird der Eintrag gelöscht."
-seit: '2026-11-23'

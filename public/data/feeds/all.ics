@@ -10,280 +10,6 @@ X-WR-TIMEZONE:Europe/Berlin
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:auto-10012621-tv-super-rtl@2026-11-17#58@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261117T085000Z
-DTEND:20261117T092000Z
-SUMMARY:Super Wings
-DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
- ails: https://anime-kalender.de/t/18191/
-CATEGORIES:Super RTL
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-10012621-tv-super-rtl@2026-11-17#59@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261117T090000Z
-DTEND:20261117T093000Z
-SUMMARY:Super Wings
-DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
- ails: https://anime-kalender.de/t/18191/
-CATEGORIES:Super RTL
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-10012621-tv-toggo-plus@2026-11-17#58@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261117T095000Z
-DTEND:20261117T102000Z
-SUMMARY:Super Wings
-DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/18191/
-CATEGORIES:TOGGO plus
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-10012621-tv-toggo-plus@2026-11-17#59@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261117T100000Z
-DTEND:20261117T103000Z
-SUMMARY:Super Wings
-DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/18191/
-CATEGORIES:TOGGO plus
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-158871-tv-super-rtl@2026-11-17@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261117T151500Z
-DTEND:20261117T154500Z
-SUMMARY:Pokémon Horizonte: Die Serie – Folge 33
-DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
- ails: https://anime-kalender.de/t/26469/
-CATEGORIES:Super RTL
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-17#74@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261117T154500Z
-DTEND:20261117T161500Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-17#75@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261117T160500Z
-DTEND:20261117T163500Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-158871-tv-toggo-plus@2026-11-17@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261117T161500Z
-DTEND:20261117T164500Z
-SUMMARY:Pokémon Horizonte: Die Serie – Folge 33
-DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/26469/
-CATEGORIES:TOGGO plus
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-112153-tv-toggo-plus@2026-11-17@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261117T201500Z
-DTEND:20261117T204500Z
-SUMMARY:Pokémon Reisen: Die Serie
-DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/10852/
-CATEGORIES:TOGGO plus
-END:VEVENT
-BEGIN:VEVENT
-UID:adn-1218@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T080000Z
-DTEND:20261118T083000Z
-SUMMARY:Kill la Kill (neu bei ADN)
-DESCRIPTION:Plattform: ADN\nRelease-Art: Katalogtitel\nIm Angebot seit dies
- em Tag – nicht der Erscheinungstag der deutschen Fassung.\nDetails: http
- s://anime-kalender.de/t/6710/
-CATEGORIES:ADN
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-10012621-tv-super-rtl@2026-11-18#60@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T085000Z
-DTEND:20261118T092000Z
-SUMMARY:Super Wings
-DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
- ails: https://anime-kalender.de/t/18191/
-CATEGORIES:Super RTL
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-10012621-tv-super-rtl@2026-11-18#61@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T090000Z
-DTEND:20261118T093000Z
-SUMMARY:Super Wings
-DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
- ails: https://anime-kalender.de/t/18191/
-CATEGORIES:Super RTL
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-10012621-tv-toggo-plus@2026-11-18#60@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T095000Z
-DTEND:20261118T102000Z
-SUMMARY:Super Wings
-DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/18191/
-CATEGORIES:TOGGO plus
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-10012621-tv-toggo-plus@2026-11-18#61@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T100000Z
-DTEND:20261118T103000Z
-SUMMARY:Super Wings
-DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/18191/
-CATEGORIES:TOGGO plus
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-G24H1N334@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T143000Z
-DTEND:20261118T150000Z
-SUMMARY:The Detective Is Already Dead Staffel 2 – Folge 4/13
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
- etails: https://anime-kalender.de/t/14415/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-158871-tv-super-rtl@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T151500Z
-DTEND:20261118T154500Z
-SUMMARY:Pokémon Horizonte: Die Serie – Folge 34
-DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
- ails: https://anime-kalender.de/t/26469/
-CATEGORIES:Super RTL
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-139630-tv-prosieben-maxx@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T154000Z
-DTEND:20261118T161000Z
-SUMMARY:My Hero Academia Staffel 6 – Folge 1
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/13453/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-18#76@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T160500Z
-DTEND:20261118T163500Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-158871-tv-toggo-plus@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T161500Z
-DTEND:20261118T164500Z
-SUMMARY:Pokémon Horizonte: Die Serie – Folge 34
-DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/26469/
-CATEGORIES:TOGGO plus
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GT00383994@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T163000Z
-DTEND:20261118T170000Z
-SUMMARY:Magic Knight Rayearth – Folge 4/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
- etails: https://anime-kalender.de/t/16013/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-223-tv-prosieben-maxx@2026-11-18#77@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T163000Z
-DTEND:20261118T170000Z
-SUMMARY:Dragon Ball
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nDetails: https://anime-kalender.de/t/193/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:yaiba-samurai-legend-prosieben-maxx@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T172500Z
-DTEND:20261118T175500Z
-SUMMARY:YAIBA: Samurai Legend – Folge 8/24
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:yaiba-samurai-legend-joyn@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T175000Z
-DTEND:20261118T182000Z
-SUMMARY:YAIBA: Samurai Legend – Folge 8/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
-  https://anime-kalender.de/t/15908/
-CATEGORIES:Joyn
-END:VEVENT
-BEGIN:VEVENT
-UID:one-piece-whole-cake-island-prosieben-maxx@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T175000Z
-DTEND:20261118T182000Z
-SUMMARY:ONE PIECE – Folge 787/877
-DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nGeschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhyth
- mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
- t/12/
-CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-112153-tv-toggo-plus@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261118T201500Z
-DTEND:20261118T204500Z
-SUMMARY:Pokémon Reisen: Die Serie
-DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/10852/
-CATEGORIES:TOGGO plus
-END:VEVENT
-BEGIN:VEVENT
-UID:memories-2026-11-18@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261118
-DTEND;VALUE=DATE:20261119
-SUMMARY:Memories (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/1262/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
-UID:motn-1548-primevideo@2026-11-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261118
-DTEND;VALUE=DATE:20261119
-SUMMARY:Die Königin der tausend Jahre (neu bei Prime Video)
-DESCRIPTION:Plattform: Prime Video\nRelease-Art: Katalogtitel\nIm Angebot s
- eit diesem Tag – nicht der Erscheinungstag der deutschen Fassung.\nUhrze
- it noch nicht bestätigt.\nDetails: https://anime-kalender.de/t/1335/
-CATEGORIES:Prime Video
-END:VEVENT
-BEGIN:VEVENT
 UID:auto-10012621-tv-super-rtl@2026-11-19#62@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261119T085000Z
@@ -328,9 +54,9 @@ UID:auto-158871-tv-super-rtl@2026-11-19@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261119T151500Z
 DTEND:20261119T154500Z
-SUMMARY:Pokémon Horizonte: Die Serie – Folge 35
+SUMMARY:Pokémon Horizonte – Folge 35
 DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
- ails: https://anime-kalender.de/t/26469/
+ ails: https://anime-kalender.de/t/14839/
 CATEGORIES:Super RTL
 END:VEVENT
 BEGIN:VEVENT
@@ -358,9 +84,9 @@ UID:auto-158871-tv-toggo-plus@2026-11-19@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261119T161500Z
 DTEND:20261119T164500Z
-SUMMARY:Pokémon Horizonte: Die Serie – Folge 35
+SUMMARY:Pokémon Horizonte – Folge 35
 DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/26469/
+ tails: https://anime-kalender.de/t/14839/
 CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
@@ -641,9 +367,9 @@ UID:auto-158871-tv-super-rtl@2026-11-20@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261120T151500Z
 DTEND:20261120T154500Z
-SUMMARY:Pokémon Horizonte: Die Serie – Folge 36
+SUMMARY:Pokémon Horizonte – Folge 36
 DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
- ails: https://anime-kalender.de/t/26469/
+ ails: https://anime-kalender.de/t/14839/
 CATEGORIES:Super RTL
 END:VEVENT
 BEGIN:VEVENT
@@ -681,9 +407,9 @@ UID:auto-158871-tv-toggo-plus@2026-11-20@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261120T161500Z
 DTEND:20261120T164500Z
-SUMMARY:Pokémon Horizonte: Die Serie – Folge 36
+SUMMARY:Pokémon Horizonte – Folge 36
 DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/26469/
+ tails: https://anime-kalender.de/t/14839/
 CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
@@ -1039,7 +765,7 @@ UID:pokemon-horizonte-s4-rtlplus@2026-11-20@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261120
 DTEND;VALUE=DATE:20261121
-SUMMARY:Pokémon Horizonte: Staffel 4 – Wunder in Sicht (neu bei RTL+)
+SUMMARY:Pokémon Horizonte – Staffel 4 (neu bei RTL+)
 DESCRIPTION:Plattform: RTL+\nRelease-Art: Katalogtitel\nIm Angebot seit die
  sem Tag – nicht der Erscheinungstag der deutschen Fassung.\nUhrzeit noch
   nicht bestätigt.\nDetails: https://anime-kalender.de/t/14839/
@@ -1092,9 +818,9 @@ UID:auto-158871-tv-super-rtl@2026-11-21@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261121T115500Z
 DTEND:20261121T122500Z
-SUMMARY:Pokémon Horizonte: Staffel 3 – Gute Aussichten – Folge 47
+SUMMARY:Pokémon Horizonte – Folge 136
 DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
- ails: https://anime-kalender.de/t/26471/
+ ails: https://anime-kalender.de/t/14839/
 CATEGORIES:Super RTL
 END:VEVENT
 BEGIN:VEVENT
@@ -1102,9 +828,9 @@ UID:auto-158871-tv-toggo-plus@2026-11-21@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261121T125500Z
 DTEND:20261121T132500Z
-SUMMARY:Pokémon Horizonte: Staffel 3 – Gute Aussichten – Folge 47
+SUMMARY:Pokémon Horizonte – Folge 136
 DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
- tails: https://anime-kalender.de/t/26471/
+ tails: https://anime-kalender.de/t/14839/
 CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
@@ -1122,7 +848,7 @@ UID:black-clover-s2-crunchyroll-synchro@2026-11-21@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261121T160000Z
 DTEND:20261121T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 3/≈12
+SUMMARY:Black Clover – Staffel 2 – Folge 3/≈174
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
  etails: https://anime-kalender.de/t/16920/
 CATEGORIES:Crunchyroll
@@ -1327,6 +1053,66 @@ DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
 CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-24#68@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261124T085000Z
+DTEND:20261124T092000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-24#69@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261124T090000Z
+DTEND:20261124T093000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-24#68@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261124T095000Z
+DTEND:20261124T102000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-24#69@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261124T100000Z
+DTEND:20261124T103000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-158871-tv-super-rtl@2026-11-24@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261124T151500Z
+DTEND:20261124T154500Z
+SUMMARY:Pokémon Horizonte – Folge 38
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/14839/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-158871-tv-toggo-plus@2026-11-24@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261124T161500Z
+DTEND:20261124T164500Z
+SUMMARY:Pokémon Horizonte – Folge 38
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/14839/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
 UID:yaiba-samurai-legend-prosieben-maxx@2026-11-24@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261124T172500Z
@@ -1362,28 +1148,94 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:auto-112153-tv-toggo-plus@2026-11-24@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261124T201500Z
+DTEND:20261124T204500Z
+SUMMARY:Pokémon Reisen: Die Serie
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/10852/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-25#70@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261125T085000Z
+DTEND:20261125T092000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-25#71@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261125T090000Z
+DTEND:20261125T093000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-25#70@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261125T095000Z
+DTEND:20261125T102000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-25#71@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261125T100000Z
+DTEND:20261125T103000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
 UID:cr-G24H1N334@2026-11-25@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261125T143000Z
-DTEND:20261125T150000Z
+DTSTART:20261125T133000Z
+DTEND:20261125T140000Z
 SUMMARY:The Detective Is Already Dead Staffel 2 – Folge 5/13
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 4415/
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
+ etails: https://anime-kalender.de/t/14415/
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2026-11-25@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261125T163000Z
-DTEND:20261125T170000Z
+DTSTART:20261125T151500Z
+DTEND:20261125T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 5/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6013/
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
+ etails: https://anime-kalender.de/t/16013/
 CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-158871-tv-super-rtl@2026-11-25@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261125T151500Z
+DTEND:20261125T154500Z
+SUMMARY:Pokémon Horizonte – Folge 39
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/14839/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-158871-tv-toggo-plus@2026-11-25@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261125T161500Z
+DTEND:20261125T164500Z
+SUMMARY:Pokémon Horizonte – Folge 39
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/14839/
+CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
 UID:yaiba-samurai-legend-prosieben-maxx@2026-11-25@anime-kalender-de
@@ -1421,6 +1273,16 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:auto-112153-tv-toggo-plus@2026-11-25@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261125T201500Z
+DTEND:20261125T204500Z
+SUMMARY:Pokémon Reisen: Die Serie
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/10852/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
 UID:auto-141391-netflix@2026-11-25@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261125
@@ -1430,6 +1292,87 @@ DESCRIPTION:Plattform: Netflix\nRelease-Art: Katalog\nSynchro offen: Der Te
  rmin ist belegt\, eine deutsche Synchro nicht.\nUhrzeit noch nicht bestät
  igt.\nDetails: https://anime-kalender.de/t/13665/
 CATEGORIES:Netflix
+END:VEVENT
+BEGIN:VEVENT
+UID:motn-135660-netflix@2026-11-25@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261125
+DTEND;VALUE=DATE:20261126
+SUMMARY:Exception (neu bei Netflix)
+DESCRIPTION:Plattform: Netflix\nRelease-Art: Katalogtitel\nIm Angebot seit 
+ diesem Tag – nicht der Erscheinungstag der deutschen Fassung.\nUhrzeit n
+ och nicht bestätigt.\nDetails: https://anime-kalender.de/t/13073/
+CATEGORIES:Netflix
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-26#72@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261126T085000Z
+DTEND:20261126T092000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-26#73@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261126T090000Z
+DTEND:20261126T093000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-26#72@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261126T095000Z
+DTEND:20261126T102000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-26#73@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261126T100000Z
+DTEND:20261126T103000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-158871-tv-super-rtl@2026-11-26@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261126T151500Z
+DTEND:20261126T154500Z
+SUMMARY:Pokémon Horizonte – Folge 40
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/14839/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-158871-tv-toggo-plus@2026-11-26@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261126T161500Z
+DTEND:20261126T164500Z
+SUMMARY:Pokémon Horizonte – Folge 40
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/14839/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:cr-GDKHZEP21@2026-11-26@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261126T170000Z
+DTEND:20261126T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 5/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
+ etails: https://anime-kalender.de/t/17631/
+CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:yaiba-samurai-legend-prosieben-maxx@2026-11-26@anime-kalender-de
@@ -1467,16 +1410,14 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
-UID:cr-GDKHZEP21@2026-11-26@anime-kalender-de
+UID:auto-112153-tv-toggo-plus@2026-11-26@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261126T180000Z
-DTEND:20261126T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 5/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
+DTSTART:20261126T201500Z
+DTEND:20261126T204500Z
+SUMMARY:Pokémon Reisen: Die Serie
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/10852/
+CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
 UID:auto-213805-netflix@2026-11-26@anime-kalender-de
@@ -1683,15 +1624,36 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2026-11-28@anime-kalender-de
+UID:black-clover-s2-crunchyroll@2026-11-28@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261128T160000Z
 DTEND:20261128T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 4/≈12
+SUMMARY:Black Clover – Staffel 2 – Folge 174/174 (OmU)
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
+ lton mit deutschen Untertiteln\, keine deutsche Synchro.\nDetails: https:/
+ /anime-kalender.de/t/16920/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll-synchro@2026-11-28#4@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261128T160000Z
+DTEND:20261128T163000Z
+SUMMARY:Black Clover – Staffel 2 – Folge 4–173/≈174
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
   oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
  6920/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
+UID:black-clover-s2-crunchyroll-synchro@2026-11-28#174@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261128T160000Z
+DTEND:20261128T163000Z
+SUMMARY:Black Clover – Staffel 2 – Folge 174/≈174
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
+ etails: https://anime-kalender.de/t/16920/
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
@@ -1914,8 +1876,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-G24H1N334@2026-12-02@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261202T143000Z
-DTEND:20261202T150000Z
+DTSTART:20261202T133000Z
+DTEND:20261202T140000Z
 SUMMARY:The Detective Is Already Dead Staffel 2 – Folge 6/13
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -1926,8 +1888,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2026-12-02@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261202T163000Z
-DTEND:20261202T170000Z
+DTSTART:20261202T151500Z
+DTEND:20261202T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 6/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -1971,6 +1933,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GDKHZEP21@2026-12-03@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261203T170000Z
+DTEND:20261203T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 6/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7631/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:yaiba-samurai-legend-prosieben-maxx@2026-12-03@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261203T172500Z
@@ -2004,18 +1978,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GDKHZEP21@2026-12-03@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261203T180000Z
-DTEND:20261203T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 6/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:hallo-kurt-2026-12-03@2026-12-03@anime-kalender-de
@@ -2183,26 +2145,6 @@ DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
 CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT
-UID:sakamoto-days-vol1@2026-12-04@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261204
-DTEND;VALUE=DATE:20261205
-SUMMARY:Sakamoto Days – Vol. 1 (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/15940/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
-UID:bocchi-the-rock-vol1@2026-12-04@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261204
-DTEND;VALUE=DATE:20261205
-SUMMARY:Bocchi the Rock! – Vol. 1 (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/12647/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
 UID:dragon-maid-s1-steelbook@2026-12-04@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261204
@@ -2333,18 +2275,6 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
   oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
  7248/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2026-12-05@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261205T160000Z
-DTEND:20261205T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 5/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
@@ -2544,8 +2474,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-G24H1N334@2026-12-09@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261209T143000Z
-DTEND:20261209T150000Z
+DTSTART:20261209T133000Z
+DTEND:20261209T140000Z
 SUMMARY:The Detective Is Already Dead Staffel 2 – Folge 7/13
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -2556,8 +2486,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2026-12-09@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261209T163000Z
-DTEND:20261209T170000Z
+DTSTART:20261209T151500Z
+DTEND:20261209T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 7/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -2601,6 +2531,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GDKHZEP21@2026-12-10@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261210T170000Z
+DTEND:20261210T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 7/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7631/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:yaiba-samurai-legend-prosieben-maxx@2026-12-10@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261210T172500Z
@@ -2634,18 +2576,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GDKHZEP21@2026-12-10@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261210T180000Z
-DTEND:20261210T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 7/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:nukitashi-vol1@2026-12-10@anime-kalender-de
@@ -2747,11 +2677,11 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
-UID:sakamoto-days-vol2@2026-12-11@anime-kalender-de
+UID:sakamoto-days-vol1@2026-12-11@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261211
 DTEND;VALUE=DATE:20261212
-SUMMARY:Sakamoto Days – Vol. 2 (Disc)
+SUMMARY:Sakamoto Days – Vol. 1 (Disc)
 DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
  och nicht bestätigt.\nDetails: https://anime-kalender.de/t/15940/
 CATEGORIES:DVD / Blu-ray
@@ -2810,18 +2740,6 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
   oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
  7248/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2026-12-12@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261212T160000Z
-DTEND:20261212T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 6/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
@@ -2975,8 +2893,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-G24H1N334@2026-12-16@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261216T143000Z
-DTEND:20261216T150000Z
+DTSTART:20261216T133000Z
+DTEND:20261216T140000Z
 SUMMARY:The Detective Is Already Dead Staffel 2 – Folge 8/13
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -2987,8 +2905,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2026-12-16@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261216T163000Z
-DTEND:20261216T170000Z
+DTSTART:20261216T151500Z
+DTEND:20261216T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 8/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -3009,6 +2927,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GDKHZEP21@2026-12-17@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261217T170000Z
+DTEND:20261217T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 8/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7631/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2026-12-17@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261217T175000Z
@@ -3019,28 +2949,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GDKHZEP21@2026-12-17@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261217T180000Z
-DTEND:20261217T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 8/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:virgin-road-vol2@2026-12-17@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261217
-DTEND;VALUE=DATE:20261218
-SUMMARY:Virgin Road – Vol. 2 (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/12466/
-CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT
 UID:auto-213805-netflix@2026-12-17@anime-kalender-de
@@ -3144,6 +3052,16 @@ DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
 CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT
+UID:bocchi-the-rock-vol1@2026-12-18@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261218
+DTEND;VALUE=DATE:20261219
+SUMMARY:Bocchi the Rock! – Vol. 1 (Disc)
+DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
+ och nicht bestätigt.\nDetails: https://anime-kalender.de/t/12647/
+CATEGORIES:DVD / Blu-ray
+END:VEVENT
+BEGIN:VEVENT
 UID:my-love-story-with-yamada-kun-vol2@2026-12-18@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261218
@@ -3217,6 +3135,16 @@ DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nAuf Deuts
 CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT
+UID:virgin-road-vol2@2026-12-18@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261218
+DTEND;VALUE=DATE:20261219
+SUMMARY:Virgin Road – Vol. 2 (Disc)
+DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
+ och nicht bestätigt.\nDetails: https://anime-kalender.de/t/12466/
+CATEGORIES:DVD / Blu-ray
+END:VEVENT
+BEGIN:VEVENT
 UID:devils-crest-primevideo@2026-12-18@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261218
@@ -3227,6 +3155,16 @@ DESCRIPTION:Plattform: Prime Video\nRelease-Art: Wöchentlich (Simuldub)\nU
  nnter Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetail
  s: https://anime-kalender.de/t/17221/
 CATEGORIES:Prime Video
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-527-disc@2026-12-18@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261218
+DTEND;VALUE=DATE:20261219
+SUMMARY:Pokémon (Disc)
+DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
+ och nicht bestätigt.\nDetails: https://anime-kalender.de/t/483/
+CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT
 UID:auto-5231-disc@2026-12-18@anime-kalender-de
@@ -3260,18 +3198,6 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
   oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
  7248/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2026-12-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261219T160000Z
-DTEND:20261219T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 7/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
@@ -3400,8 +3326,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-G24H1N334@2026-12-23@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261223T143000Z
-DTEND:20261223T150000Z
+DTSTART:20261223T133000Z
+DTEND:20261223T140000Z
 SUMMARY:The Detective Is Already Dead Staffel 2 – Folge 9/13
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -3412,8 +3338,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2026-12-23@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261223T163000Z
-DTEND:20261223T170000Z
+DTSTART:20261223T151500Z
+DTEND:20261223T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 9/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -3434,6 +3360,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GDKHZEP21@2026-12-24@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261224T170000Z
+DTEND:20261224T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 9/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7631/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2026-12-24@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261224T175000Z
@@ -3444,18 +3382,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GDKHZEP21@2026-12-24@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261224T180000Z
-DTEND:20261224T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 9/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:auto-213805-netflix@2026-12-24@anime-kalender-de
@@ -3563,18 +3489,6 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2026-12-26@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261226T160000Z
-DTEND:20261226T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 8/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
 UID:seven-knights-marronnier-kingdom-primevideo@2026-12-26@anime-kalender-d
  e
 DTSTAMP:20200101T000000Z
@@ -3664,8 +3578,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-G24H1N334@2026-12-30@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261230T143000Z
-DTEND:20261230T150000Z
+DTSTART:20261230T133000Z
+DTEND:20261230T140000Z
 SUMMARY:The Detective Is Already Dead Staffel 2 – Folge 10/13
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -3676,8 +3590,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2026-12-30@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20261230T163000Z
-DTEND:20261230T170000Z
+DTSTART:20261230T151500Z
+DTEND:20261230T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 10/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -3698,6 +3612,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GDKHZEP21@2026-12-31@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261231T170000Z
+DTEND:20261231T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 10/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7631/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2026-12-31@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261231T175000Z
@@ -3708,18 +3634,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GDKHZEP21@2026-12-31@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261231T180000Z
-DTEND:20261231T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 10/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:auto-27-primevideo@2026-12-31@anime-kalender-de
@@ -3805,18 +3719,6 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2027-01-02@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20270102T160000Z
-DTEND:20270102T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 9/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
 UID:seven-knights-marronnier-kingdom-primevideo@2027-01-02@anime-kalender-d
  e
 DTSTAMP:20200101T000000Z
@@ -3893,8 +3795,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-G24H1N334@2027-01-06@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20270106T143000Z
-DTEND:20270106T150000Z
+DTSTART:20270106T133000Z
+DTEND:20270106T140000Z
 SUMMARY:The Detective Is Already Dead Staffel 2 – Folge 11/13
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -3905,8 +3807,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2027-01-06@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20270106T163000Z
-DTEND:20270106T170000Z
+DTSTART:20270106T151500Z
+DTEND:20270106T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 11/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -3927,6 +3829,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GDKHZEP21@2027-01-07@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20270107T170000Z
+DTEND:20270107T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 11/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7631/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2027-01-07@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20270107T175000Z
@@ -3937,18 +3851,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GDKHZEP21@2027-01-07@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20270107T180000Z
-DTEND:20270107T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 11/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:apothecary-diaries-s3-cour1@2027-01-08@anime-kalender-de
@@ -4008,18 +3910,6 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
   oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
  6918/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2027-01-09@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20270109T160000Z
-DTEND:20270109T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 10/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
@@ -4086,8 +3976,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-G24H1N334@2027-01-13@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20270113T143000Z
-DTEND:20270113T150000Z
+DTSTART:20270113T133000Z
+DTEND:20270113T140000Z
 SUMMARY:The Detective Is Already Dead Staffel 2 – Folge 12/13
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -4098,8 +3988,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383994@2027-01-13@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20270113T163000Z
-DTEND:20270113T170000Z
+DTSTART:20270113T151500Z
+DTEND:20270113T154500Z
 SUMMARY:Magic Knight Rayearth – Folge 12/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -4120,6 +4010,18 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GDKHZEP21@2027-01-14@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20270114T170000Z
+DTEND:20270114T173000Z
+SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 12/≈12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7631/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2027-01-14@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20270114T175000Z
@@ -4130,18 +4032,6 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GDKHZEP21@2027-01-14@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20270114T180000Z
-DTEND:20270114T183000Z
-SUMMARY:The Iceblade Sorcerer Shall Rule the World II – Folge 12/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7631/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383999@2027-01-15@anime-kalender-de
@@ -4188,6 +4078,16 @@ DTEND;VALUE=DATE:20270116
 SUMMARY:Bitte zieh dich an\, Takamine! – Vol. 2 (Disc)
 DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
  och nicht bestätigt.\nDetails: https://anime-kalender.de/t/16104/
+CATEGORIES:DVD / Blu-ray
+END:VEVENT
+BEGIN:VEVENT
+UID:sakamoto-days-vol2@2027-01-15@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20270115
+DTEND;VALUE=DATE:20270116
+SUMMARY:Sakamoto Days – Vol. 2 (Disc)
+DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
+ och nicht bestätigt.\nDetails: https://anime-kalender.de/t/15940/
 CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT
@@ -4352,18 +4252,6 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2027-01-16@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20270116T160000Z
-DTEND:20270116T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 11/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
 UID:seven-knights-marronnier-kingdom-primevideo@2027-01-16@anime-kalender-d
  e
 DTSTAMP:20200101T000000Z
@@ -4427,8 +4315,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-G24H1N334@2027-01-20@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20270120T143000Z
-DTEND:20270120T150000Z
+DTSTART:20270120T133000Z
+DTEND:20270120T140000Z
 SUMMARY:The Detective Is Already Dead Staffel 2 – Folge 13/13
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -4473,16 +4361,14 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll-synchro@2027-01-23@anime-kalender-de
+UID:auto-9041-disc@2027-01-22@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20270123T160000Z
-DTEND:20270123T163000Z
-SUMMARY:Black Clover – Staffel 2 – Folge 12/≈12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6920/
-CATEGORIES:Crunchyroll
+DTSTART;VALUE=DATE:20270122
+DTEND;VALUE=DATE:20270123
+SUMMARY:Infinite Stratos (Disc)
+DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
+ och nicht bestätigt.\nDetails: https://anime-kalender.de/t/4725/
+CATEGORIES:DVD / Blu-ray
 END:VEVENT
 BEGIN:VEVENT
 UID:seven-knights-marronnier-kingdom-primevideo@2027-01-23@anime-kalender-d

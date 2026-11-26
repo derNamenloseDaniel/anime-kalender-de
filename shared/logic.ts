@@ -759,3 +759,9 @@ export function bereicheMitFolgen(bereiche: DubBereich[], neu: number[]): DubBer
   }
   return raus
 }
+
+/** Lage einer Staffel am Reiter (F157): Punkt = läuft, Ring = kommt, sonst ohne Marke. */
+export type StaffelLage = 'laeuft' | 'kommt' | 'ruht'
+
+/* Die Rechnung der Marke samt Grund steht in `lage-grund.ts` (hier nur der Name, damit Aufrufer ihn weiter von hier holen). */
+export { staffelLage, staffelLageMitGrund, fruehesterTermin, type LageGrund, type LageMitGrund } from './lage-grund.ts'

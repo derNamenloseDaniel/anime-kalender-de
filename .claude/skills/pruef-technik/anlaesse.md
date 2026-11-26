@@ -921,3 +921,7 @@ Gruppiert nach Kennung (K1, K5l …); Regeln ohne Kennung unter ihrem alten Absc
 ### bauer: Kennung K56
 
 - [B311] **K56 Gespeicherter Nutzerzustand (Lehre 242, 23.11.2026, PR 4763):** Der Favoriten-Abgleich las den alten Schlüssel `newsletterSyncSent` als neue Abgleich-Basis; nach dem Update löschte der erste Abgleich am PC alle Favoriten, die das Handy nicht kannte. Neue Bedeutung bekommt einen neuen Schlüssel; Tests laufen mit echten Modulen auf befülltem Speicher (Stand vor dem Update), dazu ein Rotbeleg gegen den alten Weg. Alte Seitenfassungen, die weiter blind hochladen, gehören ins Bedrohungsmodell (der Worker vereinigt ohne `ersetzen`).
+
+### bauer/pruefer: Neue Staffel = eigene Seite (Lehre 246)
+
+- [B312] **Neue Staffel (Lehre 246, 24.11.2026, The Mighty Nein Staffel 2, PR 4861/4864):** Ein Termin mit `firstEpisodeNumber` hinter der Folgenzahl des Titels hing als bloßer Termin an Staffel 1; Seite, News-Meldung und Sprachhinweis standen an der falschen Staffel. Schnitt für Anime: Mechanismus von `data/curated/horizonte-staffeln.yaml` über `pipeline/lib/pokemon-staffeln.ts` (Abschnitte `s`/`sn` in `pipeline/bau/folgen-dateien.ts`; bis F157 am 24.11.2026 eigene Staffel-Titel); Cartoons (`cartoons.json`) haben ihn noch nicht, der Fall steht mit Grund in `BEKANNT` von `pipeline/check-staffel-ohne-seite-bestand.ts`. Suche: „<Titel> Season N“ und „<Titel> Staffel N“ muss das Werk finden (`pipeline/check-suche-staffel-angabe.ts`); das ’ war harmlos, „season 2“ die Ursache.

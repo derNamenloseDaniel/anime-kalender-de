@@ -72,3 +72,5 @@
 {"datei":"pipeline/check-tmdb-angebote-kopie.ts","liest":"data/tmdb-titles.json","grund":"Wächter: prüft am echten Bestand, dass keine TMDB-Anbieterliste die Kopie der Liste eines Namensvetters ist (Stargazer 120892)"}
 {"datei":"pipeline/check-maengel-tv-folge.ts","liest":"data/wikipedia-folgen.json","grund":"Fixture-Quelle: liest die echte Horizonte-Liste, damit „Lied im Nebel“ mit Nummer belegt ist (Prüfer A2/A4, 22.11.2026)"}
 {"datei":"pipeline/check-tmdb-von-hand-abgeleitet.ts","liest":"data/tmdb-titles.json","grund":"Eigenschaft über den ganzen Bestand: jede Handzeile mit tmdbId steht mit dieser Kennung im Cache nach dem Handvorrang, kein fester Schlüssel"}
+{"datei":"pipeline/check-staffel-folge-tv.ts","liest":"data/tv-programm.json","grund":"echter Fall: jede Horizonte-Sendung bekommt Staffel und Folge über ihren Folgentitel (F157), keine ohne Treffer"}
+{"datei":"pipeline/check-staffel-folge-tv.ts","liest":"data/wikipedia-folgen.json","grund":"echter Fall: Staffel/Folge der Sendung liegt an ihrer Stelle der Episodenliste (Folge in der Staffel)"}

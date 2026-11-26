@@ -16,7 +16,7 @@ class Beobachter {
   disconnect() {}
 }
 const lager = { getItem: (k: string) => speicher.get(k) ?? null, setItem: (k: string, w: string) => void speicher.set(k, w), removeItem: (k: string) => void speicher.delete(k) }
-Object.assign(globalThis, { IntersectionObserver: Beobachter, history: { replaceState() {}, pushState() {}, state: null }, location: ort, localStorage: lager, sessionStorage: lager })
+Object.assign(globalThis, { IntersectionObserver: Beobachter, ResizeObserver: Beobachter, history: { replaceState() {}, pushState() {}, state: null }, location: ort, localStorage: lager, sessionStorage: lager })
 Object.assign(globalThis, { fetch: async () => ({ ok: false, status: 404, json: async () => ({}) }) })
 /* Reihen-Karten fragen den Beobachter mit Vorfahr und Rahmenfenster ab; die Attrappe kennt beides nicht. */
 Object.assign(MiniKnoten.prototype, { closest: () => null, querySelector: () => null })

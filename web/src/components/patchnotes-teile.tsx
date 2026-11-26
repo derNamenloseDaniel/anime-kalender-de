@@ -99,7 +99,7 @@ export function PatchTagBlock({ tag, index, heute, gestern, schliessen }: { tag:
       </h3>
       {tag.hl.map((n) => (
         <div key={n.text} className="pn-hl">
-          <span className={`pn-kreis ${n.kategorie}`} title={PT[n.kategorie]}>
+          <span className={`pn-kreis ${n.kategorie}`} data-hinweis={PT[n.kategorie]}>
             {symbolVon(n)}
             <span className="sr-only">{PT[n.kategorie]}:</span>
           </span>
@@ -117,7 +117,7 @@ export function PatchTagBlock({ tag, index, heute, gestern, schliessen }: { tag:
       ))}
       {tag.zeilen.map((n) => (
         <div key={n.text} className="pn-zeile">
-          <span className={n.kategorie} title={PT[n.kategorie]} style={{ display: 'inline-flex' }}>
+          <span className={n.kategorie} data-hinweis={PT[n.kategorie]} style={{ display: 'inline-flex' }}>
             {symbolVon(n)}
           </span>
           <span className="sr-only">{PT[n.kategorie]}:</span>

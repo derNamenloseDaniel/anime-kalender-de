@@ -5,7 +5,8 @@ import { anzeigeName } from '../../shared/titles.ts'
 import { log } from '../lib/util.ts'
 import { type Ausloeser, ausloeserZeilen } from '../lib/ausloeser-zeilen.ts'
 import type { EntfernterVerweis } from './grundlagen.ts'
-import { type DubCheck, dubKey } from '../lib/dub-confirmed.ts'
+import { type DubCheck, adressKern, dubKey } from '../lib/dub-confirmed.ts'
+import { istSammelKern } from '../../shared/adresse-kern.ts'
 import { baueNeinGilt } from '../lib/maengel-nein.ts'
 import { brichAbBeiWiderspruch } from '../lib/bau-widerspruch.ts'
 
@@ -47,16 +48,18 @@ export function istSichererTermin(r: Release): boolean {
 /**
  * Schlüssel `Titel|Anbieter`, deren Handbeleg-Nein „nicht verfügbar“ (Suche ohne Treffer) älter ist als ein sicherer Prime-Kanal-Termin (17.11.2026: Kamisama Kiss
  * 14713, Nein 27.08. gegen Aniverse-Termin 08.10.; Call of the Night 175914). Das Nein hat die Amazon-Suche gemessen, der Kanal-Termin kam danach; das Angebot kann
- * erst später erschienen sein (`baueNeinGilt`). Nur mit `kanal`: Ohne Kanal bliebe ein Weg ohne Adresse und ohne Ton (Kuroko 102836), den es vorher nicht gab.
+ * erst später erschienen sein (`baueNeinGilt`). Bei Kanal-Terminen immer; bei jedem anderen sicheren Streaming-Termin (Netflix, Crunchyroll …) nur, wenn kein „nicht verfügbar“
+ * des Titels eine echte Adresse trägt: Ein Nein mit Adresse ist eine Messung dieser Seite und bleibt (`neinMitAdresse`). Der Weg bleibt dann ohne Adresse und ohne Ton (Kuroko 102836).
  * Nur begonnene Termine (`ab <= heute`, wie die Mängelart `erschienen-ohne-weg`): Ein Weg ohne Tonurteil für einen erst kommenden Termin brächte nur `sprachurteil-offen`
  * hinzu (Call of the Night 175914, Termin 20.11.2026).
  */
 export function ueberholteNeins(belege: Parameters<typeof baueNeinGilt>[0], releases: Release[], heute: string): Set<string> {
   const gilt = baueNeinGilt(belege)
+  const mitAdresse = neinMitAdresse(belege)
   const fruehester = new Map<string, string>()
   for (const r of releases) {
     const ab = r.schedule?.firstEpisodeDate
-    if (!r.kanal || !ab || ab > heute || !istSichererTermin(r)) continue
+    if (!ab || ab > heute || !istSichererTermin(r) || (!r.kanal && mitAdresse.has(dubKey(r.titleId, r.platform)))) continue
     const k = dubKey(r.titleId, r.platform)
     if (ab < (fruehester.get(k) ?? '9')) fruehester.set(k, ab)
   }
@@ -65,6 +68,12 @@ export function ueberholteNeins(belege: Parameters<typeof baueNeinGilt>[0], rele
     return belege.some((b) => b.available === false && dubKey(b.anilistId, b.platform) === k) && !gilt(Number(id), plattform!, ab)
   })
   return new Set(ueberholt.map(([k]) => k))
+}
+
+/** Schlüssel `Titel|Anbieter`, deren „nicht verfügbar“ an einer echten Titeladresse gemessen wurde (keine Suche, keine Startseite). */
+function neinMitAdresse(belege: Parameters<typeof baueNeinGilt>[0]): Set<string> {
+  const echt = belege.filter((b) => b.available === false && adressKern(b.url) !== '' && !istSammelKern(adressKern(b.url)))
+  return new Set(echt.map((b) => dubKey(b.anilistId, b.platform)))
 }
 
 /** Ein Handbeleg „deutsch" bringt Urteil und Folgenbereiche mit; ohne ihn bleibt der Ton offen, und die Herkunft ist der Termin. */
@@ -95,7 +104,7 @@ export function ergaenzeWegeAusTerminen({ titles, releases, istTot, verweiseEntf
   istTot: IstTot
   verweiseEntfernt: EntfernterVerweis[]
   belegFuer: BelegFuer
-  /** `ueberholteNeins`: ihr Handbeleg-Nein verneint den Kanal-Termin nicht. */
+  /** `ueberholteNeins`: ihr Handbeleg-Nein verneint den sicheren Termin nicht. */
   nein?: ReadonlySet<string>
 }): number {
   const entfernt = new Set(verweiseEntfernt.map((v) => `${v.titleId}|${v.plattform}`))
@@ -109,9 +118,10 @@ export function ergaenzeWegeAusTerminen({ titles, releases, istTot, verweiseEntf
     if (titel.streams?.some((s) => s.platform === r.platform)) continue
     const belegt = r.platformUrl && !istKeineTitelseite(r.platformUrl) && !istTot(r.platformUrl)
     const url = belegt ? r.platformUrl! : ''
-    if (neu.get(schluessel)?.weg.url) continue
+    const schonDa = neu.get(schluessel)
+    if (schonDa && (schonDa.weg.url || !url)) continue
     const beleg = belegFuer(r.titleId, r.platform, url || undefined)
-    if ((beleg?.available === false || beleg?.dub === false) && !(r.kanal && nein.has(dubKey(r.titleId, r.platform)))) {
+    if ((beleg?.available === false || beleg?.dub === false) && !nein.has(dubKey(r.titleId, r.platform))) {
       handNein.add(schluessel)
       continue
     }

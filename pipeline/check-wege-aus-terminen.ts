@@ -94,7 +94,7 @@ pruefe('Titelseiten sind keine Suche', ![DISNEY, 'https://www.netflix.com/title/
   102836 Kuroko Movie 2 (Nein 30.08., Termin 13.09. ohne Kanal, Suchadresse), 103631 Trinity Seven (Nein dub:false, Aniverse-Termin).
 */
 const nein = (anilistId: number, mehr: Partial<DubCheck>) => ({ anilistId, platform: 'primevideo', checkedAt: '2026-08-27', ...mehr }) as DubCheck
-const belegeAlt = [nein(14713, { available: false }), nein(102836, { available: false, checkedAt: '2026-08-30', url: PRIME_SUCHE }), nein(103631, { dub: false, checkedAt: '2026-10-16' }), nein(20801, { available: false, checkedAt: '2026-10-20' }), nein(41, { available: false }), nein(42, { dub: true }), nein(43, { available: false }), nein(44, { available: false })]
+const belegeAlt = [nein(14713, { available: false }), nein(102836, { available: false, checkedAt: '2026-08-30', url: PRIME_SUCHE }), nein(103631, { dub: false, checkedAt: '2026-10-16' }), nein(20801, { available: false, checkedAt: '2026-10-20' }), nein(41, { available: false }), nein(42, { dub: true }), nein(43, { available: false }), nein(44, { available: false }), nein(45, { available: false, platform: 'netflix' }), nein(46, { available: false, platform: 'netflix', url: 'https://www.netflix.com/title/81234567' }), nein(47, { available: false, platform: 'netflix' })]
 const kanalTermin = (id: number, ab: string, mehr: Partial<Release> = {}) =>
   termin(id, 'primevideo', { kanal: 'Aniverse', schedule: { firstEpisodeDate: ab, episodeCount: 13 }, ...mehr })
 const termineAlt = [
@@ -108,15 +108,21 @@ const termineAlt = [
   kanalTermin(42, '2026-10-08'),
   kanalTermin(44, '2026-11-20'),
   kanalTermin(43, '2026-10-08', { slug: 'kanal-43' }),
+  termin(45, 'netflix', { schedule: { firstEpisodeDate: '2026-10-08' } }),
+  termin(46, 'netflix', { schedule: { firstEpisodeDate: '2026-10-08' } }),
+  termin(47, 'netflix', { schedule: { firstEpisodeDate: '2026-10-08', estimated: true } }),
   termin(43, 'primevideo', { platformUrl: PRIME_SUCHE, schedule: { firstEpisodeDate: '2026-09-13' } }),
 ]
-const titelAlt = new Map([14713, 102836, 103631, 20801, 43].map((id) => [id, titel(id)]))
+const titelAlt = new Map([14713, 102836, 103631, 20801, 43, 45, 46, 47].map((id) => [id, titel(id)]))
 const ueberholt = ueberholteNeins(belegeAlt, termineAlt, '2026-11-17')
-pruefe('überholtes Nein: Kamisama Kiss und 43 (Nein älter als der Kanal-Termin), sonst keiner', [...ueberholt].sort().join() === '14713|primevideo,43|primevideo', [...ueberholt].join())
+pruefe('überholtes Nein: Kamisama Kiss, Kuroko (Nein an einer Suche), 43 und das Netflix-Nein ohne Adresse (45), sonst keiner', [...ueberholt].sort().join() === '102836|primevideo,14713|primevideo,43|primevideo,45|netflix', [...ueberholt].join())
 ergaenzeWegeAusTerminen({ titles: titelAlt, releases: termineAlt, istTot: () => false, verweiseEntfernt: [], belegFuer: (id) => belegeAlt.find((b) => b.anilistId === id), nein: ueberholt })
 const wegAlt = (id: number) => titelAlt.get(id)!.streams
 pruefe('Kamisama Kiss: Weg mit Kanal, ohne Adresse, ohne Tonurteil', wegAlt(14713).length === 1 && wegAlt(14713)[0]!.kanal === 'Aniverse' && wegAlt(14713)[0]!.url === '' && wegAlt(14713)[0]!.dub === undefined && wegAlt(14713)[0]!.herkunft === 'termin', JSON.stringify(wegAlt(14713)))
-pruefe('Kuroko: ohne Kanal bleibt das Nein (kein Weg ohne Adresse und Ton)', wegAlt(102836).length === 0)
+pruefe('Kuroko: Nein nur an einer Suche, Termin ohne Kanal: Weg ohne Adresse und Ton', wegAlt(102836).length === 1 && wegAlt(102836)[0]!.url === '' && wegAlt(102836)[0]!.dub === undefined, JSON.stringify(wegAlt(102836)))
+pruefe('Netflix (45): Nein ohne Adresse älter als der sichere Termin: Weg ohne Adresse und Ton', wegAlt(45).length === 1 && wegAlt(45)[0]!.platform === 'netflix' && wegAlt(45)[0]!.dub === undefined, JSON.stringify(wegAlt(45)))
+pruefe('Netflix (46): Nein mit echter Titeladresse bleibt, auch wenn älter als der Termin', wegAlt(46).length === 0 && !ueberholt.has('46|netflix'))
+pruefe('Netflix (47): geschätzter Termin hebt das Nein nicht auf', wegAlt(47).length === 0 && !ueberholt.has('47|netflix'))
 pruefe('Trinity Seven: „ohne deutschen Ton“ bleibt, auch bei jüngerem Termin', wegAlt(103631).length === 0)
 pruefe('Nein jünger als der Termin gilt weiter', wegAlt(20801).length === 0)
 pruefe('ein Ja-Beleg (42) ist kein überholtes Nein', !ueberholt.has('42|primevideo'))

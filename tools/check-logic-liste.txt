@@ -314,6 +314,7 @@ pipeline/check-folgenzahl-offen-bau.ts
 pipeline/check-folgenzahl-offen.ts
 pipeline/check-folgenzahl-sichtung.ts
 pipeline/check-fsk-franchise.ts
+pipeline/check-fsk-justwatch-bilanz.ts
 pipeline/check-fsk-kopf-hinweis.ts
 pipeline/check-fsk-kopf-render.ts
 pipeline/check-geheimnis-testlauf.ts

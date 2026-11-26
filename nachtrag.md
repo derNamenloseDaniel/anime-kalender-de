@@ -1,0 +1,2 @@
+- A1 (spawnSync ohne Frist in `tools/ci-anmeldung-durchreichung.test.mjs`, Kette „Kette – Workflows“ rot) -> `spawnMitLimit` aus `tools/kind-mit-limit.mjs` statt `spawnSync`; Beleg: Test grün, `node tools/test-kind-frist.mjs` 0 Verstöße, `tsc --noEmit` grün, Commit 8a562f06.
+- Lehre: Neue Tests, die Kindprozesse starten, nehmen von Anfang an `spawnMitLimit`; die Ratsche `test-kind-frist` zeigt es lokal in Sekunden.

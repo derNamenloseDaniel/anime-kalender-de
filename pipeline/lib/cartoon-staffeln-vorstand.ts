@@ -1,6 +1,6 @@
 import type { Title } from '../../shared/types.ts'
 import { readJson } from './util.ts'
-import { abgaengeOhneGrund, leseVorstandJson } from './vorstand-abgang.ts'
+import { abgaengeOhneGrund, FREIGABE_HINWEIS, leseVorstandJson, ohneFreigabe } from './vorstand-abgang.ts'
 
 /** Ein Stand der Cartoons: Ausgabe (`cartoons.json`) und die Staffel-Prüfliste, die der Bau dazu schreibt (`bau/cartoon-staffeln.ts`). */
 export interface CartoonStand {
@@ -24,13 +24,14 @@ export function staffelnAbgaenge(vorher: CartoonStand, jetzt: CartoonStand): str
 }
 
 /**
- * Cartoons, deren Wege im Vorstand je Staffel verteilt waren oder die auf der Prüfliste standen und jetzt keins von beiden, obwohl
- * der Titel noch mindestens zwei Staffeln führt (sonst gibt es nichts zu verteilen; den Staffel-Verlust selbst meldet `staffelnAbgaenge`).
+ * Cartoons, deren Wege im Vorstand je Staffel verteilt waren und jetzt weder verteilt sind noch auf der Prüfliste stehen, obwohl der
+ * Titel noch mindestens zwei Staffeln führt (sonst gibt es nichts zu verteilen; den Staffel-Verlust selbst meldet `staffelnAbgaenge`).
+ * Wer die Prüfliste verlässt, ohne verteilt zu werden, ist kein Abgang: Ob verteilt wird, hängt am Ton je Staffel (`verteileWeg`);
+ * die Staffelsumme prüft die Staffel-Wache (11.11.2026: zwei Titel mit nun passender Summe, Weg ohne Ton je Staffel).
  */
 export function wegeAbgaenge(vorher: CartoonStand, jetzt: CartoonStand): string[] {
   const moeglich = new Set(mit(jetzt, verteilbar))
-  const gefuehrt = (s: CartoonStand) => [...gelistet(s), ...mit(s, verteilt)]
-  return abgaengeOhneGrund(gefuehrt(vorher), new Set(gefuehrt(jetzt)), (k) => !moeglich.has(k))
+  return abgaengeOhneGrund(mit(vorher, verteilt), new Set([...gelistet(jetzt), ...mit(jetzt, verteilt)]), (k) => !moeglich.has(k))
 }
 
 /** Die Wache am echten Bestand: Fehlerzeilen gegen den Vorstand `ref`; ein nicht lesbarer Vorstand ist selbst ein Fehler. */
@@ -42,7 +43,7 @@ export function cartoonsGegenVorstand(art: 'staffeln' | 'wege', liste: string, r
     return [`Vorstand ${ref} nicht lesbar: ${(e as Error).message.split('\n')[0]}`]
   }
   const jetzt = { cartoons: readJson<Title[]>(CARTOONS, []), liste: readJson<{ titleId: number }[]>(liste, []) }
-  const weg = art === 'staffeln' ? staffelnAbgaenge(vorher, jetzt) : wegeAbgaenge(vorher, jetzt)
-  const was = art === 'staffeln' ? 'Staffeln' : 'verteilte Wege'
-  return weg.length ? [`${weg.length} Cartoon(s) hatten im Vorstand ${ref} ${was} oder einen Prüflisten-Eintrag und jetzt keins von beiden: ${weg.slice(0, 10).join(', ')}`] : []
+  const weg = ohneFreigabe(art === 'staffeln' ? staffelnAbgaenge(vorher, jetzt) : wegeAbgaenge(vorher, jetzt), `cartoon-${art}`)
+  const was = art === 'staffeln' ? 'Staffeln oder einen Prüflisten-Eintrag und jetzt keins von beiden' : 'verteilte Wege und jetzt weder Verteilung noch Prüflisten-Eintrag'
+  return weg.length ? [`${weg.length} Cartoon(s) hatten im Vorstand ${ref} ${was}: ${weg.slice(0, 10).join(', ')} (${FREIGABE_HINWEIS})`] : []
 }

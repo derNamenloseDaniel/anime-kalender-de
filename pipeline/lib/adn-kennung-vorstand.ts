@@ -1,7 +1,7 @@
 import type { Release, Title } from '../../shared/types.ts'
 import type { AdnData } from './adn.ts'
 import { readJson } from './util.ts'
-import { abgaengeOhneGrund, leseVorstandJson } from './vorstand-abgang.ts'
+import { abgaengeOhneGrund, FREIGABE_HINWEIS, leseVorstandJson, ohneFreigabe } from './vorstand-abgang.ts'
 
 /** Ein Stand der Ausgabe, soweit sie ADN-Shows trägt: Wege (`titles.json`) und Termine (`releases.json`). */
 export interface AdnAusgabe {
@@ -42,6 +42,6 @@ export function adnGegenVorstand(ref: string): string[] {
     return [`Vorstand ${ref} nicht lesbar: ${(e as Error).message.split('\n')[0]}`]
   }
   const kalender = readJson<AdnData>('data/adn.json', { scrapedAt: '', window: { from: '', to: '' }, shows: [] }).shows
-  const weg = adnAbgaenge(vorher, ausgabe(readJson), kalender)
-  return weg.length ? [`${weg.length} ADN-Show(s) im Kalender hatten im Vorstand ${ref} Weg oder Termin und jetzt keins: ${weg.slice(0, 10).join(', ')}`] : []
+  const weg = ohneFreigabe(adnAbgaenge(vorher, ausgabe(readJson), kalender), 'adn-kennung')
+  return weg.length ? [`${weg.length} ADN-Show(s) im Kalender hatten im Vorstand ${ref} Weg oder Termin und jetzt keins: ${weg.slice(0, 10).join(', ')} (${FREIGABE_HINWEIS})`] : []
 }

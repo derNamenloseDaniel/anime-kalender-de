@@ -28,3 +28,19 @@ export function leseVorstandJson<T>(pfad: string, ref: string, wurzel = ROOT): T
 export function abgaengeOhneGrund(vorher: Iterable<string>, jetzt: ReadonlySet<string>, entfallen: (schluessel: string) => boolean): string[] {
   return [...new Set(vorher)].filter((k) => !jetzt.has(k) && !entfallen(k)).sort()
 }
+
+/**
+ * Gewollte Abgänge je Wache (Schlüssel, wie die Wache ihn nennt → Grund mit Datum und PR). Ändert ein PR eine Bauregel bewusst so, dass
+ * Einträge wegfallen (10.11.2026, PR 3018: Cartoon-Wege), nennt die PR-Kette sie rot, und der PR trägt sie hier ein; sonst bliebe jeder
+ * Bestandsbau danach rot. Nach dem ersten Bestandsbau mit der neuen Regel stehen sie nicht mehr im Vorstand: dann streichen.
+ */
+export const VORSTAND_FREIGABEN: Readonly<Record<string, Readonly<Record<string, string>>>> = {}
+
+/** Steht hinter jeder Abgangszeile: was zu tun ist, wenn der Abgang gewollt ist. */
+export const FREIGABE_HINWEIS = 'gewollt? Schlüssel mit Grund in VORSTAND_FREIGABEN (pipeline/lib/vorstand-abgang.ts) eintragen'
+
+/** `abgaenge` ohne die für `wache` freigegebenen Schlüssel. */
+export function ohneFreigabe(abgaenge: string[], wache: string, freigaben = VORSTAND_FREIGABEN): string[] {
+  const frei = freigaben[wache] ?? {}
+  return abgaenge.filter((k) => !(k in frei))
+}

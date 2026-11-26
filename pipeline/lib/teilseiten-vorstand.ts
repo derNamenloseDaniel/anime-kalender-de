@@ -1,7 +1,7 @@
 import type { Title } from '../../shared/types.ts'
 import type { TeilseitenPruefung } from './teilseiten.ts'
 import { readJson } from './util.ts'
-import { abgaengeOhneGrund, leseVorstandJson } from './vorstand-abgang.ts'
+import { abgaengeOhneGrund, FREIGABE_HINWEIS, leseVorstandJson, ohneFreigabe } from './vorstand-abgang.ts'
 
 const TITEL = 'public/data/titles.json'
 
@@ -42,6 +42,6 @@ export function teilseitenGegenVorstand(plattform: string, liste: string, ref: s
     return [`Vorstand ${ref} nicht lesbar: ${(e as Error).message.split('\n')[0]}`]
   }
   const jetzt = { titles: readJson<Title[]>(TITEL, []), liste: readJson<TeilseitenPruefung[]>(liste, []) }
-  const weg = teilseitenAbgaenge(vorher, jetzt, plattform)
-  return weg.length ? [`${weg.length} Weg(e) hatten im Vorstand ${ref} Bereich oder Prüflisten-Eintrag und jetzt keins von beiden: ${weg.slice(0, 10).join(', ')}`] : []
+  const weg = ohneFreigabe(teilseitenAbgaenge(vorher, jetzt, plattform), `teilseiten-${plattform}`)
+  return weg.length ? [`${weg.length} Weg(e) hatten im Vorstand ${ref} Bereich oder Prüflisten-Eintrag und jetzt keins von beiden: ${weg.slice(0, 10).join(', ')} (${FREIGABE_HINWEIS})`] : []
 }

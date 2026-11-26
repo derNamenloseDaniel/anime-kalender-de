@@ -15,7 +15,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { HERABGESTUFT } from './lib/bestand-warnzeile.ts'
 import { coverOhneImHauptbestand, pruefeCoverLuecken } from './lib/cover-luecken.ts'
 import { coverStandImVorstand, coverVerlust, type CoverStand } from './lib/cover-luecken-vorstand.ts'
-import { vorstandRef } from './lib/vorstand-abgang.ts'
+import { FREIGABE_HINWEIS, ohneFreigabe, vorstandRef } from './lib/vorstand-abgang.ts'
 
 const lies = (pfad: string): unknown => JSON.parse(readFileSync(pfad, 'utf8'))
 const kennungen = (liste: number[]): string => `${liste.slice(0, 10).join(', ')}${liste.length > 10 ? ', …' : ''}`
@@ -36,11 +36,11 @@ export function hauptbestandOhneCover(haupt: Parameters<typeof coverOhneImHauptb
 function verlustGegenVorstand(wurzel: string, ref: string, jetzt: CoverStand): string | undefined {
   let verlust: string[]
   try {
-    verlust = coverVerlust(coverStandImVorstand(ref, wurzel), jetzt)
+    verlust = ohneFreigabe(coverVerlust(coverStandImVorstand(ref, wurzel), jetzt), 'cover-luecken')
   } catch (e) {
     return `Vorstand ${ref} nicht lesbar: ${(e as Error).message.split('\n')[0]}`
   }
-  if (verlust.length) return `Cover-Verlust gegen den Vorstand ${ref}: ${verlust.length} Kennung(en) hatten überall ein Cover und haben jetzt keins (Bildquelle des Baus prüfen): ${kennungen(verlust.map(Number))}`
+  if (verlust.length) return `Cover-Verlust gegen den Vorstand ${ref}: ${verlust.length} Kennung(en) hatten überall ein Cover und haben jetzt keins (Bildquelle des Baus prüfen; ${FREIGABE_HINWEIS}): ${kennungen(verlust.map(Number))}`
 }
 
 export function main(wurzel: string, ref = 'HEAD'): number {

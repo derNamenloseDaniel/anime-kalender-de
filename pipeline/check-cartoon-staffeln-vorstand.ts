@@ -78,13 +78,15 @@ try {
   schreibe([cartoon(-900001, 2, true), cartoon(-900003, 1)], [])
   pruefe('Staffeln: Titel verlässt die Cartoons → grün', staffeln().code === 0, staffeln().aus)
 
-  // Wege: Bau hebt die Verteilung von -900001 auf bzw. streicht -900002 von der Liste, ohne zu verteilen.
+  // Wege: Bau hebt die Verteilung von -900001 auf, ohne den Titel auf die Liste zu setzen (Soll und Ist zugleich ohne ihn).
   schreibe([cartoon(-900001, 2), cartoon(-900002, 2), cartoon(-900003, 1)], [eintrag(-900002)])
   const ganzWeg = wege()
   pruefe('Wege: Verteilung aufgehoben, Titel mit zwei Staffeln nicht gelistet → rot', ganzWeg.code === 1 && ganzWeg.aus.includes('-900001'), ganzWeg.aus)
+  schreibe([cartoon(-900001, 2), cartoon(-900002, 2), cartoon(-900003, 1)], [eintrag(-900001), eintrag(-900002)])
+  pruefe('Wege: Verteilung aufgehoben, Titel steht jetzt auf der Liste → grün', wege().code === 0, wege().aus)
   schreibe([cartoon(-900001, 2, true), cartoon(-900002, 2), cartoon(-900003, 1)], [])
   const listeWeg = wege()
-  pruefe('Wege: Soll und Ist zugleich gestrichen → rot', listeWeg.code === 1 && listeWeg.aus.includes('-900002'), listeWeg.aus)
+  pruefe('Wege: Titel verlässt die Liste ohne Verteilung → kein Abgang der Wege (Staffelsumme prüft die Staffel-Wache)', listeWeg.code === 0, listeWeg.aus)
   schreibe([cartoon(-900001, 2), cartoon(-900002, 2, true), cartoon(-900003, 1)], [eintrag(-900001)])
   pruefe('Wege: Liste und Verteilung tauschen die Titel → grün', wege().code === 0, wege().aus)
   schreibe([cartoon(-900001, 1), cartoon(-900002, 1), cartoon(-900003, 1)], [])

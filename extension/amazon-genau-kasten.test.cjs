@@ -85,7 +85,7 @@ function lauf(treffer, { gemeldet = false, gewaehlt = null, speichernOk = true }
   }
   const { genauZeigen } = bau(umwelt)
   const auftrag = { titel: 'Black Butler', suchUrl: 'https://www.amazon.de/s?k=Black%20Butler' }
-  const befund = { art: 'genau', treffer: treffer.slice(0, 1) }
+  const befund = { art: 'genau', treffer: treffer.slice(0, 1), namensgleich: treffer }
   const gefunden = { treffer }
   genauZeigen(auftrag, () => 'zeichnen', befund, gefunden, [{ begriff: 'gesucht als: Black Butler' }], '24 Folgen')
   const [titel, folgen, ...rest] = p.kasten

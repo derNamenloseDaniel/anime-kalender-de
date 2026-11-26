@@ -3,6 +3,7 @@
 # Die Stufe füllt nur Lücken: ein Titel aus aniSearch, Crunchyroll, RTL+ oder TMDB bleibt. Pflichtfelder je Eintrag: anilistId, folge, titel, quelle
 # (`handFehler` in `pipeline/bau/folgentitel-hand.ts` lässt den Bau bei fehlendem Feld oder doppelter Folge scheitern, `check:logic` liest die Datei ebenfalls).
 # Erlaubte Quellen: RTL+, Crunchyroll, ADN, TMDB de; nicht fernsehserien.de, aniSearch-Seiten, Netflix-Serienseiten.
+# Wo TMDB einen Eigennamen deutsch und englisch gleich führt (der Bau wertet das als „nicht übersetzt"), belegt die de.wikipedia-Episodenliste (Feld DT) den deutschen Titel; die Nummer gilt nur, wenn die schon vorhandenen Titel dort unter derselben Nummer stehen (Auftrag maengel-folgentitel, 26.11.2026).
 # Rest ohne Quelle: `data/folgentitel-offen.json` und `docs/wissen/folgentitel-quellen.md`, Abschnitt „Lückenfolgen im deutschen Bereich schließen und halten".
 
 # Disney Twisted-Wonderland: Staffelbeginn 29.10.2025, acht wöchentliche Folgen = unsere acht Folgen; TMDB führt die Serie unter „Disney Twisted-Wonderland: Die Serie".
@@ -134,3 +135,25 @@
 - {anilistId: 213805, folge: 5, titel: "Wandel", quelle: "TMDB Serie 283428 (de) Staffel 1 Folge 19, 29.10.2026"}
 - {anilistId: 213805, folge: 6, titel: "Kulturfest", quelle: "TMDB Serie 283428 (de) Staffel 1 Folge 20, 05.11.2026; Abruf 11.11.2026 (api.themoviedb.org/3/tv/283428/season/1?language=de-DE): de „Kulturfest“, en „Cultural Festival“; im Bestand vom 09.11. noch „Folge 20“"}
 - {anilistId: 213805, folge: 7, titel: "Missverständnisse", quelle: "TMDB Serie 283428 (de) Staffel 1 Folge 21, 12.11.2026; Abruf 16.11.2026 (api.themoviedb.org/3/tv/283428/season/1?language=de-DE): de „Missverständnisse“, en „Misunderstandings“"}
+
+# Miraculous (Staffel 1, 10011124): TMDB führt für neun Folgen denselben Namen deutsch und englisch (Eigennamen der Schurken, Abruf 23.11.2026); der Bau wertet das als „nicht übersetzt".
+# de.wikipedia „Miraculous – Geschichten von Ladybug und Cat Noir/Episodenliste" (Abruf 26.11.2026, Feld DT, Abschnitt Staffel 1) nennt sie als deutsche Titel; Nummern gegengeprüft: 17 von 17 vorhandenen Titeln stehen dort unter derselben Nummer (Zählung 1–26 = TMDB-Staffel 1).
+- {anilistId: 10011124, folge: 4, titel: "Lady WiFi", quelle: "TMDB Staffel 1 Folge 4 (de „Lady WiFi“, 23.11.2026); de.wikipedia Episodenliste Staffel 1 Nr. 4 „Lady Wifi“ (Abruf 26.11.2026)"}
+- {anilistId: 10011124, folge: 5, titel: "Timebreaker", quelle: "TMDB Staffel 1 Folge 5; de.wikipedia Episodenliste Staffel 1 Nr. 5 „Timebreaker“ (Abruf 26.11.2026)"}
+- {anilistId: 10011124, folge: 8, titel: "Rogercop", quelle: "TMDB Staffel 1 Folge 8; de.wikipedia Episodenliste Staffel 1 Nr. 8 „Rogercop“ (Abruf 26.11.2026)"}
+- {anilistId: 10011124, folge: 12, titel: "Darkblade", quelle: "TMDB Staffel 1 Folge 12; de.wikipedia Episodenliste Staffel 1 Nr. 12 „Darkblade“ (Abruf 26.11.2026)"}
+- {anilistId: 10011124, folge: 14, titel: "Kung Food", quelle: "TMDB Staffel 1 Folge 14; de.wikipedia Episodenliste Staffel 1 Nr. 14 „Kung Food“ (Abruf 26.11.2026)"}
+- {anilistId: 10011124, folge: 15, titel: "Der Gamer", quelle: "de.wikipedia Episodenliste Staffel 1 Nr. 15 „Der Gamer“ (Abruf 26.11.2026); TMDB führt „Gamer“ (gleich dem englischen) — Schreibweise nach Wikipedia, unsicher"}
+- {anilistId: 10011124, folge: 16, titel: "Animan", quelle: "TMDB Staffel 1 Folge 16; de.wikipedia Episodenliste Staffel 1 Nr. 16 „Animan“ (Abruf 26.11.2026)"}
+- {anilistId: 10011124, folge: 19, titel: "Reflekta", quelle: "TMDB Staffel 1 Folge 19; de.wikipedia Episodenliste Staffel 1 Nr. 19 „Reflekta“ (Abruf 26.11.2026)"}
+- {anilistId: 10011124, folge: 24, titel: "Volpina", quelle: "TMDB Staffel 1 Folge 24; de.wikipedia Episodenliste Staffel 1 Nr. 24 „Volpina“ (Abruf 26.11.2026)"}
+
+# Miraculous Staffel 3 (10014481): gleicher Fall, vier Folgen. de.wikipedia Staffel 3 (Abruf 26.11.2026): 22 von 22 vorhandenen Titeln stehen dort unter derselben Nummer; TMDB-Staffel 3 hat dieselben Namen.
+- {anilistId: 10014481, folge: 5, titel: "Bakerix", quelle: "TMDB Staffel 3 Folge 5 (23.11.2026); de.wikipedia Episodenliste Staffel 3 Nr. 5 „Bakerix“ (Abruf 26.11.2026)"}
+- {anilistId: 10014481, folge: 8, titel: "Stormy Weather 2", quelle: "TMDB Staffel 3 Folge 8; de.wikipedia Episodenliste Staffel 3 Nr. 8 „Stormy Weather 2“ (Abruf 26.11.2026)"}
+- {anilistId: 10014481, folge: 9, titel: "Reflekdoll", quelle: "TMDB Staffel 3 Folge 9; de.wikipedia Episodenliste Staffel 3 Nr. 9 „Reflekdoll“ (Abruf 26.11.2026)"}
+- {anilistId: 10014481, folge: 20, titel: "Gamer 2.0", quelle: "TMDB Staffel 3 Folge 20; de.wikipedia Episodenliste Staffel 3 Nr. 20 „Gamer 2.0“ (Abruf 26.11.2026)"}
+
+# Es war einmal … Amerika (10004750): TMDB führt zwei Eigennamen gleich dem englischen Titel. de.wikipedia „Es war einmal … Amerika" (Abruf 26.11.2026, Episodenliste) nennt Nr. 12 „Jacques Cartier" und Nr. 23 „Simon Bolivar"; 24 von 24 vorhandenen Titeln stehen dort unter derselben Nummer (deutsche Erstausstrahlung 02.01.1992, Das Erste).
+- {anilistId: 10004750, folge: 12, titel: "Jacques Cartier", quelle: "de.wikipedia Es war einmal … Amerika, Episodenliste Nr. 12 (Abruf 26.11.2026); TMDB Staffel 1 Folge 12 gleich"}
+- {anilistId: 10004750, folge: 23, titel: "Simon Bolivar", quelle: "de.wikipedia Es war einmal … Amerika, Episodenliste Nr. 23 (Abruf 26.11.2026); TMDB Staffel 1 Folge 23 gleich"}

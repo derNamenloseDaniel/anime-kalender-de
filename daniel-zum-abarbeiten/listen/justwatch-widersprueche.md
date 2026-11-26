@@ -7,7 +7,7 @@ Abschnitt „JustWatch-Ton je Seite“. Unsere Messung (Handbeleg, Meldung der E
 <!-- anime:start -->
 ## Anime
 
-Flagge „Deutsch“: 56 Wege, nur Hinweis: 1.
+Flagge „Deutsch“: 58 Wege, nur Hinweis: 1.
 
 JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine Flagge): mehrere Staffeln 15, Mehrteiler 14.
 
@@ -22,7 +22,7 @@ JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine
 | Titel | Anbieter | Adresse | JustWatch | Gemessen |
 |---|---|---|---|---|
 
-### Kandidaten für neue Wege (811)
+### Kandidaten für neue Wege (809)
 
 JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „Weg ohne Kennung“: ein Weg zum Anbieter steht, seine Adresse trägt aber keine Seitenkennung.
 
@@ -751,7 +751,6 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | Magic Maker: How to Make Magic in Another World (179297) | Crunchyroll | crunchyroll:G31UVE8MN | nein |
 | Magic Maker: How to Make Magic in Another World (179297) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.199ebb49-1369-4e3f-9634-997124a1f2af | nein |
 | Sanda (179302) | Amazon Prime Video | amazon:amzn1.dv.gti.d05a91a0-99e3-4a8b-9ff0-3da3341f1128 | ja |
-| Kaiju No. 8: Mission Recon (179998) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.935bdd53-5e65-4f19-82fd-2772c12644aa | nein |
 | Witch Watch (180367) | Crunchyroll | crunchyroll:GJWUQ177W | nein |
 | Witch Watch (180367) | Aniverse Amazon Channel | amazon:amzn1.dv.gti.9063c137-e64a-4785-aa61-d087f82bb1ae | nein |
 | Witch Watch (180367) | Anime Digital Network Amazon Channel | amazon:amzn1.dv.gti.3cefe368-0d6f-4f75-9f0d-124e7e60243c | nein |
@@ -762,8 +761,7 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | May I Ask for One Final Thing? (181447) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.26996afa-102d-46d0-8778-b4fcf61904bb | nein |
 | Dark Moon: The Blood Altar (181443) | Crunchyroll | crunchyroll:GE00366126ES419 | nein |
 | Dark Moon: The Blood Altar (181443) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.233082bf-86cf-4248-a368-093ace5947b0 | nein |
-| Miss Kobayashi’s Dragon Maid: Ein einsamer Drache sehnt sich nach Liebe (181839) | Crunchyroll | crunchyroll:GMEE00351664FRFR | nein |
-| Miss Kobayashi’s Dragon Maid: Ein einsamer Drache sehnt sich nach Liebe (181839) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.1e61a3d8-44c3-4dc0-ae7c-5c655deceff5 | nein |
+| Miss Kobayashi’s Dragon Maid: Ein einsamer Drache sehnt sich nach Liebe (181839) | Crunchyroll | crunchyroll:GMEE00351664ENUS | nein |
 | City The Animation (181841) | Amazon Prime Video | amazon:amzn1.dv.gti.8c1f778c-d940-4c50-895a-f498c55101f3 | ja |
 | The Gorilla God’s Go-To Girl (182060) | Crunchyroll | crunchyroll:G2XUNV10P | nein |
 | The Gorilla God’s Go-To Girl (182060) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.21dd6325-b528-4448-b468-a320d3f84786 | nein |

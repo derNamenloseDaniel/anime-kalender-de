@@ -1,12 +1,12 @@
 {
- "erzeugtAm": "2026-11-25T23:09:42.174Z",
+ "erzeugtAm": "2026-11-26T04:41:16.676Z",
  "anbieter": [
   {
    "name": "Amazon",
    "plattform": "primevideo",
-   "gemeldet": 990,
+   "gemeldet": 988,
    "gesamt": 1029,
-   "offen": 39,
+   "offen": 41,
    "ohneSeite": 2,
    "suchAdressen": [
     "https://www.amazon.de/s?k=The%20Birth%20Of%20Kitaro%20-%20Das%20Geheimnis%20von%20Gegege&i=instant-video",
@@ -35,8 +35,16 @@
      "titel": "Meine Wiedergeburt als Schleim in einer anderen Welt: Staffel 4 (That Time I Got Reincarnated as a Slime Season 4)"
     },
     {
+     "url": "https://watch.amazon.de/detail?gti=amzn1.dv.gti.935bdd53-5e65-4f19-82fd-2772c12644aa",
+     "titel": "Kaiju No. 8: Mission Recon"
+    },
+    {
      "url": "https://www.amazon.de/gp/video/detail/B0DJKGJQ7K",
      "titel": "Yandere Dark Elf: She Chased Me All the Way from Another World!"
+    },
+    {
+     "url": "https://watch.amazon.de/detail?gti=amzn1.dv.gti.1e61a3d8-44c3-4dc0-ae7c-5c655deceff5",
+     "titel": "Miss Kobayashi’s Dragon Maid: Ein einsamer Drache sehnt sich nach Liebe (Miss Kobayashi's Dragon Maid: A lonely dragon wants to be loved)"
     },
     {
      "url": "https://watch.amazon.de/detail?gti=amzn1.dv.gti.caba97c6-120e-4294-bc60-f1ce999c941e",
@@ -775,9 +783,9 @@
   {
    "name": "Disney+",
    "plattform": "disneyplus",
-   "gemeldet": 182,
-   "gesamt": 342,
-   "offen": 160,
+   "gemeldet": 183,
+   "gesamt": 344,
+   "offen": 161,
    "ohneSeite": 13,
    "ziel": "https://www.disneyplus.com/browse/entity-faa35b37-3287-4a7c-9d42-a3a5f9ad9185",
    "ziele": [
@@ -819,6 +827,10 @@
     {
      "url": "https://www.disneyplus.com/browse/entity-b042544d-cd7d-40c6-9be4-db79666a1b51",
      "titel": "Welcome to Demon School! Iruma-kun"
+    },
+    {
+     "url": "https://www.disneyplus.com/de-de/series/mission-yozakura-family/fiCVxc9GZNVm",
+     "titel": "Mission: Yozakura Family"
     },
     {
      "url": "https://www.disneyplus.com/browse/entity-6c1cfdcd-a3b1-428a-8fe9-aa917d5b6371",

@@ -6,9 +6,10 @@
  * Aufruf: `node tools/ci-anmeldung-durchreichung.test.mjs [Wurzelordner]`
  */
 import assert from 'node:assert/strict'
+import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { CI_ANMELDUNG_DURCHREICHUNG, mitCiAnmeldung, ohneCiToken } from './bau-umgebung.mjs'
 import { zugangsWarnung } from './patchnotes-kommentar.mjs'
 
@@ -44,5 +45,24 @@ assert.equal(zugangsWarnung({ GITHUB_EVENT_NAME: 'pull_request', GITHUB_REPOSITO
 assert.match(zugangsWarnung({ GITHUB_EVENT_NAME: 'pull_request', GH_TOKEN: 't' }), /GITHUB_REPOSITORY fehlt/)
 assert.match(zugangsWarnung({ GITHUB_EVENT_NAME: 'pull_request', GITHUB_REPOSITORY: 'o/r' }), /GH_TOKEN fehlt/)
 assert.match(zugangsWarnung({ GITHUB_EVENT_NAME: 'pull_request' }), /GITHUB_REPOSITORY und GH_TOKEN fehlt/)
+
+// Beide Prüfungen starten wie in `check:logic` (Umgebung aus `ohneCiToken`, mit und ohne Durchreichung) und warnen auf stderr (Logzeile, nicht rot),
+// wenn im PR-Ereignis die Anmeldung fehlt; mit Durchreichung bleibt stderr leer. Der Aufruf ist der echte der Prüfung, nur die API ist eine Attrappe.
+const WEG = { GITHUB_EVENT_NAME: 'pull_request' }
+const EXPORTIERT = { [PFLICHT]: 'tools/patchnotes-kommentar.mjs' } // die Pflicht-Prüfung exportiert die Funktion nicht, sie importiert sie von dort
+function stderrVon(datei, env) {
+  const code =
+    `import { beschreibungMitKommentaren as f } from ${JSON.stringify(pathToFileURL(join(wurzel, EXPORTIERT[datei] ?? datei)).href)};` +
+    `console.log(f({ body: 'B', number: 1 }, process.env.GITHUB_REPOSITORY, () => []))`
+  const lauf = spawnSync(process.execPath, ['--input-type=module', '-e', code], { env: { PATH: process.env.PATH, ...env }, encoding: 'utf8' })
+  assert.equal(lauf.status, 0, lauf.stderr)
+  assert.equal(lauf.stdout.trim(), 'B', 'ohne Kommentare gilt die Beschreibung')
+  return lauf.stderr
+}
+for (const datei of Object.keys(CI_ANMELDUNG_DURCHREICHUNG)) {
+  assert.match(stderrVon(datei, { ...basis, ...WEG }), /⚠ .*GITHUB_REPOSITORY und GH_TOKEN fehlt/, `${datei}: fehlende Anmeldung im PR-Ereignis still`)
+  assert.equal(stderrVon(datei, { ...mitCiAnmeldung(basis, datei, CI), ...WEG }), '', `${datei}: mit Durchreichung keine Warnung`)
+  assert.equal(stderrVon(datei, { ...basis, GITHUB_EVENT_NAME: 'push' }), '', `${datei}: außerhalb des PR-Ereignisses keine Warnung`)
+}
 
 console.log('ci-anmeldung-durchreichung.test: ok')

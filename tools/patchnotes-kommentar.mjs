@@ -17,23 +17,29 @@ export function wirksameBeschreibung(beschreibung, kommentare, autor) {
 }
 
 /** Warntext, wenn das PR-Ereignis läuft, der Kommentar-Ausweg aber keinen Zugang hat (sonst gälte still nur die Beschreibung); sonst null. */
-export function zugangsWarnung(env = process.env) {
+export function zugangsWarnung(env = process.env, name = 'Patch-Notes-Kommentar') {
   if (env.GITHUB_EVENT_NAME !== 'pull_request') return null
   const fehlt = [env.GITHUB_REPOSITORY ? null : 'GITHUB_REPOSITORY', env.GH_TOKEN || env.GITHUB_TOKEN ? null : 'GH_TOKEN'].filter(Boolean)
-  return fehlt.length ? `⚠ Patch-Notes-Kommentar: ${fehlt.join(' und ')} fehlt im PR-Ereignis, es gilt nur die Beschreibung (Kommentar „Patch Notes: …“ wirkt nicht)` : null
+  return fehlt.length ? `⚠ ${name}: ${fehlt.join(' und ')} fehlt im PR-Ereignis, es gilt nur die Beschreibung (PR-Kommentare werden nicht gelesen)` : null
 }
 
-/** Wie `wirksameBeschreibung`, die Kommentare kommen aus `api(args)` (GitHub-API); ein Abruffehler lässt die Beschreibung gelten. */
-export function beschreibungMitKommentaren(pr, repo, api = ghApiJson, env = process.env) {
-  const beschreibung = pr.body ?? ''
-  const warnung = zugangsWarnung(env)
+/**
+ * Alle Kommentare des PR aus `api(args)` (GitHub-API); gemeinsamer Weg der Prüfungen, die Kommentare lesen. „Laut“ heißt eine Logzeile
+ * (`console.error`), nicht rot: ohne Zugang oder bei Abruffehler kommt [] samt ⚠-Zeile, es gilt dann nur die Beschreibung.
+ */
+export function leseKommentare(pr, repo, api = ghApiJson, env = process.env, name = 'Patch-Notes-Pflicht') {
+  const warnung = zugangsWarnung(env, name)
   if (warnung) console.error(`  ${warnung}`)
-  if (!repo || !pr.number) return beschreibung
+  if (!repo || !pr.number) return []
   try {
-    const kommentare = api(['--paginate', '--slurp', `repos/${repo}/issues/${pr.number}/comments`]).flat()
-    return wirksameBeschreibung(beschreibung, kommentare, pr.user?.login)
+    return api(['--paginate', '--slurp', `repos/${repo}/issues/${pr.number}/comments`]).flat()
   } catch (fehler) {
-    console.error(`  ⚠ Patch-Notes-Pflicht: Kommentare nicht lesbar, es gilt die Beschreibung (${String(fehler.message).split('\n')[0]})`)
-    return beschreibung
+    console.error(`  ⚠ ${name}: Kommentare nicht lesbar, es gilt die Beschreibung (${String(fehler.message).split('\n')[0]})`)
+    return []
   }
+}
+
+/** Wie `wirksameBeschreibung`, die Kommentare kommen aus `leseKommentare`; ohne Kommentare gilt die Beschreibung. */
+export function beschreibungMitKommentaren(pr, repo, api = ghApiJson, env = process.env) {
+  return wirksameBeschreibung(pr.body ?? '', leseKommentare(pr, repo, api, env), pr.user?.login)
 }

@@ -359,6 +359,75 @@ const mitPfad = (teil) => (args) => args.some((x) => String(x).includes(teil))
   pruefe('ungültiges Repo wirft', wirft)
 }
 
+// --- Aufrufformen am Kindprozess (Attrappe für execFileSync): Argumente, Nutzlast, Frist, Puffer -----------------------------
+{
+  const aufruf = []
+  const antworten = new Map()
+  const ausfuehren = (befehl, args, opt) => {
+    aufruf.push({ befehl, args, opt })
+    const a = antworten.get(args.join(' '))
+    if (a instanceof Error) throw a
+    return a ?? ''
+  }
+  const fehler404 = Object.assign(new Error('gh: Not Found (HTTP 404)'), { stderr: 'HTTP 404' })
+  const fehler500 = Object.assign(new Error('gh: Server Error (HTTP 500)'), { stderr: 'HTTP 500' })
+  const w = echteWelt({ ausfuehren, repo: R })
+  const letzter = () => aufruf.at(-1)
+  const wirft = (f) => {
+    try {
+      f()
+      return false
+    } catch {
+      return true
+    }
+  }
+
+  w.kommentarSchreiben(5, 'T "x"')
+  gleich('Kommentar: Befehl und Argumente', [letzter().befehl, letzter().args], ['gh', ['api', '-X', 'POST', `repos/${R}/issues/5/comments`, '--input', '-']])
+  gleich('Kommentar: Nutzlast, Kodierung, Frist 30 s, Puffer 64 MiB, ohne Fenster', [letzter().opt.input, letzter().opt.encoding, letzter().opt.timeout, letzter().opt.maxBuffer, letzter().opt.windowsHide], [JSON.stringify({ body: 'T "x"' }), 'utf8', 30000, 67108864, true])
+  w.zweigSha('fix/foo')
+  pruefe('Lesen ohne stdin: kein input', !('input' in letzter().opt))
+
+  w.labelSetzen(5, 'stufe-1')
+  gleich('labelSetzen: Pfad und Nutzlast', [letzter().args, letzter().opt.input], [['api', '-X', 'POST', `repos/${R}/issues/5/labels`, '--input', '-'], JSON.stringify({ labels: ['stufe-1'] })])
+
+  antworten.set(`api repos/${R}/issues/5/labels?per_page=100 --paginate --jq .[].name`, 'stufe-1\n\nx\n')
+  gleich('labels: Zeilen ohne leere', w.labels(5), ['stufe-1', 'x'])
+  antworten.set(`api repos/${R}/issues/5/comments?per_page=100 --paginate --jq .[] | .body | @json`, `${JSON.stringify('a')}\n${JSON.stringify('b')}\n`)
+  gleich('kommentare: Aufruf mit Seitenabruf', w.kommentare(5), ['a', 'b'])
+
+  antworten.set(`api repos/${R}/labels/stufe-2`, fehler404)
+  w.labelAnlegen('stufe-2')
+  gleich('labelAnlegen stufe-2: POST labels mit Farbe und Beschreibung', [letzter().args, JSON.parse(letzter().opt.input)], [['api', '-X', 'POST', `repos/${R}/labels`, '--input', '-'], { name: 'stufe-2', color: 'd93f0b', description: 'Prüfstufe (tools/pr-stufe.mjs), gesetzt von cloud-abgabe' }])
+  antworten.set(`api repos/${R}/labels/stufe-0`, fehler404)
+  antworten.set(`api repos/${R}/labels/stufe-1`, fehler404)
+  w.labelAnlegen('stufe-0')
+  pruefe('Farbe stufe-0', JSON.parse(letzter().opt.input).color === '0e8a16')
+  w.labelAnlegen('stufe-1')
+  pruefe('Farbe stufe-1', JSON.parse(letzter().opt.input).color === 'fbca04')
+  antworten.set(`api repos/${R}/labels/stufe-9`, fehler500)
+  pruefe('labelAnlegen: HTTP 500 wirft, legt nichts an', wirft(() => w.labelAnlegen('stufe-9')) && letzter().args[2] === undefined)
+  const vorher = aufruf.length
+  antworten.set(`api repos/${R}/labels/vorhanden`, '{}')
+  w.labelAnlegen('vorhanden')
+  gleich('labelAnlegen: vorhanden, ein einziger Aufruf', aufruf.length - vorher, 1)
+
+  w.labelEntfernen(5, 'stufe 2')
+  gleich('labelEntfernen: DELETE, Name kodiert', letzter().args, ['api', '-X', 'DELETE', `repos/${R}/issues/5/labels/stufe%202`])
+  antworten.set(`api -X DELETE repos/${R}/issues/5/labels/stufe-0`, fehler500)
+  pruefe('labelEntfernen: HTTP 500 wirft', wirft(() => w.labelEntfernen(5, 'stufe-0')))
+  antworten.set(`api -X DELETE repos/${R}/issues/5/labels/stufe-1`, fehler404)
+  pruefe('labelEntfernen: 404 still', !wirft(() => w.labelEntfernen(5, 'stufe-1')))
+
+  antworten.set(`api -X POST repos/${R}/pulls --input -`, '{"number":5}')
+  w.prAnlegen({ titel: 'T', text: 'X', zweig: 'fix/foo' })
+  gleich('prAnlegen: Pfad', letzter().args, ['api', '-X', 'POST', `repos/${R}/pulls`, '--input', '-'])
+  antworten.set('tools/pr-stufe.mjs 12', '{"stufe":1}')
+  pruefe('stufe: node mit Frist 90 s, Puffer 16 MiB', w.stufe(12) === 1 && letzter().befehl === process.execPath && letzter().opt.timeout === 90000 && letzter().opt.maxBuffer === 16777216 && letzter().opt.encoding === 'utf8', JSON.stringify(letzter()))
+  antworten.set('tools/pr-stufe.mjs 13', fehler500)
+  pruefe('stufe: Fehler gilt als 2', w.stufe(13) === 2)
+}
+
 // --- Prozess: Exit-Code und Meldung -----------------------------------------------------------------------------------
 for (const [args, muster] of [[[], /Aufruf/], [['fix/foo'], /kein prtext-Zweig/]]) {
   const p = spawnSync(process.execPath, [join(wurzel, 'tools/cloud-abgabe.mjs'), ...args], { encoding: 'utf8', env: { ...process.env, GITHUB_REPOSITORY: 'a/b', GH_TOKEN: '' }, timeout: 30000, windowsHide: true })

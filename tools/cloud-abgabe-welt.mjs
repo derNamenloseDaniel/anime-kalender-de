@@ -3,6 +3,7 @@
  * JSON über stdin, nie in einem Shell-Text. Schreibende Aufrufe (PR, Kommentar, Label) werden nie wiederholt; die Logik liest vorher neu.
  * Nur 404 heißt „fehlt“, jeder andere gh-Fehler wirft (Exit 2 im Aufrufer).
  */
+import { execFileSync } from 'node:child_process'
 import { LIMIT_STAPEL_MS, mitLimit } from './kind-mit-limit.mjs'
 import { stufeVon } from './nacht-merger-welt.mjs'
 
@@ -10,20 +11,21 @@ const REPO_STANDARD = 'derNamenloseDaniel/anime-kalender-de'
 const LABEL_FARBE = { 0: '0e8a16', 1: 'fbca04', 2: 'd93f0b' }
 const STUFE_LIMIT_MS = 90_000
 
-/** `gh` mit optionalem stdin; Rückgabe stdout. */
-export const ghEchtMitEingabe = (args, eingabe) =>
-  mitLimit('gh', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, ...(eingabe === undefined ? {} : { input: eingabe }) }, { limitMs: LIMIT_STAPEL_MS })
+/** `gh` mit optionalem stdin und Frist; Rückgabe stdout (`ausfuehren` einspeisbar). */
+export const ghMit = (ausfuehren) => (args, eingabe) =>
+  mitLimit('gh', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, ...(eingabe === undefined ? {} : { input: eingabe }) }, { limitMs: LIMIT_STAPEL_MS, ausfuehren })
+/** `node tools/pr-stufe.mjs <nr>` mit Frist (Befehl und Argumente in einer Liste, wie in der Nacht-Merger-Welt). */
+export const stufeMit = (ausfuehren) => (args) => mitLimit(args[0], args.slice(1), { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 }, { limitMs: STUFE_LIMIT_MS, ausfuehren })
 
 const fehlerText = (e) => `${e.message}\n${e.stderr ?? ''}\n${e.stdout ?? ''}`
 const ist404 = (e) => /HTTP 404/.test(fehlerText(e))
 const kodiert = (pfad) => pfad.split('/').map(encodeURIComponent).join('/')
 
-export function echteWelt({ gh = ghEchtMitEingabe, repo = process.env.GITHUB_REPOSITORY || REPO_STANDARD, zeile = (t) => console.log(t), stufeAus } = {}) {
+export function echteWelt({ ausfuehren = execFileSync, gh = ghMit(ausfuehren), repo = process.env.GITHUB_REPOSITORY || REPO_STANDARD, zeile = (t) => console.log(t), stufeAus = stufeMit(ausfuehren) } = {}) {
   if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) throw new Error('GITHUB_REPOSITORY ungültig')
   const besitzer = repo.split('/')[0]
   const lesen = (args) => gh(['api', ...args])
   const schreiben = (methode, pfad, daten) => gh(['api', '-X', methode, `repos/${repo}/${pfad}`, '--input', '-'], JSON.stringify(daten))
-  const stufeLauf = stufeAus ?? ((args) => mitLimit(args[0], args.slice(1), { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 }, { limitMs: STUFE_LIMIT_MS }))
   return {
     zeile,
     datei: (zweig, name) => {
@@ -61,7 +63,7 @@ export function echteWelt({ gh = ghEchtMitEingabe, repo = process.env.GITHUB_REP
         .filter((z) => z.trim() !== '')
         .map((z) => JSON.parse(z)),
     kommentarSchreiben: (nr, text) => void schreiben('POST', `issues/${nr}/comments`, { body: text }),
-    stufe: (nr) => stufeVon(nr, stufeLauf),
+    stufe: (nr) => stufeVon(nr, stufeAus),
     labels: (nr) => lesen([`repos/${repo}/issues/${nr}/labels?per_page=100`, '--paginate', '--jq', '.[].name']).split('\n').filter((z) => z !== ''),
     labelAnlegen: (name) => {
       try {

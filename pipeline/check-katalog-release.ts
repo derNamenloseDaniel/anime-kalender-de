@@ -7,6 +7,8 @@
  */
 import type { Release, ReleaseEvent } from '../shared/types.ts'
 import { KATALOG_MIN_FOLGEN, schreibeKatalogRelease, type KatalogBelege } from '../shared/katalog-release.ts'
+import { expandEvents } from '../shared/logic.ts'
+import { zeitplanAusVorschlag } from './lib/meldungen.ts'
 import { katalogBelegBestandFehler, katalogBelegFehler, katalogBelege, ladeKatalogBelegEintraege } from './lib/katalog-belege.ts'
 
 let verletzt = 0
@@ -71,6 +73,25 @@ function befundeDesPruefers(): void {
   pruefe('Snowball Earth: mit beobachteten 13 Folgen am Tag belegt', einzeln(BELEGT) === 'belegt')
 }
 
+/** Fool Night (26.11.2026): Netflix-ONA, Meldung ohne Folgenzahl, AniList-Ende am Starttag — vom Zeitplan der Meldung bis zum Termin. */
+function komplettstart(): void {
+  console.log('\nKomplettstart aus einer Meldung ohne Folgenzahl (Fool Night):')
+  const tag = '2026-11-26'
+  const vomTitel = (t: Parameters<typeof zeitplanAusVorschlag>[3], platform = 'netflix'): string | undefined => {
+    const z = zeitplanAusVorschlag({ articleTitle: 'Netflix-Termin' }, 'batch', tag, t, platform)
+    const r = { slug: 'auto-1-netflix', titleId: 1, name: 'X', platform, ...z } as unknown as Release
+    const events = expandEvents(r)
+    schreibeKatalogRelease(events, [r], OHNE)
+    return events[0]?.katalog
+  }
+  const fool = { episodes: 12, jpYear: 2026, format: 'ONA', jpEnd: tag } as const
+  pruefe('Netflix-ONA, 12 Folgen, AniList-Ende = Starttag: Katalog-Release (abgeleitet)', vomTitel(fool) === 'abgeleitet', vomTitel(fool))
+  pruefe('gegenprobe: Ende erst später (Wochenfolgen)', vomTitel({ ...fool, jpEnd: '2027-02-12' }) === undefined)
+  pruefe('gegenprobe: kein ONA (Katalogzugang einer Serie)', vomTitel({ ...fool, format: 'TV' }) === undefined)
+  pruefe('gegenprobe: anderer Anbieter', vomTitel(fool, 'primevideo') === undefined)
+  pruefe(`gegenprobe: unter ${KATALOG_MIN_FOLGEN} Folgen`, vomTitel({ ...fool, episodes: KATALOG_MIN_FOLGEN - 1 }) === undefined)
+}
+
 /** Die Handdatei selbst: gültig, und jede Kennung steht einmal da. */
 function handdatei(): void {
   console.log('\nHanddatei data/katalog-release-von-hand.yaml:')
@@ -93,6 +114,7 @@ function handdatei(): void {
 
 katalogRelease()
 befundeDesPruefers()
+komplettstart()
 handdatei()
 console.log(verletzt ? `\n${verletzt} Zusicherung(en) verletzt.` : '\nAlle Zusicherungen halten.')
 process.exit(verletzt ? 1 : 0)

@@ -48,6 +48,7 @@ function wasKommt(a: Laeuft): 'erste' | 'naechste' | 'finale' {
 export function folgenKopf(a: Laeuft, T: Uebersetze): string {
   const e = a.haupt
   if (a.komplett) {
+    if (a.abwurfFolgen) return T('antwort.abwurfFolgen', { von: a.abwurfFolgen[0], bis: a.abwurfFolgen[1] })
     const count = a.gesamt ?? e.episodeCount
     return count ? T('antwort.alleFolgen', { count }) : T('antwort.alleFolgenOhneZahl') /* ohne Folgenzahl keine erfundene „0“ (Beerus, 10.10.2026) */
   }

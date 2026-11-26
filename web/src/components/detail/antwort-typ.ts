@@ -25,6 +25,8 @@ export type Antwort =
       sendetage?: number[]
       /** Ein Komplettabwurf (`available-from`): alle Folgen an einem Tag, kein Wochentakt. */
       komplett?: boolean
+      /** Der Abwurf beginnt nicht bei Folge 1 (Staffel 2 am Stück): `[von, bis]`, der Kopf nennt „Folgen 9–16“ statt „Alle 16 Folgen“. */
+      abwurfFolgen?: [number, number]
       /** Aus dem TV-Programm gesichtet, ohne Folgenliste: die Nummer ist nur unsere Zählung. */
       sichtung?: boolean
       /** Aus dem TV-Programm gesichtet: das Ende ist unbekannt, auch wenn die Nummern stimmen. */

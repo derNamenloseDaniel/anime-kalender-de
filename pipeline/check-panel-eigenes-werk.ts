@@ -1,7 +1,8 @@
 /**
  * Zusicherung (20.11.2026, Daniel zu Pokémon Horizonte: „wir sollten es von pokemon trennen und als eigene serie führen“): Der Kopf des echten
  * `DetailPanel` nennt bei einem eigenen Werk der Reihe dessen eigenen Namen („Pokémon Horizonte“) ohne Unterzeile „Horizonte“; die Hauptserie
- * heißt weiter wie die Reihe. Dazu `kopfNameVon()` für jede Kennung der Handlisten eigener Werke. Läuft in `check:logic`.
+ * heißt weiter wie die Reihe. Dazu `kopfNameVon()` für jede Kennung der Handlisten eigener Werke, und (F157, 24.11.2026) die Staffel-Reiter
+ * im echten Panel, sobald die Folgendatei mindestens zwei Staffeln führt. Läuft in `check:logic`.
  */
 import { act, createElement as h } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -22,9 +23,18 @@ class Beobachter {
 }
 const lager = { getItem: (k: string) => speicher.get(k) ?? null, setItem: (k: string, w: string) => void speicher.set(k, w), removeItem: (k: string) => void speicher.delete(k) }
 Object.assign(globalThis, { IntersectionObserver: Beobachter, history: { replaceState() {}, pushState() {}, state: null }, location: ort, localStorage: lager, sessionStorage: lager })
+/* Folgendatei der Hauptserie mit drei Staffeln (Reisen: 23–25) für die Staffel-Reiter (F157). */
+const FOLGEN = { f: Array.from({ length: 136 }, (_, i) => [i + 1, `Folge ${i + 1}`]), de: [[1, 136]], s: [[23, 1, 48], [24, 49, 90], [25, 91, 136]] }
+const antwort = (daten: unknown) => ({ ok: true, status: 200, json: async () => daten })
 Object.assign(globalThis, {
-  fetch: async (adresse: unknown) =>
-    String(adresse).includes('franchises.json') ? { ok: true, status: 200, json: async () => ({ [REIHE]: MITGLIEDER }) } : { ok: false, status: 404, json: async () => ({}) },
+  fetch: async (adresse: unknown) => {
+    const url = String(adresse)
+    if (url.includes('franchises.json')) return antwort({ [REIHE]: MITGLIEDER })
+    if (url.includes('folgen/index.json')) return antwort([900_702])
+    if (url.includes('folgen/900702.json')) return antwort(FOLGEN)
+    return { ok: false, status: 404, json: async () => ({}) }
+  },
+  ResizeObserver: Beobachter,
 })
 Object.assign(MiniKnoten.prototype, { closest: () => null, querySelector: () => null })
 Object.assign(globalThis, { cancelAnimationFrame() {} })
@@ -50,15 +60,18 @@ const dom = installiereMiniDom(
 Object.assign(document, { querySelector: () => null, querySelectorAll: () => [], title: 'Start' })
 const wurzel = createRoot(dom.wurzel as unknown as Element)
 
-/** Rendert das Panel für `id` und liefert den Text der Kopfzeile (h2) und der Unterzeile darunter. */
-async function kopf(id: number): Promise<{ name: string; unter: string[] }> {
+/** Rendert das Panel für `id` und liefert den Text der Kopfzeile (h2), der Unterzeile darunter und die Staffel-Reiter (Beschriftung, gewählt). */
+async function kopf(id: number): Promise<{ name: string; unter: string[]; reiter: string[]; gewaehlt: string[] }> {
   const data = { titles: TITEL, titleById: new Map(TITEL.map((t) => [t.id, t])), releases: [], releaseBySlug: new Map(), events: [], eventsByDate: new Map(), releasesByTitle: new Map(), meta: {} }
   const e = { data, titleId: id, favorites: new Set<number>(), hidden: new Set(), onToggleFavorite() {}, onToggleHidden() {}, onClose() {}, onFilterBy() {}, onOpenTitle() {} }
   await act(async () => wurzel.render(h(DetailPanel as never, e as never)))
   await act(async () => void (await new Promise((fertig) => setTimeout(fertig, 5))))
   const h2 = dom.wurzel.finde((k) => k.tagName === 'H2')[0]
   const unter = dom.wurzel.finde((k) => k.tagName === 'P').map((k) => (k.textContent ?? '').trim())
-  return { name: (h2?.textContent ?? '').trim(), unter }
+  const tabs = dom.wurzel.finde((k) => k.getAttribute('role') === 'tab' && k.getAttribute('aria-controls') !== null)
+  const reiter = tabs.map((k) => (k.textContent ?? '').trim())
+  const gewaehlt = tabs.filter((k) => k.getAttribute('aria-selected') === 'true').map((k) => (k.textContent ?? '').trim())
+  return { name: (h2?.textContent ?? '').trim(), unter, reiter, gewaehlt }
 }
 
 const horizonte = await kopf(900_703)
@@ -66,6 +79,8 @@ pruefe('eigenes Werk: Kopf „Pokémon Horizonte“', horizonte.name === 'Pokém
 pruefe('eigenes Werk: keine Unterzeile „Horizonte“', !horizonte.unter.some((z) => z.startsWith('Horizonte')), horizonte.unter)
 const reisen = await kopf(900_702)
 pruefe('Gegenfall Hauptserie: Kopf „Pokémon“, Unterzeile „Reisen“', reisen.name === 'Pokémon' && reisen.unter.some((z) => z.startsWith('Reisen')), reisen)
+pruefe('Hauptserie mit drei Staffeln in der Folgendatei: Reiter 23–25 im Panel, letzte gewählt', reisen.reiter.join() === '23,24,25' && reisen.gewaehlt.join() === '25', reisen.reiter)
+pruefe('ohne Folgendatei keine Staffel-Reiter', horizonte.reiter.length === 0, horizonte.reiter)
 
 /* Klasse: jede Kennung der Handlisten eigener Werke heißt im Kopf wie sie selbst, auch wenn nur das Reihenglied die Marke trägt. */
 const eintraege = ladeAlleEigenenWerke()
@@ -83,4 +98,4 @@ if (verletzt) {
   console.error(`\n${verletzt} Zusicherung(en) verletzt.`)
   process.exit(1)
 }
-console.log('check-panel-eigenes-werk: ok (Kopf eigenes Werk, Hauptserie, Handlisten)')
+console.log('check-panel-eigenes-werk: ok (Kopf eigenes Werk, Hauptserie, Handlisten, Staffel-Reiter im Panel)')

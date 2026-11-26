@@ -587,3 +587,19 @@
   schedule: { firstEpisodeDate: "2026-09-29", episodeCount: 2 }
   sources:
     - https://www.anime2you.de/news/1042851/netflix-anime-neu-im-september-2026/
+
+# Call of the Night bei Netflix (25.11.2026): Anime2You 1073645 (19.11., aktualisiert 21.11.): „ab dem 25. November 2026 bei Netflix auf Abruf zur Verfügung“,
+# „Details zu den angebotenen Sprachfassungen sind zum aktuellen Zeitpunkt noch offen“. JustWatch DE führt Netflix am 25.11.2026 als Abo-Angebot (Adresse
+# title/81621036, Audioliste leer); ein deutscher Ton ist damit nicht belegt. Der Handbeleg „nicht verfügbar“ vom 22.08. (toter Verweis, Stand vor dem Start)
+# ist entfernt; ohne diesen Eintrag baute der Bau den Weg ohne Adresse.
+- slug: auto-141391-netflix
+  anilistId: 141391
+  platform: netflix
+  platformUrl: https://www.netflix.com/title/81621036
+  releaseType: batch
+  schedule: { firstEpisodeDate: "2026-11-25", episodeCount: 13 }
+  hinweis: "Termin laut Quelle – ob mit deutscher Synchro, sagt sie nicht."
+  sprache: offen
+  sources:
+    - https://www.anime2you.de/news/1073645/call-of-the-night-bald-auf-netflix/
+    - https://www.justwatch.com/de/Serie/Call-of-the-Night

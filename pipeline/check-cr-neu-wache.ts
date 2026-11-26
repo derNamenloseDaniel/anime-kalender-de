@@ -147,7 +147,7 @@ pruefe('Prozess: nichts fehlt: Exit 0 und Haken, keine Warnung', gut.status === 
 const keine = prozess('c', null, [])
 pruefe('Prozess: ohne Datei nichts zu prüfen, Exit 0', keine.status === 0 && keine.out.includes('keine Datei'), keine)
 const kaputt = prozess('d', { folgen: vier }, '{kaputt')
-pruefe('Prozess: kaputte events.json: Exit 1, Meldung auf stderr', kaputt.status === 1 && kaputt.err.includes('✖ Crunchyroll-Neuheiten') && kaputt.out === '', kaputt)
+pruefe('Prozess: kaputte events.json: Exit 1, Meldung auf stderr', kaputt.status === 1 && kaputt.err.includes('✖ Crunchyroll-Neuheiten') && kaputt.out === 'VERSTÖSSE: 1\n', kaputt)
 const form = prozess('e', { folgen: 'x' }, [])
 pruefe('Prozess: folgen keine Liste: Exit 1', form.status === 1, form)
 const psyrenProzess = { ...psyren, serie: 'PSYREN', verfuegbarAb: '2026-10-24T14:30:00.000Z' }

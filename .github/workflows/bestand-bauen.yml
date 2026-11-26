@@ -345,7 +345,9 @@ jobs:
           if grep -q '^MAENGEL_STILLSTAND ' "$RUNNER_TEMP/qualitaet.log"; then
             still="$(grep -m1 '^MAENGEL_STILLSTAND ' "$RUNNER_TEMP/qualitaet.log" | cut -d' ' -f2-)"
             echo "::warning::Mängel Stillstand: ${still}"
-            echo "STILLSTAND_WARNUNG=Mängel Stillstand: ${still}" >> "$GITHUB_ENV"
+            # Nur die Artnamen (ohne Zahlen) hängen an: `tools/bekannte-warnungen.json` erkennt daran eine bekannte Warnung, eine neue Art nicht.
+            namen="$(grep -m1 '^MAENGEL_STILLSTAND_ARTEN ' "$RUNNER_TEMP/qualitaet.log" | cut -d' ' -f2- | sed -E 's/ [0-9]+→[0-9]+ \([^)]*\)//g')"
+            echo "STILLSTAND_WARNUNG=Mängel Stillstand: ${still}${namen:+ — $namen}" >> "$GITHUB_ENV"
           fi
           # Harter Wächter rot (`HART` in check-qualitaet.ts): als gelbe Meldung sichtbar machen, sonst bleibt der Schritt unbemerkt rot.
           if grep -q 'das darf nicht vorkommen' "$RUNNER_TEMP/qualitaet.log"; then

@@ -22,6 +22,52 @@ function useAngabenDesTitels(title: Title, art: Parameters<typeof ankuendigungOh
   return { ankuendigung: ankuendigungOhneTermin(title, art), staffeln: useStaffelGrenzen(title.id) }
 }
 
+/** Zuordnung Termin-Kennung → Pillen-Gruppe (Abo/TV) für die Kopfzeilen-Pillen. */
+function pillenGruppenVon(sortiert: ReturnType<typeof sortiereNachZugang>, title: Title, releases: Release[], terminReleases: Release[], tvVorbei: TvZuletzt[]) {
+  return new Map([
+    ...zeilenGruppen(sortiert, title, releases),
+    ...terminReleases.map((r) => [r.slug, r.platform === 'tv' ? 'tv' : 'abo'] as const),
+    ...tvVorbeiGruppen(tvVorbei),
+  ])
+}
+
+interface KastenHinweisProps {
+  folgenLuecke: string | null
+  title: Title
+  antwort: ReturnType<typeof berechneAntwort>
+  verbindung: NewsletterVerbindung
+  favorites: Set<number>
+  t: Translate
+}
+
+function KastenHinweis({ folgenLuecke, title, antwort, verbindung, favorites, t }: KastenHinweisProps) {
+  if (folgenLuecke) {
+    return (
+      <p className="mt-1 text-t4 text-ak-leise">
+        {t(/^\d+$/.test(folgenLuecke) ? 'detail.folgeOhneAnbieter' : 'detail.folgenOhneAnbieter', { bereich: folgenLuecke })}
+      </p>
+    )
+  }
+  // Beim Kinofilm sagt der Kino-Hinweis darunter dasselbe.
+  if (title.ohneSynchro && antwort?.art !== 'kino') {
+    return (
+      <>
+        <p className="mt-2 text-t4 text-ak-warnung-text">
+          {verbindung.verbunden
+            ? t('detail.noDubWatchConnected', { mail: verbindung.mail ?? '' })
+            : t('detail.noDubWatchOpen')}
+        </p>
+        {favorites.has(title.id) && (
+          <p className="mt-1 text-t4 font-semibold text-ak-favorit-text">
+            {t('detail.noDubWatched')}
+          </p>
+        )}
+      </>
+    )
+  }
+  return <KinoZuletzt titleId={title.id} antwort={antwort} t={t} />
+}
+
 export function AntwortBereich({ antwort, sortiertNachZugang, streamReleases, terminReleases, title, t, today, wegeHinweis, tvVorbei, kastenNotiz, folgenLuecke, verbindung, favorites, onToggleFavorite, folgenAngabeFuer, dubZeilen, releaseJePlattform, releases, discAusgaben, discReleases, discZuerst }: {
   antwort: ReturnType<typeof berechneAntwort>
   sortiertNachZugang: ReturnType<typeof sortiereNachZugang>
@@ -53,13 +99,7 @@ export function AntwortBereich({ antwort, sortiertNachZugang, streamReleases, te
       {antwort && (
         <KastenMitFolgenKarte
           karte={ankuendigung && <TerminOffenKarte title={title} ankuendigung={ankuendigung} gemerkt={favorites.has(title.id)} onToggleFavorite={onToggleFavorite} verbindung={verbindung} t={t} />}
-          pillenGruppen={
-            new Map([
-              ...zeilenGruppen(sortiertNachZugang, title, releases),
-              ...terminReleases.map((r) => [r.slug, r.platform === 'tv' ? 'tv' : 'abo'] as const),
-              ...tvVorbeiGruppen(tvVorbei),
-            ])
-          }
+          pillenGruppen={pillenGruppenVon(sortiertNachZugang, title, releases, terminReleases, tvVorbei)}
           antwort={antwort}
           releases={releases}
           ohneSprachbeleg={ohneSprachbelegFuer(sortiertNachZugang, title, releases)}
@@ -73,27 +113,7 @@ export function AntwortBereich({ antwort, sortiertNachZugang, streamReleases, te
           folgen={<FolgenMitNachlegern titleId={title.id} wege={deutscheBereicheDerWege(title)} antwort={antwort} releases={releases} today={today} laufzeitImKopf={Boolean(title.runtimeMin)} serieBelegt={synchroBelegt(title)} />}
           schnitt={kastenNotiz?.schnitt}
           angebotSeit={angebotSeitZeileVon(title, t)}
-          hinweis={
-            folgenLuecke ? (
-              <p className="mt-1 text-t4 text-ak-leise">
-                {t(/^\d+$/.test(folgenLuecke) ? 'detail.folgeOhneAnbieter' : 'detail.folgenOhneAnbieter', { bereich: folgenLuecke })}
-              </p>
-            ) : /* Beim Kinofilm sagt der Kino-Hinweis darunter dasselbe. */
-            title.ohneSynchro && antwort?.art !== 'kino' ? (
-              <>
-                <p className="mt-2 text-t4 text-ak-warnung-text">
-                  {verbindung.verbunden
-                    ? t('detail.noDubWatchConnected', { mail: verbindung.mail ?? '' })
-                    : t('detail.noDubWatchOpen')}
-                </p>
-                {favorites.has(title.id) && (
-                  <p className="mt-1 text-t4 font-semibold text-ak-favorit-text">
-                    {t('detail.noDubWatched')}
-                  </p>
-                )}
-              </>
-            ) : <KinoZuletzt titleId={title.id} antwort={antwort} t={t} />
-          }
+          hinweis={<KastenHinweis folgenLuecke={folgenLuecke} title={title} antwort={antwort} verbindung={verbindung} favorites={favorites} t={t} />}
           stream={streamZeilen({ sortiertNachZugang: ohneAnkuendigungsWeg(sortiertNachZugang, ankuendigung), title, t, today, folgenAngabeFuer, dubZeilen, releaseJePlattform, streamReleases, releases, tvVorbei, staffeln })}
           disc={discZeilen({ sortiertNachZugang, title, t, today, folgenAngabeFuer, discAusgaben, discReleases })}
           discZuerst={discZuerst}

@@ -1,13 +1,12 @@
-import { cloneElement, isValidElement, useEffect, useId, useLayoutEffect, useRef, useState, type MouseEvent, type ReactElement, type ReactNode, type RefObject } from 'react'
-import { createPortal } from 'react-dom'
+import { Children, cloneElement, isValidElement, useEffect, useId, useRef, useState, type MouseEvent, type ReactElement, type ReactNode, type RefObject } from 'react'
 import { FSK_COLORS, PLATFORMS, RELEASE_TYPES, anbieterName } from '@shared/types.ts'
 import type { Fsk, PlatformId, ReleaseStatus, ReleaseType } from '@shared/types.ts'
 import { useLang, type TranslationKey } from '../lib/i18n.tsx'
 import { plakettenStil } from '../lib/kontrast.ts'
-import { sichtbareBreite } from '../lib/sichtbare-breite.ts'
 import { TIPPFLAECHE, TREFFER_24, TREFFER_24_MIN } from './detail/tippziel.ts'
 import { PILLE_JA, PILLE_NEIN, ZUSTAND_TEXT } from './filter/pille-zustand.ts'
-import { fokusZeigtBlase, useEinzigeBlase } from './tooltip-einzeln.ts'
+import { fokusZeigtBlase, mausZeigtBlase, useEinzigeBlase } from './tooltip-einzeln.ts'
+import { TooltipBlase, useBlasenPosition } from './tooltip-blase.tsx'
 
 /** Gemeinsamer Fokus- und Zeigerstil aller anklickbaren Elemente. */
 const CLICKABLE = 'cursor-pointer'
@@ -21,7 +20,7 @@ const CLICKABLE = 'cursor-pointer'
  * gibt keine Stelle, die beim nächsten Mal vergessen wird (Daniel, 12.08.2026:
  * „keine default web tooltips … überall nutzen").
  */
-function mitHinweis(text: string | undefined, seite: 'oben' | 'unten', kind: ReactNode): ReactNode {
+export function mitHinweis(text: string | undefined, seite: 'oben' | 'unten', kind: ReactNode): ReactNode {
   return text ? (
     <Tooltip text={text} seite={seite}>
       {kind}
@@ -547,6 +546,36 @@ export function Toggle({
   )
 }
 
+interface TooltipProps {
+  text: ReactNode
+  children: ReactNode
+  unterstrichen?: boolean
+  seite?: 'oben' | 'unten'
+  /** Das Kind ist selbst fokussierbar (Knopf, Link) - dann kein zweiter Tab-Halt in der Hülle. */
+  eigenerFokus?: boolean
+  /** Für die Hülle, wenn sie im Flex-Layout den Platz des Kinds einnimmt (`ml-auto`, `shrink-0`). */
+  className?: string
+  mitSpitze?: boolean
+  /** Hülle und Auslöser füllen die Breite des Behälters (Zeilen, abgeschnittener Text) statt nur ihren Inhalt. */
+  fuellend?: boolean
+  /** Der Auslöser ist kein Tab-Halt (Text, dessen Inhalt ohnehin im DOM steht); Maus und Antippen öffnen die Blase. */
+  ohneTabHalt?: boolean
+}
+
+const STEUERELEMENTE = new Set(['a', 'button', 'input', 'select', 'textarea'])
+
+/** Ein Steuerelement selbst (nicht seine Hülle): bekommt den `aria-describedby`-Verweis auf die Blase. */
+function kindIstSteuerelement(kind: ReactNode): kind is ReactElement<{ 'aria-describedby'?: string }> {
+  return isValidElement(kind) && typeof kind.type === 'string' && STEUERELEMENTE.has(kind.type)
+}
+
+/** Das Kind nimmt Tipp und Fokus selbst an (Steuerelement, `tabIndex` oder eine Hülle wie `<label>` darum) - dann darf die Hülle den ersten Tipp nicht schlucken. */
+export function kindIstBedienbar(kind: ReactNode): boolean {
+  if (!isValidElement<{ tabIndex?: number; children?: ReactNode }>(kind)) return false
+  if (kindIstSteuerelement(kind) || kind.props.tabIndex !== undefined) return true
+  return kind.type === 'label' && Children.toArray(kind.props.children).some(kindIstBedienbar)
+}
+
 /**
  * Ein Hinweis, der zur Seite gehört — nicht der des Betriebssystems.
  *
@@ -600,22 +629,15 @@ export function Tooltip({
   eigenerFokus,
   className = '',
   mitSpitze,
-}: {
-  text: ReactNode
-  children: ReactNode
-  unterstrichen?: boolean
-  seite?: 'oben' | 'unten'
-  /** Das Kind ist selbst fokussierbar (Knopf, Link) - dann kein zweiter Tab-Halt in der Hülle. */
-  eigenerFokus?: boolean
-  /** Für die Hülle, wenn sie im Flex-Layout den Platz des Kinds einnimmt (`ml-auto`, `shrink-0`). */
-  className?: string
-  mitSpitze?: boolean
-}) {
+  fuellend,
+  ohneTabHalt,
+}: TooltipProps) {
   const [offen, setOffen] = useState(false)
   const anker = useRef<HTMLSpanElement>(null)
   const blase = useRef<HTMLSpanElement>(null)
   const zuTimer = useRef<number>(undefined)
-  const tipp = useTippVerhalten(anker, offen, () => setOffen(false), Boolean(eigenerFokus ?? (isValidElement(children) && (children.type === 'a' || children.type === 'button'))))
+  const kindFokus = eigenerFokus ?? kindIstBedienbar(children)
+  const tipp = useTippVerhalten(anker, offen, () => setOffen(false), kindFokus)
   /**
    * Kennung, mit der der Auslöser auf seine Blase zeigt.
    *
@@ -625,57 +647,15 @@ export function Tooltip({
    * und davon gibt es auf der Startseite über zweihundert.
    */
   const blasenId = useId()
-  /* Ein Knopf oder Link ist selbst Tab-Halt: Er bekommt den Verweis auf die Blase, die Hülle keinen zweiten Halt. */
-  const kindFokus = eigenerFokus ?? (isValidElement(children) && (children.type === 'a' || children.type === 'button'))
+  /* Ein Knopf, Link oder Feld ist selbst Tab-Halt: Es bekommt den Verweis auf die Blase, die Hülle keinen zweiten Halt. */
   const verweis = offen ? blasenId : undefined
-
-  /**
-   * Position im Fenster, einmal je Öffnen gemessen.
-   *
-   * `undefined` heißt „noch nicht gemessen" — dann steht die Blase außerhalb
-   * des Bildes und wird nur ausgemessen. Ohne diesen Zwischenschritt kennt
-   * niemand ihre Breite, und ohne Breite lässt sie sich weder zentrieren noch
-   * am Rand festhalten.
-   */
-  const [pos, setPos] = useState<{ left: number; top: number }>()
-
-  /**
-   * `useLayoutEffect`, damit die Position vor dem ersten Bild sitzt — mit
-   * `useEffect` blitzte die Blase eine Bildwiederholung lang an der falschen
-   * Stelle auf.
-   */
-  useLayoutEffect(() => {
-    if (!offen) {
-      setPos(undefined)
-      return
-    }
-    const a = anker.current?.getBoundingClientRect()
-    const b = blase.current?.getBoundingClientRect()
-    if (!a || !b) return
-
-    const rand = 8
-    const luft = 6
-    // Waagrecht mittig über dem Anker, aber nie über den Fensterrand hinaus.
-    const left = Math.min(
-      Math.max(a.left + a.width / 2 - b.width / 2, rand),
-      Math.max(rand, sichtbareBreite() - b.width - rand),
-    )
-    // Senkrecht bevorzugt auf der gewünschten Seite — und **immer im Bild** (Daniel, 29.09.2026:
-    // „wird außerhalb des sichtbaren bereichs weiter unten angezeigt … das ist ein bug").
-    const oben = a.top - b.height - luft
-    const unten = a.bottom + luft
-    const platzUnten = window.innerHeight - rand - unten >= b.height
-    const platzOben = oben >= rand
-    const gewuenscht = seite === 'oben' ? (platzOben ? oben : unten) : platzUnten ? unten : oben
-    const top = Math.min(Math.max(gewuenscht, rand), Math.max(rand, window.innerHeight - b.height - rand))
-    setPos({ left, top })
-  }, [offen, seite])
+  const pos = useBlasenPosition(offen, seite, anker, blase)
 
   return (
     <span
       ref={anker}
-      className={`relative inline-flex items-center ${className}`}
-      onMouseEnter={() => !tipp.nachAntippen() && setOffen(true)}
+      className={`relative ${fuellend ? 'flex w-full min-w-0' : 'inline-flex'} items-center ${className}`}
+      onMouseEnter={() => !tipp.nachAntippen() && mausZeigtBlase() && setOffen(true)}
       onMouseLeave={() => setOffen(false)}
       onFocus={(e) => !tipp.nachAntippen() && fokusZeigtBlase(e.target) && setOffen(true)}
       onBlur={() => setOffen(false)}
@@ -689,49 +669,21 @@ export function Tooltip({
       onClickCapture={tipp.beimKlick}
     >
       <span
-        tabIndex={kindFokus ? undefined : 0}
+        tabIndex={kindFokus || ohneTabHalt ? undefined : 0}
         /* Der Auslöser zeigt auf seine Blase (kein `role="note"`); ohne `tabIndex` erreicht sie nur, wer eine Maus hat. */
         aria-describedby={kindFokus ? undefined : verweis}
         /* `inline-flex`: Die Hülle nimmt die Höhe ihres Kinds, nicht die der Zeile — sonst stehen Plaketten versetzt. */
         className={[
           /* Mit `kindFokus` ist das Kind der Auslöser (z. B. ein Knopf) und bringt seine eigene Trefferfläche mit; ein `::after` der Hülle läge sonst über ihm und finge den Klick ab (Heute-Knopf, 08.10.2026). */
-          `inline-flex items-center rounded-sm ${kindFokus ? '' : TREFFER_24_MIN}`,
+          `${fuellend ? 'flex w-full min-w-0' : 'inline-flex'} items-center rounded-sm ${kindFokus || ohneTabHalt ? '' : TREFFER_24_MIN}`,
           unterstrichen ? 'cursor-help underline decoration-dotted underline-offset-2' : '',
         ].join(' ')}
       >
-        {kindFokus && isValidElement(children)
-          ? cloneElement(children as ReactElement<{ 'aria-describedby'?: string }>, { 'aria-describedby': verweis })
+        {kindFokus && kindIstSteuerelement(children)
+          ? cloneElement(children, { 'aria-describedby': verweis })
           : children}
       </span>
-      {offen && text &&
-        createPortal(
-          <span
-            ref={blase}
-            id={blasenId}
-            role="tooltip"
-            style={
-              pos
-                ? { left: pos.left, top: pos.top }
-                : // Ungemessen: außerhalb des Bildes, damit niemand sie aufblitzen
-                  // sieht. `position: fixed` erzeugt dabei keinen Überlauf.
-                  { left: -9999, top: 0 }
-            }
-            className={[
-              'pointer-events-none fixed z-[200] w-max max-w-[min(20rem,80vw)]',
-              /* `whitespace-pre-line`: Mehrzeilige Hinweise (Anbieter-Pille) brauchen es, einzeilige
-                 ändert es nicht — React würde `\n` sonst als Leerzeichen rendern (23.09.2026). */
-              'whitespace-pre-line rounded-lg px-2.5 py-1.5 text-left text-[11px] leading-snug',
-              'bg-slate-900 text-slate-100 shadow-xl ring-1 ring-white/15',
-              'dark:bg-slate-800 dark:ring-white/10',
-              /* Nase nach oben — **ohne `relative`**: das überschreibt `fixed` (29.09.2026). */
-              mitSpitze ? 'before:absolute before:-top-1 before:left-1/2 before:-translate-x-1/2 before:border-x-4 before:border-b-4 before:border-x-transparent before:border-b-slate-900 dark:before:border-b-slate-800' : '',
-              pos ? 'animate-[hinweisEin_.15s_ease-out]' : '',
-            ].join(' ')}
-          >
-            {text}
-          </span>,
-          document.body,
-        )}
+      {offen && text && <TooltipBlase blase={blase} blasenId={blasenId} pos={pos} mitSpitze={mitSpitze} text={text} />}
     </span>
   )
 }

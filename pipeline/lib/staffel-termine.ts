@@ -64,7 +64,7 @@ export function trefferFuer(liste: FolgentitelListe, folge: string | undefined):
   return liste.get(k) ?? liste.get(aehnlicherKern(liste.keys(), k) ?? '') ?? liste.get(folgenKern(folge)) ?? liste.ohneArtikel?.get(ohneArtikel(ohneVorspann))
 }
 
-const sendeSchluessel = (sender: string, startBerlin: string): string => `${sender.toLowerCase()}|${startBerlin.slice(0, 16)}`
+export const sendeSchluessel = (sender: string, startBerlin: string): string => `${sender.toLowerCase()}|${startBerlin.slice(0, 16)}`
 
 /** Sendeplatz (Sender und Start, Berliner Zeit) → Folgentitel, nur Sendungen des Sammeltitels. */
 export function folgentitelJeSendeplatz(sendungen: TvSendung[], sammel: number): Map<string, string | undefined> {

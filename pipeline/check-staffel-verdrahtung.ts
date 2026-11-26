@@ -13,6 +13,7 @@ const FUNKTION = 'baueReihen'
 type Bindung = { name: string; aufruf: string; feld: string }
 const STAFFEL_QUELLE: Bindung = { name: 'staffelQuellen', aufruf: 'alleStaffelQuellen()', feld: 'staffelQuelle' }
 const STAFFEL_BIS: Bindung = { name: 'staffelBisse', aufruf: 'staffelEnden(ladeStaffelGrenzen())', feld: 'staffelBis' }
+const STAFFEL_FOLGEN: Bindung = { name: 'staffelGeteilt', aufruf: 'geteilteStaffeln()', feld: 'staffelFolgen' }
 
 /** Alle Abweichungen von einer Verdrahtung `const <name> = <aufruf>` → `<feld>: <name>.get(t.id)`. */
 function bindungsFehler(rumpf: ts.Block, datei: ts.SourceFile, b: Bindung): string[] {
@@ -47,7 +48,7 @@ export function verdrahtungsFehler(quelltext: string): string[] {
   const datei = ts.createSourceFile('x.ts', quelltext, ts.ScriptTarget.Latest, true)
   const rumpf = datei.statements.find((s): s is ts.FunctionDeclaration => ts.isFunctionDeclaration(s) && s.name?.text === FUNKTION)?.body
   if (!rumpf) return [`${FUNKTION} nicht gefunden`]
-  return [...bindungsFehler(rumpf, datei, STAFFEL_QUELLE), ...bindungsFehler(rumpf, datei, STAFFEL_BIS)]
+  return [...bindungsFehler(rumpf, datei, STAFFEL_QUELLE), ...bindungsFehler(rumpf, datei, STAFFEL_BIS), ...bindungsFehler(rumpf, datei, STAFFEL_FOLGEN)]
 }
 
 let fehlerZahl = 0
@@ -67,7 +68,12 @@ pruefe('Vorlage enthält Aufruf und Nutzung genau einmal', quelle.split(AUFRUF).
 const BIS_AUFRUF = 'const staffelBisse = staffelEnden(ladeStaffelGrenzen())'
 const BIS_NUTZUNG = 'staffelBis: staffelBisse.get(t.id)'
 pruefe('Vorlage enthält staffelBis-Aufruf und -Nutzung genau einmal', quelle.split(BIS_AUFRUF).length === 2 && quelle.split(BIS_NUTZUNG).length === 2)
+const FOLGEN_AUFRUF = 'const staffelGeteilt = geteilteStaffeln()'
+const FOLGEN_NUTZUNG = 'staffelFolgen: staffelGeteilt.get(t.id)'
+pruefe('Vorlage enthält staffelFolgen-Aufruf und -Nutzung genau einmal', quelle.split(FOLGEN_AUFRUF).length === 2 && quelle.split(FOLGEN_NUTZUNG).length === 2)
 const abweichungen: [string, string][] = [
+  ['staffelFolgen: falscher Schlüssel', quelle.replace(FOLGEN_NUTZUNG, 'staffelFolgen: staffelGeteilt.get(t.id + 1)')],
+  ['staffelFolgen: leere Zuordnung', quelle.replace(FOLGEN_AUFRUF, 'const staffelGeteilt = new Map<number, [number, number, number][]>()')],
   ['Rückfall auf aniSearch allein', quelle.replace(AUFRUF, 'const staffelQuellen = staffelQuellenAusAnisearch()')],
   ['leere Zuordnung', quelle.replace(AUFRUF, 'const staffelQuellen = new Map<number, number>()')],
   ['Aufruf hinter `0 &&`', quelle.replace(AUFRUF, 'const staffelQuellen = 0 && alleStaffelQuellen()')],

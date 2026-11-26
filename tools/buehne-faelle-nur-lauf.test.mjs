@@ -5,7 +5,7 @@
  */
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { FAELLE, FERNSEHTAG } from './buehne-faelle.mjs'
@@ -16,10 +16,12 @@ const ALLE_FAELLE = [...FAELLE, ...FERNSEHTAG]
 const KENNUNGEN = ALLE_FAELLE.map((f) => f.titel).filter((id) => id > 0)
 
 function baueWurzel(wurzel, name86) {
-  for (const d of ['tools/buehne-faelle.mjs', 'tools/buehne-faelle-nur.mjs', 'pipeline/lib/ausgabe-kennung.ts', 'pipeline/bau/ohne-synchro-namen.ts']) {
+  for (const d of ['tools/buehne-faelle.mjs', 'tools/buehne-faelle-nur.mjs', 'pipeline/lib/ausgabe-kennung.ts', 'pipeline/lib/staffel-versatz.ts', 'pipeline/bau/ohne-synchro-namen.ts']) {
     mkdirSync(dirname(join(wurzel, d)), { recursive: true })
     copyFileSync(join(REPO, d), join(wurzel, d))
   }
+  // `staffel-versatz.ts` (von `ausgabe-kennung.ts` geladen) braucht js-yaml.
+  if (!existsSync(join(wurzel, 'node_modules'))) symlinkSync(join(REPO, 'node_modules'), join(wurzel, 'node_modules'), 'junction')
   mkdirSync(join(wurzel, 'data'), { recursive: true })
   writeFileSync(join(wurzel, 'data/kennungen.json'), JSON.stringify({ titel: KENNUNGEN.map((al, i) => [1000 + i, al, 5000 + i]) }))
   const titel = KENNUNGEN.map((id) => ({ id, franchiseId: id, titleRomaji: id === 131586 ? name86 : `Titel ${id}` }))

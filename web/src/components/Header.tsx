@@ -8,6 +8,7 @@ import { KopfSuchfeld, useKopfSuche } from './kopf-suche.tsx'
 import { HandyNavigation } from './HandyNavigation.tsx'
 import { useEinrollen } from '../lib/use-einrollen.ts'
 import { useMobil } from '../lib/use-mobil.ts'
+import { Tooltip } from './ui.tsx'
 import { AboMenue } from './kalender/AboMenue.tsx'
 import { LogoZeichen, MondZeichen, SonnenZeichen, SuchZeichen } from './kalender/Zeichen.tsx'
 
@@ -101,10 +102,14 @@ function ThemaKnopf() {
     öffnet.
   */
   return (
-    <button type="button" onClick={umschalten} aria-label={label} title={label} className={`${RUND} hidden md:flex`}>
-      <span className={dunkel ? 'text-ak-favorit' : 'text-ak-info'}>
-        {dunkel ? <SonnenZeichen /> : <MondZeichen />}
-      </span>
-    </button>
+    <span className="hidden md:contents">
+      <Tooltip text={label} seite="unten">
+        <button type="button" onClick={umschalten} aria-label={label} className={RUND}>
+          <span className={dunkel ? 'text-ak-favorit' : 'text-ak-info'}>
+            {dunkel ? <SonnenZeichen /> : <MondZeichen />}
+          </span>
+        </button>
+      </Tooltip>
+    </span>
   )
 }

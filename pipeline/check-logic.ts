@@ -24,6 +24,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { gzipSync } from 'node:zlib'
 import { titelAus } from './lib/anisearch-titel.ts'
+import { titelFaellig } from './lib/anisearch-faellig.ts'
 import { bauQuelltext, panelQuelltext, workerQuelltext } from './lib/quelltext.ts'
 import yaml from 'js-yaml'
 import { discSlug, slugify } from './lib/util.ts'
@@ -46,7 +47,7 @@ import { toggoAngabe } from '../web/src/lib/toggo.ts'
 import { planeKatalogLauf } from './lib/katalog-plan.ts'
 import { ohneEingeordnete, verlaeufeAus } from '../web/src/lib/news-verlauf.ts'
 import { deutschAbgeschlossen, erschieneneFuerFolgenliste } from '../web/src/components/detail/antwort-regeln.ts'
-import { istEingeklappt } from '../web/src/components/detail/reihen-regeln.ts'
+import { ohneDeutscheSynchro } from '../web/src/components/detail/reihen-teil.ts'
 import { messungenFuerFolgen } from './lib/news-messung.ts'
 import { ergaenzeErstausgabeAngebot } from './bau/13-7-erstausgabe-angebot.ts'
 import { streicheMagentaPartner } from './bau/11-5-magenta-partner.ts'
@@ -3741,7 +3742,8 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
   */
   pruefe(
     'ein verneinender Handbeleg sperrt den Anbieter',
-    bau.includes('if (beleg && (beleg.dub !== true || beleg.available === false)) continue'),
+    bau.includes('if (beleg && (beleg.dub !== true || beleg.available === false)) continue') &&
+      bau.includes('if (beleg && (beleg.dub !== true || beleg.available === false)) return true'),
     'am 25.08.2026 hat ein Lauf so fünf geprüfte Neins überschrieben',
   )
   pruefe(
@@ -3751,7 +3753,7 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
   )
   pruefe(
     'bei Amazon zählt nur, was als Video belegt ist',
-    bau.includes("if (ziel === 'primevideo' && linkBefunde[url]?.prime !== true) continue"),
+    bau.includes("if (ziel === 'primevideo' && linkBefunde[url]?.prime !== true) return true"),
     'hinter /dp/ kann eine DVD liegen — eine Disc als Stream wäre schlimmer als kein Weg',
   )
   /*
@@ -4309,7 +4311,7 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
   )
   pruefe(
     'späte Ergänzungen legen keine laut Linkprüfung tote Adresse an',
-    (bau.match(/if \(lautPruefungTot\(url\)\) continue/g) ?? []).length >= 2,
+    (bau.match(/if \(lautPruefungTot\(url\)\) continue|return lautPruefungTot\(url\)/g) ?? []).length >= 2,
     'sonst stehen 404-Adressen ohne Sprachurteil im Datensatz (sechs Joyn-Verweise, 20.08.–17.09.2026)',
   )
   pruefe(
@@ -4422,9 +4424,15 @@ console.log('\nPrime: ein Handbeleg gilt seiner Adresse:')
   )
 
   const holer = readFileSync('pipeline/fetch-anisearch-titel.ts', 'utf8')
+  /* Die Regel steht in lib/anisearch-faellig.ts: als Lauf geprüft, nicht per Quelltext (Grenze der Textlesungen). */
+  const fristOpt = { jetzt: Date.parse('2026-11-24'), alterTage: 180, parserStand: 3 }
+  const altTag = (quelle: string, tage: number) => ({ fetchedAt: new Date(fristOpt.jetzt - tage * 86_400_000).toISOString(), stand: 3, quelle, synonyme: [] })
   pruefe(
     'die Warteschlange bildet sich über das Alter, nicht über „fehlt noch"',
-    holer.includes('const faellig =') && holer.includes("e.quelle === 'ueberschrift'"),
+    holer.includes('const faellig =') &&
+      [40, 90].every((t) => titelFaellig(altTag('ueberschrift', t), fristOpt)) &&
+      [40, 90].every((t) => !titelFaellig(altTag('sprachblock', t), fristOpt)) &&
+      [5, 20].every((t) => !titelFaellig(altTag('ueberschrift', t), fristOpt)),
     'ein Filter „hole, was fehlt" macht jede Antwort endgültig — auch die falsche',
   )
 }
@@ -6021,7 +6029,7 @@ pruefe(
   const suchfeldQuelle = readFileSync('web/src/components/Suchfeld.tsx', 'utf8')
   const headerQuelle = readFileSync('web/src/components/Header.tsx', 'utf8')
   const kopfSucheQuelle = readFileSync('web/src/components/kopf-suche.tsx', 'utf8')
-  const uiQuelle = readFileSync('web/src/components/ui.tsx', 'utf8')
+  const uiQuelle = ['ui.tsx', 'tooltip-blase.tsx'].map((d) => readFileSync(`web/src/components/${d}`, 'utf8')).join('\n')
   pruefe(
     'das Fragezeichen sitzt im Feld rechts',
     /relative flex w-full items-center/.test(suchfeldQuelle) &&
@@ -8134,14 +8142,21 @@ console.log('\nBeleg: Fundstelle, Banner, Handlung:')
     )
   }
   {
-    /* Reihen-Box (04.10.2026): Mit dem Schalter dürfen nur Teile mit belegter Synchro oder der geöffnete Titel stehen — auch angekündigte und laufende Teile ohne Synchro sind eingeklappt. */
-    const ranma = { id: 209872, ohneSynchro: true }
-    const film = { id: 215855, ohneSynchro: true }
-    const mitSynchro = { id: 178533 }
-    pruefe('Reihen-Box: ein laufender oder angekündigter Teil ohne Synchro ist eingeklappt', istEingeklappt(ranma, 178533) && istEingeklappt(film, 178533))
-    pruefe('Reihen-Box: ein Teil mit Synchro und der geöffnete Titel selbst bleiben sichtbar', !istEingeklappt(mitSynchro, 178533) && !istEingeklappt(ranma, 209872))
-    const geplant = { id: 206814, jpStart: '2099-10-11', jpStatus: 'NOT_YET_RELEASED', jpYear: 2099 }
-    pruefe('Reihen-Box: ein geplanter Teil (Original noch nicht erschienen) ist auch ohne Flag eingeklappt, der geöffnete bleibt sichtbar', istEingeklappt(geplant, 178533) && !istEingeklappt(geplant, 206814) && !istEingeklappt({ id: 1, jpStatus: 'FINISHED', jpYear: 2099 }, 178533))
+    /* Reihen-Reiter (26.11.2026): gestrichelt ist nur ein erschienener Teil ohne Synchro; ein geplanter oder dieses Jahr beginnender trägt „Geplant“. Tag fest 26.11.2026. */
+    const T = '2026-11-26'
+    const ranma = { ohneSynchro: true, jpStatus: 'RELEASING', jpYear: 2024 }
+    const film = { ohneSynchro: true }
+    const mitSynchro = { jpStatus: 'FINISHED', jpYear: 2020 }
+    pruefe('Reihen-Reiter: ein laufender oder erschienener Teil ohne Synchro ist ohne deutsche Synchro', ohneDeutscheSynchro(ranma, T) && ohneDeutscheSynchro(film, T))
+    pruefe('Reihen-Reiter: ein Teil mit Synchro ist es nicht', !ohneDeutscheSynchro(mitSynchro, T))
+    const geplant = { jpStart: '2099-10-11', jpStatus: 'NOT_YET_RELEASED', jpYear: 2099 }
+    pruefe('Reihen-Reiter: ein geplanter Teil ist es nicht, auch mit Flag', !ohneDeutscheSynchro(geplant, T) && !ohneDeutscheSynchro({ ...geplant, ohneSynchro: true }, T))
+    pruefe('Reihen-Reiter: Teil ohne Synchro, der dieses Jahr beginnt, ist „geplant“, der vom Vorjahr nicht', !ohneDeutscheSynchro({ ohneSynchro: true, jpYear: 2026 }, T) && ohneDeutscheSynchro({ ohneSynchro: true, jpYear: 2025 }, T))
+    pruefe('Reihen-Reiter: Teil ohne Synchro mit vollem Starttermin in der Zukunft ist „geplant“, auch wenn das Jahr noch nicht zählt', !ohneDeutscheSynchro({ ohneSynchro: true, jpStart: '2099-01-01', jpYear: 2025 }, T))
+    pruefe('Reihen-Reiter: beendeter Teil ohne Synchro zählt, auch mit spätem Jahr', ohneDeutscheSynchro({ ohneSynchro: true, jpStatus: 'FINISHED', jpYear: 2099 }, T))
+    /* Der Tag kommt aus dem Argument, nie aus der Uhr: am 01.01.2025 ist ein Start am 01.06.2025 noch geplant, an jedem späteren Tag nicht. */
+    pruefe('Reihen-Reiter: Start nach dem Stichtag ist geplant, am Tag danach erschienen', !ohneDeutscheSynchro({ ohneSynchro: true, jpStart: '2025-06-01' }, '2025-01-01') && ohneDeutscheSynchro({ ohneSynchro: true, jpStart: '2025-06-01' }, '2025-06-02'))
+    pruefe('Reihen-Reiter: Jahr aus dem Stichtag (2024: Teile von 2025 und 2024 sind geplant, egal was die Uhr sagt)', !ohneDeutscheSynchro({ ohneSynchro: true, jpYear: 2025 }, '2024-03-01') && !ohneDeutscheSynchro({ ohneSynchro: true, jpYear: 2024 }, '2024-03-01'))
   }
   pruefe('Folgenliste: bei „fertig" zählt raus (Ereignisse) nicht als Folgennummer (One Piece: 10)', erschieneneFuerFolgenliste({ art: 'fertig', raus: 10 }) === undefined && erschieneneFuerFolgenliste({ art: 'laeuft', raus: 5 }) === 5 && erschieneneFuerFolgenliste(undefined) === undefined)
   pruefe('manime.de-News und Collectors-Junkies-Beiträge werden gelesen, deren Startseiten nicht', istArtikel('https://www.manime.de/news/rtl-toggo-zensiert-dragon-ball-daima/0064225/') && istArtikel('https://collectors-junkies.com/code-geass-lelouch-of-the-rebellion-staffel-12-gesamtausgabe-auf-blu-ray-ab-september-2026/') && !istArtikel('https://collectors-junkies.com/') && !istArtikel('https://www.manime.de/'))

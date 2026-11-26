@@ -17,6 +17,7 @@
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { gunzipSync } from 'node:zlib'
 import { addDays, diffDays, todayIso } from '../shared/time.ts'
 import { log, readJson, ROOT, sleep, warn, writeJson } from './lib/util.ts'
@@ -255,8 +256,9 @@ async function sammleSerienliste(): Promise<Map<number, AdnListenEintrag>> {
   return nachId
 }
 
-async function fetchCatalog(): Promise<{ shows: AdnShow[]; auskunft: KatalogAuskunft }> {
-  const nachId = await sammleSerienliste()
+type FruehereSerie = { id: number; title: string; originalTitle?: string; age?: string }
+
+function sammleFruehere(nachId: Map<number, AdnListenEintrag>): Map<number, FruehereSerie> {
   /**
    * Was wir schon einmal gesehen haben, wird wieder gefragt.
    *
@@ -282,7 +284,7 @@ async function fetchCatalog(): Promise<{ shows: AdnShow[]; auskunft: KatalogAusk
    * ADN eine Serie aus dem Angebot — weil eine Lizenz ausläuft —, liefert der
    * Abruf kein `vde` mehr, und sie fällt heraus.
    */
-  const zusaetzlich = new Map<number, { id: number; title: string; originalTitle?: string; age?: string }>()
+  const zusaetzlich = new Map<number, FruehereSerie>()
   for (const s of readJson<AdnData>('data/adn-catalog.json', { scrapedAt: '', window: { from: '', to: '' }, shows: [] }).shows) {
     if (!nachId.has(s.showId)) zusaetzlich.set(s.showId, { id: s.showId, title: s.title, originalTitle: s.originalTitle, age: s.age })
   }
@@ -295,6 +297,12 @@ async function fetchCatalog(): Promise<{ shows: AdnShow[]; auskunft: KatalogAusk
       if (kopf) zusaetzlich.set(id, kopf)
     }
   }
+  return zusaetzlich
+}
+
+export async function fetchCatalog(): Promise<{ shows: AdnShow[]; auskunft: KatalogAuskunft }> {
+  const nachId = await sammleSerienliste()
+  const zusaetzlich = sammleFruehere(nachId)
 
   /**
    * **Die ältesten zuerst, und nur so viele wie erlaubt.**
@@ -552,23 +560,20 @@ async function katalogLauf(): Promise<void> {
   }
 }
 
-async function main(): Promise<void> {
-  log(wegZeile(WEG))
-  await holeAdnNews()
-  if (args.includes('--laufend')) return laufendLauf()
-  if (args.includes('--refresh')) {
-    const shows = await refreshCatalog()
-    if (!shows.length) return
-    writeJson(
-      'data/adn-catalog.json',
-      { scrapedAt: new Date().toISOString(), window: { from: '', to: '' }, shows } satisfies AdnData,
-      true,
-    )
-    log(`ADN-Auffrischung: ${shows.length} Serien aktualisiert`)
-    return
-  }
-  if (args.includes('--catalog')) return katalogLauf()
+/** Durchgang `--refresh`: bekannte Katalogserien neu holen und den Katalog schreiben. */
+async function auffrischLauf(): Promise<void> {
+  const shows = await refreshCatalog()
+  if (!shows.length) return
+  writeJson(
+    'data/adn-catalog.json',
+    { scrapedAt: new Date().toISOString(), window: { from: '', to: '' }, shows } satisfies AdnData,
+    true,
+  )
+  log(`ADN-Auffrischung: ${shows.length} Serien aktualisiert`)
+}
 
+/** Standarddurchgang: Kalender von `FROM` bis `TO` Tag für Tag abrufen, `data/adn.json` schreiben. */
+async function kalenderLauf(): Promise<void> {
   const today = todayIso()
   const from = addDays(today, FROM)
   const to = addDays(today, TO)
@@ -635,13 +640,24 @@ async function main(): Promise<void> {
   }
 }
 
-main()
-  .then(() => {
-    const bilanz = riegelBilanz(verworfen.length, gefragt.length)
-    log(bilanz.zeile)
-    if (bilanz.rot) process.exitCode = 1
-  })
-  .catch((err) => {
-    console.error(err)
-    process.exit(1)
-  })
+export async function main(argumente: readonly string[] = args): Promise<void> {
+  log(wegZeile(WEG))
+  await holeAdnNews()
+  if (argumente.includes('--laufend')) return laufendLauf()
+  if (argumente.includes('--refresh')) return auffrischLauf()
+  if (argumente.includes('--catalog')) return katalogLauf()
+  return kalenderLauf()
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main()
+    .then(() => {
+      const bilanz = riegelBilanz(verworfen.length, gefragt.length)
+      log(bilanz.zeile)
+      if (bilanz.rot) process.exitCode = 1
+    })
+    .catch((err) => {
+      console.error(err)
+      process.exit(1)
+    })
+}

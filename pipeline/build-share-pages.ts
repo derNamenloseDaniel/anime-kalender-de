@@ -19,6 +19,7 @@
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { SYNOPSIS_GROUPS, anbieterName, type Release, type Title } from '../shared/types.ts'
 import { todayIso } from '../shared/time.ts'
 import { ROOT, log, readJson } from './lib/util.ts'
@@ -26,7 +27,7 @@ import { hauptRelease } from './lib/haupt-release.ts'
 import { ladeStaffelGrenzen, staffelListen } from './lib/pokemon-staffeln.ts'
 import { ARTIKEL_STIL as STIL, SITE, esc, titelName, titelInhalt, titelKopf } from './lib/titel-seite.ts'
 import { START_AUSSAGE, startseiteInhalt } from './lib/startseite.ts'
-import { belegteTermine, uebersichtTexte } from './lib/termine-uebersicht.ts'
+import { belegteTermine, uebersichtTexte, type UebersichtTexte } from './lib/termine-uebersicht.ts'
 import { schreibeVerzeichnis, verzeichnisAdressen, type Buchstabe } from './lib/titel-verzeichnis.ts'
 import { umfeldFuer, type UmfeldRahmen } from './lib/titel-umfeld.ts'
 import { titelAenderung } from './lib/sitemap-datum.ts'
@@ -222,26 +223,16 @@ function terminZeile(release: Release, titel: Title | undefined, adresse: string
   )
 }
 
-function schreibeUebersicht(
-  releases: Release[],
-  titleById: Map<number, Title>,
-  belegt: number,
-  today: string,
-  before: string,
-  after: string,
-  rootTag: string,
-  adresseVon: (titleId: number) => string,
-): void {
-  const sortiert = [...releases].sort((a, b) =>
-    b.schedule.firstEpisodeDate.localeCompare(a.schedule.firstEpisodeDate),
-  )
-  const kommend = sortiert.filter((r) => r.schedule.firstEpisodeDate >= today).reverse()
-  const vergangen = sortiert.filter((r) => r.schedule.firstEpisodeDate < today)
+/** Wie die Übersicht ein Release aufführt: Titel und Adresse stammen aus den Nachschlagewegen der Seite. */
+interface UebersichtNachschlag {
+  titleById: Map<number, Title>
+  adresseVon: (titleId: number) => string
+}
 
+function uebersichtArtikel(texte: UebersichtTexte, kommend: Release[], vergangen: Release[], nachschlag: UebersichtNachschlag): string {
   const liste = (rs: Release[]) =>
-    rs.map((r) => terminZeile(r, titleById.get(r.titleId), adresseVon(r.titleId))).join('')
-  const texte = uebersichtTexte(releases.length, belegt, kommend.length)
-  const inhalt =
+    rs.map((r) => terminZeile(r, nachschlag.titleById.get(r.titleId), nachschlag.adresseVon(r.titleId))).join('')
+  return (
     `<article style="${STIL}">\n` +
     `      <h1 style="font-size:1.6rem;margin:0 0 .5rem;color:#fff;">${texte.ueberschrift}</h1>\n` +
     `      <p style="margin:0 0 1.5rem;color:#9aa5bd;">${texte.stand}</p>\n` +
@@ -253,34 +244,39 @@ function schreibeUebersicht(
     `      <ul style="margin:0 0 2rem;padding-left:1.2rem;">\n${liste(vergangen)}      </ul>\n` +
     `      <p><a href="${SITE}" style="color:#7dd3fc;">Zum Kalender</a> · <a href="${SITE}titel/" style="color:#7dd3fc;">Alle Titel von A bis Z</a></p>\n` +
     `    </article>`
+  )
+}
 
-  /**
-   * **Die Übersicht ist eine Liste — dann soll sie das auch sagen.**
-   *
-   * Gemessen am 10.09.2026 über alle 643 erzeugten Seiten: Genau zwei trugen
-   * kein `application/ld+json`, und eine davon war diese. Jede Teilen-Seite
-   * beschreibt sich seit dem 07.09.2026 als `Movie` oder `TVSeries`; der
-   * Einstieg zu allen 641 beschrieb sich gar nicht.
-   *
-   * `ItemList` ist der Typ dafür, und die zwanzig nächsten Termine reichen:
-   * Die Liste soll die Sache benennen, nicht den ganzen Bestand wiederholen —
-   * jeder Eintrag steht ohnehin auf seiner eigenen Seite.
-   */
-  const naechsteZwanzig = kommend.slice(0, 20)
-  const listenDaten = {
+/**
+ * **Die Übersicht ist eine Liste — dann soll sie das auch sagen.**
+ *
+ * Gemessen am 10.09.2026 über alle 643 erzeugten Seiten: Genau zwei trugen
+ * kein `application/ld+json`, und eine davon war diese. Jede Teilen-Seite
+ * beschreibt sich seit dem 07.09.2026 als `Movie` oder `TVSeries`; der
+ * Einstieg zu allen 641 beschrieb sich gar nicht.
+ *
+ * `ItemList` ist der Typ dafür, und die zwanzig nächsten Termine reichen:
+ * Die Liste soll die Sache benennen, nicht den ganzen Bestand wiederholen —
+ * jeder Eintrag steht ohnehin auf seiner eigenen Seite.
+ */
+function uebersichtListenDaten(texte: UebersichtTexte, anzahl: number, naechsteZwanzig: Release[], nachschlag: UebersichtNachschlag) {
+  return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: texte.listenName,
     description: texte.stand,
-    numberOfItems: releases.length,
+    numberOfItems: anzahl,
     itemListElement: naechsteZwanzig.map((r, i) => ({
       '@type': 'ListItem',
       position: i + 1,
-      url: `${SITE}${teilenPfad(adresseVon(r.titleId))}`,
-      name: titleById.get(r.titleId)?.titleDe ?? r.name,
+      url: `${SITE}${teilenPfad(nachschlag.adresseVon(r.titleId))}`,
+      name: nachschlag.titleById.get(r.titleId)?.titleDe ?? r.name,
     })),
   }
-  const kopf =
+}
+
+function uebersichtKopf(texte: UebersichtTexte, listenDaten: unknown, naechsteZwanzig: Release[]): string {
+  return (
     `    <title>${texte.seitenTitel}</title>\n` +
     `    <meta name="description" content="${texte.beschreibung}" />\n` +
     `    <link rel="canonical" href="${SITE}termine/" />\n` +
@@ -296,6 +292,31 @@ function schreibeUebersicht(
         `    <meta property="og:image:height" content="630" />\n`
       : '') +
     `    <script type="application/ld+json">${JSON.stringify(listenDaten)}</script>\n`
+  )
+}
+
+export function schreibeUebersicht(
+  releases: Release[],
+  titleById: Map<number, Title>,
+  belegt: number,
+  today: string,
+  before: string,
+  after: string,
+  rootTag: string,
+  adresseVon: (titleId: number) => string,
+): void {
+  const sortiert = [...releases].sort((a, b) =>
+    b.schedule.firstEpisodeDate.localeCompare(a.schedule.firstEpisodeDate),
+  )
+  const kommend = sortiert.filter((r) => r.schedule.firstEpisodeDate >= today).reverse()
+  const vergangen = sortiert.filter((r) => r.schedule.firstEpisodeDate < today)
+
+  const nachschlag = { titleById, adresseVon }
+  const texte = uebersichtTexte(releases.length, belegt, kommend.length)
+  const inhalt = uebersichtArtikel(texte, kommend, vergangen, nachschlag)
+  const naechsteZwanzig = kommend.slice(0, 20)
+  const listenDaten = uebersichtListenDaten(texte, releases.length, naechsteZwanzig, nachschlag)
+  const kopf = uebersichtKopf(texte, listenDaten, naechsteZwanzig)
 
   const dir = resolve(DIST, 'termine')
   mkdirSync(dir, { recursive: true })
@@ -422,4 +443,5 @@ function writeSitemap(titel: { slug: string; lastmod?: string }[], verzeichnis: 
   log(`sitemap.xml mit ${urls.length} Adressen und robots.txt geschrieben`)
 }
 
-main()
+// Nur als Skript starten: der Vergleichsrahmen (`tools/vergleich-alt-neu.mjs`) importiert die Datei, ohne zu bauen.
+if (process.argv[1] === fileURLToPath(import.meta.url)) main()

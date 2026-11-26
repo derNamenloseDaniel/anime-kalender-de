@@ -8,7 +8,7 @@
  *
  * Aufruf: `node tools/lighthouse-messen.mjs (--dist dist | --basis https://anime-kalender.de/) --profil pr|live [--n 3] [--nur-messen] [--ausgabe datei.json]`
  * `--dist` liefert den Ordner für die Dauer der Messung selbst aus (`dist-http.mjs`, Port frei auf 127.0.0.1, danach geschlossen).
- * Exit 1, wenn ein Median eine Grenze reißt oder eine Grenze gegenüber main gelockert wurde (Ratsche, nur im PR-Ereignis).
+ * Exit 1, wenn ein Median eine Grenze reißt oder eine Grenze gegenüber main gelockert wurde, ohne dass der Schritt in `LOCKERUNGEN` steht (Ratsche, nur im PR-Ereignis).
  */
 import { execFileSync, spawn } from 'node:child_process'
 import { appendFileSync, existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
@@ -16,7 +16,7 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { distAusliefern } from './dist-http.mjs'
-import { GRENZEN, SEITEN } from './lighthouse-grenzen.mjs'
+import { GRENZEN, LOCKERUNGEN, SEITEN } from './lighthouse-grenzen.mjs'
 import { gelockert, groessteAnfragen, kennzahlen, mediane, tabelle, verstoesse } from './lighthouse-urteil.mjs'
 
 export const LIGHTHOUSE = 'lighthouse@13.6.0'
@@ -95,7 +95,7 @@ async function main() {
   }
   const { laeufe, anfragen } = gemessen
   const ergebnis = Object.fromEntries(Object.entries(laeufe).map(([s, l]) => [s, mediane(l)]))
-  const fehler = hat('nur-messen') ? [] : [...Object.entries(ergebnis).flatMap(([s, w]) => verstoesse(s, w, GRENZEN[profil]?.[s])), ...gelockert(GRENZEN, await grenzenAufMain()).map((z) => `Ratsche gelockert: ${z}`)]
+  const fehler = hat('nur-messen') ? [] : [...Object.entries(ergebnis).flatMap(([s, w]) => verstoesse(s, w, GRENZEN[profil]?.[s])), ...gelockert(GRENZEN, await grenzenAufMain(), LOCKERUNGEN).map((z) => `Ratsche gelockert: ${z}`)]
   const md = `### Lighthouse mobil (${profil}, Median aus ${n} Läufen, ${LIGHTHOUSE})\n\n${tabelle(ergebnis, GRENZEN[profil])}\n\n${fehler.length ? fehler.map((f) => `- ✖ ${f}`).join('\n') : '✓ alle Grenzen gehalten'}\n`
   console.log(md)
   if (hat('ausgabe')) {

@@ -44,37 +44,73 @@ quellen_pruefen() {
   return 1
 }
 
-# Dieselbe Prüfung auf dem Stand von `origin/main` (eigener Arbeitsbaum, `node_modules` verlinkt); stdout wie bei `quellen_pruefen`. Nie ein Abbruch.
+# Nur die roten Prüfdateien des Funds (Zeilen `  - <pfad>` in $1), einzeln auf dem Stand von main (Arbeitsverzeichnis = Arbeitsbaum von main).
+# Der volle check:logic braucht rund 8 Minuten und riss die Vergleichsfrist; so bleibt es bei Sekunden (25.11.2026, PR 4979/5013).
+# stdout: die auf main roten Dateien als `  - <pfad>`; jede andere Zeile heißt „Basis nicht prüfbar“ (Grund steht im PR-Text, `quellen_neue_fehler`).
+quellen_pruefen_dateien() {
+  local frist="${QUELLEN_PRUEFFRIST:-$QUELLEN_BASISFRIST_STANDARD}" ende datei rest status
+  ende=$((SECONDS + frist))
+  [ -e node_modules ] || { echo "Basis nicht prüfbar: node_modules fehlt im Arbeitsbaum von main."; return 0; }
+  while IFS= read -r datei; do
+    datei="${datei#  - }"
+    # Eine Prüfdatei, die es auf main nicht gibt, ist dort nicht rot: ihr Fehler ist neu.
+    [ -f "$datei" ] || continue
+    rest=$((ende - SECONDS))
+    if [ "$rest" -le 0 ]; then echo "Basis nicht prüfbar: Frist von ${frist} s vor ${datei} erreicht."; return 0; fi
+    status=0
+    CI=true timeout "$rest" env -u GH_TOKEN -u GITHUB_TOKEN npx --no-install tsx "$datei" >&2 </dev/null || status=$?
+    case "$status" in
+      0) ;;
+      124) echo "Basis nicht prüfbar: ${datei} brauchte länger als die Frist von ${frist} s."; return 0 ;;
+      126|127) echo "Basis nicht prüfbar: ${datei} startete nicht (Exit ${status})."; return 0 ;;
+      *) echo "  - ${datei}" ;;
+    esac
+  done <<< "$1"
+}
+
+# $1 = stdout von `quellen_pruefen` (die roten Prüfungen des Funds). Dieselben Prüfdateien auf dem Stand von `origin/main` (eigener Arbeitsbaum, `node_modules`
+# verlinkt); stdout wie bei `quellen_pruefen_dateien`. Nie ein Abbruch. Mit QUELLEN_PRUEFBEFEHL (Test) läuft statt der Dateien dieser Befehl als Ganzes.
 quellen_pruefen_main() {
-  local dir
+  local dir status=0
   dir="$(mktemp -d)"
   if git worktree add --detach --quiet "$dir/main" origin/main >&2; then
     if [ -e node_modules ]; then ln -s "$PWD/node_modules" "$dir/main/node_modules"; fi
     # Exit 1 = main selbst ist rot (die Liste auf stdout ist der Befund); jeder andere Exit bleibt sichtbar statt verschluckt.
-    local status=0
     (
       cd "$dir/main" || exit 2
-      QUELLEN_PRUEFFRIST="${QUELLEN_PRUEFFRIST:-$QUELLEN_BASISFRIST_STANDARD}" quellen_pruefen
+      if [ -n "${QUELLEN_PRUEFBEFEHL:-}" ]; then
+        QUELLEN_PRUEFFRIST="${QUELLEN_PRUEFFRIST:-$QUELLEN_BASISFRIST_STANDARD}" quellen_pruefen
+      else
+        quellen_pruefen_dateien "${1:-}"
+      fi
     ) || status=$?
     if [ "$status" -gt 1 ]; then
       echo "Die Prüfung auf main konnte nicht laufen (Exit $status); der Vergleich gilt ohne Basis." >&2
+      echo "Basis nicht prüfbar: Die Prüfung auf main konnte nicht laufen (Exit $status)."
     fi
     rm -f "$dir/main/node_modules"
     git worktree remove --force "$dir/main" >&2 || true
   else
     echo "Kein Arbeitsbaum für origin/main; der Vergleich gilt ohne Basis." >&2
+    echo "Basis nicht prüfbar: kein Arbeitsbaum für origin/main."
   fi
   rm -rf "$dir"
 }
 
 # $1 = stdout von `quellen_pruefen` (rot). Gibt aus, was davon neu ist gegenüber `main`; leer = `main` hat dieselben Fehler schon.
-# Nur eine Liste roter Prüfungen ist vergleichbar; Frist, Absturz und alles andere bleiben ganz stehen (rot).
+# Nur eine Liste roter Prüfungen ist vergleichbar; Frist, Absturz und alles andere bleiben ganz stehen (rot). Ist die Basis nicht prüfbar, steht der Grund
+# als erste Zeile davor und damit im PR-Text (25.11.2026: vorher blieb der Fund ohne Hinweis rot liegen).
 quellen_neue_fehler() {
   local fund="$1" basis
   if printf '%s\n' "$fund" | grep -qvE '^  - '; then
     printf '%s\n' "$fund"
     return 0
   fi
-  basis="$(quellen_pruefen_main)" || basis=""
+  basis="$(quellen_pruefen_main "$fund")" || basis=""
+  if printf '%s\n' "$basis" | grep -qvE '^  - |^$'; then
+    printf 'Vergleich mit main nicht möglich, alle roten Prüfungen gelten als neu. %s\n' "$(printf '%s\n' "$basis" | grep -vE '^  - |^$' | head -1)"
+    printf '%s\n' "$fund"
+    return 0
+  fi
   printf '%s\n' "$fund" | grep -vxFf <(printf '%s\n' "$basis") || true
 }

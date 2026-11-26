@@ -37,6 +37,7 @@ import { OG_FASSUNG } from './lib/og-fassung.ts'
 import type { PlakatMasse } from './lib/titel-vorschau.ts'
 import { ladeVorschauMasse } from './lib/vorschau-masse.ts'
 import { standardKennungFuer } from './lib/og-standard.ts'
+import { startseiteMitTagesbild, tagesbildAlt } from './lib/og-tag.ts'
 import { seitenQuelle, type SynopsenFuerSeiten } from './lib/handlung-eigen.ts'
 import { ladeAkVon, umleitungen, type AkVon, type KennungsZeile } from './lib/ausgabe-kennung.ts'
 import { body, head } from './lib/termin-seite.ts'
@@ -119,7 +120,8 @@ function main(): void {
   schreibeUebersicht(releases, titleById, belegteTermine(releases, volleTitel), today, before, after, ROOT_TAG, adresseVon)
   /* Zuerst die Titelseiten samt Verzeichnis: Die Startseite verlinkt dessen Buchstaben. */
   const buchstaben = schreibeAlleTitelSeiten(akVon, kennungsZeilen, { before, after, rootTag: ROOT_TAG, today, synopses, jeTitel, standardKennung, masse: ladeVorschauMasse() })
-  schreibeStartseite(releases, titleById, today, template, ROOT_TAG, adresseVon, buchstaben, standardKennung)
+  const startVorlage = startseiteMitTagesbild(template, SITE, today, tagesbildAlt(releases, volleTitel, today, DIST))
+  schreibeStartseite(releases, titleById, today, startVorlage, ROOT_TAG, adresseVon, buchstaben, standardKennung)
 }
 
 /** Was jede Titel-Seite gemeinsam hat: die Vorlage um die Marker, der Tag des Baus, Texte und Termine je Titel. */

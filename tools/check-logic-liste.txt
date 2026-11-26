@@ -701,6 +701,7 @@ pipeline/check-synchro-termin-offen.ts
 pipeline/check-synchro-widerspruch.ts
 pipeline/check-tab-titel-quelle-lauf.ts
 pipeline/check-takt.ts
+pipeline/check-tages-highlight.ts
 pipeline/check-telekom-annahme.ts
 pipeline/check-telekom-pille.ts
 pipeline/check-termin-knopfzahl.ts

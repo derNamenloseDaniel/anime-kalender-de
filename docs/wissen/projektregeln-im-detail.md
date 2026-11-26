@@ -242,7 +242,7 @@ Zweige ohne das Werkzeug überspringen es, der Hook liegt für alle Worktrees im
 `bash tools/quellen-commit-wache.sh --einrichten` im Hauptordner ausführen, sonst bleibt der alte Hook ohne die Prüfung.
 **Auch verschluckte Leerzeichen (02.11.2026):** derselbe Hook ruft `tools/leerzeichen-gestagt-pruefen.mjs` (Regel und Meldung von
 `pipeline/check-leerzeichen-gleich.ts`, nur gestagte Quelldateien aus dem Index, ≈ 0,6 s); Test `tools/leerzeichen-gestagt.test.mjs`. Anlass: PR 2690.
-**Auch sortierte Prüflisten (26.11.2026):** derselbe Hook ruft `tools/listen-gestagt-pruefen.mjs` (Regel `tools/liste-pruefen.mjs` wie `check:logic`, nur gestagte `tools/check-*-liste.txt`); Test `tools/listen-gestagt.test.mjs`. Anlass: Fall 4857, eine Nachbesserung hängte einen Eintrag ans Listenende. Nach dem Merge einmal `bash tools/quellen-commit-wache.sh --einrichten` im Hauptordner.
+**Auch sortierte Prüflisten (26.11.2026):** derselbe Hook ruft `tools/listen-gestagt-pruefen.mjs` (Regel `tools/liste-pruefen.mjs` wie `check:logic`, nur gestagte `tools/check-*-liste.txt`); Test `tools/listen-gestagt-pruefen.test.mjs`. Anlass: Fall 4857, eine Nachbesserung hängte einen Eintrag ans Listenende. Nach dem Merge einmal `bash tools/quellen-commit-wache.sh --einrichten` im Hauptordner.
 
 **Vierter Fall, 21.09.2026 — ausgelöst von einem Commit, der gar keine Quelle anfasste.** Während
 `bestand-bauen` lief, ging eine Doku-Änderung auf `main`. Der Fernstand hatte sich bewegt, der Lauf

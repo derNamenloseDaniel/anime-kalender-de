@@ -272,6 +272,7 @@ const TEXTE = {
     „Erste Folge … · Wöchentlich · letzte Folge". Für `available-from` ist weder
     das eine noch das andere wahr — es kommt der ganze Block.
   */
+  'antwort.abwurfFolgen': 'Folgen {von}–{bis}',
   'antwort.alleFolgen': 'Alle {count} Folgen', 'antwort.alleFolgenOhneZahl': 'Alle Folgen',
   // Nur noch diese eine steht aus.
   // Ohne relative Angabe (Kino, Angebot) trägt das Datum allein.

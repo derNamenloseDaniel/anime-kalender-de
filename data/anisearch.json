@@ -739957,6 +739957,7 @@
           "language": "Deutsch",
           "title": "Mission: Yozakura Family",
           "status": "Abgeschlossen",
+          "dubbed": true,
           "released": "07.04.2024 - 27.10.2024",
           "publisher": [
             "The Walt Disney Company"
@@ -740034,7 +740035,7 @@
         "Mission of Yozakura Family"
       ]
     },
-    "fetchedAt": "2026-10-09T09:01:42.477Z"
+    "fetchedAt": "2026-11-26T06:01:20.130Z"
   },
   "158908": {
     "anisearchId": 18605,
@@ -858928,7 +858929,7 @@
       ],
       "broadcast": "Samstag 22:30 (JST)"
     },
-    "fetchedAt": "2026-10-27T04:01:50.544Z"
+    "fetchedAt": "2026-11-26T06:01:13.340Z"
   },
   "204394": {
     "anisearchId": 21494,

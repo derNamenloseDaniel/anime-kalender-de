@@ -325563,9 +325563,58 @@
     "stand": 1
   },
   "17940": {
-    "de": [],
+    "de": [
+      {
+        "figur": "Kyouichirou YOZAKURA",
+        "sprecher": "Sven-Eric MÜLLER"
+      },
+      {
+        "figur": "Futaba YOZAKURA",
+        "sprecher": "Petra SCHIEBE"
+      },
+      {
+        "figur": "Kengo YOZAKURA",
+        "sprecher": "Sven-Eric MÜLLER"
+      },
+      {
+        "figur": "Nanao YOZAKURA",
+        "sprecher": "Mira BÜTOW"
+      },
+      {
+        "figur": "Goliath",
+        "sprecher": "Sam LÜTGE"
+      },
+      {
+        "figur": "Shinzou YOZAKURA",
+        "sprecher": "Tobias KRAUSE"
+      },
+      {
+        "figur": "Shion YOZAKURA",
+        "sprecher": "Heike BRUNNER"
+      },
+      {
+        "figur": "Ayaka KIRISAKI",
+        "sprecher": "Yasmin HANKEL"
+      },
+      {
+        "figur": "Rin FUDOU",
+        "sprecher": "Isabelle HÖPFNER"
+      },
+      {
+        "figur": "Momo YOZAKURA",
+        "sprecher": "Dirk JACOBS"
+      },
+      {
+        "figur": "Ai",
+        "sprecher": "Stefanie ALDER"
+      },
+      {
+        "figur": "MIZUKI",
+        "sprecher": "Denis WIENCKE"
+      }
+    ],
     "ja": 154,
-    "fetchedAt": "2026-11-03T09:03:34.556Z",
+    "fetchedAt": "2026-11-26T10:20:33.505Z",
     "stand": 1
   },
   "17941": {

@@ -98,6 +98,9 @@ const FREMDE_MARKER = [`${MARKER_ORDNER}/fremde-sitzung.txt`, 'C:/Users/ih/.clau
 // Inhalt von woche.json und Stand (mtime) für „Kalender heute“; leer = Datei fehlt. `starte` setzt beides zurück.
 export const kalenderWelt = { woche: '', mtime: 1 }
 
+// Weitere lesbare Dateien nach Pfadende (z. B. die Logdatei des Übersicht-Knopfs); `starte` leert sie.
+export const dateiWelt: Record<string, string> = {}
+
 // `engine`: unterste Leiste wie im Betrieb, wenn kein fremdes Modul zeichnet.
 export function starte(on: On, marker: string | null, status: (string | undefined)[] = [], engine = true, stand = STAND, ruhe: boolean | string = false, agenten = 0, pruefer = 0, spar = false, ziele: Record<string, string> = {}) {
   const uhr = mock.clock(on)
@@ -109,12 +112,15 @@ export function starte(on: On, marker: string | null, status: (string | undefine
   haengeAgentenListe(on, p => (p.endsWith(ZIELE_ORDNER) ? Object.keys(ziele).map(name => ({ name, kind: 'dir' })) : null))
   if (engine) on('ui.render', { component: 'AbovePrompt' }, () => ({ type: 'engine', ref: 0 }) as never)
   Object.assign(kalenderWelt, { woche: '', mtime: 1 })
+  for (const k of Object.keys(dateiWelt)) delete dateiWelt[k]
   on('fs.stat', (_$, e) => (e.path.endsWith('woche.json') && kalenderWelt.woche ? ({ value: { kind: 'file', size: kalenderWelt.woche.length, mtimeMs: kalenderWelt.mtime, isLink: false } } as never) : ({ deny: 'fehlt' } as never)))
   on('fs.read', ($, e) => {
     // Der Pfad kommt mit Rückwärtsschrägstrichen an (Windows).
     // Unter Linux (PR-Kette) steht vor „C:/…“ womöglich das Arbeitsverzeichnis: alles vor „C:/“ weg.
     const pfad = e.path.replace(/\\/g, '/').replace(/^.*?(?=C:\/)/, '')
     if (pfad.endsWith('stand.md')) return { value: stand } as never
+    const eigen = Object.keys(dateiWelt).find(ende => pfad.endsWith(ende))
+    if (eigen !== undefined) return { value: dateiWelt[eigen] } as never
     if (kalenderWelt.woche && pfad.endsWith('woche.json')) return { value: kalenderWelt.woche } as never
     const plan = /\/ziele\/([^/]+)\/plan\.md$/.exec(pfad)?.[1]
     if (plan && ziele[plan] !== undefined) return { value: ziele[plan] } as never

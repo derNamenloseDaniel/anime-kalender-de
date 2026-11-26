@@ -14,6 +14,8 @@ export interface CuratedEntry {
   /** Nur bei `platform: tv`: der Sender. */
   sender?: string
   platformUrl?: string
+  /** Crunchyroll-Nummer der Staffel-Folge 1, wo Crunchyroll durchzählt (Black Clover S2: 171); der Kalender-Slot wird darauf umgerechnet. */
+  crZaehlungAb?: number
   buyUrl?: string
   /** Von Hand belegte EAN einer Disc; daraus entsteht der Kauflink (`discKaufUrl`), wenn kein `buyUrl` steht. */
   ean?: string

@@ -10,6 +10,8 @@ interface Eingaben {
   checks: Map<string, DubCheck>
   adressKern: (u: string) => string
   frueherEntfernt: { has: (kern: string, titleId: number) => boolean; }
+  /** Adressen, die die Linkprüfung als tot kennt: kein Kanal- oder Kaufweg dorthin (wie `09-6-1`). */
+  lautPruefungTot: (url: string) => boolean
 }
 
 interface Zaehlung {
@@ -66,7 +68,7 @@ const kanalName = (provider: string): string | undefined => {
 function ergaenzeTitel(
   title: Title,
   quellen: NonNullable<AnisearchEintrag['streams']>,
-  { adressKern, frueherEntfernt }: Pick<Eingaben, 'adressKern' | 'frueherEntfernt'>,
+  { adressKern, frueherEntfernt, lautPruefungTot }: Pick<Eingaben, 'adressKern' | 'frueherEntfernt' | 'lautPruefungTot'>,
 ): Zaehlung {
   const zaehlung: Zaehlung = { kanalWege: 0, kaufWege: 0 }
   const bekannt = new Set(
@@ -76,7 +78,7 @@ function ergaenzeTitel(
   )
   for (const quelle of quellen) {
     const url = (quelle.url ?? '').split('?')[0]
-    if (!url || bekannt.has(adressKern(url)) || frueherEntfernt.has(adressKern(url), title.id)) continue
+    if (!url || bekannt.has(adressKern(url)) || frueherEntfernt.has(adressKern(url), title.id) || lautPruefungTot(url)) continue
     const kanal = kanalName(quelle.provider ?? '')
     const istShop = quelle.provider === 'amazon-de' || quelle.provider === 'amazon-(de)'
     if (!kanal && !istShop) continue
@@ -93,7 +95,7 @@ function ergaenzeTitel(
   return zaehlung
 }
 
-export function ergaenzeKanalUndKaufWege({ titles, anisearch, checks, adressKern, frueherEntfernt }: Eingaben) {
+export function ergaenzeKanalUndKaufWege({ titles, anisearch, checks, adressKern, frueherEntfernt, lautPruefungTot }: Eingaben) {
   let kanalWege = 0
   let kaufWege = 0
   for (const title of titles.values()) {
@@ -101,7 +103,7 @@ export function ergaenzeKanalUndKaufWege({ titles, anisearch, checks, adressKern
     if (!quellen.length) continue
     if (title.streams.some((x) => x.platform === 'primevideo')) continue
     if (checks.has(dubKey(title.id, 'primevideo'))) continue
-    const z = ergaenzeTitel(title, quellen, { adressKern, frueherEntfernt })
+    const z = ergaenzeTitel(title, quellen, { adressKern, frueherEntfernt, lautPruefungTot })
     kanalWege += z.kanalWege
     kaufWege += z.kaufWege
   }

@@ -405,6 +405,7 @@ pipeline/check-kanal-erbt.ts
 pipeline/check-kanal-gegenprobe-lauf.ts
 pipeline/check-kanal-ja-sprach-termin.ts
 pipeline/check-kanal-je-seite.ts
+pipeline/check-kanal-kauf-tot.ts
 pipeline/check-kanal-leser.ts
 pipeline/check-kanal-luecken-lader.ts
 pipeline/check-kanal-merkliste-doppelt.ts

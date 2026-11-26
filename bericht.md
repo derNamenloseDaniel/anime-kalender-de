@@ -13,3 +13,9 @@
 - unerwartet: `.d.mts`-Dateien zählen als Werkzeuge in der Liste (17 Einträge), ein Test dafür wäre sinnlos.
 - Vorschlag: `.d.mts` in `istWerkzeug` ausnehmen wie `.d.ts`; Rang der meistgenutzten Werkzeuge ohne Test (poc-urteil, ladezeiten-messen) braucht Browser-Fixtures.
 - veraltet: Auftragstext „175 von 504“ — Stand heute 145 von 586.
+
+## Nachbesserung (Vorprüfung)
+- Bot-Pfade-Wächter: `prime-nachschlag.test.mjs` nennt den Dateinamen nicht mehr wörtlich (51 gegen 51, grün).
+- test-kind-frist: `timeout` am `execFileSync` in `quell-baum.test.mjs`.
+- Lehre 152: Mutationsbeleg je Test (rot an der Basis) in `pr.md`; drei Tests (regel, quell-baum, trefferprobe-ausnahmen) per Hand-Mutant bestätigt, weil der Automat keinen roten fand.
+- `pr-vorpruefung.mjs` lokal grün (Exit 0).

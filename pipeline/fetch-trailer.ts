@@ -10,7 +10,7 @@
  * wir noch nicht gefunden'."
  *
  * **Wer abgefragt wird:** Filme und die Einstiege des Entdecken-Pools (`empfehlung.json`),
- * also auch Fernsehserien (Daniel, 26.10.2026). Serien gehen nur über Weg 2 und 3.
+ * also auch Fernsehserien (Daniel, 26.10.2026). Serien gehen über Weg 2 und 3 und den Label-Abgleich (alle Titel).
  *
  * **Label-Kanäle vorab, für alle Titel (26.11.2026).** KSM Anime, peppermint u. a. (`data/curated/trailer-label-kanaele.yaml`)
  * laden deutsche Trailer zu Serien hoch, die weder KinoCheck noch TMDB führen („The Most Heretical Last Boss Queen“).

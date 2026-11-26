@@ -4,6 +4,11 @@
  * echten `AntwortKasten`; die Fixture hat die Gestalt des echten Titels (episodes 16, dubRanges 1–8, Termin ab Folge 9 als Abwurf).
  * Aufruf: npx tsx pipeline/check-folgen-vor-start.ts
  */
+import { spawnSync } from 'node:child_process'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { act, createElement as h } from 'react'
 import { createRoot } from 'react-dom/client'
 import type { Release, Title } from '../shared/types.ts'
@@ -104,6 +109,34 @@ const zwei = [abwurf(900415, 1, 8), { ...abwurf(900415, 9, 8), slug: 'p900415-zw
 pruefe('Bestand: früherer Termin ab Folge 1 deckt die Folgen davor (zwei Termine, Reihenfolge egal)', davorOhneBeleg([titel(900415, 16)], zwei, HEUTE).length === 0 && davorOhneBeleg([titel(900415, 16)], [...zwei].reverse(), HEUTE).length === 0)
 const ohneNamen = { ...titel(900416, 16), titleEn: undefined } as unknown as Title
 pruefe('Bestand: Titel ohne Namen meldet die Kennung als Namen', davorOhneBeleg([ohneNamen], [abwurf(900416, 9, 8)], HEUTE)[0]?.titel === '900416')
+
+/* Verdrahtung des Bestandswächters als eigener Prozess gegen einen Wegwerf-Ordner: Fund mit Marke, Zählzeile, Exitcode (Prüfer 5072). */
+const wurzel = mkdtempSync(join(tmpdir(), 'folgen-vor-start-'))
+try {
+  mkdirSync(join(wurzel, 'public', 'data'), { recursive: true })
+  const schreibe = (datei: string, inhalt: unknown): void => writeFileSync(join(wurzel, 'public', 'data', datei), JSON.stringify(inhalt))
+  const lauf = (): { status: number | null; aus: string } => {
+    const r = spawnSync(process.execPath, ['--import', import.meta.resolve('tsx'), fileURLToPath(new URL('./check-folgen-vor-start-bestand.ts', import.meta.url))], {
+      cwd: wurzel,
+      env: { ...process.env, TSX_TSCONFIG_PATH: fileURLToPath(new URL('../tsconfig.json', import.meta.url)) },
+      encoding: 'utf8',
+      windowsHide: true,
+      timeout: 60_000,
+    })
+    return { status: r.status, aus: r.stdout + r.stderr }
+  }
+  schreibe('titles-core.json', [titel(900411, 16, 8), titel(900412, 16, 4)])
+  schreibe('cartoons.json', [])
+  schreibe('releases.json', [abwurf(900411, 9, 8), abwurf(900412, 9, 8)])
+  const fund = lauf()
+  pruefe('Prozess mit Fund: Exit 1, VERSTÖSSE: 1, Marke an 900412, Folgen 5–8, 900411 nicht gemeldet', fund.status === 1 && /VERSTÖSSE: 1/.test(fund.aus) && /900412/.test(fund.aus) && /Folgen 5–8/.test(fund.aus) && !/900411/.test(fund.aus), fund)
+  schreibe('titles-core.json', [titel(900411, 16, 8)])
+  schreibe('releases.json', [abwurf(900411, 9, 8)])
+  const sauber = lauf()
+  pruefe('Prozess ohne Fund: Exit 0, VERSTÖSSE: 0, ok-Zeile', sauber.status === 0 && /VERSTÖSSE: 0/.test(sauber.aus) && /check-folgen-vor-start-bestand: ok/.test(sauber.aus), sauber)
+} finally {
+  rmSync(wurzel, { recursive: true, force: true })
+}
 
 globalThis.fetch = echteAbfrage
 if (verletzt) {

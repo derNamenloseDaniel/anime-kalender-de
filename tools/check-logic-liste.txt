@@ -600,6 +600,7 @@ pipeline/check-reihen-traeger.ts
 pipeline/check-reihen-uebersicht.ts
 pipeline/check-reihen-zeile-spanne.ts
 pipeline/check-reinids-grund.ts
+pipeline/check-reiter-blase.ts
 pipeline/check-reiter-lage-grund.ts
 pipeline/check-release-ohne-quelle.ts
 pipeline/check-remake-verdrahtung.ts

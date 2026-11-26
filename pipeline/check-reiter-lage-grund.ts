@@ -5,6 +5,7 @@
  */
 import type { Release, ReleaseEvent, Title } from '../shared/types.ts'
 import { fruehesterTermin, staffelLageMitGrund } from '../shared/logic.ts'
+import { discKurz } from '../shared/lage-grund.ts'
 
 const { useLang } = await import('../web/src/lib/i18n.tsx')
 const { reihenLageMitGrund, reihenLageVon } = await import('../web/src/components/detail/reihen-reiter-liste.ts')
@@ -57,6 +58,41 @@ gleich('kommende Staffel: Ring, Folge 1 am 03.01.2027', [kommt.lage, lageZeile(k
 const laeuft = reihenLageMitGrund(titel(), [woechentlich('reihe-lauf', '2026-10-30', { 1: '2026-10-30', 2: '2026-11-06', 3: '2026-11-13', 4: '2026-11-20' })], HEUTE)
 gleich('laufende Staffel: Punkt', laeuft.lage, 'laeuft')
 gleich('laufende Staffel: Zeile nennt Folge 5 am 27.11.2026, fortgeschrieben mit ≈', lageZeile(laeuft, t), '● = läuft, Folge 5 bei Crunchyroll am 27.11.2026 (≈)')
+
+/* Der Grund kommt nur aus Releases, die die Marke auslösen (Prüfer, 26.11.2026). Detektiv Conan (235): die TV-Reihe läuft, Box 1
+   (angekündigt) steht am selben Tag wie die nächste TV-Folge und vorn in der Liste; der Punkt nennt die TV-Folge, nicht die Box. */
+const lauf = () => woechentlich('reihe-lauf', '2026-10-30', { 1: '2026-10-30', 2: '2026-11-06', 3: '2026-11-13', 4: '2026-11-20' })
+const box = { ...disc(1, '2026-11-27', false), name: 'Detektiv Conan – Box 1 (30th Anniversary Edition)', edition: '30th Anniversary Edition, DVD & Blu-ray' } as Release
+const conan = reihenLageMitGrund(titel(), [box, lauf()], HEUTE)
+gleich('Conan: läuft, Grund ist die TV-Folge, nicht die frühere Box', lageZeile(conan, t), '● = läuft, Folge 5 bei Crunchyroll am 27.11.2026 (≈)')
+/* Black Clover (195604): ein angekündigter Teil ab Folge 174 und die laufende Folge 5 am selben Tag; der angekündigte steht vorn. */
+const angekuendigt = { ...woechentlich('reihe-tba', '2026-11-27'), schedule: { firstEpisodeDate: '2026-11-27', firstEpisodeNumber: 174, episodeCount: 12 } } as unknown as Release
+const clover = reihenLageMitGrund(titel(), [angekuendigt, lauf()], HEUTE)
+gleich('Black Clover: gleicher Tag, die laufende Folge 5 statt der angekündigten 174', [clover.lage, clover.grund?.episode, clover.grund?.date], ['laeuft', 5, '2026-11-27'])
+/* Ein widerlegter Start trägt weder Marke noch Grund. */
+const widerlegt = { ...woechentlich('reihe-weg', '2026-12-01'), widerlegt: { am: '2026-11-20', grund: 'Start zurückgenommen', gemeldet: true } } as unknown as Release
+const nurWiderlegt = reihenLageMitGrund(titel({ streams: [] }), [widerlegt], HEUTE)
+gleich('widerlegter Start allein: keine Marke, keine Zeile', [nurWiderlegt.lage, lageZeile(nurWiderlegt, t)], ['ruht', ''])
+const mitWiderlegt = reihenLageMitGrund(titel({ streams: [] }), [widerlegt, woechentlich('reihe-neu', '2027-01-03')], HEUTE)
+gleich('widerlegter früherer Start neben echtem: Grund ist der echte (03.01.2027)', [mitWiderlegt.lage, mitWiderlegt.grund?.date], ['kommt', '2027-01-03'])
+/* Eine ausgebliebene Folge (Vermerk ohne `erschienenAm`) ist kein Grund, die nächste schon; mit `erschienenAm` zählt sie. */
+const folge = (datum: string, nr: number, verpasst?: object) => ({ r: lauf(), e: { date: datum, platform: 'crunchyroll', episode: nr, ...(verpasst ? { verpasst } : {}) } as ReleaseEvent })
+gleich('ausgebliebene Folge zählt nicht, die nächste schon', fruehesterTermin([folge(HEUTE, 5, { erwartetAm: HEUTE }), folge('2026-12-03', 6)], HEUTE)?.episode, 6)
+gleich('nachgereichte Folge (erschienenAm) zählt', fruehesterTermin([folge(HEUTE, 5, { erwartetAm: HEUTE, erschienenAm: HEUTE }), folge('2026-12-03', 6)], HEUTE)?.episode, 5)
+
+/* Die Disc kurz, „<Marke> = <Bedeutung>“; Name, Edition und Schlagzeile wörtlich aus releases.json (Stand 26.11.2026). */
+const echteDisc = (name: string, datum: string, mehr: Partial<Release>) =>
+  reihenLageMitGrund(titel(), [abgeschlossen(), { ...disc(1, datum, false), name, edition: undefined, ...mehr } as Release], HEUTE)
+const sailor = { edition: 'Gesamtausgabe: Limited Steelbook Edition Blu-ray · Gesamtausgabe: Limited Steelbook Edition' }
+gleich('Sailor Moon S (532): Blu-ray Gesamtausgabe statt doppelter Edition', lageZeile(echteDisc('Sailor Moon S', '2026-12-18', sailor), t), '○ = Blu-ray Gesamtausgabe am 18.12.2026')
+const sakamoto = { edition: 'Vol. 3/4: Limited Steelcase Edition Blu-ray · Vol. 3/4: Limited Steelcase Edition' }
+gleich('Sakamoto Days Teil 2 (184237): Blu-ray Vol. 3', lageZeile(echteDisc('Sakamoto Days: Teil 2 – Vol. 3', '2027-01-29', sakamoto), t), '○ = Blu-ray Vol. 3 am 29.01.2027')
+const eva = { herkunft: 'Automatisch übernommen aus „Design der neuen »Neon Genesis Evangelion«-Komplettbox + Extras".' }
+gleich('Evangelion (30): ohne Edition nennt die Schlagzeile die Komplettbox', lageZeile(echteDisc('Neon Genesis Evangelion', '2027-02-05', eva), t), '○ = Komplettbox am 05.02.2027')
+const berserk = { herkunft: 'Automatisch übernommen aus „»Berserk« erscheint in einer neuen Blu-ray-Komplettbox".' }
+gleich('Berserk (33): Medium und Art aus der Schlagzeile', discKurz({ name: 'Berserk', ...berserk }), 'Blu-ray Komplettbox')
+gleich('Detektiv Conan (235): Box aus dem Namen, Medium aus der Edition', discKurz(box), 'DVD + BD Box 1')
+gleich('ohne jede Angabe: Disc', discKurz({ name: 'Titel' }), 'Disc')
 
 /* Staffel-Reiter (staffelLage): dieselbe Rechnung mit Folgenbereich; Marke und Grund zusammen. */
 const staffelKommt = staffelLageMitGrund(1, 12, false, [woechentlich('reihe-neu', '2027-01-03')], HEUTE)

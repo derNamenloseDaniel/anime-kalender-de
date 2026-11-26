@@ -5,6 +5,7 @@ import { kastenKlassen, kastenKopfVon, useKastenZustand } from './antwort-kasten
 import type { AntwortKastenProps } from './antwort-kasten-props.ts'
 import { reihenLageMitGrund, type ReihenReiter } from './reihen-reiter-liste.ts'
 import { ReiterPfeil, rolleUm, usePfeilLage } from './staffel-pfeile.tsx'
+import { useReiterBlase } from './reiter-blase.tsx'
 import { Akzentstrich, LAGE_WORT, LageMarke, LEISTE, LEISTE_HUELLE, naechsterReiter, reiterKlassen, reiterTitel, zeigeGewaehlten } from './staffel-reiter.tsx'
 import { useLang } from '../../lib/i18n.tsx'
 
@@ -29,6 +30,14 @@ export function kastenFarbe(huelle: string): string {
 }
 
 /**
+ * Reiter eines Teils ohne deutsche Synchro: gestrichelter Rand in `ak-sehr-leise` statt der Randfarbe (gewählt auch statt der des
+ * Kastens). Der Rand `ak-rand` hielt auf der Reiterfläche 1,27:1 (dunkel) bzw. 1,23:1 (hell), die Striche waren kaum zu sehen; so 4,6:1.
+ */
+export function gestrichelt(klassen: string): string {
+  return [...klassen.split(' ').filter((k) => !/^border-ak-/.test(k)), 'border-dashed', 'border-ak-sehr-leise'].join(' ')
+}
+
+/**
  * Je Titel der Kategorie ein Reiter mit nur der Kurzform (Nummer, Bereich) über dem Antwortkasten, der volle Titel steht im Tooltip;
  * ein Reiter öffnet seinen Titel. Pfeiltasten,
  * Pos1 und Ende setzen nur den Fokus, Eingabe oder Leertaste öffnet: jede Wahl lädt einen anderen Titel.
@@ -40,6 +49,11 @@ export function ReihenReiterZeile(p: { reiter: ReihenReiter[]; aktiv: number; la
   const gewaehlterReiter = useRef<HTMLButtonElement>(null)
   useEffect(() => zeigeGewaehlten(zeile.current, gewaehlterReiter.current), [aktiv])
   const lage = usePfeilLage(zeile, reiter.length)
+  const lageVon = (id: number) => lagen.get(id) ?? { lage: 'ruht' as const }
+  const blase = useReiterBlase((id) => {
+    const r = reiter.find((x) => x.id === id)
+    return r ? reiterTitel(r.name, lageVon(id), t, r.ohneSynchro) : ''
+  })
   const taste = (e: KeyboardEvent<HTMLDivElement>) => {
     const tabs = [...(zeile.current?.querySelectorAll<HTMLElement>('[role="tab"]') ?? [])]
     const von = tabs.indexOf(e.target as HTMLElement)
@@ -53,8 +67,7 @@ export function ReihenReiterZeile(p: { reiter: ReihenReiter[]; aktiv: number; la
       <div ref={zeile} role="tablist" aria-label="Titel der Reihe" data-reihen-reiter onKeyDown={taste} className={LEISTE}>
         {reiter.map((r) => {
           const gewaehlt = r.id === aktiv
-          const m = lagen.get(r.id) ?? { lage: 'ruht' as const }
-          const l = m.lage
+          const l = lageVon(r.id).lage
           return (
             <button
               key={r.id}
@@ -66,9 +79,9 @@ export function ReihenReiterZeile(p: { reiter: ReihenReiter[]; aktiv: number; la
               aria-controls={`${kennung}-kasten`}
               tabIndex={gewaehlt ? 0 : -1}
               aria-label={`${r.staffel ? `Staffel ${r.label}: ` : ''}${r.name}${LAGE_WORT[l]}${r.ohneSynchro ? OHNE_SYNCHRO_WORT : ''}`}
-              title={reiterTitel(r.name, m, t, r.ohneSynchro)}
+              {...blase.an(r.id)}
               onClick={() => beiWahl(r.id)}
-              className={`${reiterKlassen(gewaehlt, farbe)}${r.ohneSynchro ? ' border-dashed' : ''}`}
+              className={r.ohneSynchro ? gestrichelt(reiterKlassen(gewaehlt, farbe)) : reiterKlassen(gewaehlt, farbe)}
             >
               {gewaehlt && <Akzentstrich />}
               {r.label}
@@ -79,6 +92,7 @@ export function ReihenReiterZeile(p: { reiter: ReihenReiter[]; aktiv: number; la
       </div>
       <ReiterPfeil richtung="links" weitere={lage.links} beiKlick={() => rolleUm(zeile.current, 'links')} />
       <ReiterPfeil richtung="rechts" weitere={lage.rechts} beiKlick={() => rolleUm(zeile.current, 'rechts')} />
+      {blase.blase}
     </div>
   )
 }

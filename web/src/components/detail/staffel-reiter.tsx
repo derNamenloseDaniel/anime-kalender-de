@@ -5,6 +5,7 @@ import { anbieterName } from '@shared/types.ts'
 import { useLang, type Translate } from '../../lib/i18n.tsx'
 import type { Reiter } from './staffel-reiter-liste.ts'
 import { ReiterPfeil, rolleUm, usePfeilLage } from './staffel-pfeile.tsx'
+import { useReiterBlase } from './reiter-blase.tsx'
 
 /** Farbe der Abschnittsbox; der gewählte Reiter trägt sie auch und geht so ohne Kante in die Box über. */
 export const ABSCHNITT_FARBE = 'border-ak-rand bg-ak-flaeche'
@@ -80,6 +81,7 @@ export function ReiterZeile({ reiter, aktiv, kennung, beiWahl }: { reiter: Reite
   const gewaehlterReiter = useRef<HTMLButtonElement>(null)
   useEffect(() => zeigeGewaehlten(zeile.current, gewaehlterReiter.current), [aktiv])
   const lage = usePfeilLage(zeile, reiter.length)
+  const blase = useReiterBlase((i) => (reiter[i] ? reiterTitel(reiter[i].voll ?? `Staffel ${reiter[i].label}`, reiter[i], t) : ''))
   const taste = (e: KeyboardEvent<HTMLDivElement>) => {
     const ziel = naechsterReiter(e.key, aktiv, reiter.length)
     if (ziel === undefined) return
@@ -103,7 +105,7 @@ export function ReiterZeile({ reiter, aktiv, kennung, beiWahl }: { reiter: Reite
               aria-controls={`${kennung}-abschnitt`}
               tabIndex={gewaehlt ? 0 : -1}
               aria-label={`Staffel ${r.label}${r.name ? `: ${r.name}` : ''}${LAGE_WORT[r.lage]}`}
-              title={reiterTitel(r.voll ?? `Staffel ${r.label}`, r, t)}
+              {...blase.an(i)}
               onClick={() => beiWahl(i)}
               className={reiterKlassen(gewaehlt)}
             >
@@ -116,6 +118,7 @@ export function ReiterZeile({ reiter, aktiv, kennung, beiWahl }: { reiter: Reite
       </div>
       <ReiterPfeil richtung="links" weitere={lage.links} beiKlick={() => rolleUm(zeile.current, 'links')} />
       <ReiterPfeil richtung="rechts" weitere={lage.rechts} beiKlick={() => rolleUm(zeile.current, 'rechts')} />
+      {blase.blase}
     </div>
   )
 }

@@ -16,7 +16,8 @@ import type { Dataset } from '../web/src/lib/data.ts'
 import { reihenTeileVon } from '../web/src/components/detail/reihen-daten.ts'
 import { reihenNameVon } from '../web/src/components/detail/reihen-namen.ts'
 import type { FranchiseMember, Release, Title } from '../shared/types.ts'
-import { attrappeUhr, ignoriereCss, installiereMiniDom, klicke, type MiniKnoten } from '../tools/mini-dom.ts'
+import { attrappeUhr, feuere, ignoriereCss, installiereMiniDom, klicke, type MiniKnoten } from '../tools/mini-dom.ts'
+import { festeUhr } from '../tools/feste-uhr.ts'
 import { eindeutigeBeschriftung, reihenLageVon, reihenReiterVon, reiterKurzform } from '../web/src/components/detail/reihen-reiter-liste.ts'
 import { reihenOrdnung } from '../web/src/components/detail/reihen-inhalt.tsx'
 
@@ -187,11 +188,13 @@ Object.assign(globalThis, {
 })
 ignoriereCss()
 const { DetailPanel } = await import('../web/src/components/DetailPanel.tsx')
+/* Das Panel nimmt `today` aus der Uhr: fest auf den Stichtag der Liste oben. */
+const echteUhr = festeUhr(`${HEUTE}T12:00:00Z`)
 
 let fokus: MiniKnoten | undefined
 const verhindert: string[] = []
 const dom = installiereMiniDom(
-  { ...attrappeUhr(), matchMedia: () => ({ matches: false, addEventListener() {}, removeEventListener() {} }), location: ort, scrollTo() {}, innerWidth: 400, getComputedStyle: () => ({}) } as never,
+  { ...attrappeUhr(), matchMedia: () => ({ matches: false, addEventListener() {}, removeEventListener() {} }), location: ort, scrollTo() {}, innerWidth: 400, innerHeight: 800, getComputedStyle: () => ({}) } as never,
   () => ({}),
 )
 Object.assign(document, { querySelector: () => null, querySelectorAll: () => [], title: 'Start' })
@@ -206,6 +209,7 @@ Object.assign(knotenArt, {
   focus(this: MiniKnoten) {
     fokus = this
   },
+  getBoundingClientRect: () => ({ left: 0, top: 300, right: 44, bottom: 344, width: 44, height: 44 }),
 })
 const wurzel = createRoot(dom.wurzel as unknown as Element)
 const geoeffnet: number[] = []
@@ -254,9 +258,21 @@ pruefe('Pos1 fokussiert Reiter 1 und unterdrückt das Seitenrollen', fokus !== u
 await act(async () => klicke(dom.wurzel, hz.tabs[1]!))
 pruefe('Klick auf Reiter 2 öffnet Pokémon-Generationen über den Weg der Reihenliste', geoeffnet.join() === '8284', geoeffnet)
 
-const titelZeile = (k: MiniKnoten | undefined) => (k?.getAttribute('title') ?? '').split('\n')[0]
-pruefe('Tooltip: voller Titel am Reiter (erste Zeile von title)', hz.tabs.map(titelZeile).join('|') === reiter(14839).map((r) => r.name).join('|'), hz.tabs.map((k) => k.getAttribute('title')))
-pruefe('Tooltip: Reiter ohne Synchro erklärt den gestrichelten Rand in der letzten Zeile', (hz.tabs[6]?.getAttribute('title') ?? '').endsWith('\ngestrichelt = ohne deutsche Synchro') && !(hz.tabs[0]?.getAttribute('title') ?? '').includes('gestrichelt'))
+/* Tooltip: kein `title` je Reiter, die Blase entsteht beim Zeigen (`reiter-blase.tsx`; Verhalten in check-reiter-blase.ts). */
+const html = dom.wurzel.parentNode!
+async function blasenText(k: MiniKnoten | undefined): Promise<string> {
+  if (!k) return ''
+  await act(async () => feuere(dom.wurzel, 'mouseover', k))
+  const inhalt = html.finde((x) => x.getAttribute('role') === 'tooltip').map((x) => x.textContent).join('|')
+  await act(async () => feuere(dom.wurzel, 'mouseout', k))
+  return inhalt
+}
+const ersteZeile = (s: string) => s.split('\n')[0]
+const hzBlasen: string[] = []
+for (const k of hz.tabs) hzBlasen.push(await blasenText(k))
+pruefe('Tooltip: kein title, die Blase nennt den vollen Titel (erste Zeile)', hz.tabs.every((k) => k.getAttribute('title') === null) && hzBlasen.map(ersteZeile).join('|') === reiter(14839).map((r) => r.name).join('|'), hzBlasen)
+pruefe('Tooltip: Reiter ohne Synchro erklärt den gestrichelten Rand in der letzten Zeile', (hzBlasen[6] ?? '').endsWith('\ngestrichelt = ohne deutsche Synchro') && !(hzBlasen[0] ?? '').includes('gestrichelt'), hzBlasen[6])
+pruefe('Tooltip: der offene Titel läuft (Punkt), ohne künftigen Termin keine Zeitangabe', hzBlasen[4] === 'Pokémon Horizonte\n● = läuft', hzBlasen[4])
 /* Reihenliste: große Reihe als Übersicht; Gruppen mit Zahl (`data-reihe-gruppe`), die Reiter-Titel fehlen in ihrer Gruppe. */
 const gruppenZahl = () => dom.wurzel.finde((k) => k.getAttribute('data-reihe-gruppe') !== null).map((k) => `${k.getAttribute('data-reihe-gruppe')}=${text(k).replace(/\D+/g, '')}`).join()
 pruefe('Horizonte: Eigene Serien ganz als Reiter, fehlen in der Liste; Hauptserie und Filme ganz', gruppenZahl() === 'Hauptserie=12,Filme=26,Specials & OVAs=86', gruppenZahl())
@@ -266,16 +282,26 @@ pruefe('Horizonte: nur Reiter 7 ist gestrichelt und trägt es im aria-label', hz
 const film = await zeige(5726)
 const filmLabels = film.tabs.map(text)
 pruefe('Film der Reihe: Reiter der Filme 1..n, gewählt Nr. 16', film.leiste?.getAttribute('role') === 'tablist' && filmLabels.join() === filmLabels.map((_, i) => i + 1).join() && filmLabels.length === reiter(5726).length && film.tabs[15]?.getAttribute('aria-selected') === 'true', filmLabels)
-pruefe('Film: Tooltip und aria-label tragen den vollen Titel, ohne „Staffel“', film.tabs[0]?.getAttribute('title') === 'Pokémon: Der Film - Mewtu gegen Mew' && film.tabs[0]?.getAttribute('aria-label') === 'Pokémon: Der Film - Mewtu gegen Mew', [film.tabs[0]?.getAttribute('title'), film.tabs[0]?.getAttribute('aria-label')])
+const mewtu = await blasenText(film.tabs[0])
+pruefe('Film: Tooltip und aria-label tragen den vollen Titel, ohne „Staffel“', mewtu === 'Pokémon: Der Film - Mewtu gegen Mew' && film.tabs[0]?.getAttribute('aria-label') === 'Pokémon: Der Film - Mewtu gegen Mew', [mewtu, film.tabs[0]?.getAttribute('aria-label')])
 pruefe('Film: Filme fehlen in der Reihenliste, die übrigen Gruppen bleiben', gruppenZahl() === 'Hauptserie=12,Eigene Serien=8,Specials & OVAs=86', gruppenZahl())
-const reiterVon = (name: string) => film.tabs.find((k) => titelZeile(k) === name)
+/* Reiter über den Namen im aria-label (dahinter höchstens „, läuft“ u. ä.). */
+const reiterVon = (name: string) =>
+  film.tabs.find((k) => {
+    const l = k.getAttribute('aria-label') ?? ''
+    return l === name || l.startsWith(`${name},`)
+  })
 const [toho, wildCard] = [reiterVon('Toho Cinemas x Pokémon GO'), reiterVon('Pokémon: Wild Card')]
 pruefe('Film: Reiter ohne Synchro ist gestrichelt und nennt es im aria-label', klasse(toho).split(' ').includes('border-dashed') && toho?.getAttribute('aria-label') === 'Toho Cinemas x Pokémon GO, ohne deutsche Synchro', [klasse(toho), toho?.getAttribute('aria-label')])
+pruefe('Film: gestrichelter Rand in ak-sehr-leise statt ak-rand (Kontrast der Striche)', klasse(toho).split(' ').includes('border-ak-sehr-leise') && !klasse(toho).split(' ').includes('border-ak-rand'), klasse(toho))
 pruefe('Film: geplanter Reiter (Wild Card 2027) und gewählter Reiter nicht gestrichelt', wildCard !== undefined && !klasse(wildCard).split(' ').includes('border-dashed') && !(wildCard.getAttribute('aria-label') ?? '').includes('ohne deutsche Synchro') && !klasse(film.tabs[15]).split(' ').includes('border-dashed'), [klasse(wildCard), wildCard?.getAttribute('aria-label')])
 pruefe('Film: nur Reiter ohne Synchro gestrichelt (Toho Cinemas, sonst keiner mit Synchro)', film.tabs.filter((k) => klasse(k).split(' ').includes('border-dashed')).length === film.tabs.filter((k) => (k.getAttribute('aria-label') ?? '').endsWith('ohne deutsche Synchro')).length && film.tabs.filter((k) => klasse(k).split(' ').includes('border-dashed')).length >= 1)
 const hauptPanel = await zeige(10852)
 const hauptAria = hauptPanel.tabs[0]?.getAttribute('aria-label') ?? ''
-pruefe('Hauptserie: aria-label nennt Staffel und Titel', hauptAria.startsWith(`Staffel ${text(hauptPanel.tabs[0]!)}: ${titelZeile(hauptPanel.tabs[0])}`), hauptAria)
+const hauptBlase = await blasenText(hauptPanel.tabs[0])
+pruefe('Hauptserie: aria-label nennt Staffel und Titel', hauptAria.startsWith(`Staffel ${text(hauptPanel.tabs[0]!)}: ${ersteZeile(hauptBlase)}`), hauptAria)
+/* Der Grund der Marke kommt aus den Lagen am Kasten (`ReihenReiterAmKasten`): die erste Serie kommt mit der DVD am 27.11.2026. */
+pruefe('Hauptserie: Reiter 1–5 nennt Titel und Grund des Rings', text(hauptPanel.tabs[0]!) === '1–5' && hauptBlase === 'Pokémon\n○ = DVD am 27.11.2026', hauptBlase)
 /* Ein Titel ohne Reihe (eigene Kennung, keine Reihenteile): keine Leiste, kein tabpanel um den Kasten. */
 const allein = { ...offen(5726), id: 990001, franchiseId: 990001, titleDe: 'Ohne Reihe', titleEn: 'Ohne Reihe', titleRomaji: 'Ohne Reihe' } as Title
 const ohneReihe = await zeige(990001, { ...data, titles: [allein], titleById: new Map([[allein.id, allein]]), releasesByTitle: new Map() })
@@ -283,6 +309,7 @@ pruefe('Titel ohne Reihe: keine Reihen-Reiter, kein tabpanel', ohneReihe.leiste 
 
 await act(async () => wurzel.unmount())
 dom.entferne()
+echteUhr()
 if (verletzt) {
   console.error(`\n${verletzt} Zusicherung(en) verletzt.`)
   process.exit(1)

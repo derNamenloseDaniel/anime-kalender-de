@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef } from 'react'
+import { useEscape } from '../lib/escape'
 
 /** Die Schließfunktion des gerade offenen Tooltips; neue Blase schließt die alte (Daniel, 11.10.2026: „Bei ani…“ und „Bei MyAnimeList…“ standen beide da). */
 let offener: (() => void) | undefined
@@ -19,18 +20,16 @@ export function useEinzigeBlase(offen: boolean, schliessen: () => void) {
     if (offener && offener !== zu) offener()
     offener = zu
     const beiVisibility = () => document.visibilityState === 'hidden' && zu()
-    /* Escape schließt die Blase (WCAG 1.4.13), ohne dass der Fokus wandert. */
-    const beiTaste = (e: KeyboardEvent) => e.key === 'Escape' && zu()
     window.addEventListener('blur', zu)
     document.addEventListener('visibilitychange', beiVisibility)
-    document.addEventListener('keydown', beiTaste)
     return () => {
       if (offener === zu) offener = undefined
-      document.removeEventListener('keydown', beiTaste)
       window.removeEventListener('blur', zu)
       document.removeEventListener('visibilitychange', beiVisibility)
     }
   }, [offen])
+  /* Escape schließt die Blase (WCAG 1.4.13), ohne dass der Fokus wandert; als oberste Ebene zuerst, ein Dialog darunter bleibt offen. */
+  useEscape(offen, () => aktuell.current())
 }
 
 /** Fokus öffnet nur bei Tastatur (`:focus-visible`): Der Klickfokus auf einen Link und die Rückgabe des Fokus bei der Rückkehr in den Tab sind kein Anlass. */

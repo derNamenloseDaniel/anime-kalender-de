@@ -6,7 +6,7 @@
  * Aufruf: `node tools/ci-anmeldung-durchreichung.test.mjs [Wurzelordner]`
  */
 import assert from 'node:assert/strict'
-import { spawnSync } from 'node:child_process'
+import { spawnMitLimit } from './kind-mit-limit.mjs'
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -54,7 +54,7 @@ function stderrVon(datei, env) {
   const code =
     `import { beschreibungMitKommentaren as f } from ${JSON.stringify(pathToFileURL(join(wurzel, EXPORTIERT[datei] ?? datei)).href)};` +
     `console.log(f({ body: 'B', number: 1 }, process.env.GITHUB_REPOSITORY, () => []))`
-  const lauf = spawnSync(process.execPath, ['--input-type=module', '-e', code], { env: { PATH: process.env.PATH, ...env }, encoding: 'utf8' })
+  const lauf = spawnMitLimit(process.execPath, ['--input-type=module', '-e', code], { env: { PATH: process.env.PATH, ...env }, encoding: 'utf8' })
   assert.equal(lauf.status, 0, lauf.stderr)
   assert.equal(lauf.stdout.trim(), 'B', 'ohne Kommentare gilt die Beschreibung')
   return lauf.stderr

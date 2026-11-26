@@ -2,10 +2,12 @@
  * Zusicherungen zur Ein-Satz-Handlung (`data/curated/ein-satz-handlung/`, 26.11.2026): Lader über alle Teil-Dateien, Strukturprüfung (Länge, doppelte Kennung über Dateien),
  * Bauphase (`satz` neben `de`/`en`), Bestandsprüfung (Titel, Satz ≠ Titel, 5-Wort-Nähe). Läuft in `check:logic`; die echten Dateien gegen den Bestand hält `check-handlung-satz-bestand.ts`.
  */
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { ladeSaetze, satzBestandFehler, satzDateiFehler, SATZ_MAX } from './lib/handlung-satz.ts'
+import { fileURLToPath } from 'node:url'
+import { ladeSaetze, satzBestandFehler, satzDateiFehler, SATZ_MAX, teilDateien } from './lib/handlung-satz.ts'
 import { ergaenzeSaetze } from './bau/handlung-satz-einbinden.ts'
 import { type SynopsisEintrag } from './bau/13-1-anreichern.ts'
 
@@ -63,6 +65,32 @@ try {
 } finally {
   rmSync(ordner, { recursive: true, force: true })
 }
+
+/* Reihenfolge der Teil-Dateien: unsortierte Namen kommen sortiert heraus, Fremdes fällt weg. */
+pruefe('Lader: Teil-Dateien in fester Reihenfolge', teilDateien(['teil-02.yaml', 'x.txt', 'teil-01.yaml']).join() === 'teil-01.yaml,teil-02.yaml')
+
+/* Verdrahtung: die Bauphase ruft die Einbindung für alle ausgelieferten und verschobenen Titel auf. */
+pruefe('Verdrahtung: 13-schreiben.ts bindet die Sätze für slim und verschoben ein', /ergaenzeSaetze\(synopses, new Set\(\[\.\.\.slim, \.\.\.verschoben\]\.map\(\(t\) => t\.id\)\)\)/.test(readFileSync(new URL('./bau/13-schreiben.ts', import.meta.url), 'utf8')))
+
+/* Ausgang des Bestandswächters: Befund → Exit 1 mit Schlusszeile, sauber → Exit 0 (Kulisse über AK_ROOT). */
+function bestandLauf(satz: string): { status: number | null; aus: string } {
+  const kulisse = mkdtempSync(join(tmpdir(), 'satz-bestand-'))
+  try {
+    for (const d of ['public/data/synopses', 'data/curated/ein-satz-handlung']) mkdirSync(join(kulisse, d), { recursive: true })
+    writeFileSync(join(kulisse, 'public/data/titles.json'), JSON.stringify([{ id: 1, titleDe: 'Titel Eins' }]))
+    writeFileSync(join(kulisse, 'public/data/ohne-synchro.json'), '[]')
+    writeFileSync(join(kulisse, 'public/data/synopses/1.json'), '{"1":{"de":"Text"}}')
+    writeFileSync(join(kulisse, 'data/curated/ein-satz-handlung/teil-01.yaml'), `- id: 1\n  satz: ${satz}\n  quellen: [aniSearch]\n  geprueftAm: 2026-11-26\n`)
+    const r = spawnSync('npx', ['tsx', fileURLToPath(new URL('./check-handlung-satz-bestand.ts', import.meta.url))], { env: { ...process.env, AK_ROOT: kulisse }, encoding: 'utf8', timeout: 60000 })
+    return { status: r.status, aus: `${r.stdout}${r.stderr}` }
+  } finally {
+    rmSync(kulisse, { recursive: true, force: true })
+  }
+}
+const sauber = bestandLauf('Ein Junge sucht seinen Vater.')
+pruefe('Bestandswächter: ohne Befund Exit 0 und Schlusszeile 0', sauber.status === 0 && /^VERSTÖSSE: 0$/m.test(sauber.aus), `${sauber.status} ${sauber.aus.slice(-200)}`)
+const befund = bestandLauf('Titel Eins')
+pruefe('Bestandswächter: bei Befund Exit 1 und Schlusszeile 1', befund.status === 1 && /^VERSTÖSSE: 1$/m.test(befund.aus), `${befund.status} ${befund.aus.slice(-200)}`)
 
 /* Die echten Dateien: Struktur muss stimmen (Bestand: `check-handlung-satz-bestand.ts`). */
 const echt = satzDateiFehler(ladeSaetze())

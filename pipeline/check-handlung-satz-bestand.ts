@@ -35,4 +35,4 @@ if (verwaist.length) console.log(bestandWarnzeile('Ein-Satz-Handlung', 'ohne Tit
 for (const v of verstoesse) console.log(`✖ ${v}`)
 console.log(`Ein-Satz-Handlung gegen den Bestand: ${verwaist.length} verwaist (Warnung), ${verstoesse.length} Verstöße.`)
 console.log(`VERSTÖSSE: ${verstoesse.length}`)
-process.exit(0)
+process.exit(verstoesse.length ? 1 : 0)

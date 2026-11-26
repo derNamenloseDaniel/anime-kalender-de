@@ -53,8 +53,8 @@ pipeline/check-handbeleg-note-asin-bestand.ts
 pipeline/check-handbeleg-notizseite-bestand.ts
 pipeline/check-handbeleg-staffelzaehlung-bestand.ts
 pipeline/check-handlung-eigen-bestand.ts
-pipeline/check-handlung-satz-bestand.ts
 pipeline/check-handlung-quelle-bestand.ts
+pipeline/check-handlung-satz-bestand.ts
 pipeline/check-herkunftsland-bestand.ts
 pipeline/check-horizonte-staffeln-bestand.ts
 pipeline/check-interne-angaben-bestand.ts

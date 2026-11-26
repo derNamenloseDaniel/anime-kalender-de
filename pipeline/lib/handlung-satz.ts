@@ -27,12 +27,13 @@ export interface SatzDatei {
   eintraege: EinSatz[]
 }
 
+/** `.yaml`-Namen in fester Reihenfolge (readdir ist nicht überall sortiert; „erste Datei gewinnt“ bei doppelter Kennung hängt daran). */
+export const teilDateien = (namen: string[]): string[] => namen.filter((f) => f.endsWith('.yaml')).sort()
+
 /** Alle Teil-Dateien des Ordners, nach Namen sortiert; ein fehlender Ordner ist leer. */
 export function ladeSaetze(ordner = resolve(ROOT, HANDLUNG_SATZ_ORDNER)): SatzDatei[] {
   if (!existsSync(ordner)) return []
-  return readdirSync(ordner)
-    .filter((f) => f.endsWith('.yaml'))
-    .sort()
+  return teilDateien(readdirSync(ordner))
     .map((datei) => ({ datei, eintraege: (yaml.load(readFileSync(join(ordner, datei), 'utf8'), { schema: yaml.CORE_SCHEMA }) as EinSatz[] | null) ?? [] }))
 }
 

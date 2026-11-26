@@ -19,6 +19,7 @@ pipeline/check-adn-film.ts
 pipeline/check-adn-katalog-frist-lauf.ts
 pipeline/check-adn-katalog-frist.ts
 pipeline/check-adn-katalog-warteschlange.ts
+pipeline/check-adn-kennung-vorstand.ts
 pipeline/check-adn-kennung.ts
 pipeline/check-adn-kuratiert-ton.ts
 pipeline/check-adn-kuratiert.ts

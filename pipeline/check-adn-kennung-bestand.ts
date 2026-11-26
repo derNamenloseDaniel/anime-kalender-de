@@ -5,6 +5,8 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { ROOT } from './lib/util.ts'
+import { adnGegenVorstand } from './lib/adn-kennung-vorstand.ts'
+import { vorstandRef } from './lib/vorstand-abgang.ts'
 import { adnShowsMitKatalogKennung, loeseAdnTitelIds } from './bau/adn-show-titel.ts'
 import { melde } from './lib/quarantaene.ts'
 import type { AdnData } from './lib/adn.ts'
@@ -25,5 +27,9 @@ for (const showId of verloren) melde(katalog.find((s) => s.showId === showId)!.t
 
 console.log(`ADN: ${kalender.filter((k) => katalog.some((s) => s.showId === k.showId)).length} showIds in Kalender und Katalog, ohne Weg trotz Katalog-Zuordnung: ${verloren.length}`)
 if (verloren.length) console.error(`  ✖ ADN-showId ohne titleId trotz Katalog-Zuordnung: ${verloren.join(', ')}`)
-console.log(`VERSTÖSSE: ${verloren.length}`)
-process.exit(verloren.length ? 1 : 0)
+// Oben rechnet die Wache mit denselben Funktionen wie der Bau; ein Fehler darin träfe beide. Der Vorstand ist davon unabhängig.
+const gegenVorstand = adnGegenVorstand(vorstandRef(process.argv.slice(2)))
+for (const zeile of gegenVorstand) console.error(`  ✖ ${zeile}`)
+const verstoesse = verloren.length + gegenVorstand.length
+console.log(`VERSTÖSSE: ${verstoesse}`)
+process.exit(verstoesse ? 1 : 0)

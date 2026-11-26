@@ -1,3 +1,4 @@
+import { amazonLinkArt } from '@shared/plattform-suche.ts'
 import type { Release } from '@shared/types.ts'
 import { kurzeAusgabe } from './disc-ausgabe.ts'
 import { artikelUrl, FORMATE, type Ausgabe, type Format } from './disc-ausgaben.ts'
@@ -151,6 +152,26 @@ export function kompaktDatum(iso: string): string {
   return `${t}.${m}.${j.slice(2)}`
 }
 
+const LINK_RANG = { produkt: 0, ean: 1, name: 2 }
+
+/**
+ * Wohin der eine Klick einer Variante führt: zum genauesten Händlerlink (Produktseite vor EAN-Suche vor Namenssuche),
+ * ohne Händler zum aniSearch-Artikel — der ist Quelle, kein Händler, und heißt auch so.
+ */
+export function zielVon(v: Variante): { url: string; haendler?: string } | undefined {
+  const rang = (url: string): number => LINK_RANG[amazonLinkArt(url) ?? 'produkt']
+  const bester = [...v.haendler].sort((a, b) => rang(a.url) - rang(b.url))[0]
+  if (bester) return { url: bester.url, haendler: bester.name }
+  return v.quelle ? { url: v.quelle } : undefined
+}
+
+/** Formate mit gleichem Datum stehen zusammen („Blu-ray DVD seit 13.11.26“); verschiedene Daten bleiben getrennt. */
+export function formateJeDatum(v: Variante): { datum: string; formate: Format[] }[] {
+  const nach = new Map<string, Format[]>()
+  for (const f of v.formate) nach.set(v.datumJe[f] ?? '', [...(nach.get(v.datumJe[f] ?? '') ?? []), f])
+  return [...nach].map(([datum, formate]) => ({ datum, formate }))
+}
+
 /** Die Gruppen, in denen die Varianten stehen: wichtigste zuerst; leere entfallen. */
 export function gruppenVon(liste: Variante[]): { art: Art; liste: Variante[] }[] {
   return ARTEN.map((art) => ({ art, liste: liste.filter((v) => v.art === art) })).filter((g) => g.liste.length)
@@ -160,11 +181,6 @@ export function gruppenVon(liste: Variante[]): { art: Art; liste: Variante[] }[]
 export function startOffen(liste: Variante[], art: Art): boolean {
   const gross = liste.some((v) => v.art === 'gesamt' || v.art === 'box')
   return !gross || art === 'gesamt' || art === 'box'
-}
-
-/** Welche Formate in diesen Varianten vorkommen — die Spalten der Matrix, in fester Reihenfolge. */
-export function spaltenVon(liste: Variante[]): Format[] {
-  return FORMATE.filter((f) => liste.some((v) => v.formate.includes(f)))
 }
 
 /** „2019–2026“ bzw. „2025“: die Spanne der Daten einer Gruppe, damit man ohne Aufklappen weiß, wo man landet; ohne Daten leer. */

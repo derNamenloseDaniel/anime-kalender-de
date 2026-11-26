@@ -1,9 +1,8 @@
 import { useState, type ReactNode } from 'react'
 import { anzeigeName } from '@shared/titles.ts'
 import { amazonLinkArt } from '@shared/plattform-suche.ts'
-import { discAusgabenVon } from '../../src/components/detail/disc-ausgaben.ts'
-import type { Format } from '../../src/components/detail/disc-ausgaben.ts'
-import { gruppenVon, istKommend, jahre, kompaktDatum, startOffen, variantenVon, type Art, type Variante } from '../../src/components/detail/disc-varianten.ts'
+import { discAusgabenVon, FORMATE, type Format } from '../../src/components/detail/disc-ausgaben.ts'
+import { gruppenVon, istKommend, jahre, kompaktDatum, startOffen, variantenVon, zielVon, type Art, type Variante } from '../../src/components/detail/disc-varianten.ts'
 import type { DiscBereichEigenschaften } from '../ersatz.tsx'
 import { KaufwegPillen } from './disc-bereich-teile.tsx'
 
@@ -24,29 +23,23 @@ export function useVarianten(e: DiscBereichEigenschaften): Variante[] {
 
 export interface Ziel {
   url: string
-  /** Lang für Pille und Karte („Bei Amazon“), kurz für die Matrixspalte („Amazon“). */
+  /** Lang für die Karte („Bei Amazon“), kurz für die Matrixspalte („Amazon“). */
   text: string
   kurz: string
 }
 
-const RANG = { produkt: 0, ean: 1, name: 2 }
-
-/** Wohin der eine Klick führt: zum genauesten Händlerlink (Produkt vor EAN vor Namenssuche), ohne Händler zum aniSearch-Artikel. */
-export function zielVon(v: Variante): Ziel | undefined {
-  const rang = (url: string) => RANG[amazonLinkArt(url) ?? 'produkt']
-  const h = [...v.haendler].sort((a, b) => rang(a.url) - rang(b.url))[0]
-  if (h) {
-    const art = amazonLinkArt(h.url)
-    return { url: h.url, text: art === 'name' ? `Bei ${h.name} suchen` : art === 'ean' ? `Bei ${h.name}` : `Kaufen bei ${h.name}`, kurz: h.name }
-  }
-  return v.quelle ? { url: v.quelle, text: 'Details bei aniSearch', kurz: 'aniSearch' } : undefined
+/** Das Ziel der Seite (`zielVon`) mit den Beschriftungen der Varianten B und C. */
+export function zielMitText(v: Variante): Ziel | undefined {
+  const ziel = zielVon(v)
+  if (!ziel) return undefined
+  if (!ziel.haendler) return { url: ziel.url, text: 'Details bei aniSearch', kurz: 'aniSearch' }
+  const art = amazonLinkArt(ziel.url)
+  return { url: ziel.url, text: art === 'name' ? `Bei ${ziel.haendler} suchen` : art === 'ean' ? `Bei ${ziel.haendler}` : `Kaufen bei ${ziel.haendler}`, kurz: ziel.haendler }
 }
 
-/** Formate mit gleichem Datum stehen zusammen: „Blu-ray DVD seit 13.11.26“; verschiedene Daten bleiben getrennt. */
-export function formateJeDatum(v: Variante): { datum: string; formate: Format[] }[] {
-  const nach = new Map<string, Format[]>()
-  for (const f of v.formate) nach.set(v.datumJe[f] ?? '', [...(nach.get(v.datumJe[f] ?? '') ?? []), f])
-  return [...nach].map(([datum, formate]) => ({ datum, formate }))
+/** Welche Formate in diesen Varianten vorkommen — die Spalten der Matrix (B), in fester Reihenfolge. */
+export function spaltenVon(liste: Variante[]): Format[] {
+  return FORMATE.filter((f) => liste.some((v) => v.formate.includes(f)))
 }
 
 /** „ab 15.01.27“ in Akzent für Kommendes, „seit 03.09.26“ leise für Erschienenes; ohne Datum nichts. */

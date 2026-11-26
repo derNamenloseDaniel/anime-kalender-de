@@ -1,8 +1,9 @@
 /**
- * Lässt den echten Disc-Bereich (`disc-bereich.tsx`, `disc-matrix.tsx`) auf dem Mini-DOM laufen (Mockup B3, F96, 27.10.2026):
- * Gesamtausgaben und Boxen offen, Volumes und Filme zugeklappt (Zahl und Jahre am Kopf), Vol. nur ohne Gesamtausgabe offen,
- * Händler und Kalender erst unter der angetippten Zeile; Kauflink „Bei Amazon“ (EAN) bzw. „Bei Amazon suchen“ (Name).
- * Fälle wörtlich aus der Bühne (`web/buehne/faelle.json`): Dan Da Dan, Detektiv Conan, Sakamoto Days. Aufruf: `npm run check:logic`.
+ * Lässt den echten Disc-Bereich (`disc-bereich.tsx`, `disc-pillen.tsx`) auf dem Mini-DOM laufen (Mockup `disc-bereich-3` A, 26.11.2026):
+ * jede Variante eine Pille, die ohne Aufklappen zum Händler führt (ohne Händler zum aniSearch-Artikel); eine Gruppe mit einem Eintrag
+ * und eine einzige Gruppe klappen nie zu, Volumes und Filme mit mehreren Einträgen neben Gesamtausgaben oder Boxen starten zugeklappt
+ * (Zahl und Jahre am Kopf); Kauflink „Bei Amazon“ (EAN) bzw. „Bei Amazon suchen“ (Name).
+ * Fälle wörtlich aus der Bühne (`web/buehne/faelle.json`): Dan Da Dan, Detektiv Conan, Sakamoto Days, Last Boss Queen. Aufruf: `npm run check:logic`.
  */
 import { readFileSync } from 'node:fs'
 import { act, createElement as h } from 'react'
@@ -44,7 +45,14 @@ async function zeige(fall: Fall, aender?: (r: Release[]) => Release[], ausgaben?
     knopf,
     text: () => dom.wurzel.textContent,
     klick: (k: MiniKnoten | undefined) => act(async () => klicke(dom.wurzel, k!)),
-    haendler: () => dom.wurzel.finde((k) => k.getAttribute('data-disc-haendler') !== null),
+    /** Die sichtbaren Varianten: Text der Pille und die Adresse, zu der sie führt (ohne Ziel `null`). */
+    pillen: () =>
+      dom.wurzel
+        .finde((k) => k.getAttribute('data-disc-variante') !== null)
+        .map((k) => ({ text: k.textContent, href: k.finde((a) => a.tagName === 'A')[0]?.getAttribute('href') ?? null, merken: k.finde((b) => b.tagName === 'BUTTON').length })),
+    knoepfe: () => dom.wurzel.finde((k) => k.tagName === 'BUTTON'),
+    /** Zahl der sichtbaren Pillen einer Gruppe (`data-disc-gruppe`). */
+    inGruppe: (art: string) => dom.wurzel.finde((k) => k.getAttribute('data-disc-gruppe') === art)[0]?.finde((k) => k.getAttribute('data-disc-variante') !== null).length ?? 0,
     abbau: async () => {
       await act(async () => wurzel.unmount())
       dom.entferne()
@@ -55,17 +63,22 @@ async function zeige(fall: Fall, aender?: (r: Release[]) => Release[], ausgaben?
 console.log('Disc-Bereich: Dan Da Dan (Gesamtausgabe, Volumes)')
 {
   const d = await zeige(faelle['dan-da-dan']!)
-  pruefe('Gesamtausgaben offen', d.knopf(/^Gesamtausgaben/)?.getAttribute('aria-expanded') === 'true')
+  pruefe('die Gruppe mit einem Eintrag hat keinen Klappknopf, nur ihren Namen', d.knopf(/^Gesamtausgaben/) === undefined && /Gesamtausgaben/.test(d.text()), d.knoepfe().map((k) => k.textContent))
+  const offen = d.pillen()
+  pruefe('… und ihre Pille steht ohne Tipp da, mit dem aniSearch-Artikel als Ziel („Details bei aniSearch“)', offen.length === 1 && /^Gesamtausgabe/.test(offen[0]!.text) && /anisearch\.de\/article\/214677$/.test(offen[0]!.href ?? '') && /Details bei aniSearch/.test(offen[0]!.text), offen)
+  pruefe('Format als Marke und „ab“ für Kommendes', /Blu-rayDVDab 30\.10\.26/.test(offen[0]!.text), offen[0]!.text)
   const vol = d.knopf(/^Volumes/)
-  pruefe('Volumes zugeklappt, Zahl und Jahre am Kopf', vol?.getAttribute('aria-expanded') === 'false' && /Volumes\s*· \d+ · 20\d\d/.test(vol.textContent), vol?.textContent)
-  pruefe('zugeklappte Volumes zeigen keine Zeile', !/Vol\. 3/.test(d.text()))
-  pruefe('ohne Tipp kein Händlerblock', d.haendler().length === 0)
+  pruefe('Volumes (mehrere) zugeklappt, Zahl und Jahre am Kopf', vol?.getAttribute('aria-expanded') === 'false' && /Volumes\s*· \d+ · 20\d\d/.test(vol.textContent), vol?.textContent)
+  pruefe('zugeklappte Volumes zeigen keine Pille', !/Vol\. 3/.test(d.text()))
   await d.klick(vol)
-  pruefe('ein Tipp auf Volumes zeigt die Zeilen', /Vol\. 3/.test(d.text()))
-  await d.klick(d.knopf(/^Vol\. 3/))
-  pruefe('Tipp auf eine Zeile öffnet genau einen Händlerblock mit Namenssuche „Bei Amazon suchen“', d.haendler().length === 1 && /Bei Amazon suchen/.test(d.haendler()[0]!.textContent), d.haendler().map((k) => k.textContent))
-  await d.klick(d.knopf(/^Vol\. 3/))
-  pruefe('zweiter Tipp schließt ihn wieder', d.haendler().length === 0)
+  const alle = d.pillen()
+  const vol3 = alle.filter((p) => /^Vol\. 3/.test(p.text))
+  pruefe('ein Tipp auf Volumes zeigt die Pillen', vol3.length > 0, alle.map((p) => p.text))
+  pruefe('jede Pille mit Händler führt ohne weiteren Tipp dorthin: Namenssuche heißt „Bei Amazon suchen“', vol3.some((p) => /amazon\.de\/s\?k=/.test(p.href ?? '') && /Bei Amazon suchen/.test(p.text)), vol3)
+  pruefe('keine Pille ohne Ziel', alle.every((p) => p.href), alle.filter((p) => !p.href))
+  pruefe('Kalenderknopf nur an Kommendem mit Termin', alle.some((p) => p.merken === 1) && alle.filter((p) => /seit \d/.test(p.text) && !/ab \d/.test(p.text)).every((p) => p.merken === 0), alle.map((p) => [p.text, p.merken]))
+  await d.klick(vol)
+  pruefe('zweiter Tipp klappt die Volumes wieder zu', d.pillen().length === d.pillen().filter((p) => !/^Vol\./.test(p.text)).length)
   await d.abbau()
 }
 
@@ -75,13 +88,29 @@ console.log('Disc-Bereich: Detektiv Conan (Boxen, Filme)')
   pruefe('Boxen offen', d.knopf(/^Boxen/)?.getAttribute('aria-expanded') === 'true')
   const film = d.knopf(/^Filme/)
   pruefe('Filme zugeklappt mit Zahl', film?.getAttribute('aria-expanded') === 'false' && /Filme\s*· \d+/.test(film.textContent), film?.textContent)
+  const mehr = d.knopf(/^Alle \d+ anzeigen/)
+  pruefe('lange Gruppe: sechs Pillen und ein Knopf für den Rest', d.inGruppe('box') === 6 && mehr !== undefined, d.inGruppe('box'))
+  await d.klick(mehr)
+  pruefe('… ein Tipp zeigt alle, der Knopf verschwindet', d.inGruppe('box') > 8 && d.inGruppe('box') === Number(/\d+/.exec(mehr!.textContent)![0]) && d.knopf(/^Alle \d+ anzeigen/) === undefined, d.inGruppe('box'))
   await d.abbau()
 }
 
 console.log('Disc-Bereich: Sakamoto Days (nur Volumes)')
 {
   const d = await zeige(faelle['sakamoto-days']!)
-  pruefe('ohne Gesamtausgabe und Box stehen die Volumes offen', d.knopf(/^Volumes/)?.getAttribute('aria-expanded') === 'true')
+  pruefe('eine einzige Gruppe hat keinen Kopf und klappt nicht: alle Pillen stehen da', d.knopf(/^Volumes/) === undefined && !/Volumes/.test(d.text()) && d.pillen().length > 1, d.text().slice(0, 80))
+  pruefe('ab zwei Varianten steht die Zahl am Kopf', /^\d+ Varianten/.test(d.text()), d.text().slice(0, 40))
+  await d.abbau()
+}
+
+console.log('Disc-Bereich: The Most Heretical Last Boss Queen (eine Box aus zwei Quellen, Daniel 26.11.2026)')
+{
+  const fall = faelle['last-boss-queen']!
+  const d = await zeige(fall, undefined, fall.disc[String(fall.titleId)])
+  const pillen = d.pillen()
+  pruefe('eine Pille statt „Gesamtausgaben · 1“ und „Sonstiges · 1“', pillen.length === 1 && /^Gesamtausgabe/.test(pillen[0]!.text) && !/Sonstiges|Gesamtausgaben/.test(d.text()), d.text())
+  pruefe('kein Klappknopf, kein Tipp nötig: die Pille führt zur EAN-Suche („Bei Amazon“, ohne „suchen“)', d.knoepfe().length === 0 && /amazon\.de\/s\?k=4020628654016$/.test(pillen[0]!.href ?? '') && /Bei Amazon/.test(pillen[0]!.text) && !/suchen/.test(pillen[0]!.text), pillen)
+  pruefe('Erschienenes heißt „seit“, der Verlag steht am Kopf, „1 Variante“ nicht', /Blu-rayseit 03\.09\.26/.test(pillen[0]!.text) && /^KSM Anime/.test(d.text()) && !/Variante/.test(d.text()), d.text())
   await d.abbau()
 }
 
@@ -90,19 +119,16 @@ console.log('Disc-Bereich: Kauflink je Art (EAN, Produkt) und aniSearch nie Hän
   const fall = faelle['sakamoto-days']!
   const mitUrl = (url: string) => (rs: Release[]) => rs.map((r) => ({ ...r, buyUrl: url, platformUrl: url }))
   const ean = await zeige(fall, mitUrl('https://www.amazon.de/s?k=4061229123456'))
-  await ean.klick(ean.knopf(/^Vol\./))
-  const eanText = ean.haendler()[0]?.textContent ?? ''
+  const mitTermin = (d: Awaited<ReturnType<typeof zeige>>) => d.pillen().filter((p) => p.href && !/anisearch/.test(p.href))
+  const eanText = mitTermin(ean)[0]?.text ?? ''
   pruefe('EAN-Suche heißt „Bei Amazon“, ohne „suchen“', /Bei Amazon/.test(eanText) && !/suchen/.test(eanText), eanText)
   await ean.abbau()
   const produkt = await zeige(fall, mitUrl('https://www.amazon.de/dp/B0CJ3GKPHF'))
-  await produkt.klick(produkt.knopf(/^Vol\./))
-  pruefe('Produktseite heißt „Kaufen bei Amazon“', /Kaufen bei Amazon/.test(produkt.haendler()[0]?.textContent ?? ''), produkt.haendler()[0]?.textContent)
+  pruefe('Produktseite heißt „Kaufen bei Amazon“', /Kaufen bei Amazon/.test(mitTermin(produkt)[0]?.text ?? ''), mitTermin(produkt)[0]?.text)
   await produkt.abbau()
   const ani = await zeige(fall, mitUrl('https://www.anisearch.de/article/201864'))
-  await ani.klick(ani.knopf(/^Vol\./))
-  const block = ani.haendler()[0]
-  const links = block?.finde((k) => k.tagName === 'A').map((k) => k.getAttribute('href')) ?? []
-  pruefe('aniSearch ist Quelle, kein Händler: nur der Quellenlink, kein Kauflink', links.length === 1 && /anisearch\.de\/article\/\d+/.test(links[0] ?? '') && !/Amazon|Kaufen|Bei /.test(block?.textContent ?? ''), links)
+  const pillen = ani.pillen()
+  pruefe('aniSearch ist Quelle, kein Händler: jedes Ziel ist ein Artikel und heißt „Details bei aniSearch“, nie „Kaufen“ oder „Bei …“', pillen.length > 0 && pillen.every((p) => !p.href || (/anisearch\.de\/article\/\d+$/.test(p.href) && /Details bei aniSearch/.test(p.text))) && !/Amazon|Kaufen|Bei /.test(ani.text()), pillen)
   await ani.abbau()
 }
 
@@ -110,7 +136,7 @@ console.log('Disc-Bereich: nur aniSearch-Ausgaben, keine Termine')
 {
   const fall = faelle['dan-da-dan']!
   const d = await zeige(fall, () => [])
-  pruefe('Zähler und Gruppen stehen auch ohne Termine', /Varianten/.test(d.text()) && d.knopf(/^Gesamtausgaben/) !== undefined, d.text())
+  pruefe('Zähler und Gruppen stehen auch ohne Termine', /Varianten/.test(d.text()) && /Gesamtausgaben/.test(d.text()) && d.knopf(/^Volumes/) !== undefined, d.text())
   await d.abbau()
 }
 
@@ -149,6 +175,15 @@ console.log('Varianten: Randfälle')
   pruefe('verschiedene Nummern bleiben getrennt', fuegeZusammen([v({ nummer: 1 }), v({ nummer: 2, name: 'Box 2' })]).length === 2)
   pruefe('istKommend: Datum ohne Tag gilt als Monatsende', istKommend('2026-09-00', '2026-09-15') && !istKommend('2026-09-00', '2026-09-30') && !istKommend(undefined, '2026-09-15'))
   pruefe('kompaktDatum: mit und ohne Tag', kompaktDatum('2025-12-12') === '12.12.25' && kompaktDatum('2026-09-00') === 'Sep 26')
+  const { formateJeDatum, zielVon } = await import('../web/src/components/detail/disc-varianten.ts')
+  const suche = { name: 'Amazon', url: 'https://www.amazon.de/s?k=Probe%20Blu-ray' }
+  const eanLink = { name: 'Amazon', url: 'https://www.amazon.de/s?k=4020628654016' }
+  const seite = { name: 'Amazon', url: 'https://www.amazon.de/dp/B0CJ3GKPHF' }
+  pruefe('zielVon: Produktseite vor EAN-Suche vor Namenssuche, gleich in welcher Reihenfolge', zielVon(v({ haendler: [suche, eanLink, seite] }))?.url === seite.url && zielVon(v({ haendler: [suche, eanLink] }))?.url === eanLink.url && zielVon(v({ haendler: [suche] }))?.haendler === 'Amazon')
+  pruefe('zielVon: ohne Händler der aniSearch-Artikel, ohne Händlernamen', JSON.stringify(zielVon(v({ quelle: artikel.quelle }))) === JSON.stringify({ url: artikel.quelle }))
+  pruefe('zielVon: Händler schlägt den Artikel; ohne beides kein Ziel', zielVon(v({ haendler: [suche], quelle: artikel.quelle }))?.url === suche.url && zielVon(v({})) === undefined)
+  pruefe('formateJeDatum: gleiches Datum zusammen, verschiedene getrennt, in Formatreihenfolge', JSON.stringify(formateJeDatum(v({ formate: ['b', 'd', 'u'], datumJe: { b: '2026-11-13', d: '2026-11-20', u: '2026-11-13' } }))) === JSON.stringify([{ datum: '2026-11-13', formate: ['b', 'u'] }, { datum: '2026-11-20', formate: ['d'] }]))
+  pruefe('formateJeDatum: Format ohne Datum bleibt stehen', JSON.stringify(formateJeDatum(v({ formate: ['b'], datumJe: {} }))) === JSON.stringify([{ datum: '', formate: ['b'] }]))
 }
 
 console.log('Ausgaben: Termin ohne Artikelbezug und aniSearch-Artikel am selben Tag sind eine Ausgabe')

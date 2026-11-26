@@ -102,7 +102,6 @@ export const TEXTE_SPAET = {
   'db.seasons': '{count} Staffeln',
   'db.episodes': '{count} Ep.',
   'where.angebote': '{count} Angebote',
-  'disc.variante': '1 Variante',
   'disc.varianten': '{n} Varianten',
   'disc.art.gesamt': 'Gesamtausgaben',
   'disc.art.box': 'Boxen',
@@ -113,10 +112,8 @@ export const TEXTE_SPAET = {
   'disc.format.d': 'DVD',
   'disc.format.u': '4K',
   'disc.alleZeigen': 'Alle {n} anzeigen',
-  'disc.kalender': 'Kalendereintrag',
-  'disc.google': 'Google',
-  'disc.datei': 'Datei (.ics)',
-  'disc.quelle': 'Quelle: aniSearch',
+  'disc.ab': 'ab {datum}',
+  'disc.details': 'Details bei aniSearch',
   'detail.noDubWatchOpen':
     'Interessiert dich dieser Titel und du möchtest direkt informiert werden, wenn es Termine gibt? Dann markier ihn mit dem ☆ und meld dich beim Newsletter an.',
   'detail.noDubWatchConnected':

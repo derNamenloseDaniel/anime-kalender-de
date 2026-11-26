@@ -33,7 +33,7 @@ assert.deepEqual(segmente.bekannt.map((b) => b.warnung), [SPRECHER], 'nur der re
 assert.deepEqual(segmente.unbekannt.map((u) => u.rest), [['Datenqualität hart rot: Klammer'], ['Crunchyroll-Folgen ohne Termin (2): Last Boss #1'], ['Neue Meldungen zurückgestellt: x']], 'unbekannter Rest wird genannt, das bekannte Segment nicht')
 const vorangestellt = { workflow: 'Bestandsbau', notiz: `Fremdtext ${SPRECHER.notiz}` }
 assert.equal(wendeBekannteAn([EINTRAG], [vorangestellt], jetzt).bekannt.length, 0, 'Muster gilt ganz: Text vor dem Satz im selben Segment bleibt sichtbar')
-const zweiter ={ ...EINTRAG, muster: 'Datenqualität hart rot: Klammer', notiz: 'Klammer bekannt' }
+const zweiter = {...EINTRAG, muster: 'Datenqualität hart rot: Klammer', notiz: 'Klammer bekannt' }
 assert.equal(wendeBekannteAn([EINTRAG, zweiter], [davor], jetzt).bekannt.length, 1, 'jedes Segment bekannt: abgenommen')
 
 // Verdrahtung: nimmBekannteAb sendet genau einmal, nur bei vollständig bekannter Warnung mit lauf_id, Token und ohne --trocken.
@@ -42,8 +42,15 @@ const fahre = async (warnungen, opt = {}) => {
   const gesendet = []
   const zeilen = []
   await nimmBekannteAb({
-    eintraege: [EINTRAG], warnungen, jetztMs: jetzt, trocken: false, token: 'T', log: (z) => zeilen.push(z),
-    senden: async (id, notiz) => gesendet.push([id, notiz]), zeigeWarnung: (w, rest) => `WARNUNG ${w.laufId}: ${rest}`, ...opt,
+    eintraege: [EINTRAG],
+    warnungen,
+    jetztMs: jetzt,
+    trocken: false,
+    token: 'T',
+    log: (z) => zeilen.push(z),
+    senden: async (id, notiz) => gesendet.push([id, notiz]),
+    zeigeWarnung: (w, rest) => `WARNUNG ${w.laufId}: ${rest}`,
+    ...opt,
   })
   return { gesendet, zeilen }
 }

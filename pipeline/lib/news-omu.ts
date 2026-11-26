@@ -11,7 +11,7 @@
  * „keine Synchro angekündigt" entfällt, sobald es ein Release desselben Anbieters gibt: Dann steht der Start
  * schon als Termin da und hat seine Meldung.
  */
-import type { NewsMeldung, Release, Title } from '../../shared/types.ts'
+import type { NewsEintrag, NewsMeldung, Release, Title } from '../../shared/types.ts'
 import { hostVon } from '../../shared/quelle.ts'
 import { ANILIST_COVER_BASIS } from '../../shared/mappings.ts'
 import { readJson, slugify } from './util.ts'
@@ -21,14 +21,13 @@ let geladen: Map<number, Ankuendigung> | undefined
 
 export function omuMeldungen(
   titles: Iterable<Title>,
-  releases: Release[],
+  _releases: Release[],
   ankuendigungen: Map<number, Ankuendigung> = (geladen ??= ankuendigungenLaden(process.cwd())),
 ): (NewsMeldung & { schluessel: string; fallback: string; titel: Title })[] {
   const raus: (NewsMeldung & { schluessel: string; fallback: string; titel: Title })[] = []
   for (const t of titles) {
     const a = t.ankuendigung ?? ankuendigungen.get(t.id)
-    if (!a) continue
-    if (a.synchro !== 'angekuendigt' && releases.some((r) => r.titleId === t.id && r.platform === a.platform && !r.widerlegt)) continue
+    if (a?.synchro !== 'angekuendigt') continue // „keine Synchro angekündigt“ ist eine Aussage über Untertitel allein: nicht für Besucher (26.11.2026)
     raus.push({
       schluessel: `omu:${t.id}:${a.platform}:${a.omuAb}`,
       fallback: a.stand,
@@ -38,7 +37,7 @@ export function omuMeldungen(
       datum: a.omuAb,
       quelle: a.quellen[0],
       belege: a.quellen.map((url) => ({ url, name: hostVon(url) })),
-      omu: a.synchro === 'angekuendigt' ? 'synchro-angekuendigt' : 'synchro-offen',
+      omu: 'synchro-angekuendigt',
     })
   }
   return raus
@@ -58,4 +57,11 @@ export function omuTitelAusKatalog(out: string): Title[] {
       slug: t.slug ?? `${slugify(t.titleEn ?? t.titleRomaji ?? String(t.id))}-${t.id}`,
       coverImage: t.coverImage && !t.coverImage.startsWith('http') ? ANILIST_COVER_BASIS + t.coverImage : t.coverImage,
     }))
+}
+
+/** Meldungen „Start mit Untertiteln, keine Synchro angekündigt“ erreichen keinen Besucher; ein Eintrag ohne Meldung fällt weg (`shared/nur-deutsch.ts`). */
+export function ohneUntertitelMeldungen(eintraege: NewsEintrag[]): NewsEintrag[] {
+  return eintraege
+    .map((e) => ({ ...e, meldungen: e.meldungen.filter((m) => m.omu !== 'synchro-offen') }))
+    .filter((e) => e.meldungen.length > 0)
 }

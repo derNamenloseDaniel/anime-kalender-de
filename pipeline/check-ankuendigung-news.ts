@@ -1,7 +1,7 @@
 /**
  * Zusicherung (Daniel, 26.10.2026, Magic Knight Rayearth): Jede Zeile `synchro: angekuendigt` in `data/ankuendigungen.yaml`
  * wird zu genau einer News-Meldung am Tag der Quelle (`stand`), mit Quelle — auch wenn der Anbieter schon ein Release hat.
- * Eine Zeile `offen` bleibt ohne Meldung, sobald es ein Release des Anbieters gibt.
+ * Eine Zeile `offen` gibt nie eine Meldung (Untertitel allein sind nichts für Besucher, 26.11.2026).
  * Aufruf: `npm run check:logic`.
  */
 import { readFileSync } from 'node:fs'
@@ -53,9 +53,7 @@ const a = (synchro: 'angekuendigt' | 'offen', platform = 'crunchyroll'): Ankuend
 const ohneEchte = new Map<number, Ankuendigung>()
 pruefe('Synchro angekündigt: Release eines anderen Anbieters ändert nichts', omuMeldungen([titel(900001, a('angekuendigt'))], [release(900001, 'primevideo')], ohneEchte).length === 1)
 pruefe('Synchro angekündigt: widerlegtes Release desselben Anbieters ändert nichts', omuMeldungen([titel(900001, a('angekuendigt'))], [release(900001, 'crunchyroll', { widerlegt: { am: '2026-09-20', grund: 'x', gemeldet: true } })], ohneEchte).length === 1)
-pruefe('Synchro offen: Release desselben Anbieters unterdrückt die Meldung weiter', omuMeldungen([titel(900002, a('offen'))], [release(900002, 'crunchyroll')], ohneEchte).length === 0)
-pruefe('Synchro offen: Release eines anderen Anbieters unterdrückt nichts', omuMeldungen([titel(900002, a('offen'))], [release(900002, 'primevideo')], ohneEchte).length === 1)
-pruefe('Synchro offen: ohne Release gibt es die Meldung', omuMeldungen([titel(900002, a('offen'))], [], ohneEchte).length === 1)
+pruefe('Synchro offen: nie eine Meldung (Untertitel allein sind nichts für Besucher, 26.11.2026)', omuMeldungen([titel(900002, a('offen'))], [], ohneEchte).length === 0 && omuMeldungen([titel(900002, a('offen'))], [release(900002, 'primevideo')], ohneEchte).length === 0)
 pruefe('Release eines anderen Titels desselben Anbieters ändert nichts', omuMeldungen([titel(900003, a('angekuendigt'))], [release(900004, 'crunchyroll')], ohneEchte).length === 1)
 
 /* Durch den echten Aufrufer: `baueNews` mit Release desselben Anbieters liefert die Meldung am Tag der Quelle. */
@@ -71,13 +69,12 @@ pruefe('baueNews: Meldung „Synchro angekündigt" am Tag der Quelle trotz Relea
 */
 const heute = todayIso()
 const fueller = Array.from({ length: 450 }, (_, i) =>
-  titel(910000 + i, { ...a('offen'), omuAb: addDays(heute, -70), stand: addDays(heute, -1 - (i % 50)) }),
+  titel(910000 + i, { ...a('angekuendigt'), omuAb: addDays(heute, -70), stand: addDays(heute, -1 - (i % 50)) }),
 )
 const alt = addDays(heute, -110)
 const frisch = [
   titel(920001, { ...a('angekuendigt'), omuAb: addDays(heute, 5), stand: alt }),
   titel(920002, { ...a('angekuendigt'), omuAb: addDays(heute, -60), stand: alt }),
-  titel(920004, { ...a('offen'), omuAb: addDays(heute, -30), stand: alt }),
 ]
 const abgelaufen = titel(920003, { ...a('angekuendigt'), omuAb: addDays(heute, -61), stand: alt })
 const voll = baueNews([...fueller.slice(0, 410), ...frisch, abgelaufen], [], [], [], { zuerst: {} })
@@ -85,7 +82,6 @@ const hat = (id: number): boolean => voll.some((e) => e.meldungen.some((m) => m.
 pruefe('Die Liste ist über der Grenze (Wächter nicht blind)', voll.length > 400, voll.length)
 pruefe('Beschnitt: frische angekündigte Synchro, Start in der Zukunft, bleibt trotz voller Liste', hat(920001))
 pruefe('Beschnitt: frische angekündigte Synchro, Start vor 60 Tagen (letzter Tag), bleibt trotz voller Liste', hat(920002))
-pruefe('Beschnitt: frische Ankündigung mit offener Synchro bleibt trotz voller Liste', hat(920004))
 pruefe('Beschnitt: abgelaufene Ankündigung (61 Tage nach Start) fällt wie jede andere Meldung', !hat(920003))
 const ueberDeckel = baueNews([...fueller, frisch[0]!], [], [], [], { zuerst: {} })
 pruefe('Deckel: bei 451 Einträgen passt auch eine frische Ankündigung nicht mehr hinein (höchstens 440)', ueberDeckel.length <= 440 && !ueberDeckel.some((e) => e.slug === 't-920001'), ueberDeckel.length)

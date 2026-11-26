@@ -111,7 +111,7 @@ type KopfEingabe = {
   relativImSatz: (datum: string) => string
   T: (k: string, v?: Record<string, string | number>) => string
   betont: (text: string) => ReactNode
-  ohneSprachbeleg: boolean | 'omu' | 'anbieter' | undefined
+  ohneSprachbeleg: boolean | 'anbieter' | undefined
   releases: Release[]
   folgenZahl: FolgenZaehlung | undefined
   staffeln?: StaffelZeile[]
@@ -275,6 +275,12 @@ function kopfDisc({ antwort, T, betont }: Omit<KopfEingabe, 'antwort'> & { antwo
 }
 
 /** Antwortart „kino“. */
+/** Die Fassung des Kinostarts in Worten; „nur OmU“ nennt die Seite nicht (`shared/nur-deutsch.ts`). */
+function kinoFassungText(fassung: 'synchro' | 'omu' | 'beides' | undefined, T: KopfEingabe['T']): string | undefined {
+  if (!fassung || fassung === 'omu') return undefined
+  return T('antwort.kinoFassungSynchro') // „beides“ nennt nur den deutschen Teil
+}
+
 function kopfKino({ antwort, T }: Omit<KopfEingabe, 'antwort'> & { antwort: Extract<Antwort, { art: 'kino' }> }): KopfTeile {
   let haupt: ReactNode, neben: string, anteil: number | undefined, zaehl: ReactNode, fakten: Fakt[] | undefined, gedaempft = false, nebenTitel: string | undefined
   const { land, adj } = KINO_LAND[antwort.land]!
@@ -289,15 +295,7 @@ function kopfKino({ antwort, T }: Omit<KopfEingabe, 'antwort'> & { antwort: Extr
     Die Nebenzeile sagt, was zum deutschen Kinostart bekannt ist — Termin oder
     Zeitraum, Verleih, Fassung —, so viel davon eben belegt ist.
   */
-  const fassung = antwort.fassung
-    ? T(
-        antwort.fassung === 'omu'
-          ? 'antwort.kinoFassungOmu'
-          : antwort.fassung === 'synchro'
-            ? 'antwort.kinoFassungSynchro'
-            : 'antwort.kinoFassungBeides',
-      )
-    : undefined
+  const fassung = kinoFassungText(antwort.fassung, T)
   neben =
     antwort.deTermin || antwort.deZeitraum
       ? [
@@ -340,15 +338,7 @@ function kopfFilmDe({ antwort, T }: Omit<KopfEingabe, 'antwort'> & { antwort: Ex
         (antwort.kino.raus
           ? antwort.stream.datum > antwort.kino.datum
           : antwort.stream.datum < antwort.kino.datum)))
-  const fassung = antwort.fassung
-    ? T(
-        antwort.fassung === 'omu'
-          ? 'antwort.kinoFassungOmu'
-          : antwort.fassung === 'synchro'
-            ? 'antwort.kinoFassungSynchro'
-            : 'antwort.kinoFassungBeides',
-      )
-    : undefined
+  const fassung = kinoFassungText(antwort.fassung, T)
   if (gleich) {
     haupt = T(antwort.kino!.raus ? 'antwort.filmDeBeideSeit' : 'antwort.filmDeBeideAb', {
       datum: formatDate(antwort.kino!.datum),
@@ -434,7 +424,7 @@ function kopfOhne({ antwort, T, title }: Omit<KopfEingabe, 'antwort'> & { antwor
     **Ein angekündigter Simulcast gehört in die Antwort** (Daniel an Magic Knight Rayearth 2026,
     25.09.2026: „dann sollte im detail panel stehen, für wann genau das angekündigt ist … wichtigste
     infos auf einen blick"). Ist eine Synchro angekündigt, ist das die Antwort auf die Frage des
-    Kastens; der OmU-Start und der offene Termin stehen darunter.
+    Kastens; der offene Termin steht darunter.
   */
   const ankuendigung = title.westlich || ankuendigungOhneTermin(title, antwort.art) ? undefined : title.ankuendigung
   haupt = title.westlich

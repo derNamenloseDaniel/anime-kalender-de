@@ -1,4 +1,3 @@
-import { omuZeile } from '@shared/ankuendigung.ts'
 import { formatDate } from '@shared/time.ts'
 import { PLATFORMS, type Title } from '@shared/types.ts'
 import type { Translate } from '../../lib/i18n.tsx'
@@ -41,7 +40,7 @@ function BescheidKnopf({ gemerkt, onToggle, verbindung, t }: { gemerkt: boolean;
   )
 }
 
-/** Eine eigene Karte unter dem Kasten: Anbieter (Link zur Serie), Stand mit Quelle, Start mit Untertiteln und der Knopf, der wie das ☆ im Kopf merkt. */
+/** Eine eigene Karte unter dem Kasten: Anbieter (Link zur Serie), Stand mit Quelle und der Knopf, der wie das ☆ im Kopf merkt. */
 export function TerminOffenKarte({ title, ankuendigung: a, gemerkt, onToggleFavorite, verbindung, t }: {
   title: Title
   ankuendigung: Ankuendigung
@@ -51,7 +50,6 @@ export function TerminOffenKarte({ title, ankuendigung: a, gemerkt, onToggleFavo
   t: Translate
 }) {
   const anbieter = PLATFORMS[a.platform]?.name ?? a.platform
-  const omu = omuZeile(a, t as never)
   const quelle = synchroQuelle(a)
   return (
     <PanelKarte symbol={<GlockeZeichen />} titel={t('termin.titel')} akzent="akzent">
@@ -70,7 +68,6 @@ export function TerminOffenKarte({ title, ankuendigung: a, gemerkt, onToggleFavo
             </>
           )}
         </p>
-        <p className={LEISE}>{omu.charAt(0).toUpperCase() + omu.slice(1)}.</p>
         <BescheidKnopf gemerkt={gemerkt} onToggle={() => onToggleFavorite(title.id)} verbindung={verbindung} t={t} />
       </div>
     </PanelKarte>

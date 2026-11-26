@@ -77,7 +77,7 @@ const wurzel = createRoot(dom.wurzel as unknown as Element)
 async function panelText(id: number): Promise<string> {
   const t = titel(id)
   const r = s4(id)
-  const data = { titles: [t], titleById: new Map([[id, t]]), releases: [r], releaseBySlug: new Map([[r.slug, r]]), events: [], eventsByDate: new Map(), releasesByTitle: new Map([[id, [r]]]), meta: {} }
+  const data = { titles: [t], titleById: new Map([[id, t]]), releases: [r], releaseBySlug: new Map([[r.slug, r]]), events: [], eventsByDate: new Map(), nurUntertitelByTitle: new Map(), releasesByTitle: new Map([[id, [r]]]), meta: {} }
   const e = { data, titleId: id, favorites: new Set(), hidden: new Set(), onToggleFavorite() {}, onToggleHidden() {}, onClose() {}, onFilterBy() {}, onOpenTitle() {} }
   await act(async () => wurzel.render(h(DetailPanel as never, e as never)))
   /* Verzeichnis, dann Liste: zwei Abrufe nacheinander, erst danach steht die Zeile. */

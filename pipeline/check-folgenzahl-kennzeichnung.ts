@@ -75,6 +75,15 @@ pruefe('Kasten belegt: „Alle N“ unverändert', fertigZahlText(12, false, t a
 pruefe('Kasten und Pille stimmen überein (abgeleitet)', pille(beendet, ohneBereiche).startsWith('≈') === (kastenAbgeleitet?.gesamtAbgeleitet === true))
 pruefe('Kasten und Pille stimmen überein (belegt)', pille(beendet, mitBereichen).startsWith('≈') === (kastenBelegt?.gesamtAbgeleitet === true))
 
+/* Nennt ein Release des Anbieters die Zahl belegt (Anbieter, Erweiterung), ist sie keine Zahl des Werks (Call of the Night, 26.11.2026). */
+const abwurf = (extra: Record<string, unknown> = {}): Release =>
+  ({ slug: 'abwurf', titleId: 1, platform: 'netflix', releaseType: 'batch', schedule: { firstEpisodeDate: '2019-12-21', episodeCount: 12, ...extra } }) as unknown as Release
+const mitAbwurf = [abwurf()]
+pruefe('Release belegt die Zahl: Pille ohne „≈“', pille(beendet, ohneBereiche, mitAbwurf) === `${ZAHL}{"n":12}`, pille(beendet, ohneBereiche, mitAbwurf))
+pruefe('Release belegt die Zahl: Kasten belegt', kastenFertig(bebop(ohneBereiche), mitAbwurf)?.gesamtAbgeleitet === false)
+const angenommen = [abwurf({ episodeCountAssumed: true })]
+pruefe('Angenommene Release-Zahl belegt nichts: Pille mit „≈“', pille(beendet, ohneBereiche, angenommen).startsWith('≈'), pille(beendet, ohneBereiche, angenommen))
+
 if (fehler) {
   console.error(`${fehler} Prüfung(en) fehlgeschlagen`)
   process.exit(1)

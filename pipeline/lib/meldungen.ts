@@ -393,6 +393,9 @@ const SPRACH_NOTIZ: Partial<Record<Sprachbefund, string>> = {
   offen: 'Termin laut Quelle – ob mit deutscher Synchro, ist dort noch offen.',
 }
 
+/** Die Hinweistexte aus `SPRACH_NOTIZ`: `deutsch-belegt-klaeren.ts` nimmt sie zurück, sobald Deutsch belegt ist. */
+export const SPRACH_NOTIZEN: readonly string[] = Object.values(SPRACH_NOTIZ)
+
 function sprachHinweis(sprache: Sprachbefund, platform: string): Pick<Release, 'hinweis' | 'sprache'> {
   const hinweis = platform === 'disc' ? undefined : SPRACH_NOTIZ[sprache]
   return hinweis ? { hinweis, sprache: 'offen' } : {}

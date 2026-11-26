@@ -4,10 +4,11 @@
  * Anlass (05.10.2026): Der Wochenlauf verlor am Ende 107 Minuten Abrufe, weil ein Workflow auf main geändert worden war.
  */
 import { spawnSync } from 'node:child_process'
-import { chmodSync, copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import YAML from 'yaml'
 import { ohneCiToken } from './bau-umgebung.mjs'
 
 const fehler = []
@@ -148,7 +149,7 @@ case "$1 $2" in
   "pr list") [ -f "$D/schon-da" ] && echo "https://github.com/x/y/pull/88"
     if [ -f "$D/da-ab" ] && [ "$(wc -l < "$D/create-aufrufe")" -ge "$(cat "$D/da-ab")" ]; then echo "https://github.com/x/y/pull/77"; fi
     exit 0 ;;
-  "pr view") echo "MERGEABLE" ;;
+  "pr view") case "$*" in *state*) [ -f "$D/view-fehler" ] && exit 1; echo OPEN ;; *) echo MERGEABLE ;; esac ;;
   "pr merge") echo x >> "$D/merge-aufrufe"
     if [ -f "$D/merge-fehler" ] && [ "$(wc -l < "$D/merge-aufrufe")" -le "$(cat "$D/merge-fehler")" ]; then echo "HTTP 502: Bad Gateway (Merge $(wc -l < "$D/merge-aufrufe"))" >&2; exit 1; fi
     exit 0 ;;
@@ -183,11 +184,81 @@ esac
   // 502 beim dritten create, der PR entstand trotzdem (Läufe 45650281762 und 45650286140, 25.11.2026): übernehmen statt ::error::.
   const letzter = anlegen(4, 3, false, 3)
   pruefe('PR-Anlegen: nach dem dritten Fehlversuch wird ein entstandener PR übernommen und gemergt', letzter.status === 0 && letzter.aufrufe === 3 && /pr=77/.test(letzter.ausgabe) && /gemerged=true/.test(letzter.ausgabe) && !/::error::/.test(letzter.out), `${letzter.status} ${letzter.aufrufe} ${letzter.ausgabe} ${letzter.out.slice(-300)}`)
-  // 502 beim Merge: der echte Grund steht im Log, nicht „main hat sich bewegt“.
+  // 502 beim Merge: der echte Grund steht im Log, nicht „main hat sich bewegt“ (auch im Rot-Zweig nach erschöpften Pausen).
   const mergeEinmal = anlegen(5, 0, false, 0, 1)
-  pruefe('Merge: ein 502 wird mit seinem Text gemeldet, nicht als „main hat sich bewegt“', mergeEinmal.status === 0 && mergeEinmal.merges === 2 && /abgelehnt: HTTP 502: Bad Gateway \(Merge 1\)/.test(mergeEinmal.out) && !/main hat sich bewegt/.test(mergeEinmal.out) && /gemerged=true/.test(mergeEinmal.ausgabe), `${mergeEinmal.status} ${mergeEinmal.merges} ${mergeEinmal.out.slice(-400)}`)
-  const mergeImmer = anlegen(6, 0, false, 0, 6)
-  pruefe('Merge: sechs 502 enden rot, der letzte Text steht im ::error::', mergeImmer.status !== 0 && mergeImmer.merges === 6 && /::error::.*Merge 6\)/.test(mergeImmer.out) && /gemerged=false/.test(mergeImmer.ausgabe) && /pr=99/.test(mergeImmer.ausgabe), `${mergeImmer.status} ${mergeImmer.merges} ${mergeImmer.out.slice(-400)}`)
+  pruefe('Merge: ein 502 wird mit seinem Text gemeldet, nicht als „main hat sich bewegt“', mergeEinmal.status === 0 && mergeEinmal.merges === 2 && /Serverfehler \(HTTP 502: Bad Gateway \(Merge 1\)\)/.test(mergeEinmal.out) && !/main hat sich bewegt/.test(mergeEinmal.out) && /gemerged=true/.test(mergeEinmal.ausgabe), `${mergeEinmal.status} ${mergeEinmal.merges} ${mergeEinmal.out.slice(-400)}`)
+  const mergeImmer = anlegen(6, 0, false, 0, 99)
+  pruefe('Merge: dauerhaft 502 endet rot nach fünf Versuchen, der echte Grund steht im ::error::', mergeImmer.status !== 0 && mergeImmer.merges === 5 && /::error::.*zuletzt: HTTP 502: Bad Gateway \(Merge 5\)/.test(mergeImmer.out) && /gemerged=false/.test(mergeImmer.ausgabe) && /pr=99/.test(mergeImmer.ausgabe), `${mergeImmer.status} ${mergeImmer.merges} ${mergeImmer.out.slice(-400)}`)
+  // Die Zustandsabfrage vor dem nächsten Versuch scheitert selbst (leere Antwort): kein gemerged=true aus dem Nichts, es wird weiter versucht.
+  writeFileSync(join(bin2, 'view-fehler'), '')
+  const abfrageWeg = anlegen(7, 0, false, 0, 99)
+  pruefe('Merge: scheiternde Zustandsabfrage gilt nicht als gemergt, alle fünf Versuche laufen, rot', abfrageWeg.status !== 0 && abfrageWeg.merges === 5 && /gemerged=false/.test(abfrageWeg.ausgabe) && !/gemerged=true/.test(abfrageWeg.ausgabe), `${abfrageWeg.status} ${abfrageWeg.merges} ${abfrageWeg.out.slice(-300)}`)
+  rmSync(join(bin2, 'view-fehler'), { force: true })
+
+  // `gh pr merge` scheitert mit GitHub-5xx (Lauf 45650281762, 25.11.2026: über 2 Minuten 502/„Something went wrong"): wachsende Pausen, vor jedem neuen Versuch Zustand lesen;
+  // „Base branch was modified" bleibt bei kurzen Pausen und sechs Versuchen.
+  const bin3 = join(dir, 'bin3')
+  mkdirSync(bin3)
+  writeFileSync(join(bin3, 'sleep'), '#!/bin/sh\necho "$1" >> "$(dirname "$0")/pausen"\n')
+  writeFileSync(
+    join(bin3, 'gh'),
+    `#!/bin/sh
+D="$(dirname "$0")"
+case "$1 $2" in
+  "pr create") for a in "$@"; do printf '%s\\n' "$a"; done > "$D/create-args"; echo "https://github.com/x/y/pull/99" ;;
+  "pr list") exit 0 ;;
+  "pr view") case "$*" in *state*) [ -f "$D/gemergt" ] && echo MERGED || echo OPEN ;; *) echo MERGEABLE ;; esac ;;
+  "pr merge") echo x >> "$D/merge-aufrufe"
+    if [ "$(wc -l < "$D/merge-aufrufe")" -le "$(cat "$D/merge-fehler")" ]; then cat "$D/merge-meldung" >&2; exit 1; fi
+    exit 0 ;;
+esac
+`,
+  )
+  chmodSync(join(bin3, 'gh'), 0o755)
+  chmodSync(join(bin3, 'sleep'), 0o755)
+  const mergen = (nr, { fehler, meldung, gemergt = false, nachricht = `chore(data): mergen ${nr}`, faktor = '' }) => {
+    for (const d of ['merge-aufrufe', 'pausen', 'gemergt', 'create-args']) rmSync(join(bin3, d), { force: true })
+    writeFileSync(join(bin3, 'merge-aufrufe'), '')
+    writeFileSync(join(bin3, 'merge-fehler'), String(fehler))
+    writeFileSync(join(bin3, 'merge-meldung'), meldung)
+    if (gemergt) writeFileSync(join(bin3, 'gemergt'), '')
+    writeFileSync(join(lauf, 'data/cinestar.json'), `{"mergen":${nr}}`)
+    const aus = join(dir, `ausgabe-m${nr}.txt`)
+    writeFileSync(aus, '')
+    const res = sh(lauf, `PATH="${posix(bin3)}:$PATH" ${faktor} GITHUB_OUTPUT="${posix(aus)}" GITHUB_RUN_ID=9${nr} QUELLEN_PRUEFBEFEHL=true bash tools/quellen-pr.sh "$NACHRICHT"`, { NACHRICHT: nachricht })
+    const lies = (d) => (readFileSync(join(bin3, d), 'utf8').split('\n').filter(Boolean))
+    return { ...res, aufrufe: lies('merge-aufrufe').length, pausen: lies('pausen').filter((p) => Number(p) >= 3).join(','), ausgabe: readFileSync(aus, 'utf8') }
+  }
+  const zweiMal502 = mergen(1, { fehler: 2, meldung: 'non-200 OK status code: 502 Bad Gateway body: "<html>"' })
+  pruefe('Merge: zweimal 502, dann Erfolg → gemerged=true nach drei Versuchen', zweiMal502.status === 0 && zweiMal502.aufrufe === 3 && /gemerged=true/.test(zweiMal502.ausgabe), `${zweiMal502.status} ${zweiMal502.aufrufe} ${zweiMal502.out.slice(-300)}`)
+  pruefe('Merge: 5xx-Pausen wachsen (15, 30 s)', zweiMal502.pausen === '15,30', zweiMal502.pausen)
+  const wasWrong = mergen(2, { fehler: 1, meldung: 'GraphQL: Something went wrong while executing your query on 2026-11-25T16:08:29Z. Please include `D8E7` when reporting this issue.' })
+  pruefe('Merge: „Something went wrong while executing your query" zählt als Serverfehler', wasWrong.pausen === '15' && /gemerged=true/.test(wasWrong.ausgabe), `${wasWrong.pausen} ${wasWrong.out.slice(-200)}`)
+  const schonGemergt = mergen(3, { fehler: 9, meldung: 'HTTP 502: Bad Gateway', gemergt: true })
+  pruefe('Merge: 502, PR aber schon gemergt → kein weiterer Versuch, gemerged=true', schonGemergt.status === 0 && schonGemergt.aufrufe === 1 && /gemerged=true/.test(schonGemergt.ausgabe), `${schonGemergt.status} ${schonGemergt.aufrufe} ${schonGemergt.out.slice(-300)}`)
+  const immer502 = mergen(4, { fehler: 99, meldung: 'HTTP 503: Service Unavailable' })
+  pruefe('Merge: dauerhaft 5xx → fünf Versuche (vier Pausen 15/30/60/120 s), dann rot', immer502.status !== 0 && immer502.aufrufe === 5 && immer502.pausen === '15,30,60,120' && /gemerged=false/.test(immer502.ausgabe), `${immer502.status} ${immer502.aufrufe} ${immer502.pausen}`)
+  const ohnePause = mergen(5, { fehler: 1, meldung: 'HTTP 502: Bad Gateway', faktor: 'QUELLEN_PAUSE_FAKTOR=0' })
+  pruefe('Merge: QUELLEN_PAUSE_FAKTOR=0 stellt die 5xx-Pause auf 0 s', ohnePause.aufrufe === 2 && /^0$/m.test(readFileSync(join(bin3, 'pausen'), 'utf8')), readFileSync(join(bin3, 'pausen'), 'utf8'))
+  const basis = mergen(6, { fehler: 99, meldung: 'GraphQL: Base branch was modified. Review and try the merge again.' })
+  pruefe('Merge: „Base branch was modified" bleibt kurz: sechs Versuche, keine Pause ab 15 s', basis.status !== 0 && basis.aufrufe === 6 && !/(^|,)(15|30|60|120)(,|$)/.test(basis.pausen) && /Merge-Versuch 6 von 6 abgelehnt/.test(basis.out), `${basis.status} ${basis.aufrufe} ${basis.pausen}`)
+  pruefe('Merge: die Meldung der Nicht-5xx-Ablehnung nennt den echten Grund', /abgelehnt: GraphQL: Base branch was modified/.test(basis.out), basis.out.slice(-300))
+  const nachBasis = mergen(7, { fehler: 2, meldung: 'GraphQL: Base branch was modified. Review and try the merge again.' })
+  pruefe('Merge: zweimal „Base branch was modified", dann Erfolg', nachBasis.aufrufe === 3 && /gemerged=true/.test(nachBasis.ausgabe), `${nachBasis.aufrufe} ${nachBasis.out.slice(-200)}`)
+
+  // Text-Zweig der Aktion `einreichen`: die Nachricht kommt über env, nie in den Skripttext (ein `"` würde sonst Code mit dem App-Token ausführen).
+  const aktion = YAML.parse(readFileSync(join(wurzel, '.github/actions/einreichen/action.yml'), 'utf8'))
+  const schritt = aktion.runs.steps.find((s) => s.id === 'pr')
+  pruefe('Aktion einreichen: der Schritt `pr` setzt keinen Ausdruck in den Skripttext', typeof schritt?.run === 'string' && !schritt.run.includes('${{'), schritt?.run)
+  pruefe('Aktion einreichen: die Nachricht kommt über env NACHRICHT und wird in Anführungszeichen übergeben', schritt?.env?.NACHRICHT === '${{ inputs.nachricht }}' && /quellen-pr\.sh "\$NACHRICHT"/.test(schritt?.run ?? ''), schritt)
+  const boese = `fund "x"; touch "${posix(dir)}/PWNED1"; echo '$(touch ${posix(dir)}/PWNED2)' \`touch ${posix(dir)}/PWNED3\` \\"`
+  writeFileSync(join(bin3, 'merge-aufrufe'), '')
+  writeFileSync(join(bin3, 'merge-fehler'), '0')
+  writeFileSync(join(lauf, 'data/cinestar.json'), '{"aktion":1}')
+  const ra = sh(lauf, `PATH="${posix(bin3)}:$PATH" GITHUB_RUN_ID=961 QUELLEN_PRUEFBEFEHL=true ${schritt.run}`, { NACHRICHT: boese })
+  const createArgs = readFileSync(join(bin3, 'create-args'), 'utf8').split('\n')
+  pruefe('Aktion einreichen: Anführungszeichen und Shell-Zeichen der Nachricht landen unverändert als Titel', ra.status === 0 && createArgs[createArgs.indexOf('--title') + 1] === boese, createArgs)
+  pruefe('Aktion einreichen: die Nachricht schleust keinen Code ein', !['PWNED1', 'PWNED2', 'PWNED3'].some((n) => existsSync(join(dir, n))), ra.out.slice(-300))
 } finally {
   rmSync(dir, { recursive: true, force: true })
 }

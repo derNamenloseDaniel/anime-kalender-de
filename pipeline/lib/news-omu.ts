@@ -1,15 +1,13 @@
 /**
- * **OmU-Starts angekündigter Serien als Meldung** (Daniel, 03.10.2026, an „Dragon Ball Super: Beerus").
+ * **„Synchro angekündigt" als Meldung** (Daniel, 03.10.2026, an „Dragon Ball Super: Beerus").
  *
  * `data/ankuendigungen.yaml` führt Simulcasts, die Crunchyroll vor dem deutschen Start nennt („OmU: 11.10.",
- * „DE: TBA"). Sie sind kein Kalendertermin — aber eine Nachricht mit Quelle: Wer die Serie sucht, soll lesen
- * können, dass sie zuerst nur mit Untertiteln kommt und ob eine Synchro angekündigt ist. Die Meldung steht
+ * „DE: TBA"). Sie sind kein Kalendertermin — aber eine Nachricht mit Quelle: dass eine Synchro angekündigt ist. Die Meldung steht
  * am Tag der Quelle (`stand`), nicht am Tag, an dem der Start liegt. Nennt die Quelle nur den Monat („JJJJ-MM",
  * PSYREN), steht der Monat in der Meldung: „Synchro angekündigt" hat seinen Beleg auch ohne Starttag (10.10.2026).
  *
- * „Synchro angekündigt" ist eine eigene Aussage mit eigenem Tag und gilt immer (Daniel, 26.10.2026). Die Meldung
- * „keine Synchro angekündigt" entfällt, sobald es ein Release desselben Anbieters gibt: Dann steht der Start
- * schon als Termin da und hat seine Meldung.
+ * „Synchro angekündigt" ist eine eigene Aussage mit eigenem Tag und gilt immer (Daniel, 26.10.2026). Eine Zeile mit offener Synchro
+ * gibt keine Meldung: Sie wäre eine Aussage über Untertitel allein, und die Seite führt nur deutsche Fassungen (26.11.2026).
  */
 import type { NewsEintrag, NewsMeldung, Release, Title } from '../../shared/types.ts'
 import { hostVon } from '../../shared/quelle.ts'

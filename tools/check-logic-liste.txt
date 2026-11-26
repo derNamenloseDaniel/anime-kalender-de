@@ -29,6 +29,7 @@ pipeline/check-adn-news-lauf.ts
 pipeline/check-adn-news-serien.ts
 pipeline/check-adn-offen-wache.ts
 pipeline/check-adn-spanne.ts
+pipeline/check-adn-mehrfachstart.ts
 pipeline/check-adn-sprache-offen.ts
 pipeline/check-adn-sprachriegel-lauf.ts
 pipeline/check-adn-sprachriegel.ts

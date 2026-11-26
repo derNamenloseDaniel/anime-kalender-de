@@ -10,7 +10,7 @@ export function slotAufStaffelzaehlung(slot: CrunchyrollEntry, ab: number | unde
   if (!ab || ab <= 1) return slot
   const um = (n: number | undefined) => (n === undefined ? undefined : n - ab + 1)
   const beobachtungen = (slot.observations ?? []).flatMap((o) => (o.episode && o.episode < ab ? [] : [{ ...o, episode: um(o.episode) }]))
-  return { ...slot, observations: beobachtungen, earliest: slot.earliest && { ...slot.earliest, episode: um(slot.earliest.episode) } } as CrunchyrollEntry
+  return { ...slot, observations: beobachtungen, earliest: slot.earliest && (slot.earliest.episode && slot.earliest.episode < ab ? undefined : { ...slot.earliest, episode: um(slot.earliest.episode) }) } as CrunchyrollEntry
 }
 
 const TAGE = (a: string, b: string) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5)

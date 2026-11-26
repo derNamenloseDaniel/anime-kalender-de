@@ -23,6 +23,7 @@ import { baueAuslieferung } from './13-2-auslieferung.ts'
 import { anisearchKennungen } from './anisearch-kennung.ts'
 import { schreibeSynopsenUndReichereAn } from './13-1-anreichern.ts'
 import { belegeJoynTermine } from './13-1-joyn-termine-belegt.ts'
+import { leiteJoynAusTv } from './13-1-joyn-aus-tv.ts'
 import { mitBelegstaerke } from '../lib/belegstaerke.ts'
 import { ergaenzeEigeneHandlungen } from './handlung-eigen-einbinden.ts'
 import { ergaenzeDeutscheFolgenzahl } from './deutsche-folgenzahl-einbinden.ts'
@@ -78,6 +79,9 @@ export function schreibeDatensatz({
     releases,
     kanalJeAdresse,
   })
+
+  const joynAusTv = leiteJoynAusTv(releases, events)
+  if (joynAusTv.length) log(`${joynAusTv.length} Joyn-Termin(e) aus dem belegten TV-Sendeplan abgeleitet: ${joynAusTv.join(', ')}`)
 
   const joynBelegt = belegeJoynTermine(allTitles, releases, events)
   if (joynBelegt) log(`${joynBelegt} Joyn-Termin(e) ohne ≈: Tag aus belegtem Plan, Uhrzeit = Sendeende (abgeleitet)`)

@@ -25,6 +25,7 @@ import { beobachtetOhneTermin } from './folge-ueber-anzahl.ts'
 import { discTerminFehler, type DiscPruefQuellen } from './disc-anisearch-datum.ts'
 import { sichtungsZeilen } from './sichtungsfenster.ts'
 import { crWegDoppelt } from './cr-doppelter-weg.ts'
+import { joynHinterTv, belegvermerkImHinweis } from './joyn-folgen-aus-tv.ts'
 
 export interface Pruefergebnis {
   fehler: string[]
@@ -270,6 +271,8 @@ function schlussFehler(releases: Release[], events: ReleaseEvent[], titles: Map<
     ...geteilteWegeTrotzWiderlegung(releases, titles),
     ...premiereFehler(releases),
     ...beobachtetOhneTermin(releases, events),
+    ...joynHinterTv(releases, events, heute),
+    ...belegvermerkImHinweis(releases),
   ]
 }
 

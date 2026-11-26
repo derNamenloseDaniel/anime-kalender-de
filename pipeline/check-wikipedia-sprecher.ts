@@ -75,6 +75,11 @@ pruefe('rowspan 3: der letzte Unterkopf zählt', lesen('{| class="wikitable"\n! 
 pruefe('rowspan in der Kopfzelle hinter der kürzeren Folgezeile endet nach einer Zeile', lesen('{| class="wikitable"\n! Rolle !! rowspan="2"| Deutsch\n|-\n! Sub\n|-\n! a !! b\n|-\n| A || Anna\n|}') === 'A=Anna[b]')
 pruefe('Spaltenzusatz und <small> werden mit Komma verbunden', lesen('{| class="wikitable"\n! rowspan="2"| Rolle !! Deutsch\n|-\n! Alt\n|-\n| A || Anna <small>(Film)</small>\n|}') === 'A=Anna[Alt, Film]')
 
+console.log('Kopfzellen: Abkürzungen, Fettdruck, Fortsetzungszeile mit ||')
+pruefe('„Deu. Synchronsprecher“ (Made in Abyss) zählt als deutsche Spalte', lesen('{| class="wikitable"\n!Rolle\n!Jap. Synchronsprecher\n!Deu. Synchronsprecher\n|-\n|Riko\n|Ja\n|Anna\n|}') === 'Riko=Anna[]')
+pruefe('„dt. Stimme“ unter „Anime“ (Mob Psycho 100) zählt, Bühnenstück und Realserie nicht', lesen('{| class="wikitable"\n! rowspan="2"| Rolle || colspan="2"| Anime || colspan="2"| Darsteller\n|-\n! jap. Stimme || dt. Stimme || Bühnenstück || Realserie\n|-\n| A || Ja || Anna || Bü || Re\n|}') === 'A=Anna[]')
+pruefe('Kopfzelle in Fettdruck („\'\'\'Deutsche Stimme\'\'\'“) auf Fortsetzungszeile mit ||', lesen('{| class="wikitable" \n! Rolle || Japanische Stimme\n  || \'\'\'Deutsche Stimme\'\'\'\n|-\n| A || Ja\n| Anna\n|}') === 'A=Anna[]')
+
 console.log('Handliste')
 type Eintrag = { seite: string; fixture: string; titel: { id: number; fassung?: string }[] }
 const liste = yaml.load(readFileSync(join(REPO, 'data', 'wikipedia-sprecher-seiten.yaml'), 'utf8')) as Eintrag[]

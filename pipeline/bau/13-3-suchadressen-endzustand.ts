@@ -36,8 +36,10 @@ export function logzeileBeantwortete(offen: OffeneSuche[], uebrig: OffeneSuche[]
   return `Suchadressen-Liste: ${weg.length} von ${offen.length} Einträgen im Endzustand beantwortet${weg.length ? ` — z. B. ${beispiele}` : ''}`
 }
 
-export function schreibeSuchadressenImEndzustand(offen: OffeneSuche[], slim: SlimTitel[]): void {
+/** `terminSuchen` (Prime-Pillen ohne Titelseite) bleiben stehen, auch wenn der Titel eine Prime-Seite eines anderen Kanals trägt: die Pille sucht, der Kanal ist unbeantwortet. */
+export function schreibeSuchadressenImEndzustand(offen: OffeneSuche[], slim: SlimTitel[], terminSuchen: OffeneSuche[] = []): void {
   const uebrig = suchenOhneTitelseite(offen, slim)
+  for (const s of terminSuchen) if (!uebrig.some((e) => e.id === s.id && e.plattform === s.plattform)) uebrig.push(s)
   console.log(logzeileBeantwortete(offen, uebrig))
   schreibeSuchadressen(uebrig)
 }

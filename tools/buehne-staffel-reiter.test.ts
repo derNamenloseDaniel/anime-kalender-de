@@ -175,7 +175,8 @@ assert.deepEqual(reiterVon(hs, [], HEUTE, { 2: 'Orange-Liga' }).map((r) => r.nam
 // Tooltip (Daniel 24.11. 20:25): der Reiter trägt den ungekürzten Yaml-Namen als title, ohne Namen „Staffel N“.
 assert.deepEqual(hzReiter.map((r) => r.voll), ['1', '2', '3', '4'].map((nr) => hz.sn![nr]), 'Horizonte: voller Name')
 const hzZeile = renderToStaticMarkup(createElement(ReiterZeile, { reiter: hzReiter, aktiv: 0, kennung: 'hz', beiWahl: () => {} }))
-for (const nr of ['1', '2', '3', '4']) assert.ok(hzZeile.includes(`title="${hz.sn![nr]}"`), `Tooltip Staffel ${nr}: ${hz.sn![nr]}`)
+// Der Tooltip beginnt mit dem Namen; die Zeile zur Marke prüft pipeline/check-reiter-lage-grund.ts.
+for (const nr of ['1', '2', '3', '4']) assert.ok(hzZeile.includes(`title="${hz.sn![nr]}`), `Tooltip Staffel ${nr}: ${hz.sn![nr]}`)
 assert.match(zeile, /title="Staffel 1"/, 'ohne sn: Tooltip „Staffel N“')
 assert.equal((zeile.match(/ title="/g) ?? []).length, 5, 'jeder Reiter hat einen Tooltip')
 // Grenzen der Kürzung: ein einzelner Name, verschiedene Serienteile, Name ohne Rest, fremde Staffelnummer bleiben ganz.

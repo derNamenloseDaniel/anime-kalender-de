@@ -1,4 +1,4 @@
-import { titleStatus, type StaffelLage } from '@shared/logic.ts'
+import { expandEvents, fruehesterTermin, titleStatus, type LageMitGrund, type StaffelLage } from '@shared/logic.ts'
 import { anzeigeName, hauptstaffeln, staffelBeschriftungen, staffelStaende } from '@shared/titles.ts'
 import type { FranchiseMember, Release, Title } from '@shared/types.ts'
 import { ohneDeutscheSynchro } from './reihen-teil.ts'
@@ -96,10 +96,15 @@ function gesichtetBis(release: Release): number {
  * bekannte Folgenzahl, deren erste Folge erschien, läuft noch (der Status des Titels kennt kein offenes Ende).
  */
 export function reihenLageVon(titel: Title, releases: Release[], today: string): StaffelLage {
+  return reihenLageMitGrund(titel, releases, today).lage
+}
+
+/** Wie `reihenLageVon`, dazu der früheste künftige Termin der Releases, die die Marke bestimmen (auch eine kommende Disc). */
+export function reihenLageMitGrund(titel: Title, releases: Release[], today: string): LageMitGrund {
   const ende = titel.staffelTitel ? staffelEnde(titel) : 0
   const offen = ende > 0 ? releases.filter((r) => gesichtetBis(r) < ende) : releases
   const status = titleStatus(offen, today, titel)
-  if (status === 'airing') return 'laeuft'
-  if (status === 'tba') return 'kommt'
-  return status === 'abgeschlossen' && titel.episodes === undefined ? 'laeuft' : 'ruht'
+  const lage: StaffelLage = status === 'airing' ? 'laeuft' : status === 'tba' ? 'kommt' : status === 'abgeschlossen' && titel.episodes === undefined ? 'laeuft' : 'ruht'
+  if (lage === 'ruht') return { lage }
+  return { lage, grund: fruehesterTermin(offen.flatMap((r) => expandEvents(r).map((e) => ({ r, e }))), today) }
 }

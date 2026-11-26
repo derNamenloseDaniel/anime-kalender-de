@@ -1,11 +1,12 @@
 import { createContext, useContext, useEffect, useRef, type KeyboardEvent, type ReactNode } from 'react'
-import type { StaffelLage } from '@shared/logic.ts'
+import type { LageMitGrund } from '@shared/logic.ts'
 import type { Dataset } from '../../lib/data.ts'
 import { kastenKlassen, kastenKopfVon, useKastenZustand } from './antwort-kasten-zustand.tsx'
 import type { AntwortKastenProps } from './antwort-kasten-props.ts'
-import { reihenLageVon, type ReihenReiter } from './reihen-reiter-liste.ts'
+import { reihenLageMitGrund, type ReihenReiter } from './reihen-reiter-liste.ts'
 import { ReiterPfeil, rolleUm, usePfeilLage } from './staffel-pfeile.tsx'
-import { Akzentstrich, LAGE_WORT, LageMarke, LEISTE, LEISTE_HUELLE, naechsterReiter, reiterKlassen, zeigeGewaehlten } from './staffel-reiter.tsx'
+import { Akzentstrich, LAGE_WORT, LageMarke, LEISTE, LEISTE_HUELLE, naechsterReiter, reiterKlassen, reiterTitel, zeigeGewaehlten } from './staffel-reiter.tsx'
+import { useLang } from '../../lib/i18n.tsx'
 
 /** Was die Reiter am Antwortkasten aus dem Panel brauchen; ohne Anbieter (Kasten allein gerendert) stehen keine Reiter. */
 export interface ReihenReiterDaten {
@@ -32,8 +33,9 @@ export function kastenFarbe(huelle: string): string {
  * ein Reiter öffnet seinen Titel. Pfeiltasten,
  * Pos1 und Ende setzen nur den Fokus, Eingabe oder Leertaste öffnet: jede Wahl lädt einen anderen Titel.
  */
-export function ReihenReiterZeile(p: { reiter: ReihenReiter[]; aktiv: number; lagen: Map<number, StaffelLage>; farbe: string; kennung: string; beiWahl: (id: number) => void }) {
+export function ReihenReiterZeile(p: { reiter: ReihenReiter[]; aktiv: number; lagen: Map<number, LageMitGrund>; farbe: string; kennung: string; beiWahl: (id: number) => void }) {
   const { reiter, aktiv, lagen, farbe, kennung, beiWahl } = p
+  const { t } = useLang()
   const zeile = useRef<HTMLDivElement>(null)
   const gewaehlterReiter = useRef<HTMLButtonElement>(null)
   useEffect(() => zeigeGewaehlten(zeile.current, gewaehlterReiter.current), [aktiv])
@@ -51,7 +53,8 @@ export function ReihenReiterZeile(p: { reiter: ReihenReiter[]; aktiv: number; la
       <div ref={zeile} role="tablist" aria-label="Titel der Reihe" data-reihen-reiter onKeyDown={taste} className={LEISTE}>
         {reiter.map((r) => {
           const gewaehlt = r.id === aktiv
-          const l = lagen.get(r.id) ?? 'ruht'
+          const m = lagen.get(r.id) ?? { lage: 'ruht' as const }
+          const l = m.lage
           return (
             <button
               key={r.id}
@@ -63,7 +66,7 @@ export function ReihenReiterZeile(p: { reiter: ReihenReiter[]; aktiv: number; la
               aria-controls={`${kennung}-kasten`}
               tabIndex={gewaehlt ? 0 : -1}
               aria-label={`${r.staffel ? `Staffel ${r.label}: ` : ''}${r.name}${LAGE_WORT[l]}${r.ohneSynchro ? OHNE_SYNCHRO_WORT : ''}`}
-              title={r.name}
+              title={reiterTitel(r.name, m, t, r.ohneSynchro)}
               onClick={() => beiWahl(r.id)}
               className={`${reiterKlassen(gewaehlt, farbe)}${r.ohneSynchro ? ' border-dashed' : ''}`}
             >
@@ -91,7 +94,7 @@ export function ReihenReiterAmKasten({ eigenschaften, kasten }: { eigenschaften:
   if (reiter.length === 0) return kasten
   const { gedaempft } = kastenKopfVon({ antwort, title, today, T: z.T, releases, ohneSprachbeleg, folgenZahl: z.folgenZahl, staffeln: z.staffeln })
   /* Ein Reiter-Titel, den die Seite nicht kennt (nicht in `titleById`), trägt keine Marke. */
-  const lagen = new Map(reiter.map((r) => [r.id, data.titleById.has(r.id) ? reihenLageVon(data.titleById.get(r.id)!, data.releasesByTitle.get(r.id) ?? [], today) : ('ruht' as const)]))
+  const lagen = new Map<number, LageMitGrund>(reiter.map((r) => [r.id, data.titleById.has(r.id) ? reihenLageMitGrund(data.titleById.get(r.id)!, data.releasesByTitle.get(r.id) ?? [], today) : { lage: 'ruht' }]))
   const farbe = kastenFarbe(kastenKlassen({ antwort, title, neben: '', gedaempft }))
   const kennung = `reihe-${title.id}`
   /* Eine Hülle um Reiter und Kasten: der Abstand der Seite zwischen ihren Geschwistern trennt sie nicht.

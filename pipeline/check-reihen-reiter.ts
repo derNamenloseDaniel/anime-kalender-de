@@ -252,7 +252,9 @@ pruefe('Pos1 fokussiert Reiter 1 und unterdrückt das Seitenrollen', fokus !== u
 await act(async () => klicke(dom.wurzel, hz.tabs[1]!))
 pruefe('Klick auf Reiter 2 öffnet Pokémon-Generationen über den Weg der Reihenliste', geoeffnet.join() === '8284', geoeffnet)
 
-pruefe('Tooltip: voller Titel am Reiter (title)', hz.tabs.map((k) => k.getAttribute('title')).join('|') === reiter(14839).map((r) => r.name).join('|'), hz.tabs.map((k) => k.getAttribute('title')))
+const titelZeile = (k: MiniKnoten | undefined) => (k?.getAttribute('title') ?? '').split('\n')[0]
+pruefe('Tooltip: voller Titel am Reiter (erste Zeile von title)', hz.tabs.map(titelZeile).join('|') === reiter(14839).map((r) => r.name).join('|'), hz.tabs.map((k) => k.getAttribute('title')))
+pruefe('Tooltip: Reiter ohne Synchro erklärt den gestrichelten Rand in der letzten Zeile', (hz.tabs[6]?.getAttribute('title') ?? '').endsWith('\ngestrichelt = ohne deutsche Synchro') && !(hz.tabs[0]?.getAttribute('title') ?? '').includes('gestrichelt'))
 /* Reihenliste: große Reihe als Übersicht; Gruppen mit Zahl (`data-reihe-gruppe`), die Reiter-Titel fehlen in ihrer Gruppe. */
 const gruppenZahl = () => dom.wurzel.finde((k) => k.getAttribute('data-reihe-gruppe') !== null).map((k) => `${k.getAttribute('data-reihe-gruppe')}=${text(k).replace(/\D+/g, '')}`).join()
 pruefe('Horizonte: Eigene Serien ganz als Reiter, fehlen in der Liste; Hauptserie und Filme ganz', gruppenZahl() === 'Hauptserie=12,Filme=26,Specials & OVAs=86', gruppenZahl())
@@ -264,14 +266,14 @@ const filmLabels = film.tabs.map(text)
 pruefe('Film der Reihe: Reiter der Filme 1..n, gewählt Nr. 16', film.leiste?.getAttribute('role') === 'tablist' && filmLabels.join() === filmLabels.map((_, i) => i + 1).join() && filmLabels.length === reiter(5726).length && film.tabs[15]?.getAttribute('aria-selected') === 'true', filmLabels)
 pruefe('Film: Tooltip und aria-label tragen den vollen Titel, ohne „Staffel“', film.tabs[0]?.getAttribute('title') === 'Pokémon: Der Film - Mewtu gegen Mew' && film.tabs[0]?.getAttribute('aria-label') === 'Pokémon: Der Film - Mewtu gegen Mew', [film.tabs[0]?.getAttribute('title'), film.tabs[0]?.getAttribute('aria-label')])
 pruefe('Film: Filme fehlen in der Reihenliste, die übrigen Gruppen bleiben', gruppenZahl() === 'Hauptserie=12,Eigene Serien=8,Specials & OVAs=86', gruppenZahl())
-const reiterVon = (name: string) => film.tabs.find((k) => k.getAttribute('title') === name)
+const reiterVon = (name: string) => film.tabs.find((k) => titelZeile(k) === name)
 const [toho, wildCard] = [reiterVon('Toho Cinemas x Pokémon GO'), reiterVon('Pokémon: Wild Card')]
 pruefe('Film: Reiter ohne Synchro ist gestrichelt und nennt es im aria-label', klasse(toho).split(' ').includes('border-dashed') && toho?.getAttribute('aria-label') === 'Toho Cinemas x Pokémon GO, ohne deutsche Synchro', [klasse(toho), toho?.getAttribute('aria-label')])
 pruefe('Film: geplanter Reiter (Wild Card 2027) und gewählter Reiter nicht gestrichelt', wildCard !== undefined && !klasse(wildCard).split(' ').includes('border-dashed') && !(wildCard.getAttribute('aria-label') ?? '').includes('ohne deutsche Synchro') && !klasse(film.tabs[15]).split(' ').includes('border-dashed'), [klasse(wildCard), wildCard?.getAttribute('aria-label')])
 pruefe('Film: nur Reiter ohne Synchro gestrichelt (Toho Cinemas, sonst keiner mit Synchro)', film.tabs.filter((k) => klasse(k).split(' ').includes('border-dashed')).length === film.tabs.filter((k) => (k.getAttribute('aria-label') ?? '').endsWith('ohne deutsche Synchro')).length && film.tabs.filter((k) => klasse(k).split(' ').includes('border-dashed')).length >= 1)
 const hauptPanel = await zeige(10852)
 const hauptAria = hauptPanel.tabs[0]?.getAttribute('aria-label') ?? ''
-pruefe('Hauptserie: aria-label nennt Staffel und Titel', hauptAria.startsWith(`Staffel ${text(hauptPanel.tabs[0]!)}: ${hauptPanel.tabs[0]!.getAttribute('title')}`), hauptAria)
+pruefe('Hauptserie: aria-label nennt Staffel und Titel', hauptAria.startsWith(`Staffel ${text(hauptPanel.tabs[0]!)}: ${titelZeile(hauptPanel.tabs[0])}`), hauptAria)
 /* Ein Titel ohne Reihe (eigene Kennung, keine Reihenteile): keine Leiste, kein tabpanel um den Kasten. */
 const allein = { ...offen(5726), id: 990001, franchiseId: 990001, titleDe: 'Ohne Reihe', titleEn: 'Ohne Reihe', titleRomaji: 'Ohne Reihe' } as Title
 const ohneReihe = await zeige(990001, { ...data, titles: [allein], titleById: new Map([[allein.id, allein]]), releasesByTitle: new Map() })

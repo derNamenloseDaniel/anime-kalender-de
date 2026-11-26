@@ -1,0 +1,12 @@
+Rolle Bauer (lies .claude/agents/bauer.md). Deutsch, frag niemanden (auch nicht Daniel). Zweig feat/handlung-satz-einbinden von main. Nach jedem gruenen Schritt committen und pushen.
+
+Auftrag '1-Satz-Handlung fuer jeden Titel' (Daniel 23.11.2026). Parallel schreiben 12 Auftraege die Saetze in data/curated/ein-satz-handlung/teil-NN.yaml (NN = 01..12), Format je Eintrag: id (Zahl), satz (<= 160 Zeichen), quellen (Liste von Quellenfamilien), geprueftAm (Datum), optional umfang: reihe. Du baust nur die Einbindung, keine Saetze und keine Anzeige.
+
+Plan (aus dem lokalen Planbericht, Zielformat leicht geaendert auf einen Ordner statt einer Datei, damit die Pakete nicht kollidieren):
+1. Lader in pipeline/lib/ fuer alle data/curated/ein-satz-handlung/*.yaml (fehlender Ordner = leer).
+2. Neue Bauphase hinter pipeline/bau/handlung-eigen-einbinden.ts schreibt satz in die Synopsen-Gruppe (public/data/synopses/<g>.json, Feld satz neben de/en; nicht in titles.json - das Panel laedt synopses beim Oeffnen). Entstehung der Synopsen: pipeline/bau/synopse-von.ts, geschrieben in 13-2-auslieferung.ts.
+3. Pruefung in check:logic: id existiert im Bestand, Laenge <= 160, Satz != Titel, keine id doppelt ueber alle Teil-Dateien, kein 5-Wort-Abschnitt gleich mit einem ausgelieferten Quelltext des Titels (tools/handlung-naehe.ts wiederverwenden). Ein Test mit Fixture-Ordner (zwei Teil-Dateien, ein Doppel, ein zu langer Satz).
+4. Typ in shared/types.ts fuer das Synopsen-Feld, falls Synopsen dort typisiert sind.
+Neues Feld nur in synopses; Anzeige im Panel macht ein spaeterer Auftrag mit Mockup. Neue Datei im Lauf -> tools/quellen-liste.sh pruefen. Basis-Beleg: der neue Test gegen die main-Fassung rot, mit Rot-Zeile und Exit-Code im PR-Body. Beruehrte Tests, npx tsc --noEmit -p ., npm run check:umfang. Patch-Skripte nie per Heredoc.
+
+Kein gh pr (Cloud hat kein GraphQL), keinen PR selbst anlegen. Commit-Endzeile: Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>. Pushe deinen Zweig vor jedem Warten auf einen Hintergrundlauf und am Ende; lege ausserdem einen Zweig prtext/handlung-satz-einbinden (von origin/main abgezweigt, nicht orphan) mit pr.md (erste Zeile <!-- titel: ... -->, eine Zeile 'Auftrag: handlung-satz-einbinden', vorher PR_TEXT="$(cat pr.md)" node tools/pr-vorpruefung.mjs --titel "..." gruen) und bericht.md (max 10 Zeilen + Rueckblick gut/schlecht/unerwartet/Vorschlag/veraltet) an und pushe ihn.

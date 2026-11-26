@@ -205,9 +205,11 @@ export function MeineAnbieter({
     'cursor-pointer rounded-full border border-dashed border-ak-rand px-2.5 py-0.5 text-xs text-ak-leise transition hover:bg-ak-flaeche-2'
   if (gemerkt.length && !gleich)
     return (
-      <button type="button" className={knopf} onClick={() => setzen(gemerkt)} title={gemerkt.map((p) => PLATFORMS[p].name).join(', ')}>
-        ★ {t('filter.meineAnbieter')}
-      </button>
+      <Tooltip text={gemerkt.map((p) => PLATFORMS[p].name).join(', ')} seite="unten">
+        <button type="button" className={knopf} onClick={() => setzen(gemerkt)}>
+          ★ {t('filter.meineAnbieter')}
+        </button>
+      </Tooltip>
     )
   if (aktuell.length && !gleich)
     return (

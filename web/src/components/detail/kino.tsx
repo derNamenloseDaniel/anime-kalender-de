@@ -229,7 +229,7 @@ function kinoVideo({ t, titel, trailer, suche }: { t: Translate; titel: string; 
   return trailer ? (
     <iframe
       src={`https://www.youtube-nocookie.com/embed/${trailer.video}?autoplay=1&rel=0`}
-      title={trailer.titel || t('trailer.ueberschrift', { titel })}
+      title={trailer.titel || t('trailer.ueberschrift', { titel })} // title-ok: Name des iframe für Screenreader, kein Hover-Tooltip
       allow="accelerometer; autoplay; encrypted-media; picture-in-picture; fullscreen"
       allowFullScreen
       className="min-h-0 flex-1 border-0 bg-black"

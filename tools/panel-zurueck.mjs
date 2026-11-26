@@ -5,7 +5,7 @@
  *  - Escape schließt nur die Vergrößerung und lässt keinen Verlaufseintrag zurück (ein Zurück genügt für das Panel)
  *  - Klick aufs Banner zeigt das Banner, ohne Banner das Cover; Klick aufs Poster zeigt das Cover
  *  - erst Poster (großes Plakat lädt), schließen, dann Banner: das Banner-Bild ist sichtbar (nicht `opacity-0`)
- *  - „Ausblenden“ ist nur ein Zeichen (44 × 44) mit aria-label und title
+ *  - „Ausblenden“ ist nur ein Zeichen (44 × 44) mit aria-label und eigenem Tooltip (kein title)
  * Aufruf: node tools/panel-zurueck.mjs     (Teil von `npm run check:panel`)
  */
 import { chromium } from 'playwright'
@@ -119,7 +119,12 @@ async function pruefeAusblenden(seite) {
   const box = await knopf.boundingBox()
   ist(!!box && Math.round(box.width) === 44 && Math.round(box.height) === 44, `„Ausblenden“ ist 44 × 44 (gemessen ${box && Math.round(box.width)} × ${box && Math.round(box.height)})`)
   ist(((await knopf.innerText()) ?? '').trim() === '', '„Ausblenden“ trägt keinen Text')
-  ist((await knopf.getAttribute('title')) === 'Ausblenden', '„Ausblenden“ hat title')
+  ist((await knopf.getAttribute('title')) === null, '„Ausblenden“ hat kein title (eigener Tooltip)')
+  await knopf.hover()
+  const blase = seite.getByRole('tooltip').filter({ hasText: 'Ausblenden' })
+  await blase.waitFor({ state: 'visible', timeout: 3000 })
+  const verweis = await knopf.getAttribute('aria-describedby')
+  ist(!!verweis && (await blase.getAttribute('id')) === verweis, '„Ausblenden“ zeigt per aria-describedby auf seine Blase')
 }
 
 async function main() {

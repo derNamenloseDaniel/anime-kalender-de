@@ -105,6 +105,7 @@ pipeline/check-ausbleiben-messen.ts
 pipeline/check-ausgeblieben-text.ts
 pipeline/check-ausloeser-zeilen.ts
 pipeline/check-auto-disc-handeintrag.ts
+pipeline/check-banner-ersatz.ts
 pipeline/check-banner-franchise.ts
 pipeline/check-beleg-adresswechsel.ts
 pipeline/check-beleg-anbieter.ts

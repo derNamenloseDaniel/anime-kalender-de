@@ -472,21 +472,5 @@
     "geprueftAm": "2026-11-16T14:01:42.449Z",
     "newsGeprueftAm": "2026-11-16T05:02:55.499Z",
     "rechercheAm": "2026-11-16T11:02:24.185Z"
-  },
-  {
-    "id": "black-clover-s2-crunchyroll@2026-10-17",
-    "slug": "black-clover-s2-crunchyroll",
-    "titleId": 195604,
-    "name": "Black Clover – Staffel 2",
-    "platform": "crunchyroll",
-    "episode": 3,
-    "erwartetAm": "2026-10-16T22:00:00.000Z",
-    "bemerktAm": "2026-11-27T00:21:56.678Z",
-    "erschienenAm": "2026-11-07T22:00:00.000Z",
-    "verzugStunden": 528,
-    "folgenVerfuegbar": 173,
-    "tagGeschaetzt": true,
-    "neuErwartet": null,
-    "recherche": null
   }
 ]

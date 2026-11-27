@@ -333,6 +333,9 @@ console.log('liegegut: Signal 13 daten/-Zweig von fremdem Autor (PR 4732)')
   pruefe('fremder Autor auf fix/ → kein Signal', z(pr(2, { headRefName: 'fix/x', author: { login: 'derNamenloseDaniel' } })).length === 0)
   const f = liegegutAlleFunde(attrappeGh([pr(4732, { headRefName: 'daten/x', author: { login: 'derNamenloseDaniel' }, comments: [daniel(1, 'x')] })]), attrappeGit(), JETZT)
   pruefe('Gesamtlauf: auffälliger PR mit Schritt ZWEIG UMBENENNEN', f.length === 1 && /ZWEIG UMBENENNEN/.test(f[0].zeile), f)
+  pruefe('Gesamtlauf: der Fund trägt den Zweig (Grundlage der Wellen-Gruppierung)', f[0].zweig === 'daten/x', f)
+  const entwurf = liegegutAlleFunde(attrappeGh([pr(5, { headRefName: 'fix/e-5', isDraft: true, comments: [daniel(13, 'x')] })]), attrappeGit(), JETZT)[0]
+  pruefe('Gesamtlauf: auch der Entwurfs-Fund trägt Nummer, Repo und Zweig', entwurf.nr === 5 && entwurf.repo === 'anime-kalender-de' && entwurf.zweig === 'fix/e-5', entwurf)
 }
 
 console.log('liegegut: Sammelzeile je Signalnummer (Tabelle, PR 3854: 8 überlebende Mutanten an KURZ und istZugPr)')

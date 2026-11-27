@@ -5,7 +5,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writ
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { ausloeser, kontingentFunde, zahlBefunde, pruefeLauf, registerBefunde, spezMitFrist, vomWecker, wachePlanBefunde, weckplanLuecken } from './zugangs-waechter.mjs'
+import { ausloeser, claudeErholung, kontingentFunde, zahlBefunde, pruefeLauf, registerBefunde, spezMitFrist, vomWecker, wachePlanBefunde, weckplanLuecken } from './zugangs-waechter.mjs'
 
 const schritt = (name, conclusion, von, bis) => ({ name, conclusion, started_at: von, completed_at: bis })
 
@@ -87,6 +87,23 @@ assert.match(pruefeLauf('x.yml', { fristStunden: 24 }, attrappe([]), JETZT)[0].t
 assert.equal(pruefeLauf('x.yml', { fristStunden: 24 }, attrappe([]), JETZT)[0].rot, true)
 // Ohne Frist keine Zeile aus der Fristprüfung
 assert.deepEqual(pruefeLauf('x.yml', { fristStunden: null }, attrappe([]), JETZT), [])
+
+// Kontingent-Schnellabbruch (Lauf 45870267412, 26.11.2026 17:45Z): rot, bis irgendein Claude-Workflow danach gelang (gleiches Token).
+const schnell = { databaseId: 7, status: 'completed', conclusion: 'failure', createdAt: vor(5), event: 'workflow_run' }
+const claudeSchritt = { name: 'Run anthropics/claude-code-action@v1', conclusion: 'failure', started_at: vor(5), completed_at: new Date(Date.parse(vor(5)) + 14e3).toISOString() }
+const claudeGh = (eigenerErfolg) => (...a) => {
+  if (a[0] === 'api') return { jobs: [{ steps: [claudeSchritt] }] }
+  if (a.includes('--status')) return eigenerErfolg ? [eigenerErfolg] : []
+  return [schnell]
+}
+const kontingent = (erholt, eigen = null) => pruefeLauf('claude-reparatur.yml', { claude: true, fristStunden: null }, claudeGh(eigen), JETZT, erholt).filter((z) => z.kontingent)
+assert.equal(kontingent(null).length, 1, 'ohne spätere Erholung rot')
+assert.equal(kontingent(vor(4)).length, 0, 'anderer Claude-Workflow danach grün: Kontingent zurück')
+assert.equal(kontingent(vor(6)).length, 1, 'Erfolg vor dem Abbruch zählt nicht')
+assert.equal(kontingent(null, { databaseId: 8, createdAt: vor(1) }).length, 0, 'eigener späterer Erfolg wie bisher')
+const erholGh = (...a) => (a[a.indexOf('--workflow') + 1] === 'b.yml' ? [{ databaseId: 1, createdAt: vor(2) }] : [{ databaseId: 2, createdAt: vor(9) }])
+assert.equal(claudeErholung({ 'a.yml': { claude: true }, 'b.yml': { claude: true }, 'c.yml': {} }, erholGh), vor(2), 'jüngster Erfolg nur über Claude-Workflows')
+assert.equal(claudeErholung({ 'c.yml': {} }, erholGh), null)
 
 // Eine Frist-Quelle: die Register-Datei trägt keine Fristen mehr, die Wache liest die Tabelle.
 assert.equal(readFileSync(new URL('data/zugangs-register.json', wurzel), 'utf8').includes('fristStunden'), false)

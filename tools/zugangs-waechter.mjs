@@ -72,8 +72,14 @@ export function kontingentFunde(schritte) {
 /** Frist aus der gemeinsamen Tabelle (`wache-fristen.mjs`); ohne Eintrag keine Fristprüfung. */
 export const spezMitFrist = (workflow, spez, fristen = FRISTEN_STUNDEN) => ({ ...spez, fristStunden: fristen[workflow] ?? null })
 
-/** `ghAufruf` und `jetzt` sind einspeisbar, damit ein Test ohne `gh` und ohne Uhr läuft. */
-export function pruefeLauf(workflow, spez, ghAufruf = gh, jetzt = Date.now()) {
+/** Jüngster Erfolg über alle Claude-Workflows (ISO) — sie teilen Token und Kontingent. */
+export function claudeErholung(laeufe, ghAufruf = gh) {
+  const zeiten = Object.entries(laeufe).filter(([, s]) => s.claude).map(([w]) => letzterErfolg(ghAufruf, w)?.createdAt).filter(Boolean)
+  return zeiten.sort().at(-1) ?? null
+}
+
+/** `ghAufruf` und `jetzt` sind einspeisbar, damit ein Test ohne `gh` und ohne Uhr läuft; `erholt`: jüngster Erfolg eines Claude-Workflows. */
+export function pruefeLauf(workflow, spez, ghAufruf = gh, jetzt = Date.now(), erholt = null) {
   const stunden = (iso) => stundenSeit(iso, jetzt)
   const zeilen = []
   const laeufe = letzteLaeufe(ghAufruf, workflow)
@@ -85,8 +91,9 @@ export function pruefeLauf(workflow, spez, ghAufruf = gh, jetzt = Date.now()) {
     else zeilen.push({ rot: false, text: `${workflow}: letzter Erfolg vor ${Math.round(stunden(erfolg.createdAt))} h (Frist ${spez.fristStunden} h)` })
   }
   if (spez.claude) {
-    // Nur solange kein späterer Lauf gelungen ist — danach ist das Kontingent wieder da.
-    for (const l of fertig.filter((x) => x.conclusion === 'failure' && stunden(x.createdAt) <= 24 * 7 && !(erfolg && erfolg.createdAt > x.createdAt)).slice(0, 5)) {
+    // Nur solange kein späterer Claude-Lauf gelungen ist (dieser oder ein anderer Workflow, gleiches Token) — danach ist das Kontingent wieder da.
+    const spaeter = (x) => (erfolg && erfolg.createdAt > x.createdAt) || (erholt && erholt > x.createdAt)
+    for (const l of fertig.filter((x) => x.conclusion === 'failure' && stunden(x.createdAt) <= 24 * 7 && !spaeter(x)).slice(0, 5)) {
       const jobs = ghAufruf('api', `repos/${REPO}/actions/runs/${l.databaseId}/jobs`).jobs ?? []
       const funde = kontingentFunde(jobs.flatMap((j) => j.steps ?? []))
       if (funde.length) zeilen.push({ rot: true, kontingent: true, text: `${workflow}: Claude-Schritt „${funde[0].name}“ endete nach wenigen Sekunden (Lauf ${l.databaseId}, ${l.createdAt.slice(0, 16)}Z) — Kontingent leer oder CLAUDE_CODE_OAUTH_TOKEN ungültig` })
@@ -212,7 +219,8 @@ function main() {
     return
   }
   const zeilen = []
-  for (const [workflow, spez] of Object.entries(register.laeufe)) zeilen.push(...pruefeLauf(workflow, spezMitFrist(workflow, spez)))
+  const erholt = claudeErholung(register.laeufe)
+  for (const [workflow, spez] of Object.entries(register.laeufe)) zeilen.push(...pruefeLauf(workflow, spezMitFrist(workflow, spez), gh, Date.now(), erholt))
   zeilen.push(weckerBefund())
   const { aus, ohne } = ablaufBefunde()
   zeilen.push(...aus)

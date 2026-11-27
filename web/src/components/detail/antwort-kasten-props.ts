@@ -60,6 +60,8 @@ export interface AntwortKastenProps {
    * angekündigt — der Tag steht noch nicht fest."
    */
   notiz?: string; folgen?: ReactNode // Folgenliste (`folgen-bereich.tsx`)
+  /** Wer außer dem Hauptweg noch nachlegt, mit Tag und Uhrzeit (`nachleger-zeilen.tsx`) — gehört in den Kopf, nicht über die Folgenliste. */
+  nachleger?: string[]
   schnitt?: Release['schnitt']
   /**
    * **„Im Angebot seit" — die einzige Angabe, die der frühere Terminblock allein trug.**

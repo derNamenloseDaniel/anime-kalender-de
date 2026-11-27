@@ -19,10 +19,12 @@ const log = console.log
 
 const starts: string[] = []
 let bisherige: { status: string; created_at: string }[] = []
+let dispatchWirft = false
 globalThis.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
   const u = String(url)
   if (u.includes('/runs?')) return new Response(JSON.stringify({ workflow_runs: bisherige }), { status: 200 })
   if (u.includes('/dispatches') && init?.method === 'POST') {
+    if (dispatchWirft) throw new Error('Netz beim Start weg')
     starts.push(u)
     return new Response(null, { status: 204 })
   }
@@ -83,6 +85,21 @@ zurueck()
 await melde({ stapel: [meldung({ folge_nr: 1 }), meldung({ folge_nr: 2, suchUrl: 'https://www.amazon.de/s?k=A' })] })
 pruefe(dispatches() === 1, 'ein Stapel mit einer Such-Meldung stößt genau einmal an', starts)
 
+// Wirft der Start (Netz weg), bleibt die Meldung angenommen und der Fehler steht im Log: Einzelmeldung und Stapel; ohne den Fang bräche `waitUntil`.
+{
+  const fehlerzeilen: string[] = []
+  console.error = (...a: unknown[]) => void fehlerzeilen.push(a.join(' '))
+  dispatchWirft = true
+  zurueck()
+  r = await melde(meldung({ suchUrl: 'https://www.amazon.de/s?k=A' }))
+  pruefe(r.status === 200 && fehlerzeilen.some((z) => z.startsWith('[bau-anstoss]: Error Netz beim Start weg')), 'Einzelmeldung: Start wirft, Meldung angenommen, Fehlerzeile', { status: r.status, fehlerzeilen })
+  fehlerzeilen.length = 0
+  r = await melde({ stapel: [meldung({ suchUrl: 'https://www.amazon.de/s?k=A' })] })
+  pruefe(r.status === 200 && fehlerzeilen.some((z) => z.startsWith('[bau-anstoss]: Error Netz beim Start weg')), 'Stapel: Start wirft, Meldung angenommen, Fehlerzeile', { status: r.status, fehlerzeilen })
+  dispatchWirft = false
+  console.error = () => {}
+}
+
 // Abgelehnte Such-Meldung (ohne `url`) neben einer angenommenen ohne `suchUrl`: nichts Neues im Bau, kein Start.
 zurueck()
 r = await melde({ stapel: [meldung(), { ...meldung({ suchUrl: 'https://www.amazon.de/s?k=A' }), url: undefined }] })
@@ -135,11 +152,13 @@ pruefe(dispatches() === 0, 'alle Such-Meldungen abgelehnt: kein Start', starts)
   meldungen.length = 0
   laeufe = new Error('Netz weg')
   pruefe((await stosseBauAn(env)) === 'gestartet' && !!start(), 'Läufe nicht lesbar: Bau wird trotzdem gestartet')
-  pruefe(meldungen.some((m) => m.includes('[bau-anstoss] Läufe nicht lesbar') && m.includes('Netz weg')), 'Läufe nicht lesbar: Fehlerzeile mit Ursache', meldungen)
+  pruefe(meldungen.some((m) => m.startsWith('[bau-anstoss] Läufe nicht lesbar, Bau wird trotzdem gestartet: Error Netz weg')), 'Läufe nicht lesbar: Fehlerzeile mit Ursache', meldungen)
+  pruefe(anfragen[0]?.url === 'https://api.github.com/repos/derNamenloseDaniel/anime-kalender-de/actions/workflows/bestand-bauen.yml/runs?per_page=10', 'Läufe werden für Repo und Bau-Workflow gelesen', anfragen[0]?.url)
   anfragen.length = 0
   laeufe = new Response('nein', { status: 500 })
   pruefe((await stosseBauAn(env)) === 'gestartet' && !!start(), 'API-Antwort 500 (null): Bau wird gestartet')
 
+  pruefe(stoesstBauAn({ plattform: 'primevideo', suchUrl: 'a' }) === true, 'einstellige suchUrl zählt')
   pruefe(stoesstBauAn({ stapel: [{ plattform: 'netflix', suchUrl: 'x' }, { plattform: 'primevideo', suchUrl: 'https://a' }] }) === true, 'Stapel: eine Prime-Such-Meldung genügt')
   pruefe(stoesstBauAn({ stapel: [{ plattform: 'primevideo' }, { plattform: 'primevideo', suchUrl: '' }] }) === false, 'Stapel ohne Such-Meldung (fehlend, leer): kein Anstoß')
   pruefe(stoesstBauAn({ stapel: [] }) === false && stoesstBauAn(null) === false && stoesstBauAn({ plattform: 'primevideo', suchUrl: 1 }) === false, 'leerer Stapel, null, suchUrl keine Zeichenkette: kein Anstoß')

@@ -725,9 +725,7 @@ DTSTART:20261123T172500Z
 DTEND:20261123T175500Z
 SUMMARY:YAIBA: Samurai Legend – Folge 11/24
 DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nGeschätzter Termin: kein vom Anbieter gena
- nnter Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetail
- s: https://anime-kalender.de/t/15908/
+ \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
@@ -736,9 +734,8 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261123T175000Z
 DTEND:20261123T182000Z
 SUMMARY:YAIBA: Samurai Legend – Folge 11/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nGeschät
- zter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus oder O
- riginalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15908/
+DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
+  https://anime-kalender.de/t/15908/
 CATEGORIES:Joyn
 END:VEVENT
 BEGIN:VEVENT
@@ -830,9 +827,7 @@ DTSTART:20261124T172500Z
 DTEND:20261124T175500Z
 SUMMARY:YAIBA: Samurai Legend – Folge 12/24
 DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nGeschätzter Termin: kein vom Anbieter gena
- nnter Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetail
- s: https://anime-kalender.de/t/15908/
+ \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
@@ -841,9 +836,8 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261124T175000Z
 DTEND:20261124T182000Z
 SUMMARY:YAIBA: Samurai Legend – Folge 12/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nGeschät
- zter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus oder O
- riginalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15908/
+DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
+  https://anime-kalender.de/t/15908/
 CATEGORIES:Joyn
 END:VEVENT
 BEGIN:VEVENT
@@ -955,9 +949,7 @@ DTSTART:20261125T172500Z
 DTEND:20261125T175500Z
 SUMMARY:YAIBA: Samurai Legend – Folge 13/24
 DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nGeschätzter Termin: kein vom Anbieter gena
- nnter Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetail
- s: https://anime-kalender.de/t/15908/
+ \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
@@ -966,9 +958,8 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261125T175000Z
 DTEND:20261125T182000Z
 SUMMARY:YAIBA: Samurai Legend – Folge 13/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nGeschät
- zter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus oder O
- riginalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15908/
+DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
+  https://anime-kalender.de/t/15908/
 CATEGORIES:Joyn
 END:VEVENT
 BEGIN:VEVENT
@@ -1092,9 +1083,7 @@ DTSTART:20261126T172500Z
 DTEND:20261126T175500Z
 SUMMARY:YAIBA: Samurai Legend – Folge 14/24
 DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nGeschätzter Termin: kein vom Anbieter gena
- nnter Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetail
- s: https://anime-kalender.de/t/15908/
+ \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
@@ -1103,9 +1092,8 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261126T175000Z
 DTEND:20261126T182000Z
 SUMMARY:YAIBA: Samurai Legend – Folge 14/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nGeschät
- zter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus oder O
- riginalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15908/
+DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
+  https://anime-kalender.de/t/15908/
 CATEGORIES:Joyn
 END:VEVENT
 BEGIN:VEVENT
@@ -1165,6 +1153,17 @@ DESCRIPTION:Plattform: Netflix\nRelease-Art: Katalog\nSynchro offen: Der Te
 CATEGORIES:Netflix
 END:VEVENT
 BEGIN:VEVENT
+UID:motn-966-primevideo@2026-11-26@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261126
+DTEND;VALUE=DATE:20261127
+SUMMARY:Shin-chan (neu bei Prime Video)
+DESCRIPTION:Plattform: Prime Video\nRelease-Art: Katalogtitel\nIm Angebot s
+ eit diesem Tag – nicht der Erscheinungstag der deutschen Fassung.\nUhrze
+ it noch nicht bestätigt.\nDetails: https://anime-kalender.de/t/846/
+CATEGORIES:Prime Video
+END:VEVENT
+BEGIN:VEVENT
 UID:steel-ball-run-2nd-3rd-stage@2026-11-27@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261127T080000Z
@@ -1174,6 +1173,56 @@ SUMMARY:JoJo's Bizarre Adventure: Steel Ball Run – 2nd & 3rd STAGE – Fo
 DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nDetai
  ls: https://anime-kalender.de/t/17588/
 CATEGORIES:Netflix
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-27#74@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261127T085000Z
+DTEND:20261127T092000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-super-rtl@2026-11-27#75@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261127T090000Z
+DTEND:20261127T093000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/18191/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-27#74@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261127T095000Z
+DTEND:20261127T102000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-10012621-tv-toggo-plus@2026-11-27#75@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261127T100000Z
+DTEND:20261127T103000Z
+SUMMARY:Super Wings
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/18191/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-158871-tv-super-rtl@2026-11-27@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261127T151500Z
+DTEND:20261127T154500Z
+SUMMARY:Pokémon Horizonte – Folge 41
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/14839/
+CATEGORIES:Super RTL
 END:VEVENT
 BEGIN:VEVENT
 UID:apothecary-diaries-s3-cour1@2026-11-27@anime-kalender-de
@@ -1186,6 +1235,16 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
   oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
  6914/
 CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-158871-tv-toggo-plus@2026-11-27@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261127T161500Z
+DTEND:20261127T164500Z
+SUMMARY:Pokémon Horizonte – Folge 41
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/14839/
+CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-revengers-s3-disneyplus@2026-11-27@anime-kalender-de
@@ -1218,9 +1277,7 @@ DTSTART:20261127T172500Z
 DTEND:20261127T175500Z
 SUMMARY:YAIBA: Samurai Legend – Folge 15/24
 DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nGeschätzter Termin: kein vom Anbieter gena
- nnter Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetail
- s: https://anime-kalender.de/t/15908/
+ \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
@@ -1229,9 +1286,8 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261127T175000Z
 DTEND:20261127T182000Z
 SUMMARY:YAIBA: Samurai Legend – Folge 15/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nGeschät
- zter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus oder O
- riginalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15908/
+DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
+  https://anime-kalender.de/t/15908/
 CATEGORIES:Joyn
 END:VEVENT
 BEGIN:VEVENT
@@ -1245,6 +1301,16 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
  mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
  t/12/
 CATEGORIES:ProSieben MAXX
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-112153-tv-toggo-plus@2026-11-27@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261127T201500Z
+DTEND:20261127T204500Z
+SUMMARY:Pokémon Reisen: Die Serie
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/10852/
+CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
 UID:strike-witches-s2-vol1@2026-11-27@anime-kalender-de
@@ -1488,9 +1554,7 @@ DTSTART:20261130T172500Z
 DTEND:20261130T175500Z
 SUMMARY:YAIBA: Samurai Legend – Folge 16/24
 DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nGeschätzter Termin: kein vom Anbieter gena
- nnter Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetail
- s: https://anime-kalender.de/t/15908/
+ \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
@@ -1499,9 +1563,8 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261130T175000Z
 DTEND:20261130T182000Z
 SUMMARY:YAIBA: Samurai Legend – Folge 16/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nGeschät
- zter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus oder O
- riginalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15908/
+DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
+  https://anime-kalender.de/t/15908/
 CATEGORIES:Joyn
 END:VEVENT
 BEGIN:VEVENT
@@ -1533,9 +1596,7 @@ DTSTART:20261201T172500Z
 DTEND:20261201T175500Z
 SUMMARY:YAIBA: Samurai Legend – Folge 17/24
 DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nGeschätzter Termin: kein vom Anbieter gena
- nnter Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetail
- s: https://anime-kalender.de/t/15908/
+ \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
@@ -1544,9 +1605,8 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261201T175000Z
 DTEND:20261201T182000Z
 SUMMARY:YAIBA: Samurai Legend – Folge 17/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nGeschät
- zter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus oder O
- riginalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15908/
+DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
+  https://anime-kalender.de/t/15908/
 CATEGORIES:Joyn
 END:VEVENT
 BEGIN:VEVENT
@@ -1605,9 +1665,7 @@ DTSTART:20261202T172500Z
 DTEND:20261202T175500Z
 SUMMARY:YAIBA: Samurai Legend – Folge 18/24
 DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nGeschätzter Termin: kein vom Anbieter gena
- nnter Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetail
- s: https://anime-kalender.de/t/15908/
+ \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
@@ -1616,9 +1674,8 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261202T175000Z
 DTEND:20261202T182000Z
 SUMMARY:YAIBA: Samurai Legend – Folge 18/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nGeschät
- zter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus oder O
- riginalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15908/
+DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
+  https://anime-kalender.de/t/15908/
 CATEGORIES:Joyn
 END:VEVENT
 BEGIN:VEVENT
@@ -1652,9 +1709,7 @@ DTSTART:20261203T172500Z
 DTEND:20261203T175500Z
 SUMMARY:YAIBA: Samurai Legend – Folge 19/24
 DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nGeschätzter Termin: kein vom Anbieter gena
- nnter Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetail
- s: https://anime-kalender.de/t/15908/
+ \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
@@ -1663,9 +1718,8 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261203T175000Z
 DTEND:20261203T182000Z
 SUMMARY:YAIBA: Samurai Legend – Folge 19/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nGeschät
- zter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus oder O
- riginalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15908/
+DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
+  https://anime-kalender.de/t/15908/
 CATEGORIES:Joyn
 END:VEVENT
 BEGIN:VEVENT
@@ -1764,9 +1818,7 @@ DTSTART:20261204T172500Z
 DTEND:20261204T175500Z
 SUMMARY:YAIBA: Samurai Legend – Folge 20/24
 DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nGeschätzter Termin: kein vom Anbieter gena
- nnter Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetail
- s: https://anime-kalender.de/t/15908/
+ \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
@@ -1775,9 +1827,8 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261204T175000Z
 DTEND:20261204T182000Z
 SUMMARY:YAIBA: Samurai Legend – Folge 20/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nGeschät
- zter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus oder O
- riginalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15908/
+DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
+  https://anime-kalender.de/t/15908/
 CATEGORIES:Joyn
 END:VEVENT
 BEGIN:VEVENT
@@ -2134,9 +2185,7 @@ DTSTART:20261207T172500Z
 DTEND:20261207T175500Z
 SUMMARY:YAIBA: Samurai Legend – Folge 21/24
 DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nGeschätzter Termin: kein vom Anbieter gena
- nnter Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetail
- s: https://anime-kalender.de/t/15908/
+ \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
@@ -2145,9 +2194,8 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261207T175000Z
 DTEND:20261207T182000Z
 SUMMARY:YAIBA: Samurai Legend – Folge 21/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nGeschät
- zter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus oder O
- riginalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15908/
+DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
+  https://anime-kalender.de/t/15908/
 CATEGORIES:Joyn
 END:VEVENT
 BEGIN:VEVENT
@@ -2169,9 +2217,7 @@ DTSTART:20261208T172500Z
 DTEND:20261208T175500Z
 SUMMARY:YAIBA: Samurai Legend – Folge 22/24
 DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nGeschätzter Termin: kein vom Anbieter gena
- nnter Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetail
- s: https://anime-kalender.de/t/15908/
+ \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
@@ -2180,9 +2226,8 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261208T175000Z
 DTEND:20261208T182000Z
 SUMMARY:YAIBA: Samurai Legend – Folge 22/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nGeschät
- zter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus oder O
- riginalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15908/
+DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
+  https://anime-kalender.de/t/15908/
 CATEGORIES:Joyn
 END:VEVENT
 BEGIN:VEVENT
@@ -2228,9 +2273,7 @@ DTSTART:20261209T172500Z
 DTEND:20261209T175500Z
 SUMMARY:YAIBA: Samurai Legend – Folge 23/24
 DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nGeschätzter Termin: kein vom Anbieter gena
- nnter Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetail
- s: https://anime-kalender.de/t/15908/
+ \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
@@ -2239,9 +2282,8 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261209T175000Z
 DTEND:20261209T182000Z
 SUMMARY:YAIBA: Samurai Legend – Folge 23/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nGeschät
- zter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus oder O
- riginalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15908/
+DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
+  https://anime-kalender.de/t/15908/
 CATEGORIES:Joyn
 END:VEVENT
 BEGIN:VEVENT
@@ -2275,9 +2317,7 @@ DTSTART:20261210T172500Z
 DTEND:20261210T175500Z
 SUMMARY:YAIBA: Samurai Legend – Folge 24/24
 DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nErstmals im TV auf Deutsch.\nGeschätzter Termin: kein vom Anbieter gena
- nnter Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetail
- s: https://anime-kalender.de/t/15908/
+ \nErstmals im TV auf Deutsch.\nDetails: https://anime-kalender.de/t/15908/
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
@@ -2286,9 +2326,8 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261210T175000Z
 DTEND:20261210T182000Z
 SUMMARY:YAIBA: Samurai Legend – Folge 24/24
-DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nGeschät
- zter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus oder O
- riginalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15908/
+DESCRIPTION:Plattform: Joyn\nRelease-Art: Wöchentlich (Simuldub)\nDetails:
+  https://anime-kalender.de/t/15908/
 CATEGORIES:Joyn
 END:VEVENT
 BEGIN:VEVENT

@@ -5,15 +5,15 @@
  *
  * Kandidat nur, wenn ALLES gilt:
  *  1. offen, kein Entwurf, kein Daten-PR (`daten/`: Sache des Sammlers), mindestens eine geänderte Datei
- *  2. Prüfstufe 0, 1 oder 2 (`tools/pr-stufe.mjs`); unlesbar ist nie Kandidat. Stufe 2 mergt seit F131 (12.11.2026) ebenfalls,
- *     aber nur mit dem Nachtrag des Dirigenten zum aktuellen Kopf (Bot-Urteil allein genügt nie); Workflow-PRs (3) bleiben Handarbeit
+ *  2. Prüfstufe 0, 1 oder 2 (`tools/pr-stufe.mjs`); unlesbar ist nie Kandidat. Stufe 2 mergt ohne Sondertor wie 0 und 1 (Daniel, 27.11.2026:
+ *     F131 aufgehoben, geprüft wird danach über das Label `nachpruefung-offen`, siehe `nacht-merger.mjs`); Workflow-PRs (3) bleiben Handarbeit
  *  3. kein Pfad unter `.github/workflows/` (auch kein Umbenennungs-Ursprung)
  *  4. die Prüfkette (`PR-Prüfkette`) ist am aktuellen Kopf grün, kein anderer Check rot, wartend oder abgebrochen
  *  5. Freigabe für genau diesen Kopf: jüngstes CI-Urteil „ok“ zu seinem Kurz-Hash, oder der Nachtrag des Inhabers
  *  6. GitHub meldet APPROVED und CLEAN oder noch UNKNOWN (= nicht berechnet, gemessen 14.11.2026 auch bei frisch gemergten PRs);
  *     vor dem Merge bestätigt der Läufer CLEAN per Einzelabfrage, `pr-nachrechnen` MERGEABLE
  */
-import { MIN_HASH, PRAEFIX, entscheide } from './abnahme-freigabe.mjs'
+import { entscheide } from './abnahme-freigabe.mjs'
 
 export const PFLICHT_CHECK = 'PR-Prüfkette'
 /** Das CI-Urteil schreibt `github-actions[bot]` (REST-Name, gemessen 01.11.2026 an PR 2639; `gh pr view` zeigt ihn ohne `[bot]`); ein gleich lautender Kommentar anderer Nutzer zählt nie. */
@@ -24,9 +24,6 @@ export const VORRANG_ZEILE = /^\s*Behebt (den )?roten Bestandsbau\b/im
 
 /** Urteil „ok“ mit oder ohne Hinweis auf noch laufende oder unbekannte Checks; „ok, Checks rot“ und „aendern…“ sind nicht frei. */
 export const urteilIstOk = (titel) => /^ok(,|$)/.test(titel) && !/rot/i.test(titel)
-
-/** Erste Zeile des Nachtrags, die der Merger zum Kopf erkennt (`entscheide` in `abnahme-freigabe.mjs`: Inhaber, Präfix, Kopf ab 9 Zeichen). */
-export const nachtragZeile = (kopf) => `${PRAEFIX}) — Kopf ${kopf.slice(0, MIN_HASH)}`
 
 /** Gibt es einen Nachtrag des Inhabers (`## Nachtrag (Abnahme Dirigent` mit Kopf-Präfix) zu genau diesem Kopf? Eine Regel für Nacht-Merger und liegegut. */
 export const hatNachtrag = (kommentare, kopf) => kommentare.some((k) => entscheide({ autor: k.login, assoziation: k.assoc, text: k.body, kopf }).art === 'frei')
@@ -113,7 +110,6 @@ export function kandidat(pr) {
   if (!kette.gruen) return nein(kette.grund)
   const frei = freigabe(pr.kommentare, pr.kopf)
   if (!frei.frei) return nein(frei.grund)
-  if (pr.stufe === 2 && frei.weg !== 'nachtrag') return { ...nein('Stufe 2 nur mit Nachtrag des Dirigenten zum Kopf (Bot-Urteil allein genügt nie)'), nachtragFehlt: true }
   return { kandidat: true, grund: `Stufe ${pr.stufe}, ${kette.grund}, ${frei.grund}`, weg: frei.weg }
 }
 

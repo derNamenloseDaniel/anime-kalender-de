@@ -5,7 +5,7 @@
  */
 import { BUDGET_MS, argumente, exitCode, lauf, starte } from './nacht-merger.mjs'
 import { bauCommittetGerade, bestandIstRot, echteWelt, ghEcht, ghMitWiederholung, mergeMit5xxPruefung, stufeVon } from './nacht-merger-welt.mjs'
-import { freigabe, hatNachtrag, kandidat, ketteStand, nachtragZeile, neuesteJeCheck, reihenfolge, urteilIstOk, vorabGrund } from './nacht-merger-wahl.mjs'
+import { freigabe, kandidat, ketteStand, neuesteJeCheck, reihenfolge, urteilIstOk, vorabGrund } from './nacht-merger-wahl.mjs'
 
 let fehler = 0
 let anzahl = 0
@@ -105,11 +105,11 @@ pruefe('Status-Kontext erfolgreich', ketteStand([...gruen, { __typename: 'Status
 const wahl = (o) => kandidat(pr(o))
 pruefe('Basisfall (Stufe 1, grün, ok) ist Kandidat', wahl({}).kandidat)
 pruefe('Stufe 0 ist Kandidat', wahl({ stufe: 0 }).kandidat)
-pruefe('Stufe 2 mit nur Bot-ok → nie', !wahl({ stufe: 2 }).kandidat && wahl({ stufe: 2 }).grund.includes('Nachtrag des Dirigenten'))
+pruefe('Stufe 2 mit nur Bot-ok ist Kandidat (kein Sondertor, Daniel 27.11.2026)', wahl({ stufe: 2 }).kandidat && wahl({ stufe: 2 }).weg === 'pruefer')
 pruefe('Stufe 1 mit Bot-ok bleibt Kandidat', wahl({ stufe: 1 }).weg === 'pruefer')
 pruefe('Stufe 2 mit Nachtrag des Dirigenten zum Kopf ist Kandidat', wahl({ stufe: 2, kommentare: [nachtrag(KOPF)] }).weg === 'nachtrag')
 pruefe('Stufe 2 mit Nachtrag des Dirigenten zu älterem Kopf nie', !wahl({ stufe: 2, kommentare: [nachtrag(ALTER_KOPF)] }).kandidat)
-pruefe('Stufe 2: Nachtrag zu älterem Kopf neben Bot-ok zum Kopf nie', !wahl({ stufe: 2, kommentare: [nachtrag(ALTER_KOPF), urteil(KOPF, 'ok')] }).kandidat)
+pruefe('Stufe 2: Nachtrag zu älterem Kopf neben Bot-ok zum Kopf: Kandidat über das Bot-Urteil', wahl({ stufe: 2, kommentare: [nachtrag(ALTER_KOPF), urteil(KOPF, 'ok')] }).weg === 'pruefer')
 pruefe('Stufe 2: Nachtrag zu älterem Kopf neben aktuellem Nachtrag gilt', wahl({ stufe: 2, kommentare: [nachtrag(ALTER_KOPF), nachtrag(KOPF)] }).weg === 'nachtrag')
 pruefe('Stufe 2 mit Urteil zu älterem Kopf nie', !wahl({ stufe: 2, kommentare: [urteil(ALTER_KOPF, 'ok')] }).kandidat)
 pruefe('Stufe 2 ohne Urteil nie', !wahl({ stufe: 2, kommentare: [] }).kandidat)
@@ -117,19 +117,6 @@ pruefe('Stufe 2 mit Urteil aendern nie', !wahl({ stufe: 2, kommentare: [urteil(K
 pruefe('Stufe 2 mit Workflow-Datei nie', wahl({ stufe: 2, pfade: ['.github/workflows/x.yml'] }).grund.includes('.github/workflows/x.yml'))
 pruefe('Stufe 2 mit roter Kette nie', !wahl({ stufe: 2, checks: [{ name: 'PR-Prüfkette', status: 'COMPLETED', conclusion: 'FAILURE' }] }).kandidat)
 pruefe('Stufe 2 ohne APPROVED nie', !wahl({ stufe: 2, reviewDecision: 'CHANGES_REQUESTED' }).kandidat)
-// Nachtrag-fehlt-Marke (27.11.2026): genau die Stufe-2-PRs, die nur noch der Nachtrag des Dirigenten aufhält
-pruefe('Stufe 2 mit Bot-ok, Kette grün: nachtragFehlt', wahl({ stufe: 2 }).nachtragFehlt === true)
-pruefe('Stufe 1 mit Bot-ok: keine Marke', wahl({ stufe: 1 }).nachtragFehlt === undefined)
-pruefe('Stufe 2 mit Nachtrag: Kandidat ohne Marke', wahl({ stufe: 2, kommentare: [nachtrag(KOPF)] }).nachtragFehlt === undefined)
-pruefe('Stufe 2 ohne Urteil: keine Marke (es fehlt mehr als der Nachtrag)', wahl({ stufe: 2, kommentare: [] }).nachtragFehlt === undefined)
-pruefe('Stufe 2 mit rotem Check: keine Marke', wahl({ stufe: 2, checks: [{ name: 'PR-Prüfkette', status: 'COMPLETED', conclusion: 'FAILURE' }] }).nachtragFehlt === undefined)
-pruefe('Stufe 2 mit Workflow-Pfad: keine Marke', wahl({ stufe: 2, pfade: ['.github/workflows/x.yml'] }).nachtragFehlt === undefined)
-// Die vorgeschriebene Zeile erkennt der Merger als Nachtrag des Inhabers, die eines Fremden nie, und nur für genau diesen Kopf
-const eigener = (body, login = 'derNamenloseDaniel', assoc = 'OWNER') => ({ login, assoc, at: '2026-11-01T11:00:00Z', body })
-pruefe('nachtragZeile nennt den Kopf mit neun Zeichen', nachtragZeile(KOPF) === '## Nachtrag (Abnahme Dirigent) — Kopf a1b2c3d4e')
-pruefe('nachtragZeile des Inhabers gibt frei', hatNachtrag([eigener(`${nachtragZeile(KOPF)}\nAuflagen erfüllt: keine`)], KOPF))
-pruefe('nachtragZeile eines Fremden gibt nie frei', !hatNachtrag([eigener(nachtragZeile(KOPF), 'jemand', 'NONE')], KOPF))
-pruefe('nachtragZeile zu anderem Kopf gibt nie frei', !hatNachtrag([eigener(nachtragZeile(ALTER_KOPF))], KOPF))
 pruefe('Stufe unbekannt nie', !wahl({ stufe: undefined }).kandidat && !wahl({ stufe: '1' }).kandidat && !wahl({ stufe: 3 }).kandidat && !wahl({ stufe: null }).kandidat)
 pruefe('Workflow-Pfad nie', wahl({ pfade: ['web/src/a.tsx', '.github/workflows/x.yml'] }).grund.includes('.github/workflows/x.yml'))
 pruefe('Workflow-Pfad als Umbenennungsursprung nie', !wahl({ pfade: ['docs/neu.md', '.github/workflows/alt.yml'] }).kandidat)
@@ -203,6 +190,10 @@ function welt(prs, o = {}) {
       log.aufrufe.push(`merge ${p.nummer}`)
       if (o.mergeFehler === p.nummer) throw new Error('GraphQL: Fehler\nZweite Zeile')
       log.gemergt.push(p.nummer)
+    },
+    markiere: (n, label) => {
+      if (o.labelFehler === true) throw new Error('HTTP 403: Resource not accessible\nZweite Zeile')
+      log.aufrufe.push(`label ${n} ${label}`)
     },
   }
   return w
@@ -425,6 +416,8 @@ pruefe('stufeVon: Müll, Fehler und Text gelten als 2', stufeVon(5, () => 'kaput
   const voll = w.details(liste[0])
   pruefe('echteWelt: Liste wird abgebildet', liste.length === 1 && liste[0].nummer === 7 && liste[0].beschreibung === '' && liste[0].zweig === 'fix/a' && liste[0].geaenderteDateien === 2)
   pruefe('echteWelt: Liste in der echten gh-Antwortform mit mergeStateStatus UNKNOWN (Stand 14.11.2026) bleibt Kandidat der Vorauswahl', liste[0].mergeStateStatus === 'UNKNOWN' && vorabGrund(liste[0]) === null)
+  w.markiere(7, 'nachpruefung-offen')
+  pruefe('echteWelt: markiere setzt das Label über die Labels-Schnittstelle (legt es beim ersten Mal an)', aufrufe.includes('api -X POST repos/o/r/issues/7/labels -f labels[]=nachpruefung-offen'), aufrufe)
   pruefe('echteWelt: Dateiliste fragt auch den Umbenennungsursprung', aufrufe.some((s) => s.includes('/pulls/7/files') && s.includes('previous_filename')))
   pruefe('echteWelt: Kommentarliste fragt Nutzer, Verband, Zeit und Text', aufrufe.some((s) => s.includes('/issues/7/comments') && s.includes('login: .user.login, assoc: .author_association, at: .created_at, body: .body')))
   pruefe('echteWelt: Details aus Dateien, Kommentaren, Checks, Stufe', voll.stufe === 0 && voll.pfade.join(',') === 'web/src/a.tsx,docs/alt.md' && voll.kommentare.length === 2 && voll.checks.length === 2)
@@ -554,16 +547,18 @@ pruefe('argumente: ungültig', argumente(['--hoechstens', '0']) === null && argu
 }
 
 {
-  // Stufe 2 mit Bot-ok: eine eigene Zeile mit Kopf und Nachtragszeile statt der allgemeinen Abweisung; Stufe 1 daneben wird gemergt
-  const w = welt([pr({ nummer: 31, stufe: 2 }), pr({ nummer: 32, stufe: 1 }), pr({ nummer: 33, stufe: 2, kommentare: [] })])
-  const r = lauf(w, { hoechstens: 3 })
-  const fehlt = w.log.zeilen.filter((z) => z.startsWith('NACHTRAG FEHLT'))
-  pruefe('Nachtrag fehlt: genau eine Zeile, nur für PR 31', fehlt.length === 1 && fehlt[0].startsWith('NACHTRAG FEHLT #31 '))
-  pruefe('Nachtrag fehlt: Zeile nennt den Kopf mit genau neun Zeichen und die zu schreibende Zeile', fehlt[0].startsWith('NACHTRAG FEHLT #31 Kopf a1b2c3d4e: ') && fehlt[0].includes(nachtragZeile(KOPF)))
-  pruefe('Nachtrag fehlt: keine zweite ÜBERSPRUNGEN-Zeile für 31', !w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN #31')))
-  pruefe('Nachtrag fehlt: PR 33 ohne Urteil bleibt ÜBERSPRUNGEN', w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN #33') && z.includes('kein Prüfer-Urteil zu diesem Kopf')))
-  pruefe('Nachtrag fehlt: Stufe 1 wird gemergt, 31 nie', r.gemergt.join(',') === '32')
-  pruefe('Nachtrag fehlt: Schlusszeile zählt sie mit', w.log.zeilen.at(-1) === 'Nacht-Merger: 1 gemergt, 0 Fehler, 1 Kandidaten, 1 warten auf Nachtrag')
+  // Nachprüfung nach dem Merge (Daniel 27.11.2026): nur gemergte Stufe-2-PRs bekommen das Label, nach dem Merge, nie im Trockenlauf
+  const stufen = () => [pr({ nummer: 41, stufe: 2 }), pr({ nummer: 42, stufe: 1 }), pr({ nummer: 43, stufe: 2 })]
+  const w = welt(stufen())
+  lauf(w, { hoechstens: 3 })
+  pruefe('Nachprüfung: Label nur an Stufe 2, je nach dem Merge', w.log.aufrufe.filter((a) => /^(merge|label)/.test(a)).join(',') === 'merge 41,label 41 nachpruefung-offen,merge 42,merge 43,label 43 nachpruefung-offen')
+  pruefe('Nachprüfung: Protokollzeile je Label', w.log.zeilen.filter((z) => z.startsWith('NACHPRÜFUNG OFFEN #')).join('|') === 'NACHPRÜFUNG OFFEN #41: Label nachpruefung-offen gesetzt|NACHPRÜFUNG OFFEN #43: Label nachpruefung-offen gesetzt')
+  const t = welt(stufen())
+  lauf(t, { trocken: true })
+  pruefe('Nachprüfung: Trockenlauf setzt kein Label', !t.log.aufrufe.some((a) => a.startsWith('label')))
+  const f = welt([pr({ nummer: 51, stufe: 2 }), pr({ nummer: 52, stufe: 1 })], { labelFehler: true })
+  const r = lauf(f, { hoechstens: 3 })
+  pruefe('Nachprüfung: Label-Fehler stoppt nichts, Zeile nennt Grund, Exit bleibt 0', r.gemergt.join(',') === '51,52' && exitCode(r) === 0 && f.log.zeilen.some((z) => z === 'NACHPRÜFUNG-LABEL FEHLGESCHLAGEN #51: HTTP 403: Resource not accessible'))
 }
 if (fehler > 0) {
   console.error(`nacht-merger.test: ${fehler} von ${anzahl} Fällen rot`)

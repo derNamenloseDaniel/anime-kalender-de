@@ -11,8 +11,7 @@
  * Exit 0 sonst, 1 wenn ein Merge scheiterte, 2 bei Aufruffehlern.
  */
 import { pathToFileURL } from 'node:url'
-import { MIN_HASH } from './abnahme-freigabe.mjs'
-import { kandidat, nachtragZeile, reihenfolge, vorabGrund } from './nacht-merger-wahl.mjs'
+import { kandidat, reihenfolge, vorabGrund } from './nacht-merger-wahl.mjs'
 
 export const HOECHSTENS_VORGABE = 3
 /** Wartezeit vor der einen Wiederholung, wenn GitHub die Mergebarkeit noch rechnet (UNKNOWN, gemessen 07.11.2026 bei #2994/#3049: wenig später CLEAN). */
@@ -39,6 +38,18 @@ export function mergeStatusGrund(welt, nummer) {
   return status === 'CLEAN' ? null : { grund: `Mergestatus in der Einzelabfrage ${status}, nicht CLEAN`, unentschieden: status === 'UNKNOWN' }
 }
 
+export const NACHPRUEFUNG_LABEL = 'nachpruefung-offen'
+
+/** Gemergter Stufe-2-PR bekommt das Label (Daniel 27.11.2026: Prüfung nach dem Merge statt Tor davor); scheitert es, steht der Fehler im Protokoll, der Merge gilt. */
+export function markiereNachpruefung(welt, nummer) {
+  try {
+    welt.markiere(nummer, NACHPRUEFUNG_LABEL)
+    welt.zeile(`NACHPRÜFUNG OFFEN #${nummer}: Label ${NACHPRUEFUNG_LABEL} gesetzt`)
+  } catch (e) {
+    welt.zeile(`NACHPRÜFUNG-LABEL FEHLGESCHLAGEN #${nummer}: ${String(e.message).split('\n')[0]}`)
+  }
+}
+
 /** Warnzeile (GitHub-Anmerkung), wenn ein Lauf nichts merget, obwohl PRs technisch nicht entschieden werden konnten; sonst null. */
 export function stillstandWarnung(gemergt, unentschieden) {
   if (gemergt > 0 || unentschieden.length === 0) return null
@@ -55,7 +66,6 @@ export function lauf(welt, { hoechstens = HOECHSTENS_VORGABE, trocken = false, b
   const start = welt.jetzt()
   const abgewiesen = (pr, grund) => welt.zeile(`ÜBERSPRUNGEN #${pr.nummer}: ${grund}`)
   const kandidaten = []
-  let wartenAufNachtrag = 0
   for (const pr of welt.offene()) {
     const vorab = vorabGrund(pr)
     if (vorab !== null) {
@@ -65,10 +75,7 @@ export function lauf(welt, { hoechstens = HOECHSTENS_VORGABE, trocken = false, b
     const voll = welt.details(pr)
     const urteil = kandidat(voll)
     if (urteil.kandidat) kandidaten.push({ ...voll, grund: urteil.grund })
-    else if (urteil.nachtragFehlt) {
-      wartenAufNachtrag += 1
-      welt.zeile(`NACHTRAG FEHLT #${pr.nummer} Kopf ${voll.kopf.slice(0, MIN_HASH)}: Stufe 2, Prüfer-Ok, Kette grün; Nacht-Dirigent liest Diff und Prüferbericht, dann Nachtrag „${nachtragZeile(voll.kopf)}“`)
-    } else abgewiesen(pr, urteil.grund)
+    else abgewiesen(pr, urteil.grund)
   }
   const gemergt = []
   const unentschieden = []
@@ -118,8 +125,9 @@ export function lauf(welt, { hoechstens = HOECHSTENS_VORGABE, trocken = false, b
     }
     gemergt.push(pr.nummer)
     welt.zeile(`GEMERGT #${pr.nummer}: ${pr.grund}`)
+    if (pr.stufe === 2) markiereNachpruefung(welt, pr.nummer)
   }
-  welt.zeile(`Nacht-Merger: ${gemergt.length} ${trocken ? 'wären gemergt' : 'gemergt'}, ${fehler} Fehler, ${kandidaten.length} Kandidaten${wartenAufNachtrag > 0 ? `, ${wartenAufNachtrag} warten auf Nachtrag` : ''}`)
+  welt.zeile(`Nacht-Merger: ${gemergt.length} ${trocken ? 'wären gemergt' : 'gemergt'}, ${fehler} Fehler, ${kandidaten.length} Kandidaten`)
   const warnung = stillstandWarnung(gemergt.length, unentschieden)
   if (warnung !== null) welt.zeile(warnung)
   return { gemergt, fehler, stillstand: warnung !== null }

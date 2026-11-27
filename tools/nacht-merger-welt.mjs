@@ -107,5 +107,7 @@ export function echteWelt({ gh = ghEcht, stufeAus, repo = process.env.GITHUB_REP
     bestandRot: () => bestandIstRot(JSON.parse(gh(['run', 'list', '--workflow', BAU, '--limit', '30', '--json', 'status,conclusion,createdAt'])), Date.now()),
     jetzt: () => Date.now(),
     merge: (pr) => mergeMit5xxPruefung(gh, pr),
+    // Das Label entsteht beim ersten Setzen von selbst (Labels-Schnittstelle legt Unbekanntes an)
+    markiere: (nummer, label) => gh(['api', '-X', 'POST', `repos/${repo}/issues/${nummer}/labels`, '-f', `labels[]=${label}`]),
   }
 }

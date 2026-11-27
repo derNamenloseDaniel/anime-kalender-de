@@ -27,7 +27,7 @@ permissions:
   pull-requests: read
   actions: read
 
-# Zwei Läufe stießen sich bis 20.11.2026 gegenseitig die Ketten neu an; einer nach dem anderen hält den Merge-Riegel je Lauf.
+# Seit 21.11.2026 stößt der Merger keine Ketten mehr an (`tools/pr-nachrechnen.mjs` liest nur); die Sperre hält nur noch den Merge-Riegel je Lauf ein: zwei gleichzeitige Läufe mergten zusammen mehr als N.
 concurrency:
   group: nacht-merger
   cancel-in-progress: false

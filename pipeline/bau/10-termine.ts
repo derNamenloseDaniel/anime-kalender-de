@@ -12,10 +12,12 @@ import { premiereBelegtTv } from '../../shared/premiere.ts'
 import { todayIso } from '../../shared/time.ts'
 import { kostenloseFolgen } from '../../shared/kostenlos.ts'
 import { sprecherRollen } from './sprecher-anisearch.ts'
+import { leiteJoynAusTv } from './13-1-joyn-aus-tv.ts'
 import { widerlegeDeutscheTermine } from './widerlegung-woche.ts'
 import { ohneVerschobene, verschiebeHinterToggle } from './hinter-toggle.ts'
 import { urteilSchliesstLuecken } from './urteil-schliesst-luecken.ts'
-import { hinweiseAnVerworfenen, ohneOmuTermine } from './omu-ohne-termin.ts'
+import { hinweiseAnVerworfenen } from './omu-ohne-termin.ts'
+import { veralteteSynchroHinweise } from '../lib/veraltete-hinweise.ts'
 import { schreibeStaffelFolgen } from './staffel-folge-termine.ts'
 import { ladeTvStaffelEingaben, meldeTvStaffelFolgen, schreibeTvStaffelFolgen } from './staffel-folge-tv.ts'
 import { ladeStaffelGrenzen, staffelListen } from '../lib/pokemon-staffeln.ts'
@@ -86,6 +88,12 @@ export function rolleTermineAus({ releases, titles, jpStart }: {
 }) {
   /* Erst widerlegen, dann auffalten: Ein widerlegter Termin erzeugt kein Ereignis (02.10.2026). */
   widerlegeDeutscheTermine(releases, titles)
+  for (const r of veralteteSynchroHinweise(releases, todayIso())) {
+    warn(`Hinweis an „${r.slug}“ entfällt: Die deutsche Folge ist schon erschienen, der Ankündigungs-Hinweis gilt nicht mehr (data/ bereinigen).`)
+    delete r.hinweis
+  }
+  const joynAusTv = leiteJoynAusTv(releases)
+  if (joynAusTv.length) log(`${joynAusTv.length} Joyn-Termin(e) aus dem belegten TV-Sendeplan abgeleitet: ${joynAusTv.join(', ')}`)
   const events: ReleaseEvent[] = releases
     .flatMap(expandEvents)
     .sort(nachTagUndZeit)
@@ -119,7 +127,7 @@ export function rolleTermineAus({ releases, titles, jpStart }: {
   schreibeKostenlosAuskunft(events, titles)
   log(`Staffel und Folge: ${schreibeStaffelFolgen(events, staffelListen(ladeStaffelGrenzen()))} Termine`)
   meldeTvStaffelFolgen(schreibeTvStaffelFolgen(events, ladeTvStaffelEingaben()))
-  return { events: ohneOmuTermine(ohneVerschobene(events, verschoben), titles), mitStimmen, verschoben }
+  return { events: ohneVerschobene(events, verschoben), mitStimmen, verschoben }
 }
 
 /**

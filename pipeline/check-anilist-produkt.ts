@@ -10,7 +10,8 @@
  */
 import { readJson } from './lib/util.ts'
 import { ladeBewertungen, parseKlarwert, parseSchlagworte, parseStimmen } from './lib/anisearch-bewertung.ts'
-import { MIN_STIMMEN_BEWERTUNG } from './bau/produkt-regel.ts'
+import { MIN_STIMMEN_BEWERTUNG, serienDaten } from './bau/produkt-regel.ts'
+import { serienbildFremd } from './bau/banner-serienbild.ts'
 import { ladeGeteilteFilme, merkeGeteilteFilme, ohneGeteilteFilme } from './lib/tmdb-eindeutig.ts'
 import { BANNER_DATEI, bannerAdresse, waehleBanner, type TmdbBanner } from './lib/tmdb-banner.ts'
 import { SCHLAGWORT_LISTE, SCHLAGWORT_MAX } from '../shared/schlagworte.ts'
@@ -47,6 +48,13 @@ function einheiten(): void {
   pruefe('Banner: deutsch vor dem breiteren japanischen', waehleBanner([bild(3840, 2160, 'ja'), bild(1280, 720, 'de')])?.iso_639_1 === 'de')
   pruefe('Banner: nur japanisch bleibt japanisch', waehleBanner([bild(1920, 1080, 'ja')])?.iso_639_1 === 'ja')
   pruefe('Banner: zu schmal oder Hochformat gibt keins', waehleBanner([bild(1000, 562, null), bild(1000, 1500, null)]) === undefined)
+  const AL = 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/1-x.jpg'
+  const tm = '/a.jpg'
+  pruefe('Wächter Banner: AniList ohne TMDB-Eintrag ist Übergang', bannerErlaubt(AL, undefined, false))
+  pruefe('Wächter Banner: AniList neben TMDB-Eintrag bei fremdem Serienbild ist erlaubt', bannerErlaubt(AL, tm, true))
+  pruefe('Wächter Banner: AniList neben TMDB-Eintrag, Einzelstaffel mit eigenem TMDB-Bild, bleibt Verstoß', !bannerErlaubt(AL, tm, false))
+  pruefe('Wächter Banner: TMDB-Bild nur das gewählte', bannerErlaubt(bannerAdresse(tm), tm, false) && !bannerErlaubt(bannerAdresse('/b.jpg'), tm, true))
+  pruefe('Wächter Banner: fremder Host nie', !bannerErlaubt('https://example.com/x.jpg', undefined, true))
 }
 
 const host = (u: string): string => {
@@ -55,6 +63,12 @@ const host = (u: string): string => {
   } catch {
     return ''
   }
+}
+
+/** TMDB-Bild nur das gewählte; AniList-Banner nur wo TMDB keins hat oder dessen Serienbild einen anderen Teil zeigt (`serienbildFremd`, `bau/produkt-regel.ts`). */
+function bannerErlaubt(bannerImage: string, tmdb: string | undefined, fremd: boolean): boolean {
+  if (host(bannerImage) === 'image.tmdb.org') return tmdb !== undefined && bannerImage === bannerAdresse(tmdb)
+  return host(bannerImage) === 's4.anilist.co' && (tmdb === undefined || fremd)
 }
 
 function pruefeTitel(datei: string, titel: Title[], banner: TmdbBanner): void {
@@ -71,8 +85,9 @@ function pruefeTitel(datei: string, titel: Title[], banner: TmdbBanner): void {
     for (const k of t.keywords ?? []) if (!erlaubt.has(k)) schlecht.schlagwort.push(`${t.id}:${k}`)
     if (!t.bannerImage || t.bannerVon !== undefined) continue // übernommene Banner prüft `check-banner-franchise.ts`
     const tmdb = banner[String(lesekennung(t))]?.p /* Staffel-Titel: Banner liegt am Sammeltitel */
-    const ok = host(t.bannerImage) === 'image.tmdb.org' ? tmdb && t.bannerImage === bannerAdresse(tmdb) : host(t.bannerImage) === 's4.anilist.co' && !tmdb
-    if (!ok) schlecht.banner.push(t.id)
+    const { zuordnung, folgen, geteilt } = serienDaten()
+    const fremd = tmdb !== undefined && serienbildFremd({ id: lesekennung(t), episodes: t.episodes }, zuordnung, folgen, geteilt)
+    if (!bannerErlaubt(t.bannerImage, tmdb, fremd)) schlecht.banner.push(t.id)
   }
   pruefe(`${datei}: jede Bewertung ist der aniSearch-Klarwert (keine von AniList)`, schlecht.score.length === 0, schlecht.score.slice(0, 5))
   pruefe(`${datei}: keine Bewertung unter ${MIN_STIMMEN_BEWERTUNG} Stimmen (Titel:Stimmen)`, schlecht.wenigStimmen.length === 0, schlecht.wenigStimmen.slice(0, 5))

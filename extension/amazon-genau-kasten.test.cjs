@@ -68,7 +68,7 @@ const bau = new Function(
   ].join('\n'),
 )
 
-function lauf(treffer, { gemeldet = false, gewaehlt = null, speichernOk = true } = {}) {
+function lauf(treffer, { gemeldet = false, gewaehlt = null, speichernOk = true, seite = null } = {}) {
   const p = { kasten: null, gespeichert: [], gemeldetMit: null }
   const umwelt = {
     hinweisKasten: (...args) => { p.kasten = args },
@@ -85,8 +85,8 @@ function lauf(treffer, { gemeldet = false, gewaehlt = null, speichernOk = true }
   }
   const { genauZeigen } = bau(umwelt)
   const auftrag = { titel: 'Black Butler', suchUrl: 'https://www.amazon.de/s?k=Black%20Butler' }
-  const befund = { art: 'genau', treffer: treffer.slice(0, 1) }
-  const gefunden = { treffer }
+  const befund = { art: 'genau', treffer: treffer.slice(0, 1), namensgleich: treffer }
+  const gefunden = { treffer: seite ?? treffer }
   genauZeigen(auftrag, () => 'zeichnen', befund, gefunden, [{ begriff: 'gesucht als: Black Butler' }], '24 Folgen')
   const [titel, folgen, ...rest] = p.kasten
   const gruppe = rest.find((x) => x?.kinder)
@@ -108,6 +108,13 @@ const ZEHN = Array.from({ length: 10 }, (_, i) => karte(i + 1))
   pruefe('kein „Suchtreffer anklicken": der Kasten springt nicht mehr auf eine Karte', !alleKnoepfe.some((x) => /Suchtreffer anklicken/.test(x)) && !rest.some((x) => /Suchtreffer anklicken/.test(x?.knopf ?? '')), alleKnoepfe)
   pruefe('am Ende der Weg „nicht bei Prime"', rest.at(-1)?.knopf === 'Nicht bei Prime — melden', rest.at(-1))
   pruefe('nichts wurde gespeichert, bevor Daniel übernimmt', p.gespeichert.length === 0)
+}
+
+/* Empfehlungsreihen auf der Seite (26.11.2026): zur Auswahl stehen nur die Namenstreffer, nie die ganze Seite. */
+{
+  const fremd = ['Jujutsu Kaisen', 'Frieren', 'Re:ZERO'].map((t, i) => ({ titel: t, typ: 'TV Show', zugang: 'Entitled', url: `https://www.amazon.de/gp/video/detail/B0EMPF${i}` }))
+  const { boxen } = lauf(ZEHN, { seite: [...ZEHN.slice(0, 5), ...fremd, ...ZEHN.slice(5)] })
+  pruefe('Seite mit Empfehlungen: nur die zehn Namenstreffer stehen zur Auswahl', boxen.length === 10 && boxen.every((b) => b.kennung.startsWith('B0BUTLER')), boxen.map((b) => b.kennung))
 }
 
 /* Übernehmen: genau die angekreuzten Karten gehen zum Speichern. */

@@ -1,7 +1,7 @@
 /**
  * Prüft nach dem Seitenbau (`dist/`): Jeder Titel, für den der Teilen-Knopf eine Adresse nennt,
  * hat unter `dist/t/<Slug>/` eine Seite mit og:title, og:description, og:image und canonical.
- * Titel ohne Seite (Katalog ohne Synchro) bekommen keinen Knopf (`teilbarerSlug`), nie einen toten Link.
+ * Titel ohne Seite (Katalog ohne Synchro) teilen die Hash-Adresse ihres Panels (`teilenZiel`), nie einen toten Link.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'

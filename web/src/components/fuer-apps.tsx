@@ -17,7 +17,7 @@ export function FuerApps() {
             Du darfst die Termine unter <a className={link} href="https://creativecommons.org/licenses/by/4.0/deed.de">CC BY 4.0</a> nutzen, mit Quellenangabe wie „Termine: anime-kalender.de (CC BY 4.0)“.
           </li>
           <li>Ruf den Feed höchstens einmal pro Stunde ab.</li>
-          <li>„(Synchro offen)“ und „(OmU)“ im Titel: Eine deutsche Synchro ist nicht bestätigt, bitte nie als Synchro anzeigen.</li>
+          <li>„(Synchro offen)“ im Titel: Eine deutsche Synchro ist nicht bestätigt, bitte nie als Synchro anzeigen.</li>
           <li>„(neu bei …)“ im Titel: neu bei diesem Anbieter, nicht der erste Tag der deutschen Fassung.</li>
           <li>Fehlt bei einem TV-Termin „Erstmals im TV auf Deutsch.“ in der Beschreibung, ist es eine Wiederholung oder nicht geklärt.</li>
           <li>

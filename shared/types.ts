@@ -107,6 +107,8 @@ export interface Schedule {
    * Gesichtet oder aus belegtem Plan/EPG (künftige tv-Tage, Joyn-Tage mit passendem Fenster); schlägt jede Rechnung.
    */
   observed?: Record<number, string>
+  /** Sendeplan (`wochentage`, `skipDates`) als Ganzes belegt, kein Folgentag geschätzt (Yaiba, 26.11.2026); Joyn übernimmt ihn (`13-1-joyn-aus-tv.ts`). */
+  sendeplanBelegt?: boolean
   /**
    * Synchro-Tage der Folgen hinter der letzten Beobachtung, aus dem Originaltermin plus gemessenem Abstand
    * (`shared/synchro-original.ts`, 15.10.2026). Nur gesetzt, wenn der Abstand stabil ist; bleibt Fortschreibung (`estimated`).
@@ -712,7 +714,7 @@ export interface ReleaseEvent {
   /** An diesem Tag kostenlos schaubar — nur für Termine von heute gesetzt (`shared/kostenlos.ts`). */
   kostenlos?: boolean
   name: string
-  estimated?: boolean; sprache?: Release['sprache']; nachLuecke?: boolean // hinter einer offenen Lücke: kann noch nicht erschienen sein (`shared/luecken.ts`)
+  estimated?: boolean; sprache?: Exclude<Release['sprache'], 'omu'>; nachLuecke?: boolean // hinter einer offenen Lücke: kann noch nicht erschienen sein (`shared/luecken.ts`)
   /**
    * Gesetzt, wenn der Anbieter diesen Termin nicht eingehalten hat.
    *
@@ -723,6 +725,7 @@ export interface ReleaseEvent {
   verpasst?: VermerkAusgeblieben
   /** Nur angekündigt, noch nicht beim Anbieter gesehen: nach dem Termin „fällig“, nicht „erschienen“ (`shared/termin-zustand.ts`). */
   ohneSichtung?: boolean
+  vorBeobachtung?: boolean // Eine spätere Folge ist beobachtet: diese ist sicher erschienen, nur ihr Tag bleibt Rückrechnung (`estimated`; Thunder 3, 26.11.2026)
 }
 
 /**

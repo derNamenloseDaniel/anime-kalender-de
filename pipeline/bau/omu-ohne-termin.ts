@@ -1,10 +1,10 @@
-import type { Release, ReleaseEvent, Title } from '../../shared/types.ts'
+import type { Release, Title } from '../../shared/types.ts'
 import { deutschLautAnisearch, deutschGeplantLautAnisearch } from './ohne-beleg.ts'
 
 /**
- * **Ein Termin, dessen Quelle nur den Originalton nennt, gehört nicht in den Kalender**, solange weder eine deutsche Fassung
- * belegt noch eine angekündigt ist (Daniel, 14.10.2026, Dragon Ball Super: Beerus auf Netflix: „keine Deutsch-Ankündigung = Erwartung OmU = kein Eintrag").
- * Die Releases bleiben (der Weg trägt weiter „nur Untertitel“); nur die Ereignisse entfallen. Sind alle Termine eines Titels
+ * **Ein Termin, dessen Quelle nur den Originalton nennt, gehört nie in den Kalender** (Daniel, 14.10.2026, Beerus; seit 26.11.2026 auch mit
+ * Deutsch-Beleg: `expandEvents` erzeugt für `sprache: 'omu'` keine Ereignisse, `shared/nur-deutsch.ts`). Die Releases bleiben im Datensatz;
+ * ob ein Titel nur OmU-Termine hat, fragt `omuOhneDeutschBeleg` weiter. Sind alle Termine eines Titels
  * solche OmU-Termine (`nurOmuTitel`) und hat er keine deutschen Sprechrollen, verschiebt ihn `hinter-toggle.ts` aus dem Hauptbestand.
  */
 export function omuOhneDeutschBeleg(t: Title | undefined): boolean {
@@ -12,11 +12,6 @@ export function omuOhneDeutschBeleg(t: Title | undefined): boolean {
   if (t.streams.some((s) => s.dub === true) || t.deErstausgabe) return false
   if (t.ankuendigung?.synchro === 'angekuendigt') return false
   return !deutschLautAnisearch(t) && !deutschGeplantLautAnisearch(t.id)
-}
-
-/** Lässt die OmU-Termine der Titel ohne Deutsch-Beleg weg; alles andere (auch `sprache: 'offen'`) bleibt. */
-export function ohneOmuTermine(events: ReleaseEvent[], titles: Map<number, Title>): ReleaseEvent[] {
-  return events.filter((e) => !(e.sprache === 'omu' && omuOhneDeutschBeleg(titles.get(e.titleId))))
 }
 
 /**

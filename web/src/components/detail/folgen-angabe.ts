@@ -4,7 +4,7 @@ import { dubBild, bereicheGekuerzt, dubLuecken, dubGrenze, bereicheKurz } from '
 import { releaseStatus, expandEvents } from '@shared/logic.ts'
 import { formatDate } from '@shared/time.ts'
 import type { Translate } from '../../lib/i18n.tsx'
-import { abgeleiteteFolgen, ungefaehr, zaehleErschienen } from './antwort-regeln.ts'
+import { abgeleiteteFolgen, reichtBis, ungefaehr, zaehleErschienen } from './antwort-regeln.ts'
 import { zaehlPlattform } from './prime-kanal.ts'
 import { erschieneneSpanne, ergaenzungGeschaetzt, planGeschaetzt } from './folgen-spanne.ts'
 
@@ -124,7 +124,7 @@ function folgenAngabe(e: Eingabe, s: Weg | undefined): string {
   */
   if (s && s.dub !== true) return ''
   const abgeleitet = abgeleiteteFolgen(title, releases, today)
-  return abgeleitet ? ungefaehr(t('detail.folgenKurz', { n: abgeleitet }), true) : ''
+  return abgeleitet ? ungefaehr(t('detail.folgenKurz', { n: abgeleitet }), !anbieterReleases.some((r) => reichtBis(r, abgeleitet))) : ''
 }
 
 export function folgenAuskunft(eingabe: Eingabe): (s: Weg | undefined) => string {

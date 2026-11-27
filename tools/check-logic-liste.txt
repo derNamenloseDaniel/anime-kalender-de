@@ -105,7 +105,9 @@ pipeline/check-ausbleiben-messen.ts
 pipeline/check-ausgeblieben-text.ts
 pipeline/check-ausloeser-zeilen.ts
 pipeline/check-auto-disc-handeintrag.ts
+pipeline/check-banner-ersatz.ts
 pipeline/check-banner-franchise.ts
+pipeline/check-banner-serienbild.ts
 pipeline/check-beleg-adresswechsel.ts
 pipeline/check-beleg-anbieter.ts
 pipeline/check-beleg-api-web.ts
@@ -208,6 +210,7 @@ pipeline/check-db-karte-lauf.ts
 pipeline/check-db-relevanz.ts
 pipeline/check-db-staffel-kachel.ts
 pipeline/check-detektiv-funde.ts
+pipeline/check-deutsch-belegt-klaeren.ts
 pipeline/check-deutsche-folgenzahl-hinweis.ts
 pipeline/check-deutsche-folgenzahl.ts
 pipeline/check-disc-anisearch-bau.ts
@@ -315,6 +318,7 @@ pipeline/check-folgenzahl-offen-bau.ts
 pipeline/check-folgenzahl-offen.ts
 pipeline/check-folgenzahl-sichtung.ts
 pipeline/check-fsk-franchise.ts
+pipeline/check-fsk-justwatch-bilanz.ts
 pipeline/check-fsk-kopf-hinweis.ts
 pipeline/check-fsk-kopf-render.ts
 pipeline/check-geheimnis-testlauf.ts
@@ -342,6 +346,7 @@ pipeline/check-handlung-eigen-hinweis.ts
 pipeline/check-handlung-eigen.ts
 pipeline/check-handlung-quelle-panel.ts
 pipeline/check-handlung-quelle.ts
+pipeline/check-handlung-satz.ts
 pipeline/check-hauptrelease.ts
 pipeline/check-herkunft-je-folge.ts
 pipeline/check-herkunftsfilter.ts
@@ -361,6 +366,7 @@ pipeline/check-invarianten.ts
 pipeline/check-ja-hat-weg.ts
 pipeline/check-joyn-block-wache.ts
 pipeline/check-joyn-danach.ts
+pipeline/check-joyn-folgen-aus-tv.ts
 pipeline/check-joyn-hand-tv.ts
 pipeline/check-joyn-luecke-lauf.ts
 pipeline/check-joyn-luecke.ts
@@ -470,6 +476,8 @@ pipeline/check-monitor-statistik.ts
 pipeline/check-motn-reihe.ts
 pipeline/check-motn-uebernahme.ts
 pipeline/check-nachlade-vorwaermen.ts
+pipeline/check-nachleger-im-kasten.ts
+pipeline/check-nachleger-panel.ts
 pipeline/check-namens-zuordnung.ts
 pipeline/check-nebendateien-laufzeit.ts
 pipeline/check-nein-datum.ts
@@ -493,6 +501,7 @@ pipeline/check-netflix-tonspur.ts
 pipeline/check-netflix-umleitung-ablauf.ts
 pipeline/check-netflix-umleitung-meldung.ts
 pipeline/check-netflix-umleitung.ts
+pipeline/check-netflix-zaehlung.ts
 pipeline/check-netflix-zweite-kennung.ts
 pipeline/check-netflix-zweites-404.ts
 pipeline/check-neu-auf-deutsch.ts
@@ -510,6 +519,7 @@ pipeline/check-news-rhythmus.ts
 pipeline/check-news-staffel-zuordnung.ts
 pipeline/check-norm-schluessel.ts
 pipeline/check-notiz-fassung.ts
+pipeline/check-nur-deutsch.ts
 pipeline/check-nur-omu-hauptbestand.ts
 pipeline/check-nur-omu-vorstand.ts
 pipeline/check-nur-originalton-liste.ts
@@ -601,6 +611,7 @@ pipeline/check-reihen-traeger-aufrufer.ts
 pipeline/check-reihen-traeger.ts
 pipeline/check-reihen-uebersicht.ts
 pipeline/check-reihen-zeile-spanne.ts
+pipeline/check-reihen-zeilen.ts
 pipeline/check-reinids-grund.ts
 pipeline/check-reiter-blase.ts
 pipeline/check-reiter-lage-grund.ts
@@ -677,6 +688,7 @@ pipeline/check-staffelzaehlung.ts
 pipeline/check-staffelzitat.ts
 pipeline/check-stand-halten.ts
 pipeline/check-start-texte.ts
+pipeline/check-stream-pillen-sichtbar.ts
 pipeline/check-streaming-kleinfixes.ts
 pipeline/check-streaming-luecke-klassen.ts
 pipeline/check-streaming-luecke.ts
@@ -703,6 +715,8 @@ pipeline/check-synchro-termin-offen.ts
 pipeline/check-synchro-widerspruch.ts
 pipeline/check-tab-titel-quelle-lauf.ts
 pipeline/check-takt.ts
+pipeline/check-teilen-knoepfe-karten.ts
+pipeline/check-teilen-knopf.ts
 pipeline/check-telekom-annahme.ts
 pipeline/check-telekom-pille.ts
 pipeline/check-termin-knopfzahl.ts
@@ -724,6 +738,7 @@ pipeline/check-tmdb-ablauf.ts
 pipeline/check-tmdb-angebote-kopie.ts
 pipeline/check-tmdb-film-suche.ts
 pipeline/check-tmdb-film-vorrang-lauf.ts
+pipeline/check-tmdb-film-zwilling.ts
 pipeline/check-tmdb-folgen-404-lauf.ts
 pipeline/check-tmdb-folgen-404.ts
 pipeline/check-tmdb-folgen-auswahl.ts
@@ -747,6 +762,7 @@ pipeline/check-tmdb-staffel0-eigene-lauf.ts
 pipeline/check-tmdb-staffel0-liste.ts
 pipeline/check-tmdb-staffel0.ts
 pipeline/check-tmdb-suche.ts
+pipeline/check-tmdb-suchfehler.ts
 pipeline/check-tmdb-von-hand-abgeleitet.ts
 pipeline/check-toggo-adresse-stabil.ts
 pipeline/check-toggo-seiten-bestand-lauf.ts
@@ -783,11 +799,16 @@ pipeline/check-verweis-grund-region.ts
 pipeline/check-verweis-ziel.ts
 pipeline/check-verweise-gedaechtnis.ts
 pipeline/check-verweise-von-hand.ts
+pipeline/check-vor-beobachtung.ts
 pipeline/check-vorfaelle-ablauf.ts
 pipeline/check-vorlieben-getrennt.ts
 pipeline/check-vorlieben.ts
+pipeline/check-warnungen-zaehlen.ts
 pipeline/check-weg-adresse-bezugsweg.ts
 pipeline/check-weg-aus-meldung.ts
+pipeline/check-weg-handrecherche-b.ts
+pipeline/check-weg-handrecherche-c.ts
+pipeline/check-weg-handrecherche-w3.ts
 pipeline/check-weg-massenabgang.ts
 pipeline/check-weg-nein-gti.ts
 pipeline/check-weg-unten.ts

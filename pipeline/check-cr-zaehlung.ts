@@ -64,14 +64,14 @@ console.log('\nBau (baueReleases mit den echten Black-Clover-Einträgen aus data
   const mit = bau(eintraege)
   pruefe('Bau: Synchro-Eintrag trägt Folge 4 statt 174', JSON.stringify(von(mit, synchro)?.schedule.observed) === '{"1":"2026-11-07","2":"2026-11-14","3":"2026-11-21","4":"2026-11-28"}', von(mit, synchro)?.schedule.observed)
   pruefe('Bau: Start bleibt der 07.11., kein Staffelstart am 28.11.', von(mit, synchro)?.schedule.firstEpisodeDate === '2026-11-07', von(mit, synchro)?.schedule.firstEpisodeDate)
-  const omu = von(mit, 'black-clover-s2-crunchyroll')
-  pruefe('Bau: OmU-Begleiter behält den Untertitel-Start 03.10. ohne Beobachtungen', omu?.schedule.firstEpisodeDate === '2026-10-03' && !omu.schedule.observed, omu?.schedule)
+  // Der OmU-Termin speiste Panel und News mit seiner eigenen Zählung (Folge 9 statt 4); seit 27.11.2026 entfallen.
+  pruefe('Bau: kein OmU-Termin neben dem Synchro-Termin', von(mit, 'black-clover-s2-crunchyroll') === undefined, mit.map((r) => r.slug))
   // Gegenprobe: ohne `crZaehlungAb` (Stand vor dem Fix) steht die absolute Nummer im Datensatz und der Wächter schlägt an.
   const ohne = bau(eintraege.map(({ crZaehlungAb: _weg, ...rest }) => rest))
   pruefe('Bau ohne crZaehlungAb: 174 im Datensatz (der Test ist ohne den Fix rot)', von(ohne, synchro)?.schedule.observed?.[174] !== undefined, von(ohne, synchro)?.schedule.observed)
   pruefe('Bau ohne crZaehlungAb: der Wächter schlägt an', crAbsoluteZaehlungFehler(ohne, new Map()).length === 1, crAbsoluteZaehlungFehler(ohne, new Map()))
   pruefe('Bau mit crZaehlungAb: der Wächter schweigt', crAbsoluteZaehlungFehler(mit, new Map()).length === 0, crAbsoluteZaehlungFehler(mit, new Map()))
-  pruefe('Nur ein kuratierter Eintrag ist OmU mit Crunchyroll-Slot (Black Clover, Stand 26.11.2026)', alle.filter((e) => e.sprache === 'omu' && e.platform === 'crunchyroll').length === 1)
+  pruefe('Kein kuratierter Eintrag ist OmU mit Crunchyroll-Slot (Stand 27.11.2026)', alle.filter((e) => e.sprache === 'omu' && e.platform === 'crunchyroll').length === 0)
 }
 
 if (verletzt) {

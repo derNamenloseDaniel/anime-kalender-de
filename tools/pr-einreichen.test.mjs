@@ -76,7 +76,7 @@ function szenario({ zweig = 'fix/test', vorhanden = false, vorpruefungExit = 0, 
     const r = spawnSync('bash', ['tools/pr-einreichen.sh', 'Titel', 'Text'], { cwd: arbeit, env, encoding: 'utf8', timeout: 60000 })
     const aufrufe = existsSync(join(ablage, 'aufrufe.jsonl')) ? readFileSync(join(ablage, 'aufrufe.jsonl'), 'utf8').trim().split('\n').filter(Boolean).map((z) => JSON.parse(z)) : []
     const prText = existsSync(join(ablage, 'pr_text')) ? readFileSync(join(ablage, 'pr_text'), 'utf8') : null
-    const zweige = spawnSync('git', ['branch', '--list'], { cwd: remote, encoding: 'utf8' }).stdout.trim()
+    const zweige = spawnSync('git', ['branch', '--list'], { cwd: remote, encoding: 'utf8', timeout: 20000 }).stdout.trim()
     return { exit: r.status, aus: r.stdout + r.stderr, aufrufe, prText, zweige }
   } finally {
     rmSync(wurzel, { recursive: true, force: true })

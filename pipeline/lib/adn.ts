@@ -396,7 +396,7 @@ export interface AdnName {
  */
 const KURZ_ABER_WICHTIG = new Set(['ova', 'ona', 'oad', 'tv'])
 
-function woerterVon(s: string): Set<string> {
+export function woerterVon(s: string): Set<string> {
   return new Set(
     s
       .toLowerCase()

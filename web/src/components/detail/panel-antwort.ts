@@ -10,7 +10,8 @@ import { lueckeOhneAnbieter } from './folgen-ohne-anbieter.ts'
 import { dubZeilenVon } from './dub-zeilen.ts'
 import { berechneAntwortMitDeFolgen } from './antwort-de-folgen.ts'
 import { sortiereNachZugang } from './wege-sortieren.ts'
-import { wegeOhneNurUntertitel } from './legende-zeilen.ts'
+import { sichtbareTermine, sichtbareWege } from './wege-sichtbar.ts'
+import { ohneSprachbelegFuer, wegeOhneNurUntertitel } from './legende-zeilen.ts'
 import { kastenNotizVon, wegeHinweisVon } from './kasten-hinweise.ts'
 import { useReleaseSichten } from './release-sichten.ts'
 
@@ -45,17 +46,24 @@ function useWegeSichten({ title, releases, nurUntertitel, today }: Pick<PanelAnt
    * stehen:** Was hier fehlt, fällt aus allen Gruppen und verschwindet
    * kommentarlos aus der Anzeige.
    */
-  const sortiertNachZugang = useMemo(() => {
-    return title ? wegeOhneNurUntertitel(sortiereNachZugang({ title }), title, [...releases, ...nurUntertitel]) : sortiereNachZugang({ title })
-  }, [title, releases, nurUntertitel])
+  const alleWege = useMemo(() => sortiereNachZugang({ title }), [title])
+  /* Termine mit Untertiteln allein sind aus `releases` heraus; sie dienen nur dazu, ihre Wege zu erkennen und auszublenden. */
+  const mitUntertitel = useMemo(() => [...releases, ...nurUntertitel], [releases, nurUntertitel])
+  const sortiertNachZugang = useMemo(() => (title ? sichtbareWege(alleWege, title, mitUntertitel) : alleWege), [alleWege, title, mitUntertitel])
+  /* Der Kopf sagt „Sprache offen“ nach allen Wegen außer Untertitel-Wegen, auch nach denen, die als Dublette entfallen; sonst stünde „Alle N Folgen auf Deutsch“ über einem Reiter ohne Beleg. */
+  const ohneSprachbeleg = useMemo(
+    () => (title ? ohneSprachbelegFuer(wegeOhneNurUntertitel(alleWege, title, mitUntertitel), title, mitUntertitel) : undefined),
+    [alleWege, title, mitUntertitel],
+  )
   const { discReleases, releaseJePlattform, kinoRelease } = useReleaseSichten(releases, today)
-  const terminReleases = useTerminReleases(releases, title, kinoRelease?.slug, today)
+  const alleTermine = useTerminReleases(releases, title, kinoRelease?.slug, today)
+  const terminReleases = useMemo(() => sichtbareTermine(alleTermine, sortiertNachZugang), [alleTermine, sortiertNachZugang])
   /* Führt der Titel den Anbieter schon als Link, steht dort dessen Pille; der Termin allein erst vor der ersten Folge. */
   const streamReleases = useMemo(
     () => terminReleases.filter((r) => !(title?.streams ?? []).some((s) => s.platform === r.platform)),
     [terminReleases, title],
   )
-  return { sortiertNachZugang, discReleases, releaseJePlattform, kinoRelease, terminReleases, streamReleases }
+  return { sortiertNachZugang, ohneSprachbeleg, discReleases, releaseJePlattform, kinoRelease, terminReleases, streamReleases }
 }
 
 /**

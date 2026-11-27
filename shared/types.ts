@@ -725,6 +725,7 @@ export interface ReleaseEvent {
   verpasst?: VermerkAusgeblieben
   /** Nur angekündigt, noch nicht beim Anbieter gesehen: nach dem Termin „fällig“, nicht „erschienen“ (`shared/termin-zustand.ts`). */
   ohneSichtung?: boolean
+  vorBeobachtung?: boolean // Eine spätere Folge ist beobachtet: diese ist sicher erschienen, nur ihr Tag bleibt Rückrechnung (`estimated`; Thunder 3, 26.11.2026)
 }
 
 /**

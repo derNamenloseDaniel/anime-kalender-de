@@ -687,6 +687,7 @@ pipeline/check-staffelzaehlung.ts
 pipeline/check-staffelzitat.ts
 pipeline/check-stand-halten.ts
 pipeline/check-start-texte.ts
+pipeline/check-stream-pillen-sichtbar.ts
 pipeline/check-streaming-kleinfixes.ts
 pipeline/check-streaming-luecke-klassen.ts
 pipeline/check-streaming-luecke.ts
@@ -797,6 +798,7 @@ pipeline/check-verweis-grund-region.ts
 pipeline/check-verweis-ziel.ts
 pipeline/check-verweise-gedaechtnis.ts
 pipeline/check-verweise-von-hand.ts
+pipeline/check-vor-beobachtung.ts
 pipeline/check-vorfaelle-ablauf.ts
 pipeline/check-vorlieben-getrennt.ts
 pipeline/check-vorlieben.ts

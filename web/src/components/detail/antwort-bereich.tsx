@@ -3,7 +3,7 @@ import { FolgenMitNachlegern, nachlegerZeilen } from './nachleger-zeilen.tsx'
 import { deutscheBereicheDerWege } from './stream-bereiche.ts'
 import { synchroBelegt } from '@shared/titles.ts'
 import type { StreamLink, Release, Title, DiscAusgabe } from '@shared/types.ts'
-import { ohneSprachbelegFuer, zeilenGruppen } from './legende-zeilen.ts'
+import { zeilenGruppen } from './legende-zeilen.ts'
 import type { TvZuletzt } from '../../lib/tv-zuletzt.ts'
 import { tvVorbeiGruppen } from './tv-vorbei.tsx'
 import type { Translate } from '../../lib/i18n.tsx'
@@ -68,9 +68,11 @@ function KastenHinweis({ folgenLuecke, title, antwort, verbindung, favorites, t 
   return <KinoZuletzt titleId={title.id} antwort={antwort} t={t} />
 }
 
-export function AntwortBereich({ antwort, sortiertNachZugang, streamReleases, terminReleases, title, t, today, wegeHinweis, tvVorbei, kastenNotiz, folgenLuecke, verbindung, favorites, onToggleFavorite, folgenAngabeFuer, dubZeilen, releaseJePlattform, releases, discAusgaben, discReleases, discZuerst }: {
+export function AntwortBereich({ antwort, sortiertNachZugang, ohneSprachbeleg, streamReleases, terminReleases, title, t, today, wegeHinweis, tvVorbei, kastenNotiz, folgenLuecke, verbindung, favorites, onToggleFavorite, folgenAngabeFuer, dubZeilen, releaseJePlattform, releases, discAusgaben, discReleases, discZuerst }: {
   antwort: ReturnType<typeof berechneAntwort>
   sortiertNachZugang: ReturnType<typeof sortiereNachZugang>
+  /** Die Sprachaussage des Kopfs, nach allen Wegen des Titels (auch den ausgeblendeten) bestimmt. */
+  ohneSprachbeleg: boolean | 'anbieter' | undefined
   streamReleases: Release[]
   /** Alle Termine mit Anbieter/Sender, auch die, deren Anbieter schon als Link da ist. */
   terminReleases: Release[]
@@ -102,7 +104,7 @@ export function AntwortBereich({ antwort, sortiertNachZugang, streamReleases, te
           pillenGruppen={pillenGruppenVon(sortiertNachZugang, title, releases, terminReleases, tvVorbei)}
           antwort={antwort}
           releases={releases}
-          ohneSprachbeleg={ohneSprachbelegFuer(sortiertNachZugang, title, releases)}
+          ohneSprachbeleg={ohneSprachbeleg}
           terminPillen={terminPillen(terminReleases, title, releases, today, folgenAngabeFuer)}
           title={title}
           t={t}

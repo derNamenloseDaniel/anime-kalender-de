@@ -125,8 +125,8 @@ export function VerpasstMarke({ event, t }: { event: ReleaseEvent; t: Translate 
 }
 
 /**
- * **Ein Termin ohne belegte Synchro sagt es auf der Karte** (10.10.2026, Beerus): „Synchro offen" statt eines
- * stillen deutschen Termins. Die Erklärung steht im Tooltip und als Notiz im Panel. Nur-Untertitel-Termine gibt es hier nicht (`shared/nur-deutsch.ts`).
+ * **Ein Termin ohne belegte Synchro sagt es auf der Karte** (10.10.2026, Beerus): „Synchro offen" statt eines stillen deutschen
+ * Termins. Die Erklärung steht im Tooltip und als Notiz im Panel. Nur-Untertitel-Termine gibt es hier nicht (`shared/nur-deutsch.ts`).
  */
 export function SpracheMarke({ event, t }: { event: ReleaseEvent; t: Translate }) {
   if (!event.sprache) return null

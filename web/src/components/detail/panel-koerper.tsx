@@ -54,6 +54,7 @@ export function PanelKoerper(p: PanelKoerperProps) {
       <AntwortBereichOderNichts
         antwort={a.antwort}
         sortiertNachZugang={a.sortiertNachZugang}
+        ohneSprachbeleg={a.ohneSprachbeleg}
         streamReleases={a.streamReleases}
         terminReleases={a.terminReleases}
         title={title}

@@ -1062,3 +1062,13 @@ wer die Ursache dann noch kennt, hat Glück. Deshalb diese Datei.
 **Wo sind echte Risiken und Lücken?** Solange `zuAk` fehlt, führen die alten Adressen der drei Staffel-Titel ins Leere (gemerkte Titel, versandte Links). Der Folge-PR war in `status.md` nicht als eigene Zeile geführt.
 
 **Was läuft komplett falsch?** Nichts: kein Datenverlust, kein Codefehler, kein Pull Request.
+
+## 26.11.2026 — Wache meldet „Claude-Kontingent leer“ (Lauf 45896232930, Issue #5121)
+
+**Was läuft korrekt.** Der Bestand hat nichts verloren: `00-wache.md` zeigt über 24 h Titel +1, Urteile +16, offen 0, keine Abgänge; Briefkasten „Alle Adressen sind gelistet“, alle Workflow-Fristen ✓. Der Befund ist die eine ✗-Zeile: `claude-reparatur.yml`, Lauf 45870267412 (26.11. 17:44Z), Claude-Schritt endete nach Sekunden (Kontingent leer oder Token ungültig, Muster aus `betrieb.md`, 02.10.2026).
+
+**Wo ist Verbesserungspotenzial?** Die Wache nimmt den letzten nicht übersprungenen Lauf. Die Folgeläufe (45897662680, dieser hier, seit 21:22Z in Arbeit; 45898152152 wartend) hatten zur Wachzeit noch keine `conclusion`, also blieb der 17:44-Fehlschlag der „letzte“. Ein einmaliger Kontingent-Ausfall sollte nicht den ganzen Wache-Lauf rot machen.
+
+**Wo sind echte Risiken und Lücken?** Fällt das Kontingent aus, bleibt jeder rote Datenlauf unbearbeitet, bis es zurück ist; die Wache zeigt das nur, wenn gerade ein Lauf scheiterte. Ablaufdatum der Tokens ist weiter unbekannt (ℹ-Zeile).
+
+**Was läuft komplett falsch?** Nichts Belegbares: Der Claude-Schritt dieses Laufs arbeitet, das Kontingent ist zurück. Kein Codefehler, kein Pull Request.

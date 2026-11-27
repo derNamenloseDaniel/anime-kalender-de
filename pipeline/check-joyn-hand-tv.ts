@@ -104,9 +104,9 @@ const pille = (jetzt: string) => {
   bau([handtermin()], new Map([[177476, t]]))
   return joynAngabe((t.streams[0] as { fenster?: Parameters<typeof joynAngabe>[0] }).fenster, jetzt)
 }
-pruefe('Pille am 08.11. 12:00: Folge 1–2 abrufbar, Folge 3 ab 09.11.', pille('2026-11-08T12:00') === '≈ Fg. 1–2 · Fg. 3 ab 09.11.', pille('2026-11-08T12:00'))
+pruefe('Pille am 08.11. 12:00: Folge 1–2 abrufbar, Folge 3 ab 09.11.', pille('2026-11-08T12:00') === 'Fg. 1–2 · Fg. 3 ab 09.11.', pille('2026-11-08T12:00'))
 pruefe('Pille am 05.11. 18:40: noch nichts abrufbar (Sendeende 18:50), Folge 1 ab 18:50', pille('2026-11-05T18:40') === 'Fg. 1 ab 18:50', pille('2026-11-05T18:40'))
-pruefe('Pille am 09.11. 19:00: Folge 1–3', pille('2026-11-09T19:00') === '≈ Fg. 1–3 · Fg. 4 ab 10.11.', pille('2026-11-09T19:00'))
+pruefe('Pille am 09.11. 19:00: Folge 1–3', pille('2026-11-09T19:00') === 'Fg. 1–3 · Fg. 4 ab 10.11.', pille('2026-11-09T19:00'))
 
 /* Gegenproben: nichts wird geraten oder überschrieben. */
 const auto = handtermin({ observed: {} })

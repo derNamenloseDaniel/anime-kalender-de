@@ -25,6 +25,7 @@ import { schreibeSynopsenUndReichereAn } from './13-1-anreichern.ts'
 import { belegeJoynTermine } from './13-1-joyn-termine-belegt.ts'
 import { mitBelegstaerke } from '../lib/belegstaerke.ts'
 import { ergaenzeEigeneHandlungen } from './handlung-eigen-einbinden.ts'
+import { ergaenzeSaetze } from './handlung-satz-einbinden.ts'
 import { ergaenzeDeutscheFolgenzahl } from './deutsche-folgenzahl-einbinden.ts'
 import { jwNeinAnSeite } from './kanal-erbt-anbieter.ts'
 import { tonDerKanalWege } from './deutsch-nicht-gegen-sprach-termin.ts'
@@ -102,6 +103,7 @@ export function schreibeDatensatz({
   })
 
   ergaenzeEigeneHandlungen(synopses, slim, verschoben)
+  ergaenzeSaetze(synopses, new Set([...slim, ...verschoben].map((t) => t.id)))
   ergaenzeDeutscheFolgenzahl(synopses, new Map([...titles.values()].map((t) => [t.id, t.episodes])))
   const releasesVorAngebot = releases.length
   const asKennungen = anisearchKennungen([...titles.values()].map((t) => ({ id: t.id, mal: t.malId })))

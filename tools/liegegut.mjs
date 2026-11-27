@@ -37,7 +37,6 @@ export const RUHE_FREIGABE_H = 1 // Freigabe + grün + sauber, ohne Commit und K
 export const KONFLIKT_H = 2 // Konflikt ohne Aktivität; der Beginn des Konflikts ist nicht abrufbar, Näherung: letzte Aktivität.
 export const ROT_H = 2 // Rote Checks auf dem aktuellen Kopf: ein Wiederholungslauf dauert weniger.
 export const AENDERN_H = 2 // Ändern-Urteil ohne neuen Commit: ein Bauer-Lauf dauert unter zwei Stunden; andere Kommentare danach ändern daran nichts.
-export const NACHTRAG_MIN = 10 // Minuten nach dem Kopf-Commit, bis ein fehlender Nachtrag gemeldet wird (der Dirigent schreibt ihn nach dem Push).
 export const STILLSTAND_H = 12 // Keine Aktivität (Commit, Kommentar, Review), egal warum: fängt PRs, die auf kein anderes Signal passen (z. B. wartet still auf den Prüfer). Stand 27.11.2026 (vorher 48 h).
 
 const GRUEN = new Set(['SUCCESS', 'NEUTRAL', 'SKIPPED'])

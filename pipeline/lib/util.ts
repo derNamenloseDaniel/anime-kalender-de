@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync 
 import { randomUUID } from 'node:crypto'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { zaehleWarnung } from './warnungen-zaehlen.ts'
 
 /** `AK_ROOT` lässt Prüfungen ein ganzes Skript gegen eine Kulisse laufen (check-rohfolgen-ablauf.ts); im Betrieb ungesetzt. */
 export const ROOT = process.env.AK_ROOT ?? resolve(dirname(fileURLToPath(import.meta.url)), '..', '..')
@@ -32,10 +33,12 @@ export function normSchluessel(s: string | null | undefined): string {
 }
 
 export function log(...args: unknown[]): void {
+  zaehleWarnung(...args)
   console.log('[pipeline]', ...args)
 }
 
 export function warn(...args: unknown[]): void {
+  zaehleWarnung(...args)
   console.warn('[pipeline] ⚠ ', ...args)
 }
 

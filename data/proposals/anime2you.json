@@ -1,17 +1,17 @@
 {
-  "scrapedAt": "2026-11-26T17:01:46.021Z",
+  "scrapedAt": "2026-11-27T04:14:23.338Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 8,
-    "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 5,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 43,
+    "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 14,
-    "schon in einem Rubrik-Feed gelesen": 9,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 1,
-    "Sprachhinweis älter als 45 Tage": 6
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 49,
+    "schon in einem Rubrik-Feed gelesen": 33,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
+    "Sprachhinweis älter als 45 Tage": 7
   },
   "proposals": [
     {
-      "articleTitle": "Design der acht DVD-Generationsboxen zu »Pokémon« vorgestellt",
+      "articleTitle": "Neue Bilder der acht DVD-Generationsboxen zu »Pokémon« enthüllt",
       "articleUrl": "https://www.anime2you.de/news/1076238/pokemon-dvd-generationsboxen-design/",
       "publishedAt": "2026-11-26",
       "category": "disc",
@@ -25,7 +25,7 @@
         },
         {
           "iso": "2027-06-25",
-          "context": "rünglichen TV-Serie und sollen zwischen dem 18. Dezember 2026 und dem 25. Juni 2027 im monatlichen Rhythmus […] Der Beitrag Design der ach"
+          "context": "rünglichen TV-Serie und sollen zwischen dem 18. Dezember 2026 und dem 25. Juni 2027 im monatlichen Rhythmus […] Der Beitrag Neue Bilder de"
         }
       ],
       "dub": "unklar",
@@ -637,7 +637,7 @@
           "folgen": 24
         }
       ],
-      "sammelGelesen": "2026-11-24"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "Netflix nimmt »Call of the Night« in sein Programm auf",
@@ -1304,7 +1304,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-24"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "Black Friday 2026: Erste große Anime-Rabattaktionen gestartet",
@@ -2205,7 +2205,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-23"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "AniMoon-Angebot: RomCom-Serie »Toradora!« zum Sonderpreis",
@@ -2261,7 +2261,7 @@
           "folgen": 13
         }
       ],
-      "sammelGelesen": "2026-11-24"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "ProSieben MAXX zeigt »Wandering Witch: Elainas Reise« als TV-Premiere",
@@ -2599,7 +2599,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-24"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "Neue Anime-Katalogtitel im November 2026 bei aniverse",
@@ -2724,7 +2724,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-24"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "Zwei Anime-Neuzugänge auf Deutsch bei Crunchyroll",
@@ -3512,7 +3512,7 @@
       ],
       "dates": [],
       "dub": "ja",
-      "alreadyCurated": false,
+      "alreadyCurated": true,
       "sammel": [
         {
           "titel": "A Wild Last Boss Appeared!",
@@ -6644,7 +6644,7 @@
       ],
       "dates": [],
       "dub": "unklar",
-      "alreadyCurated": false,
+      "alreadyCurated": true,
       "sammel": [
         {
           "titel": "#I’m Looking For a Zombie",

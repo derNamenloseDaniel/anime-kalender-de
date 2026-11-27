@@ -124,6 +124,7 @@ export default [
         akNetflixLaufVergessen: 'readonly',
         akNetflixLeerNach: 'readonly',
         akNetflixErinnernKnopf: 'readonly',
+        akNetflixTerminLesen: 'readonly',
         akNetflixErinnernZurueckstellen: 'readonly',
         akNetflixKnopfSchreiben: 'readonly',
         akNetflixMeldenEinmal: 'readonly',

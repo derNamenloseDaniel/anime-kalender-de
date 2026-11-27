@@ -29,5 +29,18 @@ pruefe('zwei alte Fehler bleiben zusätzlich zu den letzten 80', r.length === 82
 pruefe('Eintrag ohne Feld `ok` zählt nicht als Fehler', kuerzen([{ was: 'frame' }, ...eintraege(80)]).length === 80)
 pruefe('kurze Spur bleibt unverändert', kuerzen(eintraege(5)).length === 5)
 
+const viele = eintraege(300)
+for (const i of [10, 60, 120, 180, 250]) viele[i].ok = false
+const v = kuerzen(viele).map((e) => e.nr)
+const erwartet = viele.filter((e, i) => i >= 220 || e.ok === false).map((e) => e.nr)
+pruefe('300 Einträge, 5 Fehler → 80 jüngste plus alle 5 Fehler, Reihenfolge erhalten', JSON.stringify(v) === JSON.stringify(erwartet) && v.length === 84, v.length)
+
+const fehler = eintraege(1000).map((e) => ({ ...e, ok: false }))
+const f = kuerzen(fehler)
+pruefe('Fehler wachsen nicht ins Endlose: höchstens 200 Fehler, die jüngsten bleiben', f.length === 200 && f[0].nr === 800 && f[199].nr === 999, [f.length, f[0]?.nr])
+
+const unter = eintraege(180).map((e, i) => ({ ...e, ok: i >= 100 }))
+pruefe('100 alte Fehler plus 80 jüngste liegen unter der Grenze → nichts fällt heraus', kuerzen(unter).length === 180, kuerzen(unter).length)
+
 if (rot) process.exit(1)
 console.log('prime-spur: grün')

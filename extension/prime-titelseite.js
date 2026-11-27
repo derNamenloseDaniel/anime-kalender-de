@@ -38,8 +38,14 @@ globalThis.akPrimeUebersprungenDazu = (lauf, eintragKennung, text) => {
 /*
   Die Spur des Durchgangs behält die letzten `max` Einträge und dazu jeden mit `ok: false` (gescheiterte Seite), auch wenn er
   älter ist: Der Fehler steht sonst nicht mehr im Bericht, sobald viele spätere Einträge ihn verdrängt haben.
+  Obergrenze 200 Fehler (die jüngsten bleiben): Ein Lauf mit lauter Fehlschlägen soll weder den Speicher noch den Bericht
+  endlos aufblähen; 200 deckt jeden realistischen Durchgang, die ersten Ursachen stehen in den ältesten verbleibenden.
 */
-globalThis.akPrimeSpurKuerzen = (spur, max = 80) => spur.filter((e, i) => i >= spur.length - max || e.ok === false)
+globalThis.akPrimeSpurKuerzen = (spur, max = 80, fehlerMax = 200) => {
+  const ausnahmen = spur.filter((e, i) => i < spur.length - max && e.ok === false)
+  const abgelegt = new Set(ausnahmen.slice(0, Math.max(0, ausnahmen.length + max - fehlerMax)))
+  return spur.filter((e, i) => (i >= spur.length - max || e.ok === false) && !abgelegt.has(e))
+}
 
 /*
   Fortschritt am Knopf: Nenner = offene Titel + offene gewählte Karten, beim Start gezählt (`titelGesamt`) und danach

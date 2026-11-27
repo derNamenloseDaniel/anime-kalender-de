@@ -219,6 +219,28 @@ console.log('\nKalender-Plausibilität 6: Prime-Termin nur mit Amazon-Suche')
   pruefe('der Treffer nennt Titel und Termin', text.schluessel === 'p2' && text.text.includes('Zwei') && text.text.includes('p2'), text)
 }
 
+console.log('\nKalender-Plausibilität 7: Hinweis nennt Wochentag oder Uhrzeit, die kein Termin trägt')
+{
+  // 02.10.2026 ist ein Freitag; ab 30.10. gilt MEZ.
+  const freitage = (id: number, zeit: string) => ['2026-10-02', '2026-10-09', '2026-10-16'].map((d) => ereignis(id, `r${id}@${d}`, d, { releaseSlug: `r${id}`, time: zeit }))
+  const rel = (id: number, hinweis: string) => release(id, `r${id}`, {}, { hinweis } as never)
+  const b = {
+    titles: [titel(1), titel(2), titel(3), titel(4), titel(5)],
+    releases: [
+      rel(1, 'Disney+: freitags um 19:00 Uhr. Anime2You nennt samstags um 19:00 Uhr.'),
+      rel(2, 'Disney+: freitags um 19:00 Uhr (ab 30.10. um 18:00 Uhr).'),
+      rel(3, 'Neue Folgen jeden Freitag um 20:00 Uhr.'),
+      rel(4, 'Die Folgen ab 2 kommen samstags.'),
+      release(5, 'r5', {}),
+    ],
+    events: [...freitage(1, '19:00'), ...freitage(2, '19:00'), ereignis(2, 'r2@2026-10-30', '2026-10-30', { releaseSlug: 'r2', time: '18:00' }), ...freitage(3, '19:00'), ...freitage(4, '19:00').slice(0, 2), ...freitage(5, '19:00')],
+  }
+  const t = plausibilitaet({ titles: b.titles, releases: b.releases, events: b.events, news: [], urteile: {}, kanal: new Set(), heute: HEUTE }).hinweisGegenTermin
+  pruefe('anderer Wochentag (samstags) und andere Uhrzeit (20:00) treffen', gleich(t.map((x) => x.titleId), [1, 3]), t)
+  pruefe('der Treffer nennt Slug und Widerspruch', t[0]?.schluessel === 'r1|Hinweis nennt samstags, kein Termin liegt darauf', t[0])
+  pruefe('Hinweis mit Terminen auf dem Tag, Einzeltermine (unter 3) und Release ohne Hinweis treffen nicht', !t.some((x) => [2, 4, 5].includes(x.titleId)), t)
+}
+
 console.log('\nKalender-Plausibilität: Wächter „Treffer dürfen nur sinken“ (Kulisse)')
 {
   const t = (schluessel: string): Treffer => ({ titleId: 1, schluessel, text: schluessel })

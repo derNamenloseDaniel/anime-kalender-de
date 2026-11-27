@@ -42,3 +42,42 @@
   sources:
     - https://www.toggo.de/bakugan/serien/bakugan-vse273
     - https://www.fernsehserien.de/bakugan-2023
+
+# Fortsetzungen, die AniList als eigenen Eintrag führt (Relation SEQUEL) und deren Folgen die deutsche
+# Fassung des Vorgängers schon mitzählt (Mängel-Art `folgenzahl-widerspruch`, 26.11.2026). Je Eintrag
+# eine Wikipedia-Seite und die aniSearch-Seite des Vorgängers, deren deutscher Block die Folgen mitzählt.
+- anilistId: 129610
+  title: 'Sonic X Season 2 (Folgen 53–78)'
+  belegtAm: '2026-11-26'
+  sources:
+    # „während Deutschland diese Episoden vom 6. November 2005 bis zum 26. März 2006 ausstrahlte“ (Folgen 53 bis 78)
+    - https://de.wikipedia.org/wiki/Sonic_X
+    # Deutsch: abgeschlossen, vertont, 30.10.2004 – 26.03.2006, 78 Folgen
+    - https://www.anisearch.de/anime/1013
+
+- anilistId: 146310
+  title: "Cat's♥Eye 2nd Season"
+  belegtAm: '2026-11-26'
+  sources:
+    # „Es wurden alle 73 Folgen der Originalserie synchronisiert“ (Staffeln mit 36 bzw. 37 Folgen)
+    - https://de.wikipedia.org/wiki/Cat%E2%80%99s_Eye_%E2%80%93_Ein_Supertrio
+    # Deutsch: „Ein Supertrio: Cat’s Eye“, abgeschlossen, vertont, 73 Folgen
+    - https://www.anisearch.de/anime/2213
+
+- anilistId: 102427
+  title: 'Saint Seiya: Knights of the Zodiac (Teil 1, Folgen 1–6)'
+  belegtAm: '2026-11-26'
+  sources:
+    # Premiere_DE 19. Juli 2019, Synchronisation ja; „Die ersten sechs Episoden wurden am 19. Juli 2019 auf Netflix veröffentlicht“
+    - https://de.wikipedia.org/wiki/Saint_Seiya:_Die_Krieger_des_Zodiac
+    # Deutsch: abgeschlossen, vertont, Netflix, 19.07.2019 – 23.01.2020, 12 Folgen (Teil 1 und 2)
+    - https://www.anisearch.de/anime/12698
+
+- anilistId: 162314
+  title: 'Attack on Titan: The Final Chapters Special 2'
+  belegtAm: '2026-11-26'
+  sources:
+    # Episodenliste, Special 2: Deutschsprachige Erstausstrahlung (EAD) 8. Jan. 2024
+    - https://de.wikipedia.org/wiki/Attack_on_Titan/Episodenliste
+    # Deutsch: „Attack on Titan: Final Season - The Final Chapters“, abgeschlossen, vertont, 04.03.2023 – 05.11.2023, 2 Folgen
+    - https://www.anisearch.de/anime/17265

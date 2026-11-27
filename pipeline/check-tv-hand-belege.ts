@@ -86,6 +86,15 @@ unveraendert('anderer Titel', hand({}, { titleId: 6 }))
 unveraendert('ohne Folgenliste', hand({}), SENDUNGEN, {})
 unveraendert('eine Sichtung ohne Folgentitel', hand({}), [...SENDUNGEN, sendung('2026-11-08', undefined)])
 
+// Eine ältere Sendung außerhalb der Folgenliste (One Piece, Wa No Kuni vor der Wiederholung ab 780) sperrt den Handtermin nicht.
+{
+  const { zahl, releases } = lauf([hand({})], [sendung('2026-10-20', 'Unbekannte Folge'), ...SENDUNGEN])
+  pruefe('ältere fremde Sendung: belegt', zahl, 1)
+  pruefe('ältere fremde Sendung: Tage der Folgen 2–4', releases[0]!.schedule.observed, { 2: '2026-11-03', 3: '2026-11-04', 4: '2026-11-05' })
+}
+// Eine Sendung ab dem Start außerhalb der Liste bleibt eine Sperre (Nummern wären geraten).
+unveraendert('fremde Sendung ab Start', hand({}), [...SENDUNGEN, sendung('2026-11-06', 'Unbekannte Folge')])
+
 // Leere Beobachtungen zählen als keine; mehrere Handtermine werden einzeln gezählt.
 pruefe('leere observed: belegt', lauf([hand({ observed: {} })]).zahl, 1)
 pruefe('zwei Handtermine', lauf([hand({}), hand({ firstEpisodeDate: '2026-11-07', firstEpisodeNumber: 5, episodeCount: 1 }, { slug: 'yaiba-teil-2' })]).zahl, 2)

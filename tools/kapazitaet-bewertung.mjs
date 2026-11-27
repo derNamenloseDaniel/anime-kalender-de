@@ -69,7 +69,7 @@ export function bewerteKapazitaet(tage) {
   // Cloudflare bricht erst bei dauerhaftem Überschreiten ab: Cron p99 50–73 ms bei 0 exceededCpu (25./26.11.2026). Rot ist der Abbruch, p99 nur Vorwarnung.
   const c = schlimmster(tage, 'cronP99Ms')
   if (c && c.cronP99Ms > GRENZE_CRON_P99_MS) {
-    warnungen.push(`Kapazität: Cron-CPU p99 ${c.cronP99Ms.toFixed(1)} ms am ${c.datum} über ${GRENZE_CRON_P99_MS} ms (Free-Limit 10 ms, abgebrochen wird erst dauerhaft)`)
+    warnungen.push(`Kapazität: Cron-CPU p99 ${c.cronP99Ms.toFixed(1)} ms am ${c.datum} über ${GRENZE_CRON_P99_MS} ms (Free-Limit 10 ms, abgebrochen wird erst dauerhaft; gezählt wird nur exceededCpu, exceededResources nicht)`)
   }
   const u = schlimmster(tage.slice(-FRISCHE_TAGE), 'ueberCpu')
   if (u && u.ueberCpu > 0) befunde.push(`Kapazität: ${zahl(u.ueberCpu)} Aufrufe wegen CPU-Zeit abgebrochen (exceededCpu) am ${u.datum}`)

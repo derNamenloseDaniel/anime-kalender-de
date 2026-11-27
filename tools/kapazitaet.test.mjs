@@ -206,6 +206,7 @@ assert.ok(gut.zeilen.some((z) => z.startsWith('  Stunden newsletter 2026-10-22 (
 assert.ok(!gut.zeilen.some((z) => z.startsWith('::warning::Kapazität: Stundenabfrage')))
 assert.ok(gut.zeilen.some((z) => z.startsWith('::error::Kapazität: 2 Aufrufe wegen CPU-Zeit abgebrochen')))
 assert.ok(gut.zeilen.some((z) => z.startsWith('::warning::Kapazität: Cron-CPU p99')))
+assert.ok(gut.zeilen.some((z) => /^⚠ WARNUNG Kapazität: Cron-CPU p99 .*exceededResources nicht\)$/.test(z)), 'p99-Warnung als sichtbare ⚠-Zeile samt Zählgrenze')
 assert.ok(!gut.zeilen.some((z) => z.startsWith('::error::Kapazität: Cron-CPU')))
 const fehlt = sammle()
 assert.equal(await lauf({ token: 'T', konto: 'K', jetzt: JETZT, tage: 2, holen: api({ ohne: ['workersInvocationsScheduled'] }).holen, ausgabe: fehlt.ausgabe }), 1, 'nicht lesbarer Datensatz = rot')

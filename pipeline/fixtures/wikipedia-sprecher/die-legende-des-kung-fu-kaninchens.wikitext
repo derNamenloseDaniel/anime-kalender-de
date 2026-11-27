@@ -1,0 +1,70 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Die_Legende_des_Kung_Fu_Kaninchens (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Die_Legende_des_Kung_Fu_Kaninchens&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+== Synchronisation ==
+Für Dialogbuch und Dialogregie der deutschen [[Synchronisation]] war [[Tammo Kaulbarsch]] verantwortlich.
+{| class="wikitable"
+|- class="hintergrundfarbe5"
+!| Rollenname || Figur || Deutsche Stimme || Englische Stimme || Chinesische Stimme
+|-
+| Tutu
+| weißes [[Kaninchen]]
+| [[Tim Knauer]]
+| [[Jon Heder]] (als Fu)
+| Wei Fan (als Tu)
+|-
+| Peony
+| [[Katze]]
+| [[Kristina von Weltzien]]
+| [[Rebecca Black]] (als Penny)
+| Ni Yan
+|-
+| Slash
+| weißer [[Bären|Bär]]
+| [[Erik Schäffler]]
+| [[Michael Clarke Duncan]]
+| Fengyi Zhang
+|-
+| Shifu
+| [[Affen|Affe]]
+| [[Peter Weis]]
+| [[Tom Arnold]] (als Sifu)
+| Cunxin Pu
+|-
+| Jackie
+| gelber [[Hasen|Hase]]
+| [[Patrick Bach]]
+| [[Claire Geare]] (als Biggie)
+| Yishan Zhang (als Biggie)
+|-
+| Küchenchef
+| [[Schwein]]
+| [[Michael Grimm (Schauspieler)|Michael Grimm]]
+| n/a
+| Hong Huang
+|-
+| Herzchen
+| [[Unken|Unke]]
+| [[Dagmar Dreke]]
+| n/a
+| n/a
+|-
+| Schnucki
+| [[Echse]]
+| [[Hanns-Jörg Krumpholz]]
+| n/a (als Bandit)
+| Zheng Zu (als Bandit)
+|- <!--
+| Doggie
+| n/a
+| n/a
+| n/a
+| Yuanzheng Feng
+|-
+| Mr. Tooth
+| n/a
+| n/a
+| n/a
+| Yongjian Lin
+|- -->
+|}

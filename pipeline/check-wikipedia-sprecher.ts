@@ -1,5 +1,5 @@
 /**
- * Sprechertabellen aus de.wikipedia (Vorstufe, `pipeline/lib/wikipedia-sprecher.ts`): die 48 abgerufenen Abschnitte
+ * Sprechertabellen aus de.wikipedia (Vorstufe, `pipeline/lib/wikipedia-sprecher.ts`): die 68 abgerufenen Abschnitte
  * „Synchronisation“ unter `pipeline/fixtures/wikipedia-sprecher/` (Stand 22.11.2026 und 26.11.2026) und Kleinstfälle für jede Weiche
  * des Parsers (Kopf mit rowspan/colspan, <br>, <small>, Strich als „kein Sprecher“, Verweise, Vorlagen, Links, keine deutsche Spalte).
  * Dazu die Handliste Seite → Titel. Kein Netzabruf. Aufruf: `npm run check:logic`.
@@ -86,13 +86,13 @@ pruefe('Fortsetzungszeile mit !! in der Kopfzeile und zwei Zellen in einer Daten
 console.log('Handliste')
 type Eintrag = { seite: string; fixture: string; titel: { id: number; fassung?: string; unsicher?: string }[] }
 const liste = yaml.load(readFileSync(join(REPO, 'data', 'wikipedia-sprecher-seiten.yaml'), 'utf8')) as Eintrag[]
-pruefe('48 Seiten, jede einmal, jede mit eigener Fixture-Datei', liste.length === 48 && new Set(liste.map((e) => e.seite)).size === 48 && new Set(liste.map((e) => e.fixture)).size === 48, liste.length)
+pruefe('68 Seiten, jede einmal, jede mit eigener Fixture-Datei', liste.length === 68 && new Set(liste.map((e) => e.seite)).size === 68 && new Set(liste.map((e) => e.fixture)).size === 68, liste.length)
 pruefe('die vier ersten Seiten wie auf der Wikipedia', liste.slice(0, 4).map((e) => e.seite).join('|') === 'Yū Yū Hakusho|Grappler Baki|Meisterdetektiv Ron Kamonohashi|Ranma ½', liste.map((e) => e.seite))
 pruefe('jede Fixture-Datei liegt vor und liefert Zeilen oder (Ron) keine deutsche Spalte', liste.every((e) => liesSprechertabelle(fixture(e.fixture.replace(/\.wikitext$/, ''))).deutscheSpalte === (e.seite !== 'Meisterdetektiv Ron Kamonohashi')))
 pruefe('jedes Ziel hat eine Kennung', liste.every((e) => e.titel.length > 0 && e.titel.every((t) => Number.isInteger(t.id))))
 const ziele = liste.flatMap((e) => e.titel)
-pruefe('Kennungen eindeutig über die Liste, 87 Ziele (darf nur steigen)', new Set(ziele.map((t) => t.id)).size === ziele.length && ziele.length >= 87, ziele.length)
-pruefe('jeder Eintrag mit `unsicher` nennt einen Grund, 10 Ziele ohne (Tabelle nennt den Titel selbst)', ziele.every((t) => t.unsicher === undefined || (typeof t.unsicher === 'string' && t.unsicher.length > 5)) && ziele.filter((t) => !t.unsicher).length === 10, ziele.filter((t) => !t.unsicher).length)
+pruefe('Kennungen eindeutig über die Liste, 116 Ziele (darf nur steigen)', new Set(ziele.map((t) => t.id)).size === ziele.length && ziele.length >= 116, ziele.length)
+pruefe('jeder Eintrag mit `unsicher` nennt einen Grund, 15 Ziele ohne (Tabelle nennt den Titel selbst)', ziele.every((t) => t.unsicher === undefined || (typeof t.unsicher === 'string' && t.unsicher.length > 5)) && ziele.filter((t) => !t.unsicher).length === 15, ziele.filter((t) => !t.unsicher).length)
 const ranmaFassungen = liste[3]!.titel.map((t) => t.fassung)
 pruefe('Fassung jedes Ziels kommt in der Tabelle vor', liste.every((e) => e.titel.every((t) => !t.fassung || liesSprechertabelle(fixture(e.fixture.replace(/\.wikitext$/, ''))).zeilen.some((z) => z.deutsch.some((d) => d.zusatz?.includes(t.fassung!))))) && ranmaFassungen.length === 3)
 
@@ -100,4 +100,4 @@ if (fehler) {
   console.error(`\n${fehler} Prüfung(en) fehlgeschlagen`)
   process.exit(1)
 }
-console.log('\nWikipedia-Sprecher: 48 Fixtures, 48 Seiten in der Handliste, alle Prüfungen ok')
+console.log('\nWikipedia-Sprecher: 68 Fixtures, 68 Seiten in der Handliste, alle Prüfungen ok')

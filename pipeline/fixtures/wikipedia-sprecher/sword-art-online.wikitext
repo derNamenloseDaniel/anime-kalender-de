@@ -1,0 +1,57 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Sword_Art_Online (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Sword_Art_Online&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+Die deutsche Synchronisation der ersten,<ref>{{Synchronkartei|serie|25667|Sword Art Online|Abruf=2019-07-02}}</ref> und zweiten<ref>{{Synchronkartei|serie|43324|Sword Art Online II|Abruf=2019-07-02}}</ref> Staffel, sowie von ''Extra Edition''<ref>{{Synchronkartei|film|39622|Sword Art Online: Extra Edition|Abruf=2019-07-02}}</ref> wurde vom Studio Metz-Neun<ref name="Sword Art Online: Erste Sprecher bekannt">[https://www.anisearch.de/news/3389 Anisearch.de: Sword Art Online: Erste Sprecher bekannt], vom 31. Mai 2013; abgerufen am 31. Mai 2013.</ref> angefertigt. Seit dem Film ''Ordinal Scale'' entsteht diese bei Oxygen Sound Studios.<ref>{{Synchronkartei|serie|36835|Sword Art Online: The Movie - Ordinal Scale|Abruf=2019-07-02}}</ref><ref>{{Synchronkartei|serie|43465|Sword Art Online: Alicization|Abruf=2019-07-02}}</ref><ref>{{Synchronkartei|serie|48047|Sword Art Online: Alicization - War of Underworld|Abruf=2021-05-20}}</ref>
+
+{| class="wikitable zebra"
+! Rolle || japanischer Sprecher ([[Seiyū]]) || deutscher Sprecher
+|-
+| Kazuto „Kirito“ Kirigaya || [[Yoshitsugu Matsuoka]]|| [[Patrick Keller]]
+|-
+| rowspan="2"| Asuna Yūki || rowspan="2"| [[Haruka Tomatsu]] || [[Denise Monteiro]] <small>(Staffel 1–2, Film 1–2)</small>
+|-
+| [[Lisa May-Mitsching]] <small>(Staffel 3, ab Film 3)</small>
+|-
+| Akihiko Kayaba || [[Kōichi Yamadera]] || [[Torsten Michaelis]]
+|-
+| Heathcliff || [[Tōru Ōkawa]]|| [[Gilles Karolyi]]
+|-
+| Suguha „Leafa“ Kirigaya || [[Ayana Taketatsu]]|| [[Julia Meynen]]
+|-
+| Yui || [[Kanae Itō]] || [[Christiane Werk]]
+|-
+| Ryōtarō „Klein“ Tsuboi || Hiroaki Hirata || [[Isaak Dentler]]
+|-
+| Andrew Gilbert „Agil“ Mills || Hiroki Yasutomo || [[Dirk Hardegen]]
+|-
+| Rika „Lisbeth“ Shinozaki || [[Ayahi Takagaki]] || [[Nina Amerschläger]]
+|-
+| rowspan="3"| Keiko „Silica“ Ayano || rowspan="3"| [[Rina Hidaka]]|| [[Clara Dolny]] <small>(1. Stimme)</small>
+|-
+| [[Sarah Madeleine Tusk]] <small>(2. Stimme)</small>
+|-
+| [[Helen Blaschke]] <small>(3. Stimme)</small>
+|-
+| Nobuyuki „Oberon“ Sugou || [[Takehito Koyasu]] || [[Peter Lehn]]
+|-
+| Shino „Sinon“ Asada || [[Miyuki Sawashiro]] || [[Jennifer Weiß]]
+|-
+| Yuuki Konno || [[Aoi Yūki]] || [[Nicole Hise]]
+|-
+| Alice Zuberg || [[Ai Kayano]]|| [[Lydia Morgenstern]]
+|-
+| Eugeo || [[Nobunaga Shimazaki]] || [[Christian Zeiger]]
+|-
+| Shinkawa „Death Gun“ Shouichi || [[Souichirou Hoshi]]|| [[Stephan Schleberger]]
+|-
+| Quinella „Administrator“ || [[Maaya Sakamoto]] || [[Victoria Frenz]]
+|-
+| Nochizawa „Nautilus“ Eiji || [[Yoshio Inoue]]||
+|-
+| Vassago „PoH“ Cassals || [[Tsuyoshi Koyama]]|| [[Wolfgang Wagner (Schauspieler)|Wolfgang Wagner]]
+|-
+| Gabriel „Subtilizer“ Miller || [[Akira Ishida]] || [[Karlo Hackenberger]]
+|-
+| Thrym || [[Shōzō Iizuka]]||
+|}

@@ -4594,3 +4594,16 @@ Anlass: Daniel, live `/t/6041/` (JoJo 2012): Crunchyroll „Deutsch“, Prime-Ka
 **Klasse (`public/data/titles.json`, Stand `e8f398f5`):** 97 Prime-Kanal-Wege an 94 Titeln tragen `kanal-erbt` (Crunchyroll 88, ADN 9); bei allen 97 hat der Anbieter-Weg ein eigenes Ja (53 mit Bereichen). Alle 97 zeigen jetzt „Deutsch“. Cartoons: 0. Wächter: `pipeline/check-laut-gleich.ts`, Abschnitt „Prime-Kanal neben belegtem Anbieter-Weg“ (JoJo-Wege wörtlich, Gegenfälle Hinweis, ohne Ja, entfernt, fremder Anbieter, Anbieter-Weg selbst nur abgeleitet, Weg ohne Prime mit Kanalname, Joyn pauschal, JustWatch-Nein an der Kanal-Seite).
 
 **Lehre:** Ein Herkunftskennzeichen der Pipeline („angenommen, ersetzbar“) ist kein Anzeigeurteil („nicht belegt“). Wer ein Kennzeichen in eine Pille übersetzt, hält es gegen den Wortlaut ihrer Legende, an einem Fall, in dem die Quelle hinter der Annahme belegt ist. **Warum Prüfer und Kette es durchließen:** `check-dub-anbieter-pille.ts` und `check-laut-gleich.ts` schrieben „kanal-erbt ⇒ laut Anbieter“ als Soll fest (aus der Regel des PR, nicht aus der Legende), ihre Fälle trugen keinen belegten Anbieter-Weg im selben Titel; der Prüfer hielt Pille gegen Chip, nicht Pille gegen Legende. Prüfer-Vorgabe geschärft (`.claude/agents/pruefer.md`, „Kennzeichen gegen Legende“).
+
+
+## Fristen der Titel-Sammler gegen die Änderungshäufigkeit (26.11.2026, Auftrag reste-funde-2411)
+
+**Messung:** Alle Fassungen von `data/tmdb-titles.json` (33 Commits, ab 07.08.), `anisearch-titel.json` (31, ab 31.08.) und `anisearch-artikel.json` (24, ab 03.10.) über die REST-API geholt; je Eintrag jeder Neuabruf (anderes `fetchedAt`) verglichen, ohne `fetchedAt`, `stand`, `inhaltAm`.
+- **TMDB (60 Tage):** 6.104 Neuabrufe; ohne Neuzuordnung (gleiche `tmdbId`/`miss`) änderten sich Inhaltsfelder bei 0 % der Abrufe unter 30 Tagen, 44 % bei 30–59 Tagen (fast nur `kinoDe` 667, `offers` 444, `providers` 149) und 27 % bei 60–89 Tagen. Handlung und FSK (`overviewDe` 45, `fsk` 19) ändern sich bei 1,2 % der Neuabrufe. → 60 Tage bleiben; Anbieter und Kino kommen aus eigenen Läufen.
+- **aniSearch-Titel (180 Tage):** 13.024 Neuabrufe; bei gleichem `stand` änderte sich `titel` in 30 (0,2 %), `synonyme` in 14; `quelle`/`englisch` (1.689/1.002) sind Verbesserungen der eigenen Zuordnung, keine Änderung der Quelle. Nach 30–59 Tagen nur 1,1 % geändert. → 180 Tage bleiben; die Messspanne reicht nur bis 86 Tage, 90 Tage verdoppelten die Last für ≈ 0,2 %.
+- **aniSearch-Artikel (180 Tage):** 104 Neuabrufe, 4 geändert (3,8 %; `ean`, `audio`, `untertitel`), Spanne nur 53 Tage, zu wenig für eine Aussage. → 180 Tage bleiben, ab Januar 2027 neu messen.
+- **Disc-Termine** (die einzige zeitkritische Angabe) lesen die Titelseiten ohnehin alle 7 Tage (`DISC_FRIST_TAGE`).
+
+## Katalogtitel mit Disc-Termin ohne `anisearch.json`-Eintrag (26.11.2026)
+
+Gezählt am Bestand: 2.924 Titel, 269 ohne Eintrag (155 Katalogtitel ab 10.000.000, 114 AniList-Titel); 248 davon mit Disc/Kauf-Weg. **Ursache:** Katalogtitel stehen per Bauart nie in `anisearch.json` (nur AniList-Schlüssel). Geschlossen seit PR 4854 (`lib/disc-nachlese.ts`, `check-disc-ohne-lesequelle-bestand`): Heute 149 Titel mit frischem oder künftigem Termin, 3 davon ohne Eintrag (11635, 13220, 18543) werden nachgelesen, 0 ohne Lesequelle. Alle 248 haben eine aniSearch-Kennung und eine archivierte Seite.

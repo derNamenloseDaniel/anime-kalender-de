@@ -655,3 +655,27 @@
   sources:
     - https://www.anisearch.de/anime/16390
     - https://www.moviepilot.de/serie/exception/episodenguide
+
+# Cloud-Lauf 26.11.2026 (synchro-urteil-2), Quelle de.wikipedia (?action=raw) gelesen:
+# Wolf's Rain OVA — „Auf Animax wurden alle Folgen, inklusive der vier OVAs, am 2. Januar 2009 übertragen.“ (Abschnitt zur deutschen Ausstrahlung: MTV 2007, Animax 2009, ProSieben Maxx 2014).
+- anilistId: 1023
+  title: "Wolf's Rain OVA"
+  von: '2009-01-02'
+  publisher: 'Animax'
+  sources:
+    - https://de.wikipedia.org/wiki/Wolf%E2%80%99s_Rain
+# Pikachu-Kurzfilme — Liste der Pokémon-Filme: Spalte „Pikachu-Vorfilm“ nennt den deutschen Titel zum Kinostart des Hauptfilms in D/A/CH
+# (Pokémon 2: 21.12.2000 mit „Pikachu – Die Rettung“, Pokémon 3: 21.06.2001 mit „Pikachu und Pichu“); Datum deckt sich mit PokéWiki „Erstausstrahlung DE“
+# laut Bericht vom 06.10.2026 (pokewiki.de aus der Cloud nicht erreichbar, nicht gelesen, daher keine Quelle). Sprachfassung folgt aus dem deutschen Kinostart, nicht aus einem eigenen Satz.
+- anilistId: 4792
+  title: 'Pikachu: Die Rettung'
+  von: '2000-12-21'
+  publisher: 'Kino-Vorfilm'
+  sources:
+    - https://de.wikipedia.org/wiki/Liste_der_Pok%C3%A9mon-Filme
+- anilistId: 4793
+  title: 'Pikachu und Pichu'
+  von: '2001-06-21'
+  publisher: 'Kino-Vorfilm'
+  sources:
+    - https://de.wikipedia.org/wiki/Liste_der_Pok%C3%A9mon-Filme

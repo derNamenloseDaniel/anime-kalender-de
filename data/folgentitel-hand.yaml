@@ -4,6 +4,7 @@
 # (`handFehler` in `pipeline/bau/folgentitel-hand.ts` lässt den Bau bei fehlendem Feld oder doppelter Folge scheitern, `check:logic` liest die Datei ebenfalls).
 # Erlaubte Quellen: RTL+, Crunchyroll, ADN, TMDB de, de.wikipedia (Episodenliste, Feld DT); nicht fernsehserien.de, aniSearch-Seiten, Netflix-Serienseiten.
 # Wo TMDB einen Eigennamen deutsch und englisch gleich führt (der Bau wertet das als „nicht übersetzt"), belegt die de.wikipedia-Episodenliste (Feld DT) den deutschen Titel; die Nummer gilt nur, wenn die schon vorhandenen Titel dort unter derselben Nummer stehen (Auftrag maengel-folgentitel, 26.11.2026).
+# Ebenso, wo eine de.wikipedia-Episodenliste eine ganze Staffel oder die letzte Lücke liefert (Auftrag folgentitel-wikipedia-2, 26.11.2026): die Reihenfolge ist an vorhandenen Titeln oder an TMDB gegengeprüft; ohne zweite Quelle nur, wenn die Liste mit unserer Folgenzahl lückenlos aufgeht (Beleg je Staffel in der Kommentarzeile). Zählt die Liste in anderer Reihenfolge als unsere Datei (Transformers: Armada, Captain Future), steht nichts hier.
 # Rest ohne Quelle: `data/folgentitel-offen.json` und `docs/wissen/folgentitel-quellen.md`, Abschnitt „Lückenfolgen im deutschen Bereich schließen und halten".
 
 # Disney Twisted-Wonderland: Staffelbeginn 29.10.2025, acht wöchentliche Folgen = unsere acht Folgen; TMDB führt die Serie unter „Disney Twisted-Wonderland: Die Serie".
@@ -157,3 +158,70 @@
 # Es war einmal … Amerika (10004750): TMDB führt zwei Eigennamen gleich dem englischen Titel. de.wikipedia „Es war einmal … Amerika" (Abruf 26.11.2026, Episodenliste) nennt Nr. 12 „Jacques Cartier" und Nr. 23 „Simon Bolivar"; 24 von 24 vorhandenen Titeln stehen dort unter derselben Nummer (deutsche Erstausstrahlung 02.01.1992, Das Erste).
 - {anilistId: 10004750, folge: 12, titel: "Jacques Cartier", quelle: "de.wikipedia Es war einmal … Amerika, Episodenliste Nr. 12 (Abruf 26.11.2026); TMDB Staffel 1 Folge 12 gleich"}
 - {anilistId: 10004750, folge: 23, titel: "Simon Bolivar", quelle: "de.wikipedia Es war einmal … Amerika, Episodenliste Nr. 23 (Abruf 26.11.2026); TMDB Staffel 1 Folge 23 gleich"}
+
+
+# Es war einmal … die Entdeckung unserer Welt (10005217): de.wikipedia-Episodenliste, 26 von 26 Folgen; Reihenfolge gegen TMDB „Es war einmal... Abenteurer und Entdecker“ (de) Staffel 1 geprüft: 25 von 26 Titeln gleich auf derselben Nummer (die 26. weicht nur in der Schreibweise ab).
+- {anilistId: 10005217, folge: 1, titel: "Die ersten Seefahrer", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 1, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 2, titel: "Alexander der Große", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 2, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 3, titel: "Erik der Rote", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 3, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 4, titel: "Dschingis Khan", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 4, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 5, titel: "Ibn Battuta", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 5, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 6, titel: "Die großen Dschunken", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 6, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 7, titel: "Vasco da Gama", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 7, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 8, titel: "Thurn & Taxis", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 8, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 9, titel: "Die Brüder Pinzón", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 9, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 10, titel: "Amerigo Vespucci", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 10, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 11, titel: "Fernando de Magellan", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 11, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 12, titel: "Cabeza de Vaca", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 12, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 13, titel: "Bering", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 13, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 14, titel: "Tasman & Bougainville", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 14, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 15, titel: "Bruce", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 15, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 16, titel: "La Condamine", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 16, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 17, titel: "James Cook", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 17, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 18, titel: "Alexander von Humboldt", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 18, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 19, titel: "Lewis & Clark", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 19, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 20, titel: "Stuart & Burke", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 20, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 21, titel: "Stanley & Livingstone", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 21, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 22, titel: "Amundsen", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 22, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 23, titel: "Alexandra David-Néel", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 23, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 24, titel: "Piccard", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 24, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 25, titel: "Hillary & Co.", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 25, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005217, folge: 26, titel: "Die Zukunft", quelle: "de.wikipedia 'Es war einmal … die Entdeckung unserer Welt', Episodenliste Nr. 26, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+
+# Es war einmal … Entdecker und Erfinder (10005293): de.wikipedia-Episodenliste, 26 von 26 Folgen; Reihenfolge gegen TMDB (de) Staffel 1 geprüft: 25 von 26 Titeln gleich auf derselben Nummer (die 26. weicht nur in der Schreibweise ab).
+- {anilistId: 10005293, folge: 1, titel: "Die Chinesen", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 1, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 2, titel: "Archimedes", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 2, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 3, titel: "Ptolemäus und Heron", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 3, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 4, titel: "Die Zeitmessung", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 4, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 5, titel: "Heinrich der Seefahrer", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 5, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 6, titel: "Gutenberg", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 6, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 7, titel: "Leonardo da Vinci", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 7, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 8, titel: "Die Medizin", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 8, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 9, titel: "Galilei", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 9, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 10, titel: "Newton", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 10, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 11, titel: "Buffon", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 11, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 12, titel: "Lavoisier", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 12, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 13, titel: "Stephenson", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 13, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 14, titel: "Faraday", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 14, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 15, titel: "Darwin", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 15, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 16, titel: "Mendel", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 16, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 17, titel: "Pasteur", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 17, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 18, titel: "Edison", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 18, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 19, titel: "Marconi", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 19, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 20, titel: "Ford", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 20, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 21, titel: "Von Ikarus bis Lindbergh", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 21, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 22, titel: "Madame Curie", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 22, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 23, titel: "Einstein", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 23, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 24, titel: "Lorenz", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 24, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 25, titel: "Armstrong", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 25, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+- {anilistId: 10005293, folge: 26, titel: "Die Zukunft", quelle: "de.wikipedia 'Es war einmal … Entdecker und Erfinder', Episodenliste Nr. 26, Feld Deutscher Titel (Abruf 26.11.2026); Reihenfolge gegen TMDB 25 von 26"}
+
+
+
+
+# Einzelne Lücken, Reihenfolge an den vorhandenen Titeln der Datei gegengeprüft (Auftrag folgentitel-wikipedia-2, 26.11.2026).
+- {anilistId: 146065, folge: 13, titel: "Mein Traumhaus", quelle: "de.wikipedia 'Mushoku Tensei/Episodenliste', Staffel 2 Nr. 13 (gesamt 37) (Abruf 26.11.2026); die 12 vorhandenen Titel stehen dort unter denselben Nummern (12 von 12)"}
+- {anilistId: 5680, folge: 13, titel: "Wintertag!", quelle: "de.wikipedia 'K-On!/Episodenliste', 1. Staffel Nr. 13 (Extra), deutschsprachige Ausstrahlung 14.12.2019 (Abruf 26.11.2026); die 12 vorhandenen Titel stehen dort unter denselben Nummern (10 von 12 gleich, 2 in der Schreibweise)"}
+- {anilistId: 7791, folge: 25, titel: "Planungssitzung!", quelle: "de.wikipedia 'K-On!/Episodenliste', 2. Staffel Nr. 25 (Extra), deutschsprachige Ausstrahlung 22.03.2020 (Abruf 26.11.2026); die 24 vorhandenen Titel stehen dort unter denselben Nummern"}
+- {anilistId: 7791, folge: 26, titel: "Besuch!", quelle: "de.wikipedia 'K-On!/Episodenliste', 2. Staffel Nr. 26 (Extra), deutschsprachige Ausstrahlung 22.03.2020 (Abruf 26.11.2026); die 24 vorhandenen Titel stehen dort unter denselben Nummern"}
+- {anilistId: 112153, folge: 131, titel: "Wer gibt hier den Takt an?!", quelle: "de.wikipedia 'Pokémon (Anime)/Reisen', gesamt Nr. 1218 = unsere Folge 131 (Versatz 1087) (Abruf 26.11.2026); 124 von 131 vorhandenen Titeln gleich auf derselben Nummer, 7 nur in der Schreibweise"}

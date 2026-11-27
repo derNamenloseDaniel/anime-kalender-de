@@ -66,6 +66,9 @@ titel.get(10)!.deErstausgabe = { von: '2025-10-08', bis: '2025-12-24', publisher
 titelMit(11, { netflix: { seit: '2026-11-25' } })
 titel.get(11)!.deErstausgabe = { von: '2022-10-13', publisher: 'Crunchyroll', synchro: true }
 titelMit(12, { netflix: { seit: '2026-01-01' } })
+/* Katalogdatum vor 2026 bleibt wie vorher: kein Termin, angebotSeit unverändert (keine Vergangenheitsflut). */
+titelMit(13, { netflix: { seit: '2025-05-05' } })
+titel.get(13)!.deErstausgabe = { von: '2019-04-01', publisher: 'Netflix, Inc.', synchro: true }
 
 const slim = [...titel.values()].map((t) => ({ ...t }))
 const releases: Release[] = []
@@ -90,6 +93,7 @@ pruefe('Erstausgabe zwischen 01.01.2026 und Katalogdatum: der Weg liegt am Ersta
 pruefe('Simulcast-Zeitraum (bis gesetzt): das Katalogdatum bleibt', releases.some((r) => r.slug === 'motn-10-netflix' && r.schedule.firstEpisodeDate === '2026-11-25'))
 pruefe('Erstausgabe bei einem anderen Dienst: „Neu bei Netflix“ bleibt am Katalogtag', releases.some((r) => r.slug === 'motn-11-netflix' && r.schedule.firstEpisodeDate === '2026-11-25'))
 pruefe('Katalogtag genau 01.01.2026: ein Termin', releases.some((r) => r.slug === 'motn-12-netflix'))
+pruefe('Katalogdatum vor 2026: kein Termin, angebotSeit bleibt', !releases.some((r) => r.titleId === 13) && titel.get(13)!.angebotSeit?.date === '2025-05-05', titel.get(13)!.angebotSeit)
 const netflixErst = { von: '2026-11-25', publisher: 'Netflix, Inc.', synchro: true }
 pruefe('Gleichtag: Erstausgabe am Katalogtag zählt als Neulistung', erstausgabeBeimAnbieterBis(netflixErst, 'netflix', '2026-11-25'))
 pruefe('Erstausgabe einen Tag nach dem Katalogtag: keine Neulistung', !erstausgabeBeimAnbieterBis(netflixErst, 'netflix', '2026-11-24'))

@@ -102,7 +102,7 @@ export function ergaenzeAngebotSeit({ slim, releases, titles, quellen }: { slim:
     if (!bester) continue
     const { anbieter } = bester
     /* Führte der Anbieter den Titel laut aniSearch schon vorher, ist das Katalogdatum eine Neulistung: der Weg bleibt, aber am Erstausgabetag statt als „Neu bei …“ (Exception, Netflix seit 2022). */
-    const neulistungTag = erstausgabeBeimAnbieterBis(title.deErstausgabe, anbieter, bester.seit) ? title.deErstausgabe!.von! : undefined
+    const neulistungTag = bester.seit >= GRENZE && erstausgabeBeimAnbieterBis(title.deErstausgabe, anbieter, bester.seit) ? title.deErstausgabe!.von! : undefined
     const seit = neulistungTag ?? bester.seit
 
     /*

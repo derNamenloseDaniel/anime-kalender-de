@@ -58,7 +58,10 @@
     # 17.11.2026: 17:30-20:15 „ran Fußball: U21 Kroatien - Deutschland“, keine Folge (tv.de-Tagesseite, lokal
     # abgerufen 13.11.); die Folgentitel dort stellen Folge 7 auf den 16.11., Folge 8 auf den 18.11.
     skipDates: ["2026-11-13", "2026-11-17"]
-  hinweis: "Nach der TV-Ausstrahlung sind die Folgen kostenlos auf Joyn abrufbar (seit 05.11.2026 belegt)."
+    # Sendeplan Mo–Fr (Anime2You 1059480) mit den belegten Pausen: jeder Folgentag steht fest, auch das Finale (24 Folgen).
+    sendeplanBelegt: true
+  # Das Belegdatum (Joyn führt die Serie seit 05.11.2026) steht bei den Quellen, nicht im Hinweis.
+  hinweis: "Nach der TV-Ausstrahlung sind die Folgen kostenlos auf Joyn abrufbar."
   # Handbeleg Premiere (10.10.2026): Anime2You 1059480 nennt es „deutsche TV-Premiere der ersten Staffel“;
   # davor weder deutsche Disc (erste am 04.12.2026) noch deutscher Stream (Akibapass, ADN nur OmU).
   premiere:

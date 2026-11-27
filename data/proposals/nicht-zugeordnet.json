@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-26",
+  "stand": "2026-11-27",
   "eintraege": [
     {
       "titel": "Naruto Shippuden",
@@ -34,6 +34,15 @@
       "tag": "2026-09-25",
       "anbieter": [
         "netflix"
+      ],
+      "quelle": "Sammelartikel"
+    },
+    {
+      "titel": "Shaman King",
+      "artikel": "https://www.anime2you.de/news/1035676/aniverse-august-2026-neuzugaenge/",
+      "tag": "2026-08-06",
+      "anbieter": [
+        "primevideo"
       ],
       "quelle": "Sammelartikel"
     },

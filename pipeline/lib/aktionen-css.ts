@@ -59,5 +59,5 @@ export function versteckerDesGesehenTexts(alle: Regel[], textKlassen: string[]):
 
 /** Liegt die Regel des breiten Mittelknopfs der Laptop-Reihe im Block `min-width: 1001px` und `max-height: 800px`? */
 export function laptopReiheImBlock(alle: Regel[]): boolean {
-  return alle.some((r) => r.selektor.includes('.empf-aktionen button:nth-child(2)') && r.medien === LAPTOP_BLOCK)
+  return alle.some((r) => r.selektor.includes('.empf-aktionen .empf-knopf-mitte') && r.medien === LAPTOP_BLOCK)
 }

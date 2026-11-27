@@ -13,6 +13,14 @@ export type EscapeQuelle = Pick<EventTarget, 'addEventListener' | 'removeEventLi
 /** Offene Ebenen in der Reihenfolge, in der sie aufgegangen sind; die letzte ist die oberste. */
 const ebenen: object[] = []
 
+/** Zeitpunkt (`performance.now()`) des letzten Escape, den eine Ebene gesehen hat. */
+let letzterEscape = -Infinity
+
+/** Wahr kurz nach einem Escape: Ein Fokus, der jetzt ankommt, ist die Rückgabe an den Auslöser, keine Bedienung. */
+export function escapeVorKurzem(fensterMs = 300): boolean {
+  return performance.now() - letzterEscape < fensterMs
+}
+
 /**
  * Hängt einen Escape-Hörer an `quelle` und gibt die Rücknahme zurück. Escape gilt nur der obersten Ebene (zuletzt geöffnet, egal ob
  * ihr Hörer an `document` oder `window` hängt) und nur, wenn nicht schon jemand es verbraucht hat (`defaultPrevented`, z. B. die
@@ -23,6 +31,7 @@ export function haengeEscape(quelle: EscapeQuelle, capture: boolean, aufruf: (e:
   ebenen.push(marke)
   const taste = (e: Event) => {
     const k = e as KeyboardEvent
+    if (k.key === 'Escape') letzterEscape = performance.now()
     if (k.key !== 'Escape' || k.defaultPrevented || ebenen[ebenen.length - 1] !== marke) return
     k.preventDefault()
     aufruf(k)

@@ -544,6 +544,23 @@
   sources:
     - https://www.crunchyroll.com/de/series/GT00361955/a-wild-last-boss-appeared
 
+# A Wild Last Boss Appeared! Staffel 2 bei Prime Video, Crunchyroll-Kanal (26.11.2026): ersetzt die automatische Übernahme aus Anime2You 1050718,
+# die keine Titelseite nannte (Weg ohne Adresse). Anime2You 1063615 (24.10.): „Staffel 2 · deutsch · wöchentlich · Prime Video, Crunchyroll“.
+# Adresse: Prime-Kennung der Staffel-2-Seite „Watch A Wild Last Boss Appeared! Season 2“ (primevideo.com/detail/0OPTCDPN7UYNAUNUCD1KACDL6P,
+# Suchtreffer 26.11.2026: 9 Folgen = OmU-Stand seit 21.11.); Staffel 1 trägt dieselbe Kennungsform (0T72HYK532MWZKMYSDZDF2R3WQ, data/motn-links.json).
+# Die Seite selbst war aus der Cloud nicht abrufbar; der Ton bleibt offen, ein Termin ist kein Tonbeleg.
+- slug: auto-204389-primevideo
+  anilistId: 204389
+  titleDe: "A Wild Last Boss Appeared! Staffel 2"
+  platform: primevideo
+  platformUrl: https://www.amazon.de/gp/video/detail/0OPTCDPN7UYNAUNUCD1KACDL6P
+  kanal: Crunchyroll
+  releaseType: batch
+  schedule: { firstEpisodeDate: "2026-09-26" }
+  sources:
+    - https://www.anime2you.de/news/1050718/crunchyroll-19-neue-herbst-2026-simulcasts/
+    - https://www.anime2you.de/news/1063615/crunchyroll-apotheke-staffel-3-synchro-und-mehr/
+
 - slug: appraisal-aristocrat-s3-crunchyroll
   anilistId: 185756
   search: "Tensei Kizoku, Kantei Skill de Nariagaru 3rd Season"

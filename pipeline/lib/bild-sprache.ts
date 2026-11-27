@@ -29,7 +29,7 @@ export const KEINE_LESBARE = 'keine-lesbare-fassung'
  * Die Bilder eines Titels mit japanischer Schrift oder als AniList-Key-Visual: je Bild, ob es nachweislich keine lesbare TMDB-Fassung gibt.
  * Leer = kein solches Bild. Gemessen wird nur, was belegt ist: die Sprache des gewählten TMDB-Plakats und die Herkunft AniList.
  */
-export function fremdeBilder(t: Title, plakat: BildLookup<PlakatWahl>, banner: BildLookup<{ p: string }>): boolean[] {
+export function fremdeBilder(t: Title, plakat: BildLookup<PlakatWahl>, banner: BildLookup<{ p: string }>, serienbildFremd: (t: Title) => boolean): boolean[] {
   const aus: boolean[] = []
   const cover = t.coverImage ?? ''
   const p = plakat(t.id)
@@ -37,5 +37,7 @@ export function fremdeBilder(t: Title, plakat: BildLookup<PlakatWahl>, banner: B
   if (cover.includes('anilist.co')) aus.push(p === null)
   // Ein übernommenes Banner (`bannerVon`) zählt beim Spender, nicht noch einmal beim Empfänger.
   if (t.bannerVon === undefined && t.bannerImage?.includes('anilist.co')) aus.push(banner(t.id) === null)
+  // Das Serienbild einer anderen Staffel (`serienbildFremd`), das mangels AniList-Banner stehen bleibt: nie ohne Grund, also offen.
+  if (t.bannerVon === undefined && t.bannerImage?.includes('image.tmdb.org') && serienbildFremd(t)) aus.push(false)
   return aus
 }

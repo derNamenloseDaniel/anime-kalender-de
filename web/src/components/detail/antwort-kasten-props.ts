@@ -14,7 +14,7 @@ export interface AntwortKastenProps {
   /** Erklärt die Zustände der Anbieterzeilen (Stream-Seite) — nur, was dort wirklich vorkommt. */
   legende?: string
   /** Alle Stream-Zeilen ohne Sprachbeleg: Die Überschrift „Auf Deutsch …“ entfällt. */
-  ohneSprachbeleg?: boolean | 'omu' | 'anbieter'
+  ohneSprachbeleg?: boolean | 'anbieter'
   /** Die Termine des Titels — gebraucht für den frühesten deutschen Start (`de-seit.ts`). */
   releases?: Release[]
   antwort: Antwort

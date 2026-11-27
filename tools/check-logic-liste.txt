@@ -105,6 +105,7 @@ pipeline/check-ausbleiben-messen.ts
 pipeline/check-ausgeblieben-text.ts
 pipeline/check-ausloeser-zeilen.ts
 pipeline/check-auto-disc-handeintrag.ts
+pipeline/check-banner-ersatz.ts
 pipeline/check-banner-franchise.ts
 pipeline/check-beleg-adresswechsel.ts
 pipeline/check-beleg-anbieter.ts
@@ -513,6 +514,7 @@ pipeline/check-news-rhythmus.ts
 pipeline/check-news-staffel-zuordnung.ts
 pipeline/check-norm-schluessel.ts
 pipeline/check-notiz-fassung.ts
+pipeline/check-nur-deutsch.ts
 pipeline/check-nur-omu-hauptbestand.ts
 pipeline/check-nur-omu-vorstand.ts
 pipeline/check-nur-originalton-liste.ts
@@ -728,6 +730,7 @@ pipeline/check-tmdb-ablauf.ts
 pipeline/check-tmdb-angebote-kopie.ts
 pipeline/check-tmdb-film-suche.ts
 pipeline/check-tmdb-film-vorrang-lauf.ts
+pipeline/check-tmdb-film-zwilling.ts
 pipeline/check-tmdb-folgen-404-lauf.ts
 pipeline/check-tmdb-folgen-404.ts
 pipeline/check-tmdb-folgen-auswahl.ts
@@ -794,6 +797,7 @@ pipeline/check-vorlieben.ts
 pipeline/check-warnungen-zaehlen.ts
 pipeline/check-weg-adresse-bezugsweg.ts
 pipeline/check-weg-aus-meldung.ts
+pipeline/check-weg-handrecherche-b.ts
 pipeline/check-weg-handrecherche-c.ts
 pipeline/check-weg-massenabgang.ts
 pipeline/check-weg-nein-gti.ts

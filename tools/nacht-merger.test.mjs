@@ -559,9 +559,9 @@ pruefe('argumente: ungültig', argumente(['--hoechstens', '0']) === null && argu
   const r = lauf(w, { hoechstens: 3 })
   const fehlt = w.log.zeilen.filter((z) => z.startsWith('NACHTRAG FEHLT'))
   pruefe('Nachtrag fehlt: genau eine Zeile, nur für PR 31', fehlt.length === 1 && fehlt[0].startsWith('NACHTRAG FEHLT #31 '))
-  pruefe('Nachtrag fehlt: Zeile nennt Kopf und die zu schreibende Zeile', fehlt[0].includes('a1b2c3d4e') && fehlt[0].includes(nachtragZeile(KOPF)))
+  pruefe('Nachtrag fehlt: Zeile nennt den Kopf mit genau neun Zeichen und die zu schreibende Zeile', fehlt[0].startsWith('NACHTRAG FEHLT #31 Kopf a1b2c3d4e: ') && fehlt[0].includes(nachtragZeile(KOPF)))
   pruefe('Nachtrag fehlt: keine zweite ÜBERSPRUNGEN-Zeile für 31', !w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN #31')))
-  pruefe('Nachtrag fehlt: PR 33 ohne Urteil bleibt ÜBERSPRUNGEN', w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN #33')))
+  pruefe('Nachtrag fehlt: PR 33 ohne Urteil bleibt ÜBERSPRUNGEN', w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN #33') && z.includes('kein Prüfer-Urteil zu diesem Kopf')))
   pruefe('Nachtrag fehlt: Stufe 1 wird gemergt, 31 nie', r.gemergt.join(',') === '32')
   pruefe('Nachtrag fehlt: Schlusszeile zählt sie mit', w.log.zeilen.at(-1) === 'Nacht-Merger: 1 gemergt, 0 Fehler, 1 Kandidaten, 1 warten auf Nachtrag')
 }

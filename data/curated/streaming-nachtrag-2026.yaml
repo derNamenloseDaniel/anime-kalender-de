@@ -295,6 +295,21 @@
   sources:
     - https://www.anime2you.de/news/1056322/aniverse-oktober-2026-neuzugaenge/
 
+# Exception (Daniel, 27.11.2026): Netflix-Eigenproduktion, weltweit am 13.10.2022 mit allen 8 Folgen erschienen; aniSearch führt die deutsche
+# Fassung (Synchro) ab diesem Tag bei Netflix, Inc. Ohne diesen Termin machte der MOTN-Feed aus einer Neulistung am 25.11.2026 „Neu bei Netflix“.
+# Kein `available-from`: der Tag ist das Erscheinungsdatum, daher Katalog-Release („Vermutlich alle 8 Folgen auf einmal“). Uhrzeit nicht belegt.
+- slug: exception-netflix-2022
+  anilistId: 135660
+  titleDe: "Exception"
+  platform: netflix
+  netflixOriginal: true
+  platformUrl: https://www.netflix.com/title/81002444
+  releaseType: batch
+  schedule: { firstEpisodeDate: "2022-10-13", episodeCount: 8 }
+  sources:
+    - https://www.anisearch.de/anime/16390
+    - https://www.moviepilot.de/serie/exception/episodenguide
+
 # Shaman King (2001, 64 Folgen) bei aniverse, Prime Video Channel: aniverse veröffentlicht in Blöcken zu 16 Folgen
 # (Anime2You 1035676: „Part 3“, 16 Folgen, 06.08.; 1065078: „Staffel 4“, 16 Folgen, 12.11.; Handbeleg B0DYF8BKVP: Staffel 4 = 16 Folgen, Deutsch).
 # Die Folgennummern sind abgeleitet (64 = 4 × 16), keine Quelle nennt sie; deshalb „≈“ im Hinweis.

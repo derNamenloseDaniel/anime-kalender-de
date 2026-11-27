@@ -1,10 +1,10 @@
 <!-- titel: feat(sprecher): Wikipedia-Sprecherliste an den Bau angeschlossen (81 sprecher-Mängel, 77 mit ≈) -->
-Baut auf: fix/maengel-sprecher-wikipedia (zuerst mergen)
+Baut auf: fix/maengel-sprecher-wikipedia (zuerst mergen) — seit 27.11.2026 als #5158 gemergt
 Auftrag: sprecher-bauanschluss
 
 ## Was
 
-Die Handliste `data/wikipedia-sprecher-seiten.yaml` (48 Seiten, 87 Ziele; inhaltlich unverändert, kommt aus dem Basis-Zweig samt den Fixtures unter `pipeline/fixtures/wikipedia-sprecher/` und `pipeline/check-wikipedia-sprecher.ts`) wird jetzt gesammelt und gebaut:
+Die Handliste die Handliste wikipedia-sprecher-seiten (48 Seiten, 87 Ziele; inhaltlich unverändert, kommt aus dem Basis-Zweig samt den Fixtures unter `pipeline/fixtures/wikipedia-sprecher/` und `pipeline/check-wikipedia-sprecher.ts`) wird jetzt gesammelt und gebaut:
 
 - **Sammler** `pipeline/fetch-wikipedia-sprecher.ts` (Kern `pipeline/lib/wikipedia-sprecher-sammeln.ts`, `npm run data:wikipedia-sprecher`): holt je Seite `https://de.wikipedia.org/wiki/<Seite>?action=raw`, 2 s Abstand, je Seite höchstens einmal je Woche (`FRISCH_TAGE = 7`), liest nur den Abschnitt mit „Synchron“ in der Überschrift (`pipeline/lib/wikipedia-sprecher-seite.ts`; sonst träfe der Parser die Episodenliste mit „Deutsche Erstausstrahlung“). Störung (HTTP ≠ 200, Weiterleitung, Netzfehler) behält den alten Stand und wird gemeldet; in der Quellen-Gesundheit zählen nur gelungene Abrufe als gearbeitet, ein Lauf mit lauter Störungen ist rot. Ablage im Sammler-Ort `data/wikipedia-sprecher.json` (eine Tabellenzeile je Textzeile, 108 KB), eingetragen in `tools/quellen-liste.sh` und `tools/pr-nachrechnen-bot-erzeugt.mjs`; Schritt im Tageslauf `.github/workflows/refresh-data.yml` hinter den Wikipedia-Folgen; Frist 4 Tage in `tools/quellen-fristen.mjs` (+ `tools/quellen-fristen-takt.test.mjs`); Skript in `package.json`. Erster Lauf aus der Cloud am 27.11.2026 ist mitcommittet: 48/48 Seiten HTTP 200, 47 mit deutscher Spalte.
 - **Parser** `pipeline/lib/wikipedia-sprecher.ts`: zweite Stimme auf eigener Zeile ohne `<br>` wird getrennt, wenn die Zeile mit einem Großbuchstaben beginnt (Live-Ranma 27.11.: „Thomas Rauscher“ + „Torsten Münchow (ab Staffel 3)“ waren ein Name), Komma am Ende fällt weg. Gegen alle 48 Fixtures und 48 Live-Seiten: 7 Tabellen ändern sich, alle durch getrennte Namen (Mushoku Tensei, Ranma, Re:Zero, Record of Ragnarok).
@@ -56,3 +56,20 @@ Schätzung vs. Ist: 120 min geschätzt, rund 190 min (drei Mutationsrunden).
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 https://claude.ai/code/session_01Bx77znPs5UYzuHQPpUHFLH
+
+## Nachtrag (Kopf 51293c7b, 27.11.2026)
+
+Kette am Kopf 2c680868 war rot (Logik 1, Logik 2, PR-Datenbau): sechs Prüfungen bauen in einer Kulisse ohne die Handliste wikipedia-sprecher-seiten und brachen mit `ENOENT … Handliste wikipedia-sprecher-seiten` ab (`check-ankuendigung-sichtbar`, `check-staffel-anzeige-bau`, `check-nur-omu-hauptbestand`, `check-omu-ohne-termin`, `check-phasenfolge`, `check-staffel-folge-tv-schleife`).
+
+- **Fix** `pipeline/bau/sprecher-wikipedia.ts`: neue Funktion `liesZiele()` — fehlt die Handliste, Warnzeile „Handliste wikipedia-sprecher-seiten nicht lesbar (fehlt): keine Wikipedia-Sprecher“ und keine Ziele (Muster wie den ADN-Handadressen); kaputtes YAML bricht weiter ab.
+- **Test** `pipeline/check-sprecher-wikipedia-bau.ts`, Fall „ohne Handliste“: vor dem Fix `✖ ohne Handliste: kein Abbruch, Warnzeile nennt die Datei, AniList-Rollen bleiben — gefunden: "Error: ENOENT …"`, `EXIT 1`; danach `EXIT 0`.
+- Die sechs Prüfungen lokal grün (Exit 0), dazu `check-deutsch-belegt-klaeren`, `check-adn-sprachriegel(-lauf)`, `check-shop-wege-falsches-ziel-bestand`; `npx tsc --noEmit -p .` grün.
+- **Mutationsprobe** (`diff-mutanten --basis 2c680868 --test "npx tsx pipeline/check-sprecher-wikipedia-bau.ts"`):
+
+| Datei | Mutanten | rot | überlebt (gleichwertig) |
+|---|---|---|---|
+| pipeline/bau/sprecher-wikipedia.ts | 13 | 12 | 1 |
+
+Überlebender: Zeile 124 `readFileSync(pfad)` ohne `'utf8'` — `yaml.load` liest den Buffer als denselben Text, gleichwertig.
+
+Lehre: eine Bauphase, die eine neue Handliste liest, darf in den Bau-Kulissen der übrigen Prüfungen nicht hart abbrechen; vor dem Push `grep -l "bauePhasenfolge\|mkdtemp.*data" pipeline/check-*.ts` und diese Prüfungen mitfahren.

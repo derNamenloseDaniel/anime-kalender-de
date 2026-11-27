@@ -1,6 +1,7 @@
 import { diffDays } from '../../shared/time.ts'
 import type { SprecherZeile } from './wikipedia-sprecher.ts'
 import { sprecherAusSeite } from './wikipedia-sprecher-seite.ts'
+import { verwirfFalscheStimmen } from './wikipedia-sprecher-waechter.ts'
 
 /**
  * Sammler-Kern für die Sprechertabellen der Handliste `data/wikipedia-sprecher-seiten.yaml`: je Seite ein Abruf
@@ -27,11 +28,14 @@ export interface Sammelergebnis {
   datei: SprecherDatei
   abrufe: number
   stoerungen: string[]
+  /** Vom Wächter verworfene Stimmen („Seite: Rolle → Sprecher (Grund)“), kein Abrufproblem. */
+  verworfen: string[]
 }
 
 export async function sammle(seiten: string[], alt: SprecherDatei, abruf: Abruf, heute: string, pause: () => Promise<void>): Promise<Sammelergebnis> {
   const aus: SprecherDatei = { seiten: {} }
   const stoerungen: string[] = []
+  const verworfen: string[] = []
   let abrufe = 0
   for (const seite of seiten) {
     const vorher = alt.seiten[seite]
@@ -41,12 +45,12 @@ export async function sammle(seiten: string[], alt: SprecherDatei, abruf: Abruf,
     }
     if (abrufe > 0) await pause()
     abrufe++
-    const grund = await hole(seite, abruf, heute, aus)
+    const grund = await hole(seite, abruf, heute, aus, verworfen)
     if (!grund) continue
     stoerungen.push(`${seite}: ${grund}`)
     if (vorher) aus.seiten[seite] = vorher
   }
-  return { datei: aus, abrufe, stoerungen }
+  return { datei: aus, abrufe, stoerungen, verworfen }
 }
 
 /** Eine Tabellenzeile je Textzeile: lesbare Diffs im Sammler-PR bei einem Drittel der eingerückten Größe. */
@@ -59,13 +63,15 @@ export function alsText(datei: SprecherDatei): string {
 }
 
 /** Trägt die Seite in `aus` ein; Rückgabe ist der Störungsgrund, sonst null. */
-async function hole(seite: string, abruf: Abruf, heute: string, aus: SprecherDatei): Promise<string | null> {
+async function hole(seite: string, abruf: Abruf, heute: string, aus: SprecherDatei, verworfen: string[]): Promise<string | null> {
   try {
     const { status, text } = await abruf(seite)
     if (status !== 200) return `HTTP ${status}`
     if (/^#(?:WEITERLEITUNG|REDIRECT)/i.test(text.trim())) return 'Weiterleitung (Handliste auf die Zielseite umstellen)'
-    const { abschnitt, zeilen } = sprecherAusSeite(text)
-    aus.seiten[seite] = { abgerufen: heute, abschnitt, zeilen }
+    const gelesen = sprecherAusSeite(text)
+    const geprueft = verwirfFalscheStimmen(gelesen.zeilen)
+    verworfen.push(...geprueft.verworfen.map((v) => `${seite}: ${v}`))
+    aus.seiten[seite] = { abgerufen: heute, abschnitt: gelesen.abschnitt, zeilen: geprueft.zeilen }
     return null
   } catch (e) {
     return e instanceof Error ? e.message : String(e)

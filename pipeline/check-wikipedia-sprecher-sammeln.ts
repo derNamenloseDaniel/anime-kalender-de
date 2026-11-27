@@ -73,6 +73,8 @@ pruefe('Weiterleitung ist eine Störung, alter Stand bleibt', erg.datei.seiten.W
 pruefe('Netzfehler ohne alten Stand: keine Seite, gemeldet', !('Neu' in erg.datei.seiten) && erg.stoerungen.includes('Neu: Netz weg'))
 pruefe('Seite nicht mehr in der Handliste fällt weg, frische bleibt', !('Entfernt' in erg.datei.seiten) && erg.datei.seiten.Frisch === alt.seiten.Frisch)
 pruefe('Abrufzahl', erg.abrufe === 4, erg.abrufe)
+const falsch = await sammle(['K'], { seiten: {} }, async () => ({ status: 200, text: '=== Synchronisation ===\n{| class="wikitable"\n! Rolle !! Deutsch\n|-\n| Held || Held\n|-\n| Freund || N. N.\n|-\n| Rolle C || Cora\n|}' }), heute, async () => undefined)
+pruefe('Wächter im Sammler: Sprecher gleich Rolle und Platzhalter fallen aus der Sammlung, werden gezählt und genannt', JSON.stringify(falsch.datei.seiten.K?.zeilen) === '[{"rolle":"Rolle C","deutsch":[{"sprecher":"Cora","zusatz":null}]}]' && falsch.verworfen.join('|') === 'K: Held → „Held“ (Sprecher gleich Rolle)|K: Freund → „N. N.“ (Platzhalter)', falsch)
 pruefe('Textform ist gültiges JSON mit demselben Inhalt', JSON.stringify(JSON.parse(alsText(erg.datei))) === JSON.stringify(erg.datei))
 const zwei = await sammle(['Z', 'Leer'], { seiten: {} }, async (s) => ({ status: 200, text: s === 'Z' ? zweiZeilen : 'kein Abschnitt' }), heute, async () => undefined)
 pruefe(
@@ -134,7 +136,7 @@ pruefe('eingebaute Pause: rund 2 s zwischen zwei Abrufen', dauer >= 1900 && daue
 const datei = JSON.parse(readFileSync(join(wurzel, 'data', 'wikipedia-sprecher.json'), 'utf8')) as SprecherDatei
 pruefe('main schreibt die Sammlung', Object.keys(datei.seiten).join('|') === 'Serie A|Serie B' && datei.seiten['Serie A']?.zeilen.length === 1, datei)
 pruefe('Quelle grün mit Zahl der Seiten mit Tabelle', typeof gesundheit().lastOk === 'string' && gesundheit().lastCount === 2 && gesundheit().lastError === undefined, gesundheit())
-pruefe('Zusammenfassung', ausgabe.includes('[pipeline] Wikipedia-Sprecher: 2 Seiten in der Handliste, 2 abgerufen, 0 gestört, 2 mit deutscher Tabelle → data/wikipedia-sprecher.json'), ausgabe)
+pruefe('Zusammenfassung', ausgabe.includes('[pipeline] Wikipedia-Sprecher: 2 Seiten in der Handliste, 2 abgerufen, 0 gestört, 0 Stimmen verworfen (Platzhalter oder gleich Rolle), 2 mit deutscher Tabelle → data/wikipedia-sprecher.json'), ausgabe)
 
 // Seiten ohne deutsche Tabelle: der Abruf hat gearbeitet (grün), ein zweiter Lauf am selben Tag holt nichts und bleibt grün.
 rmSync(join(wurzel, 'data', 'wikipedia-sprecher.json'))

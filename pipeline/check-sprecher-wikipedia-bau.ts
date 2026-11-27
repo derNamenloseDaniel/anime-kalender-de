@@ -50,6 +50,9 @@ schreibe(
     '- seite: Serie C',
     '  titel:',
     '    - id: 900009',
+    '- seite: Serie D',
+    '  titel:',
+    '    - id: 900013',
   ].join('\n'),
 )
 const zeile = (rolle: string, ...deutsch: [string, string | null][]) => ({ rolle, deutsch: deutsch.map(([sprecher, zusatz]) => ({ sprecher, zusatz })) })
@@ -62,6 +65,8 @@ schreibe('data/wikipedia-sprecher.json', {
       zeilen: [zeile('Vater', ['Carl Chor', 'alte Serie'], ['Dora Dur', 'neue Serie'], ['Emil Ems', 'neue Serie, ab Staffel 3']), zeile('Mutter', ['Fritz Fis', 'alte Serie']), zeile('Onkel', ['Gerd Gut (Staffel 2)', 'neue Serie'])],
     },
     'Serie C': { abgerufen: '2026-11-22', abschnitt: null, zeilen: [] },
+    // Falsch gelesene Zeilen (Kaiju No. 8): Sprecher gleich Rolle und Platzhalter dürfen nie Rollen werden.
+    'Serie D': { abgerufen: '2026-11-23', abschnitt: 'Synchronisation', zeilen: [zeile('Held', ['Held', null], ['N. N.', 'Staffel 2'], ['Hanne Gut', 'Staffel 1']), zeile('Rolle Zwei', ['Rolle Zwei', null]), zeile('Rolle Drei', ['unbekannt', null])] },
   },
 })
 // Pflichtdateien, die `bau/grundlagen.ts` beim Laden liest.
@@ -79,7 +84,7 @@ schreibe('public/data/voices/900010.json', { titleId: 900010, updatedAt: '2026-0
 schreibe('public/data/voices/900012.json', '{kaputt')
 
 const titel = (id: number, dub: boolean): Title => ({ id, streams: dub ? [{ platform: 'crunchyroll', dub: true }] : [] }) as unknown as Title
-const titles = new Map<number, Title>([900001, 900002, 900003, 900004, 900005, 900006, 900007, 900009, 900010, 900012].map((id) => [id, titel(id, id !== 900003)]))
+const titles = new Map<number, Title>([900001, 900002, 900003, 900004, 900005, 900006, 900007, 900009, 900010, 900012, 900013].map((id) => [id, titel(id, id !== 900003)]))
 // Abgeleitete Synchro ist kein Beleg für eine vermutete Besetzung.
 titles.set(900011, { id: 900011, streams: [{ platform: 'crunchyroll', dub: true, dubAbgeleitet: true }] } as unknown as Title)
 
@@ -112,19 +117,20 @@ pruefe('Fassung filtert, weiterer Zusatz und Klammer am Namen wandern an die Fig
 pruefe('leerer AniList-Merker wird gefüllt (ohne Fassung die ganze Tabelle, Zusatz an der Figur) und behält sein Datum', lies(900007)?.roles.map((r) => `${r.character}=${r.actor}`).join(';') === 'Vater (alte Serie)=Carl Chor;Vater (neue Serie)=Dora Dur;Vater (neue Serie, ab Staffel 3)=Emil Ems;Mutter (alte Serie)=Fritz Fis;Onkel (neue Serie, Staffel 2)=Gerd Gut' && lies(900007)?.updatedAt === '2026-02-02T00:00:00.000Z', lies(900007))
 pruefe('Ziel ohne Titel im Datensatz bekommt keine Datei', lies(900008) === undefined)
 pruefe('Seite ohne deutsche Spalte: keine Datei', lies(900009) === undefined)
-pruefe('Sprechermerker genau für die Titel mit Rollen (auch AniList ohne Ziel)', [...mit].sort().join(',') === '900001,900002,900004,900006,900007,900010,900012', [...mit])
+pruefe('Wächter: Sprecher gleich Rolle und Platzhalter werden nie Rolle, vier verworfen und im Bau gezählt', JSON.stringify(lies(900013)?.roles) === JSON.stringify([{ character: 'Held (Staffel 1)', actor: 'Hanne Gut', von: 'wikipedia' }]) && zeilen.some((z) => z.includes('4 falsche Stimmen verworfen')), [lies(900013)?.roles, zeilen.filter((z) => z.includes('Sprecher aus Wikipedia'))])
+pruefe('Sprechermerker genau für die Titel mit Rollen (auch AniList ohne Ziel)', [...mit].sort().join(',') === '900001,900002,900004,900006,900007,900010,900012,900013', [...mit])
 pruefe('unsicher mit nur abgeleiteter Synchro: keine Datei', lies(900011) === undefined, lies(900011))
 pruefe('Titel ohne Ziel: Wikipedia-Rest und Vermerk weg, AniList-Rolle bleibt', JSON.stringify(lies(900010)?.roles) === '[{"character":"Held","actor":"Ida Igel"}]' && !lies(900010)?.wikipedia, lies(900010))
 pruefe('unlesbare Sprecherdatei wird gemeldet und neu geschrieben', lies(900012)?.wikipedia?.seite === 'Serie A' && zeilen.some((z) => z.includes('900012.json unlesbar (SyntaxError:') && z.includes('JSON')), zeilen)
 pruefe('Doppelte Tabellenzeile ergibt eine Rolle (900001 oben: zwei Rollen)', lies(900001)?.roles.length === 2)
 pruefe(
   'Zählzeile der Phase',
-  zeilen.includes('[pipeline] Sprecher aus Wikipedia: 5 Titel (1 ≈ unsicher); übergangen: 1 mit anderer Quelle, 2 unsicher ohne Synchrobeleg, 1 ohne Rollen, 1 ohne Titel'),
+  zeilen.includes('[pipeline] Sprecher aus Wikipedia: 6 Titel (1 ≈ unsicher); übergangen: 1 mit anderer Quelle, 2 unsicher ohne Synchrobeleg, 1 ohne Rollen, 1 ohne Titel, 4 falsche Stimmen verworfen'),
   zeilen.filter((z) => z.includes('Wikipedia')),
 )
 
 console.log('\nSprecher aus Wikipedia: zweiter Bau, Index')
-const alle = [900001, 900002, 900004, 900005, 900006, 900007, 900010, 900012]
+const alle = [900001, 900002, 900004, 900005, 900006, 900007, 900010, 900012, 900013]
 const vorher = alle.map((id) => JSON.stringify(lies(id))).join('\n')
 const zeiten = alle.map((id) => statSync(join(voices, `${id}.json`)).mtimeMs).join(',')
 mitschreiben()

@@ -29,13 +29,14 @@ export async function main(abruf = async (seite: string) => {
 }, pause = () => sleep(2000)): Promise<void> {
   const liste = yaml.load(readFileSync(join(ROOT, HANDLISTE), 'utf8')) as { seite: string }[]
   const alt = readJson<SprecherDatei>(ZIEL, { seiten: {} })
-  const { datei, abrufe, stoerungen } = await sammle(liste.map((e) => e.seite), alt, abruf, todayIso(), pause)
+  const { datei, abrufe, stoerungen, verworfen } = await sammle(liste.map((e) => e.seite), alt, abruf, todayIso(), pause)
   writeText(ZIEL, alsText(datei))
   for (const s of stoerungen) warn(`Wikipedia-Sprecher ${s}`)
+  for (const v of verworfen) warn(`Wikipedia-Sprecher verworfen: ${v}`)
   const mitTabelle = Object.values(datei.seiten).filter((s) => s.zeilen.length).length
   // Gearbeitet hat nur ein gelungener Abruf: ein Lauf, in dem jeder Abruf scheitert, ist nicht grün.
   recordSource('wikipedia-sprecher', mitTabelle, stoerungen.length ? `${stoerungen.length} von ${abrufe} Abrufen gestört` : undefined, abrufe - stoerungen.length, abrufe === 0)
-  log(`Wikipedia-Sprecher: ${liste.length} Seiten in der Handliste, ${abrufe} abgerufen, ${stoerungen.length} gestört, ${mitTabelle} mit deutscher Tabelle → ${ZIEL}`)
+  log(`Wikipedia-Sprecher: ${liste.length} Seiten in der Handliste, ${abrufe} abgerufen, ${stoerungen.length} gestört, ${verworfen.length} Stimmen verworfen (Platzhalter oder gleich Rolle), ${mitTabelle} mit deutscher Tabelle → ${ZIEL}`)
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]!).href) await main()

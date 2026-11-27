@@ -5,6 +5,7 @@ import type { Title } from '../../shared/types.ts'
 import { log, readJson, ROOT, warn } from '../lib/util.ts'
 import type { SprecherDatei } from '../lib/wikipedia-sprecher-sammeln.ts'
 import { wikipediaAdresse } from '../lib/wikipedia-sprecher-seite.ts'
+import { verwirfFalscheStimmen } from '../lib/wikipedia-sprecher-waechter.ts'
 import type { SprecherZeile } from '../lib/wikipedia-sprecher.ts'
 import { VOICES_DIR } from './grundlagen.ts'
 import type { Rolle } from './sprecher-zusammen.ts'
@@ -53,6 +54,8 @@ export interface Zaehlung {
   /** Seite nicht gesammelt, ohne deutsche Spalte oder ohne Stimme der Fassung. */
   ohneRollen: number
   ohneTitel: number
+  /** Vom Wächter verworfene Stimmen (Platzhalter, Sprecher gleich Rolle) der Ziele. */
+  verworfen: number
 }
 
 export function zieleAusHandliste(liste: { seite: string; titel: Omit<WikipediaZiel, 'seite'>[] }[]): WikipediaZiel[] {
@@ -129,7 +132,7 @@ export function ergaenzeWikipediaSprecher({ titles, mitStimmen }: { titles: Map<
   const ziele = liesZiele()
   const sammlung = readJson<SprecherDatei>(SAMMLUNG, { seiten: {} })
   const jeId = new Map(ziele.map((z) => [z.id, z]))
-  const z: Zaehlung = { titel: 0, unsicher: 0, andereQuelle: 0, ohneSynchroBeleg: 0, ohneRollen: 0, ohneTitel: 0 }
+  const z: Zaehlung = { titel: 0, unsicher: 0, andereQuelle: 0, ohneSynchroBeleg: 0, ohneRollen: 0, ohneTitel: 0, verworfen: 0 }
   const aus = new Set(mitStimmen)
   for (const id of new Set([...jeId.keys(), ...idsMitWikipedia()])) {
     const t = titles.get(id)
@@ -139,7 +142,9 @@ export function ergaenzeWikipediaSprecher({ titles, mitStimmen }: { titles: Map<
       continue
     }
     const seite = ziel ? sammlung.seiten[ziel.seite] : undefined
-    const rollen = ziel && seite ? rollenFuer(seite.zeilen, ziel.fassung) : []
+    const geprueft = verwirfFalscheStimmen(seite?.zeilen ?? [])
+    if (ziel) z.verworfen += geprueft.verworfen.length
+    const rollen = ziel && seite ? rollenFuer(geprueft.zeilen, ziel.fassung) : []
     const datei = liesDatei(id)
     const neu = wendeAn(datei, ziel, rollen, synchroBelegt(t), seite?.abgerufen ?? '')
     if (neu && JSON.stringify(neu) !== JSON.stringify(datei)) writeFileSync(`${VOICES_DIR}/${id}.json`, JSON.stringify(neu))
@@ -154,7 +159,7 @@ export function ergaenzeWikipediaSprecher({ titles, mitStimmen }: { titles: Map<
   }
   log(
     `Sprecher aus Wikipedia: ${z.titel} Titel (${z.unsicher} ≈ unsicher); übergangen: ${z.andereQuelle} mit anderer Quelle, ` +
-      `${z.ohneSynchroBeleg} unsicher ohne Synchrobeleg, ${z.ohneRollen} ohne Rollen, ${z.ohneTitel} ohne Titel`,
+      `${z.ohneSynchroBeleg} unsicher ohne Synchrobeleg, ${z.ohneRollen} ohne Rollen, ${z.ohneTitel} ohne Titel, ${z.verworfen} falsche Stimmen verworfen`,
   )
   return aus
 }

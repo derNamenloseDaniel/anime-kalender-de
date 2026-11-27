@@ -790,6 +790,7 @@ pipeline/check-vorlieben.ts
 pipeline/check-warnungen-zaehlen.ts
 pipeline/check-weg-adresse-bezugsweg.ts
 pipeline/check-weg-aus-meldung.ts
+pipeline/check-weg-handrecherche-c.ts
 pipeline/check-weg-massenabgang.ts
 pipeline/check-weg-nein-gti.ts
 pipeline/check-weg-unten.ts

@@ -72,10 +72,10 @@ async function frist(g, datumVonSeite) {
   const quelle = readFileSync(resolve(__dirname, 'melder.js'), 'utf8')
   const von = quelle.search(/^function erscheinungsdatum\(/m)
   const code = quelle.slice(von, quelle.indexOf('\n}\n', von) + 2)
-  const datum = (dialoge, body) => new Function('document', `${code}; return erscheinungsdatum()`)({
+  const datum = (dialoge, body) => new Function('document', 'akNetflixTerminLesen', `${code}; return erscheinungsdatum()`)({
     body: { innerText: body },
     querySelector: (s) => dialoge.find((d) => !s.includes(':has(') || d.erinnern),
-  })
+  }, kontext.akNetflixTerminLesen)
   const mitErinnern = { erinnern: true, innerText: 'Erinnern Ab 19. November' }
   const ohneErinnern = { erinnern: false, innerText: 'Abspielen 1. Folge' }
   pruefe('H3: Dialog mit Erinnern-Knopf liefert sein Datum', datum([mitErinnern], 'Ab 3. Dezember') === '19. November')

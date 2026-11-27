@@ -172,13 +172,13 @@ assert.deepEqual(echtErholt.zeilen, [
 ])
 // Ablauf und Wecker laufen durch dieselbe Schleife: Ablauf in 9 Tagen und seit 4 Tagen rot, ein fernes Datum nicht, „unbekannt“ als ℹ-Zeile; Wecker 7 h alt rot.
 const zugang = (id, gueltigBis, art = 'handgriff') => ({ id, gueltig: { gueltigBis }, erneuerung: { art, text: 't' } })
-const ablauf = lauf({ 'b.yml': [{ databaseId: 31, createdAt: vor(2) }] }, { 20: schnellSchritte, 31: [{ name: 'Recherche', conclusion: 'success' }] }, { zugaenge: [zugang('X', '3000-01-10'), zugang('V', '2999-12-28'), zugang('F', '3000-06-01'), zugang('Y', null), zugang('Z', null, 'automatisch')], weckerH: 7 })
+const ablauf = lauf({ 'b.yml': [{ databaseId: 31, createdAt: vor(2) }] }, { 20: schnellSchritte, 31: [{ name: 'Recherche', conclusion: 'success' }] }, { zugaenge: [zugang('X', '3000-01-10'), zugang('V', '2999-12-28'), zugang('F', '3000-06-01'), zugang('Y', null), zugang('W', null), zugang('Z', null, 'automatisch')], weckerH: 7 })
 assert.equal(ablauf.code, 1)
 assert.deepEqual(ablauf.zeilen.slice(1), [
   '✗ GITHUB_WECKER_TOKEN: letzter Start durch den Wecker vor 7 h',
   '✗ X: läuft in 9 Tagen ab (3000-01-10) — t',
   '✗ V: läuft seit 4 Tagen ab ab (2999-12-28) — t', // vorhandene doppelte Silbe „ab ab“ nicht Teil dieses Auftrags
-  'ℹ Ablaufdatum unbekannt (gueltigBis leer): Y — Daniel liest es einmal im Konto ab und trägt es ins Register ein.',
+  'ℹ Ablaufdatum unbekannt (gueltigBis leer): Y, W — Daniel liest es einmal im Konto ab und trägt es ins Register ein.',
   '\n3 Befund(e) bei den Zugängen.',
 ])
 // Nur ein Lauf aus a.yml mit anderem Ergebnis als „failure“, zu alt (> 7 Tage) oder gleichzeitig mit der Erholung löst den roten Befund nicht aus bzw. bleibt rot (Grenzen).
@@ -187,7 +187,9 @@ const bef = (l, erholt = null) => pruefeLauf('claude-reparatur.yml', { claude: t
 assert.equal(bef({ ...schnell, createdAt: vor(24 * 7) }).length, 1, 'genau 7 Tage zählt')
 assert.equal(bef({ ...schnell, createdAt: vor(24 * 7 + 1) }).length, 0, 'älter als 7 Tage nicht')
 assert.equal(bef({ ...schnell, conclusion: 'success' }).length, 0, 'ein Erfolg mit gleichen Schritten ist kein Befund')
-assert.equal(bef(schnell, erh(5)).length, 1, 'Erholung zur selben Sekunde deckt den Abbruch nicht')
+assert.equal(bef(schnell, erh(5)).filter((z) => z.rot).length, 1, 'Erholung zur selben Sekunde deckt den Abbruch nicht')
+const viele = (...a) => (a[0] === 'api' ? { jobs: [{ steps: [claudeSchritt] }] } : a.includes('--status') ? [] : Array.from({ length: 7 }, (_, i) => ({ ...schnell, databaseId: 50 + i })))
+assert.equal(pruefeLauf('claude-reparatur.yml', { claude: true, fristStunden: null }, viele, JETZT, null).length, 5, 'höchstens fünf Läufe je Workflow werden gelesen')
 assert.equal(bef(schnell)[0].text, 'claude-reparatur.yml: Claude-Schritt „Run anthropics/claude-code-action@v1“ endete nach wenigen Sekunden (Lauf 7, 2999-12-31T07:00Z) — Kontingent leer oder CLAUDE_CODE_OAUTH_TOKEN ungültig')
 assert.equal(bef(schnell, erh(4))[0].text, 'claude-reparatur.yml: Claude-Schritt „Run anthropics/claude-code-action@v1“ endete nach wenigen Sekunden (Lauf 7, 2999-12-31T07:00Z) — Token läuft wieder: claude-daten-merge.yml Lauf 9 (2999-12-31T08:00Z)')
 const nurGruen = lauf({ 'b.yml': [{ databaseId: 32, createdAt: vor(2) }] }, { 20: schnellSchritte, 32: [{ name: 'Artikel auswerten', conclusion: 'skipped' }] })

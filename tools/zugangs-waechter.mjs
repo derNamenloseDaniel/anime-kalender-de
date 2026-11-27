@@ -92,7 +92,7 @@ export function claudeErholung(laeufe, ghAufruf = gh) {
       }
     }
   }
-  return funde.sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1)).at(-1) ?? null
+  return funde.reduce((neuster, f) => (!neuster || f.createdAt > neuster.createdAt ? f : neuster), null)
 }
 
 /** `ghAufruf` und `jetzt` sind einspeisbar, damit ein Test ohne `gh` und ohne Uhr läuft; `erholt`: jüngster Erfolg eines Claude-Workflows. */

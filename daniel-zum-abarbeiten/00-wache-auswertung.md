@@ -5,6 +5,17 @@ verliert. Sie kann nicht wissen, **warum** — hier steht es. Neue Auswertungen
 kommen oben dazu, ältere bleiben stehen: An der Reihe zeigt sich, ob eine Lücke
 wiederkehrt.
 
+## 27.11.2026, 10:07 — Claude-Lauf, Befund
+
+**Was läuft korrekt.** Bestandsbau, Deploy und Nachlauf zeigen keinen Alarm, letzter grüner Bestandsbau-Lauf heute um 08:07 Uhr (12). Der Briefkasten zeigt weiterhin alle 233 Adressen gelistet, 0 zurückgestellt (03); Zugänge und Workflow-Fristen liegen unauffällig (04). Die Terminableitungs-Ausschlüsse bleiben bei 229/45/4 unverändert (07) — kein neuer stiller Verlust dort. Der einzige Alarm in 12 (Nachtprüfung rot, Lauf 01:00 Uhr) ist bereits als Issue #5172 „ALARM 2026-11-27: Wache meldet ALARM" erfasst (08) — der Alarm-Mechanismus hat hier gegriffen.
+
+**Wo ist Verbesserungspotenzial?** `tv-de` bleibt per HTTP 403 gesperrt, jetzt 21,4 Tage ohne Treffer, weiterhin ohne Issue (06), wie seit mindestens 22.11. gemeldet (10). `messbelege` ist weiterhin „grün aber leer" seit 21 Tagen (06). `cr-einzelwerke`/`cr-filmbloecke` wachsen auf 13,7 Tage ohne neuen Erfolg bei je nur 1 Treffer insgesamt (06). Neu seit dem letzten Urteil: `cartoons` ist jetzt ebenfalls „grün aber leer seit 2026-11-27" (06), zusätzlich zu `cartoon-reihen` (seit 25.11., weiterhin offen). Issue #1595 steht jetzt 39 Tage offen, #898 46 Tage, die vier Erweiterungs-Issues #4071/#4060/#4059/#4058 jetzt 11 Tage ohne PR (08). „Claude — roten Datenlauf untersuchen" lief erneut 57x nur „skipped", kein einziges „success" (01), wie bereits mehrfach seit 22.11. gemeldet (10). Zwölf der offenen Pull Requests sind am 26.11. gleichzeitig als „Ein-Satz-Handlung"-Teile 01–12 entstanden (08) — ein wachsender, noch unzusammengeführter Stapel gleichartiger Daten-PRs.
+
+**Wo sind echte Risiken und Lücken?** Neu seit dem letzten Urteil: Der Bestandsbau-Lauf am 26.11. um 23:13 Uhr zeigte „releases +1, termine -150", vom Skript selbst als Auffälligkeit markiert (⚠, Exit-Code 1) (02). Die beiden Folgeläufe um 00:24 und 00:51 Uhr brachten nur je „releases +2, termine +2" — keine Erklärung oder Erholung der 150 fehlenden Termine im Dossier sichtbar, kein Issue dazu auffindbar (08). Mein Versuch, dafür über einen `bauer`-Agenten (isolation worktree) ein Issue anzulegen, wurde vom Hook `agenten-grenze.js` mit Verweis auf Cloud-Pflicht blockiert — derselbe strukturelle Fehler wie am 25./26.11. mit vier anderen Konfigurationen gemeldet (10), jetzt auch für diese Konfiguration bestätigt. „PR-Prüfkette" schlug 6x fehl (01), davon 3 den offenen PRs #5169/#5168/#5167 zuordenbar (08); die anderen 3 Fehlschläge nennt das Dossier ohne Branch. Da die Rot-Untersuchung durchgehend nur skippt, bleibt unklar, ob diese Fehlschläge je automatisch beobachtet werden — Ursache weiterhin offen (10). Issue #4420 (Cloud-Orchester) steht jetzt 6 Tage offen, weiterhin ohne erkennbaren Fortschritt (08, 10). Daniel: die 150 fehlenden Termine vom Lauf 23:13 prüfen, da die Wache dafür kein Issue anlegen konnte.
+
+**Was läuft komplett falsch?** Kein Fall von jetzt falsch oder still ausgelieferten Daten im Dossier sichtbar; der einzige Alarm (12, Nachtprüfung) ist bereits per Issue #5172 erfasst (08). Die Wache-Sitzung kann weiterhin strukturell kein Issue anlegen: Der heutige Versuch für die Termine-Anomalie wurde vom selben Hook blockiert, der schon am 25.11. in vier anderen Konfigurationen protokolliert wurde (10) — damit bleibt dieser Fund nur dokumentiert, nicht als Issue verankert, trotz aktivem Versuch heute.
+
+
 ## 26.11.2026, 10:05 — Claude-Lauf, Befund
 
 **Was läuft korrekt.** Bestandsbau, Deploy, Nachtprüfung und Nachlauf zeigen keinen Alarm, letzter grüner Bestandsbau-Lauf heute um 08:07 Uhr (12). Zugänge und Workflow-Fristen liegen unauffällig (04, 11), der Briefkasten zeigt weiterhin alle 230 Adressen gelistet, 0 zurückgestellt (03). Quelle `motn-changes` hat sich erholt: heute 60 Treffer vor 0,2 Tagen, nachdem sie im letzten Urteil noch als „grün aber leer seit 23.11." galt (06, 10). „Nachlauf auf main" und „Mutationsprobe" bleiben in den letzten 48 Stunden ohne Fehlschlag (01), wie bereits am 25.11. gemeldet (10). Die Terminableitungs-Ausschlüsse bleiben seit mehreren Tagen bei 229/45/4 unverändert (07) — kein neuer stiller Verlust.
@@ -1062,3 +1073,13 @@ wer die Ursache dann noch kennt, hat Glück. Deshalb diese Datei.
 **Wo sind echte Risiken und Lücken?** Solange `zuAk` fehlt, führen die alten Adressen der drei Staffel-Titel ins Leere (gemerkte Titel, versandte Links). Der Folge-PR war in `status.md` nicht als eigene Zeile geführt.
 
 **Was läuft komplett falsch?** Nichts: kein Datenverlust, kein Codefehler, kein Pull Request.
+
+## 26.11.2026 — Wache meldet „Claude-Kontingent leer“ (Lauf 45896232930, Issue #5121)
+
+**Was läuft korrekt.** Der Bestand hat nichts verloren: `00-wache.md` zeigt über 24 h Titel +1, Urteile +16, offen 0, keine Abgänge; Briefkasten „Alle Adressen sind gelistet“, alle Workflow-Fristen ✓. Der Befund ist die eine ✗-Zeile: `claude-reparatur.yml`, Lauf 45870267412 (26.11. 17:44Z), Claude-Schritt endete nach Sekunden (Kontingent leer oder Token ungültig, Muster aus `betrieb.md`, 02.10.2026).
+
+**Wo ist Verbesserungspotenzial?** Die Wache nimmt den letzten nicht übersprungenen Lauf. Die Folgeläufe (45897662680, dieser hier, seit 21:22Z in Arbeit; 45898152152 wartend) hatten zur Wachzeit noch keine `conclusion`, also blieb der 17:44-Fehlschlag der „letzte“. Ein einmaliger Kontingent-Ausfall sollte nicht den ganzen Wache-Lauf rot machen.
+
+**Wo sind echte Risiken und Lücken?** Fällt das Kontingent aus, bleibt jeder rote Datenlauf unbearbeitet, bis es zurück ist; die Wache zeigt das nur, wenn gerade ein Lauf scheiterte. Ablaufdatum der Tokens ist weiter unbekannt (ℹ-Zeile).
+
+**Was läuft komplett falsch?** Nichts Belegbares: Der Claude-Schritt dieses Laufs arbeitet, das Kontingent ist zurück. Kein Codefehler, kein Pull Request.

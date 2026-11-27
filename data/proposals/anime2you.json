@@ -1,12 +1,13 @@
 {
-  "scrapedAt": "2026-11-27T03:01:43.694Z",
+  "scrapedAt": "2026-11-27T04:14:23.338Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 43,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 13,
-    "schon in einem Rubrik-Feed gelesen": 11,
-    "Sprachhinweis älter als 45 Tage": 6
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 49,
+    "schon in einem Rubrik-Feed gelesen": 33,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
+    "Sprachhinweis älter als 45 Tage": 7
   },
   "proposals": [
     {
@@ -636,7 +637,7 @@
           "folgen": 24
         }
       ],
-      "sammelGelesen": "2026-11-24"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "Netflix nimmt »Call of the Night« in sein Programm auf",
@@ -1303,7 +1304,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-24"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "Black Friday 2026: Erste große Anime-Rabattaktionen gestartet",
@@ -2204,7 +2205,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-23"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "AniMoon-Angebot: RomCom-Serie »Toradora!« zum Sonderpreis",
@@ -2260,7 +2261,7 @@
           "folgen": 13
         }
       ],
-      "sammelGelesen": "2026-11-24"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "ProSieben MAXX zeigt »Wandering Witch: Elainas Reise« als TV-Premiere",
@@ -2598,7 +2599,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-24"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "Neue Anime-Katalogtitel im November 2026 bei aniverse",
@@ -2723,7 +2724,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-24"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "Zwei Anime-Neuzugänge auf Deutsch bei Crunchyroll",

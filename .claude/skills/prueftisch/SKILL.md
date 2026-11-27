@@ -87,6 +87,8 @@ Vorschläge steigen, die Daniel-Funde sinken.
 | Skills & Regeln | Widersprüche, Doppelungen, Veraltetes, Regeln ohne Wächter, Lücken in `lehren.md` (Tage mit Daniel-Fund ohne Lehre) |
 | Oberfläche, Mobil & Erweiterung | Trefferprobe (`elementFromPoint`) aller sichtbaren Links/Knöpfe, Überlappung, Lesbarkeit bei 360 px und beiden Themen, Stiländerung der Gastseite durch die Erweiterung |
 
+**Prüfungslücke Gegenprobe (26.11.2026, PR 5101):** Eine Gegenprobe gilt erst, wenn ihr Fall nachweislich den geprüften Zweig erreicht (Fixture traf die neue Bedingung nicht, Test grün ohne Prüfwert); Bauer und Prüfer setzen je neuer Bedingung einen Mutanten und zeigen ihn rot (Skill `pruef-technik`).
+
 **Dichte (ab 16.10.2026):** Funde wiederholen sich binnen 4 Tagen, eine Runde über 10 Bereiche
 dauert 10 — darum täglich **zwei** Termine: der älteste Bereich der Rotation **und** die Klasse mit
 den meisten Daniel-Funden ohne Wächter. Ausgangswert Daniel-Funde 09.–16.10.: **59** (Oberfläche 21,

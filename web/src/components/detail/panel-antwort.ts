@@ -10,12 +10,15 @@ import { lueckeOhneAnbieter } from './folgen-ohne-anbieter.ts'
 import { dubZeilenVon } from './dub-zeilen.ts'
 import { berechneAntwortMitDeFolgen } from './antwort-de-folgen.ts'
 import { sortiereNachZugang } from './wege-sortieren.ts'
+import { wegeOhneNurUntertitel } from './legende-zeilen.ts'
 import { kastenNotizVon, wegeHinweisVon } from './kasten-hinweise.ts'
 import { useReleaseSichten } from './release-sichten.ts'
 
 interface PanelAntwortEingabe {
   title: Title | undefined
   releases: Release[]
+  /** Releases mit Untertiteln allein: nur zum Ausblenden ihrer Wege (`wegeOhneNurUntertitel`), nie angezeigt. */
+  nurUntertitel: Release[]
   today: string
   synopsis: Synopsis | undefined
   favorites: Set<number>
@@ -24,7 +27,7 @@ interface PanelAntwortEingabe {
 }
 
 /** Die Sichten auf Titel und Termine, nach denen die Wege des Panels gegliedert sind. */
-function useWegeSichten({ title, releases, today }: Pick<PanelAntwortEingabe, 'title' | 'releases' | 'today'>) {
+function useWegeSichten({ title, releases, nurUntertitel, today }: Pick<PanelAntwortEingabe, 'title' | 'releases' | 'nurUntertitel' | 'today'>) {
   /**
    * Streaming, aufgeteilt nach dem, was es kostet.
    *
@@ -43,8 +46,8 @@ function useWegeSichten({ title, releases, today }: Pick<PanelAntwortEingabe, 't
    * kommentarlos aus der Anzeige.
    */
   const sortiertNachZugang = useMemo(() => {
-    return sortiereNachZugang({ title })
-  }, [title])
+    return title ? wegeOhneNurUntertitel(sortiereNachZugang({ title }), title, [...releases, ...nurUntertitel]) : sortiereNachZugang({ title })
+  }, [title, releases, nurUntertitel])
   const { discReleases, releaseJePlattform, kinoRelease } = useReleaseSichten(releases, today)
   const terminReleases = useTerminReleases(releases, title, kinoRelease?.slug, today)
   /* Führt der Titel den Anbieter schon als Link, steht dort dessen Pille; der Termin allein erst vor der ersten Folge. */

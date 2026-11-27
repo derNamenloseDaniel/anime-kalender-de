@@ -309,3 +309,30 @@
   sources:
     - https://www.anisearch.de/anime/16390
     - https://www.moviepilot.de/serie/exception/episodenguide
+
+# Shaman King (2001, 64 Folgen) bei aniverse, Prime Video Channel: aniverse veröffentlicht in Blöcken zu 16 Folgen
+# (Anime2You 1035676: „Part 3“, 16 Folgen, 06.08.; 1065078: „Staffel 4“, 16 Folgen, 12.11.; Handbeleg B0DYF8BKVP: Staffel 4 = 16 Folgen, Deutsch).
+# Die Folgennummern sind abgeleitet (64 = 4 × 16), keine Quelle nennt sie; deshalb „≈“ im Hinweis.
+- slug: shaman-king-2001-part3-primevideo
+  anilistId: 154
+  titleDe: "Shaman King – Part 3"
+  platform: primevideo
+  kanal: Aniverse
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-08-06", firstEpisodeNumber: 33, episodeCount: 16 }
+  hinweis: "16 Folgen (≈ Folgen 33–48) seit 06.08.2026 über den Prime-Kanal aniverse."
+  sources:
+    - https://www.anime2you.de/news/1035676/aniverse-august-2026-neuzugaenge/
+- slug: shaman-king-2001-staffel4-primevideo
+  anilistId: 154
+  titleDe: "Shaman King – Staffel 4"
+  platform: primevideo
+  kanal: Aniverse
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-11-12", firstEpisodeNumber: 49, episodeCount: 16 }
+  hinweis: "16 Folgen (≈ Folgen 49–64) seit 12.11.2026 über den Prime-Kanal aniverse."
+  sources:
+    - https://www.anime2you.de/news/1065078/aniverse-november-2026-neuzugaenge/
+    - https://www.amazon.de/gp/video/detail/B0DYF8BKVP

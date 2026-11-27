@@ -47,6 +47,11 @@ assert.equal(
   'LIEGT: 7 (Konflikt 30 h), Welle fix/handlung-satz-teil-* 3 PRs 5130, 5131, 5132 (rot 14 h)',
   'Einzelne zuerst, dann die Welle',
 )
+// Stunden der Welle = ältestes Mitglied, auch wenn es nicht vorn steht
+assert.equal(
+  liegtZeile([fund(1, 'fix/a-1', [4], 5), fund(2, 'fix/a-2', [4], 20), fund(3, 'fix/a-3', [4], 8)], JETZT),
+  'LIEGT: Welle fix/a-* 3 PRs 1, 2, 3 (rot 20 h)',
+)
 assert.equal(liegtZeile(welle12.slice(0, 2), JETZT), 'LIEGT: 5130 (rot 14 h), 5131 (rot 13 h)', 'unter WELLE_AB bleibt es bei Einzelzeilen')
 assert.equal(
   liegtZeile(welle12.slice(0, 3).map((f) => ({ ...f, repo: 'anime-kalender-nativ' })), JETZT),

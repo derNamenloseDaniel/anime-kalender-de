@@ -47,7 +47,8 @@ export function DetailPanel({
   const { reihenTeile, eigenerTeil, reihenName, kopfName, teilName } = usePanelReihe(title, data)
   const reihe = useReiheZustand(reihenTeile)
   const holt = useTitelNachladen(data, titleId)
-  const a = usePanelAntwort({ title, releases, today, synopsis: s.synopsis, favorites, verbindung, t })
+  const nurUntertitel = useMemo(() => data.nurUntertitelByTitle.get(titleId) ?? [], [data, titleId])
+  const a = usePanelAntwort({ title, releases, nurUntertitel, today, synopsis: s.synopsis, favorites, verbindung, t })
   const wechsel = useReihenWechsel(data, titleId, onOpenTitle)
   const ersatz = useErsatzHandlung({ titleId, title, synopsis: s.synopsis, reihenTeile })
 

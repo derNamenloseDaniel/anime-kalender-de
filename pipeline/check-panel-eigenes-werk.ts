@@ -62,7 +62,7 @@ const wurzel = createRoot(dom.wurzel as unknown as Element)
 
 /** Rendert das Panel für `id` und liefert den Text der Kopfzeile (h2), der Unterzeile darunter und die Staffel-Reiter (Beschriftung, gewählt). */
 async function kopf(id: number): Promise<{ name: string; unter: string[]; reiter: string[]; gewaehlt: string[]; reihe: string[] }> {
-  const data = { titles: TITEL, titleById: new Map(TITEL.map((t) => [t.id, t])), releases: [], releaseBySlug: new Map(), events: [], eventsByDate: new Map(), releasesByTitle: new Map(), meta: {} }
+  const data = { titles: TITEL, titleById: new Map(TITEL.map((t) => [t.id, t])), releases: [], releaseBySlug: new Map(), events: [], eventsByDate: new Map(), nurUntertitelByTitle: new Map(), releasesByTitle: new Map(), meta: {} }
   const e = { data, titleId: id, favorites: new Set<number>(), hidden: new Set(), onToggleFavorite() {}, onToggleHidden() {}, onClose() {}, onFilterBy() {}, onOpenTitle() {} }
   await act(async () => wurzel.render(h(DetailPanel as never, e as never)))
   await act(async () => void (await new Promise((fertig) => setTimeout(fertig, 5))))

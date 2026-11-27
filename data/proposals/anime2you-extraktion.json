@@ -2347,6 +2347,11 @@
       "am": "2026-11-25",
       "vorschlaege": 5
     },
+    "1076111": {
+      "am": "2026-11-27",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
     "1076120": {
       "am": "2026-11-25",
       "vorschlaege": 0
@@ -2372,12 +2377,25 @@
       "am": "2026-11-26",
       "vorschlaege": 2
     },
+    "1076318": {
+      "am": "2026-11-27",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
     "1076406": {
       "am": "2026-11-26",
       "vorschlaege": 0
     },
     "1076464": {
       "am": "2026-11-26",
+      "vorschlaege": 0
+    },
+    "1076796": {
+      "am": "2026-11-27",
+      "vorschlaege": 1
+    },
+    "1077302": {
+      "am": "2026-11-27",
       "vorschlaege": 0
     }
   },
@@ -17910,6 +17928,27 @@
       "quelle": "https://www.anime2you.de/news/1076257/akiba-pass-shop-sechs-polyband-neuheiten/",
       "veroeffentlicht": "2026-11-26",
       "gelesenAm": "2026-11-26"
+    },
+    {
+      "titel": "The Cat and the Dragon",
+      "zitat": "Der Streaming-Dienst Crunchyroll zeigt die Fortsetzung im Originalton mit deutschen Untertiteln im Simulcast.",
+      "art": "ankuendigung",
+      "sprache": "omu",
+      "plattform": "crunchyroll",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1076796",
+      "artikel": "Start der zweiten »The Cat and the Dragon«-Staffel + Trailer",
+      "quelle": "https://www.anime2you.de/news/1076796/the-cat-and-the-dragon-staffel-2-start/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
     }
   ]
 }

@@ -52,7 +52,7 @@ Object.assign(Object.getPrototypeOf(dom.wurzel), { querySelector: () => null, cl
 const wurzel = createRoot(dom.wurzel as unknown as Element)
 
 async function rendere(titel: Title[]): Promise<MiniKnoten> {
-  const data = { titles: titel, titleById: new Map(titel.map((t) => [t.id, t])), releases: [], releaseBySlug: new Map(), events: [], eventsByDate: new Map(), releasesByTitle: new Map(), meta: {} }
+  const data = { titles: titel, titleById: new Map(titel.map((t) => [t.id, t])), releases: [], releaseBySlug: new Map(), events: [], eventsByDate: new Map(), nurUntertitelByTitle: new Map(), releasesByTitle: new Map(), meta: {} }
   const e = { data, titleId: titel[0].id, favorites: new Set<number>(), hidden: new Set(), onToggleFavorite() {}, onToggleHidden() {}, onClose() {}, onFilterBy() {}, onOpenTitle() {} }
   await act(async () => wurzel.render(h(DetailPanel as never, e as never)))
   await act(async () => void (await new Promise((fertig) => setTimeout(fertig, 5))))

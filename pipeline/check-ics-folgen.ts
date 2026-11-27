@@ -54,9 +54,9 @@ function beschreibung(e: ReleaseEvent): string {
 }
 
 function releaseArt(): void {
-  console.log('\nRelease-Art: „Simuldub“ nur ohne gesetzte Sprache (Beerus, omu):')
+  console.log('\nRelease-Art: „Simuldub“ nur ohne gesetzte Sprache (Beerus):')
   pruefe('ohne Sprache: „Wöchentlich (Simuldub)“', beschreibung(ev(1)).includes('Release-Art: Wöchentlich (Simuldub)'), beschreibung(ev(1)))
-  for (const sprache of ['omu', 'offen'] as const) {
+  for (const sprache of ['offen'] as const) {
     const b = beschreibung(ev(1, { sprache }))
     pruefe(`Sprache ${sprache}: Kurzform „Wöchentlich“, kein „Simuldub“`, b.includes('Release-Art: Wöchentlich\\n') && !b.includes('Simuldub'), b)
   }

@@ -86,6 +86,7 @@ export const LAUF_ARTEN = [
   'Nacht-Merger',
   'Zug — Fahrt',
   'Sammler-PRs neu prüfen',
+  'Cloud-Abgabe',
 ]
 
 /** Alle Abfragen dieses Moduls — für den Prüflauf. */

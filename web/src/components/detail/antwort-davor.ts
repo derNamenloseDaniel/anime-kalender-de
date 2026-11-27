@@ -29,3 +29,18 @@ export function abwurfBereich(release: Release | undefined): [number, number] | 
   if (!von || von <= 1 || !s.episodeCount || s.episodeCountAssumed) return undefined
   return [von, von + s.episodeCount - 1]
 }
+
+/**
+ * **Die erschienenen Folgen mit den Nummern des Anbieters, wenn die Zählung durchläuft** (Steel Ball Run 2nd & 3rd STAGE: Folge 1 liegt im
+ * Vorfilm, die Termine zählen 2–12, AniList führt 11 Folgen). Statt „10 von 11“ steht „Folge 2–11 von 12“. Nur, wenn die Termine über die
+ * Folgenzahl des Titels hinausreichen und nicht bei Folge 1 beginnen (der Fall, in dem `folgenDavor` leer bleibt); sonst nichts.
+ */
+export function zaehlSpanne(releases: Pick<Release, 'releaseType' | 'schedule'>[], raus: number, gesamt: number | undefined): { nr: string; gesamt: number } | undefined {
+  const ohneDisc = releases.filter((r) => r.releaseType !== 'disc' && r.schedule?.episodeCount && !r.schedule.episodeCountAssumed)
+  if (!ohneDisc.length || !gesamt || raus < 1) return undefined
+  const erste = Math.min(...ohneDisc.map((r) => r.schedule?.firstEpisodeNumber ?? 1))
+  const ende = Math.max(...ohneDisc.map((r) => (r.schedule?.firstEpisodeNumber ?? 1) + r.schedule!.episodeCount! - 1))
+  if (erste <= 1 || ende <= gesamt) return undefined
+  const bis = erste + raus - 1
+  return { nr: bis > erste ? `${erste}–${bis}` : String(erste), gesamt: ende }
+}

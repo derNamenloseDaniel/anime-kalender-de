@@ -1,8 +1,8 @@
 import { staffelSpanne, type StaffelNummer } from '@shared/titles.ts'
 
-/** „Staffel 4" bzw. „Staffel 4 - Teil 2". */
-export function staffelKurz(n: Pick<StaffelNummer, 'staffel' | 'bis' | 'teil'>): string {
-  return n.teil ? `Staffel ${n.staffel} - Teil ${n.teil}` : `Staffel ${staffelSpanne(n)}`
+/** „Staffel 4", „Staffel 4 - Teil 2" bzw. „Staffel 7 - Teil 2–3". */
+export function staffelKurz(n: Pick<StaffelNummer, 'staffel' | 'bis' | 'teil' | 'teilBis'>): string {
+  return n.teil ? `Staffel ${n.staffel} - Teil ${n.teil}${n.teilBis ? `–${n.teilBis}` : ''}` : `Staffel ${staffelSpanne(n)}`
 }
 
 /**

@@ -2,6 +2,7 @@ import { expandEvents, fruehesterTermin, releaseStatus, titleStatus, type LageMi
 import { anzeigeName, hauptstaffeln, staffelBeschriftungen, staffelStaende } from '@shared/titles.ts'
 import type { FranchiseMember, Release, Title } from '@shared/types.ts'
 import { ohneDeutscheSynchro } from './reihen-teil.ts'
+import { kopfTextVon } from './reihen-namen.ts'
 import { staffelKurz } from './reihen-regeln.ts'
 
 /**
@@ -26,7 +27,7 @@ function ausSammeltitel(sammel: number, titel: Title[], today: string): ReihenRe
 
 /** „Staffel 3 - Teil 2“ wird am Reiter „3.2“, „Staffel 1–5“ „1–5“; Reihenliste und Tooltip behalten den langen Namen. */
 export function reiterKurzform(beschriftung: string): string {
-  return beschriftung.replace(/^Staffel\s+/, '').replace(/\s*-\s*Teil\s+(\d+)$/, '.$1')
+  return beschriftung.replace(/^Staffel\s+/, '').replace(/\s*-\s*Teil\s+(\d+(?:–\d+)?)$/, '.$1')
 }
 
 /**
@@ -34,8 +35,14 @@ export function reiterKurzform(beschriftung: string): string {
  * Staffel in Teilen („Teil 1“, „Teil 2“) hat Beschriftungen, aber keinen Staffelstand: dann zählt nur die Kennung. Eine Staffel mit
  * eigenem Namen („Christmas Showdown“) hat keine Beschriftung, aber ihre Nummer im Staffelstand: die steht am Reiter, wie in der Reihenliste.
  */
-function ausHauptstaffeln(teile: FranchiseMember[], reihenName: string, today: string): ReihenReiter[] {
+function ausHauptstaffeln(teile: FranchiseMember[], reihe: FranchiseMember[], reihenName: string, titel: Title[], today: string): ReihenReiter[] {
   const haupt = hauptstaffeln(teile)
+  /* Der Tooltip nennt den Namen, den der Kopf des Reiter-Titels zeigt, nicht den Rohnamen der Reihe (Yaiba 2: „Shin Samurai-den YAIBA 2“). */
+  const titleById = new Map(titel.map((t) => [t.id, t]))
+  const kopfText = (m: FranchiseMember) => {
+    const t = titleById.get(m.id)
+    return t ? kopfTextVon(t, reihe, teile, { titleById }) : m.name
+  }
   const stand = staffelStaende(haupt, reihenName)
   const text = staffelBeschriftungen(haupt, reihenName)
   const nummer = (id: number) => stand.get(id)?.staffel ?? 0
@@ -43,7 +50,7 @@ function ausHauptstaffeln(teile: FranchiseMember[], reihenName: string, today: s
   return haupt
     .filter((m) => beschriftung(m.id) !== undefined)
     .sort((a, b) => nummer(a.id) - nummer(b.id) || a.id - b.id)
-    .map((m) => ({ id: m.id, label: reiterKurzform(beschriftung(m.id)!), name: m.name, ohneSynchro: ohneDeutscheSynchro(m, today) }))
+    .map((m) => ({ id: m.id, label: reiterKurzform(beschriftung(m.id)!), name: kopfText(m), ohneSynchro: ohneDeutscheSynchro(m, today) }))
 }
 
 /** Gleiche Kurzbeschriftungen verschiedener Titel (zwei „16“, zwei „1“) bekommen in Listenreihenfolge a, b, …; einmalige bleiben. */
@@ -63,10 +70,11 @@ export function eindeutigeBeschriftung(liste: ReihenReiter[]): ReihenReiter[] {
  * Die Reiter für den geöffneten Titel: Sammeltitel-Staffeln, sonst die Hauptstaffeln. Filme, Specials, OVAs und eigene Serien haben
  * keine Reiter, sie stehen in der Reihenliste (Daniel 27.11.2026: Reiter nur bei der Hauptserie). Eine Liste nur ab zwei Reitern, die
  * den Titel enthalten. Alles kommt aus den Daten der Seite. `today` (ISO-Tag) entscheidet, ob ein Teil ohne Synchro schon erschienen ist.
+ * `reihe` ist die Reihe aus `franchises.json`, wie der Kopf sie liest; ohne sie zählen die Teile.
  */
-export function reihenReiterVon(title: Title, teile: FranchiseMember[], reihenName: string, titel: Title[], today: string): ReihenReiter[] {
+export function reihenReiterVon(title: Title, teile: FranchiseMember[], reihenName: string, titel: Title[], today: string, reihe: FranchiseMember[] = teile): ReihenReiter[] {
   const istHaupt = hauptstaffeln(teile).some((m) => m.id === title.id)
-  const liste = title.staffelTitel ? ausSammeltitel(title.staffelTitel.sammel, titel, today) : istHaupt ? ausHauptstaffeln(teile, reihenName, today) : []
+  const liste = title.staffelTitel ? ausSammeltitel(title.staffelTitel.sammel, titel, today) : istHaupt ? ausHauptstaffeln(teile, reihe, reihenName, titel, today) : []
   return liste.length >= 2 && liste.some((r) => r.id === title.id) ? eindeutigeBeschriftung(liste) : []
 }
 

@@ -21,7 +21,7 @@ import { kurzName } from './reihen-regeln.ts'
  * auf Englisch. Der Kopf nennt jetzt die Reihe, die Staffel steht im
  * Umschalter darunter.
  */
-export function reihenNameVon(title: Title | undefined, reihe: FranchiseMember[], data: Dataset): string {
+export function reihenNameVon(title: Title | undefined, reihe: FranchiseMember[], data: Pick<Dataset, 'titleById'>): string {
   if (!title) return ''
   /* Der Kopf nennt die Zählgruppe des geöffneten Titels: Eine Neuverfilmung heißt nicht wie das Original (Yaiba 2025, 26.10.2026). */
   const gruppe = zaehlgruppeVon(reihe, title.id)
@@ -112,4 +112,11 @@ export function teilNameVon(title: Title | undefined, reihenName: string, reihen
   const beschriftung = staffelBeschriftungen(hauptstaffeln(reihenTeile), reihenName).get(title.id)
   if (beschriftung) return beschriftung
   return kurzName(rest, voll)
+}
+
+/** Der Name eines Reihenteils, wie ihn der Kopf des Panels zeigt: Reihenname · Teilname (Teilname nur ab zwei Teilen und wenn er sich unterscheidet). */
+export function kopfTextVon(title: Title, reihe: FranchiseMember[], reihenTeile: FranchiseMember[], data: Pick<Dataset, 'titleById'>): string {
+  const kopf = kopfNameVon(title, reihe, reihenNameVon(title, reihe, data))
+  const teil = teilNameVon(title, kopf, reihenTeile)
+  return reihenTeile.length > 1 && teil !== kopf ? `${kopf} · ${teil}` : kopf
 }

@@ -14,7 +14,7 @@ import { createRoot } from 'react-dom/client'
 import type { Release, Title } from '../shared/types.ts'
 import { berechneAntwort } from '../web/src/components/detail/antwort-berechnen.ts'
 import { davorOhneBeleg } from './lib/folgen-vor-start.ts'
-import { abwurfBereich, folgenVorDemStart } from '../web/src/components/detail/antwort-davor.ts'
+import { abwurfBereich, folgenVorDemStart, zaehlSpanne } from '../web/src/components/detail/antwort-davor.ts'
 import { attrappeUhr, ignoriereCss, installiereMiniDom, type MiniKnoten } from '../tools/mini-dom.ts'
 ignoriereCss()
 const { AntwortKasten } = await import('../web/src/components/detail/antwort-kasten.tsx')
@@ -98,6 +98,14 @@ pruefe('abwurfBereich: 9–16, nicht bei Folge 1, nicht ohne Anzahl', JSON.strin
 /* Wochentakt ab Folge 9 bleibt „Nächste Folge“, kein Abwurf-Kopf. */
 const woechentlich = await kastenText(titel(900406, 16, 8), [abwurf(900406, 9, 8, 'weekly')])
 pruefe('Wochentermin ab Folge 9: kein „Folgen 9–16“ im Kopf', !woechentlich.includes('Folgen 9–16'), woechentlich)
+
+/* Durchlaufende Zählung (Steel Ball Run 2nd & 3rd STAGE, Daniel 27.11.2026): AniList führt 11 Folgen, Netflix zählt 2–12 (Folge 1 lief im Vorfilm). Der Kopf nennt die Nummern des Anbieters. */
+const durchlauf = { ...abwurf(900421, 2, 11, 'weekly'), schedule: { firstEpisodeDate: '2026-09-25', firstEpisodeNumber: 2, episodeCount: 11 } } as unknown as Release
+const nummern = await kastenText(titel(900421, 11), [durchlauf], '2026-11-28')
+pruefe('Durchlaufende Zählung: „Folge 2–11 von 12 erschienen“ statt „10 von 11“', nummern.includes('Folge 2–11 von 12 erschienen') && !nummern.includes('10 von 11'), nummern)
+const beiFolge1 = await kastenText(titel(900422, 11), [{ ...durchlauf, titleId: 900422, schedule: { ...durchlauf.schedule, firstEpisodeNumber: 1, episodeCount: 11 } } as Release], '2026-11-28')
+pruefe('Start bei Folge 1: Zeile bleibt „von 11 Folgen erschienen“', beiFolge1.includes('von 11 Folgen erschienen') && !beiFolge1.includes('Folge 1–'), beiFolge1)
+pruefe('zaehlSpanne: eine Folge „Folge 2“, nichts bei Start 1, nichts ohne Überhang', [zaehlSpanne([durchlauf], 1, 11)?.nr, zaehlSpanne([abwurf(900423, 1, 11)], 3, 11), zaehlSpanne([abwurf(900423, 2, 5)], 3, 11)].join() === '2,,')
 
 /* Bestandsprüfung (`davorOhneBeleg`): drei Titel, der unbelegte in der Mitte. */
 const titel3 = [titel(900411, 16, 8), titel(900412, 16, 4), titel(900413, 16, 8)]

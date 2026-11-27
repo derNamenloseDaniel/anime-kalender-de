@@ -21,5 +21,5 @@ export function usePanelReihe(title: Title | undefined, data: Dataset) {
   const kopfName = useMemo(() => kopfNameVon(title, reihe, reihenName), [title, reihe, reihenName])
   const teilName = useMemo(() => teilNameVon(title, kopfName, reihenTeile), [title, kopfName, reihenTeile])
 
-  return { reihenTeile, eigenerTeil, reihenName, kopfName, teilName }
+  return { reihe, reihenTeile, eigenerTeil, reihenName, kopfName, teilName }
 }

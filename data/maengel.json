@@ -10,7 +10,7 @@
     "folgenzahl": {"wirkung":3,"wer":"auto:anilist","offen":0,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":15},
     "fsk": {"wirkung":2,"wer":"auto:justwatch","offen":863,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0},
     "wertung": {"wirkung":1,"wer":"auto:anilist","offen":1,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":59},
-    "studio": {"wirkung":1,"wer":"hand:studio-von-hand","offen":26,"neu":0,"behoben":8,"rueckfall":0,"ausnahme":61},
+    "studio": {"wirkung":1,"wer":"hand:studio-von-hand","offen":26,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":61},
     "genre": {"wirkung":1,"wer":"auto:anilist","offen":11,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":30},
     "laufzeit": {"wirkung":1,"wer":"auto:anisearch","offen":10,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0},
     "jahr": {"wirkung":2,"wer":"auto:anilist","offen":0,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":3},

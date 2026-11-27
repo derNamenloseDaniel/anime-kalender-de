@@ -16,6 +16,8 @@ import { pathToFileURL } from 'node:url'
 const MIN = 60_000
 const STUNDE = 60 * MIN
 export const FENSTER_MS = 72 * STUNDE
+/** Obergrenze für das PR-Fenster (27.11.2026): ein alter Registerstart ließ die Liste über 1000 geschlossene PRs wachsen, `uebersicht` brach ab. Offene PRs kommen immer vollständig. */
+export const FENSTER_MAX_MS = 14 * 24 * STUNDE
 export const KONTINGENT_MIN = 5
 export const KONTINGENT_MAX = 15
 export const AKTIV_HOECHSTENS = 5
@@ -153,7 +155,7 @@ function optionen(args) {
 }
 
 /** Frühester Start im Register, damit die PR-Abfrage alle PRs der Einträge umfasst (ein PR entsteht nach dem Start). */
-const fensterSeit = (register, jetztMs) => Math.min(jetztMs - FENSTER_MS, ...register.map((e) => Date.parse(e.start) || jetztMs))
+const fensterSeit = (register, jetztMs) => Math.max(jetztMs - FENSTER_MAX_MS, Math.min(jetztMs - FENSTER_MS, ...register.map((e) => Date.parse(e.start) || jetztMs)))
 
 /** Ablauf aller Unterbefehle; gibt den Exit-Code zurück. `welt`: { jetzt, prs(seitMs), letzterCommit, pruefstand, zeile }. */
 export function lauf(argv, welt) {

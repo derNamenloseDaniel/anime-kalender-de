@@ -169,6 +169,10 @@ gleich('vorab fragt die PRs ab Registerstart oder 72 h zurück ab, was früher i
 const regAlt = pfad('r-alt.json')
 writeFileSync(regAlt, JSON.stringify([{ ...eintrag('x'), start: '2026-11-01T00:00:00.000Z' }]))
 gleich('vorab: älterer Registerstart weitet das Fenster', ruf(['vorab', 'neu', '--register', regAlt], { prs: [] }).aufrufe.prs, [Date.parse('2026-11-01T00:00:00Z')])
+const regUralt = pfad('r-uralt.json')
+writeFileSync(regUralt, JSON.stringify([{ ...eintrag('x'), start: '2026-09-01T00:00:00.000Z' }]))
+gleich('vorab: uralter Registerstart wird auf 14 Tage gedeckelt (27.11.2026, sonst >1000 geschlossene PRs)', ruf(['vorab', 'neu', '--register', regUralt], { prs: [] }).aufrufe.prs, [JETZT - 14 * 24 * 3600 * 1000])
+gleich('uebersicht: gleiche Deckelung', ruf(['uebersicht', '--register', regUralt], { prs: [] }).aufrufe.prs, [JETZT - 14 * 24 * 3600 * 1000])
 writeFileSync(pfad('kaputt.json'), '{"a":1}')
 let wurf = null
 try {

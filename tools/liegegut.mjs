@@ -32,12 +32,12 @@ export function ghFuerRepo(ghFn, slug) {
   }
 }
 export const ENTWURF_H = 12 // Entwurf ohne Aktivität: sonst bliebe er unbemerkt (14.11.2026: neun Zerlegungs-Entwürfe lagen seit 13.11. 00:11, „0 auffällige PRs“).
-// Schwellen (Stand 21.10.2026, aus dem Liegegut-Bericht der 13 PRs vom 21.10.: kürzer meldet bei normalem Prüfer-Takt Fehlalarm).
-export const RUHE_FREIGABE_H = 12 // Freigabe + grün + sauber, ohne Commit und Kommentar: nach einer halben Tagesschicht liegt es.
-export const KONFLIKT_H = 24 // Konflikt ohne Aktivität; der Beginn des Konflikts ist nicht abrufbar, Näherung: letzte Aktivität.
-export const ROT_H = 12 // Rote Checks auf dem aktuellen Kopf: ein Wiederholungslauf dauert weniger.
-export const AENDERN_H = 24 // Ändern-Urteil ohne neuen Commit: der Bauer hatte einen Tag.
-export const STILLSTAND_H = 48 // Keine Aktivität (Commit, Kommentar, Review), egal warum: fängt PRs, die auf kein anderes Signal passen (z. B. wartet still auf den Prüfer). Stand 30.10.2026, Schwelle = zwei Tage.
+// Schwellen (Stand 27.11.2026): Wachphase alle 10–60 min; die 12/24-h-Werte vom 21.10. ließen neun PRs bis 17 h liegen, „0 auffällige“.
+export const RUHE_FREIGABE_H = 1 // Freigabe + grün + sauber, ohne Commit und Kommentar: der Dirigent merged in der nächsten Wachphase.
+export const KONFLIKT_H = 2 // Konflikt ohne Aktivität; der Beginn des Konflikts ist nicht abrufbar, Näherung: letzte Aktivität.
+export const ROT_H = 2 // Rote Checks auf dem aktuellen Kopf: ein Wiederholungslauf dauert weniger.
+export const AENDERN_H = 2 // Ändern-Urteil ohne neuen Commit: ein Bauer-Lauf dauert unter zwei Stunden; andere Kommentare danach ändern daran nichts.
+export const STILLSTAND_H = 12 // Keine Aktivität (Commit, Kommentar, Review), egal warum: fängt PRs, die auf kein anderes Signal passen (z. B. wartet still auf den Prüfer). Stand 27.11.2026 (vorher 48 h).
 
 const GRUEN = new Set(['SUCCESS', 'NEUTRAL', 'SKIPPED'])
 const ROT = new Set(['FAILURE', 'TIMED_OUT', 'STARTUP_FAILURE', 'ERROR'])

@@ -112,7 +112,7 @@ export function pruefeSynchroJePlattform({
 function ordneSpracheDerTermine(releases: Release[], titles: Map<number, Title>, belegeHand: ReturnType<typeof ladeHandbelege>) {
   kennzeichneNeinTermineAlsOffen(releases, titles, baueNeinGilt(belegeHand))
   widerlegeNeinNachStart(releases, belegeHand, todayIso())
-  klaereDeutschBelegteTermine(releases, titles, adressenMitSynchroZusage())
+  klaereDeutschBelegteTermine(releases, titles, adressenMitSynchroZusage(), belegeHand, todayIso())
 }
 
 /** Was die Phasen nach der Synchro-Prüfung brauchen (`build.ts` reicht es als `synchro` weiter). */

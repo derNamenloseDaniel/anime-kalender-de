@@ -1,0 +1,106 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Haikyu!! (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Haikyu!!&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+==== Synchronisation ====
+{| class="wikitable"
+! Rolle
+! japanischer Sprecher ([[Seiyū]])
+! deutscher Sprecher
+|-
+| Shōyō Hinata
+| [[Ayumu Murase]]
+| [[Christian Zeiger]]
+|-
+| Tobio Kageyama
+| [[Kaito Ishikawa]]
+| [[Roman Wolko]]
+|-
+| Daichi Sawamura
+| [[Satoshi Hino]]
+| [[Arne Stephan]]
+|-
+| Kōshi Sugawara
+| [[Miyu Irino]]
+| [[Konrad Bösherz]]
+|-
+| Ryūnosuke Tanaka
+| [[Yū Hayashi]]
+| [[Jan Rohrbach]]
+|-
+| Kei Tsukishima
+| [[Kōki Uchiyama]]
+| [[Dirk Stollberg]]
+|-
+| Tadashi Yamaguchi
+| [[Sōma Saitō]]
+| [[Sebastian Kluckert (Synchronsprecher)|Sebastian Kluckert]]
+|-
+| Yū Nishinoya
+| [[Nobuhiko Okamoto]]
+| [[Dennis Saemann]]
+|-
+| Asahi Azumane
+| [[Yoshimasa Hosoya]]
+| [[Simon Derksen]]
+|-
+| Chikara Ennoshita
+| [[Toshiki Masuda]]
+| [[Raúl Richter]]
+|-
+| Keishin Ukai
+| [[Kazunari Tanaka]]
+| [[Nick Forsberg]]
+|-
+| Kiyoko Shimizu
+| [[Kaori Nazuka]]
+| [[Birte Baumgardt]]
+|-
+| Ittetsu Takeda
+| [[Hiroshi Kamiya]]
+| [[Julien Haggége]]
+|-
+| Yuutarō Kindaichi
+| [[Makoto Furukawa]]
+| [[Sebastian Fitzner]]
+|-
+| Yui Michimiya
+| [[Asami Seto]]
+| [[Rieke Werner]]
+|-
+| Tooru Oikawa
+| [[Daisuke Namikawa]]
+| [[René Dawn-Claude]]
+|-
+|Hajime Iwaizumi
+|Hiroyuki Yoshino
+|[[Fabian Kluckert]]
+|-
+| Yuusuke Takinoue
+| [[Shuuhei Sakaguchi]]
+| [[Fabian Oscar Wien]]
+|-
+| Makoto Shimada
+| [[Tomoaki Maeno]]
+| [[Bastian Sierich]]
+|-
+| Kenma Kozume
+| [[Yūki Kaji]]
+| [[Amadeus Strobl]]
+|-
+| Tetsurō Kuroo
+| [[Yūichi Nakamura (Synchronsprecher)|Yūichi Nakamura]]
+| [[Tim Knauer]]
+|-
+|Satori Tendō
+|Subaru Kimura
+|[[Asad Schwarz]]
+|-
+|-
+|Wakatoshi Ushijima
+|Ryōta Takeuchi
+|[[Gerrit Hamann]]
+|-
+|Takahiro Hanamaki
+|Tōru Sakurai
+|Nico Wiek
+|}

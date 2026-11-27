@@ -10,7 +10,7 @@ import { mitLimit } from './kind-mit-limit.mjs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { nachtragSignal, stufeEcht, stufeOderHinweis, STUFE_FRIST_MS, liegegutAlle, liegegutAlleFunde, liegtZeile, offenePrs, checkStand, geteilteEntscheidungen, offeneEntscheidungen, kopfZeitVon, kopfZeiten, liegegut, main, meldeLiegt, hauptordner, standImProjekt, stapelBasis, grepMain, neueBezeichner, naechsterSchritt, signaleEinzel, stillstandSignal, entwurfSignal, datenZweigSignal, stapelKandidat, ueberholtTreffer, urteile, JQ_PATCHES } from './liegegut.mjs'
+import { freigabeVerworfenSignal, liegegutAlle, liegegutAlleFunde, liegtZeile, offenePrs, checkStand, geteilteEntscheidungen, offeneEntscheidungen, kopfZeitVon, kopfZeiten, liegegut, main, meldeLiegt, hauptordner, standImProjekt, stapelBasis, grepMain, neueBezeichner, naechsterSchritt, signaleEinzel, stillstandSignal, entwurfSignal, datenZweigSignal, stapelKandidat, ueberholtTreffer, urteile, JQ_PATCHES } from './liegegut.mjs'
 
 // Der echte Vorrat im Hauptordner darf diese Fälle nicht färben (Vorrat-Signal: tools/liegegut-vorrat.test.mjs).
 process.env.AK_VORRAT_ORDNER = path.join(os.tmpdir(), 'liegegut-ohne-vorrat')
@@ -74,10 +74,10 @@ console.log('liegegut: Signal 1 Freigabe + grün + ruhend (Fall 1676)')
   const frei = pr(1676, { comments: [bot(20, KOPF, 'ok')] })
   pruefe('ok + grün + clean + 20 h ruhig → Signal 1', JSON.stringify(nummern(frei)) === '[1]', nummern(frei))
   pruefe('Daniel „freigeben“ ohne Bot zählt als Freigabe', JSON.stringify(nummern(pr(1, { comments: [daniel(20, 'Prüfer Runde 2: freigeben')] }))) === '[1]')
-  pruefe('genau 12 h ruhig → noch nicht', nummern(pr(2, { comments: [bot(12, KOPF, 'ok')] })).length === 0)
-  pruefe('12 h und eine Minute → Signal 1', nummern(pr(3, { comments: [{ ...bot(12, KOPF, 'ok'), createdAt: new Date(JETZT - 12 * 3600 * 1000 - 60000).toISOString() }] })).includes(1))
-  pruefe('Kopf-Commit jünger als 12 h → nicht ruhend', nummern(pr(4, { comments: [bot(20, KOPF, 'ok')] }), 5).length === 0)
-  pruefe('jüngerer Kommentar (5 h) → nicht ruhend', nummern(pr(5, { comments: [bot(20, KOPF, 'ok'), daniel(5, 'Hinweis')] })).length === 0)
+  pruefe('genau 1 h ruhig → noch nicht', nummern(pr(2, { comments: [bot(1, KOPF, 'ok')] })).length === 0)
+  pruefe('1 h und eine Minute → Signal 1', nummern(pr(3, { comments: [{ ...bot(1, KOPF, 'ok'), createdAt: new Date(JETZT - 1 * 3600 * 1000 - 60000).toISOString() }] })).includes(1))
+  pruefe('Kopf-Commit jünger als 1 h → nicht ruhend', nummern(pr(4, { comments: [bot(20, KOPF, 'ok')] }), 0.5).length === 0)
+  pruefe('jüngerer Kommentar (0,5 h) → nicht ruhend', nummern(pr(5, { comments: [bot(20, KOPF, 'ok'), daniel(0.5, 'Hinweis')] })).length === 0)
   pruefe('Urteil auf altem Kopf zählt nicht', nummern(pr(6, { comments: [bot(20, ALT, 'ok')] })).length === 0)
   pruefe('Check offen (pending) → nicht grün', nummern(pr(7, { comments: [bot(20, KOPF, 'ok')], statusCheckRollup: [...GRUEN, { status: 'IN_PROGRESS', conclusion: '' }] })).length === 0)
   pruefe('keine Checks → nicht grün', nummern(pr(8, { comments: [bot(20, KOPF, 'ok')], statusCheckRollup: [] })).length === 0)
@@ -99,16 +99,16 @@ console.log('liegegut: Signal 3 Konflikt liegt (Fall 1530) und Gegenprobe')
 {
   const p1530 = pr(1530, { mergeable: 'CONFLICTING', mergeStateStatus: 'DIRTY', comments: [bot(40, KOPF, 'ok')] })
   pruefe('ok + Konflikt 40 h → Signal 3, nicht Signal 1', JSON.stringify(nummern(p1530)) === '[3]', nummern(p1530))
-  pruefe('Konflikt genau 24 h → noch nicht', nummern(pr(13, { mergeable: 'CONFLICTING', comments: [daniel(24, 'Hinweis')] })).length === 0)
-  pruefe('Konflikt 25 h → Signal 3', nummern(pr(14, { mergeable: 'CONFLICTING', comments: [daniel(25, 'Hinweis')] })).includes(3))
+  pruefe('Konflikt genau 2 h → noch nicht', nummern(pr(13, { mergeable: 'CONFLICTING', comments: [daniel(2, 'Hinweis')] })).length === 0)
+  pruefe('Konflikt 2 h und eine Minute → Signal 3', nummern(pr(14, { mergeable: 'CONFLICTING', comments: [daniel(2.02, 'Hinweis')] })).includes(3))
   pruefe('MERGEABLE + UNKNOWN zählt nicht als Konflikt', nummern(pr(15, { mergeable: 'UNKNOWN', comments: [daniel(40, 'Hinweis')] })).length === 0)
 }
 
 console.log('liegegut: Signal 4 rote Checks auf dem Kopf (Fälle 1433, 1594)')
 {
   pruefe('FAILURE seit 13 h → Signal 4', nummern(pr(1594, { statusCheckRollup: ROTE })).includes(4))
-  const knapp = [{ status: 'COMPLETED', conclusion: 'FAILURE', completedAt: h(12) }]
-  pruefe('FAILURE genau 12 h → noch nicht', !nummern(pr(16, { statusCheckRollup: knapp })).includes(4))
+  const knapp = [{ status: 'COMPLETED', conclusion: 'FAILURE', completedAt: h(2) }]
+  pruefe('FAILURE genau 2 h → noch nicht', !nummern(pr(16, { statusCheckRollup: knapp })).includes(4))
   pruefe('TIMED_OUT zählt als rot', nummern(pr(17, { statusCheckRollup: [{ status: 'COMPLETED', conclusion: 'TIMED_OUT', completedAt: h(20) }] })).includes(4))
   pruefe('StatusContext state ERROR zählt als rot', nummern(pr(18, { statusCheckRollup: [{ state: 'ERROR', startedAt: h(20) }] })).includes(4))
   pruefe('abgebrochen/offen ist nicht rot', !nummern(pr(19, { statusCheckRollup: [{ status: 'IN_PROGRESS', conclusion: '', startedAt: h(20) }, { status: 'COMPLETED', conclusion: 'CANCELLED', completedAt: h(20) }] })).includes(4))
@@ -117,7 +117,7 @@ console.log('liegegut: Signal 4 rote Checks auf dem Kopf (Fälle 1433, 1594)')
 console.log('liegegut: Signal 5 Ändern-Urteil ohne neuen Commit (Fall 1390)')
 {
   pruefe('Bot ändern auf dem Kopf seit 30 h → Signal 5', JSON.stringify(nummern(pr(1390, { comments: [bot(30, KOPF, 'aendern')] }), 40)) === '[5]')
-  pruefe('genau 24 h → noch nicht', nummern(pr(20, { comments: [bot(24, KOPF, 'aendern')] }), 40).length === 0)
+  pruefe('genau 2 h → noch nicht', nummern(pr(20, { comments: [bot(2, KOPF, 'aendern')] }), 40).length === 0)
   pruefe('neuer Commit nach dem Urteil: Urteil gilt nicht mehr', nummern(pr(21, { comments: [bot(30, ALT, 'aendern')] }), 2).length === 0)
   pruefe('Daniel ändern seit 25 h, danach Bot ok → kein Signal 5 (letztes Urteil ok)', !nummern(pr(22, { comments: [daniel(26, 'Prüfer: ändern'), bot(25, KOPF, 'ok')] }), 40).includes(5))
   const review = (stunden, state) => ({ state, submittedAt: h(stunden), author: { login: 'derNamenloseDaniel' } })
@@ -125,6 +125,7 @@ console.log('liegegut: Signal 5 Ändern-Urteil ohne neuen Commit (Fall 1390)')
   pruefe('Ändern seit 30 h, Approve jünger → kein Signal 5 (3009)', !nummern({ ...ohneApprove, reviews: [review(10, 'APPROVED')] }, 40).includes(5))
   pruefe('Gegenfall: Approve älter als das Ändern → Signal 5 bleibt', nummern({ ...ohneApprove, reviews: [review(40, 'APPROVED')] }, 40).includes(5))
   pruefe('Gegenfall: jüngeres Review ohne Approve (COMMENTED) → Signal 5 bleibt', nummern({ ...ohneApprove, reviews: [review(10, 'COMMENTED')] }, 40).includes(5))
+  pruefe('Ändern seit 3 h, danach andere Kommentare (Hinweis, Bauer) → Signal 5 bleibt (27.11.2026)', nummern(pr(23, { comments: [bot(3, KOPF, 'aendern'), daniel(2, 'Hinweis'), daniel(1, 'Bauer Runde 2: Stand')] }), 40).includes(5))
 }
 
 console.log('liegegut: Signal 6 gleiche offene Entscheidung (Fälle 1508, 1513)')
@@ -202,7 +203,7 @@ console.log('liegegut: Grenzen und Randfälle (Mutationsprobe 21.10.2026)')
 {
   const minute = (stunden) => new Date(JETZT - stunden * 3600 * 1000 - 60000).toISOString()
   const ae = (zeit) => ({ ...bot(0, KOPF, 'aendern'), createdAt: zeit })
-  pruefe('Ändern-Urteil 24 h und eine Minute → Signal 5', nummern(pr(30, { comments: [ae(minute(24))] }), 40).includes(5))
+  pruefe('Ändern-Urteil 2 h und eine Minute → Signal 5', nummern(pr(30, { comments: [ae(minute(2))] }), 40).includes(5))
   const unsortiert = urteile([daniel(1, 'Prüfer: ändern'), daniel(5, 'Prüfer: freigeben')])
   pruefe('Urteile kommen nach Zeit sortiert (älteste zuerst)', unsortiert.map((u) => u.gut).join() === 'true,false', unsortiert)
   pruefe('Daniel schreibt klein/groß: „prüfer Runde 2: Freigeben“ gilt', urteile([daniel(1, 'prüfer Runde 2: Freigeben')]).length === 1)
@@ -211,7 +212,7 @@ console.log('liegegut: Grenzen und Randfälle (Mutationsprobe 21.10.2026)')
   pruefe('Daniel-Urteil ohne Kopf zur Sekunde des Kopf-Commits gilt', gleich.map((s) => s.nr).join() === '5', gleich)
   pruefe('CANCELLED ist weder grün noch rot', nummern(pr(32, { comments: [bot(20, KOPF, 'ok')], statusCheckRollup: [...GRUEN, { status: 'COMPLETED', conclusion: 'CANCELLED', completedAt: h(20) }] })).length === 0)
   pruefe('StatusContext state SUCCESS zählt als grün', nummern(pr(33, { comments: [bot(20, KOPF, 'ok')], statusCheckRollup: [{ state: 'SUCCESS' }] })).includes(1))
-  pruefe('zweiter, jüngerer Fehlschlag (5 h) setzt die Rotzeit zurück', !nummern(pr(34, { statusCheckRollup: [{ status: 'COMPLETED', conclusion: 'FAILURE', completedAt: h(30) }, { status: 'COMPLETED', conclusion: 'FAILURE', completedAt: h(5) }] })).includes(4))
+  pruefe('zweiter, jüngerer Fehlschlag (1 h) setzt die Rotzeit zurück', !nummern(pr(34, { statusCheckRollup: [{ status: 'COMPLETED', conclusion: 'FAILURE', completedAt: h(30) }, { status: 'COMPLETED', conclusion: 'FAILURE', completedAt: h(1) }] })).includes(4))
   // Doppelstart der Kette (pr-nachrechnen öffnet zweimal): der abgebrochene Sammeljob bleibt neben dem neuen im Rollup (PR 2340: 3 CANCELLED + 4 SUCCESS)
   const lauf = (konkl, vor, name = 'PR-Prüfkette') => ({ name, status: 'COMPLETED', conclusion: konkl, completedAt: h(vor) })
   const mitLauf = (...laeufe) => nummern(pr(40, { comments: [bot(20, KOPF, 'ok')], statusCheckRollup: [...GRUEN, ...laeufe] }))
@@ -228,7 +229,7 @@ console.log('liegegut: Grenzen und Randfälle (Mutationsprobe 21.10.2026)')
   pruefe('Wiederholungslauf: älterer FAILURE, jüngerer SUCCESS → nicht rot', !nummern(pr(41, { statusCheckRollup: [lauf('FAILURE', 30), lauf('SUCCESS', 25)] })).includes(4))
   pruefe('jüngerer FAILURE über älterem SUCCESS → rot', nummern(pr(42, { statusCheckRollup: [lauf('SUCCESS', 30), lauf('FAILURE', 25)] })).includes(4))
   pruefe('gleicher Zeitpunkt: der spätere Listeneintrag gewinnt', checkStand([lauf('CANCELLED', 30), lauf('SUCCESS', 30)]).art === 'gruen')
-  pruefe('StatusContext ohne completedAt: startedAt zählt (5 h → nicht rot lang genug)', !nummern(pr(35, { statusCheckRollup: [{ state: 'ERROR', startedAt: h(5) }] })).includes(4))
+  pruefe('StatusContext ohne completedAt: startedAt zählt (1 h → nicht rot lang genug)', !nummern(pr(35, { statusCheckRollup: [{ state: 'ERROR', startedAt: h(1) }] })).includes(4))
   const widerspruch = signaleEinzel(pr(36, { comments: [bot(60, KOPF, 'ok'), bot(50, KOPF, 'aendern'), bot(40, KOPF, 'ok'), bot(30, KOPF, 'aendern')] }), JETZT - 100 * 3600 * 1000, JETZT).find((s) => s.nr === 2)
   pruefe('Signal 2 „seit“ ist das jüngste Urteil', widerspruch !== undefined && widerspruch.seit === JETZT - 30 * 3600 * 1000, widerspruch)
   const stufe1 = signaleEinzel(pr(37, { comments: [bot(30, KOPF, 'aendern'), bot(20, KOPF, 'ok')] }), JETZT - 100 * 3600 * 1000, JETZT)
@@ -280,11 +281,13 @@ const patchVon = (url) => {
 }
 const NATIV = 'derNamenloseDaniel/anime-kalender-nativ'
 // `listeNativ` kommt für Aufrufe an das nativ-Repo (`--repo`, Adresse oder graphql-Name), sonst `liste`; ohne Angabe ist nativ leer.
-const attrappeGh = (liste, aufrufe = [], listeNativ = []) => (args) => {
+const attrappeGh = (liste, aufrufe = [], listeNativ = [], kopfStunden = 100) => (args) => {
   aufrufe.push(args.join(' '))
   const nativ = args.some((a) => a.includes(NATIV) || a === 'name=anime-kalender-nativ')
   if (args[0] === 'pr') return JSON.stringify(nativ ? listeNativ : liste)
-  if (args[1].includes('/commits/')) return h(100)
+  if (args[1] === '-X' && args.some((a) => a.includes('/issues'))) return '[]' // offene Nachprüfungen (liegegut-nachpruefung.mjs)
+  if (args[0] === 'run' && args[1] === 'list') return '[]' // Warteschlange (liegegut-warteschlange.mjs)
+  if (args[1].includes('/commits/')) return h(kopfStunden)
   if (args[1].endsWith('/files')) return patchVon(args[1])
   throw new Error(`unerwartet: ${args.join(' ')}`)
 }
@@ -331,12 +334,15 @@ console.log('liegegut: Signal 13 daten/-Zweig von fremdem Autor (PR 4732)')
   pruefe('fremder Autor auf fix/ → kein Signal', z(pr(2, { headRefName: 'fix/x', author: { login: 'derNamenloseDaniel' } })).length === 0)
   const f = liegegutAlleFunde(attrappeGh([pr(4732, { headRefName: 'daten/x', author: { login: 'derNamenloseDaniel' }, comments: [daniel(1, 'x')] })]), attrappeGit(), JETZT)
   pruefe('Gesamtlauf: auffälliger PR mit Schritt ZWEIG UMBENENNEN', f.length === 1 && /ZWEIG UMBENENNEN/.test(f[0].zeile), f)
+  pruefe('Gesamtlauf: der Fund trägt den Zweig (Grundlage der Wellen-Gruppierung)', f[0].zweig === 'daten/x', f)
+  const entwurf = liegegutAlleFunde(attrappeGh([pr(5, { headRefName: 'fix/e-5', isDraft: true, comments: [daniel(13, 'x')] })]), attrappeGit(), JETZT)[0]
+  pruefe('Gesamtlauf: auch der Entwurfs-Fund trägt Nummer, Repo und Zweig', entwurf.nr === 5 && entwurf.repo === 'anime-kalender-de' && entwurf.zweig === 'fix/e-5', entwurf)
 }
 
 console.log('liegegut: Sammelzeile je Signalnummer (Tabelle, PR 3854: 8 überlebende Mutanten an KURZ und istZugPr)')
 {
   // Signalnummer → Kurzname; 7 hat keinen Eintrag in KURZ (Signal 7 ist nur Gegenprobe, nie ein eigenes Signal).
-  const tabelle = [[1, 'Freigabe ruht'], [2, 'Urteile widersprechen'], [3, 'Konflikt'], [4, 'rot'], [5, 'Ändern offen'], [6, 'gleiche Entscheidung'], [8, 'Stillstand'], [9, 'Stapel'], [10, 'Nachrechnen-Schleife'], [11, 'Entwurf liegt'], [13, 'daten/-Zweig fremd']]
+  const tabelle = [[1, 'Freigabe ruht'], [2, 'Urteile widersprechen'], [3, 'Konflikt'], [4, 'rot'], [5, 'Ändern offen'], [6, 'gleiche Entscheidung'], [8, 'Stillstand'], [9, 'Stapel'], [10, 'Nachrechnen-Schleife'], [11, 'Entwurf liegt'], [13, 'daten/-Zweig fremd'], [14, 'Freigabe verworfen']]
   for (const [nr, kurz] of tabelle) {
     const ist = liegtZeile([{ nr: 77, repo: 'anime-kalender-de', signale: [{ nr, seit: JETZT - 5 * 3600 * 1000 }] }], JETZT)
     pruefe(`Signal ${nr} → „${kurz}“ mit Stundenzahl`, ist === `LIEGT: 77 (${kurz} 5 h)`, ist)
@@ -363,19 +369,19 @@ console.log('liegegut: Entwurf nennt Konflikt und rote Kette als Grund')
   pruefe('Entwurf unter 12 h mit Konflikt → weiter keine Zeile', liegegut(attrappeGh([pr(9, { isDraft: true, mergeable: 'CONFLICTING', comments: [daniel(2, 'x')] })]), attrappeGit(), JETZT).length === 0)
 }
 
-console.log('liegegut: Signal 8 Stillstand (48 h)')
+console.log('liegegut: Signal 8 Stillstand (12 h)')
 {
   const still = (p, kopfStunden) => stillstandSignal(p, JETZT - kopfStunden * 3600 * 1000, JETZT)
-  pruefe('Kopf 47 h alt, sonst nichts → noch nicht', still(pr(1), 47).length === 0)
-  pruefe('Kopf 48 h alt → genau an der Grenze noch nicht', still(pr(1), 48).length === 0)
-  pruefe('Kopf 49 h alt → Signal 8 seit dem Kopf', JSON.stringify(still(pr(1), 49).map((s) => s.nr)) === '[8]')
-  pruefe('Kommentar vor 5 h setzt zurück (Kopf 100 h)', still(pr(2, { comments: [daniel(5, 'Hinweis')] }), 100).length === 0)
-  pruefe('Kommentar vor 49 h, Kopf 100 h → Signal 8 seit dem Kommentar', still(pr(3, { comments: [daniel(49, 'Hinweis')] }), 100)[0]?.seit === JETZT - 49 * 3600 * 1000)
-  pruefe('Review vor 5 h setzt zurück (Kopf und Kommentar alt)', still(pr(4, { comments: [daniel(60, 'Hinweis')], reviews: [{ submittedAt: h(5) }] }), 100).length === 0)
-  pruefe('Review vor 49 h, Kopf 100 h → Signal 8 seit dem Review', still(pr(5, { reviews: [{ submittedAt: h(49) }] }), 100)[0]?.seit === JETZT - 49 * 3600 * 1000)
-  pruefe('Kopf vor 5 h setzt zurück (Kommentar alt)', still(pr(6, { comments: [daniel(90, 'Hinweis')] }), 5).length === 0)
-  pruefe('offene Review ohne Zeitstempel (submittedAt fehlt) verdeckt den Stillstand nicht', still(pr(8, { reviews: [{ state: 'PENDING' }] }), 49).length === 1)
-  pruefe('ohne reviews-Feld kein Absturz', still({ ...pr(7), reviews: undefined }, 49).length === 1)
+  pruefe('Kopf 11 h alt, sonst nichts → noch nicht', still(pr(1), 11).length === 0)
+  pruefe('Kopf 12 h alt → genau an der Grenze noch nicht', still(pr(1), 12).length === 0)
+  pruefe('Kopf 13 h alt → Signal 8 seit dem Kopf', JSON.stringify(still(pr(1), 13).map((s) => s.nr)) === '[8]')
+  pruefe('Kommentar vor 2 h setzt zurück (Kopf 100 h)', still(pr(2, { comments: [daniel(2, 'Hinweis')] }), 100).length === 0)
+  pruefe('Kommentar vor 13 h, Kopf 100 h → Signal 8 seit dem Kommentar', still(pr(3, { comments: [daniel(13, 'Hinweis')] }), 100)[0]?.seit === JETZT - 13 * 3600 * 1000)
+  pruefe('Review vor 2 h setzt zurück (Kopf und Kommentar alt)', still(pr(4, { comments: [daniel(60, 'Hinweis')], reviews: [{ submittedAt: h(2) }] }), 100).length === 0)
+  pruefe('Review vor 13 h, Kopf 100 h → Signal 8 seit dem Review', still(pr(5, { reviews: [{ submittedAt: h(13) }] }), 100)[0]?.seit === JETZT - 13 * 3600 * 1000)
+  pruefe('Kopf vor 2 h setzt zurück (Kommentar alt)', still(pr(6, { comments: [daniel(90, 'Hinweis')] }), 2).length === 0)
+  pruefe('offene Review ohne Zeitstempel (submittedAt fehlt) verdeckt den Stillstand nicht', still(pr(8, { reviews: [{ state: 'PENDING' }] }), 13).length === 1)
+  pruefe('ohne reviews-Feld kein Absturz', still({ ...pr(7), reviews: undefined }, 13).length === 1)
   pruefe('nur Signal 8 → Schritt STILLSTAND, mit Signal 3 → NACHBESSERN', naechsterSchritt([8], [], false) === 'STILLSTAND' && naechsterSchritt([3, 8], [], false) === 'NACHBESSERN')
   const lauf = liegegut(attrappeGh([pr(11, { comments: [daniel(60, 'Hinweis')] })]), attrappeGit(), JETZT)
   pruefe('Gesamtlauf: still wartender PR bekommt eine Zeile', lauf.length === 1 && /^anime-kalender-de PR 11: STILLSTAND – Signal 8 Stillstand/.test(lauf[0]), lauf)
@@ -392,7 +398,7 @@ console.log('liegegut: Gesamtlauf mit Anlassfällen')
   const git = []
   const zeilen = liegegut(attrappeGh(LISTE, gh), attrappeGit(STAND_MAIN, git), JETZT)
   const nach = (n) => zeilen.find((z) => z.startsWith(`anime-kalender-de PR ${n}:`))
-  pruefe('1676 → MERGEN mit „keine Treffer“', /^anime-kalender-de PR 1676: MERGEN – Signal 1 Freigabe \+ grün \+ ruhend – seit \d\d\.\d\d\. [\d:]+; Gegenprobe: keine Treffer$/.test(nach(1676) ?? ''), nach(1676))
+  pruefe('1676 → MERGEN mit „keine Treffer“', /^anime-kalender-de PR 1676: MERGEN – Signal 1 Freigabe \+ grün \+ ruhend(?:; 8 Stillstand)? – seit \d\d\.\d\d\. [\d:]+; Gegenprobe: keine Treffer$/.test(nach(1676) ?? ''), nach(1676))
   pruefe('1437 → ÜBERHOLT? mit Fundstelle der Funktion auf main', /^anime-kalender-de PR 1437: ÜBERHOLT\? – Signal 3 Konflikt liegt.*Treffer pipeline\/bau\/urteil-schliesst-luecken\.ts:7 loescheKennzeichnung$/.test(nach(1437) ?? ''), nach(1437))
   pruefe('1438 gleicher Titel und gleiche Datei wie 1437, aber neuer Name → NACHBESSERN, kein Fehlalarm', /^anime-kalender-de PR 1438: NACHBESSERN – Signal 3 .*keine Treffer$/.test(nach(1438) ?? ''), nach(1438))
   pruefe('1530 → NACHBESSERN (Konflikt, kein Treffer)', /^anime-kalender-de PR 1530: NACHBESSERN – Signal 3 .*keine Treffer$/.test(nach(1530) ?? ''), nach(1530))
@@ -595,7 +601,7 @@ console.log('liegegut: zweites Repo anime-kalender-nativ (erfundene PR-Listen be
   pruefe('jede Zeile nennt ihr Repo', zeilen.length === 4 && zeilen.every((z) => /^anime-kalender-(de|nativ) PR \d+: /.test(z)), zeilen)
   pruefe('gleiche Nummer 5 in beiden Repos → zwei getrennte Zeilen', /Signal 8 Stillstand/.test(nr('anime-kalender-de', 5) ?? '') && /Signal 8 Stillstand/.test(nr('anime-kalender-nativ', 5) ?? ''), zeilen)
   pruefe('nativ 7 → STILLSTAND', /^anime-kalender-nativ PR 7: STILLSTAND – Signal 8/.test(nr('anime-kalender-nativ', 7) ?? ''), zeilen)
-  pruefe('nativ 8 Konflikt → NACHBESSERN ohne Gegenprobe-Text (kein Klon, kein git grep)', /^anime-kalender-nativ PR 8: NACHBESSERN – Signal 3 Konflikt liegt – seit [\d.: ]+$/.test(nr('anime-kalender-nativ', 8) ?? '') && git.every((a) => !a.startsWith('grep')), { zeilen, git })
+  pruefe('nativ 8 Konflikt → NACHBESSERN ohne Gegenprobe-Text (kein Klon, kein git grep)', /^anime-kalender-nativ PR 8: NACHBESSERN – Signal 3 Konflikt liegt(?:; 8 Stillstand)? – seit [\d.: ]+$/.test(nr('anime-kalender-nativ', 8) ?? '') && git.every((a) => !a.startsWith('grep')), { zeilen, git })
   pruefe('F77 in Haupt-Repo 6 und nativ 9 ist keine gemeinsame Entscheidung (je Repo gerechnet)', zeilen.every((z) => !z.includes('Signal 6')), zeilen)
   pruefe('nativ-Aufrufe: pr list mit --repo, Commit-Abruf mit Repo-Adresse', gh.some((a) => a.startsWith('pr list') && a.endsWith(`--repo ${NATIV}`)) && gh.some((a) => a.includes(`repos/${NATIV}/commits/`)), gh)
   pruefe('Haupt-Repo-Aufrufe bleiben ohne --repo und ohne nativ-Adresse', gh.filter((a) => !a.includes(NATIV) && !a.includes('anime-kalender-nativ')).some((a) => a.startsWith('pr list')) && gh.filter((a) => a.includes('--repo')).every((a) => a.includes(NATIV)), gh)
@@ -629,6 +635,8 @@ console.log('liegegut: eigener Prozess (Vorlader tools/pr-nachrechnen-mock.mjs)'
     'pr list --state open --limit 100 --json number,comments': { aus: JSON.stringify([frei]) },
     [`api repos/{owner}/{repo}/commits/${KOPF} --jq .commit.committer.date`]: { aus: '2026-10-20T10:40:00Z\n' },
     [`api repos/{owner}/{repo}/pulls/1676/files --paginate --jq ${JQ_PATCHES}`]: { aus: '+++ b/tools/x.mjs\n@@ -1 +1,2 @@\n+nagel = 1\n' },
+    'api -X GET repos/{owner}/{repo}/issues -f labels=nachpruefung-offen -f state=all -f per_page=100 --jq [.[] | {nr: .number, zu: .closed_at}]': { aus: '[]' },
+    'run list --status queued --limit 100 --json workflowName,displayTitle,createdAt': { aus: '[]' },
     'rev-parse --git-common-dir': { aus: `${path.join(werk, 'haupt', '.git')}\n` },
   }
   // nativ-Repo: leere Listen (die Ablaufschlüssel tragen --repo)
@@ -665,62 +673,25 @@ console.log('liegegut: eigener Prozess (Vorlader tools/pr-nachrechnen-mock.mjs)'
   fs.rmSync(werk, { recursive: true, force: true })
 }
 
-console.log('liegegut: Signal 12 – Stufe-2-PR mit Prüfer-ok, aber ohne Nachtrag zum aktuellen Kopf (14.11.2026: 3661, 3717, 3720, 3726)')
+console.log('liegegut: Signal 14 – Freigabe nach Main-Nachzug verworfen (Dirigent-Nachtrag 7218441221)')
 {
-  const k9 = KOPF.slice(0, 9)
-  const nachtrag = (stunden, kopf) => ({ ...daniel(stunden, `## Nachtrag (Abnahme Dirigent)\nKopf ${kopf.slice(0, 9)}`), authorAssociation: 'OWNER' })
-  const signal = (kommentare, stufe, kopfStunden = 1) => nachtragSignal(pr(7, { comments: kommentare }), JETZT - kopfStunden * 3600 * 1000, JETZT, () => stufe).map((s) => s.nr)
-  pruefe('Stufe 2, Prüfer-ok zum alten Kopf, Nachtrag nur zum alten Kopf → Signal 12', JSON.stringify(signal([bot(5, ALT, 'ok'), nachtrag(4, ALT)], 2)) === '[12]')
-  pruefe('Stufe 2, Prüfer-ok, Nachtrag zum neuen Kopf → kein Signal', signal([bot(5, ALT, 'ok'), nachtrag(0.5, KOPF)], 2).length === 0)
-  pruefe('Stufe 1 → kein Signal', signal([bot(5, ALT, 'ok')], 1).length === 0)
-  pruefe('Stufe 2, jüngstes Urteil ändern → kein Signal (Sache der Nachbesserung)', signal([bot(6, ALT, 'ok'), bot(5, ALT, 'aendern')], 2).length === 0)
-  pruefe('Stufe 2, Kopf-Commit jünger als 10 min → noch kein Signal', signal([bot(5, ALT, 'ok')], 2, 9 / 60).length === 0)
-  pruefe('Stufe 2, Kopf-Commit 11 min alt → Signal', signal([bot(5, ALT, 'ok')], 2, 11 / 60).length === 1)
-  const text = nachtragSignal(pr(7, { comments: [bot(5, KOPF, 'ok')] }), JETZT - 3600 * 1000, JETZT, () => 2)[0]?.text
-  pruefe('Text nennt den Kopf kurz', text === `Stufe 2: Nachtrag zum Kopf ${k9} fehlt (Nacht-Merger überspringt)`, text)
-  let gefragt = 0
-  nachtragSignal(pr(7, { comments: [bot(5, ALT, 'aendern')] }), JETZT - 3600 * 1000, JETZT, () => { gefragt++; return 2 })
-  pruefe('Stufe wird nur erfragt, wenn alles andere zutrifft (pr-stufe lädt den Diff)', gefragt === 0)
-  pruefe('Ohne Stufenquelle (null) kein Signal', nachtragSignal(pr(7, { comments: [bot(5, KOPF, 'ok')] }), JETZT - 3600 * 1000, JETZT, null).length === 0)
-}
-
-console.log('liegegut: Signal 12 verdrahtet (Prüfer 3865, Befund 1 und 3)')
-{
-  const offener = () => pr(8, { comments: [bot(5, ALT, 'ok')] })
-  let gefragt = []
-  const stufe = (n) => { gefragt.push(n); return 2 }
-  const zeilen = liegegutAlle(attrappeGh([offener()], [], [offener()]), attrappeGit(), JETZT, () => {}, null, false, stufe)
-  pruefe('liegegutAlle: Signal 12 und Schritt NACHTRAG in der Zeile', zeilen.length === 1 && /: NACHTRAG \(.*Signal 12 Stufe 2: Nachtrag zum Kopf a1b2c3d4e fehlt/.test(zeilen[0]), zeilen)
-  pruefe('Stufe nur für das Haupt-Repo erfragt (nativ hat keinen pr-stufe-Klon)', JSON.stringify(gefragt) === '[8]', gefragt)
-  pruefe('ohne Stufenfunktion kein Signal 12', liegegutAlle(attrappeGh([offener()]), attrappeGit(), JETZT, () => {}, null, false).every((z) => !/Signal 12/.test(z)))
-  const wache = []
-  meldeLiegt(attrappeGh([offener()]), attrappeGit(), (t) => wache.push(t), JETZT, () => 2)
-  pruefe('meldeLiegt reicht die Stufenfunktion durch: Sammelzeile „Nachtrag fehlt“', wache.some((t) => /^LIEGT: 8 \(Nachtrag fehlt \d+ h\)/.test(t)), wache)
-  const ausgabe = []
-  main(attrappeGh([offener()]), attrappeGit(), (t) => ausgabe.push(t), JETZT, () => 2)
-  pruefe('main reicht die Stufenfunktion durch', ausgabe.some((t) => /Signal 12/.test(t)), ausgabe)
-  const aufraeumen = fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'laeufe-aufraeumen.mjs'), 'utf8')
-  pruefe('Wachphase (laeufe-aufraeumen) übergibt stufeEcht an meldeLiegt', /meldeLiegt\(.*Date\.now\(\), stufeEcht\)/.test(aufraeumen))
-  const wirft = (aus) => { try { stufeEcht(5, aus); return null } catch (e) { return e.message } }
-  pruefe('stufeEcht: Stufe 2 aus der JSON-Ausgabe', stufeEcht(5, () => '{"stufe":2}') === 2)
-  pruefe('stufeEcht: Stufe 0 bleibt 0', stufeEcht(5, () => '{"stufe":0}') === 0)
-  pruefe('stufeEcht: Ausgabe ohne stufe wirft', wirft(() => '{}') === 'Ausgabe ohne Stufe')
-  pruefe('stufeEcht: Stufe als Text wirft', wirft(() => '{"stufe":"2"}') === 'Ausgabe ohne Stufe')
-  pruefe('stufeEcht: Müll statt JSON wirft', wirft(() => 'kein json') !== null)
-  pruefe('stufeEcht: Prozess scheitert → wirft die Fehlermeldung', wirft(() => { throw new Error('Frist') }) === 'Frist')
-  const hinweise = []
-  const sicher = stufeOderHinweis(() => { throw new Error('Frist\nzweite') }, (t) => hinweise.push(t))
-  pruefe('stufeOderHinweis: Fehler → null und Zeile „LIEGT? Stufe PR n nicht lesbar“', sicher(7) === null && hinweise.join() === 'LIEGT? Stufe PR 7 nicht lesbar: Frist', hinweise)
-  pruefe('stufeOderHinweis: null bleibt null, Erfolg wird durchgereicht', stufeOderHinweis(null, () => {}) === null && stufeOderHinweis(() => 2, () => {})(7) === 2)
-  const haenger = (nummer) => mitLimit(process.execPath, ['-e', 'setTimeout(() => {}, 20000)', String(nummer)], {}, { limitMs: 300 })
-  const hinweiseHaenger = []
-  const t0 = performance.now()
-  const ergebnisHaenger = stufeOderHinweis((n) => stufeEcht(n, haenger), (z) => hinweiseHaenger.push(z))(9)
-  pruefe('Hänger (Kindprozess ohne Ausgabe): nach der Frist abgebrochen, Zeile statt Warten, Signal entfällt', ergebnisHaenger === null && performance.now() - t0 < 5000 && /^LIEGT\? Stufe PR 9 nicht lesbar: FEHLER: .* nach 0 s abgebrochen/.test(hinweiseHaenger[0] ?? ''), hinweiseHaenger)
-  pruefe('Frist je pr-stufe-Aufruf höchstens 30 s', STUFE_FRIST_MS <= 30_000)
-  const wacheFehler = []
-  meldeLiegt(attrappeGh([offener()]), attrappeGit(), (t) => wacheFehler.push(t), JETZT, () => { throw new Error('gh down') })
-  pruefe('meldeLiegt: Stufenfehler erscheint als LIEGT?-Zeile in der Wachphase', wacheFehler.some((t) => t === 'LIEGT? Stufe PR 8 nicht lesbar: gh down'), wacheFehler)
+  const verworfen = (stunden, state, extra = {}) => ({ ...pr(14, { reviews: [{ state, submittedAt: h(stunden), author: { login: 'github-actions' } }] }), ...extra })
+  const sig = (p, kopfMin = 45) => freigabeVerworfenSignal(p, JETZT - kopfMin * 60 * 1000, JETZT)
+  pruefe('jüngstes Review DISMISSED, Kette grün, Kopf 45 min alt → Signal 14', JSON.stringify(sig(verworfen(5, 'DISMISSED')).map((s) => s.nr)) === '[14]')
+  pruefe('Signal 14: seit = Kopf-Commit', sig(verworfen(5, 'DISMISSED'))[0].seit === JETZT - 45 * 60 * 1000)
+  pruefe('Kopf jünger als 30 min → noch kein Signal', sig(verworfen(5, 'DISMISSED'), 29).length === 0 && sig(verworfen(5, 'DISMISSED'), 30).length === 1)
+  pruefe('jüngstes Review APPROVED → kein Signal', sig(verworfen(5, 'APPROVED')).length === 0)
+  pruefe('DISMISSED, danach neues APPROVED → kein Signal (Übernahme kam)', sig(pr(14, { reviews: [{ state: 'DISMISSED', submittedAt: h(9) }, { state: 'APPROVED', submittedAt: h(1) }] })).length === 0)
+  pruefe('APPROVED, danach DISMISSED (Reihenfolge der Liste egal) → Signal', sig(pr(14, { reviews: [{ state: 'DISMISSED', submittedAt: h(1) }, { state: 'APPROVED', submittedAt: h(9) }] })).length === 1)
+  pruefe('rote oder laufende Kette → kein Signal', sig(verworfen(5, 'DISMISSED', { statusCheckRollup: [{ name: 'PR-Prüfkette', status: 'COMPLETED', conclusion: 'FAILURE' }] })).length === 0 && sig(verworfen(5, 'DISMISSED', { statusCheckRollup: [{ name: 'PR-Prüfkette', status: 'IN_PROGRESS' }] })).length === 0)
+  pruefe('ohne Reviews oder ohne Zeit → kein Signal', sig(pr(14, {})).length === 0 && sig(pr(14, { reviews: [{ state: 'DISMISSED', submittedAt: 'x' }] })).length === 0)
+  pruefe('Schritt ÜBERNAHME mit Dispatch-Befehl', naechsterSchritt([14], [], false).startsWith('ÜBERNAHME (Prüfer-Lauf anstoßen: gh workflow run pr-pruefer.yml --ref main -f pr=<PR>)'))
+  const zeilen = liegegutAlle(attrappeGh([verworfen(5, 'DISMISSED', { headRefOid: KOPF })]), attrappeGit(), JETZT, () => {}, null)
+  pruefe('Gesamtlauf: Zeile mit Signal 14 und Schritt ÜBERNAHME', zeilen.length === 1 && /ÜBERNAHME \(.*Signal 14 Freigabe verworfen nach Main-Nachzug/.test(zeilen[0]), zeilen)
+  const jung = liegegutAlle(attrappeGh([verworfen(5, 'DISMISSED', { headRefOid: KOPF })], [], [], 10 / 60), attrappeGit(), JETZT, () => {}, null)
+  pruefe('Gesamtlauf: Kopf erst 10 min alt → keine Zeile (Schwelle 30 min wird mit der echten Zeit gerechnet)', jung.length === 0, jung)
+  const reif = liegegutAlle(attrappeGh([verworfen(5, 'DISMISSED', { headRefOid: KOPF })], [], [], 45 / 60), attrappeGit(), JETZT, () => {}, null)
+  pruefe('Gesamtlauf: Kopf 45 min alt → Zeile mit Signal 14', reif.length === 1 && /Signal 14/.test(reif[0]), reif)
 }
 
 if (fehler.length > 0) {

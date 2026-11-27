@@ -5,8 +5,8 @@
  *
  * Kandidat nur, wenn ALLES gilt:
  *  1. offen, kein Entwurf, kein Daten-PR (`daten/`: Sache des Sammlers), mindestens eine geänderte Datei
- *  2. Prüfstufe 0, 1 oder 2 (`tools/pr-stufe.mjs`); unlesbar ist nie Kandidat. Stufe 2 mergt seit F131 (12.11.2026) ebenfalls,
- *     aber nur mit dem Nachtrag des Dirigenten zum aktuellen Kopf (Bot-Urteil allein genügt nie); Workflow-PRs (3) bleiben Handarbeit
+ *  2. Prüfstufe 0, 1 oder 2 (`tools/pr-stufe.mjs`); unlesbar ist nie Kandidat. Stufe 2 mergt ohne Sondertor wie 0 und 1 (Daniel, 27.11.2026:
+ *     F131 aufgehoben, geprüft wird danach über das Label `nachpruefung-offen`, siehe `nacht-merger.mjs`); Workflow-PRs (3) bleiben Handarbeit
  *  3. kein Pfad unter `.github/workflows/` (auch kein Umbenennungs-Ursprung)
  *  4. die Prüfkette (`PR-Prüfkette`) ist am aktuellen Kopf grün, kein anderer Check rot, wartend oder abgebrochen
  *  5. Freigabe für genau diesen Kopf: jüngstes CI-Urteil „ok“ zu seinem Kurz-Hash, oder der Nachtrag des Inhabers
@@ -16,6 +16,7 @@
 import { entscheide } from './abnahme-freigabe.mjs'
 
 export const PFLICHT_CHECK = 'PR-Prüfkette'
+const WORKFLOW_ORDNER = '.github/workflows/'
 /** Das CI-Urteil schreibt `github-actions[bot]` (REST-Name, gemessen 01.11.2026 an PR 2639; `gh pr view` zeigt ihn ohne `[bot]`); ein gleich lautender Kommentar anderer Nutzer zählt nie. */
 export const PRUEFER_LOGIN = 'github-actions[bot]'
 const URTEIL = /^\*\*Prüfer-Review\*\* für ([0-9a-f]{9}) - Urteil: \*\*([^*\r\n]+)\*\*/
@@ -110,7 +111,6 @@ export function kandidat(pr) {
   if (!kette.gruen) return nein(kette.grund)
   const frei = freigabe(pr.kommentare, pr.kopf)
   if (!frei.frei) return nein(frei.grund)
-  if (pr.stufe === 2 && frei.weg !== 'nachtrag') return nein('Stufe 2 nur mit Nachtrag des Dirigenten zum Kopf (Bot-Urteil allein genügt nie)')
   return { kandidat: true, grund: `Stufe ${pr.stufe}, ${kette.grund}, ${frei.grund}`, weg: frei.weg }
 }
 
@@ -118,4 +118,21 @@ export function kandidat(pr) {
 export function reihenfolge(prs, bestandRot) {
   const vorrang = (p) => (bestandRot && VORRANG_ZEILE.test(p.beschreibung ?? '') ? 0 : 1)
   return [...prs].sort((a, b) => vorrang(a) - vorrang(b) || Date.parse(a.erstellt) - Date.parse(b.erstellt) || a.nummer - b.nummer)
+}
+
+/**
+ * Freigabe nach einem Main-Nachzug verworfen (27.11.2026, Dirigent-Nachtrag 7218441221): Das Ruleset verwirft die Freigabe bei jedem Push (`dismiss_stale`),
+ * auch bei einem reinen Main-Merge. Der PR ist dann REVIEW_REQUIRED, obwohl die Kette am Kopf grün ist und das jüngste Prüfer-Urteil „ok“ lautet,
+ * nur zu einem früheren Kopf. Nur dann soll der Merger die Übernahme (Prüfer-Lauf) anstoßen; jeder andere Grund für REVIEW_REQUIRED bleibt Abweisung.
+ */
+export function freigabeVerworfen(pr) {
+  if (!pr.offen || pr.entwurf || pr.zweig.startsWith('daten/') || pr.reviewDecision !== 'REVIEW_REQUIRED') return false
+  if (pr.mergeStateStatus === 'DIRTY' || pr.pfade.some((p) => p.startsWith(WORKFLOW_ORDNER))) return false
+  if (!ketteStand(pr.checks).gruen || freigabe(pr.kommentare, pr.kopf).frei) return false
+  const urteile = pr.kommentare.filter((k) => k.login === PRUEFER_LOGIN && URTEIL.test(k.body))
+  if (urteile.length === 0) return false
+  // Das jüngste Urteil gilt; bei gleicher Zeit das spätere in der Liste
+  const juengstes = urteile.reduce((a, b) => (Date.parse(b.at) >= Date.parse(a.at) ? b : a))
+  const [, kopf9, titel] = URTEIL.exec(juengstes.body)
+  return urteilIstOk(titel.trim()) && !pr.kopf.startsWith(kopf9)
 }

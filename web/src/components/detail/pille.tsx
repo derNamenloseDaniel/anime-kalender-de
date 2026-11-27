@@ -93,17 +93,16 @@ export function statusArt(dub: boolean | undefined, stand?: string): DubStatusAr
 
 /* Kontrast (14.10.2026, dunkel / hell): belegt 10,0 / 5,5 und offen 6,2 / 5,6 aus `tools/design-kontrast.mjs`; Weiß auf #475569 7,6 und auf #1d4ed8 6,7 von Hand gerechnet. */
 const FREMDANGABE = 'bg-[#475569] text-white'
-const STATUS_KLASSE: Record<DubStatusArt, string> = {
+const STATUS_KLASSE: Record<Exclude<DubStatusArt, 'omu'>, string> = {
   belegt: 'bg-ak-gut text-ak-auf-gut',
   jwDeutsch: 'bg-ak-gut text-ak-auf-gut',
   justwatch: FREMDANGABE,
   schwester: FREMDANGABE,
   annahme: FREMDANGABE,
   anbieter: FREMDANGABE,
-  omu: 'bg-[#1d4ed8] text-white',
   offen: 'bg-ak-flaeche-2 text-ak-leise',
 }
-const STATUS_TEXT = { belegt: 'detail.statusDeutsch', jwDeutsch: 'detail.statusDeutsch', justwatch: 'detail.statusJustwatch', schwester: 'detail.statusSchwester', annahme: 'detail.statusAnnahme', anbieter: 'detail.statusAnbieter', omu: 'detail.statusOmu', offen: 'detail.statusOffen' } as const
+const STATUS_TEXT = { belegt: 'detail.statusDeutsch', jwDeutsch: 'detail.statusDeutsch', justwatch: 'detail.statusJustwatch', schwester: 'detail.statusSchwester', annahme: 'detail.statusAnnahme', anbieter: 'detail.statusAnbieter', offen: 'detail.statusOffen' } as const
 
 /** Wahr, wenn der Kopf des Kastens „Sprache offen“ schon sagt (`kasten-marke.tsx`). */
 export const KopfSagtOffen = createContext(false)
@@ -112,7 +111,7 @@ export const KopfSagtOffen = createContext(false)
 export function DubStatus({ art }: { art: DubStatusArt }) {
   const { t } = useLang()
   const kopfOffen = useContext(KopfSagtOffen)
-  if (art === 'offen' && kopfOffen) return null
+  if (art === 'omu' || (art === 'offen' && kopfOffen)) return null // Untertitel-Wege zeigt die Seite nie (`wegeOhneNurUntertitel`)
   const text = t(STATUS_TEXT[art])
   /* Der unsichtbare Zwilling ohne Höhe (Text nur per ::before, damit textContent ihn nicht doppelt zählt) gibt der Pille mindestens die Breite ihrer Blase; sonst ragt die rechtsbündige Blase an schmalen Pillen (Joyn) links heraus. */
   return (

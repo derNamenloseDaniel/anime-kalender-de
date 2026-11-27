@@ -1,8 +1,9 @@
 /**
- * Saison-Karte mit Anbieter-Chips „Deutsch laut Anbieter“ (Handy 360 px, beide Themen), gemessen in der gebauten App an den echten Karten:
+ * Saison-Karte mit Anbieter-Chips „Deutsch laut Anbieter“ (Handy 360 px, beide Themen), gemessen in der gebauten App an den echten Karten der gebauten App mit Fixture-Kennzeichnung:
  *  - eine Karte mit gestricheltem Chip trägt die Zeile „<Anbieter>: Deutsch laut Anbieter“; eine Karte ohne trägt weder Strich noch Zeile;
  *  - Karte >= 44 px hoch, Chips und Zeile ragen nicht über den Kartenrand, Seite ohne seitlichen Überlauf.
- * Regeln als reine Funktionen in `saison-chip-urteil.mjs`. Ohne Server: `page.route()` liefert `dist/`.
+ * Die Titel werden beim Ausliefern mit einer Fixture versehen (`mitLautFixture`): ungerade Kennung gekennzeichnet, gerade belegt; der Bestand kennt je nach Saison keine
+ * gekennzeichnete Karte mehr. Regeln als reine Funktionen in `saison-chip-urteil.mjs`. Ohne Server: `page.route()` liefert `dist/`.
  * Aufruf allein: `node tools/ansicht-saison-chip.mjs [--dist <ordner>]`; in `ansicht-bild.mjs --handy` als Zusatzprüfung.
  */
 import { chromium } from 'playwright'
@@ -10,12 +11,13 @@ import { readFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { urteilKarte, urteilSeite } from './saison-chip-urteil.mjs'
+import { mitLautFixture, urteilKarte, urteilSeite } from './saison-chip-urteil.mjs'
 
 const WURZEL = path.resolve(import.meta.dirname, '..')
 const TYPEN = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.png': 'image/png', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json' }
 const COVER_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300"><rect width="200" height="300" fill="#4a5a80"/></svg>'
 const ZEILE = /Deutsch laut Anbieter/
+const TITEL_DATEI = /\/titles(-core)?\.json$/
 
 function antworter(dist) {
   return async (route) => {
@@ -23,7 +25,9 @@ function antworter(dist) {
     if (url.hostname !== 'ak.test') return route.fulfill({ status: 200, contentType: 'image/svg+xml', body: COVER_SVG })
     const datei = path.join(dist, url.pathname === '/' ? '/index.html' : url.pathname)
     if (!existsSync(datei)) return route.fulfill({ status: 404, body: '' })
-    return route.fulfill({ status: 200, contentType: TYPEN[path.extname(datei)] ?? 'application/octet-stream', body: await readFile(datei) })
+    const roh = await readFile(datei)
+    const body = TITEL_DATEI.test(url.pathname) ? JSON.stringify(mitLautFixture(JSON.parse(roh.toString('utf8')))) : roh
+    return route.fulfill({ status: 200, contentType: TYPEN[path.extname(datei)] ?? 'application/octet-stream', body })
   }
 }
 

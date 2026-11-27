@@ -8,7 +8,16 @@ import type { berechneAntwort } from './antwort-berechnen.ts'
 /** Nur diese Zustände sagen etwas über den Stand der Folgen; Film, Kino und Disc haben keine Nachleger. */
 const MIT_NACHLEGERN = ['fertig', 'laeuft', 'teilweise']
 
-/** Die Zeilen unter dem Antwortkasten-Kopf, direkt über der Folgenliste (`folgen`-Platz des Kastens). */
+/**
+ * Die Nachleger-Zeilen für den roten Kasten (Daniel, 27.11.2026: „keine folgen ankündigung info im folgen kasten, das gehört in roten kasten“).
+ * Sie standen über der Folgenliste und sagten dort, was der Kasten schon sagt.
+ */
+export function nachlegerZeilen(antwort: ReturnType<typeof berechneAntwort>, releases: Release[], today: string): string[] {
+  if (!antwort || !MIT_NACHLEGERN.includes(antwort.art)) return []
+  return nachlegerJeAnbieter(releases.flatMap((r) => expandEvents(r)), today).map(nachlegerText)
+}
+
+/** Die Folgenliste im `folgen`-Platz des Kastens; Nachleger-Zeilen stehen im Kasten (`nachlegerZeilen`). */
 export function FolgenMitNachlegern({ titleId, wege, antwort, releases, today, laufzeitImKopf, serieBelegt }: {
   titleId: number
   serieBelegt?: boolean
@@ -18,15 +27,5 @@ export function FolgenMitNachlegern({ titleId, wege, antwort, releases, today, l
   releases: Release[]
   today: string
 }) {
-  const zeilen = antwort && MIT_NACHLEGERN.includes(antwort.art) ? nachlegerJeAnbieter(releases.flatMap((r) => expandEvents(r)), today) : []
-  return (
-    <>
-      {zeilen.map((n) => (
-        <p key={n.platform} className="mt-1 text-t4 text-ak-leise">
-          {nachlegerText(n)}
-        </p>
-      ))}
-      <FolgenBereich titleId={titleId} wege={wege} erschienen={erschieneneFuerFolgenliste(antwort)} laufzeitImKopf={laufzeitImKopf} serieBelegt={serieBelegt} releases={releases} today={today} />
-    </>
-  )
+  return <FolgenBereich titleId={titleId} wege={wege} erschienen={erschieneneFuerFolgenliste(antwort)} laufzeitImKopf={laufzeitImKopf} serieBelegt={serieBelegt} releases={releases} today={today} />
 }

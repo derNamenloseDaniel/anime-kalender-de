@@ -7,28 +7,24 @@
  */
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import ts from 'typescript'
-import { parse } from 'yaml'
+import { betroffen, listeAus } from './pr-aussehen-betroffen.mjs'
 
 const WURZEL = resolve(import.meta.dirname, '..')
 export const WURZELN = ['check:panel', 'check:ansichten', 'check:einstellungen', 'check:suchhinweis', 'check:buehne-basis', 'check:buehne-fenster', 'check:buehne-messen', 'check:buehne-panel', 'check:kasten', 'check:cls-wechsel', 'check:cls-erstladen', 'check:filter-tempo', 'check:lighthouse', 'check:leerlauf']
 
-/** Führt die Zeilen `PFADE=` und `LISTE=` des Schritts in bash aus und liefert beide echten Ausdrücke als einen. */
-export function pfadAusdruck(lauf) {
-  const zeilen = lauf.split('\n').filter((z) => /^\s*(PFADE|LISTE)=/.test(z))
-  const r = spawnSync('bash', ['-s'], { input: `${zeilen.join('\n')}\nprintf '%s\\n' "$PFADE" "$LISTE"\n`, cwd: WURZEL, encoding: 'utf8', timeout: 20000, windowsHide: true })
-  assert.equal(r.status, 0, `Ausdrücke nicht berechenbar: ${r.stderr}`)
-  const [pfade, liste] = r.stdout.split('\n')
-  assert.ok(pfade && liste, 'PFADE und LISTE müssen beide gesetzt sein')
-  return new RegExp(`${pfade}|${liste}`)
+/** Der echte Ausdruck des Werkzeugs (`betroffen`) als Prüfling mit `test(datei)`, mit der Liste aus `listeText`. */
+export function pfadAusdruck(listeText) {
+  const liste = listeAus(listeText)
+  return { test: (datei) => betroffen([datei], liste) }
 }
 
-/** Fährt den ganzen Schritt in einem Wegwerf-Repo: Liste und eine Änderung `geaendert` im zweiten Commit; liefert, ob er `betroffen=1` schreibt. */
-export function jobSagtBetroffen(lauf, listeText, geaendert) {
+/** Fährt das Werkzeug des Scope-Jobs in einem Wegwerf-Repo: Liste und eine Änderung `geaendert` im zweiten Commit; liefert, ob es `aussehen=1` schreibt. */
+export function jobSagtBetroffen(listeText, geaendert) {
   const ordner = mkdtempSync(join(tmpdir(), 'pfade-union-'))
   const git = (...a) => {
     const r = spawnSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...a], { cwd: ordner, encoding: 'utf8', timeout: 20000, windowsHide: true })
@@ -37,6 +33,7 @@ export function jobSagtBetroffen(lauf, listeText, geaendert) {
   try {
     mkdirSync(join(ordner, 'tools'))
     writeFileSync(join(ordner, 'tools/pr-aussehen-pfade.txt'), listeText)
+    copyFileSync(join(WURZEL, 'tools/pr-aussehen-betroffen.mjs'), join(ordner, 'tools/pr-aussehen-betroffen.mjs'))
     git('init', '-q')
     git('add', '.')
     git('commit', '-q', '-m', 'a')
@@ -44,11 +41,10 @@ export function jobSagtBetroffen(lauf, listeText, geaendert) {
     writeFileSync(join(ordner, geaendert), geaendert === 'tools/pr-aussehen-pfade.txt' ? `${listeText}tools/neu.mjs\n` : 'x\n')
     git('add', '.')
     git('commit', '-q', '-m', 'b')
-    const ausgabe = join(ordner, 'ausgabe')
-    writeFileSync(ausgabe, '')
-    const r = spawnSync('bash', ['-s'], { input: lauf, cwd: ordner, env: { ...process.env, GITHUB_OUTPUT: ausgabe }, encoding: 'utf8', timeout: 20000, windowsHide: true })
-    assert.equal(r.status, 0, `Schritt endete mit ${r.status}: ${r.stderr}`)
-    return readFileSync(ausgabe, 'utf8').includes('betroffen=1')
+    const r = spawnSync(process.execPath, ['tools/pr-aussehen-betroffen.mjs', 'HEAD^1', 'HEAD'], { cwd: ordner, encoding: 'utf8', timeout: 20000, windowsHide: true })
+    assert.equal(r.status, 0, `Werkzeug endete mit ${r.status}: ${r.stderr}`)
+    assert.match(r.stdout, /^aussehen=[01]\n$/, 'genau eine Zeile aussehen=0|1')
+    return r.stdout === 'aussehen=1\n'
   } finally {
     rmSync(ordner, { recursive: true, force: true })
   }
@@ -95,14 +91,14 @@ export function listenFehler(text) {
 }
 
 /** Der Schritt liest die Datei wirklich (Lauf im Wegwerf-Repo) und die Listenprüfung schlägt bei jedem Formfehler an. */
-function pruefeSelbst(lauf, liste) {
+function pruefeSelbst(liste) {
   const klein = '# k (offene Klammer\ntools/a-b.mjs\ntools/c.mjs\n'
-  assert.equal(jobSagtBetroffen(lauf, klein, 'tools/c.mjs'), true, 'Werkzeug aus der Liste löst den Job aus')
-  assert.equal(jobSagtBetroffen(lauf, klein, 'tools/cx.mjs'), false, 'Werkzeug außerhalb der Liste löst ihn nicht aus')
-  assert.equal(jobSagtBetroffen(lauf, klein, 'tools/aXb.mjs'), false, 'Punkt und Bindestrich werden wörtlich genommen')
-  assert.equal(jobSagtBetroffen(lauf, klein, 'tools/c-mjs'), false, 'Punkt im Pfad wird maskiert')
-  assert.equal(jobSagtBetroffen(lauf, klein, 'tools/pr-aussehen-pfade.txt'), true, 'Änderung der Liste löst den Job aus')
-  assert.equal(jobSagtBetroffen(lauf, klein, 'web/src/x.tsx'), true, 'Oberfläche löst den Job aus')
+  assert.equal(jobSagtBetroffen(klein, 'tools/c.mjs'), true, 'Werkzeug aus der Liste löst den Job aus')
+  assert.equal(jobSagtBetroffen(klein, 'tools/cx.mjs'), false, 'Werkzeug außerhalb der Liste löst ihn nicht aus')
+  assert.equal(jobSagtBetroffen(klein, 'tools/aXb.mjs'), false, 'Punkt und Bindestrich werden wörtlich genommen')
+  assert.equal(jobSagtBetroffen(klein, 'tools/c-mjs'), false, 'Punkt im Pfad wird maskiert')
+  assert.equal(jobSagtBetroffen(klein, 'tools/pr-aussehen-pfade.txt'), true, 'Änderung der Liste löst den Job aus')
+  assert.equal(jobSagtBetroffen(klein, 'web/src/x.tsx'), true, 'Oberfläche löst den Job aus')
   assert.deepEqual(listenFehler(liste), [])
   assert.deepEqual(listenFehler('tools/b.mjs\ntools/a.mjs\n'), ['nicht sortiert (LC_ALL=C sort)'])
   assert.deepEqual(listenFehler('tools/a.mjs\ntools/a.mjs\n'), ['doppelte Zeile'])
@@ -111,12 +107,10 @@ function pruefeSelbst(lauf, liste) {
 }
 
 function main() {
-  const doc = parse(readFileSync(resolve(WURZEL, '.github/workflows/pr-pruefung.yml'), 'utf8'))
-  const lauf = doc.jobs.aussehen.steps.find((s) => s.id === 'pfad').run
   const liste = readFileSync(resolve(WURZEL, 'tools/pr-aussehen-pfade.txt'), 'utf8')
   assert.deepEqual(listenFehler(liste), [], 'tools/pr-aussehen-pfade.txt')
-  pruefeSelbst(lauf, liste)
-  const ausdruck = pfadAusdruck(lauf)
+  pruefeSelbst(liste)
+  const ausdruck = pfadAusdruck(liste)
   const scripts = JSON.parse(readFileSync(resolve(WURZEL, 'package.json'), 'utf8')).scripts
   const namen = Object.keys(scripts).filter((n) => WURZELN.some((w) => n === w || n.startsWith(`${w}-`)))
   const dateien = huelle(namen.flatMap((n) => [...skripteVon(scripts, n)]))
@@ -124,7 +118,7 @@ function main() {
   const fehlen = muss.filter((d) => !ausdruck.test(d))
   assert.deepEqual(fehlen, [], `lösen den Job aussehen nicht aus: ${fehlen.join(', ')}`)
   assert.ok(dateien.size >= 15, `zu wenige Werkzeuge erkannt (${dateien.size})`)
-  assert.doesNotMatch('tools/andere-datei.mjs', ausdruck, 'Pfadliste ist zu weit')
+  assert.equal(ausdruck.test('tools/andere-datei.mjs'), false, 'Pfadliste ist zu weit')
   console.log(`pr-aussehen-pfade.test: grün (${muss.length} Dateien)`)
 }
 

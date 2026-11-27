@@ -47,6 +47,24 @@ try {
     // Nur die Basis schreibt die Datei: dieselbe Auskunft, andersherum.
     assert.deepEqual(beschreibeDatei(kontext, mit, leer, 'public/data/patchnotes.json'), ['    1× [] (entfallen)  (z. B. Kennung 3)'])
 
+    // Sonderausgaben nur für ihre Datei: releases.json nennt Folgenlücken, news.json ihr News-Delta, andere Dateien keins von beiden.
+    const mitLuecke = JSON.stringify([{ slug: 'x', schedule: { observed: { 1: 'a', 3: 'c' } } }])
+    const ohneLuecke = JSON.stringify([{ slug: 'x', schedule: { observed: { 1: 'a', 2: 'b', 3: 'c' } } }])
+    const news = (titel) => JSON.stringify([{ am: '2026-11-01', titelId: 1, titel, meldungen: titel ? [{ art: 'neu' }] : [] }])
+    const luecke = 'Folgenlücke neu: x ohne Folge 2'
+    const seiten = (datei, vorher, nachher) => {
+      schreibe(leer, datei, vorher)
+      schreibe(mit, datei, nachher)
+      return beschreibeDatei(kontext, leer, mit, datei)
+    }
+    assert.ok(seiten('public/data/releases.json', ohneLuecke, mitLuecke).includes(luecke), 'releases.json nennt die Lücke')
+    assert.ok(!seiten('public/data/titles.json', ohneLuecke, mitLuecke).includes(luecke), 'andere Datei nennt keine Lücke')
+    const newsZeilen = seiten('public/data/news.json', news(''), news('T'))
+    assert.ok(newsZeilen.some((z) => z.startsWith('news.json je Titel: 1 neu')), 'news.json nennt ihr News-Delta')
+    assert.ok(!seiten('public/data/titles.json', news(''), news('T')).some((z) => z.startsWith('news.json je Titel')), 'andere Datei nennt kein News-Delta')
+    assert.ok(!newsZeilen.includes(luecke) && !seiten('public/data/news.json', ohneLuecke, mitLuecke).includes(luecke), 'news.json nennt keine Lücke')
+    assert.ok(!seiten('public/data/releases.json', news(''), news('T')).some((z) => z.startsWith('news.json je Titel')), 'releases.json nennt kein News-Delta')
+
     // Die Glättung gilt auch für den Stand der Basis.
     assert.equal(liesSeite(kontext, leer, 'public/data/zeit.json', false), '["<zeit>"]')
 

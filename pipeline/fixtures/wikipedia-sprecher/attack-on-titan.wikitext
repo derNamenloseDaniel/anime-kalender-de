@@ -1,0 +1,100 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Attack_on_Titan (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Attack_on_Titan&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+Die deutsche Synchronisation wurde von ''VSI Synchron GmbH'' in [[Berlin]] angefertigt.<ref>AnimaniA Ausgabe 160 (06/2016), S. 15</ref> Für [[Dialogbuch]] und [[Dialogregie|Regie]] zeichnet René Dawn-Claude verantwortlich.<ref>{{Synchronkartei|serie|35420|Abruf=2017-03-02}}</ref>
+{| class="wikitable"
+! Rolle || Japanischer Sprecher ([[Seiyū]]) || Deutscher Sprecher
+|- class="hintergrundfarbe5"
+! colspan="3"| Protagonisten
+|-
+| Eren Jäger || [[Yūki Kaji]] || [[Max Felder]]
+|-
+| Mikasa Ackermann || [[Yui Ishikawa]] || [[Nicole Hannak]]
+|-
+| Armin Arlert / ''Erzähler'' || [[Marina Inoue]] || [[Christian Zeiger]]
+|- class="hintergrundfarbe5"
+! colspan="3"| 104. Trainingseinheit
+|-
+| Keith Shadis || Tsuguo Mogami || [[Klaus-Dieter Klebsch]]
+|-
+| Marco Bott || Ryōta Ōsaka || [[Konrad Bösherz]]
+|- class="hintergrundfarbe5"
+! colspan="3"| Aufklärungstrupp
+|-
+| Historia Reiss/Christa Renz || Shiori Mikami || [[Jodie Blank]] <small>(Staffel 1–3 & OVA)</small><br />[[Laura Elßel]] <small>(Staffel 4)</small>
+|-
+| Erwin Smith || [[Daisuke Ono]] || [[Peter Flechtner]]
+|-
+| Hanji Zoe || [[Romi Park]] || [[Josephine Schmidt]]
+|-
+| Levi Ackermann || [[Hiroshi Kamiya]] || [[Florian Halm]]
+|-
+| Jean Kirschstein || Kishō Taniyama || [[René Dawn-Claude]]
+|-
+| Connie Springer || Hiro Shimono || [[Julius Jellinek]] <small>(bis Folge 4.16)</small><br />[[Jan Makino]] <small>(ab Folge 4.17)</small>
+|-
+| Sasha Braus || Yū Kobayashi || [[Lina Rabea Mohr]]
+|-
+| Moblit Berner || Rintarou Nishi ||[[Christopher Kohn]] <small>(Staffel 1)</small><br />[[Johannes Walenta]] <small>(Staffel 2–3 & OVA)</small>
+|-
+| Flocke Forster || Kensho Ono || [[Tim Schwarzmaier]]
+|-
+| Ymir || Saki Fujita || [[Esra Vural]]
+|- class="hintergrundfarbe5"
+! colspan="3"| Militärpolizei
+|-
+| Hitch Dreyse || [[Akeno Watanabe]] || [[Maria Hönig]]
+|-
+| Marlo Freudenberg || [[Tomokazu Sugita]] || [[Florian Hoffmann (Synchronsprecher)|Florian Hoffmann]]
+|-
+| Kenny Ackermann || [[Kazuhiro Yamaji]] || [[Dirk Bublies]]
+|- class="hintergrundfarbe5"
+! colspan="3"| Mauergarnison
+|-
+| Hannes || [[Keiji Fujiwara]] <small>(Staffel 1)</small><br /> Kenjiro Tsuda <small>(Staffel 2)</small> || [[Tim Moeseritz]]
+|-
+| Dot Pixis || Masahiko Tanaka || [[Elmar Gutmann]]
+|-
+| Anka Rheinberger || Ikumi Hayama || [[Jamie Lee Blank]]
+|-
+| Rico Brzenska || Michiko Kaiden || [[Melanie Isakowitz]]
+|- class="hintergrundfarbe5"
+! colspan="3"| Militär der Marley
+|-
+| Zeke Jäger || [[Takehito Koyasu]] || [[Oliver Stritzel]]
+|-
+| Annie Leonhardt || Yū Shimamura || [[Marieke Oeffinger]]
+|-
+| Reiner Braun || [[Yoshimasa Hosoya]] || [[Marios Gavrilis]]
+|-
+| Berthold Fubar || Tomohisa Hashizu || [[Tim Knauer]]
+|-
+| Falco Grice || Natsuki Hanae || [[Patrick Baehr]]
+|-
+| Colt Grice || Masaya Matsukaze || [[Sebastian Schulz]]
+|-
+| Marcel Galliard || Masamichi Kitada || [[Bastian Sierich]] <small>(Staffel 4)</small>
+|-
+| Porco Galliard || Toshiko Masuda || [[Nico Sablik]]
+|-
+| Pieck Finger || Manami Numakura || [[Patrizia Carlucci]]
+|-
+| Theo Magath || Mitsuki Saiga || [[Erich Räuker]]
+|-
+| Nicolo || Eiji Hanawa || [[Julian Tennstedt]]
+|- class="hintergrundfarbe5"
+! colspan="3"| Freiwillige
+|-
+| Yelena || Mitsuki Saiga || [[Giovanna Winterfeldt]] <small>(bis Folge 4.16)</small><br />[[Rubina Nath]] <small>(ab Folge 4.17)</small>
+|-
+| Onyankopon || Kouji Hiwatari || [[Roman Wolko]]
+|- class="hintergrundfarbe5"
+! colspan="3"| Zivilisten
+|-
+| Grisha Jäger || Hiroshi Tsuchida || [[Frank Röth]]
+|-
+| Carla Jäger || Yoshino Takamori || [[Melanie Hinze]]
+|-
+| Rod Reiss || [[Yusaku Yara]] || [[Wolfgang Wagner (Schauspieler)|Wolfgang Wagner]]
+|}

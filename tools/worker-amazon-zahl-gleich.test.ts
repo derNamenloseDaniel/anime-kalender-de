@@ -198,6 +198,20 @@ pruefe(weniger.zahl() === 2, `Worker führt 2 Ziele, Paket 8: Knopf ${weniger.za
   pruefe(ohneStand.knopfText().endsWith('· Liste veraltet'), `Stempel veraltet, kein Worker-Stand: Warnung bleibt: ${ohneStand.knopfText()}`)
 }
 
+/* Gewählte Suchtreffer (PR 4394): `kartenOffen` kommt aus der Seite, die Titelzahl bleibt die des Workers; die Karten stehen daneben, nicht darin. */
+{
+  const mitKarten = sandkasten(paketVon(titel), 'stand', stand)
+  await mitKarten.holen()
+  mitKarten.ctx.kartenOffen = () => 2
+  mitKarten.ctx.suchOffen = () => [1, 2]
+  pruefe(mitKarten.zahl() === worker.titel, `zwei Karten offen: Titelzahl bleibt ${mitKarten.zahl()} = Worker ${worker.titel}`)
+  pruefe(mitKarten.knopfText() === `${worker.titel} Prime-Titel · 2 gewählte Treffer · 2 Suchen offen`, `Knopf nennt Titel, Karten und Suchen getrennt: ${mitKarten.knopfText()}`)
+  const nurKarten = sandkasten(paketVon(titel), 'stand', { anbieter: [{ ...worker, ziele: [] }] })
+  await nurKarten.holen()
+  nurKarten.ctx.kartenOffen = () => 1
+  pruefe(nurKarten.knopfText() === '1 gewählte Treffer offen', `nur eine Karte offen: nicht „alles geprüft“: ${nurKarten.knopfText()}`)
+}
+
 if (fehler) {
   console.log(`\n${fehler} Prüfung(en) rot.`)
   process.exit(1)

@@ -3,7 +3,7 @@
  * Wegwerf-Ordner unter `os.tmpdir()`) in der Kamisama-Kiss-Lage (14713): Prime-Nein „Suche ohne Treffer“ vom 27.08. ohne Adresse, der Titel führt einen
  * Prime-Weg mit `kanal`, der Aniverse-Termin beginnt am 08.10.2026.
  * Fall 1: Termin jünger als das Nein: kein Fund (ohne die Ausnahme Exit 1, „steht aber noch im Datensatz“).
- * Fall 2: kein Termin: das Nein gilt, Exit 1. Fall 3: Nein jünger als der Termin: Exit 1. Fall 4: Termin ohne `kanal`: Exit 1.
+ * Fall 2: kein Termin: das Nein gilt, Exit 1. Fall 3: Nein jünger als der Termin: Exit 1. Fall 4: Termin ohne `kanal` überholt ebenso (Kuroko 102836, 26.11.2026): kein Fund.
  */
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
@@ -60,16 +60,16 @@ function lauf(yamlText: string, releases: unknown[]): { status: number; text: st
 }
 
 const ueberholt = lauf(nein('2026-08-27'), [termin(true)])
-pruefe('Nein vom 27.08. vor dem Kanal-Termin vom 08.10.: kein Fund, Zähler 1', ueberholt.status === 0 && ueberholt.text.includes('Nein überholt (Kanal-Termin) : 1'), ueberholt)
+pruefe('Nein vom 27.08. vor dem Kanal-Termin vom 08.10.: kein Fund, Zähler 1', ueberholt.status === 0 && ueberholt.text.includes('Nein überholt (jüngerer Termin) : 1'), ueberholt)
 const ohneTermin = lauf(nein('2026-08-27'), [])
 pruefe('ohne Termin gilt das Nein: Exit 1, Weg „steht aber noch im Datensatz“', ohneTermin.status === 1 && ohneTermin.text.includes('steht aber noch im Datensatz'), ohneTermin)
 const jung = lauf(nein('2026-10-20'), [termin(true)])
 pruefe('Nein jünger als der Termin gilt: Exit 1', jung.status === 1 && jung.text.includes('steht aber noch im Datensatz'), jung)
 const ohneKanal = lauf(nein('2026-08-27'), [termin(false)])
-pruefe('Termin ohne Kanal überholt das Nein nicht: Exit 1', ohneKanal.status === 1 && ohneKanal.text.includes('steht aber noch im Datensatz'), ohneKanal)
+pruefe('Termin ohne Kanal überholt das Nein ebenso: kein Fund', ohneKanal.status === 0 && ohneKanal.text.includes('Nein überholt (jüngerer Termin) : 1'), ohneKanal)
 
 if (fehler) {
   console.error(`FEHL check-handbelege-nein-ueberholt-lauf: ${fehler}`)
   process.exit(1)
 }
-console.log('check-handbelege-nein-ueberholt-lauf: check-handbelege lässt ein Nein durch, das ein jüngerer Prime-Kanal-Termin überholt, und nur dieses.')
+console.log('check-handbelege-nein-ueberholt-lauf: check-handbelege lässt ein Nein durch, das ein jüngerer Termin überholt, und nur dieses.')

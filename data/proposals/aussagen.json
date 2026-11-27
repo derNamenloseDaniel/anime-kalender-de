@@ -1,6 +1,6 @@
 {
   "format": 2,
-  "stand": "2026-11-26",
+  "stand": "2026-11-27",
   "hinweis": "Vorschlagsmodus: nur gelesen, nie übernommen — docs/wissen/sammelartikel-poc.md (Abschnitt „Vorschlagslauf\"). Schreiber: pipeline/fetch-sammelartikel.ts",
   "aussagen": [
     {
@@ -7144,222 +7144,6 @@
       }
     },
     {
-      "id": "https://www.anime2you.de/news/1054611/crunchyroll-overgeared-und-mehr/|A Wild Last Boss Appeared!|Staffel 2|start|crunchyroll+primevideo",
-      "erstGesehen": "2026-10-13",
-      "fingerabdruck": "8e2ebab91296",
-      "offenOderUnklar": false,
-      "ergebnis": {
-        "quelle": {
-          "url": "https://www.anime2you.de/news/1054611/crunchyroll-overgeared-und-mehr/",
-          "veroeffentlicht": "2026-09-27",
-          "leser": "anime2you-sammel"
-        },
-        "titel": "A Wild Last Boss Appeared!",
-        "zusatz": "Staffel 2",
-        "art": "start",
-        "plattformen": [
-          "primevideo",
-          "crunchyroll"
-        ],
-        "datum": "2026-09-27",
-        "datumBedeutung": "tag-der-meldung",
-        "deutsch": "angekuendigt",
-        "woechentlich": true,
-        "zeit": "15:30",
-        "konfidenz": 0.8,
-        "gruende": [
-          "Hinweis: Synchronisation angekündigt",
-          "„ab sofort\" = Tag der Meldung"
-        ],
-        "zitat": "»A Wild Last Boss Appeared!« – Staffel 2\nEpisoden: 1\nSprache: Japanisch (UT)\nSimulcast: Jeden Samstag um 15:30 Uhr\nHinweis: Deutsche Synchronisation angekündigt\nStream: Prime Video, Crunchyroll",
-        "zuordnung": {
-          "anilistId": 204389,
-          "name": "A Wild Last Boss Appeared! Staffel 2",
-          "wie": "name+start",
-          "abstandTage": 1
-        },
-        "bestand": {
-          "status": "neu",
-          "ankuendigung": {
-            "omuAb": "2026-09-26",
-            "synchro": "angekuendigt"
-          },
-          "hatSynchroBelege": true
-        },
-        "inhaltZeichen": 317
-      }
-    },
-    {
-      "id": "https://www.anime2you.de/news/1054611/crunchyroll-overgeared-und-mehr/|As a Reincarnated Aristocrat, I’ll Use My Appraisal Skill to Rise in the World|Staffel 3|start|crunchyroll+primevideo",
-      "erstGesehen": "2026-10-13",
-      "fingerabdruck": "dda4a5973f32",
-      "offenOderUnklar": false,
-      "ergebnis": {
-        "quelle": {
-          "url": "https://www.anime2you.de/news/1054611/crunchyroll-overgeared-und-mehr/",
-          "veroeffentlicht": "2026-09-27",
-          "leser": "anime2you-sammel"
-        },
-        "titel": "As a Reincarnated Aristocrat, I’ll Use My Appraisal Skill to Rise in the World",
-        "zusatz": "Staffel 3",
-        "art": "start",
-        "plattformen": [
-          "primevideo",
-          "crunchyroll"
-        ],
-        "datum": "2026-09-27",
-        "datumBedeutung": "tag-der-meldung",
-        "deutsch": "angekuendigt",
-        "woechentlich": true,
-        "zeit": "17:00",
-        "konfidenz": 0.8,
-        "gruende": [
-          "Hinweis: Synchronisation angekündigt",
-          "„ab sofort\" = Tag der Meldung"
-        ],
-        "zitat": "»As a Reincarnated Aristocrat, I’ll Use My Appraisal Skill to Rise in the World« – Staffel 3\nEpisoden: 1\nSprache: Japanisch (UT)\nSimulcast: Jeden Sonntag um 17:00 Uhr\nHinweis: Deutsche Synchronisation angekündigt\nStream: Prime Video, Crunchyroll",
-        "zuordnung": {
-          "anilistId": 185756,
-          "name": "I’ll Use My Appraisal Skill to Rise in the World: Staffel 3",
-          "wie": "name+start",
-          "abstandTage": 0
-        },
-        "bestand": {
-          "status": "neu",
-          "ankuendigung": {
-            "omuAb": "2026-09-27",
-            "synchro": "angekuendigt"
-          },
-          "hatSynchroBelege": false
-        },
-        "inhaltZeichen": 298
-      }
-    },
-    {
-      "id": "https://www.anime2you.de/news/1054611/crunchyroll-overgeared-und-mehr/|Overgeared||start|crunchyroll+primevideo",
-      "erstGesehen": "2026-10-13",
-      "fingerabdruck": "14ac7bd9acc7",
-      "offenOderUnklar": false,
-      "ergebnis": {
-        "quelle": {
-          "url": "https://www.anime2you.de/news/1054611/crunchyroll-overgeared-und-mehr/",
-          "veroeffentlicht": "2026-09-27",
-          "leser": "anime2you-sammel"
-        },
-        "titel": "Overgeared",
-        "art": "start",
-        "plattformen": [
-          "crunchyroll",
-          "primevideo"
-        ],
-        "datum": "2026-09-27",
-        "datumBedeutung": "tag-der-meldung",
-        "deutsch": "ja",
-        "woechentlich": true,
-        "zeit": "16:30",
-        "konfidenz": 0.8,
-        "gruende": [
-          "Sprache: Deutsch, Japanisch (UT)",
-          "„ab sofort\" = Tag der Meldung"
-        ],
-        "zitat": "»Overgeared«\nEpisoden: 1\nSprache: Deutsch, Japanisch (UT)\nSimulcast: Jeden Sonntag um 16:30 Uhr\nStream: Crunchyroll, Prime Video",
-        "zuordnung": {
-          "anilistId": 212888,
-          "name": "Overgeared",
-          "wie": "name-genau"
-        },
-        "bestand": {
-          "status": "bekannt",
-          "release": {
-            "slug": "cr-GT00384004",
-            "firstEpisodeDate": "2026-09-27"
-          },
-          "ankuendigung": {
-            "omuAb": "2026-09-27",
-            "synchro": "angekuendigt"
-          },
-          "hatSynchroBelege": true
-        },
-        "inhaltZeichen": 369
-      }
-    },
-    {
-      "id": "https://www.anime2you.de/news/1054460/rtl-plus-zwei-pokemon-filme/|Pokémon – Der Film: Die Macht in uns||start|rtlplus",
-      "erstGesehen": "2026-10-13",
-      "fingerabdruck": "fed48319c000",
-      "offenOderUnklar": false,
-      "ergebnis": {
-        "quelle": {
-          "url": "https://www.anime2you.de/news/1054460/rtl-plus-zwei-pokemon-filme/",
-          "veroeffentlicht": "2026-09-27",
-          "leser": "anime2you-sammel"
-        },
-        "titel": "Pokémon – Der Film: Die Macht in uns",
-        "art": "start",
-        "plattformen": [
-          "rtlplus"
-        ],
-        "datum": "2026-09-27",
-        "datumBedeutung": "tag-der-meldung",
-        "deutsch": "ja",
-        "konfidenz": 0.8,
-        "gruende": [
-          "Sprache: Deutsch",
-          "„ab sofort\" = Tag der Meldung"
-        ],
-        "zitat": "»Pokémon – Der Film: Die Macht in uns«\nLaufzeit: 93 Minuten\nSprache: Deutsch\nStream: RTL+",
-        "zuordnung": {
-          "anilistId": 100744,
-          "name": "Pokémon: Der Film - Die Macht in uns",
-          "wie": "name-genau",
-          "abstandTage": 2998
-        },
-        "bestand": {
-          "status": "neu",
-          "hatSynchroBelege": true
-        },
-        "inhaltZeichen": 242
-      }
-    },
-    {
-      "id": "https://www.anime2you.de/news/1054460/rtl-plus-zwei-pokemon-filme/|Pokémon – Der Film: Du bist dran!||start|rtlplus",
-      "erstGesehen": "2026-10-13",
-      "fingerabdruck": "2220f3b4d290",
-      "offenOderUnklar": false,
-      "ergebnis": {
-        "quelle": {
-          "url": "https://www.anime2you.de/news/1054460/rtl-plus-zwei-pokemon-filme/",
-          "veroeffentlicht": "2026-09-27",
-          "leser": "anime2you-sammel"
-        },
-        "titel": "Pokémon – Der Film: Du bist dran!",
-        "art": "start",
-        "plattformen": [
-          "rtlplus"
-        ],
-        "datum": "2026-09-27",
-        "datumBedeutung": "tag-der-meldung",
-        "deutsch": "ja",
-        "konfidenz": 0.8,
-        "gruende": [
-          "Sprache: Deutsch",
-          "„ab sofort\" = Tag der Meldung"
-        ],
-        "zitat": "»Pokémon – Der Film: Du bist dran!«\nLaufzeit: 92 Minuten\nSprache: Deutsch\nStream: RTL+",
-        "zuordnung": {
-          "anilistId": 98298,
-          "name": "Pokémon: Der Film - Du bist dran!",
-          "wie": "name-genau",
-          "abstandTage": 3361
-        },
-        "bestand": {
-          "status": "neu",
-          "hatSynchroBelege": true
-        },
-        "inhaltZeichen": 246
-      }
-    },
-    {
       "id": "https://www.anime2you.de/news/1060717/crunchyroll-full-clearing-another-world-und-mehr/|Snowball Earth||start|crunchyroll+primevideo",
       "erstGesehen": "2026-10-14",
       "fingerabdruck": "0762254e6b70",
@@ -12382,6 +12166,92 @@
           "hatSynchroBelege": true
         },
         "inhaltZeichen": 360
+      }
+    },
+    {
+      "id": "https://www.anime2you.de/news/1076269/netflix-fool-night-und-mehr/|Call of the Night|Staffel 1|start|netflix",
+      "erstGesehen": "2026-11-27",
+      "fingerabdruck": "491d6017ea62",
+      "offenOderUnklar": false,
+      "ergebnis": {
+        "quelle": {
+          "url": "https://www.anime2you.de/news/1076269/netflix-fool-night-und-mehr/",
+          "veroeffentlicht": "2026-11-26",
+          "leser": "anime2you-sammel"
+        },
+        "titel": "Call of the Night",
+        "zusatz": "Staffel 1",
+        "art": "start",
+        "plattformen": [
+          "netflix"
+        ],
+        "datum": "2026-11-26",
+        "datumBedeutung": "tag-der-meldung",
+        "deutsch": "ja",
+        "folgen": 13,
+        "konfidenz": 0.8,
+        "gruende": [
+          "Sprache: Deutsch, Japanisch (UT)",
+          "„ab sofort\" = Tag der Meldung"
+        ],
+        "zitat": "»Call of the Night« – Staffel 1\nEpisoden: 13 (komplett)\nSprache: Deutsch, Japanisch (UT)\nStream: Netflix",
+        "zuordnung": {
+          "anilistId": 141391,
+          "name": "Call of the Night",
+          "wie": "name-genau",
+          "abstandTage": 1602
+        },
+        "bestand": {
+          "status": "abweichend",
+          "release": {
+            "slug": "auto-141391-netflix",
+            "firstEpisodeDate": "2026-11-25"
+          },
+          "hatSynchroBelege": true
+        },
+        "inhaltZeichen": 285
+      }
+    },
+    {
+      "id": "https://www.anime2you.de/news/1076269/netflix-fool-night-und-mehr/|Fool Night||start|netflix",
+      "erstGesehen": "2026-11-27",
+      "fingerabdruck": "74e122365d8e",
+      "offenOderUnklar": false,
+      "ergebnis": {
+        "quelle": {
+          "url": "https://www.anime2you.de/news/1076269/netflix-fool-night-und-mehr/",
+          "veroeffentlicht": "2026-11-26",
+          "leser": "anime2you-sammel"
+        },
+        "titel": "Fool Night",
+        "art": "start",
+        "plattformen": [
+          "netflix"
+        ],
+        "datum": "2026-11-26",
+        "datumBedeutung": "tag-der-meldung",
+        "deutsch": "ja",
+        "folgen": 12,
+        "konfidenz": 0.8,
+        "gruende": [
+          "Sprache: Deutsch, Japanisch (UT)",
+          "„ab sofort\" = Tag der Meldung"
+        ],
+        "zitat": "»Fool Night«\nEpisoden: 12 (komplett)\nSprache: Deutsch, Japanisch (UT)\nStream: Netflix",
+        "zuordnung": {
+          "anilistId": 213457,
+          "name": "Fool Night",
+          "wie": "name-genau"
+        },
+        "bestand": {
+          "status": "bekannt",
+          "release": {
+            "slug": "auto-10021751-netflix",
+            "firstEpisodeDate": "2026-11-26"
+          },
+          "hatSynchroBelege": true
+        },
+        "inhaltZeichen": 373
       }
     }
   ]

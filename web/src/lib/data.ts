@@ -7,6 +7,7 @@ import { SYNOPSIS_GROUPS, type DiscAusgabe } from '@shared/types.ts'
 import type { WochenDatei } from '@shared/wochen-datei.ts'
 import { KACHEL_DATEI } from '@shared/wochen-kacheln.ts'
 import { entpackeKachel } from '@shared/wochen-packen.ts'
+import { fuerBesucher, istNurUntertitel } from '@shared/nur-deutsch.ts'
 import type { DataMeta, Franchises, Meldung, NewsEintrag, Release, ReleaseEvent, Title } from '@shared/types.ts'
 
 export interface Dataset {
@@ -17,6 +18,8 @@ export interface Dataset {
   events: ReleaseEvent[]
   eventsByDate: Map<string, ReleaseEvent[]>
   releasesByTitle: Map<number, Release[]>
+  /** Releases, die nur Untertitel nennen: nie angezeigt, nur zum Ausblenden der zugehörigen Wege (`wege-nur-deutsch.ts`). */
+  nurUntertitelByTitle: Map<number, Release[]>
   meta: DataMeta
 }
 
@@ -82,7 +85,12 @@ export function loadWochenStart(): Promise<WochenStart> {
   }))
 }
 
-function baueDataset(alleTitel: Title[], alleReleases: Release[], alleEvents: ReleaseEvent[], meta: DataMeta): Dataset {
+function baueDataset(alleTitel: Title[], releasesRoh: Release[], eventsRoh: ReleaseEvent[], meta: DataMeta): Dataset {
+  /* Nur deutsche Fassungen sind sichtbar (`shared/nur-deutsch.ts`); die Releases mit Untertiteln allein bleiben als `nurUntertitelByTitle` für die Wege. */
+  const alleReleases = fuerBesucher(releasesRoh)
+  const alleEvents = fuerBesucher(eventsRoh)
+  const nurUntertitelByTitle = new Map<number, Release[]>()
+  for (const r of releasesRoh.filter(istNurUntertitel)) nurUntertitelByTitle.set(r.titleId, [...(nurUntertitelByTitle.get(r.titleId) ?? []), r])
   /* Nachschlagen (Panel, geteilter Link) kennt alle Titel; die Listen der Ansichten nur die nicht ausgeblendeten (`ecchi.ts`). */
   const titleById = new Map(alleTitel.map((t) => [t.id, t]))
   const releaseBySlug = new Map(alleReleases.map((r) => [r.slug, r]))
@@ -108,7 +116,7 @@ function baueDataset(alleTitel: Title[], alleReleases: Release[], alleEvents: Re
 
   /* Solange Ecchi ausgeblendet ist, gibt es auch den Genre-Filter dafür nicht. */
   const filterMeta = !ecchiZeigen() ? { ...meta, genres: meta.genres.filter((g) => g !== 'Ecchi') } : meta
-  return { titles, titleById, releases, releaseBySlug, events, eventsByDate, releasesByTitle, meta: filterMeta }
+  return { titles, titleById, releases, releaseBySlug, events, eventsByDate, releasesByTitle, nurUntertitelByTitle, meta: filterMeta }
 }
 
 
@@ -292,6 +300,9 @@ export interface Synopsis {
   asUrl?: string
   /** Eigener Text aus Fakten mehrerer Quellen: alle Quellen, Lizenz des Textes; `reihe` = beschreibt nur die Reihe, nicht diesen Titel. */
   eigen?: { quellen: { name: string; url: string }[]; lizenz: string; reihe?: true }
+  /** Ein selbst geschriebener Satz Handlung; `satzReihe` = er beschreibt die Reihe, nicht diesen Titel. */
+  satz?: string
+  satzReihe?: true
   /** Nur ein Teil der Folgen liegt auf Deutsch vor: Zahl, Quelle und kurzes Zitat daraus. */
   deFolgen?: { n: number; quelle: { name: string; url: string }; zitat: string }
   /** Größtes brauchbares Plakat (TMDB): Pfad, Breite, Höhe — nur für die Vergrößerung des Covers. */

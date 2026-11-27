@@ -6,6 +6,7 @@ import { doppelteZusaetzeDerReihe, type FolgenText } from './reihen-doppelt.ts'
 import { ReihenSpur } from './reihen-spur.tsx'
 import { ReihenKopf } from './reihen-kopf.tsx'
 import { reihenGruppen } from './reihen-gruppen.ts'
+import { gruppenZeilen } from './reihen-zeilen.ts'
 import { gezeigteGruppen } from './reihen-uebersicht-regeln.ts'
 import type { Translate } from '../../lib/i18n.tsx'
 import type { Dispatch, SetStateAction } from 'react'
@@ -139,10 +140,16 @@ export function reihenInhalt({ reihenTeile, t, reihenName, title, favorites, wec
     <div className="flex flex-col gap-0.5">
       {lang && <ReihenKopf t={t} suche={suchText ? reiheSuche.text : ''} onSuche={(text) => setReiheSuche({ reihe: reihenSchluessel, text })} />}
       {!gefiltert.length && <span className="px-1 py-2 text-t4 text-ak-leise">{t('detail.reiheKeinTreffer')}</span>}
-      {gefiltert.map((g, i) => (
-        <ReihenSpur key={g.titel} titel={g.titel} gewaehltId={title.id} erste={i === 0} t={t}>
-          {g.teile.map(karte)}
-        </ReihenSpur>
+      {gruppenZeilen(gefiltert).map((zeile, i) => (
+        <div key={zeile[0]!.titel} className={zeile.length > 1 ? 'grid grid-cols-2 gap-x-2' : undefined}>
+          {zeile.map((g) => (
+            <div key={g.titel} className="min-w-0">
+              <ReihenSpur titel={g.titel} gewaehltId={title.id} erste={i === 0} t={t}>
+                {g.teile.map(karte)}
+              </ReihenSpur>
+            </div>
+          ))}
+        </div>
       ))}
     </div>
   )

@@ -7,6 +7,7 @@ import { quellenUndTermin } from '../lib/quellen-bindung.ts'
 import { nachgereichteFolgen, verpasstAmTermin } from './verpasst-am-termin.ts'
 import { verpassteTermine } from './grundlagen.ts'
 import { crQuelleUrl } from './cr-quelle.ts'
+import { slotAufStaffelzaehlung } from '../lib/cr-zaehlung.ts'
 import { pickPlatformUrl, derivedStart, observedEpisodes, overlapsWindow, werkTitel } from './titel-hilfen.ts'
 import {
   normalizeTitle,
@@ -306,7 +307,8 @@ export function baueReleases({
       const slot = findCrunchyroll(platformUrl, entry.titleDe ?? name)
       if (slot) {
         usedCrKeys.add(normalizeTitle(slot.rawTitle))
-        durchzaehlungHinweis = uebernehmeCrSlot(slot, entry, entry.schedule, schedule, sources, verpasst, crKalenderBis)
+        /* Der deutsche Slot gehört dem Synchro-Eintrag, nicht dem OmU-Begleiter (der behält seinen Untertitel-Start). */
+        if (entry.sprache !== 'omu') durchzaehlungHinweis = uebernehmeCrSlot(slotAufStaffelzaehlung(slot, entry.crZaehlungAb), entry, entry.schedule, schedule, sources, verpasst, crKalenderBis)
       } else if (verwirftOhneCrEintrag(entry, entry.schedule, schedule, angekuendigt, crunchyroll.window)) {
         unverified.push(entry.slug)
         continue

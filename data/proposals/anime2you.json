@@ -1,17 +1,152 @@
 {
-  "scrapedAt": "2026-11-26T17:01:46.021Z",
+  "scrapedAt": "2026-11-27T20:01:41.002Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 8,
-    "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 5,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
+    "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 4,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 14,
-    "schon in einem Rubrik-Feed gelesen": 9,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 1,
+    "schon in einem Rubrik-Feed gelesen": 11,
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 12,
     "Sprachhinweis älter als 45 Tage": 6
   },
   "proposals": [
     {
-      "articleTitle": "Design der acht DVD-Generationsboxen zu »Pokémon« vorgestellt",
+      "articleTitle": "Termin von »Wazamonogatari: Karen Ogre« steht fest + Trailer",
+      "articleUrl": "https://www.anime2you.de/news/1077302/termin-von-wazamonogatari-karen-ogre/",
+      "publishedAt": "2026-11-27",
+      "category": "allgemein",
+      "platforms": [],
+      "dates": [
+        {
+          "iso": "2026-12-31",
+          "context": "Franchise wurde heute verkündet, dass »Wazamonogatari: Karen Ogre« am 31. Dezember 2026 seine Premiere im japanischen Fernsehen feiert. Wir"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Vier Blu-ray-Termine von KSM Anime und AniMoon verschoben",
+      "articleUrl": "https://www.anime2you.de/news/1076668/ksm-animoon-vier-disc-verschiebungen/",
+      "publishedAt": "2026-11-27",
+      "category": "disc",
+      "platforms": [
+        "disc"
+      ],
+      "dates": [],
+      "dub": "unklar",
+      "pause": "verschoben",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Nur noch für kurze Zeit: Über 800 Anime-Produkte im AKIBA PASS SHOP reduziert",
+      "articleUrl": "https://www.anime2you.de/news/1077056/akiba-pass-shop-black-friday-2026-endet-bald/",
+      "publishedAt": "2026-11-27",
+      "category": "disc",
+      "platforms": [],
+      "dates": [
+        {
+          "iso": "2026-11-30",
+          "context": "attern möchte, sollte sich beeilen: Die Aktion läuft nur noch bis zum 30. November 2026. Wir fassen noch einmal die Highlights zusammen. Übe"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "RTL+ nimmt drei beliebte Anime-Klassiker in sein Programm auf",
+      "articleUrl": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "publishedAt": "2026-11-27",
+      "category": "streaming",
+      "platforms": [
+        "rtlplus"
+      ],
+      "dates": [
+        {
+          "iso": "2026-12-15",
+          "context": "Heidi« (1974) und »Wickie und die starken Männer« (1974-1976), die am 15. Dezember 2026 mit deutscher Synchronisation erscheinen. Die […]"
+        }
+      ],
+      "dub": "ja",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Zwei Anime-Neuzugänge ab sofort auf Crunchyroll verfügbar",
+      "articleUrl": "https://www.anime2you.de/news/1077111/crunchyroll-detektiv-conan-rueckkehr-und-mehr/",
+      "publishedAt": "2026-11-27",
+      "category": "streaming",
+      "platforms": [
+        "crunchyroll"
+      ],
+      "dates": [],
+      "dub": "nein",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Anime-Neuheiten im Dezember 2026 auf DVD und Blu-ray",
+      "articleUrl": "https://www.anime2you.de/news/1073705/disc-neuheiten-dezember-2026/",
+      "publishedAt": "2026-11-27",
+      "category": "disc",
+      "platforms": [
+        "disc"
+      ],
+      "dates": [
+        {
+          "month": "2026-12",
+          "context": "Anime-Neuheiten im Dezember 2026 auf DVD und Blu-ray Im Dezember 2026 kommen wieder za"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Große Black-Friday-Rabattaktion bei Anime Planet endet bald",
+      "articleUrl": "https://www.anime2you.de/news/1076950/anime-planet-black-friday-2026-endet-bald/",
+      "publishedAt": "2026-11-27",
+      "category": "disc",
+      "platforms": [],
+      "dates": [
+        {
+          "iso": "2026-11-30",
+          "context": "neigt sich das »Black Weeks Adventure« dem Ende zu. Nur noch bis zum 30. November 2026 könnt ihr von der großen 3-für-2-Aktion profitieren."
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "ADN kündigt sieben Anime-Neuzugänge für Dezember 2026 an",
+      "articleUrl": "https://www.anime2you.de/news/1077624/adn-neuzugaenge-im-dezember-2026/",
+      "publishedAt": "2026-11-27",
+      "category": "streaming",
+      "platforms": [
+        "adn"
+      ],
+      "dates": [
+        {
+          "month": "2026-12",
+          "context": "ezember 2026 an Der Streaming-Dienst ADN erweitert sein Anime-Angebot im Dezember 2026 um mehrere neue Serien und ein Special. Wir fassen zu"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "ProSieben MAXX zeigt 13 Anime-Filme zu Weihnachten 2026",
+      "articleUrl": "https://www.anime2you.de/news/1077600/prosieben-maxx-weihnachten-2026-filme/",
+      "publishedAt": "2026-11-27",
+      "category": "allgemein",
+      "platforms": [],
+      "dates": [
+        {
+          "iso": "2026-12-24",
+          "context": "sfeiertag insgesamt 13 Anime-Filme. Ghibli-Klassiker und »Digimon« Am 24. Dezember 2026 widmet sich ProSieben MAXX ab 09:10 Uhr sechs Klassi"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Neue Bilder der acht DVD-Generationsboxen zu »Pokémon« enthüllt",
       "articleUrl": "https://www.anime2you.de/news/1076238/pokemon-dvd-generationsboxen-design/",
       "publishedAt": "2026-11-26",
       "category": "disc",
@@ -25,7 +160,7 @@
         },
         {
           "iso": "2027-06-25",
-          "context": "rünglichen TV-Serie und sollen zwischen dem 18. Dezember 2026 und dem 25. Juni 2027 im monatlichen Rhythmus […] Der Beitrag Design der ach"
+          "context": "rünglichen TV-Serie und sollen zwischen dem 18. Dezember 2026 und dem 25. Juni 2027 im monatlichen Rhythmus […] Der Beitrag Neue Bilder de"
         }
       ],
       "dub": "unklar",
@@ -49,7 +184,7 @@
       "alreadyCurated": false
     },
     {
-      "articleTitle": "Netflix ergänzt sein Anime-Angebot um zwei neue Serien",
+      "articleTitle": "Zwei Anime-Neuzugänge ab sofort auf Netflix verfügbar",
       "articleUrl": "https://www.anime2you.de/news/1076269/netflix-fool-night-und-mehr/",
       "publishedAt": "2026-11-26",
       "category": "streaming",
@@ -58,7 +193,6 @@
       ],
       "dates": [],
       "dub": "ja",
-      "hinweis": "sprache",
       "alreadyCurated": false
     },
     {
@@ -637,7 +771,7 @@
           "folgen": 24
         }
       ],
-      "sammelGelesen": "2026-11-24"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "Netflix nimmt »Call of the Night« in sein Programm auf",
@@ -1304,7 +1438,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-24"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "Black Friday 2026: Erste große Anime-Rabattaktionen gestartet",
@@ -2205,7 +2339,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-23"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "AniMoon-Angebot: RomCom-Serie »Toradora!« zum Sonderpreis",
@@ -2261,7 +2395,7 @@
           "folgen": 13
         }
       ],
-      "sammelGelesen": "2026-11-24"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "ProSieben MAXX zeigt »Wandering Witch: Elainas Reise« als TV-Premiere",
@@ -2599,7 +2733,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-24"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "Neue Anime-Katalogtitel im November 2026 bei aniverse",
@@ -2724,7 +2858,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-24"
+      "sammelGelesen": "2026-11-27"
     },
     {
       "articleTitle": "Zwei Anime-Neuzugänge auf Deutsch bei Crunchyroll",
@@ -3512,7 +3646,7 @@
       ],
       "dates": [],
       "dub": "ja",
-      "alreadyCurated": false,
+      "alreadyCurated": true,
       "sammel": [
         {
           "titel": "A Wild Last Boss Appeared!",
@@ -6506,7 +6640,7 @@
       ],
       "dates": [],
       "dub": "unklar",
-      "alreadyCurated": false,
+      "alreadyCurated": true,
       "sammel": [
         {
           "titel": "Blue Box",
@@ -6644,7 +6778,7 @@
       ],
       "dates": [],
       "dub": "unklar",
-      "alreadyCurated": false,
+      "alreadyCurated": true,
       "sammel": [
         {
           "titel": "#I’m Looking For a Zombie",

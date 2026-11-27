@@ -2,7 +2,7 @@
 import type { Release, Title } from '../shared/types.ts'
 import { adresseMehrfach, REGELN, zaehleMaengel, type Kontext } from './lib/maengel-regeln.ts'
 import { baueNeinGilt } from './lib/maengel-nein.ts'
-import { alsLookup } from './lib/bild-sprache.ts'
+import { alsLookup, bannerOhneTmdbSerie } from './lib/bild-sprache.ts'
 import { franchiseTeile } from './lib/folgenzahl-erklaerung.ts'
 
 let verletzt = 0
@@ -50,6 +50,7 @@ const kontext = (ueber: Partial<Kontext> = {}): Kontext => ({
   neinGilt: () => false,
   plakat: () => undefined,
   banner: () => undefined,
+  serienbildFremd: () => false,
   ...ueber,
 })
 const arten = (t: Title, k = kontext()) => zaehleMaengel([t], k).map((x) => (x.grund ? `${x.art}:${x.grund}` : x.art))
@@ -89,6 +90,13 @@ pruefe('bild-fremdsprachig: AniList-Banner offen, solange TMDB nicht „kein Ban
 const nachschlagen = alsLookup({ 1: { p: '/a.jpg' }, 2: null, 3: { p: '/geteilt.jpg' } }, { 1: { p: '/a.jpg' }, 2: null })
 pruefe('bild-fremdsprachig: Bestand wie im Bau – Eintrag, null, geteilter Film wird null, nie gesucht bleibt undefined', nachschlagen(1)?.p === '/a.jpg' && nachschlagen(2) === null && nachschlagen(3) === null && nachschlagen(4) === undefined)
 pruefe('bild-fremdsprachig: Ausnahme nur, wenn jedes Bild sie hat', arten(gut(1, { coverImage: ANILIST, bannerImage: ANILIST }), kontext({ plakat: () => null })).join() === 'bild-fremdsprachig' && arten(gut(1, { coverImage: ANILIST, bannerImage: ANILIST }), kontext({ plakat: () => null, banner: () => null })).join() === 'bild-fremdsprachig:keine-lesbare-fassung')
+pruefe('bild-fremdsprachig: TMDB-Banner einer anderen Staffel (Serienbild bleibt, AniList hat keins) ist offen, eigenes TMDB-Banner nicht', arten(gut(1, { bannerImage: TMDB }), kontext({ serienbildFremd: () => true })).join() === 'bild-fremdsprachig' && arten(gut(1, { bannerImage: TMDB })).length === 0)
+/* Titel ohne TMDB-Serie (Suche ohne Treffer): kein Banner-Abruf, also „TMDB hat keins“ statt „nie gesucht“ */
+const ohneSerie = bannerOhneTmdbSerie(alsLookup({ 5: { p: '/b.jpg' }, 6: null }, { 5: { p: '/b.jpg' }, 6: null }), new Set([1, 5, 6]))
+pruefe('bannerOhneTmdbSerie: ohne Serie und ohne Eintrag null, Eintrag gewinnt, andere bleiben undefined', ohneSerie(1) === null && ohneSerie(5)?.p === '/b.jpg' && ohneSerie(6) === null && ohneSerie(2) === undefined)
+pruefe('banner: Titel ohne TMDB-Serie, allein in der Reihe: Ausnahme', arten(ohneBanner, kontext({ banner: ohneSerie })).join() === 'banner:kein-banner-bekannt')
+pruefe('banner: Titel ohne TMDB-Serie, Teil mit Banner in der Reihe: offen', arten(ohneBanner, kontext({ banner: ohneSerie, franchiseTeile: (t) => (t.id === 1 ? teile(true) : []) })).join() === 'banner')
+pruefe('bild-fremdsprachig: AniList-Banner und -Cover, Titel ohne TMDB-Serie und ohne Plakat: Ausnahme', arten(gut(1, { coverImage: ANILIST, bannerImage: ANILIST }), kontext({ plakat: () => null, banner: ohneSerie })).join() === 'bild-fremdsprachig:keine-lesbare-fassung')
 pruefe('titel-de: Treffer mit Weg', arten(gut(1, { titleDe: undefined })).join() === 'titel-de')
 pruefe('titel-de: ohne Weg und Erstausgabe zu Recht leer', arten(gut(1, { titleDe: undefined, streams: [], watchLinks: [], deErstausgabe: undefined })).join() === 'titel-de:ohne-deutsche-fassung,kein-weg')
 pruefe('handlung-de: Treffer', arten(gut(1), kontext({ synopse: () => ({ en: 'only' }) })).join() === 'handlung-de')

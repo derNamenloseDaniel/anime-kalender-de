@@ -1,8 +1,7 @@
-import type { NewsEintrag, ReleaseEvent } from '../../shared/types.ts'
-import type { PushEreignis } from './push-text.ts'
+import type { ReleaseEvent } from '../../shared/types.ts'
+import type { PushEreignis, WeitererAnbieter } from './push-text.ts'
 import { imTagesfenster } from './push-fenster.ts'
 import { pushIstErschienen, pushVersand, type PushEnv } from './push.ts'
-import { weitereAusNews } from './news-quelle.ts'
 import { fehlerLog } from './werte.ts'
 
 /**
@@ -50,8 +49,8 @@ export async function pushStuendlich(
   env: PushEnv & { DB: D1Database },
   jetzt: Date,
   ladeEreignisse: () => Promise<ReleaseEvent[]>,
-  ladeNews: () => Promise<NewsEintrag[]>,
+  ladeWeitere: () => Promise<WeitererAnbieter[]>,
 ): Promise<string> {
-  const [ereignisse, news] = await Promise.all([ladeEreignisse(), ladeNews()])
-  return pushVersand(env, jetzt, ereignisse, pushIstErschienen, weitereAusNews(news))
+  const [ereignisse, weitere] = await Promise.all([ladeEreignisse(), ladeWeitere()])
+  return pushVersand(env, jetzt, ereignisse, pushIstErschienen, weitere)
 }

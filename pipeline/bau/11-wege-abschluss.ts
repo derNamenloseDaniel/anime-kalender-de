@@ -15,6 +15,7 @@ import { vermerkeGeteilteAdressen } from './geteilte-adressen.ts'
 import { kennzeichneFreenetLautSchwester } from './11-8-schwester-shop.ts'
 import { verwirfKapitelShopWege } from './11-9-kapitel-shop.ts'
 import { uebernehmeFskAusJustwatch } from './11-2-1-fsk-justwatch.ts'
+import { uebernehmeFskVonHand } from '../lib/fsk-von-hand.ts'
 import { uebernehmeFskAusFranchise } from './11-2-1-fsk-franchise.ts'
 import { uebernehmeGenreAusTmdb } from './genre-aus-tmdb.ts'
 import { ergaenzeDiscUndZugang } from './11-1-disc-und-zugang.ts'
@@ -23,7 +24,7 @@ import { begrenzeWegeAufBelege } from './wege-begrenzen.ts'
 import { baueEanHaendlerWege } from '../lib/disc-haendler-weg.ts'
 import { setzeCoverNachRegel } from './cover-regel.ts'
 import { setzeProduktFelder } from './produkt-regel.ts'
-import { uebernehmeFranchiseBanner } from './banner-franchise.ts'
+import { ersetzeAnilistBanner, uebernehmeFranchiseBanner } from './banner-franchise.ts'
 import { log, readJson } from '../lib/util.ts'
 import { entferneBezugswegeTrotzNein } from '../lib/handbeleg-bezugswege.ts'
 import { joynAdressenVonJw } from '../lib/handbeleg-weg.ts'
@@ -68,6 +69,7 @@ export function schliesseWegeAb({
 
   const hatteStream = titelMitStream(titles)
   fuelleWegeAusJustwatch({ titles, tmdbMehrdeutig, istTot })
+  uebernehmeFskVonHand(titles)
   uebernehmeFskAusJustwatch({ titles, tmdbMehrdeutig })
   uebernehmeFskAusFranchise(titles, releases)
   uebernehmeGenreAusTmdb({ titles, tmdbMehrdeutig })
@@ -105,6 +107,7 @@ export function schliesseWegeAb({
   setzeCoverNachRegel(titles)
   setzeProduktFelder(titles)
   uebernehmeFranchiseBanner(titles)
+  ersetzeAnilistBanner(titles)
 }
 
 /** Wege ohne Beleg und Crunchyroll-Wege ohne Staffel der Serie fliegen hier endgültig raus. */

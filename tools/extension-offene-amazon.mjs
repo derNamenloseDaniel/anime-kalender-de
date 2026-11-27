@@ -548,7 +548,7 @@ try {
   for (const e of JSON.parse(readFileSync(resolve(wurzel, 'data/suchadressen-offen.json'), 'utf8'))) {
     if (e.plattform !== 'primevideo' || !e.url) continue
     if (!abgelegteSuchen.has(e.id)) abgelegteSuchen.set(e.id, [])
-    abgelegteSuchen.get(e.id).push({ platform: 'primevideo', url: e.url })
+    abgelegteSuchen.get(e.id).push({ platform: 'primevideo', url: e.url, ...(e.termin ? { termin: true } : {}) })
   }
 } catch {
   /* Ohne Datei gibt es keine abgelegten Suchen. */
@@ -563,7 +563,7 @@ for (const t of titel) {
       schonGeprueft++
       continue
     }
-    if (istNachrangigeStaffel(t)) {
+    if (istNachrangigeStaffel(t) && !s.termin) { // die Pille einer Fortsetzung sucht selbst (185756, 27.11.2026): ihr Auftrag bleibt
       wegenStaffel++
       continue
     }

@@ -14,6 +14,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { PLATFORMS, RELEASE_TYPES, type Release, type Title } from '../shared/types.ts'
 import { expandEvents, releaseStatus } from '../shared/logic.ts'
+import { fuerBesucher } from '../shared/nur-deutsch.ts'
 import { todayIso } from '../shared/time.ts'
 import { ROOT, log, readJson, warn } from './lib/util.ts'
 import { zeichneKarte, type KartenDaten } from './lib/og-karte.ts'
@@ -22,6 +23,7 @@ import { OG_FASSUNG } from './lib/og-fassung.ts'
 import { terminKopf } from './lib/og-termin.ts'
 import { SCHAETZ_DATEI, liesSchaetzListe, neuWegenSchaetzung, nurVorhandene, schreibSchaetzListe } from './lib/og-schaetz.ts'
 import { mussNeuZeichnen, standardKarte, standardKennung } from './lib/og-standard.ts'
+import { baueTagesbild } from './lib/og-tag.ts'
 
 const OUT_DIR = resolve(ROOT, 'public/og')
 const COVER_CACHE = resolve(ROOT, 'data/cache/covers')
@@ -76,7 +78,7 @@ async function standardBild(): Promise<void> {
 
 // Titel aus Kern und `titles.json`: Der Kern kennt nur Titel, deren Release beim Schreiben schon feststand („Im Angebot seit" kommt später); Cartoons stehen nur im Kern.
 async function main(): Promise<void> {
-  const releases = readJson<Release[]>('public/data/releases.json', [])
+  const releases = fuerBesucher(readJson<Release[]>('public/data/releases.json', []))
   const titles = [...readJson<Title[]>('public/data/titles-core.json', []), ...readJson<Title[]>('public/data/titles.json', [])]
   const titleById = new Map(titles.map((t) => [t.id, t]))
   const today = todayIso()
@@ -116,6 +118,11 @@ async function main(): Promise<void> {
     written++
     if (kopf.fakt.includes('≈')) mitSchaetzung.add(release.slug)
     else mitSchaetzung.delete(release.slug)
+  }
+
+  // --- Bild des Tages (wichtigstes Release, `shared/tages-highlight.ts`) --------
+  if (!NUR) {
+    await baueTagesbild(releases, titleById, today, OUT_DIR, loadCover, process.argv.includes('--tag-neu'), { log, warn })
   }
 
   log(`${written} Vorschaubilder erzeugt, ${releases.length} Releases insgesamt`)

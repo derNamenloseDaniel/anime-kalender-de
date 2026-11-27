@@ -7,6 +7,7 @@
  * der heutige Stand steht in "Mit Handbeleg". Aufruf: `npm run check:logic`.
  */
 import { anbieterChips, istLautAnbieter } from '../shared/saison.ts'
+import { kanalErbtVomAnbieter } from './bau/kanal-erbt-anbieter.ts'
 import type { Release, StreamLink, Title } from '../shared/types.ts'
 import { streamStatus } from '../web/src/components/detail/legende-zeilen.ts'
 
@@ -72,10 +73,10 @@ for (const f of FAELLE.filter((x) => x.platform === 'joyn')) {
 }
 
 console.log('istLautAnbieter direkt')
-pruefe('dub true und abgeleitet: laut', istLautAnbieter({ dub: true, dubAbgeleitet: 'joyn-pauschal' }) === true)
-pruefe('dub true ohne Ableitung: nicht laut', istLautAnbieter({ dub: true }) === false)
-pruefe('dub false mit Ableitung: nicht laut', istLautAnbieter({ dub: false, dubAbgeleitet: 'joyn-pauschal' }) === false)
-pruefe('dub fehlt mit Ableitung: nicht laut', istLautAnbieter({ dubAbgeleitet: 'kanal-erbt' }) === false)
+pruefe('dub true und abgeleitet: laut', istLautAnbieter({ dub: true, dubAbgeleitet: 'joyn-pauschal' }, []) === true)
+pruefe('dub true ohne Ableitung: nicht laut', istLautAnbieter({ dub: true }, []) === false)
+pruefe('dub false mit Ableitung: nicht laut', istLautAnbieter({ dub: false, dubAbgeleitet: 'joyn-pauschal' }, []) === false)
+pruefe('dub fehlt mit Ableitung: nicht laut', istLautAnbieter({ dubAbgeleitet: 'kanal-erbt' }, []) === false)
 
 console.log('Grenzen des Chips')
 {
@@ -87,8 +88,34 @@ console.log('Grenzen des Chips')
   pruefe('Weg ohne Tonspur-Beleg (dub fehlt) zählt nicht als Chip', chip(titelMit(900804, [{ ...joyn, dub: undefined }]), [], 'joyn') === undefined)
 }
 
+console.log('Prime-Kanal neben belegtem Anbieter-Weg: „Deutsch“ wie der Anbieter (JoJo 2012, AniList 14719, Wege wörtlich aus titles.json vom 27.11.2026)')
+{
+  const cr = weg('crunchyroll', 'https://www.crunchyroll.com/de/jojos-bizarre-adventure')
+  const kanal = weg('primevideo', 'https://www.amazon.de/gp/video/detail/B0CH1GVRKK', { kanal: 'Crunchyroll', dubAbgeleitet: 'kanal-erbt' })
+  const jojo = titelMit(14719, [cr, weg('netflix', 'https://www.netflix.com/title/80179831'), kanal])
+  pruefe('Pille am Kanal: belegt', streamStatus(jojo, kanal, []) === 'belegt', streamStatus(jojo, kanal, []))
+  pruefe('Chip Prime: nicht „laut“', chip(jojo, [], 'primevideo') === false)
+  const mitAnbieter = (anbieter: StreamLink) => titelMit(900810, [anbieter, kanal])
+  pruefe('Anbieter-Weg nur JustWatch-Hinweis: laut', streamStatus(mitAnbieter({ ...cr, dubHintOnly: true }), kanal, []) === 'anbieter')
+  pruefe('Anbieter-Weg ohne Ja: laut', streamStatus(mitAnbieter({ ...cr, dub: undefined }), kanal, []) === 'anbieter')
+  pruefe('Anbieter-Weg entfernt: laut', streamStatus(mitAnbieter({ ...cr, entferntAm: '2026-11-01' }), kanal, []) === 'anbieter')
+  pruefe('anderer Anbieter (ADN) belegt, Kanal Crunchyroll: laut', streamStatus(mitAnbieter(weg('adn', 'https://animationdigitalnetwork.com/de/video/1')), kanal, []) === 'anbieter')
+  pruefe('ADN-Kanal neben belegtem ADN-Weg: belegt', streamStatus(titelMit(900811, [weg('adn', 'https://animationdigitalnetwork.com/de/video/1'), { ...kanal, kanal: 'ADN' }]), { ...kanal, kanal: 'ADN' }, []) === 'belegt')
+  pruefe('Anbieter-Weg selbst nur abgeleitet (Joyn-Art): Kanal bleibt laut', streamStatus(mitAnbieter({ ...cr, dubAbgeleitet: 'joyn-pauschal' }), kanal, []) === 'anbieter' && chip(mitAnbieter({ ...cr, dubAbgeleitet: 'joyn-pauschal' }), [], 'primevideo') === true)
+  const keinKanal = weg('netflix', 'https://www.netflix.com/title/1', { kanal: 'Crunchyroll', dubAbgeleitet: 'kanal-erbt' })
+  pruefe('Weg ohne Prime mit Kanalname Crunchyroll neben belegtem Anbieter: bleibt laut', streamStatus(titelMit(900813, [cr, keinKanal]), keinKanal, []) === 'anbieter')
+  const joynKanal = weg('primevideo', 'https://www.amazon.de/gp/video/detail/B0X', { kanal: 'Crunchyroll', dubAbgeleitet: 'joyn-pauschal' })
+  pruefe('Prime-Kanal mit anderer Ableitung (Joyn-Art) neben belegtem Anbieter: bleibt laut', streamStatus(titelMit(900814, [cr, joynKanal]), joynKanal, []) === 'anbieter')
+  /* Daniels Regel (13.10./27.11.2026): Anbieter belegt → Prime-Kanal desselben Anbieters ist Annahme, nie Beleg; ein JustWatch-Nein an der Kanal-Seite schlägt sie. */
+  const kanalNein = weg('primevideo', 'https://www.amazon.de/gp/video/detail/B0NEIN', { kanal: 'Crunchyroll', dub: undefined })
+  const nein = titelMit(900815, [cr, kanalNein])
+  pruefe('JustWatch-Nein an der Kanal-Seite: Bau erbt nichts', kanalErbtVomAnbieter([nein], () => true) === 0 && kanalNein.dub === undefined)
+  pruefe('JustWatch-Nein an der Kanal-Seite: Pille nie „belegt“, Chip Prime nie „Deutsch“', streamStatus(nein, kanalNein, []) !== 'belegt' && chip(nein, [], 'primevideo') !== false)
+  pruefe('Joyn pauschal bleibt laut, auch neben belegtem Weg anderer Anbieter', streamStatus(titelMit(900812, [cr, weg('joyn', 'https://www.joyn.de/serien/x', { dubAbgeleitet: 'joyn-pauschal' })]), weg('joyn', 'https://www.joyn.de/serien/x', { dubAbgeleitet: 'joyn-pauschal' }), []) === 'anbieter')
+}
+
 if (verletzt) {
   console.error(`\n✖ ${verletzt} Zusicherung(en) verletzt`)
   process.exit(1)
 }
-console.log('\n✓ Pille und Chip „laut Anbieter“: dieselbe Funktion, drei Anlassfälle, Handbeleg, Funktion direkt und fünf Grenzen ok')
+console.log('\n✓ Pille und Chip „laut Anbieter“: dieselbe Funktion, drei Anlassfälle, Handbeleg, Funktion direkt, fünf Grenzen und Prime-Kanal neben belegtem Anbieter ok')

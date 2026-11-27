@@ -10,16 +10,6 @@ X-WR-TIMEZONE:Europe/Berlin
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:road-to-ninja-naruto-the-movie-2026-11-19@2026-11-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261119
-DTEND;VALUE=DATE:20261120
-SUMMARY:Road to Ninja: Naruto the Movie (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/5917/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
 UID:virgin-road-vol1@2026-11-20@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261120
@@ -90,19 +80,6 @@ SUMMARY:Magic Knight Rayearth – Folge 5/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
  etails: https://anime-kalender.de/t/16013/
 CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-156040-primevideo@2026-11-26@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261126
-DTEND;VALUE=DATE:20261127
-SUMMARY:The Most Heretical Last Boss Queen: From Villainess to Savior (neu 
- bei Prime Video) (Synchro offen)
-DESCRIPTION:Plattform: Prime Video\nRelease-Art: Katalog\nIm Angebot seit d
- iesem Tag – nicht der Erscheinungstag der deutschen Fassung.\nSynchro of
- fen: Der Termin ist belegt\, eine deutsche Synchro nicht.\nUhrzeit noch ni
- cht bestätigt.\nDetails: https://anime-kalender.de/t/14693/
-CATEGORIES:Prime Video
 END:VEVENT
 BEGIN:VEVENT
 UID:last-boss-s2-crunchyroll@2026-11-28@anime-kalender-de

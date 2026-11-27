@@ -65,7 +65,7 @@ export function echteWelt({ gh = ghEcht, stufeAus, repo = process.env.GITHUB_REP
   if (!/^[\w.-]+\/[\w.-]+$/.test(repo ?? '')) throw new Error('GITHUB_REPOSITORY fehlt oder ist ungültig')
   const stufeSkript = stufeAus ?? ((args) => mitLimit(args[0], args.slice(1), { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 }, { limitMs: STUFE_LIMIT_MS }))
   const zusammenfassung = process.env.GITHUB_STEP_SUMMARY
-  return {
+  const welt = {
     zeile: (t) => {
       zeileAus(t)
       if (zusammenfassung) appendFileSync(zusammenfassung, `${t}\n`)
@@ -84,13 +84,14 @@ export function echteWelt({ gh = ghEcht, stufeAus, repo = process.env.GITHUB_REP
         mergeStateStatus: p.mergeStateStatus,
         geaenderteDateien: p.changedFiles,
       })),
-    details: (pr) => ({
+    // Ohne Prüfstufe (die startet je PR ein pr-stufe): genügt für die Frage, ob eine verworfene Freigabe zurückgeholt werden soll
+    leicht: (pr) => ({
       ...pr,
-      stufe: stufeVon(pr.nummer, stufeSkript),
       pfade: zeilen(gh(['api', `repos/${repo}/pulls/${pr.nummer}/files`, '--paginate', '--jq', '.[] | .filename, (.previous_filename // empty)'])),
       checks: JSON.parse(gh(['pr', 'view', String(pr.nummer), '--json', 'statusCheckRollup', '--jq', '.statusCheckRollup'])),
       kommentare: zeilen(gh(['api', `repos/${repo}/issues/${pr.nummer}/comments`, '--paginate', '--jq', '.[] | {login: .user.login, assoc: .author_association, at: .created_at, body: .body}'])).map((z) => JSON.parse(z)),
     }),
+    details: (pr) => ({ ...welt.leicht(pr), stufe: stufeVon(pr.nummer, stufeSkript) }),
     warte: schlafe,
     kopfVon: (n) => gh(['pr', 'view', String(n), '--json', 'headRefOid', '--jq', '.headRefOid']).trim(),
     mergeStatus: (n) => gh(['pr', 'view', String(n), '--json', 'mergeStateStatus', '--jq', '.mergeStateStatus']).trim(),
@@ -107,5 +108,14 @@ export function echteWelt({ gh = ghEcht, stufeAus, repo = process.env.GITHUB_REP
     bestandRot: () => bestandIstRot(JSON.parse(gh(['run', 'list', '--workflow', BAU, '--limit', '30', '--json', 'status,conclusion,createdAt'])), Date.now()),
     jetzt: () => Date.now(),
     merge: (pr) => mergeMit5xxPruefung(gh, pr),
+    // Das Label entsteht beim ersten Setzen von selbst (Labels-Schnittstelle legt Unbekanntes an)
+    markiere: (nummer, label) => gh(['api', '-X', 'POST', `repos/${repo}/issues/${nummer}/labels`, '-f', `labels[]=${label}`]),
+    // Der Lauf `PR-Prüfer #<PR> <sha>` (run-name in pr-pruefer.yml) steht schon in der Warteschlange oder läuft: ein zweiter Start bräche ihn ab (concurrency)
+    pruefungLaeuft: (nummer) => laeuftSchon(JSON.parse(gh(['run', 'list', '--workflow', 'pr-pruefer.yml', '--limit', '100', '--json', 'displayTitle,status'])), nummer),
+    uebernahmeAnstossen: (nummer, kopf) => gh(['workflow', 'run', 'pr-pruefer.yml', '--ref', 'main', '-f', `pr=${nummer}`, '-f', `sha=${kopf}`]),
   }
+  return welt
 }
+
+/** Gibt es zum PR einen Prüfer-Lauf (`displayTitle` „PR-Prüfer #<PR> …“) in der Warteschlange oder in Arbeit? */
+export const laeuftSchon = (laeufe, nummer) => laeufe.some((l) => ['queued', 'in_progress', 'waiting', 'pending'].includes(l.status) && l.displayTitle.startsWith(`PR-Prüfer #${nummer} `))

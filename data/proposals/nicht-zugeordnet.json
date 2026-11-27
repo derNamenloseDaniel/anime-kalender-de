@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-26",
+  "stand": "2026-11-27",
   "eintraege": [
     {
       "titel": "Naruto Shippuden",
@@ -11,33 +11,6 @@
       "quelle": "Sammelartikel"
     },
     {
-      "titel": "STEEL BALL RUN: JoJo’s Bizarre Adventure",
-      "artikel": "https://www.anime2you.de/news/1073600/netflix-anime-neu-im-dezember-2026/",
-      "tag": "2026-12-04",
-      "anbieter": [
-        "netflix"
-      ],
-      "quelle": "Sammelartikel"
-    },
-    {
-      "titel": "Shaman King",
-      "artikel": "https://www.anime2you.de/news/1065078/aniverse-november-2026-neuzugaenge/",
-      "tag": "2026-11-12",
-      "anbieter": [
-        "primevideo"
-      ],
-      "quelle": "Sammelartikel"
-    },
-    {
-      "titel": "STEEL BALL RUN: JoJo’s Bizarre Adventure",
-      "artikel": "https://www.anime2you.de/news/1052324/netflix-fuenf-herbst-2026-simulcasts/",
-      "tag": "2026-09-25",
-      "anbieter": [
-        "netflix"
-      ],
-      "quelle": "Sammelartikel"
-    },
-    {
       "titel": "Danganronpa 3 – Future & Despair",
       "artikel": "https://www.anime2you.de/news/1035676/aniverse-august-2026-neuzugaenge/",
       "tag": "2026-08-13",
@@ -45,6 +18,15 @@
         "primevideo"
       ],
       "quelle": "Sammelartikel"
+    },
+    {
+      "titel": "RTL+ nimmt drei beliebte Anime-Klassiker in sein Programm auf",
+      "artikel": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "tag": "2026-12-15",
+      "anbieter": [
+        "rtlplus"
+      ],
+      "quelle": "Einzelartikel"
     }
   ]
 }

@@ -67,6 +67,8 @@ const aufrufe = []
 const gh = (args) => {
   aufrufe.push(args.join(' '))
   if (args[0] === 'pr') return JSON.stringify([{ number: 3870, title: 't', headRefOid: 'a'.repeat(40), createdAt: new Date(JETZT - 3600e3).toISOString(), mergeable: 'MERGEABLE', mergeStateStatus: 'CLEAN', isDraft: false, body: '', baseRefName: 'main', reviews: [], statusCheckRollup: [], comments: [] }])
+  if (args[1] === '-X' && args.some((a) => a.includes('/issues'))) return '[]' // offene Nachprüfungen
+  if (args[0] === 'run' && args[1] === 'list') return '[]' // Warteschlange
   if (args[1] === 'graphql') return `${'a'.repeat(40)} ${new Date(JETZT - 3600e3).toISOString()}`
   return ''
 }

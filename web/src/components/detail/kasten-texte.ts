@@ -57,7 +57,10 @@ export function widerlegtTexte(
   antwort: Extract<Antwort, { art: 'widerlegt' }>,
   T: (k: string, v?: Record<string, string | number>) => string,
 ): { haupt: string; neben: string; gedaempft: boolean } {
-  const grund = T('antwort.widerlegtNeben', { datum: formatDate(antwort.datum) })
+  /* Ohne `anbieter` stammt die Widerlegung aus Crunchyrolls Wochenprogramm, mit ihm aus einer Handprüfung beim Anbieter (27.11.2026). */
+  const grund = antwort.anbieter
+    ? T('antwort.widerlegtNebenAnbieter', { datum: formatDate(antwort.datum), anbieter: antwort.anbieter })
+    : T('antwort.widerlegtNeben', { datum: formatDate(antwort.datum) })
   if (!antwort.terminOffen) return { haupt: T('antwort.widerlegtTitel'), neben: grund, gedaempft: true }
   return { haupt: T('antwort.synchroAngekuendigt'), neben: `${T('antwort.synchroTerminOffen')} · ${grund}`, gedaempft: false }
 }

@@ -7,11 +7,19 @@ import { istAusgeblieben } from './logic.ts'
 import { premiereHinweis } from './premiere.ts'
 import { fasseFolgenZusammen } from './ics-folgen.ts'
 import { zeitGeschaetzt } from './zeit-text.ts'
+import { fuerBesucher } from './nur-deutsch.ts'
 
 const PRODID = '-//anime-kalender-de//Anime-Kalender DE//DE'
 
+/** TEXT nach RFC 5545 §3.3.11; ein einzelnes CR zählt als Zeilenumbruch, übrige Steuerzeichen (außer Tab) entfallen. */
 function esc(value: string): string {
-  return value.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n')
+  return value
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\r\n|\r|\n/g, '\\n')
+    // eslint-disable-next-line no-control-regex -- Steuerzeichen sind genau der Gegenstand
+    .replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, '')
 }
 
 /**
@@ -58,9 +66,8 @@ export interface IcsOptions {
 }
 
 /** Kennzeichnung eines Termins ohne belegte Synchro (10.10.2026, wie `Marken.tsx`); gilt für ICS und Newsletter. */
-export const SPRACHE_MARKE = { omu: 'OmU', offen: 'Synchro offen' } as const
+export const SPRACHE_MARKE = { offen: 'Synchro offen' } as const
 export const SPRACHE_HINWEIS = {
-  omu: 'OmU: Originalton mit deutschen Untertiteln, keine deutsche Synchro.',
   offen: 'Synchro offen: Der Termin ist belegt, eine deutsche Synchro nicht.',
 } as const
 
@@ -113,7 +120,7 @@ function summaryBasis(ev: ReleaseEvent, bis?: number): string {
 export function eventDescription(ev: ReleaseEvent, opts: IcsOptions = {}): string {
   const lines = [
     `Plattform: ${anbieterName(ev.platform, ev.sender)}`,
-    // „Simuldub“ im Namen der Art behauptet eine Synchro; bei gesetzter Sprache (omu/offen) gilt die Kurzform.
+    // „Simuldub“ im Namen der Art behauptet eine Synchro; bei gesetzter Sprache (offen) gilt die Kurzform.
     `Release-Art: ${ev.sprache ? RELEASE_TYPES[ev.releaseType].short : RELEASE_TYPES[ev.releaseType].name}`,
   ]
   if (ev.imAngebot) lines.push(IM_ANGEBOT_HINWEIS)
@@ -187,7 +194,7 @@ export const ICS_FUSS = 'END:VCALENDAR\r\n'
 
 export function buildIcs(events: ReleaseEvent[], opts: IcsOptions = {}): string {
   const lines: string[] = []
-  for (const { ev, bis } of fasseFolgenZusammen(events)) lines.push(...veventBody(ev, opts, bis))
+  for (const { ev, bis } of fasseFolgenZusammen(fuerBesucher(events))) lines.push(...veventBody(ev, opts, bis))
   return icsKopf(opts.calendarName) + lines.map((l) => fold(l) + '\r\n').join('') + ICS_FUSS
 }
 

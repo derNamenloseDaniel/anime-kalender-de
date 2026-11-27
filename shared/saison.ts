@@ -1,4 +1,5 @@
 import type { PlatformId, Release, StreamLink, Title } from './types.ts'
+import { anbieterBelegtKanal } from './kanal-anbieter.ts'
 
 /** Die vier Anime-Saisons Japans; `jpSeason` am Titel nutzt dieselben Namen wie AniList. */
 export type Saison = 'WINTER' | 'SPRING' | 'SUMMER' | 'FALL'
@@ -40,7 +41,7 @@ export function ersterTermin(releases: Release[] | undefined): { datum: string; 
   return liste.sort((a, b) => a.datum.localeCompare(b.datum))[0]
 }
 
-/** Deutsch belegt: Weg mit Tonspur-Beleg, Erstausgabe mit Synchro oder Sprecherliste. Ein nur abgeleiteter Weg (`dubAbgeleitet`: Joyn pauschal, Prime-Kanal erbt) zählt nicht, das Detail nennt ihn „Deutsch laut Anbieter“. */
+/** Deutsch belegt: Weg mit Tonspur-Beleg, Erstausgabe mit Synchro oder Sprecherliste. Ein nur abgeleiteter Weg (`dubAbgeleitet`: Joyn pauschal, Prime-Kanal erbt) zählt nicht; den Kanal trägt der belegte Anbieter-Weg desselben Titels (`istLautAnbieter`). */
 export const hatDeutsch = (t: Pick<Title, 'streams' | 'deErstausgabe' | 'hasVoices'>): boolean =>
   Boolean((t.streams ?? []).some((s) => s.dub === true && !s.dubAbgeleitet) || t.deErstausgabe?.synchro || t.hasVoices)
 
@@ -54,8 +55,9 @@ export function anbieterVon(t: Pick<Title, 'streams' | 'ankuendigung'>, releases
   return [...new Set([...(t.streams ?? []).filter((s) => s.dub === true).map((s) => s.platform), ...angekuendigt, ...ausTermin])]
 }
 
-/** Ein Tonspur-Weg, dessen Deutsch nur abgeleitet ist (Joyn pauschal, Prime-Kanal erbt): „Deutsch laut Anbieter“. Pille und Chip fragen hier. Ein Termin belegt die Tonspur nicht; nennt ein Artikel die Sprache, wird er als Handbeleg geführt (`data/dub-confirmed.yaml`), und der Weg trägt kein `dubAbgeleitet` mehr. */
-export const istLautAnbieter = (s: Pick<StreamLink, 'dub' | 'dubAbgeleitet'>): boolean => s.dub === true && Boolean(s.dubAbgeleitet)
+/** Ein Tonspur-Weg, dessen Deutsch nur abgeleitet ist (Joyn pauschal, Prime-Kanal erbt ohne belegten Anbieter-Weg im Titel): „Deutsch laut Anbieter“. Belegt der Anbieter-Weg sein Ja, zeigt der Kanal „Deutsch“ wie er (`anbieterBelegtKanal`). Pille und Chip fragen hier. Ein Termin belegt die Tonspur nicht; nennt ein Artikel die Sprache, wird er als Handbeleg geführt (`data/dub-confirmed.yaml`), und der Weg trägt kein `dubAbgeleitet` mehr. */
+export const istLautAnbieter = (s: Pick<StreamLink, 'dub' | 'dubAbgeleitet'> & Partial<Pick<StreamLink, 'platform' | 'kanal'>>, streams: StreamLink[]): boolean =>
+  s.dub === true && Boolean(s.dubAbgeleitet) && !(s.dubAbgeleitet === 'kanal-erbt' && anbieterBelegtKanal(s, streams))
 
 /** Ein Anbieter-Chip; `laut` = Deutsch nur aus abgeleitetem Weg: mindestens ein Tonspur-Weg dieses Anbieters, alle `dubAbgeleitet` (dieselbe Frage wie die Pille am Weg; Termine und Ankündigungen belegen die Tonspur nicht). */
 export type AnbieterChip = { platform: PlatformId; laut: boolean }
@@ -64,6 +66,6 @@ export function anbieterChips(t: Pick<Title, 'streams' | 'ankuendigung'>, releas
   const dub = (t.streams ?? []).filter((s) => s.dub === true)
   return anbieterVon(t, releases).map((platform) => {
     const wege = dub.filter((s) => s.platform === platform)
-    return { platform, laut: wege.length > 0 && wege.every(istLautAnbieter) }
+    return { platform, laut: wege.length > 0 && wege.every((s) => istLautAnbieter(s, t.streams ?? [])) }
   })
 }

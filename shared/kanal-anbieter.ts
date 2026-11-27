@@ -24,6 +24,15 @@ export function anbieterWegMitJa(s: Pick<StreamLink, 'platform' | 'kanal'>, stre
 }
 
 /**
+ * Belegt der Anbieter-Weg desselben Titels sein Ja selbst (weder abgeleitet noch nur JustWatch-Hinweis)? Dann trägt dieselbe Quelle den
+ * Prime-Kanal: Der Kanal führt den Bestand des Anbieters (Daniel, 27.11.2026: „Deutsch laut Anbieter“ am Crunchyroll-Kanal neben „Deutsch“ bei Crunchyroll).
+ */
+export function anbieterBelegtKanal(s: Partial<Pick<StreamLink, 'platform' | 'kanal'>>, streams: StreamLink[]): boolean {
+  const plattform = s.platform === 'primevideo' ? anbieterDesKanals(s.kanal) : undefined
+  return plattform !== undefined && streams.some((q) => q.platform === plattform && q.dub === true && !q.dubAbgeleitet && !q.dubHintOnly && !q.entferntAm)
+}
+
+/**
  * Die Wege, deren Ja der Bau vom Anbieter übernommen hat (`kanalErbtVomAnbieter`). Nur im Prozess des Baus, nie in den Dateien: Die Nachrichten
  * kennen so ein geerbtes Ja und melden es nicht als weiteren Anbieter (der Titel läuft dort seit Langem), ohne dass ein Feld in `titles.json` steht.
  */

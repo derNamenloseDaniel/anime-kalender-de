@@ -77,7 +77,7 @@ const wurzel = createRoot(dom.wurzel as unknown as Element)
 async function panel(title: Title, releases: Release[]) {
   let a: ReturnType<typeof usePanelAntwort> | undefined
   function Probe() {
-    a = usePanelAntwort({ title, releases, today: HEUTE, synopsis: undefined, favorites: new Set(), verbindung: { verbunden: false } as never, t: translate })
+    a = usePanelAntwort({ title, releases, nurUntertitel: [], today: HEUTE, synopsis: undefined, favorites: new Set(), verbindung: { verbunden: false } as never, t: translate })
     return null
   }
   await act(async () => wurzel.render(h(Probe)))
@@ -107,11 +107,11 @@ pruefe('Panel: kein OmU-Termin, kein zweiter Aniverse-Termin neben dem Weg', pFa
 pruefe('Panel: der Kaufweg bleibt (Disc-Reiter)', pFall.sortiertNachZugang.some((g) => g.shops.length > 0))
 pruefe('Panel-Kopf (fertig, heute) nennt die Sprache offen, nicht Deutsch', kopfText(pFall, fall, fallTermine) === 'Anbieter, Sprache offen', kopfText(pFall, fall, fallTermine))
 
-/* Nur Untertitel: die Pille entfällt, der Kopf nennt es weiter („Anbieter, nur Untertitel“), er kippt nicht auf eine Deutsch-Aussage. */
+/* Nur Untertitel: die Pille entfällt, und der Kopf nennt ihn nirgends (Daniel, 26.11.2026, PR 5091); er kippt nicht auf „Sprache offen“ mit dem Anbieter. */
 const nurOmu = titel([], [akibapass])
 const pOmu = await panel(nurOmu, [])
 pruefe('Panel: nur Untertitel — keine Pille', pOmu.sortiertNachZugang.length === 0, pOmu.sortiertNachZugang.length)
-pruefe('Panel-Kopf: nur Untertitel bleibt „nur Untertitel“', kopfText(pOmu, nurOmu, []) === 'Anbieter, nur Untertitel', kopfText(pOmu, nurOmu, []))
+pruefe('Panel-Kopf: nur Untertitel steht nirgends, auch nicht als „Sprache offen“', !/untertitel|omu|offen/i.test(String(kopfText(pOmu, nurOmu, []) ?? '')), kopfText(pOmu, nurOmu, []))
 
 /* Ein belegter Prime-Kanal-Weg neben einem Verweis ohne Beleg: der Beleg bleibt bis in die Pillenliste. */
 const pBeleg = await panel(titel([verweisAniverse({})], [belegterBezug]), [])

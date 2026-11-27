@@ -72,7 +72,7 @@ export function AntwortBereich({ antwort, sortiertNachZugang, ohneSprachbeleg, s
   antwort: ReturnType<typeof berechneAntwort>
   sortiertNachZugang: ReturnType<typeof sortiereNachZugang>
   /** Die Sprachaussage des Kopfs, nach allen Wegen des Titels (auch den ausgeblendeten) bestimmt. */
-  ohneSprachbeleg: boolean | 'omu' | 'anbieter' | undefined
+  ohneSprachbeleg: boolean | 'anbieter' | undefined
   streamReleases: Release[]
   /** Alle Termine mit Anbieter/Sender, auch die, deren Anbieter schon als Link da ist. */
   terminReleases: Release[]

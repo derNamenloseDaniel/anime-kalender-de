@@ -111,6 +111,7 @@ function kasten(streams: StreamLink[]): string {
   return renderToStaticMarkup(createElement(KastenRahmen, {
     antwort: { art: 'fertig', gesamt: 13, raus: 13, gesamtAbgeleitet: true },
     sortiertNachZugang: sortiertVon(streams),
+    ohneSprachbeleg: ohneSprachbelegFuer(sortiertVon(streams), titelMit(streams), []),
     title,
     t: uebersetze,
     today: '2026-10-13',

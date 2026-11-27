@@ -11,7 +11,7 @@ import { dubZeilenVon } from './dub-zeilen.ts'
 import { berechneAntwortMitDeFolgen } from './antwort-de-folgen.ts'
 import { sortiereNachZugang } from './wege-sortieren.ts'
 import { sichtbareTermine, sichtbareWege } from './wege-sichtbar.ts'
-import { ohneSprachbelegFuer } from './legende-zeilen.ts'
+import { ohneSprachbelegFuer, wegeOhneNurUntertitel } from './legende-zeilen.ts'
 import { kastenNotizVon, wegeHinweisVon } from './kasten-hinweise.ts'
 import { useReleaseSichten } from './release-sichten.ts'
 
@@ -50,8 +50,11 @@ function useWegeSichten({ title, releases, nurUntertitel, today }: Pick<PanelAnt
   /* Termine mit Untertiteln allein sind aus `releases` heraus; sie dienen nur dazu, ihre Wege zu erkennen und auszublenden. */
   const mitUntertitel = useMemo(() => [...releases, ...nurUntertitel], [releases, nurUntertitel])
   const sortiertNachZugang = useMemo(() => (title ? sichtbareWege(alleWege, title, mitUntertitel) : alleWege), [alleWege, title, mitUntertitel])
-  /* Der Kopf sagt „Sprache offen“ nach allen Wegen des Titels, auch nach denen, die als Pille entfallen. */
-  const ohneSprachbeleg = useMemo(() => (title ? ohneSprachbelegFuer(alleWege, title, mitUntertitel) : undefined), [alleWege, title, mitUntertitel])
+  /* Der Kopf sagt „Sprache offen“ nach allen Wegen außer Untertitel-Wegen, auch nach denen, die als Dublette entfallen; sonst stünde „Alle N Folgen auf Deutsch“ über einem Reiter ohne Beleg. */
+  const ohneSprachbeleg = useMemo(
+    () => (title ? ohneSprachbelegFuer(wegeOhneNurUntertitel(alleWege, title, mitUntertitel), title, mitUntertitel) : undefined),
+    [alleWege, title, mitUntertitel],
+  )
   const { discReleases, releaseJePlattform, kinoRelease } = useReleaseSichten(releases, today)
   const alleTermine = useTerminReleases(releases, title, kinoRelease?.slug, today)
   const terminReleases = useMemo(() => sichtbareTermine(alleTermine, sortiertNachZugang), [alleTermine, sortiertNachZugang])

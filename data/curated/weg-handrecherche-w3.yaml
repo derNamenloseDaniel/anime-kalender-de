@@ -37,9 +37,9 @@
   platform: disc
   releaseType: disc
   publisher: "FilmConfect"
-  edition: "Komplettset, DVD (Folge 13 und 14 sind die Specials)"
+  edition: "Komplettset (14 Folgen), DVD"
   ean: "7630017535337"
-  note: "Deutsche Tonspur, dazu Japanisch; die Specials stehen als Folge 13 und 14 im Set."
+  note: "Deutsche Tonspur, dazu Japanisch; das Komplettset führt alle 14 Folgen der Serie, die Specials zählt aniSearch als Folge 13 und 14."
   schedule: { firstEpisodeDate: "2024-03-08" }
   sources:
     - https://www.anisearch.de/article/156743,to-love-ru-darkness-2nd-komplettset

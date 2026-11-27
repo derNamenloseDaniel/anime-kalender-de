@@ -107,6 +107,7 @@ pipeline/check-ausloeser-zeilen.ts
 pipeline/check-auto-disc-handeintrag.ts
 pipeline/check-banner-ersatz.ts
 pipeline/check-banner-franchise.ts
+pipeline/check-banner-serienbild.ts
 pipeline/check-beleg-adresswechsel.ts
 pipeline/check-beleg-anbieter.ts
 pipeline/check-beleg-api-web.ts

@@ -36,7 +36,7 @@ pruefe('allein in der Reihe: AniList-Banner bleibt', allein.bannerImage === AL &
 pruefe('eigenes TMDB-Banner bleibt, Titel ohne Banner bleibt ohne', eigenTmdb.bannerVon === undefined && ohneBanner.bannerImage === undefined)
 pruefe('Spender behält sein Banner ohne Kennzeichnung', kopf.bannerImage === TM && kopf.bannerVon === undefined)
 pruefe('Rückgabe: genau die Ersetzten', ids.join() === '2,3,4', ids)
-pruefe('Mangel bild-fremdsprachig: ersetztes Banner zählt nicht mehr', fremdeBilder(staffel, () => undefined, () => undefined).length === 0)
+pruefe('Mangel bild-fremdsprachig: ersetztes Banner zählt nicht mehr', fremdeBilder(staffel, () => undefined, () => undefined, () => false).length === 0)
 
 // Mehrere Spender in der Reihe: der nächstliegende nach Jahr gilt, auch wenn er vor dem letzten steht.
 {

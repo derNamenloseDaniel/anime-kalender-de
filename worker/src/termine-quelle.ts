@@ -6,8 +6,8 @@ import type { Env } from './env.ts'
 import { berlinParts, fehlerLog } from './werte.ts'
 
 /**
- * Termine und „Jetzt auch bei“-Zeilen für einen Cron-Aufruf: die kleine Bau-Datei `worker-termine.json` (rund 50 KB statt 1,7 MB, siehe
- * `shared/worker-termine.ts`), einmal je Aufruf geladen. Fehlt sie, ist sie veraltet oder hat sie eine andere Form, lesen `termine` und
+ * Termine und „Jetzt auch bei“-Zeilen für einen Cron-Aufruf: die kleine Bau-Datei `worker-termine.json` (27.11.2026: 43 KB im Repo,
+ * 96 KB im PR-Bau, statt rund 2,3 MB für `events.json` und `releases.json`; siehe `shared/worker-termine.ts`), einmal je Aufruf geladen. Fehlt sie, ist sie veraltet oder hat sie eine andere Form, lesen `termine` und
  * `weitere` wie früher die vollen Dateien (jeweils nur die, die der Aufruf braucht).
  */
 export function termineQuelle(env: Env, jetzt: Date, ladeVoll: () => Promise<ReleaseEvent[]>, ladeNews: () => Promise<NewsEintrag[]>) {

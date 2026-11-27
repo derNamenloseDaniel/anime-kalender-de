@@ -789,6 +789,7 @@ pipeline/check-vorlieben-getrennt.ts
 pipeline/check-vorlieben.ts
 pipeline/check-weg-adresse-bezugsweg.ts
 pipeline/check-weg-aus-meldung.ts
+pipeline/check-weg-handrecherche-w3.ts
 pipeline/check-weg-massenabgang.ts
 pipeline/check-weg-nein-gti.ts
 pipeline/check-weg-unten.ts

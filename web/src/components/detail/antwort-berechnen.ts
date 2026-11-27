@@ -204,7 +204,7 @@ export function berechneAntwort({ title, releases, today, jetzt }: AntwortEingab
   /* Ein widerlegter deutscher Termin erzeugt kein Ereignis — er bekommt seine eigene Antwort (02.10.2026). */
   const widerlegt = widerlegterTermin(releases, alleEvents.length)
   if (widerlegt) {
-    return { art: 'widerlegt' as const, datum: widerlegt.am, grund: widerlegt.grund, quelle: widerlegt.quelle, terminOffen: titelSynchroAngekuendigt(title) }
+    return { art: 'widerlegt' as const, datum: widerlegt.am, grund: widerlegt.grund, quelle: widerlegt.quelle, anbieter: widerlegt.anbieter, terminOffen: titelSynchroAngekuendigt(title) }
   }
   const gesamt = gesamtFolgen(title, fuerKopf, alleEvents)
   const { vereint, vollstaendig, teilOhneZahl, belegteFolgen, restBelegt, abgeschlossenFuerKasten } = dubBelegung({ title, today, hatSynchro, gesamt })

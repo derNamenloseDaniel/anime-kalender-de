@@ -618,7 +618,7 @@ export interface Release {
    * geprüft, keiner nennt einen Tag.
    */
   disputedDates?: { date: string; source: string }[]
-  widerlegt?: { am: string; grund: string; quelle?: string; gemeldet: boolean } // Wochenprogramm, 02.10.2026
+  widerlegt?: { am: string; grund: string; quelle?: string; gemeldet: boolean; anbieter?: string } // Wochenprogramm, 02.10.2026; `anbieter`: Handbeleg-Nein nach dem Start (27.11.2026)
   schedule: Schedule
   /** Jahr der ersten Folge im deutschen Dub. */
   year: number

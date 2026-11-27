@@ -18,12 +18,21 @@ function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
 
 const ZEILE = 'Crunchyroll: Folge 4 am Sa 28.11. um 17:00 Uhr'
 const antwort = { art: 'laeuft', haupt: { platform: 'netflix', date: '2026-11-29', episode: 5 } }
+const titel = { id: 1, slug: 't' } as unknown as Title
+const umschalter = { aktivDisc: false, streamLeer: false, discLeer: true, onWahl: () => undefined }
 const kopf = (nachleger?: string[]) =>
   renderToStaticMarkup(
     h(KastenKopfblock, {
-      antwort, title: { id: 1, slug: 't' } as unknown as Title, today: '2026-11-27', T: (k: string) => k, haupt: 'Nächste Folge', gedaempft: false,
-      neben: '', nebenTitel: undefined, fakten: undefined, anteil: undefined, zaehl: '',
-      umschalter: { aktivDisc: false, streamLeer: false, discLeer: true, onWahl: () => undefined }, nachleger,
+      antwort,
+      title: titel,
+      today: '2026-11-27',
+      T: (k: string) => k,
+      haupt: 'Nächste Folge',
+      gedaempft: false,
+      neben: '',
+      zaehl: '',
+      umschalter,
+      nachleger,
     } as never),
   )
 

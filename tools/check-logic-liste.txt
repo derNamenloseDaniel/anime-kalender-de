@@ -198,6 +198,7 @@ pipeline/check-cr-teilseiten-bestand-kulisse.ts
 pipeline/check-cr-teilseiten.ts
 pipeline/check-cr-termine-neu.ts
 pipeline/check-cr-us-nein-adresse.ts
+pipeline/check-cr-zaehlung.ts
 pipeline/check-cr-zeit-katalog.ts
 pipeline/check-cr-zeit-woche.ts
 pipeline/check-datei-kennungen.ts
@@ -314,6 +315,7 @@ pipeline/check-folgenzahl-offen-bau.ts
 pipeline/check-folgenzahl-offen.ts
 pipeline/check-folgenzahl-sichtung.ts
 pipeline/check-fsk-franchise.ts
+pipeline/check-fsk-justwatch-bilanz.ts
 pipeline/check-fsk-kopf-hinweis.ts
 pipeline/check-fsk-kopf-render.ts
 pipeline/check-geheimnis-testlauf.ts
@@ -360,6 +362,7 @@ pipeline/check-invarianten.ts
 pipeline/check-ja-hat-weg.ts
 pipeline/check-joyn-block-wache.ts
 pipeline/check-joyn-danach.ts
+pipeline/check-joyn-folgen-aus-tv.ts
 pipeline/check-joyn-hand-tv.ts
 pipeline/check-joyn-luecke-lauf.ts
 pipeline/check-joyn-luecke.ts
@@ -492,6 +495,7 @@ pipeline/check-netflix-tonspur.ts
 pipeline/check-netflix-umleitung-ablauf.ts
 pipeline/check-netflix-umleitung-meldung.ts
 pipeline/check-netflix-umleitung.ts
+pipeline/check-netflix-zaehlung.ts
 pipeline/check-netflix-zweite-kennung.ts
 pipeline/check-netflix-zweites-404.ts
 pipeline/check-neu-auf-deutsch.ts
@@ -600,6 +604,7 @@ pipeline/check-reihen-traeger-aufrufer.ts
 pipeline/check-reihen-traeger.ts
 pipeline/check-reihen-uebersicht.ts
 pipeline/check-reihen-zeile-spanne.ts
+pipeline/check-reihen-zeilen.ts
 pipeline/check-reinids-grund.ts
 pipeline/check-reiter-blase.ts
 pipeline/check-reiter-lage-grund.ts
@@ -617,6 +622,7 @@ pipeline/check-saison-deutsch.ts
 pipeline/check-saison-karte-chip.ts
 pipeline/check-saison-termin.ts
 pipeline/check-sammel-erste-folgen.ts
+pipeline/check-sammel-part.ts
 pipeline/check-sammel-titel.ts
 pipeline/check-sammel-unzugeordnet.ts
 pipeline/check-sammelartikel.ts
@@ -746,6 +752,7 @@ pipeline/check-tmdb-staffel0-eigene-lauf.ts
 pipeline/check-tmdb-staffel0-liste.ts
 pipeline/check-tmdb-staffel0.ts
 pipeline/check-tmdb-suche.ts
+pipeline/check-tmdb-suchfehler.ts
 pipeline/check-tmdb-von-hand-abgeleitet.ts
 pipeline/check-toggo-adresse-stabil.ts
 pipeline/check-toggo-seiten-bestand-lauf.ts
@@ -785,8 +792,11 @@ pipeline/check-verweise-von-hand.ts
 pipeline/check-vorfaelle-ablauf.ts
 pipeline/check-vorlieben-getrennt.ts
 pipeline/check-vorlieben.ts
+pipeline/check-warnungen-zaehlen.ts
 pipeline/check-weg-adresse-bezugsweg.ts
 pipeline/check-weg-aus-meldung.ts
+pipeline/check-weg-handrecherche-b.ts
+pipeline/check-weg-handrecherche-c.ts
 pipeline/check-weg-massenabgang.ts
 pipeline/check-weg-nein-gti.ts
 pipeline/check-weg-unten.ts

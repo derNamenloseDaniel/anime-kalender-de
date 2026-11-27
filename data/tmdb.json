@@ -4437,5 +4437,66 @@
       "adn"
     ],
     "inhaltAm": "2026-11-26"
+  },
+  "auto-204389-primevideo": {},
+  "berserk-1997-part2-primevideo": {
+    "tmdbId": 35935,
+    "fsk": 18,
+    "justwatchUrl": "https://www.themoviedb.org/tv/35935-jian-feng-yun-qi-beruseruku/watch?locale=DE",
+    "offers": [
+      {
+        "name": "Netflix",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Netflix Standard with Ads",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Aniverse Amazon Channel",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Amazon Video",
+        "kind": "buy"
+      }
+    ],
+    "providers": [
+      "netflix",
+      "primevideo"
+    ],
+    "inhaltAm": "2026-11-27"
+  },
+  "berserk-1997-part1-primevideo": {
+    "tmdbId": 35935,
+    "fsk": 18,
+    "justwatchUrl": "https://www.themoviedb.org/tv/35935-jian-feng-yun-qi-beruseruku/watch?locale=DE",
+    "offers": [
+      {
+        "name": "Netflix",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Netflix Standard with Ads",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Aniverse Amazon Channel",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Amazon Video",
+        "kind": "buy"
+      }
+    ],
+    "providers": [
+      "netflix",
+      "primevideo"
+    ],
+    "inhaltAm": "2026-11-27"
+  },
+  "wolfs-rain-ova-peppermint-classics-5-blu-ray-2017-07-28": {},
+  "techno-police-das-gesetz-der-zukunft-dvd-2017-08-31": {
+    "tmdbId": 76427
   }
 }

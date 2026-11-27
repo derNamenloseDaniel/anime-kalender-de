@@ -1,0 +1,28 @@
+# Disc-Ausgaben mit deutscher Tonspur für Titel ohne Weg (Mangel `kein-weg`), von Hand belegt, Auftrag weg-handrecherche-c (27.11.2026).
+# Beleg ist je Eintrag eine Einzelseite (bluray-disc.de bzw. OFDb-Fassung), abgerufen 27.11.2026; nur Fakten übernommen.
+# Ein Eintrag ohne EAN bekommt vom Build die Amazon.de-Namenssuche.
+
+# Die Gesamtausgabe führt Folge 1-26 der Serie und als Folge 27-30 die vier OVA-Folgen (AniList 1023, 4 Folgen); Tonspur laut Seite „Deutsch DTS-HD MA 5.1, Japanisch PCM 2.0“.
+- slug: wolfs-rain-ova-peppermint-classics-5-blu-ray-2017-07-28
+  anilistId: 1023
+  titleDe: "Wolf's Rain OVA"
+  platform: disc
+  releaseType: disc
+  publisher: "peppermint anime (Vertrieb AV Visionen)"
+  edition: "peppermint classics #005, Gesamtausgabe mit den OVA-Folgen 27-30, 5 Blu-rays"
+  note: "Deutsche Tonspur (DTS-HD MA 5.1), dazu Japanisch; die OVA-Folgen stehen als Folge 27 bis 30 auf der Box."
+  schedule: { firstEpisodeDate: "2017-07-28" }
+  sources: [https://bluray-disc.de/blu-ray-filme/112527-wolfs_rain_peppermint_classics_005]
+
+# Die Fassung nennt „Deutsch (Dolby Digital 2.0 Stereo)“, ungekürzt, FSK 12, EAN auf der OFDb-Seite.
+- slug: techno-police-das-gesetz-der-zukunft-dvd-2017-08-31
+  anilistId: 5090
+  titleDe: "Techno Police: Das Gesetz der Zukunft"
+  platform: disc
+  releaseType: disc
+  publisher: "Motion Cap"
+  edition: "DVD"
+  ean: "4043962215200"
+  note: "Deutsche Tonspur (Dolby Digital 2.0 Stereo), ungekürzt."
+  schedule: { firstEpisodeDate: "2017-08-31" }
+  sources: ["https://www.ofdb.de/fassung/32304,444636,Techno-Police-Das-Gesetz-der-Zukunft/"]

@@ -77,7 +77,7 @@ function jaNachNein(belege: Parameters<typeof baueNeinGilt>[0], k: string): bool
 }
 
 /** Ein Handbeleg „deutsch" bringt Urteil und Folgenbereiche mit; ohne ihn bleibt der Ton offen, und die Herkunft ist der Termin. */
-function tonAusBeleg(beleg: DubCheck | undefined): Pick<StreamLink, 'dub' | 'dubRanges' | 'herkunft'> {
+function tonAusBeleg(beleg: Pick<DubCheck, 'dub' | 'dubRanges'> | undefined): Pick<StreamLink, 'dub' | 'dubRanges' | 'herkunft'> {
   if (beleg?.dub !== true) return { herkunft: 'termin' }
   const bereiche = beleg.dubRanges?.map((b) => ({ from: b.from, to: b.to, dub: b.dub }))
   return { dub: true, ...(bereiche?.length ? { dubRanges: bereiche } : {}) }

@@ -480,6 +480,17 @@ DESCRIPTION:Plattform: Prime Video\nRelease-Art: Katalog\nIm Angebot seit d
 CATEGORIES:Prime Video
 END:VEVENT
 BEGIN:VEVENT
+UID:motn-966-primevideo@2026-11-26@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261126
+DTEND;VALUE=DATE:20261127
+SUMMARY:Shin-chan (neu bei Prime Video)
+DESCRIPTION:Plattform: Prime Video\nRelease-Art: Katalogtitel\nIm Angebot s
+ eit diesem Tag – nicht der Erscheinungstag der deutschen Fassung.\nUhrze
+ it noch nicht bestätigt.\nDetails: https://anime-kalender.de/t/846/
+CATEGORIES:Prime Video
+END:VEVENT
+BEGIN:VEVENT
 UID:yaiba-samurai-legend-prosieben-maxx@2026-11-27@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261127T172500Z

@@ -73,3 +73,9 @@ Kette am Kopf 2c680868 war rot (Logik 1, Logik 2, PR-Datenbau): sechs Prüfungen
 Überlebender: Zeile 124 `readFileSync(pfad)` ohne `'utf8'` — `yaml.load` liest den Buffer als denselben Text, gleichwertig.
 
 Lehre: eine Bauphase, die eine neue Handliste liest, darf in den Bau-Kulissen der übrigen Prüfungen nicht hart abbrechen; vor dem Push `grep -l "bauePhasenfolge\|mkdtemp.*data" pipeline/check-*.ts` und diese Prüfungen mitfahren.
+
+## Nachtrag 2 (Kopf a9679f14)
+
+`Kette – Workflows` war am Kopf 51293c7b rot: der Workflow-Prüfer liest jeden `'data/…'`-Text einer schreibenden Datei unter `pipeline/` als Schreibziel, darunter auch den erwarteten Warntext im Test `pipeline/check-sprecher-wikipedia-bau.ts`. Der Test prüft die Zeile jetzt ohne das `data/`-Präfix; Workflow-Prüfer und sein Test lokal grün (Exit 0).
+
+Lehre: In Testtexten unter `pipeline/` keinen `'data/…'`-Pfad in Anführungszeichen schreiben, der keine Datei meint.

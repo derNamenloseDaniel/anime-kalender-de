@@ -1,6 +1,5 @@
 import { istLink } from '@shared/quelle.ts'
 import type { NewsMeldung } from '@shared/types.ts'
-import { GRUND_NUR_ORIGINALTON } from '@shared/news-typen.ts'
 import { useLang } from '../lib/i18n.tsx'
 import { datumKurz } from '../lib/news-text.ts'
 import { Tooltip } from './ui.tsx'
@@ -35,10 +34,8 @@ export function AbgeloestHinweis({ m }: { m: NewsMeldung }) {
   }
   if (m.zurueckgezogen) {
     return (
-      <Tooltip text={m.zurueckgezogen.grund === GRUND_NUR_ORIGINALTON ? GRUND_NUR_ORIGINALTON : t('news.zurueckgezogenTitel')} seite="unten" className="shrink-0">
-        <span className="text-[11px] text-ak-fehler-text">
-          {t(m.zurueckgezogen.grund === GRUND_NUR_ORIGINALTON ? 'news.zurueckgezogenOmu' : 'news.zurueckgezogen')}
-        </span>
+      <Tooltip text={t('news.zurueckgezogenTitel')} seite="unten" className="shrink-0">
+        <span className="text-[11px] text-ak-fehler-text">{t('news.zurueckgezogen')}</span>
       </Tooltip>
     )
   }

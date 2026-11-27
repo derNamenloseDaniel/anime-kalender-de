@@ -43,3 +43,31 @@ export function uebernehmeFranchiseBanner(titles: Map<number, Title>): number[] 
   log(`Banner aus der Reihe übernommen: ${empfaenger.length} Titel`)
   return empfaenger
 }
+
+const istAnilistBild = (url: string | undefined): boolean => Boolean(url?.includes('anilist.co'))
+
+/**
+ * Ein AniList-Banner (Key Visual, meist mit japanischer Schrift) weicht dem TMDB-Banner eines anderen Teils derselben Reihe (`bild-fremdsprachig`):
+ * TMDB wählt textlos vor deutsch vor englisch (`lib/tmdb-banner.ts`), und 331 von 348 offenen Fällen hatten einen solchen Teil (Stand 26.11.2026).
+ * Spender ist nur ein eigenes TMDB-Banner (keine Ketten); ohne Spender bleibt das AniList-Banner. Kennzeichnung wie bei `uebernehmeFranchiseBanner`.
+ * Läuft danach, damit auch dort übernommene AniList-Banner ersetzt werden. Gibt die Kennungen der Ersetzten zurück.
+ */
+export function ersetzeAnilistBanner(titles: Map<number, Title>): number[] {
+  const spender = new Map<number, Title[]>()
+  for (const t of titles.values()) {
+    if (!t.bannerImage?.includes('tmdb.org') || t.bannerVon !== undefined) continue
+    const reihe = t.franchiseId ?? t.id
+    spender.set(reihe, [...(spender.get(reihe) ?? []), t])
+  }
+  const ersetzt: number[] = []
+  for (const t of titles.values()) {
+    if (!istAnilistBild(t.bannerImage)) continue
+    const wahl = waehleBannerSpender(t, (spender.get(t.franchiseId ?? t.id) ?? []).filter((x) => x.id !== t.id))
+    if (!wahl) continue
+    t.bannerImage = wahl.bannerImage
+    t.bannerVon = wahl.id
+    ersetzt.push(t.id)
+  }
+  log(`AniList-Banner durch das TMDB-Banner der Reihe ersetzt: ${ersetzt.length} Titel`)
+  return ersetzt
+}

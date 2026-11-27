@@ -206,6 +206,16 @@
     return gruppe
   }
 
+  /**
+   * Der Kasten bei Adress-, Folgen- oder Erwartungswechsel (26.11.2026): Such- bzw. Titelbauer neu rechnen; baut keiner
+   * neu (kein Auftrag für diese Seite), steht sonst der Inhalt der Vorseite weiter da (SPA) — dann die leere Hülle.
+   */
+  globalThis.akPrimeKastenNeu = (alter, adresse, pfad, bauer) => {
+    if (pfad === '/s' || pfad.startsWith('/s/')) bauer.suche()
+    else bauer.titel()
+    if (alter.isConnected && alter.dataset.fuerAdresse !== adresse) bauer.huelle()
+  }
+
   /** Die letzten Knopftexte mit Zeit seit Seitenstart — was ein Frame zeigte, bevor er scheiterte. */
   globalThis.akPrimeTagebuch = (bisher, textJetzt, nachMs) =>
     text(textJetzt) && text(bisher?.[bisher.length - 1]?.text) !== text(textJetzt)

@@ -8,6 +8,7 @@ import { bekannteSeitenAusBestand, schreibeKernUndNews } from './13-5-kerndateie
 import { ergaenzeKennungen } from './13-6-kennungen.ts'
 import { ergaenzeTitelRang } from './titel-rang.ts'
 import { schreibeWochenDatei } from './13-8-wochen-datei.ts'
+import { schreibeWorkerTermine } from './13-9-worker-termine.ts'
 import { schreibePatchnotes } from './13-9-patchnotes.ts'
 import { ergaenzeErstausgabeAngebot } from './13-7-erstausgabe-angebot.ts'
 import { ergaenzeAngebotTermine } from './13-7-angebot-termine.ts'
@@ -19,12 +20,14 @@ import { schreibeSprecherIndex } from './sprecher-index.ts'
 import { schreibeListen } from './13-3-listen.ts'
 import { schreibeKinoZuletzt } from './kino-zuletzt.ts'
 import { schreibeSuchadressenImEndzustand, type OffeneSuche } from './13-3-suchadressen-endzustand.ts'
+import { offeneTerminSuchen } from './13-3-termin-suchen.ts'
 import { baueAuslieferung } from './13-2-auslieferung.ts'
 import { anisearchKennungen } from './anisearch-kennung.ts'
 import { schreibeSynopsenUndReichereAn } from './13-1-anreichern.ts'
 import { belegeJoynTermine } from './13-1-joyn-termine-belegt.ts'
 import { mitBelegstaerke } from '../lib/belegstaerke.ts'
 import { ergaenzeEigeneHandlungen } from './handlung-eigen-einbinden.ts'
+import { ergaenzeSaetze } from './handlung-satz-einbinden.ts'
 import { ergaenzeDeutscheFolgenzahl } from './deutsche-folgenzahl-einbinden.ts'
 import { jwNeinAnSeite } from './kanal-erbt-anbieter.ts'
 import { tonDerKanalWege } from './deutsch-nicht-gegen-sprach-termin.ts'
@@ -102,12 +105,13 @@ export function schreibeDatensatz({
   })
 
   ergaenzeEigeneHandlungen(synopses, slim, verschoben)
+  ergaenzeSaetze(synopses, new Set([...slim, ...verschoben].map((t) => t.id)))
   ergaenzeDeutscheFolgenzahl(synopses, new Map([...titles.values()].map((t) => [t.id, t.episodes])))
   const releasesVorAngebot = releases.length
   const asKennungen = anisearchKennungen([...titles.values()].map((t) => ({ id: t.id, mal: t.malId })))
   ergaenzeErstausgabeAngebot({ titles: titles.values(), releases, kennungen: asKennungen })
   schreibeListen({ slim, tmdbTitles, releases, titles, istTot })
-  schreibeSuchadressenImEndzustand(suchOffen, slim)
+  schreibeSuchadressenImEndzustand(suchOffen, slim, offeneTerminSuchen(releases, allTitles))
   ergaenzeAngebotTermine({ events, releases, ab: releasesVorAngebot, slim, titles })
   schreibeKinoZuletzt(titles, tmdbTitles)
 
@@ -120,6 +124,7 @@ export function schreibeDatensatz({
   const { newsFuerRss } = schreibeKernUndNews({ releases, events, titles, meta, bekannteSeiten })
   ergaenzeKennungen(); ergaenzeTitelRang()
   schreibeWochenDatei()
+  schreibeWorkerTermine()
   schreibePatchnotes()
   return { newsFuerRss }
 }

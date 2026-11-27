@@ -1,19 +1,29 @@
 {
- "erzeugtAm": "2026-11-26T19:24:09.198Z",
+ "erzeugtAm": "2026-11-27T18:40:55.525Z",
  "anbieter": [
   {
    "name": "Amazon",
    "plattform": "primevideo",
-   "gemeldet": 1017,
-   "gesamt": 1046,
-   "offen": 29,
-   "ohneSeite": 2,
+   "gemeldet": 1021,
+   "gesamt": 1048,
+   "offen": 27,
+   "ohneSeite": 8,
    "suchAdressen": [
+    "https://www.amazon.de/s?k=Chrono%20Crusade&i=instant-video",
+    "https://www.amazon.de/s?k=Yandere%20Dark%20Elf%3A%20She%20Chased%20Me%20All%20the%20Way%20from%20Another%20World!&i=instant-video",
+    "https://www.amazon.de/s?k=As%20a%20Reincarnated%20Aristocrat%2C%20I%E2%80%99ll%20Use%20My%20Appraisal%20Skill%20to%20Rise%20in%20the%20World%3A%20Staffel%203&i=instant-video",
+    "https://www.amazon.de/s?k=Snowball%20Earth&i=instant-video",
+    "https://www.amazon.de/s?k=Cat's%20Eye%20Season%202&i=instant-video",
+    "https://www.amazon.de/s?k=Zorros%20Geheimnis&i=instant-video",
     "https://www.amazon.de/s?k=The%20Birth%20Of%20Kitaro%20-%20Das%20Geheimnis%20von%20Gegege&i=instant-video",
     "https://www.amazon.de/s?k=Black%20Butler&i=instant-video"
    ],
-   "ziel": "https://www.amazon.de/gp/video/detail/B09JLN6S1R",
+   "ziel": "https://www.amazon.de/gp/video/detail/0OPTCDPN7UYNAUNUCD1KACDL6P",
    "ziele": [
+    {
+     "url": "https://www.amazon.de/gp/video/detail/0OPTCDPN7UYNAUNUCD1KACDL6P",
+     "titel": "A Wild Last Boss Appeared! Staffel 2 (A Wild Last Boss Appeared! Season 2)"
+    },
     {
      "url": "https://www.amazon.de/gp/video/detail/B09JLN6S1R",
      "titel": "Detektiv Conan (Detective Conan)"
@@ -35,16 +45,8 @@
      "titel": "Meine Wiedergeburt als Schleim in einer anderen Welt: Staffel 4 (That Time I Got Reincarnated as a Slime Season 4)"
     },
     {
-     "url": "https://www.amazon.de/gp/video/detail/B0FCQJPR5S",
-     "titel": "Kaiju No. 8: Mission Recon"
-    },
-    {
      "url": "https://www.amazon.de/gp/video/detail/B0DJKGJQ7K",
      "titel": "Yandere Dark Elf: She Chased Me All the Way from Another World!"
-    },
-    {
-     "url": "https://www.amazon.de/gp/video/detail/B0H11D41SV",
-     "titel": "Miss Kobayashi’s Dragon Maid: Ein einsamer Drache sehnt sich nach Liebe (Miss Kobayashi's Dragon Maid: A lonely dragon wants to be loved)"
     },
     {
      "url": "https://www.amazon.de/gp/video/detail/B0CJRZY5ND",
@@ -61,10 +63,6 @@
     {
      "url": "https://www.amazon.de/gp/video/detail/B0CJYLSY3D",
      "titel": "Golden Kamuy 4 (Golden Kamuy Season 4)"
-    },
-    {
-     "url": "https://www.amazon.de/gp/video/detail/B098JKZFBH",
-     "titel": "Made in Abyss: Die Reise beginnt (Made in Abyss: Journey's Dawn)"
     },
     {
      "url": "https://www.amazon.de/gp/video/detail/B0CHP5RVPL",
@@ -116,7 +114,7 @@
      "hinweis": "Staffeln unklar: TMDB zählt 62 Folgen insgesamt, der Anbieter kann sie anders schneiden"
     }
    ],
-   "naechster": "Detektiv Conan (Detective Conan)",
+   "naechster": "A Wild Last Boss Appeared! Staffel 2 (A Wild Last Boss Appeared! Season 2)",
    "bekannt": {
     "B0DGGZSKRM": 13,
     "B0FKZM9J6V": 25,
@@ -299,9 +297,9 @@
   {
    "name": "Netflix",
    "plattform": "netflix",
-   "gemeldet": 774,
-   "gesamt": 914,
-   "offen": 140,
+   "gemeldet": 779,
+   "gesamt": 917,
+   "offen": 138,
    "ohneSeite": 15,
    "ziel": "https://www.netflix.com/title/81608820",
    "ziele": [
@@ -312,10 +310,6 @@
     {
      "url": "https://www.netflix.com/title/81272431",
      "titel": "Numberblocks"
-    },
-    {
-     "url": "https://www.netflix.com/title/81991076",
-     "titel": "Fool Night"
     },
     {
      "url": "https://www.netflix.com/title/80107103",
@@ -329,12 +323,15 @@
      ]
     },
     {
-     "url": "https://www.netflix.com/title/81684733",
-     "titel": "Oshi no Ko: Mein Star"
+     "url": "https://www.netflix.com/title/81506915",
+     "titel": "Devil May Cry",
+     "staffeln": [
+      2
+     ]
     },
     {
-     "url": "https://www.netflix.com/title/82036361",
-     "titel": "My Hero Academia: Vigilantes Staffel 2"
+     "url": "https://www.netflix.com/title/81684733",
+     "titel": "Oshi no Ko: Mein Star"
     },
     {
      "url": "https://www.netflix.com/title/82746480",
@@ -395,6 +392,10 @@
      "staffeln": [
       1
      ]
+    },
+    {
+     "url": "https://www.netflix.com/title/81172267",
+     "titel": "Sonic X: The Metarex Saga"
     },
     {
      "url": "https://www.netflix.com/title/80193421",
@@ -667,10 +668,6 @@
     {
      "url": "https://www.netflix.com/title/81937398",
      "titel": "Pantheon"
-    },
-    {
-     "url": "https://www.netflix.com/title/82116553",
-     "titel": "Steel Ball Run: Jojo’s Bizarre Adventure - Phase 1"
     }
    ],
    "naechster": "Cosmo & Wanda – Ein neuer Wunsch",
@@ -683,7 +680,6 @@
     "80103318": 13,
     "80174918": 12,
     "80174974": 10,
-    "80186926": 6,
     "80206326": 26,
     "80212481": 13,
     "80221272": 13,
@@ -715,7 +711,6 @@
     "81442091": 12,
     "81497635": 12,
     "81499847": 13,
-    "81506915": 1,
     "81564899": 1,
     "81642998": 12,
     "81684552": 12,
@@ -985,6 +980,116 @@
     "8cc06990-0faf-4a7e-ac1f-fb74cb4b9286": 15,
     "5ecc8b00-79fd-4c1a-81ed-f44260ef38d4": 13
    }
+  },
+  {
+   "name": "Suchadressen",
+   "plattform": "suchadressen",
+   "gemeldet": 0,
+   "gesamt": 24,
+   "offen": 24,
+   "titel": 0,
+   "ohneSeite": 24,
+   "ziel": "https://www.amazon.de/s?k=Aesthetica%20of%20a%20Rogue%20Hero&i=instant-video",
+   "ziele": [
+    {
+     "url": "https://www.amazon.de/s?k=Aesthetica%20of%20a%20Rogue%20Hero&i=instant-video",
+     "titel": "Aesthetica of a Rogue Hero"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Ame%20%26%20Yuki%3A%20Die%20Wolfskinder&i=instant-video",
+     "titel": "Ame & Yuki: Die Wolfskinder"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Angel%E2%80%99s%20Egg&i=instant-video",
+     "titel": "Angel’s Egg"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=As%20a%20Reincarnated%20Aristocrat%2C%20I%E2%80%99ll%20Use%20My%20Appraisal%20Skill%20to%20Rise%20in%20the%20World%3A%20Staffel%203&i=instant-video",
+     "titel": "As a Reincarnated Aristocrat, I’ll Use My Appraisal Skill to Rise in the World: Staffel 3"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Attack%20on%20Titan&i=instant-video",
+     "titel": "Attack on Titan"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Azumanga%20Daioh&i=instant-video",
+     "titel": "Azumanga Daioh"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Cat's%20Eye%20Season%202&i=instant-video",
+     "titel": "Cat's Eye Season 2"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Chrono%20Crusade&i=instant-video",
+     "titel": "Chrono Crusade"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Der%20Junge%20und%20das%20Biest&i=instant-video",
+     "titel": "Der Junge und das Biest"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Gantz&i=instant-video",
+     "titel": "Gantz"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Gunslinger%20Girl&i=instant-video",
+     "titel": "Gunslinger Girl"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Gunslinger%20Girl%20il%20teatrino&i=instant-video",
+     "titel": "Gunslinger Girl il teatrino"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Overlord%3A%20The%20Sacred%20Kingdom&i=instant-video",
+     "titel": "Overlord: The Sacred Kingdom"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Peter%20Pan&i=instant-video",
+     "titel": "Peter Pan"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Samurai%20Girls&i=instant-video",
+     "titel": "Samurai Girls"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Snowball%20Earth&i=instant-video",
+     "titel": "Snowball Earth"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Summer%20Wars&i=instant-video",
+     "titel": "Summer Wars"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Trinity%20Blood&i=instant-video",
+     "titel": "Trinity Blood"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Trinity%20Seven%3A%20Heavens%20Library%20%26%20Crimson%20Lord&i=instant-video",
+     "titel": "Trinity Seven: Heavens Library & Crimson Lord"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Wolf%20Girl%20%26%20Black%20Prince&i=instant-video",
+     "titel": "Wolf Girl & Black Prince"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Yandere%20Dark%20Elf%3A%20She%20Chased%20Me%20All%20the%20Way%20from%20Another%20World!&i=instant-video",
+     "titel": "Yandere Dark Elf: She Chased Me All the Way from Another World!"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Your%20Forma&i=instant-video",
+     "titel": "Your Forma"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Yu-Gi-Oh!&i=instant-video",
+     "titel": "Yu-Gi-Oh!"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Zorros%20Geheimnis&i=instant-video",
+     "titel": "Zorros Geheimnis"
+    }
+   ],
+   "naechster": "Aesthetica of a Rogue Hero",
+   "hinweis": "Suchadressen ohne Titelseite: den richtigen Treffer beim Anbieter heraussuchen"
   }
  ]
 }

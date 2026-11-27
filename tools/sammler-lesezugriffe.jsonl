@@ -47,6 +47,7 @@
 {"datei":"pipeline/check-tmdb-folgen-404-lauf.ts","liest":"data/tmdb-folgen-404.json","grund":"Kulisse: schreibt und liest die Dateien im Wegwerf-Ordner AK_ROOT, nie den echten Bestand"}
 {"datei":"pipeline/check-trailer-lauf.ts","liest":"data/trailer.json","grund":"Kulisse: schreibt und liest die Dateien im Wegwerf-Ordner AK_ROOT, nie den echten Bestand"}
 {"datei":"pipeline/check-trailer-lauf.ts","liest":"data/trailer-versuche.json","grund":"Kulisse: schreibt und liest die Dateien im Wegwerf-Ordner AK_ROOT, nie den echten Bestand"}
+{"datei":"pipeline/check-trailer-lauf.ts","liest":"data/trailer-label-kanaele.json","grund":"Kulisse: schreibt und liest die Dateien im Wegwerf-Ordner AK_ROOT, nie den echten Bestand"}
 {"datei":"pipeline/check-tmdb-genre.ts","liest":"data/tmdb-titles.json","grund":"Eigenschaft über den ganzen Bestand: jede Zuordnung mit bekanntem Genre trägt Animation, kein fester Schlüssel"}
 {"datei":"pipeline/check-tmdb-hauptserie.ts","liest":"data/tmdb-titles.json","grund":"feste Kennungen nur als Verneinung (trägt keine TMDB-Kennung), fehlt ein Eintrag, bleibt der Fall grün"}
 {"datei":"pipeline/check-tmdb-hauptserie.ts","liest":"data/tmdb-banner.json","grund":"Eigenschaft über die ganze Datei (jedes Bild hat eine Kennung)"}
@@ -74,3 +75,5 @@
 {"datei":"pipeline/check-tmdb-von-hand-abgeleitet.ts","liest":"data/tmdb-titles.json","grund":"Eigenschaft über den ganzen Bestand: jede Handzeile mit tmdbId steht mit dieser Kennung im Cache nach dem Handvorrang, kein fester Schlüssel"}
 {"datei":"pipeline/check-staffel-folge-tv.ts","liest":"data/tv-programm.json","grund":"echter Fall: jede Horizonte-Sendung bekommt Staffel und Folge über ihren Folgentitel (F157), keine ohne Treffer"}
 {"datei":"pipeline/check-staffel-folge-tv.ts","liest":"data/wikipedia-folgen.json","grund":"echter Fall: Staffel/Folge der Sendung liegt an ihrer Stelle der Episodenliste (Folge in der Staffel)"}
+{"datei":"tools/worker-termine.test.ts","liest":"data/kennungen.json","grund":"Invariante über die ganze Datei: Übersetzung der Ausgabe-Kennungen gegen die echte Zuordnungstabelle (Ausschnitt gleich den vollen Dateien), kein fester Schlüssel"}
+{"datei":"tools/ak-von.test.mjs","liest":"data/kennungen.json","grund":"echte Zuordnungstabelle ist der Gegenstand des Tests: wählt Zeilen nach Eigenschaft (eigene ak-Spalte / ohne), kein fester Schlüssel; Fixture würde die Datei nicht mehr prüfen"}

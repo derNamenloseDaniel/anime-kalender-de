@@ -2020,6 +2020,10 @@
       "am": "2026-11-19",
       "vorschlaege": 1
     },
+    "1073705": {
+      "am": "2026-11-27",
+      "vorschlaege": 1
+    },
     "1073719": {
       "am": "2026-11-20",
       "vorschlaege": 0
@@ -2046,6 +2050,10 @@
       "am": "2026-11-22",
       "vorschlaege": 0,
       "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1073824": {
+      "am": "2026-11-27",
+      "vorschlaege": 0
     },
     "1073842": {
       "am": "2026-11-20",
@@ -2347,6 +2355,11 @@
       "am": "2026-11-25",
       "vorschlaege": 5
     },
+    "1076111": {
+      "am": "2026-11-27",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
     "1076120": {
       "am": "2026-11-25",
       "vorschlaege": 0
@@ -2372,6 +2385,11 @@
       "am": "2026-11-26",
       "vorschlaege": 2
     },
+    "1076318": {
+      "am": "2026-11-27",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
     "1076406": {
       "am": "2026-11-26",
       "vorschlaege": 0
@@ -2379,6 +2397,60 @@
     "1076464": {
       "am": "2026-11-26",
       "vorschlaege": 0
+    },
+    "1076510": {
+      "am": "2026-11-27",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1076668": {
+      "am": "2026-11-27",
+      "vorschlaege": 4
+    },
+    "1076693": {
+      "am": "2026-11-27",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1076694": {
+      "am": "2026-11-27",
+      "vorschlaege": 1
+    },
+    "1076796": {
+      "am": "2026-11-27",
+      "vorschlaege": 1
+    },
+    "1076950": {
+      "am": "2026-11-27",
+      "vorschlaege": 0
+    },
+    "1077056": {
+      "am": "2026-11-27",
+      "vorschlaege": 0
+    },
+    "1077111": {
+      "am": "2026-11-27",
+      "vorschlaege": 2
+    },
+    "1077302": {
+      "am": "2026-11-27",
+      "vorschlaege": 0
+    },
+    "1077491": {
+      "am": "2026-11-27",
+      "vorschlaege": 6
+    },
+    "1077542": {
+      "am": "2026-11-27",
+      "vorschlaege": 3
+    },
+    "1077600": {
+      "am": "2026-11-27",
+      "vorschlaege": 15
+    },
+    "1077624": {
+      "am": "2026-11-27",
+      "vorschlaege": 7
     }
   },
   "vorschlaege": [
@@ -17910,6 +17982,795 @@
       "quelle": "https://www.anime2you.de/news/1076257/akiba-pass-shop-sechs-polyband-neuheiten/",
       "veroeffentlicht": "2026-11-26",
       "gelesenAm": "2026-11-26"
+    },
+    {
+      "titel": "The Cat and the Dragon",
+      "zitat": "Der Streaming-Dienst Crunchyroll zeigt die Fortsetzung im Originalton mit deutschen Untertiteln im Simulcast.",
+      "art": "ankuendigung",
+      "sprache": "omu",
+      "plattform": "crunchyroll",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1076796",
+      "artikel": "Start der zweiten »The Cat and the Dragon«-Staffel + Trailer",
+      "quelle": "https://www.anime2you.de/news/1076796/the-cat-and-the-dragon-staffel-2-start/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Bocchi the Rock! – Vol. 1 (Limited Edition mit Sammelschuber)",
+      "zitat": "Bocchi the Rock! – Vol. 1 (Limited Edition mit Sammelschuber) 04.12. 18.12.",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2026-12-18",
+      "uhrzeit": null,
+      "anbieter": "AniMoon Publishing",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „AniMoon Publishing“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076668",
+      "artikel": "Vier Blu-ray-Termine von KSM Anime und AniMoon verschoben",
+      "quelle": "https://www.anime2you.de/news/1076668/ksm-animoon-vier-disc-verschiebungen/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "My Love Story with Yamada-kun at Lv999 – Vol. 2 (Limited Edition)",
+      "zitat": "My Love Story with Yamada-kun at Lv999 – Vol. 2 (Limited Edition) 18.12. 05.02.",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2027-02-05",
+      "uhrzeit": null,
+      "anbieter": "AniMoon Publishing",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „AniMoon Publishing“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076668",
+      "artikel": "Vier Blu-ray-Termine von KSM Anime und AniMoon verschoben",
+      "quelle": "https://www.anime2you.de/news/1076668/ksm-animoon-vier-disc-verschiebungen/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Sakamoto Days – Vol. 1 (Limited Edition mit Sammelschuber)",
+      "zitat": "Sakamoto Days – Vol. 1 (Limited Edition mit Sammelschuber) 04.12. 11.12.",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2026-12-11",
+      "uhrzeit": null,
+      "anbieter": "AniMoon Publishing",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „AniMoon Publishing“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076668",
+      "artikel": "Vier Blu-ray-Termine von KSM Anime und AniMoon verschoben",
+      "quelle": "https://www.anime2you.de/news/1076668/ksm-animoon-vier-disc-verschiebungen/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Die Königin der 1000 Jahre (Komplettbox)",
+      "zitat": "Die Königin der 1000 Jahre (Komplettbox) 17.12. 28.01.",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2027-01-28",
+      "uhrzeit": null,
+      "anbieter": "KSM Anime",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [
+        "anbieter „KSM Anime“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076668",
+      "artikel": "Vier Blu-ray-Termine von KSM Anime und AniMoon verschoben",
+      "quelle": "https://www.anime2you.de/news/1076668/ksm-animoon-vier-disc-verschiebungen/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Witch on the Holy Night",
+      "zitat": "Crunchyroll bringt den Film am 26. Januar 2027 in die deutschen Kinos.",
+      "art": "kino",
+      "sprache": "unklar",
+      "plattform": "kino",
+      "datum": "2027-01-26",
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [],
+      "artikelId": "1076694",
+      "artikel": "»Witch on the Holy Night« feiert große Erfolge in den japanischen Kinos",
+      "quelle": "https://www.anime2you.de/news/1076694/witch-on-the-holy-night-grosse-erfolge-in-japan/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Die Biene Maja",
+      "zitat": "»Die Biene Maja« Verfügbar ab: 15. Dezember 2026 Episoden: 104 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "rtlplus",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "RTL+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "104 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „RTL+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „rtl+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Die Biene Maja",
+      "zitat": "»Die Biene Maja« Verfügbar ab: 15. Dezember 2026 Episoden: 104 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "primevideo",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "Prime Video",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "104 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „Prime Video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „prime video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Heidi",
+      "zitat": "»Heidi« Verfügbar ab: 15. Dezember 2026 Episoden: 52 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "rtlplus",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "RTL+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "52 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „RTL+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „rtl+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Heidi",
+      "zitat": "»Heidi« Verfügbar ab: 15. Dezember 2026 Episoden: 52 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "primevideo",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "Prime Video",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "52 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „Prime Video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „prime video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Wickie und die starken Männer",
+      "zitat": "»Wickie und die starken Männer« Verfügbar ab: 15. Dezember 2026 Episoden: 78 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "rtlplus",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "RTL+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "78 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „RTL+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „rtl+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Wickie und die starken Männer",
+      "zitat": "»Wickie und die starken Männer« Verfügbar ab: 15. Dezember 2026 Episoden: 78 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "primevideo",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "Prime Video",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "78 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „Prime Video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „prime video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Pokémon Horizonte",
+      "zitat": "Hierzulande feiert die vierte Staffel von »Pokémon Horizonte« am morgigen Samstag, den 28. November 2026, um 12:55 Uhr ihre TV-Premiere im TOGGO-Programm von SUPER RTL.",
+      "art": "start",
+      "sprache": "unklar",
+      "plattform": "tv",
+      "datum": "2026-11-28",
+      "uhrzeit": "12:55",
+      "anbieter": null,
+      "sender": "TOGGO-Programm von SUPER RTL",
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Samstag",
+      "warnungen": [],
+      "artikelId": "1077542",
+      "artikel": "Neue »Pokémon«-Staffel für 2027 angekündigt + Teaser",
+      "quelle": "https://www.anime2you.de/news/1077542/pokemon-neue-staffel-fuer-2027-angekuendigt/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Hallo Kurt!",
+      "zitat": "3. Dezember 2026 Hallo Kurt! Komplettbox PIDAX · Serie DVD",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2026-12-03",
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [],
+      "artikelId": "1073705",
+      "artikel": "Anime-Neuheiten im Dezember 2026 auf DVD und Blu-ray",
+      "quelle": "https://www.anime2you.de/news/1073705/disc-neuheiten-dezember-2026/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Fafner: The Beyond",
+      "zitat": "»Fafner: The Beyond« Episoden: 12 (komplett) Sprache: Japanisch (UT)",
+      "art": "start",
+      "sprache": "omu",
+      "plattform": "crunchyroll",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "12 (komplett)",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „Crunchyroll“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „crunchyroll“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077111",
+      "artikel": "Zwei Anime-Neuzugänge ab sofort auf Crunchyroll verfügbar",
+      "quelle": "https://www.anime2you.de/news/1077111/crunchyroll-detektiv-conan-rueckkehr-und-mehr/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Detektiv Conan",
+      "zitat": "»Detektiv Conan« – Episode 484 bis 486 Episoden: 484 bis 486 Sprache: Deutsch, Japanisch (UT)",
+      "art": "folgen",
+      "sprache": "deutsch+omu",
+      "plattform": "crunchyroll",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "484 bis 486",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „Crunchyroll“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „crunchyroll“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077111",
+      "artikel": "Zwei Anime-Neuzugänge ab sofort auf Crunchyroll verfügbar",
+      "quelle": "https://www.anime2you.de/news/1077111/crunchyroll-detektiv-conan-rueckkehr-und-mehr/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Rascal Does Not Dream of Bunny Girl Senpai",
+      "zitat": "5. Dezember: »Rascal Does Not Dream of Bunny Girl Senpai« Episoden: 13 (komplett) Sprache: Deutsch, Japanisch (UT)",
+      "art": "start",
+      "sprache": "deutsch+omu",
+      "plattform": "adn",
+      "datum": "2026-12-05",
+      "uhrzeit": null,
+      "anbieter": "ADN",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "13 (komplett)",
+      "unsicher": null,
+      "wochentag": "Samstag",
+      "warnungen": [
+        "anbieter „ADN“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „adn“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077624",
+      "artikel": "ADN kündigt sieben Anime-Neuzugänge für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077624/adn-neuzugaenge-im-dezember-2026/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Angel Beats!",
+      "zitat": "10. Dezember: »Angel Beats!« Episoden: 13 (komplett) Sprache: Deutsch, Japanisch (UT)",
+      "art": "start",
+      "sprache": "deutsch+omu",
+      "plattform": "adn",
+      "datum": "2026-12-10",
+      "uhrzeit": null,
+      "anbieter": "ADN",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "13 (komplett)",
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [
+        "anbieter „ADN“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „adn“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077624",
+      "artikel": "ADN kündigt sieben Anime-Neuzugänge für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077624/adn-neuzugaenge-im-dezember-2026/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Eromanga Sensei",
+      "zitat": "15. Dezember: »Eromanga Sensei« Episoden: 12 (komplett) Sprache: Deutsch, Japanisch (UT)",
+      "art": "start",
+      "sprache": "deutsch+omu",
+      "plattform": "adn",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "ADN",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "12 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „ADN“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „adn“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077624",
+      "artikel": "ADN kündigt sieben Anime-Neuzugänge für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077624/adn-neuzugaenge-im-dezember-2026/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Durarara!!",
+      "zitat": "21. Dezember: »Durarara!!« Episoden: 26 (inklusive Specials) Sprache: Deutsch, Japanisch (UT)",
+      "art": "start",
+      "sprache": "deutsch+omu",
+      "plattform": "adn",
+      "datum": "2026-12-21",
+      "uhrzeit": null,
+      "anbieter": "ADN",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "26 (inklusive Specials)",
+      "unsicher": null,
+      "wochentag": "Montag",
+      "warnungen": [
+        "anbieter „ADN“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „adn“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077624",
+      "artikel": "ADN kündigt sieben Anime-Neuzugänge für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077624/adn-neuzugaenge-im-dezember-2026/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Durarara!! x2",
+      "zitat": "21. Dezember: »Durarara!! x2« Episoden: 39 (inklusive Specials) Sprache: Japanisch (UT)",
+      "art": "start",
+      "sprache": "omu",
+      "plattform": "adn",
+      "datum": "2026-12-21",
+      "uhrzeit": null,
+      "anbieter": "ADN",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "39 (inklusive Specials)",
+      "unsicher": null,
+      "wochentag": "Montag",
+      "warnungen": [
+        "anbieter „ADN“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „adn“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077624",
+      "artikel": "ADN kündigt sieben Anime-Neuzugänge für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077624/adn-neuzugaenge-im-dezember-2026/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Reborn!",
+      "zitat": "28. Dezember: »Reborn!« – Episode 154 bis 203 Episoden: 50 Sprache: Japanisch (UT)",
+      "art": "start",
+      "sprache": "omu",
+      "plattform": "adn",
+      "datum": "2026-12-28",
+      "uhrzeit": null,
+      "anbieter": "ADN",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "154 bis 203",
+      "unsicher": "Artikel nennt nur die letzten 50 Episoden (154 bis 203) als Neuzugang bei ADN; ob frühere Episoden dort schon liefen, steht nicht im Artikel.",
+      "wochentag": "Montag",
+      "warnungen": [
+        "anbieter „ADN“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „adn“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077624",
+      "artikel": "ADN kündigt sieben Anime-Neuzugänge für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077624/adn-neuzugaenge-im-dezember-2026/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Reborn! Hier kommt eine Klassenfahrt im Vongola-Stil!",
+      "zitat": "28. Dezember: »Reborn! Hier kommt eine Klassenfahrt im Vongola-Stil!« Laufzeit: circa 27 Minuten Sprache: Japanisch (UT)",
+      "art": "start",
+      "sprache": "omu",
+      "plattform": "adn",
+      "datum": "2026-12-28",
+      "uhrzeit": null,
+      "anbieter": "ADN",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Montag",
+      "warnungen": [
+        "anbieter „ADN“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „adn“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077624",
+      "artikel": "ADN kündigt sieben Anime-Neuzugänge für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077624/adn-neuzugaenge-im-dezember-2026/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Kikis kleiner Lieferservice",
+      "zitat": "24. Dezember um 09:10 Uhr: »Kikis kleiner Lieferservice« Laufzeit: 103 Minuten Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "tv",
+      "datum": "2026-12-24",
+      "uhrzeit": "09:10",
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [
+        "sender „ProSieben MAXX“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077600",
+      "artikel": "ProSieben MAXX zeigt 13 Anime-Filme zu Weihnachten 2026",
+      "quelle": "https://www.anime2you.de/news/1077600/prosieben-maxx-weihnachten-2026-filme/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Ponyo – Das große Abenteuer am Meer",
+      "zitat": "24. Dezember um 11:05 Uhr: »Ponyo – Das große Abenteuer am Meer« Laufzeit: 101 Minuten Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "tv",
+      "datum": "2026-12-24",
+      "uhrzeit": "11:05",
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [
+        "sender „ProSieben MAXX“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077600",
+      "artikel": "ProSieben MAXX zeigt 13 Anime-Filme zu Weihnachten 2026",
+      "quelle": "https://www.anime2you.de/news/1077600/prosieben-maxx-weihnachten-2026-filme/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Tränen der Erinnerung",
+      "zitat": "24. Dezember um 12:55 Uhr: »Tränen der Erinnerung« Laufzeit: 118 Minuten Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "tv",
+      "datum": "2026-12-24",
+      "uhrzeit": "12:55",
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [
+        "sender „ProSieben MAXX“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077600",
+      "artikel": "ProSieben MAXX zeigt 13 Anime-Filme zu Weihnachten 2026",
+      "quelle": "https://www.anime2you.de/news/1077600/prosieben-maxx-weihnachten-2026-filme/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Die Legende der Prinzessin Kaguya",
+      "zitat": "24. Dezember um 15:10 Uhr: »Die Legende der Prinzessin Kaguya« Laufzeit: 137 Minuten Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "tv",
+      "datum": "2026-12-24",
+      "uhrzeit": "15:10",
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [
+        "sender „ProSieben MAXX“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077600",
+      "artikel": "ProSieben MAXX zeigt 13 Anime-Filme zu Weihnachten 2026",
+      "quelle": "https://www.anime2you.de/news/1077600/prosieben-maxx-weihnachten-2026-filme/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Stimme des Herzens",
+      "zitat": "24. Dezember um 17:45 Uhr: »Stimme des Herzens« Laufzeit: 111 Minuten Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "tv",
+      "datum": "2026-12-24",
+      "uhrzeit": "17:45",
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [
+        "sender „ProSieben MAXX“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077600",
+      "artikel": "ProSieben MAXX zeigt 13 Anime-Filme zu Weihnachten 2026",
+      "quelle": "https://www.anime2you.de/news/1077600/prosieben-maxx-weihnachten-2026-filme/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Prinzessin Mononoke",
+      "zitat": "24. Dezember um 19:55 Uhr: »Prinzessin Mononoke« Laufzeit: 134 Minuten Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "tv",
+      "datum": "2026-12-24",
+      "uhrzeit": "19:55",
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [
+        "sender „ProSieben MAXX“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077600",
+      "artikel": "ProSieben MAXX zeigt 13 Anime-Filme zu Weihnachten 2026",
+      "quelle": "https://www.anime2you.de/news/1077600/prosieben-maxx-weihnachten-2026-filme/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Prinzessin Mononoke",
+      "zitat": "24. Dezember um 19:55 Uhr: »Prinzessin Mononoke« Laufzeit: 134 Minuten Sprache: Deutsch Wiederholung: 25. Dezember 2026 um 03:05 Uhr",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "tv",
+      "datum": "2026-12-25",
+      "uhrzeit": "03:05",
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": "Zweite Ausstrahlung als Wiederholung der Erstausstrahlung vom 24. Dezember.",
+      "wochentag": "Freitag",
+      "warnungen": [
+        "sender „ProSieben MAXX“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077600",
+      "artikel": "ProSieben MAXX zeigt 13 Anime-Filme zu Weihnachten 2026",
+      "quelle": "https://www.anime2you.de/news/1077600/prosieben-maxx-weihnachten-2026-filme/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Digimon Adventure tri. Chapter 1 – Reunion",
+      "zitat": "25. Dezember um 07:35 Uhr: »Digimon Adventure tri. Chapter 1 – Reunion« Laufzeit: 96 Minuten Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "tv",
+      "datum": "2026-12-25",
+      "uhrzeit": "07:35",
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "sender „ProSieben MAXX“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077600",
+      "artikel": "ProSieben MAXX zeigt 13 Anime-Filme zu Weihnachten 2026",
+      "quelle": "https://www.anime2you.de/news/1077600/prosieben-maxx-weihnachten-2026-filme/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Digimon Adventure tri. Chapter 1 – Reunion",
+      "zitat": "25. Dezember um 07:35 Uhr: »Digimon Adventure tri. Chapter 1 – Reunion« Laufzeit: 96 Minuten Sprache: Deutsch Wiederholung: 26. Dezember 2026 um 05:45 Uhr",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "tv",
+      "datum": "2026-12-26",
+      "uhrzeit": "05:45",
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": "Zweite Ausstrahlung als Wiederholung der Erstausstrahlung vom 25. Dezember.",
+      "wochentag": "Samstag",
+      "warnungen": [
+        "sender „ProSieben MAXX“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077600",
+      "artikel": "ProSieben MAXX zeigt 13 Anime-Filme zu Weihnachten 2026",
+      "quelle": "https://www.anime2you.de/news/1077600/prosieben-maxx-weihnachten-2026-filme/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Digimon Adventure tri. Chapter 2 – Determination",
+      "zitat": "25. Dezember um 09:10 Uhr: »Digimon Adventure tri. Chapter 2 – Determination« Laufzeit: 88 Minuten Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "tv",
+      "datum": "2026-12-25",
+      "uhrzeit": "09:10",
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "sender „ProSieben MAXX“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077600",
+      "artikel": "ProSieben MAXX zeigt 13 Anime-Filme zu Weihnachten 2026",
+      "quelle": "https://www.anime2you.de/news/1077600/prosieben-maxx-weihnachten-2026-filme/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Digimon Adventure tri. Chapter 2 – Determination",
+      "zitat": "25. Dezember um 09:10 Uhr: »Digimon Adventure tri. Chapter 2 – Determination« Laufzeit: 88 Minuten Sprache: Deutsch Wiederholung: 26. Dezember 2026 um 07:25 Uhr",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "tv",
+      "datum": "2026-12-26",
+      "uhrzeit": "07:25",
+      "anbieter": null,
+      "sender": "ProSieben MAXX",
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": "Zweite Ausstrahlung als Wiederholung der Erstausstrahlung vom 25. Dezember.",
+      "wochentag": "Samstag",
+      "warnungen": [
+        "sender „ProSieben MAXX“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077600",
+      "artikel": "ProSieben MAXX zeigt 13 Anime-Filme zu Weihnachten 2026",
+      "quelle": "https://www.anime2you.de/news/1077600/prosieben-maxx-weihnachten-2026-filme/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
     }
   ]
 }

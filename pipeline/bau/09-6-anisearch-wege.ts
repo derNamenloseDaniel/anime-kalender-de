@@ -181,7 +181,7 @@ export function ergaenzeAnisearchWege({
 
   ergaenzeCrWegeAusKatalog({ titles, crAdresseZu, crKatalogDeutsch, adressKern, frueherEntfernt, toteCrSerien, belegFuer, lautPruefungTot })
 
-  ergaenzeKanalUndKaufWege({ titles, anisearch, checks, adressKern, frueherEntfernt })
+  ergaenzeKanalUndKaufWege({ titles, anisearch, checks, adressKern, frueherEntfernt, lautPruefungTot })
 
   bewerteErgaenzteWegeNach({ crDub, titles, belegFuer, crOffeneBefunde, crSerienJeKennung, adnArchiv, adnStreamSchaerfen, verweiseEntfernt })
 }

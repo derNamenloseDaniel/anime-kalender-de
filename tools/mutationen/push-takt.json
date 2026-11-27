@@ -148,7 +148,7 @@
     "aenderungen": [
       {
         "datei": "worker/src/index.ts",
-        "suche": "pushStuendlich(env, now, () => loadEvents(env), () => loadNews(env))\n        .then((msg) => console.log(`[push] ${msg}`))",
+        "suche": "pushStuendlich(env, now, termine, quelle.weitere)\n        .then((msg) => console.log(`[push] ${msg}`))",
         "ersetze": "Promise.resolve('aus')\n        .then((msg) => console.log(`[push] ${msg}`))"
       }
     ]
@@ -178,8 +178,8 @@
     "aenderungen": [
       {
         "datei": "worker/src/push-takt.ts",
-        "suche": "weitereAusNews(news))",
-        "ersetze": "[])"
+        "suche": "pushIstErschienen, weitere)",
+        "ersetze": "pushIstErschienen, [])"
       }
     ]
   },
@@ -288,8 +288,8 @@
     "aenderungen": [
       {
         "datei": "worker/src/push-takt.ts",
-        "suche": "ereignisse, pushIstErschienen, weitereAusNews",
-        "ersetze": "ereignisse, (e, z) => istErschienen(e, z), weitereAusNews"
+        "suche": "ereignisse, pushIstErschienen, weitere)",
+        "ersetze": "ereignisse, (e, z) => istErschienen(e, z), weitere)"
       },
       {
         "datei": "worker/src/push-takt.ts",

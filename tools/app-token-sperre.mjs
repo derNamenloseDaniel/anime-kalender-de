@@ -27,7 +27,12 @@ export const TOKEN_JOBS = {
   'claude-anime2you-extraktion.yml': { lesen: 'quellen-pr' },
   'claude-verpasst-recherche.yml': { recherchieren: 'quellen-pr' },
   'claude-wache-urteil.yml': { urteilen: 'quellen-pr' },
+  'cloud-abgabe.yml': { abgeben: 'cloud-abgabe' },
 }
+/* cloud-abgabe: nur `node tools/cloud-abgabe.mjs "$ZWEIG"` (Skript aus main, Zweigname über env); das Token trägt kein contents: write (Workflow-Test). */
+const CLOUD_ABGABE_ENV = ['GH_TOKEN', 'ZWEIG']
+const CLOUD_ABGABE_ZWEIG = '${{ github.event.inputs.zweig || github.ref_name }}'
+const CLOUD_ABGABE_RUN = 'node tools/cloud-abgabe.mjs "$ZWEIG"'
 
 const MERGEN_RUNS = ['bash tools/daten-pr-mergen.sh $NUMMERN', 'bash tools/daten-pr-mergen.sh ${NUMMERN//,/ }']
 const ANMELDUNG = [
@@ -45,6 +50,10 @@ const EINREICHEN_SCHLUESSEL = ['name', 'id', 'if', 'uses', 'with']
 const RUN_SCHLUESSEL = ['name', 'id', 'if', 'env', 'run', 'continue-on-error', 'timeout-minutes']
 const ENV_SCHLUESSEL = ['GH_TOKEN', 'FUND_DIR', 'NUMMERN']
 
+/* Rechte, die die Installation der Daten-App hat; jedes weitere `permission-*` an einem App-Token-Schritt ergibt HTTP 422 „The permissions requested are not granted to this installation.“
+ * (Beleg: cloud-abgabe.yml mit `permission-issues`, Lauf 46052330705, 27.11.2026). Erweitert wird die Liste erst, wenn die App-Einstellungen das Recht tragen. */
+export const APP_RECHTE = ['contents', 'pull-requests', 'workflows']
+
 const usesAlsPfad = (u) => String(u ?? '').replace(/@.*$/, '').replace(/^\.\//, '').replace(/\/$/, '')
 const istAppSchritt = (s) => String(s?.uses ?? '').includes('create-github-app-token')
 
@@ -58,6 +67,13 @@ function blaetter(wert, pfad = [], aus = []) {
     }
   }
   return aus
+}
+
+/** Regel 4: Ein App-Token-Schritt fordert nur Rechte an, die die Installation hat. */
+function pruefeRechte(ort, schritte) {
+  return schritte.filter(istAppSchritt).flatMap((s) =>
+    Object.keys(s.with ?? {}).filter((k) => k.startsWith('permission-') && !APP_RECHTE.includes(k.slice('permission-'.length)))
+      .map((k) => `${ort}: fordert ${k} an, die Installation der Daten-App hat nur ${APP_RECHTE.join(', ')} (422) — APP_RECHTE in tools/app-token-sperre.mjs`))
 }
 
 /** Regel 1: Wo die Secrets der App stehen dürfen. */
@@ -85,7 +101,12 @@ function formFehler(art, s, ausdruck) {
   }
   const fehler = []
   if (Object.keys(s).some((k) => !RUN_SCHLUESSEL.includes(k))) fehler.push(`nur die Schlüssel ${RUN_SCHLUESSEL.join(', ')}`)
-  if (s.env?.GH_TOKEN !== ausdruck || Object.keys(s.env ?? {}).some((k) => !ENV_SCHLUESSEL.includes(k))) fehler.push(`env nur ${ENV_SCHLUESSEL.join(', ')}, GH_TOKEN genau ${ausdruck}`)
+  const envSchluessel = art === 'cloud-abgabe' ? CLOUD_ABGABE_ENV : ENV_SCHLUESSEL
+  if (s.env?.GH_TOKEN !== ausdruck || Object.keys(s.env ?? {}).some((k) => !envSchluessel.includes(k))) fehler.push(`env nur ${envSchluessel.join(', ')}, GH_TOKEN genau ${ausdruck}`)
+  if (art === 'cloud-abgabe') {
+    const ok = s.env?.ZWEIG === CLOUD_ABGABE_ZWEIG && String(s.run ?? '').trim() === CLOUD_ABGABE_RUN
+    return ok ? fehler : [...fehler, `env.ZWEIG genau ${CLOUD_ABGABE_ZWEIG} und run genau ${CLOUD_ABGABE_RUN}`]
+  }
   const zeilen = String(s.run ?? '').trim().split('\n').map((z) => z.trim())
   const passt =
     art === 'daten-pr-mergen'
@@ -158,7 +179,12 @@ function pruefeAktionen(aktionen) {
 /** Eingabe: `workflows`, `aktionen` (Name → geparstes YAML). Ausgabe: Fehlertexte, leer = in Ordnung. */
 export function pruefeAppToken({ workflows, aktionen }) {
   return [
-    ...Object.entries(workflows).flatMap(([datei, doc]) => [...pruefeSecrets(datei, doc), ...pruefeTokenJobs(datei, doc)]),
+    ...Object.entries(workflows).flatMap(([datei, doc]) => [
+      ...pruefeSecrets(datei, doc),
+      ...pruefeTokenJobs(datei, doc),
+      ...Object.entries(doc.jobs ?? {}).flatMap(([job, j]) => pruefeRechte(`${datei}: Job ${job}`, j.steps ?? [])),
+    ]),
     ...pruefeAktionen(aktionen),
+    ...Object.entries(aktionen).flatMap(([name, doc]) => pruefeRechte(`.github/actions/${name}`, doc?.runs?.steps ?? [])),
   ]
 }

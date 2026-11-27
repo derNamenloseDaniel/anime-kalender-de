@@ -1,0 +1,45 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Watashi_no_Shiawase_na_Kekkon (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Watashi_no_Shiawase_na_Kekkon&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+{| class="wikitable"
+!Rolle
+!japanische Stimme ([[Seiyū]])
+!deutsche Stimme
+|-
+|Miyo Saimori
+|[[Reina Ueda]]
+|[[Laura Maire]]
+|-
+|Kiyoka Kudo
+|[[Kaito Ishikawa]]
+|[[Patrick Roche]]
+|-
+|Yurie
+|[[Hōko Kuwashima]]
+|Alisa-Palmer Stoll
+|-
+|Minoru Tatsuishi
+|Kenyū Horiuchi
+|[[Andreas Borcherding]]
+|-
+|Kaya Saimori
+|Ayane Sakura
+|[[Farina Brock]]
+|-
+|Koji Tatsuishi
+|Kōtarō Nishiyama
+|[[Maximilian Belle]]
+|-
+|Yoshito Godo
+|[[Hiro Shimono]]
+|Mio Lechenmayr
+|-
+|Kanoko Saimori
+|Kana Ueda
+|[[Sonja Reichelt]]
+|-
+|Shinichi Saimori
+|Hiroshi Yanaka
+|Stefan Lehnen
+|}

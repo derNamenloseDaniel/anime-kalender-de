@@ -2,6 +2,8 @@
 # Stand 22.11.2026, Zuordnung von Hand an den Tabellenköpfen und titles.json (Kennung, Format, jpYear) geprüft.
 # Quelle de.wikipedia, Lizenz CC BY-SA 4.0 (Quellennennung mit Link auf die Versionsgeschichte der Seite).
 # fassung: Teilzeichenkette im `zusatz` der Stimme (Spaltenüberschrift oder <small>-Vermerk); fehlt sie, gilt die ganze Tabelle.
+# unsicher: Grund, warum die Tabelle diesen Titel nur vermutlich trägt (Film, OVA, Special oder Staffel nicht in der Tabelle genannt);
+#   fehlt das Feld, nennt die Tabelle den Titel selbst. Stand 26.11.2026: 44 weitere Seiten, Zuordnung an Seitentext und Tabellenkopf geprüft.
 # Noch ohne Bau-Anschluss; die Fixtures liegen unter pipeline/fixtures/wikipedia-sprecher/.
 - seite: Yū Yū Hakusho
   fixture: yu-yu-hakusho.wikitext
@@ -13,6 +15,10 @@
   titel:
     - id: 287
       fassung: 1. Serie (2001)
+    # Baki: Staatsfeind Nummer 1 (SPECIAL 2002), Zusammenschnitt der 1. Serie
+    - id: 10015206
+      fassung: 1. Serie (2001)
+      unsicher: Special nicht genannt
     - id: 97888
       fassung: 2. Serie (2018)
 - seite: Meisterdetektiv Ron Kamonohashi
@@ -20,6 +26,9 @@
   # Die Tabelle nennt nur japanische Sprecher: keine deutsche Spalte, nichts zu übernehmen.
   titel:
     - id: 158926
+    # Meisterdetektiv Ron Kamonohashi: Staffel 2 (TV 2026)
+    - id: 172355
+      unsicher: Staffel 2 nicht genannt
 - seite: Ranma ½
   fixture: ranma.wikitext
   titel:
@@ -27,3 +36,507 @@
       fassung: alte Serie
     - id: 178533
       fassung: neue Serie
+    # Ranma 1/2: Staffel 3 (TV 2026)
+    - id: 209872
+      fassung: neue Serie
+      unsicher: Tabelle trennt keine Staffeln der neuen Serie
+- seite: Attack on Titan
+  fixture: attack-on-titan.wikitext
+  titel:
+    # Attack on Titan: The Last Attack (MOVIE 2024)
+    - id: 10019527
+      unsicher: "Film nicht genannt (Tabelle: Staffel 1–4 und OVA)"
+- seite: Cells at Work!
+  fixture: cells-at-work.wikitext
+  titel:
+    # Cells at Work!: Mini-Specials (SPECIAL 2018)
+    - id: 109085
+      unsicher: "Mini-Specials nicht genannt (Tabelle: beide Staffeln)"
+- seite: Digimon Adventure tri.
+  fixture: digimon-adventure-tri.wikitext
+  titel:
+    # Digimon Adventure tri. Chapter 4: Lost (MOVIE 2017)
+    - id: 97734
+      unsicher: "Quellen der Tabelle: Synchronkartei Kapitel 1 und 2"
+    # Digimon Adventure tri. Chapter 5: Coexistence (MOVIE 2017)
+    - id: 98402
+      unsicher: "Quellen der Tabelle: Synchronkartei Kapitel 1 und 2"
+    # Digimon Adventure tri. - Chapter 6: Our Future (MOVIE 2018)
+    - id: 100181
+      unsicher: "Quellen der Tabelle: Synchronkartei Kapitel 1 und 2"
+- seite: Free!
+  fixture: free.wikitext
+  titel:
+    # Free! The Final Stroke - The First Volume (MOVIE 2021)
+    - id: 107203
+    # Free! The Final Stroke - The Second Volume (MOVIE 2022)
+    - id: 133124
+    # Free! Timeless Medley: The Promise (MOVIE 2017)
+    - id: 98496
+- seite: Fullmetal Alchemist
+  fixture: fullmetal-alchemist.wikitext
+  titel:
+    # Fullmetal Alchemist: Brotherhood - OVA Collection (OVA 2009)
+    - id: 6421
+      unsicher: "OVA nicht genannt (Tabelle: Brotherhood)"
+- seite: Girls und Panzer
+  fixture: girls-und-panzer.wikitext
+  titel:
+    # Girls & Panzer OVA (SPECIAL 2013)
+    - id: 15811
+      unsicher: OVA nicht genannt
+    # Girls und Panzer - Das Finale: Teil 3 (MOVIE 2021)
+    - id: 124115
+      unsicher: Film nicht genannt
+    # Girls und Panzer - Das Finale: Teil 4 (MOVIE 2023)
+    - id: 132420
+      unsicher: Film nicht genannt
+- seite: Gurren Lagann
+  fixture: gurren-lagann.wikitext
+  titel:
+    # Gurren Lagann: Es gibt ein paar Dinge, die ich unbedingt sehen muss (SPECIAL 2008)
+    - id: 10019260
+      unsicher: Special nicht genannt
+- seite: Haikyu!!
+  fixture: haikyu.wikitext
+  titel:
+    # Haikyu!! Movie 1 - Ende und Anfang (MOVIE 2015)
+    - id: 21120
+      unsicher: Film nicht genannt
+    # Haikyu!! Movie 3 - Talent Und Gespür (MOVIE 2017)
+    - id: 98884
+      unsicher: Film nicht genannt
+    # Haikyu!! Movie 4 - Ein Kampf der Konzepte (MOVIE 2017)
+    - id: 98885
+      unsicher: Film nicht genannt
+    # Haikyu!! Sonderbeitrag: Die Jugend beim Frühlingsturnier (OVA 2017)
+    - id: 107351
+      unsicher: OVA nicht genannt
+- seite: Jujutsu Kaisen
+  fixture: jujutsu-kaisen.wikitext
+  titel:
+    # Jujutsu Kaisen: Hidden Inventory / Premature Death - The Movie (MOVIE 2025)
+    - id: 192809
+      unsicher: Film nicht genannt
+- seite: Kabaneri of the Iron Fortress
+  fixture: kabaneri-of-the-iron-fortress.wikitext
+  titel:
+    # Kabaneri of the Iron Fortress: Brennendes Leben (MOVIE 2017)
+    - id: 98663
+      unsicher: Film nicht genannt
+    # Kabaneri of the Iron Fortress: Gebündeltes Licht (MOVIE 2016)
+    - id: 98662
+      unsicher: Film nicht genannt
+- seite: Kaiju No. 8
+  fixture: kaiju-no-8.wikitext
+  titel:
+    # Kaiju No. 8: Hoshinas freier Tag (SPECIAL 2025)
+    - id: 179999
+      unsicher: "Special nicht genannt (Tabelle: Staffel 1 und 2)"
+    # Kaiju No. 8: Mission Recon (MOVIE 2025)
+    - id: 179998
+      unsicher: "Film nicht genannt (Tabelle: Staffel 1 und 2)"
+    # Kaiju No. 8: Narumi’s Week at Work (SPECIAL 2026)
+    - id: 204431
+      unsicher: "Special nicht genannt (Tabelle: Staffel 1 und 2)"
+- seite: Kuroko’s Basketball
+  fixture: kuroko-s-basketball.wikitext
+  titel:
+    # Kuroko’s Basketball - Winter Cup Highlights Movie 1 Shadow and Light (MOVIE 2016)
+    - id: 102093
+      unsicher: Film nicht genannt
+    # Kuroko’s Basketball - Winter Cup Highlights Movie 2 Beyond the Tears (MOVIE 2016)
+    - id: 102836
+      unsicher: Film nicht genannt
+    # Kuroko’s Basketball - Winter Cup Highlights Movie 3 Crossing the Door (MOVIE 2016)
+    - id: 102839
+      unsicher: Film nicht genannt
+    # Kuroko’s Basketball: Das Beste Geschenk (SPECIAL 2015)
+    - id: 21235
+      unsicher: Special nicht genannt
+- seite: Mushoku Tensei
+  fixture: mushoku-tensei.wikitext
+  titel:
+    # Mushoku Tensei: Jobless Reincarnation - Staffel 2 Cour 2 (TV 2024)
+    - id: 166873
+    # Mushoku Tensei: Jobless Reincarnation - Eris auf Goblinjagd (SPECIAL 2022)
+    - id: 141534
+      unsicher: "Special nicht genannt (Tabelle: Staffel 1 und 2)"
+- seite: My Hero Academia
+  fixture: my-hero-academia.wikitext
+  titel:
+    # My Hero Academia: Das todesmutige Überlebenstraining (ONA 2020)
+    - id: 122349
+      unsicher: ONA nicht genannt
+    # My Hero Academia: Memories (SPECIAL 2024)
+    - id: 10019221
+      unsicher: Special nicht genannt
+    # My Hero Academia: Yuei Heroes Battle (OVA 2023)
+    - id: 169402
+      unsicher: OVA nicht genannt
+    # My Hero Academia: More (SPECIAL 2026)
+    - id: 204356
+      unsicher: Special nicht genannt
+    # My Hero Academia: I Am a Hero Too (SPECIAL 2026)
+    - id: 211711
+      unsicher: Special nicht genannt
+- seite: Re:Zero – Starting Life in Another World
+  fixture: re-zero-starting-life-in-another-world.wikitext
+  titel:
+    # Re:Zero - Starting Life in Another World: Director’s Cut (TV 2020)
+    - id: 10014867
+      unsicher: "Director’s Cut: Schnittfassung der Staffel 1, Fassung nicht genannt"
+- seite: Tensei Shitara Slime Datta Ken
+  fixture: tensei-shitara-slime-datta-ken.wikitext
+  titel:
+    # Meine Wiedergeburt als Schleim in einer anderen Welt: Nebengeschichte - Luminas’ Erinnerungen (SPECIAL 2024)
+    - id: 10019810
+      unsicher: Special nicht genannt
+    # Meine Wiedergeburt als Schleim in einer anderen Welt: Veldoras Tagebuch 2 (SPECIAL 2021)
+    - id: 10016435
+      unsicher: Special nicht genannt
+- seite: Urusei Yatsura
+  fixture: urusei-yatsura.wikitext
+  titel:
+    # Urusei Yatsura: Staffel 2 (TV 2024)
+    - id: 155645
+      unsicher: Tabelle trennt keine Staffeln
+- seite: Detektiv Conan
+  fixture: detektiv-conan.wikitext
+  titel:
+    # Detektiv Conan: Der gefallene Engel des Highways (MOVIE 2026)
+    - id: 198369
+      unsicher: Tabelle trennt Serie und Filme/TV-Specials in zwei Spalten, Film 28 nicht genannt
+- seite: Made in Abyss
+  fixture: made-in-abyss.wikitext
+  titel:
+    # Made in Abyss: Die Reise beginnt (MOVIE 2019)
+    - id: 101343
+      unsicher: Film nicht genannt
+    # Made in Abyss: Gefährten der Dämmerung (MOVIE 2019)
+    - id: 101344
+      unsicher: Film nicht genannt
+    # Made in Abyss: Mit Papa (SPECIAL 2022)
+    - id: 153791
+      unsicher: Special nicht genannt
+- seite: Maken-Ki
+  fixture: maken-ki.wikitext
+  titel:
+    # Maken-ki! Geheimes Training (SPECIAL 2011)
+    - id: 12449
+      unsicher: Special nicht genannt
+    # Maken-ki! OVA (OVA 2012)
+    - id: 11209
+      unsicher: OVA nicht genannt
+    # Maken-ki! Privates (SPECIAL 2014)
+    - id: 20750
+      unsicher: Special nicht genannt
+- seite: Mob Psycho 100
+  fixture: mob-psycho-100.wikitext
+  titel:
+    # Mob Psycho 100 Reigen: Der Unbekannte Typ mit Kräften (OVA 2018)
+    - id: 100353
+      unsicher: OVA nicht genannt
+- seite: Shakugan no Shana
+  fixture: shakugan-no-shana.wikitext
+  titel:
+    # Shakugan no Shana S (OVA 2009)
+    - id: 6572
+      unsicher: OVA nicht genannt
+- seite: Mirai Nikki
+  fixture: mirai-nikki.wikitext
+  titel:
+    # Mirai Nikki OVA 2 (OVA 2010)
+    - id: 8460
+      unsicher: OVA nicht genannt
+- seite: My-HiME
+  fixture: my-hime.wikitext
+  titel:
+    # My-Hime: Mini-Episoden (SPECIAL 2005)
+    - id: 673
+      unsicher: Mini-Episoden nicht genannt
+- seite: Junjo Romantica
+  fixture: junjo-romantica.wikitext
+  titel:
+    # Junjo Romantica 3 (TV 2015)
+    - id: 20796
+      unsicher: Staffel 3 nicht genannt
+- seite: Kage no Jitsuryokusha ni Naritakute!
+  fixture: kage-no-jitsuryokusha-ni-naritakute.wikitext
+  titel:
+    # The Eminence in Shadow: Mini Episoden (ONA 2022)
+    - id: 156001
+      unsicher: Mini-Episoden nicht genannt
+- seite: Chūnibyō Demo Koi ga Shitai!
+  fixture: chunibyo-demo-koi-ga-shitai.wikitext
+  titel:
+    # Love, Chunibyo & Other Delusions: Heart Throb - Offenbarung des wahren Auges des bösen Königs … Wiederholung (OVA 2014)
+    - id: 20889
+      unsicher: OVA nicht genannt
+- seite: Dungeon ni Deai o Motomeru no wa Machigatteiru Darō ka
+  fixture: dungeon-ni-deai-o-motomeru-no-wa-machigatteiru-daro-ka.wikitext
+  titel:
+    # Danmachi: Is It Wrong to Try to Pick Up Girls in a Dungeon? Familia Myth II: Episode 0 (SPECIAL 2019)
+    - id: 10014497
+      unsicher: "Special nicht genannt (Tabelle: Staffeln, OVA-Film, Sword Oratoria, Film)"
+- seite: Fire Force
+  fixture: fire-force.wikitext
+  titel:
+    # Fire Force Staffel 2 Miniepisoden (ONA 2021)
+    - id: 128390
+      unsicher: "Miniepisoden nicht genannt (Tabelle: Staffel 1–3)"
+- seite: Given (Manga)
+  fixture: given-manga.wikitext
+  titel:
+    # Given: The Movie (MOVIE 2020)
+    - id: 111734
+      unsicher: Film nicht genannt
+    # Given: The Movie - Hiiragi Mix (MOVIE 2024)
+    - id: 162987
+      unsicher: Film nicht genannt
+    # Given: The Movie - To the Sea (MOVIE 2024)
+    - id: 175199
+      unsicher: Film nicht genannt
+- seite: One Piece (Anime)
+  fixture: one-piece-anime.wikitext
+  titel:
+    # One Piece Fan Letter (SPECIAL 2024)
+    - id: 182469
+      unsicher: Special nicht genannt
+- seite: "Persona 5: The Animation"
+  fixture: persona-5-the-animation.wikitext
+  titel:
+    # Persona 5 the Animation: Ein Beweis für die Gerechtigkeit (OVA 2019)
+    - id: 109418
+      unsicher: OVA nicht genannt
+    # Persona 5 the Animation: Ein magischer Valentinstag (OVA 2019)
+    - id: 110265
+      unsicher: OVA nicht genannt
+- seite: Sengoku Basara
+  fixture: sengoku-basara.wikitext
+  titel:
+    # Samurai Kings 2: Einer leuchtenden Zukunft entgegen (SPECIAL 2011)
+    - id: 10483
+      unsicher: "Special nicht genannt (deutscher Titel: Samurai Kings)"
+    # Sengoku Basara: Samurai Kings - Die feuerspuckende Festung am Berg Fuji (SPECIAL 2010)
+    - id: 6581
+      unsicher: "Special nicht genannt (deutscher Titel: Samurai Kings)"
+- seite: Yama no Susume
+  fixture: yama-no-susume.wikitext
+  titel:
+    # Encouragement of Climb Season 3 (TV_SHORT 2018)
+    - id: 98866
+      unsicher: Tabelle trennt keine Staffeln
+    # Encouragement of Climb: Next Summit (TV 2022)
+    - id: 131182
+      unsicher: Tabelle trennt keine Staffeln
+    # Encouragement of Climb: Staffel 2 Specials (SPECIAL 2014)
+    - id: 21003
+      unsicher: Specials nicht genannt
+- seite: The Dangers in My Heart
+  fixture: the-dangers-in-my-heart.wikitext
+  titel:
+    # The Dangers in My Heart: Season 2 (TV 2024)
+    - id: 166216
+      unsicher: Tabelle trennt keine Staffeln
+    # The Dangers in My Heart: TwiYaba (ONA 2023)
+    - id: 170221
+      unsicher: ONA nicht genannt
+- seite: K Project
+  fixture: k-project.wikitext
+  titel:
+    # K: Seven Stories Movie 2 - Side:Blue - Like Sirius (MOVIE 2018)
+    - id: 102346
+      unsicher: Film nicht genannt
+    # K: Seven Stories Movie 3 - Side:Green - The Overwritten World (MOVIE 2018)
+    - id: 102347
+      unsicher: Film nicht genannt
+    # K: Seven Stories Movie 4 - Lost Small World - Outside the Cage (MOVIE 2018)
+    - id: 102348
+      unsicher: Film nicht genannt
+    # K: Seven Stories Movie 5 - Memory of Red - BURN (MOVIE 2018)
+    - id: 102349
+      unsicher: Film nicht genannt
+    # K: Seven Stories Movie 6 - Circle Vision - Nameless Song (MOVIE 2018)
+    - id: 102350
+      unsicher: Film nicht genannt
+- seite: "Trinity Seven: 7-nin no Masho Tsukai"
+  fixture: trinity-seven-7-nin-no-masho-tsukai.wikitext
+  titel:
+    # Trinity Seven: Heavens Library & Crimson Lord (MOVIE 2019)
+    - id: 103631
+      unsicher: "Film nicht genannt (Tabelle: Anime)"
+- seite: "Kaguya-sama: Love is War"
+  fixture: kaguya-sama-love-is-war.wikitext
+  titel:
+    # Kaguya-sama: Love Is War - Ultra Romantic: Ishigami Yu möchte sich unterhalten (ONA 2021)
+    - id: 165557
+      unsicher: ONA nicht genannt
+- seite: The Quintessential Quintuplets
+  fixture: the-quintessential-quintuplets.wikitext
+  titel:
+    # The Quintessential Quintuplets: Absehbare Sommerferien (SPECIAL 2023)
+    - id: 163327
+      unsicher: Special nicht genannt
+    # The Quintessential Quintuplets Special 2 (SPECIAL 2024)
+    - id: 177191
+      unsicher: Special nicht genannt
+- seite: Record of Ragnarok
+  fixture: record-of-ragnarok.wikitext
+  titel:
+    # Record of Ragnarok: Staffel 3 (ONA 2025)
+    - id: 187921
+      unsicher: "Staffel 3 nicht genannt (Tabelle: Staffel 1 und 2)"
+- seite: Kusuriya no Hitorigoto
+  fixture: kusuriya-no-hitorigoto.wikitext
+  titel:
+    # Die Tagebücher der Apothekerin: Staffel 3 - Cour 1 (TV 2026)
+    - id: 195516
+      unsicher: Staffel 3 nicht genannt (Tabelle ohne Staffeltrennung)
+- seite: Black Clover
+  fixture: black-clover.wikitext
+  titel:
+    # Black Clover: Staffel 2 (TV 2026)
+    - id: 195604
+      unsicher: Staffel 2 nicht genannt (Tabelle ohne Staffeltrennung)
+- seite: Yōjo Senki
+  fixture: yojo-senki.wikitext
+  titel:
+    # Saga of Tanya the Evil: Staffel 2 (TV 2026)
+    - id: 135865
+      unsicher: Staffel 2 nicht genannt (Tabelle ohne Staffeltrennung)
+- seite: Dr. Stone
+  fixture: dr-stone.wikitext
+  titel:
+    # Dr. Stone: Science Future (TV 2025)
+    - id: 172019
+      unsicher: "Staffel 4 nicht genannt (Tabelle: Staffel 1–3)"
+# Zweite Tranche 26.11.2026: 20 weitere Seiten, Zuordnung an Seitentext und Tabellenkopf geprüft.
+- seite: Beyblade Burst
+  fixture: beyblade-burst.wikitext
+  titel:
+    # Beyblade Burst QuadStrike (ONA 2023)
+    - id: 166062
+      unsicher: QuadStrike nicht genannt (Tabelle ohne Staffeltrennung)
+- seite: Blue Box (Manga)
+  fixture: blue-box-manga.wikitext
+  titel:
+    # Blue Box: Staffel 2 (TV 2026)
+    - id: 189123
+      unsicher: Staffel 2 nicht genannt
+- seite: Gaikotsu Kishi-sama, Tadaima Isekai e Odekakechū
+  fixture: gaikotsu-kishi-sama-tadaima-isekai-e-odekakechu.wikitext
+  titel:
+    # Skeleton Knight in Another World: Staffel 2 (TV 2026)
+    - id: 185542
+      unsicher: Staffel 2 nicht genannt
+- seite: Gans im Glück
+  fixture: gans-im-gluck.wikitext
+  titel:
+    # Gans im Glück (MOVIE 2018), zwei Synchros in der Tabelle (Kino, Netflix)
+    - id: 10013576
+      unsicher: Fassung des Titels nicht genannt (Tabelle trennt Kino- und Netflix-Synchro)
+- seite: Die Legende des Kung Fu Kaninchens
+  fixture: die-legende-des-kung-fu-kaninchens.wikitext
+  titel:
+    - id: 102234
+- seite: Es war einmal … Entdecker und Erfinder
+  fixture: es-war-einmal-entdecker-und-erfinder.wikitext
+  titel:
+    - id: 10005293
+- seite: M.A.S.K.
+  fixture: m-a-s-k.wikitext
+  titel:
+    - id: 5000003
+- seite: Oh! My Goddess
+  fixture: oh-my-goddess.wikitext
+  titel:
+    # Oh! My Goddess Specials (SPECIAL 2005)
+    - id: 1003
+      unsicher: Special nicht genannt
+- seite: Shaolin Wuzang
+  fixture: shaolin-wuzang.wikitext
+  titel:
+    - id: 102501
+- seite: Sword Art Online
+  fixture: sword-art-online.wikitext
+  titel:
+    # Sword Art Online: Alicization - War of Underworld Episode 12.5 (SPECIAL 2020)
+    - id: 10015501
+      unsicher: "Special nicht genannt (Tabelle: Staffel 1–2, Film 1–2 und Hauptstimmen)"
+- seite: Tsuki ga Kirei
+  fixture: tsuki-ga-kirei.wikitext
+  titel:
+    # Tsukigakirei: Wie Alles Enstand (SPECIAL 2017)
+    - id: 10012493
+      unsicher: Special nicht genannt
+- seite: Unterm Wolkenhimmel
+  fixture: unterm-wolkenhimmel.wikitext
+  titel:
+    # Unterm Wolkenhimmel - Laughing Under the Clouds: Gaiden - Teil 2 (MOVIE 2018)
+    - id: 99196
+      unsicher: Gaiden-Film nicht genannt
+- seite: Watashi no Shiawase na Kekkon
+  fixture: watashi-no-shiawase-na-kekkon.wikitext
+  titel:
+    # Meine ganz besondere Hochzeit: Special (SPECIAL 2026)
+    - id: 190054
+      unsicher: Special nicht genannt
+- seite: Yuna & Stitch
+  fixture: yuna-stitch.wikitext
+  titel:
+    # Yuna & Stitch: Kampf der Gigantchen (SPECIAL 2009)
+    - id: 8963
+      unsicher: Special nicht genannt
+    # Yuna & Stitch: Kijimunaas Schwester (SPECIAL 2010)
+    - id: 140340
+      unsicher: Special nicht genannt
+    # Yuna & Stitch: Ein wahrer Held (SPECIAL 2011)
+    - id: 146171
+      unsicher: Special nicht genannt
+- seite: Z wie Zorro
+  fixture: z-wie-zorro.wikitext
+  titel:
+    # Z wie Zorro – Der Film (MOVIE 1996)
+    - id: 5000001
+      unsicher: Film nicht genannt (Tabelle gilt der Serie)
+- seite: AIKa
+  fixture: aika.wikitext
+  titel:
+    # Agent Aika: Special Trial (SPECIAL 1998)
+    - id: 4718
+      unsicher: Special nicht genannt
+- seite: Bullet/Bullet
+  fixture: bullet-bullet.wikitext
+  titel:
+    - id: 157960
+- seite: Ajin – Demi-Human
+  fixture: ajin-demi-human.wikitext
+  titel:
+    # Ajin - Demi-Human: Impulse (MOVIE 2015)
+    - id: 21212
+      unsicher: Film nicht genannt (Tabelle gilt der Serie)
+    # Ajin - Film 2: Collision (MOVIE 2016)
+    - id: 21505
+      unsicher: Film nicht genannt (Tabelle gilt der Serie)
+    # Ajin - Film 3: Clash (MOVIE 2016)
+    - id: 21681
+      unsicher: Film nicht genannt (Tabelle gilt der Serie)
+- seite: Guǐmì zhī zhǔ
+  fixture: guimi-zhi-zhu.wikitext
+  titel:
+    # Lord of Mysteries (ONA 2026)
+    - id: 199448
+      unsicher: Specials nicht genannt (Tabelle gilt der Serie)
+- seite: "Code Geass: Lelouch of the Rebellion"
+  fixture: code-geass-lelouch-of-the-rebellion.wikitext
+  titel:
+    # Code Geass: Lelouch of the Rebellion - Initiation (MOVIE)
+    - id: 101811
+      unsicher: Zusammenschnitt der Serie, Film in der Tabelle nicht genannt
+    # Code Geass: Lelouch of the Rebellion - Überschreitung (MOVIE)
+    - id: 101812
+      unsicher: Zusammenschnitt der Serie, Film in der Tabelle nicht genannt
+    # Code Geass: Lelouch of the Rebellion - Verherrlichung (MOVIE)
+    - id: 101813
+      unsicher: Zusammenschnitt der Serie, Film in der Tabelle nicht genannt

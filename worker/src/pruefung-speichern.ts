@@ -19,6 +19,8 @@
  * Seit 12.10.2026 stehen diese Bedingungen als SELECT (mit Hash) in `rohfolgen-abgleich.ts`.
  */
 import { ereignisSenden } from './ereignisse.ts'
+import { stoesstBauAn, stosseBauAn } from './bau-anstoss.ts'
+import { fehlerLog } from './werte.ts'
 import { type Env } from './env.ts'
 import { verarbeiteStapel } from './pruefung-stapel.ts'
 import { speichereRohfolgen } from './pruefung-rohfolgen-speichern.ts'
@@ -143,6 +145,7 @@ export async function speichereDaten({ request, antwort, token, env, ctx, offene
     Sie hat ihre Arbeit getan, sobald die Meldung in der Datenbank steht.
   */
   ctx?.waitUntil(ereignisSenden(env, 'pruefung', { plattform: String(daten.plattform ?? 'unbekannt') }))
+  if (stoesstBauAn(daten)) ctx?.waitUntil(stosseBauAn(env).catch((e) => fehlerLog('[bau-anstoss]', e)))
   return antwort({ ok: true, befund })
 }
 
@@ -295,6 +298,7 @@ async function speichereStapel({ request, antwort, token, env, ctx }: Kontext, s
   const ergebnisse = stapel.map((_, i) => inTitelzeile.get(i) ?? uebrige.shift()!)
   const erste = stapel[0] as Record<string, unknown>
   ctx?.waitUntil(ereignisSenden(env, 'pruefung', { plattform: String(erste?.plattform ?? 'unbekannt') }))
+  if (stapel.some((m, i) => stoesstBauAn(m) && ergebnisse[i]?.ok)) ctx?.waitUntil(stosseBauAn(env).catch((e) => fehlerLog('[bau-anstoss]', e)))
   return antwort({ ok: true, ergebnisse })
 }
 

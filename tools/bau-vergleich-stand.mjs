@@ -6,6 +6,7 @@
  */
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { lueckenDelta } from './bau-vergleich-luecken.mjs'
 import { newsDelta } from './bau-vergleich-news.mjs'
 import { beschreibeUnterschied } from './vergleich-unterschied.mjs'
 
@@ -31,5 +32,6 @@ export function beschreibeDatei(kontext, a, b, pfad) {
   const alt = liesSeite(kontext, a, pfad, false)
   const neu = liesSeite(kontext, b, pfad, true)
   const zeilen = beschreibeUnterschied(pfad, alt, neu)
-  return pfad === 'public/data/news.json' ? [...zeilen, ...newsDelta(alt, neu)] : zeilen
+  if (pfad === 'public/data/news.json') return [...zeilen, ...newsDelta(alt, neu)]
+  return pfad === 'public/data/releases.json' ? [...zeilen, ...lueckenDelta(alt, neu)] : zeilen
 }

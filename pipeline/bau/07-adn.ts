@@ -24,6 +24,7 @@ import { adnShowsAusKalenderUndKatalog, belegeTonKuratierterAdnTermine } from '.
 import { adnShowsMitKatalogKennung, loeseAdnTitelIds, titelZurShow } from './adn-show-titel.ts'
 import { cartoonTitelJeAdn } from './cartoon-adn.ts'
 import type { CartoonEintrag } from '../lib/cartoons.ts'
+import { beobachteteFolgen } from '../lib/adn-beobachtet.ts'
 import { type Title, type Release } from '../../shared/types.ts'
 
 type AdnEingabe = {
@@ -222,7 +223,7 @@ function titelGesperrt(lauf: AdnLauf, show: AdnShow, block: AdnBlock, title: Tit
 }
 
 /** Das Release eines Abschnitts aus seinen Folgen (`first`/`letzte` = früheste/späteste nach Termin). */
-function adnRelease(a: {
+export function adnRelease(a: {
   lauf: AdnLauf
   show: AdnShow
   block: AdnBlock
@@ -264,6 +265,8 @@ function adnRelease(a: {
       time: first.time,
       episodeCount: anzahl,
       lastEpisodeDate: letzte.date,
+      /* ADNs Kalendertag gilt als Beleg, auch für noch nicht erschienene Folgen (Sendeplan, nicht Rechnung). */
+      observed: block.rhythm === 'weekly' ? beobachteteFolgen(folgen) : undefined,
     },
     year: Number(first.date.slice(0, 4)),
     sources: [...(artikel ? [artikel.url] : []), show.fromCatalog ? adnKatalogUrl(show.showId) : ADN_CALENDAR_URL],

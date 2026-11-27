@@ -7,6 +7,7 @@
  * der heutige Stand steht in "Mit Handbeleg". Aufruf: `npm run check:logic`.
  */
 import { anbieterChips, istLautAnbieter } from '../shared/saison.ts'
+import { kanalErbtVomAnbieter } from './bau/kanal-erbt-anbieter.ts'
 import type { Release, StreamLink, Title } from '../shared/types.ts'
 import { streamStatus } from '../web/src/components/detail/legende-zeilen.ts'
 
@@ -100,6 +101,16 @@ console.log('Prime-Kanal neben belegtem Anbieter-Weg: „Deutsch“ wie der Anbi
   pruefe('Anbieter-Weg entfernt: laut', streamStatus(mitAnbieter({ ...cr, entferntAm: '2026-11-01' }), kanal, []) === 'anbieter')
   pruefe('anderer Anbieter (ADN) belegt, Kanal Crunchyroll: laut', streamStatus(mitAnbieter(weg('adn', 'https://animationdigitalnetwork.com/de/video/1')), kanal, []) === 'anbieter')
   pruefe('ADN-Kanal neben belegtem ADN-Weg: belegt', streamStatus(titelMit(900811, [weg('adn', 'https://animationdigitalnetwork.com/de/video/1'), { ...kanal, kanal: 'ADN' }]), { ...kanal, kanal: 'ADN' }, []) === 'belegt')
+  pruefe('Anbieter-Weg selbst nur abgeleitet (Joyn-Art): Kanal bleibt laut', streamStatus(mitAnbieter({ ...cr, dubAbgeleitet: 'joyn-pauschal' }), kanal, []) === 'anbieter' && chip(mitAnbieter({ ...cr, dubAbgeleitet: 'joyn-pauschal' }), [], 'primevideo') === true)
+  const keinKanal = weg('netflix', 'https://www.netflix.com/title/1', { kanal: 'Crunchyroll', dubAbgeleitet: 'kanal-erbt' })
+  pruefe('Weg ohne Prime mit Kanalname Crunchyroll neben belegtem Anbieter: bleibt laut', streamStatus(titelMit(900813, [cr, keinKanal]), keinKanal, []) === 'anbieter')
+  const joynKanal = weg('primevideo', 'https://www.amazon.de/gp/video/detail/B0X', { kanal: 'Crunchyroll', dubAbgeleitet: 'joyn-pauschal' })
+  pruefe('Prime-Kanal mit anderer Ableitung (Joyn-Art) neben belegtem Anbieter: bleibt laut', streamStatus(titelMit(900814, [cr, joynKanal]), joynKanal, []) === 'anbieter')
+  /* Daniels Regel (13.10./27.11.2026): Anbieter belegt → Prime-Kanal desselben Anbieters ist Annahme, nie Beleg; ein JustWatch-Nein an der Kanal-Seite schlägt sie. */
+  const kanalNein = weg('primevideo', 'https://www.amazon.de/gp/video/detail/B0NEIN', { kanal: 'Crunchyroll', dub: undefined })
+  const nein = titelMit(900815, [cr, kanalNein])
+  pruefe('JustWatch-Nein an der Kanal-Seite: Bau erbt nichts', kanalErbtVomAnbieter([nein], () => true) === 0 && kanalNein.dub === undefined)
+  pruefe('JustWatch-Nein an der Kanal-Seite: Pille nie „belegt“, Chip Prime nie „Deutsch“', streamStatus(nein, kanalNein, []) !== 'belegt' && chip(nein, [], 'primevideo') !== false)
   pruefe('Joyn pauschal bleibt laut, auch neben belegtem Weg anderer Anbieter', streamStatus(titelMit(900812, [cr, weg('joyn', 'https://www.joyn.de/serien/x', { dubAbgeleitet: 'joyn-pauschal' })]), weg('joyn', 'https://www.joyn.de/serien/x', { dubAbgeleitet: 'joyn-pauschal' }), []) === 'anbieter')
 }
 

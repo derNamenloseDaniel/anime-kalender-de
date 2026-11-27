@@ -18,7 +18,8 @@ let tmdbBanner: TmdbBanner | undefined
 const banner = (): TmdbBanner => (tmdbBanner ??= ohneGeteilteFilme(readJson<TmdbBanner>(BANNER_DATEI, {}), 'Banner'))
 
 let serien: { zuordnung: SerienZuordnung; folgen: SerienFolgen; geteilt: Set<number> } | undefined
-function serienDaten(): NonNullable<typeof serien> {
+/** Dieselben Dateien für den Wächter `check-anilist-produkt.ts` (`--bestand`) wie für den Bau. */
+export function serienDaten(): NonNullable<typeof serien> {
   if (serien) return serien
   const zuordnung = mitHandvorrang(readJson<Record<string, { tmdbId?: number; kind?: string }>>('data/tmdb-titles.json', {}))
   return (serien = { zuordnung, folgen: readJson<SerienFolgen>('data/tmdb-folgen.json', {}), geteilt: geteilteSerien(zuordnung) })
@@ -45,12 +46,18 @@ export function schlagworteNachRegel(anisearchId: number | undefined): string[] 
  * bleibt vorerst das AniList-Banner — diese Zeile entfällt, sobald für die Lücken ein Ersatz gefunden ist.
  * Umfasst die TMDB-Serie mehr als den Titel (`serienbildFremd`), geht das eigene AniList-Banner vor: Es gehört zu genau diesem Teil.
  */
-export function bannerNachRegel(id: number, anilistBanner: string | undefined, episodes?: number): string | undefined {
+export type BannerArt = 'tmdb' | 'anilist-luecke' | 'wechsel' | 'fremd-bleibt'
+
+/** Das Banner und warum: `wechsel` = AniList statt fremdem Serienbild, `fremd-bleibt` = fremdes Serienbild, weil AniList keins hat (Rest-Falschangabe, der Bau zählt sie). */
+export function bannerEntscheidung(id: number, anilistBanner: string | undefined, episodes?: number): { bild: string | undefined; art: BannerArt } {
   const tmdb = banner()[String(id)]?.p
-  if (!tmdb) return anilistBanner
+  if (!tmdb) return { bild: anilistBanner, art: 'anilist-luecke' }
   const { zuordnung, folgen, geteilt } = serienDaten()
-  return anilistBanner && serienbildFremd({ id, episodes }, zuordnung, folgen, geteilt) ? anilistBanner : bannerAdresse(tmdb)
+  if (!serienbildFremd({ id, episodes }, zuordnung, folgen, geteilt)) return { bild: bannerAdresse(tmdb), art: 'tmdb' }
+  return anilistBanner ? { bild: anilistBanner, art: 'wechsel' } : { bild: bannerAdresse(tmdb), art: 'fremd-bleibt' }
 }
+
+export const bannerNachRegel = (id: number, anilistBanner: string | undefined, episodes?: number): string | undefined => bannerEntscheidung(id, anilistBanner, episodes).bild
 
 /** Bewertung, Schlagworte und Banner nach der Regel; auch für die Kopien in `verschoben`, die vor `setzeProduktFelder` entstanden. */
 export function mitProduktFeldern<T extends Title>(t: T, anisearchId: number | undefined): T {
@@ -71,12 +78,15 @@ export function mitProduktFeldern<T extends Title>(t: T, anisearchId: number | u
 export function setzeProduktFelder(titles: Map<number, Title>): void {
   const kennungen = anisearchKennungen([...titles.values()].map((t) => ({ id: t.id, mal: t.malId })))
   let ohneKennung = 0
+  const bannerArten: Record<BannerArt, number> = { tmdb: 0, 'anilist-luecke': 0, wechsel: 0, 'fremd-bleibt': 0 }
   for (const t of titles.values()) {
     const asId = kennungen.get(t.id)
     if (asId === undefined) ohneKennung++
+    bannerArten[bannerEntscheidung(t.id, t.bannerImage, t.episodes).art]++
     Object.assign(t, mitProduktFeldern(t, asId))
   }
   const mitBewertung = [...titles.values()].filter((t) => t.score !== undefined).length
   const ausAnilist = [...titles.values()].filter((t) => t.scoreQuelle === 'anilist').length
   log(`Bewertung, Schlagworte und Banner nach Regel: ${mitBewertung} von ${titles.size} Titeln mit Bewertung (davon ${ausAnilist} Rückfall AniList), ${ohneKennung} ohne aniSearch-Kennung`)
+  log(`Banner: ${bannerArten.wechsel} Titel wechseln vom Serienbild einer anderen Staffel auf ihr AniList-Banner, ${bannerArten['fremd-bleibt']} behalten es mangels AniList-Banner (${bannerArten.tmdb} eigenes TMDB-Bild, ${bannerArten['anilist-luecke']} AniList ohne TMDB)`)
 }

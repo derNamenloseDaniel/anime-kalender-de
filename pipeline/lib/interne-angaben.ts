@@ -20,7 +20,7 @@ export const NAMEN_AUSNAHMEN: readonly Ausnahme[] = [
   { datei: /^sprecher\.json$/, felder: ['sprecher'] },
   { datei: /^sprecher\/[^/]+\.json$/, felder: ['rollen'] },
   { datei: /^synonyme\.json$/, felder: ['*'] },
-  { datei: /^synopses\/[^/]+\.json$/, felder: ['de', 'en'] },
+  { datei: /^synopses\/[^/]+\.json$/, felder: ['de', 'en', 'satz'] },
   { datei: /^folgen\/[^/]+\.json$/, felder: ['f'] },
   { datei: /^(cartoons|ohne-synchro|ohne-synchro-namen|titles|titles-core)\.json$/, felder: ['slug', 'url', 'titleDe', 'titleEn', 'titleRomaji'] },
 ]

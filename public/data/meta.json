@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-11-27T11:33:04.511Z",
-  "titleCount": 2927,
+  "generatedAt": "2026-11-27T16:52:00.230Z",
+  "titleCount": 2926,
   "belegtCount": 2637,
-  "releaseCount": 932,
-  "eventCount": 4693,
+  "releaseCount": 935,
+  "eventCount": 4683,
   "genres": [
     "Action",
     "Adventure",
@@ -201,8 +201,8 @@
     "Thalia",
     "TOGGO",
     "Rtl+ Max Amazon Channel",
-    "bücher.de",
     "YouTube",
+    "bücher.de",
     "Crunchyroll",
     "Crunchyroll Amazon Channel",
     "Netflix",
@@ -217,11 +217,11 @@
     "Chili",
     "Wow Fiction Amazon Channel",
     "Amazon Mx Player",
+    "Kixi Select Amazon Channel",
     "Amazon Prime (ADN)",
     "Animation Digital Network",
     "Anime Digital Network Amazon Channel",
     "Kixi",
-    "Kixi Select Amazon Channel",
     "Shahid VIP",
     "Amazon Prime (Pokémon TV)",
     "Plex",
@@ -313,5 +313,16 @@
     "Termine: aniSearch, Anime2You — siehe Quellenangabe je Eintrag",
     "Markenzeichen der Anbieter: simple-icons (https://simpleicons.org) — CC0, Wikimedia Commons (https://commons.wikimedia.org) — gemeinfrei, ADN-Wortmarke aus der französischen Wikipedia, maxdome-Zeichen nach „Maxdome Logo (2021)“ von videociety GmbH (CC BY-SA 4.0, zugeschnitten); die Marken gehören ihren Inhabern",
     "Welche Folgen auf Netflix eine deutsche Tonspur haben: Streaming Availability API (https://www.movieofthenight.com/about/api)"
+  ],
+  "quarantaene": [
+    {
+      "titleId": 154,
+      "pruefung": "folgen-vor-start",
+      "grund": "Folgen 1–32 vor dem ersten Termin ohne Beleg",
+      "releases": [
+        "shaman-king-2001-part3-primevideo",
+        "shaman-king-2001-staffel4-primevideo"
+      ]
+    }
   ]
 }

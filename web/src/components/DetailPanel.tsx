@@ -21,7 +21,6 @@ import { useReiheZustand } from './detail/panel-reihe-zustand.ts'
 import { PanelKoerper } from './detail/panel-koerper.tsx'
 import { ReihenReiterKontext } from './detail/reihen-reiter.tsx'
 import { reihenReiterVon } from './detail/reihen-reiter-liste.ts'
-import { reihenOrdnung } from './detail/reihen-inhalt.tsx'
 import type { DetailPanelProps } from './detail/panel-props.ts'
 
 export function DetailPanel({
@@ -48,7 +47,8 @@ export function DetailPanel({
   const { reihenTeile, eigenerTeil, reihenName, kopfName, teilName } = usePanelReihe(title, data)
   const reihe = useReiheZustand(reihenTeile)
   const holt = useTitelNachladen(data, titleId)
-  const a = usePanelAntwort({ title, releases, today, synopsis: s.synopsis, favorites, verbindung, t })
+  const nurUntertitel = useMemo(() => data.nurUntertitelByTitle.get(titleId) ?? [], [data, titleId])
+  const a = usePanelAntwort({ title, releases, nurUntertitel, today, synopsis: s.synopsis, favorites, verbindung, t })
   const wechsel = useReihenWechsel(data, titleId, onOpenTitle)
   const ersatz = useErsatzHandlung({ titleId, title, synopsis: s.synopsis, reihenTeile })
 
@@ -92,7 +92,7 @@ export function DetailPanel({
           asZiel={asZiel}
         />
         {/* Reiter der Kategorie am Antwortkasten (F157): ein Reiter öffnet den Titel auf demselben Weg wie die Reihenliste, die ihn dafür nicht mehr zeigt. */}
-        <ReihenReiterKontext.Provider value={{ data, reiter: reihenReiterVon(title, reihenTeile, reihenName, data.titles, reihenOrdnung(reihenTeile, reihenName, t).gruppen, today), wechsleZu: wechsel.wechsleZu }}>
+        <ReihenReiterKontext.Provider value={{ data, reiter: reihenReiterVon(title, reihenTeile, reihenName, data.titles, today), wechsleZu: wechsel.wechsleZu }}>
           <PanelKoerper
             {...{ data, title, today, releases, verbindung, favorites, onToggleFavorite, onFilterBy, onOpenTitle }}
             {...{ a, s, discAusgaben, discZuerst, plot, asZiel, reihenTeile, reihenName, reihe, wechsel }}

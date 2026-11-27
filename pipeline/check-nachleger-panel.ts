@@ -56,7 +56,7 @@ const dom = installiereMiniDom(
 )
 Object.assign(document, { querySelector: () => null, querySelectorAll: () => [], title: 'Start' })
 const wurzel = createRoot(dom.wurzel as unknown as Element)
-const data = { titles: [titel], titleById: new Map([[ID, titel]]), releases, releaseBySlug: new Map(releases.map((r) => [r.slug, r])), events: [], eventsByDate: new Map(), releasesByTitle: new Map([[ID, releases]]), meta: {} }
+const data = { titles: [titel], titleById: new Map([[ID, titel]]), releases, releaseBySlug: new Map(releases.map((r) => [r.slug, r])), events: [], eventsByDate: new Map(), nurUntertitelByTitle: new Map(), releasesByTitle: new Map([[ID, releases]]), meta: {} }
 const e = { data, titleId: ID, favorites: new Set(), hidden: new Set(), onToggleFavorite() {}, onToggleHidden() {}, onClose() {}, onFilterBy() {}, onOpenTitle() {} }
 await act(async () => wurzel.render(h(DetailPanel as never, e as never)))
 const text = (dom.wurzel.textContent ?? '').replace(/\s+/g, ' ')

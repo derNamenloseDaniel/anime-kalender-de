@@ -6284,6 +6284,12 @@
   ],
   "tokyo-revengers-s3-disneyplus": [
     {
+      "url": "https://www.anime2you.de/news/1057610/tokyo-revengers-staffel-4-episodenanzahl/",
+      "name": "anime2you.de",
+      "gesehenAm": "2026-11-27",
+      "stand": "aktuell"
+    },
+    {
       "url": "https://www.anime2you.de/news/1056867/disney-plus-tokyo-revengers-simulcast-und-mehr/",
       "name": "anime2you.de",
       "gesehenAm": "2026-10-04",
@@ -6323,7 +6329,7 @@
       "url": "https://gw.api.animationdigitalnetwork.com/video/show/198",
       "name": "ADN API",
       "gesehenAm": "2026-10-29",
-      "stand": "vermutlich-ueberholt",
+      "stand": "aktuell",
       "gelesenAm": "2026-11-23",
       "bestaetigt": "2026-10-12"
     },
@@ -6337,7 +6343,7 @@
       "url": "https://gw.api.animationdigitalnetwork.com/video/calendar",
       "name": "ADN API",
       "gesehenAm": "2026-10-14",
-      "stand": "aktuell",
+      "stand": "vermutlich-ueberholt",
       "gelesenAm": "2026-11-26",
       "bestaetigt": "2026-10-12"
     },
@@ -6353,7 +6359,7 @@
       "url": "https://gw.api.animationdigitalnetwork.com/video/show/352",
       "name": "ADN API",
       "gesehenAm": "2026-10-29",
-      "stand": "vermutlich-ueberholt",
+      "stand": "aktuell",
       "gelesenAm": "2026-11-23",
       "bestaetigt": "2026-10-12"
     },
@@ -6367,7 +6373,7 @@
       "url": "https://gw.api.animationdigitalnetwork.com/video/calendar",
       "name": "ADN API",
       "gesehenAm": "2026-10-14",
-      "stand": "aktuell",
+      "stand": "vermutlich-ueberholt",
       "gelesenAm": "2026-11-26",
       "bestaetigt": "2026-10-12"
     },
@@ -6383,7 +6389,7 @@
       "url": "https://gw.api.animationdigitalnetwork.com/video/show/361",
       "name": "ADN API",
       "gesehenAm": "2026-10-29",
-      "stand": "vermutlich-ueberholt",
+      "stand": "aktuell",
       "gelesenAm": "2026-11-23",
       "bestaetigt": "2026-10-12"
     },
@@ -6397,7 +6403,7 @@
       "url": "https://gw.api.animationdigitalnetwork.com/video/calendar",
       "name": "ADN API",
       "gesehenAm": "2026-10-14",
-      "stand": "aktuell",
+      "stand": "vermutlich-ueberholt",
       "gelesenAm": "2026-11-26",
       "bestaetigt": "2026-10-12"
     },
@@ -6761,7 +6767,7 @@
       "url": "https://gw.api.animationdigitalnetwork.com/video/show/197",
       "name": "ADN API",
       "gesehenAm": "2026-10-29",
-      "stand": "vermutlich-ueberholt",
+      "stand": "aktuell",
       "gelesenAm": "2026-11-23",
       "bestaetigt": "2026-10-12"
     },
@@ -6781,7 +6787,7 @@
       "url": "https://gw.api.animationdigitalnetwork.com/video/calendar",
       "name": "ADN API",
       "gesehenAm": "2026-10-08",
-      "stand": "aktuell",
+      "stand": "vermutlich-ueberholt",
       "gelesenAm": "2026-11-26",
       "bestaetigt": "2026-10-12"
     }
@@ -7287,11 +7293,29 @@
   ],
   "auto-204389-primevideo": [
     {
+      "url": "https://www.anime2you.de/news/1063615/crunchyroll-apotheke-staffel-3-synchro-und-mehr/",
+      "name": "anime2you.de",
+      "gesehenAm": "2026-11-27",
+      "stand": "aktuell"
+    },
+    {
+      "url": "https://www.crunchyroll.com/de/news/seasonal-lineup/2026/9/15/crunchyroll-anime-lineup-herbst-2026",
+      "name": "Crunchyroll News",
+      "gesehenAm": "2026-11-27",
+      "stand": "aktuell"
+    },
+    {
+      "url": "https://www.crunchyroll.com/de/news/seasonal-lineup/2026/9/15/crunchyroll-deutsche-synchros-herbst-2026",
+      "name": "Crunchyroll News",
+      "gesehenAm": "2026-11-27",
+      "stand": "aktuell"
+    },
+    {
       "url": "https://www.anime2you.de/news/1050718/crunchyroll-19-neue-herbst-2026-simulcasts/",
       "name": "anime2you.de",
       "gesehenAm": "2026-10-13",
-      "sagt": "2026-09-26",
-      "stand": "aktuell"
+      "stand": "aktuell",
+      "sagt": "2026-09-26"
     }
   ],
   "auto-185756-primevideo": [
@@ -7766,7 +7790,7 @@
       "name": "ADN API",
       "gesehenAm": "2026-10-16",
       "stand": "aktuell",
-      "gelesenAm": "2026-11-26",
+      "gelesenAm": "2026-11-27",
       "bestaetigt": "2026-10-17"
     }
   ],
@@ -7790,7 +7814,7 @@
       "name": "ADN API",
       "gesehenAm": "2026-10-17",
       "stand": "aktuell",
-      "gelesenAm": "2026-11-26",
+      "gelesenAm": "2026-11-27",
       "bestaetigt": "2026-10-29"
     }
   ],
@@ -7806,7 +7830,7 @@
       "name": "ADN API",
       "gesehenAm": "2026-10-17",
       "stand": "aktuell",
-      "gelesenAm": "2026-11-26",
+      "gelesenAm": "2026-11-27",
       "bestaetigt": "2026-10-29"
     }
   ],
@@ -7830,7 +7854,7 @@
       "name": "ADN API",
       "gesehenAm": "2026-10-17",
       "stand": "aktuell",
-      "gelesenAm": "2026-11-26",
+      "gelesenAm": "2026-11-27",
       "bestaetigt": "2026-10-29"
     }
   ],
@@ -7854,7 +7878,7 @@
       "name": "ADN API",
       "gesehenAm": "2026-10-17",
       "stand": "aktuell",
-      "gelesenAm": "2026-11-26",
+      "gelesenAm": "2026-11-27",
       "bestaetigt": "2026-10-29"
     }
   ],
@@ -8713,7 +8737,7 @@
       "name": "ADN API",
       "gesehenAm": "2026-11-07",
       "stand": "aktuell",
-      "gelesenAm": "2026-11-26",
+      "gelesenAm": "2026-11-27",
       "bestaetigt": "2026-11-18"
     }
   ],
@@ -9419,6 +9443,22 @@
     {
       "url": "https://www.anime2you.de/news/1056322/aniverse-oktober-2026-neuzugaenge/",
       "name": "anime2you.de",
+      "gesehenAm": "2026-11-27",
+      "stand": "aktuell"
+    }
+  ],
+  "wolfs-rain-ova-peppermint-classics-5-blu-ray-2017-07-28": [
+    {
+      "url": "https://bluray-disc.de/blu-ray-filme/112527-wolfs_rain_peppermint_classics_005",
+      "name": "bluray-disc.de",
+      "gesehenAm": "2026-11-27",
+      "stand": "aktuell"
+    }
+  ],
+  "techno-police-das-gesetz-der-zukunft-dvd-2017-08-31": [
+    {
+      "url": "https://www.ofdb.de/fassung/32304,444636,Techno-Police-Das-Gesetz-der-Zukunft/",
+      "name": "ofdb.de",
       "gesehenAm": "2026-11-27",
       "stand": "aktuell"
     }

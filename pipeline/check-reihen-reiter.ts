@@ -65,7 +65,7 @@ const ohneSt = { ...st2, ohneSynchro: true, jpStatus: 'FINISHED' } as Title
 pruefe('Sammeltitel-Staffel ohne Synchro: Reiter trägt ohneSynchro, die andere nicht', reihenReiterVon(ohneSt, teile, 'Pokémon', [ohneSt, st1], HEUTE).map((r) => `${r.id}:${r.ohneSynchro}`).join() === '990101:false,990102:true')
 const teileOhne = teile.map((m) => (m.id === 1349 ? { ...m, ohneSynchro: true, jpStatus: 'FINISHED' } : m)) as FranchiseMember[]
 pruefe('Hauptserie: Staffel ohne Synchro trägt ohneSynchro, alle anderen nicht', reihenReiterVon(offen(483), teileOhne, 'Pokémon', titel, HEUTE).filter((r) => r.ohneSynchro).map((r) => r.id).join() === '1349')
-pruefe('Hauptserie zeigt nur Hauptserie, kein Film', reiter(483).every((r) => teile.find((m) => m.id === r.id)?.format === 'TV' && r.staffel), reiter(483))
+pruefe('Hauptserie zeigt nur Hauptserie, kein Film', reiter(483).every((r) => teile.find((m) => m.id === r.id)?.format === 'TV'), reiter(483))
 pruefe('ohne Reihe: keine Reiter', reihenReiterVon(offen(10852), [], 'Pokémon', titel, HEUTE).length === 0)
 const aot = faelle['attack-on-titan']!
 const aotTitel = aot['titles.json'] as Title[]
@@ -155,7 +155,7 @@ for (const [name, f] of Object.entries(faelle)) {
 pruefe(`alle Bühnenfälle ohne Absturz (${gerechnet} Titel-Reihe-Paare)`, gerechnet > 100 && abstuerze.length === 0, abstuerze.slice(0, 5))
 pruefe('alle Bühnenfälle: Kurzform, kein Titel in Reiter und Reihenliste, keiner unerreichbar', nachtragFehler.length === 0, nachtragFehler.slice(0, 5))
 pruefe('alle Bühnenfälle: Reiter nur an Hauptstaffeln, jede nummerierte Hauptstaffel mit Reitern', meldungFehler.length === 0, meldungFehler.slice(0, 5))
-const rohe = (labels: string[]) => labels.map((label, i) => ({ id: i + 1, label, name: `T${i + 1}`, staffel: true, ohneSynchro: false }))
+const rohe = (labels: string[]) => labels.map((label, i) => ({ id: i + 1, label, name: `T${i + 1}`, ohneSynchro: false }))
 pruefe('Eindeutigkeit: gleiche Beschriftung a, b in Listenreihenfolge; einmalige und Überlappung bleiben', eindeutigeBeschriftung(rohe(['14–15', '15–16', '16', '16', '25', '16'])).map((r) => r.label).join() === '14–15,15–16,16a,16b,25,16c')
 pruefe('Staffel in zwei Teilen ohne Staffelstand: Teil 1, Teil 2 nach Kennung', JSON.stringify(skReiter) === '[[15940,"Teil 1"],[16333,"Teil 2"]]', skReiter)
 
@@ -178,7 +178,7 @@ pruefe('Plan vorbei: mit bekannter Folgenzahl ruht, ohne läuft', reihenLageVon(
 /* Reihenliste mit Reitern am Kasten (statisch): Reiter-Titel zählen nicht am Schalter „ohne Synchro“, ohne übrige Teile keine Karte. */
 const glied = (id: number, mehr: Partial<FranchiseMember> = {}) => ({ id, name: `Reihe ${id}`, format: 'TV', jpYear: 2000 + (id % 100), episodes: 12, ...mehr }) as FranchiseMember
 function listeMitReitern(teileListe: FranchiseMember[], reiterIds: number[]): string {
-  const reiterListe = reiterIds.map((id) => ({ id, label: String(id), name: `Reihe ${id}`, staffel: true, ohneSynchro: false }))
+  const reiterListe = reiterIds.map((id) => ({ id, label: String(id), name: `Reihe ${id}`, ohneSynchro: false }))
   const liste = () => {
     const { t } = useLang()
     const eigenschaften = { reihenTeile: teileListe, t, reihenName: 'Reihe', title: { id: reiterIds[0] } as Title, favorites: new Set<number>(), wechselt: false, wechsleZu() {} }
@@ -194,7 +194,7 @@ pruefe('Übersicht: kein Schalter mehr', listeMitReitern(grosseReihe, [900001]).
 pruefe('alle Teile als Reiter: keine Reihen-Karte', listeMitReitern(kleineReihe, [900001, 900002, 900003, 900004]) === '' && listeMitReitern(kleineReihe, [900001, 900002]) !== '')
 
 /* Reiterzeile allein (statisch): 900101 läuft, 900102 ohne Synchro und gewählt, 900103 ohne Synchro; nur 900101 steht in `lagen`. */
-const zeileReiter = [900101, 900102, 900103].map((id) => ({ id, label: String(id - 900100), name: `Reihe ${id}`, staffel: true, ohneSynchro: id !== 900101 }))
+const zeileReiter = [900101, 900102, 900103].map((id) => ({ id, label: String(id - 900100), name: `Reihe ${id}`, ohneSynchro: id !== 900101 }))
 const zeilenHtml = renderToStaticMarkup(h(ReihenReiterZeile, { reiter: zeileReiter, aktiv: 900102, lagen: new Map([[900101, { lage: 'laeuft' as const }]]), farbe: 'bg-ak-test-kasten border-ak-akzent', kennung: 'z', beiWahl() {} }))
 const knopf = (id: number) => new RegExp(`<button[^>]*id="z-reiter-${id}"[^>]*>(.*?)</button>`).exec(zeilenHtml)
 const klassenVon = (id: number) => (/class="([^"]*)"/.exec(knopf(id)?.[0] ?? '')?.[1] ?? '').split(' ')

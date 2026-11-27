@@ -5,15 +5,14 @@ import { ohneDeutscheSynchro } from './reihen-teil.ts'
 import { staffelKurz } from './reihen-regeln.ts'
 
 /**
- * Ein Reihen-Reiter (F157): der Titel, den er öffnet, seine Kurzbeschriftung („4“, „1–5“, beim Film die laufende Nummer) und der
- * volle Titel für Tooltip und Hilfsmittel; `staffel` sagt, ob die Beschriftung eine Staffelnummer ist, `ohneSynchro`, ob der Teil
- * ohne deutsche Synchro erschienen ist (gestrichelter Rand; ein geplanter Teil zählt nicht).
+ * Ein Reihen-Reiter (F157): der Titel, den er öffnet, seine Kurzbeschriftung, eine Staffelnummer („4“, „1–5“, „3.2“), und der volle
+ * Titel für Tooltip und Hilfsmittel; `ohneSynchro`, ob der Teil ohne deutsche Synchro erschienen ist (gestrichelter Rand; ein geplanter
+ * Teil zählt nicht).
  */
 export interface ReihenReiter {
   id: number
   label: string
   name: string
-  staffel: boolean
   ohneSynchro: boolean
 }
 
@@ -22,7 +21,7 @@ function ausSammeltitel(sammel: number, titel: Title[], today: string): ReihenRe
   return titel
     .filter((t) => t.staffelTitel?.sammel === sammel)
     .sort((a, b) => a.staffelTitel!.nr - b.staffelTitel!.nr)
-    .map((t) => ({ id: t.id, label: String(t.staffelTitel!.nr), name: anzeigeName(t), staffel: true, ohneSynchro: ohneDeutscheSynchro(t, today) }))
+    .map((t) => ({ id: t.id, label: String(t.staffelTitel!.nr), name: anzeigeName(t), ohneSynchro: ohneDeutscheSynchro(t, today) }))
 }
 
 /** „Staffel 3 - Teil 2“ wird am Reiter „3.2“, „Staffel 1–5“ „1–5“; Reihenliste und Tooltip behalten den langen Namen. */
@@ -44,7 +43,7 @@ function ausHauptstaffeln(teile: FranchiseMember[], reihenName: string, today: s
   return haupt
     .filter((m) => beschriftung(m.id) !== undefined)
     .sort((a, b) => nummer(a.id) - nummer(b.id) || a.id - b.id)
-    .map((m) => ({ id: m.id, label: reiterKurzform(beschriftung(m.id)!), name: m.name, staffel: true, ohneSynchro: ohneDeutscheSynchro(m, today) }))
+    .map((m) => ({ id: m.id, label: reiterKurzform(beschriftung(m.id)!), name: m.name, ohneSynchro: ohneDeutscheSynchro(m, today) }))
 }
 
 /** Gleiche Kurzbeschriftungen verschiedener Titel (zwei „16“, zwei „1“) bekommen in Listenreihenfolge a, b, …; einmalige bleiben. */

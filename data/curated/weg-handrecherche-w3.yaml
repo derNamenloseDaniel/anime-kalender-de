@@ -1,0 +1,46 @@
+# Wege mit deutscher Tonspur für W3-Titel ohne Termin (Mangel `kein-weg`), von Hand belegt, Auftrag weg-handrecherche-w3 (27.11.2026).
+# Tonspur, EAN und Label stammen aus dem aniSearch-Artikelbestand im Repo (`data/anisearch-artikel.json`, Tag aus `data/disc-ausgaben.json`);
+# wo genannt, kommt eine zweite Quelle dazu. Ein Eintrag ohne EAN bekommt vom Build die Amazon.de-Namenssuche.
+
+# Die Trilogie-Box enthält alle drei Sinbad-Filme (aniSearch 10156: „Film, 3 Folgen“); Teil 1 (21032) hat dieselbe Box als Erstausgabe.
+# Tonspur laut Artikel 57349/57350 „Deutsch, Japanisch“; Anime2You bespricht die Blu-ray.
+- slug: sinbad-mahou-no-lamp-trilogie-uncut-2019-06-14
+  anilistId: 21368
+  platform: disc
+  releaseType: disc
+  publisher: "Kazé Deutschland"
+  edition: "Die Trilogie (Uncut), Blu-ray und DVD"
+  ean: "7630017517128"
+  note: "Deutsche Tonspur, dazu Japanisch; die Box enthält alle drei Filme."
+  schedule: { firstEpisodeDate: "2019-06-14" }
+  sources:
+    - https://www.anisearch.de/article/57349,die-abenteuer-des-jungen-sinbad-die-trilogie-uncut-blu-ray
+    - https://www.anime2you.de/news/318357/die-abenteuer-des-jungen-sinbad-die-trilogie-blu-ray/
+
+- slug: sinbad-mahiru-no-yoru-trilogie-uncut-2019-06-14
+  anilistId: 100658
+  platform: disc
+  releaseType: disc
+  publisher: "Kazé Deutschland"
+  edition: "Die Trilogie (Uncut), Blu-ray und DVD"
+  ean: "7630017517128"
+  note: "Deutsche Tonspur, dazu Japanisch; die Box enthält alle drei Filme."
+  schedule: { firstEpisodeDate: "2019-06-14" }
+  sources:
+    - https://www.anisearch.de/article/57349,die-abenteuer-des-jungen-sinbad-die-trilogie-uncut-blu-ray
+    - https://www.anime2you.de/news/318357/die-abenteuer-des-jungen-sinbad-die-trilogie-blu-ray/
+
+# Die beiden Specials zählt aniSearch als Folge 13 und 14 der Serie (10072, 14 Folgen, beide mit deutschem Folgentitel);
+# das Komplettset führt alle 14 Folgen, Tonspur laut Artikel 156743 „Deutsch, Japanisch“. ANN zählt die US-Gesamtausgabe ebenso als Folge 1–14.
+- slug: to-love-ru-darkness-2nd-specials-komplettset-2024-03-08
+  anilistId: 21852
+  platform: disc
+  releaseType: disc
+  publisher: "FilmConfect"
+  edition: "Komplettset (14 Folgen), DVD"
+  ean: "7630017535337"
+  note: "Deutsche Tonspur, dazu Japanisch; das Komplettset führt alle 14 Folgen der Serie, die Specials zählt aniSearch als Folge 13 und 14."
+  schedule: { firstEpisodeDate: "2024-03-08" }
+  sources:
+    - https://www.anisearch.de/article/156743,to-love-ru-darkness-2nd-komplettset
+    - https://www.animenewsnetwork.com/encyclopedia/releases.php?id=31779

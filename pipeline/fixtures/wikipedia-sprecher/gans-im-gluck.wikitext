@@ -1,0 +1,66 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Gans_im_Gl%C3%BCck (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Gans_im_Gl%C3%BCck&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+== Synchronisation ==
+{| class="wikitable"
+|+
+!Rolle
+!Originalsprecher
+!Deutscher Sprecher (Kino)<ref>{{Synchronkartei|film|40901|Gans im Glück – 2. Synchro (Kino)|Abruf=2020-07-31}}</ref>
+!Deutscher Sprecher (Netflix)<ref>{{Synchronkartei|film|40829|Gans im Glück – 1. Synchro (Netflix)|Abruf=2020-07-31}}</ref>
+|-
+|Peng
+|Jim Gaffigan
+|[[Markus Pfeiffer]]
+|[[Rainer Doering]]
+|-
+|Lissy
+|[[Zendaya]]
+|[[Marcia von Rebay]]
+|[[Olivia Büschken]]
+|-
+|Lucky
+|Lance Lim
+|Norman Endres
+|[[Patrick Keller]]
+|-
+|Banzou
+|[[Greg Proops]]
+|[[Oliver Stritzel]]
+|[[Ingo Albrecht]]
+|-
+|Bing
+|[[Diedrich Bader]]
+|[[Reinhard Scheunemann]]
+|Frank Kirschgens
+|-
+|Carl
+|Reggie Watts
+|[[Thomas Wenke]]
+|[[Klaus-Peter Grap]]
+|-
+|Larry
+|[[Carl Reiner]]
+|[[Erich Ludwig (Schauspieler)|Erich Ludwig]]
+|[[Hans-Eckart Eckhardt]]
+|-
+|Jingjing
+|[[Natasha Leggero]]
+|[[Laura Maire]]
+|[[Cathlen Gawlich]]
+|-
+|Gustl (Giles)
+|[[Craig Ferguson]]
+|[[Christian Tramitz]]
+|[[Michael Ernst (Synchronsprecher)|Michael Ernst]]
+|-
+|Franzl (Frazier)
+|[[Stephen Fry]]
+|[[William Cohn (Sprecher)|William Cohn]]
+|[[Dirk Stollberg]]
+|-
+|Edna
+|[[Jennifer Grey]]
+|[[Bettina Redlich]]
+|Antje Thiele
+|}

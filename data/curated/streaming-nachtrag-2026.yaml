@@ -294,3 +294,18 @@
   hinweis: "Folgen 1–13 seit 01.10.2026 über den Prime-Kanal aniverse."
   sources:
     - https://www.anime2you.de/news/1056322/aniverse-oktober-2026-neuzugaenge/
+
+# Exception (Daniel, 27.11.2026): Netflix-Eigenproduktion, weltweit am 13.10.2022 mit allen 8 Folgen erschienen; aniSearch führt die deutsche
+# Fassung (Synchro) ab diesem Tag bei Netflix, Inc. Ohne diesen Termin machte der MOTN-Feed aus einer Neulistung am 25.11.2026 „Neu bei Netflix“.
+# Kein `available-from`: der Tag ist das Erscheinungsdatum, daher Katalog-Release („Vermutlich alle 8 Folgen auf einmal“). Uhrzeit nicht belegt.
+- slug: exception-netflix-2022
+  anilistId: 135660
+  titleDe: "Exception"
+  platform: netflix
+  netflixOriginal: true
+  platformUrl: https://www.netflix.com/title/81002444
+  releaseType: batch
+  schedule: { firstEpisodeDate: "2022-10-13", episodeCount: 8 }
+  sources:
+    - https://www.anisearch.de/anime/16390
+    - https://www.moviepilot.de/serie/exception/episodenguide

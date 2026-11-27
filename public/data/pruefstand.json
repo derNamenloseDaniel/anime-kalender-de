@@ -1,5 +1,5 @@
 {
- "erzeugtAm": "2026-11-27T13:49:23.087Z",
+ "erzeugtAm": "2026-11-27T16:52:23.794Z",
  "anbieter": [
   {
    "name": "Amazon",
@@ -292,9 +292,9 @@
   {
    "name": "Netflix",
    "plattform": "netflix",
-   "gemeldet": 778,
+   "gemeldet": 779,
    "gesamt": 917,
-   "offen": 139,
+   "offen": 138,
    "ohneSeite": 15,
    "ziel": "https://www.netflix.com/title/81608820",
    "ziele": [
@@ -663,10 +663,6 @@
     {
      "url": "https://www.netflix.com/title/81937398",
      "titel": "Pantheon"
-    },
-    {
-     "url": "https://www.netflix.com/title/82116553",
-     "titel": "Steel Ball Run: Jojo’s Bizarre Adventure - Phase 1"
     }
    ],
    "naechster": "Cosmo & Wanda – Ein neuer Wunsch",

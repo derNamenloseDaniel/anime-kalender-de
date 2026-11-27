@@ -7,7 +7,7 @@ Stand 22.11.2026, 02:00 UTC (erste und zweite Nacht, Auftrag Issue 4420). Alle Z
 
 - **Orchestrator:** eine dauerhafte Cloud-Sitzung (Routine, stündlich geweckt). Er vergibt Aufgaben, liest Berichte und Prüfer-Urteile, nimmt ab und pflegt den Lage-Kommentar im Auftrags-Issue. Er baut nicht selbst.
 - **Bauer:** je Aufgabe ein Agent in der Orchester-Sitzung (Agent-Werkzeug, `run_in_background`, `isolation: worktree`, Sonnet, 5 gleichzeitig (seit 22.11.2026; jede Spanne über 15 min mit weniger kommt mit Grund in den Nachtbericht); nicht per `create_session`, siehe „Ergänzungen und Bauer-Weg“; die ersten zwei Nächte liefen noch mit `create_session`). Jeder öffnet einen PR mit Label `orchester` und meldet sich mit `## Bauer fertig · <Aufgabe> · PR <N>` im Issue.
-- **Prüfer:** die PR-Prüfkette (CI-Prüfer schreibt „Prüfer-Review“ als Kommentar). Stufe 0/1 mergt der Nacht-Merger nach Bot-„ok“; Stufe 2 nur mit `## Nachtrag (Abnahme Dirigent) — Kopf <9 Zeichen>` zum aktuellen Kopf; Workflow-PRs nur von Hand.
+- **Prüfer:** die PR-Prüfkette (CI-Prüfer schreibt „Prüfer-Review“ als Kommentar). Stufe 0/1 mergt der Nacht-Merger nach Bot-„ok“; Stufe 2 seit 27.11.2026 wie Stufe 0/1 (Nachprüfung danach, Label `nachpruefung-offen`; vorher nur mit `## Nachtrag (Abnahme Dirigent) — Kopf <9 Zeichen>` zum aktuellen Kopf); Workflow-PRs nur von Hand.
 - **Wecken:** Ereignis-Monitor (Bash-Schleife, 120 s, gesehene IDs in einer Datei, Frist 30 min, bei jedem Wecken neu starten), dazu `ScheduleWakeup` 30 min als Rückfall und die stündliche Routine.
 - **Schalter:** Label `orchester-aktiv` am Issue, geprüft vor jedem Schreiben.
 
@@ -78,7 +78,7 @@ Stand 22.11.2026, 02:00 UTC (erste und zweite Nacht, Auftrag Issue 4420). Alle Z
 1. **Netz (erledigt, zweite Nacht: Umgebung „nacht-orchester“):** Für Nacht-Orchester eine eigene Cloud-Umgebung mit erlaubten Hosts (`anime-kalender.de`, `api.themoviedb.org`, `graphql.anilist.co`, …) und Setup-Skript `npm ci` anlegen; die Default-Umgebung hat keines, jeder Bauer verlor Zeit mit `npm ci`.
 2. **Mod-Test:** Stempel in `anzeige.test.ts` aus fester Uhr bilden; `uhr-in-tests` auf `.claude/mods` ausdehnen (Vorschlag A8).
 3. **Rückgabe an Bauer (seit 22.11.2026 umgesetzt):** Bauer als Hintergrund-Agent (Agent-Werkzeug) statt Cloud-Sitzung — dann geht `SendMessage` für Auflagen.
-4. **Stufe 2 ohne Auflagen:** Der Orchester-Auftrag erlaubt Abnahme nur nach umgesetzten Auflagen; reine Stufe-2-PRs mit Bot-„ok“ (4415, 4423, 4424, 4427, 4428, 4435, 4438) bleiben bis zum Morgen liegen. Entscheiden, ob der Orchestrator sie nach eigener Stichprobe abnehmen darf.
+4. **Stufe 2 ohne Auflagen:** Der Orchester-Auftrag erlaubt Abnahme nur nach umgesetzten Auflagen; reine Stufe-2-PRs mit Bot-„ok“ (4415, 4423, 4424, 4427, 4428, 4435, 4438) bleiben bis zum Morgen liegen. Entscheiden, ob der Orchestrator sie nach eigener Stichprobe abnehmen darf. **Entschieden 27.11.2026:** ja, nach Lektüre von Diff und Prüferbericht, Ablauf unten in „Nachprüfung nach dem Merge“.
 5. **Reine Kommentar-PRs** in `pr-stufe` herabstufen (Vorschlag A21).
 6. **Gegenprobe:** Mutanten nur per Zeilenanker setzen, nie per erster Textfundstelle.
 7. **Monitor:** meldet `github-actions`-Kommentare; `## Frage`-Kommentare der Bauer meldet er nicht — mit aufnehmen.
@@ -88,6 +88,16 @@ Stand 22.11.2026, 02:00 UTC (erste und zweite Nacht, Auftrag Issue 4420). Alle Z
 11. **Nachschub** nur für Mängelarten mit erreichbarer Quelle; TMDB-Aufgaben über `claude-auftrag.yml` (die Umgebung hat keinen Schlüssel, siehe „Ergänzungen und Bauer-Weg“).
 12. **Lehren-Aufgaben:** `lehren.md` ins Repo legen oder solche Aufgaben als „lokal“ markieren.
 13. **Neue Mutanten** sofort mit `tests`-Eintrag anlegen (PR 4531).
+
+## Nachprüfung nach dem Merge (27.11.2026, Issue 5209)
+
+Seit 27.11.2026 mergt der Nacht-Merger Stufe 2 ohne Sondertor (Daniel hat F131 aufgehoben); der zweite Blick kommt danach. Anlass: 23 fertige Stufe-2-PRs lagen 8 753 min, weil nachts niemand den Nachtrag schrieb (Messung 25.–27.11.2026). Vorschlag 4 oben (Orchestrator darf abnehmen) ist damit erledigt.
+- **Liste:** Der Merger setzt auf jeden gemergten Stufe-2-PR das Label `nachpruefung-offen` (Protokollzeile `NACHPRÜFUNG OFFEN #<PR>`). Bei jedem Wecken `node tools/liegegut.mjs` (Zeile `NACHPRÜFUNG OFFEN: …`) oder `gh api -X GET repos/derNamenloseDaniel/anime-kalender-de/issues -f labels=nachpruefung-offen -f state=all`.
+- **Prüfen:** Diff des gemergten PR gegen Auftrag und Prüferbericht lesen (Auflagen einzeln), bei Daten-PRs eine Stichprobe am Beleg, nach dem Deploy die Wirkung live messen. Ohne Befund das Label entfernen (`gh api -X DELETE repos/derNamenloseDaniel/anime-kalender-de/issues/<N>/labels/nachpruefung-offen`) und einen Satz im PR kommentieren, was geprüft wurde.
+- **Befund:** Fix-PR oder Revert (je nach Schaden, Revert bei falschen Live-Daten zuerst), der Mangel geht an den Auftrag zurück (`## Frage` oder neue Aufgabe im Auftrags-Issue); das Label bleibt, bis der Fix gemergt ist.
+- **Grenzen:** Das Bot-Urteil zum Kopf, grüne Kette, APPROVED und CLEAN bleiben Bedingung des Merges; Workflow-PRs merged der Dirigent von Hand. Ein altes `## Nachtrag (Abnahme Dirigent) — Kopf …` gilt weiter als Freigabe, wird aber für Stufe 2 nicht mehr verlangt.
+- **Verworfene Freigabe:** Ein Main-Nachzug verwirft die Freigabe (Ruleset `dismiss_stale`, bleibt). Der Merger stößt die Prüfer-Übernahme dann selbst an (`ÜBERNAHME ANGESTOSSEN #<PR>` im Protokoll); `node tools/liegegut.mjs` zeigt Signal 14 „Freigabe verworfen nach Main-Nachzug“ und `WARTESCHLANGE: …`, wenn Prüfer- oder Freigabe-Läufe seit 30 min auf `queued` stehen. Bei Signal 14 ohne Anstoß: `gh workflow run pr-pruefer.yml --ref main -f pr=<PR>`; bei WARTESCHLANGE nichts neu starten (ein zweiter Lauf bricht den ersten ab), sondern warten und den Stau in `## Frage` oder im Nachtbericht nennen.
+- **Wirkung:** Stufe-2-PRs mit Prüfer-Ok und grüner Kette sind nachts innerhalb von ≤ 40 min gemergt; Messung in der Nacht auf den 28.11.2026.
 
 ## Ergänzungen und Bauer-Weg (22.11.2026)
 

@@ -20,6 +20,7 @@ assert.equal(nachpruefungMeldung(ghMit([{ nr: 5101, zu: '2026-11-28T02:30:00Z' }
 assert.ok(aufrufe[0].includes('labels=nachpruefung-offen') && aufrufe[0].includes('state=all'), 'fragt das Label, auch geschlossene (gemergte) PRs')
 assert.equal(nachpruefungMeldung(ghMit([]), JETZT), null, 'ohne Treffer keine Zeile')
 assert.equal(nachpruefungMeldung(ghMit([{ nr: 7, zu: null }]), JETZT), 'NACHPRÜFUNG OFFEN: 7', 'ohne Merge-Zeit ohne Altersangabe')
+assert.equal(nachpruefungMeldung(ghMit([{ nr: 999, zu: null }, { nr: 5100, zu: '2026-11-28T03:00:00Z' }]), JETZT), 'NACHPRÜFUNG OFFEN: 999, 5100 (älteste seit 3 h)', 'Nummern numerisch sortiert, ein fehlendes Datum verfälscht das Alter nicht')
 assert.throws(() => nachpruefungMeldung(() => 'kein json', JETZT), 'Müll statt JSON wirft (meldeLiegt macht daraus eine LIEGT?-Zeile)')
 
 // Verdrahtung: Wachphase und Kommandozeile melden die Zeile

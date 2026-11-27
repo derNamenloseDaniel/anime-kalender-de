@@ -3,7 +3,7 @@ import { BRAUCHT_TAGE, WORKER_TERMINE_DATEI, deckt, type Weitere } from '../../s
 import { weitereAusNews } from '../../shared/news-weitere.ts'
 import { einmal } from './ausbleiben-messer.ts'
 import type { Env } from './env.ts'
-import { berlinParts } from './werte.ts'
+import { berlinParts, fehlerLog } from './werte.ts'
 
 /**
  * Termine und „Jetzt auch bei“-Zeilen für einen Cron-Aufruf: die kleine Bau-Datei `worker-termine.json` (rund 50 KB statt 1,7 MB, siehe
@@ -17,8 +17,9 @@ export function termineQuelle(env: Env, jetzt: Date, ladeVoll: () => Promise<Rel
       const res = await fetch(new URL(`data/${WORKER_TERMINE_DATEI}`, env.SITE_URL).toString(), { cf: { cacheTtl: 900 } } as RequestInit)
       const datei: unknown = res.ok ? await res.json() : null
       return deckt(datei, tag(-BRAUCHT_TAGE), tag(BRAUCHT_TAGE)) ? datei : null
-    } catch {
-      return null // Netzfehler oder kein JSON: volle Dateien
+    } catch (e) {
+      fehlerLog('[termine-quelle] worker-termine.json nicht lesbar, volle Dateien', e) // Netzfehler oder kein JSON
+      return null
     }
   })
   return {

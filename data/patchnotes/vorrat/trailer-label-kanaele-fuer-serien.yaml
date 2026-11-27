@@ -1,0 +1,5 @@
+kategorie: feature
+text: Deutsche Trailer der Anime-Labels jetzt auch für Serien
+untertitel: Etwa von KSM Anime, direkt im Detail-Panel
+wartetAuf: "Trailer-Lauf und Bestandsbau nach PR 5123 (gemergt 27.11.2026 16:38). Stand 27.11.2026 22:20 UTC: deutsche Trailer bei Titeln, die kein Film sind, 234 → 237. Probe: public/data/titles.json zählt bei format ungleich MOVIE mindestens 260 Titel mit trailer.sprache de. Vor der Freigabe die Zahl in den Text setzen. Ändert sich nach dem Lauf nichts, wird der Eintrag gelöscht."
+seit: '2026-11-27'

@@ -1,20 +1,6 @@
 {
-  "stand": "2026-11-27",
+  "stand": "2026-11-28",
   "eintraege": [
-    {
-      "titel": "Expelled from Paradise: Liberated from Paradise",
-      "id": 157330,
-      "anbieter": "unbekannt",
-      "start": "2026-11-13",
-      "seit": "2026-11-08"
-    },
-    {
-      "titel": "Orochi: Seventh Echoes Pilot Film",
-      "id": 219880,
-      "anbieter": "unbekannt",
-      "start": "2026-11-13",
-      "seit": "2026-11-14"
-    },
     {
       "titel": "Kamisama Kiss: Staffel 2",
       "id": 20801,
@@ -122,6 +108,20 @@
     }
   ],
   "abgeloest": [
+    {
+      "titel": "Expelled from Paradise: Liberated from Paradise",
+      "id": 157330,
+      "anbieter": "unbekannt",
+      "start": "2026-11-13",
+      "seit": "2026-11-08"
+    },
+    {
+      "titel": "Orochi: Seventh Echoes Pilot Film",
+      "id": 219880,
+      "anbieter": "unbekannt",
+      "start": "2026-11-13",
+      "seit": "2026-11-14"
+    },
     {
       "titel": "Call of the Night: Staffel 2",
       "id": 175914,

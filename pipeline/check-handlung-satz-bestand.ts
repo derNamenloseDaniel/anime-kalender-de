@@ -4,7 +4,7 @@
  */
 import { SYNOPSIS_GROUPS, type Title } from '../shared/types.ts'
 import { readJson } from './lib/util.ts'
-import { zurueckgestellt } from './lib/quarantaene.ts'
+import { melde, zurueckgestellt } from './lib/quarantaene.ts'
 import { ladeSaetze, satzBestandFehler } from './lib/handlung-satz.ts'
 import { bestandWarnzeile } from './lib/bestand-warnzeile.ts'
 
@@ -32,7 +32,10 @@ const verwaist = alle.filter((f) => f.endsWith('Titel nicht im Bestand'))
 const verstoesse = alle.filter((f) => !verwaist.includes(f))
 
 if (verwaist.length) console.log(bestandWarnzeile('Ein-Satz-Handlung', 'ohne Titel im Bestand (nichts davon live; Eintrag löschen)', verwaist.map((f) => Number(/Titel (\d+)/.exec(f)![1]))))
-for (const v of verstoesse) console.log(`✖ ${v}`)
+for (const v of verstoesse) {
+  console.log(`✖ ${v}`)
+  melde(Number(/Titel (\d+)/.exec(v)![1]), 'handlung-satz', 'Ein-Satz-Handlung ist nur der Titel oder zu nah an einem ausgelieferten Text')
+}
 console.log(`Ein-Satz-Handlung gegen den Bestand: ${verwaist.length} verwaist (Warnung), ${verstoesse.length} Verstöße.`)
 console.log(`VERSTÖSSE: ${verstoesse.length}`)
 process.exit(verstoesse.length ? 1 : 0)

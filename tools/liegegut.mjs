@@ -11,8 +11,9 @@ import { pathToFileURL } from 'node:url'
 import { istZugPr, leseZugAktiv } from './zug-aktiv.mjs'
 import { schleifeSignal, schleifenBeginn } from './nachrechnen-schleife.mjs'
 import { PRAEFIX as ABNAHME_PRAEFIX } from './abnahme-freigabe.mjs'
-import { hatNachtrag } from './nacht-merger-wahl.mjs'
 import { vorratMeldung } from './liegegut-vorrat.mjs'
+import { nachpruefungMeldung } from './liegegut-nachpruefung.mjs'
+import { warteschlangeMeldung } from './liegegut-warteschlange.mjs'
 
 const STUNDE = 3600 * 1000
 
@@ -35,7 +36,6 @@ export const RUHE_FREIGABE_H = 12 // Freigabe + grün + sauber, ohne Commit und 
 export const KONFLIKT_H = 24 // Konflikt ohne Aktivität; der Beginn des Konflikts ist nicht abrufbar, Näherung: letzte Aktivität.
 export const ROT_H = 12 // Rote Checks auf dem aktuellen Kopf: ein Wiederholungslauf dauert weniger.
 export const AENDERN_H = 24 // Ändern-Urteil ohne neuen Commit: der Bauer hatte einen Tag.
-export const NACHTRAG_MIN = 10 // Minuten nach dem Kopf-Commit, bis ein fehlender Nachtrag gemeldet wird (der Dirigent schreibt ihn nach dem Push).
 export const STILLSTAND_H = 48 // Keine Aktivität (Commit, Kommentar, Review), egal warum: fängt PRs, die auf kein anderes Signal passen (z. B. wartet still auf den Prüfer). Stand 30.10.2026, Schwelle = zwei Tage.
 
 const GRUEN = new Set(['SUCCESS', 'NEUTRAL', 'SKIPPED'])
@@ -133,47 +133,25 @@ const letzteAktivitaet = (pr, kopfZeit) => {
   return Math.max(...zeiten.filter((z) => !Number.isNaN(z)))
 }
 
-export const STUFE_FRIST_MS = 30_000
-const prStufeLauf = (nummer) => mitLimit(process.execPath, ['tools/pr-stufe.mjs', String(nummer)], { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 }, { limitMs: STUFE_FRIST_MS })
-
-/** Prüfstufe über `pr-stufe` (dasselbe Werkzeug wie der Nacht-Merger), Frist 30 s je Aufruf; Fehler und Ausgabe ohne Stufe werfen (sichtbar macht sie `stufeOderHinweis`). */
-export function stufeEcht(nummer, ausfuehren = prStufeLauf) {
-  const s = JSON.parse(ausfuehren(nummer)).stufe
-  if (!Number.isInteger(s)) throw new Error('Ausgabe ohne Stufe')
-  return s
-}
-
-/** Stufenfunktion, die statt zu werfen eine Hinweiszeile gibt und null liefert (Signal 12 entfällt dann nur für diesen PR, nicht still). */
-export function stufeOderHinweis(stufeFn, hinweis) {
-  if (stufeFn === null) return null
-  return (nummer) => {
-    try {
-      return stufeFn(nummer)
-    } catch (e) {
-      hinweis(`LIEGT? Stufe PR ${nummer} nicht lesbar: ${String(e.message).split("\n")[0]}`)
-      return null
-    }
-  }
-}
-
-/**
- * Signal 12: Stufe-2-PR, dessen jüngstes Prüfer-Urteil ok ist, aber ohne Nachtrag des Dirigenten zum aktuellen Kopf — der Nacht-Merger überspringt ihn
- * (14.11.2026: 3661, 3717, 3720, 3726 nach update-branch). `stufeFn(nummer)` null = Signal aus; sie wird erst gefragt, wenn alles andere zutrifft.
- */
-export function nachtragSignal(pr, kopfZeit, jetzt, stufeFn) {
-  if (stufeFn === null || stunden(kopfZeit, jetzt) * 60 < NACHTRAG_MIN) return []
-  if (urteile(pr.comments).at(-1)?.gut !== true) return []
-  const kommentare = pr.comments.map((c) => ({ login: c.author?.login, assoc: c.authorAssociation, at: c.createdAt, body: c.body }))
-  if (hatNachtrag(kommentare, pr.headRefOid) || stufeFn(pr.number) !== 2) return []
-  return [{ nr: 12, text: `Stufe 2: Nachtrag zum Kopf ${pr.headRefOid.slice(0, 9)} fehlt (Nacht-Merger überspringt)`, seit: kopfZeit }]
-}
-
 export const SAMMLER_AUTOR = 'app/anime-kalender-daten'
 
 /** Signal 13: offener PR auf `daten/` von einem anderen Autor als dem Sammler: die Kette überspringt `daten/`, nichts prüft oder mergt ihn (PR 4732, 23.11.2026). */
 export function datenZweigSignal(pr, kopfZeit) {
   if (!pr.headRefName?.startsWith('daten/') || pr.author?.login === SAMMLER_AUTOR) return []
   return [{ nr: 13, text: `daten/-Zweig von ${pr.author?.login ?? 'unbekannt'} (Kette überspringt ihn)`, seit: kopfZeit }]
+}
+
+export const FREIGABE_VERWORFEN_MIN = 30 // Minuten nach dem Kopf-Commit, bis ein verworfenes Prüfer-Ok gemeldet wird (die Übernahme braucht ihre Zeit)
+
+/**
+ * Signal 14 (27.11.2026, Dirigent-Nachtrag 7218441221): Das Ruleset verwirft die Freigabe bei jedem Push (`dismiss_stale`), auch bei einem reinen
+ * Main-Nachzug. Das jüngste Review ist dann `DISMISSED`, die Kette am neuen Kopf grün; ohne neues Review (Übernahme oder Abnahme-Freigabe) bleibt der PR liegen.
+ */
+export function freigabeVerworfenSignal(pr, kopfZeit, jetzt) {
+  const reviews = (pr.reviews ?? []).filter((r) => !Number.isNaN(Date.parse(r.submittedAt)))
+  const juengstes = reviews.sort((a, b) => Date.parse(a.submittedAt) - Date.parse(b.submittedAt)).at(-1)
+  if (juengstes?.state !== 'DISMISSED' || checkStand(pr.statusCheckRollup).art !== 'gruen' || stunden(kopfZeit, jetzt) * 60 < FREIGABE_VERWORFEN_MIN) return []
+  return [{ nr: 14, text: 'Freigabe verworfen nach Main-Nachzug (Übernahme fehlt)', seit: kopfZeit }]
 }
 
 /** Signal 11: Entwurf ohne Aktivität länger als ENTWURF_H; für Entwürfe das einzige Signal (die übrigen gelten nur für ready-PRs). */
@@ -296,14 +274,14 @@ export function ueberholtTreffer(patches, grepFn) {
   return gesamt > 0 && funde.length === gesamt ? funde : []
 }
 
-const NAECHSTER = { ENTWURF: 'ENTWURF (prüfen, auf bereit stellen oder schließen)', STAPEL: 'STAPEL', STILLSTAND: 'STILLSTAND', SCHLEIFE: 'SCHLEIFE (Nachrechnen-Gründe in den Kommentaren lesen)', UEBERHOLT: 'ÜBERHOLT?', NACHTRAG: 'NACHTRAG (Abnahme Dirigent zum Kopf schreiben)', ZWEIG: 'ZWEIG UMBENENNEN (auf fix/ oder korrektur/ neu pushen)', DANIEL: 'DANIEL', MERGEN: 'MERGEN', ZUG: 'AUF ZUG MERGEN (merge-reihe-zug.sh)', NACHBESSERN: 'NACHBESSERN' }
+const NAECHSTER = { ENTWURF: 'ENTWURF (prüfen, auf bereit stellen oder schließen)', STAPEL: 'STAPEL', STILLSTAND: 'STILLSTAND', SCHLEIFE: 'SCHLEIFE (Nachrechnen-Gründe in den Kommentaren lesen)', UEBERHOLT: 'ÜBERHOLT?', UEBERNAHME: 'ÜBERNAHME (Prüfer-Lauf anstoßen: gh workflow run pr-pruefer.yml --ref main -f pr=<PR>)', ZWEIG: 'ZWEIG UMBENENNEN (auf fix/ oder korrektur/ neu pushen)', DANIEL: 'DANIEL', MERGEN: 'MERGEN', ZUG: 'AUF ZUG MERGEN (merge-reihe-zug.sh)', NACHBESSERN: 'NACHBESSERN' }
 
 /** Nächster Schritt aus Signalen und Gegenprobe; `daniel` = Signal 6 oder Signal 2 mit Bot-Urteil als letztem (nur Daniel löst das). */
 export function naechsterSchritt(nummern, treffer, botLetzt, imZug = false) {
   const hat = (n) => nummern.includes(n)
   if (hat(9)) return NAECHSTER.STAPEL
   if (hat(13)) return NAECHSTER.ZWEIG
-  if (hat(12)) return NAECHSTER.NACHTRAG
+  if (hat(14)) return NAECHSTER.UEBERNAHME
   if (nummern.every((n) => n === 8)) return NAECHSTER.STILLSTAND
   if (nummern.every((n) => n === 10 || n === 8)) return NAECHSTER.SCHLEIFE
   if (treffer.length > 0 && (hat(1) || hat(3) || hat(5))) return NAECHSTER.UEBERHOLT
@@ -363,11 +341,11 @@ function bewerteEntwurf(pr, kopfZeit, jetzt, repo) {
 }
 
 /** Bewertet einen PR; null, wenn nichts auffällt, sonst { nr, signale: [{ nr, seit }], zeile }. */
-function bewertePr(ghFn, gitFn, pr, geteilt, jetzt, karte, stapel, imZug, repo, stufeFn) {
+function bewertePr(ghFn, gitFn, pr, geteilt, jetzt, karte, stapel, imZug, repo) {
   const kopfZeit = kopfZeitVon(ghFn, pr, karte)
   if (Number.isNaN(kopfZeit)) throw new Error(`PR ${pr.number}: Kopf-Zeit nicht lesbar`)
   if (pr.isDraft) return bewerteEntwurf(pr, kopfZeit, jetzt, repo)
-  const signale = [...signaleEinzel(pr, kopfZeit, jetzt), ...stillstandSignal(pr, kopfZeit, jetzt), ...schleifeSignal(pr, schleifenBeginn(ghFn, pr, kopfZeit)), ...nachtragSignal(pr, kopfZeit, jetzt, stufeFn), ...datenZweigSignal(pr, kopfZeit)]
+  const signale = [...signaleEinzel(pr, kopfZeit, jetzt), ...stillstandSignal(pr, kopfZeit, jetzt), ...schleifeSignal(pr, schleifenBeginn(ghFn, pr, kopfZeit)), ...datenZweigSignal(pr, kopfZeit), ...freigabeVerworfenSignal(pr, kopfZeit, jetzt)]
   const texte = signale.map((s) => `${s.nr} ${s.text}`)
   const zeiten = signale.map((s) => s.seit)
   const nummern = signale.map((s) => s.nr)
@@ -428,7 +406,7 @@ export function standImProjekt(gitFn, hinweis) {
 }
 
 /** Holt die offenen PRs über gh/git (einspeisbar) und rechnet alle. `standText` = Text von stand.md (null = keine Einschränkung bei Signal 6). Rückgabe: Funde { nr, signale, zeile }. */
-export function liegegutFunde(ghFn, gitFn, jetzt, hinweis, standText = null, zugAktiv = leseZugAktiv(), repo = HAUPT_REPO, stufeFn = null) {
+export function liegegutFunde(ghFn, gitFn, jetzt, hinweis, standText = null, zugAktiv = leseZugAktiv(), repo = HAUPT_REPO) {
   const gh = ghFuerRepo(ghFn, repo.slug)
   const git = repo.slug ? null : gitFn
   const zug = repo.slug ? false : zugAktiv
@@ -436,21 +414,20 @@ export function liegegutFunde(ghFn, gitFn, jetzt, hinweis, standText = null, zug
   const offen = alle.filter((p) => !p.isDraft)
   const geteilt = geteilteEntscheidungen(offen, offeneEntscheidungen(standText))
   const karte = kopfZeiten(gh)
-  const stufe = stufeOderHinweis(stufeFn, hinweis)
   const stapel = stapelBasen(gh, offen, zug)
-  return alle.map((pr) => bewertePr(gh, git, pr, geteilt.get(pr.number), jetzt, karte, stapel.get(pr.number), istZugPr(pr, zug), repo.name, repo.slug ? null : stufe)).filter((f) => f !== null)
+  return alle.map((pr) => bewertePr(gh, git, pr, geteilt.get(pr.number), jetzt, karte, stapel.get(pr.number), istZugPr(pr, zug), repo.name)).filter((f) => f !== null)
 }
 
 /** Funde aller überwachten Repos (REPOS), Haupt-Repo zuerst; ein Abruffehler in einem Repo schlägt durch. */
-export const liegegutAlleFunde = (ghFn, gitFn, jetzt, hinweis, standText, zugAktiv, stufeFn = null) => REPOS.flatMap((r) => liegegutFunde(ghFn, gitFn, jetzt, hinweis, standText, zugAktiv, r, stufeFn))
+export const liegegutAlleFunde = (ghFn, gitFn, jetzt, hinweis, standText, zugAktiv) => REPOS.flatMap((r) => liegegutFunde(ghFn, gitFn, jetzt, hinweis, standText, zugAktiv, r))
 
 /** Dieselben Funde als Textzeilen (nur das Haupt-Repo; main() und die Wachphase nehmen `liegegutAlle`). */
 export const liegegut = (ghFn, gitFn, jetzt, hinweis, standText, zugAktiv) => liegegutFunde(ghFn, gitFn, jetzt, hinweis, standText, zugAktiv).map((f) => f.zeile)
 
 /** Textzeilen aller überwachten Repos. */
-export const liegegutAlle = (ghFn, gitFn, jetzt, hinweis, standText, zugAktiv, stufeFn = null) => liegegutAlleFunde(ghFn, gitFn, jetzt, hinweis, standText, zugAktiv, stufeFn).map((f) => f.zeile)
+export const liegegutAlle = (ghFn, gitFn, jetzt, hinweis, standText, zugAktiv) => liegegutAlleFunde(ghFn, gitFn, jetzt, hinweis, standText, zugAktiv).map((f) => f.zeile)
 
-const KURZ = { 1: 'Freigabe ruht', 2: 'Urteile widersprechen', 3: 'Konflikt', 4: 'rot', 5: 'Ändern offen', 6: 'gleiche Entscheidung', 8: 'Stillstand', 9: 'Stapel', 10: 'Nachrechnen-Schleife', 11: 'Entwurf liegt', 12: 'Nachtrag fehlt', 13: 'daten/-Zweig fremd' }
+const KURZ = { 1: 'Freigabe ruht', 2: 'Urteile widersprechen', 3: 'Konflikt', 4: 'rot', 5: 'Ändern offen', 6: 'gleiche Entscheidung', 8: 'Stillstand', 9: 'Stapel', 10: 'Nachrechnen-Schleife', 11: 'Entwurf liegt', 13: 'daten/-Zweig fremd', 14: 'Freigabe verworfen' }
 
 /** Eine Sammelzeile für die Wachphase: `LIEGT: 2377 (Konflikt 30 h, Stillstand 52 h), …`; null ohne Funde. */
 export function liegtZeile(funde, jetzt) {
@@ -460,12 +437,16 @@ export function liegtZeile(funde, jetzt) {
 }
 
 /** Wachphase: Sammelzeile oder eigene Fehlerzeile, wirft nie (kein stilles „nichts“). */
-export function meldeLiegt(ghFn, gitFn, log, jetzt, stufeFn = null) {
+export function meldeLiegt(ghFn, gitFn, log, jetzt) {
   try {
-    const zeile = liegtZeile(liegegutAlleFunde(ghFn, gitFn, jetzt, log, standImProjekt(gitFn, log), undefined, stufeFn), jetzt)
+    const zeile = liegtZeile(liegegutAlleFunde(ghFn, gitFn, jetzt, log, standImProjekt(gitFn, log)), jetzt)
     if (zeile) log(zeile)
     const vorrat = vorratMeldung(ghFn, hauptordner(gitFn), jetzt)
     if (vorrat) log(vorrat)
+    const nachpruefung = nachpruefungMeldung(ghFn, jetzt)
+    if (nachpruefung) log(nachpruefung)
+    const warteschlange = warteschlangeMeldung(ghFn, jetzt)
+    if (warteschlange) log(warteschlange)
   } catch (e) {
     log(`LIEGT? liegegut nicht lesbar: ${String(e.message).split('\n')[0]}`)
   }
@@ -499,12 +480,16 @@ export function git(args) {
 }
 
 /** Startlogik: Fehler als Exit 2, Funde als Exit 0. */
-export function main(ghFn, gitFn, melde, jetzt, stufeFn = null) {
+export function main(ghFn, gitFn, melde, jetzt) {
   try {
-    const zeilen = liegegutAlle(ghFn, gitFn, jetzt, melde, standImProjekt(gitFn, melde), undefined, stufeFn)
+    const zeilen = liegegutAlle(ghFn, gitFn, jetzt, melde, standImProjekt(gitFn, melde))
     for (const z of zeilen) melde(z)
     const vorrat = vorratMeldung(ghFn, hauptordner(gitFn), jetzt)
     if (vorrat) melde(vorrat)
+    const nachpruefung = nachpruefungMeldung(ghFn, jetzt)
+    if (nachpruefung) melde(nachpruefung)
+    const warteschlange = warteschlangeMeldung(ghFn, jetzt)
+    if (warteschlange) melde(warteschlange)
     melde(`liegegut: ${zeilen.length} auffällige PRs`)
     return 0
   } catch (e) {
@@ -514,5 +499,5 @@ export function main(ghFn, gitFn, melde, jetzt, stufeFn = null) {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  process.exit(main(gh, git, (t) => console.log(t), Date.now(), stufeEcht))
+  process.exit(main(gh, git, (t) => console.log(t), Date.now()))
 }

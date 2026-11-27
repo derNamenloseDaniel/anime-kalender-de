@@ -1,11 +1,11 @@
 {
-  "scrapedAt": "2026-11-27T13:12:15.995Z",
+  "scrapedAt": "2026-11-27T14:08:08.085Z",
   "verworfen": {
     "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 13,
     "schon in einem Rubrik-Feed gelesen": 10,
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 14,
     "Sprachhinweis älter als 45 Tage": 6
   },
   "proposals": [
@@ -22,6 +22,19 @@
         }
       ],
       "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Vier Blu-ray-Termine von KSM Anime und AniMoon verschoben",
+      "articleUrl": "https://www.anime2you.de/news/1076668/ksm-animoon-vier-disc-verschiebungen/",
+      "publishedAt": "2026-11-27",
+      "category": "disc",
+      "platforms": [
+        "disc"
+      ],
+      "dates": [],
+      "dub": "unklar",
+      "pause": "verschoben",
       "alreadyCurated": false
     },
     {

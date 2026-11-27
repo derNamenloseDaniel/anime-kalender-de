@@ -1,5 +1,6 @@
 import type { Env } from './env.ts'
 import { KOPF, STANDARD_REPO, letzteLaeufe } from './wecker.ts'
+import { fehlerLog } from './werte.ts'
 
 /**
  * **Eine gemeldete Prime-Seite stößt den Bestandsbau an** (Daniel, 26.11.2026: „sobald ich über die Erweiterung die richtige Seite melde, muss der Fix sofort live sein“).
@@ -26,7 +27,10 @@ export type AnstossErgebnis = 'gestartet' | 'wartet-schon' | 'ohne-token' | 'abg
 
 export async function stosseBauAn(env: Env): Promise<AnstossErgebnis> {
   if (!env.GITHUB_WECKER_TOKEN) return 'ohne-token'
-  const laeufe = await letzteLaeufe(env, STANDARD_REPO, BAU).catch(() => null)
+  const laeufe = await letzteLaeufe(env, STANDARD_REPO, BAU).catch((e) => {
+    fehlerLog('[bau-anstoss] Läufe nicht lesbar, Bau wird trotzdem gestartet', e)
+    return null
+  })
   if (laeufe?.some((l) => WARTEND.has(String(l.status)))) return 'wartet-schon'
   const r = await fetch(`https://api.github.com/repos/${STANDARD_REPO}/actions/workflows/${BAU}/dispatches`, {
     method: 'POST',

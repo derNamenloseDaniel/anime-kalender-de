@@ -19,7 +19,7 @@ import { berechneAntwort } from '../web/src/components/detail/antwort-berechnen.
 import { AntwortKasten } from '../web/src/components/detail/antwort-kasten.tsx'
 import { deutschBegonnen } from '../web/src/components/detail/antwort-regeln.ts'
 import { deSeitZeigen } from '../web/src/components/detail/de-seit.ts'
-import { wegeOhneNurUntertitel, alleOhneSprachbeleg, streamStatus, streamWegStatus } from '../web/src/components/detail/legende-zeilen.ts'
+import { wegeOhneNurUntertitel, ohneSprachbelegFuer, alleOhneSprachbeleg, streamStatus, streamWegStatus } from '../web/src/components/detail/legende-zeilen.ts'
 import { legendeFuer } from '../web/src/components/detail/pille.tsx'
 import { translate } from '../web/src/lib/i18n.tsx'
 import { newsSatz } from '../web/src/lib/news-text.ts'
@@ -149,6 +149,7 @@ function bereich(t: Title, rs: Release[]): string {
     ...leer,
     antwort,
     sortiertNachZugang: wegeOhneNurUntertitel(sortiereNachZugang({ title: t }), t, rs),
+    ohneSprachbeleg: ohneSprachbelegFuer(wegeOhneNurUntertitel(sortiereNachZugang({ title: t }), t, rs), t, rs),
     streamReleases: [],
     terminReleases: [],
     title: t,

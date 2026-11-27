@@ -125,15 +125,15 @@ export function VerpasstMarke({ event, t }: { event: ReleaseEvent; t: Translate 
 }
 
 /**
- * **Ein Termin ohne belegte Synchro sagt es auf der Karte** (10.10.2026, Beerus): „OmU" oder „Synchro offen" statt eines
- * stillen deutschen Termins. Die Erklärung steht im Tooltip und als Notiz im Panel.
+ * **Ein Termin ohne belegte Synchro sagt es auf der Karte** (10.10.2026, Beerus): „Synchro offen" statt eines
+ * stillen deutschen Termins. Die Erklärung steht im Tooltip und als Notiz im Panel. Nur-Untertitel-Termine gibt es hier nicht (`shared/nur-deutsch.ts`).
  */
 export function SpracheMarke({ event, t }: { event: ReleaseEvent; t: Translate }) {
   if (!event.sprache) return null
   return (
-    <Tooltip text={t(event.sprache === 'omu' ? 'fachwort.omu' : 'kal.synchroOffenHinweis')} seite="oben">
+    <Tooltip text={t('kal.synchroOffenHinweis')} seite="oben">
       <span className="rounded bg-ak-flaeche-2 px-1 text-[11px] font-semibold text-ak-leise">
-        {t(event.sprache === 'omu' ? 'kal.omu' : 'kal.synchroOffen')}
+        {t('kal.synchroOffen')}
       </span>
     </Tooltip>
   )

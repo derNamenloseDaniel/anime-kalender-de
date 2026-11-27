@@ -13,7 +13,7 @@ import { autoReleaseWidersprueche } from '../lib/auto-release-pruefung.ts'
 import { vorschlaegeAusAllenSammelartikeln } from '../lib/sammelartikel.ts'
 import { baueNews, type NewsHistorie } from '../lib/news.ts'
 import { traegeAltbestandEin, vorigeWatchAdressen } from '../lib/news-altbestand.ts'
-import { omuTitelAusKatalog } from '../lib/news-omu.ts'
+import { omuTitelAusKatalog, ohneUntertitelMeldungen } from '../lib/news-omu.ts'
 import { belegeFuerAlle, type BelegGedaechtnis } from '../lib/beleg-lesung.ts'
 import { entdoppeleUndMelde } from '../lib/beleg-anbieter.ts'
 import { messungenFuerFolgen } from '../lib/news-messung.ts'
@@ -78,8 +78,9 @@ export function schreibeKernUndNews({ releases, events, titles, meta, bekannteSe
       /* Das zuvor ausgelieferte `news.json` speist beim ersten Lauf den Verlauf. */
       readJson<NewsEintrag[]>(`${OUT}/news.json`, []), omuTitelAusKatalog(OUT), nurOriginaltonAdressen(),
     ), readJson<BelegGedaechtnis>('data/beleg-lesungen.json', {}))))
-    writeJson(`${OUT}/news.json`, meldungen)
-    newsFuerRss = meldungen
+    const sichtbar = ohneUntertitelMeldungen(meldungen)
+    writeJson(`${OUT}/news.json`, sichtbar)
+    newsFuerRss = sichtbar
     setzeVerlaufEin(newsHistorie, gehalten)
     writeJson('data/news-historie.json', newsHistorie)
     protokolliereNews(meldungen)

@@ -1,15 +1,42 @@
 {
-  "scrapedAt": "2026-11-27T04:14:23.338Z",
+  "scrapedAt": "2026-11-27T14:08:08.085Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 43,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 49,
-    "schon in einem Rubrik-Feed gelesen": 33,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
-    "Sprachhinweis älter als 45 Tage": 7
+    "schon in einem Rubrik-Feed gelesen": 10,
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 14,
+    "Sprachhinweis älter als 45 Tage": 6
   },
   "proposals": [
+    {
+      "articleTitle": "Termin von »Wazamonogatari: Karen Ogre« steht fest + Trailer",
+      "articleUrl": "https://www.anime2you.de/news/1077302/termin-von-wazamonogatari-karen-ogre/",
+      "publishedAt": "2026-11-27",
+      "category": "allgemein",
+      "platforms": [],
+      "dates": [
+        {
+          "iso": "2026-12-31",
+          "context": "Franchise wurde heute verkündet, dass »Wazamonogatari: Karen Ogre« am 31. Dezember 2026 seine Premiere im japanischen Fernsehen feiert. Wir"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Vier Blu-ray-Termine von KSM Anime und AniMoon verschoben",
+      "articleUrl": "https://www.anime2you.de/news/1076668/ksm-animoon-vier-disc-verschiebungen/",
+      "publishedAt": "2026-11-27",
+      "category": "disc",
+      "platforms": [
+        "disc"
+      ],
+      "dates": [],
+      "dub": "unklar",
+      "pause": "verschoben",
+      "alreadyCurated": false
+    },
     {
       "articleTitle": "Neue Bilder der acht DVD-Generationsboxen zu »Pokémon« enthüllt",
       "articleUrl": "https://www.anime2you.de/news/1076238/pokemon-dvd-generationsboxen-design/",
@@ -49,7 +76,7 @@
       "alreadyCurated": false
     },
     {
-      "articleTitle": "Netflix ergänzt sein Anime-Angebot um zwei neue Serien",
+      "articleTitle": "Zwei Anime-Neuzugänge ab sofort auf Netflix verfügbar",
       "articleUrl": "https://www.anime2you.de/news/1076269/netflix-fool-night-und-mehr/",
       "publishedAt": "2026-11-26",
       "category": "streaming",
@@ -58,7 +85,6 @@
       ],
       "dates": [],
       "dub": "ja",
-      "hinweis": "sprache",
       "alreadyCurated": false
     },
     {
@@ -6506,7 +6532,7 @@
       ],
       "dates": [],
       "dub": "unklar",
-      "alreadyCurated": false,
+      "alreadyCurated": true,
       "sammel": [
         {
           "titel": "Blue Box",

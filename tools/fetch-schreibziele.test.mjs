@@ -120,6 +120,11 @@ try {
   const eigenerStart = wurzelMit('tsx pipeline/anders.ts')
   erwarte('eigener Start, package.json bleibt ungeprüft', pfade(zieleAusArgumenten([join(eigenerStart, 'pipeline/fetch.ts')], eigenerStart)), GEFUNDEN)
   erwarte('eigener Start mit eigener package.json', pfade(zieleAusArgumenten([join(eigenerStart, 'pipeline/fetch.ts'), join(eigenerStart, 'package.json')], eigenerStart)), ['?', ZIEL])
+
+  // Echtes pipeline/fetch.ts in der PR-Kette: ein `?` im Importgraph fiel sonst erst der Nachtprüfung auf (commit-data.test, 27.11.2026, #5150).
+  console.log('Echter Bestand')
+  const offen = zieleAusArgumenten([]).filter((z) => z.pfad === '?').map((z) => z.ort)
+  erwarte('pipeline/fetch.ts samt Importen: jedes Schreibziel ein fester Pfad', offen, [])
 } finally {
   rmSync(wurzel, { recursive: true, force: true })
 }

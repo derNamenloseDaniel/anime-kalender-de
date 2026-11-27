@@ -12,6 +12,7 @@ import { premiereBelegtTv } from '../../shared/premiere.ts'
 import { todayIso } from '../../shared/time.ts'
 import { kostenloseFolgen } from '../../shared/kostenlos.ts'
 import { sprecherRollen } from './sprecher-anisearch.ts'
+import { leiteJoynAusTv } from './13-1-joyn-aus-tv.ts'
 import { widerlegeDeutscheTermine } from './widerlegung-woche.ts'
 import { ohneVerschobene, verschiebeHinterToggle } from './hinter-toggle.ts'
 import { urteilSchliesstLuecken } from './urteil-schliesst-luecken.ts'
@@ -86,6 +87,8 @@ export function rolleTermineAus({ releases, titles, jpStart }: {
 }) {
   /* Erst widerlegen, dann auffalten: Ein widerlegter Termin erzeugt kein Ereignis (02.10.2026). */
   widerlegeDeutscheTermine(releases, titles)
+  const joynAusTv = leiteJoynAusTv(releases)
+  if (joynAusTv.length) log(`${joynAusTv.length} Joyn-Termin(e) aus dem belegten TV-Sendeplan abgeleitet: ${joynAusTv.join(', ')}`)
   const events: ReleaseEvent[] = releases
     .flatMap(expandEvents)
     .sort(nachTagUndZeit)

@@ -22,11 +22,25 @@ pruefe('FSK von Hand: http-Quelle', fskVonHandFehler([zeile(5, { sources: ['http
 pruefe('FSK von Hand: fehlende Quelle', fskVonHandFehler([zeile(5, { sources: [] })]).length === 1 && fskVonHandFehler([zeile(5, { sources: undefined as never })]).length === 1)
 pruefe('FSK von Hand: leerer Beleg', fskVonHandFehler([zeile(5, { beleg: '  ' })]).length === 1)
 
-const karte = new Map([t(10, 'TV'), t(11, 'TV', 6), t(12, 'TV')].map((x) => [x.id, x]))
-uebernehmeFskVonHand(karte, [zeile(10, { fsk: 16 }), zeile(11, { fsk: 18 }), zeile(99)])
+const karte = new Map([t(10, 'TV'), t(11, 'TV', 6), t(12, 'TV'), t(13, 'TV')].map((x) => [x.id, x]))
+const meldungen: string[] = []
+const [altLog, altWarn] = [console.log, console.warn]
+console.log = (...a: unknown[]) => void meldungen.push(`log ${a.join(' ')}`)
+console.warn = (...a: unknown[]) => void meldungen.push(`warn ${a.join(' ')}`)
+uebernehmeFskVonHand(karte, [zeile(10, { fsk: 16 }), zeile(11, { fsk: 18 }), zeile(12, { fsk: 6 }), zeile(99)])
+;[console.log, console.warn] = [altLog, altWarn]
+pruefe('FSK von Hand: Log nennt Zahl der gesetzten Zeilen und die Kennung ohne Titel', meldungen.some((m) => m.startsWith('log') && m.includes('2 von 4 Zeilen gesetzt') && m.includes('ohne Titel im Bestand: 99')))
+pruefe('FSK von Hand: Widerspruch zur vorhandenen Freigabe wird gewarnt, Übereinstimmung nicht', meldungen.filter((m) => m.startsWith('warn')).length === 1 && meldungen.some((m) => m.startsWith('warn') && m.includes('11 trägt schon FSK 6') && m.includes('sagt 18')))
+pruefe('FSK von Hand: ohne unbekannte Kennung steht kein „ohne Titel“ im Log', (() => {
+  const m2: string[] = []
+  console.log = (...a: unknown[]) => void m2.push(a.join(' '))
+  uebernehmeFskVonHand(new Map([t(30, 'TV')].map((x) => [x.id, x])), [zeile(30)])
+  console.log = altLog
+  return m2.length === 1 && m2[0]!.includes('1 von 1 Zeilen gesetzt') && !m2[0]!.includes('ohne Titel')
+})())
 pruefe('FSK von Hand: setzt die Freigabe an einem Titel ohne FSK', karte.get(10)!.fsk === 16)
 pruefe('FSK von Hand: eine vorhandene abweichende Freigabe bleibt', karte.get(11)!.fsk === 6)
-pruefe('FSK von Hand: unbekannte Kennung und nicht genannte Titel bleiben unberührt', !karte.has(99) && karte.get(12)!.fsk === undefined)
+pruefe('FSK von Hand: unbekannte Kennung und nicht genannte Titel bleiben unberührt', !karte.has(99) && karte.get(13)!.fsk === undefined)
 
 suchadressenInTemp() // der Abschluss schreibt Listen; nie in getrackte Dateien
 const abschluss = (titles: Map<number, Title>) => schliesseWegeAb({

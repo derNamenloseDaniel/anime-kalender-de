@@ -727,6 +727,7 @@ pipeline/check-tages-highlight.ts
 pipeline/check-takt.ts
 pipeline/check-teilen-knoepfe-karten.ts
 pipeline/check-teilen-knopf.ts
+pipeline/check-tbt-drift.ts
 pipeline/check-telekom-annahme.ts
 pipeline/check-telekom-pille.ts
 pipeline/check-termin-knopfzahl.ts

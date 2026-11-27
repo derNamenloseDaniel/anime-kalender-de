@@ -314,6 +314,7 @@ function terminGeschaetzt(
   const nachBeobachtung = Object.keys(s.observed ?? {}).some((k) => Number(k) < episode)
   const belegt =
     s.observed?.[episode] ||
+    s.sendeplanBelegt ||
     (s.belegtBis && nachBeobachtung && episode <= s.belegtBis.folge && date <= s.belegtBis.am) ||
     /* Zwischen zwei Stützpunkten eines Sendeplans ist der Tag belegt, nicht geschätzt. */
     (s.wochentage?.length && lastAnchor && episode < lastAnchor.episode && !s.estimated)

@@ -71,6 +71,7 @@ const MEHRZAHL_GARANTIERT = [
   'shared/ics.ts', // else-Zweig von restHinweis (rest !== 1)
   'shared/takt-text.ts', // „N Folgen auf einmal“ gilt nur für n ≥ 2
   'shared/folgen-anker.ts', // Diagnosezeile für die Pflege, kein Besuchertext
+  'shared/tages-highlight.ts', // „Alle N Folgen“ nur im Zweig n >= 2 (sonst „Neu“), Fall n = 1 in check-tages-highlight.ts
 ]
 function dateien(ordner: string): string[] {
   return readdirSync(ordner, { withFileTypes: true }).flatMap((d) => {

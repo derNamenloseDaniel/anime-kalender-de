@@ -23,6 +23,7 @@ import { OG_FASSUNG } from './lib/og-fassung.ts'
 import { terminKopf } from './lib/og-termin.ts'
 import { SCHAETZ_DATEI, liesSchaetzListe, neuWegenSchaetzung, nurVorhandene, schreibSchaetzListe } from './lib/og-schaetz.ts'
 import { mussNeuZeichnen, standardKarte, standardKennung } from './lib/og-standard.ts'
+import { baueTagesbild } from './lib/og-tag.ts'
 
 const OUT_DIR = resolve(ROOT, 'public/og')
 const COVER_CACHE = resolve(ROOT, 'data/cache/covers')
@@ -117,6 +118,11 @@ async function main(): Promise<void> {
     written++
     if (kopf.fakt.includes('≈')) mitSchaetzung.add(release.slug)
     else mitSchaetzung.delete(release.slug)
+  }
+
+  // --- Bild des Tages (wichtigstes Release, `shared/tages-highlight.ts`) --------
+  if (!NUR) {
+    await baueTagesbild(releases, titleById, today, OUT_DIR, loadCover, process.argv.includes('--tag-neu'), { log, warn })
   }
 
   log(`${written} Vorschaubilder erzeugt, ${releases.length} Releases insgesamt`)

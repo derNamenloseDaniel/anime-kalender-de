@@ -717,6 +717,7 @@ pipeline/check-synchro-original.ts
 pipeline/check-synchro-termin-offen.ts
 pipeline/check-synchro-widerspruch.ts
 pipeline/check-tab-titel-quelle-lauf.ts
+pipeline/check-tages-highlight.ts
 pipeline/check-takt.ts
 pipeline/check-teilen-knoepfe-karten.ts
 pipeline/check-teilen-knopf.ts

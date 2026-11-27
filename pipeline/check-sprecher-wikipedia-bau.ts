@@ -163,7 +163,7 @@ try {
   abbruch = e
 }
 zurueck()
-pruefe('ohne Handliste: kein Abbruch, Warnzeile nennt die Datei, AniList-Rollen bleiben', !abbruch && !!ohneListe?.has(900010) && zeilen.some((z) => z.includes('data/wikipedia-sprecher-seiten.yaml nicht lesbar')), abbruch ? String(abbruch) : zeilen)
+pruefe('ohne Handliste: kein Abbruch, Warnzeile nennt die Datei, AniList-Rollen bleiben', !abbruch && !!ohneListe?.has(900010) && zeilen.some((z) => z.endsWith('wikipedia-sprecher-seiten.yaml nicht lesbar (fehlt): keine Wikipedia-Sprecher')), abbruch ? String(abbruch) : zeilen)
 
 rmSync(wurzel, { recursive: true, force: true })
 if (verletzt) {

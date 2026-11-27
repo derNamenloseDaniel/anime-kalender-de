@@ -9,7 +9,7 @@ import { resolve } from 'node:path'
 import type { Release, Title } from '../../shared/types.ts'
 import { formatDate, weekdayName } from '../../shared/time.ts'
 import { waehleTageshighlight, type Tageshighlight } from '../../shared/tages-highlight.ts'
-import { zeichneKarte, type KartenDaten } from './og-karte.ts'
+import type { KartenDaten } from './og-karte.ts'
 
 /** Tagesbilder älter als diese Tage werden gelöscht (Messenger holen ein Bild kurz nach dem Teilen). */
 export const TAGESBILD_TAGE = 7
@@ -36,6 +36,8 @@ export async function schreibeTagesbild(
   if (!h) return undefined
   const datei = resolve(ordner, tagBildName(heute, h.release.slug))
   if (existsSync(datei) && !erzwingen) return h
+  // Erst hier laden: `build-share-pages.ts` importiert dieses Modul, darf aber sharp (natives Modul) nicht laden (Bau liest nur BAU_EINGABEN).
+  const { zeichneKarte } = await import('./og-karte.ts')
   await zeichneKarte(tagesKarte(h, heute), await ladeCover(titelVon.get(h.titleId)?.coverImage), datei)
   return h
 }

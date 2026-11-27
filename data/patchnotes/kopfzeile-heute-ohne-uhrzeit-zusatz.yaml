@@ -1,4 +1,4 @@
 datum: '2026-11-26'
 kategorie: bugfix
-text: 'Antwortkasten: „Alle 12 Folgen da“ statt Uhrzeit-Zusatz'
-untertitel: Bei Komplettstarts am Veröffentlichungstag, etwa Fool Night
+text: Komplettstarts zeigen am Starttag „Alle Folgen da“
+untertitel: Im Detail-Panel, vorher mit Zusatz zur offenen Uhrzeit

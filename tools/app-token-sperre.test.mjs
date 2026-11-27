@@ -184,4 +184,13 @@ erwarte('andere Aktion holt ein Token', (s) => { s.aktionen.einrichten.runs.step
 
 // Ohne App-Token bleibt ein Befehl in jeder Form ohne Wirkung auf main: GITHUB_TOKEN umgeht das Ruleset nicht, der Nachholer mergt nur App-PRs.
 erwarteOk('gh pr merge mit GITHUB_TOKEN in einem neuen Workflow', (s) => { s.workflows['neu.yml'] = { jobs: { a: { steps: [{ env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}' }, run: ARRAY_FORM }] } } } })
+
+// cloud-abgabe.yml (26.11.2026): nur das Skript aus main mit dem Zweignamen über env
+const ABGABE = ['cloud-abgabe.yml', 'abgeben', 'Abgabe verarbeiten']
+erwarte('cloud-abgabe: anderer Befehl', (s) => { schritt(s, ...ABGABE).run = ARRAY_FORM }, /cloud-abgabe\.yml: Job abgeben.*\(cloud-abgabe\).*run genau/)
+erwarte('cloud-abgabe: Zweigname im run-Text statt env', (s) => { schritt(s, ...ABGABE).run = 'node tools/cloud-abgabe.mjs "${{ github.ref_name }}"' }, /Job abgeben.*run genau/)
+erwarte('cloud-abgabe: Zeile nach dem Aufruf', (s) => { schritt(s, ...ABGABE).run += '\ngh pr merge 5' }, /Job abgeben.*run genau/)
+erwarte('cloud-abgabe: ZWEIG aus anderer Quelle', (s) => { schritt(s, ...ABGABE).env.ZWEIG = '${{ github.event.head_commit.message }}' }, /Job abgeben.*env.ZWEIG genau/)
+erwarte('cloud-abgabe: fremde env', (s) => { schritt(s, ...ABGABE).env.NODE_OPTIONS = '--require ./x.cjs' }, /Job abgeben.*env nur GH_TOKEN, ZWEIG/)
+erwarte('cloud-abgabe: working-directory', (s) => { schritt(s, ...ABGABE)['working-directory'] = 'fremd' }, /Job abgeben.*nur die Schlüssel/)
 console.log('app-token-sperre.test: ok')

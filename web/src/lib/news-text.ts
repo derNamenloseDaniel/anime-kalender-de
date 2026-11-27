@@ -2,7 +2,7 @@ import { PLATFORMS, type NewsMeldung, type PlatformId } from '@shared/types.ts'
 import { translate as t } from './i18n.tsx'
 import { weekdayName } from '@shared/time.ts'
 import { ankuendigungsWort } from '@shared/news-typen.ts'
-import { omuDatumText, omuStartText } from '@shared/ankuendigung.ts'
+import { omuDatumText } from '@shared/ankuendigung.ts'
 import { folgenProWoche } from '@shared/folgenrhythmus.ts'
 import { taktKurz, taktSatz } from '@shared/takt-text.ts'
 
@@ -64,7 +64,7 @@ export function newsSatz(m: NewsMeldung, am?: string): string {
     case 'angekuendigt':
       /* **Der Satz bleibt kurz**. Der Vermerk (`hinweis`) steht seitdem als
          eigene, leisere Zeile daneben — in der Übersicht kurz, im Aufgeklappten ausführlich. */
-      if (m.omu) return t(m.omu === 'synchro-angekuendigt' ? 'news.omuAngekuendigt' : 'news.omuOffen', { wann: omuStartText(m.datum ?? ''), anbieter }) + lautQuelle(m, am)
+      if (m.omu) return t('news.omuAngekuendigt', { anbieter }) + lautQuelle(m, am)
       if (m.platform === 'tv' && m.datum) return t(m.premiere ? 'news.angekuendigtTvPremiere' : 'news.angekuendigtTv', { sender: m.anbieter ? ` bei ${m.anbieter}` : '', tag: weekdayName(m.datum), datum }) + lautQuelle(m, am)
       if (m.schonKaufbar) return t('news.angekAbo', { datum, anbieter }) + lautQuelle(m, am)
       if (m.jahre && anbieter) return t(m.discSeitText ? 'news.angekNachJahrenStream' : 'news.angekNachJahren', { jahre: m.jahre, datum, anbieter, disc: m.discSeitText ?? '' }) + lautQuelle(m, am)
@@ -113,7 +113,7 @@ export function newsKurz(m: NewsMeldung): string {
         ? t('news.kurz.folgen', { von: m.von ?? '', bis: m.bis, anbieter })
         : t('news.kurz.folge', { von: m.von ?? '', anbieter })
     case 'angekuendigt':
-      return t(m.omu ? 'news.kurz.omu' : 'news.kurz.angekuendigt', { datum, anbieter })
+      return t('news.kurz.angekuendigt', { datum, anbieter })
     case 'rhythmus':
       return t('news.kurz.angekRhythmus', { zahl: folgenProWoche(m.proWoche ?? [0, 0]), datum, anbieter })
     case 'takt':

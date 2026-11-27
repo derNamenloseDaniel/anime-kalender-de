@@ -51,6 +51,6 @@
   { "name": "Tabelle: claude-daten-merge 48 -> 2 h", "datei": "tools/wache-fristen.mjs", "suche": "'claude-daten-merge.yml': 48", "ersetze": "'claude-daten-merge.yml': 2" },
   { "name": "Zugangs-Wache: Fristen nicht aus der Tabelle (immer null)", "datei": "tools/zugangs-waechter.mjs", "suche": "fristStunden: fristen[workflow] ?? null", "ersetze": "fristStunden: null" },
   { "name": "Zugangs-Wache: Erfolg wieder im 20er-Fenster", "datei": "tools/zugangs-waechter.mjs", "suche": "const erfolg = letzterErfolg(ghAufruf, workflow)", "ersetze": "const erfolg = fertig.find((l) => l.conclusion === 'success')" },
-  { "name": "Zugangs-Wache: letzterErfolg ohne --status success", "datei": "tools/zugangs-waechter.mjs", "suche": "'--status', 'success', ", "ersetze": "" },
+  { "name": "Zugangs-Wache: letzterErfolg ohne --status success", "datei": "tools/zugangs-waechter.mjs", "suche": "'--status', 'success', '--limit', '1'", "ersetze": "'--limit', '1'" },
   { "name": "Zugangs-Wache: spezMitFrist fällt auf 0 statt null", "datei": "tools/zugangs-waechter.mjs", "suche": "fristen[workflow] ?? null", "ersetze": "fristen[workflow] ?? 0" }
 ]

@@ -1,0 +1,38 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Junjo_Romantica (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Junjo_Romantica&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronsprecher ===
+Die deutsche Synchronfassung entstand bei G&G Tonstudios in Kaarst unter der Regie von Lukas Güttes.
+{| class="wikitable" id="Synchronisation"
+! Rolle
+! japanischer Synchronsprecher ([[Seiyū]])
+!deutsche Synchronsprecher
+|-
+| Misaki Takahashi
+| [[Takahiro Sakurai]]
+|Ben Küch
+|-
+| Akihiko Usami
+| [[Hikaru Hanada]]
+|[[Tobias Brecklinghaus]]
+|-
+| Hiroki Kamijō
+| [[Kentarō Itō]]
+|[[Christopher Kohn]]
+|-
+| Nowaki Kusama
+| [[Nobutoshi Canna]]
+|Julius Keusch
+|-
+| Yō Miyagi
+| [[Kazuhiko Inoue]]
+|[[Tim Knauer]]
+|-
+| Shinobu Takatsuki
+| [[Daisuke Kishio]]
+|[[Felix Mayer (Synchronsprecher)|Felix Mayer]]
+|-
+|Eri Aikawa
+|Noriko Namiki
+|[[Dagmar Bittner]]
+|}

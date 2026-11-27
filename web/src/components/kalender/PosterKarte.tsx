@@ -6,7 +6,7 @@ import { istAusgeblieben } from '@shared/logic.ts'
 import { useLang } from '../../lib/i18n.tsx'
 import { useShare } from '../../lib/share.ts'
 import { useAbSm } from '../../lib/use-breit.ts'
-import { teilbarerSlug } from '@shared/teilen.ts'
+import { teilenZiel } from '@shared/teilen.ts'
 import { coverBild, KACHEL_DICHTE } from '../../lib/cover.ts'
 import { FavoriteStar, HideEye, ShareIcon, Tooltip } from '../ui.tsx'
 import { anbieterZeile, SpracheMarke, VerpasstMarke, weitereFolgen, ZeitMarke } from './Marken.tsx'
@@ -186,7 +186,7 @@ function CoverAktionen(p: PosterKarteProps & { saal: boolean }) {
   const { t } = useLang()
   const { share, copiedSlug } = useShare()
   const desktop = useAbSm()
-  const teilbar = teilbarerSlug(p.title)
+  const ziel = p.title && teilenZiel(p.title)
   return (
     <>
       {/*
@@ -202,7 +202,7 @@ function CoverAktionen(p: PosterKarteProps & { saal: boolean }) {
       {desktop && (
         <span className={`absolute ${p.saal ? SAAL_KNOEPFE : 'right-1.5 bottom-2.5'} flex items-center gap-1`} onClick={(e) => e.stopPropagation()}>
           <span className={`${KNOPF_GRUND} ${ERST_BEIM_ZEIGEN}`}>
-            {teilbar && <ShareIcon onShare={() => void share(teilbar, p.event.name)} copied={copiedSlug === teilbar} size="sm" />}
+            {ziel && <ShareIcon onShare={() => void share(ziel, p.event.name)} copied={copiedSlug === ziel} size="sm" />}
             {p.onToggleHidden && <HideEye hidden={false} onToggle={p.onToggleHidden} size="sm" />}
           </span>
           {p.onToggleFavorite && (

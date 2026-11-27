@@ -3,6 +3,7 @@ import { addDays, todayIso, utcZeitInBerlin, toIsoDate } from './time.ts'
 import { markiereNachLuecke, verpasstAnVorhandenes } from './luecken.ts'
 import { istAusgeblieben, istKatalogstartOhneUhrzeit, markiereOhneSichtung, terminZustand, type TerminFelder } from './termin-zustand.ts'
 import { erstesFreiesDatum, folgeNachOriginal } from './synchro-original.ts'
+import { istNurUntertitel } from './nur-deutsch.ts'
 
 /** Berliner Kalendertag eines Vermerk-Zeitpunkts (`erwartetAm`, `neuErwartet` sind UTC). */
 const vermerkTag = (zeitpunkt: string): string => toIsoDate(new Date(zeitpunkt))
@@ -274,6 +275,7 @@ export { istKatalogstartOhneUhrzeit, istAusgeblieben }
 export const NETFLIX_UHRZEIT_UTC = '08:00'
 
 export function expandEvents(release: Release): ReleaseEvent[] {
+  if (istNurUntertitel(release)) return [] // nur deutsche Termine (`shared/nur-deutsch.ts`)
   const termine = markiereOhneSichtung(release, termineAusPlan(release))
   if (release.dateMeaning === 'available-from') for (const e of termine) e[release.erstausgabe ? 'erstausgabe' : 'imAngebot'] = true
   if (release.platform !== 'netflix' || !release.netflixOriginal) return termine
@@ -311,7 +313,8 @@ function terminGeschaetzt(
   first: number,
 ): boolean | undefined {
   /* `belegtBis` nennt keinen Tag: Vor der frühesten Beobachtung sind die Tage zurückgerechnet und bleiben geschätzt (12.10.2026). */
-  const nachBeobachtung = Object.keys(s.observed ?? {}).some((k) => Number(k) < episode)
+  /* Setzt die Reihe mitten in der Zählung ein (Folge 1 im Schwester-Release), liegt die Beobachtung nicht im selben Release (Ranma S3, 26.11.2026). */
+  const nachBeobachtung = first > 1 || Object.keys(s.observed ?? {}).some((k) => Number(k) < episode)
   const belegt =
     s.observed?.[episode] ||
     s.sendeplanBelegt ||
@@ -321,6 +324,15 @@ function terminGeschaetzt(
   if (belegt) return undefined
   const nurStartBelegt = Boolean(s.wochentage?.length) && !lastAnchor
   return lastAnchor || (nurStartBelegt && episode > first) ? true : s.estimated
+}
+
+/**
+ * Liegt eine beobachtete Folge hinter dieser, mit späterem Tag? Dann ist sie erschienen, auch wenn ihr Tag nur
+ * zurückgerechnet ist. Der Tagvergleich fängt eine Beobachtung in fremder Zählung ab (Black Clover S2: „174“ =
+ * 171 + 3 am 28.11. liegt nicht hinter Folge 5–173, 26.11.2026).
+ */
+function vorBeobachteterFolge(s: NonNullable<Release['schedule']>, date: string): boolean {
+  return Object.values(s.observed ?? {}).some((tag) => tag > date)
 }
 
 /** Uhrzeit aus dem Plan; eine festgelegte, nicht gemessene trägt `timeEstimated` („≈"). */
@@ -352,7 +364,7 @@ function terminBasis(release: Release, s: Plan) {
     ...uhrzeitAusPlan(s),
     releaseType: release.releaseType,
     platform: release.platform,
-    ...(release.sender ? { sender: release.sender } : {}), ...(release.sprache ? { sprache: release.sprache } : {}),
+    ...(release.sender ? { sender: release.sender } : {}), ...(release.sprache === 'offen' ? { sprache: release.sprache } : {}),
     ...(release.tvLetzteSichtung && !release.folgenBelegt ? { sichtung: true } : {}), ...(s.episodeCountAssumed ? { episodeCountAssumed: true } : {}),
     name: release.name,
     estimated: s.estimated,
@@ -478,6 +490,7 @@ function folgenTermine(release: Release, s: Plan, base: TerminBasis, skips: Set<
      * sondern eine Erfindung.
      */
     if (s.lastEpisodeDate && date > s.lastEpisodeDate) break
+    const geschaetzt = terminGeschaetzt(s, episode, date, lastAnchor, first)
     events.push({
       ...base,
       /* Lief eine TV-Sichtung zu verschiedenen Zeiten, trägt jede Folge ihre eigene. */
@@ -486,7 +499,8 @@ function folgenTermine(release: Release, s: Plan, base: TerminBasis, skips: Set<
       date,
       episode,
       ...gesamtzahl(s, last),
-      estimated: terminGeschaetzt(s, episode, date, lastAnchor, first),
+      estimated: geschaetzt,
+      ...(geschaetzt && vorBeobachteterFolge(s, date) ? { vorBeobachtung: true } : {}),
       /*
         **Nur der Tag, an dem wirklich nichts kam, trägt den Vermerk.**
 

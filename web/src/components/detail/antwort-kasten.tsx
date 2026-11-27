@@ -30,7 +30,7 @@ export function AntwortKasten({
   stream = [],
   disc = [],
   wegeHinweis,
-  notiz, folgen,
+  notiz, folgen, nachleger,
   schnitt,
   angebotSeit,
   hinweis,
@@ -64,6 +64,7 @@ export function AntwortKasten({
         angebotSeit={angebotSeit}
         hinweis={hinweis}
         notiz={notiz}
+        nachleger={nachleger}
         schnitt={schnitt}
       />
       <KastenWegeHinweis pillen={z.pillen} wegeHinweis={wegeHinweis} antwort={antwort} />

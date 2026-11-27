@@ -67,10 +67,10 @@ console.log('\nKalender-Poster')
 console.log('\nPanel: „Kopiert“-Beschriftung')
 for (const [name, titel] of [['ohne Synchro', ohneSynchro], ['mit Seite', mitSeite]] as const) {
   await act(async () => wurzel.render(h(PanelAktionen, { title: titel, favorites: new Set<number>(), onToggleFavorite() {}, onToggleHidden() {}, t, trailer: null })))
-  const knopf = () => dom.wurzel.finde((x: MiniKnoten) => x.tagName === 'BUTTON' && [t('detail.share'), t('kopf.kopiert')].includes(x.textContent))[0]
-  pruefe(`${name}: vor dem Klick „Teilen“`, knopf()?.textContent === t('detail.share'), knopf()?.textContent)
+  const knopf = () => dom.wurzel.finde((x: MiniKnoten) => x.tagName === 'BUTTON' && [t('detail.share'), t('kopf.kopiert')].includes(x.getAttribute('aria-label') ?? ''))[0]
+  pruefe(`${name}: vor dem Klick „Teilen“`, knopf()?.getAttribute('aria-label') === t('detail.share'), knopf()?.getAttribute('aria-label'))
   await act(async () => klicke(dom.wurzel, knopf()!))
-  pruefe(`${name}: nach dem Klick „Kopiert“`, knopf()?.textContent === t('kopf.kopiert'), knopf()?.textContent)
+  pruefe(`${name}: nach dem Klick „Kopiert“`, knopf()?.getAttribute('aria-label') === t('kopf.kopiert'), knopf()?.getAttribute('aria-label'))
 }
 await act(async () => wurzel.unmount())
 dom.entferne()

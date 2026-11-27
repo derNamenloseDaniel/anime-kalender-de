@@ -30,7 +30,7 @@ pruefe('die Hash-Adresse öffnet den Titel', parseHash(teilenZiel(ohneSynchro)).
 const { t } = useLang()
 const knoepfe = (title: Title) =>
   renderToStaticMarkup(createElement(PanelAktionen, { title, favorites: new Set<number>(), onToggleFavorite() {}, onToggleHidden() {}, t, trailer: null }))
-pruefe('Panel: Teilen-Knopf beim Titel ohne Synchro', knoepfe(ohneSynchro).includes(`>${t('detail.share')}<`), knoepfe(ohneSynchro))
-pruefe('Panel: Teilen-Knopf beim Titel mit Seite', knoepfe(mitSeite).includes(`>${t('detail.share')}<`))
+pruefe('Panel: Teilen-Knopf beim Titel ohne Synchro', knoepfe(ohneSynchro).includes(`aria-label="${t('detail.share')}"`), knoepfe(ohneSynchro))
+pruefe('Panel: Teilen-Knopf beim Titel mit Seite', knoepfe(mitSeite).includes(`aria-label="${t('detail.share')}"`))
 
 process.exit(verletzt ? 1 : 0)

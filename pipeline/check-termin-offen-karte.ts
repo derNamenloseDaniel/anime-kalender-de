@@ -94,7 +94,7 @@ console.log('\nVermilion Mask: Synchro angekündigt, Termin offen')
   const taste = knopf(w)
   if (taste) klicke(dom.wurzel, taste)
   pruefe('der Klick kommt bei der Seite an und merkt den Titel (wie das ☆ im Kopf)', JSON.stringify(gemerkt) === '[195571]', gemerkt)
-  const stern = w.finde((k) => k.tagName === 'BUTTON' && k.textContent === 'Merken')[0]
+  const stern = w.finde((k) => k.tagName === 'BUTTON' && k.getAttribute('aria-label') === 'Merken')[0]
   if (stern) klicke(dom.wurzel, stern)
   pruefe('das ☆ im Kopf ruft denselben Handler mit derselben Kennung', JSON.stringify(gemerkt) === '[195571,195571]', gemerkt)
 }

@@ -6,8 +6,6 @@ import { useShare } from '../../lib/share.ts'
 import type { Translate } from '../../lib/i18n.tsx'
 import { Tooltip } from '../ui.tsx'
 
-const KNOPF =
-  'inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-slate-300 px-3.5 text-t3 font-semibold text-ak-text transition hover:bg-ak-flaeche-2 dark:border-white/20'
 /** Nur das Zeichen: 44 × 44, rund — „Ausblenden“ braucht kein Wort, der Name steht in `aria-label` und `title`. */
 const KNOPF_ZEICHEN =
   'inline-flex size-11 cursor-pointer items-center justify-center rounded-full border border-slate-300 text-ak-text transition hover:bg-ak-flaeche-2 dark:border-white/20'
@@ -56,16 +54,20 @@ export function PanelAktionen({ title, favorites, onToggleFavorite, onToggleHidd
   const { share, copiedSlug } = useShare()
   const gemerkt = favorites.has(title.id)
   const ziel = teilenZiel(title)
+  const merkenText = t(gemerkt ? 'kopf.gemerkt' : 'kopf.merken')
+  const teilenText = t(copiedSlug === ziel ? 'kopf.kopiert' : 'detail.share')
   return (
     <div className="flex flex-wrap gap-2 px-4 pb-4">
-      <button type="button" aria-pressed={gemerkt} onClick={() => onToggleFavorite(title.id)} className={`${KNOPF} ${gemerkt ? AN : ''}`}>
-        <Stern gefuellt={gemerkt} />
-        {t(gemerkt ? 'kopf.gemerkt' : 'kopf.merken')}
-      </button>
-      <button type="button" onClick={() => share(ziel, anzeigeName(title))} className={KNOPF}>
-        <Kette />
-        {t(copiedSlug === ziel ? 'kopf.kopiert' : 'detail.share')}
-      </button>
+      <Tooltip text={merkenText} seite="oben">
+        <button type="button" aria-pressed={gemerkt} aria-label={merkenText} onClick={() => onToggleFavorite(title.id)} className={`${KNOPF_ZEICHEN} ${gemerkt ? AN : ''}`}>
+          <Stern gefuellt={gemerkt} />
+        </button>
+      </Tooltip>
+      <Tooltip text={teilenText} seite="oben">
+        <button type="button" aria-label={teilenText} onClick={() => share(ziel, anzeigeName(title))} className={KNOPF_ZEICHEN}>
+          <Kette />
+        </button>
+      </Tooltip>
       <Tooltip text={t('kopf.ausblenden')} seite="unten">
         <button type="button" onClick={() => onToggleHidden(title.id)} aria-label={t('kopf.ausblenden')} className={KNOPF_ZEICHEN}>
           <Auge />

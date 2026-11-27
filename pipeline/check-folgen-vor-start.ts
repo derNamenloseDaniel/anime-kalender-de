@@ -105,6 +105,13 @@ const nummern = await kastenText(titel(900421, 11), [durchlauf], '2026-11-28')
 pruefe('Durchlaufende Zählung: „Folge 2–11 von 12 erschienen“ statt „10 von 11“', nummern.includes('Folge 2–11 von 12 erschienen') && !nummern.includes('10 von 11'), nummern)
 const beiFolge1 = await kastenText(titel(900422, 11), [{ ...durchlauf, titleId: 900422, schedule: { ...durchlauf.schedule, firstEpisodeNumber: 1, episodeCount: 11 } } as Release], '2026-11-28')
 pruefe('Start bei Folge 1: Zeile bleibt „von 11 Folgen erschienen“', beiFolge1.includes('von 11 Folgen erschienen') && !beiFolge1.includes('Folge 1–'), beiFolge1)
+/* Gegenfall Wistoria: 12 Folgen, Termine ab Folge 13 — eine ganze Vorstaffel davor, die Zeile bleibt „von 12 Folgen“. Eighty Six Teil 2 (11 davor, 12 Folgen) bekommt die Nummern. */
+const vorstaffel = { ...abwurf(900424, 13, 12, 'weekly'), schedule: { firstEpisodeDate: '2026-09-25', firstEpisodeNumber: 13, episodeCount: 12 } } as unknown as Release
+pruefe('Gegenfall ganze Vorstaffel (Termine ab Folge 13, 12 Folgen): keine Spanne', zaehlSpanne([vorstaffel], 3, 12) === undefined)
+const teilzwei = { ...abwurf(900425, 12, 12, 'weekly'), schedule: { firstEpisodeDate: '2026-09-25', firstEpisodeNumber: 12, episodeCount: 12 } } as unknown as Release
+pruefe('Teilstück (11 Folgen davor, 12 Folgen): „Folge 12–14 von 23“', JSON.stringify(zaehlSpanne([teilzwei], 3, 12)) === '{"nr":"12–14","gesamt":23}', zaehlSpanne([teilzwei], 3, 12))
+const wistoria = await kastenText(titel(900426, 12), [{ ...vorstaffel, titleId: 900426 } as Release], '2026-11-28')
+pruefe('Wistoria-Form im Kasten: „von 12 Folgen erschienen“, keine Folge-Spanne', wistoria.includes('von 12 Folgen erschienen') && !wistoria.includes('Folge 13–'), wistoria)
 pruefe('zaehlSpanne: eine Folge „Folge 2“, nichts bei Start 1, nichts ohne Überhang', [zaehlSpanne([durchlauf], 1, 11)?.nr, zaehlSpanne([abwurf(900423, 1, 11)], 3, 11), zaehlSpanne([abwurf(900423, 2, 5)], 3, 11)].join() === '2,,')
 
 /* Bestandsprüfung (`davorOhneBeleg`): drei Titel, der unbelegte in der Mitte. */

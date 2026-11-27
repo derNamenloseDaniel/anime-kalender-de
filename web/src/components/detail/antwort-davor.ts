@@ -33,14 +33,17 @@ export function abwurfBereich(release: Release | undefined): [number, number] | 
 /**
  * **Die erschienenen Folgen mit den Nummern des Anbieters, wenn die Zählung durchläuft** (Steel Ball Run 2nd & 3rd STAGE: Folge 1 liegt im
  * Vorfilm, die Termine zählen 2–12, AniList führt 11 Folgen). Statt „10 von 11“ steht „Folge 2–11 von 12“. Nur, wenn die Termine über die
- * Folgenzahl des Titels hinausreichen und nicht bei Folge 1 beginnen (der Fall, in dem `folgenDavor` leer bleibt); sonst nichts.
+ * Folgenzahl des Titels hinausreichen, nicht bei Folge 1 beginnen und weniger Folgen davor liegen als der Titel hat (ein Teilstück derselben
+ * Staffel, keine Vorstaffel); sonst nichts. Gemessen 27.11.2026 an public/data: vier Titel erfüllen die ersten beiden Bedingungen, mit der
+ * dritten bleiben zwei (JoJo 210482, Eighty Six Teil 2 mit Folge 12–23); Wistoria und The 100 Girlfriends Staffel 3 behalten ihre Zeile.
  */
 export function zaehlSpanne(releases: Pick<Release, 'releaseType' | 'schedule'>[], raus: number, gesamt: number | undefined): { nr: string; gesamt: number } | undefined {
   const ohneDisc = releases.filter((r) => r.releaseType !== 'disc' && r.schedule?.episodeCount && !r.schedule.episodeCountAssumed)
   if (!ohneDisc.length || !gesamt || raus < 1) return undefined
   const erste = Math.min(...ohneDisc.map((r) => r.schedule?.firstEpisodeNumber ?? 1))
   const ende = Math.max(...ohneDisc.map((r) => (r.schedule?.firstEpisodeNumber ?? 1) + r.schedule!.episodeCount! - 1))
-  if (erste <= 1 || ende <= gesamt) return undefined
+  /* Liegen vor dem Start mindestens so viele Folgen, wie der Titel selbst hat, ist es eine ganze Vorstaffel (Wistoria 13–24): die zählt nicht zu diesem Titel. */
+  if (erste <= 1 || ende <= gesamt || erste - 1 >= gesamt) return undefined
   const bis = erste + raus - 1
   return { nr: bis > erste ? `${erste}–${bis}` : String(erste), gesamt: ende }
 }

@@ -15,6 +15,7 @@ import { ReihenListe } from '../web/src/components/detail/reihen-liste.tsx'
 import { kastenFarbe, ReihenReiterKontext, ReihenReiterZeile } from '../web/src/components/detail/reihen-reiter.tsx'
 import type { Dataset } from '../web/src/lib/data.ts'
 import { reihenTeileVon } from '../web/src/components/detail/reihen-daten.ts'
+import { teilMerkmal } from '../shared/staffel-part.ts'
 import { kopfTextVon, reihenNameVon } from '../web/src/components/detail/reihen-namen.ts'
 import type { FranchiseMember, Release, Title } from '../shared/types.ts'
 import { attrappeUhr, feuere, ignoriereCss, installiereMiniDom, klicke, type MiniKnoten } from '../tools/mini-dom.ts'
@@ -75,6 +76,12 @@ const jojo = [
 ]
 const jojoReiter = reihenReiterVon({ id: 910008 } as Title, jojo, 'JoJo’s Bizarre Adventure', [], HEUTE)
 pruefe('JoJo: Steel Ball Run Phase 1 und Phase 2-3 sind Reiter 6.1 und 6.2–3, Stone Ocean 5.1/5.2', jojoReiter.map((r) => `${r.id}:${r.label}`).join() === '910001:1,910002:2,910003:3,910004:4,910005:5.1,910006:5.2,910007:6.1,910008:6.2–3', jojoReiter.map((r) => `${r.id}:${r.label}`))
+const merkmal = (n: string) => JSON.stringify(teilMerkmal(n))
+pruefe(
+  'teilMerkmal: Phase/Part/Teil am Ende, Spanne mit Bindestrich oder Halbgeviertstrich; nicht mitten im Namen, nicht ohne Stamm',
+  [merkmal('Steel Ball Run: Jojo’s Bizarre Adventure - Phase 2-3'), merkmal('Reihe: Part 2'), merkmal('Reihe – Teil 4–5'), merkmal('Reihe Part 2: Zusatz'), merkmal('Phase 1'), merkmal('Reihe')].join('|') ===
+    '{"stamm":"Steel Ball Run: Jojo’s Bizarre Adventure","teil":2,"bis":3}|{"stamm":"Reihe","teil":2}|{"stamm":"Reihe","teil":4,"bis":5}|||',
+)
 pruefe('Reiter-Kurzform: Teilspanne „Staffel 7 - Teil 2–3“ wird „7.2–3“', reiterKurzform('Staffel 7 - Teil 2–3') === '7.2–3')
 const gundam = [teilGlied(920001, 'Gundam Build Fighters', 2013), onaGlied(920002, 'Gundam Build Divers Re:Rise', 25, '2019-04-01'), onaGlied(920003, 'Gundam Build Divers: Prolog', 1, '2018-09-01')]
 pruefe('Gegenprobe: ein kurzes ONA mit anderem Namen („Prolog“) bleibt keine Hauptstaffel', hauptstaffeln(gundam).map((m) => m.id).join() === '920001,920002', hauptstaffeln(gundam).map((m) => m.id))

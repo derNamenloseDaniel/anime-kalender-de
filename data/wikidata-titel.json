@@ -1,0 +1,25 @@
+{
+  "geholtAm": "2026-11-23T05:02:16.590Z",
+  "titel": {
+    "65": {
+      "malId": 65,
+      "label": "Rozen Maiden: Träumend",
+      "verworfen": "gleich dem vorhandenen Namen"
+    },
+    "495": {
+      "malId": 495,
+      "label": "Sorcerer Hunters: Heiße Früchtchen zum Vernaschen"
+    },
+    "2108": {
+      "malId": 2108,
+      "label": "MegaMan NT Warrior/Staffel 2",
+      "verworfen": "Wikipedia-Unterseite, kein Werktitel"
+    },
+    "111852": {
+      "malId": 40416,
+      "label": "Dead or Bullet",
+      "artikel": "Dead or Bullet",
+      "verworfen": "Reihenkopf oder Name ohne seine Reihe"
+    }
+  }
+}

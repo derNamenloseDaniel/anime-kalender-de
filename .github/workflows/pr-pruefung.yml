@@ -1,0 +1,360 @@
+name: PR-Prüfkette
+
+# Pflicht-Check für Pull Requests auf main (Spezifikation: daniel-zum-abarbeiten/berichte/pruefweg-pr-spezifikation.md, 2a).
+# Bis zum 10.10.2026 lief jede Prüfung erst nach dem Merge. Der Job `kette` heißt `PR-Prüfkette`; dieser Name ist der
+# Pflicht-Check im Ruleset. Berührt keinen Datenlauf: nur `pull_request`, nur lesen.
+#
+# Seit 16.10.2026 laufen die Prüfungen von `check:vor-commit` in parallelen Teiljobs (Logik und Tests je in zwei Teilen); `kette` ist der Sammeljob und nur grün,
+# wenn alle Teiljobs `success` melden (übersprungen oder Mix = rot, außer beim Mod-Schnellweg unten; nur `cancelled` = abgebrochener Lauf, Urteil in tools/kette-urteil.mjs). Jede Prüfung aus `check:vor-commit` steht in genau einem
+# Teiljob; `tools/pr-kette-pruefen.mjs` (Test in `check:workflows`) rechnet das nach und prüft die `needs` des Sammeljobs.
+#
+# **Schlanke Kette (seit 18.11.2026, Ziel unter 10 min):** Die Kette fährt den schnellen Kern. Die langsamen Logik-Prüfungen und Tests, die nur Code prüfen, laufen nachts gegen main
+# (`nacht-pruefung.yml`, Wecker 01 UTC, `npm run check:nachts`); im Deploy laufen sie nicht, die mit Lesedateien (`liest`) laufen im PR mit, wenn er eine davon ändert. Welche das sind, steht in `tools/pruefung-ort.json`
+# (je Eintrag Grund und Beleg); `check:logic` und `tests-alle` lassen sie ohne `--nachts` aus, `tools/pr-kette-ort.mjs` rechnet nach, dass jede Prüfung genau einen Ort hat.
+# Rot nachts erzeugt eine ALARM-Zeile (`tools/bestand-rot-alarm.mjs`, Wachphase). Wer eine dieser Dateien ändert, fährt sie lokal (`npm run check:nachts`).
+#
+# Kein Pfadfilter auf Workflow-Ebene: ein ausgefilterter Pflicht-Check meldet sich nie, der PR hinge fest.
+# Daten-PRs der Sammler (`daten/`) überspringt jeder Job-`if` — übersprungen zählt als bestanden.
+# Ein `daten/`-Zweig von einem anderen Autor als dem Sammler-App-Konto (`anime-kalender-daten[bot]`) bekäme so nie Kette, Prüfer oder Merge (PR 4732, 23.11.2026): `daten-zweig-fremd` endet dann rot.
+
+on:
+  pull_request:
+    branches: [main, zug]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+# Ortszeit wie Daniels Rechner (Windows, Berlin): Tests mit UTC-Annahme fallen sonst erst lokal auf (19.10.2026).
+env:
+  TZ: Europe/Berlin
+
+concurrency:
+  group: pr-pruefung-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  # Mod-Schnellweg (Daniel, 20.11.2026, F147): Ändert ein PR nur `.claude/mods/arbeitsliste/**` (dazu höchstens Skill-Markdown), berührt er weder Seite noch Daten
+  # noch Pipeline. `scope` stellt das fest (tools/pr-nur-mod.mjs); dann entfallen alle anderen Jobs (ihr `if` prüft `needs.scope.outputs.nur_mod`), und `modschnell`
+  # fährt allein, was eine Mod-Änderung wirklich berührt. Ein Pfadfilter auf Workflow-Ebene ginge nicht (der Pflicht-Check meldete sich nie); der Sammeljob zählt
+  # übersprungen nur bei `nur_mod == '1'` und grünem `modschnell` als bestanden (tools/kette-urteil.mjs). Form beider Jobs: tools/pr-kette-schnellweg.mjs.
+  scope:
+    name: Kette – Umfang
+    if: ${{ !startsWith(github.head_ref, 'daten/') && !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      nur_mod: ${{ steps.pfad.outputs.nur_mod }}
+      aussehen: ${{ steps.aussehen.outputs.aussehen }}
+    steps:
+      # Tiefe 2: HEAD^1 ist die Basis (main im Merge-Ref), HEAD der Merge-Commit.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Nur Mod-Dateien?
+        id: pfad
+        run: node tools/pr-nur-mod.mjs HEAD^1 HEAD >> "$GITHUB_OUTPUT"
+      # Einmal fragen statt in jedem der 19 Aussehen-Jobs (27.11.2026, Issue 5209): ohne Oberfläche starten sie nicht (Warteschlange, 20-Jobs-Grenze).
+      - name: Betrifft der PR die Oberfläche?
+        id: aussehen
+        run: node tools/pr-aussehen-betroffen.mjs HEAD^1 HEAD >> "$GITHUB_OUTPUT"
+
+  modschnell:
+    name: Kette – Mod-Schnellweg
+    needs: [scope]
+    if: ${{ needs.scope.outputs.nur_mod == '1' && !startsWith(github.head_ref, 'daten/') && !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/kette-einrichten
+      # Läuft unter dem Workflow-Namen „PR-Prüfkette“: ohne Claude-CLI scheitert der Test hier, statt zu überspringen (tools/browser-weiche.mjs).
+      - name: Mod-Tests (claude plugin test)
+        run: node tools/mod-tests.test.mjs
+      - name: Mod-Prüfung (claude plugin validate)
+        run: npx --yes @anthropic-ai/claude-code@2.1.321 plugin validate .claude/mods/arbeitsliste
+      # Leser der Mod außerhalb von ihr: Rangfolge-Test (importiert stand-kennzeichen), Autorfeld der plugin.json, Mutationsanker auf Mod-Dateien,
+      # Skill-Markdown, Umfangsgrenzen.
+      - name: Prüfungen, die Mod und Skill-Texte lesen
+        run: node tools/naechster.test.mjs && npx tsx pipeline/check-privatkennungen.ts && node tools/mutationsanker-alle.test.mjs && node tools/claude-global-privat.test.mjs && node tools/umfang-pruefen.mjs
+
+  # `check:logic` in zwei Jobs (`--teil k/2`, tools/tests-teil.mjs: jede zweite Prüfung je Teil; Wächter tools/check-logic-teil.test.mjs, 18.11.2026).
+  logik:
+    name: Kette – Logik 1
+    needs: [scope]
+    if: ${{ needs.scope.outputs.nur_mod != '1' && !startsWith(github.head_ref, 'daten/') && !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/kette-einrichten
+        with:
+          playwright: 'true'
+      - run: npm run check:logic-1
+        env:
+          # check-patchnotes-pflicht liest die Kommentare des PR (Ausweg aus einem Falschtreffer der Textsuche).
+          GH_TOKEN: ${{ github.token }}
+
+  logik2:
+    name: Kette – Logik 2
+    needs: [scope]
+    if: ${{ needs.scope.outputs.nur_mod != '1' && !startsWith(github.head_ref, 'daten/') && !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/kette-einrichten
+        with:
+          playwright: 'true'
+      - run: npm run check:logic-2
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  bau:
+    name: Kette – Bau und Installation
+    needs: [scope]
+    if: ${{ needs.scope.outputs.nur_mod != '1' && !startsWith(github.head_ref, 'daten/') && !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/kette-einrichten
+        with:
+          playwright: 'true'
+      - name: Bauen
+        env:
+          PAGES_BASE: /
+          VITE_NEWSLETTER_API: ${{ vars.NEWSLETTER_API_URL }}
+        run: npm run build
+      # `check:install` rendert mit Chromium und liest das gebaute `dist/`.
+      - name: Installationszustände
+        env:
+          PAGES_BASE: /
+        run: npm run check:install
+      # Der Deploy nach dem Merge liefert diesen geprüften Bau aus, wenn der Git-Baum des Merge-Commits dem hier gebauten gleicht
+      # (`dist/version.json` trägt ihn; tools/deploy-aus-build.mjs). Letzter Schritt: nur ein Bau, der `check:install` bestand.
+      - name: Bau für den Deploy bereithalten
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+          retention-days: 3
+
+  workflows:
+    name: Kette – Workflows
+    needs: [scope]
+    if: ${{ needs.scope.outputs.nur_mod != '1' && !startsWith(github.head_ref, 'daten/') && !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/kette-einrichten
+        with:
+          playwright: 'true'
+      - run: npm run check:wachen
+      - run: npm run check:tests-1
+
+  # Zweite Hälfte von tests-alle (tools/tests-teil.mjs): halbiert die Laufzeit des längsten Teiljobs (Messung 03.11.2026, Tests 330 s auf 4 Kernen).
+  workflows2:
+    name: Kette – Workflows 2
+    needs: [scope]
+    if: ${{ needs.scope.outputs.nur_mod != '1' && !startsWith(github.head_ref, 'daten/') && !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/kette-einrichten
+        with:
+          playwright: 'true'
+      - run: npm run check:tests-2
+
+  typen:
+    name: Kette – Typen und Worker
+    needs: [scope]
+    if: ${{ needs.scope.outputs.nur_mod != '1' && !startsWith(github.head_ref, 'daten/') && !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/kette-einrichten
+      - run: npm run typecheck
+      - run: npm run check:worker
+      - run: npm run check:hooks
+
+  uebrige:
+    name: Kette – Daten, Erweiterung, Belege
+    needs: [scope]
+    if: ${{ needs.scope.outputs.nur_mod != '1' && !startsWith(github.head_ref, 'daten/') && !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/kette-einrichten
+        with:
+          playwright: 'true'
+      - run: npm run data:validate
+      - run: npm run check:vorlieben
+      - run: npm run check:extension
+      - run: npm run check:wiedervorlage
+      - run: npm run check:zugangsart
+      - run: npm run check:beleg-wand
+      - run: npm run check:beleg-sammelartikel
+      - run: npm run check:beleg-reihenfolge
+      - run: npm run check:woche-bild
+      - run: npm run check:pfade
+      - run: npm run check:search
+
+  # Sammeljob: der Name `PR-Prüfkette` ist der Pflicht-Check im Ruleset. `always()` ist Pflicht: ohne es würde ein roter Teiljob
+  # diesen Job überspringen, und übersprungen zählt als bestanden. Hier zählt nur `success`; sind alle Teiljobs `cancelled` (Neustart durch Push), ist es kein Fehlschlag.
+  kette:
+    name: PR-Prüfkette
+    needs: [scope, modschnell, logik, logik2, bau, workflows, workflows2, typen, uebrige, datenbau, aussehen]
+    if: ${{ always() && !startsWith(github.head_ref, 'daten/') && !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # actions: write nur für `force-cancel` (API) im Urteilsskript: bei „alles abgebrochen“ muss dieser Job selbst als abgebrochen enden, Exit 0 zählte als success.
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Alle Teiljobs grün?
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+          GH_TOKEN: ${{ github.token }}
+        run: node tools/kette-urteil.mjs
+
+
+  # Wächter (23.11.2026, Lehre 229): `daten/` ist Sammlern vorbehalten. Läuft nur bei `daten/`-Zweig UND fremdem Autor; Sammler-PRs (Autor App) bleiben unberührt.
+  # Bewusst nicht in `needs` von `kette`: die Kette überspringt `daten/`-Zweige ganz, dieser Job soll dort allein rot melden. Form fest: tools/pr-kette-waechter.mjs.
+  daten-zweig-fremd:
+    name: Zweig daten/ nur für Sammler
+    if: ${{ startsWith(github.head_ref, 'daten/') && github.event.pull_request.user.login != 'anime-kalender-daten[bot]' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: |
+          echo "::error::Zweig daten/ ist Sammlern vorbehalten: Commit auf fix/ oder korrektur/ neu pushen"
+          exit 1
+
+  # Datenbau (16.10.2026): `pipeline/lib/pruefung.ts` lief nur im Bestandsbau nach dem Merge; PR 1368 setzte ein Feld, das ein späterer Bauschritt
+  # anders vererbt, und main brach ab. Der Job baut den Datensatz wie `bestand-bauen.yml` (Cache `anilist-cache-`, nur lesen) ohne Commit; ein
+  # Widerspruch macht ihn rot. Bewusst ohne Pfadfilter: die Eingaben des Baus reichen bis in `web/src/lib` (news-text, i18n), eine Positivliste
+  # ginge am Importgraph vorbei; der Job läuft parallel zur längsten Kette. Form fest: tools/pr-kette-datenbau.mjs.
+  datenbau:
+    name: PR-Datenbau
+    needs: [scope]
+    if: ${{ needs.scope.outputs.nur_mod != '1' && !startsWith(github.head_ref, 'daten/') && !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Tiefe 2: die Bestandsprüfungen bauen bei Rot die Basis HEAD^1 zum Vergleich.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: ./.github/actions/kette-einrichten
+      - name: AniList-Cache lesen
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: data/cache
+          key: anilist-cache-${{ github.run_id }}
+          restore-keys: anilist-cache-
+      - if: steps.cache.outputs.cache-matched-key == ''
+        name: Kein Cache vorhanden
+        run: |
+          echo "::error::Kein anilist-cache gefunden"
+          exit 1
+      # Neue Beleg-Adressen des PR werden abgerufen: 404/410 rot, sonst Nichtauskunft (PR 2628: UCI-Adresse 404, alle Checks grün).
+      - name: Neue Beleg-Adressen erreichbar
+        run: npx tsx pipeline/neue-quellen-pruefen.ts
+      - name: Datensatz bauen (ohne Commit)
+        run: npm run data:build
+      # Wie bestand-bauen.yml („Arbeitslisten und Prüfstand neu erzeugen“): `check:bestand` liest die Listen der Erweiterung, die erst nach dem Bau entstehen
+      # (01.11.2026: ein neuer Prime-Eintrag „Sprache offen“ war ohne `data:extension-liste` „weder belegt noch auf der Prüfliste“).
+      - name: Arbeitslisten und Prüfstand neu erzeugen
+        run: npm run data:arbeitslisten
+      # Gemessenes Ja ⇒ mindestens ein Weg, am frisch gebauten Datensatz (18.10.2026: Hazbin Hotel und fünf weitere Cartoons).
+      - name: Gemessenes Ja hat einen Weg
+        run: npx tsx pipeline/check-ja-hat-weg-bestand.ts
+      # Bestandsprüfungen (16.10.2026): `check:bestand` lief nur im Bestandsbau nach dem Merge; PR 1377 hätte dort `check-cartoon-wege-bestand` rot gemacht.
+      # Hier auf der frisch gebauten Ausgabe, jede Prüfung ohne Abbruch; rot nur, was auf der Basis HEAD^1 (main im Merge-Ref) grün ist (17.10.2026).
+      - name: Bestandsprüfungen auf der Bauausgabe
+        run: node tools/pr-bestand-vergleich.mjs HEAD^1
+
+  # Aussehen (wie aussehen-pruefen.yml), nur bei Änderungen an der Oberfläche; sonst endet jeder Teil nach der Pfadprüfung grün.
+  # Drei parallele Teile statt einer Kette (16.10.2026): die längste Kette wächst durch die Trefferprobe sonst um ≈ 130 s. Jeder Teil
+  # baut selbst (parallel kostet das keine Wartezeit; ein Artefakt-Umweg würde seriell Hoch- und Herunterladen anhängen). Der Sammeljob
+  # führt `aussehen` in `needs`, ein roter Teil hält also den Merge auf.
+  aussehen:
+    name: PR-Aussehen – ${{ matrix.teil }}
+    needs: [scope]
+    if: ${{ needs.scope.outputs.nur_mod != '1' && needs.scope.outputs.aussehen != '0' && !startsWith(github.head_ref, 'daten/') && !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ matrix.frist || 20 }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - teil: Panel
+            befehl: npm run check:panel
+          - teil: Ansichten
+            befehl: npm run check:ansichten-desktop
+          - teil: Ansichten Handy
+            befehl: npm run check:ansichten-handy
+          - teil: Erstladen
+            befehl: npm run check:cls-erstladen
+          - teil: Ansichtswechsel
+            befehl: npm run check:cls-wechsel
+          - teil: Einstellungen
+            befehl: npm run check:einstellungen
+          - teil: Suchhinweis
+            befehl: npm run check:suchhinweis
+          - teil: Filter-Tempo
+            befehl: npm run check:filter-tempo
+          # Lighthouse mobil gegen dist (3 Läufe je Seite, Median gegen tools/lighthouse-grenzen.json) und Leerlauf/Leck (70 s je Ansicht), 18.11.2026.
+          # Nur hier, nicht in `npm run build` und nicht im Deploy-Weg: der Deploy wartet sonst auf ≈ 5 min Messung.
+          - teil: Lighthouse
+            befehl: npm run check:lighthouse
+          - teil: Leerlauf
+            befehl: npm run check:leerlauf
+          - teil: Bühne-Fenster
+            befehl: npm run check:buehne-fenster
+          # Bühne-Messen in 5 Scheiben (CI 20.11.2026: eine Scheibe 1214 s abgebrochen); der Umfang (nur berührte Mockups?) kommt aus tools/buehne-umfang.mjs.
+          - teil: Bühne-Messen 1/5
+            befehl: npm run check:buehne-messen
+            scheibe: 1/5
+          - teil: Bühne-Messen 2/5
+            befehl: npm run check:buehne-messen
+            scheibe: 2/5
+          - teil: Bühne-Messen 3/5
+            befehl: npm run check:buehne-messen
+            scheibe: 3/5
+          - teil: Bühne-Messen 4/5
+            befehl: npm run check:buehne-messen
+            scheibe: 4/5
+          - teil: Bühne-Messen 5/5
+            befehl: npm run check:buehne-messen
+            scheibe: 5/5
+          - teil: Bühne-Basis
+            befehl: npm run check:buehne-basis
+            frist: 25 # CI-Messung 12.11.2026: Einrichtung 2 + Basis 7 + Kopf 7 min; Fristen 10 + 10 min in buehne-basis.mjs
+          - teil: Bühne-Panel
+            befehl: npm run check:buehne-panel
+          - teil: Melde-Kasten
+            befehl: npm run check:kasten
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: ./.github/actions/kette-einrichten
+        with:
+          playwright: 'true'
+      - run: npm run build
+      - name: Umfang der Bühne-Messung
+        id: umfang
+        if: matrix.scheibe
+        run: node tools/buehne-umfang.mjs HEAD^1 HEAD | tee -a "$GITHUB_OUTPUT"
+      - env:
+          BUEHNE_MOCKUPS: ${{ steps.umfang.outputs.mockups }}
+          BUEHNE_SCHEIBE: ${{ matrix.scheibe }}
+        run: ${{ matrix.befehl }}

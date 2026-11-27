@@ -1,0 +1,100 @@
+import '../../lib/i18n-spaet.ts' // Texte der nachgeladenen Ansichten
+import { useMemo, useState } from 'react'
+import type { Dataset } from '../../lib/data.ts'
+import { useEmpfehlungsDaten } from '../../lib/empfehlung-daten.ts'
+import { empfehlungGesehen, empfehlungVerworfen, useReiseAnbieter } from '../../lib/empfehlung-speicher.ts'
+import { baueAktionen, nimmWeg } from '../../lib/empfehlung-aktionen.ts'
+import { mosaikIds } from '../../lib/empfehlung-reise.ts'
+import { useFavorites, useHidden } from '../../lib/favorites.ts'
+import { useLang } from '../../lib/i18n.tsx'
+import { AnbieterBlatt, poolAnbieter } from './AnbieterBlatt.tsx'
+import { Hintergrund } from './bilder.tsx'
+import { Duell } from './Duell.tsx'
+import { Einleitung } from './Einleitung.tsx'
+import { Fortsetzen } from './Fortsetzen.tsx'
+import { Kopfzeile, AnbieterLasche } from './Kopfzeile.tsx'
+import { Leinwand } from './Leinwand.tsx'
+import { useReise } from './use-reise.ts'
+import { zeichnung } from '../../lib/empfehlung-zeichnung.ts'
+import { Vorschlaege } from './Vorschlaege.tsx'
+import './empfehlung.css'
+
+/** Zahl der Cover im Mosaik der Einleitung. */
+const MOSAIK_COVER = 24
+
+const zufallsStart = (): number => Math.floor(Math.random() * 1e6)
+
+/** „Entdecken“: Einleitung → Duelle → fünf Vorschläge → Leinwand. Liegt als Fläche über der Seite; erreichbar nur per Adresse (`#/entdecken`). */
+export default function EmpfehlungView({ data }: { data: Dataset }) {
+  const { t } = useLang()
+  const { kontext, titel, fehler } = useEmpfehlungsDaten(data)
+  const { favorites, toggle } = useFavorites()
+  const { hidden } = useHidden()
+  const gesehen = empfehlungGesehen.use()
+  const verworfen = empfehlungVerworfen.use()
+  const [eigene, setzeEigene] = useReiseAnbieter()
+  const [blatt, setBlatt] = useState(false)
+  const [schein, setSchein] = useState<string>()
+  const reise = useReise(kontext, { favoriten: favorites, ausgeblendet: hidden, gesehen: gesehen.ids, verworfen: verworfen.ids, eigene }, zufallsStart)
+  const mosaik = useMemo(() => mosaikIds(kontext?.datei.einstiege ?? [], MOSAIK_COVER), [kontext])
+  const kandidat = (id: number) => kontext!.datei.einstiege[kontext!.index.get(id)!]
+  const genresVon = (id: number) => kandidat(id).g.map((i) => kontext!.datei.genres[i])
+  const aktionen = baueAktionen({ gesehen: empfehlungGesehen, verworfen: empfehlungVerworfen, favorit: toggle, oeffne: reise.oeffne, entferne: reise.entferne })
+  const kandidaten = (ids: Set<number>) => (kontext ? [...ids].filter((id) => kontext.index.has(id)).map(kandidat) : [])
+  const ablage = {
+    verworfen: kandidaten(verworfen.ids),
+    gesehen: kandidaten(gesehen.ids),
+    verworfenHolen: (id: number) => nimmWeg(empfehlungVerworfen, id),
+    gesehenHolen: (id: number) => nimmWeg(empfehlungGesehen, id),
+  }
+  const phase = kontext ? reise.phase : 'start'
+  const abschnitt = zeichnung({ kontext: !!kontext, phase, sitzung: !!reise.sitzung, fortsetzbar: reise.fortsetzbar, aktuell: reise.aktuell !== undefined })
+
+  return (
+    <div className="empf fixed inset-0 z-50 flex flex-col bg-ak-grund text-ak-text">
+      <Hintergrund url={schein} />
+      <Kopfzeile phase={phase} anbieter={eigene.length} blattOffen={blatt} vorschlaege={() => reise.setPhase('ergebnis')} blatt={() => setBlatt(true)} />
+      {fehler && <p className="m-auto text-ak-fehler-text">{t('empf.fehler')}</p>}
+      {!fehler && !kontext && <p className="m-auto text-ak-leise">{t('empf.laedt')}</p>}
+      {kontext && abschnitt === 'einleitung' && <Einleitung titel={titel} ids={mosaik} los={reise.neu} />}
+      {kontext && abschnitt === 'fortsetzen' && (
+        <Fortsetzen
+          vorschau={reise.vorschau.map(kandidat)}
+          titel={titel}
+          mosaik={mosaik}
+          offenesDuell={!!reise.stehen && !reise.stehen.fertig}
+          fortfahren={reise.fortfahren}
+          neu={reise.verwerfenUndNeu}
+        />
+      )}
+      {kontext && abschnitt === 'duell' && reise.sitzung && (
+        <Duell kontext={kontext} sitzung={reise.sitzung} ziel={reise.ziel} titel={titel} antworte={reise.antworte} zurueck={reise.zurueckDuell} schein={setSchein} />
+      )}
+      {kontext && abschnitt === 'ergebnis' && (
+        <Vorschlaege
+          kontext={kontext}
+          gezeigt={reise.gezeigt}
+          titel={titel}
+          favoriten={favorites}
+          aktionen={aktionen}
+          stand={reise.stehen}
+          genauer={reise.kannGenauer ? reise.genauer : undefined}
+          vonVorn={reise.vonVorn}
+          ablage={ablage}
+        />
+      )}
+      {kontext && abschnitt === 'leinwand' && reise.aktuell !== undefined && (
+        <Leinwand
+          key={reise.aktuell}
+          k={kandidat(reise.aktuell)}
+          titel={titel?.get(reise.aktuell)}
+          genres={genresVon(reise.aktuell)}
+          eigene={reise.eigene}
+          zurueck={() => reise.setPhase('ergebnis')}
+        />
+      )}
+      {kontext && phase !== 'start' && <AnbieterLasche anbieter={eigene.length} offen={blatt} umschalten={() => setBlatt(!blatt)} />}
+      {kontext && <AnbieterBlatt offen={blatt} zu={() => setBlatt(false)} alle={poolAnbieter(kontext.datei.einstiege)} gewaehlt={eigene} setze={setzeEigene} />}
+    </div>
+  )
+}

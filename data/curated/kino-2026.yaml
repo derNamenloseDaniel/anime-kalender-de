@@ -1,0 +1,108 @@
+# Anime-Kinostarts im deutschsprachigen Raum 2026.
+#
+# Ein Kinostart ist ein einzelner Termin, deshalb `releaseType: movie` und
+# `platform: kino`. `publisher` trägt hier den Verleih, nicht das Disc-Label.
+#
+# Wichtig für dieses Projekt: Ein Kinostart bedeutet **nicht** automatisch eine
+# deutsche Synchronfassung. Viele Filme laufen zunächst nur im Original mit
+# Untertiteln, und die Verleiher lassen die Sprachfassung in der Ankündigung oft
+# ausdrücklich offen. Wo das so ist, steht es in `note` — geraten wird nichts.
+
+- slug: venus-wars-kino-2026
+  anilistId: 544
+  search: "Venus Senki"
+  titleDe: "Venus Wars (2K-Remaster)"
+  platform: kino
+  releaseType: movie
+  publisher: "Film Verleih Gruppe / Tonkatsu Pictures"
+  schedule: { firstEpisodeDate: "2026-07-28" }
+  sources: [https://www.anime2you.de/news/1034477/venus-wars-2k-remaster-im-kino/]
+
+- slug: chihiro-jubilaeum-kino-2026
+  anilistId: 199
+  search: "Sen to Chihiro no Kamikakushi"
+  titleDe: "Chihiros Reise ins Zauberland (25. Jubiläum)"
+  platform: kino
+  releaseType: movie
+  publisher: "Wild Bunch Germany"
+  hinweis: "Wiederaufführung zum 25. Jubiläum."
+  schedule: { firstEpisodeDate: "2026-08-18" }
+  sources: [https://www.anime2you.de/news/1034379/chihiros-reise-ins-zauberland-bald-wieder-im-kino/]
+
+- slug: detektiv-conan-movie-29-kino
+  anilistId: 198369
+  search: "Meitantei Conan: Highway no Datenshi"
+  titleDe: "Detektiv Conan – Der gefallene Engel des Highways"
+  platform: kino
+  releaseType: movie
+  publisher: "Crunchyroll (KAZÉ Anime)"
+  hinweis: "Am Starttag laufen 42 deutsche Vorstellungen in 36 Städten, ab dem 27.08. nur noch deutsche (gezählt am 25.08.2026 über alle 43 CineStar-Standorte)."
+  note: "Am Starttag laufen 42 deutsche Vorstellungen in 36 Städten, ab dem 27.08. nur noch deutsche. Gezählt über alle 43 CineStar-Standorte am 25.08.2026; die FSK führt den Film unter der Nummer 287674 mit deutscher Sprachfassung."
+  schedule: { firstEpisodeDate: "2026-08-25" }
+  sources:
+    - https://www.kinoheld.de/film/sen-to-chihiro-no-kamikakushi
+    - https://www.anime2you.de/news/1020620/detektiv-conan-film-29-kinostart-deutschland/
+    - https://www.kinoheld.de/film/detektiv-conan-film-29-der-gefallene-engel-des-highways
+    - https://www.cinestar.de/kino-mainz/veranstaltung-detektiv-conan-film-29-der-gefallene-engel-des-highways-cineanime
+    - https://www.fsk.de/freigabensuche/
+
+- slug: your-name-cineanime-2026
+  anilistId: 21519
+  search: "Kimi no Na wa."
+  titleDe: "Your Name. (CineAnime)"
+  platform: kino
+  releaseType: movie
+  publisher: "CineStar CineAnime"
+  hinweis: "Einzelvorstellung im Rahmen von CineAnime, nur an diesem Tag. Gezählt am 14.09.2026: 30 deutsche Vorstellungen in 28 CineStar-Kinos."
+  schedule: { firstEpisodeDate: "2026-09-29" }
+  sources:
+    - https://www.cinestar.de/kino-augsburg/veranstaltung-your-name-cineanime
+    - https://www.kinoheld.de/film/your-name-gestern-heute-und-fuer-immer
+
+- slug: a-new-dawn-kino
+  anilistId: 177132
+  search: "Hanarokushou ga Akeru Hi ni"
+  titleDe: "A New Dawn"
+  platform: kino
+  releaseType: movie
+  publisher: "polyband anime"
+  schedule: { firstEpisodeDate: "2026-10-15" }
+  sources:
+    - https://www.anime2you.de/news/1036946/a-new-dawn-deutscher-kinostart/
+    - https://www.kinoheld.de/film/a-new-dawn
+
+- slug: madoka-walpurgisnacht-rising-kino
+  anilistId: 133007
+  search: "Mahou Shoujo Madoka Magica: Walpurgis no Kaiten"
+  titleDe: "Puella Magi Madoka Magica the Movie – Walpurgisnacht: Rising"
+  platform: kino
+  releaseType: movie
+  publisher: "Crunchyroll"
+  sprache: omu
+  schedule: { firstEpisodeDate: "2026-11-24" }
+  sources: [https://www.anime2you.de/news/1036604/madoka-magica-walpurgisnacht-rising-kinostart/, https://www.anime2you.de/news/1053546/madoka-magica-film-deutscher-kinostart/]
+
+- slug: all-you-need-is-kill-kino
+  anilistId: 187892
+  search: "ALL YOU NEED IS KILL"
+  titleDe: "All You Need is Kill"
+  platform: kino
+  releaseType: movie
+  publisher: "KSM Anime"
+  schedule: { firstEpisodeDate: "2026-09-29" }
+  sources: [https://www.anime2you.de/news/1039622/all-you-need-is-kill-deutscher-kinostart/]
+
+# Nachtrag 06.10.2026 (Abgleich der Kinostarts Oktober bis Dezember): Anime2You „Kinoliste", Verleih peppermint anime, über 100 Kinos in Deutschland und Österreich.
+# insidekino nennt zusätzlich den 20.10. (vermutlich Eventvorstellung); als Starttag gilt der 27.10. aus der Meldung.
+- slug: rascal-dear-friend-kino
+  anilistId: 199340
+  titleDe: "Rascal Does Not Dream of a Dear Friend"
+  platform: kino
+  releaseType: movie
+  publisher: "peppermint anime"
+  hinweis: "Eine deutsche Synchronfassung ist nicht geplant."
+  sprache: omu
+  schedule: { firstEpisodeDate: "2026-10-27" }
+  sources:
+    - https://www.anime2you.de/news/1053560/rascal-does-not-dream-of-a-dear-friend-kinoliste/
+    - https://www.anime2you.de/news/1049457/rascal-does-not-dream-of-a-dear-friend-deutscher-kinostart/

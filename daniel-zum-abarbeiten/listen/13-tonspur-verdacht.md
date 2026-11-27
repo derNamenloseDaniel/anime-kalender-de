@@ -1,0 +1,20 @@
+# Tonspur-Verdacht
+
+Verweise, für die die Streaming Availability API **früher** eine deutsche Tonspur nannte und
+jetzt keine mehr. Das ist die Frage, für die es diese Prüfung gibt: Verliert ein Anbieter die
+Lizenz, nimmt er die deutsche Fassung aus dem Angebot, und niemand sagt es uns.
+
+**Ein Schweigen ist kein Eintrag.** Kennt die Quelle einen Titel gar nicht auf Deutsch, steht
+hier nichts — bei `thunder-3` kannte sie eine Folge zwei Tage nach dem Erscheinen noch nicht.
+Nur der Wechsel von „deutsch" auf „nicht mehr genannt" zählt.
+
+Der Vergleichsmaßstab steht in `data/motn-tonspur.json`: je Verweis die zuletzt gesehene
+Aussage. Ohne Vorstand gibt es keinen Verdacht, nur einen ersten Eintrag.
+
+Stand: 2026-11-07 · 3 offen · 429 Verweise beobachtet
+
+| Titel | Anbieter | Folgen | nannte Deutsch seit | Wechsel bemerkt | Verweis |
+|---|---|---|---|---|---|
+| Babylon | primevideo | 1–12 | 2026-08-31 | 2026-10-23 | https://www.amazon.de/gp/video/detail/0J16B1NAB82TO0O5A5Q8TLG1VP |
+| Call of the Night | primevideo | 1–13 | 2026-08-31 | 2026-10-23 | https://www.amazon.de/gp/video/detail/B0B6FVJXST |
+| Cyberpunk: Edgerunners | netflix | 1–10 | 2026-08-31 | 2026-11-07 | https://www.netflix.com/title/81054853 |

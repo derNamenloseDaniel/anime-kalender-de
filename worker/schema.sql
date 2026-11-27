@@ -1,0 +1,106 @@
+-- Anwenden mit:
+--   wrangler d1 execute anime-kalender --file=./schema.sql            (lokal)
+--   wrangler d1 execute anime-kalender --remote --file=./schema.sql   (live)
+
+CREATE TABLE IF NOT EXISTS subscribers (
+  id           TEXT PRIMARY KEY,
+  email        TEXT NOT NULL UNIQUE,
+  frequency    TEXT NOT NULL CHECK (frequency IN ('daily', 'weekly')),
+  platforms    TEXT NOT NULL DEFAULT '',   -- kommagetrennt, leer = alle
+  -- AniList-IDs der gemerkten Titel, kommagetrennt. Sie liegen sonst nur im
+  -- Browser des Nutzers; für den Versand müssen sie hierher gespiegelt werden.
+  favorites    TEXT NOT NULL DEFAULT '',
+  status       TEXT NOT NULL CHECK (status IN ('pending', 'active')) DEFAULT 'pending',
+  confirm_token TEXT NOT NULL,
+  unsub_token  TEXT NOT NULL,
+  -- Erlaubt das spätere Abgleichen der Favoriten, ohne den Abmeldelink
+  -- preiszugeben.
+  pref_token   TEXT NOT NULL DEFAULT '',
+  -- Vorgemerkte Änderungen an einem bereits AKTIVEN Abo. Sie greifen erst mit
+  -- dem Klick auf den Bestätigungslink — siehe migrations/003. Ohne diese
+  -- Trennung konnte jeder, der eine fremde Adresse ins Formular tippt, deren
+  -- Einstellungen und Favoriten sofort ersetzen (14.08.2026).
+  pending_frequency TEXT,
+  pending_platforms TEXT,
+  pending_favorites TEXT,
+  -- Einmal-Link zum Wiederherstellen der Favoriten — siehe migrations/004.
+  restore_token TEXT,
+  restore_expires TEXT,
+  restore_sent_at TEXT,
+  -- Befristeter Abgleich-Link für die Newsletter-Mails — siehe migrations/005.
+  -- Der `pref_token` darf seit dem 14.08.2026 keine Mail mehr verlassen.
+  sync_token TEXT,
+  sync_expires TEXT,
+  favorites_at TEXT,
+  created_at   TEXT NOT NULL,
+  created_ip   TEXT,
+  confirmed_at TEXT,
+  confirmed_ip TEXT,
+  last_sent_at TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_subscribers_status ON subscribers (status, frequency);
+CREATE INDEX IF NOT EXISTS idx_subscribers_confirm ON subscribers (confirm_token);
+CREATE INDEX IF NOT EXISTS idx_subscribers_unsub ON subscribers (unsub_token);
+
+-- Verhindert, dass ein Cron-Doppellauf zweimal dieselbe Mail schickt.
+-- Dient gleichzeitig als Sperre für die Benachrichtigungen der Überwachung:
+-- "alert:2026-08-08" bzw. "weekly:2026-W32".
+-- Zähler je Schlüssel und Zeitfenster, für Ratenbegrenzungen. Siehe
+-- migrations/004; erster Nutzer ist die Wiederherstellung der Favoriten.
+CREATE TABLE IF NOT EXISTS rate_limit (
+  key          TEXT PRIMARY KEY,
+  count        INTEGER NOT NULL,
+  window_start TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS send_log (
+  run_key    TEXT PRIMARY KEY,   -- z. B. "daily:2026-08-07"
+  sent_at    TEXT NOT NULL,
+  recipients INTEGER NOT NULL
+);
+
+-- Ergebnis der letzten Erreichbarkeitsprüfung je Seite.
+CREATE TABLE IF NOT EXISTS site_status (
+  url          TEXT PRIMARY KEY,
+  name         TEXT NOT NULL,
+  ok           INTEGER NOT NULL,
+  status       INTEGER NOT NULL,
+  ms           INTEGER NOT NULL,
+  reason       TEXT,
+  checked_at   TEXT NOT NULL,
+  -- Zeitpunkt der letzten erfolgreichen Prüfung: daraus ergibt sich, wie lange
+  -- eine Seite schon weg ist.
+  last_ok_at   TEXT,
+  fail_streak  INTEGER NOT NULL DEFAULT 0
+);
+
+-- Messverlauf je Seite und Lauf, 60 Tage — siehe migrations/044.
+CREATE TABLE IF NOT EXISTS site_history (
+  url         TEXT NOT NULL,
+  checked_at  TEXT NOT NULL,
+  ok          INTEGER NOT NULL,
+  ms          INTEGER NOT NULL,
+  PRIMARY KEY (url, checked_at)
+);
+
+-- Schnellmessung alle 5 Minuten und ihre Alarme — siehe migrations/045.
+CREATE TABLE IF NOT EXISTS site_probe (
+  url        TEXT NOT NULL,
+  checked_at TEXT NOT NULL,
+  ok         INTEGER NOT NULL,
+  status     INTEGER NOT NULL,
+  ttfb_ms    INTEGER NOT NULL,
+  total_ms   INTEGER NOT NULL,
+  grund      TEXT,
+  PRIMARY KEY (url, checked_at)
+);
+CREATE TABLE IF NOT EXISTS monitor_alarm (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  url            TEXT NOT NULL,
+  seit           TEXT NOT NULL,
+  grund          TEXT,
+  geschlossen_am TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_site_probe_zeit ON site_probe (checked_at);

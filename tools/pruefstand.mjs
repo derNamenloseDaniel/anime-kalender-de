@@ -1,0 +1,386 @@
+/**
+ * Wie weit die Prüfung je Anbieter ist — für die Statusanzeige.
+ *
+ * Daniel am 26.08.2026: „mach oben in die status app eine leiste für die
+ * prüfliste, damit ich auf einen blick sehe ob dort irgendwas für mich zum
+ * abarbeiten mit extension drinsteht … mach dort zB amazon 40/300, wenn 300 von
+ * mir zu melden sind und ich 40 bereits gemeldet habe."
+ *
+ * Gezählt werden **Einträge**, nicht Adressen: Unter einer Amazon-Kennung
+ * hängen oft mehrere Staffeln, und jede braucht ihre eigene Antwort.
+ *
+ * **Die Prüfliste ist die Wahrheit über „offen", nicht der Datensatz.** Sie
+ * lässt weg, was niemand anklicken kann — bei Amazon etwa jede Suchadresse
+ * (`/s?k=…`), die keine Kennung trägt. Wer stattdessen selbst über
+ * `titles.json` zählt, kommt auf 210 offene Einträge, wo 62 zu tun sind: eine
+ * Zahl, die zu Arbeit auffordert, die es nicht gibt. Deshalb kommt „offen" aus
+ * der Liste und „gemeldet" ist die Differenz — so stimmt die Rechnung auch
+ * dann noch, wenn ein Erzeuger seinen Filter ändert.
+ *
+ * Die Datei ist klein (rund 4 KB am 10.10.2026, mit `bekannt`) und liegt neben den anderen
+ * Erzeugnissen. Die Statusanzeige läuft aus einer lokalen Datei; sie kann
+ * `titles.json` mit seinen gut 550 KB nicht bei jedem Takt laden, diese hier
+ * schon.
+ *
+ * Aufruf: node tools/pruefstand.mjs — hängt an `npm run data:extension-liste`.
+ */
+import { readFileSync, writeFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { bekannteFolgen } from './pruefstand-bekannt.mjs'
+import { ladeZusatz, zaehleZusatzZiele } from './netflix-zweite-kennung.mjs'
+import { ladeBestand, ladeCartoons, sortiereListe } from './pruef-bestand.mjs'
+
+// AK_ROOT: Kulissentest (pipeline/check-netflix-zweite-kennung.ts) lässt den echten Lauf in einem Wegwerf-Ordner arbeiten.
+const wurzel = process.env.AK_ROOT ?? resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const titel = [...ladeBestand(wurzel), ...ladeCartoons(wurzel)]
+
+
+/** Die Prüfliste laden, wie die Erweiterung sie sieht. */
+function listeLesen(datei, global) {
+  try {
+    const text = readFileSync(resolve(wurzel, datei), 'utf8')
+    return JSON.parse(text.replace(new RegExp(`^globalThis.${global} = `), ''))
+  } catch {
+    return {}
+  }
+}
+
+/** Ein Ziel der Prüfliste; die Warnung bei unklaren Staffeln reist mit (Statusanzeige, Erweiterung). */
+function zielVon(url, wert, staffeln) {
+  return {
+    url,
+    titel: wert?.titel ?? null,
+    ...(wert?.hinweis ? { hinweis: wert.hinweis } : {}),
+    /* Wiedervorlage: erst eine Meldung nach `seit` erledigt sie — der Worker rechnet damit wie die Erweiterung. */
+    ...(wert?.seit ? { seit: wert.seit } : {}),
+    ...(staffeln.length ? { staffeln } : {}),
+  }
+}
+
+/** Die Adresse aus dem Bestand holen, statt sie zu bauen. */
+function adresseFuer(plattform, kennung) {
+  for (const t of titel) {
+    for (const s of t.streams ?? []) {
+      if (s.platform === plattform && (s.seite ?? s.url ?? '').includes(kennung)) return s.seite ?? s.url
+    }
+  }
+  return null
+}
+
+const ANBIETER = [
+  {
+    name: 'Amazon',
+    plattform: 'primevideo',
+    datei: 'extension/offene-amazon.js',
+    global: 'AK_OFFENE_AMAZON',
+    /* Bei Amazon steht die Adresse im Eintrag, bei Netflix ist sie der Schlüssel. */
+    ziel: (schluessel, wert) => wert.url ?? schluessel,
+    /* Dieselbe Regel wie in `extension-offene-amazon.mjs`: /dp/ oder /detail/, 10–32 Zeichen. */
+    kennung: (u) => /\/(?:dp|detail)\/([A-Z0-9]{10,32})/.exec(u)?.[1],
+    offene: (wert) => (wert.eintraege ?? []).filter((e) => e.offen).length,
+    /*
+      **Die Suchaufträge werden gezählt, nicht nachgerechnet.**
+
+      `ohneSeite` entstand bisher aus `titles.json`: jeder Prime-Verweis, dessen
+      Adresse keine Kennung trägt. Die Erweiterung führt aber eine eigene Liste
+      — `offene-amazon-suche.js`, erzeugt von `extension-offene-amazon.mjs`, mit
+      Fortsetzungen aussortiert und TMDB-Vorschlägen ergänzt.
+
+      Zwei Rechnungen für dieselbe Sache laufen auseinander, und am 30.08.2026
+      taten sie es sichtbar: Die Statusanzeige schrieb „58 Suchen", die
+      Erweiterung im selben Moment „122 von 176 offen".
+
+      Maßgeblich ist die Liste, die Daniel wirklich abarbeitet.
+    */
+    suchdatei: 'extension/offene-amazon-suche.js',
+    suchglobal: 'AK_PRIME_SUCHE',
+  },
+  {
+    name: 'Netflix',
+    plattform: 'netflix',
+    datei: 'extension/offene-netflix.js',
+    global: 'AK_OFFENE_TITEL',
+    /*
+      Netflix führt die Kennung als Schlüssel, nicht die Adresse. Die Form ist
+      im Bestand belegt (`https://www.netflix.com/title/80075178`) und wird von
+      dort genommen, nicht zusammengebaut — eine Adresse, die plausibel aussieht
+      und ins Leere führt, ist von einer echten nicht zu unterscheiden.
+    */
+    /*
+      **Die Pille führt auf die Titelseite, nie in den Player.**
+
+      `adresseFuer` gibt die Adresse zurück, die im Bestand steht — und die ist
+      bei zwei Verweisen eine `/watch/`-Adresse. Am 06.09.2026 landete Daniel
+      über die Pille deshalb direkt im laufenden Player: „fate grand order wurde
+      per klick auf pill geöffnet, aber direkt im player … mach pill clicks zu
+      overview, nicht direkt player."
+
+      Auf der Titelseite steht die Folgenliste, dort blendet die Erweiterung
+      ihre Prüfliste ein, und von dort führt ein Klick in den Player — umgekehrt
+      führt aus dem Player nichts zurück außer der Zurück-Taste.
+
+      Der Verweis im Datensatz bleibt, wie er ist: Er beschreibt, wo die Folge
+      liegt. Nur das **Ziel des Klicks** wird auf die Titelseite gezogen.
+    */
+    ziel: (schluessel) => `https://www.netflix.com/title/${schluessel}`,
+    /* Dieselbe Regel wie in `extension-offene-liste.mjs`. */
+    /*
+      **`/watch/` ist eine Kennung, keine Lücke.**
+
+      Hier stand nur `/title/(\d+)`. Zwei Netflix-Verweise tragen aber eine
+      Player-Adresse — `netflix.com/watch/81186102` und `.../82850867`, beides
+      Filme aus der Fate-Reihe. Sie fielen damit in `ohneSeite`, also in den
+      Topf „nur von Hand aufzulösen".
+
+      Die Folge stand am 06.09.2026 auf Daniels Bildschirm: Die Statusanzeige
+      zeigte eine Netflix-Pille mit zwei offenen Verweisen, der Klick führte auf
+      `netflix.com/browse` — die Startseite, auf der es nichts zu melden gibt —
+      und die Erweiterung blieb still, weil sie dort keinen Auftrag hat. Sein
+      Wort: „im status stand netflix hat einträge zum melden, ich klick drauf,
+      es öffnet sich nix."
+
+      Dabei ist `/watch/<id>` bei Netflix nicht weniger wert als `/title/<id>`,
+      sondern **der Arbeitsplatz der Erweiterung**: Dort läuft der Player, und
+      nur dort gibt Netflix die Tonspuren heraus. Was fehlt, ist keine Kennung,
+      sondern die Titelseite davor — und die braucht niemand, der ohnehin
+      abspielen muss.
+
+      **Der Unterschied bleibt trotzdem stehen:** Bei einer Serie ist die Zahl
+      hinter `/watch/` eine **Folge**, hinter `/title/` die **Reihe**. Beide
+      Fälle hier sind Filme, wo das zusammenfällt. Käme je ein Serienverweis in
+      dieser Form dazu, gehörte er über die Reihe aufgelöst, nicht über die
+      Folge.
+    */
+    kennung: (u) => /\/(?:title|watch)\/(\d+)/.exec(u)?.[1],
+    offene: (wert) => (wert.staffeln ?? []).filter((s) => s.offen).length,
+  },
+  {
+    name: 'Disney+',
+    plattform: 'disneyplus',
+    datei: 'extension/offene-disney.js',
+    global: 'AK_OFFENE_DISNEY',
+    /* Die Adresse steht im Eintrag — Disney+ führt zwei Formen derselben Seite. */
+    ziel: (schluessel, wert) => wert.url ?? schluessel,
+    /* Dieselbe Regel wie in `extension-offene-disney.mjs` und `disney.js`. */
+    kennung: (u) =>
+      /\/browse\/entity-([0-9a-f-]{8,})/i.exec(u)?.[1] ??
+      /\/(?:series|movies)\/[^/]+\/([A-Za-z0-9]{6,})/.exec(u)?.[1],
+    offene: (wert) => (wert.staffeln ?? []).filter((s) => s.offen).length,
+  },
+]
+
+/** Verweise der Titel auf einen Anbieter: mit Titelseite (`gesamt`) und ohne (`ohneSeite`). */
+function zaehleStreams(a) {
+  let gesamt = 0
+  let ohneSeite = 0
+  for (const t of titel) {
+    for (const s of t.streams ?? []) {
+      if (s.platform !== a.plattform) continue
+      if (a.kennung(s.seite ?? s.url ?? '')) gesamt++
+      else ohneSeite++
+    }
+  }
+  return { gesamt, ohneSeite }
+}
+
+/** Die Prüfziele eines Anbieters aus seiner sortierten Liste. */
+function zieleVon(a, liste) {
+  return liste
+    .filter(([, wert]) => a.offene(wert) > 0)
+    /* Alle Ziele, nicht 25 (14.09.2026) — die Erweiterung liest ihr „offen" daraus. */
+    .map(([schluessel, wert]) => {
+      /*
+        **Die offenen Staffeln gehören ans Ziel** (22.09.2026). Der Worker strich ein Ziel, sobald
+        unter seiner Adresse irgendetwas gemeldet war — Dr. STONE verschwand nach Staffel 1 aus der
+        Prüfliste, obwohl Staffel 2 offen war. Nur Listen in Netflix-Zählung: Dort ist `nr` dieselbe
+        Zahl, die der Player als `staffel` meldet.
+      */
+      const staffeln =
+        wert?.laut === 'anbieter-gerechnet'
+          ? [...new Set((wert.staffeln ?? []).filter((st) => st.offen && !st.film).map((st) => Number(st.nr)))].filter(Number.isFinite)
+          : []
+      return zielVon(a.ziel(schluessel, wert), wert, staffeln)
+    })
+    .filter((z) => z.url)
+}
+
+function standVon(a) {
+  const liste = sortiereListe(Object.entries(listeLesen(a.datei, a.global)), titel, a.plattform)
+  const offen = liste.reduce((n, [, wert]) => n + a.offene(wert), 0)
+
+  /*
+    **Gezählt wird nur, was jemand öffnen kann.**
+
+    Daniel am 26.08.2026: „wieso 550/550 amazon, heißt das 550 wurden gemeldet
+    und immer noch nicht übernommen in kalender?"
+
+    Nein — und die Zahl war trotzdem falsch. 122 der 550 Prime-Verweise sind
+    **Suchadressen** (`/s?k=Cowboy%20Bebop&i=instant-video`); dort gibt es
+    keine Titelseite, auf der die Erweiterung etwas lesen könnte. Sie stehen
+    darum zu Recht nicht in der Prüfliste — nur zählte die erste Fassung sie
+    über die Differenz stillschweigend als „gemeldet" mit. 428 geprüfte
+    Verweise sahen damit aus wie 550.
+
+    Eine geschönte Zahl ist schlimmer als eine unbequeme: Sie behauptet
+    Erledigtes, das niemand erledigt hat.
+  */
+  const { gesamt, ohneSeite: ohneSeiteTitel } = zaehleStreams(a)
+  let ohneSeite = ohneSeiteTitel
+
+  /*
+    **Mehrere Ziele, nicht eines.**
+
+    Wer den ersten Titel gemeldet hat, soll beim nächsten Klick den zweiten
+    bekommen — und nicht wieder den ersten, bis der nächste Datenlauf die Liste
+    neu schreibt. Die Anzeige gleicht dazu gegen den Briefkasten ab; dafür
+    braucht sie mehr als einen Kandidaten.
+
+    Fünfundzwanzig reichen für eine Sitzung und halten die Datei klein.
+  */
+  const ziele = zieleVon(a, liste)
+
+  /*
+    Wo es eine Suchliste gibt, ist sie die Wahrheit über die Suchaufträge — die
+    Zählung über `titles.json` bleibt für die Anbieter ohne eine solche Liste.
+  */
+  const suchAdressen = a.suchdatei ? Object.keys(listeLesen(a.suchdatei, a.suchglobal)) : null
+  if (suchAdressen) ohneSeite = suchAdressen.length
+
+  const [schluessel, wert] = liste.find(([, w]) => a.offene(w) > 0) ?? liste[0] ?? [] // erster offener: Disney+ führt auch beantwortete
+  return {
+    name: a.name,
+    /* Der Schlüssel, unter dem der Worker die Meldungen im Briefkasten zählt. */
+    plattform: a.plattform,
+    gemeldet: Math.max(0, gesamt - offen),
+    gesamt,
+    offen,
+    /* Verweise ohne Titelseite — nicht prüfbar, deshalb außerhalb der Rechnung. */
+    ohneSeite,
+    /*
+      Die Adressen selbst, damit der Worker abziehen kann, was schon gemeldet
+      ist — dieselbe Rechnung wie bei `ziele`, und dieselbe, die die
+      Erweiterung mit `suchOffen()` macht.
+    */
+    ...(suchAdressen ? { suchAdressen } : {}),
+    ziel: schluessel ? a.ziel(schluessel, wert) : null,
+    ziele,
+    /* Der Name des ersten offenen Eintrags — er steht als Titel am Knopf. */
+    naechster: wert?.titel ?? null,
+  }
+}
+
+const stand = ANBIETER.map(standVon)
+
+/* Die höchste Folge laut Datensatz je Kennung (4.24.21) — die Erweiterung vergleicht sie mit der Plattform. */
+ANBIETER.forEach((a, i) => {
+  stand[i].bekannt = bekannteFolgen(titel.filter((t) => !t.cartoon), a.plattform, a.kennung)
+})
+
+/* Jede zweite Netflix-Kennung ist ein eigenes Ziel der Prüfliste (`extension-offene-liste.mjs`) und zählt zum Gesamt. */
+const netflixStand = stand.find((s) => s.plattform === 'netflix')
+if (netflixStand) zaehleZusatzZiele(netflixStand, ladeZusatz(titel, wurzel))
+
+/**
+ * **Was keine Erweiterung hat, ist trotzdem Arbeit.**
+ *
+ * Daniel am 10.09.2026, mit Bild der Statusanzeige: „im todo stehen viel mehr
+ * meldungen etc die ich machen muss als im status app als pill stehen." Die
+ * Prüfliste führte fünf Aufgaben, die Anzeige eine Pille.
+ *
+ * Zwei Ursachen, und das hier ist die zweite: Der Prüfstand kannte nur die drei
+ * Anbieter, für die es ein Content-Skript gibt. Die Crunchyroll-Verweise ohne
+ * Urteil und die Suchadressen, für die niemand eine Titelseite kennt, standen
+ * nirgends — obwohl beide in `00-START-HIER.md` als Aufgabe geführt werden.
+ *
+ * Sie brauchen keine Zählung über Staffeln: Es sind Listen, und ihre Länge ist
+ * die Arbeit. Ein Klick führt auf den ersten Eintrag, wie bei den übrigen
+ * Pillen auch.
+ */
+function nachtrag(name, plattform, ziele, { alsTitel = false, hinweis = null } = {}) {
+  if (!ziele.length) return []
+  return [
+    {
+      name,
+      plattform,
+      gemeldet: 0,
+      gesamt: ziele.length,
+      offen: ziele.length,
+      /*
+        **Die Anzeige rechnet ihre Arbeit aus `titel` + `ohneSeite`**, nicht aus
+        `offen` (das meint bei Amazon Staffeln). Eine Liste, die keines der beiden
+        Felder setzt, fällt dort durch den Filter und bekommt gar keine Pille,
+        obwohl sie Arbeit ist. Darum steht hier, welcher Fall gemeint ist:
+        Crunchyroll sind Titel mit offenem Sprachurteil, „Suchadressen" Adressen
+        ohne Titelseite.
+      */
+      titel: alsTitel ? ziele.length : 0,
+      ohneSeite: alsTitel ? 0 : ziele.length,
+      ziel: ziele[0].url,
+      ziele: ziele.slice(0, 25),
+      naechster: ziele[0].titel ?? null,
+      /* Was zu tun ist — die Zahl allein lässt es offen. */
+      hinweis,
+    },
+  ]
+}
+
+/*
+  **Es gibt keine Crunchyroll-Pille mehr** (28.09.2026).
+
+  Daniel: „warum muss ich überhaupt für crunchy irgendwas melden, wir haben doch crunchy
+  automatisiert?" — Gemessen an den sechs Einträgen, die dort standen, ist keiner Arbeit für
+  ihn: **vier sind angekündigte Staffeln** (OMU-Start am 2./3.10., Synchro angekündigt, noch
+  keine Folgenzahl — Black Clover S2, Apothekerin S3, Last Boss S2, Appraisal S3), **eine ist
+  eine tote Seite**, die unsere eigene Crunchyroll-Runde als `nichtVerfuegbar` führt (Perfect
+  Blue), und **eine ein misslungener Abruf** (Yamato 2202, „Content-API kennt keine Staffel zu
+  dieser Kennung"). Angekündigtes erscheint von selbst, sobald es deutsch ist; die beiden
+  anderen sind Arbeit der Pipeline.
+
+  „Was keine Erweiterung hat, ist trotzdem Arbeit" gilt für die
+  **Suchadressen** — dort sucht wirklich jemand den richtigen Treffer —, nicht für einen
+  Anbieter, den wir selbst abfragen. Eine Pille, die Arbeit behauptet, die keine ist, kostet
+  mehr als sie zeigt.
+*/
+
+/*
+  Die Suchadressen kommen aus der Datei, die der Bau neben der Markdown-Liste
+  schreibt — dieselbe Quelle, damit Anzeige und Prüfliste nicht auseinanderlaufen.
+*/
+let suchOffen = []
+try {
+  suchOffen = JSON.parse(readFileSync(resolve(wurzel, 'data/suchadressen-offen.json'), 'utf8')).map((e) => ({
+    url: e.url,
+    titel: e.titel ?? null,
+  }))
+} catch {
+  /* Gibt es die Datei nicht, gibt es die Pille nicht — kein Grund abzubrechen. */
+}
+
+stand.push(
+  ...nachtrag('Suchadressen', 'suchadressen', suchOffen, {
+    hinweis: 'Suchadressen ohne Titelseite: den richtigen Treffer beim Anbieter heraussuchen',
+  }),
+)
+
+/** `erzeugtAm` nur erneuern, wenn sich die Anbieter ändern — sonst ändert jeder Lauf die Datei. */
+function schreibePruefstand(anbieter) {
+  const ziel = resolve(wurzel, 'public/data/pruefstand.json')
+  const text = (erzeugtAm) => JSON.stringify({ erzeugtAm, anbieter }, null, 1) + '\n'
+  let alt = ''
+  try {
+    alt = readFileSync(ziel, 'utf8')
+  } catch {
+    /* Erster Lauf: keine Datei. */
+  }
+  const altStand = alt ? JSON.parse(alt).erzeugtAm : null
+  writeFileSync(ziel, altStand && text(altStand) === alt ? alt : text(new Date().toISOString()))
+}
+schreibePruefstand(stand)
+for (const a of stand) {
+  console.log(
+    `${a.name}: ${a.gemeldet}/${a.gesamt} — ${a.offen} offen` +
+      (a.naechster ? `, zuerst „${a.naechster}"` : '') +
+      (a.ohneSeite ? `; ${a.ohneSeite} Suchadressen ohne Titelseite` : ''),
+  )
+}

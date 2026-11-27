@@ -1,0 +1,207 @@
+#!/usr/bin/env node
+/**
+ * Anker-Wächter für Mutationslisten (tools/mutationen/*.json): findet der Läufer (tools/mutationslaeufer.mjs)
+ * jeden `suche`-Anker noch in seiner `datei`? Sonst wäre der Mutant beim Prüfer „nicht gefunden“.
+ * Dieselbe Suche wie der Läufer (planeMutant), keine zweite Fassung.
+ *
+ * Aufruf: node tools/mutationsanker.mjs <liste.json>…   prüft genau diese Listen
+ *         node tools/mutationsanker.mjs --alle          prüft alle Listen, Exit 1 bei totem Anker
+ *         --diff                                prüft wie die PR-Vorprüfung (ankerRot) die Listen des Diffs gegen origin/main und jede Liste mit Ziel im Diff;
+ *                                                       Exit 1 bei totem Anker (Wächter vor dem Push: .claude/hooks/anker-wache.js)
+ *         --umhaengen (zusätzlich)                      totem Anker: enthält genau eine Quelldatei (ohne Tests) die `suche`, wird sie eingetragen;
+ *                                                       mehrere oder keine Treffer: nur gemeldet (tools/mutationsanker-umhaengen.mjs)
+ * tests-alle fährt dasselbe über tools/mutationsanker-alle.test.mjs für jeden PR (Merge-Ref = Stand von main):
+ * so fallen Rennen paralleler PRs auf, die der Diff-Filter unten nicht sieht.
+ * Mutanten ohne `tests`-Eintrag meldet der Aufruf mit Listen als Warnung (⚠, Exit unverändert); die Ratsche steht in
+ * tools/mutationsanker-ohne-tests.test.mjs (Zahl je Liste darf nur unter den Stand von origin/main sinken, neue Listen tragen `tests`; tools/ratsche-basis.mjs).
+ * Im PR prüft tools/pr-vorpruefung.mjs die Listen, die der Diff neu anlegt oder ändert, und jede Liste, deren
+ * Mutanten eine Datei des Diffs nennen (der Code kann dorthin gewandert sein); übrige Listen bleiben unberührt.
+ */
+import { execFileSync } from 'node:child_process'
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { ankerVorschlaege, umhaengenText, vorschlagZeilen } from './mutationsanker-umhaengen.mjs'
+import { normalisiereListe, normalisierePfad, parseListeText, planeMutant } from './mutationslaeufer.mjs'
+
+const LISTEN_ORDNER = 'tools/mutationen/'
+
+export const istMutationsliste = (pfad) => pfad.startsWith(LISTEN_ORDNER) && pfad.endsWith('.json') && !pfad.slice(LISTEN_ORDNER.length).includes('/')
+
+/** Fehlerzeilen einer Liste: kaputtes JSON, fehlende Datei, Anker weg/mehrdeutig/wirkungslos. `lies(pfad)` liefert Text oder null. */
+export function ankerFehler(listeName, listeText, lies, cwd = process.cwd()) {
+  let liste
+  try {
+    const roh = parseListeText(listeText)
+    // Paare [suche, ersetze] ohne Datei gehören zu mutationsprobe.mjs, nicht zum Läufer: hier nichts zu prüfen.
+    if (Array.isArray(roh) && roh.length > 0 && roh.every(Array.isArray)) return []
+    liste = normalisiereListe(roh)
+  } catch (e) {
+    return [`${listeName}: ${e.message}`]
+  }
+  const fehler = []
+  const originale = new Map()
+  for (const m of liste) {
+    for (const a of m.aenderungen) {
+      const pfad = normalisierePfad(a.datei, cwd)
+      if (originale.has(pfad)) continue
+      const text = lies(a.datei)
+      if (text !== null) originale.set(pfad, Buffer.from(text, 'utf8'))
+    }
+  }
+  for (const m of liste) {
+    const fehlt = m.aenderungen.find((a) => !originale.has(normalisierePfad(a.datei, cwd)))
+    if (fehlt) {
+      fehler.push(`${listeName}: „${m.name}“: Datei ${fehlt.datei} fehlt`)
+      continue
+    }
+    const plan = planeMutant(m, originale, cwd)
+    if (plan.urteil) fehler.push(`${listeName}: „${m.name}“: ${plan.urteil} (${plan.detail})`)
+  }
+  return fehler
+}
+
+const leseDatei = (pfad) => (existsSync(pfad) ? readFileSync(pfad, 'utf8') : null)
+
+/** Prüft die genannten Listen auf der Platte; Rückgabe { fehler, anzahl } (anzahl = geprüfte Mutanten). */
+export function pruefeListen(listen, lies = leseDatei) {
+  const fehler = []
+  let anzahl = 0
+  for (const name of listen) {
+    const text = lies(name)
+    if (text === null) continue
+    fehler.push(...ankerFehler(name, text, lies))
+    try {
+      anzahl += parseListeText(text).length
+    } catch {
+      // schon als Fehler gemeldet
+    }
+  }
+  return { fehler, anzahl }
+}
+
+/** Namen der Mutanten einer Liste ohne eigenen `tests`-Eintrag (dann braucht der Läufer `--test`); Kontrollen, Paar-Listen und kaputte Listen zählen nicht. */
+export function ohneTestsEintrag(listeText) {
+  try {
+    const roh = parseListeText(listeText)
+    if (Array.isArray(roh) && roh.length > 0 && roh.every(Array.isArray)) return []
+    return normalisiereListe(roh).filter((m) => m.aenderungen.length > 0 && !(Array.isArray(m.tests) && m.tests.length > 0)).map((m) => m.name)
+  } catch {
+    return []
+  }
+}
+
+/** Warnzeilen „Liste: Mutant ohne tests-Eintrag“ für die genannten Listen. */
+export function testsLueckenZeilen(listen, lies = leseDatei) {
+  return listen.flatMap((name) => ohneTestsEintrag(lies(name) ?? '[]').map((m) => `${name}: „${m}“ ohne tests-Eintrag`))
+}
+
+/** Ratsche: `ist` = Liste -> Zahl der Mutanten ohne tests-Eintrag, `bekannt` = erlaubte Zahl je Liste (fehlt sie, gilt 0). Rückgabe: Zeilen für Listen über ihrer Grenze. */
+export function ratscheLuecken(ist, bekannt) {
+  return Object.entries(ist).filter(([liste, n]) => n > (bekannt[liste] ?? 0)).map(([liste, n]) => `${liste}: ${n} Mutanten ohne tests-Eintrag, erlaubt ${bekannt[liste] ?? 0}`)
+}
+
+/** Die Mutationslisten, die der Diff (Pfade) neu anlegt oder ändert; gelöschte Dateien fehlen auf der Platte und fallen weg. */
+export const listenImDiff = (dateien) => dateien.filter(istMutationsliste)
+
+// Ohne Listenordner (Kulisse, Wegwerf-Repo) gibt es nichts zu prüfen.
+export const listenAufPlatte = () => !existsSync(LISTEN_ORDNER) ? [] : readdirSync(LISTEN_ORDNER).filter((n) => n.endsWith('.json')).map((n) => LISTEN_ORDNER + n)
+
+/** Listen, deren Mutanten eine Datei des Diffs ändern: wandert der Code dorthin, stirbt sonst der Anker unbemerkt. */
+export function listenMitZiel(dateien, lies = leseDatei, alle = listenAufPlatte, cwd = process.cwd()) {
+  const ziele = new Set(dateien.map((d) => normalisierePfad(d, cwd)))
+  return alle().filter((name) => {
+    const text = lies(name)
+    if (text === null) return false
+    try {
+      return normalisiereListe(parseListeText(text)).some((m) => m.aenderungen.some((a) => ziele.has(normalisierePfad(a.datei, cwd))))
+    } catch {
+      return false // kaputte oder Paar-Listen meldet ankerFehler, sobald sie im Diff stehen
+    }
+  })
+}
+
+/** Rote Befunde für die Listen des Diffs und die Listen, die eine Datei des Diffs zum Ziel haben (für tools/pr-vorpruefung.mjs). */
+export function ankerRot(dateien, lies = leseDatei, alle = listenAufPlatte) {
+  const listen = [...new Set([...listenImDiff(dateien), ...listenMitZiel(dateien, lies, alle)])]
+  return pruefeListen(listen, lies).fehler.map((f) => `Mutationsanker: ${f}`)
+}
+
+/** Meldet zu toten Ankern die Dateivorschläge; mit `umhaengen` schreibt es die eindeutigen in die Listen. Rückgabe: Zahl der geänderten Anker. */
+function schlageVor(listen, umhaengen) {
+  const dateiListe = () => {
+    try {
+      return execFileSync('git', ['ls-files'], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] }).split('\n').filter(Boolean)
+    } catch (fehler) {
+      console.warn(`mutationsanker: git ls-files fehlgeschlagen (${fehler.message}), keine Vorschläge; der Befund bleibt rot`)
+      return []
+    }
+  }
+  let geaendert = 0
+  for (const name of listen) {
+    const text = leseDatei(name)
+    if (text === null) continue
+    const vorschlaege = ankerVorschlaege(text, leseDatei, dateiListe)
+    for (const z of vorschlagZeilen(name, vorschlaege)) console.error(`  → ${z}`)
+    if (!umhaengen) continue
+    const neu = umhaengenText(text, vorschlaege)
+    if (neu.geaendert) writeFileSync(name, neu.text)
+    geaendert += neu.geaendert
+  }
+  return geaendert
+}
+
+/** Wächter vor dem Push: Befunde von ankerRot für den Diff gegen origin/main (ohne origin/main: nichts zu prüfen); ANKER_BASIS ersetzt die Basis (Test im flachen CI-Checkout ohne origin/main). */
+function diffRot() {
+  let basis = process.env.ANKER_BASIS
+  try {
+    basis ||= execFileSync('git', ['merge-base', 'origin/main', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
+  } catch {
+    console.log('Mutationsanker (Diff): kein origin/main, nichts geprüft')
+    return []
+  }
+  const diff = execFileSync('git', ['diff', '--name-only', '--no-renames', `${basis}..HEAD`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
+  return ankerRot(diff.split('\n').filter(Boolean))
+}
+
+function main() {
+  if (process.argv.includes('--diff')) {
+    const rot = diffRot()
+    for (const f of rot) console.error(`  ✖ ${f}`)
+    if (rot.length) console.error('  → Anker nachziehen: Datei, Mutant und `suche` stehen oben; Vorschläge: node tools/mutationsanker.mjs <liste.json> --umhaengen')
+    console.log(`Mutationsanker (Diff): ${rot.length} Anker nicht auffindbar`)
+    return rot.length ? 1 : 0
+  }
+  const umhaengen = process.argv.includes('--umhaengen')
+  const args = process.argv.slice(2).filter((a) => a !== '--umhaengen')
+  if (args.includes('--alle')) {
+    const alle = listenAufPlatte()
+    for (const name of alle) {
+      const { fehler, anzahl } = pruefeListen([name])
+      console.log(`${name}: ${anzahl} Mutanten, ${fehler.length} ohne Anker`)
+    }
+    const gesamt = pruefeListen(alle)
+    for (const f of gesamt.fehler) console.error(`  ✖ ${f}`)
+    if (gesamt.fehler.length) {
+      const n = schlageVor(alle, umhaengen)
+      if (n) console.log(`${n} Anker umgehängt`)
+    }
+    console.log(`Mutationsanker (alle): ${alle.length} Listen, ${gesamt.anzahl} Mutanten, ${gesamt.fehler.length} Anker nicht auffindbar`)
+    return gesamt.fehler.length ? 1 : 0
+  }
+  if (!args.length) {
+    const basis = execFileSync('git', ['merge-base', 'origin/main', 'HEAD'], { encoding: 'utf8' }).trim()
+    const diff = execFileSync('git', ['diff', '--name-only', '--no-renames', '--diff-filter=AM', `${basis}..HEAD`], { encoding: 'utf8' })
+    args.push(...listenImDiff(diff.split('\n').filter(Boolean)))
+  }
+  const { fehler, anzahl } = pruefeListen(args)
+  for (const f of fehler) console.error(`  ✖ ${f}`)
+  if (fehler.length) {
+    const n = schlageVor(args, umhaengen)
+    if (n) console.log(`${n} Anker umgehängt`)
+  }
+  for (const z of testsLueckenZeilen(args)) console.error(`  ⚠ ${z}`)
+  console.log(`Mutationsanker: ${args.length} Listen, ${anzahl} Mutanten, ${fehler.length} Anker nicht auffindbar`)
+  return fehler.length ? 1 : 0
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) process.exit(main())

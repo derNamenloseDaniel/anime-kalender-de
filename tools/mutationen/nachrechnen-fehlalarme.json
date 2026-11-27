@@ -1,0 +1,60 @@
+[
+  {
+    "name": "Kontrolle unmutiert",
+    "aenderungen": []
+  },
+  {
+    "name": "Trocken: Schalter wirkungslos",
+    "datei": "tools/pr-nachrechnen.mjs",
+    "suche": "  if (trocken) {",
+    "ersetze": "  if (false) {",
+    "tests": [
+      "node tools/pr-nachrechnen.test.mjs"
+    ]
+  },
+  {
+    "name": "Trocken: Exit 0 statt 1",
+    "datei": "tools/pr-nachrechnen.mjs",
+    "suche": "nichts geschlossen, geöffnet oder aktualisiert`)\n    return 1",
+    "ersetze": "nichts geschlossen, geöffnet oder aktualisiert`)\n    return 0",
+    "tests": [
+      "node tools/pr-nachrechnen.test.mjs"
+    ]
+  },
+  {
+    "name": "Trocken: main erkennt --trocken nicht",
+    "datei": "tools/pr-nachrechnen.mjs",
+    "suche": "const trocken = argv.includes('--trocken')",
+    "ersetze": "const trocken = false",
+    "tests": [
+      "node tools/pr-nachrechnen.test.mjs"
+    ]
+  },
+  {
+    "name": "Trocken: main reicht den Schalter nicht weiter",
+    "datei": "tools/pr-nachrechnen.mjs",
+    "suche": "nachziehen(nummer, ausfuehrer, melde, warte, trocken))",
+    "ersetze": "nachziehen(nummer, ausfuehrer, melde, warte))",
+    "tests": [
+      "node tools/pr-nachrechnen.test.mjs"
+    ]
+  },
+  {
+    "name": "Trocken: Argument --trocken bleibt in der Nummernliste",
+    "datei": "tools/pr-nachrechnen.mjs",
+    "suche": "const args = argv.filter((a) => a !== '--trocken')",
+    "ersetze": "const args = argv",
+    "tests": [
+      "node tools/pr-nachrechnen.test.mjs"
+    ]
+  },
+  {
+    "name": "Trocken: schreibt erst nach dem Trockenlauf-Zweig (Reihenfolge)",
+    "datei": "tools/pr-nachrechnen.mjs",
+    "suche": "  if (trocken) {\n",
+    "ersetze": "  anstossen(gh, nummer, main, warte)\n  if (trocken) {\n",
+    "tests": [
+      "node tools/pr-nachrechnen.test.mjs"
+    ]
+  }
+]

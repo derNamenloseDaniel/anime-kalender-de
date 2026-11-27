@@ -1,0 +1,717 @@
+# Projektregeln im Detail (Volltext bis 26.09.2026)
+
+Die `CLAUDE.md` im Repo ist seit dem 26.09.2026 eine Kurzfassung (Daniel: „you reach token limit too quickly“ — die Datei hatte 42,8 KB und lud in jeder Sitzung). Hier steht der vollständige Text der Regelabschnitte von damals, mit allen Anlässen, Zahlen und Laufkennungen. **Es gilt die Kurzfassung;** dieser Text erklärt sie. Neue Anlässe kommen hierher, in die `CLAUDE.md` höchstens ein Halbsatz.
+
+## Projektziel
+
+Ein **Gesamtüberblick aller Anime, für die es eine deutsche Synchronfassung gibt oder geben
+wird** — die bereits erschienenen ebenso wie die angekündigten. Dazu **filterbar**, **durchsuchbar**
+und als **Kalendereintrag** übernehmbar (Daniel, 11.08.2026).
+
+Fünf Punkte gehören aus der bisherigen Arbeit dazu, weil ohne sie keiner der vier oben trägt:
+
+1. **Synchro ist nicht Untertitel.** Das ist die Trennlinie, an der sich das Projekt von jedem
+   anderen Kalender scheidet. Chiikawa hat 120 deutsche Folgen — alle untertitelt, keine
+   synchronisiert; unser Kalender führt es zu Recht nicht. Wer diese Unterscheidung nicht
+   trifft, beantwortet eine andere Frage als die gestellte.
+2. **Nichts behaupten, was nicht belegt ist** (siehe nächster Abschnitt). Ein Kalender, dem man
+   nicht trauen kann, ist wertlos — er kostet dann Zeit, statt sie zu sparen.
+3. **Unsicheres kennzeichnen statt weglassen.** Der Sinn ist vorherzusagen, damit niemand etwas
+   verpasst. Ein Eintrag wird nur gestrichen, wenn eine Quelle ihn **aktiv widerlegt** — nicht,
+   weil er unbestätigt ist. Sonst fehlt genau der Termin, für den jemand die Seite aufruft.
+4. **Nicht nur wann, auch wo.** Zu jedem Titel gehört, wo man ihn sehen oder kaufen kann. Bei
+   den meisten Titeln ist das die eigentliche Frage — nur gut hundert haben überhaupt einen
+   anstehenden Termin.
+5. **Rechtzeitig Bescheid geben.** Kalender-Abo, ICS-Export und Newsletter sind kein Beiwerk:
+   Wer die Seite nicht täglich aufruft, verpasst sonst genau das, wovor sie bewahren soll.
+
+Was **nicht** zum Ziel gehört: eine Community-Plattform, Bewertungen, Wasserstandsmeldungen zu
+japanischen Ausstrahlungen. Der Kalender beantwortet eine Frage, und die auf Deutsch.
+
+## Grundsatz: nichts behaupten, was nicht belegt ist
+
+Dieses Projekt lebt davon, dass die Termine stimmen. Deshalb gilt ausnahmslos:
+
+- **Kein Termin ohne `sources`.** `npm run data:validate` bricht sonst ab, und das ist Absicht.
+- **Keine erfundenen Uhrzeiten.** Ist die Uhrzeit nicht belegt, bleibt `time` leer — die
+  Oberfläche schreibt dann „Zeit offen". Das ist besser als eine plausible Falschangabe.
+  **Einzige Ausnahme, auf Daniels Wunsch (25.09.2026): Netflix.** Netflix nennt für Katalogtitel
+  keine Uhrzeit, veröffentlicht Anime aber um 17:00 JST = 08:00 UTC (Tudum zu Steel Ball Run;
+  Daniel sah Folge 2 um 09:35 noch nicht, um 10:11 schon). `expandEvents` setzt diese Zeit dort,
+  wo keine belegt ist, als `timeEstimated` — angezeigt mit „≈", ohne Countdown.
+  **Zweite Ausnahme (18.10.2026, F39): Regeltermin aus einer eigenen Sichtung.** Fehlte eine Folge zu `notSeen`
+  und war zu `seen` da, darf `schedule.time` ein Wert im Fenster sein und gilt als Regeltermin für **alle**
+  Folgen der Serie (auch vergangene). Das Fenster steht als Beleg in `schedule.timeSighting` (`notSeen`, `seen`,
+  `date`, `source`). **Fenster unter 60 min: belegt, kein `timeEstimated`; ab 60 min: `timeEstimated` (≈).**
+  Beobachtet man später an einer Folge eine andere Zeit, steht sie als Abweichung in `schedule.zeiten`
+  (Folge → Uhrzeit) und schlägt den Regeltermin. Es gibt keinen eigenen Leser: alle Stellen lesen wie bisher
+  `schedule.time`/`zeiten`. `data:validate` (`pipeline/lib/sichtungsfenster.ts`) verlangt `schedule.time` im
+  Fenster, vollständige Angaben, ein Datum nicht vor der ersten Folge und nicht in der Zukunft und das
+  `timeEstimated`, das die Fensterbreite vorgibt; das Bau-Log hat die Zeile „N Regeltermin aus Sichtung: …".
+  **Jede kuratierte `time` + `timeEstimated` braucht eine benannte Ausnahme:** `timeSighting` oder einen
+  Eintrag in `FESTGELEGTE_ZEITEN` (seit 31.10.2026 leer: Altfall Avatar 11:00 entfernt, alle Folgen erschienen; ein Eintrag hat
+  eine Frist `bis`, danach Fehler in PR-CI und lokal, im Deploy nur Warnung auf der Konsole, damit er nicht an der Frist stirbt).
+- **Abgeleitetes kennzeichnen.** Datum aus dem Simulcast-Start übernommen statt aus einer
+  Dub-Ankündigung? Dann `estimated: true`. Folgenzahl geraten? Setzt die Pipeline selbst als
+  `episodeCountAssumed`. Beides erscheint im UI als `≈`.
+  **Eine einmal belegte Uhrzeit gilt auch am fortgeschriebenen Termin, bis eine Quelle sie widerlegt**
+  (Daniel, 21.11.2026: „einmal bestätigte uhrzeiten gelten als erwartete uhrzeiten bis andere quellen es
+  widerlegen“). Sie steht dort ohne „≈“; der abgeleitete Tag bleibt gekennzeichnet („voraussichtlich“,
+  „(Termin abgeleitet)“, Mail „geschätzt“, ICS „Geschätzter Termin“). „≈“ an der Uhrzeit nur bei `timeEstimated`
+  (`zeitGeschaetzt()` in `shared/zeit-text.ts`, Test `tools/zeit-kennzeichnung.test.ts`).
+- **Keine Folgenzahl erfinden, auch nicht als Rückfall.** Ein einzelner Termin im
+  Crunchyroll-Kalender ist kein Beleg für eine Wochenserie — dort stehen auch Specials,
+  Filmpremieren und die Anime Awards. Ein `Math.max(12, …)` als Standardwert machte daraus neun
+  zwölfteilige Reihen (10.08.2026), und der Kalender behauptete Woche für Woche eine Folge, die
+  es nicht gibt. Ein Termin ohne belegte Stückzahl über eins ist ein Einzeltermin.
+- **Ein Wochentakt muss gemessen sein, nicht angenommen.** „Nicht alles an einem Tag" heißt
+  nicht „jede Woche eine Folge". ADN nahm Sword Art Online in zwei Wellen ins Angebot (11.06.
+  und 17.07.2025, 49 und 47 Folgen); weil die Einstufung nur `dates.size === 1` prüfte, galt der
+  Eintrag als Wochenserie, und der Kalender rechnete daraus 96 Termine bis 2027 — zusammen mit
+  Sailor Moon **196 von 867 Terminen frei erfunden** (12.08.2026). Entscheidend sind der
+  Abstand zwischen den Terminen **und** die Zahl der Folgen je Termin; beides prüft
+  `bestimmeRhythmus()` in `pipeline/lib/adn.ts`.
+- **Ein belegtes Ende schlägt jede Fortschreibung.** `expandEvents` bricht bei
+  `schedule.lastEpisodeDate` ab. Vorher las nur `releaseStatus()` das Feld, `expandEvents` nicht
+  — der Datensatz behauptete gleichzeitig „abgeschlossen seit Juli 2025" und „nächste Folge
+  nächsten Mittwoch".
+- **Eine Plattform-Serienkennung ist ein Franchise, keine Staffel.** ADN führt unter einer
+  Kennung alle drei Staffeln von SAO, alle fünf von Sailor Moon, acht Blöcke von Haikyu!! —
+  neun der 37 Serien. Zerlegt wird über das Feld `season` der Quelle
+  (`staffelBloecke()`); die Zuordnung zur richtigen AniList-Staffel läuft über die
+  **Folgenzahl**, nicht über den Namen: ADN-Staffel 3 von SAO hat 47 Folgen = Alicization 24 +
+  War of Underworld 12 + Part 2 11. Geht die Summe nicht exakt auf, bleibt der Block lieber
+  unzugeordnet, als einen fremden Titel mitzubringen.
+- **Umgekehrt gilt es auch: ein Anime gehört genau einer Serienkennung.** ADN führt „To Love-Ru"
+  unter 217 **und** 670, beide mit 26 Folgen. Die Namenssuche gibt für Fortsetzungen gern den
+  Reihenkopf zurück, und `passtZuSerie` nimmt ihn an, sobald ein Wort geteilt wird — bei
+  „To Love-Ru - Darkness" gegen „To Love Ru" ist das „love". Beide Kennungen beanspruchten
+  AniList 3455, `pruefeErgebnis` meldete zu Recht „zusammen 52 Folgen bei 26 vorhandenen" und
+  brach ab. **Drei Wochenläufe in Folge haben deshalb nichts geschrieben** (10.–17.08.2026): Der
+  Abbruch schützt den Datensatz, aber er verwirft auch alles andere, was der Lauf geholt hat.
+  Ist ein Treffer schon vergeben, wird deshalb die nächste Schreibweise probiert, nicht
+  aufgegeben. Die Zusicherung dazu steht in `check-logic.ts` — wer den Melder weicher stellt, um
+  einen grünen Lauf zu bekommen, bricht sie.
+- **Es gewinnt der beste Treffer, nicht der erste — und kurze Wörter entscheiden.** Ein
+  Namensabgleich, der Wörter unter vier Zeichen wegwirft, wirft genau die Kürzel weg, die eine
+  Nebenausgabe von der Hauptserie trennen: `OVA`, `ONA`, `OAD`, `TV`. „Wolf's Rain OVA" (4 Folgen)
+  sah dadurch wie „Wolf's Rain" aus und gewann gegen die Serie (26) — für eine ADN-Kennung mit 30
+  Folgen, was den Build abbrach (17.08.2026). Diese vier Kürzel zählen deshalb mit; Füllwörter wie
+  „the", „no", „to" weiterhin nicht. `bewerteTreffer` wertet je Titelschreibweise (geteilte Wörter
+  doppelt, fremde einfach dagegen) und lässt den **japanischen** Titel außen vor: Sein
+  lateinischer Rest verliert genau das unterscheidende Wort — „To LOVEる -とらぶる- ダークネス"
+  schrumpft auf „love", und „Darkness" ist weg.
+- **Ein Vorfilter verschiebt, er löscht nicht.** Wer aus dem Hauptbestand fällt, muss hinter dem
+  Toggle ankommen, und zwar nachweislich: Sich darauf zu verlassen, dass der AniList-Katalog ihn
+  von selbst wieder mitbringt, ging bei acht von neun Titeln gut — der neunte war über keinen Weg
+  mehr erreichbar. Ein Titel, den man nirgends findet, ist stillschweigend gestrichen, und
+  gestrichen wird nur, was eine Quelle aktiv widerlegt.
+- **„Früheste Beobachtung" ist nicht „erste Folge".** `earliest` in `data/crunchyroll.json` ist
+  der früheste Tag, den ein Abruf **gesehen** hat — der Kalender holt ein Fenster von acht bis
+  zwölf Wochen, was davor lief, steht dort nie. Bei „Wistoria: Wand and Sword" Staffel 2 ist
+  das der 31.05.2026 mit Folge 17; die Staffel begann am 03.05.2026 mit Folge 13 (Daniel,
+  21.08.2026, bestätigt durch einen Artikel vom 04.05.2026). Wer die beiden verwechselt,
+  verschiebt eine ganze Staffel — der Datensatz führte dafür zwölf Termine von Februar bis
+  April, und keinen einzigen echten. Dieselbe Verwechslung ist mir am 21.08.2026 auch in der
+  **Beschreibung** des Fehlers unterlaufen, nicht nur dem Code: „die Staffel lief vom 31.05.
+  bis 19.07." stand in einem Auftrag, der genau diesen Fehler beheben sollte.
+
+- **Der erste Eintrag einer Staffelliste ist nicht deren erste Folge.** Crunchyroll führt unter
+  „Wistoria" Staffel 2 an erster Stelle ein Rückblick-Special **ohne** deutsche Synchro. Wer
+  nach Position zählt statt nach Folgennummer, verschiebt die ganze Staffel um eins und nimmt
+  einen untertitelten Eintrag in einen Synchro-Kalender auf (Daniel, 21.08.2026).
+
+- **„Im Angebot seit" ist nicht „erschienen am".** Nimmt eine Plattform einen Katalogtitel auf,
+  kennt sie nur das Datum ihrer eigenen Aufnahme. Für SAO war das der 11.06.2025 — die deutsche
+  Fassung gibt es seit 2013, die von Alicization seit August 2019 auf Disc. Deshalb trägt jedes
+  nicht-wöchentliche ADN-Release `dateMeaning: 'available-from'`, und die Oberfläche schreibt
+  „Im Angebot seit" statt „Start".
+- **Geteilte Staffelstarts über `schedule.firstEpisodeNumber` abbilden.** Netflix brachte Steel
+  Ball Run als eine Folge im März und den Rest im September. Zwei Releases, aber eine
+  durchlaufende Zählung: Ohne das Feld beginnt die Terminliste des zweiten Teils wieder bei „1."
+  und liest sich wie der Termin der Auftaktfolge.
+- Bei Fortsetzungen die **AniList-ID prüfen**, nicht der Suche vertrauen. `npx tsx
+  pipeline/qa-resolve.ts` zeigt Verdachtsfälle; die Folgenzahl wird nur übernommen, wenn das
+  japanische Ausstrahlungsjahr zum deutschen Termin passt.
+- **Meldungen mit „erstmals im Stream/TV“ als `premiere` eintragen** (Daniel, 10.10.2026): Sagt eine Quelle
+  ausdrücklich, dass ein Release erstmals auf Deutsch im Fernsehen oder Streaming erscheint, gehört am
+  kuratierten Release `premiere: { weg, quelle, vorher?, vorherDatum? }` dazu (`vorher: disc|kino`, wenn die
+  Fassung dort schon erschien — Anzeige „Premiere*“). Nie aus Abwesenheit oder „im Angebot seit“ ableiten;
+  eine Neuzugangsmeldung ohne das Wort „erstmals“ reicht nicht. Einzelheiten: `datensatz.md`.
+
+## Was erzeugt wird, wird auch geprüft
+
+`npm run data:validate` sichert nur `data/curated/*.yaml` — also den Teil, den ohnehin jemand
+durchdacht hat. Der Fehler vom 12.08.2026 entstand vollständig in `build.ts` und wäre dort nie
+aufgefallen. Deshalb prüft `pipeline/lib/pruefung.ts` am Ende jedes Builds den **erzeugten**
+Datensatz und bricht bei einem Widerspruch ab, bevor etwas geschrieben wird:
+
+- kein Termin nach dem belegten `lastEpisodeDate`
+- keine Folgenzahl über dem Doppelten der AniList-Angabe (Ausnahme: `firstEpisodeNumber` oder
+  ein erklärender `note`)
+- keine zwei Releases, die zusammen mehr Folgen behaupten, als der Anime hat
+- kein Release ohne Quelle
+
+`npm run check:logic` stellt zusätzlich die vier Annahmen nach, aus denen der Fehler entstand.
+Beide gehören zur Prüfkette vor dem Commit.
+
+**Drei Prüfungen sichern die Synchro-Auswertung, und sie messen Verschiedenes.** Das ist
+Absicht: Jede einzelne davon kann grün bleiben, während die anderen einen echten Ausfall sehen.
+
+| Lauf | misst | blinder Fleck |
+|---|---|---|
+| `check:handbelege` | steht jede Handprüfung so im Datensatz? | **merkt einen Ausfall der Automatik nicht** — der Build setzt Handprüfungen direkt, sie decken den Ausfall zu |
+| `check:cr-zuordnung` | tut `beurteile()` das Richtige? | kennt nur die neun hinterlegten Fälle |
+| `check:quellen` | widerspricht eine Quelle einer Handprüfung? | kleine Kontrollgruppe, sagt nichts über Ungeprüftes |
+
+Der mittlere Lauf ist die Antwort auf Daniels Frage vom 23.08.2026: „ist das jetzt von dir
+korrigiert worden, sodass zukünftige läufe es nicht erneut kaputt machen? nicht nur speziell
+für den fall, sondern generisch gelöst?" Er stellt neun reale Fälle nach — Gun Gale Online,
+Fruits Basket, KONOSUBA, Food Wars, Free!, den US-Katalog — und zieht darunter eine
+**Untergrenze auf dem echten Bestand**: Fällt die Auswertung unter 300 Urteile (Stand
+23.08.2026: 470), ist etwas gebrochen, auch wenn jeder Einzelfall noch stimmt.
+
+`npm run check:handbelege` hält seit dem 23.08.2026 die **1.946 von Hand geprüften Angaben**
+aus `data/dub-confirmed.yaml` gegen den gebauten Datensatz. Sie sind die einzige Quelle im
+Projekt, die weder rät noch schweigt — und die teuerste, weil sie Daniels Zeit kostet statt
+Rechenzeit.
+
+Ihr Schutz besteht in `build.ts` aus drei Stellen mit `if (stream.dub !== undefined) continue`,
+also aus einer **Reihenfolge**. Reihenfolgen brechen leise: Wer eine Quelle nach oben zieht
+oder die Bedingung vergisst, sieht danach einen Datensatz, der genauso vollständig aussieht —
+nur steht an einzelnen Stellen die Vermutung einer Quelle, wo eine Messung stand. Der Anlass
+war Daniels Frage vom 23.08.2026, ob seine Netflix-Meldungen vom Vortag beim nächsten Lauf
+überschrieben werden könnten.
+
+Seit dem 14.10.2026 (Reste aus PR 1151): Die Nein-Seite liest auch `watchLinks` (ein Nein zu einer
+Plattform verträgt keinen Bezugsweg dorthin; bei `dub: false` bleibt ein Kaufweg stehen,
+`lib/handbeleg-bezugswege.ts`). „Handprüfung zeigt auf keinen Titel im Bestand" bricht ab, im
+Vergleichsbau (`BAU_VERGLEICH=1`, Ersatz-Cache) warnt sie nur (`lib/handbeleg-verwaist.ts`).
+
+## Ein laufender Datenlauf committet den Stand von seinem Start
+
+**Überholt seit 05.10.2026:** `commit-data.sh` rettet nur noch die **eigenen** Änderungen (`tools/quellen-aufsetzen.sh`), die Sammler liefern per Pull Request, und die Wache hält nur noch Commits an, solange ein direkt schreibender Lauf (Bestandsbau) läuft. Die Chronik unten bleibt als Anlass stehen; die geltende Regel steht in `CLAUDE.md` und in `docs/wissen/betrieb.md` („Datenläufe neu geschnitten").
+
+Am 29.08.2026 wurden 19 berichtigte Handbelege wieder falsch — keine Stunde,
+nachdem sie behoben waren. Die Ursache steht in `tools/commit-data.sh`, und sie
+ist kein Fehler, sondern eine Abwägung, die man kennen muss:
+
+Hat sich der Fernstand während des Laufs bewegt, rettet das Skript die
+**Quellen** aus seinem Arbeitsverzeichnis, setzt hart auf `origin/main` zurück
+und spielt sie wieder ein. Für geholte Daten ist das richtig — sonst wäre eine
+Stunde Abrufarbeit weg. Für eine Datei, an der **zwischenzeitlich jemand
+anderes gearbeitet hat**, bedeutet es: Die ältere Fassung gewinnt.
+
+Betroffen ist alles unter `QUELLEN` in diesem Skript, allen voran
+`data/dub-confirmed.yaml` — ausgerechnet die Datei mit den 2.947 von Hand
+geprüften Angaben.
+
+**Praktische Folge:** Eine Korrektur an einer Quelldatei, während ein Datenlauf
+läuft, ist nicht sicher. Entweder man wartet ihn ab (`gh run list`), oder man
+prüft nach seinem Ende nach, ob die Korrektur noch steht. Ein roter
+`check:logic` ist dabei der Freund: Er hat genau diesen Fall gemeldet, zwanzig
+Minuten nachdem er eingetreten war.
+
+**Zweiter Fall, 16.09.2026, und er traf eine Datei, die ich lokal neu erzeugt hatte.**
+`data/disc-ausgaben.json` bekam um 15:21 Uhr neue Felder (Format, Art); ein Nachhol-Lauf,
+der um 15:19 Uhr gestartet war, committete um 16:07 Uhr seinen alten Stand darüber. Der
+Bau danach fand keine Felder, die Disc-Pillen blieben aus — bemerkt erst bei der
+Live-Prüfung. **Vor dem Commit einer Datei aus `QUELLEN` wird `gh run list` gefragt**, ob
+ein Datenlauf läuft; wenn ja, wird nach seinem Ende nachgesehen, ob die eigene Fassung
+noch steht.
+
+**Dritter Fall, 16.09.2026 abends — und diesmal stand der laufende Bau in der Ausgabe
+direkt über dem Commit.** `bestand-bauen` (in_progress) committete danach seinen Stand von
+`data/verweise-von-hand.yaml` und nahm den Daima-YouTube-Verweis wieder heraus;
+`dub-confirmed.yaml` im selben Commit überlebte. Nachsehen allein hat also nicht getragen.
+**Läuft ein Datenlauf oder Bau, wird eine Datei aus `QUELLEN` nicht committet, sondern
+gewartet** — im Hintergrund, bis er fertig ist.
+
+**Seit dem 18.09.2026 hält das eine Maschine fest** (dritter Fall, Rückfall-Register):
+`tools/quellen-commit-wache.sh` hängt als pre-commit-Hook im lokalen Repo (einrichten mit
+`bash tools/quellen-commit-wache.sh --einrichten`) und hält jeden Commit an, der eine Datei aus
+`QUELLEN` enthält, solange ein Lauf außer Deploy, Aussehen und Claude läuft.
+**Seit dem 11.10.2026 nur noch für Commits auf `main` und nur, solange der Bestandsbau läuft** (der einzige Lauf, der direkt auf `main` schreibt; Branch-Commits und PR-Läufe sperren nichts mehr — am 10.10. hielt die Wache einen Branch-Commit 42 Minuten an).
+
+**Pre-commit prüft gestagte Patch Notes (12.10.2026).** Derselbe Hook (`bash tools/quellen-commit-wache.sh --einrichten`, schreibt jetzt
+über `git rev-parse --git-path`, geht also auch aus einem Worktree) ruft `tools/patchnotes-gestagt-pruefen.mjs`: bei gestagten
+`data/patchnotes/*.yaml` gültiges YAML und das Schema aus `shared/patchnotes.ts` (dieselbe Prüfung wie `pipeline/check-patchnotes.ts`,
+gelesen wird der Index). Anlass: ein Doppelpunkt im Untertitel fiel erst in `check:vor-commit` auf. Ohne gestagte Patch Notes endet
+das Werkzeug nach einem `git diff` (≈ 0,1 s), mit ihnen ≈ 0,2 s (gemessen 12.10.2026); Test `tools/patchnotes-gestagt.test.mjs`.
+Zweige ohne das Werkzeug überspringen es, der Hook liegt für alle Worktrees im gemeinsamen `.git/hooks/`. Nach dem Merge einmal
+`bash tools/quellen-commit-wache.sh --einrichten` im Hauptordner ausführen, sonst bleibt der alte Hook ohne die Prüfung.
+**Auch verschluckte Leerzeichen (02.11.2026):** derselbe Hook ruft `tools/leerzeichen-gestagt-pruefen.mjs` (Regel und Meldung von
+`pipeline/check-leerzeichen-gleich.ts`, nur gestagte Quelldateien aus dem Index, ≈ 0,6 s); Test `tools/leerzeichen-gestagt.test.mjs`. Anlass: PR 2690.
+**Auch sortierte Prüflisten (26.11.2026):** derselbe Hook ruft `tools/listen-gestagt-pruefen.mjs` (Regel `tools/liste-pruefen.mjs` wie `check:logic`, nur gestagte `tools/check-*-liste.txt`); Test `tools/listen-gestagt-pruefen.test.mjs`. Anlass: Fall 4857, eine Nachbesserung hängte einen Eintrag ans Listenende. Nach dem Merge einmal `bash tools/quellen-commit-wache.sh --einrichten` im Hauptordner.
+
+**Vierter Fall, 21.09.2026 — ausgelöst von einem Commit, der gar keine Quelle anfasste.** Während
+`bestand-bauen` lief, ging eine Doku-Änderung auf `main`. Der Fernstand hatte sich bewegt, der Lauf
+nahm den Rettungsweg und spielte die Erweiterungslisten zurück (in `QUELLEN`), ihre ausgelieferte
+Prüfsumme `public/data/pruefliste-stand.json` aber nicht (nicht in `QUELLEN`). Der Deploy wurde rot
+(Lauf 35567600545). Seitdem stehen beide Hälften des Generatorschritts in `tools/quellen-liste.sh`.
+**Was ein Schritt zusammen schreibt, steht zusammen in `QUELLEN` — oder gar nicht.**
+
+**Und deshalb gehört zu jeder Datenkorrektur eine Zusicherung.** Die Korrektur
+allein hält einen Lauf nicht aus; die Zusicherung meldet sich, wenn sie
+verlorengeht. Am selben Tag zweimal bewiesen — beim Kanal-Nein und bei den
+Prime-Meldungen.
+
+## Architektur
+
+Bauweise, Grenzen und die Schwellen, ab denen umgebaut werden müsste: [ARCHITEKTUR.md](ARCHITEKTUR.md).
+
+Die eine Regel, die man dort nicht nachlesen muss: **Ladelast, veröffentlichte Seite und
+Repo-Größe sind drei verschiedene Dinge.** Rohdaten unter `data/` kosten keine Ladelast und
+zählen nicht zur Pages-Grenze — sie wandern nie nach `dist/`. Ein neues Feld gehört nur dann
+in `titles.json`, wenn es die Mehrheit der Besucher braucht; alles andere kommt als eigene
+Datei, nachgeladen bei Bedarf.
+
+## Datenfluss
+
+`data/curated/*.yaml` (Handarbeit) + `data/cache/*` (APIs) → `pipeline/build.ts` → `public/data/*`
+
+`public/data/` wird **mit committet** — die Seite ist statisch und lädt genau diese Dateien.
+`data/cache/` ist bewusst nicht im Repo; die nächtliche Action baut ihn neu auf.
+
+## Codegestalt: Neues bekommt eine eigene Funktion (26.09.2026)
+
+Eine Durchsicht am 26.09.2026 maß die Codebasis: rund 112.000 Zeilen, davon ein gutes Drittel in
+sechs Dateien. `main()` in `pipeline/build.ts` war eine Funktion mit **7.809 Zeilen** und 183
+Variablen auf oberster Ebene (57 davon `let`), `DetailPanel` 3.125, `handlePruefung` im Worker
+1.244, `amazon.js` eine einzige Hülle über 11.225 Zeilen. Die Architektur darüber ist gesund
+(ARCHITEKTUR.md), die Typen streng, Doppelungen selten — das Problem war allein, dass jede
+Ergänzung dort landete, wo schon der Rest stand.
+
+Die Folgen stehen in diesen Regeln selbst: Der Vorrang der Handbelege „hängt an einer
+Reihenfolge", `pruefeErgebnis()` „läuft mitten im Bau", die Disc-Wege liefen zweimal ins Leere,
+weil sie an der falschen Stelle standen (29.08.2026). In einer Funktion, in der jeder Abschnitt
+jede Variable lesen und ändern kann, ist die Reihenfolge eine unsichtbare Schnittstelle.
+
+**Warum eine Zahl statt eines Vorsatzes.** Ein Vorsatz wird bei der zehnten kleinen Ergänzung
+übersehen; `tools/umfang-pruefen.mjs` nicht. Es misst je Bereich die Summe der Zeilen über den
+Grenzen (Funktion 80, Datei 800) und vergleicht mit `tools/umfang-grenzen.json`. Verschieben ist
+neutral, Herauslösen senkt, Anbauen hebt — und nur Letzteres wird rot. Prüfsätze
+(`check-*`, `*.test.*`, `*-pruefen*`) zählen nur mit ihren Funktionen, nicht mit der Dateilänge,
+weil jeder neue Fehlerfall sie verlängern soll. Eine Modulhülle `;(() => { … })()` um eine ganze
+Datei zählt nicht als Funktion.
+
+**Kommentare.** In `build.ts` waren 36 % der Zeilen Kommentar, in `amazon.js` 43 %, oft als
+Chronik („Am 29.08.2026 kostete das eine Stunde …"). Die Begründung ist wertvoll, die Chronik
+kostet jeden, der die Stelle liest, und jede Sitzung Kontext. Im Code steht das Warum in wenigen
+Zeilen; Anlass und Verlauf gehören in den Commit oder hierher.
+
+**Umbauen, ohne etwas zu ändern.** `tools/bau-vergleich.mjs` baut Basis und Kandidat je in einem
+eigenen Worktree mit einem nachgebildeten Cache und vergleicht alles, was der Bau schreibt. Ein
+reiner Umbau ist erst fertig, wenn das „gleich" meldet. Beide Seiten starten von `public/data/` und `data/` der Basis; der Kandidat bekommt seit 12.10.2026 zusätzlich seine eigenen Änderungen an `data/` seit der Merge-Basis (`git diff basis...kandidat`, ohne `data/cache/`, Gelöschtes wird entfernt), Änderungen an Handdateien (`data/*.yaml`) werden also mitgebaut und verglichen. Vorher bauten beide mit `data/` der Basis, und ein PR auf Handdateien meldete „gleich" (Befund zu PR 977). Nur die eigenen Änderungen, nicht das ganze `data/` des Kandidaten: Er liegt meist hinter der Basis, und die Sammler-Rohdaten von `main` (403 von 550 Commits in 3 Tagen berühren `data/`) wären sonst immer ein Unterschied. Hat die Basis dieselbe Datei auch geändert, wird der Diff Merge-Basis..Kandidat per `git apply --3way` auf die Basis gelegt, bei Konflikt bricht der Vergleich ab (Test `tools/bau-vergleich-daten.test.mjs`). Meldet der Vergleich „gleich", obwohl der Kandidat `data/` ändert, steht ein Hinweis dabei. Läuft schon ein Vergleich, reiht sich der Aufruf in die Schlange ein (Abschnitt „Warteschlange“ unten) und wartet bis zu 45 min, danach Exit 3. Der Bau läuft dabei mit
+`BAU_VERGLEICH=1`: Widersprüche im Ergebnis (`brichAbBeiWiderspruch`, `pipeline/lib/bau-widerspruch.ts`; Phasen 10, 11-6, 11-7, 13-5, 13-8)
+brechen ihn nicht ab, sondern stehen als „Widerspruch (Vergleichsmodus)" im mitverglichenen Protokoll — der Ersatz-Cache ist nicht
+der echte, und eine Invariante, die dort reißt, verhinderte sonst jede Basis (12.10.2026: Bookworm-Dublette, Prime-Häkchen ohne Beleg).
+Neue Abbruchstelle für ein Ergebnis-Urteil: über diese Funktion, nicht mit eigenem `process.exit`. Bei verschiedenen JSON-Dateien nennt
+die Ausgabe die Felder mit Anzahl und Beispiel (`tools/vergleich-unterschied.mjs`, etwa `streams[].dubQuelle` = Herkunft „Deutsch laut
+JustWatch" am Weg). Schreibt nur eine Seite die Datei (der Bau ändert sie nur einseitig), gilt für die andere der Stand der Basis per `git show` (`tools/bau-vergleich-stand.mjs`), damit der Feldvergleich greift statt Textzeilen; ausgenommen sind Handdateien, die der Kandidat selbst ändert. Wird eine Liste nur umsortiert, steht „[] (nur Reihenfolge)“ da, die Datei ist ja verschieden (14.10.2026, Befunde zu PR 1145). Bei `public/data/news.json` hängt er ein News-Delta je Titel an (`tools/bau-vergleich-news.mjs`, 06.11.2026): neu (+), weggefallen (-), Inhalt geändert (~) mit Titelname, Tag, Art und Anbieter, höchstens 40 Zeilen; der Feldvergleich ordnet die Datei nur nach Stelle zu. Nicht abgedeckt: Verlust-Riegel (`13-2`), Eingabe-Prüfungen (`01-quellen`, `nebendateien`, Patchnotes). Für `web/src` tut dasselbe
+`tools/panel-vergleich.mjs`: beide Stände bauen, das Detail-Panel für 80 feste Titel bei stehender
+Uhr rendern, HTML vergleichen. Für Reihen-Änderungen (`franchises.json`) vergleicht
+`tools/reihen-vergleich.mjs [basis] [kandidat] [--json]` alle Reihen in Sekunden, ohne Bau: Reihenname, Anzahl, Reihenfolge der
+Glieder, Beschriftung und Staffelstand je Glied, berechnet mit dem `shared/titles.ts` des jeweiligen Commits (zeigt so auch
+Regeländerungen bei gleichen Daten); Exit 0 gleich, 1 verschieden (12.10.2026). Verschoben wird mit `tools/modul-umzug.mjs` (Namen, Abschnitte,
+JSX-Blöcke), das Parameter und Importe aus dem Typprüfer ableitet — von Hand verschobener Code
+verliert zu leicht eine Neuzuweisung oder eine Reihenfolge. Einige Zusicherungen in `check:logic`
+lesen Quelltext und prüfen die Reihenfolge von Marken; sie lesen deshalb alle Module in
+Aufrufreihenfolge (`bauQuelltext()`, `panelQuelltext()`, `workerQuelltext()`).
+
+**Exit-Codes von `bau-vergleich.mjs` (12.10.2026):** 0 gleich, 1 verschieden, 2 Bau der Basis gescheitert, 3 Sperre belegt, **4 Konflikt**
+bei der Übernahme der eigenen `data/`-Änderungen (nichts verglichen; Kandidat auf die Basis rebasen). Vorher endete der Konflikt als
+unbehandelte Ausnahme mit Exit 1 und sah aus wie ein Unterschied im Ergebnis. Die Codes stehen in `tools/bau-vergleich-urteil.mjs`.
+Bei Exit 2 nennt die Meldung seit 13.10.2026 die letzten ≤ 10 Fehlerzeilen des Basis-Baus (ohne Warnungen und Stack-Zeilen;
+`tools/bau-vergleich-protokoll.mjs`, Test `.test.mjs`). Anlass: Eine rote Patch-Notes-Prüfung auf main (3 Highlights an einem Tag) kostete einen Bauer eine Stunde, weil nur „scheitert selbst“ dastand.
+
+**Abstand und Sperre bei `bau-vergleich.mjs` (12.10.2026).** Ist die Basis kein Vorfahre des Kandidaten (Zweig hinter `origin/main` oder
+auseinandergelaufen), steht vor dem Lauf und am Ende eine WARNUNG mit Zahl der fehlenden Commits und der Merge-Basis
+(`tools/bau-vergleich-abstand.mjs`), bei „verschieden“ dazu, wie viele der Dateien die Basis seit der Merge-Basis selbst geändert hat.
+Anlass: Prüfer verglichen gegen das wandernde `origin/main` und sahen 32 fremde Dateien (`public/data/synopses/*`). Regel bleibt:
+zwei feste Hashes, bei einem Zweig hinter main gegen die Merge-Basis (`git merge-base`) oder erst rebasen. Die Sperre
+(`tools/einzel-sperre.mjs`, auch `panel-vergleich`) nannte schon PID und Startzeit, aber nicht, was läuft; jetzt steht in der Absage und
+in der Wartemeldung (sofort, dann jede Minute) PID, Startzeit, „vor N min“ sowie bei `bau-vergleich` beide Hashes und der Ort des
+Halters (Vorgabe für andere Werkzeuge: Skript, Argumente, Arbeitsverzeichnis). Wer bei `bau-vergleich` wartet, steht in der Schlange (nächster Absatz); `panel-vergleich` bricht weiter sofort mit Exit 3 ab.
+Eine Sperre mit totem Halter (PID lebt nicht) übernimmt der nächste Lauf mit Meldung. Seit 12.10.2026 räumt `bau-vergleich` nach der Sperre auch gesperrte `baum-*`-Worktrees, deren Ordner fehlt, selbst ab (`git worktree prune` lässt gesperrte stehen; Rest eines hart beendeten `worktree add`, Sperre „initializing“) — `tools/bau-vergleich-reste.mjs`, nur in der eigenen Ablage.
+
+**Warteschlange bei `bau-vergleich.mjs` (13.10.2026).** Wartende fragten bisher alle 5 s die Sperre ab, wer zufällig nach der Freigabe dran war,
+überholte die Älteren: Katalog-Release dreimal, OG-Titel viermal Exit 3 ohne Vergleich; ein Bauer half sich mit einer Wiederholschleife ohne PID.
+Jetzt legt jeder Wartende ein Ticket `bau-vergleich.warte-<Zeit>-<PID>` neben die Sperre in `tmpdir()`, nur das älteste Ticket darf die Sperre
+nehmen (FIFO, `tools/einzel-sperre-schlange.mjs`). Die Meldung nennt „Platz N von M“ und den Halter, sofort bei jeder Platzänderung, sonst jede
+Minute. Tickets hart beendeter Wartender (PID tot oder fremdes Programm) räumt der nächste Takt weg; reguläres Ende, SIGINT und SIGTERM löschen
+das eigene. Frist 45 min (`FRIST_MS`), dann Meldung mit Platz und Halter und Exit 3; ein neuer Aufruf reiht sich hinten ein. Test
+`tools/einzel-sperre-schlange.test.mjs` (echte Prozesse; ein Nachzügler, der 150-mal so oft fragt (Takt 10 ms gegen 1,5 s), bleibt hinter den Älteren; ein fälschlich gelöschtes eigenes Ticket legt der Besitzer am alten Platz neu an; mit
+`if (!nimmSperre(…))` statt `platz === 1 &&` war er in 4 von 4 Läufen rot). Wartende Bauer brauchen weder Wiederholschleife noch „bei Exit 3 neu starten“.
+
+**Entfernte Felder und Zwischenstand bei `bau-vergleich.mjs` (13.10.2026).** Die Feldliste zeigte höchstens 6 Felder nach Häufigkeit; ein Feld, das im
+neuen Bau nur an einer Stelle fehlte, fiel hinter häufigen Änderungen weg (gemessen an `public/data/titles.json`: `titleEn` bei einem Eintrag entfernt, 8 Felder
+überall geändert → nur „… und 2 weitere Felder“). Jetzt stehen fehlende Felder und entfallene Listenelemente als eigene Zeilen `… (entfernt)` bzw. `(entfallen)`
+vorn, mit eigener Kürzung (je 6, Rest „… und N weitere entfernte Felder“); `null` → fehlt zählt als entfernt (`tools/vergleich-unterschied.mjs`, Test dort).
+Zwischenstand: Warten in der Schlange, Beginn und Ende von Bau A, Bau B und Vergleich schreiben eine Zeile `[HH:MM:SS] …` sofort (`writeSync`,
+`tools/bau-vergleich-log.mjs`); Anlass: Bauer warteten bis zu 80 min ohne Rückmeldung im Log. Test `tools/bau-vergleich-log.test.mjs`: eine Zeile ist beim
+Leser, während der schreibende Prozess noch läuft (spätestens nach 5 s).
+
+**Stand nach dem ersten Umbau (26.09.2026):** `build.ts` 9.286 → 109 Zeilen, `main()` 7.809 → 90;
+die Phasen liegen in `pipeline/bau/` (größte Funktion 619 Zeilen). `DetailPanel.tsx` 6.237 →
+1.478, Teile in `web/src/components/detail/`. `handlePruefung` 1.244 → rund 70 (die Hälfte davon
+Kommentar), Teile in `worker/src/pruefung-*.ts`. Jeder Schritt bau- bzw. panelgleich
+nachgewiesen. Offen, bewusst: `extension/amazon.js` (11.225 Zeilen, eine Hülle ohne Bündler) —
+zerlegen, wenn dort ohnehin gearbeitet wird.
+
+## Keine Information zweimal
+
+Daniel am 03.09.2026 zum blauen Kasten im Detail-Panel: Dort stand „Auf Deutsch
+verfügbar", darunter „Vollständig synchronisiert" und darunter „Alle 24 Folgen
+auf Deutsch" — drei Zeilen für eine Auskunft. Sein Urteil: „blauer kasten sagt
+quasi 3x das selbe … zusammenfassen zu 1, so spart man sich 3 und benötigt nur
+1 zeile → mehr platz für andere elemente… **Globale Regel: Keine
+Information-Dopplung.**"
+
+**Prüffrage vor jeder Zeile in der Oberfläche: Steht das, was sie sagt, schon
+irgendwo auf demselben Bildschirm?** Wenn ja, wird sie gestrichen — nicht
+umformuliert. Zwei Formulierungen derselben Sache lesen sich wie zwei Angaben,
+und der Leser sucht dann den Unterschied, den es nicht gibt.
+
+Das gilt für die drei Häufungen, die dabei immer wieder auftauchen:
+
+- **Überschrift und Inhalt.** „WO LÄUFT ES" über drei Anbieter-Pillen sagt
+  nichts, was die Pillen nicht selbst zeigen.
+- **Zustand in Wort und Bild.** Ein voller Fortschrittsbalken **und** „Alle 24
+  Folgen auf Deutsch" **und** „Vollständig synchronisiert" sind dreimal dasselbe.
+- **Der Reihenname in jeder Zeile einer Reihe.** Er steht in der Überschrift;
+  darunter gehört nur, was die Teile unterscheidet.
+
+**Die Grenze:** Zwei Angaben, die *heute zufällig* dasselbe sagen, sind keine
+Dopplung. „24 Folgen" im Kopf und „24 von 24 auf Deutsch" im Kasten fallen
+auseinander, sobald eine Staffel halb synchronisiert ist — das ist eine
+Auskunft über zwei verschiedene Dinge, die gerade übereinstimmen.
+
+## Sprache
+
+Oberfläche, Kommentare, Commit-Messages und Dokumentation auf Deutsch. Feldnamen im Code
+bleiben englisch (`releaseType`, `firstEpisodeDate`), damit sie zu den Fremd-APIs passen.
+
+## Wo was liegt
+
+- `shared/` wird von Pipeline, Web-App **und** Worker importiert. Nichts hier hineinschreiben,
+  was Node-APIs oder DOM braucht.
+- Statusberechnung (`airing`/`abgeschlossen`/`tba`/`unbekannt`) steht in `shared/logic.ts` und
+- **Diese Statusberechnung nie selbst nachbauen — auch nicht für ein Hilfsskript.**
+  `schedule.lastEpisodeDate` ist bei den meisten Releases **nicht gesetzt**; es entsteht zur
+  Laufzeit aus Startdatum, Folgenzahl und Sendepausen. Wer das Feld direkt liest und sein
+  Fehlen als „läuft noch" auslegt, erklärt jede abgeschlossene Reihe für laufend. Real am
+  21.08.2026: Eine Arbeitsliste meldete „Dorohedoro Staffel 2 — läuft, 11/11" für eine
+  Staffel, die seit dem 27.05. durch ist. Daniel hat es gemeldet, nicht der Code.
+
+  Dazu gehört ein zweiter Griff: **Ein Anbieter-Verweis gehört zum Release seiner eigenen
+  Plattform.** Nimmt man je Titel einfach das Release mit dem spätesten Termin, macht ein
+  künftiger Disc-Termin aus „auf Netflix längst fertig" ein „läuft noch, 0/51" — die Disc hat
+  mit Netflix nichts zu tun. Nach der Berichtigung beider Fehler blieben von elf angeblich
+  laufenden Netflix-Reihen **null** übrig.
+
+  wird nie gespeichert, sondern immer gegen das heutige Datum gerechnet.
+- Zeitzonen laufen ausschließlich über `shared/time.ts`. Alle Datumsangaben im Datensatz sind
+  Ortszeit Europe/Berlin; die Umrechnung nach UTC für ICS und Google Calendar passiert dort
+  über `Intl`, damit die Sommerzeit stimmt. „Heute“ ist `todayIso()`, nie
+  `new Date().toISOString().slice(0, 10)` (UTC, zwischen 0 und 2 Uhr Berliner Zeit der Vortag);
+  der Wächter `tools/heute-utc.mjs` (in `check:logic`, Grenze `tools/heute-utc-grenzen.json`, Grundstand
+  21.10.2026: 66 Stellen) lässt die Zahl nur sinken.
+
+## Newsletter
+
+Der Worker in `worker/` ist optional. Ohne gesetztes `VITE_NEWSLETTER_API` zeigt das Formular
+einen ehrlichen Hinweis statt eines kaputten Buttons. DSGVO-Pflichten (Double-Opt-in,
+Abmeldelink, Impressum, Datenschutzerklärung) sind kein Nice-to-have — nichts davon entfernen.
+
+**D1 und Website (Daniel, 23.10.2026):** Die Regel „keine D1“ gilt nur für die Website selbst. Der Newsletter-Worker darf D1 nutzen, auch auf Nutzerpfaden: Favoriten-Abgleich, Web-Push und der persönliche Kalender-Feed. Feed-Abrufe der Kalender-Apps lesen D1 trotzdem nicht bei jedem Mal (Edge-Cache 15 Minuten, `worker/src/favoriten-feed.ts`).
+
+## Ein roter Lauf wird bemerkt, nicht gemeldet — und die Anzeige danach geleert
+
+Daniel am 07.09.2026, 15:50: „in status app sind 2 rote läufe (vor 3h+). wann
+immer ein lauf fehlschlägt musst du selbst mitbekommen, anschauen, und handeln,
+und im anschluss status app säubern. jeder überprüfte lauf in status app muss
+aus status app auch wieder verschwinden."
+
+Beide Läufe standen seit drei Stunden, beide gingen auf **meine** Commits
+zurück, und beide hätte ich beim nächsten `gh run list` sehen können — ich habe
+nur nicht hingesehen. Die Aufräum-Regel darunter gab es längst; was fehlte, war
+der Blick.
+
+**Der Griff gehört an jede Wachphase und an jeden eigenen Push**, nicht an einen
+Vorsatz:
+
+```
+LAUF_TOKEN=… node tools/laeufe-aufraeumen.mjs --trocken
+```
+
+Er zeigt in zwei Sekunden, was in der Anzeige rot steht, und sagt dazu, ob ein
+erfolgreicher Lauf desselben Workflows nachgekommen ist. Was er **nicht**
+abnimmt, ist genau das, was ich mir ansehen muss.
+
+### Was an diesem Tag die Ursache war — und sie kommt wieder
+
+```
+! [remote rejected] daten/34112899516-… → refusing to allow a GitHub App to
+  create or update workflow `.github/workflows/refresh-weekly.yml`
+  without `workflows` permission
+```
+
+Ein Datenlauf legt seinen Fund auf einen Zweig `daten/<lauf>`. Zieht er dabei
+einen Stand von `main`, auf dem eine **Workflow-Datei** geändert wurde, will er
+sie mitpushen — und das darf das `GITHUB_TOKEN` nicht. Der ganze Lauf endet
+rot, obwohl seine Arbeit fehlerfrei war.
+
+**Ursache und Abhilfe (07.11.2026):** Gepusht hat bis dahin die Checkout-Anmeldung (`GITHUB_TOKEN`), nicht das App-Token; das gab es nur für PR anlegen und mergen.
+`tools/quellen-pr.sh` meldet sich im Lauf jetzt mit dem App-Token an (`token_anmelden`), und die Token-Schritte holen es mit `permission-workflows: write`.
+Beleg 12.11.2026 (betrieb.md „Workflow-Sperre“): Der Zweig-Push mit Recht `workflows` geht durch, ohne das Recht lehnt GitHub mit genau dieser Meldung ab.
+
+**Praktische Folge (bis 07.11.2026, danach hinfällig):** Wer `.github/workflows/*` änderte, machte jeden
+laufenden Datenlauf rot. Heute stört ein Workflow-Push Sammler nicht mehr; die Ausnahme `claude-daten-merge.yml` steht in betrieb.md „Workflow-Sperre“.
+
+## Datenläufe laufen remote, nicht hier
+
+Daniel am 24.08.2026: „stoß die läufe ab jetzt immer remote an, damit das herunterfahren kein
+absturz der läufe bedeutet."
+
+Jeder Lauf, der Daten holt oder schreibt, wird über GitHub angestoßen:
+
+```bash
+gh workflow run <datei>.yml --repo derNamenloseDaniel/anime-kalender-de [-f budget=240]
+```
+
+Er läuft dann auf GitHubs Rechnern, committet selbst, überlebt jedes Herunterfahren und ist
+später im Verlauf nachlesbar. Ein lokaler Lauf hat nichts davon: Er stirbt mit dem Fenster,
+und was er geholt hat, liegt unversioniert herum.
+
+**Ausgenommen sind nur Läufe, die nur hier funktionieren:**
+
+- `tools/cr-zugang-holen.mjs` — braucht eine deutsche IP, sonst kommt der US-Katalog
+- Prüfläufe ohne Netzzugriff (`check:*`, `typecheck`, `build`) — sie schreiben nichts und
+  gehören vor jeden Commit
+- eine einzelne Messung zur Fehlersuche, die nichts in den Bestand schreibt
+
+**Und was ohnehin nach Plan läuft, wird nicht von Hand angestoßen.** Die vier Workflows decken
+den Regelfall ab; ein Lauf von Hand ist die Ausnahme für einen Nachzügler oder ein Kontingent,
+das sonst verfällt.
+
+## Prüfung nach Risiko: Stufen 0, 1, 2 (Daniel, 10.10.2026)
+
+Anlass: „keine Prüfer-Agenten bei Kleinigkeiten“. `node tools/pr-stufe.mjs <PR>` (Tabelle und Tests: `tools/pr-stufe.mjs`, `tools/pr-stufe.test.mjs`) stuft mechanisch aus Pfaden und Zeilenzahl des Diffs ein, im Zweifel Stufe 2.
+Handwerkzeuge (`tools/<name>.mjs|cjs|js|ts` mit eigenem Test, deren Name in `.github`, `package.json`, Wurzeldateien (`vite.config.ts`), `tools`, `pipeline`, `shared`, `web`, `worker`, `extension`, `.claude` nirgends vorkommt (fremde Tests zählen als Aufrufer, nur der eigene nicht) und auf den kein Glob oder Template-Pfad in `.github`/`package.json` passt (dann Stufe 2); `tools/pr-stufe-kette.mjs`) sind samt ihrem Test Stufe 1 (seit 31.10.2026, Anlass PR 2519; gemessen 31.10.2026: 8 von 374 Werkzeugen, nach der Prüferauflage A1–A3 noch 5 unter `tools/`); alles andere unter `tools/` bleibt 2.
+Nur Testdateien (`*.test.*`, `*.spec.*`, auch als Umbenennungsquelle) sind höchstens Stufe 1, nie 0 (gelöschte Tests oder geschwächte Zusicherungen sieht der Pfad nicht; seit 25.10.2026, Anlass PR 2018: 5 Zeilen in einem Test = Stufe 2); eine einzige Nicht-Testdatei im PR lässt die Tabelle unverändert gelten.
+Stufe 0 (Text/Patchnotes/i18n ohne Rechtstexte, eine CSS ≤ 30 Zeilen, Doku, Kommentare): nur die PR-Prüfkette, bei Grün Merge, danach Livemessung. Stufe 1 (UI-Logik, einzelne Handbelege, Daten-Konstanten, Skill-Texte `.claude/skills/**/*.md` seit 12.10.2026, alles unter `.claude/` seit 23.10.2026): schlanker Prüfer liest Diff und `gh pr checks`, baut nicht nach. Stufe 2 (pipeline, worker, Workflows, shared/logic/time, Schemata, > ~300 Zeilen): voller Prüfer mit Gegenproben. Tatsachenzahlen (IDs, Termine, Uhrzeiten, Folgenzahlen, Synchro-Status) sind nie Stufe 0. `pr-pruefer.yml` führt die Stufe als PR-Kommentar; bei Stufe 0 prüft der CI-Prüfer seit 12.10.2026 schlank (nur Diff, kleines Zugbudget) und gibt bei Ok frei, sonst Änderungswünsche. **Nur-Mod (20.11.2026, Daniel, F147: „nur testen, worauf es echte Auswirkungen hat“):** Ändert ein PR ausschließlich `.claude/mods/arbeitsliste/**` (dazu höchstens `.claude/skills/**/*.md`, mindestens eine Mod-Datei; kein Symlink, kein Moduswechsel), ist er Stufe 0 ohne Größengrenze (`nurMod` in `tools/pr-stufe.mjs`, Regel in `tools/pr-nur-mod.mjs`). Die Kette (`pr-pruefung.yml`) überspringt dann alle Jobs außer `Kette – Umfang` und `Kette – Mod-Schnellweg` (`claude plugin test`, `plugin validate`, Rangfolge-Test, `check-privatkennungen`, Mutationsanker, Skill-Texte, Umfang); der Sammeljob zählt „übersprungen“ nur bei `nur_mod == '1'` und grünem Schnellweg als bestanden (`tools/kette-urteil.mjs`). Der CI-Prüfer gibt ohne Modellaufruf frei (Schritt „Freigabe ohne Modell (nur Mod)“), sobald die Kette grün ist. Andere Mods, Regeln, Hooks, Agenten und reine Skill-PRs bleiben beim alten Weg.
+
+## Bilder für PR-Beschreibungen ohne Hook-Umgehung (14.10.2026)
+
+Anlass: Der Bilderzweig `bilder/<name>` hat keinen Vorgänger und enthält nur PNGs; der Pre-Commit-Hook (`bash tools/quellen-commit-wache.sh`, `node tools/umfang-pruefen.mjs`) kann dort nicht laufen, und am 14.10. wurde er mit `core.hooksPath` umgangen — das ist ein `--no-verify`.
+`node tools/pr-bilder.mjs <name> <bild.png> […] [--ersetzen]` legt Blobs, Baum und Wurzel-Commit mit `git hash-object`/`mktree`/`commit-tree` an und schiebt `<hash>:refs/heads/bilder/<name>`. Ohne Index und `git commit` läuft kein Hook, nichts wird abgeschaltet. Ausgabe: Kopf-Hash und je Bild eine Markdown-Zeile mit `raw.githubusercontent.com`-Link (live gemessen: 200, `image/png`, gleiche Bytegröße). Test: `tools/pr-bilder.test.mjs` (temporäres Repo mit immer scheiterndem Hook). Nach dem Merge des PR: `git push origin --delete bilder/<name>`.
+Verworfen: den (unversionierten, `.git/hooks/pre-commit`) Hook für „Baum ohne `package.json`, nur Bilder“ aufweichen — jede Ausnahme im Hook ist eine Lücke, und die Datei liegt nicht im Repo, wäre also je Klon neu zu pflegen.
+
+## Vor dem Commit
+
+```bash
+npm run check:vor-commit
+```
+
+**Ein Generator schreibt mehr als die Datei, wegen der man ihn aufruft.** Am 14.09.2026 habe ich die Prüflisten neu erzeugt und `extension/offene-*.js` committet — `public/data/pruefliste-stand.json`, die dieselben Werkzeuge im selben Zug schreiben, blieb liegen. `tools/extension-listenstand-pruefen.cjs` vergleicht beide Stände, und der Deploy wurde rot („stimmt mit der ausgelieferten überein"), bis der nächste Commit die Datei nachholte. Nach jedem Generatorlauf deshalb `git status` und **alles** stagen, was er geändert hat — nicht nur die erwarteten Pfade.
+
+**Jeder rote Lauf ist eine Mail an Daniel** (16.09.2026: „soviele emails wegen failenden runs,
+allein heute und gestern"). Gezählt am 15./16.09.: 14 Fehlermails, alle von meinen eigenen
+Pushes oder Versuchen — Daten-Commits ohne `check:logic` (Deploy 07:55–11:30 rot), ein
+Typfehler an `synonyms`, ein 404 in `check:ansichten`, drei umgehängte Belege ohne
+`check:handbelege`, ein Messlauf, der absichtlich scheitern durfte. Drei Griffe dagegen:
+Vor dem Push die Prüfungen fahren, die die CI **zusätzlich** fährt (`check:ansichten` und
+`check:panel` bei Änderungen an `web/src`, `check:handbelege` nach einem Bau bei geänderten
+Belegen). Ein Mess- oder Versuchslauf endet mit Exit 0 und schreibt sein Ergebnis ins
+Protokoll, statt rot zu werden. Und ein Messlauf wird erst angestoßen, wenn feststeht,
+dass sein Ergebnis nicht schon anderswo liegt (die Cron-Landmessung stand seit dem 22.08.
+in D1).
+
+**Eine Zusicherung in `pruefeErgebnis()` sieht den Datensatz an ihrer Stelle im Bau, nicht am Ende.** Sie läuft vor den JustWatch-Runden und vor vielem, was danach noch Wege anlegt oder umschreibt. Am 22.09.2026 kennzeichnete ein Block TMDB-Wege erst nach der Prüfung; die neue Zusicherung „TMDB nur mit Kennzeichnung" sah 1.172 ungekennzeichnete Wege und brach den Bestandslauf ab (Lauf 35748165978). Eigenschaften, die eine Zusicherung prüft, werden deshalb **beim Anlegen** gesetzt. Und: **Der lokale Bau erreicht die Prüfung, bevor ihn der Cache-Abbruch („N Titel würden aus dem Datensatz fallen") stoppt** — ein lokaler `npm run data:build` beantwortet also sehr wohl, ob sie grün ist; danach die erzeugten Dateien mit `git checkout` zurücksetzen.
+
+**Wer in `build.ts` ändert, was entfernt oder wie ein Feld gebildet wird, sucht zuerst die Zusicherungen, die das festhalten** — am 22.09.2026 hängte ein Nachlauf „– Teil N“ an 20 deutsche Namen, und `check:logic` („kein Titel trägt die Nummer eines seiner Teile“, Yu-Gi-Oh 24.08.) ließ den Bestandslauf nichts übernehmen (Lauf 35752376247). Die Regel war nicht falsch, sie war enger gemeint; verfeinert statt umgangen. `check:cr-zuordnung` läuft erst im Bau (`commit-data.sh`) und hielt „keine tote Crunchyroll-Adresse im Datensatz" fest; der Fix vom 17.09.2026, der US-„nicht verfügbar" nicht mehr als tot wertet, machte den Bau deshalb rot (Lauf 35225087674). Prüfgriff: `grep -rn "<Grund oder Feldname>" pipeline/check-*.ts tools/*-pruefen*` vor dem Push.
+
+**Wer einen Handbeleg auf eine andere Kennung umhängt, fährt `check:handbelege` vorher mit.** Das steht nicht in `check:vor-commit` (es braucht den gebauten Datensatz) und bricht den Bau ab, wenn die neue Kennung nicht im Bestand steht — am 16.09.2026 bei drei umgehängten Prime-Belegen (Lauf 35125372002). Entweder die Staffel kommt über `synchro-von-hand.yaml` in den Bestand, oder der Beleg trägt `nichtImBestand: true` mit dem Grund in der Notiz.
+
+**Eine Prüfung, die `public/data` liest, gehört nicht nach `check:logic`, sondern in `tools/check-bestand-liste.txt` (`check:bestand`, läuft im Bestandsbau über `tools/commit-data.sh`) — `check:logic` lehnt sie ab (12.10.2026).** Anlass: Der Bestand liegt hinter neueren Rohdaten zurück; am 12.10. hingen fünf freigegebene PRs 1–2 h fest, weil `check-anisearch-katalog-abgleich` (aniSearch-Brücke vom Sammellauf) in der PR-Prüfkette rot war, ohne dass ein PR etwas dafür konnte. Der Wächter sitzt in `tools/check-logic-alle.mjs` (`tools/bestand-sperre.cjs` verbietet jeder Prüfung und ihren Unterprozessen den Lesezugriff auf `public/data`; Gegenprobe `tools/check-logic-ohne-bestand.test.mjs`). Altlasten stehen mit Frist in `tools/check-logic-bestand-ausnahmen.json` und müssen gestrichen werden, sobald sie nicht mehr lesen; `hoechstens` sinkt nur. Gemischte Prüfdatei: den Bestandsteil als `pipeline/check-<name>-bestand.ts` abtrennen (Muster: `check-kachel-anbieter-bestand.ts`). Stand 12.10.2026: 18 Bestandsteile und 2 ganze Prüfungen umgezogen (20 in `check-bestand-liste.txt`), zwei Ausnahmen (Handbeleg-Tor in `check-logic.ts`, `check-kanal-abgehakt.ts`). Prüfungen, die vom Sammellauf erneuerte Rohdaten unter `data/` lesen (z. B. `anisearch-eintraege.json`, `kennungen.json`), sind noch nicht ausgelagert (Folgeposten).
+
+**Neuer Check = neue Zeile in `tools/check-logic-liste.txt`** (nicht in `package.json`; `tools/check-logic-alle.mjs` führt die Liste der Reihe nach aus). Die Liste ist alphabetisch sortiert (Pflicht, `check-logic-alle.mjs` prüft es; seit 11.10.2026): die Zeile an die passende Stelle setzen, nicht ans Ende, denn zwei Zweige, die dieselbe Stelle ergänzen, kollidieren (10.10.2026 mit `git merge-file` gemessen). Seit 13.10.2026 führt `.gitattributes` die Liste mit `merge=union` zusammen (lokal bei Merge und Rebase, in der Probe ohne Konflikt; ob GitHubs eigener Merge das Attribut liest, ist nicht belegt): zwei Zweige mit verschiedener Zeile an derselben Stelle ergeben beide Zeilen, bei Merge in der Reihenfolge „unsere, ihre“ — ist die unsortiert, meldet `check:logic` es, dann die zwei Zeilen tauschen; dieselbe Zeile doppelt meldet `check:logic` als „mehrfach“ (`tools/check-logic-liste.test.mjs`). **Neuer Test `tools/<name>.test.mjs` = nur die Datei anlegen:** `tools/tests-alle.mjs` (in `check:workflows`) führt jede `tools/*.test.mjs` aus, kein Eintrag in `package.json`. Mit `node tools/tests-alle.mjs --alle` laufen alle durch und am Ende steht die Liste der roten (seit 12.10.2026). **Vergessene Prüfungen (12.10.2026):** `check:logic` wird rot, wenn eine `check-*.ts` oder `*.test.mjs|ts` in `pipeline/` oder `tools/` weder in `check-logic-liste.txt` / `check-bestand-liste.txt` noch in einem `package.json`-Skript steht und keine `tools/*.test.mjs` ist (`tools/check-logic-vollstaendig.mjs`); eine bewusste Ausnahme steht mit Grund in `tools/check-logic-liste-ausnahmen.txt` (heute: `pipeline/check-invarianten-kanal.ts`, nur Proben-Bibliothek).
+
+**Auch ein reiner Daten-Commit läuft durch `check:logic`.** Am 15.09.2026 gingen im Durchgang
+morgens mehrere Handbeleg-Commits ohne Prüfkette raus; zwei davon (FGO 1–22 bei 21 Folgen,
+Shiboyugi 1–12 bei 11) hoben „Handbelege über der Folgenzahl" von 8 auf 10, und **jeder Deploy
+blieb von 07:55 bis 11:30 rot**. Bemerkt wurde es erst beim nächsten Code-Commit. Eine Zeile in
+`data/dub-confirmed.yaml` ist für die Zusicherungen genauso Code wie eine Zeile in `build.ts`.
+Und beim Beheben: **Eine Schwelle nicht auf den Messwert des Augenblicks senken.** Ich setzte
+sie danach von 8 auf 5, und der nächste Bau machte den Deploy sofort wieder rot, weil er zwei
+Zuordnungsaufträge aus demselben Durchgang als Belege übernahm. Dazu kam, dass ich beim
+Aufräumen einen roten Lauf gelöscht habe, ohne ihn anzusehen: **Vor `gh run delete` wird jeder
+einzelne Lauf angesehen, nicht die Liste der roten von heute.**
+
+**Ein Aufruf statt einer Liste zum Abtippen** — und der Grund ist ein Fehlschlag
+vom 06.09.2026: In der Liste, die hier stand, fehlte `check:workflows`. Der
+CI-Lauf fährt ihn, die Kette hier nicht, und so gingen **drei Deploys
+hintereinander** rot, weil eine neue Datendatei nicht in `tools/quellen-liste.sh`
+stand. Eine Kette, die man von Hand zusammensetzt, ist genau um die Glieder
+kürzer, an die man gerade nicht denkt.
+
+Was darin läuft, in dieser Reihenfolge:
+
+```
+data:validate · check:logic · check:workflows · typecheck · check:worker
+check:hooks · check:extension · check:wiedervorlage · check:zugangsart · build
+```
+
+**Jedes `tsc` hier braucht `--noEmit`, und die Skripte setzen es.** Ohne das legt `tsc -b`
+neben jede `.ts`/`.tsx` eine übersetzte `.js` — 85 Dateien in `web/src` und `shared`. Sie
+stehen in `.gitignore`, richten also keinen Schaden im Repo an, aber der **nächste** Schritt
+der Kette fällt über sie: `eslint web/src` liest die erzeugten `.js` mit und bricht mit
+„Definition for rule 'react-hooks/exhaustive-deps' was not found" ab (real am 22.08.2026). Der
+Fehler zeigt dann auf eine Datei, die niemand geschrieben hat. Aufräumen lässt sich das nur von
+Hand — deshalb steht `--noEmit` seit dem 22.08.2026 fest in `typecheck` und `build`.
+
+**`npm run check:worker` nicht weglassen.** Das Haupt-`tsconfig.json` deckt nur `web/src`,
+`pipeline` und `shared` ab — `worker/` hat ein eigenes und wird von `tsc -b` **nicht** erfasst.
+Am 12.08.2026 meldete `tsc -b` „sauber" für Code, in dem fünfmal eine gelöschte Variable stand;
+der Fehler wäre erst beim `wrangler deploy` aufgefallen.
+
+**`npm run check:hooks` steht dort, weil `tsc` die Hooks-Regeln nicht sehen kann.** Für den
+Compiler ist `useMemo(…)` ein gewöhnlicher Funktionsaufruf mit passenden Typen; dass React
+seine Hooks über die Zahl und Reihenfolge der Aufrufe je Renderdurchlauf zuordnet, steht in
+keinem Typ und lässt sich in keinem prüfen. Am 20.08.2026 lagen zwei `useMemo` hinter dem
+`if (!title) return` des Detail-Panels: bei geschlossenem Panel liefen sie nicht, beim Öffnen
+schon. React brach mit Fehler #310 die ganze Anwendung ab, die Seite war weiß — und der
+Service Worker lieferte das kaputte Bundle weiter aus. Die vollständige Prüfkette war grün,
+`tsc -b` auch. Der Lauf ist rot bei `react-hooks/rules-of-hooks`;
+`react-hooks/exhaustive-deps` bleibt Warnung, weil die Regel bekannte Fehlalarme hat.
+
+Dieselbe Prüfung hängt zusätzlich vorne in `npm run build` — dort, wo sie niemand vergessen
+kann. Ein Deploy-Schritt schützt nur den einen Workflow, der ihn trägt; als erster Schritt des
+Baus gilt sie überall, wo diese Seite entsteht. Der Deploy wird dadurch rot, bevor ein `dist/`
+existiert. In der Prüfkette oben steht sie trotzdem eigens, damit ein Verstoß beim Namen
+genannt wird und nicht als Baufehler erscheint.
+
+## Eine Datenkorrektur gehört ins Repo, nicht in `data/cache/` (08.10.2026)
+
+**Anlass.** PR 444 legte eine Cover-Zuordnung („Dragon Ball Super: Beerus", „Fool Night", Titel 21575) in
+`data/cache/anilist-anisearch-mal.json`. `data/cache/` liegt nicht im Repo, nur Datenläufe befüllen ihn, und diese
+Datei schreibt nur der Wochenlauf (letzter 05.10., nächster ~12.10.). Der Bau fand sie leer, die Cover fehlten live;
+die PR-Prüfungen waren lokal mit gefülltem Cache grün. Behoben mit PR 470 (`data/anisearch-cover.json`, Zusicherung in
+`check-bild-bestand.ts`, läuft in `check:bestand`).
+
+**Regel.** Eine Handkorrektur oder Vorbelegung gehört nach `data/…` im Repo. Fertig heißt erst: nach Bau und Deploy
+auf der Live-Seite gemessen (Datei oder Seite, erwarteter Wert) — grüne PR-Prüfungen belegen es nicht, weil sie mit
+dem lokalen Cache laufen. Was ein Bauer live messen soll, steht vorher im PR.
+
+**Absicherung.** `data/cache-register.json` führt jede Cache-Datei mit Schreiber, Läufen, Intervall und der Folge
+eines leeren Caches; `tools/check-cache-abhaengigkeit.mjs` (in `check:workflows`, also in `check:vor-commit` und im
+Deploy) bricht ab, wenn Code, Werkzeuge oder Workflows eine nicht eingetragene Datei nennen oder ein Eintrag keine
+Fundstelle mehr hat. Der Bau zählt die vom Register als nötig markierten Caches (`pipeline/bau/cache-stand.ts`) und
+warnt bei leerem oder fehlendem Stand, statt still auf `{}` zurückzufallen. Neue Cache-Datei: erst fragen, ob sie
+nicht nach `data/` gehört (dann `tools/quellen-liste.sh`), sonst ins Register.
+
+## Wortlaut der `CLAUDE.md` vor der Kürzung vom 10.10.2026
+
+Die `CLAUDE.md` wurde am 10.10.2026 von 14 KB auf wenige KB gekürzt (Daniel: Start-Kontext zu groß). Was in den Abschnitten oben noch nicht stand, steht hier im bisherigen Wortlaut.
+
+### Projektziel (Ergänzungen)
+
+0. **Umfang: alle Animation, nicht nur japanische** — Anime, Cartoons, Zeichentrick und Ähnliches aus jedem Land (China, Korea, USA …); die Herkunft schließt nie aus (Daniel, 09.10.2026, Anlass: „Die Legende von Nezha").
+
+**Leitziel: Mobile Performance und Best Practice** (Daniel, 07.10.2026): schnell und flüssig auf dem Handy bei schwacher Leitung, bei *jeder*
+Entscheidung — Budgets, Bildauslieferung und Messrezept im Skill `web-best-practice`, Ziele in [ZIELE.md](../../ZIELE.md).
+
+**Die Seite ist nichtkommerziell und bleibt es:** niemals Werbung, Tracking zu Werbezwecken oder
+sonstige kommerzielle Ziele (Daniel, 06.10.2026). Das trägt die Quellen-Zugänge (aniSearch-API, TMDB)
+und darf bei keiner Entscheidung aufgeweicht werden.
+
+### Grundsatz (Ergänzungen)
+
+- Netflix-Uhrzeit (08:00 UTC als `timeEstimated`, „≈", ohne Countdown) nur bei Eigenproduktionen (`netflixOriginal`); Lizenztitel bleiben „Zeit offen" (Vigilantes, 06.10.2026).
+- **Namensabgleich:** der beste Treffer gewinnt, nicht der erste; `OVA`/`ONA`/`OAD`/`TV` zählen mit, der japanische Titel nicht (`bewerteTreffer`). Ein Namensvergleich allein ist kein Beleg.
+- **Was AniList, aniSearch oder MAL als Anime führen, ist kein Cartoon** (Daniel, 08.10.2026) — der Cartoon zieht auf den Anime-Titel um (`cartoon-umzug.json`); Beleg: TMDB-Kennung, sonst Name **und** Jahr **und** Folgenzahl, im Zweifel Ausnahmeliste statt Zusammenlegung (`check:logic`).
+- **Eine News-Meldung ist eine Aussage zu ihrem Tag:** nie umschreiben (Späteres ist eine neue Meldung), Belege nur ihrer eigenen Aussage, eine Quelle an genau einer Meldung; eigene Messung belegt der Anbieter-Kalender an diesem Tag ([news-plan.md](news-plan.md)). Ein neues abgeleitetes Feld an einer Meldung wird dort als Aussage (eingefroren, `pipeline/lib/news-felder-fest.ts`) oder Darstellung (lebendig) eingeordnet, bevor es gebaut wird (20.10.2026).
+
+### Datenläufe: wer auf `main` schreibt, und was beim Ändern zu beachten ist
+
+Seit dem 05.10.2026 (`docs/wissen/betrieb.md`, „Datenläufe neu geschnitten"; Skill `datenlaeufe-entwerfen`):
+
+- **Auf `main` schreibt nur der Bestandsbau** (`tools/commit-data.sh`, Gruppe `bau`). Alle Sammler (Stündlich, Täglich, Wöchentlich, ADN, aniSearch-Katalog, Abruf, Nachholen) reichen per Pull Request ein
+  (`.github/actions/einreichen` → `tools/quellen-pr.sh`), jeder in eigener Gruppe. `tools/quellen-aufsetzen.sh` legt nur die **eigenen** Änderungen auf den jüngsten Stand zurück — niemand überschreibt,
+  was ein anderer Lauf aktualisiert hat. Wer eine neue Datei in einem Lauf schreibt, trägt sie in `tools/quellen-liste.sh` ein (sonst warnt `quellen_verloren` und die Datei geht verloren).
+- **Workflow-Push und laufende Sammler (Sperre aufgehoben 12.11.2026, betrieb.md „Workflow-Sperre“):** Der Zweig-Push der Sammler läuft mit dem App-Token samt Recht `workflows`. Geht trotzdem etwas verloren (Wochenlauf 05.10.2026: 107 Minuten), sichert der Lauf einen Fund als Artefakt (`fund-<Job>`): Workflow „Fund nachliefern" mit der Lauf-Nummer.
+- **Zeitpläne kommen vom Cloudflare-Wecker** (`shared/weckplan.ts`, `worker/src/wecker.ts`), nicht von GitHubs Cron (4–7 h zu spät). `wecker-wache.yml` holt Überfälliges nach.
+- **Commits an Quelldateien** warten nicht mehr auf Sammler (die liefern per Pull Request); `tools/quellen-commit-wache.sh` hält nur noch Commits an, solange ein direkt schreibender Lauf (Bestandsbau) läuft.
+  Zu jeder Datenkorrektur gehört weiterhin eine Zusicherung, die meldet, wenn sie verlorengeht.
+
+### Läufe (Ergänzungen)
+
+- **Ein roter Lauf wird bemerkt, nicht gemeldet** — an jeder Wachphase und nach jedem eigenen Push `LAUF_TOKEN=… node tools/laeufe-aufraeumen.mjs --trocken`, ansehen, handeln, Anzeige leeren. Vor `gh run delete` jeden Lauf einzeln ansehen.
+- Wer `.github/workflows/*` ändert, macht laufende Datenläufe rot (GitHub-App ohne `workflows`-Recht) — danach hinsehen und neu anstoßen.
+
+### Vor dem Commit (Ergänzungen)
+
+Zusätzlich vor dem Push, was die CI zusätzlich fährt: `check:ansichten` und `check:panel` bei Änderungen an `web/src`, `check:handbelege` nach einem Bau bei geänderten oder umgehängten Belegen. Jeder rote Lauf ist eine Mail an Daniel.
+
+- Auch ein reiner Daten-Commit läuft durch `check:logic`; Schwellen nie auf den Messwert des Augenblicks senken.
+- Eigenschaften, die `pruefeErgebnis()` prüft, beim Anlegen setzen — die Prüfung läuft mitten im Bau, nicht am Ende.
+- Ein lokaler `npm run data:build` stoppt am Cache-Abbruch („N Titel würden fallen"), erreicht die Prüfungen aber vorher; danach die erzeugten Dateien mit `git checkout` zurücksetzen.
+- Jedes `tsc` braucht `--noEmit`; `check:worker` nicht weglassen (eigenes tsconfig); `check:hooks` prüft React-Hook-Regeln, die `tsc` nicht sieht.
+- Mess- und Versuchsläufe enden mit Exit 0 statt rot.
+- `daniel-zum-abarbeiten/` steht in `.git/info/exclude` (gemeinsam für alle Worktrees). Eine neue Liste dort wird von `git add` still übergangen und fehlt dann im PR: mit `git add -f daniel-zum-abarbeiten/listen/<name>.md` hinzufügen (bereits getrackte Dateien ändert `git add` normal; 13.10.2026).
+
+### Codegestalt (Ergänzungen)
+
+- `check:umfang` (steckt in `build`) misst die Überlänge je Bereich — sie darf nur sinken, gesunkene Werte übernimmt `--festschreiben`, angehoben wird nie. **Festgeschrieben wird nur im Bestandsbau auf main (`tools/commit-data.sh`, seit 11.10.2026), und dort seit 23.10.2026 nur in der Stunde 02 UTC, nie in einem PR:** Sonst machte jeder Bau nach einem Merge den nächsten offenen PR „nicht aktuell“ (21.10.2026). Fast jeder PR senkte dieselbe Zeile in `umfang-grenzen.json` um 1 und machte die übrigen offenen PRs DIRTY (28 Commits an der Datei in 3 Tagen). Der PR-Check bleibt gleich streng (Wachstum gegen die Datei ist rot); nur das Nachziehen der gesunkenen Zahl verschiebt sich bis zum nächsten Bestandsbau, bis dahin steht die gewonnene Überlänge anderen PRs zur Verfügung. `--liste` zeigt die größten Stellen. Zusätzlich zählt er „Ketten" (`tools/umfang-ketten.mjs`, Ausgangswert 10.10.2026 je Bereich in `umfang-grenzen.json`): Anweisungen, Typ-Felder und Objekt-Einträge, die in der Zeile ihres Vorgängers beginnen (`a(); b()`, `x?: A; y?: B`, mehrere `...`-Spreads in einer Zeile) — sonst ließe sich die 80/800-Zählung durch Anhängen an bestehende Zeilen umgehen; ein Eintrag je Zeile, `--ketten` zeigt die Fundstellen, Listen ganz in einer Zeile (`{ a, b }`) bleiben erlaubt.
+- Verschoben wird mit `tools/modul-umzug.mjs`, nicht von Hand. Vorgehen: Skill `zerlegen`. Bei reinen Kommentar-Umbauten `node tools/nur-kommentare.mjs` (Code ohne Kommentare gleich).
+- Wegwerfskripte gehören ins Scratchpad, nicht ins Repo; Aufbewahrtes nach `tools/archiv/`.
+- **Claude-Konfiguration im Projekt (seit G2, 09.11.2026):** Regeln, Skills, Agenten (`bauer`/`pruefer`/`analyst`), Hooks, Commands und die Mod `arbeitsliste` liegt in `.claude/` und wirken nur in Sitzungen dieses Projekts und seiner Worktrees; `~/.claude` hält nur noch Zustandsdateien (`hooks/state/`, Marker `ruhemodus.txt`, `sparmodus.txt`, `ende-um.txt`, `autonomer-modus/`). Hook-Einträge und `CLAUDE_CODE_PLUGIN_DIRS` stehen in `.claude/settings.json` (Pfade über `$CLAUDE_PROJECT_DIR`). Das Kopierwerkzeug `einrichten.mjs` gibt es nicht mehr; geändert wird direkt in `.claude/`. Nicht im Repo (öffentlich, privat oder Fremdinhalt): Skills laut `.claude/skills-ausschluss.json`, `95-privat.md`, Bewerbungs-Commands; `tools/claude-global-privat.test.mjs` hält private Projektnamen, Pfade und den Nachnamen aus dem Ordner. Hooks, die ein Skript außerhalb des Repos brauchen (`wissensbasis-pruefen.mjs`, `prozess-inventur`), laufen über `.claude/hooks/falls-vorhanden.js` und enden still, wenn die Datei fehlt; Erlaubnisregeln für `gh pr merge`, `mit-lauf-token` und Fremdprojekte stehen nur in der globalen `~/.claude/settings.json`, nicht im öffentlichen Repo.
+- Die Claude-Code-Mod `arbeitsliste` (zeigt `daniel-zum-abarbeiten/stand.md`) wird in `.claude/mods/arbeitsliste/` gepflegt und über `env.CLAUDE_CODE_PLUGIN_DIRS` geladen (Test: `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1 claude plugin test` im Mod-Ordner). Nicht im Repo: `messung.log`, `.claude-plugin/types/` (erzeugt Claude Code selbst; der Test braucht sie nicht, 11.11.2026 gemessen). Die Kette fährt alle Mod-Tests über `tools/mod-tests.test.mjs` (Teil von `tests-alle`; Kopie in os.tmpdir(), CLI über `npx @anthropic-ai/claude-code@2.1.321 plugin test`, Version bei CLI-Wechsel nachziehen; Rot-Probe eingebaut; ohne Netz in der Kette Fehler, sonst übersprungen). Der Mod-Lader kann nur ESM: der gemeinsame Kennzeichen-Kern ist `hooks/stand-kennzeichen.mjs` (mit `.d.mts`); der Hook `stand-prs.js` lädt dieselbe Datei per `require` (Node 24) und läuft ohne sie weiter.
+- Agenten in der Leiste (15.11.2026, Savvy entfernt): Die Mod `arbeitsliste` zählt die laufenden Subagenten selbst (`hooks/agenten.ts`, Nachbau von `laufendeAgenten` in `.claude/hooks/agenten-grenze.js`: `agent-*.jsonl` und `.meta.json` unter `~/.claude/projects/<Arbeitsordner>/<Sitzungs-ID>/subagents`, beendet laut letzter Zeile oder `meta.finished`; Prüfer getrennt). Der Knopf „Agents“ öffnet das Pane „Arbeitsliste“, dessen Abschnitt „Agenten“ je Agent Typ, Beschreibung und Laufzeit zeigt. Regeländerung an der Grenze dort und hier gemeinsam nachführen.
+- **Worktrees räumen sich selbst ab (seit 18.10.2026)** — Hook `.claude/hooks/worktree-aufraeumen.js` (+ `-logik.js`, Test `tools/worktree-aufraeumen.test.mjs`). Anlass: 274 Worktrees à ~49 000 Dateien, Windows hielt ~8 KB Kernel-Dateicache je Datei (~3 GB RAM). Auslöser: PostToolUse nach `gh pr merge` und SessionStart (dort zusätzlich eine Zeile bei > 20 Worktrees); beide kehren sofort zurück und starten `--abbau` unsichtbar über `prozess-register.mjs` (Frist 30 min, Sperrdatei `__assets/prozesse/worktree-aufraeumen.lock` = höchstens ein Abbau). Entfernt wird nur, wenn die Arbeit gesichert ist (seit 02.11.2026; vorher nur über den PR-Kopf, dabei blieben 101 Worktrees stehen): der Kopf liegt auf mindestens einem Zweig-Ref (`git branch -a --contains <kopf>`; Zweige bleiben, losgelöster Kopf ohne Zweig = `kopf-ungesichert`), und es gilt eine Frist von 24 h — bei einem gemergten/geschlossenen PR mit Kopf == `headRefOid` seit dessen Abschluss, sonst (kein PR, anderer Kopf als der PR, auch ein später weitergeführter oder nach dem Merge bewegter Zweig) seit der letzten Datei- oder HEAD-Bewegung (`ohne-pr-frist`); zusätzlich keine Änderung in den letzten 2 h (Ordner, oberste Einträge, `index`, `HEAD`, `logs/HEAD`), Probe-Umbenennen des Ordners (EPERM/EBUSY = in Benutzung, dann wird nichts gelöst, nur gemeldet), kein offener PR (Zweigname oder Kopf), kein echter `data/cache` mit Inhalt, `git status --porcelain --ignored` leer, ausgenommen die Junctions `node_modules` und `data/cache` (ignorierte Dateien wie `.env` oder `dist/` halten den Worktree; vor dem Entfernen erneut; ein git-Fehler gilt als „geändert“), PR-Liste mit Limit 6000 (erreicht sie es, kein Abbau); ohne `--force`, ein Rest im Ordner nach `worktree remove` wird als Fehler gemeldet. `--liste` liest nur (kein `git fetch`) und nennt jeden behaltenen Worktree mit Grund. Zweige bleiben. Verknüpfungen (`node_modules` auch in Unterordnern wie `worker/`, `data/cache`) werden vorher einzeln mit `unlink` gelöst, nie rekursiv; bleibt eine, bleibt der Worktree. Lose Ordner (nicht registriert) unter `C:/code/_worktrees/<repo>/` (seit 25.10.2026 der einzige Ort): nur Verknüpfungen jeden Namens plus leere Ordner (bis 6 Ebenen) → weg (Link per `unlink`, von unten; vorher, zwischen den Links und nachher müssen Haupt-`node_modules` und `data/cache` da sein, sonst Abbruch); echte Datei, `.git`-Datei, Dateien oder ein Link als Ordnername bleiben, nur Liste (`--liste`); die Wächterzeile zählt `_worktrees/<repo>/` (seit 25.10.2026). Eingehängt in `.claude/settings.json` (SessionStart und PostToolUse):
+  ```json
+  "SessionStart": [ { "hooks": [ { "type": "command", "command": "node", "args": ["C:/Users/ih/.claude/hooks/worktree-aufraeumen.js"], "timeout": 15 } ] } ],
+  "PostToolUse": [ { "matcher": "Bash", "hooks": [ { "type": "command", "command": "node", "args": ["C:/Users/ih/.claude/hooks/worktree-aufraeumen.js"], "timeout": 15 } ] } ]
+  ```
+  (Beide gehören als zusätzliche Elemente in die vorhandenen Listen `hooks.SessionStart` und `hooks.PostToolUse`, nicht als Ersatz.)
+- **PR-Zeilen in `stand.md` schreibt ein Hook (seit 19.10.2026, Daniel: „kein manuelles eintragen per hauptsitzung mehr“)** — `.claude/hooks/stand-prs.js` mit dem Blockteil `stand-prs-block.js` (Tests `tools/stand-prs-hook.test.mjs`, `tools/stand-prs-block.test.mjs`; gh-Attrappe `tools/stand-prs-gh-attrappe.mjs`; echte Urteilskommentare `tools/stand-prs-urteile-echt.json`). Er hält unter „## In Arbeit“ einen Block zwischen `<!-- pr-zeilen … -->` und `<!-- /pr-zeilen -->`: je offenem PR eine Zeile (Kurztitel, Entwurf, Konflikt, CI-Urteil „**Prüfer-Review** für <Kopf>“ und Agent-Urteil „Prüfer Runde N: freigeben|ändern“ getrennt, je mit „älterer Kopf“, Checks; „bereit“ und damit oben nur, wenn beide auf dem aktuellen Kopf ok sind), dazu seit 20.10.2026 **eine** `[klein]`-Sammelzeile „Gemergt in 24 h: N — zuletzt TT.MM. HH:MM — [alle](Suchlink)“ für alle in 24 h gemergten ohne `chore(data):` (vorher je PR eine Zeile, 20.10. waren es ≈ 80 von 119 Punkten in „In Arbeit“; die Mod zählt nur Zeilen mit `- `; die Sammelzeile ist die Reihe 0, alte Einzelzeilen fallen beim nächsten Lauf weg; geblättert nach letzter Änderung, bis zur 24-h-Grenze, höchstens 20 Seiten à 100).
+  - **Nichts geht verloren:** eingerückte Notizen wandern mit ihrer PR-Zeile; jede andere Zeile im Block (Handzeile, `### Gruppe`, Freitext) rückt direkt unter die Endmarke; Notizen eines PRs, der aus der Liste fällt, stehen dort unter „Notiz zu PR n — aus der PR-Liste gefallen“. Fehlt eine Marke, ist eine doppelt, verändert oder in falscher Reihenfolge, schreibt der Hook nichts und meldet es der Sitzung (`systemMessage`). Die Änderungszeit der Datei bleibt (`daniel-dateien.js` misst daran die Pflege).
+  - **Wächter (`stand-waechter.js`, Test `tools/stand-waechter.test.mjs`, seit 20.10.2026):** meldet der Sitzung (`systemMessage`, bei jedem Lauf, solange es stimmt), wenn „In Arbeit“ außerhalb des Blocks mehr als 20 `- `-Zeilen hat oder die Kopfzeile keinen „Stand TT.MM.JJJJ HH:MM“ (Berliner Zeit) trägt, der höchstens 24 h alt ist. Geschrieben wird trotzdem.
+  - **Fehler sichtbar:** scheitert der Abruf, bleibt der Block still stehen, bis der letzte Erfolg 30 min zurückliegt; dann trägt er die Zeile „PR-Liste veraltet — Stand …; Abruf scheitert: …“ und die Sitzung erfährt es. Mehr als 100 offene PRs gelten als Fehler (Liste wäre unvollständig).
+  - Eine GraphQL-Abfrage (≈ 2–3 s), async: sofort nach `gh pr create|merge|close|ready|reopen|edit`, sonst nach gh-pr/run-Befehlen und Prompts höchstens alle 5 min; Ergebnis und letzter Erfolg in `~/.claude/hooks/state/stand-prs.json`, von Hand `node ~/.claude/hooks/stand-prs.js --jetzt`. Verworfen: Workflow schreibt `stand.md` (unversioniert), Mod fragt GitHub selbst (jede Anzeige ein Abruf, nichts für den Hook `daniel-dateien.js`), nur ein Werkzeug für Agenten (hängt an Disziplin).
+  - Eingehängt in `.claude/settings.json` je ein Element in `hooks.PostToolUse` und `hooks.UserPromptSubmit`. Nie als neuen Schlüssel einfügen: ein zweiter Schlüssel `"PostToolUse"` ersetzt im JSON den ersten samt seinen Hooks.
+  ```json
+  { "matcher": "Bash", "hooks": [ { "type": "command", "command": "node", "args": ["C:/Users/ih/.claude/hooks/stand-prs.js"], "timeout": 60, "async": true } ] }
+  { "hooks": [ { "type": "command", "command": "node", "args": ["C:/Users/ih/.claude/hooks/stand-prs.js"], "timeout": 60, "async": true } ] }
+  ```
+
+### Wissen nach Thema (Verweisliste)
+
+- [karte.md](karte.md) — Einstieg: Datenfluss, Verzeichnisse, welche Datei bei welcher Änderung, Rezepte, Werkzeugfallen. Dazu [befund-2026-10-02.md](befund-2026-10-02.md), [architektur-bewertung.md](architektur-bewertung.md); Gegenprobe: `node tools/daten-befund.mjs`; aniSearch-Umstellung: [sitzung-2026-10-02-analyse-und-umstellung.md](sitzung-2026-10-02-analyse-und-umstellung.md)
+- [erweiterung.md](erweiterung.md) — Browser-Erweiterung (Amazon, Netflix, Disney+): Melden, Durchgänge, Leser, Prüflisten
+- [quellen.md](quellen.md) — Datenquellen, Grenzen, Sperren, robots.txt, News-Quellen
+- [betrieb.md](betrieb.md) — Läufe, Worker, Git, Prüfungen
+- [datensatz.md](datensatz.md) — Bau und Anzeige
+- [daten-detektiv.md](daten-detektiv.md) — `npm run detektiv`: 25 Regeln gegen Zweitquellen, Funde nach Hebel
+- [meine-woche.md](meine-woche.md) — Konzept „Meine Woche"; Prototyp (Code am 09.10.2026 entfernt, in der Git-Historie)
+
+
+## Ordnung unter C:/code: Worktrees und Wegwerfdateien (25.10.2026)
+
+Anlass (Daniel, 25.10.2026): Im Explorer standen unter `C:/code/ai` Dutzende `.wt-*`/`_wt-*`-Ordner, im Hauptordner lose `_q.mjs`, `_vc-*.log`, `.liste1397.txt`. Regel: **Jeder Worktree jedes Repos liegt unter `C:/code/_worktrees/<repo>/<thema>`** (ohne `_wt-`-Präfix), Wegwerfdateien (Logs, Probeskripte, PR-Texte) nur im Scratchpad der Sitzung, nie in einem Repo- oder Projektordner.
+
+- **Wächter 1** (`.claude/hooks/ort-sperre.js`, vom Verteiler über `hauptordner-sperre.js` aufgerufen, Test `tools/ort-sperre.test.mjs`): `git worktree add` mit einem Ziel außerhalb `C:/code/_worktrees/<repo>/<thema>` wird verweigert, die Meldung nennt den richtigen Befehl. Gilt in jedem Repo und in jeder Schreibweise (`-C`, Git-Bash-Pfad, relativ, Variable, `bash -c`); ein nicht bestimmbares Ziel (`$X`) bleibt frei. Skripte, die selbst Wegwerf-Worktrees im Temp-Ordner anlegen (`bau-vergleich`, `quellen-pruefen.sh`), sieht der Hook nicht und sind nicht gemeint.
+- **Wächter 2** (derselbe Baustein): Write einer **neuen** Datei direkt in einer Repo-Wurzel unter `C:/code` (Ordner mit `.git`, Hauptordner wie Worktree) mit Wegwerf-Namen wird verweigert, der Hinweis nennt das Scratchpad. Grenze: Name mit `_`-Präfix, Endung `.log`/`.bak`/`.tmp`, oder Punkt-Name mit `.txt`/`.tmp…`. Begründung: Von den versionierten Wurzeldateien in 22 Repos unter `C:/code/ai` passt keine einzige (nur `.gitignore`, `.env.example`, `robots.txt` …); alle losen Dateien im Hauptordner-Status vom 25.10.2026 (`_q.mjs`, `_vc-*.log`, `.a.bak`, `.tmp_x`) passen. Pauschal `*.txt`/`*.mjs` wären Fehlalarme (`robots.txt`, `eslint.config.mjs`). Nicht erfasst: Schreiben per Shell-Umleitung.
+- **Aufräumer** (`worktree-aufraeumen*.js`) erkennt nur `_worktrees/<repo>/<thema>` und sucht lose Ordner nur dort; der Hauptordner ist nie ein Worktree. `erneut-melden-worktree.mjs` legt seinen Arbeitsbaum dort an (`AK_WORKTREES` ersetzt die Wurzel nur in Tests).
+- Einhängen: `ort-sperre.js` liegt neben dem Verteiler in `.claude/hooks/`; der Verteilereintrag für `hauptordner-sperre.js` genügt, ein neuer ist nicht nötig. Der Matcher des Verteilers in `.claude/settings.json` beginnt mit `Edit|Write|NotebookEdit|MultiEdit|Bash|` und reicht Write durch (am 25.10.2026 gemessen: eine Verteiler-Kopie mit den Dateien dieses Zweigs verweigert Write `_probe-neu.mjs` im Hauptordner und `git worktree add C:/code/ai/_wt-x`, erlaubt README und den neuen Ort).
+
+## Mutationsläufer `tools/mutationslaeufer.mjs` (19.10.2026)
+
+Festes Werkzeug für Mutationsproben statt Wegwerf-Läufer: Mutanten über mehrere Dateien, `nr`/`zeile` bei doppelten Zeilen, mehrzeilige `suche`, `@ENDE` zum Anhängen, Git-Bash-Pfade, Kopie `<datei>.mutlauf-orig` mit bytegleichem Rückspiel, `--log <ordner>` mit Diff und Test je Mutant sowie `tabelle.md` für den PR-Nachtrag. Aufruf und Mutantenformat stehen im Kopf der Datei; Test `tools/mutationslaeufer.test.mjs` (läuft über `tools/tests-alle.mjs`).
+
+**Als Job (29.10.2026, F40 Schritt 2):** `.github/workflows/mutationsprobe.yml` (nur `workflow_dispatch`) fährt den Läufer auf GitHub statt auf Daniels PC. Eingaben `zweig`, `liste` (Pfad im Zweig, Vorbilder `tools/mutationen/*.json`), `test`, optional `pr` und `timeout`. Ergebnis: Job-Log, Zusammenfassung, Artefakt `mutation-ergebnis` und mit `pr` ein Kommentar (eigener Job mit `pull-requests: write`, führt keinen Zweig-Code aus). Aufruf: `gh workflow run mutationsprobe.yml --ref main -f zweig=… -f liste=… -f test="…" -f pr=…`. Test `tools/mutationsprobe-workflow.test.mjs`. **Bei Prüfstufe 2 automatisch (12.11.2026):** ändert der PR eine Mutantenliste unter `tools/mutationen/`, startet der eigene Job `mutationsprobe` von `pr-pruefer.yml` (`tools/mutationsprobe-pr.mjs`, einziger Job mit `actions: write`, ohne Claude-Schritt) die Probe zum Kopf-SHA (Eingabe `kopf`, Lauftitel „Mutationsprobe <liste> @ <kopf>“, kein `pr=`, also kein zweiter Kommentar), wartet höchstens 8 min und reicht das Ergebnis als Artefakt `mutationsprobe` an `pruefen` weiter (nur bei diff-zustand ok), das es als `mutationsprobe.txt` in den Prüfordner legt. Es zählen nur Läufe ab dem Start des Dispatch (10 s Uhrtoleranz). Der Läufer kommt aus main (zweiter Checkout), Liste und Tests vom Kopf. Je Liste und Zweig läuft höchstens ein Lauf (`concurrency`, ein neuer ersetzt den alten; ein ersetzter Lauf gilt als „nicht beurteilt“). Dateiliste und Listeninhalt werden dreimal abgerufen (5 s, 10 s Pause), ein dauerhafter Fehler steht in der Datei. Listen, in denen ein Mutant kein eigenes `tests` trägt (88 Listen, Stand 12.11.), werden mit Hinweis übersprungen; höchstens 5 Listen je Lauf; kein Ergebnis in der Frist ist ein Hinweis im Urteil, nie rot. Kosten: `pruefen` beginnt erst nach dem Job (Stufe-2-PR ohne Liste rund 0,5 min mehr, mit Liste die Laufzeit der Probe, 80 bis 427 s gemessen); sein Zeitbudget (52,5 von 60 min) bleibt unberührt. Test `tools/mutationsprobe-pr.test.mjs`, Ablauf in `tools/pr-pruefer-ablauf.test.mjs`.
+
+## Wächter prüft die Regel, nicht einen Datenstand (22.11.2026)
+
+Ein Wächter in `check:logic` nagelt den lebenden Bestand nie auf eine Zahl oder einen Titel fest: der Anlassfall steht als Fixture mit festen Daten im Test, am echten Bestand gilt nur die Regel (hart), ein Rohfund davor höchstens als `⚠ WARNUNG` mit Zahl. Sonst färbt jede Sammler-Korrektur die Kette rot (Stargazer 120892, PR 4587, Prüfer-Befund Runde 1).

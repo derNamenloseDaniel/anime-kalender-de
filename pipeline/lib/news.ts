@@ -1,0 +1,615 @@
+/**
+ * **Die Nachrichten der Seite — aus dem, was ohnehin dasteht.**
+ *
+ * Daniel am 12.09.2026: „think about a news section for the website, where all
+ * our news regarding dubs (ankündigungen und releases) are published in a
+ * bite-sized format (short and simple)", dazu ausdrücklich „Verschiebungen,
+ * Verspätungen, nicht erschienen trotz ankündigung … (wir haben es gemerkt)".
+ *
+ * **Kein neuer Abruf.** Jede Meldung entsteht aus einer Angabe, die der Bau
+ * schon hat:
+ *
+ * | Art | Quelle |
+ * |---|---|
+ * | `neu` | `synchro-historie.json` — der Tag, an dem ein Titel erstmals belegte Synchro hatte |
+ * | `folgen` | `crunchyroll-neu.json` — neue deutsche Folgen, je Serie und Tag |
+ * | `angekuendigt` | ein Release mit deutschem Termin, das wir zum ersten Mal sehen |
+ * | `disc`, `kino` | dasselbe für Disc- und Kinotermine |
+ * | `verspaetet` | `schedule.verpasst` — ein angekündigter Termin verstrich, ohne dass etwas erschien |
+ * | `offiziell` | `data/offizielle-meldungen.yaml` — von Hand freigegebene Meldung der offiziellen Website (365 Tage Fenster, `news-offiziell.ts`) |
+ * | `nachgereicht` | dasselbe, sobald die Folgen kamen — je Tag gebündelt (`news-verspaetung.ts`) |
+ *
+ * **Das Datum einer Meldung ist der Tag, an dem sie zum ersten Mal wahr war.**
+ * Ohne Gedächtnis würde jede Meldung bei jedem Bau nach oben rutschen und die
+ * Seite behauptete, alles sei von heute. `data/news-historie.json` hält je
+ * Meldung fest, wann sie zuerst dastand; danach ändert sich ihr Datum nie
+ * wieder.
+ */
+import type { NewsArt, NewsBeleg, NewsEintrag, NewsMeldung, PlatformId, Release, StreamLink, Title } from '../../shared/types.ts'
+import { pflegeTerminverlauf, type DatiertNews, type TerminGedaechtnis } from './news-verlauf.ts'
+import { bereinigeNews } from './news-bereinigen.ts'
+import { ausgabeKurz } from './news-ausgabe.ts'
+import { addDays, todayIso, toIsoDate } from '../../shared/time.ts'
+import { eindeutschenStaffel } from '../../shared/titles.ts'
+import { hostVon, istApiAdresse } from '../../shared/quelle.ts'
+import { adnApiBeleg } from './beleg-api.ts'
+import { geerbteWege } from '../../shared/kanal-anbieter.ts'
+import { ohneDoppelteFolgen, verspaetungsMeldungen } from './news-verspaetung.ts'
+import { omuMeldungen } from './news-omu.ts'
+import { fensterBeginn, offizielleMeldungen, type OffizielleMeldung } from './news-offiziell.ts'
+import { behalteEintrag } from './news-obergrenze.ts'
+import { titelNachSerienId, waehleStaffel } from './news-cr-zuordnung.ts'
+import { rhythmusMeldung } from './news-rhythmus.ts'
+import { ohneDoppelteTakte, taktMeldungen } from './news-takt.ts'
+import { ankuendigungJahre, neuJahre, neuZeile } from './news-neu-zeile.ts'
+import { haltFelderFest, type FesteFelder } from './news-felder-fest.ts'
+import { haltPremiereFest, haltWeitererFest, vergissAlte } from './news-einfrieren.ts'
+import { premiereBelegtTv } from '../../shared/premiere.ts'
+import { geerbterAnbieterTag } from './staffel-historie.ts'
+
+/** Wie lange eine Meldung auf der Seite steht. */
+const FENSTER_TAGE = 120
+/** Obergrenze, damit die Datei klein bleibt — sie wird bei jedem Seitenaufruf geladen. */
+export const HOECHSTENS = 400
+
+export interface NewsHistorie extends TerminGedaechtnis {
+  /** Meldungsschlüssel → Tag, an dem die Meldung zum ersten Mal dastand. */
+  zuerst: Record<string, string>
+  /**
+   * **Titel und Anbieter mit belegter Synchro → Tag, an dem wir das zuerst sahen**
+   * (18.09.2026). Getrennt von `zuerst`, weil es nicht altern darf: Fiele ein Eintrag
+   * nach 400 Tagen heraus, meldete der nächste Bau den Anbieter als neu. Beim ersten
+   * Bau mit diesem Feld wird der ganze Bestand als alt eingetragen (`'0000-00-00'`),
+   * sonst stünden an einem Tag zweitausend „neue" Anbieter auf der Seite.
+   */
+  anbieter?: Record<string, string>
+  /** Meldungsschlüssel (`angekuendigt`) → `weiterer` vom Bau, der die Meldung erzeugte (`news-einfrieren.ts`). */
+  weiterer?: Record<string, boolean>
+  /** Meldungsschlüssel → Anbieter, Kanal, Einordnung vom Bau, der die Meldung auslieferte (`news-felder-fest.ts`). */
+  felder?: Record<string, FesteFelder>
+  /** Meldungsschlüssel → `true`, wenn die Meldung beim ersten Bau schon „Deutsche TV-Premiere“ sagte; ältere Meldungen behalten ihren Text. */
+  premiere?: Record<string, true>
+}
+
+/**
+ * Die Plattformen mit belegter Synchro, die als „weiterer Anbieter“ gelten können. YouTube bleibt draußen; ein Prime-Kanal, der sein Ja vom
+ * Anbieter hat (`kanalErbtVomAnbieter`), ist kein weiterer: Die Titel laufen dort seit Langem, die Meldung wäre zu ihrem Tag falsch (13.10.2026).
+ */
+export function anbieterMitDeutsch(t: Title): Set<PlatformId> {
+  return new Set(t.streams.filter((s) => meldetNeu(s) && s.platform !== 'youtube').map((s) => s.platform))
+}
+
+/**
+ * Ein Ja, das „neu auf Deutsch“ melden darf. Ein Weg, den nur ein Handbeleg trägt (`herkunft: 'handbeleg'`), belegt das Angebot, nicht seinen
+ * Beginn: Durarara!! Tenka Taihei ist seit 2022 deutsch bei Crunchyroll, die Meldung trüge den Tag der Aufnahme in den Bestand (14.10.2026).
+ * Ein Prime-Kauf-/Leihweg nur aus JustWatch (`herkunft: 'justwatch'`, `bau/11-2-4-kauf-wege.ts`) trägt kein Datum seines Beginns: der Tag der
+ * Aufnahme wäre eine falsche Aussage (Starship Troopers: Traitor of Mars, 23.10.2026).
+ */
+export function meldetNeu(s: StreamLink): boolean {
+  return eigenesJa(s) && s.herkunft !== 'handbeleg' && s.herkunft !== 'justwatch'
+}
+
+/** Ein belegtes Ja des Weges selbst; ein vom Anbieter geerbtes Ja (`geerbteWege`) zählt für Meldungen nicht. */
+export function eigenesJa(s: StreamLink): boolean {
+  return s.dub === true && !geerbteWege.has(s)
+}
+
+/** Ein automatisch übernommener Kanal-Termin stammt aus einem Artikel über den Kanal-Anbieter und belegt kein Ja des Kanals (13.10.2026). */
+const istAutomatischerKanalTermin = (r: Release): boolean => !!(r.kanal && r.automatisch)
+
+/** Zählt dieser Termin als deutscher Start? Ein automatischer Kanal-Termin nur, wenn der Titel ein eigenes Ja hat (`news.json`, `neu-mit-synchro.json`). */
+export function zaehltAlsDeutscherTermin(r: Release, t: Title | undefined): boolean {
+  return !istAutomatischerKanalTermin(r) || !!t?.streams.some(eigenesJa)
+}
+
+interface NeuerTitel {
+  id: number
+  seit: string
+}
+
+/**
+ * **Die Quelle eines Termins — eine Seite zum Nachsehen, kein Endpunkt** (29.09.2026).
+ *
+ * Daniel am 28.09.2026 zu den Neuigkeiten im Newsletter: „inkl Link zur Quelle". Die Quelle ist
+ * nicht unsere Titelseite, sondern die Stelle, an der wir gelesen haben: meist ein Artikel
+ * (anime2you.de, anisearch.de), bei ADN der Kalender-Endpunkt. Der wird nur genommen, wenn nichts
+ * Lesbares dasteht — ein Link auf `gw.api.…` erklärt niemandem etwas.
+ */
+function quelleVonRelease(r: Release): string | undefined {
+  /*
+    **Die geltende Quelle zuerst** (01.10.2026). `quellen` führt die Historie mit,
+    und dort stand die falsche aniSearch-Seite (Spin-off) noch als
+    „vermutlich-überholt" an erster Stelle — der Link ging dorthin. `sources` ist
+    die gehegte Liste des Termins (kuratiert, dann Ankündigung) und damit der
+    bessere erste Griff.
+  */
+  const aktuelle = (r.quellen ?? []).filter((q) => q.stand === 'aktuell')
+  return (
+    r.sources?.find((u) => !u.includes('//gw.api.')) ??
+    aktuelle.find((q) => !q.url.includes('//gw.api.'))?.url ??
+    r.sources?.[0] ??
+    (r.quellen ?? []).find((q) => !q.url.includes('//gw.api.'))?.url ??
+    (r.quellen ?? [])[0]?.url
+  )
+}
+
+/**
+ * **Die Belege eines Termins — je Dokument einer** (01.10.2026).
+ *
+ * Daniel am 01.10.2026: gezählt wird **nach Artikel-Adresse**. Ein zweimal gelesener oder später
+ * aktualisierter Artikel bleibt **eine** Quelle; nur ein weiteres Dokument kommt dazu. Deshalb
+ * wird hier über die Adresse dedupliziert, nicht über die Lesung.
+ *
+ * Überholte Quellen zählen nicht mit: Sie belegen den geltenden Stand nicht mehr.
+ */
+export function belegeVonRelease(r: Release): NewsBeleg[] | undefined {
+  const nachUrl = new Map<string, NewsBeleg>()
+  for (const q of r.quellen ?? []) {
+    if (q.stand && q.stand !== 'aktuell') continue
+    if (istApiAdresse(q.url)) {
+      /* Eine API-Adresse zeigt ihre Messung statt einer Seite; ohne Lesetag (`gelesenAm`, nicht die Erstsichtung) bleibt nichts zu zeigen. */
+      const api = adnApiBeleg(r, q.url, q.gelesenAm)
+      if (api && !nachUrl.has(q.url)) nachUrl.set(q.url, api)
+      continue
+    }
+    if (!nachUrl.has(q.url)) nachUrl.set(q.url, { url: q.url, name: q.name, veroeffentlichtAm: q.veroeffentlichtAm, aktualisiertAm: q.aktualisiertAm, ausgabeAm: q.ausgabeAm, bild: q.bild, ...(q.markierung ? { markierung: q.markierung } : {}) })
+  }
+  /* Kuratierte Termine tragen nackte Adressen in `sources` — sie sind ebenso Belege. */
+  for (const u of r.sources ?? []) if (!nachUrl.has(u) && !istApiAdresse(u)) nachUrl.set(u, { url: u, name: hostVon(u) })
+  return nachUrl.size ? [...nachUrl.values()] : undefined
+}
+
+/** Die Marke „Deutsche TV-Premiere“ nur, wenn der Handbeleg unter den Belegen der Meldung selbst steht (Meldung = Aussage zu ihrem Tag). */
+function premiereSteht(r: Release): boolean {
+  const quelle = r.premiere?.quelle
+  return premiereBelegtTv(r) && !!quelle && (belegeVonRelease(r) ?? []).some((b) => b.url === quelle)
+}
+
+/**
+ * **Die Termine als Meldungen** — angekündigt, auf Disc, im Kino, verschoben.
+ *
+ * Am 29.09.2026 aus `baueNews` herausgelöst (Längengrenze); dabei trägt jede Meldung ihre
+ * **Quelle** — die Stelle, an der wir den Termin gelesen haben.
+ */
+function terminMeldungen(
+  releases: Release[],
+  nachId: Map<number, Title>,
+  heute: string,
+): (NewsMeldung & { schluessel: string; fallback: string; titel: Title })[] {
+  const raus: (NewsMeldung & { schluessel: string; fallback: string; titel: Title })[] = []
+  for (const r of releases) {
+    const t = nachId.get(r.titleId)
+    if (!t) continue
+    /* Ein widerlegter, behaupteter deutscher Termin wird zurückgezogen, nicht erneut angekündigt (02.10.2026). */
+    if (r.widerlegt?.gemeldet) continue
+    const quelle = quelleVonRelease(r)
+    const datum = r.schedule?.firstEpisodeDate
+    /* Die Folgen nach einem rückwirkend eingetragenen Start stehen schon in dessen Meldung. */
+    const folgetermin = !r.nachtrag && (r.schedule?.firstEpisodeNumber ?? 1) > 1 && releases.some((x) => x.titleId === r.titleId && x.nachtrag)
+    if (datum && !folgetermin) {
+      /*
+        **„Im Kino" sagt die Plattform, nicht die Art des Werks.**
+
+        `releaseType: 'movie'` heißt „das hier ist ein Film" — und daraus wurde
+        „Im Kino". Für „Mononoke – The Movie: Chapter III" stand deshalb „ab
+        29.09.2026 · Im Kino" in den Nachrichten; das Release trägt
+        `platform: 'netflix'` und die Netflix-Adresse als Quelle (Daniel,
+        12.09.2026: „woher kommt dieser news eintrag mit ab 29.09.2026 im kino?
+        … wo genau steht diese info, und woher kommt das?").
+
+        Ein Film, der bei einem Streamingdienst erscheint, ist keine
+        Kinopremiere. Entschieden wird deshalb an `platform === 'kino'` — dem
+        Feld, das genau das bedeutet.
+      */
+      const art: NewsArt =
+        r.nachtrag ? 'nachgetragen' : r.releaseType === 'disc' ? 'disc' : r.platform === 'kino' ? 'kino' : 'angekuendigt'
+      raus.push({
+        schluessel: `${art}:${r.slug}:${datum}`,
+        fallback: datum > heute || art === 'nachgetragen' ? heute : datum,
+        art,
+        ...(art === 'nachgetragen' ? { von: r.schedule?.firstEpisodeNumber ?? 1, hinweis: r.nachtrag?.kurz, abschnitte: r.nachtrag?.abschnitte, ...(r.schedule?.time ? { zeit: r.schedule.time } : {}) } : {}),
+        titel: t,
+        platform: r.platform, ...(r.platform === 'tv' && r.sender ? { anbieter: r.sender } : {}),
+        ...(r.kanal ? { kanal: r.kanal } : {}),
+        ...(art === 'angekuendigt' && premiereSteht(r) ? { premiere: true } : {}),
+        datum,
+        release: r.slug,
+        ...(art === 'disc' && ausgabeKurz(r.edition) ? { ausgabe: ausgabeKurz(r.edition) } : {}),
+        quelle, belege: belegeVonRelease(r), ...(r.schedule?.estimated ? { geschaetzt: true } : {}), ...(art === 'angekuendigt' && (t.deErstausgabe?.synchro || t.streams.some((s) => eigenesJa(s) && s.platform !== r.platform)) ? { weiterer: true } : {}),
+        /* Die Notiz des Releases (`note`) ist intern und kommt nie in eine Meldung. */
+        ...(art === 'angekuendigt' && r.platform !== 'tv' ? ankuendigungJahre(t, r, datum) : {}),
+      })
+    }
+    for (const m of verspaetungsMeldungen(r)) raus.push({ ...m, titel: t })
+    for (const m of rhythmusMeldung(r)) raus.push({ ...m, titel: t })
+    for (const m of taktMeldungen(r, heute)) raus.push({ ...m, titel: t })
+  }
+  return raus
+}
+
+interface CrNeueFolge {
+  serieId: string
+  serie: string
+  nummer?: number
+  /**
+   * **Crunchyrolls eigenes Datum für die deutsche Fassung.**
+   *
+   * `premium_available_date` an der deutschen Folge — für die
+   * Lord-of-Mysteries-Specials der 10.09.2026, auf den Tag Daniels Angabe.
+   * Ohne dieses Feld datierte die Meldung auf unseren Fundtag, und der ist
+   * bei einem täglichen Lauf bis zu einen Tag daneben, beim ersten Lauf über
+   * ein Fenster von 120 Tagen beliebig weit.
+   */
+  verfuegbarAb?: string
+  gesehenAm: string
+}
+
+/**
+ * **Eine Quelle, eine Meldung**.
+ *
+ * Am Overgeared-Panel standen zwei Einträge am selben Tag aus derselben Quelle: „Neu auf Deutsch ·
+ * Erstmals mit deutscher Synchro bei Crunchyroll" und „Neue Folgen · Folge 1 auf Deutsch bei
+ * Crunchyroll". Beides ist **dieselbe Aussage** — Daniel: „1 quelle = 1 news eintrag → beides muss
+ * gebündelt werden".
+ *
+ * Gebündelt wird deshalb, wenn am **selben Tag**, beim **selben Titel und Anbieter**, aus
+ * **derselben Quelle** eine `folgen`-Meldung neben einer `neu`-Meldung steht. Die Folgen-Angabe
+ * geht nicht verloren: Sie wandert in den Vermerk (`hinweis`), der in der Oberfläche als leisere
+ * Zeile unter dem Satz steht — die Hauptaussage bleibt kurz.
+ *
+ * **Noch nicht gebaut** (dafür fehlen die Lesungen): der zweite Teil von Daniels Ansage — wird ein
+ * Artikel später **aktualisiert** und bringt neue Angaben, soll die Meldung mit **neuem**
+ * Datumsstempel dastehen und das **alte Datum im Kleingedruckten** behalten. Das ist der
+ * Lesungs-/Belegteil (Stufe 4 des Datenbank-Plans).
+ */
+export function verschmelzeGleicheQuelle(datiert: DatiertNews[]): DatiertNews[] {
+  const neuJeSchluessel = new Map<string, DatiertNews>()
+  for (const m of datiert) {
+    if (m.art !== 'neu' || !m.quelle) continue
+    neuJeSchluessel.set([m.titel.id, m.am, m.platform, m.quelle].join('|'), m)
+  }
+  /* Ein rückwirkender Eintrag nennt den Start selbst; „Neu auf Deutsch" desselben Titels wäre dieselbe Aussage mit falschem Tag. */
+  const nachgetragen = new Set(datiert.filter((m) => m.art === 'nachgetragen').map((m) => m.titel.id))
+  const raus: DatiertNews[] = []
+  for (const m of datiert) {
+    if (m.art === 'neu' && !m.weiterer && nachgetragen.has(m.titel.id)) continue
+    if (m.art === 'folgen' && m.quelle) {
+      const neu = neuJeSchluessel.get([m.titel.id, m.am, m.platform, m.quelle].join('|'))
+      if (neu) {
+        const spanne = m.bis !== undefined && m.bis !== m.von ? `Folgen ${m.von}–${m.bis}` : `Folge ${m.von ?? 1}`
+        neu.hinweis = `${spanne} auf Deutsch bei ${m.platform === 'crunchyroll' ? 'Crunchyroll' : m.platform}`
+        continue
+      }
+    }
+    raus.push(m)
+  }
+  return raus
+}
+
+/**
+ * **Steht der deutsche Start desselben Anbieters noch aus?** Dann ist es „angekündigt", nicht
+ * „neu" (Daniel am 02.10.2026 an der Apothekerin S3: Der 03.09.-Eintrag hieß „Neu auf Deutsch ·
+ * Erstmals mit deutscher Synchro bei Crunchyroll", „das muss heißen angekündigt und zum 02.10.").
+ *
+ * Die Regel vom 19.09.2026 — „neu auf Deutsch" nur, wenn die Synchro *an dem Tag zu sehen* ist —
+ * kannte nur den erreichten Termin. Ein **künftiger** Termin desselben Anbieters ist der Beweis
+ * für das Gegenteil: Es ist angekündigt. Steht er noch aus, fällt die Meldung dem
+ * `angekuendigt`-Eintrag zu, der denselben Termin ohnehin trägt.
+ *
+ * **Gemessen am Tag der Meldung, nicht an heute** (02.10.2026): Der Bau am 02.10. fand den Termin
+ * vom 02.10. bereits „erreicht" und ließ die 03.09.-Meldung stehen. Gefragt ist, ob Deutsch **an
+ * dem Tag zu sehen war, an dem die Meldung entstand** — deshalb `n.seit`.
+ *
+ * **Gemessen am Anbieter, nicht am Titel:** Der erste Entwurf nahm „irgendein erreichter Termin"
+ * als Ausnahme — beim Apothekerin-Titel war das der **Disc**-Termin vom 04.09., und die falsche
+ * „Neu auf Deutsch"-Meldung blieb stehen. Ein Disc-Termin sagt nichts darüber, ob bei Crunchyroll
+ * zu sehen ist; nur die Termine **desselben Anbieters** zählen.
+ */
+export function nurAngekuendigt(releases: Release[], titleId: number, plattform: string | undefined, tag: string): boolean {
+  if (!plattform) return false
+  const termine = releases
+    .filter((r) => r.titleId === titleId && r.platform === plattform)
+    .map((r) => r.schedule?.firstEpisodeDate)
+    .filter((d): d is string => !!d)
+  if (!termine.length) return false
+  return !termine.some((d) => d <= tag)
+}
+
+/**
+ * Das früheste deutsche Release des Titels, dessen Termin erreicht ist (nicht widerlegt, nicht nur OmU). Ohne eigenen Anbieter-Weg zählt ein
+ * automatisch übernommener Prime-Kanal-Termin nicht: Er stammt aus einem Artikel über den Kanal-Anbieter und belegt kein Prime-Ja (13.10.2026).
+ */
+function erreichtesRelease(releases: Release[], titleId: number, heute: string, anbieter: PlatformId | undefined): Release | undefined {
+  return releases
+    .filter((r) => r.titleId === titleId && !r.widerlegt && !r.sprache && r.schedule?.firstEpisodeDate && r.schedule.firstEpisodeDate <= heute)
+    .filter((r) => anbieter || !istAutomatischerKanalTermin(r))
+    .sort((a, b) => a.schedule!.firstEpisodeDate!.localeCompare(b.schedule!.firstEpisodeDate!))[0]
+}
+
+/** Teil und Kennung einer Meldung. „Titel / Titel“ sagt nichts (26 Meldungen am 06.10.2026): ohne eigenen Teilnamen bleibt es bei der Kennung. */
+function teilFelder(teilname: string, kopf: string, teilId: number): { teil?: string; teilId: number } {
+  return teilname.toLowerCase() === kopf.toLowerCase() ? { teilId } : { teil: teilname, teilId }
+}
+
+/** Rangfolge der Arten: was am Tag eines Eintrags zuerst genannt wird. */
+const rang: Record<NewsArt, number> = {
+  neu: 0,
+  angekuendigt: 1,
+  verspaetet: 2,
+  nachgereicht: 2,
+  nachgetragen: 1,
+  rhythmus: 2,
+  takt: 2,
+  offiziell: 3,
+  kino: 3,
+  disc: 4,
+  folgen: 5,
+}
+
+type RohMeldung = NewsMeldung & { schluessel: string; fallback: string; titel: Title }
+
+interface Gruppe {
+  am: string
+  wurzel: number
+  teile: DatiertNews[]
+}
+
+const kopf = (t: Title) => ({ titel: t })
+
+/**
+ * Dieselbe Schreibweise wie überall sonst. Ohne die Eindeutschung stand im
+ * Chip „Staffel 3 - Cour 1" neben einem „Staffel 3 - Teil 2" aus derselben
+ * Reihe — die Vereinheitlichung von „Cour"/„Part" lebt in `shared/titles.ts`.
+ */
+const name = (t: Title) => eindeutschenStaffel(t.titleDe ?? t.titleEn ?? t.titleRomaji ?? String(t.id))
+
+const wurzelVon = (t: Title) => t.franchiseId ?? t.id
+
+/*
+  1. Erstmals mit deutscher Synchro — **aber erst, wenn man sie an dem Tag auch sehen kann**
+  (Daniel, 19.09.2026, an „Witch on the Holy Night": „neu auf deutsch … sollten nur titel
+  bekommen die an dem tag auch deutsch sind, hier ist es eher eine ankündigung"). Die Synchro
+  war belegt, der Kinostart ist aber erst am 26.01.2027 — das sagt die Meldung „Im Kino" schon.
+  Sichtbar ist Deutsch mit einem Stream mit deutscher Tonspur oder mit einem erreichten Termin
+  (Kino, Disc, TV); die Meldung trägt dann dieses Datum, nicht den Tag, an dem wir die Synchro
+  fanden.
+*/
+function neuAufDeutsch(releases: Release[], neuMitSynchro: NeuerTitel[], nachId: Map<number, Title>, heute: string): RohMeldung[] {
+  const roh: RohMeldung[] = []
+  for (const n of neuMitSynchro) {
+    const t = nachId.get(n.id)
+    if (!t) continue
+    const anbieter = t.streams.find(meldetNeu)?.platform
+    const erreichtRelease = erreichtesRelease(releases, t.id, heute, anbieter)
+    const erreicht = erreichtRelease?.schedule?.firstEpisodeDate
+    if ((!anbieter && !erreicht) || nurAngekuendigt(releases, t.id, anbieter, n.seit)) continue
+    roh.push({
+      schluessel: `neu:${t.id}`,
+      fallback: anbieter || !erreicht || erreicht < n.seit ? n.seit : erreicht,
+      art: 'neu',
+      ...kopf(t),
+      platform: anbieter ?? (erreichtRelease && !['kino', 'tv'].includes(erreichtRelease.platform) ? erreichtRelease.platform : undefined),
+      quelle: t.streams.find((s) => eigenesJa(s) && s.platform === anbieter)?.url ?? (erreichtRelease ? quelleVonRelease(erreichtRelease) : undefined),
+      belege: (erreichtRelease && belegeVonRelease(erreichtRelease)) || undefined, hinweis: neuZeile(t, erreichtRelease, heute), ...neuJahre(t, erreicht ?? n.seit),
+    })
+  }
+  return roh
+}
+
+/*
+  1b. **Jetzt auch bei einem weiteren Anbieter auf Deutsch** (18.09.2026,
+  Feature-Vergleich: JustWatch-Watchlist-Alerts). „Wo läuft es" ist bei den meisten
+  Titeln die eigentliche Frage; ein neuer Weg zur Synchro ist deshalb eine Nachricht.
+  Gemeldet wird nur ein **weiterer** Anbieter — der erste ist schon Meldung 1.
+  YouTube bleibt draußen: Dort ist es oft ein einzelnes Probevideo, keine Serie.
+  Ergänzt `historie.anbieter`.
+*/
+function weitereAnbieter(titles: Title[], historie: NewsHistorie, grenze: string, heute: string): RohMeldung[] {
+  const roh: RohMeldung[] = []
+  const saeen = historie.anbieter === undefined
+  const anbieterSeit = (historie.anbieter ??= {})
+  for (const t of titles) {
+    const wege = anbieterMitDeutsch(t)
+    for (const p of wege) {
+      const k = `${t.id}:${p}`
+      if (!(k in anbieterSeit)) anbieterSeit[k] = geerbterAnbieterTag(anbieterSeit, t, p) ?? (saeen ? '0000-00-00' : heute)
+    }
+    for (const p of wege) {
+      const seit = anbieterSeit[`${t.id}:${p}`]!
+      if (seit < grenze) continue
+      const frueher = [...wege].some((q) => q !== p && anbieterSeit[`${t.id}:${q}`]! < seit)
+      if (!frueher) continue
+      roh.push({
+        schluessel: `anbieter:${t.id}:${p}`,
+        fallback: seit,
+        art: 'neu',
+        ...kopf(t),
+        platform: p,
+        weiterer: true,
+        quelle: t.streams.find((s) => eigenesJa(s) && s.platform === p)?.url,
+      })
+    }
+  }
+  return roh
+}
+
+/** 2. Neue deutsche Folgen — je Serie und Tag eine Meldung, nicht je Folge. */
+function neueFolgen(titles: Title[], releases: Release[], crNeu: CrNeueFolge[], grenze: string): RohMeldung[] {
+  const roh: RohMeldung[] = []
+  const jeSerieUndTag = new Map<string, { serie: string; tag: string; nummern: number[] }>()
+  for (const f of crNeu) {
+    /* Crunchyrolls eigenes Datum als Berliner Tag (00:30 Berlin ist UTC am Vortag), sonst unser Fundtag. */
+    const tag = f.verfuegbarAb ? toIsoDate(new Date(f.verfuegbarAb)) : f.gesehenAm.slice(0, 10)
+    if (!f.serieId || tag < grenze) continue
+    const schluessel = `${f.serieId}|${tag}`
+    const eintrag = jeSerieUndTag.get(schluessel) ?? { serie: f.serie, tag, nummern: [] }
+    if (typeof f.nummer === 'number') eintrag.nummern.push(f.nummer)
+    jeSerieUndTag.set(schluessel, eintrag)
+  }
+  /*
+    Die Zuordnung läuft über die Crunchyroll-Adresse: Der Fund nennt die
+    Serienkennung, unsere Verweise tragen sie in der Adresse. Ohne Treffer gibt
+    es keine Meldung — ein Name allein ist keine Zuordnung (CLAUDE.md).
+  */
+  const nachSerienId = titelNachSerienId(titles)
+  for (const [schluessel, eintrag] of jeSerieUndTag) {
+    const serienId = schluessel.split('|')[0]!
+    const nummern = [...new Set(eintrag.nummern)].sort((a, b) => a - b)
+    const t = waehleStaffel(nachSerienId.get(serienId), releases, serienId, eintrag.tag, nummern)
+    if (!t) continue
+    roh.push({
+      schluessel: `folgen:${schluessel}`,
+      fallback: eintrag.tag,
+      art: 'folgen',
+      ...kopf(t),
+      platform: 'crunchyroll',
+      von: nummern[0],
+      bis: nummern[nummern.length - 1],
+      anzahl: nummern.length || undefined,
+      /* Die Seite, auf der die deutschen Folgen stehen — dieselbe Adresse, über die zugeordnet wurde. */
+      quelle: t.streams.find((s) => s.url.includes(serienId))?.url,
+    })
+  }
+  return roh
+}
+
+/** Das Datum: beim ersten Mal gemerkt (`historie.zuerst`), danach unverändert; zu alte Meldungen fallen heraus. */
+function datiereMeldungen(roh: RohMeldung[], historie: NewsHistorie, heute: string, grenze: string): DatiertNews[] {
+  const datiert: DatiertNews[] = []
+  for (const r of roh) {
+    const { schluessel, fallback, ...rest } = r
+    const zuerst = historie.zuerst[schluessel] ?? (fallback > heute ? heute : fallback)
+    historie.zuerst[schluessel] = zuerst
+    if (zuerst < fensterBeginn(r.art, heute, grenze)) continue
+    datiert.push(haltWeitererFest(historie, schluessel, { ...rest, am: zuerst, schluessel }))
+  }
+  return datiert
+}
+
+/** Die Gruppen je Tag und Reihe, in der Reihenfolge ihres ersten Auftretens. */
+function gruppiereNachTagUndReihe(datiert: DatiertNews[]): Gruppe[] {
+  const gruppen = new Map<string, Gruppe>()
+  for (const m of datiert) {
+    const schluessel = `${m.am}|${wurzelVon(m.titel)}`
+    const g = gruppen.get(schluessel) ?? { am: m.am, wurzel: wurzelVon(m.titel), teile: [] }
+    g.teile.push(m)
+    gruppen.set(schluessel, g)
+  }
+  return [...gruppen.values()]
+}
+
+/*
+  **Der Teil nennt, was ihn von der Reihe unterscheidet — nicht die Reihe.**
+
+  Unter „Lord of Mysteries" stand „bei Crunchyroll · Lord of Mysteries
+  Specials", blass und hinter dem Anbieter. Der
+  Reihenname steht eine Zeile höher; hier bleibt „Specials".
+*/
+function teilName(teil: Title, kopfName: string): string {
+  const voll = name(teil)
+  const rest = voll.toLowerCase().startsWith(kopfName.toLowerCase())
+    ? voll.slice(kopfName.length).replace(/^[\s:–—-]+/, '').trim()
+    : voll
+  /* Trägt der Rest selbst einen Doppelpunkt („Horizonte: Die Serie“), bleibt der volle Name: „Pokémon: Horizonte: Die Serie“ wäre ein falscher Titel. */
+  return rest && !rest.includes(': ') ? rest : voll
+}
+
+/**
+ * **Der Kopf der Gruppe ist die Reihe, nicht der Teil.**
+ *
+ * Bevorzugt der Titel, dessen Kennung die Reihe selbst ist; gibt es ihn im
+ * Bestand nicht (die Reihe hängt dann an einem Teil), entscheidet der Teil mit
+ * den meisten Meldungen an diesem Tag. Das Cover wird geliehen, wo der Kopf
+ * keines hat — eine Zeile ohne Bild fällt in einer Liste auf.
+ */
+function eintragVon(g: Gruppe, kopfTitel: Map<number, Title>): NewsEintrag {
+  const jeTeil = new Map<number, number>()
+  for (const m of g.teile) jeTeil.set(m.titel.id, (jeTeil.get(m.titel.id) ?? 0) + 1)
+  const haeufigster = [...jeTeil.entries()].sort((a, b) => b[1] - a[1])[0]![0]
+  const kopfT =
+    kopfTitel.get(g.wurzel) ?? g.teile.find((m) => m.titel.id === haeufigster)!.titel
+  const kopfName = name(kopfT)
+  const meldungen: NewsMeldung[] = g.teile
+    .slice()
+    .sort((a, b) => rang[a.art] - rang[b.art] || (a.datum ?? '').localeCompare(b.datum ?? ''))
+    .map((m) => {
+      const { am: _am, titel: teil, schluessel: _s, ...rest } = m
+      return teil.id === kopfT.id ? rest : { ...rest, ...teilFelder(teilName(teil, kopfName), kopfName, teil.id) }
+    })
+  return {
+    am: g.am,
+    titelId: kopfT.id,
+    titel: kopfName,
+    slug: kopfT.slug,
+    cover: kopfT.coverImage ?? g.teile.find((m) => m.titel.coverImage)?.titel.coverImage,
+    meldungen,
+  }
+}
+
+/**
+ * Baut die Meldungen. `historie` wird dabei **ergänzt** — der Aufrufer schreibt
+ * sie zurück, damit das Datum einer Meldung beim nächsten Bau dasselbe bleibt.
+ */
+export function baueNews(
+  titles: Title[],
+  releases: Release[],
+  neuMitSynchro: NeuerTitel[],
+  crNeu: CrNeueFolge[],
+  historie: NewsHistorie,
+  vorherige: NewsEintrag[] = [], omuTitel: Title[] = [], nurOriginalton: ReadonlySet<string> = new Set(), offizielle?: OffizielleMeldung[],
+): NewsEintrag[] {
+  const heute = todayIso()
+  const grenze = addDays(heute, -FENSTER_TAGE)
+  const nachId = new Map(titles.map((t) => [t.id, t]))
+  const roh: RohMeldung[] = [
+    ...neuAufDeutsch(releases, neuMitSynchro, nachId, heute),
+    ...weitereAnbieter(titles, historie, grenze, heute),
+    ...neueFolgen(titles, releases, crNeu, grenze),
+  ]
+
+  /* 3. Termine: angekündigt, auf Disc, im Kino — und die, die niemand eingehalten hat. */
+  roh.push(...haltPremiereFest(historie, terminMeldungen(releases, nachId, heute)), ...omuMeldungen([...titles, ...omuTitel], releases), ...offizielleMeldungen(titles, offizielle))
+  let datiert = datiereMeldungen(roh, historie, heute, grenze)
+
+  /* Alte Schlüssel aus dem Gedächtnis werfen — sonst wächst es ohne Ende. */
+  vergissAlte(historie, addDays(heute, -400))
+
+  const kopfTitel = new Map<number, Title>()
+  for (const t of titles) if (wurzelVon(t) === t.id) kopfTitel.set(t.id, t)
+
+  datiert = ohneDoppelteTakte(ohneDoppelteFolgen(verschmelzeGleicheQuelle(datiert)))
+  datiert.push(...pflegeTerminverlauf({ datiert, nachId, historie, vorherige, name, wurzel: wurzelVon, grenze, heute, nurOriginalton }))
+  datiert = haltFelderFest(historie, bereinigeNews(ohneKuenstlicheAnkuendigung(datiert)), vorherige)
+
+  const eintraege = gruppiereNachTagUndReihe(datiert).map((g) => eintragVon(g, kopfTitel))
+
+  /*
+    **Sortiert wird nach Tag, dann nach der wichtigsten Meldung des Eintrags.**
+    Ein Anime, der heute erstmals deutsch ist, steht über einem, der eine
+    weitere Folge bekommen hat — auch wenn er daneben noch drei Termine trägt.
+  */
+  return eintraege
+    .sort(
+      (a, b) =>
+        b.am.localeCompare(a.am) ||
+        rang[a.meldungen[0]!.art] - rang[b.meldungen[0]!.art] ||
+        a.titel.localeCompare(b.titel, 'de'),
+    )
+    .filter((e, i) => behalteEintrag(e, i, heute, HOECHSTENS))
+}
+
+/**
+ * **Keine künstliche Ankündigung** (Daniel, 05.10.2026): Steht der Termin am Tag der Meldung schon bei „Neu auf Deutsch", gab es keine Vorankündigung und keine Quelle dafür.
+ * Gilt nach der Termin-Pflege, denn sie führt Meldungen aus früheren Bauten wieder ein.
+ */
+export function ohneKuenstlicheAnkuendigung(meldungen: DatiertNews[]): DatiertNews[] {
+  return meldungen.filter(
+    (m) =>
+      !(
+        m.art === 'angekuendigt' &&
+        m.datum !== undefined &&
+        m.am >= m.datum &&
+        meldungen.some((x) => x.art === 'neu' && x.titel.id === m.titel.id && x.platform === m.platform && x.am === m.am)
+      ),
+  )
+}

@@ -1,0 +1,225 @@
+# Einen einzelnen Datenlauf anstoßen, ohne den ganzen Wochenlauf mitzunehmen.
+#
+# **Warum es das gibt.** Die vier planmäßigen Workflows decken den Regelfall ab,
+# aber sie sind Pakete: Wer die TMDB-Folgen nachholen will, stößt sonst einen
+# Tiefendurchlauf über alle Quellen an — vierzig Minuten für eine Sache, die drei
+# braucht. Und lokal laufen sollen Datenläufe nicht (siehe CLAUDE.md, „Datenläufe
+# laufen remote").
+#
+# **Die Auswahl ist fest.** Ein Freitextfeld, das in eine Shell wandert, ist eine
+# offene Tür — auch in einem privaten Repo. Wer einen neuen Lauf braucht, trägt
+# ihn hier ein; das ist eine Zeile und ein Commit.
+#
+# **`data:build` steht bewusst nicht zur Wahl.** Der Workflow stellt nur den
+# AniList-Cache früherer Läufe wieder her (Schritt „AniList-Cache
+# wiederverwenden“), holt aber keine frischen AniList-Daten; der Datensatz-Bau
+# gehört dem Bestandsbau (`bestand-bauen.yml`). Vor dem Merge eines Fundes
+# fährt nur der Probebau (`data:bauprobe`, Aktion `einreichen`).
+name: Datenlauf auf Abruf
+
+on:
+  # **Abends noch einmal TOGGO** (22.09.2026): Das freie Fenster einer Folge öffnet sich rund zwei
+  # Minuten nach ihrem Sendeende — Dragon Ball DAIMA läuft 21:15–21:35 auf TOGGO plus, Folge 20 war
+  # ab 21:37 abrufbar. Der Tageslauf holt TOGGO um 06:17, also stand am Abend eine Folge zu wenig in
+  # der Pille (Daniel, 22.09.2026: „bei toggo pill 16-20"). 21:05 UTC sind 23:05 im Sommer und 22:05
+  # im Winter — beides nach dem Sendeende. Ohne Eingaben läuft genau dieser eine Abruf.
+  schedule:
+    - cron: '5 21 * * *'
+    # **Nachts die aniSearch-Disc-Artikel, danach die Sprecherseiten** (03.10.2026, Daniel): je Nacht ein
+    # Block im Zeitbudget von 100 Minuten (~870 Seiten), bis alles geholt ist; ist die Warteschlange leer,
+    # endet der Lauf nach einer Minute. 00:00 UTC sind 02:00 Berliner Zeit im Sommer. `concurrency: daten`
+    # reiht die Läufe hintereinander.
+    - cron: '0 0 * * *'
+    - cron: '0 2 * * *'
+    # Der aniSearch-Katalog läuft seit dem 04.10.2026 als eigener Workflow `anisearch-katalog.yml` (06:00 UTC, eigene Gruppe,
+    # Pull Request) und blockiert hier nichts mehr.
+
+  workflow_dispatch:
+    inputs:
+      lauf:
+        description: 'Welcher Lauf'
+        required: true
+        type: choice
+        options:
+          - data:tmdb-folgen
+          - data:cartoon-folgen
+          - data:tmdb
+          - data:tmdb-poster
+          # Genre je TMDB-Zuordnung nachtragen, Zuordnungen ohne Animation entfernen (21.10.2026, Kakegurui-Realserie); danach data:tmdb.
+          - data:tmdb-genre
+          - data:kitsu-folgen
+          - data:anisearch-dubs
+          - data:anisearch-eintraege
+          # Brücke MAL → aniSearch (ein API-Abruf): ordnet Titeln ohne Titelseite ihre Kennung zu.
+          - data:anisearch-zuordnung
+          - data:anisearch
+          - data:anisearch-folgen
+          - data:anisearch-titel
+          # Disc-Artikelseiten: Tonspur, EAN, enthaltene Titel (03.10.2026, ~1.100 Seiten je Lauf).
+          - data:anisearch-artikel
+          # Deutsche Sprecher je Figur (seiyuu-Seite), ~3.200 Seiten.
+          - data:anisearch-sprecher
+          # Slugs der aniSearch-Titelseiten für kanonische Quellenlinks (ein Abruf, eigenes Limit: 1 je Stunde mit Token, 24 h ohne).
+          - data:anisearch-slugs
+          # Eigene Kopien der aniSearch-Cover (11.10.2026): erst robots.txt beider Hosts, dann Bilder als WebP 300 px ins Artefakt cover-ausgabe + Manifest data/cover-eigen.json.
+          - data:anisearch-cover
+          - data:cr-dub
+          # Neuzugänge bei Crunchyroll. Auf Abruf, wenn der Lauf ein Feld
+          # mehr mitschreibt — die bekannten Funde bekommen es dann nachgetragen.
+          - data:cr-neu
+          # Verweise ohne Sprachurteil — über die Vercel-Weiche in Frankfurt (weiche-vercel/).
+          - data:cr-offene
+          - data:extension-liste
+          - data:justwatch
+          # Einmalig alle Cartoons (~16 min) — Adressen beim Anbieter (16.09.2026).
+          - data:justwatch-cartoons
+          # Der Gesamtkatalog läuft sonst nur wöchentlich. Auf Abruf braucht man
+          # ihn, wenn sich die **Regel** geändert hat, nach der Reihen gebaut
+          # werden — dann sind die gespeicherten `rel`-Listen falsch, und kein
+          # planmäßiger Lauf merkt das von allein (03.09.2026: `OTHER` klebte
+          # Gundam an Patlabor, der Fix kam erst mit dem nächsten Volllauf an).
+          - data:katalog
+          - data:trailer
+          - data:cartoons
+          - data:cartoon-reihen
+          - data:youtube:kauf
+          # Abrufbarkeit der YouTube-Verweise in Deutschland. Läuft sonst nur im
+          # Wochenlauf; auf Abruf gebraucht, wenn die Quelle als stumm gemeldet wird
+          # (23.09.2026, Issue #215: Der Riegel hatte neun Tage lang nichts geschrieben,
+          # und ohne einen Lauf bleibt `lastOk` alt, auch wenn der Fehler behoben ist).
+          - data:youtube
+          # TOGGO-Fenster; läuft zusätzlich als Zeitplan um 21:05 UTC (22.09.2026).
+          - data:toggo
+      grenze:
+        description: 'Höchstzahl Titel (nur wo der Lauf --limit kennt)'
+        required: false
+        default: '300'
+        type: string
+      alle:
+        description: 'Alle Plakate neu holen, nicht nur veraltete; grenze gilt dann nicht (nur data:tmdb-poster; 27.10.2026, deutsche Cover vor englischen)'
+        required: false
+        default: false
+        type: boolean
+      katalog:
+        description: 'Auch Titel hinter dem Toggle holen (nur data:anisearch)'
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: abruf
+  cancel-in-progress: false
+
+jobs:
+  lauf:
+    runs-on: ubuntu-latest
+    # Der Katalog-Block (knapp fünf Stunden) läuft in `anisearch-katalog.yml`; auf Abruf kann er hier mit `katalog` laufen
+    # (330 Minuten Obergrenze). Davor galt: Zwei Stunden statt 45 Minuten: Die aniSearch-Folgenlisten sind der Anker,
+    # an dem die ganze Folgen-Zuordnung haengt, und sie kommen im Sechs-Sekunden-
+    # Takt — 45 Minuten sind 450 Titel, bei 2.615 offenen also sechs Laeufe.
+    # Der Takt selbst bleibt unangetastet; laenger heisst nicht schneller,
+    # sondern nur, dass ein Lauf nicht mittendrin abgeschnitten wird.
+    timeout-minutes: 330
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # `data/cache/` liegt bewusst nicht im Repo. Der Katalog-Lauf setzt darauf
+      # auf und der Bau braucht ihn — ohne diesen Schritt hätte ein Abruf hier
+      # keine Wirkung auf den nächsten Bau. Derselbe Schlüssel wie in
+      # `bestand-bauen.yml`, damit beide dieselbe Ablage benutzen.
+      - name: AniList-Cache wiederverwenden
+        uses: actions/cache@v4
+        with:
+          path: data/cache
+          key: anilist-cache-${{ github.run_id }}
+          restore-keys: anilist-cache-
+
+      # Frisches Zugangspaket über die Vercel-Weiche in Frankfurt (weiche-vercel/,
+      # 16.09.2026) — das Secret CR_ZUGANG bleibt nur Rückfall, es lebt 24 Stunden.
+      - name: Crunchyroll-Zugangspaket über die Weiche holen
+        continue-on-error: true
+        env:
+          CR_WEICHE_TOKEN: ${{ secrets.CR_WEICHE_TOKEN }}
+        run: node tools/cr-zugang-holen.mjs --github-env
+
+      # `data:cr-dub` öffnet Crunchyroll-Serienseiten im Browser (scrape-crunchyroll-dub.ts); wie in den Wochen- und Nachhol-Läufen braucht er Chromium.
+      - name: Microsoft-Paketquelle entfernen
+        if: ${{ inputs.lauf == 'data:cr-dub' }}
+        run: sudo grep -l packages.microsoft.com /etc/apt/sources.list.d/* | sudo xargs -r rm -fv || true
+
+      - name: Browser für Crunchyroll-Tonspuren installieren
+        if: ${{ inputs.lauf == 'data:cr-dub' }}
+        run: npx playwright install chromium
+
+      # apt-Störung (security.ubuntu.com, 11.11.2026) darf den Lauf nicht reißen; fehlt danach eine Bibliothek, scheitert sichtbar erst der Browserstart (nicht gemessen).
+      - name: Chromium-Systempakete
+        if: ${{ inputs.lauf == 'data:cr-dub' }}
+        run: npx playwright install-deps chromium || echo "::warning::Chromium-Systempakete nicht installiert (apt-Störung)"
+
+      # Vor dem Cover-Lauf: robots.txt von www.anisearch.de und cdn.anisearch.de wörtlich nach data/anisearch-robots.txt. Sperrt sie den Cover-Pfad, wird der Lauf rot
+      # und lädt nichts; die Datei geht trotzdem in den Pull Request (der Schritt „Quellen als Pull Request einreichen“ läuft immer).
+      - name: aniSearch-Cover — robots.txt prüfen
+        if: ${{ inputs.lauf == 'data:anisearch-cover' }}
+        run: npm run data:anisearch-robots
+
+      - name: Lauf ausführen
+        id: lauf
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+          CR_ZUGANG: ${{ env.CR_ZUGANG_FRISCH || secrets.CR_ZUGANG }}
+          CR_WEICHE_TOKEN: ${{ secrets.CR_WEICHE_TOKEN }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          ANISEARCH_TOKEN: ${{ secrets.ANISEARCH_TOKEN }}
+        run: |
+          set -euo pipefail
+          LAUF='${{ inputs.lauf || (github.event.schedule == '0 0 * * *' && 'data:anisearch-artikel') || (github.event.schedule == '0 2 * * *' && 'data:anisearch-sprecher') || (github.event.schedule == '0 4 * * *' && 'data:anisearch') || 'data:toggo' }}'
+          GRENZE='${{ inputs.grenze || (github.event_name == 'schedule' && '1100') || '300' }}'
+          # Der Lauf steht in der Nachricht des Pull Requests, sie ist Teil des Fund-Schlüssels: Ein roter TOGGO-Fund löst so keinen roten aniSearch-Fund ab (tools/quellen-pr.sh).
+          echo "name=$LAUF" >> "$GITHUB_OUTPUT"
+          # Nicht jeder Lauf kennt --limit; die, die es nicht tun, bekommen es nicht.
+          case "$LAUF" in
+            data:anisearch)
+              # `--katalog` haengt die Titel hinter dem Toggle hinten an — 11.607
+              # mit aniSearch-Kennung, von denen noch keiner geholt wurde.
+              npm run "$LAUF" -- --limit "$GRENZE" ${{ inputs.katalog && '--katalog' || '' }} ;;
+            data:tmdb-poster)
+              # Mit `alle` keine Grenze: der Abruf schneidet sonst jedes Mal dieselben ersten N Titel ab
+              # (feste Reihenfolge, kein Fortschritt). 3.005 Zuordnungen à 120 ms Pause ≈ 6 min plus Abruf (27.10.2026).
+              npm run "$LAUF" -- --limit ${{ inputs.alle && '100000' || '"$GRENZE"' }} ${{ inputs.alle && '--alle' || '' }} ;;
+            data:tmdb-folgen|data:cartoon-folgen|data:kitsu-folgen|data:anisearch-eintraege|data:tmdb|data:anisearch-folgen|data:anisearch-titel|data:anisearch-artikel|data:anisearch-sprecher|data:anisearch-cover|data:cr-dub|data:justwatch|data:youtube:kauf)
+              npm run "$LAUF" -- --limit "$GRENZE" ;;
+            *)
+              npm run "$LAUF" ;;
+          esac
+
+      # Die Bilder gehören nicht ins Repo: Das Artefakt holt Daniel ab und lädt es nach R2 (cover-ausgabe/anisearch/<Kennung>.webp = Pfad aus data/cover-eigen.json).
+      - name: aniSearch-Cover — Bilder als Artefakt ablegen
+        if: ${{ always() && inputs.lauf == 'data:anisearch-cover' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cover-ausgabe-${{ github.run_id }}
+          path: cover-ausgabe
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Quellen als Pull Request einreichen
+        if: always()
+        uses: ./.github/actions/einreichen
+        with:
+          nachricht: "chore(data): Lauf auf Abruf (${{ steps.lauf.outputs.name || 'unbekannt' }})"
+          fund: lauf
+          # Probebau vor dem Merge (31.10.2026, PR 2524 brach den Bestandsbau): rot = PR bleibt offen, Grund in der Zusammenfassung.
+          bauprobe: 'true'
+          app-id: ${{ secrets.DATEN_APP_ID }}
+          app-key: ${{ secrets.DATEN_APP_KEY }}

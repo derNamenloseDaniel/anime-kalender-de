@@ -1,0 +1,576 @@
+#!/usr/bin/env node
+/**
+ * **Der Hinweiskasten der Erweiterung als Bild — ohne Amazon, ohne Anmeldung.**
+ *
+ * Am 02.09.2026 sind drei Fassungen der Fußzeile hintereinander falsch
+ * ausgeliefert worden, jede aus einer Vermutung über das CSS. Daniels Vorgabe
+ * danach: „prüf das styling selbst mit playwright und screenshots."
+ *
+ * Was hier gemessen wird, ist genau das, was sich ohne seine angemeldete
+ * Sitzung messen lässt: **wie `melder.css` die Zeilen des Kastens anordnet.**
+ * Die Daten der Seite (Folgenzahl, Tonspuren, Briefkasten) sind dafür ohne
+ * Belang — der Kasten ist eine Spalte aus fünf Zeilen, und ob sie
+ * nebeneinander oder untereinander stehen, entscheidet allein das Stylesheet.
+ *
+ * **Die Struktur stammt aus dem Code, nicht aus dem Gedächtnis:**
+ * `kastenSkelett()` in `amazon.js` legt die fünf Zeilen an, der Takt schiebt
+ * Prüflisten-Knopf und Melde-Knopf hinein. Ändert sich dort etwas, gehört es
+ * hier nachgezogen — und die Zusicherung darunter meldet sich, wenn die
+ * Klassennamen auseinanderlaufen.
+ *
+ * Aufruf:
+ *
+ *     node tools/melder-kasten-bild.mjs [ziel.png]
+ *
+ * Läuft headless; es erscheint kein Fenster.
+ */
+import { chromium } from 'playwright'
+import { readFileSync, existsSync } from 'node:fs'
+import { sperreNetz } from './netz-sperre.mjs'
+import { join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const wurzel = join(dirname(fileURLToPath(import.meta.url)), '..')
+const css = readFileSync(join(wurzel, 'extension/melder.css'), 'utf8')
+const quelle = readFileSync(join(wurzel, 'extension/amazon.js'), 'utf8')
+const version = JSON.parse(readFileSync(join(wurzel, 'extension/manifest.json'), 'utf8')).version
+const ziel = process.argv[2] ?? join(wurzel, 'docs/melder-kasten.png')
+
+/*
+  **Die Klassennamen werden gegen den Code gehalten, bevor gemessen wird.**
+
+  Ein Bild von einer Struktur, die es so nicht mehr gibt, ist schlimmer als
+  keines: Es sieht richtig aus und misst etwas anderes.
+*/
+const gebraucht = [
+  'ak-amazon-suchhinweis',
+  'ak-z-titel',
+  'ak-z-inhalt',
+  'ak-z-melden',
+  'ak-such-fuss',
+  'ak-such-fuss-mitte',
+  'ak-such-fuss-rechts',
+  'ak-z-debug',
+  'ak-debugpaar',
+]
+const fehlend = gebraucht.filter((k) => !quelle.includes(k))
+if (fehlend.length) {
+  console.error(`amazon.js kennt diese Klassen nicht mehr: ${fehlend.join(', ')}`)
+  console.error('Die Struktur unten ist veraltet — erst nachziehen, dann messen.')
+  process.exit(1)
+}
+
+/*
+  **Amazons eigene Regeln gehören in die Kulisse.**
+
+  Der erste Anlauf zeigte einen sauber zentrierten aniSearch-Knopf — auf der
+  echten Seite klebte sein Text links (Daniel, 02.09.2026, mit Bild). Eine
+  Kulisse ohne das fremde Stylesheet misst den **eigenen** Stil, nicht das
+  Ergebnis: Amazon setzt für `a` unter anderem `display: inline` und
+  `text-align: left`, und wo unser `display: flex` verliert, wirkt
+  `justify-content` gar nicht mehr.
+
+  Nachgestellt wird deshalb, was erfahrungsgemäß hineinreicht — mit **höherer
+  Spezifität** als unsere Klassenregel, so wie es dort auch der Fall ist. Was
+  hier durchgeht, geht auch auf der Seite durch.
+*/
+const amazonRegeln = `
+  body a, body a:link, body a:visited {
+    display: inline;
+    text-align: left;
+    text-decoration: underline;
+    color: #0066c0;
+    line-height: 19px;
+  }
+  /*
+    Und dasselbe für Knöpfe. Der erste Anlauf hatte nur die Link-Regeln, und
+    die Kulisse meldete deshalb ein zentriertes ✕, das auf der echten Seite
+    links oben saß (Daniel, 02.09.2026: „x is not centered"). Amazon gibt
+    Knöpfen eine eigene Schrift, eine feste Zeilenhöhe und linksbündigen Text —
+    jede der drei Angaben verschiebt ein einzelnes Zeichen.
+  */
+  body button {
+    display: inline-block;
+    font-family: "Amazon Ember", Arial, sans-serif;
+    font-size: 13px;
+    line-height: 29px;
+    text-align: left;
+    vertical-align: baseline;
+  }
+`
+
+const seite = `<!doctype html><meta charset="utf-8">
+<style>
+  html { background: #0b0e13; }
+  body { margin: 0; min-height: 420px; font: 13px/1.45 system-ui, sans-serif; }
+  ${amazonRegeln}
+  ${css}
+</style>
+<div class="ak-box ak-amazon-suchhinweis" data-version="${version}">
+  <div class="ak-z-titel">
+    <span class="ak-z-titel-text">Is This a Zombie? · 12 Folgen</span>
+    <button type="button" class="ak-z-weg">✕</button>
+  </div>
+  <div class="ak-z-inhalt">
+    <label class="ak-such-auswahl">
+      <input type="checkbox" checked>
+      Kauf/Abo · Is this a Zombie? (B0BYY9NN5D)
+      <button type="button" class="ak-such-sprung">öffnen</button>
+    </label>
+    <label class="ak-such-auswahl">
+      <input type="checkbox" checked>
+      Kauf/Abo · Is this a Zombie? (B0B8TN9LSJ)
+      <button type="button" class="ak-such-sprung">öffnen</button>
+    </label>
+  </div>
+  <div class="ak-z-melden"><span class="ak-such-fertig">gemeldet ✓</span></div>
+  <div class="ak-such-fuss">
+    <span class="ak-such-fuss-links"></span>
+    <span class="ak-such-fuss-mitte">
+      <button type="button" class="ak-uebersicht ak-uebersicht-innen">Prime: alles geprüft</button>
+    </span>
+    <span class="ak-such-fuss-rechts"><a class="ak-such-quelle" href="#">aniSearch</a></span>
+  </div>
+  <div class="ak-z-debug">
+    <div class="ak-debugleiste">
+      <span class="ak-debugpaar"><button type="button" class="ak-debugknopf">▶</button><span>Ruhemodus für Aufnahmen</span></span>
+      <span class="ak-debugpaar"><button type="button" class="ak-debugknopf">⭳</button><span>Bericht laden</span></span>
+    </div>
+  </div>
+</div>`
+
+/*
+  **Die zweite Kulisse: die Prüfliste mit eingeblendeten Erledigten.**
+
+  Am 02.09.2026 nahm dort eine Pille die volle Breite ein, und erledigte Zeilen
+  waren blass statt grün (Daniel: „why pill taking full width? shouldnt. also
+  already reported episodes should be colored green"). Beides hing an einer
+  einzigen Regel — `display: grid` an der abgehakten Zeile, übrig aus einer
+  Zeit, in der sie Spalten hatte: In einem Grid mit einer Spalte füllt jedes
+  Kind die ganze Breite, auch eine Pille, die `inline-flex` trägt.
+*/
+const dialogSeite = `<!doctype html><meta charset="utf-8">
+<style>
+  html { background: #0b0e13; }
+  body { margin: 0; font: 13px/1.45 system-ui, sans-serif; }
+  ${amazonRegeln}
+  ${css}
+</style>
+<div class="ak-kasten ak-mit-erledigten" style="width: 760px">
+  <div class="ak-zeile ak-suchzeile ak-abgehakt">
+    <a class="ak-titel" href="#">My First Girlfriend Is a Gal — Kauftitel (FSK 16, mit OVA)</a>
+    <span class="ak-folge">✕</span>
+  </div>
+  <div class="ak-zeile ak-suchzeile">
+    <a class="ak-titel" href="#">Is This a Zombie?</a>
+    <span class="ak-folge">12 Folgen</span>
+  </div>
+</div>`
+
+const browser = await chromium.launch()
+const seiteObj = await browser.newPage({ viewport: { width: 520, height: 420 } })
+await sperreNetz(seiteObj)
+await seiteObj.setContent(seite)
+
+/* Gemessen wird die Lage, nicht der Eindruck — das Bild ist der Beleg dazu. */
+const lage = await seiteObj.evaluate(() => {
+  const kasten = document.querySelector('.ak-amazon-suchhinweis')
+  const knopf = document.querySelector('.ak-uebersicht-innen')
+  const link = document.querySelector('.ak-such-fuss-rechts a')
+  const fertig = document.querySelector('.ak-such-fertig')
+  const platz = document.querySelector('.ak-such-fuss-links')
+  const r = (e) => (e ? e.getBoundingClientRect() : null)
+  const k = r(kasten)
+  return {
+    kastenBreite: Math.round(k.width),
+    knopf: r(knopf) && { x: Math.round(r(knopf).x - k.x), breite: Math.round(r(knopf).width), y: Math.round(r(knopf).y - k.y), hoehe: Math.round(r(knopf).height) },
+    link: r(link) && { x: Math.round(r(link).x - k.x), breite: Math.round(r(link).width), y: Math.round(r(link).y - k.y), hoehe: Math.round(r(link).height) },
+    fertig: r(fertig) && { breite: Math.round(r(fertig).width), hoehe: Math.round(r(fertig).height) },
+    leererPlatz: platz ? getComputedStyle(platz).display : '—',
+    /*
+      **Der Text in der Pille, nicht die Pille.** Gemessen wird der Kasten des
+      Textknotens selbst — nur so fällt auf, dass er linksbündig steht, während
+      sein Rahmen die halbe Breite einnimmt.
+    */
+    linkText: (() => {
+      if (!link || !link.firstChild) return null
+      const bereich = document.createRange()
+      bereich.selectNodeContents(link)
+      const t = bereich.getBoundingClientRect()
+      const l = r(link)
+      return {
+        linksAbstand: Math.round(t.x - l.x),
+        rechtsAbstand: Math.round(l.right - t.right),
+      }
+    })(),
+    linkDisplay: link ? getComputedStyle(link).display : '—',
+    /* Das X sitzt oben rechts — auf Höhe des Titels, am rechten Rand. */
+    weg: (() => {
+      const w = document.querySelector('.ak-z-weg')
+      const t = document.querySelector('.ak-z-titel')
+      if (!w || !t) return null
+      const a = r(w)
+      const b = r(t)
+      /*
+        **Das Zeichen im Knopf, nicht der Knopf.** Ein ✕ sitzt in seiner
+        Schriftart nicht von selbst mittig; gemessen wird deshalb sein eigener
+        Kasten gegen den des Knopfes (Daniel, 02.09.2026: „x is not centered").
+      */
+      const bereich = document.createRange()
+      bereich.selectNodeContents(w)
+      const z = bereich.getBoundingClientRect()
+      return {
+        rechtsAbstand: Math.round(b.right - a.right),
+        obenAbstand: Math.round(a.y - b.y),
+        zeichenLinks: Math.round(z.x - a.x),
+        zeichenRechts: Math.round(a.right - z.right),
+        zeichenOben: Math.round(z.y - a.y),
+        zeichenUnten: Math.round(a.bottom - z.bottom),
+      }
+    })(),
+  }
+})
+
+await seiteObj.screenshot({ path: ziel })
+
+/*
+  **Und derselbe Kasten ohne aniSearch — dann gehört die Zeile dem
+  Prüflisten-Knopf allein.**
+
+  Mit dem früheren Grid aus zwei festen Spalten blieb rechts eine leere Hälfte
+  stehen (Daniel, 03.09.2026: „wenn anilist nicht da ist, kann prime 100%
+  einnehmen"). Gemessen wird deshalb beides: geteilt, wenn zwei Knöpfe da sind,
+  und ganz, wenn nur einer bleibt.
+*/
+/*
+  **Und derselbe Kasten mit einer langen Beschriftung links.**
+
+  Der Normalfall („Prime: alles geprüft") lässt beide Knöpfe bei ihrer halben
+  Zeile — daran ist nicht abzulesen, was bei einem langen Text passiert. Genau
+  dort lag der Fehler vom 09.09.2026: „1 Prime-Titel · 2 Suchen offen" brach in
+  zwei Zeilen um, während neben „aniSearch" Platz stand.
+
+  Gemessen wird deshalb ein zweiter Kasten mit Daniels echtem Text. Er muss
+  einzeilig bleiben, breiter als die Hälfte sein — und aniSearch entsprechend
+  schmaler.
+*/
+const langObj = await browser.newPage({ viewport: { width: 520, height: 420 } })
+await sperreNetz(langObj)
+/*
+  Ersetzt wird über den Klassennamen, nicht über den Text: Ein Textvergleich
+  hängt an Umlaut und Schreibweise der Kulisse und scheitert lautlos, sobald
+  dort jemand ein Wort ändert — beim ersten Anlauf genau so passiert, die
+  Messung lief mit der kurzen Beschriftung weiter und meldete „unverändert".
+*/
+await langObj.setContent(
+  seite.replace(
+    /(<button type="button" class="ak-uebersicht ak-uebersicht-innen">)[^<]*/,
+    '$14 Prime-Titel · 12 Suchen offen · 2 Kanäle',
+  ),
+)
+
+/*
+  **Und der Extremfall: die längste Beschriftung, die der Knopf je trägt.**
+
+  „Erweiterung neu geladen — Seite aktualisieren" steht dort nach jedem
+  Neuladen der Erweiterung (Daniel, 06.09.2026, mit Bild). Bei einem Kasten von
+  340 px muss aniSearch dafür so weit nachgeben, dass sein eigener Name nicht
+  mehr hineinpasst — die Untergrenze am rechten Platz hält ihn lesbar, und der
+  linke Text bricht dann um, statt den Nachbarn zu verdrängen.
+*/
+const extremObj = await browser.newPage({ viewport: { width: 520, height: 420 } })
+await sperreNetz(extremObj)
+await extremObj.setContent(
+  seite.replace(
+    /(<button type="button" class="ak-uebersicht ak-uebersicht-innen">)[^<]*/,
+    '$1Erweiterung neu geladen — Seite aktualisieren',
+  ),
+)
+const extremLage = await extremObj.evaluate(() => {
+  const knopf = document.querySelector('.ak-uebersicht-innen')
+  const link = document.querySelector('.ak-such-fuss-rechts a')
+  if (!knopf || !link) return null
+  const a = knopf.getBoundingClientRect()
+  const b = link.getBoundingClientRect()
+  /* Der Textknoten des Links — läuft er über seine Pille hinaus? */
+  const bereich = document.createRange()
+  bereich.selectNodeContents(link)
+  const t = bereich.getBoundingClientRect()
+  return {
+    knopfBreite: Math.round(a.width),
+    linkBreite: Math.round(b.width),
+    linkTextBreite: Math.round(t.width),
+    linkHoehe: Math.round(b.height),
+    aufEinerZeile: Math.abs(a.y - b.y) <= 1,
+    ueberstand: Math.round(b.right - document.querySelector('.ak-amazon-suchhinweis').getBoundingClientRect().right),
+  }
+})
+await extremObj.close()
+
+/*
+  **Und Daniels echter Text vom 07.11.2026: Liste veraltet.**
+  „48 Prime-Titel · 2 Suchen offen · Liste veraltet" schob aniSearch rechts aus dem
+  Kasten (der linke Platz schrumpfte nicht, `flex-shrink: 0`). Gemessen wird der Überstand
+  der rechten Pille über den Kastenrand — er muss 0 sein.
+*/
+async function misseVeraltet(text) {
+  const obj = await browser.newPage({ viewport: { width: 520, height: 420 } })
+  await obj.setContent(
+    seite.replace(
+      /(<button type="button" class="ak-uebersicht ak-uebersicht-innen">)[^<]*/,
+      (_, anfang) => anfang + text,
+    ),
+  )
+  const lage = await obj.evaluate(() => {
+    const kasten = document.querySelector('.ak-amazon-suchhinweis').getBoundingClientRect()
+    const knopf = document.querySelector('.ak-uebersicht-innen').getBoundingClientRect()
+    const link = document.querySelector('.ak-such-fuss-rechts a').getBoundingClientRect()
+    return {
+      text: document.querySelector('.ak-uebersicht-innen').textContent.trim(),
+      ueberstand: Math.round(link.right - kasten.right),
+      abstand: Math.round(link.left - knopf.right),
+      linkHoehe: Math.round(link.height),
+    }
+  })
+  await obj.close()
+  return lage
+}
+/* Der zweite Text ist so lang, dass er in jeder Schrift (auch ohne Segoe UI) über die Kastenbreite ginge. */
+const veraltetLage = await misseVeraltet('48 Prime-Titel · 2 Suchen offen · Liste veraltet')
+const veraltetLang = await misseVeraltet('148 Prime-Titel · 12 Suchen offen · Liste veraltet und mehr')
+const langeLage = await langObj.evaluate(() => {
+  const kasten = document.querySelector('.ak-amazon-suchhinweis')
+  const knopf = document.querySelector('.ak-uebersicht-innen')
+  const link = document.querySelector('.ak-such-fuss-rechts a')
+  if (!kasten || !knopf || !link) return null
+  const k = kasten.getBoundingClientRect()
+  const a = knopf.getBoundingClientRect()
+  const b = link.getBoundingClientRect()
+  return {
+    kastenBreite: Math.round(k.width),
+    knopfBreite: Math.round(a.width),
+    linkBreite: Math.round(b.width),
+    knopfHoehe: Math.round(a.height),
+    linkHoehe: Math.round(b.height),
+    aufEinerZeile: Math.abs(a.y - b.y) <= 1,
+    ueberstand: Math.round(b.right - k.right),
+    /* Gegenprobe: Steht in der Kulisse wirklich die lange Beschriftung? */
+    text: knopf.textContent.trim(),
+  }
+})
+await langObj.close()
+
+const ohneAniObj = await browser.newPage({ viewport: { width: 520, height: 420 } })
+await sperreNetz(ohneAniObj)
+await ohneAniObj.setContent(
+  seite.replace(/<span class="ak-such-fuss-rechts">[\s\S]*?<\/span>/, '<span class="ak-such-fuss-rechts"></span>'),
+)
+const ohneAni = await ohneAniObj.evaluate(() => {
+  const fuss = document.querySelector('.ak-such-fuss')
+  const knopf = document.querySelector('.ak-uebersicht-innen')
+  if (!fuss || !knopf) return null
+  return {
+    fussBreite: Math.round(fuss.getBoundingClientRect().width),
+    knopfBreite: Math.round(knopf.getBoundingClientRect().width),
+  }
+})
+await ohneAniObj.close()
+
+/* Dieselbe Messung für die Prüfliste. */
+const dialogObj = await browser.newPage({ viewport: { width: 800, height: 180 } })
+await sperreNetz(dialogObj)
+await dialogObj.setContent(dialogSeite)
+const dialogLage = await dialogObj.evaluate(() => {
+  const zeile = document.querySelector('.ak-zeile.ak-abgehakt')
+  const pille = zeile?.querySelector('.ak-folge')
+  const titel = zeile?.querySelector('.ak-titel')
+  if (!zeile || !pille) return null
+  return {
+    zeileBreite: Math.round(zeile.getBoundingClientRect().width),
+    pilleBreite: Math.round(pille.getBoundingClientRect().width),
+    zeileDisplay: getComputedStyle(zeile).display,
+    titelFarbe: titel ? getComputedStyle(titel).color : '—',
+    deckkraft: getComputedStyle(zeile).opacity,
+  }
+})
+await dialogObj.screenshot({ path: ziel.replace(/\.png$/, '-pruefliste.png') })
+await browser.close()
+
+const g = (b) => (b ? '  ok   ' : '  FEHL ')
+let fehler = 0
+const pruefe = (bedingung, text) => {
+  console.log(g(bedingung) + text)
+  if (!bedingung) fehler++
+}
+
+console.log('Hinweiskasten — gemessen\n')
+console.log(`  Kasten ${lage.kastenBreite} px breit, leerer Fußzeilen-Platz: ${lage.leererPlatz}`)
+console.log(`  Prüfliste  x=${lage.knopf?.x} y=${lage.knopf?.y} breit=${lage.knopf?.breite}`)
+console.log(`  aniSearch  x=${lage.link?.x} y=${lage.link?.y} breit=${lage.link?.breite}`)
+console.log(`  gemeldet   breit=${lage.fertig?.breite} hoch=${lage.fertig?.hoehe}\n`)
+
+pruefe(lage.leererPlatz === 'none', 'der leere dritte Platz der Fußzeile ist ausgeblendet')
+pruefe(lage.knopf && lage.link && lage.knopf.y === lage.link.y, 'Prüfliste und aniSearch stehen auf einer Zeile')
+/*
+  **Auf einer Zeile heißt noch nicht auf einer Höhe.**
+
+  Die Kulisse trug bis 4.13.2 ein nacktes `<a>`; das echte Element ist ein
+  `.ak-such-quelle` und brachte seinen Stil als `style`-Attribut mit
+  (`display:block`, 4 px Abstand von oben). Gegen ein Attribut kommt keine
+  Klassenregel an, und die beiden Knöpfe standen verschieden hoch — die
+  Zusicherung darüber blieb trotzdem grün, weil die Kulisse den Fall nicht
+  nachstellte (Daniel, 06.09.2026, mit Bild).
+*/
+pruefe(
+  lage.knopf && lage.link && Math.abs(lage.knopf.hoehe - lage.link.hoehe) <= 1,
+  `… und sind gleich hoch (${lage.knopf?.hoehe} / ${lage.link?.hoehe} px)`,
+)
+pruefe(lage.knopf && lage.link && lage.knopf.x < lage.link.x, 'die Prüfliste steht links, aniSearch rechts')
+pruefe(
+  lage.knopf && lage.link && Math.abs(lage.knopf.breite - lage.link.breite) <= 10,
+  'bei kurzer Beschriftung sind beide gleich breit (je eine Hälfte)',
+)
+/*
+  **Und bei langer Beschriftung gibt aniSearch nach, statt links umzubrechen.**
+
+  Daniel am 09.09.2026: „mach anisearch flex verkleinern … sodass der kleiner
+  wird wenn text von prüfliste button groß wird." Vorher war die Hälfte fest,
+  und „1 Prime-Titel · 2 Suchen offen" brach in zwei Zeilen um — neben einem
+  Knopf, in dem ein Wort mit neun Buchstaben stand.
+
+  Die drei Zusicherungen messen die drei Teile der Vorgabe: der linke Knopf
+  wächst über die Hälfte, der rechte fällt darunter, und einzeilig bleibt es.
+*/
+console.log(
+  `\n  lang   „${langeLage?.text}" — Prüfliste ${langeLage?.knopfBreite} px, aniSearch ${langeLage?.linkBreite} px`,
+)
+console.log(
+  `  extrem „Erweiterung neu geladen …" — Prüfliste ${extremLage?.knopfBreite} px, aniSearch ${extremLage?.linkBreite} px\n`,
+)
+/*
+  **Die Gegenprobe zur Kulisse selbst.** Beim ersten Anlauf griff die Ersetzung
+  nicht (Umlaut im Suchtext), und die „lange" Messung lief mit der kurzen
+  Beschriftung weiter — sie meldete „unverändert" und war doch nur dieselbe
+  Messung zweimal.
+*/
+pruefe(
+  langeLage?.text?.startsWith('4 Prime-Titel') === true,
+  'die lange Kulisse trägt wirklich die lange Beschriftung',
+)
+/*
+  **Gemessen wird die Sache, nicht die Pixelzahl.**
+
+  Der erste Anlauf verlangte „beide auf einer Zeile" und „aniSearch mindestens
+  78 px". Beides sind Behauptungen über die **Schrift des Betrachters**: Auf dem
+  CI-Rechner gibt es kein Segoe UI, die Ersatzschrift ist breiter, und dieselbe
+  Beschriftung passt dort nicht mehr nebeneinander (09.09.2026, dreimal rot).
+
+  Schriftunabhängig gilt genau das, was die Regel aussagt: Der linke Knopf nimmt
+  sich mehr Platz als der rechte, der rechte bricht seinen Namen nicht um.
+*/
+pruefe(
+  langeLage != null && langeLage.linkHoehe <= 30,
+  `bei langer Beschriftung bleibt aniSearch einzeilig (${langeLage?.linkHoehe} px hoch)`,
+)
+pruefe(
+  langeLage != null && langeLage.knopfBreite > (langeLage.knopfBreite + langeLage.linkBreite) * 0.5,
+  `… der Prüflisten-Knopf nimmt sich mehr als die Hälfte (${langeLage?.knopfBreite} neben ${langeLage?.linkBreite} px)`,
+)
+pruefe(
+  langeLage != null && langeLage.linkBreite < lage.link.breite,
+  `… und aniSearch gibt nach (${langeLage?.linkBreite} statt ${lage.link?.breite} px)`,
+)
+pruefe(
+  langeLage != null && langeLage.ueberstand <= 0 && langeLage.knopfHoehe <= 60,
+  /* Seit 07.11.2026 darf der Text umbrechen (auf Linux-Schrift 38 px, zwei Zeilen), solange nichts aus dem Kasten ragt. */
+  `… der Text bricht höchstens in zwei Zeilen um, nichts ragt aus dem Kasten (${langeLage?.knopfHoehe} px hoch, Überstand ${langeLage?.ueberstand})`,
+)
+/*
+  **Und beim Extremfall gibt aniSearch nicht seinen Namen her.**
+
+  Ohne Untergrenze schrumpfte der rechte Platz auf 64 px, und „aniSearch" brach
+  auf zwei Zeilen um (46 px hoch) — während links weiter alles in eine Zeile
+  passte. Daniel am 09.09.2026: „mach für den anisearch button einfach eine
+  min-width."
+*/
+pruefe(
+  extremLage != null && extremLage.linkHoehe <= 30,
+  `bei der längsten Beschriftung bleibt aniSearch einzeilig (${extremLage?.linkHoehe} px hoch)`,
+)
+pruefe(
+  veraltetLage.text.startsWith('48 Prime-Titel'),
+  'die Kulisse „Liste veraltet" trägt Daniels echten Text',
+)
+pruefe(
+  veraltetLage.ueberstand <= 0,
+  `„Liste veraltet": aniSearch ragt nicht aus dem Kasten (Überstand ${veraltetLage.ueberstand} px)`,
+)
+pruefe(
+  veraltetLage.abstand >= 0 && veraltetLage.linkHoehe <= 30,
+  `… überlappt den Nachbarn nicht und bleibt einzeilig (Abstand ${veraltetLage.abstand}, ${veraltetLage.linkHoehe} px hoch)`,
+)
+pruefe(
+  veraltetLang.ueberstand <= 0 && veraltetLang.abstand >= 0,
+  `… auch bei noch längerem Text (Überstand ${veraltetLang.ueberstand}, Abstand ${veraltetLang.abstand} px)`,
+)
+pruefe(
+  extremLage != null && extremLage.ueberstand <= 0,
+  `längste Beschriftung: aniSearch ragt nicht aus dem Kasten (Überstand ${extremLage?.ueberstand} px)`,
+)
+pruefe(lage.fertig && lage.fertig.breite > lage.kastenBreite * 0.8, '„gemeldet ✓" nimmt die volle Breite')
+pruefe(lage.fertig && lage.fertig.hoehe >= 28, '… mit fester Höhe statt Innenabstand')
+/*
+  Die beiden Zusicherungen, die den Fall vom 02.09.2026 halten: Unser `display`
+  muss sich gegen Amazons `inline` durchsetzen, und der Text muss mittig in
+  seiner Pille stehen — gleicher Abstand links wie rechts, zwei Pixel Toleranz
+  für die Rundung.
+*/
+pruefe(lage.linkDisplay === 'flex', 'die Pille bleibt ein Flex-Container, auch gegen Amazons Regeln')
+pruefe(
+  lage.linkText && Math.abs(lage.linkText.linksAbstand - lage.linkText.rechtsAbstand) <= 2,
+  `der aniSearch-Text steht mittig (links ${lage.linkText?.linksAbstand}, rechts ${lage.linkText?.rechtsAbstand})`,
+)
+
+/* Der Ausweg aus einem Titel, der bei Prime nicht zu finden ist (02.09.2026). */
+pruefe(lage.weg && lage.weg.rechtsAbstand <= 1, 'das X sitzt am rechten Rand der Titelzeile')
+pruefe(lage.weg && lage.weg.obenAbstand <= 4, '… auf Höhe des Titels')
+pruefe(
+  lage.weg && Math.abs(lage.weg.zeichenLinks - lage.weg.zeichenRechts) <= 1,
+  `… und das ✕ steht waagerecht mittig (${lage.weg?.zeichenLinks}/${lage.weg?.zeichenRechts})`,
+)
+pruefe(
+  lage.weg && Math.abs(lage.weg.zeichenOben - lage.weg.zeichenUnten) <= 1,
+  `… wie senkrecht (${lage.weg?.zeichenOben}/${lage.weg?.zeichenUnten})`,
+)
+
+console.log(`\nOhne aniSearch: Fußzeile ${ohneAni?.fussBreite} px, Prüfliste ${ohneAni?.knopfBreite} px`)
+pruefe(
+  ohneAni && ohneAni.knopfBreite >= ohneAni.fussBreite - 1,
+  'ohne aniSearch nimmt der Prüflisten-Knopf die ganze Zeile',
+)
+
+console.log('\nPrüfliste — erledigte Zeile')
+console.log(`  Zeile ${dialogLage?.zeileBreite} px (${dialogLage?.zeileDisplay}), Pille ${dialogLage?.pilleBreite} px`)
+console.log(`  Titelfarbe ${dialogLage?.titelFarbe}, Deckkraft ${dialogLage?.deckkraft}\n`)
+
+/*
+  Eine Pille sagt „so viele Folgen" — sie ist eine Angabe, keine Fläche. Nimmt
+  sie die ganze Zeile ein, sieht sie aus wie ein Balken und verdeckt, dass
+  daneben noch etwas stehen könnte.
+*/
+pruefe(
+  dialogLage && dialogLage.pilleBreite < dialogLage.zeileBreite * 0.5,
+  `die Pille ist so breit wie ihr Inhalt (${dialogLage?.pilleBreite} von ${dialogLage?.zeileBreite} px)`,
+)
+pruefe(dialogLage && dialogLage.deckkraft === '1', 'eine erledigte Zeile ist nicht blass')
+pruefe(
+  dialogLage && dialogLage.titelFarbe === 'rgb(110, 231, 160)',
+  `… sondern grün (${dialogLage?.titelFarbe})`,
+)
+
+console.log(`\nBild: ${ziel}`)
+if (!existsSync(ziel)) {
+  console.error('Kein Bild geschrieben.')
+  process.exit(1)
+}
+process.exit(fehler ? 1 : 0)

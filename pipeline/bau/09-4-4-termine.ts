@@ -1,0 +1,244 @@
+import { readJson, log, discSlug } from '../lib/util.ts'
+import { writeJsonStand } from '../lib/stand-halten.ts'
+import { alleTermine, ausgelassen as termineAusgelassen, beobachtungenAusBlock, reichsteSerieJeKennung, type CrTermin } from '../lib/crunchyroll-termine.ts'
+import { beobachtungenZusammenfuehren } from '../lib/crunchyroll.ts'
+import { crHerkunft } from '../lib/cr-batch-wache.ts'
+import { zahlFelder } from '../lib/offene-folgenzahl.ts'
+import { meldeAnClaude } from '../lib/meldung.ts'
+import { type Title, type Release } from '../../shared/types.ts'
+import { type AnisearchEintrag } from './01-quellen.ts'
+import { type CrDubData } from '../lib/crunchyroll-dub.ts'
+import { loadDubChecks, neinHandbelege } from '../lib/dub-confirmed.ts'
+import { legeCrWegeAusKatalogAn } from './09-4-4-1-katalog-wege.ts'
+import { quellenMitZeit, zeitHinweis } from '../lib/cr-zeit-woche.ts'
+import { ladeZeitBelege, merkeZeitKorrekturen } from '../lib/cr-zeit-merkliste.ts'
+import { setzeKatalogZeit } from '../lib/cr-zeit-katalog.ts'
+
+interface CrVerweiseEingaben {
+  titles: Map<number, Title>
+  anisearch: Record<string, AnisearchEintrag>
+  belegt: number
+  crDub: CrDubData
+  verschwunden: number
+  usNeinOffen: number
+  nachUrl: Map<string, Title[]>
+  releases: Release[]
+  /** Die Uhr für „frisch“ (21 Tage); nur Tests setzen sie. */
+  jetzt?: number
+}
+
+export function legeCrVerweiseUndTermineAn({ titles, anisearch, belegt, crDub, verschwunden, usNeinOffen, nachUrl, releases, jetzt }: CrVerweiseEingaben) {
+    legeCrWegeAusKatalogAn({
+      titles,
+      anisearch,
+      crDub,
+      handNein: neinHandbelege(loadDubChecks()),
+    })
+    log(`${belegt} Synchro-Angaben aus den Crunchyroll-Serienseiten belegt (${crDub.serien.length} Seiten gelesen)`)
+    if (verschwunden) log(`${verschwunden} Crunchyroll-Verweise entfernt — die Serie ist dort nicht mehr verfügbar`)
+    if (usNeinOffen) log(`${usNeinOffen} Crunchyroll-Serien mit US-„nicht verfügbar" bleiben offen — der deutsche Katalog führt sie`)
+    /*
+      **Und aus denselben Daten kommen die Termine.**
+
+      Bis zum 02.09.2026 endete der Crunchyroll-Abschnitt hier: Er beantwortete
+      **ob** es eine deutsche Fassung gibt und warf weg, **wann** sie kam —
+      obwohl beides in derselben Antwort steht. Der Kalender zeigte für „Die
+      Tagebücher der Apothekerin“ deshalb nur eine Blu-ray im September 2026,
+      für eine Serie, die seit dem 18.11.2023 vollständig deutsch läuft.
+      21.689 datierte deutsche
+      Folgen lagen ungenutzt im Repo.
+
+      Die Ableitung steht in `lib/crunchyroll-termine.ts` und ist bewusst
+      streng: Sie liefert nur, wo genau ein Titel an der Adresse hängt, genau
+      ein Block datierte Folgen hat und dessen Folgenzahl exakt zur unseren
+      passt. Was sie liegen lässt, lässt sie mit Absicht liegen.
+    */
+    const zeitBelege = ladeZeitBelege()
+    const crTermine = alleTermine(crDub.serien, nachUrl, jetzt, zeitBelege)
+    merkeZeitKorrekturen(crTermine)
+    const { termineNeu, termineSchonDa } = legeTermineAn(crTermine, { titles, anisearch, releases })
+    meldeAusgelasseneTermine()
+    if (termineNeu || termineSchonDa)
+      log(
+        `${termineNeu} deutsche Streaming-Termine aus den Crunchyroll-Folgendaten abgeleitet` +
+          (termineSchonDa ? ` (${termineSchonDa} hatten schon einen)` : ''),
+      )
+
+    const { folgenDatiert, zeitenKorrigiert } = trageFolgenTageNach(releases, crDub, zeitBelege)
+    if (folgenDatiert) log(`${folgenDatiert} Crunchyroll-Folgen mit ihrem deutschen Tag nachgetragen (vorher geschätzt)`)
+    if (zeitenKorrigiert) log(`${zeitenKorrigiert} Crunchyroll-Wochentermine mit der Uhrzeit aus dem Katalog statt aus dem Wochenprogramm`)
+}
+
+/** Legt je abgeleitetem Termin ein Release an (oder ersetzt das Sammeldatum eines vorhandenen); zählt neue und schon vorhandene. */
+function legeTermineAn(
+  crTermine: CrTermin[],
+  { titles, anisearch, releases }: Pick<CrVerweiseEingaben, 'titles' | 'anisearch' | 'releases'>,
+): { termineNeu: number; termineSchonDa: number } {
+  let termineNeu = 0
+  let termineSchonDa = 0
+  for (const t of crTermine) {
+    const title = titles.get(t.titleId)
+    if (!title) continue
+    /*
+      **Ein vorhandener Streaming-Termin gewinnt** — nicht aber einer mit `sprache`
+      (OmU, offen): Er sagt nichts über die deutsche Fassung (Black Clover S2,
+      07.11.2026). Sonst stünde ein zweites Release derselben Plattform da, das
+      die Staffel zweimal behauptet; Kalender und Kuratierung sind näher an der Quelle.
+    */
+    const vorhanden = releases.filter((r) => r.titleId === t.titleId && r.platform === 'crunchyroll' && !r.sprache)
+    if (vorhanden.length) {
+      if (ersetzeSammeldatum(vorhanden, t, anisearch)) termineNeu++
+      else termineSchonDa++
+      continue
+    }
+    releases.push(neuesCrRelease(t, title, anisearch))
+    termineNeu++
+  }
+  return { termineNeu, termineSchonDa }
+}
+
+/** Ersetzt das Sammeldatum des einen vorhandenen Eintrags durch den Wochentakt; false, wenn nichts zu ersetzen ist. */
+function ersetzeSammeldatum(vorhanden: Release[], t: CrTermin, anisearch: Record<string, AnisearchEintrag>): boolean {
+  /*
+    **Ein gemessener Wochentakt schlägt den Aufnahmetag** (Daniel, 20.09.2026, „Das Band
+    der Unterwelt"): Die Serie kam als Katalogtitel herein — ein Eintrag vom 04.04.2026,
+    `available-from`, alles an einem Tag. Ihre deutsche Fassung erscheint seitdem Folge
+    für Folge; Folge 21 lief am 19.09., im Kalender stand nichts. Crunchyrolls
+    Simulcast-Kalender kennt solche Titel nicht, die Folgendaten schon.
+
+    Ersetzt wird nur der **Termin**, nicht der Eintrag: Der Slug bleibt, damit die
+    Adresse nicht wandert (CLAUDE.md, „Ein Slug ist eine Adresse").
+  */
+  const sammel = vorhanden.find(
+    (r) =>
+      r.schedule?.firstEpisodeDate === r.schedule?.lastEpisodeDate &&
+      (r.dateMeaning === 'available-from' || r.releaseType === 'batch'),
+  )
+  if (t.rhythmus !== 'weekly' || !sammel || vorhanden.length > 1) return false
+  sammel.releaseType = 'weekly'
+  sammel.dateMeaning = undefined
+  sammel.schedule = {
+    ...sammel.schedule,
+    firstEpisodeDate: t.firstEpisodeDate,
+    lastEpisodeDate: t.lastEpisodeDate,
+    time: t.time ?? sammel.schedule?.time,
+    ...zahlFelder(t, anisearch[t.titleId]?.info),
+    observed: beobachtungenZusammenfuehren(t.beobachtet, sammel.schedule?.observed),
+  }
+  sammel.herkunft = `Deutsche Fassung bei Crunchyroll — ${t.datiert} Folgen mit belegtem Termin (Block „${t.blockName}"), Sammeldatum ersetzt${zeitHinweis(t.zeitQuelle)}`
+  sammel.sources = quellenMitZeit(sammel.sources, t.zeitQuelle)
+  return true
+}
+
+/** Das neue Crunchyroll-Release zu einem abgeleiteten Termin. */
+function neuesCrRelease(t: CrTermin, title: Title, anisearch: Record<string, AnisearchEintrag>): Release {
+      const name = title.titleDe ?? title.titleEn ?? title.titleRomaji ?? `Titel ${t.titleId}`
+      const adresse = title.streams.find((x) => x.platform === 'crunchyroll')?.url
+      return {
+        /*
+          **Der Slug wird gebaut, nicht gekappt.** `slugify` schneidet bei 80
+          Zeichen ab — bei „I Was Reincarnated as the 7th Prince…“ (84 Zeichen)
+          fiel damit genau der unterscheidende Teil weg, das Datum, und beide
+          Staffeln beanspruchten dieselbe Adresse. Der Bau brach ab: „Termin
+          2025-07-30 (Folge 1) liegt nach dem belegten Ende 2024-07-16“ — zwei
+          Staffeln in einem Eintrag.
+
+          Denselben Fehler gab es am 30.08.2026 schon einmal bei den
+          Disc-Terminen, und `discSlug()` ist die Antwort darauf: Der **Name**
+          wird gekappt, das Datum danach angehängt.
+        */
+        slug: discSlug(`${name} crunchyroll de`, t.firstEpisodeDate),
+        titleId: t.titleId,
+        name,
+        platform: 'crunchyroll',
+        platformUrl: adresse,
+        releaseType: t.rhythmus,
+        schedule: {
+          firstEpisodeDate: t.firstEpisodeDate,
+          lastEpisodeDate: t.lastEpisodeDate,
+          time: t.time,
+          ...zahlFelder(t, anisearch[t.titleId]?.info),
+          /* Die gemessenen Tage je Folge — sonst rechnet die Fortschreibung an Pausen vorbei. */
+          ...(Object.keys(t.beobachtet).length ? { observed: t.beobachtet } : {}),
+        },
+        /*
+          **„Im Angebot seit“, wenn alles an einem Tag kam.** Bei einem
+          Katalogtitel nimmt Crunchyroll die ganze Staffel auf einmal auf; das
+          Datum ist dann der Tag der Aufnahme, nicht der Erstausstrahlung —
+          dieselbe Unterscheidung wie bei ADN.
+        */
+        dateMeaning: t.rhythmus === 'batch' ? 'available-from' : undefined,
+        fsk: title.fsk,
+        herkunft: crHerkunft(t.datiert, t.blockName) + zeitHinweis(t.zeitQuelle),
+        year: Number(t.firstEpisodeDate.slice(0, 4)),
+        sources: quellenMitZeit([adresse ?? 'https://www.crunchyroll.com/de'], t.zeitQuelle),
+      }
+}
+
+/** Vorhandene Wochentermine bekommen die Tage der Folgen, die das Kalenderfenster nicht sah — siehe `beobachtungenAusBlock()`. */
+function trageFolgenTageNach(
+  releases: Release[],
+  crDub: CrDubData,
+  zeitBelege: ReturnType<typeof ladeZeitBelege>,
+): { folgenDatiert: number; zeitenKorrigiert: number } {
+  const crNachKennung = reichsteSerieJeKennung(crDub.serien)
+  let folgenDatiert = 0
+  let zeitenKorrigiert = 0
+  for (const r of releases) {
+    if (r.platform !== 'crunchyroll' || r.releaseType !== 'weekly' || !r.schedule.observed) continue
+    const kennung = /series\/([A-Z0-9]+)/.exec(r.platformUrl ?? '')?.[1]
+    const serie = kennung ? crNachKennung.get(kennung) : undefined
+    if (!serie) continue
+    const erste = r.schedule.firstEpisodeNumber ?? 1
+    const letzte = erste + (r.schedule.episodeCount ?? 0) - 1
+    const neu = Object.entries(beobachtungenAusBlock(serie, r.schedule.observed)).filter(
+      ([n]) => Number(n) >= erste && Number(n) <= letzte,
+    )
+    for (const [n, datum] of neu) r.schedule.observed[Number(n)] = datum
+    folgenDatiert += neu.length
+    /* Nur Termine aus dem Crunchyroll-Kalender (`06-cr-simuldubs.ts`, Slug `cr-…`): ihre Zeit stammt aus dem Wochenprogramm. */
+    if (r.slug.startsWith('cr-') && setzeKatalogZeit(r.schedule, serie, zeitBelege)) zeitenKorrigiert++
+  }
+  return { folgenDatiert, zeitenKorrigiert }
+}
+
+/** Schreibt die verworfenen Serien der Terminableitung in die Datei und meldet einen Zuwachs. */
+function meldeAusgelasseneTermine() {
+  /*
+    **Was die Ableitung verworfen hat, wird sichtbar**: Riegel, die
+    eine Serie stumm durchfallen lassen, kosten Termine, die niemand vermisst — „Das Band
+    der Unterwelt" fehlte ein halbes Jahr. Die Gründe stehen ab jetzt in einer Datei, die
+    Zahl im Lauf (Skill `stille-ausfaelle-verhindern`).
+  */
+  if (termineAusgelassen.length) {
+    const jeGrund = new Map<string, number>()
+    for (const a of termineAusgelassen) jeGrund.set(a.grund, (jeGrund.get(a.grund) ?? 0) + 1)
+    const vorher = readJson<{ jeGrund?: Record<string, number> }>('data/termine-ausgelassen.json', {})
+    writeJsonStand('data/termine-ausgelassen.json', {
+      erzeugtAm: new Date().toISOString(),
+      jeGrund: Object.fromEntries(jeGrund),
+      faelle: termineAusgelassen.slice(0, 400),
+    }, 'erzeugtAm')
+    /*
+      **Ein Zuwachs geht in den Posteingang**: eine Datei, die niemand
+      öffnet, ist keine Meldung. `~/.claude/hooks/posteingang.js` liest
+      `data/meldungen-an-claude.jsonl` und nennt neue Zeilen beim nächsten Prompt.
+    */
+    const gestiegen = [...jeGrund].filter(([g, n]) => n > (vorher.jeGrund?.[g] ?? 0))
+    if (gestiegen.length && Object.keys(vorher.jeGrund ?? {}).length) {
+      meldeAnClaude(
+        'bestand-bauen',
+        'warnung',
+        `Terminableitung verwirft mehr: ${gestiegen
+          .map(([g, n]) => `${g} ${vorher.jeGrund?.[g] ?? 0} → ${n}`)
+          .join(', ')}`,
+        'data/termine-ausgelassen.json',
+      )
+    }
+    log(
+      `Terminableitung übersprungen: ${termineAusgelassen.length} Serien — ` +
+        [...jeGrund].map(([g, n]) => `${n}× ${g}`).join(', ') +
+        ' (data/termine-ausgelassen.json)',
+    )
+  }
+}

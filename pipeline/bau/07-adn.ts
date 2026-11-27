@@ -1,0 +1,410 @@
+import {
+  type AdnData,
+  type AdnShow,
+  type AdnBlock,
+  type AdnEpisode,
+  type Blockzuordnung,
+  staffelBloecke,
+  staffelnDesFranchise,
+  ordneBloeckeZuStaffeln,
+  alsEinBlock,
+  blockPasstInTitel,
+} from '../lib/adn.ts'
+import { readJson, log, warn, ROOT } from '../lib/util.ts'
+import { ausreisserAusArchiv, ohneAusreisser } from '../lib/adn-ausreisser.ts'
+import { normalizeTitle } from '../lib/crunchyroll.ts'
+import { adnSlug, adnBlockName, fskFromAdnAge, adnHinweis, werkTitel } from './titel-hilfen.ts'
+import { ADN_CALENDAR_URL, adnKatalogUrl } from './grundlagen.ts'
+import { todayIso } from '../../shared/time.ts'
+import { artikelJeShow, type AdnNews } from '../lib/adn-news.ts'
+import { terminSpanne } from '../lib/adn-spanne.ts'
+import { ergaenzeTeilnamen } from './adn-teilnamen.ts'
+import { verschmelzeAdnMitKuratiertem } from './adn-kuratiert.ts'
+import { adnShowsAusKalenderUndKatalog, belegeTonKuratierterAdnTermine } from './adn-kuratiert-ton.ts'
+import { adnShowsMitKatalogKennung, loeseAdnTitelIds, titelZurShow } from './adn-show-titel.ts'
+import { cartoonTitelJeAdn } from './cartoon-adn.ts'
+import type { CartoonEintrag } from '../lib/cartoons.ts'
+import { beobachteteFolgen } from '../lib/adn-beobachtet.ts'
+import { type Title, type Release } from '../../shared/types.ts'
+
+type AdnEingabe = {
+  titles: Map<number, Title>
+  releases: Release[]
+  titleByName: Map<string, Title>
+  seenSlugs: Set<string>
+}
+
+const LEER_ADN: AdnData = {
+  scrapedAt: '',
+  window: { from: '', to: '' },
+  shows: [],
+}
+
+/** ADN-Termine aus Kalender und Katalog; ein kuratierter Termin desselben Titels am selben Tag geht darin auf (`adn-kuratiert.ts`). */
+export function ergaenzeAdnTitel(eingabe: AdnEingabe) {
+  const cartoonJeAdn = cartoonTitelJeAdn(readJson<Record<string, CartoonEintrag>>('data/cartoons.json', {}))
+  /* Eine einzelne vde-Folge unter lauter vostde ist ein Katalogfehler und belegt keine Synchro (`lib/adn-ausreisser.ts`). */
+  const ausreisser = ausreisserAusArchiv(ROOT)
+  const ergebnis = ergaenzeAdnTitelAusDaten({ ...eingabe, cartoonJeAdn, ausreisser })
+  const alleShows = adnShowsAusKalenderUndKatalog(readJson<AdnData>('data/adn.json', LEER_ADN), ergebnis.adnKatalog)
+  const shows = ohneAusreisser(alleShows, ausreisser)
+  const belegt = belegeTonKuratierterAdnTermine(eingabe.releases, eingabe.titles, shows, todayIso())
+  if (belegt) log(`${belegt} ADN-Wege kuratierter Termine mit deutscher Synchro belegt (vde am Starttag laut ADN)`)
+  const aufgegangen = verschmelzeAdnMitKuratiertem(eingabe.releases)
+  if (aufgegangen) log(`${aufgegangen} ADN-Termine mit dem kuratierten Termin desselben Titels am selben Tag zusammengelegt`)
+  return ergebnis
+}
+
+type Abschnitt = { title: Title | undefined; adnVon: number; adnBis: number }
+
+/** Gemeinsamer Zustand eines Bauabschnitts: über alle Serien hinweg geteilte Sperren und Zähler. */
+interface AdnLauf {
+  titles: Map<number, Title>
+  releases: Release[]
+  seenSlugs: Set<string>
+  /**
+   * Kein Anime zweimal aus ADN — **über alle Serien hinweg**.
+   *
+   * Diese Sperre stand bis zum 17.08.2026 innerhalb der Schleife und wirkte
+   * deshalb nur je Serienkennung. Über zwei Kennungen hinweg griff sie nicht,
+   * und genau das brach den Wochenlauf: ADN führt „To Love-Ru" unter zwei
+   * Kennungen (217 und 670), beide mit 26 Folgen, und beide ordneten sich
+   * demselben AniList-Eintrag 3455 zu. Die Prüfung im Build meldete zu Recht
+   * „zusammen 52 Folgen bei 26 vorhandenen" und brach ab — womit der ganze
+   * Wochenlauf nichts schrieb, dreimal in Folge seit dem 10.08.2026.
+   *
+   * Der Kommentar an der Sperre war immer richtig: Ein Titel mit zwei
+   * widersprüchlichen Folgenzahlen ist schlimmer als ein fehlender Eintrag. Nur
+   * der Gültigkeitsbereich war zu eng.
+   */
+  belegteTitel: Set<number>
+  /**
+   * Wem ein Titel aus eigener Kennung zusteht — der starke Anspruch.
+   *
+   * Zwei Wege führen im Folgenden zu einem Titel: die im Katalogabruf
+   * zugeordnete `anisearchId` der Serie (im Bau `titleId`), und ein Treffer über die Folgenzahl
+   * innerhalb der Reihe. Der erste ist eine Zuordnung, der zweite eine Schätzung
+   * — und die Schätzung einer Serie darf der Zuordnung einer anderen nicht
+   * zuvorkommen.
+   *
+   * Genau das passierte am 17.08.2026: Ein Ein-Folgen-Block landete über die
+   * Folgenzahl auf „ONE PIECE", und als die echte One-Piece-Serie an die Reihe
+   * kam, war ihr eigener Titel vergeben — alle sieben Sagas fielen heraus.
+   */
+  starkerAnspruch: Map<number, number>
+  /** Der spezifischste Artikel je Serie steht als lesbare Quelle vor dem Kalender-Endpunkt. */
+  artikelProShow: ReturnType<typeof artikelJeShow>
+  /* Ein Termin ab diesem Tag gilt als verfügbar — davor ist er angekündigt. */
+  heute: string
+  /** ADN-Verweise, die aus einem ADN-Termin entstehen (der Termin belegt die Synchro). */
+  adnVerweiseErgaenzt: number
+  adnAdded: number
+  adnBloecke: number
+}
+
+/** Kalender, Katalog und News von der Platte; der Katalog wird den Titeln zugeordnet. */
+function ladeAdnQuellen(titles: Map<number, Title>, ausreisser: ReadonlySet<number>) {
+  // ADN nennt in seiner Schnittstelle je Folge die Sprachfassung. Was dort als
+  // `vde` steht, ist eine belegte deutsche Synchro mit belegter Uhrzeit — hier
+  // muss nichts abgeleitet werden, außer bei einem Ausreißer (eine einzelne `vde`-
+  // Folge unter lauter `vostde`, `lib/adn-ausreisser.ts`): der belegt nichts. Kuratierte Einträge haben Vorrang: Wer eine
+  // ADN-Adresse von Hand gepflegt hat, will keinen zweiten Eintrag daneben.
+  const leer: AdnData = { scrapedAt: '', window: { from: '', to: '' }, shows: [] }
+  const adnKalender = readJson<AdnData>('data/adn.json', leer)
+  // Der Katalog-Lauf (`data:adn -- --catalog`) findet Serien, die vollständig
+  // im Angebot liegen und deshalb in keinem Kalenderfenster mehr auftauchen.
+  // Er läuft selten; fehlt die Datei, ändert sich nichts.
+  const adnKatalog = readJson<AdnData>('data/adn-catalog.json', leer)
+  /*
+    **Die News-Artikel als lesbare Quelle** (`pipeline/lib/adn-news.ts`).
+    Der Kalender-Endpunkt bleibt der Beleg, der Artikel steht davor — er
+    erklärt denselben Termin und lässt sich ohne `date`-Parameter öffnen.
+  */
+  const adnNews = readJson<AdnNews | null>('data/adn-news.json', null)
+  const artikelProShow = artikelJeShow(adnNews)
+  /* Eine Katalogzuordnung muss den Namen tragen, nicht nur ein Werkwort — siehe `WERKWOERTER`
+     in lib/adn.ts. Der Katalog wird nur alle paar Wochen neu nachgeschlagen; bis dahin
+     fängt der Bau die falschen Zuordnungen selbst ab. */
+  loeseAdnTitelIds(adnKatalog.shows, titles)
+  const adn: AdnData = {
+    ...adnKalender,
+    // Der Kalender ist die frischere Quelle — was dort schon steht, gewinnt (die Katalog-`titleId` übernimmt er).
+    shows: ohneAusreisser(adnShowsMitKatalogKennung(adnKalender.shows, adnKatalog.shows), ausreisser),
+  }
+  return { adn, adnKatalog, artikelProShow }
+}
+
+function starkeAnsprueche(shows: AdnData['shows'], titles: Map<number, Title>): Map<number, number> {
+  const starkerAnspruch = new Map<number, number>()
+  for (const show of shows) {
+    const eigen = show.titleId ? titles.get(show.titleId) : undefined
+    if (eigen && !starkerAnspruch.has(eigen.id)) starkerAnspruch.set(eigen.id, show.showId)
+  }
+  return starkerAnspruch
+}
+
+/** Blöcke der Serie samt Staffelzuordnung. */
+function bloeckeUndZuordnungen(show: AdnData['shows'][number], serienTitel: Title | undefined, titles: Map<number, Title>) {
+  /**
+   * Eine ADN-Serienkennung ist ein Franchise, keine Staffel.
+   *
+   * Bis zum 12.08.2026 wurde je Serie **ein** Release gebaut. Für „Sword Art
+   * Online" hieß das: ein Eintrag mit 96 Folgen, deren Nummern zweimal bei 1
+   * neu anfangen, unter dem Namen der ersten Staffel — und, weil zwei
+   * Abwurftermine nicht als Komplettabwurf erkannt wurden, mit 96
+   * Wochenterminen bis 2027. Neun der 37 ADN-Serien führen mehrere Staffeln
+   * unter einer Kennung.
+   */
+  let bloecke = staffelBloecke(show)
+  /**
+   * Ein einzelner Block braucht keine Staffelsuche — er **ist** die Serie.
+   *
+   * `ordneBloeckeZuStaffeln` ordnet über die Folgenzahl innerhalb der Reihe zu,
+   * und das ist für einen Film die falsche Frage. Die acht One-Piece-Filme haben
+   * je eine Folge; die Suche fand darum bei allen achten denselben Reihenteil
+   * mit einer Folge — „MONSTERS: Ippaku Sanjou Hiryuu Jigoku", den Pilotfilm von
+   * 1998 — und überschrieb damit die Zuordnung, die der Katalogabruf für jeden
+   * Film einzeln und richtig nachgeschlagen hatte (17.08.2026).
+   *
+   * Steht die Kennung fest, gibt es nur einen Block, **und passt dessen
+   * Folgenzahl in den Titel**, dann gewinnt die Kennung. Alle drei Bedingungen
+   * sind nötig: „To Love-Ru - Darkness" kommt bei ADN als **ein** Block mit 26
+   * Folgen, während der AniList-Eintrag 12 hat — dort umfasst ein einzelner
+   * Block eben doch mehrere Staffeln, und die Suche muss laufen, sonst behauptet
+   * der Datensatz 26 Folgen für einen Zwölfteiler.
+   */
+  const passtInDenTitel = bloecke.length === 1 && blockPasstInTitel(bloecke[0], serienTitel)
+  const staffeln =
+    !passtInDenTitel && serienTitel?.franchiseId
+      ? staffelnDesFranchise(titles.values(), serienTitel.franchiseId)
+      : []
+  let zuordnungen = ordneBloeckeZuStaffeln(bloecke, staffeln)
+  /**
+   * Lieferwellen sind keine Staffeln.
+   *
+   * Findet die Suche für **keinen** Block einen eigenen Reihenteil, dann haben
+   * die Schnitte nichts bedeutet — alle Blöcke zeigen auf denselben Titel, und
+   * die Sperre gegen doppelte Titel behält den ersten und wirft den Rest weg.
+   * Bei One Piece kostete das 505 der 515 belegten deutschen Folgen: ADN teilt
+   * sie in zwölf „Sagas", AniList kennt für die Serie einen einzigen Eintrag.
+   *
+   * Ein Release über alles ist dann die ehrlichere Auskunft als eines über den
+   * ersten Zehntel. Der Slug bleibt dabei `adn-<id>` — dieselbe Adresse wie bei
+   * jeder anderen einblockigen Serie.
+   */
+  if (bloecke.length > 1 && zuordnungen.every((z) => !z.teile.length)) {
+    bloecke = [alsEinBlock(show)]
+    zuordnungen = ordneBloeckeZuStaffeln(bloecke, staffeln)
+  }
+  return { bloecke, zuordnungen }
+}
+
+/** Beide Sperren gegen doppelte Titel; true = Abschnitt überspringen (Warnung ist geschrieben). */
+function titelGesperrt(lauf: AdnLauf, show: AdnShow, block: AdnBlock, title: Title | undefined): boolean {
+  if (title && lauf.belegteTitel.has(title.id)) {
+    warn(
+      `ADN ${show.showId} (${show.title}): Staffel ${block.season ?? '?'} mit ${block.episodes.length} Folgen ` +
+        `zeigt auf "${title.titleRomaji ?? title.id}", der schon aus einer anderen ADN-Serie stammt — übersprungen.`,
+    )
+    return true
+  }
+  // Der Titel gehört einer anderen Serie aus deren eigener Kennung. Ihn
+  // über einen Folgenzahl-Treffer wegzunehmen hieße, eine Schätzung gegen
+  // eine Zuordnung zu stellen.
+  const inhaber = title ? lauf.starkerAnspruch.get(title.id) : undefined
+  if (inhaber !== undefined && inhaber !== show.showId) {
+    warn(
+      `ADN ${show.showId} (${show.title}): Staffel ${block.season ?? '?'} mit ${block.episodes.length} Folgen ` +
+        `zeigt auf "${title!.titleRomaji ?? title!.id}", der laut Katalog zu ADN ${inhaber} gehört — übersprungen.`,
+    )
+    return true
+  }
+  return false
+}
+
+/** Das Release eines Abschnitts aus seinen Folgen (`first`/`letzte` = früheste/späteste nach Termin). */
+export function adnRelease(a: {
+  lauf: AdnLauf
+  show: AdnShow
+  block: AdnBlock
+  abschnitt: Abschnitt
+  zuordnung: Blockzuordnung
+  folgen: AdnEpisode[]
+  first: AdnEpisode
+  letzte: AdnEpisode
+  slug: string
+  anzeigename: string
+}): Release {
+  const { lauf, show, block, abschnitt, zuordnung, folgen, first, letzte } = a
+  const { teile, unscharf } = zuordnung
+  const title = abschnitt.title
+  const anzahl = new Set(folgen.map((e) => e.episode ?? e.url)).size
+  /* Lesbarer Artikel, falls ADN einen zur Serie veröffentlicht hat. */
+  const artikel = lauf.artikelProShow.get(show.showId)
+  return {
+    slug: a.slug,
+    titleId: title?.id ?? -1,
+    name: a.anzeigename,
+    platform: 'adn',
+    platformUrl: folgen[0].url,
+    releaseType: block.rhythm === 'weekly' ? 'weekly' : 'batch',
+    /**
+     * Was das Datum bedeutet — und was es ausdrücklich nicht bedeutet.
+     *
+     * Bei einem Wochentakt ist der Termin der Sendeplan, also die
+     * Erstveröffentlichung. Bei einem Komplettabwurf weiß ADN nur, wann
+     * der Titel ins Angebot kam: „Sword Art Online" am 11.06.2025,
+     * obwohl es die deutsche Fassung seit 2013 gibt. „Im Angebot seit"
+     * ist in beiden Fällen wahr, „erschienen am" wäre geraten.
+     */
+    dateMeaning: block.rhythm === 'weekly' ? undefined : 'available-from',
+    fsk: title?.fsk ?? fskFromAdnAge(show.age),
+    herkunft: adnHinweis(block, abschnitt, teile.length, anzahl, title, unscharf),
+    schedule: {
+      firstEpisodeDate: first.date,
+      time: first.time,
+      episodeCount: anzahl,
+      lastEpisodeDate: letzte.date,
+      /* ADNs Kalendertag gilt als Beleg, auch für noch nicht erschienene Folgen (Sendeplan, nicht Rechnung). */
+      observed: block.rhythm === 'weekly' ? beobachteteFolgen(folgen) : undefined,
+    },
+    year: Number(first.date.slice(0, 4)),
+    sources: [...(artikel ? [artikel.url] : []), show.fromCatalog ? adnKatalogUrl(show.showId) : ADN_CALENDAR_URL],
+  }
+}
+
+/** Verweis und deutscher Titel, die ein ADN-Termin dem Titel mitgibt. */
+function ergaenzeTitelAusTermin(lauf: AdnLauf, title: Title | undefined, show: AdnShow, first: AdnEpisode) {
+  /*
+    **Ein ADN-Termin belegt die Synchro — also gehört ein ADN-Verweis dazu.** Der Termin
+    entsteht nur aus Folgen mit `vde`. „Undefeated Bahamut Chronicle" hatte trotzdem keinen
+    Verweis: Das Panel zeigte „Noch keine deutsche Fassung" und darunter eine Termin-Pille
+    mit dem Seriennamen, die auf Folge 1 führte. Der Verweis zeigt auf
+    die Serienseite, nicht auf die Folge; Handbelege greifen weiter unten wie bei jedem
+    anderen Verweis.
+  */
+  /* Ein angekündigter Termin ist keine verfügbare Fassung (86: Eighty Six, 01.10.2026). */
+  if (title && first.date <= lauf.heute && !title.streams.some((s) => s.platform === 'adn')) {
+    title.streams.push({ platform: 'adn', url: first.url.replace(/(\/video\/[^/]+)\/\d+-[^/]*$/, '$1'), dub: true })
+    lauf.adnVerweiseErgaenzt++
+  }
+  /**
+   * ADNs Titel ist der deutsche — er wird zum Suchbegriff.
+   *
+   * Seit dem 24.08.2026 fragt `fetch-adn.ts` mit `Accept-Language: de`,
+   * und seither heißt Serie 1331 nicht mehr „Hero Without a Class: Who
+   * Even Needs Skills?!", sondern „Der Held ohne Klasse: Der Aufstieg
+   * eines Talentlosen". Genau danach hat Daniel gesucht und nichts
+   * gefunden — der Titel stand im Kalender, aber unter seinem japanischen
+   * Namen, und `titleDe` war leer.
+   *
+   * Die Suche im Frontend liest `titleDe` bereits (`web/src/lib/filters.ts`).
+   * Es fehlte nur der Wert: 99 von 2.762 Titeln hatten einen.
+   *
+   * **Ein vorhandener Wert wird nicht angetastet.** Ein von Hand oder aus
+   * einer kuratierten Quelle gesetzter Titel ist verlässlicher als der
+   * eines Anbieters, der ihn nach eigenem Geschmack schreibt.
+   */
+  if (title && show.title && !title.titleDe) title.titleDe = werkTitel(show.title)
+}
+
+/** Ein Abschnitt eines Blocks wird zum Release; Reihenfolge der Sperren und Zähler wie im Bau gewachsen. */
+function verarbeiteAbschnitt(lauf: AdnLauf, show: AdnShow, zuordnung: Blockzuordnung, abschnitt: Abschnitt, bloecke: AdnBlock[]) {
+  const { block, teile } = zuordnung
+  const title = abschnitt.title
+  if (titelGesperrt(lauf, show, block, title)) return
+  if (title) lauf.belegteTitel.add(title.id)
+  // Nur wenn es bei einem einzigen Block bleibt, behält das Release seinen
+  // alten Slug — geteilte Links und Merklisten sollen nicht ins Leere laufen.
+  const slug = adnSlug(show.showId, block, teile.length > 1 ? title?.id : undefined, bloecke.length === 1)
+  if (lauf.seenSlugs.has(slug)) return
+  lauf.seenSlugs.add(slug)
+
+  // Der Ton ist deutsch — der Name von ADN oft nicht. „One Piece Film 3 •
+  // Le Royaume de Chopper" heißt hier „One Piece – Chopper auf der Insel
+  // der seltsamen Tiere". Für Katalogtitel gewinnt deshalb der
+  // Anime-Eintrag; er nennt außerdem die Staffel beim Namen, während ADN
+  // nur „3" schreibt.
+  const anzeigename =
+    (show.fromCatalog || teile.length) && title
+      ? (title.titleDe ?? title.titleEn ?? title.titleRomaji ?? show.title)
+      : adnBlockName(show.title, block, bloecke.length)
+
+  const folgen = block.episodes.filter(
+    (e) => !teile.length || ((e.episode ?? 0) >= abschnitt.adnVon && (e.episode ?? 0) <= abschnitt.adnBis),
+  )
+  if (!folgen.length) return
+  const { fruehste: first, spaetste: letzte } = terminSpanne(folgen, `ADN ${show.showId} (${show.title})`)
+  lauf.releases.push(adnRelease({ lauf, show, block, abschnitt, zuordnung, folgen, first, letzte, slug, anzeigename }))
+  ergaenzeTitelAusTermin(lauf, title, show, first)
+  lauf.adnAdded++
+}
+
+/** Eine Serie: Titel suchen, in Blöcke zerlegen, jeden Abschnitt verarbeiten. */
+function verarbeiteShow(lauf: AdnLauf, show: AdnShow, titleByName: Map<string, Title>, cartoonJeAdn: Map<number, Title>) {
+  // Die im Katalog-Lauf nachgeschlagene Kennung zuerst — sie trifft auch,
+  // wo der Namensabgleich an Schreibweisen scheitert.
+  const serienTitel = titelZurShow(show, lauf.titles, titleByName, cartoonJeAdn)
+  // Aus dem Katalogdurchlauf nur, was sich einem Anime zuordnen lässt: Der
+  // Katalog führt den französischen Bestand, und ohne Zuordnung bliebe der
+  // französische Name stehen, dazu ohne Cover, Genres und Beschreibung.
+  // Beim Kalender-Weg ist der Name belegt; ohne Treffer nimmt ihn
+  // `entferneVomKalender` später wieder heraus und meldet ihn.
+  if (!serienTitel && show.fromCatalog) return
+
+  const { bloecke, zuordnungen } = bloeckeUndZuordnungen(show, serienTitel, lauf.titles)
+  lauf.adnBloecke += bloecke.length
+  /**
+   * Kein Anime zweimal in derselben ADN-Serie.
+   *
+   * Ohne diese Sperre landete „Sailor Moon" doppelt im Datensatz: Staffel 1
+   * mit 46 Folgen und Staffel 2 mit 42, beide auf AniList 530 gezeigt, weil
+   * der Rückfall auf den Serientitel keine Rücksicht darauf nahm, dass der
+   * längst vergeben war. Ein Titel mit zwei widersprüchlichen Folgenzahlen
+   * ist schlimmer als ein fehlender Eintrag.
+   */
+  for (const zuordnung of zuordnungen) {
+    const { block, teile } = zuordnung
+    // Ohne aufgehende Rechnung deckt der Block genau einen Titel ab: den der
+    // Serie. Lieber eine gröbere Zuordnung als eine falsche.
+    const abschnitte: Abschnitt[] = teile.length
+      ? teile
+      : [{ title: serienTitel, adnVon: block.nummern[0] ?? 1, adnBis: block.nummern.at(-1) ?? block.episodes.length }]
+    for (const abschnitt of abschnitte) verarbeiteAbschnitt(lauf, show, zuordnung, abschnitt, bloecke)
+  }
+}
+
+function ergaenzeAdnTitelAusDaten({ titles, releases, titleByName, seenSlugs, cartoonJeAdn, ausreisser }: AdnEingabe & { cartoonJeAdn: Map<number, Title>; ausreisser: ReadonlySet<number> }) {
+  const { adn, adnKatalog, artikelProShow } = ladeAdnQuellen(titles, ausreisser)
+  const curatedAdnShows = new Set(
+    releases
+      .filter((r) => r.platform === 'adn')
+      .map((r) => normalizeTitle(r.name)),
+  )
+  const lauf: AdnLauf = {
+    titles,
+    releases,
+    seenSlugs,
+    belegteTitel: new Set<number>(),
+    starkerAnspruch: starkeAnsprueche(adn.shows, titles),
+    artikelProShow,
+    heute: todayIso(),
+    adnVerweiseErgaenzt: 0,
+    adnAdded: 0,
+    adnBloecke: 0,
+  }
+  for (const show of adn.shows) {
+    if (!show.episodes.length) continue
+    if (curatedAdnShows.has(normalizeTitle(show.title))) continue
+    verarbeiteShow(lauf, show, titleByName, cartoonJeAdn)
+  }
+  if (adn.shows.length)
+    log(
+      `${lauf.adnAdded} ADN-Releases aus ${lauf.adnBloecke} Staffelblöcken ergänzt (${adn.shows.length} Serien gefunden)`,
+    )
+
+  /* Ist der Teil selbst der Eintrag, gehört seine Nummer in den Namen (`adn-teilnamen.ts`). */
+  const teilNamen = ergaenzeTeilnamen(titles)
+  if (teilNamen) log(`${teilNamen} deutsche Namen um ihre Teilnummer ergänzt (der Teil ist der Eintrag)`)
+  return { adnKatalog, adnVerweiseErgaenzt: lauf.adnVerweiseErgaenzt }
+}

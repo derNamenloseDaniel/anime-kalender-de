@@ -1,0 +1,31 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Gaikotsu_Kishi-sama,_Tadaima_Isekai_e_Odekakech%C5%AB (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Gaikotsu_Kishi-sama%2C_Tadaima_Isekai_e_Odekakech%C5%AB&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+Die Synchronisation fand nach einem Dialogbuch von Daniel Gärtner unter der Regie von Jermain Meyer im Auftrag der TNT Media in Berlin statt.<ref name=":0">{{Internetquelle |url=https://www.synchronkartei.de/serie/52643 |titel=Deutsche Synchronkartei {{!}} Serien {{!}} Skeleton Knight in Another World |abruf=2022-07-20}}</ref> 
+
+{| class="wikitable"
+!Rolle
+!japanischer Sprecher ([[Seiyū]])
+!deutscher Sprecher<ref name=":0" />
+|-
+|Arc Lalatoya
+|[[Tomoaki Maeno]]
+|[[Julian Tennstedt]]
+|-
+|Ariane Glenys Maple
+|[[Ai Fairouz]]
+|[[Moira May]]
+|-
+|Ponta
+|[[Nene Hieda]]
+|[[Ness Gerung]]
+|-
+|Chiyome
+|Miyu Tomita
+|[[Magdalena Höfner]]
+|-
+|Yuriarna Merol Melissa Rhoden Olav
+|Saori Oonishi
+|Sabrina Schwarz
+|}

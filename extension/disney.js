@@ -1,0 +1,1031 @@
+/**
+ * Disney+: prüfen ohne Player, melden auf Klick, nichts doppelt.
+ *
+ * Der Weg steht in `disney-leser.js` — ein POST je Folge, Tonspuren im
+ * Klartext, kein Eintrag unter „Weiterschauen".
+ *
+ * Dieser Teil sagt, **was noch fehlt**, und zwar in Bereichen statt in Sätzen:
+ *
+ *     grün  1e1-15
+ *     grau  1e16-51, 2e1-35
+ *
+ * Daniels Vorgabe am 26.08.2026: „außerdem ist es zuviel text, also grün:
+ * 1e1-15, grau: 1e16-51, 2e1-35." Eine Zeile beantwortet damit beide Fragen —
+ * was erledigt ist und was ansteht — ohne dass jemand rechnen muss.
+ *
+ * **Was der Worker übernommen hat, verschwindet von selbst.** Die Bereiche
+ * kommen aus dem Briefkasten, nicht aus einem eigenen Gedächtnis: Sobald der
+ * stündliche Lauf die Meldungen abgeholt hat, ist der grüne Teil weg und der
+ * graue steht allein da. Genau so soll es sein — die Ferne ist die Quelle.
+ */
+;(() => {
+  const MARKE = 'ak-disney'
+  const MARKE_STEUER = 'ak-disney-steuer'
+  const WORKER = 'https://newsletter.animekalender.workers.dev/pruefung'
+
+  /**
+   * **Was auffällt, wird gemeldet — nicht in die Konsole geschrieben.**
+   *
+   * Daniel am 10.09.2026: „info bringt nix, du liest nix aus der console aus,
+   * ich lese auch nix aus … du musst informiert werden über issues." Jede
+   * Diagnose, die in der Browserkonsole endet, ist tote Information: Er schaut
+   * dort nicht hin, ich komme nicht daran.
+   *
+   * Der Weg ist derselbe, den die Meldungen ohnehin gehen — an den Worker, von
+   * dort holt ihn ein Datenlauf ab und legt ihn unter `daniel-zum-abarbeiten/`.
+   *
+   * **Drei Riegel**, damit der Melder nicht selbst zur Störquelle wird:
+   * dieselbe Art je Seite nur einmal pro Sitzung, höchstens zwanzig insgesamt,
+   * und jeder Fehler beim Melden bleibt stumm.
+   */
+  const VORFALL_GEMELDET = new Set()
+  let vorfallZahl = 0
+  async function vorfallMelden(art, daten = {}) {
+    try {
+      const schluessel = `${art}|${location.pathname}`
+      if (VORFALL_GEMELDET.has(schluessel) || vorfallZahl >= 20) return
+      VORFALL_GEMELDET.add(schluessel)
+      vorfallZahl++
+      const { token } = (await globalThis.akKontext.lesen('token', 'sync')) ?? {}
+      if (!token) return
+      await fetch(WORKER.replace('/pruefung', '/vorfall'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Lauf-Token': token },
+        body: JSON.stringify({
+          plattform: 'disneyplus',
+          art,
+          url: location.href.split('?')[0],
+          version: globalThis.akKontext.version(),
+          ...daten,
+        }),
+      })
+    } catch {
+      /* Ein Vorfallbericht darf nie im Weg stehen. */
+    }
+  }
+
+
+  /* Abstand zwischen zwei Abrufen — die Seite selbst macht einen je Klick. */
+  const TAKT = 300
+
+  /**
+   * Die Kennung einer Disney+-Adresse.
+   *
+   * Zwei Formen, weil Disney+ dieselbe Serie unter beiden führt: 27 Verweise in
+   * unserem Bestand tragen `/browse/entity-<uuid>`, 19 `/series/<slug>/<id>`.
+   * Dieselbe Regel steht in `tools/extension-offene-disney.mjs`;
+   * `disney.test.cjs` hält beide gegeneinander.
+   */
+  function kennung(url) {
+    return (
+      /\/browse\/entity-([0-9a-f-]{8,})/i.exec(url)?.[1] ??
+      /\/(?:series|movies)\/[^/]+\/([A-Za-z0-9]{6,})/.exec(url)?.[1] ??
+      null
+    )
+  }
+
+  /**
+   * Der Schlüssel einer Folge — **mit Staffel**.
+   *
+   * Der erste Anlauf merkte sich nur die Folgennummer. Bei Beyblade X waren
+   * S1E1-15 gemeldet, und damit galten **S2E1-15** als erledigt: Der Durchlauf
+   * übersprang sie, und im Briefkasten landeten Staffel 1 vollständig und
+   * Staffel 2 erst ab Folge 16 (gemessen am 26.08.2026, nachdem Daniel fragte:
+   * „2e16? wo sind die ersten 15 von s2?").
+   *
+   * Jede Staffel zählt bei Disney+ ab 1. Eine Nummer allein ist deshalb keine
+   * Kennung, sondern ein Namensvetter.
+   */
+  const folgenSchluessel = (staffel, nummer) => `${staffel ?? 1}e${nummer}`
+
+  /**
+   * Zusammenhängende Folgen als Bereich: `[1,2,3,7]` → `1-3, 7`.
+   *
+   * Fünfzig Nummern nebeneinander liest niemand; drei Bereiche schon.
+   */
+  function bereiche(nummern) {
+    const sortiert = [...new Set(nummern)].sort((a, b) => a - b)
+    if (!sortiert.length) return ''
+    const teile = []
+    let von = sortiert[0]
+    let bis = sortiert[0]
+    for (const n of sortiert.slice(1)) {
+      if (n === bis + 1) {
+        bis = n
+        continue
+      }
+      teile.push(von === bis ? `${von}` : `${von}-${bis}`)
+      von = n
+      bis = n
+    }
+    teile.push(von === bis ? `${von}` : `${von}-${bis}`)
+    return teile.join(', ')
+  }
+
+  /**
+   * Folgen je Staffel als `1e1-15, 2e1-35` — bei einem Film schlicht „Film".
+   *
+   * **Eine hohe Staffelnummer ist Disneys Zählung, kein Fehler.** Bei „Undead
+   * Unluck" steht neben `1e1-24` ein `99e1`; Disney+ führt Extras und Specials
+   * unter Nummern weit über der Serie. Daniel am 26.08.2026: „99e1? wieso steht
+   * das da?"
+   *
+   * Statt der nackten Zahl steht dort deshalb der Name, den Disney+ selbst
+   * vergibt — der sagt, was es ist.
+   */
+  function nachStaffeln(eintraege) {
+    if (eintraege.length === 1 && eintraege[0].film) return 'Film'
+    const jeStaffel = new Map()
+    for (const f of eintraege) {
+      const nr = f.staffel ?? 1
+      jeStaffel.set(nr, [...(jeStaffel.get(nr) ?? []), f.nummer])
+    }
+    return [...jeStaffel.entries()]
+      .sort((a, b) => a[0] - b[0])
+      .map(([nr, nummern]) => {
+        /*
+          Ab 90 ist es keine Staffel mehr, sondern ein Nebenblock — und der
+          traegt seinen eigenen Namen: „Undead Unluck: Winter Arc" laeuft als
+          Staffel 99. Die Suche nach „Extra" oder „Special" im Namen ging daran
+          vorbei; jetzt kommt er von der Folge selbst.
+        */
+        if (nr >= 90) {
+          const name = eintraege.find((f) => (f.staffel ?? 1) === nr && f.block)?.block
+          return `${name ?? 'Extras'} ${bereiche(nummern)}`
+        }
+        return `${nr}e${bereiche(nummern)}`
+      })
+      .join(', ')
+  }
+
+  /**
+   * Wann der nächste Lauf die Meldungen übernimmt.
+   *
+   * `refresh-hourly.yml` läuft zur Minute 23 und ruft dort `data:pruefungen`
+   * auf — der Schritt, der den Briefkasten leert. Ohne die Uhrzeit ist von
+   * außen nicht zu unterscheiden, ob der Lauf noch aussteht oder seine Arbeit
+   * nicht getan hat. GitHub startet geplante Läufe oft ein paar Minuten später,
+   * deshalb „ab", nicht „um".
+   */
+  function naechsteUebernahme(jetzt = new Date()) {
+    const ziel = new Date(jetzt)
+    ziel.setSeconds(0, 0)
+    ziel.setMinutes(23)
+    if (ziel <= jetzt) ziel.setTime(ziel.getTime() + 3600000)
+    return ziel
+  }
+
+  const uhrzeit = (d) =>
+    `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+
+  const liste = globalThis.AK_OFFENE_DISNEY ?? {}
+
+  /*
+    **Welches Werk meint diese Meldung — der Auftrag weiß es, die Adresse nicht.**
+
+    Die Rechnung steht in disney-staffeln.js: Staffelnummer **und** die Folgenzahl der
+    Seite, weil Disney+ und unser Bestand die Staffeln verschieden zählen (Yozakura,
+    28.09.2026). Hier bleiben nur die Aufrufe — disney.js ist über die Dateigrenze
+    gewachsen (check:umfang).
+  */
+  /*
+    `undefined`, nicht `null` — sonst erkennt der erste Durchlauf auf einer
+    Seite ohne Kennung keinen Wechsel (`null === null`), und der Knopf erscheint
+    erst nach einer Navigation („ein reload auf homepage zeigt anime-kalender
+    button nicht an", 26.08.2026).
+  */
+  let seite
+  let eintrag = null
+  let folgen = []
+  let anbieterStaffeln = []
+  let erwartet = 0
+  let bereit = false
+  let angefordert = false
+  let gelaufen = false
+  let ergebnisse = []
+  let gemeldeteNummern = new Set()
+  /* Laut Prüfstand schon beantwortet (`disney-beantwortet.js`): undefined = ungeklärt, true = passiv, false = prüfen. */
+  let beantwortet
+  const offeneFragen = new Map()
+  /** Je Adresse die gemeldeten Folgennummern — für die Liste. */
+  let briefkasten = new Map()
+  /* Adressen, unter denen je gemeldet wurde — auch übernommene (Worker-Feld `gemeldet`). */
+  let gemeldeteAdressen = new Set()
+  /* Adressen mit Wiedervorlage, zu denen nach deren `seit` gemeldet wurde — siehe `istErledigt`. */
+  let erneutBeantwortet = new Set()
+  /* Adressen, zu denen die Ferne (`?gemeldet=`) Meldungen kennt, die die 30 Minuten alte Liste noch nicht führt. */
+  let wartetAufUebernahme = globalThis.AK_DISNEY_NETZ.gemerktesSet()
+  /* Für den Durchgang (`disney-durchgang.js`): Ergebnis von Prüfen und Melden als Ereignis. */
+  const signal = (art, detail) => document.dispatchEvent(new CustomEvent(`ak-disney-${art}`, { detail }))
+
+  // --- Brücke zur Seitenwelt ------------------------------------------------
+
+  window.addEventListener('message', (e) => {
+    if (e.source !== window || e.data?.marke !== MARKE) return
+    if (e.data.antwortFuer) {
+      offeneFragen.get(e.data.antwortFuer)?.(e.data)
+      offeneFragen.delete(e.data.antwortFuer)
+      return
+    }
+    if (Array.isArray(e.data.folgen)) folgen = e.data.folgen
+    if (Array.isArray(e.data.staffeln)) anbieterStaffeln = e.data.staffeln
+    if (Number.isFinite(e.data.erwartet)) erwartet = e.data.erwartet
+    globalThis.AK_DISNEY_BEANTWORTET.folgenZahl(erwartet, gemeldeteNummern.size)
+    if (e.data.bereit) bereit = true
+
+    if (!eintrag || beantwortet !== false) return
+
+    /* Die Anforderung wird wiederholt, solange der Leser ein Hindernis meldet (fehlendes Token); sonst stand „sammle Folgen" für immer da (26.08.2026). */
+    if (e.data.hindernis) {
+      angefordert = false
+      zeigePruefung(`${eintrag.titel}\nwarte auf die Seite (${e.data.hindernis}) …`)
+      return
+    }
+    if (bereit && !angefordert) {
+      angefordert = true
+      /* Ein Film ist mit einer Kennung vollständig — nichts nachzuladen. */
+      if (folgen.length === 1 && folgen[0].film) return void vielleichtPruefen()
+      window.postMessage({ marke: MARKE_STEUER, allesHolen: true }, '*')
+      zeigePruefung(`${eintrag.titel}\nsammle Folgen …`, { laeuft: true })
+      return
+    }
+    /* Losgelegt wird, wenn die Folgen da sind (so viele wie die Staffeln ansagen) oder `vollstaendig` kommt — ein Signal kann ausbleiben, eine Zahl nicht (26.08.2026). */
+    const beisammen = erwartet > 0 && folgen.length >= erwartet
+    if (!e.data.vollstaendig && !beisammen) {
+      if (erwartet) {
+        const offen = Math.max(0, erwartet - gemeldeteNummern.size)
+        zeigePruefung(
+          `${eintrag.titel}\nsammle Folgen … ${folgen.length}/${erwartet}` +
+            (gemeldeteNummern.size ? `\n${gemeldeteNummern.size} gemeldet, ${offen} zu prüfen` : ''),
+          { laeuft: true },
+        )
+      }
+      return
+    }
+    void vielleichtPruefen()
+  })
+
+  /* Bahnen, Senden mit Wiederholung, frische Meldungen: `disney-netz.js` */
+  const { inBahnen } = globalThis.AK_DISNEY_NETZ
+
+  const frage = (playbackId) =>
+    new Promise((fertig) => {
+      offeneFragen.set(playbackId, fertig)
+      window.postMessage({ marke: MARKE_STEUER, playbackId }, '*')
+      setTimeout(() => {
+        if (offeneFragen.delete(playbackId)) fertig({ fehler: 'keine Antwort' })
+      }, 15000)
+    })
+
+  // --- Der Kasten ----------------------------------------------------------
+
+  /**
+   * **Dasselbe Gerüst wie bei Netflix und Prime.**
+   *
+   * Daniel am 10.09.2026: „am besten selbe extension design auf allen seiten
+   * fürs reporten, aber jede seite hat eigenheiten, also eigene melde
+   * elemente." Netflix und Prime zogen am selben Tag um; Disney+ lud `box.js`
+   * laut Manifest, rief es aber nie — hier schwebten die beiden Knöpfe weiter
+   * einzeln am Bildschirmrand, jeder mit seiner eigenen Lage im Inline-Stil.
+   *
+   * **Der Schlüssel ist die Kennung der Seite, nicht die Adresse.** Disney+
+   * hängt an eine Titeladresse Parameter, die den Kasten nichts angehen; die
+   * Kennung ist genau das, was `pruefeAdresse()` ohnehin als Seitenwechsel
+   * ansieht. Fehlt sie (Fehlerseite, Startseite), trägt der Pfad.
+   */
+  function disneyKasten() {
+    return akBox('ak-disney-kasten', kennung(location.href) ?? location.pathname)
+  }
+
+  /**
+   * Die Debug-Zeile — Bericht und Ruhemodus, wie bei den anderen beiden.
+   *
+   * Der Diagnosebericht hing hier bisher allein an einem Ereignis am
+   * `document` und setzte damit eine offene Konsole voraus — genau die will
+   * Daniel nicht bedienen (10.09.2026).
+   */
+  function disneyDebugZeile(kasten) {
+    akDebugLeiste(kasten, [
+      {
+        an: '⏸',
+        aus: '▶',
+        text: 'Ruhemodus',
+        titel: 'Hintergrundvideo und Animationen anhalten (für Aufnahmen)',
+        aktiv: () => document.documentElement?.classList?.contains('ak-ruhig') ?? false,
+        schalten: () => document.dispatchEvent(new CustomEvent('ak-ruhig')),
+      },
+      akBerichtSchalter(() => document.dispatchEvent(new CustomEvent('ak-report'))),
+    ])
+  }
+
+  // --- Die beiden Knöpfe ----------------------------------------------------
+
+  let pruefKnopf = null
+  /*
+    Ein Lebenszeichen: Ohne es sieht ein Knopf, der zwei Minuten „sammle Folgen"
+    sagt, aus wie einer, der hängt. Die Zeichen wechseln jede halbe Sekunde, solange nichts anderes
+    angezeigt wird.
+  */
+  const ZEICHEN = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
+  let dreher = null
+  let dreherText = ''
+  function drehe(text) {
+    dreherText = text
+    if (dreher) return
+    let i = 0
+    dreher = setInterval(() => {
+      if (!pruefKnopf) return
+      pruefKnopf.textContent = `${ZEICHEN[i++ % ZEICHEN.length]} ${dreherText}`
+    }, 500)
+  }
+  function haltAn() {
+    if (dreher) clearInterval(dreher)
+    dreher = null
+  }
+
+  function zeigePruefung(text, { klasse = null, klick = null, laeuft = false } = {}) {
+    const kasten = disneyKasten()
+    if (!pruefKnopf?.isConnected) {
+      pruefKnopf = document.createElement('button')
+      pruefKnopf.type = 'button'
+      kasten.querySelector('.ak-z-melden')?.appendChild(pruefKnopf)
+    }
+    disneyDebugZeile(kasten)
+    if (laeuft) drehe(text)
+    else {
+      haltAn()
+      pruefKnopf.textContent = text
+    }
+    /*
+      Die Farben kommen aus `melder.css`, nicht mehr aus dem Inline-Stil: Ein
+      grüner Melde-Knopf soll auf allen drei Seiten derselbe grüne sein.
+    */
+    pruefKnopf.className =
+      'ak-melder' + (klasse === 'gut' ? ' ak-erfolg' : klasse === 'schlecht' ? ' ak-fehler' : '')
+    globalThis.AK_MELDE_SPERRE.setzeKlick(pruefKnopf, klick)
+  }
+
+  // --- Übersicht ------------------------------------------------------------
+
+  let uebersichtKnopf = null
+  let dialog = null
+  /* Gemeldetes bleibt eingeklappt, bis jemand danach fragt. */
+  let zeigeErledigte = false
+
+  /**
+   * Ist zu diesem Titel alles gemeldet, was Disney+ führt?
+   *
+   * „Alles" heißt hier: mindestens eine Meldung, und keine Folge mehr offen,
+   * soweit wir das wissen. Ein Titel mit „nichts da" zählt ebenfalls als
+   * erledigt — er ist beantwortet, nur eben mit Nein.
+   *
+   * Der Wert kommt aus dem Briefkasten, nicht aus einem eigenen Gedächtnis:
+   * Der Briefkasten führt nur Unübernommenes; `gemeldeteAdressen` (Worker-Feld `gemeldet`) kennt
+   * auch Übernommenes seit dem Prüfstand — sonst wäre ein übernommener Titel bis zur nächsten
+   * Listenerzeugung wieder „offen" (08.10.2026).
+   */
+  function istErledigt(e) {
+    /*
+      Eine Wiedervorlage ist erst mit einer Meldung **nach** ihrem `seit` erledigt. Vorher
+      zählte jede alte Meldung: Snowball Earth (Synchro läuft noch) und Yu-Gi-Oh! standen als
+      „alles gemeldet“ da, und auf der Titelseite gab es nichts zu melden (26.09.2026).
+    */
+    if (e.seit) return globalThis.AK_DISNEY_WEG.erledigt(e.url, e.seit, erneutBeantwortet.has(e.url))
+    return globalThis.AK_DISNEY_WEG.erledigt(e.url, null, briefkasten.has(e.url) || gemeldeteAdressen.has(e.url) || wartetAufUebernahme.has(e.url))
+  }
+
+  const zurueckBis = (url) => globalThis.akDisneyZurueckBis(localStorage, url, Date.now())
+  function offeneEintraege() {
+    return Object.entries(liste)
+      .map(([id, wert]) => ({ id, ...wert, offen: wert.staffeln.filter((st) => st.offen).length }))
+      .filter((e) => e.offen > 0)
+      .sort((a, b) => a.titel.localeCompare(b.titel, 'de'))
+  }
+
+  /*
+    Welche Folgennummern zu jeder Adresse im Briefkasten liegen.
+
+    Ein Abruf für alle 31 Titel, nicht einer je Titel. Ohne ihn sagt die Liste
+    nichts darüber, was schon erledigt ist.
+  */
+  async function briefkastenHolen() {
+    try {
+      const [antwort] = await Promise.all([fetch(`${WORKER}?zaehlen=1&nummern=1`, { cache: 'no-store' }), globalThis.akDisneyStandEinarbeiten(liste)])
+      if (!antwort.ok) return
+      const daten = await antwort.json()
+      const gesammelt = new Map()
+      /*
+        Der Worker antwortet je nach Fassung mit `eintraege` (Adresse + Nummer)
+        oder nur mit `adressen`. Beides wird gelesen; fehlt die Nummer, zählt
+        der Eintrag trotzdem.
+      */
+      for (const e of daten.eintraege ?? []) {
+        const dazu = gesammelt.get(e.url) ?? []
+        /*
+          Eine Meldung ohne Folgennummer ist keine Folge — „nichts da" trägt
+          keine. Ohne diese Prüfung stand in der Liste „Aoashi 1e0" (Daniel,
+          26.08.2026).
+        */
+        if (Number(e.folge_nr) > 0)
+          dazu.push({ staffel: Number(e.staffel) || 1, nummer: Number(e.folge_nr) })
+        gesammelt.set(e.url, dazu)
+      }
+      for (const url of daten.adressen ?? []) {
+        if (!gesammelt.has(url)) gesammelt.set(url, [])
+      }
+      briefkasten = gesammelt
+      gemeldeteAdressen = new Set(Array.isArray(daten.gemeldet) ? daten.gemeldet : [])
+    } catch {
+      /* Ohne Auskunft bleibt die Liste bei dem, was der Datensatz sagt. */
+    }
+    /* Wiedervorlagen einzeln (nur `?gemeldet=` nennt das Datum jeder Meldung), aber gemerkt wie die offenen Adressen. */
+    const seitVon = new Map(Object.values(liste).filter((e) => e.seit && e.url).map((e) => [e.url, e.seit]))
+    /* Autoritativ je offener Adresse nachfragen (gebündelt, gemerkt); ohne Auskunft bleibt der Zustand. */
+    const offene = [...new Set([...offeneEintraege().filter((e) => !e.seit && !istErledigt(e)).map((e) => e.url), ...wartetAufUebernahme])]
+    /* Alle Adressen in einer Anfrage, erst beim ersten Bedarf (`disney-sammel.js`). */
+    const sammel = globalThis.akDisneySammel?.(WORKER, () => [...seitVon.keys(), ...offene])
+    erneutBeantwortet = await globalThis.AK_DISNEY_NETZ.frischGemeldet(
+      [...seitVon.keys()],
+      (u) => gemeldeteHolen(u, seitVon.get(u), true, sammel),
+      { seit: (u) => seitVon.get(u) },
+    )
+    wartetAufUebernahme = await globalThis.AK_DISNEY_NETZ.frischGemeldet(offene, (u) => gemeldeteHolen(u, null, true, sammel))
+  }
+
+  function dialogSchliessen() {
+    dialog?.remove()
+    dialog = null
+  }
+
+  /** „▶ alle durchgehen" — der Ablauf steht in `disney-durchgang.js`. */
+  function durchgangKnopf(kopf, nochOffen) {
+    const lauf = globalThis.AK_DISNEY_DURCHGANG
+    if (!lauf || (!nochOffen && !lauf.laeuft())) return
+    const knopf = document.createElement('button')
+    knopf.type = 'button'
+    knopf.style.cssText =
+      'padding:2px 9px;border-radius:6px;border:1px solid #ffffff33;background:none;color:#fff;font:11px system-ui,sans-serif;cursor:pointer'
+    knopf.textContent = lauf.laeuft() ? '⏹ Durchgang beenden' : '▶ alle durchgehen'
+    knopf.title = 'Öffnet die offenen Titel nacheinander, prüft und meldet sie — in diesem Tab.'
+    knopf.onclick = () => {
+      dialogSchliessen()
+      if (lauf.laeuft()) lauf.beenden()
+      else lauf.starten()
+    }
+    kopf.appendChild(knopf)
+  }
+
+  function dialogOeffnen() {
+    if (dialog) return dialogSchliessen()
+    const alle = offeneEintraege()
+    const erledigte = alle.filter(istErledigt)
+    const eintraege = zeigeErledigte ? alle : alle.filter((e) => !istErledigt(e))
+    dialog = document.createElement('div')
+    /* Über dem Kasten: Der Abstand kommt aus dessen Lage, der Kasten ist unterschiedlich hoch (13.09.2026). */
+    const kastenOben = disneyKasten().getBoundingClientRect().top
+    const unten = Math.max(16, Math.round(window.innerHeight - kastenOben + 12))
+    dialog.style.cssText =
+      `position:fixed;right:16px;bottom:${unten}px;z-index:2147483001;width:min(460px,92vw);` +
+      `max-height:min(70vh,calc(100vh - ${unten + 16}px));overflow:auto;background:#111;color:#fff;border:1px solid #ffffff33;` +
+      'border-radius:10px;padding:14px 16px;font:13px/1.5 system-ui,sans-serif;' +
+      'box-shadow:0 8px 32px #000a'
+
+    const kopf = document.createElement('div')
+    kopf.style.cssText = 'display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap'
+    const titelzeile = document.createElement('strong')
+    const zaehlung = globalThis.akDisneyZaehlung(alle, istErledigt, zurueckBis)
+    titelzeile.textContent = globalThis.akDisneyKopfText(zaehlung)
+    kopf.appendChild(titelzeile)
+    durchgangKnopf(kopf, zaehlung.offen)
+
+    /* Wann das Gemeldete hier wieder verschwindet. */
+    if ([...briefkasten.values()].some((n) => n.length >= 0) && briefkasten.size) {
+      const lauf = document.createElement('span')
+      lauf.style.cssText = 'font-size:11px;opacity:.65;margin-left:auto;white-space:nowrap'
+      lauf.textContent = `Übernahme ab ${uhrzeit(naechsteUebernahme())}`
+      lauf.title =
+        'Der stündliche Datenlauf holt die Meldungen ab und schreibt sie in den Kalender. Danach sind die grünen Bereiche hier weg.'
+      kopf.appendChild(lauf)
+    }
+    /* Gemeldetes ist standardmäßig ausgeblendet, wie bei Netflix. */
+    if (erledigte.length) {
+      const umschalter = document.createElement('button')
+      umschalter.type = 'button'
+      umschalter.style.cssText =
+        'padding:2px 9px;border-radius:6px;border:1px solid #ffffff33;background:none;' +
+        'color:#fff;font:11px system-ui,sans-serif;cursor:pointer'
+      const beschriften = () => {
+        umschalter.textContent = zeigeErledigte
+          ? `${erledigte.length} gemeldet ausblenden`
+          : `${erledigte.length} gemeldet zeigen`
+      }
+      beschriften()
+      umschalter.onclick = () => {
+        zeigeErledigte = !zeigeErledigte
+        dialogSchliessen()
+        dialogOeffnen()
+      }
+      kopf.appendChild(umschalter)
+    }
+
+    const zu = document.createElement('button')
+    zu.textContent = '×'
+    zu.title = 'Schließen (Esc)'
+    zu.style.cssText =
+      'background:none;border:none;color:#fff;font-size:18px;cursor:pointer;line-height:1'
+    zu.onclick = dialogSchliessen
+    kopf.appendChild(zu)
+    dialog.appendChild(kopf)
+
+    for (const e of eintraege) {
+      const zeile = document.createElement('div')
+      zeile.style.cssText = 'padding:6px 0;border-top:1px solid #ffffff1a'
+
+      const verweis = document.createElement('a')
+      verweis.href = e.url
+      verweis.textContent = e.titel
+      verweis.style.cssText = 'color:#7dd3fc;text-decoration:none'
+      /* Die Zielseite weiß nach einer Umleitung nicht mehr, welcher Titel gemeint war — der Klick hinterlegt ihn. */
+      verweis.onclick = () => merkeZiel(e.id)
+      zeile.appendChild(verweis)
+
+      const gemeldet = briefkasten.get(e.url) ?? null
+      if (gemeldet?.length) {
+        const gruen = document.createElement('span')
+        gruen.style.cssText = 'margin-left:8px;color:#4ade80'
+        gruen.textContent = nachStaffeln(gemeldet)
+        zeile.appendChild(gruen)
+      } else {
+        /* Ohne Meldung: was unser Bestand erwartet, mit „ca." — Disney+ teilt Staffeln anders ein. */
+        const grau = document.createElement('span')
+        grau.style.cssText = 'margin-left:8px;opacity:.6'
+        const wartet = istErledigt(e)
+        grau.textContent = wartet ? 'gemeldet, wartet auf Übernahme' : globalThis.akDisneyZeilenText(e, zurueckBis(e.url))
+        zeile.appendChild(grau)
+      }
+
+      /* „Nicht da" steht in der Liste: Ein nicht verfügbarer Titel leitet auf die Startseite um (26.08.2026). */
+      const wegKnopf = document.createElement('button')
+      wegKnopf.type = 'button'
+      wegKnopf.textContent = 'nichts da?'
+      wegKnopf.style.cssText =
+        'margin-left:8px;padding:1px 7px;border-radius:6px;border:1px solid #ffffff33;' +
+        'background:none;color:#fca5a5;font:11px system-ui,sans-serif;cursor:pointer'
+      wegKnopf.onclick = async (ev) => {
+        ev.preventDefault()
+        wegKnopf.disabled = true
+        wegKnopf.textContent = '…'
+        const ok = await meldeWeg(e)
+        if (!ok) {
+          wegKnopf.textContent = 'ging nicht'
+          return
+        }
+        /* Die Zeile verschwindet, sobald der Briefkasten die Meldung kennt — deshalb neu holen. */
+        await briefkastenHolen()
+        zeigeUebersicht()
+        dialogSchliessen()
+        dialogOeffnen()
+      }
+      zeile.appendChild(wegKnopf)
+
+      dialog.appendChild(zeile)
+    }
+    document.body.appendChild(dialog)
+  }
+
+  function zeigeUebersicht() {
+    const offen = offeneEintraege()
+    const kasten = disneyKasten()
+    if (!uebersichtKnopf?.isConnected) {
+      uebersichtKnopf = document.createElement('button')
+      uebersichtKnopf.type = 'button'
+      /* Zwei Klassen wie bei Netflix und Prime: Form und Farbe, ohne feste Lage am Rand. */
+      uebersichtKnopf.className = 'ak-uebersicht ak-uebersicht-innen'
+      uebersichtKnopf.onclick = dialogOeffnen
+      kasten.querySelector('.ak-such-fuss-mitte')?.appendChild(uebersichtKnopf)
+    }
+    disneyDebugZeile(kasten)
+    /* Gezählt wird der Titel, nicht die Meldung — teilweise gemeldet ist noch offen (26.08.2026). */
+    const zaehlung = globalThis.akDisneyZaehlung(offen, istErledigt, zurueckBis)
+    const nochOffen = akZaehler(null, zaehlung.offen, !!globalThis.AK_DISNEY_DURCHGANG?.laeuft())
+    uebersichtKnopf.textContent = globalThis.akDisneyPilleText(nochOffen, zaehlung)
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') dialogSchliessen()
+  })
+
+  // --- Was schon gemeldet ist ----------------------------------------------
+
+  /** `seit`: nur Meldungen ab diesem Zeitpunkt zählen — Maßstab ist der Prüfstand (`pruefstand-zeit.js`). */
+  async function gemeldeteHolen(url, seit = null, wirf = false, sammel = null) {
+    if (typeof globalThis.akGemeldetSeit === 'function') seit = await globalThis.akGemeldetSeit(seit)
+    try {
+      const daten = await globalThis.akDisneyGemeldet(WORKER, url, sammel)
+      /* Die Ferne antwortet mit Nummern und Staffeln; der Schlüssel braucht beides. */
+      const paare = daten.paare ?? null
+      if (seit) {
+        return new Set(
+          (paare ?? [])
+            .filter((p) => String(p.am ?? '') >= seit)
+            .map((p) => folgenSchluessel(p.staffel, p.nummer)),
+        )
+      }
+      if (paare) return new Set(paare.map((p) => folgenSchluessel(p.staffel, p.nummer)))
+      return new Set((daten.nummern ?? []).map((n) => folgenSchluessel(daten.staffel ?? 1, Number(n))))
+    } catch (fehler) {
+      /* Ohne Auskunft lieber einmal zu viel prüfen als eine Lücke lassen; `wirf`: der Ablage keine Nichtauskunft als „nichts“ unterschieben. */
+      if (wirf) throw fehler
+      return new Set()
+    }
+  }
+
+  // --- Prüfen ---------------------------------------------------------------
+
+  async function vielleichtPruefen() {
+    if (gelaufen || !eintrag || folgen.length === 0) return
+    gelaufen = true
+
+    const adresse = eintrag.url ?? location.href.split('?')[0]
+    gemeldeteNummern = await gemeldeteHolen(adresse, eintrag.seit ?? null)
+
+    /* Nach Staffel und Folge, nicht in Ladereihenfolge. */
+    const alle = [...folgen].sort(
+      (a, b) => (a.staffel ?? 0) - (b.staffel ?? 0) || a.nummer - b.nummer,
+    )
+    const istGemeldet = (f) => gemeldeteNummern.has(folgenSchluessel(f.staffel, f.nummer))
+    const zuPruefen = alle.filter((f) => !istGemeldet(f))
+    const schon = alle.filter(istGemeldet)
+
+    if (!zuPruefen.length) {
+      zeigePruefung(`${eintrag.titel}\n✓ ${nachStaffeln(alle)} gemeldet`, { klasse: 'gut' })
+      return signal('geprueft', { url: eintrag.url, zuMelden: 0, schon: alle.length })
+    }
+    zeigePruefung(
+      `${eintrag.titel}\nprüfe ${zuPruefen.length} Folgen …` +
+        (schon.length ? `\n✓ ${nachStaffeln(schon)}` : ''),
+    )
+
+    const beginn = Date.now()
+    ergebnisse = await inBahnen(
+      zuPruefen,
+      async (f) => ({ ...f, ...(await frage(f.playbackId)) }),
+      (n) =>
+        zeigePruefung(`${eintrag.titel}\nprüfe ${n}/${zuPruefen.length}` +
+          (schon.length ? `\n✓ ${nachStaffeln(schon)}` : ''), { laeuft: true }),
+    )
+    const sekunden = ((Date.now() - beginn) / 1000).toFixed(1)
+
+    const echte = ergebnisse.filter((r) => r.sprachen)
+    const mitDeutsch = echte.filter((r) => r.sprachen.includes('de'))
+
+    /* Eine Tabelle, nicht fünfzig Zeilen — getrennte Ausgaben muss man suchen. */
+    console.log(
+      `[Anime-Kalender] ${eintrag.titel}: ${echte.length} Folgen in ${sekunden} s, ohne Player-Start` +
+        (schon.length ? ` (${schon.length} schon gemeldet)` : '') +
+        (anbieterStaffeln.length
+          ? ` — Disney+ teilt: ${anbieterStaffeln.map((s) => `${s.name}: ${s.gesamt}`).join(', ')}`
+          : ''),
+    )
+    console.table(
+      ergebnisse.map((r) => ({
+        Folge: `S${r.staffel ?? '?'}E${r.nummer}`,
+        Titel: (r.titel ?? '').slice(0, 32),
+        Deutsch: r.sprachen ? (r.sprachen.includes('de') ? 'ja' : 'NEIN') : (r.fehler ?? '?'),
+        Tonspuren: (r.sprachen ?? []).join(' '),
+      })),
+    )
+
+    if (!echte.length) {
+      zeigePruefung(`${eintrag.titel}\nkeine Antwort — ${ergebnisse[0]?.fehler ?? 'unbekannt'}`, {
+        klasse: 'schlecht',
+      })
+      return signal('geprueft', { url: eintrag.url, zuMelden: 0, fehler: ergebnisse[0]?.fehler ?? 'unbekannt' })
+    }
+    zeigePruefung(
+      `${eintrag.titel}` +
+        (schon.length ? `\n✓ ${nachStaffeln(schon)}` : '') +
+        `\n▸ ${nachStaffeln(echte)} melden (${mitDeutsch.length}× deutsch)`,
+      { klasse: mitDeutsch.length ? 'gut' : null, klick: melden },
+    )
+    signal('geprueft', { url: eintrag.url, zuMelden: echte.length })
+  }
+
+  // --- Melden ---------------------------------------------------------------
+
+  /** Ein Titel, den Disney+ hier gar nicht führt. */
+  function meldeWeg(e) {
+    return globalThis.akDisneyWegSenden(e, { worker: WORKER, anbieterStaffeln, weg: globalThis.AK_DISNEY_WEG })
+  }
+
+  /* Was nach dem Verlassen der Titelseite noch läuft, sendet nicht mehr (19.11.2026). */
+  const titelBindung = globalThis.akTitelBindung.fuer({ kennung: () => kennung(location.href) ?? null })
+
+  async function melden() {
+    const karte = titelBindung.karte()
+    const echte = ergebnisse.filter(
+      (r) => r.sprachen && !gemeldeteNummern.has(folgenSchluessel(r.staffel, r.nummer)),
+    )
+    if (!echte.length) return signal('gemeldet', { ok: true })
+    const { token } = (await globalThis.akKontext.lesen('token', 'sync')) ?? {}
+    if (!token) {
+      signal('gemeldet', { ok: false })
+      return zeigePruefung(globalThis.akKontext.keinTokenText(), {
+        klasse: 'schlecht',
+      })
+    }
+    if (!titelBindung.gueltig(karte)) return signal('gemeldet', { ok: false })
+
+    /* Wie Disney+ die Reihe teilt — damit lässt sich die Meldung später unserer Staffel zuordnen. */
+    const staffeln = globalThis.AK_DISNEY_STAFFELN.staffelnDerMeldung(echte, anbieterStaffeln)
+
+    let geschafft = 0
+    const gescheitert = new Map() // Folgenschlüssel → Fehlertext
+    await inBahnen(
+      echte,
+      async (r) => {
+        if (!titelBindung.gueltig(karte)) return
+        /* Mit Wiederholung und `keepalive` (`disney-netz.js`): ein Fehlschlag ohne Antwort ist meist vorübergehend. */
+        const antwort = await globalThis.AK_DISNEY_NETZ.sende(WORKER, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Lauf-Token': token },
+          body: JSON.stringify({
+            plattform: 'disneyplus',
+            /* Die Adresse aus unserem Bestand — danach sucht die Pipeline. */
+            url: eintrag.url ?? location.href.split('?')[0],
+            ...globalThis.akKontext.meldungKopf(),
+            /* Welches Werk gemeint ist — der Auftrag weiß es, die Adresse nicht. */
+            titelId: globalThis.AK_DISNEY_STAFFELN.titelIdFuer(eintrag.staffeln, r.staffel ?? null, anbieterStaffeln),
+            sprachen: r.sprachen,
+            /* Jede Folge ist einzeln abgefragt — gemessen, nie angenommen. */
+            vorhanden: 'ja',
+            ton_de: r.sprachen.includes('de') ? 'ja' : 'nein',
+            art: 'gemessen',
+            titel: eintrag.titel,
+            folge: r.titel || null,
+            folge_nr: r.nummer,
+            staffel: r.staffel,
+            staffeln,
+            serientitel: eintrag.titel,
+            /* Die Rohfolge, unverändert: Sammeln und Zuordnen sind getrennt (docs/wissen/erweiterung.md, 01.09.2026). */
+            rohfolgen: [
+              {
+                gti: r.playbackId ?? null,
+                nummer: r.nummer ?? null,
+                titel: r.titel || null,
+                sprachen: r.sprachen ?? [],
+                staffelNr: Number.isFinite(r.staffel) ? r.staffel : null,
+                /* Stufe 1 je Folge (Migration 035) — dieselbe Beobachtung wie die Meldung. */
+                vorhanden: 'ja',
+                ton_de: r.sprachen.includes('de') ? 'ja' : 'nein',
+              },
+            ],
+          }),
+        })
+        if (antwort.ok) {
+          geschafft++
+          /* Sofort merken — ein zweiter Klick soll nichts verdoppeln. */
+          gemeldeteNummern.add(folgenSchluessel(r.staffel, r.nummer))
+        } else {
+          /* Eine ausgefallene Meldung ist kein Grund, die übrigen zu lassen. */
+          gescheitert.set(folgenSchluessel(r.staffel, r.nummer), `S${r.staffel}E${r.nummer}: ${antwort.fehler}`)
+        }
+      },
+      (n) => zeigePruefung(`${eintrag.titel}\nmelde ${n}/${echte.length}`, { laeuft: true }),
+      3, // Bahnen: fünf gleichzeitige Meldungen brachten Fehlschläge ohne Antwort (08.10.2026)
+    )
+    /* Die Anfrage kann angekommen sein und nur die Antwort ausgeblieben (Naruto Shippuden: 166/166 da, 14 „Failed to fetch“) — erst fragen, dann „nicht angekommen“. */
+    if (gescheitert.size)
+      for (const k of await gemeldeteHolen(eintrag.url ?? location.href.split('?')[0]))
+        if (gescheitert.delete(k)) (geschafft++, gemeldeteNummern.add(k))
+    if (geschafft) wartetAufUebernahme.add(eintrag.url ?? location.href.split('?')[0])
+    const fehler = [...gescheitert.values()]
+    if (fehler.length) {
+      console.warn(`[Anime-Kalender] ${fehler.length} Meldungen kamen nicht an:`, fehler)
+      /* Verlorene Befunde gehen an den Worker, nicht in die Konsole (10.09.2026). */
+      void vorfallMelden('melden_fehlgeschlagen', {
+        text: `${fehler.length} Meldung(en) kamen nicht an: ${fehler.slice(0, 3).join('; ')}`,
+      })
+    }
+    await briefkastenHolen()
+    zeigeUebersicht()
+    const alle = [...folgen].sort(
+      (a, b) => (a.staffel ?? 0) - (b.staffel ?? 0) || a.nummer - b.nummer,
+    )
+    zeigePruefung(
+      /* Die Zahl der deutschen Folgen bleibt nach dem Melden stehen. */
+      `${eintrag.titel}\n✓ ${nachStaffeln(
+        alle.filter((f) => gemeldeteNummern.has(folgenSchluessel(f.staffel, f.nummer))),
+      )} gemeldet (${echte.filter((r) => r.sprachen.includes('de')).length}× deutsch)` +
+        (fehler.length ? `\n${fehler.length} kamen nicht an — Klick sendet sie erneut` : '') +
+        `\nÜbernahme ab ${uhrzeit(naechsteUebernahme())}`,
+      {
+        /* Rot heißt: etwas kam nicht an — der Grund steht in der Zeile darunter. */
+        klasse: geschafft === echte.length ? 'gut' : 'schlecht',
+        klick: geschafft === echte.length ? null : melden,
+      },
+    )
+    signal('gemeldet', { ok: geschafft === echte.length })
+  }
+
+  // --- Wenn Disney+ die Seite gar nicht zeigt ------------------------------
+
+  /*
+    **Wohin der Klick ging.** Disney+ leitet um (`/series/…` → `/browse/entity-…`) oder zeigt eine
+    Fehlerseite ohne Kennung (`/error?src=bap`) — nur der Klick weiß dann, welcher Titel gemeint war.
+  */
+  const ZIEL_SCHLUESSEL = 'ak-disney-ziel'
+
+  function merkeZiel(id) {
+    try {
+      sessionStorage.setItem(ZIEL_SCHLUESSEL, JSON.stringify({ id, zeit: Date.now() }))
+    } catch {
+      /* Ohne Speicher fällt nur diese Bequemlichkeit aus. */
+    }
+  }
+
+  function letztesZiel() {
+    try {
+      const roh = sessionStorage.getItem(ZIEL_SCHLUESSEL)
+      if (!roh) return null
+      const { id, zeit } = JSON.parse(roh)
+      if (Date.now() - zeit > 600000) return null
+      return liste[id] ? { id, ...liste[id] } : null
+    } catch {
+      return null
+    }
+  }
+
+  /**
+   * **Der Merker gilt der Seite, auf die der Klick führt**: der eigenen Adresse und der ersten anderen
+   * in 20 s (Umleitung); nach einer Seite ohne Kennung oder später ist er verbraucht. Vorher galt er
+   * zehn Minuten für jede Seite — 25 Folgen eines von Hand geöffneten Titels landeten unter
+   * „Mission: Yozakura Family Season 2" (28.09.2026, verworfen). Test: `disney-ziel.test.cjs`.
+   */
+  function zielFuer(jetzt) {
+    let z = null
+    try {
+      z = JSON.parse(sessionStorage.getItem(ZIEL_SCHLUESSEL) ?? 'null')
+    } catch {
+      return null
+    }
+    const ziel = z && Date.now() - z.zeit <= 600000 && liste[z.id] ? { id: z.id, ...liste[z.id] } : null
+    if (!ziel) return null
+    if (jetzt === kennung(ziel.url)) return ziel
+    const binden = (wert) => {
+      try {
+        sessionStorage.setItem(ZIEL_SCHLUESSEL, JSON.stringify({ ...z, gebunden: wert }))
+      } catch {
+        /* Ohne Speicher gilt der Merker nur für die eigene Adresse. */
+      }
+    }
+    if (z.gebunden !== undefined) return z.gebunden === jetzt ? ziel : null
+    if (!jetzt || Date.now() - z.zeit > 20000) return void binden(jetzt ?? null)
+    binden(jetzt)
+    return ziel
+  }
+
+  function istFehlerseite() {
+    return /\/error(\?|$)/.test(location.pathname + location.search)
+  }
+
+  function vielleichtFehlerseite() {
+    if (!istFehlerseite()) return false
+    const ziel = letztesZiel()
+    if (!ziel) return false
+    /*
+      **Aus der Fehlerseite wird weiterhin keine Meldung — aber ein Vorfall.**
+
+      Die Unterscheidung steht weiter oben: `/de-de/error?src=bap` kann eine
+      Störung sein, die beim zweiten Klick weg ist (real am 26.08.2026 bei
+      „Bright Sun: Dark Shadows"). Als Befund über den Titel taugt sie deshalb
+      nichts, und daran ändert sich nichts.
+
+      **Ihre Häufigkeit ist trotzdem eine Auskunft.** Landet Daniel bei jedem
+      dritten Klick aus der Prüfliste auf einer Fehlerseite, stimmt etwas mit
+      unseren Adressen nicht — und das sieht niemand, solange jeder Fall
+      einzeln vor ihm steht und danach vergessen ist. Genau dafür gibt es den
+      Kanal seit 4.17.11.
+    */
+    /* Kein `titel`-Feld: Der Vorfall kennt die Spalte nicht, der Text trägt ihn. */
+    void vorfallMelden('stoerung', {
+      text: `Disney+ zeigte eine Fehlerseite statt „${ziel.titel}"`,
+    })
+    zeigePruefung(`${ziel.titel}\nDisney+ hat eine Fehlerseite gezeigt.\n▸ nochmal versuchen`, {
+      klasse: 'schlecht',
+      klick: () => {
+        location.href = ziel.url
+      },
+    })
+    return true
+  }
+
+  // --- Start ----------------------------------------------------------------
+
+  /*
+    Disney+ wechselt die Seite ohne Neuladen. Ohne diesen Blick auf die Adresse
+    bliebe der Knopf des vorigen Titels stehen — bei Netflix hat genau das eine
+    Meldung unter der falschen Reihe erzeugt.
+  */
+  function pruefeAdresse() {
+    const jetzt = kennung(location.href)
+    if (jetzt === seite) return
+    seite = jetzt
+    /* Der Klick schlägt die Adresse — aber nur für die Seite, auf die er führt (`zielFuer`). */
+    eintrag = zielFuer(jetzt) ?? (jetzt ? liste[jetzt] : null)
+    gelaufen = false
+    angefordert = false
+    folgen = []
+    anbieterStaffeln = []
+    erwartet = 0
+    ergebnisse = []
+    gemeldeteNummern = new Set()
+    beantwortet = undefined
+    globalThis.AK_DISNEY_BEANTWORTET.entfernen()
+    pruefKnopf?.remove()
+    pruefKnopf = null
+    dialogSchliessen()
+
+    zeigeUebersicht()
+    if (!eintrag) return void vielleichtFehlerseite()
+    /* Vorab, nicht erst nach dem Sammeln: So nennt die Anzeige schon beim Sammeln, wie viele Folgen noch anstehen. */
+    void gemeldeteHolen(eintrag.url ?? location.href.split('?')[0], eintrag.seit ?? null).then((n) => {
+      gemeldeteNummern = n
+    })
+    /* Beantwortet laut Prüfstand → nur Hinweis, sonst der bisherige Weg (`disney-beantwortet.js`). */
+    void globalThis.AK_DISNEY_BEANTWORTET.klaere({
+      url: eintrag.url ?? location.href.split('?')[0],
+      kennungVon: kennung,
+      zahlen: () => ({ erwartet, gemeldet: gemeldeteNummern.size }),
+      aktuell: () => jetzt === seite,
+      zeige: (text, o) => zeigePruefung(`${eintrag.titel}\n${text}`, o),
+      knopf: () => pruefKnopf,
+      setze: (b) => (beantwortet = b),
+      signal: (d) => signal('geprueft', { url: eintrag.url, ...d }),
+      anfrage: () => window.postMessage({ marke: MARKE_STEUER, frageListe: true }, '*'),
+    })
+  }
+
+  /**
+   * **Der Diagnosebericht — hier, nicht am `document` vorbei.**
+   *
+   * „Bericht laden" schickte bisher nur ein `ak-report`-Ereignis; den Empfänger
+   * dafür gibt es in `amazon.js` und `melder.js`, auf einer Disney-Seite läuft
+   * aber keins von beiden. Der Knopf tat deshalb nichts (Daniel, 20.09.2026:
+   * „bericht laden klick macht nix").
+   */
+  function disneyBericht() {
+    const sicher = (f) => {
+      try {
+        return f()
+      } catch (e) {
+        return `FEHLER: ${e?.message ?? e}`
+      }
+    }
+    return {
+      erzeugtAm: new Date().toISOString(),
+      version: globalThis.akKontext.version(),
+      adresse: location.href,
+      eintrag: sicher(() => (eintrag ? { titel: eintrag.titel, url: eintrag.url, staffeln: eintrag.staffeln } : null)),
+      folgen: sicher(() =>
+        folgen.slice(0, 60).map((f) => ({ staffel: f.staffel, nummer: f.nummer, titel: f.titel, sprachen: f.sprachen })),
+      ),
+      folgenGesamt: sicher(() => folgen.length),
+      gemeldet: sicher(() => [...gemeldeteNummern].slice(0, 80)),
+      seite: sicher(() => ({ titel: document.title, kennung: kennung(location.href) })),
+    }
+  }
+
+  try {
+    document.addEventListener('ak-report', () => {
+      const daten = JSON.stringify(disneyBericht(), null, 2)
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(new Blob([daten], { type: 'application/json' }))
+      a.download = `anime-kalender-disney-${new Date().toISOString().replace(/[:.]/g, '-')}.json`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      console.log('[Anime-Kalender] Disney+-Diagnosebericht heruntergeladen.')
+    })
+  } catch {
+    /* Ohne document gibt es nichts zu berichten. */
+  }
+
+  /* Was der Durchgang braucht — dieselben Wege wie beim Klick. */
+  globalThis.AK_DISNEY = {
+    offene: () => offeneEintraege().filter((e) => !istErledigt(e)),
+    zustand: () => ({ kennung: kennung(location.href), eintragUrl: eintrag?.url ?? null, startseite: /\/home\/?$/.test(location.pathname) }),
+    melden,
+    meldeGebiet: (url) => meldeWeg(offeneEintraege().find((e) => e.url === url) ?? { url }),
+    merkeZiel,
+    zeigeEnde: (info) =>
+      zeigePruefung(
+        globalThis.akDisneyEndeText(info, (url) => Object.values(liste).find((e) => e.url === url)?.titel ?? url),
+        { klasse: info.uebersprungen.length ? 'schlecht' : 'gut' },
+      ),
+  }
+
+  void briefkastenHolen().then(zeigeUebersicht)
+  pruefeAdresse()
+  setInterval(pruefeAdresse, 1000)
+})()

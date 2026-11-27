@@ -1,0 +1,55 @@
+/**
+ * Holt die jüngste Meldungskopie, die der Lauf `meldungskopie.yml` als Artefakt abgelegt hat (GitHub, kein D1-Zugriff).
+ */
+import { DatabaseSync } from 'node:sqlite'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { dirname, join } from 'node:path'
+import { STAND_MAX_STUNDEN, alterStunden } from './meldungskopie-abfrage.mjs'
+import { entschluessle, tokenOderAbbruch } from './meldungskopie-schluessel.mjs'
+
+export const WORKFLOW = 'meldungskopie.yml'
+export const ARTEFAKT = 'meldungskopie'
+export const DATEINAME = 'meldungen.sqlite'
+/** Im Artefakt liegt nur die verschlüsselte Fassung. */
+export const ARTEFAKT_DATEI = DATEINAME + '.enc'
+
+/** Der Stand der vorhandenen Kopie (leer, wenn es keine gibt). */
+export function lokalerStand(datei) {
+  if (!existsSync(datei)) return ''
+  const db = new DatabaseSync(datei, { readOnly: true })
+  try {
+    return db.prepare('SELECT stand FROM kopie_stand').get().stand
+  } finally {
+    db.close()
+  }
+}
+
+/** Meldezeile von `holen`: nennt Stand und Alter der Kopie (aus `kopie_stand`, nicht dem Datei-Zeitstempel); "aktuell" heißt nur
+ * "kein neuerer erfolgreicher Lauf", ein verpasster Lauf macht die Kopie trotzdem alt (Befund 18.11.2026: Kopie vom 17.11. galt am 18.11. als aktuell). */
+export function holenZeile(e, ziel, jetzt = new Date()) {
+  const stunden = alterStunden(e.stand, jetzt)
+  const warnung = stunden > STAND_MAX_STUNDEN ? ` — ÄLTER ALS ${STAND_MAX_STUNDEN} h: kein neuerer erfolgreicher Lauf, meldungskopie.yml anstoßen` : ''
+  const was = e.art === 'aktuell' ? 'Kein neuerer Lauf als die Kopie' : `Kopie geholt (Lauf ${e.lauf})`
+  return `${was}, Stand ${e.stand} (vor ${stunden.toFixed(1)} h): ${ziel}${warnung}`
+}
+
+/** `gh(args)` liefert den Text der Ausgabe; die Kopie wird nur geholt, wenn der jüngste erfolgreiche Lauf neuer ist als sie.
+ * Gefiltert wird hier statt mit `--status success`: dieser Filter führte den fertigen Lauf noch Minuten später nicht (20.11.2026). */
+export function holen({ gh, ziel, umgebung = process.env }) {
+  const token = tokenOderAbbruch(umgebung)
+  const laeufe = JSON.parse(gh(['run', 'list', '--workflow', WORKFLOW, '--limit', '10', '--json', 'databaseId,createdAt,conclusion']))
+  const lauf = laeufe.find((l) => l.conclusion === 'success')
+  if (!lauf) throw new Error(`Noch kein erfolgreicher Lauf von ${WORKFLOW}: gh workflow run ${WORKFLOW}`)
+  const vorhanden = lokalerStand(ziel)
+  if (vorhanden && Date.parse(vorhanden) >= Date.parse(lauf.createdAt)) return { art: 'aktuell', stand: vorhanden }
+  const ordner = mkdtempSync(join(tmpdir(), 'meldungskopie-holen-'))
+  try {
+    gh(['run', 'download', String(lauf.databaseId), '--name', ARTEFAKT, '--dir', ordner])
+    mkdirSync(dirname(ziel), { recursive: true })
+    writeFileSync(ziel, entschluessle(readFileSync(join(ordner, ARTEFAKT_DATEI)), token))
+  } finally {
+    rmSync(ordner, { recursive: true, force: true })
+  }
+  return { art: 'geholt', stand: lokalerStand(ziel), lauf: lauf.databaseId }
+}

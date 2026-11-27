@@ -1,0 +1,782 @@
+import type { Release, ReleaseEvent, ReleaseStatus, Title } from './types.ts'
+import { addDays, todayIso, utcZeitInBerlin, toIsoDate } from './time.ts'
+import { markiereNachLuecke, verpasstAnVorhandenes } from './luecken.ts'
+import { istAusgeblieben, istKatalogstartOhneUhrzeit, markiereOhneSichtung, terminZustand, type TerminFelder } from './termin-zustand.ts'
+import { erstesFreiesDatum, folgeNachOriginal } from './synchro-original.ts'
+import { istNurUntertitel } from './nur-deutsch.ts'
+
+/** Berliner Kalendertag eines Vermerk-Zeitpunkts (`erwartetAm`, `neuErwartet` sind UTC). */
+const vermerkTag = (zeitpunkt: string): string => toIsoDate(new Date(zeitpunkt))
+
+/**
+ * Beobachtete Folgen als Stützpunkte, aufsteigend nach Folgennummer.
+ *
+ * Steht an einer Stelle im Code und wird von beiden Rechnungen benutzt, weil
+ * ein Auseinanderlaufen genau die Art Widerspruch erzeugt, an der der Kalender
+ * schon einmal zerbrochen ist: hier „letzte Folge am 18.11.", darunter eine
+ * Terminliste, die am 04.11. endet.
+ */
+function stuetzpunkte(s: Release['schedule']): { episode: number; date: string }[] {
+  /*
+    **Ein recherchierter Ersatztermin ist ein Stützpunkt wie eine Beobachtung.**
+
+    Hält ein Anbieter einen Termin nicht ein, verschiebt sich nicht nur diese
+    Folge, sondern alles dahinter. Bis zum 01.09.2026 rechnete der Kalender
+    unbeirrt weiter: Mushoku Tensei Folge 6 kam am 30.08. nicht, und für den
+    06.09. stand trotzdem Folge **7** im Kalender — obwohl die Recherche in
+    `data/termine-verpasst.json` genau diesen Tag für Folge 6 nennt.
+
+    Deshalb zählt `neuErwartet` hier mit. Der Unterschied zu einer Beobachtung
+    steht nicht hier, sondern am Ereignis: Was hinter dem letzten Stützpunkt
+    liegt, trägt weiterhin `estimated`.
+  */
+  const ausRecherche = Object.entries(s.verpasst ?? {})
+    .filter(([, v]) => v?.neuErwartet && !v.erschienenAm)
+    .map(([episode, v]) => ({ episode: Number(episode), date: vermerkTag(String(v!.neuErwartet)) }))
+  const beobachtet = Object.entries(s.observed ?? {}).map(([episode, date]) => ({
+    episode: Number(episode),
+    date,
+  }))
+  /*
+    Eine Recherche, die eine beobachtete Folge derselben oder einer früheren Nummer an einem späteren Tag
+    gesehen hat, ist überholt: Folge 16 kann nicht vor Folge 15 erscheinen (Re:ZERO, 4p.de meinte Folge 14).
+  */
+  const nochGueltig = ausRecherche.filter((r) => !beobachtet.some((b) => b.episode <= r.episode && b.date > r.date))
+  /* Eine Beobachtung schlägt eine Recherche — gemessen vor vermutet. */
+  const jeFolge = new Map<number, string>()
+  for (const a of [...nochGueltig, ...beobachtet]) if (a.date) jeFolge.set(a.episode, a.date)
+  return [...jeFolge.entries()]
+    .map(([episode, date]) => ({ episode, date }))
+    .filter((a) => a.episode > 0 && a.date)
+    .sort((a, b) => a.episode - b.episode)
+}
+
+/** ISO-Wochentag eines Datums, 1 = Montag … 7 = Sonntag. */
+function isoWochentag(datum: string): number {
+  const tag = new Date(`${datum}T12:00:00Z`).getUTCDay()
+  return tag === 0 ? 7 : tag
+}
+
+/**
+ * **Einen Sendeplatz weiter (oder zurück).** Ohne `wochentage` ist das eine
+ * Woche; mit Sendetagen der nächste davon — „Dragon Ball DAIMA" bei TOGGO plus
+ * springt vom Freitag auf den Montag.
+ */
+export function sendeplatz(
+  s: Release['schedule'],
+  datum: string,
+  schritte: number,
+  pausen?: ReadonlySet<string>,
+): string {
+  const tage = (s.wochentage ?? []).filter((t) => t >= 1 && t <= 7)
+  if (!tage.length && !pausen?.size) return addDays(datum, 7 * schritte)
+  const richtung = schritte < 0 ? -1 : 1
+  let rest = Math.abs(schritte)
+  let d = datum
+  let guard = 0
+  while (rest > 0 && guard++ < 7 * 400) {
+    d = addDays(d, tage.length ? richtung : 7 * richtung)
+    /* Ein Pausentag ist kein Sendeplatz: die Zählung rückt nach (wie in `lastEpisodeDate`). */
+    if ((!tage.length || tage.includes(isoWochentag(d))) && !pausen?.has(d)) rest--
+  }
+  return d
+}
+
+/** Fällt der Start auf eine Pause, rückt Folge 1 auf den nächsten freien Sendeplatz, statt wegzufallen. */
+function ersterSendeplatz(s: Release['schedule'], pausen: ReadonlySet<string>): string {
+  return pausen.has(s.firstEpisodeDate) ? sendeplatz(s, s.firstEpisodeDate, 1, pausen) : s.firstEpisodeDate
+}
+
+/** Termin aus der Originaltabelle (`nachOriginal`), über Pausentage geschoben — eine Regel für Plan und Ende. */
+function nachOriginalFrei(
+  s: Release['schedule'],
+  folge: number,
+  anker: { episode: number; date: string } | undefined,
+  pausen: ReadonlySet<string>,
+): string | undefined {
+  const tag = folgeNachOriginal(s.nachOriginal, folge, anker)
+  return tag && erstesFreiesDatum(tag, pausen)
+}
+
+/**
+ * Letzter Termin eines Releases im deutschen Dub.
+ * Bei `weekly` aus Startdatum + Folgenzahl + Sendepausen berechnet,
+ * sonst identisch mit dem Startdatum.
+ *
+ * Gerechnet wird ab der letzten Beobachtung, nicht ab dem Start: Erschienen
+ * drei Folgen an einem Tag, ist die Reihe zwei Wochen früher durch, als der
+ * reine Wochentakt ausrechnet.
+ */
+export function lastEpisodeDate(release: Release): string | undefined {
+  const s = release.schedule
+  if (s.lastEpisodeDate) return s.lastEpisodeDate
+  if (release.releaseType !== 'weekly') return s.firstEpisodeDate
+  if (!s.episodeCount || s.episodeCount < 1) return undefined
+  const skips = new Set(s.skipDates ?? [])
+  const first = Math.max(1, s.firstEpisodeNumber ?? 1)
+  const letzte = first + s.episodeCount - 1
+  const anker = stuetzpunkte(s).filter((a) => a.episode >= first && a.episode <= letzte).at(-1)
+  const nachOriginal = nachOriginalFrei(s, letzte, anker, skips)
+  if (nachOriginal) return nachOriginal
+  let date = anker?.date ?? ersterSendeplatz(s, skips)
+  let produced = anker?.episode ?? first
+  let guard = 0
+  while (produced < letzte && guard++ < 400) {
+    date = sendeplatz(s, date, 1)
+    if (!skips.has(date)) produced++
+  }
+  return date
+}
+
+/**
+ * Status nach Definition aus dem Auftrag:
+ * airing         — heute liegt zwischen erster und letzter Dub-Folge
+ * abgeschlossen  — letzte Dub-Folge liegt vor heute
+ * tba            — erste Dub-Folge liegt in der Zukunft
+ */
+export function releaseStatus(release: Release, today = todayIso()): ReleaseStatus {
+  const s = release.schedule
+  /* Ein widerlegter Termin hat keinen Sendeplan: er verschwindet still (02.10.2026). */
+  if (!s?.firstEpisodeDate || release.widerlegt) return 'unbekannt'
+  if (s.firstEpisodeDate > today) return 'tba'
+  /* Gesichtete TV-Reihen haben kein bekanntes Ende — eine Woche nach der letzten Sichtung laufen sie noch. */
+  if (release.tvLetzteSichtung && release.tvLetzteSichtung >= addDays(today, -7)) return 'airing'
+  const last = lastEpisodeDate(release)
+  if (!last) return 'airing'
+  if (last < today) return 'abgeschlossen'
+  return 'airing'
+}
+
+/**
+ * Status eines Anime über alle seine Releases hinweg.
+ * Läuft irgendetwas gerade, gewinnt „airing"; sonst zählt der nächste Termin.
+ *
+ * Ohne erfassten deutschen Termin hilft die japanische Ausstrahlung weiter:
+ * Ist die längst vorbei und eine Synchro belegt, dann ist sie erschienen —
+ * „Termin unbekannt" wäre für einen Titel von 2003 unsinnig.
+ */
+/**
+ * Wie lange nach dem japanischen Ende eine deutsche Fassung als „erschienen"
+ * gilt, wenn kein Termin bekannt ist.
+ *
+ * Der Status stützt sich auf einen Schluss, der bei alten Katalogtiteln trägt:
+ * Cowboy Bebop lief 1998, es gibt eine deutsche Fassung, also ist sie längst
+ * draußen — nur das Datum kennen wir nicht. Bei einer Serie, die vor fünf
+ * Wochen in Japan endete, trägt derselbe Schluss nicht mehr.
+ *
+ * Real am 10.08.2026: „Mushoku Tensei Staffel 3" (japanisches Ende 04.07.2026)
+ * stand auf der Seite mit „Die deutsche Fassung ist erschienen." Es gibt sie
+ * nicht, nicht einmal die erste Folge. 96 Titel trugen dieselbe Behauptung.
+ *
+ * Ein Jahr ist bewusst großzügig: Eine Synchro entsteht nicht über Nacht, und
+ * wer im letzten Jahr lief und bei uns keinen Termin hat, ist entweder noch
+ * nicht vertont oder von uns nicht erfasst. In beiden Fällen ist „unbekannt"
+ * die ehrliche Antwort.
+ */
+const ERSCHIENEN_MINDESTABSTAND_TAGE = 365
+
+export function titleStatus(
+  releases: Release[],
+  today = todayIso(),
+  title?: Pick<Title, 'jpEnd' | 'jpYear' | 'dubConfidence' | 'einzelquelle' | 'streams'>,
+): ReleaseStatus {
+  if (releases.length > 0) {
+    const all = releases.map((r) => releaseStatus(r, today))
+    if (all.includes('airing')) return 'airing'
+    if (all.includes('tba')) return 'tba'
+    if (all.includes('abgeschlossen')) return 'abgeschlossen'
+  }
+
+  /**
+   * Wer die deutsche Fassung schon anbietet, hat sie veröffentlicht.
+   *
+   * Das ist die stärkste Auskunft, die es hier gibt, und sie stand bis zum
+   * 24.08.2026 hinter zwei schwächeren: Der Status hing allein am japanischen
+   * Enddatum und einem Jahr Abstand. „Der Held ohne Klasse: Der Aufstieg eines
+   * Talentlosen" stand deshalb auf **„Termin unbekannt"**, obwohl ADN alle
+   * zwölf Folgen mit deutscher Tonspur führt und das Panel sie eine Zeile
+   * tiefer auch anzeigt — mit einem grünen „DE ✓".
+   *
+   * Daniel dazu: „es ist erschienen, mach den bereich deutlicher, es gibt
+   * deutsche synchro." Der Widerspruch war für den Leser nicht auflösbar: oben
+   * eine Fehlanzeige, unten das Angebot.
+   *
+   * Ein belegter Verweis schlägt hier auch `dubConfidence: 'low'`. Die
+   * Einstufung sagt, wie gut die **Terminlage** belegt ist; ob die Fassung
+   * existiert, beantwortet der Anbieter selbst.
+   */
+  /* Ein widerlegter deutscher Termin belegt kein verfügbares Deutsch (02.10.2026). */
+  const nurWiderlegt = releases.length > 0 && releases.every((r) => r.widerlegt)
+  if (!nurWiderlegt && (title?.streams ?? []).some((s) => s.dub === true)) return 'erschienen'
+
+  const ended = title?.jpEnd ?? (title?.jpYear ? `${title.jpYear}-12-31` : undefined)
+  // Ohne einen belegten Verweis reicht eine einzige Quelle für den Satz „die
+  // deutsche Fassung ist erschienen" nicht.
+  if (ended && !(title?.einzelquelle ?? title?.dubConfidence === 'low') && ended < addDays(today, -ERSCHIENEN_MINDESTABSTAND_TAGE)) {
+    return 'erschienen'
+  }
+  return 'unbekannt'
+}
+
+/**
+ * Liegt der Start des Originals noch in der Zukunft? Dann ist eine fehlende deutsche Synchro kein Befund
+ * (Daniel, 10.10.2026: Reihenliste „Yaiba"). Ein volles Datum entscheidet; sonst der AniList-Status, zuletzt Monat oder Jahr
+ * (nur strikt später als heute). Im Zweifel `false` — lieber kein Label als ein falsches „Geplant".
+ */
+export function erscheintErst(t: Pick<Title, 'jpStart' | 'jpStatus' | 'jpYear'>, today = todayIso()): boolean {
+  if (t.jpStatus === 'FINISHED' || t.jpStatus === 'RELEASING') return false
+  const jp = t.jpStart ?? (t.jpYear ? String(t.jpYear) : '')
+  if (jp.length >= 10) return jp > today
+  if (t.jpStatus === 'NOT_YET_RELEASED') return true
+  return jp !== '' && jp > today.slice(0, jp.length)
+}
+
+/** Erzeugt aus der Termin-Regel eines Releases die einzelnen Kalender-Einträge. */
+/**
+ * Ist dieser Termin schon durch — nach Datum **und** Uhrzeit?
+ *
+ * Daniel am 23.08.2026: „um 16:59 sollte im panel 4 stehen, ab 17:00 uhr
+ * (release zeitpunkt) sollte dort 5 stehen." Ein Vergleich über das Datum
+ * allein zählt die heutige Folge ab Mitternacht mit — bei einer Serie, die um
+ * 17:00 erscheint, siebzehn Stunden zu früh.
+ *
+ * Fehlt die Uhrzeit, gilt der Tag als abgeschlossen (23:59): Wir wissen dann nicht,
+ * wann sie kam, aber dass sie kam. Ausnahme: ein Katalogstart (`batch`, nicht TV) gilt ab 00:00 als erschienen,
+ * sonst steht am Starttag "0 von 6"; der Kasten sagt dann "Alle N Folgen da" (`heuteOffen` in `fertigAntwort`).
+ * Der Push bleibt bei 23:59 (`katalogAmTagesbeginn = false`): Netflix schaltet erst gegen 9 Uhr frei.
+ */
+export function istErschienen(
+  ereignis: TerminFelder,
+  jetzt: Date = new Date(),
+  katalogAmTagesbeginn = true,
+): boolean {
+  /*
+    **Ein verstrichener Termin ist keine erschienene Folge.**
+
+    Daniel am 13.09.2026, mit zwei Bildern: Im Kalender stand „You and I Are
+    Polar Opposites" Folge 8 mit „⚠ nicht erschienen", im Detail-Panel
+    daneben „8 von 13 Folgen erschienen" und „Nächste Folge (Folge 9)". Die
+    Kachel las `verpasst`, die Zählung nur die Uhrzeit — zwei Leitungen für
+    dieselbe Frage. Seitdem beantwortet diese Funktion sie für alle.
+  */
+  return terminZustand(ereignis, jetzt, katalogAmTagesbeginn) === 'erschienen'
+}
+
+/* Seit dem Umbau liegen sie in `termin-zustand.ts`; die Importeure lesen sie weiter von hier. */
+export { istKatalogstartOhneUhrzeit, istAusgeblieben }
+
+/**
+ * **Netflix' übliche Uhrzeit für Anime: 17:00 JST = 08:00 UTC** (25.09.2026). Netflix nennt für
+ * Katalogtitel keine Uhrzeit, veröffentlicht Anime aber zu dieser. Belegt an „Steel Ball Run"
+ * 2nd STAGE: Netflix Tudum „1 a.m. PDT / 5 p.m. JST", und Daniel sah Folge 2 um 09:35 noch nicht,
+ * um 10:11 schon. Auf Daniels Wunsch („schreib das als voraussichtliche netflix uhrzeit für
+ * releases die nur tag angaben haben") trug jeder Netflix-Termin diese. Seit dem 06.10.2026 nur noch Eigenproduktionen (`netflixOriginal`): Lizenztitel haben keine feste Zeit (My Hero Academia: Vigilantes fehlte um 14:44 noch). Als `timeEstimated`, im Sommer 10:00, im Winter 09:00 Berliner Zeit.
+ */
+export const NETFLIX_UHRZEIT_UTC = '08:00'
+
+export function expandEvents(release: Release): ReleaseEvent[] {
+  if (istNurUntertitel(release)) return [] // nur deutsche Termine (`shared/nur-deutsch.ts`)
+  const termine = markiereOhneSichtung(release, termineAusPlan(release))
+  if (release.dateMeaning === 'available-from') for (const e of termine) e[release.erstausgabe ? 'erstausgabe' : 'imAngebot'] = true
+  if (release.platform !== 'netflix' || !release.netflixOriginal) return termine
+  return termine.map((e) => (e.time ? e : { ...e, time: utcZeitInBerlin(e.date, NETFLIX_UHRZEIT_UTC), timeEstimated: true }))
+}
+
+/**
+ * **Was sich in den Kalender übernehmen lässt** (30.09.2026): nur was noch aussteht.
+ *
+ * Ein Termin, der heute ist oder war, ist kein Angebot mehr — der Kalenderknopf am Disc-Termin
+ * „seit 30.09.2026" verschwindet. Für
+ * eine laufende Serie bleiben die künftigen Folgen, solange eine aussteht.
+ */
+export function merkbareTermine(release: Release, today: string): ReleaseEvent[] {
+  return expandEvents(release).filter((e) => e.date > today && !istAusgeblieben(e))
+}
+
+/** Eine Folgennummer darf erscheinen, wenn sie belegt ist — bei einer TV-Sichtung ohne Folgenliste ist sie nur unsere Zählung. */
+export function anzeigeFolge(e: Pick<ReleaseEvent, 'episode' | 'sichtung'>): boolean {
+  return Boolean(e.episode) && !e.sichtung
+}
+
+/**
+ * Ob ein Termin des Plans geschätzt ist. Gesehen ist gesehen; fortgeschrieben bleibt eine Annahme,
+ * auch wenn der Start selbst belegt ist.
+ *
+ * Ein Sendeplan mit Sendetagen ohne jede Beobachtung belegt nur den Start (10.10.2026): Alles danach
+ * rechnet Wochentage fort und kennt weder Feiertags- noch Sendepausen.
+ */
+function terminGeschaetzt(
+  s: Release['schedule'],
+  episode: number,
+  date: string,
+  lastAnchor: { episode: number } | undefined,
+  first: number,
+): boolean | undefined {
+  /* `belegtBis` nennt keinen Tag: Vor der frühesten Beobachtung sind die Tage zurückgerechnet und bleiben geschätzt (12.10.2026). */
+  /* Setzt die Reihe mitten in der Zählung ein (Folge 1 im Schwester-Release), liegt die Beobachtung nicht im selben Release (Ranma S3, 26.11.2026). */
+  const nachBeobachtung = first > 1 || Object.keys(s.observed ?? {}).some((k) => Number(k) < episode)
+  const belegt =
+    s.observed?.[episode] ||
+    s.sendeplanBelegt ||
+    (s.belegtBis && nachBeobachtung && episode <= s.belegtBis.folge && date <= s.belegtBis.am) ||
+    /* Zwischen zwei Stützpunkten eines Sendeplans ist der Tag belegt, nicht geschätzt. */
+    (s.wochentage?.length && lastAnchor && episode < lastAnchor.episode && !s.estimated)
+  if (belegt) return undefined
+  const nurStartBelegt = Boolean(s.wochentage?.length) && !lastAnchor
+  return lastAnchor || (nurStartBelegt && episode > first) ? true : s.estimated
+}
+
+/**
+ * Liegt eine beobachtete Folge hinter dieser, mit späterem Tag? Dann ist sie erschienen, auch wenn ihr Tag nur
+ * zurückgerechnet ist. Der Tagvergleich fängt eine Beobachtung in fremder Zählung ab (Black Clover S2: „174“ =
+ * 171 + 3 am 28.11. liegt nicht hinter Folge 5–173, 26.11.2026).
+ */
+function vorBeobachteterFolge(s: NonNullable<Release['schedule']>, date: string): boolean {
+  return Object.values(s.observed ?? {}).some((tag) => tag > date)
+}
+
+/** Uhrzeit aus dem Plan; eine festgelegte, nicht gemessene trägt `timeEstimated` („≈"). */
+function uhrzeitAusPlan(s: NonNullable<Release['schedule']>) {
+  return s.time && s.timeEstimated ? { time: s.time, timeEstimated: true } : { time: s.time }
+}
+
+/** Die Folgenzahl am Termin; steht sie nur für die letzte gesichtete Folge, gibt es keinen Nenner. */
+function gesamtzahl(s: NonNullable<Release['schedule']>, letzte: number): { episodeCount?: number } {
+  return s.episodeCountNurGesichtet ? {} : { episodeCount: letzte }
+}
+
+/**
+ * Ein Stapel mit genau einer Folge und belegter Folgennummer ist eine Folge, keine Staffel: der Termin trägt die Nummer statt „1 Folge“
+ * (Horizonte Staffel 4 bei RTL+ stand als „Neu bei RTL+“ ohne Folge im Kalender, 21.11.2026). Ein Takt folgt daraus nicht.
+ */
+function stapelFolgen(art: Release['releaseType'], s: NonNullable<Release['schedule']>): { episode?: number; episodeCount?: number } {
+  return art === 'batch' && s.episodeCount === 1 && s.firstEpisodeNumber ? { episode: s.firstEpisodeNumber } : { episodeCount: s.episodeCount }
+}
+
+type Plan = NonNullable<Release['schedule']>
+type Stuetzpunkt = { episode: number; date: string }
+
+/** Die Felder, die jeder Termin eines Releases gemeinsam hat. */
+function terminBasis(release: Release, s: Plan) {
+  return {
+    releaseSlug: release.slug,
+    titleId: release.titleId,
+    ...uhrzeitAusPlan(s),
+    releaseType: release.releaseType,
+    platform: release.platform,
+    ...(release.sender ? { sender: release.sender } : {}), ...(release.sprache === 'offen' ? { sprache: release.sprache } : {}),
+    ...(release.tvLetzteSichtung && !release.folgenBelegt ? { sichtung: true } : {}), ...(s.episodeCountAssumed ? { episodeCountAssumed: true } : {}),
+    name: release.name,
+    estimated: s.estimated,
+  }
+}
+
+type TerminBasis = ReturnType<typeof terminBasis>
+
+function termineAusPlan(release: Release): ReleaseEvent[] {
+  const s = release.schedule
+  if (!s?.firstEpisodeDate || release.widerlegt) return []
+
+  const base = terminBasis(release, s)
+
+  if (release.releaseType !== 'weekly') {
+    return [
+      {
+        ...base,
+        id: `${release.slug}@${s.firstEpisodeDate}`,
+        date: s.firstEpisodeDate,
+        ...stapelFolgen(release.releaseType, s),
+      },
+    ]
+  }
+
+  /**
+   * Ohne belegte Folgenzahl wird **eine** Folge erzeugt, nicht zwölf.
+   *
+   * Hier stand `?? 12`. Das ist derselbe geratene Standardwert, den CLAUDE.md
+   * unter „Keine Folgenzahl erfinden, auch nicht als Rückfall" verbietet — nur
+   * eine Ebene tiefer, wo ihn die Kuratierung nicht mehr sieht. Ein einzelner
+   * belegter Termin ist ein Termin, keine Staffel.
+   */
+  const count = s.episodeCount ?? 1
+  const skips = new Set(s.skipDates ?? [])
+
+  /**
+   * Bei welcher Folgennummer dieses Release einsetzt — und bis zu welcher die
+   * Reihe insgesamt läuft. Beides fällt nur dann zusammen, wenn ein Release
+   * die ganze Staffel abdeckt; bei einem geteilten Start (siehe
+   * `firstEpisodeNumber`) beginnt der zweite Teil mitten in der Zählung.
+   */
+  const first = Math.max(1, s.firstEpisodeNumber ?? 1)
+  const last = first + count - 1
+
+  const events = folgenTermine(release, s, base, skips, first, last)
+  ausgefalleneTage(events, s, base, last)
+  markiereNachLuecke(events.sort((a, b) => (a.date === b.date ? (a.episode ?? 0) - (b.episode ?? 0) : a.date < b.date ? -1 : 1)))
+
+  /**
+   * **Zwei fortgeschriebene Folgen landen nicht auf demselben Tag.**
+   *
+   * Belegte Mehrfachstarts gibt es wirklich — Mushoku Tensei Staffel 3 begann
+   * mit drei Folgen an einem Tag, und `observed` trägt das. Eine **Rechnung**
+   * darf so etwas aber nicht behaupten.
+   *
+   * Der reale Fall (Daniel, 20.09.2026, mit drei Bildern): „You and I Are Polar
+   * Opposites" Staffel 2 hatte zwei offene Ausfälle — Folge 8 vom 13.09. ohne
+   * Ersatztermin, Folge 9 vom 20.09. mit recherchiertem Ersatztermin 27.09.
+   * Folge 8 wurde zwischen ihren Nachbarn eingerechnet und landete dadurch auf
+   * demselben 27.09. wie Folge 9. Zwei Folgen an einem Tag, beide geschätzt,
+   * keine davon belegt — und der Kalender hatte am 20.09. bereits „Folge 8
+   * kommt heute" neben „Folge 9 ist nicht erschienen" gezeigt.
+   *
+   * Aufgelöst wird nach Folgennummer: Die niedrigere behält den Tag, die höhere
+   * rückt einen Sendeplatz weiter. Angefasst wird nur Fortgeschriebenes;
+   * Beobachtetes und Ausfallvermerke bleiben, wo sie sind.
+   */
+  schiebeGleichTagFolgen(events, release.slug, s, skips)
+  events.sort((a, b) => (a.date === b.date ? (a.episode ?? 0) - (b.episode ?? 0) : a.date < b.date ? -1 : 1))
+  eindeutigeKennungen(events)
+
+  return events
+}
+
+/**
+ * Die Termine der Folgen `first`…`last` aus dem Sendeplan.
+ *
+ * Beobachtete Folgen, aufsteigend, sind die Stützpunkte des Sendeplans:
+ * Jede Folge rechnet ab der jüngsten Beobachtung **vor** ihr weiter.
+ *
+ * Der Unterschied ist keine Kleinigkeit. Vorher lief die Rechnung stur ab
+ * Folge 1 durch, und eine einzige Sendepause verschob alles Weitere um eine
+ * Woche: Bei „Ascendance of a Bookworm" pausierte die Staffel am 25.07., die
+ * echte Folge 14 lief am 08.08. — der Kalender setzte dorthin Folge 15 und
+ * behauptete damit eine deutsche Fassung, die es noch gar nicht gab.
+ *
+ * Ein Stützpunkt hinter sich zu haben heißt: Der Takt ab dort ist gemessen,
+ * nicht geraten. Alles jenseits der letzten Beobachtung bleibt Fortschreibung
+ * und wird als solche gekennzeichnet.
+ */
+function folgenTermine(release: Release, s: Plan, base: TerminBasis, skips: Set<string>, first: number, last: number): ReleaseEvent[] {
+  const anchors = stuetzpunkte(s)
+  const lastAnchor = anchors[anchors.length - 1]
+
+  const events: ReleaseEvent[] = []
+  for (let episode = first; episode <= last; episode++) {
+    /*
+      **Eine TV-Sichtung kennt nur die gesichteten Folgen** (19.09.2026). Seit die Nummern
+      aus der Wikipedia-Episodenliste kommen, hat die Zählung Lücken: Super RTL zeigte
+      Pokémon Horizonte werktags Folge 78–80 und samstags Folge 127. Aufgefüllt hätte
+      diese Schleife 46 Folgen auf den Samstag gelegt, die niemand gesendet hat.
+    */
+    if (release.tvLetzteSichtung && !s.observed?.[episode]) continue
+    const date = folgenDatum(s, anchors, skips, first, episode)
+    if (skips.has(date)) continue
+    /**
+     * Ein belegtes Enddatum beendet die Reihe — auch wenn die Folgenzahl noch
+     * mehr hergäbe.
+     *
+     * Genau hier entstand der schlimmste Fehler, den die Seite je hatte: ADN
+     * nahm „Sword Art Online" am 11.06. und 17.07.2025 als Komplettabwurf ins
+     * Angebot, 96 Folgen an zwei Tagen. Weil der Eintrag fälschlich als
+     * wöchentlich galt (siehe fetch-adn.ts), rechnete diese Schleife 96
+     * Wochentermine bis zum 07.04.2027 aus — und das, obwohl `lastEpisodeDate`
+     * mit dem 17.07.2025 daneben stand und `releaseStatus()` in derselben
+     * Datei brav „Abgeschlossen" meldete. Der Datensatz widersprach sich
+     * selbst, und der Kalender kündigte Woche für Woche eine Folge an, die es
+     * nicht gibt (gemeldet von Daniel, 12.08.2026).
+     *
+     * Die Abbruchbedingung ist billiger als jede Rhythmus-Reparatur: Was
+     * hinter dem letzten belegten Termin liegt, ist keine Fortschreibung mehr,
+     * sondern eine Erfindung.
+     */
+    if (s.lastEpisodeDate && date > s.lastEpisodeDate) break
+    const geschaetzt = terminGeschaetzt(s, episode, date, lastAnchor, first)
+    events.push({
+      ...base,
+      /* Lief eine TV-Sichtung zu verschiedenen Zeiten, trägt jede Folge ihre eigene. */
+      ...(s.zeiten?.[episode] ? { time: s.zeiten[episode] } : {}),
+      id: `${release.slug}@${date}`,
+      date,
+      episode,
+      ...gesamtzahl(s, last),
+      estimated: geschaetzt,
+      ...(geschaetzt && vorBeobachteterFolge(s, date) ? { vorBeobachtung: true } : {}),
+      /*
+        **Nur der Tag, an dem wirklich nichts kam, trägt den Vermerk.**
+
+        Seit `neuErwartet` als Stützpunkt zählt, liegt die Folge auf ihrem
+        Ersatztermin — und der ist der gültige, nicht der ausgefallene. Trüge er
+        den Vermerk, stünde der neue Termin durchgestrichen da.
+      */
+      verpasst:
+        s.verpasst?.[episode] && date === vermerkTag(String(s.verpasst[episode].erwartetAm))
+          ? s.verpasst[episode]
+          : undefined,
+    })
+  }
+  return events
+}
+
+/** Das Datum einer Folge: aus den Stützpunkten davor und dahinter, sonst aus dem Sendeplan. */
+function folgenDatum(s: Plan, anchors: Stuetzpunkt[], skips: Set<string>, first: number, episode: number): string {
+  let anchor: Stuetzpunkt | undefined
+  let danach: Stuetzpunkt | undefined
+  for (const candidate of anchors) {
+    if (candidate.episode > episode) {
+      danach = candidate
+      break
+    }
+    anchor = candidate
+  }
+
+  const zwischen = datumZwischenStuetzpunkten(s, anchor, danach, skips, episode)
+  if (zwischen) return zwischen
+
+  /**
+   * Kein Stützpunkt davor, aber einer dahinter: rückwärts rechnen.
+   *
+   * Sonst käme die Folge auf den Starttermin plus Wochen und läge damit
+   * ebenfalls hinter der belegten.
+   */
+  if (danach && !anchor) {
+    return sendeplatz(s, danach.date, -(danach.episode - episode), skips)
+  }
+
+  return anchor
+    ? (nachOriginalFrei(s, episode, anchor, skips) ?? sendeplatz(s, anchor.date, episode - anchor.episode, skips))
+    : sendeplatz(s, ersterSendeplatz(s, skips), episode - first, skips)
+}
+
+/**
+ * Liegt eine **höhere** Folge bereits belegt vor, wird zwischen den beiden
+ * Messpunkten geteilt statt darüber hinaus gerechnet.
+ *
+ * Der Anlass (Daniel, 23.08.2026, mit zwei Bildern): Bei „Mushoku Tensei"
+ * Staffel 3 kennt der Bestand die Folgen 1–3 vom 19.08. und Folge **5**
+ * vom 23.08.; Folge 4 fehlt, weil sie kein Abruf gesehen hat. Die stumme
+ * Wochenrechnung setzte sie auf den 26.08. — hinter eine Folge, die es
+ * längst gibt. Die Karte zeigte „Ep 5/14", das Panel darunter „4/14".
+ *
+ * Zwischen zwei Messpunkten zu teilen ist keine Erfindung, sondern die
+ * einzige Lage, die beide Messungen achtet. Sie kann daneben liegen, wenn
+ * genau in dieser Lücke eine Sendepause lag — aber sie kann nicht die
+ * Reihenfolge verletzen, und **das** ist der Fehler, der dem Leser auffällt.
+ *
+ * **Nur wenn die Folge selbst kein Stuetzpunkt ist.**
+ *
+ * Ist sie einer, steht ihr Termin fest und wird unten unveraendert
+ * zurueckgegeben. Ohne diese Bedingung schob der erste Versuch auch
+ * belegte Folgen auf den naechsten Termin: Folge 3 lag am 19.08. und
+ * landete auf dem 23.08. -- eine Messung durch eine Ableitung ersetzt,
+ * der schlimmste Tausch, den dieses Projekt kennt.
+ */
+function datumZwischenStuetzpunkten(
+  s: Plan,
+  anchor: Stuetzpunkt | undefined,
+  danach: Stuetzpunkt | undefined,
+  skips: Set<string>,
+  episode: number,
+): string | undefined {
+  /*
+    **Ein Sendeplan ist kein Nachzügler.** Bei festen Sendetagen (Fernsehen)
+    zählt der Plan zwischen zwei Stützpunkten weiter — solange er den zweiten
+    nicht überholt. Ohne das lagen bei Dragon Ball DAIMA die Folgen 4 bis 19
+    alle auf dem 22.09., dem Tag von Folge 20 (16.09.2026).
+  */
+  if (danach && anchor && anchor.episode !== episode && s.wochentage?.length) {
+    const nachPlan = sendeplatz(s, anchor.date, episode - anchor.episode, skips)
+    if (nachPlan <= danach.date) return nachPlan
+  }
+  if (danach && anchor && anchor.episode !== episode) {
+    /**
+     * **Auf den naechsten belegten Termin, nicht in die Mitte.**
+     *
+     * Die erste Fassung teilte die Spanne gleichmaessig auf: Bei Folge 3 am
+     * 19.08. und Folge 5 am 23.08. landete Folge 4 auf dem 21.08. Das sah
+     * vernuenftig aus und war falsch -- Crunchyroll hat die Folgen 4 und 5
+     * am selben Tag veroeffentlicht (Daniel, 24.08.2026: "i dont remember
+     * watching ep 4 yesterday, so it must be correct that it released
+     * today").
+     *
+     * Der Grund liegt auf der Hand, sobald man ihn sieht: Eine Folge fehlt
+     * in unseren Daten nicht zufaellig, sondern weil kein Abruf sie als
+     * eigenen Termin gesehen hat. Am haeufigsten, weil sie gar keinen
+     * eigenen hatte -- Nachzuegler kommen gebuendelt.
+     *
+     * Die Mitte zu raten ist eine Erfindung mit vernuenftigem Anstrich. Der
+     * naechste belegte Termin ist dagegen eine **Obergrenze**: Sie kann zu
+     * spaet liegen, aber sie behauptet nie eine Folge, die es noch nicht
+     * gibt. Fuer einen Kalender, der vorhersagt, ist das die richtige
+     * Richtung.
+     */
+    return danach.date
+  }
+  return undefined
+}
+
+/**
+ * **Der ausgefallene Tag bleibt im Kalender stehen**:
+ * „wir haben es erst auf dem kalender gezeigt, dann ändert sich das, wir
+ * sollten es dort dann rot markieren oder durchstreichen … damit weiterhin
+ * sichtbar ist, das es dort stand, aber die echte neue info es nachweislich
+ * überschreibt."
+ *
+ * Wer den Tag im Kopf oder im Kalender-Abo hatte, sucht ihn — und findet ihn,
+ * durchgestrichen, mit der Auskunft daneben. Der Eintrag entsteht nur, wenn
+ * die Folge inzwischen woanders liegt; sonst steht er schon in der Schleife.
+ *
+ * **Ausgefallen ist immer die nächste ausstehende Folge.**
+ *
+ * Der Vermerk trägt die Nummer, die in der Fortschreibung an diesem Tag
+ * stand — und die stimmt nicht mehr, sobald davor schon etwas ausgefallen
+ * ist. „You and I Are Polar Opposites" Staffel 2: Am 13.09.2026 kam Folge 8
+ * nicht, am 20.09. wieder nichts, und der Kalender schrieb an den zweiten Tag
+ * „Ep 9/13 nicht erschienen". Erschienen waren zu dem Zeitpunkt sieben
+ * Folgen; ausgeblieben ist also zum zweiten Mal die **achte** (Daniel,
+ * 20.09.2026, mit zwei Bildern: „richtig müsste eig sein 8/13 ist in dieser
+ * spalte und durchgestrichen als nicht erschienen markiert").
+ *
+ * Gerechnet wird aus den Beobachtungen: die höchste Folge, die vor diesem Tag
+ * wirklich da war, plus eins. Ohne Beobachtungen bleibt die Nummer des
+ * Vermerks stehen — dann gibt es nichts Besseres.
+ */
+function ausgefalleneTage(events: ReleaseEvent[], s: Plan, base: TerminBasis, last: number): void {
+  const ausstehendAm = (tag: string, fallback: number): number => {
+    const davor = Object.entries(s.observed ?? {})
+      .filter(([, datum]) => datum && datum < tag)
+      .map(([nr]) => Number(nr))
+      .filter((n) => Number.isFinite(n))
+    return davor.length ? Math.max(...davor) + 1 : fallback
+  }
+
+  for (const [nr, v] of Object.entries(s.verpasst ?? {})) {
+    if (!v?.erwartetAm || v.erschienenAm) continue
+    const alterTag = vermerkTag(String(v.erwartetAm))
+    const episode = ausstehendAm(alterTag, Number(nr))
+    if (verpasstAnVorhandenes(events, alterTag, episode, v)) continue
+    if (s.lastEpisodeDate && alterTag > s.lastEpisodeDate) continue
+    events.push({
+      ...base,
+      id: `${base.releaseSlug}@${alterTag}`,
+      date: alterTag,
+      episode,
+      ...gesamtzahl(s, last),
+      estimated: undefined,
+      verpasst: v,
+    })
+  }
+}
+
+/**
+ * Mehrere Folgen an einem Tag brauchen unterscheidbare Kennungen.
+ *
+ * Der Wochentakt ist ein guter Vorgabewert, aber Abweichungen sind der
+ * Normalfall — Pausen, Verschiebungen, und ein Auftakt mit mehreren Folgen auf
+ * einmal. Bei „Mushoku Tensei" Staffel 3 erschienen am 19.08.2026 die ersten
+ * **drei** Folgen zusammen; über `observed` lässt sich das
+ * eintragen, nur trugen die drei Termine dann dieselbe Kennung
+ * `slug@datum` — dieselbe React-Kennung in der Liste und dieselbe UID im
+ * Kalender-Abo, wo drei Einträge zu einem verschmolzen wären.
+ *
+ * Angehängt wird die Folgennummer **nur dort, wo sie gebraucht wird**. Jede
+ * Kennung, die schon eindeutig ist, bleibt unverändert — sonst bekäme jeder
+ * Abonnent seinen gesamten Kalender neu eingetragen, weil eine geänderte UID
+ * für sein Programm ein anderer Termin ist.
+ */
+function eindeutigeKennungen(events: ReleaseEvent[]): void {
+  const proDatum = new Map<string, number>()
+  for (const ev of events) proDatum.set(ev.date, (proDatum.get(ev.date) ?? 0) + 1)
+  for (const ev of events) {
+    if ((proDatum.get(ev.date) ?? 0) > 1) ev.id = `${ev.id}#${ev.episode}`
+  }
+}
+
+/**
+ * Fortgeschriebene Folgen am selben Tag rücken je einen Sendeplatz weiter (Text in `termineAusPlan`), nie hinter eine
+ * belegte höhere Folge: Ohne `belegtBis` standen Folge 2–4 am Tag der belegten Folge 5 (05.08.) und wurden auf den 19.08. geschoben (Bestandsbau 19.11.2026).
+ */
+function schiebeGleichTagFolgen(events: ReleaseEvent[], slug: string, s: NonNullable<Release['schedule']>, skips: Set<string>): void {
+  for (const ev of events.filter((e) => e.estimated && !e.verpasst).sort((a, b) => (a.episode ?? 0) - (b.episode ?? 0))) {
+    const grenze = events.filter((e) => !e.estimated && !e.verpasst && (e.episode ?? 0) > (ev.episode ?? 0)).map((e) => e.date).sort()[0]
+    let schutz = 0
+    while (
+      schutz++ < 60 &&
+      events.some((a) => a !== ev && a.date === ev.date && (a.episode ?? 0) < (ev.episode ?? 0))
+    ) {
+      const weiter = sendeplatz(s, ev.date, 1, skips)
+      /* Hinter einem belegten Ende wird nichts mehr angesetzt — dort gilt der Abbruch von oben. */
+      if (s.lastEpisodeDate && weiter > s.lastEpisodeDate) break
+      if (grenze && weiter > grenze) break
+      ev.date = weiter
+      ev.id = `${slug}@${weiter}`
+    }
+  }
+}
+
+/**
+ * **Belegte Bereiche plus die seither erschienenen Folgen des deutschen Wochenplans** (25.09.2026).
+ *
+ * „Vom Landei zum Schwertheiligen II": Daniel belegte am 13.09.2026 die Folgen 1–10 bei Prime,
+ * danach liefen 11 und 12 im Wochentakt. Die Wochenansicht zählte die Termine (Ep 12/12), das
+ * Detail-Panel nur den Beleg („10 von 12 Folgen auf Deutsch, für die übrigen fehlt uns eine
+ * Angabe") — Daniel prüfte nach: 12 sind richtig.
+ *
+ * Ein Wochen-Release in diesem Kalender ist ein deutsches; seine erschienenen Folgen
+ * (`istErschienen`) gelten deshalb für den Weg desselben Anbieters als deutsch — außer ein Beleg
+ * sagt für eine Folge etwas anderes (ein Bereich mit `dub: false` oder ein schon belegter). Nur
+ * Wege mit belegten deutschen Bereichen werden ergänzt; ohne Bereiche zählt das Panel die
+ * erschienenen Folgen ohnehin selbst.
+ */
+export function bereicheMitTermin(
+  bereiche: DubBereich[] | undefined,
+  releases: Release[],
+  plattform: string,
+  jetzt: Date = new Date(),
+): DubBereich[] | undefined {
+  const neu = ergaenzteFolgen(bereiche, releases, plattform, jetzt)
+  return bereiche && neu.length ? bereicheMitFolgen(bereiche, neu) : bereiche
+}
+
+type DubBereich = { from: number; to: number; dub: boolean }
+
+/** Die erschienenen Wochenplan-Folgen dieses Anbieters, die kein belegter Bereich deckt (aufsteigend). */
+export function ergaenzteFolgen(
+  bereiche: DubBereich[] | undefined,
+  releases: Release[],
+  plattform: string,
+  jetzt: Date = new Date(),
+): number[] {
+  if (!bereiche?.some((b) => b.dub)) return []
+  const gedeckt = new Set<number>()
+  for (const b of bereiche) for (let n = b.from; n <= b.to; n++) gedeckt.add(n)
+  const erschienen = releases
+    .filter((r) => r.platform === plattform && r.releaseType === 'weekly')
+    .flatMap((r) => expandEvents(r))
+    .filter((e) => typeof e.episode === 'number' && istErschienen(e, jetzt))
+    .map((e) => e.episode as number)
+  return [...new Set(erschienen.filter((n) => !gedeckt.has(n)))].sort((a, b) => a - b)
+}
+
+/** Die belegten Bereiche plus die Folgen `neu` als deutsch; direkt anschließende werden zusammengezogen: 1–10 und 11–12 werden 1–12. */
+export function bereicheMitFolgen(bereiche: DubBereich[], neu: number[]): DubBereich[] {
+  const dazu: DubBereich[] = []
+  for (const n of neu) {
+    const letzter = dazu[dazu.length - 1]
+    if (letzter && letzter.to === n - 1) letzter.to = n
+    else dazu.push({ from: n, to: n, dub: true })
+  }
+  const alle = [...bereiche.map((b) => ({ ...b })), ...dazu].sort((a, b) => a.from - b.from)
+  const raus: DubBereich[] = []
+  for (const b of alle) {
+    const vor = raus[raus.length - 1]
+    if (vor && vor.dub === b.dub && vor.to + 1 >= b.from) vor.to = Math.max(vor.to, b.to)
+    else raus.push(b)
+  }
+  return raus
+}
+
+/** Lage einer Staffel am Reiter (F157): Punkt = läuft, Ring = kommt, sonst ohne Marke. */
+export type StaffelLage = 'laeuft' | 'kommt' | 'ruht'
+
+/* Die Rechnung der Marke samt Grund steht in `lage-grund.ts` (hier nur der Name, damit Aufrufer ihn weiter von hier holen). */
+export { staffelLage, staffelLageMitGrund, fruehesterTermin, type LageGrund, type LageMitGrund } from './lage-grund.ts'

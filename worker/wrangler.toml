@@ -1,0 +1,83 @@
+name = "newsletter"
+main = "src/index.ts"
+compatibility_date = "2025-05-01"
+
+# Stündlich: Monitor, Wecker, Push, Löschfristen. Der Digest hat einen eigenen
+# Trigger (DIGEST_CRON in src/digest-versand.ts), weil jeder Aufruf auf der
+# Free-Stufe nur 50 Unteraufrufe hat und D1 mitzählt (15.10.2026). 05 und 06 UTC
+# sind 07:00 Berlin in Sommer- und Winterzeit; welche Stunde versendet,
+# entscheidet der Worker über SEND_HOUR_BERLIN (tools/worker-digest-versand.test.ts
+# prüft, dass beide Stunden abgedeckt sind).
+[triggers]
+crons = ["0 * * * *", "0 5,6 * * *", "*/5 * * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "anime-kalender"
+database_id = "ee32d6b3-0290-4ad3-b899-da37577a8d20"
+
+[vars]
+SITE_URL = "https://anime-kalender.de/"
+ALLOWED_ORIGIN = "https://anime-kalender.de"
+# Anbieter, deren Folgen in `titel_zeile` stehen (Migration 055, Pilot). Leer = aus. Erst auf "disneyplus" setzen, wenn 055
+# eingespielt ist; Reihenfolge und Einspielen der Altdaten: tools/worker-titelzeile-einspielen.ts.
+TITELZEILE_PLATTFORMEN = "disneyplus,netflix"
+MAIL_PROVIDER = "resend"       # resend | brevo | console
+FROM_EMAIL = "kalender@send.anime-kalender.de"
+FROM_NAME = "Anime-Kalender DE"
+# Antworten der Abonnenten sollen NICHT bei `send.anime-kalender.de` landen —
+# das ist eine reine Versand-Subdomain ohne Postfach. `kontakt@anime-kalender.de`
+# ist die Projektadresse (Email Routing); der Betreibername darf nie öffentlich stehen.
+REPLY_TO = "kontakt@anime-kalender.de"
+SEND_HOUR_BERLIN = "7"
+# Empfänger der Überwachungsmeldungen
+MONITOR_EMAIL = "kontakt@anime-kalender.de"
+# Wird nach dem ersten Deploy mit der tatsächlichen Worker-Adresse gefüllt;
+# sie steckt in jedem Abmeldelink.
+WORKER_URL = "https://newsletter.animekalender.workers.dev"
+
+# Geheim setzen mit:  wrangler secret put MAIL_API_KEY
+
+# Der Push-Kanal zur Statusanzeige (30.08.2026).
+#
+# Ein Worker lebt je Anfrage und kann deshalb keine Verbindung halten, über die
+# er eine zweite Anfrage benachrichtigt. Ein Durable Object kann es: Es gibt es
+# genau einmal, und es weiß, wer gerade zuhört. Auf Cloudflare ist das der
+# einzige Weg zu echtem Push.
+#
+# `new_sqlite_classes` statt `new_classes`: die Variante, die auf dem freien
+# Tarif läuft.
+[[durable_objects.bindings]]
+name = "EREIGNISSE"
+class_name = "Ereignisse"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Ereignisse"]
+
+# Taktgeber der Schnellmessung (schnellmesser.ts): Alarm alle 5 Minuten.
+[[durable_objects.bindings]]
+name = "SCHNELLMESSER"
+class_name = "Schnellmesser"
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["Schnellmesser"]
+
+# Private Beleg-Ablage (02.10.2026): je Lesung eines Artikels Bild und HTML. Kein öffentlicher
+# Zugang am Bucket — gelesen und geschrieben wird nur über /beleg mit LAUF_TOKEN.
+[[r2_buckets]]
+binding = "BELEGE"
+bucket_name = "anime-kalender-belege"
+
+# Workers Logs (11.10.2026): jede Logzeile (abgelehnte Meldungen: pruefung-ablehnung.ts) steht im
+# Dashboard und in `wrangler tail`. Kosten (developers.cloudflare.com/workers/observability/logs/workers-logs,
+# gelesen 11.10.2026): Free 200.000 Ereignisse am Tag, 3 Tage Aufbewahrung; Paid 20 Mio. im Monat
+# inklusive, 7 Tage. Die Aufruf-Logs sind aus: sie enthielten die volle Adresse samt Query
+# (Token, Push-Endpunkt) und kosteten bei vielen Aufrufen am Tag Ereignisse ohne Nutzen (Aufrufe/Tag: Messung `tools/kapazitaet-messen.mjs`, betrieb.md).
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[observability.logs]
+invocation_logs = false

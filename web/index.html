@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="de" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/icons/favicon-32.png" sizes="32x32" type="image/png" />
+    <!-- Diese Zeile ist für Google da, nicht für den Browser-Tab.
+         In der Ergebnisliste stand statt unseres Symbols der graue Globus
+         (17.08.2026). Angemeldet waren nur das SVG und ein 32er PNG, und die
+         Google-Dokumentation empfiehlt ausdrücklich mehr als 48 Pixel: „we
+         recommend using a favicon that's larger than 48x48px so that it looks
+         good on various surfaces". Ein Rastersymbol in 96 Pixeln nimmt Googlebot
+         jede Ausrede — SVG steht auf seiner Liste, aber sicher ist sicher. -->
+    <link rel="icon" href="/icons/favicon-96.png" sizes="96x96" type="image/png" />
+    <!-- Apple liest weder das Manifest noch die icon-Liste; es braucht diese
+         eine Zeile, sonst landet ein Bildschirmfoto auf dem Home-Bildschirm. -->
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="alternate" type="application/rss+xml" title="Anime-Kalender DE – News" href="/data/feeds/news.xml" />
+    <meta name="theme-color" content="#0d0f14" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f5f4f0" media="(prefers-color-scheme: light)" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Anime-Kalender" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- social:start
+      Alles zwischen diesen Markern tauscht `pipeline/build-share-pages.ts` beim
+      Bauen gegen release-eigene Angaben aus. Grund: WhatsApp, Discord, Telegram
+      und Co. führen kein JavaScript aus — sie lesen die ausgelieferte HTML-Datei
+      und hören dann auf. Eine Vorschau je Titel muss also als echte Datei unter
+      einem echten Pfad existieren; alles hinter dem `#` sieht ein Crawler nie.
+    -->
+    <!--
+      Steht innerhalb des social-Blocks: Die Teilen-Seiten tauschen ihn gegen
+      ihre eigene Adresse aus. Auf der Startseite sagt er Google, welche der drei
+      erreichbaren Adressen die richtige ist — es gibt sie noch unter
+      dernamenlosedaniel.github.io und unter www., und beide leiten hierher um. Ohne
+      diese Zeile bleibt es Googles Vermutung, und die Search Console meldet
+      „Seite mit Weiterleitung" (16.08.2026).
+    -->
+    <link rel="canonical" href="https://anime-kalender.de/" />
+    <title>Deutscher Anime-Kalender: Anime mit deutscher Synchro</title>
+    <meta
+      name="description"
+      content="Deutscher Anime-Kalender: Termine für Anime mit deutscher Synchro bei Crunchyroll, Netflix, Prime Video und Co. – mit Uhrzeit, FSK und Kalender-Export."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Anime-Kalender DE" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:url" content="https://anime-kalender.de/" />
+    <meta property="og:title" content="Deutscher Anime-Kalender: Anime mit deutscher Synchro" />
+    <meta
+      property="og:description"
+      content="Jede Woche auf einen Blick, was mit deutscher Synchro erscheint — Streaming, Disc und Kino, mit Uhrzeit, Plattform und FSK."
+    />
+    <meta
+      property="og:image"
+      content="https://anime-kalender.de/og/default.jpg"
+    />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Anime-Kalender DE — Termine mit deutscher Synchro, Woche für Woche"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Deutscher Anime-Kalender: Anime mit deutscher Synchro" />
+    <meta
+      name="twitter:description"
+      content="Jede Woche auf einen Blick, was mit deutscher Synchro erscheint."
+    />
+    <meta
+      name="twitter:image"
+      content="https://anime-kalender.de/og/default.jpg"
+    />
+    <!-- social:end -->
+    <!--
+      **Der Ladeschirm — und warum er nicht einfach ein leeres Feld ist.**
+
+      Im `#root` steht ausgeliefertes HTML: Titel, Beschreibung und die
+      nächsten Termine, erzeugt von `build-share-pages.ts`. Das ist Absicht und
+      bleibt so — eine Seite ohne Text rankt für nichts, und ein Besucher ohne
+      JavaScript bekommt hier eine vollständige Auskunft.
+
+      Für alle anderen blitzt sie eine knappe Sekunde auf, bevor React sie
+      ersetzt (Daniel, 12.09.2026, mit Bild: „beim neuladen der webseite steht
+      für <1sek dieser frame auf der webseite"). Also: Wer JavaScript hat,
+      bekommt den Ladeschirm und sieht den Rohbau gar nicht erst; wer keins
+      hat, sieht weiterhin die Termine.
+
+      Die Umschaltung passiert **vor** dem ersten Zeichnen — deshalb steht das
+      Skript im Kopf und nicht am Ende des Körpers.
+    -->
+    <style>
+      #ak-ladeschirm { display: none }
+      html.ak-laedt #root { visibility: hidden }
+      html.ak-laedt #ak-ladeschirm {
+        display: grid;
+        place-items: center;
+        position: fixed;
+        inset: 0;
+        background: #0d0f14;
+        z-index: 9999;
+      }
+      html.ak-laedt:not(.dark) #ak-ladeschirm { background: #f5f4f0 }
+      /* Drei Punkte, die nacheinander atmen — klein genug, um nicht selbst aufzufallen. */
+      #ak-ladeschirm span {
+        width: 0.5rem;
+        height: 0.5rem;
+        margin: 0 0.2rem;
+        border-radius: 9999px;
+        background: #ff5a36;
+        display: inline-block;
+        animation: ak-puls 1.05s ease-in-out infinite;
+      }
+      #ak-ladeschirm span:nth-child(2) { animation-delay: 0.14s }
+      #ak-ladeschirm span:nth-child(3) { animation-delay: 0.28s }
+      @keyframes ak-puls {
+        0%, 70%, 100% { opacity: 0.25; transform: scale(0.8) }
+        35% { opacity: 1; transform: scale(1) }
+      }
+      /* Start mit Gerüst (Standard; Vorschau `startgeruest` = `spinner` bringt die Punkte zurück): statt der Punkte ein Kopf- und Karten-Skelett, schon vor dem Skript-Bündel. */
+      #ak-geruest { display: none }
+      html.ak-geruest #ak-ladeschirm { display: block; place-items: unset }
+      html.ak-geruest #ak-ladeschirm > div:first-child { display: none }
+      html.ak-geruest #ak-geruest { display: block; padding: 0 1rem }
+      #ak-geruest i { display: block; background: rgba(128, 128, 128, 0.18); border-radius: 0.75rem }
+      #ak-geruest .k { height: 3.5rem; margin: 0 -1rem 1.5rem; border-radius: 0; border-bottom: 1px solid rgba(128, 128, 128, 0.25) }
+      #ak-geruest .r { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem 0.75rem; max-width: 640px }
+      #ak-geruest .r i { aspect-ratio: 2 / 3 }
+      /* Wer keine Bewegung will, bekommt einen ruhenden Punkt statt keiner Auskunft. */
+      @media (prefers-reduced-motion: reduce) {
+        #ak-ladeschirm span { animation: none; opacity: 0.6 }
+      }
+    </style>
+    <script>
+      document.documentElement.classList.add('ak-laedt')
+      try {
+        if (JSON.parse(localStorage.getItem('ak-vorschau') || '{}').startgeruest !== 'spinner') {
+          // Thema schon jetzt wählen (wie main.tsx), sonst zeigt das Gerüst kurz die falsche Farbe.
+          var t = localStorage.getItem('theme')
+          var dunkel = t ? t === 'dark' : !matchMedia('(prefers-color-scheme: light)').matches
+          document.documentElement.classList.toggle('dark', dunkel)
+          document.documentElement.classList.add('ak-geruest')
+        }
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="ak-ladeschirm" role="status" aria-label="Die Seite wird geladen">
+      <div><span></span><span></span><span></span></div>
+      <div id="ak-geruest"><i class="k"></i><div class="r"><i></i><i></i><i></i><i></i></div></div>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,565 @@
+import { ANILIST_COVER_BASIS, FRANCHISE_RELATIONS, otherZaehlt } from '../../shared/mappings.ts'
+import { NAMENSGEBUNDENE_RELATIONEN, namensanfangMindestens } from '../../shared/namensgebunden.ts'
+import { sleep, warn } from './util.ts'
+
+const ENDPOINT = 'https://graphql.anilist.co'
+
+export interface AniListMedia {
+  id: number
+  idMal: number | null
+  title: { romaji: string | null; english: string | null; native: string | null }
+  format: string | null
+  status: string | null
+  episodes: number | null
+  duration: number | null
+  season: string | null
+  seasonYear: number | null
+  startDate: { year: number | null; month: number | null; day: number | null }
+  genres: string[]
+  tags: { name: string; rank: number; isMediaSpoiler: boolean; isAdult: boolean }[]
+  externalLinks: { site: string; url: string; type: string | null }[]
+  studios: { nodes: { name: string; isAnimationStudio?: boolean }[] }
+  coverImage: { large: string | null; extraLarge: string | null }
+  bannerImage: string | null
+  averageScore: number | null
+  /** Ungewichtetes Mittel; fehlt in Zwischenspeichern vor dem 22.11.2026. Rückfall der Wertung (`lib/anilist-wertung.ts`). */
+  meanScore?: number | null
+  /** Stimmen je Wertungsstufe (Summe = Zahl der Stimmen); fehlt in Zwischenspeichern vor dem 22.11.2026. */
+  stats?: { scoreDistribution: { score: number; amount: number }[] | null } | null
+  /** Produktionsland laut AniList (z. B. `JP`); fehlt in Zwischenspeichern vor dem 09.10.2026. */
+  countryOfOrigin?: string | null
+  isAdult: boolean
+  description: string | null
+  relations?: {
+          edges: {
+            relationType: string
+            node: { id: number; type: string; title?: { romaji: string | null; english: string | null } }
+          }[]
+        }
+  endDate?: { year: number | null; month: number | null; day: number | null }
+}
+
+/** Muss ein Zwischenspeicher-Eintrag neu geholt werden? Nicht abgeschlossen, ohne Herkunftsland (vor 09.10.2026) oder ohne Stimmenverteilung (vor 22.11.2026, sonst bliebe der AniList-Rückfall der Wertung leer). */
+export function eintragNochOffen(m: Pick<AniListMedia, 'status' | 'countryOfOrigin' | 'stats'>): boolean {
+  return (m.status !== 'FINISHED' && m.status !== 'CANCELLED') || m.countryOfOrigin === undefined || m.stats === undefined
+}
+
+const MEDIA_FIELDS = `
+  id idMal
+  title { romaji english native }
+  format status episodes duration season seasonYear
+  startDate { year month day }
+  endDate { year month day }
+  genres
+  tags { name rank isMediaSpoiler isAdult }
+  externalLinks { site url type }
+  studios { nodes { name isAnimationStudio } }
+  coverImage { large extraLarge }
+  bannerImage
+  averageScore meanScore stats { scoreDistribution { score amount } } isAdult countryOfOrigin
+  description(asHtml: false)
+  relations { edges { relationType node { id type title { romaji english } } } }
+`
+
+interface GqlResponse<T> {
+  data?: T
+  errors?: { message: string }[]
+}
+
+/**
+ * AniList erlaubt laut Doku 90 Requests/Minute, drosselt in der Praxis aber
+ * härter. Deshalb: fester Mindestabstand plus Auswertung der Rate-Limit-Header.
+ */
+let minDelayMs = 750
+
+async function gql<T>(query: string, variables: Record<string, unknown>, attempt = 0): Promise<T> {
+  const res = await fetch(ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ query, variables }),
+  })
+
+  if (res.status === 429) {
+    const retryAfter = Number(res.headers.get('retry-after') ?? 60)
+    warn(`AniList Rate-Limit — warte ${retryAfter}s`)
+    minDelayMs = Math.min(minDelayMs * 1.5, 4000)
+    await sleep((retryAfter + 1) * 1000)
+    if (attempt >= 5) throw new Error('AniList: zu oft rate-limited')
+    return gql<T>(query, variables, attempt + 1)
+  }
+  if (res.status >= 500) {
+    if (attempt >= 5) throw new Error(`AniList ${res.status}`)
+    await sleep(2 ** attempt * 1000)
+    return gql<T>(query, variables, attempt + 1)
+  }
+
+  const json = (await res.json()) as GqlResponse<T>
+  if (json.errors?.length) {
+    // "Not Found" ist bei Einzelabfragen ein normaler Fall, kein Abbruchgrund.
+    const msg = json.errors.map((e) => e.message).join('; ')
+    if (/not found/i.test(msg)) return {} as T
+    /**
+     * Ein Ausfall der Quelle ist etwas anderes als ein Fehler in der Abfrage.
+     *
+     * Am 23.08.2026 antwortete AniList stundenlang mit „The AniList API has
+     * been temporarily disabled due to severe stability issues" — und der
+     * stündliche Datenlauf brach vollständig ab, obwohl der Cache 2.989
+     * Einträge hielt und die Sendezeiten von Crunchyroll kommen.
+     *
+     * Die Kennzeichnung erlaubt dem Aufrufer, den Fall zu unterscheiden:
+     * eine kaputte Abfrage muss auffallen, eine abgeschaltete Quelle nicht.
+     */
+    const fehler = new Error(`AniList: ${msg}`)
+    if (/temporarily disabled|stability issues|service unavailable|maintenance/i.test(msg)) {
+      ;(fehler as Error & { quelleAus?: boolean }).quelleAus = true
+    }
+    throw fehler
+  }
+  const remaining = Number(res.headers.get('x-ratelimit-remaining') ?? 90)
+  if (remaining < 15) minDelayMs = Math.max(minDelayMs, 2000)
+  await sleep(minDelayMs)
+  return json.data as T
+}
+
+/**
+ * Ein Anime aus dem Gesamtkatalog — bewusst mager.
+ *
+ * Zu diesen Titeln wissen wir nichts über deutsche Fassungen, weil es keine
+ * gibt. Gespeichert wird deshalb nur, was zum Finden und Wiedererkennen reicht.
+ * Sobald eine Synchro belegt ist, wandert der Titel in den gepflegten Bestand
+ * und wird dort vollständig geholt.
+ */
+export interface KatalogEintrag {
+  /** Kennungen der Eltern — wer zwei hat, ist ein Crossover und verbindet nichts. */
+  eltern?: number[]
+  id: number
+  /**
+   * **Die MAL-Kennung** (29.09.2026) — AniList führt sie als `idMal`.
+   *
+   * Daniel öffnete „1/100 SHIBUYA Crossing" (steht in `ohne-synchro.json`) und fand keinen
+   * MAL-Absprung: Die Datei trug nur die AniList-Kennung, und die ist nicht dieselbe. Für den Weg
+   * zu MyAnimeList braucht der Titel diese Nummer.
+   */
+  mal?: number
+  /** Romaji, Englisch, Japanisch — alle drei, weil alle drei gesucht werden. */
+  t: [string | null, string | null, string | null]
+  format: string | null
+  jahr: number | null
+  folgen: number | null
+  /**
+   * **Beginn laut AniList — der einzige Termin, den ein Katalogtitel hat.**
+   *
+   * Bis zum 12.09.2026 holte die Abfrage nur `seasonYear`, und der ist bei
+   * Ankündigungen und bei chinesischen Produktionen oft leer: Alle vier Teile
+   * von „Lord of Mysteries" standen ohne jede Zeitangabe im Panel (Daniel:
+   * „why important info like release dates or estimated release dates are
+   * missing"). `startDate` trägt dort den 19.06.2026.
+   *
+   * Unvollständige Daten bleiben unvollständig: AniList führt „2026" ohne
+   * Monat als `{ year: 2026 }`, und daraus wird `2026`, nicht `2026-01-01`.
+   */
+  start?: string | null
+  /** `RELEASING`, `FINISHED`, `NOT_YET_RELEASED` — sagt, ob ein Termin noch aussteht. */
+  status?: string | null
+  /**
+   * **Ein lesbarer Name, wo der Romaji keiner ist.**
+   *
+   * AniLists `romaji` ist bei japanischen Werken die etablierte Umschrift —
+   * „Shingeki no Kyojin" sucht auch hier jemand so. Bei chinesischen und
+   * koreanischen Produktionen ist es eine Pinyin- bzw. Hangul-Umschrift, die
+   * niemand kennt: „Guimi Zhi Zhu: Wu Mian Ren Pian" (Daniel, 12.09.2026:
+   * „wu mian ren pian ist weiterhin chinesisch").
+   *
+   * Fehlt dort der englische Name, führt AniList ihn oft unter `synonyms` —
+   * für diesen Titel „Lord of the Mysteries 2". Genommen wird davon nur ein
+   * rein lateinischer Eintrag, und nur bei `countryOfOrigin` ≠ JP: Die Liste
+   * enthält auch vietnamesische und indonesische Fassungen, und für ein
+   * japanisches Werk wäre der Romaji ohnehin der richtige Name.
+   */
+  latein?: string | null
+  /**
+   * **Herkunftsland, nur wenn es nicht Japan ist** (`countryOfOrigin`).
+   *
+   * Der Kasten eines angekündigten Kinofilms nennt den Kinostart im
+   * Herkunftsland. 19 von 112 angekündigten Filmen stammen
+   * aus China oder Südkorea — „In Japan ab …" wäre dort eine Falschangabe.
+   * Japan bleibt weg: Es ist der Regelfall und stünde sonst siebzehntausendmal
+   * im Cache.
+   */
+  land?: string
+  /**
+   * **Die Synonyme im Rohzustand — der deutsche Name steht oft darunter.**
+   *
+   * AniList kennzeichnet Synonyme nicht nach Sprache, deshalb entsteht hier
+   * kein Urteil: „Die Tagebücher der Apothekerin: Der Film" und „Les Carnets de
+   * l'Apothicaire : Le Film" stehen gleichberechtigt nebeneinander (Daniel,
+   * 12.09.2026: „Die Tagebücher der Apothekerin: Der Film muss da stehen").
+   *
+   * Entscheiden kann es nur der Bau, denn dort ist bekannt, wie die **Reihe**
+   * auf Deutsch heißt — und ein Synonym, das mit diesem belegten Namen
+   * beginnt, ist belegbar deutsch. Das ist ein Abgleich, kein Sprachraten.
+   */
+  synonyme?: string[] | null
+  genres: string[]
+  score: number | null
+  /**
+   * Cover **ohne** Adressvorsatz — nur der Dateiname.
+   *
+   * Die vollen AniList-Adressen sind rund 70 Zeichen lang und beginnen alle
+   * gleich. Bei 20.000 Titeln sind das 1,2 MB, die niemand braucht: Der
+   * Vorsatz wird beim Anzeigen wieder angehängt (`COVER_BASIS`).
+   */
+  cover: string | null
+  /**
+   * Kennungen verwandter Anime — nur die Beziehungen aus `FRANCHISE_RELATIONS`.
+   *
+   * Ohne dieses Feld gibt es für Titel ohne deutsche Synchro keine
+   * `franchiseId`, und „Staffeln zusammenfassen" wirkt auf sie nicht: „Link
+   * Click" stand mit sieben Kacheln nebeneinander, obwohl der Schalter an war
+   * (Daniel, 13.08.2026, mit Bild). Gefiltert wird schon beim Abruf, damit im
+   * Zwischenspeicher nur landet, was auch gebraucht wird.
+   */
+  rel: number[]
+}
+
+
+/**
+ * **Der beste lateinische Zweitname — oder keiner.**
+ *
+ * Greift nur, wo AniList keinen englischen Namen führt **und** das Werk nicht
+ * aus Japan stammt. Genommen wird der längste Eintrag, der ausschließlich aus
+ * lateinischen Buchstaben, Ziffern und gewöhnlicher Zeichensetzung besteht:
+ * Diakritika schließen die vietnamesische Fassung aus („Chúa Tể Huyền Bí"),
+ * die Mindestlänge das Kürzel („LOTM"), und der längste ist der mit dem
+ * meisten Inhalt.
+ *
+ * Was übrig bleibt, ist ein Vorschlag für `titleEn` — nicht für `titleDe`.
+ * Ein englischer Name ist keine deutsche Fassung, und die Trennlinie dieses
+ * Projekts verläuft genau dort.
+ */
+export function bestesSynonym(
+  englisch: string | null | undefined,
+  land: string | null | undefined,
+  synonyme: string[] | null | undefined,
+): string | null {
+  if (englisch || !land || land === 'JP' || !synonyme?.length) return null
+  const tauglich = synonyme
+    .map((s) => s.trim())
+    .filter((s) => s.length >= 6 && /^[A-Za-z0-9][A-Za-z0-9 .,:!?'&()/-]*$/.test(s) && /[a-z]/.test(s))
+  if (!tauglich.length) return null
+  return tauglich.sort((a, b) => b.length - a.length)[0]!
+}
+
+/** Formate, die als Anime-Titel zählen — `MUSIC` sind Musikvideos. */
+const KATALOG_FORMATE = ['TV', 'TV_SHORT', 'MOVIE', 'SPECIAL', 'OVA', 'ONA']
+
+/**
+ * Ob ein AniList-Eintrag in den Katalog gehört. Eine noch nicht erschienene Ankündigung
+ * ohne Format zählt mit: AniList legt neue Titel oft zuerst ohne Format und Datum an, und
+ * `format_in` verwirft sie (gemessen 09.10.2026: 28 von 63 fehlenden jüngsten Titeln).
+ */
+export function gehoertInKatalog(format: string | null | undefined, status: string | null | undefined): boolean {
+  return format ? KATALOG_FORMATE.includes(format) : status === 'NOT_YET_RELEASED'
+}
+
+/**
+ * Eine Seite des Gesamtkatalogs.
+ *
+ * **Warum jahrweise abgefragt wird:** AniList lässt je Abfrage nur 5.000
+ * Einträge durchblättern („Page depth exceeds maximum allowed"), das sind bei
+ * 50 je Seite genau 100 Seiten. Der Bestand ist deutlich größer. Ein Zeiger auf
+ * die Kennung wäre die elegante Lösung, aber `id_greater` gibt es nicht — nur
+ * `id_in` und `id_not_in`. Also wird nach Startjahr zerlegt; kein Jahr kommt
+ * der Grenze auch nur nahe.
+ *
+ * `pageInfo.total` ist dabei **nutzlos**: Es meldet für jedes Jahr 5.000, weil
+ * AniList dort denselben Deckel anlegt. Gezählt wird deshalb über
+ * `hasNextPage`, nicht über `total`.
+ *
+ * Ohne `von`/`bis` läuft die Abfrage über den ganzen Bestand — gebraucht für
+ * den Nachlauf über die jüngsten Kennungen, der Titel ohne Startdatum einsammelt.
+ */
+export async function katalogSeite(
+  seite: number,
+  von?: number,
+  bis?: number,
+  absteigend = false,
+  formatlose = false, // ohne `format_in` abfragen, selbst filtern (`gehoertInKatalog`): nimmt formatlose Ankündigungen mit
+  kennungen?: number[], // nur diese Kennungen (höchstens 50): frischt Einträge auf, die kein Jahrgang und kein Nachlauf mehr erreicht
+): Promise<{ eintraege: KatalogEintrag[]; weiter: boolean }> {
+  const datumsFilter = von !== undefined ? 'startDate_greater: $von, startDate_lesser: $bis,' : ''
+  const datumsArgs = von !== undefined ? '$von: FuzzyDateInt, $bis: FuzzyDateInt,' : ''
+  const query = `query ($p: Int, ${datumsArgs} ${kennungen ? '$ids: [Int],' : ''} ${formatlose ? '' : '$f: [MediaFormat]'}) {
+    Page(page: $p, perPage: 50) {
+      pageInfo { hasNextPage }
+      media(type: ANIME, isAdult: false, ${kennungen ? 'id_in: $ids,' : ''} ${formatlose ? '' : 'format_in: $f,'} ${datumsFilter} sort: ${absteigend ? 'ID_DESC' : 'ID'}) {
+        id idMal
+        title { romaji english native }
+        synonyms countryOfOrigin
+        format episodes seasonYear averageScore status
+        startDate { year month day }
+        genres
+        coverImage { large }
+        relations { edges { relationType node { id type title { romaji english } } } }
+      }
+    }
+  }`
+  const vars: Record<string, unknown> = { p: seite, ...(formatlose ? {} : { f: KATALOG_FORMATE }), ...(kennungen ? { ids: kennungen } : {}) }
+  if (von !== undefined) {
+    vars.von = von
+    vars.bis = bis
+  }
+
+  const data = await gql<{ Page: { pageInfo: { hasNextPage: boolean }; media: KatalogMedium[] } }>(query, vars)
+
+  return {
+    weiter: data?.Page?.pageInfo?.hasNextPage ?? false,
+    eintraege: (data?.Page?.media ?? []).filter((m) => !formatlose || gehoertInKatalog(m.format, m.status)).map(katalogEintragAus),
+  }
+}
+
+/** Die Felder eines AniList-Eintrags, die der Katalog führt (auch für Formate, die `gehoertInKatalog` ausschließt). */
+export interface KatalogMedium {
+  id: number
+  idMal: number | null
+  title: { romaji: string | null; english: string | null; native: string | null }
+  synonyms?: string[] | null
+  countryOfOrigin?: string | null
+  format: string | null
+  episodes: number | null
+  seasonYear: number | null
+  status?: string | null
+  startDate?: { year: number | null; month: number | null; day: number | null } | null
+  averageScore: number | null
+  genres: string[]
+  coverImage: { large: string | null }
+  relations?: {
+    edges: {
+      relationType: string
+      node: { id: number; type: string; title?: { romaji: string | null; english: string | null } }
+    }[]
+  }
+}
+
+/** Ein Katalogeintrag aus dem AniList-Eintrag; die Filter (`gehoertInKatalog`) wendet der Aufrufer an. */
+export function katalogEintragAus(m: KatalogMedium): KatalogEintrag {
+  return {
+    id: m.id,
+    mal: m.idMal ?? undefined,
+    t: [m.title.romaji, m.title.english, m.title.native],
+    format: m.format,
+    jahr: m.seasonYear ?? m.startDate?.year ?? null,
+    start: (() => {
+      const d = m.startDate
+      if (!d?.year) return null
+      const zwei = (n: number) => String(n).padStart(2, '0')
+      if (!d.month) return String(d.year)
+      return d.day ? `${d.year}-${zwei(d.month)}-${zwei(d.day)}` : `${d.year}-${zwei(d.month)}`
+    })(),
+    status: m.status ?? null,
+    latein: bestesSynonym(m.title.english, m.countryOfOrigin, m.synonyms),
+    land: m.countryOfOrigin && m.countryOfOrigin !== 'JP' ? m.countryOfOrigin : undefined,
+    /* Höchstens acht — mehr trägt keine Reihe bei, und der Cache bleibt schlank. */
+    synonyme: m.synonyms?.length ? m.synonyms.slice(0, 8) : undefined,
+    folgen: m.episodes,
+    genres: m.genres ?? [],
+    score: m.averageScore,
+    cover: m.coverImage?.large?.startsWith(ANILIST_COVER_BASIS)
+      ? m.coverImage.large.slice(ANILIST_COVER_BASIS.length)
+      : (m.coverImage?.large ?? null),
+    /*
+      **Wer zwei Eltern hat, ist ein Crossover — und verbindet nichts.**
+
+      „Dragon Ball: Annecy Festival 60th Anniversary" trägt `PARENT` auf
+      Dragon Ball Super **und** auf den One-Piece-Beitrag desselben Festivals.
+      Über diese eine Kante klebten am 03.09.2026 elf Dragon-Ball-Titel in der
+      One-Piece-Reihe.
+
+      Der Hauptbestand kennt diese Regel seit dem 12.08.2026 (`crossoverEltern`
+      in `build.ts`), der Katalog nicht — dort standen nur die Kennungen, nicht
+      die Kantenarten. Jetzt reisen die Eltern mit, und der Bau kann dieselbe
+      Entscheidung treffen.
+    */
+    eltern: (m.relations?.edges ?? [])
+      .filter((e) => e.relationType === 'PARENT' && e.node?.type === 'ANIME')
+      .map((e) => e.node.id),
+    rel: (m.relations?.edges ?? [])
+      .filter(
+        (e) =>
+          e.node?.type === 'ANIME' &&
+          (FRANCHISE_RELATIONS.has(e.relationType) ||
+            /*
+              `OTHER` ist AniLists Sammelbecken — dort stehen Reihenteile ohne
+              eigene Schublade neben „vom selben Studio". Der Namensvergleich
+              trennt sie; die Begründung samt Messwerten steht bei
+              `otherZaehlt` in `shared/mappings.ts`.
+            */
+            (NAMENSGEBUNDENE_RELATIONEN.has(e.relationType) &&
+              otherZaehlt(
+                [m.title.romaji, m.title.english],
+                [e.node.title?.romaji, e.node.title?.english], namensanfangMindestens(e.relationType),
+              ))),
+      )
+      .map((e) => e.node.id),
+  }
+}
+
+/** Holt Media-Einträge zu einer Liste von MAL-IDs, 50 Stück pro Request. */
+export async function mediaByMalIds(
+  malIds: number[],
+  onProgress?: (done: number, total: number) => void,
+  /** Ein fehlgeschlagener Block wirft, statt als „nichts gefunden" zu gelten (für Aufrufer, die Nichtauskunft nicht als Befund speichern dürfen). */
+  strikt = false,
+): Promise<Map<number, AniListMedia>> {
+  const out = new Map<number, AniListMedia>()
+  const query = `query ($ids: [Int]) {
+    Page(page: 1, perPage: 50) { media(idMal_in: $ids, type: ANIME) { ${MEDIA_FIELDS} } }
+  }`
+
+  for (let i = 0; i < malIds.length; i += 50) {
+    const chunk = malIds.slice(i, i + 50)
+    try {
+      const data = await gql<{ Page: { media: AniListMedia[] } }>(query, { ids: chunk })
+      for (const m of data?.Page?.media ?? []) {
+        if (m.idMal != null) out.set(m.idMal, m)
+      }
+    } catch (err) {
+      if (strikt) throw err
+      warn(`Batch ab Index ${i} fehlgeschlagen: ${(err as Error).message}`)
+    }
+    onProgress?.(Math.min(i + 50, malIds.length), malIds.length)
+  }
+  return out
+}
+
+/** Holt Media-Einträge zu AniList-Kennungen, 50 je Anfrage; ein fehlgeschlagener Block wirft (Nichtauskunft ist kein Befund). */
+export async function mediaByIds(ids: number[]): Promise<Map<number, AniListMedia>> {
+  const out = new Map<number, AniListMedia>()
+  const query = `query ($ids: [Int]) {
+    Page(page: 1, perPage: 50) { media(id_in: $ids, type: ANIME) { ${MEDIA_FIELDS} } }
+  }`
+  for (let i = 0; i < ids.length; i += 50) {
+    const data = await gql<{ Page: { media: AniListMedia[] } }>(query, { ids: ids.slice(i, i + 50) })
+    for (const m of data?.Page?.media ?? []) out.set(m.id, m)
+  }
+  return out
+}
+
+/** Sucht einen Titel per Freitext — für kuratierte Einträge ohne ID. */
+/**
+ * Ist dieser Fehler ein Ausfall der Quelle — oder unser eigener?
+ *
+ * Nur beim Ausfall darf ein Lauf weitermachen; alles andere muss auffallen.
+ */
+export function istQuellenAusfall(err: unknown): boolean {
+  if (!(err instanceof Error)) return false
+  if ((err as Error & { quelleAus?: boolean }).quelleAus) return true
+  return /temporarily disabled|stability issues|503|502|504|ECONNRESET|ETIMEDOUT/i.test(err.message)
+}
+
+export async function searchMedia(term: string, year?: number): Promise<AniListMedia | undefined> {
+  const query = `query ($search: String, $year: Int) {
+    Page(page: 1, perPage: 5) {
+      media(search: $search, type: ANIME, startDate_like: $year, sort: SEARCH_MATCH) { ${MEDIA_FIELDS} }
+    }
+  }`
+  // startDate_like erwartet ein Muster wie 2026%, deshalb als String bauen.
+  const q = year
+    ? query.replace('$year: Int', '$year: String').replace('startDate_like: $year', 'startDate_like: $year')
+    : query.replace(', $year: Int', '').replace(', startDate_like: $year', '')
+  const vars: Record<string, unknown> = { search: term }
+  if (year) vars.year = `${year}%`
+  const data = await gql<{ Page: { media: AniListMedia[] } }>(q, vars)
+  return data?.Page?.media?.[0]
+}
+
+/** Eine Sprechrolle: Figur, deutsche Stimme, dazu die japanische zum Vergleich. */
+export interface VoiceRole {
+  character: string
+  /** Deutsche Sprecherin oder Sprecher. */
+  actor: string
+  /** 'MAIN' | 'SUPPORTING' | 'BACKGROUND' — die Reihenfolge kommt von AniList. */
+  role?: string
+}
+
+/**
+ * Holt die deutschen Sprechrollen zu mehreren Titeln.
+ *
+ * Warum AniList und nicht die Deutsche Synchronkartei, die ungleich mehr hat:
+ * Deren rechtliche Hinweise untersagen automatisiertes Auslesen wörtlich
+ * („Insbesondere ist ein automatisiertes Auslesen des Internetangebots nicht
+ * gestattet"). AniList dagegen betreibt die Schnittstelle ausdrücklich für
+ * genau solche Zugriffe — und wir fragen sie ohnehin schon ab.
+ *
+ * Zehn Titel je Anfrage: Die Figurenliste ist eine verschachtelte Abfrage,
+ * größere Bündel treiben die Kosten je Anfrage unnötig hoch.
+ *
+ * **Nur eine Sprache je Abfrage.** AniList löst das Feld voiceActors pro
+ * Auswahl genau einmal auf: Steht es zweimal mit verschiedenen Sprachen da,
+ * gewinnt die letzte — und zwar für beide Felder. Aliasse helfen nicht, sie
+ * machen es schlimmer, weil dann beide die japanischen Namen liefern. Der
+ * Fehler ist still und plausibel: Die Liste ist gefüllt, die Namen sehen nach
+ * Sprechern aus, nur spricht Yuuka Nanri kein Deutsch. Wer die japanische
+ * Besetzung dazu will, braucht eine zweite Abfrage.
+ */
+export async function germanVoicesFor(
+  ids: number[],
+  onProgress?: (done: number, total: number) => void,
+): Promise<Map<number, VoiceRole[]>> {
+  const out = new Map<number, VoiceRole[]>()
+  const query = `query ($ids: [Int]) {
+    Page(page: 1, perPage: 10) {
+      media(id_in: $ids, type: ANIME) {
+        id
+        characters(sort: [ROLE, RELEVANCE], perPage: 25) {
+          edges {
+            role
+            node { name { full } }
+            voiceActors(language: GERMAN) { name { full } }
+          }
+        }
+      }
+    }
+  }`
+
+  for (let i = 0; i < ids.length; i += 10) {
+    const chunk = ids.slice(i, i + 10)
+    try {
+      const data = await gql<{
+        Page: {
+          media: {
+            id: number
+            characters: {
+              edges: {
+                role: string | null
+                node: { name: { full: string | null } }
+                voiceActors: { name: { full: string | null } }[]
+              }[]
+            }
+          }[]
+        }
+      }>(query, { ids: chunk })
+
+      for (const m of data?.Page?.media ?? []) {
+        const rollen: VoiceRole[] = []
+        for (const kante of m.characters?.edges ?? []) {
+          const stimme = kante.voiceActors?.[0]?.name?.full
+          const figur = kante.node?.name?.full
+          if (!stimme || !figur) continue
+          rollen.push({ character: figur, actor: stimme, role: kante.role ?? undefined })
+        }
+        if (rollen.length) out.set(m.id, rollen)
+      }
+    } catch (err) {
+      warn(`Sprecher-Bündel ab Index ${i} fehlgeschlagen: ${(err as Error).message}`)
+    }
+    onProgress?.(Math.min(i + 10, ids.length), ids.length)
+  }
+  return out
+}
+
+export async function mediaById(id: number): Promise<AniListMedia | undefined> {
+  const query = `query ($id: Int) { Media(id: $id, type: ANIME) { ${MEDIA_FIELDS} } }`
+  const data = await gql<{ Media: AniListMedia }>(query, { id })
+  return data?.Media
+}

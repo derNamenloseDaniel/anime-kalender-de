@@ -1,0 +1,107 @@
+name: PR-Prüfer — Neustart bei Nachtrag
+
+# Ein Kommentar „Nachtrag…“/„Nachbesserung…“ eines Berechtigten auf einem offenen PR startet den CI-Prüfer (pr-pruefer.yml)
+# für den aktuellen Kopf neu (Fälle 1585 R2, 2284, 2289: Prüfer urteilte ohne Nachtrag); die Entscheidung trifft
+# tools/pr-pruefer-neustart.mjs (Skript aus main). Seit 21.11.2026 per workflow_dispatch: ein laufender Prüfer desselben PR
+# bricht über dessen concurrency-Gruppe ab.
+# `issue_comment` läuft mit Repo-Rechten in der Fassung von main: der Kommentartext geht nur über `env`, nie in `run:`,
+# und es wird kein PR-Code ausgeführt oder ausgecheckt.
+
+# Zweiter Auslöser (`workflow_run`): Endet die PR-Prüfkette eines Kopfes ohne Prüfer-Urteil, startet tools/pr-pruefer-nach-kette.mjs
+# den Prüfer (seit 21.11.2026 der einzige Start nach einem Push; Marke „Kette offen“ wie bisher). Ohne PR-Code, ohne Kommentartext.
+
+on:
+  issue_comment:
+    types: [created]
+  workflow_run:
+    workflows: ['PR-Prüfkette']
+    types: [completed]
+  # Dritter Auslöser: Ein gemergter PR, den offene PRs als Basis nennen („mergen nach #N“), rechnet deren Kette nach
+  # (Job basis-gemergt, tools/basis-gemergt-neustart.mjs). `pull_request_target` läuft in der Fassung von main, ohne PR-Code.
+  pull_request_target:
+    types: [closed]
+
+permissions:
+  contents: read
+  pull-requests: read
+  # actions: write nur für den workflow_dispatch von pr-pruefer.yml (tools/pr-pruefer-start.mjs, `starte`).
+  actions: write
+
+# Ein Neustart je PR (Nachtrag) bzw. je Kopf (Kettenende) zur Zeit; ein wartender wird vom neueren ersetzt (der neue liest ohnehin alle Kommentare).
+# Ein abgebrochenes Kettenende (cancelled) hat eine eigene Gruppe: sein Lauf tut nichts (Job übersprungen) und darf darum keinen
+# wartenden Neustart desselben Kopfes verdrängen (Kette erneut gestartet, Ende success wartet, cancelled-Ereignis käme als Neueres).
+concurrency:
+  group: pr-pruefer-nachtrag-${{ github.event_name == 'pull_request_target' && 'basis-' || '' }}${{ github.event.issue.number || github.event.workflow_run.head_sha || github.event.pull_request.number }}${{ github.event.workflow_run.conclusion == 'cancelled' && '-abgebrochen' || '' }}
+  cancel-in-progress: false
+
+jobs:
+  neustart:
+    name: Prüfer neu starten
+    # Kommentare auf Issues und die des Prüfers selbst starten nichts (keine Schleife).
+    if: github.event.issue.pull_request != null && github.event.comment.user.login != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    # 20 min = 5 min (Checkout, vier Abfragen, Dispatch) plus das Zeitkonto KONTO_MS (15 min für alle Warteplätze bei „rate limit“,
+    # tools/gh-ratelimit.mjs); Rechnung: tools/pr-pruefer-neustart.test.mjs.
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Prüfer neu starten
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMMER: ${{ github.event.issue.number }}
+          KOMMENTAR: ${{ github.event.comment.body }}
+          KOMMENTAR_LOGIN: ${{ github.event.comment.user.login }}
+          KOMMENTAR_ASSOZIATION: ${{ github.event.comment.author_association }}
+          KOMMENTAR_ZEIT: ${{ github.event.comment.created_at }}
+        run: node tools/pr-pruefer-neustart.mjs
+
+  nach-kette:
+    name: Prüfer nach Kettenende starten
+    # Eine abgebrochene Kette (cancelled) startet nichts: Ein neuerer Kopf hat seine eigene Kette und sein eigenes Ende; wurde sie von Hand
+    # ohne Nachfolger abgebrochen, steht nichts zu beurteilen an, und der nächste Kettenlauf desselben Kopfes endet wieder hier (success/failure).
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion != 'cancelled'
+    runs-on: ubuntu-latest
+    # 20 min = 5 min (Checkout, drei Abfragen, Dispatch; kein Warten mehr) plus das Zeitkonto KONTO_MS (15 min für alle Warteplätze
+    # bei „rate limit“, tools/gh-ratelimit.mjs); Rechnung: tools/pr-pruefer-nach-kette.test.mjs.
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Prüfer nach Kettenende starten
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          KOPF_SHA: ${{ github.event.workflow_run.head_sha }}
+          KETTE_ERGEBNIS: ${{ github.event.workflow_run.conclusion }}
+        run: node tools/pr-pruefer-nach-kette.mjs
+
+  basis-gemergt:
+    name: Kette der Stapel-PRs nach Basis-Merge neu rechnen
+    if: github.event_name == 'pull_request_target' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    # Höchstens 5 Stapel-PRs je Merge (tools/basis-gemergt-neustart.mjs), je PR bis ~1 min.
+    timeout-minutes: 9
+    # Nur Lesen: Schließen und Öffnen geschieht mit dem PAT (das GITHUB_TOKEN löst keine Folgeläufe aus).
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: read
+    steps:
+      # Flacher Checkout genügt: `nachziehen` (tools/pr-nachrechnen.mjs) fragt nur die GitHub-API, kein git log (seit 21.11.2026).
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Stapel-PRs nachrechnen
+        env:
+          GH_TOKEN: ${{ secrets.NACHT_MERGER_TOKEN || secrets.GITHUB_TOKEN }}
+          # Ohne PAT nur rechnen (Trockenlauf), nichts schließen oder öffnen.
+          TROCKEN: ${{ secrets.NACHT_MERGER_TOKEN == '' }}
+          BASIS_PR: ${{ github.event.pull_request.number }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_REPO: ${{ github.repository }}
+        run: node tools/basis-gemergt-neustart.mjs

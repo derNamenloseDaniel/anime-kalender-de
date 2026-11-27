@@ -1,0 +1,87 @@
+name: Fund nachliefern
+
+# Spielt den Fund eines Sammel-Laufs ein, dessen Pull Request nicht zustande kam. Jeder Sammel-Lauf sichert seine geänderten Quelldateien vor dem Einreichen als
+# Artefakt „fund-<Job>" (14 Tage, `.github/actions/einreichen`). Dieser Workflow lädt die Artefakte eines Laufs, legt sie auf den jüngsten Stand von `main` und reicht
+# sie wie ein Sammler ein. Aufruf: Lauf-Nummer angeben, optional nur ein Artefakt.
+#
+# Anlass (05.10.2026): Der Wochenlauf scheiterte am letzten Schritt (Push eines Zweigs mit abweichenden Workflow-Dateien), und 107 Minuten Abrufe waren weg.
+
+on:
+  workflow_dispatch:
+    inputs:
+      lauf:
+        description: 'Nummer des Laufs, dessen Fund eingespielt wird'
+        required: true
+        type: string
+      artefakt:
+        description: 'Nur dieses Artefakt (z. B. fund-anilist); leer = alle des Laufs'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: fund-nachliefern
+  cancel-in-progress: false
+
+jobs:
+  nachliefern:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Funde laden
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/funde"
+          if [ -n "${{ inputs.artefakt }}" ]; then
+            gh run download "${{ inputs.lauf }}" --repo "$GITHUB_REPOSITORY" --name "${{ inputs.artefakt }}" --dir "$RUNNER_TEMP/funde/${{ inputs.artefakt }}"
+          else
+            gh run download "${{ inputs.lauf }}" --repo "$GITHUB_REPOSITORY" --pattern 'fund-*' --dir "$RUNNER_TEMP/funde"
+          fi
+          find "$RUNNER_TEMP/funde" -type f | head -50
+
+      # Die Dateien liegen unter `files/<Pfad>`; gelöschte Pfade stehen in `geloescht.txt`. Sie werden in das Arbeitsverzeichnis gelegt, dann übernimmt quellen-pr.sh
+      # (Zweig auf dem jüngsten main, nur die eigenen Änderungen, source-health und dub-confirmed zusammengeführt).
+      - name: Funde einspielen
+        run: |
+          for fund in "$RUNNER_TEMP"/funde/*/; do
+            [ -d "${fund}files" ] && cp -r "${fund}files/." .
+            if [ -f "${fund}geloescht.txt" ]; then while IFS= read -r p; do [ -n "$p" ] && rm -f "$p"; done < "${fund}geloescht.txt"; fi
+          done
+          git status --short | head -30
+
+      # Was auf main nach dem Start des Fundlaufs geändert wurde, bleibt auf dem Stand von main (Anlass 14.11.2026: der Fund vom 10.11. hätte neuere Dateien überlagert).
+      # Jede verworfene Datei steht im Log, in der Zusammenfassung und im Titel des PR; scheitert ein Abruf, endet der Schritt rot und nichts wird eingereicht.
+      - name: Funde schonen (neuere Stände auf main behalten)
+        id: schonen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LAUF: ${{ inputs.lauf }}
+        run: |
+          START="$(gh run view "$LAUF" --repo "$GITHUB_REPOSITORY" --json createdAt --jq .createdAt)"
+          echo "Fundlauf $LAUF gestartet: $START"
+          node tools/fund-schonen.mjs "$START" --hinweis "$RUNNER_TEMP/schonen-hinweis.txt" > "$RUNNER_TEMP/schonen.log"
+          cat "$RUNNER_TEMP/schonen.log"
+          { echo '### Fund schonen'; echo '```'; cat "$RUNNER_TEMP/schonen.log"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          echo "hinweis=$(cat "$RUNNER_TEMP/schonen-hinweis.txt")" >> "$GITHUB_OUTPUT"
+
+      - uses: ./.github/actions/einrichten
+        with:
+          cache: 'aus'
+
+      - name: Quellen als Pull Request einreichen
+        uses: ./.github/actions/einreichen
+        with:
+          nachricht: "chore(data): Fund nachgeliefert (Lauf ${{ inputs.lauf }}${{ steps.schonen.outputs.hinweis && format('; {0}', steps.schonen.outputs.hinweis) || '' }})"
+          fund: nachgeliefert
+          app-id: ${{ secrets.DATEN_APP_ID }}
+          app-key: ${{ secrets.DATEN_APP_KEY }}

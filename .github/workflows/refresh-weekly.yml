@@ -1,0 +1,513 @@
+name: Wöchentlich — tiefer Durchlauf
+
+# **Dieser Lauf sammelt und reicht ein — er baut nicht und schreibt nicht auf `main`.** Jede Familie von Quellen ist ein eigener Job und reicht ihren Fund
+# als eigenen Pull Request ein (`tools/quellen-pr.sh`: Zweig auf dem jüngsten `main`, Merge, wenn GitHub `MERGEABLE` sagt; sonst übernimmt
+# „Claude — Daten-PR zusammenführen"). Den Datensatz baut „Bestand — zusammenführen und bauen"; dass eine Quelle schweigt, meldet dort `data:check`.
+#
+# Umbau vom 05.10.2026 (Daniel: „prüf Parallelisierbarkeit … Abhängigkeiten verringern oder entfernen"):
+#
+# - Vorher ein Job mit rund 35 Schritten hintereinander, 62 bis 92 Minuten, in der Gruppe `daten`. Die hielt Bestandsbau und Stundenlauf an
+#   (15 von 148 Bauläufen in sieben Tagen wurden dadurch abgebrochen). Jetzt läuft der Wochenlauf in der eigenen Gruppe `woche`; die Familien laufen
+#   nebeneinander, der längste Job (aniSearch, ~60 Minuten durch den Sechs-Sekunden-Takt) bestimmt die Dauer.
+# - Gruppiert ist nach **Server** (gemeinsame Drosselung) und nach **Abhängigkeit** (Datei eines Schritts ist Eingabe des nächsten):
+#   anilist → adn (teilen AniList), crunchyroll, anisearch (eigene Sperre `anisearch`), tmdb (TMDB → JustWatch → Gegenprobe), rtl (Katalog → Folgen), sonst.
+#   Die Reihenfolge innerhalb einer Familie ist die alte; Schritte, die eine Datei der Vorwoche lesen, tun das weiter (`docs/wissen/betrieb.md`).
+# - Jeder Schritt läuft über `tools/schritt.sh`: Zeitgrenze, Ergebnis in der Zusammenfassung, gelbe Meldung statt stillem Haken. Der Pull Request steht
+#   am Ende jedes Jobs mit `if: always()` — ein hängender Schritt kostet nur sich selbst, nicht den Fund der übrigen.
+# - Der Zeitplan kommt vom Cloudflare-Wecker (`worker/src/wecker.ts`); GitHubs eigener Cron kam 4 bis 7 Stunden zu spät. Fällt der Wecker aus, holt
+#   `wecker-wache.yml` den Lauf nach.
+
+on:
+  # Zeitplan: Cloudflare-Wecker (`worker/src/wecker.ts`) startet diesen Lauf per workflow_dispatch zur festen Stunde (UTC). GitHubs eigener Cron kam
+  # gemessen 4–7 Stunden zu spät und würde Läufe verdoppeln; `wecker-wache.yml` holt Überfälliges nach, falls der Wecker ausfällt (05.10.2026).
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: woche
+  cancel-in-progress: false
+
+env:
+  LAUF_ZWECK: 'Wöchentlicher Tiefendurchlauf über alle Quellen von anime-kalender.de'
+  LAUF_ZIEL: 'ADN-Katalog, Sprecher, Crunchyroll-Synchro, aniSearch, TMDB, JustWatch und Link-Prüfung auffrischen'
+  LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+
+jobs:
+  anmelden:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      laufen: ${{ steps.pruefen.outputs.laufen }}
+    steps:
+      - name: Lauf freigeben
+        id: pruefen
+        run: echo "laufen=true" >> "$GITHUB_OUTPUT"
+
+      - name: Lauf anmelden
+        if: steps.pruefen.outputs.laufen == 'true'
+        continue-on-error: true
+        run: |
+          printf '{"lauf_id":"%s","repo":"%s","workflow":"%s","zweck":"%s","ziel":"%s","zustand":"laeuft","url":"%s","notiz":"sieben Familien laufen nebeneinander"}' \
+            "$GITHUB_RUN_ID" "$GITHUB_REPOSITORY" "$GITHUB_WORKFLOW" "$LAUF_ZWECK" "$LAUF_ZIEL" \
+            "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > /tmp/anmeldung.json
+          [ -z "$LAUF_TOKEN" ] || curl -sS --max-time 10 -X POST "https://newsletter.animekalender.workers.dev/lauf" \
+            -H "Content-Type: application/json" -H "X-Lauf-Token: $LAUF_TOKEN" --data-binary @/tmp/anmeldung.json > /dev/null || true
+
+  # --- AniList und was daran hängt (Katalog, Sprecher, ANN) -------------------------------------------------------------
+  anilist:
+    needs: anmelden
+    if: needs.anmelden.outputs.laufen == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    outputs:
+      fehler: ${{ steps.auswerten.outputs.fehler }}
+    env:
+      JOB_ANZEIGE: AniList
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      # Dieser Job schreibt `data/cache/` und legt ihn unter eigenem Schlüssel ab; alle anderen Jobs lesen nur.
+      - uses: ./.github/actions/einrichten
+        with:
+          cache: save
+
+      - name: Rohdaten holen
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: bash tools/schritt.sh --zeit 25m "Rohdaten holen" -- npm run data:fetch
+
+      # Die Grundlage für die Titel **ohne** deutsche Synchro; setzt auf dem Cache auf und holt nur das laufende Jahr und Fehlendes.
+      - name: AniList-Gesamtkatalog
+        run: bash tools/schritt.sh --zeit 30m "AniList-Gesamtkatalog" -- npm run data:katalog
+
+      # Holt nur, was fehlt oder älter als ein halbes Jahr ist.
+      - name: Deutsche Synchronsprecher (AniList)
+        run: bash tools/schritt.sh --zeit 20m "Deutsche Synchronsprecher" -- npm run data:voices -- --limit 400
+
+      # Offline-Datensatz von manami-project; liefert `data/ann-ids.json` für den nächsten Schritt.
+      - name: Zuordnung zu Anime News Network
+        run: bash tools/schritt.sh --zeit 10m "Zuordnung zu Anime News Network" -- npm run data:ann:ids
+
+      # Eine Anfrage je Sekunde, wie ANN es vorschreibt; 400 Titel sind knapp sieben Minuten. Arbeitet auf den Sprecherdateien des Schritts davor.
+      - name: Deutsche Sprechrollen von Anime News Network
+        run: bash tools/schritt.sh --zeit 20m "Sprechrollen von Anime News Network" -- npm run data:ann:voices -- --limit 400
+
+      - name: Quellen als Pull Request einreichen
+        if: always()
+        uses: ./.github/actions/einreichen
+        with:
+          nachricht: 'chore(data): Tiefendurchlauf gesammelt (AniList)'
+          fund: anilist
+          bauprobe: 'true'
+          app-id: ${{ secrets.DATEN_APP_ID }}
+          app-key: ${{ secrets.DATEN_APP_KEY }}
+
+      - name: Fehlschläge auswerten
+        id: auswerten
+        if: always()
+        continue-on-error: true
+        run: bash tools/schritte-auswerten.sh
+
+  # --- ADN: teilt AniList (Suche je Treffer), deshalb erst nach dem AniList-Job ---------------------------------------
+  adn:
+    needs: [anmelden, anilist]
+    if: always() && needs.anmelden.outputs.laufen == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    outputs:
+      fehler: ${{ steps.auswerten.outputs.fehler }}
+    env:
+      JOB_ANZEIGE: ADN
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: ./.github/actions/einrichten
+        with:
+          cache: restore
+
+      - name: ADN — ein halbes Jahr voraus
+        env:
+          AK_ADN_PROXY: https://ak-adn-gw.animekalender.workers.dev/adn-gw
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: bash tools/schritt.sh --zeit 15m "ADN — ein halbes Jahr voraus" -- npx tsx pipeline/fetch-adn.ts --from -90 --to 180
+
+      # Der Kalender zeigt nur, was neu erscheint; eine Serie, die komplett im Angebot liegt, taucht dort nie auf. 600 je Woche decken den Bestand in gut vier
+      # Wochen ab (gemessen 29.08.2026: ohne Grenze ~2.600 Abfragen und 42 Minuten); was sich bewegt, holt `data:adn` alle sechs Stunden.
+      - name: ADN — vollständiger Katalog
+        env:
+          ANISEARCH_TOKEN: ${{ secrets.ANISEARCH_TOKEN }}
+          AK_ADN_PROXY: https://ak-adn-gw.animekalender.workers.dev/adn-gw
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: bash tools/schritt.sh --zeit 45m "ADN — vollständiger Katalog" -- npm run data:adn:catalog -- --limit 600
+
+      - name: Quellen als Pull Request einreichen
+        if: always()
+        uses: ./.github/actions/einreichen
+        with:
+          nachricht: 'chore(data): Tiefendurchlauf gesammelt (ADN)'
+          fund: adn
+          bauprobe: 'true'
+          app-id: ${{ secrets.DATEN_APP_ID }}
+          app-key: ${{ secrets.DATEN_APP_KEY }}
+
+      - name: Fehlschläge auswerten
+        id: auswerten
+        if: always()
+        continue-on-error: true
+        run: bash tools/schritte-auswerten.sh
+
+  # --- Crunchyroll ----------------------------------------------------------------------------------------------------
+  crunchyroll:
+    needs: anmelden
+    if: needs.anmelden.outputs.laufen == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    outputs:
+      fehler: ${{ steps.auswerten.outputs.fehler }}
+    env:
+      JOB_ANZEIGE: Crunchyroll
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: ./.github/actions/einrichten
+        with:
+          cache: restore
+          playwright: 'true'
+
+      # Frisches Zugangspaket über die Vercel-Weiche in Frankfurt (weiche-vercel/); das Secret `CR_ZUGANG` bleibt nur Rückfall, es lebt 24 Stunden.
+      - name: Crunchyroll-Zugangspaket über die Weiche holen
+        env:
+          CR_WEICHE_TOKEN: ${{ secrets.CR_WEICHE_TOKEN }}
+        run: bash tools/schritt.sh --zeit 5m "Zugangspaket holen" -- node tools/cr-zugang-holen.mjs --github-env
+
+      # 300 Serien je Woche gegen 911 Adressen und 28 Tage Wiedervorlage. Crunchyroll sperrt nach rund 300 Serien für eine Viertelstunde (gemessen 21.08.2026).
+      # Ein abgelaufenes Paket wird gemeldet, nicht verschluckt (Lehre 07.09.2026): roter Eintrag in der Statusanzeige mit dem Befehl, der es behebt.
+      - name: Crunchyroll-Serienseiten auf deutsche Tonspur
+        env:
+          CR_ZUGANG: ${{ env.CR_ZUGANG_FRISCH || secrets.CR_ZUGANG }}
+        run: >
+          bash tools/schritt.sh --zeit 45m "Crunchyroll-Tonspuren" -- bash -c
+          'npm run data:cr-dub -- --limit 300 || { bash "$MELDER" fehler "Crunchyroll-Zugangspaket abgelaufen — von Daniels Rechner erneuern: node tools/cr-zugang-holen.mjs --secret"; exit 1; }'
+
+      - name: Quellen als Pull Request einreichen
+        if: always()
+        uses: ./.github/actions/einreichen
+        with:
+          nachricht: 'chore(data): Tiefendurchlauf gesammelt (Crunchyroll)'
+          fund: crunchyroll
+          bauprobe: 'true'
+          app-id: ${{ secrets.DATEN_APP_ID }}
+          app-key: ${{ secrets.DATEN_APP_KEY }}
+
+      - name: Fehlschläge auswerten
+        id: auswerten
+        if: always()
+        continue-on-error: true
+        run: bash tools/schritte-auswerten.sh
+
+  # --- aniSearch: ein Server, sechs Sekunden je Seite — nie zwei Läufe zugleich (Sperre `anisearch`) ----------------------
+  anisearch:
+    needs: anmelden
+    if: needs.anmelden.outputs.laufen == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    concurrency:
+      group: anisearch
+      cancel-in-progress: false
+    outputs:
+      fehler: ${{ steps.auswerten.outputs.fehler }}
+    env:
+      JOB_ANZEIGE: aniSearch
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: ./.github/actions/einrichten
+        with:
+          cache: restore
+
+      # Seit 29.08.2026 holt der Tageslauf die Hauptmenge; hier stehen die Nachzügler.
+      - name: Deutsche Texte und Anbieter von aniSearch
+        run: bash tools/schritt.sh --zeit 25m "aniSearch — Texte und Anbieter" -- npm run data:anisearch -- --limit 60
+
+      # Die kanonischen Slugs der Titelseiten für die Quellenlinks (ein Abruf der API); braucht die Kennungen aus dem Schritt davor.
+      - name: aniSearch — Slugs der Titelseiten
+        env:
+          ANISEARCH_TOKEN: ${{ secrets.ANISEARCH_TOKEN }}
+        run: bash tools/schritt.sh --zeit 5m "aniSearch — Slugs" -- npm run data:anisearch-slugs
+
+      # Die Folgenlisten mit den deutschen Folgentiteln — braucht `data/anisearch.json` (anisearchId) aus dem Schritt davor.
+      - name: aniSearch — Folgenlisten
+        run: bash tools/schritt.sh --zeit 30m "aniSearch — Folgenlisten" -- npm run data:anisearch-folgen -- --limit 120
+
+      # Deutsche Namen für den Katalog hinter dem Toggle; braucht `data/anime-ids.json` aus dem ersten Schritt. 400 Seiten zu sechs Sekunden: rund 40 Minuten.
+      - name: aniSearch — deutsche Titel für den Katalog
+        run: bash tools/schritt.sh --zeit 65m "aniSearch — deutsche Titel" -- npm run data:anisearch-titel -- --limit 400
+
+      - name: Quellen als Pull Request einreichen
+        if: always()
+        uses: ./.github/actions/einreichen
+        with:
+          nachricht: 'chore(data): Tiefendurchlauf gesammelt (aniSearch)'
+          fund: anisearch
+          bauprobe: 'true'
+          app-id: ${{ secrets.DATEN_APP_ID }}
+          app-key: ${{ secrets.DATEN_APP_KEY }}
+
+      - name: Fehlschläge auswerten
+        id: auswerten
+        if: always()
+        continue-on-error: true
+        run: bash tools/schritte-auswerten.sh
+
+  # --- TMDB → JustWatch → Gegenprobe (jeder Schritt braucht die `tmdbId` aus dem davor) ------------------------------------
+  tmdb:
+    needs: anmelden
+    if: needs.anmelden.outputs.laufen == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    # Ein Schreiber an `data/justwatch-audio.json` zur Zeit: der Tageslauf (Job `sammeln` in refresh-data.yml) trägt dieselbe Gruppe (`tools/justwatch-schreiber.test.mjs`).
+    concurrency:
+      group: justwatch-datei
+      cancel-in-progress: false
+    outputs:
+      fehler: ${{ steps.auswerten.outputs.fehler }}
+    env:
+      JOB_ANZEIGE: TMDB
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: ./.github/actions/einrichten
+        with:
+          cache: restore
+
+      # Liest `data/tmdb-titles.json` vom Vorlauf — bewusst vor dem Auffrischen (altes Verhalten, kein Zufall).
+      - name: Deutsche Anime-Kinostarts bei TMDB
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: bash tools/schritt.sh --zeit 10m "Kinostarts bei TMDB" -- npm run data:tmdb-kino
+
+      # Deutsche Handlung, FSK und Anbieter je Titel; 400 je Woche, 60 Tage Wiedervorlage.
+      - name: TMDB-Angaben auffrischen
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: bash tools/schritt.sh --zeit 20m "TMDB-Angaben" -- npm run data:tmdb -- --limit 400
+
+      # Folgentitel und Erstausstrahlungsdaten; braucht die `tmdbId` aus dem Schritt davor.
+      - name: TMDB-Folgen holen
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: bash tools/schritt.sh --zeit 25m "TMDB-Folgen" -- npm run data:tmdb-folgen -- --limit 300
+
+      # Titelliste je Cartoon mit Netflix-/Prime-Verweis; die Zuordnung der Meldungen läuft über die Folgentitel.
+      - name: Cartoon-Folgen holen
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: bash tools/schritt.sh --zeit 25m "Cartoon-Folgen" -- npm run data:cartoon-folgen -- --limit 150
+
+      # Größtes Plakat je Titel (Vergrößerung im Panel); braucht die TMDB-Zuordnung aus dem Schritt davor.
+      - name: TMDB-Plakate holen
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: bash tools/schritt.sh --zeit 20m "TMDB-Plakate" -- npm run data:tmdb-poster -- --limit 400
+
+      # Folgentitel und Laufzeit von Kitsu, wo aniSearch, Crunchyroll und TMDB nichts haben; Zuordnung nur über die MAL-Kennung.
+      - name: Kitsu-Folgen holen
+        run: bash tools/schritt.sh --zeit 20m "Kitsu-Folgen" -- npm run data:kitsu-folgen -- --limit 300
+
+      # Die aniSearch-Dub-Liste kommt seit 15.10.2026 aus dem Tageslauf (Job aniSearch); die Einträge unten lesen ihre Kennungen aus dem Bestand.
+
+      # Einträge, die aniSearch führt und wir noch nicht (erst die mit Deutsch, dann der Rest); 400 Kennungen je Woche, tokenlos alle 10 Sekunden ein Abruf.
+      - name: aniSearch-Einträge holen
+        env:
+          ANISEARCH_TOKEN: ${{ secrets.ANISEARCH_TOKEN }}
+        run: bash tools/schritt.sh --zeit 25m "aniSearch-Einträge" -- npm run data:anisearch-eintraege -- --limit 400
+
+      # Tonspuren laut JustWatch: die einzige maschinelle Quelle für Prime Video und die Kanal-Angebote. Fragt reihum alle Titel (alle drei Wochen jeder: fällig ab 20 Tagen, Befund gilt 28; `ABRUF_ALTER_TAGE`).
+      # 1.200 je Woche: rund 3.100 Titel in drei Wochenläufen, gemessen 1,3 s je Titel (800 in 17–19 min, Läufe 12.–26.10.2026) → ~26 min von 35; der Stand wird erst am Ende geschrieben.
+      - name: Tonspuren laut JustWatch
+        run: bash tools/schritt.sh --zeit 35m "Tonspuren laut JustWatch" -- npm run data:justwatch -- --limit 1200
+
+      # Direkt hinter JustWatch, weil es die zweite Quelle ist: Was gerade geholt wurde, wird im selben Durchgang ausgewertet.
+      - name: Kanal-Meldungen gegen JustWatch prüfen
+        run: bash tools/schritt.sh --zeit 10m "Kanal-Gegenprobe" -- npm run data:kanal-gegenprobe
+
+      # Verweise ohne Sprachurteil: eigene Anmeldung über die Weiche (`CR_WEICHE_TOKEN`), kein Zugangspaket. Steht hier, weil er wie die Gegenprobe
+      # `data/justwatch-handpruefung.json` schreibt — zwei Jobs an einer Datei wären ein Konflikt.
+      - name: Crunchyroll — Verweise ohne Sprachurteil auflösen
+        env:
+          CR_WEICHE_TOKEN: ${{ secrets.CR_WEICHE_TOKEN }}
+        run: bash tools/schritt.sh --zeit 30m "Crunchyroll — Verweise ohne Sprachurteil" -- npm run data:cr-offene
+
+      - name: Quellen als Pull Request einreichen
+        if: always()
+        uses: ./.github/actions/einreichen
+        with:
+          nachricht: 'chore(data): Tiefendurchlauf gesammelt (TMDB und JustWatch)'
+          fund: tmdb
+          bauprobe: 'true'
+          app-id: ${{ secrets.DATEN_APP_ID }}
+          app-key: ${{ secrets.DATEN_APP_KEY }}
+
+      - name: Fehlschläge auswerten
+        id: auswerten
+        if: always()
+        continue-on-error: true
+        run: bash tools/schritte-auswerten.sh
+
+  # --- RTL+: Katalog liefert die Adressen für die Folgen; die Link-Prüfung teilt sich den Server ----------------------------
+  rtl:
+    needs: anmelden
+    if: needs.anmelden.outputs.laufen == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    outputs:
+      fehler: ${{ steps.auswerten.outputs.fehler }}
+    env:
+      JOB_ANZEIGE: RTL+ und Links
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: ./.github/actions/einrichten
+        with:
+          cache: restore
+
+      # Der Katalog als Sitemap (`Allow: /`, geprüft 30.08.2026): 211 Teilkarten zu 1000 Adressen, 400 ms auseinander.
+      - name: RTL+-Katalog über die Sitemaps abgleichen
+        run: bash tools/schritt.sh --zeit 15m "RTL+-Katalog" -- npm run data:rtlplus:katalog
+
+      # Staffel, Nummer und RTL+-Start je Folge für TV-Serien ohne Wikipedia-Liste; braucht die Slugs aus dem Katalog.
+      - name: RTL+-Folgen für TV-Serien ohne Episodenliste
+        run: bash tools/schritt.sh --zeit 20m "RTL+-Folgen" -- npm run data:rtlplus:folgen
+
+      # Stichprobe der Anbieter-Verweise auf 404 (Joyn, Aniverse, Netflix, Prime …); Wiedervorlage 30 Tage. Eine Amazon-Sperre pausiert den Abruf bis zu
+      # zwei Stunden — die Zeitgrenze hält den Job im Rahmen, der Pull Request steht trotzdem.
+      - name: Anbieter-Verweise auf tote Seiten prüfen
+        run: bash tools/schritt.sh --zeit 45m "Link-Prüfung" -- npm run data:links -- --limit 400
+
+      - name: Quellen als Pull Request einreichen
+        if: always()
+        uses: ./.github/actions/einreichen
+        with:
+          nachricht: 'chore(data): Tiefendurchlauf gesammelt (RTL+ und Links)'
+          fund: rtl
+          bauprobe: 'true'
+          app-id: ${{ secrets.DATEN_APP_ID }}
+          app-key: ${{ secrets.DATEN_APP_KEY }}
+
+      - name: Fehlschläge auswerten
+        id: auswerten
+        if: always()
+        continue-on-error: true
+        run: bash tools/schritte-auswerten.sh
+
+  # --- Übrige kleine Quellen (je ein Server, wenige Abfragen) ----------------------------------------------------------
+  sonst:
+    needs: anmelden
+    if: needs.anmelden.outputs.laufen == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    outputs:
+      fehler: ${{ steps.auswerten.outputs.fehler }}
+    env:
+      JOB_ANZEIGE: Übrige Quellen
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: ./.github/actions/einrichten
+        with:
+          cache: restore
+
+      # Kinotermine und Sprachfassung je Vorstellung — 43 Standorte bei einer Anfrage je Sekunde.
+      - name: Kinotermine und Sprachfassung von CineStar
+        run: bash tools/schritt.sh --zeit 10m "CineStar" -- npm run data:cinestar
+
+      # Eine SPARQL-Abfrage über alle offenen MAL-Kennungen: Kandidatenliste, kein Titel.
+      - name: Deutsche Werktitel bei Wikidata
+        run: bash tools/schritt.sh --zeit 10m "Werktitel bei Wikidata" -- npm run data:wikidata-titel
+
+      - name: IMDb-Kennungen über Wikidata
+        run: bash tools/schritt.sh --zeit 10m "IMDb-Kennungen" -- npm run data:imdb
+
+      # kinoheld sperrt Agenten; die Filmadresse kommt über Serper oder DuckDuckGo, 3 s Abstand.
+      - name: kinoheld-Adressen für Kinotermine suchen
+        env:
+          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+        run: bash tools/schritt.sh --zeit 15m "kinoheld-Adressen" -- npm run data:kinoheld
+
+      # Die offizielle Data API v3 nennt die Ländersperre ausdrücklich; Wiedervorlage 30 Tage.
+      - name: YouTube-Verweise auf Abrufbarkeit in Deutschland
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: bash tools/schritt.sh --zeit 15m "YouTube — Abrufbarkeit" -- npm run data:youtube
+
+      - name: YouTube-Verweise auf Titel, Kanal und Kaufangebot
+        run: bash tools/schritt.sh --zeit 30m "YouTube — Titel und Kaufangebot" -- bash -c 'npm run data:youtube:titel && npm run data:youtube:report'
+
+      - name: Anime2You
+        run: bash tools/schritt.sh --zeit 15m "Anime2You" -- npm run data:anime2you
+
+      # Arbeitslisten und Wiedervorlage — standen bis 29.08.2026 in keinem Workflow und veralteten still.
+      - name: Arbeitslisten und Wiedervorlage
+        run: bash tools/schritt.sh --zeit 10m "Arbeitslisten und Wiedervorlage" -- bash -c 'npm run data:netflix-rest && npm run data:rtlplus:report && npm run data:wiedervorlage'
+
+      # Vor dem Pull Request, damit `15-news-vorschau.md` mit eingereicht wird (stand bis 05.10.2026 dahinter und ging verloren).
+      - name: Was noch kuratiert werden müsste
+        run: bash tools/schritt.sh --zeit 5m "Was noch kuratiert werden müsste" -- bash -c 'npm run data:report >> "$GITHUB_STEP_SUMMARY"'
+
+      - name: Quellen als Pull Request einreichen
+        if: always()
+        uses: ./.github/actions/einreichen
+        with:
+          nachricht: 'chore(data): Tiefendurchlauf gesammelt (übrige Quellen)'
+          fund: sonst
+          bauprobe: 'true'
+          app-id: ${{ secrets.DATEN_APP_ID }}
+          app-key: ${{ secrets.DATEN_APP_KEY }}
+
+      - name: Fehlschläge auswerten
+        id: auswerten
+        if: always()
+        continue-on-error: true
+        run: bash tools/schritte-auswerten.sh
+
+  # --- Abschluss: Statusanzeige und Discord -----------------------------------------------------------------------------
+  abschluss:
+    needs: [anmelden, anilist, adn, crunchyroll, anisearch, tmdb, rtl, sonst]
+    if: always() && needs.anmelden.outputs.laufen == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      LAUF_ZWECK: 'Wöchentlicher Tiefendurchlauf über alle Quellen von anime-kalender.de'
+      LAUF_ZIEL: 'ADN-Katalog, Sprecher, Crunchyroll-Synchro, aniSearch, TMDB, JustWatch und Link-Prüfung auffrischen'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: tools
+      - name: Zustand bestimmen und melden
+        env:
+          ERGEBNISSE: ${{ join(needs.*.result, ' ') }}
+          FEHLER: ${{ needs.anilist.outputs.fehler }} ${{ needs.adn.outputs.fehler }} ${{ needs.crunchyroll.outputs.fehler }} ${{ needs.anisearch.outputs.fehler }} ${{ needs.tmdb.outputs.fehler }} ${{ needs.rtl.outputs.fehler }} ${{ needs.sonst.outputs.fehler }}
+        run: |
+          fehler="$(printf '%s' "$FEHLER" | tr -s ' ')"
+          fehler="${fehler# }"; fehler="${fehler% }"
+          if printf '%s' "$ERGEBNISSE" | grep -q failure; then
+            bash tools/lauf-melden.sh fehler "Ein Job ist gescheitert — Pull Request der betroffenen Familie prüfen"
+          elif printf '%s' "$ERGEBNISSE" | grep -q cancelled; then
+            bash tools/lauf-melden.sh abgebrochen "Ein Job wurde abgebrochen (z. B. wartender aniSearch-Job von einem neueren verdrängt)"
+          elif [ -n "${fehler//[[:space:]]/}" ]; then
+            bash tools/lauf-melden.sh warnung "Schritte fehlgeschlagen: $fehler"
+          else
+            bash tools/lauf-melden.sh ok "alle Familien gesammelt"
+          fi

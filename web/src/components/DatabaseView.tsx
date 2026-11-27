@@ -1,0 +1,118 @@
+import { useMemo, useState } from 'react'
+
+import type { Title } from '@shared/types.ts'
+import { todayIso } from '@shared/time.ts'
+import type { Dataset } from '../lib/data.ts'
+import { DbKopfbereich } from './filter/DbWerkzeug.tsx'
+import type { ZaehlKern } from './filter/FilterZaehlungsrahmen.tsx'
+import { zaehleMitSynchro } from './db-kopfzeile.tsx'
+import { DbLeer, DbRaster, MehrKnopf } from './db-bedienung.tsx'
+import { EcchiHinweis } from './EcchiHinweis.tsx'
+import type { FilterState } from '../lib/filters.ts'
+import { groupByFranchise, type TitleGroup } from '../lib/db-gruppen.ts'
+import { ordneListe } from '../lib/db-liste.ts'
+import { useHinweisInhalt, type HinweisLoesen } from './SuchHinweis.tsx'
+import { useSuchhinweis } from '../lib/use-suchhinweis.ts'
+import { useShare } from '../lib/share.ts'
+import type { DbSort } from '../lib/router.ts'
+
+const PAGE_SIZE = 60
+
+export interface DatabaseViewProps {
+  data: Dataset
+  titles: Title[]
+  grouped: boolean
+  onGroupedChange: (next: boolean) => void
+  /** Titel ohne belegte deutsche Synchro mitzeigen. */
+  ohneSynchro: boolean
+  onOhneSynchroChange: (next: boolean) => void
+  /** Die Zusatzdatei ist unterwegs — der Schalter steht, die Titel noch nicht. */
+  ohneSynchroLaedt: boolean
+  favorites: Set<number>
+  hidden: Set<number>
+  onToggleFavorite: (id: number) => void
+  onToggleHidden: (id: number) => void
+  onOpenTitle: (id: number) => void
+  /** Ist eine Suche aktiv, kommen die Titel nach Treffergüte sortiert (lib/search.ts). */
+  suche: string
+  /** Sortierung aus der Adresse (`?sort=`); ohne Wahl gilt die Vorgabe unten. */
+  gewaehlt?: DbSort
+  onSortChange: (next: DbSort) => void
+  /** Die Filter für die Werkzeugleiste am Handy. */
+  filters: FilterState
+  onFiltersChange: (next: FilterState) => void
+  /** Der Knopf des Hinweises auf Treffer ohne Synchro: Filter und Schalter in einem Adresswechsel. */
+  onHinweisLoesen: HinweisLoesen
+  /** Der Kernbestand vor dem Filter — Grundlage der Zahlen an den Chips. */
+  kern?: ZaehlKern
+}
+
+export function DatabaseView({
+  data,
+  titles,
+  grouped,
+  onGroupedChange,
+  ohneSynchro,
+  onOhneSynchroChange,
+  ohneSynchroLaedt,
+  favorites,
+  hidden,
+  onToggleFavorite,
+  onToggleHidden,
+  onOpenTitle,
+  suche,
+  gewaehlt,
+  onSortChange,
+  filters,
+  onFiltersChange,
+  onHinweisLoesen,
+  kern,
+}: DatabaseViewProps) {
+  const { share, copiedSlug } = useShare()
+  const today = todayIso()
+  const [visible, setVisible] = useState(PAGE_SIZE)
+  /* Vorgabe ist „Relevanz": mit Suche die Treffergüte, ohne Suche die Gruppen „Läuft jetzt" / „Demnächst" / „Schon erschienen". */
+  const sort = gewaehlt ?? 'relevanz'
+
+  const { liste, zahlen } = useMemo(() => {
+    const base: TitleGroup[] = grouped ? groupByFranchise(titles) : titles.map((tt) => ({ main: tt, members: [tt] }))
+    return ordneListe(base, sort, suche, data.releasesByTitle, today)
+  }, [titles, grouped, sort, suche, data.releasesByTitle, today])
+  const mitSynchro = useMemo(() => zaehleMitSynchro(liste), [liste])
+  const hinweis = useSuchhinweis({ data, suche, filters, ohneSynchro, gruppiert: grouped, ergebnisse: liste.length, sichtbar: titles, favorites })
+  const hinweisDa = useHinweisInhalt({ hinweis, filters, ohneSynchro }) !== null
+
+  return (
+    <div className="flex flex-col gap-4">
+      <DbKopfbereich
+        meta={data.meta} filters={filters} onFiltersChange={onFiltersChange} favoriteCount={favorites.size}
+        ergebnisse={liste.length} mitSynchro={mitSynchro} suche={suche}
+        sort={sort} onSortChange={onSortChange}
+        ohneSynchro={ohneSynchro} onOhneSynchroChange={onOhneSynchroChange} laedt={ohneSynchroLaedt}
+        grouped={grouped} onGroupedChange={onGroupedChange}
+        hinweis={hinweis} onHinweisLoesen={onHinweisLoesen} kern={kern}
+      />
+
+      <EcchiHinweis data={data} filters={filters} favorites={favorites} ohneSynchro={ohneSynchro} titles={titles} />
+
+      <DbRaster
+        liste={liste.slice(0, visible)}
+        zahlen={zahlen}
+        data={data}
+        ausgeschlossen={filters.excluded}
+        today={today}
+        grouped={grouped}
+        favorites={favorites}
+        hidden={hidden}
+        onToggleFavorite={onToggleFavorite}
+        onToggleHidden={onToggleHidden}
+        onOpenTitle={onOpenTitle}
+        share={share}
+        copiedSlug={copiedSlug}
+      />
+
+      {liste.length === 0 && !ohneSynchroLaedt && <DbLeer ohneSynchro={ohneSynchro || hinweisDa} onOhneSynchro={() => onOhneSynchroChange(true)} />}
+      {visible < liste.length && <MehrKnopf schritt={PAGE_SIZE * 2} rest={liste.length - visible} onClick={() => setVisible((v) => v + PAGE_SIZE * 2)} />}
+    </div>
+  )
+}

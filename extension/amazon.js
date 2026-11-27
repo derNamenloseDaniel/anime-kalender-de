@@ -1,0 +1,8980 @@
+/**
+ * Liest bei Amazon die Tonspuren mit, während Daniel die Seite ohnehin ansieht.
+ *
+ * ## Warum das hier einfacher ist als bei Netflix
+ *
+ * Netflix gibt seine Tonspuren erst preis, wenn eine Folge läuft — deshalb
+ * braucht es dort ein Skript in der Seitenwelt, das `window.netflix` erreicht.
+ * Amazon liefert sie **im HTML mit**: je Folge ein `audioTracks`-Feld, je
+ * Staffel ein `benefitId`. Ein gewöhnliches Content-Script genügt.
+ *
+ * Gemessen am 23.08.2026 an „Naruto Shippuden", drei Staffeln einzeln:
+ *
+ * ```
+ * "audioTracks":["Deutsch","日本語"]      je Folge
+ * "benefitId":"Prime" | "aniversede"     je Staffel — welches Abo nötig ist
+ * ```
+ *
+ * ## Was ausdrücklich nicht gelesen wird
+ *
+ * `entitlementType` sagt, ob **dieses Konto** Zugriff hat — anonym steht dort
+ * immer „Unentitled", bei Daniel etwas anderes. Eine Angabe über ihn, nicht
+ * über den Titel. Sie bleibt liegen.
+ *
+ * ## Warum die Erweiterung und kein Abruf
+ *
+ * Amazons Nutzungsbedingungen untersagen „Data Mining, Robots oder ähnliche
+ * Datensammel- und Extraktionsprogramme". Ein Mensch, der eine Seite ansieht,
+ * nutzt die Lizenz bestimmungsgemäß. Deshalb wird hier **nichts angefordert** —
+ * gelesen wird nur, was die Seite ohnehin geladen hat.
+ */
+;(async () => {
+
+/*
+  **In Frames läuft die Erweiterung nur in unseren eigenen** (25.09.2026). Das Manifest lädt sie
+  seit dem Prime-Durchgang mit `all_frames`, damit sie in dessen Staffel-Frames arbeitet; Amazon
+  bettet aber auch Werbung und Messung in Frames ein. Erkannt wird unser Frame am Namen.
+*/
+if (window.top && window !== window.top && window.name !== 'ak-durchgang') return
+
+/* Tot-sicherer Zugriff auf `chrome.*`: `kontext.js` (Erweiterung neu geladen = Kontext tot, 23.08.2026). */
+const verbindungLebt = () => globalThis.akKontext.lebt()
+
+/**
+ * Liest den Speicher — und gibt synchron zurück, wo das möglich ist.
+ *
+ * Chrome liefert hier immer ein Promise. Der Testsandkasten kann es synchron:
+ * Er hat keinen echten Speicher, sondern ein Objekt. Ohne diesen Weg zeigte der
+ * Knopf im Test dauerhaft „prüfe Melde-Status", weil der Microtask nie an die
+ * Reihe kam — der Sandkasten führt auch keine Timer aus. Ein Test, der deshalb
+ * einen anderen Zustand prüft als den gemeinten, ist schlechter als keiner.
+ */
+const speicherLesen = (schluessel) => globalThis.akKontext.lesen(schluessel)
+
+const speicherSchreiben = (werte) => globalThis.akKontext.schreiben(werte)
+  /**
+   * Der Seiten-Quelltext, einmal je Takt statt achtmal.
+   *
+   * **Das hat einen Tab zum Absturz gebracht**. Der Grund liegt in einer Zahl, die niemand nachgerechnet hat:
+   * `document.documentElement.innerHTML` **baut die Zeichenkette jedes Mal neu
+   * auf**, und bei einer Prime-Video-Seite sind das rund 1,6 MB.
+   *
+   * `zeichnen()` läuft alle 500 ms und ruft dabei `spuren()`, `asinAusSeite()`,
+   * `staffelAusSeite()`, `staffelZahl()`, `abos()` und `zugangsart()` — acht
+   * Lesungen im Takt, also gut 25 MB Müll je Sekunde. Der Speicherbereiniger
+   * kommt dabei nicht hinterher.
+   *
+   * Gewachsen ist das Stück für Stück: Jede neue Beobachtung bekam ihre eigene
+   * Lesung, und keine davon sah teuer aus. **Wer hier eine Funktion ergänzt,
+   * die den Quelltext braucht, nimmt `seitenHtml()`** — nie `innerHTML` direkt.
+   *
+   * **Zwei Sekunden Frist — der zweite Anlauf, und diesmal gemessen.**
+   *
+   * Der erste Versuch war „einmal je Durchlauf": `zeichnen()` warf den
+   * Zwischenspeicher zu Beginn weg, damit jeder Durchlauf einen frischen Stand
+   * sieht. Das senkte acht Lesungen auf eine — aber `zeichnen()` läuft im
+   * 500-ms-Takt, und `beiStaffelwechsel()` daneben liest noch einmal. Rund
+   * **3 MB Zeichenketten je Sekunde**, dauerhaft, auf einer Seite, die
+   * stundenlang offen ist.
+   *
+   * Am 25.08.2026 ist Daniels Tab erneut daran gestorben: „nach ca 20 meldungen
+   * in a row, crashed es … memory leak??" — dasselbe „Aw, Snap! Out of Memory"
+   * wie am Vortag, nur später. Chrome hält alle Tabs derselben Site in **einem**
+   * Renderer-Prozess; der Müll mehrerer Prime-Video-Tabs summiert sich dort.
+   *
+   * Die Frist kostet, was sie kosten muss: Ein Wechsel wird bis zu zwei
+   * Sekunden später bemerkt. Das ist zu verschmerzen, weil die Erkennung
+   * ohnehin nicht am Quelltext hängt — Amazon tauscht ihn beim Staffelwechsel
+   * gar nicht aus (siehe CLAUDE.md). Was wirklich etwas Neues bringt, sind
+   * Ereignisse: eine Nachricht des Mitlesers und der Klick auf den Knopf. Beide
+   * werfen den Zwischenspeicher **sofort** weg, und damit ist die Frist überall
+   * dort unwirksam, wo sie schaden könnte.
+   *
+   * **Wer hier eine Funktion ergänzt, die den Quelltext braucht, nimmt
+   * `seitenHtml()`** — nie `innerHTML` direkt.
+   */
+  const HTML_FRIST_MS = 2000
+  /* „N Staffel(n)" als Anzahl: Zahl und Wort auf einer Zeile, keine Zahl dahinter (siehe `seitenLage`). */
+  const STAFFEL_ANZAHL = /(\d+)[  ]*Staffeln?\b(?![  ]*\d)/
+  let htmlZwischenspeicher = null
+  let htmlGelesenAm = 0
+  /**
+   * **Nach einem Staffelwechsel liest die Erweiterung die neue Seite selbst.**
+   *
+   * Amazon tauscht beim Wechsel über das Auswahlfeld Adresse und Folgenliste,
+   * den Quelltext mit dem Hydration-Block aber nicht (gemessen 24.08.2026).
+   * Die Folgen holt der Mitleser seitdem über `getDetailWidgets` nach — Zugang,
+   * Kanal, Jahr und Staffelnummer lasen weiter aus dem alten Block. Daniel am
+   * 15.09.2026 an Bungo Stray Dogs (Staffel 3 → 1): Ohne Neuladen stand der
+   * Knopf auf „🇩🇪 Deutsch · 12 Folgen · Staffel 1 · Abo + Kauf · ⚠ Kanal",
+   * nach dem Neuladen auf „✕ kein Deutsch" — die Staffel-1-Seite ist in der
+   * Region gar nicht verfügbar. „fix das es direkt ohne neuladen klappt."
+   *
+   * Der Mitleser holt die neue Adresse einmal im Hintergrund ab
+   * (`ausNachgeholterSeite()` in `amazon-leser.js`) und schickt den Quelltext mit.
+   * Solange er zur Adresse gehört, ist er der Quelltext.
+   */
+  let ersatzQuelltext = null
+  function seitenHtml() {
+    if (ersatzQuelltext && ersatzQuelltext.fuerPfad === location.pathname) return ersatzQuelltext.html
+    if (htmlZwischenspeicher === null || Date.now() - htmlGelesenAm > HTML_FRIST_MS) {
+      htmlZwischenspeicher = document.documentElement?.innerHTML ?? ''
+      htmlGelesenAm = Date.now()
+    }
+    return htmlZwischenspeicher
+  }
+  function htmlNeuLesen() {
+    htmlZwischenspeicher = null
+  }
+
+  /**
+   * Was die Seite über sich selbst sagt — einmal je Quelltext-Lesung.
+   *
+   * Die drei Sätze und der Folgen-Reiter wurden bis zum 25.08.2026 in jedem
+   * `zeichnen()` neu gesucht, und zwar über `body.innerText` **plus** den
+   * ganzen Quelltext. `innerText` ist dabei der teurere Teil: Es erzwingt ein
+   * Layout über die ganze Seite, zweimal je Sekunde, für einen Zustand, der
+   * sich nur beim Staffel- oder Seitenwechsel ändert.
+   *
+   * Gelesen wird beides zusammen, weil keine der beiden Quellen allein
+   * genügt: `innerText` gibt es nur, wo etwas gerendert ist; der Hinweis steht
+   * aber auch in der ausgelieferten Seite, bevor sie gerendert ist.
+   */
+  /**
+   * Die Folgennummern, deren Kachel „In deiner Region nicht mehr …" trägt.
+   *
+   * XPath statt `querySelectorAll('*')`: Eine Prime-Video-Seite hat
+   * zehntausende Elemente, und diese Funktion läuft im Takt der Lage. Der
+   * Browser findet die paar Textknoten selbst, ohne dass hier jedes Element
+   * angefasst wird.
+   *
+   * Nach oben wird höchstens acht Ebenen gegangen. Weiter oben liegt die
+   * Folgenliste als Ganzes — dort stünde die Nummer der ersten Folge, nicht
+   * die der gemeinten.
+   */
+  function regionFolgenAusDom() {
+    try {
+      /**
+       * **Erst im Quelltext nachsehen, dann den DOM durchsuchen.**
+       *
+       * `//*[contains(text(), …)]` prüft **jeden Knoten des Dokuments** — auf
+       * einer Prime-Seite sind das mehrere Tausend —, und danach liest die
+       * Schleife unten je Treffer bis zu acht Mal `innerText`, was jedes Mal
+       * ein vollständiges Layout erzwingt. Das lief bisher in **jedem** Takt,
+       * auch auf den allermeisten Seiten, die überhaupt keinen Regionshinweis
+       * tragen.
+       *
+       * Der Quelltext liegt ohnehin im Speicher und beantwortet dieselbe Frage:
+       * Steht der Satz dort nicht, gibt es auch keinen Knoten damit. Ein
+       * `includes` über eine Zeichenkette ist um Größenordnungen billiger als
+       * ein XPath über einen Baum — und die Bedingung ist dieselbe, nicht bloß
+       * eine ähnliche.
+       *
+       * Anlass: Daniels Bildschirmmitschnitt vom 25.08.2026 („it impacts
+       * performance drastically").
+       */
+      if (!seitenHtml().includes('In deiner Region nicht mehr')) return []
+      const treffer = document.evaluate?.(
+        '//*[contains(text(), "In deiner Region nicht mehr")]',
+        document,
+        null,
+        7 /* ORDERED_NODE_SNAPSHOT_TYPE */,
+        null,
+      )
+      if (!treffer?.snapshotLength) return []
+      const nummern = new Set()
+      for (let i = 0; i < treffer.snapshotLength; i++) {
+        let el = treffer.snapshotItem(i)
+        for (let hoch = 0; el && hoch < 8; hoch++, el = el.parentElement) {
+          const n = /(?:^|\n)\s*(\d{1,3})\.\s+\S/.exec(el.innerText ?? '')?.[1]
+          if (n) {
+            nummern.add(Number(n))
+            break
+          }
+        }
+      }
+      return [...nummern].sort((a, b) => a - b)
+    } catch {
+      return []
+    }
+  }
+
+  let lage = null
+  let lageZu = -1
+  function seitenLage() {
+    const html = seitenHtml()
+    if (lage && lageZu === htmlGelesenAm) return lage
+    const sichtbar = document.body?.innerText ?? ''
+    const text = `${sichtbar} ${html}`
+    lage = {
+      /** Amazons Satz auf einer Suche ohne Treffer — gelesen in `suchTreffer()`. */
+      keineErgebnisse: /keine\s+ergebnisse|no\s+results\s+for/i.test(sichtbar),
+      fehlerseite: /keine funktionsf(?:ä|ae)hige Seite|Suchen Sie etwas?/i.test(text),
+      regionWeg: /In deiner Region nicht mehr auf Prime Video verf(?:ü|ue)gbar/i.test(text),
+      /**
+       * Amazons dritter Satz für dasselbe Nein — und der einzige, den Filme
+       * bekommen.
+       *
+       * „Dieses Video ist derzeit nicht verfügbar." steht dort, wo sonst der
+       * Abspiel-Knopf sitzt. Belegt am 25.08.2026 an „Onigamiden — Legend of
+       * the Millennium Dragon" (Daniel, mit Bild): ein Film, also ohne
+       * Folgenliste und ohne „Folgen"-Reiter. Der Knopf schickte ihn deshalb
+       * zur „anderen Fassung im Auswahlfeld" — eine, die es bei einem Film
+       * nicht gibt: „kann nicht melden, dass dieses video nicht verfügbar ist".
+       *
+       * Das „derzeit" ändert nichts am Befund: Was heute nicht läuft, ist
+       * heute kein Angebot. Es wird als `weg` gemeldet, wie jedes andere Nein
+       * auch, und ein späterer Lauf darf es zurücknehmen.
+       */
+      nichtAbrufbar: /Dieses Video ist derzeit nicht verf(?:ü|ue)gbar/i.test(text),
+      stoerung: /Bei der Verarbeitung deiner Anfrage ist ein Fehler aufgetreten/i.test(text),
+      hatFolgenReiter: /(^|>)\s*Folgen\s*(<|$)/m.test(sichtbar),
+      /**
+       * Wie viele Staffeln diese Serie führt — aus dem **sichtbaren** Text.
+       *
+       * Bis zum 25.08.2026 suchte `staffelZahl()` `(\\d+)\\s*Staffeln` im ganzen
+       * Quelltext. Der ist 1,6 MB groß und voller Empfehlungskacheln, und die
+       * erste Fundstelle ist dort fast nie die richtige — dieselbe Falle, die
+       * `seitenTitel()` am 24.08. eine fremde Serie lesen ließ.
+       *
+       * Bei „Gurren Lagann" kam beides zusammen: Der Kopf schreibt „1 Staffel"
+       * im **Singular**, die Regex verlangte den Plural und suchte weiter — bis
+       * sie irgendwo „20 Staffeln" fand. Die Übersicht zeigte daraufhin „3/20"
+       * für eine Serie mit einer Staffel (Daniel, 25.08.2026, mit Bild).
+       *
+       * Der sichtbare Text ist um ein Vielfaches kleiner, und der Kopf steht
+       * darin vor allen Kacheln. Findet sich nichts, gilt eine Staffel — die
+       * Annahme, mit der jede Seite ohne Auswahlfeld richtig liegt.
+       *
+       * **Zahl und Wort auf derselben Zeile, und keine Zahl dahinter.** Bei
+       * „Grisaia Phantom Trigger" steht das Altersfeld „18" als letzte Zeile
+       * vor der Überschrift „Staffel 1"; `\s*` lief über den Zeilenumbruch und
+       * las „18 Staffel" — die Erweiterung verlangte „weiter mit Staffel 2" für
+       * eine Serie mit einer Staffel (Daniel, 19.09.2026, Diagnosebericht:
+       * `staffelZahl: 18`). „Staffel 1" ist eine Überschrift, keine Anzahl.
+       */
+      staffelZahl:
+        Number(STAFFEL_ANZAHL.exec(sichtbar)?.[1]) ||
+        // Rückfall auf den Quelltext, solange die Seite noch nichts gerendert
+        // hat. Der Singular gehört dabei dazu: Ohne ihn übersprang die Suche
+        // „1 Staffel" im Kopf und lief bis zur nächsten Empfehlungskachel.
+        Number(STAFFEL_ANZAHL.exec(html)?.[1]) ||
+        1,
+      /**
+       * Welche **einzelnen Folgen** den Regionshinweis in ihrer Kachel tragen.
+       *
+       * Daniel am 25.08.2026 zu „Mahouka" Staffel 2, zweimal: „folge 1 und 2
+       * sind in deiner region nicht mehr verfügbar, aber alle anderen folgen
+       * der staffel sind doch verfügbar" — und dann: „kann ich trotzdem nicht
+       * melden, dass die ersten 2 nicht in region sind, die anderen 11 schon".
+       *
+       * Die Staffel als Ganzes ist abrufbar, ein `weg` wäre also falsch. Die
+       * Auskunft geht deshalb als **Notiz** mit: Sie geht nicht verloren, und
+       * sie behauptet nichts, was der Datensatz nicht abbilden kann.
+       *
+       * Gesucht wird über die Baumstruktur, nicht über einen Abstand in
+       * Zeichen: Vom Element mit dem Satz aus aufwärts, bis ein Vorfahre eine
+       * Folgenüberschrift der Form „N. Titel" trägt. Ein Ausschnitt fester
+       * Länge hinge davon ab, wie lang die Beschreibung daneben gerade ist —
+       * genau die Sorte Zufall mit Frist, an der die Folgenerkennung schon
+       * einmal gescheitert ist (siehe CLAUDE.md).
+       */
+      regionFolgen: regionFolgenAusDom(),
+      /**
+       * Wie viele Folgen die Seite über der Liste **anzeigt** — „13 Folgen".
+       *
+       * Das ist die einzige Angabe zur gewählten Staffel, die ein Dropdown-
+       * Wechsel wirklich aktualisiert: Sie wird gerendert, während die
+       * JSON-Fracht im Skriptblock stehen bleibt (CLAUDE.md, „Der Quelltext
+       * veraltet beim Staffelwechsel").
+       *
+       * Damit ist sie der Prüfstein für alles, was aus dem Quelltext kommt.
+       * Widersprechen sich beide, hat die Seite recht — Daniel am 25.08.2026
+       * an „Solar Impulse": Wechsel von Staffel 7 auf 8, die Seite schreibt
+       * „1 Folge", der Knopf sagte „3 von 26".
+       */
+      folgenLautSeite: folgenAusText(sichtbar),
+      /**
+       * Nennt die Seite eine **Laufzeit** — „1 Std. 26 Min." oder „97 Min."?
+       *
+       * Zusammen mit dem fehlenden „Folgen"-Reiter ist das der Film (siehe
+       * `istFilmSeite()`). Der Wert entsteht hier, weil `body.innerText` ein
+       * Neuberechnen des Layouts erzwingt und deshalb nur an dieser einen
+       * Stelle gelesen wird.
+       */
+      hatLaufzeit: /\d+\s*Std\.\s*\d+\s*Min\.|\b\d{2,3}\s*Min\.\B/.test(sichtbar),
+    }
+    lageZu = htmlGelesenAm
+    return lage
+  }
+
+  const WORKER = 'https://newsletter.animekalender.workers.dev/pruefung'
+
+  /**
+   * **Was auffällt, wird gemeldet — nicht in die Konsole geschrieben.**
+   *
+   * Daniel am 10.09.2026: „info bringt nix, du liest nix aus der console aus,
+   * ich lese auch nix aus … du musst informiert werden über issues." Jede
+   * Diagnose, die in der Browserkonsole endet, ist tote Information: Er schaut
+   * dort nicht hin, ich komme nicht daran.
+   *
+   * Der Weg ist derselbe, den die Meldungen ohnehin gehen — an den Worker, von
+   * dort holt ihn ein Datenlauf ab und legt ihn unter `daniel-zum-abarbeiten/`.
+   *
+   * **Drei Riegel**, damit der Melder nicht selbst zur Störquelle wird:
+   * dieselbe Art je Seite nur einmal pro Sitzung, höchstens zwanzig insgesamt,
+   * und jeder Fehler beim Melden bleibt stumm.
+   */
+  const VORFALL_GEMELDET = new Set()
+  let vorfallZahl = 0
+  async function vorfallMelden(art, daten = {}) {
+    try {
+      const schluessel = `${art}|${location.pathname}`
+      if (VORFALL_GEMELDET.has(schluessel) || vorfallZahl >= 20) return
+      VORFALL_GEMELDET.add(schluessel)
+      vorfallZahl++
+      const { token } = (await globalThis.akKontext.lesen('token', 'sync')) ?? {}
+      if (!token) return
+      await fetch(WORKER.replace('/pruefung', '/vorfall'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Lauf-Token': token },
+        body: JSON.stringify({
+          plattform: 'primevideo',
+          art,
+          url: location.href.split('?')[0],
+          version: globalThis.akKontext.version(),
+          ...daten,
+        }),
+      })
+    } catch {
+      /* Ein Vorfallbericht darf nie im Weg stehen. */
+    }
+  }
+
+
+  /** Kurz und eindeutig — der Knopf hat wenig Platz. */
+  const ZUGANG_TEXT = {
+    kauf: '💰 nur Kauf',
+    kauf_oder_leihe: '💰 Kauf/Leihe',
+    abo_und_kauf: 'Abo + Kauf',
+    abo: 'Abo',
+  }
+
+  /** Die Kennung aus der Adresse — beide Formen kommen vor. */
+  function asinAusAdresse() {
+    /*
+      **Drei Formen, nicht zwei.** Zehn Zeichen sind die ASIN, 26 die GTI — und
+      daneben fuehrt Prime Adressen wie `/gp/video/detail/amzn1.dv.gti.d1c0…`
+      mit Kleinbuchstaben und Punkten. Die Liste kennt sie seit dem 05.09.2026;
+      beide Seiten muessen dieselbe Kennung bilden, sonst steht ein Auftrag in
+      der Liste, den die Seite nie wiedererkennt — genau der Fehler vom
+      25.08.2026, nur mit vertauschten Rollen.
+    */
+    return (
+      /\/(?:dp|detail)\/([A-Z0-9]{10,32}|amzn1\.dv\.gti\.[a-z0-9-]+)/i.exec(
+        `${location.pathname}${location.search}`,
+      )?.[1] ?? null
+    )
+  }
+
+  /**
+   * Die Kennung der Staffel, die **gerade** in der Folgenliste steht.
+   *
+   * ## Warum die Adresse dafür nicht taugt
+   *
+   * **Alle Staffeln einer Serie teilen sich eine ASIN.** Welche gezeigt wird,
+   * steht im Verweis-Parameter: `/gp/video/detail/B0GFPBT6FG?ref_=
+   * atv_dp_season_select_s3` ist Staffel 3, dieselbe Kennung wie Staffel 1
+   * (Daniel, 23.08.2026 — er hatte die Seite frisch geladen, nicht das
+   * Auswahlfeld benutzt).
+   *
+   * Die Meldung ging deshalb mit richtigem Befund und falscher Kennung raus:
+   * Inhalt und Folgenzahl waren Staffel 3 (11 Folgen, aniverse statt Prime),
+   * die Adresse zeigte auf Staffel 1. Das ist schlimmer als keine Meldung —
+   * es schreibt das Ergebnis dem falschen Titel zu.
+   *
+   * Im Quelltext steht dagegen `"titleID"` und meint die gezeigte Staffel.
+   * Denselben Wert nutzt `amazon-leser.js`, um die Folgenabschnitte
+   * nachzuladen — er muss also stimmen, sonst käme dort nichts an.
+   *
+   * Gesucht wird über **alle** Fundstellen: Auf der Digimon-Seite steht
+   * `titleID` 220-mal, und die erste trägt keinen Wert.
+   */
+  /**
+   * **Eine Prime-Kennung hat nicht immer zehn Zeichen.**
+   *
+   * Neben ASINs (zehn Zeichen) führt Prime Video GTIs mit **26** Zeichen
+   * (`0J16B1NAB82TO0O5A5Q8TLG1VP`). Ein Muster `[A-Z0-9]{10}` schnitte sie ab, der
+   * Vergleich in `quelltextPasst()` scheiterte, und der Knopf bliebe auf
+   * „Tonspuren noch nicht geladen" stehen.
+   *
+   * Sichtbar wurde es erst durch die Messung in Daniels Sitzung: Die Seite führt
+   * 15 Tonspurangaben, alle mit Deutsch, und die Paarung findet 12 Folgen. Die
+   * Daten waren da; sie wurden nur nie gelesen.
+   *
+   * `{10,32}` deckt beide Formen ab. Eine Obergrenze bleibt, damit das Muster
+   * nicht in einen benachbarten Wert hineinläuft.
+   */
+  /**
+   * Die Zahl über der Folgenliste — „12 Folgen".
+   *
+   * **Zwei Fallen stehen im selben sichtbaren Text**, und beide sind gemessen,
+   * nicht ausgedacht (Daniel, 25.08.2026, an „Babylon"):
+   *
+   * 1. **Die Reiterleiste.** Dort steht „Staffel 1" direkt vor dem Reiternamen
+   *    „Folgen" — zusammengelesen ergibt das „1 Folgen". Der alte Einzeiler
+   *    nahm genau diesen ersten Treffer, kam auf **1** und stellte ihn gegen
+   *    die 12 aus dem Quelltext. Da beide auseinandergingen, hielt
+   *    `quelltextPasst()` den Quelltext für veraltet, `spuren()` lief nie, und
+   *    der Knopf blieb auf „Tonspuren noch nicht geladen" — bei 15 vorhandenen
+   *    Tonspurangaben mit Deutsch.
+   *
+   * 2. **Die Erscheinungsdaten der Folgen.** „25 Min. 6. Okt. 2019 Folge 2 …"
+   *    liefert zwölfmal die Zahl **2019**. Sie stand in der Messung direkt
+   *    hinter dem richtigen Treffer; fehlt der einmal, wäre eine Jahreszahl die
+   *    Folgenzahl.
+   *
+   * Beide werden am **Umfeld** erkannt, nicht an der Zahl selbst: Eine feste
+   * Obergrenze („keine Staffel hat 2019 Folgen") wäre wieder ein Zufall mit
+   * Frist — „One Piece" führt über tausend.
+   */
+  /**
+   * Zeigt diese Seite einen **Film**?
+   *
+   * Erkannt an dem, was ein Film hat und eine Staffel nicht: eine **Laufzeit**
+   * („1 Std. 26 Min.", „97 Min.") statt einer Folgenzahl, und keinen
+   * „Folgen"-Reiter. Beides muss zusammenkommen — eine Staffelseite nennt
+   * ebenfalls Minuten, aber je Folge, und sie führt den Reiter.
+   *
+   * Gemessen am 25.08.2026 an „Bayonetta: Bloody Fate [dt./OV]": „Anime ·
+   * Animation · Action · 4.6/5 · IMDb 5,7/10 · 2013 · 1 Std. 26 Min.", Reiter
+   * „Ähnliches" und „Details" — kein „Folgen".
+   */
+  /**
+   * **Ein Film braucht den Mitleser nicht — die Tonspuren stehen im DOM.**
+   *
+   * Gemessen am 28.08.2026 an zwei von Daniel gemeldeten Fällen, mit einer Gegenprobe:
+   *
+   * | Titel | Adresse | pageTitleId | audioTracks |
+   * |---|---|---|---|
+   * | Blood-C: The Last Dark | B0GQJFL1XG | **B0GQJ8WYJD** | Deutsch, 日本語 |
+   * | Have A Nice Day | B0FYSH898T | **B0FWK8XMDJ** | Deutsch |
+   * | Avatar Aang (geht) | B0H6QYBZFS | B0H6QYBZFS | Deutsch, English |
+   *
+   * Der Block ist vollständig, `entityType` sagt „Movie", die Tonspuren stehen im Klartext — und am
+   * Knopf kam nichts an: `gesamt: 1` bei `fuerAdresse: null`, die Eins stammt aus dem Seitengerüst.
+   * Weil Mitleser und Erweiterung sich das DOM teilen, entfällt die postMessage-Kette hier ganz —
+   * bei einem Film ist nichts nachzuladen, nur eine Fehlerquelle weniger.
+   *
+   * **Überholt am 15.09.2026:** Seit dem Leser-Umbau kommt der Film über den Schnappschuss (`seite`,
+   * eine Folge); `filmAusSeite()` liest nur diesen Stand. Gelesen wird einmal je Adresse — der Block
+   * ist 145 bis 204 KB JSON, und `taktMax: 1377` ließ die Seite am 28.08.2026 schon einmal einfrieren.
+   */
+  /*
+    **Seit dem 15.09.2026 (Umbau Phase 2) liest diese Funktion nichts mehr selbst.**
+    Bis dahin parste sie den Hydration-Block ein zweites Mal — mit drei Riegeln
+    gegen die Rechenlast, die 3.82 den Rechner eingefroren hatte. Der Leser
+    (`amazon-leser.js`) liest denselben Block ohnehin, schickt die Seite als
+    `seite` im Schnappschuss mit und zählt einen Film als eine Folge. Den
+    Rückfall für ein leeres `headerDetail` („One Piece – Strong World") hat er
+    übernommen. Hier bleibt die Frage „Film mit Tonspuren?" an einer Stelle.
+  */
+  function filmAusSeite() {
+    try {
+      const s = gesehen?.seite
+      if (!s || s.art !== 'Movie' || !(s.sprachen ?? []).length) return null
+      return {
+        kennung: s.kennung ?? null,
+        titel: s.titel ?? null,
+        sprachen: s.sprachen,
+        untertitel: s.untertitel ?? [],
+        dauerSek: s.dauerSek ?? null,
+        erschienen: s.erschienen ?? null,
+      }
+    } catch {
+      /* Vor dem ersten Schnappschuss gibt es keinen Stand — dann entscheidet der Textweg. */
+      return null
+    }
+  }
+
+  function istFilmSeite() {
+    const lage = seitenLage()
+    // Die Laufzeit kommt aus `seitenLage()` mit — `body.innerText` erzwingt ein
+    // Neuberechnen des Layouts und wird deshalb nur an einer Stelle gelesen
+    // (eine Zusicherung in `amazon.test.cjs` wacht darüber).
+    /*
+      **„1 Folge laut Seite" schließt einen Film nicht aus — es beschreibt ihn.**
+
+      Bis 3.77 verlangte die Erkennung `!lage.folgenLautSeite`, also gar keine
+      Zahl. „Blood-C: The Last Dark" nennt aber eine: eine. Damit galt der Film als
+      Serie, der Knopf wartete auf eine Folgenliste, die es nicht gibt, und stand
+      nach 42 Sekunden auf „✕ keine Folgen für diese Staffel — melden" (Daniels
+      Bericht vom 28.08.2026, `istFilmSeite: false` bei `hatLaufzeit: true`,
+      `hatFolgenReiter: false`, `folgenLautSeite: 1`).
+
+      Entscheidend sind die beiden anderen Merkmale: **kein Folgen-Reiter** und
+      **eine Laufzeit im Seitenkopf**. Eine Serie hat den Reiter, ein Film die
+      Laufzeit. Eine Zahl über eins widerspricht dem Film weiterhin.
+    */
+    /*
+      **Der Hydration-Block schlägt den gerenderten Text.**
+
+      „5 Centimeters per Second" (`B0FMNGNH2G`) zeigte am 28.08.2026 erst
+      „1 Film melden" und eine Sekunde später „1 von 3 — Abschnitte selbst
+      öffnen", dann hing es (Daniel, mit Bild). Der Knopf war also zuerst
+      richtig: Solange nur das Gerüst stand, war `folgenLautSeite` null.
+
+      Anonym nachgemessen sagt der Block:
+
+          entityType   Movie
+          audioTracks  Deutsch, … , 日本語
+          runtime      1 Std. 2 Min.
+          episodeCount nicht gesetzt
+          seasons      keine
+
+      Kein Feld nennt drei Folgen, und im Quelltext steht nirgends „3 Folgen".
+      Die Zahl entsteht erst im **gerenderten** Text — der Beschreibungstext
+      spricht von „drei miteinander verbundenen Kurzfilmen", daneben laufen
+      Empfehlungsleisten. `seitenLage()` liest `body.innerText`, und was dort
+      nachträglich erscheint, kippte die Erkennung.
+
+      Ein Textmuster gegen ein Datenfeld antreten zu lassen ist der falsche Weg
+      herum. Sagt der Block „Movie" und nennt Tonspuren, ist es ein Film — was
+      die Seite daneben schreibt, ändert daran nichts. Der Textweg bleibt als
+      Rückfall für Seiten ohne brauchbaren Block.
+    */
+    if (filmAusSeite()) return true
+    return !lage.hatFolgenReiter && (lage.folgenLautSeite ?? 0) <= 1 && lage.hatLaufzeit
+  }
+
+  /**
+   * Die Zahl über der Folgenliste — **am Zeilenanfang**, nicht irgendwo im Text.
+   *
+   * ## Warum keine Ausschlussliste
+   *
+   * Die erste Fassung nahm den ersten Treffer von `(\d+)\s*Folgen?` und schloss
+   * danach aus, was falsch aussah. Diese Liste wuchs an einem einzigen Abend
+   * viermal, jedes Mal nach einem echten Fehlgriff:
+   *
+   * | Seite | gelesen | richtig | Ursache |
+   * |---|---|---|---|
+   * | Babylon | 1 | 12 | „Staffel 1" + Reiter „Folgen" |
+   * | JUJUTSU KAISEN | 3 | 12 | „Season 3" + Reiter |
+   * | Made in Abyss | 2 | 6 | „Staffel 1, Volume 2" + Reiter |
+   * | Detektiv Conan | 254 | 24 | „EPISODEN 231-254" + Reiter |
+   *
+   * Nach dem vierten war klar, dass die Liste den Fällen immer hinterherläuft:
+   * Jeder neue Titelzusatz bringt eine neue Variante, und gemerkt wird es erst,
+   * wenn eine falsche Zahl an den Worker gegangen ist.
+   *
+   * ## Was stattdessen trägt
+   *
+   * `body.innerText` liefert **Zeilen**, keinen Fließtext — und die Zahl über
+   * der Liste steht dort immer allein auf ihrer:
+   *
+   * ```
+   * Staffel 1, Volume 2
+   * Folgen
+   * Ähnliches
+   * Details
+   * 6 Folgen          ← die gesuchte Zeile
+   * 1. Die Reise
+   * ```
+   *
+   * Alle vier Fehlgriffe entstanden, weil der **Reiter** „Folgen" hinter einem
+   * Text mit Zahl stand. Am Zeilenanfang verankert, fällt jeder davon weg,
+   * ohne dass ein einziges Wort aufgezählt werden muss. Gegen alle vier
+   * gemessenen Seitentexte geprüft — und gegen einen Film, der weiterhin keine
+   * Zahl liefert.
+   *
+   * Der Preis: Diese Funktion braucht `innerText`, nicht `textContent`. Genau
+   * den bekommt sie aus `seitenLage()`, das ihn ohnehin einmal je Frist liest.
+   */
+  function folgenAusText(text) {
+    if (typeof text !== 'string') return null
+    for (const m of text.matchAll(/(?:^|\n)[ \t]*(\d+)[ \t]*Folgen?\b/g)) {
+      return Number(m[1]) || null
+    }
+    return null
+  }
+
+  let taktMs = 0
+  let taktSumme = 0
+  let taktMax = 0
+  let takte = 0
+  /**
+   * **Die Kennung, die der Mitleser aus dem JSON gemeldet hat.**
+   *
+   * Daniel am 25.08.2026: „falsche asin darf nie passieren, das ist wieder eine
+   * altlast von geparsedtem code, die asin steht auch in hydrated und metadata
+   * drin."
+   *
+   * Er hat recht, und die Messung zeigt zugleich, warum sie die Adresse **nicht**
+   * ersetzt: `pageTitleId` ist eine andere Kennung als die in der Adresse.
+   *
+   *     Kill Blue    Adresse B0GTN94C9M    pageTitleId B0GVSG9NN1
+   *     Avatar Aang  Adresse B0H6R4L3Y8    pageTitleId B0H6QYBZFS
+   *
+   * Für die Zuordnung zur Prüfliste zählt deshalb weiterhin die Adresse. Die
+   * gemeldete Kennung ist die **zweite** Angabe — sie gehört in die Notiz, und
+   * sie kommt aus gültigem JSON statt aus einem Muster über 2,2 Millionen
+   * Zeichen, das nach einem Wechsel den vorigen Titel nennt.
+   */
+  let gemeldeteSeitenKennung = null
+
+  /**
+   * **Serientitel und Staffelnummer, aus dem JSON gemeldet.**
+   *
+   * Beide standen bisher nur im Quelltext und wurden über Muster gesucht — der
+   * Serientitel über vier Rückfallebenen bis hinunter zum Fenstertitel, die
+   * Staffelnummer über ein Fenster um jede `titleID`-Fundstelle.
+   *
+   * Der Hydration-Block nennt beides direkt (gemessen an „Yu-Gi-Oh! ZEXAL"
+   * Staffel 2): `parentTitle: "Yu-Gi-Oh! ZEXAL [OV]"` und `seasonNumber: 2`.
+   */
+  let gemeldeterSerientitel = null
+  let gemeldeteStaffelNummer = null
+  /** Der Bandname, wenn Prime die Staffel geteilt hat („Season 2, Volume 2"). */
+  let gemeldeterBand = null
+
+  /**
+   * **Der Zwischenspeicher von `kennungImQuelltextBekannt()` — hier oben, nicht
+   * bei seiner Funktion.**
+   *
+   * Die Funktion steht rund 4.000 Zeilen weiter unten, `zeigeAuftragshinweis()`
+   * ruft sie seit dem 09.09.2026 über `quelltextVeraltet()` aber schon beim
+   * Seitenaufbau. Ein `let` unterhalb der ersten Nutzung liefert dann kein
+   * `undefined`, sondern wirft — und der Kasten war weg.
+   *
+   * Fünfter Fall dieser Klasse (`listenId`, `knopf`, `wiedervorlageBeantwortet`,
+   * `istKanalKarte`). Gefangen hat ihn diesmal der Sandkasten, nicht der Blick:
+   * `amazon-suchseite.test.cjs` wurde rot, bevor etwas ausgeliefert war.
+   */
+  let kennungBekanntSpeicher = null
+  let kennungBekanntZu = -1
+  /**
+   * **Welche Kennungen die Adresse schon getragen hat — hier oben, aus demselben
+   * Grund wie der Speicher darüber.**
+   *
+   * Beide werden von `quelltextVeraltet()` gelesen, und das läuft schon beim
+   * Seitenaufbau. Ein `let` unterhalb der ersten Nutzung wirft; das ist in
+   * dieser Datei fünfmal passiert.
+   *
+   * Gebraucht werden sie für den Staffelwechsel: Wechselt die Adresse von
+   * `B0BZGQZCFT` auf `B0CHL21CT2`, tauscht Amazon den Quelltext erst Sekunden
+   * später aus. Nennt der Quelltext in dieser Zeit eine Kennung, die die
+   * **Adresse vorher trug**, gehört er zur alten Seite — und nur so ist das von
+   * einer Sammelseite zu unterscheiden, deren `titleID` legitim abweicht.
+   */
+  let letzteAdressKennung = null
+  /** Kennung und Titel der soeben verlassenen Seite: ein gleicher Titel gehört nicht sicher zur neuen Kennung. */
+  let titelVerlassen = null
+  const fruehereAdressKennungen = new Set()
+  /**
+   * **Was der Briefkasten weiß — hier oben, und zwar aus demselben Grund wie
+   * alles andere in diesem Block.**
+   *
+   * Die vier standen bis zum 10.09.2026 rund 2.800 Zeilen weiter unten, direkt
+   * über `erwartungZu()`. Das ging gut, solange nur der Takt sie las; seit
+   * `suchauftragMerken()` die bestätigte Erwartung mitgibt, liest sie auch eine
+   * Funktion, die 2.800 Zeilen **davor** steht. Ein `let` unterhalb der ersten
+   * Nutzung wirft — fünfmal in dieser Datei passiert, zuletzt an
+   * `kennungBekanntSpeicher`.
+   */
+  /**
+   * **Die offenen Prime-Adressen laut Worker — dieselbe Zahl wie in der Statusanzeige.**
+   *
+   * `null`, solange der Worker nicht geantwortet hat. `fertig()` fragt zuerst
+   * hier (14.09.2026, siehe dort). Steht oben, weil `fertig()` von Stellen weit
+   * über seiner Deklaration gerufen wird — ein `let` darunter wirft.
+   */
+  let standZiele = null
+  /** Adressen, die diese Sitzung selbst gemeldet hat — bis der Stand sie abbildet. */
+  const frischGemeldet = new Set()
+  /** Adressen, unter denen gemeldet wurde — vom Briefkasten, nicht lokal. */
+  let briefkastenAdressen = null
+  /** Suchadressen, unter denen gemeldet wurde — vom Briefkasten, nicht lokal. */
+  let briefkastenSuchen = null
+  /** Seiten-Kennungen, auf denen schon nachgesehen wurde. */
+  let briefkastenSeiten = null
+  /** Je Suchadresse die bestätigten Ausgaben — vom Worker, nicht aus dem Browser. */
+  let briefkastenErwartungen = null
+  /* Durchgangs-Zustand oben: der `message`-Hörer (Z. 6783) liest ihn schon vorher — sonst
+     `Cannot access 'primeFrames' before initialization` (Prime-Startseite, 28.09.2026). */
+  const PRIME_LAUF = 'ak-prime-lauf'
+  const PRIME_LAUF_ENDE = 'ak-prime-lauf-ende'
+  const PRIME_LAUF_HOECHSTENS_MS = 2 * 60 * 60 * 1000
+  const PRIME_SEITE_HOECHSTENS_MS = 60_000
+  const PRIME_FRAME_HOECHSTENS_MS = 90_000
+  const PRIME_RUHE_MS = 1000
+  const PRIME_FRAMES = 3
+  const PRIME_FRAME_NAME = 'ak-durchgang'
+  const PRIME_NACHHOLEN_MS = 8000
+  let primeNachholTimer = null
+  const IM_FRAME = Boolean(window.top) && window !== window.top
+  const primeFrames = new Map() // offene Frames dieser Seite: Element → { kennung, start }
+  /**
+   * **Was diese Sitzung selbst gemeldet hat — neben dem Briefkasten, nicht in ihm.**
+   *
+   * Die eigene Meldung wurde bis 4.17.4 in `briefkastenSeiten` nachgetragen, und
+   * das hielt genau bis zum nächsten Abruf: `briefkastenHolen()` **ersetzt** die
+   * Menge, und der Worker führt die Meldung erst, wenn sie durch ist. Der Haken
+   * erschien deshalb nicht.
+   *
+   * Eine eigene Menge übersteht das Ersetzen. Sie gilt nur für die Anzeige der
+   * Checkliste: Ob ein Verweis wirklich abgehakt ist, entscheidet weiterhin der
+   * Briefkasten allein (siehe `seiteOffen`), denn eine Meldung, die nicht
+   * ankommt, darf nicht als erledigt gelten.
+   */
+  const selbstGemeldeteSeiten = new Set()
+  /* Die eigene Meldung bis der Briefkasten sie führen kann, `seiteOffen()` liest sie (prime-stand.js). */
+  const frischGemeldeteSeiten = new Set()
+  globalThis.akPrimeSeitenStarten(selbstGemeldeteSeiten, frischGemeldeteSeiten, speicherLesen, () => {
+    letzterStand = ''
+  })
+  /** Wie oft der 500-ms-Takt hintereinander geworfen hat — der Durchgang darf daran nicht sterben. */
+  let primeFehler = 0
+  /*
+    Zustand, den Hörer, Takte und Rückrufe vor dem Warten auf eine Kennung (`id = await`) schon
+    erreichen. Alles, was sie lesen, steht VOR diesem `await`, sonst TDZ (18.11.2026, `primeLaufName`);
+    `node tools/amazon-tdz-pruefen.cjs` prüft es. Zugewiesen wird weiter unten.
+  */
+  let letzterStand = ''
+  let letzterFortschritt = Date.now()
+  let letzteZahl = -1
+  let letzteKennung = null
+  let langsam = false
+  let frischeStaffel = null
+  let eintrag = null
+  let meldeSperre = null
+  let gesehen = leererStand()
+  const knopf = document.createElement('button')
+  knopf.className = 'ak-amazon-knopf'
+  knopf.type = 'button'
+  /**
+   * **Ein Muster über den ganzen Quelltext — nicht 220 Ausschnitte.**
+   *
+   * Die erste Fassung lief über **alle** `titleID`-Fundstellen und legte je
+   * Fundstelle einen 80-Zeichen-Ausschnitt an, um darauf ein zweites Muster
+   * anzuwenden. Bei „Digimon Tamers" steht `titleID` **220-mal** im Quelltext
+   * (siehe CLAUDE.md) — bis zu 220 Substring-Allokationen je Aufruf. Und
+   * aufgerufen wird die Funktion mehrfach je Takt: aus `asin()`, aus
+   * `quelltextPasst()`, aus `quelltextGehoertZurSeite()` und aus der Diagnose.
+   *
+   * Das vollständige Muster direkt über den Quelltext leistet dasselbe: Der
+   * Regex-Motor sucht die erste Stelle, die **ganz** passt, und überspringt
+   * Fundstellen ohne brauchbaren Wert von selbst. Genau das war der Sinn der
+   * Schleife — sie hat ihn nur teuer erkauft.
+   *
+   * Dazu ein Zwischenspeicher an derselben Frist wie der Quelltext: Solange
+   * der sich nicht geändert hat, kann sich die Kennung darin nicht ändern.
+   */
+  function asinAusSeite() {
+    /* Aus dem JSON gemeldet schlägt aus dem Quelltext gelesen. */
+    /*
+      **Kein Muster über den Quelltext mehr (Umbau Phase 2, 15.09.2026).** Die
+      Kennung kommt aus dem Schnappschuss des Lesers (`seite.kennung`); vor dem
+      ersten Schnappschuss gibt es keine, und `asin()` nimmt die Adresse.
+    */
+    return gemeldeteSeitenKennung ?? null
+  }
+
+  /**
+   * Die Adresse beim **Seitenstart** — und welche Staffel sie meint.
+   *
+   * **Widerlegt am 24.08.2026:** Hier stand, alle Staffeln einer Serie teilten
+   * sich eine ASIN und nur der Verweis-Parameter (`?ref_=atv_dp_season_select_s3`)
+   * sage, welche gemeint ist. Gemessen an Barbapapa führt jede Staffel ihre
+   * **eigene** ASIN, und `seasonNumber` steht daneben — siehe `staffelAusSeite()`.
+   * Die Adresse bleibt trotzdem nützlich: Sie ist da, bevor der Quelltext steht.
+   * Daniel am 23.08.2026: „ich hab dropdown nicht angefasst, sondern die seite
+   * neugeladen, diese url … ?ref_=atv_dp_season_select_s3."
+   *
+   * **Amazon räumt den Parameter weg, sobald die Seite steht.** Dieses Skript
+   * startet bei `document_idle` und sieht ihn nicht mehr — `amazon-leser.js`
+   * läuft bei `document_start` und schickt ihn mit. Die Meldung von 19:31 Uhr
+   * trug deshalb keine Staffelangabe, obwohl die Adresse sie enthielt.
+   *
+   * Die Nummer entscheidet **nichts** — gemeldet wird, was im Quelltext steht.
+   * Sie kommt in die Notiz, damit später erkennbar ist, welche Staffel gemeint
+   * war, auch wenn die Kennung einmal nicht zuzuordnen ist.
+   */
+  let startAdresse = location.href || `${location.pathname ?? ''}${location.search ?? ''}`
+
+  /** Ab dem ersten Wechsel im Auswahlfeld ist `startAdresse` veraltet. */
+  /**
+   * **Ein Fahrtenschreiber für den Fall, dass es hängt.**
+   *
+   * Der Staffelwechsel blieb am 27.08.2026 bei „Staffel wechselt — einen
+   * Moment" stehen (Daniel, an „Dragon Ball Super", Staffel 2). Von außen ist
+   * nicht zu sehen, woran: Der Wechsel hängt an vier Zuständen — Kennung,
+   * Listeneintrag, Zählstand, Widget-Antworten —, und welcher davon nicht
+   * nachzog, weiß nur die Erweiterung selbst.
+   *
+   * Sie schreibt deshalb mit. Der Puffer hält die letzten 400 Ereignisse; das
+   * sind bei einem 500-ms-Takt gut drei Minuten, und länger als drei Minuten
+   * wartet ohnehin niemand, bevor er neu lädt.
+   *
+   * Abholen in der Konsole: `AK.report()` lädt eine JSON-Datei herunter.
+   */
+  const TAGEBUCH_MAX = 400
+  const tagebuch = []
+
+  /**
+   * **Gekappt wird der einzelne Wert, nicht nur die Zahl der Einträge.**
+   *
+   * Vierhundert Einträge sind harmlos, solange jeder klein bleibt. Ein
+   * einziges Feld mit einer Folgenliste über tausend Einträge oder einem
+   * Quelltext-Ausschnitt macht daraus ein Leck, das über Stunden wächst —
+   * und die Erweiterung läuft auf jeder Prime-Seite mit (Daniel, 27.08.2026:
+   * „nur aufpassen das du kein memory leak einbaust").
+   *
+   * Deshalb: Zeichenketten auf 300 Zeichen, Listen auf 60 Einträge, alles
+   * andere fliegt raus. Was hier nicht hineinpasst, gehört ohnehin in den
+   * Zustandsteil des Berichts, der jedes Mal neu berechnet wird.
+   */
+  const kappe = (wert) => {
+    if (typeof wert === 'string') return wert.length > 300 ? wert.slice(0, 300) + '…' : wert
+    if (Array.isArray(wert)) return wert.length > 60 ? [...wert.slice(0, 60), `… +${wert.length - 60}`] : wert
+    if (wert && typeof wert === 'object') return undefined
+    return wert
+  }
+
+  function notiere(was, daten) {
+    try {
+      const eintrag = { t: new Date().toISOString(), was }
+      for (const [k, v] of Object.entries(daten ?? {})) {
+        const gekappt = kappe(v)
+        if (gekappt !== undefined) eintrag[k] = gekappt
+      }
+      tagebuch.push(eintrag)
+      if (tagebuch.length > TAGEBUCH_MAX) tagebuch.splice(0, tagebuch.length - TAGEBUCH_MAX)
+    } catch {
+      /* Ein Fahrtenschreiber, der die Fahrt stört, ist keiner. */
+    }
+  }
+
+  /**
+   * **Der Bericht, den Daniel herunterlädt.**
+   *
+   * Er enthält alles, was für die Ferndiagnose zählt, und nichts darüber
+   * hinaus: Adresse, Version, die vier Zustände des Staffelwechsels, den
+   * Zählstand und das Tagebuch. Keine Kontodaten, kein Schlüssel.
+   */
+  /**
+   * **Warum ein Auftrag als erledigt gilt — Zeile für Zeile.**
+   *
+   * Am 02.09.2026 sagte die Übersicht „Prime: alles geprüft", während der Worker
+   * die Erwartung sauber führte (zwei Kennungen, eine davon offen). Drei
+   * Vermutungen später stand fest, dass Raten hier nichts bringt: Die Antwort
+   * steht im Zustand der Erweiterung, und den sieht nur, wer ihn ausgibt.
+   */
+  function erwartungsLage() {
+    try {
+      const zeilen = []
+      for (const [url, wert] of Object.entries(suchliste)) {
+        const erw = erwartungZu(url)
+        zeilen.push({
+          suche: url.slice(-60),
+          titel: wert?.titel ?? null,
+          erwartet: erw,
+          jeKennung: erw ? erw.map((k) => `${k}:${briefkastenSeiten?.has(String(k)) ? 'gemeldet' : 'offen'}`) : null,
+          inGemeldeteSuchen: briefkastenSuchen?.has(url) ?? null,
+          lokalErledigt: suchErledigt[url] ?? null,
+          istGemeldet: istGemeldet(url),
+        })
+      }
+      return {
+        briefkastenDa: Boolean(briefkastenAdressen),
+        seitenBekannt: briefkastenSeiten?.size ?? null,
+        erwartungenBekannt: briefkastenErwartungen ? Object.keys(briefkastenErwartungen).length : null,
+        suchOffen: suchOffen().length,
+        zeilen,
+      }
+    } catch (e) {
+      return { fehler: String(e) }
+    }
+  }
+
+  /**
+   * **Ruhemodus für Aufnahmen: Der Hintergrund steht still.**
+   *
+   * Prime Video spielt hinter der Seite ein Video und animiert die Karten. Bei
+   * einer Bildschirmaufnahme ändert sich dadurch fast jedes Einzelbild, und
+   * gleichmäßige Stichproben verfehlen genau die Stelle, an der die Erweiterung
+   * etwas tut.
+   *
+   * Steht der Hintergrund, ist jede Änderung im Bild eine Änderung der
+   * Oberfläche — und die lässt sich aus der Aufnahme Bild für Bild
+   * herausrechnen, statt sie zu suchen.
+   *
+   *     document.dispatchEvent(new CustomEvent('ak-ruhig'))
+   *
+   * Ein zweiter Aufruf schaltet zurück. Der Modus gilt nur für diesen Tab und
+   * ist nach dem Neuladen weg — er ändert nichts an der Seite, er blendet aus.
+   */
+  /**
+   * **Die Schalter für Diagnose-Läufe — am linken Rand des Kastens.**
+   *
+   * Der Ruhemodus lässt sich per Konsolenbefehl schalten, und für ein einmaliges
+   * Messen genügt das. Für etwas, das man während einer Aufnahme mehrfach
+   * braucht, nicht.
+   *
+   * Sie hängen **am Kasten**, nicht frei am Bildschirmrand: Alles, was die
+   * Erweiterung zeigt, gehört zusammen — dieselbe Vorgabe wie beim Melde- und
+   * Prüflisten-Knopf. Außen liegen sie trotzdem, denn sie sind Werkzeug, nicht
+   * Bedienung.
+   *
+   * Die Liste ist der Grund für die Bauweise: Ein zweiter Schalter kostet eine
+   * Zeile hier, keine neue Oberfläche.
+   */
+  const DEBUG_SCHALTER = [
+    {
+      an: '⏸',
+      aus: '▶',
+      text: 'Ruhemodus für Aufnahmen',
+      titel: 'Ruhemodus: Hintergrundvideo und Animationen anhalten (für Aufnahmen)',
+      aktiv: () => document.documentElement?.classList?.contains('ak-ruhig') ?? false,
+      schalten: () => document.dispatchEvent(new CustomEvent('ak-ruhig')),
+    },
+    /*
+      **Der Bericht als Knopf — nicht als Konsolenbefehl.**
+
+      Er hing an `AK.report()` bzw. an einem Ereignis am `document`, und beides
+      setzt eine offene Konsole voraus. Genau die will Daniel nicht bedienen
+      (09.09.2026: „pack in die debug leiste der extension ein report button für
+      das ak-report rein"), und wer gerade einen Fehler vor sich hat, soll ihn
+      mit einem Klick festhalten können statt mit einer Anleitung.
+    */
+    {
+      an: '⭳',
+      aus: '⭳',
+      text: 'Bericht laden',
+      titel: 'Diagnosebericht als JSON herunterladen (Tagebuch, Zählstand, Auftrag)',
+      schalten: () => berichtHerunterladen(),
+    },
+  ]
+
+  function debugLeisteZeichnen() {
+    try {
+      const platz = document.querySelector('.ak-amazon-suchhinweis .ak-z-debug')
+      if (!platz) return
+      if (platz.querySelector('.ak-debugleiste')) return
+      const leiste = document.createElement('div')
+      leiste.className = 'ak-debugleiste'
+      /*
+        **Ein Schalter ohne Beschriftung ist ein Rätsel.**
+
+        Als schwebende Leiste am Kastenrand war ⏸ noch selbsterklärend genug —
+        in einer Zeile mit den übrigen steht er neben Knöpfen, die etwas ganz
+        anderes tun. Daniel am 02.09.2026: „neben dem button steht ein kurztext
+        was der button macht."
+      */
+      for (const sch of DEBUG_SCHALTER) {
+        const k = document.createElement('button')
+        k.type = 'button'
+        k.className = 'ak-debugknopf'
+        k.title = sch.titel
+        const zeigen = () => {
+          const an = sch.aktiv?.() ?? false
+          k.textContent = an ? sch.an : sch.aus
+          k.classList.toggle('ak-debug-an', an)
+        }
+        k.addEventListener('click', () => {
+          sch.schalten()
+          zeigen()
+        })
+        zeigen()
+        /*
+          **Jeder Schalter trägt seine eigene Beschriftung.**
+
+          Bis 4.16.5 stand eine einzige am Ende der Leiste — sie gehörte dem
+          Ruhemodus und wäre neben einem zweiten Knopf eine Falschauskunft
+          gewesen. Der Schalter zuerst, sein Text dahinter (Daniel, 02.09.2026:
+          „ruhemodus button muss links sein, text rechts").
+        */
+        const paar = document.createElement('span')
+        paar.className = 'ak-debugpaar'
+        const beschriftung = document.createElement('span')
+        beschriftung.textContent = sch.text
+        paar.append(k, beschriftung)
+        leiste.appendChild(paar)
+      }
+      platz.appendChild(leiste)
+    } catch {
+      /* Eine Diagnosehilfe darf den Ablauf nie aufhalten. */
+    }
+  }
+
+  /**
+   * **Der Ruhemodus überlebt das Neuladen.**
+   *
+   * Er ist für Aufnahmen da, und eine Aufnahme führt über mehrere Seiten: Suche,
+   * Titelseite, zurück. Musste man ihn nach jedem Wechsel neu einschalten, war
+   * das erste Bild jeder Seite wieder voller Videorauschen (Daniel, 02.09.2026:
+   * „muss sich den an/aus zustand merken und bei reload etc direkt anspringen").
+   *
+   * Gespeichert wird in `chrome.storage.local` — er gilt für alle Tabs, und das
+   * ist gewollt: Wer aufnimmt, wechselt zwischen ihnen. Das ist kein Datenstand,
+   * sondern eine Werkzeug-Einstellung; die Regel „kein localStorage für
+   * gemeldet/nicht gemeldet" ist davon nicht berührt.
+   */
+  /**
+   * **Diese Seite gehört Amazon — das muss auch das Stylesheet wissen.**
+   *
+   * `melder.css` gilt für Netflix, Amazon und Disney+ zugleich (drei Einträge im
+   * Manifest, eine Datei). Eine Regel, die für Amazons Hinweiskasten geschrieben
+   * ist, trifft damit die anderen beiden mit — und genau das ist am 06.09.2026
+   * passiert: Der Prüflisten-Knopf war auf Netflix **unsichtbar geschaltet**,
+   * weil er dort nie in einen Kasten einzieht, den es nur bei Amazon gibt.
+   *
+   * Gemessen im Diagnosebericht von 22:18: `imDom: true`, richtige Lage, oberster
+   * z-index — und `visibility: hidden`. Drei Runden Suche gingen vorher an der
+   * Frage vorbei, weil „ist er da?" und „sieht man ihn?" verschiedene Fragen
+   * sind.
+   *
+   * Die Markierung steht am `<html>`, damit jede Regel sie als Vorfahren
+   * verwenden kann, und sie wird einmal gesetzt — hier gibt es nichts
+   * umzuschalten.
+   */
+  document.documentElement.classList.add('ak-amazon')
+
+  /**
+   * **Diese Seite gehört Amazon — das muss auch das Stylesheet wissen.**
+   *
+   * `melder.css` gilt für Netflix, Amazon und Disney+ zugleich (drei Einträge im
+   * Manifest, eine Datei). Eine Regel, die für Amazons Hinweiskasten geschrieben
+   * ist, trifft damit die anderen beiden mit — und genau das ist am 06.09.2026
+   * passiert: Der Prüflisten-Knopf war auf Netflix **unsichtbar geschaltet**,
+   * weil er dort nie in einen Kasten einzieht, den es nur bei Amazon gibt.
+   *
+   * Gemessen im Diagnosebericht von 22:18: `imDom: true`, richtige Lage, oberster
+   * z-index — und `visibility: hidden`. Drei Runden Suche gingen vorher an der
+   * Frage vorbei, weil „ist er da?" und „sieht man ihn?" verschiedene Fragen
+   * sind.
+   *
+   * Die Markierung steht am `<html>`, damit jede Regel sie als Vorfahren
+   * verwenden kann, und sie wird einmal gesetzt — hier gibt es nichts
+   * umzuschalten.
+   */
+  document.documentElement.classList.add('ak-amazon')
+
+  function ruhigSetzen(an) {
+    try {
+      document.documentElement.classList.toggle('ak-ruhig', an)
+      if (an) {
+        for (const v of document.querySelectorAll('video')) {
+          try {
+            v.pause()
+          } catch {
+            /* Ein Player, der sich nicht anhalten lässt, ist kein Grund abzubrechen. */
+          }
+        }
+      }
+    } catch {
+      /* Ohne Dokument gibt es nichts zu beruhigen. */
+    }
+  }
+
+  /*
+    **Wiederhergestellt wird in `ruhig.js`, nicht hier.**
+
+    Diese Datei läuft bei `document_idle` — da stehen Amazons Elemente längst
+    und das Hintergrundvideo läuft. Der Modus muss bei `document_start` greifen,
+    und dafür gibt es ein eigenes, winziges Content-Script.
+
+    Hier bleibt nur das Umschalten: Wer den Knopf drückt, ist ohnehin da.
+  */
+
+  /* Der Sandkasten der Zusicherungen kennt kein `addEventListener` am Dokument. */
+  document.addEventListener?.('ak-ruhig', () => {
+    const an = !(document.documentElement?.classList?.contains('ak-ruhig') ?? false)
+    ruhigSetzen(an)
+    /* Ohne Speicher gilt er nur für diese Seite. */
+    void globalThis.akKontext.schreiben({ akRuhig: an })
+    console.log('[Anime-Kalender] Ruhemodus ' + (an ? 'an' : 'aus') + ' — Hintergrund steht still.')
+  })
+
+  function bericht() {
+    const sicher = (f) => {
+      try {
+        return f()
+      } catch (e) {
+        return /before initialization/.test(e?.message) ? 'noch nicht angelegt: die Seite wartet auf eine Titel-Kennung' : `FEHLER: ${e?.message ?? e}`
+      }
+    }
+    return {
+      erwartungsLage: erwartungsLage(),
+      /*
+        **Warum der Kasten fehlt: Player oder fremde Seite?** Auf der Prime-Startseite war er am
+        26.09.2026 unsichtbar, und von außen ließ sich nicht sagen, welche der beiden Bedingungen
+        in `taktSchritt()` griff — nur angemeldet zeigt die Startseite einen Trailer.
+      */
+      sichtbarkeit: sicher(() => ({
+        imPlayer: imPlayer(),
+        seiteGehtUnsAn: seiteGehtUnsAn(),
+        fensterHoehe: window.innerHeight,
+        container: [...document.querySelectorAll('.webPlayerSDKContainer, [data-testid="player-container"]')].map((e) => ({
+          klasse: String(e.className).slice(0, 80),
+          hoehe: e.offsetHeight,
+        })),
+        videos: [...document.querySelectorAll('video')].map((v) => ({
+          stumm: v.muted,
+          lautstaerke: v.volume,
+          bereit: v.readyState,
+          hoehe: v.offsetHeight,
+          imContainer: Boolean(v.closest('.webPlayerSDKContainer, [data-testid="player-container"]')),
+        })),
+      })),
+      /**
+       * **Was der Knopf sagt — und was die Sperren dazu beitragen.**
+       *
+       * Am 02.09.2026 stand dort „✓ alles gemeldet", während die Checkliste
+       * daneben „offen" zeigte; drei gefixte Sperrzweige später sagte er es
+       * immer noch. Von außen war nicht zu sehen, welche Bedingung greift —
+       * vier Runden Raten haben das nicht geklärt, eine Ausgabe hätte es
+       * getan.
+       */
+      knopfLage: sicher(() => ({
+        text: knopf?.textContent ?? null,
+        gesperrt: Boolean(knopf?.disabled),
+        sichtbar: knopf?.style?.display !== 'none',
+        imKasten: Boolean(knopf?.closest?.('.ak-amazon-suchhinweis')),
+        /* Die drei Bedingungen, die ihn sperren — einzeln, damit erkennbar ist, welche. */
+        seiteOffen: seiteOffen(),
+        gemeldeteStaffel: gemeldeteStaffelNummer,
+        lokalAbgehakt: Object.keys(erledigt[listenId]?.staffeln ?? {}),
+        fertigLaut: fertig(listenId),
+      })),
+      /*
+        Alle gtis im Quelltext der Seite — für die Frage, ob JustWatchs gti dort
+        irgendwo steht, auch wenn der Kopf eine andere trägt (19.09.2026, Air Gear).
+      */
+      gtisImQuelltext: sicher(() => [
+        ...new Set(String(seitenHtml() ?? '').match(/amzn1\.dv\.gti\.[0-9a-f-]{36}/g) ?? []),
+      ].slice(0, 80)),
+      erzeugtAm: new Date().toISOString(),
+      version: globalThis.akKontext.version() ?? 'unbekannt',
+      /* Der Durchgang und wie der letzte endete — die Spur überlebt den Seitenwechsel. */
+      durchgang: sicher(() => ({ lauf: primeLaufLesen(), ende: primeLaufEndeLesen() })),
+      adresse: location.href,
+      zustand: {
+        id: sicher(() => id),
+        listenId: sicher(() => listenId),
+        eintrag: sicher(() => (eintrag ? { titel: eintrag.titel, ausSuche: Boolean(eintrag.ausSuche) } : null)),
+        letzteKennung: sicher(() => letzteKennung),
+        staffelKennung: sicher(() => staffelKennung()),
+        staffelNummer: sicher(() => staffelNummer()),
+        /* Damit der nächste Bericht zeigt, welche der drei Quellen geantwortet hat. */
+        staffelAusAdresse: sicher(() => staffelAusAdresse()),
+        staffelAusSeite: sicher(() => staffelAusSeite()),
+        gemeldeteStaffelNummer: sicher(() => gemeldeteStaffelNummer ?? null),
+        gabStaffelwechsel: sicher(() => gabStaffelwechsel),
+        letzteZahl: sicher(() => letzteZahl),
+        letzterStand: sicher(() => letzterStand),
+        letzterFortschritt: sicher(() => new Date(letzterFortschritt).toISOString()),
+        wartetSeitMs: sicher(() => Date.now() - letzterFortschritt),
+        langsam: sicher(() => langsam),
+        taktMs: sicher(() => taktMs),
+        taktMax: sicher(() => taktMax),
+        takte: sicher(() => takte),
+      },
+      zaehlstand: sicher(() => ({
+        gesamt: gesehen?.gesamt ?? null,
+        fuerAdresse: gesehen?.fuerAdresse ?? null,
+        nummern: [...(gesehen?.nummern ?? [])].sort((a, b) => a - b),
+        jeFolge: [...(gesehen?.jeFolge ?? new Map())].map(([nr, sp]) => [nr, sp]),
+        /*
+          **Ohne dieses Feld war der Bericht vom 30.08.2026 nicht auswertbar.**
+
+          Der Knopf stand auf „10 von 10 Folgen gelesen — 0 fehlen noch" und
+          gab nicht frei. Warum, entscheidet `istVollstaendig()`: Sind
+          Abschnitte bekannt, zählt allein `abschnitte.offen`, und die Zahl der
+          Folgen daneben sagt gar nichts mehr. Genau die stand im Bericht — die
+          entscheidende nicht.
+        */
+        abschnitte: gesehen?.abschnitte ?? null,
+      })),
+      /*
+        Die Seitenlage entscheidet, ob ein Film oder eine Staffel vor uns liegt —
+        und genau da lag der Knopf am 27.08.2026 falsch: Auf der Filmseite von
+        „Halo: Legends" bot er „keine Folgen für diese Staffel" an, obwohl
+         das hätte verhindern müssen.
+      */
+      lage: sicher(() => seitenLage()),
+      istFilmSeite: sicher(() => istFilmSeite()),
+      quelltextVeraltet: sicher(() => quelltextVeraltet()),
+      seite: sicher(() => ({
+        titel: document.title,
+        folgenImDom: document.querySelectorAll('[data-testid="episode-list-item"], li[data-automation-id^="ep-"]').length,
+        knopfText: document.querySelector('.ak-amazon-knopf')?.textContent ?? null,
+      })),
+      /*
+        Was sonst noch das Verhalten erklärt: die Größe der Listen, der
+        laufende Suchauftrag, die Zugangsart. Alles knapp gehalten — der
+        Bericht soll gelesen werden, nicht gescrollt.
+      */
+      umfeld: sicher(() => ({
+        eintraegeInListe: Object.keys(liste ?? {}).length,
+        erledigteEintraege: Object.keys(erledigt ?? {}).length,
+        offeneSuchen: Object.keys(suchliste ?? {}).length,
+        suchauftrag: suchauftrag(),
+        zugangsart: zugangsart(),
+        abos: abos(),
+        ueberKanal: ueberKanal(),
+      })),
+      tagebuch,
+    }
+  }
+
+  /**
+   * **Der Auslöser ist ein DOM-Ereignis, keine Variable.**
+   *
+   * `window.AK = …` war der falsche Weg: Ein Content-Script läuft in einer
+   * eigenen Welt mit eigenem `window`. In der Konsole der Seite kam nur
+   * „AK is not defined" an (Daniel, 27.08.2026, mit Bild).
+   *
+   * Das `document` teilen beide Welten, und DOM-Ereignisse gehen hindurch.
+   * Der Befehl für die Konsole lautet deshalb:
+   *
+   *     document.dispatchEvent(new CustomEvent('ak-report'))
+   */
+  /**
+   * **Der Bericht landet als Datei — zwei Wege dorthin.**
+   *
+   * Das Ereignis geht aus jedem Scope, auch aus `top`: Beide Welten teilen
+   * sich das `document`.
+   *
+   *     document.dispatchEvent(new CustomEvent('ak-report'))
+   *
+   * `AK.report()` bleibt daneben stehen. Es funktioniert nur, wenn die Konsole
+   * auf den Scope der Erweiterung umgeschaltet ist — dafür war es gedacht, und
+   * genau so hat Daniel es benutzt. In 3.61 habe ich es ersatzlos gestrichen,
+   * statt beide Wege zu lassen; die Folge war „AK is not defined" an einer
+   * Stelle, an der es vorher ging (27.08.2026).
+   */
+  function berichtHerunterladen() {
+    const daten = JSON.stringify(bericht(), null, 2)
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(new Blob([daten], { type: 'application/json' }))
+    a.download = `anime-kalender-diagnose-${new Date().toISOString().replace(/[:.]/g, '-')}.json`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    console.log('[Anime-Kalender] Diagnosebericht heruntergeladen.')
+    return 'Bericht heruntergeladen.'
+  }
+
+  try {
+    window.AK = { bericht, report: berichtHerunterladen }
+  } catch {
+    /* Ohne window bleibt das Ereignis. */
+  }
+
+  try {
+    document.addEventListener('ak-report', () => {
+      berichtHerunterladen()
+    })
+    /**
+     * **Gezielt wieder öffnen, was abgehakt ist.**
+     *
+     * „Abhaken zurücksetzen" in der Übersicht leert den ganzen Speicher — am
+     * 28.08.2026 wären das sechzig Einträge gewesen, um an zwei heranzukommen.
+     * Daniel brauchte genau zwei zurück („Digimon Adventure", „Blood-C"), um
+     * eine Messung nachliefern zu können, und der einzige vorhandene Weg hätte
+     * ihm die Arbeit eines halben Tages weggeworfen.
+     *
+     * Der Speicher liegt in `chrome.storage`, an das die Seiten-Konsole nicht
+     * herankommt (getrennte Welten). Deshalb derselbe Weg wie beim Bericht: ein
+     * Ereignis am gemeinsamen `document`.
+     *
+     *     document.dispatchEvent(new CustomEvent('ak-oeffnen', { detail: 'digimon' }))
+     *
+     * Verglichen wird gegen Titel **und** Serienname, ohne Groß-/Kleinschreibung.
+     * Die Zahl der wieder geöffneten Einträge steht danach in der Konsole.
+     */
+    document.addEventListener('ak-oeffnen', async (e) => {
+      const suche = String(e?.detail ?? '').trim().toLowerCase()
+      if (!suche) {
+        console.log("[AK] ak-oeffnen braucht einen Text, z. B. { detail: 'digimon' }")
+        return
+      }
+      /*
+        **Es gibt zwei Speicher, und das war der Fehler von 3.80.**
+
+        `amazonErledigt` hält die Titelseiten, `amazonSuche` die Suchadressen.
+        Die erste Fassung räumte nur den ersten, meldete Erfolg — und in der
+        Liste änderte sich nichts, weil die über den zweiten filtert (Daniel,
+        28.08.2026: „der command sagt in console die sind wieder offen aber sind
+        sie nicht").
+      */
+      const offen = []
+      for (const [schluessel, wert] of Object.entries(erledigt)) {
+        const text = `${wert?.titel ?? ''} ${wert?.serie ?? ''}`.toLowerCase()
+        if (text.includes(suche)) offen.push(schluessel)
+      }
+      const offeneSuchen = []
+      for (const url of Object.keys(suchErledigt)) {
+        const text = `${url} ${suchliste[url]?.titel ?? ''}`.toLowerCase()
+        if (text.includes(suche)) offeneSuchen.push(url)
+      }
+      if (!offen.length && !offeneSuchen.length) {
+        console.log(
+          `[AK] nichts Abgehaktes passt auf „${suche}“ — ${Object.keys(erledigt).length} Titelseiten und ` +
+            `${Object.keys(suchErledigt).length} Suchadressen geprüft`,
+        )
+        return
+      }
+      for (const schluessel of offen) delete erledigt[schluessel]
+      for (const url of offeneSuchen) delete suchErledigt[url]
+      await speicherSchreiben({ amazonErledigt: erledigt, amazonSuche: suchErledigt })
+      /*
+        Der lokale Speicher ist nur die Überbrückung — maßgeblich ist der
+        Briefkasten. Steht die Adresse dort noch, bleibt sie abgehakt, und genau
+        das soll man sehen.
+      */
+      await briefkastenHolen(true)
+      console.log(
+        `[AK] ${offen.length} Titelseite(n) und ${offeneSuchen.length} Suchadresse(n) lokal geöffnet.`,
+        'Maßgeblich ist der Briefkasten — was dort noch liegt, bleibt abgehakt.',
+        { titelseiten: offen, suchen: offeneSuchen },
+      )
+      try {
+        uebersichtZeichnen()
+      } catch {
+        /* Die Übersicht ist nicht auf jeder Seite gebaut — der Speicher zählt. */
+      }
+    })
+  } catch {
+    /* Ohne Ereignis kein Konsolenzugang — die Erweiterung läuft trotzdem. */
+  }
+
+  let gabStaffelwechsel = false
+  /** Titel und Quelltext-Kennung, wie sie zuletzt zusammen gesehen wurden. */
+  let titelZuQuelltext = null
+
+  /**
+   * Die Staffelnummer, wie die Seite sie selbst nennt.
+   *
+   * Gemessen am 24.08.2026 an `amazon.de/dp/B0CBNFP57W`:
+   *
+   *     "titleID":"B0CBNFP57W" … "seasonNumber":2
+   *
+   * Und der Seitentitel bestätigt es: „Barbapapa, Staffel 2". **Jede Staffel
+   * hat ihre eigene ASIN**, die Nummer steht im selben JSON-Block. Das ist die
+   * verlässliche Quelle — sie überlebt, was Amazon mit der Adresse macht.
+   *
+   * Der Kommentar unten behauptete bis dahin das Gegenteil, und daran hing ein
+   * echter Datenverlust: Ohne Nummer fiel der Meldeschlüssel auf die
+   * **Folgenzahl** zurück, zwei Staffeln kollidierten, und die zweite Meldung
+   * überschrieb die erste.
+   */
+  function staffelAusSeite() {
+    /* Aus dem JSON gemeldet schlägt aus dem Quelltext gesucht. */
+    if (Number.isFinite(gemeldeteStaffelNummer)) return gemeldeteStaffelNummer
+    /*
+      **Die Fundstelle gehört zur Adresse, nicht zur ersten `titleID`.**
+
+      Die Schleife unten nimmt die erste Kennung im Quelltext — bei einer
+      Serienseite ist das die Reihe oder die erste Staffel, nicht die gewählte.
+      Steht die Kennung aus der Adresse im Text (bei Sekirei 91-mal), ist ihr
+      Umfeld die richtige Stelle.
+    */
+    /*
+      **Hier stand bis 4.1.7 eine zweite Suche über den ganzen Quelltext.**
+
+      Sie sollte die `seasonNumber` im Umfeld der Adress-Kennung finden statt
+      bei der ersten `titleID`. Der Gedanke stimmt — der Preis nicht: Der Aufruf
+      lag in `staffelSchluessel()`, das mehrfach je Takt läuft, und jeder
+      `seitenHtml()`-Aufruf baut bei Prime **zwei Megabyte** neu auf.
+
+      Daniel am 31.08.2026: „horrible performance … es dauert 5 sec bis der
+      hover effekt von einer kachel aktiviert wird", dazu ein Tab mit **9,4 GB**
+      und `setInterval handler took 1228ms` in der Konsole.
+
+      Die Staffelnummer kommt jetzt wieder allein aus der Adresse und aus dem
+      Mitleser — beides kostet nichts. Dieselbe Lehre wie am 28.08.2026: Wer
+      den Quelltext ein weiteres Mal liest, zahlt dafür bei jedem Takt.
+    */
+    /*
+      **Und seit dem 15.09.2026 auch keine Suche nach `seasonNumber` mehr.** Die
+      Nummer kommt aus dem Schnappschuss (`seite.staffel`); bis er da ist, bleibt
+      der Fenstertitel. Die Adresse fragt `staffelSchluessel()` selbst.
+    */
+    // Rückfall: der Seitentitel nennt sie im Klartext.
+    const ausTitel = /,\s*(?:Staffel|Season)\s*(\d+)/i.exec(document.title || '')?.[1]
+    return ausTitel ? Number(ausTitel) : null
+  }
+
+  /**
+   * **Die Staffelnummer — das JSON schlägt die Adresse.**
+   *
+   * Die Angabe kommt aus dem Hydration-Block, der nach einem Wechsel mitwandert;
+   * deshalb steht das JSON vor `staffelAusAdresse()` — und
+   * „Yu-Gi-Oh! ZEXAL" zeigt, warum das nötig ist. Prime teilt dort jede
+   * Staffel in zwei Bände und nutzt `sequenceNumber` als **Sortierschlüssel**,
+   * nicht als Staffelnummer:
+   *
+   * ```
+   * B0CB8SGJCZ  seq 1    Staffel 1, Band 2
+   * B0GTJV4S7L  seq 1    Season 1, Volume 2
+   * B0GV8N71SL  seq 2    Season 2, Volume 2
+   * B0FHGJ7KS1  seq 3    Season 3, Volume 2
+   * B01EKI0P2U  seq 101  Season 1, Volume 1
+   * B01EKI0SQ8  seq 201  Season 2, Volume 1
+   * ```
+   *
+   * Die Adresse trägt genau diese Zahl (`?ref_=atv_dp_season_select_s101`).
+   * Ein Klick auf „Season 1, Volume 1" hätte also **Staffel 101** gemeldet.
+   * `headerDetail.seasonNumber` sagt dort 1 — geprüft am gewählten Band, wo
+   * es 2 sagt und die Adresse `s2` trägt.
+   *
+   * Die Adresse bleibt die Rückfallebene: Sie ist die einzige Quelle, wenn der
+   * Block nicht gelesen werden konnte. Ihre Zahl wird dann aber verworfen,
+   * sobald sie kein Staffelwert mehr sein kann — mehr als fünfzig Staffeln hat
+   * keine Reihe bei Prime, und die Grenze trennt jeden echten Fall von den
+   * dreistelligen Sortierschlüsseln.
+   */
+  /*
+    **Die Adresse steht wieder vorn — aber nur, wenn ihre Zahl eine sein kann.**
+
+    Drei Fälle vom 31.08.2026, alle mit Bericht in `docs/diagnose/`: Shangri-La
+    Frontier, Space Dandy und Sekirei. Überall trug die Adresse
+    `?ref_=atv_dp_season_select_s2`, das Auswahlfeld den Staffel-2-Namen,
+    `lage.staffelZahl` die 2 — und der Knopf meldete Staffel 1.
+
+    Seit 2.8 stand `gemeldeteStaffelNummer` vorn, weil Yu-Gi-Oh! ZEXAL zeigte,
+    dass die Adresse **Sortierschlüssel** trägt: 101 und 201 für die beiden
+    Bände derselben Staffel. Genau dagegen gibt es aber schon die Grenze von
+    fünfzig — sie trennt jeden echten Staffelwert von jedem Sortierschlüssel.
+
+    Die Meldung des Mitlesers hat dafür einen Nachteil, den die Adresse nicht
+    hat: Sie kann **alt** sein. Sie entsteht beim Lesen des Seitenblocks, und
+    nach einem Wechsel über das Auswahlfeld tauscht Amazon den nicht aus
+    (CLAUDE.md, 24.08.2026). Die Adresse wandert dagegen sofort mit.
+
+    Also: Adresse zuerst, solange ihre Zahl ≤ 50 ist; darüber gilt sie als
+    Sortierschlüssel und die Meldung übernimmt. Beide Fälle sind damit
+    abgedeckt, ohne dass einer den anderen kostet.
+  */
+  function staffelNummer() {
+    const ausAdresse = staffelAusAdresse()
+    if (Number.isFinite(ausAdresse) && ausAdresse <= 50) return ausAdresse
+    if (Number.isFinite(gemeldeteStaffelNummer)) return gemeldeteStaffelNummer
+    if (Number.isFinite(ausAdresse)) return null
+    return quelltextPasst() ? staffelAusSeite() : null
+  }
+
+  function staffelAusAdresse() {
+    /**
+     * Zwei Quellen, und die gemerkte ist die Rückfallebene.
+     *
+     * Solange Amazon den Parameter noch nicht weggeräumt hat, steht er in der
+     * **aktuellen** Adresse — die ist auch nach einem Staffelwechsel richtig,
+     * während die gemerkte noch die erste Staffel nennt. Fehlt er dort, gilt
+     * die Adresse vom Seitenstart, die `amazon-leser.js` bei `document_start`
+     * gesehen hat.
+     */
+    /**
+     * Die gemerkte Startadresse gilt nur bis zum ersten Staffelwechsel.
+     *
+     * Sie ist die Adresse, mit der die Seite geladen wurde — und damit die
+     * Staffel, bei der Daniel eingestiegen ist. Wechselt er im Auswahlfeld,
+     * nennt sie weiter die alte, und ein leerer `location.search` liesse sie
+     * gewinnen: Jede Meldung waere wieder die Startstaffel.
+     *
+     * Genau das ist am 24.08.2026 bei „Captain Tsubasa" passiert — gemeldet
+     * wurden fuenf Staffeln, abgehakt kamen S1 und S5 an.
+     */
+    const quellen = gabStaffelwechsel ? [location.search] : [location.search, startAdresse]
+    for (const wo of quellen) {
+      const n = /[?&]ref_=[^&]*_s(\d+)/.exec(wo ?? '')?.[1]
+      if (n) return Number(n)
+    }
+    return null
+  }
+
+  /**
+   * Unter welcher Nummer diese Staffel abgehakt wird — an **einer** Stelle.
+   *
+   * Sie wurde an zwei Orten gebildet, und beide waren falsch: der
+   * Meldeschlüssel und der Vergleich in `zeichnen()`, der entscheidet, ob am
+   * Knopf „✓ gemeldet" stehen bleibt. Beide fielen ohne Adressparameter auf die
+   * **Folgenzahl** zurück. Zwei Fassungen derselben Regel laufen auseinander —
+   * hier taten sie es sogar gleichzeitig in dieselbe falsche Richtung.
+   *
+   * Die Reihenfolge ist die Reihenfolge der Verlässlichkeit: die Nummer aus dem
+   * Quelltext, dann die aus der Adresse, dann die ASIN. Die ASIN ist je Staffel
+   * verschieden und kollidiert nie — anders als die Folgenzahl.
+   */
+  /**
+   * Amazons Nummer für die Anzeige — aus 201 wird „2, Vol. 1".
+   *
+   * Ist eine Staffel in Bänden geteilt, zählt Amazon sie dreistellig:
+   * Hunderterstelle ist die Staffel, die letzten beiden Stellen der Band.
+   * Belegt am 25.08.2026 an „Made in Abyss" (Daniel): Das Auswahlfeld führt
+   * „Staffel 1", „Staffel 1, Volume 2", „Staffel 2, Volume 1", „Staffel 2,
+   * Volume 2" — gemeldet wurden sie als 1, 102, 201 und 202.
+   *
+   * Umgeschrieben wird nur die **Anzeige**. Der Schlüssel bleibt Amazons Zahl:
+   * Er muss eindeutig sein, nicht schön, und über ihn läuft der Abgleich mit
+   * den Meldungen im Worker.
+   */
+  function staffelText(nr) {
+    const m = /^([1-9]\d?)(\d{2})$/.exec(String(nr))
+    return m && Number(m[2]) > 0 ? `${m[1]}, Vol. ${Number(m[2])}` : String(nr)
+  }
+
+  function staffelSchluessel() {
+    return String(staffelAusAdresse() ?? staffelAusSeite() ?? id ?? 1)
+  }
+
+  /**
+   * Wie viele Ausgaben die Seite für die gerade gewählte Staffel führt.
+   *
+   * Prime führt dieselbe Staffel regelmäßig zweimal — bei „Mob Psycho 100 II"
+   * einmal als reinen Kauftitel, einmal über ein Kanal-Abo (Daniel,
+   * 30.08.2026). Die Zugangsart gilt dann nur für die geöffnete Ausgabe, und
+   * genau das muss am Knopf und in der Notiz stehen.
+   *
+   * **Verglichen wird als Zahl.** Der erste Anlauf nahm `staffelSchluessel()`,
+   * und der liefert einen String — `Number.isFinite('2')` ist `false`, der
+   * Zusatz konnte also nie erscheinen. An der zweiten Stelle war die Variable
+   * gar nicht im Scope; beide Zugriffe standen in einem `try`, deshalb fiel
+   * nichts auf außer der ausbleibenden Wirkung.
+   */
+  function ausgabenDieserStaffel() {
+    try {
+      const nr = Number(staffelAusAdresse() ?? staffelAusSeite())
+      if (!Number.isFinite(nr)) return 0
+      return (gesehen?.seite?.staffeln ?? []).filter((s) => s?.nummer === nr).length
+    } catch {
+      return 0
+    }
+  }
+
+  /**
+   * Die Kennung zum Melden: erst die Seite, dann die Adresse.
+   *
+   * Die Adresse bleibt als Rückfallebene — sie stimmt, solange niemand die
+   * Staffel gewechselt hat, und sie ist da, bevor der Quelltext steht.
+   */
+  /**
+   * **Die Adresse zuerst — sie wandert mit, der Quelltext nicht.**
+   *
+   * Bis 2.3.2 galt die Kennung aus dem Quelltext als die bessere. Das war die
+   * Reihenfolge aus der Zeit, in der der Quelltext die einzige Quelle war; seit
+   * dem Umbau auf die Widget-Antworten ist sie schlicht falsch herum.
+   *
+   * Sichtbar wurde es an zwei Meldungen vom 25.08.2026, 20:20 Uhr: Für
+   * „PAC-MAN und die Geisterabenteuer" — beide Staffeln — stand in der Notiz
+   * „Amazon-Seite B0FFRD3ZRL". Das ist „New PANTY & STOCKING", der Titel
+   * achtzehn Sekunden davor. Die **Sprachen** stimmten (26 Folgen, alle nur
+   * Deutsch, an der Seite nachgemessen) — allein die Kennung stammte vom
+   * vorigen Titel, und damit war die Meldung nicht mehr sauber zuzuordnen.
+   *
+   * Umgekehrt gibt es keinen Fall, in dem die Adresse falscher wäre als der
+   * Quelltext: Sie ist da, bevor irgendetwas geladen ist, und sie ist das
+   * Einzige, was Amazon beim Wechsel zuverlässig austauscht (CLAUDE.md,
+   * „Der Quelltext veraltet beim Staffelwechsel").
+   */
+  function asin() {
+    return asinAusAdresse() ?? asinAusSeite()
+  }
+
+  /**
+   * Die Tonspuren der **geladenen** Folgen — und wie viele das von wie vielen sind.
+   *
+   * Gelesen wird aus dem Quelltext, nicht aus dem sichtbaren DOM: Amazon legt
+   * die Angaben in JSON-Blöcken ab, die nie als Text erscheinen.
+   *
+   * ## Zwei Fehler der ersten Fassung (Daniel, 23.08.2026, mit Bild)
+   *
+   * Sie zeigte bei „Digimon Tamers" **27 Folgen**, während die Seite „51 Folgen"
+   * nennt und im Auswahlfeld „Folgen 1–24" steht. Beides war falsch:
+   *
+   * 1. **Gezählt wurde jedes `audioTracks`-Feld im Quelltext** — auch solche aus
+   *    Vorschauen und Empfehlungsleisten, die zu anderen Titeln gehören. Deshalb
+   *    27 statt 24. Jetzt zählt nur, was zu einer `episodeNumber` gehört.
+   * 2. **Amazon lädt seine Folgenliste seitenweise.** Was im Quelltext steht,
+   *    ist der gerade sichtbare Ausschnitt, nicht die Staffel. Ein Befund über
+   *    24 von 51 Folgen als „51 Folgen deutsch" auszugeben, wäre genau der
+   *    Fehler, den dieses Projekt an anderen Quellen kritisiert.
+   *
+   * Deshalb wird die Gesamtzahl von der Seite gelesen und **beides** angezeigt.
+   * Was nicht geladen ist, wird nicht behauptet.
+   */
+  /*
+    **`spuren()` gibt es nicht mehr (15.09.2026, Umbau Phase 2).** Die Funktion las
+    Tonspuren und Folgennummern per Muster aus dem ganzen Quelltext; seit dem
+    Umbau vom 15.09.2026 liefert allein `amazon-leser.js` den Zählstand, und sie
+    hatte keinen Aufrufer mehr.
+  */
+
+  /**
+   * Der Serientitel, wie ihn die Seite selbst nennt.
+   *
+   * Gebraucht für Staffeln, die unser Bestand nicht kennt — etwa solche, die
+   * nur über ein Zusatzabo laufen.
+   */
+  function seitenTitel() {
+    /* Aus dem JSON gemeldet schlägt aus dem Quelltext gesucht. */
+    /*
+      Titel und Kennung des Lesers gehören zusammen: Nennt er noch die Kennung einer verlassenen Seite,
+      ist auch sein Titel der alte (Prime-Wechsel Goblin Slayer → Blade of the Immortal, 01.11.2026).
+    */
+    const vonVerlassener = quelltextVonFruehererSeite()
+    if (gemeldeterSerientitel && !vonVerlassener) return gemeldeterSerientitel
+    /**
+     * `document.title` taugt nicht — gemessen, nicht vermutet.
+     *
+     * Bei „Oshi no Ko" Staffel 3 steht dort **„Amazon.de: Season 3"**: kein
+     * Serienname, nur die Staffelnummer und der Shopname. Genau so kam die
+     * Meldung am 23.08.2026 an, und zuzuordnen war sie damit nicht.
+     *
+     * Der Serientitel steht im Quelltext, und zwar in der Überschrift der
+     * Seite. Probiert wird von der verlässlichsten Stelle abwärts; erst zum
+     * Schluss der Fenstertitel, und der nur, wenn er nach etwas aussieht.
+     */
+    /**
+     * Das Open-Graph-Feld zuerst — es ist dafür gemacht, geteilt zu werden.
+     *
+     * Weder `<h1>` noch `pageTitle` lieferten bei „Oshi no Ko" Staffel 3
+     * etwas; die Meldung kam zweimal ohne Titel an (23.08.2026). `og:title`
+     * steht dagegen in jeder Seite, die in einer Linkvorschau erscheinen soll,
+     * und trägt den Serientitel ohne Staffelzusatz.
+     */
+    /**
+     * Das Auswahlfeld der Staffeln — die verlässlichste Stelle.
+     *
+     * Gemessen am 23.08.2026 an „Oshi no Ko" Staffel 3: `og:title`,
+     * `twitter:title` und `<h1>` sind **alle leer**, `document.title` trägt
+     * „Amazon.de: Season 3 ansehen | Prime Video". Der Serientitel steht
+     * einzig im Auswahlfeld:
+     *
+     *     <span class="_36qUej">[Oshi No Ko] - [Mein*Star] - Staffel 1</span>
+     *
+     * Die Klasse ist generiert und beim nächsten Amazon-Deploy eine andere —
+     * gesucht wird deshalb nach dem **Textmuster**, nicht nach dem Element.
+     *
+     * **Nur der Teil vor „ - Staffel N" wird genommen, nie die Nummer.** Im
+     * Auswahlfeld stand „Season 3", im Quelltext fand sich trotzdem
+     * „… - Staffel 1" (Daniel, 23.08.2026, mit Bild): Der Quelltext führt alle
+     * Einträge, nicht nur den gewählten. Der Serientitel ist bei allen
+     * derselbe und deshalb brauchbar; die Staffelnummer kommt ausschließlich
+     * aus dem Verweis-Parameter.
+     */
+    /**
+     * **Die Reihenfolge ist seit dem 24.08.2026 umgekehrt** — und das aus einem
+     * Fehler heraus, der teuer hätte werden können.
+     *
+     * Das Auswahlfeld-Muster stand vorn. Es sucht „*Titel* – Staffel N" im
+     * **gesamten** HTML, und wo das echte Auswahlfeld nur „Staffel 1" trägt —
+     * ohne Serienname davor, wie bei „Chaika" —, trifft es den ersten
+     * passenden Text irgendwo sonst: eine Empfehlungskachel.
+     *
+     * Sichtbar wurde es im Diagnose-Tooltip, den Daniel geschickt hat:
+     *
+     *     Serie im Bestand: Ragna Crimson · Seitentitel: Ragna Crimson
+     *
+     * Auf einer Chaika-Seite. Und weil der Serientitel seit 0.72 Meldungen
+     * einem Listeneintrag zuordnet, hätte das den Befund einer Serie an eine
+     * andere geschrieben.
+     *
+     * `og:title` ist dafür gemacht, **diese** Seite zu benennen, und kann
+     * nichts aus einer Kachel aufschnappen. Das Auswahlfeld bleibt als
+     * Rückfall: Bei „Oshi no Ko" Staffel 3 sind `og:title`, `twitter:title`
+     * und `<h1>` allesamt leer (gemessen 23.08.2026), und dort ist es die
+     * einzige Quelle.
+     */
+    const ausOg = vonVerlassener ? null : document
+      .querySelector?.('meta[property="og:title"], meta[name="twitter:title"]')
+      ?.getAttribute?.('content')
+    if (ausOg) {
+      const sauber = saeubern(ausOg)
+      if (sauber) return sauber
+    }
+
+    for (const wahl of ['h1', '[data-automation-id="title"]', '[data-testid="title"]']) {
+      const text = document.querySelector?.(wahl)?.textContent
+      if (text) {
+        const sauber = saeubern(text)
+        if (sauber) return sauber
+      }
+    }
+
+    /**
+     * **Erst den Anker suchen, dann rückwärts lesen — nicht umgekehrt.**
+     *
+     * Hier stand `([^<>"]{3,120}?)\s+[-–—]\s+(?:Staffel|Season)\s+\d+`, und
+     * dieses Muster war mit Abstand der teuerste Posten der ganzen Erweiterung:
+     * **81,4 ms je Durchlauf**, gemessen am 25.08.2026 über einen Quelltext von
+     * knapp einer Million Zeichen — dreißigmal mehr als alle anderen Muster
+     * zusammen.
+     *
+     * Der Grund ist nicht die Länge des Quelltextes, sondern das **faule
+     * Zählquantiv**: An jeder der rund einer Million Startstellen probiert der
+     * Regex-Motor die Längen 3, 4, 5 … durch, bis die Zeichenklasse abbricht.
+     * Ohne Tags im Text sind es sogar 119 ms — die Zahl hängt also nicht an der
+     * Füllmasse, sondern am Rückzugsverhalten.
+     *
+     * Und der Rückfall ist kein Sonderfall: Er greift, sobald `og:title`,
+     * `twitter:title` und `<h1>` **alle** leer sind — genau so sah „Oshi no Ko"
+     * Staffel 3 aus (23.08.2026). Dort ruft ein Takt `seitenTitel()` bis zu
+     * fünfmal auf; fünfmal 81 ms sind 400 ms in einem 500-ms-Takt. Das deckt
+     * sich mit der Messung in Daniels Sitzung: `taktMax: 417 ms`.
+     *
+     * Jetzt sucht ein billiges Muster den **Anker** („– Staffel 3"), und der
+     * Titel wird aus den 120 Zeichen davor gelesen. Der Motor hat damit
+     * höchstens so viele Startstellen wie es Trennzeichen gibt, statt einer je
+     * Zeichen.
+     */
+    const anker = /\s+[-–—]\s+(?:Staffel|Season)\s+\d+/i.exec(seitenHtml())
+    if (anker) {
+      const davor = seitenHtml().slice(Math.max(0, anker.index - 120), anker.index)
+      const ausAuswahl = /([^<>"]{3,120})$/.exec(davor)?.[1]
+      if (ausAuswahl) {
+        const sauber = saeubern(ausAuswahl)
+        if (sauber) return sauber
+      }
+    }
+
+    const html = seitenHtml()
+    // Amazons eigener Titel für diese Seite — dasselbe Feld, das die
+    // Freigabehinweise und die Besetzung trägt.
+    const ausDaten = /"pageTitle"\\*"?\s*:\s*\\*"([^"\\]{3,120})/.exec(html)?.[1]
+    if (ausDaten) {
+      const sauber = saeubern(ausDaten)
+      if (sauber) return sauber
+    }
+
+    return saeubern(document.title ?? '')
+  }
+
+  /**
+   * Aus einem gefundenen Text einen brauchbaren Titel machen — oder keinen.
+   *
+   * „Season 3" allein ist kein Titel, „Amazon.de: Season 3" erst recht nicht.
+   * Lieber nichts schicken als etwas, das beim Zuordnen in die Irre führt: Die
+   * Kennung und die Staffelnummer tragen die Meldung dann allein.
+   */
+  function saeubern(roh) {
+    const geputzt = String(roh)
+      .replace(/^Amazon\.de\s*:\s*/i, '')
+      .replace(/\s*[|–—-]\s*(Prime Video|Amazon\.de|Amazon Prime).*$/i, '')
+      .replace(/\s+(ansehen|anschauen|streamen)\s*$/i, '')
+      .trim()
+    if (!geputzt || geputzt.length < 3) return null
+    if (/^(season|staffel)\s*\d+$/i.test(geputzt)) return null
+    if (/^amazon\.de$/i.test(geputzt)) return null
+    /*
+      **„Chatverlauf" ist Amazons Rufus-Leiste, kein Titel.** Zwei Meldungen am
+      13.09.2026 (Okko, Danganronpa 3) trugen genau diesen Namen und ließen sich
+      keinem Titel zuordnen; am 09.09.2026 stand er schon einmal im Kasten von
+      „Death Note: Relight". Die Überschrift des Chat-Fensters ist das erste
+      `h1`, wenn die Seite selbst keins trägt.
+    */
+    if (/^chatverlauf$/i.test(geputzt)) return null
+    return geputzt
+  }
+
+  /**
+   * Wie man an diesen Titel kommt: im Abo, gegen Geld, oder beides.
+   *
+   * Amazon führt beides nebeneinander, und die Seite sagt es im Klartext —
+   * „Als Kauftitel verfügbar", „Folge 1 kaufen in HD 2,99 €", „Staffel 1
+   * kaufen HD 29,99 €". Daneben steht das Abo als `benefitId` im Quelltext.
+   *
+   * **Beides zugleich ist der Regelfall, nicht die Ausnahme.** „Akane-banashi"
+   * läuft im aniverse-Abo **und** ist einzeln zu kaufen (Daniel, 23.08.2026,
+   * mit Bild). Wer nur eines meldet, meldet die Hälfte.
+   *
+   * Gelesen wird der **sichtbare Text**, nicht nur das JSON: Ein `benefitId`
+   * steht auch bei Titeln, die zusätzlich Geld kosten, und fehlt bei reinen
+   * Kauftiteln ganz. Die Kaufhinweise sind verlässlicher, weil Amazon sie dem
+   * Kunden zeigen muss.
+   *
+   * Bleibt beides stumm, wird **nichts** behauptet — der Datensatz hat schon
+   * 202 Verweise mit geratener Zugangsart, ein weiterer hilft niemandem.
+   */
+  /*
+    **Seit dem 15.09.2026 (Umbau Phase 2) aus dem Schnappschuss.** Kauf und Leihe
+    kamen per Muster aus dem sichtbaren Seitentext („Als Kauftitel verfügbar",
+    „Kaufen HD"); der Leser liest sie jetzt aus dem Aktionsblock (`seite.kaufbar`,
+    `seite.leihbar`, gemessen an `B0CVQW43HC`). Vor dem ersten Schnappschuss wird
+    nichts behauptet.
+  */
+  function zugangsart() {
+    let s = null
+    try {
+      s = gesehen?.seite ?? null
+    } catch {
+      return null
+    }
+    if (!s) return null
+    const kauf = Boolean(s.kaufbar)
+    const leihe = Boolean(s.leihbar)
+    const abo = abos().length > 0
+    return abo && kauf ? 'abo_und_kauf' : abo ? 'abo' : kauf ? (leihe ? 'kauf_oder_leihe' : 'kauf') : null
+  }
+
+  /**
+   * Wie viele Staffeln dieser Titel hat — laut Seite.
+   *
+   * Amazon schreibt es in die Kopfzeile: „Kinder · Animation · Drama · 4.8/5
+   * · IMDb 7,7/10 · 1988 · **5 Staffeln**". Ohne diese Zahl weiß die
+   * Erweiterung nicht, wann ein Titel wirklich durch ist.
+   *
+   * Fehlt sie, gilt der Titel als einstaffelig — dann ist eine Meldung eine
+   * ganze Auskunft, und das ist der häufigere Fall.
+   */
+  function staffelZahl() {
+    /*
+      **Zwei Einträge, eine Staffel — Amazon zählt trotzdem zwei.**
+
+      Bei „Kakushite! Makina-san!!" führt Prime dieselbe erste Staffel zweimal
+      (zwei Ausgaben, beide `sequenceNumber: 1`) und schreibt „2 Staffeln" in
+      den Seitentext. Die Erweiterung verlangte daraufhin eine zweite Meldung —
+      für eine Staffel, die es nicht gibt.
+
+      Die Staffelliste aus dem Hydration-Block weiß es besser: Sie nennt je
+      Eintrag die Nummer, und verschiedene Nummern sind verschiedene Staffeln.
+      Der Seitentext bleibt Rückfall, solange sie fehlt.
+
+      In `try`, weil `gesehen` weiter unten angelegt wird und diese Funktion
+      beim Seitenaufbau läuft — derselbe Grund wie bei `nichtAngekommen()`.
+    */
+    const ausText = seitenLage().staffelZahl
+    try {
+      const staffelListe = gesehen?.seite?.staffeln ?? []
+      const nummern = new Set(staffelListe.map((s) => s?.nummer).filter((n) => Number.isFinite(n)))
+      /*
+        **Nur eine vollständige Liste darf die Zahl senken.**
+
+        Die Staffelliste trifft mit Verzögerung ein. Steht dort erst ein
+        Eintrag, während der Seitentext „5 Staffeln" sagt, wäre eine 1 keine
+        Korrektur, sondern ein halber Ladezustand — und die Serie gälte nach
+        einer einzigen Meldung als fertig. Genau das ist bei „Danmachi" passiert:
+        Staffel 1 gemeldet, Eintrag weg, Staffel 2 nicht mehr meldbar (Daniel,
+        30.08.2026).
+
+        Vollständig ist die Liste, wenn sie so viele Einträge hat, wie die Seite
+        Staffeln nennt. Dann — und nur dann — zählen ihre Nummern: bei
+        „Kakushite" zwei Einträge mit derselben Nummer 1, also eine Staffel.
+      */
+      if (nummern.size && staffelListe.length >= ausText) return nummern.size
+    } catch {
+      /* Noch keine Staffelliste — dann gilt die Zahl aus dem Seitentext. */
+    }
+    return ausText
+  }
+
+  /**
+   * Laeuft dieser Titel ueber einen fremden Kanal statt ueber Prime selbst?
+   *
+   * Amazon fuehrt beides unter derselben Oberflaeche: eigene Inhalte
+   * ("In Prime enthalten", benefitId "Prime") und Kanal-Abos wie ADN,
+   * aniverse oder Crunchyroll, die man dort dazubucht.
+   *
+   * **Der Unterschied entscheidet, ob die Sprachangabe etwas taugt.** Bei
+   * "Kill Blue" behauptet Amazon 12 deutsche Folgen; ADN, die Quelle hinter
+   * dem Kanal, hat 2. Offenbar zeigt Amazon dort die
+   * Sprachen des Kanals, nicht die der Folge.
+   *
+   * Ein Kauftitel zaehlt nicht als Kanal: Was gekauft wird, hat seine
+   * eigene Tonspur, und die kennt Amazon.
+   */
+  function ueberKanal() {
+    return ueberKanalRechnen()
+  }
+
+  function ueberKanalRechnen() {
+    const gefunden = abos()
+    if (!gefunden.length) return false
+    if (gefunden.some((a) => /^prime$/i.test(a))) return false
+    const art = zugangsart()
+    if (art === 'kauf' || art === 'kauf_oder_leihe') return false
+    return true
+  }
+
+  /**
+   * Welche Abos diese Staffel freischalten — `Prime`, `aniversede`, …
+   *
+   * **Aus dem Aktionsblock der Seite, nicht aus dem ganzen Quelltext** (Umbau
+   * Phase 2, 15.09.2026). Das Muster über den Quelltext fand `benefitId` auch in
+   * Empfehlungsleisten fremder Titel; der Leser liest es aus `atf.state.action`
+   * und schickt es als `seite.zugaenge` (gemessen an Avatar: `paramountplusde`,
+   * an ZEXAL: `crunchyrollde`). Vor dem ersten Schnappschuss ist die Liste leer.
+   */
+  function abos() {
+    try {
+      const z = gesehen?.seite?.zugaenge
+      return Array.isArray(z) ? z : []
+    } catch {
+      return []
+    }
+  }
+
+  const liste = globalThis.AK_OFFENE_AMAZON ?? {}
+
+  /**
+   * **„Alles geprüft" ist nur wahr, solange die Liste aktuell ist.**
+   *
+   * `AK_OFFENE_AMAZON` liegt in der Erweiterung, nicht auf dem Server: Was der
+   * Bau hinzufügt, sieht der Browser erst nach einem Neuladen in
+   * `chrome://extensions`. Bis dahin sagt der Knopf „Prime: alles geprüft" und
+   * meint „in meiner Liste steht nichts mehr" — zwei verschiedene Aussagen.
+   *
+   * Real am 02.09.2026: „Karakai Jouzu no Takagi-san 2" kam um 08:53 in die
+   * Liste. Um 11:16 stand der Titel auf dem Bildschirm, die Statusanzeige
+   * zählte ihn als offen, und der Knopf meldete „alles geprüft". Beide hatten
+   * recht — nur aus verschiedenen Ständen, und nichts sagte es.
+   *
+   * Verglichen wird eine **Prüfsumme der Prüfliste** gegen die der Live-Seite.
+   * Einmal je Stunde; ein Fehlschlag bleibt folgenlos — dann steht dort eben kein
+   * Hinweis.
+   *
+   * **Nicht der Datenstand.** Die erste Fassung verglich `meta.generatedAt`, und
+   * das war ein Fehlalarm-Generator: Der Datensatz wird stündlich neu gebaut, die
+   * Prüfliste ändert sich dabei fast nie. Zwölf Minuten nach dem Neuladen stand
+   * bei Daniel wieder „Prime-Liste veraltet" auf dem Bildschirm (02.09.2026) —
+   * bei einer Liste, die Zeichen für Zeichen die aktuelle war. Eine Warnung, die
+   * zuverlässig zu Unrecht kommt, ist schlimmer als keine.
+   */
+  const STAND_FRIST_MS = 60 * 60 * 1000
+  let listeVeraltet = false
+  let standGeprueftAm = 0
+
+  async function standPruefen() {
+    const eigener = globalThis.AK_OFFENE_AMAZON_STAND ?? null
+    if (!eigener) return
+    if (Date.now() - standGeprueftAm < STAND_FRIST_MS) return
+    standGeprueftAm = Date.now()
+    try {
+      const antwort = await fetch('https://anime-kalender.de/data/pruefliste-stand.json', { cache: 'no-store' })
+      if (!antwort.ok) return
+      const daten = await antwort.json()
+      /*
+        **Verglichen wird die Prüfliste, nicht der Datenstand.**
+
+        `generatedAt` ändert sich stündlich mit jedem Bau; die Prüfliste ändert
+        sich fast nie. Die erste Fassung verglich den Datenstand und meldete
+        deshalb zwölf Minuten nach dem Neuladen wieder „veraltet" — bei einer
+        Liste, die Zeichen für Zeichen die aktuelle war.
+      */
+      if (!daten?.amazon) return
+      listeVeraltet = String(daten.amazon) !== String(eigener)
+    } catch {
+      /* Kein Netz, keine Aussage — der Hinweis bleibt weg, statt falsch zu sein. */
+    }
+  }
+  /**
+   * **Die Prüflisten kommen von der Seite, nicht aus dem Paket.**
+   *
+   * Beide Listen stecken als Datei in der Erweiterung und altern damit ab dem
+   * Moment, in dem sie gepackt wurde. Am 31.08.2026 sagte die Erweiterung
+   * „Prime: alles geprüft", während die Statusanzeige 24 offene Suchen zeigte —
+   * beide hatten recht, nur lag zwischen ihnen ein Tiefendurchlauf, der 25 neue
+   * Aufträge erzeugt hatte. Daniel: „single source of truth."
+   *
+   * Beim Start wird deshalb nachgeladen, was der Bau zuletzt veröffentlicht hat.
+   * Die gepackte Fassung bleibt als Rückfall: Ohne Netz oder mit einer alten
+   * Seite arbeitet die Erweiterung weiter, nur eben mit dem Stand von damals.
+   *
+   * Zwischengespeichert wird in `chrome.storage.local` — ein Abruf je zehn
+   * Minuten reicht für eine Liste, die sich im Takt der Datenläufe ändert, und
+   * ein neuer Prime-Tab kostet dann nichts.
+   */
+  let suchliste = globalThis.AK_PRIME_SUCHE ?? {}
+  /* Titel und Folgenzahl der Suchen mit Auswahl: der Worker kennt nur die Kennungen (`erwartungMelden`). */
+  let auswahlMerk = {}
+  async function auswahlMerkLaden() {
+    auswahlMerk = (await globalThis.akKontext.lesen('primeAuswahlKopf'))?.primeAuswahlKopf ?? {}
+  }
+  void auswahlMerkLaden()
+  const FRISCH_MS = 10 * 60 * 1000
+  const QUELLE = 'https://anime-kalender.de/data/prime-suche.json'
+  ;(async () => {
+    try {
+      const { primeSuche } = (await globalThis.akKontext.lesen('primeSuche')) ?? {}
+      if (primeSuche?.stand && Date.now() - primeSuche.stand < FRISCH_MS) {
+        if (primeSuche.liste) uebernehmen(primeSuche.liste)
+        return
+      }
+      const antwort = await fetch(QUELLE, { cache: 'no-store' })
+      if (!antwort.ok) return
+      const frisch = await antwort.json()
+      if (frisch && typeof frisch === 'object' && Object.keys(frisch).length) {
+        await globalThis.akKontext.schreiben({ primeSuche: { stand: Date.now(), liste: frisch } })
+        uebernehmen(frisch)
+      }
+    } catch {
+      /* Ohne Netz bleibt die gepackte Liste — sie ist alt, aber sie trägt. */
+    }
+  })()
+
+  /** Die frische Liste einsetzen und alles neu zeichnen, was aus ihr liest. */
+  function uebernehmen(frisch) {
+    if (JSON.stringify(frisch) === JSON.stringify(suchliste)) return
+    suchliste = frisch
+    try {
+      uebersichtZeichnen()
+    } catch {
+      /* Der Kasten steht noch nicht — dann zeichnet ihn der nächste Takt. */
+    }
+  }
+
+  // --- Suchseiten: der Weg zur echten Titelseite ----------------------------
+
+  /**
+   * **118 unserer Prime-Verweise sind Suchen, keine Titelseiten.**
+   *
+   * Weder AniList noch aniSearch liefern für diese Titel eine belastbare
+   * Produktseite, und weder MOTN noch TMDB führen eine (beides am 27.08.2026
+   * gemessen, beides null Treffer). Auf einer Suchseite gibt es keine
+   * Tonspuren zu lesen.
+   *
+   * Was die Erweiterung kann: den Weg zeigen. Hier steht ein Hinweis, welcher
+   * Titel gemeint ist; der Klick auf den richtigen Treffer hinterlegt ihn für
+   * zehn Minuten, und auf der Titelseite läuft die gewohnte Prüfung — auch
+   * wenn deren Adresse in keiner Liste steht.
+   *
+   * Der Rest ist schon gebaut: Die Handbeleg-Datei kennt ein Feld für „die
+   * richtige Adresse, falls die im Datensatz danebenliegt", und der
+   * Übernahme-Lauf ordnet eine unbekannte Adresse über den Namen zu.
+   */
+  const SUCH_SCHLUESSEL = 'ak-prime-suchauftrag'
+
+  /**
+   * **Welcher Auftrag weggelegt wurde — und nur der.**
+   *
+   * Daniel am 02.09.2026: „pack ein x button oben rechts in die box, um diesen
+   * titel nicht mehr zu suchen … nur noch prüfliste und ruhemodus sind sichtbar
+   * wenn man x drückt, bis man den nächsten titel in der prüfliste auswählt."
+   *
+   * Der Fall dahinter: Ein Titel ist bei Prime nicht zu finden, und der Kasten
+   * fragt trotzdem weiter danach — auf jeder Seite, die man danach ansieht.
+   *
+   * **Gemerkt wird der Auftrag, nicht die Adresse.** Wer wegen desselben Titels
+   * eine zweite Seite öffnet, will ihn dort auch nicht mehr sehen; wer in der
+   * Prüfliste den nächsten anklickt, schon. Der Vermerk verfällt damit von
+   * selbst, ohne dass ihn jemand aufheben muss.
+   *
+   * Er liegt im `sessionStorage` neben dem Auftrag selbst — derselbe
+   * Geltungsbereich, dieselbe Lebensdauer. Ein Vermerk, der länger lebt als
+   * das, worauf er sich bezieht, wird zum Rätsel: „Warum zeigt der Kasten
+   * nichts mehr?"
+   */
+  const WEGGELEGT_SCHLUESSEL = 'akWeggelegt'
+
+  /** Kennzeichnet einen Auftrag — die Suchadresse, sonst der Titel. */
+  function auftragsKennung(auftrag) {
+    return auftrag?.suchUrl || auftrag?.url || auftrag?.titel || null
+  }
+
+  function istWeggelegt(auftrag) {
+    try {
+      const k = auftragsKennung(auftrag)
+      return Boolean(k) && sessionStorage.getItem(WEGGELEGT_SCHLUESSEL) === k
+    } catch {
+      return false
+    }
+  }
+
+  function weglegen(auftrag) {
+    try {
+      const k = auftragsKennung(auftrag)
+      if (k) sessionStorage.setItem(WEGGELEGT_SCHLUESSEL, k)
+    } catch {
+      /* Ohne Speicher bleibt der Kasten offen — sichtbar ist besser als kaputt. */
+    }
+  }
+
+  function suchauftragMerken(auftrag) {
+    try {
+      /*
+        **Ein Klick in der Prüfliste hebt das Weglegen auf — auch beim selben
+        Titel.**
+
+        Der Vermerk hängt an der Auftrags-Kennung. Wer denselben Titel nach dem
+        X noch einmal aus der Liste öffnet, bekam deshalb wieder einen leeren
+        Kasten. Seine Vorgabe lautete „bis man den nächsten titel in
+        der prüfliste auswählt" — und ein Klick auf denselben ist genauso eine
+        Auswahl.
+
+        Aufgehoben wird hier, weil **jeder** Weg aus der Liste durch diese
+        Funktion geht: Ein Vorsatz an den Klickstellen wäre bei der dritten
+        vergessen.
+      */
+      sessionStorage.removeItem(WEGGELEGT_SCHLUESSEL)
+      /*
+        **Die bestätigte Erwartung reist mit — hier, nicht an den Klickstellen.**
+
+        Daniel am 10.09.2026 an „Plus-Sized Elf" mit drei Bildern: Auf der
+        Suchseite standen beide Ausgaben angehakt („2 erwartet"), auf **beiden**
+        Titelseiten fehlte die Checkliste. Sie hängt an
+        `erwartet.length >= 2`, und dort kommt die Liste aus zwei Quellen: dem
+        Briefkasten — der auf einer frisch geladenen Seite noch schweigt — und
+        dem Auftrag im `sessionStorage`.
+
+        Der Auftrag stammt aus `AK_OFFENE_AMAZON`, und **die Prüfliste kennt
+        keine Erwartung**; das steht am Auswahlkasten sogar wörtlich. Die vier
+        Klickstellen schrieben ihn deshalb ohne, obwohl der Kommentar an einer
+        von ihnen behauptete, sie reise mit. Der Leser war seit dem 09.09.2026
+        gebaut, der Schreiber nicht.
+
+        Ergänzt wird sie an **dieser** Stelle, weil jeder Weg hier durchkommt —
+        derselbe Grund, aus dem zwei Zeilen darüber das Weglegen aufgehoben
+        wird: „Ein Vorsatz an den Klickstellen wäre bei der dritten vergessen."
+      */
+      const mitErwartung = (() => {
+        if (Array.isArray(auftrag?.erwartet) && auftrag.erwartet.length) return auftrag
+        const bestaetigt = erwartungZu(auftrag?.suchUrl ?? '')
+        return bestaetigt ? { ...auftrag, erwartet: bestaetigt } : auftrag
+      })()
+      sessionStorage.setItem(SUCH_SCHLUESSEL, JSON.stringify({ ...mitErwartung, zeit: Date.now() }))
+    } catch {
+      /* Ohne Speicher fällt nur diese Bequemlichkeit aus. */
+    }
+  }
+
+  /**
+   * **Der Auftrag ist abgearbeitet — der Kasten bleibt trotzdem.**
+   *
+   * Bis zum 02.09.2026 wurde er hier entfernt, und das war richtig, solange er
+   * nur ein Hinweis war („Meldung läuft unter diesem Titel" — nach der Meldung
+   * läuft nichts mehr, Daniel am 27.08.2026).
+   *
+   * Seit dem Umbau ist er das Bedienelement: Prüflisten-Knopf, Melde-Knopf,
+   * Checkliste und die Marke „gemeldet ✓" sitzen darin. Ihn zu entfernen nahm
+   * alles mit — nach der Meldung war der Bildschirm leer.
+   *
+   * Der nächste Takt zeichnet ihn neu, jetzt mit dem Ergebnis statt mit dem
+   * Auftrag. Nur der Sitzungs-Merker wird geleert — er hat seine Aufgabe getan.
+   */
+  function suchauftragVergessen() {
+    try {
+      sessionStorage.removeItem(SUCH_SCHLUESSEL)
+    } catch {
+      /* Ohne Speicher gab es auch nichts zu vergessen. */
+    }
+  }
+
+  /*
+    **Ein Klick auf eine JustWatch-Adresse nimmt den Auftrag mit.**
+
+    `watch.amazon.de/detail?gti=…` leitet auf eine Seite mit eigener ASIN um
+    (`?ref_=atv_dl_rdr`), und die gti im Kopf dieser Seite ist eine **andere**
+    als JustWatchs (Air Gear: 66c97aeb… gegen 4825705e…, 19.09.2026). Weder
+    Adresse noch Seite verraten also, welcher Auftrag gemeint war. Der Klick in
+    der Prüfliste weiß es: Er merkt sich die Kennung für zwei Minuten, und die
+    Zielseite übernimmt sie — aber nur, wenn sie wirklich aus einer
+    Weiterleitung kommt.
+  */
+  const GTI_SPRUNG = 'ak-prime-gti-sprung'
+  function gtiSprungMerken(kennung) {
+    try {
+      sessionStorage.setItem(GTI_SPRUNG, JSON.stringify({ kennung, zeit: Date.now() }))
+    } catch {
+      /* Ohne Speicher bleibt nur die Zuordnung über die Seite. */
+    }
+  }
+  function gtiSprung() {
+    try {
+      if (!/[?&]ref_=atv_dl_rdr\b/.test(location.search)) return null
+      const a = JSON.parse(sessionStorage.getItem(GTI_SPRUNG) ?? 'null')
+      return a && Date.now() - a.zeit < 120000 ? a.kennung : null
+    } catch {
+      return null
+    }
+  }
+
+  function suchauftrag() {
+    try {
+      const roh = sessionStorage.getItem(SUCH_SCHLUESSEL)
+      if (!roh) return null
+      const a = JSON.parse(roh)
+      return Date.now() - a.zeit > 600000 ? null : a
+    } catch {
+      return null
+    }
+  }
+
+  /**
+   * **Unter welchen Suchbegriffen ein gemerkter Auftrag gilt.**
+   *
+   * Der Merker überlebt den Seitenwechsel und gilt zehn Minuten — er ist dafür
+   * da, eine **Weitersuche** desselben Auftrags zu überbrücken („Kürzer
+   * suchen", „Deutsch suchen"), deren Adresse in keiner Liste steht.
+   *
+   * Ohne diese Bindung galt er für **jede** Suchseite. Daniel am 09.09.2026:
+   * „polar bären als ‚nicht bei prime' gemeldet -> nächsten eintrag in
+   * prüfliste gewählt -> extension wechselt inhalt der melde box zurück zu
+   * polar bären nach <2sek". Der Kasten zeigte den alten Auftrag über den
+   * Trefferkarten des neuen — samt Melde-Knopf, der unter der alten
+   * Suchadresse gemeldet hätte.
+   *
+   * Aufgefallen ist es an einer Sekunde Verzug: `suchliste` kommt aus
+   * `chrome.storage`, also asynchron. Beim ersten Takt ist sie leer,
+   * `offeneSuche()` findet nichts — und genau in dieses Loch sprang der
+   * Merker. Er schrieb sich dabei mit neuer Zeit zurück und hielt sich selbst
+   * am Leben.
+   */
+  function begriffeDesAuftrags(a) {
+    const s = new Set()
+    try {
+      const k = new URLSearchParams(new URL(a?.suchUrl ?? '').search).get('k')
+      if (k) s.add(k)
+    } catch {
+      /* Ohne brauchbare Adresse zählen die Begriffe darunter. */
+    }
+    for (const b of [a?.suchbegriff, a?.suchbegriffEn, ...(Array.isArray(a?.begriffe) ? a.begriffe : [])]) {
+      if (b) s.add(String(b))
+    }
+    return s
+  }
+
+  /** Gehört die Suche, auf der wir stehen, zu diesem Auftrag? */
+  function gehoertZurSuche(a) {
+    const begriff = new URLSearchParams(location.search).get('k')
+    if (!begriff || !a) return false
+    return begriffeDesAuftrags(a).has(begriff)
+  }
+
+  /**
+   * Weitersuchen — der Auftrag nimmt den neuen Begriff mit.
+   *
+   * Ohne ihn stünde die Zieladresse in keiner Liste und trüge einen Begriff,
+   * den der Auftrag nicht kennt: `gehoertZurSuche()` sagte nein, und der Kasten
+   * wäre weg — genau der Fehler vom 27.08.2026, gegen den es den Merker gibt.
+   */
+  function weitersuchen(auftrag, begriff) {
+    try {
+      const bisher = Array.from(begriffeDesAuftrags(auftrag))
+      suchauftragMerken({ ...auftrag, begriffe: [...bisher, begriff] })
+    } catch {
+      /* Ohne Speicher bleibt nur die Suche selbst. */
+    }
+    location.href = `https://www.amazon.de/s?k=${encodeURIComponent(begriff)}&i=instant-video`
+  }
+
+  /** Steht die aktuelle Adresse als Suche auf der Liste? */
+  function offeneSuche() {
+    /*
+      **Verglichen wird der Suchbegriff, nicht die Adresse.** Amazon hängt beim
+      Aufruf eigene Parameter an (`crid`, `sprefix`), und alle 118 Adressen aus
+      unserem Bestand tragen ein `k` — geprüft, nicht angenommen.
+    */
+    const begriff = new URLSearchParams(location.search).get('k')
+    if (!begriff) return null
+    for (const [url, wert] of Object.entries(suchliste)) {
+      try {
+        /*
+          **Der Auftrag wird auch unter seinem Suchbegriff wiedererkannt.**
+
+          Seit 4.1.1 öffnet die Prüfliste nicht mehr die Adresse aus dem
+          Bestand, sondern den beigelegten `suchbegriff` — den deutschen Titel
+          ohne Gattungswörter. Der Vergleich lief aber weiter nur gegen den
+          `k`-Parameter des Listenschlüssels, und der trägt den alten Begriff.
+
+          Folge: Nach einem Klick aus der Liste fand `offeneSuche()` nichts, es
+          gab keinen Auftrag, und der Kasten blieb aus (Daniel, 31.08.2026:
+          „immer noch keine hinweise nach klick auf eintrag in prüfliste" —
+          Diagnose zeigte `suchauftrag: null` bei 129 offenen Suchen).
+
+          Verglichen wird deshalb gegen alle drei Schreibweisen: den Schlüssel,
+          den deutschen Suchbegriff und den englischen. Gemeldet wird weiterhin
+          unter `suchUrl` — der Adresse aus dem Bestand.
+        */
+        const ausSchluessel = new URLSearchParams(new URL(url).search).get('k')
+        if (
+          ausSchluessel === begriff ||
+          (wert?.suchbegriff && wert.suchbegriff === begriff) ||
+          (wert?.suchbegriffEn && wert.suchbegriffEn === begriff)
+        ) {
+          return { ...wert, suchUrl: url }
+        }
+      } catch {
+        /* Eine kaputte Adresse in der Liste hält den Rest nicht auf. */
+      }
+    }
+    return null
+  }
+
+  /**
+   * **Was die Suchseite wirklich gefunden hat — und was nur Werbung ist.**
+   *
+   * Prime Video legt jeden Treffer als `article[data-testid="card"]` ab, mit
+   * allem Nötigen in Attributen:
+   *
+   * ```
+   * data-card-title       "Saber Rider and the Star Sheriffs"
+   * data-card-entity-type "TV Show" | "Movie"
+   * a[href]               /gp/video/detail/B088PPNGFS?…
+   * ```
+   *
+   * **Die Falle ist die Liste darum.** Findet die Suche nichts, füllt Amazon
+   * die Seite trotzdem mit Karten — unter `ul[aria-label="Mehr entdecken"]`.
+   * Bei der Suche nach „009 Re:Cyborg" standen dort Predator, Aliens und
+   * Hentai Kamen (Daniel, 27.08.2026, mit Quelltext). Wer die mitzählt, hält
+   * fünf Empfehlungen für fünf Treffer.
+   *
+   * Dieselbe Verwechslung hat schon einmal Geld gekostet: Bei Disney+ galt die
+   * Empfehlungsleiste als Staffel, und aus 86 Folgen wurden 94.
+   */
+  /**
+   * **Nur eine Liste auf der Seite enthält Suchtreffer: „Beste Ergebnisse".**
+   *
+   * Prime Video stapelt auf einer Suchseite mehrere Karussells übereinander,
+   * alle aus denselben `article[data-testid="card"]`:
+   *
+   * ```
+   * ul[aria-label="Beste Ergebnisse"]              ← die Treffer
+   * ul[aria-label="Death Note -Zuschauer sahen auch"]  Empfehlung
+   * ul[aria-label="Mehr entdecken"]                    Empfehlung
+   * ```
+   *
+   * Deshalb wird eingeschlossen statt ausgeschlossen. Eine Liste zu verwerfen,
+   * weil sie „Mehr entdecken" heißt, hat zweimal danebengelegen: Bei „Angels
+   * of Death" stand der gesuchte Titel als Karte 0 genau dort, bei „009
+   * Re:Cyborg" standen dort Predator und Aliens. Der Listenname trennt also
+   * nicht Treffer von Werbung — nur der Name **dieser einen** Liste tut es.
+   *
+   * Fehlt sie ganz, hat die Suche nichts gefunden. Amazon schreibt das dann
+   * auch hin („Für … wurden keine Ergebnisse gefunden"), aber die fehlende
+   * Liste ist das robustere Merkmal: Sie hängt nicht an einem Satz.
+   */
+  const ERGEBNISLISTE = /^(beste ergebnisse|best results|ergebnisse|results)/i
+
+  function suchTreffer() {
+    const karten = [...document.querySelectorAll('article[data-testid="card"]')]
+    return {
+      /** Alle Karten auf der Seite. Null davon heißt: nichts gelesen. */
+      gesehen: karten.length,
+      /**
+       * Wie viele in der Ergebnisliste stehen — nur zur Anzeige.
+       *
+       * **Entschieden wird über den Namen, nicht über die Liste.** Drei Anläufe
+       * haben das gekostet: erst wurden Empfehlungslisten ausgeschlossen (dann
+       * fiel „Angels of Death" als Karte 0 unter „Mehr entdecken" durch), dann
+       * nur „Beste Ergebnisse" eingeschlossen (dann fiel derselbe Titel wieder
+       * durch, weil Amazon auf dieser Suchseite gar keine Ergebnisliste
+       * ausliefert — nur zwanzig Empfehlungen, deren erste der gesuchte Titel
+       * ist).
+       *
+       * Beide Male war die Liste das falsche Merkmal. Was „009 Re:Cyborg" von
+       * „Angels of Death" trennt, ist nicht, wo die Karten stehen, sondern ob
+       * eine davon so heißt wie der gesuchte Titel: Dort Saber Rider und
+       * Predator, hier „Angels of Death" auf Position 0.
+       */
+      echte: karten.filter((k) => ERGEBNISLISTE.test((k.closest('ul')?.getAttribute('aria-label') ?? '').trim())).length,
+      treffer: karten.map((k) => ({
+        titel: k.getAttribute('data-card-title') ?? '',
+        typ: k.getAttribute('data-card-entity-type') ?? '',
+        /*
+          „Entitled" heißt, dass Daniels Konto den Titel abspielen darf —
+          Prime-eigen oder über ein gebuchtes Kanal-Abo. Für die Tonspur sagt
+          das nichts, aber es sagt, ob ein Klick dorthin überhaupt etwas
+          bringt. Kanal-Titel bleiben die bekannte Grauzone: Amazon nennt dort
+          die Sprachen des Kanals, nicht der Folge.
+        */
+        zugang: k.getAttribute('data-card-entitlement') ?? '',
+        url: k.querySelector('a[href*="/gp/video/detail/"]')?.getAttribute('href') ?? null,
+      })),
+      /*
+        **Eine Suche ohne jede Karte, die das selbst sagt, ist gelesen.**
+
+        Ohne Karten galt die Seite als „noch nicht gelesen", für immer: Bei
+        „Yu-Gi-Oh! Capsule Monsters" liefert Prime gar nichts, auch keine
+        Empfehlungen, und der Kasten hätte nie „nicht bei Prime" angeboten
+        (16.09.2026). Nur mit Amazons eigenem Satz, damit eine halb geladene
+        Seite weiter als ungelesen gilt.
+      */
+      leerGemeldet:
+        !karten.length && seitenLage().keineErgebnisse,
+    }
+  }
+
+  /** Titel auf ihren Kern bringen — dieselbe Kürzung wie bei Crunchyroll. */
+  const titelKern = (t) =>
+    (t ?? '')
+      .toLowerCase()
+      .replace(/ß/g, 'ss')
+      .normalize('NFKD')
+      .replace(/\b(staffel|season|vol\.?|volume|teil|part)\s*\d+\b/g, '')
+      .replace(/[^a-z0-9]/g, '')
+
+  /**
+   * **Prime zählt Teile, wo unser Bestand keinen Teil kennt.**
+   *
+   * Gemessen am 28.08.2026 an „Code Geass: Akito the Exiled — The Wyvern
+   * Arrives". Die Karte auf Platz 1 der Trefferliste ist der richtige Titel,
+   * der Kasten sagte trotzdem „2 Treffer gelesen, keiner passt":
+   *
+   *     Auftrag  codegeassakitotheexiled thewyvernarrives
+   *     Karte    codegeassakitotheexiled1thewyvernarrivesova
+   *
+   * Zwei Abweichungen, beide von Prime hinzugefügt: die **Teilnummer** mitten
+   * im Titel und das **Typ-Kürzel** am Ende. `titelKern` streicht „Teil 1" und
+   * „Part 1", aber eine nackte Ziffer war nie vorgesehen — und weil sie in der
+   * Mitte steht, greift auch der Rückfall über `includes` nicht.
+   *
+   * **Beide Regeln sind eng gefasst, und das mit Absicht.** Die Ziffer wird nur
+   * einstellig und nur als eigenes Wort entfernt: „Mob Psycho 100" und
+   * „Ranking of Kings" behalten ihre Zahlen, „Golden Kamuy 2" ebenfalls — dort
+   * ist die Zahl die Staffel, und die trennt `staffelImTitel()` weiterhin. Das
+   * Kürzel fällt nur am **Ende**; mittendrin trennt es Ausgaben voneinander
+   * (siehe CLAUDE.md, „Wolf’s Rain OVA" gegen die Serie).
+   */
+  const titelKernLocker = (t) =>
+    titelKern(
+      (t ?? '')
+        .toLowerCase()
+        .replace(/\s*[-–—:]\s*(ova|ona|oad|tv|movie|film)\s*$/i, ' ')
+        .replace(/[[(]\s*(ova|ona|oad|tv)\s*[\])]\s*$/i, ' ')
+        .replace(/\b\d\b/g, ' '),
+    )
+
+  /**
+   * **Ein eingeschobener Reihenname macht aus demselben Titel keinen anderen.**
+   *
+   * Daniel am 28.08.2026 an „Arpeggio of Blue Steel - Cadenza": Die einzige
+   * Karte der Trefferliste heißt bei Prime „Arpeggio of Blue Steel - **Ars
+   * Nova** - Cadenza" — derselbe Film, mit dem Reihennamen dazwischen. Unser
+   * eigener Bestand führt ihn übrigens auch, im japanischen Titel („Aoki
+   * Hagane no Arpeggio: Ars Nova - Cadenza"); nur der deutsche lässt ihn weg.
+   *
+   * Ein Zusatz **am Rand** fangen `ohneBeiwerk` und der `includes`-Rückfall
+   * längst ab. Steht er in der **Mitte**, greift keiner von beiden: Die
+   * Zeichenkette ist an dieser Stelle aufgetrennt.
+   *
+   * Verglichen wird deshalb wortweise. Die Wörter des Auftrags müssen alle in
+   * der Karte vorkommen, **in derselben Reihenfolge** — dazwischen darf stehen,
+   * was will.
+   *
+   * **Zwei Riegel halten das eng**, denn sonst würde „Attack on Titan" auf
+   * „Attack on Titan: Final Season" passen:
+   *
+   * - Höchstens zwei zusätzliche Wörter. Ein Titel, dem drei Wörter fehlen, ist
+   *   ein anderer Titel.
+   * - Keines davon darf eine Fortsetzung ankündigen. `staffelImTitel()` erkennt
+   *   nur nummerierte Staffeln; „Final Season", „The Movie" und „Chapter"
+   *   tragen keine Zahl und kämen sonst durch.
+   */
+  /*
+    **Was eine Fortsetzung ankündigt — und was nur Satzbau ist.**
+
+    `the`, `ova`, `ona` und `oad` standen hier bis 3.83 mit drin und haben
+    „Code Geass: Akito the Exiled 4 — From the Memories of Hatred — OVA"
+    blockiert. Ein Artikel kündigt keine Fortsetzung an,
+    und ein Formatkürzel am Ende schneidet `titelKernLocker` ohnehin weg.
+
+    `movie`, `film` und `special` bleiben: Sie trennen ein eigenes Werk von der
+    Serie („Jujutsu Kaisen" gegen „Jujutsu Kaisen The Movie"), und genau das ist
+    ein Unterschied, der zählt.
+  */
+  const REIHENFOLGE_SPERRE =
+    /^(final|last|first|second|third|next|new|season|staffel|movie|film|part|teil|cour|chapter|kapitel|special|recap|origin|beginning|end|ending|zero|remake|reboot)$/i
+  /**
+   * **Gattungswörter sagen nichts über das Werk.**
+   *
+   * Daniel am 31.08.2026: „remove special characters from matching, just match
+   * with words. instead of 'One Piece Film: Strong World' -> 'One Piece Strong
+   * World'. remove generics and special characters."
+   *
+   * Sonderzeichen fielen schon vorher weg — der Split trennt an allem, was kein
+   * Buchstabe und keine Ziffer ist. Die Gattungswörter blieben und haben den
+   * Vergleich gekippt: Unser Titel führt „Film", Prime schreibt „One Piece –
+   * Strong World", und schon zählte der Auftrag ein Wort mehr als die Karte.
+   *
+   * **Film und Serie trennt trotzdem niemand mehr über den Titel** — das macht
+   * `typPasst()` über Amazons `data-card-entity-type`. Ein Datenfeld schlägt ein
+   * Textmuster, hier wie überall in diesem Projekt.
+   */
+  /*
+    **Gemessen am eigenen Bestand, nicht ausgedacht.**
+
+    Ausgezählt wurden am 31.08.2026 alle Titelzusätze hinter dem letzten
+    Doppelpunkt oder Gedankenstrich:
+
+        40× the movie      18× the animation     17× der film
+         7× the series      5× die serie          5× episoden
+
+    „The Animation" ist der Fall, an dem es auffiel: Unser Titel lautet
+    „Phantasy Star Online 2: The Animation", Prime schreibt „Phantasy Star
+    Online 2".
+
+    **Die Artikel gehören dazu.** Ohne sie bliebe „the" stehen, und der Auftrag
+    hätte immer noch ein Wort mehr als die Karte — der Treffer fiele durch
+    dieselbe Längenprüfung wie vorher. `FUELLWORT` führt sie ohnehin; hier
+    fallen sie eine Stufe früher weg.
+  */
+  const GATTUNG = new Set([
+    'film', 'movie', 'serie', 'series', 'anime', 'animation', 'staffel', 'season',
+    'komplett', 'komplette', 'complete', 'gesamtausgabe', 'edition',
+    'episoden', 'folgen',
+    /* Artikel und Bindewörter — sie benennen nichts. */
+    'the', 'der', 'die', 'das', 'des', 'dem', 'den', 'und', 'and',
+  ])
+  const titelWorte = (t) =>
+    (t ?? '')
+      .toLowerCase()
+      .replace(/\b(staffel|season|vol\.?|volume|teil|part)\s*\d+\b/g, ' ')
+      .split(/[^a-z0-9]+/)
+      .filter((w) => w.length > 2 && !GATTUNG.has(w))
+  /*
+    **Nicht jedes fremde Wort unterscheidet.** „Code Geass: Akito the Exiled —
+    Memories of Hatred" gegen die Prime-Karte „… Akito the Exiled 4 — From the
+    Memories of Hatred — OVA": drei Zusatzwörter, und damit
+    über der Grenze — obwohl nur eines davon etwas aussagt.
+
+        from   ein Wort des Satzbaus
+        the    Füllwort, steht im Auftrag schon einmal
+        ova    Typ-Kürzel am Ende, das `titelKernLocker` längst wegschneidet
+
+    Gezählt werden deshalb nur Wörter, die eine Sache benennen. Die Grenze von
+    zwei bleibt, sie misst jetzt nur das Richtige.
+  */
+  const FUELLWORT = new Set([
+    'the', 'and', 'for', 'from', 'with', 'der', 'die', 'das', 'des', 'dem', 'den',
+    'und', 'von', 'vom', 'zum', 'zur', 'ein', 'eine', 'einen', 'einer',
+  ])
+  const TYP_KUERZEL = new Set([
+    'ova', 'ona', 'oad', 'omu', 'uncut', 'edition',
+  ])
+  const wortFolgePasst = (auftrag, karte) => {
+    const a = titelWorte(auftrag)
+    const k = titelWorte(karte)
+    if (!a.length || k.length < a.length) return false
+    /* Die Auftragswörter der Reihe nach in der Karte suchen. */
+    let n = 0
+    const zusatz = []
+    for (const wort of k) {
+      if (n < a.length && wort === a[n]) n++
+      else zusatz.push(wort)
+    }
+    if (n !== a.length) return false
+    /*
+      Ein Fortsetzungswort sperrt weiterhin sofort, auch als Füllwort-Nachbar —
+      sonst käme „Attack on Titan" auf „Attack on Titan: Final Season" durch.
+    */
+    if (zusatz.some((w) => REIHENFOLGE_SPERRE.test(w))) return false
+    if (zusatz.some((w) => /^\d+$/.test(w))) return false
+    const benennend = zusatz.filter((w) => !FUELLWORT.has(w) && !TYP_KUERZEL.has(w))
+    return benennend.length <= 2
+  }
+
+  /**
+   * **Welche Staffel meint dieser Titel?**
+   *
+   * `titelKern()` wirft die Staffelangabe weg — richtig, wenn es darum geht,
+   * denselben Stoff wiederzuerkennen, und falsch, wenn es darum geht, die
+   * richtige Staffel zu treffen. Bei Prime ist jede Staffel ein eigener
+   * Eintrag mit eigener Kennung: „Call of the Night" (Staffel 1, aniverse,
+   * deutsch) und „Call of the Night (OmU)" (zwei Staffeln, ADN, nur
+   * untertitelt) sind zwei Seiten mit zwei ASINs.
+   *
+   * Ohne diese Unterscheidung meldete die Erweiterung am 27.08.2026 für
+   * „Call of the Night: Season 2" die dreizehn deutschen Folgen der ersten
+   * Staffel — auf einer Seite, die Staffel 2 gar nicht führt (Daniel, mit
+   * drei Bildern).
+   *
+   * Ohne Angabe gilt Staffel 1: Ein Titel ohne Nummer meint die erste.
+   */
+  const staffelImTitel = (t) => {
+    const s = (t ?? '').toLowerCase()
+    /*
+      **Anbieter schreiben Staffeln auf ein halbes Dutzend Arten.**
+
+      „Staffel 2" und „Season 2" waren der einfache Fall. Daneben stehen im
+      Bestand: „Golden Kamuy 2" (nackte Zahl), „Food Wars! The Second Plate"
+      (ausgeschriebenes Zahlwort mit eigenem Substantiv), „2nd Season". Alle
+      drei galten als Staffel 1 — und damit meldete die Erweiterung am
+      27.08.2026 die erste Staffel für einen Auftrag, der die zweite meinte.
+
+      Die nackte Zahl bleibt bewusst auf 2 bis 9 beschränkt: „Fate/Zero" und
+      „Ranking of Kings" enden auch auf Ziffern, und eine dreistellige Zahl war
+      noch nie eine Staffel.
+    */
+    const WORTE = { second: 2, zweite: 2, third: 3, dritte: 3, fourth: 4, vierte: 4, fifth: 5 }
+    const treffer =
+      /\b(?:staffel|season|teil|part|cour|plate)\s*(\d+)\b/.exec(s) ??
+      /\b(\d+)(?:st|nd|rd|th)?\s*(?:staffel|season|plate)\b/.exec(s)
+    if (treffer) return Number(treffer[1])
+    const wort = /\b(second|zweite|third|dritte|fourth|vierte|fifth)\b/.exec(s)?.[1]
+    if (wort) return WORTE[wort]
+    /*
+      **Die nackte Zahl steht am Ende — auch wenn ein Gattungswort folgt.**
+
+      „Phantasy Star Online 2" gilt hier als Staffel 2 (die Zahl schließt den
+      Titel ab), „Phantasy Star Online 2: The Animation" dagegen als Staffel 1
+      — dort endet der Titel auf „animation". Damit galten Auftrag und Karte als
+      verschiedene Staffeln, und der Treffer fiel auf „ähnlich" zurück (Daniel,
+      31.08.2026).
+
+      Gattungswörter sagen nichts über die Staffel; sie werden vorher
+      abgeschnitten. Dass beide Seiten dieselbe Nummer bekommen, ist der ganze
+      Zweck — welche es ist, entscheidet der Rest des Namens.
+    */
+    /* Im Rumpf, nicht daneben: Die Zusicherungen schneiden Funktionen einzeln aus. */
+    const ohneGattung = s.replace(
+      /[\s:–—-]+(?:the\s+)?(?:animation|movie|film|serie|series|anime|edition)\s*$/i,
+      '',
+    )
+    const nackt = /\s([2-9])\s*$/.exec(ohneGattung)?.[1]
+    return nackt ? Number(nackt) : 1
+  }
+
+  /**
+   * Wie gut passt die Trefferliste zu dem, was wir suchen?
+   *
+   * Drei Ausgänge, und der mittlere ist der heikle:
+   *
+   * | Befund | Was er heißt |
+   * |---|---|
+   * | `genau` | Der Titel steht dort — die Tonspuren holt ein Klick |
+   * | `aehnlich` | Etwas Verwandtes, aber nicht **dieses** Werk |
+   * | `keiner` | Prime führt den Titel nicht |
+   *
+   * **`aehnlich` ist für den gesuchten Titel dasselbe wie `keiner`.** Eine
+   * Suche nach „Cowboy Bebop" liefert bei Prime nur den Film von 2001; das
+   * heißt, dass es **die Serie** dort nicht gibt. Der Film ist ein eigener
+   * Eintrag in unserem Bestand und braucht seinen eigenen Verweis — er darf
+   * nie das Urteil der Serie werden.
+   *
+   * Deshalb wird bei `aehnlich` nichts von selbst gemeldet: Der Fund gehört
+   * jemandem, nur nicht dem, der gerade gesucht wurde.
+   */
+  function beurteileTreffer(auftrag, gefunden) {
+    const kern = titelKern(auftrag.titel)
+    if (!kern) return { art: 'unklar' }
+    /**
+     * **Der Typ trennt, was der Name nicht trennt.**
+     *
+     * Prime nennt an jeder Karte `data-card-entity-type`: „TV Show" oder
+     * „Movie". Film und Serie tragen oft denselben Namen — „Akira", „Ghost in
+     * the Shell", „Fullmetal Alchemist" gibt es als beides. Ohne den Typ
+     * bekäme eine Serie das Urteil ihres Films, und dessen Tonspur ist eine
+     * andere Frage.
+     *
+     * Erwartet wird nach der Folgenzahl aus unserem Bestand: mehr als eine
+     * Folge heißt Serie, genau eine heißt Film. Kennen wir sie nicht, zählt
+     * der Typ nicht mit — dann ist Schweigen besser als eine Regel aus einer
+     * fehlenden Zahl.
+     */
+    const erwartetSerie = auftrag.folgen > 1
+    const erwartetFilm = auftrag.folgen === 1
+    const typPasst = (t) => {
+      if (!auftrag.folgen) return true
+      const istSerie = /tv|show|serie|season/i.test(t.typ)
+      const istFilm = /movie|film/i.test(t.typ)
+      if (!istSerie && !istFilm) return true
+      return erwartetSerie ? istSerie : erwartetFilm ? istFilm : true
+    }
+
+    /*
+      **Ein Doppeltitel ist derselbe Titel.**
+      Wir führen „Beyond the Boundary: Kyoukai no Kanata" — englischer Titel,
+      Doppelpunkt, japanischer Titel. Prime führt dieselbe Serie schlicht als
+      „Beyond the Boundary". Der Vergleich auf Gleichheit fand sie nicht,
+      obwohl sie in der Ergebnisliste ganz vorn stand (Daniel, 27.08.2026:
+      „da ist der suchtreffer, warum wird es nicht gefunden?").
+
+      Verglichen wird deshalb auch gegen den Teil vor dem ersten Doppelpunkt —
+      aber nur, wenn der für sich trägt: mindestens zwei Wörter und zehn
+      Zeichen. Sonst würde „Gundam: Iron-Blooded Orphans" jede Karte namens
+      „Gundam" einsammeln, und das ist eine andere Serie.
+    */
+    const vorn = auftrag.titel.split(':')[0].trim()
+    /*
+      Ein Untertitel, der die Staffel nennt, ist kein Untertitel: „Call of the
+      Night: Season 2" auf „Call of the Night" zu kürzen träfe Staffel 1.
+    */
+    const untertitelIstStaffel = staffelImTitel(auftrag.titel.split(':').slice(1).join(':')) > 1
+    const kernVorn =
+      !untertitelIstStaffel && vorn !== auftrag.titel.trim() && vorn.split(/\s+/).length >= 2 && titelKern(vorn).length >= 10
+        ? titelKern(vorn)
+        : null
+    /*
+      **Der Suchbegriff zählt mit, nicht nur unser Anzeigetitel.**
+
+      Wir führen „Captain Tsubasa" mit 52 Folgen; die Suchadresse in unserem
+      Bestand lautet aber `k=Captain Tsubasa (2018)`. Prime nennt die Serie
+      genau so — und der Vergleich gegen den Anzeigetitel fand sie nicht:
+      „captaintsubasa" gegen „captaintsubasa2018".
+
+      Der Begriff ist dabei die **bessere** Auskunft, nicht die schlechtere: Er
+      wurde gezielt gesetzt, weil unser Eintrag die Fassung von 2018 meint und
+      nicht die von 1983 — eine andere Serie mit 128 Folgen. Ein Jahr pauschal
+      wegzuwerfen würde genau diese Unterscheidung zerstören.
+    */
+    const begriff = decodeURIComponent((/[?&]k=([^&#]*)/.exec(auftrag.suchUrl ?? '')?.[1] ?? '').replace(/\+/g, ' '))
+    const kernBegriff = begriff ? titelKern(begriff) : null
+    /*
+      **Beiwerk vor und hinter dem Titel zählt nicht mit.**
+
+      Prime führt „H.O.T.D. High School of the Dead" und „Highschool of the
+      Dead [dt./OV]" — dieselbe Serie, einmal mit Abkürzung davor, einmal mit
+      Fassungsangabe dahinter. Beide galten nur als „ähnlich" (Daniel,
+      27.08.2026, mit zwei Bildern).
+
+      Weggeschnitten wird deshalb, was erkennbar Beiwerk ist: eine Abkürzung
+      aus Großbuchstaben mit Punkten am Anfang, eine Klammer- oder
+      Fassungsangabe am Ende. Ein bloßes „enthält" wäre zu großzügig —
+      „Naruto" steckt auch in „Naruto Shippuden", und das ist eine andere
+      Serie.
+    */
+    const ohneBeiwerk = (t) =>
+      titelKern(
+        (t ?? '')
+          .replace(/^\s*(?:[A-Z]\.){2,}\s*/, '')
+          /* Eine Jahreszahl bleibt: Sie trennt Neuauflagen — „Captain Tsubasa (1983)". */
+          .replace(/\s*[[(](?!\s*\d{4}\s*[\])])[^\])]*[\])]\s*$/, '')
+          .replace(/\s*[-–]\s*(?:dt\.?|omu|ov|uncut|subbed|dubbed)[\s\S]*$/i, ''),
+      )
+    /*
+      Die lockere Form kommt als **weitere** Schreibweise dazu, nicht als
+      Ersatz: Verglichen wird weiterhin zuerst streng, und die Typ- und
+      Staffelprüfung darunter gilt unverändert für jeden Treffer.
+    */
+    const kernLocker = titelKernLocker(auftrag.titel)
+    const gleichNamig = gefunden.treffer.filter((t) => {
+      const k = titelKern(t.titel)
+      const roh = ohneBeiwerk(t.titel)
+      const locker = titelKernLocker(t.titel)
+      return (
+        [k, roh, locker].some(
+          (x) => x === kern || x === kernBegriff || (kernVorn !== null && x === kernVorn) || x === kernLocker,
+        ) ||
+        /* Ein Reihenname mitten im Titel — „Arpeggio of Blue Steel - Ars Nova - Cadenza". */
+        wortFolgePasst(auftrag.titel, t.titel) ||
+        globalThis.akPrimeKopfPasst(auftrag.titel, t.titel, titelKern, gefunden.treffer.map((x) => x.titel)) ||
+        (begriff ? wortFolgePasst(begriff, t.titel) : false)
+      )
+    })
+    /*
+      **Und die Staffel muss dieselbe sein.**
+
+      Ab Staffel 2 zählt der Name allein nicht mehr: Prime führt jede Staffel
+      als eigenen Eintrag, und der trägt ihre Nummer im Titel. Eine Karte ohne
+      Nummer meint die erste — die ist für „Season 2" der falsche Eintrag,
+      selbst wenn sie deutsche Folgen führt.
+
+      Sie fällt damit nicht unter den Tisch, sondern auf „ähnlich": Daniel
+      sieht sie samt Namen und entscheidet selbst.
+    */
+    const gesuchteStaffel = staffelImTitel(auftrag.titel)
+    const staffelPasst = (t) => staffelImTitel(t.titel) === gesuchteStaffel
+    const genau = gleichNamig.filter((t) => typPasst(t) && staffelPasst(t))
+    if (genau.length) return { art: 'genau', treffer: genau, namensgleich: gleichNamig }
+    /*
+      Gleicher Name, falscher Typ — das ist kein Treffer, sondern der
+      Nachbar: der Film zur gesuchten Serie oder umgekehrt.
+    */
+    if (gleichNamig.length) {
+      return { art: 'aehnlich', treffer: gleichNamig }
+    }
+    const aehnlich = gefunden.treffer.filter((t) => {
+      const k = titelKern(t.titel)
+      return k.length >= 4 && (k.includes(kern) || kern.startsWith(k))
+    })
+    if (aehnlich.length) return { art: 'aehnlich', treffer: aehnlich }
+
+    /*
+      Null Karten heißt nicht „null Treffer", sondern „nichts gelesen" — die
+      Seite war vielleicht noch nicht fertig. Ein Befund „nichts gefunden"
+      beantwortet nicht, ob überhaupt gesucht wurde.
+    */
+    if (!gefunden.gesehen && !gefunden.leerGemeldet) return { art: 'unklar' }
+
+    /*
+      Karten da, aber keine trägt den Namen: Der Titel ist nicht dabei. Das
+      ist ein Befund, kein Zweifel — die Karten wurden gelesen.
+    */
+    return { art: 'keiner', treffer: [] }
+  }
+
+  /** Eine Zeile im Kasten, mit eigener Klasse für ihre Rolle. */
+  function kastenZeile(klasse, text) {
+    const z = document.createElement('div')
+    z.className = klasse
+    z.textContent = text
+    return z
+  }
+
+  /**
+   * Der Kasten — auf der Suchseite wie auf der Titelseite derselbe.
+   *
+   * **Der gesuchte Titel steht oben und groß**, alles andere darunter und
+   * kleiner. Daniel am 27.08.2026: „titel des gesuchten anime ganz oben ganz
+   * groß anzeigen, damit ich nicht so viel text lesen muss."
+   *
+   * Er sieht diesen Kasten 117 Mal. Was er jedes Mal braucht, ist eine einzige
+   * Auskunft — welchen Titel suche ich gerade —, und die darf nicht in einem
+   * Absatz stehen. Der Befund darunter ist eingefärbt statt beschrieben:
+   * grün heißt gefunden, gelb heißt nichts da.
+   */
+  /**
+   * **Im laufenden Player hat die Erweiterung nichts zu suchen.**
+   *
+   * Gesammelt wird auf der Übersichtsseite — dort stehen die Folgenliste und
+   * die Tonspuren. Der Player weiß darüber nichts und ist der einzige Ort, an
+   * dem ein eingeblendeter Kasten wirklich stört.
+   */
+  function imPlayer() {
+    try {
+      /*
+        **Nur ein sichtbarer Player zählt.** Die erste Fassung fragte auch nach
+        `video[src]` — das gibt es auf jeder Übersichtsseite als Hintergrundvideo,
+        und damit verschwand der Listen-Knopf dort ebenfalls (Daniel, 27.08.2026:
+        „auf der overview jedes anime sollte die Liste öffenbar sein, nur wenn
+        player da ist soll es verschwinden").
+
+        Prime Video hängt seinen Player als `.webPlayerSDKContainer` ein. Der
+        steht auf der Übersicht mitunter schon im DOM, aber ohne Höhe — deshalb
+        entscheidet die gemessene Größe, nicht die bloße Anwesenheit.
+      */
+      const el = document.querySelector('.webPlayerSDKContainer, [data-testid="player-container"]')
+      if (el && el.offsetHeight > 200) return true
+
+      /*
+        **Der Container ist nicht der einzige Weg, und er hat nicht gereicht.**
+
+        Am 02.09.2026 lief „Vom Landei zum Schwertheiligen" S2F9 im Vollbild auf
+        `amazon.de/gp/video/detail/B0H1R24SVB?jic=…` — und über dem Bild standen
+        Prüflisten-Knopf und Ruhemodus-Zeile. Daniels Wort: „in watch mode no
+        extension should be visible." Es ist derselbe Fall, den die Regel
+        „Beim Fernsehen ist die Erweiterung unsichtbar" (30.08.2026) schon meint;
+        die Erkennung traf ihn nur nicht, weil Amazon den Player hier ohne den
+        bekannten Container einhängt.
+
+        **Ein Klassenname ist eine Vermutung über fremden Code, ein laufendes
+        Video ist eine Messung.** Deshalb entscheidet als Zweites die Sache
+        selbst: ein `<video>`, das mehr als die halbe Fensterhöhe einnimmt.
+
+        Der Riegel dagegen ist `muted`. Das Hintergrundvideo einer Übersicht ist
+        immer stumm — sonst lärmte jede Seite beim Blättern —, und genau daran
+        war die erste Fassung dieser Funktion gescheitert: `video[src]` allein
+        ließ den Listen-Knopf auf jeder Übersicht verschwinden (Daniel,
+        27.08.2026). Ein Film, den jemand ansieht, ist nicht stumm; ist er es
+        doch, greift der Container-Zweig darüber.
+      */
+      const hoehe = window.innerHeight || 0
+      for (const v of document.querySelectorAll('video')) {
+        if (v.muted) continue
+        if (v.readyState === 0) continue
+        if (v.offsetHeight > hoehe * 0.5) return true
+      }
+      return false
+    } catch {
+      return false
+    }
+  }
+
+  /**
+   * **Der Kasten hat fünf feste Zeilen — sie entstehen zusammen und bleiben.**
+   *
+   * Bis 4.10.33 löschte `hinweisKasten()` den Kasten und baute ihn neu, und der
+   * Takt tat das zweimal je Sekunde. Was im Takt einzieht — Melde-Knopf,
+   * Prüflisten-Knopf, Debugleiste — flog dabei jedes Mal heraus und musste
+   * zurück. Im Video vom 02.09.2026 ist das an vier Stellen zu sehen: erst
+   * 2,3 Sekunden nichts, dann drei Stufen über 1,4 Sekunden, dazwischen ein
+   * Bild, in dem Elemente wieder verschwinden (Frames 239/240) und eins, in dem
+   * sie zurückkommen (277/278).
+   *
+   * Daniels Vorgabe dazu ist eine Bauanweisung, keine Bitte um weniger
+   * Flackern: „es soll ruhig sein, möglichst wenig ui changes, kein flackern …
+   * Es gibt elemente die je nach zustand sichtbar/nicht sichtbar sind, und
+   * elemente die immer sichtbar sind, und elemente die je nach zustand
+   * unterschiedliche label haben."
+   *
+   * Also von oben nach unten, und jede Zeile entsteht **einmal**:
+   *
+   * | Zeile | Inhalt | wechselt |
+   * |---|---|---|
+   * | `ak-z-titel` | Titel · erwartete Folgen | Text |
+   * | `ak-z-inhalt` | Checkliste, Hinweise, Warnungen | Inhalt |
+   * | `ak-z-melden` | der Melde-Knopf | Label |
+   * | `ak-such-fuss` | Prüflisten-Knopf, aniSearch | Label |
+   * | `ak-z-debug` | Diagnose-Schalter, standardmäßig aus | — |
+   *
+   * Gefüllt werden nur die ersten beiden; die unteren drei nehmen auf, was der
+   * Takt hineinschiebt, und behalten es. Die Höhe steht damit ab der ersten
+   * Zeichnung.
+   */
+  /**
+   * **Die Adresse des Kastens — ohne das, was Prime laufend umschreibt.**
+   *
+   * `location.search` ist als Schlüssel unbrauchbar: Prime Video schreibt
+   * `ref_`, `qid`, `sr` und `pageTypeId` während des Betrachtens immer
+   * wieder um. Der Vergleich schlug damit bei **jedem** Takt fehl, der Kasten
+   * wurde zweimal je Sekunde verworfen und neu gebaut — und die Knöpfe, die
+   * darin sitzen, mit ihm. Daniel am 02.09.2026, mit Bild: „wieso seh ich das
+   * (prime alles geprüft button in box, alle anderen elemente unsichtbar)".
+   *
+   * **Derselbe Fehlgriff steht seit dem 28.08.2026 in `CLAUDE.md`**, für
+   * `filmAusSeite()`: „Ein Zwischenspeicher, dessen Schlüssel sich ständig
+   * ändert, ist keiner." Dort fiel er als Rechenlast auf, hier als
+   * verschwundene Oberfläche. Die alte Fassung baute den Kasten ohnehin bei
+   * jedem Takt neu — sie konnte an dem Schlüssel nicht scheitern, weil sie ihn
+   * nicht brauchte.
+   *
+   * Gebraucht wird von der Query genau ein Wert: der **Suchbegriff**. Jede
+   * Prime-Suche liegt unter `/s`, und zwei Suchen unterscheiden sich nur
+   * darin (31.08.2026 — ohne ihn zeigte der Kasten den Auftrag von vorhin).
+   * Auf Titelseiten trägt der Pfad die Kennung und die Query nichts, was den
+   * Kasten anginge.
+   */
+  function kastenAdresse() {
+    try {
+      const begriff = new URLSearchParams(location.search).get('k')
+      return location.pathname + (begriff ? '?k=' + begriff : '')
+    } catch {
+      return location.pathname
+    }
+  }
+
+  /**
+   * **Das Gerüst kommt aus `box.js`, der Inhalt von hier.**
+   *
+   * Bis zum 10.09.2026 baute diese Funktion den Kasten selbst — fünf Zeilen,
+   * ein Fuß mit drei Plätzen, eine Debug-Zeile. Netflix und Disney+ hatten
+   * nichts dergleichen, und Daniel wollte es dort auch: „am besten selbe
+   * extension design auf allen seiten fürs reporten, aber jede seite hat
+   * eigenheiten."
+   *
+   * Zwei Kopien desselben Gerüsts laufen auseinander — deshalb steht es einmal
+   * in `box.js` und wird von allen drei Meldern gerufen. Was Prime auszeichnet,
+   * bleibt hier: die bereinigte Adresse als Schlüssel und die Klasse, an der
+   * das Stylesheet die Lage festmacht.
+   */
+  function kastenSkelett() {
+    const kasten = akBox('ak-amazon-suchhinweis', kastenAdresse())
+    /*
+      **Die letzte Zeile entsteht mit dem Kasten, nicht einen Takt später.**
+
+      `debugLeisteZeichnen()` lief bisher nur am Anfang von `taktSchritt()` und
+      suchte dort `.ak-z-debug` — ein Element, das es zu diesem Zeitpunkt noch
+      gar nicht gab: Der Kasten entsteht erst weiter unten im selben Takt. Die
+      Zeile kam deshalb frühestens im **nächsten** Durchlauf, und weil der Kasten
+      seinerseits erst entsteht, sobald ein Knopf sichtbar ist, lagen dazwischen
+      mehrere halbe Sekunden.
+
+      Hier ist der Platz schon da. Der Aufruf im Takt bleibt als Rückfall — er
+      steigt aus, sobald die Leiste steht.
+    */
+    debugLeisteZeichnen()
+    return kasten
+  }
+
+  /**
+   * **Der Ladepunkt für eine Zeile, deren Inhalt noch berechnet wird.**
+   *
+   * Er stand bis 4.10.33 als „···" da, halbdurchsichtig und pulsierend —
+   * Daniels Urteil im Video: „das ist ein furchtbares load icon, auch weil du
+   * es mit opacity kaum sichtbar gemacht hast". Ein drehender Ring sagt
+   * dasselbe und ist zu sehen.
+   */
+  function ladeRing(text) {
+    const huelle = document.createElement('span')
+    huelle.className = 'ak-laedt'
+    const ring = document.createElement('span')
+    ring.className = 'ak-laedt-ring'
+    huelle.appendChild(ring)
+    if (text) {
+      const wort = document.createElement('span')
+      wort.textContent = text
+      huelle.appendChild(wort)
+    }
+    return huelle
+  }
+
+  function hinweisKasten(titel, unterzeile, ...zusatz) {
+    const kasten = kastenSkelett()
+    /*
+      **Der Kasten gehört zu einem Folgenstand, nicht nur zu einer Adresse.**
+
+      Der Auftragshinweis entscheidet über die Folgenzahl, ob die Seite ein
+      Werk bündelt, es teilt oder ein anderes ist. Gebaut wird er beim
+      Seitenaufbau — da steht die Zahl oft noch auf null, und der Kasten wählte
+      den Zweig „zeigt deutlich weniger, ist ein anderes Werk" (Danganronpa 3,
+      Daniel, 30.08.2026).
+    */
+    try {
+      kasten.dataset.beiFolgen = globalThis.akPrimeFolgenStand(gesehen, location)
+    } catch {
+      kasten.dataset.beiFolgen = '0'
+    }
+    /*
+      **Und zu einem Stand der bestätigten Auswahl (15.09.2026).** Touken Ranbu:
+      Im neuen Tab entstand der Kasten, bevor der Worker die Auswahl geliefert
+      hatte — beide Ausgaben vorgekreuzt, „Auswahl bestätigen". Neu gezeichnet
+      wurde nur bei neuer Adresse oder Folgenzahl, also nie. Beim Neuladen kam
+      die Antwort zufällig früher. Das Eintreffen der Auswahl ist jetzt selbst
+      ein Anlass.
+    */
+    kasten.dataset.beiErwartungen = erwartungsMarke()
+    kasten.classList.remove('ak-nur-huelle')
+
+    /*
+      **Titel und Folgenzahl in einer Zeile.** Zwei Zeilen für zwei Wörter
+      kosten Höhe, die der Kasten für die Auswahl braucht.
+    */
+    const kopf = kasten.querySelector('.ak-z-titel')
+    const kopfText = unterzeile ? titel + ' · ' + unterzeile : titel
+    if (kopf) {
+      /*
+        Der Titel steht in einem eigenen Feld neben dem X — sonst überschreibt
+        `textContent` den Knopf gleich wieder mit.
+      */
+      let text = kopf.querySelector('.ak-z-titel-text')
+      if (!text) {
+        kopf.replaceChildren()
+        text = document.createElement('span')
+        text.className = 'ak-z-titel-text'
+        kopf.appendChild(text)
+
+        /*
+          **Das X legt den Titel weg, es schließt nicht den Kasten.**
+
+          Ein Kasten, der ganz verschwindet, nimmt den Prüflisten-Knopf mit —
+          und damit den Weg zum nächsten Titel. Weggelegt wird deshalb nur, was
+          diesen einen Auftrag betrifft; was den Stand der Arbeit zeigt, bleibt.
+        */
+        const x = document.createElement('button')
+        x.type = 'button'
+        x.className = 'ak-z-weg'
+        x.textContent = '✕'
+        x.title = 'Diesen Titel nicht mehr suchen — bis zum nächsten aus der Prüfliste'
+        x.addEventListener('click', (e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          weglegen(suchauftrag())
+          kasten.classList.add('ak-weggelegt')
+        })
+        kopf.appendChild(x)
+      }
+      if (text.textContent !== kopfText) text.textContent = kopfText
+    }
+
+    /*
+      Der Zustand wird bei jedem Zeichnen neu gesetzt, nicht nur beim Klick: Ein
+      Auftragswechsel hebt ihn damit von selbst auf, ohne dass eine zweite
+      Stelle daran denken muss.
+    */
+    kasten.classList.toggle('ak-weggelegt', istWeggelegt(suchauftrag()))
+
+    /*
+      **Der aniSearch-Verweis sitzt in der Fußzeile, nicht im Inhalt.**
+
+      Er gehört zu den Dingen, die immer da sind (Daniel, 02.09.2026:
+      „Prüfliste Button und anisearch button | immer sichtbar"). Als Zusatzzeile
+      wäre er bei jedem Neuzeichnen mit verschwunden und wieder erschienen.
+
+      aniSearch statt AniList, weil es deutsche Titel, deutsche Beschreibungen
+      und eine Episodenliste mit deutschen Folgentiteln führt — genau das
+      entscheidet bei Reihen, die Prime durchnummeriert.
+    */
+    try {
+      const rechts = kasten.querySelector('.ak-such-fuss-rechts')
+      /*
+        **Der Verweis gilt dem Auftrag — egal, aus welcher der beiden Listen er
+        stammt.**
+
+        Bis 4.12.7 kam er nur aus `suchauftrag()`, also aus einem Klick auf eine
+        **Such**adresse. Wer einen Auftrag mit eigener Titelseite oeffnete —
+        seit heute wieder vier davon —, stand ohne Gegenprobe da (Daniel,
+        05.09.2026: „wo ist der anisearch link zum gegenpruefen?").
+
+        Die Kennung liegt seit derselben Fassung in der Liste: `eintraege[].asId`.
+        Wo sie fehlt, bleibt es beim Suchverweis ueber den Namen — besser als
+        nichts, und derselbe Weg wie bisher.
+      */
+      /*
+        Der Auftrag kann unter einer anderen Kennung stehen als die Seite — seit
+        4.20.35 unter JustWatchs gti (To Love-Ru, 19.09.2026: kein aniSearch-Knopf).
+        `listenId` entsteht weiter unten; beim ersten Zeichnen gibt es ihn noch nicht.
+      */
+      const listenEintrag =
+        (() => {
+          try {
+            return listenId ? liste[listenId] : undefined
+          } catch {
+            return undefined
+          }
+        })() ?? liste[id]
+      const auftrag = suchauftrag() ?? {
+        asId: listenEintrag?.eintraege?.find((e) => e?.asId)?.asId,
+        malId: listenEintrag?.eintraege?.find((e) => e?.malId)?.malId,
+        imdb: listenEintrag?.eintraege?.find((e) => e?.imdb)?.imdb,
+        titel: listenEintrag?.titel,
+      }
+      /*
+        **„Nachschlagen: MAL IMDb“ — eine schmale Zeile über der Fußzeile** (Daniel,
+        19.09.2026, Entwurf B). Für Staffel- und Teilfragen, die aniSearch allein nicht
+        beantwortet (Grisaia Stargazer, Fushigi Yugi OVA). Die Kennungen kommen aus der
+        Prüfliste; IMDb über Wikidata, abgerufen wird IMDb nie.
+      */
+      {
+        const ziele = [
+          auftrag?.malId ? ['MAL', 'https://myanimelist.net/anime/' + auftrag.malId] : null,
+          auftrag?.imdb ? ['IMDb', 'https://www.imdb.com/title/' + auftrag.imdb + '/'] : null,
+        ].filter(Boolean)
+        const signatur = ziele.map((z) => z[1]).join(' ')
+        let zeile = kasten.querySelector('.ak-nachschlagen')
+        if (!ziele.length) {
+          zeile?.remove()
+        } else if (!zeile || zeile.dataset.signatur !== signatur) {
+          if (!zeile) {
+            zeile = document.createElement('div')
+            zeile.className = 'ak-nachschlagen'
+            const fuss = kasten.querySelector('.ak-such-fuss')
+            if (fuss) kasten.insertBefore(zeile, fuss)
+            else kasten.appendChild(zeile)
+          }
+          zeile.dataset.signatur = signatur
+          const vorn = document.createElement('span')
+          vorn.textContent = 'Nachschlagen:'
+          zeile.replaceChildren(
+            vorn,
+            ...ziele.map(([text, adresse]) => {
+              const a = document.createElement('a')
+              a.href = adresse
+              a.target = '_blank'
+              a.rel = 'noopener noreferrer'
+              a.textContent = text
+              return a
+            }),
+          )
+        }
+      }
+      /*
+        Die Adresse wird bei jedem Zeichnen neu bestimmt und nur bei einer Änderung
+        getauscht: Beim ersten Zeichnen ist der Auftrag oft noch unbekannt (Suchverweis),
+        einen Takt später steht die aniSearch-Kennung fest.
+      */
+      const ziel = auftrag?.asId
+        ? 'https://www.anisearch.de/anime/' + auftrag.asId
+        : auftrag?.titel
+          ? /*
+              Gesucht wird mit dem **Kern** des Titels: „Kizumonogatari III:
+              Kaltes Blut — Teil 3" findet nichts, „Kizumonogatari" findet beide
+              Filme. Und über `/search?q=` — `/anime/index?text=` ist der Filter
+              des Index und antwortet von außen mit „Suchanfrage ist ungültig".
+            */
+            'https://www.anisearch.de/search?q=' +
+            encodeURIComponent(auftrag.titel.split(/[:—–-]/)[0].trim() || auftrag.titel)
+          : null
+      if (rechts && ziel && rechts.firstChild?.href !== ziel) {
+        rechts.replaceChildren(kastenVerweis('aniSearch', ziel))
+      }
+    } catch {
+      /* Ohne Auftrag kein Verweis — die Fußzeile behält ihre beiden anderen Plätze. */
+    }
+    /*
+      **Derselbe Inhalt wird nicht noch einmal gebaut.**
+
+      `zeigeAuftragshinweis()` läuft bei jedem Takt, also zweimal je Sekunde.
+      Würde die Zeile jedes Mal geleert und neu gefüllt, verlöre ein Haken, den
+      Daniel gerade gesetzt hat, im nächsten halben Takt seinen Zustand — und
+      der Kasten wäre wieder das, was er nicht mehr sein soll: eine Fläche, auf
+      der sich ohne Anlass etwas bewegt.
+
+      Verglichen wird der **Text** der Zeilen. Er ändert sich, wenn sich der
+      Befund ändert; ein Haken ändert ihn nicht, und genau das ist gewollt.
+    */
+    const inhalt = kasten.querySelector('.ak-z-inhalt')
+    if (inhalt) {
+      const teile = []
+      for (const z of zusatz) if (z) teile.push(String(z.textContent ?? ''))
+      const signatur = teile.join('\u0000')
+      if (inhalt.dataset.signatur === signatur && inhalt.firstChild) return kasten
+      inhalt.dataset.signatur = signatur
+      inhalt.replaceChildren()
+      /*
+        **Ein wackeliger Auftrag sagt es selbst, bevor jemand sucht.**
+
+        Der Vermerk kommt aus `vorschlaege-anbieter.ts`: Dort passte das Format
+        oder das Jahr des TMDB-Treffers nicht zu unserem Eintrag. Wer das vorher
+        weiß, hört nach zwei Blicken auf zu suchen statt nach zwei Minuten.
+
+        Er steht hier und nicht an einer Aufrufstelle, aus demselben Grund wie
+        der aniSearch-Verweis: Jeder Kasten gehört zu einem Auftrag.
+      */
+      try {
+        const auftrag = suchauftrag()
+        if (auftrag?.unsicher) {
+          inhalt.appendChild(kastenZeile('ak-such-warn', 'Wackeliger Vorschlag: ' + auftrag.unsicher))
+        }
+      } catch {
+        /* Ohne Auftrag bleibt die Zeile leer — der Kasten steht trotzdem. */
+      }
+      for (const z of zusatz) if (z) inhalt.appendChild(z)
+    }
+
+    return kasten
+  }
+
+  /**
+   * **Die Adresse eines Suchtreffers ohne ihre Parameter.**
+   *
+   * Der Link in einer Trefferkarte trägt Amazons Verfolgungsmarken mit:
+   * `?qid=…&pageTypeIdSource=ASIN&pageTypeId=…&ref_=atv_sr_fle_c_…&sr=1-1`.
+   * Ein Klick darauf landet bei „Da ist etwas schief gelaufen." — dieselbe
+   * Adresse ohne alles hinter dem Fragezeichen öffnet die Titelseite normal
+   * (Daniel, 27.08.2026, mit Bild und Gegenprobe an „Angels of Death").
+   *
+   * Was genau Amazon daran stört, ist von hier nicht zu klären. Es genügt zu
+   * wissen, dass die Parameter nichts tragen, was wir brauchen: Die Kennung
+   * steht im Pfad.
+   */
+  const ohneParameter = (url) => (url ?? '').split('?')[0]
+
+  /** Ein Knopf im Kasten — gleiche Form für alle Fälle. */
+  /**
+   * **Woher der Auftrag stammt, gehört in den Kasten.**
+   *
+   * Daniel am 28.08.2026: „pack in dieses prüf-div fenster auch den link zu
+   * anilist, wo du das herhast, damit ich nachschauen kann und nicht jedes mal
+   * manuell googlen muss."
+   *
+   * Der Kasten nennt Titel und erwartete Folgenzahl — beides stammt aus unserem
+   * Bestand, und der stammt aus AniList. Wenn die Zahl nicht zur Seite passt (was
+   * bei Prime der Regelfall ist, siehe „Prime schneidet Reihen anders zu"), ist
+   * die erste Frage: Was steht dort eigentlich? Ein Klick beantwortet sie.
+   *
+   * `target="_blank"` mit `rel="noopener"`, damit die Prime-Seite stehen bleibt —
+   * ein Wechsel würde den halb geladenen Zählstand wegwerfen.
+   */
+/**
+   * **Die Marke „gemeldet ✓" — gesetzt und zurückgenommen an einer Stelle.**
+   *
+   * In 4.13.2 wurde sie nur gesetzt. Der Kasten überlebt aber den Wechsel zum
+   * nächsten Titel, und damit stand sie dort weiter: „Detektiv Conan …" zeigte
+   * gleichzeitig einen grünen „melden"-Knopf und daneben „gemeldet ✓" (Daniel,
+   * 06.09.2026, mit Bild). Zwei Aussagen, die sich widersprechen, und die
+   * falsche sah aus wie ein Ergebnis.
+   *
+   * Wer setzt, nimmt auch zurück — und beides im selben Takt, damit kein
+   * Zwischenzustand übrig bleibt. Angefasst wird nur bei echter Änderung: Ein
+   * Entfernen und Neubauen je halbe Sekunde wäre genau das Flackern, das am
+   * 30.08.2026 abgestellt wurde.
+   */
+  function gemeldetMarke(an, text = 'gemeldet ✓') {
+    try {
+      /*
+        **Sie steht, wo der Knopf stand** — in der Meldezeile, über der Fußzeile
+        und so breit wie sie.
+
+        Das ist zugleich der Platz, den sie seit 4.11.0 hatte; in 4.13.2 war sie
+        versehentlich in die Fußzeile gewandert und drängte dort die beiden
+        Knöpfe zusammen.
+      */
+      const zeile = document.querySelector('.ak-amazon-suchhinweis .ak-z-melden')
+      if (!zeile) return
+      const da = zeile.querySelector('.ak-such-fertig')
+      if (an && !da) zeile.appendChild(kastenZeile('ak-such-fertig', text))
+      else if (an && da.textContent !== text) da.textContent = text
+      else if (!an && da) da.remove()
+    } catch {
+      /* Ohne Kasten gibt es nichts zu markieren. */
+    }
+  }
+
+  function kastenVerweis(text, adresse) {
+    const a = document.createElement('a')
+    a.className = 'ak-such-quelle'
+    a.href = adresse
+    a.target = '_blank'
+    a.rel = 'noopener noreferrer'
+    a.textContent = text
+    /*
+      **Kein Stil am Element — sonst gewinnt er gegen jedes Stylesheet.**
+
+      Hier stand `style.cssText = 'display:block;margin-top:4px;…'`. In der
+      Fußzeile ist der Verweis aber eine Pille neben dem Prüflisten-Knopf, und
+      gegen `display:block` plus 4 px Abstand von oben kommt keine Klassenregel
+      an: Beide Knöpfe standen auf verschiedenen Höhen (Daniel, 06.09.2026:
+      „mach die buttons für anisearch und prüfliste auf selber höhe").
+
+      Das Aussehen ist dasselbe geblieben, es steht nur in `melder.css` unter
+      `.ak-such-quelle` — dort, wo die Fußzeile es überschreiben darf.
+    */
+    return a
+  }
+
+  /**
+   * Die Karte zu einer Prime-Kennung auf der Trefferseite.
+   *
+   * Gesucht wird über den Verweis, nicht über einen gespeicherten Knoten: Amazon
+   * baut die Trefferliste beim Filtern neu auf, und eine gemerkte Referenz zeigt
+   * danach auf ein Element, das nicht mehr im Baum steht.
+   */
+  /**
+   * Die Prime-Kennung aus einer Trefferadresse — oder `null`.
+   *
+   * Steht dreimal im Kasten und wird jedes Mal für dasselbe gebraucht: Ein
+   * Knopf, der zu einer Karte springt, gibt sie an `kastenKnopf` weiter, und
+   * die markiert damit beim Überfahren die gemeinte Kachel.
+   *
+   * **26 Zeichen, nicht 10** — Prime Video führt neben ASINs auch GTIs, und
+   * ein Muster mit `{10}` schnitt sie ab (25.08.2026).
+   */
+  function kennungAus(url) {
+    return /\/(?:dp|detail)\/([A-Z0-9]{10,26})/.exec(ohneParameter(url) ?? '')?.[1] ?? null
+  }
+
+  function karteZu(kennung) {
+    if (!kennung) return null
+    try {
+      return (
+        document.querySelector(`article[data-testid="card"] a[href*="${kennung}"]`)?.closest('article') ?? null
+      )
+    } catch {
+      return null
+    }
+  }
+
+  /**
+   * Ein Knopf im Auftragskasten — mit der Karte, die er meint.
+   *
+   * Daniel am 30.08.2026 vor „One Punch Man", das die Suche achtmal ausgibt:
+   * „ich hab überhaupt keine ahnung was der eine oder der andere button meint,
+   * welcher der button springt zu welchem der suchtreffer? markier beim hover
+   * auf die button die suchtreffer irgendwie und setz in klammern hinter die
+   * label evtl die asin."
+   *
+   * Beides ist hier drin: Die Kennung steht im Label, und beim Überfahren
+   * bekommt die Karte einen Rahmen und wird ins Bild geholt. Ohne das ist ein
+   * Klick ein Sprung ins Ungewisse — zwischen einem Kauftitel und einem
+   * Kanal-Abo entscheidet er, was überhaupt belegbar ist.
+   */
+  /**
+   * **Eine Auswahlzeile: welche Seiten gehören zu diesem Titel?**
+   *
+   * Prime führt denselben Anime regelmäßig zweimal — über einen Kanal (aniverse,
+   * Crunchyroll) und als Kauftitel. Beide sind Wege, und **nur ein Mensch sieht
+   * vorher, welche Karten zusammengehören**: Der Bau kennt höchstens eine
+   * Adresse, und aus einem Namensvergleich folgt es nicht.
+   *
+   * Daniels Vorschlag am 02.09.2026, nachdem eine abgeleitete Lösung dreimal
+   * danebenging: „auf search seite checkboxen anbieten, welche titel erwartet
+   * werden sollen. ich wähle alles aus, klicke auf bestätigen, dann melde ich
+   * die beiden, so kann es vorher getracked werden … und du musst keine
+   * fehleranfällige implementierung bauen."
+   *
+   * Genau das: Was er ankreuzt, ist die Erwartung. Der Auftrag gilt erst als
+   * erledigt, wenn jede angekreuzte Seite gemeldet ist — und **gemeldet** sagt
+   * der Briefkasten, nicht ein lokaler Zähler.
+   */
+  /**
+   * **Die Fußzeile: Ergebnis links, Nachschlagen rechts.**
+   *
+   * „gemeldet ✓" und der aniSearch-Verweis standen als zwei Zeilen untereinander
+   * und sahen beide wie Fließtext aus. Sie beantworten verschiedene Fragen — was ist passiert,
+   * und wo sehe ich nach — und teilen sich deshalb eine Zeile mit klaren Enden.
+   *
+   * Die Marke wird eingesammelt, nicht neu gebaut: Wo sie im Kasten schon steht,
+   * wandert sie hierher; sonst bleibt die linke Seite leer.
+   */
+  function kastenAuswahl(beschriftung, kennung, angehakt, beimSprung = null) {
+    const zeile = document.createElement('label')
+    zeile.className = 'ak-such-auswahl'
+    const box = document.createElement('input')
+    box.type = 'checkbox'
+    box.checked = angehakt !== false
+    box.dataset.kennung = kennung ?? ''
+    zeile.append(box, document.createTextNode(' ' + (kennung ? `${beschriftung} (${kennung})` : beschriftung)))
+    /*
+      **Der Sprung sitzt an der Zeile, nicht als eigener Knopf darunter.**
+
+      Vorher stand unter der Auswahl noch „Zum Anime springen (B0BYY9NN5D)" und
+      „Stattdessen: Kauf/Abo · … (B0B8TN9LSJ)" — dieselben zwei Kennungen ein
+      zweites Mal.
+    */
+    if (kennung) {
+      const sprung = document.createElement('a')
+      sprung.className = 'ak-such-sprung'
+      sprung.href = `https://www.amazon.de/gp/video/detail/${kennung}`
+      /* Als Knopf, nicht als Zeichen — ein ↗ am Zeilenende übersieht man. */
+      sprung.textContent = 'öffnen'
+      sprung.title = `${kennung} öffnen`
+      sprung.addEventListener('click', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (typeof beimSprung === 'function') beimSprung(kennung)
+        location.href = sprung.href
+      })
+      zeile.appendChild(sprung)
+    }
+    if (kennung) {
+      zeile.addEventListener('mouseenter', () => {
+        const karte = karteZu(kennung)
+        if (!karte) return
+        karte.classList.add('ak-treffer-zeigen')
+        karte.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' })
+      })
+      zeile.addEventListener('mouseleave', () => {
+        for (const el of document.querySelectorAll('.ak-treffer-zeigen')) {
+          el.classList.remove('ak-treffer-zeigen')
+        }
+      })
+    }
+    return zeile
+  }
+
+  function kastenKnopf(beschriftung, tun, kennung = null) {
+    const k = document.createElement('button')
+    k.type = 'button'
+    k.className = 'ak-suchknopf'
+    k.textContent = kennung ? `${beschriftung} (${kennung})` : beschriftung
+    k.addEventListener('click', () => tun(k))
+    if (kennung) {
+      k.title = `Zeigt auf ${kennung} — beim Überfahren wird die Karte markiert`
+      k.addEventListener('mouseenter', () => {
+        const karte = karteZu(kennung)
+        if (!karte) return
+        karte.classList.add('ak-treffer-zeigen')
+        /* `nearest` statt `center`: Steht die Karte schon im Bild, soll nichts springen. */
+        karte.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' })
+      })
+      k.addEventListener('mouseleave', () => {
+        for (const el of document.querySelectorAll('.ak-treffer-zeigen')) {
+          el.classList.remove('ak-treffer-zeigen')
+        }
+      })
+    }
+    return k
+  }
+
+  /*
+    **Alle Staffeln hinter einem Suchtreffer gehören zu ihm** (Daniel, 17.09.2026,
+    Schleim): Nach dem Wechsel im Auswahlfeld trägt die Adresse eine andere
+    Kennung, und die Checkliste verlor die Markierung des Treffers, von dem man
+    kam. Ein Wechsel im Auswahlfeld lädt die Seite nicht neu — was dieses Skript
+    danach sieht, gehört zur selben Reihe, solange der Serientitel bleibt.
+  */
+  let letzteSeite = null
+  const reiheDesTreffers = new Map()
+
+  /** Gehört die Seite `hier` zum Suchtreffer `treffer` — selbst oder über einen Staffelwechsel? */
+  function zurReihe(treffer, hier) {
+    try {
+      if (!treffer || !hier) return false
+      return String(treffer) === String(hier) || Boolean(reiheDesTreffers.get(String(treffer))?.has(String(hier)))
+    } catch {
+      return String(treffer) === String(hier)
+    }
+  }
+
+  /** Merkt sich Kennungen, die per Auswahlfeld auf einen Treffer folgen. */
+  function reiheMerken(treffer) {
+    try {
+      const hier = String(asin() ?? '')
+      const titel = titelKern(seitenTitel() ?? '')
+      const vorher = letzteSeite
+      letzteSeite = { kennung: hier, titel }
+      if (!vorher || !hier || vorher.kennung === hier || !titel || vorher.titel !== titel) return
+      for (const k of treffer) {
+        if (!zurReihe(k, vorher.kennung)) continue
+        const menge = reiheDesTreffers.get(String(k)) ?? new Set()
+        menge.add(hier)
+        reiheDesTreffers.set(String(k), menge)
+      }
+    } catch {
+      /* Vor der Initialisierung gibt es noch nichts zu merken. */
+    }
+  }
+
+  /**
+   * „Prime führt diesen Titel nicht" — die Meldung dazu, unter der **Suchadresse** aus unserem Bestand: die Übernahme macht
+   * daraus `available: false` und entfernt den Verweis (wie bei Crunchyroll seit 27.08.2026).
+   */
+  async function nichtBeiPrimeMelden(auftrag, befund, knopf, nachher) {
+    knopf.disabled = true
+    knopf.textContent = 'meldet …'
+    try {
+      /* Der Schlüssel liegt im Sitzungs-Speicher, wie beim Melde-Knopf auch. */
+      const { token } = (await globalThis.akKontext.lesen('token', 'sync')) ?? {}
+      if (!token) throw new Error('kein Schlüssel hinterlegt')
+      const antwort = await fetch(WORKER, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Lauf-Token': token },
+        body: JSON.stringify({
+          plattform: 'primevideo',
+          url: auftrag.suchUrl,
+          ...globalThis.akKontext.meldungKopf(),
+          vorhanden: 'nein',
+          art: 'gemessen',
+          titel: auftrag.titel,
+          /* Woher die Auskunft stammt — Suchseite oder geöffnete Titelseite. */
+          notiz:
+            befund.art === 'liste'
+              ? 'Aus der Prüfliste gemeldet: nachgesehen, den Titel gibt es bei Prime Video nicht'
+              : befund.art === 'titelseite'
+              ? 'Titelseite auf Prime Video geöffnet und geprüft: Sie gehört nicht zu diesem Titel'
+              : 'Suche auf Prime Video: ' +
+                (befund.art === 'aehnlich'
+                  ? 'kein Treffer für diesen Titel, nur Verwandtes (' +
+                    befund.treffer.map((t) => t.titel).slice(0, 3).join(', ') +
+                    ')'
+                  : 'kein einziger Treffer'),
+        }),
+      })
+      if (!antwort.ok) throw new Error(`HTTP ${antwort.status}`)
+      await suchAbhaken(auftrag.suchUrl)
+      knopf.textContent = 'gemeldet ✓'
+      knopf.classList.add('ak-such-fertig')
+      nachher?.() // sofort neu zeichnen: grüne Marke, keine Suchvorschläge mehr (17.09.2026)
+      uebersichtZeichnen()
+    } catch (err) {
+      knopf.disabled = false
+      knopf.textContent = `Fehler: ${err.message} — nochmal`
+    }
+  }
+
+  /**
+   * **Solange gesendet wird, fasst der Takt den Knopf nicht an.**
+   *
+   * Der Klick setzt „sende …", und eine halbe Sekunde später schrieb
+   * `zeichnen()` den alten Text zurück — bis die Antwort da war, wechselte die
+   * Beschriftung im Takt hin und her.
+   *
+   * Der Merker steht am Modul, nicht am Knopf: `zeichnen()` steigt daran aus,
+   * bevor es irgendetwas berechnet.
+   */
+  let sendetGerade = false
+  /**
+   * **Wie die letzte Meldung dieser Seite ausging — der Haken für den Durchgang** (25.09.2026).
+   * Er las bis 4.22.8 den Knopftext und wartete auf Ruhe; das kostete je Staffel rund fünf der
+   * gemessenen zehn Sekunden und hing einmal ganz, weil der versteckte Knopf „trage ein …" behielt.
+   */
+  let letzteMeldung = null
+  /** Bewusster Ausstieg des Klicks ohne Senden: `frameSchritt` meldet den Grund sofort. */
+  function abweisen(grund, ok = false) {
+    letzteMeldung = globalThis.akPrimeAbweisung(grund, ok, location.pathname, Date.now())
+  }
+
+  /** Text der Marke, wenn noch eine Staffel aussteht — sonst „gemeldet ✓". */
+  let weiterText = null
+  /*
+    **Die Wegweisung gilt der Seite, auf der sie entstand** (Daniel, 20.09.2026, JoJo): Nach
+    der Meldung zu Staffel 1 stand „✓ Staffel 1 gemeldet" noch da, als er auf Staffel 2 einer
+    anderen Seite meldete — der Text ist ein `let` und wurde beim Wechsel nicht zurückgesetzt.
+    Die Meldung selbst war richtig (Staffel 2, Eintrag 4816), nur die Marke log.
+  */
+  let weiterTextPfad = null
+  /*
+    **Die Marke aus „alles gemeldet" hat ihren eigenen Merker (15.09.2026).**
+    Solo Leveling: In den ersten Sekunden fehlten Stand und Briefkasten, die
+    Rechnung hielt den Titel wegen einer lokalen Meldung von 11:07 für erledigt
+    und merkte sich den Pfad in `gemeldetFuerPfad`. Danach war die Seite laut
+    Stand offen, der Melde-Knopf erschien — und „gemeldet ✓" blieb daneben
+    stehen, weil nichts den Merker zurücknahm. Dieser hier fällt, sobald
+    „alles gemeldet" nicht mehr gilt; der für die eigene Meldung bleibt.
+  */
+  let durchFuerPfad = null
+
+  function zeigeSuchhinweis() {
+    /*
+      **Eine zweite Suche gehört noch zum selben Auftrag.**
+
+      `offeneSuche()` vergleicht den Suchbegriff mit unseren Adressen. Wer über
+      „Kürzer suchen" oder „Anders schreiben" weitersucht, steht danach auf
+      einer Adresse, die dort nicht steht — und der Kasten war weg, mitsamt dem
+      Auftrag.
+
+      Bei „Horimiya" fiel das nicht auf: Die Kurzform ist zufällig selbst ein
+      Eintrag. Das ist der Zufall, nicht die Regel.
+
+      Der gemerkte Auftrag gilt zehn Minuten und überlebt jeden Seitenwechsel.
+      Auf einer Suchseite ist er die richtige Auskunft — dort gibt es nichts
+      anderes, worauf er sich beziehen könnte.
+    */
+    const ausListe = offeneSuche()
+    /*
+      **Und nur, wenn diese Suche wirklich zu ihm gehört** — siehe
+      `gehoertZurSuche()`. Vorher genügte „irgendeine Suchseite", und der
+      Auftrag des vorigen Titels stand über den Treffern des nächsten.
+    */
+    const gemerktRoh = !ausListe && /^\/s(\/|$)/.test(location.pathname) ? suchauftrag() : null
+    const gemerkt = gemerktRoh && gehoertZurSuche(gemerktRoh) ? gemerktRoh : null
+    const auftrag = ausListe ?? gemerkt
+    if (!auftrag) return false
+    /*
+      **Die aniSearch-Kennung muss mitwandern.**
+
+      Hier standen vier Felder, und `asId` war keines davon. Auf der Suchseite
+      zeigte der Kasten deshalb den aniSearch-Verweis, nach dem Sprung auf die
+      Titelseite — wo der Vergleich wirklich stattfindet — fiel er auf AniList
+      zurück.
+
+      Daniel am 30.08.2026: „ich will keine anilist links, die sind furchtbar,
+      da kann ich nicht herausfinden wozu das gehört, ich brauche anisearch
+      links zu dem arc, damit ich das vergleichen und korrekt zuordnen kann."
+      Sein Beispiel war „Danganronpa 3 — Future Arc"; der Auftrag trägt
+      `asId: 11046`, nur kam sie nie an.
+
+      Übernommen wird jetzt der ganze Auftrag; `suchUrl` bleibt ausdrücklich
+      stehen, weil sie aus dem Aufrufer kommt und nicht aus dem Listeneintrag.
+    */
+    suchauftragMerken({ ...auftrag, suchUrl: auftrag.suchUrl })
+    /*
+      Die Treffer stehen erst da, wenn die Seite fertig ist. Zweimal
+      nachsehen genügt: einmal sofort, einmal nach anderthalb Sekunden.
+    */
+    const zeichnen = () => {
+      /*
+        Hier stand bis 4.11.0 ein `remove()`. Es ist überflüssig geworden und
+        war schädlich: `kastenSkelett()` verwaltet den Kasten selbst — es gibt
+        immer genau einen, und er wird nur beim Adresswechsel ersetzt. Wer ihn
+        vorher wegnahm, warf die Knöpfe mit heraus, die im Takt eingezogen sind.
+      */
+      const gefunden = suchTreffer()
+      const befund = beurteileTreffer(auftrag, gefunden)
+      const folgen = auftrag.folgen ? `${auftrag.folgen} ${auftrag.folgen === 1 ? 'Folge' : 'Folgen'}` : ''
+      /*
+        **Gesucht wird oft unter einem anderen Namen, als wir führen.**
+
+        Die Suchadresse stammt aus unserem Bestand und trägt den Begriff, unter
+        dem Prime den Titel kennt — „Captain Tsubasa (2018)", während unser
+        Eintrag „Captain Tsubasa" heißt. Der Kasten zeigte nur unseren Namen,
+        und das sah aus wie ein Fehler: oben ein Titel, in der Suchzeile ein
+        anderer (Daniel, 27.08.2026, mit Bild).
+
+        Weichen beide ab, steht der Suchbegriff jetzt dabei.
+      */
+      const begriff = decodeURIComponent((/[?&]k=([^&#]*)/.exec(auftrag.suchUrl ?? '')?.[1] ?? '').replace(/\+/g, ' '))
+      /*
+        Weg mit dem, was Prime nicht führt: der Zusatz in Bindestrichen
+        („-Dive to the Future-"), die Klammer, alles ab dem Doppelpunkt. Was
+        übrig bleibt, ist der Name, unter dem die Serie dort steht.
+      */
+      const kurzform = begriff
+        .replace(/\s-[^-]+-\s*$/, '')
+        .replace(/\s*\([^)]*\)\s*$/, '')
+        .split(':')[0]
+        .trim()
+      /*
+        Die ersten beiden Wörter zusammengezogen: „High School" → „HighSchool".
+        Genau dieses Paar trennt bei Prime Treffer von Nichts.
+      */
+      /*
+        **Verglichen wird mit der Suche, auf der wir stehen — nicht mit unserer.**
+
+        `begriff` kommt aus `auftrag.suchUrl`, also aus dem Bestand. Nach einem
+        Klick auf „Anders schreiben" steht in der Adresse längst die Variante,
+        der Auftrag aber unverändert — und der Knopf bot dieselbe Schreibweise
+        ein zweites Mal an.
+
+        Steht die Variante schon in der Adresse, ist der Weg zurück das
+        Sinnvolle: Beide Schreibweisen sind dann gesehen.
+      */
+      const jetzigerBegriff = decodeURIComponent((/[?&]k=([^&#]*)/.exec(location.search)?.[1] ?? '').replace(/\+/g, ' '))
+      const zusammengezogen = (t) => t.replace(/^(\S+)\s+(\S+)/, (_, a, b) => a + b.charAt(0).toUpperCase() + b.slice(1))
+      const variante = zusammengezogen(begriff)
+      const zusammen = jetzigerBegriff === variante ? begriff : variante
+      /*
+        Die englische Schreibweise kommt aus dem Bestand, nicht aus einer
+        Umformung — der Listengenerator legt sie als `suchbegriffEn` bei.
+      */
+      /* Beide aus dem Bestand, nicht aus einer Umformung des laufenden Begriffs. */
+      const auftragDe = (() => {
+        try {
+          return suchliste[auftrag?.suchUrl]?.suchbegriff ?? null
+        } catch {
+          return null
+        }
+      })()
+      const auftragEn = (() => {
+        try {
+          return suchliste[auftrag?.suchUrl]?.suchbegriffEn ?? null
+        } catch {
+          return null
+        }
+      })()
+      const begriffZeile =
+        begriff && titelKern(begriff) !== titelKern(auftrag.titel)
+          ? [kastenZeile('ak-such-hinweis', `gesucht als: ${begriff}`)]
+          : []
+
+      if (befund.art === 'genau') return genauZeigen(auftrag, zeichnen, befund, gefunden, begriffZeile, folgen)
+
+      if (befund.art === 'unklar') {
+        hinweisKasten(auftrag.titel, folgen, kastenZeile('ak-such-hinweis', 'Ergebnisse noch nicht gelesen …'))
+        return
+      }
+
+      /*
+        **Nur Verwandtes ist für diesen Titel dasselbe wie nichts.** Der Film
+        zur Serie ist ein eigener Eintrag in unserem Bestand und bekommt seinen
+        eigenen Verweis; er darf nie das Urteil der Serie werden.
+      */
+      const nurAehnlich = befund.art === 'aehnlich'
+      /*
+        **Gleicher Name, anderer Typ — das kann eine Sammelfassung sein.**
+
+        Die Typregel trennt den Film zur Serie von der Serie („Akira", „Ghost
+        in the Shell"), und das ist richtig: zwei Werke, zwei Verweise.
+
+        Sie trennt aber auch, was zusammengehört. AniList führt „Halo Legends"
+        als ONA mit neun Teilen; Prime zeigt dieselben Kurzfilme am Stück, als
+        Film von 1:57 h — neun mal dreizehn Minuten. Anthologien liegen
+        bei Anbietern regelmäßig so.
+
+        Von hier aus ist beides nicht zu unterscheiden: Die Karte nennt keine
+        Laufzeit. Also entscheidet Daniel — der Knopf steht nur da, wenn der
+        Name **genau** passt und allein der Typ widerspricht.
+      */
+      /*
+        **Die Reihenseite führt unsere Staffel, nur unter dem Grundtitel.**
+
+        Wir führen „Free! Dive to the Future" (Staffel 3), Prime führt „Free!"
+        mit drei Staffeln; dasselbe bei „Food Wars! The Second Plate" gegen
+        „Food Wars!" und „Golden Kamuy 2" gegen „Golden Kamuy" (Daniel,
+        27.08.2026, drei Bilder). Der Kasten sagte jedes Mal „Anderes Werk".
+
+        Erkennbar ist das am Namen: Der Kartentitel ist der Anfang unseres
+        Titels, und die Karte ist eine Serie. Der Sprung führt dann auf die
+        Reihenseite — dort wählt Daniel die Staffel, und die Sperre aus 3.59
+        passt auf, dass er die richtige erwischt.
+      */
+      const reihenTreffer = befund.treffer.find(
+        (t) =>
+          /tv|show|serie|season/i.test(t.typ) &&
+          titelKern(t.titel).length >= 4 &&
+          titelKern(auftrag.titel).startsWith(titelKern(t.titel)) &&
+          titelKern(t.titel) !== titelKern(auftrag.titel),
+      )
+      const nurTypStreitig =
+        nurAehnlich &&
+        befund.treffer.length === 1 &&
+        titelKern(befund.treffer[0].titel) === titelKern(auftrag.titel) &&
+        /movie|film/i.test(befund.treffer[0].typ)
+      hinweisKasten(
+        auftrag.titel,
+        folgen,
+        ...begriffZeile,
+        nurAehnlich
+          ? kastenZeile('ak-such-warn', `Nicht dieser Titel — gefunden: ${befund.treffer.map((t) => t.titel).slice(0, 2).join(', ')}`)
+          : kastenZeile('ak-such-warn', 'Kein Treffer bei Prime'),
+        kastenZeile(
+          'ak-such-hinweis',
+          /*
+            **„Anderes Werk" stimmt nicht, wenn die Reihe danebensteht.**
+
+            Daniel am 31.08.2026 an „Two Car: Racing Sidecar": Die Karte heißt
+            bei Prime schlicht „Two Car" — derselbe Anime, nur ohne Untertitel.
+            Der Wortvergleich verlangt aber **alle** Auftragswörter in der
+            Karte, und „racing sidecar" fehlt dort; ein Präfix-Treffer wäre zu
+            riskant, weil er „Sword Art Online" auf „… Alicization" treffen
+            ließe.
+
+            Der Kasten bietet den richtigen Weg trotzdem an — „Zur Reihe
+            springen" —, sagte darüber aber „Anderes Werk". Zwei Zeilen, die
+            einander widersprechen. Steht ein Reihen-Treffer bereit, sagt die
+            Zeile jetzt, was Sache ist.
+          */
+          nurAehnlich
+            ? reihenTreffer
+              ? 'Prime führt nur den Reihennamen — der Sprung unten führt hin'
+              : 'Anderes Werk — gehört zu einem eigenen Eintrag'
+            : gefunden.echte
+              ? `${gefunden.echte} Treffer gelesen, keiner passt`
+              : `${gefunden.gesehen} Karten gelesen, alle Empfehlungen`,
+        ),
+        /**
+         * **Auch ein „ähnlicher" Befund bekommt die Ankreuz-Felder.**
+         *
+         * Death Note: Relight (09.09.2026) hat zwei Kauftitel mit eigenen Kennungen, die zusammen unser
+         * Eintrag sind; der Kasten bot nur „Anderes Werk" an. Seit 31.10.2026 sind alle angehakt und
+         * Daniel nimmt ab, was fremd ist („Sword Art Online" gegen „… Alicization").
+         */
+        ...(nurAehnlich ? auswahlGruppe(auftrag, { treffer: befund.treffer }) : []),
+        /*
+          **Ein Titel mit Zusatz findet oft nichts, der Haupttitel schon.**
+
+          `Free! -Dive to the Future-` liefert bei Prime null Treffer, `Free!`
+          findet die Serie auf Anhieb; dasselbe bei `Doukyuusei -Classmates-`
+          gegen `Doukyuusei` (Daniel, 27.08.2026, beide mit Bild). Die Zusätze
+          stammen aus unserem Bestand — Prime führt sie nicht.
+
+          Angeboten wird die Kurzform nur, wenn sie sich vom Begriff
+          unterscheidet und noch etwas übrig bleibt. Gesucht wird sie nicht von
+          selbst: Ein zweiter Seitenaufruf ohne Not ist keiner.
+        */
+        /*
+          **Amazon findet je nach Schreibweise etwas anderes.**
+
+          „High School of the Dead" liefert nichts, „HighSchool of the Dead"
+          findet die Serie auf Platz eins (Daniel, 27.08.2026, mit beiden
+          Bildern). Welche Schreibweise trifft, ist von außen nicht zu wissen —
+          also wird die andere angeboten, statt sie zu erraten.
+        */
+        /*
+          **Die englische Schreibweise als zweiter Versuch.**
+
+          Bis 4.1.0 stand hier „Anders schreiben" mit einer aus dem Begriff
+          zusammengezogenen Variante („SailorMoon" statt „Sailor Moon") — ein
+          Rateversuch. Daniel am 31.08.2026: „optional soll ein button angezeigt
+          werden der die englische schreibweise hat (ersetzt ‚anders
+          schreiben')."
+
+          Der englische Titel steht im Bestand und wird vom Listengenerator als
+          `suchbegriffEn` beigelegt, ebenfalls ohne Gattungswörter. Er ist die
+          bessere Zweitsuche: Prime führt manche Titel nur englisch.
+
+          Die zusammengezogene Variante bleibt als dritter Weg — sie hat bei
+          „Horimiya" wirklich getragen —, steht aber hinter dem Englischen.
+        */
+        /*
+          **Der deutsche Titel gehört an die erste Stelle.**
+
+          Daniel am 31.08.2026 vor „Tenjo Tenge OVA": Die Suche lief unter
+          „Tenjho Tenge: The Ultimate Fight", und der Kasten bot „Englisch
+          suchen", „Anders schreiben" und „Kürzer suchen" an — **keiner der drei
+          trug den deutschen Titel**, obwohl er im Auftrag steht.
+
+          Die Vorschläge wurden alle aus dem **laufenden** Suchbegriff gebaut,
+          nicht aus dem Bestand. Der deutsche Titel ist aber der, unter dem Prime
+          einen Titel führt, wenn er ihn führt — er steht deshalb zuerst.
+        */
+        ...(!istGemeldet(auftrag.suchUrl) && auftragDe && auftragDe !== jetzigerBegriff
+          ? [
+              kastenKnopf(`Deutsch suchen: ${auftragDe}`, () => weitersuchen(auftrag, auftragDe)),
+            ]
+          : []),
+        ...(!istGemeldet(auftrag.suchUrl) && auftragEn && auftragEn !== jetzigerBegriff
+          ? [
+              kastenKnopf(`Englisch suchen: ${auftragEn}`, () => weitersuchen(auftrag, auftragEn)),
+            ]
+          : []),
+        /*
+          **„Anders schreiben" ist raus**.
+
+          Der Knopf bot den Begriff mit zusammengezogenen ersten zwei Wörtern an
+          — „DreiKleine Geister" statt „Drei kleine Geister". Bei „Horimiya" hat
+          das einmal getragen, sonst schlägt es Schreibweisen vor, die es nicht
+          gibt. Deutsch und Englisch stehen darüber, „Kürzer suchen" darunter;
+          beide kommen aus dem Bestand statt aus einer Regel.
+        */
+        ...(!istGemeldet(auftrag.suchUrl) && kurzform && kurzform !== jetzigerBegriff
+          ? [kastenKnopf(`Kürzer suchen: ${kurzform}`, () => weitersuchen(auftrag, kurzform))]
+          : []),
+        ...(!istGemeldet(auftrag.suchUrl) && reihenTreffer && ohneParameter(reihenTreffer.url)
+          ? [
+              kastenKnopf(
+                `Zur Reihe springen: ${reihenTreffer.titel}`,
+                () => {
+                  location.href = ohneParameter(reihenTreffer.url)
+                },
+                kennungAus(reihenTreffer.url),
+              ),
+            ]
+          : []),
+        ...(!istGemeldet(auftrag.suchUrl) && nurTypStreitig
+          ? [
+              kastenKnopf(
+                `Als Sammelfassung öffnen: ${befund.treffer[0].titel}`,
+                () => {
+                  const ziel = ohneParameter(befund.treffer[0].url)
+                  if (ziel) location.href = ziel
+                },
+                kennungAus(befund.treffer[0].url),
+              ),
+            ]
+          : []),
+        /*
+          **Ist die Adresse schon gemeldet, gibt es nichts mehr zu melden.**
+
+          Daniel am 28.08.2026: „gemeldet nicht bei prime -> eintrag
+          verschwindet aus liste korrekt, aber button nicht bei prime melden
+          wird wieder klickbar." Der Knopf wird nach der Meldung gesperrt — nur
+          baut der Takt den Kasten kurz darauf neu auf, und der neue Knopf
+          kennt die Sperre nicht. Ein zweiter Klick haette dieselbe Meldung
+          ein zweites Mal geschickt.
+
+          Gefragt wird deshalb der Briefkasten, nicht der alte Knopf: Liegt die
+          Suchadresse dort, steht an seiner Stelle die Bestaetigung.
+        */
+        istGemeldet(auftrag.suchUrl)
+          ? kastenZeile('ak-such-fertig', 'gemeldet ✓')
+          : kastenKnopf('Nicht bei Prime — melden', (k) => nichtBeiPrimeMelden(auftrag, befund, k, zeichnen)),
+      )
+    }
+
+    zeichnen()
+    setTimeout(zeichnen, 1500)
+    return true
+  }
+
+  /** Ein Schalter der Liste zeigt „an" wie die anderen (grün, `ak-selbst-an`) und sagt es mit `aria-pressed`. */
+  function umschalterZeigen(knopf, an) {
+    knopf.classList.toggle('ak-selbst-an', an)
+    knopf.setAttribute('aria-pressed', String(an))
+  }
+
+  /** Eine gewählte Karte als Zeile der Prüfliste: Klick öffnet ihre Titelseite, dort meldet der Knopf wie bei jedem Titel. */
+  function auswahlZeileBauen(z) {
+    const zeile = document.createElement('div')
+    zeile.className = 'ak-zeile ak-suchzeile'
+    if (z.gemeldet) zeile.classList.add('ak-abgehakt')
+    const verweis = document.createElement('a')
+    verweis.className = 'ak-titel'
+    verweis.href = `https://www.amazon.de/gp/video/detail/${z.kennung}`
+    verweis.textContent = `${z.titel} · ${z.kennung}`
+    verweis.addEventListener('click', () => suchauftragMerken({ ...auswahlKopf(z.suchUrl), suchUrl: z.suchUrl, zielAsin: z.kennung }))
+    zeile.appendChild(verweis)
+    zeile.style.cursor = 'pointer'
+    zeile.addEventListener('click', (ev) => {
+      if (!ev.target.closest('a')) verweis.click()
+    })
+    return zeile
+  }
+
+  /** Der Abschnitt „Gewählte Treffer" der Prüfliste, offene zuerst. */
+  function auswahlAbschnitt(inhalt) {
+    const zeilen = auswahlZeilen().sort((a, b) => Number(a.gemeldet) - Number(b.gemeldet))
+    if (!zeilen.length) return
+    const trenner = document.createElement('div')
+    trenner.className = 'ak-abschnitt'
+    trenner.textContent = globalThis.akPrimeSuchUeberschrift('Gewählte Treffer', zeilen.filter((z) => !z.gemeldet).length, zeilen.length)
+    trenner.title = 'Karten, die du auf einer Suchseite gewählt hast. „▶ alle durchgehen“ meldet sie wie jeden Titel.'
+    inhalt.appendChild(trenner)
+    for (const z of zeilen) inhalt.appendChild(auswahlZeileBauen(z))
+  }
+
+  /** Die Kennung einer Karte (ASIN oder gti) aus ihrer Adresse. */
+  function karteKennung(url) {
+    return /\/(?:dp|detail)\/([A-Z0-9]{10,32}|amzn1\.dv\.gti\.[a-z0-9-]+)/i.exec(ohneParameter(url) ?? '')?.[1] ?? null
+  }
+
+  /**
+   * **Der Suchauftrag ist nur eine Auswahl (20.11.2026).** Daniel kreuzt an, welche Karten zum Titel gehören;
+   * jede wird beim Worker gespeichert und steht danach als eigene Zeile in der Prüfliste. Gemeldet wird erst auf
+   * der Titelseite der Karte, nie hier.
+   */
+  function auswahlGruppe(auftrag, gefunden) {
+    const karten = globalThis.akPrimeAuswahlKarten(gefunden.treffer, karteKennung)
+    if (!karten.length) return []
+    return [
+      globalThis.akPrimeAuswahlGruppe({
+        karten,
+        gewaehlt: erwartungZu(auftrag.suchUrl),
+        zeile: kastenZeile,
+        auswahl: kastenAuswahl,
+        knopf: kastenKnopf,
+        speichern: (kennungen) => auswahlSpeichern(auftrag, kennungen),
+      }),
+    ]
+  }
+
+  /**
+   * Titelseite eines Suchauftrags ohne Auswahl: „Weitere Versionen verfügbar" (4.32.2) als Auswahl derselben Gruppe.
+   * Die Suche zeigt nicht alle Fassungen (Fischen Impossible: die Uncut-Fassung fehlte); ohne Suchadresse oder Abschnitt nichts.
+   */
+  function fassungenAuswahl(auftrag) {
+    if (!auftrag.suchUrl) return []
+    const treffer = globalThis.akPrimeKarten(document, asin(), seitenTitel() || auftrag.titel, abos(), zugangsart())
+    return treffer.length ? auswahlGruppe(auftrag, { treffer }) : []
+  }
+
+  /** Auswahl zum Worker; Titel und Folgenzahl merkt sich die Erweiterung, falls der Bau die Suche später abräumt. */
+  async function auswahlSpeichern(auftrag, kennungen) {
+    const ok = await erwartungMelden(auftrag.suchUrl, kennungen)
+    if (ok) {
+      /* `eigen` überbrückt die zwei Stunden, die der Briefkasten die alte Antwort hält (`akPrimeErwartungZu`); leer = zurückgenommen. */
+      auswahlMerk = { ...auswahlMerk, [auftrag.suchUrl]: { titel: auftrag.titel ?? null, folgen: auftrag.folgen ?? null, eigen: kennungen, am: Date.now() } }
+      await globalThis.akKontext.schreiben({ primeAuswahlKopf: auswahlMerk })
+    }
+    if (ok) uebersichtZeichnen()
+    return ok
+  }
+
+  /** Eine genaue oder ähnliche Trefferliste: Auswahl der Karten und der Weg „nicht bei Prime". */
+  function genauZeigen(auftrag, zeichnen, befund, gefunden, begriffZeile, folgen) {
+    hinweisKasten(
+      auftrag.titel,
+      folgen,
+      ...begriffZeile,
+      ...auswahlGruppe(auftrag, { treffer: befund.namensgleich ?? befund.treffer }),
+      /* Auch eine gefundene Karte kann die falsche sein (31.08.2026, „Ronja Räubertochter"); gemeldet wird unter der Suchadresse. */
+      istGemeldet(auftrag.suchUrl)
+        ? kastenZeile('ak-such-fertig', 'gemeldet ✓')
+        : kastenKnopf('Nicht bei Prime — melden', (k) => nichtBeiPrimeMelden(auftrag, befund, k, zeichnen)),
+    )
+  }
+
+  /**
+   * **Auf der Titelseite muss stehen, unter welchem Titel gemeldet wird.**
+   *
+   * Der Suchauftrag lässt eine fremde Adresse als unseren Titel melden — das
+   * ist der ganze Zweck. Genau darin liegt aber auch die Gefahr: Eine Suche
+   * liefert nicht immer das gesuchte Werk. Daniel am 27.08.2026 an „Cowboy
+   * Bebop": Prime führt die Serie nicht, nur den Film. Wer dort meldet,
+   * meldet die Tonspur des Films als die der Serie.
+   *
+   * Deshalb steht auf der Titelseite dasselbe Kästchen wie auf der Suchseite,
+   * mit der erwarteten Folgenzahl. Sie ist das Merkmal, an dem sich beides
+   * unterscheidet — 26 gegen 1. Entschieden wird von Hand; die Erweiterung
+   * kann diese Frage nicht beantworten, aber sie kann sie stellen.
+   */
+  /*
+    **`teilBereich` gibt es hier nicht mehr (15.09.2026, Umbau Phase 2).** Der
+    Ausschnitt einer durchlaufenden Prime-Liste (Captain Tsubasa 2018: 91 Folgen,
+    53–91 sind „Die Junioren") wurde von Knöpfen gesetzt, die 4.0.16 entfernt
+    hat; seitdem blieb die Variable immer `null`. Zugeordnet wird im Bau über die
+    Rohfolgen oder per Handbeleg mit `teilBereich` in `data/dub-confirmed.yaml`.
+  */
+  function zeigeAuftragshinweis() {
+    /*
+      **Nach `listenId`, nicht davor.** Diese Funktion braucht den fertigen
+      Eintrag; ein Aufruf weiter oben läse `listenId` vor seinem `let` und
+      würde werfen statt `undefined` zu liefern — derselbe Fehler, der am
+      25.08.2026 den Dialog auf jeder Seite ohne Kennung tötete.
+    */
+    if (!eintrag?.ausSuche) return false
+    const auftrag = suchauftrag()
+    if (!auftrag) return false
+    /*
+      **Nur auf der Seite, zu der der Auftrag gehört.** Ein Auftrag gilt zehn
+      Minuten; ohne diese Prüfung erschien der Hinweis in dieser Zeit überall,
+      auch im Player einer ganz anderen Serie.
+    */
+    /*
+      **Eine fremde Kennung blendet den Kasten nicht mehr aus — sie warnt.**
+
+      Bis 3.84 verschwand der Hinweis, sobald die Seite eine andere Kennung trug
+      als die Karte, auf die geklickt wurde. Gedacht war das gegen den Fall, dass
+      der Auftrag zehn Minuten lang überall aufpoppt.
+
+      Am 28.08.2026 hat sich die Kehrseite gezeigt: Daniel klickte in der Suche
+      auf ein **zweites** Ergebnis, weil das erste der falsche Titel war — und
+      genau dort war der Kasten weg. Der Melde-Knopf blieb. Damit war die einzige
+      Stelle verschwunden, die die Zuordnung prüft, während die Stelle blieb, die
+      meldet. Das ist die falsche Richtung herum.
+
+      Der Kasten bleibt jetzt und sagt, dass diese Seite nicht die angeklickte
+      ist. Der Player bleibt ausgenommen — dort gehört kein Hinweis hin.
+    */
+    if (auftrag.zielAsin) reiheMerken([auftrag.zielAsin])
+    const andereSeite = Boolean(auftrag.zielAsin && !zurReihe(auftrag.zielAsin, asin()))
+    /*
+      **Eine andere Ausgabe ist etwas anderes als ein fremdes Werk.**
+
+      Der Absatz darüber hält den Kasten bewusst offen, wenn die Kennung
+      abweicht — Daniel klickt in derselben Suche auf ein zweites Ergebnis, und
+      dort wird der Hinweis gebraucht.
+
+      Am 30.08.2026 zeigte sich die andere Seite davon: Auf einer
+      Pokémon-Titelseite stand der Kasten für „One Piece Film: Strong World".
+      Der Auftrag gilt zehn Minuten, und Daniel war längst weitergezogen.
+
+      Die Trennlinie ist der **Name**. Trägt der Seitentitel den Auftragstitel
+      (oder umgekehrt), ist es dieselbe Sache in einer anderen Ausgabe — dann
+      warnt der Kasten. Haben beide nichts gemeinsam, ist es ein fremdes Werk,
+      und der Auftrag hat hier nichts zu suchen (Suchbegriffe zählen als Name mit: Prime führt Serien oft englisch).
+    */
+    if (andereSeite || !auftrag.zielAsin) {
+      try {
+        const namen = [auftrag.titel, ...['suchbegriff', 'suchbegriffEn'].map((k) => suchliste[auftrag.suchUrl]?.[k])].map((n) => titelKern(n ?? '')).filter(Boolean)
+        const b = titelKern(seitenTitel() ?? '')
+        if (b && namen.length && namen.every((a) => !a.includes(b) && !b.includes(a))) return false
+      } catch {
+        /* Ohne Titel bleibt es beim bisherigen Verhalten: warnen statt ausblenden. */
+      }
+    }
+    if (imPlayer()) return false
+    /*
+      **Deutlich mehr Folgen als erwartet heißt: Die Seite bündelt.**
+
+      Vorgeschlagen werden die **letzten** Folgen der Liste, weil Arcs
+      chronologisch angehängt werden — bei Captain Tsubasa liegen die 39
+      Junioren-Folgen hinter den 52 der ersten Staffel. Bestätigt wird die
+      Annahme von Daniel, nicht von der Zahl allein.
+    */
+    /*
+      **Die Gesamtzahl der Seite zählt, nicht die schon geladene.**
+
+      Prime lädt in Abschnitten zu 24 Folgen. Verglichen mit den geladenen kam
+      das Angebot deshalb nie: 24 ist nicht mehr als die 39 erwarteten, obwohl
+      die Seite oben „91 Folgen" schreibt.
+
+      `gesehen.gesamt` ist genau diese Zahl. Fehlt sie, bleibt die geladene als
+      Rückfall — dann ist die Seite noch nicht weit genug, und ein Angebot wäre
+      ohnehin geraten.
+    */
+    let hier = 0
+    try {
+      hier = globalThis.akPrimeFolgenStandFrisch(gesehen, location) ? gesehen?.gesamt || geladeneFolgen() : 0
+    } catch {
+      hier = 0
+    }
+    /*
+      **Welcher Teil gemeint ist, weiß die Seite nicht — also werden beide angeboten.**
+
+      Bis 3.77 stand hier nur das hintere Fenster, begründet damit, dass Arcs
+      chronologisch angehängt werden. Das galt für den Auftrag, an dem es gebaut
+      wurde: „Captain Tsubasa — Junior Youth Arc" mit 39 Folgen liegt bei Prime
+      wirklich hinter den 52 der ersten Staffel.
+
+      Für den Auftrag „Captain Tsubasa (2018)" mit 52 Folgen ist genau dieselbe
+      Seite umgekehrt zu lesen — gemeint sind die **ersten** 52 (Daniel,
+      28.08.2026). Dieselbe Zahl, dieselbe Seite, zwei richtige Antworten; welche
+      gilt, entscheidet der Auftrag, und der steht nicht auf der Seite.
+
+      Beide Fenster werden berechnet und stehen im Diagnosebericht — als
+      Knöpfe gab es sie bis 4.0.16, seitdem ordnet der Bau über die Folgentitel
+      zu. Geraten wird weiterhin nichts.
+    */
+    const buendel =
+      auftrag.folgen && hier > auftrag.folgen
+        ? [
+            { von: 1, bis: auftrag.folgen },
+            { von: hier - auftrag.folgen + 1, bis: hier },
+          ]
+        : null
+    /*
+      **Die offene Staffel muss die gesuchte sein.**
+
+      Der Sprung landet auf der Serienseite, und die zeigt Staffel 1. Wer dort
+      meldet, meldet die erste Staffel für einen Auftrag, der die zweite meint —
+      genau so geschehen bei „Golden Kamuy 2" (Daniel, 27.08.2026, mit Bild).
+
+      Der Knopf verschwindet dann, statt eine falsche Meldung anzubieten; die
+      Zeile darüber sagt, was zu tun ist. Sobald Daniel die richtige Staffel
+      wählt, ist er wieder da — der Takt zeichnet ohnehin neu.
+    */
+    const gesuchteStaffel = staffelImTitel(auftrag.titel)
+    let offeneStaffel = null
+    try {
+      offeneStaffel = staffelNummer()
+    } catch {
+      offeneStaffel = null
+    }
+    /*
+      Die Prüfung gilt in beide Richtungen. „Goblin Slayer" ohne Zusatz ist bei
+      uns Staffel 1 mit 12 Folgen; der Sprung landete auf Staffel 2, die
+      ebenfalls 12 Folgen hat, und der Knopf bot an, sie zu melden (Daniel,
+      27.08.2026). Eine Fassung, die nur „ab Staffel 2" prüft, hätte das
+      durchgelassen.
+    */
+    /*
+      **Eine fehlende Staffelangabe ist keine Eins.**
+
+      `staffelImTitel()` gibt 1 zurück, wenn im Titel keine Nummer steht — als
+      **Standardwert**, nicht als Feststellung. Die Warnung behandelte ihn wie
+      eine: Bei „Tokyo Ghoul:re" (das ist Staffel 3, trägt die Zahl aber nirgends)
+      stand auf der Staffel-3-Seite „Hier steht Staffel 3 — gesucht ist Staffel 1",
+      obwohl alle Staffeln längst gemeldet waren.
+
+      Gewarnt wird deshalb nur, wenn der Auftragstitel eine Staffel wirklich
+      **nennt**. Der Fall, für den die Warnung gebaut wurde, bleibt gedeckt:
+      „Goblin Slayer" gegen Staffel 2 fiel darunter, weil dort die Seite die
+      Nummer trägt — und „Call of the Night: Season 2" nennt sie im Auftrag.
+    */
+    /* Zusammengesetzt statt als Literal: Ein Regex mit Escapes überlebt keinen Patch. */
+    const NENNT_STAFFEL = new RegExp(
+      [
+        '\\b(?:staffel|season|teil|part|cour|plate)\\s*\\d+\\b',
+        '\\b\\d+(?:st|nd|rd|th)?\\s*(?:staffel|season)\\b',
+        '\\b(?:second|zweite|third|dritte|fourth|vierte|fifth)\\b',
+        '\\s[2-9]\\s*$',
+      ].join('|'),
+      'i',
+    )
+    const auftragNenntStaffel = NENNT_STAFFEL.test(auftrag.titel ?? '')
+    const falscheStaffel =
+      auftragNenntStaffel && Number.isFinite(offeneStaffel) && offeneStaffel !== gesuchteStaffel
+    /*
+      **Der Knopf entsteht rund 950 Zeilen weiter unten — vorher wirft jeder
+      Zugriff.**
+
+      `const knopf = document.createElement('button')` steht im selben Scope, und
+      `const` hebt den Namen hoch, aber nicht den Wert. `zeigeAuftragshinweis()`
+      läuft beim Seitenaufbau, also regelmäßig davor:
+
+          Uncaught (in promise) ReferenceError:
+          Cannot access 'knopf' before initialization
+          amazon.js:2398 (zeigeAuftragshinweis)
+
+      Daniel hat es am 28.08.2026 in der Fehlerliste der Erweiterung gefunden —
+      zusammen mit der Meldung, die Erweiterung friere den Rechner ein. Beides
+      gehört zusammen: Der Fehler entsteht in einem `await`-Zweig, wird als
+      abgelehnte Zusage geschluckt und wiederholt sich bei jedem Takt. Chrome
+      hält zu jeder davon einen Stapelauszug fest.
+
+      **Das ist derselbe Fehler wie bei `listenId` am 25.08.2026**, und dieselbe
+      Lehre gilt: Ein `let` oder `const` weiter unten liefert kein `undefined`,
+      es wirft. Ein `typeof` hilft hier nicht — auch das wirft in der toten Zone.
+    */
+    if (falscheStaffel) {
+      try {
+        knopf.style.display = 'none'
+      } catch {
+        /* Der Knopf existiert noch nicht; er wird beim Aufbau ohnehin gezeichnet. */
+      }
+    }
+    const teilZeilen = []
+    if (falscheStaffel) {
+      teilZeilen.push(
+        kastenZeile('ak-such-warn', `Hier steht Staffel ${offeneStaffel} — gesucht ist Staffel ${gesuchteStaffel}`),
+        kastenZeile('ak-such-hinweis', 'Oben die richtige Staffel wählen, dann melden'),
+      )
+    }
+    if (buendel) {
+      /*
+        **Zuordnen ist Sache des Baus, nicht Daniels.**
+
+        Hier standen bis 4.0.16 Knöpfe „Als Folgen 1–12 melden" — Daniel sollte
+        die Folgentitel vergleichen und den Bereich wählen. Sein Einwand vom
+        30.08.2026 trifft: „wozu muss ich 1-12 überhaupt melden wenn du die 24
+        bereits gemeldet und im katalog hast, du hättest die verlinkung selbst
+        machen und den eintrag aus der prüfliste nehmen können."
+
+        Er hat recht, und es steht so schon in CLAUDE.md: Seit 3.77 trägt jede
+        Meldung ihre Folgen einzeln mit — Nummer, Titel, Datum, Laufzeit —, und
+        `pipeline/fetch-rohfolgen.ts` legt sie über TMDBs Folgentitel auf unsere
+        Zählung. „Sammeln und zuordnen sind zwei Arbeiten, und nur die erste
+        passiert im Browser."
+
+        Die Knöpfe waren außerdem eine Sackgasse: Sie setzten nur den Bereich
+        und meldeten nichts; der Melde-Knopf daneben stand auf „✓ alles
+        gemeldet" und war gesperrt.
+
+        Was bleibt, ist die Auskunft — sie erklärt, warum hier mehr Folgen
+        stehen als erwartet.
+      */
+      teilZeilen.push(
+        kastenZeile('ak-such-hinweis', `${hier} Folgen hier, ${auftrag.folgen} erwartet — Prime bündelt mehrere Teile`),
+        kastenZeile('ak-such-gut', 'Alles melden genügt; welche Folgen zu diesem Titel gehören, entscheidet der Bau über die Folgentitel'),
+      )
+    } else if (auftrag.folgen && hier && hier < auftrag.folgen) {
+      /*
+        **Weniger Folgen heißt: Prime teilt, wo wir zusammenfassen.**
+
+        „Chibi Maruko-chan" führt Prime als Staffel 1 mit 52 Folgen, unser Bestand
+        die Reihe mit 142 (Daniel, 28.08.2026, mit Bild). Gemeldet wird trotzdem —
+        was hier steht, ist wahr, es ist nur ein Teil. Welcher, entscheidet der Bau
+        über die Folgentitel.
+      */
+      teilZeilen.push(
+        kastenZeile('ak-such-hinweis', `${hier} Folgen hier, ${auftrag.folgen} erwartet — die Reihe ist aufgeteilt, melden ist richtig`),
+      )
+    }
+    /*
+      **Gleicher Name, anderes Jahrzehnt — dann ist es ein anderes Werk.**
+
+      „Elysium" steht bei uns als koreanischer Mecha-Film von 2003 (AniList
+      2941). Die Prime-Suche führt auf den Hollywood-Film mit Matt Damon von
+      2013, und der Kasten bot an, den zu melden. Titel, Typ und Folgenzahl stimmen
+      dort alle überein — nur das Jahr nicht.
+
+      Ein Jahr allein widerlegt noch nichts: Zwischen japanischer
+      Erstausstrahlung und deutscher Veröffentlichung liegen regelmäßig ein, zwei
+      Jahre, und Prime nennt oft das Datum der eigenen Fassung. Der zweite
+      Elysium-Treffer (2005 bei Prime, 2003 bei uns) ist genau so ein Fall und
+      muss durchgehen. Ab **fünf** Jahren Abstand ist es keine Fassung mehr,
+      sondern ein anderer Film.
+
+      Gemeldet wird trotzdem nicht verhindert — Daniel sieht die Seite, wir
+      nicht. Der Kasten sagt beide Jahreszahlen, und der AniList-Verweis
+      daneben klärt den Rest.
+    */
+    const jahrZeilen = []
+    if (Number.isFinite(auftrag.jahr)) {
+      /*
+        Das Jahr steht schon da: Der Mitleser liest `releaseYear` aus dem
+        Hydration-Block und schickt es als `seite.jahr` mit. Kein zweiter Parse,
+        keine neue Messung — genau die Sorte Arbeit, die heute schon einmal einen
+        Rechner lahmgelegt hat.
+      */
+      /*
+        In try, nicht mit `?.`: Ist der Name im Geltungsbereich gar nicht
+        angelegt, wirft auch die optionale Kette — dieselbe tote Zone, die heute
+        schon `knopf` betroffen hat.
+      */
+      let seitenJahr = null
+      try {
+        seitenJahr = Number.isFinite(gesehen?.seite?.jahr) ? gesehen.seite.jahr : null
+      } catch {
+        seitenJahr = null
+      }
+      /* Eine Seite aus der von Daniel bestätigten Auswahl warnt nicht: Er hat sie selbst zugeordnet (Ribbit, 31.10.2026). */
+      const bestaetigt = (erwartungZu(auftrag.suchUrl) ?? []).includes(String(asin()))
+      if (Number.isFinite(seitenJahr) && Math.abs(seitenJahr - auftrag.jahr) >= 5 && !bestaetigt) {
+        jahrZeilen.push(
+          kastenZeile(
+            'ak-such-warn',
+            `Diese Seite ist von ${seitenJahr}, unser Eintrag von ${auftrag.jahr} — vermutlich ein anderes Werk`,
+          ),
+        )
+      }
+    }
+
+    /*
+      **Nach einem Staffelwechsel schweigt der Kasten über die Seite.**
+
+      Daniel am 30.08.2026 an „Pokémon — Sonne & Mond": Er wechselte im
+      Auswahlfeld auf „Ultra-Legenden" (Adresse `s2204`, Seite zeigt 2020, 14
+      Folgen) — im Kasten stand weiter „Diese Seite ist von 1999" und „Hier
+      steht Staffel 201".
+
+      Der Grund steht seit dem 24.08.2026 in CLAUDE.md: **Amazon tauscht beim
+      Wechsel über das Auswahlfeld den Quelltext nicht aus.** Jahr und
+      Staffelnummer stammen von dort und gehören danach zur alten Staffel.
+
+      Eine falsche Auskunft ist schlechter als keine — die beiden Zeilen fallen
+      weg, bis die Seite frisch geladen ist. Was der Kasten sonst sagt (Titel,
+      erwartete Folgenzahl, Zugangsart), hängt am Auftrag und bleibt richtig.
+    */
+    const seitenAngabenGelten = !quelltextVeraltet()
+
+    hinweisKasten(
+      auftrag.titel,
+      auftrag.folgen ? `${auftrag.folgen} ${auftrag.folgen === 1 ? 'Folge' : 'Folgen'} erwartet` : '',
+      ...(andereSeite
+        ? [kastenZeile('ak-such-warn', 'Andere Seite als der Treffer aus der Suche — vor dem Melden prüfen')]
+        : []),
+      ...(seitenAngabenGelten
+        ? [...jahrZeilen, ...teilZeilen]
+        /*
+          **„Titel gewechselt", nicht „Staffel gewechselt".** Der Wächter
+          darüber schlägt seit dem 09.09.2026 nur noch an, wenn der Quelltext
+          zu einem anderen **Werk** gehört — beim Staffelwechsel liefert er
+          bauartbedingt false (siehe `quelltextVeraltet()`). Die alte
+          Beschriftung nannte eine Ursache, die es nie war.
+        */
+        : [kastenZeile('ak-such-hinweis', 'Titel gewechselt — für Jahr und Staffelnummer die Seite neu laden')]),
+      /*
+        **Dieselbe Checkliste wie auf der Trefferliste — hier ohne Ankreuzen.**
+
+        Wer zwei Ausgaben bestätigt hat, arbeitet sie nacheinander ab und braucht
+        auf jeder Seite dasselbe Bild: welche gehören dazu, welche sind schon
+        gemeldet, und wie komme ich zur nächsten.
+
+        Vorher stand hier ein Knopf „nochmal ansehen", der auf den **anderen**
+        Titel führte — verwirrend, weil er wie eine Handlung für diese Seite
+        aussah. Jetzt: Die aktuelle Seite ist markiert und
+        trägt keinen Sprung, die anderen tragen ihr „öffnen", und was gemeldet
+        ist, hat ein Häkchen.
+      */
+      ...(() => {
+        try {
+          const a = suchauftrag()
+          /*
+            **Der Briefkasten gewinnt, der Vermerk überbrückt.**
+
+            Auf einer frisch geladenen Titelseite ist `briefkastenErwartungen`
+            beim ersten Zeichnen noch leer; die Checkliste fehlte damit genau
+            dann, wenn sie gebraucht wird — direkt nach dem Sprung von der
+            Suchseite (Daniel, 09.09.2026, mit Bild). Der Vermerk aus dem
+            `sessionStorage` trägt dieselbe Auswahl und ist sofort da.
+          */
+          const suchUrlHier = a?.suchUrl ?? eintrag?.url ?? ''
+          const erwartet = erwartungZu(suchUrlHier) ?? (Array.isArray(a?.erwartet) ? a.erwartet : [])
+          if (!erwartet || !erwartet.length) return fassungenAuswahl({ ...auftrag, suchUrl: suchUrlHier })
+          const hier = asin()
+          reiheMerken(erwartet)
+          const gruppe = document.createElement('div')
+          gruppe.className = 'ak-such-gruppe'
+          for (const k of erwartet) {
+            /* Der Briefkasten weiß es später, diese Sitzung weiß es sofort. */
+            const fertig = globalThis.akPrimeSeiteGemeldet(k, briefkastenSeiten, selbstGemeldeteSeiten)
+            const dieseSeite = zurReihe(k, hier)
+            const zeile = document.createElement('div')
+            zeile.className = 'ak-such-auswahl' + (dieseSeite ? ' ak-such-hier' : '')
+            const stand = document.createElement('span')
+            stand.className = fertig ? 'ak-such-haken' : 'ak-such-offen'
+            stand.textContent = fertig ? '✓' : '○'
+            stand.title = fertig ? 'gemeldet' : 'noch offen'
+            zeile.append(stand, document.createTextNode(' ' + k + (String(k) === String(hier) ? ' — diese Seite' : dieseSeite ? ' — diese Reihe' : '')))
+            /*
+              **Ohne Ankreuzfeld ist die Zeile selbst der Knopf.**
+
+              Auf der Trefferliste braucht jede Zeile ein Ankreuzfeld — dort wird
+              ausgewählt, und ein Klick auf die Zeile würde die Auswahl umwerfen.
+              Hier gibt es nichts auszuwählen: Die Zeile hat genau einen Zweck,
+              und dafür braucht sie keinen eigenen Knopf daneben (Daniel,
+              02.09.2026).
+
+              Auf die Seite, auf der man steht, führt weiterhin nichts.
+            */
+            if (!dieseSeite) {
+              zeile.classList.add('ak-such-klickbar')
+              zeile.title = `${k} öffnen`
+              zeile.addEventListener('click', (e) => {
+                e.preventDefault()
+                /*
+                  **Der Auftrag reist mit — sonst steht die Zielseite ohne da.**
+
+                  Der Sprung auf der Trefferliste merkt ihn seit 4.10.10; dieser
+                  hier war neu und tat es nicht. Wer von einer Ausgabe zur
+                  anderen springt, landete deshalb auf einer Seite, die ihren
+                  Auftrag erst über die Erwartung wiederfinden musste — und
+                  solange der Briefkasten noch nicht geantwortet hatte, gar nicht
+                  (Daniel, 02.09.2026: „über die prüfliste geöffnet" — nur so
+                  ging es).
+                */
+                try {
+                  /*
+                    **Fehlt der Merker, wird er aus dem Eintrag gebaut.** Die
+                    Checkliste steht auch dann da, wenn der Auftrag nur über die
+                    Erwartung gefunden wurde (`eintragFuer()`); ohne diesen Zweig
+                    reiste er von hier aus nicht mit, und die Zielseite fing bei
+                    null an.
+                  */
+                  const a2 =
+                    suchauftrag() ??
+                    (suchUrlHier ? { titel: suchliste[suchUrlHier]?.titel ?? null, suchUrl: suchUrlHier, erwartet } : null)
+                  if (a2?.suchUrl) suchauftragMerken({ ...a2, zielAsin: String(k) })
+                } catch {
+                  /* Ohne Merker geht es über die Erwartung — nur langsamer. */
+                }
+                location.href = `https://www.amazon.de/gp/video/detail/${k}`
+              })
+            }
+            gruppe.appendChild(zeile)
+          }
+          return [gruppe]
+        } catch {
+          return []
+        }
+      })(),
+      /*
+        Hier stand „Zeigt die Seite deutlich weniger, ist es ein anderes Werk" —
+        entfernt am 02.09.2026 auf Daniels Wunsch: „das kann weg. ist klar."
+        Ein Hinweis, der nur wiederholt, was der Leser ohnehin sieht, kostet
+        Platz und Aufmerksamkeit für die Zeilen, die etwas sagen.
+      */
+      /*
+        **„Nicht bei Prime" gehört auch auf die Titelseite.**
+
+        Auf der Suchseite steht der Knopf seit dem 30.08.2026 — dort sieht man,
+        dass kein Treffer passt. Auf der Titelseite fehlte er, und genau dort
+        merkt man es oft erst: „Pinocchio" verlangt 52 Folgen, die geöffnete
+        Seite führt 18 (Daniel, 31.08.2026, mit Bild).
+
+        Kurz stand daneben ein Schalter „ohne Zuordnung", der die Meldung von
+        ihrem Auftrag löste. Er ist wieder weg — Daniel: „warum ohne zuordnung
+        und nicht bei prime beides?? eins von beidem reicht. besser nicht bei
+        prime, weil das funktioniert."
+
+        Der Knopf ist derselbe wie im Treffer-Kasten und meldet unter der
+        Suchadresse; die Notiz nennt, dass die geöffnete Titelseite nicht passt.
+      */
+      ...(istGemeldet(auftrag.suchUrl)
+        ? []
+        : [
+            kastenKnopf('Nicht bei Prime — melden', (k) =>
+              nichtBeiPrimeMelden(auftrag, { art: 'titelseite' }, k),
+            ),
+          ]),
+    )
+    return true
+  }
+  /*
+    **Sofort, nicht am Ende des Aufbaus.** Eine Suchseite trägt keine Kennung,
+    und der Ablauf weiter unten setzt eine voraus — dort angehängt, wurde der
+    Hinweis nie erreicht (gemessen am 27.08.2026, der Übersichts-Knopf kam an,
+    der Kasten nicht). Er hängt von nichts ab außer der Adresse.
+  */
+  /*
+    **Eine Suchseite bleibt eine Suchseite, auch ohne unseren Auftrag.**
+
+    `zeigeSuchhinweis()` sagt nur, ob eine Suche **aus unserer Liste** läuft.
+    Sucht Daniel selbst — Amazons eigenes Feld schickt an `/s?ref=nb_sb_noss…`
+    mit `field-keywords` statt `k` —, war das falsch, und der Melde-Knopf stand
+    wieder auf einer Trefferliste („✕ keine Folgen für diese Staffel",
+    27.08.2026, mit Bild).
+
+    Der Pfad entscheidet, nicht die Parameter: `/s` ist Amazons Suche.
+  */
+  const aufSuchseite = zeigeSuchhinweis() || /^\/s(\/|$)/.test(location.pathname)
+
+  /**
+   * **Dieselbe Frage, aber jetzt statt beim Aufbau.**
+   *
+   * `aufSuchseite` oben entsteht einmal und bleibt es. Prime Video wechselt
+   * ohne Neuladen: Wer aus der Trefferliste auf einen Titel klickt, steht auf
+   * einer Seite, auf der gemeldet werden kann — mit einem Skript, das die Seite
+   * für eine Trefferliste hält und den Melde-Knopf ausblendet.
+   *
+   * Daniel am 30.08.2026: „ich hab den treffer in der suche angeklickt und will
+   * ihn melden, das tool lässt mich nicht."
+   *
+   * Der Pfad allein entscheidet, und zwar zur Zeichenzeit. Der gemerkte Auftrag
+   * gehört nicht in diese Frage: Er gilt zehn Minuten und über Seiten hinweg —
+   * genau deshalb darf er keine Titelseite stumm schalten.
+   */
+  const jetztAufSuchseite = () => /^\/s(\/|$)/.test(location.pathname)
+
+  /**
+   * **Geht diese Seite uns überhaupt etwas an?**
+   *
+   * Das Manifest lässt die Erweiterung auf `amazon.de/*` laufen — also auch auf
+   * jedem Monitor, jeder Kaffeemaschine und jeder Bestellübersicht. Bis 4.12.5
+   * hat sie dort mitgezeichnet: Daniel stand am 05.09.2026 auf der Seite eines
+   * AOC-Bildschirms, und unten rechts sagte der Knopf „✕ nicht abrufbar —
+   * melden", darüber „Prime-Liste veraltet — neu laden". Sein Wort: „dont show
+   * extension on pages that are irrelevant, like this one."
+   *
+   * **Warum die Seite überhaupt so weit kam**, ist der lehrreiche Teil: Die
+   * Filmerkennung fällt auf `hatLaufzeit` zurück, und deren Muster
+   * (`\d+ Std. \d+ Min.`) trifft bei Amazon auch den Lieferzähler —
+   * „Bestellung innerhalb 3 Std. 38 Min." steht auf dem Bild. Eine Heuristik
+   * für Filme, angewandt auf eine Seite, die gar kein Video ist.
+   *
+   * Vier Merkmale, jedes für sich ausreichend, alle vier ohne Kosten:
+   *
+   * 1. **Der Pfad** `/gp/video/…` — dann ist es Prime Video, ohne Zweifel.
+   * 2. **Der Hydration-Block** `dv-web-page-hydration-data`. Das `dv-` ist
+   *    Prime Videos eigener Namensraum; `filmAusSeite()` liest ihn seit 3.82,
+   *    er ist also gemessen und nicht geraten.
+   * 3. **Der Folgen-Reiter.** Eine Serienseite hat ihn, ein Bildschirm nicht.
+   *    Steht ohnehin in `seitenLage()` bereit.
+   * 4. **Ein Auftrag für diese Adresse.** Führt die Prüfliste sie, gehört der
+   *    Kasten hin — auch wenn die Seite gerade nichts hergibt. Sonst
+   *    verschwände die Erweiterung genau dort, wo sie gebraucht wird.
+   *
+   * **`hatLaufzeit` gehört bewusst nicht dazu** — siehe oben, der Lieferzähler.
+   *
+   * Dieselbe Regel gilt seit dem 30.08.2026 für Netflix („Beim Fernsehen ist
+   * die Erweiterung unsichtbar"): Ein Element, das man nicht gesucht hat, ist
+   * im Weg. Sie war nur nie auf Amazon übertragen worden.
+   */
+  function seiteGehtUnsAn() {
+    if (/^\/gp\/video\//.test(location.pathname)) return true
+    if (document.getElementById('dv-web-page-hydration-data')) return true
+    try {
+      if (seitenLage().hatFolgenReiter) return true
+    } catch {
+      /* Ohne Lage entscheiden die übrigen drei Merkmale. */
+    }
+    try {
+      if (!eintragFuer(id)?.unbekannt) return true
+    } catch {
+      /* Ohne Liste kein Auftrag — dann bleibt es bei den Merkmalen der Seite. */
+    }
+    return false
+  }
+
+  // Veränderlich: Das Auswahlfeld wechselt die Staffel ohne Seitenneuladen,
+  // und damit die Kennung — siehe `beiStaffelwechsel()`.
+  let id = asin()
+
+  // --- Die Übersicht: was noch zu prüfen ist --------------------------------
+
+  /**
+   * Der Weg in die Liste, ohne eine Datei zu suchen.
+   *
+   * Daniels Frage vom 23.08.2026: „also du hast eine liste für prime
+   * vorbereitet die ich damit durchgehen soll?" — Die Liste gab es, aber nur
+   * in `extension/offene-amazon.js`, einer Datei, die niemand von Hand liest.
+   * Für Netflix steht sie seit dem 22.08. als aufklappbare Übersicht in der
+   * Erweiterung; hier fehlte sie.
+   *
+   * Absichtlich **vor** dem Ausstieg für unbekannte Titel: Der Knopf soll auch
+   * dann erreichbar sein, wenn die gerade geöffnete Seite nicht auf der Liste
+   * steht — sonst käme man aus einer Sackgasse nicht mehr in die Liste zurück.
+   */
+  let erledigt = {}
+  /**
+   * **Hier oben, nicht bei ihrem Gebrauch — sonst wirft der Seitenaufbau.**
+   *
+   * Der Speicher-Ladepfad ein paar Zeilen weiter unten schreibt diesen Wert,
+   * und er liegt rund 150 Zeilen vor der Stelle, an der der Zähler ihn liest.
+   * Ein `let` hebt den Namen zwar hoch, aber nicht den Wert: Jeder Zugriff
+   * davor wirft, statt `undefined` zu liefern.
+   *
+   * **Das ist in dieser Datei der dritte Fall derselben Art** — nach
+   * `listenId` und `dialog`, beide mit demselben Kommentar versehen.
+   *
+   * `no-use-before-define` als Zusicherung wurde am 27.08.2026 probiert und
+   * wieder verworfen: Die Regel kann einen Zugriff **innerhalb** einer erst
+   * später aufgerufenen Funktion nicht von einem auf Ausführungsebene
+   * unterscheiden und meldet in dieser Datei 25 Stellen, von denen keine
+   * einzige abstürzt. Eine Prüfung, die 25 Fehlalarme liefert, wird
+   * abgeschaltet — dann hätte sie nichts gebracht.
+   *
+   * Gefangen hat diesen Fall der Sandkasten-Durchlauf in
+   * `amazon-uebersicht.test.cjs`: Er lädt die Datei wirklich und stirbt am
+   * Absturz. Das ist die Zusicherung, die trägt — sie hat hier binnen einer
+   * halben Minute rot gemeldet.
+   */
+  let suchErledigt = {}
+
+  /**
+   * **Eine beantwortete Wiedervorlage bleibt beantwortet — über das Neuladen hinweg.**
+   *
+   * Der Riegel kennt sonst kein Ende: Die Liste trägt `erneut`, bis der nächste
+   * Bau sie neu erzeugt, und der Knopf stünde die ganze Zeit offen. Daniel am
+   * 01.09.2026 nach der Meldung: „ich hab geklickt - button bleibt klickbar -
+   * ist was angekommen?" — sie war angekommen, der Knopf sagte es nur nicht.
+   *
+   * **Der erste Anlauf war ein `Set` im Arbeitsspeicher** und überlebte kein
+   * Neuladen; zwei Minuten später stand dieselbe Frage wieder da („soll ich
+   * klicken oder wie wird er zu 'alles gemeldet'?"). Gespeichert wird deshalb
+   * wie alles andere hier: in `chrome.storage.local`.
+   *
+   * Der Eintrag hält den **Grund**, auf den geantwortet wurde. Schreibt der
+   * nächste Bau eine *andere* Wiedervorlage, greift der Merker nicht mehr —
+   * eine neue Frage ist eine neue Frage.
+   */
+  let wiedervorlageBeantwortet = {}
+  /**
+   * Bis der Stand da ist, wird nichts behauptet.
+   *
+   * `speicherLesen` ist asynchron; in den ersten Millisekunden nach dem Laden
+   * ist `erledigt` leer. Der Knopf sah darin einen ungemeldeten Titel und lud
+   * zum Melden ein — Sekunden später sprang er auf „alles gemeldet" zurück.
+   * Wer in diesem Fenster klickt, meldet eine Staffel ein
+   * zweites Mal.
+   */
+  let standGeladen = false
+  /** Das Laden selbst — damit ein Klick darauf warten kann statt zu pollen. */
+  const gelesen = speicherLesen(['amazonErledigt', 'amazonSuche', 'amazonWiedervorlage'])
+  // Synchron oder als Zusage — beides kommt vor, siehe `speicherLesen`.
+  const standFertig = gelesen && typeof gelesen.then === 'function' ? gelesen : Promise.resolve(gelesen)
+  if (gelesen && typeof gelesen.then !== 'function') {
+    erledigt = gelesen.amazonErledigt ?? {}
+    suchErledigt = gelesen.amazonSuche ?? {}
+    wiedervorlageBeantwortet = gelesen.amazonWiedervorlage ?? {}
+    standGeladen = true
+  }
+  standFertig
+    .then((x) => {
+      erledigt = x?.amazonErledigt ?? {}
+      suchErledigt = x?.amazonSuche ?? {}
+      wiedervorlageBeantwortet = x?.amazonWiedervorlage ?? {}
+      standGeladen = true
+      /**
+       * Jetzt erst kann der Weg über den Serientitel greifen — vorher war
+       * `erledigt` leer. Ohne diese Zeile bliebe der Schlüssel auf der fremden
+       * Staffel-ASIN stehen, die beim Seitenaufbau herauskam.
+       */
+      const besser = listenSchluessel(listenId)
+      if (besser !== listenId) {
+        listenId = besser
+        eintrag = liste[listenId] ?? eintrag
+        letzterStand = ''
+      }
+      uebersichtZeichnen()
+      /*
+        Und gleich beim Briefkasten nachfragen, wer wirklich schon gemeldet ist.
+        Der lokale Stand hat den Aufbau nur überbrückt; ab hier gilt der
+        gemeinsame.
+      */
+      void briefkastenHolen(true)
+    })
+    .catch(() => {
+      // Ohne Speicher ist der Stand unbekannt — dann lieber melden lassen als
+      // dauerhaft sperren.
+      standGeladen = true
+      void briefkastenHolen(true)
+    })
+
+  /**
+   * Was ein anderer Tab meldet, kommt hier an.
+   *
+   * Ohne das zeigt dieser Tab weiter „offen" für etwas, das nebenan längst
+   * gemeldet ist — und beim nächsten eigenen Melden wäre sein Stand wieder der
+   * alte. Zusammen mit dem Zusammenführen beim Schreiben ergibt das einen
+   * Stand, den sich alle Tabs teilen.
+   */
+  try {
+    globalThis.akKontext.beiAenderung((aenderungen, bereich) => {
+      if (bereich !== 'local') return
+      if (aenderungen.amazonSuche) suchErledigt = aenderungen.amazonSuche.newValue ?? {}
+      if (!aenderungen.amazonErledigt) return uebersichtZeichnen()
+      erledigt = aenderungen.amazonErledigt.newValue ?? {}
+      /**
+       * Auch der Melde-Knopf, nicht nur die Zahl in der Übersicht.
+       *
+       * Meldet Daniel denselben Titel in einem zweiten Tab, sprang die Zahl
+       * dort sofort — der Knopf erst Sekunden später (Daniel, 25.08.2026:
+       * „der melde button aktualisiert erst nach weiteren ~5sek").
+       *
+       * Der Grund ist `letzterStand`: `zeichnen()` steigt früh aus, wenn sich
+       * an Sprache, Folgenzahl und Vollständigkeit nichts geändert hat — und
+       * eine fremde Meldung ändert daran nichts. Sie ändert nur den Bestand,
+       * und den muss die Signatur nicht kennen; sie muss nur einmal verworfen
+       * werden.
+       */
+      letzterStand = ''
+      uebersichtZeichnen()
+      zeichnen()
+    })
+  } catch {
+    // Erweiterung neu geladen — dann gibt es hier nichts mehr zu hören.
+  }
+
+  /**
+   * Ist dieser Titel **vollständig** abgearbeitet?
+   *
+   * Ein Eintrag im Speicher sieht so aus:
+   *
+   *     "B018YLXXNW": { staffeln: { "1": "🇩🇪" }, gesamt: 5 }
+   *
+   * Erledigt ist er erst, wenn so viele Staffeln gemeldet sind, wie die
+   * Seite nennt. Vorher bleibt die Zeile in der Liste stehen und zeigt den
+   * Fortschritt.
+   */
+  /**
+   * Alle Listeneinträge, die dieselbe Amazon-Serie meinen.
+   *
+   * Bakugan steht bei uns als drei Titel, bei Amazon als **eine** Serie mit
+   * fünfzehn Staffeln; Barbapapa als zwei. Wer alle durchgeht, verteilt seinen
+   * Fortschritt sonst auf mehrere Zeilen, und keine wird je fertig — „12/15",
+   * „2/15", „2/15".
+   *
+   * Verbunden wird über den Serientitel, den Amazon beim Melden liefert. Fehlt
+   * er — bei allem, was vor dem 24.08.2026 gemeldet wurde —, bleibt der Eintrag
+   * für sich; erfunden wird nichts.
+   */
+  function serienGefaehrten(asinEintrag) {
+    const serie = erledigt[asinEintrag]?.serie
+    if (!serie) return [asinEintrag]
+    return Object.keys(erledigt).filter((k) => erledigt[k]?.serie === serie)
+  }
+
+  /** Die gemeldeten Staffeln aller Zeilen derselben Serie, zusammengelegt. */
+  function staffelnDerSerie(asinEintrag) {
+    const zusammen = {}
+    for (const k of serienGefaehrten(asinEintrag)) {
+      Object.assign(zusammen, erledigt[k]?.staffeln ?? {})
+    }
+    return zusammen
+  }
+
+  /** Wie viele Staffeln die Serie insgesamt hat — die größte bekannte Angabe. */
+  /**
+   * Wie viele Staffeln diese Zeile hat.
+   *
+   * **Bewusst nicht über die Serie gebündelt** — das war der erste Versuch und
+   * ein Fehlgriff: Das Maximum über alle Zeilen derselben Serie zieht jede
+   * fehlerhafte Zahl auf alle anderen. Bei „K — Return of Kings" (zwei
+   * Staffeln) stand daraufhin „noch 19 Staffeln" am Knopf.
+   *
+   * Die gemeldeten Staffeln werden weiterhin zusammengelegt — das ist die
+   * Auskunft, um die es Daniel ging. Die Gesamtzahl bleibt bei ihrer Zeile.
+   */
+  function gesamtDerSerie(asinEintrag) {
+    /*
+      Die Staffeln werden über alle Einträge der Serie gesammelt — die Zahl, mit
+      der sie verglichen werden, muss denselben Umfang haben. Sonst entsteht
+      „7/5".
+    */
+    let groesste = 0
+    for (const k of serienGefaehrten(asinEintrag)) {
+      const n = erledigt[k]?.gesamt
+      if (Number.isFinite(n) && n > groesste) groesste = n
+    }
+    /*
+      **Die offene Seite darf eine zu kleine gespeicherte Zahl berichtigen.**
+
+      Ein `gesamt`, das beim Melden aus einem halben Ladezustand entstand,
+      bliebe sonst für immer stehen — und mit ihm ein Titel, der nach einer
+      Meldung als fertig gilt. Bei „Danmachi" war das eine 1 für eine Serie mit
+      fünf Staffeln; der Eintrag verschwand aus der Liste, und Staffel 2 war
+      nicht mehr erreichbar.
+
+      Nur nach oben, und nur für den Eintrag, dessen Seite gerade offen ist:
+      Was hier steht, ist die Auskunft der Seite selbst.
+    */
+    try {
+      if (asinEintrag === listenId) {
+        const jetzt = staffelZahl()
+        if (Number.isFinite(jetzt) && jetzt > groesste) groesste = jetzt
+      }
+    } catch {
+      /* `listenId` noch nicht gesetzt — dann bleibt es beim Gespeicherten. */
+    }
+    return groesste || erledigt[asinEintrag]?.gesamt || 1
+  }
+
+  /**
+   * **Lokal abgehakt, aber beim Worker nie angekommen.**
+   *
+   * Der Briefkasten führt jede Adresse, unter der jemals gemeldet wurde. Kennt
+   * er eine nicht, ist die Arbeit verloren gegangen — der lokale Vermerk gilt
+   * dann nicht, ganz gleich was er sagt.
+   *
+   * Als eigene Funktion, weil dieselbe Regel an drei Stellen gebraucht wird:
+   * `fertig()` hatte sie, die Marke in der Liste bekam sie am 30.08.2026, und
+   * der Melde-Knopf hatte sie nicht. Genau das fiel Daniel auf: „eintrag der
+   * ‚nicht angekommen' ist angeklickt, da steht alles gemeldet, wie soll ich
+   * das erneut melden?" Drei Kopien derselben Regel laufen auseinander; eine
+   * Funktion tut es nicht.
+   *
+   * In `try`, weil `briefkastenAdressen` weiter unten angelegt wird und diese
+   * Funktion beim Seitenaufbau läuft. Vorher gilt: noch keine Auskunft, also
+   * entscheidet der lokale Stand.
+   */
+  /**
+   * **Ein Eintrag mit Wiedervorlage ist nie „alles gemeldet".**
+   *
+   * `tools/extension-offene-amazon.mjs` schreibt seit dem 29.08.2026 ein Feld
+   * `erneut` mit dem Grund, aus dem ein längst gemeldeter Titel noch einmal
+   * angesehen gehört — bei „Golden Kamuy: Final Season" steht dort „9 von 13
+   * deutsch, obwohl Crunchyroll alle führt — derselbe Kanal".
+   *
+   * **Gelesen hat es hier niemand.** Der Kasten zeigte „✓ alles gemeldet", der
+   * Grund stand nirgends, und der Auftrag war damit unerreichbar (Daniel,
+   * 01.09.2026). Derselbe Fehlertyp wie bei `titelId` am 28.08. und bei
+   * `paare` in `melder.js`: Das Feld entsteht, reist mit — und kommt nie an.
+   *
+   * Der lokale Vermerk bleibt stehen; er trägt den Befund von damals.
+   */
+
+  function wiedervorlage(asinEintrag) {
+    try {
+      const grund = String(liste[asinEintrag]?.erneut ?? '') || null
+      if (!grund) return null
+      return wiedervorlageBeantwortet[asinEintrag] === grund ? null : grund
+    } catch {
+      return null
+    }
+  }
+
+  function nichtAngekommen(asinEintrag) {
+    try {
+      const url = liste[asinEintrag]?.url
+      const fehlt = Boolean(url && briefkastenAdressen && !briefkastenAdressen.has(url))
+      /* Nur ein Vermerk nach dem Prüfstand kann „nicht angekommen“ sein; ältere hat der Bau übernommen. */
+      const vermerk = erledigt[asinEintrag]
+      return fehlt && globalThis.akVermerkGilt(vermerk?.zeit ?? vermerk?.datum, globalThis.AK_OFFENE_AMAZON_ERZEUGT)
+    } catch {
+      return false
+    }
+  }
+
+  function fertig(asinEintrag) {
+    /*
+      **Erledigt ist, was der Worker nicht mehr als Ziel führt.**
+
+      Am 14.09.2026 zeigte die Statusanzeige „Amazon 6", der Knopf hier „2
+      Prime-Titel" — beide aus derselben Liste, aber aus zwei Rechnungen. Die
+      Anzeige liest `?stand=1` (Prüfliste minus Meldungen seit ihrer Erzeugung),
+      diese Datei rechnete mit Meldungen aller Zeiten und zwei lokalen Speichern.
+      Daniel: „das sollte doch single source of truth sein und den tatsächlichen
+      zu meldenden stand anzeigen."
+
+      Seitdem gilt hier dieselbe Antwort wie dort: Führt der Worker die Adresse
+      als offenes Ziel, ist der Eintrag offen. Die eigene Meldung dieser Sitzung
+      (`frischGemeldet`) überbrückt nur die Sekunden bis zum nächsten Abruf. Ohne
+      Antwort des Workers bleibt die ältere Rechnung darunter der Rückfall.
+
+      **Auch die Titelmenge folgt dem Worker** (29.10.2026): Am 26.10. zählte der Knopf 32, der Worker 62,
+      weil das Paket (`AK_OFFENE_AMAZON`) nur 39 Adressen kannte und Fehlendes nie auftauchte. Ziele ohne
+      Paket-Eintrag legt `prime-stand-ziele.js` mit Titel und Adresse des Workers an.
+    */
+    const url = liste[asinEintrag]?.url
+    if (standZiele && url) return !standZiele.has(url) || frischGemeldet.has(url) || globalThis.akPrimeBruecke(erledigt[asinEintrag]?.zeit, Date.now())
+    /*
+      **Auch hier entscheidet der Briefkasten, nicht der Rechner.**
+
+      Führt er die Adresse dieses Eintrags nicht mehr, ist nichts gemeldet — egal
+      was lokal steht. Das ist die Richtung, an der am 28.08.2026 zwei Titel
+      hängen blieben: lokal abgehakt, im Briefkasten nie angekommen (oder längst
+      übernommen), und damit für immer unsichtbar.
+    */
+    if (nichtAngekommen(asinEintrag)) return false
+    /*
+      **Und eine Wiedervorlage ist nie fertig.**
+
+      Der erste Anlauf (4.9.6) fasste nur den Melde-Knopf an — Liste und
+      Uebersicht haengen aber an dieser Funktion, und die sagte weiter
+      "alles geprueft" (Daniel, 01.09.2026, mit Bild). Ein Riegel, der an
+      einer von zwei Stellen sitzt, ist keiner.
+    */
+    if (wiedervorlage(asinEintrag)) return false
+    const e = erledigt[asinEintrag]
+    if (!e) return false
+    return Object.keys(staffelnDerSerie(asinEintrag)).length >= gesamtDerSerie(asinEintrag)
+  }
+
+  /**
+   * Welche Staffeln gemeldet sind und welche fehlen — im Klartext.
+   *
+   * Steht als Tooltip an der Fortschritts-Marke. Gemeldete Staffeln mit ihrem
+   * Befund, fehlende als Aufzählung: „Gemeldet: S1 🇩🇪, S2 ✕ · Es fehlen: S3, S4".
+   *
+   * Die Nummern sind die aus dem Quelltext (`seasonNumber`), also dieselben,
+   * die im Auswahlfeld stehen — man kann sie unmittelbar ansteuern. Wo eine
+   * Meldung ohne Nummer erfolgte (ältere Einträge tragen dort eine ASIN),
+   * bleibt sie stehen, wie sie ist; erfunden wird nichts.
+   */
+  function staffelUebersicht(asinEintrag) {
+    const e = erledigt[asinEintrag]
+    if (!e) return 'Noch nichts gemeldet'
+    const geprueft = Object.entries(staffelnDerSerie(asinEintrag))
+    if (!geprueft.length) return 'Noch nichts gemeldet'
+
+    const teile = ['Gemeldet: ' + geprueft.map(([nr, befund]) => `S${nr} ${befund}`).join(', ')]
+
+    // Welche Nummern fehlen — nur dort, wo die Staffeln durchnummeriert sind.
+    const gesamt = gesamtDerSerie(asinEintrag)
+    const zahlen = geprueft.map(([nr]) => Number(nr)).filter((n) => Number.isFinite(n))
+    if (gesamt > 1 && zahlen.length === geprueft.length) {
+      const fehlen = []
+      for (let n = 1; n <= gesamt; n++) if (!zahlen.includes(n)) fehlen.push('S' + n)
+      if (fehlen.length) teile.push('Es fehlen: ' + fehlen.join(', '))
+    }
+    return teile.join(' · ')
+  }
+
+  /** Wie weit dieser Titel ist — für die Zeile in der Liste. */
+  /**
+   * Wie weit dieser Titel ist — für die Zeile in der Liste.
+   *
+   * **„7/5" stand am 28.08.2026 bei „Golden Kamuy: Final Season"** (Daniel, mit
+   * Bild). Der Zähler sammelt die gemeldeten Staffeln über **alle** Einträge
+   * derselben Serie (`staffelnDerSerie` läuft über `serienGefaehrten`), verglich
+   * sie aber gegen die Staffelzahl **eines** Eintrags. Golden Kamuy hat mehrere
+   * Prime-Einträge; sieben gemeldete Staffeln gegen die fünf des einen.
+   *
+   * Verglichen wird deshalb gegen die größte Zahl, die einer der Gefährten
+   * nennt. Bleibt es darüber, ist die Sache erledigt und der Bruch sagt nichts
+   * mehr — dann steht dort ein Haken.
+   */
+  /**
+   * **Was gemeldet ist, kurz: „S1 E1–54" oder „S1, S3".**
+   *
+   * Die Folgenzahl stammt aus der Meldung selbst (`folgen` im Briefkasten).
+   * Fehlt sie, bleibt es bei der Staffel. Eine Deklaration, keine
+   * Pfeilfunktion: Die Liste wird auch gezeichnet, bevor diese Zeile gelaufen
+   * ist (CLAUDE.md, „Ein Helfer im Modulscope ist eine `function`").
+   */
+  function gemeldetKurz(asinEintrag) {
+    /*
+      **Die Marke sagt, was unter diesem Eintrag gemeldet ist — nicht in der Reihe.**
+
+      Free!, 15.09.2026: Eine Seite mit einer Staffel trug „S1, S2, S3 gemeldet",
+      weil hier `staffelnDerSerie()` über alle Einträge derselben Serie las. Für
+      den Fortschritt der Reihe ist das richtig (`fortschritt()`), für die Marke
+      eines Eintrags nicht.
+    */
+    const nummern = Object.keys(erledigt[asinEintrag]?.staffeln ?? {})
+    if (!nummern.length) return ''
+    const folgen = { ...(erledigt[asinEintrag]?.folgen ?? {}) }
+    const teile = nummern
+      .map((nr) => {
+        const name = nr === 'ohne Nummer' ? '' : `S${nr}`
+        const bereich = folgen[nr] > 1 ? `E1–${folgen[nr]}` : ''
+        return [name, bereich].filter(Boolean).join(' ')
+      })
+      .filter(Boolean)
+    return teile.length > 3 ? `${teile.slice(0, 3).join(', ')} +${teile.length - 3}` : teile.join(', ')
+  }
+
+  function fortschritt(asinEintrag) {
+    const e = erledigt[asinEintrag]
+    if (!e) return null
+    const staffeln = staffelnDerSerie(asinEintrag)
+    const zahl = Object.keys(staffeln).length
+    const gesamt = gesamtDerSerie(asinEintrag)
+    if (gesamt <= 1) return Object.values(staffeln)[0] ?? '✓'
+    return zahl >= gesamt ? '✓' : `${zahl}/${gesamt}`
+  }
+
+  const offeneZahl = () => Object.keys(liste).filter((a) => !fertig(a)).length
+
+  /**
+   * **Die Suchadressen gehören in dieselbe Übersicht wie die Titelseiten.**
+   *
+   * Daniel am 27.08.2026, nach der ersten Runde: „golden kamui stand auch in
+   * der liste, hab ich gemeldet, mehr seh ich in der liste nicht." Der Knopf
+   * zählte zwei offene Titelseiten und schwieg über 118 Suchadressen — die
+   * gab es nur zu sehen, wenn man zufällig auf einer davon landete.
+   *
+   * Ein Zähler, der einen ganzen Stapel Arbeit verschweigt, ist schlimmer als
+   * keiner: „Prime: alles geprüft" war schlicht falsch.
+   *
+   * Abgehakt werden sie getrennt von den Titelseiten. Deren Abhak-Liste hängt
+   * an Kennung, Staffel und Serientitel; eine Suchadresse hat nichts davon.
+   * Sie ist erledigt, sobald unter ihr gemeldet wurde — mehr gibt es dort
+   * nicht zu wissen.
+   */
+  /**
+   * **Was gemeldet ist, sagt der Briefkasten — nicht der Rechner.**
+   *
+   * Bis 3.81 führte die Erweiterung zwei eigene Speicher: `amazonErledigt` für
+   * Titelseiten, `amazonSuche` für Suchadressen. Beide lagen nur hier, und
+   * genau daran ist am 28.08.2026 sichtbar geworden, was daran falsch ist:
+   *
+   * - Ein Werkzeug zum Zurücksetzen räumte einen der beiden Speicher, meldete
+   *   Erfolg — und in der Liste änderte sich nichts, weil der andere filterte.
+   * - Was auf einem Rechner abgehakt war, war es auf keinem anderen.
+   * - Zwei Quellen für dieselbe Frage laufen auseinander, und keine kann sagen,
+   *   welche recht hat.
+   *
+   * Daniel dazu: „die liste sollte synchron sein … gemeldet/nicht gemeldet
+   * sollte ebenfalls synchron remote abgeglichen werden, kein lokales
+   * zurücksetzen only, kein localstorage dafür … single source of truth."
+   *
+   * Der Briefkasten weiß es ohnehin: Jede Meldung landet dort, und
+   * `?zaehlen=1&nummern=1` gibt die Adressen zurück, die noch nicht übernommen
+   * sind. Genau diesen Weg geht `disney.js` seit dem 26.08.2026.
+   *
+   * **Der lokale Speicher bleibt als Überbrückung, nicht als Wahrheit.** Zwischen
+   * dem Klick auf „melden" und der nächsten Antwort des Briefkastens liegen
+   * Sekunden; ohne ihn stünde der Titel in dieser Zeit wieder als offen da. Er
+   * wird deshalb weiter geschrieben, aber nur noch **zusätzlich** gelesen — und
+   * jede Adresse, die der Briefkasten nicht mehr führt, gilt als offen, auch
+   * wenn sie lokal abgehakt ist.
+   */
+
+  /** Die bestätigte Erwartung zu einer Suchadresse, oder null; die eigene frische Wahl gilt vor dem Briefkasten. */
+  function erwartungZu(suchUrl) {
+    try {
+      return globalThis.akPrimeErwartungZu(briefkastenErwartungen, auswahlMerk, suchUrl, Date.now())
+    } catch {
+      return null
+    }
+  }
+
+  /**
+   * **Steht von einer bestätigten Erwartung noch eine Ausgabe aus?**
+   *
+   * Der Auftrag endet nicht mit der ersten Meldung, wenn ein Mensch angekreuzt
+   * hat, dass zwei Ausgaben zusammengehören. `istGemeldet()` weiß das seit dem
+   * 02.09.2026 — die **Aufräumarbeiten** nach der Meldung wussten es nicht:
+   * Sie hakten die Suchadresse ab und vergaßen den Auftrag.
+   *
+   * Daniel am 09.09.2026 an „Death Note: Relight" (zwei Kauftitel, ein
+   * Eintrag): Nach der Meldung von `B0FVDZ286F` führte der Klick auf die
+   * zweite Zeile auf eine Seite ohne Kasten — keine Checkliste, kein
+   * aniSearch-Verweis, und statt des Auftragstitels stand dort „Chatverlauf",
+   * ein Textfund aus Amazons eigener Seite.
+   *
+   * Der Vermerk aus dem `sessionStorage` zählt als Rückfall mit: Direkt nach
+   * der Meldung hat der Briefkasten noch nicht geantwortet, und genau in
+   * diesen Sekunden wird entschieden.
+   */
+  function erwartungNochOffen(suchUrl) {
+    try {
+      const erwartet = erwartungZu(suchUrl) ?? (Array.isArray(suchauftrag()?.erwartet) ? suchauftrag().erwartet : null)
+      if (!erwartet || erwartet.length < 2) return false
+      return erwartet.some((k) => !briefkastenSeiten?.has(String(k)))
+    } catch {
+      return false
+    }
+  }
+
+  /**
+   * **Bestätigen heißt: dem Worker sagen, was zusammengehört.**
+   *
+   * Eine leere Liste nimmt die Bestätigung zurück (das ↺ neben dem Knopf).
+   * Danach wird der Briefkasten neu geholt, damit die Anzeige nicht auf einem
+   * lokalen Zwischenstand sitzt.
+   */
+  async function erwartungMelden(suchUrl, kennungen) {
+    try {
+      /* Dasselbe wie an jeder anderen Meldestelle — es gibt kein tokenHolen(). */
+      const { token } = (await globalThis.akKontext.lesen('token', 'sync')) ?? {}
+      if (!token) return false
+      const antwort = await fetch(WORKER, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Lauf-Token': token },
+        body: JSON.stringify({ erwartung: { suchUrl, kennungen } }),
+      })
+      if (!antwort.ok) return false
+      await briefkastenHolen(true)
+      /*
+        **Die Auswahl wandert in den gemerkten Auftrag — sonst ist sie auf der
+        nächsten Seite nicht da.**
+
+        Der Briefkasten ist die Quelle der Wahrheit, aber er ist auf einer frisch
+        geladenen Titelseite erst nach dem ersten Zeichnen da. Die Checkliste
+        („welche gehören dazu, welche sind gemeldet") blieb deshalb leer, obwohl
+        die Bestätigung stand — Daniel am 09.09.2026: „in extension fehlt die
+        checkliste, ich erwarte die checkliste, sodass ich nach meldung auch
+        direkt sehe das der eine eintrag der checkliste erfolgreich gemeldet ist
+        … und dass ich direkt zum 2. springen kann."
+
+        Der Vermerk im `sessionStorage` überbrückt genau diese Lücke. Er ersetzt
+        den Briefkasten nicht: Welche Ausgabe schon **gemeldet** ist, sagt
+        weiterhin nur der (`briefkastenSeiten`), und sobald er da ist, gewinnt
+        seine Liste.
+      */
+      try {
+        const roh = sessionStorage.getItem(SUCH_SCHLUESSEL)
+        if (roh) {
+          const a = JSON.parse(roh)
+          if (a && (a.suchUrl === suchUrl || !a.suchUrl)) {
+            a.erwartet = kennungen
+            sessionStorage.setItem(SUCH_SCHLUESSEL, JSON.stringify(a))
+          }
+        }
+      } catch {
+        /* Ohne Speicher bleibt es beim Briefkasten — eine Bequemlichkeit weniger. */
+      }
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  /**
+   * **Diese Seite ist offen, auch wenn ihr Auftrag schon eine Meldung hat.**
+   *
+   * Prime führt denselben Anime regelmäßig zweimal — über einen Kanal und als
+   * Kauftitel. Beide sind Wege, und nur die Meldung sagt uns, dass es sie gibt.
+   * Ein Auftrag steuert, **was** zu prüfen ist; er darf nicht verbieten, die
+   * zweite Seite zu melden.
+   *
+   * Am 02.09.2026 tat er genau das: Nach der Kauftitel-Meldung war die
+   * aniverse-Meldung gesperrt, weil die Suchadresse als erledigt galt (Daniel:
+   * „nach kaufoption meldung ist aniverse meldung nicht mehr möglich").
+   *
+   * Solange der Briefkasten schweigt, gilt der Auftrag — dann ist das Verhalten
+   * wie bisher, und ein Titel steht höchstens einmal zu viel offen.
+   */
+  function seiteOffen() {
+    try {
+      /* Briefkasten und frische eigene Meldung, für genau diese Kennung; ohne Beleg ist die Seite meldbar. */
+      return !globalThis.akPrimeSeiteGemeldet(asin(), briefkastenSeiten, frischGemeldeteSeiten)
+    } catch {
+      return true
+    }
+  }
+  let briefkastenGeholtAm = 0
+  const BRIEFKASTEN_FRIST_MS = 60_000
+
+  async function briefkastenHolen(erzwingen = false) {
+    if (!erzwingen && briefkastenAdressen && Date.now() - briefkastenGeholtAm < BRIEFKASTEN_FRIST_MS) return
+    try {
+      const antwort = await fetch(`${WORKER}?zaehlen=1&nummern=1`)
+      if (!antwort.ok) return
+      const daten = await antwort.json()
+      if (!Array.isArray(daten.adressen)) return
+      /*
+        **`gemeldet` statt `adressen` — der Unterschied kostete jede Meldung
+        ihre Wirkung.**
+
+        `adressen` führt nur, was der Datenlauf noch nicht abgeholt hat. Wer
+        einen Titel meldete und danach lief ein Datenlauf, fand ihn am nächsten
+        Tag wieder in der Prüfliste — die Meldung war da, nur eben nicht mehr
+        „im Briefkasten".
+
+        Der Rückfall auf `adressen` gilt für die Minuten zwischen dem Ausrollen
+        der Erweiterung und dem des Workers; danach ist `gemeldet` immer da.
+      */
+      briefkastenAdressen = new Set(Array.isArray(daten.gemeldet) ? daten.gemeldet : daten.adressen)
+      /*
+        **Der Briefkasten räumt den lokalen Speicher auf — an einer Stelle, nicht an siebzehn.**
+
+        `erledigt` wird an siebzehn Stellen gelesen, und jede davon hielt einen
+        Titel für gemeldet, den der Briefkasten längst nicht mehr kennt. Am
+        02.09.2026 sperrte das „Is This a Zombie?": Die frühere Meldung war aus
+        dem Briefkasten verworfen, im Browser stand weiter „✓ alles gemeldet",
+        und nur ein Konsolenbefehl half. Daniel: „warum ist ein befehl
+        notwendig… das soll synchron sein."
+
+        Statt jede Lesestelle zu prüfen, wird hier ausgemistet: Was der
+        Briefkasten nicht führt, fliegt raus. Danach stimmen alle siebzehn von
+        selbst — und das ist die einzige Stelle, die es wissen muss.
+
+        **Der frische Vermerk bleibt.** Zwischen dem Klick auf „melden" und der
+        nächsten Antwort liegen Sekunden; in denen soll der Titel nicht wieder
+        als offen dastehen. Verglichen wird gegen den Erzeugungstag der
+        Prüfliste: Was danach abgehakt wurde, ist jünger als jede Antwort, die
+        der Briefkasten dazu geben könnte.
+      */
+      try {
+        const listeVom = String(globalThis.AK_OFFENE_AMAZON_ERZEUGT ?? '').slice(0, 10)
+        await globalThis.akGemeldetSeit(listeVom)
+        const { bereinigt, entfernt } = globalThis.akPrimeAufraeumen(erledigt, liste, briefkastenAdressen, listeVom)
+        if (entfernt) {
+          erledigt = bereinigt
+          void speicherSchreiben({ amazonErledigt: erledigt })
+        }
+      } catch {
+        /* Im Zweifel bleibt der Speicher, wie er war — lieber ein Titel zu viel als einer zu wenig. */
+      }
+      /*
+        Die Suchadressen, unter denen gemeldet wurde — seit dem 02.09.2026 weiß
+        der Briefkasten sie, und damit entscheidet er auch dort. Vorher blieb
+        für Suchadressen nur der lokale Vermerk, und der ist nicht abgeglichen.
+      */
+      const neueSuchen = Array.isArray(daten.gemeldeteSuchen) ? new Set(daten.gemeldeteSuchen) : null
+      /* Die Seiten, auf denen schon nachgesehen wurde — siehe `seiteOffen`. */
+      const neueSeiten = Array.isArray(daten.gemeldeteSeiten) ? new Set(daten.gemeldeteSeiten) : null
+      /*
+        Welche Ausgaben zu einem Suchauftrag gehören — bestätigt von Daniel, und
+        beim Worker gespeichert. Nicht im Browser: Der erste Anlauf legte es in
+        `sessionStorage` ab und war nach einem Neuladen weg (02.09.2026).
+      */
+      const neueErwartungen = daten.erwartungen && typeof daten.erwartungen === 'object' ? daten.erwartungen : null
+      briefkastenGeholtAm = Date.now()
+      /*
+        **Im selben Takt der Stand, den die Statusanzeige zeigt.**
+
+        `?stand=1` ist die Prüfliste minus der Meldungen seit ihrer Erzeugung,
+        gerechnet vom Worker. Er hält seine Antwort 300 s (seit 11.10.2026) und
+        bildet die eigene Meldung erst nach dieser Frist ab — bis dahin trägt
+        die Überbrückung in `frischGemeldet` die Adresse.
+      */
+      standZiele = (await globalThis.akPrimeStandLaden(WORKER, liste, frischGemeldet)) ?? standZiele // ohne Stand gilt in `fertig()` die ältere Rechnung
+      briefkastenSuchen = neueSuchen // erst mit standZiele: die Zählung ist bis 2 h alt
+      briefkastenSeiten = neueSeiten
+      briefkastenErwartungen = neueErwartungen
+      try {
+        uebersichtZeichnen()
+      } catch {
+        /* Die Übersicht ist nicht auf jeder Seite gebaut. */
+      }
+    } catch {
+      /*
+        **Ohne Auskunft wird nichts ausgeblendet.** Ein Netzfehler darf keine
+        Arbeit verstecken — lieber ein Titel zu viel in der Liste als einer, den
+        niemand mehr sieht.
+      */
+    }
+  }
+
+  /**
+   * Ist unter dieser Adresse schon gemeldet worden?
+   *
+   * Solange der Briefkasten nicht geantwortet hat, gilt der lokale Stand — sonst
+   * flackerte die Liste bei jedem Seitenaufbau. Sobald er da ist, entscheidet er.
+   */
+  /**
+   * **Ein lokaler Vermerk, den der Bau überholt hat, gilt nicht mehr.**
+   *
+   * Er überbrückt die Sekunden zwischen dem Klick und der nächsten Antwort des
+   * Briefkastens — mehr nicht. Steht die Adresse in einer Prüfliste, die **nach**
+   * dem Abhaken erzeugt wurde, hat der Bau sie nicht abgeräumt, also ist sie
+   * offen. Verglichen werden Tage: Am Tag des Abhakens gilt der Vermerk weiter.
+   */
+  function suchErledigtFrisch(url) {
+    try {
+      const vermerk = suchErledigt[url]
+      if (!vermerk) return false
+      const listeVom = globalThis.AK_OFFENE_AMAZON_ERZEUGT ?? null
+      if (listeVom && String(vermerk).slice(0, 10) < String(listeVom).slice(0, 10)) return false
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  /**
+   * **Einen lokalen Vermerk wegwerfen, den der Briefkasten widerlegt hat.**
+   *
+   * Läuft aus `istGemeldet()`, also aus einer Funktion, die im Takt mehrfach je
+   * Sekunde aufgerufen wird — geschrieben wird trotzdem höchstens einmal je
+   * Adresse: Danach ist der Eintrag weg, und die Bedingung greift nicht mehr.
+   */
+  function vermerkVerwerfen(url) {
+    try {
+      const rest = { ...suchErledigt }
+      delete rest[url]
+      suchErledigt = rest
+      void speicherSchreiben({ amazonSuche: rest })
+    } catch {
+      /* Ohne Speicher bleibt der Vermerk stehen — der Briefkasten gilt trotzdem. */
+    }
+  }
+
+  function istGemeldet(url) {
+    /*
+      **Als Funktionsdeklaration, und der Rumpf in try.**
+
+      Der Aufruf aus dem Auftragskasten steht rund 560 Zeilen weiter oben. Ein
+      Pfeil-const dort ist die tote Zone: „Cannot access istGemeldet before
+      initialization" — der dritte Fall derselben Art an
+      einem Tag, nach knopf und listenId.
+
+      Die Deklaration wird hochgezogen, ihre beiden Variablen nicht. Deshalb
+      zusaetzlich try: Vor ihrer Zeile gilt „noch nichts bekannt", und das ist
+      die richtige Antwort — nicht gemeldet, also offen.
+    */
+    try {
+      /*
+        **Eine Suchadresse kann der Briefkasten gar nicht kennen.**
+
+        Für Titelseiten ist er die einzige Quelle, und das bleibt so — dort
+        entscheidet er auch gegen einen lokalen Vermerk (28.08.2026).
+
+        Eine Suchadresse landet dort aber nur in einem einzigen Fall: wenn
+        „nicht bei Prime" gemeldet wurde. Wer den Treffer **findet**, meldet
+        unter der Titeladresse — und die Suchadresse bleibt dem Worker
+        unbekannt. `suchAbhaken()` trug sie hilfsweise in die geholte Liste
+        ein, und der nächste Abruf warf sie sofort wieder hinaus.
+
+        Sichtbar wurde das an „Jormungand: Perfect Order": gemeldet, Knopf auf
+        „alles gemeldet", und der Sucheintrag stand weiter in der Liste.
+
+        Deshalb gilt hier beides. Das ist keine Rückkehr zum alten Zustand,
+        sondern die Trennung, die vorher fehlte: Der Briefkasten entscheidet,
+        wo er etwas wissen kann.
+      */
+      /*
+        **Die Erwartung steht vor allem anderen — auch vor dem Briefkasten.**
+
+        Dieser Zweig hier fragte zuerst: Steht die Adresse unter den je gemeldeten?
+        Bei einem Suchauftrag steht sie dort, sobald **eine** Ausgabe gemeldet ist —
+        und damit galt der Auftrag als fertig, obwohl die zweite noch offen war.
+
+        Belegt am 02.09.2026 im Diagnosebericht, nach drei Vermutungen:
+
+            erwartet     B0BYY9NN5D:offen · B0B8TN9LSJ:gemeldet
+            istGemeldet  true          <- falsch
+
+        Wo ein Mensch angekreuzt hat, was zusammengehört, entscheidet das — und
+        sonst nichts.
+      */
+      /*
+        **Für eine Suche der Prüfliste entscheidet der Worker-Stand — wie bei den Titelseiten.**
+
+        Daniel am 15.09.2026, mit zwei Bildern: Statusanzeige „Amazon 11 offen ·
+        8 Titel · 3 Suchen", die Erweiterung „8 Prime-Titel · 2 Suchen offen".
+        Am 14.09.2026 war nur `fertig()` auf `?stand=1` umgestellt worden, die
+        Suchen rechneten weiter mit Meldungen aller Zeiten. Die neue Ausgaben-Suche
+        für „Bungo Stray Dogs" trägt dieselbe Adresse wie eine Suche, die Wochen
+        vorher gemeldet worden war, und galt deshalb als erledigt.
+
+        Nur für Adressen der Prüfliste: Eine Weitersuche („Kürzer suchen") steht
+        nicht im Stand und darf daraus nicht „gemeldet" ableiten. Eine
+        angekreuzte Erwartung bleibt, was sie ist: Erst alle Ausgaben machen den
+        Auftrag fertig.
+      */
+      if (standZiele && suchliste?.[url]) {
+        if (standZiele.has(url) && !frischGemeldet.has(url) && !globalThis.akPrimeBruecke(suchErledigt[url], Date.now())) return false
+        const erwartetStand = erwartungZu(url)
+        if (erwartetStand && briefkastenSeiten) {
+          return erwartetStand.every((k) => briefkastenSeiten.has(String(k)))
+        }
+        return true
+      }
+      const erwartetVorab = erwartungZu(url)
+      if (erwartetVorab && briefkastenSeiten) {
+        return erwartetVorab.every((k) => briefkastenSeiten.has(String(k)))
+      }
+      if (briefkastenAdressen?.has(url)) return true
+      /*
+        **Auch für eine Suchadresse entscheidet jetzt der Briefkasten.**
+
+        Seit dem 02.09.2026 trägt jede Meldung die Suchadresse mit, unter der ihr
+        Auftrag stand (`suchUrl`, Migration 025). Damit ist die Lücke zu, wegen
+        der es hier überhaupt einen lokalen Zweig gab: Wird eine Meldung
+        verworfen, verschwindet sie aus **beiden** Listen, und der Auftrag steht
+        wieder offen — ohne Konsolenbefehl.
+
+        Daniels Regel vom 28.08.2026: „gemeldet/nicht gemeldet sollte ebenfalls
+        synchron remote abgeglichen werden, kein lokales zurücksetzen only, kein
+        localstorage dafür … single source of truth."
+      */
+      /*
+        **Hat der Briefkasten geantwortet, entscheidet er allein — auch gegen
+        den lokalen Vermerk.**
+
+        Bis 4.16.6 stand hier `|| suchErledigtFrisch(url)`, und damit war der
+        Vermerk nicht mehr Überbrückung, sondern zweite Wahrheit: Wer eine
+        Meldung serverseitig verwarf, um einen Titel noch einmal prüfen zu
+        lassen, sah den Eintrag in Daniels Browser trotzdem nicht wieder — es
+        brauchte einen Konsolenbefehl bei ihm.
+
+        Daniel am 09.09.2026: „mach das die prüfliste synchron ist … sodass du
+        einträge beliebig zur prüfung geben kannst, ich will keine console
+        commands bei mir lokal ausführen." Und schon am 28.08.2026: „single
+        source of truth."
+
+        Der Vermerk wird dabei **aufgeräumt**, nicht nur übergangen — sonst
+        bliebe er liegen und entschiede beim nächsten Start wieder mit, solange
+        der Briefkasten noch schweigt.
+      */
+      if (briefkastenSuchen) {
+        const gefuehrt = briefkastenSuchen.has(url)
+        if (!gefuehrt && globalThis.akPrimeBruecke(suchErledigt[url], Date.now())) return true // frischer Vermerk bleibt
+        if (!gefuehrt && suchErledigt[url]) vermerkVerwerfen(url)
+        return gefuehrt
+      }
+      /*
+        **Solange der Briefkasten schweigt, gilt der lokale Vermerk — befristet.**
+
+        Steht die Adresse in einer Prüfliste, die **nach** dem Abhaken erzeugt
+        wurde, hat der Bau sie nicht abgeräumt — also ist sie offen, was auch
+        immer lokal steht. Für eine Titelseite entscheidet das der Briefkasten;
+        für eine Suchadresse kann er es nicht (sie landet dort nur im Fall
+        „nicht bei Prime"), und genau dort war die Lücke.
+
+        Real am 02.09.2026: Eine Meldung zu „Is This a Zombie?" wurde aus dem
+        Briefkasten verworfen. Der Vermerk im Browser blieb, der Auftrag stand
+        wieder in der Liste — und der Knopf sagte „gemeldet ✓". Daniel: „ich hab
+        ihn nicht melden können."
+
+        Verglichen werden Tage, nicht Sekunden: Der Vermerk trägt ein
+        ISO-Datum, die Liste ihren Erzeugungstag. Am Tag des Abhakens gilt er
+        weiter — das ist die Überbrückung, für die er gedacht ist.
+      */
+      return Boolean(suchErledigtFrisch(url))
+    } catch {
+      return false
+    }
+  }
+
+  /* Eine Suche mit gewählten Karten ist erledigt; ihre Karten stehen als eigene Zeilen in der Liste. */
+  const suchOffen = () => Object.keys(suchliste).filter((u) => !erwartungZu(u) && !istGemeldet(u))
+
+  /** Kopf einer Suche (Titel, Folgen): aus der Liste, sonst aus dem Merker der Auswahl, wenn der Bau sie schon abgeräumt hat. */
+  const auswahlKopf = (suchUrl) => suchliste[suchUrl] ?? auswahlMerk[suchUrl] ?? null
+  const auswahlZeilen = () =>
+    globalThis.akPrimeAuswahlZeilen(globalThis.akPrimeErwartungenMitEigenen(briefkastenErwartungen, auswahlMerk, Date.now()), auswahlKopf, (k) => globalThis.akPrimeSeiteGemeldet(k, briefkastenSeiten, selbstGemeldeteSeiten))
+
+  /** Anlass, den Kasten neu zu zeichnen: der Briefkasten ist da, und die eigene Wahl (nach dem Neuladen kommt sie aus dem Speicher). */
+  function erwartungsMarke() {
+    return (briefkastenErwartungen ? 'da' : 'fehlt') + JSON.stringify(Object.values(auswahlMerk).map((m) => m.eigen ?? null))
+  }
+
+  /** Offene gewählte Karten: dieselbe Zahl für Knopf, Listenkopf, Nenner und Signatur. */
+  const kartenOffen = () => auswahlZeilen().filter((z) => !z.gemeldet).length
+
+  async function suchAbhaken(url) {
+    /* Der Worker-Stand führt die Suche noch bis zum nächsten Abruf — so lange zählt die eigene Meldung. */
+    frischGemeldet.add(url)
+    /*
+      Der lokale Eintrag überbrückt die Sekunden bis zur nächsten Antwort des
+      Briefkastens; danach ist dessen Liste maßgeblich.
+    */
+    suchErledigt = { ...suchErledigt, [url]: globalThis.akPrimeVermerk(Date.now()) }
+    if (briefkastenAdressen) briefkastenAdressen.add(url)
+    await speicherSchreiben({ amazonSuche: suchErledigt })
+    /* Und gleich nachfragen, damit der gemeinsame Stand stimmt. */
+    void briefkastenHolen(true)
+  }
+
+  /**
+   * Muss **vor** `uebersichtZeichnen()` stehen, nicht darunter.
+   *
+   * `let` hebt den Namen zwar hoch, aber nicht den Wert: Ein Zugriff vor der
+   * Zeile wirft `Cannot access 'dialog' before initialization` — und
+   * `uebersichtZeichnen()` läuft sofort beim Seitenaufbau. Die Erweiterung
+   * wäre auf jeder Amazon-Seite mit einem Fehler ausgestiegen, ohne Knopf und
+   * ohne sichtbare Ursache.
+   */
+  let dialog = null
+
+  /**
+   * **Aus demselben Grund steht der Name hier und nicht bei seinem Wert.**
+   *
+   * `listenId` bekommt seinen Wert erst 300 Zeilen weiter unten, sobald
+   * `listenSchluessel()` alles beisammen hat, was es braucht — Adresse,
+   * Bestand, Serientitel von der Seite. `listenSignatur()` liest es aber schon
+   * hier oben, und ein `let` weiter unten heißt für jeden Zugriff davor nicht
+   * „undefined", sondern **Absturz**:
+   *
+   *     Uncaught ReferenceError: Cannot access 'listenId' before initialization
+   *     amazon.js:1286
+   *
+   * Daniel am 25.08.2026 mit dem Fehlerbild aus `chrome://extensions`: „dialog
+   * öffnet sich nicht auf amazon.de". Der Knopf war da — er wird vor der
+   * Absturzstelle angelegt —, nur lief danach nichts mehr, und deshalb blieb
+   * auch die Zahl darauf stehen, wie sie beim Aufbau gerade war.
+   *
+   * Die Deklaration hier oben nimmt den Namen aus der temporalen Totzone; bis
+   * zur Zuweisung ist er schlicht `undefined`, und damit kommt eine Signatur
+   * aus Zeichenketten zurecht.
+   */
+  let listenId
+
+  const uebersichtKnopf = document.createElement('button')
+  uebersichtKnopf.className = 'ak-uebersicht ak-amazon-uebersicht'
+  uebersichtKnopf.type = 'button'
+  uebersichtKnopf.addEventListener('click', dialogUmschalten)
+  document.body.appendChild(uebersichtKnopf)
+
+  function uebersichtZeichnen() {
+    // Nach einem Neuladen der Erweiterung ist die Verbindung weg. Das
+    // gehoert an den Knopf, sonst klickt Daniel ins Leere.
+    if (!verbindungLebt()) {
+      /*
+        **Kurz genug für eine Zeile**. Der lange Satz „Erweiterung neu
+        geladen — Seite aktualisieren" lief aus der Pille heraus; was er
+        zusätzlich sagte — warum das nötig ist —, steht jetzt im Tooltip.
+      */
+      setz(uebersichtKnopf, 'textContent', '↻ Seite neu laden')
+      setz(uebersichtKnopf, 'title', 'Die Erweiterung wurde neu geladen. Diese Seite kennt sie noch nicht — einmal aktualisieren, dann geht es weiter.')
+      uebersichtKnopf.classList.add('ak-fertig')
+      return
+    }
+    const offen = offeneZahl()
+    const suchen = suchOffen().length
+    const karten = kartenOffen()
+    const gesamt = offen + suchen + karten
+    akZaehler(uebersichtKnopf, gesamt, !!primeLaufLesen())
+    const lauf = primeLaufLesen()
+    if (lauf) {
+      /*
+        **Der Fortschritt steht am Knopf, nicht die Zahl der offenen Titel.**
+
+        Die Frames melden in eigenen Dokumenten; diese Seite erfährt davon erst, wenn der
+        Briefkasten wieder abgefragt ist; „4 offen" wirkte deshalb hängend (26.09.2026).
+        Die Pille bleibt kurz, Grund der Pause und Zahlen stehen im Tooltip (13.10.2026).
+      */
+      const { nr, gesamt } = globalThis.akPrimeFortschritt(lauf)
+      const grundPause = globalThis.AK_TAGESLIMIT?.text()
+      setz(uebersichtKnopf, 'textContent', `${grundPause ? '⏸' : '⏹'} ${nr}/${gesamt}`)
+      setz(uebersichtKnopf, 'title', `${grundPause ? `${grundPause} · ` : ''}Titel ${nr}/${gesamt} · ${lauf.seiten ?? 0} Seiten gemeldet. Liste öffnen — dort lässt sich der Durchgang beenden`)
+      void standPruefen()
+      if (dialog) dialogFuellen()
+      return
+    }
+    /*
+      Beide Zahlen getrennt, weil sie verschiedene Arbeit meinen: Eine
+      Titelseite liest die Erweiterung selbst, eine Suchadresse verlangt, den
+      richtigen Treffer herauszusuchen.
+    */
+    const veraltet = globalThis.akPrimeListeVeraltet(listeVeraltet, liste, Boolean(standZiele))
+    setz(uebersichtKnopf, 'textContent', globalThis.akPrimeKnopfText(offen, suchen, veraltet, karten))
+    setz(
+      uebersichtKnopf,
+      'title',
+      gesamt
+        ? veraltet
+          ? 'Der Bestand ist neuer als diese Liste — es können weitere Aufträge dazugekommen sein. In chrome://extensions auf „Aktualisieren".'
+          : 'Liste öffnen — Seite aufrufen, warten bis der Knopf eine Zahl zeigt, klicken'
+        : veraltet
+          ? 'Der Bestand ist neuer als diese Liste. In chrome://extensions auf „Aktualisieren", dann stehen die neuen Aufträge hier.'
+          : 'Keine offenen Prime-Titel mehr',
+    )
+    void standPruefen()
+    if (dialog) dialogFuellen()
+  }
+  uebersichtZeichnen()
+
+  /*
+    **`?ak=liste` klappt die Prüfliste beim Laden auf**. Damit führt ein Link aus dem Chat direkt
+    zur Liste, statt erst auf eine Seite mit Knopf und dann in die Liste.
+  */
+  try {
+    if (/[?&]ak=liste\b/.test(location.search) && !imPlayer()) dialogUmschalten()
+  } catch {
+    /* Ohne Dialog bleibt der Knopf — er tut dasselbe, nur mit einem Klick mehr. */
+  }
+
+  function dialogUmschalten() {
+    if (dialog) {
+      dialog.remove()
+      dialog = null
+      return
+    }
+    dialog = document.createElement('div')
+    dialog.className = 'ak-dialog'
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialogUmschalten()
+    })
+    document.body.appendChild(dialog)
+    dialogFuellen()
+  }
+
+  /**
+   * Woran sich ablesen lässt, ob ein Neuaufbau überhaupt nötig ist.
+   *
+   * Alles, was in der Liste sichtbar ist: die offene Gesamtzahl, welcher Titel
+   * gerade offen ist, und je Eintrag sein Fortschritt. Ändert sich davon
+   * nichts, ändert sich auch die Anzeige nicht.
+   */
+  function listenSignatur() {
+    /*
+      **Die Suchadressen gehören in die Signatur, nicht nur die Titelseiten.**
+
+      Daniel am 28.08.2026: „und nach meldung bleibt der eintrag in der liste."
+      Der Dialog wird nur neu gefüllt, wenn sich die Signatur ändert — und die
+      zählte ausschließlich `liste`, also die Titelseiten. Eine abgehakte
+      Suchadresse ließ sie unverändert, der Dialog blieb stehen, wie er war.
+
+      Die Anzeige führt beide Sorten in einer Liste; dann muss die Signatur auch
+      beide messen. `suchOffen()` ist billig — eine Filterung über ein Set.
+    */
+    const teile = [offeneZahl(), suchOffen().length, listenId, globalThis.AK_TAGESLIMIT?.text()]
+    /* Der Stand der gewählten Karten: eine gemeldete Karte ändert sonst keine Zahl, die Zeile bliebe offen. */
+    for (const z of auswahlZeilen()) teile.push(`${z.kennung}:${z.gemeldet ? '1' : '0'}`)
+    for (const asinEintrag of Object.keys(liste)) {
+      teile.push(asinEintrag + ':' + (fortschritt(asinEintrag) || '') + ':' + (fertig(asinEintrag) ? '1' : '0'))
+    }
+    return teile.join('|')
+  }
+  let letzteSignatur = null
+
+  function dialogFuellen() {
+    if (!dialog) return
+
+    /**
+     * Nur neu bauen, wenn sich wirklich etwas geändert hat.
+     *
+     * Ohne diese Zeile lief `dialogFuellen` zweimal je Sekunde durch, weil sie
+     * am Ende von `uebersichtZeichnen` steht und die im 500-ms-Takt läuft. Das
+     * Suchfeld bekam dabei jedes Mal neu den Fokus (es blinkte), und ein Klick,
+     * der zwischen `mousedown` und `mouseup` in einen Neuaufbau fiel, traf ein
+     * Element, das es nicht mehr gab — Daniel musste Titel mehrfach anklicken
+     * (24.08.2026).
+     */
+    /**
+     * Ein frisch geöffneter Dialog ist leer — der muss immer gefüllt werden.
+     *
+     * Der Wächter allein prüfte nur, ob sich am **Inhalt** etwas geändert hat.
+     * Beim Schließen und Neuöffnen ändert sich daran nichts, also baute er
+     * nichts: „es kommt backdrop aber kein dialog".
+     */
+    const signatur = listenSignatur()
+    if (signatur === letzteSignatur && dialog.querySelector('.ak-kasten')) return
+    letzteSignatur = signatur
+
+    // Was ein Neuaufbau sonst verschluckt: der eingetippte Suchbegriff, die
+    // Scrollposition und die Einstellung „Erledigte zeigen".
+    const altesFeld = dialog.querySelector('.ak-suche')
+    const altesInhalt = dialog.querySelector('.ak-liste')
+    const merkeSuche = altesFeld ? altesFeld.value : ''
+    const merkeScroll = altesInhalt ? altesInhalt.scrollTop : 0
+    const merkeErledigte = !!dialog.querySelector('.ak-kasten.ak-mit-erledigten')
+    const hatteFokus = altesFeld && document.activeElement === altesFeld
+
+    dialog.textContent = ''
+
+    const kasten = document.createElement('div')
+    kasten.className = 'ak-kasten'
+    dialog.appendChild(kasten)
+
+    const kopf = document.createElement('div')
+    kopf.className = 'ak-kopf'
+    kasten.appendChild(kopf)
+    globalThis.AK_TAGESLIMIT?.hinweisAnhaengen(kasten)
+
+    const titelzeile = document.createElement('strong')
+    const offen = offeneZahl()
+    titelzeile.textContent = globalThis.akPrimeListenKopf(offen, kartenOffen())
+    kopf.appendChild(titelzeile)
+
+    const suche = document.createElement('input')
+    suche.className = 'ak-suche'
+    suche.type = 'search'
+    suche.placeholder = 'Suchen'
+    kopf.appendChild(suche)
+
+    // Erledigtes ist standardmäßig weg — dieselbe Entscheidung wie bei
+    // Netflix, und aus demselben Grund: Bei 300 abgehakten Zeilen findet man
+    // die offenen sonst nicht mehr.
+    const umschalter = document.createElement('button')
+    umschalter.className = 'ak-umschalter'
+    umschalter.type = 'button'
+    umschalter.textContent = 'Erledigte zeigen'
+    umschalterZeigen(umschalter, false)
+    umschalter.addEventListener('click', () => umschalterZeigen(umschalter, kasten.classList.toggle('ak-mit-erledigten')))
+    kopf.appendChild(umschalter)
+
+    /**
+     * Die Abhak-Liste wegwerfen — ohne eine einzige Meldung zu verlieren.
+     *
+     * Beides zu trennen ist der Grund, warum das gefahrlos geht: Was gemeldet
+     * wurde, liegt beim Worker und trägt seine eigene Adresse. Hier steht nur,
+     * was **dieser Browser** für erledigt hält.
+     *
+     * Gebraucht wurde das am 24.08.2026: Ein Fehler in `seitenTitel()` hat
+     * Meldungen unter fremden Serien abgelegt („Ragna Crimson" auf einer
+     * Chaika-Seite), und der Knopf zeigte danach überall den Stand des falschen
+     * Titels. Eine kaputte Abhak-Liste lässt sich nicht reparieren — sie sagt
+     * ja nicht, welcher Eintrag falsch ist. Sie lässt sich nur neu aufbauen,
+     * und das kostet Daniel nichts als ein paar Klicks auf Titel, die er ohnehin
+     * schon gemeldet hat.
+     */
+    const zuruecksetzen = document.createElement('button')
+    zuruecksetzen.className = 'ak-umschalter'
+    zuruecksetzen.type = 'button'
+    zuruecksetzen.textContent = 'Abhaken zurücksetzen'
+    zuruecksetzen.title =
+      'Leert nur die Liste, was dieser Browser für erledigt hält.\n' +
+      'Die gemeldeten Tonspuren liegen beim Worker und bleiben erhalten.'
+    zuruecksetzen.addEventListener('click', async () => {
+      zuruecksetzen.textContent = 'setzt zurück …'
+      erledigt = {}
+      await speicherSchreiben({ amazonErledigt: {} })
+      letzteSignatur = null
+      letzterStand = ''
+      uebersichtZeichnen()
+      zeichnen()
+    })
+    kopf.appendChild(zuruecksetzen)
+
+    /* Der Durchgang über alle offenen Titel — siehe primeLaufStarten(). */
+    const durchgang = document.createElement('button')
+    const laeuft = Boolean(primeLaufLesen())
+    durchgang.className = 'ak-umschalter' + (laeuft ? ' ak-selbst-an' : '')
+    durchgang.type = 'button'
+    durchgang.textContent = laeuft ? '⏹ Durchgang beenden' : '▶ alle durchgehen'
+    durchgang.title = laeuft
+      ? 'Beendet den laufenden Durchgang.'
+      : 'Öffnet jede Staffel der offenen Titel und meldet, was der Knopf anbietet. Suchaufträge bleiben offen.'
+    durchgang.addEventListener('click', () => {
+      const lauf = primeLaufLesen()
+      if (lauf) {
+        primeLaufBeenden(lauf, 'von Hand')
+        letzteSignatur = null
+        dialogFuellen()
+        return
+      }
+      if (primeLaufStarten()) return
+      durchgang.textContent = 'nichts offen'
+      durchgang.disabled = true
+    })
+    kopf.appendChild(durchgang)
+
+    const ende = primeLaufEndeLesen()
+    if (ende) {
+      const zeile = document.createElement('div')
+      zeile.className = 'ak-hinweis ak-durchgang-ende'
+      zeile.textContent = akPrimeEndeText({ ...ende, suchen: suchOffen().length })
+      kasten.appendChild(zeile)
+    }
+
+    const inhalt = document.createElement('div')
+    inhalt.className = 'ak-liste'
+    kasten.appendChild(inhalt)
+
+    /**
+     * Offenes zuerst, Erledigtes ans Ende — und der gerade geöffnete Titel
+     * ganz oben, damit erkennbar ist, wo man steht.
+     */
+    const eintraege = Object.entries(liste).sort((a, b) => {
+      if (a[0] === listenId) return -1
+      if (b[0] === listenId) return 1
+      const d = Number(fertig(a[0])) - Number(fertig(b[0]))
+      return d || a[1].titel.localeCompare(b[1].titel, 'de')
+    })
+
+    for (const [asinEintrag, e] of eintraege) {
+      const zeile = document.createElement('div')
+      zeile.className = 'ak-zeile'
+      if (fertig(asinEintrag)) zeile.classList.add('ak-abgehakt')
+
+      const verweis = document.createElement('a')
+      verweis.className = 'ak-titel'
+      verweis.href = e.url
+      verweis.textContent = e.titel
+      if (asinEintrag === listenId) verweis.textContent = `▸ ${e.titel}`
+      /* JustWatch-Adresse: Der Auftrag reist über die Weiterleitung mit (siehe `gtiSprung`). */
+      if (String(asinEintrag).startsWith('amzn1.dv.gti.')) {
+        verweis.addEventListener('click', () => gtiSprungMerken(asinEintrag))
+      }
+      zeile.appendChild(verweis)
+
+      /**
+       * Getroffen wird die ganze Zeile, nicht nur der Linktext.
+       *
+       * Daniel am 24.08.2026: „das klick event in der liste sollte nicht auf
+       * dem linktext liegen sondern auf der zeile". Bei einem kurzen Titel ist
+       * der Streifen daneben breiter als der Text selbst — und ein Klick
+       * dorthin tat bisher nichts.
+       *
+       * Der Klick auf den Verweis selbst bleibt unberührt: Sonst würde er hier
+       * ein zweites Mal ausgelöst und der Titel ginge doppelt auf.
+       */
+      zeile.style.cursor = 'pointer'
+      zeile.addEventListener('click', (ev) => {
+        if (ev.target.closest('a')) return
+        if (ev.target.closest('button')) return
+        verweis.click()
+      })
+
+      /*
+        **„Gibt es dort nicht" braucht keinen Umweg über die Seite.**
+
+        Daniel am 05.09.2026: „warum gibt es in der liste kein button für 'nicht
+        auf prime' melden?" — und auf die Rückfrage, was der Knopf bedeuten
+        soll: „Ich hab nachgesehen, gibt's dort nicht."
+
+        Genau das meldet er: `befund: 'weg'` unter der Adresse des Auftrags,
+        also dasselbe Ergebnis wie der Knopf auf der Seite. Die Übernahme macht
+        daraus ein `available: false` und entfernt den Verweis.
+
+        Er steht **nicht** für „der Auftrag ist Unsinn" — dafür gibt es das X am
+        Kasten, das nur weglegt. Der Unterschied ist der zwischen einer Aussage
+        über das Angebot und einer über unsere Liste.
+      */
+      const nichtDa = document.createElement('button')
+      nichtDa.className = 'ak-umschalter ak-nichtda'
+      nichtDa.type = 'button'
+      nichtDa.textContent = '✕ nicht da'
+      nichtDa.title =
+        'Ich habe nachgesehen: Diesen Titel gibt es bei Prime Video nicht.\n' +
+        'Wird als „nicht verfügbar" gemeldet, der Verweis verschwindet aus dem Bestand.'
+      nichtDa.addEventListener('click', (ev) => {
+        ev.stopPropagation()
+        void nichtBeiPrimeMelden({ suchUrl: e.url, titel: e.titel }, { art: 'liste' }, nichtDa)
+      })
+      zeile.appendChild(nichtDa)
+
+      // Was an dieser Adresse hängt: mehrere Staffeln unter einer Seite sind
+      // der Regelfall, nicht die Ausnahme.
+      const offeneNamen = e.eintraege.filter((x) => x.offen)
+      if (offeneNamen.length > 1) {
+        const zusatz = document.createElement('span')
+        zusatz.className = 'ak-folge'
+        zusatz.textContent = `${offeneNamen.length} Einträge`
+        zeile.appendChild(zusatz)
+      }
+      // Der Fortschritt gehört sichtbar in die Zeile: „1/5" sagt, dass hier
+      // noch vier Staffeln warten.
+      const stand = fortschritt(asinEintrag)
+      if (stand) {
+        const marke = document.createElement('span')
+        /**
+         * **Lokal abgehakt, beim Worker nichts — das muss dastehen.**
+         *
+         * Daniel am 30.08.2026: „einträge in der liste sind mit checkmark und x
+         * symbol markiert, was bedeutet es? wenn das bedeutet sie wurden bereits
+         * gemeldet, warum sind sie dann immer noch in der liste?"
+         *
+         * Beides stimmt gleichzeitig: Die Marke zeigt den **lokal gemerkten**
+         * Befund, und die Zeile bleibt stehen, weil beim Worker keine Meldung
+         * liegt. Gemessen am selben Tag: 435 von 582 Prime-Adressen sind dort
+         * angekommen — die acht in der Liste nicht, obwohl alle acht lokal einen
+         * Befund tragen. Die Meldung ist unterwegs verloren gegangen.
+         *
+         * Die Liste hat recht, sie zu zeigen. Sie war nur stumm darüber, warum.
+         */
+        const verloren = nichtAngekommen(asinEintrag)
+        marke.className = fertig(asinEintrag) ? 'ak-folge ak-fertig' : 'ak-folge ak-angefasst'
+        /*
+          **Zwei Aussagen, zwei Marken — sie zusammenzuziehen war der Fehler.**
+
+          In einer Pille liest man sie als eine Aussage. Es sind aber zwei
+          unabhängige Dinge:
+
+              2 von 9 gemeldet     wie weit die Serie durch ist
+              nur auf dem Rechner  ob die Meldung den Worker erreicht hat
+
+          Dazu kam, dass die zweite Angabe verschwindet, sobald die Meldung
+          ankommt — nach ein paar Sekunden. Nebeneinander in derselben Pille
+          sah das aus wie eine wechselnde Beschriftung derselben Sache.
+
+          Ausgeschrieben statt „2/9": Der Bruchstrich sagt nicht, was gezählt
+          wird, und genau danach musste er fragen.
+        */
+        /*
+          **Die Marke nennt, was gemeldet ist — nicht „alle".**
+
+          Daniel am 14.09.2026 an Digimon: „ich hab nur die 54 folgen von staffel
+          1 gemeldet, warum steht da alle gemeldet statt (s1e1-54) gemeldet?"
+          „✓" hieß hier „so viele Staffeln, wie diese Zeile kennt" — bei einer
+          Zeile mit einer Staffel also immer „alle", auch wenn die Reihe weitere
+          hat, die als eigene Titel geführt werden.
+        */
+        const gemeldet = gemeldetKurz(asinEintrag)
+        marke.textContent = gemeldet
+          ? stand.includes('/')
+            ? `${gemeldet} gemeldet · ${stand.replace('/', ' von ')}`
+            : `${gemeldet} gemeldet`
+          : stand === '✓'
+            ? '✓ gemeldet'
+            : `${stand.replace('/', ' von ')} gemeldet`
+        /**
+         * Beim Überfahren steht da, **welche** Staffeln durch sind.
+         *
+         * „12/15" sagt, dass drei fehlen, aber nicht welche — bei fünfzehn
+         * Staffeln bleibt sonst nur, alle noch einmal durchzugehen (Daniel,
+         * 24.08.2026). Die Antwort liegt im Bestand: Jede gemeldete Staffel
+         * steht dort mit ihrem Befund.
+         */
+        marke.title = staffelUebersicht(asinEintrag)
+        zeile.appendChild(marke)
+        /*
+          **Und der Sendezustand als eigene Marke daneben.**
+
+          Daniel am 09.09.2026: „wenn es nur lokal und noch nicht gesendet ist,
+          mach diesen zustand deutlich." Sie steht nur da, solange der
+          Briefkasten die Adresse nicht führt — im Normalfall also für die
+          Sekunden zwischen Klick und Ankunft, und dauerhaft nur dann, wenn die
+          Meldung wirklich unterwegs verlorengegangen ist (30.08.2026: acht
+          Titel lokal abgehakt, im Briefkasten nie angekommen).
+        */
+        if (verloren) {
+          const sende = document.createElement('span')
+          sende.className = 'ak-folge ak-verloren'
+          sende.textContent = 'nur auf diesem Rechner'
+          sende.title =
+            'Der Befund steht lokal, im Briefkasten liegt dazu nichts. Kurz nach dem Melden ist das normal — bleibt es stehen, ist die Meldung nicht angekommen.'
+          zeile.appendChild(sende)
+        }
+      }
+      inhalt.appendChild(zeile)
+    }
+
+    /**
+     * **Die Suchadressen — dieselbe Liste, eigener Abschnitt.**
+     *
+     * 118 unserer Prime-Verweise sind Suchen statt Titelseiten. Sie standen
+     * bis zum 27.08.2026 in keiner Übersicht: Der Knopf zählte zwei offene
+     * Titelseiten, und nach deren Meldung schrieb er „Prime: alles geprüft",
+     * während 118 Adressen unbearbeitet waren.
+     *
+     * Sie bekommen einen eigenen Abschnitt, weil sie andere Arbeit meinen:
+     * Eine Titelseite liest die Erweiterung selbst; hier muss erst der
+     * richtige Treffer herausgesucht werden. Die Folgenzahl steht in der
+     * Zeile — sie ist das Merkmal, an dem sich die Serie von ihrem Film
+     * unterscheidet.
+     */
+    auswahlAbschnitt(inhalt)
+    const suchZeilen = Object.entries(suchliste)
+    if (suchZeilen.length) {
+      const trenner = document.createElement('div')
+      trenner.className = 'ak-abschnitt'
+      trenner.textContent = globalThis.akPrimeSuchUeberschrift('Suchen', suchOffen().length, suchZeilen.length)
+      trenner.title = 'Für diese Titel kennt niemand eine Prime-Adresse. Öffne die Suche und kreuze an, welche Karten zum Titel gehören; sie erscheinen dann hier unter „Gewählte Treffer“.'
+      inhalt.appendChild(trenner)
+
+      /*
+        **Was aussichtsreich ist, steht oben — abgehakt unten, wackelig ganz unten.**
+
+        Die Liste war rein alphabetisch, und damit ging genau die Reihenfolge
+        verloren, die `vorschlaege-anbieter.ts` mühsam herstellt: Titel mit
+        belegten deutschen Sprechrollen zuerst, wackelige TMDB-Treffer zuletzt.
+        Wer von oben nach unten arbeitet, soll den Ertrag vorn haben.
+
+        Ein wackeliger Vorschlag wird deshalb **nicht** ausgeblendet — er ist
+        seltener richtig, nicht nie. Er steht nur hinten und sagt in der Zeile,
+        woran es liegt.
+      */
+      for (const [url, e] of suchZeilen.sort((a, b) => {
+        const d = Number(istGemeldet(a[0])) - Number(istGemeldet(b[0]))
+        if (d) return d
+        const u = Number(Boolean(a[1].unsicher)) - Number(Boolean(b[1].unsicher))
+        if (u) return u
+        return a[1].titel.localeCompare(b[1].titel, 'de')
+      })) {
+        const zeile = document.createElement('div')
+        zeile.className = 'ak-zeile ak-suchzeile'
+        /*
+          **Ausgeblendet wird, was wirklich erledigt ist — nicht, was lokal abgehakt wurde.**
+
+          `.ak-abgehakt` blendet die Zeile ganz aus (`display: none`). Sie hing am
+          lokalen Vermerk, und der steht auch dann, wenn erst eine von zwei
+          angekreuzten Ausgaben gemeldet ist: Die Liste zählte "1 von 1 offen"
+          und zeigte nichts (Daniel, 02.09.2026: "wo ist der listeneintrag?").
+
+          `istGemeldet` ist dieselbe Quelle, aus der der Zähler kommt — damit
+          sagen Zahl und Liste dasselbe.
+        */
+        if (istGemeldet(url) || erwartungZu(url)) zeile.classList.add('ak-abgehakt')
+
+        const verweis = document.createElement('a')
+        verweis.className = 'ak-titel'
+        /*
+          **Geöffnet wird der Suchbegriff, gemeldet die Adresse.**
+
+          Die Adresse aus dem Bestand ist der Schlüssel für jede Zuordnung — sie
+          bleibt unverändert. Womit gesucht wird, ist davon unabhängig: Der
+          Listengenerator legt seit dem 31.08.2026 einen `suchbegriff` bei,
+          gebaut aus dem **deutschen** Titel ohne Gattungswörter.
+
+          Daniel: „alle titel sollen im search mit ihrem deutschen titel gesucht
+          werden … die generics sollen aus der search rausgenommen werden."
+          Gemessen trugen 26 von 51 Adressen den englischen Titel, und der
+          findet bei Prime oft nichts.
+        */
+        verweis.href = e?.suchbegriff
+          ? `https://www.amazon.de/s?k=${encodeURIComponent(e.suchbegriff)}&i=instant-video`
+          : url
+        verweis.textContent = e.titel
+        zeile.appendChild(verweis)
+
+        /*
+          Die Folgenzahl ist hier kein Fortschritt, sondern das Erkennungs-
+          merkmal: Eine Suche nach „Cowboy Bebop" liefert bei Prime nur den
+          Film — eine Folge statt sechsundzwanzig.
+        */
+        if (e.folgen) {
+          const marke = document.createElement('span')
+          marke.className = 'ak-folge'
+          marke.textContent = `${e.folgen} Folgen`
+          marke.title = 'So viele Folgen führt unser Bestand. Zeigt der Treffer deutlich weniger, ist es ein anderes Werk — meist der Film zur Serie.'
+          zeile.appendChild(marke)
+        }
+
+        /*
+          **Der Vermerk gehört in die Zeile, nicht erst in den Kasten.**
+
+          Bis 3.91 stand er nur auf der Suchseite — also erst, nachdem Daniel
+          geklickt und gewartet hat. Hier entscheidet er, was er überhaupt
+          anfasst; ein Hinweis danach kommt zu spät.
+        */
+        if (e.unsicher) {
+          const marke = document.createElement('span')
+          marke.className = 'ak-folge ak-unsicher'
+          marke.textContent = 'wackelig'
+          marke.title = e.unsicher + ' — der Anbieter gehört vielleicht einem anderen Werk. Findest du hier nichts, ist das die wahrscheinliche Erklärung.'
+          zeile.appendChild(marke)
+        }
+
+        zeile.style.cursor = 'pointer'
+        zeile.addEventListener('click', (ev) => {
+          if (ev.target.closest('a')) return
+          verweis.click()
+        })
+        inhalt.appendChild(zeile)
+      }
+    }
+
+    const filtern = () => {
+      const q = suche.value.trim().toLowerCase()
+      for (const z of inhalt.children) {
+        z.style.display = !q || z.textContent.toLowerCase().includes(q) ? '' : 'none'
+      }
+    }
+    suche.addEventListener('input', filtern)
+
+    // Der gemerkte Zustand zurück: Suchbegriff, Filter, Scrollposition,
+    // „Erledigte zeigen". Ein Neuaufbau soll für den Benutzer unsichtbar sein.
+    if (merkeSuche) {
+      suche.value = merkeSuche
+      filtern()
+    }
+    if (merkeErledigte) {
+      kasten.classList.add('ak-mit-erledigten')
+      umschalterZeigen(umschalter, true)
+    }
+    inhalt.scrollTop = merkeScroll
+
+    /**
+     * Der Fokus kommt nur beim **Öffnen** ins Suchfeld — oder zurück, wenn er
+     * vorher schon dort war.
+     *
+     * Bedingungslos gesetzt sprang er zweimal je Sekunde hinein, das Feld
+     * blinkte, und wer gerade woanders klickte, verlor den Klick.
+     */
+    if (!altesFeld || hatteFokus) suche.focus()
+  }
+
+  /**
+   * Auch Staffeln, die **nicht** auf unserer Liste stehen, sind meldenswert.
+   *
+   * Daniel am 23.08.2026: „staffel 3 ist nur mit aniverse anschaubar … nach
+   * neuladen auf season 3 erscheint der button nicht." Der Grund war nicht das
+   * Abo — die Erweiterung kennt keine Abo-Sperre —, sondern dass diese Staffel
+   * unter einer eigenen Kennung läuft, die im Bestand fehlt.
+   *
+   * Sie stumm zu übergehen ist der falsche Schluss: Eine belegte deutsche
+   * Tonspur ist auch dann etwas wert, wenn wir den Titel noch nicht führen. Die
+   * Meldung geht dann mit der Adresse der Seite raus und ohne unsere Kennung;
+   * zuordnen lässt sie sich später über den Titel.
+   */
+  /* Startseite: nie eine Kennung, also Hörer und Takt vor dem Warten. Im Frame erst am Ende (`frameSchritt()` braucht `knopf`, `gesehen`). */
+  window.addEventListener('message', primeHoerer)
+  if (!IM_FRAME) setTimeout(primeTakt, 500)
+
+  /**
+   * Keine Titelseite? Dann wird gewartet, nicht ausgestiegen.
+   *
+   * Seit dem 24.08.2026 läuft dieses Skript auf **jeder** Amazon-Seite — anders
+   * kommt es bei einer Navigation innerhalb der Seite gar nicht erst zum Zug
+   * (Chrome injiziert bei einem History-Wechsel nicht nach). Auf der Startseite
+   * gibt es dann keine Kennung, und ein `return` an dieser Stelle hieße: Wer
+   * von dort aus einen Titel öffnet, sieht keine Knöpfe und muss F5 drücken.
+   * Genau das war Daniels Beschwerde.
+   *
+   * Gewartet wird auf die Kennung, nicht auf die Adresse: Amazon tauscht den
+   * Seiteninhalt aus, und erst wenn der Quelltext eine Titel-Kennung trägt,
+   * gibt es überhaupt etwas zu melden.
+   *
+   * Fünf Minuten Frist, dann ist Schluss — wer so lange bei Amazon liest, ohne
+   * einen Titel zu öffnen, braucht keinen Melder, und ein Takt, der ewig läuft,
+   * gehört nicht auf eine Seite, die stundenlang offen sein kann.
+   */
+  if (!id) {
+    id = await new Promise((fertig) => {
+      const bis = Date.now() + 5 * 60 * 1000
+      const takt = setInterval(() => {
+        /*
+          **Auch beim Warten gehört die Prüfliste in den Kasten.** Auf einer
+          Suchseite gibt es nie eine Kennung; der Takt weiter unten, der den Knopf
+          sonst einsetzt, läuft dort gar nicht an. Nach „Nicht bei Prime — melden“
+          stand der Kasten deshalb ohne Weg zur nächsten Aufgabe da (Daniel,
+          19.09.2026: „wo ist der button für die liste?“).
+        */
+        try {
+          /*
+            **Und auf einer Prime-Video-Seite ohne Titel entsteht der Kasten hier.** Startseite,
+            Serien, Filme tragen keine Kennung, und der Takt, der ihn sonst baut, läuft erst mit
+            einer. Die Prüfliste war dort unerreichbar (Daniel, 26.09.2026, Bild der Startseite).
+          */
+          if (imPlayer()) document.querySelector('.ak-amazon-suchhinweis.ak-nur-huelle')?.remove()
+          else if (!document.querySelector('.ak-amazon-suchhinweis') && seiteGehtUnsAn()) {
+            kastenSkelett().classList.add('ak-nur-huelle')
+          }
+          const mitte = document.querySelector('.ak-amazon-suchhinweis .ak-such-fuss-mitte')
+          if (mitte && !imPlayer() && uebersichtKnopf.parentElement !== mitte) {
+            uebersichtKnopf.classList.add('ak-uebersicht-innen')
+            mitte.appendChild(uebersichtKnopf)
+          }
+          uebersichtZeichnen()
+        } catch {
+          /* Ohne Kasten bleibt der Knopf, wo er ist. */
+        }
+        const jetzt = asin()
+        if (jetzt || Date.now() > bis) {
+          clearInterval(takt)
+          fertig(jetzt ?? null)
+        }
+      }, 700)
+    })
+    if (!id) return
+    // Die Adresse hat sich unterdessen geändert — die gemerkte Startadresse
+    // stammt noch von der Seite, auf der wir angekommen sind.
+    startAdresse = location.href || startAdresse
+    // Die Geduldsfrist beginnt mit dem Titel, nicht mit dem Skriptstart auf der Startseite.
+    letzterFortschritt = Date.now()
+  }
+
+  /**
+   * Unter welcher Kennung dieser Titel in **unserer Liste** steht.
+   *
+   * Nicht dieselbe wie die Melde-Kennung: Die Liste entsteht aus den
+   * Adressen im Datensatz, der Quelltext nennt die Kennung der gezeigten
+   * Staffel. Bei „Digimon Tamers" sind das B0CQ4VL364 und B0CKPCSHMC.
+   *
+   * Gesucht wird über beide — und abgehakt wird unter **dieser**, sonst
+   * verschwindet der Eintrag nie aus der Liste.
+   */
+  /**
+   * Unter welchem Listeneintrag diese Seite abgehakt wird.
+   *
+   * `bisher` ist der Eintrag, unter dem wir gerade stehen — und der Grund,
+   * warum er übergeben wird: **Ein Staffelwechsel wechselt die ASIN, nicht die
+   * Serie.** Jede Staffel hat ihre eigene, unsere Liste kennt aber nur die
+   * eine, über die der Verweis in den Bestand kam.
+   *
+   * Ohne diesen Rückfall landete jede Meldung ab Staffel 2 unter einer
+   * Kennung, die in keiner Zeile der Liste steht: Bei „Captain Tsubasa" waren
+   * vier von fünf Meldungen unsichtbar, bei Bakugan verteilten sie sich auf
+   * drei Zeilen derselben Serie.
+   */
+  /**
+   * **Steht diese Serie irgendwo bei uns — egal unter welcher Staffel?**
+   *
+   * Prime gibt jeder Staffel eine eigene Kennung. Unsere Liste führt aber
+   * nicht jede davon: Wer Staffel 1 gemeldet hat und dann auf Staffel 2
+   * umschaltet, landet auf einer Kennung, die dort nicht steht — und seit
+   * 3.44 verschwanden damit alle Bedienelemente.
+   *
+   * Das Ausblenden war für **fremde** Titelseiten gedacht, nicht für die
+   * zweite Staffel einer Serie, die wir führen. Der Serientitel trennt beides:
+   * Amazon nennt ihn auf jeder Staffel-Seite gleich.
+   */
+  function serieBekannt() {
+    const serie = titelKern(seitenTitel())
+    if (!serie) return false
+    /*
+      **Verglichen wird der Kern, und „enthält" genügt.**
+
+      Gleichheit trägt hier nicht: Amazon nennt die Seite „Dr. Stone", unser
+      Eintrag heißt „Dr. Stone – Staffel 3", und die Prüfliste führt oft nur
+      eine der Staffeln. `titelKern()` wirft Staffelangaben und Satzzeichen
+      ohnehin weg; was bleibt, muss nur ineinander vorkommen.
+    */
+    const passt = (t) => globalThis.akPrimeTitelPasst(titelKern, seitenTitel(), t)
+    if (Object.keys(erledigt).some((k) => passt(erledigt[k]?.serie) || passt(erledigt[k]?.titel))) return true
+    return Object.values(liste).some((e) => passt(e?.serie) || passt(e?.titel))
+  }
+
+  /** Eine Entscheidung für Knopf und Kopfzeile: bleibt „melden“ auf dieser Seite weg? */
+  function meldenVersteckt() {
+    return globalThis.akPrimeKnopfVersteckt({
+      listeGeladen: Object.keys(liste).length > 0,
+      inListe: Boolean(liste[listenId]),
+      ausSuche: Boolean(eintrag?.ausSuche),
+      serieBekannt,
+      seiteGehtUnsAn,
+    })
+  }
+
+  function listenSchluessel(bisher) {
+    const ausAdresse = asinAusAdresse()
+    if (ausAdresse && liste[ausAdresse]) return ausAdresse
+    if (liste[id]) return id
+    /*
+      **Ein Auftrag unter JustWatchs gti.** `watch.amazon.de/detail?gti=…` leitet
+      auf eine Seite mit eigener Kennung weiter; die Adresse nennt die gti danach
+      nicht mehr, der Hydration-Block schon (Edens Zero S2, 19.09.2026: kein
+      Melde-Knopf). `gesehen` entsteht weiter unten — beim ersten Aufruf gibt es
+      ihn noch nicht, der Takt fragt später erneut.
+    */
+    /*
+      Der Klick zuerst: JustWatch führt manche Seite unter zwei gtis, und die
+      Kopf-gti der Seite traf dann den **anderen**, schon gemeldeten Eintrag —
+      der angeklickte blieb offen und war nicht meldbar (Yu-Gi-Oh! 5D’s,
+      Yamada-kun, 19.09.2026).
+    */
+    const sprung = gtiSprung()
+    if (sprung && liste[sprung]) return sprung
+    try {
+      const gti = gesehen?.seite?.gti
+      if (gti && liste[gti]) return gti
+    } catch {
+      /* `gesehen` noch nicht angelegt. */
+    }
+    if (bisher && liste[bisher] && globalThis.akPrimeEintragGehoertZurSeite(titelKern, seitenTitel(), [liste[bisher], erledigt[bisher]])) return bisher
+    /**
+     * Nach einem **Neuladen** auf einer Staffel-Seite hilft `bisher` nicht mehr.
+     *
+     * Der Rückfall darüber gilt nur innerhalb einer Sitzung: Wer die Seite neu
+     * lädt, während Staffel 3 offen ist, startet ohne vorherigen Eintrag — und
+     * die ASIN dieser Staffel steht nicht in unserer Liste. Die Meldung landete
+     * dann wieder unter einer fremden Kennung, und der Fortschritt sprang
+     * zurück: „ich sende die ersten 2 staffeln, es steht 2 staffeln noch …
+     * wenn ich die seite neulade kann ich staffel 3 senden, aber dann steht
+     * dort 4 staffeln noch" (Daniel, 24.08.2026, an „Wickie").
+     *
+     * Der Serientitel schließt die Lücke: Er steht seit dem 24.08.2026 in jedem
+     * gemeldeten Eintrag, und Amazon nennt ihn auf jeder Staffel-Seite gleich.
+     */
+    const serie = seitenTitel()
+    if (serie) {
+      const treffer = Object.keys(erledigt).find((k) => erledigt[k]?.serie === serie && liste[k])
+      if (treffer) return treffer
+    }
+    return ausAdresse ?? id
+  }
+
+  /**
+   * Der Listeneintrag zur aktuellen Seite — oder der Ersatz dafür.
+   *
+   * Steht die Seite in keiner Liste, gibt es zwei Fälle. Der Regelfall ist
+   * eine Seite, die uns nichts angeht; dann bleibt der Platzhalter stehen.
+   * Der zweite ist der Treffer einer **Suche**, die aus unserer Liste kam:
+   * Dann steht der gemeinte Titel im Suchauftrag, und gemeldet wird unter der
+   * **Suchadresse** — die kennt die Pipeline, die Titelseite nicht.
+   */
+  function eintragFuer(schluessel) {
+    if (liste[schluessel]) return liste[schluessel]
+    const auftrag = suchauftrag()
+    if (auftrag) {
+      return { titel: auftrag.titel, url: auftrag.suchUrl, ausSuche: true }
+    }
+    /*
+      **Eine bestätigte Erwartung nennt diese Seite — dann gehört sie zum Auftrag.**
+
+      Der Sprung-Merker in `sessionStorage` verfällt nach zehn Minuten; er ist
+      dafür gedacht, einen Klick zu überbrücken. Die Erwartung liegt seit dem
+      02.09.2026 beim Worker und gilt, bis alle Ausgaben gemeldet sind — wer sich
+      Zeit lässt oder zwischendurch etwas anderes tut, stand danach ohne
+      Melde-Knopf da, obwohl der Auftrag offen war.
+
+      Gesucht wird die Kennung dieser Seite in allen Erwartungen. Sie ist
+      eindeutig: Sie wurde auf genau einer Trefferliste angekreuzt.
+    */
+    try {
+      for (const [suchUrl, kennungen] of Object.entries(globalThis.akPrimeErwartungenMitEigenen(briefkastenErwartungen, auswahlMerk, Date.now()) ?? {})) {
+        if (!Array.isArray(kennungen) || !kennungen.includes(String(schluessel))) continue
+        return { titel: auswahlKopf(suchUrl)?.titel ?? null, url: suchUrl, ausSuche: true }
+      }
+    } catch {
+      /* Ohne Erwartung bleibt es beim Bisherigen. */
+    }
+    return { titel: null, url: `https://www.amazon.de/dp/${id}`, unbekannt: true }
+  }
+
+  listenId = listenSchluessel()
+  eintrag = eintragFuer(listenId)
+  /*
+    **Auf einer Suchseite gibt es nichts zu melden.**
+
+    Der rote Knopf „✕ keine Folgen für diese Staffel — melden" stand am
+    27.08.2026 auf `amazon.de/s?k=Anonymous+Noise` — einer Trefferliste ohne
+    Staffel, ohne Folgen und ohne Kennung. Er kam dorthin, weil ein Auftrag
+    aus der Suche als Listeneintrag gilt (3.47, damit der Sprung meldet); für
+    die Suchseite selbst gilt das gerade nicht.
+  */
+  if (!aufSuchseite) zeigeAuftragshinweis()
+
+  // --- Der Knopf -----------------------------------------------------------
+
+  document.body.appendChild(knopf)
+
+
+  /**
+   * Gesammelt wird über die Abschnitte hinweg, nicht je Ansicht.
+   *
+   * Amazon zeigt lange Staffeln seitenweise („Folgen 1–24", „25–48", „49–51").
+   * Im Quelltext steht immer nur der gerade gewählte Abschnitt. Wer einmal
+   * meldet, meldet also einen Ausschnitt — bei „Digimon Tamers" wären das 24
+   * von 51 Folgen (Daniel, 23.08.2026, mit Bild).
+   *
+   * Deshalb merkt sich der Knopf, was er schon gesehen hat, und zählt weiter,
+   * während die Abschnitte eintreffen — gleich ob Daniel sie anklickt oder
+   * `amazon-leser.js` sie nachholt.
+   */
+  /**
+   * **Ein Zählstand gehört zu genau einer Adresse — sonst ist er keiner.**
+   *
+   * Daniel am 25.08.2026: „warum schmeißt du alt daten nach erkanntem wechsel
+   * nicht direkt weg und hörst nur auf widget, sobald neues widget reinkommt
+   * alte daten rausschmeißen, dann kann das nie passieren."
+   *
+   * Bis dahin wuchs `gesehen` über die Zeit und wurde aus **zwei** Quellen
+   * gefüttert: aus den Widget-Antworten und aus dem Seiten-Quelltext. Der
+   * Quelltext ist nach einem Staffelwechsel aber der alte (siehe CLAUDE.md),
+   * und damit mischten sich zwei Stände. Dagegen wurden nacheinander sechs
+   * Wächter gebaut — Ruhefristen, Signaturvergleiche, Kennungsprüfungen —, und
+   * jeder einzelne behandelte ein Symptom.
+   *
+   * `fuerAdresse` behandelt die Ursache: Kommt eine Antwort für eine andere
+   * Adresse, wird der Stand **ersetzt**, nicht ergänzt. Ein alter Stand kann
+   * damit gar nicht überleben.
+   */
+  function leererStand() {
+    return {
+      fuerAdresse: null,
+      nummern: new Set(),
+      gesamt: null,
+      jeFolge: new Map(),
+      /* Folgen, die hier nicht abrufbar sind — sie zählen weder mit noch dagegen. */
+      gesperrt: new Map(),
+      /* Wie viele Folgenabschnitte die Seite kennt und wie viele davon noch fehlen. */
+      abschnitte: null,
+      /* Was der Hydration-Block über die Seite selbst sagt. */
+      seite: null,
+    }
+  }
+  gesehen = leererStand()
+  /* Deutsch steht in den Folgen, nie in einem Sammelwert (Hell Mode, 30.08.2026). */
+  const hatDeutsch = (namen) => (namen ?? []).some((s) => /deutsch|german/i.test(s))
+  const deutschInFolgen = () => [...gesehen.jeFolge.values()].some(hatDeutsch)
+  const sprachenAusFolgen = () => [...new Set([...gesehen.jeFolge.values()].flat())]
+
+  /**
+   * Was der Mitleser aus den Nachlade-Antworten fischt, kommt hier an.
+   *
+   * Ohne diesen Weg bliebe der Knopf beim ersten Abschnitt stehen: Amazon
+   * schreibt die Tonspuren nur einmal ins HTML, beim Blättern kommen sie
+   * ausschließlich über das Netz (gemessen am 23.08.2026, siehe
+   * `amazon-leser.js`).
+   */
+  /**
+   * Was der Worker über gemeldete Titel weiß — die verlässliche Quelle.
+   *
+   * Geholt wird einmal je Seitenaufruf, im Hintergrund. Schlägt es fehl, bleibt
+   * es beim lokalen Stand: Ein Abgleich, der beim ersten Netzproblem alles
+   * vergisst, wäre schlechter als einer, der manchmal hinterherhinkt.
+   *
+   * Die Meldungen tragen die **Listen-Adresse** (`url`) und, wo sie bekannt
+   * war, die Staffelnummer. Wo sie fehlt, zählt die Meldung als „dieser Titel
+   * wurde gemeldet" — gröber, aber nie falsch.
+   *
+   * Quelle ist `?zaehlen=1&nummern=1` (Edge-Cache, dieselbe Adresse wie in
+   * `disney.js`), nicht mehr die Token-Liste: die las je Seitenaufruf rund
+   * 36.000 D1-Zeilen (15.10.2026). Umrechnung in `prime-stand.js`.
+   */
+  async function standVomWorker() {
+    try {
+      const antwort = await fetch(`${WORKER}?zaehlen=1&nummern=1`)
+      if (!antwort.ok) return null
+      const { eintraege } = await antwort.json()
+      if (!Array.isArray(eintraege)) return null
+      return globalThis.akPrimeStandAusBriefkasten(eintraege)
+    } catch {
+      return null
+    }
+  }
+
+  // Im Hintergrund abgleichen — der Knopf wartet nicht darauf.
+  void (async () => {
+    const ausWorker = await standVomWorker()
+    if (!ausWorker) return
+    erledigt = globalThis.akPrimeStandVereinigen(erledigt, ausWorker)
+    letzteSignatur = null
+    letzterStand = ''
+    uebersichtZeichnen()
+  })()
+
+  /*
+    **Beim Start den Stand beim Leser anfragen.** Sein erster Schnappschuss kommt
+    oft, bevor dieses Skript zuhört (siehe `amazon-leser.js`, „amazon.js fragt
+    nach"). Die Antwort trifft ein, nachdem der Hörer darunter steht —
+    `postMessage` stellt sie erst in einer späteren Aufgabe zu.
+  */
+  try {
+    window.postMessage({ marke: 'ak-amazon-anfrage' }, '*')
+  } catch {
+    /* Ohne Nachrichtenweg (Sandkasten) bleibt es beim ersten Schnappschuss. */
+  }
+  window.addEventListener('message', (e) => {
+    /* Die Antwort eines Durchgangs-Frames beantwortet `primeHoerer()`, schon vor dem Warten auf eine Kennung. */
+    if (e?.data?.marke === 'ak-prime-frame') return
+    /**
+     * **Eine späte Antwort des vorigen Titels gehört nicht in diesen Zählstand.**
+     *
+     * Daniel hat den Wettlauf am 25.08.2026 eingekreist, und zwar durch
+     * Abwarten statt durch Raten: Lädt ein Titel noch — erkennbar an Amazons
+     * Abspiel-Knopf, der rund zwanzig Sekunden lang eine Ladeanimation zeigt —
+     * und wechselt man in dieser Zeit, kommen dessen Nachlade-Antworten **nach**
+     * dem Wechsel an. Sie landeten im frisch geleerten Zählstand des neuen
+     * Titels: „13 von 24" bei Clannad, wo die dreizehn zu „Darwin Jihen"
+     * gehörten. Wartete er, bis der vorige Titel fertig war, stimmten die 24.
+     *
+     * Das erklärt auch, warum die Fehler so sprunghaft wirkten: Sie hingen
+     * daran, **wie schnell** geklickt wurde, nicht daran, welcher Titel es war.
+     *
+     * Der Mitleser hängt seit 1.7 an jede Meldung die Adresse, für die er
+     * gelesen hat. Passt sie nicht zur jetzigen, ist die Antwort überholt —
+     * und eine überholte Antwort ist schlimmer als keine.
+     */
+    if (
+      typeof e?.data?.fuerAdresse === 'string' &&
+      e.data.fuerAdresse !== location.pathname + location.search
+    ) {
+      return
+    }
+    // Ein Ereignis schlägt jede Frist: Was der Mitleser meldet, kann den Stand
+    // der Seite geändert haben — dann wird der Quelltext sofort neu gelesen.
+    htmlNeuLesen()
+    /**
+     * Eine gezielt geholte Staffel **ersetzt** den Zählstand.
+     *
+     * Sonst mischen sich die Folgen zweier Staffeln: Der Quelltext trägt nach
+     * einem Dropdown-Wechsel weiter die alten, und die neuen kämen obendrauf.
+     */
+    /**
+     * Die Marke steht hier als Literal — `MARKE` gehört dem Leser.
+     *
+     * Die beiden Skripte laufen in getrennten Welten: `amazon-leser.js` in der
+     * Seitenwelt, dieses hier in der isolierten. Eine Konstante von dort ist
+     * hier schlicht nicht vorhanden, und der Zugriff wirft — bei **jeder**
+     * Nachricht, also bei jedem Takt. Genau das stand am 24.08.2026 in Daniels
+     * Fehlerkonsole: „Uncaught ReferenceError: MARKE is not defined".
+     *
+     * Die Folge war die schlimmste Sorte: Der Hörer starb, die gezielt geholte
+     * Staffel kam nie an, und der Knopf verlangte weiter ein Neuladen — für
+     * einen Umbau, der genau das abschaffen sollte.
+     *
+     * Zwei Zeilen tiefer stand das Literal die ganze Zeit richtig da.
+     */
+    /*
+      **Die Adresse entscheidet, nicht ein Flag.**
+
+      Bis zum 25.08.2026 wurde der Stand nur geleert, wenn die Antwort
+      `ersetzt: true` trug — also nur beim gezielt geholten Block. Jede andere
+      Antwort kam obendrauf, auch wenn sie zu einer anderen Staffel gehörte.
+
+      Jetzt gilt: Gehört der Stand zu einer anderen Adresse als diese Antwort,
+      ist er alt und wird weggeworfen. Das deckt beide Fälle ab, den gezielten
+      Abruf und die nachlaufenden Abschnitte, und braucht keinen Sonderfall.
+    */
+    if (e?.data?.marke === 'ak-amazon-folgen') {
+      const jetzigeAdresse = e.data.fuerAdresse ?? location.pathname + location.search
+      /*
+        **Jede Antwort wird vermerkt, bevor sie verarbeitet wird.**
+
+        Bei „Haikyu!!" fehlten die Folgen 3 und 4 im Zählstand (Daniel,
+        27.08.2026). Ob ihre Antwort nie kam oder ankam und verworfen wurde,
+        beantwortet nur diese Zeile: Der Zählstand zeigt das Ergebnis, nicht
+        den Weg dorthin.
+      */
+      notiere('antwort', {
+        fuerAdresse: jetzigeAdresse,
+        standAdresse: gesehen?.fuerAdresse ?? null,
+        nummern: (e.data.folgen ?? []).map((f) => f?.nummer ?? null).filter((n) => n !== null),
+        anzahl: (e.data.folgen ?? []).length,
+        ersetzt: Boolean(e.data.ersetzt),
+      })
+      /*
+        **Ein Schnappschuss ersetzt den Zählstand — ohne Zusammenführen.**
+
+        Seit dem Umbau vom 15.09.2026 schickt der Leser immer seinen ganzen
+        Zustand für eine Seite (`amazon-leser.js`, „Das Modell"). Was vorher im
+        Stand lag, ist darin enthalten oder gehört zu einer anderen Seite. Die
+        Adressregel darunter bleibt für die Angaben, die an der Seite hängen.
+      */
+      if (e.data.schnappschuss && gesehen.fuerAdresse === jetzigeAdresse) {
+        gesehen = leererStand()
+        gesehen.fuerAdresse = jetzigeAdresse
+      }
+      if (gesehen.fuerAdresse !== jetzigeAdresse) {
+        gesehen = leererStand()
+        gesehen.fuerAdresse = jetzigeAdresse
+        /* Sie gehören zur alten Adresse — mit ihr wandern sie weg. */
+        gemeldeteSeitenKennung = null
+        gemeldeterSerientitel = null
+        gemeldeteStaffelNummer = null
+        gemeldeterBand = null
+        letzteZahl = -1
+        gemeldeteStaffel = null
+        letzterStand = ''
+        letzterFortschritt = Date.now()
+      }
+      if (e.data.abschnitte) gesehen.abschnitte = e.data.abschnitte
+    if (e.data.ersetzt) frischeStaffel = e.data.asin ?? null
+    }
+    if (e.source !== window || e.data?.marke !== 'ak-amazon-folgen') return
+    // `episodeCount` aus der Nachlade-Antwort ist verlässlicher als die Zahl im
+    // Seitengerüst — die steht dort für die gerade gewählte Staffel.
+    if (Number.isFinite(e.data.gesamt)) gesehen.gesamt = e.data.gesamt
+    // Der Leser sah die Adresse noch mit dem Verweis-Parameter.
+    if (typeof e.data.startAdresse === 'string') startAdresse = e.data.startAdresse
+    /*
+      Was der Hydration-Block über die Seite sagt — Kennung, Serientitel,
+      Staffelnummer, Gesamtzahl. Alles aus gültigem JSON, keine Muster mehr.
+    */
+    /* Der nachgeholte Quelltext einer neuen Staffel — siehe `ersatzQuelltext`. */
+    if (typeof e.data.quelltext === 'string' && e.data.quelltextFuer === location.pathname) {
+      ersatzQuelltext = { fuerPfad: e.data.quelltextFuer, html: e.data.quelltext }
+      /* Die Zwischenspeicher hängen an diesem Zeitstempel — sie rechnen jetzt neu. */
+      htmlGelesenAm = Date.now()
+      notiere('quelltext-nachgeholt', { pfad: e.data.quelltextFuer, zeichen: e.data.quelltext.length })
+    }
+    if (e.data.seite) {
+      const s = e.data.seite
+      if (s.kennung) gemeldeteSeitenKennung = s.kennung
+      if (s.serie || s.titel) gemeldeterSerientitel = s.serie ?? s.titel
+      if (Number.isFinite(s.staffel)) gemeldeteStaffelNummer = s.staffel
+      if (s.band) gemeldeterBand = s.band
+      gesehen.seite = s
+    }
+    for (const f of e.data.funde ?? []) {
+      // Ein Fund ohne Nummer zählt weder als Folge (der 27-von-24-Fehler) noch mit
+      // seinen Sprachen (Hell Mode, 30.08.2026): Sprachen kommen nur aus den Folgen.
+      /*
+        **Eine gesperrte Folge zählt nicht als „ohne deutsche Fassung".**
+
+        Daniel am 25.08.2026 an „Yu-Gi-Oh! ZEXAL" Staffel 2: Zwölf der
+        vierundzwanzig Folgen tragen statt eines Abspiel-Knopfes nur die
+        Meldung „In deiner Region nicht mehr auf Prime Video verfügbar" — und
+        ihre `audioTracks` sind **leer**. Wer sie mitzählt, meldet für die
+        halbe Staffel ein Nein, das keine Quelle deckt.
+      */
+      if (f.verfuegbar === false) {
+        gesehen.gesperrt ??= new Map()
+        gesehen.gesperrt.set(f.kennung ?? f.nummer, f)
+        continue
+      }
+      if (Number.isFinite(f.nummer)) {
+        gesehen.nummern.add(f.nummer)
+        /*
+          Die ganze Folge, nicht zwei Felder daraus: Titel, Beschreibung,
+          Laufzeit, Erscheinungsdatum, FSK, Zugänge. Der Leser liest sie aus
+          gültigem JSON; sie hier wegzuwerfen hieße, sie später ein zweites Mal
+          abzurufen.
+        */
+        /* Leere Tonspuren überschreiben keine gefüllten — das regelt der Leser (`uebernehmen()`). */
+        gesehen.jeFolge.set(f.nummer, f.sprachen ?? [])
+        gesehen.metaJeFolge ??= new Map()
+        gesehen.metaJeFolge.set(f.nummer, f)
+      }
+    }
+    zeichnen()
+  })
+
+  /**
+   * `letzterFortschritt` (deklariert im Zustandsblock oben): wann die Zahl zuletzt gestiegen ist.
+   *
+   * `amazon-leser.js` holt die übrigen Abschnitte selbst nach — solange das
+   * läuft, wäre „weitere Abschnitte öffnen" eine falsche Aufforderung. Bleibt
+   * die Zahl aber stehen, ist das Nachholen fehlgeschlagen, und dann muss der
+   * Knopf den Weg zeigen: Daniel kann die Abschnitte von Hand durchklicken.
+   */
+  /** Welche Staffel gerade gemeldet wurde — hält den Knopf auf „gemeldet". */
+  let gemeldeteStaffel = null
+  const GEDULD_MS = 8000
+
+  /**
+   * Wie lange die Folgenzahl unverändert stehen muss, bevor sie gilt.
+   *
+   * Amazon tauscht beim Staffelwechsel erst das Gerüst und dann die Zahlen. In
+   * diesem Fenster steht am Knopf die Zahl der **vorigen** Staffel, und wer
+   * dann klickt, meldet den falschen Stand.
+   *
+   * Zwei Sekunden sind großzügig für einen Austausch, der im Bruchteil davon
+   * passiert — und kurz genug, dass niemand darauf wartet.
+   */
+  const RUHE_MS = 2000
+  /**
+   * Wann Warten keine Auskunft mehr ist.
+   *
+   * Zwölf Sekunden, weil ein Abschnitt bei Prime in zwei bis drei ankommt — wer
+   * so lange nichts geschickt hat, schickt nichts mehr. Die Konstante steht hier
+   * oben, weil die Signatur in `zeichnen()` sie braucht: Ohne sie dort läuft die
+   * Frist ab, ohne dass jemand hinsieht.
+   */
+  const WARTE_FRIST_MS = 12_000
+
+  /**
+   * Wie lange ein Widerspruch zwischen Adresse und Quelltext sperren darf.
+   *
+   * Danach gewinnt die Adresse. Fünf Sekunden reichen für jeden Austausch, den
+   * Amazon im Bruchteil davon erledigt — und sie sind kurz genug, dass niemand
+   * vor einem Knopf sitzt, der sich nicht mehr rührt.
+   */
+  const WIDERSPRUCH_MS = 5000
+  let widerspruchSeit = 0
+  let gesamtGeaendertAm = 0
+  /** Die Folgenzahl, die der Quelltext zuletzt nannte — für die Regel darunter. */
+  let letzteQuelltextGesamt = null
+
+  /**
+   * Warum der Knopf sagt, was er sagt — beim Überfahren lesbar.
+   *
+   * Am 24.08.2026 stand er bei „Chaika" auf „noch 1 Staffel" und blieb dort,
+   * auch über einen Staffelwechsel hinweg. Von außen war nicht zu sehen, ob er
+   * die falsche Staffel meinte, den falschen Listeneintrag oder gar nicht mehr
+   * lief — und ein Skript in Daniels Chrome kann ich nicht befragen.
+   *
+   * Statt dessen sagt er es jetzt selbst. Kein Aufwand: Die Werte liegen ohnehin
+   * vor, sie standen nur nirgends.
+   */
+  function zustandAlsText() {
+    const e = erledigt[listenId]
+    return [
+      `Listeneintrag: ${listenId}${liste[listenId] ? '' : ' (nicht in der Liste)'}`,
+      /*
+        **Was der Band heißt, steht vor dem, wonach er sortiert wird.**
+
+        Daniel am 30.08.2026 an „Pokémon — Staffel 20 Teil 1": „tooltip sagt
+        staffel 2001 adresse 2001 seite 201? evtl ist es doch richtig, aber
+        liest sich komisch."
+
+        Es war richtig und trotzdem unlesbar. 2001 und 201 sind Amazons
+        **Sortierschlüssel**, keine Staffelnummern — dieselbe Beobachtung wie
+        bei „Yu-Gi-Oh! ZEXAL", wo Band 1 und Band 2 derselben Staffel als 101
+        und 1 nebeneinander stehen (CLAUDE.md, 25.08.2026). Der Name, den die
+        Seite selbst führt, sagt dagegen genau, wo man ist.
+      */
+      `Staffel: ${gemeldeterBand ?? staffelSchluessel()}`,
+      `  Sortierschlüssel — Adresse ${staffelAusAdresse() ?? '—'}, Seite ${staffelAusSeite() ?? '—'}`,
+      `gemeldet: ${Object.keys(staffelnDerSerie(listenId)).join(', ') || '—'} von ${gesamtDerSerie(listenId)} (Amazons Staffelzählung)`,
+      `Serie im Bestand: ${e?.serie ?? '—'} · Seitentitel: ${seitenTitel() ?? '—'}`,
+      `Folgen: ${gesehen.nummern.size} gelesen, ${gesehen.gesamt ?? '?'} laut Seite`,
+      /* Der Grund der Wiedervorlage gehoert dorthin, wo jemand nachsieht, warum
+         ein laengst gemeldeter Titel wieder dasteht. */
+      wiedervorlage(listenId) ? `Wiedervorlage: ${wiedervorlage(listenId)}` : '',
+    ]
+      .filter(Boolean)
+      .join(String.fromCharCode(10))
+  }
+
+  /**
+   * Gehört der Quelltext überhaupt zu der Staffel, die gerade gewählt ist?
+   *
+   * Amazon tauscht ihn beim Wechsel über das Auswahlfeld **nicht** aus (siehe
+   * CLAUDE.md). Die Adresse wandert mit, die JSON-Fracht bleibt. Nennen beide
+   * verschiedene Kennungen, gehören Folgenzahl, Tonspuren und Nummern im
+   * Quelltext nachweislich zu einer **anderen** Staffel.
+   *
+   * Bis zum 25.08.2026 flossen sie trotzdem in den Zählstand. Das war auch
+   * dann noch falsch, wenn der Mitleser die richtige Staffel längst geholt
+   * hatte: Sein `ersetzt: true` leert den Stand, und der nächste Durchlauf
+   * kippte die alten Folgen sofort wieder hinein — jede halbe Sekunde aufs
+   * Neue. Zwei Meldungen von Daniel an einem Abend, beide mit Bild:
+   *
+   * - „Jackie und Jill" Staffel 3: Knopf sagte 7 Folgen, die Staffel hat 6.
+   * - „Solar Impulse" Staffel 8: Knopf sagte 26, die Seite schreibt „1 Folge".
+   *
+   * Stimmen die Kennungen nicht überein, kommt der Zählstand deshalb
+   * ausschließlich vom Mitleser. Hat der noch nichts geliefert, steht er auf
+   * null, und der Knopf sagt „Tonspuren noch nicht geladen" — richtig, denn
+   * dann weiß niemand etwas über diese Staffel.
+   *
+   * Bei einer **Sammel-ASIN** sind beide Kennungen gleich, obwohl die Staffel
+   * gewechselt hat. Dagegen hilft diese Prüfung nicht — dort greift der
+   * Vergleich der Staffelnummern weiter unten, der zum Neuladen auffordert.
+   */
+  /**
+   * **Kennt der Quelltext die Kennung aus der Adresse überhaupt?**
+   *
+   * Der Wächter unterscheidet einen *Staffel*wechsel von einem *Titel*wechsel,
+   * und das ist der Unterschied, an dem am 25.08.2026 eine Falschmeldung
+   * vorbeikam: Für „My Isekai Life" (`0RNU3R7XQ7HDN1EOCZRAFD5R5R`, ein reiner
+   * ADN-Kanal-Titel ohne deutschen Ton) meldete die Erweiterung neun Tonspuren
+   * einschließlich Deutsch, der Knopf war grün. Die Sprachen gehörten zu „Ein
+   * Stern, heller als die Sonne" (`B0FMNQMXXG`) — dem Titel, den Daniel vier
+   * Sekunden zuvor gemeldet hatte.
+   *
+   * Gefangen hat es keiner der drei vorhandenen Prüfsteine: Die Staffelnummer
+   * war in beiden Fällen dieselbe, die Folgenzahl **beide Male 12**, und ohne
+   * gezielt geholten Block (`frischeStaffel === null`) fiel der Kennungsvergleich
+   * ganz aus.
+   *
+   * **Gemessen an sechs Seitenabrufen** (25.08.2026, ohne Anmeldung):
+   *
+   *     eigene Seite    0RNU3R7XQ7HDN1EOCZRAFD5R5R in ihrem Quelltext    11x
+   *     eigene Seite    B0FMNQMXXG in ihrem Quelltext                    91x
+   *     fremder Text    0RNU3R7XQ7HDN1EOCZRAFD5R5R in B0FMNQMXXG          0x
+   *     fremder Text    B0FMNQMXXG in der Isekai-Seite                    0x
+   *
+   * **Und die Gegenprobe, die den Sammelseiten-Fall schützt:** Die
+   * GOSICK-Staffel-1-Seite (`B0B8MTPWRN`) nennt die Kennung ihrer zweiten
+   * Staffel (`B0B8XVGL62`) **dreimal** — ein Staffelwechsel läuft hier also
+   * nicht hinein. Der bleibt Sache von `quelltextVeraltet()`.
+   *
+   * Null Treffer heißt damit: Der Quelltext gehört zu einem anderen Titel.
+   */
+  function kennungImQuelltextBekannt() {
+    const html = seitenHtml()
+    if (kennungBekanntZu === htmlGelesenAm) return kennungBekanntSpeicher
+    const ausAdresse = asinAusAdresse()
+    /* Ohne Kennung in der Adresse gibt es nichts zu widerlegen. */
+    kennungBekanntSpeicher =
+      !ausAdresse || typeof html !== 'string' ? true : html.includes(ausAdresse)
+    kennungBekanntZu = htmlGelesenAm
+    return kennungBekanntSpeicher
+  }
+
+  function quelltextPasst() {
+    /**
+     * Der Beleg ist der Mitleser, nicht die Adresse.
+     *
+     * Erst wenn er eine Staffel **gezielt geholt** hat (`ersetzt: true` mit
+     * ihrer Kennung), steht fest, dass der Quelltext zu einer anderen gehört —
+     * vorher ist jede Abweichung zwischen Adresse und Quelltext harmlos: Eine
+     * Sammelseite trägt im Quelltext die Sammel-Kennung und in der Adresse die
+     * der Staffel, und beim ersten Laden stimmt der Quelltext trotzdem.
+     *
+     * `gabStaffelwechsel` taugt als Wächter nicht: Es steht schon nach dem
+     * ersten Nachladen der Folgenliste auf true, weil sich dabei die
+     * Staffelnummer im Quelltext von „unbekannt" auf „1" ändert.
+     */
+    /**
+     * **Der erste Prüfstein ist die Zahl über der Folgenliste.**
+     *
+     * Sie wird beim Dropdown-Wechsel neu gerendert, der Quelltext nicht.
+     * Nennen beide verschiedene Zahlen, gehört der Quelltext zu einer anderen
+     * Staffel — und zwar auch dann, wenn die Kennung gleich geblieben ist.
+     * Genau das ist der Sammel-ASIN-Fall, den kein Kennungsvergleich sieht:
+     * „Solar Impulse" Staffel 8 zeigt „1 Folge", während im Quelltext noch die
+     * 26 der siebten stehen (Daniel, 25.08.2026, mit Bild).
+     */
+    /*
+      **Ein Titelwechsel macht den Quelltext wertlos — aber nicht die Seite.**
+
+      Daniel am 25.08.2026: „wozu neuladen? die infos kommen auf die seite nach
+      dem wechsel... ich sehe es doch". Er hat recht, und sein Netzwerkmitschnitt
+      zeigt warum: Prime holt beim Navigieren
+      `/gp/video/api/getDetailWidgets?titleID=<neue Kennung>&widgets=[EpisodeList]`
+      und bekommt dort alles — `episodeCount`, je Folge `audioTracks` und
+      `episodeNumber`, dazu die Tokens der übrigen Abschnitte.
+
+      Der veraltete Quelltext ist also **kein Grund zum Neuladen**, sondern nur
+      einer, ihn nicht zu lesen. `beiSeitenwechsel()` im Mitleser stößt denselben
+      Abruf an; bis er ankommt, gilt der Zählstand als leer. Das ist der
+      Unterschied zwischen „Seite neu laden" und „einen Moment".
+
+      **Beide Wege müssen tragen**: „prime ab und zu nicht
+      neulädt … und manchmal neulädt". Bei einer echten Neuladung ist der
+      Quelltext frisch, und die Kennung wandert mit — dann greift dieser Zweig
+      gar nicht. Nur der Weg ohne Neuladen braucht ihn.
+    */
+    if (quelltextVeraltet()) return false
+    const lautSeite = seitenLage().folgenLautSeite
+    if (lautSeite) {
+      /* Aus dem Hydration-Block, nicht aus dem Quelltext. */
+      const imQuelltext = gesehen.seite?.folgenGesamt ?? null
+      if (imQuelltext && imQuelltext !== lautSeite) return false
+    }
+    /*
+      Der Titelwechsel wird **vor** der Sammelseiten-Ausnahme geprüft — sonst
+      steigt die Funktion mit `true` aus, bevor sie ihn sehen kann.
+    */
+    if (!kennungImQuelltextBekannt()) return false
+    if (frischeStaffel === null) return true
+    const ausSeite = asinAusSeite()
+    return !ausSeite || frischeStaffel === ausSeite
+  }
+
+  /**
+   * Wie viele Folgen **dieser** Staffel gelesen sind.
+   *
+   * Eine Staffel mit dreizehn Folgen hat keine Folge 15. Steht trotzdem eine
+   * im Zählstand, stammt sie aus einer anderen — der Mitleser hat sie geschickt,
+   * bevor der Wechsel bemerkt war, oder der Quelltext trug sie noch. Solche
+   * Nummern zählen nicht mit.
+   *
+   * Daniel am 25.08.2026 an „Mahouka" Staffel 2: „v90 zeigt jetzt übrigens 15
+   * folgen auf button obwohl es 13 (minus 3) sind."
+   *
+   * Der Deckel wirkt unabhängig davon, welcher Weg die fremde Nummer
+   * hereingetragen hat — und das ist der Punkt: An dieser Zahl hängt, was
+   * gemeldet wird, und sie darf nicht davon abhängen, ob jede
+   * Wechselerkennung rechtzeitig gegriffen hat.
+   */
+  function geladeneFolgen() {
+    if (!gesehen.gesamt) return gesehen.nummern.size
+    /*
+      **Prime nummeriert bis 40 und hat 39 Folgen — die Lücke ist echt.**
+
+      Bei „JoJo's Bizarre Adventure" Staffel 5 fehlt Folge 14; die übrigen
+      tragen die Nummern 1–13 und 15–40. Gelesen wurden 38 Einträge, und der
+      Knopf meldete „37 Folgen": Die Nummer 40 fiel durch die Grenze
+      `nummer <= gesamt`, obwohl sie eine echte Folge bezeichnet (Daniel,
+      30.08.2026).
+
+      Die Grenze ist trotzdem richtig gedacht — sie fängt die durchlaufende
+      Zählung ab, mit der Prime bei Detektiv Conan die Folgen 1146 bis 1148
+      neben 149 bis 151 führt (CLAUDE.md, 25.08.2026). Dort sind es dieselben
+      Folgen zweimal, hier ist es eine Lücke in der Nummerierung.
+
+      Beides trennt die **Anzahl**, nicht die Höhe der Nummern: Gelesen ist,
+      was gelesen wurde — höchstens aber so viel, wie die Staffel hat. Bei JoJo
+      sind das 38 von 39, bei Detektiv Conan bleiben es die drei echten Folgen.
+    */
+    return Math.min(gesehen.nummern.size, gesehen.gesamt)
+  }
+
+  /**
+   * **Ist die Folgenliste vollständig?**
+   *
+   * Entschieden wird an den **Abschnitten**, nicht an einer Zahl: Steht kein
+   * Token mehr aus, gibt es nichts mehr zu holen — dann ist gezählt, was diese
+   * Seite hergibt. Erst wenn die Seite gar keine Abschnitte nennt (Film, kurze
+   * Staffel), entscheidet der Vergleich mit `episodeCount`.
+   *
+   * @param abschnitte `{ gesamt, offen }` vom Mitleser, oder `null`
+   * @param gezaehlt   abrufbare plus gesperrte Folgen
+   * @param gesamt     was die Seite als Folgenzahl nennt
+   */
+  function istVollstaendig(abschnitte, gezaehlt, gesamt, stillSeitMs = 0) {
+    /*
+      Die Frist steht hier drin, nicht daneben als Konstante: Die Testdatei
+      `amazon-serie-hydration.test.cjs` schneidet diese Funktion einzeln aus
+      der Datei heraus, und ein Bezug nach außen ist dort undefiniert.
+    */
+    const STILL_MS = 15_000
+    /* Alle Abschnitte geholt — mehr gibt es nicht, und zwar sofort. */
+    if (abschnitte && abschnitte.offen === 0) return true
+    /*
+      **Sonst entscheidet der Stillstand, nicht Amazons Zahl.**
+
+      Daniel am 30.08.2026: „erst melden möglich machen nachdem alle episoden
+      gesammelt wurden die amazon dort listet (nicht was wir erwarten, sondern
+      tatsächliche realität)."
+
+      Die alte Fassung verglich gegen `gesamt` — die Zahl aus dem Seitengerüst.
+      Die ist bei Prime regelmäßig falsch: Sie zählt Sprachdubletten mit (15 statt
+      13 bei „Infinite Dendrogram"), sie meint bei Bänden die ganze Staffel (96
+      statt 48 erreichbare bei Yu-Gi-Oh ZEXAL), und sie kennt Lücken in der
+      Nummerierung nicht (JoJo: 1–13 und 15–40 für 39 Folgen). Jede dieser
+      Abweichungen sperrte den Knopf dauerhaft.
+
+      Gemessen wird jetzt, was die Seite **hergibt**: Kommt fünfzehn Sekunden
+      nichts mehr nach, ist gesammelt, was zu sammeln war. Beim normalen
+      Nachladen tickt die Frist ständig neu, greift also nur im Stillstand.
+    */
+    if (gezaehlt > 0 && stillSeitMs >= STILL_MS) return true
+    /*
+      **Die Zahl bleibt — als Freigabe, nicht als Sperre.**
+
+      Stimmt sie, ist sofort fertig; das ist der Normalfall und soll keine
+      fünfzehn Sekunden warten. Stimmt sie nicht, hält sie nichts mehr auf, denn
+      darüber entscheidet inzwischen der Stillstand. Genau das ist der
+      Unterschied zur alten Fassung: Dort war sie die **einzige** Bedingung.
+    */
+    if (gesamt && gezaehlt >= gesamt) return true
+    /* Ohne Abschnitte und ohne Erwartung ist da, was da ist. */
+    if (!abschnitte && !gesamt) return gezaehlt > 0
+    return false
+  }
+
+
+  /**
+   * Setzt ein Attribut nur, wenn es sich unterscheidet.
+   *
+   * Daniel am 30.08.2026, mit Videomitschnitt aus dem Elements-Tab: „im element
+   * tab flackern die elemente der extension, warum ist das per intervall statt
+   * per eventing gemacht?"
+   *
+   * Der Takt war nicht die Ursache — `zeichnen()` steigt seit jeher aus, wenn
+   * sich der Stand nicht geändert hat. Die Zuweisungen **davor** liefen aber
+   * jedes Mal durch, allen voran `dataset.diag` mit den Taktmesswerten: vier
+   * Zahlen, die sich zweimal je Sekunde ändern, in ein Attribut geschrieben,
+   * das der Elements-Tab bei jeder Berührung aufblinken lässt.
+   *
+   * Eine Zuweisung mit gleichem Wert ist keine leere Anweisung: `textContent`
+   * ersetzt den Textknoten, `dataset.x` setzt das Attribut neu, `style.x`
+   * schreibt das Style-Attribut. Der Browser sieht eine Mutation, wo keine ist —
+   * und jeder MutationObserver auf der Seite auch.
+   */
+  function setz(el, feld, wert) {
+    if (el[feld] !== wert) el[feld] = wert
+  }
+  function setzData(el, feld, wert) {
+    const text = String(wert)
+    if (el.dataset[feld] !== text) el.dataset[feld] = text
+  }
+  function setzStil(el, feld, wert) {
+    if (el.style[feld] !== wert) el.style[feld] = wert
+  }
+
+  // Sperre nach angekommener Meldung (melde-sperre.js, Daniel 16.10.2026): am Befund, nicht an der Beschriftung.
+  meldeSperre = globalThis.AK_MELDE_SPERRE.fuer(knopf, {
+    befund: () => `${location.pathname}|${staffelSchluessel()}|${deutschInFolgen()}`,
+    angekommen: () => globalThis.AK_MELDUNG_BELEGT(liste[listenId]?.url, asin, briefkastenAdressen, briefkastenSeiten),
+    zeichneRoh: () => zeichnenRoh(),
+    lesen: speicherLesen,
+    schreiben: speicherSchreiben,
+    standVergessen: () => {
+      letzterStand = ''
+    },
+  })
+
+  function zeichnen() {
+    meldeSperre?.zeichnen()
+  }
+
+  function zeichnenRoh() {
+    return globalThis.AK_KNOPF_ZEICHNEN()
+  }
+
+  // Die Namen, die zeichnenRoh in amazon-knopf-zeichnen.js liest (und ändert) — live, nie als Kopie.
+  Object.defineProperties(globalThis.AK_ZEICHNEN_WELT, Object.getOwnPropertyDescriptors({
+    __proto__: null,
+    get seitenHtml() { return seitenHtml },
+    get seitenLage() { return seitenLage },
+    get vorfallMelden() { return vorfallMelden },
+    get ZUGANG_TEXT() { return ZUGANG_TEXT },
+    get asinAusAdresse() { return asinAusAdresse },
+    get filmAusSeite() { return filmAusSeite },
+    get istFilmSeite() { return istFilmSeite },
+    get standZiele() { return standZiele },
+    get briefkastenSeiten() { return briefkastenSeiten },
+    get asinAusSeite() { return asinAusSeite },
+    get notiere() { return notiere },
+    get staffelAusSeite() { return staffelAusSeite },
+    get staffelNummer() { return staffelNummer },
+    get staffelAusAdresse() { return staffelAusAdresse },
+    get staffelText() { return staffelText },
+    get staffelSchluessel() { return staffelSchluessel },
+    get ausgabenDieserStaffel() { return ausgabenDieserStaffel },
+    get asin() { return asin },
+    get seitenTitel() { return seitenTitel },
+    get zugangsart() { return zugangsart },
+    get staffelZahl() { return staffelZahl },
+    get ueberKanal() { return ueberKanal },
+    get suchauftrag() { return suchauftrag },
+    get titelKern() { return titelKern },
+    get gemeldetMarke() { return gemeldetMarke },
+    get sendetGerade() { return sendetGerade },
+    get weiterText() { return weiterText },
+    set weiterText(wert) { weiterText = wert },
+    get weiterTextPfad() { return weiterTextPfad },
+    set weiterTextPfad(wert) { weiterTextPfad = wert },
+    get durchFuerPfad() { return durchFuerPfad },
+    set durchFuerPfad(wert) { durchFuerPfad = wert },
+    get jetztAufSuchseite() { return jetztAufSuchseite },
+    get id() { return id },
+    get erledigt() { return erledigt },
+    get standGeladen() { return standGeladen },
+    get staffelnDerSerie() { return staffelnDerSerie },
+    get gesamtDerSerie() { return gesamtDerSerie },
+    get wiedervorlage() { return wiedervorlage },
+    get nichtAngekommen() { return nichtAngekommen },
+    get fertig() { return fertig },
+    get seiteOffen() { return seiteOffen },
+    get istGemeldet() { return istGemeldet },
+    get listenId() { return listenId },
+    get meldenVersteckt() { return meldenVersteckt },
+    get eintrag() { return eintrag },
+    get knopf() { return knopf },
+    get gesehen() { return gesehen },
+    get deutschInFolgen() { return deutschInFolgen },
+    get sprachenAusFolgen() { return sprachenAusFolgen },
+    get frischeStaffel() { return frischeStaffel },
+    get letzterStand() { return letzterStand },
+    set letzterStand(wert) { letzterStand = wert },
+    get letzterFortschritt() { return letzterFortschritt },
+    set letzterFortschritt(wert) { letzterFortschritt = wert },
+    get letzteZahl() { return letzteZahl },
+    set letzteZahl(wert) { letzteZahl = wert },
+    get gemeldeteStaffel() { return gemeldeteStaffel },
+    set gemeldeteStaffel(wert) { gemeldeteStaffel = wert },
+    get GEDULD_MS() { return GEDULD_MS },
+    get RUHE_MS() { return RUHE_MS },
+    get WARTE_FRIST_MS() { return WARTE_FRIST_MS },
+    get WIDERSPRUCH_MS() { return WIDERSPRUCH_MS },
+    get widerspruchSeit() { return widerspruchSeit },
+    set widerspruchSeit(wert) { widerspruchSeit = wert },
+    get gesamtGeaendertAm() { return gesamtGeaendertAm },
+    set gesamtGeaendertAm(wert) { gesamtGeaendertAm = wert },
+    get letzteQuelltextGesamt() { return letzteQuelltextGesamt },
+    set letzteQuelltextGesamt(wert) { letzteQuelltextGesamt = wert },
+    get zustandAlsText() { return zustandAlsText },
+    get kennungImQuelltextBekannt() { return kennungImQuelltextBekannt },
+    get quelltextPasst() { return quelltextPasst },
+    get geladeneFolgen() { return geladeneFolgen },
+    get istVollstaendig() { return istVollstaendig },
+    get setzData() { return setzData },
+    get meldeSperre() { return meldeSperre },
+    get quelltextVeraltet() { return quelltextVeraltet },
+    get quelltextVonFruehererSeite() { return quelltextVonFruehererSeite },
+  }))
+
+  /**
+   * Amazon lädt die Folgenliste nach, nicht mit dem ersten HTML.
+   *
+   * Deshalb wird wiederholt nachgesehen statt einmal beim Laden — sonst stünde
+   * dort dauerhaft „noch nicht geladen", obwohl die Angaben längst da sind.
+   */
+  zeichnen()
+
+  /**
+   * Der Staffelwechsel im Auswahlfeld ist ein Seitenwechsel ohne Neuladen.
+   *
+   * Amazon tauscht bei „Season 2" den ganzen Inhalt aus und schreibt eine neue
+   * Kennung in die Adresse — `B0GFPBT6FG` wird zu `B0D8FH5NC6`. Ein
+   * Content-Script läuft dabei **nicht** neu: Es behält seine alte Kennung,
+   * seinen alten Zählstand und meldet die neue Staffel unter der alten Adresse.
+   *
+   * Genau das ist Daniel am 23.08.2026 passiert: „beim dropdownwechsel hat der
+   * button unten rechts nicht reagiert, es stand weiterhin immer 12 folgen, und
+   * der nächste eintrag der liste blieb stehen nach klick auf 12 melden."
+   * Erledigt wurde dabei die **erste** Staffel — ein zweites Mal, mit deren
+   * Zahlen.
+   *
+   * Deshalb wird die Kennung bei jedem Takt nachgesehen. Ändert sie sich, fängt
+   * alles von vorn an: neuer Eintrag, leerer Zählstand, leerer Knopf.
+   */
+  /**
+   * Woran ein Staffelwechsel erkennbar ist — die Kennung reicht nicht.
+   *
+   * Daniel am 23.08.2026: „nach dropdown auswahl von staffel 3 zeigt button
+   * weiterhin 12 folgen, wenn ich auf staffel 3 neulade steht dort 11 folgen."
+   *
+   * Beim Wechsel im Auswahlfeld ändert sich **weder die Adresse noch die
+   * `titleID` im Quelltext** — alle Staffeln einer Serie teilen sich beides.
+   * Was sich ändert, ist die Folgenliste. Die Gesamtzahl ist der schärfste
+   * Anhaltspunkt: 12 wird zu 11.
+   *
+   * Zwei Staffeln mit gleicher Folgenzahl bleiben damit unerkannt. Dafür ist
+   * die Staffelnummer aus der Adresse da — und wo auch die schweigt, meldet
+   * der Knopf wenigstens keine **falsche** Zahl, sondern die der zuletzt
+   * geladenen Liste.
+   */
+  /**
+   * Woran ein Staffelwechsel erkannt wird.
+   *
+   * Die Nummer aus dem Quelltext gehoert hier an die erste Stelle, und das ist
+   * der Grund: Wechselt Daniel im Auswahlfeld, tauscht Amazon die Seite ohne
+   * Neuladen. ASIN und Folgenzahl im Quelltext koennen dabei kurz noch die
+   * alten sein -- der Wechsel blieb unbemerkt, und die Erweiterung zeigte auf
+   * Staffel 1 noch die Folgenzahl von Staffel 2 (Daniel, 24.08.2026: "bei
+   * barbapapa steht 55 folgen auf staffel 1 obwohl diese nur 45 folgen hat").
+   *
+   * Gemessen an beiden Seiten: B0CC7FXYFQ meldet Staffel 1 mit 45 Folgen,
+   * B0CBNFP57W Staffel 2 mit 55. Die Nummer trennt sie sauber.
+   */
+  function staffelKennung() {
+    /**
+     * Die Folgenzahl gehört **nicht** in die Kennung.
+     *
+     * Sie stand hier, damit ein Wechsel auffällt, bevor ASIN und Nummer
+     * nachgezogen sind. Der Preis war zu hoch: Wechselt Daniel auf den Reiter
+     * „Ähnliches" oder „Details", verschwindet die Folgenliste aus dem DOM, die
+     * Zahl wird zu `undefined` — und die Kennung ändert sich. Der Zählstand
+     * wurde geleert, und der Knopf sagte „nicht abrufbar" für einen Titel mit
+     * 24 deutschen Folgen (Daniel, 24.08.2026, an „Kanon").
+     *
+     * Staffelnummer und ASIN genügen. Wo beide fehlen, hilft die
+     * Beruhigungsfrist in `zeichnen()`.
+     */
+    /**
+     * **Der sichtbare Titel gehört dazu — sonst bleibt ein Titelwechsel unbemerkt.**
+     *
+     * Gemessen am 25.08.2026 in Daniels Sitzung, über zwei Wechsel aus der
+     * Prüfliste heraus:
+     *
+     * | | Start | Wechsel 1 | Wechsel 2 |
+     * |---|---|---|---|
+     * | Adresse | `0NWGEHP4…` | `0J16B1NAB8…` | `0OULQMP5Z…` |
+     * | Überschrift | Armed Girl's… | Babylon | Bayonetta |
+     * | Quelltext-Kennung | `B0CJPZFQ9H` | `B0CJPZFQ9H` | `B0CJPZFQ9H` |
+     *
+     * Der Knopf zeigte acht Sekunden lang unverändert „🇩🇪 Deutsch · 12 Folgen
+     * · ⚠ Kanal" — über drei verschiedene Titel. Er war nicht zu langsam: Seine
+     * Datenquelle hat sich nie geändert.
+     *
+     * `asin()` allein genügt hier nicht, weil es aus der **Adresse** liest und
+     * damit zwar wandert — aber der geleerte Zählstand füllt sich sofort wieder
+     * aus demselben alten Quelltext. Erst der Titel macht den Widerspruch
+     * sichtbar, und `quelltextVeraltet()` zieht daraus die Folgerung.
+     *
+     * Ein **leerer** Titel zählt nicht mit: Bei „Oshi no Ko" Staffel 3 waren
+     * `og:title`, `twitter:title` und `<h1>` allesamt leer (siehe
+     * `seitenTitel()`). Ohne diese Ausnahme würde jede Seite, die den Titel
+     * kurzzeitig nicht rendert, den Zählstand verwerfen.
+     */
+    const titel = seitenTitel()
+    return `${staffelAusAdresse() ?? '?'}|${staffelAusSeite() ?? '?'}|${asin()}|${titel || '?'}`
+  }
+
+  /**
+   * Zeigt die Seite einen anderen Titel, als der Quelltext beschreibt?
+   *
+   * Amazon rendert beim Wechsel innerhalb der Anwendung den sichtbaren Inhalt
+   * neu, tauscht die JSON-Fracht im Skriptblock aber nicht aus — dieselbe
+   * Beobachtung wie beim Staffelwechsel, nur eine Ebene höher. Was danach aus
+   * dem Quelltext gelesen wird, gehört zum **vorigen** Titel.
+   *
+   * Erkannt wird das an einem Paar, nicht an einer Zahl: Beim ersten Zeichnen
+   * merkt sich die Erweiterung Titel und Quelltext-Kennung gemeinsam. Wandert
+   * der Titel, während die Kennung stehen bleibt, ist der Quelltext veraltet.
+   */
+  function quelltextVeraltet() {
+    // Der eindeutige Fall zuerst: gleiche Kennung in Adresse und Quelltext.
+    if (quelltextGehoertZurSeite()) return false
+    /*
+      **Und der zweite eindeutige Fall: Der Quelltext kennt die Adress-Kennung.**
+
+      Ohne diese Zeile war der Titelvergleich darunter auf jeder Seite mit
+      abweichender `titleID` ein Dauer-Fehlalarm — und das sind viele: Prime
+      führt Filme und Sammelseiten regelmäßig so (Digimon Tamers, Death Note
+      Relight, 2.5 Dimensional Seduction). Beim Rendern wechselt der Titel auch
+      dann, wenn alles in Ordnung ist; oben griff der Rettungsanker nur bei
+      **gleicher** Kennung, und hier fiel er aus.
+
+      Daniel am 09.09.2026 an zwei frisch geladenen Seiten mit je einer
+      Staffel: „warum steht da staffel gewechselt jahr staffelnummer warnung?"
+      Neuladen half nicht — es konnte nicht helfen.
+
+      **Dem Staffelwechsel wird dadurch nichts genommen.** Er leert über
+      `beiStaffelwechsel()` das Titel-Kennung-Paar, und der Serientitel bleibt
+      dabei derselbe: Der Vergleich darunter schlägt in diesem Fall ohnehin nie
+      an. Was er wirklich fängt, ist der **Titel**wechsel — und dort ist die
+      Adress-Kennung im alten Quelltext nachweislich 0-mal zu finden (Messung
+      vom 25.08.2026, siehe `kennungImQuelltextBekannt()`).
+    */
+    /*
+      **Vor dem Freibrief steht die Frage, ob wir die Seite schon verlassen
+      haben.** Umgekehrte Reihenfolge hieße: Der Staffelwähler der alten Seite
+      nennt die neue Kennung, `kennungImQuelltextBekannt()` sagt „passt", und
+      der veraltete Quelltext gilt als frisch (10.09.2026, Bungo Stray Dogs).
+    */
+    if (quelltextVonFruehererSeite()) return true
+    if (kennungImQuelltextBekannt()) return false
+    const titel = seitenTitel()
+    const kennung = asinAusSeite()
+    if (!titel || !kennung) return false
+    if (!titelZuQuelltext) {
+      titelZuQuelltext = { titel, kennung }
+      return false
+    }
+    if (titelZuQuelltext.kennung !== kennung) {
+      // Der Quelltext ist nachgezogen — ab hier gilt das neue Paar.
+      titelZuQuelltext = { titel, kennung }
+      return false
+    }
+    return titelZuQuelltext.titel !== titel
+  }
+
+  /**
+   * **Nennen Adresse und Quelltext dieselbe Kennung, ist nichts veraltet.**
+   *
+   * Diese Zeile fehlte, und sie hat den Wächter darüber unbrauchbar gemacht:
+   * Er merkt sich ein Paar aus Titel und Quelltext-Kennung und meldet
+   * „veraltet", sobald der Titel wechselt, während die Kennung steht. Beim
+   * Rendern wechselt der Titel aber auch dann, wenn alles in Ordnung ist —
+   * erst ist er leer oder trägt den Shopnamen, dann den echten. Danach kam der
+   * Wächter nie wieder heraus, weil sein Paar nur ein **Kennungswechsel**
+   * erneuert.
+   *
+   * Sichtbar wurde es erst durch das Diagnosefeld (Daniel, 25.08.2026, an
+   * „Clannad"): `ausSeite` und `ausAdresse` standen beide auf `B0FM2CDBWL`,
+   * `quelltextVeraltet` trotzdem auf `true`. Dass es dort funktionierte, lag
+   * allein am Mitleser — bei einem **Film** gibt es den nicht, und genau dort
+   * erschien deshalb der Neuladen-Knopf.
+   *
+   * Denselben Schluss legt der Versionsvergleich nahe: Mit 1.2.2 ging es
+   * nicht, mit 1.3 schon — und 1.3 hat nur die Diagnose ergänzt, keine Zeile
+   * Logik. Was sich geändert hatte, war der **frisch geladene Zustand**.
+   *
+   * Der Vergleich hier ist der eindeutige Fall und gehört deshalb nach vorn.
+   * Der Titelvergleich bleibt für den Rest: Bei einer Sammel-Kennung dürfen
+   * Adresse und Quelltext auseinandergehen, ohne dass etwas veraltet ist.
+   */
+  function quelltextGehoertZurSeite() {
+    const ausSeite = asinAusSeite()
+    /*
+      **asinAusAdresse(), nicht asin().**
+
+      asin() liefert asinAusSeite() ?? asinAusAdresse() — also zuerst den
+      Quelltext. Der Vergleich fragte damit zweimal dieselbe Quelle ab und war
+      immer wahr; der Waechter darueber wurde wirkungslos, und der veraltete
+      Quelltext galt als frisch.
+
+      Sichtbar im Diagnosefeld (Daniel, 25.08.2026, Wechsel von Darwin Jihen zu
+      Clannad): Die Adresse lautete .../detail/0FQH6UJI..., ausAdresse meldete
+      trotzdem B0FZLQTT9W — die Kennung aus dem alten Quelltext. Gelesen wurden
+      dessen dreizehn Folgen und neun Sprachen, obwohl Clannad nur Deutsch und
+      Japanisch fuehrt.
+    */
+    const ausAdresse = asinAusAdresse()
+    return Boolean(ausSeite && ausAdresse && ausSeite === ausAdresse)
+  }
+
+  /**
+   * **Der Quelltext gehört zu einer Seite, die wir schon verlassen haben.**
+   *
+   * Daniel am 10.09.2026 mit einer Bildschirmaufnahme: Nach dem Wechsel auf
+   * Staffel 2 stand der Melde-Knopf **vier Sekunden lang** scharf, während die
+   * Kopfzeile weiter `B0BZGQZCFT` nannte — die Adresse führte längst
+   * `B0CHL21CT2`. Wer in diesem Fenster klickt, meldet die alte Kennung.
+   *
+   * Dass der Wächter das durchgehen ließ, hat einen Grund:
+   * `kennungImQuelltextBekannt()` fragt, ob die Adress-Kennung **irgendwo** im
+   * Quelltext steht — und beim Staffelwechsel steht sie dort immer, nämlich im
+   * Staffelwähler der alten Seite. Der Freibrief, der Sammelseiten vom
+   * Fehlalarm befreit, deckte damit genau den Fall zu, für den es den Wächter
+   * gibt.
+   *
+   * Die Unterscheidung läuft deshalb über die **Adresse**, nicht über den
+   * Quelltext: Eine Sammelseite trägt im Quelltext eine `titleID`, die nie in
+   * der Adresse stand; nach einem Staffelwechsel trägt er die Kennung, die
+   * gerade noch dort stand.
+   */
+  function quelltextVonFruehererSeite() {
+    const ausSeite = asinAusSeite()
+    const ausAdresse = asinAusAdresse()
+    if (!ausSeite || !ausAdresse || ausSeite === ausAdresse) return false
+    return fruehereAdressKennungen.has(ausSeite)
+  }
+
+  /**
+   * Schreibt die Adress-Kennung fort. Läuft aus der Adresswache und einmal beim
+   * Start — ohne den ersten Aufruf bliebe die erste Seite ungezählt, und der
+   * Wechsel von ihr weg wäre unsichtbar.
+   */
+  function adressKennungFortschreiben() {
+    const jetzt = asinAusAdresse()
+    if (!jetzt || jetzt === letzteAdressKennung) return
+    /* Vor dem Vermerken lesen: danach gilt der Titel des Lesers als der einer verlassenen Seite. */
+    titelVerlassen = { kennung: letzteAdressKennung, titel: seitenTitel() }
+    if (letzteAdressKennung) fruehereAdressKennungen.add(letzteAdressKennung)
+    letzteAdressKennung = jetzt
+  }
+  adressKennungFortschreiben()
+
+  /* Verlässt die Seite den Titel, ist das Panel leer wie bei einem Start ohne Titel (19.11.2026, Landei II); bei der Rückkehr liest `beiStaffelwechsel()` neu. */
+  const titelBindung = globalThis.akTitelBindung.fuer({
+    kennung: asinAusAdresse,
+    beiWechsel: (alt, neu) => {
+      letzteKennung = ''
+      if (neu) return
+      id = null
+      gesehen = leererStand()
+      listenId = listenSchluessel(null)
+      eintrag = eintragFuer(listenId)
+      letzterStand = ''
+      knopf.disabled = true
+    },
+  })
+
+  letzteKennung = staffelKennung()
+
+  function beiStaffelwechsel() {
+    const kennung = staffelKennung()
+    if (kennung === letzteKennung) return
+    notiere('staffelwechsel', { von: letzteKennung, nach: kennung, adresse: location.search })
+    letzteKennung = kennung
+    gabStaffelwechsel = true
+    const jetzt = titelBindung.pruefen() ? asin() : null
+    if (!jetzt) {
+      /* Ohne Kennung bricht der Wechsel hier ab — und genau das war unsichtbar. */
+      notiere('staffelwechsel-ohne-asin', { kennung })
+      return
+    }
+    id = jetzt
+    listenId = listenSchluessel(listenId)
+    eintrag = eintragFuer(listenId)
+    /* Kein `gesehen = leererStand()` im Takt: Der Zählstand hängt an der Adresse, der Empfänger ersetzt ihn (seit 2.3; Leeren löschte frisch angekommene Folgen). */
+    letzteZahl = -1
+    /* `gemeldeteStaffel` leert der Empfänger beim Adresswechsel; hier geleert, löschte der neue Schnappschuss seine eigene Nummer (15.09.2026). */
+    gemeldeteStaffel = null
+    letzterStand = ''
+    letzterFortschritt = Date.now()
+    /* Was an einem Titel hängt, endet mit ihm: `frischeStaffel` und das Titel-Kennung-Paar der vorigen Seite machten `quelltextPasst()` dauerhaft falsch (25.08.2026). */
+    frischeStaffel = null
+    titelZuQuelltext = null
+    /* Hängt an der alten Adresse — mit ihr wandert er weg. */
+    kennungBekanntZu = -1
+    knopf.disabled = false
+    zeichnen()
+    // Die Übersicht hebt den gerade offenen Titel hervor — nach dem Wechsel
+    // ist das ein anderer.
+    uebersichtZeichnen()
+  }
+
+  /**
+   * **Wie lange ein Takt wirklich braucht — gemessen, nicht geschätzt.**
+   *
+   * Daniel am 25.08.2026 mit einem Bildschirmmitschnitt: „it impacts
+   * performance drastically". Die Frame-Analyse des Videos gab den Unterschied
+   * **nicht** her — 23,4 gegen 25,8 Bildänderungen je Sekunde, und die
+   * schlechtesten Werte lagen in der Phase *ohne* Erweiterung. Kein Wunder:
+   * Das Maß zählt Bildänderungen, und eine ruhende Seite ändert wenig.
+   *
+   * Also misst die Erweiterung sich selbst. Die Werte stehen im Diagnosefeld
+   * (`taktMs`, `taktSchnitt`, `taktMax`, `takte`) und beantworten die Frage,
+   * die das Video nicht beantworten kann: Wie viel von den 500 ms je Takt
+   * verbraucht dieses Skript?
+   */
+  /**
+   * **Die Ecke, in der unsere Knöpfe stehen, gehört uns.**
+   *
+   * Prime Video vergrößert eine Ergebniskarte, sobald die Maus sie berührt,
+   * und legt die aufgeklappte Fassung über alles Tieferliegende. Der Kasten
+   * verschwand darunter, obwohl er den höchsten z-index trägt: Amazon hängt
+   * die Aufklappung **nach** unseren Elementen ins DOM, und bei gleichem
+   * z-index gewinnt das spätere.
+   *
+   * Dagegen hilft kein höherer Wert — 2147483647 ist das Maximum. Es hilft,
+   * dass die Karte gar nicht erst aufklappt: Diese Fläche liegt über den
+   * **ruhenden** Karten und fängt den Zeiger ab, bevor er sie erreicht.
+   *
+   * Netflix hat eine Schwester dieser Fläche, dort aber mit `z-index: 1` —
+   * das ist kein Widerspruch, sondern ein anderes Problem: Bei Netflix ging
+   * es um Klicks, die die Ansicht schlossen, und die Fläche musste **unter**
+   * allem liegen. Hier geht es um Hover, und sie muss darüber.
+   */
+  /** Amazons Ergebniskarten — dieselbe Wahl wie in `suchTreffer()`. */
+  const KARTE = 'article[data-testid="card"], [data-testid="card"], .tst-hover-container'
+
+  let schutzflaeche = null
+
+  function schutzflaecheZeigen(sichtbar) {
+    if (!sichtbar) {
+      schutzflaeche?.remove()
+      schutzflaeche = null
+      return
+    }
+    if (schutzflaeche) return
+    schutzflaeche = document.createElement('div')
+    schutzflaeche.className = 'ak-amazon-schutz'
+    schutzflaeche.title = 'Anime-Kalender — Diese Ecke gehört dem Anime-Kalender'
+    /*
+      Zum Einstellen der Maße trug sie einen roten Rahmen — `ak-schutz-sichtbar`
+      in `melder.css` gibt es weiterhin. Wer die Fläche wieder sehen will,
+      hängt die Klasse hier an; sie hat drei Fehler an einem Abend gefunden
+      (falsche Größe, verschluckte Klicks, und dass sie überhaupt nie da war).
+    */
+    /* Der Zeiger endet hier; die Karte darunter erfährt nichts davon. */
+    /*
+      **Alle Zeigerereignisse, nicht nur der Hover.** Die Fläche ist selbst das
+      Ziel: Was hier ankommt, erreicht Amazon nicht mehr — weder ein Klick, der
+      eine fremde Serie öffnet, noch die Bewegung, die eine Karte aufklappt.
+      Unsere eigenen Knöpfe liegen darüber und bekommen ihre Ereignisse wie
+      zuvor.
+    */
+    for (const art of [
+      'mouseover',
+      'mousemove',
+      'mouseenter',
+      'pointerover',
+      'pointermove',
+      'pointerdown',
+      'pointerup',
+      'mousedown',
+      'mouseup',
+      'click',
+      'dblclick',
+      'contextmenu',
+      'wheel',
+      'touchstart',
+    ]) {
+      schutzflaeche.addEventListener(art, (e) => {
+        e.stopPropagation()
+        /* Ein Klick ins Leere soll auch nichts auslösen, was Amazon daran hängt. */
+        if (art !== 'wheel') e.preventDefault()
+      })
+    }
+    document.body.appendChild(schutzflaeche)
+    schutzflaecheAnpassen()
+  }
+
+  /**
+   * **Die Fläche deckt genau das ab, was gerade zu sehen ist.**
+   *
+   * Sie war bis 3.48 ein festes Rechteck von 400 × 360 Pixeln in der Ecke —
+   * groß genug für den ausgeklappten Kasten, und damit auf jeder Seite ohne
+   * Kasten viel zu groß: Dort steht nur der Knopf „115 Prime-Suchen offen",
+   * und ringsum lagen vier Bildschirmzentimeter, in denen Amazons Karten
+   * tot waren, ohne dass etwas von uns dort stand (Daniel, 27.08.2026, mit
+   * zwei eingezeichneten Bildern: „schutz area abhängig von eingeblendeten
+   * elementen").
+   *
+   * Jetzt wird gemessen statt geschätzt: Die Fläche ist das umschließende
+   * Rechteck aller sichtbaren eigenen Elemente plus einem Rand, der den Weg
+   * des Zeigers dorthin abfängt. Ein Element weniger heißt eine kleinere
+   * Fläche, ganz ohne zweiten Satz Maße.
+   */
+  const SCHUTZ_RAND = 12
+
+  function schutzflaecheAnpassen() {
+    if (!schutzflaeche) return
+    /* Der Dialog deckt sich selbst — dahinter kommt ohnehin nichts durch. */
+    const eigene = [knopf, uebersichtKnopf, document.querySelector('.ak-amazon-suchhinweis')]
+    let links = Infinity
+    let oben = Infinity
+    let rechts = -Infinity
+    let unten = -Infinity
+    for (const el of eigene) {
+      /*
+        **Nicht `offsetParent` fragen.** Alle drei Elemente stehen
+        `position: fixed` — und für die liefert Chrome `offsetParent === null`,
+        auch wenn sie mitten auf dem Bildschirm stehen. Die Fläche hielt sich
+        deshalb seit 3.49 für überflüssig und stellte sich auf `display: none`;
+        der Schutz war nie aktiv, und der rote Rahmen aus 3.50 blieb unsichtbar.
+
+        Das Rechteck beantwortet die Frage direkt: Was 0 × 0 misst, ist nicht da.
+      */
+      if (!el?.isConnected) continue
+      const r = el.getBoundingClientRect()
+      if (!r.width || !r.height) continue
+      links = Math.min(links, r.left)
+      oben = Math.min(oben, r.top)
+      rechts = Math.max(rechts, r.right)
+      unten = Math.max(unten, r.bottom)
+    }
+    if (links === Infinity) {
+      /* Nichts von uns sichtbar — dann schützt die Fläche auch nichts. */
+      setzStil(schutzflaeche, 'display', 'none')
+      return
+    }
+
+    setzStil(schutzflaeche, 'display', '')
+    /*
+      **Zur Ecke hin bis zum Rand, nach links mit Anlauf.**
+
+      Ein enger Rand um die eigenen Elemente genügte nicht: Amazons Karte
+      klappt auf, sobald die Maus sie irgendwo berührt, und die vergrößerte
+      Fassung wächst dann über den Knopf. Rechts und unten ist der
+      Bildschirmrand ohnehin die Grenze; nach links braucht es den Anlaufweg,
+      auf dem der Zeiger sonst eine Karte streift (Daniels Maße, 27.08.2026:
+      „should go ~100px more to left, and all the way to right and bottom").
+
+      Nach oben bleibt es beim knappen Rand — dort steht die Seite selbst, und
+      eine Fläche über den halben Bildschirm nähme mehr, als sie schützt.
+    */
+    const ANLAUF_LINKS = 100
+    setzStil(schutzflaeche, 'left', `${Math.max(0, links - ANLAUF_LINKS)}px`)
+    setzStil(schutzflaeche, 'top', `${Math.max(0, oben - SCHUTZ_RAND)}px`)
+    setzStil(schutzflaeche, 'right', '0px')
+    setzStil(schutzflaeche, 'bottom', '0px')
+    setzStil(schutzflaeche, 'width', 'auto')
+    setzStil(schutzflaeche, 'height', 'auto')
+  }
+
+  function taktSchritt() {
+    const t0 = performance.now()
+    debugLeisteZeichnen()
+    /*
+      **Im Player zeigt die Erweiterung gar nichts.** Gesammelt wird auf der
+      Übersichtsseite; im Player gibt es nichts zu lesen und nichts zu melden,
+      dafür ein Bild, das niemand verdeckt haben will.
+    */
+    /*
+      **Zwei Gruende, sich unsichtbar zu machen — und nur eine Stelle dafuer.**
+
+      Der Player: Wer fernsieht, soll nichts von der Erweiterung sehen
+      (30.08.2026). Und die fremde Seite: Das Manifest laesst uns auf
+      `amazon.de/*` laufen, also auch auf jedem Monitor und jeder Kaffeemaschine
+      — dort hat der Kasten nichts verloren.
+
+      Beide zusammen in **einer** Bedingung, weil der Abriss des Kastens genau
+      einmal im Zeichenpfad stehen darf: Jede weitere Stelle bringt das Flackern
+      zurueck, das am 30.08.2026 abgestellt wurde — eine Zusicherung in
+      `amazon-uebersicht.test.cjs` zaehlt sie deshalb.
+    */
+    if (imPlayer() || !seiteGehtUnsAn()) {
+      knopf.style.display = 'none'
+      uebersichtKnopf.style.display = 'none'
+      document.querySelector('.ak-amazon-suchhinweis')?.remove()
+      schutzflaecheZeigen(false)
+      return
+    }
+    uebersichtKnopf.style.display = ''
+    /*
+      **Der Knopf gehört in den Kasten, auch wenn der später entsteht.**
+
+      Er zieht beim Aufbau des Kastens ein — nur entsteht der Kasten manchmal
+      erst danach (Titelseite mit geerbtem Auftrag). Dann stand er wieder
+      draußen, und im Kasten fehlte die Prüfliste. Der Takt holt das nach; er läuft ohnehin.
+    */
+    try {
+      /*
+        **Der Kasten steht immer, sobald die Erweiterung etwas zu sagen hat.**
+
+        Er entstand früher nur, wenn es einen Auftrag zu zeigen gab. Nach der
+        Meldung gibt es keinen mehr — und dann standen die beiden Knöpfe wieder
+        frei nebeneinander.
+
+        Ohne sichtbaren Knopf wird er nicht gebaut: Wer gerade fernsieht, soll
+        nichts von der Erweiterung sehen (30.08.2026).
+      */
+      const etwasZuZeigen =
+        uebersichtKnopf.style.display !== 'none' || knopf.style.display !== 'none'
+      let kasten = document.querySelector('.ak-amazon-suchhinweis')
+      if (!kasten && etwasZuZeigen) {
+        kasten = kastenSkelett()
+        kasten.classList.add('ak-nur-huelle')
+      }
+
+      /*
+        **Jede Zeile hat ihren Platz, und der bleibt leer, bis sein Inhalt da
+        ist.** Der Takt schiebt nur hinein und räumt nicht mehr um — die Zeilen
+        selbst entstehen einmal in `kastenSkelett()`.
+      */
+      /*
+        **Über dem Knopf steht, was er meldet.**
+
+        Daniel am 05.09.2026: „wieso steht nicht welche asin/serientitel gemeldet
+        wird auf melde button?" Auf seiner Aufnahme stand dort „✕ keine Folgen
+        für diese Staffel — melden" und sonst nichts — die Seite hiess „Cats",
+        der Auftrag „Mao Yu Tao Hua Yuan", und welcher von beiden gleich in den
+        Datensatz geht, war nicht zu sehen.
+
+        Auf seine Wahl hin steht es als **eigene Zeile über dem Knopf** statt am
+        Knopf selbst: Der bleibt damit kurz, und die Angabe ist immer sichtbar
+        statt nur beim Darüberfahren.
+      */
+      const meldetZeile = kasten?.querySelector('.ak-z-inhalt')
+      if (meldetZeile && knopf.style.display !== 'none') {
+        /*
+          **Dieselbe Quelle wie die Meldung — sonst zeigt die Zeile etwas anderes an,
+          als der Knopf sendet.**
+
+          Nicht `id`: das zieht nur `beiStaffelwechsel()` nach, die Meldung liest die
+          Adresse (Daniel, 09.09.2026: Zeile nannte nach dem Wechsel die Staffel davor).
+        */
+        const kennungJetzt = (() => {
+          try {
+            /*
+              `asin()` fragt zuerst den Quelltext, und der hinkt nach (10.09.2026: vier Sekunden
+              lang die Kennung der verlassenen Seite in der Kopfzeile).
+            */
+            return (quelltextVonFruehererSeite() ? asinAusAdresse() : asin()) ?? id
+          } catch {
+            return id
+          }
+        })()
+        const wasGemeldetWird = (() => {
+          /*
+            **Keine Kopfzeile über einer leeren Meldezeile** (Daniel, 13.09.2026): Wo der Knopf wegbleibt,
+            wird auch nichts angekündigt — dieselbe Entscheidung wie beim Knopf.
+          */
+          try {
+            if (meldenVersteckt()) return ''
+          } catch {
+            /* Ohne Auskunft bleibt es bei der Kopfzeile. */
+          }
+          /* Nur die Kennung der Seite zählt: `id` hinkt beim Wechsel hinterher und nennt den alten Titel. */
+          const e = liste[kennungJetzt]
+          /*
+            Der Auftragstitel steht vor dem Seitentitel (09.09.2026: „Chatverlauf" aus Amazons
+            Navigationsleiste) — aber nur, wenn der Auftrag zu dieser Kennung gehört.
+          */
+          const ausAuftrag = (() => {
+            try {
+              const a = suchauftrag()
+              return a && (!a.zielAsin || zurReihe(a.zielAsin, kennungJetzt)) ? (a.titel ?? null) : null
+            } catch {
+              return null
+            }
+          })()
+          const name = e?.titel ?? ausAuftrag ?? seitenTitel() ?? null
+          return globalThis.akPrimeMeldetZeile(Boolean(eintrag?.unbekannt), name, kennungJetzt)
+        })()
+        let z = meldetZeile.querySelector('.ak-meldet')
+        if (wasGemeldetWird) {
+          if (!z) {
+            z = document.createElement('div')
+            z.className = 'ak-meldet'
+            meldetZeile.appendChild(z)
+          }
+          /* Nur bei echter Änderung schreiben — sonst flackert der Kasten. */
+          if (z.textContent !== wasGemeldetWird) z.textContent = wasGemeldetWird
+          z.dataset.kennung = kennungJetzt ?? ''
+        } else if (z) {
+          z.remove()
+        }
+      }
+
+      /*
+        **Der aniSearch-Verweis gehört in den Takt, nicht in den Hinweiskasten.**
+
+        Seit 4.12.8 nimmt `hinweisKasten()` die Kennung aus der Liste — nur
+        läuft die Funktion gar nicht, wenn der Kasten keinen Titel bekommt. Bei
+        den vier Titel-Aufträgen ist das der Regelfall: Dort steht die blosse
+        Hülle mit Knopf und Fußzeile, und die Fußzeile blieb rechts leer.
+
+        Hier greift es unabhängig davon: Der Takt läuft immer, und wer zuerst
+        füllt, gewinnt — `hinweisKasten()` prüft dieselbe Bedingung
+        (`!rechts.firstChild`) und lässt eine vorhandene Zeile in Ruhe.
+      */
+      const rechtsPlatz = kasten?.querySelector('.ak-such-fuss-rechts')
+      if (rechtsPlatz && !rechtsPlatz.firstChild) {
+        try {
+          const e = liste[id]
+          const asId = e?.eintraege?.find((x) => x?.asId)?.asId
+          if (asId) {
+            rechtsPlatz.appendChild(
+              kastenVerweis('aniSearch', 'https://www.anisearch.de/anime/' + asId),
+            )
+          } else if (e?.titel) {
+            /* Ohne Kennung bleibt die Suche über den Kern des Namens — wie beim Suchauftrag. */
+            const kern = e.titel.split(/[:—–(]/)[0].trim() || e.titel
+            rechtsPlatz.appendChild(
+              kastenVerweis('aniSearch', 'https://www.anisearch.de/search?q=' + encodeURIComponent(kern)),
+            )
+          }
+        } catch {
+          /* Ohne Auftrag bleibt der Platz leer — er ist eine Zugabe, keine Bedingung. */
+        }
+      }
+
+      const mitte = kasten?.querySelector('.ak-such-fuss-mitte')
+      if (mitte) {
+        /*
+          Der Prüflisten-Knopf zieht in die Mitte der Fußzeile. Solange der
+          Briefkasten schweigt, steht dort ein Ladering; steht fest, dass kein
+          Knopf kommt (Antwort da, Knopf versteckt), weicht er ersatzlos.
+
+          Ohne diese zweite Bedingung pulsierte der Platzhalter im Video vom
+          02.09.2026 vier Sekunden lang weiter, bis zum Ende der Aufnahme.
+        */
+        const platz = mitte.querySelector('.ak-laedt')
+        if (uebersichtKnopf.style.display === 'none') {
+          if (briefkastenAdressen) platz?.remove()
+          else if (!platz) mitte.appendChild(ladeRing('Prüfliste'))
+        } else if (uebersichtKnopf.parentElement !== mitte) {
+          uebersichtKnopf.classList.add('ak-uebersicht-innen')
+          platz?.remove()
+          mitte.appendChild(uebersichtKnopf)
+        }
+      }
+
+      /*
+        **Die Meldezeile trägt entweder den Knopf oder die Marke „gemeldet ✓".**
+
+        Beides sagt dasselbe über denselben Gegenstand, deshalb derselbe Platz.
+        Solange keins von beidem feststeht, hält ein Ladering die Höhe — die
+        Zeile darf nicht nachträglich erscheinen.
+      */
+      const meldeZeile = kasten?.querySelector('.ak-z-melden')
+      if (meldeZeile) {
+        if (knopf.style.display !== 'none') {
+          if (knopf.parentElement !== meldeZeile) {
+            knopf.classList.add('ak-amazon-knopf-innen')
+            meldeZeile.replaceChildren(knopf)
+          }
+        } else {
+          const marke = kasten.querySelector('.ak-z-inhalt .ak-such-fertig')
+          if (marke) meldeZeile.replaceChildren(marke)
+          else if (!briefkastenAdressen && !meldeZeile.firstChild) {
+            meldeZeile.appendChild(ladeRing('Meldezustand'))
+          } else if (briefkastenAdressen && meldeZeile.querySelector('.ak-laedt')) {
+            meldeZeile.replaceChildren()
+          }
+        }
+      }
+    } catch {
+      /* Ohne Kasten bleibt er, wo er ist. */
+    }
+    schutzflaecheZeigen(true)
+    /*
+      **Ein Hinweiskasten einer anderen Seite wird weggeräumt und neu gebaut.**
+
+      Prime Video wechselt ohne Neuladen; beide Hinweise entstehen aber nur
+      beim Seitenaufbau. Ohne diese Zeilen bleibt der Befund der Suchseite über
+      einer Titelseite stehen und behauptet dort „Anderes Werk", während der
+      Melde-Weg gerade offen wäre (Daniel, 30.08.2026, an „Danmachi").
+
+      Neu aufgebaut wird nur der Auftragshinweis: Der Suchhinweis gehört auf
+      eine Trefferliste, und die erreicht man nicht per Wechsel innerhalb des
+      Titelbereichs.
+    */
+    const alterHinweis = document.querySelector('.ak-amazon-suchhinweis')
+    if (alterHinweis) {
+      const andereAdresse = alterHinweis.dataset.fuerAdresse !== kastenAdresse()
+      /*
+        Die Folgenzahl kommt Sekunden nach dem Seitenaufbau — und sie
+        entscheidet, welchen Zweig der Auftragshinweis wählt. Ändert sie sich,
+        wird er neu gebaut.
+      */
+      let andereFolgen = false
+      try {
+        andereFolgen = alterHinweis.dataset.beiFolgen !== globalThis.akPrimeFolgenStand(gesehen, location)
+      } catch {
+        /* Kein Zählstand — dann bleibt es beim Adressvergleich. */
+      }
+      const andereErwartungen = alterHinweis.dataset.beiErwartungen !== erwartungsMarke()
+      if (andereAdresse || andereFolgen || andereErwartungen) {
+        /*
+          Neu **gezeichnet**, nicht abgerissen. Bis 4.11.0 stand hier ein
+          `remove()`, und der folgende Aufruf baute den Kasten von vorn — im
+          Video vom 02.09.2026 der Moment, in dem Elemente verschwinden
+          (Frames 239/240) und Sekundenbruchteile später zurückkommen (277/278).
+
+          Beide Bauer schreiben jetzt in die bestehenden Zeilen; was sich nicht
+          geändert hat, wird nicht angefasst (Signatur in `hinweisKasten`), und
+          den Adresswechsel erledigt `kastenSkelett()`.
+        */
+        try {
+          /*
+            **Auf einer Suchseite baut ihn `zeigeSuchhinweis()`, sonst `zeigeAuftragshinweis()`.**
+
+            Bis 4.1.3 stand hier nur der zweite. Auf Titelseiten genügte das, weil
+            der Pfad dort die Kennung trägt und ein Wechsel die Seite neu lädt.
+            Auf Suchseiten war `andereAdresse` nie wahr — der Pfad ist immer
+            `/s` —, also wurde der Kasten dort nie ersetzt: Er zeigte den Auftrag
+            von vorhin.
+
+            Seit der Vergleich die Query einschließt, greift der Zweig auch dort.
+            Nur baute ihn danach niemand neu, und der Kasten war ganz weg
+            („wo ist die extension?"). Beide Bauer gehören hierher.
+          */
+          globalThis.akPrimeKastenNeu(alterHinweis, kastenAdresse(), location.pathname, { suche: zeigeSuchhinweis, titel: zeigeAuftragshinweis, huelle: () => kastenSkelett().classList.add('ak-nur-huelle') })
+        } catch {
+          /* Ohne Auftrag gibt es nichts zu zeigen — der alte Kasten ist trotzdem weg. */
+        }
+      }
+    }
+    beiStaffelwechsel()
+    zeichnen()
+    /**
+     * Auch der Uebersichts-Knopf gehoert in den Takt.
+     *
+     * Er wurde bisher nur beim Start und nach einer Meldung gezeichnet.
+     * Stirbt die Verbindung mitten in der Sitzung -- beim Neuladen der
+     * Erweiterung --, blieb dort weiter "384 Prime-Titel offen" stehen,
+     * obwohl ein Klick nichts mehr bewirkt haette.
+     */
+    uebersichtZeichnen()
+    /* Erst nach dem Zeichnen messen: vorher stehen die Elemente noch anders. */
+    schutzflaecheAnpassen()
+    taktMs = performance.now() - t0
+    taktSumme += taktMs
+    takte++
+    if (taktMs > taktMax) taktMax = taktMs
+    /**
+     * **Der Takt hält an, sobald es nichts mehr zu tun gibt.**
+     *
+     * Gemessen am 25.08.2026 in Daniels Sitzung: `taktSchnitt: 226 ms` bei
+     * einem Takt von 500 ms — die Erweiterung verbrauchte **45 % der Zeit**,
+     * Spitze 417 ms. Der Quelltext einer Prime-Seite ist dabei **2,2 Millionen
+     * Zeichen** groß, nicht die zuvor angenommene knappe Million.
+     *
+     * Das ist die Erklärung für „it impacts performance drastically": Nicht
+     * eine teure Einzelstelle, sondern zwanzig Regex-Läufe über zwei Megabyte,
+     * zweimal je Sekunde, **auch wenn längst alles gelesen ist**.
+     *
+     * Ist der Zählstand vollständig — alle Folgen der Staffel liegen vor —,
+     * ändert weiteres Lesen nichts mehr. Der Takt geht dann auf vier Sekunden
+     * und kehrt sofort zurück, sobald sich Adresse oder Zählstand ändern. Das
+     * ist derselbe Gedanke, den `amazon-leser.js` mit seinem gemächlichen Modus
+     * schon verfolgt.
+     */
+    const fertig = Boolean(gesehen.gesamt) && geladeneFolgen() >= gesehen.gesamt
+    if (fertig !== langsam) {
+      langsam = fertig
+      clearInterval(taktGeber)
+      taktGeber = setInterval(taktSchritt, langsam ? 4000 : 500)
+    }
+  }
+
+  let taktGeber = setInterval(taktSchritt, 500)
+
+  /**
+   * **Der Wechsel wird an der Adresse erkannt, nicht im teuren Takt.**
+   *
+   * Bis 4.13.7 fiel beides zusammen: Ob sich der Titel geändert hat, stellte
+   * `taktSchritt()` fest — und der läuft alle 500 ms, im Sparmodus alle vier
+   * Sekunden. Auf einer fertig gelesenen Seite kam ein Wechsel deshalb bis zu
+   * vier Sekunden zu spät an.
+   *
+   * Genau so ist es jetzt gebaut. Der Wachposten vergleicht **eine
+   * Zeichenkette** — `location.href` gegen den letzten Stand. Das kostet
+   * nichts, deshalb darf er alle 150 ms laufen; die zwanzig Mustersuchen über
+   * 2,2 Millionen Zeichen bleiben im Takt dahinter.
+   *
+   * `popstate` kommt dazu, weil es für Vor und Zurück sofort feuert. Was
+   * **nicht** geht, ist `history.pushState` zu überschreiben: Ein Content-Skript
+   * lebt in einer eigenen JS-Welt, und die Aufrufe der Seite laufen an einer
+   * Fassung vorbei, die nur hier gilt. Der Vergleich ist der Weg, der ohne
+   * Annahmen über fremden Code auskommt.
+   */
+  let letzteAdresse = location.href
+
+  function adresseNeuPruefen() {
+    if (location.href === letzteAdresse) return
+    letzteAdresse = location.href
+    /*
+      **Der Quelltext der alten Seite wird weggeworfen, nicht abgewartet.**
+
+      `seitenHtml()` hält ihn bis zu zwei Sekunden. Ohne diese Zeile arbeitet
+      der Takt direkt nach dem Wechsel garantiert mit dem alten Stand — und der
+      Wechsel „sofort erkannt" wäre nur die halbe Wahrheit.
+    */
+    htmlNeuLesen()
+    adressKennungFortschreiben()
+    titelBindung.pruefen()
+    /*
+      Der Sparmodus gehört zur alten Seite. Ihn stehen zu lassen hieße, den
+      Wechsel zwar sofort zu bemerken und dann vier Sekunden zu warten.
+    */
+    if (langsam) {
+      langsam = false
+      clearInterval(taktGeber)
+      taktGeber = setInterval(taktSchritt, 500)
+    }
+    /* Und nicht erst beim nächsten Takt — jetzt. */
+    taktSchritt()
+  }
+
+  setInterval(adresseNeuPruefen, 150)
+  /*
+    `popstate` ist die Zugabe für Vor und Zurück — nicht die Grundlage. Wo es
+    das Ereignis nicht gibt, trägt der Vergleich oben allein; deshalb steht der
+    Aufruf in einem `try`. Ein Fehler an dieser Stelle riss sonst den ganzen
+    Rest des Skripts mit (im Sandkasten sofort sichtbar: Der Knopf blieb in
+    seinem Anfangszustand).
+  */
+  try {
+    window.addEventListener('popstate', adresseNeuPruefen)
+  } catch {
+    /* Ohne Ereignis bleibt der Vergleich im 150-ms-Takt. */
+  }
+
+
+  // --- Melden --------------------------------------------------------------
+
+  const abweisenMitGrund = (grund) => globalThis.akPrimeGrundZeigen(knopf, grund, abweisen)
+  knopf.addEventListener('click', meldeSperre.mitSperre(async (befundBeimKlick) => {
+    if (!verbindungLebt()) {
+      abweisen('Erweiterung neu geladen')
+      knopf.textContent = '↻ Seite neu laden'
+      knopf.title = 'Die Erweiterung wurde neu geladen. Diese Seite kennt sie noch nicht — einmal aktualisieren, dann geht es weiter.'
+      return
+    }
+    /* Die Seite des Klicks: ohne Titel in der Adresse gibt es nichts zu melden, und was nach einem Wechsel noch läuft, wird nicht gesendet. */
+    const seitenKarte = titelBindung.karte()
+    if (!seitenKarte) return abweisenMitGrund('Kein Titel geöffnet')
+    // „Nicht abrufbar" ist eine eigene Aussage, kein Sonderfall von „kein
+    // Deutsch" — siehe den Kommentar am Knopf.
+    /* Auf den gespeicherten Stand warten, statt den Klick zu verwerfen: Direkt nach dem Laden ist `erledigt` noch leer, und ein Klick meldete zum zweiten Mal. */
+    if (!standGeladen) {
+      try {
+        await standFertig
+      } catch {
+        /* Ohne Speicher bleibt es beim ungeprüften Stand. */
+      }
+      // Der Stand kann die Lage geändert haben — diese Staffel ist womöglich
+      // längst gemeldet.
+      if (erledigt[listenId]?.staffeln?.[staffelSchluessel()]) {
+        abweisen('schon gemeldet', true)
+        letzterStand = ''
+        zeichnen()
+        return
+      }
+    }
+    /**
+     * Steht der Knopf auf „Neuladen", meldet er nicht — er lädt neu.
+     *
+     * Der Quelltext gehört nach einem Dropdown-Wechsel zur alten Staffel; eine
+     * Meldung von hier wäre eine Meldung über die falsche Staffel. Genau das
+     * ist heute mehrfach passiert.
+     */
+    /**
+     * Mitten im Staffelwechsel wird nicht gemeldet.
+     *
+     * Der Zaehlstand gehoert dann noch zur vorigen Staffel, die Nummer schon
+     * zur neuen -- eine Meldung von hier traegt beides zusammen und ist
+     * falsch. Gefangen hat das die Zusicherung, nicht der Blick: Der Knopf war
+     * zwar gesperrt, aber `disabled` haelt keinen Klick auf, der aus dem Code
+     * kommt.
+     */
+    if (knopf.dataset.wechselt === 'true' && knopf.dataset.neuLaden !== 'true') {
+      abweisenMitGrund('Staffelwechsel läuft')
+      return
+    }
+    /* Alter Name mit neuer ASIN wäre Falschdaten: Name und Kennung müssen von derselben Seite stammen. */
+    const widerspruch = globalThis.akPrimeMeldungWiderspruch(document, quelltextVonFruehererSeite(), asinAusAdresse(), asinAusSeite(), eintrag.titel ?? seitenTitel(), titelVerlassen)
+    if (widerspruch) return abweisenMitGrund(widerspruch)
+    if (knopf.dataset.neuLaden === 'true') {
+      knopf.textContent = '↻ lädt neu …'
+      // Defensiv: Im Testsandkasten gibt es kein `reload`.
+      if (typeof location?.reload === 'function') location.reload()
+      abweisen('Seite lädt neu')
+      return
+    }
+    htmlNeuLesen()
+    const nichtAbrufbar = knopf.dataset.tot === 'true'
+    const sprachen = sprachenAusFolgen()
+    const geladen = geladeneFolgen()
+    // Ein toter Verweis der Prüfliste hat naturgemäß keine Folgen; eine unbekannte Seite meldet ohne gelesene Folge nie "weg"
+    // (der Bau könnte sie per Namen einem Titel zuordnen und dessen Wege aufheben).
+    if (!geladen && (!nichtAbrufbar || eintrag.unbekannt)) {
+      abweisenMitGrund('keine Folge gelesen')
+      return
+    }
+    const deutsch = deutschInFolgen()
+    /**
+     * **Der Umfang ist die größere der beiden Zahlen — nicht die bekanntere.**
+     *
+     * `gesehen.gesamt` stammt aus der Nachlade-Antwort. Bleibt sie leer, weil
+     * das Nachladen scheitert, galt der Stand bisher als „vollständig" — und
+     * die Sperre unten lief ins Leere. Am 25.08.2026 meldete der Knopf bei
+     * „Beyblade Burst" Staffel 3 deshalb `kein Deutsch · 3 Folgen`, während die
+     * Seite darüber `51 Folgen` schrieb und den Abschnitt `Folgen 1–24` offen
+     * hatte. Drei gelesene Folgen, ein Nein über einundfünfzig.
+     *
+     * Die Seite selbst nennt ihre Folgenzahl, und diese Angabe ist unabhängig
+     * davon, ob unser Nachladen funktioniert. Sie zählt deshalb mit: Was die
+     * Erweiterung nicht erklären kann, darf sie nicht überstimmen.
+     */
+    const lautSeite = seitenLage().folgenLautSeite || 0
+    const gesperrtN = globalThis.akPrimeGesperrteZahl(gesehen.gesperrt, seitenLage().regionFolgen)
+    const sollFolgen = globalThis.akPrimeSollFolgen(gesehen, lautSeite, geladen + gesperrtN)
+    const vollstaendig = globalThis.akPrimeMeldungVollstaendig(sollFolgen, geladen, gesperrtN)
+
+    /**
+     * Aus einem Ausschnitt entsteht **nie** ein Nein.
+     *
+     * „Deutsch gefunden" bleibt wahr, auch wenn erst 24 von 51 Folgen geladen
+     * sind — eine deutsche Tonspur ist eine deutsche Tonspur. „Kein Deutsch"
+     * dagegen wäre eine Aussage über die **ganze** Staffel, gestützt auf die
+     * Hälfte davon. Genau diese Asymmetrie hat dieses Projekt an fremden
+     * Quellen wiederholt bemängelt; sie gilt hier genauso.
+     *
+     * Deshalb: Wer nichts Deutsches gefunden hat und noch nicht durch ist,
+     * bekommt keine Meldung, sondern die Aufforderung, die übrigen Abschnitte
+     * zu öffnen.
+     */
+    // Die Sperre gilt der Aussage "kein Deutsch". "Gibt es nicht" ist eine
+    // andere -- sie stuetzt sich nicht auf Folgen, sondern auf ihr Fehlen.
+    const keinDeutschDaten = { sollFolgen, geladen, gesperrt: gesperrtN }
+    if (!globalThis.akPrimeMeldungErlaubt({ nichtAbrufbar, deutsch, ...keinDeutschDaten })) {
+      /* Dieselbe Regel wie am Knopf (prime-region.js); der Durchgang erfährt den Grund sofort. */
+      const sperre = globalThis.akPrimeKeinDeutschSperre({ ...keinDeutschDaten, kanal: ueberKanal() })
+      knopf.textContent = sperre.text
+      knopf.title = sperre.title
+      abweisen('Staffel nicht vollständig gelesen')
+      setTimeout(() => {
+        letzterStand = ''
+        zeichnen()
+      }, 4000)
+      return
+    }
+    /**
+     * Jeder Schritt sagt, dass er dran ist — und keiner darf ewig dauern.
+     *
+     * Am 24.08.2026 blieb der Knopf eine Minute auf „sende …" stehen. Der
+     * Worker antwortet in 0,2 Sekunden (gemessen, dreimal), also hing etwas
+     * davor — nur ließ sich von außen nicht sagen, was: Der Vorgang hat drei
+     * Wartestellen und alle drei sahen gleich aus.
+     *
+     * Statt zu raten, was hängt, sagt es der Knopf. Und nach fünfzehn Sekunden
+     * bricht er ab: Ein Vorgang, der so lange braucht, kommt nicht mehr, und
+     * ein Knopf, der ewig „sende …" zeigt, sagt weniger als einer, der einen
+     * Fehler nennt.
+     */
+    const mitFrist = (zusage, was) =>
+      Promise.race([
+        Promise.resolve(zusage).then((r) => r ?? Promise.reject(new Error(`${was} antwortet nicht`))),
+        new Promise((_, ab) => setTimeout(() => ab(new Error(`${was} antwortet nicht`)), 15000)),
+      ])
+
+    knopf.disabled = true
+    let token
+    try {
+      knopf.textContent = 'hole Zugangsschlüssel …'
+      ;({ token } = await mitFrist(globalThis.akKontext.lesen('token', 'sync'), 'Der Speicher'))
+    } catch (err) {
+      abweisen(err.message)
+      knopf.textContent = err.message
+      setTimeout(() => {
+        letzterStand = ''
+        zeichnen()
+      }, 3000)
+      return
+    }
+    if (!token) {
+      abweisen('kein Token')
+      knopf.textContent = globalThis.akKontext.keinTokenText()
+      return
+    }
+    if (!titelBindung.gueltig(seitenKarte)) return abweisenMitGrund('Seite verlassen — nicht gemeldet')
+    sendetGerade = true
+    knopf.disabled = true
+    knopf.textContent = 'sende …'
+
+    /**
+     * **Trägt jede Folge dieselben Sprachen — oder ist die Staffel gemischt?**
+     *
+     * Bei „Kill Blue" (`B0GTN94C9M`) trägt Folge 1 bis 4 `["Deutsch","日本語"]`
+     * und Folge 5 bis 12 nur `["日本語"]`. Bis zum 25.08.2026 wurde daraus eine
+     * Meldung „🇩🇪 Deutsch · 12 Folgen" — zwölf behauptet, vier vorhanden.
+     * Daniel hat es an drei Quellen unabhängig gemessen (ADN 4, Netflix 4,
+     * Crunchyroll 0); Amazon selbst liefert es je Folge und liefert es richtig.
+     *
+     * Ist die Staffel **einheitlich**, bleibt es bei einer Meldung wie bisher —
+     * sonst schwölle der Briefkasten um das Zwölffache an, ohne mehr zu sagen.
+     * Nur bei **Mischung** geht eine Meldung je Folge raus, jede mit ihrer
+     * eigenen `folge_nr`. Aus denen baut `fetch-pruefungen.ts` die
+     * `dubRanges`; das Feld gibt es dort seit jeher, es kam nur nie etwas an.
+     */
+    const meldeTeile = () => {
+      const karte = gesehen.jeFolge
+      if (!karte || karte.size < 2) return [null]
+      /*
+        **Eine Folge ohne Tonspurangabe wird nicht gemeldet — sie hat nichts gesagt.**
+
+        Captain Tsubasa 2018, 15.09.2026 (Meldungen 4483 ff.): Folgen 25–52 kamen
+        über den Crunchyroll-Kanal ohne Abo mit leerem `audioTracks` und gingen als
+        `kein_dub` raus. Leer heißt „nicht gezeigt", nicht „kein Deutsch". Solche
+        Folgen machen die Staffel trotzdem zur Mischung — sonst würde aus 53–91
+        Deutsch eine Meldung über alle 91 Folgen.
+      */
+      const bekannt = [...karte.entries()].filter(([, namen]) => (namen ?? []).length)
+      if (!bekannt.length) return [null]
+      const gemischt =
+        bekannt.length < karte.size || bekannt.some(([, n]) => hatDeutsch(n) !== hatDeutsch(bekannt[0][1]))
+      if (!gemischt) return [null]
+      return bekannt
+        .sort((a, b) => a[0] - b[0])
+        .map(([nr, namen]) => ({ folgeNr: nr, sprachen: namen, deutsch: hatDeutsch(namen) }))
+    }
+
+    const teile = meldeTeile()
+    if (teile.length > 1) knopf.textContent = `sende ${teile.length} Folgen …`
+
+    try {
+      let antwort
+      for (const teil of teile) {
+      if (!titelBindung.gueltig(seitenKarte)) throw new Error('Seite verlassen, Rest nicht gemeldet')
+      antwort = await mitFrist(
+        fetch(WORKER, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Lauf-Token': token },
+        body: JSON.stringify({
+          plattform: 'primevideo',
+          url: eintrag.url,
+          ...globalThis.akKontext.meldungKopf(),
+          /**
+           * **Die Suchadresse, unter der dieser Auftrag stand.**
+           *
+           * Ein Suchauftrag wird auf der **Titelseite** gemeldet, nicht auf der
+           * Suchseite — der Worker erfuhr deshalb nie, dass die Suche erledigt
+           * ist. Für „schon gemeldet?" blieb bei Suchadressen nur der lokale
+           * Vermerk, und der ist nicht abgeglichen: Wird eine Meldung im
+           * Briefkasten verworfen, bleibt er stehen und sperrt den Auftrag.
+           *
+           * Real am 02.09.2026 bei „Is This a Zombie?": Briefkasten leer, Knopf
+           * „gemeldet ✓", und Daniel kam nicht weiter — „ich hab ihn nicht
+           * melden können". Zu beheben war es nur mit einem Konsolenbefehl,
+           * und das ist genau, was seine Regel vom 28.08.2026 ausschließt:
+           * „single source of truth … kein lokales zurücksetzen only".
+           *
+           * Mit diesem Feld weiß der Briefkasten es, und `?zaehlen=1` gibt die
+           * erledigten Suchadressen zurück. Der lokale Vermerk überbrückt dann
+           * nur noch die Sekunden bis zur nächsten Antwort — seine eigentliche
+           * Aufgabe.
+           */
+          suchUrl: (() => {
+            try {
+              return eintrag.ausSuche ? (eintrag.url ?? suchauftrag()?.suchUrl ?? null) : (suchauftrag()?.suchUrl ?? null)
+            } catch {
+              return null
+            }
+          })(),
+          /**
+           * **Die Kennung der Seite, auf der wirklich gelesen wurde.**
+           *
+           * `url` ist die Adresse aus unserer Prüfliste — dieselbe für beide
+           * Ausgaben eines Titels. Prime führt aber regelmäßig zwei: „My First
+           * Girlfriend is a Gal" liegt als Kauftitel mit **11 Folgen und FSK 16**
+           * (die KAZÉ-Fassung samt OVA) und über den Crunchyroll-Kanal mit
+           * **10 Folgen und FSK 18**, mit völlig anderen Folgentiteln — zwei
+           * Lokalisierungen, zwei Angebote (Daniel, 30.08.2026, mit Bildern).
+           *
+           * Ohne dieses Feld tragen beide Meldungen dieselbe Adresse, und die
+           * zweite überschreibt die erste schon im Briefkasten. Die Kennung
+           * stand bisher nur im Fließtext der Notiz.
+           */
+          seiten_kennung: (() => {
+            try {
+              return asin() ?? null
+            } catch {
+              return null
+            }
+          })(),
+          sprachen: teil ? teil.sprachen : sprachen,
+          /* Ohne Mischung bleibt das Feld leer — dann gilt der Befund der Staffel. */
+          folge_nr: teil ? teil.folgeNr : undefined,
+          /*
+            Die gültigen Werte stehen in `worker/src/pruefung-speichern.ts` — nachlesen, nicht
+            erraten: Die erste Fassung schickte `befund: 'ja'` und bekam HTTP 400
+            (Digimon Tamers, 23.08.2026).
+          */
+          /*
+            **Stufe 1 des Meldemodells: Verfügbarkeit und Sprache getrennt** (22.09.2026,
+            docs/konzept-meldungen-architektur.md). Der Worker leitet daraus das alte
+            `befund` (`weg` / `dub` / `kein_dub`) für den heutigen Einleser ab. Prime
+            liest jede Folge einzeln aus der Seite — gemessen, nie angenommen.
+          */
+          ...(nichtAbrufbar
+            ? { vorhanden: 'nein', art: 'gemessen' }
+            : { vorhanden: 'ja', ton_de: (teil ? teil.deutsch : deutsch) ? 'ja' : 'nein', art: 'gemessen' }),
+          /**
+           * Kennen wir den Titel nicht, wird er von der Seite gelesen.
+           *
+           * Ohne ihn wäre die Meldung nicht zuzuordnen — und eine Meldung, die
+           * niemand zuordnen kann, ist keine. Amazon setzt den Serientitel in
+           * `<title>`, mit angehängtem „ansehen | Prime Video" o. Ä.; der Teil
+           * hinter dem senkrechten Strich fällt weg.
+           */
+          titel: eintrag.titel ?? seitenTitel(),
+          /**
+           * Die Staffelnummer aus dem Verweis-Parameter, als Zahl.
+           *
+           * Alle Staffeln einer Serie können sich eine ASIN teilen — bei „Oshi
+           * no Ko" ist `B0GFPBT6FG` die Sammelseite für alle drei. Dann ist die
+           * Nummer das Einzige, was die Staffeln auseinanderhält, und sie
+           * gehört in ihr Feld statt in einen Satz.
+           *
+           * **Und der Quelltext ist die zweite Quelle, nicht keine.** Bis zum
+           * 25.08.2026 stand hier allein `staffelAusAdresse()`. Wer eine Seite
+           * öffnet, ohne im Auswahlfeld zu wechseln, hat kein `_sN` in der
+           * Adresse — die Meldung ging dann ohne Nummer raus. Gemessen im
+           * Briefkasten: **203 von 297** Prime-Meldungen tragen `staffel: null`,
+           * und in der Übersicht liest sich das als „S ohne Nummer" neben den
+           * nummerierten (Daniel, 25.08.2026, mit Bild).
+           *
+           * `staffelAusSeite()` liest `seasonNumber` aus dem Quelltext und
+           * schließt die Lücke — aber nur, solange der Quelltext zu dieser
+           * Staffel gehört. Nach einem Wechsel gehört er zur vorigen.
+           *
+           * Ein Film bekommt weiterhin `null`, und das ist richtig: Er hat
+           * keine Staffel, und eine erfundene 1 wäre schlimmer als keine Angabe.
+           */
+          staffel: staffelNummer(),
+          /* Nur gesetzt, wenn Prime die Staffel in Bände geteilt hat. */
+          band: gemeldeterBand,
+          /**
+           * Wie man an den Titel kommt — im Abo, gegen Geld, oder beides.
+           *
+           * Der Datensatz führt 202 Amazon-Verweise mit behaupteter
+           * Zugangsart „Mit Abo", die niemand geprüft hat. Diese Angabe ist
+           * die einzige, die sie berichtigen kann.
+           */
+          zugang: zugangsart(),
+          /**
+           * Laeuft der Titel ueber einen fremden Kanal, ist die
+           * Sprachangabe ein Hinweis und kein Beleg — siehe `ueberKanal()`.
+           * Die Pipeline muss das wissen, sonst wird aus einer Vermutung
+           * eine Handpruefung.
+           */
+          ueberKanal: ueberKanal(),
+          /**
+           * Die geprüfte Folgenzahl, als Zahl.
+           *
+           * Sie stand bisher nur in der Notiz („alle 11 Folgen geprüft") und
+           * musste dort beim Auswerten wieder herausgeklaubt werden. Geschickt
+           * wird die **geladene** Zahl, nicht die behauptete Gesamtzahl: Nur
+           * über die reicht der Befund.
+           */
+          folgen: teil ? 1 : geladen,
+          /**
+           * Zugangsart und Abos als eigene Felder, nicht nur als Fließtext.
+           *
+           * Beides steht seit jeher auf dem Melde-Knopf („🇩🇪 Deutsch · 12 Folgen
+           * · Kaufen oder leihen"), landete aber nur in der Notiz und musste
+           * dort beim Auswerten wieder herausgeklaubt werden — derselbe Umweg,
+           * den die Folgenzahl schon hinter sich hat.
+           *
+           * Bei Prime ist das die einzige Quelle: Kein öffentlicher Dienst nennt
+           * die Zugangsart, weshalb am 24.08.2026 alle 203 Amazon-Suchadressen
+           * ungeprüft „Mit Abo" trugen.
+           *
+           * `abos` trägt die `benefitId`-Liste. Sie unterscheidet, was von außen
+           * nicht zu sehen ist: ob ein Titel Prime-eigen läuft oder über einen
+           * Kanal. Bei „Kill Blue" meldete Amazon zwölf deutsche Folgen — die
+           * aber nur sieht, wer das ADN-Kanal-Abo hat; ohne es sind es vier.
+           */
+          zugang: zugangsart(),
+          abos: abos(),
+         /**
+           * **Die Folgen selbst — roh, ohne Deutung.**
+           *
+           * Bis 3.76 schickte die Meldung ein Urteil: `dub`, eine Folgenzahl, ein
+           * Sprachbündel. Die Grundlage dafür — Titel, Erstausstrahlung, Laufzeit
+           * je Folge — las der Leser längst aus, und die Meldung warf sie weg.
+           *
+           * Damit war jede spätere Frage unbeantwortbar („ist das dieselbe
+           * Folge?", „gehört diese Staffel zu unserem Eintrag?"), und genau
+           * deshalb musste die Erweiterung sie im Browser beantworten. Am
+           * 27.08.2026 hat das neununddreißig Fassungen an einem Abend gekostet.
+           *
+           * Jetzt geht die Liste mit. Die Zuordnung passiert im Bau gegen TMDB —
+           * dort liegen Folgentitel und Erstausstrahlungsdaten, gegen die sich
+           * das abgleichen lässt.
+           */
+          /*
+            **Unsere Titel-Kennung geht mit — sie loest die Zuordnung.**
+
+            Gemessen am 28.08.2026: Von 67 gemeldeten Adressen liess sich
+            genau eine einem Titel zuordnen. Der Bau suchte ueber die Adresse
+            in `titles.streams.url`; ein Titel ohne Verweis steht dort nicht.
+            Die Kennung liegt hier im Auftrag bereit und beendet das Raten.
+          */
+          /*
+            **Die Kennung steht eine Ebene tiefer — deshalb kam nie eine an.**
+
+            Das Feld wurde am 28.08.2026 eingebaut, damit die Zuordnung nicht
+            mehr über die Adresse raten muss. Es blieb trotzdem leer: In
+            `AK_OFFENE_AMAZON` trägt der äußere Eintrag Titel und Adresse, die
+            AniList-Kennung steht je Werk in `eintraege[]`. Gemessen am
+            31.08.2026: **0 von 21 Adressen** haben ein äußeres `id`, 19 haben
+            eines in `eintraege`. Alle 795 gemeldeten Rohfolgen kamen deshalb
+            mit `titel_id: null` an, und der Bau ordnete **null** davon zu.
+
+            Genommen wird sie nur, wenn sie **eindeutig** ist: Hängen zwei
+            Werke an derselben Adresse, entscheidet nicht der erste Treffer,
+            sondern der Bau über die Folgentitel.
+          */
+          titelId: (() => {
+            try {
+              /*
+                **Nach einem Staffelwechsel gilt die Kennung des Auftrags nicht mehr**
+                (17.09.2026, Golden Kamuy): Der Auftrag meint die Seite, von der er
+                kam. Steht jetzt eine andere Kennung in der Adresse, entscheidet der
+                Import über die Staffelnummer.
+              */
+              const hierKennung = String(asin() ?? '')
+              const auftragsSeite = kennungAus(eintrag?.url ?? '') ?? suchauftrag()?.zielAsin ?? null
+              if (hierKennung && auftragsSeite && auftragsSeite !== hierKennung) return null
+              if (eintrag?.id != null) return eintrag.id
+              const ids = [...new Set((eintrag?.eintraege ?? []).map((e) => e?.id).filter((x) => x != null))]
+              if (ids.length === 1) return ids[0]
+              return suchauftrag()?.id ?? null
+            } catch {
+              return null
+            }
+          })(),
+          /*
+            **Gesperrte Folgen gehen mit — als `vorhanden: 'nein'`.**
+
+            Bis 4.20 fielen sie hier ganz heraus (`gesehen.gesperrt`), und mit ihnen die
+            Beobachtung „diese Folge gibt es bei Prime nicht". Das neue Urteil je Folge
+            braucht sie. Der heutige Zuordner sieht sie nicht: `?rohfolgen=1` lässt sie
+            aus, bis Stufe 2 ihn ersetzt (Migration 035).
+
+            `ton_de` ist `unbekannt`, wenn die Folge keine Tonspuren nennt — leer heißt
+            „nicht gezeigt", nicht „kein Deutsch" (Captain Tsubasa, 15.09.2026).
+          */
+          rohfolgen: [
+            ...[...(gesehen.metaJeFolge ?? new Map()).values()].map((f) => ({ f, vorhanden: 'ja' })),
+            ...[...(gesehen.gesperrt ?? new Map()).values()].map((f) => ({ f, vorhanden: 'nein' })),
+          ].map(({ f, vorhanden }) => ({
+            vorhanden,
+            ton_de:
+              vorhanden === 'nein' || !(f.sprachen ?? []).length
+                ? 'unbekannt'
+                : f.sprachen.some((x) => /deutsch|german/i.test(x))
+                  ? 'ja'
+                  : 'nein',
+            asin: f.kennung ?? null,
+            gti: f.gti ?? null,
+            nummer: f.nummer ?? null,
+            titel: f.titel ?? null,
+            erschienen: f.erschienen ?? null,
+            dauerSek: f.dauerSek ?? null,
+            sprachen: f.sprachen ?? [],
+            untertitel: f.untertitel ?? [],
+            staffelText: gemeldeterBand ?? null,
+            staffelNr: (() => {
+              try {
+                return staffelNummer()
+              } catch {
+                return null
+              }
+            })(),
+          })),
+          /**
+           * Die Notiz sagt, worüber der Befund reicht.
+           *
+           * Ein Befund über 24 von 51 Folgen ist kein Befund über die Staffel.
+           * Wer das später liest, muss es sehen können, ohne die Seite noch
+           * einmal zu öffnen.
+           */
+          notiz:
+            `Amazon-Seite ${asin()}: ` +
+            (vollstaendig
+              ? geladen === 1 && !gesehen.gesamt
+                ? 'Film geprüft'
+                : `alle ${geladen} ${geladen === 1 ? 'Folge' : 'Folgen'} geprüft` +
+                  (gesperrtN ? `, ${gesperrtN} in der Region gesperrt` : '')
+              : `nur ${geladen} von ${gesehen.gesamt} Folgen geladen — Rest ungeprüft`) +
+            `, Abos: ${abos().join(', ') || 'keine Angabe'}` +
+            (eintrag.unbekannt ? ' — Staffel nicht im Bestand, Titel von der Seite gelesen, unbekannt=1' : '') +
+            // Beide Kennungen, solange sie auseinandergehen können: Die eine
+            // steht in der Adresse, die andere im Quelltext, und nur die
+            // zweite meint die gezeigte Staffel.
+            (asinAusAdresse() && asinAusAdresse() !== id ? `, Seitenadresse: ${asinAusAdresse()}` : '') +
+            (staffelAusAdresse() ? `, laut Adresse Staffel ${staffelAusAdresse()}` : '') +
+            /**
+             * Die Zugangsart auch in die Notiz, nicht nur ins Feld.
+             *
+             * Die Tabelle im Worker hat keine Spalte dafür, und anlegen lässt
+             * sie sich mit den vorhandenen Berechtigungen nicht (D1-API
+             * antwortet 7403). Das Feld bleibt trotzdem im Meldekörper — es
+             * schadet nicht und trägt, sobald die Spalte da ist. Bis dahin ist
+             * die Notiz der Träger: `zugang=kauf` steht maschinenlesbar drin.
+             */
+            (zugangsart() ? `, zugang=${zugangsart()}` : '') +
+            /* Maschinenlesbar wie `zugang=`: Der Import baut daraus ASIN → gti (gti-Brücke, 17.09.2026). */
+            (gesehen.seite?.gti ? `, gti=${gesehen.seite.gti}` : '') +
+            /*
+              **Die Regionssperre gehört in die Meldung, auch wenn Folgen übrig sind.**
+
+              Daniel am 31.08.2026 an „Shakugan no Shana": Die Seite trägt oben
+              und unter Folge 1 „In deiner Region nicht mehr auf Prime Video
+              verfügbar", die Meldung ging trotzdem als `dub` mit
+              `zugang=abo_und_kauf` heraus — ohne jeden Hinweis darauf.
+
+              Der Knopf urteilt zu Recht so: `regionWeg` gilt erst, wenn **keine**
+              Folge mehr abrufbar ist (bei „Chaika" waren es 12 von 24, und die
+              übrigen 12 laufen). Hier sind alle 24 lesbar, weil der Titel
+              **kaufbar** bleibt — weg ist nur das Abo.
+
+              Für die Sprachfrage ändert das nichts, für die Zugangsart schon.
+              Der Vermerk steht deshalb in der Notiz, statt den Befund zu kippen:
+              „deutsch" bleibt wahr, „im Abo" womöglich nicht.
+            */
+            (() => {
+              try {
+                return seitenLage().regionWeg ? ', regionsperre=laut Seite nicht mehr im Abo' : ''
+              } catch {
+                return ''
+              }
+            })() +
+            /*
+              Die Notiz trägt es maschinenlesbar mit, aus demselben Grund wie
+              `zugang=`: Ohne den Vermerk sähe „kauf" im Datensatz aus wie eine
+              Aussage über den Titel, und sie gilt nur für diese Ausgabe.
+            */
+            ((() => {
+              const gleiche = ausgabenDieserStaffel()
+              return gleiche > 1 ? `, ausgaben=${gleiche} (Zugangsart gilt nur für diese)` : ''
+            })()) +
+            (ueberKanal()
+              ? ' — ACHTUNG: Kanal-Titel, Amazons Sprachangabe ist hier kein Beleg'
+              : ''),
+        }),
+        }),
+        'Der Anime-Kalender',
+      )
+      if (!antwort.ok) break
+      }
+      knopf.textContent = 'trage ein …'
+      /**
+       * Kein Zwischenstand mehr — nur Fehler werden gemeldet.
+       *
+       * Daniel am 24.08.2026: „angekommen auf button brauch ich auch nicht …
+       * ich sehe am ‚alles gemeldet' wenn ich mit einer meldung fertig bin,
+       * wenn es error oder sonstiges gibt, sollte ja nicht alles gemeldet
+       * kommen." Der Erfolg zeigt sich am Ergebnis, nicht an einer Zwischenzeile.
+       */
+      if (!antwort.ok) knopf.textContent = `Fehler ${antwort.status}`
+      letzteMeldung = { pfad: location.pathname, ok: antwort.ok, am: Date.now() }
+      /**
+       * Abgehakt wird erst, wenn die Meldung wirklich angekommen ist.
+       *
+       * Die Liste selbst entsteht beim Datenlauf und weiß bis zum nächsten Bau
+       * nichts von einer Meldung, die noch im Briefkasten liegt. Ohne diese
+       * Markierung stünde jeder eben geprüfte Titel weiter obenauf — bei
+       * Netflix war genau das Daniels Beschwerde („7seeds already checked but
+       * still in list", 22.08.2026).
+       *
+       * Vermerkt wird der Befund, nicht nur ein Haken: Wer eine Seite ein
+       * zweites Mal öffnet, soll sehen, was beim ersten Mal herauskam.
+       */
+      if (antwort.ok) {
+        /**
+         * Abgehakt wird **diese Staffel** unter der Listen-Kennung.
+         *
+         * Die Meldung trägt die Kennung aus dem Quelltext, die Liste kennt
+         * nur die aus der Adresse — und ein Titel mit fünf Staffeln ist erst
+         * durch, wenn alle fünf gemeldet sind.
+         */
+        /**
+         * Der Schlüssel kommt aus dem Quelltext, nicht aus der Folgenzahl.
+         *
+         * `gesehen.gesamt` als letzte Rückfallebene war der Grund, warum zwei
+         * gemeldete Staffeln als eine gezählt wurden: Stimmt die geladene
+         * Folgenzahl zufällig überein — oder ist sie beim Wechsel noch die der
+         * vorigen Staffel —, kollidieren die Schlüssel und die zweite Meldung
+         * überschreibt die erste (Daniel, 24.08.2026, an Sindbad, Barbapapa
+         * und Bakugan).
+         *
+         * Als allerletzter Ausweg steht jetzt die ASIN dort: Sie ist je
+         * Staffel verschieden und kollidiert nie.
+         */
+        const nr = staffelSchluessel()
+        /**
+         * Frisch lesen, zusammenführen, schreiben — nie den eigenen Stand
+         * für die Wahrheit halten.
+         *
+         * Jeder Tab hielt seine Kopie von `erledigt` und schrieb sie beim
+         * Melden **komplett** zurück. Wer zwei Listeneinträge in zwei Tabs
+         * öffnete und nacheinander meldete, verlor die erste Meldung: Der
+         * zweite Tab kannte sie nicht und überschrieb sie mit seinem Stand von
+         * vor dem Öffnen.
+         *
+         * Der Speicher ist die gemeinsame Sache mehrerer Tabs — er wird
+         * behandelt wie eine, nicht wie eine private Variable.
+         */
+        /**
+         * Vereinigt, nicht ersetzt -- in beide Richtungen.
+         *
+         * Der Speicher hat, was andere Tabs gemeldet haben; `erledigt` hat,
+         * was dieser Tab gemeldet hat. **Beide sind gueltig**, denn eine
+         * Meldung wird nie zurueckgenommen. Wer eine Seite als Wahrheit nimmt,
+         * verliert die andere -- und genau das ist zweimal passiert: erst
+         * zwischen zwei Tabs, dann zwischen zwei Klicks im selben Tab, weil
+         * das Schreiben nicht abgewartet wurde und der naechste Lesevorgang
+         * den alten Stand sah.
+         */
+        const frisch = (await speicherLesen('amazonErledigt'))?.amazonErledigt ?? {}
+        const zusammen = { ...frisch }
+        for (const [schluessel, wert] of Object.entries(erledigt)) {
+          zusammen[schluessel] = globalThis.akPrimeEintragVereinigen(frisch[schluessel], wert)
+        }
+        const bisher = zusammen[listenId] ?? { staffeln: {}, gesamt: staffelZahl() }
+        globalThis.akPrimeMeldungEintragen(bisher, nr, deutsch ? '🇩🇪' : '✕', geladen)
+        /**
+         * Die Gesamtzahl wächst, sie schrumpft nicht.
+         *
+         * `staffelZahl()` liest „N Staffeln" aus dem Seitentext. Stand der beim
+         * ersten Melden noch nicht da, kam eine 1 heraus — und jede weitere
+         * Meldung schrieb sie erneut, auch wenn der Text inzwischen 2 sagte.
+         * Der Knopf hielt den Titel dann für fertig (Daniel, 24.08.2026, an
+         * „Barbapapa": „da steht alles gemeldet, obwohl liste sagt s1 muss noch
+         * gemeldet werden").
+         */
+        bisher.gesamt = Math.max(staffelZahl(), bisher.gesamt ?? 1, Object.keys(bisher.staffeln).length)
+        // Der Serienname, wie Amazon ihn nennt — er verbindet Listenzeilen, die
+        // dieselbe Serie meinen (siehe `serienGefaehrten`).
+        /**
+         * Gespeichert wird der **Seitentitel**, nicht unser Listenname.
+         *
+         * Verglichen wird später mit `seitenTitel()` — wer hier etwas anderes
+         * ablegt, findet seinen eigenen Eintrag nie wieder. Genau das ist bei
+         * „Chaika" passiert: Unsere Liste führt ihn als
+         * „Hitsugi no Chaika: AVENGING BATTLE", Amazon nennt beide Staffeln
+         * schlicht „Chaika". Nach dem Neuladen auf Staffel 1 passte nichts
+         * zusammen, die Meldung landete unter einer fremden Kennung, und der
+         * Knopf sagte weiter „noch 1 Staffel" — bei zwei gemeldeten von zwei.
+         *
+         * Der Listenname kommt als Rückfall dahinter: Wo Amazon keinen Titel
+         * hergibt, ist er besser als nichts.
+         */
+        bisher.serie = seitenTitel() ?? eintrag.titel ?? bisher.serie
+        /* Wann abgehakt — der Briefkasten mistet danach aus, siehe briefkastenHolen. */
+        bisher.zeit = globalThis.akPrimeVermerk(Date.now())
+        erledigt = { ...zusammen, [listenId]: bisher }
+        /* Eine Teilmeldung schließt den Titel nicht ab (Regel in prime-stand.js). */
+        const teilOffen = globalThis.akPrimeTeilOffen(erledigt, bisher.serie, suchauftrag()?.folgen, titelKern)
+        gemeldeteStaffel = nr
+        // Abwarten: Der naechste Klick liest hier gleich wieder, und ohne das
+        // liest er den Stand von vor dieser Meldung.
+        await speicherSchreiben({ amazonErledigt: erledigt })
+        /*
+          **Die eigene Meldung zählt sofort, nicht erst beim nächsten Abruf.**
+
+          `nichtAngekommen()` fragt die geholte Briefkasten-Liste, und die hält die
+          Edge bis zu zwei Stunden (ZAEHLEN_SEKUNDEN). Direkt nach dem Melden stand die Adresse dort
+          noch nicht — der Knopf ging wieder auf „melden", als wäre nichts
+          geschehen. Gemessen war die Meldung längst angekommen.
+
+          Der Eintrag überbrückt die Zeit bis zum nächsten Abruf; danach
+          entscheidet wieder der Worker. Kam sie wirklich nicht an, geht der
+          Knopf dann zu Recht erneut auf.
+        */
+        try {
+          if (briefkastenAdressen && eintrag.url) briefkastenAdressen.add(eintrag.url)
+          /* Dieselbe Überbrückung für den Worker-Stand, bis `briefkastenHolen` ihn neu lädt. */
+          if (eintrag.url) frischGemeldet.add(eintrag.url)
+        } catch {
+          /* Noch keine Auskunft vom Briefkasten — dann gibt es nichts zu ergänzen. */
+        }
+        /*
+          **Und dieselbe Ueberbrueckung fuer die Wiedervorlage.**
+
+          Sie steht in der Liste, bis der naechste Bau sie neu erzeugt — ohne
+          diesen Merker bliebe der Knopf bis dahin offen, auch direkt nach einer
+          angekommenen Meldung (Daniel, 01.09.2026: "ich hab geklickt - button
+          bleibt klickbar - ist was angekommen?"). Sie war angekommen.
+        */
+        const grundJetzt = String(liste[listenId]?.erneut ?? '')
+        if (grundJetzt) {
+          wiedervorlageBeantwortet = { ...wiedervorlageBeantwortet, [listenId]: grundJetzt }
+          await speicherSchreiben({ amazonWiedervorlage: wiedervorlageBeantwortet })
+        }
+        void briefkastenHolen(true)
+        /*
+          Kam der Eintrag aus einer Suche, ist die Suchadresse damit erledigt —
+          der Treffer ist gefunden und gemeldet. Getrennt gespeichert, weil die
+          Abhak-Liste der Titelseiten an Kennung, Staffel und Serientitel hängt
+          und eine Suchadresse nichts davon hat.
+        */
+        /*
+          **Die Suchadresse steht im Auftrag, nicht immer im Eintrag.**
+
+          Daniel am 30.08.2026: „nach der meldung ist der eintrag weiterhin in
+          der prüfliste." Sein Diagnosebericht zeigt warum — der Eintrag lautet
+          `{"titel":"Danganronpa 3 … Future Arc","ausSuche":true}`, ohne `url`.
+          Die Bedingung fiel durch, und abgehakt wurde nichts.
+
+          Die Adresse gibt es trotzdem: Der Suchauftrag trägt sie als `suchUrl`
+          über den Sprung von der Trefferliste auf die Titelseite hinweg.
+        */
+        const suchAdresse = eintrag.url ?? suchauftrag()?.suchUrl ?? null
+        /*
+          **Die eigene Seite gilt sofort als gemeldet — sonst zählt die
+          Checkliste sie erst nach der nächsten Briefkasten-Antwort.**
+
+          Daniels Erwartung vom 09.09.2026: „nach meldung erwartung:
+          Checklisten Eintrag kriegt checkmark." Der Haken hängt an
+          `briefkastenSeiten`; bis dessen Antwort da ist, vergehen Sekunden.
+          Dieselbe Überbrückung wie bei `briefkastenAdressen` zwei Absätze
+          weiter oben — der Briefkasten bleibt maßgeblich, er kommt nur später.
+        */
+        try {
+          const hier = asin()
+          if (hier) {
+            /*
+              **Beides, und das zweite ist das, was hält.** Der Nachtrag in
+              `briefkastenSeiten` hilft dem laufenden Takt; er verschwindet aber
+              beim nächsten Abruf, weil der die Menge ersetzt. Der eigene Merker
+              bleibt, bis die Seite neu geladen wird.
+            */
+            if (briefkastenSeiten) briefkastenSeiten.add(String(hier))
+            selbstGemeldeteSeiten.add(String(hier))
+            frischGemeldeteSeiten.add(String(hier))
+            void globalThis.akPrimeSeiteSichern(hier, speicherLesen, speicherSchreiben, Date.now()).catch(() => {})
+          }
+        } catch {
+          /* Ohne Kennung gibt es nichts nachzutragen — der Briefkasten holt es nach. */
+        }
+        /*
+          **Erst wenn keine Ausgabe mehr aussteht.** Bei zwei bestätigten
+          Ausgaben ist die Suche nach der ersten Meldung nicht erledigt.
+        */
+        if (eintrag.ausSuche && suchAdresse && !teilOffen && !erwartungNochOffen(suchAdresse)) await suchAbhaken(suchAdresse)
+        /*
+          Und der Kasten verschwindet mit ihm. Er sagt „Meldung läuft unter
+          diesem Titel" — nach der Meldung läuft nichts mehr, und er stand
+          trotzdem weiter da.
+        */
+        if (eintrag.ausSuche && !teilOffen && !erwartungNochOffen(suchAdresse)) suchauftragVergessen()
+        /* Erst hier, nicht nach dem catch: Ein Fehlschlag darf keine Marke setzen. */
+        meldeSperre.vermerken(befundBeimKlick)
+        uebersichtZeichnen()
+      }
+    } catch (err) {
+      knopf.textContent = `Nicht erreichbar: ${err.message}`
+      letzteMeldung = { pfad: location.pathname, ok: false, am: Date.now() }
+      /*
+        **Ein Befund, der nicht ankommt, ist verlorene Arbeit.** Bis zum
+        10.09.2026 stand das nur am Knopf — und war weg, sobald Daniel die Seite
+        verließ. Der Vorfall überlebt das.
+      */
+      void vorfallMelden('melden_fehlgeschlagen', {
+        text: `Meldung nicht abgesetzt: ${String(err?.message ?? err).slice(0, 200)}`,
+      })
+    }
+    /**
+     * „Gemeldet" bleibt stehen, bis sich etwas ändert.
+     *
+     * Vorher sprang der Knopf nach 2,5 Sekunden zurück auf „melden" — bei
+     * einem Titel mit fünf Staffeln sah das aus, als wäre nichts passiert.
+     *
+     * Zurück kommt er erst beim Staffelwechsel — dort wird
+     * `gemeldeteStaffel` geleert.
+     */
+    /*
+      **Der Merker faellt hier, nicht frueher.** Zwischen Antwort und diesem
+      Punkt liegt das Abhaken; ein Takt dazwischen haette den Knopf schon wieder
+      auf „melden" gestellt, obwohl die Meldung durch ist.
+    */
+    sendetGerade = false
+    setTimeout(() => {
+      knopf.disabled = false
+      letzterStand = ''
+      zeichnen()
+    }, 1200)
+  }))
+
+  // --- Durchgang über die Prüfliste ------------------------------------------
+
+  /*
+    **„▶ alle durchgehen" für Prime — Staffeln in unsichtbaren Frames** (25.09.2026).
+
+    Daniel: „naruto … hat 9 staffeln, ein alles-durchgehen button würde das stark erleichtern".
+    Prime braucht keinen Player: Die Tonspuren stehen auf der Staffelseite, und der Meldeknopf liest
+    sie selbst.
+
+    **Bis 4.22.9 navigierte der Durchgang die sichtbare Seite** von Staffel zu Staffel. Gemessen am
+    ersten Lauf (102 Seiten): rund 10 s je Seite, die Hälfte davon Laden, und Daniel: „das ist kaum
+    zumutbar". Jetzt steuert die sichtbare Seite nur noch; jede Staffel lädt in einem unsichtbaren
+    Frame derselben Domain (`x-frame-options: SAMEORIGIN`, gemessen), bis zu drei gleichzeitig. Im
+    Frame läuft dieselbe Erweiterung mit demselben Knopf — kein zweiter Meldeweg, und Staffeln über
+    24 Folgen lädt der Leser dort nach wie auf einer geöffneten Seite. Der Weg „Staffel per Abruf
+    lesen" wurde im PoC gemessen (Ton 31/31) und verworfen, weil er eine zweite Fassung der Meldung
+    gebraucht hätte (docs/wissen/erweiterung.md).
+
+    - **Der Knopf entscheidet, nicht der Durchgang.** Der Frame klickt nur, wenn der Meldeknopf
+      „… melden" anbietet und die Beschriftung 1 s stillsteht; das Ergebnis kommt aus dem
+      Meldehandler (`letzteMeldung`), nicht aus dem Knopftext.
+    - **Staffeln aus dem Quelltext** (`seasons`, jede mit eigener ASIN — gemessen an Naruto). Der
+      erste Frame eines Titels liefert die Liste, danach laufen die übrigen parallel.
+    - **Titel mit eigener Titelseite, danach die Suchaufträge** (Suchseite im Frame, ihre genauen und bestätigten Treffer einzeln).
+    - **Der Lauf gehört dem Tab** (`sessionStorage`) und endet spätestens nach zwei Stunden. Die
+      Frames teilen ihn (gleiche Herkunft), schreiben ihn aber nie.
+  */
+  /* Die Zustandswerte des Durchgangs stehen oben (Z. 755 ff.). */
+  function primeLaufLesen() {
+    try {
+      const lauf = JSON.parse(sessionStorage.getItem(PRIME_LAUF) ?? 'null')
+      if (!lauf || Date.now() - lauf.seit > PRIME_LAUF_HOECHSTENS_MS) return null
+      return lauf
+    } catch {
+      return null
+    }
+  }
+
+  function primeLaufSchreiben(lauf) {
+    try {
+      sessionStorage.setItem(PRIME_LAUF, JSON.stringify(lauf))
+    } catch {
+      /* Ohne Speicher endet der Lauf mit dem nächsten Takt. */
+    }
+  }
+
+  function primeLaufEndeLesen() {
+    try {
+      return JSON.parse(sessionStorage.getItem(PRIME_LAUF_ENDE) ?? 'null')
+    } catch {
+      return null
+    }
+  }
+
+  function primeSpur(lauf, was, daten = {}) {
+    lauf.spur = globalThis.akPrimeSpurKuerzen([...(lauf.spur ?? []), { t: new Date().toISOString(), was, ...daten }])
+    notiere(`durchgang-${was}`, daten)
+  }
+
+  /** Titel mit eigener Titelseite, die dieser Lauf noch nicht hatte — in der Reihenfolge des Dialogs. */
+  function primeNaechsterTitel(lauf) {
+    return Object.keys(liste)
+      .filter((a) => !fertig(a) && akPrimeHatTitelseite(liste[a]) && !lauf.fertig.includes(a))
+      .sort(akPrimeVergleich(liste))[0]
+  }
+
+  // --- Die Steuerung: sichtbare Seite --------------------------------------------
+
+  function primeLaufStarten() {
+    const lauf = {
+      seit: Date.now(),
+      titel: null,
+      plan: [],
+      planBekannt: false,
+      staffelNr: {},
+      laufend: [],
+      fertig: [],
+      uebersprungen: [],
+      spur: [],
+      titelGesamt: Object.keys(liste).filter((a) => !fertig(a) && akPrimeHatTitelseite(liste[a])).length + kartenOffen(),
+      seiten: 0,
+    }
+    /* Steht die Seite auf einem offenen Titel der Liste, fängt der Lauf mit ihm an. */
+    const hier = liste[listenId] && !fertig(listenId) && akPrimeHatTitelseite(liste[listenId]) ? listenId : null
+    if (!hier && !primeNaechsterTitel(lauf) && !auswahlZeilen().some((z) => !z.gemeldet)) return false
+    try {
+      sessionStorage.removeItem(PRIME_LAUF_ENDE)
+    } catch {
+      /* Dann steht das alte Ende noch da, bis der Lauf endet. */
+    }
+    primeSpur(lauf, 'start', { hier })
+    if (hier) primeTitelBeginnen(lauf, hier)
+    primeLaufSchreiben(lauf)
+    if (dialog) dialogUmschalten()
+    primeKoordinieren()
+    uebersichtZeichnen()
+    return true
+  }
+
+  function primeLaufBeenden(lauf, grund) {
+    primeSpur(lauf, 'ende', { grund })
+    for (const el of primeFrames.keys()) el.remove()
+    primeFrames.clear()
+    try {
+      sessionStorage.removeItem(PRIME_LAUF)
+      sessionStorage.setItem(
+        PRIME_LAUF_ENDE,
+        JSON.stringify({ grund, uebersprungen: lauf.uebersprungen, erledigt: lauf.fertig.length, seiten: lauf.seiten, spur: lauf.spur }),
+      )
+    } catch {
+      /* Ohne Speicher endet er trotzdem — der Takt findet keinen Lauf mehr. */
+    }
+    letzteSignatur = null
+    uebersichtZeichnen()
+    if (grund !== 'von Hand' && !dialog) dialogUmschalten()
+    /*
+      Der Briefkasten dieser Seite stammt vom Start — was die Frames gemeldet haben, fehlt darin.
+      Ohne frischen Abruf zeigte die Liste danach „nur auf diesem Rechner" und dieselbe Zahl
+      offener Titel wie vorher, obwohl alles angekommen war (26.09.2026).
+    */
+    primeBriefkastenFrisch()
+    primeBriefkastenNachholen()
+  }
+
+  function primeBriefkastenFrisch() {
+    void Promise.resolve(briefkastenHolen(true)).then(() => {
+      letzteSignatur = null
+      uebersichtZeichnen()
+    })
+  }
+
+  /* Meldungen, die beim ersten Abruf noch unterwegs waren, gelten sonst bis zum Seitenwechsel als „nur auf diesem Rechner" (Higurashi, 19.11.2026). Ein einziger Nachabruf, kein Polling. */
+  function primeBriefkastenNachholen() {
+    clearTimeout(primeNachholTimer)
+    primeNachholTimer = setTimeout(() => {
+      primeNachholTimer = null
+      primeBriefkastenFrisch()
+    }, PRIME_NACHHOLEN_MS)
+    window.addEventListener('pagehide', () => clearTimeout(primeNachholTimer), { once: true })
+  }
+
+  function primeTitelBeginnen(lauf, schluessel) {
+    lauf.titel = schluessel
+    lauf.plan = [akPrimeStartKennung(liste[schluessel].url, kennungAus)].filter(Boolean)
+    lauf.planBekannt = false
+    lauf.staffelNr = {}
+    primeSpur(lauf, 'titel', { schluessel, titel: liste[schluessel]?.titel ?? null })
+  }
+
+  /* Deklaration statt const: Hörer und Takt laufen auf der Startseite schon, während das Skript oben auf eine Kennung wartet (`id = await`). */
+  function primeLaufName(lauf) {
+    return (liste[lauf.titel] ?? auswahlKopf(lauf.suche))?.titel ?? '?'
+  }
+
+  /** Titel sind durch: die gewählten Karten der Suchaufträge, eine nach der anderen. Suchseiten öffnet der Lauf nie. */
+  function primeSucheBeginnen(lauf) {
+    const schritt = globalThis.akPrimeSucheWeiter(lauf, () => globalThis.akPrimeAuswahlEinheiten(auswahlZeilen()))
+    if (!schritt) return false
+    lauf.titel = schritt.schluessel
+    lauf.plan = [schritt.eintrag]
+    lauf.planBekannt = false
+    lauf.staffelNr = {}
+    lauf.suche = schritt.art === 'treffer' ? schritt.suche : null
+    primeSpur(lauf, schritt.art, { schluessel: schritt.schluessel })
+    return true
+  }
+
+  function primeFrameOeffnen(lauf, kennung) {
+    const el = document.createElement('iframe')
+    el.name = PRIME_FRAME_NAME
+    if (lauf.suche) suchauftragMerken(globalThis.akPrimeZielAuftrag(lauf, kennung, auswahlKopf))
+    el.src = globalThis.akPrimeEintragAdresse(kennung, gtiSprungMerken)
+    /* Kein Vorschauvideo mit Ton aus einem Frame, den niemand sieht. */
+    el.allow = "autoplay 'none'"
+    el.tabIndex = -1
+    el.setAttribute('aria-hidden', 'true')
+    el.className = 'ak-durchgang-frame'
+    /*
+      Im Bild, aber unsichtbar und ohne Mausziel: Ein Frame außerhalb des Bildes kann Chrome im
+      Zeichnen drosseln, und die Seite darin soll laden wie eine geöffnete.
+    */
+    el.style.cssText =
+      'position:fixed;left:0;top:0;width:1280px;height:900px;opacity:0;pointer-events:none;border:0;z-index:-1'
+    document.body.appendChild(el)
+    primeFrames.set(el, { kennung, start: Date.now() })
+    lauf.laufend.push(kennung)
+    primeSpur(lauf, 'frame', { kennung })
+  }
+
+  /** Ein Frame ist fertig — Ergebnis eintragen, Plan ergänzen, weiter. */
+  function primeFrameErgebnis(el, daten) {
+    const f = primeFrames.get(el)
+    if (!f) return
+    primeFrames.delete(el)
+    el.remove()
+    const lauf = primeLaufLesen()
+    if (!lauf) return
+    lauf.laufend = lauf.laufend.filter((k) => k !== f.kennung)
+    primeSpur(lauf, 'seite', { kennung: f.kennung, ok: Boolean(daten.ok), grund: daten.grund ?? null, tagebuch: daten.tagebuch ?? null, abschnitte: daten.abschnitte ?? undefined })
+    if (daten.ok) {
+      lauf.seiten = (lauf.seiten ?? 0) + 1
+      /* Die Zeile einer gewählten Karte ist sofort erledigt, nicht erst nach dem nächsten Abruf des Briefkastens. */
+      if (lauf.suche) selbstGemeldeteSeiten.add(globalThis.akPrimeEintragKennung(f.kennung))
+    }
+    /*
+      Die Meldung ging aus dem Frame, nicht von dieser Seite — `frischGemeldet` wusste nichts
+      davon. `?stand=1` läuft beim Worker nach einer Minute ab, statt bei jeder Meldung verworfen
+      zu werden (24.09.2026); ohne diese Zeile blieb ein gemeldeter Titel bis dahin offen, und der
+      Durchgang endete mit „fertig“ neben „1 Prime-Titel zu prüfen“ (Daniel, 26.09.2026, Dating Sim S2).
+      Nur die eigene Seite des Titels zählt (`akPrimeTitelErgebnis`).
+    */
+    globalThis.akPrimeTitelErgebnis(lauf, f.kennung, Boolean(daten.ok), liste[lauf.titel]?.url, frischGemeldet)
+    if (/kein Token/.test(String(daten.grund ?? ''))) return primeLaufBeenden(lauf, 'kein Token in den Optionen')
+    if (!lauf.planBekannt) {
+      const { eintraege: staffeln, verloren } = globalThis.akPrimePlanEintraege(daten.staffeln, [f.kennung, daten.hier], lauf.plan)
+      for (const s of staffeln) lauf.staffelNr[s.eintrag] = s.nummer
+      lauf.plan.push(...staffeln.map((s) => s.eintrag))
+      lauf.planBekannt = true
+      primeSpur(lauf, 'plan', { staffeln: staffeln.map((s) => `${s.nummer}:${s.eintrag}`), verloren })
+      const warnung = globalThis.akPrimeStaffelWarnung(verloren, (daten.staffeln ?? []).length, primeLaufName(lauf))
+      if (warnung) lauf.uebersprungen.push(warnung)
+    }
+    if (!daten.ok && !globalThis.AK_TAGESLIMIT?.zurueckstellen(lauf.plan, f.kennung)) {
+      const nr = lauf.staffelNr[f.kennung]
+      globalThis.akPrimeUebersprungenDazu(lauf, f.kennung, globalThis.akPrimeUebersprungen(primeLaufName(lauf), nr, daten.grund))
+    }
+    primeLaufSchreiben(lauf)
+    primeKoordinieren()
+    uebersichtZeichnen()
+  }
+
+  function primeHoerer(e) {
+    if (e?.data?.marke !== 'ak-prime-frame' || e.origin !== location.origin || IM_FRAME) return
+    const el = [...primeFrames.keys()].find((x) => x.contentWindow === e.source)
+    if (el) primeFrameErgebnis(el, globalThis.AK_TAGESLIMIT?.ausFrame(e.data) ?? e.data)
+  }
+
+  function primeKoordinieren() {
+    const lauf = primeLaufLesen()
+    if (!lauf || globalThis.AK_TAGESLIMIT?.aktiv()) {
+      for (const el of primeFrames.keys()) el.remove()
+      primeFrames.clear()
+      return
+    }
+    const jetzt = Date.now()
+    const haengend = [...primeFrames].filter(([, f]) => jetzt - f.start > PRIME_FRAME_HOECHSTENS_MS)
+    for (const [el] of haengend) primeFrameErgebnis(el, { ok: false, grund: 'Frame antwortet nicht' })
+    if (haengend.length) return
+    /* Nach einem Neuladen der sichtbaren Seite sind ihre Frames weg — deren Staffeln kommen zurück in den Plan. */
+    const offen = new Set([...primeFrames.values()].map((f) => f.kennung))
+    const verwaist = lauf.laufend.filter((k) => !offen.has(k))
+    if (verwaist.length) {
+      lauf.plan.unshift(...verwaist)
+      lauf.laufend = lauf.laufend.filter((k) => offen.has(k))
+    }
+    if (!lauf.titel) {
+      const naechster = primeNaechsterTitel(lauf)
+      if (naechster) primeTitelBeginnen(lauf, naechster)
+      else if (!primeSucheBeginnen(lauf)) return primeLaufBeenden(lauf, 'nichts mehr offen')
+    }
+    /* Bis die Staffelliste da ist, genau ein Frame; Treffer einer Suche einzeln (ein Auftrag im Tab-Speicher). */
+    const grenze = lauf.planBekannt && !lauf.suche ? PRIME_FRAMES : 1
+    while (primeFrames.size < grenze && lauf.plan.length) primeFrameOeffnen(lauf, lauf.plan.shift())
+    if (!primeFrames.size && !lauf.plan.length) {
+      if (!lauf.fertig.includes(lauf.titel)) lauf.fertig.push(lauf.titel)
+      lauf.titel = null
+      lauf.suche = null
+      primeLaufSchreiben(lauf)
+      return primeKoordinieren()
+    }
+    primeLaufSchreiben(lauf)
+  }
+
+  // --- Der Automat: im Frame -----------------------------------------------------
+
+  /** Zustand dieser einen Frame-Seite — lebt nur, solange sie lebt. */
+  const frameZustand = { start: Date.now(), text: null, textSeit: Date.now(), geklickt: null, fertig: false, tagebuch: [] }
+
+  /** Scheitert der Frame, nennt die Antwort seine letzten Knopftexte mit Zeit. */
+  function frameFertig(ok, grund) {
+    if (frameZustand.fertig) return
+    frameZustand.fertig = true
+    const staffeln = (gesehen?.seite?.staffeln ?? [])
+      .filter((s) => s?.kennung)
+      .map((s) => ({ kennung: String(s.kennung), nummer: s.nummer ?? null, name: s.name ?? null, link: s.link ?? null, gewaehlt: Boolean(s.gewaehlt) }))
+    window.parent.postMessage(
+      { marke: 'ak-prime-frame', ok, grund, hier: String(asin() ?? ''), staffeln, abschnitte: ok ? null : globalThis.akPrimeAbschnittSpur(gesehen?.abschnitte), limit: globalThis.AK_TAGESLIMIT?.rest() ?? null, tagebuch: ok ? undefined : frameZustand.tagebuch },
+      location.origin,
+    )
+  }
+  function frameSchritt() {
+    if (frameZustand.fertig) return
+    if (!verbindungLebt()) return frameFertig(false, 'Erweiterung neu geladen')
+    const jetzt = Date.now()
+    const text = String(knopf.textContent ?? '').trim()
+    if (text !== frameZustand.text) {
+      frameZustand.text = text
+      frameZustand.textSeit = jetzt
+      frameZustand.tagebuch = globalThis.akPrimeTagebuch(frameZustand.tagebuch, text, jetzt - frameZustand.start)
+    }
+    if (jetzt - frameZustand.start > PRIME_SEITE_HOECHSTENS_MS) return frameFertig(...globalThis.akPrimeFrist(text, gesehen))
+    const hier = String(asin() ?? '')
+    if (!hier) return
+    const ruhig = jetzt - frameZustand.textSeit >= PRIME_RUHE_MS
+    const sichtbar = knopf.isConnected && knopf.style.display !== 'none'
+    const bietetMelden = sichtbar && !knopf.disabled && globalThis.akPrimeBietetMelden(text)
+    /*
+      Nur der **sichtbare** Knopf spricht. Nach dem Melden versteckt ihn die Erweiterung und zeigt die
+      grüne Marke — auf dem versteckten Knopf bleibt „trage ein …" stehen (Daniels Bericht,
+      25.09.2026, Naruto S9: der Durchgang wartete darauf für immer).
+    */
+    if (sendetGerade || (sichtbar && /^(sende|trage ein|meldet|hole Zugang)/.test(text))) return
+    if (sichtbar && /^Kein Token/.test(text)) return frameFertig(false, 'kein Token')
+    if (frameZustand.geklickt) {
+      const m = letzteMeldung
+      if (m && m.am >= frameZustand.geklickt && m.abgewiesen) {
+        const a = globalThis.akPrimeAbweisungAntwort(m)
+        return frameFertig(a.ok, a.grund)
+      }
+      if (m && m.am >= frameZustand.geklickt) return frameFertig(m.ok, m.ok ? 'gemeldet' : `Fehler: ${text}`)
+      /* Jeder bewusste Ausstieg setzt `letzteMeldung` (`abweisen`); hier bleibt nur echtes Ausbleiben. */
+      if (jetzt - frameZustand.geklickt > 15_000) return frameFertig(false, `keine Rückmeldung: ${text}`)
+      return
+    }
+    if (!ruhig) return
+    if (sichtbar && text.startsWith('↻')) {
+      const schluessel = `ak-frame-neu-${hier}`
+      try {
+        if (!sessionStorage.getItem(schluessel)) {
+          sessionStorage.setItem(schluessel, '1')
+          location.reload()
+          return
+        }
+      } catch {
+        /* Ohne Speicher kein zweiter Versuch. */
+      }
+      return frameFertig(false, text)
+    }
+    if (bietetMelden && meldeSperre.gesperrt()) return frameFertig(true, 'schon gemeldet')
+    if (bietetMelden) {
+      frameZustand.geklickt = jetzt
+      return knopf.click()
+    }
+    /* Kein Angebot: schon gemeldet. Kurz warten, weil der Knopf in den ersten Sekunden noch lädt. */
+    if (jetzt - frameZustand.start > 4000 && (!sichtbar || /gemeldet/.test(text))) {
+      return frameFertig(true, sichtbar ? text : 'kein Knopf')
+    }
+  }
+
+  /*
+    setTimeout-Kette statt setInterval (Sandkasten, 25.09.2026) - und finally: Warf ein Takt einmal,
+    gab es keinen naechsten mehr und der Durchgang stand still (29.09.2026, mit Bild).
+  */
+  function primeTakt() {
+    try {
+      if (IM_FRAME) frameSchritt()
+      else primeKoordinieren()
+      primeFehler = 0
+    } catch (fehler) {
+      if (++primeFehler === 3) console.warn('[Anime-Kalender] Durchgang: Takt wirft ' + String(fehler?.message ?? fehler))
+    } finally {
+      setTimeout(primeTakt, 500)
+    }
+  }
+  if (IM_FRAME) setTimeout(primeTakt, 500)
+})()

@@ -1,0 +1,150 @@
+import { existsSync, readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import yaml from 'js-yaml'
+import { PLATFORMS, type Title } from '../../shared/types.ts'
+import { EIGENE_ID_BASIS, EIGENE_ID_ENDE, istEigenerTitel } from '../../shared/eigene-titel.ts'
+import { ROOT, log, slugify } from '../lib/util.ts'
+
+/**
+ * **Titel aus einer belegten Ankündigung, die kein AniList-Eintrag trägt** (`data/eigene-titel.yaml`, Daniel 04.11.2026).
+ * Der Titel entsteht aus der Handzeile; Termin und Anbieter kommen wie bei jedem Titel aus der Meldung (`releasesAus`, Phase 08),
+ * weil er dann unter genau seinem Namen gefunden wird. Keine Uhrzeit, keine Folgenzahl, kein Cover: was die Quelle nicht sagt, steht nicht da.
+ */
+export interface EigenerEintrag {
+  nr: number
+  name: string
+  format: string
+  anbieter: string[]
+  tag: string
+  sources: string[]
+  zitat: string
+  /** Folgenzahl, wenn die Quelle sie nennt (nur Serien; M.A.S.K. „73 (komplett)“). */
+  folgen?: number
+  /** Prime-Zusatzkanal, wenn die Quelle genau einen nennt. */
+  kanal?: string
+  /** Der Tag ist der Meldetag („ab sofort“), nicht belegter Erscheinungstag: der Termin steht als ≈. */
+  geschaetzt?: boolean
+  zuId?: number
+  widerrufen?: string
+  /** TMDB-Werk (`movie/<Kennung>` oder `tv/<Kennung>`), dessen Plakat der Titel trägt (`lib/eigene-tmdb.ts`). */
+  tmdb?: string
+  /** Statt `tmdb`: warum es kein Plakat gibt. */
+  coverGrund?: string
+  /** Stammdaten, die `datenQuelle` belegt (nie aus der Ankündigung): Produktionsfirma, Genres (AniList-Schreibweise), Minuten je Folge, Erstausstrahlungsjahr. */
+  studios?: string[]
+  genres?: string[]
+  runtimeMin?: number
+  jpYear?: number
+  /** Letzter Ausstrahlungstag der Originalserie laut `datenQuelle` (JJJJ-MM-TT); eine beendete Serie zählt nicht als laufend ohne Termin. */
+  jpEnd?: string
+  /** Folgenzahl der Serie laut `datenQuelle`; nicht `folgen` (Umfang des Katalogs der Ankündigung, kann kleiner sein). */
+  episodes?: number
+  /** Adresse, die die Stammdaten belegt (Pflicht, sobald eines davon steht). */
+  datenQuelle?: string
+}
+
+const FORMATE = ['TV', 'MOVIE', 'OVA', 'ONA', 'SPECIAL']
+
+/** Jede lebende Zeile nennt, woher ihr Plakat kommt (`tmdb`) oder warum keins da ist (`coverGrund`): ein Termin ohne Bild fiel am 03.11.2026 erst im Kalender auf. */
+function pruefeCover(e: Partial<EigenerEintrag>, wo: string): void {
+  if (e.tmdb !== undefined && !/^(movie|tv)\/\d+$/.test(String(e.tmdb))) throw new Error(`${wo}: tmdb muss movie/<Kennung> oder tv/<Kennung> sein`)
+  if (e.widerrufen || e.zuId) return
+  if (e.tmdb === undefined && !e.coverGrund?.trim()) throw new Error(`${wo}: tmdb (Plakat) oder coverGrund fehlt`)
+}
+
+/** Stammdatenfelder: gültige Werte, und ohne `datenQuelle` kein Wert. */
+function pruefeStammdaten(e: Partial<EigenerEintrag>, wo: string): void {
+  const liste = (v: unknown) => Array.isArray(v) && v.length > 0 && v.every((x) => typeof x === 'string' && x.trim())
+  if (e.studios !== undefined && !liste(e.studios)) throw new Error(`${wo}: studios ist keine Liste von Namen`)
+  if (e.genres !== undefined && !liste(e.genres)) throw new Error(`${wo}: genres ist keine Liste von Namen`)
+  if (e.runtimeMin !== undefined && (!Number.isInteger(e.runtimeMin) || e.runtimeMin < 1)) throw new Error(`${wo}: runtimeMin ist keine positive Zahl`)
+  if (e.jpYear !== undefined && (!Number.isInteger(e.jpYear) || e.jpYear < 1900 || e.jpYear > 2100)) throw new Error(`${wo}: jpYear ist kein Jahr`)
+  if (e.jpEnd !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(String(e.jpEnd))) throw new Error(`${wo}: jpEnd ist kein JJJJ-MM-TT`)
+  if (e.episodes !== undefined && (!Number.isInteger(e.episodes) || e.episodes < 1)) throw new Error(`${wo}: episodes ist keine positive Zahl`)
+  const hat = e.studios || e.genres || e.runtimeMin !== undefined || e.jpYear !== undefined || e.jpEnd !== undefined || e.episodes !== undefined
+  if (hat && !/^https:\/\//.test(String(e.datenQuelle ?? ''))) throw new Error(`${wo}: datenQuelle (https-Adresse) fehlt für die Stammdaten`)
+}
+
+/** Prüft eine Zeile der Handdatei; ein Fehler bricht den Bau ab, statt einen halben Titel zu zeigen. */
+function pruefeZeile(e: Partial<EigenerEintrag>, i: number, gesehen: Set<number>): EigenerEintrag {
+  const wo = `data/eigene-titel.yaml, Zeile ${i + 1} (${e?.name ?? '?'})`
+  if (!Number.isInteger(e?.nr) || e.nr! < 1 || e.nr! >= EIGENE_ID_ENDE - EIGENE_ID_BASIS) throw new Error(`${wo}: nr fehlt oder liegt außerhalb`)
+  if (gesehen.has(e.nr!)) throw new Error(`${wo}: nr ${e.nr} steht doppelt`)
+  gesehen.add(e.nr!)
+  if (!e.name?.trim()) throw new Error(`${wo}: name fehlt`)
+  if (!FORMATE.includes(String(e.format))) throw new Error(`${wo}: format muss eines von ${FORMATE.join(', ')} sein`)
+  if (!Array.isArray(e.anbieter) || e.anbieter.some((a) => !(a in PLATFORMS))) throw new Error(`${wo}: anbieter fehlt oder nennt eine unbekannte Plattform`)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(e.tag))) throw new Error(`${wo}: tag ist kein JJJJ-MM-TT`)
+  if (!Array.isArray(e.sources) || !e.sources.length || e.sources.some((q) => !/^https:\/\//.test(String(q)))) throw new Error(`${wo}: sources fehlen oder sind keine Adressen`)
+  if (!e.zitat?.trim()) throw new Error(`${wo}: zitat fehlt`)
+  if (e.zuId !== undefined && !Number.isInteger(e.zuId)) throw new Error(`${wo}: zuId ist keine Kennung`)
+  if (e.folgen !== undefined && (!Number.isInteger(e.folgen) || e.folgen < 1)) throw new Error(`${wo}: folgen ist keine positive Zahl`)
+  if (e.kanal !== undefined && !String(e.kanal).trim()) throw new Error(`${wo}: kanal ist leer`)
+  if (e.geschaetzt !== undefined && typeof e.geschaetzt !== 'boolean') throw new Error(`${wo}: geschaetzt muss true oder false sein`)
+  pruefeCover(e, wo)
+  pruefeStammdaten(e, wo)
+  return e as EigenerEintrag
+}
+
+export function ladeEigeneTitel(wurzel: string = ROOT): EigenerEintrag[] {
+  const datei = resolve(wurzel, 'data/eigene-titel.yaml')
+  if (!existsSync(datei)) return []
+  const roh = (yaml.load(readFileSync(datei, 'utf8')) ?? []) as (Omit<Partial<EigenerEintrag>, 'tag'> & { tag?: string | Date })[]
+  const gesehen = new Set<number>()
+  /* YAML liest ein unquotiertes Datum als Zeitpunkt (UTC-Mitternacht): zurück auf den Tag. */
+  return roh.map((e, i) => pruefeZeile({ ...e, tag: e.tag instanceof Date ? e.tag.toISOString().slice(0, 10) : e.tag }, i, gesehen))
+}
+
+export const eigeneId = (nr: number): number => EIGENE_ID_BASIS + nr
+
+/** Der Titel einer Zeile: nur, was die Zeile belegt. `dubConfidence: normal` wie bei einer angekündigten deutschen Fassung. */
+export function titelAusEintrag(e: EigenerEintrag): Title {
+  const id = eigeneId(e.nr)
+  return {
+    id,
+    slug: `${slugify(e.name)}-${id}`,
+    titleDe: e.name,
+    format: e.format,
+    genres: e.genres ?? [],
+    keywords: [],
+    studios: e.studios ?? [],
+    ...(e.runtimeMin ? { runtimeMin: e.runtimeMin } : {}),
+    ...(e.jpYear ? { jpYear: e.jpYear } : {}),
+    ...(e.jpEnd ? { jpEnd: e.jpEnd } : {}),
+    ...(e.episodes ? { episodes: e.episodes } : {}),
+    dubConfidence: 'normal',
+    streams: [],
+  } as Title
+}
+
+/** Legt die Titel der Handdatei an (ohne widerrufene). Gibt zurück, wie viele es sind. */
+export function ergaenzeEigeneTitel(titles: Map<number, Title>, eintraege: EigenerEintrag[] = ladeEigeneTitel()): number {
+  let neu = 0
+  for (const e of eintraege) {
+    if (e.widerrufen) continue
+    titles.set(eigeneId(e.nr), titelAusEintrag(e))
+    neu++
+  }
+  if (neu) log(`${neu} eigene Titel aus belegter Ankündigung ergänzt: ${eintraege.filter((e) => !e.widerrufen).map((e) => e.name).join(', ')}`)
+  return neu
+}
+
+const norm = (s: string): string => s.toLowerCase().replace(/[^a-z0-9]+/g, '')
+const klasse = (f: string | null | undefined): string => (f === 'TV_SHORT' || f === 'ONA' ? 'TV' : f ?? '?')
+
+type KatalogNah = Pick<Title, 'id' | 'titleDe' | 'titleEn' | 'titleRomaji' | 'format'>
+
+/**
+ * **„Katalog führt jetzt X“** (Vorbild `gleichesWerk`, `anisearch-dubletten.ts`): Zeilen der Handdatei ohne `zuId`, deren Name (normalisiert)
+ * und Formatklasse ein Titel trägt, der kein eigener ist. Kein Auto-Zusammenführen: der Mensch setzt `zuId` oder widerruft.
+ * Gibt je Fund eine Zeile zurück, sonst leer.
+ */
+export function katalogFuehrtJetzt(eintraege: EigenerEintrag[], titel: KatalogNah[]): string[] {
+  const raus: string[] = []
+  for (const e of eintraege) {
+    if (e.zuId || e.widerrufen) continue
+    const treffer = titel.filter((t) => !istEigenerTitel(t.id) && klasse(t.format) === klasse(e.format) && [t.titleDe, t.titleEn, t.titleRomaji].some((n) => n && norm(n) === norm(e.name)))
+    for (const t of treffer) raus.push(`Katalog führt jetzt „${e.name}“ (Titel ${t.id}); eigene Zeile ${e.nr} in data/eigene-titel.yaml: zuId: ${t.id} setzen oder widerrufen`)
+  }
+  return raus
+}

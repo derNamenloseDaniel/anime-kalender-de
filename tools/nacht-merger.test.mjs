@@ -1,0 +1,631 @@
+/**
+ * Test zu tools/nacht-merger-wahl.mjs (Auswahlregel), tools/nacht-merger.mjs (Ablauf) und tools/nacht-merger-welt.mjs (gh-Anschluss).
+ * Erwartete Werte stehen fest im Test. Der Ablauf läuft mit einer Attrappe-Welt; die Verdrahtung (nachrechnen vor jedem Merge, Riegel,
+ * Trockenlauf) prüfen die Fälle über `lauf`, nie über den Quelltext.
+ */
+import { BUDGET_MS, UEBERNAHMEN_JE_LAUF, argumente, exitCode, lauf, starte } from './nacht-merger.mjs'
+import { bauCommittetGerade, bestandIstRot, echteWelt, ghEcht, ghMitWiederholung, laeuftSchon, mergeMit5xxPruefung, stufeVon } from './nacht-merger-welt.mjs'
+import { freigabe, freigabeVerworfen, kandidat, ketteStand, neuesteJeCheck, reihenfolge, urteilIstOk, vorabGrund } from './nacht-merger-wahl.mjs'
+
+let fehler = 0
+let anzahl = 0
+function pruefe(name, ok, info = '') {
+  anzahl++
+  if (!ok) {
+    fehler++
+    console.error(`✗ ${name} ${info}`)
+  }
+}
+
+const KOPF = 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678'
+const ALTER_KOPF = '0badc0de0badc0de0badc0de0badc0de0badc0de'
+const kurz = (k) => k.slice(0, 9)
+const urteil = (kopf, titel, at = '2026-11-01T10:00:00Z', login = 'github-actions[bot]') => ({ login, assoc: 'NONE', at, body: `**Prüfer-Review** für ${kurz(kopf)} - Urteil: **${titel}**\n\nProtokoll` })
+const nachtrag = (kopf, extra = {}) => ({ login: 'derNamenloseDaniel', assoc: 'OWNER', at: '2026-11-01T11:00:00Z', body: `## Nachtrag (Abnahme Dirigent) — Kopf ${kurz(kopf)}\nAuflagen erfüllt`, ...extra })
+const gruen = [
+  { __typename: 'CheckRun', name: 'PR-Prüfkette', status: 'COMPLETED', conclusion: 'SUCCESS' },
+  { __typename: 'CheckRun', name: 'Prüfer-Review', status: 'COMPLETED', conclusion: 'SUCCESS' },
+]
+let zaehler = 100
+const pr = (o = {}) => ({
+  nummer: ++zaehler,
+  titel: `Titel ${zaehler}`,
+  beschreibung: '',
+  kopf: KOPF,
+  zweig: 'fix/etwas',
+  entwurf: false,
+  offen: true,
+  erstellt: '2026-11-01T08:00:00Z',
+  reviewDecision: 'APPROVED',
+  mergeStateStatus: 'CLEAN',
+  geaenderteDateien: 2,
+  stufe: 1,
+  pfade: ['web/src/a.tsx', 'docs/x.md'],
+  checks: gruen,
+  kommentare: [urteil(KOPF, 'ok')],
+  ...o,
+})
+
+// --- urteilIstOk -------------------------------------------------------------------------------------------------
+for (const [titel, soll] of [['ok', true], ['ok, Checks laufen noch: x', true], ['ok, Checks-Stand unbekannt', true], ['ok, Checks rot: PR-Prüfkette', false], ['aendern', false], ['aendern, Auflagen offen: Dirigent entscheidet', false], ['okay', false], ['', false]]) {
+  pruefe(`Urteil „${titel}“`, urteilIstOk(titel) === soll)
+}
+
+// --- freigabe ----------------------------------------------------------------------------------------------------
+pruefe('Urteil ok zum Kopf gibt frei', freigabe([urteil(KOPF, 'ok')], KOPF).weg === 'pruefer')
+pruefe('Urteil ok zu altem Kopf gibt nicht frei', !freigabe([urteil(ALTER_KOPF, 'ok')], KOPF).frei)
+pruefe('Urteil aendern gibt nicht frei', !freigabe([urteil(KOPF, 'aendern')], KOPF).frei)
+pruefe('ok, Checks rot gibt nicht frei', !freigabe([urteil(KOPF, 'ok, Checks rot: PR-Prüfkette')], KOPF).frei)
+pruefe('ok, Checks laufen noch gibt frei (die Kette prüft der Läufer selbst)', freigabe([urteil(KOPF, 'ok, Checks laufen noch: PR-Prüfkette')], KOPF).frei)
+pruefe('ohne jedes Urteil nicht frei', !freigabe([], KOPF).frei)
+pruefe('jüngeres aendern nach älterem ok gilt', !freigabe([urteil(KOPF, 'ok', '2026-11-01T09:00:00Z'), urteil(KOPF, 'aendern', '2026-11-01T10:00:00Z')], KOPF).frei)
+pruefe('jüngeres ok nach älterem aendern gilt (Reihenfolge der Liste egal)', freigabe([urteil(KOPF, 'ok', '2026-11-01T10:00:00Z'), urteil(KOPF, 'aendern', '2026-11-01T09:00:00Z')], KOPF).frei)
+pruefe('gleich lautender Kommentar eines anderen Nutzers zählt nicht', !freigabe([urteil(KOPF, 'ok', '2026-11-01T10:00:00Z', 'jemand-anders')], KOPF).frei)
+pruefe('Name ohne [bot] ist nicht der CI-Prüfer (REST-Name ist github-actions[bot], gemessen an PR 2639)', !freigabe([urteil(KOPF, 'ok', '2026-11-01T10:00:00Z', 'github-actions')], KOPF).frei)
+{
+  // Form eines echten Kommentars aus `gh api repos/…/issues/2639/comments --jq` (Kopfzeile wörtlich aus PR 2639, Urteil hier ok).
+  const echt = { login: 'github-actions[bot]', assoc: 'CONTRIBUTOR', at: '2026-11-01T21:14:10Z', body: '**Prüfer-Review** für d556678aa - Urteil: **ok**\n\nAbnahme-Modus: nur die Auflagen\n\n<!-- pruefer-modus: abnahme -->' }
+  pruefe('echter Kommentar des CI-Prüfers mit Urteil ok gibt frei', freigabe([echt], 'd556678aab5d6a6d3c0e1f7a0c0f3c4b9e8d7a6f').weg === 'pruefer')
+}
+pruefe('Nachtrag des Inhabers mit Kopf gibt frei, auch nach aendern', freigabe([urteil(KOPF, 'aendern'), nachtrag(KOPF)], KOPF).weg === 'nachtrag')
+pruefe('Nachtrag mit altem Kopf gibt nicht frei', !freigabe([urteil(KOPF, 'aendern'), nachtrag(ALTER_KOPF)], KOPF).frei)
+pruefe('Nachtrag eines Fremden gibt nicht frei', !freigabe([nachtrag(KOPF, { login: 'jemand-anders', assoc: 'NONE' })], KOPF).frei)
+pruefe('Nachtrag ohne Mitgliedschaft OWNER gibt nicht frei', !freigabe([nachtrag(KOPF, { assoc: 'CONTRIBUTOR' })], KOPF).frei)
+
+// --- ketteStand --------------------------------------------------------------------------------------------------
+pruefe('Kette grün', ketteStand(gruen).gruen)
+pruefe('übersprungener Nebencheck stört nicht', ketteStand([...gruen, { name: 'x', status: 'COMPLETED', conclusion: 'SKIPPED' }]).gruen)
+pruefe('Pflicht-Check fehlt', !ketteStand([gruen[1]]).gruen && ketteStand([gruen[1]]).grund.includes('fehlt'))
+pruefe('keine Checks', !ketteStand([]).gruen)
+pruefe('Pflicht-Check rot', !ketteStand([{ name: 'PR-Prüfkette', status: 'COMPLETED', conclusion: 'FAILURE' }]).gruen)
+{
+  // Form des echten Rollups (PR 2625, 01.11.2026): frühere Läufe desselben Kopfs stehen mit drin.
+  const lauf = (name, conclusion, startedAt, status = 'COMPLETED', workflowName = 'PR-Prüfkette') => ({ __typename: 'CheckRun', name, conclusion, startedAt, status, workflowName, completedAt: status === 'COMPLETED' ? startedAt : '0001-01-01T00:00:00Z' })
+  const kette = (logik) => [...logik, lauf('PR-Prüfkette', 'SUCCESS', '2026-11-01T21:13:00Z')]
+  const alt = lauf('Kette – Logik', 'CANCELLED', '2026-11-01T18:31:50Z')
+  const gut = lauf('Kette – Logik', 'SUCCESS', '2026-11-01T21:06:25Z')
+  pruefe('früherer abgebrochener Lauf stört nicht, wenn ein neuerer grün ist (Reihenfolge egal)', ketteStand(kette([alt, gut])).gruen && ketteStand(kette([gut, alt])).gruen)
+  pruefe('neuerer abgebrochener Lauf nach einem grünen ist rot', ketteStand(kette([gut, lauf('Kette – Logik', 'CANCELLED', '2026-11-01T21:20:00Z')])).grund === 'Check rot: Kette – Logik')
+  pruefe('früherer roter Lauf stört nicht, neuerer grüner gilt', ketteStand(kette([lauf('Kette – Logik', 'FAILURE', '2026-11-01T18:00:00Z'), gut])).gruen)
+  pruefe('laufender Lauf gilt als neuester, auch mit leerem Startzeitpunkt', ketteStand(kette([gut, lauf('Kette – Logik', '', '', 'IN_PROGRESS')])).grund === 'Check läuft noch: Kette – Logik')
+  pruefe('laufender Lauf gilt als neuester, auch wenn sein Start älter als ein grüner ist', ketteStand(kette([lauf('Kette – Logik', '', '2026-11-01T17:00:00Z', 'IN_PROGRESS'), gut])).gruen === false)
+  pruefe('gleicher Name in zwei Workflows zählt getrennt', ketteStand(kette([gut, lauf('Kette – Logik', 'FAILURE', '2026-11-01T19:00:00Z', 'COMPLETED', 'Anderer')])).grund === 'Check rot: Kette – Logik')
+  pruefe('neuesteJeCheck: ein Eintrag je Workflow und Name', neuesteJeCheck([alt, gut, lauf('PR-Prüfkette', 'SUCCESS', '2026-11-01T21:13:00Z')]).length === 2)
+}
+pruefe('neutraler Nebencheck stört nicht', ketteStand([...gruen, { name: 'x', status: 'COMPLETED', conclusion: 'NEUTRAL' }]).gruen)
+pruefe('Nebencheck rot', ketteStand([...gruen, { name: 'Aussehen', status: 'COMPLETED', conclusion: 'FAILURE' }]).grund === 'Check rot: Aussehen')
+pruefe('Nebencheck abgebrochen zählt als rot', !ketteStand([...gruen, { name: 'Aussehen', status: 'COMPLETED', conclusion: 'CANCELLED' }]).gruen)
+pruefe('Pflicht-Check läuft', ketteStand([{ name: 'PR-Prüfkette', status: 'IN_PROGRESS', conclusion: '' }]).grund === 'Check läuft noch: PR-Prüfkette')
+pruefe('Status-Kontext pending: läuft noch, nicht rot', ketteStand([...gruen, { __typename: 'StatusContext', context: 'extern', state: 'PENDING' }]).grund === 'Check läuft noch: extern')
+pruefe('Status-Kontext failure: rot mit Namen', ketteStand([...gruen, { __typename: 'StatusContext', context: 'extern', state: 'FAILURE' }]).grund === 'Check rot: extern')
+pruefe('Pflicht-Check als Status-Kontext zählt über seinen Namen', ketteStand([{ __typename: 'StatusContext', context: 'PR-Prüfkette', state: 'SUCCESS' }]).gruen)
+pruefe('Status-Kontext erfolgreich', ketteStand([...gruen, { __typename: 'StatusContext', context: 'extern', state: 'SUCCESS' }]).gruen)
+
+// --- kandidat ----------------------------------------------------------------------------------------------------
+const wahl = (o) => kandidat(pr(o))
+pruefe('Basisfall (Stufe 1, grün, ok) ist Kandidat', wahl({}).kandidat)
+pruefe('Stufe 0 ist Kandidat', wahl({ stufe: 0 }).kandidat)
+pruefe('Stufe 2 mit nur Bot-ok ist Kandidat (kein Sondertor, Daniel 27.11.2026)', wahl({ stufe: 2 }).kandidat && wahl({ stufe: 2 }).weg === 'pruefer')
+pruefe('Stufe 1 mit Bot-ok bleibt Kandidat', wahl({ stufe: 1 }).weg === 'pruefer')
+pruefe('Stufe 2 mit Nachtrag des Dirigenten zum Kopf ist Kandidat', wahl({ stufe: 2, kommentare: [nachtrag(KOPF)] }).weg === 'nachtrag')
+pruefe('Stufe 2 mit Nachtrag des Dirigenten zu älterem Kopf nie', !wahl({ stufe: 2, kommentare: [nachtrag(ALTER_KOPF)] }).kandidat)
+pruefe('Stufe 2: Nachtrag zu älterem Kopf neben Bot-ok zum Kopf: Kandidat über das Bot-Urteil', wahl({ stufe: 2, kommentare: [nachtrag(ALTER_KOPF), urteil(KOPF, 'ok')] }).weg === 'pruefer')
+pruefe('Stufe 2: Nachtrag zu älterem Kopf neben aktuellem Nachtrag gilt', wahl({ stufe: 2, kommentare: [nachtrag(ALTER_KOPF), nachtrag(KOPF)] }).weg === 'nachtrag')
+pruefe('Stufe 2 mit Urteil zu älterem Kopf nie', !wahl({ stufe: 2, kommentare: [urteil(ALTER_KOPF, 'ok')] }).kandidat)
+pruefe('Stufe 2 ohne Urteil nie', !wahl({ stufe: 2, kommentare: [] }).kandidat)
+pruefe('Stufe 2 mit Urteil aendern nie', !wahl({ stufe: 2, kommentare: [urteil(KOPF, 'aendern')] }).kandidat)
+pruefe('Stufe 2 mit Workflow-Datei nie', wahl({ stufe: 2, pfade: ['.github/workflows/x.yml'] }).grund.includes('.github/workflows/x.yml'))
+pruefe('Stufe 2 mit roter Kette nie', !wahl({ stufe: 2, checks: [{ name: 'PR-Prüfkette', status: 'COMPLETED', conclusion: 'FAILURE' }] }).kandidat)
+pruefe('Stufe 2 ohne APPROVED nie', !wahl({ stufe: 2, reviewDecision: 'CHANGES_REQUESTED' }).kandidat)
+pruefe('Stufe unbekannt nie', !wahl({ stufe: undefined }).kandidat && !wahl({ stufe: '1' }).kandidat && !wahl({ stufe: 3 }).kandidat && !wahl({ stufe: null }).kandidat)
+pruefe('Workflow-Pfad nie', wahl({ pfade: ['web/src/a.tsx', '.github/workflows/x.yml'] }).grund.includes('.github/workflows/x.yml'))
+pruefe('Workflow-Pfad als Umbenennungsursprung nie', !wahl({ pfade: ['docs/neu.md', '.github/workflows/alt.yml'] }).kandidat)
+pruefe('genau eine geänderte Datei genügt', wahl({ geaenderteDateien: 1 }).kandidat)
+pruefe('Ordner mit Workflows als Namensanfang ist erlaubt', wahl({ pfade: ['.github/workflows-alt/a.yml'] }).kandidat)
+pruefe('Ordner ähnlich wie Workflows ist erlaubt', wahl({ pfade: ['.github/actions/einreichen/action.yml'] }).kandidat)
+pruefe('rote Kette nie', !wahl({ checks: [{ name: 'PR-Prüfkette', status: 'COMPLETED', conclusion: 'FAILURE' }] }).kandidat)
+pruefe('wartende Kette nie', !wahl({ checks: [{ name: 'PR-Prüfkette', status: 'QUEUED', conclusion: '' }] }).kandidat)
+pruefe('Prüfer aendern nie', wahl({ kommentare: [urteil(KOPF, 'aendern')] }).grund.includes('aendern'))
+pruefe('Prüfer-Urteil zum alten Kopf nie', !wahl({ kommentare: [urteil(ALTER_KOPF, 'ok')] }).kandidat)
+pruefe('aendern, aber Nachtrag zum Kopf: Kandidat', wahl({ kommentare: [urteil(KOPF, 'aendern'), nachtrag(KOPF)] }).weg === 'nachtrag')
+pruefe('Entwurf nie', !wahl({ entwurf: true }).kandidat)
+pruefe('Daten-PR nie', !wahl({ zweig: 'daten/quellen-1' }).kandidat)
+pruefe('geschlossener PR nie', !wahl({ offen: false }).kandidat)
+pruefe('leerer PR nie', !wahl({ geaenderteDateien: 0 }).kandidat)
+pruefe('ohne Freigabe-Review nie', wahl({ reviewDecision: 'REVIEW_REQUIRED' }).grund.includes('nicht APPROVED'))
+pruefe('Änderungswunsch-Review nie', !wahl({ reviewDecision: 'CHANGES_REQUESTED' }).kandidat)
+pruefe('Mergestatus BLOCKED nie', wahl({ mergeStateStatus: 'BLOCKED' }).grund.includes('BLOCKED'))
+pruefe('Mergestatus DIRTY nie', !wahl({ mergeStateStatus: 'DIRTY' }).kandidat)
+pruefe('vorabGrund: Basisfall null', vorabGrund(pr()) === null)
+pruefe('Mergestatus UNKNOWN weist in der Vorauswahl nicht ab', vorabGrund(pr({ mergeStateStatus: 'UNKNOWN' })) === null && wahl({ mergeStateStatus: 'UNKNOWN' }).kandidat)
+pruefe('Mergestatus BEHIND, UNSTABLE, DRAFT, leer weisen weiter ab', ['BEHIND', 'UNSTABLE', 'DRAFT', '', undefined].every((s) => vorabGrund(pr({ mergeStateStatus: s })) !== null))
+
+// --- freigabeVerworfen (Main-Nachzug verwirft die Freigabe, Dirigent-Nachtrag 7218441221) ------------------------------
+const verworfen = (o) => freigabeVerworfen(pr({ reviewDecision: 'REVIEW_REQUIRED', kommentare: [urteil(ALTER_KOPF, 'ok')], ...o }))
+pruefe('Freigabe verworfen: Prüfer-Ok am Vorgänger-Kopf, Kette grün, REVIEW_REQUIRED', verworfen({}) === true)
+pruefe('Freigabe verworfen: auch bei Stufe 2 und ohne lesbare Stufe', verworfen({ stufe: 2 }) === true && verworfen({ stufe: undefined }) === true)
+pruefe('Freigabe verworfen: Ok zum jetzigen Kopf ist kein Fall (Freigabe fehlt aus anderem Grund)', verworfen({ kommentare: [urteil(KOPF, 'ok')] }) === false)
+pruefe('Freigabe verworfen: Nachtrag zum Kopf ist kein Fall', verworfen({ kommentare: [urteil(ALTER_KOPF, 'ok'), nachtrag(KOPF)] }) === false)
+pruefe('Freigabe verworfen: ohne Urteil kein Fall', verworfen({ kommentare: [] }) === false)
+pruefe('Freigabe verworfen: jüngstes Urteil aendern kein Fall', verworfen({ kommentare: [urteil(ALTER_KOPF, 'ok', '2026-11-01T10:00:00Z'), urteil(ALTER_KOPF, 'aendern', '2026-11-01T12:00:00Z')] }) === false)
+pruefe('Freigabe verworfen: früheres aendern, jüngeres ok ist ein Fall', verworfen({ kommentare: [urteil(ALTER_KOPF, 'aendern', '2026-11-01T10:00:00Z'), urteil(ALTER_KOPF, 'ok', '2026-11-01T12:00:00Z')] }) === true)
+pruefe('Freigabe verworfen: ok eines Fremden zählt nie', verworfen({ kommentare: [urteil(ALTER_KOPF, 'ok', '2026-11-01T10:00:00Z', 'jemand')] }) === false)
+pruefe('Freigabe verworfen: rote Kette kein Fall', verworfen({ checks: [{ name: 'PR-Prüfkette', status: 'COMPLETED', conclusion: 'FAILURE' }] }) === false)
+pruefe('Freigabe verworfen: Konflikt (DIRTY) kein Fall', verworfen({ mergeStateStatus: 'DIRTY' }) === false)
+pruefe('Freigabe verworfen: Workflow-Pfad kein Fall', verworfen({ pfade: ['.github/workflows/x.yml'] }) === false)
+pruefe('Freigabe verworfen: APPROVED kein Fall', verworfen({ reviewDecision: 'APPROVED' }) === false)
+pruefe('Freigabe verworfen: Entwurf, Daten-Zweig, geschlossen kein Fall', verworfen({ entwurf: true }) === false && verworfen({ zweig: 'daten/x' }) === false && verworfen({ offen: false }) === false)
+pruefe('laeuftSchon: Lauf zum PR in Warteschlange oder in Arbeit', laeuftSchon([{ displayTitle: 'PR-Prüfer #61 a1b2c3d4e', status: 'queued' }], 61) && laeuftSchon([{ displayTitle: 'PR-Prüfer #61 a1b2c3d4e', status: 'in_progress' }], 61))
+pruefe('laeuftSchon: fertiger Lauf, anderer PR und Präfix-Nummer zählen nicht', !laeuftSchon([{ displayTitle: 'PR-Prüfer #61 x', status: 'completed' }, { displayTitle: 'PR-Prüfer #610 x', status: 'queued' }, { displayTitle: 'PR-Prüfer #6 x', status: 'queued' }], 61))
+
+// --- reihenfolge -------------------------------------------------------------------------------------------------
+const a = pr({ nummer: 1, erstellt: '2026-11-01T01:00:00Z' })
+const b = pr({ nummer: 2, erstellt: '2026-11-01T02:00:00Z', beschreibung: 'Text\nBehebt roten Bestandsbau\nweiter' })
+const c = pr({ nummer: 3, erstellt: '2026-11-01T00:30:00Z' })
+const nr = (liste) => liste.map((p) => p.nummer).join(',')
+pruefe('ohne roten Bau: ältester zuerst', nr(reihenfolge([a, b, c], false)) === '3,1,2')
+pruefe('roter Bau: Behebender zuerst, Rest nach Alter', nr(reihenfolge([a, b, c], true)) === '2,3,1')
+pruefe('Vorrang-Zeile ohne roten Bau zählt nicht', nr(reihenfolge([b, a], false)) === '1,2')
+pruefe('gleiche Zeit: kleinere Nummer zuerst', nr(reihenfolge([pr({ nummer: 9, erstellt: 'x' }), pr({ nummer: 8, erstellt: 'x' })], false)) === '8,9')
+
+// --- lauf (Attrappe-Welt) ----------------------------------------------------------------------------------------
+function welt(prs, o = {}) {
+  const log = { zeilen: [], aufrufe: [], gemergt: [], details: [] }
+  const exits = o.exits ?? {}
+  let uhr = 5000
+  const w = {
+    log,
+    zeile: (t) => log.zeilen.push(t),
+    offene: () => prs,
+    details: (p) => {
+      log.details.push(p.nummer)
+      return p
+    },
+    // Attrappe-Uhr: jede Kopfabfrage kostet o.proPr ms, jede Wartezeit ihre Dauer
+    jetzt: () => uhr,
+    kopfVon: (n) => {
+      uhr += o.proPr ?? 0
+      return o.neuerKopf?.[n] ?? prs.find((p) => p.nummer === n).kopf
+    },
+    warte: (ms) => {
+      uhr += ms
+      log.aufrufe.push(`warte ${ms}`)
+    },
+    mergeStatus: (n) => {
+      log.aufrufe.push(`status ${n}`)
+      const folge = o.status?.[n]
+      return folge !== undefined && folge.length > 0 ? folge.shift() : 'CLEAN'
+    },
+    nachrechnen: (n) => {
+      log.aufrufe.push(`nachrechnen ${n}`)
+      const folge = o.folge?.[n]
+      if (folge !== undefined && folge.length > 0) return folge.shift()
+      return { exit: exits[n] ?? 0, text: `Exit ${exits[n] ?? 0}` }
+    },
+    bauCommittet: () => o.bau === true,
+    bestandRot: () => o.rot === true,
+    merge: (p) => {
+      log.aufrufe.push(`merge ${p.nummer}`)
+      if (o.mergeFehler === p.nummer) throw new Error('GraphQL: Fehler\nZweite Zeile')
+      log.gemergt.push(p.nummer)
+    },
+    leicht: (p) => p,
+    pruefungLaeuft: (n) => o.laeuft?.includes(n) === true,
+    uebernahmeAnstossen: (n, kopf) => {
+      if (o.anstossFehler === n) throw new Error('HTTP 403: Resource not accessible\nZweite Zeile')
+      log.aufrufe.push(`anstoss ${n} ${kopf}`)
+    },
+    markiere: (n, label) => {
+      if (o.labelFehler === true) throw new Error('HTTP 403: Resource not accessible\nZweite Zeile')
+      log.aufrufe.push(`label ${n} ${label}`)
+    },
+  }
+  return w
+}
+const vier = () => [pr({ nummer: 11, erstellt: '2026-11-01T01:00:00Z' }), pr({ nummer: 12, erstellt: '2026-11-01T02:00:00Z' }), pr({ nummer: 13, erstellt: '2026-11-01T03:00:00Z' }), pr({ nummer: 14, erstellt: '2026-11-01T04:00:00Z' })]
+{
+  const w = welt(vier())
+  const r = lauf(w, { hoechstens: 2 })
+  pruefe('Riegel: genau zwei Merges', r.gemergt.join(',') === '11,12' && w.log.gemergt.join(',') === '11,12')
+  pruefe('Riegel: Rest mit Grund zurückgestellt', w.log.zeilen.filter((z) => z.startsWith('ÜBERSPRUNGEN') && z.includes('Riegel: höchstens 2')).length === 2)
+  pruefe('je Merge eine Protokollzeile mit Grund', w.log.zeilen.filter((z) => z.startsWith('GEMERGT #1') && z.includes('Prüfer-Urteil ok zum Kopf')).length === 2)
+  pruefe('nachrechnen läuft vor jedem Merge, nicht dahinter', w.log.aufrufe.join(',') === 'nachrechnen 11,status 11,merge 11,nachrechnen 12,status 12,merge 12')
+  pruefe('Schlusszeile zählt', w.log.zeilen.at(-1) === 'Nacht-Merger: 2 gemergt, 0 Fehler, 4 Kandidaten')
+}
+{
+  const w = welt(vier(), { exits: { 11: 1, 12: 2 } })
+  const r = lauf(w, { hoechstens: 3 })
+  pruefe('nachrechnen Exit 1 oder 2: nicht gemergt, die übrigen kommen dran', r.gemergt.join(',') === '13,14')
+  pruefe('Abweisung nennt Exit und Text', w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN #11') && z.includes('Exit 1')) && w.log.zeilen.some((z) => z.includes('#12') && z.includes('Exit 2')))
+}
+const UNKNOWN = { exit: 2, text: 'PR 11: Mergebarkeit noch nicht berechnet (UNKNOWN), gleich erneut aufrufen' }
+{
+  // UNKNOWN: nach kurzer Wartezeit genau eine zweite Abfrage; ist sie grün, wird gemergt
+  const w = welt(vier(), { folge: { 11: [UNKNOWN, { exit: 0, text: 'aktuell' }] } })
+  const r = lauf(w, { hoechstens: 1 })
+  pruefe('UNKNOWN, dann aktuell: nach 20 s Wartezeit gemergt', r.gemergt.join(',') === '11' && w.log.aufrufe.join(',') === 'nachrechnen 11,warte 20000,nachrechnen 11,status 11,merge 11')
+}
+{
+  // Zweimal UNKNOWN: nur eine Wiederholung, dann übersprungen; der nächste Kandidat kommt dran
+  const w = welt(vier(), { folge: { 11: [UNKNOWN, UNKNOWN] } })
+  const r = lauf(w, { hoechstens: 1 })
+  pruefe('zweimal UNKNOWN: genau zwei Abfragen, nicht gemergt, Abweisung nennt den Grund', r.gemergt.join(',') === '12' && w.log.aufrufe.filter((x) => x === 'nachrechnen 11').length === 2 && w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN #11') && z.includes('UNKNOWN')))
+}
+{
+  // Liste zeigt UNKNOWN: Einzelabfrage bestätigt CLEAN, dann wird gemergt (nachrechnen davor, Status danach)
+  const liste = vier().map((p) => ({ ...p, mergeStateStatus: 'UNKNOWN' }))
+  const w = welt(liste)
+  const r = lauf(w, { hoechstens: 1 })
+  pruefe('Liste UNKNOWN, Einzelabfrage CLEAN: gemergt, Status erst nach nachrechnen', r.gemergt.join(',') === '11' && w.log.aufrufe.join(',') === 'nachrechnen 11,status 11,merge 11' && w.log.zeilen.every((z) => !z.startsWith('::warning')))
+}
+{
+  // Einzelabfrage UNKNOWN, dann CLEAN: eine Wiederholung nach 20 s
+  const w = welt(vier(), { status: { 11: ['UNKNOWN', 'CLEAN'] } })
+  const r = lauf(w, { hoechstens: 1 })
+  pruefe('Einzelabfrage UNKNOWN, dann CLEAN: nach 20 s gemergt', r.gemergt.join(',') === '11' && w.log.aufrufe.join(',') === 'nachrechnen 11,status 11,warte 20000,status 11,merge 11')
+}
+{
+  // Einzelabfrage DIRTY oder dauerhaft UNKNOWN: nie gemergt; die übrigen kommen dran
+  const w = welt(vier(), { status: { 11: ['DIRTY'], 12: ['UNKNOWN', 'UNKNOWN'] } })
+  const r = lauf(w, { hoechstens: 1 })
+  pruefe('Einzelabfrage nicht CLEAN: nicht gemergt, Grund genannt, nächster Kandidat kommt dran', r.gemergt.join(',') === '13' && w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN #11') && z.includes('DIRTY')) && w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN #12') && z.includes('UNKNOWN')))
+}
+{
+  // Wächter: 0 Merges und technisch Unentschiedene -> Warnzeile; mit Merge oder ohne Unentschiedene nicht
+  const w = welt(vier().slice(0, 2), { status: { 11: ['UNKNOWN', 'UNKNOWN'], 12: ['UNKNOWN', 'UNKNOWN'] } })
+  const r = lauf(w, { hoechstens: 3 })
+  pruefe('0 Merges, zwei technisch unentschieden: Warnzeile nennt beide', r.gemergt.length === 0 && w.log.zeilen.includes('::warning::Nacht-Merger: 0 Merges, 2 PR technisch nicht entschieden (#11, #12)'))
+  // Echte Abweisungen (Konflikt, DIRTY, BLOCKED) sind nicht unentschieden: kein Stillstand, sonst wäre der Lauf rot, solange so ein PR liegt
+  const NOCH_NICHT = { exit: 2, text: 'PR 11: Mergebarkeit noch nicht berechnet (UNKNOWN), gleich erneut aufrufen' }
+  const KONFLIKT = { exit: 2, text: 'PR 11 hat einen Konflikt mit main: erst main hineinmergen, das startet die Kette neu' }
+  const konflikt = welt(vier().slice(0, 1), { folge: { 11: [KONFLIKT] } })
+  const rk = lauf(konflikt, { hoechstens: 3 })
+  pruefe('nur ein Konflikt-PR offen (nachrechnen Exit 2, echte Meldung): kein Stillstand, Exit 0', rk.gemergt.length === 0 && rk.stillstand === false && exitCode(rk) === 0 && konflikt.log.zeilen.every((z) => !z.startsWith('::warning')) && konflikt.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN #11') && z.includes('Konflikt')))
+  const dirty = welt(vier().slice(0, 2), { status: { 11: ['DIRTY'], 12: ['BLOCKED'] } })
+  const rd = lauf(dirty, { hoechstens: 3 })
+  pruefe('nur DIRTY und BLOCKED in der Einzelabfrage: kein Stillstand, Exit 0', rd.gemergt.length === 0 && rd.stillstand === false && exitCode(rd) === 0)
+  const nurUnknown = welt(vier().slice(0, 1), { folge: { 11: [NOCH_NICHT, NOCH_NICHT] } })
+  const ru = lauf(nurUnknown, { hoechstens: 3 })
+  pruefe('Gegenprobe: nachrechnen dauerhaft „noch nicht berechnet“: Stillstand, Exit 1, eine Wiederholung', ru.stillstand === true && exitCode(ru) === 1 && nurUnknown.log.aufrufe.join(',') === 'nachrechnen 11,warte 20000,nachrechnen 11')
+  const unknownStatus = welt(vier().slice(0, 1), { status: { 11: ['UNKNOWN', 'UNKNOWN'] } })
+  const rs = lauf(unknownStatus, { hoechstens: 3 })
+  pruefe('Gegenprobe: Einzelabfrage dauerhaft UNKNOWN: Stillstand, Exit 1', rs.stillstand === true && exitCode(rs) === 1)
+  const w2 = welt(vier(), { exits: { 11: 2 } })
+  lauf(w2, { hoechstens: 3 })
+  pruefe('Exit 2 bei einem PR, andere gemergt: keine Warnung', w2.log.zeilen.every((z) => !z.startsWith('::warning')))
+  const w3 = welt(vier(), { exits: { 11: 1, 12: 1, 13: 1, 14: 1 } })
+  lauf(w3, { hoechstens: 3 })
+  pruefe('0 Merges nur wegen Exit 1 (Kette neu angestoßen): keine Warnung', w3.log.zeilen.every((z) => !z.startsWith('::warning')))
+  const w4 = welt(vier().slice(0, 1), { folge: { 11: [{ exit: 2, text: 'noch nicht berechnet' }, { exit: 2, text: 'noch nicht berechnet' }] } })
+  lauf(w4, { hoechstens: 3 })
+  pruefe('0 Merges wegen nachrechnen Exit 2 „noch nicht berechnet“: Warnung', w4.log.zeilen.some((z) => z.startsWith('::warning::') && z.includes('#11')))
+}
+{
+  // Zeitbudget (Attrappe-Uhr): Grenze genau an, eins drüber; danach geordnet aufhören, Rest als unentschieden, Exit 1
+  const liste = () => vier().slice(0, 3)
+  const bis = (proPr) => {
+    const w = welt(liste(), { proPr })
+    const r = lauf(w, { hoechstens: 3, budgetMs: 1000 })
+    return { w, r }
+  }
+  const gleich = bis(500)
+  pruefe('Budget: genau an der Grenze (Uhr 1000 bei 1000) läuft weiter, alle drei gemergt', gleich.r.gemergt.join(',') === '11,12,13')
+  const knapp = bis(501)
+  pruefe('Budget: eins drüber stoppt, Rest mit Grund übersprungen', knapp.r.gemergt.join(',') === '11,12' && knapp.w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN #13') && z.includes('Zeitbudget')))
+  const aus = (() => {
+    const w = welt(liste(), { proPr: 2000 })
+    return { w, r: lauf(w, { hoechstens: 3, budgetMs: 1000 }) }
+  })()
+  pruefe('Budget: nach dem ersten PR erschöpft, nur dieser gemergt, kein Stillstand (es wurde gemergt)', aus.r.gemergt.join(',') === '11' && aus.r.stillstand === false)
+  const keiner = welt(liste(), { proPr: 0, exits: {} })
+  const sofort = lauf(keiner, { hoechstens: 3, budgetMs: -1 })
+  pruefe('Budget schon vor dem ersten PR erschöpft: 0 Merges, alle genannt, Stillstand', sofort.gemergt.length === 0 && sofort.stillstand === true && keiner.log.zeilen.some((z) => z.includes('#11, #12, #13')))
+  pruefe('exitCode: Stillstand und Merge-Fehler sind rot, sonst 0', exitCode({ gemergt: [], fehler: 0, stillstand: true }) === 1 && exitCode({ gemergt: [1], fehler: 1, stillstand: false }) === 1 && exitCode({ gemergt: [], fehler: 0, stillstand: false }) === 0 && exitCode(sofort) === 1)
+  pruefe('Vorgabe: Budget 15 min unter der Jobgrenze von 20 min', BUDGET_MS === 900_000)
+  // Standardbudget ohne Angabe: Uhr 0, 600 s, 1200 s -> der dritte PR kommt nach 15 min nicht mehr dran
+  const standard = welt(liste(), { proPr: 600_000 })
+  pruefe('Standardbudget wirkt ohne Option: dritter PR nach 20 min Uhrzeit übersprungen', lauf(standard, { hoechstens: 3 }).gemergt.join(',') === '11,12')
+}
+{
+  // Andere Exit-2-Gründe (Konflikt) und Exit 1 (Kette neu angestoßen) werden nicht wiederholt, es wird nicht gewartet
+  const w = welt(vier(), { folge: { 11: [{ exit: 2, text: 'PR 11 hat einen Konflikt mit main' }], 12: [{ exit: 1, text: 'NICHT AKTUELL, Test-Merge noch nicht berechnet' }] } })
+  lauf(w, { hoechstens: 3 })
+  pruefe('Konflikt (Exit 2) und NICHT AKTUELL (Exit 1): keine Wiederholung, keine Wartezeit', !w.log.aufrufe.some((x) => x.startsWith('warte')) && w.log.aufrufe.filter((x) => x === 'nachrechnen 11').length === 1 && w.log.aufrufe.filter((x) => x === 'nachrechnen 12').length === 1)
+}
+{
+  const w = welt(vier(), { exits: { 11: 3 } })
+  pruefe('nachrechnen Exit 3 (unbekannt) nie gemergt', !lauf(w).gemergt.includes(11))
+}
+{
+  const w = welt(vier(), { neuerKopf: { 11: ALTER_KOPF } })
+  const r = lauf(w)
+  pruefe('Kopf zwischen Auswahl und Merge geändert: übersprungen, nicht nachgerechnet', !r.gemergt.includes(11) && !w.log.aufrufe.includes('nachrechnen 11'))
+}
+{
+  const w = welt(vier(), { bau: true })
+  pruefe('Bestandsbau committet gerade: kein Merge', lauf(w).gemergt.length === 0 && w.log.zeilen.some((z) => z.includes('Bestandsbau committet')))
+}
+{
+  const w = welt(vier())
+  const r = lauf(w, { trocken: true, hoechstens: 3 })
+  pruefe('Trockenlauf: nie merge, aber Protokoll „WÜRDE MERGEN“', w.log.gemergt.length === 0 && !w.log.aufrufe.some((x) => x.startsWith('merge')) && w.log.zeilen.filter((z) => z.startsWith('WÜRDE MERGEN')).length === 3 && r.gemergt.length === 3)
+  pruefe('Trockenlauf: Schlusszeile sagt „wären gemergt“', w.log.zeilen.at(-1).includes('3 wären gemergt'))
+}
+{
+  const w = welt(vier(), { mergeFehler: 11 })
+  const r = lauf(w)
+  pruefe('Merge scheitert: Fehler gezählt, Lauf stoppt, erste Zeile des Fehlers im Protokoll', r.fehler === 1 && r.gemergt.length === 0 && w.log.aufrufe.join(',') === 'nachrechnen 11,status 11,merge 11' && w.log.zeilen.some((z) => z === 'MERGE FEHLGESCHLAGEN #11: GraphQL: Fehler'))
+}
+{
+  const p = [
+    pr({ nummer: 21, stufe: 9 }),
+    pr({ nummer: 22, pfade: ['.github/workflows/y.yml'] }),
+    pr({ nummer: 23, kommentare: [urteil(KOPF, 'aendern')] }),
+    pr({ nummer: 24, kommentare: [urteil(ALTER_KOPF, 'ok')] }),
+    pr({ nummer: 25, checks: [{ name: 'PR-Prüfkette', status: 'COMPLETED', conclusion: 'FAILURE' }] }),
+    pr({ nummer: 26, entwurf: true }),
+    pr({ nummer: 27, reviewDecision: 'CHANGES_REQUESTED' }),
+  ]
+  const w = welt(p)
+  const r = lauf(w)
+  pruefe('unlesbare Stufe, Workflow-PR, Prüfer aendern, alter Kopf, rote Kette, Entwurf, Änderungswunsch: nie gemergt, nie nachgerechnet', r.gemergt.length === 0 && w.log.aufrufe.length === 0 && w.log.zeilen.filter((z) => z.startsWith('ÜBERSPRUNGEN')).length === 7)
+  pruefe('Entwurf und Änderungswunsch scheitern schon an der Liste: keine weiteren Abrufe', w.log.details.join(',') === '21,22,23,24,25')
+}
+{
+  const p = [pr({ nummer: 31, erstellt: '2026-11-01T01:00:00Z' }), pr({ nummer: 32, erstellt: '2026-11-01T05:00:00Z', beschreibung: 'Behebt roten Bestandsbau' })]
+  const rot = welt(p, { rot: true })
+  lauf(rot, { hoechstens: 1 })
+  pruefe('roter Bestandsbau: der behebende PR geht vor dem älteren', rot.log.gemergt.join(',') === '32')
+  const ok = welt(p, { rot: false })
+  lauf(ok, { hoechstens: 1 })
+  pruefe('Bestandsbau grün: der älteste geht zuerst', ok.log.gemergt.join(',') === '31')
+}
+{
+  // Zweiter Kandidat im selben Lauf (Daniel 21.11.2026): nach dem Merge von A ist main weiter, B wird trotzdem gemergt; das echte
+  // pr-nachrechnen über die gh-Attrappe sieht den neuen main nicht an (bis 20.11. Exit 1 „nicht aktuell“, B erst im nächsten Lauf).
+  const p = [pr({ nummer: 41, erstellt: '2026-11-01T01:00:00Z' }), pr({ nummer: 42, erstellt: '2026-11-01T02:00:00Z' })]
+  const ghAufrufe = []
+  let main = 'a'.repeat(40)
+  const gh = (args) => {
+    const s = args.join(' ')
+    ghAufrufe.push(s)
+    const n = /^pr view (\d+) --json number,state/.exec(s)?.[1]
+    if (n !== undefined) return JSON.stringify({ number: Number(n), state: 'OPEN', mergeable: 'MERGEABLE', headRefOid: KOPF, headRefName: `fix/${n}`, comments: [], commits: [] })
+    if (s === 'pr list --state open --limit 200 --json number,title,body') return '[]'
+    if (s.includes('git/ref/heads/main')) return `${main}\n`
+    throw new Error(`HTTP 404: ${s}`)
+  }
+  const echt = echteWelt({ gh, stufeAus: () => '{"stufe":0}', repo: 'o/r', zeileAus: () => {} })
+  const w = welt(p)
+  w.nachrechnen = (n) => {
+    w.log.aufrufe.push(`nachrechnen ${n}`)
+    return echt.nachrechnen(n)
+  }
+  const mergeAttrappe = w.merge
+  w.merge = (x) => {
+    mergeAttrappe(x)
+    main = 'b'.repeat(40)
+  }
+  const r = lauf(w)
+  pruefe('zweiter Kandidat: nach dem Merge von A (main weiter) wird B im selben Lauf gemergt', r.gemergt.join(',') === '41,42' && w.log.aufrufe.join(',') === 'nachrechnen 41,status 41,merge 41,nachrechnen 42,status 42,merge 42', { r, a: w.log.aufrufe, z: w.log.zeilen })
+  pruefe('zweiter Kandidat: nachrechnen liest nur PR und Ersatz-Liste, schreibt nie', ghAufrufe.every((s) => s.startsWith('pr view') || s.startsWith('pr list')) && ghAufrufe.length === 4, ghAufrufe)
+}
+
+// --- Welt: gh-Anschluss ------------------------------------------------------------------------------------------
+pruefe('bauCommittetGerade: Schritt läuft', bauCommittetGerade([{ steps: [{ name: 'Änderungen committen und pushen', status: 'in_progress' }] }]))
+pruefe('bauCommittetGerade: Schritt fertig', !bauCommittetGerade([{ steps: [{ name: 'Änderungen committen und pushen', status: 'completed' }] }]))
+pruefe('bauCommittetGerade: anderer Schritt läuft', !bauCommittetGerade([{ steps: [{ name: 'Bauen', status: 'in_progress' }] }]))
+pruefe('bauCommittetGerade: Job ohne Schritte', !bauCommittetGerade([{}]))
+const T = Date.parse('2026-11-01T12:00:00Z')
+pruefe('bestandIstRot: rot nach grün', bestandIstRot([{ conclusion: 'success', createdAt: '2026-11-01T08:00:00Z' }, { conclusion: 'failure', createdAt: '2026-11-01T11:59:00Z' }], T))
+pruefe('bestandIstRot: grün zuletzt', !bestandIstRot([{ conclusion: 'failure', createdAt: '2026-11-01T07:00:00Z' }, { conclusion: 'success', createdAt: '2026-11-01T11:00:00Z' }], T))
+pruefe('stufeVon: Zahl', stufeVon(5, () => '{"stufe":0}') === 0 && stufeVon(5, () => '{"stufe":1}') === 1)
+pruefe('stufeVon: Müll, Fehler und Text gelten als 2', stufeVon(5, () => 'kaputt') === 2 && stufeVon(5, () => { throw new Error('x') }) === 2 && stufeVon(5, () => '{"stufe":"1"}') === 2)
+{
+  const aufrufe = []
+  const gh = (args) => {
+    aufrufe.push(args.join(' '))
+    const s = args.join(' ')
+    if (s.startsWith('pr list')) return JSON.stringify([{ number: 7, title: 'Titel 7', body: null, headRefOid: KOPF, headRefName: 'fix/a', isDraft: false, createdAt: '2026-11-01T01:00:00Z', reviewDecision: 'APPROVED', mergeStateStatus: 'UNKNOWN', changedFiles: 2 }])
+    if (s.includes('/files')) return 'web/src/a.tsx\ndocs/alt.md\n'
+    if (s.includes('/comments')) return `${JSON.stringify(urteil(KOPF, 'ok'))}\n${JSON.stringify(nachtrag(KOPF))}\n`
+    if (s.startsWith('pr view 7 --json statusCheckRollup')) return JSON.stringify(gruen)
+    if (s.startsWith('run list --workflow pr-pruefer.yml')) return JSON.stringify([{ displayTitle: 'PR-Prüfer #7 abc', status: 'queued' }])
+    if (s.startsWith('pr view 7 --json headRefOid')) return `${KOPF}\n`
+    if (s.startsWith('pr view 7 --json number,state')) return JSON.stringify({ number: 7, state: 'CLOSED', mergeable: 'UNKNOWN', headRefOid: KOPF, headRefName: 'fix/a' })
+    return ''
+  }
+  const ausgaben = []
+  const w = echteWelt({ gh, stufeAus: () => '{"stufe":0}', repo: 'o/r', zeileAus: (t) => ausgaben.push(t) })
+  const liste = w.offene()
+  const voll = w.details(liste[0])
+  pruefe('echteWelt: Liste wird abgebildet', liste.length === 1 && liste[0].nummer === 7 && liste[0].beschreibung === '' && liste[0].zweig === 'fix/a' && liste[0].geaenderteDateien === 2)
+  pruefe('echteWelt: Liste in der echten gh-Antwortform mit mergeStateStatus UNKNOWN (Stand 14.11.2026) bleibt Kandidat der Vorauswahl', liste[0].mergeStateStatus === 'UNKNOWN' && vorabGrund(liste[0]) === null)
+  w.markiere(7, 'nachpruefung-offen')
+  pruefe('echteWelt: markiere setzt das Label über die Labels-Schnittstelle (legt es beim ersten Mal an)', aufrufe.includes('api -X POST repos/o/r/issues/7/labels -f labels[]=nachpruefung-offen'), aufrufe)
+  pruefe('echteWelt: pruefungLaeuft liest die Läufe von pr-pruefer.yml (PR 7 steht an, PR 8 nicht)', w.pruefungLaeuft(7) === true && w.pruefungLaeuft(8) === false)
+  w.uebernahmeAnstossen(7, KOPF)
+  pruefe('echteWelt: uebernahmeAnstossen startet pr-pruefer.yml auf main mit PR und Kopf', aufrufe.includes(`workflow run pr-pruefer.yml --ref main -f pr=7 -f sha=${KOPF}`), aufrufe)
+  pruefe('echteWelt: Dateiliste fragt auch den Umbenennungsursprung', aufrufe.some((s) => s.includes('/pulls/7/files') && s.includes('previous_filename')))
+  pruefe('echteWelt: Kommentarliste fragt Nutzer, Verband, Zeit und Text', aufrufe.some((s) => s.includes('/issues/7/comments') && s.includes('login: .user.login, assoc: .author_association, at: .created_at, body: .body')))
+  pruefe('echteWelt: Details aus Dateien, Kommentaren, Checks, Stufe', voll.stufe === 0 && voll.pfade.join(',') === 'web/src/a.tsx,docs/alt.md' && voll.kommentare.length === 2 && voll.checks.length === 2)
+  pruefe('echteWelt: Auswahlregel nimmt diese Details an', kandidat(voll).kandidat)
+  pruefe('echteWelt: kopfVon', w.kopfVon(7) === KOPF)
+  const n = w.nachrechnen(7)
+  pruefe('echteWelt: nachrechnen liest den PR über dieselbe gh und meldet Exit 2 mit Text', n.exit === 2 && n.text.includes('nicht offen'))
+  w.merge(voll)
+  const m = aufrufe.at(-1)
+  pruefe('echteWelt: merge als Squash mit Kopfbindung, nie --admin, nie --auto', m === `pr merge 7 --squash --subject Titel 7 (#7) --match-head-commit ${KOPF}` && !m.includes('--admin') && !m.includes('--auto'))
+  const t0 = performance.now()
+  w.warte(30)
+  pruefe('echteWelt: warte wartet wirklich', performance.now() - t0 >= 25)
+  w.zeile('Probezeile')
+  pruefe('echteWelt: Zeile geht an die Ausgabe', ausgaben.join('|') === 'Probezeile')
+}
+{
+  // PR, dessen Kette gegen einen älteren main rechnete (main seither mit Code weiter): bis 20.11.2026 schloss/öffnete nachrechnen ihn
+  // oder holte main per update-branch (Exit 1, Merge erst im nächsten Lauf). Seit 21.11.2026: mergebar, Exit 0, kein Schreibaufruf.
+  const MAIN = 'b'.repeat(40)
+  const BASIS = 'c'.repeat(40)
+  const veraltet = (aufrufe) => (args) => {
+    const s = args.join(' ')
+    aufrufe.push(s)
+    if (s.startsWith('pr view 7 --json number,state')) return JSON.stringify({ number: 7, state: 'OPEN', mergeable: 'MERGEABLE', headRefOid: KOPF, headRefName: 'fix/a' })
+    if (s.includes('git/ref/heads/main')) return `${MAIN}\n`
+    if (s.startsWith('pr list --state open --limit 200 --json number,title,body')) return '[]'
+    if (s.startsWith('run list')) return JSON.stringify([{ databaseId: 1, headSha: KOPF, createdAt: '2026-11-01T01:00:00Z', conclusion: 'success' }])
+    if (s.startsWith('run view 1')) return JSON.stringify({ jobs: [{ name: 'Kette – Workflows', status: 'completed', databaseId: 9 }] })
+    if (s.includes('actions/jobs/9/logs')) return `HEAD is now at 1234567 Merge ${KOPF} into ${BASIS}\n`
+    if (s.includes('/compare/')) return JSON.stringify({ status: 'diverged', anzahl: 1, dateien: ['web/src/a.tsx'], commitsGesamt: 1, autoren: ['x'] })
+    return ''
+  }
+  for (const [name, w] of [['Lauf', (a) => echteWelt({ gh: veraltet(a), repo: 'o/r', zeileAus: () => {} })], ['mit 5xx-Wiederholung', (a) => echteWelt({ gh: ghMitWiederholung(veraltet(a), () => a.push('pause')), repo: 'o/r', zeileAus: () => {} })]]) {
+    const aufrufe = []
+    const r = w(aufrufe).nachrechnen(7)
+    const schreibend = aufrufe.filter((s) => /^pr (close|reopen|merge)|update-branch|PUT|POST|PATCH/.test(s))
+    pruefe(`main weiter, kein Konflikt (${name}): Exit 0, mergebar, kein Schreibaufruf`, r.exit === 0 && r.text.includes('mergebar, kein Konflikt mit main') && schreibend.length === 0 && aufrufe.length === 2, { r, aufrufe })
+  }
+  const konflikt = []
+  const k = echteWelt({ gh: (args) => (args.join(' ').startsWith('pr view 7 --json number,state') ? JSON.stringify({ number: 7, state: 'OPEN', mergeable: 'CONFLICTING', headRefOid: KOPF, headRefName: 'fix/a' }) : veraltet(konflikt)(args)), repo: 'o/r', zeileAus: () => {} }).nachrechnen(7)
+  pruefe('Gegenprobe Konflikt mit main: Exit 2 mit „Konflikt mit main“, nichts geschrieben', k.exit === 2 && k.text.includes('Konflikt mit main') && konflikt.every((s) => !/close|reopen|update-branch/.test(s)), k)
+}
+{
+  // GitHub-5xx: eine Wiederholung nach Pause; zweiter 504 sichtbar; andere Fehler und Erfolg ohne Pause
+  const f504 = () => Object.assign(new Error('Command failed: gh pr list'), { stderr: 'HTTP 504: Gateway Timeout (https://api.github.com/graphql)' })
+  const lauf5 = (antworten) => {
+    const aufrufe = []
+    const gh = ghMitWiederholung((args) => {
+      aufrufe.push(`gh ${args[0]}`)
+      const a = antworten.shift()
+      if (a instanceof Error) throw a
+      return a
+    }, (ms) => aufrufe.push(`pause ${ms}`))
+    let fehlerText = null
+    let wert = null
+    try {
+      wert = gh(['pr'])
+    } catch (e) {
+      fehlerText = e.stderr ?? e.message
+    }
+    return { aufrufe: aufrufe.join(','), fehlerText, wert }
+  }
+  const einmal = lauf5([f504(), 'ok'])
+  pruefe('504 dann Erfolg: eine Pause von 5000 ms, zwei Aufrufe, Wert geliefert', einmal.aufrufe === 'gh pr,pause 5000,gh pr' && einmal.wert === 'ok' && einmal.fehlerText === null)
+  const zweimal = lauf5([f504(), f504(), 'nie'])
+  pruefe('zweimal 504: genau eine Wiederholung, der Fehler bleibt sichtbar', zweimal.aufrufe === 'gh pr,pause 5000,gh pr' && zweimal.fehlerText.includes('HTTP 504'))
+  const andere = lauf5([new Error('HTTP 404: Not Found'), 'nie'])
+  pruefe('HTTP 404: keine Wiederholung', andere.aufrufe === 'gh pr' && andere.fehlerText.includes('404'))
+  const meldung = lauf5([new Error('gh: HTTP 502 Bad Gateway'), 'ok'])
+  pruefe('5xx nur in der Fehlermeldung (ohne stderr): ebenfalls einmal wiederholt', meldung.wert === 'ok')
+  pruefe('Erfolg: weder Pause noch zweiter Aufruf', lauf5(['x']).aufrufe === 'gh pr')
+  // Merge wird von der Wiederholung ausgenommen (504 nach erfolgtem Merge gäbe „already merged“)
+  const merge504 = []
+  const ohneMerge = ghMitWiederholung((args) => { merge504.push(args.join(' ')); throw f504() }, () => merge504.push('pause'))
+  let geworfen = false
+  try { ohneMerge(['pr', 'merge', '5']) } catch { geworfen = true }
+  pruefe('ghMitWiederholung: pr merge nie wiederholt, Fehler weitergereicht', geworfen && merge504.join('|') === 'pr merge 5')
+  // close/reopen (aus pr-nachrechnen) ebenso: nach einem 504 kann der Zustandswechsel schon durch sein
+  for (const kommando of ['close', 'reopen']) {
+    const spur = []
+    const ohne = ghMitWiederholung((args) => { spur.push(args.join(' ')); throw f504() }, () => spur.push('pause'))
+    let wirft = false
+    try { ohne(['pr', kommando, '5']) } catch { wirft = true }
+    pruefe(`ghMitWiederholung: pr ${kommando} nie wiederholt, Fehler weitergereicht`, wirft && spur.join('|') === `pr ${kommando} 5`)
+  }
+  // mergeMit5xxPruefung: 504, PR ist MERGED -> kein Fehler; 504 und OPEN -> Fehler; 404 -> Fehler ohne Zustandsabfrage
+  const mitZustand = (zustand, fehlerBei) => {
+    const aufrufe = []
+    const gh = (args) => {
+      aufrufe.push(args.slice(0, 2).join(' '))
+      if (args[1] === 'merge') throw fehlerBei
+      return `${zustand}\n`
+    }
+    let ok = true
+    try { mergeMit5xxPruefung(gh, { nummer: 5, titel: 'T', kopf: KOPF }) } catch { ok = false }
+    return { ok, aufrufe: aufrufe.join(',') }
+  }
+  const nachErfolg = mitZustand('MERGED', f504())
+  pruefe('504 beim Merge, PR danach MERGED: kein Fehler (kein falsches MERGE FEHLGESCHLAGEN)', nachErfolg.ok && nachErfolg.aufrufe === 'pr merge,pr view')
+  pruefe('504 beim Merge, PR noch OPEN: Fehler bleibt', !mitZustand('OPEN', f504()).ok)
+  const nicht5xx = mitZustand('MERGED', new Error('HTTP 405: already merged'))
+  pruefe('anderer Merge-Fehler: Fehler, keine Zustandsabfrage', !nicht5xx.ok && nicht5xx.aufrufe === 'pr merge')
+  pruefe('ghEcht (Standard von echteWelt) ist mit der 5xx-Wiederholung verdrahtet', ghEcht.wiederholt5xx === true)
+  // echteWelt.mergeStatus fragt den einen PR ab und schneidet den Zeilenumbruch ab
+  const abfragen = []
+  const status = echteWelt({ gh: (args) => { abfragen.push(args.join(' ')); return 'UNKNOWN\n' }, repo: 'o/r', zeileAus: () => {} }).mergeStatus(42)
+  pruefe('echteWelt.mergeStatus: Einzelabfrage des PR, getrimmter Status', status === 'UNKNOWN' && abfragen.join('|') === 'pr view 42 --json mergeStateStatus --jq .mergeStateStatus')
+}
+pruefe('echteWelt: ohne Repo-Angabe Fehler', (() => { try { echteWelt({ gh: () => '', repo: '' }); return false } catch { return true } })())
+pruefe('argumente: Vorgabe', JSON.stringify(argumente([])) === '{"trocken":false,"hoechstens":3}')
+pruefe('argumente: --trocken und --hoechstens', JSON.stringify(argumente(['--trocken', '--hoechstens', '5'])) === '{"trocken":true,"hoechstens":5}')
+pruefe('argumente: ungültig', argumente(['--hoechstens', '0']) === null && argumente(['--hoechstens']) === null && argumente(['--admin']) === null)
+
+// starte: die Optionen des Aufrufs erreichen lauf() (A7: `--hoechstens 1` darf nicht still 3 Merges erlauben)
+{
+  const w = welt(vier())
+  pruefe('starte --hoechstens 1: Exit 0, genau ein Merge (#11), die übrigen vom Riegel zurückgestellt', starte(['--hoechstens', '1'], () => w) === 0 && w.log.gemergt.join(',') === '11' && w.log.zeilen.filter((z) => z.includes('Riegel: höchstens 1')).length === 3)
+  const w2 = welt(vier())
+  pruefe('starte ohne Option: Vorgabe 3 Merges', starte([], () => w2) === 0 && w2.log.gemergt.join(',') === '11,12,13')
+  const w3 = welt(vier())
+  pruefe('starte --trocken: Exit 0, kein Merge', starte(['--trocken'], () => w3) === 0 && w3.log.gemergt.length === 0 && w3.log.aufrufe.every((a) => !a.startsWith('merge')))
+  let geholt = 0
+  pruefe('starte ungültig: Exit 2, die Welt wird nie geholt', starte(['--hoechstens', '0'], () => { geholt++; return welt(vier()) }) === 2 && geholt === 0)
+  const w4 = welt([pr({ nummer: 11, mergeStateStatus: 'UNKNOWN' })], { folge: { 11: [UNKNOWN, UNKNOWN] } })
+  pruefe('starte: Stillstand (0 Merges, PR unentschieden) -> Exit 1 aus exitCode', starte([], () => w4) === 1)
+}
+
+{
+  // Nachprüfung nach dem Merge (Daniel 27.11.2026): nur gemergte Stufe-2-PRs bekommen das Label, nach dem Merge, nie im Trockenlauf
+  const stufen = () => [pr({ nummer: 41, stufe: 2 }), pr({ nummer: 42, stufe: 1 }), pr({ nummer: 43, stufe: 2 })]
+  const w = welt(stufen())
+  lauf(w, { hoechstens: 3 })
+  pruefe('Nachprüfung: Label nur an Stufe 2, je nach dem Merge', w.log.aufrufe.filter((a) => /^(merge|label)/.test(a)).join(',') === 'merge 41,label 41 nachpruefung-offen,merge 42,merge 43,label 43 nachpruefung-offen')
+  pruefe('Nachprüfung: Protokollzeile je Label', w.log.zeilen.filter((z) => z.startsWith('NACHPRÜFUNG OFFEN #')).join('|') === 'NACHPRÜFUNG OFFEN #41: Label nachpruefung-offen gesetzt|NACHPRÜFUNG OFFEN #43: Label nachpruefung-offen gesetzt')
+  const t = welt(stufen())
+  lauf(t, { trocken: true })
+  pruefe('Nachprüfung: Trockenlauf setzt kein Label', !t.log.aufrufe.some((a) => a.startsWith('label')))
+  const f = welt([pr({ nummer: 51, stufe: 2 }), pr({ nummer: 52, stufe: 1 })], { labelFehler: true })
+  const r = lauf(f, { hoechstens: 3 })
+  pruefe('Nachprüfung: Label-Fehler stoppt nichts, Zeile nennt Grund, Exit bleibt 0', r.gemergt.join(',') === '51,52' && exitCode(r) === 0 && f.log.zeilen.some((z) => z === 'NACHPRÜFUNG-LABEL FEHLGESCHLAGEN #51: HTTP 403: Resource not accessible'))
+}
+{
+  // Übernahme nach Main-Nachzug: Prüfer-Lauf anstoßen, nie doppelt, höchstens UEBERNAHMEN_JE_LAUF je Lauf, im Trockenlauf nur melden
+  const rr = (nummer, o = {}) => pr({ nummer, reviewDecision: 'REVIEW_REQUIRED', kommentare: [urteil(ALTER_KOPF, 'ok')], ...o })
+  const fall = () => [rr(71), rr(72), rr(73), rr(74), rr(75, { kommentare: [] })]
+  const w = welt(fall(), { laeuft: [72] })
+  const r = lauf(w, { hoechstens: 3 })
+  const anstoss = w.log.aufrufe.filter((a) => a.startsWith('anstoss'))
+  pruefe('Übernahme: Anstoß mit PR und Kopf für 71, 73, 74; 72 läuft schon', anstoss.join(',') === `anstoss 71 ${KOPF},anstoss 73 ${KOPF},anstoss 74 ${KOPF}`, anstoss)
+  pruefe('Übernahme: Zeilen ANGESTOSSEN mit Kopf (9 Zeichen), WARTET für 72', w.log.zeilen.filter((z) => z.startsWith('ÜBERNAHME ANGESTOSSEN #7')).length === 3 && w.log.zeilen.some((z) => z.startsWith('ÜBERNAHME WARTET #72 Kopf a1b2c3d4e:')))
+  pruefe('Übernahme: kein Merge, keine ÜBERSPRUNGEN-Zeile für Übernahme-Fälle', r.gemergt.length === 0 && !w.log.zeilen.some((z) => /^ÜBERSPRUNGEN #7[1-4]/.test(z)))
+  pruefe('Übernahme: REVIEW_REQUIRED ohne Prüfer-Ok bleibt ÜBERSPRUNGEN', w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN #75') && z.includes('REVIEW_REQUIRED')) && !anstoss.some((a) => a.includes(' 75 ')))
+  const v = welt([rr(81), rr(82), rr(83), rr(84)])
+  lauf(v, { hoechstens: 3 })
+  pruefe(`Übernahme: Riegel ${UEBERNAHMEN_JE_LAUF} Anstöße, der vierte meldet ÜBERNAHME RIEGEL`, UEBERNAHMEN_JE_LAUF === 3 && v.log.aufrufe.filter((a) => a.startsWith('anstoss')).length === 3 && v.log.zeilen.some((z) => z.startsWith('ÜBERNAHME RIEGEL #84')))
+  const t = welt([rr(91)])
+  lauf(t, { trocken: true })
+  pruefe('Übernahme: Trockenlauf stößt nichts an und sagt es', !t.log.aufrufe.some((a) => a.startsWith('anstoss')) && t.log.zeilen.some((z) => z.startsWith('WÜRDE ÜBERNAHME ANSTOSSEN #91')))
+  const f = welt([rr(95), rr(96)], { anstossFehler: 95 })
+  lauf(f, { hoechstens: 3 })
+  pruefe('Übernahme: Fehler beim Anstoß steht mit erster Zeile im Protokoll und zählt nicht gegen den Riegel', f.log.zeilen.some((z) => z === 'ÜBERNAHME FEHLGESCHLAGEN #95 Kopf a1b2c3d4e: HTTP 403: Resource not accessible') && f.log.zeilen.some((z) => z.startsWith('ÜBERNAHME ANGESTOSSEN #96')))
+}
+{
+  // Übernahme-Fälle erzeugen nie eine zweite ÜBERSPRUNGEN-Zeile; Fehler zählen nicht gegen den Riegel, der Trockenlauf zählt wie der Echtlauf
+  const rr = (nummer) => pr({ nummer, reviewDecision: 'REVIEW_REQUIRED', kommentare: [urteil(ALTER_KOPF, 'ok')] })
+  const alleOhneUebersprungen = (w) => !w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN'))
+  const f = welt([rr(101), rr(102), rr(103), rr(104)], { anstossFehler: 101 })
+  lauf(f, { hoechstens: 3 })
+  pruefe('Übernahme: nach einem Fehler kommen noch drei Anstöße (Fehler verbraucht keinen Riegel), kein ÜBERSPRUNGEN', f.log.aufrufe.filter((a) => a.startsWith('anstoss')).length === 3 && !f.log.zeilen.some((z) => z.startsWith('ÜBERNAHME RIEGEL')) && alleOhneUebersprungen(f))
+  const t = welt([rr(111), rr(112), rr(113), rr(114)])
+  lauf(t, { trocken: true })
+  pruefe('Übernahme: Trockenlauf zählt Anstöße gegen den Riegel (3 Zeilen WÜRDE, 1 RIEGEL), kein ÜBERSPRUNGEN', t.log.zeilen.filter((z) => z.startsWith('WÜRDE ÜBERNAHME')).length === 3 && t.log.zeilen.some((z) => z.startsWith('ÜBERNAHME RIEGEL #114')) && alleOhneUebersprungen(t))
+  const l = welt([rr(121)], { laeuft: [121] })
+  lauf(l, { hoechstens: 3 })
+  pruefe('Übernahme: wartender Lauf erzeugt nur die WARTET-Zeile', l.log.zeilen.filter((z) => z.includes('#121')).length === 1 && alleOhneUebersprungen(l))
+  pruefe('freigabeVerworfen: gleiche Zeit zweier Urteile, das spätere in der Liste gilt (aendern zuletzt → kein Fall)', freigabeVerworfen(pr({ reviewDecision: 'REVIEW_REQUIRED', kommentare: [urteil(ALTER_KOPF, 'ok', '2026-11-01T10:00:00Z'), urteil(ALTER_KOPF, 'aendern', '2026-11-01T10:00:00Z')] })) === false)
+}
+if (fehler > 0) {
+  console.error(`nacht-merger.test: ${fehler} von ${anzahl} Fällen rot`)
+  process.exit(1)
+}
+console.log(`nacht-merger.test: ${anzahl} Fälle grün (Auswahlregel, Ablauf mit Riegel/Trockenlauf/Kreislauf, gh-Anschluss)`)

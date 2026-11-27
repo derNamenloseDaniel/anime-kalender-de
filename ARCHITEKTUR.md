@@ -1,0 +1,215 @@
+# Architektur und Skalierung
+
+Stand: 11.08.2026
+
+Dieses Dokument beantwortet eine Frage: **Trägt die heutige Bauweise, und woran merken wir,
+dass sie es nicht mehr tut?** Es steht hier, damit die Antwort nicht jedes Mal neu aus dem
+Bauch kommt, sondern aus Zahlen — und damit ein späterer Umbau eine geplante Entscheidung ist
+statt einer Notoperation.
+
+## Wie es heute läuft
+
+Eine statische Seite ohne Backend. Alles, was der Browser braucht, liegt als Datei auf GitHub
+Pages; erzeugt wird es von einer Pipeline, die mehrmals täglich als GitHub Action läuft.
+
+```
+Quellen (Crunchyroll, ADN, AniList, TMDB, aniSearch, Anime2You)
+   ↓  Actions: stündlich / täglich / wöchentlich
+data/cache/, data/anisearch.json, data/curated/*.yaml   ← Rohdaten, im Repo
+   ↓  pipeline/build.ts (Phasen in pipeline/bau/NN-*.ts)
+public/data/*.json                                       ← ausgeliefert
+   ↓  vite build
+dist/                                                    ← GitHub Pages
+```
+
+Der Newsletter ist das einzige bewegliche Teil: ein Cloudflare Worker mit D1-Datenbank. Er ist
+bewusst optional — fehlt er, zeigt das Formular einen ehrlichen Hinweis statt eines kaputten
+Knopfs.
+
+## Die drei Größen, die man nicht verwechseln darf
+
+Das ist der Kern, und der häufigste Denkfehler:
+
+| | Was es ist | Heute | Grenze | Wer es merkt |
+|---|---|---|---|---|
+| **Ladelast** | was ein Besucher wirklich herunterlädt | gzip, Start; Wert und Grenze misst der Wächter `tools/start-budget.mjs` (`node tools/start-budget.mjs`) | gefühlt ab ~1 MB | jeder Besucher, sofort |
+| **Veröffentlichte Seite** | Inhalt von `dist/` | 20 MB | **1 GB** (GitHub Pages) | niemand, bis es reißt |
+| **Repo** | alles inkl. Rohdaten und Historie | Größe siehe „3. Repo über 1 GB“ unten | ~1 GB empfohlen | nur wer klont |
+
+**Rohdaten in `data/` kosten keine Ladelast und zählen nicht zur Pages-Grenze.** Sie liegen
+außerhalb von `public/`, wandern also nie nach `dist/`. Das aniSearch-Rohdaten-Archiv darf
+deshalb ruhig wachsen: Es macht das Klonen langsamer, sonst nichts. Wer über Ladelast
+nachdenkt, muss auf die erste Zeile schauen, nicht auf die dritte.
+
+Dateizahl: <!-- kennzahlen:public-dateien -->6499 Dateien in `public/` (Schwelle 15.000), Stand 12.11.2026<!-- /kennzahlen -->. Die Größen der Dateien unten erzeugt `node tools/kennzahlen.mjs` aus `public/data` (auf Abruf; `--pruefen` meldet Marker, die älter als 30 Tage sind).
+
+### Was der Erstaufruf tatsächlich kostet
+
+| Datei | über die Leitung (gzip) |
+|---|---|
+| `index.html` | 3,7 KB |
+| `index-*.js` (App) | 210,7 KB |
+| `index-*.css` | 25,7 KB |
+| `meta.json` | <!-- kennzahlen:meta-gzip -->2,5 KB gzip, Stand 12.11.2026<!-- /kennzahlen --> |
+| `woche-kacheln.json` (Wochenansicht, nur Kachelfelder) | <!-- kennzahlen:woche-kacheln-gzip -->10,0 KB gzip (schwankt mit dem Wochenfenster), Stand 12.11.2026<!-- /kennzahlen --> |
+| **Summe** | misst `tools/start-budget.mjs` (keine Handzahl) |
+
+Gezählt wird, was der Wächter `tools/start-budget.mjs` misst (Stand 18.10.2026). Die Zeilen für `index-*.js`, `index-*.css` und `index.html` stammen aus dem Bau von `dist` und sind in diesem Stand (25.10.2026) nicht neu gemessen. Ohne Bedienung lädt die Seite danach innerhalb von
+etwa 6 s die vollen Dateien nach (<!-- kennzahlen:nachladen-gzip -->gzip: `titles-core` 206,5 KB, `releases` 109,3 KB, `events` 76,0 KB, Stand 12.11.2026<!-- /kennzahlen -->, `planeNachladen`; dazu der Precache des Service Workers):
+nicht im Wächter, offen als Folgeauftrag. Alle Zahlen: Playwright-Messung gegen `dist`, 360 und 1280 px.
+
+Nachgeladen wird nur, wer es anfordert:
+
+- `titles.json` (<!-- kennzahlen:titles-gzip -->815,4 KB gzip, Stand 12.11.2026<!-- /kennzahlen -->) erst beim Öffnen der Datenbank-Ansicht
+- Handlungsbeschreibungen in **32 Gruppen** — eine Kachel lädt nur ihre eigene Gruppe
+- Cover-Bilder direkt von AniList, nicht von uns
+
+Diese Trennung ist die wichtigste Architekturentscheidung des Projekts und der Grund, warum
+der Kalender trotz 2.922 Titeln (Stand 25.10.2026) unter der Grenze von 250 KB startet (Messung: `tools/start-budget.mjs`).
+
+**Laufzeit-Budgets (18.11.2026):** Neben den Bytes beim Bau wachen zwei Messungen über die laufende Seite — Lighthouse mobil je Seite (LCP, CLS, TBT, Byte-Gewicht mit Covern, vier Kategorien; Grenzen und Basis in `tools/lighthouse-grenzen.mjs`) und der Leerlauf (CPU < 1 %, kein Takt unter 1 s, keine Dauer-Animation, Heap-Wachstum ≤ 1 MB; `tools/leerlauf-urteil.mjs`). Beide in der PR-Kette und täglich gegen live; Messrezept in `docs/wissen/betrieb.md`, „Lighthouse und Leerlauf als Wächter“.
+
+## Wo wir an den Grenzen stehen
+
+Quelle: [GitHub Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits)
+
+| Grenze | Wert | Heute | Abstand |
+|---|---|---|---|
+| Veröffentlichte Seite | 1 GB | 20 MB | **50-fach** |
+| Bandbreite | 100 GB/Monat | ~327 KB je Aufruf (Start; Stand 18.10.2026, nicht neu gemessen: dist-Bau nötig) | reicht für **~300.000 Aufrufe/Monat** (mit diesem Wert gerechnet) |
+| Builds pro Stunde | 10 (entfällt bei eigenem Actions-Workflow — den haben wir) | 3 Läufe/Tag | greift nicht |
+| Deploy-Dauer | 10 Minuten | ~2 Minuten | 5-fach |
+| Datei | 100 MB | größte: 2,6 MB | 38-fach |
+
+Kein Wert liegt näher als Faktor fünf an seiner Grenze. Die Bandbreite ist die einzige, die
+allein durch Erfolg reißen könnte — dafür bräuchte es 23.000 Besucher am Tag.
+
+## Wann umgebaut werden muss — und worauf
+
+Jede Zeile nennt den Auslöser, nicht ein Gefühl. Solange keiner eintritt, ist Umbauen
+verschwendete Zeit.
+
+### 1. Ladelast über 300 KB beim Erstaufruf
+
+**Auslöser:** `titles-core.json` oder `events.json` wachsen so, dass die Summe 300 KB gzip
+überschreitet — realistisch bei etwa 400 gleichzeitig laufenden Serien statt heute 125.
+
+**Reaktion:** `events.json` nach Monat aufteilen, wie es die Beschreibungen schon vorleben.
+Der Kalender zeigt ohnehin nie mehr als eine Woche gleichzeitig. Aufwand: klein, die
+Ladelogik dafür steht bereits.
+
+*Stand 08.10.2026:* Die Summe lag bei ≈ 590 KB (Start, mit Code). Statt der Monatsteilung startet
+die Wochenansicht aus `woche.json` (seit 25.10.2026 `woche-kacheln.json`, Größe siehe Tabelle oben), die vollen Dateien laden danach nach — Zahlen und
+Regeln in `docs/wissen/datensatz.md`, „Wochen-Datei zuerst umgesetzt".
+
+### 2. Ein Datenfeld interessiert nur eine Minderheit
+
+**Auslöser:** Eine neue Angabe würde `titles.json` deutlich vergrößern, aber die wenigsten
+Besucher fragen sie ab. Der erste konkrete Fall: **deutsche Synchronsprecher.** Bei etwa
+zwanzig Rollen je Titel und 2.922 Titeln (Stand 25.10.2026) reden wir über rund 58.000 Einträge (2.922 × 20) — ein Vielfaches des
+heutigen Datensatzes, für eine Angabe, die man erst sieht, wenn man eine Kachel öffnet und
+aufklappt.
+
+**Reaktion:** Eine Datei je Titel unter `public/data/<bereich>/<id>.json`, geladen erst beim
+Aufklappen. **Nicht** in `titles.json`. Das ist derselbe Weg wie bei den Beschreibungen und
+kostet Uninteressierte exakt null.
+
+*Stand 13.10.2026:* „Zuletzt im Kino“ (254 von 716 Filmen mit TMDB-Kennung) liegt als eine kleine Datei `kino-zuletzt.json`, die das Panel erst beim Öffnen eines Films lädt — Zahlen in `docs/wissen/quellen.md`.
+
+> Ein eigener Host ist dafür **nicht** nötig. Eine Datei, die niemand anfordert, wird auch
+> nicht übertragen — egal wo sie liegt. Ein zweiter Host löst ein anderes Problem
+> (Repo-Größe, Deploy-Kopplung), nicht das der Ladelast.
+
+### 2b. Ein neues Release zieht Titel in den Erstaufruf
+
+**Der Fall, der Punkt 2 nicht abdeckt — gemessen am 03.09.2026.** Nicht ein neues *Feld*
+kostet Ladelast, sondern eine neue *Sorte Release*: `titles-core.json` enthält genau die
+Titel, auf die ein Release zeigt (`referenced`). Wer Releases erzeugt, entscheidet damit
+zugleich, wer in der Erstaufruf-Datei landet — auch wenn er nur an den Kalender dachte.
+
+Konkret: 1.985 deutsche Erstveröffentlichungen aus aniSearch („Cowboy Bebop, 08.01.2003,
+Dybex") als Release gebaut → `titles-core.json` **von 554 KB auf 2,7 MB**, das Fünffache,
+für Termine, die alle in der Vergangenheit liegen und die im Kalender niemand sucht.
+
+**Prüffrage vor jeder neuen Release-Quelle: Würde jemand diesen Termin im Kalender
+suchen?** Lautet die Antwort nein, ist es keine Veröffentlichung, sondern eine
+Stammdatenangabe — und die gehört als Feld an den Titel (hier: `deErstausgabe`), wo sie
+nur die Datenbank-Ansicht kostet. Dieselbe Angabe, ein Zehntel der Ladelast.
+
+### 3. Repo über 1 GB
+
+**Stand (Messung 12.11.2026):** Pack 988 MiB lokal, GitHub meldet 847 MiB; Wachstum 55–78 MB
+je Woche, nicht fallend. Sechs Rohordner (`anisearch-raw`, `anisearch-folgen-raw`,
+`anisearch-sprecher-raw`, `motn-raw`, `crunchyroll-raw`, `ann-raw`) plus `public/og` sind
+≈ 60 % des Arbeitsbaums (291 von 483 MB). Der Checkout macht nur 1,5–4 % der Zeit bis live
+aus: an der Laufzeit wird nichts getan.
+
+**Auslöser:** Klon- und Plattenaufwand (lokale Worktrees, ~480 MB je Stück) oder eine
+GitHub-Warnung zur Repo-Größe. Dann Reaktion 2/3. Sparse-Checkout in PR-Jobs nur als
+Handgriff, wenn ein Workflow ohnehin angefasst wird (Gewinn geschätzt 4–8 s je Job).
+
+**Reaktion, in dieser Reihenfolge:**
+
+1. Alte Archivstände nicht mitschleppen: Jede Datei wird genau einmal geschrieben und danach
+   nicht mehr angefasst. Das ist bereits so gebaut — deshalb wächst die Historie nicht mit
+   jedem Nachtlauf.
+2. Archive in ein zweites Repo (`anime-kalender-daten`), als Submodul oder gar nicht
+   eingebunden. Die Seite braucht sie nicht, nur die Pipeline.
+3. Cloudflare R2 (10 GB kostenlos), wenn es wirklich groß wird.
+
+### 4. Bandbreite über 100 GB im Monat
+
+**Auslöser:** ~23.000 Besucher täglich. Bis dahin ist es weit.
+
+**Reaktion:** Cloudflare vor die Seite hängen — die Domain liegt ohnehin dort, der Worker
+läuft dort. Der Wechsel ist eine DNS-Änderung, kein Umbau.
+
+### 5. Daten müssen sich zwischen zwei Nachtläufen ändern
+
+**Auslöser:** Nutzer sollen etwas eintragen oder korrigieren können, oder Termine müssen
+minutenaktuell sein.
+
+**Reaktion:** Dann, und wirklich erst dann, kommt eine Datenbank ins Spiel — Cloudflare D1
+steht bereits, der Worker auch. **Heute wäre eine Datenbank ein Rückschritt:** Ein statisches
+JSON vom CDN antwortet in Millisekunden ohne Kaltstart, ohne Ausfallrisiko und ohne Kosten.
+Eine Datenbank lohnt sich, wenn geschrieben wird — nicht, wenn viel gelesen wird.
+
+### 6. Die Folgen-Ebene wird sichtbar
+
+**Auslöser:** Folgentitel, Folgentermine und Tonspuren je Folge sollen auf der Seite stehen —
+nicht nur je Staffel.
+
+**Warum das die erste echte Schwelle ist, die näher rückt:** Der aniSearch-Lauf holt seit dem
+29.08.2026 Folgenlisten mit deutschen Folgentiteln. Gemessen am ersten Lauf: **6.874 Folgen aus
+100 Titeln**, davon 5.347 mit deutschem Titel. Über den Bestand von 2.615 zugeordneten Titeln
+hochgerechnet sind das weit über 150.000 Folgen.
+
+Das ist eine andere Größenordnung als alles Bisherige. `titles.json` mit 2.763 Titeln ist
+2,6 MB; eine Folgen-Datei wäre ein Vielfaches davon, und sie ließe sich nicht sinnvoll
+vorladen — niemand braucht 150.000 Folgen, jeder braucht die zwölf einer Staffel.
+
+**Reaktion:** Kein Umbau, sondern ein Endpunkt. Die Folgen wandern nach D1 (steht bereits, der
+Worker auch), und die Seite fragt sie beim Öffnen eines Titels ab — dieselbe Stelle, an der
+heute schon die Handlungsbeschreibung nachgeladen wird. Alles andere bleibt statisch.
+
+**Was dagegen weiterhin nicht in eine Datenbank gehört:** die 2.763 Titel, die 889 Termine, die
+Verweise. Sie ändern sich dreimal am Tag, werden bei jedem Seitenaufruf gebraucht und sind als
+Datei schneller, billiger und ausfallsicherer.
+
+## Was bewusst nicht gemacht wird
+
+- **Keine Datenbank für Lesedaten.** Siehe oben. Der Termindatensatz ändert sich dreimal am
+  Tag; ihn bei jedem Seitenaufruf abzufragen wäre teurer und langsamer als eine Datei.
+- **Kein serverseitiges Rendering.** Die Teilen-Seiten unter `dist/r/` werden im Build als
+  echte HTML-Dateien erzeugt — das löst das Vorschaubild-Problem ohne laufenden Server.
+- **Kein Live-Abruf fremder Seiten beim Seitenaufruf.** Das macht aus einem Abruf je Titel und
+  Woche einen je Besucher: dieselbe Last, unbegrenzt, dazu ein fremder Server im Ladepfad.
+- **Kein Auslagern um des Auslagerns willen.** Jede Trennung kostet einen Ort mehr, an dem
+  etwas kaputtgehen kann.
+
+## Zusammengefasst
+
+Die Bauweise trägt, und zwar mit großem Abstand. Der begrenzende Faktor ist nicht die Technik,
+sondern die Datenpflege. Die nächste Architekturentscheidung steht an, wenn die
+Synchronsprecher kommen — und die Antwort steht schon fest: eine Datei je Titel, nachgeladen
+beim Aufklappen, nicht in den Hauptdatensatz.

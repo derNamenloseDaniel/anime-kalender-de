@@ -1,0 +1,431 @@
+# Verweise, die kein Sammellauf findet — von Hand belegt.
+#
+# **Wofür das gut ist.** Die Erweiterung meldet Seiten, die unser Datensatz gar
+# nicht kennt: Ein Anbieter führt denselben Anime unter mehreren Kennungen, und
+# aniSearch nennt nur eine. Solche Meldungen landen in
+# `daniel-zum-abarbeiten/11-meldungen-ohne-zuordnung.md` — und blieben dort
+# liegen, denn es gab keinen Weg, die Adresse einzutragen. Am 10.09.2026 warteten
+# so 54 Meldungen zu drei Haikyu!!-Staffeln.
+#
+# `data/adn-adressen.yaml` und `data/rtlplus-adressen.yaml` **ersetzen** eine
+# vorhandene Adresse; diese Datei **legt eine an**. Das ist der Unterschied, und
+# er ist der Grund, warum es eine dritte Datei braucht.
+#
+# **Was ein Eintrag nicht tut: urteilen.** Er sagt „dort gibt es diesen Titel",
+# nicht „dort ist er auf Deutsch". Das Sprachurteil kommt weiter aus den
+# Meldungen — sobald die Adresse hier steht, findet `fetch-pruefungen.ts` sie
+# und ordnet die Folgenbefunde zu.
+#
+# **Jede Zeile trägt ihren Beleg.** Nicht „sieht richtig aus", sondern was
+# gemessen wurde: die Staffelangabe der Seite, die Folgenzahl, die Summe. Ein
+# Namensvergleich allein genügt nicht — „Beyblade Burst Surge" und „Beyblade
+# Burst Rise" trennt ein Wort.
+#
+# Felder:
+#   anilistId  Pflicht — die Kennung des Anime.
+#   platform   Pflicht — crunchyroll | netflix | primevideo | youtube | adn |
+#              aniverse | wow | joyn | rtlplus | disneyplus
+#   url        Pflicht — die Adresse, wie sie im Browser steht.
+#   kanal      Optional — Prime-Zusatzkanal ("Crunchyroll", "Aniverse"), wenn der Titel nur über ihn läuft.
+#   belegtAm   Pflicht — Datum, ISO, in Anführungszeichen.
+#   beleg      Pflicht — womit die Zuordnung gemessen wurde.
+
+- anilistId: 21698
+  title: 'HAIKYU!! 3rd Season'
+  platform: primevideo
+  url: https://www.amazon.de/dp/B0D544CDK6
+  belegtAm: '2026-09-10'
+  beleg: >-
+    Die Seite meldet sich als Staffel 3 unter dem Serientitel „Haikyuu!!".
+    Prime führt dort 11 Folgen; unsere 3rd Season hat 10 und das
+    Spring-Tournament-Special (107351) eine — die Summe geht exakt auf.
+    Der Titel hatte bis dahin keinen einzigen Prime-Verweis.
+
+- anilistId: 106625
+  title: 'HAIKYU!! TO THE TOP'
+  platform: primevideo
+  url: https://www.amazon.de/dp/B0D2NL5GYX
+  belegtAm: '2026-09-10'
+  beleg: >-
+    Die Seite meldet sich als Staffel 4 unter dem Serientitel „Haikyuu!!" und
+    führt 27 Folgen. Unsere drei Einträge dieser Staffel zusammen: TO THE TOP
+    13, LAND VS. AIR 2, TO THE TOP Part 2 zwölf — genau 27. Daniels 27
+    Folgenmeldungen vom 10.09.2026 nennen 25 mit deutschem Ton und zwei ohne.
+    Der Titel hatte bis dahin keinen einzigen Prime-Verweis.
+
+# Entfernt 19.09.2026: B0D4K9PV2F stand hier als Seite der ersten Staffel (20464).
+# Widerlegt: Die Seite öffnet Staffel 2 (Daniel im Durchgang, Staffel-Dropdown
+# und Erweiterung „Staffel 2“), Folge 1 ist „Let's go! Tokyo!“; der Handbeleg in
+# dub-confirmed.yaml ordnet sie seit dem 15.09. zu Recht 20992 zu. Staffel 1 hat
+# ihren eigenen Prime-Weg (0Q6QUJIEW346VMM87OG648DPND).
+
+- anilistId: 170083
+  title: 'Dragon Ball Daima'
+  platform: youtube
+  url: https://www.youtube.com/watch?v=Ck7fc3OiRak
+  belegtAm: '2026-09-16'
+  beleg: >-
+    Videotitel laut oEmbed „Dragon Ball DAIMA Deutsch | Verschwörung | Folge 1 |
+    TOGGO", Kanal TOGGO (@TOGGO). Daniel hat die Folge am 16.09.2026 dort
+    gesehen; Folge 2 fand er auf keinem Kanal.
+
+# Berserk (1997): Prime teilt die 25 Folgen in zwei Staffeln. Mit nur einem Weg
+# liest der Bau die Adresse eines Handbelegs als Korrektur der vorhandenen, und
+# der Beleg zu Staffel 2 überschrieb den zu Staffel 1 (18.09.2026). Zwei Wege
+# machen daraus eine Unterscheidung; jeder Beleg färbt dann seine eigene Seite.
+- anilistId: 33
+  platform: primevideo
+  url: https://www.amazon.de/dp/B0DGGZSKRM
+  belegtAm: '2026-09-18'
+  beleg: 'Prime-Staffel 1, 13 Folgen (Folgen 1–13 der Serie von 1997), Handbeleg vom 30.08.2026'
+- anilistId: 33
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0FKZM9J6V
+  belegtAm: '2026-09-18'
+  beleg: 'Prime-Staffel 2, 12 Folgen, Kopfblock releaseYear 1998, Folgentitel der Eklipse („Das Grab in Flammen“) = Folgen 14–25'
+
+# Suchadressen aufgelöst (18.09.2026). Jede Seite einzeln abgerufen und am
+# Kopfblock bestätigt — Titel, Staffel, Jahr; Kandidaten aus aniSearch und
+# JustWatch. Ein Eintrag urteilt nicht über die Sprache: Die kommt aus der
+# Meldung mit der Erweiterung.
+- anilistId: 124080
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0CHLH4NR6
+  belegtAm: '2026-09-18'
+  beleg: 'Kopfblock „Horimiya (Simuldub)“, Staffel 1, 2021; aniSearch nennt dieselbe Seite, JustWatchs gti führt ebenfalls dorthin'
+- anilistId: 21507
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0CH8YTK4T
+  belegtAm: '2026-09-18'
+  beleg: 'Kopfblock „Mob Psycho 100 - Staffel 1“, 2016; aniSearch nennt dieselbe Seite'
+- anilistId: 21519
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/0HZY7HB8IQJX7YWB81SW44OGCX
+  belegtAm: '2026-09-18'
+  beleg: 'Kopfblock „Your Name. - Gestern, heute und für immer“, Movie; Ziel von JustWatchs gti 3004ad12…, die alte Seite B0FLLFC2L6 ist gelöscht (404)'
+
+# JustWatch-Kandidaten, von Daniel im Durchgang am 19.09.2026 gegengeprüft.
+- anilistId: 317
+  title: "Final Fantasy VII: Advent Children"
+  platform: primevideo
+  url: https://watch.amazon.de/detail?gti=amzn1.dv.gti.c6aad0b3-be42-32dc-6efa-5c489c3d9fef
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch-gti; Seite zeigt „Final Fantasy Vii: Advent Children“, 2005, 1 Std. 41 Min., Leihen/Kaufen HD (Daniel, Bild)'
+- anilistId: 442
+  title: "Naruto: The Movie - Geheimmission im Land des ewigen Schnees"
+  platform: primevideo
+  url: https://watch.amazon.de/detail?gti=amzn1.dv.gti.d0b6a7ab-204d-6fff-7737-584d42e18d1f
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch-gti; Seite zeigt „Naruto The Movie – Geheimmission im Land des ewigen Schnees“, 2004, 1 Std. 18 Min., aniverse-Kanal und Leihen/Kaufen HD (Daniel, Bild)'
+- anilistId: 857
+  title: "Air Gear"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/0L8OEXAMVVVVJF4LJA0B8D1BIP
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch-gti; Seite zeigt „Air Gear – Staffel 1“, 2007, In Prime enthalten, deutsche Sprecher (Konrad Bösherz, Rubina Nath) (Daniel im Durchgang, Bild); gemeldete Seite 0L8OEXAMVVVVJF4LJA0B8D1BIP (JustWatch-gti 66c97aeb…), Meldung 4736: Staffel 1, 26 Folgen deutsch'
+
+# JustWatch-Kandidaten auf die Prüfliste (19.09.2026, Daniel: „pack lieber auf prüfliste“).
+# Die Zuordnung ist JustWatchs; Titel und Staffel bestätigt erst die Meldung der Erweiterung.
+- anilistId: 9181
+  title: "Motto To Love-Ru: Trouble"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/0Q0397G70ZXQRCUP0YKTJQJFIG
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch führte diese Seite (gti b736b2f5…) unter „To Love-Ru: Trouble“; die Seite ist laut Kopf „Motto To Love-Ru: Trouble“, Staffel 1, 12 Folgen (Diagnosebericht Daniel, 19.09.2026)'
+- anilistId: 3455
+  title: "To Love-Ru: Trouble"
+  platform: primevideo
+  url: https://watch.amazon.de/detail?gti=amzn1.dv.gti.d7c875aa-05e6-43fa-a666-22e6eb54c33b
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch nennt diese Prime-Adresse für den Titel, einer von 2 Links; Identität und Sprache per Meldung der Erweiterung'
+# Entfernt 19.09.2026, doppelt: Yu-Gi-Oh! 5D’s: leitet auf dieselbe Seite wie gti 1dbc472c… (0R9YBE7IZ53JEOV1GISIWI1XHV, Meldung 4754) (Diagnosebericht Daniel).
+- anilistId: 3972
+  title: "Yu-Gi-Oh! 5D's"
+  platform: primevideo
+  url: https://watch.amazon.de/detail?gti=amzn1.dv.gti.1dbc472c-0c4e-4a1e-8d86-27f146750f22
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch nennt diese Prime-Adresse für den Titel, einer von 3 Links; Identität und Sprache per Meldung der Erweiterung'
+- anilistId: 3972
+  title: "Yu-Gi-Oh! 5D's"
+  platform: primevideo
+  url: https://watch.amazon.de/detail?gti=amzn1.dv.gti.a3fa85b3-9fd1-4c50-89ce-13e8d5953f92
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch nennt diese Prime-Adresse für den Titel, einer von 3 Links; Identität und Sprache per Meldung der Erweiterung'
+- anilistId: 8246
+  title: "Naruto Shippuden: The Movie 4 - The Lost Tower"
+  platform: primevideo
+  url: https://watch.amazon.de/detail?gti=amzn1.dv.gti.a998437d-aa08-4fdb-b6a3-9baa7169fff3
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch nennt diese Prime-Adresse für den Titel; Identität und Sprache per Meldung der Erweiterung'
+- anilistId: 10589
+  title: "Naruto Shippuden: The Movie 5 - Blood Prison"
+  platform: primevideo
+  url: https://watch.amazon.de/detail?gti=amzn1.dv.gti.1869366c-03be-449a-82bb-2e059f1f3b15
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch nennt diese Prime-Adresse für den Titel; Identität und Sprache per Meldung der Erweiterung'
+- anilistId: 12477
+  title: "Patema Inverted"
+  platform: primevideo
+  url: https://watch.amazon.de/detail?gti=amzn1.dv.gti.4c2b4a96-95f5-4ece-b85f-8047619b27bc
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch nennt diese Prime-Adresse für den Titel; Identität und Sprache per Meldung der Erweiterung'
+- anilistId: 13667
+  title: "Road to Ninja: Naruto the Movie"
+  platform: primevideo
+  url: https://watch.amazon.de/detail?gti=amzn1.dv.gti.0ab6a7ab-1804-c22a-ec45-a45654c26263
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch nennt diese Prime-Adresse für den Titel; Identität und Sprache per Meldung der Erweiterung'
+# Entfernt 19.09.2026, doppelt: Yamada-kun: leitet auf dieselbe Seite wie gti 8395764e… (0GLVDDY266OLQKA1OCWMOZ1JNP, Meldung 4748) (Diagnosebericht Daniel).
+- anilistId: 20966
+  title: "Yamada-kun & the 7 Witches"
+  platform: primevideo
+  url: https://watch.amazon.de/detail?gti=amzn1.dv.gti.8395764e-78be-4174-a913-6803849052a1
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch nennt diese Prime-Adresse für den Titel, einer von 2 Links; Identität und Sprache per Meldung der Erweiterung'
+- anilistId: 20954
+  title: "A Silent Voice"
+  platform: primevideo
+  url: https://watch.amazon.de/detail?gti=amzn1.dv.gti.5482d2e9-157c-411c-b5c3-7f3210286c90
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch nennt diese Prime-Adresse für den Titel; Identität und Sprache per Meldung der Erweiterung'
+- anilistId: 21202
+  title: "Konosuba: God's Blessing on This Wonderful World!"
+  platform: primevideo
+  url: https://watch.amazon.de/detail?gti=amzn1.dv.gti.ec42c902-df70-4ac2-b114-31d74f2f96ba
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch nennt diese Prime-Adresse für den Titel, einer von 2 Links; Identität und Sprache per Meldung der Erweiterung'
+- anilistId: 21202
+  title: "Konosuba: God's Blessing on This Wonderful World!"
+  platform: primevideo
+  url: https://watch.amazon.de/detail?gti=amzn1.dv.gti.84eb2188-9463-47f4-a9d7-191e72ba8ebb
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch nennt diese Prime-Adresse für den Titel, einer von 2 Links; Identität und Sprache per Meldung der Erweiterung'
+- anilistId: 21425
+  title: "Black Butler: Book of the Atlantic"
+  platform: primevideo
+  url: https://watch.amazon.de/detail?gti=amzn1.dv.gti.2b4f6080-5781-4c1d-9fb8-c5b84c3c7531
+  belegtAm: '2026-09-19'
+  beleg: 'JustWatch nennt diese Prime-Adresse für den Titel; Identität und Sprache per Meldung der Erweiterung'
+
+# Urteile ohne Folgenmeldung zurückgenommen (Daniel, 19.09.2026): Die Adresse bleibt, die Sprache
+# kommt aus der Meldung der Erweiterung. Magilumiere 1 und 2 laufen über watch-links.yaml.
+- anilistId: 20474
+  title: "JoJo no Kimyou na Bouken: Stardust Crusaders"
+  platform: primevideo
+  url: https://www.amazon.de/dp/B0GX7VDJK3
+  belegtAm: '2026-09-19'
+  beleg: 'Prime-Staffel 2 der JoJo-Sammelseite B0CG7S59KL: Stardust Crusaders mit 48 Folgen = 24 + 24 Battle in Egypt (Meldung 4785). Die Sammelseite selbst stand hier vorher und ist kein Titel.'
+- anilistId: 20799
+  title: "JoJo no Kimyou na Bouken: Stardust Crusaders - Egypt-hen"
+  platform: primevideo
+  url: https://www.amazon.de/dp/B0GX7VDJK3
+  belegtAm: '2026-09-19'
+  beleg: 'dieselbe Prime-Staffel wie Stardust Crusaders, Folgen 25–48 (Meldung 4785)'
+
+# Diamond is Unbreakable (21450): Prime-Staffel 3 der JoJo-Sammelseite, Folge 1 „Jōtarō Kūjō! Trifft
+# Jōsuke Higashikata“ (prime_folge, 19.09.2026). Mit nur einem Weg las der Bau den Handbeleg als
+# Korrektur von B0CGQ71TKG; als eigener Verweis steht die Seite daneben.
+- anilistId: 21450
+  title: "JoJo's Bizarre Adventure: Diamond Is Unbreakable"
+  platform: primevideo
+  url: https://www.amazon.de/dp/B0GXK7RJFW
+  belegtAm: '2026-09-19'
+  beleg: 'Prime-Staffel 3 der JoJo-Sammelseite, 39 Folgen = unsere 39; Folge 1 „Jōtarō Kūjō! Trifft Jōsuke Higashikata“'
+
+# Golden Wind (102883): Prime-Staffel 4 der JoJo-Sammelseite, Folge 37 „Sein Name ist Diavolo“
+# (prime_folge). Nur über den Crunchyroll-Kanal, ohne deutschen Ton — der Weg steht ohne Urteil,
+# damit keine Suchadresse nach etwas sucht, das längst gefunden ist.
+- anilistId: 102883
+  title: "JoJo's Bizarre Adventure: Golden Wind"
+  platform: primevideo
+  url: https://www.amazon.de/dp/B0G1ZD14D3
+  belegtAm: '2026-09-19'
+  beleg: 'Prime-Staffel 4 der JoJo-Sammelseite, 39 Folgen = unsere 39; Folgentitel „Sein Name ist Diavolo“, „Leise erklingt das Requiem“'
+
+# Briefkasten aufgeräumt (20.09.2026): fünf Meldungen lagen seit Tagen ohne Zuordnung.
+# Captain Tsubasa (2018): Prime führt die 52 Folgen in Bögen — „Elementary School“ (14) und
+# „Junior High School“ (12) sind eigene Seiten derselben Serie (Meldungen 4551, 4553, beide deutsch).
+- anilistId: 100745
+  title: "Captain Tsubasa (2018)"
+  platform: primevideo
+  url: https://www.amazon.de/dp/B0DJB5NGNK
+  belegtAm: '2026-09-20'
+  beleg: 'Prime-Bogen „Elementary School“ der Serie von 2018, 14 Folgen, deutsch (Meldung 4551)'
+- anilistId: 100745
+  title: "Captain Tsubasa (2018)"
+  platform: primevideo
+  url: https://www.amazon.de/dp/B0D2M355W6
+  belegtAm: '2026-09-20'
+  beleg: 'Prime-Bogen „Junior High School“ derselben Serie, 12 Folgen, deutsch (Meldung 4553)'
+
+# KonoSuba 2 (21699): Prime führt sie als Staffel 2 unter der Reihe von Staffel 1, je Ausgabe mit
+# eigener Seite. Ohne eigenen Verweis blieb die Meldung liegen („Staffel 2 in der Reihe nicht zu
+# bestimmen“) — unsere Staffelzählung kennt 21699 nicht als Nummer 2.
+- anilistId: 21699
+  title: "KonoSuba 2"
+  platform: primevideo
+  url: https://www.amazon.de/dp/B0F5J5JTSL
+  belegtAm: '2026-09-20'
+  beleg: 'Prime-Staffel 2 der KonoSuba-Reihe (Crunchyroll-Kanal), 10 Folgen = unsere zehn (Meldung 4741, deutsch)'
+- anilistId: 21699
+  title: "KonoSuba 2"
+  platform: primevideo
+  url: https://www.amazon.de/dp/B0FVFT9MQF
+  belegtAm: '2026-09-20'
+  beleg: 'Prime-Staffel 2 derselben Reihe, Ausgabe „Free with Ads“, 10 Folgen (Meldung 4746, deutsch)'
+
+# Lupin III. Part 6 (134623): Prime führt Part 6 zweimal. Als „Staffel 6" auf der Sammelseite von
+# Part 1 (B0DTN9NW75, „2 Staffeln"), mit eigener Staffelseite — dort 25 Folgen, genau unsere 25
+# (Daniels Bild, 21.09.2026). Und als eigener Eintrag im Crunchyroll-Kanal, drei Staffeln = Cours.
+# Ohne eigenen Verweis blieb die Meldung zur Staffel 6 ohne Titel liegen.
+- anilistId: 134623
+  title: "Lupin III. Part 6"
+  platform: primevideo
+  url: https://www.amazon.de/dp/B0D3WCX3WH
+  belegtAm: '2026-09-21'
+  beleg: 'Staffelseite „Lupin III. - Part 6", 25 Folgen = unsere 25, Kauf (Daniels Meldung vom 21.09.2026, deutsch)'
+- anilistId: 134623
+  title: "Lupin III. Part 6"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0CJJKGFGW
+  belegtAm: '2026-09-21'
+  beleg: 'Crunchyroll-Kanal „LUPIN III. PART 6", Staffel 1 von 3 (Tavily-Abruf 21.09.2026); Sprachurteil über die Kanal-Gegenprobe'
+- anilistId: 6702
+  title: "Fairy Tail"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0CHBX8CM2
+  belegtAm: '2026-09-22'
+  beleg: 'Serienseite „Fairy Tail", deutsche Folgentitel (Tavily-Abruf 22.09.2026); Staffel 1 in Deutschland nicht verfügbar, Staffel 2–9 und 100 zum Kauf (Daniel mit Bildern). Sprache offen'
+- anilistId: 21175
+  title: "Dragon Ball Super"
+  platform: joyn
+  url: https://www.joyn.de/serien/dragon-ball-super-dpp50bwivlve
+  belegtAm: '2026-09-22'
+  zugang: kostenlos
+  beleg: 'Daniel mit Bild: kostenlos (AVOD), ProSieben-MAXX-Folgen seit 03.09.2026, laut Joyn Staffel 3 Folge 108–127; jede Folge rund 30 Tage abrufbar. JustWatch kennt das Angebot nicht (Stand 17.09.2026)'
+- anilistId: 223
+  title: "Dragon Ball"
+  platform: joyn
+  url: https://www.joyn.de/serien/dragonball
+  belegtAm: '2026-09-27'
+  zugang: kostenlos
+  beleg: 'JustWatch führt „Dragon Ball" bei Joyn als kostenlos mit Werbung (ADS), Abfrage 27.09.2026; die Folgen laufen seit 24.09.2026 Mo–Fr auf ProSieben MAXX und stehen danach rollend in der Mediathek. Joyn ist deutsch (Daniel, 02.09.2026)'
+- anilistId: 3199
+  title: "Tico: Ein toller Freund"
+  platform: joyn
+  url: https://www.joyn.de/serien/tico-ein-toller-freund-die-komplette-serie
+  belegtAm: '2026-11-04'
+  beleg: 'Adresse von Daniel (04.11.2026, 10:44). JustWatch führt Tico nur bei Amazon Video (Abruf 04.11.2026), Joyn selbst wird nicht abgerufen (Text- und Data-Mining-Vorbehalt); die Linkprüfung prüft die Adresse'
+
+# Monsuno Staffel 1 (13185): kostenlos auf YouTube, Daniel 02.10.2026. Staffel 2 und 3 haben keine deutsche Fassung.
+- anilistId: 13185
+  title: "Monsuno"
+  platform: youtube
+  url: https://www.youtube.com/playlist?list=PLGFlb1G8-ThNpiqdBrJZdVMG4V6MlTT74
+  belegtAm: '2026-10-02'
+  zugang: kostenlos
+  beleg: 'oEmbed: Playlist „Monsuno Staffel 1 | Deutsch/German“, Kanal „Monsuno Deutsch“ (@monsunodeutsch); erstes Video „Monsuno S1 E01 Clash | Deutsch/German“, passend zur ersten Nickelodeon-Sendung „Clash“ vom 02.06.2012 (fernsehserien.de). Daniel: alle 26 Folgen, ab Folge 1, 360p. Ob der Kanal offiziell ist, ist offen.'
+
+# Reborn as a Space Mercenary (186541): Prime führt den Titel über den Crunchyroll-Kanal. Daniel fand die Seite am
+# 11.10.2026 selbst bei Amazon; die Erweiterung hatte nie einen Auftrag, weil der Titel nur einen Prime-Termin (kein Weg) hatte.
+- anilistId: 186541
+  title: 'Reborn as a Space Mercenary: I Woke Up Piloting the Strongest Starship!'
+  platform: primevideo
+  kanal: Crunchyroll
+  url: https://www.amazon.de/gp/video/detail/B0HKFFGQ7F
+  belegtAm: '2026-10-11'
+  beleg: 'Daniel hat die Seite am 11.10.2026 bei Amazon gefunden (Kennung B0HKFFGQ7F). Anime2You (Artikel 1057488, 11.10.2026): „Stream: Prime Video, Crunchyroll", Sprache Deutsch und Japanisch (UT) — Prime ist hier der Crunchyroll-Kanal. Das Sprachurteil steht aus: Die Erweiterung prüft die Seite.'
+
+# Pluto TV (Anime2You 1066055 und 1068729, 31.10./06.11.2026): kostenlos mit Werbung, auf Abruf; die Adressen sind die im Artikel verlinkten Seiten.
+- anilistId: 97940
+  title: "Black Clover"
+  platform: plutotv
+  url: https://pluto.tv/gsa/shows/black-clover/
+  belegtAm: '2026-11-08'
+  zugang: kostenlos
+  beleg: 'Anime2You 1068729 (06.11.2026): „alle 51 Episoden mit deutscher Synchronisation verfügbar“ (erste Staffel); die im Artikel verlinkte Seite, von uns nicht abgerufen'
+
+- anilistId: 105333
+  title: "Dr. Stone"
+  platform: plutotv
+  url: https://pluto.tv/gsa/shows/dr-stone/
+  belegtAm: '2026-11-08'
+  zugang: kostenlos
+  beleg: 'Anime2You 1068729 (06.11.2026): erste Staffel „mit deutscher Sprachfassung auf Abruf“, 23 von 24 Folgen; die im Artikel verlinkte Seite, von uns nicht abgerufen'
+
+- anilistId: 47
+  title: "Akira"
+  platform: joyn
+  url: https://www.joyn.de/filme/akira
+  belegtAm: '2026-11-08'
+  zugang: abo
+  beleg: 'Anime2You 1069021 (08.11.2026): „Der Science-Fiction-Klassiker »Akira« aus dem Jahr 1988 kann ab sofort mit deutscher Synchronisation im kostenpflichtigen Plus-Abo von Joyn gestreamt werden“. JustWatch kennt das Angebot nicht (Stand 19.10.2026)'
+
+# Bakugan: Armored Alliance (116415): Seite bei RTL+, 16.11.2026 abgerufen. Sprachurteil offen, bis die Folgenliste gelesen ist
+# (die Seite nennt „104 Episoden“ zu „etwa 12 Minuten“; ob das den 52 Folgen des Bestands entspricht, ist nicht belegt).
+- anilistId: 116415
+  title: "Bakugan: Armored Alliance"
+  platform: rtlplus
+  url: https://plus.rtl.de/bakugan-armored-alliance-p_10406
+  belegtAm: '2026-11-16'
+  zugang: abo
+  beleg: 'plus.rtl.de (Abruf 16.11.2026, HTTP 200): TVSeries „Bakugan: Armored Alliance“, Beschreibung „Zweite Staffel der Animeserie Bakugan: Battle Planet“ (Battle Planet hat bei RTL+ eine eigene Seite, 108852); Seitenfeld „Deutschsprachige Erstausstrahlung 20. August 2020“ = deErstausgabe.von 2020-08-20 in titles.json. Die Folgenliste lädt per Skript und ist nicht gelesen: 52 Folgen laut titles.json ungeprüft gegen RTL+'
+
+# Yu-Gi-Oh! Zexal (10015) und Zexal II (15489) bei Prime (19.11.2026): drei deutsche Staffelseiten mit 49 + 49 + 48 = 146 Folgen, die beiden
+# AniList-Einträge haben je 73. Zuordnung an den deutschen Folgentiteln der Prime-Seiten gegen public/data/folgen/10015.json und 15489.json:
+# Staffel 1 = Zexal 1–49, Staffel 2 = Zexal 50–73 plus Zexal II 1–25 (geteilte Seite), Staffel 3 = Zexal II 26–73.
+- anilistId: 10015
+  title: "Yu-Gi-Oh! Zexal"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0H1R11K51
+  belegtAm: '2026-11-19'
+  zugang: abo
+  beleg: 'Prime-Staffel 1 (49 Folgen): Folgentitel „Yuma startet durch“ bis „Die letzte Prophezeiung“ gleich den deutschen Titeln der Zexal-Folgen 1–49 (prime_folge der Meldungskopie 19.11.2026, Seite B0H1R11K51)'
+- anilistId: 10015
+  title: "Yu-Gi-Oh! Zexal"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0GWMY6WCP
+  belegtAm: '2026-11-19'
+  zugang: abo
+  beleg: 'Prime-Staffel 2 (49 Folgen): Folgen 1–24 („Die Show beginnt“ …) gleich den deutschen Titeln der Zexal-Folgen 50–73, Folgen 25–49 gleich Zexal II 1–25 (Meldungskopie 19.11.2026, Seite B0GWMY6WCP)'
+- anilistId: 15489
+  title: "Yu-Gi-Oh! Zexal II"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0GWMY6WCP
+  belegtAm: '2026-11-19'
+  zugang: abo
+  beleg: 'Prime-Staffel 2 (49 Folgen): Folgen 25–49 gleich den deutschen Titeln der Zexal-II-Folgen 1–25 (Meldungskopie 19.11.2026, Seite B0GWMY6WCP); die Folgen 1–24 gehören Zexal'
+- anilistId: 15489
+  title: "Yu-Gi-Oh! Zexal II"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0H298L2X9
+  belegtAm: '2026-11-19'
+  zugang: abo
+  beleg: 'Prime-Staffel 3 (48 Folgen): „Duell in der Ruine“ bis „Zexal für immer“ gleich den deutschen Titeln der Zexal-II-Folgen 26–73 (Meldungskopie 19.11.2026, Seite B0H298L2X9)'
+
+# Pokémon Horizonte bei RTL+ (20.11.2026): eine Serienseite für alle vier deutschen Staffeln (AniList 158871 zählt sie durch, S1 = 1–45, S2 = 46–89, S3 = 90–136, S4 ab 137; Versatz 1234 gegen NR_GES der Wikipedia-Liste, 89 von 89 Titeln gleich).
+- anilistId: 158871
+  title: "Pokémon Horizonte"
+  platform: rtlplus
+  url: https://plus.rtl.de/pokemon-horizonte-die-serie-p_10142
+  belegtAm: '2026-11-20'
+  zugang: abo
+  beleg: 'plus.rtl.de (Abruf 20.11.2026, HTTP 200): TVSeries „Pokémon Horizonte: Die Serie“, Staffelwähler mit totalItems 45 (Staffel 1), 44 (Staffel 2), 47 (Staffel 3) und 1 (Staffel 4) = die deutschen Staffelgrößen der Wikipedia-Episodenliste und der TOGGO-Schnittstelle (data/toggo.json, Serie VSE292: 45, 44, 47); Folge 1 der Staffel 4 („Eine Welt voller Abenteuer“, availabilityStarts 2026-11-20, Abo)'
+
+# Bakugan: Evolutions (146885) und Geogan Rising (131096) bei RTL+ (24.11.2026): beide standen seit dem Katalogabgleich vom 30.08.2026 in
+# data/rtlplus-katalog.json (Gattung „video“, kein Hörbuch), aber ohne Weg im Titel (kein-weg). Sprachurteil offen wie bei Armored Alliance:
+# der Katalog belegt das Führen des Titels, nicht die Sprache, und die Folgenlisten sind nicht gelesen.
+- anilistId: 146885
+  title: "Bakugan: Evolutions"
+  platform: rtlplus
+  url: https://plus.rtl.de/bakugan-evolutions-p_8016
+  belegtAm: '2026-11-24'
+  zugang: abo
+  beleg: 'RTL+-Programm-Sitemap, abgeglichen am 30.08.2026 (data/rtlplus-katalog.json, Eintrag 146885, Gattung „video“): Seitentitel „Bakugan: Evolutions“, Slug bakugan-evolutions-p_8016. Direktabruf am 24.11.2026 nicht möglich (plus.rtl.de ist aus dieser Sitzung gesperrt); Wortlaut und Sprache nicht gelesen'
+- anilistId: 131096
+  title: "Bakugan: Geogan Rising"
+  platform: rtlplus
+  url: https://plus.rtl.de/bakugan-geogan-rising-p_5148
+  belegtAm: '2026-11-24'
+  zugang: abo
+  beleg: 'RTL+-Programm-Sitemap, abgeglichen am 30.08.2026 (data/rtlplus-katalog.json, Eintrag 131096, Gattung „video“): Seitentitel „Bakugan: Geogan Rising“, Slug bakugan-geogan-rising-p_5148. Direktabruf am 24.11.2026 nicht möglich (plus.rtl.de ist aus dieser Sitzung gesperrt); Wortlaut und Sprache nicht gelesen'

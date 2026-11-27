@@ -1,0 +1,6 @@
+[
+  { "name": "Kontrolle (unmutiert)", "aenderungen": [], "tests": ["npx tsx tools/worker-amazon-zahl-gleich.test.ts"] },
+  { "name": "Amazon-Knopf: Karten nicht an den Text gegeben", "aenderungen": [{ "datei": "extension/amazon.js", "suche": "akPrimeKnopfText(offen, suchen, veraltet, karten)", "ersetze": "akPrimeKnopfText(offen, suchen, veraltet)" }], "tests": ["npx tsx tools/worker-amazon-zahl-gleich.test.ts"] },
+  { "name": "Amazon-Knopf: nur Karten offen gilt als alles geprüft", "aenderungen": [{ "datei": "extension/prime-stand-ziele.js", "suche": "if (!offen && !suchen && !karten)", "ersetze": "if (!offen && !suchen)" }], "tests": ["npx tsx tools/worker-amazon-zahl-gleich.test.ts"] },
+  { "name": "Amazon-Knopf: Karten nicht als eigener Teil", "aenderungen": [{ "datei": "extension/prime-stand-ziele.js", "suche": "karten && `${karten} gewählte Treffer`, suchen &&", "ersetze": "suchen &&" }], "tests": ["npx tsx tools/worker-amazon-zahl-gleich.test.ts"] }
+]

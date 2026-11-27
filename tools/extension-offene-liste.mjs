@@ -1,0 +1,464 @@
+/**
+ * Die Liste der Netflix-Titel, bei denen eine Prüfung noch etwas bringt.
+ *
+ * Ohne sie meldete die Erweiterung **jede** Netflix-Seite: Am 22.08.2026 kam
+ * ein Befund zu „Heroes" an, während Daniel dort einfach eine Serie sah. Sein
+ * Urteil: „die extension stört beim gucken und will ich da nicht sehen."
+ *
+ * Aufgenommen wird nur, wo die Antwort fehlt — ein Titel, dessen Synchro schon
+ * belegt ist, braucht keinen Knopf mehr.
+ *
+ * Je Adresse steht dabei, **welche Folgen** sich lohnen. Denn eine Netflix-Seite
+ * bedient oft mehrere unserer Staffeln: „My Hero Academia" führt sieben unter
+ * einer Adresse. Wer dort nur die erste Folge prüft, weiß nichts über Staffel 7
+ * — und genau dort hört die deutsche Fassung auf.
+ *
+ * Empfohlen werden **erste und letzte Folge je Staffel**: Sind beide gleich,
+ * ist die Staffel einheitlich; weichen sie ab, liegt die Grenze dazwischen und
+ * wird gesucht.
+ *
+ * Aufruf: node tools/extension-offene-liste.mjs
+ */
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import yaml from 'js-yaml'
+import { resolve, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+import { blockStand } from './extension-block.mjs'
+import { ergaenzeZweiteKennungen, ladeZusatz } from './netflix-zweite-kennung.mjs'
+import { verdachtHinweis, verdachtsfaelle } from './verdacht.mjs'
+import { ausgeblendet, brauchtUrteil, eintragsInfo, ladeBestand, ladeCartoons, nachRang, wartet } from './pruef-bestand.mjs'
+
+// AK_ROOT: Kulissentest (tools/pruefliste-asid.test.mjs) lässt den echten Lauf in einem Wegwerf-Ordner arbeiten.
+const wurzel = process.env.AK_ROOT ?? resolve(dirname(fileURLToPath(import.meta.url)), '..')
+/** Verweise, denen eine zweite Quelle widerspricht — sie gehören auf die Liste. */
+const verdaechtig = verdachtsfaelle(wurzel, 'netflix')
+const titel = [...ladeBestand(wurzel), ...ladeCartoons(wurzel)]
+
+/**
+ * Die Kennung aus einer Netflix-Adresse — `/title/70302573` → `70302573`.
+ *
+ * **`/watch/` zählt mit.** Zwei Verweise im Bestand tragen eine Player-Adresse
+ * (die beiden Fate-Filme); ohne diese Form fehlten sie in der Liste der
+ * Erweiterung, während die Statusanzeige sie als offen zählte. Auf Daniels
+ * Bildschirm sah das am 06.09.2026 so aus: Pille mit zwei offenen Verweisen,
+ * Klick führt ins Leere, Erweiterung still.
+ *
+ * Bei einer Serie meint die Zahl hinter `/watch/` eine **Folge**, hinter
+ * `/title/` die **Reihe** — hier sind es Filme, wo das zusammenfällt.
+ */
+function kennung(url) {
+  return /\/(?:title|watch)\/(\d+)/.exec(url)?.[1]
+}
+
+/** Reihenfolge der Staffeln: japanische Erstausstrahlung, nicht AniList-Kennung. */
+const JAHRESZEIT = { WINTER: 0, SPRING: 1, SUMMER: 2, FALL: 3 }
+function vergleiche(a, b) {
+  return (a.jpYear ?? 0) - (b.jpYear ?? 0) || (JAHRESZEIT[a.jpSeason] ?? 0) - (JAHRESZEIT[b.jpSeason] ?? 0)
+}
+
+/** Alle unsere Einträge je Netflix-Adresse — auch die schon beantworteten. */
+const jeAdresse = new Map()
+for (const t of titel) {
+  for (const s of t.streams ?? []) {
+    if (s.platform !== 'netflix') continue
+    const id = kennung(s.url)
+    if (!id || ausgeblendet(t, 'netflix', s)) continue
+    jeAdresse.set(id, [...(jeAdresse.get(id) ?? []), { t, dub: s.dub, wartet: wartet(wurzel, t, 'netflix', s) }])
+  }
+}
+/* Nennen aniSearch oder JustWatch eine andere Kennung, ist auch sie ein Prüfziel. */
+ergaenzeZweiteKennungen(jeAdresse, ladeZusatz(titel, wurzel))
+
+/**
+ * Was der Anbieter über seine eigenen Staffeln gesagt hat.
+ *
+ * Sie schlägt unsere Aufteilung, und zwar in beide Richtungen:
+ *
+ * - Netflix führt BAKI-DOU als **eine** Staffel mit 25 Folgen, wir als zwei mit
+ *   13 und 12. Die Empfehlung „2e01" schickte Daniel zu einer Staffel, die es
+ *   dort nicht gibt (22.08.2026).
+ * - Bei My Hero Academia zählt Netflix über alle Staffeln durch: Staffel 7
+ *   beginnt bei Folge 146. Eine Empfehlung „7e01" wäre ins Leere gegangen, und
+ *   der Vermerk nach der Meldung („7e170") hätte nie zu ihr gepasst — deshalb
+ *   färbte sich nichts ein.
+ *
+ * Bekannt ist sie erst nach der ersten Prüfung eines Titels. Bis dahin bleibt
+ * unsere Aufteilung die beste Schätzung.
+ */
+const struktur = existsSync(resolve(wurzel, 'data/anbieter-staffeln.json'))
+  ? JSON.parse(readFileSync(resolve(wurzel, 'data/anbieter-staffeln.json'), 'utf8'))
+  : {}
+
+/*
+  **Die aniSearch-Kennung gehört auch in die Netflix- und Disney-Liste.**
+
+  Daniel am 28.08.2026: „kannst du die anilist links mit anisearch ersetzen in
+  der melde extension?" — Bei Prime steckte der Verweis schon im Prüfkasten, hier
+  gab es gar keinen. aniSearch führt deutsche Titel, deutsche Beschreibungen und
+  eine Episodenliste mit deutschen Folgentiteln; bei einer Reihe, die der
+  Anbieter anders schneidet als wir, ist das die Seite, die es klärt.
+  Die Kennung kommt aus dem Titel selbst (`t.anisearchId`): `data/anisearch.json` kennt nur Titel mit AniList-Schlüssel.
+*/
+
+/**
+ * **Drei Zustände je Folge, eine Quelle**.
+ *
+ * Aus dem Bestand kommt je Eintrag, was er über seine Folgen weiß:
+ *
+ * - `melden`: kein Urteil im Datensatz
+ * - `erneut`: ein Urteil, dem eine zweite Quelle widerspricht
+ * - `belegt`: ein Urteil — mit Datum, wo ein Handbeleg es trägt
+ *
+ * „Gemeldet" ergänzt die Erweiterung aus dem Briefkasten, je Folge mit Datum.
+ * Dialog und Knopf lesen beides über dieselbe Funktion (`folgeZustand()` in
+ * `melder.js`); keiner von beiden rechnet einen eigenen Stand.
+ */
+const belegtAm = (() => {
+  try {
+    const liste = yaml.load(readFileSync(resolve(wurzel, 'data/dub-confirmed.yaml'), 'utf8')) ?? []
+    const raus = new Map()
+    for (const b of liste) {
+      if (b?.platform !== 'netflix' || !b.checkedAt) continue
+      if (b.dub === undefined && b.available === undefined) continue
+      const alt = raus.get(b.anilistId)
+      if (!alt || String(b.checkedAt) > alt) raus.set(b.anilistId, String(b.checkedAt))
+    }
+    return raus
+  } catch {
+    return new Map()
+  }
+})()
+function zustandVon(e) {
+  if (e.dub === undefined) return { zustand: 'melden' }
+  /*
+    Seit wann: Eine Meldung danach löst das „erneut“ ab, eine ältere nicht.
+    Maßgeblich ist das `seit` des Falls, nicht die Erzeugung der Liste — sonst
+    zählt eine Meldung, die schon vor dem Neubau kam, nicht mehr, und der Titel
+    steht auf ↻, bis der Zuordner den Beleg geschrieben hat (My Hero Academia
+    S1, 25.09.2026: gemeldet am 24., Liste neu erzeugt am 25.).
+    Ein Fall ohne Datum (Anbieter-Zählung) wird von jeder Meldung abgelöst:
+    Er braucht nur die Folgentitel, und die bringt jede Meldung mit.
+  */
+  const fall = verdaechtig.get(e.t.id)
+  if (fall) return { zustand: 'erneut', seit: fall.seit ?? null }
+  return { zustand: 'belegt', am: belegtAm.get(e.t.id) ?? null }
+}
+
+const offen = {}
+for (const [id, eintraege] of nachRang(jeAdresse, 'netflix')) {
+  /**
+   * Gefragt wird nur nach dem, was auch angezeigt wird.
+   *
+   * Sonst steht ein Titel auf der Liste, weil eine OVA offen ist, zeigt aber nur
+   * Serienstaffeln — und die sind alle beantwortet. Bei Haikyu!! war genau das
+   * der Fall: vier abgehakte Staffeln, und trotzdem eine Zeile mit nichts zu tun.
+   *
+   * Netflix zählt die OVAs ohnehin als Folgen der Staffeln mit: Es meldet
+   * 26 + 26 + 11 + 27 = 90 Folgen, unsere fünf Fernsehstaffeln haben 85, die
+   * vier OVA-Einträge zusammen fünf. Wer die Staffel prüft, hat die OVA mit
+   * geprüft.
+   */
+  const serien = eintraege.filter((e) => e.t.format === 'TV' || e.t.format === 'ONA')
+  const zuZeigen = serien.length ? serien : eintraege
+  /*
+    **Ein Verdachtsfall hat ein Urteil — es ist nur womöglich überholt.**
+
+    Der Grundfilter zeigt, was **kein** Urteil hat. Wer in
+    `data/tonspur-verdacht.json` steht, hat eines, dem eine zweite Quelle
+    widerspricht; er gehört genauso auf die Liste.
+  */
+  const verdacht = eintraege.map((e) => verdaechtig.get(e.t.id)).find(Boolean)
+  /*
+    **Gefragt wird nach allem, was offen ist — angezeigt wird es seit heute auch.**
+
+    Der Absatz darüber stimmt für die Zeile, die daraus entsteht: Vier abgehakte
+    Staffeln und keine anklickbare Folge waren eine Zumutung. Er hat aber vier
+    Haikyu!!-OVAs **dauerhaft unsichtbar** gemacht: Sie standen ohne Urteil im
+    Datensatz, tauchten in keiner Liste auf, und niemand konnte sie prüfen
+    (gemessen 09.09.2026 — von neun offenen Netflix-Verweisen sind fünf so
+    entstanden).
+
+    Seit heute bekommen überzählige Einträge eigene Zeilen **mit ihrem Namen**
+    (`ausserhalb: true`), und damit ist der alte Einwand erledigt: Es steht dort
+    „Haikyu!! Lev ist hier!", nicht „Film 2". Der Vorfilter darf sie deshalb
+    nicht mehr aussortieren.
+  */
+  if (!eintraege.some(brauchtUrteil) && !verdacht) continue
+  /**
+   * OVAs und Specials fallen weg, wo Serienstaffeln dieselbe Adresse haben.
+   *
+   * An Haikyu!!s Netflix-Seite hängen neun unserer Einträge: fünf Fernsehstaffeln
+   * und vier OVAs dazwischen. Netflix führt die OVAs nicht als eigene Staffeln —
+   * es zeigt fünf. In der Liste standen sie trotzdem, und weil sie auf den
+   * Positionen 2, 4, 6 und 8 lagen, hieß es dort „Film 2, Film 4, Film 6,
+   * Film 8" bei einer Serie.
+   *
+   * Ein Titel, an dessen Adresse **nur** Filme hängen, bleibt unberührt — dort
+   * ist der Film die Sache selbst, nicht das Beiwerk.
+   */
+  const sortiert = [...zuZeigen].sort((a, b) => vergleiche(a.t, b.t))
+  const gemeldet = struktur[id]?.staffeln
+  if (gemeldet?.length) {
+    // Der Anbieter hat selbst gesagt, wie er teilt — dann gilt seine Zählung,
+    // denn genau die steht im Player und landet später im Vermerk.
+    offen[id] = {
+      ...(verdacht ? { wiedervorlage: verdachtHinweis(verdacht) } : {}),
+      titel: sortiert[0].t.titleDe ?? sortiert[0].t.titleEn ?? sortiert[0].t.titleRomaji ?? '',
+      asId: sortiert[0].t.anisearchId ?? null,
+      asTitel: sortiert[0].t.id,
+      staffeln: gemeldet.map((s, i) => ({
+        nr: s.seq,
+        name: s.name ?? `Staffel ${s.seq}`,
+        folgen: s.folgen,
+        // Die Nummer der ersten Folge — bei durchgezählten Reihen nicht 1.
+        erste: s.erste ?? 1,
+        film: eintraege.length === 1 && eintraege[0].t.format === 'MOVIE',
+        /**
+         * Ob diese Staffel noch offen ist, weiß nur unser Datensatz.
+         *
+         * Der Anbieter sagt, **wie** er teilt — nicht, was wir schon geprüft
+         * haben. Ohne diesen Abgleich standen bei Aggretsuko plötzlich wieder
+         * alle fünf Staffeln da, obwohl zwei davon belegt sind (22.08.2026).
+         *
+         * Gepaart wird der Reihe nach. Reicht unsere Liste nicht so weit,
+         * gilt die Staffel als offen: Lieber einmal zu viel gefragt als eine
+         * Lücke, von der niemand weiß.
+         */
+        ...blockStand(sortiert, i, verdaechtig, zustandVon),
+      })),
+      laut: 'anbieter',
+    }
+    /**
+     * **Was über die Zählung des Anbieters hinausgeht, verschwindet sonst
+     * spurlos.**
+     *
+     * Die Paarung oben läuft der Reihe nach: Netflix nennt fünf Staffeln, wir
+     * führen an derselben Adresse neun Einträge (fünf Fernsehstaffeln und vier
+     * OVAs dazwischen). Die Einträge ab Position sechs wurden nie betrachtet —
+     * weder gepaart noch angehängt. Waren die ersten fünf beantwortet, fiel der
+     * Titel ganz aus der Liste.
+     *
+     * Gemessen am 09.09.2026: Die Netflix-Prüfliste war **leer**, während der
+     * Datensatz neun Verweise ohne Sprachurteil führte — fünf davon an dieser
+     * einen Haikyu!!-Adresse. Niemand konnte sie prüfen, und niemandem fiel es
+     * auf: Eine leere Liste sieht aus wie erledigte Arbeit.
+     *
+     * Sie kommen deshalb als eigene Zeilen dazu, mit **unserer** Zählung und
+     * ihrer Titel-Kennung. Der Anbieter kennt sie nicht als Staffel; die
+     * Erweiterung bietet dafür seit 4.17.0 das ✕ an der Pille, das titelgenau
+     * meldet.
+     */
+    /*
+      **Gezählt wird gegen alle Einträge, nicht gegen die angezeigten.**
+
+      `sortiert` enthält nur Serien (`zuZeigen`) — die OVAs sind dort gar nicht
+      drin, und `slice()` darauf fand sie nie. Genau deshalb blieben die vier
+      Haikyu!!-OVAs unsichtbar, obwohl die Zeile daneben schon stand.
+    */
+    /**
+     * **Der Anbieter zählt kumulativ — und damit steht fest, wo unsere Titel liegen.**
+     *
+     * Daniel am 10.09.2026 an „Haikyu!! Lev ist hier!", mit vier Bildern: Er
+     * fand die OVA bei Netflix unter `/watch/81308427`, und der Zurück-Pfeil
+     * führte auf **Staffel 1, Folge 26**. Sie ist dort keine eigene Staffel —
+     * sie hängt am Ende der Staffel, zu der sie gehört.
+     *
+     * Damit ist die Paarung „Position gegen Position" widerlegt: Sie ordnete
+     * unsere Staffel 1 (25 Folgen) Netflix' Staffel 1 (26) zu und verglich die
+     * Zahlen nie. Bei Haikyu!! passte **keine** einzige Position — 25↔26,
+     * 25↔26, 10↔11, 13↔27 —, und die vier OVAs fielen als „überzählig" heraus.
+     *
+     * Die Rechnung, die es auflöst, stand seit dem 22.08.2026 als Kommentar
+     * zwanzig Zeilen weiter oben: „Netflix meldet 26 + 26 + 11 + 27 = 90
+     * Folgen, unsere Fernsehstaffeln haben 85, die vier OVA-Einträge zusammen
+     * fünf." Gezogen wurde daraus nur der Schluss, die OVAs zu verstecken.
+     *
+     * Jetzt wird gerechnet: Unsere Titel werden der Reihe nach in die
+     * Anbieter-Staffeln gefüllt. Geht eine Staffel **exakt** auf, ist die
+     * Zuordnung belegt, und jeder Titel kennt seine erste Folgennummer beim
+     * Anbieter — „Lev ist hier!" beginnt bei 26.
+     *
+     * Gemessen am 10.09.2026 über alle Netflix-Adressen mit Anbieterzählung:
+     * Bei Haikyu!! geht jede der vier Staffelgrenzen auf (25+1, 25+1, 10+1,
+     * 13+2+12), ebenso bei Hi Score Girl (12+3, 9), Dorohedoro (12+1, 11),
+     * BAKI-DOU (13+12) und Sailor Moon Eternal (1+1).
+     *
+     * **Geht die Rechnung nicht auf, wird nichts behauptet.** Dann bleibt es
+     * beim bisherigen Weg: eigene Zeile mit `ausserhalb: true`, die die
+     * Erweiterung mit dem ✕ „gibt es hier nicht" abschließen kann.
+     */
+    const reihenfolge = [...eintraege].sort((a, b) => vergleiche(a.t, b.t))
+    const verteilung = (() => {
+      const raus = new Map()
+      let i = 0
+      for (const st of gemeldet) {
+        const drin = []
+        let summe = 0
+        const soll = st.folgen ?? 0
+        while (i < reihenfolge.length && summe < soll) {
+          const e = reihenfolge[i]
+          const n = e.t.episodes ?? 0
+          /* Ein Titel, der über die Staffelgrenze hinausragt, wird nicht geteilt. */
+          if (!n || summe + n > soll) break
+          drin.push({ e, erste: summe + 1 })
+          summe += n
+          i++
+        }
+        /* Nur eine **exakt** gefüllte Staffel ist ein Beleg. */
+        if (summe !== soll || !drin.length) return null
+        /*
+          **Nebenausgaben hängt der Anbieter ans Ende, nicht an ihre
+          chronologische Stelle.**
+
+          Belegt an Haikyu!!, zweimal (Daniel, 12.09.2026, mit Bild aus dem
+          Player): Netflix' Staffel 4 hat 27 Folgen — 1 bis 13 „TO THE TOP",
+          14 bis 25 „Part 2", und **26 und 27** die OVA „An Land vs. In der
+          Luft / Der ‚Weg' des Balls". Die Rechnung setzte sie auf 14 und 15,
+          weil sie 2020 zwischen den beiden Cours erschien; auf Position 14
+          steht dort aber „Rhythmus". Dieselbe Bauform in Staffel 1: „Lev ist
+          hier!" ist Folge 26 hinter 25 regulären.
+
+          Die Summe ändert sich dadurch nicht, nur die Reihenfolge **innerhalb**
+          einer Anbieterstaffel — die Zuordnung bleibt also belegt, und nur die
+          Folgennummern rücken an die richtige Stelle. Sortiert wird stabil,
+          damit mehrere Nebenausgaben untereinander chronologisch bleiben.
+        */
+        const beiwerk = (paar) => (['OVA', 'SPECIAL', 'MOVIE'].includes(paar.e.t.format ?? '') ? 1 : 0)
+        drin.sort((a, b) => beiwerk(a) - beiwerk(b))
+        let laufend = 1
+        for (const eintrag of drin) {
+          eintrag.erste = laufend
+          laufend += eintrag.e.t.episodes ?? 0
+        }
+        raus.set(st.seq, drin)
+      }
+      /* Bleibt einer unserer Titel übrig, deckt die Rechnung ihn nicht ab. */
+      return i === reihenfolge.length ? raus : null
+    })()
+
+    if (verteilung) {
+      /*
+        **Die Zeilen werden neu gebaut, nicht ergänzt.** Die Paarung oben hat
+        jeder Anbieter-Staffel genau einen unserer Titel zugeschrieben; die
+        Rechnung weiß es besser und kennt zu jeder Staffel alle.
+      */
+      offen[id].staffeln = []
+      for (const st of gemeldet) {
+        for (const { e, erste } of verteilung.get(st.seq) ?? []) {
+          const einzeln = (verteilung.get(st.seq) ?? []).length > 1
+          offen[id].staffeln.push({
+            nr: st.seq,
+            /*
+              Steht nur ein Titel in der Staffel, ist der Name des Anbieters der
+              richtige — er steht so im Player. Teilen sich mehrere die Staffel,
+              sagt erst unser Name, welcher gemeint ist.
+            */
+            name: einzeln
+              ? (e.t.titleDe ?? e.t.titleEn ?? e.t.titleRomaji ?? `Staffel ${st.seq}`)
+              : (st.name ?? `Staffel ${st.seq}`),
+            folgen: e.t.episodes ?? 1,
+            erste,
+            film: e.t.format === 'MOVIE',
+            id: e.t.id,
+            offen: brauchtUrteil(e) || verdaechtig.has(e.t.id),
+            ...zustandVon(e),
+          })
+        }
+      }
+      offen[id].laut = 'anbieter-gerechnet'
+      if (!offen[id].staffeln.some((st) => st.offen)) delete offen[id]
+      continue
+    }
+
+    const gepaart = new Set(sortiert.slice(0, gemeldet.length).map((e) => e.t.id))
+    const ueberzaehlig = reihenfolge
+      .filter((e) => !gepaart.has(e.t.id))
+      .filter((e) => brauchtUrteil(e) || verdaechtig.has(e.t.id))
+    for (const [j, e] of ueberzaehlig.entries()) {
+      offen[id].staffeln.push({
+        nr: gemeldet.length + j + 1,
+        name: e.t.titleDe ?? e.t.titleEn ?? e.t.titleRomaji ?? `Eintrag ${gemeldet.length + j + 1}`,
+        folgen: e.t.episodes ?? 1,
+        erste: 1,
+        film: e.t.format === 'MOVIE',
+        id: e.t.id,
+        offen: true,
+        ...zustandVon(e),
+        ausserhalb: true,
+      })
+    }
+    /**
+     * Bleibt nach dem Abgleich keine offene Staffel, gehört der Titel nicht auf
+     * die Liste.
+     *
+     * Der Fall entsteht, wo der Anbieter gröber teilt als wir: Netflix führt
+     * BAKI-DOU als **eine** Staffel, wir als zwei — die erste ist beantwortet,
+     * die zweite hat bei Netflix keine Entsprechung. Auf der Liste stand dann
+     * eine Zeile ohne eine einzige Folge zum Anklicken (22.08.2026).
+     */
+    if (!offen[id].staffeln.some((s) => s.offen)) delete offen[id]
+    continue
+  }
+  offen[id] = {
+    titel: sortiert[0].t.titleDe ?? sortiert[0].t.titleEn ?? sortiert[0].t.titleRomaji ?? '',
+    asId: sortiert[0].t.anisearchId ?? null,
+    asTitel: sortiert[0].t.id,
+    ...eintragsInfo(sortiert[0].t, 'netflix', sortiert[0]),
+    staffeln: sortiert.map((e, i) => ({
+      nr: i + 1,
+      /*
+        **Die Kennung des Werks — sonst muss der Bau später raten.**
+
+        Eine Meldung nennt bisher nur die Adresse, und Anbieter führen denselben
+        Anime unter mehreren davon (Jujutsu Kaisen meldete sich als
+        `title/80237957`, bei uns steht `title/81278456`). Findet der Bau die
+        gemeldete Adresse nicht im Datensatz, fällt er auf einen Namensvergleich
+        zurück, der ausdrücklich kein Beleg ist — am 02.09.2026 warteten so 36
+        Meldungen in `daniel-zum-abarbeiten/listen/11-meldungen-ohne-zuordnung.md` auf
+        Daniels Bestätigung.
+
+        Dabei steht die Antwort fest, bevor die Meldung entsteht: Wer aus der
+        Prüfliste öffnet, arbeitet **diesen** Auftrag ab. Die Kennung reist
+        deshalb je Staffel mit, nicht je Adresse — bei einer Serienseite mit
+        mehreren Staffeln ist die Adresse für alle dieselbe, das Werk nicht.
+      */
+      id: e.t?.id ?? e.id ?? null,
+      name: e.t.titleDe ?? e.t.titleEn ?? e.t.titleRomaji ?? '',
+      folgen: e.t.episodes ?? 0,
+      // Ein Film hat keine Folge zum Auswählen — man startet ihn einfach.
+      // Ohne diese Angabe stand in der Liste „1e01".
+      // Nur ein echter Film ist ein Film. OVAs und Specials sind meist Folgen
+      // einer Staffel und werden oben ohnehin ausgefiltert, wo eine Serie
+      // dieselbe Adresse hat.
+      //
+      // **Bis auf das Special, das allein auf seiner Seite steht.** „Pokémon:
+      // Blauer Himmel in der Ferne!" ist ein SPECIAL mit einer Folge und einer
+      // eigenen Netflix-Adresse; in der Liste stand „offen: E1", und die Folge
+      // gab es nicht zum Anklicken. Wo eine Serie dieselbe
+      // Adresse hat, greift der Filter oben — was hier ankommt, steht für sich
+      // und wird wie ein Film bedient. `=== 1` und nicht `<= 1`: „ONE PIECE"
+      // läuft und trägt `folgen: 0`, ist aber eine Serie (22.08.2026).
+      film: e.t.format === 'MOVIE' || (e.t.format !== 'TV' && e.t.episodes === 1),
+      // Was hier schon beantwortet ist, muss niemand mehr anklicken.
+      offen: brauchtUrteil(e) || verdaechtig.has(e.t.id),
+      ...zustandVon(e),
+    })),
+  }
+}
+
+const ziel = resolve(wurzel, 'extension/offene-netflix.js')
+/**
+ * Als Skript, nicht als JSON.
+ *
+ * Der Weg über `fetch(chrome.runtime.getURL(…))` scheiterte an Netflix'
+ * Sicherheitsregeln: Die Seite lässt keine Abrufe auf `chrome-extension://` zu,
+ * und die Erweiterung blieb stumm — kein Knopf, keine Meldung (Daniel,
+ * 22.08.2026, mit Bild von netflix.com/browse).
+ *
+ * Ein Content-Script wird dagegen vom Browser selbst geladen, bevor die Seite
+ * etwas dazu sagen kann. Daran kommt keine Regel der Seite heran.
+ */
+writeFileSync(ziel, 'globalThis.AK_OFFENE_TITEL = ' + JSON.stringify(offen) + '\n')
+const staffeln = Object.values(offen).reduce((n, o) => n + o.staffeln.filter((s) => s.offen).length, 0)
+console.log(`${Object.keys(offen).length} Netflix-Adressen mit ${staffeln} offenen Staffeln`)

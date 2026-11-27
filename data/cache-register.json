@@ -1,0 +1,110 @@
+{
+  "_hinweis": "Register aller Dateien unter data/cache/ (liegt nicht im Repo, nur Datenläufe befüllen sie). Geprüft von tools/check-cache-abhaengigkeit.mjs: Jede im Code genannte Cache-Datei muss hier stehen. Eine Handkorrektur gehört nach data/, nicht hierher. Stand der Messung: 08.10.2026.",
+  "dateien": {
+    "anilist-media.json": {
+      "schreiber": "pipeline/fetch.ts (npm run data:fetch)",
+      "laeufe": ["refresh-data.yml (täglich 04:00 UTC, speichert den Cache)", "refresh-weekly.yml, Job anilist (montags 05:00 UTC, speichert den Cache)"],
+      "intervall": "täglich",
+      "bauBraucht": true,
+      "fehlt": "Bau bricht ab, wenn auch anilist-by-id.json leer ist (01-quellen.ts)"
+    },
+    "anilist-by-id.json": {
+      "schreiber": "pipeline/fetch.ts (npm run data:fetch)",
+      "laeufe": ["refresh-data.yml (täglich 04:00 UTC, speichert den Cache)", "refresh-weekly.yml, Job anilist (montags 05:00 UTC, speichert den Cache)"],
+      "intervall": "täglich",
+      "bauBraucht": true,
+      "fehlt": "Bau bricht ab, wenn auch anilist-media.json leer ist (01-quellen.ts)"
+    },
+    "dub-confidence.json": {
+      "schreiber": "pipeline/fetch.ts (npm run data:fetch)",
+      "laeufe": ["refresh-data.yml (täglich 04:00 UTC, speichert den Cache)", "refresh-weekly.yml, Job anilist (montags 05:00 UTC, speichert den Cache)"],
+      "intervall": "täglich",
+      "bauBraucht": true,
+      "fehlt": "Rückfall auf {}: keine Synchro-Sicherheit aus dem Cache; der Bau meldet die Zahl (cache-stand.ts)"
+    },
+    "anilist-katalog.json": {
+      "schreiber": "pipeline/fetch-anilist-katalog.ts (npm run data:katalog)",
+      "laeufe": ["refresh-weekly.yml, Job anilist (montags 05:00 UTC, speichert den Cache)", "daten-auf-abruf.yml, Lauf data:katalog (auf Abruf)"],
+      "intervall": "wöchentlich",
+      "bauBraucht": true,
+      "fehlt": "ohne-synchro.json bleibt stehen (nebendateien.ts), Sendeplatz-Suche, Umzugs-Riegel und Eltern-Kanten laufen leer; der Bau meldet die Zahl (cache-stand.ts)"
+    },
+    "kinocheck-kanal.json": {
+      "schreiber": "pipeline/fetch-trailer.ts (npm run data:trailer)",
+      "laeufe": ["refresh-data.yml (täglich 04:00 UTC)", "daten-auf-abruf.yml, Lauf data:trailer (auf Abruf)"],
+      "intervall": "täglich",
+      "bauBraucht": false,
+      "fehlt": "Nur der Trailer-Lauf liest ihn (eigener Zwischenstand); fehlt er, holt der Lauf den Kanal neu"
+    },
+    "tmdb-geteilte-filme.json": {
+      "schreiber": "pipeline/bau/01-quellen.ts (ladeQuellen, schreibeGeteilteFilme)",
+      "laeufe": ["bestand-bauen.yml (je Bauzyklus)", "pr-pruefung.yml, Job PR-Datenbau (je PR-Bau)"],
+      "intervall": "je Bau",
+      "bauBraucht": false,
+      "fehlt": "Nur die Bestandsprüfung check:anilist-bestand liest sie; fehlt sie, rechnet diese die reine Film-Regel auf data/tmdb-titles.json neu"
+    },
+    "quittung-offen": {
+      "schreiber": "pipeline/lib/spaeter-quittieren.ts (Merker von fetch-pruefungen, fetch-rohfolgen, fetch-vorfaelle)",
+      "laeufe": ["bestand-bauen.yml (je Bauzyklus; tools/commit-data.sh verschiebt nach grünem Commit nach quittung-frei)"],
+      "intervall": "je Bauzyklus",
+      "bauBraucht": false,
+      "fehlt": "Kurzlebiger Merkzettel innerhalb eines Laufs; ohne ihn wird nichts abgehakt"
+    },
+    "quittung-frei": {
+      "schreiber": "tools/commit-data.sh (quittungen_freigeben)",
+      "laeufe": ["bestand-bauen.yml (je Bauzyklus; die Quittungsschritte nach dem Commit leeren ihn)"],
+      "intervall": "je Bauzyklus",
+      "bauBraucht": false,
+      "fehlt": "Vor dem grünen Commit leer; die Quittungsschritte schicken dann nichts ab"
+    },
+    "anisearch-titelliste.json": {
+      "schreiber": "pipeline/fetch-anisearch-katalog-abgleich.ts (npm run data:anisearch-katalog-abgleich)",
+      "laeufe": ["von Hand (einmaliger Abgleich 11.10.2026; kein Workflow)"],
+      "intervall": "höchstens täglich (Limit mit Token: 1 Abruf je Stunde)",
+      "bauBraucht": false,
+      "fehlt": "Der Abgleich holt sie neu"
+    },
+    "anisearch-abgleich-eintraege.json": {
+      "schreiber": "pipeline/fetch-anisearch-katalog-abgleich.ts (npm run data:anisearch-katalog-abgleich)",
+      "laeufe": ["von Hand (einmaliger Abgleich 11.10.2026; kein Workflow)"],
+      "intervall": "bei Bedarf",
+      "bauBraucht": false,
+      "fehlt": "Der Abgleich holt die Einzelabrufe neu (zehn je Abruf, 5,5 s Pause)"
+    },
+    "anilist-abgleich-merkmale.json": {
+      "schreiber": "pipeline/fetch-anisearch-katalog-abgleich.ts (npm run data:anisearch-katalog-abgleich)",
+      "laeufe": ["von Hand (einmaliger Abgleich 11.10.2026; kein Workflow)"],
+      "intervall": "eine Woche (Länge und Endtag der unsicheren AniList-Titel)",
+      "bauBraucht": false,
+      "fehlt": "Der Abgleich holt sie neu (eine AniList-Abfrage je 50 Titel)"
+    },
+    "covers": {
+      "schreiber": "pipeline/build-og.ts (npm run data:og)",
+      "laeufe": ["bestand-bauen.yml (lädt bei Bedarf nach)"],
+      "intervall": "je Bauzyklus",
+      "bauBraucht": false,
+      "fehlt": "Wird bei Bedarf neu geladen"
+    },
+    "og-schriften": {
+      "schreiber": "pipeline/lib/og-schriften.ts",
+      "laeufe": ["bestand-bauen.yml (packt bei Bedarf um)"],
+      "intervall": "je Bauzyklus",
+      "bauBraucht": false,
+      "fehlt": "Wird bei Bedarf neu erzeugt"
+    },
+    "offizielle-news": {
+      "schreiber": "pipeline/fetch-offizielle-news.ts (npm run data:offizielle-news)",
+      "laeufe": ["offizielle-news.yml (täglich, Wecker-Eintrag offen; Actions-Cache offizielle-news-…)"],
+      "intervall": "täglich",
+      "bauBraucht": false,
+      "fehlt": "Stand und Rohantworten fehlen: der Lauf liest alle Hosts neu (höchstens 30 je Lauf) und holt die robots.txt neu; der Bau liest den Ordner nicht"
+    },
+    "handlung-fakten": {
+      "schreiber": "tools/handlung-fakten.ts (npx tsx tools/handlung-fakten.ts)",
+      "laeufe": ["keiner: nur von Hand, wenn eigene Handlungstexte entstehen (Wikipedia-Seiten, Faktenkarten, Quelltexte; nie im Repo)"],
+      "intervall": "bei Bedarf, von Hand",
+      "bauBraucht": false,
+      "fehlt": "Wird beim nächsten Lauf neu geholt; der Bau liest den Ordner nicht"
+    }
+  }
+}

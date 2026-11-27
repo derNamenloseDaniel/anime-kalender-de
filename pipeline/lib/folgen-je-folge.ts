@@ -1,0 +1,250 @@
+/**
+ * **Stufe 2: Zuordnung je Plattform-Folge** (22.09.2026, `docs/konzept-meldungen-architektur.md`).
+ *
+ * Schlüssel ist `plattform:kennung` — Prime die Folgen-ASIN, Netflix und Disney+ die gti. Nicht die
+ * gemeldete Adresse: Yamada-kun kam über zwei Adressen, dieselben zwölf Folgen standen damit
+ * zweimal da.
+ *
+ * **Kandidaten** sind alle `titel_id`, unter denen die Folge gemeldet wurde, die Titel mit einem Weg
+ * zur gemeldeten Adresse und die Titel, denen die Adresse früher zugeordnet war. `titel_id` ist
+ * dabei nur ein Kandidat, keine Antwort: Sie beschreibt den Auftrag, und ein Suchauftrag kann auf
+ * die Seite einer anderen Staffel führen (Gegenprobe 22.09.2026: 173 Folgen, alle an
+ * Staffelgrenzen, in der Stichprobe lag jedes Mal der Anker richtig).
+ *
+ * **Anker** je Kandidat: aniSearch-Folgentitel, sonst die TMDB-Staffel mit passender Folgenzahl —
+ * dieselben Regeln wie `fetch-rohfolgen.ts` (`ordneZu`: Datum, dann Titel, nie die Position).
+ *
+ * Ergebnis je Folge: `titel` + `folge` (genau ein Kandidat trifft), nur `titel` (einziger
+ * Kandidat, kein Anker trifft), sonst offen mit den Kandidaten. Geraten wird nicht.
+ */
+import { adressKern } from './dub-confirmed.ts'
+import { ohneStaffelMarke } from '../../shared/adresse-kern.ts'
+import {
+  ausAnisearch,
+  englischeSchreibweisen,
+  ordneZu,
+  type AsFolgeRoh,
+  type TmdbFolge,
+} from '../../shared/folgen-zuordnung.ts'
+import { passendeStaffel } from '../../shared/folgen-anker.ts'
+import type { Title } from '../../shared/types.ts'
+import { korrigiereNachTeiljahr, type RestFolge } from './folgen-teile.ts'
+
+/** Eine Beobachtung aus `prime_folge`, wie `?rohfolgen=1&alle=1` sie liefert. */
+export interface Beobachtung {
+  id: number
+  plattform: string
+  url: string
+  asin: string | null
+  gti: string | null
+  nummer: number | null
+  titel: string | null
+  erschienen: string | null
+  titel_id: number | null
+  gemeldet_am: string
+  /** Die Seite (Amazon-Teil), auf der die Folge stand, und seine Staffelnummer bei Amazon. */
+  seiten_kennung?: string | null
+  staffel_nr?: number | null
+}
+
+export interface FolgenZuordnung {
+  /** Unser Titel — fehlt, wenn offen. */
+  titel?: number
+  /** Unsere Folgennummer in diesem Titel — fehlt, wenn nur der Titel feststeht. */
+  folge?: number
+  /** Woran es festgemacht wurde. */
+  grund: 'datum' | 'titel' | 'jahr' | 'einziger-kandidat' | 'offen' | 'ohne-kandidat' | 'strittig'
+  /** Bei offen und strittig: die Kandidaten, damit die Nachprüfung weiß, wo sie suchen muss. */
+  kandidaten?: number[]
+  /** Jüngste Beobachtung dieser Folge. */
+  gesehen: string
+}
+
+export interface Kontext {
+  titel: Map<number, Title>
+  tmdb: Record<string, { folgen: TmdbFolge[] }>
+  asFolgen: Record<string, { folgen: AsFolgeRoh[] }>
+  asKennung: Record<string, { anisearchId?: number }>
+  /** Adresskern → Titel, aus Wegen des Bestands und früheren Zuordnungen. */
+  jeAdresse: Map<string, Set<number>>
+  /** Adresskern → Serienname aus der Meldung zu dieser Adresse (`?rohfolgen=1&namen=1`). */
+  namenJeAdresse?: Map<string, string>
+  /** Name → Titel über alle Schreibweisen des Bestands (`namenIndex`/`titelZuordnen`). */
+  nameZuTitel?: (name: string) => number | undefined
+}
+
+/**
+ * **Ein Name ist ein Kandidat für die ganze Reihe, nicht für einen Titel** (22.09.2026). 980 Folgen
+ * hatten keinen Kandidaten: Die Adresse stand nicht im Bestand, `titel_id` fehlte. Die Meldung
+ * nennt aber die Reihe („Food Wars!" für B0CK66ZZ8G mit 552 Folgen aus mehreren Staffeln), ein
+ * Suchauftrag trägt sie im Suchbegriff („amazon.de/s?k=Digimon%20Frontier"). Der Name trifft den
+ * Reihenkopf; welche Staffel es ist, entscheidet danach der Anker — deshalb die ganze Reihe.
+ */
+function namensKandidaten(url: string, k: Kontext, reihen: Map<number, number[]>): number[] {
+  if (!k.nameZuTitel) return []
+  const namen = [k.namenJeAdresse?.get(ankerAdresse(url)), (() => {
+    try {
+      const such = /[?&]k=([^&#]+)/.exec(url)?.[1]
+      return such ? decodeURIComponent(such.replace(/\+/g, ' ')) : undefined
+    } catch {
+      return undefined
+    }
+  })()]
+  const aus = new Set<number>()
+  for (const n of namen) {
+    if (!n) continue
+    /* „Die komplette Serie", „Staffel 3" und Ähnliches hängt am Namen, nicht an der Reihe. */
+    const id = k.nameZuTitel(n) ?? k.nameZuTitel(n.replace(/\s*[-–:]\s*(die komplette serie|staffel \d+|season \d+).*$/i, ''))
+    if (!id) continue
+    const f = k.titel.get(id)?.franchiseId ?? id
+    for (const t of reihen.get(f) ?? [id]) aus.add(t)
+  }
+  return [...aus]
+}
+
+/**
+ * Eine Suchadresse („amazon.de/s?k=…") ist kein Anker — ohne Abfrageteil fallen alle auf
+ * „amazon.de/s", und der PoC sammelte darunter rund 90 Titel als Kandidaten jeder Folge.
+ */
+export function ankerAdresse(u: string | null | undefined): string {
+  const k = adressKern(u ? ohneStaffelMarke(u) : undefined)
+  return /\/s$|\/search$|^[^/:]*$/.test(k) ? '' : k
+}
+
+export function adressIndex(
+  titel: Map<number, Title>,
+  frueher: Iterable<[url: string, titelId: number]>,
+): Map<string, Set<number>> {
+  const jeAdresse = new Map<string, Set<number>>()
+  const dazu = (u: string | undefined, id: number) => {
+    const k = ankerAdresse(u)
+    if (!k) return
+    if (!jeAdresse.has(k)) jeAdresse.set(k, new Set())
+    jeAdresse.get(k)!.add(id)
+  }
+  for (const t of titel.values()) {
+    for (const w of [...(t.streams ?? []), ...(t.watchLinks ?? [])] as { url?: string; seite?: string }[]) {
+      dazu(w.url, t.id)
+      dazu(w.seite, t.id)
+    }
+  }
+  for (const [url, id] of frueher) if (titel.has(id)) dazu(url, id)
+  return jeAdresse
+}
+
+/** Der Anker eines Titels (aniSearch, sonst TMDB-Staffel), je Titel einmal gerechnet. */
+function ankerFinder(k: Kontext): (id: number) => TmdbFolge[] | null {
+  const ankerCache = new Map<number, TmdbFolge[] | null>()
+  return (id) => {
+    if (ankerCache.has(id)) return ankerCache.get(id)!
+    const t = k.titel.get(id)
+    let a: TmdbFolge[] | null = null
+    const asId = k.asKennung[String(id)]?.anisearchId
+    const as = asId ? k.asFolgen[String(asId)] : undefined
+    if (as?.folgen?.length) a = [...ausAnisearch(as.folgen), ...englischeSchreibweisen(as.folgen)]
+    else if (t && k.tmdb[String(id)]) {
+      const s = passendeStaffel(k.tmdb[String(id)]!.folgen, t)
+      if (s !== null) a = k.tmdb[String(id)]!.folgen.filter((f) => f.s === s)
+    }
+    ankerCache.set(id, a)
+    return a
+  }
+}
+
+/** Franchise-Kennung → Titel der Reihe. */
+function reihenVon(titel: Map<number, Title>): Map<number, number[]> {
+  const reihen = new Map<number, number[]>()
+  for (const t of titel.values()) {
+    const f = t.franchiseId ?? t.id
+    reihen.set(f, [...(reihen.get(f) ?? []), t.id])
+  }
+  return reihen
+}
+
+/** Beobachtungen je Plattform-Folge (`plattform:kennung`); ohne Kennung fällt eine Beobachtung weg. */
+function jeFolgeGruppieren(beobachtungen: Beobachtung[]): Map<string, Beobachtung[]> {
+  const jeFolge = new Map<string, Beobachtung[]>()
+  for (const b of beobachtungen) {
+    const kennung = b.asin ?? b.gti
+    if (!kennung) continue
+    const s = `${b.plattform}:${kennung}`
+    jeFolge.set(s, [...(jeFolge.get(s) ?? []), b])
+  }
+  return jeFolge
+}
+
+/** Das Urteil aus Ankertreffern und Kandidaten; geraten wird nicht. */
+function urteilAusTreffern(
+  treffer: { id: number; folge: number; grund: 'datum' | 'titel' }[],
+  kandidaten: Set<number>,
+  gesehen: string,
+): FolgenZuordnung {
+  if (treffer.length === 1) return { titel: treffer[0]!.id, folge: treffer[0]!.folge, grund: treffer[0]!.grund, gesehen }
+  if (treffer.length > 1) return { grund: 'strittig', kandidaten: treffer.map((t) => t.id), gesehen }
+  if (kandidaten.size === 1) return { titel: [...kandidaten][0]!, grund: 'einziger-kandidat', gesehen }
+  if (kandidaten.size) return { grund: 'offen', kandidaten: [...kandidaten], gesehen }
+  return { grund: 'ohne-kandidat', gesehen }
+}
+
+export function ordneFolgenZu(
+  beobachtungen: Beobachtung[],
+  k: Kontext,
+  bisher: Record<string, FolgenZuordnung> = {},
+): Record<string, FolgenZuordnung> {
+  const anker = ankerFinder(k)
+  const reihen = reihenVon(k.titel)
+  const jeFolge = jeFolgeGruppieren(beobachtungen)
+
+  const aus: Record<string, FolgenZuordnung> = {}
+  const rest: RestFolge[] = []
+  for (const [schluessel, liste] of jeFolge) {
+    const jung = liste.reduce((a, b) => (b.gemeldet_am > a.gemeldet_am ? b : a))
+    const kandidaten = new Set<number>()
+    for (const b of liste) {
+      if (b.titel_id != null && k.titel.has(b.titel_id)) kandidaten.add(b.titel_id)
+      for (const id of k.jeAdresse.get(ankerAdresse(b.url)) ?? []) kandidaten.add(id)
+    }
+    const ankerTreffer = (ids: Iterable<number>) => {
+      const t: { id: number; folge: number; grund: 'datum' | 'titel' }[] = []
+      for (const id of ids) {
+        const a = anker(id)
+        if (!a) continue
+        const [p] = ordneZu([{ nummer: jung.nummer, titel: jung.titel, datum: jung.erschienen?.slice(0, 10) ?? null, minuten: null }], a)
+        if (p?.unsere != null && (p.grund === 'datum' || p.grund === 'titel')) t.push({ id, folge: p.unsere, grund: p.grund })
+      }
+      return t
+    }
+    let treffer = ankerTreffer(kandidaten)
+    /*
+      **Trifft kein Anker, kommt die Reihe dazu** — erst dann, weil ein Name ganze Reihen mitbringt.
+      Food Wars B0CJQPBXM4 „Vorwärts mit der Tōtsuki-Bahn" (Staffel 3) hing am 22.09.2026 als
+      „einziger Kandidat" an Staffel 4, weil ein Auftrag dorthin zeigte; die Reihe hätte den Anker
+      gehabt. Der einzige Kandidat gilt erst, wenn auch die Reihe nichts trifft.
+    */
+    const vorher = new Set(kandidaten)
+    if (!treffer.length) {
+      const reihe = new Set<number>()
+      for (const b of liste) for (const id of namensKandidaten(b.url, k, reihen)) if (!kandidaten.has(id)) reihe.add(id)
+      for (const id of kandidaten) {
+        const f = k.titel.get(id)?.franchiseId ?? id
+        for (const t of reihen.get(f) ?? []) if (!kandidaten.has(t)) reihe.add(t)
+      }
+      treffer = ankerTreffer(reihe)
+      if (!vorher.size) for (const id of reihe) kandidaten.add(id)
+    }
+    let z = urteilAusTreffern(treffer, kandidaten, jung.gemeldet_am)
+    if (z.grund === 'einziger-kandidat' || z.grund === 'offen') rest.push({ schluessel, kandidaten: [...kandidaten] })
+    /*
+      **Eine Zuordnung wird festgehalten** (erster Schnitt, 22.09.2026): Wege ändern sich, und eine
+      Beobachtung, deren Adresse nicht mehr im Bestand steht, verlöre sonst ihren Titel. Fällt der
+      neue Lauf hinter die frühere Zuordnung zurück (kein Titel mehr), bleibt die frühere stehen.
+    */
+    const alt = bisher[schluessel]
+    if (!z.titel && alt?.titel) z = { ...alt, gesehen: jung.gemeldet_am }
+    aus[schluessel] = z
+  }
+  korrigiereNachTeiljahr(aus, rest, jeFolge, k.titel, reihen)
+  /* Was diesmal nicht vorkam (Zeile gelöscht), bleibt stehen — ein Lauf löscht keine Zuordnung. */
+  for (const [s, z] of Object.entries(bisher)) if (!aus[s]) aus[s] = z
+  return aus
+}

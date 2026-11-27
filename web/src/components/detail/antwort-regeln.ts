@@ -1,0 +1,344 @@
+/**
+ * **Zwei Regeln für den Antwort-Kasten** — ausgelagert, weil `berechneAntwort`
+ * die Längengrenze reißt (`tools/umfang-pruefen.mjs`).
+ */
+import { anzeigeFolge, istErschienen, istKatalogstartOhneUhrzeit, releaseStatus } from '@shared/logic.ts'
+import { formatDate, todayIso, weekdayName } from '@shared/time.ts'
+import type { Release, ReleaseEvent, Title, WatchLink } from '@shared/types.ts'
+import { erstausgabeVorDisc } from '../../lib/erste-disc.ts'
+import type { Antwort } from './antwort-typ.ts'
+import type { StaffelZeile } from '@shared/staffel-folge.ts'
+
+/**
+ * **Gezählt werden Folgen, nicht Termine**.
+ *
+ * Ein Komplettabwurf ist **ein** Termin, aber N Folgen. Vorher zählte die
+ * Schleife Ereignisse — ein ADN-Block mit 12 Folgen stand nach dem Start als
+ * „1 von 12 erschienen" da. Wöchentliche Termine tragen je eine Folge, dort
+ * ändert die Summe nichts.
+ */
+export function zaehleErschienen(events: ReleaseEvent[], jetzt: Date = new Date()): number {
+  const nummern = new Set<number>()
+  let ohneNummer = 0
+  for (const e of events) {
+    if (!istErschienen(e, jetzt)) continue
+    if (e.episode != null) nummern.add(e.episode)
+    else ohneNummer += e.episodeCount ?? 1
+  }
+  return nummern.size + ohneNummer
+}
+
+/**
+ * **Ein Anbieter zählt für sich, der Kasten nimmt den weitesten.** Dieselbe Folge liegt bei
+ * Crunchyroll und Netflix: Beide zu addieren schrieb „27 von 24 Folgen erschienen" (Das Band der
+ * Unterwelt, 10.10.2026). Mehrere Releases eines Anbieters (Folge 1 als Abwurf, 2–12 im Wochentakt)
+ * addieren sich weiter.
+ */
+export function zaehleErschienenJeAnbieter(events: ReleaseEvent[], jetzt: Date = new Date()): number {
+  const jeAnbieter = new Map<string, ReleaseEvent[]>()
+  for (const e of events) jeAnbieter.set(e.platform, [...(jeAnbieter.get(e.platform) ?? []), e])
+  return Math.max(0, ...[...jeAnbieter.values()].map((l) => zaehleErschienen(l, jetzt)))
+}
+
+/**
+ * **„Nächste Folge" ist eine, die noch nirgends erschienen ist.** Hat Crunchyroll Folge 15 schon
+ * gebracht, ist Netflix' Termin für Folge 15 keine neue Folge (Das Band der Unterwelt: „Folge 15
+ * erscheint heute"). TV-Sichtungen tragen unsere Zählung, keine belegte Nummer — sie entscheiden nichts.
+ */
+export function ohneSchonErschienene(offen: ReleaseEvent[], alle: ReleaseEvent[], jetzt: Date = new Date()): ReleaseEvent[] {
+  const da = new Set(alle.filter((e) => anzeigeFolge(e) && istErschienen(e, jetzt)).map((e) => e.episode))
+  return offen.filter((e) => !anzeigeFolge(e) || !da.has(e.episode))
+}
+
+/**
+ * **Ein abgeschlossenes, vollständig deutsches Werk ist die feste Wahrheit.**
+ *
+ * „86: Eighty Six" liegt seit 2021 vollständig auf Deutsch vor; im Oktober 2026
+ * nimmt ADN dieselben Folgen als Komplettabwurf ins Angebot. Der Kasten las den
+ * künftigen Termin als Sendeplan und schrieb „0 von 12 Folgen erschienen ·
+ * Wöchentlich" über eine fertige Serie.
+ *
+ * Ein späterer Abwurf oder eine Wiederholung überschreibt das nicht. Eine
+ * **laufende** Serie bleibt unberührt — dort sind die künftigen Folgen wirklich
+ * noch offen.
+ */
+export function istBelegtAbgeschlossen(
+  hatSynchro: boolean,
+  vollstaendig: boolean,
+  abgeschlossen: boolean,
+  events: ReleaseEvent[],
+  jetzt: Date = new Date(),
+): boolean {
+  return hatSynchro && vollstaendig && abgeschlossen && !deutscherWochentaktLaeuft(events, jetzt)
+}
+
+/**
+ * **Ein wöchentlicher deutscher Release mittendrin ist keine fertige Synchro.**
+ * Folge 1 erschienen, die übrigen erst angekündigt: Ein `dub: true` ohne
+ * Folgenbereiche hieße sonst „alle N Folgen auf Deutsch", sobald Japan fertig
+ * ist (Overgeared). Ein Komplettabwurf (86) oder eine TV-Wiederholung läuft
+ * nicht im Wochentakt eines Streams und bleibt davon unberührt.
+ */
+export function deutscherWochentaktLaeuft(events: ReleaseEvent[], jetzt: Date = new Date()): boolean {
+  const jeRelease = new Map<string, ReleaseEvent[]>()
+  for (const e of events) {
+    if (e.releaseType !== 'weekly' || e.platform === 'tv' || e.platform === 'disc') continue
+    jeRelease.set(e.releaseSlug, [...(jeRelease.get(e.releaseSlug) ?? []), e])
+  }
+  return [...jeRelease.values()].some((l) => l.some((e) => istErschienen(e, jetzt)) && l.some((e) => !istErschienen(e, jetzt)))
+}
+
+/**
+ * **Hat die deutsche Fassung schon begonnen?** Ein Stream mit belegter Tonspur, eine erschienene deutsche Folge oder eine
+ * deutsche Erstausgabe mit Tagesdatum bis heute. Ohne eines davon ist ein künftiger Termin eine Premiere, kein Nachschlag
+ * (Yaiba: Sprecher belegt, erste TV-Folge am 05.11.2026 — der Kasten sagte „Alle 24 Folgen auf Deutsch“, 21.10.2026).
+ */
+export function deutschBegonnen(title: Title, erschieneneFolgen: number, heute: string, releases: Release[] = []): boolean {
+  if ((title.streams ?? []).some((s) => s.dub === true) || erschieneneFolgen > 0) return true
+  const von = title.deErstausgabe?.von
+  const aniSearchTag = Boolean(title.deErstausgabe?.synchro && von && /^\d{4}-\d{2}-\d{2}$/.test(von) && von <= heute)
+  return aniSearchTag && !erstausgabeVorDisc(title, releases, heute)
+}
+
+/**
+ * **Welche Releases beantworten die Kopffrage?** Streams ohne Disc und Kino-Banner; gibt es keine, fällt der Kopf auf die Disc
+ * zurück — außer die deutsche Fassung hat nachweislich begonnen (dann ist die Disc nur eine Kaufausgabe). Ohne Beleg der Synchro
+ * zählt alles; mit Synchro-Hinweis, aber ohne begonnene Fassung (Bocchi: nur Sprecher, Vol. 1 am 06.11.), antwortet die Disc.
+ */
+export function kopfReleases(
+  { ohneDisc, releases, imKino, hatSynchro, title, heute }: { ohneDisc: Release[]; releases: Release[]; imKino: (r: Release) => boolean; hatSynchro: boolean; title: Title; heute: string },
+): Release[] {
+  if (ohneDisc.length) return ohneDisc
+  const ohneKino = releases.filter((r) => !imKino(r))
+  if (!hatSynchro) return ohneKino
+  /* Filme haben ihren eigenen Zweig („film“, Kino); dort bleibt der Kopf wie er war. */
+  if (title.format === 'MOVIE' || deutschBegonnen(title, 0, heute, releases)) return []
+  return ohneKino.filter((r) => r.releaseType === 'disc')
+}
+
+/**
+ * **Der Terminsatz im Kopf** — „erscheint am …" bzw. beim Komplettabwurf
+ * „im Angebot ab …". Ausgelagert, damit `AntwortKasten` die Längengrenze hält.
+ */
+export function terminSatz(
+  komplett: boolean | undefined,
+  rel: string,
+  datum: string,
+  T: (k: string, v?: Record<string, string | number>) => string,
+  mehrzahl = false,
+): string {
+  if (komplett) {
+    return rel
+      ? T('antwort.angebotRelativ', { rel, tag: weekdayName(datum), datum: formatDate(datum) })
+      : T('antwort.angebotDatum', { tag: weekdayName(datum), datum: formatDate(datum) })
+  }
+  const verb = mehrzahl ? 'erscheinen' : 'erscheint'
+  return rel
+    ? T(`antwort.${verb}Relativ`, { rel, tag: weekdayName(datum), datum: formatDate(datum) })
+    : T(`antwort.${verb}Datum`, { tag: weekdayName(datum), datum: formatDate(datum) })
+}
+
+/**
+ * **Japans Ende ist nicht das deutsche.** AniList führt für Slime Staffel 4 das Ende 25.09.2026, Crunchyroll
+ * zeigt die Folgen bis 16.10. und hatte am 03.10. erst 22 von 24. Die Prime-Pille schrieb dort „24 Fg.",
+ * weil der Titel nach Japans Ende als abgeschlossen galt. Abgeschlossen ist er erst, wenn auch kein
+ * deutscher Wochentermin mehr läuft.
+ */
+export function deutschAbgeschlossen(title: Title, releases: Release[], today: string): boolean {
+  const japan = title.jpEnd ? title.jpEnd < today : Boolean(title.jpYear && title.jpYear < Number(today.slice(0, 4)))
+  if (!japan) return false
+  return !releases.some((r) => r.releaseType === 'weekly' && r.platform !== 'disc' && r.platform !== 'tv' && releaseStatus(r, today) === 'airing')
+}
+
+/**
+ * **Die abgeleitete Folgenzahl einer Pille ohne Bereiche am Weg**: bei deutsch abgeschlossener Serie die
+ * Folgenzahl des Werks (AniList `episodes`). Kein Beleg für diesen Weg, nur die Annahme „alles liegt dort".
+ */
+export function abgeleiteteFolgen(title: Title, releases: Release[], today: string): number | undefined {
+  return deutschAbgeschlossen(title, releases, today) ? title.episodes : undefined
+}
+
+/** Der Kopf, wenn keine Zeile die Sprache belegt: dieselbe Aussage wie die Blase „Deutsch laut Anbieter“ an der Pille. */
+export function kopfSchluesselOhneBeleg(art: true | 'anbieter'): 'detail.statusAnbieter' | 'antwort.sprachOffen' {
+  return art === 'anbieter' ? 'detail.statusAnbieter' : 'antwort.sprachOffen'
+}
+
+/** Der Tooltip an „Auf Deutsch seit …“: woher das Datum stammt. */
+export function deSeitQuelleSchluessel(quelle: 'wikipedia' | 'disc' | undefined): 'antwort.deSeitWikipedia' | 'antwort.deSeitDisc' | 'antwort.deSeitQuelle' {
+  return quelle === 'wikipedia' ? 'antwort.deSeitWikipedia' : quelle === 'disc' ? 'antwort.deSeitDisc' : 'antwort.deSeitQuelle'
+}
+
+/** Letzte Folgennummer einer angenommenen Folgenzahl (0 ohne Annahme). */
+function angenommeneLetzte(r: Release | undefined): number {
+  const s = r?.schedule
+  return s?.episodeCountAssumed && s.episodeCount ? (s.firstEpisodeNumber ?? 1) + s.episodeCount - 1 : 0
+}
+
+/**
+ * **Kündigt eine Plattform mehr Folgen an, als die Datenbank für Japan kennt, gilt für die deutsche Fassung die
+ * Ankündigung** (Villainess, 18.10.2026: AniList 11, Wochenplan Folge 12) — als Annahme, `gesamtGeschaetzt` kennzeichnet sie.
+ */
+export function angekuendigteLaenge(title: Title, releases: Release[]): number {
+  return Math.max(0, ...releases.map(angenommeneLetzte).filter((n) => n > (title.episodes ?? Infinity)))
+}
+
+/** Stammt die Gesamtzahl nur aus der fortgeschriebenen Folgenzahl des laufenden Release? */
+export function gesamtGeschaetzt(title: Title, releases: Release[], n: ReleaseEvent): boolean {
+  const r = releases.find((x) => x.slug === n.releaseSlug)
+  return Boolean(r?.schedule.episodeCountAssumed) && (!title.episodes || angenommeneLetzte(r) > title.episodes)
+}
+
+/** Eine Zahl oder ein Datum, das auf einer geschätzten Folgenzahl beruht, trägt „≈“. */
+export function ungefaehr(wert: string | number, geschaetzt: boolean | undefined): string {
+  return geschaetzt ? `≈ ${wert}` : String(wert)
+}
+
+/**
+ * **Die Zahl im „fertig"-Kasten hat denselben Beleg wie die Pille** (11.10.2026): deutsche Bereiche, die das Werk
+ * decken, oder der Wochenplan eines Anbieters. Sonst ist „Alle N" nur die Folgenzahl des Werks (Cowboy Bebop) und
+ * der Kasten sagt „≈ N" wie die Pille („≈ N Fg.").
+ */
+export function fertigAntwort(
+  raus: number | undefined,
+  gesamt: number | undefined,
+  belegteFolgen: number,
+  events: ReleaseEvent[],
+  heute?: string,
+  releases: Release[] = [],
+): { art: 'fertig'; raus?: number; gesamt?: number; gesamtAbgeleitet: boolean; heuteOffen?: boolean } {
+  const wochenplan = events.some((e) => e.releaseType === 'weekly' && e.platform !== 'tv' && e.platform !== 'disc')
+  /* Nennt ein Release des Titels die Zahl belegt (Anbieter-Folgenzahl, Erweiterung), ist sie keine Zahl des Werks. */
+  const belegt = Boolean(gesamt && (belegteFolgen >= gesamt || releases.some((r) => reichtBis(r, gesamt)))) || wochenplan
+  const heuteOffen = katalogstartHeuteOffen(events, heute, releases) || undefined
+  return { art: 'fertig', raus, gesamt, gesamtAbgeleitet: !belegt, heuteOffen }
+}
+
+/**
+ * Ein Release mit Katalogstart ohne Uhrzeit liegt ganz heute — je Release, nicht je Titel: weitere Starts desselben Titels
+ * an anderen Tagen (Disney+ 01.08. und 14.10.) blenden den Hinweis nicht aus. Setzt der heutige Start eine frühere
+ * Folgenreihe fort (`firstEpisodeNumber` > 1, Teil 2 nach Teil 1 am 20.10.), wäre "Alle N heute" falsch: dann zählt der ganze Titel.
+ */
+export function katalogstartHeuteOffen(events: ReleaseEvent[], heute: string | undefined, releases: Release[]): boolean {
+  const fortsetzung = new Set(releases.filter((r) => (r.schedule.firstEpisodeNumber ?? 1) > 1).map((r) => r.slug))
+  const katalog = events.filter(istKatalogstartOhneUhrzeit)
+  const jeRelease = new Map<string, ReleaseEvent[]>()
+  for (const e of katalog) jeRelease.set(e.releaseSlug, [...(jeRelease.get(e.releaseSlug) ?? []), e])
+  const ganzerTitelHeute = katalog.length > 0 && katalog.every((e) => e.date === heute)
+  return [...jeRelease.values()].some((liste) => liste.every((e) => e.date === heute) && (ganzerTitelHeute || !fortsetzung.has(liste[0]!.releaseSlug)))
+}
+
+/** Bis zu welcher Folge die Folgenliste „erschienen" kennt: Nur bei laufender Ausstrahlung ist `raus` eine Folgennummer; bei `fertig` ist es die Zahl der Ereignisse (One Piece: 10) und ließ ab Folge 11 alles ohne Flagge als „noch nicht erschienen" stehen. */
+export const erschieneneFuerFolgenliste = (a: { art: string; raus?: unknown } | undefined): number | undefined =>
+  a?.art === 'laeuft' && typeof a.raus === 'number' ? a.raus : undefined
+
+/**
+ * **Die deutsche Erstausgabe steht in den Neuigkeiten, nicht unter „Auf Deutsch verfügbar"** (Daniel, 07.10.2026: „Text kann weg, der Trenner rückt nach oben;
+ * das Datum wandert in die Neuigkeiten, zurückdatiert"). Gilt nur mit Tagesdatum und Synchro-Marke — ohne Datum bleibt die Zeile im Kasten die einzige Spur.
+ */
+export function erstausgabeAlsNeuigkeit(title: Pick<Title, 'deErstausgabe'> & Partial<Pick<Title, 'angebotSeit' | 'streams'>>, heute = todayIso(), releases: Release[] = []): boolean {
+  const von = title.deErstausgabe?.von
+  if (!title.deErstausgabe?.synchro || !von || !/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(von) || von > heute) return false
+  /* Steht Vol. 1 noch aus, war die Erstausgabe noch nicht (Virgin Road): keine Zeile, der Kasten nennt den Termin. */
+  if (erstausgabeVorDisc(title, releases, heute)) return false
+  /* Liegt das Angebot eines Anbieters mit deutscher Tonspur davor, ist die Ausgabe nicht die erste Gelegenheit (wie in `deSeitZeile`). */
+  const angebot = title.angebotSeit
+  return !(angebot?.date && angebot.date < von && (title.streams ?? []).some((x) => x.platform === angebot.platform && x.dub === true))
+}
+
+/** Der Titel, dessen deutsche Erstausgabe in den Neuigkeiten steht; holt die Termine selbst aus der Karte (Aufrufer: `Neuigkeiten`). */
+export function erstausgabeNeuigkeitTitel(
+  daten: { titleById: Map<number, Title>; releasesByTitle: Map<number, Release[]> },
+  titelId: number,
+  heute: string,
+): Title | undefined {
+  const titel = daten.titleById.get(titelId)
+  return titel && erstausgabeAlsNeuigkeit(titel, heute, daten.releasesByTitle.get(titelId) ?? []) ? titel : undefined
+}
+
+/** Die Überschrift des „fertig“-Kastens mit Zahl; abgeleitet ohne „Alle“, mit „≈“ (siehe `fertigAntwort`). */
+export function fertigZahlText(
+  gesamt: number,
+  abgeleitet: boolean | undefined,
+  T: (k: string, v?: Record<string, string | number>) => string,
+): string {
+  return abgeleitet ? T('antwort.fertigUngefaehr', { count: ungefaehr(gesamt, true) }) : T('antwort.fertigZahl', { count: gesamt })
+}
+
+/** Trägt der Release eine belegte Gesamtzahl (weder angenommen noch nur die höchste gesichtete Folge)? */
+const belegteZahl = (r: Release): boolean => Boolean(r.schedule?.episodeCount && !r.schedule.episodeCountAssumed && !r.schedule.episodeCountNurGesichtet)
+
+/** Ist `gesamt` belegt: AniList führt mindestens so viele Folgen, oder irgendein Release nennt eine belegte Zahl? */
+export const gesamtIstBelegt = (title: Title, releases: Release[], gesamt: number): boolean => (title.episodes ?? 0) >= gesamt || releases.some(belegteZahl)
+
+/** `[alle, deutsch]` aus `folgen/zaehlung.json`; die dritte Stelle `1` heißt: die letzte Staffel ist offen, `alle` ist keine Gesamtzahl. */
+export type FolgenZaehlung = [number, number] | [number, number, 1]
+
+/** Reicht die belegte Zahl des Releases bis Folge `m`? Ein Teilstapel (Folge 101–122) belegt keine 128 Folgen. */
+export const reichtBis = (r: Release, m: number): boolean => belegteZahl(r) && (r.schedule.firstEpisodeNumber ?? 1) + r.schedule.episodeCount! - 1 >= m
+
+/**
+ * „N von M Folgen auf Deutsch“ aus der Folgenliste. Das „von M“ steht nur, wenn ein Release die Zahl bis M belegt (weder angenommen
+ * noch nur gesichtet) und keine Staffel offen ist — sonst ist M keine Gesamtzahl (Horizonte: „137 von 137“, Staffel 4 lief erst an,
+ * 21.11.2026), dann „N Folgen auf Deutsch“ ohne „von“.
+ */
+export function deFolgenZahlText(
+  z: FolgenZaehlung,
+  releases: Release[],
+  T: (k: string, v?: Record<string, string | number>) => string,
+  staffeln?: StaffelZeile[],
+): string {
+  const jeStaffel = z[2] ? offeneStaffelText(z, staffeln, T) : undefined
+  if (jeStaffel) return jeStaffel
+  return z[2] || !releases.some((r) => reichtBis(r, z[0]))
+    ? T('detail.dubKopf', { n: z[1] })
+    : T('antwort.teilweiseZahl', { raus: z[1], gesamt: z[0] })
+}
+
+/**
+ * Sammeltitel mit offener letzter Staffel zählen je Staffel statt durchgehend: „Staffel 1–3: 136 Folgen · Staffel 4: 1 Folge (läuft)“
+ * statt „137 Folgen“ (Horizonte, Daniel 22.11.2026). Nur wenn alle gezählten Folgen deutsch sind (`alle` = `deutsch`) und die Zahl in
+ * die offene Staffel reicht — sonst `undefined` und der Kopf bleibt bei der Gesamtzahl.
+ */
+export function offeneStaffelText(
+  z: FolgenZaehlung,
+  staffeln: StaffelZeile[] | undefined,
+  T: (k: string, v?: Record<string, string | number>) => string,
+): string | undefined {
+  const offen = staffeln?.[staffeln.length - 1]
+  if (!offen || offen.length !== 2 || staffeln!.length < 2 || z[0] !== z[1] || z[1] < offen[1]) return undefined
+  const erste = staffeln![0]![0]
+  const vorige = staffeln![staffeln!.length - 2]![0]
+  const fertig = offen[1] - staffeln![0]![1]
+  const laufend = z[1] - offen[1] + 1
+  return T(laufend === 1 ? 'detail.dubKopfStaffelnEine' : 'detail.dubKopfStaffeln', {
+    voll: erste === vorige ? T('detail.staffelNummer', { n: erste }) : T('detail.staffelBereich', { von: erste, bis: vorige }),
+    n: fertig,
+    offen: offen[0],
+    m: laufend,
+  })
+}
+
+/** Die Überschrift des „teilweise“-Kastens; „von M“ nur, wenn M belegt ist (nicht angenommen, nicht die Listenlänge). */
+export function teilweiseHaupt(
+  antwort: Extract<Antwort, { art: 'teilweise' }>,
+  T: (k: string, v?: Record<string, string | number>) => string,
+): string {
+  if (antwort.raus === undefined) return T('antwort.teilweiseOhneZahl')
+  return antwort.gesamtBelegt ? T('antwort.teilweiseZahl', { raus: antwort.raus, gesamt: antwort.gesamt }) : T('detail.dubKopf', { n: antwort.raus })
+}
+
+/** Die Nebenzeile eines „teilweise“-Kastens: die Quelle der deutschen Folgenzahl, sonst der Hinweis auf fehlende Angaben. */
+export function teilweiseNeben(
+  antwort: Extract<Antwort, { art: 'teilweise' }>,
+  T: (k: string, v?: Record<string, string | number>) => string,
+): string {
+  if (antwort.deFolgen) return T('antwort.deFolgenQuelle', { quelle: antwort.deFolgen.quelle.name, zitat: antwort.deFolgen.zitat })
+  return antwort.restBelegt ? '' : T('antwort.teilweiseNeben')
+}
+
+/**
+ * Die Bereiche eines Kaufwegs, die als **Beleg** zählen (13.10.2026): Videoload und MagentaTV tragen `dubRanges` aus der
+ * Annahme (`pipeline/lib/telekom-annahme.ts`), und die ist kein Beleg — sonst zeigt der Kasten bei Devil May Cry „12 von 12“.
+ */
+export const belegteBereiche = (w: WatchLink): NonNullable<WatchLink['dubRanges']> =>
+  w.dubAbgeleitet === 'telekom-annahme' ? [] : (w.dubRanges ?? [])

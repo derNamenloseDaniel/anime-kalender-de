@@ -1,0 +1,442 @@
+import { ANILIST_COVER_BASIS } from '@shared/mappings.ts'
+import { datenAdresse } from './daten-adresse.ts'
+import { gemerkt, holeMitNeuversuch, type NeuversuchOptionen } from './lade-neuversuch.ts'
+import { ecchiZeigen, istEcchi, ohneEcchi } from './ecchi.ts'
+import { merkeSammelartikel } from './sammel-belege.ts'
+import { SYNOPSIS_GROUPS, type DiscAusgabe } from '@shared/types.ts'
+import type { WochenDatei } from '@shared/wochen-datei.ts'
+import { KACHEL_DATEI } from '@shared/wochen-kacheln.ts'
+import { entpackeKachel } from '@shared/wochen-packen.ts'
+import { fuerBesucher, istNurUntertitel } from '@shared/nur-deutsch.ts'
+import type { DataMeta, Franchises, Meldung, NewsEintrag, Release, ReleaseEvent, Title } from '@shared/types.ts'
+
+export interface Dataset {
+  titles: Title[]
+  titleById: Map<number, Title>
+  releases: Release[]
+  releaseBySlug: Map<string, Release>
+  events: ReleaseEvent[]
+  eventsByDate: Map<string, ReleaseEvent[]>
+  releasesByTitle: Map<number, Release[]>
+  /** Releases, die nur Untertitel nennen: nie angezeigt, nur zum Ausblenden der zugehörigen Wege (`wege-nur-deutsch.ts`). */
+  nurUntertitelByTitle: Map<number, Release[]>
+  meta: DataMeta
+}
+
+/**
+ * Kennung des Builds, in `vite.config.ts` einkompiliert.
+ *
+ * Im Test- und Pipeline-Kontext gibt es sie nicht — dort steht `dev`, und das
+ * genügt: Beim Entwickeln gibt es keinen Service Worker, der etwas festhält.
+ */
+declare const __BUILD_ID__: string | undefined
+const BUILD_ID = typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'dev'
+declare const __DATEI_KENNUNGEN__: Record<string, string> | undefined
+const KENNUNGEN = typeof __DATEI_KENNUNGEN__ === 'object' ? __DATEI_KENNUNGEN__ : {}
+
+/**
+ * Adresse einer Datendatei — mit der Inhalts-Kennung der Datei (`daten-adresse.ts`).
+ *
+ * Ohne sie blieb nach einem Deploy die alte Fassung stehen, und nur ein hartes
+ * Neuladen half. Die Kennung macht daraus eine neue Adresse; für Browser-Cache
+ * und Service Worker ist das ein Erstabruf, kein Auffrischen.
+ *
+ * Der Service Worker weiß davon (siehe `public/sw.js`): Er antwortet bei
+ * gleicher Kennung sofort aus dem Cache und fällt offline auf die letzte
+ * bekannte Fassung zurück, egal welche Kennung die trägt. Bei einer 5xx-Antwort
+ * tut er das bewusst nicht (alte und neue Dateien würden unbemerkt gemischt):
+ * da greifen die Neuversuche von `loadJson`.
+ */
+function url(path: string): string {
+  return datenAdresse(import.meta.env?.BASE_URL ?? '/', path, KENNUNGEN, BUILD_ID)
+}
+
+/** Mit Neuversuchen bei Netzfehler, 5xx und 429 (`lade-neuversuch.ts`); `opt` setzen nur Tests. */
+export function loadJson<T>(path: string, opt?: NeuversuchOptionen): Promise<T> {
+  return holeMitNeuversuch<T>(url(path), path, opt)
+}
+
+/** `meta.json` wird vom Wochen-Start und vom vollen Datensatz gebraucht — ein Abruf; ein Fehlschlag wird nicht gemerkt (`gemerkt`), damit „Erneut versuchen“ neu abruft. */
+const loadMeta = () => gemerkt('meta', () => loadJson<DataMeta>('meta.json'))
+
+export async function loadDataset(): Promise<Dataset> {
+  const [titles, releases, events, meta] = await Promise.all([
+    loadJson<Title[]>('titles-core.json'),
+    loadJson<Release[]>('releases.json'),
+    loadJson<ReleaseEvent[]>('events.json'),
+    loadMeta(),
+  ])
+  return baueDataset(titles, releases, events, meta)
+}
+
+/** Der Wochen-Start: die Woche des Baus als kleiner Datensatz (`shared/wochen-datei.ts`). */
+export interface WochenStart {
+  data: Dataset
+  von: string
+  bis: string
+}
+
+
+/** `woche-kacheln.json` (nur Kachelfelder, `shared/wochen-kacheln.ts`) + `meta.json` statt der drei vollen Dateien — für den Erstaufruf der Wochenansicht. */
+export function loadWochenStart(): Promise<WochenStart> {
+  return gemerkt('wochenStart', () => Promise.all([loadJson<WochenDatei>(`${KACHEL_DATEI}.json`), loadMeta()]).then(([gepackt, meta]) => {
+    const w = entpackeKachel(gepackt)
+    return { data: baueDataset(w.titles, w.releases, w.events, meta), von: w.von, bis: w.bis }
+  }))
+}
+
+function baueDataset(alleTitel: Title[], releasesRoh: Release[], eventsRoh: ReleaseEvent[], meta: DataMeta): Dataset {
+  /* Nur deutsche Fassungen sind sichtbar (`shared/nur-deutsch.ts`); die Releases mit Untertiteln allein bleiben als `nurUntertitelByTitle` für die Wege. */
+  const alleReleases = fuerBesucher(releasesRoh)
+  const alleEvents = fuerBesucher(eventsRoh)
+  const nurUntertitelByTitle = new Map<number, Release[]>()
+  for (const r of releasesRoh.filter(istNurUntertitel)) nurUntertitelByTitle.set(r.titleId, [...(nurUntertitelByTitle.get(r.titleId) ?? []), r])
+  /* Nachschlagen (Panel, geteilter Link) kennt alle Titel; die Listen der Ansichten nur die nicht ausgeblendeten (`ecchi.ts`). */
+  const titleById = new Map(alleTitel.map((t) => [t.id, t]))
+  const releaseBySlug = new Map(alleReleases.map((r) => [r.slug, r]))
+  const titles = ohneEcchi(alleTitel)
+  const ausgeblendet = titles.length !== alleTitel.length
+  const sichtbar = (id: number): boolean => !istEcchi(titleById.get(id) ?? { genres: [] })
+  const releases = ausgeblendet ? alleReleases.filter((r) => sichtbar(r.titleId)) : alleReleases
+  const events = ausgeblendet ? alleEvents.filter((e) => sichtbar(e.titleId)) : alleEvents
+
+  const eventsByDate = new Map<string, ReleaseEvent[]>()
+  for (const ev of events) {
+    const list = eventsByDate.get(ev.date)
+    if (list) list.push(ev)
+    else eventsByDate.set(ev.date, [ev])
+  }
+
+  const releasesByTitle = new Map<number, Release[]>()
+  for (const r of alleReleases) {
+    const list = releasesByTitle.get(r.titleId)
+    if (list) list.push(r)
+    else releasesByTitle.set(r.titleId, [r])
+  }
+
+  /* Solange Ecchi ausgeblendet ist, gibt es auch den Genre-Filter dafür nicht. */
+  const filterMeta = !ecchiZeigen() ? { ...meta, genres: meta.genres.filter((g) => g !== 'Ecchi') } : meta
+  return { titles, titleById, releases, releaseBySlug, events, eventsByDate, releasesByTitle, nurUntertitelByTitle, meta: filterMeta }
+}
+
+
+/**
+ * Vollständige Titelliste — mehrere Megabyte, deshalb erst beim Öffnen der
+ * Datenbank-Ansicht. Die geladenen Titel wandern in den bestehenden Index,
+ * damit das Detail-Panel sie danach ohne weiteren Abruf findet.
+ */
+export function loadAllTitles(data: Dataset): Promise<Title[]> {
+  return gemerkt('allTitles', () => loadJson<Title[]>('titles.json').then((titles) => {
+    for (const t of titles) {
+      const existing = data.titleById.get(t.id)
+      // Kuratierte Ergänzungen aus dem Kern-Datensatz nicht überschreiben.
+      data.titleById.set(t.id, existing ? { ...t, ...existing } : t)
+    }
+    return ohneEcchi(titles.map((t) => data.titleById.get(t.id)!))
+  }))
+}
+
+/**
+ * Macht einen unbekannten Titel auffindbar: erst der Hauptbestand (791 KB gzip), den Katalog ohne Synchro (1,9 MB gzip)
+ * nur, wenn der Titel dort noch fehlt. Vorher holte jeder Titel außerhalb des Kalenders beide (Stand 08.10.2026).
+ */
+export async function ladeTitelBestand(data: Dataset, id: number): Promise<void> {
+  await loadAllTitles(data)
+  if (!data.titleById.has(id)) await loadOhneSynchro(data)
+}
+
+
+/**
+ * Anime **ohne** belegte deutsche Synchro — die größte Datei des Projekts.
+ *
+ * Geholt wird sie erst, wenn jemand den Schalter in der Datenbank umlegt. Das
+ * ist der ganze Grund, warum sie nicht in `titles.json` steht: Es sind ein
+ * Vielfaches des gepflegten Bestands, und die überwältigende Mehrheit der
+ * Besucher braucht sie nie.
+ *
+ * Wie bei `loadAllTitles` wandern die Titel in den bestehenden Index — sonst
+ * fände das Detail-Panel einen gemerkten Titel nicht wieder.
+ */
+export function loadOhneSynchro(data: Dataset): Promise<Title[]> {
+  return gemerkt('ohneSynchro', () => loadJson<OhneSynchroRoh[]>('ohne-synchro.json')
+    .then((roh) => {
+      const titles = roh.map((t) => ({
+        ...t,
+        // Der Adressvorsatz der Cover fehlt in der Datei — siehe
+        // ANILIST_COVER_BASIS. Hier ist die einzige Stelle, an der er wieder
+        // angehängt wird; danach sieht der Rest der App nur vollständige
+        // Adressen. Ein bereits vollständiger Wert bleibt unangetastet.
+        coverImage:
+          t.coverImage && !t.coverImage.startsWith('http')
+            ? ANILIST_COVER_BASIS + t.coverImage
+            : t.coverImage,
+        /**
+         * Drei Felder, die die Datei nicht mitschickt, weil sie für jeden
+         * dieser Titel leer wären — 900 KB, die niemand übertragen muss. Der
+         * Rest der Anwendung darf sie trotzdem wie gewohnt vorfinden.
+         *
+         * Der Slug ist die Kennung als Text: Zu diesen Titeln gibt es keine
+         * eigene Seite, also auch keinen sprechenden Namen dafür.
+         */
+        slug: String(t.id),
+        keywords: [],
+        streams: [],
+      }))
+      for (const t of titles) data.titleById.set(t.id, data.titleById.get(t.id) ?? t)
+      return ohneEcchi(titles)
+    })
+    , () => [])
+}
+
+
+/**
+ * Nur die Namen und Filterfelder der Titel ohne Synchro (`ohne-synchro-namen.json`) — für den Suchhinweis, der sonst die ganze Datei
+ * (gzip 1,7 MB) laden müsste. Die Titel wandern nicht in den Index der App (kein Panel dazu); fehlt die Datei, gibt es keinen Hinweis.
+ */
+export function loadOhneSynchroNamen(): Promise<Title[]> {
+  return gemerkt('ohneNamen', () => loadJson<Title[]>('ohne-synchro-namen.json')
+    .then((zeilen) => ohneEcchi(zeilen.map((t) => ({ ...t, slug: String(t.id), genres: t.genres ?? [], keywords: [], streams: [], dubConfidence: 'low' as const, ohneSynchro: true }))))
+    , () => [])
+}
+
+
+/**
+ * **Westliche Animationsserien — immer geladen, ausblendbar über den Schnellfilter „Cartoon".**
+ *
+ * Daniel am 12.09.2026: alle 906 aufnehmen, immer sichtbar; seit 09.10.2026 schaltet sie nur noch der
+ * Schnellfilter (nicht mehr ein Schalter in den Einstellungen).
+ *
+ * Sie stehen in einer eigenen Datei (372 KB), nicht in `titles.json`: Wer nur
+ * den Kalender aufruft, soll sie nicht mitladen. Geholt wird beim ersten
+ * Aufbau der Titelliste, nicht beim Start.
+ *
+ * Die Titel wandern in denselben Index wie alle anderen — sonst fände das
+ * Detail-Panel einen gemerkten Titel nicht wieder.
+ */
+export function loadCartoons(data: Dataset): Promise<Title[]> {
+  return gemerkt('cartoons', () => loadJson<Title[]>('cartoons.json')
+    .then((titles) => {
+      for (const t of titles) data.titleById.set(t.id, data.titleById.get(t.id) ?? t)
+      return titles
+    })
+    , () => [])
+}
+
+/** Wie ein Eintrag in `ohne-synchro.json` wirklich aussieht — drei Felder fehlen. */
+type OhneSynchroRoh = Omit<Title, 'slug' | 'keywords' | 'streams'>
+
+
+/**
+ * Welche Staffeln, Filme und Specials zu einer Reihe gehören.
+ *
+ * Eigene Datei (33 KB gzip), geholt beim ersten Öffnen eines Detail-Panels.
+ * Vorher las das Panel dafür `data.titles` — im Kalender sind das aber nur die
+ * 133 Titel **mit Termin**. „That Time I Got Reincarnated as a Slime" zeigte
+ * deshalb allein Staffel 4 als verwandten Eintrag, „I've Been Killing Slimes"
+ * gar nichts (gemeldet von Daniel, 12.08.2026).
+ */
+export function loadFranchises(): Promise<Franchises> {
+  return gemerkt('franchises', () => loadJson<Franchises>('franchises.json')
+    .then((reihen) => {
+      // Der Adressvorsatz der Cover fehlt in der Datei — hier kommt er zurück,
+      // an genau einer Stelle. Siehe ANILIST_COVER_BASIS.
+      for (const mitglieder of Object.values(reihen)) {
+        for (const m of mitglieder) {
+          if (m.cover && !m.cover.startsWith('http')) m.cover = ANILIST_COVER_BASIS + m.cover
+        }
+      }
+      return reihen
+    })
+    , () => ({}) as Franchises)
+}
+
+
+/**
+ * Die Meldungen der Nachrichtenseite — eigene Datei, geholt beim Öffnen.
+ *
+ * Sie gehört nicht in den Startdatensatz: Wer den Kalender aufschlägt, will
+ * Termine sehen, nicht die Chronik. 275 Meldungen sind rund 60 KB.
+ */
+export function loadNews(): Promise<NewsEintrag[]> {
+  return gemerkt('news', () => loadJson<NewsEintrag[]>('news.json')
+    .then((liste) => {
+      for (const m of liste) if (m.cover && !m.cover.startsWith('http')) m.cover = ANILIST_COVER_BASIS + m.cover
+      merkeSammelartikel(liste)
+      return liste
+    })
+    , () => [])
+}
+
+
+/**
+ * Fundstellen aus den Nachrichtenquellen, nach Titel gebündelt.
+ *
+ * Eigene Datei und erst beim Öffnen eines Panels geholt: Sie betrifft eine
+ * Handvoll Titel, und für alle anderen wäre sie Ladelast ohne Gegenwert.
+ */
+export function loadMeldungen(): Promise<Map<number, Meldung[]>> {
+  return gemerkt('meldungen', () => loadJson<Meldung[]>('meldungen.json')
+    .then((liste) => {
+      const nachTitel = new Map<number, Meldung[]>()
+      for (const m of liste) nachTitel.set(m.titleId, [...(nachTitel.get(m.titleId) ?? []), m])
+      return nachTitel
+    })
+    , () => new Map<number, Meldung[]>())
+}
+
+/** Handlung je Sprache. Deutsch stammt von TMDB, Englisch von AniList. */
+export interface Synopsis {
+  de?: string
+  en?: string
+  /**
+   * Woher die deutsche Fassung stammt — aniSearch oder TMDB.
+   *
+   * aniSearch hängt die Quelle als Fließtext an die Beschreibung. Die Pipeline
+   * löst sie heraus, damit sie hier genauso aussieht wie unter einem Termin,
+   * statt einmal im Text zu stehen und einmal als Zeile darunter — und dort
+   * womöglich noch mit dem falschen Namen.
+   */
+  deSource?: { name: string; url: string }
+  asUrl?: string
+  /** Eigener Text aus Fakten mehrerer Quellen: alle Quellen, Lizenz des Textes; `reihe` = beschreibt nur die Reihe, nicht diesen Titel. */
+  eigen?: { quellen: { name: string; url: string }[]; lizenz: string; reihe?: true }
+  /** Ein selbst geschriebener Satz Handlung; `satzReihe` = er beschreibt die Reihe, nicht diesen Titel. */
+  satz?: string
+  satzReihe?: true
+  /** Nur ein Teil der Folgen liegt auf Deutsch vor: Zahl, Quelle und kurzes Zitat daraus. */
+  deFolgen?: { n: number; quelle: { name: string; url: string }; zitat: string }
+  /** Größtes brauchbares Plakat (TMDB): Pfad, Breite, Höhe — nur für die Vergrößerung des Covers. */
+  cg?: [string, number, number]
+}
+
+/**
+ * Bereits geholte Gruppen. Eine Gruppe deckt rund neunzig Titel ab, deshalb
+ * lohnt das Merken: Wer sich durch eine Serie klickt, trifft oft dieselbe.
+ */
+const synopsisGroups = new Map<number, Promise<Record<number, Synopsis>>>()
+
+/**
+ * Handlung eines Titels — holt nur die Gruppe, in der er liegt.
+ *
+ * Vorher lag alles in einer Datei: 3,8 MB gingen beim ersten Öffnen eines
+ * Detail-Panels über die Leitung, um **eine** Beschreibung anzuzeigen. Jetzt
+ * sind es rund 120 KB (10.08.2026, aufgefallen, weil der Browser-Speicher
+ * auffällig voll war).
+ */
+export async function loadSynopsis(titleId: number): Promise<Synopsis | undefined> {
+  const gruppe = titleId % SYNOPSIS_GROUPS
+  let geladen = synopsisGroups.get(gruppe)
+  if (!geladen) {
+    geladen = loadJson<Record<number, Synopsis>>(`synopses/${gruppe}.json`).catch(() => ({}))
+    synopsisGroups.set(gruppe, geladen)
+  }
+  return (await geladen)[titleId]
+}
+
+/** Eine deutsche Sprechrolle: Figur und Stimme. */
+export interface VoiceRole {
+  character: string
+  actor: string
+  /** 'MAIN' | 'SUPPORTING' | 'BACKGROUND' */
+  role?: string
+  /**
+   * Woher die Rolle stammt. Fehlt = AniList.
+   *
+   * Anime News Network verlangt fuer die Nutzung seiner Encyclopedia-Daten eine
+   * Quellennennung **und** einen Link zum jeweiligen Eintrag auf jeder Seite,
+   * die die Angaben zeigt. Ohne dieses Feld liesse sich nicht sagen, ob der
+   * Link ueberhaupt faellig ist.
+   */
+  von?: 'ann' | 'anisearch'
+}
+
+/** Die Sprecherliste eines Titels samt Herkunft. */
+export interface Voices {
+  roles: VoiceRole[]
+  /** Adresse des ANN-Encyclopedia-Eintrags, wenn von dort Rollen stammen. */
+  annUrl?: string
+}
+
+const voiceCache = new Map<number, Promise<Voices>>()
+
+/**
+ * Deutsche Synchronsprecher eines Titels — eine eigene Datei je Titel.
+ *
+ * Anders als die Handlung liegt das **nicht** in Gruppen: Bei rund zwanzig
+ * Rollen je Titel wäre eine Gruppe von neunzig Titeln schnell hundert Kilobyte
+ * groß, und geholt wird sie für eine einzige aufgeklappte Liste. Eine Datei je
+ * Titel sind zwei Kilobyte.
+ *
+ * Fehlt die Datei, hat AniList für diesen Titel keine deutschen Stimmen — das
+ * ist kein Fehler, sondern die Antwort.
+ */
+export function loadVoices(titleId: number): Promise<Voices> {
+  let geladen = voiceCache.get(titleId)
+  if (!geladen) {
+    geladen = loadJson<{ roles?: VoiceRole[]; annUrl?: string }>(`voices/${titleId}.json`)
+      .then((d) => ({ roles: d.roles ?? [], annUrl: d.annUrl }))
+      .catch(() => ({ roles: [] }))
+    voiceCache.set(titleId, geladen)
+  }
+  return geladen
+}
+
+/**
+ * Adresse eines ICS-Feeds — **ohne** Build-Kennung.
+ *
+ * Das ist kein Versehen, sondern der Unterschied zwischen Abrufen und
+ * Abonnieren: Diese Adresse trägt jemand in Google Calendar oder Outlook ein,
+ * und die fragt sie monatelang immer wieder ab. Eine Kennung darin würde beim
+ * nächsten Deploy auf eine Datei zeigen, die es nicht mehr gibt — das Abo wäre
+ * still tot.
+ */
+export function feedUrl(name: string): string {
+  return `${import.meta.env?.BASE_URL ?? '/'}data/feeds/${name}`
+}
+
+/** Absolute URL — Google Calendar und Outlook brauchen sie zum Abonnieren. */
+export function absoluteFeedUrl(name: string): string {
+  return new URL(feedUrl(name), window.location.href).toString()
+}
+
+/**
+ * **Weitere Namen je Titel — nur für die Suche.**
+ *
+ * aniSearchs Synonyme tragen oft den deutschen Namen, unter dem jemand sucht („Dais
+ * Abenteuer"), ohne dass er angezeigt wird. Sie liegen in einer eigenen Datei und kommen
+ * erst mit der Datenbank-Ansicht; bis dahin sucht die Suche wie bisher.
+ */
+const SYNONYME = new Map<number, string[]>()
+
+export function loadSynonyme(): Promise<void> {
+  return gemerkt('synonyme', () => loadJson<Record<string, string[]>>('synonyme.json')
+    .then((roh) => {
+      for (const [id, namen] of Object.entries(roh)) SYNONYME.set(Number(id), namen)
+    })
+    , () => {})
+}
+
+export function synonymeFuer(id: number): string[] {
+  return SYNONYME.get(id) ?? []
+}
+
+let kinoZuletztPromise: Promise<Record<number, string>> | undefined
+
+/** Monat (`JJJJ-MM`) des letzten deutschen Kinostarts eines Films — eine kleine Datei, erst geladen, wenn ein Film offen ist. */
+export function loadKinoZuletzt(titleId: number): Promise<string | undefined> {
+  kinoZuletztPromise ??= loadJson<Record<number, string>>('kino-zuletzt.json').catch(() => ({}))
+  return kinoZuletztPromise.then((monate) => monate[titleId])
+}
+
+const discGruppen = new Map<number, Promise<Record<number, DiscAusgabe[]>>>()
+
+/** Die deutschen Disc-Ausgaben eines Titels — dieselben Gruppen wie die Handlung. */
+export async function loadDiscAusgaben(titleId: number): Promise<DiscAusgabe[]> {
+  const gruppe = titleId % SYNOPSIS_GROUPS
+  let geladen = discGruppen.get(gruppe)
+  if (!geladen) {
+    geladen = loadJson<Record<number, DiscAusgabe[]>>(`disc/${gruppe}.json`).catch(() => ({}))
+    discGruppen.set(gruppe, geladen)
+  }
+  return (await geladen)[titleId] ?? []
+}

@@ -1,0 +1,80 @@
+/**
+ * Attrappe für `berechnePruefstand`: ein Briefkasten aus Zeilen im Speicher und ein Prüfstand, den
+ * `fetch` liefert. Nie gegen den echten Briefkasten. Gemeinsam genutzt von `worker-pruefstand.test.ts`.
+ */
+import { berechnePruefstand } from '../worker/src/pruefung-stand.ts'
+import { type Env } from '../worker/src/env.ts'
+
+export type Zeile = { plattform: string; url: string; staffel?: number | null; such_url?: string; uebernommen: 0 | 1; gemeldet_am: string }
+
+type Ziel = { url: string; titel: string; staffeln?: number[]; seit?: string }
+export type Anbieter = { name: string; plattform: string; offen: number; gesamt: number; gemeldet: number; ziele: Ziel[]; ohneSeite?: number; suchAdressen?: string[] }
+
+const nurAdresse = (z: Zeile) => ({ plattform: z.plattform, url: z.url, staffel: z.staffel ?? null })
+
+/** Bildet die Abfragen aus `pruefung-stand.ts` nach — nach dem Anfang der SQL-Zeichenkette erkannt. */
+export type Titelzeile = { url: string; daten: string }
+
+/** Eine Zeile aus `pruefung_zurueck` (Migration 064); `Error` = Tabelle fehlt oder D1 antwortet nicht. */
+export type ZurueckZeile = { plattform: string; daten: string }
+type Quellen = { titelzeilen: Titelzeile[] | Error; zurueck: ZurueckZeile[] | Error }
+
+function ergebnisFuer(zeilen: Zeile[], sql: string, arg: unknown[], { titelzeilen, zurueck }: Quellen) {
+  if (sql.includes('FROM pruefung_zurueck')) {
+    if (zurueck instanceof Error) throw zurueck
+    return zurueck
+  }
+  if (sql.includes('FROM titel_zeile WHERE url IN')) {
+    if (titelzeilen instanceof Error) throw titelzeilen
+    return titelzeilen
+  }
+  if (sql.includes('such_url IS NOT NULL')) {
+    const seit = sql.includes('gemeldet_am > ?1') ? String(arg[0]) : ''
+    return zeilen.filter((z) => z.such_url && z.gemeldet_am > seit).map((z) => ({ plattform: z.plattform, such_url: z.such_url }))
+  }
+  const mitUrl = zeilen.filter((z) => z.url)
+  if (sql.includes('uebernommen = 0')) return zeilen.filter((z) => !z.uebernommen).map(nurAdresse)
+  if (sql.includes('gemeldet_am > ?1')) return mitUrl.filter((z) => z.gemeldet_am > String(arg[0])).map(nurAdresse)
+  return mitUrl.map(nurAdresse)
+}
+
+function baueDb(zeilen: Zeile[], quellen: Quellen) {
+  return {
+    prepare(sql: string) {
+      const lauf = (arg: unknown[]) => ({ all: async () => ({ results: ergebnisFuer(zeilen, sql, arg, quellen) }) })
+      return { bind: (...arg: unknown[]) => lauf(arg), ...lauf([]) }
+    },
+  }
+}
+
+/** Rechnet den Prüfstand mit gegebenen Briefkasten-Zeilen und einem Prüfstand, der um `erzeugtAm` gebaut wurde. */
+export async function rechnePruefstand(
+  zeilen: Zeile[],
+  anbieter: Anbieter[],
+  erzeugtAm = '2026-10-11T16:00:00.000Z',
+  titelzeilen: Titelzeile[] | Error = [],
+  zurueck: ZurueckZeile[] | Error = [],
+  jetzt = Date.UTC(2026, 9, 11, 16),
+) {
+  const env = { DB: baueDb(zeilen, { titelzeilen, zurueck }), SITE_URL: 'https://attrappe.test/' } as unknown as Env
+  const echtesFetch = globalThis.fetch
+  globalThis.fetch = (async () => new Response(JSON.stringify({ erzeugtAm, anbieter }))) as typeof fetch
+  try {
+    const antwort = (body: unknown) => Response.json(body)
+    const res = await berechnePruefstand({ env, antwort, jetzt })
+    return (await res.json()) as {
+      anbieter: {
+        plattform: string
+        offen: number
+        titel: number
+        unterwegs: number
+        ohneSeite: number
+        zurueck: number
+        ziel: string | null
+        ziele: (Ziel & { zurueck?: true })[]
+      }[]
+    }
+  } finally {
+    globalThis.fetch = echtesFetch
+  }
+}

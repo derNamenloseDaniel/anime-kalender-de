@@ -1,0 +1,88 @@
+# ADN-Serienkennungen für Verweise, die keine tragen.
+#
+# **Wofür das gut ist.** aniSearch führt zu manchen Titeln einen ADN-Verweis auf
+# `animationdigitalnetwork.de/video/<slug>` — die alte Domain, teils mit
+# **französischen** Namensteilen (`a-quoi-tu-joues-ayumu`, `50-nuances-de-gras`).
+# Eine solche Adresse ist stumm: Ohne Serienkennung findet `beurteileAdnVerweis`
+# nichts im Archiv, und der Verweis bleibt bei „🇩🇪 ?", obwohl ADN die Antwort
+# je Folge mitliefert.
+#
+# Die meisten dieser Adressen löst der Katalog selbst auf — er trägt je Serie
+# eine `anilistId`. Diese Datei ist für die übrigen: Serien, die der Katalog
+# gerade nicht führt.
+#
+#   <anilistId>: <adn-showId>
+#
+# **Wie eine Zeile hier belegt wird.** Nicht über einen Seitenaufruf: Beide
+# ADN-Domains antworten jedem Skript mit HTTP 403, die alte wie die neue
+# (gemessen 06.09.2026). Belegt wird über die Schnittstelle —
+# `gw.api.animationdigitalnetwork.com/show/<id>` mit `X-Target-Distribution: de`
+# antwortet mit 200, dem deutschen Titel und der kanonischen Adresse.
+#
+# **Und der Katalogendpunkt beantwortet eine andere Frage, als er scheint.**
+# `/show?limit=100&offset=0` gibt 96 Serien zurück und meldet dabei
+# `total: 252`; über drei Seiten gesammelt sind es 184 eindeutige. „Steht nicht
+# in der Antwort" heißt hier also nicht „gibt es nicht" — alle sechs Serien
+# unten fehlten in der ersten Seite und existieren trotzdem.
+
+# --- Gemessen am 06.09.2026, je Serie einzeln über /show/<id> ---------------
+# Alle sechs führen ausschließlich `vostde` (Untertitel, keine Synchro). Das
+# ist kein Grund, sie hier wegzulassen: Erst mit der Kennung kommt der Bau an
+# diese Auskunft heran, und erst dann fällt der Verweis über die übliche Regel
+# heraus.
+128223: 913 # When will Ayumu make his move?
+129192: 908 # My Isekai Life
+144932: 1035 # Edens Zero: Season 2
+144533: 976 # Bibliophile Princess
+145815: 967 # I've Somehow Gotten Stronger When I Improved My Farm-Related Skills
+162780: 1121 # Gushing over Magical Girls
+
+# --- Gemessen am 09.09.2026 über `/show?limit=100&offset=…` -----------------
+#
+# Drei Sammelseiten ergeben **171** Shows (`total` meldet weiterhin 252). Damit
+# stehen zwei Fälle da, die am 06.09. noch fehlten — und der dritte, der als
+# „ohne Kennung, bleibt offen" notiert war, steht jetzt auch drin.
+#
+# Zugeordnet wird über den **Slug unserer Adresse**, nicht über den Namen: Bei
+# beiden One-Piece-Filmen trägt der ADN-Titel wörtlich dieselben Bestandteile
+# (`one-piece-film-laventure-sans-issue` → „One Piece Film 4 • L'Aventure sans
+# issue", `one-piece-film-10-strong-world` → „One Piece Film 10 • Strong World").
+462: 906 # One Piece: The Movie - Das Dead End Rennen (vde, vostde)
+4155: 948 # One Piece Film: Strong World (vde, vostde)
+173388: 1171 # Plus-Sized Elf — führt ausschließlich vostde, also Untertitel
+
+# --- Über JustWatch gefunden, 09.09.2026 -----------------------------------
+#
+# **JustWatch nennt die kanonische ADN-Adresse — mit Kennung.**
+#
+# Unter den 171 Shows, die `/show?limit=100&offset=…` herausgibt, steht dieser
+# Film nicht (die API meldet weiter `total: 252`). JustWatch führt ihn dagegen
+# mit `animationdigitalnetwork.com/de/video/1181/25475-film`, und die
+# Folgenliste `/video/show/1181` bestätigt es: `languages: ["vostde", "vde"]`.
+#
+# `/show/1181` selbst antwortet mit HTTP 504 — die Folgenroute tut es nicht.
+# Das ist ein Weg, den dieses Projekt bisher nicht genutzt hat: JustWatch nennt
+# je Angebot eine **kanonische** Adresse, und bei ADN steckt die Serienkennung
+# darin.
+21158: 1181 # High Speed! Free! Starting Days (vde, vostde)
+# --- Gemessen am 21.09.2026 über `/show/<id>` (X-Target-Distribution: de) ----
+#
+# Der Katalog ordnet diese drei Filme falschen AniList-Titeln zu (882 → 18617
+# „Girls und Panzer der Film", 904 → 8184, 924 → 2679). Die alten Adressen im
+# Bestand zeigten auf `animationdigitalnetwork.de/video/<slug>`, und diese Domain
+# leitet auf die Startseite um (Daniel, 21.09.2026). Belegt über den Slug: Die
+# kanonische Adresse aus `/show/<id>` trägt wörtlich denselben Namensteil.
+459: 882 # One Piece • Le Film — 882-one-piece-le-film (vde, vostde)
+460: 904 # One Piece Film 2 — 904-one-piece-film-aventure-de-lile-de-lhorloge (vde, vostde)
+2107: 924 # One Piece Film 8 — 924-one-piece-film-episode-alabasta-les-pirates-et-la-princesse-du-desert (vde, vostde)
+# --- Gemessen am 14.10.2026: vier Wege auf der alten Domain animationdigitalnetwork.de ---
+#
+# Die Wege (`…de/video/<slug>`) trugen keine Kennung, und die Serien stehen nicht mehr in der Liste `/show`
+# (264 Serien am 14.10.2026), wohl aber im eigenen Archiv `data/adn-raw/`. Zugeordnet über den Namensteil: Die
+# Adresse, die ADN dort selbst ausgibt (`show.url` im Archiv), trägt wörtlich denselben.
+#   uq-holder → 1131-uq-holder (12 Folgen, alle vde) · free-take-your-marks → 1177-free-take-your-marks (1 Film, vde)
+#   fire-force, fire-force-saison-2 → 562-fire-force (zwei ADN-Staffeln zu je 24 Folgen, alle vde; beide Titel zeigen auf die Serie, ohne ?s=)
+21855: 1131 # UQ Holder! (vde)
+98497: 1177 # Free! Take Your Marks (vde)
+105310: 562 # Fire Force, Staffel 1 (vde)
+114236: 562 # Fire Force, Staffel 2 (vde)

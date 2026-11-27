@@ -1,0 +1,81 @@
+{
+  "_hinweis": "Prüfliste der Domains, deren Seiten als Beleg gelesen werden. Eine neue Domain kommt erst hierher, nachdem von Hand geprüft ist, ob eine Zustimmungswand oder ein Banner den Artikel verdeckt — und ein Fix im Lauf steht (pipeline/lib/beleg-bild.ts). `node tools/belege-pruefen.mjs` wird rot, wenn eine gelesene Domain fehlt oder ungeprüft ist.",
+  "www.anime2you.de": {
+    "geprueft": "2026-10-03",
+    "wand": "contentpass-Zustimmungswand — am Rechner sichtbar, auf dem Runner bisher nicht",
+    "fix": "beleg-bild.ts: Mitte des Fensters muss im Artikel liegen, sonst wird das Oberelement entfernt, sonst kein Bild",
+    "beleg": "Bild der abgelegten Lesung vom 03.10.2026 angesehen: Artikel sichtbar"
+  },
+  "www.anisearch.de": {
+    "geprueft": "2026-10-03",
+    "wand": "keine",
+    "fix": "—",
+    "beleg": "abgelegte Produktseite vom 03.10.2026 angesehen: Seite sichtbar"
+  },
+  "www.crunchyroll.com": {
+    "geprueft": "2026-10-05",
+    "wand": "Onetrust-Banner (wird entfernt); kopflos lokal gesperrt (Cloudflare-Hülle)",
+    "fix": "belege-lesen.ts entfernt #onetrust-consent-sdk",
+    "beleg": "Bilder dreier News-Artikel vom Runner-Stand (05.10.2026) angesehen: Artikel lesbar, kein Banner. Serienseiten (`/series/`) bleiben draußen: Sony-Banner und Nutzungsbedingungen, die Aufnahme war schwarz."
+  },
+  "news.animationdigitalnetwork.com": {
+    "geprueft": "2026-10-05",
+    "wand": "unbekannt; liefert mit Desktop-UA eine leere Seite",
+    "fix": "belege-lesen.ts nimmt für ADN den Standard-UA",
+    "beleg": "Bilder dreier ADN-News (05.10.2026) angesehen: Artikel lesbar, keine Wand."
+  },
+  "tokyo-revengers-anime.com": {
+    "geprueft": "2026-10-04",
+    "wand": "keine — offizielle Serienseite (Japanisch), Artikel ohne Banner",
+    "fix": "—",
+    "beleg": "Seite am 04.10.2026 angesehen: Meldung vom 24.08.2026 mit Sendezeiten sichtbar."
+  },
+  "press.disneyplus.com": {
+    "geprueft": "2026-10-04",
+    "wand": "keine sichtbar; vier Elemente mit „cookie/consent\" im Quelltext, verdecken den Artikel lokal nicht",
+    "fix": "—",
+    "beleg": "Bild vom 05.10.2026 angesehen: Pressemeldung lesbar, kein Banner."
+  },
+  "www.joyn.de": {
+    "geprueft": "2026-10-05",
+    "wand": "keine sichtbar (lokal); Usercentrics-Banner würde entfernt",
+    "fix": "beleg-bild.ts: sperreEntfernen, Leer-Wächter",
+    "beleg": "Drei Seiten (Film, zwei Serien) angesehen: Metadaten, Details/Folgen mit Datum lesbar; Titel steht im Titelbild und fehlt im Ausschnitt — mit Stützstelle (Titelname im Text) wird der Ausschnitt breiter."
+  },
+  "www.disneyplus.com": {
+    "geprueft": "2026-10-05",
+    "wand": "keine sichtbar (lokal, Deutschland-Adresse)",
+    "fix": "beleg-bild.ts: sperreEntfernen, Leer-Wächter",
+    "beleg": "Zwei Titelseiten (Mission: Yozakura Family, Black Clover) angesehen: Titel, Beschreibung, Folgen je Staffel lesbar."
+  },
+  "www.whats-on-netflix.com": {
+    "geprueft": "2026-10-05",
+    "wand": "keine sichtbar",
+    "fix": "beleg-bild.ts: sperreEntfernen, Leer-Wächter",
+    "beleg": "Artikel zu Steel Ball Run angesehen: lesbar, Datum 6. Juli 2026 im Kopf."
+  },
+  "de.wikipedia.org": {
+    "geprueft": "2026-10-05",
+    "wand": "keine",
+    "fix": "beleg-bild.ts: sperreEntfernen, Leer-Wächter",
+    "beleg": "Zwei Artikel (Pokémon Horizonte, Detektiv Conan Episodenliste) angesehen: lesbar."
+  },
+  "www.kinoheld.de": {
+    "geprueft": "2026-10-05",
+    "wand": "keine sichtbar",
+    "fix": "beleg-bild.ts: sperreEntfernen, Leer-Wächter",
+    "beleg": "Zwei Filmseiten angesehen: Titel, Daten, Veröffentlichung lesbar."
+  },
+  "www.manime.de": {
+    "geprueft": "2026-10-05",
+    "wand": "keine",
+    "fix": "—",
+    "beleg": "Aufnahme der News „RTL/TOGGO zensiert Dragon Ball Daima\" vom 05.10.2026 angesehen: Artikel lesbar, kein Banner; robots.txt: User-agent * ohne Sperre"
+  },
+  "collectors-junkies.com": {
+    "geprueft": "2026-10-05",
+    "wand": "keine sichtbar",
+    "fix": "—",
+    "beleg": "Aufnahme des Beitrags „Code Geass Gesamtausgabe\" vom 05.10.2026 angesehen: Beitrag lesbar, kein Banner; robots.txt sperrt nur GPTBot, Ahrefs, MJ12 u. a., nicht den Browser-Zugriff"
+  }
+}

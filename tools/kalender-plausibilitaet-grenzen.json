@@ -1,0 +1,23 @@
+{
+  "_hinweis": "Wird nur vom Bestandsbau gesenkt (tools/commit-data.sh, --festschreiben), nie von Hand erhöht. Ausgangswerte 16.10.2026.",
+  "vorkommen": {
+    "erschienenOhneTermin": 0,
+    "schaetzungNachEnde": 0,
+    "spracheOffenTrotzMeldung": 0,
+    "ereignisOhneNews": 0,
+    "terminOhneBeleg": 0,
+    "primeOhneTitelseite": 1,
+    "hinweisGegenTermin": 0
+  },
+  "bekannt": {
+    "erschienenOhneTermin": [],
+    "schaetzungNachEnde": [],
+    "spracheOffenTrotzMeldung": [],
+    "ereignisOhneNews": [],
+    "terminOhneBeleg": [],
+    "primeOhneTitelseite": [
+      "yu-gi-oh-s1-primevideo"
+    ],
+    "hinweisGegenTermin": []
+  }
+}

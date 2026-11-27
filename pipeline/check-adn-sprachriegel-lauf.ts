@@ -1,0 +1,171 @@
+/**
+ * Der echte Ablauf von `fetch-adn.ts` gegen eine französische Antwort (Anlass: Lauf vom 28.10.2026, PR 2274, Prüfer-Befund 1 und 2).
+ *
+ * Das Skript läuft ganz durch (`AK_ROOT`-Kulisse, Attrappe `tools/adn-franzoesisch-mock.mjs`, Antwort = Fixture aus Commit 4b8f4c268):
+ * Archiv, Katalog und Abfrage-Stand bleiben byte-gleich, die Bilanz zählt, mehr als MAX_VERWORFEN Verwerfungen färben den Exit-Code rot.
+ * Das fängt, wenn ein Schreibweg die Verwerfung ignoriert oder die Bilanz in `main` nicht verdrahtet ist.
+ */
+import { spawnSync } from 'node:child_process'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
+import { tmpdir } from 'node:os'
+import { dirname, join } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
+import { gzipSync } from 'node:zlib'
+
+type Video = { id: number; shortNumber: string; languages: string[] }
+const wurzel = join(dirname(fileURLToPath(import.meta.url)), '..')
+const tsx = createRequire(join(wurzel, 'package.json')).resolve('tsx/cli')
+const mock = pathToFileURL(join(wurzel, 'tools/adn-franzoesisch-mock.mjs')).href
+const ausschnitt = JSON.parse(readFileSync(join(wurzel, 'pipeline/fixtures/adn-sprachriegel-ausschnitt.json'), 'utf8')) as Record<
+  string,
+  { vorher: Video[]; nachher: Video[] }
+>
+// Teils vertont (ein Video ohne vde), sonst zählt `laufendeSerien` die Serie nicht als laufend.
+const DEUTSCH: Video[] = [...ausschnitt['1375'].vorher, { id: 1, shortNumber: '0', languages: ['vostde'] }]
+const FRANZ = ausschnitt['1375'].nachher
+
+let fehler = 0
+function pruefe(name: string, bedingung: boolean, gefunden?: unknown) {
+  if (bedingung) return console.log(`  ✓ ${name}`)
+  fehler++
+  console.error(`  ✗ ${name}${gefunden === undefined ? '' : ` — gefunden: ${JSON.stringify(gefunden)}`}`)
+}
+
+const KATALOGSHOW = {
+  showId: 1375,
+  title: 'Dorohedoro',
+  url: 'https://animationdigitalnetwork.com/de/video/1375',
+  episodes: [{ date: '2026-01-01', time: '12:00', number: '1', title: 'Folge 1', id: 1 }],
+  batch: false,
+  fromCatalog: true,
+}
+
+/** Baut eine Kulisse (Archiv-Serien, Katalog) und lässt `fetch-adn.ts` mit `modus` laufen; liefert Ausgabe, Exit-Code und Dateistand davor/danach. */
+function lauf(modus: string, archivIds: number[], liste: number[], extra: { katalog?: unknown[]; args?: string[]; status?: string; stand?: Record<string, string>; offen?: unknown[]; zweite?: boolean } = {}) {
+  const kulisse = mkdtempSync(join(tmpdir(), 'adn-franz-'))
+  try {
+    const archiv = join(kulisse, 'data', 'adn-raw')
+    mkdirSync(archiv, { recursive: true })
+    for (const id of archivIds) writeFileSync(join(archiv, `${id}.json.gz`), gzipSync(JSON.stringify({ showId: id, videos: DEUTSCH }), { level: 9 }))
+    // Beim Laden liest `bau/grundlagen.ts` diese Handdateien; leer genügt.
+    mkdirSync(join(kulisse, 'data', 'curated'), { recursive: true })
+    writeFileSync(join(kulisse, 'data', 'kino-ankuendigungen.yaml'), '[]\n')
+    const katalogPfad = join(kulisse, 'data', 'adn-catalog.json')
+    writeFileSync(katalogPfad, JSON.stringify({ scrapedAt: '', window: { from: '', to: '' }, shows: extra.katalog ?? [KATALOGSHOW] }))
+    if (extra.stand) writeFileSync(join(kulisse, 'data', 'adn-katalog-stand.json'), JSON.stringify(extra.stand))
+    const antwort = join(kulisse, 'antwort.json')
+    writeFileSync(antwort, JSON.stringify(FRANZ))
+    const deutsch = join(kulisse, 'deutsch.json')
+    writeFileSync(deutsch, JSON.stringify(DEUTSCH))
+    const offenPfad = join(kulisse, 'data', 'adn-anisearch-offen.json')
+    if (extra.offen) writeFileSync(offenPfad, JSON.stringify({ anzahl: extra.offen.length, serien: extra.offen }))
+    const stand = (): Record<string, Buffer> =>
+      Object.fromEntries(readdirSync(archiv).map((d) => [d, readFileSync(join(archiv, d))]))
+    const vorher = { archiv: stand(), katalog: readFileSync(katalogPfad) }
+    const l = spawnSync(process.execPath, [tsx, '--import', mock, join(wurzel, 'pipeline/fetch-adn.ts'), modus, ...(extra.args ?? [])], {
+      cwd: wurzel,
+      encoding: 'utf8',
+      env: { ...process.env, AK_ROOT: kulisse, AK_ADN_ANTWORT: antwort, AK_ADN_LISTE: liste.join(','), AK_ADN_STATUS: extra.status ?? '', AK_ADN_WIEDERHOLUNG_MS: '0', ...(extra.zweite ? { AK_ADN_ANTWORT_NACH: deutsch } : {}) },
+    })
+    const nachher = { archiv: stand(), katalog: readFileSync(katalogPfad) }
+    const standDatei = join(kulisse, 'data', 'adn-katalog-stand.json')
+    const abfrageStand = existsSync(standDatei) ? (JSON.parse(readFileSync(standDatei, 'utf8')) as Record<string, string>) : {}
+    const offenNachher = existsSync(offenPfad) ? (JSON.parse(readFileSync(offenPfad, 'utf8')) as { serien: { showId: number }[] }).serien.map((o) => o.showId) : []
+    return { l, ausgabe: `${l.stdout}${l.stderr}`, vorher, nachher, abfrageStand, offenNachher }
+  } finally {
+    rmSync(kulisse, { recursive: true, force: true })
+  }
+}
+const gleich = (a: Record<string, Buffer>, b: Record<string, Buffer>) =>
+  Object.keys(a).length === Object.keys(b).length && Object.keys(a).every((k) => b[k]?.equals(a[k]))
+
+console.log('ADN-Sammler: französische Antwort durch den ganzen Lauf\n')
+
+// --laufend: sechs Archiv-Serien + eine neue Serie aus der Liste = sieben Verwerfungen > 5.
+const laufend = lauf('--laufend', [2001, 2002, 2003, 2004, 2005, 2006], [1433])
+pruefe('--laufend: Archiv bleibt byte-gleich', gleich(laufend.vorher.archiv, laufend.nachher.archiv))
+pruefe('--laufend: neue Serie mit französischer Antwort legt kein Archiv an', !('1433.json.gz' in laufend.nachher.archiv))
+pruefe('--laufend: Katalog bleibt byte-gleich', laufend.vorher.katalog.equals(laufend.nachher.katalog))
+pruefe('--laufend: verworfene neue Serie steht nicht im Abfrage-Stand (kommt im nächsten Lauf wieder dran)', !('1433' in laufend.abfrageStand), laufend.abfrageStand)
+pruefe('--laufend: Bilanz zählt sieben', laufend.ausgabe.includes('ADN-Sprachriegel: 7 Serien'), laufend.ausgabe.slice(-300))
+pruefe('--laufend: Bilanzzeile nennt die sieben Gefragten (Verdrahtung des Zählers)', laufend.ausgabe.includes('(Grenze 5, 7 gefragt)'), laufend.ausgabe.slice(-300))
+pruefe('--laufend: mehr als fünf Verwerfungen färben den Lauf rot', laufend.l.status === 1, laufend.l.status)
+
+// Genau eine Verwerfung bleibt grün.
+const eine = lauf('--laufend', [2001], [])
+pruefe('--laufend: eine Verwerfung zählt eins', eine.ausgabe.includes('ADN-Sprachriegel: 1 Serien'), eine.ausgabe.slice(-300))
+pruefe('--laufend: eine Verwerfung lässt den Lauf grün', eine.l.status === 0, eine.l.status)
+pruefe('--laufend: eine Verwerfung lässt das Archiv stehen', gleich(eine.vorher.archiv, eine.nachher.archiv))
+
+// --refresh: der bekannte Katalogeintrag bleibt stehen.
+const refresh = lauf('--refresh', [], [])
+const nachRefresh = (JSON.parse(refresh.nachher.katalog.toString()) as { shows: unknown[] }).shows
+pruefe('--refresh: Katalogeintrag bleibt unverändert', JSON.stringify(nachRefresh) === JSON.stringify([KATALOGSHOW]), nachRefresh)
+pruefe('--refresh: Bilanz zählt eins', refresh.ausgabe.includes('ADN-Sprachriegel: 1 Serien'), refresh.ausgabe.slice(-300))
+
+// --catalog: Serie aus Liste und Archiv; weder Archiv noch Katalog noch Stand ändern sich.
+const katalog = lauf('--catalog', [1375], [1433])
+const nachKatalog = (JSON.parse(katalog.nachher.katalog.toString()) as { shows: unknown[] }).shows
+pruefe('--catalog: Archiv bleibt byte-gleich, keine neue Datei', gleich(katalog.vorher.archiv, katalog.nachher.archiv))
+pruefe('--catalog: der alte Katalogeintrag der verworfenen Serie bleibt, es kommt nichts Neues dazu', JSON.stringify(nachKatalog) === JSON.stringify([KATALOGSHOW]), nachKatalog)
+pruefe('--catalog: verworfene Serien stehen nicht im Abfrage-Stand', !('1433' in katalog.abfrageStand) && !('1375' in katalog.abfrageStand), katalog.abfrageStand)
+pruefe('--catalog: Bilanz zählt zwei', katalog.ausgabe.includes('ADN-Sprachriegel: 2 Serien'), katalog.ausgabe.slice(-400))
+
+// --catalog --limit: eine Antwort ganz ohne Videos (404) ist keine Auskunft, der alte Eintrag bleibt (09.11.2026, elf Serien im Tiefendurchlauf verloren).
+const mitId = (showId: number) => ({ ...KATALOGSHOW, showId, title: `Serie ${showId}` })
+const ids = (l: { nachher: { katalog: Buffer } }) => (JSON.parse(l.nachher.katalog.toString()) as { shows: { showId: number }[] }).shows.map((s) => s.showId)
+const begrenzt = lauf('--catalog', [], [], { katalog: [mitId(3001), mitId(3002), mitId(3003)], args: ['--limit', '2'], status: '3001:500,3002:404' })
+pruefe('--catalog --limit: Serie mit 5xx bleibt (Abbruch ist keine Auskunft)', ids(begrenzt).includes(3001), ids(begrenzt))
+pruefe('--catalog --limit: Serie jenseits des Limits bleibt (nicht gefragt)', ids(begrenzt).includes(3003), ids(begrenzt))
+pruefe('--catalog --limit: Serie mit 404 ohne Videos bleibt (leere Antwort ist keine Auskunft)', ids(begrenzt).includes(3002), ids(begrenzt))
+pruefe('--catalog --limit: Zähler je Weg in der Logzeile', begrenzt.ausgabe.includes('ADN-Katalog behalten: 1 nicht gefragt, 2 Abbruch, 0 entfernt'), begrenzt.ausgabe.slice(-500))
+pruefe('--catalog --limit: Serie mit 5xx steht nicht im Abfrage-Stand (kommt wieder dran)', !('3001' in begrenzt.abfrageStand), begrenzt.abfrageStand)
+
+// Stand-Schlüssel ohne Archivdatei und ohne Katalogeintrag („Gespenster“) kommen zusätzlich in die Schlange: 4001 antwortet mit 5xx (Versuch vermerkt), 4002 mit 404 (Antwortzeit gesetzt).
+const gespenster = lauf('--catalog', [], [], { katalog: [mitId(3010)], args: ['--limit', '1'], status: '4001:500,4002:404', stand: { '4001': '2026-10-01T00:00:00.000Z', '4002': '2026-10-02T00:00:00.000Z' } })
+pruefe('--catalog --limit: Gespenst mit 5xx wird gefragt, Versuch vermerkt, Antwortzeit unverändert', gespenster.abfrageStand.v4001 !== undefined && gespenster.abfrageStand['4001'] === '2026-10-01T00:00:00.000Z', gespenster.abfrageStand)
+pruefe('--catalog --limit: Gespenst mit 404 wird gefragt, Antwortzeit neu', gespenster.abfrageStand['4002'] !== '2026-10-02T00:00:00.000Z' && gespenster.abfrageStand.v4002 === undefined, gespenster.abfrageStand)
+pruefe('--catalog --limit: Logzeile nennt gefragt und ohne Antwort', gespenster.ausgabe.includes('ADN-Katalog: 3 gefragt, davon 2 ohne Antwort'), gespenster.ausgabe.slice(-600))
+
+// Auch 404/410 auf Seite 1 ohne Videos entfernen nichts mehr; Zeitüberschreitung, 429 und ein Fehler auf Seite 2 sind Nichtauskunft.
+const nichtauskunft = lauf('--catalog', [], [], {
+  katalog: [mitId(3004), mitId(3005), mitId(3006), mitId(3007), mitId(3008), mitId(3009)],
+  args: ['--limit', '6'],
+  status: '3004:throw,3005:429,3006:410,3007:404,3008:seite2-404,3009:seite2-500',
+})
+const bleibt = ids(nichtauskunft)
+const stand2 = nichtauskunft.abfrageStand
+pruefe('--catalog: Zeitüberschreitung (fetch wirft) lässt die Serie im Katalog', bleibt.includes(3004), bleibt)
+pruefe('--catalog: 429 lässt die Serie im Katalog', bleibt.includes(3005), bleibt)
+pruefe('--catalog: 410 auf Seite 1 ohne Videos lässt die Serie im Katalog', bleibt.includes(3006), bleibt)
+pruefe('--catalog: 404 auf Seite 1 ohne Videos lässt die Serie im Katalog', bleibt.includes(3007), bleibt)
+pruefe('--catalog: 404 auf Seite 2 (Seite 1 voll) lässt die Serie im Katalog', bleibt.includes(3008), bleibt)
+pruefe('--catalog: 500 auf Seite 2 (Seite 1 voll) lässt die Serie im Katalog', bleibt.includes(3009), bleibt)
+pruefe('--catalog: Nichtauskunft steht nicht im Abfrage-Stand, Verneinung schon', !('3004' in stand2) && !('3005' in stand2) && !('3008' in stand2) && !('3009' in stand2) && '3006' in stand2 && '3007' in stand2, stand2)
+pruefe('--catalog: Zähler Nichtauskunft', nichtauskunft.ausgabe.includes('ADN-Katalog behalten: 0 nicht gefragt, 6 Abbruch, 0 entfernt'), nichtauskunft.ausgabe.slice(-500))
+
+// Punkt 1: französische Sicht wird einmal nach Wartezeit erneut gefragt; erst die zweite zählt.
+const wieder = lauf('--laufend', [2001, 2002, 2003, 2004, 2005, 2006], [1433], { zweite: true })
+const erneut = (ausgabe: string) => (ausgabe.match(/einmal erneut gefragt/g) ?? []).length
+pruefe('Wiederholung: kommt beim zweiten Mal Deutsch, zählt keine Verwerfung', wieder.ausgabe.includes('ADN-Sprachriegel: 0 Serien'), wieder.ausgabe.slice(-300))
+pruefe('Wiederholung: der Lauf bleibt grün (sieben Serien einmal Französisch)', wieder.l.status === 0, wieder.l.status)
+pruefe('Wiederholung: jede der sieben Serien wurde genau einmal erneut gefragt', erneut(wieder.ausgabe) === 7, erneut(wieder.ausgabe))
+pruefe('Wiederholung: bleibt es beim zweiten Mal Französisch, zählt es einmal je Serie', eine.ausgabe.includes('ADN-Sprachriegel: 1 Serien') && erneut(eine.ausgabe) === 1, eine.ausgabe.slice(-300))
+
+// Punkt 2: Katalog und Offen-Liste passen zusammen, auch wenn Alteinträge nur behalten werden (5xx, nicht gefragt) und keine aniSearch-Titelliste da ist (429).
+const offenEintrag = (showId: number) => ({ showId, title: `Serie ${showId}`, grund: 'mehrdeutig', kandidaten: [] })
+const zusammen = lauf('--catalog', [], [], { katalog: [mitId(3101), mitId(3102)], args: ['--limit', '2'], status: '3101:500,3102:500', offen: [offenEintrag(3101), offenEintrag(3102)] })
+pruefe('Katalog/Offen: beide behaltenen Alten stehen weiter im Katalog', ids(zusammen).join() === '3101,3102', ids(zusammen))
+pruefe('Katalog/Offen: ihre Einträge in der Offen-Liste bleiben erhalten', zusammen.offenNachher.join() === '3101,3102', zusammen.offenNachher)
+const gemischt = lauf('--catalog', [], [], { katalog: [mitId(3103), mitId(3104)], args: ['--limit', '1'], status: '3103:500', offen: [offenEintrag(3103), offenEintrag(3104)] })
+pruefe('Katalog/Offen: nicht gefragte und abgebrochene Alte behalten ihren Offen-Eintrag', gemischt.offenNachher.join() === '3103,3104', gemischt.offenNachher)
+
+console.log()
+if (fehler) {
+  console.error(`${fehler} Zusicherung(en) verletzt.`)
+  console.log(`VERSTÖSSE: ${fehler}`)
+  process.exit(1)
+}
+console.log('Alle Zusicherungen halten.')
+console.log('VERSTÖSSE: 0')

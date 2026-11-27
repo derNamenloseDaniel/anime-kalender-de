@@ -1,0 +1,192 @@
+import { type IstTot } from '../lib/adresse-tot.ts'
+import { type PlatformId, type Release, type StreamLink, type Title } from '../../shared/types.ts'
+import { zugangsart } from '../../shared/zugangsart.ts'
+import { anzeigeName } from '../../shared/titles.ts'
+import { log } from '../lib/util.ts'
+import { type Ausloeser, ausloeserZeilen } from '../lib/ausloeser-zeilen.ts'
+import type { EntfernterVerweis } from './grundlagen.ts'
+import { type DubCheck, adressKern, dubKey } from '../lib/dub-confirmed.ts'
+import { istSammelKern } from '../../shared/adresse-kern.ts'
+import { baueNeinGilt } from '../lib/maengel-nein.ts'
+import { brichAbBeiWiderspruch } from '../lib/bau-widerspruch.ts'
+
+/** Der Handbeleg-Leser des Baus (`09-1-belege.ts`). */
+type BelegFuer = (titleId: number, plattform: PlatformId, url?: string, anzahlWege?: number) => DubCheck | undefined
+
+/** Anbieter, bei denen man schauen kann; Disc, Kino und Fernsehen sind keine Streaming-Wege. */
+const STREAMING = new Set<PlatformId>([
+  'crunchyroll',
+  'netflix',
+  'primevideo',
+  'disneyplus',
+  'paramountplus',
+  'adn',
+  'aniverse',
+  'wow',
+  'joyn',
+  'rtlplus',
+  'plutotv',
+  'youtube',
+])
+
+/** Führt die Adresse auf eine Suche oder die Startseite statt auf eine Titelseite? (Eine Suche ist kein Weg, Daniel 10.09.2026.) */
+export function istKeineTitelseite(url: string): boolean {
+  try {
+    const u = new URL(url)
+    const pfad = /\/(search|suche|results)(\/|$)|^\/s$/.test(u.pathname) || u.pathname.replace(/\/+$/, '') === ''
+    return pfad || ['k', 'q', 's', 'search', 'search_query'].some((p) => u.searchParams.has(p))
+  } catch {
+    return true
+  }
+}
+
+/** Ein sicherer Termin: belegt, nicht geschätzt, bei einem Streaming-Anbieter. */
+export function istSichererTermin(r: Release): boolean {
+  return STREAMING.has(r.platform) && r.releaseType !== 'disc' && !r.schedule?.estimated && (r.sources?.length ?? 0) > 0
+}
+
+/**
+ * Schlüssel `Titel|Anbieter`, deren Handbeleg-Nein „nicht verfügbar“ (Suche ohne Treffer) älter ist als ein sicherer Termin (Kamisama Kiss 14713: Nein 27.08.
+ * gegen Aniverse-Termin 08.10.; Kuroko 102836: Nein 30.08. gegen Nachtrag-Termin 13.09.). Das Nein hat vor dem Termin gemessen, die Quelle des Termins
+ * widerlegt es (`baueNeinGilt`). Auch ohne `kanal` (26.11.2026): Ein Weg ohne Adresse oder Ton meldet `weg-ohne-adresse` bzw. `sprachurteil-offen`,
+ * sonst stünde der belegte Anbieter als `kein-weg` offen. Ohne `kanal` bleibt ein Nein, das an einer echten Titeladresse gemessen wurde (`neinMitAdresse`).
+ * Nur begonnene Termine (`ab <= heute`, wie die Mängelart `erschienen-ohne-weg`): Ein Weg ohne Tonurteil für einen erst kommenden Termin brächte nur `sprachurteil-offen`
+ * hinzu (Call of the Night 175914, Termin 20.11.2026).
+ * Ein jüngerer Ja-Beleg hat das Nein schon selbst abgelöst (`jaNachNein`); der Schlüssel bleibt dann draußen, sonst übersähe `check-handbelege` den Ja-Beleg.
+ */
+export function ueberholteNeins(belege: Parameters<typeof baueNeinGilt>[0], releases: Release[], heute: string): Set<string> {
+  const gilt = baueNeinGilt(belege)
+  const mitAdresse = neinMitAdresse(belege)
+  const fruehester = new Map<string, string>()
+  for (const r of releases) {
+    const ab = r.schedule?.firstEpisodeDate
+    if (!ab || ab > heute || !istSichererTermin(r) || (!r.kanal && mitAdresse.has(dubKey(r.titleId, r.platform)))) continue
+    const k = dubKey(r.titleId, r.platform)
+    if (ab < (fruehester.get(k) ?? '9')) fruehester.set(k, ab)
+  }
+  const ueberholt = [...fruehester].filter(([k, ab]) => {
+    const [id, plattform] = k.split('|')
+    return belege.some((b) => b.available === false && dubKey(b.anilistId, b.platform) === k) && !gilt(Number(id), plattform!, ab) && !jaNachNein(belege, k)
+  })
+  return new Set(ueberholt.map(([k]) => k))
+}
+
+/** Schlüssel `Titel|Anbieter`, deren „nicht verfügbar“ an einer echten Titeladresse gemessen wurde (keine Suche, keine Startseite). */
+function neinMitAdresse(belege: Parameters<typeof baueNeinGilt>[0]): Set<string> {
+  const echt = belege.filter((b) => b.available === false && adressKern(b.url) !== '' && !istSammelKern(adressKern(b.url)))
+  return new Set(echt.map((b) => dubKey(b.anilistId, b.platform)))
+}
+
+/** Steht zum Schlüssel ein „deutsch“-Beleg, der jünger ist als jedes „nicht verfügbar“? */
+function jaNachNein(belege: Parameters<typeof baueNeinGilt>[0], k: string): boolean {
+  const eigene = belege.filter((b) => dubKey(b.anilistId, b.platform) === k)
+  const neinAm = eigene.filter((b) => b.available === false).reduce((m, b) => ((b.checkedAt ?? '') > m ? (b.checkedAt ?? '') : m), '')
+  return eigene.some((b) => tonAusBeleg(b).dub !== undefined && (b.checkedAt ?? '') > neinAm) // Ja-Beleg wie in tonAusBeleg gelesen, keine eigene dub-Lesestelle
+}
+
+/** Ein Handbeleg „deutsch" bringt Urteil und Folgenbereiche mit; ohne ihn bleibt der Ton offen, und die Herkunft ist der Termin. */
+function tonAusBeleg(beleg: Pick<DubCheck, 'dub' | 'dubRanges'> | undefined): Pick<StreamLink, 'dub' | 'dubRanges' | 'herkunft'> {
+  if (beleg?.dub !== true) return { herkunft: 'termin' }
+  const bereiche = beleg.dubRanges?.map((b) => ({ from: b.from, to: b.to, dub: b.dub }))
+  return { dub: true, ...(bereiche?.length ? { dubRanges: bereiche } : {}) }
+}
+
+/**
+ * **Wer einen sicheren Kalendertermin bei einem Anbieter hat, hat dort einen Weg** (11.10.2026).
+ *
+ * „Tokyo Revengers: War of the Three Titans" läuft laut Disney+ und Anime2You freitags, trug aber
+ * `streams: []` — kein Anbieter-Chip im Panel, und die Prüfliste, die nur über Wege mit Adresse
+ * läuft, kannte den Titel nicht. Der Weg entsteht hier, ganz am Ende des Wege-Abschlusses:
+ * Anbieter aus dem Termin, Adresse nur, wenn der Termin eine Titelseite nennt (keine Suche, keine
+ * tote), sonst `url: ''` (Weg ohne Adresse, nur der Anbieter ist bekannt; wie bei den Cartoons, am 18.10.2026
+ * 24 Wege bei Disney+, Prime, Netflix, Joyn, RTL+). `dub` bleibt offen — ein Termin ist kein Tonbeleg.
+ * Was schon einen Weg zum Anbieter hat oder bewusst entfernt wurde, bleibt unberührt.
+ *
+ * **Ein Handbeleg gilt vor dem Termin** (11.10.2026: Seit diese Ergänzung läuft, gaben drei Handprüfungen dem Datensatz recht nicht mehr, und der
+ * Bau lieferte nichts aus): „nicht verfügbar" oder „ohne deutschen Ton" heißt kein Weg, „deutsch" heißt ein Weg mit dem Urteil und den
+ * Folgenbereichen des Belegs, dann ohne Herkunft Termin, denn der Ton ist belegt.
+ */
+export function ergaenzeWegeAusTerminen({ titles, releases, istTot, verweiseEntfernt, belegFuer, nein = new Set() }: {
+  titles: Map<number, Title>
+  releases: Release[]
+  istTot: IstTot
+  verweiseEntfernt: EntfernterVerweis[]
+  belegFuer: BelegFuer
+  /** `ueberholteNeins`: ihr Handbeleg-Nein verneint den Termin nicht. */
+  nein?: ReadonlySet<string>
+}): number {
+  const entfernt = new Set(verweiseEntfernt.map((v) => `${v.titleId}|${v.plattform}`))
+  const handNein = new Set<string>()
+  const neu = new Map<string, { titel: Title; weg: StreamLink }>()
+  const termine = new Map<string, string | undefined>()
+  for (const r of releases) {
+    const titel = titles.get(r.titleId)
+    const schluessel = `${r.titleId}|${r.platform}`
+    if (!titel || !istSichererTermin(r) || entfernt.has(schluessel)) continue
+    if (titel.streams?.some((s) => s.platform === r.platform)) continue
+    const belegt = r.platformUrl && !istKeineTitelseite(r.platformUrl) && !istTot(r.platformUrl)
+    const url = belegt ? r.platformUrl! : ''
+    // Ein zweiter Termin ersetzt den ersten nur, wenn er mehr weiß: eine Adresse, wo jener keine hat, oder sonst einen Kanal.
+    const bisher = neu.get(schluessel)
+    if (bisher && (bisher.weg.url || (!url && (bisher.weg.kanal || !r.kanal)))) continue
+    const beleg = belegFuer(r.titleId, r.platform, url || undefined)
+    if ((beleg?.available === false || beleg?.dub === false) && !nein.has(dubKey(r.titleId, r.platform))) {
+      handNein.add(schluessel)
+      continue
+    }
+    const weg: StreamLink = { platform: r.platform, url, ...tonAusBeleg(beleg), zugang: wegZugang(r.platform, url) }
+    if (r.kanal) weg.kanal = r.kanal
+    neu.set(schluessel, { titel, weg })
+    termine.set(schluessel, r.platformUrl)
+  }
+  for (const { titel, weg } of neu.values()) titel.streams = [...(titel.streams ?? []), weg]
+  if (neu.size) {
+    log(`${neu.size} Wege aus sicheren Kalenderterminen ergänzt (Ton nur, wo ein Handbeleg ihn belegt)`)
+    for (const z of ausloeserZeilen(wegAusloeser(neu, termine))) log(z)
+  }
+  bestehe(termineOhneWeg(titles, releases, new Set([...entfernt, ...handNein])), tonOhneBeleg(titles))
+  return neu.size
+}
+
+/** Auslöser-Angaben je ergänztem Weg; aufgerufen nach dem Anhängen. `wegVorher` ist der Bestand vor der ganzen Runde (ohne alle neuen Wege), `wegNachher` er plus dieser eine Weg. */
+function wegAusloeser(neu: Map<string, { titel: Title; weg: StreamLink }>, termine: Map<string, string | undefined>): Ausloeser[] {
+  const neueWege = new Set([...neu.values()].map((n) => n.weg))
+  return [...neu].map(([schluessel, { titel, weg }]) => {
+    const vorher = (titel.streams ?? []).filter((s) => !neueWege.has(s)).map((s) => s.url)
+    return {
+      titleId: titel.id,
+      name: anzeigeName(titel),
+      regel: `wegAusTermin:${weg.platform}`,
+      terminUrl: termine.get(schluessel),
+      wegVorher: vorher,
+      wegNachher: [...vorher, weg.url],
+    }
+  })
+}
+
+/** Schlüssel `Titel|Anbieter` aller sicheren Termine, zu denen der Titel keinen Weg hat und die nicht bewusst entfernt wurden. */
+export function termineOhneWeg(titles: Map<number, Title>, releases: Release[], entfernt: Set<string>): string[] {
+  const fehlt = releases.filter((r) => {
+    const titel = titles.get(r.titleId)
+    return titel && istSichererTermin(r) && !entfernt.has(`${r.titleId}|${r.platform}`) && !titel.streams?.some((s) => s.platform === r.platform)
+  })
+  return [...new Set(fehlt.map((r) => `${r.titleId}|${r.platform}`))]
+}
+
+/** Titel, deren Weg aus einem Termin stammt und trotzdem ein Tonurteil trägt — ein Termin ist kein Tonbeleg. */
+export function tonOhneBeleg(titles: Map<number, Title>): number[] {
+  return [...titles.values()].filter((t) => t.streams?.some((s) => s.herkunft === 'termin' && s.dub !== undefined)).map((t) => t.id)
+}
+
+/** Zusicherung: bricht den Bau ab, statt einen Datensatz mit Lücke oder erfundenem Ton zu schreiben. */
+function bestehe(ohneWeg: string[], mitTon: number[]) {
+  brichAbBeiWiderspruch([
+    ...(ohneWeg.length ? [`sicherer Termin ohne Weg zum Anbieter: ${ohneWeg.slice(0, 10).join(', ')}`] : []),
+    ...(mitTon.length ? [`Weg aus einem Termin mit Tonurteil: ${mitTon.slice(0, 10).join(', ')}`] : []),
+  ])
+}
+
+/** Prime führt Abo und Kauf nebeneinander; was ein Termin kostet, sagt er nicht. */
+function wegZugang(platform: PlatformId, url: string): StreamLink['zugang'] {
+  return platform === 'primevideo' ? 'unbekannt' : zugangsart(platform, undefined, url)
+}

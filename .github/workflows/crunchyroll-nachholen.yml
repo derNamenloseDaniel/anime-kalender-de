@@ -1,0 +1,167 @@
+name: Crunchyroll — Rückstand nachholen
+
+# Einmaliger Nachhol-Lauf für die Tonspur-Prüfung, von Hand angestoßen.
+#
+# Warum es diesen Workflow gibt: Im Wochenlauf steht `data:cr-dub --limit 250`.
+# Dieser Deckel schützt **die Laufzeit des Wochenlaufs**, nicht Crunchyroll —
+# ein voller Durchgang dauert länger als der ganze restliche Tiefendurchlauf.
+# Bei 954 Adressen und 28 Tagen Wiedervorlage sind 250 pro Woche aber genau die
+# Erhaltungsrate: Ein Rückstand baut sich damit nicht ab, er bleibt stehen.
+#
+# Gemessen am 21.08.2026: 6,7 Sekunden je Serie (9 Serien in 59 s im Lauf
+# 32359320442). 769 offene Adressen sind also rund 85 Minuten — hier, wo kein
+# anderer Schritt dahinter wartet, ist das kein Problem.
+#
+# Warum in der Cloud und nicht auf Daniels Rechner: Ein Direktabruf von dort
+# lief am 15.08.2026 in Crunchyrolls Bot-Sperre, und die trifft dann auch ihn
+# selbst beim normalen Surfen.
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Obergrenze an Serien (0 = alle offenen)'
+        required: false
+        default: '0'
+        type: string
+      alter:
+        description: 'Wiedervorlage in Tagen — was jünger ist, wird übersprungen'
+        required: false
+        default: '28'
+        type: string
+      nur_fehler:
+        description: 'Nur die Seiten, bei denen der letzte Lauf einen Fehler vermerkt hat'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# Gruppe der Abruf-Läufe (seit 05.10.2026 mit Pull Request statt Push): Zwei Läufe gegen dieselbe Quelle
+# sollen nicht zugleich laufen.
+concurrency:
+  group: abruf
+  cancel-in-progress: false
+
+jobs:
+  nachholen:
+    runs-on: ubuntu-latest
+    # Zweck und Ziel gehen an die Statusanzeige mit. Ohne sie steht dort nur
+    # der Workflow-Name, und der sagt bei drei Auftrags-Läufen dreimal
+    # dasselbe (Daniel, 21.08.2026: „Zweck sollte kurz beschreiben wofür
+    # dieser lauf ist"). Der Lauf weiß es, die Anzeige nicht — also liefert
+    # er es mit.
+    env:
+      LAUF_ZWECK: "Holt den Rückstand bei den Crunchyroll-Synchro-Prüfungen nach"
+      LAUF_ZIEL: "bis zu ${{ inputs.limit }} Serien bei Crunchyroll prüfen"
+      LAUF_SCHRITTE: '1'
+    # Der Standard von 360 Minuten wäre großzügiger als nötig; 3 Stunden decken
+    # auch einen vollen Durchgang über alle 954 Adressen ab.
+    timeout-minutes: 180
+    steps:
+      # Sofort anmelden, noch vor allem anderen.
+      #
+      # Der Schritt weiter unten braucht das ausgecheckte Skript und läuft
+      # deshalb erst nach Checkout und npm-Einrichtung — das sind dreißig bis
+      # sechzig Sekunden, in denen die Statusanzeige nichts weiß. Daniel am
+      # 21.08.2026: „der läuft sogar schon seit 1min aber ist erst jetzt in
+      # der app aufgetaucht."
+      #
+      # Ein curl braucht nichts als das Token. Schlägt er fehl, läuft der Job
+      # weiter — die spätere Anmeldung holt es nach.
+      - name: Sofort anmelden
+        continue-on-error: true
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: |
+          if [ -z "$LAUF_TOKEN" ]; then exit 0; fi
+          printf '{"lauf_id":"%s","repo":"%s","workflow":"%s","zustand":"laeuft","url":"%s","notiz":"wird eingerichtet"}' \
+            "$GITHUB_RUN_ID" "$GITHUB_REPOSITORY" "$GITHUB_WORKFLOW" \
+            "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > /tmp/anmeldung.json
+          curl -sS --max-time 10 -X POST "https://newsletter.animekalender.workers.dev/lauf" \
+            -H "Content-Type: application/json" -H "X-Lauf-Token: $LAUF_TOKEN" \
+            --data-binary @/tmp/anmeldung.json > /dev/null || true
+
+
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      # Meldet der Statusanzeige, dass hier etwas läuft. Ohne LAUF_TOKEN
+      # passiert nichts — eine fehlende Meldung darf keinen Lauf rot machen.
+      # Das Meldeskript an einen Ort legen, den kein Zweigwechsel wegnimmt.
+      #
+      # Am 21.08.2026 hat ein Auftrags-Lauf seinen eigenen Zweig angelegt und
+      # ist dorthin gewechselt — auf dem gab es `tools/lauf-melden.sh` noch
+      # nicht. Die Abmeldung scheiterte mit Exit 127 und machte einen Lauf rot,
+      # dessen Arbeit fertig und richtig war.
+      - name: Melder bereitlegen
+        run: |
+          cp tools/lauf-melden.sh "$RUNNER_TEMP/lauf-melden.sh"
+          echo "MELDER=$RUNNER_TEMP/lauf-melden.sh" >> "$GITHUB_ENV"
+
+      - name: Lauf anmelden
+        continue-on-error: true
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+          LAUF_AUFTRAG: Crunchyroll-Rückstand, Limit ${{ inputs.limit }}
+        run: bash "$MELDER" laeuft
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Microsoft-Paketquelle entfernen
+        run: sudo grep -l packages.microsoft.com /etc/apt/sources.list.d/* | sudo xargs -r rm -fv || true
+
+      - name: Browser installieren
+        run: npx playwright install chromium
+
+      # apt-Störung (security.ubuntu.com, 11.11.2026) darf den Lauf nicht reißen; fehlt danach eine Bibliothek, scheitert sichtbar erst der Browserstart (nicht gemessen).
+      - name: Chromium-Systempakete
+        run: npx playwright install-deps chromium || echo "::warning::Chromium-Systempakete nicht installiert (apt-Störung)"
+
+      # Frisches Zugangspaket über die Vercel-Weiche in Frankfurt (weiche-vercel/,
+      # 16.09.2026) — das Secret CR_ZUGANG bleibt nur Rückfall, es lebt 24 Stunden.
+      - name: Crunchyroll-Zugangspaket über die Weiche holen
+        continue-on-error: true
+        env:
+          CR_WEICHE_TOKEN: ${{ secrets.CR_WEICHE_TOKEN }}
+        run: node tools/cr-zugang-holen.mjs --github-env
+
+      - name: Crunchyroll-Serienseiten auf deutsche Tonspur
+        env:
+          # Ohne das Paket bricht der Lauf ab, statt still den US-Katalog zu
+          # lesen. Es gilt 24 Stunden — ein Lauf braucht also ein frisches.
+          CR_ZUGANG: ${{ env.CR_ZUGANG_FRISCH || secrets.CR_ZUGANG }}
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: npm run data:cr-dub -- --limit ${{ inputs.limit }} --alter ${{ inputs.alter }}${{ inputs.nur_fehler && ' --nur-fehler' || '' }}
+
+      - name: Fortschritt — Crunchyroll-Serienseiten auf deutsche Tonspur
+        continue-on-error: true
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: bash "$MELDER" schritt "Crunchyroll-Serienseiten auf deutsche Tonspur"
+
+      - name: Quellen als Pull Request einreichen
+        if: always()
+        uses: ./.github/actions/einreichen
+        with:
+          nachricht: 'chore(data): Crunchyroll-Rückstand nachgeholt'
+          fund: nachholen
+          app-id: ${{ secrets.DATEN_APP_ID }}
+          app-key: ${{ secrets.DATEN_APP_KEY }}
+
+      # Läuft auch nach einem Fehler: Der rote Lauf ist der, den man sehen will.
+      - name: Lauf abmelden
+        continue-on-error: true
+        if: always()
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+          LAUF_AUFTRAG: Crunchyroll-Rückstand, Limit ${{ inputs.limit }}
+        run: bash "$MELDER" "${{ job.status == 'success' && 'ok' || job.status == 'cancelled' && 'abgebrochen' || 'fehler' }}"

@@ -1,0 +1,690 @@
+[
+  {
+    "name": "pipeline/bau/13-12-maengel.ts:48 Argumente getauscht staffelZuordnung",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-12-maengel.ts",
+        "suche": "staffelZuordnung(titel, readJson(ANBIETER_STAFFELN_DATEI, {}), (id) => letzterNetflixStart(releases.get(id) ?? []))",
+        "ersetze": "staffelZuordnung(readJson(ANBIETER_STAFFELN_DATEI, {}), titel, (id) => letzterNetflixStart(releases.get(id) ?? []))",
+        "zeile": 48
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-12-maengel.ts:48 Argumente getauscht readJson",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-12-maengel.ts",
+        "suche": "readJson(ANBIETER_STAFFELN_DATEI, {})",
+        "ersetze": "readJson({}, ANBIETER_STAFFELN_DATEI)",
+        "zeile": 48
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-regeln.ts:193 Zahl 2 → 0",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-regeln.ts",
+        "suche": "2",
+        "ersetze": "0",
+        "zeile": 193
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-regeln.ts:193 ?: Zweige vertauscht",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-regeln.ts",
+        "suche": "laeuftNoch(t, k) ? 'laeuft' : undefined",
+        "ersetze": "laeuftNoch(t, k) ? undefined : 'laeuft'",
+        "zeile": 193
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-regeln.ts:193 Argumente getauscht laeuftNoch",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-regeln.ts",
+        "suche": "laeuftNoch(t, k)",
+        "ersetze": "laeuftNoch(k, t)",
+        "zeile": 193
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:12 || → &&",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "releases.filter((r) => r.platform === 'netflix').map((r) => r.schedule?.firstEpisodeDate ?? '').sort().at(-1) || undefined",
+        "ersetze": "releases.filter((r) => r.platform === 'netflix').map((r) => r.schedule?.firstEpisodeDate ?? '').sort().at(-1) && undefined",
+        "zeile": 12
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:12 === → !==",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "r.platform === 'netflix'",
+        "ersetze": "r.platform !== 'netflix'",
+        "zeile": 12
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:12 Zahl 1 → 0",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "1",
+        "ersetze": "0",
+        "zeile": 12
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:14 Zahl 1 → 0",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "1",
+        "ersetze": "0",
+        "zeile": 14
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:48 Aufruf entfernt",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "(je.get(id) ?? je.set(id, new Map()).get(id)!).set(t.id, t)",
+        "ersetze": "void 0",
+        "zeile": 48
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:48 Argumente getauscht (je.get(id) ?? je.set(id, new Map()).get(id)!).set",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "(je.get(id) ?? je.set(id, new Map()).get(id)!).set(t.id, t)",
+        "ersetze": "(je.get(id) ?? je.set(id, new Map()).get(id)!).set(t, t.id)",
+        "zeile": 48
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:48 Argumente getauscht je.set",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "je.set(id, new Map())",
+        "ersetze": "je.set(new Map(), id)",
+        "zeile": 48
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:54 || → &&",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "ts.length < 2 || new Set(ts.map((t) => t.franchiseId ?? t.id)).size > 1 || ts.some((t) => !t.episodes)",
+        "ersetze": "ts.length < 2 || new Set(ts.map((t) => t.franchiseId ?? t.id)).size > 1 && ts.some((t) => !t.episodes)",
+        "zeile": 54
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:54 || → &&",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "ts.length < 2 || new Set(ts.map((t) => t.franchiseId ?? t.id)).size > 1",
+        "ersetze": "ts.length < 2 && new Set(ts.map((t) => t.franchiseId ?? t.id)).size > 1",
+        "zeile": 54
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:54 < → <=",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "ts.length < 2",
+        "ersetze": "ts.length <= 2",
+        "zeile": 54
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:54 < → >=",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "ts.length < 2",
+        "ersetze": "ts.length >= 2",
+        "zeile": 54
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:54 Zahl 2 → 0",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "2",
+        "ersetze": "0",
+        "zeile": 54
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:54 > → >=",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "new Set(ts.map((t) => t.franchiseId ?? t.id)).size > 1",
+        "ersetze": "new Set(ts.map((t) => t.franchiseId ?? t.id)).size >= 1",
+        "zeile": 54
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:54 > → <=",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "new Set(ts.map((t) => t.franchiseId ?? t.id)).size > 1",
+        "ersetze": "new Set(ts.map((t) => t.franchiseId ?? t.id)).size <= 1",
+        "zeile": 54
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:54 Zahl 1 → 0",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "1",
+        "ersetze": "0",
+        "zeile": 54
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:55 Zahl 0 → 1",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "0",
+        "ersetze": "1",
+        "zeile": 55
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:56 ?: Zweige vertauscht",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "!folgen.length ? 'ohne-bereich' : befundVon(zaehlweisen(ts), folgen)",
+        "ersetze": "!folgen.length ? befundVon(zaehlweisen(ts), folgen) : 'ohne-bereich'",
+        "zeile": 56
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:31 ?: Zweige vertauscht",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "eps.some((n) => n > Math.max(...folgen)) ? 'laenger-als-staffel' : eps.reduce((a, n) => a + n, 0) > folgen.reduce((a, n) => a + n, 0) ? 'ueberlappung' : undefined",
+        "ersetze": "eps.some((n) => n > Math.max(...folgen)) ? (eps.reduce((a, n) => a + n, 0) > folgen.reduce((a, n) => a + n, 0) ? 'ueberlappung' : undefined) : 'laenger-als-staffel'",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:31 > → >=",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "n > Math.max(...folgen)",
+        "ersetze": "n >= Math.max(...folgen)",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:31 > → <=",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "n > Math.max(...folgen)",
+        "ersetze": "n <= Math.max(...folgen)",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:31 ?: Zweige vertauscht",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "eps.reduce((a, n) => a + n, 0) > folgen.reduce((a, n) => a + n, 0) ? 'ueberlappung' : undefined",
+        "ersetze": "eps.reduce((a, n) => a + n, 0) > folgen.reduce((a, n) => a + n, 0) ? undefined : 'ueberlappung'",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:31 > → >=",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "eps.reduce((a, n) => a + n, 0) > folgen.reduce((a, n) => a + n, 0)",
+        "ersetze": "eps.reduce((a, n) => a + n, 0) >= folgen.reduce((a, n) => a + n, 0)",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:31 > → <=",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "eps.reduce((a, n) => a + n, 0) > folgen.reduce((a, n) => a + n, 0)",
+        "ersetze": "eps.reduce((a, n) => a + n, 0) <= folgen.reduce((a, n) => a + n, 0)",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:31 Argumente getauscht ts.reduce",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "eps.reduce((a, n) => a + n, 0)",
+        "ersetze": "eps.reduce(0, (a, n) => a + n)",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:31 Zahl 0 → 1",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "a + n, 0) > folgen",
+        "ersetze": "a + n, 1) > folgen",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:31 Argumente getauscht folgen.reduce",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "folgen.reduce((a, n) => a + n, 0)",
+        "ersetze": "folgen.reduce(0, (a, n) => a + n)",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:31 Zahl 0 → 1",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "folgen.reduce((a, n) => a + n, 0)",
+        "ersetze": "folgen.reduce((a, n) => a + n, 1)",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:58 && → ||",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "befund && gemeldet && ts.some((t) => (netflixStart(t.id) ?? '') >= gemeldet)",
+        "ersetze": "befund && gemeldet || ts.some((t) => (netflixStart(t.id) ?? '') >= gemeldet)",
+        "zeile": 58
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:58 && → ||",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "befund && gemeldet",
+        "ersetze": "befund || gemeldet",
+        "zeile": 58
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:58 >= → >",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "(netflixStart(t.id) ?? '') >= gemeldet",
+        "ersetze": "(netflixStart(t.id) ?? '') > gemeldet",
+        "zeile": 58
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:58 >= → <",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "(netflixStart(t.id) ?? '') >= gemeldet",
+        "ersetze": "(netflixStart(t.id) ?? '') < gemeldet",
+        "zeile": 58
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:59 Aufruf entfernt",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "aus.set(t.id, veraltet ? 'liste-veraltet' : befund)",
+        "ersetze": "void 0",
+        "zeile": 59
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:59 Argumente getauscht aus.set",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "aus.set(t.id, veraltet ? 'liste-veraltet' : befund)",
+        "ersetze": "aus.set(veraltet ? 'liste-veraltet' : befund, t.id)",
+        "zeile": 59
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:59 ?: Zweige vertauscht",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "veraltet ? 'liste-veraltet' : befund",
+        "ersetze": "veraltet ? befund : 'liste-veraltet'",
+        "zeile": 59
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:24 every → some (gemischte Gruppe halbiert)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "ts.every((t) => t.format === 'TV_SHORT')",
+        "ersetze": "ts.some((t) => t.format === 'TV_SHORT')",
+        "zeile": 24
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:24 Math.ceil → Math.floor",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "Math.ceil(n / 2)",
+        "ersetze": "Math.floor(n / 2)",
+        "zeile": 24
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:32 Befundart nicht die des Katalogs",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "je(zaehlweisen[0])",
+        "ersetze": "je(zaehlweisen[zaehlweisen.length - 1])",
+        "zeile": 32
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  },
+  {
+    "name": "pipeline/lib/maengel-staffel.ts:23 SPECIAL-Filter entfällt",
+    "aenderungen": [
+      {
+        "datei": "pipeline/lib/maengel-staffel.ts",
+        "suche": "t.format !== 'SPECIAL'",
+        "ersetze": "t.format !== 'NIE'",
+        "zeile": 23
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-maengel-staffel.ts",
+      "npx tsx pipeline/check-maengel-bau-lauf.ts",
+      "npx tsx pipeline/check-maengel-regeln.ts"
+    ]
+  }
+]

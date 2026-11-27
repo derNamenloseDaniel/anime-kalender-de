@@ -1,0 +1,80 @@
+# aniSearch-Katalog — sammelt nachts, blockiert nichts.
+#
+# Daniel am 04.10.2026: „Kannst du den Lauf nicht so anpassen, dass er nix blockiert, nur von aniSearch sammelt und zB
+# PR anlegt?" Der Katalog-Block lief bis dahin als Cron von „Datenlauf auf Abruf" in der Gruppe `daten` — knapp fünf Stunden
+# lang, in denen kein Bestandsbau und kein stündlicher Lauf starten konnte.
+#
+# Jetzt:
+#   - eigene Concurrency-Gruppe `anisearch-katalog` (ein Lauf zur Zeit, bei aniSearch gilt der Sechs-Sekunden-Takt als Zusage),
+#   - Beginn **nach** dem Tageslauf (04:17 UTC, höchstens 75 Minuten): 06:00 UTC, damit nie zwei Läufe zugleich bei aniSearch
+#     abrufen,
+#   - das Ergebnis geht als Pull Request ein (`tools/quellen-pr.sh`), wie beim Tageslauf — kein Schreiben auf `main` mitten im
+#     Bau, kein Push-Wettlauf mit dem Bestandsbau.
+# Der Bestandsbau läuft währenddessen weiter; was dieser Lauf holt, baut der nächste planmäßige Lauf nach dem Merge.
+#
+# Reihenfolge der Seiten (10.10.2026, `pipeline/lib/anisearch-archiv-vorrang.ts`): zuerst die Lücken im Hauptbestand (Kennung ohne Archivseite), dann die des Katalogs —
+# auch die reinen aniSearch-Titel (Kennung ab 10.000.000), die der Lauf bis dahin nie holte. Nach einer Sperre pausiert der Lauf (10, 20, 40 Minuten) statt abzubrechen.
+name: aniSearch-Katalog
+
+on:
+  # Zeitplan: Cloudflare-Wecker (`worker/src/wecker.ts`) startet diesen Lauf per workflow_dispatch zur festen Stunde (UTC). GitHubs eigener Cron kam
+  # gemessen 4–7 Stunden zu spät und würde Läufe verdoppeln; `wecker-wache.yml` holt Überfälliges nach, falls der Wecker ausfällt (05.10.2026).
+  workflow_dispatch:
+    inputs:
+      grenze:
+        description: 'Höchstzahl Seiten dieses Laufs'
+        required: false
+        default: '2800'
+        type: string
+
+concurrency:
+  group: anisearch-katalog
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  katalog:
+    runs-on: ubuntu-latest
+    # Dieselbe Sperre wie der aniSearch-Job des Wochenlaufs: Der Sechs-Sekunden-Takt ist eine Zusage, nie zwei Läufe zugleich (05.10.2026).
+    concurrency:
+      group: anisearch
+      cancel-in-progress: false
+    # Rund 2.800 Seiten im Sechs-Sekunden-Takt: knapp fünf Stunden.
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Derselbe Schlüssel wie in `bestand-bauen.yml` und `daten-auf-abruf.yml`: Der Katalog-Lauf setzt auf dem AniList-Cache auf.
+      - name: AniList-Cache wiederverwenden
+        uses: actions/cache@v4
+        with:
+          path: data/cache
+          key: anilist-cache-${{ github.run_id }}
+          restore-keys: anilist-cache-
+
+      - name: Katalog holen
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: |
+          # Frist 290 Minuten: Pausen nach einer Sperre und der Sechs-Sekunden-Takt bleiben unter dem Zeitlimit des Jobs; was nicht kam, ist beim nächsten Lauf dran.
+          npm run data:anisearch -- --limit "${{ inputs.grenze || '2800' }}" --katalog --frist 290
+
+      - name: Quellen als Pull Request einreichen
+        if: always()
+        uses: ./.github/actions/einreichen
+        with:
+          nachricht: 'chore(data): aniSearch-Katalog gesammelt'
+          fund: katalog
+          app-id: ${{ secrets.DATEN_APP_ID }}
+          app-key: ${{ secrets.DATEN_APP_KEY }}

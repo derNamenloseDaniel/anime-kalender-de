@@ -1,0 +1,36 @@
+# Staffelnummern, die die deutsche Quelle nennt, ohne dass der aniSearch-Sprachblock sie im Titel trägt.
+#
+# Wirkung: Der Eintrag zählt im Reihenbau wie ein „Staffel N" im deutschen Titel (`staffelQuelle`, siehe
+# `pipeline/bau/staffel-quelle.ts`): eigene Staffel statt „Teil 2" der Staffel davor. Hand schlägt Ableitung.
+# Nur mit Quelle und Tag, an dem sie gelesen wurde; wer widerlegt, löscht den Eintrag im Commit.
+#
+# Felder: anilistId, staffel, titel (zum Wiederfinden), quelle (Adresse), belegtAm, grund.
+
+# aniSearch führt die zweite Hälfte als „Dai 2 Cour" (Englisch „2nd Cour"), der Deutsch-Block hat keinen Titel;
+# das Synonym „Staffel 2" sah Daniel am 18.10.2026 live auf der Seite. Teil 2 startet 01.2027, Teil 1 hat 11 Folgen.
+- anilistId: 217070
+  staffel: 2
+  titel: 'Though I Am an Inept Villainess Part 2'
+  quelle: 'https://www.anisearch.de/anime/21976,futsutsuka-na-akujo-de-wa-gozaimasu-ga-suuguu-chouso-torikae-den-dai-2-cour'
+  belegtAm: '2026-10-18'
+  grund: 'aniSearch-Synonym „Staffel 2"; „Teil 1" neben „Teil 2" wäre falsch, es sind zwei Staffeln'
+
+# aniSearch nennt :re 2 „Tokyo Ghoul:re (Staffel 2)" und zählt damit innerhalb von :re; die Reihe zählt Tokyo Ghoul (1), √A (2), :re (3), :re 2 (4).
+# Amazon führt :re 2 als „Staffel 4" (Folgen „Und noch einmal – Place …", gelesen 04.11.2026, `data/belege-entfernt.yaml`), „Staffel 2" ist √A (20850).
+# Ohne diesen Eintrag standen √A und :re 2 beide als „Staffel 2" in der Reihe.
+- anilistId: 102351
+  staffel: 4
+  titel: 'Tokyo Ghoul:re — 2'
+  quelle: 'https://www.amazon.de/gp/video/detail/B0D7N68Q5T'
+  belegtAm: '2026-11-04'
+  grund: 'Amazon-Seite „Staffel 4“ trägt die Folgen von :re 2; aniSearch-„Staffel 2“ zählt innerhalb von :re, nicht in der Reihe'
+
+# aniSearch nennt „Urteil des Drachen" „Staffel 4" und lässt „Anzeichen eines Heiligen Kriegs" (4 Folgen) ungezählt; Netflix zählt sie als St. 2:
+# 24 / 4 / 24 / 24 / 24 Folgen (`data/anbieter-staffeln.json`, Netflix 80050063, gelesen 24.09.2026). Die Reihe zählt wie Netflix, „Kaiserlicher Zorn der Götter" ist Staffel 4.
+# Ohne diesen Eintrag standen beide als „Staffel 4 von 4".
+- anilistId: 116752
+  staffel: 5
+  titel: 'The Seven Deadly Sins: Urteil des Drachen'
+  quelle: 'https://www.netflix.com/title/80050063'
+  belegtAm: '2026-09-24'
+  grund: 'Netflix führt die fünfte Staffel mit 24 Folgen; aniSearch-„Staffel 4“ lässt die 4-Folgen-Staffel 2 aus'

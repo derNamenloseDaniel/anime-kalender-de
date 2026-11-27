@@ -1,0 +1,191 @@
+/**
+ * Holt die deutschen Synchronsprecher zu jedem Titel.
+ *
+ * „Wer spricht diese Figur auf Deutsch" ist die Frage, die nach dem Termin
+ * kommt — und die außer uns niemand neben einem Kalender beantwortet.
+ *
+ * **Warum AniList:** Die Deutsche Synchronkartei hätte ungleich mehr, untersagt
+ * automatisiertes Auslesen aber wörtlich („Insbesondere ist ein automatisiertes
+ * Auslesen des Internetangebots nicht gestattet", Stand 11.08.2026).
+ * synchrondatenbank.de veröffentlicht frei nur Synchronisationen, die über
+ * dreißig Jahre zurückliegen. Bleibt AniList: offene Schnittstelle, ohnehin
+ * angebunden, und in der Stichprobe hatten 14 von 18 Titeln deutsche Stimmen.
+ *
+ * **Warum eine Datei je Titel** (`public/data/voices/<id>.json`): Bei rund
+ * zwanzig Rollen je Titel und 2.753 Titeln wären das über 50.000 Einträge — ein
+ * Vielfaches des heutigen Datensatzes, für eine Angabe, die man erst sieht,
+ * wenn man eine Kachel öffnet **und** den Bereich aufklappt. Im Hauptdatensatz
+ * würde sie jeden Besucher etwas kosten, auch die Mehrheit, die nie danach
+ * fragt. Siehe ARCHITEKTUR.md, Abschnitt „Ein Datenfeld interessiert nur eine
+ * Minderheit".
+ *
+ * Aufruf: npm run data:voices [-- --limit 400] [-- --force]
+ */
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { pathToFileURL } from 'node:url'
+import { germanVoicesFor, type VoiceRole } from './lib/anilist.ts'
+import { log, readJson, warn } from './lib/util.ts'
+import { recordSource } from './lib/health.ts'
+import type { Release, Title } from '../shared/types.ts'
+
+const args = process.argv.slice(2)
+const LIMIT = Number(args[args.indexOf('--limit') + 1]) || 600
+const FORCE = args.includes('--force')
+
+const OUT = 'public/data/voices'
+
+/**
+ * Nach wie vielen Tagen ein Titel erneut abgefragt wird.
+ *
+ * Sprecherlisten wachsen: Bei einer laufenden Serie stehen zum Start oft nur
+ * die Hauptrollen fest. Ein halbes Jahr ist der Kompromiss zwischen „immer
+ * aktuell" und „nicht dieselbe Antwort zweitausendmal abholen".
+ */
+const MAX_AGE_TAGE = 180
+
+interface VoiceFile {
+  titleId: number
+  updatedAt: string
+  roles: VoiceRole[]
+}
+
+function alter(pfad: string): number {
+  try {
+    const inhalt = JSON.parse(readFileSync(pfad, 'utf8')) as VoiceFile
+    return (Date.now() - new Date(inhalt.updatedAt).getTime()) / 86_400_000
+  } catch {
+    return Number.POSITIVE_INFINITY
+  }
+}
+
+/** Stufe D: Hat aniSearch die Besetzung eines Titels, fragt AniList nicht mehr nach (der Bau führt AniList dort nur als Lückenfüller). */
+function hatAnisearchRollen(pfad: string): boolean {
+  try {
+    return (JSON.parse(readFileSync(pfad, 'utf8')) as { roles?: { von?: string }[] }).roles?.some((r) => r.von === 'anisearch') ?? false
+  } catch {
+    return false
+  }
+}
+
+/** Titel mit Termin zuerst: Das sind die, die gerade jemand aufschlägt. */
+function baueWarteschlange(titles: Title[], releases: Release[]): Title[] {
+  const mitTermin = new Set(releases.map((r) => r.titleId))
+  return titles
+    .filter((t) => {
+      if (FORCE) return true
+      const pfad = `${OUT}/${t.id}.json`
+      return !existsSync(pfad) || (alter(pfad) > MAX_AGE_TAGE && !hatAnisearchRollen(pfad))
+    })
+    .sort((a, b) => Number(mitTermin.has(b.id)) - Number(mitTermin.has(a.id)))
+    .slice(0, LIMIT)
+}
+
+interface Zaehlung {
+  geschrieben: number
+  leer: number
+  /** Wie oft eine leere Antwort belegte Rollen stehen ließ. */
+  behalten: number
+}
+
+/** Schreibt die Antworten eines Blocks, eine Datei je Titel. */
+function schreibeBlock(block: Title[], gefunden: Map<number, VoiceRole[]>): Zaehlung {
+  const z: Zaehlung = { geschrieben: 0, leer: 0, behalten: 0 }
+  for (const title of block) {
+    const rollen = gefunden.get(title.id) ?? []
+    // Auch das Nichts festhalten — sonst fragt jeder Lauf dieselben Titel
+    // erneut ab, bei denen AniList schlicht keine deutschen Stimmen führt.
+    /*
+      **Ein Ausfall löscht keine belegten Rollen** (17.09.2026). Ein gescheitertes
+      AniList-Bündel liefert eine leere Liste; sie über belegte Sprechrollen zu
+      schreiben nähme dem Titel die Auskunft „eine deutsche Fassung gab es".
+    */
+    const pfad = `${OUT}/${title.id}.json`
+    if (!rollen.length && existsSync(pfad)) {
+      try {
+        if ((JSON.parse(readFileSync(pfad, 'utf8')) as VoiceFile).roles?.length) {
+          z.behalten++
+          continue
+        }
+      } catch {
+        /* Unlesbar — dann darf die leere Fassung sie ersetzen. */
+      }
+    }
+    const datei: VoiceFile = {
+      titleId: title.id,
+      updatedAt: new Date().toISOString(),
+      roles: rollen,
+    }
+    writeFileSync(pfad, JSON.stringify(datei))
+    if (rollen.length) z.geschrieben++
+    else z.leer++
+  }
+  return z
+}
+
+export async function main(): Promise<void> {
+  const titles = readJson<Title[]>('public/data/titles.json', [])
+  const releases = readJson<Release[]>('public/data/releases.json', [])
+  if (!titles.length) {
+    warn('Keine Titel — erst "npm run data:build" laufen lassen.')
+    return
+  }
+  if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true })
+
+  const queue = baueWarteschlange(titles, releases)
+
+  if (!queue.length) {
+    log('Sprecher: nichts nachzuladen.')
+    recordSource('anilist-voices', readdirSync(OUT).length)
+    return
+  }
+
+  log(`Sprecher: ${queue.length} Titel werden abgefragt`)
+
+  let geschrieben = 0
+  let leer = 0
+  let behalten = 0
+
+  /**
+   * In Blöcken abfragen und nach jedem Block schreiben.
+   *
+   * Ein Lauf über alle Titel dauert Minuten. Würde erst am Ende geschrieben,
+   * wäre ein Abbruch kurz davor gleichbedeutend mit hunderten vergeblichen
+   * Anfragen — vergeblich für uns und umsonst belastend für die Gegenseite.
+   */
+  const BLOCK = 100
+  for (let i = 0; i < queue.length; i += BLOCK) {
+    const block = queue.slice(i, i + BLOCK)
+    const gefunden = await germanVoicesFor(block.map((t) => t.id))
+    const z = schreibeBlock(block, gefunden)
+    geschrieben += z.geschrieben
+    leer += z.leer
+    behalten += z.behalten
+    log(`  ${Math.min(i + BLOCK, queue.length)}/${queue.length} — ${geschrieben} mit Stimmen`)
+  }
+
+  if (behalten) log(`${behalten} Titel behielten ihre belegten Rollen (leere Antwort verworfen)`)
+  const gesamt = readdirSync(OUT).filter((d) => d.endsWith('.json')).length
+  /*
+    **Gearbeitet ist gearbeitet — auch wenn keine deutsche Stimme dabei war.**
+
+    Bis zum 29.08.2026 galt der Lauf nur dann als erfolgreich, wenn er Titel
+    **mit** Stimmen gefunden hat. Der Bestand ist aber vollstaendig (2.765
+    Dateien), und was die Warteschlange noch enthaelt, sind ueberwiegend Titel
+    ohne deutsche Rollen — der Lauf schrieb sie sauber weg und meldete trotzdem
+    „keine Sprecher gefunden". Nach fuenf Tagen haette das den Tageslauf rot
+    gemacht, wie es `youtube-check` am selben Tag zweimal getan hat.
+  */
+  recordSource('anilist-voices', geschrieben, undefined, geschrieben + leer, true)
+  log(
+    `Sprecher: ${geschrieben} Titel mit deutschen Stimmen, ${leer} ohne — ` +
+      `${gesamt} Dateien im Bestand`,
+  )
+}
+
+// Nur beim Direktstart: der Vergleichsrahmen (tools/vergleich-alt-neu.mjs) importiert `main`, ohne Netz zu rufen.
+if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+  main().catch((err) => {
+    console.error(err)
+    process.exit(1)
+  })
+}

@@ -1,0 +1,214 @@
+name: Wache — Delta und Briefkasten
+
+# **Diese Wache lief bis zum 03.09.2026 auf Daniels Rechner.**
+#
+# Sie war eine geplante Aufgabe im Claude-Client: jeden Morgen um 09:07 die
+# Delta-Historie durchsehen und melden, was auffällt. Sein Einwand: „diese
+# routine kann doch problemlos remote laufen? … änder das, sodass es nicht mehr
+# auf meinem pc läuft."
+#
+# Er hat recht, und mehr als das: Sie **braucht** kein Modell. Die Beurteilung
+# steckt längst in `tools/delta-pruefen.mjs` — es endet mit Exit-Code 1, wenn
+# ein Lauf etwas Auffälliges getan hat. Was ein Modell hier tat, war vorlesen.
+# Als Workflow ist die Wache billiger, überlebt jedes Herunterfahren und hält
+# ihr Ergebnis dort fest, wo es auch morgen noch steht.
+#
+# **Das Ergebnis landet im Repo, nicht in einem Chat** (Daniel, 03.09.2026: „im
+# chat soll nix stehen, das ergebnis soll als file ins repo"). Eine Meldung im
+# Gespräch ist beim nächsten Start weg; `daniel-zum-abarbeiten/00-wache.md` steht
+# auch in drei Monaten noch da, mit Datum und Vorgeschichte.
+#
+# **Warum es diese Wache überhaupt gibt:** Am 26.08.2026 gingen an einem Abend
+# zweimal Meldungen aus der Browser-Erweiterung verloren, ohne dass ein Lauf rot
+# wurde — 508 Disney-Meldungen wurden zu einem einzigen Eintrag abgehakt, 216
+# One-Piece-Meldungen verschwanden ganz. Gefunden hat es Daniel, weil ihm eine
+# Zahl komisch vorkam. Das soll ihm keiner mehr abverlangen.
+
+on:
+  schedule:
+    # 07:20 UTC ist 09:20 in Berlin — kurz nach dem täglichen Datenlauf um
+    # 06:17, damit die Wache den frischen Stand sieht und nicht den von gestern.
+    - cron: '20 7 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: delta-wache
+  cancel-in-progress: false
+
+jobs:
+  wache:
+    runs-on: ubuntu-latest
+    steps:
+      # Die Wache pusht direkt auf `main`; das Ruleset `main-pruefweg` lässt dafür nur die App durch (11.10.2026). Fehlt das Token,
+      # wird der Lauf rot (kein Rückfall auf GITHUB_TOKEN).
+      - name: App-Token holen
+        id: app
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.DATEN_APP_ID }}
+          private-key: ${{ secrets.DATEN_APP_KEY }}
+          permission-contents: write
+
+      - uses: actions/checkout@v4
+        with:
+          # Der Datenlauf hat gerade gepusht — diese Wache braucht dessen Stand.
+          ref: main
+          token: ${{ steps.app.outputs.token }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Der Vortagsstand der ausgelassenen Termine (`tools/wache-schreiben.mjs`) liegt nicht im
+      # Repo. Eigenes Präfix, nicht `anilist-cache-`; gesichert wird auch nach einem Befund
+      # (`always()`), denn ein roter Lauf überspringt sonst das Speichern von `actions/cache`.
+      - name: Vortagsstand wiederherstellen
+        uses: actions/cache/restore@v4
+        with:
+          path: .wache-stand/ausgelassen.json
+          key: wache-stand-${{ github.run_id }}
+          restore-keys: wache-stand-
+
+      # `npm ci` wäre hier Verschwendung: Beide Skripte kommen mit dem aus, was
+      # Node selbst mitbringt — kein Import aus `node_modules`.
+
+      # `continue-on-error`, damit die zweite Prüfung auch nach einem Befund
+      # läuft: Zwei Auffälligkeiten am selben Morgen sind wahrscheinlicher als
+      # eine, und die zweite ginge sonst verloren. Über Rot entscheidet der
+      # Schritt am Ende.
+      - name: Delta der letzten 24 Stunden
+        id: delta
+        continue-on-error: true
+        shell: bash
+        run: node tools/delta-pruefen.mjs --tage 1 | tee delta.txt
+
+      - name: Briefkasten — kommt Daniels Arbeit an?
+        id: kasten
+        continue-on-error: true
+        shell: bash
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: node tools/briefkasten-wache.mjs | tee briefkasten.txt
+
+      # Zugänge: Läufe in ihrer Frist, leeres Claude-Kontingent, Wecker, Ablauf (data/zugangs-register.json).
+      # Kein eigenes Secret nötig — liest nur den Verlauf der Läufe.
+      - name: Zugänge und Kontingent
+        id: zugaenge
+        continue-on-error: true
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node tools/zugangs-waechter.mjs | tee zugaenge.txt
+
+      # **Der Exit-Code kommt aus `steps.*.outcome`.** Ohne `shell: bash` gibt `node … | tee` den Rückgabewert
+      # von `tee` zurück (Standard-Shell ohne pipefail): Seit 03.09.2026 war jeder Befund hier „success“ und
+      # die Wache schrieb „unauffällig“ (18.10.2026). `tools/delta-wache-schritte.test.mjs` hält das fest.
+      - name: Ergebnis in die Wache-Datei schreiben
+        run: |
+          LAGE=ok
+          if [ "${{ steps.delta.outcome }}" != "success" ] || [ "${{ steps.kasten.outcome }}" != "success" ] || [ "${{ steps.zugaenge.outcome }}" != "success" ]; then
+            LAGE=befund
+          fi
+          cat zugaenge.txt >> briefkasten.txt 2>/dev/null || true
+          node tools/wache-schreiben.mjs delta.txt briefkasten.txt "$LAGE"
+          rm -f delta.txt briefkasten.txt zugaenge.txt
+          echo "LAGE=$LAGE" >> "$GITHUB_ENV"
+
+      - name: Vortagsstand sichern
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .wache-stand/ausgelassen.json
+          key: wache-stand-${{ github.run_id }}
+
+      # **Nur ein Befund wird committet** (Daniel, 26.09.2026: „Behalten, still bei Ruhe"). 25 Tage
+      # lang stand hier täglich „Unauffällig" als eigener Commit — Rauschen in der Historie, keine
+      # Auskunft. Dass die Wache lief, zeigt der grüne Lauf in Actions; die Datei hält den letzten Befund.
+      - name: Änderung committen
+        if: env.LAGE == 'befund'
+        run: |
+          git config user.name "anime-kalender-bot"
+          git config user.email "bot@anime-kalender.de"
+          git add daniel-zum-abarbeiten/00-wache.md
+          if git diff --staged --quiet; then
+            echo "Keine Änderung an der Wache-Datei."
+            exit 0
+          fi
+          git commit -q -m "chore(wache): Bestand und Briefkasten geprüft"
+          # Der tägliche Datenlauf kann zwischendurch gepusht haben.
+          git pull -q --rebase origin main || true
+          git push -q; echo "push exit=$?"
+
+      # **Wochenwache = der Teil von „Wache durchsehen" (status.md), der kein Modell braucht** (Fahrplan Schritt 3,
+      # `docs/autonomie-plan.md`): endete jeder Datenlauf in seiner Frist **erfolgreich**, ist der Datensatz frisch,
+      # schweigt eine Quelle? Montags und auf Abruf. Ein Befund wird eine Zeile in `data/meldungen-an-claude.jsonl`
+      # (der Posteingang, `pipeline/lib/meldung.ts`) und eine Warnung im Protokoll — kein roter Lauf, denn rot machen
+      # sollen Sammler, nicht ihre Wache. `npm ci` fällt nur an diesem einen Wochentag an.
+      - name: Wochenwache — Läufe, Stand, stumme Quellen
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "$(date -u +%u)" != 1 ] && [ "${{ github.event_name }}" != workflow_dispatch ]; then
+            echo "Wochenwache läuft nur montags und auf Abruf."
+            exit 0
+          fi
+          npm ci --no-audit --no-fund
+          node tools/wache-woechentlich.mjs | tee -a "$GITHUB_STEP_SUMMARY"
+          npx tsx pipeline/check-sources.ts --nur-melden > /dev/null
+          git diff -U0 data/meldungen-an-claude.jsonl | grep '^+{' | cut -c2- > "$RUNNER_TEMP/neue-meldungen.jsonl" || true
+          wc -l < "$RUNNER_TEMP/neue-meldungen.jsonl" | xargs echo "Neue Meldungen:"
+
+      # Die Zeilen werden auf den frischen Stand von `main` gelegt (angehängt, nie umgeschrieben): Ein Datenlauf
+      # kann dieselbe Datei gleichzeitig verändert haben, und ein Rebase darüber scheitert am Dateiende.
+      - name: Wochenmeldungen ablegen
+        if: always()
+        run: |
+          neu="$RUNNER_TEMP/neue-meldungen.jsonl"
+          if [ ! -s "$neu" ]; then exit 0; fi
+          git config user.name "anime-kalender-bot"
+          git config user.email "bot@anime-kalender.de"
+          for versuch in 1 2 3; do
+            git fetch -q origin main
+            git reset -q --hard origin/main
+            cat "$neu" >> data/meldungen-an-claude.jsonl
+            git add data/meldungen-an-claude.jsonl
+            git commit -q -m "chore(wache): Wochenwache meldet einen Befund"
+            if git push -q origin HEAD:main; then echo "Abgelegt (Versuch $versuch)."; exit 0; fi
+            sleep $((versuch * 5))
+          done
+          echo "::warning title=Wochenwache::Meldung konnte nicht abgelegt werden — steht im Protokoll oben."
+
+      # Der Lauf meldet sich in Daniels Statusanzeige — dort sieht er ihn neben
+      # den Datenläufen, ohne GitHub zu öffnen. Die Datei bleibt die
+      # ausführliche Fassung.
+      # **Die Meldung trägt Repo, Workflow und Adresse mit — sonst steht in der
+      # Anzeige „(ohne Namen)".**
+      #
+      # Genau das war beim ersten Lauf zu sehen (Daniel, 03.09.2026, mit Bild).
+      # Den Namen bildet die Statusanzeige aus `workflow`; ohne ihn bleibt eine
+      # rote Zeile ohne Absender, und wer sie sieht, weiß nicht, wo er nachsehen
+      # soll. Die übrigen Läufe dieses Repos senden dieselben Felder.
+      - name: Befund melden und rot werden
+        if: steps.delta.outcome != 'success' || steps.kasten.outcome != 'success' || steps.zugaenge.outcome != 'success'
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: |
+          if [ -n "$LAUF_TOKEN" ]; then
+            printf '{"lauf_id":"%s","repo":"%s","workflow":"%s","zustand":"fehler","url":"%s","zweck":"%s","ziel":"%s","notiz":"%s"}' \
+              "$GITHUB_RUN_ID" "$GITHUB_REPOSITORY" "$GITHUB_WORKFLOW" \
+              "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+              "Sieht täglich nach, ob Bestand oder Briefkasten etwas verloren haben" \
+              "Auffälligkeiten stehen in daniel-zum-abarbeiten/00-wache.md" \
+              "Auffälligkeit gefunden — Einzelheiten in daniel-zum-abarbeiten/00-wache.md" > /tmp/befund.json
+            curl -sS --max-time 10 -X POST "https://newsletter.animekalender.workers.dev/lauf" \
+              -H "Content-Type: application/json" -H "X-Lauf-Token: $LAUF_TOKEN" \
+              --data-binary @/tmp/befund.json > /dev/null \
+              || echo "Meldung an die Statusanzeige fehlgeschlagen — der rote Lauf bleibt trotzdem sichtbar."
+          fi
+          echo "::error::Auffälligkeit gefunden — Einzelheiten in daniel-zum-abarbeiten/00-wache.md"
+          exit 1

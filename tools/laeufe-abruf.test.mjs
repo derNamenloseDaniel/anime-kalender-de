@@ -1,0 +1,279 @@
+// Prüft, dass das D1-Tageslimit (Worker antwortet 503 mit JSON, oder 1101 als HTML/Text) eine klare Zeile ergibt
+// statt eines JSON-Stacktraces, und dass `laeufe-aufraeumen.mjs --trocken` dabei mit Exit 0 endet. Kein Netz, kein Token.
+import assert from 'node:assert/strict'
+import { spawnSync } from 'node:child_process'
+import { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { erledigtArgumente, findeRotenLauf, holeLaeufe, letzteDatenAenderung, notizZu, roteArten, stillstand, STILLSTAND_GRENZE_STUNDEN, verlaufsZeile } from './laeufe-abruf.mjs'
+
+const antwort = (status, text) => async () => new Response(text, { status })
+
+const KONTINGENT = /\(D1-Tageslimit erreicht, Reset 00:00 UTC\)/
+
+// Form wie worker/src/auffangnetz.ts beim Tageslimit: 503, JSON mit error, Retry-After bis 00:00 UTC.
+const tageslimit = async () =>
+  new Response(JSON.stringify({ error: 'Der Dienst macht gerade Pause. Versuch es später noch einmal.' }), {
+    status: 503,
+    headers: { 'Content-Type': 'application/json', 'Retry-After': '3600' },
+  })
+const limit = await holeLaeufe(tageslimit, 'x')
+assert.equal(limit.liste, undefined)
+assert.equal(limit.meldung, 'Status-Worker antwortet 503 (D1-Tageslimit erreicht, Reset 00:00 UTC) — nichts aufgeräumt')
+
+// Cloudflare-Fehlerseite „1101“ (Text oder HTML) deutet ebenfalls auf das Kontingent.
+const html = await holeLaeufe(antwort(500, '<html><body>error code: 1101</body></html>'), 'x')
+assert.equal(html.liste, undefined)
+assert.match(html.meldung, /^Status-Worker antwortet 500 /)
+assert.match(html.meldung, KONTINGENT)
+
+// Jeder andere Fehler: nur die Statuszeile, kein Kontingent-Hinweis (JSON wie vom Auffangnetz, aber 500).
+const ANDERER = 'Status-Worker antwortet 500 — nichts aufgeräumt'
+const fehlerJson = await holeLaeufe(antwort(500, '{"error":"Das hat gerade nicht geklappt. Versuch es später noch einmal."}'), 'x')
+assert.equal(fehlerJson.meldung, ANDERER)
+assert.equal((await holeLaeufe(antwort(500, 'Internal Server Error'), 'x')).meldung, ANDERER)
+
+const kaputt200 = await holeLaeufe(antwort(200, '<html>keine Liste</html>'), 'x')
+assert.equal(kaputt200.meldung, 'Status-Worker antwortet 200 — nichts aufgeräumt')
+
+const netz = await holeLaeufe(async () => { throw new Error('getaddrinfo ENOTFOUND') }, 'x')
+assert.match(netz.meldung, /nicht erreichbar \(getaddrinfo ENOTFOUND\)/)
+assert.equal(netz.liste, undefined)
+
+assert.deepEqual((await holeLaeufe(antwort(200, '[{"lauf_id":1}]'), 'x')).liste, [{ lauf_id: 1 }])
+assert.deepEqual((await holeLaeufe(antwort(200, '{"laeufe":[{"lauf_id":2}]}'), 'x')).liste, [{ lauf_id: 2 }])
+
+// Das ganze Werkzeug mit untergeschobenem fetch (500 + HTML): Meldung ohne Stacktrace, Exit 0 nur bei --trocken.
+const vorlauf = 'data:text/javascript,globalThis.fetch=async()=>new Response("<html>error code: 1101</html>",{status:500})'
+const werkzeug = fileURLToPath(new URL('./laeufe-aufraeumen.mjs', import.meta.url))
+const lauf = (...args) =>
+  spawnSync(process.execPath, ['--import', vorlauf, werkzeug, ...args], {
+    encoding: 'utf8',
+    env: { ...process.env, LAUF_TOKEN: '' },
+  })
+const trocken = lauf('--trocken')
+assert.equal(trocken.status, 0)
+assert.match(trocken.stdout, /^STILLSTAND\? Letzte Änderung von public\/data nicht lesbar/m)
+assert.match(trocken.stderr, /Status-Worker antwortet 500/)
+assert.doesNotMatch(trocken.stderr, /SyntaxError|\n\s+at /)
+assert.equal(lauf().status, 1)
+
+// Rote Läufe stehen nur im Verlauf (neuester zuletzt): Treffer vorn, in der Mitte und hinten, dazu Gegenfälle.
+const eintrag = (z, am) => ({ z, am })
+const T = (stunde) => `2026-10-18T${String(stunde).padStart(2, '0')}:00:00Z`
+const verlauf = {
+  A: [eintrag('fehler', T(1)), eintrag('ok', T(2))],
+  B: [eintrag('ok', T(3)), eintrag('fehler', T(4)), eintrag('laeuft', T(5))],
+  C: [eintrag('ok', T(6)), eintrag('laeuft', T(7))],
+  G: [eintrag('ok', T(1)), eintrag('fehler', T(8))],
+  D: [eintrag('fehler', T(8)), eintrag('warnung', T(9)), eintrag('ok', T(10)), eintrag('warnung', T(11))],
+  E: [eintrag('abgebrochen', T(12))],
+  F: [eintrag('ok', T(1)), eintrag('fehler', T(2)), eintrag('abgebrochen', T(3))],
+  H: [eintrag('ok', T(1)), eintrag('fehler', T(8))],
+}
+// G: grüner Lauf nach dem Fehler (überholt); H: grüner Lauf davor und einer genau zur Fehlerzeit (nicht überholt).
+const gruen = new Map([['G', T(9)], ['H', T(8)]])
+const jetztRot = Date.parse(T(14))
+assert.deepEqual(roteArten(verlauf, gruen, jetztRot), [
+  { art: 'B', zustand: 'fehler', am: T(4), stunden: 10 },
+  { art: 'D', zustand: 'warnung', am: T(11), stunden: 3 },
+  { art: 'F', zustand: 'fehler', am: T(2), stunden: 12 },
+  { art: 'H', zustand: 'fehler', am: T(8), stunden: 6 },
+])
+assert.deepEqual(roteArten(undefined), [])
+assert.equal(roteArten({ G: [eintrag('fehler', T(8))] }, new Map([['G', T(7)]]), jetztRot).length, 1)
+assert.equal(roteArten({ G: [eintrag('fehler', T(8))] }, new Map([['G', T(9)]]), jetztRot).length, 0)
+
+// Das ganze Werkzeug: Liste leer (nichts läuft), Verlauf mit rotem Bestandsbau -> die Zeile erscheint, auch bei --trocken.
+// `gh run list` und die GitHub-API sind Kulissen; `gh` antwortet nur auf die Frage je Workflow mit `--status success`.
+const FEHLERZEIT = '2026-10-18T09:00:00Z'
+// Rote App-Läufe (A2): der passende in der Mitte, sein Workflow steht nicht im Verlauf.
+const appLauf = (lauf_id, workflow, zustand, gemeldet_am) => ({ lauf_id, workflow, zustand, gemeldet_am })
+const appRot = [appLauf(71, 'Andere', 'fehler', '2026-10-18T10:00:00Z'), appLauf(72, 'Nachzügler', 'fehler', '2026-10-18T11:00:00Z'), appLauf(73, 'Nachzügler', 'warnung', '2026-10-18T13:00:00Z')]
+const rotAntwort = JSON.stringify({ laeufe: appRot, verlauf: { Bestand: [eintrag('ok', '2026-10-18T08:00:00Z'), eintrag('fehler', FEHLERZEIT)], Sammler: [eintrag('ok', FEHLERZEIT)], 'Claude — roten Datenlauf untersuchen': [eintrag('warnung', FEHLERZEIT)] } })
+const STUNDE = 3_600_000
+// Verlauf einer Art (`?verlauf=`): Form des Workers mit Notiz = Text aus `DATEN_WARNUNG` (Lauf 43836990379, 16.11.2026).
+const WARN_NOTIZ = 'Streaming-Abdeckung gesunken: mitStreamingWeg: 1947 → 1927 (−20, mehr als 1 % weniger als beim letzten Wert)'
+const verlaufAntwort = JSON.stringify({ laeufe: [{ lauf_id: '1', zustand: 'warnung', gemeldet_am: FEHLERZEIT, notiz: WARN_NOTIZ }] })
+const mitCommitVor = (stunden, gruenAm = '2026-10-17T00:00:00Z', ghWirftFuer = '') => {
+  const datum = new Date(Date.now() - stunden * STUNDE).toISOString()
+  const commits = JSON.stringify([{ commit: { committer: { date: datum } } }, { commit: { committer: { date: '2000-01-01T00:00:00Z' } } }])
+  const laeufe = JSON.stringify([
+    { workflowName: 'Sammler', conclusion: 'failure', createdAt: '2026-10-18T23:00:00Z' },
+    { workflowName: 'Bestand', conclusion: 'success', createdAt: gruenAm },
+    { workflowName: 'Bestand', conclusion: 'failure', createdAt: '2026-10-18T23:30:00Z' },
+    { workflowName: 'Nachzügler', conclusion: 'success', createdAt: '2026-10-18T12:00:00Z' },
+    { workflowName: 'bestand-bauen.yml', conclusion: 'success', createdAt: gruenAm },
+  ])
+  const stub =
+    'import cp from "node:child_process";import {syncBuiltinESMExports} from "node:module";' +
+    `const L=${laeufe};cp.execFileSync=(c,a)=>{const w=a[a.indexOf("--workflow")+1];if(c!=="gh"||a[0]!=="run"||a[1]!=="list"||!a.includes("--workflow")||a[a.indexOf("--status")+1]!=="success"||w===${JSON.stringify(ghWirftFuer)})throw new Error("gh?");return JSON.stringify(L.filter(r=>r.workflowName===w&&r.conclusion==="success").sort((x,y)=>y.createdAt.localeCompare(x.createdAt)).slice(0,1))};syncBuiltinESMExports();` +
+    `globalThis.fetch=async(u)=>String(u).includes("?verlauf=")?new Response(${JSON.stringify(verlaufAntwort)},{status:200}):String(u).startsWith("https://api.github.com/repos/derNamenloseDaniel/anime-kalender-de/commits?path=public/data&per_page=1")?new Response(${JSON.stringify(commits)},{status:200}):new Response(${JSON.stringify(rotAntwort)},{status:200})`
+  return spawnSync(process.execPath, ['--import', `data:text/javascript,${stub}`, werkzeug, '--trocken'], { encoding: 'utf8' })
+}
+const rot = mitCommitVor(20)
+assert.equal(rot.status, 0)
+assert.match(rot.stdout, /^ROT im Verlauf: Bestand — letzter Lauf fehler am 2026-10-18T09:00:00Z \(vor -?[\d.]+ h, kein grüner Lauf danach\)$/m)
+assert.doesNotMatch(rot.stdout, /ROT im Verlauf: Sammler/)
+// Untersucher-Warnung: nur der grüne Bestandsbau danach hebt sie auf (der Untersucher selbst hat keine grünen Läufe).
+assert.match(rot.stdout, /^WARNUNG im Verlauf: Claude — roten Datenlauf untersuchen .*kein Lauf ohne Warnung danach\): Streaming-Abdeckung gesunken: mitStreamingWeg: 1947 → 1927/m)
+assert.doesNotMatch(rot.stdout, /ROT im Verlauf: Claude/)
+assert.doesNotMatch(mitCommitVor(20, '2026-10-18T09:30:00Z').stdout, /Claude — roten/)
+assert.match(mitCommitVor(20, '2026-10-18T09:30:00Z', 'bestand-bauen.yml').stdout, /^WARNUNG im Verlauf: Claude — roten /m)
+// Grüner Lauf nach dem Fehler: keine ROT-Zeile (Gegenprobe gegen `gh run list`).
+assert.doesNotMatch(mitCommitVor(20, '2026-10-18T09:30:00Z').stdout, /ROT im Verlauf/)
+// gh-Ausfall für einen Workflow (A1): der grüne Lauf danach ist unbekannt, die Zeile bleibt.
+assert.match(mitCommitVor(20, '2026-10-18T09:30:00Z', 'Bestand').stdout, /^ROT im Verlauf: Bestand /m)
+// Rote App-Läufe (A2): nur der mit grünem Lauf danach wird abgenommen, auch ohne Eintrag im Verlauf.
+assert.match(rot.stdout, /^ {2}bleibt {3}71 {2}Andere /m)
+assert.match(rot.stdout, /^ {2}nimmt ab 72 {2}Nachzügler$/m)
+assert.match(rot.stdout, /^ {2}bleibt {3}73 {2}Nachzügler /m)
+assert.match(mitCommitVor(20, undefined, 'Nachzügler').stdout, /^ {2}bleibt {3}72 {2}Nachzügler /m)
+
+assert.match(rot.stdout, /^STILLSTAND: public\/data seit 20\.0 h unverändert \(Grenze 8 h, letzter Commit /m)
+assert.doesNotMatch(mitCommitVor(7).stdout, /STILLSTAND/)
+
+// Grenze: genau 8 h noch in Ordnung, eine Sekunde mehr nicht.
+const jetzt = Date.parse('2026-10-18T12:00:00Z')
+assert.equal(STILLSTAND_GRENZE_STUNDEN, 8)
+assert.equal(stillstand('2026-10-18T04:00:00Z', jetzt).zuLang, false)
+assert.equal(stillstand('2026-10-18T03:59:59Z', jetzt).zuLang, true)
+assert.equal(stillstand('2026-10-18T11:00:00Z', jetzt).stunden, 1)
+
+// Die Abfrage nimmt den ersten (neuesten) Commit und fragt genau `public/data`; unlesbar ergibt `undefined`.
+let gefragt = ''
+const kulisse = async (u) => {
+  gefragt = u
+  return new Response(JSON.stringify([{ commit: { committer: { date: 'A' } } }, { commit: { committer: { date: 'B' } } }]))
+}
+assert.equal(await letzteDatenAenderung(kulisse, 'o/r'), 'A')
+assert.equal(gefragt, 'https://api.github.com/repos/o/r/commits?path=public/data&per_page=1')
+assert.equal(await letzteDatenAenderung(async () => new Response('[]'), 'o/r'), undefined)
+assert.equal(await letzteDatenAenderung(async () => { throw new Error('netz') }, 'o/r'), undefined)
+
+
+// Fehlerfälle der Abfrage: Rate-Limit (403 mit Objekt), Nicht-JSON, `null`, ungültiges Datum -> `undefined` bzw. Wächter schlägt an.
+const limit403 = async () => new Response('{"message":"API rate limit exceeded"}', { status: 403 })
+assert.equal(await letzteDatenAenderung(limit403, 'o/r'), undefined)
+assert.equal(await letzteDatenAenderung(async () => new Response('<html>Bad gateway</html>', { status: 502 }), 'o/r'), undefined)
+assert.equal(await letzteDatenAenderung(async () => new Response('null'), 'o/r'), undefined)
+assert.equal(stillstand('kein Datum', jetzt).zuLang, true)
+
+
+// --erledigt: Argumente (Notiz Pflicht), Trefferwahl nur unter roten Einträgen, erledigter Eintrag zählt nicht mehr als ROT.
+assert.deepEqual(erledigtArgumente(['--trocken']), {})
+assert.deepEqual(erledigtArgumente(['--erledigt', '12', '--notiz', ' behoben ']), { laufId: '12', notiz: 'behoben' })
+assert.match(erledigtArgumente(['--erledigt', '12']).fehler, /--notiz/)
+assert.match(erledigtArgumente(['--erledigt', '12', '--notiz']).fehler, /--notiz/)
+assert.match(erledigtArgumente(['--erledigt', '12', '--notiz', '  ']).fehler, /--notiz/)
+assert.match(erledigtArgumente(['--erledigt', '12', '--notiz', '--trocken']).fehler, /--notiz/)
+assert.match(erledigtArgumente(['--erledigt']).fehler, /lauf_id/)
+assert.match(erledigtArgumente(['x', '--erledigt', '12']).fehler, /--notiz/)
+assert.match(erledigtArgumente(['--erledigt', '--notiz', 'x']).fehler, /lauf_id/)
+const reihe = [
+  { lauf_id: 'a1', zustand: 'ok', gemeldet_am: T(1) },
+  { lauf_id: 'b2', zustand: 'warnung', gemeldet_am: T(2) },
+  { lauf_id: 'c3', zustand: 'fehler', gemeldet_am: T(3) },
+]
+assert.equal(findeRotenLauf(reihe, 'b2').gemeldet_am, T(2))
+assert.equal(findeRotenLauf(reihe, 'c3').zustand, 'fehler')
+assert.equal(findeRotenLauf(reihe, 'a1'), undefined)
+assert.equal(findeRotenLauf(reihe, 'zz'), undefined)
+assert.equal(findeRotenLauf(reihe, 'c'), undefined)
+// Nach dem Abhaken steht der Eintrag als `erledigt` im Verlauf (Worker setzt nur Zustand, Notiz, Zeit): kein ROT mehr, ein späterer Fehler schon.
+assert.equal(roteArten({ W: [eintrag('warnung', T(1)), eintrag('erledigt', T(2))] }, new Map(), jetztRot).length, 0)
+assert.equal(roteArten({ W: [eintrag('erledigt', T(2)), eintrag('fehler', T(3))] }, new Map(), jetztRot).length, 1)
+assert.equal(roteArten({ W: [eintrag('warnung', T(1)), eintrag('erledigt', T(2)), eintrag('abgebrochen', T(3))] }, new Map(), jetztRot).length, 0)
+
+// Das ganze Werkzeug mit Kulisse: GET Übersicht, GET ?verlauf=<Art> (mit lauf_id), POST wird nur ausgegeben.
+const erledigtLauf = (args, token = 'T0K') => {
+  const uebersicht = JSON.stringify({ laeufe: [], verlauf: { Früh: [eintrag('fehler', T(5))], 'Wöchentlich': [eintrag('ok', T(1)), eintrag('warnung', T(2))], Grün: [eintrag('ok', T(1))] } })
+  const art = JSON.stringify({ laeufe: [{ lauf_id: '901', zustand: 'warnung', gemeldet_am: T(2) }, { lauf_id: '900', zustand: 'ok', gemeldet_am: T(1) }] })
+  const frueh = JSON.stringify({ laeufe: [{ lauf_id: '777', zustand: 'fehler', gemeldet_am: T(5) }] })
+  const stub =
+    `globalThis.fetch=async(u,o)=>{u=String(u);if(o&&o.method==="POST"){console.log("POST "+o.headers["X-Lauf-Token"]+" "+o.body);return new Response("{}",{status:o.headers["X-Lauf-Token"]==="KAPUTT"?500:200})}` +
+    `if(u.includes("api.github.com"))return new Response("[]",{status:500});` +
+    `return new Response(u.includes("?verlauf=")?(u.includes(encodeURIComponent("Wöchentlich"))?${JSON.stringify(art)}:u.includes(encodeURIComponent("Früh"))?${JSON.stringify(frueh)}:"{\\"laeufe\\":[]}"):${JSON.stringify(uebersicht)},{status:200})}`
+  return spawnSync(process.execPath, ['--import', `data:text/javascript,${stub}`, werkzeug, ...args], {
+    encoding: 'utf8',
+    env: { ...process.env, LAUF_TOKEN: token },
+  })
+}
+const NOTIZ = ['--notiz', 'behoben durch #1690']
+const echt = erledigtLauf(['--erledigt', '901', ...NOTIZ])
+assert.equal(echt.status, 0, echt.stderr)
+assert.match(echt.stdout, /^erledigt 901 {2}Wöchentlich — warnung vom 2026-10-18T02:00:00Z: behoben durch #1690$/m)
+assert.match(echt.stdout, /^POST T0K \{"lauf_id":"901","zustand":"erledigt","notiz":"behoben durch #1690"\}$/m)
+assert.equal(echt.stdout.match(/^POST /gm).length, 1)
+assert.match(erledigtLauf(['--erledigt', '777', ...NOTIZ]).stdout, /^erledigt 777 {2}Früh — fehler /m)
+// trocken: anzeigen, nichts senden; falsche ID, grüner Eintrag, fehlende Notiz, fehlendes Token: Abbruch ohne POST.
+const trockenE = erledigtLauf(['--erledigt', '901', ...NOTIZ, '--trocken'])
+assert.equal(trockenE.status, 0)
+assert.match(trockenE.stdout, /^erledigt 901 /m)
+assert.doesNotMatch(trockenE.stdout, /POST/)
+for (const [args, token, muster] of [
+  [['--erledigt', '999', ...NOTIZ], 'T0K', /Lauf 999 ist kein roter Verlaufseintrag/],
+  [['--erledigt', '900', ...NOTIZ], 'T0K', /Lauf 900 ist kein roter/],
+  [['--erledigt', '901'], 'T0K', /braucht --notiz/],
+  [['--erledigt', '901', '--trocken'], 'T0K', /braucht --notiz/],
+  [['--erledigt', '901', ...NOTIZ], '', /LAUF_TOKEN fehlt/],]) {
+  const r = erledigtLauf(args, token)
+  assert.equal(r.status, 1, args.join(' '))
+  assert.match(r.stderr, muster)
+  assert.doesNotMatch(r.stdout, /POST/)
+}
+// Lehnt der Worker ab (500), endet das Werkzeug mit Exit 1 statt still mit 0.
+const abgelehnt = erledigtLauf(['--erledigt', '901', ...NOTIZ], 'KAPUTT')
+assert.equal(abgelehnt.status, 1)
+assert.match(abgelehnt.stderr, /Worker antwortete mit 500/)
+console.log('laeufe-abruf --erledigt: ok')
+console.log('laeufe-abruf: ok')
+
+// Verlaufszeile: Warnung (grüner Lauf, DATEN_WARNUNG) heißt WARNUNG und trägt den Wortlaut; echter roter Lauf bleibt ROT, ohne Notiz.
+const warnArt = { art: 'Bestand — zusammenführen und bauen', zustand: 'warnung', am: '2026-11-16T09:43:35Z', stunden: 0.3 }
+assert.equal(
+  verlaufsZeile(warnArt, WARN_NOTIZ),
+  `WARNUNG im Verlauf: Bestand — zusammenführen und bauen — letzter Lauf warnung am 2026-11-16T09:43:35Z (vor 0.3 h, kein Lauf ohne Warnung danach): ${WARN_NOTIZ}`,
+)
+const lang = verlaufsZeile(warnArt, `A${'b'.repeat(400)}\nZeile2`)
+assert.ok(!lang.includes('\n') && lang.endsWith('…') && lang.length < 330, 'auf eine Zeile gekürzt')
+assert.doesNotMatch(verlaufsZeile(warnArt), /: $/, 'ohne Notiz kein hängender Doppelpunkt')
+assert.equal(
+  verlaufsZeile({ ...warnArt, zustand: 'fehler' }, 'wird bei Rot nicht genannt'),
+  'ROT im Verlauf: Bestand — zusammenführen und bauen — letzter Lauf fehler am 2026-11-16T09:43:35Z (vor 0.3 h, kein grüner Lauf danach)',
+)
+assert.equal(notizZu([{ gemeldet_am: 'x', zustand: 'warnung', notiz: 'a' }, { gemeldet_am: warnArt.am, zustand: 'warnung', notiz: WARN_NOTIZ }], warnArt), WARN_NOTIZ)
+assert.equal(notizZu([], warnArt), '')
+
+// Bekannte Warnungen im ganzen Werkzeug (Kulisse mit POST-Aufzeichnung, eingefrorene Uhr 26.11.2026). Ohne `gh` im PATH
+// scheitern dessen Aufrufe sofort statt nach je Sekunden am Proxy (lokal ~28 s je Start), und jeder Start hat ein Zeitlimit.
+const BEKANNT_STILLSTAND = 'Mängel Stillstand: seit 2026-11-22: 1 gestiegen (Arten: Logzeile MAENGEL_STILLSTAND_ARTEN) — gestiegen: sprecher'
+const bekanntLauf = (notiz, args = [], opt = {}) => {
+  const einzel = { lauf_id: 'w1', zustand: 'warnung', gemeldet_am: T(2), notiz, ...opt.eintrag }
+  const stub =
+    `Date.now=()=>Date.parse("${opt.jetzt ?? '2026-11-26T00:00:00Z'}");` +
+    `globalThis.fetch=async(u,o)=>{u=String(u);if(o&&o.method==="POST"){console.log("POST "+o.headers["X-Lauf-Token"]+" "+o.body);return new Response("{}",{status:200})}` +
+    `return new Response(u.includes("?verlauf=")?${JSON.stringify(JSON.stringify({ laeufe: [einzel] }))}:${JSON.stringify(JSON.stringify({ laeufe: [], verlauf: { Bestandsbau: [eintrag('warnung', T(2))] } }))},{status:200})}`
+  return spawnSync(process.execPath, ['--import', `data:text/javascript,${encodeURIComponent(stub)}`, werkzeug, ...args], {
+    encoding: 'utf8',
+    timeout: 60_000,
+    env: { PATH: dirname(process.execPath), LAUF_TOKEN: 'T0K', ...opt.env },
+  })
+}
+const posts = (r) => r.stdout.match(/^POST /gm)?.length ?? 0
+const passend = bekanntLauf(BEKANNT_STILLSTAND)
+assert.equal(passend.status, 0, passend.stderr)
+assert.equal(posts(passend), 1, 'passende Warnung mit Token: genau ein POST')
+assert.match(passend.stdout, /^POST T0K \{"lauf_id":"w1","zustand":"erledigt","notiz":"bekannt bis 2026-11-30: sprecher /m)
+assert.doesNotMatch(passend.stdout, /WARNUNG im Verlauf/)
+assert.equal(posts(bekanntLauf(BEKANNT_STILLSTAND, ['--trocken'])), 0, '--trocken: kein POST')
+const fremd = bekanntLauf(`Datenqualität hart rot: Klammer · ${BEKANNT_STILLSTAND}`)
+assert.equal(posts(fremd), 0, 'fremde Warnung davor: kein POST')
+assert.match(fremd.stdout, /^WARNUNG im Verlauf: Bestandsbau .*Datenqualität hart rot: Klammer$/m)
+assert.equal(posts(bekanntLauf(BEKANNT_STILLSTAND, [], { eintrag: { lauf_id: undefined } })), 0, 'ohne lauf_id: kein POST')
+// Abgelaufener Eintrag (nach dem 30.11.): gemeldet, auch ohne passende Warnung; die Warnung selbst bleibt sichtbar.
+const abgelaufen = bekanntLauf('Crunchyroll-Folgen ohne Termin (2): Last Boss #1', [], { jetzt: '2026-12-01T00:00:00Z' })
+assert.match(abgelaufen.stdout, /^abgelaufen: Bestandsbau /m)
+assert.match(abgelaufen.stdout, /^WARNUNG im Verlauf: /m)
+assert.equal(posts(abgelaufen), 0)
+assert.equal(posts(bekanntLauf(BEKANNT_STILLSTAND, [], { jetzt: '2026-12-01T00:00:00Z' })), 0, 'nach bis: kein POST')
+console.log('laeufe-abruf bekannte Warnungen: ok')

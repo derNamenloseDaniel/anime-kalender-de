@@ -1,0 +1,557 @@
+import type {
+  DubConfidence,
+  Fsk,
+  PlatformId,
+  Release,
+  ReleaseEvent,
+  ReleaseStatus,
+  ReleaseType,
+  Title,
+} from '@shared/types.ts'
+import { releaseStatus } from '@shared/logic.ts'
+import type { Dataset } from './data.ts'
+import { sucheGen, treibe, type Fundstelle, type FundstelleArt, type Suchfeld } from './search.ts'
+import { tvPremiere } from './tv-angabe.ts'
+import { anzeigeName, nachAusstrahlung, reihenVertreter } from '@shared/titles.ts'
+import { kostenloseFolgen } from '@shared/kostenlos.ts'
+import { synonymeFuer } from './data.ts'
+import { passtSprecher, type SprecherAuswahl } from './sprecher-auswahl.ts'
+import { herkunftVon, type Herkunft } from './herkunft.ts'
+import { passtWertung, wertungGesetzt } from './filter-wertung.ts'
+import { passtAmTermin, tvSichtbar } from '@shared/push-filter.ts'
+import { passtWege } from './wege-filter.ts'
+
+/**
+ * Die Listen, die es sowohl als Einschluss als auch als Ausschluss gibt.
+ * Als eigener Typ, damit beide Seiten nicht auseinanderlaufen können.
+ */
+export interface FilterLists {
+  platforms: PlatformId[]
+  /**
+   * Bezugsquellen jenseits der neun bekannten Plattformen — maxdome, Apple TV,
+   * Videobuster, die Prime-Video-Kanäle. Als Klartextnamen, weil sie keine
+   * feste Kennung haben; die Schreibweise vereinheitlicht `providerName` schon
+   * beim Bauen des Datensatzes.
+   */
+  providers: string[]
+  releaseTypes: ReleaseType[]
+  statuses: ReleaseStatus[]
+  fsk: Fsk[]
+  years: number[]
+  genres: string[]
+  keywords: string[]
+  /**
+   * Deutsche Sprecher, nach Namen. Anders als die übrigen Listen gilt hier eine feste Verknüpfung:
+   * eingeschlossene Sprecher mit ODER, ausgeschlossene mit UND (`SprecherAuswahl`); deshalb kein `ModusFeld`.
+   */
+  sprecher: string[]
+  /** Herkunft des Titels (`lib/herkunft.ts`); einwertig wie FSK, deshalb ohne `ModusFeld`. */
+  land: Herkunft[]
+}
+
+export type ListKey = keyof FilterLists
+
+export const LIST_KEYS: ListKey[] = [
+  'platforms',
+  'providers',
+  'releaseTypes',
+  'statuses',
+  'fsk',
+  'years',
+  'genres',
+  'keywords',
+  'sprecher',
+  'land',
+]
+
+export interface FilterState extends FilterLists {
+  /**
+   * Was **nicht** vorkommen darf. Ausschluss schlägt Einschluss: Wer „Fantasy"
+   * wählt und „Ecchi" ausschließt, will Fantasy ohne Ecchi — nicht beides.
+   */
+  excluded: FilterLists
+  search: string
+  /** Blendet Termine aus, die nur abgeleitet sind. */
+  confirmedOnly: boolean
+  /** Zeigt nur gemerkte Titel. */
+  favoritesOnly: boolean
+  /**
+   * Zeigt nur Titel, bei denen belegt ist, wo man sie sehen oder kaufen kann.
+   *
+   * Der Kalender kennt 2.753 Anime mit belegter deutscher Synchro, aber nur
+   * gut hundert davon haben einen anstehenden Termin. Die übrigen sind nicht
+   * weniger interessant — bei ihnen ist die Frage bloß nicht „wann", sondern
+   * „wo". Für rund 2.000 gibt es darauf inzwischen eine Antwort, sie war nur
+   * nicht auffindbar (eingeführt 10.08.2026).
+   */
+  availableOnly: boolean
+  /**
+   * Nur Titel mit kostenlosen Folgen (TOGGO, YouTube). Daniel im Durchgang,
+   * 19.09.2026: „kostenlos“ nur als Filter, kein Etikett auf Karten oder in der Datenbank.
+   */
+  kostenlosOnly: boolean
+  /** Das Gegenstück je Schnellfilter (✅|🚫, 04.10.2026): ausgeblendet statt nur angezeigt. Nie zugleich mit dem Nur-Schalter. */
+  favoritesExcluded: boolean
+  kostenlosExcluded: boolean
+  confirmedExcluded: boolean
+  availableExcluded: boolean
+  /** Spätere Anbieter derselben Folge ausblenden (`zweitanbieter` am Termin, Bau); nur im Kalender. */
+  zweitanbieterExcluded: boolean
+  /** Mindest-Vertrauensstufe der Dub-Angabe (nur Datenbank-Ansicht). */
+  minConfidence: DubConfidence
+  /** Mindestwertung auf der Skala der Daten (0–100); 0 = keine Schwelle (`filter-wertung.ts`). */
+  minScore: number
+  /** Titel ohne Wertung ausblenden — wirkt auch ohne Schwelle. */
+  ohneWertungAus: boolean
+  /**
+   * **Ob mehrere Pills einer Kategorie mit UND oder ODER verknüpft werden.**
+   *
+   * Voreingestellt ist, was die jeweilige Frage meistens meint: Bei Plattformen
+   * „irgendwo davon", bei Genres „alle davon". Wer es anders braucht — Titel,
+   * die auf Netflix **und** Prime laufen, oder Action **oder** Comedy —, stellt
+   * es je Kategorie um.
+   *
+   * **Nur wo ein Titel mehrere Werte haben kann.** Status und FSK sind
+   * einwertig: „läuft UND abgeschlossen" wäre immer leer, und ein Schalter, der
+   * garantiert nichts findet, ist schlimmer als keiner. Sie fehlen hier
+   * deshalb.
+   */
+  modus: FilterModus
+}
+
+/** Die Kategorien, in denen ein Titel mehrere Werte tragen kann. */
+export type ModusFeld = 'platforms' | 'providers' | 'releaseTypes' | 'years' | 'genres' | 'keywords'
+
+export type FilterModus = Partial<Record<ModusFeld, 'und' | 'oder'>>
+
+/**
+ * Die Voreinstellung je Kategorie — sie hält das Verhalten von vor dem
+ * 02.09.2026 fest, damit ein geteilter Link dasselbe zeigt wie vorher.
+ */
+export const MODUS_VORGABE: Record<ModusFeld, 'und' | 'oder'> = {
+  platforms: 'oder',
+  providers: 'oder',
+  releaseTypes: 'oder',
+  years: 'oder',
+  genres: 'und',
+  keywords: 'und',
+}
+
+export function modusVon(f: FilterState, feld: ModusFeld): 'und' | 'oder' {
+  return f.modus?.[feld] ?? MODUS_VORGABE[feld]
+}
+
+const emptyLists = (): FilterLists => ({
+  platforms: [],
+  providers: [],
+  releaseTypes: [],
+  statuses: [],
+  fsk: [],
+  years: [],
+  genres: [],
+  keywords: [],
+  sprecher: [],
+  land: [],
+})
+
+/**
+ * **Der leere Filter — alles aus, auch die Suche.**
+ *
+ * **Wer das zurücksetzt, nimmt die Suche aus**: Der Suchbegriff steht in der Adresse, die Filter sind Pillen.
+ * Wer eine geteilte Adresse öffnet und dann die Pillen zurücksetzt, soll seinen Suchbegriff nicht
+ * verlieren. Deshalb rettet `setFilters` in `App.tsx` die Suche bei **jedem** Filterwechsel — hier
+ * bleibt der leere Wert stehen, weil er für Vergleiche gebraucht wird.
+ */
+export const EMPTY_FILTERS: FilterState = {
+  ...emptyLists(),
+  excluded: emptyLists(),
+  search: '',
+  confirmedOnly: false,
+  favoritesOnly: false,
+  availableOnly: false,
+  kostenlosOnly: false,
+  favoritesExcluded: false,
+  kostenlosExcluded: false,
+  confirmedExcluded: false,
+  availableExcluded: false,
+  zweitanbieterExcluded: false,
+  minConfidence: 'low',
+  minScore: 0,
+  ohneWertungAus: false,
+  modus: {},
+}
+
+export { emptyLists }
+
+/**
+ * Schaltet einen Wert um — je nach Modus als Einschluss oder als Ausschluss.
+ *
+ * Der Wechsel räumt die jeweils andere Seite mit auf: Ein Genre kann nicht
+ * gleichzeitig gefordert und verboten sein, und ein Klick, der beides stehen
+ * ließe, würde eine Filterung erzeugen, die nie ein Ergebnis hat.
+ */
+export function toggleFilter<K extends ListKey>(
+  filters: FilterState,
+  key: K,
+  value: FilterLists[K][number],
+  mode: 'include' | 'exclude',
+): FilterState {
+  const include = filters[key] as FilterLists[K]
+  const exclude = filters.excluded[key] as FilterLists[K]
+  const target = mode === 'include' ? include : exclude
+  const other = mode === 'include' ? exclude : include
+
+  const nextTarget = (target as unknown[]).includes(value)
+    ? (target as unknown[]).filter((v) => v !== value)
+    : [...(target as unknown[]), value]
+  const nextOther = (other as unknown[]).filter((v) => v !== value)
+
+  return mode === 'include'
+    ? { ...filters, [key]: nextTarget, excluded: { ...filters.excluded, [key]: nextOther } }
+    : { ...filters, [key]: nextOther, excluded: { ...filters.excluded, [key]: nextTarget } }
+}
+
+/** 'include' | 'exclude' | undefined — wie ein Wert gerade gesetzt ist. */
+export function filterMode<K extends ListKey>(
+  filters: FilterState,
+  key: K,
+  value: FilterLists[K][number],
+): 'include' | 'exclude' | undefined {
+  if ((filters[key] as unknown[]).includes(value)) return 'include'
+  if ((filters.excluded[key] as unknown[]).includes(value)) return 'exclude'
+  return undefined
+}
+
+const CONFIDENCE_RANK: Record<DubConfidence, number> = {
+  low: 0,
+  normal: 1,
+  high: 2,
+  'very-high': 3,
+}
+
+export function isFilterActive(f: FilterState): boolean {
+  return activeFilterCount(f) > 0
+}
+
+/**
+ * Wie viele **Filter** gesetzt sind — die Suche zählt nicht mit.
+ *
+ * Sie hat ihr eigenes Feld in der Kopfleiste und geht durch „zurücksetzen" nicht weg (Daniel,
+ * 29.09.2026: „Filter (1) - 1 entfernen, es zeigt 1 weil im suchfeld text eingegeben wurde, aber das
+ * sollte nicht über die filter pill angezeigt werden"). Wer wissen will, ob die Ansicht eingeschränkt
+ * ist, fragt getrennt (`KalenderBereich`: Filter **oder** Suche).
+ */
+export function activeFilterCount(f: FilterState): number {
+  const lists = LIST_KEYS.reduce((sum, key) => sum + f[key].length + f.excluded[key].length, 0)
+  return (
+    lists +
+    (f.confirmedOnly ? 1 : 0) +
+    (f.favoritesOnly ? 1 : 0) +
+    (f.availableOnly ? 1 : 0) +
+    (f.kostenlosOnly ? 1 : 0) +
+    (f.favoritesExcluded ? 1 : 0) +
+    (f.kostenlosExcluded ? 1 : 0) +
+    (f.confirmedExcluded ? 1 : 0) +
+    (f.availableExcluded ? 1 : 0) +
+    (f.zweitanbieterExcluded ? 1 : 0) +
+    (f.minConfidence !== 'low' ? 1 : 0) +
+    (f.minScore > 0 ? 1 : 0) +
+    (f.ohneWertungAus ? 1 : 0)
+  )
+}
+
+/**
+ * Die Namen eines Anime in allen drei Sprachen.
+ *
+ * Deutsch, Englisch, Japanisch — letzteres doppelt, in Umschrift und in
+ * Originalschrift. Wer „Tensei Shitara Slime" tippt, sucht dasselbe wie jemand,
+ * der „転生したらスライム" einfügt oder „Meine Wiedergeburt als Schleim" schreibt.
+ */
+function namen(title: Title | undefined): string[] {
+  return [
+    title?.titleDe,
+    title?.titleEn,
+    title?.titleRomaji,
+    title?.titleNative,
+    /* Weitere Namen aus aniSearch — geladen mit der Datenbank-Ansicht, siehe `loadSynonyme()`. */
+    ...(title ? synonymeFuer(title.id) : []),
+  ].filter((v): v is string => !!v)
+}
+
+/**
+ * **Alles, was die strenge Suchstufe durchsuchen darf — mit Beschriftung.**
+ *
+ * Die Art (`art`) ist die Auskunft, die der Hinweis an der Trefferkarte nennt: „Treffer über
+ * Genre". Deshalb steht hier nicht mehr nur der Text, sondern auch, wozu er gehört — und die
+ * Liste deckt sich mit `SUCHFELD_ARTEN` in `search.ts`, die das Info-Symbol am Suchfeld zeigt
+ * (Zusicherung in `check:logic`).
+ */
+function suchfelder(release: Release | undefined, title: Title | undefined): Suchfeld[] {
+  const raus: Suchfeld[] = []
+  const dazu = (art: FundstelleArt, text?: string | null) => {
+    if (text) raus.push({ art, text })
+  }
+  dazu('release', release?.name)
+  dazu('verlag', release?.publisher)
+  dazu('ausgabe', release?.edition)
+  for (const n of [title?.titleDe, title?.titleEn, title?.titleRomaji, title?.titleNative]) dazu('titel', n)
+  for (const s of title ? synonymeFuer(title.id) : []) dazu('synonym', s)
+  for (const s of title?.studios ?? []) dazu('studio', s)
+  for (const g of title?.genres ?? []) dazu('genre', g)
+  for (const k of title?.keywords ?? []) dazu('keyword', k)
+  return raus
+}
+
+/** Die Fundstellen der Treffer in die Map legen — dieselbe Zeile in beiden Filtern. */
+function merkeFundstellen<T>(
+  treffer: { item: T; fundstellen: Fundstelle[] }[],
+  schluessel: (item: T) => string,
+  ziel?: Map<string, Fundstelle[]>,
+): void {
+  if (!ziel) return
+  for (const t of treffer) if (t.fundstellen.length) ziel.set(schluessel(t.item), t.fundstellen)
+}
+
+const herkunftOderUnbekannt = (title: Title | undefined): Herkunft => (title ? herkunftVon(title) : 'XX')
+
+/** Prüft einen einzelnen Release gegen die Filter. */
+export function releaseMatches(
+  release: Release,
+  title: Title | undefined,
+  f: FilterState,
+  today: string,
+): boolean {
+  const status = releaseStatus(release, today)
+  const genres = title?.genres ?? []
+  const keywords = title?.keywords ?? []
+
+  // Ausschluss zuerst — er schlägt jeden Einschluss.
+  const x = f.excluded
+  if (!passtAmTermin(release.platform, release.releaseType, f)) return false
+  if (x.years.includes(release.year)) return false
+  if (release.fsk !== undefined && x.fsk.includes(release.fsk)) return false
+  if (x.statuses.includes(status)) return false
+  if (x.genres.some((g) => genres.includes(g))) return false
+  if (x.keywords.some((k) => keywords.includes(k))) return false
+  if (x.land.length && x.land.includes(herkunftOderUnbekannt(title))) return false
+
+  if (f.years.length && !f.years.includes(release.year)) return false
+  if (f.confirmedOnly && release.schedule.estimated) return false
+  if (f.confirmedExcluded && !release.schedule.estimated) return false
+  if (f.kostenlosOnly && (!title || !kostenloseFolgen(title))) return false
+  if (f.kostenlosExcluded && title && kostenloseFolgen(title)) return false
+
+  if (f.fsk.length) {
+    if (release.fsk === undefined) return false
+    if (!f.fsk.includes(release.fsk)) return false
+  }
+  if (f.statuses.length && !f.statuses.includes(status)) return false
+  if (f.land.length && !f.land.includes(herkunftOderUnbekannt(title))) return false
+  /* Die Wertung wird nur gelesen, wenn der Filter gesetzt ist: Die Kachel-Datei des Wochenstarts trägt `score` nicht (`TITEL_OHNE`). */
+  if (wertungGesetzt(f) && !passtWertung(title?.score, f.minScore, f.ohneWertungAus)) return false
+
+  if (f.genres.length && !f.genres.every((g) => genres.includes(g))) return false
+  if (f.keywords.length && !f.keywords.every((k) => keywords.includes(k))) return false
+  // Der Suchbegriff wird **nicht** hier geprüft: Er läuft zweistufig über die
+  // ganze Liste (siehe search.ts) und braucht dafür das Gesamtergebnis, nicht
+  // ein Einzelurteil.
+  return true
+}
+
+/**
+ * Die Termine zum Filter — `fundstellen` nimmt auf, **warum** ein Treffer dasteht (29.09.2026).
+ *
+ * Der Aufrufer reicht eine leere Map herein und bekommt sie gefüllt zurück; die Trefferkarten
+ * lesen daraus, was hervorgehoben und was im Hinweis erklärt wird. Ohne Map ändert sich nichts.
+ */
+export function* filterEventsGen(
+  data: Dataset,
+  f: FilterState,
+  today: string,
+  favorites: Set<number>,
+  fundstellen?: Map<string, Fundstelle[]>,
+): Generator<void, ReleaseEvent[]> {
+  const passend = data.releases
+    .filter((r) => !f.favoritesOnly || favorites.has(r.titleId))
+    .filter((r) => !f.favoritesExcluded || !favorites.has(r.titleId))
+    .filter((r) => releaseMatches(r, data.titleById.get(r.titleId), f, today))
+
+  const gesucht = yield* sucheGen(
+    passend,
+    f.search,
+    (r) => suchfelder(r, data.titleById.get(r.titleId)),
+    (r) => [r.name, ...namen(data.titleById.get(r.titleId))],
+    (r) => r.name,
+  )
+  merkeFundstellen(gesucht, (r) => r.slug, fundstellen)
+
+  const allowed = new Set(gesucht.map((t) => t.item.slug))
+  return data.events.filter((e) => allowed.has(e.releaseSlug) && !(f.zweitanbieterExcluded && e.zweitanbieter))
+}
+
+/** Dasselbe in einem Zug. */
+export const filterEvents = (...args: Parameters<typeof filterEventsGen>): ReleaseEvent[] => treibe(filterEventsGen(...args))
+
+/** Filter für die Datenbank-Ansicht: arbeitet auf Anime statt auf Terminen. */
+export function* filterTitlesGen(
+  source: Title[],
+  data: Dataset,
+  f: FilterState,
+  today: string,
+  favorites: Set<number>,
+  fundstellen?: Map<string, Fundstelle[]>,
+  /** Welcher Name auf der Karte steht — Träger der höchsten Trefferklasse (bei Gruppierung der Kopf). */
+  sichtbarerName?: (t: Title) => string,
+  /** Titel der gewählten Sprecher (`lib/sprecher-auswahl.ts`); ohne Angabe wirkt der Sprecher-Filter nicht. */
+  sprecher?: SprecherAuswahl,
+): Generator<void, Title[]> {
+  /* Auch das Vorfiltern über alle Titel gibt zwischendurch ab — ein Block von 18.863 Einträgen friert sonst ein (gemessen mit Handy-Drosselung). */
+  const vorgefiltert: Title[] = []
+  let marke = performance.now()
+  for (const t of source) {
+    if (performance.now() - marke > 6) {
+      yield
+      marke = performance.now()
+    }
+    if (passtTitel(t, data, f, today, favorites, sprecher) && (!wertungGesetzt(f) || passtWertung(t.score, f.minScore, f.ohneWertungAus))) vorgefiltert.push(t)
+  }
+  const gesucht = yield* sucheGen(
+    vorgefiltert,
+    f.search,
+    (t) => suchfelder(undefined, t),
+    (t) => namen(t),
+    sichtbarerName ?? ((t) => anzeigeName(t)),
+  )
+  merkeFundstellen(gesucht, (t) => String(t.id), fundstellen)
+  return gesucht.map((t) => t.item)
+}
+
+/** Dasselbe in einem Zug — für Aufrufer, die nicht abgeben müssen. */
+export const filterTitles = (...args: Parameters<typeof filterTitlesGen>): Title[] => treibe(filterTitlesGen(...args))
+
+/**
+ * **Passt dieser Titel zum Filter?** — herausgelöst aus `filterTitles` (29.09.2026), damit die
+ * Funktion unter der Längengrenze bleibt. Inhalt unverändert.
+ */
+function passtTitel(t: Title, data: Dataset, f: FilterState, today: string, favorites: Set<number>, sprecher?: SprecherAuswahl): boolean {
+  if (sprecher && !passtSprecher(t.id, sprecher)) return false
+  if (f.favoritesOnly && !favorites.has(t.id)) return false
+  if (f.favoritesExcluded && favorites.has(t.id)) return false
+  /**
+   * „Streambar" — Titel, bei denen wir einen Stream kennen oder vermuten.
+   *
+   * Der Filter hieß bis zum 15.08.2026 „verfügbar" und nahm alles mit, was
+   * irgendeinen Bezugsweg hatte: auch reine Disc-Veröffentlichungen und
+   * Kauflinks. Daniel las ihn deshalb als „hat deutsche Synchro" und stolperte
+   * darüber, dass „.hack//SIGN" verschwand, obwohl es synchronisiert ist und
+   * man die DVD kaufen kann.
+   *
+   * Beide Lesarten waren falsch, und beide lagen am Namen. Jetzt beantwortet
+   * der Filter genau eine Frage — **kann ich das streamen?** — und lässt
+   * draußen, was nur auf Disc erscheint oder nur zu kaufen ist. Über die
+   * Synchro sagt er weiterhin nichts; das tut die Kennzeichnung am Anbieter.
+   */
+  if (f.kostenlosOnly && !kostenloseFolgen(t)) return false
+  if (f.kostenlosExcluded && kostenloseFolgen(t)) return false
+  if (f.availableOnly || f.availableExcluded) {
+    const stream =
+      t.streams.length > 0 ||
+      (t.watchLinks ?? []).some((w) => w.kind === 'stream') ||
+      (data.releasesByTitle.get(t.id) ?? []).some(
+        (r) => r.platform !== 'disc' && r.platform !== 'kino',
+      )
+    if (f.availableOnly ? !stream : stream) return false
+  }
+  if (CONFIDENCE_RANK[t.dubConfidence] < CONFIDENCE_RANK[f.minConfidence]) return false
+
+  const x = f.excluded
+  if (x.genres.some((g) => t.genres.includes(g))) return false
+  if (x.keywords.some((k) => t.keywords.includes(k))) return false
+  if (t.fsk !== undefined && x.fsk.includes(t.fsk)) return false
+  if (x.land.length && x.land.includes(herkunftVon(t))) return false
+
+  /*
+    **UND oder ODER — je Kategorie, wie eingestellt.**
+
+    `passt` fasst beides zusammen: Bei „und" muss jede gewählte Pill zutreffen,
+    bei „oder" reicht eine. Die Voreinstellung hält das Verhalten von vor dem
+    02.09.2026 fest (`MODUS_VORGABE`), damit ein geteilter Link dasselbe zeigt.
+  */
+  const passt = <T>(gewaehlt: readonly T[], feld: ModusFeld, hat: (v: T) => boolean) => {
+    if (!gewaehlt.length) return true
+    return modusVon(f, feld) === 'und' ? gewaehlt.every(hat) : gewaehlt.some(hat)
+  }
+
+  if (!passt(f.genres, 'genres', (g) => t.genres.includes(g))) return false
+  if (!passt(f.keywords, 'keywords', (k) => t.keywords.includes(k))) return false
+  /* FSK ist einwertig — „ab 12 UND ab 16" gibt es nicht, deshalb ohne Modus. */
+  if (f.fsk.length && (t.fsk === undefined || !f.fsk.includes(t.fsk))) return false
+  if (f.land.length && !f.land.includes(herkunftVon(t))) return false
+
+  return passtWege(t, data.releasesByTitle.get(t.id) ?? [], f, today, (feld) => modusVon(f, feld))
+}
+
+/**
+ * **Die Termine der Ansicht samt ihren Fundstellen** — die zwei Zeilen, die `App` sonst selbst
+ * rechnen müsste. `filterEvents` füllt die Map, hier wird beides zusammen zurückgegeben.
+ */
+export function* eventsFuerAnsichtGen(
+  data: Dataset,
+  f: FilterState,
+  today: string,
+  favorites: Set<number>,
+  tvAus: boolean,
+): Generator<void, { liste: ReleaseEvent[]; fundstellen: Map<string, Fundstelle[]> }> {
+  const fundstellen = new Map<string, Fundstelle[]>()
+  const gefiltert = (yield* filterEventsGen(data, f, today, favorites, fundstellen)).filter(
+    /* Ausgeschaltet bleiben Premieren sichtbar. */
+    (e) => tvSichtbar(e.platform, tvPremiere(e, data), tvAus),
+  )
+  return { liste: gefiltert, fundstellen }
+}
+
+/** Dasselbe für die Datenbank-Ansicht (Schlüssel: Titel-Kennung). */
+export function* titelFuerAnsichtGen(
+  quelle: Title[],
+  data: Dataset,
+  f: FilterState,
+  today: string,
+  favorites: Set<number>,
+  /** Gruppiert die Ansicht die Staffeln? Dann ist der **Reihenkopf** der sichtbare Name. */
+  gruppiert = false,
+  sprecher?: SprecherAuswahl,
+): Generator<void, { liste: Title[]; fundstellen: Map<string, Fundstelle[]> }> {
+  const fundstellen = new Map<string, Fundstelle[]>()
+  const sichtbar = gruppiert ? reihenKopf(quelle) : (t: Title) => anzeigeName(t)
+  return { liste: yield* filterTitlesGen(quelle, data, f, today, favorites, fundstellen, sichtbar, sprecher), fundstellen }
+}
+
+/**
+ * **Wer im Katalog als Reihe angezeigt wird** — für die Rangfolge der Suche (29.09.2026).
+ *
+ * Daniel mit Bild: „wieso taucht dieser erste treffer vor den anderen auf? es ist ein sekundär
+ * treffer (nicht im sichtbaren titel)". Auf der Karte stand „Haikyu!! Lev ist hier!", getroffen hatte
+ * die Suche „Haikyu!! Lev **Ken**zen" — ein *anderer* Titel derselben Reihe. Mit eingeschalteter
+ * Gruppierung zeigt die Karte den Reihenkopf, also muss die Rangfolge ihn auch messen; sonst gilt ein
+ * unsichtbarer Name als sichtbarer Treffer. Dieselbe Regel wie `groupByFranchise()`
+ * (`reihenVertreter` nach Ausstrahlung).
+ */
+export function reihenKopf(quelle: Title[]): (t: Title) => string {
+  const nachReihe = new Map<number, Title[]>()
+  for (const t of quelle) {
+    const k = t.franchiseId ?? t.id
+    const liste = nachReihe.get(k)
+    if (liste) liste.push(t)
+    else nachReihe.set(k, [t])
+  }
+  const kopf = new Map<number, Title>()
+  for (const [k, mitglieder] of nachReihe) kopf.set(k, reihenVertreter(mitglieder.slice().sort(nachAusstrahlung)))
+  return (t) => anzeigeName(kopf.get(t.franchiseId ?? t.id) ?? t)
+}
+
+export function toggleValue<T>(list: T[], value: T): T[] {
+  return list.includes(value) ? list.filter((v) => v !== value) : [...list, value]
+}
+
+/** Das Schlagwort, unter dem jeder westliche Cartoon läuft — Filter und Schnellfilter teilen es. */
+export const CARTOON_KEYWORD = 'Cartoon'

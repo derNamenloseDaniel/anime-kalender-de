@@ -1,0 +1,318 @@
+/**
+ * Laufzeitprobe für den Schritt „Protokoll und Freigabe“ aus .github/workflows/pr-pruefer.yml: Der `run`-Block wird
+ * aus der YAML gelesen und mit bash gegen eine gh-Attrappe ausgeführt. Geprüft wird, welche gh-Aufrufe entstehen
+ * (Kommentar, --approve, --request-changes), nicht der Wortlaut des Skripts. Die Attrappe kennt nur die Aufrufe des
+ * Schritts mit genauem Pfad und Parametern, jeder andere Aufruf endet mit Exit 99.
+ */
+import { spawnSync } from 'node:child_process'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+import { parse } from 'yaml'
+import { baueDateien } from './pr-kettenlog.mjs'
+import { basisZeile } from './pr-pruefer-basis-offen.mjs'
+import { WORKFLOW, fuerSchnappschuss, leseSchnappschuss, meldung, schreibeSchnappschuss, unterschiede } from './pr-pruefer-schnappschuss.mjs'
+
+const fehler = []
+const pruefe = (name, ok, info) => {
+  if (ok) return console.log(`  ✓ ${name}`)
+  fehler.push(name)
+  console.error(`  ✗ ${name}${info === undefined ? '' : ` — ${JSON.stringify(info)}`}`)
+}
+
+const wf = parse(fs.readFileSync(WORKFLOW, 'utf8'))
+if (process.argv.includes('--schnappschuss')) {
+  schreibeSchnappschuss(wf)
+  console.log('tools/pr-pruefer.schnappschuss.json neu geschrieben.')
+  process.exit(0)
+}
+// Das ganze Dokument gegen den Schnappschuss: ein Zusatzschritt, ein anderer Wert oder ein neuer Schlüssel ist rot.
+const abweichungen = unterschiede(leseSchnappschuss(), fuerSchnappschuss(wf))
+if (abweichungen.length) {
+  console.error(meldung(abweichungen))
+  process.exit(1)
+}
+console.log('  ✓ Workflow stimmt mit dem Schnappschuss überein (alle Schlüssel und Werte außer dem Prompt-Text)')
+const freigabe = wf.jobs.pruefen.steps.find((s) => s.name === 'Protokoll und Freigabe')
+const KOPF = 'c'.repeat(40)
+const ANDERER = 'd'.repeat(40)
+const TOKEN = 'tok-geheim-123'
+const BASH = process.platform === 'win32' ? 'C:/Program Files/Git/bin/bash.exe' : 'bash'
+
+// ATTRAPPE_LIMIT_BEI = "pr comment": der erste Aufruf mit diesem Unterbefehl scheitert mit „rate limit“, ATTRAPPE_FEHLER_BEI ebenso
+// mit einem Fehler anderer Art (je einmal, Marke in ATTRAPPE_MARKE); `api rate_limit` antwortet mit Reset ATTRAPPE_RESET (Sekunden seit 1970).
+const ATTRAPPE = `#!/bin/bash
+echo "$*" >> "$ATTRAPPE_LOG"
+if [ "$1 $2" = "api rate_limit" ]; then echo "{\\"resources\\":{\\"core\\":{\\"remaining\\":0,\\"reset\\":\${ATTRAPPE_RESET:-1}}}}"; exit 0; fi
+if [ "$1 $2" = "$ATTRAPPE_LIMIT_BEI" ] && [ ! -e "$ATTRAPPE_MARKE" ]; then touch "$ATTRAPPE_MARKE"; echo "HTTP 403: API rate limit exceeded for installation" >&2; exit 1; fi
+if [ "$1 $2" = "$ATTRAPPE_FEHLER_BEI" ] && [ ! -e "$ATTRAPPE_MARKE" ]; then touch "$ATTRAPPE_MARKE"; echo "HTTP 502: Bad Gateway" >&2; exit 1; fi
+case "$1 $2" in
+  "pr view")
+    [ "$*" = "pr view 7 --repo o/r --json headRefOid -q .headRefOid" ] || exit 99
+    echo "$ATTRAPPE_AKTUELL" ;;
+  "pr comment")
+    [ "$3 $4 $5 $6" = "7 --repo o/r --body-file" ] || exit 99
+    cp "$7" "$ATTRAPPE_KOMMENTAR" ;;
+  "pr review")
+    [ "$3 $4 $5" = "7 --repo o/r" ] || exit 99
+    [ "$6" = "--approve" ] || [ "$6" = "--request-changes" ] || exit 99 ;;
+  *) exit 99 ;;
+esac
+`
+
+/** Die env des Schritts aus der YAML; nur die beiden bekannten Ausdrücke werden eingesetzt. */
+function werteEnv(zustand, checks, modus = '', frei = '') {
+  const ausdruecke = {
+    'steps.modus.outputs.modus': modus,
+    'steps.modus.outputs.aendern-frei': frei,
+    'steps.eingang.outputs.zustand': zustand,
+    'steps.checks.outputs.stand': checks,
+    'secrets.GITHUB_TOKEN': TOKEN,
+    'needs.ziel.outputs.pr': '7',
+    'needs.ziel.outputs.sha': KOPF,
+    'needs.ziel.outputs.basis': ANDERER,
+  }
+  const setze = (_, a) => {
+    if (!(a in ausdruecke)) throw new Error(`Ausdruck nicht nachgebildet: ${a}`)
+    return ausdruecke[a]
+  }
+  return Object.fromEntries(Object.entries({ ...wf.jobs.pruefen.env, ...freigabe.env }).map(([s, w]) => [s, String(w).replace(/\$\{\{\s*([^}]+?)\s*\}\}/g, setze)]))
+}
+
+/** Führt den run-Block aus; `f.urteil`: Text von urteil.json oder null, `f.protokoll` ebenso. */
+function laufe(f) {
+  const ordner = fs.mkdtempSync(path.join(os.tmpdir(), 'pr-freigabe-'))
+  try {
+    const bin = path.join(ordner, 'bin')
+    const temp = path.join(ordner, 'runner').replaceAll('\\', '/')
+    fs.mkdirSync(bin)
+    fs.mkdirSync(path.join(temp, 'pruefer'), { recursive: true })
+    fs.writeFileSync(path.join(bin, 'gh'), ATTRAPPE, { mode: 0o755 })
+    if (f.urteil !== null) fs.writeFileSync(path.join(temp, 'pruefer', 'urteil.json'), f.urteil)
+    if (f.protokoll !== null) fs.writeFileSync(path.join(temp, 'pruefer', 'protokoll.md'), f.protokoll)
+    // Das Werkzeug des Schritts liegt wie im Workflow unter tools/ des Arbeitsordners.
+    fs.mkdirSync(path.join(ordner, 'tools'))
+    fs.copyFileSync(new URL('./pr-pruefer-kette-offen.mjs', import.meta.url), path.join(ordner, 'tools', 'pr-pruefer-kette-offen.mjs'))
+    fs.copyFileSync(new URL('./pr-pruefer-basis-offen.mjs', import.meta.url), path.join(ordner, 'tools', 'pr-pruefer-basis-offen.mjs'))
+    for (const d of ['gh-ratelimit.mjs', 'gh-mit-limit.sh']) fs.copyFileSync(new URL(`./${d}`, import.meta.url), path.join(ordner, 'tools', d))
+    // `gh-ratelimit.mjs` ruft `gh api rate_limit` über spawnSync: unter Windows findet das nur gh.exe (Node mit dem Skript `api` im Arbeitsordner).
+    if (process.platform === 'win32') {
+      fs.copyFileSync(process.execPath, path.join(bin, 'gh.exe'))
+      fs.writeFileSync(path.join(ordner, 'api'), 'require("fs").appendFileSync(process.env.ATTRAPPE_LOG, "api rate_limit\\n"); process.stdout.write(JSON.stringify({ resources: { core: { remaining: 0, reset: Number(process.env.ATTRAPPE_RESET ?? 1) } } }))\n')
+    }
+    if (f.kettenlog) fs.writeFileSync(path.join(temp, 'pruefer', 'kettenlog.txt'), f.kettenlog)
+    const skript = path.join(ordner, 'schritt.sh')
+    fs.writeFileSync(skript, freigabe.run)
+    const log = path.join(ordner, 'aufrufe.log')
+    const kommentar = path.join(ordner, 'kommentar.md')
+    const env = Object.fromEntries(Object.entries(process.env).filter(([s]) => !/^(GITHUB_|RUNNER_|GH_)/.test(s)))
+    const pfad = Object.keys(env).find((s) => s.toUpperCase() === 'PATH') ?? 'PATH'
+    env[pfad] = bin + path.delimiter + env[pfad]
+    Object.assign(env, {
+      GITHUB_REPOSITORY: 'o/r',
+      RUNNER_TEMP: temp,
+      ...werteEnv(f.zustand, f.checks ?? 'gruen', f.modus, f.frei),
+      ATTRAPPE_LOG: log,
+      ATTRAPPE_KOMMENTAR: kommentar,
+      ATTRAPPE_AKTUELL: f.aktuell ?? KOPF,
+      ATTRAPPE_MARKE: path.join(ordner, 'marke'),
+      ATTRAPPE_LIMIT_BEI: f.limitBei ?? '',
+      ATTRAPPE_FEHLER_BEI: f.fehlerBei ?? '',
+      ATTRAPPE_RESET: String(f.reset ?? 1),
+    })
+    const r = spawnSync(BASH, ['-e', skript], { cwd: ordner, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+    const aufrufe = fs.existsSync(log) ? fs.readFileSync(log, 'utf8').split('\n').filter(Boolean) : []
+    return {
+      status: r.status,
+      aufrufe: aufrufe.map((a) => a.replace(/--body-file \S+/, '--body-file <datei>')),
+      kommentar: fs.existsSync(kommentar) ? fs.readFileSync(kommentar, 'utf8') : '',
+    }
+  } finally {
+    fs.rmSync(ordner, { recursive: true, force: true })
+  }
+}
+
+const urteil = (art, sha = KOPF) => JSON.stringify({ urteil: art, sha })
+const basis = { urteil: urteil('ok'), protokoll: 'Alles gut.\n', zustand: 'ok' }
+// Die gh-Aufrufe des guten Laufs, Wort für Wort: jeder zusätzliche Aufruf ist rot, auch wenn der Schritt grün endet.
+const ANSICHT = 'pr view 7 --repo o/r --json headRefOid -q .headRefOid'
+const KOMMENTAR = 'pr comment 7 --repo o/r --body-file <datei>'
+const APPROVE = 'pr review 7 --repo o/r --approve --body Urteil: ok. Prüfprotokoll steht als Kommentar (Stand ccccccccc).'
+const AENDERN = 'pr review 7 --repo o/r --request-changes --body Befunde im Prüfprotokoll-Kommentar (Stand ccccccccc).'
+const FREIGABE = { status: 0, aufrufe: [ANSICHT, KOMMENTAR, APPROVE] }
+const ABLEHNUNG = { status: 0, aufrufe: [ANSICHT, KOMMENTAR, AENDERN] }
+const NICHTS = { status: 0, aufrufe: [ANSICHT] }
+const NUR_KOMMENTAR = { status: 0, aufrufe: [ANSICHT, KOMMENTAR] }
+const KEIN_URTEIL = { status: 1, aufrufe: [] }
+const UNVOLL = '**Prüfer-Review** für ccccccccc - Urteil: **nicht beurteilt, Diff unvollständig**'
+
+const faelle = [
+  ['Zustand ok, Urteil ok: Freigabe', basis, FREIGABE],
+  ['Zustand unvollstaendig, Urteil ok: kein Approve und kein Änderungswunsch, nur Kommentar (12.11.2026, PRs 3579/3584)', { ...basis, zustand: 'unvollstaendig' }, NUR_KOMMENTAR],
+  ['Zustand unvollstaendig, Urteil ok, Token im Protokoll: Änderungswunsch (Token geht vor)', { ...basis, zustand: 'unvollstaendig', protokoll: 'x ghp_abcdef y\n' }, ABLEHNUNG],
+  ['Zustand leer, Urteil ok: keine Freigabe', { ...basis, zustand: '' }, ABLEHNUNG],
+  ['Zustand unbekannt, Urteil ok: keine Freigabe', { ...basis, zustand: 'ok2' }, ABLEHNUNG],
+  ['Zustand ok, Urteil aendern: Änderungswunsch', { ...basis, urteil: urteil('aendern') }, ABLEHNUNG],
+  ['Zustand unvollstaendig, Urteil aendern: Änderungswunsch', { ...basis, zustand: 'unvollstaendig', urteil: urteil('aendern') }, ABLEHNUNG],
+  ['Token-Muster im Protokoll, Zustand ok: keine Freigabe', { ...basis, protokoll: 'x ghp_abcdef y\n' }, ABLEHNUNG],
+  ['Eigenes Token im Protokoll, Zustand ok: keine Freigabe', { ...basis, protokoll: `Wert ${TOKEN}\n` }, ABLEHNUNG],
+  ['Urteil weder ok noch aendern, Zustand ok: keine Freigabe', { ...basis, urteil: urteil('vielleicht') }, ABLEHNUNG],
+  ['Urteil für anderen Stand: nichts gepostet', { ...basis, urteil: urteil('ok', ANDERER) }, NICHTS],
+  ['Kopf des PR inzwischen ein anderer: nichts gepostet', { ...basis, aktuell: ANDERER }, NICHTS],
+  ['Urteil fehlt: Abbruch ohne Freigabe', { ...basis, urteil: null }, KEIN_URTEIL],
+  ['Protokoll leer: Abbruch ohne Freigabe', { ...basis, protokoll: '' }, KEIN_URTEIL],
+  ['Urteil unlesbar: Abbruch ohne Freigabe', { ...basis, urteil: '{kaputt' }, KEIN_URTEIL],
+]
+for (const [name, eingabe, soll] of faelle) {
+  const ist = laufe(eingabe)
+  pruefe(name, ist.status === soll.status && JSON.stringify(ist.aufrufe) === JSON.stringify(soll.aufrufe), { ist: ist.aufrufe, soll: soll.aufrufe })
+}
+
+// Kontingent erschöpft (PR 4467, Lauf 44899735502): jeder gh-Aufruf des Schritts wartet bis zum Reset (hier längst vorbei, kein echtes
+// Warten) und läuft genau einmal neu; das Urteil geht nicht verloren. Reset 2100 = jenseits des Zeitkontos: nicht gewartet, Fehler sichtbar.
+const RATE = 'api rate_limit'
+const limitFaelle = [
+  ['Limit beim Lesen des Kopfes: Reset abgefragt, Ansicht neu, danach Kommentar und Freigabe', { ...basis, limitBei: 'pr view' }, { status: 0, aufrufe: [ANSICHT, RATE, ANSICHT, KOMMENTAR, APPROVE] }],
+  ['Limit beim Kommentar: Reset abgefragt, Kommentar neu, danach Freigabe', { ...basis, limitBei: 'pr comment' }, { status: 0, aufrufe: [ANSICHT, KOMMENTAR, RATE, KOMMENTAR, APPROVE] }],
+  ['Limit bei der Freigabe: Reset abgefragt, Review neu', { ...basis, limitBei: 'pr review' }, { status: 0, aufrufe: [ANSICHT, KOMMENTAR, APPROVE, RATE, APPROVE] }],
+  ['Limit beim Änderungswunsch: Reset abgefragt, Review neu', { ...basis, urteil: urteil('aendern'), limitBei: 'pr review' }, { status: 0, aufrufe: [ANSICHT, KOMMENTAR, AENDERN, RATE, AENDERN] }],
+  ['Limit beim Kommentar, Reset jenseits des Zeitkontos: kein Neuversuch, Schritt rot', { ...basis, limitBei: 'pr comment', reset: 4_102_444_800 }, { status: 1, aufrufe: [ANSICHT, KOMMENTAR, RATE] }],
+  ['Fehler anderer Art beim Kommentar: kein Reset abgefragt, kein Neuversuch, Schritt rot', { ...basis, fehlerBei: 'pr comment' }, { status: 1, aufrufe: [ANSICHT, KOMMENTAR] }],
+]
+for (const [name, eingabe, soll] of limitFaelle) {
+  const ist = laufe(eingabe)
+  pruefe(name, ist.status === soll.status && JSON.stringify(ist.aufrufe) === JSON.stringify(soll.aufrufe), { ist: ist.aufrufe, soll: soll.aufrufe, status: ist.status })
+}
+const nachLimit = laufe({ ...basis, limitBei: 'pr comment' })
+pruefe('Limit beim Kommentar: der Kommentar mit dem Urteil steht danach da', nachLimit.kommentar.includes('Urteil: **ok**'), nachLimit.kommentar)
+const nachLimitLesen = laufe({ ...basis, limitBei: 'pr view' })
+pruefe('Limit beim Lesen des Kopfes: die Warte-Zeile landet nicht im Kopf-Vergleich (kein „passt nicht zum Head“, Kommentar steht)', nachLimitLesen.kommentar.includes('Urteil: **ok**'), nachLimitLesen)
+
+const unvollstaendig = laufe({ ...basis, zustand: 'unvollstaendig' })
+pruefe('Unvollständiger Diff: Kommentar nennt „nicht beurteilt, Diff unvollständig“ und den Hinweis',
+  unvollstaendig.kommentar.includes('Urteil: **nicht beurteilt, Diff unvollständig**') && unvollstaendig.kommentar.includes('nicht vollständig geprüft'), unvollstaendig.kommentar)
+const freigegeben = laufe(basis)
+pruefe('Freigabe: Kommentar nennt Urteil ok, ohne Hinweis',
+  freigegeben.kommentar.includes('Urteil: **ok**') && !freigegeben.kommentar.includes('nicht vollständig geprüft'), freigegeben.kommentar)
+// Check-Stand des Kopfes: „ok“ ohne Zusatz nur bei gruen, sonst steht der Stand in der ersten Zeile und im Review.
+const ersteZeile = (r) => r.kommentar.split('\n')[0]
+const mitChecks = (checks, art = 'ok') => laufe({ ...basis, urteil: urteil(art), checks })
+const genehmigt = (titel) => [ANSICHT, KOMMENTAR,
+  `pr review 7 --repo o/r --approve --body Urteil: ${titel}. Prüfprotokoll steht als Kommentar (Stand ccccccccc).`]
+const checkFaelle = [
+  ['gruen', 'ok'],
+  ['Checks rot: Kette – Workflows, PR-Prüfkette', 'ok, Checks rot: Kette – Workflows, PR-Prüfkette'],
+  ['Checks-Stand unbekannt: API: HTTP 502', 'ok, Checks-Stand unbekannt: API: HTTP 502'],
+  ['', 'ok, Checks-Stand unbekannt'],
+  ['gruen2', 'ok, gruen2'],
+]
+for (const [checks, titel] of checkFaelle) {
+  const r = mitChecks(checks)
+  pruefe(`Checks "${checks}", Urteil ok: erste Zeile "${titel}", Review nennt es`,
+    ersteZeile(r) === `**Prüfer-Review** für ccccccccc - Urteil: **${titel}**` && JSON.stringify(r.aufrufe) === JSON.stringify(genehmigt(titel)),
+    { erste: ersteZeile(r), aufrufe: r.aufrufe })
+}
+// Pflicht-Kette läuft beim ok-Urteil noch (PRs 3478, 3475): nicht beurteilt mit Marke, kein Review; Rot bleibt ok mit Zusatz.
+const okLaeuft = mitChecks('Checks laufen noch: PR-Aussehen – Bühne-Panel, PR-Prüfkette (fehlt)')
+// Seit 19.11.2026 schweigt der Prüfer, wenn die Kette beim Urteil noch läuft: kein Kommentar, kein Review (Neustart nach Kettenende liefert das Urteil).
+const STILL = { status: 0, aufrufe: [], kommentar: '' }
+const still = (r) => r.status === 0 && JSON.stringify(r.aufrufe) === JSON.stringify(STILL.aufrufe) && r.kommentar === ''
+pruefe('Urteil ok, Checks laufen noch: still (kein Kommentar, kein Approve, kein gh-Aufruf)', still(okLaeuft), okLaeuft)
+const okLaeuftDiff = laufe({ ...basis, zustand: 'unvollstaendig', checks: 'Checks laufen noch: PR-Prüfkette' })
+pruefe('Urteil ok, Diff unvollständig, Checks laufen noch: nur Kommentar ohne Review, keine Marke',
+  JSON.stringify(okLaeuftDiff.aufrufe) === JSON.stringify(NUR_KOMMENTAR.aufrufe) && !okLaeuftDiff.kommentar.includes('pruefer-kette-offen'), okLaeuftDiff)
+pruefe('Urteil aendern, Checks laufen noch (ohne Kettenlog): bleibt aendern', JSON.stringify(mitChecks('Checks laufen noch: PR-Prüfkette', 'aendern').aufrufe) === JSON.stringify(ABLEHNUNG.aufrufe))
+const aendernRot = mitChecks('Checks rot: Kette – Logik', 'aendern')
+pruefe('Checks rot, Urteil aendern: bleibt aendern ohne Zusatz',
+  ersteZeile(aendernRot) === '**Prüfer-Review** für ccccccccc - Urteil: **aendern**' && JSON.stringify(aendernRot.aufrufe) === JSON.stringify(ABLEHNUNG.aufrufe), aendernRot)
+const unvollRot = laufe({ ...basis, zustand: 'unvollstaendig', checks: 'Checks rot: X' })
+pruefe('Diff unvollständig und Checks rot: nicht beurteilt', ersteZeile(unvollRot) === UNVOLL, ersteZeile(unvollRot))
+
+// Abnahme-Modus (21.10.2026): „aendern“ sperrt nur, wenn es frei ist (Stufe 2, einmal); sonst Kommentar ohne Review.
+const marke = (r) => r.kommentar.trimEnd().split('\n').at(-1)
+const abnahme = (art, frei, extra = {}) => laufe({ ...basis, urteil: urteil(art), modus: 'abnahme', frei, ...extra })
+const OFFEN = '**Prüfer-Review** für ccccccccc - Urteil: **aendern, Auflagen offen: Dirigent entscheidet**'
+const nurKommentar = (r) => JSON.stringify(r.aufrufe) === JSON.stringify([ANSICHT, KOMMENTAR])
+const aOk = abnahme('ok', '0')
+pruefe('Abnahme, Urteil ok (auch ohne Freigabe zum Ändern): Approve, Marke abnahme, Hinweiszeile',
+  JSON.stringify(aOk.aufrufe) === JSON.stringify(FREIGABE.aufrufe) && marke(aOk) === '<!-- pruefer-modus: abnahme -->' && aOk.kommentar.includes('Abnahme-Modus: nur die Auflagen'), aOk)
+const aFrei = abnahme('aendern', '1')
+pruefe('Abnahme, aendern, frei (Stufe 2, erstes Mal): Änderungswunsch wie bisher',
+  JSON.stringify(aFrei.aufrufe) === JSON.stringify(ABLEHNUNG.aufrufe) && ersteZeile(aFrei) === '**Prüfer-Review** für ccccccccc - Urteil: **aendern**', aFrei)
+const aGesperrt = abnahme('aendern', '0')
+pruefe('Abnahme, aendern, nicht frei (Stufe < 2 oder schon einmal): nur Kommentar, kein Review, Titel nennt Dirigent',
+  nurKommentar(aGesperrt) && ersteZeile(aGesperrt) === OFFEN, aGesperrt)
+pruefe('Abnahme, aendern, Freigabe-Ausgabe leer (Modus-Schritt ohne Ausgabe): nur Kommentar', nurKommentar(abnahme('aendern', '')), abnahme('aendern', ''))
+pruefe('Abnahme, aendern, frei = 2 (kein exakter Wert 1): nur Kommentar', nurKommentar(abnahme('aendern', '2')))
+const aUnvoll = abnahme('ok', '0', { zustand: 'unvollstaendig' })
+pruefe('Abnahme, Diff unvollständig, nicht frei: kein Approve, nur Kommentar', nurKommentar(aUnvoll) && ersteZeile(aUnvoll) === UNVOLL, aUnvoll)
+const aToken = abnahme('ok', '0', { protokoll: 'x ghp_abcdef y\n' })
+pruefe('Abnahme, Token im Protokoll, nicht frei: kein Approve', nurKommentar(aToken) && !aToken.kommentar.includes('ghp_abcdef'), aToken)
+const aChecks = abnahme('ok', '0', { checks: 'Checks rot: Kette' })
+pruefe('Abnahme, ok bei roten Checks: Approve mit Zusatz wie im Modus voll', ersteZeile(aChecks).endsWith('Urteil: **ok, Checks rot: Kette**') && JSON.stringify(aChecks.aufrufe) === JSON.stringify(genehmigt('ok, Checks rot: Kette')), aChecks)
+const vFrei = laufe({ ...basis, urteil: urteil('aendern'), modus: 'voll', frei: '0' })
+pruefe('Modus voll, aendern, nicht frei: bleibt Änderungswunsch (die Sperre gilt nur im Abnahme-Modus), Marke voll',
+  JSON.stringify(vFrei.aufrufe) === JSON.stringify(ABLEHNUNG.aufrufe) && marke(vFrei) === '<!-- pruefer-modus: voll -->' && !vFrei.kommentar.includes('Abnahme-Modus'), vFrei)
+const vLeer = laufe({ ...basis, urteil: urteil('aendern') })
+pruefe('Modus-Ausgabe fehlt ganz, aendern: Änderungswunsch (fail closed)', JSON.stringify(vLeer.aufrufe) === JSON.stringify(ABLEHNUNG.aufrufe) && marke(vLeer) === '<!-- pruefer-modus: voll -->', vLeer)
+const aAnderer = abnahme('aendern', '0', { urteil: urteil('aendern', ANDERER) })
+pruefe('Abnahme, Urteil für anderen Stand: nichts gepostet', JSON.stringify(aAnderer.aufrufe) === JSON.stringify(NICHTS.aufrufe), aAnderer)
+
+// Kette beim Urteil noch offen (PRs 2953, 2820): „aendern“ wird zu „nicht beurteilt“ ohne Review; eine fertige rote Kette bleibt „aendern“.
+// Kettenlog aus dem echten Erzeuger (pr-kettenlog.mjs), nicht nachgebaut.
+const kettenlog = (lauf, jobStatus) => baueDateien({ kopf: KOPF, lauf, jobs: [{ name: 'Kette – Logik', status: jobStatus, conclusion: jobStatus === 'completed' ? lauf.conclusion : '', log: 'x: ok' }] }).uebersicht
+const KETTE_LAEUFT = kettenlog({ id: 9, status: 'in_progress', conclusion: '' }, 'in_progress')
+const KETTE_ROT = kettenlog({ id: 9, status: 'completed', conclusion: 'failure' }, 'completed')
+const KETTE_GRUEN = kettenlog({ id: 9, status: 'completed', conclusion: 'success' }, 'completed')
+const AUSSTEHEND = '**Prüfer-Review** für ccccccccc - Urteil: **nicht beurteilt, Kette lief noch**'
+const offenFall = (extra) => laufe({ ...basis, urteil: urteil('aendern'), kettenlog: KETTE_LAEUFT, ...extra })
+const kOffen = offenFall({})
+pruefe('Kette offen, Urteil aendern: still, kein Kommentar, kein Review', still(kOffen), kOffen)
+const kRot = laufe({ ...basis, urteil: urteil('aendern'), kettenlog: KETTE_ROT })
+pruefe('Gegenfall: Kette fertig und rot, Urteil aendern: Änderungswunsch wie bisher, keine Marke', JSON.stringify(kRot.aufrufe) === JSON.stringify(ABLEHNUNG.aufrufe) && ersteZeile(kRot).endsWith('Urteil: **aendern**') && !kRot.kommentar.includes('pruefer-kette-offen'), kRot)
+const KETTE_ROT_BASIS = baueDateien({ kopf: KOPF, lauf: { id: 9, status: 'completed', conclusion: 'failure' }, basis: basisZeile({ beschreibung: 'mergen nach #3435', lauf: { status: 'completed', conclusion: 'failure' }, basisStand: 'open' }), jobs: [{ name: 'Kette – Logik', status: 'completed', conclusion: 'failure', log: 'x: ok' }] }).uebersicht
+const BASIS_TITEL = '**Prüfer-Review** für ccccccccc - Urteil: **nicht beurteilt, Basis offen**'
+const BEFUND = 'Befund 1: Zeile 7 verliert Einträge (echter Fehler).\n'
+const kBasis = laufe({ ...basis, urteil: urteil('aendern'), protokoll: BEFUND, kettenlog: KETTE_ROT_BASIS })
+pruefe('Kette rot, Basis-PR offen, Urteil aendern: nur Kommentar „nicht beurteilt, Basis offen“ mit Marke, kein Review', nurKommentar(kBasis) && ersteZeile(kBasis) === BASIS_TITEL && kBasis.kommentar.includes('<!-- pruefer-kette-offen -->'), kBasis)
+// Gegenfall „echter Fehler in derselben Lage“: der Befund des Prüfers bleibt wörtlich sichtbar, gekennzeichnet als ungeprüft, und der Text lügt nicht über einen Selbststart.
+pruefe('Basis offen, echter Befund: Befund wörtlich im Kommentar, als „Ungeprüft, Basis offen“ gekennzeichnet', kBasis.kommentar.includes(BEFUND) && kBasis.kommentar.includes('Ungeprüft, Basis offen') && kBasis.kommentar.indexOf('Ungeprüft, Basis offen') < kBasis.kommentar.indexOf(BEFUND), kBasis)
+pruefe('Basis offen: Text sagt nicht „startet nach Kettenende von selbst neu“', !kBasis.kommentar.includes('nach Kettenende von selbst neu'), kBasis)
+pruefe('Unfertige Kette (ohne Basiszeile) schweigt, „Basis offen“ kommentiert weiter', still(kOffen) && ersteZeile(kBasis) === BASIS_TITEL && !kBasis.kommentar.includes('Kette lief noch') && !kOffen.kommentar.includes('Basis offen'), kOffen)
+const kBasisOk = laufe({ ...basis, urteil: urteil('ok'), kettenlog: KETTE_ROT_BASIS })
+pruefe('Basis offen, Urteil ok: Freigabe wie bisher, kein „Basis offen“', JSON.stringify(kBasisOk.aufrufe) === JSON.stringify(FREIGABE.aufrufe) && !kBasisOk.kommentar.includes('Basis offen'), kBasisOk)
+const kBasisDiff = laufe({ ...basis, urteil: urteil('aendern'), zustand: 'unvollstaendig', protokoll: BEFUND, kettenlog: KETTE_ROT_BASIS })
+pruefe('Basis offen, Diff unvollständig: Änderungswunsch bleibt (Diff geht vor)', JSON.stringify(kBasisDiff.aufrufe) === JSON.stringify(ABLEHNUNG.aufrufe) && !kBasisDiff.kommentar.includes('Basis offen'), kBasisDiff)
+pruefe('Gegenfall: Kette fertig und grün, Urteil aendern: Änderungswunsch', JSON.stringify(laufe({ ...basis, urteil: urteil('aendern'), kettenlog: KETTE_GRUEN }).aufrufe) === JSON.stringify(ABLEHNUNG.aufrufe))
+pruefe('Kettenlog fehlt, Urteil aendern: Änderungswunsch (fail closed)', JSON.stringify(laufe({ ...basis, urteil: urteil('aendern') }).aufrufe) === JSON.stringify(ABLEHNUNG.aufrufe))
+const kOk = laufe({ ...basis, kettenlog: KETTE_LAEUFT })
+pruefe('Kette offen, Urteil ok: Freigabe wie bisher (Check-Stand-Zusatz regelt den Rest)', JSON.stringify(kOk.aufrufe) === JSON.stringify(FREIGABE.aufrufe) && !kOk.kommentar.includes('pruefer-kette-offen'), kOk)
+const kDiff = offenFall({ zustand: 'unvollstaendig' })
+pruefe('Kette offen, Diff unvollständig, Urteil aendern: Änderungswunsch (Diff geht vor)', JSON.stringify(kDiff.aufrufe) === JSON.stringify(ABLEHNUNG.aufrufe) && !kDiff.kommentar.includes('pruefer-kette-offen'), kDiff)
+const kDiffOk = laufe({ ...basis, zustand: 'unvollstaendig', kettenlog: KETTE_LAEUFT })
+pruefe('Kette offen, Diff unvollständig, Urteil ok: nur Kommentar ohne Review', JSON.stringify(kDiffOk.aufrufe) === JSON.stringify(NUR_KOMMENTAR.aufrufe) && ersteZeile(kDiffOk) === UNVOLL, kDiffOk)
+const kToken = offenFall({ protokoll: 'x ghp_abcdef y\n' })
+pruefe('Kette offen, Token im Protokoll: Änderungswunsch, Token verworfen', JSON.stringify(kToken.aufrufe) === JSON.stringify(ABLEHNUNG.aufrufe) && !kToken.kommentar.includes('ghp_abcdef') && !kToken.kommentar.includes('pruefer-kette-offen'), kToken)
+const kAbnahme = offenFall({ modus: 'abnahme', frei: '1' })
+pruefe('Kette offen, Abnahme-Modus, aendern frei: still', still(kAbnahme), kAbnahme)
+const kAbnahmeZu = offenFall({ modus: 'abnahme', frei: '0' })
+pruefe('Kette offen, Abnahme-Modus, aendern gesperrt: still statt „Auflagen offen“', still(kAbnahmeZu), kAbnahmeZu)
+const kAnderer = offenFall({ urteil: urteil('aendern', ANDERER) })
+pruefe('Kette offen, Urteil für anderen Stand: still, nichts gepostet', still(kAnderer), kAnderer)
+
+const token = laufe({ ...basis, protokoll: 'x ghp_abcdef y\n' })
+pruefe('Token im Protokoll: Kommentar enthält das Token nicht', !token.kommentar.includes('ghp_abcdef') && token.kommentar.includes('verworfen'), token.kommentar)
+
+// PR 2436: 13 Züge bei Grenze 12 ließen die Action scheitern, obwohl ein "ok" geschrieben war. Jeder Prüfer-Schritt darf
+// scheitern, ohne den Lauf zu färben; ob es ein Urteil gibt, entscheidet allein der Freigabe-Schritt (Fall "Urteil fehlt" oben).
+const pruefSchritte = wf.jobs.pruefen.steps.filter((s) => String(s.uses ?? '').startsWith('anthropics/claude-code-action'))
+pruefe('drei Prüfer-Schritte', pruefSchritte.length === 3)
+for (const s of pruefSchritte) pruefe(`Zugbudget-Fehler färbt den Lauf nicht: ${s.name}`, s['continue-on-error'] === true)
+pruefe('Freigabe-Schritt läuft immer und liegt nach allen Prüfer-Schritten',
+  freigabe.if === 'always()' && pruefSchritte.every((s) => wf.jobs.pruefen.steps.indexOf(s) < wf.jobs.pruefen.steps.indexOf(freigabe)))
+
+if (fehler.length) {
+  console.error(`pr-pruefer-freigabe.test: ${fehler.length} Fehler`)
+  process.exit(1)
+}
+console.log('pr-pruefer-freigabe.test: grün')

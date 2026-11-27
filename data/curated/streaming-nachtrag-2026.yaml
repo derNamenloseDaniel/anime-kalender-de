@@ -1,0 +1,365 @@
+# Neuzugänge bei Prime Video, Netflix, Disney+ und RTL+ aus Anime2You-Sammelartikeln (13.10.2026, zweite Runde der Anime2You-Vorschläge).
+# Jeder Titel hatte bei diesem Anbieter keinen Termin im Datensatz (je anilistId und Anbieter in releases.json geprüft). Die Artikel erschienen vor der
+# Regel „Ab sofort = Tag der Meldung“ (02.10.2026).
+# Der Tag ist der Meldetag (`available-from`: im Angebot spätestens seit); „in den letzten Tagen“ oder „seit heute“ nennt kein früheres Datum.
+# Ton: Jeder Artikel nennt die deutsche Fassung im Fließtext („mit deutscher Synchronisation“, „auf Deutsch“, „deutsche Sprachfassung/-ausgabe“), darum ohne `sprache`.
+
+# ---------------------------------------------------------------- Prime Video
+# Anime2You 1044599 (27.08.2026): „Alle 24 Episoden können ausschließlich mit deutscher Sprachfassung angesehen werden“ — beide Staffeln.
+- slug: concrete-revolutio-primevideo
+  anilistId: 21249
+  platform: primevideo
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-08-27", episodeCount: 24 }
+  hinweis: "Beide Staffeln (Concrete Revolutio und The Last Song), 24 Episoden laut Anime2You; AniList führt die zweite Staffel getrennt."
+  sources: [https://www.anime2you.de/news/1044599/prime-video-yu-gi-oh-5ds-und-mehr/]
+
+# 1044599: „mit allen 116 auf Deutsch vorhandenen Episoden“ (von 154), „Der japanische Originalton wird dabei nicht angeboten“.
+- slug: yu-gi-oh-5ds-primevideo
+  anilistId: 3972
+  platform: primevideo
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-08-27", episodeCount: 116 }
+  hinweis: "116 von 154 Episoden auf Deutsch."
+  sources: [https://www.anime2you.de/news/1044599/prime-video-yu-gi-oh-5ds-und-mehr/]
+
+# 1048315 (09.09.2026): „alle zwölf Episoden von »Special 7: Special Crime Investigation Unit«, wobei letztere Serie sowohl auf Deutsch als auch auf Japanisch angesehen werden kann“.
+- slug: special-7-primevideo
+  anilistId: 108554
+  platform: primevideo
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-09-09", episodeCount: 12 }
+  sources: [https://www.anime2you.de/news/1048315/prime-video-date-a-live-staffel-2-und-mehr/]
+
+# 1049795 (13.09.2026): die beiden Compilation-Filme „ab sofort auf Deutsch verfügbar“, je 87 Minuten, „Sprache: Deutsch, Japanisch (UT)“.
+- slug: kuroko-winter-cup-movie-2-primevideo
+  anilistId: 102836
+  titleDe: "Kuroko’s Basketball Movie 2 – Winter Cup: Beyond the Tears"
+  platform: primevideo
+  releaseType: movie
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-09-13" }
+  sources: [https://www.anime2you.de/news/1049795/prime-video-trinity-seven-und-mehr/]
+
+- slug: kuroko-winter-cup-movie-3-primevideo
+  anilistId: 102839
+  titleDe: "Kuroko’s Basketball Movie 3 – Winter Cup: Crossing the Door"
+  platform: primevideo
+  releaseType: movie
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-09-13" }
+  # Titelseite aus dem Handbeleg vom 31.10.2026 (dub-confirmed.yaml, Amazon-Seite 0L25HFK7RGCXATV0VZBMEK4G7F, Tonspuren Deutsch, 日本語): der Weg
+  # trägt zwei Prime-Adressen (diese und /gp/video/detail/B0CWGVXPC3), der Termin übernahm daher keine und verlinkte nur eine Suche.
+  platformUrl: https://watch.amazon.de/detail?gti=amzn1.dv.gti.63b9a08d-3318-4dd4-be6f-9f48926fd70b
+  sources: [https://www.anime2you.de/news/1049795/prime-video-trinity-seven-und-mehr/]
+
+# 1053585 (24.09.2026): Ghost Cat Anzu „ab sofort mit deutscher Sprachausgabe sowie im japanischen Originalton mit deutschen Untertiteln“; Miss Hokusai „auf Deutsch und Japanisch“;
+# Yu-Gi-Oh! Staffel 1 „mit deutscher Synchronisation“ (49 Episoden, komplett).
+- slug: ghost-cat-anzu-primevideo
+  anilistId: 158641
+  platform: primevideo
+  releaseType: movie
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-09-24" }
+  sources: [https://www.anime2you.de/news/1053585/prime-video-ghost-cat-anzu-und-mehr/]
+
+- slug: miss-hokusai-primevideo
+  anilistId: 20709
+  platform: primevideo
+  releaseType: movie
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-09-24" }
+  sources: [https://www.anime2you.de/news/1053585/prime-video-ghost-cat-anzu-und-mehr/]
+
+- slug: yu-gi-oh-s1-primevideo
+  anilistId: 481
+  titleDe: "Yu-Gi-Oh! – Staffel 1"
+  platform: primevideo
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-09-24", episodeCount: 49 }
+  sources: [https://www.anime2you.de/news/1053585/prime-video-ghost-cat-anzu-und-mehr/]
+
+# 1059642 (10.10.2026): „The Sky Crawlers“ „ab sofort sowohl mit deutscher Synchronisation als auch im japanischen Originalton mit deutschen Untertiteln“, 122 Minuten.
+- slug: the-sky-crawlers-primevideo
+  anilistId: 3089
+  platform: primevideo
+  releaseType: movie
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-10-10" }
+  sources: [https://www.anime2you.de/news/1059642/prime-video-weitere-demon-slayer-staffeln/]
+
+# ---------------------------------------------------------------- Netflix
+# 1045191 (30.08.2026): „auf Deutsch und Japanisch in das Portfolio von Netflix aufgenommen“, 108 Minuten. 1037860 (04.08.) hatte „ab dem 31. August 2026“ angekündigt;
+# die spätere Meldung gilt als Beleg für „spätestens seit 30.08.“.
+- slug: mobile-suit-gundam-hathaway-2-netflix
+  anilistId: 113971
+  platform: netflix
+  releaseType: movie
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-08-30" }
+  sources:
+    - https://www.anime2you.de/news/1045191/netflix-gintama-film-und-mehr/
+    - https://www.anime2you.de/news/1037860/zweiter-mobile-suit-gundam-hathaway-film-auf-netflix/
+
+# ---------------------------------------------------------------- Disney+
+# 1051128 (17.09.2026): Campfire Cooking Staffel 1 „ab sofort mit deutscher Sprachfassung“ (12 Episoden); One Piece Staffel 4 bis 8, Episoden 93 bis 206,
+# „seit heute mit deutscher Synchronisation“ — 114 Episoden.
+- slug: campfire-cooking-s1-disneyplus
+  anilistId: 156067
+  platform: disneyplus
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-09-17", episodeCount: 12 }
+  sources: [https://www.anime2you.de/news/1051128/disney-plus-campfire-cooking-und-mehr/]
+
+- slug: one-piece-s4-s8-disneyplus
+  anilistId: 21
+  titleDe: "One Piece – Staffel 4 bis 8"
+  platform: disneyplus
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-09-17", firstEpisodeNumber: 93, episodeCount: 114 }
+  sources: [https://www.anime2you.de/news/1051128/disney-plus-campfire-cooking-und-mehr/]
+
+# 1052288 (20.09.2026): „A Sign of Affection“ „ab sofort mit deutscher Sprachfassung“ (12 Episoden, komplett).
+- slug: a-sign-of-affection-disneyplus
+  anilistId: 166794
+  platform: disneyplus
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-09-20", episodeCount: 12 }
+  sources: [https://www.anime2you.de/news/1052288/disney-plus-a-sign-of-affection-und-mehr/]
+
+# ---------------------------------------------------------------- RTL+
+# 1054460 (27.09.2026): beide Filme „ab sofort mit deutscher Synchronisation“; früher schon auf RTL+, zwischenzeitlich entfernt, jetzt wieder im Angebot.
+- slug: pokemon-die-macht-in-uns-rtlplus
+  anilistId: 100744
+  platform: rtlplus
+  releaseType: movie
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-09-27" }
+  hinweis: "Wieder im Angebot; war zwischenzeitlich entfernt."
+  sources: [https://www.anime2you.de/news/1054460/rtl-plus-zwei-pokemon-filme/]
+
+- slug: pokemon-du-bist-dran-rtlplus
+  anilistId: 98298
+  platform: rtlplus
+  releaseType: movie
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-09-27" }
+  hinweis: "Wieder im Angebot; war zwischenzeitlich entfernt."
+  sources: [https://www.anime2you.de/news/1054460/rtl-plus-zwei-pokemon-filme/]
+
+# ---------------------------------------------------------------- Dritte Runde (13.10.2026): Rest der zweiten Runde
+# Der Tag ist wieder der Meldetag (`available-from`); die Artikel nennen die deutsche Fassung im Fließtext.
+# 1048315 (09.09.2026): „Bei »Yu-Gi-Oh! ZEXAL« stehen ab sofort zusätzlich die zweite und dritte Staffel mit 49 beziehungsweise 48 Episoden auf Deutsch zur Verfügung“ (Prime Video).
+# Die deutschen Staffeln folgen nicht den AniList-Einträgen (Zexal Folge 1 bis 73, Zexal II Folge 74 bis 146): Der Eintrag hängt an Zexal II, in dem Staffel 3 ganz und Staffel 2 mit den Folgen 25–49 liegt (Folgen 1–24 sind Zexal 50–73).
+# Die Adresse steht fest: Zexal II führt bei Prime zwei Wege (Staffel 2 geteilt, Staffel 3), mit zwei Wegen vergäbe der Bau dem Termin keine mehr.
+- slug: yu-gi-oh-zexal-s2-s3-primevideo
+  anilistId: 15489
+  titleDe: "Yu-Gi-Oh! ZEXAL – Staffel 2 und 3"
+  platform: primevideo
+  platformUrl: https://www.amazon.de/gp/video/detail/B0GWMY6WCP
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-09-09", episodeCount: 73 }
+  hinweis: "Staffel 2 (49 Folgen) und Staffel 3 (48 Folgen) laut Anime2You; von den 97 Folgen sind 24 (Staffel 2, Folgen 1–24) Zexal 50–73, bei Zexal II liegen 25 + 48 = 73; die erste Staffel war schon zuvor im Angebot."
+  sources: [https://www.anime2you.de/news/1048315/prime-video-date-a-live-staffel-2-und-mehr/]
+
+# 1049988 (14.09.2026): „14 weitere Episoden von »Beyblade X« mit deutscher Synchronisation … Damit ist die zweite Staffel mit insgesamt 49 Folgen nun vollständig auf Disney+ verfügbar.“
+# Folgen 87 bis 100 der Disney+-Zählung (Staffel 1: 51, Staffel 2: 49; 100 Folgen laut Handbeleg in `dub-confirmed.yaml`, 19.09.2026).
+- slug: beyblade-x-s2-teil-2-disneyplus
+  anilistId: 165159
+  titleDe: "Beyblade X – Staffel 2 Part 2"
+  platform: disneyplus
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-09-14", firstEpisodeNumber: 87, episodeCount: 14 }
+  sources: [https://www.anime2you.de/news/1049988/disney-plus-the-god-of-high-school-und-mehr/]
+
+# ---------------------------------------------------------------- Anime2You 1068059 (06.11.2026, 15:45): Prime Video, zwei Anime auf Deutsch
+# »Devils‘ Crest« (Simulcast): „heute ist die erste Episode erschienen“, „Episoden: 2 verfügbar“, „Jeden Freitag eine neue Episode“, Deutsch und Japanisch (UT).
+# Der Artikel nennt weder Uhrzeit noch Folgenzahl: ohne `time`, ohne `episodeCount`.
+# Doppelstart: Folge 1 und 2 am 06.11. („Episoden: 2 verfügbar“), Folge 3 am 13.11. (Prime-Seite, Sichtung Daniel 13.11.2026:
+# „In der Falle“ und „Die Verwandlung“ 06.11., „Das Erwachen“ 13.11.).
+- slug: devils-crest-primevideo
+  anilistId: 203275
+  platform: primevideo
+  platformUrl: https://www.amazon.de/dp/B0HKLZZ54Y
+  releaseType: weekly
+  schedule:
+    firstEpisodeDate: "2026-11-06"
+    observed:
+      1: "2026-11-06"
+      2: "2026-11-06"
+      3: "2026-11-13"
+  sources:
+    - https://www.amazon.de/dp/B0HKLZZ54Y
+    - https://www.anime2you.de/news/1068059/prime-video-devils-crest-und-mehr/
+
+# »Pet« (Synchro): „kann ab sofort auch mit deutscher Synchronisation auf Prime Video angesehen werden“, 13 Episoden (komplett). Der Tag ist der Meldetag (im Angebot spätestens seit 06.11.).
+# Die Originalfassung ist laut Artikel ein eigener Eintrag (B0C7R946DL); der Weg hier ist die deutsche Seite.
+- slug: pet-primevideo
+  anilistId: 101350
+  platform: primevideo
+  platformUrl: https://www.amazon.de/dp/B0DMF65NY2
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-11-06", episodeCount: 13 }
+  sources:
+    - https://www.anime2you.de/news/1068059/prime-video-devils-crest-und-mehr/
+
+# YAIBA: Samurai Legend bei Joyn (Daniel, 09.11.2026): nach der Sendung auf ProSieben MAXX (Mo–Fr 18:25, tv-2026.yaml) ist jede Folge
+# ab 18:50 auf Joyn abrufbar. Zeit und Start aus den Joyn-Fenstern in titles.json (Folge 1–6 je ab 18:50, 05.11. bis 12.11.), 24 Folgen aus
+# Anime2You 1059480. Der Handtermin ersetzt den automatischen Block-Termin `auto-177476-joyn` (08.11., geschätzt) aus Anime2You 1069021.
+- slug: yaiba-samurai-legend-joyn
+  anilistId: 177476
+  platform: joyn
+  platformUrl: https://www.joyn.de/serien/yaiba-samurai-legend
+  releaseType: weekly
+  schedule:
+    firstEpisodeDate: "2026-11-05"
+    time: "18:50"
+    episodeCount: 24
+    wochentage: [1, 2, 3, 4, 5]
+    # 13.11. und 17.11.2026: keine TV-Folge (Fußball auf ProSieben MAXX, siehe tv-2026.yaml), also auch keine auf Joyn
+    # (Joyn bringt jede Folge erst nach der Sendung; am 13.11. abends standen dort nur 1-6).
+    skipDates: ["2026-11-13", "2026-11-17"]
+  sources:
+    - https://www.joyn.de/serien/yaiba-samurai-legend
+    - https://www.anime2you.de/news/1059480/yaiba-samurai-legend-prosieben-maxx-termin/
+    - https://www.anime2you.de/news/1069021/joyn-yaiba-samurai-legend-und-mehr/
+
+# The Mighty Nein, Staffel 2 — Prime Video, alle 8 Folgen am 24.03.2027 (Ankündigung von Prime Video am 15.11.2026, englische Berichte).
+# TV Insider (Terminliste): „The Mighty Nein, Season 2 Premiere (All Episodes), March 24, 2027, Prime Video“; Nerdist: „The second chapter of The Mighty Nein will release on March 24, 2027“, alle Folgen auf einmal, acht Folgen.
+# Westliche Produktion (TMDB 219080, Cartoon-Kennung -219080). Staffel 1 hat laut Handbeleg eine deutsche Fassung (Folgen 1–8); für Staffel 2 nennt keine Quelle eine deutsche Tonspur, der Handbeleg gilt nur bis Folge 8. Keine Uhrzeit: Prime-Start ohne Beleg.
+- slug: the-mighty-nein-s2-primevideo
+  anilistId: -219080
+  titleDe: "The Mighty Nein"
+  platform: primevideo
+  platformUrl: https://www.primevideo.com/-/de/detail/0MD5F00E71JERTL1FLARU1SLO5
+  releaseType: batch
+  schedule: { firstEpisodeDate: "2027-03-24", firstEpisodeNumber: 9, episodeCount: 8 }
+  hinweis: "Staffel 2, alle 8 Folgen am 24.03.2027 bei Prime Video. Deutsche Fassung zu erwarten, Staffel 1 erschien zeitgleich auch auf Deutsch."
+  sources:
+    - https://www.tvinsider.com/1303804/the-mighty-nein-season-2-premiere-date-details/
+    - https://nerdist.com/article/the-mighty-nein-season-2-release-date-schedule-synopsis/
+    - https://de.wikipedia.org/wiki/The_Mighty_Nein
+
+# Pokémon Horizonte Staffel 4 bei RTL+ (20.11.2026): Folge 1 „Eine Welt voller Abenteuer“ mit availabilityStarts 2026-11-20 (Abo, schema.org TVEpisode der Folgenseite, Abruf 20.11.2026); der Staffelwähler der Serienseite nennt bisher genau eine Folge.
+# Folge 137 in unserer Zählung (Staffel 1–3 = 136 Folgen). Als Stapel mit einer Folge geführt statt als Wochentermin: AniList und aniSearch führen keine belastbare Gesamtzahl (der Bau hätte 286 Wochentermine geschätzt), und mit einer Folge ist kein Takt messbar. Keine Uhrzeit (00:00 ist der Tagesbeginn der Freischaltung).
+- slug: pokemon-horizonte-s4-rtlplus
+  anilistId: 158871
+  titleDe: "Pokémon Horizonte – Staffel 4"
+  platform: rtlplus
+  platformUrl: https://plus.rtl.de/pokemon-horizonte-die-serie-p_10142
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-11-20", firstEpisodeNumber: 137, episodeCount: 1 }
+  hinweis: "Folge 1 der Staffel 4 ab 20.11.2026 bei RTL+ (Abo). Bei TOGGO ab 27.11.2026 kostenlos, im Fernsehen ab 28.11.2026 samstags bei Super RTL und TOGGO plus."
+  sources:
+    - https://plus.rtl.de/pokemon-horizonte-die-serie-p_10142/video/eine-welt-voller-abenteuer-c_2211265
+    - https://www.anime2you.de/news/1067953/pokemon-horizonte-staffel-4-toggo-start/
+    - https://de.wikipedia.org/wiki/Pok%C3%A9mon_(Anime)/Horizonte
+
+# Berserk (1997) bei aniverse, Prime Video Channel (26.11.2026): Amazon und aniverse teilen die 25 Folgen in zwei Teile. Kein Katalogtitel trägt „Part 2“, deshalb von Hand;
+# Teil 2 = unsere Folgen 14–25 (Handbeleg B0FKZM9J6V in dub-confirmed.yaml, aniSearch-News 60167: „Folgen 14-25“). Keine Uhrzeit: der Artikel nennt nur den Tag.
+# Anime2You 1074092 (20.11.2026): „24. Dezember: »Berserk« – Part 2 · Episoden: 12 (komplett) · Sprache: Deutsch, Japanisch (UT) · Stream: Prime Video“.
+- slug: berserk-1997-part2-primevideo
+  anilistId: 33
+  titleDe: "Berserk – Part 2"
+  platform: primevideo
+  kanal: Aniverse
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-12-24", firstEpisodeNumber: 14, episodeCount: 12 }
+  hinweis: "Folgen 14–25 ab 24.12.2026 über den Prime-Kanal aniverse."
+  sources:
+    - https://www.anime2you.de/news/1074092/aniverse-dezember-2026-neuzugaenge/
+    - https://www.anisearch.de/news/anime/60167,aniverse-monatsuebersicht-dezember-2026
+
+# Anime2You 1056322 (aniverse Oktober 2026): „1. Oktober: »Berserk« – Part 1 · Episoden: 13 · Sprache: Deutsch · aniverse“ (gelesen aus data/proposals/anime2you.json, Sammelzeile).
+- slug: berserk-1997-part1-primevideo
+  anilistId: 33
+  titleDe: "Berserk – Part 1"
+  platform: primevideo
+  kanal: Aniverse
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-10-01", firstEpisodeNumber: 1, episodeCount: 13 }
+  hinweis: "Folgen 1–13 seit 01.10.2026 über den Prime-Kanal aniverse."
+  sources:
+    - https://www.anime2you.de/news/1056322/aniverse-oktober-2026-neuzugaenge/
+
+# Exception (Daniel, 27.11.2026): Netflix-Eigenproduktion, weltweit am 13.10.2022 mit allen 8 Folgen erschienen; aniSearch führt die deutsche
+# Fassung (Synchro) ab diesem Tag bei Netflix, Inc. Ohne diesen Termin machte der MOTN-Feed aus einer Neulistung am 25.11.2026 „Neu bei Netflix“.
+# Kein `available-from`: der Tag ist das Erscheinungsdatum, daher Katalog-Release („Vermutlich alle 8 Folgen auf einmal“). Uhrzeit nicht belegt.
+- slug: exception-netflix-2022
+  anilistId: 135660
+  titleDe: "Exception"
+  platform: netflix
+  netflixOriginal: true
+  platformUrl: https://www.netflix.com/title/81002444
+  releaseType: batch
+  schedule: { firstEpisodeDate: "2022-10-13", episodeCount: 8 }
+  sources:
+    - https://www.anisearch.de/anime/16390
+    - https://www.moviepilot.de/serie/exception/episodenguide
+
+# Shaman King (2001, 64 Folgen) bei aniverse, Prime Video Channel: aniverse veröffentlicht in Blöcken zu 16 Folgen
+# (Anime2You 1035676: „Part 3“, 16 Folgen, 06.08.; 1065078: „Staffel 4“, 16 Folgen, 12.11.; Handbeleg B0DYF8BKVP: Staffel 4 = 16 Folgen, Deutsch).
+# Die Folgennummern sind abgeleitet (64 = 4 × 16), keine Quelle nennt sie; deshalb „≈“ im Hinweis.
+# Part 1 und Part 2 (je 16 Folgen, Dub) erschienen vorher (Anime2You 922565: ab 14.08.2025; 938606: Oktober 2025, 23.10.); ohne sie lag der
+# erste Termin bei Folge 33 und 1–32 standen ohne Beleg davor (Bestandsprüfung folgen-vor-start, 27.11.2026). Nummern abgeleitet (≈).
+# Wortlaut (Suchauszüge 27.11.2026, Seiten selbst nicht abrufbar): Anime2You Aug. 2025 „Ab 14.08.: »Shaman King« – Part 1 (Dub)“, erste 16 Folgen deutsch;
+# Anime2You Okt. 2025 „Ab 23.10.“ Part 2 (Dub); aniSearch-Monatsübersicht 54756 (Okt. 2025): Folgen 17–32 deutsch ab 23.10. (Serie von 2001).
+- slug: shaman-king-2001-part1-primevideo
+  anilistId: 154
+  titleDe: "Shaman King – Part 1"
+  platform: primevideo
+  kanal: Aniverse
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2025-08-14", firstEpisodeNumber: 1, episodeCount: 16 }
+  hinweis: "16 Folgen (≈ Folgen 1–16) seit 14.08.2025 über den Prime-Kanal aniverse."
+  sources:
+    - https://www.anime2you.de/news/922565/aniverse-august-2025-neuzugaenge/
+- slug: shaman-king-2001-part2-primevideo
+  anilistId: 154
+  titleDe: "Shaman King – Part 2"
+  platform: primevideo
+  kanal: Aniverse
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2025-10-23", firstEpisodeNumber: 17, episodeCount: 16 }
+  hinweis: "16 Folgen (≈ Folgen 17–32) seit 23.10.2025 über den Prime-Kanal aniverse."
+  sources:
+    - https://www.anime2you.de/news/938606/aniverse-oktober-2025-neuzugaenge/
+    - https://www.anisearch.com/news/anime/54756,aniverse-monatsuebersicht-oktober-2025
+- slug: shaman-king-2001-part3-primevideo
+  anilistId: 154
+  titleDe: "Shaman King – Part 3"
+  platform: primevideo
+  kanal: Aniverse
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-08-06", firstEpisodeNumber: 33, episodeCount: 16 }
+  hinweis: "16 Folgen (≈ Folgen 33–48) seit 06.08.2026 über den Prime-Kanal aniverse."
+  sources:
+    - https://www.anime2you.de/news/1035676/aniverse-august-2026-neuzugaenge/
+- slug: shaman-king-2001-staffel4-primevideo
+  anilistId: 154
+  titleDe: "Shaman King – Staffel 4"
+  platform: primevideo
+  kanal: Aniverse
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2026-11-12", firstEpisodeNumber: 49, episodeCount: 16 }
+  hinweis: "16 Folgen (≈ Folgen 49–64) seit 12.11.2026 über den Prime-Kanal aniverse."
+  sources:
+    - https://www.anime2you.de/news/1065078/aniverse-november-2026-neuzugaenge/
+    - https://www.amazon.de/gp/video/detail/B0DYF8BKVP

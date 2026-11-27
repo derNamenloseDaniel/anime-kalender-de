@@ -1,0 +1,62 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Mirai_Nikki (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Mirai_Nikki&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+==== Synchronisation ====
+Die deutsche Fassung wurde von den Oxygen Sound Studios aus Berlin produziert. Die Dialogregie führte René Dawn-Claude.<ref>{{Synchronkartei|1=serie|2=40576|3=Mirai Nikki|Abruf=2020-10-29}}</ref>
+{| class="wikitable"
+!Rolle
+!japanischer Sprecher ([[Seiyū]])
+!deutscher Sprecher
+|-
+|Yukiteru Amano
+|Misuzu Togashi
+|[[Constantin von Jascheroff]]
+|-
+|Yuno Gasai
+|Tomosa Murata
+|[[Jodie Blank]]
+|-
+|Deus Ex Machina
+|[[Norio Wakamoto]]
+|[[Torsten Michaelis]]
+|-
+|Muru-Muru
+|Manami Honda
+|[[Charlotte Uhlig]]
+|-
+|Minene Uryuu
+|Mai Aizawa
+|[[Mia Diekow]]
+|-
+|Keigo Kurusu
+|Masahiko Tanaka
+|[[Dirk Bublies]]
+|-
+|Ai Mikami
+|Natsuko Kuwatani
+|[[Sarah Riedel (Schauspielerin)|Sarah Riedel]]
+|-
+|Kamado Ueshita
+|Hiromi Konno
+|[[Gundi Eberhard]]
+|-
+|Masumi Nishijima
+|Makoto Ishii
+|[[René Dawn-Claude]]
+|-
+|Orin Miyashiro
+|Etsuko Kozakura
+|[[Clara Drews]]
+|-
+|Ouji Kousaka
+|Minoru Shiraishi
+|[[Wilhelm-Rafael Garth]]
+|-
+|Rea Amano
+|Kaoru Mizuhara
+|[[Antje von der Ahe]]
+|-
+|Aru Akise
+|Akira Ishida
+|[[Carsten Otto]]
+|}

@@ -1,0 +1,368 @@
+/**
+ * Prüft, was die Pipeline **erzeugt** hat — nicht, was ein Mensch eingetippt
+ * hat.
+ *
+ * Warum es diese Datei gibt: `validate.ts` sicherte bis zum 12.08.2026
+ * ausschließlich `data/curated/*.yaml` ab, also den Teil, den ohnehin jemand
+ * durchdacht hatte. Alles automatisch Erzeugte — ADN, Crunchyroll, aniSearch —
+ * ging ungeprüft nach `public/data/`. Genau dort standen dann 196 von 867
+ * Terminen, die es nicht gibt: „Sword Art Online, Folge 62, 12.08.2026",
+ * „Sailor Moon, Folge 34, 11.08.2026", wöchentlich weiter bis 2027.
+ *
+ * Keine dieser Zeilen wäre schwer zu finden gewesen. Ein Release, dessen
+ * Termine über sein eigenes Enddatum hinauslaufen, widerspricht sich selbst —
+ * das ist ein Dreizeiler. Die Prüfung fehlte, nicht die Möglichkeit.
+ *
+ * Deshalb steht sie hier und wird am Ende von `build.ts` aufgerufen: Was nicht
+ * durchkommt, wird gar nicht erst geschrieben.
+ */
+import type { Release, ReleaseEvent, Title } from '../../shared/types.ts'
+import type { OhneWegEintrag } from '../../shared/ohne-weg.ts'
+import { lastEpisodeDate } from '../../shared/logic.ts'
+import { addDays } from '../../shared/time.ts'
+import { premiereFehler } from './premiere.ts'
+import { beobachtetOhneTermin } from './folge-ueber-anzahl.ts'
+import { discTerminFehler, type DiscPruefQuellen } from './disc-anisearch-datum.ts'
+import { sichtungsZeilen } from './sichtungsfenster.ts'
+import { crWegDoppelt } from './cr-doppelter-weg.ts'
+import { deutschBelegtTrotzOffen } from './deutsch-belegt.ts'
+import { veralteteSynchroHinweise } from './veraltete-hinweise.ts'
+import { fuerBesucher, istNurUntertitel } from '../../shared/nur-deutsch.ts'
+import { joynHinterTv, belegvermerkImHinweis } from './joyn-folgen-aus-tv.ts'
+import { crAbsoluteZaehlungFehler } from './cr-zaehlung.ts'
+
+export interface Pruefergebnis {
+  fehler: string[]
+  warnungen: string[]
+}
+
+/**
+ * Ab welchem Verhältnis eine Folgenzahl nicht mehr zum Werk passen kann.
+ *
+ * „Sword Art Online" hat 25 Folgen, das Release behauptete 96 — das Vierfache.
+ * Sailor Moon: 46 gegen 100. Eine Serie kann ein paar Folgen mehr haben als
+ * der AniList-Eintrag (OVAs, Rekapitulationen, eine abweichende Zählung), aber
+ * nicht das Doppelte. Wo das passiert, sind mehrere Staffeln in einen Eintrag
+ * gerutscht.
+ */
+const FOLGENZAHL_FAKTOR = 2
+const FOLGENZAHL_MINDESTABSTAND = 10
+
+/** Eine Folgenzahl, die zum Werk nicht mehr passen kann (mehrere Staffeln in einem Eintrag): mehr als das Doppelte und mindestens zehn mehr. */
+export const folgenzahlUeberWerk = (folgen: number, werkFolgen: number): boolean =>
+  folgen > werkFolgen * FOLGENZAHL_FAKTOR && folgen - werkFolgen >= FOLGENZAHL_MINDESTABSTAND
+
+/** Ab wann ein Termin so weit weg ist, dass er einen Beleg braucht. */
+const FERNE_ZUKUNFT_TAGE = 550
+
+/** `land` ist ein Länderkürzel ≠ JP und stammt von AniList; eine synthetische Kennung (≥ 10.000.000) hat keine Quelle dafür. */
+export function landFehler(titles: Map<number, Title>): string[] {
+  const fehler: string[] = []
+  for (const t of titles.values()) {
+    if (t.land === undefined) continue
+    if (!/^[A-Z]{2}$/.test(t.land) || t.land === 'JP') fehler.push(`Anime ${t.id}: Herkunftsland „${t.land}" ist kein Kürzel ≠ JP`)
+    else if (t.id >= 10_000_000) fehler.push(`Anime ${t.id}: Herkunftsland „${t.land}" ohne AniList-Kennung — keine Quelle`)
+  }
+  return fehler
+}
+
+export function pruefeErgebnis(
+  releases: Release[],
+  events: ReleaseEvent[],
+  titles: Map<number, Title>,
+  heute: string,
+  discQuellen?: DiscPruefQuellen,
+): Pruefergebnis {
+  const fehler: string[] = []
+  const warnungen: string[] = []
+
+  const eventsProSlug = new Map<string, ReleaseEvent[]>()
+  for (const e of events) {
+    const liste = eventsProSlug.get(e.releaseSlug) ?? []
+    liste.push(e)
+    eventsProSlug.set(e.releaseSlug, liste)
+  }
+
+  for (const r of releases) {
+    if (istNurUntertitel(r)) {
+      if (eventsProSlug.has(r.slug)) fehler.push(`"${r.slug}": Termin mit Untertiteln allein erzeugt ein Ereignis (shared/nur-deutsch.ts)`)
+      continue // ohne Ereignisse gibt es nichts zu vergleichen
+    }
+    const eventsDerRelease = eventsProSlug.get(r.slug) ?? []
+    grundlagenFehler(r, eventsDerRelease, fehler)
+    beobachtungFehler(r, eventsDerRelease, fehler)
+    folgenzahlMeldungen(r, titles, fehler, warnungen)
+
+    const ende = lastEpisodeDate(r)
+    if (ende && ende > addDays(heute, FERNE_ZUKUNFT_TAGE)) {
+      warnungen.push(`"${r.slug}": letzter Termin ${ende} liegt mehr als eineinhalb Jahre in der Zukunft`)
+    }
+  }
+
+  folgenzahlWiderspruch(releases, titles, fehler)
+  fehler.push(...crAbsoluteZaehlungFehler(releases, titles))
+  tmdbOhneKennzeichnung(titles, fehler)
+  for (const r of veralteteSynchroHinweise(releases, heute)) fehler.push(`"${r.slug}": Ankündigungs-Hinweis, obwohl die deutsche Folge schon erschienen ist (nur deutsche Fassungen, keine veralteten Hinweise)`)
+
+  const schluss = schlussPruefung(releases, events, titles, heute, discQuellen)
+  return { fehler: [...fehler, ...schluss.fehler], warnungen: [...warnungen, ...schluss.warnungen] }
+}
+
+/** Quelle, Slug, Enddatum und Termine nach dem belegten Ende einer Release (Fehler). */
+function grundlagenFehler(r: Release, eventsDerRelease: ReleaseEvent[], fehler: string[]): void {
+  const at = `"${r.slug}"`
+  const s = r.schedule
+
+  if (!r.sources?.length) fehler.push(`${at}: keine Quelle angegeben`)
+
+  /**
+   * Ein Slug wird zu einer Adresse und zu einem Ordnernamen.
+   *
+   * Aus `Release.slug` entsteht `/r/<slug>/` — eine echte Datei im Bauwerk, ein
+   * Eintrag in der Sitemap, ein geteilter Link. Ein Leerzeichen wird darin zu
+   * `%20`, ein Doppelpunkt ist unter Windows überhaupt kein Dateiname.
+   *
+   * Am 17.08.2026 kam One Piece in den ADN-Katalog, dessen Staffeln „Saga 1 :
+   * East Blue" heißen. Der Slug lautete `adn-561-sSaga 1 : East Blue-20190520`,
+   * und der Bau der Teilen-Seiten brach mit `ENOENT` ab — eine Fehlermeldung,
+   * die nach einem fehlenden Ordner klingt und nichts über die Ursache sagt.
+   * Hier fällt es künftig mit Namen und Grund auf.
+   *
+   * **Großbuchstaben sind erlaubt**, auch wenn sie unschön sind: Die
+   * Crunchyroll-Slugs tragen deren Kennung im Original (`cr-GT00371857`), und
+   * das sind 21 live erreichbare Adressen. Eine Prüfung, die sie verbietet,
+   * verbietet nicht einen Fehler, sondern den Bestand.
+   */
+  if (!/^[A-Za-z0-9._-]+$/.test(r.slug)) {
+    fehler.push(`${at}: der Slug enthält Zeichen, die in einer Adresse nichts zu suchen haben`)
+  }
+
+  if (s.lastEpisodeDate && s.lastEpisodeDate < s.firstEpisodeDate) {
+    fehler.push(`${at}: lastEpisodeDate ${s.lastEpisodeDate} liegt vor firstEpisodeDate ${s.firstEpisodeDate}`)
+  }
+
+  /**
+   * Der Prüfsatz, der den ganzen Fehler gefunden hätte.
+   *
+   * `expandEvents` las das Enddatum nicht, `releaseStatus` schon. Der
+   * Datensatz behauptete deshalb gleichzeitig „abgeschlossen seit Juli 2025"
+   * und „nächste Folge nächsten Mittwoch".
+   */
+  for (const e of eventsDerRelease) {
+    if (s.lastEpisodeDate && e.date > s.lastEpisodeDate) {
+      fehler.push(
+        `${at}: Termin ${e.date} (Folge ${e.episode ?? '?'}) liegt nach dem belegten Ende ${s.lastEpisodeDate}`,
+      )
+      break
+    }
+  }
+}
+
+/** Die letzte Terminzeile liegt vor der frühesten Beobachtung (Fehler). */
+function beobachtungFehler(r: Release, eventsDerRelease: ReleaseEvent[], fehler: string[]): void {
+  const at = `"${r.slug}"`
+  const s = r.schedule
+
+  /**
+   * Die Staffel war fertig, bevor wir ihre erste Folge gesehen haben.
+   *
+   * In einem Satz der Widerspruch, an dem „Wistoria: Wand and Sword Staffel
+   * 2" am 21.08.2026 hing: zwölf Termine vom 08.02. bis 26.04.2026 im
+   * Datensatz, während der Kalender die Folgen 17 bis 24 zwischen dem 31.05.
+   * und dem 19.07.2026 belegt hatte. Crunchyroll zählt die Reihe durch,
+   * AniList je Staffel — die Rückrechnung ab Folge 1 landete drei Monate zu
+   * früh, und keiner der acht belegten Termine stand noch drin.
+   *
+   * Eine Beobachtung ist der eine Punkt, an dem der Sendeplan die
+   * Wirklichkeit berührt. Läuft die Terminliste vollständig an ihr vorbei,
+   * ist nicht die Beobachtung falsch, sondern alles, was daraus gerechnet
+   * wurde.
+   */
+  const beobachtet = Object.values(s.observed ?? {}).filter(Boolean).sort()
+  const termine = eventsDerRelease.map((e) => e.date).sort()
+  if (beobachtet.length && termine.length && termine[termine.length - 1] < beobachtet[0]) {
+    fehler.push(
+      `${at}: letzter Termin ${termine[termine.length - 1]} liegt vor der frühesten belegten ` +
+        `Beobachtung ${beobachtet[0]} — die Staffel wäre fertig gewesen, bevor wir ihre erste Folge gesehen haben`,
+    )
+  }
+}
+
+/** Folgenzahl der Release gegen die des Werks: Fehler bei mehreren Staffeln in einem Eintrag, Warnung bei Abweichung nach oben. */
+function folgenzahlMeldungen(r: Release, titles: Map<number, Title>, fehler: string[], warnungen: string[]): void {
+  const at = `"${r.slug}"`
+  const s = r.schedule
+
+  const title = titles.get(r.titleId)
+  if (title?.episodes && s.episodeCount) {
+    const diff = s.episodeCount - title.episodes
+    if (
+      folgenzahlUeberWerk(s.episodeCount, title.episodes) &&
+      // Ein Release, das ausdrücklich mitten in der Zählung einsetzt oder das
+      // seine Abweichung selbst erklärt, ist kein Verdachtsfall. „Steel Ball
+      // Run – 2nd & 3rd STAGE" deckt elf Folgen ab, während der
+      // AniList-Eintrag der Auftaktfolge auf 1 steht — beides stimmt.
+      !s.firstEpisodeNumber &&
+      (!r.note && !r.hinweis && !r.herkunft)
+    ) {
+      fehler.push(
+        `${at}: ${s.episodeCount} Folgen für "${title.titleRomaji ?? title.id}", der ${title.episodes} hat — ` +
+          `das sieht nach mehreren Staffeln in einem Eintrag aus`,
+      )
+    } else if (diff > 0 && !s.episodeCountAssumed && !s.firstEpisodeNumber && (!r.note && !r.hinweis && !r.herkunft)) {
+      // Nur nach oben: Ein Release, das einen Teil einer langen Serie
+      // abdeckt (Disney+ zeigt Naruto in Staffelpaketen), nennt zu Recht
+      // weniger Folgen als der Gesamteintrag.
+      warnungen.push(
+        `${at}: ${s.episodeCount} Folgen gegen ${title.episodes} laut AniList ("${title.titleRomaji ?? title.id}")`,
+      )
+    }
+  }
+}
+
+/**
+ * Zwei Releases, die denselben Anime auf derselben Plattform mit
+ * unterschiedlicher Folgenzahl führen, können nicht beide stimmen.
+ *
+ * Real am 12.08.2026 beim ersten Reparaturversuch: „Sailor Moon" stand
+ * zweimal auf AniList 530, einmal mit 46 und einmal mit 42 Folgen — die
+ * zweite ADN-Staffel war mangels exakter Zuordnung auf den Serientitel
+ * zurückgefallen.
+ *
+ * Zwei Ausnahmen, beide berechtigt: **Discs** — mehrere Ausgaben desselben
+ * Werks sind dort der Normalfall — und Releases mit `firstEpisodeNumber`,
+ * die ausdrücklich nur einen Abschnitt abdecken.
+ *
+ * Ausschlaggebend ist nicht, dass die Zahlen verschieden sind, sondern dass
+ * sie **zusammen nicht in das Werk passen**: Disney+ zeigt Yu-Gi-Oh in
+ * Paketen zu 48 und 40 Folgen — beides Teile derselben 224-teiligen Serie
+ * und damit kein Widerspruch. 46 und 42 Folgen für einen 46-teiligen Anime
+ * dagegen können nicht beide stimmen.
+ */
+/** Release-Paare auf derselben Plattform, deren Folgenzahlen zusammen nicht ins Werk passen (Fehler). */
+function folgenzahlWiderspruch(releases: Release[], titles: Map<number, Title>, fehler: string[]): void {
+const nachTitelUndPlattform = new Map<string, Release[]>()
+for (const r of releases) {
+  /* Fernsehen wiederholt dieselben Folgen (Daima: Erstausstrahlung, dann Sa/So) — kein Widerspruch. */
+  if (r.titleId < 0 || r.platform === 'disc' || r.platform === 'tv' || r.schedule.firstEpisodeNumber) continue
+  if (!(r.schedule.episodeCount ?? 0)) continue
+  const key = `${r.titleId}|${r.platform}`
+  const liste = nachTitelUndPlattform.get(key) ?? []
+  liste.push(r)
+  nachTitelUndPlattform.set(key, liste)
+}
+for (const [key, liste] of nachTitelUndPlattform) {
+  if (liste.length < 2) continue
+  const summe = liste.reduce((n, r) => n + (r.schedule.episodeCount ?? 0), 0)
+  const gesamt = titles.get(liste[0].titleId)?.episodes
+  if (gesamt && summe > gesamt) {
+    fehler.push(
+      `Anime ${key.split('|')[0]} ("${titles.get(liste[0].titleId)?.titleRomaji ?? '?'}") auf ${key.split('|')[1]}: ` +
+        `zusammen ${summe} Folgen bei ${gesamt} vorhandenen — ` +
+        liste.map((r) => `${r.slug}=${r.schedule.episodeCount}`).join(', '),
+    )
+  }
+}
+}
+
+/** Ein Weg auf TMDB trägt seine Kennzeichnung — sonst liest er sich als Anbieteradresse (Fehler). */
+function tmdbOhneKennzeichnung(titles: Map<number, Title>, fehler: string[]): void {
+for (const t of titles.values())
+  for (const w of t.watchLinks ?? [])
+    if (/themoviedb\.org/.test(w.url) && !w.ueberTmdb)
+      fehler.push(`Anime ${t.id}: Bezugsweg „${w.name}" zeigt auf TMDB, ohne als „über TMDB" gekennzeichnet zu sein`)
+}
+/** Die Prüfungen am Ende von `pruefeErgebnis`, die nicht je Release laufen (eigene Funktion, damit jene nicht wächst). */
+export function schlussFehler(releases: Release[], events: ReleaseEvent[], titles: Map<number, Title>, heute: string, discQuellen?: DiscPruefQuellen): string[] {
+  return [
+    ...discTerminFehler(releases, heute, discQuellen),
+    ...landFehler(titles),
+    ...crWegDoppelt(titles),
+    ...geteilteWegeTrotzWiderlegung(releases, titles),
+    ...premiereFehler(releases),
+    ...beobachtetOhneTermin(fuerBesucher(releases), events),
+    ...deutschBelegtTrotzOffen(releases, titles),
+    ...joynHinterTv(releases, events, heute),
+    ...belegvermerkImHinweis(releases),
+  ]
+}
+
+/** Schluss-Fehler plus die Ergebniszeile der Sichtungen fürs Bau-Log (sie belegt, dass die Prüfung am echten Bestand lief). */
+function schlussPruefung(releases: Release[], events: ReleaseEvent[], titles: Map<number, Title>, heute: string, discQuellen?: DiscPruefQuellen): Pruefergebnis {
+  return { fehler: schlussFehler(releases, events, titles, heute, discQuellen), warnungen: sichtungsZeilen(releases) }
+}
+
+/**
+ * Eine Staffel, deren deutsche Termine auf einem Anbieter **alle** widerlegt sind, darf dort keinen
+ * geteilten Reihen-Weg mit `dub: true` tragen — sonst stünde „DE ✓" neben „widerlegt" und die
+ * Staffel käme als „Neu auf Deutsch" in die News (`loeseGeteilteWegeVonWiderlegten`).
+ */
+export function geteilteWegeTrotzWiderlegung(releases: Release[], titles: Map<number, Title>): string[] {
+  const jeTitelPlattform = new Map<string, boolean>()
+  for (const r of releases) {
+    const k = `${r.titleId}|${r.platform}`
+    jeTitelPlattform.set(k, (jeTitelPlattform.get(k) ?? true) && Boolean(r.widerlegt))
+  }
+  const fehler: string[] = []
+  for (const [k, alleWiderlegt] of jeTitelPlattform) {
+    if (!alleWiderlegt) continue
+    const [id, plattform] = k.split('|')
+    const weg = titles.get(Number(id))?.streams.find((s) => s.platform === plattform && s.dub === true && (s.sharedWith ?? 0) > 1 && !s.dubRanges?.length)
+    if (weg) fehler.push(`Anime ${id}: alle Termine auf ${plattform} widerlegt, der geteilte Weg ${weg.url} trägt trotzdem „deutsch"`)
+  }
+  return fehler
+}
+
+/** Die Schlüssel `titleId|platform`, deren Termine **alle** eine Sprachkennzeichnung (`sprache`: omu/offen) tragen. */
+export function alleTermineGekennzeichnet(releases: Release[]): Set<string> {
+  const alle = new Map<string, boolean>()
+  for (const r of releases) {
+    const k = `${r.titleId}|${r.platform}`
+    alle.set(k, (alle.get(k) ?? true) && Boolean(r.sprache))
+  }
+  return new Set([...alle].filter(([, gekennzeichnet]) => gekennzeichnet).map(([k]) => k))
+}
+
+/**
+ * Ein Stream trägt kein „deutsch", wenn alle Termine seines Anbieters eine Sprachkennzeichnung (`sprache`: omu/offen) haben:
+ * Ein solcher Termin belegt keine Synchro (Beerus und Fool Night, Netflix, 13.10.2026).
+ * Ausnahme `handJa` (Schlüssel `titleId|platform` eines Handbelegs deutsch): Ein Termin mit nur `offen` sagt unklar, widerlegt nichts,
+ * und der Handbeleg hat Vorrang (Rooster Fighter, Netflix, 31.10.2026). Ein `omu` widerlegt ihn weiter und wird gemeldet.
+ */
+export function deutschNurAusSpracheTermin(releases: Release[], titles: Map<number, Title>, handJa: ReadonlySet<string> = new Set()): string[] {
+  const fehler: string[] = []
+  for (const k of alleTermineGekennzeichnet(releases)) {
+    const [id, plattform] = k.split('|')
+    if (handJa.has(k) && !releases.some((r) => `${r.titleId}|${r.platform}` === k && r.sprache === 'omu')) continue
+    const weg = titles.get(Number(id))?.streams.find((s) => s.platform === plattform && s.dub === true)
+    if (weg) fehler.push(`Anime ${id}: alle Termine auf ${plattform} tragen eine Sprachkennzeichnung, der Weg trägt trotzdem „deutsch"`)
+  }
+  return fehler
+}
+
+/** Kein automatischer Termin trägt als Beleg eine Meldung, die nur Originalton nennt — sie widerlegt die deutsche Fassung (Beerus, 10.10.2026). Handeinträge zitieren solche Artikel bewusst (Kino-OmU). */
+export function releasesAusNurOriginalton(releases: Release[], adressen: ReadonlySet<string>): string[] {
+  return releases.filter((r) => r.automatisch && r.sources.some((u) => adressen.has(u))).map((r) => `"${r.slug}": Beleg nennt nur Originalton mit Untertiteln`)
+}
+
+const ISO_TAG = /^\d{4}-\d{2}-\d{2}$/
+
+/**
+ * `ohne-weg.json` gegen die Titel ohne Streaming-Weg: jeder hat genau einen Eintrag und kein anderer; jeder Grund außer `offen` trägt seinen Tag
+ * (`checkedAt` aus der Quelle, bei `angekuendigt` der künftige Starttag `ab`). Mehr `offen` als `grenze` ist eine Warnung, kein Abbruch:
+ * ein neuer Titel ohne Beleg darf den Tagesbau nicht anhalten; die Grenze wird mit jedem Abbau nachgezogen (nur sinken).
+ */
+export function ohneWegFehler(eintraege: Record<number, OhneWegEintrag>, titelOhneWeg: readonly number[], grenze: number): Pruefergebnis {
+  const fehler: string[] = []
+  const soll = new Set(titelOhneWeg)
+  for (const id of soll) if (!eintraege[id]) fehler.push(`Titel ${id}: ohne Streaming-Weg, aber ohne Eintrag in ohne-weg.json`)
+  for (const [id, e] of Object.entries(eintraege)) {
+    if (!soll.has(Number(id))) fehler.push(`Titel ${id}: steht in ohne-weg.json, hat aber einen Streaming-Weg`)
+    if (e.reason === 'offen') continue
+    const tag = e.reason === 'angekuendigt' ? e.ab : e.checkedAt
+    if (!tag || !ISO_TAG.test(tag)) fehler.push(`Titel ${id}: Grund „${e.reason}“ ohne ${e.reason === 'angekuendigt' ? 'Starttag (ab)' : 'Prüftag (checkedAt)'}`)
+  }
+  const offen = Object.values(eintraege).filter((e) => e.reason === 'offen').length
+  const warnungen = offen > grenze ? [`ohne-weg.json: ${offen} Titel „offen“, mehr als die Grenze ${grenze} — Gründe nachtragen oder die Grenze begründet ändern`] : []
+  return { fehler, warnungen }
+}

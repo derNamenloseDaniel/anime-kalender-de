@@ -1,0 +1,144 @@
+/**
+ * Zusicherungen zur Film-Nachsuche der TMDB-Titelsuche (04.11.2026, Bright: Samurai Soul): AniList führt einen einzelnen Netflix-Film als ONA mit einer Folge,
+ * TMDB als Film (839100, 2021-10-12). Die Serien-Suche fand ihn nie. `lookup` fragt nach einem Fehlschlag der Serien-Suche noch den Film ab,
+ * aber nur für ONA, OVA und Special mit genau einer Folge.
+ * Aufruf: `npm run check:logic`.
+ */
+import type { Title } from '../shared/types.ts'
+import { faelligeTitel } from './lib/tmdb-faellig.ts'
+import { nachAbruf } from './lib/tmdb-ablauf.ts'
+import { FILMSUCHE_SEIT, koennteFilmSein, lookup } from './lib/tmdb-titel-lookup.ts'
+
+let verletzt = 0
+let faelle = 0
+function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
+  faelle++
+  if (ok) return void console.log(`  ✓ ${name}`)
+  verletzt++
+  console.error(`  ✖ ${name}${gefunden === undefined ? '' : ` — gefunden: ${JSON.stringify(gefunden)}`}`)
+}
+
+/* Echte Antworten (TMDB, 04.11.2026): Serien-Suche leer, Film-Suche ein Treffer mit Genre Animation, Aktion, Fantasy. */
+const BRIGHT_FILM = { id: 839100, title: 'Bright: Samurai Soul', original_title: 'Bright: Samurai Soul', release_date: '2021-10-12', genre_ids: [16, 28, 14], vote_count: 300 }
+const BRIGHT = { id: 135432, titleEn: 'Bright: Samurai Soul', titleRomaji: 'BRIGHT: Samurai Soul', jpYear: 2021, format: 'ONA', episodes: 1 } as Title
+
+function kulisse(tvTreffer: object[], filmTreffer: object[], tvFehler = false): { holen: typeof import('./lib/util.ts').fetchJson; adressen: string[] } {
+  const adressen: string[] = []
+  const holen = (async (url: string) => {
+    adressen.push(url)
+    if (url.includes('/search/tv')) {
+      if (tvFehler) throw new Error('503')
+      return { results: tvTreffer }
+    }
+    if (url.includes('/search/movie')) return { results: filmTreffer }
+    if (url.includes('/movie/839100?')) return { title: 'Bright: Samurai Soul', release_date: '2021-10-12', genres: [{ id: 16 }] }
+    if (url.includes('/content_ratings')) return { results: [] }
+    if (url.includes('/release_dates')) return { results: [{ iso_3166_1: 'DE', release_dates: [{ certification: '16', type: 4, release_date: '2021-10-12T00:00:00.000Z' }] }] }
+    return { results: {} }
+  }) as unknown as typeof import('./lib/util.ts').fetchJson
+  return { holen, adressen }
+}
+const keinSchlaf = async (): Promise<void> => {}
+const arten = (adressen: string[]): string => adressen.filter((a) => a.includes('/search/')).map((a) => (a.includes('/search/tv') ? 'tv' : 'movie')).join()
+
+console.log('\nFilm-Nachsuche: Auslöser Bright: Samurai Soul')
+{
+  const { holen, adressen } = kulisse([], [BRIGHT_FILM])
+  const r = await lookup('k', BRIGHT, holen, keinSchlaf)
+  pruefe('ONA, eine Folge: Film 839100 als movie zugeordnet', r.tmdbId === 839100 && r.kind === 'movie' && r.miss === undefined, r)
+  pruefe('Reihenfolge: erst alle Serien-Suchen, dann die Film-Suchen', arten(adressen) === 'tv,tv,movie,movie', arten(adressen))
+  pruefe('Filmwege: Details und Freigaben kommen vom Film, nicht von einer Serie', adressen.some((a) => a.includes('/movie/839100?')) && adressen.some((a) => a.includes('/movie/839100/release_dates')) && !adressen.some((a) => a.includes('/tv/839100')), adressen)
+  pruefe('Freigabe und Kinostart-Feld des Films gelesen', r.fsk === 16 && Array.isArray(r.kinoDe), r)
+}
+
+console.log('\nFilm-Nachsuche: wann nicht')
+{
+  const f = (extra: Partial<Title>): Title => ({ ...BRIGHT, ...extra }) as Title
+  const frage = async (t: Title, tv: object[] = [], film: object[] = [BRIGHT_FILM], tvFehler = false): Promise<{ arten: string; r: Awaited<ReturnType<typeof lookup>> }> => {
+    const { holen, adressen } = kulisse(tv, film, tvFehler)
+    const r = await lookup('k', t, holen, keinSchlaf)
+    return { arten: arten(adressen), r }
+  }
+  const zwei = await frage(f({ episodes: 2 }))
+  pruefe('zwei Folgen: keine Film-Suche, Fehlschlag', zwei.arten === 'tv,tv' && zwei.r.miss === true, zwei)
+  const ohneZahl = await frage(f({ episodes: undefined }))
+  pruefe('Folgenzahl unbekannt: keine Film-Suche', ohneZahl.arten === 'tv,tv' && ohneZahl.r.miss === true, ohneZahl)
+  const tvFormat = await frage(f({ format: 'TV' }))
+  pruefe('Format TV mit einer Folge: keine Film-Suche', tvFormat.arten === 'tv,tv' && tvFormat.r.miss === true, tvFormat)
+  const serieTrifft = await frage(f({ format: 'ONA' }), [{ id: 7, name: 'Bright: Samurai Soul', original_name: 'Bright: Samurai Soul', first_air_date: '2021-10-12', genre_ids: [16], vote_count: 5 }])
+  pruefe('Serie trifft: die Serie gewinnt, kein Film gefragt', serieTrifft.r.tmdbId === 7 && serieTrifft.r.kind === 'tv' && serieTrifft.arten === 'tv,tv', serieTrifft)
+  const film = await frage(f({ format: 'MOVIE' }))
+  pruefe('Format MOVIE: wie bisher nur Film-Suche', film.arten === 'movie,movie' && film.r.tmdbId === 839100, film)
+  const falschesJahr = await frage(f({ jpYear: 2015 }))
+  pruefe('Film aus anderem Jahr: Fehlschlag trotz Nachsuche', falschesJahr.arten === 'tv,tv,movie,movie' && falschesJahr.r.miss === true, falschesJahr)
+  const realfilm = await frage(f({}), [], [{ ...BRIGHT_FILM, genre_ids: [28, 14] }])
+  pruefe('Realfilm gleichen Namens (ohne Animation): Fehlschlag', realfilm.r.miss === true, realfilm)
+  /* Gegenfall zur Falschzuordnung: ohne Jahr prüft waehleBesten kein Jahr, ein gleichnamiger Film von 1990 wäre sonst der Treffer. */
+  const film1990 = { ...BRIGHT_FILM, id: 1990, release_date: '1990-05-01' }
+  const ohneJahr = await frage(f({ jpYear: undefined }), [], [film1990])
+  pruefe('jpYear fehlt, Film gleichen Namens von 1990: keine Film-Suche, Fehlschlag', ohneJahr.arten === 'tv,tv' && ohneJahr.r.miss === true, ohneJahr)
+  /* Ähnlichkeit: 10 Wörter, 9 gemeinsame = 0,9 gilt; 8 gemeinsame = 0,8 nicht (Tachikomatic Days: Special mit Seriennamen, 0,86). */
+  const lang = 'alpha bravo charlie delta echo foxtrot golf hotel india juliet'
+  const mit = (name: string): object => ({ ...BRIGHT_FILM, title: name, original_title: name })
+  const genau = await frage(f({ titleEn: lang, titleRomaji: undefined }), [], [mit('alpha bravo charlie delta echo foxtrot golf hotel india')])
+  pruefe('Film-Ähnlichkeit genau 0,9: Treffer', genau.r.tmdbId === 839100, genau)
+  const knapp = await frage(f({ titleEn: lang, titleRomaji: undefined }), [], [mit('alpha bravo charlie delta echo foxtrot golf hotel')])
+  pruefe('Film-Ähnlichkeit 0,8: Fehlschlag, Serien-Suche hätte sie angenommen', knapp.r.miss === true, knapp)
+  const knappSerie = await frage(f({ titleEn: lang, titleRomaji: undefined, format: 'TV' }), [{ id: 8, name: 'alpha bravo charlie delta echo foxtrot golf hotel', first_air_date: '2021-01-01', genre_ids: [16], vote_count: 1 }])
+  pruefe('Kontrolle: dieselbe Ähnlichkeit 0,8 ist bei einer Serie ein Treffer', knappSerie.r.tmdbId === 8, knappSerie)
+  const serienFehler = await frage(f({}), [], [BRIGHT_FILM], true)
+  pruefe('Serien-Suche scheitert (503): der Film wird trotzdem gefunden', serienFehler.r.tmdbId === 839100 && serienFehler.r.kind === 'movie', serienFehler)
+}
+
+console.log('\nFilm-Nachsuche: koennteFilmSein')
+const fall = (format: string, episodes: number | undefined, jpYear: number | null = 2021): boolean => koennteFilmSein({ format, episodes, jpYear: jpYear ?? undefined } as Pick<Title, 'format' | 'episodes' | 'jpYear'>)
+pruefe('ohne Jahr keine Nachsuche', !fall('ONA', 1, null))
+pruefe('ONA, OVA, SPECIAL mit einer Folge', fall('ONA', 1) && fall('OVA', 1) && fall('SPECIAL', 1))
+pruefe('keine Folgenzahl, zwei, null Folgen', !fall('ONA', undefined) && !fall('ONA', 2) && !fall('OVA', 0))
+pruefe('TV, TV_SHORT, MUSIC, MOVIE', !fall('TV', 1) && !fall('TV_SHORT', 1) && !fall('MUSIC', 1) && !fall('MOVIE', 1))
+
+console.log('\nFilm-Nachsuche: Wiedervorlage des Fehlschlags (Bright steht seit 06.10.2026 als Fehlschlag im Bestand)')
+{
+  const opt = { handIds: new Set<number>(), nurOhneEintrag: false, force: false, grenze: '2000-01-01T00:00:00.000Z', grenzeFehlschlag: '2999-01-01T00:00:00.000Z' }
+  const cache = { '135432': { miss: true as const, fetchedAt: '2026-10-06T12:16:28.303Z' } }
+  pruefe('der Fehlschlag ist nach der Wartezeit wieder fällig', faelligeTitel([{ id: 135432 }, { id: 5 }], cache, opt).map((t) => t.id).join() === '5,135432', faelligeTitel([{ id: 135432 }, { id: 5 }], cache, opt).map((t) => t.id))
+}
+
+console.log('\nFilm-Nachsuche: Fehlschläge von vor der Regel zuerst (Rückstau 856, Wochenlauf 400; 06.11.2026)')
+{
+  const jetzt = '2026-11-06T12:00:00.000Z'
+  const opt = { handIds: new Set<number>(), nurOhneEintrag: false, force: false, grenze: '2026-09-10T00:00:00.000Z', grenzeFehlschlag: '2026-10-30T00:00:00.000Z' }
+  const film = { ids: new Set([11, 12, 13, 15, 17]), vor: '2026-11-04' }
+  const tot = { 16: { tmdbId: 9, geprueft: '2026-11-05' } }
+  pruefe('die Film-Nachsuche gilt seit dem 04.11.2026', FILMSUCHE_SEIT === '2026-11-04', FILMSUCHE_SEIT)
+  /*
+    11 Film-Fehlschlag Oktober, 12 Film-Fehlschlag nach der Regel, 13 Film-Fehlschlag vom 01.11. (noch nicht 7 Tage alt), 14 Serien-Fehlschlag September,
+    15 Treffer August, 16 tote Kennung (Vermerk jünger als der Abruf), 17 Film-Fehlschlag ohne Zeitstempel (Alter unbekannt, im Zweifel groß).
+  */
+  const cache: Record<string, { miss?: true; tmdbId?: number; fetchedAt?: string }> = {
+    '11': { miss: true, fetchedAt: '2026-10-12T00:00:00.000Z' },
+    '12': { miss: true, fetchedAt: '2026-11-05T00:00:00.000Z' },
+    '13': { miss: true, fetchedAt: '2026-11-01T00:00:00.000Z' },
+    '14': { miss: true, fetchedAt: '2026-09-01T00:00:00.000Z' },
+    '15': { tmdbId: 7, fetchedAt: '2026-08-01T00:00:00.000Z' },
+    '16': { tmdbId: 9, fetchedAt: '2026-10-20T00:00:00.000Z' },
+    '17': { miss: true },
+  }
+  const titel = [11, 12, 13, 14, 15, 16, 17].map((id) => ({ id }))
+  const ids = (o: Parameters<typeof faelligeTitel>[2]): string => faelligeTitel(titel, cache, o).map((t) => t.id).join()
+  pruefe('ohne die Regel kommt der Film-Fehlschlag nach den älteren Einträgen und der vom 01.11. gar nicht', ids({ ...opt, tot }) === '16,17,15,14,11', ids({ ...opt, tot }))
+  pruefe('mit der Regel: tote Kennung zuerst, dann Film-Fehlschläge von vor der Regel, ältester zuerst', ids({ ...opt, tot, filmNeusuche: film }) === '16,17,11,13,15,14', ids({ ...opt, tot, filmNeusuche: film }))
+  pruefe('ein Film-Fehlschlag nach der Regel (12) bekommt keinen Vorrang', !ids({ ...opt, filmNeusuche: film }).includes('12'), ids({ ...opt, filmNeusuche: film }))
+  pruefe('ein Serien-Fehlschlag (14) bekommt keinen Vorrang', ids({ ...opt, filmNeusuche: { ids: new Set([11]), vor: '2026-11-04' } }).split(',').indexOf('14') > 0, ids({ ...opt, filmNeusuche: film }))
+  const limit = faelligeTitel(titel, cache, { ...opt, tot, filmNeusuche: film }).slice(0, 4).map((t) => t.id).join()
+  pruefe('ein kleines Limit trifft die Vorrang-Titel', limit === '16,17,11,13', limit)
+  /* Kreislauf: Lauf 1 sucht 11, 13 und 17 neu (wieder ohne Treffer), Lauf 2 sieht sie nicht mehr als Vorrang. */
+  for (const id of ['11', '13', '17']) cache[id] = nachAbruf(cache[id], { miss: true, fetchedAt: jetzt }, jetzt) as never
+  pruefe('nach der Neusuche sind 11, 13 und 17 nicht mehr fällig', ids({ ...opt, tot, filmNeusuche: film }) === '16,15,14', ids({ ...opt, tot, filmNeusuche: film }))
+}
+
+if (verletzt) {
+  console.error(`\n${verletzt} von ${faelle} Zusicherung(en) verletzt.`)
+  process.exit(1)
+}
+console.log(`\nFilm-Nachsuche: ${faelle} Zusicherungen grün (ONA/OVA/Special mit einer Folge, Reihenfolge, Gegenfälle, Wiedervorlage).`)

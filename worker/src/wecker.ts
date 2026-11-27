@@ -1,0 +1,58 @@
+import type { Env } from './env.ts'
+import { faelligeEintraege, startErlaubt, type LaufStand } from '../../shared/weckplan.ts'
+import { fehlerLog } from './werte.ts'
+
+/**
+ * **Der Wecker für die Datenläufe.** GitHubs eigener Cron-Plan feuert nicht pünktlich: gemessen am 05.10.2026 kam „Stündlich" alle ~4,6 Stunden, „Täglich"
+ * im Mittel 6 Stunden und „Wöchentlich" 7 Stunden zu spät (Mittelwert über 14 Tage, `docs/wissen/betrieb.md`). Ein Cloudflare-Cron (`0 * * * *`) kommt
+ * pünktlich und startet die Workflows über die GitHub-API (`workflow_dispatch`). Das Token liegt als Worker-Secret `GITHUB_WECKER_TOKEN` (Fine-grained,
+ * nur dieses Repo und `anime-kalender-nativ`, Actions: Read and write). Ohne Token tut die Funktion nichts.
+ *
+ * Fällt der Wecker aus, merkt es `wecker-wache.yml` (GitHub-Cron als zweite, unabhängige Linie) und startet überfällige Läufe selbst.
+ */
+export const STANDARD_REPO = 'derNamenloseDaniel/anime-kalender-de'
+
+export const KOPF = (env: Env) => ({
+  Authorization: `Bearer ${env.GITHUB_WECKER_TOKEN}`,
+  Accept: 'application/vnd.github+json',
+  'User-Agent': 'anime-kalender-wecker',
+  'X-GitHub-Api-Version': '2022-11-28',
+})
+
+/** Die letzten Läufe dieses Workflows (neuester zuerst); `null`, wenn die API nicht antwortet (der Stunden-Cron startet dann trotzdem, der 5-Minuten-Cron nicht). */
+export async function letzteLaeufe(env: Env, repo: string, workflow: string): Promise<LaufStand[] | null> {
+  const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/${workflow}/runs?per_page=10`, { headers: KOPF(env) })
+  if (!r.ok) return null
+  return ((await r.json()) as { workflow_runs?: LaufStand[] }).workflow_runs ?? []
+}
+
+async function starte(env: Env, repo: string, workflow: string, jetzt: Date, schnell: boolean): Promise<void> {
+  /* Doppelstarts abfangen: Am 05.10.2026 kamen zwei Starts im Abstand von zehn Sekunden; Ursache ungeklärt, der Schutz gilt unabhängig davon. */
+  const laeufe = await letzteLaeufe(env, repo, workflow).catch(() => null)
+  if (laeufe === null && schnell) {
+    console.log(`[wecker] ${repo}/${workflow}: Läufe nicht lesbar, im 5-Minuten-Cron kein Start`)
+    return
+  }
+  if (!startErlaubt(workflow, laeufe ?? [], jetzt)) {
+    console.log(`[wecker] ${repo}/${workflow}: übersprungen (Mindestabstand oder Lauf aktiv)`)
+    return
+  }
+  const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/${workflow}/dispatches`, {
+    method: 'POST',
+    headers: KOPF(env),
+    body: JSON.stringify({ ref: 'main' }),
+  })
+  if (r.status !== 204) console.error(`[wecker] ${repo}/${workflow}: HTTP ${r.status}`)
+}
+
+/** Jede volle Stunde aufgerufen (`scheduled`): startet alles, was jetzt fällig ist. Ein Ausfall eines Starts hält die anderen nicht auf. */
+export async function starteFaelligeLaeufe(env: Env, jetzt: Date = new Date(), nurFuenfMinutenCron = false): Promise<void> {
+  if (!env.GITHUB_WECKER_TOKEN) return
+  await Promise.all(faelligeEintraege(jetzt, undefined, nurFuenfMinutenCron).map((p) => starte(env, p.repo ?? STANDARD_REPO, p.workflow, jetzt, nurFuenfMinutenCron).catch((e) => fehlerLog(`[wecker] ${p.workflow}`, e))))
+}
+
+/** Der 5-Minuten-Cron: startet nur Einträge mit `auchImFuenfMinutenCron`. Zur vollen Stunde nicht: dort läuft zeitgleich der Stunden-Cron, zwei Aufrufe überholten sich beim Doppelstart-Schutz. */
+export async function starteSchnelleLaeufe(env: Env, jetzt: Date): Promise<void> {
+  if (jetzt.getUTCMinutes() === 0) return
+  await starteFaelligeLaeufe(env, jetzt, true)
+}

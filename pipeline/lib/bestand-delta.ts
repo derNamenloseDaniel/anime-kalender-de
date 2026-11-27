@@ -1,0 +1,396 @@
+/**
+ * Die Kennzahlen eines Bestands und der Vergleich mit dem vorigen — der Kern von `pipeline/bestand-historie.ts`,
+ * hier ohne Dateizugriff, damit ein Test die Urteile der Wache mit gebauten Zeilen durchspielen kann.
+ */
+import { plattformAusAdresse } from '../../shared/adresse-passt.ts'
+import type { Title } from '../../shared/types.ts'
+import { anzeigeName } from '../../shared/titles.ts'
+import { sperrKern, type BelegEntfernt } from './sperr-kern.ts'
+
+/** Ein fehlender Synchro-Beleg (Anbieter, „Titel (Kennung): Adresse", link-check-Eintrag). Hier statt in `bestand-link-abgang.ts`: dieses Modul läuft in `delta-wache.yml` ohne `npm ci` (kein js-yaml im Importgraph). */
+export interface LinkAbgang {
+  anbieter: string
+  text: string
+  befund?: string
+}
+export interface LinkAbgaenge {
+  begruendet: LinkAbgang[]
+  unerklaert: LinkAbgang[]
+  /** Der Weg hängt jetzt mit gleichem Urteil an einem anderen Titel: Hinweis, nicht rot. */
+  verschoben?: LinkAbgang[]
+}
+
+export interface Kennzahlen {
+  titel: number
+  titelMitVerweis: number
+  verweise: number
+  mitUrteil: number
+  ohneUrteil: number
+  titelMitSynchro: number
+  /**
+   * Wie viele Verweise das Gedächtnis als **begründet entfernt** führt.
+   *
+   * Ohne diese Zahl kann die Wache „78 Verweise entfernt" nicht von „78
+   * Verweise verschwunden" unterscheiden — und meldete am 06.09.2026 einen
+   * Alarm für den Normalfall: Die aniSearch-Ergänzung hatte 123 Verweise
+   * angelegt und 78 davon im selben Lauf als belegtes Nein wieder entfernt.
+   *
+   * Eine Warnung, die zuverlässig zu Unrecht kommt, ist schlimmer als keine
+   * (CLAUDE.md, 16.08.2026): Man hört auf hinzusehen, und die echte Störung
+   * geht darin unter.
+   */
+  entferntProtokolliert: number
+  /** Dasselbe je Anbieter — damit die Aufschlüsselung ihre Erklärung mitbringt. */
+  entferntJeAnbieter?: Record<string, number>
+  /** Schlüssel (`entfernterBelegSchluessel`) der Handbelege, die `data/belege-entfernt.yaml` gewollt entzieht. Fehlt das Feld (Zeilen vor dem 29.10.2026), erklärt die Wache daraus nichts. */
+  entfernteBelege?: string[]
+  releases: number
+  termine: number
+  /** Je Anbieter die Zahl der Verweise mit belegter Synchro. */
+  jeAnbieter: Record<string, number>
+  /**
+   * Je Anbieter die Verweise ohne Ja bei Titeln, die auf diesem Anbieter einen Kanal-Titel-Beleg tragen (Amazons Sprachangabe, seit 11.10.2026 kein Beleg).
+   * Fehlt das Feld (Zeilen vor dem 19.10.2026), erklärt die Wache daraus nichts.
+   */
+  kanalOhneUrteil?: Record<string, number>
+  /** Titel ohne jedes Ja, die mindestens einen solchen Kanal-Verweis tragen. */
+  kanalTitelOhneSynchro?: number
+}
+
+/** Schlüssel für `Eingabe.kanal`: ein Titel auf einem Anbieter. */
+export const kanalTitelSchluessel = (titelId: number, anbieter: string): string => `${titelId}|${anbieter}`
+
+/** Die Titel-Anbieter-Paare, deren Ja nur Amazons Sprachangabe auf einem Kanal-Titel war (Handbelege nach `ohneKanalSprache()`). */
+export function kanalTitelMenge(belege: { anilistId: number; platform: string; kanalOhneBeleg?: boolean; dub?: boolean }[]): Set<string> {
+  return new Set(belege.filter((c) => c.kanalOhneBeleg && c.dub !== true).map((c) => kanalTitelSchluessel(c.anilistId, c.platform)))
+}
+
+/** Alles, was `messen()` braucht; der Aufrufer liest die Dateien. */
+export interface Eingabe {
+  titel: Title[]
+  releases: unknown
+  termine: unknown
+  /** `data/verweise-entfernt.json`: `verweise` (Gedächtnis) und `belegWege` (per Handbeleg gestrichen) zählen beide als protokolliert. */
+  entfernt: { verweise?: unknown[]; belegWege?: unknown[] }
+  /** Schlüssel „Titel|Anbieter“ der Handbelege mit `kanalOhneBeleg` (`kanalTitelSchluessel()`). Titelweit, nicht je Adresse: JustWatch ersetzt die Amazon-Adresse (gti), der Beleg nennt die alte. */
+  kanal: ReadonlySet<string>
+  /** Einträge aus `data/belege-entfernt.yaml`. */
+  belegeEntfernt?: readonly BelegEntfernt[]
+}
+
+/** „Kennung|Anbieter|Adresskern“ eines gewollt entfernten Belegs; der Anbieter folgt der Adresse. */
+export function entfernterBelegSchluessel(b: Pick<BelegEntfernt, 'anilistId' | 'url'>): string {
+  return `${b.anilistId}|${plattformAusAdresse(b.url) ?? 'unbekannt'}|${sperrKern(b.url)}`
+}
+
+/** Zeile je entferntem Beleg für die Wache: „Titel (Kennung): Grund“, unter dem Schlüssel von `entfernterBelegSchluessel`. */
+export function belegGruende(liste: readonly BelegEntfernt[], titel: readonly Pick<Title, 'id' | 'titleDe' | 'titleEn' | 'titleRomaji'>[]): Record<string, string> {
+  const namen = new Map(titel.map((t) => [t.id, anzeigeName(t)]))
+  return Object.fromEntries(liste.map((b) => [entfernterBelegSchluessel(b), `${namen.get(b.anilistId) ?? 'Titel'} (${b.anilistId}): ${b.grund}`]))
+}
+
+/** Alle Einträge des Entfernungsprotokolls: Gedächtnis und per Handbeleg gestrichene Wege. */
+function protokollEintraege(entfernt: Eingabe['entfernt']): { plattform?: string }[] {
+  const liste = (x: unknown) => (Array.isArray(x) ? (x as { plattform?: string }[]) : [])
+  return [...liste(entfernt.verweise), ...liste(entfernt.belegWege)]
+}
+
+export function messen(e: Eingabe): Kennzahlen {
+  const { titel, releases, termine, kanal } = e
+  const protokoll = protokollEintraege(e.entfernt)
+  const kanalOhneUrteil: Record<string, number> = {}
+  let kanalTitelOhneSynchro = 0
+  const jeAnbieter: Record<string, number> = {}
+  let verweise = 0
+  let mitUrteil = 0
+  let ohneUrteil = 0
+  let titelMitVerweis = 0
+  let titelMitSynchro = 0
+
+  for (const t of titel) {
+    const streams = t.streams ?? []
+    if (streams.length) titelMitVerweis++
+    let hat = false
+    let kanalVerweis = false
+    for (const s of streams) {
+      verweise++
+      if (s.dub === true) {
+        mitUrteil++
+        hat = true
+        jeAnbieter[s.platform] = (jeAnbieter[s.platform] ?? 0) + 1
+      } else if (s.dub === false) mitUrteil++
+      else ohneUrteil++
+      if (s.dub !== true && kanal.has(kanalTitelSchluessel(t.id, s.platform))) {
+        kanalOhneUrteil[s.platform] = (kanalOhneUrteil[s.platform] ?? 0) + 1
+        kanalVerweis = true
+      }
+    }
+    if (hat) titelMitSynchro++
+    else if (kanalVerweis) kanalTitelOhneSynchro++
+  }
+
+  return {
+    titel: titel.length,
+    titelMitVerweis,
+    verweise,
+    mitUrteil,
+    ohneUrteil,
+    titelMitSynchro,
+    entferntProtokolliert: protokoll.length,
+    /**
+     * **Dasselbe je Anbieter — sonst bleibt die Aufschlüsselung ohne Erklärung.**
+     *
+     * Die Gesamtzahl der Verweise ist seit dem 06.09.2026 gegen das Gedächtnis
+     * gerechnet: Was mit Grund entfernt wurde, gilt nicht als Verlust. Die
+     * Zeilen „crunchyroll: 6 Synchro-Belege weniger" liefen daran vorbei und
+     * standen weiter als Auffälligkeit da.
+     *
+     * Am 07.09.2026 meldete die Wache fünf solche Zeilen, und **alle fünf**
+     * gingen auf gewollte Entfernungen desselben Tages zurück: 16
+     * YouTube-Verweise ohne belegte Synchro, die FSK-18-Fassung von Date a
+     * Live, „7th Time Loop". Wer das am nächsten Morgen liest, sieht fünf
+     * Alarme und muss jeden einzeln nachschlagen.
+     */
+    entferntJeAnbieter: protokoll.reduce<Record<string, number>>((n, e) => {
+      const p = e.plattform ?? 'unbekannt'
+      n[p] = (n[p] ?? 0) + 1
+      return n
+    }, {}),
+    entfernteBelege: (e.belegeEntfernt ?? []).map(entfernterBelegSchluessel),
+    releases: Array.isArray(releases) ? releases.length : 0,
+    termine: Array.isArray(termine) ? termine.length : 0,
+    jeAnbieter,
+    kanalOhneUrteil,
+    kanalTitelOhneSynchro,
+  }
+}
+
+/** Das Urteil der Wache: `auffaellig` färbt sie rot, `erklaert` nennt gewollte Herabstufungen, ohne Rot. */
+export interface Befund {
+  auffaellig: string[]
+  erklaert: string[]
+}
+
+/**
+ * Wie viele Verweise (je Anbieter, gesamt) und Titel seit der vorigen Zeile neu als Kanal-Titel ohne Ja dastehen. Das ist die
+ * Obergrenze dessen, was die Regel vom 11.10.2026 herabgestuft haben kann. Fehlt die Kennzahl in der vorigen Zeile, ist nichts erklärt:
+ * Der ganze Bestand stünde sonst als Zuwachs da.
+ */
+function kanalZuwachs(jetzt: Kennzahlen, vorher: Kennzahlen): { jeAnbieter: Record<string, number>; titel: number } {
+  const jeAnbieter: Record<string, number> = {}
+  if (vorher.kanalOhneUrteil && jetzt.kanalOhneUrteil) {
+    for (const [anbieter, zahl] of Object.entries(jetzt.kanalOhneUrteil)) {
+      jeAnbieter[anbieter] = Math.max(0, zahl - (vorher.kanalOhneUrteil[anbieter] ?? 0))
+    }
+  }
+  const titel = vorher.kanalTitelOhneSynchro === undefined ? 0 : Math.max(0, (jetzt.kanalTitelOhneSynchro ?? 0) - vorher.kanalTitelOhneSynchro)
+  return { jeAnbieter, titel }
+}
+
+/**
+ * Titel, die ihr einziges Ja verloren haben: erklärt durch Kanal-Titel (Regel vom 11.10.2026) und durch gewollt entfernte
+ * Belege/Links (derselbe Verweis, der das Urteil erklärt: Kitarou 130622, Prime-Beleg am 05.11.2026); der Rest färbt rot.
+ */
+function titelOhneBeleg(titelWeg: number, kanalTitel: number, belegAbzug: number, verschobenAbzug: number): Befund {
+  const weg = Math.max(0, titelWeg)
+  const kanal = Math.min(kanalTitel, weg)
+  const beleg = Math.min(belegAbzug, weg - kanal)
+  const verschoben = Math.min(verschobenAbzug, weg - kanal - beleg)
+  const rest = weg - kanal - beleg - verschoben
+  const befund: Befund = { auffaellig: [], erklaert: [] }
+  if (rest > 0) {
+    befund.auffaellig.push(
+      `${rest} Titel ohne Synchro-Beleg` +
+        (kanal ? ` (${kanal} weitere durch Kanal-Titel herabgestuft)` : '') +
+        (beleg ? ` (${beleg} weitere durch gewollt entfernten Beleg)` : '') +
+        (verschoben ? ` (${verschoben} weitere durch verschobenen Weg)` : ''),
+    )
+  }
+  if (kanal) befund.erklaert.push(`${kanal} Titel ohne Synchro-Beleg, weil ihr Ja nur Amazons Sprachangabe auf einem Kanal-Titel war`)
+  if (beleg) befund.erklaert.push(`${beleg} Titel ohne Synchro-Beleg, weil ihr Beleg gewollt entfernt wurde`)
+  if (verschoben) befund.erklaert.push(`${verschoben} Titel ohne Synchro-Beleg, weil ihr Weg an einen anderen Titel ging`)
+  return befund
+}
+
+/** Verschwundene Titel: verschoben (hinter den Toggle) oder gewollt zusammengelegt (`zuAk`) ist begründet, der Rest ist „Titel weniger“; die Namen stehen in der Zeile. */
+function titelAbgang(weg: number, verschoben: string[], zusammengelegt: string[]): Befund {
+  const befund: Befund = { auffaellig: [], erklaert: [] }
+  const v = Math.min(weg, verschoben.length)
+  const z = Math.min(weg - v, zusammengelegt.length)
+  if (v) befund.erklaert.push(`${v} Titel verschoben nach ohne-synchro: ${verschoben.join(', ')}`)
+  if (z) befund.erklaert.push(`${z} Titel zusammengelegt (zuAk): ${zusammengelegt.join(', ')}`)
+  if (weg - v - z > 0) befund.auffaellig.push(`${weg - v - z} Titel weniger`)
+  return befund
+}
+
+/**
+ * Was auffällt, steht im Klartext dabei.
+ *
+ * Die Schwellen sind bewusst niedrig: Lieber eine Zeile zu viel in der Historie
+ * als ein stiller Verlust. Wer sie liest, entscheidet — die Datei urteilt nicht.
+ */
+export function findeAuffaelliges(
+  jetzt: Kennzahlen,
+  vorher: Kennzahlen | null,
+  verschoben: string[] = [],
+  gruende: Record<string, string> = {},
+  link: LinkAbgaenge = { begruendet: [], unerklaert: [] },
+  zusammengelegt: string[] = [],
+): Befund {
+  const auffaellig: string[] = []
+  const erklaert: string[] = []
+  if (!vorher) return { auffaellig, erklaert }
+  const d = (feld: keyof Kennzahlen) => (jetzt[feld] as number) - (vorher[feld] as number)
+  const kanal = kanalZuwachs(jetzt, vorher)
+  /* Je Anbieter zuerst: Nur was ein Anbieter selbst an Kanal-Titeln zugelegt hat, erklärt auch Urteile (Prime-Kanäle erklären keine Netflix-Abnahme). */
+  const je: Befund = { auffaellig: [], erklaert: [] }
+  const anbieter = anbieterBefunde(jetzt, vorher, kanal.jeAnbieter, je, { neue: neueBelege(jetzt, vorher), gruende, link })
+
+  /* Verschoben nach ohne-synchro (hinter den Toggle) ist begründet, nicht verloren; die Namen stehen in der Zeile. */
+  const abgang = titelAbgang(Math.max(0, -d('titel')), verschoben, zusammengelegt)
+  auffaellig.push(...abgang.auffaellig)
+  erklaert.push(...abgang.erklaert)
+  /*
+    Auch hier gegen das Gedächtnis gerechnet: Ein Urteil verschwindet in aller
+    Regel mit dem Verweis, an dem es hing — und wenn der mit Grund entfernt
+    wurde, ist nichts verloren. Am 07.09.2026 standen fünf solche Zeilen in der
+    Wache, alle fünf erklärt.
+  */
+  const urteilWeg = -d('mitUrteil')
+  const urteilRest = urteilWeg - Math.max(0, d('entferntProtokolliert')) - anbieter.beleg - anbieter.link - anbieter.verschoben
+  const urteilKanal = anbieter.kanal
+  if (urteilRest - urteilKanal > 0) {
+    auffaellig.push(
+      `${urteilRest - urteilKanal} Urteile verloren` +
+        (urteilWeg > urteilRest ? ` (${urteilWeg - urteilRest} weitere sind begründet entfernt)` : '') +
+        (urteilKanal ? ` (${urteilKanal} weitere durch Kanal-Titel herabgestuft)` : ''),
+    )
+  }
+  /* Ein Titel, dessen einziges Ja an einem Kanal-Titel-Beleg hing, ist gewollt ohne Synchro-Beleg (Regel vom 11.10.2026). */
+  const titelWeg = -d('titelMitSynchro')
+  const ohneBeleg = titelOhneBeleg(titelWeg, kanal.titel, anbieter.beleg + anbieter.link, anbieter.verschoben)
+  auffaellig.push(...ohneBeleg.auffaellig)
+  erklaert.push(...ohneBeleg.erklaert)
+  if (d('termine') < -20) auffaellig.push(`${-d('termine')} Termine weniger`)
+  /*
+    Ein Verweis, der verschwindet, ist oft richtig — tote Adressen und belegte
+    Neins werden entfernt, und das Gedächtnis schreibt jeden davon mit. Gemeldet
+    wird deshalb nur, was **darüber hinaus** fehlt.
+
+    Am 06.09.2026 stand hier „78 Verweise entfernt" als Auffälligkeit, während
+    das Gedächtnis im selben Lauf um 78 Einträge wuchs — der Normalfall, als
+    Alarm ausgegeben. Wo die Zahlen zusammenpassen, ist nichts verlorengegangen;
+    bleibt ein Rest, steht genau der da.
+  */
+  const wegErklaert = Math.max(0, d('entferntProtokolliert'))
+  const wegUnerklaert = -d('verweise') - wegErklaert
+  if (wegUnerklaert > 50) {
+    auffaellig.push(
+      `${wegUnerklaert} Verweise ohne protokollierten Grund weg` +
+        (wegErklaert ? ` (${wegErklaert} weitere sind begründet entfernt)` : ''),
+    )
+  }
+  auffaellig.push(...je.auffaellig)
+  auffaellig.push(...massenabgang(jetzt, vorher))
+  erklaert.push(...je.erklaert)
+  return { auffaellig, erklaert }
+}
+
+/** Ab so vielen in einem Lauf entfernten Wegen eines Anbieters ist die Entfernung auffällig, auch mit Grund (gemessen: 51 tote Verweise aller Anbieter im Bau vom 17.11.2026). */
+export const MASSENABGANG = 40
+
+/**
+ * **Eine begründete Entfernung im Großen ist trotzdem ein Befund** (17.11.2026): Der Takt-Fehler der Erweiterung ließ 170
+ * Netflix-Wege per Handbeleg `available: false` entfernen — jeder „mit Grund“, also erklärt, und die Wache blieb stumm.
+ */
+function massenabgang(jetzt: Kennzahlen, vorher: Kennzahlen): string[] {
+  return Object.entries(jetzt.entferntJeAnbieter ?? {})
+    .map(([anbieter, n]) => ({ anbieter, zuwachs: n - (vorher.entferntJeAnbieter?.[anbieter] ?? 0) }))
+    .filter((e) => e.zuwachs >= MASSENABGANG)
+    .map((e) => `${e.anbieter}: ${e.zuwachs} Wege in einem Lauf entfernt — Grund einzeln prüfen, auch wenn jeder begründet ist`)
+}
+
+/**
+ * **Je Anbieter dieselbe Rechnung wie bei den Urteilen.**
+ *
+ * Was mit protokolliertem Grund entfernt wurde, ist kein Verlust — es ist die
+ * Arbeit, für die es das Gedächtnis gibt. Gemeldet wird der Rest; passt alles
+ * zusammen, steht die Zeile gar nicht erst da.
+ */
+function anbieterBefunde(
+  jetzt: Kennzahlen,
+  vorher: Kennzahlen,
+  kanal: Record<string, number>,
+  befund: Befund,
+  belege: { neue: string[]; gruende: Record<string, string>; link: LinkAbgaenge },
+): { kanal: number; beleg: number; link: number; verschoben: number } {
+  let erklaertGesamt = 0
+  let belegGesamt = 0
+  let linkGesamt = 0
+  let verschobenGesamt = 0
+  for (const [anbieter, zahl] of Object.entries(jetzt.jeAnbieter)) {
+    const alt = vorher.jeAnbieter?.[anbieter] ?? 0
+    if (zahl >= alt) continue
+    const weg = alt - zahl
+    const begruendet = Math.max(
+      0,
+      (jetzt.entferntJeAnbieter?.[anbieter] ?? 0) - (vorher.entferntJeAnbieter?.[anbieter] ?? 0),
+    )
+    const durchBeleg = belegErklaerung(anbieter, weg - begruendet, belege, befund)
+    belegGesamt += durchBeleg
+    const durchLink = linkErklaerung(anbieter, weg - begruendet - durchBeleg, belege.link, befund)
+    linkGesamt += durchLink
+    const durchVerschoben = verschobenErklaerung(anbieter, weg - begruendet - durchBeleg - durchLink, belege.link, befund)
+    verschobenGesamt += durchVerschoben
+    const rest = weg - begruendet - durchBeleg - durchLink - durchVerschoben
+    const durchKanal = Math.min(kanal[anbieter] ?? 0, Math.max(0, rest))
+    erklaertGesamt += durchKanal
+    if (durchKanal) befund.erklaert.push(`${anbieter}: ${durchKanal} Synchro-Belege herabgestuft (Kanal-Titel, Amazons Sprachangabe)`)
+    if (rest - durchKanal <= 0) continue
+    befund.auffaellig.push(
+      `${anbieter}: ${rest - durchKanal} Synchro-Belege weniger` +
+        (weg - rest ? ` (${weg - rest} weitere sind begründet entfernt)` : '') +
+        (durchKanal ? ` (${durchKanal} weitere durch Kanal-Titel herabgestuft)` : ''),
+      ...belege.link.unerklaert.filter((a) => a.anbieter === anbieter).map((a) => `${anbieter}: fehlt ${a.text} (${a.befund ?? 'kein link-check-Eintrag'})`),
+    )
+  }
+  for (const [anbieter, alt] of Object.entries(vorher.jeAnbieter ?? {})) {
+    if (!(anbieter in jetzt.jeAnbieter) && alt > 0) {
+      const durchBeleg = belegErklaerung(anbieter, alt, belege, befund)
+      belegGesamt += durchBeleg
+      if (alt - durchBeleg > 0) befund.auffaellig.push(`${anbieter}: alle ${alt} Synchro-Belege weg`)
+    }
+  }
+  return { kanal: erklaertGesamt, beleg: belegGesamt, link: linkGesamt, verschoben: verschobenGesamt }
+}
+
+/** Wie viele des Rückgangs `rest` bei diesem Anbieter die Linkprüfung entfernt hat (404/region); Titel und Adresse landen in `befund.erklaert`. */
+function linkErklaerung(anbieter: string, rest: number, link: LinkAbgaenge, befund: Befund): number {
+  const eigene = link.begruendet.filter((a) => a.anbieter === anbieter)
+  const n = Math.min(eigene.length, Math.max(0, rest))
+  for (const a of eigene.slice(0, n)) befund.erklaert.push(`${anbieter}: Weg durch Linkprüfung entfernt – ${a.text} (${a.befund})`)
+  return n
+}
+
+/** Wie viele des Rückgangs `rest` bei diesem Anbieter nur den Titel gewechselt haben; Hinweis in `befund.erklaert`. */
+function verschobenErklaerung(anbieter: string, rest: number, link: LinkAbgaenge, befund: Befund): number {
+  const eigene = (link.verschoben ?? []).filter((a) => a.anbieter === anbieter)
+  const n = Math.min(Math.max(0, rest), eigene.length)
+  befund.erklaert.push(...eigene.slice(0, n).map((a) => `${anbieter}: Weg verschoben – ${a.text}`))
+  return n
+}
+
+/** Schlüssel der Belege, die `data/belege-entfernt.yaml` seit der vorigen Zeile neu entzieht; ohne das Feld in einer der Zeilen nichts. */
+function neueBelege(jetzt: Kennzahlen, vorher: Kennzahlen): string[] {
+  if (!vorher.entfernteBelege || !jetzt.entfernteBelege) return []
+  const alt = new Set(vorher.entfernteBelege)
+  return jetzt.entfernteBelege.filter((k) => !alt.has(k))
+}
+
+/** Wie viele des Rückgangs `rest` bei diesem Anbieter auf neu entzogene Belege gehen; deren Zeilen (Titel, Grund) landen in `befund.erklaert`. */
+function belegErklaerung(anbieter: string, rest: number, belege: { neue: string[]; gruende: Record<string, string> }, befund: Befund): number {
+  const eigene = belege.neue.filter((k) => k.split('|')[1] === anbieter)
+  const n = Math.min(eigene.length, Math.max(0, rest))
+  for (const k of eigene.slice(0, n)) befund.erklaert.push(`${anbieter}: Beleg gewollt entfernt – ${belege.gruende[k] ?? k}`)
+  return n
+}

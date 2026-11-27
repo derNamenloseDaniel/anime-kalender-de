@@ -1,0 +1,100 @@
+/** Test für `.claude/hooks/md-links-relativ.js`: file:///-Links in Daniels .md-Dateien werden relativ. */
+import assert from 'node:assert/strict'
+import { spawnSync } from 'node:child_process'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+
+const hook = join(import.meta.dirname, '..', '.claude', 'hooks', 'md-links-relativ.js')
+const { relativ, umschreiben, betroffen } = createRequire(import.meta.url)(hook)
+
+const W = 'C:/code/ai/anime-kalender-de/daniel-zum-abarbeiten'
+const JETZT = W + '/jetzt/e36.md'
+
+// Ziel außerhalb des Repos, mit Leerzeichen und Zeilenanker
+assert.equal(relativ(JETZT, 'C:/code/ai/ai%20helper%20files/my_secrets.md#L250'), '../../../ai%20helper%20files/my_secrets.md#L250')
+// anderer Zweig des Laufwerks
+assert.equal(relativ(JETZT, 'C:/Users/ih/.claude/rules/95-privat.md'), '../../../../../Users/ih/.claude/rules/95-privat.md')
+// Ordner behält den Schrägstrich, Klammern werden kodiert
+assert.equal(relativ(JETZT, 'C:/code/ai/ai%20helper%20files/'), '../../../ai%20helper%20files/')
+assert.equal(relativ(JETZT, 'C:/x/a%20(b).md'), '../../../../../x/a%20%28b%29.md')
+// Umlaut bleibt lesbar kodiert und auflösbar
+assert.equal(decodeURIComponent(relativ(JETZT, W + '/berichte/l%C3%A4ufe.md')), '../berichte/läufe.md')
+
+const { text, n } = umschreiben(JETZT, 'a [x](file:///C:/code/ai/anime-kalender-de/daniel-zum-abarbeiten/berichte/b.md) b [y](https://e.de) [z](../c.md)')
+assert.equal(n, 1)
+assert.equal(text, 'a [x](../berichte/b.md) b [y](https://e.de) [z](../c.md)')
+
+assert.equal(betroffen(JETZT), true)
+assert.equal(betroffen(W + '/stand.md'), false, 'stand.md liest die Mod, bleibt file:///')
+assert.equal(betroffen(W + '/listen/stand.md'), true)
+assert.equal(betroffen('C:/code/ai/anime-kalender-de/docs/x.md'), false)
+assert.equal(betroffen(W + '/mockups/index.html'), false)
+assert.equal(betroffen(W.replace(/\//g, '\\') + '\\jetzt\\e.md'), true)
+assert.equal(betroffen('C:/code/ai/__assets/notes/paypal-mitschnitt/auftrag.md'), true, 'Notizen öffnet Daniel in VS Code')
+assert.equal(betroffen('C:/code/ai/__assets/notes-alt/x.md'), false)
+
+// Prozess: Write-Ereignis schreibt um und meldet, stand.md bleibt
+const tmp = mkdtempSync(join(tmpdir(), 'mdlinks-')).replace(/\\/g, '/')
+try {
+  mkdirSync(tmp + '/jetzt')
+  const ziel = tmp + '/jetzt/e.md'
+  writeFileSync(ziel, `[s](file:///${tmp}/berichte/x.md#L3)\n`)
+  writeFileSync(tmp + '/stand.md', `[s](file:///${tmp}/berichte/x.md)\n`)
+  const lauf = (ein) => spawnSync(process.execPath, [hook], { input: JSON.stringify(ein), env: { ...process.env, DANIEL_ORDNER: tmp }, encoding: 'utf8', timeout: 15000 })
+  const r = lauf({ tool_name: 'Write', tool_input: { file_path: ziel } })
+  assert.equal(r.status, 0)
+  assert.equal(readFileSync(ziel, 'utf8'), '[s](../berichte/x.md#L3)\n')
+  assert.match(JSON.parse(r.stdout).hookSpecificOutput.additionalContext, /e\.md: 1/)
+  // Ohne Git-Stand (kein Repo): Bash-Ereignis schreibt frische Dateien trotzdem um
+  const ohneGit = tmp + '/jetzt/g.md'
+  writeFileSync(ohneGit, `[g](file:///${tmp}/g.md)\n`)
+  lauf({ tool_name: 'Bash', tool_input: { command: 'node x' } })
+  assert.equal(readFileSync(ohneGit, 'utf8'), '[g](../g.md)\n', 'ohne Git wird auf alle frischen Dateien zurückgefallen')
+  // Git-Stand: s.md ist frisch, aber sauber (wie nach einem Pull) und trägt noch file:///
+  const sauber = tmp + '/jetzt/s.md'
+  const sauberText = `[p](file:///${tmp}/pull.md)\n`
+  writeFileSync(sauber, sauberText)
+  const git = (...a) => assert.equal(spawnSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...a], { cwd: tmp, encoding: 'utf8', timeout: 15000 }).status, 0)
+  git('init', '-q')
+  git('add', '-A')
+  git('commit', '-q', '-m', 'basis')
+  const b = lauf({ tool_name: 'Bash', tool_input: { command: 'node x' } })
+  assert.equal(b.status, 0)
+  assert.equal(b.stdout, '', 'nichts Geändertes, stand.md ausgenommen')
+  assert.equal(readFileSync(sauber, 'utf8'), sauberText, 'frisch gepullte, saubere Datei bleibt unberührt')
+  assert.match(readFileSync(tmp + '/stand.md', 'utf8'), /file:\/\/\//)
+  const gepullt = tmp + '/jetzt/gepullt.md'
+  writeFileSync(gepullt, `[g](file:///${tmp}/g.md)\n`)
+  git('add', '-A')
+  git('commit', '-q', '-m', 'x')
+  lauf({ tool_name: 'Bash', tool_input: { command: 'node x' } })
+  assert.match(readFileSync(gepullt, 'utf8'), /file:\/\/\//, 'frisch gepullte (unveränderte) Datei bleibt unberührt')
+  writeFileSync(ziel, `[t](file:///${tmp}/a.md)\n`)
+  lauf({ tool_name: 'Bash', tool_input: { command: 'node x' } })
+  assert.equal(readFileSync(ziel, 'utf8'), '[t](../a.md)\n', 'Bash-Ereignis erfasst frisch geänderte Dateien')
+  assert.equal(readFileSync(sauber, 'utf8'), sauberText, 'sauber bleibt auch neben einer geänderten Datei')
+  const neu = tmp + '/jetzt/n.md'
+  writeFileSync(neu, `[n](file:///${tmp}/n.md)\n`)
+  lauf({ tool_name: 'Bash', tool_input: { command: 'node x' } })
+  assert.equal(readFileSync(neu, 'utf8'), '[n](../n.md)\n', 'neue, ungetrackte Datei wird bearbeitet')
+  // Umbenennung: der neue Pfad zählt; der alte Pfad (ohne Statuspräfix, 'xxx' + echter Pfad) darf keine saubere Datei treffen
+  mkdirSync(tmp + '/xxxjetzt')
+  const alt = tmp + '/xxxjetzt/q.md'
+  const rest = tmp + '/jetzt/q.md'
+  const restText = `[q](file:///${tmp}/q.md)\n`
+  writeFileSync(alt, `[r](file:///${tmp}/r.md)\n`)
+  writeFileSync(rest, restText)
+  git('add', '-A')
+  git('commit', '-q', '-m', 'vor umbenennung')
+  git('mv', 'xxxjetzt/q.md', 'jetzt/r.md')
+  lauf({ tool_name: 'Bash', tool_input: { command: 'node x' } })
+  assert.equal(readFileSync(tmp + '/jetzt/r.md', 'utf8'), '[r](../r.md)\n', 'umbenannte Datei wird bearbeitet')
+  assert.equal(readFileSync(rest, 'utf8'), restText, 'alter Pfad der Umbenennung trifft keine saubere Datei')
+  assert.match(readFileSync(gepullt, 'utf8'), /file:\/\/\//, 'gepullte Datei bleibt auch neben einer geänderten unberührt')
+} finally {
+  rmSync(tmp, { recursive: true, force: true })
+}
+
+console.log('md-links-relativ-hook.test: ok (relativ, Anker, Ordner, Klammern, Umlaut, nur file:, Ausnahme stand.md, Write- und Bash-Ereignis)')

@@ -1,0 +1,240 @@
+import { readJson, log } from '../lib/util.ts'
+import {
+  type CrunchyrollData,
+  type WochenFolgeRoh,
+  wocheAnhaengen,
+  type CrunchyrollEntry,
+  crunchyrollSeriesId,
+  normalizeTitle,
+} from '../lib/crunchyroll.ts'
+import { type Title } from '../../shared/types.ts'
+import { type KatalogEintrag } from '../lib/anilist.ts'
+import { ladeKatalogEintraege } from '../lib/katalog-eingefroren.ts'
+import { titelAusKatalogEintrag } from './katalog-titel.ts'
+import { gruppiereJeKennung } from '../lib/je-kennung.ts'
+import { waehleKalenderEintrag } from '../lib/cr-kalender-auswahl.ts'
+
+/**
+ * Der letzte Tag mit deutscher Folge im Kalender, nie über den gelesenen Stand (`window.to`) hinaus: Seit 27.10.2026 legt das
+ * Wochenprogramm neue Einträge mit Terminen der kommenden Tage an (`lib/woche-neue-eintraege.ts`); sie dürfen die Marke nicht
+ * in die Zukunft schieben (Prüfer 2170).
+ */
+function kalenderBis(crunchyroll: CrunchyrollData): string | undefined {
+  const letzterTermin = Object.values(crunchyroll.german)
+    .flatMap((e) => e.dates ?? [])
+    .sort()
+    .at(-1)
+  const gelesenBis = crunchyroll.window?.to
+  return letzterTermin && gelesenBis && letzterTermin > gelesenBis ? gelesenBis : letzterTermin
+}
+
+/** Kalender lesen und das Wochenprogramm anhängen. */
+function ladeKalenderMitWoche(): CrunchyrollData {
+  const crunchyroll = readJson<CrunchyrollData>('data/crunchyroll.json', {
+    scrapedAt: '',
+    german: {},
+    slots: [],
+  })
+  /*
+    **Kommende Synchro-Folgen aus Crunchyrolls Wochenprogramm** (25.09.2026). Der Kalender führt
+    sie nicht; `scrape-crunchyroll-woche.ts` hat nach der mit Daniel festgelegten Regel entschieden,
+    welche anschließen. Sie werden nur **angehängt** — eine gemessene Folge bleibt, wie sie ist.
+  */
+  const woche = readJson<{ uebernommen?: WochenFolgeRoh[] }>('data/crunchyroll-woche.json', {})
+  const wocheAngehaengt = wocheAnhaengen(crunchyroll.german, woche.uebernommen ?? [])
+  if (wocheAngehaengt) log(`Wochenprogramm: ${wocheAngehaengt} kommende Synchro-Folgen an den Crunchyroll-Kalender gehängt`)
+  return crunchyroll
+}
+
+/**
+ * AniList-Titel über ihre Crunchyroll-Serien-ID auffindbar machen.
+ *
+ * Bewusst eine Liste je Serie, kein einzelner Titel: Crunchyroll führt alle
+ * Staffeln und Specials einer Reihe unter derselben Serien-ID. Wer hier nur
+ * den ersten Treffer behält, ordnet jede Folge willkürlich irgendeiner
+ * Staffel zu — so landete „I am a hero too" bei Staffel 6.
+ */
+function indiziereTitelNachSerie(titles: Map<number, Title>): Map<string, Title[]> {
+  const titlesByCrSeries = new Map<string, Title[]>()
+  for (const title of titles.values()) {
+    for (const stream of title.streams) {
+      const id = stream.platform === 'crunchyroll' ? crunchyrollSeriesId(stream.url) : undefined
+      if (!id) continue
+      const list = titlesByCrSeries.get(id)
+      if (list) {
+        if (!list.includes(title)) list.push(title)
+      } else {
+        titlesByCrSeries.set(id, [title])
+      }
+    }
+  }
+  return titlesByCrSeries
+}
+
+/** AniList-Titel über ihren normalisierten Namen auffindbar machen. */
+function indiziereTitelNachName(titles: Map<number, Title>): Map<string, Title> {
+  const titleByName = new Map<string, Title>()
+  for (const title of titles.values()) {
+    for (const name of [title.titleRomaji, title.titleEn, title.titleNative]) {
+      const key = name ? normalizeTitle(name) : ''
+      if (key && !titleByName.has(key)) titleByName.set(key, title)
+    }
+  }
+  return titleByName
+}
+
+/**
+ * Der Kalendername traegt einen Zusatz, der Katalogtitel nicht.
+ *
+ * Crunchyroll nennt die Reihe "Jaadugar: A Witch in Mongolia Staffel 1",
+ * AniList "Jaadugar: A Witch in Mongolia". Ein exakter Vergleich findet
+ * deshalb nichts -- gesucht wird nach dem laengsten Katalogtitel, der
+ * am Anfang des Kalendernamens steht.
+ *
+ * Der laengste, nicht der erste: "Dragon Ball" waere sonst ein Treffer
+ * fuer "Dragon Ball Super Staffel 2".
+ */
+function besterKatalogEintrag(katalogEintraege: KatalogEintrag[], gesucht: string): KatalogEintrag | undefined {
+  let bester: { eintrag: KatalogEintrag; laenge: number } | undefined
+  for (const e of katalogEintraege) {
+    for (const schreibweise of e.t) {
+      if (!schreibweise) continue
+      const kandidat = normalizeTitle(schreibweise)
+      if (!kandidat || kandidat.length < 4) continue
+      if (gesucht !== kandidat && !gesucht.startsWith(kandidat + ' ')) continue
+      if (bester && bester.laenge >= kandidat.length) continue
+      bester = { eintrag: e, laenge: kandidat.length }
+    }
+  }
+  return bester?.eintrag
+}
+
+/**
+ * Der Katalog als Rückfallebene — die Metadaten liegen im Haus.
+ *
+ * `data/cache/anilist-katalog.json` führt rund 3.000 Titel mit Namen,
+ * Format, Jahr, Genres und Cover. Wer hier nicht nachsieht, fragt AniList
+ * nach etwas, das er schon hat — und steht mit leeren Händen da, wenn die
+ * Quelle ausfällt (23.08.2026, „Jaadugar: A Witch in Mongolia").
+ *
+ * Gesucht wird über **alle drei** Schreibweisen: Der Crunchyroll-Kalender
+ * nennt mal den englischen, mal den Romaji-Titel. Ein Treffer ist ein
+ * vollwertiger Titel und wird in den Bestand aufgenommen, damit ihn auch
+ * Suche und Detail-Panel finden.
+ */
+function titelAusKatalog(titles: Map<number, Title>, katalogEintraege: KatalogEintrag[], name: string): Title | undefined {
+  const gesucht = normalizeTitle(name)
+  if (!gesucht) return undefined
+  const e = besterKatalogEintrag(katalogEintraege, gesucht)
+  if (!e) return undefined
+  const vorhanden = titles.get(e.id)
+  if (vorhanden) return vorhanden
+  const neu = titelAusKatalogEintrag(e)
+  titles.set(e.id, neu)
+  log(`  Titel aus dem Katalog ergänzt: ${e.id} (${e.t[0] ?? e.t[1]})`)
+  return neu
+}
+
+/**
+ * Einen AniList-Titel zu einem Kalendernamen finden.
+ *
+ * Crunchyroll setzt im Kalender gern zwei Namen hintereinander — den
+ * deutschen und den englischen („Elainas Reise Wandering Witch: The Journey
+ * of Elaina") oder die Serie und ihren Untertitel („Fruits Basket (2019)
+ * Fruits Basket: The Final Season"). Ein Vergleich auf den ganzen String
+ * findet dann nichts. Deshalb wird der Name von vorne verkürzt und der
+ * längste Treffer genommen; unter zwei Wörtern wird nicht mehr gesucht,
+ * sonst trifft irgendwann jedes „Season 2".
+ */
+function titelFuerKalenderName(titleByName: Map<string, Title>, name: string): Title | undefined {
+  const words = normalizeTitle(name).split(' ').filter(Boolean)
+  for (let start = 0; start <= words.length - 2; start++) {
+    const hit = titleByName.get(words.slice(start).join(' '))
+    if (hit) return hit
+  }
+  return undefined
+}
+
+/** Staffelnummer aus einem Namen, sofern er eine nennt. */
+function seasonNumber(name: string | undefined): number | undefined {
+  const match = name ? normalizeTitle(name).match(/\bs(\d+)\b/) : null
+  return match ? Number(match[1]) : undefined
+}
+
+/**
+ * Aus allen Staffeln einer Crunchyroll-Serie die gemeinte heraussuchen.
+ *
+ * Der Rückfall auf die Serien-ID greift, wenn der Name nichts findet — bei
+ * deutschen Kalendernamen also fast immer. Nennt der Kalender eine
+ * Staffelnummer, muss der Titel sie auch tragen: „Meine Wiedergeburt als
+ * Schleim … Staffel 4" hing sonst an „Slime Season 3", mitsamt deren
+ * Folgenzahl, Cover und Beschreibung. Passt keine, bleibt der Titel lieber
+ * leer — eine falsche Zuordnung ist schlechter als keine.
+ */
+function titelAusSerie(
+  titlesByCrSeries: Map<string, Title[]>,
+  seriesId: string,
+  calendarName: string,
+  year: number,
+): Title | undefined {
+  const candidates = titlesByCrSeries.get(seriesId) ?? []
+  if (!candidates.length) return undefined
+  const wanted = seasonNumber(calendarName)
+  if (wanted === undefined) return candidates[0]
+
+  const numberOf = (t: Title) => seasonNumber(t.titleEn) ?? seasonNumber(t.titleRomaji)
+  const exact = candidates.find((t) => numberOf(t) === wanted)
+  if (exact) return exact
+  // Die erste Staffel trägt ihre Nummer meist nicht im Titel.
+  if (wanted === 1) {
+    const plain = candidates.find((t) => numberOf(t) === undefined)
+    if (plain) return plain
+  }
+  // Viele Reihen nummerieren gar nicht, sondern geben jeder Staffel einen
+  // eigenen Untertitel („Ascendance of a Bookworm: Adopted Daughter of an
+  // Archduke"). Dann entscheidet das Ausstrahlungsjahr — und nur, wenn es
+  // genau einen Kandidaten trifft. Bei zweien wäre es wieder geraten.
+  const sameYear = candidates.filter((t) => t.jpYear && Math.abs(t.jpYear - year) <= 1)
+  return sameYear.length === 1 ? sameYear[0] : undefined
+}
+
+function sucheCrunchyroll(
+  crunchyroll: CrunchyrollData,
+  crBySeriesId: Map<string, CrunchyrollEntry>,
+  entryUrl: string | undefined,
+  name: string,
+): CrunchyrollEntry | undefined {
+  const id = crunchyrollSeriesId(entryUrl)
+  return (id ? crBySeriesId.get(id) : undefined) ?? crunchyroll.german[normalizeTitle(name)]
+}
+
+export function indiziereCrSendeplaetze({ titles }: {
+  titles: Map<number, Title>
+}) {
+  const crunchyroll = ladeKalenderMitWoche()
+  const crBySeriesId = new Map(
+    [...gruppiereJeKennung(Object.values(crunchyroll.german), (e) => e.seriesId)].map(([k, liste]) => [k, waehleKalenderEintrag(liste)]),
+  )
+  /*
+    Wie weit der Kalender inhaltlich reicht — der letzte Tag, für den er überhaupt eine deutsche Folge führt. Nicht
+    `crunchyroll.window.to` (der abgesuchte Zeitraum, wie weit **wir gefragt** haben): Am 21.08.2026 ging der Abruf bis zum
+    30.08., die letzte deutsche Kachel stand aber auf dem 19.08. — Crunchyroll kündigt Synchronfolgen praktisch nicht vor.
+  */
+  const crKalenderBis = kalenderBis(crunchyroll)
+  const titlesByCrSeries = indiziereTitelNachSerie(titles)
+  const titleByName = indiziereTitelNachName(titles)
+  /** Einmal gelesen, nicht je Aufruf — die Datei hat rund 3.000 Eintraege. */
+  const katalogEintraege = ladeKatalogEintraege()
+  return {
+    findCrunchyroll: (entryUrl: string | undefined, name: string) => sucheCrunchyroll(crunchyroll, crBySeriesId, entryUrl, name),
+    crKalenderBis,
+    crunchyroll,
+    titleForCalendarName: (name: string) => titelFuerKalenderName(titleByName, name),
+    titleFromSeries: (seriesId: string, calendarName: string, year: number) =>
+      titelAusSerie(titlesByCrSeries, seriesId, calendarName, year),
+    titelAusKatalog: (name: string) => titelAusKatalog(titles, katalogEintraege, name),
+    titleByName,
+    crBySeriesId,
+    katalogEintraege,
+  }
+}

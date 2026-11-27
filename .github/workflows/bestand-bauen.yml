@@ -1,0 +1,500 @@
+name: Bestand — zusammenführen und bauen
+
+# Sammeln und Zusammenführen sind zwei Arbeiten — und nur die zweite darf rot
+# werden.
+#
+# Daniel am 30.08.2026: „mach die läufe stabil. wöchentlich und stündlich sollte
+# nie rot sein können, alles was sie machen ist sammeln und liefern. sie müssen
+# keine merge conflicts etc fixen, sie können irgendwo erstmal alles ablegen, das
+# mergen in bestand muss separat passieren."
+#
+# Der Anlass waren zwei rote Läufe an einem Tag, beide mit fertiger Arbeit:
+#
+# - Der Wochenlauf (33313062428) holte 58 Minuten lang von fünf fremden Servern
+#   und wurde am Ende rot, weil `check:bestand` einen Widerspruch im **gebauten**
+#   Datensatz fand — an den Abrufen lag nichts.
+# - Der stündliche Lauf (33312972636) brach beim Bau an einer YAML-Zeile ab, die
+#   ein früherer Lauf geschrieben hatte.
+#
+# Seitdem gilt die Arbeitsteilung: Die drei planmäßigen Läufe holen Daten und
+# reichen sie als Pull Request ein — kein Bau, keine Zusicherung, kein Rot, und
+# seit dem Nachmittag desselben Tages auch kein Schreiben auf `main` mehr.
+# Dieser Lauf hier baut aus dem, was auf `main` steht, prüft und liefert aus.
+# Wird er rot, ist wirklich etwas am Bestand kaputt, und genau das soll man
+# sehen.
+
+on:
+  # Läuft nach jedem Sammel-Lauf, auch nach einem gescheiterten: Der holt seine
+  # Quellen trotzdem, und die gehören verbaut.
+  workflow_run:
+    workflows:
+      - 'Stündlich — Sendezeiten'
+      - 'Täglich — alle Quellen'
+      - 'Wöchentlich — tiefer Durchlauf'
+      # Die Recherche zu ausgebliebenen Folgen reicht wie ein Sammel-Lauf ein.
+      - 'Claude — ausgebliebene Folgen recherchieren'
+    types: [completed]
+    # **Nicht** zusätzlich hinter „Claude — Daten-PR zusammenführen".
+    #
+    # Der Merge-Lauf endet auch dann grün, wenn er gar nichts zu tun hatte —
+    # das ist der Normalfall. Hinge der Bau daran, liefe er bei jedem Zyklus
+    # zweimal: 26 überflüssige Läufe am Tag, jeder mit einer Zeile in der
+    # Statusanzeige. Auslösen kann der Merge-Lauf ihn auch nicht selbst, denn
+    # ein Workflow mit GITHUB_TOKEN startet keine weiteren.
+    #
+    # Also: Was Claude zusammengeführt hat, baut der nächste planmäßige Lauf —
+    # spätestens eine Stunde später. Ein Konflikt ist der Ausnahmefall, und
+    # eine Stunde Verzug ist dort verkraftbar.
+  # Ein gemergter Handbeleg oder Pipeline-Umbau wartete bis zum nächsten Sammel-Lauf (10.10.2026: 25 Minuten bis zum Baustart).
+  # Jetzt baut jeder Push, der Bauquellen berührt. Pushes der App anime-kalender-daten (Sammler-Merges, dieser Lauf selbst, Wachen; seit
+  # 11.10.2026 statt GITHUB_TOKEN, das am Ruleset `main-pruefweg` scheitert) lösen anders als GITHUB_TOKEN Workflows aus — der Job-`if`
+  # überspringt sie, sonst baute der Bau seinen eigenen Commit erneut. Die Gruppe `bau` hält einen laufenden und einen wartenden Lauf.
+  # Bewusst ohne `web/src/**` (die Pipeline importiert dort einzelne Module) und ohne `tools/daten-kennung.ts`: Änderungen dort lösen
+  # keinen Bau aus und wirken beim nächsten Sammel-Lauf oder per `workflow_dispatch`. Das Lockfile ändert dagegen, was die Pipeline ausführt.
+  push:
+    branches: [main]
+    paths:
+      - 'data/**'
+      - '!data/cache/**'
+      - 'pipeline/**'
+      - 'shared/**'
+      - 'package-lock.json'
+      # Keine Bauquellen: Weckplan-Zeiten (die Pipeline importiert sie nicht; ein Push darauf baute am 11.10.2026 umsonst) und Texte.
+      - '!shared/weckplan.ts'
+      - '!data/*.md'
+      - '!pipeline/**/*.md'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+  issues: write
+
+concurrency:
+  # Nur ein Bau zugleich. Die Sammler haben seit dem 05.10.2026 eigene Gruppen (stunde, tag, woche, …): Sie reichen Pull Requests ein, und der Bau legt bei
+  # bewegtem Fernstand nur seine eigenen Änderungen zurück (`tools/quellen-aufsetzen.sh`) — niemand überschreibt mehr, was ein anderer Lauf aktualisiert hat.
+  #
+  # Pushes der Daten-App überspringt der Job-`if`; der Lauf selbst bekäme sonst die Gruppe und verdrängte einen wartenden Bau.
+  group: ${{ (github.event_name == 'push' && github.actor == 'anime-kalender-daten[bot]') && format('app-push-{0}', github.run_id) || 'bau' }}
+  cancel-in-progress: false
+
+jobs:
+  # Zwei Merges im Abstand von Sekunden lösen zwei Push-Läufe aus; der erste baut `main` schon mit beiden (11.10.2026: 12:05:32/37 und
+  # 12:36:12/17). Der zweite überspringt den Bau, wenn nach seinem Auslöser schon ein Bau-Commit auf main steht.
+  vorab:
+    if: ${{ github.event_name != 'push' || github.actor != 'anime-kalender-daten[bot]' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      noetig: ${{ steps.pruefen.outputs.noetig }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/bau-schon-gebaut.sh
+          sparse-checkout-cone-mode: false
+      - id: pruefen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          noetig=true
+          if [ "${{ github.event_name }}" = push ] && [ "$(bash tools/bau-schon-gebaut.sh "${{ github.sha }}")" = ja ]; then
+            noetig=false
+          fi
+          echo "noetig=$noetig" >> "$GITHUB_OUTPUT"
+
+  bauen:
+    needs: vorab
+    if: ${{ needs.vorab.outputs.noetig == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      LAUF_ZWECK: 'Führt die gesammelten Quellen zum ausgelieferten Datensatz zusammen'
+      LAUF_ZIEL: 'Datensatz gebaut, Zusicherungen gehalten, Erzeugnisse committet'
+      LAUF_SCHRITTE: '5'
+    steps:
+      # Frist für `commit-data.sh` (Neuversuch nur, wenn die Restzeit reicht): 45 min Jobfrist abzüglich 2 min für den Jobstart.
+      - name: Jobfrist merken
+        run: echo "BAU_FRIST_EPOCH=$(( $(date +%s) + 43 * 60 ))" >> "$GITHUB_ENV"
+
+      - name: Sofort anmelden
+        continue-on-error: true
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: |
+          if [ -z "$LAUF_TOKEN" ]; then exit 0; fi
+          printf '{"lauf_id":"%s","repo":"%s","workflow":"%s","zustand":"laeuft","url":"%s","notiz":"wird eingerichtet"}' \
+            "$GITHUB_RUN_ID" "$GITHUB_REPOSITORY" "$GITHUB_WORKFLOW" \
+            "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > /tmp/anmeldung.json
+          curl -sS --max-time 10 -X POST "https://newsletter.animekalender.workers.dev/lauf" \
+            -H "Content-Type: application/json" -H "X-Lauf-Token: $LAUF_TOKEN" \
+            --data-binary @/tmp/anmeldung.json > /dev/null || true
+
+      # Der Push von `commit-data.sh` geht direkt auf `main`; das Ruleset lässt dafür nur die App durch (Bypass „always“).
+      - name: App-Token holen
+        id: app
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.DATEN_APP_ID }}
+          private-key: ${{ secrets.DATEN_APP_KEY }}
+          permission-contents: write
+
+      - uses: actions/checkout@v4
+        with:
+          # Der Sammler hat gerade gepusht — dieser Lauf braucht dessen Stand,
+          # nicht den Commit, für den er ausgelöst wurde.
+          ref: main
+          token: ${{ steps.app.outputs.token }}
+
+      - name: Melder bereitlegen
+        run: |
+          cp tools/lauf-melden.sh "$RUNNER_TEMP/lauf-melden.sh"
+          echo "MELDER=$RUNNER_TEMP/lauf-melden.sh" >> "$GITHUB_ENV"
+          echo "BAU_BEGINN=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+
+      - name: Lauf anmelden
+        continue-on-error: true
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: bash "$MELDER" laeuft
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # `data/cache/` liegt bewusst nicht im Repo, der Bau braucht ihn aber —
+      # ohne ihn entstünde ein Datensatz ganz ohne Titel. Die Sammel-Läufe legen
+      # ihn unter demselben Präfix ab. Der Bau liest ihn nur (seit 05.10.2026): Ein Lauf, der den Stand unverändert unter neuem Schlüssel ablegt, verdrängte am 29.09.2026 den frischen.
+      - name: AniList-Cache wiederverwenden
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: data/cache
+          key: anilist-cache-${{ github.run_id }}
+          restore-keys: anilist-cache-
+
+      # Merker (`pipeline/lib/spaeter-quittieren.ts`) gelten nur für diesen Lauf: Aus dem Cache wiederhergestellt, würde `commit-data.sh` sie nach einem grünen Commit freigeben.
+      - name: Quittungs-Merker aus dem Cache verwerfen
+        run: rm -rf data/cache/quittung-offen data/cache/quittung-frei
+
+      - name: Rohdaten holen, falls kein Cache da ist
+        if: steps.cache.outputs.cache-matched-key == ''
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: npm run data:fetch
+
+      # Die Meldungen aus der Erweiterung wandern hier in `dub-confirmed.yaml`
+      # — das ist Zusammenführen, nicht Sammeln. Die Antwort des Briefkastens
+      # bleibt liegen, damit der nächste Schritt sie ohne neuen Abruf nachspielen kann.
+      - name: Meldungen aus der Erweiterung einarbeiten
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+          MELDUNGEN_SICHERN: /tmp/meldungen-antwort.json
+        run: npm run data:pruefungen -- --abhaken-spaeter
+
+      # Neue Handbelege werden geprüft, bevor sie in den Bau gehen (17.09.2026). Ist die Prüfung rot, sucht
+      # `meldungen-eingrenzen.mjs` die auslösenden Meldungen; nur sie bleiben im Briefkasten, der Rest wird übernommen
+      # (18.10.2026: eine Meldung hielt sieben Tage lang 10.556 andere auf). Findet es keine, bleiben wie bisher alle
+      # neuen draußen. Der Lauf wird in beiden Fällen gelb statt rot, Grund und Kennungen stehen in der Statusanzeige.
+      # Die Zurückgestellten führt `data/meldungen-zurueckgestellt.json` (Briefkasten-Wache, nächstes Eingrenzen); ist der ganze Stapel grün, ist sie leer.
+      - name: Neue Handbelege prüfen
+        run: |
+          if git diff --quiet -- data/dub-confirmed.yaml; then exit 0; fi
+          if npm run check:logic > /tmp/logic.txt 2>&1 && npx tsx pipeline/check-logic-bestand.ts >> /tmp/logic.txt 2>&1; then
+            echo '[]' > data/meldungen-zurueckgestellt.json
+            # Beleg für den Schritt „Änderungen committen“ (Commit-Skript): bleibt der Inhalt außerhalb der Datenpfade gleich, entfällt dort das zweite check:logic.
+            if node tools/logik-beleg.mjs abdruck > "$RUNNER_TEMP/logik-gruen.txt"; then
+              echo "LOGIK_GRUEN_DATEI=$RUNNER_TEMP/logik-gruen.txt" >> "$GITHUB_ENV"
+            fi
+            exit 0
+          fi
+          echo "::group::Protokoll der Prüfung (die Ursache steht nicht am Ende: parallele Prüfungen drucken danach weiter)"
+          cat /tmp/logic.txt
+          echo "::endgroup::"
+          grund="$(bash tools/pruefgrund.sh /tmp/logic.txt)"
+          if zurueck="$(node tools/meldungen-eingrenzen.mjs /tmp/logic.txt /tmp/meldungen-antwort.json)"; then
+            echo "DATEN_WARNUNG=${DATEN_WARNUNG:+$DATEN_WARNUNG · }Meldungen zurückgestellt: $zurueck — $grund" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          git checkout -- data/dub-confirmed.yaml
+          git checkout -- data/anbieter-staffeln.json 2>/dev/null || true
+          git checkout -- data/meldungen-uebernahme.json
+          rm -f data/cache/quittung-offen/pruefungen-abhaken.json
+          echo "DATEN_WARNUNG=${DATEN_WARNUNG:+$DATEN_WARNUNG · }Neue Meldungen zurückgestellt: $grund" >> "$GITHUB_ENV"
+
+      # Was der Erweiterung aufgefallen ist, ohne dass jemand die Konsole oeffnet.
+      # Bis zum 10.09.2026 stand das nur im Browser-Log — also nirgends, wo es
+      # jemand liest (Daniel: "du musst informiert werden ueber issues").
+      - name: Vorfaelle aus der Erweiterung abholen
+        continue-on-error: true
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: npm run data:vorfaelle
+
+      - name: Fortschritt — Meldungen einarbeiten
+        continue-on-error: true
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: bash "$MELDER" schritt "Meldungen einarbeiten"
+
+      # Die gemeldeten Rohfolgen unseren Folgen zuordnen — gegen TMDB, nicht im
+      # Browser. Muss vor der Prüfliste laufen: Was zugeordnet ist, gehört nicht
+      # mehr auf sie.
+      - name: Rohfolgen zuordnen
+        continue-on-error: true
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: npm run data:rohfolgen
+
+      # Stufe 2 (22.09.2026): jede Beobachtung je Plattform-Folge zuordnen und festhalten.
+      # Der Bau liest die Datei noch nicht — sie ist bis Stufe 3 ein Messwert.
+      - name: Folgen je Plattform-Folge zuordnen
+        continue-on-error: true
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: npm run data:folgen-zuordnung
+
+      # Stufe 3 (22.09.2026): das Urteil je Titel x Anbieter x Folge aus allen Beobachtungen.
+      # Der Bau liest die Datei noch nicht.
+      - name: Urteile je Folge berechnen
+        continue-on-error: true
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: npm run data:urteile
+
+      - name: Datensatz bauen
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: npm run data:build
+
+      - name: Fortschritt — Datensatz bauen
+        continue-on-error: true
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: bash "$MELDER" schritt "Datensatz bauen"
+
+      # Was dieser Lauf am Bestand verändert hat, Zeile für Zeile. Ohne diese
+      # Spur sah ein Lauf, der 508 Meldungen verlor, genauso grün aus wie einer,
+      # der alles eingearbeitet hat (26.08.2026).
+      - name: Delta am Bestand festhalten
+        continue-on-error: true
+        run: npm run data:historie -- --lauf "${{ github.workflow }}"
+
+      # Erst nach dem Bau: Die Listen zählen gegen `titles.json`, und das
+      # entsteht eine Zeile weiter oben.
+      - name: Arbeitslisten und Prüfstand neu erzeugen
+        continue-on-error: true
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: |
+          for skript in data:vorschlaege data:dub-checks data:extension-liste data:start-liste; do
+            if ! npm run "$skript"; then
+              echo "::error::$skript ist gescheitert, die Arbeitslisten zählen gegen einen älteren Bestand."
+              echo "DATEN_WARNUNG=${DATEN_WARNUNG:+$DATEN_WARNUNG · }Arbeitslisten nicht neu erzeugt: $skript" >> "$GITHUB_ENV"
+              exit 1
+            fi
+          done
+
+      - name: Fortschritt — Arbeitslisten neu erzeugen
+        continue-on-error: true
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: bash "$MELDER" schritt "Arbeitslisten neu erzeugen"
+
+      # Zählt den Bestand und schreibt den Verlauf fort. Bricht nur ab, wenn
+      # etwas gefunden wird, das gar nicht vorkommen darf.
+      - name: Datenqualität messen
+        continue-on-error: true
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        # Rückgang der Titel mit Streaming-Weg: `check-qualitaet.ts` druckt eine Zeile `STREAMING_RUECKGANG …` (Exit bleibt 0),
+        # daraus wird die gelbe Lauf-Meldung (`DATEN_WARNUNG`); der Exit-Code der Messung selbst bleibt erhalten.
+        run: |
+          status=0
+          npm run check:qualitaet > "$RUNNER_TEMP/qualitaet.log" 2>&1 || status=$?
+          cat "$RUNNER_TEMP/qualitaet.log"
+          if grep -q '^STREAMING_RUECKGANG ' "$RUNNER_TEMP/qualitaet.log"; then
+            rueckgang="$(grep -m1 '^STREAMING_RUECKGANG ' "$RUNNER_TEMP/qualitaet.log" | cut -d' ' -f2-)"
+            echo "::warning::Streaming-Abdeckung: ${rueckgang}"
+            DATEN_WARNUNG="${DATEN_WARNUNG:+$DATEN_WARNUNG · }Streaming-Abdeckung gesunken: ${rueckgang}"
+            echo "DATEN_WARNUNG=${DATEN_WARNUNG}" >> "$GITHUB_ENV"
+          fi
+          # Titel mit bekannter deutscher Erstausgabe, aber ohne Stream und Verweis: steigt ihre Zahl, druckt die Messung `ERSTAUSGABE_OHNE_WEG …`.
+          if grep -q '^ERSTAUSGABE_OHNE_WEG ' "$RUNNER_TEMP/qualitaet.log"; then
+            ohneWeg="$(grep -m1 '^ERSTAUSGABE_OHNE_WEG ' "$RUNNER_TEMP/qualitaet.log" | cut -d' ' -f2-)"
+            echo "::warning::Erstausgabe ohne Weg: ${ohneWeg}"
+            DATEN_WARNUNG="${DATEN_WARNUNG:+$DATEN_WARNUNG · }Erstausgabe bekannt, kein Weg gestiegen: ${ohneWeg}"
+            echo "DATEN_WARNUNG=${DATEN_WARNUNG}" >> "$GITHUB_ENV"
+          fi
+          # Mängel-Register (`data/maengel.json`, vom Bau): neu offene Mängel, Rückfälle je Art und ein Hinweis zur Vorfassung, Zeilen aus `qualitaet-warnzeilen.ts`. Cover steht nur im Register.
+          for art in NEU:neu RUECKFALL:Rückfall VORFASSUNG:Vorfassung; do
+            if grep -q "^MAENGEL_${art%%:*} " "$RUNNER_TEMP/qualitaet.log"; then
+              maengel="$(grep -m1 "^MAENGEL_${art%%:*} " "$RUNNER_TEMP/qualitaet.log" | cut -d' ' -f2-)"
+              echo "::warning::Mängel ${art##*:}: ${maengel}"
+              DATEN_WARNUNG="${DATEN_WARNUNG:+$DATEN_WARNUNG · }Mängel ${art##*:}: ${maengel}"
+              echo "DATEN_WARNUNG=${DATEN_WARNUNG}" >> "$GITHUB_ENV"
+            fi
+          done
+          # auto-Arten (3 Tage) und hand-Arten (7 Tage) ohne Abbau (`maengel-stillstand.ts`): steht oft tagelang, darum kurz und erst in „Lauf abmelden“
+          # ans Ende der Lauf-Meldung, sonst schöbe sie spätere Warnungen aus den 160 Zeichen der Wachzeile (`laeufe-abruf.mjs`).
+          if grep -q '^MAENGEL_STILLSTAND ' "$RUNNER_TEMP/qualitaet.log"; then
+            still="$(grep -m1 '^MAENGEL_STILLSTAND ' "$RUNNER_TEMP/qualitaet.log" | cut -d' ' -f2-)"
+            echo "::warning::Mängel Stillstand: ${still}"
+            # Nur die Artnamen (ohne Zahlen) hängen an: `tools/bekannte-warnungen.json` erkennt daran eine bekannte Warnung, eine neue Art nicht.
+            namen="$(grep -m1 '^MAENGEL_STILLSTAND_ARTEN ' "$RUNNER_TEMP/qualitaet.log" | cut -d' ' -f2- | sed -E 's/ [0-9]+→[0-9]+ \([^)]*\)//g')"
+            echo "STILLSTAND_WARNUNG=Mängel Stillstand: ${still}${namen:+ — $namen}" >> "$GITHUB_ENV"
+          fi
+          # Harter Wächter rot (`HART` in check-qualitaet.ts): als gelbe Meldung sichtbar machen, sonst bleibt der Schritt unbemerkt rot.
+          if grep -q 'das darf nicht vorkommen' "$RUNNER_TEMP/qualitaet.log"; then
+            hart="$(grep 'das darf nicht vorkommen' "$RUNNER_TEMP/qualitaet.log" | sed 's/^.*⚠ *//; s/ — das darf nicht vorkommen//' | paste -sd';' -)"
+            echo "::warning::Datenqualität (hart): ${hart}"
+            echo "DATEN_WARNUNG=${DATEN_WARNUNG:+$DATEN_WARNUNG · }Datenqualität hart rot: ${hart}" >> "$GITHUB_ENV"
+          fi
+          exit "$status"
+
+      # Fehlt eine deutsche Crunchyroll-Folge der letzten 14 Tage als Termin, bleibt der Bau grün und die Daten gehen raus; die Folge
+      # kommt als gelbe Lauf-Meldung (`DATEN_WARNUNG`) in die App und in `laeufe-aufraeumen` (Anlass 25.10.2026: Last Boss S2 #1–2,
+      # Apothekerin S3 #49 fehlten Tage, Widerlegung durch das Wochenprogramm).
+      - name: Crunchyroll-Folgen im Kalender prüfen
+        continue-on-error: true
+        run: |
+          if ! npm run check:cr-termine > "$RUNNER_TEMP/cr-termine.log" 2>&1; then
+            cat "$RUNNER_TEMP/cr-termine.log"
+            fehlt="$(grep -c '^FEHLT' "$RUNNER_TEMP/cr-termine.log" || true)"
+            folgen="$(grep '^FEHLT' "$RUNNER_TEMP/cr-termine.log" | head -3 | cut -d' ' -f3- | paste -sd';' - || true)"
+            [ "$fehlt" = 0 ] && folgen='Prüfung nicht lesbar'
+            echo "::error::Crunchyroll-Folgen ohne Termin: ${folgen}"
+            echo "DATEN_WARNUNG=${DATEN_WARNUNG:+$DATEN_WARNUNG · }Crunchyroll-Folgen ohne Termin (${fehlt}): ${folgen}" >> "$GITHUB_ENV"
+            exit 1
+          fi
+
+      - name: Vorschaubilder für neue Releases
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: npm run data:og
+
+      - name: Fortschritt — Vorschaubilder
+        continue-on-error: true
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: bash "$MELDER" schritt "Vorschaubilder"
+
+      # Die frisch erzeugten Listen für die Erweiterung (`offene-amazon.js`, `pruefstand.json` …) und die Wiedervorlagen werden geprüft,
+      # bevor sie auf main landen. Bis dahin liefen `check:extension` und `check:wiedervorlage` erst danach in Deploy und PR-Kette und
+      # machten einen schon committeten Stand rot (Prüftisch 19.10.2026). Rot hier: kein Commit, Lauf rot, Meldungen bleiben im Briefkasten.
+      # Gemessen 24.10.2026: zusammen etwa 16 s.
+      - name: Erweiterung und Wiedervorlagen gegen die neuen Listen prüfen
+        run: |
+          for pruefung in check:extension check:wiedervorlage; do
+            if ! npm run "$pruefung"; then
+              echo "::error::$pruefung ist rot gegen die frisch erzeugten Dateien, nichts wird committet."
+              exit 1
+            fi
+          done
+
+      # Hier sitzt die Zusicherung über den gebauten Bestand (`check:bestand` in
+      # commit-data.sh). Sie macht den Lauf rot (11.10.2026: Als sie ihn nur gelb färbte, blieben die Erzeugnisse sechs
+      # Stunden unausgeliefert). `BAU_LAUF` nimmt dann alles aus diesem Lauf zurück außer den Abrufen von `data:fetch`
+      # (`bau_lauf_zuruecknehmen`): Meldungen, Stempel, Listen und Bestand bleiben auf HEAD, die Meldungen im Briefkasten. Was eine einzelne Meldung
+      # auslöst, hat „Neue Handbelege prüfen“ schon eingegrenzt; hier bleibt nur, was erst der gebaute Bestand zeigt.
+      - name: Änderungen committen
+        env:
+          BAU_LAUF: '1'
+        run: |
+          bash tools/commit-data.sh "chore(data): Bestand neu gebaut"
+
+      # Erst jetzt, wo die Belege im Repo stehen, verschwinden sie aus dem Briefkasten.
+      - name: Meldungen abhaken
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: npm run data:pruefungen -- --nur-abhaken
+
+      # Ebenso die zugeordneten Rohfolgen (17.10.2026): Am 16.10. hakte der Zuordner selbst ab, der Bau
+      # scheiterte danach, und 1.029 Adressen aus Daniels Prime-Durchgang kamen nie ins Repo.
+      # Wächter: tools/quittung-nach-commit-waechter.mjs.
+      - name: Rohfolgen abhaken
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: npm run data:rohfolgen-abhaken
+
+      - name: Vorfälle löschen
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: npm run data:vorfaelle -- --nur-loeschen
+
+      # Der Alarm für stumm gewordene Quellen. Er gehört hierher und nicht in
+      # den Sammler: Ein Sammler, der eine Quelle nicht erreicht, macht weiter
+      # — dass sie seit Tagen schweigt, ist eine Aussage über den Bestand.
+      - name: Quellen auf Schweigen prüfen
+        if: ${{ !cancelled() }}
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: npm run data:check
+
+      # Ein grüner Bau schließt die "Bestandsbau rot"-Issues, die vor ihm entstanden (bis 11.10.2026 sammelten sie sich).
+      - name: Behobene Rot-Issues schließen
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash tools/bau-issues-schliessen.sh "$GITHUB_RUN_ID" "$BAU_BEGINN"
+
+      # Eingaben: `data/cache/` (nicht im Repo) und die Dateien, die „Meldungen einarbeiten“ (`data:pruefungen`) nur im
+      # Arbeitsbaum schreibt; ein roter Bau committet sie nicht, ohne D1 ließe er sich sonst nicht nachstellen (31.10.2026).
+      # Gemessen 27.10.2026: 131 MB roh, ~54 MB gepackt (Grenze 200 MB). Der Untersucher (`claude-reparatur.yml`) lädt es nach `data/`.
+      - name: Eingaben des roten Baus als Artefakt sichern
+        if: failure()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: bau-eingaben-${{ github.run_id }}
+          path: |
+            data/cache
+            data/dub-confirmed.yaml
+            data/amazon-gti-belegt.json
+            data/anbieter-staffeln.json
+            data/meldungs-auffaelligkeiten.json
+            data/meldungen-uebernahme.json
+            !data/cache/quittung-offen
+            !data/cache/quittung-frei
+          retention-days: 7
+          if-no-files-found: ignore
+
+      # Rot durch einen schon gepushten Sammler-Commit (31.10.2026: 12 h): `bau_lauf_zuruecknehmen` nimmt nur die Ausgabe dieses Laufs
+      # zurück, nie einen Commit auf main. Hier gehen die Dateien der Sammler-Commits seit dem letzten grünen Bau auf deren Stand
+      # zurück; wird der Bau damit grün, kommt das als eigener Commit nach main, sonst bleibt alles wie es war. Der Lauf bleibt rot.
+      - name: Sammler-Stand seit dem letzten grünen Bau zurücknehmen
+        if: failure()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: |
+          basis="$(bash tools/sammler-basis.sh)"
+          git fetch --no-tags --depth=400 origin main
+          if [ -z "$basis" ] || ! git cat-file -e "$basis^{commit}"; then
+            echo "::warning::Letzter grüner Bau ($basis) nicht erreichbar, keine Sammler-Zurücknahme."
+            exit 0
+          fi
+          node tools/sammler-zuruecknehmen.mjs --basis "$basis"
+
+      - name: Lauf abmelden
+        continue-on-error: true
+        if: always()
+        env:
+          LAUF_TOKEN: ${{ secrets.LAUF_TOKEN }}
+        run: |
+          z="${{ job.status == 'success' && 'ok' || job.status == 'cancelled' && 'abgebrochen' || 'fehler' }}"
+          DATEN_WARNUNG="${DATEN_WARNUNG:-}${STILLSTAND_WARNUNG:+${DATEN_WARNUNG:+ · }$STILLSTAND_WARNUNG}"
+          if [ "$z" = ok ] && [ -n "${DATEN_WARNUNG:-}" ]; then
+            bash "$MELDER" warnung "$DATEN_WARNUNG"
+          elif [ "$z" = fehler ] && [ -n "${DATEN_WARNUNG:-}" ]; then
+            bash "$MELDER" fehler "$DATEN_WARNUNG"
+          else
+            bash "$MELDER" "$z"
+          fi

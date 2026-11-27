@@ -1,0 +1,44 @@
+/**
+ * Attrappe von ADN für `pipeline/check-adn-sprachriegel-lauf.ts`: `fetch` antwortet auf jede Serie (`/video/show/<id>`) mit der
+ * Datei `$AK_ADN_ANTWORT` (JSON-Liste von Videos), auf die Serienliste (`/show`) mit den Kennungen aus `$AK_ADN_LISTE` (Komma-getrennt,
+ * Sprache `vostf`, bei Kennungen aus `$AK_ADN_LISTE_VDE` `vostde` und `vde`) und auf alles andere mit 404. `$AK_ADN_STATUS` ("<id>:<status>,…") setzt für einzelne Serien einen festen
+ * Statuscode (500 = Abbruch, 404 = nicht im Angebot). Kein Netz, kein Server.
+ */
+import { readFileSync } from 'node:fs'
+
+/** Statuscode, den `$AK_ADN_STATUS` für diese Serie vorgibt, sonst undefined. */
+function festerStatus(id) {
+  const eintraege = (process.env.AK_ADN_STATUS ?? '').split(',').map((e) => e.split(':'))
+  return eintraege.find(([k]) => k === id)?.[1]
+}
+
+const fragen = new Map()
+
+globalThis.fetch = async (url) => {
+  const pfad = new URL(String(url)).pathname
+  if (pfad.startsWith('/video/show/')) {
+    const status = festerStatus(pfad.split('/').pop())
+    if (status === 'throw') throw new Error('Zeitüberschreitung (Attrappe)')
+    const offset = Number(new URL(String(url)).searchParams.get('offset') ?? 0)
+    // "seite2-<status>": Seite 1 voll (100 Videos), ab Seite 2 der feste Status.
+    if (status?.startsWith('seite2-')) {
+      if (offset > 0) return new Response('{}', { status: Number(status.slice(7)) })
+      const voll = Array.from({ length: 100 }, (_, i) => ({ id: i, shortNumber: String(i), languages: ['vde'] }))
+      return new Response(JSON.stringify({ videos: voll }), { status: 200 })
+    }
+    if (status) return new Response('{}', { status: Number(status) })
+    // `$AK_ADN_ANTWORT_NACH`: Antwort ab der zweiten Frage nach derselben Serie (ADN wechselt zurück zur deutschen Sicht).
+    const nummer = (fragen.get(pfad) ?? 0) + (offset === 0 ? 1 : 0)
+    fragen.set(pfad, nummer)
+    const datei = nummer > 1 && process.env.AK_ADN_ANTWORT_NACH ? process.env.AK_ADN_ANTWORT_NACH : process.env.AK_ADN_ANTWORT
+    const videos = JSON.parse(readFileSync(datei, 'utf8'))
+    return new Response(JSON.stringify({ videos }), { status: 200 })
+  }
+  if (pfad === '/show') {
+    const ids = (process.env.AK_ADN_LISTE ?? '').split(',').filter(Boolean)
+    const mitVde = (process.env.AK_ADN_LISTE_VDE ?? '').split(',')
+    const shows = ids.map((id) => ({ id: Number(id), title: `Serie ${id}`, languages: mitVde.includes(id) ? ['vostde', 'vde'] : ['vostf'] }))
+    return new Response(JSON.stringify({ shows }), { status: 200 })
+  }
+  return new Response('{}', { status: 404 })
+}

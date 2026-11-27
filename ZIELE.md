@@ -1,0 +1,178 @@
+# Ziele des Projekts
+
+Festgehalten am 28.08.2026 nach Daniels Auftrag. Diese Datei ist das Manifest:
+Was hier steht, wird nicht vergessen, und jede Arbeit am Projekt lässt sich
+daran messen. Sie wird fortgeschrieben, nicht neu geschrieben — was erreicht
+ist, bekommt einen Haken und bleibt stehen.
+
+## Leitziel: Mobile Performance und Best Practice
+
+> „mobile performance als leitziel … best practice sollte eig immer überall berücksichtigt werden für alle entscheidungen … eine perfekt entwickelte webseite" (Daniel, 07.10.2026)
+
+Die Seite ist auf einem Handy mit schwacher Leitung immer schnell und flüssig. Das gilt für jede Entscheidung — Bilder, Daten, Suche, Oberfläche, Fremddienste —, nicht erst für eigene Performance-Aufgaben.
+
+- **Budgets:** Erstaufruf wie in `ARCHITEKTUR.md` (Grenze 190 KB gzip: Bündel, CSS, HTML, Kachel-Datei der Woche, keine Webschrift; gemessen 05.11.2026 ≈ 184 KB; Seitenansichten, Detailpanel, Monat, Filterfeld und Einstellungen laden erst auf Absicht (Vorwärmen im Leerlauf), `woche-kacheln.json` bewacht `check-woche-groesse-bestand.ts` (22 KB), Wächter `tools/start-budget.mjs` im Bau; nicht gezählt: das Nachladen der vollen Dateien ≈ 337 KB nach ≤ 6 s und der Precache des Service Workers, das dem „erst auf Absicht“ widerspricht, Folgeauftrag); alles Weitere erst auf Absicht (Klick, Öffnen). Handy, 4G langsam, CPU 4× gedrosselt: LCP ≤ 2,5 s, INP ≤ 200 ms, CLS ≤ 0,1, keine Eingabe-Aufgabe über 50 ms.
+- **Bilder:** kleine Fassung sofort, große erst auf Klick, `srcset`/`sizes`, Datensparmodus beachten (erstes Beispiel: Cover-Vergrößerung, 07.10.2026).
+- **Messen statt vermuten:** Jede sichtbare Änderung wird nach dem Deploy gedrosselt gemessen (Messrezept im Skill `web-best-practice`).
+- **Umschalter am Handy:** `node tools/handy-tempo.mjs [--dist <Build-Ordner>]` misst Monat↔Woche, Blättern, Filter und Panel mit echten Tipps (Pixel 7, 4× CPU). Stand 12.10.2026, 4×: 40–130 ms bis zum stabilen Bild (Ausnahme: Rückkehr zur heutigen Woche, weiches Scrollen ≈ 480 ms), die längste Aufgabe je Aktion aber noch 50–110 ms (Grenze 50 ms nicht erreicht). Knoten im Monat 1052 → 499. Das erste Panel-Öffnen kostet einmalig ≈ 165 ms für das erste Layout (Schrift, Textformung). **Dauerüberwachung:** `npm run check:ladezeiten` prüft Kalender-sichtbar (896 ms) und sechs Umschalter gegen Grenzen (Median 12.10.2026 × 1,5), Exit 1 bei Überschreitung (`docs/wissen/betrieb.md`).
+- **Lighthouse mobil:** `npm run check:lighthouse` (PR-Kette, gegen `dist`) und täglich live (`ladezeiten.yml`, Job `live`), Grenzen in `tools/lighthouse-grenzen.mjs` als Ratsche (nur strenger). Stand 18.11.2026 (CI-Runner; TBT und Performance schwanken je Runner bis 2,6×): Kalender LCP 0,9–1,0 s, TBT 25–206 ms (auf langsamem Runner über 200), Performance 97–100; Datenbank (LCP 11,5–14,3 s, TBT 228–765 ms, Performance 56–71) und Titel-Detail (LCP 13,8–16,9 s, Performance 52–66) reißen das Budget — offener Befund (`docs/wissen/betrieb.md`, „Lighthouse und Leerlauf als Wächter“).
+- **Leerlauf:** Ein offener Tab weckt den Rechner nicht — CPU < 1 %, keine Dauer-Animation, kein Takt unter 1 s, Heap nach 20 Ansichtswechseln ≤ +1 MB (`npm run check:leerlauf`, PR-Kette und täglich live). Stand 18.11.2026 live: 0,04 % (Kalender) / 0,05 % (Datenbank), kein Intervall, +0,48 MB.
+- **Nichtkommerziell** bleibt Voraussetzung (`CLAUDE.md`).
+
+## Hauptziel 1: Der Bestand ist vollständig und richtig
+
+> „alle anime müssen wir im bestand haben, alle verweise auf deutsche synchros
+> müssen korrekt verlinkt sein, alle anime müssen korrekt gekennzeichnet und
+> episoden korrekt zugeordnet sein"
+
+**Stand 28.08.2026, gemessen:**
+
+| Kennzahl | Wert |
+|---|---|
+| Titel im Bestand | 2.762 |
+| davon mit mindestens einem Verweis | 1.431 |
+| davon ohne jeden Verweis | 1.331 |
+| mit belegter deutscher Synchro | 1.278 |
+| Verweise gesamt | 1.847 (Crunchyroll 637, Prime 533, Netflix 399, ADN 128, YouTube 72, RTL+ 40, Disney+ 36, Joyn 2) |
+
+**Was dafür offen ist:**
+
+- Folgen-genaue Zuordnung statt Staffel-Schätzung → `docs/prime-erfassung-neu.md`
+- 1.331 Titel ohne Verweis: prüfen, ob es sie wirklich nirgends deutsch gibt
+- Die 62 offenen Prime-Suchen und 30 Netflix-Titel der Prüfliste
+
+**Der Bestand aller Anbieter, laufend nachgeführt (Entscheidung 21.11.2026).** Ziel ist,
+von allen Streaming-Anbietern zu wissen, was jetzt im Angebot ist, und es anzuzeigen —
+nicht als einmalige Momentaufnahme, sondern so, dass sich Änderungen im Bestand eines
+Anbieters im Datensatz niederschlagen. Fehlende Wege bei älteren Titeln (Erstausgabe 2020
+oder früher) bleiben Mängel und zählen mit, werden aber getrennt ausgewiesen und mit
+niedrigerer Priorität gefüllt (`node tools/maengel.mjs`).
+
+## Hauptziel 2: Die Webseite bleibt aktuell
+
+> „automatisches Erfassen von Informationen zu Neu-Ankündigungen … sobald
+> offizielle Einträge angelegt wurden … Release-Termine der deutschen Synchro
+> für kommende Episoden, Filme, Titel sind schnellstmöglich automatisch zu
+> erfassen"
+
+**Stand:** 889 Termine, davon 196 künftige bis Juni 2027. Fünf Cron-Läufe:
+stündlich Sendezeiten, täglich 04:17 alle Quellen, alle sechs Stunden ADN,
+montags 05:41 Tiefendurchlauf, monatlich Tonspuren.
+
+**Der Takt reicht — gemessen am 28.08.2026, Frage geschlossen.** Über vierzehn Tage
+aus `meta.json` je Tag:
+
+| | 14.08. | 28.08. | je Tag |
+|---|---|---|---|
+| Titel | 2.760 | 2.763 | **+0,2** |
+| Releases | 179 | 257 | **+5,6** |
+
+Beide Zahlen zusammen sagen mehr als jede für sich: Neue **Termine** kommen
+reichlich, neue **Titel** fast nie — die Termine betreffen also fast immer Reihen,
+die längst im Bestand stehen. Ein Ankündigungstakt unter einem Tag hätte daran
+nichts zu holen.
+
+Und der eine Fall, in dem Stunden zählen, ist bereits abgedeckt: Eine Folge, die
+**heute** erscheint, muss heute dastehen. Genau dafür läuft der Crunchyroll-Lauf
+stündlich. Alles andere wird Wochen vorher angekündigt, und dagegen sind 24 Stunden
+Verzug keine.
+
+**Was dafür offen ist:**
+
+- Deutsche Synchro-Termine kommen aus Handmeldungen und wenigen Quellen. Jede
+  Handmeldung ist eine Übergangslösung — die automatische Quelle dahinter suchen.
+
+## Hauptziel 3: Hohe Datenqualität, keine falschen Daten
+
+> „Hohe Datenqualität ist oberstes Gut. Falsche Daten sind absolut zu vermeiden."
+
+Das ist die Regel, an der alle anderen gemessen werden. Konkret:
+
+- **Kein Urteil ohne Grundlage.** Eine Lücke im Wissen wird als Lücke geführt,
+  nicht als Befund. (Ein Beispiel, das es fast in den Bestand geschafft hätte:
+  „kein Deutsch" bei 15 von 39 gelesenen Folgen, 27.08.2026.)
+- **Nur funktionierende Verweise auf der Seite.** Tote Links werden entfernt,
+  nicht mit „✕" markiert.
+- **Veralten ist ein Ereignis, kein Zustand.** Läuft eine Synchro-Lizenz aus,
+  muss das auffallen und den Bestand ändern.
+
+**Was dafür offen ist:**
+
+- Automatische Erkennung ausgelaufener Lizenzen (siehe Hauptziel 4)
+- Die Zusicherungen des Bestands laufen bei jedem Bau; ihre Abdeckung
+  regelmäßig prüfen
+
+## Hauptziel 4: Veralten wird bemerkt
+
+> „Daten können über Zeit veralten, diese Information müssen wir automatisch
+> mitbekommen und erfassen (Synchro-Lizenz ausgelaufen bei Anbieter → nicht mehr
+> stream/kaufbar mit deutscher Synchro → update Bestand & Webseite)"
+
+**Stand:** `pipeline/check-youtube.ts` prüft YouTube-Verweise gegen die Data API.
+`data/link-check.json` führt einen Linkstatus. Für Prime, Netflix und Crunchyroll
+gibt es keine laufende Prüfung; Änderungen fallen nur auf, wenn jemand hinsieht.
+
+**Was dafür offen ist:**
+
+- Ein wiederkehrender Lauf, der bestehende Verweise nachprüft, nicht nur neue
+  sucht
+- Ein Verfallsdatum je Verweis: Was länger als X nicht geprüft wurde, kommt in
+  die Prüfliste
+
+## Nebenziel A: Bessere automatische Informationsbeschaffung
+
+Recherche nach Quellen, die heute von Hand ersetzt werden. Jede Handmeldung ist
+ein Hinweis auf eine fehlende Automatik.
+
+## Nebenziel B: Die Prüflisten-Erweiterung
+
+Für jede Seite, wo Handarbeit nötig bleibt. Aktuell: Prime, Netflix, Disney+.
+Offen: Crunchyroll, ADN, RTL+.
+
+## Nebenziel C: Die Status-App
+
+Zeigt Läufe und Prüfstand. Offen: Sie soll auch zeigen, was gerade veraltet.
+
+## Querschnittsanforderungen
+
+Diese gelten für jede Änderung, nicht für ein einzelnes Ziel:
+
+- **Schlank und performant.** Was die Webseite lädt, enthält nur, was ein
+  Besucher sieht. Rohdaten bleiben in der Datenbank und unter `data/`.
+- **Keine Speicherlecks.** Besonders in der Erweiterung, die auf jeder Seite
+  mitläuft. Ringpuffer werden gekappt, Messungen laufen einmal je Takt.
+- **Bugs und Unschönheiten werden erkannt, nicht gemeldet.** Wo eine Prüfung
+  möglich ist, läuft sie automatisch.
+- **Wissen veraltet nie.** Was sich ändert, wird im selben Zug nachgeführt —
+  hier, in `status.md`, in `CLAUDE.md`, in den Kommentaren.
+
+## Fortschritt
+
+### 28.08.2026 — Grundlagen für die Folgen-Zuordnung
+
+Der Tag begann mit der Erkenntnis aus `docs/prime-erfassung-neu.md`: Die
+Erweiterung entscheidet auf der Seite über Dinge, die dort nicht entscheidbar
+sind. Gebaut wurde die Grundlage dafür, das an die richtige Stelle zu holen.
+
+| Was | Wirkung |
+|---|---|
+| `pipeline/fetch-tmdb-folgen.ts` | 594 Titel, 23.522 Folgen mit Titel und Erstausstrahlung — der Anker, den AniList nicht liefert |
+| `shared/folgen-zuordnung.ts` | Datum vor Titel vor Position; 254 von 300 Staffeln eindeutig, Haikyu vollständig über das Datum |
+| `pipeline/vorschlaege-anbieter.ts` | 224 Titel ohne Verweis, für die TMDB einen Anbieter nennt → 158 neue Prime-Suchen |
+| `pipeline/wiedervorlage.ts` | Belege veralten; Fristen je Anbieter, heute noch nichts fällig |
+| `pipeline/check-qualitaet.ts` | Kennzahlen mit Verlauf, drei harte Punkte machen den Lauf rot |
+| TMDB-Suche mit vier Schreibweisen | 1.247 Fehlschläge bekommen einen zweiten Versuch mit japanischem und deutschem Titel |
+| TMDB als zweite Titelquelle | gegen die 194 Titel ohne deutschen Namen |
+| `.github/workflows/daten-auf-abruf.yml` | einzelne Datenläufe ohne den ganzen Wochenlauf |
+
+**Offen aus diesem Tag:** Schritt 2 und 4 des Umbauplans — der Worker braucht
+eine Tabelle je Folge, und die Erweiterung muss die Liste schicken statt der
+Zahl.
+
+## Wie diese Datei benutzt wird
+
+Vor jeder größeren Arbeit: Welchem Ziel dient sie? Steht das Ziel hier? Wenn
+nicht, gehört es ergänzt oder die Arbeit unterlassen.
+
+Nach jeder Arbeit: Hat sich eine Kennzahl geändert? Dann wird sie hier
+nachgezogen, mit Datum.

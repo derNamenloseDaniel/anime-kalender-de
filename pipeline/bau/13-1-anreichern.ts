@@ -1,0 +1,130 @@
+import { readJson, log } from '../lib/util.ts'
+import { type Title, type Release } from '../../shared/types.ts'
+import { amazonAdresseRichten } from '../lib/amazon-adresse.ts'
+import { ladeTrailerHand } from '../lib/trailer-hand.ts'
+import { richtePrimeWege } from './13-1-prime-richten.ts'
+import { richteTerminAdressen } from './13-1-termin-adressen.ts'
+import { setzeJoynFenster } from './13-1-joyn-fenster.ts'
+import { setzeToggoFenster } from './13-1-toggo-fenster.ts'
+import { setzeToggoSeiten } from './13-1-toggo-seiten.ts'
+import { providerName } from '../../shared/mappings.ts'
+
+/** Handlung je Titel, mit belegter Herkunft der deutschen Fassung. */
+export interface SynopsisEintrag {
+  de?: string
+  en?: string
+  deSource?: { name: string; url: string }
+  /** Titelseite bei aniSearch mit Slug, wo die Beschreibung nicht von dort stammt (für Pille und Quellenübersicht). */
+  asUrl?: string
+  /** Eigener Text aus Fakten mehrerer Quellen (`data/handlung-eigen.yaml`): alle Quellen, Lizenz des Textes, `reihe` = beschreibt nur die Reihe. */
+  eigen?: { quellen: { name: string; url: string }[]; lizenz: string; reihe?: true }
+  /** Ein selbst geschriebener Satz Handlung (`data/curated/ein-satz-handlung/`); `satzReihe` = er beschreibt die Reihe, nicht diesen Titel. */
+  satz?: string
+  satzReihe?: true
+  /** Nur ein Teil der Folgen liegt auf Deutsch vor (`data/erstausgabe-von-hand.yaml`): Zahl der deutschen Folgen, Quelle samt kurzem Zitat. */
+  deFolgen?: { n: number; quelle: { name: string; url: string }; zitat: string }
+  /** Größtes brauchbares Plakat (TMDB): Pfad, Breite, Höhe — nur für die Vergrößerung des Covers. */
+  cg?: [string, number, number]
+}
+
+export function schreibeSynopsenUndReichereAn({ allTitles, releases, kanalJeAdresse }: {
+  allTitles: Title[]
+  releases: Release[]
+  kanalJeAdresse: Map<string, string | undefined>
+}) {
+  // Synopsen liegen getrennt, damit die Startseite nicht Megabytes laden muss.
+  //
+  // Drei Quellen, in dieser Reihenfolge: aniSearch schreibt redaktionelle
+  // deutsche Texte, TMDB oft nur einen übersetzten Stummel, AniList gar kein
+  // Deutsch. Vorher gewann TMDB — und bei „You and I Are Polar Opposites
+  // Staffel 2" stand deshalb „The second season of …" auf der Seite, obwohl es
+  // eine ausführliche deutsche Inhaltsangabe gibt.
+  const synopses: Record<number, SynopsisEintrag> = {}
+
+
+  /**
+   * Die Quelle aus dem Beschreibungstext herauslösen.
+   *
+   * aniSearch hängt sie an den Text an: „… hinterher.\n\nQuelle:
+   * www.anisearch.de/anime/1572". Das stand bei 2.385 von 2.683 deutschen
+   * Beschreibungen mitten im Fließtext — und darunter dann noch einmal unsere
+   * eigene, anders gestaltete Quellenzeile, die obendrein „themoviedb.org"
+   * behauptete, obwohl der Text von aniSearch kam.
+   *
+   * Herausgelöst wird sie hier, einmal beim Bauen, statt in der Oberfläche bei
+   * jedem Öffnen eines Panels.
+   */
+  function trenneQuelle(text: string): { text: string; url?: string } {
+    const treffer = /\n+\s*Quelle:\s*(\S+)\s*$/.exec(text)
+    if (!treffer) return { text: text.trim() }
+    const roh = treffer[1]
+    return {
+      text: text.slice(0, treffer.index).trim(),
+      url: roh.startsWith('http') ? roh : `https://${roh}`,
+    }
+  }
+
+  /* `data/ann-ids.json` führt die Zuordnung unter `ann`: AniList-Kennung -> ANN-Kennung. */
+  const annKennungen = readJson<{ ann?: Record<string, number> }>('data/ann-ids.json', {}).ann ?? {}
+
+  /*
+    **Die Trailer, je Titel eine YouTube-Kennung.** Geholt von
+    `fetch-trailer.ts` aus KinoChecks offizieller API und dem Index seines
+    Kanals; hier wird nur zugeordnet. Ein Titel ohne Eintrag bekommt kein Feld
+    — die Pille im Panel hängt an seinem Dasein.
+  */
+  const trailer = readJson<Record<string, { video: string; titel: string; sprache?: 'de' | 'en' | 'ja' }>>(
+    'data/trailer.json',
+    {},
+  )
+  /* Ein Handeintrag (`data/curated/trailer-hand.yaml`) geht dem Lauf-Ergebnis vor. */
+  Object.assign(trailer, ladeTrailerHand())
+  setzeToggoFenster(allTitles)
+  setzeToggoSeiten(allTitles, 'Anime')
+
+  setzeJoynFenster(allTitles, releases)
+  let gerichtet = richtePrimeWege(allTitles, kanalJeAdresse)
+  const amazon = richteAmazonWege(allTitles)
+  gerichtet += amazon.gerichtet
+  const kanalBenannt = amazon.kanalBenannt
+  if (kanalBenannt) log(`${kanalBenannt} Kanal-Wege mit Amazon-Adresse als „Amazon Prime (Kanal)" benannt`)
+  gerichtet += richteTerminAdressen(releases, allTitles)
+  if (gerichtet) log(`${gerichtet} Prime-Verweise auf die Video-Adresse gerichtet`)
+  return { trenneQuelle, synopses, annKennungen, trailer }
+}
+
+/** Amazon-Wege der Titel richten und benennen; zählt gerichtete Adressen und benannte Kanäle. */
+function richteAmazonWege(allTitles: Title[]): { gerichtet: number; kanalBenannt: number } {
+  let gerichtet = 0
+  let kanalBenannt = 0
+  for (const t of allTitles) {
+    /*
+      **Und die Bezugswege zum Ansehen ebenso** (21.09.2026). JustWatchs „Amazon Prime
+      (Aniverse)" und Verwandte standen unter `/dp/` — bei „The Legend of Hei" eine 404-Seite,
+      während dieselbe Kennung unter der Video-Adresse lebt (Daniel mit Bild). Gegenprobe an
+      fünf Kanal-Wegen: fünfmal lebendig unter `/gp/video/detail/`, einmal tot unter `/dp/`.
+      Betroffen waren 597 Wege. Kaufwege (`kind: 'buy'`) bleiben: Eine DVD gibt es nur unter `/dp/`.
+    */
+    for (const w of t.watchLinks ?? []) {
+      if (w.kind !== 'stream' || !/amazon\.de\/dp\//i.test(w.url)) continue
+      const neu = amazonAdresseRichten(w.url)
+      if (neu !== w.url) gerichtet++
+      w.url = neu
+    }
+    /*
+      **Ein Kanal mit Amazon-Adresse heißt „Amazon Prime (Kanal)"** (21.09.2026). aniSearch
+      führt Kanäle teils unter dem Anbieter selbst (`anime-digital-network-(de)`, `aniverse`,
+      `pokémon-(de)`), TMDB als „Anime Digital Network Amazon Channel". Bei „Super Cube" stand
+      so eine zweite Pille „ADN", die zu Amazon führte (Daniel mit Bild). Gemessen am selben
+      Tag: 16 solche Wege, gegen 600 richtig benannte „Amazon Prime (…)".
+    */
+    for (const w of t.watchLinks ?? []) {
+      if (w.kind !== 'stream' || !/(^|\.)amazon\.de\//i.test(w.url.replace(/^https?:\/\//, '')) || /^amazon/i.test(w.name))
+        continue
+      const kanal = / Amazon Channel$/i.test(w.name) ? providerName(w.name.replace(/ Amazon Channel$/i, '')) : w.name
+      w.name = `Amazon Prime (${kanal})`
+      kanalBenannt++
+    }
+  }
+  return { gerichtet, kanalBenannt }
+}

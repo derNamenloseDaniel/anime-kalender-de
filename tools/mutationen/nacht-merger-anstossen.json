@@ -1,0 +1,13 @@
+[
+  { "name": "Kontrolle unmutiert", "aenderungen": [] },
+  { "name": "lauf: Wiederholung nicht aufgerufen", "datei": "tools/nacht-merger.mjs", "suche": "const r = nachrechnenMitWiederholung(welt, pr.nummer)", "ersetze": "const r = welt.nachrechnen(pr.nummer)" },
+  { "name": "Wiederholung: Exit-Prüfung immer falsch", "datei": "tools/nacht-merger.mjs", "suche": "erst.exit !== 2 ||", "ersetze": "false ||" },
+  { "name": "Wiederholung: Exit-Prüfung entfernt", "datei": "tools/nacht-merger.mjs", "suche": "erst.exit !== 2 || !", "ersetze": "!" },
+  { "name": "Wiederholung: Text-Prüfung umgekehrt", "datei": "tools/nacht-merger.mjs", "suche": "|| !NOCH_NICHT_BERECHNET.test(erst.text)", "ersetze": "|| NOCH_NICHT_BERECHNET.test(erst.text)" },
+  { "name": "Wiederholung: Text-Prüfung entfernt (jedes Exit 2)", "datei": "tools/nacht-merger.mjs", "suche": "|| !NOCH_NICHT_BERECHNET.test(erst.text)", "ersetze": "" },
+  { "name": "Wiederholung: Wartezeit entfällt", "datei": "tools/nacht-merger.mjs", "suche": "  welt.warte(UNKNOWN_WARTE_MS)\n  return welt.nachrechnen(nummer)", "ersetze": "  return welt.nachrechnen(nummer)" },
+  { "name": "Wiederholung: Wartezeit +1", "datei": "tools/nacht-merger.mjs", "suche": "|| 20_000", "ersetze": "|| 20_001" },
+  { "name": "Wiederholung: Wartezeit -1", "datei": "tools/nacht-merger.mjs", "suche": "|| 20_000", "ersetze": "|| 19_999" },
+  { "name": "Wiederholung: liefert das erste Ergebnis", "datei": "tools/nacht-merger.mjs", "suche": "  return welt.nachrechnen(nummer)\n}", "ersetze": "  welt.nachrechnen(nummer)\n  return erst\n}" },
+  { "name": "Verdrahtung: Welt hat kein warte", "datei": "tools/nacht-merger-welt.mjs", "suche": "    warte: schlafe,\n", "ersetze": "" }
+]

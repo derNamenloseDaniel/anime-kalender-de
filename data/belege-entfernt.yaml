@@ -1,0 +1,995 @@
+# Aus data/dub-confirmed.yaml entfernte Fehlbelege. Die abgeholten Browser-Meldungen hängen sie nicht wieder an
+# (pipeline/lib/belege-anhaengen.ts, Regel in pipeline/lib/belege-entfernt.ts). Ein Eintrag gilt für Kennung UND Adresse.
+# Wer einen Beleg als falsch entfernt, trägt ihn hier im selben Commit ein (pipeline/check-belege-entfernt.ts prüft,
+# dass kein Eintrag dieser Liste in der Beleg-Datei steht).
+- anilistId: 2225
+  url: https://www.disneyplus.com/de-de/browse/entity-cfb90125-8678-4327-a1b8-e608f293eccd
+  grund: 'Disney+-Seite gehört dem Cartoon Heidi (2015), nicht dem Anime von 1974 (#2263)'
+  entferntAm: '2026-10-28'
+- anilistId: 97986
+  url: https://www.amazon.de/gp/video/detail/B0CWLSM344
+  grund: 'Amazon-Seite gehört Made in Abyss: Die Goldene Stadt der sengenden Sonne (114745), nicht der ersten Staffel (#2257)'
+  entferntAm: '2026-10-28'
+- anilistId: 99470
+  url: https://www.amazon.de/dp/B0DMMT9B67
+  grund: 'Amazon-Seite gehört der Serie Grisaia Phantom Trigger (145740, 13 Folgen, nur Japanisch, Handbeleg dub:false), nicht dem 2-Folgen-Film 99470 (Zuordnung 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 105096
+  url: https://www.netflix.com/title/80057610
+  grund: 'Netflix-Seite gehört dem Cartoon Kulipari – Die Frosch-Armee (-74222), nicht Hero Mask (Zuordnung 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 20875
+  url: https://www.netflix.com/title/80180600
+  grund: 'Netflix-Seite gehört dem Cartoon Kulipari: Traumwandler (-83723), nicht Swordgai (Zuordnung 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 20875
+  url: https://www.netflix.com/title/81628023
+  grund: 'Netflix-Seite gehört dem Cartoon My Little Pony: Erzähle deine Geschichte (-202905), nicht Swordgai (Zuordnung 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 527
+  url: https://www.netflix.com/title/81553278
+  grund: 'Netflix-Seite gehört dem Cartoon Thomas & seine Freunde – Alle Maschinen los (-138523), nicht Pokémon (Zuordnung 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 163024
+  url: https://www.amazon.de/dp/B0CZTFL57B
+  grund: 'Kaufausgabe gehört Captain Tsubasa (100745, Folgen 29–40, Zuordnung 15.09.2026), nicht Staffel 2 (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 180745
+  url: https://www.amazon.de/dp/B0F1DKXTW7
+  grund: 'Seite hat 13 Folgen und gehört Staffel 2 (145545), nicht der 4. Staffel (16 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 124194
+  url: https://www.amazon.de/dp/B0G6HF46PV
+  grund: 'Seite hat 25 Folgen und ist Staffel 1 (105334), nicht Staffel 3 (13 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 117448
+  url: https://www.amazon.de/gp/video/detail/B0DV5RJM1Q
+  grund: 'Seite hat 12 Folgen und gehört der 1. Staffel (101004), nicht Staffel Ω (10 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 21874
+  url: https://www.amazon.de/gp/video/detail/0TKA5TG7J16JXLROE6HYTDJDN9
+  grund: 'Seite ist die OVA (21064, von Daniel am 03.10.2026 geklärt), nicht Film 1 (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 101811
+  url: https://www.amazon.de/gp/video/detail/B0CJY19RYP
+  grund: 'Seite gehört dem Film Akito (21178), nicht Code Geass Initiation (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 112125
+  url: https://www.amazon.de/gp/video/detail/B0GYMPR92B
+  grund: 'Seite gehört dem Film Arrow of the Orion (101166), nicht der OVA (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 2171
+  url: https://www.amazon.de/gp/video/detail/B0CBYFC4VN
+  grund: 'Seite gehört dem Film Das 14. Ziel (780), nicht Die azurblaue Piratenflagge (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 1505
+  url: https://www.amazon.de/gp/video/detail/B0CBJ7B4LP
+  grund: 'Seite gehört dem Film Der tickende Wolkenkratzer (779), nicht Das Komplott über dem Ozean (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 12117
+  url: https://www.amazon.de/gp/video/detail/B0FVGKW3GH
+  grund: 'Seite gehört dem Film Die 15 Minuten der Stille (9963), nicht Der 11. Stürmer (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 449
+  url: https://www.amazon.de/gp/video/detail/B0FXS96LSG
+  grund: 'Seite gehört dem Film Das Traumschloss im Inneren der Spiegel (450), nicht Die Insel Hourai im Flammenmeer (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 6325
+  url: https://www.amazon.de/gp/video/detail/B0GLDFTT19
+  grund: 'Seite gehört dem Film The Movie (2472), nicht Die Erben des Willens des Feuers (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 137612
+  url: https://www.amazon.de/gp/video/detail/B0B8SZ32DY
+  grund: 'Seite gehört Crown Handler 1 (101595), nicht Crown Handler 3 (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 137612
+  url: https://www.amazon.de/gp/video/detail/B0BZBFRZ5V
+  grund: 'Seite gehört Crown Handler 2 (129759), nicht Crown Handler 3 (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 126659
+  url: https://www.amazon.de/gp/video/detail/B0DPLC3MW8
+  grund: 'Seite gehört dem Film Heroes Rising (108553), nicht World Heroes’ Mission (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 108553
+  url: https://www.amazon.de/gp/video/detail/B0FV86Y4H1
+  grund: 'Seite gehört dem Film Two Heroes (100723), nicht Heroes Rising (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 20603
+  url: https://www.amazon.de/gp/video/detail/B09ZJW8HGH
+  grund: 'Seite hat 25 Folgen und gehört der 3. Staffel (20725), nicht der OVA (1 Folge) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 102977
+  url: https://www.amazon.de/gp/video/detail/B0CHBQ91TK
+  grund: 'Seite gehört Golden Kamuy 3 (110355, Beleg „laut Adresse Staffel 3“), nicht Staffel 2 (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 110355
+  url: https://www.amazon.de/gp/video/detail/B0CGGJKCT8
+  grund: 'Seite gehört Golden Kamuy 2 (102977, Beleg „laut Adresse Staffel 2“), nicht Staffel 3 (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 16049
+  url: https://www.amazon.de/gp/video/detail/B0CYWDP17J
+  grund: 'Seite hat 24 Folgen und gehört Railgun (6213); Railgun S hat B0CVFNLP9D „laut Adresse Staffel 2“ (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 15583
+  url: https://www.amazon.de/gp/video/detail/B0FLKK79P9
+  grund: 'Seite gehört Date a Live V (151380, Beleg „laut Adresse Staffel 5“), nicht der 1. Staffel (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 159309
+  url: https://www.amazon.de/gp/video/detail/B0CJRDG5R6
+  grund: 'Seite gehört Trapped in a Dating Sim (142074); Staffel 2 hat B0H7YCRTJN „laut Adresse Staffel 2“ (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 21087
+  url: https://www.amazon.de/gp/video/detail/B0D4KNHDMT
+  grund: 'Seite gehört One Punch Man 2 (97668, Beleg „laut Adresse Staffel 2“); Staffel 1 hat B0DCPGLMHR (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 143277
+  url: https://www.netflix.com/title/81642888
+  grund: 'Netflix-Seite gehört Urusei Yatsura Staffel 2 (155645, Folge 23 „Boy Meets Girl“ = Folge 46), nicht der 1. Staffel (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 21087
+  url: https://www.amazon.de/gp/video/detail/B0FTGLMFP3
+  grund: 'Beleg „laut Adresse Staffel 3“ gehört One-Punch Man Staffel 3 (153800) und ist dorthin umgehängt (Fehlablage, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 1889
+  url: https://www.amazon.de/gp/video/detail/B0CW5RP53F
+  grund: 'Seite (15 Folgen) gehört Higurashi Sotsu (131149), nicht Kai (24 Folgen); Beleg umgehängt (Fehlablage, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 21196
+  url: https://www.amazon.de/gp/video/detail/0M8DANTSGA69M1PDY94H2WE49L
+  grund: 'Seite hat 1 Folge und gehört dem Film Kabaneri: Brennendes Leben (98663), nicht der Serie; Beleg umgehängt (Fehlablage, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 130050
+  url: https://www.amazon.de/gp/video/detail/B0CC5GCCKZ
+  grund: 'Seite hat 13 Folgen (Rondo of Princesses mit OVA, 3712), ein Film hat keine 13 Folgen; Summer Ghost hat B0B8NF5X8N (Fehlablage, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 20605
+  url: https://www.amazon.de/gp/video/detail/B0D188KVH4
+  grund: 'Amazon-Seite gehört Tokyo Ghoul:re, nicht Staffel 1 (#1612)'
+  entferntAm: '2026-10-20'
+- anilistId: 182205
+  url: https://www.amazon.de/gp/video/detail/B0CJC11GRB
+  grund: 'Seite hat laut Adresse Staffel 2 (108511/116742), nicht Staffel 4 (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 182205
+  url: https://www.amazon.de/gp/video/detail/B0CVS8488Z
+  grund: 'Seite hat laut Adresse Staffel 3 (156822), nicht Staffel 4 (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 6213
+  url: https://www.amazon.de/gp/video/detail/B0CGGZVNFS
+  grund: 'Seite hat 25 Folgen und ist Railgun T (100185, laut Adresse Staffel 3), nicht Staffel 1 (24 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 180745
+  url: https://www.amazon.de/gp/video/detail/B0GGJKGT5P
+  grund: 'Seite hat 12 Folgen und gehört der 1. Staffel (98659), nicht der 4. Staffel (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 146066
+  url: https://www.amazon.de/gp/video/detail/B0F1DKXTW7
+  grund: 'Seite gehört laut Adresse Staffel 2 (145545), nicht Staffel 3 (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 146066
+  url: https://www.amazon.de/gp/video/detail/B0GGJKGT5P
+  grund: 'Seite hat 12 Folgen und gehört der 1. Staffel (98659), nicht Staffel 3 (13 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 21003
+  url: https://www.amazon.de/gp/video/detail/B0GP83RCNX
+  grund: 'Seite hat 13 Folgen, laut Adresse Staffel 3 der Serie (14355), nicht die 2 Specials (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 124194
+  url: https://www.amazon.de/gp/video/detail/B0GFGTTR3N
+  grund: 'Seite hat 25 Folgen und gehört Fruits Basket Staffel 2 (111762), nicht Staffel 3 (13 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 145064
+  url: https://www.amazon.de/gp/video/detail/B0H8NJSHG8
+  grund: 'Seite gehört Staffel 3 Teil 1 (172463, laut Adresse Staffel 4 / 12 Folgen), nicht Staffel 2 (23 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 116742
+  url: https://www.amazon.de/gp/video/detail/B0CVS8488Z
+  grund: 'Seite hat 24 Folgen und gehört Staffel 3 (156822), nicht Staffel 2 Teil 2 (12 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 14813
+  url: https://www.amazon.de/gp/video/detail/B0B5HRCG7M
+  grund: 'Seite hat 12 Folgen und gehört Climax/TOO (108489, 20698), nicht der 1. Staffel (13 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 1195
+  url: https://www.amazon.de/gp/video/detail/B0DHYDBJWD
+  grund: 'Seite hat 12 Folgen und gehört „F“ (11319), nicht Staffel 1 (13 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 2167
+  url: https://www.amazon.de/gp/video/detail/B0H4834VK9
+  grund: 'Seite hat 25 Folgen und gehört After Story (4181), nicht Clannad (23 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 8937
+  url: https://www.amazon.de/gp/video/detail/B0CH5YL4B4
+  grund: 'Seite hat 25 Folgen und ist Railgun T (100185), nicht Index II (24 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 98437
+  url: https://www.amazon.de/gp/video/detail/B0DN482ZYY
+  grund: 'Seite hat laut Adresse Staffel 1 (20832), nicht Staffel 2 (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 133844
+  url: https://www.amazon.de/gp/video/detail/B0DN482ZYY
+  grund: 'Seite hat laut Adresse Staffel 1 (20832), nicht Staffel 4 (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 5764
+  url: https://www.amazon.de/gp/video/detail/B0B8RQ86ZZ
+  grund: 'Seite hat 13 Folgen und gehört der Serie (1195), nicht der OVA (1 Folge) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 111762
+  url: https://www.amazon.de/gp/video/detail/B0GDFC7BL6
+  grund: 'Seite gehört Fruits Basket Staffel 3 (124194, 13 Folgen, deutsch), nicht Staffel 2 (25 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 131149
+  url: https://www.amazon.de/gp/video/detail/B0CBKJKYM4
+  grund: 'Seite hat 24 Folgen und gehört Kai (1889), nicht Sotsu (15 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 1195
+  url: https://www.amazon.de/gp/video/detail/B0B8PXXV17
+  grund: 'Seite hat 12 Folgen und gehört Staffel 2 (1840), nicht Staffel 1 (13 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 3712
+  url: https://www.amazon.de/gp/video/detail/B0B8RQ86ZZ
+  grund: 'Seite hat 13 Folgen und gehört Staffel 1 (1195), nicht „Rondo“ (12 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 101280
+  url: https://www.amazon.de/gp/video/detail/B0F4V6JFZK
+  grund: 'Seite hat 12 Folgen, laut Adresse Staffel 2 (108511), nicht Staffel 1 (24 Folgen) (Fremdzuordnung, 29.10.2026)'
+  entferntAm: '2026-10-29'
+- anilistId: 102351
+  url: https://www.amazon.de/gp/video/detail/B0D83P6X34
+  grund: 'Seite zeigt Tokyo Ghoul Staffel 1 (12 Folgen, gti df2c72f7, Beleg 20605), nicht :re (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 100240
+  url: https://www.amazon.de/gp/video/detail/B0DB78FWK9
+  grund: 'Seite zeigt Tokyo Ghoul Staffel 1 (gti df2c72f7, Beleg 20605), nicht :re; :re hat B0CW5WH6XZ (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 100240
+  url: https://www.amazon.de/gp/video/detail/B0D83P6X34
+  grund: 'Seite zeigt Tokyo Ghoul Staffel 1 (Beleg 20605), nicht :re (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 20850
+  url: https://www.amazon.de/gp/video/detail/B0D83P6X34
+  grund: 'Seite zeigt Tokyo Ghoul Staffel 1 (Beleg 20605); √A hat B0DCXV5GMB (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 101117
+  url: https://www.amazon.de/gp/video/detail/B0CGVS29ZD
+  grund: 'Seite hat 12 Folgen und gehört Free! Iwatobi (18507); Dive hat B0CJK3GVR1 (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 101117
+  url: https://www.amazon.de/gp/video/detail/B0CH396B9Y
+  grund: 'Seite hat 13 Folgen und gehört nicht Dive (12 Folgen, B0CJK3GVR1); vermutlich Eternal Summer (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 18507
+  url: https://www.amazon.de/gp/video/detail/B0CH396B9Y
+  grund: 'Seite hat 13 Folgen, Iwatobi hat 12; vermutlich Eternal Summer (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 18507
+  url: https://www.amazon.de/gp/video/detail/B0CJK3GVR1
+  grund: 'Seite gehört Free! Dive to the Future (101117, Deutsch, 12 Folgen, gti 836c011c) (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 14813
+  url: https://www.amazon.de/gp/video/detail/B0B6TTP1TL
+  grund: 'Seite gehört SNAFU TOO! (20698, gti d423b351); Staffel 1 hat B0B5HR8NVX (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 20698
+  url: https://www.amazon.de/gp/video/detail/B0B5HR8NVX
+  grund: 'Seite gehört SNAFU Staffel 1 (14813, gti a904e94f, „laut Adresse Staffel 1“) (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 136430
+  url: https://www.amazon.de/gp/video/detail/B0BX1M7K82
+  grund: 'Seite gehört Vinland Saga Staffel 1 (101348, gti 28dcdb64, 24 Folgen); Staffel 2 hat B0B8Q3TSS9 (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 136430
+  url: https://www.amazon.de/gp/video/detail/B0C55SJB1W
+  grund: 'Seite gehört Vinland Saga Staffel 1 (101348, gti 28dcdb64); Staffel 2 bleibt über B0B8Q3TSS9 (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 117612
+  url: https://www.amazon.de/gp/video/detail/B0G1DT86QJ
+  grund: 'Seite („laut Adresse Staffel 2“) gehört Realist Hero Teil 2 (139648) und ist dorthin umgehängt; die Messung von B0GFC11F2R hängt jetzt an dieser Adresse (Fehlablage, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 106625
+  url: https://www.amazon.de/gp/video/detail/B0D544CDK6
+  grund: 'Seite hat 11 Folgen und gehört Haikyu!! Staffel 3 (21698); Staffel 4 hat B0D2NL5GYX (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 21518
+  url: https://www.amazon.de/gp/video/detail/B0CJPKQQNL
+  grund: 'Seite hat 12 Folgen und gehört Food Wars! Fourth Plate (109963), Second Plate hat 13 (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 1195
+  url: https://www.amazon.de/gp/video/detail/B0CC5GCCKZ
+  grund: 'Seite hat 13 Folgen (Rondo of Princesses 12 + OVA, 3712); Staffel 1 hat B0B8RQ86ZZ (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 5764
+  url: https://www.amazon.de/gp/video/detail/B0CC5GCCKZ
+  grund: 'Zeile „laut Adresse Staffel 1“ gehört Familiar of Zero Staffel 1 (1195), nicht der OVA (Fehlablage, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 187054
+  url: https://www.amazon.de/gp/video/detail/B07XYDCVFK
+  grund: 'Seite gehört Sylvanian Families Ivy (187053, Prime-Weg, Erstausgabe Amazon); Klee erschien bei Netflix (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 4437
+  url: https://www.amazon.de/gp/video/detail/B01HSH3W1G
+  grund: 'Seite gehört dem Film Naruto Movie 2 (936, Beleg „Seitenadresse B01HSH3W1G“); 4437 hat B0GMYN3JS9 (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 20913
+  url: https://www.amazon.de/gp/video/detail/B0C8TKFF2J
+  grund: 'Seite gehört K (14467, gti 8eb57c90); Return of Kings hat B0C8THGKXC (Fremdzuordnung, 30.10.2026)'
+  entferntAm: '2026-10-30'
+- anilistId: 21699
+  url: https://www.amazon.de/gp/video/detail/B0F3TCT3TG
+  grund: 'Seite hat 13 Folgen (11 + 2 Bonus) und gehört Staffel 3 (136804), nicht Staffel 2 mit 10 Folgen (Meldungen 4742, 8832, 24007; Zuordnung pendelte zwischen den Bestandsläufen, #2497)'
+  entferntAm: '2026-10-31'
+- anilistId: 10719
+  url: https://www.amazon.de/gp/video/detail/B09JV7CC61
+  grund: 'Seite B09JV7CC61 gehört Haganai NEXT (14967, Seite B0CZ4GBM2D, gleiche gti 7669196e, Staffel 2; prime-zugeordnet.json), nicht der ersten Staffel (Meldungen 8556, 24279, 02.11.2026)'
+  entferntAm: '2026-11-02'
+- anilistId: 14967
+  url: https://www.amazon.de/gp/video/detail/B09JV7CC61
+  grund: 'Doppel: B09JV7CC61 und B0CZ4GBM2D sind dieselbe Serienseite (gleiche gti 7669196e, prime-zugeordnet.json Seite B0CZ4GBM2D); der Weg B0CZ4GBM2D steht schon (Haganai NEXT, 02.11.2026)'
+  entferntAm: '2026-11-02'
+- anilistId: 131264
+  url: https://www.amazon.de/gp/video/detail/B0D58K5WH5
+  grund: 'Seite gehört InuYasha (249): alle drei Meldungen (2723, 22754, 22794) lesen den Titel InuYasha, 27 Folgen, Staffel 2; Yashahime hat Crunchyroll und Joyn (Zuordnung 02.11.2026)'
+  entferntAm: '2026-11-02'
+- anilistId: 20578
+  url: https://www.amazon.de/gp/video/detail/B0CH9BW1PW
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 10172
+  url: https://www.amazon.de/gp/video/detail/B0CH9BW1PW
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 4814
+  url: https://www.amazon.de/gp/video/detail/B0D1XZZH1F
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188055
+  url: https://www.amazon.de/gp/video/detail/B0FLQN4VG9
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188056
+  url: https://www.amazon.de/gp/video/detail/B0FLQN4VG9
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188058
+  url: https://www.amazon.de/gp/video/detail/B0FLQN4VG9
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188059
+  url: https://www.amazon.de/gp/video/detail/B0FLQN4VG9
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 4654
+  url: https://www.amazon.de/gp/video/detail/B0CG86KS61
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 14355
+  url: https://www.amazon.de/gp/video/detail/B0GNH738G2
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 100780
+  url: https://www.amazon.de/gp/video/detail/B09MHFZFC8
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 124080
+  url: https://www.amazon.de/dp/B0CG8SW2YQ
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CNGQNN2P
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 8937
+  url: https://www.amazon.de/gp/video/detail/B0CVFNLP9D
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 163828
+  url: https://www.amazon.de/gp/video/detail/B0FVGGZNJ5
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188055
+  url: https://www.amazon.de/gp/video/detail/B0FVGGZNJ5
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188056
+  url: https://www.amazon.de/gp/video/detail/B0FVGGZNJ5
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188059
+  url: https://www.amazon.de/gp/video/detail/B0FVGGZNJ5
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 163828
+  url: https://www.amazon.de/gp/video/detail/B0FNRYDMBV
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188056
+  url: https://www.amazon.de/gp/video/detail/B0FNRYDMBV
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188058
+  url: https://www.amazon.de/gp/video/detail/B0FNRYDMBV
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188059
+  url: https://www.amazon.de/gp/video/detail/B0FNRYDMBV
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 163828
+  url: https://www.amazon.de/gp/video/detail/B0FF5DG447
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188055
+  url: https://www.amazon.de/gp/video/detail/B0FF5DG447
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188058
+  url: https://www.amazon.de/gp/video/detail/B0FF5DG447
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188059
+  url: https://www.amazon.de/gp/video/detail/B0FF5DG447
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 163828
+  url: https://www.amazon.de/gp/video/detail/B0FVGMRDR6
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188055
+  url: https://www.amazon.de/gp/video/detail/B0FVGMRDR6
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188056
+  url: https://www.amazon.de/gp/video/detail/B0FVGMRDR6
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 188058
+  url: https://www.amazon.de/gp/video/detail/B0FVGMRDR6
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 144932
+  url: https://www.amazon.de/gp/video/detail/B0H4834VK9
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 20698
+  url: https://www.amazon.de/gp/video/detail/B0B5HRCG7M
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 11307
+  url: https://www.amazon.de/gp/video/detail/B00ERK3MQ8
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 101165
+  url: https://www.amazon.de/dp/B0CFL5Y7XN
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 21856
+  url: https://www.amazon.de/gp/video/detail/B0CC5DX1T7
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 100166
+  url: https://www.amazon.de/gp/video/detail/B0CC5DX1T7
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 117193
+  url: https://www.amazon.de/gp/video/detail/B0CC5DX1T7
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 139630
+  url: https://www.amazon.de/gp/video/detail/B0CC5DX1T7
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 163139
+  url: https://www.amazon.de/gp/video/detail/B0CC5DX1T7
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 182896
+  url: https://www.amazon.de/gp/video/detail/B0CC5DX1T7
+  grund: 'Notizseite gehört einem anderen Titel (Altfälle-Abarbeitung 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 10012621
+  url: https://www.amazon.de/dp/B0DJ4FCM5H
+  grund: 'Amazon-Seite B0DJ4FCM5H (1 Folge, Kanal Kixi) gehört Prinz Ribbit (10011569, 1 Folge, Kixi-Seite prinz-ribbit), nicht Super Wings (52 Folgen, Toggo/RTL; Altfälle 03.11.2026)'
+- anilistId: 1889
+  url: https://www.amazon.de/gp/video/detail/B09JTSD79F
+  grund: 'Seite gehört Higurashi no Naku Koro ni (Staffel 1, 2006) (934), nicht dem angegebenen Titel (Prime-Restliste 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 1889
+  url: https://www.amazon.de/gp/video/detail/B0CBKJKYM4
+  grund: 'Seite gehört Higurashi: When They Cry Gou (114446), nicht dem angegebenen Titel (Prime-Restliste 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 11307
+  url: https://www.amazon.de/gp/video/detail/B00IKSHXG8
+  grund: 'Seite gehört Es war einmal … Entdecker und Erfinder (10005293), nicht dem angegebenen Titel (Prime-Restliste 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 11307
+  url: https://www.amazon.de/gp/video/detail/B00IKSSO70
+  grund: 'Seite gehört Es war einmal … Amerika (10004750), nicht dem angegebenen Titel (Prime-Restliste 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 11307
+  url: https://www.amazon.de/gp/video/detail/B00IKSJP6O
+  grund: 'Seite gehört Es war einmal … Die Entdeckung unserer Welt (10005217), nicht dem angegebenen Titel (Prime-Restliste 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 11307
+  url: https://www.amazon.de/gp/video/detail/B00RWFX9CW
+  grund: 'Seite gehört einer Reihe, die wir nicht führen (Staffel 7, Alternative Energien) (Prime-Restliste 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 11307
+  url: https://www.amazon.de/gp/video/detail/B01L62OGCI
+  grund: 'Seite gehört einer Reihe, die wir nicht führen (Staffel 8, Solar Impulse) (Prime-Restliste 03.11.2026)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CGMVVT8X
+  grund: 'Pokémon-Kanalseite (Staffel „Staffel 2 Band 2“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CGZY983N
+  grund: 'Pokémon-Kanalseite (Staffel „Staffel 2101“, Rohzeilen der Meldungskopie 03.11.2026) gehört Sonne & Mond (97634), nicht der ersten Serie (527)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CH3DCVW6
+  grund: 'Pokémon-Kanalseite (Staffel „Staffel 20 Teil 2“, Rohzeilen der Meldungskopie 03.11.2026) gehört Sonne & Mond (97634), nicht der ersten Serie (527)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CH3SN9L1
+  grund: 'Pokémon-Kanalseite (Staffel „Staffel 2104“, Rohzeilen der Meldungskopie 03.11.2026) gehört Sonne & Mond (97634), nicht der ersten Serie (527)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CJLR7CLT
+  grund: 'Pokémon-Kanalseite (Staffel „Staffel 2 Band 3“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CJP92569
+  grund: 'Pokémon-Kanalseite (Staffel „Staffel 20 Teil 3“, Rohzeilen der Meldungskopie 03.11.2026) gehört Sonne & Mond (97634), nicht der ersten Serie (527)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CJQDVS5H
+  grund: 'Pokémon-Kanalseite (Staffel „Staffel 2 Band 1“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CJSYBV2D
+  grund: 'Pokémon-Kanalseite (Staffel „Teil 4“, Rohzeilen der Meldungskopie 03.11.2026) gehört Sonne & Mond (97634), nicht der ersten Serie (527)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CLLNHKGX
+  grund: 'Pokémon-Kanalseite (Staffel „Staffel 2103“, Rohzeilen der Meldungskopie 03.11.2026) gehört Sonne & Mond (97634), nicht der ersten Serie (527)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CM453B26
+  grund: 'Pokémon-Kanalseite (Staffel „Staffel 2102“, Rohzeilen der Meldungskopie 03.11.2026) gehört Sonne & Mond (97634), nicht der ersten Serie (527)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CMCSGG5B
+  grund: 'Pokémon-Kanalseite (Staffel „Staffel 2 Band 4“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CN9PNHTV
+  grund: 'Pokémon-Kanalseite (Staffel „Band 5“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CV4GB8CD
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 2“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CV4GB8CD
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 2“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CVHJ47BP
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 3“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CVHJ47BP
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 3“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CVMSTW44
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 3“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CVMSTW44
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 3“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CVNHPVBS
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 3“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CVNHPVBS
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 3“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CVQHBYT6
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 2“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CVQHBYT6
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 2“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CW4QLFJQ
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 4“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CW4QLFJQ
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 4“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CW97DG21
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 1“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CW97DG21
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 1“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CWB4VLSB
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 4“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CWB4VLSB
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 4“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CWPKJ5YM
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 4“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CWPKJ5YM
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 4“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CX3JT43W
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 2“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CX3JT43W
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 2“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CXGMWR2X
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 2“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CXGMWR2X
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 2“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CXKV9K66
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 3“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CXKV9K66
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 3“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CY142C1B
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 1“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CY142C1B
+  grund: 'Pokémon-Kanalseite (Staffel „Rubin und Saphir, Band 1“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DBRBR4LW
+  grund: 'Pokémon-Kanalseite (Staffel „Gold und Silber“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DJ1JR29D
+  grund: 'Pokémon-Kanalseite (Staffel „Gold und Silber“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNBZ67NK
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNBZ67NK
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNC1RLQN
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNC1RLQN
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNC1WZKP
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNC1WZKP
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNC2D7PS
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNC2D7PS
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNC2FD5M
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNC2FD5M
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNC3HYS1
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNC3HYS1
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNC3V2CW
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNC3V2CW
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNC458FN
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNC458FN
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNC578GM
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNC578GM
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNC5TR2F
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNC5TR2F
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNC92R9S
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNC92R9S
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNCF1H62
+  grund: 'Pokémon-Kanalseite (Staffel „Gold und Silber“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNCF1MFZ
+  grund: 'Pokémon-Kanalseite (Staffel „Gold und Silber“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNCF3BHW
+  grund: 'Pokémon-Kanalseite (Staffel „Gold und Silber“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNCG8746
+  grund: 'Pokémon-Kanalseite (Staffel „Gold und Silber“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNCG8GT9
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNCG8GT9
+  grund: 'Pokémon-Kanalseite (Staffel „Schwarz und Weiß“, Rohzeilen der Meldungskopie 03.11.2026) gehört weder der ersten Serie (527) noch Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNCGCVN6
+  grund: 'Pokémon-Kanalseite (Staffel „Gold und Silber“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNCGKCG9
+  grund: 'Pokémon-Kanalseite (Staffel „Gold und Silber“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNCGNSP4
+  grund: 'Pokémon-Kanalseite (Staffel „Gold und Silber“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNCGP14M
+  grund: 'Pokémon-Kanalseite (Staffel „Gold und Silber“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNCGPP9Z
+  grund: 'Pokémon-Kanalseite (Staffel „Gold und Silber“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNCH2FW4
+  grund: 'Pokémon-Kanalseite (Staffel „Gold und Silber“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0DNCLBMLQ
+  grund: 'Pokémon-Kanalseite (Staffel „Gold und Silber“, Rohzeilen der Meldungskopie 03.11.2026) gehört der ersten Serie (527), nicht Sonne & Mond (97634)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNDB2PLM
+  grund: 'Pokémon-Kanalseite (Staffel „Ultra-Legenden“, Rohzeilen der Meldungskopie 03.11.2026) gehört Sonne & Mond (97634), nicht der ersten Serie (527)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNDB4Y9V
+  grund: 'Pokémon-Kanalseite (Staffel „Ultra-Legenden“, Rohzeilen der Meldungskopie 03.11.2026) gehört Sonne & Mond (97634), nicht der ersten Serie (527)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNDB9PCP
+  grund: 'Pokémon-Kanalseite (Staffel „Ultra-Legenden“, Rohzeilen der Meldungskopie 03.11.2026) gehört Sonne & Mond (97634), nicht der ersten Serie (527)'
+  entferntAm: '2026-11-03'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0DNDBKNMQ
+  grund: 'Pokémon-Kanalseite (Staffel „Ultra-Legenden“, Rohzeilen der Meldungskopie 03.11.2026) gehört Sonne & Mond (97634), nicht der ersten Serie (527)'
+  entferntAm: '2026-11-03'
+- anilistId: 5027
+  url: https://www.amazon.de/gp/video/detail/B010QJOLA4
+  grund: 'Seite „Staffel 2 Teil 1“ (10 Folgen) gehört Yuna & Stitch Staffel 2 (6899), nicht der ersten Staffel'
+  entferntAm: '2026-11-03'
+- anilistId: 5027
+  url: https://www.amazon.de/gp/video/detail/B0H4BCQFYP
+  grund: 'Seite „Staffel 2 Teil 2“ (10 Folgen) gehört Yuna & Stitch Staffel 2 (6899), nicht der ersten Staffel'
+  entferntAm: '2026-11-03'
+- anilistId: 6899
+  url: https://www.amazon.de/gp/video/detail/B0H4HK2PBB
+  grund: 'Seite „Staffel 1 Teil 1“ (11 Folgen) gehört Yuna & Stitch (5027), nicht Staffel 2'
+  entferntAm: '2026-11-03'
+- anilistId: 163146
+  url: https://www.amazon.de/gp/video/detail/B0BZYQSDN8
+  grund: 'Seite „Staffel 1“ (25 Folgen, 2022) gehört Bluelock (137822), nicht Blue Lock Staffel 2 (2024)'
+  entferntAm: '2026-11-03'
+- anilistId: 144932
+  url: https://www.amazon.de/gp/video/detail/B0D956JD5Y
+  grund: 'Seite „Staffel 1“ (24 Folgen, 2016) gehört Clannad (2167), nicht Edens Zero Staffel 2 (2023)'
+  entferntAm: '2026-11-03'
+- anilistId: 100240
+  url: https://www.amazon.de/gp/video/detail/B0DCXV5GMB
+  grund: 'Seite „Staffel 2“ (12 Folgen) gehört Tokyo Ghoul √A (20850), nicht Tokyo Ghoul:re'
+  entferntAm: '2026-11-03'
+- anilistId: 102351
+  url: https://www.amazon.de/gp/video/detail/B0DCXV5GMB
+  grund: 'Seite „Staffel 2“ (12 Folgen) gehört Tokyo Ghoul √A (20850), nicht Tokyo Ghoul:re'
+  entferntAm: '2026-11-03'
+- anilistId: 20850
+  url: https://www.amazon.de/gp/video/detail/B0CW5WH6XZ
+  grund: 'Seite „Staffel 3“ (12 Folgen) ist eine Tokyo-Ghoul:re-Staffel, nicht √A (Staffel 2 ist B0DCXV5GMB)'
+  entferntAm: '2026-11-03'
+- anilistId: 20850
+  url: https://www.amazon.de/gp/video/detail/B0D7N68Q5T
+  grund: 'Seite „Staffel 4“ (12 Folgen) ist eine Tokyo-Ghoul:re-Staffel, nicht √A (Staffel 2 ist B0DCXV5GMB)'
+  entferntAm: '2026-11-03'
+- anilistId: 11307
+  url: https://www.amazon.de/gp/video/detail/B00IKSSO70
+  grund: 'Kanalseite „Staffel 4“ (26 Folgen, 1992) gehört Es war einmal … Amerika (10004750), nicht … der Weltraum (1982)'
+  entferntAm: '2026-11-03'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CVWZXGJT
+  grund: 'Pokémon-Kanalseite „Staffel 901“ (12 Folgen, Oktober 2006) gehört nicht Sonne & Mond (2016–2019); Besitz liegt bei der ersten Serie (527), PR 2760 R2'
+  entferntAm: '2026-11-03'
+- anilistId: 16049
+  url: https://www.amazon.de/gp/video/detail/B0CGGZVNFS
+  grund: 'Seite „Staffel 3“ mit 25 Folgen ist Railgun T (AniList 104462, 25 Folgen, 2020), nicht Railgun S (16049, 24 Folgen)'
+  entferntAm: '2026-11-04'
+- anilistId: 100185
+  url: https://www.amazon.de/gp/video/detail/B0CGGZVNFS
+  grund: 'Seite „Staffel 3“ mit 25 Folgen ist Railgun T (104462), nicht Magical Index III (100185, 26 Folgen)'
+  entferntAm: '2026-11-04'
+- anilistId: 102351
+  url: https://www.amazon.de/gp/video/detail/B0CW5WH6XZ
+  grund: 'Seite „Staffel 3“ trägt die Folgen von Tokyo Ghoul:re (100240, Start – Jäger …), nicht von :re 2 (102351)'
+  entferntAm: '2026-11-04'
+- anilistId: 100240
+  url: https://www.amazon.de/gp/video/detail/B0D7N68Q5T
+  grund: 'Seite „Staffel 4“ trägt die Folgen von Tokyo Ghoul:re 2 (102351, Und noch einmal – Place …), nicht von :re (100240)'
+  entferntAm: '2026-11-04'
+- anilistId: 527
+  url: https://www.amazon.de/gp/video/detail/B0CVG5M4FP
+  grund: 'Kanalseite „Staffel 6 Band 1“ trägt die 13 Folgen von Pokémon Advanced Generation (1564, Pikachu in Not! …), nicht der ersten Serie'
+  entferntAm: '2026-11-04'
+- anilistId: 97634
+  url: https://www.amazon.de/gp/video/detail/B0CVG5M4FP
+  grund: 'Kanalseite „Staffel 6 Band 1“ trägt die 13 Folgen von Pokémon Advanced Generation (1564, Pikachu in Not! …), nicht Sonne & Mond'
+  entferntAm: '2026-11-04'
+- anilistId: 10012621
+  url: https://www.amazon.de/gp/video/detail/B0DJ4FCM5H
+  grund: 'Seite hat eine Folge „Prinz Ribbit“ (89 min, Film) = Prinz Ribbit: Ein Frosch auf Umwegen! (10011569), nicht die Serie Super Wings'
+  entferntAm: '2026-11-04'
+- anilistId: -13247
+  url: https://www.amazon.de/gp/video/detail/B07XYDCVFK
+  grund: 'Seite mit 12 Mini-Folgen (gti 76b69f3a) gehört Sylvanian Families Mini Story Ivy (187053); TMDB tv/13247 (API, 05.11.2026): Season 1 26 Folgen, Ivy 12, Clover 12, Peony 12, jede Folge 3 min, zusammen 62 Folgen; AniList 187053 hat 12 Folgen à 3 min; RTL+ „Freyas fröhliches Tagebuch“ führt den Cartoon'
+  entferntAm: '2026-11-05'
+- anilistId: -13247
+  url: https://www.amazon.de/gp/video/detail/0J822CL4BXX0ZX75E9JA1XCMND
+  grund: 'Gleiche Amazon-Serienkennung (gti 76b69f3a, 12 Folgen) wie B07XYDCVFK = Mini Story Ivy (187053), nicht der Cartoon mit 62 Folgen'
+  entferntAm: '2026-11-05'
+- anilistId: 130622
+  url: https://www.amazon.de/gp/video/detail/B0FX4Q35V2
+  grund: 'Seite hat eine Folge „The Birth of Kitaro: Das Geheimnis von GeGeGe“ (erschienen 18.11.2025, 105 min, polyband) = Shinsei-ban 2024 (10019697), nicht das Original von 2023'
+  entferntAm: '2026-11-04'
+- anilistId: 182587
+  url: https://www.amazon.de/dp/B0B7D5DRV2
+  grund: 'Seite B0B7D5DRV2 ist Staffel 1 (150672, Zuordnung prime-zugeordnet.json); die Staffel-1-Meldungen an der Adresse B0GFPBT6FG nennen sie in der Notiz und wurden auch an 182587 gehängt (#3316, Bestandsbau 10.11.2026)'
+  entferntAm: '2026-11-10'
+- anilistId: 150672
+  url: https://www.amazon.de/gp/video/detail/B0GFPBT6FG
+  grund: 'Kanal-Seite B0GFPBT6FG gehört Staffel 3 (182587); die Staffel-1-Blöcke von 150672 stehen seit #3339 an B0B7D5DRV2, der Pauschalblock vom 23.08. ist gelöscht — der Bestandsbau liest die Meldungen jeden Lauf neu und hängte sie sonst wieder an (10.11.2026)'
+  entferntAm: '2026-11-10'
+- anilistId: 16894
+  url: https://www.amazon.de/gp/video/detail/B0B6R47YQ3
+  grund: 'Seite B0B6R47YQ3 gehört Kuroko 3rd Season (20725, Handbeleg 28.09., 25 Folgen); die Zeile von 16894 ist ein Staffelwähler-Stummel der Serienseite B09ZJW8HGH ohne Folge (unsere null), 16894 hat B0H47T317D mit 24 Folgen (Fremdzuordnung, 12.11.2026)'
+  entferntAm: '2026-11-12'
+- anilistId: 20725
+  url: https://www.amazon.de/gp/video/detail/B0H47T317D
+  grund: 'Seite B0H47T317D gehört Kuroko 2nd Season (16894, Handbeleg 28.09., 25 Folgen, zugeordnete Zeile mit 24 Folgen); die Zeile von 20725 ist ein Staffelwähler-Stummel der Serienseite B0B6R47YQ3 ohne Folge (unsere null) (Fremdzuordnung, 12.11.2026)'
+  entferntAm: '2026-11-12'
+- anilistId: 143277
+  url: https://www.amazon.de/gp/video/detail/B0GQ5Z2KBR
+  grund: 'Seite B0GQ5Z2KBR ist die Serienseite (gti e3405b7b, Handbeleg von 143277 an dieser gti, Staffel 1); die Meldungen vom 16.10. mit Staffel 2 an B0GQ5Z2KBR gehören 155645 (prime-zugeordnet.json seit #1444, Stream B0GXQVM89H) und wurden mit dem Namen „Seasons 1 & 2“ auch an 143277 gehängt — der Bestandsbau legte daraus einen zweiten Handbeleg an und stellte 155645 zurück (Fremdzuordnung, 12.11.2026)'
+  entferntAm: '2026-11-12'
+- anilistId: 2571
+  url: https://www.amazon.de/gp/video/detail/B013PTWL2W
+  grund: 'Amazon-Seite B013PTWL2W gehört der Biene Maja von 1982 (8373), nicht der Serie von 1975; Belege getauscht (#3605, 12.11.2026)'
+  entferntAm: '2026-11-12'
+- anilistId: 8373
+  url: https://www.amazon.de/gp/video/detail/B013PQIF2U
+  grund: 'Amazon-Seite B013PQIF2U gehört der Biene Maja von 1975 (2571), nicht der Serie von 1982; Belege getauscht (#3605, 12.11.2026)'
+  entferntAm: '2026-11-12'
+- anilistId: 20462
+  url: https://www.amazon.de/dp/B07LHCSXV6
+  grund: 'Seite B07LHCSXV6 ist dieselbe Staffel-1-Seite wie B07LHFLDBS (Messung 12.11.2026); der Beleg von 20462 steht jetzt an B07LHFLDBS, die alte Zeile nannte „10 Folgen“ (Adresswechsel 12.11.2026)'
+  entferntAm: '2026-11-12'
+- anilistId: 20719
+  url: https://www.amazon.de/dp/B07LHCSXV6
+  grund: 'Seite B07LHCSXV6 gehört Chaika Staffel 1 (20462, 12 Folgen), nicht Avenging Battle (20719, Staffel 2 = B07MXMCF4V, Deutsch nicht belegt; Fremdzuordnung, 12.11.2026)'
+  entferntAm: '2026-11-12'
+- anilistId: 20719
+  url: https://www.amazon.de/gp/video/detail/B07LHFLDBS
+  grund: 'Seite B07LHFLDBS gehört Chaika Staffel 1 (20462, 12 Folgen), nicht Avenging Battle (20719; Fremdzuordnung, 12.11.2026)'
+  entferntAm: '2026-11-12'
+- anilistId: 146493
+  url: https://www.amazon.de/dp/B07LHFLDBS
+  grund: 'Seite B07LHFLDBS gehört Chaika Staffel 1 (20462, Messung 12.11.2026), nicht Ragna Crimson (146493; Fremdzuordnung, 12.11.2026)'
+  entferntAm: '2026-11-12'
+- anilistId: 20719
+  url: https://www.amazon.de/gp/video/detail/B07MXMCF4V
+  grund: 'Messung 14.11.2026 23:36 an B07MXMCF4V widerspricht sich: Meldung 27458 zeigt die Staffel-2-Seite gesperrt (10 Folgen), Meldung 27459 Sekunden später Folgen und gti von Staffel 1 (B07LHFLDBS, 12 Folgen). Der Nein-Beleg hätte Avenging Battle den Weg genommen, während prime-zugeordnet.json die Seite Staffel 1 (20462) zuschrieb; erst nach sauberer Neumessung der Seite wieder eintragen (Notizseite-Wächter, 15.11.2026)'
+  entferntAm: '2026-11-15'
+- anilistId: 20462
+  url: https://www.amazon.de/gp/video/detail/B07MXMCF4V
+  grund: 'Seite B07MXMCF4V ist die Staffel-2-Seite (Avenging Battle, 20719, 10 Folgen; Notiz oben, 14./15.11.2026); 20462 (Staffel 1, 12 Folgen) führt B07LHFLDBS. Die Meldung in prime-zugeordnet.json schrieb sie Staffel 1 zu, weil die Seite Sekunden später die gti von Staffel 1 zeigte (widersprüchliche Messung 14.11.2026). Neumessung der Seite steht aus (16.11.2026)'
+  entferntAm: '2026-11-16'
+- anilistId: 15489
+  url: https://www.amazon.de/gp/video/detail/B0H1R11K51
+  grund: 'Seite B0H1R11K51 ist Prime-Staffel 1 (49 Folgen, Folge 1 „Yuma startet durch“) und gehört Yu-Gi-Oh! Zexal (10015, Folgen 1–49), nicht Zexal II; die Messung vom 16.10.2026 hing an der Serien-gti und ist zu 10015 umgehängt (19.11.2026)'
+  entferntAm: '2026-11-19'
+- anilistId: 10015
+  url: https://www.amazon.de/gp/video/detail/B0H298L2X9
+  grund: 'Seite B0H298L2X9 ist Prime-Staffel 3 (48 Folgen) und gehört Yu-Gi-Oh! Zexal II (15489, Folgen 26–73); Meldungen von der Zexal-Serienseite B07FBGYPR6 nennen sie als Seite des Anime, ihr Beleg bleibt bei 15489 (19.11.2026)'
+  entferntAm: '2026-11-19'
+- anilistId: 2787
+  url: https://www.amazon.de/dp/B0CMZZVV7R
+  grund: 'Seite führt Shana Staffel 1 und 2 (Daniel 13.09.2026, mit Bild); die Messung (24 Folgen) ist nicht staffelgenau und gilt über den Beleg vom 19.11.2026 dem Titel 355. 2787 behält seine eigenen Seiten 0NQ6I1WXBDFEZHZBCNOTC626F9 und B0FFGWVYVK (je 24 Folgen, Ja, 28.09.2026) (PR 4312)'
+  entferntAm: '2026-11-19'
+- anilistId: 21450
+  url: https://www.amazon.de/dp/B0F4V6JFH9
+  grund: 'Seite B0F4V6JFH9 ist die JoJo-Sammelseite (71 Folgen); die Messung „Folgen 1–26, laut Adresse Staffel 1“ gehört der 26-Folgen-Staffel (14719, Zuordnung der Adresse B0F9FWKDXT), nicht Diamond Is Unbreakable mit 39 Folgen (PR 4312)'
+  entferntAm: '2026-11-19'
+- anilistId: 1889
+  url: https://www.amazon.de/gp/video/detail/B09JZHRQ18
+  grund: 'Seite B09JZHRQ18 ist Higurashi no Naku Koro ni Staffel 1 (26 Folgen, gleiche gti 64ed5868 wie der Beleg von 934), nicht Kai (1889, 24 Folgen + Bonusfolge, eigene Seite B09KX2VLPR); die Messung vom 11.11.2026 hing am Kanal-Titel (22.11.2026)'
+  entferntAm: '2026-11-22'
+- anilistId: 13469
+  url: https://www.amazon.de/gp/video/detail/B0DC75L8BJ
+  grund: 'Seite B0DC75L8BJ (10 Folgen, gti 5f6a4c2e) trägt die Hyouka-Folgen 13–22 (12189); die OVA (13469) ist die 13. Folge der Seite B0B5JVJKCD (13 Folgen = Serienfolgen 1–12 plus OVA, gleiche-adresse-stand.json) (22.11.2026)'
+  entferntAm: '2026-11-22'

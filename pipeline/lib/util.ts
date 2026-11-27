@@ -1,0 +1,141 @@
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { randomUUID } from 'node:crypto'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { zaehleWarnung } from './warnungen-zaehlen.ts'
+
+/** `AK_ROOT` lässt Prüfungen ein ganzes Skript gegen eine Kulisse laufen (check-rohfolgen-ablauf.ts); im Betrieb ungesetzt. */
+export const ROOT = process.env.AK_ROOT ?? resolve(dirname(fileURLToPath(import.meta.url)), '..', '..')
+
+/**
+ * `.env` einlesen, damit die Schlüssel nicht bei jedem Aufruf gesetzt werden müssen.
+ *
+ * Bereits gesetzte Umgebungsvariablen gewinnen — in der Cloud kommen die
+ * Schlüssel aus den Repo-Secrets, und eine lokal liegengebliebene `.env` darf
+ * sie dort nicht überschreiben.
+ */
+export function loadEnv(): void {
+  const envPath = resolve(ROOT, '.env')
+  if (!existsSync(envPath)) return
+  for (const line of readFileSync(envPath, 'utf8').split(/\r?\n/)) {
+    const m = /^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/.exec(line)
+    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '')
+  }
+}
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms))
+}
+
+/** Vergleichsschlüssel eines Titels: klein, nur a–z und 0–9 (Umlaute und Satzzeichen fallen weg). */
+export function normSchluessel(s: string | null | undefined): string {
+  return (s ?? '').toLowerCase().replace(/[^a-z0-9]/g, '')
+}
+
+export function log(...args: unknown[]): void {
+  zaehleWarnung(...args)
+  console.log('[pipeline]', ...args)
+}
+
+export function warn(...args: unknown[]): void {
+  zaehleWarnung(...args)
+  console.warn('[pipeline] ⚠ ', ...args)
+}
+
+export function readJson<T>(path: string, fallback: T): T {
+  const full = resolve(ROOT, path)
+  if (!existsSync(full)) return fallback
+  return JSON.parse(readFileSync(full, 'utf8')) as T
+}
+
+export function writeJson(path: string, data: unknown, pretty = false): void {
+  const full = resolve(ROOT, path)
+  mkdirSync(dirname(full), { recursive: true })
+  const text = pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data)
+  // Inline (nicht ausgelagert): `tools/fetch-schreibziele.mjs` überspringt nur die Rümpfe der Helfer selbst.
+  // tmp im selben Ordner, dann rename: ein Abbruch hinterlässt nie eine halbe Zieldatei; Zufallsanteil gegen Namensgleichheit.
+  const tmp = `${full}.${process.pid}-${randomUUID().slice(0, 8)}.tmp`
+  try {
+    writeFileSync(tmp, text, 'utf8')
+    renameSync(tmp, full)
+  } catch (err) {
+    rmSync(tmp, { force: true })
+    throw err
+  }
+}
+
+/** Löscht den Inhalt eines Ordners, legt ihn bei Bedarf an. */
+export function clearDir(path: string): void {
+  const full = resolve(ROOT, path)
+  rmSync(full, { recursive: true, force: true })
+  mkdirSync(full, { recursive: true })
+}
+
+export function writeText(path: string, text: string): void {
+  const full = resolve(ROOT, path)
+  mkdirSync(dirname(full), { recursive: true })
+  // Inline wie in `writeJson` (der Scanner überspringt nur die Helfer-Rümpfe): tmp im selben Ordner, dann rename.
+  const tmp = `${full}.${process.pid}-${randomUUID().slice(0, 8)}.tmp`
+  try {
+    writeFileSync(tmp, text, 'utf8')
+    renameSync(tmp, full)
+  } catch (err) {
+    rmSync(tmp, { force: true })
+    throw err
+  }
+}
+
+/** Adresse für Meldungen: Wert von api_key, apikey, key, token, access_token und client_secret ersetzt, sonst steht der Schlüssel im öffentlichen CI-Log. */
+export function maskiereSchluessel(url: string): string {
+  return url.replace(/([?&](?:api_?key|key|(?:access_)?token|client_secret)=)[^&\s]+/gi, '$1***')
+}
+
+/** fetch mit Retry und exponentiellem Backoff; respektiert Retry-After. */
+export async function fetchJson<T>(
+  url: string,
+  init: RequestInit = {},
+  attempt = 0,
+): Promise<T> {
+  const res = await fetch(url, init)
+  if (res.status === 429 || res.status >= 500) {
+    if (attempt >= 5) throw new Error(`${res.status} nach ${attempt} Versuchen: ${maskiereSchluessel(url)}`)
+    const retryAfter = Number(res.headers.get('retry-after') ?? 0)
+    const waitMs = retryAfter > 0 ? retryAfter * 1000 : 2 ** attempt * 1000
+    warn(`${res.status} — warte ${waitMs} ms und versuche erneut (${maskiereSchluessel(url).slice(0, 60)})`)
+    await sleep(waitMs)
+    return fetchJson<T>(url, init, attempt + 1)
+  }
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}: ${maskiereSchluessel(url)}`)
+  return (await res.json()) as T
+}
+
+export function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[äÄ]/g, 'ae')
+    .replace(/[öÖ]/g, 'oe')
+    .replace(/[üÜ]/g, 'ue')
+    .replace(/ß/g, 'ss')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80)
+}
+
+/**
+ * Slug aus Name und Datum — das Datum bleibt, gekappt wird der Name.
+ *
+ * `slugify` schneidet bei 80 Zeichen ab, und bei langen Titeln fiel damit
+ * genau das Unterscheidungsmerkmal weg: Aus „My Gift Lvl 9999 Unlimited
+ * Gacha: Backstabbed in a Backwater Dungeon, I'm Out for Revenge!“ zum 08.09.
+ * und zum 24.09. wurde zweimal derselbe Slug, ohne jedes Datum. Vier Releases
+ * im ausgelieferten Bestand tragen solche gekappten Adressen.
+ *
+ * 69 Zeichen Name + Bindestrich + zehn Zeichen Datum ergeben dieselbe
+ * Höchstlänge wie bisher.
+ */
+export function discSlug(name: string, datum: string): string {
+  const kern = slugify(name).slice(0, 69).replace(/-+$/, '')
+  return `${kern}-${datum}`
+}

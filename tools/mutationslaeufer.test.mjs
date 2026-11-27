@@ -1,0 +1,348 @@
+// Test für tools/mutationslaeufer.mjs. Aufruf: node tools/mutationslaeufer.test.mjs [läufer.mjs]
+// Wegwerf-Dateien unter os.tmpdir(); der Läufer ist als eigener Prozess aufgerufen (Exit-Code, Zurücksetzen).
+import assert from "node:assert/strict"
+import { spawn, spawnSync } from "node:child_process"
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
+import { ausfuehrbareTests, normalisiereListe, beiSignal, laufTest, normalisierePfad, planeMutant, registriereSignale, schlusszeile, SIGNALE, spieleOriginaleZurueck, ueberlebendeZeile } from "./mutationslaeufer.mjs"
+
+const hier = dirname(fileURLToPath(import.meta.url))
+const laeufer = process.argv[2] ?? join(hier, "mutationslaeufer.mjs")
+const ordner = mkdtempSync(join(tmpdir(), "mutlaeufer-test-"))
+const knoten = `"${process.execPath}"`
+
+// BOM, CRLF, Umlaut und doppelte Zeile: bytegleiches Zurücksetzen, n-tes Vorkommen, mehrzeilig.
+const A = "\uFEFFexport const A = 1 // Größe\r\nexport function f() {\r\n  return 1\r\n}\r\nexport function g() {\r\n  return 1\r\n}\r\n"
+const B = "export const B = 1\n"
+const TEST = `import { A, g } from "./a.mjs"
+import { B } from "./b.mjs"
+import * as a from "./a.mjs"
+if (g() !== 1) process.exit(1)
+if (A === 0 && B === 0) process.exit(1)
+if (a.ENDE) process.exit(1)
+`
+const TEST_F = 'import { f } from "./a.mjs"\nif (f() !== 1) process.exit(1)\n'
+writeFileSync(join(ordner, "test.mjs"), TEST)
+writeFileSync(join(ordner, "test-f.mjs"), TEST_F)
+const dateien = { "a.mjs": A, "b.mjs": B }
+for (const [n, t] of Object.entries(dateien)) writeFileSync(join(ordner, n), t)
+
+function lauf(mutanten, extra = [], tests = [`${knoten} test.mjs`]) {
+  const liste = join(ordner, "m.json")
+  writeFileSync(liste, JSON.stringify(mutanten))
+  const args = [laeufer, liste, "--cwd", ordner, "--timeout", "20", ...tests.flatMap((t) => ["--test", t]), ...extra]
+  const r = spawnSync(process.execPath, args, { encoding: "utf8", stdin: "ignore", windowsHide: true })
+  return { exit: r.status, aus: r.stdout + r.stderr }
+}
+
+function unversehrt() {
+  for (const [n, t] of Object.entries(dateien)) {
+    assert.equal(readFileSync(join(ordner, n), "utf8"), t, `${n} nicht zurückgesetzt`)
+    assert.ok(!existsSync(join(ordner, `${n}.mutlauf-orig`)), `${n}: Sicherungskopie übrig`)
+  }
+}
+
+const zeile = (aus, name) => aus.split("\n").find((z) => z.includes(name) && !z.startsWith("--- ")) ?? ""
+const urteilVon = (aus, name) => zeile(aus, name).split(/\s+/)[0]
+const mut = [
+  { name: "plain", datei: "a.mjs", suche: "return 1\r\n}\r\nexport function g", ersetze: "return 2\r\n}\r\nexport function g" },
+  { name: "mehrzeilig", datei: "a.mjs", suche: "export function g() {\n  return 1\n}", ersetze: "export function g() {\n  return 2\n}" },
+  { name: "zweites", datei: "a.mjs", suche: "return 1", ersetze: "return 2", nr: 2 },
+  { name: "zeile6", datei: "a.mjs", suche: "return 1", ersetze: "return 2", zeile: 6 },
+  { name: "zeile3-g-egal", datei: "a.mjs", suche: "return 1", ersetze: "return 2", zeile: 3 },
+  { name: "doppelt", datei: "a.mjs", suche: "return 1", ersetze: "return 2" },
+  { name: "fehlt", datei: "a.mjs", suche: "gibt es nicht", ersetze: "x" },
+  { name: "nr3", datei: "a.mjs", suche: "return 1", ersetze: "return 2", nr: 3 },
+  { name: "nichts", datei: "a.mjs", suche: "return 1", ersetze: "return 1", nr: 1 },
+  { name: "nur-A", datei: "a.mjs", suche: "A = 1", ersetze: "A = 0" },
+  { name: "nur-B", datei: "b.mjs", suche: "B = 1", ersetze: "B = 0" },
+  { name: "beide", aenderungen: [{ datei: "a.mjs", suche: "A = 1", ersetze: "A = 0" }, { datei: "b.mjs", suche: "B = 1", ersetze: "B = 0" }] },
+  { name: "anhang", datei: "a.mjs", suche: "@ENDE", ersetze: "export const ENDE = 1" },
+  { name: "Kontrolle", aenderungen: [] },
+]
+
+// 1. Urteile je Form; Exit 1, weil es Überlebende gibt.
+const r1 = lauf(mut)
+assert.equal(r1.exit, 1, r1.aus)
+const erwartet = {
+  plain: "GRÜN", // f() wird vom Test nur über test-f geprüft, hier unentdeckt
+  mehrzeilig: "rot",
+  zweites: "rot",
+  zeile6: "rot",
+  "zeile3-g-egal": "GRÜN",
+  doppelt: "mehrdeutig",
+  fehlt: "nicht",
+  nr3: "nicht",
+  nichts: "wirkungslos",
+  "nur-A": "GRÜN",
+  "nur-B": "GRÜN",
+  beide: "rot",
+  anhang: "rot",
+  Kontrolle: "GRÜN",
+}
+for (const [name, urteil] of Object.entries(erwartet)) assert.equal(urteilVon(r1.aus, name), urteil, `${name}: ${zeile(r1.aus, name)}`)
+assert.match(r1.aus, /mutationslaeufer: 5 rot, 4 überlebt, 2 Anker nicht gefunden, 1 mehrdeutig, 1 wirkungslos, 14 gesamt/)
+assert.equal(schlusszeile([{ urteil: "nicht gefunden" }, { urteil: "GRÜN", kontrolle: true }, { urteil: "rot" }]), "mutationslaeufer: 1 rot, 0 überlebt, 1 Anker nicht gefunden, 0 mehrdeutig, 0 wirkungslos, 3 gesamt")
+const ungleich = [..."rrr"].map(() => ({ urteil: "rot" })).concat({ urteil: "GRÜN", kontrolle: true }, { urteil: "GRÜN" }, { urteil: "nicht gefunden" }, [1, 2, 3].map(() => ({ urteil: "mehrdeutig" })), [1, 2].map(() => ({ urteil: "wirkungslos" })))
+assert.equal(schlusszeile(ungleich.flat()), "mutationslaeufer: 3 rot, 1 überlebt, 1 Anker nicht gefunden, 3 mehrdeutig, 2 wirkungslos, 11 gesamt")
+assert.equal(ueberlebendeZeile(ungleich.flat()), "Überlebende: 1 von 10", "maschinenlesbare Zeile: Überlebende von allen echten Mutanten")
+assert.equal(ueberlebendeZeile([{ urteil: "GRÜN", kontrolle: true }, { urteil: "rot" }]), "Überlebende: 0 von 1", "Kontrollen zählen nicht")
+unversehrt()
+
+// 2. Alle rot (und Kontrolle grün): Exit 0; Test je Mutant überschreibt --test.
+const gut = [mut[1], mut[2], mut[11], { ...mut[0], name: "plain-mit-test-f", tests: [`${knoten} test-f.mjs`] }, mut[13]]
+const r2 = lauf(gut)
+assert.equal(r2.exit, 0, r2.aus)
+assert.match(zeile(r2.aus, "plain-mit-test-f"), /^rot/)
+unversehrt()
+
+// 3. Log: Diff mit Datei:Zeile, Tabelle für den PR, Test des Fängers.
+const logOrdner = join(ordner, "log")
+const r3 = lauf([mut[2], mut[11]], ["--log", logOrdner])
+assert.equal(r3.exit, 0, r3.aus)
+// Konsole: Diff je Mutant steht vor dessen Urteilszeile; der wirkungslose Mutant zeigt seinen Diff und bleibt unbrauchbar.
+assert.match(r3.aus, /--- zweites\n@@ a\.mjs:6\n- return 1\n\+ return 2\n(rot|GRÜN)\s+zweites/)
+assert.match(r3.aus, /--- beide\n@@ a\.mjs:1\n[^]*@@ b\.mjs:1\n[^]*\nrot\s+beide/)
+const rNichts = lauf([mut.find((x) => x.name === "nichts")])
+assert.equal(rNichts.exit, 1, rNichts.aus)
+assert.match(rNichts.aus, /--- nichts\n@@ a\.mjs:\d+\n- (.+)\n\+ \1\nwirkungslos/)
+unversehrt()
+const dateienLog = readdirSync(logOrdner).sort()
+assert.deepEqual(dateienLog, ["01-zweites.diff", "01-zweites.log", "02-beide.diff", "02-beide.log", "tabelle.md"])
+assert.match(readFileSync(join(logOrdner, "01-zweites.diff"), "utf8"), /^@@ a\.mjs:6\n- return 1\n\+ return 2\n$/)
+assert.match(readFileSync(join(logOrdner, "02-beide.diff"), "utf8"), /@@ a\.mjs:1[\s\S]*@@ b\.mjs:1/)
+const md = readFileSync(join(logOrdner, "tabelle.md"), "utf8")
+assert.match(md, /\| 2 \| beide \| a\.mjs, b\.mjs \| rot \(Exit 1\) \| .*test\.mjs/)
+unversehrt()
+
+// 4. Rest eines toten Laufs verweigert den Start und lässt die Dateien in Ruhe.
+writeFileSync(join(ordner, "b.mjs.mutlauf-orig"), B)
+const r4 = lauf([mut[10]])
+assert.equal(r4.exit, 2, r4.aus)
+assert.match(r4.aus, /Rest eines abgebrochenen Laufs/)
+rmSync(join(ordner, "b.mjs.mutlauf-orig"))
+unversehrt()
+
+// 5. Grundlauf rot: Exit 2; fehlender Testbefehl: Liste unbrauchbar, Exit 1 (Lehre 132); nichts verändert.
+writeFileSync(join(ordner, "kaputt.mjs"), "process.exit(1)\n")
+assert.equal(lauf([mut[2]], [], [`${knoten} kaputt.mjs`]).exit, 2)
+assert.equal(lauf([mut[2]], [], []).exit, 1)
+unversehrt()
+
+// 6. Pfade: Git-Bash-Form nur unter Windows umgesetzt, relative und Slash-Pfade gegen --cwd.
+assert.equal(normalisierePfad("/c/code/x.ts", "/egal", "win32").replace(/\\/g, "/"), "C:/code/x.ts")
+assert.equal(normalisierePfad("/c/code/x.ts", "/egal", "linux").replace(/\\/g, "/").endsWith("/c/code/x.ts"), true)
+assert.equal(normalisierePfad("sub/x.ts", ordner, "win32"), join(ordner, "sub", "x.ts"))
+const bashForm = process.platform === "win32" ? `/${ordner[0].toLowerCase()}${ordner.slice(2).replace(/\\/g, "/")}/a.mjs` : join(ordner, "a.mjs")
+const r6 = lauf([{ name: "bash-pfad", datei: bashForm, suche: "A = 1", ersetze: "A = 0" }, { name: "b", datei: "b.mjs", suche: "B = 1", ersetze: "B = 0" }])
+assert.equal(urteilVon(r6.aus, "bash-pfad"), "GRÜN", r6.aus)
+unversehrt()
+
+// 7. Mehrere Änderungen einer Datei beziehen sich aufs Original (kürzere/längere Ersetzung verschiebt nichts); Überlappung ist unbrauchbar.
+const roh = Buffer.from("aaa\nbbb\nccc\n")
+const mapX = () => new Map([[normalisierePfad("x", "/w"), roh]])
+const plan = planeMutant(
+  { aenderungen: [{ datei: "x", suche: "aaa", ersetze: "a" }, { datei: "x", suche: "ccc", ersetze: "cccccc" }, { datei: "x", suche: "bbb", ersetze: "" }] },
+  mapX(),
+  "/w",
+)
+assert.equal([...plan.texte.values()][0], "a\n\ncccccc\n")
+const lap = planeMutant({ aenderungen: [{ datei: "x", suche: "aaa\nb", ersetze: "1" }, { datei: "x", suche: "a\nbbb", ersetze: "2" }] }, mapX(), "/w")
+assert.equal(lap.urteil, "nicht gefunden")
+assert.match(lap.detail, /überlappen/)
+
+// 8. Meldungen der Anker und Anhängen an eine Datei ohne Schlusszeilenumbruch.
+const ohneNl = new Map([[normalisierePfad("y", "/w"), Buffer.from("abc")]])
+const anhang = planeMutant({ aenderungen: [{ datei: "y", suche: "@ENDE", ersetze: "d" }] }, ohneNl, "/w")
+assert.equal([...anhang.texte.values()][0], "abc\nd\n")
+// zeile ist nur Hinweis: eindeutiger Anker gilt trotz falscher Zeile; mehrdeutiger mit falscher Zeile und ohne Zeile bleibt Fehler.
+const falscheZeile = planeMutant({ aenderungen: [{ datei: "y", suche: "abc", ersetze: "d", zeile: 99 }] }, ohneNl, "/w")
+assert.equal([...falscheZeile.texte.values()][0], "d")
+const zweimal = new Map([[normalisierePfad("y", "/w"), Buffer.from("abc\nabc")]])
+assert.equal(planeMutant({ aenderungen: [{ datei: "y", suche: "abc", ersetze: "d", zeile: 99 }] }, zweimal, "/w").detail, "y: nicht gefunden auf Zeile 99")
+assert.equal(planeMutant({ aenderungen: [{ datei: "y", suche: "abc", ersetze: "d" }] }, zweimal, "/w").detail, "y: mehrdeutig (2-mal)")
+assert.equal([...planeMutant({ aenderungen: [{ datei: "y", suche: "abc", ersetze: "d", zeile: 2 }] }, zweimal, "/w").texte.values()][0], "abc\nd")
+assert.equal(planeMutant({ aenderungen: [{ datei: "y", suche: "xyz", ersetze: "d" }] }, ohneNl, "/w").detail, "y: nicht gefunden")
+
+// 9. Laufzeit: Sicherungskopie liegt während des Mutanten da; Grundlauf prüft auch die Tests je Mutant; Zeitlimit tötet den Test;
+// leere suche und --timeout 0 sind Aufruffehler.
+writeFileSync(join(ordner, "kopie-da.mjs"), `import { readFileSync } from "node:fs"\nif (readFileSync("a.mjs.mutlauf-orig", "utf8") !== ${JSON.stringify(A)}) process.exit(1)\n`)
+const mitKopie = lauf([{ ...mut[9], name: "kopie", tests: [`${knoten} kopie-da.mjs`] }], [], [])
+assert.equal(urteilVon(mitKopie.aus, "kopie"), "GRÜN", mitKopie.aus)
+assert.equal(lauf([{ ...mut[9], tests: [`${knoten} kaputt.mjs`] }], [], []).exit, 2)
+const haengt = 'import { readFileSync, writeFileSync } from "node:fs"\nif (readFileSync("a.mjs", "utf8").includes("A = 0")) setTimeout(() => writeFileSync("fertig.txt", "x"), 4000)\n'
+writeFileSync(join(ordner, "haengt.mjs"), haengt)
+const lang = lauf([mut[9]], ["--timeout", "2"], [`${knoten} haengt.mjs`])
+assert.match(zeile(lang.aus, "nur-A"), /^rot\s+nur-A \(Zeitlimit\)/, lang.aus)
+assert.ok(!existsSync(join(ordner, "fertig.txt")), "Testprozess wurde nicht beendet")
+unversehrt()
+const leer = lauf([{ name: "leer", datei: "a.mjs", suche: "", ersetze: "x" }])
+assert.equal(leer.exit, 2)
+assert.match(leer.aus, /datei\/suche\/ersetze fehlen/)
+const nullZeit = lauf([mut[9]], ["--timeout", "0"])
+assert.equal(nullZeit.exit, 2)
+assert.match(nullZeit.aus, /^Aufruf:/m)
+
+// 9b. Signal-Handler mit Attrappen (läuft auch unter win32): Reihenfolge, Exit 130, feste Signalliste.
+const spur = []
+const abh = {
+  kinder: new Set([{ pid: 1 }, { pid: 2 }]),
+  beendeBaum: (k) => spur.push(`baum${k.pid}`),
+  zuruecksetzen: () => spur.push("zurueck"),
+  exit: (code) => spur.push(`exit${code}`),
+}
+beiSignal(abh)
+assert.deepEqual(spur, ["baum1", "baum2", "zurueck", "exit130"])
+const angemeldet = new Map()
+registriereSignale({ on: (sig, fn) => angemeldet.set(sig, fn) }, abh)
+assert.deepEqual([...angemeldet.keys()], ["SIGINT", "SIGTERM", "SIGBREAK", "SIGHUP"])
+assert.deepEqual(SIGNALE, ["SIGINT", "SIGTERM", "SIGBREAK", "SIGHUP"])
+for (const fn of angemeldet.values()) {
+  spur.length = 0
+  fn()
+  assert.deepEqual(spur, ["baum1", "baum2", "zurueck", "exit130"])
+}
+
+// 10. SIGTERM mitten im Mutanten: Exit 130, Dateien bytegleich, keine Sicherungskopie, der Testprozess ist beendet.
+// Unter win32 gibt es kein abfangbares SIGTERM (Kind wird hart beendet), dort übersprungen.
+if (process.platform === "win32") {
+  console.log("mutationslaeufer.test: Signal-Fall übersprungen (win32)")
+} else {
+  const warte = (ms) => new Promise((fertig) => setTimeout(fertig, ms))
+  const hang = 'import { readFileSync, writeFileSync } from "node:fs"\nif (readFileSync("a.mjs", "utf8").includes("A = 0")) {\n  writeFileSync("hang.pid", String(process.pid))\n  setInterval(() => {}, 1000)\n}\n'
+  writeFileSync(join(ordner, "hang.mjs"), hang)
+  writeFileSync(join(ordner, "m-signal.json"), JSON.stringify([mut[9]]))
+  const args = [laeufer, join(ordner, "m-signal.json"), "--cwd", ordner, "--timeout", "60", "--test", `${knoten} hang.mjs`]
+  const kind = spawn(process.execPath, args, { stdio: "ignore" })
+  const ende = new Promise((fertig) => kind.on("close", (code, signal) => fertig({ code, signal })))
+  for (let i = 0; i < 100 && !existsSync(join(ordner, "hang.pid")); i++) await warte(100)
+  assert.ok(existsSync(join(ordner, "hang.pid")), "Mutant wurde nicht gestartet")
+  kind.kill("SIGTERM")
+  const erg = await ende
+  assert.deepEqual(erg, { code: 130, signal: null })
+  unversehrt()
+  const pid = Number(readFileSync(join(ordner, "hang.pid"), "utf8"))
+  let lebt = true
+  for (let i = 0; i < 30 && lebt; i++) {
+    try {
+      process.kill(pid, 0)
+      await warte(100)
+    } catch {
+      lebt = false
+    }
+  }
+  assert.ok(!lebt, "Testprozess läuft nach dem Signal weiter")
+}
+
+// 6. Kontrolle ohne tests und ohne --test fährt die tests aller Mutanten; echter Mutant ohne Test bricht weiter ab.
+const kontrolle = { name: "Kontrolle", aenderungen: [] }
+const mitTests = { ...mut[0], tests: [`${knoten} test-f.mjs`] }
+const k6 = lauf([mitTests, kontrolle], [], [])
+assert.equal(k6.exit, 0, k6.aus)
+assert.equal(urteilVon(k6.aus, "Kontrolle"), "GRÜN", k6.aus)
+const k6b = lauf([mitTests, { ...kontrolle, tests: [`${knoten} test.mjs`] }], [], [])
+assert.equal(k6b.exit, 0, k6b.aus)
+const k6c = lauf([mut[0], kontrolle], [], [])
+assert.equal(k6c.exit, 1, k6c.aus)
+assert.match(k6c.aus, /unbrauchbar, kein Testbefehl/)
+unversehrt()
+
+// 6d. Zähler-Kulisse: test-x ist immer grün, test-y wird ab dem zweiten Lauf rot (Zähler-Datei). Die Kontrolle steht zuerst;
+// nur wer tatsächlich beide Tests fährt (Vereinigung), sieht Y rot. Tötet `.slice(0, 1)`, `!m.tests`, `global.length === 0` und „nur --test“.
+writeFileSync(join(ordner, "test-x.mjs"), "process.exit(0)\n")
+writeFileSync(join(ordner, "test-y.mjs"), 'import { appendFileSync, readFileSync } from "node:fs"\nappendFileSync("zaehler.txt", "x")\nif (readFileSync("zaehler.txt", "utf8").length >= 2) process.exit(1)\n')
+const testX = `${knoten} test-x.mjs`
+const testY = `${knoten} test-y.mjs`
+const mitX = { ...mut[9], name: "nur-A-x", tests: [testX] }
+const mitY = { ...mut[10], name: "nur-B-y", tests: [testY] }
+const zaehlerLauf = (liste, extra, tests) => {
+  rmSync(join(ordner, "zaehler.txt"), { force: true })
+  return lauf(liste, extra, tests)
+}
+// A1: Kontrolle ohne tests und ohne --test fährt die Vereinigung beider Tests: Y wird beim zweiten Lauf rot, Kontrolle rot, Exit 1.
+const k6d = zaehlerLauf([kontrolle, mitX, mitY], [], [])
+assert.equal(urteilVon(k6d.aus, "Kontrolle"), "rot", k6d.aus)
+assert.equal(k6d.exit, 1, k6d.aus)
+// A2: Kontrolle mit eigenen tests behält genau diese (nur X, bleibt grün); die Vereinigung würde Y zweimal fahren.
+const k6e = zaehlerLauf([{ ...kontrolle, tests: [testX] }, mitX, mitY], [], [])
+assert.equal(urteilVon(k6e.aus, "Kontrolle"), "GRÜN", k6e.aus)
+// A3: Kontrolle mit --test fährt --test (X, grün), nicht die Mutanten-tests (Y zweimal wäre rot).
+const k6f = zaehlerLauf([kontrolle, mitY], [], [testX])
+assert.equal(urteilVon(k6f.aus, "Kontrolle"), "GRÜN", k6f.aus)
+// A4: Liste nur aus der Kontrolle, ohne --test: Aufrufabbruch statt stillem Lauf ohne Tests.
+const k6g = lauf([kontrolle], [], [])
+assert.equal(k6g.exit, 1, k6g.aus)
+assert.match(k6g.aus, /unbrauchbar, kein Testbefehl/)
+unversehrt()
+
+// 6h. Lehre 132 (17.11.2026): leerer oder nur aus Leerraum bestehender Befehl ist kein Test (die Shell meldete „grün“, 0,05 s);
+// ein Mutant ohne ausführbaren Test ist „unbrauchbar“ (nie rot/grün, wird nicht gefahren), die übrigen laufen weiter.
+const blank = lauf([kontrolle, { ...mut[0], tests: ["  "] }], [], [])
+assert.equal(blank.exit, 1, blank.aus)
+assert.match(blank.aus, /unbrauchbar, kein Testbefehl/)
+assert.doesNotMatch(blank.aus, /GRÜN/, blank.aus)
+const gemischt = lauf([{ ...mut[1], name: "ohne-test" }, { ...mut[0], name: "mit-test", tests: [`${knoten} test-f.mjs`] }], [], [])
+assert.equal(gemischt.exit, 1, gemischt.aus)
+assert.equal(urteilVon(gemischt.aus, "ohne-test"), "unbrauchbar", gemischt.aus)
+assert.equal(urteilVon(gemischt.aus, "mit-test"), "rot", gemischt.aus)
+assert.match(gemischt.aus, /1 unbrauchbar \(kein Testbefehl\)/)
+assert.equal(ausfuehrbareTests(["", " ", "x", 5, undefined]).join("|"), "x")
+unversehrt()
+
+// 11. Ausnahme mitten im Mutanten (zweite Datei schreibgeschützt, Schreiben wirft): die erste, schon mutierte Datei
+// wird trotzdem zurückgespielt. Der erste Mutant (nur b, Anker fehlt) legt die Reihenfolge b vor a fest — ohne
+// Einzelrückspiel stoppt der Rückweg an b und a bliebe mutiert.
+chmodSync(join(ordner, "b.mjs"), 0o444)
+const ausnahme = lauf([
+  { name: "b-fehlt", datei: "b.mjs", suche: "gibt es nicht", ersetze: "x" },
+  {
+    name: "a-dann-b",
+    aenderungen: [
+      { datei: "a.mjs", suche: "A = 1", ersetze: "A = 0" },
+      { datei: "b.mjs", suche: "B = 1", ersetze: "B = 0" },
+    ],
+  },
+])
+chmodSync(join(ordner, "b.mjs"), 0o666)
+if (process.getuid?.() !== 0) {
+  assert.equal(ausnahme.exit, 2, ausnahme.aus)
+  assert.match(ausnahme.aus, /EPERM|EACCES/)
+}
+unversehrt()
+
+// 12. Rückspiel einzeln: ein Fehler bei der ersten Datei (Verzeichnis statt Datei) stoppt die zweite nicht, die Kopie bleibt.
+const dir = join(ordner, "dir.mjs")
+mkdirSync(dir)
+writeFileSync(join(ordner, "x.mjs"), "mutiert\n")
+const fehler = spieleOriginaleZurueck(new Map([[dir, Buffer.from("o")], [join(ordner, "x.mjs"), Buffer.from("original\n")]]))
+assert.equal(fehler.length, 1)
+assert.equal(readFileSync(join(ordner, "x.mjs"), "utf8"), "original\n")
+rmSync(dir, { recursive: true })
+
+// 13. Testprozess startet nicht: synchroner Startfehler (NUL im Befehl) und fehlender Ordner sind rot, kein Abbruch.
+for (const [befehl, cwd] of [["x\0y", ordner], [`${knoten} test.mjs`, join(ordner, "gibt-es-nicht")]]) {
+  const r = await laufTest(befehl, cwd, 5)
+  assert.equal(r.gruen, false)
+  assert.equal(r.code, -1)
+}
+
+// Lehre 132: "tests" als String statt Liste wird abgewiesen, nicht still als Zeichenliste behandelt
+assert.throws(() => normalisiereListe([{ datei: "a", suche: "x", ersetze: "y", tests: "node test.mjs" }]), /"tests" muss eine Liste/)
+assert.equal(normalisiereListe([{ datei: "a", suche: "x", ersetze: "y", tests: ["t"] }])[0].tests[0], "t")
+{
+  const lauf = (name, test) => {
+    const liste = join(ordner, `${name}.json`)
+    writeFileSync(liste, JSON.stringify([{ name: "Kontrolle", aenderungen: [], tests: [test] }, { ...mut[0], tests: [`${knoten} test-f.mjs`] }]))
+    const r = spawnSync(process.execPath, [laeufer, liste, "--cwd", ordner, "--timeout", "30"], { encoding: "utf8", timeout: 60000 })
+    return r.status + r.stdout
+  }
+  const schnell = lauf("kontr-schnell", `${knoten} -e "0"`)
+  assert.match(schnell, /^0[\s\S]*GRÜN +Kontrolle \(Warnung: Kontrolle verdächtig schnell/, "Kontrolle unter 1 s: Warnung, Exit bleibt 0")
+  const langsam = lauf("kontr-langsam", `${knoten} -e "setTimeout(()=>{},1200)"`)
+  assert.ok(!langsam.includes("Warnung"), "Kontrolle über 1 s: keine Warnung")
+}
+
+rmSync(ordner, { recursive: true, force: true })
+console.log("mutationslaeufer.test: ok")

@@ -1,0 +1,242 @@
+/**
+ * Der Film-Weg, an einem einzigen echten Fall geprüft: **Avatar Aang**
+ * (`B0H6QYBZFS`, Kanal Paramount+).
+ *
+ * Daniel am 25.08.2026: „für filme wird kein widget request abgeschickt. für
+ * filme wird das html hydrated, es kommt ein document request response für die
+ * webseite und das response html object hat ein
+ * `<script id="dv-web-page-hydration-data" …>`, darin steht ein json mit all den
+ * infos."
+ *
+ * Er hat die Seite abgelegt (953.373 Zeichen), der Block darin umfasst 239.064.
+ * `avatar-hydration.fixture.json` ist ein **Auszug daraus** — dieselben Felder,
+ * dieselben Werte, nur ohne die 230 KB, die niemand prüft.
+ *
+ * Geprüft wird die Lesefunktion des Lesers, nicht ein Muster: Es gibt hier
+ * nichts zu parsen, der Block ist gültiges JSON in einem `<script>`-Element.
+ */
+const { readFileSync } = require('node:fs')
+const { resolve } = require('node:path')
+const vm = require('node:vm')
+
+const fehler = []
+function pruefe(name, bedingung, gefunden) {
+  if (bedingung) return console.log(`  ✓ ${name}`)
+  fehler.push(name)
+  console.error(`  ✗ ${name}${gefunden === undefined ? '' : ` — gefunden: ${JSON.stringify(gefunden)}`}`)
+}
+
+console.log('Zusicherungen für den Film-Weg (Avatar Aang, B0H6QYBZFS)\n')
+
+const fixture = readFileSync(resolve(__dirname, 'avatar-hydration.fixture.json'), 'utf8')
+
+/*
+  Der Leser wird als Ganzes geladen; gebraucht wird daraus `ausHydration()`.
+  Der Sandkasten stellt genau das bereit, was die Funktion anfasst — ein
+  `getElementById`, das den Block liefert, und eine Adresse.
+*/
+const gemeldet = []
+const sandkasten = {
+  globalThis: null,
+  document: {
+    getElementById: (id) => (id === 'dv-web-page-hydration-data' ? { textContent: fixture } : null),
+    documentElement: { innerHTML: '<html></html>', classList: { add() {}, remove() {}, toggle() {}, contains: () => false } },
+    body: { textContent: '' },
+    addEventListener() {},
+    querySelector: () => null,
+    querySelectorAll: () => [],
+  },
+  location: { pathname: '/gp/video/detail/B0H6QYBZFS', search: '', href: '' },
+  window: {
+    addEventListener() {},
+    postMessage: (nachricht) => gemeldet.push(nachricht),
+    location: { pathname: '/gp/video/detail/B0H6QYBZFS', search: '' },
+  },
+  fetch: () => Promise.resolve({ ok: false, text: () => Promise.resolve('') }),
+  setInterval: () => 0,
+  setTimeout: () => 0,
+  clearInterval() {},
+  console: { log() {}, warn() {}, error() {} },
+  performance: { now: () => 0 },
+  Date,
+  JSON,
+  Math,
+  Set,
+  Map,
+  Number,
+  String,
+  Object,
+  Array,
+  Boolean,
+  RegExp,
+  Promise,
+  Error,
+  encodeURIComponent,
+  decodeURIComponent,
+  XMLHttpRequest: function () {},
+}
+sandkasten.globalThis = sandkasten
+sandkasten.window.document = sandkasten.document
+
+/*
+  **Geprüft wird der Produktivcode, keine Kopie davon.**
+
+  Der Leser läuft in einer IIFE; seine Funktionen sind von außen nicht
+  erreichbar. Statt sie hier nachzubauen — zwei Fassungen derselben Regel
+  laufen garantiert auseinander — werden die beiden gebrauchten Funktionen aus
+  der Quelldatei geschnitten und im Sandkasten ausgewertet. Ändert sich die
+  Funktion, ändert sich die Prüfung mit.
+*/
+const quelle = readFileSync(resolve(__dirname, 'amazon-leser.js'), 'utf8')
+
+function schneide(name) {
+  const start = quelle.indexOf(`function ${name}(`)
+  if (start < 0) throw new Error(`Funktion ${name} nicht gefunden`)
+  let tiefe = 0
+  let i = quelle.indexOf('{', start)
+  const von = i
+  for (; i < quelle.length; i++) {
+    if (quelle[i] === '{') tiefe++
+    else if (quelle[i] === '}' && --tiefe === 0) return quelle.slice(start, i + 1)
+  }
+  throw new Error(`Funktion ${name} endet nicht (ab ${von})`)
+}
+
+vm.runInNewContext(
+  `${schneide('namenAus')}\n${schneide('ausHydration')}\n;globalThis.__ausHydration = ausHydration;`,
+  sandkasten,
+  { filename: 'amazon-leser.js (Auszug)' },
+)
+
+/* Seit dem Umbau vom 15.09.2026 bekommt die Funktion den Blocktext — aus dem DOM oder aus einer nachgeholten Seite. */
+const film = sandkasten.__ausHydration(fixture)
+
+pruefe('der Hydration-Block wird gelesen', Boolean(film), film)
+pruefe('die Kennung stimmt', film?.kennung === 'B0H6QYBZFS', film?.kennung)
+pruefe('als Film erkannt', film?.art === 'Movie', film?.art)
+/* gti-Brücke (17.09.2026): Die gti des eigenen Kopfs geht mit, damit der Bau JustWatchs Zuordnung prüfen kann. */
+pruefe('die gti der Seite wird gelesen', film?.gti === 'amzn1.dv.gti.5e42bcf1-8d2c-41cd-a3b6-f1e248c42049', film?.gti)
+pruefe(
+  'der Titel steht drin',
+  film?.titel === 'Avatar Aang: Der Herr der Elemente',
+  film?.titel,
+)
+
+/* Der Kern für dieses Projekt: die Tonspuren. */
+pruefe(
+  'Deutsch steht in den Tonspuren',
+  (film?.sprachen ?? []).includes('Deutsch'),
+  film?.sprachen,
+)
+pruefe(
+  'die Untertitel sind davon getrennt',
+  (film?.untertitel ?? []).includes('Deutsch') && film?.untertitel !== film?.sprachen,
+  film?.untertitel,
+)
+
+/*
+  **Und der Zugang ist ein Kanal, kein Prime-Inhalt.**
+
+  „da steht auch paramount+ drin, das ist ein prime kanal abo das man benötigt
+  um es zu sehen" (Daniel). Genau die Unterscheidung, an der die Sprachangabe
+  hängt — bei einem Kanal-Titel ist sie ein Hinweis, kein Beleg.
+*/
+pruefe(
+  'der Kanal Paramount+ wird erkannt',
+  (film?.zugaenge ?? []).includes('paramountplusde'),
+  film?.zugaenge,
+)
+pruefe('kein Prime-Zugang dabei', !(film?.zugaenge ?? []).includes('Prime'), film?.zugaenge)
+
+/* „One Piece – Strong World", 30.08.2026: `headerDetail` leer, der Kopf steht in `detail.detail`. */
+const ohneKopf = sandkasten.__ausHydration(
+  JSON.stringify({
+    init: {
+      preparations: {
+        body: {
+          atf: {
+            state: {
+              pageTitleId: 'B0DQM2JXB6',
+              detail: {
+                headerDetail: {},
+                detail: { B0DQM2JXB6: { entityType: 'Movie', title: 'One Piece – Strong World', audioTracks: ['Deutsch', '日本語'] } },
+              },
+            },
+          },
+        },
+      },
+    },
+  }),
+)
+/* Kaufausgabe B0CVQW43HC, 15.09.2026: TRANSACT und „Als Kauftitel verfügbar" im Aktionsblock. */
+const kaufSeite = (texte) =>
+  sandkasten.__ausHydration(
+    JSON.stringify({
+      init: {
+        preparations: {
+          body: {
+            atf: {
+              state: {
+                pageTitleId: 'B0KAUF0001',
+                detail: { headerDetail: { B0KAUF0001: { entityType: 'TV Show', title: 'Kaufstaffel', audioTracks: ['Deutsch'] } } },
+                action: { atf: { B0KAUF0001: { primaryActions: [{ actionType: 'TRANSACT', label: { string: texte } }] } } },
+              },
+            },
+          },
+        },
+      },
+    }),
+  )
+pruefe('eine Kaufseite ist kaufbar, nicht leihbar', kaufSeite('Als Kauftitel verfügbar')?.kaufbar === true && kaufSeite('Als Kauftitel verfügbar')?.leihbar === false)
+pruefe('„Als Kauf- oder Leihtitel verfügbar" ist beides', kaufSeite('Als Kauf- oder Leihtitel verfügbar')?.leihbar === true)
+pruefe('Avatar (Paramount+-Kanal) ist nicht kaufbar', film?.kaufbar === false, film?.kaufbar)
+pruefe(
+  'ein leeres headerDetail fällt auf detail.detail zurück',
+  ohneKopf?.art === 'Movie' && (ohneKopf?.sprachen ?? []).includes('Deutsch'),
+  ohneKopf,
+)
+
+/* Was der Kalender sonst noch brauchen kann — alles ohne zweiten Abruf. */
+pruefe('Laufzeit gelesen', typeof film?.laufzeit === 'string' && film.laufzeit.length > 0, film?.laufzeit)
+pruefe('Erscheinungsjahr gelesen', film?.jahr === 2026, film?.jahr)
+pruefe('Genres gelesen', (film?.genres ?? []).includes('Animation'), film?.genres)
+pruefe('Beschreibung gelesen', (film?.beschreibung ?? '').length > 40, (film?.beschreibung ?? '').length)
+
+/**
+ * **Ein Fehlschlag darf den Film-Weg nicht dauerhaft sperren.**
+ *
+ * Daniel am 25.08.2026 an „Jujutsu Kaisen 0" (`0PCNT2617SSVLV8ZGSS62UTQSZ`):
+ * Der Knopf blieb auf „nicht abrufbar", auch nach Neuladen. Sein Diagnosefeld
+ * zeigte neun Sprachen, aber `folgen: 0` und `jeFolge: {}` — die Sprachen kamen
+ * aus dem Muster-Rückfall, der Film-Weg war nie gelaufen.
+ *
+ * Der Block war da und vollständig (544.032 Zeichen, nachgemessen), mit
+ * `entityType: "Movie"` und den neun Tonspuren. Nur hatte der erste Versuch
+ * nach 500 ms ins Leere gegriffen, und `hydrationFuer` wurde **unabhängig vom
+ * Ergebnis** gesetzt — damit gab es keinen zweiten.
+ *
+ * Geprüft wird hier die Regel selbst: Der Merker steht hinter einer Bedingung,
+ * nicht davor. Das ist eine Aussage über die Reihenfolge im Quelltext, und die
+ * lässt sich nur dort prüfen — ein Sandkasten, der `schritt()` erreicht, müsste
+ * die ganze Taktmechanik nachbauen.
+ */
+{
+  /*
+    Seit dem Umbau vom 15.09.2026 steht der Merker in `ausDom()` und heißt
+    `gelesenBeiLaenge`. Er muss **hinter** der Treffer-Prüfung stehen: Steht er
+    davor, sperrt ein Fehlschlag jeden weiteren Versuch — der Fall „Jujutsu
+    Kaisen 0".
+  */
+  const start = quelle.indexOf('function ausDom(')
+  pruefe('der DOM-Weg steht in ausDom()', start >= 0, start)
+  const rumpf = quelle.slice(start, quelle.indexOf('\n  }\n', start))
+  const pruefung = rumpf.indexOf("if (!ausSeite(z, knoten.textContent, html, 'dom')) return")
+  const merker = rumpf.indexOf('gelesenBeiLaenge = laenge')
+  pruefe('der Merker steht hinter der Treffer-Prüfung', pruefung >= 0 && merker > pruefung, { pruefung, merker })
+}
+
+if (fehler.length) {
+  console.error(`\n${fehler.length} Zusicherung(en) rot.`)
+  process.exit(1)
+}
+console.log('\nFilm-Weg: alle Zusicherungen erfüllt.')

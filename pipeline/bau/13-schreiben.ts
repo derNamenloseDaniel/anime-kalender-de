@@ -1,0 +1,130 @@
+import {
+  type Title, type Release, type ReleaseEvent,
+  type DataMeta
+} from '../../shared/types.ts'
+import { type EntfernterVerweis } from './grundlagen.ts'
+import { type AnisearchEintrag, type TmdbTitelEintrag } from './01-quellen.ts'
+import { bekannteSeitenAusBestand, schreibeKernUndNews } from './13-5-kerndateien.ts'
+import { ergaenzeKennungen } from './13-6-kennungen.ts'
+import { ergaenzeTitelRang } from './titel-rang.ts'
+import { schreibeWochenDatei } from './13-8-wochen-datei.ts'
+import { schreibeWorkerTermine } from './13-9-worker-termine.ts'
+import { schreibePatchnotes } from './13-9-patchnotes.ts'
+import { ergaenzeErstausgabeAngebot } from './13-7-erstausgabe-angebot.ts'
+import { ergaenzeAngebotTermine } from './13-7-angebot-termine.ts'
+import { schreibeZusatzdateien } from './13-4-zusatzdateien.ts'
+import { bereinigePruefliste } from './pruefliste-bereinigen.ts'
+import { schreibeLueckenTitel } from './luecken-titel.ts'
+import { ordneCartoonsZuAnime } from './cartoon-zu-anime.ts'
+import { schreibeSprecherIndex } from './sprecher-index.ts'
+import { schreibeListen } from './13-3-listen.ts'
+import { schreibeKinoZuletzt } from './kino-zuletzt.ts'
+import { schreibeSuchadressenImEndzustand, type OffeneSuche } from './13-3-suchadressen-endzustand.ts'
+import { offeneTerminSuchen } from './13-3-termin-suchen.ts'
+import { baueAuslieferung } from './13-2-auslieferung.ts'
+import { anisearchKennungen } from './anisearch-kennung.ts'
+import { schreibeSynopsenUndReichereAn } from './13-1-anreichern.ts'
+import { belegeJoynTermine } from './13-1-joyn-termine-belegt.ts'
+import { mitBelegstaerke } from '../lib/belegstaerke.ts'
+import { ergaenzeEigeneHandlungen } from './handlung-eigen-einbinden.ts'
+import { ergaenzeSaetze } from './handlung-satz-einbinden.ts'
+import { ergaenzeDeutscheFolgenzahl } from './deutsche-folgenzahl-einbinden.ts'
+import { jwNeinAnSeite } from './kanal-erbt-anbieter.ts'
+import { tonDerKanalWege } from './deutsch-nicht-gegen-sprach-termin.ts'
+import { schliesseSpaeteLuecken } from './urteil-schliesst-luecken.ts'
+import { log } from '../lib/util.ts'
+import { type IstTot } from '../lib/adresse-tot.ts'
+import { type StaffelSammel } from './staffel-titel.ts'
+
+/** Eingaben der Schreibphase; der Bau reicht sie aus den früheren Phasen durch. */
+export interface DatensatzEingaben {
+  allTitles: Title[]
+  releases: Release[]
+  kanalJeAdresse: Map<string, string | undefined>
+  /** Streams, deren Tonspur nur die Streaming-Availability-API belegt (Schlüssel `motnTonSchluessel`). */
+  motnTon: ReadonlySet<string>
+  anisearch: Record<string, AnisearchEintrag>
+  tmdbTitles: Record<string, TmdbTitelEintrag>
+  mitStimmen: Set<number>
+  verschoben: Title[]
+  verweiseEntfernt: EntfernterVerweis[]
+  titles: Map<number, Title>
+  jpStartAnzeige: Map<number, string>
+  events: ReleaseEvent[]
+  istTot: IstTot
+  /** Suchadressen, die der Bau entfernt hat; die Liste entsteht erst hier, im Endzustand. */
+  suchOffen: OffeneSuche[]
+  meta: DataMeta
+}
+
+export function schreibeDatensatz({
+  allTitles,
+  releases,
+  kanalJeAdresse,
+  motnTon,
+  anisearch,
+  tmdbTitles,
+  mitStimmen,
+  verschoben,
+  verweiseEntfernt,
+  titles,
+  jpStartAnzeige,
+  events,
+  istTot,
+  suchOffen,
+  meta,
+}: DatensatzEingaben, staffelSammel: StaffelSammel[] = []) {
+  /* Der vorige Bestand muss vor dem ersten Schreiben von titles.json gelesen werden (`13-3-listen`). */
+  const bekannteSeiten = bekannteSeitenAusBestand()
+  const { trenneQuelle, synopses, annKennungen, trailer } = schreibeSynopsenUndReichereAn({
+    allTitles,
+    releases,
+    kanalJeAdresse,
+  })
+
+  const joynBelegt = belegeJoynTermine(allTitles, releases, events)
+  if (joynBelegt) log(`${joynBelegt} Joyn-Termin(e) ohne ≈: Tag aus belegtem Plan, Uhrzeit = Sendeende (abgeleitet)`)
+
+  const spaet = schliesseSpaeteLuecken(allTitles, releases)
+  if (spaet) log(`${spaet} spät entstandene Weg(e) über das Urteil aus Stufe 3 belegt`)
+
+  tonDerKanalWege(allTitles, releases, jwNeinAnSeite())
+
+  const { slim } = baueAuslieferung({
+    allTitles: mitBelegstaerke(allTitles, releases, motnTon),
+    anisearch,
+    tmdbTitles,
+    trenneQuelle,
+    synopses,
+    mitStimmen,
+    annKennungen,
+    trailer,
+    releases,
+    verschoben,
+    verweiseEntfernt,
+  })
+
+  ergaenzeEigeneHandlungen(synopses, slim, verschoben)
+  ergaenzeSaetze(synopses, new Set([...slim, ...verschoben].map((t) => t.id)))
+  ergaenzeDeutscheFolgenzahl(synopses, new Map([...titles.values()].map((t) => [t.id, t.episodes])))
+  const releasesVorAngebot = releases.length
+  const asKennungen = anisearchKennungen([...titles.values()].map((t) => ({ id: t.id, mal: t.malId })))
+  ergaenzeErstausgabeAngebot({ titles: titles.values(), releases, kennungen: asKennungen })
+  schreibeListen({ slim, tmdbTitles, releases, titles, istTot })
+  schreibeSuchadressenImEndzustand(suchOffen, slim, offeneTerminSuchen(releases, allTitles))
+  ergaenzeAngebotTermine({ events, releases, ab: releasesVorAngebot, slim, titles })
+  schreibeKinoZuletzt(titles, tmdbTitles)
+
+  schreibeZusatzdateien({ titles, anisearch, slim, verschoben, releases, synopses, jpStartAnzeige, staffelSammel })
+  bereinigePruefliste(slim)
+  schreibeLueckenTitel(slim, synopses)
+  ordneCartoonsZuAnime()
+  schreibeSprecherIndex({ ausgeliefert: new Set(slim.map((t) => t.id)) })
+
+  const { newsFuerRss } = schreibeKernUndNews({ releases, events, titles, meta, bekannteSeiten })
+  ergaenzeKennungen(); ergaenzeTitelRang()
+  schreibeWochenDatei()
+  schreibeWorkerTermine()
+  schreibePatchnotes()
+  return { newsFuerRss }
+}

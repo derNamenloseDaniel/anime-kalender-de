@@ -1,0 +1,481 @@
+/**
+ * **Ein geschätzter Termin, an dem nichts erscheint, muss das sagen.**
+ *
+ * Bis zum 31.08.2026 verstrich eine Schätzung spurlos: Der Kalender zeigte
+ * „Mushoku Tensei Staffel 3, Folge 6, 30.08." mit dem Näherungszeichen, die
+ * deutsche Fassung kam nicht, und am nächsten Tag stand der Termin unverändert
+ * da. Daniel: „warum hat der lauf diesen mis-stand nicht bemerkt und behoben?"
+ *
+ * Der Grund war eine Lücke, keine Fehlmessung: der Kalender-Abruf (bis 21.10.2026) hielt
+ * fest, was im Anbieter-Kalender **steht**. Ein fehlender Eintrag hinterlässt
+ * dort nichts, und der Bau rechnet unbeirrt weiter — er liest nicht einmal das
+ * `weeklyConfirmed`-Feld, das bei dieser Staffel ausdrücklich `false` sagt.
+ *
+ * Dieser Lauf schließt sie. Er vergleicht die geschätzten Termine mit dem, was
+ * der Anbieter wirklich gezeigt hat (bis 21.10.2026 der Simulcast-Kalender, seither der Katalog `crunchyroll-neu.json`):
+ *
+ * - **Überfällig** (mehr als fünfzehn Minuten vorbei, keine Beobachtung): Der
+ *   Termin wird als verpasst vermerkt. Er verschwindet nicht — er sagt jetzt,
+ *   dass der Anbieter ihn nicht eingehalten hat, und wann wir das nächste Mal
+ *   nachsehen. Daniel: „falsche infos auf der webseite sind unbedingt zu
+ *   vermeiden."
+ * - **Nachgeholt** (später doch eine Beobachtung): Der Eintrag bekommt das
+ *   echte Datum und nennt den Verzug.
+ *
+ * **Nur im gelesenen Fenster** (Kalender, bis 21.10.2026). `data/crunchyroll.json` trägt, welchen Zeitraum
+ * der Scrape abgedeckt hat. Ein Termin davor hat keine Beobachtung, weil
+ * niemand hingesehen hat — ihn als verpasst zu führen wäre eine Behauptung
+ * über etwas Ungeprüftes. Seit der Kalender tot ist (Fenster bis 21.10.2026),
+ * urteilt der Katalog `crunchyroll-neu.json` über spätere Termine, und eine
+ * Ankündigung im Wochenprogramm zählt nie als Beobachtung (`lib/verpasst-ankuendigung.ts`).
+ *
+ * Was hier landet, gehört gelesen: `daniel-zum-abarbeiten/listen/12-verpasste-termine.md`
+ * listet die Fälle samt Feldern für die Handrecherche. Ein dort eingetragener
+ * `neuErwartet` wird vom nächsten Lauf bestätigt oder verworfen.
+ *
+ * Aufruf: `tsx pipeline/termine-pruefen.ts [--jetzt 2026-08-31T18:00:00Z]`
+ */
+import { writeFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { log, readJson, ROOT, writeJson } from './lib/util.ts'
+import { hinweiseAnhaengen, folgeAmVerpasstenTermin, rechercheFaellig, terminFrist, terminPruefen, terminZeitpunkt } from './lib/ausgeblieben.ts'
+import { meldeAbbruch } from './lib/abbruch.ts'
+import { beobachtetAusRelease } from './lib/verpasst-beobachtet.ts'
+import { katalogBeobachtungen, katalogOhneTag, katalogStaffel, keinVerworfen } from './lib/verpasst-katalog.ts'
+import { angekuendigteFolgen, darfUrteilen, ohneAnkuendigung, staffelImKatalog } from './lib/verpasst-ankuendigung.ts'
+import { toIsoDate } from '../shared/time.ts'
+import type { NeueFolge } from './lib/cr-neu-wache.ts'
+import type { Title } from '../shared/types.ts'
+import { BELEGE_DATEI, belegeAnhaengen, type WocheBelege } from './lib/woche-beleg.ts'
+import { neuerVermerk } from './lib/vermerk-neu.ts'
+import type { WocheBelegVermerk } from '../shared/woche-beleg-typ.ts'
+
+/*
+  **Dieser Lauf ist im Stundeltakt als geduldeter Schritt eingehängt** (`continue-on-error`, weil er
+  den Datenlauf nicht aufhalten soll). Ohne die folgenden zwei Zeilen bliebe ein Absturz unsichtbar —
+  genau die Form, die am 28.09.2026 drei Tage lang niemandem auffiel. Deshalb meldet sich jeder
+  Abbruch als Vorfall an die Statusanzeige; `tools/check-workflows.mjs` achtet darauf.
+*/
+for (const ereignis of ['uncaughtException', 'unhandledRejection'] as const) {
+  process.on(ereignis, (err) => {
+    void meldeAbbruch('verpasste-termine', err, 'mehrere')
+    console.error(err)
+    process.exit(1)
+  })
+}
+
+const JETZT = new Date(
+  /--jetzt[= ](\S+)/.exec(process.argv.join(' '))?.[1] ?? new Date().toISOString(),
+)
+
+interface Ereignis {
+  id: string
+  releaseSlug: string
+  titleId: number
+  name: string
+  platform: string
+  date: string
+  time?: string
+  episode?: number
+  estimated?: boolean
+}
+interface Beobachtung {
+  date: string
+  episode?: number
+  /** Tag aus dem ersten Katalogfund: belegt „war da“, nicht den Erscheinungstag. */
+  rueckfall?: true
+  /** `woche`: aus dem Wochenprogramm angehängt — eine Ankündigung, keine Sichtung. */
+  quelle?: string
+}
+interface Kalender {
+  scrapedAt?: string
+  window?: { from?: string; to?: string }
+  german?: Record<string, { seriesUrl?: string; observations?: Beobachtung[] }>
+}
+
+/**
+ * Ein verpasster Termin, wie er in `data/termine-verpasst.json` steht.
+ *
+ * `neuErwartet` und `recherche` füllt ein Mensch — sie sind der Grund, warum
+ * die Datei im Repo liegt und nicht nur im Kalender steht.
+ */
+export interface VerpassterTermin {
+  id: string
+  slug: string
+  titleId: number
+  name: string
+  platform: string
+  episode: number | null
+  /** Der Termin, den wir angekündigt hatten. */
+  erwartetAm: string
+  /** Wann der Lauf gemerkt hat, dass nichts kam. */
+  bemerktAm: string
+  /** Wann die Folge wirklich kam — gefüllt, sobald der Anbieter sie zeigt. */
+  erschienenAm: string | null
+  /** Verzug in Stunden, sobald beides bekannt ist. */
+  verzugStunden: number | null
+  /** Wie viele Folgen der Anbieter zu diesem Zeitpunkt wirklich zeigte. */
+  folgenVerfuegbar: number | null
+  /** War der Tag beim Vermerken errechnet? Hält das Wort „angekündigt“/„erwartet“ stabil, auch wenn die Folge kommt. */
+  tagGeschaetzt?: boolean
+  /** Von Hand: der neue erwartete Termin, wenn die Recherche einen ergibt. */
+  neuErwartet: string | null
+  /** Was die Recherche ergeben hat — ein bis zwei Sätze, die auf der Seite stehen. */
+  recherche: string | null
+  /** Die Adresse, die `recherche` belegt. */
+  rechercheQuelle?: string | null
+  /** Wann zuletzt recherchiert wurde, auch ohne Fund — die Frist hängt daran. */
+  rechercheAm?: string | null
+  /** Wann der Anbieter-Kalender zuletzt gelesen wurde, ohne die Folge zu zeigen. */
+  geprueftAm?: string | null
+  /** Wann die Anime2You-Meldungen zuletzt gelesen wurden. */
+  newsGeprueftAm?: string | null
+  /** Anime2You-Meldungen zu diesem Titel mit Pausen- oder Verschiebungssignal. */
+  hinweise?: { quelle: string; titel: string; url: string; datum: string }[]
+  /**
+   * Wird beim Schreiben aussortiert — die Folge kam am erwarteten Tag, der
+   * Vermerk beschreibt also nichts, was passiert ist. Steht bewusst nicht in
+   * der Datei, sondern nur zwischen Lesen und Schreiben.
+   */
+  gestrichen?: boolean
+  /** Bild und HTML des Kalendertags beim Bemerken bzw. beim Nachreichen (`messbelege.ts`). */
+  messbeleg?: Messbeleg
+  nachgereichtBeleg?: Messbeleg
+  /** Foto der Wochenprogramm-Zeile, die den Termin ankündigte (`lib/woche-beleg.ts`). */
+  wocheBeleg?: WocheBelegVermerk
+}
+
+/** Was wir beim Messen gesehen haben — privat abgelegt, der Schlüssel steht hier. */
+export interface Messbeleg {
+  am: string
+  url: string
+  bild: string
+  html?: string
+}
+
+const ereignisse = readJson<Ereignis[]>('public/data/events.json', [])
+const kalender = readJson<Kalender>('data/crunchyroll.json', {})
+const verpasst = readJson<VerpassterTermin[]>('data/termine-verpasst.json', [])
+const wocheFolgen = readJson<{ uebernommen?: { seriesId: string | null; episode: number; date: string }[] }>('data/crunchyroll-woche.json', {}).uebernommen ?? []
+
+/**
+ * **Der Schlüssel ist die Serienkennung, nicht die volle Adresse.**
+ *
+ * Beide Seiten nennen dieselbe Serie und schreiben sie verschieden: Der
+ * Kalender führt `…/series/GT00378123/tomb-raider-king`, die Veröffentlichung
+ * `…/series/GT00378123/`. Als Zeichenketten treffen sie sich **nie** — und
+ * damit fand kein einziger verpasster Termin je seine Bestätigung.
+ *
+ * Aufgefallen am 10.09.2026: „Tomb Raider King" stand mit „⚠ nicht erschienen"
+ * an Folge 7 im Kalender, während Crunchyroll sie seit dem 09.09. zeigt und
+ * unser eigener Bestand sie als beobachtet führt. Der Nachtrag darunter war
+ * gebaut und lief ins Leere.
+ *
+ * Die Kennung nach `/series/` ist eindeutig und überlebt jede Schreibweise des
+ * Slugs. Wo sie fehlt (andere Anbieter), bleibt die Adresse ohne ihre
+ * Schrägstriche am Ende der Schlüssel.
+ */
+const adressKern = (u: string): string =>
+  /\/series\/([A-Z0-9]+)/i.exec(String(u))?.[1] ?? String(u).replace(/\/+$/, '').toLowerCase()
+
+/* Beobachtungen je Serie — der Schlüssel, über den ein Termin bestätigt wird. */
+const gesehen = new Map<string, Beobachtung[]>()
+for (const eintrag of Object.values(kalender.german ?? {})) {
+  if (!eintrag.seriesUrl) continue
+  const schluessel = adressKern(eintrag.seriesUrl)
+  gesehen.set(schluessel, [...(gesehen.get(schluessel) ?? []), ...(eintrag.observations ?? [])])
+}
+/* Ein Ereignis kennt die Serienadresse nicht — die Veröffentlichung schon. */
+const veroeffentlichungen = readJson<Array<{ slug: string; titleId?: number; platformUrl?: string; schedule?: { firstEpisodeDate?: string; observed?: Record<string, string> } }>>(
+  'public/data/releases.json',
+  [],
+)
+const adresseJeSlug = new Map(veroeffentlichungen.map((r) => [r.slug, r.platformUrl]))
+const folgentageJeSlug = new Map(veroeffentlichungen.map((r) => [r.slug, r.schedule?.observed]))
+/*
+  **Ein Vermerk vor dem heutigen Start ist gegenstandslos.** Er stammt aus einer
+  Schätzung, die eine spätere Ankündigung widerlegt hat (Apothekerin: 01.10.
+  geschätzt, 02.10. belegt; Daniel, 01.10.2026). Er wird nicht mehr geführt.
+*/
+const startJeSlug = new Map(veroeffentlichungen.map((r) => [r.slug, r.schedule?.firstEpisodeDate]))
+const vorDemStart = (v: { slug: string; erwartetAm: string }) => {
+  const start = startJeSlug.get(v.slug)
+  return Boolean(start && v.erwartetAm.slice(0, 10) < start)
+}
+
+/* Der Katalog (`crunchyroll-neu.json`) sieht deutsche Folgen, die der Simulcast-Kalender nicht zeigt (Aristocrat S3 F2, 26.10.2026). */
+const katalog = readJson<{ geholtAm?: string; folgen?: NeueFolge[] }>('data/crunchyroll-neu.json', {})
+const katalogFolgen = katalog.folgen ?? []
+const ohneTag = katalogOhneTag(katalogFolgen)
+if (ohneTag.length) {
+  console.log(`⚠ Katalogfolgen ohne Tag (zählen nicht als Beleg): ${ohneTag.length} — ${ohneTag.map((f) => `${f.serie} ${f.staffel} F${f.nummer}`).join('; ')}`)
+}
+const katalogVerworfen = keinVerworfen()
+const alleTitel = readJson<Title[]>('public/data/titles.json', [])
+const titelIdJeSlug = new Map(veroeffentlichungen.map((r) => [r.slug, r.titleId]))
+
+/* Angekündigte Folgen (Wochenprogramm): Sie machen einen Termin prüfbar, bestätigen ihn aber nicht (`lib/verpasst-ankuendigung.ts`). */
+const wocheBelege = readJson<WocheBelege>(BELEGE_DATEI, {})
+const kalenderWoche = Object.values(kalender.german ?? {}).flatMap((g) =>
+  (g.observations ?? []).filter((o) => o.quelle === 'woche' && o.episode != null).map((o) => ({ seriesId: adressKern(g.seriesUrl ?? ''), episode: o.episode!, date: o.date })),
+)
+const angekuendigt = angekuendigteFolgen(wocheFolgen, wocheBelege, kalenderWoche)
+
+/** Serienkennung und Katalog-Staffel einer Veröffentlichung; die Staffel ist `undefined`, wenn sie nicht eindeutig ist. */
+function katalogSuche(slug: string): { serieId: string | undefined; staffel: number | undefined } {
+  const titel = alleTitel.find((t) => t.id === titelIdJeSlug.get(slug))
+  return { serieId: /\/series\/([A-Z0-9]+)/i.exec(adresseJeSlug.get(slug) ?? '')?.[1], staffel: katalogStaffel(titel, alleTitel) }
+}
+
+function beobachtungen(slug: string): Beobachtung[] {
+  const adresse = adresseJeSlug.get(slug)
+  const ausKalender = adresse ? (gesehen.get(adressKern(adresse)) ?? []) : []
+  const { serieId, staffel } = katalogSuche(slug)
+  const ausKatalog = katalogBeobachtungen(katalogFolgen, serieId, staffel, toIsoDate(JETZT), katalogVerworfen)
+  const ausRelease = beobachtetAusRelease(folgentageJeSlug.get(slug), JETZT)
+  return [...ohneAnkuendigung(ausKalender, serieId, angekuendigt), ...ausKatalog, ...ohneAnkuendigung(ausRelease, serieId, angekuendigt)]
+}
+
+function zeitpunkt(e: Ereignis): Date {
+  return terminZeitpunkt(e.date, e.time)
+}
+
+/**
+ * **Ab wann ein Ausbleiben gilt — nicht, wann der Termin „ist".**
+ *
+ * Nur das Datum bekannt (keine Uhrzeit): Der Anbieter kann bis zum Tagesende
+ * liefern, der Termin gilt erst ab 23:59:59 Ortszeit als verpasst. Vorher
+ * stand hier Mitternacht + fünfzehn Minuten — „Die Tagebücher der Apothekerin"
+ * Staffel 3 wurde damit am 01.10. um 01:59 als „nicht erschienen" vermerkt,
+ * obwohl der Tag noch lief.
+ *
+ * Datum **und** Uhrzeit bekannt: Uhrzeit + Karenz. Die Laufzeit der Folge
+ * gehört nach Daniels Vorgabe dazu, steht aber nicht in jedem Termin — sie
+ * nachzutragen ist offen; bis dahin bleibt es bei der Karenz allein.
+ */
+function frist(e: Ereignis): Date {
+  return terminFrist(e.date, e.time)
+}
+
+/**
+ * Wie viele Folgen der Anbieter zu dieser Serie wirklich zeigt.
+ *
+ * Steht im Kalender „Folge 6 kommt heute" und kam sie nicht, ist die nächste
+ * Frage, wie weit die Staffel überhaupt ist. Die Zahl steht im Dub-Bestand, den
+ * der Crunchyroll-Lauf schreibt.
+ */
+const dub = readJson<{
+  serien?: Array<{
+    url?: string
+    seriesId?: string
+    staffeln?: Array<{ deutscheFolgen?: Array<{ nummer: number }> }>
+  }>
+}>('data/crunchyroll-dub.json', {}).serien ?? []
+function folgenBeimAnbieter(slug: string): number | null {
+  const adresse = adresseJeSlug.get(slug)
+  if (!adresse) return null
+  const kennung = /\/series\/([A-Z0-9]+)/.exec(adresse)?.[1]
+  const eintrag = dub.find((d) => (kennung ? d.seriesId === kennung : d.url === adresse))
+  if (!eintrag) return null
+  /* Folgen ohne Nummer (Specials) ergäben sonst NaN — so stand „NaN Folgen" in der Liste (13.09.2026). */
+  const zahlen = (eintrag.staffeln ?? [])
+    .flatMap((s) => (s.deutscheFolgen ?? []).map((f) => f.nummer))
+    .filter((n) => Number.isFinite(n))
+  return zahlen.length ? Math.max(...zahlen) : null
+}
+
+const von = kalender.window?.from ?? '9999-12-31'
+const bis = kalender.window?.to ?? '0000-01-01'
+const bekannt = new Set(verpasst.map((v) => v.id))
+
+let neu = 0
+for (const e of ereignisse) {
+  const kennung = adressKern(adresseJeSlug.get(e.releaseSlug) ?? '')
+  if (bekannt.has(e.id) || !terminPruefen(e, kennung, angekuendigt)) continue
+  /*
+    **Nur Crunchyroll — dort gibt es einen Kalender, den wir lesen.**
+
+    Der erste Lauf am 31.08.2026 meldete vier verpasste Termine, drei davon
+    falsch: „The Ghost in the Shell" und „Vom Landei zum Schwertheiligen II"
+    auf Prime, „Thunder 3" auf Netflix. Zu keiner dieser Plattformen führen
+    wir einen Sendekalender — dort **kann** es per Bauart keine Beobachtung
+    geben, und jeder geschätzte Termin wäre automatisch verpasst.
+
+    Daniel hat es sofort gesehen: „sind die anderen 3 wirklich verpasst? ich
+    hab es nicht geprüft, wie hast du es mitbekommen?" Genau die richtige
+    Frage — „keine Beobachtung" ist nur dort eine Auskunft, wo jemand
+    hingesehen hat.
+  */
+  if (e.platform !== 'crunchyroll') continue
+  /* Und nur im gelesenen Fenster — davor hat auch bei Crunchyroll niemand hingesehen; danach sieht nur noch der Katalog hin. */
+  const suche = katalogSuche(e.releaseSlug)
+  const staffelEindeutig = staffelImKatalog(katalogFolgen, suche.serieId, suche.staffel)
+  if (!darfUrteilen(e, { von, bis }, { frist: frist(e), jetzt: JETZT, geholtAm: katalog.geholtAm, staffelEindeutig })) continue
+  if (JETZT.getTime() - frist(e).getTime() < 0) continue
+  const gesehenHier = beobachtungen(e.releaseSlug)
+  const folge = folgeAmVerpasstenTermin(
+    e.date,
+    e.episode,
+    gesehenHier,
+    verpasst.filter((v) => v.slug === e.releaseSlug && !v.gestrichen).map((v) => v.id.slice(v.id.lastIndexOf('@') + 1)),
+  )
+  const treffer = gesehenHier.some((o) => o.date === e.date || (folge != null && o.episode === folge))
+  if (treffer) continue
+  verpasst.push(neuerVermerk(e, folge, zeitpunkt(e).toISOString(), JETZT.toISOString(), folgenBeimAnbieter(e.releaseSlug)))
+  neu++
+}
+
+/* Das Bild der Ankündigung im Wochenprogramm kommt an jeden Vermerk, zu dem eine Zeile vorliegt — auch an bestehende (Tomb Raider King F12). */
+const wocheBelegNeu = belegeAnhaengen(verpasst, wocheBelege, (slug) => adressKern(adresseJeSlug.get(slug) ?? ''))
+if (wocheBelegNeu) log(`${wocheBelegNeu} Vermerk(e) mit dem Bild der Wochenprogramm-Ankündigung versehen`)
+
+/*
+  **Nachgeholt: Steht die Folge inzwischen im Kalender, bekommt der Eintrag ihr Datum.**
+
+  Die Suche nach der **gleichen** Nummer allein trägt nicht, und das ist keine
+  Feinheit: Crunchyrolls Kalender führt je Tag und Serie genau **eine** Kachel —
+  die neueste Folge. Wird ein ausgefallener Termin gesammelt nachgereicht, taucht
+  die verpasste Zwischenfolge dort deshalb **nie** auf, und der Eintrag bliebe
+  für immer offen.
+
+  Real bei Mushoku Tensei Staffel 3: Folge 6 fiel am 30.08.2026 aus; am
+  06.09.2026 kamen 6, 7 und 8 gemeinsam (Daniel, 22:31). Der Kalender jenes Tages
+  kennt nur „Folge 8". Ohne die Regel darunter rechnete der Kalender weiter mit
+  dem Ersatztermin aus einer Recherche — einer Vermutung, obwohl die Sache längst
+  entschieden war.
+
+  **Eine höhere Folgennummer belegt die niedrigere**, denn Folgen erscheinen
+  aufsteigend: Folge 8 kann nicht dastehen, während 6 fehlt. Was sie **nicht**
+  belegt, ist der Tag — die Folge war „spätestens dann" da. Deshalb zählt die
+  **früheste** solche Beobachtung, und nur eine ab dem erwarteten Tag; eine
+  frühere gehört zu einem Termin, der nie verpasst war.
+*/
+let nachgeholt = 0
+let ohneVerzug = 0
+let ohneErscheinungstag = 0
+for (const v of verpasst) {
+  if (v.erschienenAm) continue
+  if (v.episode == null) continue
+  const erwartetTag = String(v.erwartetAm).slice(0, 10)
+  const treffer = beobachtungen(v.slug)
+    .filter((o) => o.episode != null && o.episode >= v.episode! && o.date >= erwartetTag)
+    .sort((a, b) => (a.date < b.date ? -1 : 1))[0]
+  if (!treffer) continue
+  /*
+    Der Tag kommt aus der Beobachtung, die **Uhrzeit aus dem erwarteten
+    Termin** — der Sendeplatz ändert sich beim Nachreichen nicht. Mitternacht
+    einzusetzen läge systematisch zu früh und machte den Verzug zu klein: bei
+    Mushoku Tensei 151 Stunden statt der tatsächlichen 168, also einer Woche.
+  */
+  /*
+    Ein Rückfall-Tag (`gesehenAm`) ist der Tag des ersten Katalogfundes, nicht des Erscheinens (bei den ersten fünf Fällen
+    10–34 Tage nach `ausstrahlung`): Er belegt, dass die Folge da war, aber keinen Verzug. Der Vermerk „nicht erschienen“
+    ist damit widerlegt und fällt weg; ein Verzug wird nicht ausgewiesen.
+  */
+  if (treffer.rueckfall) {
+    v.gestrichen = true
+    ohneErscheinungstag++
+    continue
+  }
+  const uhrzeit = String(v.erwartetAm).slice(11, 19) || '00:00:00'
+  const wirklich = new Date(`${treffer.date}T${uhrzeit}Z`)
+  const verzug = Math.round((wirklich.getTime() - new Date(v.erwartetAm).getTime()) / 36e5)
+  /**
+   * **Kein Verzug heißt: Der Termin wurde eingehalten.**
+   *
+   * Der Prüflauf sieht am Abend des Sendetags nach. Steht die Folge dann noch
+   * nicht da — weil der Anbieter eine Stunde später liefert, oder weil unsere
+   * Uhrzeit zehn Minuten danebenliegt —, entsteht ein Vermerk, den die
+   * Beobachtung desselben Tages sofort widerlegt. „Tomb Raider King" trug ihn
+   * an Folge 7, obwohl Crunchyroll sie am erwarteten Tag zeigte (10.09.2026).
+   *
+   * Ein solcher Eintrag wird nicht nachgetragen, sondern **gestrichen**: Er
+   * beschreibt nichts, was passiert ist.
+   */
+  if (verzug <= 0) {
+    v.gestrichen = true
+    ohneVerzug++
+    continue
+  }
+  v.erschienenAm = wirklich.toISOString()
+  v.verzugStunden = verzug
+  nachgeholt++
+}
+
+/*
+  **Was bei einem offenen Vermerk zuletzt nachgesehen wurde, steht am Vermerk.**
+
+  Daniel am 13.09.2026: Unter „Folge 8 ist nicht erschienen" soll stehen, dass
+  wir nachsehen, wie oft, und ob die News etwas wissen — „sodass nutzer beruhigt
+  sind". Behauptet wird dabei nur, was dieser Lauf belegen kann:
+
+  - `geprueftAm` ist der Zeitpunkt, an dem der **Kalender** gelesen wurde
+    (`scrapedAt`), nicht der dieses Laufs. Ist der Abruf davor gescheitert,
+    bleibt die Datei alt, und mit ihr der Zeitstempel — sonst stünde auf der
+    Seite „zuletzt nachgesehen: eben", obwohl niemand hingesehen hat.
+  - `newsGeprueftAm` gilt nur, wenn der Feed **nach** dem Termin geholt wurde.
+    Ein Feed vom Vormittag sagt nichts über eine Absage am Nachmittag.
+*/
+const a2y = readJson<{
+  scrapedAt?: string
+  proposals?: { articleTitle: string; articleUrl: string; publishedAt: string; category: string; platforms: string[]; pause?: string }[]
+}>('data/proposals/anime2you.json', {})
+const titel = readJson<Array<{ id: number; titleDe?: string; titleEn?: string; titleRomaji?: string }>>(
+  'public/data/titles.json',
+  [],
+)
+const titelJeId = new Map(titel.map((t) => [t.id, t]))
+let hinweiseNeu = 0
+for (const v of verpasst) {
+  if (v.erschienenAm || v.gestrichen) continue
+  /* Seit dem Ende des Simulcast-Kalenders (21.10.2026) sieht der Katalog nach (`geholtAm`). */
+  for (const gelesen of [kalender.scrapedAt, katalog.geholtAm]) {
+    if (gelesen && gelesen > v.erwartetAm && (!v.geprueftAm || gelesen > v.geprueftAm)) v.geprueftAm = gelesen
+  }
+  if (a2y.scrapedAt && a2y.scrapedAt > v.erwartetAm) v.newsGeprueftAm = a2y.scrapedAt
+  const t = titelJeId.get(v.titleId)
+  hinweiseNeu += hinweiseAnhaengen(v, a2y.proposals ?? [], [v.name, t?.titleDe, t?.titleEn, t?.titleRomaji], JETZT)
+}
+if (hinweiseNeu) log(`${hinweiseNeu} Anime2You-Meldung(en) einem ausgebliebenen Termin zugeordnet`)
+
+if (ohneErscheinungstag) log(`${ohneErscheinungstag} Vermerk(e) gestrichen — der Katalog belegt die Folge, ihr Erscheinungstag ist unbekannt`)
+const kv = katalogVerworfen
+log(`Katalog verworfen: ${kv.ohneSerieOderStaffel} Titel ohne Serie/Staffel, ${kv.ohneNummer} Folgen ohne Nummer, ${kv.andereStaffel} andere Staffel, ${kv.ohneTag} ohne Tag, ${kv.angekuendigt} angekündigt`)
+if (ohneVerzug) log(`${ohneVerzug} Vermerk(e) gestrichen — die Folge kam am erwarteten Tag`)
+/* Vermerke vor dem geltenden Start fallen weg (widerlegte Schätzung). */
+const endgueltig = verpasst.filter((v) => !v.gestrichen && !vorDemStart(v))
+const veraltet = verpasst.length - endgueltig.length - ohneVerzug - ohneErscheinungstag
+if (veraltet > 0) log(`${veraltet} Vermerk(e) verworfen — ihr Tag liegt vor dem heutigen Start`)
+writeJson('data/termine-verpasst.json', endgueltig, true)
+
+/* Die Arbeitsliste für die Handrecherche — offene Fälle zuerst. */
+const offen = endgueltig.filter((v) => !v.erschienenAm)
+const zeilen = [
+  '# Verpasste Termine',
+  '',
+  'Geschätzte Termine, an denen beim Anbieter nichts erschienen ist. Der Lauf trägt sie',
+  'automatisch ein; auf der Seite steht danach, dass der Anbieter den Termin nicht eingehalten',
+  'hat, und wann wir das nächste Mal nachsehen. Erscheint die Folge später doch, füllt er',
+  '`erschienenAm` und nennt den Verzug.',
+  '',
+  '**Recherchiert wird automatisch:** Ab sechs Stunden Verzug sucht `claude-verpasst-recherche.yml`',
+  'einmal täglich im Netz (Anbieter-News, Social Media, Anime2You) und schreibt `recherche`,',
+  '`rechercheQuelle`, `rechercheAm` und — nur mit Quelle, die den Tag nennt — `neuErwartet`.',
+  'Nach zwei Wochen wöchentlich, nach zwei Monaten nicht mehr. Von Hand eintragen geht weiterhin.',
+  '',
+  `Stand: ${JETZT.toISOString().slice(0, 16).replace('T', ' ')} · ${offen.length} offen, ${verpasst.length - offen.length} nachgeholt`,
+  '',
+  '| Titel | Folge | erwartet | beim Anbieter | Kalender gelesen | Anime2You | Recherche | fällig |',
+  '|---|---|---|---|---|---|---|---|',
+  ...offen.map(
+    (v) =>
+      `| ${v.name} | ${v.episode ?? '—'} | ${v.erwartetAm.slice(0, 16).replace('T', ' ')} | ${v.folgenVerfuegbar ?? '?'} Folgen | ${v.geprueftAm?.slice(0, 16).replace('T', ' ') ?? '—'} | ${v.hinweise?.length ? v.hinweise.map((h) => `[${h.titel}](${h.url})`).join('<br>') : v.newsGeprueftAm ? 'keine Meldung' : '—'} | ${v.recherche ? `${v.recherche}${v.rechercheQuelle ? ` ([Quelle](${v.rechercheQuelle}))` : ''}` : v.rechercheAm ? `nichts gefunden (${v.rechercheAm.slice(0, 10)})` : '**offen**'} | ${rechercheFaellig(v, JETZT) ? 'ja' : 'nein'} |`,
+  ),
+  '',
+]
+writeFileSync(resolve(ROOT, 'daniel-zum-abarbeiten/listen/12-verpasste-termine.md'), zeilen.join('\n'))
+
+log(
+  `${neu} Termin(e) neu als verpasst vermerkt, ${nachgeholt} nachgeholt, ${offen.length} offen ` +
+    `(Fenster ${von} bis ${bis}, danach Katalog vom ${katalog.geholtAm ?? '–'})`,
+)

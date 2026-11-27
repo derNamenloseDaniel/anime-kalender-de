@@ -1,0 +1,523 @@
+import { useState } from 'react'
+import type { DataMeta, PlatformId } from '@shared/types.ts'
+import { WOCHENPROGRAMM_UEBERSICHT } from '@shared/wochenprogramm.ts'
+import { absoluteFeedUrl, type Dataset } from '../lib/data.ts'
+import { useLang, type Translate } from '../lib/i18n.tsx'
+import { useFavorites } from '../lib/favorites.ts'
+import { useUebernommeneNamen } from './uebernommene-namen.ts'
+import {
+  favoritenFeedAdresse,
+  getSyncToken,
+  useNewsletterVerbindung
+} from '../lib/newsletterSync.ts'
+import { AdminPanel, readAdminToken } from './AdminPanel.tsx'
+import { Button, SectionTitle } from './ui.tsx'
+import { PushTest } from './PushTest.tsx'
+import type { AbmeldeState } from './AboBeenden.tsx'
+import { AboEinstellungen } from './abo-einstellungen.tsx'
+import { ImpressumAnbieter } from './impressum-anbieter.tsx'
+import { WiederherstellenKasten } from './newsletter-kaesten.tsx'
+import { AnmeldeFormular } from './newsletter-kaesten.tsx'
+import { UebernommenKasten } from './newsletter-kaesten.tsx'
+import { Card, PlatformToggleList } from './static-bausteine.tsx'
+import { FuerApps } from './fuer-apps.tsx'
+import { useAbgleichBeimOeffnen, useAnmeldung, type AbgleichZustand } from './newsletter-zustand.ts'
+
+function CopyField({ value }: { value: string }) {
+  const { t } = useLang()
+  const [copied, setCopied] = useState(false)
+  return (
+    <div className="flex gap-2">
+      <input
+        readOnly
+        aria-label={t('sub.adresse')}
+        value={value}
+        onFocus={(e) => e.currentTarget.select()}
+        className="min-w-0 flex-1 cursor-text rounded-lg border border-slate-300 bg-slate-100 px-2 py-1.5 font-mono text-xs dark:border-white/15 dark:bg-black/30"
+      />
+      <Button
+        size="sm"
+        onClick={() => {
+          navigator.clipboard.writeText(value).then(() => {
+            setCopied(true)
+            setTimeout(() => setCopied(false), 1500)
+          })
+        }}
+      >
+        {copied ? t('sub.copied') : t('sub.copy')}
+      </Button>
+    </div>
+  )
+}
+
+/**
+ * **Nur deine Favoriten** — der persönliche Feed. Braucht ein bestätigtes Newsletter-Abo,
+ * denn nur dort liegen die Favoriten auf dem Server.
+ */
+function FavoritenFeed() {
+  const { t } = useLang()
+  const { verbunden } = useNewsletterVerbindung()
+  const [url, setUrl] = useState<string>()
+  const [fehler, setFehler] = useState<string>()
+  const holen = (neu: boolean) => {
+    const token = getSyncToken()
+    if (!token) return
+    setFehler(undefined)
+    favoritenFeedAdresse(token, neu).then(setUrl, (e: Error) => setFehler(e.message))
+  }
+  return (
+    <Card>
+      <SectionTitle>{t('sub.favTitel')}</SectionTitle>
+      {!verbunden ? (
+        <p className="text-sm text-slate-600 dark:text-slate-300">
+          {t('sub.favOhneAbo')}{' '}
+          <a href="#/newsletter" className="text-sky-600 underline underline-offset-2 dark:text-sky-400">
+            {t('sub.favZumNewsletter')}
+          </a>
+        </p>
+      ) : url ? (
+        <>
+          <CopyField value={url} />
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button href={url.replace(/^https?:/, 'webcal:')} size="sm">
+              {t('sub.favAbonnieren')}
+            </Button>
+            <Button onClick={() => holen(true)} size="sm">
+              {t('sub.favNeu')}
+            </Button>
+          </div>
+          <p className="mt-2 text-xs text-ak-leise">{t('sub.favHinweis')}</p>
+        </>
+      ) : (
+        <Button onClick={() => holen(false)} size="sm">
+          {t('sub.favAnlegen')}
+        </Button>
+      )}
+      {fehler && <p className="mt-2 text-xs text-ak-fehler-text">{fehler}</p>}
+    </Card>
+  )
+}
+
+export function SubscribeView({ meta }: { meta: DataMeta }) {
+  const { t } = useLang()
+  const [platform, setPlatform] = useState<PlatformId | 'all'>('all')
+  const feed = platform === 'all' ? 'all.ics' : `platform-${platform}.ics`
+  const url = absoluteFeedUrl(feed)
+
+  return (
+    <div className="mx-auto flex max-w-3xl flex-col gap-5">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('sub.title')}</h1>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{t('sub.intro')}</p>
+      </div>
+
+      <Card>
+        <SectionTitle>{t('sub.pick')}</SectionTitle>
+        <div className="mb-3">
+          <PlatformToggleList
+            platforms={meta.platforms}
+            selected={platform === 'all' ? 'all' : [platform]}
+            onToggle={(p) => setPlatform(p)}
+            allLabel={t('sub.all')}
+            onAll={() => setPlatform('all')}
+          />
+        </div>
+        <CopyField value={url} />
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button href={url} download={feed} size="sm">
+            ⬇ {t('sub.download')}
+          </Button>
+          <Button href="https://calendar.google.com/calendar/u/0/r/settings/addbyurl" size="sm">
+            {t('sub.insert')}
+          </Button>
+        </div>
+      </Card>
+
+      <FavoritenFeed />
+      <PushTest />
+
+      <Card>
+        <SectionTitle>{t('sub.how')}</SectionTitle>
+        <ol className="ml-4 list-decimal space-y-1.5 text-sm text-slate-600 dark:text-slate-300">
+          <li>{t('sub.step1')}</li>
+          <li>{t('sub.step2')}</li>
+          <li>{t('sub.step3')}</li>
+        </ol>
+        <p className="mt-3 text-xs text-ak-leise">{t('sub.note')}</p>
+      </Card>
+
+      <FuerApps />
+    </div>
+  )
+}
+
+function SyncHinweise({ abgleich, t }: { abgleich: AbgleichZustand; t: Translate }) {
+  const { welcome, syncState, syncMessage } = abgleich
+  return (
+    <>
+      {welcome && (
+        <div className="rounded-xl border border-ak-gut/40 bg-ak-gut-grund px-4 py-3 text-sm text-ak-gut-text">
+          <strong className="block">{t('news.welcomeTitle')}</strong>
+          {t('news.welcomeBody')}
+        </div>
+      )}
+
+      {syncState !== 'idle' && (
+        <div
+          className={[
+            'rounded-xl border px-4 py-3 text-sm',
+            syncState === 'ok'
+              ? 'border-ak-gut/40 bg-ak-gut-grund text-ak-gut-text'
+              : syncState === 'error'
+                ? 'border-ak-fehler/40 bg-ak-fehler-grund text-ak-fehler-text'
+                : 'border-slate-300 text-slate-500 dark:border-white/15',
+          ].join(' ')}
+        >
+          {syncState === 'sending' ? t('news.syncRunning') : syncMessage}
+        </div>
+      )}
+    </>
+  )
+}
+
+function WarteUndFunktionsKarten({ t }: { t: Translate }) {
+  return (
+    <>
+      <Card>
+        <SectionTitle>{t('news.waitTitle')}</SectionTitle>
+        <p className="text-sm text-slate-600 dark:text-slate-300">{t('news.waitBody')}</p>
+        <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{t('news.waitHow')}</p>
+      </Card>
+
+      <Card>
+        <SectionTitle>{t('news.howTitle')}</SectionTitle>
+        <p className="text-sm text-slate-600 dark:text-slate-300">{t('news.how')}</p>
+      </Card>
+    </>
+  )
+}
+
+export function NewsletterView({ meta, data }: { meta: DataMeta; data: Dataset }) {
+  const { t } = useLang()
+  const { favorites, toggle: toggleFavorit } = useFavorites()
+  const [restoreState, setRestoreState] = useState<'idle' | 'sending' | 'done'>('idle')
+  /** Formular trotz bestehender Verbindung zeigen — für den Fall eines toten Schlüssels. */
+  const [restoreOffen, setRestoreOffen] = useState(false)
+  const [abmeldeState, setAbmeldeState] = useState<AbmeldeState>('idle')
+  const abgleich = useAbgleichBeimOeffnen(favorites, t)
+  const namen = useUebernommeneNamen(abgleich.uebernommen, data)
+  const anmeldung = useAnmeldung(favorites, t)
+  const verbindung = useNewsletterVerbindung()
+  /**
+   * Aus dem **reaktiven** Zustand, nicht aus einem Direktzugriff.
+   *
+   * `!!getSyncToken()` war ein Schnappschuss beim Zeichnen: Wurde der Schlüssel
+   * danach weggeräumt — weil das Abo nicht mehr existiert —, bemerkte diese
+   * Ansicht es nicht und zeigte weiter „verbunden". Genau daran hing der
+   * widersprüchliche Zustand vom 18.08.2026.
+   */
+  const autoSync = verbindung.verbunden
+  /**
+   * Wann der Kasten „Dieses Gerät" statt des Wiederherstellungs-Formulars steht.
+   *
+   * Nach dem Abbestellen ist die Verbindung im selben Augenblick weg — und mit
+   * ihr wäre der Satz „Abo beendet" verschwunden, bevor ihn jemand liest.
+   * Übrig bliebe ein Formular, das aussieht, als sei nichts passiert.
+   */
+  const zeigeGeraet = (autoSync || abmeldeState === 'weg') && !restoreOffen
+  /** Bewusst aufklappbar: Eine neue Adresse ist eine neue Anmeldung. */
+  const [adresseWechseln, setAdresseWechseln] = useState(false)
+  const adminToken = readAdminToken()
+
+  return (
+    <div className="mx-auto flex max-w-2xl flex-col gap-5">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('news.title')}</h1>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{t('news.intro')}</p>
+      </div>
+
+      {adminToken && <AdminPanel token={adminToken} />}
+
+      <SyncHinweise abgleich={abgleich} t={t} />
+
+      <UebernommenKasten
+        uebernommen={abgleich.uebernommen}
+        t={t}
+        favorites={favorites}
+        toggleFavorit={toggleFavorit}
+        namen={namen}
+      />
+
+      {/*
+        Ein verbundener Browser sieht seinen Stand, kein Anmeldeformular.
+
+        Vorher stand hier für jeden dasselbe Formular — auch für Abonnenten, die
+        weder Rhythmus noch Plattformen ändern konnten, ohne sich neu
+        anzumelden. Wer die Adresse wechseln will,
+        klappt das Formular über den Knopf darunter wieder auf: Eine neue
+        Adresse ist eine neue Anmeldung samt Bestätigung, und das soll sie auch
+        bleiben.
+      */}
+      {verbindung.verbunden && !adresseWechseln ? (
+        <AboEinstellungen meta={meta} onWechseln={() => setAdresseWechseln(true)} abmeldeState={abmeldeState} setAbmeldeState={setAbmeldeState} />
+      ) : (
+      <Card>
+        <AnmeldeFormular
+          submit={anmeldung.submit}
+          t={t}
+          email={anmeldung.email}
+          setEmail={anmeldung.setEmail}
+          frequency={anmeldung.frequency}
+          setFrequency={anmeldung.setFrequency}
+          favorites={favorites}
+          autoSync={autoSync}
+          meta={meta}
+          platforms={anmeldung.platforms}
+          setPlatforms={anmeldung.setPlatforms}
+          consent={anmeldung.consent}
+          setConsent={anmeldung.setConsent}
+          state={anmeldung.state}
+          message={anmeldung.message}
+        />
+      </Card>
+      )}
+
+      <WiederherstellenKasten
+        t={t}
+        zeigeGeraet={zeigeGeraet}
+        abmeldeState={abmeldeState}
+        setRestoreOffen={setRestoreOffen}
+        restoreState={restoreState}
+        setRestoreState={setRestoreState}
+        email={anmeldung.email}
+        setEmail={anmeldung.setEmail}
+      />
+
+      <WarteUndFunktionsKarten t={t} />
+    </div>
+  )
+}
+
+/* Rechtstexte bleiben bewusst deutsch: Sie richten sich nach deutschem Recht
+   und wären in Übersetzung nicht mehr die verbindliche Fassung. */
+
+export function ImpressumView() {
+  return (
+    <div className="mx-auto flex max-w-2xl flex-col gap-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Impressum</h1>
+
+      <ImpressumAnbieter />
+
+      <div>
+        <h2 className="font-semibold text-slate-800 dark:text-slate-100">Verantwortlich für den Inhalt</h2>
+        <p>Daniel Zaiser, Anschrift wie oben.</p>
+      </div>
+
+      <ImpressumHaftung />
+
+      <ImpressumQuellen />
+
+      <div>
+        <h2 className="font-semibold text-slate-800 dark:text-slate-100">Streitschlichtung</h2>
+        <p>
+          Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer
+          Verbraucherschlichtungsstelle teilzunehmen.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function ImpressumHaftung() {
+  return (
+    <>
+      <div>
+        <h2 className="font-semibold text-slate-800 dark:text-slate-100">Haftung für Inhalte</h2>
+        <p>
+          Alle Termine sind ohne Gewähr. Maßgeblich sind ausschließlich die Angaben der jeweiligen
+          Anbieter. Erscheinungsdaten verschieben sich in dieser Branche regelmäßig; abgeleitete oder
+          unbestätigte Angaben sind auf dieser Seite mit einem ≈ gekennzeichnet.
+        </p>
+      </div>
+
+      <div>
+        <h2 className="font-semibold text-slate-800 dark:text-slate-100">Haftung für Links</h2>
+        <p>
+          Diese Seite verlinkt auf Angebote Dritter (Streaming-Anbieter, Händler, Datenbanken). Auf
+          deren Inhalte haben wir keinen Einfluss; für sie ist ausschließlich der jeweilige Betreiber
+          verantwortlich. Zum Zeitpunkt der Verlinkung waren keine Rechtsverstöße erkennbar.
+        </p>
+      </div>
+
+      <div>
+        <h2 className="font-semibold text-slate-800 dark:text-slate-100">Urheberrecht</h2>
+        <p>
+          Titelbilder stammen von TMDB, wo es dort ein Plakat gibt, sonst von AniList oder aniSearch; Titel und Beschreibungstexte von AniList und den jeweiligen
+          Rechteinhabern und werden hier lediglich eingebunden. Alle Marken- und Bildrechte liegen bei
+          ihren Inhabern. Der Quellcode dieser Seite steht unter der MIT-Lizenz, die selbst gepflegten
+          Termindaten unter CC BY 4.0 (<a className="underline" href="#/abo">Hinweise für Webseiten und Apps</a>).
+        </p>
+      </div>
+    </>
+  )
+}
+
+function ImpressumQuellen() {
+  return (
+    <div>
+      <h2 className="font-semibold text-slate-800 dark:text-slate-100">Datenquellen</h2>
+      <ul className="ml-4 list-disc space-y-0.5">
+        <li>
+          Metadaten: <a className="underline" href="https://anilist.co">AniList</a>; Bewertung und Schlagworte: <a className="underline" href="https://www.anisearch.de">aniSearch</a>; Folgentitel und Folgenlängen, wo keine andere Quelle sie hat: <a className="underline" href="https://kitsu.app">Kitsu</a>
+        </li>
+        <li>
+          FSK, Cover- und Vorschaubilder: <a className="underline" href="https://www.themoviedb.org">TMDB</a> (ohne TMDB-Bild: AniList) — diese Seite nutzt die
+          TMDB-API, ist aber weder von TMDB unterstützt noch zertifiziert <img src="/icons/tmdb.svg" alt="TMDB" width="137" height="18" loading="lazy" className="mt-1 block" /></li>
+        <li>
+          Wo ein Titel läuft und was er kostet:{' '}
+          <a className="underline" href="https://www.justwatch.com">JustWatch</a>, über die TMDB-API
+        </li>
+        <li>
+          Tonspuren bei Netflix, Prime Video und Disney+:{' '}
+          <a className="underline" href="https://www.movieofthenight.com/about/api">
+            Streaming Availability API
+          </a>{' '}
+          von Movie of the Night
+        </li>
+        <li>
+          Sendezeiten:{' '}
+          <a className="underline" href={WOCHENPROGRAMM_UEBERSICHT}>Crunchyroll-Wochenprogramm</a>
+        </li>
+        {/*
+          **aniSearch mit voller Rolle und Link** (16.09.2026).
+
+          Hier stand nur „Termine: aniSearch, Anime2You" — ohne Link und ohne
+          die beiden Angaben, für die wir aniSearch tatsächlich am meisten
+          nutzen: deutsche Titel und Inhaltsangaben. aniSearch hat genau das
+          angemerkt, und der Punkt trifft: Die Quellenseite (#/quellen) führt
+          beides seit Längerem, das Impressum nicht.
+        */}
+        <li>
+          Deutsche Titel, Inhaltsangaben, Bezugsquellen, Cover:{' '}
+          <a className="underline" href="https://www.anisearch.de">aniSearch</a>
+        </li>
+        <li>
+          Termine:{' '}
+          <a className="underline" href="https://www.anisearch.de">aniSearch</a>,{' '}
+          <a className="underline" href="https://www.anime2you.de">Anime2You</a> — Quelle je
+          Eintrag im Detail-Panel verlinkt
+        </li>
+      </ul>
+    </div>
+  )
+}
+
+/**
+ * Quellen und Lizenzen als eigene Ansicht.
+ *
+ * Im Seitenfuß machte die Liste ihn sechs Zeilen lang. Verschwinden darf sie nicht — die anime-offline-database steht
+ * unter ODbL und verlangt die Nennung. Ein
+ * Klick entfernt erfüllt das genauso wie unter jeder Seite, und hier ist Platz
+ * zu erklären, wofür welche Quelle überhaupt gebraucht wird.
+ */
+/**
+ * **Eine Adresse, die dasteht, gehört verlinkt.**
+ *
+ * `meta.attribution` sind fertige Sätze aus der Pipeline, und die Adresse steht
+ * darin im Klartext, z. B. „Quelle (https://…) — Lizenz". Gerendert wurde der Satz roh — auf der Quellenseite standen damit sieben
+ * ausgeschriebene URLs, die niemand anklicken konnte (gemessen am 03.09.2026).
+ *
+ * Der Lizenzhinweis verlangt die Nennung der Quelle; ein Klick dorthin ist das
+ * Mindeste, was man daraus machen kann. Zerlegt wird am Adressmuster, damit die
+ * Pipeline weiter Sätze liefern kann und kein Datenformat sich ändern muss.
+ */
+function MitLinks({ text }: { text: string }) {
+  /* Die schließende Klammer gehört zum Satz, nicht zur Adresse — daher `[^\s)]`. */
+  const teile = text.split(/(https?:\/\/[^\s)]+)/g)
+  return (
+    <>
+      {teile.map((teil, i) =>
+        /^https?:\/\//.test(teil) ? (
+          <a
+            key={i}
+            href={teil}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sky-600 underline decoration-dotted underline-offset-2 hover:decoration-solid dark:text-sky-400"
+          >
+            {teil.replace(/^https?:\/\/(www\.)?/, '')}
+          </a>
+        ) : (
+          <span key={i}>{teil}</span>
+        ),
+      )}
+    </>
+  )
+}
+
+export function SourcesView({ meta }: { meta: DataMeta }) {
+  const { t } = useLang()
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-8 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+      <h1 className="mb-1 text-xl font-bold text-slate-900 dark:text-slate-100">
+        {t('sources.title')}
+      </h1>
+      <p className="mb-6 text-ak-leise">{t('sources.intro')}</p>
+      <ul className="space-y-2">
+        {meta.attribution.map((a) => (
+          <li
+            key={a}
+            className="rounded-lg border border-slate-200 px-3 py-2 dark:border-white/10"
+          >
+            <MitLinks text={a} />
+          </li>
+        ))}
+      </ul>
+      <p className="mt-6 text-xs text-ak-leise">{t('sources.perEntry')}</p>
+
+      <Wissenswert />
+    </div>
+  )
+}
+
+/**
+ * Wie die Termine hierher kommen — die Betriebsanleitung des Bots.
+ *
+ * Steht auf der Quellenseite und nicht im Impressum: Wer wissen will, woher ein
+ * Termin stammt, klickt „Quellen". Dort erwartet er die Liste **und** das
+ * Verfahren; zwei Seiten dafür wären eine zu viel.
+ *
+ * Bewusst knapp gehalten. Was hier fehlt, steht ausführlich in `CLAUDE.md` —
+ * hier braucht der Leser nur, was er zur Einordnung eines Termins braucht.
+ */
+function Wissenswert() {
+  const { t } = useLang()
+  const bloecke: { titel: string; text: string }[] = [
+    { titel: t('sources.howTitle'), text: t('sources.howText') },
+    { titel: t('sources.autoTitle'), text: t('sources.autoText') },
+    { titel: t('sources.unsureTitle'), text: t('sources.unsureText') },
+    { titel: t('sources.catalogTitle'), text: t('sources.catalogText') },
+    { titel: t('sources.staleTitle'), text: t('sources.staleText') },
+  ]
+  return (
+    <div className="mt-10 space-y-5">
+      {/*
+        Der Bereichstitel muss sich von seinen Unterfragen abheben.
+
+        Vorher war er `text-lg font-bold`, die Fragen darunter `font-semibold`
+        in Grundgröße — zwei Stufen, die im Fließtext fast gleich aussehen.
+        Jetzt trennen ihn drei Dinge: Größe, eine Linie
+        darunter und mehr Abstand.
+      */}
+      <h2 className="border-b border-slate-200 pb-2 text-2xl font-bold text-slate-900 dark:border-white/10 dark:text-slate-100">
+        {t('sources.pipelineTitle')}
+      </h2>
+      {bloecke.map((b) => (
+        <div key={b.titel}>
+          <h3 className="font-semibold text-slate-800 dark:text-slate-100">{b.titel}</h3>
+          <p className="mt-0.5">{b.text}</p>
+        </div>
+      ))}
+    </div>
+  )
+}

@@ -17,6 +17,11 @@ export function verlagIstAnbieter(publisher: string | undefined, platform: Platf
   return ANBIETER_VON_VERLAG[publisher] === platform || publisher.toLowerCase().includes((PLATFORMS[platform]?.name ?? '§').toLowerCase())
 }
 
+/** Führte dieser Anbieter laut aniSearch-Erstausgabe den Titel schon am `datum` oder früher? Dann ist ein Katalogdatum dort keine Neuheit, nur eine Neulistung. */
+export function erstausgabeBeimAnbieterBis(e: { von?: string; publisher?: string } | undefined, platform: PlatformId, datum: string): boolean {
+  return !!e?.von && e.von <= datum && verlagIstAnbieter(e.publisher, platform)
+}
+
 /** Verlage der Erstausgabe, die keine Discs herausgeben: Streaming-Dienste, Fernsehsender, Kino-Verleih (Messung 23.11.2026 an den Verlagsnamen in `titles.json`). */
 const KEIN_DISC_VERLAG = /netflix|crunchyroll|disney\+|disney channel|amazon|prime video|hbo|wakanim|myvideo|viewster|joyn|rtl\+|pluto|youtube|paramount\+|aniverse|\bADN\b|\bARD\b|\bZDF\b|sat\.1|kabel 1|\bVOX\b|super rtl|prosieben|jetix|fox kids|nickelodeon|\(kino\)|motion pictures|premiere\)/i
 

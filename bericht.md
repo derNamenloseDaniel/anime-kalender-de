@@ -1,19 +1,45 @@
-# Bericht: Disc-Bereich sichtbar (Zweig `feat/disc-bereich-sichtbar`, Kopf `63df57d8`)
+# Nachbesserung PR 5252 — `amSelbenTag` und die Edition
 
-1. **Ergebnis:** Jede Disc-Ausgabe ist eine Pille wie bei „Stream“, die ganze Pille führt zum Händler (ohne Händler zum aniSearch-Artikel). Eine Gruppe mit einem Eintrag klappt nie zu; `disc-matrix.tsx` ist weg.
-2. **Anlassfall 156040:** vorher 2 Einträge, 0 Links, 2–3 Klicks; nachher 1 Pille „Gesamtausgabe · Complete Box“, 1 Link „Bei Amazon ↗“ (EAN), 1 Klick. Kasten am Handy 296 → 187 px.
-3. **Dublette belegt und zusammengeführt:** Termin (anime2you) und aniSearch-Artikel 209535, beide Blu-ray, 03.09.2026. Regel `amSelbenTag` (gleicher Tag, gemeinsames Format, 1:1, kein widersprechender Band); Bestand: lose Termine 183 → 60.
-4. **Varianten:** A Pillen (gebaut), B offene Matrix, C Karten als Mockup `disc-bereich-3`; Vergleichsbilder und Begründung in `pr.md`. B und C brechen am Handy (Spalten laufen ineinander, Karten schneiden ab).
-5. **Beleg:** `check-disc-bereich.ts` 72 Zusicherungen grün, an main rot; Mutationsprobe 191 Mutanten, 189 rot, 2 gleichwertig; 52 Importeur-Prüfungen, `check-logic.ts`, `tsc --noEmit` grün; Pillen ≥ 52 px, Knöpfe 44 px, Schrift ≥ 11 px; Startbudget 171,0 → 170,9 KB (nach main-Merge 171,1).
-6. **Bilder:** 40 Vorher/Nachher (echte Seite, 390 und 1600 px, hell und dunkel, 4 Titel) und 12 Mockup-Bilder unter `bilder/`. `pr-vorpruefung.mjs` meldet nur diese 48 Bildpfade als „nicht im Repo“; sonst kein Befund. Bitte beim Einreichen über `tools/pr-bilder.mjs` hochladen.
-7. **Offen:** Händlerlink gibt es nur für 233 Termine (188 Titel); alle anderen Ausgaben führen zu aniSearch. Echte Händlerlinks dort bräuchten die EAN aus `data/anisearch-artikel.json` im Panel (eigener Auftrag). Bild und Preis je Ausgabe kennt der Datensatz nicht, nicht gebaut.
-8. **Nicht getan:** kein PR, kein Navigator-Upload (kein `ticket-board` in der Cloud), `stand.md` unberührt; `check:panel`/`check:ansichten` nur in der Kette.
-9. Schätzung vs. Ist: keine Schätzung beim Start notiert; Ist 20:33–21:20 Uhr. Prozesse: keine übrig.
+**Ergebnis:** Alle 123 Paare, die nur durch `amSelbenTag` zusammenkommen, abgeglichen (nicht nur 40). 8 waren zwei verschiedene Produkte. Die Regel verlangt jetzt eine passende Edition; danach 115 Paare, 0 Abweichungen. Gepusht auf `fix/disc-bereich-sichtbar` (Kopf `e11db8d66`).
 
-## Rückblick
+## Vorgehen
+Skript (Scratchpad `paare.mts`) ruft `discAusgabenVon` je Titel mit Disc-Terminen auf den committeten Daten (`public/data/releases.json`, `titles-core.json`, `disc/*.json`) auf. Ein Paar = Zeile mit Termin, dessen Quellen keinen Artikel dieser Ausgabe nennen. Je Paar: Titel, Datum, Format, Artikelname, Terminname + Edition. Abweichung = Artikel und Termin unterscheiden sich in „besondere Ausgabe“ (Limited, Steelbook, Steelcase, Mediabook, Collector’s, Ultimate, Schuber, Deluxe, Special) oder in der Art der Besonderheit. Ein Termin, dessen Edition nur Format nennt („Blu-ray“, „DVD & Blu-ray“) oder leer ist, sagt nichts über das Produkt und zählt nicht als Abweichung.
 
-- **Gut:** Die Bühne zeigte in einer Aufnahme, dass B und C am Handy brechen; der Variantenentscheid brauchte kein Abwägen.
-- **Schlecht:** Die erste Fassung der Dubletten-Regel hätte „Vol. 2“ mit einer Gesamtausgabe desselben Tages verschmolzen; aufgefallen erst am vorhandenen Dan-Da-Dan-Test, nicht an meiner Messung (40 Stichproben waren alle richtig).
-- **Unerwartet:** `pipeline/check-logic.ts` prüft den Klassen-String der Pille wörtlich; meine erste Umformung von `pille.tsx` machte ihn rot, obwohl sich an Stream-Pillen nichts änderte. In der Cloud zeigt Playwright auf eine Browser-Revision, die es nicht gibt (Verweis `chromium_headless_shell-1234` → `-1243` nötig, wie in `bauer.md` beschrieben).
-- **Vorschlag:** `tools/diff-mutanten.mjs` bekommt einen Pfadfilter (`--nur web/src`); ohne ihn bricht der Lauf an Mockup-Dateien ab, ich habe die Liste von Hand gefiltert. Und: Bühnengerät 390 px ergänzen, damit Mockup-Bilder das Regelmaß aus `design-regeln.md` treffen.
-- **Veraltet:** `docs/wissen/betrieb.md` beschrieb beim Mockup `disc-bereich-2` die Matrix als Stand der Seite; der neue Eintrag darunter nennt die Ablösung. `web/buehne/mockups/disc-bereich*.tsx` (Runden 1 und 2) sind Nachbauten einer Komponente, die es nicht mehr gibt, und könnten gelöscht werden.
+## Vorher (alte Regel): 123 Paare, 8 Abweichungen
+- Artikel „Gesamtausgabe: Limited Edition“ ↔ Termin „Complete Box, Blu-ray“ — Re:Monster S1 (04.09.2026), My One-Hit Kill Sister, 7th Prince S1 und S2, Café Terrace S1 (5 Paare: 4× „Complete Box“, 1× „Komplettbox“)
+- Artikel „Komplettset: Limited Edition“ ↔ Termin „Bundle Edition, DVD & Blu-ray“ — Chainsaw Man S1 (02.10.2026)
+- Artikel „Komplettset: Limited Steelbook Edition + Sammelschuber“ ↔ Termin „Komplett-Bundle“ — Shakugan no Shana (20.11.2026)
+- Artikel „Vol. 1/4“ (schlicht) ↔ Termin „Limited Edition mit Sammelschuber, DVD und Blu-ray“ — Tagebücher der Apothekerin S2 (04.12.2026)
+
+
+## Änderung (nur `disc-ausgaben.ts`, Funktion `gleicheEdition`, in `amSelbenTag`)
+Nennt der Termin eine Edition, muss der Artikel dieselbe Art Ausgabe sein: besonders ↔ besonders / schlicht ↔ schlicht, und bei genannter Art (Steelbook gegen Collector’s) ein gemeinsamer Treffer. Die Eindeutigkeit (genau ein freier Artikel, genau ein loser Termin) bleibt unverändert, die neue Bedingung kommt nur dazu — die Regel ist strikt enger.
+
+## Nachher: 115 Paare, 0 Abweichungen
+8 Paare bleiben jetzt zwei Zeilen (Artikel ohne Shop, Termin mit Shop) statt eine falsch zusammengeführte. Zusammengeführt bleiben u. a. Artikel „Limited Mediabook“ ↔ Termin „Limited Edition“, „Steelbook“ ↔ „Limited Steelbook Edition“, Artikel „Gesamtausgabe“ ↔ „Complete Box“, Termine ohne Editionsangabe.
+
+## Offen / Annahme
+Termine ohne jede Editionsangabe (z. B. „Elainas Reise“, „Clevatess“ gegen „Limited Edition“-Artikel; 7 Fälle) bleiben zusammengeführt: ohne Angabe lässt sich nichts widerlegen. Falls das zu locker ist, wäre die Alternative „ohne Angabe nie zusammenführen“ — dann zusätzlich ca. 7 getrennte Zeilen. Entscheidung beim Prüfer.
+
+## Testfälle (`pipeline/check-disc-bereich.ts`)
+Je Abweichungsart ein Fall, gegen alte Regel **rot**, gegen neue **grün**:
+- Limited-Artikel ↔ „Complete Box“ — rot → grün
+- schlichter Artikel „Vol. 1/4“ ↔ „Limited Edition mit Sammelschuber“ — rot → grün
+- Steelbook ↔ Collector’s — rot → grün
+
+Dazu zwei Gegenproben (grün in beiden Ständen): Termin nur mit Format passt zum Limited-Artikel; „Limited“ ↔ „Limited Mediabook“ bleibt eine Zeile. Ein bestehender Test („Box 9“ ist „Box 09“) nannte den Artikel ohne „Limited“, der Termin war Limited — Artikelname im Test auf „Box 09: Limited Edition“ angepasst (die Aussage des Tests, Bandnummern, bleibt).
+
+Rotlauf (alte Regel, Datei per `git stash` zurückgesetzt):
+```
+✖ Artikel „Limited“, Termin „Complete Box“ …: zwei Produkte, zwei Zeilen
+✖ Artikel schlicht, Termin „Limited Edition mit Sammelschuber“ …: zwei Zeilen
+✖ andere Art der Limited-Ausgabe (Steelbook gegen Collector’s): zwei Zeilen
+3 Zusicherung(en) verletzt.   exit 1
+```
+
+## Prüfungen (nach Merge von origin/main, 115 Paare auf dem Datenstand vom 27.11.2026)
+- `npx tsx pipeline/check-disc-bereich.ts` → „alle Zusicherungen erfüllt“, exit 0
+- `npx tsc --noEmit -p .` → exit 0
+- Skript nachher: `PAARE 115 · ABWEICHUNGEN: 0`
+
+Hinweis: Das Repo der Sitzung war flach geklont; der Merge von main war erst nach `git fetch --unshallow` möglich (Merge ohne Konflikte). Der Zweig war zwischenzeitlich schon durch einen Merge von main (`df346fe35`) vorgerückt, den habe ich eingemergt.

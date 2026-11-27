@@ -14,6 +14,34 @@ import { PLATFORMS, RELEASE_TYPES } from '../shared/types.ts'
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
 const FSK = [0, 6, 12, 16, 18]
 
+/**
+ * Lassen sich die übrigen YAML-Dateien überhaupt lesen?
+ *
+ * `loadCurated` deckt nur `data/curated/` ab. Am 20.08.2026 stand in
+ * `dub-confirmed.yaml` ein Titel mit Doppelpunkt ohne Anführungszeichen —
+ * `title: BLEACH: Thousand-Year Blood War`. Das zerlegt die Datei, und der
+ * Fehler fiel erst im Build auf, nachdem `data:validate` längst „keine
+ * Fehler" gemeldet hatte. Die Prüfung ist das billigere Tor; hier gehört er
+ * hin.
+ *
+ * Geprüft wird nur, ob sich die Datei lesen lässt — der Inhalt hat seine
+ * eigenen Prüfungen an der Stelle, die ihn benutzt.
+ */
+function handdateiLeseFehler(): string[] {
+  const errors: string[] = []
+  for (const datei of ['data/dub-confirmed.yaml', 'data/watch-links.yaml', 'data/synchro-von-hand.yaml', 'data/erstausgabe-von-hand.yaml', 'data/ohne-synchro-von-hand.yaml']) {
+    const pfad = resolve(ROOT, datei)
+    if (!existsSync(pfad)) continue
+    try {
+      const inhalt = yaml.load(readFileSync(pfad, 'utf8'))
+      if (inhalt !== null && !Array.isArray(inhalt)) errors.push(`${datei}: erwartet eine Liste`)
+    } catch (err) {
+      errors.push(`${datei}: ${(err as Error).message.split('\n')[0]}`)
+    }
+  }
+  return errors
+}
+
 function main(): void {
   const entries = loadCurated()
   const errors: string[] = []
@@ -63,30 +91,7 @@ function main(): void {
       errors.push(`${at}: releaseType "disc" gehört zu platform "disc"`)
   }
 
-  /**
-   * Lassen sich die übrigen YAML-Dateien überhaupt lesen?
-   *
-   * `loadCurated` deckt nur `data/curated/` ab. Am 20.08.2026 stand in
-   * `dub-confirmed.yaml` ein Titel mit Doppelpunkt ohne Anführungszeichen —
-   * `title: BLEACH: Thousand-Year Blood War`. Das zerlegt die Datei, und der
-   * Fehler fiel erst im Build auf, nachdem `data:validate` längst „keine
-   * Fehler" gemeldet hatte. Die Prüfung ist das billigere Tor; hier gehört er
-   * hin.
-   *
-   * Geprüft wird nur, ob sich die Datei lesen lässt — der Inhalt hat seine
-   * eigenen Prüfungen an der Stelle, die ihn benutzt.
-   */
-  for (const datei of ['data/dub-confirmed.yaml', 'data/watch-links.yaml', 'data/synchro-von-hand.yaml', 'data/erstausgabe-von-hand.yaml', 'data/ohne-synchro-von-hand.yaml']) {
-    const pfad = resolve(ROOT, datei)
-    if (!existsSync(pfad)) continue
-    try {
-      const inhalt = yaml.load(readFileSync(pfad, 'utf8'))
-      if (inhalt !== null && !Array.isArray(inhalt)) errors.push(`${datei}: erwartet eine Liste`)
-    } catch (err) {
-      errors.push(`${datei}: ${(err as Error).message.split('\n')[0]}`)
-    }
-  }
-
+  errors.push(...handdateiLeseFehler())
   errors.push(...fskVonHandFehler(ladeFskVonHand()))
 
   if (errors.length) {

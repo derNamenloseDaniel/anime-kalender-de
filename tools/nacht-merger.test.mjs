@@ -3,9 +3,9 @@
  * Erwartete Werte stehen fest im Test. Der Ablauf läuft mit einer Attrappe-Welt; die Verdrahtung (nachrechnen vor jedem Merge, Riegel,
  * Trockenlauf) prüfen die Fälle über `lauf`, nie über den Quelltext.
  */
-import { BUDGET_MS, argumente, exitCode, lauf, starte } from './nacht-merger.mjs'
-import { bauCommittetGerade, bestandIstRot, echteWelt, ghEcht, ghMitWiederholung, mergeMit5xxPruefung, stufeVon } from './nacht-merger-welt.mjs'
-import { freigabe, kandidat, ketteStand, neuesteJeCheck, reihenfolge, urteilIstOk, vorabGrund } from './nacht-merger-wahl.mjs'
+import { BUDGET_MS, UEBERNAHMEN_JE_LAUF, argumente, exitCode, lauf, starte } from './nacht-merger.mjs'
+import { bauCommittetGerade, bestandIstRot, echteWelt, ghEcht, ghMitWiederholung, laeuftSchon, mergeMit5xxPruefung, stufeVon } from './nacht-merger-welt.mjs'
+import { freigabe, freigabeVerworfen, kandidat, ketteStand, neuesteJeCheck, reihenfolge, urteilIstOk, vorabGrund } from './nacht-merger-wahl.mjs'
 
 let fehler = 0
 let anzahl = 0
@@ -105,11 +105,11 @@ pruefe('Status-Kontext erfolgreich', ketteStand([...gruen, { __typename: 'Status
 const wahl = (o) => kandidat(pr(o))
 pruefe('Basisfall (Stufe 1, grün, ok) ist Kandidat', wahl({}).kandidat)
 pruefe('Stufe 0 ist Kandidat', wahl({ stufe: 0 }).kandidat)
-pruefe('Stufe 2 mit nur Bot-ok → nie', !wahl({ stufe: 2 }).kandidat && wahl({ stufe: 2 }).grund.includes('Nachtrag des Dirigenten'))
+pruefe('Stufe 2 mit nur Bot-ok ist Kandidat (kein Sondertor, Daniel 27.11.2026)', wahl({ stufe: 2 }).kandidat && wahl({ stufe: 2 }).weg === 'pruefer')
 pruefe('Stufe 1 mit Bot-ok bleibt Kandidat', wahl({ stufe: 1 }).weg === 'pruefer')
 pruefe('Stufe 2 mit Nachtrag des Dirigenten zum Kopf ist Kandidat', wahl({ stufe: 2, kommentare: [nachtrag(KOPF)] }).weg === 'nachtrag')
 pruefe('Stufe 2 mit Nachtrag des Dirigenten zu älterem Kopf nie', !wahl({ stufe: 2, kommentare: [nachtrag(ALTER_KOPF)] }).kandidat)
-pruefe('Stufe 2: Nachtrag zu älterem Kopf neben Bot-ok zum Kopf nie', !wahl({ stufe: 2, kommentare: [nachtrag(ALTER_KOPF), urteil(KOPF, 'ok')] }).kandidat)
+pruefe('Stufe 2: Nachtrag zu älterem Kopf neben Bot-ok zum Kopf: Kandidat über das Bot-Urteil', wahl({ stufe: 2, kommentare: [nachtrag(ALTER_KOPF), urteil(KOPF, 'ok')] }).weg === 'pruefer')
 pruefe('Stufe 2: Nachtrag zu älterem Kopf neben aktuellem Nachtrag gilt', wahl({ stufe: 2, kommentare: [nachtrag(ALTER_KOPF), nachtrag(KOPF)] }).weg === 'nachtrag')
 pruefe('Stufe 2 mit Urteil zu älterem Kopf nie', !wahl({ stufe: 2, kommentare: [urteil(ALTER_KOPF, 'ok')] }).kandidat)
 pruefe('Stufe 2 ohne Urteil nie', !wahl({ stufe: 2, kommentare: [] }).kandidat)
@@ -139,6 +139,24 @@ pruefe('Mergestatus DIRTY nie', !wahl({ mergeStateStatus: 'DIRTY' }).kandidat)
 pruefe('vorabGrund: Basisfall null', vorabGrund(pr()) === null)
 pruefe('Mergestatus UNKNOWN weist in der Vorauswahl nicht ab', vorabGrund(pr({ mergeStateStatus: 'UNKNOWN' })) === null && wahl({ mergeStateStatus: 'UNKNOWN' }).kandidat)
 pruefe('Mergestatus BEHIND, UNSTABLE, DRAFT, leer weisen weiter ab', ['BEHIND', 'UNSTABLE', 'DRAFT', '', undefined].every((s) => vorabGrund(pr({ mergeStateStatus: s })) !== null))
+
+// --- freigabeVerworfen (Main-Nachzug verwirft die Freigabe, Dirigent-Nachtrag 7218441221) ------------------------------
+const verworfen = (o) => freigabeVerworfen(pr({ reviewDecision: 'REVIEW_REQUIRED', kommentare: [urteil(ALTER_KOPF, 'ok')], ...o }))
+pruefe('Freigabe verworfen: Prüfer-Ok am Vorgänger-Kopf, Kette grün, REVIEW_REQUIRED', verworfen({}) === true)
+pruefe('Freigabe verworfen: auch bei Stufe 2 und ohne lesbare Stufe', verworfen({ stufe: 2 }) === true && verworfen({ stufe: undefined }) === true)
+pruefe('Freigabe verworfen: Ok zum jetzigen Kopf ist kein Fall (Freigabe fehlt aus anderem Grund)', verworfen({ kommentare: [urteil(KOPF, 'ok')] }) === false)
+pruefe('Freigabe verworfen: Nachtrag zum Kopf ist kein Fall', verworfen({ kommentare: [urteil(ALTER_KOPF, 'ok'), nachtrag(KOPF)] }) === false)
+pruefe('Freigabe verworfen: ohne Urteil kein Fall', verworfen({ kommentare: [] }) === false)
+pruefe('Freigabe verworfen: jüngstes Urteil aendern kein Fall', verworfen({ kommentare: [urteil(ALTER_KOPF, 'ok', '2026-11-01T10:00:00Z'), urteil(ALTER_KOPF, 'aendern', '2026-11-01T12:00:00Z')] }) === false)
+pruefe('Freigabe verworfen: früheres aendern, jüngeres ok ist ein Fall', verworfen({ kommentare: [urteil(ALTER_KOPF, 'aendern', '2026-11-01T10:00:00Z'), urteil(ALTER_KOPF, 'ok', '2026-11-01T12:00:00Z')] }) === true)
+pruefe('Freigabe verworfen: ok eines Fremden zählt nie', verworfen({ kommentare: [urteil(ALTER_KOPF, 'ok', '2026-11-01T10:00:00Z', 'jemand')] }) === false)
+pruefe('Freigabe verworfen: rote Kette kein Fall', verworfen({ checks: [{ name: 'PR-Prüfkette', status: 'COMPLETED', conclusion: 'FAILURE' }] }) === false)
+pruefe('Freigabe verworfen: Konflikt (DIRTY) kein Fall', verworfen({ mergeStateStatus: 'DIRTY' }) === false)
+pruefe('Freigabe verworfen: Workflow-Pfad kein Fall', verworfen({ pfade: ['.github/workflows/x.yml'] }) === false)
+pruefe('Freigabe verworfen: APPROVED kein Fall', verworfen({ reviewDecision: 'APPROVED' }) === false)
+pruefe('Freigabe verworfen: Entwurf, Daten-Zweig, geschlossen kein Fall', verworfen({ entwurf: true }) === false && verworfen({ zweig: 'daten/x' }) === false && verworfen({ offen: false }) === false)
+pruefe('laeuftSchon: Lauf zum PR in Warteschlange oder in Arbeit', laeuftSchon([{ displayTitle: 'PR-Prüfer #61 a1b2c3d4e', status: 'queued' }], 61) && laeuftSchon([{ displayTitle: 'PR-Prüfer #61 a1b2c3d4e', status: 'in_progress' }], 61))
+pruefe('laeuftSchon: fertiger Lauf, anderer PR und Präfix-Nummer zählen nicht', !laeuftSchon([{ displayTitle: 'PR-Prüfer #61 x', status: 'completed' }, { displayTitle: 'PR-Prüfer #610 x', status: 'queued' }, { displayTitle: 'PR-Prüfer #6 x', status: 'queued' }], 61))
 
 // --- reihenfolge -------------------------------------------------------------------------------------------------
 const a = pr({ nummer: 1, erstellt: '2026-11-01T01:00:00Z' })
@@ -190,6 +208,16 @@ function welt(prs, o = {}) {
       log.aufrufe.push(`merge ${p.nummer}`)
       if (o.mergeFehler === p.nummer) throw new Error('GraphQL: Fehler\nZweite Zeile')
       log.gemergt.push(p.nummer)
+    },
+    leicht: (p) => p,
+    pruefungLaeuft: (n) => o.laeuft?.includes(n) === true,
+    uebernahmeAnstossen: (n, kopf) => {
+      if (o.anstossFehler === n) throw new Error('HTTP 403: Resource not accessible\nZweite Zeile')
+      log.aufrufe.push(`anstoss ${n} ${kopf}`)
+    },
+    markiere: (n, label) => {
+      if (o.labelFehler === true) throw new Error('HTTP 403: Resource not accessible\nZweite Zeile')
+      log.aufrufe.push(`label ${n} ${label}`)
     },
   }
   return w
@@ -402,6 +430,7 @@ pruefe('stufeVon: Müll, Fehler und Text gelten als 2', stufeVon(5, () => 'kaput
     if (s.includes('/files')) return 'web/src/a.tsx\ndocs/alt.md\n'
     if (s.includes('/comments')) return `${JSON.stringify(urteil(KOPF, 'ok'))}\n${JSON.stringify(nachtrag(KOPF))}\n`
     if (s.startsWith('pr view 7 --json statusCheckRollup')) return JSON.stringify(gruen)
+    if (s.startsWith('run list --workflow pr-pruefer.yml')) return JSON.stringify([{ displayTitle: 'PR-Prüfer #7 abc', status: 'queued' }])
     if (s.startsWith('pr view 7 --json headRefOid')) return `${KOPF}\n`
     if (s.startsWith('pr view 7 --json number,state')) return JSON.stringify({ number: 7, state: 'CLOSED', mergeable: 'UNKNOWN', headRefOid: KOPF, headRefName: 'fix/a' })
     return ''
@@ -412,6 +441,11 @@ pruefe('stufeVon: Müll, Fehler und Text gelten als 2', stufeVon(5, () => 'kaput
   const voll = w.details(liste[0])
   pruefe('echteWelt: Liste wird abgebildet', liste.length === 1 && liste[0].nummer === 7 && liste[0].beschreibung === '' && liste[0].zweig === 'fix/a' && liste[0].geaenderteDateien === 2)
   pruefe('echteWelt: Liste in der echten gh-Antwortform mit mergeStateStatus UNKNOWN (Stand 14.11.2026) bleibt Kandidat der Vorauswahl', liste[0].mergeStateStatus === 'UNKNOWN' && vorabGrund(liste[0]) === null)
+  w.markiere(7, 'nachpruefung-offen')
+  pruefe('echteWelt: markiere setzt das Label über die Labels-Schnittstelle (legt es beim ersten Mal an)', aufrufe.includes('api -X POST repos/o/r/issues/7/labels -f labels[]=nachpruefung-offen'), aufrufe)
+  pruefe('echteWelt: pruefungLaeuft liest die Läufe von pr-pruefer.yml (PR 7 steht an, PR 8 nicht)', w.pruefungLaeuft(7) === true && w.pruefungLaeuft(8) === false)
+  w.uebernahmeAnstossen(7, KOPF)
+  pruefe('echteWelt: uebernahmeAnstossen startet pr-pruefer.yml auf main mit PR und Kopf', aufrufe.includes(`workflow run pr-pruefer.yml --ref main -f pr=7 -f sha=${KOPF}`), aufrufe)
   pruefe('echteWelt: Dateiliste fragt auch den Umbenennungsursprung', aufrufe.some((s) => s.includes('/pulls/7/files') && s.includes('previous_filename')))
   pruefe('echteWelt: Kommentarliste fragt Nutzer, Verband, Zeit und Text', aufrufe.some((s) => s.includes('/issues/7/comments') && s.includes('login: .user.login, assoc: .author_association, at: .created_at, body: .body')))
   pruefe('echteWelt: Details aus Dateien, Kommentaren, Checks, Stufe', voll.stufe === 0 && voll.pfade.join(',') === 'web/src/a.tsx,docs/alt.md' && voll.kommentare.length === 2 && voll.checks.length === 2)
@@ -540,6 +574,56 @@ pruefe('argumente: ungültig', argumente(['--hoechstens', '0']) === null && argu
   pruefe('starte: Stillstand (0 Merges, PR unentschieden) -> Exit 1 aus exitCode', starte([], () => w4) === 1)
 }
 
+{
+  // Nachprüfung nach dem Merge (Daniel 27.11.2026): nur gemergte Stufe-2-PRs bekommen das Label, nach dem Merge, nie im Trockenlauf
+  const stufen = () => [pr({ nummer: 41, stufe: 2 }), pr({ nummer: 42, stufe: 1 }), pr({ nummer: 43, stufe: 2 })]
+  const w = welt(stufen())
+  lauf(w, { hoechstens: 3 })
+  pruefe('Nachprüfung: Label nur an Stufe 2, je nach dem Merge', w.log.aufrufe.filter((a) => /^(merge|label)/.test(a)).join(',') === 'merge 41,label 41 nachpruefung-offen,merge 42,merge 43,label 43 nachpruefung-offen')
+  pruefe('Nachprüfung: Protokollzeile je Label', w.log.zeilen.filter((z) => z.startsWith('NACHPRÜFUNG OFFEN #')).join('|') === 'NACHPRÜFUNG OFFEN #41: Label nachpruefung-offen gesetzt|NACHPRÜFUNG OFFEN #43: Label nachpruefung-offen gesetzt')
+  const t = welt(stufen())
+  lauf(t, { trocken: true })
+  pruefe('Nachprüfung: Trockenlauf setzt kein Label', !t.log.aufrufe.some((a) => a.startsWith('label')))
+  const f = welt([pr({ nummer: 51, stufe: 2 }), pr({ nummer: 52, stufe: 1 })], { labelFehler: true })
+  const r = lauf(f, { hoechstens: 3 })
+  pruefe('Nachprüfung: Label-Fehler stoppt nichts, Zeile nennt Grund, Exit bleibt 0', r.gemergt.join(',') === '51,52' && exitCode(r) === 0 && f.log.zeilen.some((z) => z === 'NACHPRÜFUNG-LABEL FEHLGESCHLAGEN #51: HTTP 403: Resource not accessible'))
+}
+{
+  // Übernahme nach Main-Nachzug: Prüfer-Lauf anstoßen, nie doppelt, höchstens UEBERNAHMEN_JE_LAUF je Lauf, im Trockenlauf nur melden
+  const rr = (nummer, o = {}) => pr({ nummer, reviewDecision: 'REVIEW_REQUIRED', kommentare: [urteil(ALTER_KOPF, 'ok')], ...o })
+  const fall = () => [rr(71), rr(72), rr(73), rr(74), rr(75, { kommentare: [] })]
+  const w = welt(fall(), { laeuft: [72] })
+  const r = lauf(w, { hoechstens: 3 })
+  const anstoss = w.log.aufrufe.filter((a) => a.startsWith('anstoss'))
+  pruefe('Übernahme: Anstoß mit PR und Kopf für 71, 73, 74; 72 läuft schon', anstoss.join(',') === `anstoss 71 ${KOPF},anstoss 73 ${KOPF},anstoss 74 ${KOPF}`, anstoss)
+  pruefe('Übernahme: Zeilen ANGESTOSSEN mit Kopf (9 Zeichen), WARTET für 72', w.log.zeilen.filter((z) => z.startsWith('ÜBERNAHME ANGESTOSSEN #7')).length === 3 && w.log.zeilen.some((z) => z.startsWith('ÜBERNAHME WARTET #72 Kopf a1b2c3d4e:')))
+  pruefe('Übernahme: kein Merge, keine ÜBERSPRUNGEN-Zeile für Übernahme-Fälle', r.gemergt.length === 0 && !w.log.zeilen.some((z) => /^ÜBERSPRUNGEN #7[1-4]/.test(z)))
+  pruefe('Übernahme: REVIEW_REQUIRED ohne Prüfer-Ok bleibt ÜBERSPRUNGEN', w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN #75') && z.includes('REVIEW_REQUIRED')) && !anstoss.some((a) => a.includes(' 75 ')))
+  const v = welt([rr(81), rr(82), rr(83), rr(84)])
+  lauf(v, { hoechstens: 3 })
+  pruefe(`Übernahme: Riegel ${UEBERNAHMEN_JE_LAUF} Anstöße, der vierte meldet ÜBERNAHME RIEGEL`, UEBERNAHMEN_JE_LAUF === 3 && v.log.aufrufe.filter((a) => a.startsWith('anstoss')).length === 3 && v.log.zeilen.some((z) => z.startsWith('ÜBERNAHME RIEGEL #84')))
+  const t = welt([rr(91)])
+  lauf(t, { trocken: true })
+  pruefe('Übernahme: Trockenlauf stößt nichts an und sagt es', !t.log.aufrufe.some((a) => a.startsWith('anstoss')) && t.log.zeilen.some((z) => z.startsWith('WÜRDE ÜBERNAHME ANSTOSSEN #91')))
+  const f = welt([rr(95), rr(96)], { anstossFehler: 95 })
+  lauf(f, { hoechstens: 3 })
+  pruefe('Übernahme: Fehler beim Anstoß steht mit erster Zeile im Protokoll und zählt nicht gegen den Riegel', f.log.zeilen.some((z) => z === 'ÜBERNAHME FEHLGESCHLAGEN #95 Kopf a1b2c3d4e: HTTP 403: Resource not accessible') && f.log.zeilen.some((z) => z.startsWith('ÜBERNAHME ANGESTOSSEN #96')))
+}
+{
+  // Übernahme-Fälle erzeugen nie eine zweite ÜBERSPRUNGEN-Zeile; Fehler zählen nicht gegen den Riegel, der Trockenlauf zählt wie der Echtlauf
+  const rr = (nummer) => pr({ nummer, reviewDecision: 'REVIEW_REQUIRED', kommentare: [urteil(ALTER_KOPF, 'ok')] })
+  const alleOhneUebersprungen = (w) => !w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN'))
+  const f = welt([rr(101), rr(102), rr(103), rr(104)], { anstossFehler: 101 })
+  lauf(f, { hoechstens: 3 })
+  pruefe('Übernahme: nach einem Fehler kommen noch drei Anstöße (Fehler verbraucht keinen Riegel), kein ÜBERSPRUNGEN', f.log.aufrufe.filter((a) => a.startsWith('anstoss')).length === 3 && !f.log.zeilen.some((z) => z.startsWith('ÜBERNAHME RIEGEL')) && alleOhneUebersprungen(f))
+  const t = welt([rr(111), rr(112), rr(113), rr(114)])
+  lauf(t, { trocken: true })
+  pruefe('Übernahme: Trockenlauf zählt Anstöße gegen den Riegel (3 Zeilen WÜRDE, 1 RIEGEL), kein ÜBERSPRUNGEN', t.log.zeilen.filter((z) => z.startsWith('WÜRDE ÜBERNAHME')).length === 3 && t.log.zeilen.some((z) => z.startsWith('ÜBERNAHME RIEGEL #114')) && alleOhneUebersprungen(t))
+  const l = welt([rr(121)], { laeuft: [121] })
+  lauf(l, { hoechstens: 3 })
+  pruefe('Übernahme: wartender Lauf erzeugt nur die WARTET-Zeile', l.log.zeilen.filter((z) => z.includes('#121')).length === 1 && alleOhneUebersprungen(l))
+  pruefe('freigabeVerworfen: gleiche Zeit zweier Urteile, das spätere in der Liste gilt (aendern zuletzt → kein Fall)', freigabeVerworfen(pr({ reviewDecision: 'REVIEW_REQUIRED', kommentare: [urteil(ALTER_KOPF, 'ok', '2026-11-01T10:00:00Z'), urteil(ALTER_KOPF, 'aendern', '2026-11-01T10:00:00Z')] })) === false)
+}
 if (fehler > 0) {
   console.error(`nacht-merger.test: ${fehler} von ${anzahl} Fällen rot`)
   process.exit(1)

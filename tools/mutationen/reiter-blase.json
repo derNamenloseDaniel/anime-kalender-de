@@ -1,7 +1,7 @@
 [
   { "name": "Kontrolle (unmutiert)", "aenderungen": [], "tests": ["npx tsx pipeline/check-reiter-blase.ts"] },
   { "name": "Mausklick öffnet auch ohne Fingertipp", "aenderungen": [{ "datei": "web/src/components/detail/reiter-blase.tsx", "suche": "      if (!perTouch.current) return\n", "ersetze": "" }], "tests": ["npx tsx pipeline/check-reiter-blase.ts"] },
-  { "name": "Zeigen nach Fingertipp öffnet doch", "aenderungen": [{ "datei": "web/src/components/detail/reiter-blase.tsx", "suche": "!perTouch.current && auf(", "ersetze": "auf(" }], "tests": ["npx tsx pipeline/check-reiter-blase.ts"] },
+  { "name": "Zeigen nach Fingertipp öffnet doch", "aenderungen": [{ "datei": "web/src/components/detail/reiter-blase.tsx", "suche": "!perTouch.current && mausZeigtBlase() && auf(", "ersetze": "auf(" }], "tests": ["npx tsx pipeline/check-reiter-blase.ts"] },
   { "name": "Berühren merkt sich nichts", "aenderungen": [{ "datei": "web/src/components/detail/reiter-blase.tsx", "suche": "onTouchStart: () => void (perTouch.current = true),", "ersetze": "onTouchStart: () => undefined," }], "tests": ["npx tsx pipeline/check-reiter-blase.ts"] },
   { "name": "Berühren öffnet sofort", "aenderungen": [{ "datei": "web/src/components/detail/reiter-blase.tsx", "suche": "onTouchStart: () => void (perTouch.current = true),", "ersetze": "onTouchStart: (e: MouseEvent<HTMLElement>) => void ((perTouch.current = true), auf(schluessel, e.currentTarget))," }], "tests": ["npx tsx pipeline/check-reiter-blase.ts"] },
   { "name": "Tipp schließt nie", "aenderungen": [{ "datei": "web/src/components/detail/reiter-blase.tsx", "suche": "      zuTimer.current = window.setTimeout(() => setOffen(undefined), TIPP_DAUER)\n", "ersetze": "" }], "tests": ["npx tsx pipeline/check-reiter-blase.ts"] },

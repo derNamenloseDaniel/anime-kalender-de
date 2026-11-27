@@ -1,7 +1,8 @@
 /**
  * **Was die Joyn-Pille über die abrufbaren Folgen sagt** (22.09.2026).
  *
- * Die Fenster sind aus den ProSieben-MAXX-Terminen gerechnet, nicht bei Joyn gemessen — daher „≈".
+ * Die Fenster sind aus den ProSieben-MAXX-Terminen gerechnet; „≈“ steht nur bei einem geschätzten offenen Fenster
+ * (Daniel, 26.11.2026: MAXX → Joyn nach der Sendung ist bestätigt).
  * Gerechnet wird beim Anzeigen: Bei Dragon Ball Super kamen täglich zwei Folgen dazu und zwei fielen
  * heraus, der Datensatz ist bis zu einem Tag alt.
  */
@@ -11,7 +12,8 @@ import { jetztBerlin } from './toggo.ts'
 /** „≈ Fg. 126–127 · Fg. 128 ab 17:05", „Fg. 130 ab 23.09." — `undefined` ohne bekanntes Fenster. */
 export function joynAngabe(fenster: FolgenFenster[] | undefined, jetzt = jetztBerlin()): string | undefined {
   if (!fenster?.length) return undefined
-  const offen = fenster.filter((f) => f.ab <= jetzt && jetzt < f.ende).map((f) => f.nr).sort((a, b) => a - b)
+  const offeneFenster = fenster.filter((f) => f.ab <= jetzt && jetzt < f.ende)
+  const offen = offeneFenster.map((f) => f.nr).sort((a, b) => a - b)
   const bereiche: [number, number][] = []
   for (const nr of offen) {
     const l = bereiche[bereiche.length - 1]
@@ -25,7 +27,7 @@ export function joynAngabe(fenster: FolgenFenster[] | undefined, jetzt = jetztBe
       : `${naechste.ab.slice(8, 10)}.${naechste.ab.slice(5, 7)}.`
     : undefined
   const teile = [
-    bereiche.length ? `≈ Fg. ${bereiche.map(([a, b]) => (a === b ? a : `${a}–${b}`)).join(', ')}` : undefined,
+    bereiche.length ? `${offeneFenster.some((f) => f.geschaetzt) ? '≈ ' : ''}Fg. ${bereiche.map(([a, b]) => (a === b ? a : `${a}–${b}`)).join(', ')}` : undefined,
     naechste ? `Fg. ${naechste.nr} ab ${wann}` : undefined,
   ].filter(Boolean)
   return teile.length ? teile.join(' · ') : undefined

@@ -1,11 +1,11 @@
 {
-  "scrapedAt": "2026-11-27T15:03:48.750Z",
+  "scrapedAt": "2026-11-27T16:03:07.423Z",
   "verworfen": {
     "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 5,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "schon in einem Rubrik-Feed gelesen": 9,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 15,
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 14,
+    "schon in einem Rubrik-Feed gelesen": 10,
     "Sprachhinweis älter als 45 Tage": 6
   },
   "proposals": [
@@ -50,6 +50,23 @@
         }
       ],
       "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "articleUrl": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "publishedAt": "2026-11-27",
+      "category": "streaming",
+      "platforms": [
+        "rtlplus"
+      ],
+      "dates": [
+        {
+          "iso": "2026-12-15",
+          "context": "Heidi« (1974) und »Wickie und die starken Männer« (1974-1976), die am 15. Dezember 2026 mit deutscher Synchronisation erscheinen. Die […]"
+        }
+      ],
+      "dub": "ja",
       "alreadyCurated": false
     },
     {

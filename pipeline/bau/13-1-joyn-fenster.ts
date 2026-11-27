@@ -1,4 +1,5 @@
 import { log } from '../lib/util.ts'
+import { expandEvents } from '../../shared/logic.ts'
 import { type FolgenFenster, type Title, type Release } from '../../shared/types.ts'
 
 /*
@@ -15,6 +16,14 @@ import { type FolgenFenster, type Title, type Release } from '../../shared/types
   14.09. — die Nacht wiederholt. Solche Folgen bleiben ohne Fenster (die Pille zählt dann zu
   wenig, nie zu viel). Gemessen nur an ProSieben MAXX; andere Sender der Gruppe erst nach Messung.
 */
+/** Folge → Sendetag: die Sichtungen, bei einem belegten Sendeplan (`sendeplanBelegt`) zusätzlich dessen Folgentage (Yaiba, 26.11.2026). */
+export function tageAusPlan(r: Release): Record<number, string> {
+  const tage: Record<number, string> = { ...r.schedule.observed }
+  if (!r.schedule.sendeplanBelegt) return tage
+  for (const e of expandEvents(r)) if (e.episode && !e.estimated) tage[e.episode] ??= e.date
+  return tage
+}
+
 export function setzeJoynFenster(allTitles: Title[], releases: Release[]): void {
   const SENDER = new Set(['prosieben maxx'])
   const titelNachId = new Map(allTitles.map((t) => [t.id, t]))
@@ -26,7 +35,7 @@ export function setzeJoynFenster(allTitles: Title[], releases: Release[]): void 
     if (r.platform !== 'tv' || !r.folgenBelegt || !SENDER.has((r.sender ?? '').toLowerCase())) continue
     const t = titelNachId.get(r.titleId)
     const joyn = (t?.streams ?? []).find((s) => s.platform === 'joyn')
-    const beobachtet = r.schedule.observed ?? {}
+    const beobachtet = tageAusPlan(r)
     if (!joyn || !Object.keys(beobachtet).length) continue
     const zeit = (nr: number) => r.schedule.zeiten?.[nr] ?? r.schedule.time
     const start = new Map<number, string>()
@@ -64,7 +73,7 @@ export function setzeJoynFenster(allTitles: Title[], releases: Release[]): void 
       for (let nr = Math.max(1, erste - 19); nr < erste; nr++) {
         const nachfolger = start.get(nr + 20)
         const ende = nachfolger && plusMinuten(nachfolger, 25) < obergrenze ? plusMinuten(nachfolger, 25) : obergrenze
-        fenster.push({ nr, ab: davor, ende })
+        fenster.push({ nr, ab: davor, ende, geschaetzt: true })
       }
       fenster.sort((a, b) => a.nr - b.nr)
     }

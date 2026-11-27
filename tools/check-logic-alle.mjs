@@ -24,7 +24,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { dauerZeilen, laufePool } from './arbeiterpool.mjs'
-import { ohneBauVariablen, ohneCiToken, ohneGeheimnisse } from './bau-umgebung.mjs'
+import { mitCiAnmeldung, ohneBauVariablen, ohneCiToken, ohneGeheimnisse } from './bau-umgebung.mjs'
 import { historieErgebnis } from './check-logic-historie.mjs'
 import { pruefeVollstaendig } from './check-logic-vollstaendig.mjs'
 import { listenEintraege, listenFehler } from './liste-pruefen.mjs'
@@ -66,9 +66,9 @@ function ladeAusnahmen(dateien) {
 }
 
 /** Umgebung einer Prüfung: mit Sperre, bei einer Ausnahme mit den erlaubten Pfaden und einer Spur-Datei. */
-function umgebung(ausnahme, spurDatei) {
+function umgebung(datei, ausnahme, spurDatei) {
   if (!mitSperre) return ohneCiToken(ohneGeheimnisse(ohneBauVariablen()))
-  return sperreUmgebung(ausnahme?.erlaubt.join(','), spurDatei)
+  return mitCiAnmeldung(sperreUmgebung(ausnahme?.erlaubt.join(','), spurDatei), datei)
 }
 
 /** Eine Ausnahme, deren Pfade nicht mehr gelesen werden, ist überflüssig: Der Wächter verlangt, sie zu streichen (Fehltext oder null). */
@@ -124,7 +124,7 @@ const auftraege = dateien.map((datei, i) => {
     befehl: process.execPath,
     args: [tsx, datei],
     cwd: wurzel,
-    env: umgebung(ausnahmen.get(datei), spurDatei),
+    env: umgebung(datei, ausnahmen.get(datei), spurDatei),
     nachher: () => (ausnahmen.has(datei) ? pruefeAusnahmeGenutzt(ausnahmen.get(datei), spurDatei) : null),
   }
 })

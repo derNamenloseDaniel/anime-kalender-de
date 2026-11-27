@@ -51,6 +51,7 @@ Ziel (Daniel, 08.10.2026): Daten aktuell halten und Neuigkeiten einarbeiten, ohn
 
 
 ### In Arbeit
+- [ ] Wache 27.11. (#5234, 1 SP): „Shaman King (154) entfernt“ = Quarantäne folgen-vor-start, behoben mit #5229; „150 Termine weniger“ (26.11. 23:13) nicht erklärt. Zu prüfen: nächster Bestandsbau trägt Titel 154 wieder, Wache ohne ⚠; Herkunft der 150 Termine.
 - [ ] Wache 26.11. (#5121, 1 SP): „Claude-Kontingent leer“ (claude-reparatur 17:44Z), Bestand ohne Verlust; Kontingent seit 21:22Z wieder da. Zu prüfen: nächste Wache ohne ⚠; Wache nach Kontingent-Ausfall nicht mehr rot machen.
 - [ ] Wache 24./25.11. (#4902, #5031, 1 SP): „3 Titel weniger“ = gewollte Zusammenlegung Pokémon Horizonte (PR 4897), `zuAk` steht seit 25.11. 09:08 (f373f1b2). Zu prüfen: Wache 26.11. ohne ⚠ (Fenster-Effekt, kein Fehler). Auswertung: daniel-zum-abarbeiten/00-wache-auswertung.md
 - [ ] Wache 22.11.: Titel 120892 (Grisaia Stargazer) in Quarantäne `telekom-annahme` (Bau 557e551a, 04:48); Ursache der roten Prüfung nicht gemessen, Wache sollte `meta.quarantaene` als erklärt lesen. 2 SP. Auswertung: daniel-zum-abarbeiten/00-wache-auswertung.md, Issue #4584.

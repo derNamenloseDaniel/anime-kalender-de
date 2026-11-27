@@ -12,7 +12,7 @@ export interface AntwortKastenProps {
   /** Über einen Disc-Termin geöffnet — dann steht der Umschalter auf „Disc". */
   discZuerst?: boolean
   /** Alle Stream-Zeilen ohne Sprachbeleg: Die Überschrift „Auf Deutsch …“ entfällt. */
-  ohneSprachbeleg?: boolean | 'omu' | 'anbieter'
+  ohneSprachbeleg?: boolean | 'anbieter'
   /** Die Termine des Titels — gebraucht für den frühesten deutschen Start (`de-seit.ts`). */
   releases?: Release[]
   antwort: Antwort
@@ -58,6 +58,8 @@ export interface AntwortKastenProps {
    * angekündigt — der Tag steht noch nicht fest."
    */
   notiz?: string; folgen?: ReactNode // Folgenliste (`folgen-bereich.tsx`)
+  /** Wer außer dem Hauptweg noch nachlegt, mit Tag und Uhrzeit (`nachleger-zeilen.tsx`) — gehört in den Kopf, nicht über die Folgenliste. */
+  nachleger?: string[]
   schnitt?: Release['schnitt']
   /**
    * **„Im Angebot seit" — die einzige Angabe, die der frühere Terminblock allein trug.**

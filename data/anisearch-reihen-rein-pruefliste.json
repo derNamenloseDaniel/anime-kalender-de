@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-26",
+  "stand": "2026-11-27",
   "bestand": {
     "inReihen": 3028,
     "reihen": 820,
@@ -1586,7 +1586,7 @@
     ]
   },
   "katalog": {
-    "inReihen": 12063,
+    "inReihen": 12059,
     "reihen": 3067,
     "pruefliste": [
       {
@@ -6084,7 +6084,7 @@
           {
             "id": 2043,
             "name": "Cat's♥Eye",
-            "titel": 4
+            "titel": 3
           }
         ],
         "alleinstehende": [],

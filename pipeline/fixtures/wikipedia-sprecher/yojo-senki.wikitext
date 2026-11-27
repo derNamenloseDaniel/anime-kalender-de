@@ -1,0 +1,37 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Yōjo_Senki (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Yōjo_Senki&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+==== Synchronsprecher ====
+{| class="wikitable" 
+! Rolle{{FN|a}} || Japanische Stimme ([[Seiyū]]) || Deutsche Stimme
+|-
+| Tanya (von) Degretschow / Tanya (von) Degurechaff || [[Aoi Yūki]] || [[Mayke Dähn]]
+|-
+| Viktoriya Ivanovna „Visha“ Serebryakov || [[Saori Hayami]] || [[Katharina von Daake]]
+|- 
+| Hans von Zettour || [[Hōchu Ōtsuka]] || [[Dirk Hardegen]]
+|- 
+| Erich von Rerugen / Erich von Lergen || [[Shinichiro Miki]] || [[Tobias Brecklinghaus]]
+|-
+| Kurt von Rudersdorf || [[Tesshō Genda]] || [[Torsten Münchow]]
+|-
+|Matthäus Johann Weiß / Matheus Johan Weiss
+|[[Daika Hamano]]
+|[[Matthias Ransberger]]
+|-
+|Willibald König / Wilibald Koenig
+|[[Jun Kasama]]
+|[[Uwe Thomsen]]
+|-
+|Reiner Neumann / Rhiner Neumann
+|[[Daichi Hayashi (Synchronsprecher)|Daichi Hayashi]]
+|[[Stefan Lehnen]]
+|-
+|Warren Grantz / Vooren Glanz
+|[[Yūsuke Kobayashi (Synchronsprecher)|Yūsuke Kobayashi]]
+|[[Arne Hörmann]]
+|}
+
+{{FNBox|'''Anmerkung:'''
+  {{FNZ|a|Die Schreibweise der Namen unterscheidet sich zwischen der Light Novel/Manga und dem deutschen Anime}}
+}}

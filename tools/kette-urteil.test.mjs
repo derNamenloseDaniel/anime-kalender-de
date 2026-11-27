@@ -56,6 +56,24 @@ assert.equal(kettenUrteil(jobs('0', { scope: 'cancelled', logik: 'cancelled', ba
 assert.equal(kettenUrteil(jobs('0', { scope: 'failure', logik: 'cancelled', bau: 'cancelled' })), 'rot', 'Umfangsjob rot, Rest abgebrochen')
 assert.equal(kettenUrteil({ scope: { result: 'success', outputs: { nur_mod: '1' } } }), 'rot', 'nur Mod ohne Schnellweg in needs')
 
+// Aussehen-Jobs ohne Oberfläche (27.11.2026, Issue 5209): `scope.outputs.aussehen == '0'` erlaubt „übersprungen“ für den Job `aussehen`, nur für ihn
+const mitAussehen = (aussehen, ergebnis, rest = {}) => ({
+  ...jobs('0', rest),
+  scope: { result: 'success', outputs: { nur_mod: '0', ...(aussehen === undefined ? {} : { aussehen }) } },
+  aussehen: { result: ergebnis },
+})
+assert.equal(kettenUrteil(mitAussehen('0', 'skipped')), 'gruen', 'ohne Oberfläche: Aussehen übersprungen ist grün')
+assert.equal(kettenUrteil(mitAussehen('1', 'skipped')), 'rot', 'mit Oberfläche: übersprungenes Aussehen ist rot')
+assert.equal(kettenUrteil(mitAussehen(undefined, 'skipped')), 'rot', 'ohne Ausgabe: übersprungenes Aussehen ist rot')
+assert.equal(kettenUrteil(mitAussehen('', 'skipped')), 'rot', 'leere Ausgabe: übersprungenes Aussehen ist rot')
+assert.equal(kettenUrteil(mitAussehen('true', 'skipped')), 'rot', 'Ausgabe nur genau 0')
+assert.equal(kettenUrteil(mitAussehen('1', 'success')), 'gruen', 'mit Oberfläche und success')
+assert.equal(kettenUrteil(mitAussehen('0', 'success')), 'gruen', 'ohne Oberfläche, Aussehen lief trotzdem: grün')
+assert.equal(kettenUrteil(mitAussehen('0', 'failure')), 'rot', 'Aussehen rot zählt immer')
+assert.equal(kettenUrteil(mitAussehen('0', 'skipped', { logik: 'skipped' })), 'rot', 'ohne Oberfläche: nur Aussehen darf übersprungen sein')
+assert.equal(kettenUrteil(mitAussehen('0', 'skipped', { logik: 'cancelled', bau: 'cancelled' })), 'abgebrochen', 'Neustart ohne Oberfläche: übersprungenes Aussehen verhindert „abgebrochen“ nicht')
+assert.equal(kettenUrteil(mitAussehen('0', 'skipped', { logik: 'cancelled', bau: 'success' })), 'rot', 'Mix bleibt rot')
+
 const ZIEL = 'repos/eigner/repo/actions/runs/4711/force-cancel'
 // Abbruch des eigenen Laufs: Attrappe prüft Befehl und Argumente
 const aufrufe = []

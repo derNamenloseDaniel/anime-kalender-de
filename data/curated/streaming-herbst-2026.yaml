@@ -6,53 +6,10 @@
 # Sobald ein Anbieter den Tag nennt, wird das Datum ersetzt und `estimated`
 # entfernt.
 
-- slug: black-clover-s2-crunchyroll
-  anilistId: 195604
-  search: "Black Clover 2nd Season"
-  titleDe: "Black Clover – Staffel 2"
-  platform: crunchyroll
-  releaseType: weekly
-  schedule:
-    firstEpisodeDate: "2026-10-03"
-    estimated: true
-  # **Stand 15.09.2026:** Anime2You (07.09.2026) und Crunchyroll nennen den
-  # 03.10.2026 als Start in Japan, Crunchyroll zeigt die Folgen im Simulcast mit
-  # Untertiteln; die deutsche Fassung steht dort als „TBA". Das Datum ist damit
-  # der OmU-Start, übernommen mit `estimated` — so erlaubt es CLAUDE.md
-  # („Datum aus dem Simulcast-Start übernommen statt aus einer Dub-Ankündigung").
-  # Vorher stand hier der Monatserste als Platzhalter, und AniLists fehlender Tag
-  # erschien im Panel als „JP 31.10.2026" (Daniel, 15.09.2026).
-  #
-  # **Ursprünglich: drei Angaben fehlen, und jede einzelne wäre geraten.**
-  #
-  # Crunchyroll hat die Staffel am 15.06.2026 für Oktober 2026 angekündigt —
-  # ohne Tag. AniList führt denselben Stand (am 04.09.2026 abgefragt:
-  # `startDate { year: 2026, month: 10, day: null }`, `episodes: null`,
-  # Status NOT_YET_RELEASED). Auch die Folgenzahl ist damit unbelegt.
-  #
-  # **Und eine deutsche Fassung nennt keine der beiden Quellen.** Die erste
-  # Staffel liegt bei Crunchyroll mit 170 deutschen Folgen — ein starker
-  # Hinweis, aber kein Beleg. Der Eintrag steht trotzdem: „Unsicheres
-  # kennzeichnen statt weglassen" ist der Grund, warum es diesen Kalender gibt
-  # (Daniel, 04.09.2026: „warum führen wir keine staffel 2 und haben auch nicht
-  # diese info auf der webseite?").
-  # **25.09.2026: Die Synchro ist angekündigt.** Crunchyrolls Artikel „Crunchyroll kündigt die
-  # deutschen Synchros für Herbst 2026 an" (15.09.2026) führt Black Clover Staffel 2, das
-  # Lineup nennt „OmU: 3. Oktober, DE: TBA". Der alte Satz „Eine deutsche Fassung ist noch
-  # nicht angekündigt" war seit dem 15.09. falsch.
-  hinweis: "Crunchyroll zeigt die Staffel ab dem 03.10.2026 mit Untertiteln. Die deutsche Synchro ist angekündigt, ihr Termin noch offen — das Datum ist der Start mit Untertiteln."
-  sprache: omu
-  sources:
-    - https://www.crunchyroll.com/de/news/seasonal-lineup/2026/9/15/crunchyroll-deutsche-synchros-herbst-2026
-    - https://www.crunchyroll.com/de/news/seasonal-lineup/2026/9/15/crunchyroll-anime-lineup-herbst-2026
-    - https://www.anime2you.de/news/1047190/black-clover-second-season-termin/
-    - https://www.crunchyroll.com/news/latest/2026/6/15/black-clover-season-2-anime-october-2026-release-date-director
-    - https://www.crunchyroll.com/de/news/latest/2026/6/15/black-clover-staffel-2-premiere-oktober-2026
-    - https://anilist.co/anime/195604
-
 # Black Clover Staffel 2, deutsche Fassung: Crunchyrolls Katalog (Abruf 07.11.2026, `data/crunchyroll-dub.json`, Staffel „GS00385471JAJP“)
-# führt Folge 171 (durchlaufend gezählt, Folge 1 der Staffel) mit deutscher Tonspur, `verfuegbarAb` 07.11.2026 16:00 UTC. Der OmU-Eintrag oben bleibt
-# (Start 03.10.2026, Untertitel); ohne diesen zweiten Eintrag trug der Weg „deutsch", während jeder Termin „nur OmU" sagte (Bau 42389332341).
+# führt Folge 171 (durchlaufend gezählt, Folge 1 der Staffel) mit deutscher Tonspur, `verfuegbarAb` 07.11.2026 16:00 UTC.
+# Der frühere OmU-Termin (Start 03.10.2026, Untertitel) ist am 27.11.2026 entfallen: Er speiste Panel, Zählung und News
+# (Folge 9 statt 4, „Folge 3 nicht erschienen“), obwohl dieser Synchro-Termin steht (Fehlermeldung Daniel).
 # Folgen 172/173 (Folge 2/3 der Staffel) laut Katalog ab 14.11./21.11.2026 16:00 UTC. Keine Folgenzahl und kein `lastEpisodeDate` (nicht belegt).
 # Regeltermin 17:00: Folge 173 fehlte im CR-Lauf um 16:02 (`data/crunchyroll-neu.json` geholtAm 15:02:28Z, Commit ebb45dcb8) und war um 17:01
 # da (16:01:21Z, fdbf8e03a); Fenster unter 60 min gilt als belegt, daher ohne ≈. Deckt sich mit `verfuegbarAb` 16:00 UTC aller drei Folgen.
@@ -160,7 +117,7 @@
   # MESZ; Disney+ Brasilien meldet „jede Woche freitags 14:00" (= 17:00 UTC, passt). Ab 25.10. gilt MEZ, die Folge kommt dann
   # um 18:00 (`zeiten`). Anime2You nennt „samstags 19:00 Uhr" — der Unterschied steht offen im Hinweis; am 09.10. 19:00 prüft
   # Daniel (Kalender-Notiz). Folge 1 ist gesehen (Disney+ „Neue Folge", Anime2You 02.10. 19:55 „ab sofort").
-  hinweis: "Disney+ weltweit: freitags um 19:00 Uhr (ab 30.10. um 18:00 Uhr wegen der Zeitumstellung) laut offizieller Serienseite. Anime2You nennt samstags um 19:00 Uhr."
+  hinweis: "Disney+ weltweit: freitags um 19:00 Uhr (ab 30.10. um 18:00 Uhr wegen der Zeitumstellung) laut offizieller Serienseite; der Start war Freitag, 02.10. (Anime2You, 13 Folgen). Die Uhrzeit ab 30.10. ist aus dem Takt abgeleitet."
   # Text der News-Meldung „Rückwirkend eingetragen" (Entwurf G, Daniel 04.10.2026): erster Satz = Weiterlaufen, der Rest steht hinter „mehr".
   nachtrag:
     kurz: "Die Serie läuft im Simulcast wöchentlich freitags um 19 Uhr; die nächste Folge erscheint voraussichtlich am 09.10."
@@ -194,6 +151,7 @@
     - https://tokyo-revengers-anime.com/news/archives/4935
     - https://press.disneyplus.com/news/next-on-disney-plus-october-2026
     - https://www.anime2you.de/news/1056867/disney-plus-tokyo-revengers-simulcast-und-mehr/
+    - https://www.anime2you.de/news/1057610/tokyo-revengers-staffel-4-episodenanzahl/
 
 # Nachtrag 06.10.2026 aus dem Abgleich mit heise (Neue Filme und Serien im Oktober 2026) und Anime2You: Prime Video, deutsche Synchro und OmU im Simulcast.
 - slug: seven-knights-marronnier-kingdom-primevideo
@@ -362,7 +320,7 @@
     observed:
       12: "2026-09-19"
       15: "2026-10-10"
-  hinweis: "Gesamtzahl 24 nach AniList, von Netflix nicht genannt."
+  hinweis: "Gesamtzahl 24 durch Crunchyroll belegt (Finale am 10.10.), von Netflix nicht genannt."
   sources:
     - https://www.netflix.com/title/82719204
 
@@ -542,6 +500,23 @@
       2: "2026-10-24"
   sources:
     - https://www.crunchyroll.com/de/series/GT00361955/a-wild-last-boss-appeared
+
+# A Wild Last Boss Appeared! Staffel 2 bei Prime Video, Crunchyroll-Kanal (26.11.2026): ersetzt die automatische Übernahme aus Anime2You 1050718,
+# die keine Titelseite nannte (Weg ohne Adresse). Anime2You 1063615 (24.10.): „Staffel 2 · deutsch · wöchentlich · Prime Video, Crunchyroll“.
+# Adresse: Prime-Kennung der Staffel-2-Seite „Watch A Wild Last Boss Appeared! Season 2“ (primevideo.com/detail/0OPTCDPN7UYNAUNUCD1KACDL6P,
+# Suchtreffer 26.11.2026: 9 Folgen = OmU-Stand seit 21.11.); Staffel 1 trägt dieselbe Kennungsform (0T72HYK532MWZKMYSDZDF2R3WQ, data/motn-links.json).
+# Die Seite selbst war aus der Cloud nicht abrufbar; der Ton bleibt offen, ein Termin ist kein Tonbeleg.
+- slug: auto-204389-primevideo
+  anilistId: 204389
+  titleDe: "A Wild Last Boss Appeared! Staffel 2"
+  platform: primevideo
+  platformUrl: https://www.amazon.de/gp/video/detail/0OPTCDPN7UYNAUNUCD1KACDL6P
+  kanal: Crunchyroll
+  releaseType: batch
+  schedule: { firstEpisodeDate: "2026-09-26" }
+  sources:
+    - https://www.anime2you.de/news/1050718/crunchyroll-19-neue-herbst-2026-simulcasts/
+    - https://www.anime2you.de/news/1063615/crunchyroll-apotheke-staffel-3-synchro-und-mehr/
 
 - slug: appraisal-aristocrat-s3-crunchyroll
   anilistId: 185756

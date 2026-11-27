@@ -1,5 +1,7 @@
 import { log, readJson, writeJson } from './util.ts'
 import { herabgestufteWarnzeile } from './bestand-warnzeile.ts'
+import { ANISEARCH_AB } from './anisearch-archiv-vorrang.ts'
+import { anisearchBruecke } from './anisearch-katalog-ids.ts'
 
 /**
  * **Ein TMDB-Film gehört genau einem Titel.**
@@ -22,9 +24,12 @@ import { herabgestufteWarnzeile } from './bestand-warnzeile.ts'
  *
  * Serien dürfen sich eine Kennung teilen — die Staffeln eines Werks stehen bei
  * TMDB unter einer Serie.
+ *
+ * `seiteVon` ist die aniSearch-Brücke (Titel → aniSearch-Kennung, `anisearchBruecke()`).
  */
 export function mehrdeutigeFilmzuordnungen(
   zuordnung: Record<string, { tmdbId?: number; kind?: 'tv' | 'movie' }>,
+  seiteVon: Map<string, string> = new Map(),
 ): Set<string> {
   const jeFilm = new Map<number, string[]>()
   for (const [titelId, eintrag] of Object.entries(zuordnung)) {
@@ -34,8 +39,17 @@ export function mehrdeutigeFilmzuordnungen(
     jeFilm.set(eintrag.tmdbId, liste)
   }
   const raus = new Set<string>()
-  for (const liste of jeFilm.values()) if (liste.length > 1) for (const id of liste) raus.add(id)
+  for (const liste of jeFilm.values()) if (ohneSeitenzwillinge(liste, seiteVon).length > 1) for (const id of liste) raus.add(id)
   return raus
+}
+
+/**
+ * Die Titel einer Filmgruppe ohne die aniSearch-Zeilen, deren Seite ein anderer Titel der Gruppe trägt: Die Zeile kommt nie neben
+ * ihrem Träger in den Bestand (`vergebeneSeiten`), sie ist dasselbe Werk (Spycies 163696/10014868, Rohirrim 185613/10019566, 26.11.2026).
+ */
+function ohneSeitenzwillinge(liste: string[], seiteVon: Map<string, string>): string[] {
+  const getragen = new Set(liste.map((id) => seiteVon.get(id)))
+  return liste.filter((id) => Number(id) < ANISEARCH_AB || !getragen.has(String(Number(id) - ANISEARCH_AB)))
 }
 
 /** Die Titel mit geteiltem Film, einmal je Bau in `ladeQuellen()` gesetzt; Plakat- und Banner-Leser filtern damit. */
@@ -61,7 +75,7 @@ export const schreibeGeteilteFilme = (ids: Set<string>): void => writeJson(GETEI
 /** Die vom Bau geschriebene Menge; fehlt die Datei (kein Bau in diesem Ordner), nur die reine Film-Regel auf `tmdbTitles`. */
 export function ladeGeteilteFilme(tmdbTitles: Parameters<typeof mehrdeutigeFilmzuordnungen>[0]): Set<string> {
   const ids = readJson<string[] | null>(GETEILTE_FILME_DATEI, null)
-  return ids ? new Set(ids) : mehrdeutigeFilmzuordnungen(tmdbTitles)
+  return ids ? new Set(ids) : mehrdeutigeFilmzuordnungen(tmdbTitles, anisearchBruecke())
 }
 
 /**

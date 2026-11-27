@@ -17,10 +17,13 @@ import { pathToFileURL } from 'node:url'
 /** Job-Schlüssel in pr-pruefung.yml: Umfangsjob (liefert `nur_mod`) und Mod-Schnellweg (läuft nur bei `nur_mod == '1'`). */
 export const SCOPE_JOB = 'scope'
 export const SCHNELLWEG_JOB = 'modschnell'
+/** Matrix-Job `PR-Aussehen – …`: entfällt ohne Oberflächen-Änderung (`scope.outputs.aussehen == '0'`, tools/pr-aussehen-betroffen.mjs, 27.11.2026). */
+export const AUSSEHEN_JOB = 'aussehen'
 
 /**
  * Mod-Schnellweg (20.11.2026): Bei `scope.outputs.nur_mod == '1'` zählt `skipped` für jeden Job außer Umfangsjob und Schnellweg als bestanden,
  * der Schnellweg muss `success` sein; sonst darf nur der Schnellweg übersprungen sein. Fehlt `nur_mod` oder ist es nicht genau '1', gilt die volle Kette.
+ * Aussehen-Jobs (27.11.2026): Nur bei genau `scope.outputs.aussehen == '0'` zählt auch `skipped` des Jobs `aussehen` als bestanden; fehlt die Ausgabe, gilt die volle Kette.
  * Abgebrochen: alle zählenden Jobs außer dem Umfangsjob `cancelled` (der Umfangsjob selbst darf vorher fertig geworden sein).
  * @param {Record<string, {result: string, outputs?: Record<string, string>}>} needs @returns {'gruen'|'abgebrochen'|'rot'}
  */
@@ -28,7 +31,8 @@ export function kettenUrteil(needs) {
   const eintraege = Object.entries(needs ?? {})
   if (eintraege.length === 0) return 'rot'
   const nurMod = needs[SCOPE_JOB]?.outputs?.nur_mod === '1'
-  const darfUebersprungenSein = (id) => (nurMod ? id !== SCOPE_JOB && id !== SCHNELLWEG_JOB : id === SCHNELLWEG_JOB)
+  const ohneAussehen = needs[SCOPE_JOB]?.outputs?.aussehen === '0'
+  const darfUebersprungenSein = (id) => (nurMod ? id !== SCOPE_JOB && id !== SCHNELLWEG_JOB : id === SCHNELLWEG_JOB || (ohneAussehen && id === AUSSEHEN_JOB))
   const zaehlend = eintraege.filter(([id, n]) => !(n?.result === 'skipped' && darfUebersprungenSein(id)))
   const schnellOk = !nurMod || needs[SCHNELLWEG_JOB]?.result === 'success' // fehlt der Schnellweg in needs, wurde nichts geprüft
   if (schnellOk && zaehlend.every(([, n]) => n?.result === 'success')) return 'gruen'

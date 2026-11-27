@@ -14,6 +14,8 @@ export const KEIN_NUR_MOD = "needs.scope.outputs.nur_mod != '1'"
 /** `if` jedes Jobs, der bei Nur-Mod entfällt (Teiljobs, Datenbau, Aussehen). */
 export const IF_VOLLE_KETTE = `\${{ ${KEIN_NUR_MOD} && ${NICHT_DATEN} }}`
 export const NEEDS_SCOPE = ['scope']
+/** Bedingung der Aussehen-Jobs (27.11.2026): zusätzlich nur bei Oberflächen-PRs; fehlt die Ausgabe (leer), läuft die volle Kette. `tools/kette-urteil.mjs` lässt übersprungene Aussehen-Jobs nur bei genau '0' zu. */
+export const IF_AUSSEHEN = `\${{ ${KEIN_NUR_MOD} && needs.scope.outputs.aussehen != '0' && ${NICHT_DATEN} }}`
 
 /** Die Claude-Code-Version der Mod-Tests (tools/mod-tests.test.mjs, `CLI`); ein Test hält beide gleich. */
 export const CLI_VERSION = '@anthropic-ai/claude-code@2.1.321'
@@ -23,11 +25,12 @@ export const SOLL_SCOPE = {
   if: `\${{ ${NICHT_DATEN} }}`,
   'runs-on': 'ubuntu-latest',
   'timeout-minutes': 5,
-  outputs: { nur_mod: '${{ steps.pfad.outputs.nur_mod }}' },
+  outputs: { nur_mod: '${{ steps.pfad.outputs.nur_mod }}', aussehen: '${{ steps.aussehen.outputs.aussehen }}' },
   steps: [
     // Tiefe 2: HEAD^1 ist die Basis (main im Merge-Ref), HEAD der Merge-Commit.
     { uses: 'actions/checkout@v4', with: { 'fetch-depth': 2 } },
     { name: 'Nur Mod-Dateien?', id: 'pfad', run: 'node tools/pr-nur-mod.mjs HEAD^1 HEAD >> "$GITHUB_OUTPUT"' },
+    { name: 'Betrifft der PR die Oberfläche?', id: 'aussehen', run: 'node tools/pr-aussehen-betroffen.mjs HEAD^1 HEAD >> "$GITHUB_OUTPUT"' },
   ],
 }
 
@@ -65,7 +68,7 @@ export function pruefeSchnellweg(jobs) {
   for (const [id, job] of Object.entries(jobs)) {
     if (!String(job.name ?? '').startsWith('PR-Aussehen')) continue
     if (!isDeepStrictEqual(job.needs, NEEDS_SCOPE)) fehler.push(`Aussehen-Job "${id}": needs ist nicht exakt ["scope"]`)
-    if (job.if !== IF_VOLLE_KETTE) fehler.push(`Aussehen-Job "${id}": if ist nicht textgleich "${IF_VOLLE_KETTE}"`)
+    if (job.if !== IF_AUSSEHEN) fehler.push(`Aussehen-Job "${id}": if ist nicht textgleich "${IF_AUSSEHEN}"`)
   }
   return fehler
 }

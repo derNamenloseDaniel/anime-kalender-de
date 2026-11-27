@@ -1,5 +1,5 @@
 import { KastenMitFolgenKarte } from './kasten-folgen.tsx'
-import { FolgenMitNachlegern } from './nachleger-zeilen.tsx'
+import { FolgenMitNachlegern, nachlegerZeilen } from './nachleger-zeilen.tsx'
 import { deutscheBereicheDerWege } from './stream-bereiche.ts'
 import { synchroBelegt } from '@shared/titles.ts'
 import type { StreamLink, Release, Title, DiscAusgabe } from '@shared/types.ts'
@@ -109,6 +109,7 @@ export function AntwortBereich({ antwort, sortiertNachZugang, streamReleases, te
           today={today}
           wegeHinweis={wegeHinweis}
           notiz={kastenNotiz?.hinweis}
+          nachleger={nachlegerZeilen(antwort, releases, today)}
           folgen={<FolgenMitNachlegern titleId={title.id} wege={deutscheBereicheDerWege(title)} antwort={antwort} releases={releases} today={today} laufzeitImKopf={Boolean(title.runtimeMin)} serieBelegt={synchroBelegt(title)} />}
           schnitt={kastenNotiz?.schnitt}
           angebotSeit={angebotSeitZeileVon(title, t)}

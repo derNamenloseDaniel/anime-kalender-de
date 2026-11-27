@@ -17,7 +17,7 @@ pruefe('FSK von Hand: gültige Zeilen (Datenbank und Disc, alle Stufen) ergeben 
 pruefe('FSK von Hand: doppelte Kennung', fskVonHandFehler([zeile(5), zeile(5)]).length === 1)
 pruefe('FSK von Hand: fehlende Kennung', fskVonHandFehler([zeile(5, { anilistId: undefined as never })]).length === 1)
 pruefe('FSK von Hand: ungültige Stufe (7)', fskVonHandFehler([zeile(5, { fsk: 7 as never })]).length === 1)
-pruefe('FSK von Hand: Art "streaming" ist keine Art', fskVonHandFehler([zeile(5, { art: 'streaming' as never })]).length === 1)
+pruefe('FSK von Hand: Art "streaming" ist keine Art', fskVonHandFehler([zeile(5, { art: 'streaming' as never })]).length === 1 && fskVonHandFehler([zeile(5, { art: 'streaming' as never })])[0]!.includes('fsk-datenbank oder disc'))
 pruefe('FSK von Hand: http-Quelle', fskVonHandFehler([zeile(5, { sources: ['http://www.fsk.de/x'] })]).length === 1)
 pruefe('FSK von Hand: fehlende Quelle', fskVonHandFehler([zeile(5, { sources: [] })]).length === 1 && fskVonHandFehler([zeile(5, { sources: undefined as never })]).length === 1)
 pruefe('FSK von Hand: leerer Beleg', fskVonHandFehler([zeile(5, { beleg: '  ' })]).length === 1)
@@ -27,9 +27,9 @@ const meldungen: string[] = []
 const [altLog, altWarn] = [console.log, console.warn]
 console.log = (...a: unknown[]) => void meldungen.push(`log ${a.join(' ')}`)
 console.warn = (...a: unknown[]) => void meldungen.push(`warn ${a.join(' ')}`)
-uebernehmeFskVonHand(karte, [zeile(10, { fsk: 16 }), zeile(11, { fsk: 18 }), zeile(12, { fsk: 6 }), zeile(99)])
+uebernehmeFskVonHand(karte, [zeile(10, { fsk: 16 }), zeile(11, { fsk: 18 }), zeile(12, { fsk: 6 }), zeile(99), zeile(98)])
 ;[console.log, console.warn] = [altLog, altWarn]
-pruefe('FSK von Hand: Log nennt Zahl der gesetzten Zeilen und die Kennung ohne Titel', meldungen.some((m) => m.startsWith('log') && m.includes('2 von 4 Zeilen gesetzt') && m.includes('ohne Titel im Bestand: 99')))
+pruefe('FSK von Hand: Log nennt Zahl der gesetzten Zeilen und die Kennung ohne Titel', meldungen.some((m) => m.startsWith('log') && m.includes('2 von 5 Zeilen gesetzt') && m.includes('ohne Titel im Bestand: 99, 98')))
 pruefe('FSK von Hand: Widerspruch zur vorhandenen Freigabe wird gewarnt, Übereinstimmung nicht', meldungen.filter((m) => m.startsWith('warn')).length === 1 && meldungen.some((m) => m.startsWith('warn') && m.includes('11 trägt schon FSK 6') && m.includes('sagt 18')))
 pruefe('FSK von Hand: ohne unbekannte Kennung steht kein „ohne Titel“ im Log', (() => {
   const m2: string[] = []

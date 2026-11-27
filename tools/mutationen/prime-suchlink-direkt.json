@@ -1,0 +1,1787 @@
+[
+  {
+    "name": "Kontrolle (unmutiert)",
+    "aenderungen": [],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:22 === → !==",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "wege.length === 0",
+        "ersetze": "wege.length !== 0",
+        "zeile": 22
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:22 Zahl 0 → 1",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "0",
+        "ersetze": "1",
+        "zeile": 22
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:22 Argumente getauscht primeVerweisDesKanals",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "primeVerweisDesKanals(r, titel)",
+        "ersetze": "primeVerweisDesKanals(titel, r)",
+        "zeile": 22
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:22 Parameter am Aufrufort entfernt primeVerweisDesKanals (1. von 2)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "primeVerweisDesKanals(r, titel)",
+        "ersetze": "primeVerweisDesKanals(titel)",
+        "zeile": 22
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:22 Parameter am Aufrufort entfernt primeVerweisDesKanals (2. von 2)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "primeVerweisDesKanals(r, titel)",
+        "ersetze": "primeVerweisDesKanals(r)",
+        "zeile": 22
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:31 || → &&",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "r.platform !== 'primevideo' || !r.kanal",
+        "ersetze": "r.platform !== 'primevideo' && !r.kanal",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:31 !== → ===",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "r.platform !== 'primevideo'",
+        "ersetze": "r.platform === 'primevideo'",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:33 Parameter am Aufrufort entfernt (titel.watchLinks ?? []).filter (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "(titel.watchLinks ?? []).filter(\n    (w) => w.kind === 'stream' && /^https:\\/\\/(?:www\\.|watch\\.)?amazon\\.de\\//.test(w.url) && !istKeineTitelseite(w.url) && w.name.toLowerCase().includes(marke),\n  )",
+        "ersetze": "(titel.watchLinks ?? []).filter(\n    ,\n  )",
+        "zeile": 33
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:34 && → ||",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "w.kind === 'stream' && /^https:\\/\\/(?:www\\.|watch\\.)?amazon\\.de\\//.test(w.url) && !istKeineTitelseite(w.url) && w.name.toLowerCase().includes(marke)",
+        "ersetze": "w.kind === 'stream' && /^https:\\/\\/(?:www\\.|watch\\.)?amazon\\.de\\//.test(w.url) && !istKeineTitelseite(w.url) || w.name.toLowerCase().includes(marke)",
+        "zeile": 34
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:34 && → ||",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "w.kind === 'stream' && /^https:\\/\\/(?:www\\.|watch\\.)?amazon\\.de\\//.test(w.url) && !istKeineTitelseite(w.url)",
+        "ersetze": "w.kind === 'stream' && /^https:\\/\\/(?:www\\.|watch\\.)?amazon\\.de\\//.test(w.url) || !istKeineTitelseite(w.url)",
+        "zeile": 34
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:34 && → ||",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "w.kind === 'stream' && /^https:\\/\\/(?:www\\.|watch\\.)?amazon\\.de\\//.test(w.url)",
+        "ersetze": "w.kind === 'stream' || /^https:\\/\\/(?:www\\.|watch\\.)?amazon\\.de\\//.test(w.url)",
+        "zeile": 34
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:34 === → !==",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "w.kind === 'stream'",
+        "ersetze": "w.kind !== 'stream'",
+        "zeile": 34
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:34 Parameter am Aufrufort entfernt /^https:\\/\\/(?:www\\.|watch\\.)?amazon\\.de\\//.test (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "/^https:\\/\\/(?:www\\.|watch\\.)?amazon\\.de\\//.test(w.url)",
+        "ersetze": "/^https:\\/\\/(?:www\\.|watch\\.)?amazon\\.de\\//.test()",
+        "zeile": 34
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:34 Parameter am Aufrufort entfernt istKeineTitelseite (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "istKeineTitelseite(w.url)",
+        "ersetze": "istKeineTitelseite()",
+        "zeile": 34
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:34 Parameter am Aufrufort entfernt w.name.toLowerCase().includes (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "w.name.toLowerCase().includes(marke)",
+        "ersetze": "w.name.toLowerCase().includes()",
+        "zeile": 34
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:36 Anweisung → if (false)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "return treffer.length === 1 ? treffer[0]!.url : undefined",
+        "ersetze": "{ if (false) return treffer.length === 1 ? treffer[0]!.url : undefined }",
+        "zeile": 36
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:36 ?: Zweige vertauscht",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "treffer.length === 1 ? treffer[0]!.url : undefined",
+        "ersetze": "treffer.length === 1 ? undefined : treffer[0]!.url",
+        "zeile": 36
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:36 === → !==",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "treffer.length === 1",
+        "ersetze": "treffer.length !== 1",
+        "zeile": 36
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:36 Zahl 1 → 0",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "1",
+        "ersetze": "0",
+        "zeile": 36
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-1-termin-adressen.ts:36 Zahl 0 → 1",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-1-termin-adressen.ts",
+        "suche": "0",
+        "ersetze": "1",
+        "zeile": 36
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:14 Parameter am Aufrufort entfernt Map (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "new Map(titles.map((t) => [t.id, t]))",
+        "ersetze": "new Map()",
+        "zeile": 14
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:14 Parameter am Aufrufort entfernt titles.map (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "titles.map((t) => [t.id, t])",
+        "ersetze": "titles.map()",
+        "zeile": 14
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:17 || → &&",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "r.platform !== 'primevideo' || r.releaseType === 'disc' || r.buyUrl",
+        "ersetze": "r.platform !== 'primevideo' || r.releaseType === 'disc' && r.buyUrl",
+        "zeile": 17
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:17 || → &&",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "r.platform !== 'primevideo' || r.releaseType === 'disc'",
+        "ersetze": "r.platform !== 'primevideo' && r.releaseType === 'disc'",
+        "zeile": 17
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:17 !== → ===",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "r.platform !== 'primevideo'",
+        "ersetze": "r.platform === 'primevideo'",
+        "zeile": 17
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:17 === → !==",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "r.releaseType === 'disc'",
+        "ersetze": "r.releaseType !== 'disc'",
+        "zeile": 17
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:18 && → ||",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "r.platformUrl && !istKeineTitelseite(r.platformUrl)",
+        "ersetze": "r.platformUrl || !istKeineTitelseite(r.platformUrl)",
+        "zeile": 18
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:18 Parameter am Aufrufort entfernt istKeineTitelseite (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "istKeineTitelseite(r.platformUrl)",
+        "ersetze": "istKeineTitelseite()",
+        "zeile": 18
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:19 Parameter am Aufrufort entfernt titelNachId.get (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "titelNachId.get(r.titleId)",
+        "ersetze": "titelNachId.get()",
+        "zeile": 19
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:20 || → &&",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "!titel || je.has(r.titleId)",
+        "ersetze": "!titel && je.has(r.titleId)",
+        "zeile": 20
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:20 Parameter am Aufrufort entfernt je.has (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "je.has(r.titleId)",
+        "ersetze": "je.has()",
+        "zeile": 20
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:21 Parameter am Aufrufort entfernt anzeigeName (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "anzeigeName(titel)",
+        "ersetze": "anzeigeName()",
+        "zeile": 21
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:22 Aufruf entfernt",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "je.set(r.titleId, { id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name) })",
+        "ersetze": "void 0",
+        "zeile": 22
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:22 Argumente getauscht je.set",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "je.set(r.titleId, { id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name) })",
+        "ersetze": "je.set({ id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name) }, r.titleId)",
+        "zeile": 22
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:22 Parameter am Aufrufort entfernt je.set (1. von 2)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "je.set(r.titleId, { id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name) })",
+        "ersetze": "je.set({ id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name) })",
+        "zeile": 22
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:22 Parameter am Aufrufort entfernt je.set (2. von 2)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "je.set(r.titleId, { id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name) })",
+        "ersetze": "je.set(r.titleId)",
+        "zeile": 22
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:22 Objekt-Eigenschaft entfernt id",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "id: r.titleId",
+        "ersetze": "...{}",
+        "zeile": 22
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:22 Objekt-Eigenschaft entfernt titel",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "titel: name",
+        "ersetze": "...{}",
+        "zeile": 22
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:22 Objekt-Eigenschaft entfernt plattform",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "plattform: 'primevideo'",
+        "ersetze": "...{}",
+        "zeile": 22
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:22 Objekt-Eigenschaft entfernt url",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "url: r.platformUrl ?? primeVideoSearchUrl(name)",
+        "ersetze": "...{}",
+        "zeile": 22
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:22 Parameter am Aufrufort entfernt primeVideoSearchUrl (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "primeVideoSearchUrl(name)",
+        "ersetze": "primeVideoSearchUrl()",
+        "zeile": 22
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:24 Anweisung → if (false)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "return [...je.values()]",
+        "ersetze": "{ if (false) return [...je.values()] }",
+        "zeile": 24
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:35 Parameter-Vorgabe → 0 geprueft",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "geprueft: ReadonlySet<number> = new Set()",
+        "ersetze": "geprueft: ReadonlySet<number> = 0",
+        "zeile": 35
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:37 Parameter am Aufrufort entfernt Map (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "new Map(titles.map((t) => [t.id, t]))",
+        "ersetze": "new Map()",
+        "zeile": 37
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:37 Parameter am Aufrufort entfernt titles.map (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "titles.map((t) => [t.id, t])",
+        "ersetze": "titles.map()",
+        "zeile": 37
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:41 || → &&",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "r.platform !== 'primevideo' || r.releaseType === 'disc' || r.buyUrl",
+        "ersetze": "r.platform !== 'primevideo' || r.releaseType === 'disc' && r.buyUrl",
+        "zeile": 41
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:41 || → &&",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "r.platform !== 'primevideo' || r.releaseType === 'disc'",
+        "ersetze": "r.platform !== 'primevideo' && r.releaseType === 'disc'",
+        "zeile": 41
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:41 !== → ===",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "r.platform !== 'primevideo'",
+        "ersetze": "r.platform === 'primevideo'",
+        "zeile": 41
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:41 === → !==",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "r.releaseType === 'disc'",
+        "ersetze": "r.releaseType !== 'disc'",
+        "zeile": 41
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:42 && → ||",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "r.platformUrl && !istKeineTitelseite(r.platformUrl)",
+        "ersetze": "r.platformUrl || !istKeineTitelseite(r.platformUrl)",
+        "zeile": 42
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:42 Parameter am Aufrufort entfernt istKeineTitelseite (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "istKeineTitelseite(r.platformUrl)",
+        "ersetze": "istKeineTitelseite()",
+        "zeile": 42
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:43 Parameter am Aufrufort entfernt titelNachId.get (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "titelNachId.get(r.titleId)",
+        "ersetze": "titelNachId.get()",
+        "zeile": 43
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:45 Argumente getauscht adresseDesWegs",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "adresseDesWegs(r, titel)",
+        "ersetze": "adresseDesWegs(titel, r)",
+        "zeile": 45
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:45 Parameter am Aufrufort entfernt adresseDesWegs (1. von 2)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "adresseDesWegs(r, titel)",
+        "ersetze": "adresseDesWegs(titel)",
+        "zeile": 45
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:45 Parameter am Aufrufort entfernt adresseDesWegs (2. von 2)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "adresseDesWegs(r, titel)",
+        "ersetze": "adresseDesWegs(r)",
+        "zeile": 45
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:46 Aufruf entfernt",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "probleme.push(`${r.slug}: Pille führt in die Suche, der Direktlink desselben Kanals liegt vor (${direkt})`)",
+        "ersetze": "void 0",
+        "zeile": 46
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:46 Parameter am Aufrufort entfernt probleme.push (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "probleme.push(`${r.slug}: Pille führt in die Suche, der Direktlink desselben Kanals liegt vor (${direkt})`)",
+        "ersetze": "probleme.push()",
+        "zeile": 46
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:47 Parameter am Aufrufort entfernt auftragsIds.has (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "auftragsIds.has(r.titleId)",
+        "ersetze": "auftragsIds.has()",
+        "zeile": 47
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:48 Parameter am Aufrufort entfernt geprueft.has (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "geprueft.has(r.titleId)",
+        "ersetze": "geprueft.has()",
+        "zeile": 48
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:48 Aufruf entfernt",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "ungeklaert.push(r.titleId)",
+        "ersetze": "void 0",
+        "zeile": 48
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:48 Parameter am Aufrufort entfernt ungeklaert.push (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "ungeklaert.push(r.titleId)",
+        "ersetze": "ungeklaert.push()",
+        "zeile": 48
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:49 Aufruf entfernt",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "probleme.push(`${r.slug}: Pille führt in die Suche, Titel ${r.titleId} steht auf keiner Suchauftragsliste`)",
+        "ersetze": "void 0",
+        "zeile": 49
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:49 Parameter am Aufrufort entfernt probleme.push (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "probleme.push(`${r.slug}: Pille führt in die Suche, Titel ${r.titleId} steht auf keiner Suchauftragsliste`)",
+        "ersetze": "probleme.push()",
+        "zeile": 49
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:51 Anweisung → if (false)",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "return { probleme, ungeklaert }",
+        "ersetze": "{ if (false) return { probleme, ungeklaert } }",
+        "zeile": 51
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:51 Objekt-Eigenschaft entfernt probleme",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "probleme",
+        "ersetze": "...{}",
+        "zeile": 51
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "pipeline/bau/13-3-termin-suchen.ts:51 Objekt-Eigenschaft entfernt ungeklaert",
+    "aenderungen": [
+      {
+        "datei": "pipeline/bau/13-3-termin-suchen.ts",
+        "suche": "ungeklaert",
+        "ersetze": "...{}",
+        "zeile": 51
+      }
+    ],
+    "tests": [
+      "npx tsx pipeline/check-prime-suchlink-direkt.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:14 Parameter am Aufrufort entfernt Set (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "new Set(['queued', 'pending', 'waiting', 'requested'])",
+        "ersetze": "new Set()",
+        "zeile": 14
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:20 Anweisung → if (false)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "return !!d && d.plattform === 'primevideo' && typeof d.suchUrl === 'string' && d.suchUrl.length > 0",
+        "ersetze": "{ if (false) return !!d && d.plattform === 'primevideo' && typeof d.suchUrl === 'string' && d.suchUrl.length > 0 }",
+        "zeile": 20
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:20 && → ||",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "!!d && d.plattform === 'primevideo' && typeof d.suchUrl === 'string' && d.suchUrl.length > 0",
+        "ersetze": "!!d && d.plattform === 'primevideo' && typeof d.suchUrl === 'string' || d.suchUrl.length > 0",
+        "zeile": 20
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:20 && → ||",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "!!d && d.plattform === 'primevideo' && typeof d.suchUrl === 'string'",
+        "ersetze": "!!d && d.plattform === 'primevideo' || typeof d.suchUrl === 'string'",
+        "zeile": 20
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:20 && → ||",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "!!d && d.plattform === 'primevideo'",
+        "ersetze": "!!d || d.plattform === 'primevideo'",
+        "zeile": 20
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:20 === → !==",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "d.plattform === 'primevideo'",
+        "ersetze": "d.plattform !== 'primevideo'",
+        "zeile": 20
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:20 === → !==",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "typeof d.suchUrl === 'string'",
+        "ersetze": "typeof d.suchUrl !== 'string'",
+        "zeile": 20
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:20 > → >=",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "d.suchUrl.length > 0",
+        "ersetze": "d.suchUrl.length >= 0",
+        "zeile": 20
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:20 > → <=",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "d.suchUrl.length > 0",
+        "ersetze": "d.suchUrl.length <= 0",
+        "zeile": 20
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:20 Zahl 0 → 1",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "0",
+        "ersetze": "1",
+        "zeile": 20
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:23 Anweisung → if (false)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "return Array.isArray(stapel) ? stapel.some(einzeln) : einzeln(daten)",
+        "ersetze": "{ if (false) return Array.isArray(stapel) ? stapel.some(einzeln) : einzeln(daten) }",
+        "zeile": 23
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:23 ?: Zweige vertauscht",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "Array.isArray(stapel) ? stapel.some(einzeln) : einzeln(daten)",
+        "ersetze": "Array.isArray(stapel) ? einzeln(daten) : stapel.some(einzeln)",
+        "zeile": 23
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:23 Parameter am Aufrufort entfernt Array.isArray (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "Array.isArray(stapel)",
+        "ersetze": "Array.isArray()",
+        "zeile": 23
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:23 Parameter am Aufrufort entfernt stapel.some (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "stapel.some(einzeln)",
+        "ersetze": "stapel.some()",
+        "zeile": 23
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:23 Parameter am Aufrufort entfernt einzeln (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "einzeln(daten)",
+        "ersetze": "einzeln()",
+        "zeile": 23
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:30 Parameter am Aufrufort entfernt letzteLaeufe(env, STANDARD_REPO, BAU).catch (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "letzteLaeufe(env, STANDARD_REPO, BAU).catch((e) => {\n    fehlerLog('[bau-anstoss] Läufe nicht lesbar, Bau wird trotzdem gestartet', e)\n    return null\n  })",
+        "ersetze": "letzteLaeufe(env, STANDARD_REPO, BAU).catch()",
+        "zeile": 30
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:30 Argumente getauscht letzteLaeufe",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "letzteLaeufe(env, STANDARD_REPO, BAU)",
+        "ersetze": "letzteLaeufe(STANDARD_REPO, env, BAU)",
+        "zeile": 30
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:30 Parameter am Aufrufort entfernt letzteLaeufe (1. von 3)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "letzteLaeufe(env, STANDARD_REPO, BAU)",
+        "ersetze": "letzteLaeufe(STANDARD_REPO, BAU)",
+        "zeile": 30
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:30 Parameter am Aufrufort entfernt letzteLaeufe (2. von 3)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "letzteLaeufe(env, STANDARD_REPO, BAU)",
+        "ersetze": "letzteLaeufe(env, BAU)",
+        "zeile": 30
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:30 Parameter am Aufrufort entfernt letzteLaeufe (3. von 3)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "letzteLaeufe(env, STANDARD_REPO, BAU)",
+        "ersetze": "letzteLaeufe(env, STANDARD_REPO)",
+        "zeile": 30
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:31 Aufruf entfernt",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "fehlerLog('[bau-anstoss] Läufe nicht lesbar, Bau wird trotzdem gestartet', e)",
+        "ersetze": "void 0",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:31 Argumente getauscht fehlerLog",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "fehlerLog('[bau-anstoss] Läufe nicht lesbar, Bau wird trotzdem gestartet', e)",
+        "ersetze": "fehlerLog(e, '[bau-anstoss] Läufe nicht lesbar, Bau wird trotzdem gestartet')",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:31 Parameter am Aufrufort entfernt fehlerLog (1. von 2)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "fehlerLog('[bau-anstoss] Läufe nicht lesbar, Bau wird trotzdem gestartet', e)",
+        "ersetze": "fehlerLog(e)",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:31 Parameter am Aufrufort entfernt fehlerLog (2. von 2)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "fehlerLog('[bau-anstoss] Läufe nicht lesbar, Bau wird trotzdem gestartet', e)",
+        "ersetze": "fehlerLog('[bau-anstoss] Läufe nicht lesbar, Bau wird trotzdem gestartet')",
+        "zeile": 31
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:32 Anweisung → if (false)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "return null",
+        "ersetze": "{ if (false) return null }",
+        "zeile": 32
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:34 Parameter am Aufrufort entfernt laeufe?.some (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "laeufe?.some((l) => WARTEND.has(String(l.status)))",
+        "ersetze": "laeufe?.some()",
+        "zeile": 34
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:34 Parameter am Aufrufort entfernt WARTEND.has (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "WARTEND.has(String(l.status))",
+        "ersetze": "WARTEND.has()",
+        "zeile": 34
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:34 Parameter am Aufrufort entfernt String (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "String(l.status)",
+        "ersetze": "String()",
+        "zeile": 34
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:35 Argumente getauscht fetch",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "fetch(`https://api.github.com/repos/${STANDARD_REPO}/actions/workflows/${BAU}/dispatches`, {\n    method: 'POST',\n    headers: KOPF(env),\n    body: JSON.stringify({ ref: 'main' }),\n  })",
+        "ersetze": "fetch({\n    method: 'POST',\n    headers: KOPF(env),\n    body: JSON.stringify({ ref: 'main' }),\n  }, `https://api.github.com/repos/${STANDARD_REPO}/actions/workflows/${BAU}/dispatches`)",
+        "zeile": 35
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:35 Parameter am Aufrufort entfernt fetch (1. von 2)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "fetch(`https://api.github.com/repos/${STANDARD_REPO}/actions/workflows/${BAU}/dispatches`, {\n    method: 'POST',\n    headers: KOPF(env),\n    body: JSON.stringify({ ref: 'main' }),\n  })",
+        "ersetze": "fetch({\n    method: 'POST',\n    headers: KOPF(env),\n    body: JSON.stringify({ ref: 'main' }),\n  })",
+        "zeile": 35
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:35 Parameter am Aufrufort entfernt fetch (2. von 2)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "fetch(`https://api.github.com/repos/${STANDARD_REPO}/actions/workflows/${BAU}/dispatches`, {\n    method: 'POST',\n    headers: KOPF(env),\n    body: JSON.stringify({ ref: 'main' }),\n  })",
+        "ersetze": "fetch(`https://api.github.com/repos/${STANDARD_REPO}/actions/workflows/${BAU}/dispatches`)",
+        "zeile": 35
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:36 Objekt-Eigenschaft entfernt method",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "method: 'POST'",
+        "ersetze": "...{}",
+        "zeile": 36
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:37 Objekt-Eigenschaft entfernt headers",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "headers: KOPF(env)",
+        "ersetze": "...{}",
+        "zeile": 37
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:37 Parameter am Aufrufort entfernt KOPF (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "KOPF(env)",
+        "ersetze": "KOPF()",
+        "zeile": 37
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:38 Objekt-Eigenschaft entfernt body",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "body: JSON.stringify({ ref: 'main' })",
+        "ersetze": "...{}",
+        "zeile": 38
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:38 Parameter am Aufrufort entfernt JSON.stringify (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "JSON.stringify({ ref: 'main' })",
+        "ersetze": "JSON.stringify()",
+        "zeile": 38
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:38 Objekt-Eigenschaft entfernt ref",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "ref: 'main'",
+        "ersetze": "...{}",
+        "zeile": 38
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:40 !== → ===",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "r.status !== 204",
+        "ersetze": "r.status === 204",
+        "zeile": 40
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:40 Zahl 204 → 0",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "204",
+        "ersetze": "0",
+        "zeile": 40
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:41 Aufruf entfernt",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "console.error(`[bau-anstoss] ${BAU}: HTTP ${r.status}`)",
+        "ersetze": "void 0",
+        "zeile": 41
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:41 Parameter am Aufrufort entfernt console.error (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "console.error(`[bau-anstoss] ${BAU}: HTTP ${r.status}`)",
+        "ersetze": "console.error()",
+        "zeile": 41
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:42 Anweisung → if (false)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "return 'abgelehnt'",
+        "ersetze": "{ if (false) return 'abgelehnt' }",
+        "zeile": 42
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/bau-anstoss.ts:44 Anweisung → if (false)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/bau-anstoss.ts",
+        "suche": "return 'gestartet'",
+        "ersetze": "{ if (false) return 'gestartet' }",
+        "zeile": 44
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:148 Parameter am Aufrufort entfernt stoesstBauAn (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "stoesstBauAn(daten)",
+        "ersetze": "stoesstBauAn()",
+        "zeile": 148
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:148 Aufruf entfernt",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "ctx?.waitUntil(stosseBauAn(env).catch((e) => fehlerLog('[bau-anstoss]', e)))",
+        "ersetze": "void 0",
+        "zeile": 148
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:148 Parameter am Aufrufort entfernt ctx?.waitUntil (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "ctx?.waitUntil(stosseBauAn(env).catch((e) => fehlerLog('[bau-anstoss]', e)))",
+        "ersetze": "ctx?.waitUntil()",
+        "zeile": 148
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:148 Parameter am Aufrufort entfernt stosseBauAn(env).catch (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "stosseBauAn(env).catch((e) => fehlerLog('[bau-anstoss]', e))",
+        "ersetze": "stosseBauAn(env).catch()",
+        "zeile": 148
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:148 Parameter am Aufrufort entfernt stosseBauAn (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "stosseBauAn(env)",
+        "ersetze": "stosseBauAn()",
+        "zeile": 148
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:148 Argumente getauscht fehlerLog",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "fehlerLog('[bau-anstoss]', e)",
+        "ersetze": "fehlerLog(e, '[bau-anstoss]')",
+        "zeile": 148
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:148 Parameter am Aufrufort entfernt fehlerLog (1. von 2)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "fehlerLog('[bau-anstoss]', e)",
+        "ersetze": "fehlerLog(e)",
+        "zeile": 148
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:148 Parameter am Aufrufort entfernt fehlerLog (2. von 2)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "fehlerLog('[bau-anstoss]', e)",
+        "ersetze": "fehlerLog('[bau-anstoss]')",
+        "zeile": 148
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:301 Parameter am Aufrufort entfernt stapel.some (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "stapel.some((m, i) => stoesstBauAn(m) && ergebnisse[i]?.ok)",
+        "ersetze": "stapel.some()",
+        "zeile": 301
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:301 && → ||",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "stoesstBauAn(m) && ergebnisse[i]?.ok",
+        "ersetze": "stoesstBauAn(m) || ergebnisse[i]?.ok",
+        "zeile": 301
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:301 Parameter am Aufrufort entfernt stoesstBauAn (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "stoesstBauAn(m)",
+        "ersetze": "stoesstBauAn()",
+        "zeile": 301
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:301 Aufruf entfernt",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "ctx?.waitUntil(stosseBauAn(env).catch((e) => fehlerLog('[bau-anstoss]', e)))",
+        "ersetze": "void 0",
+        "zeile": 301
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:301 Parameter am Aufrufort entfernt ctx?.waitUntil (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "ctx?.waitUntil(stosseBauAn(env).catch((e) => fehlerLog('[bau-anstoss]', e)))",
+        "ersetze": "ctx?.waitUntil()",
+        "zeile": 301
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:301 Parameter am Aufrufort entfernt stosseBauAn(env).catch (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "stosseBauAn(env).catch((e) => fehlerLog('[bau-anstoss]', e))",
+        "ersetze": "stosseBauAn(env).catch()",
+        "zeile": 301
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:301 Parameter am Aufrufort entfernt stosseBauAn (1. von 1)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "stosseBauAn(env)",
+        "ersetze": "stosseBauAn()",
+        "zeile": 301
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:301 Argumente getauscht fehlerLog",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "fehlerLog('[bau-anstoss]', e)",
+        "ersetze": "fehlerLog(e, '[bau-anstoss]')",
+        "zeile": 301
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:301 Parameter am Aufrufort entfernt fehlerLog (1. von 2)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "fehlerLog('[bau-anstoss]', e)",
+        "ersetze": "fehlerLog(e)",
+        "zeile": 301
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  },
+  {
+    "name": "worker/src/pruefung-speichern.ts:301 Parameter am Aufrufort entfernt fehlerLog (2. von 2)",
+    "aenderungen": [
+      {
+        "datei": "worker/src/pruefung-speichern.ts",
+        "suche": "fehlerLog('[bau-anstoss]', e)",
+        "ersetze": "fehlerLog('[bau-anstoss]')",
+        "zeile": 301
+      }
+    ],
+    "tests": [
+      "npx tsx tools/worker-bau-anstoss.test.ts"
+    ]
+  }
+]

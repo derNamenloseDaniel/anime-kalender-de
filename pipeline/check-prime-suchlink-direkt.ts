@@ -72,7 +72,12 @@ const titel9 = [titel(9, [])]
 const aus = offeneTerminSuchen(auswahl, titel9)
 pruefe('Auswahl: nur der erste Prime-Termin ohne Kauf/Disc/Titelseite, je Titel ein Auftrag', aus.length === 1 && aus[0]!.id === 9, aus)
 pruefe('Auftrag: Titel, Plattform und die Adresse des ersten Termins', JSON.stringify(aus[0]) === JSON.stringify({ id: 9, titel: 'Testtitel 9', plattform: 'primevideo', url: AMAZON_SUCHE }), aus[0])
-const ohneAdresse = offeneTerminSuchen([termin(9, 'Aniverse')], titel9)
+for (const [grund, t] of [['anderer Anbieter', auswahl[0]!], ['Typ disc', auswahl[1]!], ['Kauf-Adresse', auswahl[2]!]] as const) {
+  pruefe(`Auswahl einzeln: ${grund} ergibt keinen Auftrag`, offeneTerminSuchen([t], titel9).length === 0)
+}
+const sucheAmTermin = suchlinksOhneAusweg([termin(9, 'Aniverse', { platformUrl: AMAZON_SUCHE })], titel9, new Set())
+pruefe('Wächter: Suche als Adresse am Termin ist ohne Auftrag ein Verstoß', sucheAmTermin.probleme.length === 1, sucheAmTermin)
+const ohneAdresse =offeneTerminSuchen([termin(9, 'Aniverse')], titel9)
 pruefe('Termin ohne Adresse: Suche aus dem Anzeigenamen', ohneAdresse[0]?.url === AMAZON_SUCHE, ohneAdresse[0])
 const w = suchlinksOhneAusweg(auswahl.slice(0, 4), titel9, new Set())
 pruefe('Wächter: Netflix, Disc, Kauf-Adresse und unbekannter Titel sind kein Verstoß', w.probleme.length === 0, w)

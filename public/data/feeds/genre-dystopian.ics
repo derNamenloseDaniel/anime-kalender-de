@@ -82,6 +82,17 @@ DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
+UID:auto-10021751-netflix@2026-11-26@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261126
+DTEND;VALUE=DATE:20261127
+SUMMARY:Fool Night (Synchro offen)
+DESCRIPTION:Plattform: Netflix\nRelease-Art: Katalog\nSynchro offen: Der Te
+ rmin ist belegt\, eine deutsche Synchro nicht.\nUhrzeit noch nicht bestät
+ igt.\nDetails: https://anime-kalender.de/t/17705/
+CATEGORIES:Netflix
+END:VEVENT
+BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2026-11-27@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261127T175000Z

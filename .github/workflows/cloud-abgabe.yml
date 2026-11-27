@@ -9,7 +9,8 @@ name: Cloud-Abgabe
 # abzweigen (kein Orphan-Zweig: ohne diese Datei startet nichts). Ein Orphan-Zweig oder ein verpasster Lauf: `workflow_dispatch` mit `zweig`.
 #
 # App-Token (wie bestand-bauen.yml): ein mit GITHUB_TOKEN angelegter PR startet keine Workflows, die PR-Prüfkette bliebe aus. Rechte nur
-# pull-requests/issues schreiben, contents lesen: kein Merge (der braucht contents: write). Der Vorprüf-Schritt tools/pr-vorpruefung.mjs
+# pull-requests schreiben, contents lesen: kein Merge (der braucht contents: write). Die Installation der Daten-App hat `issues` nicht (422 am 27.11.2026);
+# Kommentar, Label anlegen/setzen/löschen gehen laut GitHub-Rechtetabelle (github/docs, server-to-server-permissions.json) auch mit pull-requests: write. Der Vorprüf-Schritt tools/pr-vorpruefung.mjs
 # braucht den Diff des Fremdzweigs im Arbeitsbaum und entfällt hier; die Cloud-Routine fährt ihn vor dem Push, die PR-Kette prüft danach.
 
 on:
@@ -48,7 +49,6 @@ jobs:
           private-key: ${{ secrets.DATEN_APP_KEY }}
           permission-contents: read
           permission-pull-requests: write
-          permission-issues: write
 
       - name: Abgabe verarbeiten
         env:

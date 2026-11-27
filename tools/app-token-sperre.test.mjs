@@ -193,4 +193,8 @@ erwarte('cloud-abgabe: Zeile nach dem Aufruf', (s) => { schritt(s, ...ABGABE).ru
 erwarte('cloud-abgabe: ZWEIG aus anderer Quelle', (s) => { schritt(s, ...ABGABE).env.ZWEIG = '${{ github.event.head_commit.message }}' }, /Job abgeben.*env.ZWEIG genau/)
 erwarte('cloud-abgabe: fremde env', (s) => { schritt(s, ...ABGABE).env.NODE_OPTIONS = '--require ./x.cjs' }, /Job abgeben.*env nur GH_TOKEN, ZWEIG/)
 erwarte('cloud-abgabe: working-directory', (s) => { schritt(s, ...ABGABE)['working-directory'] = 'fremd' }, /Job abgeben.*nur die Schlüssel/)
+// Rechte (27.11.2026): `permission-issues` am App-Token ergab 422 (Installation hat nur contents, pull-requests, workflows).
+erwarte('cloud-abgabe: permission-issues (Stand vom 27.11.2026)', (s) => { holer(s, 'cloud-abgabe.yml', 'abgeben').with['permission-issues'] = 'write' }, /cloud-abgabe\.yml: Job abgeben: fordert permission-issues an/)
+erwarte('Aktion einreichen: permission-issues', (s) => { s.aktionen.einreichen.runs.steps.find((x) => x.id === 'app').with['permission-issues'] = 'write' }, /actions\/einreichen: fordert permission-issues an/)
+erwarteOk('permission-pull-requests bleibt erlaubt', (s) => { holer(s, 'cloud-abgabe.yml', 'abgeben').with['permission-pull-requests'] = 'write' })
 console.log('app-token-sperre.test: ok')

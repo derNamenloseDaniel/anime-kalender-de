@@ -461,7 +461,7 @@ for (const [args, muster] of [[[], /Aufruf/], [['fix/foo'], /kein prtext-Zweig/]
   const checkout = job.steps[0]
   pruefe('Workflow: Checkout von main ohne gespeicherte Anmeldung', checkout.uses === 'actions/checkout@v4' && checkout.with.ref === 'main' && checkout.with['persist-credentials'] === false)
   const app = job.steps.find((s) => s.id === 'app')
-  gleich('Workflow: App-Token ohne contents: write (kein Merge)', Object.keys(app.with).filter((k) => k.startsWith('permission-')).sort().map((k) => `${k}=${app.with[k]}`), ['permission-contents=read', 'permission-issues=write', 'permission-pull-requests=write'])
+  gleich('Workflow: App-Token ohne contents: write (kein Merge)', Object.keys(app.with).filter((k) => k.startsWith('permission-')).sort().map((k) => `${k}=${app.with[k]}`), ['permission-contents=read', 'permission-pull-requests=write'])
   const schritt = job.steps.find((s) => s.name === 'Abgabe verarbeiten')
   pruefe('Workflow: Zweigname nur über env, run ohne Ausdruck', schritt.run === 'node tools/cloud-abgabe.mjs "$ZWEIG"' && !job.steps.some((s) => String(s.run ?? '').includes('${{')))
   pruefe('Workflow: kein weiterer Schritt sieht das Token', job.steps.filter((s) => JSON.stringify(s).includes('steps.app.outputs')).length === 1)

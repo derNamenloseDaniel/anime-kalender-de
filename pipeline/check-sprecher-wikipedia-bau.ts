@@ -151,6 +151,20 @@ rmSync(join(wurzel, 'data', 'wikipedia-sprecher.json'))
 const ohne = sprecherRollen({ titles })
 pruefe('ohne Sammlung: kein Abbruch, Wikipedia-Rollen fallen weg', JSON.stringify(lies(900002)?.roles) === '[]' && !ohne.has(900002) && ohne.has(900004) && ohne.has(900010), lies(900002))
 
+console.log('\nSprecher aus Wikipedia: Handliste fehlt (Bau-Kulisse anderer Prüfungen)')
+rmSync(join(wurzel, 'data', 'wikipedia-sprecher-seiten.yaml'))
+zeilen.length = 0
+mitschreiben()
+let ohneListe: Set<number> | undefined
+let abbruch: unknown
+try {
+  ohneListe = sprecherRollen({ titles })
+} catch (e) {
+  abbruch = e
+}
+zurueck()
+pruefe('ohne Handliste: kein Abbruch, Warnzeile nennt die Datei, AniList-Rollen bleiben', !abbruch && !!ohneListe?.has(900010) && zeilen.some((z) => z.includes('data/wikipedia-sprecher-seiten.yaml nicht lesbar')), abbruch ? String(abbruch) : zeilen)
+
 rmSync(wurzel, { recursive: true, force: true })
 if (verletzt) {
   console.error(`\n${verletzt} Prüfung(en) verletzt`)

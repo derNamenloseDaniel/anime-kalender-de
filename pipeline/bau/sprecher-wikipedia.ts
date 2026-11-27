@@ -114,9 +114,19 @@ function idsMitWikipedia(): number[] {
     .map((n) => Number(n.slice(0, -5)))
 }
 
+/** Ziele der Handliste; fehlt sie (Bau-Kulisse anderer Prüfungen), keine Ziele. Kaputtes YAML bricht ab. */
+function liesZiele(): WikipediaZiel[] {
+  const pfad = join(ROOT, HANDLISTE)
+  if (!existsSync(pfad)) {
+    warn(`${HANDLISTE} nicht lesbar (fehlt): keine Wikipedia-Sprecher`)
+    return []
+  }
+  return zieleAusHandliste(yaml.load(readFileSync(pfad, 'utf8')) as Parameters<typeof zieleAusHandliste>[0])
+}
+
 /** Schreibt die Wikipedia-Rollen; Rückgabe: Titel mit Rollen danach (ergänzt `mitStimmen`). */
 export function ergaenzeWikipediaSprecher({ titles, mitStimmen }: { titles: Map<number, Title>; mitStimmen: Set<number> }): Set<number> {
-  const ziele = zieleAusHandliste(yaml.load(readFileSync(join(ROOT, HANDLISTE), 'utf8')) as Parameters<typeof zieleAusHandliste>[0])
+  const ziele = liesZiele()
   const sammlung = readJson<SprecherDatei>(SAMMLUNG, { seiten: {} })
   const jeId = new Map(ziele.map((z) => [z.id, z]))
   const z: Zaehlung = { titel: 0, unsicher: 0, andereQuelle: 0, ohneSynchroBeleg: 0, ohneRollen: 0, ohneTitel: 0 }

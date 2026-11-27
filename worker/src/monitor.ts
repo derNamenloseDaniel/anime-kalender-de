@@ -31,6 +31,23 @@ export interface CheckResult {
 const BATCH = 5
 const TIMEOUT_MS = 15000
 
+/** Mehr als den Anfang braucht keine Prüfung (`minBytes` höchstens 2.000, `expect` steht vorn); die 1,3 MB `events.json` ganz zu lesen kostete ~4 ms CPU je Lauf. */
+const LESE_GRENZE = 64 * 1024
+
+export async function leseAnfang(res: Response, grenze = LESE_GRENZE): Promise<string> {
+  if (!res.body) return ''
+  const leser = res.body.getReader()
+  const dekoder = new TextDecoder()
+  let text = ''
+  while (text.length < grenze) {
+    const { done, value } = await leser.read()
+    if (done) break
+    text += dekoder.decode(value, { stream: true })
+  }
+  await leser.cancel()
+  return text
+}
+
 async function checkOne(site: Site): Promise<CheckResult> {
   const started = Date.now()
   try {
@@ -40,7 +57,7 @@ async function checkOne(site: Site): Promise<CheckResult> {
       headers: { 'User-Agent': 'anime-kalender-monitor/1.0 (+https://anime-kalender.de)' },
     })
     const ms = Date.now() - started
-    const body = await res.text()
+    const body = await leseAnfang(res)
 
     if (res.status < 200 || res.status >= 300) {
       return { site, ok: false, status: res.status, ms, reason: `HTTP ${res.status}` }

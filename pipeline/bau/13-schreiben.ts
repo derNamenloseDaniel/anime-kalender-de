@@ -8,6 +8,7 @@ import { bekannteSeitenAusBestand, schreibeKernUndNews } from './13-5-kerndateie
 import { ergaenzeKennungen } from './13-6-kennungen.ts'
 import { ergaenzeTitelRang } from './titel-rang.ts'
 import { schreibeWochenDatei } from './13-8-wochen-datei.ts'
+import { schreibeWorkerTermine } from './13-9-worker-termine.ts'
 import { schreibePatchnotes } from './13-9-patchnotes.ts'
 import { ergaenzeErstausgabeAngebot } from './13-7-erstausgabe-angebot.ts'
 import { ergaenzeAngebotTermine } from './13-7-angebot-termine.ts'
@@ -122,6 +123,7 @@ export function schreibeDatensatz({
   const { newsFuerRss } = schreibeKernUndNews({ releases, events, titles, meta, bekannteSeiten })
   ergaenzeKennungen(); ergaenzeTitelRang()
   schreibeWochenDatei()
+  schreibeWorkerTermine()
   schreibePatchnotes()
   return { newsFuerRss }
 }

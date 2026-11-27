@@ -1,6 +1,6 @@
 /**
- * Sprechertabellen aus de.wikipedia (Vorstufe, `pipeline/lib/wikipedia-sprecher.ts`): die vier abgerufenen Abschnitte
- * „Synchronisation“ unter `pipeline/fixtures/wikipedia-sprecher/` (Stand 22.11.2026) und Kleinstfälle für jede Weiche
+ * Sprechertabellen aus de.wikipedia (Vorstufe, `pipeline/lib/wikipedia-sprecher.ts`): die 48 abgerufenen Abschnitte
+ * „Synchronisation“ unter `pipeline/fixtures/wikipedia-sprecher/` (Stand 22.11.2026 und 26.11.2026) und Kleinstfälle für jede Weiche
  * des Parsers (Kopf mit rowspan/colspan, <br>, <small>, Strich als „kein Sprecher“, Verweise, Vorlagen, Links, keine deutsche Spalte).
  * Dazu die Handliste Seite → Titel. Kein Netzabruf. Aufruf: `npm run check:logic`.
  */
@@ -75,19 +75,27 @@ pruefe('rowspan 3: der letzte Unterkopf zählt', lesen('{| class="wikitable"\n! 
 pruefe('rowspan in der Kopfzelle hinter der kürzeren Folgezeile endet nach einer Zeile', lesen('{| class="wikitable"\n! Rolle !! rowspan="2"| Deutsch\n|-\n! Sub\n|-\n! a !! b\n|-\n| A || Anna\n|}') === 'A=Anna[b]')
 pruefe('Spaltenzusatz und <small> werden mit Komma verbunden', lesen('{| class="wikitable"\n! rowspan="2"| Rolle !! Deutsch\n|-\n! Alt\n|-\n| A || Anna <small>(Film)</small>\n|}') === 'A=Anna[Alt, Film]')
 
+console.log('Kopfzellen: Abkürzungen, Fettdruck, Fortsetzungszeile mit ||')
+pruefe('„Deu. Synchronsprecher“ (Made in Abyss) zählt als deutsche Spalte', lesen('{| class="wikitable"\n!Rolle\n!Jap. Synchronsprecher\n!Deu. Synchronsprecher\n|-\n|Riko\n|Ja\n|Anna\n|}') === 'Riko=Anna[]')
+pruefe('„dt. Stimme“ unter „Anime“ (Mob Psycho 100) zählt, Bühnenstück und Realserie nicht', lesen('{| class="wikitable"\n! rowspan="2"| Rolle || colspan="2"| Anime || colspan="2"| Darsteller\n|-\n! jap. Stimme || dt. Stimme || Bühnenstück || Realserie\n|-\n| A || Ja || Anna || Bü || Re\n|}') === 'A=Anna[]')
+pruefe('Kopfzelle in Fettdruck („\'\'\'Deutsche Stimme\'\'\'“) auf Fortsetzungszeile mit ||', lesen('{| class="wikitable" \n! Rolle || Japanische Stimme\n  || \'\'\'Deutsche Stimme\'\'\'\n|-\n| A || Ja\n| Anna\n|}') === 'A=Anna[]')
+pruefe('Fortsetzungszeile mit !! in der Kopfzeile und zwei Zellen in einer Datenzeile', lesen('{| class="wikitable"\n! Rolle\n  !! Japanisch !! Deutsch\n|-\n| A\n  || Ja || Anna\n|}') === 'A=Anna[]')
+
 console.log('Handliste')
-type Eintrag = { seite: string; fixture: string; titel: { id: number; fassung?: string }[] }
+type Eintrag = { seite: string; fixture: string; titel: { id: number; fassung?: string; unsicher?: string }[] }
 const liste = yaml.load(readFileSync(join(REPO, 'data', 'wikipedia-sprecher-seiten.yaml'), 'utf8')) as Eintrag[]
-pruefe('4 Seiten, jede einmal', liste.length === 4 && new Set(liste.map((e) => e.seite)).size === 4, liste.map((e) => e.seite))
-pruefe('Seiten wie auf der Wikipedia', liste.map((e) => e.seite).join('|') === 'Yū Yū Hakusho|Grappler Baki|Meisterdetektiv Ron Kamonohashi|Ranma ½', liste.map((e) => e.seite))
+pruefe('48 Seiten, jede einmal, jede mit eigener Fixture-Datei', liste.length === 48 && new Set(liste.map((e) => e.seite)).size === 48 && new Set(liste.map((e) => e.fixture)).size === 48, liste.length)
+pruefe('die vier ersten Seiten wie auf der Wikipedia', liste.slice(0, 4).map((e) => e.seite).join('|') === 'Yū Yū Hakusho|Grappler Baki|Meisterdetektiv Ron Kamonohashi|Ranma ½', liste.map((e) => e.seite))
 pruefe('jede Fixture-Datei liegt vor und liefert Zeilen oder (Ron) keine deutsche Spalte', liste.every((e) => liesSprechertabelle(fixture(e.fixture.replace(/\.wikitext$/, ''))).deutscheSpalte === (e.seite !== 'Meisterdetektiv Ron Kamonohashi')))
 pruefe('jedes Ziel hat eine Kennung', liste.every((e) => e.titel.length > 0 && e.titel.every((t) => Number.isInteger(t.id))))
-pruefe('Kennungen eindeutig über die Liste', new Set(liste.flatMap((e) => e.titel.map((t) => t.id))).size === 6, liste.flatMap((e) => e.titel.map((t) => t.id)))
+const ziele = liste.flatMap((e) => e.titel)
+pruefe('Kennungen eindeutig über die Liste, 87 Ziele (darf nur steigen)', new Set(ziele.map((t) => t.id)).size === ziele.length && ziele.length >= 87, ziele.length)
+pruefe('jeder Eintrag mit `unsicher` nennt einen Grund, 10 Ziele ohne (Tabelle nennt den Titel selbst)', ziele.every((t) => t.unsicher === undefined || (typeof t.unsicher === 'string' && t.unsicher.length > 5)) && ziele.filter((t) => !t.unsicher).length === 10, ziele.filter((t) => !t.unsicher).length)
 const ranmaFassungen = liste[3]!.titel.map((t) => t.fassung)
-pruefe('Fassung jedes Ziels kommt in der Tabelle vor', liste.every((e) => e.titel.every((t) => !t.fassung || liesSprechertabelle(fixture(e.fixture.replace(/\.wikitext$/, ''))).zeilen.some((z) => z.deutsch.some((d) => d.zusatz?.includes(t.fassung!))))) && ranmaFassungen.length === 2)
+pruefe('Fassung jedes Ziels kommt in der Tabelle vor', liste.every((e) => e.titel.every((t) => !t.fassung || liesSprechertabelle(fixture(e.fixture.replace(/\.wikitext$/, ''))).zeilen.some((z) => z.deutsch.some((d) => d.zusatz?.includes(t.fassung!))))) && ranmaFassungen.length === 3)
 
 if (fehler) {
   console.error(`\n${fehler} Prüfung(en) fehlgeschlagen`)
   process.exit(1)
 }
-console.log('\nWikipedia-Sprecher: 4 Fixtures, 4 Seiten in der Handliste, alle Prüfungen ok')
+console.log('\nWikipedia-Sprecher: 48 Fixtures, 48 Seiten in der Handliste, alle Prüfungen ok')

@@ -5,7 +5,8 @@
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { artDerWarnung, MAX_ARTEN, meldeWarnungen, setzeWarnungenZurueck, warnungsZusammenfassung, zaehleWarnung } from './lib/warnungen-zaehlen.ts'
+import { meldeWarnungen } from './lib/warnungen-melden.ts'
+import { artDerWarnung, MAX_ARTEN, setzeWarnungenZurueck, warnungsZusammenfassung, zaehleWarnung } from './lib/warnungen-zaehlen.ts'
 import { log, warn } from './lib/util.ts'
 
 let fehler = 0

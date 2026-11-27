@@ -1,0 +1,249 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Tensei_Shitara_Slime_Datta_Ken (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Tensei_Shitara_Slime_Datta_Ken&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+Die deutsche Synchronfassung entsteht bei der TNT Media GmbH in [[Potsdam]]. Velin Marcone und Jermain Meyer dienen in der deutschen Bearbeitung als Synchronregisseure, während das Dialogbuch unter anderem von Daniel Gärtner geführt wird.<ref name="dt-synchron">{{Synchronkartei |Typ=serie |ID=47615 |Linktext=Meine Wiedergeburt als Schleim in einer anderen Welt |Abruf=2024-06-01}}</ref><ref>{{Internetquelle |autor=Melanie Höpfler |url=https://www.crunchyroll.com/de/news/announcements/2024/4/26/schleim-staffel-3-deutsche-synchro-crunchyroll-stream-sprechercast |titel=Deutsche Synchro zu Meine Wiedergeburt als Schleim in einer anderen Welt Staffel 3 auf Crunchyroll gestartet |werk=[[Crunchyroll]].com |sprache=de |abruf=2024-06-01}}</ref>
+
+{| class="wikitable"
+!Rolle
+!japanischer Sprecher ([[Seiyū]])
+!deutscher Sprecher<ref name="dt-synchron" />
+|-
+! colspan=3 | Jura-Tempest-Föderation
+|-
+|Rimuru Tempest
+|[[Miho Okazaki]]
+|[[Peggy Pollow]]
+|-
+|Großer Weiser / Raphael
+|[[Megumi Toyoguchi]]
+|[[Heike Schroetter]]
+|-
+|Veldora Tempest
+|[[Tomoaki Maeno]]
+|[[Klaus-Dieter Klebsch]]
+|-
+|Ranga
+|[[Chikahiro Kobayashi]]
+|[[Johann Fohl]]
+|-
+|Gobuta
+|[[Asuna Tomari]]
+|[[Sven Plate]]
+|-
+|Riguldo
+|[[Kanehira Yamamoto]]
+|[[Hans-Eckart Eckhardt]] (1. Stimme)<br/>[[Axel Lutter]] (2. Stimme)
+|-
+|Benimaru
+|[[Makoto Furukawa]]
+|[[Roman Wolko]]
+|-
+|Shuna
+|[[Sayaka Senbongi]]
+|[[Alice Bauer]]
+|-
+|Souei
+|[[Takuya Eguchi]]
+|[[Paul Matzke]]
+|-
+|Shion
+|[[Mao Ichimichi]]
+|[[Josephine Schmidt]]
+|-
+|Gerudo II.
+|[[Tarou Yamaguchi]]
+|[[Phillip Sponbiel]]
+|-
+|Gabiru
+|[[Jun Fukushima]]
+|[[Lasse Dreyer]]
+|-
+|Kaijin
+|[[Atsushi Ono]]
+|[[Ronald Nitschke]]
+|-
+|Tryney
+|[[Rie Tanaka]]
+|[[Dana Friedrich]]
+|-
+|Diablo
+|[[Takahiro Sakurai]]
+|[[Bastian Sierich]]
+|-
+|Venom
+|[[Kensho Ono]]
+|[[Nico Sablik]]
+|-
+! colspan=3 | Dämonenkönige
+|-
+|Guy Crimson
+|[[Akira Ishida]]
+|[[Julien Haggège]]
+|-
+|Milim Nava
+|[[Rina Hidaka]]
+|[[Jodie Blank]]
+|-
+|Leon Cromwell
+|[[Jun Fukuyama]]
+|[[Bernd Egger]]
+|-
+|Ramiris
+|[[Anzu Haruno]]
+|[[Esra Vural]]
+|-
+|Karion
+|[[Yasuaki Takumi]]
+|[[Dirk Talaga]]
+|-
+|Frey
+|[[Sayaka Ohara]]
+|[[Doreaux Zwetkow]]
+|-
+|Luminas Valentine
+|[[Lynn (Seiyū)|Lynn]]
+|[[Samina König]]
+|-
+|Clayman
+|[[Takehito Koyasu]]
+|[[Florian Hoffmann (Synchronsprecher)|Florian Hoffmann]]
+|-
+|Dino
+|[[Yuusuke Kobayashi]]
+|[[Jan Makino]]
+|-
+|Dagroule
+|[[Rikiya Koyama]]
+|[[Frank Kirschgens]]
+|-
+! colspan=3 | Freiheitsgilde
+|-
+|Yuuki Kagurazaka
+|[[Natsuki Hanae]]
+|[[Konrad Bösherz]]
+|-
+|Shizue Izawa
+|[[Yumiri Hanamori]]
+|[[Luisa Wietzorek]]
+|-
+|Ken'ya Misaki
+|[[Ayaka Asai]]
+|[[Sarah Tkotsch]]
+|-
+|Gale Gibson
+|[[Gen Satou]]
+|[[Johannes Walenta]]
+|-
+|Alice Rondo
+|[[Haruka Shiraishi]]
+|[[Franziska Trunte]]
+|-
+|Ryouta Sekiguchi
+|[[Shizuka Ishigami]]
+|[[Derya Flechtner]]
+|-
+|Chloe O’veil
+|[[Azusa Tadokoro]]
+|[[Moira May]]
+|-
+! colspan=3 | Heiliges Kaiserreich Lubelius
+|-
+|Hinata Sakaguchi
+|[[Manami Numakura]]
+|[[Rieke Werner]]
+|-
+|Roy Valentine
+|[[Masaaki Mizunaka]]
+|[[Stefan Bräuler]]
+|-
+|Louis Valentine
+|[[Masaaki Mizunaka]]
+|
+|-
+|Leonard
+|[[Kenji Nojima]]
+|
+|-
+|Arno
+|[[Eiji Takemoto]]
+|
+|-
+|Bacchus
+|[[Hajime Iijima]]
+|
+|-
+|Litis
+|[[Haruka Aikawa]]
+|
+|-
+|Fritz
+|[[Taishi Murata]]
+|
+|-
+|Garde
+|[[Wataru Komada]]
+|
+|-
+|Saare
+|[[Shōya Chiba]]
+|
+|-
+|Gregory
+|[[Masashi Yamane]]
+|
+|-
+|Glenda
+|[[Mari Hino]]
+|
+|-
+! colspan=3 | Königreich Farmas
+|-
+|Edomalis
+|[[Hiroshi Yanaka]]
+|[[Thomas Schmuckert]]
+|-
+|Razen
+|[[Eiji Hanawa]]
+|[[Reinhard Scheunemann]]
+|-
+|Reyheim
+|[[Hayato Fujii]]
+|[[Martin Schubach (Synchronsprecher)|Martin Schubach]]
+|-
+|Youm
+|[[Yoshimasa Hosoya]]
+|[[Simon Derksen]]
+|-
+|Mjurran
+|[[Atsumi Tanezaki]]
+|[[Giovanna Winterfeldt]]
+|-
+|Grucius
+|[[Satoshi Hino]]
+|[[Jaron Löwenberg]]
+|-
+! colspan=3 | Tugendhafte Schausteller
+|-
+|Kagali
+|[[Yui Ishikawa]]
+|[[Flavia Vinzens]]
+|-
+|Laplace
+|[[Kazuya Nakai]]
+|[[Tim Schwarzmaier]]
+|-
+|Footman
+|[[Shinji Kawada]]
+|[[Rafael Albert]]
+|-
+|Tear
+|[[Kaede Hondo]]
+|[[Magdalena Höfner]]
+|-
+! colspan=3 | Weitere
+|-
+|Satoru Mikami
+|[[Takuma Terashima]]
+|[[Florian Clyde]]
+|}

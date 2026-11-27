@@ -59,6 +59,10 @@ function zeilenAusTabelle(tabelle: string): Zeile[] {
       aktuell = null
       continue
     }
+    if (aktuell && /^\s+(\|\||!!)/.test(l)) {
+      aktuell.zellen.push(...l.trim().slice(2).split(aktuell.kopf ? /!!|\|\|/ : '||').map(zelle))
+      continue
+    }
     const kopf = l.startsWith('!')
     if ((!kopf && !l.startsWith('|')) || l.startsWith('|+')) {
       const letzte = aktuell?.zellen.at(-1)
@@ -111,7 +115,7 @@ function stimmen(zellText: string, spaltenZusatz: string | null): DeutscheStimme
 function deutscheSpalten(pfade: string[][]): { spalte: number; zusatz: string | null }[] {
   const aus: { spalte: number; zusatz: string | null }[] = []
   pfade.forEach((pfad, spalte) => {
-    const i = pfad.findIndex((p) => /^deutsch/i.test(p))
+    const i = pfad.findIndex((p) => /^(?:deutsch|deu\.|dt\.)/i.test(p.replace(/'{2,}/g, '').trim()))
     if (i < 0) return
     const unter = pfad.slice(i + 1).at(-1)
     aus.push({ spalte, zusatz: unter ? unter.replace(/\s+/g, ' ') : null })

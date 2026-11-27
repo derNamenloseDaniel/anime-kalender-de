@@ -28,7 +28,8 @@ const [altLog, altWarn] = [console.log, console.warn]
 console.log = (...a: unknown[]) => void meldungen.push(`log ${a.join(' ')}`)
 console.warn = (...a: unknown[]) => void meldungen.push(`warn ${a.join(' ')}`)
 uebernehmeFskVonHand(karte, [zeile(10, { fsk: 16 }), zeile(11, { fsk: 18 }), zeile(12, { fsk: 6 }), zeile(99), zeile(98)])
-;[console.log, console.warn] = [altLog, altWarn]
+console.log = altLog
+console.warn = altWarn
 pruefe('FSK von Hand: Log nennt Zahl der gesetzten Zeilen und die Kennung ohne Titel', meldungen.some((m) => m.startsWith('log') && m.includes('2 von 5 Zeilen gesetzt') && m.includes('ohne Titel im Bestand: 99, 98')))
 pruefe('FSK von Hand: Widerspruch zur vorhandenen Freigabe wird gewarnt, Übereinstimmung nicht', meldungen.filter((m) => m.startsWith('warn')).length === 1 && meldungen.some((m) => m.startsWith('warn') && m.includes('11 trägt schon FSK 6') && m.includes('sagt 18')))
 pruefe('FSK von Hand: ohne unbekannte Kennung steht kein „ohne Titel“ im Log', (() => {
@@ -44,9 +45,21 @@ pruefe('FSK von Hand: unbekannte Kennung und nicht genannte Titel bleiben unber�
 
 suchadressenInTemp() // der Abschluss schreibt Listen; nie in getrackte Dateien
 const abschluss = (titles: Map<number, Title>) => schliesseWegeAb({
-  titles, anisearch: {}, releases: [] as Release[], zugangJeAdresse: new Map(), tmdbMehrdeutig: new Set(), toteAdressen: new Set(),
-  linkBefunde: {}, verweiseEntfernt: [], crAdresseZu: () => undefined, beantworteteSuchen: new Set(), suchOffen: [], alleChecks: [],
-  lautPruefungTot: () => false, checksJePlattform: new Map(), belegFuer: () => undefined,
+  titles,
+  anisearch: {},
+  releases: [] as Release[],
+  zugangJeAdresse: new Map(),
+  tmdbMehrdeutig: new Set(),
+  toteAdressen: new Set(),
+  linkBefunde: {},
+  verweiseEntfernt: [],
+  crAdresseZu: () => undefined,
+  beantworteteSuchen: new Set(),
+  suchOffen: [],
+  alleChecks: [],
+  lautPruefungTot: () => false,
+  checksJePlattform: new Map(),
+  belegFuer: () => undefined,
 })
 // Verdrahtung: ein Franchise-Geschwister mit anderer Stufe würde den Titel ableiten; die echte Handzeile gilt davor und gewinnt
 const hand = ladeFskVonHand()[0]!

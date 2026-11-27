@@ -59,7 +59,6 @@ export function BereichePillen({ stil, ...p }: Eigenschaften & { stil: 'A' | 'B'
       ) : (
         <div className={`${PILLEN_REIHE} pt-2`}>{p.pillen}</div>
       )}
-      {p.legende && !p.aktivDisc && <p className="mt-2 text-t4 text-ak-leise">{p.legende}</p>}
     </div>
   )
 }

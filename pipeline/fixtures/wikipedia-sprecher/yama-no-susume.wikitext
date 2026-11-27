@@ -1,0 +1,16 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Yama_no_Susume (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Yama_no_Susume&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+Die Synchronisation entstand 2024 im [[Tonwerk München @Alpha Postproduktion]] in München. Dialogregie übernahm [[Leonard Rosemann]], für die Dialogbücher waren er und Sólveig Pudelski verantwortlich.<ref name="dt_sync">{{Synchronkartei |Typ=serie |ID=59190 |Linktext=Yama no Susume |Abruf=2024-11-13}}</ref>
+{| class="wikitable"
+! Rolle || Japanische Stimme || Deutsche Stimme<ref name="dt_sync" /><ref>{{Internetquelle |url=https://www.anisearch.de/anime/4088,encouragement-of-climb/seiyuu |titel=Encouragement of Climb (Anime) ➜ Sprecher |werk=anisearch.de |sprache=de |abruf=2024-11-13}}</ref>
+|-
+| Aoi || [[Yuka Iguchi]]|| [[Lara Wurmer]]
+|-
+| Hinata || [[Kana Asumi]]|| [[Patricia Strasburger]]
+|-
+| Kaede || [[Yōko Hikasa]]|| [[Marie-Jeanne Widera]]
+|-
+| Kokona || [[Yui Ogura]]|| Lisa Dzyadyk
+|}

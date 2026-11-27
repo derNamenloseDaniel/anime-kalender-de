@@ -49,6 +49,8 @@ export interface Kontext {
   /** Eintrag in `data/tmdb-poster.json` bzw. `data/tmdb-banner.json` (Sprache und Abruftag des gewählten Bildes). */
   plakat: BildLookup<PlakatWahl>
   banner: BildLookup<{ p: string }>
+  /** Zeigt das TMDB-Banner des Titels womöglich einen anderen Teil (`serienbildFremd`, `bau/banner-serienbild.ts`)? */
+  serienbildFremd: (t: Title) => boolean
 }
 
 export interface Regel {
@@ -166,7 +168,7 @@ const jahrNochOhneStart = (t: Title, k: Kontext): string | undefined =>
 export const REGELN: Regel[] = [
   { art: 'cover', gruppe: 'fehlend', wirkung: 3, wer: 'auto:tmdb-poster', zaehle: luecke('c'), ausnahme: (t, k) => (k.coverBekannt[t.id] ? 'ohne-bekanntes-cover' : undefined) },
   { art: 'banner', gruppe: 'fehlend', wirkung: 1, wer: 'auto:tmdb-banner', zaehle: (t) => !t.bannerImage, ausnahme: keinBannerBekannt },
-  { art: 'bild-fremdsprachig', gruppe: 'schwach', wirkung: 2, wer: 'auto:tmdb-poster', zaehle: (t, k) => fremdeBilder(t, k.plakat, k.banner).length > 0, ausnahme: (t, k) => (fremdeBilder(t, k.plakat, k.banner).every(Boolean) ? KEINE_LESBARE : undefined) },
+  { art: 'bild-fremdsprachig', gruppe: 'schwach', wirkung: 2, wer: 'auto:tmdb-poster', zaehle: (t, k) => fremdeBilder(t, k.plakat, k.banner, k.serienbildFremd).length > 0, ausnahme: (t, k) => (fremdeBilder(t, k.plakat, k.banner, k.serienbildFremd).every(Boolean) ? KEINE_LESBARE : undefined) },
   { art: 'titel-de', gruppe: 'fehlend', wirkung: 3, wer: 'hand:synchro-belegen', zaehle: luecke('t'), ausnahme: (t) => (hatEinenWeg(t) || t.deErstausgabe ? undefined : 'ohne-deutsche-fassung') },
   { art: 'handlung-de', gruppe: 'fehlend', wirkung: 2, wer: 'hand:handlung-eigen', zaehle: (t, k) => !k.synopse(t.id)?.de },
   { art: 'folgentitel', gruppe: 'fehlend', wirkung: 2, wer: 'auto:tmdb', zaehle: folgentitelFehlen, ausnahme: (t) => (t.format === 'MOVIE' ? 'film' : undefined) },

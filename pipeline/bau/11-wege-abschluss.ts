@@ -24,7 +24,7 @@ import { begrenzeWegeAufBelege } from './wege-begrenzen.ts'
 import { baueEanHaendlerWege } from '../lib/disc-haendler-weg.ts'
 import { setzeCoverNachRegel } from './cover-regel.ts'
 import { setzeProduktFelder } from './produkt-regel.ts'
-import { uebernehmeFranchiseBanner } from './banner-franchise.ts'
+import { ersetzeAnilistBanner, uebernehmeFranchiseBanner } from './banner-franchise.ts'
 import { log, readJson } from '../lib/util.ts'
 import { entferneBezugswegeTrotzNein } from '../lib/handbeleg-bezugswege.ts'
 import { joynAdressenVonJw } from '../lib/handbeleg-weg.ts'
@@ -107,6 +107,7 @@ export function schliesseWegeAb({
   setzeCoverNachRegel(titles)
   setzeProduktFelder(titles)
   uebernehmeFranchiseBanner(titles)
+  ersetzeAnilistBanner(titles)
 }
 
 /** Wege ohne Beleg und Crunchyroll-Wege ohne Staffel der Serie fliegen hier endgültig raus. */

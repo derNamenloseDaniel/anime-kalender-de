@@ -27,12 +27,13 @@ export interface KopfblockProps {
   angebotSeit?: string
   hinweis?: ReactNode
   notiz?: string
+  nachleger?: string[]
   schnitt?: Release['schnitt']
 }
 
 /** Überschrift mit Umschalter, Nebenzeile, Fakten, Zähler und Hinweise (aus `AntwortKasten` herausgelöst). */
 export function KastenKopfblock(p: KopfblockProps) {
-  const { antwort, title, today, T, haupt, gedaempft, neben, nebenTitel, fakten, anteil, zaehl, umschalter, angebotSeit, hinweis, notiz, schnitt } = p
+  const { antwort, title, today, T, haupt, gedaempft, neben, nebenTitel, fakten, anteil, zaehl, umschalter, angebotSeit, hinweis, notiz, nachleger, schnitt } = p
   return (
       <div className="flex flex-col">
       <div className="flex items-start gap-2">
@@ -63,6 +64,7 @@ export function KastenKopfblock(p: KopfblockProps) {
         </p>
       )}
 
+      {nachleger?.map((z) => <p key={z} className="mt-1 text-t4 text-ak-leise">{z}</p>)}
       <KastenFakten fakten={fakten} anteil={anteil} />
 
       {zaehl && <p className="mt-1 text-t4 text-ak-leise">{zaehl}</p>}

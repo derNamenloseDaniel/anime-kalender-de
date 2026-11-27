@@ -161,7 +161,32 @@ function woechentlich(e: ReleaseEvent, data: MitReleases): Release | undefined {
  */
 export function istStaffelstart(e: ReleaseEvent, data: MitReleases): boolean {
   const release = woechentlich(e, data)
-  return !!release && e.episode === (release.schedule?.firstEpisodeNumber ?? 1)
+  return !!release && e.episode === (release.schedule?.firstEpisodeNumber ?? 1) && !hatFruehereFolgen(release, data.releaseBySlug)
+}
+
+const releasesJeTitelUndAnbieter = new WeakMap<Map<string, Release>, { groesse: number; index: Map<string, Release[]> }>()
+
+/**
+ * Lief zu diesem Titel beim selben Anbieter schon eine frühere Folge (anderer Release, früherer Starttag)?
+ * Dann ist die erste Folge dieses Releases kein Staffelstart: „Folge 1 sofort, der Rest wöchentlich" (26.11.2026).
+ */
+function hatFruehereFolgen(release: Release, releaseBySlug: Map<string, Release>): boolean {
+  const zuletzt = releasesJeTitelUndAnbieter.get(releaseBySlug)
+  let index = zuletzt?.groesse === releaseBySlug.size ? zuletzt.index : undefined
+  if (!index) {
+    index = new Map()
+    for (const r of releaseBySlug.values()) {
+      const key = `${r.titleId}|${r.platform}`
+      index.set(key, [...(index.get(key) ?? []), r])
+    }
+    releasesJeTitelUndAnbieter.set(releaseBySlug, { groesse: releaseBySlug.size, index })
+  }
+  const start = release.schedule?.firstEpisodeDate
+  const ersteNummer = release.schedule?.firstEpisodeNumber ?? 1
+  return (index.get(`${release.titleId}|${release.platform}`) ?? []).some((r) => {
+    const s = r.schedule
+    return r.slug !== release.slug && !!s?.firstEpisodeDate && !!start && s.firstEpisodeDate < start && (s.firstEpisodeNumber ?? 1) < ersteNummer
+  })
 }
 
 /**

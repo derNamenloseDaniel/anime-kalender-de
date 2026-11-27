@@ -651,6 +651,28 @@ Gemessen an `public/data/titles.json` (2.924 Titel, Bau 26.11.2026 21:09) und `d
 
 Ursache für `banner` (30) und den größten Teil von `bild-fremdsprachig` (509): `holeBanner` ruft nur Titel mit TMDB-Kennung ab; ein Titel ohne Kennung bekommt nie einen Eintrag in `data/tmdb-banner.json`, die Regel liest „kein Eintrag“ als „nie gesucht“. **Ein `miss` ohne `tmdbId` in `data/tmdb-titles.json` ist kein Beleg für „TMDB führt die Serie nicht“** (er heißt auch „Namensabgleich fand nichts“ oder „Suche scheiterte“, `sucheBesten` in `pipeline/lib/tmdb-titel-lookup.ts` fängt Suchfehler ab): Von 30 offenen Banner-Titeln führt TMDB 18 (Handsuche 26.11., Kennungen in `data/tmdb-von-hand.yaml`, z. B. Rainbow Brite 572, Willy Fog 5150). Darum gilt als „TMDB hat keins“ (`bannerOhneTmdbSerie`, `pipeline/lib/bild-sprache.ts`, gespeist aus `ohneKennungen()`) nur, was von Hand als `ohne: true` belegt ist; ein vorhandener Eintrag gewinnt. Der Banner kommt, wenn der TMDB-Lauf vom 30.11. die Handkennungen abruft. Restweg `bild-fremdsprachig` (409 offene Titel mit `miss` ohne Kennung, ungesucht): der Sammler speichert künftig, ob die Suche fehlerfrei lief (`miss` nach Fehler ≠ `miss` nach leerer Antwort), eigener PR; Handsuche der größten Brocken danach.
 
+## folgentitel, auto:tmdb: warum 283 offen bleiben (26.11.2026, Auftrag maengel-folgentitel)
+
+Einordnung aller 283 offenen Titel (Stand `data/maengel.json` 24.11.2026) gegen `tmdb-titles.json`, `tmdb-folgen.json`, `tmdb-folgen-404.json` (Zählskript im Scratchpad, nur Dateien, kein Netz):
+
+| Klasse | Titel | Befund |
+|---|---|---|
+| A Format/Länge ausgeschlossen (OVA, Special, Film, unter 6 Folgen) | 99 | `tmdbFolgentitel` nimmt nur TV/TV_SHORT/ONA ab 6 Folgen, Absicht |
+| B keine TMDB-Kennung | 47 | Zuordnung nur von Hand mit Beleg (`tmdb-von-hand.yaml`) |
+| C Kennung, **nie abgerufen** (+1 mit 404) | 71 + 1 | Ursache am 23.11. geschlossen (`abrufLuecke`); Simulation mit der echten `waehleAbrufe` an `main`: **72 Titel** kommen beim nächsten Wochenlauf dran (`LUECKE_LIMIT` 128), danach hängt es nur noch an TMDB |
+| D keine TMDB-Staffel mit unserer Folgenzahl | 16 | Folgenzahl-Frage (AniList zählt anders), keine Titelfrage |
+| E Staffel passt, TMDB nur „Folge N“ oder englisch | 28 | nicht behebbar |
+| F Staffel passt, TMDB teils gleich englisch (Lücken) | 18 | siehe unten |
+| G Staffel passt, alle Titel echt, trotzdem offen | 3 | 10005217, 10005293 (Rang 8: `original_name` fehlt im Abruf), 19603 nicht untersucht |
+
+**F: warum `echterTitel` nicht lockerer werden darf.** Ein Titel gleich dem englischen gilt als nicht übersetzt. Bei Eigennamen stimmt das nicht (Miraculous: Lady WiFi, Timebreaker, Rogercop …), aber derselbe Befund steht auf Englisch-Rückfällen: Yu-Gi-Oh! GX Folge 156 „Judai Revived!? A Brand New Journey“ neben Folge 47 „Chazz-anova“. Beide sind in `tmdb-folgen.json` nicht zu unterscheiden; eine Regel „unter x % gleich englisch bleibt stehen“ ließe englische Titel als deutsche durch (Gegenprobe `ohneEnglischeTitel` greift erst ab 90 %). Darum bleibt die Stufe; wo ein Eigenname gemeint ist, belegt eine zweite Quelle den Titel von Hand (`folgentitel-hand.yaml`, hier de.wikipedia-Episodenliste, Feld DT; Nummern nur, wenn die vorhandenen Titel dort unter derselben Nummer stehen).
+
+**Echter Code-Fehler, gefunden beim Eintragen:** `mitFremdTiteln` füllte die Handzuordnung mit `mitCrTiteln`, und das füllt nur vorhandene Zeilen. Eine Liste, die nur aus den echten TMDB-Titeln besteht (Miraculous: 17 von 26 Zeilen), verlor jede Handfolge ohne Zeile still. Neu: `mitHandTiteln` (`folgentitel-hand.ts`) legt Zeilen bis zur Folgenzahl an. Bestand: alle 95 vorhandenen Handeinträge haben eine Zeile in `folgen/<id>.json` (92 gleicher Titel, 3 mit Titel einer früheren Stufe), die Änderung betrifft sie nicht. Simulation mit den echten Bau-Funktionen: 10011124 17 → 26, 10014481 22 → 26, 10004750 24 → 26 benannte Folgen; erwartet 283 → 280 offen nach dem nächsten Bestandsbau.
+
+**Miraculous Staffel 2 und 4 nicht eingetragen (Reihenfolge):** Die Wikipedia-Liste zählt anders als unsere Dateien. Staffel 2: Wikipedia Nr. 1 ist „Eine böse Weihnachtsüberraschung“ (bei TMDB Staffel 0), unsere 15 Titel stehen dort alle eine Nummer später (0 von 15 gleich). Staffel 4: 21 von 24 vorhandenen Titeln stehen unter anderer Nummer. Fehlende Folgen: S2 10 von 25, S4 Nr. 4 „Mr. Pigeon 72“ und Nr. 10. Ohne geklärte Reihenfolge (deutsche Erstausstrahlung gegen Produktionsreihenfolge) wäre jede Nummer geraten. Staffel 1 und 3 stimmen Nummer für Nummer (13 + 4 Formatabweichungen von 17, 22 von 22).
+
+**Quellenlage:** fernsehserien.de ist für `folgentitel-hand.yaml` ausgeschlossen (Kopf der Datei, Anfrage seit 12.11. offen), deshalb nicht benutzt. Wikipedia-Listen gibt es nicht für Mech Cadets, Wandance, Pacific Rim: The Black, Iruma-kun, Tales of Zestiria (HTTP 404 bzw. Seite ohne Liste, 26.11.2026).
+
 ## Einzeltitel 204389 „A Wild Last Boss Appeared! Staffel 2“ (27.11.2026, Cloud ohne Prime/JustWatch/TMDB)
 
 - **weg-ohne-adresse geschlossen:** Handtermin `auto-204389-primevideo` in `data/curated/streaming-herbst-2026.yaml` ersetzt die automatische Übernahme (gleicher Titel, Anbieter, Tag → `istBelegtVermerkt`) und trägt die Adresse; `11-7` übernimmt eine Titelseite des Termins als Weg-Adresse. Kennung aus dem Suchtreffer „Watch A Wild Last Boss Appeared! Season 2“ (`primevideo.com/detail/0OPTCDPN7UYNAUNUCD1KACDL6P`, 9 Folgen = OmU-Stand), Prime-Angebot mit Deutsch laut Anime2You 1063615. Lehre: Für einen Weg ohne Adresse aus einem Auto-Termin ist der Handtermin mit `platformUrl` der Weg (wie Call of the Night 25.11.), nicht `verweise-von-hand.yaml`.

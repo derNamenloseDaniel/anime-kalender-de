@@ -31,6 +31,7 @@ const funde = keinWegTrotzQuelle({ offen, releases, kuratiert, belege, neinGilt:
 for (const f of funde) console[f.rot ? 'error' : 'log'](`  ${f.rot ? '✖' : '⚠ WARNUNG'} ${f.titleId} ohne Weg offen, aber ${f.platform} laut ${f.quelle}`)
 const rot = funde.filter((f) => f.rot).length
 for (const f of funde.filter((x) => x.rot)) melde(f.titleId, 'kein-weg-trotz-quelle-bestand', `ohne Weg offen, aber ${f.platform} laut ${f.quelle}`)
+console.log(`VERSTÖSSE: ${rot}`)
 if (rot) {
   console.error(`check-kein-weg-trotz-quelle-bestand: ${rot} Titel ohne Weg trotz sicherem Termin — Bauphase 11-7 (Wege aus Terminen) oder die Zuordnung des Termins prüfen`)
   process.exit(1)

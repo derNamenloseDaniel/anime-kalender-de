@@ -26,6 +26,9 @@
   # Die Tabelle nennt nur japanische Sprecher: keine deutsche Spalte, nichts zu übernehmen.
   titel:
     - id: 158926
+    # Meisterdetektiv Ron Kamonohashi: Staffel 2 (TV 2026)
+    - id: 172355
+      unsicher: Staffel 2 nicht genannt
 - seite: Ranma ½
   fixture: ranma.wikitext
   titel:
@@ -133,6 +136,9 @@
     # Kaiju No. 8: Mission Recon (MOVIE 2025)
     - id: 179998
       unsicher: "Film nicht genannt (Tabelle: Staffel 1 und 2)"
+    # Kaiju No. 8: Narumi’s Week at Work (SPECIAL 2026)
+    - id: 204431
+      unsicher: "Special nicht genannt (Tabelle: Staffel 1 und 2)"
 - seite: Kuroko’s Basketball
   fixture: kuroko-s-basketball.wikitext
   titel:
@@ -170,6 +176,9 @@
       unsicher: OVA nicht genannt
     # My Hero Academia: More (SPECIAL 2026)
     - id: 204356
+      unsicher: Special nicht genannt
+    # My Hero Academia: I Am a Hero Too (SPECIAL 2026)
+    - id: 211711
       unsicher: Special nicht genannt
 - seite: Re:Zero – Starting Life in Another World
   fixture: re-zero-starting-life-in-another-world.wikitext
@@ -402,3 +411,132 @@
     # Dr. Stone: Science Future (TV 2025)
     - id: 172019
       unsicher: "Staffel 4 nicht genannt (Tabelle: Staffel 1–3)"
+# Zweite Tranche 26.11.2026: 20 weitere Seiten, Zuordnung an Seitentext und Tabellenkopf geprüft.
+- seite: Beyblade Burst
+  fixture: beyblade-burst.wikitext
+  titel:
+    # Beyblade Burst QuadStrike (ONA 2023)
+    - id: 166062
+      unsicher: QuadStrike nicht genannt (Tabelle ohne Staffeltrennung)
+- seite: Blue Box (Manga)
+  fixture: blue-box-manga.wikitext
+  titel:
+    # Blue Box: Staffel 2 (TV 2026)
+    - id: 189123
+      unsicher: Staffel 2 nicht genannt
+- seite: Gaikotsu Kishi-sama, Tadaima Isekai e Odekakechū
+  fixture: gaikotsu-kishi-sama-tadaima-isekai-e-odekakechu.wikitext
+  titel:
+    # Skeleton Knight in Another World: Staffel 2 (TV 2026)
+    - id: 185542
+      unsicher: Staffel 2 nicht genannt
+- seite: Gans im Glück
+  fixture: gans-im-gluck.wikitext
+  titel:
+    # Gans im Glück (MOVIE 2018), zwei Synchros in der Tabelle (Kino, Netflix)
+    - id: 10013576
+      unsicher: Fassung des Titels nicht genannt (Tabelle trennt Kino- und Netflix-Synchro)
+- seite: Die Legende des Kung Fu Kaninchens
+  fixture: die-legende-des-kung-fu-kaninchens.wikitext
+  titel:
+    - id: 102234
+- seite: Es war einmal … Entdecker und Erfinder
+  fixture: es-war-einmal-entdecker-und-erfinder.wikitext
+  titel:
+    - id: 10005293
+- seite: M.A.S.K.
+  fixture: m-a-s-k.wikitext
+  titel:
+    - id: 5000003
+- seite: Oh! My Goddess
+  fixture: oh-my-goddess.wikitext
+  titel:
+    # Oh! My Goddess Specials (SPECIAL 2005)
+    - id: 1003
+      unsicher: Special nicht genannt
+- seite: Shaolin Wuzang
+  fixture: shaolin-wuzang.wikitext
+  titel:
+    - id: 102501
+- seite: Sword Art Online
+  fixture: sword-art-online.wikitext
+  titel:
+    # Sword Art Online: Alicization - War of Underworld Episode 12.5 (SPECIAL 2020)
+    - id: 10015501
+      unsicher: "Special nicht genannt (Tabelle: Staffel 1–2, Film 1–2 und Hauptstimmen)"
+- seite: Tsuki ga Kirei
+  fixture: tsuki-ga-kirei.wikitext
+  titel:
+    # Tsukigakirei: Wie Alles Enstand (SPECIAL 2017)
+    - id: 10012493
+      unsicher: Special nicht genannt
+- seite: Unterm Wolkenhimmel
+  fixture: unterm-wolkenhimmel.wikitext
+  titel:
+    # Unterm Wolkenhimmel - Laughing Under the Clouds: Gaiden - Teil 2 (MOVIE 2018)
+    - id: 99196
+      unsicher: Gaiden-Film nicht genannt
+- seite: Watashi no Shiawase na Kekkon
+  fixture: watashi-no-shiawase-na-kekkon.wikitext
+  titel:
+    # Meine ganz besondere Hochzeit: Special (SPECIAL 2026)
+    - id: 190054
+      unsicher: Special nicht genannt
+- seite: Yuna & Stitch
+  fixture: yuna-stitch.wikitext
+  titel:
+    # Yuna & Stitch: Kampf der Gigantchen (SPECIAL 2009)
+    - id: 8963
+      unsicher: Special nicht genannt
+    # Yuna & Stitch: Kijimunaas Schwester (SPECIAL 2010)
+    - id: 140340
+      unsicher: Special nicht genannt
+    # Yuna & Stitch: Ein wahrer Held (SPECIAL 2011)
+    - id: 146171
+      unsicher: Special nicht genannt
+- seite: Z wie Zorro
+  fixture: z-wie-zorro.wikitext
+  titel:
+    # Z wie Zorro – Der Film (MOVIE 1996)
+    - id: 5000001
+      unsicher: Film nicht genannt (Tabelle gilt der Serie)
+- seite: AIKa
+  fixture: aika.wikitext
+  titel:
+    # Agent Aika: Special Trial (SPECIAL 1998)
+    - id: 4718
+      unsicher: Special nicht genannt
+- seite: Bullet/Bullet
+  fixture: bullet-bullet.wikitext
+  titel:
+    - id: 157960
+- seite: Ajin – Demi-Human
+  fixture: ajin-demi-human.wikitext
+  titel:
+    # Ajin - Demi-Human: Impulse (MOVIE 2015)
+    - id: 21212
+      unsicher: Film nicht genannt (Tabelle gilt der Serie)
+    # Ajin - Film 2: Collision (MOVIE 2016)
+    - id: 21505
+      unsicher: Film nicht genannt (Tabelle gilt der Serie)
+    # Ajin - Film 3: Clash (MOVIE 2016)
+    - id: 21681
+      unsicher: Film nicht genannt (Tabelle gilt der Serie)
+- seite: Guǐmì zhī zhǔ
+  fixture: guimi-zhi-zhu.wikitext
+  titel:
+    # Lord of Mysteries (ONA 2026)
+    - id: 199448
+      unsicher: Specials nicht genannt (Tabelle gilt der Serie)
+- seite: "Code Geass: Lelouch of the Rebellion"
+  fixture: code-geass-lelouch-of-the-rebellion.wikitext
+  titel:
+    # Code Geass: Lelouch of the Rebellion - Initiation (MOVIE)
+    - id: 101811
+      unsicher: Zusammenschnitt der Serie, Film in der Tabelle nicht genannt
+    # Code Geass: Lelouch of the Rebellion - Überschreitung (MOVIE)
+    - id: 101812
+      unsicher: Zusammenschnitt der Serie, Film in der Tabelle nicht genannt
+    # Code Geass: Lelouch of the Rebellion - Verherrlichung (MOVIE)
+    - id: 101813
+      unsicher: Zusammenschnitt der Serie, Film in der Tabelle nicht genannt

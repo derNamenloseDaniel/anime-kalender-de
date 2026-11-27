@@ -1,0 +1,21 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Unterm_Wolkenhimmel (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Unterm_Wolkenhimmel&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+{| class="wikitable"
+! Rolle || Japanische Stimme || Deutsche Stimme (Filme)<ref>{{Synchronkartei|film|43510|Laughing Under the Clouds: Gaiden|2019-04-25}}</ref>
+|-
+| Tenka Kumō || [[Yūichi Nakamura (Synchronsprecher)|Yūichi Nakamura]] || [[Benedikt Gutjan]]
+|-
+| Soramaru Kumō || [[Yuuki Kaji]] || [[Felix Mayer (Synchronsprecher)|Felix Mayer]]
+|-
+| Chūtarō Kumō || [[Tsubasa Yonaga]] || 
+|-
+| Shirasu Kinjō || [[Takahiro Sakurai]] || 
+|-
+| Botan || [[Rina Satō]] || 
+|-
+| Abe no Hirari || [[Kenichi Suzumura]] || 
+|-
+| Nishiki || [[Mamiko Noto]] || 
+|}

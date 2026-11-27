@@ -1,0 +1,42 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Es_war_einmal_%E2%80%A6_Entdecker_und_Erfinder (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Es_war_einmal_%E2%80%A6_Entdecker_und_Erfinder&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+== Synchronisation ==
+Die Synchronisation erfolgte durch die Legard Synchron GmbH, Berlin. Dialogregie führte [[Michael Richter (Dialogregisseur)|Michael Richter]]; das Dialogbuch stammt von [[Eberhard Weiß]].
+
+{| class="wikitable sortable mw-datatable" id="Synchronisation"
+|- class="hintergrundfarbe5"
+! Rolle
+! französischer Sprecher
+! deutscher Sprecher<ref>{{Internetquelle |url=https://www.synchronkartei.de/serie/32842 |titel=Es war einmal... Entdecker und Erfinder (1994) |werk=synchronkartei.de |abruf=2022-11-26}}</ref>
+|-
+| Maestro
+| rowspan="2" | [[Roger Carel]]
+|[[Hans-Werner Bussinger]]
+|-
+| Erzähler
+|
+|-
+| Pierrot
+| [[Olivier Destrez]]
+| [[Frank Schröder (Synchronsprecher)|Frank Schröder]]
+|-
+|Pierette
+| rowspan="2" |[[Marie-Laure Beneston]]
+|[[Bettina Weiß]]
+|-
+|Psi
+|[[Bianca Krahl]]
+|-
+|Giftzwerg
+|[[Patrick Préjean]]
+|[[Wilfried Herbst]]
+|-
+|Dickie
+| rowspan="2" |[[Sady Reboot]]
+|[[Jörg Döring (Synchronsprecher)|Jörg Döring]]
+[[Thomas Petruo]] ''(eine Episode)''
+|-
+|Dicknase
+|[[Tilo Schmitz]]
+|}

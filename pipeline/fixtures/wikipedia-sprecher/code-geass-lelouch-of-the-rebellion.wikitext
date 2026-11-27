@@ -1,0 +1,99 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Code_Geass:_Lelouch_of_the_Rebellion (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Code_Geass%3A_Lelouch_of_the_Rebellion&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+Das in Berlin ansässige [[Synchronstudio]] [[VSI Berlin GmbH]] war für die deutsche Synchronfassung verantwortlich.
+{| class="wikitable" id="Synchronisation"
+|- class="hintergrundfarbe5"
+! Rolle || Japanischer Sprecher ([[Seiyū]]) || Deutscher Sprecher
+|-
+| Lelouch vi Britannia/Lamperouge || [[Jun Fukuyama]] || [[Nico Sablik]]
+|-
+| Suzaku Kururugi || [[Takahiro Sakurai]] || [[Konrad Bösherz]]
+|-
+| C.C. || [[Yukana Nogami]] || [[Antje von der Ahe]]
+|-
+| Kallen Kozuki/Stadtfeld || [[Ami Koshimizu]] || [[Julia Ziffer]]
+|-
+| Milly Ashford || [[Sayaka Ohara]] || [[Ursula Hugo]]
+|-
+| Shirley Fenette || [[Fumiko Orikasa]] || [[Maria Koschny]]
+|-
+| Rivalz Cardemonde || [[Noriaki Sugiyami]] || [[Sebastian Schulz]]
+|-
+| Nunnally vi Britannia/Lamperouge || [[Kaori Nazuka]] || [[Julia Stoepel]]
+|-
+| Rolo Lamperouge || [[Takahiro Mizushima]] || [[David Turba]]
+|-
+| Gino Weinberg || [[Sōichirō Hoshi]] || [[Dennis Schmidt-Foß]]
+|-
+| Anya Alstreim || [[Yūko Gotō]] || [[Sarah Riedel (Schauspielerin)|Sarah Riedel]]
+|-
+| Kaname Ougi || [[Mitsuagi Madono]] || [[Markus Pfeiffer]]
+|-
+| Jeremiah Gottwald || [[Ken Narita]] || [[Marcus Off]]
+|-
+| Villetta Nu || rowspan="2"|[[Akeno Watanabe]] || [[Katrin Zimmermann]]
+|-
+| Alicia Lohmeyer || [[Sabine Jaeger]]
+|-
+| Lloyd Asplund || [[Tetsu Shiratori]] || [[Stefan Staudinger]]
+|-
+| Cecile Croomy || [[Kikuko Inoue (Synchronsprecherin)|Kikuko Inoue]] || [[Marie Bierstedt]]
+|-
+| Kyoshiro Toudou || [[Yūji Takada]] || [[Jaron Löwenberg]]
+|-
+| Nina Einstein || rowspan="2"|[[Saeko Chiba]]  || rowspan="2"|[[Manja Doering]]
+|-
+| Nagisa Chiba
+|-
+| Rakshata Chawla || [[Masayo Kurata]] || [[Silvia Mißbach]]
+|-
+| Diethard Ried || [[Jōji Nakata]] || [[Peter Reinhardt (Synchronsprecher)|Peter Reinhardt]]
+|-
+| Charles zi Britannia || [[Norio Wakamoto]] || [[Oliver Stritzel]]
+|-
+| Marianne vi Britannia || [[Asako Dodo]] || [[Liane Rudolph]]
+|-
+| Schneizel el Britannia || [[Norihiro Inoue]] || [[Sebastian Christoph Jacob]]
+|-
+| Cornelia li Britannia || [[Junko Minagawa]] || [[Marina Krogull]]
+|-
+| Clovis el Britannia || [[Nobuo Tobita]] || [[Frank Röth]]
+|-
+| Euphemia li Britannia || [[Omi Minami]] || [[Jill Schulz]]
+|-
+| Odysseus eu Britannia || [[Jin Yamanoi]] || [[Jan Kurbjuweit]]
+|-
+| Kaguya Sumeragi || [[Mika Kanai]] || rowspan="2"|[[Marie-Luise Schramm]]
+|-
+| V.V. || [[Kazato Tomizawa]]
+|-
+| Andreas Darlton || [[Kiyoyuki Yanada]] || [[Axel Lutter]]
+|-
+| Bartley Aspirus || [[Katsuhisa Houki]] || [[Stefan Gossler]]
+|-
+| Sayoko Shinozaki || [[Satomi Arai]] || [[Heike Beeck]]
+|-
+| Yoshitaka Minami || [[Yasuyuki Kase]] || [[Andreas Hosang]]
+|-
+| Shinichiro Tamaki || [[Kazunari Tanaka]] || [[Michael Baral]]
+|-
+| Ryouga Senba || [[Yu Shimaka]] || [[Gerald Paradies]]
+|-
+| Shougo Asahina || |[[Atsushi Kisaichi]] || [[Kim Hasper]]
+|-
+| Taizou Kirihara  || [[Shinpachi Tsuji]] || [[Manfred Petersen]]
+|-
+| Ayame Futaba || [[Fumiko Orikasa]] || [[Nadine Zaddam|Nadine Leopold]]
+|-
+| Kaiserin Tianzi || [[Tamaki Matsumoto]] || [[Josefin Hagen]]
+|-
+| Zhou Xianglin || [[Sayaka Ohara]] || [[Judith Hoersch]]
+|-
+| Luciano Bradley || [[Atsushi Kisaichi]] || [[Gerald Schaale]]
+|-
+| Bismarck Waldstein || [[Sōmei Uchida]] || [[Tilo Schmitz]]
+|-
+| Kanon Maldini || [[Kōzō Mito]] || [[Karlo Hackenberger]]
+|}

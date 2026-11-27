@@ -473,6 +473,7 @@ pipeline/check-motn-reihe.ts
 pipeline/check-motn-uebernahme.ts
 pipeline/check-nachlade-vorwaermen.ts
 pipeline/check-nachleger-im-kasten.ts
+pipeline/check-nachleger-panel.ts
 pipeline/check-namens-zuordnung.ts
 pipeline/check-nebendateien-laufzeit.ts
 pipeline/check-nein-datum.ts

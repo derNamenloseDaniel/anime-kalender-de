@@ -880879,5 +880879,40 @@
       ]
     },
     "fetchedAt": "2026-11-25T06:49:36.985Z"
+  },
+  "220269": {
+    "anisearchId": 22123,
+    "streams": [],
+    "info": {
+      "languages": [
+        {
+          "language": "Japanisch",
+          "title": "25-ji Akasaka de",
+          "titleNative": "25時、赤坂で",
+          "status": "Zukünftig",
+          "released": "2027 - ?"
+        }
+      ],
+      "format": "TV-Serie",
+      "adaptedFrom": "Manga",
+      "websites": [
+        {
+          "name": "X",
+          "url": "https://x.com/25ji_anime"
+        },
+        {
+          "name": "25jiakasakade Anime",
+          "url": "https://25jiakasakade-anime.com/"
+        }
+      ],
+      "synonyms": [
+        "At 25:00 in Akasaka",
+        "A las 25:00",
+        "en Akasaka",
+        "À 25 h",
+        "à Akasaka"
+      ]
+    },
+    "fetchedAt": "2026-11-27T06:01:30.485Z"
   }
 }

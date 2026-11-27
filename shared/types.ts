@@ -107,6 +107,8 @@ export interface Schedule {
    * Gesichtet oder aus belegtem Plan/EPG (künftige tv-Tage, Joyn-Tage mit passendem Fenster); schlägt jede Rechnung.
    */
   observed?: Record<number, string>
+  /** Sendeplan (`wochentage`, `skipDates`) als Ganzes belegt, kein Folgentag geschätzt (Yaiba, 26.11.2026); Joyn übernimmt ihn (`13-1-joyn-aus-tv.ts`). */
+  sendeplanBelegt?: boolean
   /**
    * Synchro-Tage der Folgen hinter der letzten Beobachtung, aus dem Originaltermin plus gemessenem Abstand
    * (`shared/synchro-original.ts`, 15.10.2026). Nur gesetzt, wenn der Abstand stabil ist; bleibt Fortschreibung (`estimated`).

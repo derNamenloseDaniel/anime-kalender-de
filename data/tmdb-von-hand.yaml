@@ -531,3 +531,68 @@
   geprueftAm: '2026-11-23'
   grund: >-
     Namenssuche bei TMDB (movie, Modern Love Tokyo: He’s Playing Our Song (de-DE)): "彼が奏でるふたりの調べ" (2022), Originaltitel „彼が奏でるふたりの調べ“ passt zum japanischen Titel bei AniList, Jahr (AniList 2022) stimmen, Genre Animation, TMDB-Kennung bei keinem anderen Titel in Gebrauch, Zuordnung für das Hintergrundbild.
+
+# Banner-Stillstand 26.11.2026 (Auftrag maengel-stillstand-2611, Runde 1): Handsuche je Titel auf themoviedb.org (Websuche, Treffer-Seite gelesen), TMDB-Kennung bei keinem anderen Titel in Gebrauch.
+- anilistId: 10018543
+  tmdbId: 572
+  kind: tv
+  titel: Rainbow Brite
+  geprueftAm: '2026-11-26'
+  grund: TMDB „Rainbow Brite (TV Series 1984)“, 13 Folgen (https://www.themoviedb.org/tv/572-rainbow-brite); „Regina Regenbogen“ ist der deutsche Titel derselben Serie.
+
+- anilistId: 2579
+  tmdbId: 5150
+  kind: tv
+  titel: Around the World with Willy Fog
+  geprueftAm: '2026-11-26'
+  grund: TMDB „Around the World with Willy Fog (TV Series 1983)“, 26 Folgen, Original „La vuelta al mundo de Willy Fog“ (https://www.themoviedb.org/tv/5150-around-the-world-with-willy-fog); gleiche Serie, TMDB nennt die spanische Erstausstrahlung 1983, AniList 1987.
+
+- anilistId: 10004442
+  tmdbId: 134902
+  kind: movie
+  titel: 'The Adventures of Willy Fog: Journey to Center of the Earth'
+  geprueftAm: '2026-11-26'
+  grund: TMDB „Willy Fog in Journey to the Center of the Earth (1995)“, Fortsetzung der Serie 5150 (https://www.themoviedb.org/movie/134902-willy-fog-in-journey-to-the-center-of-the-earth); Name passt, Jahr bei TMDB 1995, bei AniList 1993.
+
+- anilistId: 10004821
+  tmdbId: 101433
+  kind: movie
+  titel: 'The Adventures of Willy Fog: 20,000 Leagues Under the Sea'
+  geprueftAm: '2026-11-26'
+  grund: TMDB „Willy Fog in 20,000 Leagues Under the Sea (1995)“, Fortsetzung der Serie 5150 (https://www.themoviedb.org/movie/101433-willy-fog-20-000-leguas-de-viaje-submarino); Name passt, Jahr bei TMDB 1995, bei AniList 1993.
+
+- anilistId: 10003453
+  tmdbId: 241802
+  kind: tv
+  titel: Funky Fables
+  geprueftAm: '2026-11-26'
+  grund: TMDB „Funky Fables (TV Series 1988-1990)“, 41 Folgen, Original めいさくわーるど/むかしばなし (https://www.themoviedb.org/tv/241802).
+
+- anilistId: 2282
+  tmdbId: 16962
+  kind: tv
+  titel: 'In The Beginning: Stories from the Bible'
+  geprueftAm: '2026-11-26'
+  grund: >-
+    TMDB „In the Beginning: The Bible Stories“, Tezuka, 26 Folgen; die deutsche Übersetzung dort heißt „Der kleine Bibelfuchs“ (https://www.themoviedb.org/tv/16962-in-the-beginning-the-bible-stories).
+
+- anilistId: 153734
+  tmdbId: 487758
+  kind: movie
+  titel: Shen Bi
+  geprueftAm: '2026-11-26'
+  grund: TMDB „Magic Brush (1955)“, Original 神笔马良, Shanghai Animation Film Studio (https://www.themoviedb.org/movie/487758-shen-bi).
+
+- anilistId: 7252
+  tmdbId: 279987
+  kind: movie
+  titel: The Enchanted Journey
+  geprueftAm: '2026-11-26'
+  grund: TMDB „Enchanted Journey“, グリックの冒険, Pippo als Brieftaube, US-Start 10.12.1984 (https://www.themoviedb.org/movie/279987); AniList 1984.
+
+- anilistId: 196840
+  tmdbId: 80867
+  kind: tv
+  titel: I Want You To Show Me Your Panties With a Disgusted Face Returns
+  geprueftAm: '2026-11-26'
+  grund: TMDB führt die Reihe als eine Serie „I Want You to Make a Disgusted Face and Show Me Your Underwear“ (嫌な顔されながらおパンツ見せてもらいたい) mit Staffel 3 für 2026 (https://www.themoviedb.org/tv/80867).

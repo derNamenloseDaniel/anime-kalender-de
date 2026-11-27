@@ -27,6 +27,8 @@ import { sichtungsZeilen } from './sichtungsfenster.ts'
 import { crWegDoppelt } from './cr-doppelter-weg.ts'
 import { veralteteSynchroHinweise } from './veraltete-hinweise.ts'
 import { fuerBesucher, istNurUntertitel } from '../../shared/nur-deutsch.ts'
+import { joynHinterTv, belegvermerkImHinweis } from './joyn-folgen-aus-tv.ts'
+import { crAbsoluteZaehlungFehler } from './cr-zaehlung.ts'
 
 export interface Pruefergebnis {
   fehler: string[]
@@ -97,6 +99,7 @@ export function pruefeErgebnis(
   }
 
   folgenzahlWiderspruch(releases, titles, fehler)
+  fehler.push(...crAbsoluteZaehlungFehler(releases, titles))
   tmdbOhneKennzeichnung(titles, fehler)
   for (const r of veralteteSynchroHinweise(releases, heute)) fehler.push(`"${r.slug}": Ankündigungs-Hinweis, obwohl die deutsche Folge schon erschienen ist (nur deutsche Fassungen, keine veralteten Hinweise)`)
 
@@ -277,6 +280,8 @@ function schlussFehler(releases: Release[], events: ReleaseEvent[], titles: Map<
     ...geteilteWegeTrotzWiderlegung(releases, titles),
     ...premiereFehler(releases),
     ...beobachtetOhneTermin(fuerBesucher(releases), events),
+    ...joynHinterTv(releases, events, heute),
+    ...belegvermerkImHinweis(releases),
   ]
 }
 

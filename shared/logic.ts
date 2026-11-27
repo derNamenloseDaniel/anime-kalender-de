@@ -242,7 +242,7 @@ export function erscheintErst(t: Pick<Title, 'jpStart' | 'jpStatus' | 'jpYear'>,
  *
  * Fehlt die Uhrzeit, gilt der Tag als abgeschlossen (23:59): Wir wissen dann nicht,
  * wann sie kam, aber dass sie kam. Ausnahme: ein Katalogstart (`batch`, nicht TV) gilt ab 00:00 als erschienen,
- * sonst steht am Starttag "0 von 6"; der Kasten nennt dann "genaue Uhrzeit unbekannt" (`heuteOffen` in `fertigAntwort`).
+ * sonst steht am Starttag "0 von 6"; der Kasten sagt dann "Alle N Folgen da" (`heuteOffen` in `fertigAntwort`).
  * Der Push bleibt bei 23:59 (`katalogAmTagesbeginn = false`): Netflix schaltet erst gegen 9 Uhr frei.
  */
 export function istErschienen(
@@ -316,6 +316,7 @@ function terminGeschaetzt(
   const nachBeobachtung = Object.keys(s.observed ?? {}).some((k) => Number(k) < episode)
   const belegt =
     s.observed?.[episode] ||
+    s.sendeplanBelegt ||
     (s.belegtBis && nachBeobachtung && episode <= s.belegtBis.folge && date <= s.belegtBis.am) ||
     /* Zwischen zwei Stützpunkten eines Sendeplans ist der Tag belegt, nicht geschätzt. */
     (s.wochentage?.length && lastAnchor && episode < lastAnchor.episode && !s.estimated)

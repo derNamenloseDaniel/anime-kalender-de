@@ -231,7 +231,7 @@ function kopfFertig({ antwort, T, releases, folgenZahl, staffeln, deSeitNeben, t
     nichts.
   */
   /* „Alle 1 Folgen" stand über OVAs mit einer Folge — dort sagt die Überschrift ohne Zahl dasselbe. */
-  haupt = antwort.heuteOffen && antwort.gesamt && antwort.gesamt > 1 ? T('antwort.heuteUhrzeitOffen', { count: antwort.gesamt }) : antwort.gesamt && antwort.gesamt > 1
+  haupt = antwort.heuteOffen && antwort.gesamt && antwort.gesamt > 1 ? T('antwort.heuteDa', { count: antwort.gesamt }) : antwort.gesamt && antwort.gesamt > 1
     ? fertigZahlText(antwort.gesamt, antwort.gesamtAbgeleitet, T)
     : folgenZahl && !antwort.gesamt && folgenZahl[1] > 1 ? deFolgenZahlText(folgenZahl, releases, T, staffeln) : T('antwort.fertigTitel')
   /*
@@ -480,8 +480,10 @@ function kopfOhne({ antwort, T, title }: Omit<KopfEingabe, 'antwort'> & { antwor
 function laeuftMitZeit(antwort: Extract<Antwort, { art: 'laeuft' }>, rel: string, T: KopfEingabe['T']): string {
   const e = antwort.haupt
   const termin = terminSatz(antwort.komplett, rel, e.date, T, antwort.blockBis !== undefined)
+  /* Ein belegter Joyn-Tag (nach der TV-Sendung, 26.11.2026) ist kein „voraussichtlich“: Joyn bringt die Folge ab dem Sendeende. */
+  const joynBelegt = e.platform === 'joyn' && !e.estimated && !e.timeEstimated
   const mitZeit = e.time
-    ? T('antwort.erscheintUmZeit', { termin: termin.replace(/\.$/, ''), zeit: e.timeEstimated ? `≈ ${e.time}` : e.time })
+    ? T(joynBelegt ? 'antwort.erscheintAbZeit' : 'antwort.erscheintUmZeit', { termin: termin.replace(/\.$/, ''), zeit: e.timeEstimated ? `≈ ${e.time}` : e.time })
     : termin
   return mitZeit
 }

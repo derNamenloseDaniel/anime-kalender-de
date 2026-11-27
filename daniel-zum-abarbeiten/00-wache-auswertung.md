@@ -1083,3 +1083,13 @@ wer die Ursache dann noch kennt, hat Glück. Deshalb diese Datei.
 **Wo sind echte Risiken und Lücken?** Fällt das Kontingent aus, bleibt jeder rote Datenlauf unbearbeitet, bis es zurück ist; die Wache zeigt das nur, wenn gerade ein Lauf scheiterte. Ablaufdatum der Tokens ist weiter unbekannt (ℹ-Zeile).
 
 **Was läuft komplett falsch?** Nichts Belegbares: Der Claude-Schritt dieses Laufs arbeitet, das Kontingent ist zurück. Kein Codefehler, kein Pull Request.
+
+## 27.11.2026 — Wache meldet „150 Termine weniger“ und „Shaman King (154) entfernt“ (Lauf 46042064479, Issue #5234)
+
+**Was läuft korrekt.** Die Wache hat beide Abgänge gefunden: Bestandsbau 26.11. 23:13 (termine −150) und `--ersetzen` 27.11. 13:56 (Titel 154 Shaman King weg, Urteil und Prime-Beleg mit). Die Ursache für Shaman King steht in `14d37f4b` (#5229, im `headSha` enthalten): Der Titel stand in der Quarantäne `folgen-vor-start`, weil die Handtermine aus #5192 bei Folge 33 begannen und Folgen 1–32 ohne Beleg davor lagen; #5229 ergänzt Part 1 (14.08.2025) und Part 2 (23.10.2025) bei aniverse. Es ist also kein Quellenverlust und kein Bauschaden.
+
+**Wo ist Verbesserungspotenzial?** Die Wache zeigt die Quarantäne weiter als „Titel entfernt“ (siehe 22.11.) und widerspricht sich selbst: „jüngere Handprüfung widerspricht“ steht neben der Rot-Meldung. #5192 hat den Titel zugeordnet, ohne dass der Bau danach gegen die Quarantäne geprüft wurde; der Titel fehlte vom 13:56-Bau bis zum Merge von #5229.
+
+**Wo sind echte Risiken und Lücken?** Die 150 fehlenden Termine (26.11. 23:13) sind nicht erklärt: Der Checkout ist 50 Commits tief und reicht nicht bis dorthin, `00-wache.md` nennt keinen Titel dazu. Es kann eine gewollte Bereinigung gewesen sein, belegt ist es nicht. Titel 154 kehrt erst mit dem nächsten Bestandsbau nach #5229 zurück; ob er dort die Prüfung besteht, ist offen.
+
+**Was läuft komplett falsch?** Nichts Belegbares an Code: kein Fehlerschritt, der Lauf ist absichtlich rot (`exit 1`). Kein Pull Request, die Ursache ist schon gemergt.

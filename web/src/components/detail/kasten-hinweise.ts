@@ -1,6 +1,6 @@
 import { PLATFORMS, type Release, type Title } from '@shared/types.ts'
 import { addDays, formatDate } from '@shared/time.ts'
-import { verlagIstAnbieter } from '@shared/verlag-anbieter.ts'
+import { erstausgabeBeimAnbieterVor } from '@shared/verlag-anbieter.ts'
 import type { Translate } from '../../lib/i18n.tsx'
 import type { NewsletterVerbindung } from '../../lib/newsletterSync.ts'
 import type { berechneAntwort } from './antwort-berechnen.ts'
@@ -11,12 +11,7 @@ type Antwort = ReturnType<typeof berechneAntwort>
    Auskunft mehr („Auf Deutsch seit 28.12.2023 · Netflix, Inc." über „Bei Netflix im
    Angebot seit 08.03.2024", Pokémon-Concierge, Stichprobe 16.09.2026). */
 export function angebotSeitZeileVon(title: Title, t: Translate): string | undefined {
-  return title.angebotSeit &&
-    !(
-      title.deErstausgabe?.von &&
-      title.deErstausgabe.von <= title.angebotSeit.date &&
-      verlagIstAnbieter(title.deErstausgabe.publisher, title.angebotSeit.platform)
-    )
+  return title.angebotSeit && !erstausgabeBeimAnbieterVor(title.deErstausgabe, title.angebotSeit.platform, title.angebotSeit.date)
     ? t('antwort.imAngebotSeit', {
         datum: formatDate(title.angebotSeit.date),
         anbieter: PLATFORMS[title.angebotSeit.platform]?.name ?? title.angebotSeit.platform,

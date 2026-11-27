@@ -72,8 +72,31 @@ export function kontingentFunde(schritte) {
 /** Frist aus der gemeinsamen Tabelle (`wache-fristen.mjs`); ohne Eintrag keine Fristprüfung. */
 export const spezMitFrist = (workflow, spez, fristen = FRISTEN_STUNDEN) => ({ ...spez, fristStunden: fristen[workflow] ?? null })
 
-/** `ghAufruf` und `jetzt` sind einspeisbar, damit ein Test ohne `gh` und ohne Uhr läuft. */
-export function pruefeLauf(workflow, spez, ghAufruf = gh, jetzt = Date.now()) {
+/** Hat in diesen Schritten ein Claude-Schritt wirklich gearbeitet? Ein grüner Lauf mit übersprungenem Schritt belegt das Token nicht. */
+export const claudeSchrittGelang = (schritte) => schritte.some((s) => CLAUDE_SCHRITT.test(s.name) && s.conclusion === 'success')
+
+// So viele jüngste Erfolge je Workflow werden auf einen echten Claude-Schritt geprüft (stündliche Läufe überspringen ihn meist).
+const ERHOLUNG_LAEUFE = 8
+
+/** Jüngster Lauf über alle Claude-Workflows, in dem ein Claude-Schritt `success` endete — sie teilen Token und Kontingent. `{ createdAt, workflow, lauf }` oder null. */
+export function claudeErholung(laeufe, ghAufruf = gh) {
+  const funde = []
+  for (const [workflow, s] of Object.entries(laeufe)) {
+    if (!s.claude) continue
+    const erfolge = ghAufruf('run', 'list', '--repo', REPO, '--workflow', workflow, '--status', 'success', '--limit', String(ERHOLUNG_LAEUFE), '--json', 'databaseId,createdAt')
+    for (const l of erfolge) {
+      const jobs = ghAufruf('api', `repos/${REPO}/actions/runs/${l.databaseId}/jobs`).jobs ?? []
+      if (claudeSchrittGelang(jobs.flatMap((j) => j.steps ?? []))) {
+        funde.push({ createdAt: l.createdAt, workflow, lauf: l.databaseId })
+        break
+      }
+    }
+  }
+  return funde.reduce((neuster, f) => (!neuster || f.createdAt > neuster.createdAt ? f : neuster), null)
+}
+
+/** `ghAufruf` und `jetzt` sind einspeisbar, damit ein Test ohne `gh` und ohne Uhr läuft; `erholt`: jüngster Erfolg eines Claude-Workflows. */
+export function pruefeLauf(workflow, spez, ghAufruf = gh, jetzt = Date.now(), erholt = null) {
   const stunden = (iso) => stundenSeit(iso, jetzt)
   const zeilen = []
   const laeufe = letzteLaeufe(ghAufruf, workflow)
@@ -85,26 +108,31 @@ export function pruefeLauf(workflow, spez, ghAufruf = gh, jetzt = Date.now()) {
     else zeilen.push({ rot: false, text: `${workflow}: letzter Erfolg vor ${Math.round(stunden(erfolg.createdAt))} h (Frist ${spez.fristStunden} h)` })
   }
   if (spez.claude) {
-    // Nur solange kein späterer Lauf gelungen ist — danach ist das Kontingent wieder da.
-    for (const l of fertig.filter((x) => x.conclusion === 'failure' && stunden(x.createdAt) <= 24 * 7 && !(erfolg && erfolg.createdAt > x.createdAt)).slice(0, 5)) {
+    // Nur solange kein späterer Lauf mit gelungenem Claude-Schritt existiert (dieser oder ein anderer Workflow, gleiches Token) — danach ist das Kontingent wieder da.
+    const spaeter = (x) => erholt && erholt.createdAt > x.createdAt
+    for (const l of fertig.filter((x) => x.conclusion === 'failure' && stunden(x.createdAt) <= 24 * 7).slice(0, 5)) {
       const jobs = ghAufruf('api', `repos/${REPO}/actions/runs/${l.databaseId}/jobs`).jobs ?? []
       const funde = kontingentFunde(jobs.flatMap((j) => j.steps ?? []))
-      if (funde.length) zeilen.push({ rot: true, kontingent: true, text: `${workflow}: Claude-Schritt „${funde[0].name}“ endete nach wenigen Sekunden (Lauf ${l.databaseId}, ${l.createdAt.slice(0, 16)}Z) — Kontingent leer oder CLAUDE_CODE_OAUTH_TOKEN ungültig` })
+      if (!funde.length) continue
+      const befund = `${workflow}: Claude-Schritt „${funde[0].name}“ endete nach wenigen Sekunden (Lauf ${l.databaseId}, ${l.createdAt.slice(0, 16)}Z)`
+      if (!spaeter(l)) zeilen.push({ rot: true, kontingent: true, text: `${befund} — Kontingent leer oder CLAUDE_CODE_OAUTH_TOKEN ungültig` })
+      // Gedeckt durch einen fremden Workflow: sichtbar bleiben, damit ein workflow-eigenes Dauerproblem (Rechte, Prompt) nicht verschwindet.
+      else if (erholt.workflow !== workflow) zeilen.push({ rot: false, text: `${befund} — Token läuft wieder: ${erholt.workflow} Lauf ${erholt.lauf} (${erholt.createdAt.slice(0, 16)}Z)` })
     }
   }
   return zeilen
 }
 
-function ablaufBefunde() {
+function ablaufBefunde(reg = register, jetzt = Date.now()) {
   const aus = []
   const ohne = []
-  for (const z of register.zugaenge) {
+  for (const z of reg.zugaenge) {
     const bis = z.gueltig.gueltigBis
     if (!bis) {
       if (z.erneuerung.art === 'handgriff') ohne.push(z.id)
       continue
     }
-    const tage = Math.floor((Date.parse(bis) - Date.now()) / 86400e3)
+    const tage = Math.floor((Date.parse(bis) - jetzt) / 86400e3)
     if (tage <= WARN_TAGE) aus.push({ rot: true, text: `${z.id}: läuft ${tage < 0 ? `seit ${-tage} Tagen ab` : `in ${tage} Tagen`} ab (${bis}) — ${z.erneuerung.text}` })
   }
   return { aus, ohne }
@@ -113,11 +141,11 @@ function ablaufBefunde() {
 /** Der Wecker startet mit dem PAT (Nutzer); die Wache mit GITHUB_TOKEN (`github-actions[bot]`) und darf den Wecker nicht vortäuschen. */
 export const vomWecker = (lauf) => lauf.event === 'workflow_dispatch' && !String(lauf.actor?.login).endsWith('[bot]')
 
-function weckerBefund() {
-  const laeufe = gh('api', 'repos/' + REPO + '/actions/workflows/refresh-hourly.yml/runs?per_page=20&event=workflow_dispatch').workflow_runs
+function weckerBefund(ghAufruf = gh, jetzt = Date.now()) {
+  const laeufe = ghAufruf('api', 'repos/' + REPO + '/actions/workflows/refresh-hourly.yml/runs?per_page=20&event=workflow_dispatch').workflow_runs
   const l = laeufe.find(vomWecker)
   if (!l) return { rot: true, text: 'GITHUB_WECKER_TOKEN: unter den letzten 20 Starts des Stundenlaufs keiner vom Cloudflare-Wecker (nur Wecker-Wache oder gar keiner)' }
-  const h = stundenSeit(l.created_at, Date.now())
+  const h = stundenSeit(l.created_at, jetzt)
   return { rot: h > 5, text: `GITHUB_WECKER_TOKEN: letzter Start durch den Wecker vor ${Math.round(h)} h` }
 }
 
@@ -190,6 +218,22 @@ function workflowTexte() {
   return Object.fromEntries(readdirSync(verz).filter((d) => d.endsWith('.yml')).map((d) => [d, readFileSync(new URL(d, verz), 'utf8')]))
 }
 
+/** Fristen-, Kontingent-, Wecker- und Ablaufprüfung; Rückgabe ist der Exit-Code (1 bei Befund). Alles einspeisbar für den Lauf-Test. */
+export function wacheLauf({ reg = register, ghAufruf = gh, jetzt = Date.now(), ausgabe = console.log } = {}) {
+  const zeilen = []
+  const erholt = claudeErholung(reg.laeufe, ghAufruf)
+  for (const [workflow, spez] of Object.entries(reg.laeufe)) zeilen.push(...pruefeLauf(workflow, spezMitFrist(workflow, spez), ghAufruf, jetzt, erholt))
+  zeilen.push(weckerBefund(ghAufruf, jetzt))
+  const { aus, ohne } = ablaufBefunde(reg, jetzt)
+  zeilen.push(...aus)
+  const rot = zeilen.filter((z) => z.rot)
+  for (const z of zeilen) ausgabe(`${z.rot ? '✗' : '✓'} ${z.text}`)
+  if (ohne.length) ausgabe(`ℹ Ablaufdatum unbekannt (gueltigBis leer): ${ohne.join(', ')} — Daniel liest es einmal im Konto ab und trägt es ins Register ein.`)
+  if (rot.some((z) => z.kontingent)) ausgabe('::warning title=Claude-Kontingent leer::Claude-Läufe enden nach Sekunden — Abo-Kontingent oder CLAUDE_CODE_OAUTH_TOKEN prüfen (docs/wissen/betrieb.md)')
+  ausgabe(rot.length ? `\n${rot.length} Befund(e) bei den Zugängen.` : '\nZugänge unauffällig.')
+  return rot.length ? 1 : 0
+}
+
 function main() {
   if (process.argv.includes('--secrets')) {
     // Nur lokal: das GITHUB_TOKEN der CI darf keine Secret-Namen lesen (tools/zugangs-secret-wache.mjs).
@@ -211,17 +255,8 @@ function main() {
     console.log(`Zugangs-Register stimmig: ${register.zugaenge.length} Zugänge, ${Object.keys(register.laeufe).length} überwachte Läufe.`)
     return
   }
-  const zeilen = []
-  for (const [workflow, spez] of Object.entries(register.laeufe)) zeilen.push(...pruefeLauf(workflow, spezMitFrist(workflow, spez)))
-  zeilen.push(weckerBefund())
-  const { aus, ohne } = ablaufBefunde()
-  zeilen.push(...aus)
-  const rot = zeilen.filter((z) => z.rot)
-  for (const z of zeilen) console.log(`${z.rot ? '✗' : '✓'} ${z.text}`)
-  if (ohne.length) console.log(`ℹ Ablaufdatum unbekannt (gueltigBis leer): ${ohne.join(', ')} — Daniel liest es einmal im Konto ab und trägt es ins Register ein.`)
-  if (rot.some((z) => z.kontingent)) console.log('::warning title=Claude-Kontingent leer::Claude-Läufe enden nach Sekunden — Abo-Kontingent oder CLAUDE_CODE_OAUTH_TOKEN prüfen (docs/wissen/betrieb.md)')
-  console.log(rot.length ? `\n${rot.length} Befund(e) bei den Zugängen.` : '\nZugänge unauffällig.')
-  if (rot.length) process.exit(1)
+  const code = wacheLauf()
+  if (code) process.exit(code)
 }
 
 if (process.argv[1]?.endsWith('zugangs-waechter.mjs')) main()

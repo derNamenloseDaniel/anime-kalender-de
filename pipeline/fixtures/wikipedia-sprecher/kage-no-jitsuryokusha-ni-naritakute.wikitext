@@ -1,0 +1,59 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Kage_no_Jitsuryokusha_ni_Naritakute! (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Kage_no_Jitsuryokusha_ni_Naritakute!&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+Die deutsche Synchronfassung entstand bei [[@alpha Postproduktion]] unter der Regie von Nicolle Gonsior. Die Dialogbücher schrieb Julien Hebenstreit.
+{| class="wikitable sortable"
+|-
+! Rolle
+! japanische Stimme ([[Seiyū]])
+! deutsche Stimme
+|-
+|Cid Kagenō/Shadow
+|[[Seiichirō Yamashita]]
+|[[Benjamin Mereis]]
+|-
+|Claire Kagenō
+|[[Rina Hidaka]]
+|[[Friederike Sipp]]
+|-
+|Alpha
+|[[Asami Seto]]
+|Angelina Markiefka
+|-
+|Beta
+|[[Inori Minase]]
+|Anna Ewelina
+|-
+|Gamma
+|Suzuko Mimori
+|Tatjana Pokorny
+|-
+|Delta
+|Ai Fairouz
+|[[Lara Schmidt (Synchronsprecherin)|Lara Schmidt]]
+|-
+|Epsilon
+|Hisako Kanemoto
+|Andrea Wick
+|-
+|Eta
+|Reina Kondou
+|Eileen Fuhrmann
+|-
+|Zeta
+|Ayaka Asai
+|Cindy Kepke
+|-
+|Alexia Midgar
+|[[Kana Hanazawa]]
+|[[Leslie-Vanessa Lill]]
+|-
+|Rose Oriana
+|[[Haruka Shiraishi]]
+|[[Alina Freund]]
+|-
+|Iris Midgar
+|[[Yōko Hikasa]]
+|[[Maren Rainer]]
+|}

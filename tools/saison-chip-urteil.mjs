@@ -24,3 +24,19 @@ export function urteilKarte(karte, erwartet) {
 export function urteilSeite(scrollBreite, fensterBreite) {
   return scrollBreite > fensterBreite ? [`Seite ${scrollBreite - fensterBreite} px zu breit`] : []
 }
+
+/**
+ * Fixture der Titel für die Messung, unabhängig vom Bestand: Bei ungerader Kennung tragen alle Tonspur-Wege `dubAbgeleitet: 'joyn-pauschal'`
+ * (Karte „Deutsch laut Anbieter“), bei gerader keinen (belegte Karte). Der Bestand kennt je nach Saison keine gekennzeichnete Karte
+ * (27.11.2026: die 97 Prime-Kanal-Wege zeigen „Deutsch“), die Messung hätte dann nichts gemessen.
+ */
+export function mitLautFixture(titles) {
+  return titles.map((t) => ({
+    ...t,
+    streams: (t.streams ?? []).map((s) => {
+      if (s.dub !== true) return s
+      const { dubAbgeleitet: _alt, ...rest } = s
+      return t.id % 2 !== 0 ? { ...rest, dubAbgeleitet: 'joyn-pauschal' } : rest
+    }),
+  }))
+}

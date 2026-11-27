@@ -15,7 +15,7 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261120T080000Z
 DTEND:20261120T083000Z
 SUMMARY:JoJo's Bizarre Adventure: Steel Ball Run – 2nd & 3rd STAGE – Fo
- lge 9/11
+ lge 10/12
 DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nDetai
  ls: https://anime-kalender.de/t/17588/
 CATEGORIES:Netflix
@@ -147,9 +147,7 @@ DTSTART:20261120T175000Z
 DTEND:20261120T182000Z
 SUMMARY:ONE PIECE – Folge 789/877
 DESCRIPTION:Plattform: ProSieben MAXX\nRelease-Art: Wöchentlich (Simuldub)
- \nGeschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhyth
- mus oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/
- t/12/
+ \nDetails: https://anime-kalender.de/t/12/
 CATEGORIES:ProSieben MAXX
 END:VEVENT
 BEGIN:VEVENT
@@ -350,19 +348,6 @@ SUMMARY:Beyblade X – Folge 125
 DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
  tails: https://anime-kalender.de/t/15075/
 CATEGORIES:TOGGO plus
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll@2026-11-21@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261121
-DTEND;VALUE=DATE:20261122
-SUMMARY:Black Clover – Staffel 2 – Folge 8/≈12 (OmU)
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
- lton mit deutschen Untertiteln\, keine deutsche Synchro.\nUhrzeit noch nic
- ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
- dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
- e-kalender.de/t/16920/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:das-band-der-unterwelt-netflix@2026-11-21@anime-kalender-de
@@ -812,7 +797,7 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261127T080000Z
 DTEND:20261127T083000Z
 SUMMARY:JoJo's Bizarre Adventure: Steel Ball Run – 2nd & 3rd STAGE – Fo
- lge 10/11
+ lge 11/12
 DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nDetai
  ls: https://anime-kalender.de/t/17588/
 CATEGORIES:Netflix
@@ -972,19 +957,6 @@ DTEND:20261128T163000Z
 SUMMARY:Black Clover – Staffel 2 – Folge 4/≈12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
  etails: https://anime-kalender.de/t/16920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll@2026-11-28@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261128
-DTEND;VALUE=DATE:20261129
-SUMMARY:Black Clover – Staffel 2 – Folge 9/≈12 (OmU)
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
- lton mit deutschen Untertiteln\, keine deutsche Synchro.\nUhrzeit noch nic
- ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
- dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
- e-kalender.de/t/16920/
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
@@ -1205,7 +1177,7 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261204T080000Z
 DTEND:20261204T083000Z
 SUMMARY:JoJo's Bizarre Adventure: Steel Ball Run – 2nd & 3rd STAGE – Fo
- lge 11/11
+ lge 12/12
 DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nDetai
  ls: https://anime-kalender.de/t/17588/
 CATEGORIES:Netflix
@@ -1329,19 +1301,6 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
   oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
  6920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll@2026-12-05@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261205
-DTEND;VALUE=DATE:20261206
-SUMMARY:Black Clover – Staffel 2 – Folge 10/≈12 (OmU)
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
- lton mit deutschen Untertiteln\, keine deutsche Synchro.\nUhrzeit noch nic
- ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
- dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
- e-kalender.de/t/16920/
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
@@ -1615,19 +1574,6 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll@2026-12-12@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261212
-DTEND;VALUE=DATE:20261213
-SUMMARY:Black Clover – Staffel 2 – Folge 11/≈12 (OmU)
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
- lton mit deutschen Untertiteln\, keine deutsche Synchro.\nUhrzeit noch nic
- ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
- dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
- e-kalender.de/t/16920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
 UID:das-band-der-unterwelt-netflix@2026-12-12@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261212
@@ -1849,19 +1795,6 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
   oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
  6920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll@2026-12-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261219
-DTEND;VALUE=DATE:20261220
-SUMMARY:Black Clover – Staffel 2 – Folge 12/≈12 (OmU)
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
- lton mit deutschen Untertiteln\, keine deutsche Synchro.\nUhrzeit noch nic
- ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
- dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
- e-kalender.de/t/16920/
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT

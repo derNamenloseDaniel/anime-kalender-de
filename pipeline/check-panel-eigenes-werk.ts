@@ -61,17 +61,20 @@ Object.assign(document, { querySelector: () => null, querySelectorAll: () => [],
 const wurzel = createRoot(dom.wurzel as unknown as Element)
 
 /** Rendert das Panel für `id` und liefert den Text der Kopfzeile (h2), der Unterzeile darunter und die Staffel-Reiter (Beschriftung, gewählt). */
-async function kopf(id: number): Promise<{ name: string; unter: string[]; reiter: string[]; gewaehlt: string[] }> {
-  const data = { titles: TITEL, titleById: new Map(TITEL.map((t) => [t.id, t])), releases: [], releaseBySlug: new Map(), events: [], eventsByDate: new Map(), releasesByTitle: new Map(), meta: {} }
+async function kopf(id: number): Promise<{ name: string; unter: string[]; reiter: string[]; gewaehlt: string[]; reihe: string[] }> {
+  const data = { titles: TITEL, titleById: new Map(TITEL.map((t) => [t.id, t])), releases: [], releaseBySlug: new Map(), events: [], eventsByDate: new Map(), nurUntertitelByTitle: new Map(), releasesByTitle: new Map(), meta: {} }
   const e = { data, titleId: id, favorites: new Set<number>(), hidden: new Set(), onToggleFavorite() {}, onToggleHidden() {}, onClose() {}, onFilterBy() {}, onOpenTitle() {} }
   await act(async () => wurzel.render(h(DetailPanel as never, e as never)))
   await act(async () => void (await new Promise((fertig) => setTimeout(fertig, 5))))
   const h2 = dom.wurzel.finde((k) => k.tagName === 'H2')[0]
   const unter = dom.wurzel.finde((k) => k.tagName === 'P').map((k) => (k.textContent ?? '').trim())
+  /* Folgen-Reiter steuern den Folgenbereich, Reihen-Reiter den Kasten (`reihe-<id>-kasten`). */
   const tabs = dom.wurzel.finde((k) => k.getAttribute('role') === 'tab' && k.getAttribute('aria-controls') !== null)
-  const reiter = tabs.map((k) => (k.textContent ?? '').trim())
-  const gewaehlt = tabs.filter((k) => k.getAttribute('aria-selected') === 'true').map((k) => (k.textContent ?? '').trim())
-  return { name: (h2?.textContent ?? '').trim(), unter, reiter, gewaehlt }
+  const reihenTab = (k: MiniKnoten) => (k.getAttribute('aria-controls') ?? '').startsWith('reihe-')
+  const folgenTabs = tabs.filter((k) => !reihenTab(k))
+  const reiter = folgenTabs.map((k) => (k.textContent ?? '').trim())
+  const gewaehlt = folgenTabs.filter((k) => k.getAttribute('aria-selected') === 'true').map((k) => (k.textContent ?? '').trim())
+  return { name: (h2?.textContent ?? '').trim(), unter, reiter, gewaehlt, reihe: tabs.filter(reihenTab).map((k) => (k.textContent ?? '').trim()) }
 }
 
 const horizonte = await kopf(900_703)
@@ -80,6 +83,8 @@ pruefe('eigenes Werk: keine Unterzeile „Horizonte“', !horizonte.unter.some((
 const reisen = await kopf(900_702)
 pruefe('Gegenfall Hauptserie: Kopf „Pokémon“, Unterzeile „Reisen“', reisen.name === 'Pokémon' && reisen.unter.some((z) => z.startsWith('Reisen')), reisen)
 pruefe('Hauptserie mit drei Staffeln in der Folgendatei: Reiter 23–25 im Panel, letzte gewählt', reisen.reiter.join() === '23,24,25' && reisen.gewaehlt.join() === '25', reisen.reiter)
+/* Meldung 27.11.2026: zwei Hauptstaffeln mit eigenem Namen tragen Reihen-Reiter mit ihrer Nummer; das eigene Werk Horizonte keine. */
+pruefe('Hauptserie mit eigenen Namen: Reihen-Reiter 1 und 2, Horizonte ohne', reisen.reihe.join() === '1,2' && horizonte.reihe.length === 0, [reisen.reihe, horizonte.reihe])
 pruefe('ohne Folgendatei keine Staffel-Reiter', horizonte.reiter.length === 0, horizonte.reiter)
 
 /* Klasse: jede Kennung der Handlisten eigener Werke heißt im Kopf wie sie selbst, auch wenn nur das Reihenglied die Marke trägt. */

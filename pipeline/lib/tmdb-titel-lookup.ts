@@ -47,7 +47,7 @@ export function koennteFilmSein(title: Pick<Title, 'format' | 'episodes' | 'jpYe
  */
 const FILM_MIN_AEHNLICHKEIT = 0.9
 
-/** Bester Treffer über alle Schreibweisen für eine Art (`tv` oder `movie`). */
+/** Bester Treffer über alle Schreibweisen für eine Art (`tv` oder `movie`); `fehler` zählt gescheiterte Suchen (ein Fehler ist keine Auskunft „kein Treffer“). */
 async function sucheBesten(
   apiKey: string,
   kind: 'tv' | 'movie',
@@ -55,8 +55,9 @@ async function sucheBesten(
   jpYear: number | undefined,
   holen: typeof fetchJson,
   pause: (ms: number) => Promise<void>,
-): Promise<Bester | undefined> {
+): Promise<{ best: Bester | undefined; fehler: number }> {
   let best: Bester | undefined
+  let fehler = 0
   for (const query of candidates) {
     const url =
       `${BASE}/search/${kind}?api_key=${apiKey}&language=de-DE&include_adult=false` +
@@ -66,13 +67,14 @@ async function sucheBesten(
       results = (await holen<{ results: SearchHit[] }>(url)).results ?? []
     } catch (err) {
       warn(`Suche fehlgeschlagen für "${query}": ${(err as Error).message}`)
+      fehler++
       continue
     }
     await pause(40)
 
     best = waehleBesten(best, query, results, jpYear)
   }
-  return best
+  return { best, fehler }
 }
 
 type Holen = typeof fetchJson
@@ -125,15 +127,19 @@ async function sucheTreffer(
   candidates: string[],
   holen: Holen,
   pause: Pause,
-): Promise<{ best: Bester | undefined; kind: 'tv' | 'movie' }> {
+): Promise<{ best: Bester | undefined; kind: 'tv' | 'movie'; fehler: number }> {
   let kind: 'tv' | 'movie' = title.format === 'MOVIE' ? 'movie' : 'tv'
-  let best = await sucheBesten(apiKey, kind, candidates, title.jpYear, holen, pause)
+  const tv = await sucheBesten(apiKey, kind, candidates, title.jpYear, holen, pause)
+  let best = tv.best
+  let fehler = tv.fehler
   if (!best && kind === 'tv' && koennteFilmSein(title)) {
     kind = 'movie'
-    best = await sucheBesten(apiKey, kind, candidates, title.jpYear, holen, pause)
+    const film = await sucheBesten(apiKey, kind, candidates, title.jpYear, holen, pause)
+    best = film.best
+    fehler += film.fehler
     if (best && best.score < FILM_MIN_AEHNLICHKEIT) best = undefined
   }
-  return { best, kind }
+  return { best, kind, fehler }
 }
 
 /** Handlung, Genres, Jahr und deutscher Name; schreibt in `out`, damit ein späterer Fehler das Bisherige nicht verliert. */
@@ -203,8 +209,9 @@ export async function lookup(
   const candidates = schreibweisen(title)
   if (!candidates.length) return { miss: true }
 
-  const { best, kind } = await sucheTreffer(apiKey, title, candidates, holen, pause)
-  if (!best) return { miss: true }
+  const { best, kind, fehler } = await sucheTreffer(apiKey, title, candidates, holen, pause)
+  /* Eine gescheiterte Suche ist kein „kein Treffer“: der Vermerk trennt beides, `faelligeTitel` legt den Titel im nächsten Lauf wieder vor. */
+  if (!best) return fehler ? { miss: true, suchfehler: true } : { miss: true }
 
   const out: TmdbTitle = { tmdbId: best.hit.id, kind }
   try {

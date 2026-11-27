@@ -37,12 +37,12 @@ export function planGeschaetzt(
 ): boolean {
   const belegt = (n: number | undefined): boolean =>
     n != null && !ergaenzt.includes(n) && (bereiche ?? []).some((b) => b.dub && n >= b.from && n <= b.to)
-  return events.some((e) => istErschienen(e, jetzt) && e.estimated && !belegt(e.episode))
+  return events.some((e) => istErschienen(e, jetzt) && e.estimated && !e.vorBeobachtung && !belegt(e.episode))
 }
 
 /** Steht in den Bereichen eine Folge, die nur der fortgeschriebene Wochenplan liefert (ergänzt, ihr Termin `estimated`)? */
 export function ergaenzungGeschaetzt(releases: Release[], ergaenzt: number[] = []): boolean {
   return releases
     .flatMap((r) => expandEvents(r))
-    .some((e) => istErschienen(e) && e.estimated && e.episode != null && ergaenzt.includes(e.episode))
+    .some((e) => istErschienen(e) && e.estimated && !e.vorBeobachtung && e.episode != null && ergaenzt.includes(e.episode))
 }

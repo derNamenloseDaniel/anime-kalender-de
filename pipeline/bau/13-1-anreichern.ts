@@ -1,6 +1,7 @@
 import { readJson, log } from '../lib/util.ts'
 import { type Title, type Release } from '../../shared/types.ts'
 import { amazonAdresseRichten } from '../lib/amazon-adresse.ts'
+import { ladeTrailerHand } from '../lib/trailer-hand.ts'
 import { richtePrimeWege } from './13-1-prime-richten.ts'
 import { richteTerminAdressen } from './13-1-termin-adressen.ts'
 import { setzeJoynFenster } from './13-1-joyn-fenster.ts'
@@ -76,6 +77,8 @@ export function schreibeSynopsenUndReichereAn({ allTitles, releases, kanalJeAdre
     'data/trailer.json',
     {},
   )
+  /* Ein Handeintrag (`data/curated/trailer-hand.yaml`) geht dem Lauf-Ergebnis vor. */
+  Object.assign(trailer, ladeTrailerHand())
   setzeToggoFenster(allTitles)
   setzeToggoSeiten(allTitles, 'Anime')
 

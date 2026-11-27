@@ -5,6 +5,7 @@
  */
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
+import ts from 'typescript'
 import { resolve } from 'node:path'
 import type { Release, Title } from '../shared/types.ts'
 import { waehleTageshighlight } from '../shared/tages-highlight.ts'
@@ -76,6 +77,15 @@ const mitNormal = new Map(titel_).set(6, titel(6, 'normal'))
 pruefe('Gleicher Rang: höhere Synchro-Stufe gewinnt', sieger([release('a-batch', 6, { releaseType: 'batch' }), komplett], mitNormal)?.release.slug === 'komplett-netflix')
 const zwei = [release('b-zwei', 7, { releaseType: 'batch' }), release('a-eins', 8, { releaseType: 'batch' })]
 pruefe('Gleicher Rang und Stufe: kleinerer Slug gewinnt', sieger(zwei)?.release.slug === 'a-eins' && sieger([...zwei].reverse())?.release.slug === 'a-eins')
+
+// Mutanten der Prüfer-Runde 2 (PR 5111): Stufenfolge der Synchro, Staffelstart gegen Einzelfolge ohne Hilfe des Slugs, „Alle 2“, titleId.
+const stufen = new Map([[11, titel(11, 'normal')], [12, titel(12, 'high')], [13, titel(13, 'very-high')]])
+const stufenTermine = [release('a-normal', 11, { releaseType: 'batch' }), release('b-high', 12, { releaseType: 'batch' }), release('c-sehr', 13, { releaseType: 'batch' })]
+pruefe('Stufen: very-high vor high vor normal, in jeder Eingabereihenfolge', sieger(stufenTermine, stufen)?.release.slug === 'c-sehr' && sieger([...stufenTermine].reverse(), stufen)?.release.slug === 'c-sehr')
+pruefe('Stufen: high vor normal, in beiden Reihenfolgen', sieger(stufenTermine.slice(0, 2), stufen)?.release.slug === 'b-high' && sieger(stufenTermine.slice(0, 2).reverse(), stufen)?.release.slug === 'b-high')
+pruefe('Staffelstart (Folge 1) vor Einzelfolge, auch wenn der Slug der Einzelfolge kleiner ist', sieger([woechentlich('a-einzel', 2, 9), woechentlich('z-start', 3, 1)])?.release.slug === 'z-start')
+pruefe('Zwei Folgen: „Alle 2 Folgen“', text({ schedule: { episodeCount: 2 } }) === 'Alle 2 Folgen', String(text({ schedule: { episodeCount: 2 } })))
+pruefe('Ergebnis trägt die Titelkennung', sieger([komplett])?.titleId === 1 && sieger([folge9])?.titleId === 2)
 
 // Ausschlüsse: nie ohne Beleg.
 pruefe('Ohne sources kein Highlight', sieger([{ ...komplett, sources: [] }]) === undefined)
@@ -162,8 +172,26 @@ async function schrittTests(): Promise<void> {
 
 // Verdrahtung: die Hauptläufe rufen die geprüften Schritte (Quelltext, die Läufe selbst starten Netz und Bild).
 const quelle = (d: string) => readFileSync(resolve(import.meta.dirname, d), 'utf8')
-pruefe('build-og.ts ruft baueTagesbild', /await baueTagesbild\(releases, titleById, today, OUT_DIR,/.test(quelle('build-og.ts')))
-pruefe('build-share-pages.ts ruft startseiteFuerTag mit dem Tag und dem dist', /startseiteFuerTag\(template, SITE, releases, volleTitel, today, DIST\)/.test(quelle('build-share-pages.ts')))
+/** Argumente aller Aufrufe von `name` in einer Quelldatei, aus dem Syntaxbaum (kein Textmuster), mit dem Namen der Variable, der der Aufruf zugewiesen wird. */
+function aufrufeVon(datei: string, name: string): { args: string[]; zuweisung?: string }[] {
+  const baum = ts.createSourceFile(datei, quelle(datei), ts.ScriptTarget.Latest, true)
+  const treffer: { args: string[]; zuweisung?: string }[] = []
+  const gehe = (n: ts.Node): void => {
+    if (ts.isCallExpression(n) && ts.isIdentifier(n.expression) && n.expression.text === name) {
+      const eltern = ts.isAwaitExpression(n.parent) ? n.parent.parent : n.parent
+      treffer.push({ args: n.arguments.map((x) => x.getText(baum)), zuweisung: ts.isVariableDeclaration(eltern) ? eltern.name.getText(baum) : undefined })
+    }
+    ts.forEachChild(n, gehe)
+  }
+  gehe(baum)
+  return treffer
+}
+const og = aufrufeVon('build-og.ts', 'baueTagesbild')
+pruefe('build-og.ts: genau ein Aufruf baueTagesbild(releases, titleById, today, OUT_DIR, loadCover, --tag-neu, …)', og.length === 1 && og[0]!.args.slice(0, 6).join('|') === "releases|titleById|today|OUT_DIR|loadCover|process.argv.includes('--tag-neu')", JSON.stringify(og))
+const sp = aufrufeVon('build-share-pages.ts', 'startseiteFuerTag')
+pruefe('build-share-pages.ts: genau ein Aufruf startseiteFuerTag(template, SITE, releases, volleTitel, today, DIST), Ergebnis in startVorlage', sp.length === 1 && sp[0]!.args.join('|') === 'template|SITE|releases|volleTitel|today|DIST' && sp[0]!.zuweisung === 'startVorlage', JSON.stringify(sp))
+const start = aufrufeVon('build-share-pages.ts', 'schreibeStartseite')
+pruefe('build-share-pages.ts: schreibeStartseite bekommt startVorlage als Vorlage (4. Argument)', start.length === 1 && start[0]!.args[3] === 'startVorlage', JSON.stringify(start))
 
 try {
   await proben()

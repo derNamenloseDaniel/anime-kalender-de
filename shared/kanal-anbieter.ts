@@ -24,8 +24,9 @@ export function anbieterWegMitJa(s: Pick<StreamLink, 'platform' | 'kanal'>, stre
 }
 
 /**
- * Belegt der Anbieter-Weg desselben Titels sein Ja selbst (weder abgeleitet noch nur JustWatch-Hinweis)? Dann trägt dieselbe Quelle den
- * Prime-Kanal: Der Kanal führt den Bestand des Anbieters (Daniel, 27.11.2026: „Deutsch laut Anbieter“ am Crunchyroll-Kanal neben „Deutsch“ bei Crunchyroll).
+ * Belegt der Anbieter-Weg desselben Titels sein Ja selbst (weder abgeleitet noch nur JustWatch-Hinweis)? Dann gilt der Prime-Kanal als so deutsch
+ * wie der Anbieter: Annahme nach Daniels Regel (Anbieter belegt → Prime-Kanal desselben Anbieters, 13.10./27.11.2026), kein eigener Beleg der
+ * Kanal-Tonspur. Ein JustWatch-Nein an der Kanal-Seite schlägt sie schon im Bau (`kanalErbtVomAnbieter`: kein Erbe, kein „Deutsch“).
  */
 export function anbieterBelegtKanal(s: Partial<Pick<StreamLink, 'platform' | 'kanal'>>, streams: StreamLink[]): boolean {
   const plattform = s.platform === 'primevideo' ? anbieterDesKanals(s.kanal) : undefined

@@ -1,239 +1,23 @@
 {
-  "geholtAm": "2026-11-26T04:13:27.479Z",
+  "geholtAm": "2026-11-27T03:35:25.578Z",
   "katalog": [
     {
-      "id": "VSE88",
-      "uname": "fragfinn-vse88",
-      "titel": "fragFINN",
+      "id": "VSE179",
+      "uname": "super-toy-club-vse179",
+      "titel": "Super Toy Club",
       "figuren": [
-        "fragfinn"
+        "super-toy-club"
       ],
       "frei": true
     },
     {
-      "id": "VSE5",
-      "uname": "meine-freundin-conni-vse5",
-      "titel": "Meine Freundin Conni",
+      "id": "VSE323",
+      "uname": "zig--sharko--meerjungfrauen-frisst-man-nicht-vse323",
+      "titel": "Zig & Sharko - Meerjungfrauen frisst man nicht!",
       "figuren": [
-        "meine-freundin-conni-pty99"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE106",
-      "uname": "woodiehoo-vse106",
-      "titel": "Woodiehoo",
-      "figuren": [
-        "woodiehoo"
+        "zig--sharko"
       ],
       "frei": true
-    },
-    {
-      "id": "VSE390",
-      "uname": "lana-longbeard-vse390",
-      "titel": "Lana Longbeard",
-      "figuren": [
-        "lana-longbeard-pty616"
-      ],
-      "frei": true
-    },
-    {
-      "id": "DSE5",
-      "uname": "toggo-hypezeit-dse5",
-      "titel": "TOGGO Hypezeit",
-      "figuren": [
-        "toggo-hypezeit-pty557"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE200",
-      "uname": "geolino-tv-vse200",
-      "titel": "GEOLINO TV",
-      "figuren": [
-        "geolino"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE201",
-      "uname": "geolino-tv--kurze-clips",
-      "titel": "GEOLINO TV - Kurze Clips",
-      "figuren": [
-        "geolino"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE445",
-      "uname": "floyd-fliege-vse445",
-      "titel": "Floyd Fliege",
-      "figuren": [
-        "floyd-fliege-pty668"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE444",
-      "uname": "grisu--der-kleine-drache-vse444",
-      "titel": "Grisu - Der kleine Drache",
-      "figuren": [
-        "grisu--der-kleine-drache-pty667"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE437",
-      "uname": "avatar--der-herr-der-elemente-vse437",
-      "titel": "Avatar - Der Herr der Elemente",
-      "figuren": [
-        "avatar--der-herr-der-elemente-pty658"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE433",
-      "uname": "haikyu-vse433",
-      "titel": "Haikyu!!",
-      "figuren": [
-        "haikyu-pty652"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE416",
-      "uname": "the-next-step-vse416",
-      "titel": "The Next Step",
-      "figuren": [
-        "the-next-step-pty640"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE422",
-      "uname": "gangnam-project-vse422",
-      "titel": "Gangnam Project",
-      "figuren": [
-        "gangnam-project-pty644"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE424",
-      "uname": "gangnam-project-musikclips-vse424",
-      "titel": "Gangnam Project Musikclips",
-      "figuren": [
-        "gangnam-project-pty644"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE415",
-      "uname": "pocoyo-vse415",
-      "titel": "Pocoyo",
-      "figuren": [
-        "pocoyo-pty636"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE440",
-      "uname": "pocoyo--kurze-clips-vse440",
-      "titel": "Pocoyo - Kurze Clips",
-      "figuren": [
-        "pocoyo-pty636"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE417",
-      "uname": "pocoyo-lieder-vse417",
-      "titel": "Pocoyo Songs",
-      "figuren": [
-        "pocoyo-pty636"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE418",
-      "uname": "pocoyo-specials-vse418",
-      "titel": "Pocoyo Specials",
-      "figuren": [
-        "pocoyo-pty636"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE421",
-      "uname": "fuse-vse421",
-      "titel": "FUSE",
-      "figuren": [
-        "fuse-pty642"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE441",
-      "uname": "gluecksbaerchis--entdecke-die-magie-vse441",
-      "titel": "Glücksbärchis - Entdecke die Magie",
-      "figuren": [
-        "gluecksbaerchis--entdecke-die-magie-pty662"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE446",
-      "uname": "dragon-ball-daima-vse446",
-      "titel": "Dragon Ball DAIMA",
-      "figuren": [
-        "dragon-ball-daima-pty669"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE439",
-      "uname": "toggo-liga-songs-vse439",
-      "titel": "TOGGO Liga Songs",
-      "figuren": [
-        "toggo-liga-pty632"
-      ],
-      "frei": true
-    },
-    {
-      "id": "DSE19",
-      "uname": "toggo-liga-dse19",
-      "titel": "TOGGO Liga",
-      "figuren": [
-        "toggo-liga-pty632"
-      ],
-      "frei": true
-    },
-    {
-      "id": "DSE18",
-      "uname": "toggo-liga-highlights-at-dse18",
-      "titel": "TOGGO Liga Highlights",
-      "figuren": [
-        "toggo-liga-pty632"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE403",
-      "uname": "gabbys-dollhouse-vse403",
-      "titel": "Gabby's Dollhouse",
-      "figuren": [
-        "gabbys-dollhouse-pty634"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE326",
-      "uname": "simsalagrimm-vse326",
-      "titel": "SimsalaGrimm",
-      "figuren": [
-        "simsalagrimm-pty572"
-      ],
-      "frei": false
     },
     {
       "id": "VSE123",
@@ -245,92 +29,29 @@
       "frei": true
     },
     {
-      "id": "VSE385",
-      "uname": "sylvanian-families-vse385",
-      "titel": "Sylvanian Families",
+      "id": "VSE88",
+      "uname": "fragfinn-vse88",
+      "titel": "fragFINN",
       "figuren": [
-        "sylvanian-families-pty613"
+        "fragfinn"
       ],
       "frei": true
     },
     {
-      "id": "VSE386",
-      "uname": "sylvanian-families--freyas-froehliches-tagebuch-vse386",
-      "titel": "Sylvanian Families - Freyas fröhliches Tagebuch",
+      "id": "VSE14",
+      "uname": "chuggington--die-loks-sind-los",
+      "titel": "Chuggington - Die Loks sind los!",
       "figuren": [
-        "sylvanian-families-pty613"
+        "chuggington"
       ],
       "frei": true
     },
     {
-      "id": "VSE293",
-      "uname": "billy--der-cowboy-hamster-vse293",
-      "titel": "Billy - Der Cowboy Hamster",
+      "id": "VSE85",
+      "uname": "moka--cherry--immer-unterwegs",
+      "titel": "Moka & Cherry - Immer unterwegs",
       "figuren": [
-        "billy--der-cowboy-hamster-pty559"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE460",
-      "uname": "wild-kat-vse460",
-      "titel": "Wild Kat",
-      "figuren": [
-        "wild-kat-pty680"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE212",
-      "uname": "mighty-express--superschnelle-zugfreunde-shorts",
-      "titel": "Mighty Express - Kurze Clips",
-      "figuren": [
-        "mighty-express"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE26",
-      "uname": "mighty-express--superschnelle-zugfreunde",
-      "titel": "Mighty Express - Superschnelle Zugfreunde",
-      "figuren": [
-        "mighty-express"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE341",
-      "uname": "die-kleine-prinzessin-vse341",
-      "titel": "Die Kleine Prinzessin",
-      "figuren": [
-        "die-kleine-prinzessin-pty588"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE115",
-      "uname": "lexi--lottie--detektive-im-doppelpack",
-      "titel": "Lexi & Lottie - Detektive im Doppelpack",
-      "figuren": [
-        "lexi--lottie"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE246",
-      "uname": "kruemelmonsters-foodie-truck-mit-steffen-henssler-vse246",
-      "titel": "Krümelmonsters Foodie Truck mit Steffen Henssler",
-      "figuren": [
-        "kruemelmonsters-foodie-truck"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE42",
-      "uname": "kingdom-force-vse42",
-      "titel": "Kingdom Force",
-      "figuren": [
-        "kingdom-force"
+        "moka--cherry"
       ],
       "frei": true
     },
@@ -344,42 +65,6 @@
       "frei": true
     },
     {
-      "id": "VSE435",
-      "uname": "captain-tsubasa--die-tollen-fusballstars-vse435",
-      "titel": "Captain Tsubasa - Die tollen Fußballstars",
-      "figuren": [
-        "captain-tsubasa-pty655"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE197",
-      "uname": "dino-ranch-vse197",
-      "titel": "Dino Ranch",
-      "figuren": [
-        "dino-ranch"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE203",
-      "uname": "dino-ranch-charaktere",
-      "titel": "Dino Ranch Shorts",
-      "figuren": [
-        "dino-ranch"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE247",
-      "uname": "petronix-defenders-vse247",
-      "titel": "Petronix Defenders",
-      "figuren": [
-        "petronix-defenders-pty526"
-      ],
-      "frei": true
-    },
-    {
       "id": "VSE83",
       "uname": "go-jetters-vse83",
       "titel": "Go Jetters",
@@ -389,13 +74,49 @@
       "frei": true
     },
     {
-      "id": "VSE290",
-      "uname": "heidi-vse290",
-      "titel": "Heidi",
+      "id": "VSE405",
+      "uname": "inside-ninja-academy-vse405",
+      "titel": "Inside Ninja Academy",
       "figuren": [
-        "heidi-pty555"
+        "ninja-warrior-germany-kids"
       ],
-      "frei": false
+      "frei": true
+    },
+    {
+      "id": "VSE412",
+      "uname": "ninja-warrior-germany-kids-academy-vse412",
+      "titel": "Ninja Warrior Germany Kids Academy",
+      "figuren": [
+        "ninja-warrior-germany-kids"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE62",
+      "uname": "bo-flo--co--familie-und-so",
+      "titel": "Bo, Flo & Co. - Familie und so",
+      "figuren": [
+        "bo-flo--co"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE67",
+      "uname": "die-supermonster-vse67",
+      "titel": "Die Supermonster",
+      "figuren": [
+        "die-supermonster"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE27",
+      "uname": "die-supermonster--monstertiere",
+      "titel": "Die Supermonster - Monstertiere",
+      "figuren": [
+        "die-supermonster"
+      ],
+      "frei": true
     },
     {
       "id": "VSE455",
@@ -425,506 +146,11 @@
       "frei": false
     },
     {
-      "id": "VSE208",
-      "uname": "karate-schaf-vse208",
-      "titel": "Karate Schaf",
+      "id": "VSE42",
+      "uname": "kingdom-force-vse42",
+      "titel": "Kingdom Force",
       "figuren": [
-        "karate-schaf"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE179",
-      "uname": "super-toy-club-vse179",
-      "titel": "Super Toy Club",
-      "figuren": [
-        "super-toy-club"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE391",
-      "uname": "willkommen-bei-den-echten-louds-vse391",
-      "titel": "Willkommen bei den echten Louds",
-      "figuren": [
-        "willkommen-bei-den-echten-louds-pty619"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE287",
-      "uname": "wickie-und-die-starken-maenner-vse287",
-      "titel": "Wickie und die starken Männer",
-      "figuren": [
-        "wickie-und-die-starken-maenner-pty553"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE260",
-      "uname": "hello-kitty-super-style-vse260",
-      "titel": "Hello Kitty: Super Style!",
-      "figuren": [
-        "hello-kitty-pty531"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE396",
-      "uname": "die-thundermans-vse396",
-      "titel": "Die Thundermans",
-      "figuren": [
-        "die-thundermans-pty625"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE451",
-      "uname": "die-thundermans-undercover-vse451",
-      "titel": "Die Thundermans: Undercover",
-      "figuren": [
-        "die-thundermans-pty625"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE285",
-      "uname": "agent-203-vse285",
-      "titel": "Agent 203",
-      "figuren": [
-        "agent-203-pty550"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE99",
-      "uname": "gigantosaurus-vse99",
-      "titel": "Gigantosaurus",
-      "figuren": [
-        "gigantosaurus"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE277",
-      "uname": "mystic--das-geheimnis-von-kauri-point-vse277",
-      "titel": "Mystic - Das Geheimnis von Kauri Point",
-      "figuren": [
-        "mystic--das-geheimnis-von-kauri-point-pty540"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE17",
-      "uname": "barbie--dreamtopia",
-      "titel": "Barbie - Dreamtopia",
-      "figuren": [
-        "barbie--dreamtopia-pty622"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE243",
-      "uname": "smash-vse243",
-      "titel": "S.M.A.S.H!",
-      "figuren": [
-        "smash-pty523"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE188",
-      "uname": "der-toggo-weihnachtstausch-vse188",
-      "titel": "Der TOGGO Weihnachtstausch",
-      "figuren": [
-        "der-toggo-tausch"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE194",
-      "uname": "der-toggo-wintertausch",
-      "titel": "Der TOGGO Wintertausch",
-      "figuren": [
-        "der-toggo-tausch"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE67",
-      "uname": "die-supermonster-vse67",
-      "titel": "Die Supermonster",
-      "figuren": [
-        "die-supermonster"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE27",
-      "uname": "die-supermonster--monstertiere",
-      "titel": "Die Supermonster - Monstertiere",
-      "figuren": [
-        "die-supermonster"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE284",
-      "uname": "die-biene-maja-vse284",
-      "titel": "Biene Maja",
-      "figuren": [
-        "die-biene-maja-pty546"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE410",
-      "uname": "ninja-warrior-academy-shorts-gg-vse410",
-      "titel": "Ninja Warrior Academy Shorts",
-      "figuren": [
-        "toggo-gg-pty530"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE395",
-      "uname": "toggo-gg--der-podcast-vse395",
-      "titel": "TOGGO GG - Der Podcast",
-      "figuren": [
-        "toggo-gg-pty530"
-      ],
-      "frei": true
-    },
-    {
-      "id": "DSE13",
-      "uname": "cozy-corner-dse13",
-      "titel": "Cozy Corner",
-      "figuren": [
-        "toggo-gg-pty530"
-      ],
-      "frei": true
-    },
-    {
-      "id": "DSE8",
-      "uname": "first-try-dse8",
-      "titel": "First Try",
-      "figuren": [
-        "toggo-gg-pty530"
-      ],
-      "frei": true
-    },
-    {
-      "id": "DSE7",
-      "uname": "fortnite-dse7",
-      "titel": "Fortnite",
-      "figuren": [
-        "toggo-gg-pty530"
-      ],
-      "frei": true
-    },
-    {
-      "id": "DSE16",
-      "uname": "gg-news-dse16",
-      "titel": "GG News",
-      "figuren": [
-        "toggo-gg-pty530"
-      ],
-      "frei": true
-    },
-    {
-      "id": "DSE11",
-      "uname": "komplett-eskaliert-dse11",
-      "titel": "Komplett eskaliert",
-      "figuren": [
-        "toggo-gg-pty530"
-      ],
-      "frei": true
-    },
-    {
-      "id": "DSE12",
-      "uname": "mario--friends-dse12",
-      "titel": "Mario & Friends",
-      "figuren": [
-        "toggo-gg-pty530"
-      ],
-      "frei": true
-    },
-    {
-      "id": "DSE9",
-      "uname": "minecraft-dse9",
-      "titel": "Minecraft",
-      "figuren": [
-        "toggo-gg-pty530"
-      ],
-      "frei": true
-    },
-    {
-      "id": "DSE6",
-      "uname": "roblox-dse6",
-      "titel": "Roblox",
-      "figuren": [
-        "toggo-gg-pty530"
-      ],
-      "frei": true
-    },
-    {
-      "id": "DSE21",
-      "uname": "toggo-gg-livestreams-dse21",
-      "titel": "TOGGO GG Livestreams",
-      "figuren": [
-        "toggo-gg-pty530"
-      ],
-      "frei": true
-    },
-    {
-      "id": "DSE17",
-      "uname": "story-game-dse17",
-      "titel": "TOGGO GG: Story Game",
-      "figuren": [
-        "toggo-gg-pty530"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE394",
-      "uname": "dragons--die-jungen-drachenretter-vse394",
-      "titel": "Dragons - Die jungen Drachenretter",
-      "figuren": [
-        "dragons--die-jungen-drachenretter-helden-der-luefte-pty623"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE324",
-      "uname": "dance-academy--tanz-deinen-traum-vse324",
-      "titel": "Dance Academy - Tanz Deinen Traum",
-      "figuren": [
-        "dance-academy--tanz-deinen-traum-pty570"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE164",
-      "uname": "44-cats-vse164",
-      "titel": "44 Cats",
-      "figuren": [
-        "44-cats"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE318",
-      "uname": "milo-vse318",
-      "titel": "Milo",
-      "figuren": [
-        "milo-pty567"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE23",
-      "uname": "gustavs-welt-vse23",
-      "titel": "Gustavs Welt",
-      "figuren": [
-        "gustavs-welt"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE331",
-      "uname": "find-me-in-paris-vse331",
-      "titel": "Find me in Paris",
-      "figuren": [
-        "find-me-in-paris-pty577"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE448",
-      "uname": "submarine-jim-vse448",
-      "titel": "Submarine Jim",
-      "figuren": [
-        "submarine-jim-pty676"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE452",
-      "uname": "submarine-jim--die-besten-momente-vse452",
-      "titel": "Submarine Jim - Die besten Momente",
-      "figuren": [
-        "submarine-jim-pty676"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE272",
-      "uname": "batwheels-vse272",
-      "titel": "Batwheels",
-      "figuren": [
-        "batwheels-pty539"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE58",
-      "uname": "mascha-und-der-baer-vse58",
-      "titel": "Mascha und der Bär",
-      "figuren": [
-        "mascha-und-der-baer-pty92"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE442",
-      "uname": "lauras-stern-vse442",
-      "titel": "Lauras Stern",
-      "figuren": [
-        "lauras-stern-pty665"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE334",
-      "uname": "lassie-vse334",
-      "titel": "Lassie",
-      "figuren": [
-        "lassie-pty580"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE110",
-      "uname": "camp-sumpfgrund-vse110",
-      "titel": "Camp Sumpfgrund",
-      "figuren": [
-        "camp-sumpfgrund-pty50"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE397",
-      "uname": "simon-vse397",
-      "titel": "Simon",
-      "figuren": [
-        "simon-pty626"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE449",
-      "uname": "baby-lemminge-vse449",
-      "titel": "Baby Lemminge",
-      "figuren": [
-        "baby-lemminge-pty678"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE265",
-      "uname": "he-man-and-the-masters-of-the-universe-vse265",
-      "titel": "He-Man and the Masters of the Universe",
-      "figuren": [
-        "he-man-pty535"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE401",
-      "uname": "spellbound--verzaubert-in-paris-vse401",
-      "titel": "Spellbound - Verzaubert in Paris",
-      "figuren": [
-        "spellbound--verzaubert-in-paris-pty631"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE237",
-      "uname": "jade-armor-vse237",
-      "titel": "Jade Armor",
-      "figuren": [
-        "jade-armor-pty521"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE450",
-      "uname": "witch-detectives-vse450",
-      "titel": "Witch Detectives",
-      "figuren": [
-        "witch-detectives-pty679"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE151",
-      "uname": "nexo-knights--die-ritter-der-zukunft",
-      "titel": "Nexo Knights - Die Ritter der Zukunft",
-      "figuren": [
-        "nexo-knights"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE327",
-      "uname": "h2o--ploetzlich-meerjungfrau-vse327",
-      "titel": "H2O - Plötzlich Meerjungfrau",
-      "figuren": [
-        "h2o-pty573"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE338",
-      "uname": "mako--einfach-meerjungfrau-vse338",
-      "titel": "Mako - Einfach Meerjungfrau",
-      "figuren": [
-        "h2o-pty573"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE328",
-      "uname": "h2o--abenteuer-meerjungfrau-vse328",
-      "titel": "H2O - Abenteuer Meerjungfrau",
-      "figuren": [
-        "h2o-pty573"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE349",
-      "uname": "sherlock-yack--der-zoodetektiv-vse349",
-      "titel": "Sherlock Yack - Der Zoodetektiv",
-      "figuren": [
-        "sherlock-yack--der-zoodetektiv-pty597"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE25",
-      "uname": "bob-der-baumeister-vse25",
-      "titel": "Bob der Baumeister",
-      "figuren": [
-        "bob-der-baumeister"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE73",
-      "uname": "bob-der-baumeister--kurze-clips",
-      "titel": "Bob der Baumeister - Kurze Clips",
-      "figuren": [
-        "bob-der-baumeister"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE429",
-      "uname": "die-eintracht-und-ich-vse429",
-      "titel": "Die Eintracht und Ich",
-      "figuren": [
-        "die-eintracht-und-ich-pty649"
+        "kingdom-force"
       ],
       "frei": true
     },
@@ -956,184 +182,121 @@
       "frei": true
     },
     {
-      "id": "VSE402",
-      "uname": "weasy-family-vse402",
-      "titel": "Weasy Family",
+      "id": "VSE358",
+      "uname": "die-casagrandes-vse358",
+      "titel": "Die Casagrandes",
       "figuren": [
-        "weasy-family-pty633"
+        "willkommen-bei-den-louds"
       ],
       "frei": true
     },
     {
-      "id": "VSE280",
-      "uname": "neue-geschichten-vom-pumuckl-vse280",
-      "titel": "Neue Geschichten vom Pumuckl",
+      "id": "VSE304",
+      "uname": "willkommen-bei-den-louds-vse304",
+      "titel": "Willkommen bei den Louds",
       "figuren": [
-        "neue-geschichten-vom-pumuckl-pty541"
+        "willkommen-bei-den-louds"
       ],
       "frei": true
     },
     {
-      "id": "VSE371",
-      "uname": "dora-vse371",
-      "titel": "Dora",
+      "id": "VSE44",
+      "uname": "brave-bunnies--hasenbande-unterwegs",
+      "titel": "Brave Bunnies - Hasenbande unterwegs",
       "figuren": [
-        "dora-pty609"
+        "brave-bunnies"
       ],
       "frei": true
     },
     {
-      "id": "VSE378",
-      "uname": "die-abenteuer-der-teenage-mutant-ninja-turtles-vse378",
-      "titel": "Die Abenteuer der Teenage Mutant Ninja Turtles",
+      "id": "VSE39",
+      "uname": "nova-one--mission-sonnenstaub",
+      "titel": "Nova One - Mission Sonnenstaub",
       "figuren": [
-        "teenage-mutant-ninja-turtles-pty612"
+        "nova-one"
       ],
       "frei": true
     },
     {
-      "id": "VSE21",
-      "uname": "caillou-vse21",
-      "titel": "Caillou",
+      "id": "VSE28",
+      "uname": "pikwik-pack-vse28",
+      "titel": "Pikwik Pack",
       "figuren": [
-        "caillou"
+        "pikwik-pack"
       ],
       "frei": true
     },
     {
-      "id": "VSE370",
-      "uname": "caillou-vse370",
-      "titel": "Caillou",
+      "id": "VSE31",
+      "uname": "idefix-und-die-unbeugsamen",
+      "titel": "Idefix und die Unbeugsamen",
       "figuren": [
-        "caillou"
+        "idefix"
       ],
       "frei": true
     },
     {
-      "id": "VSE275",
-      "uname": "monster-high-vse275",
-      "titel": "Monster High",
+      "id": "VSE120",
+      "uname": "familie-fox--die-geheimnishueter",
+      "titel": "Familie Fox - Die Geheimnishüter",
       "figuren": [
-        "monster-high-pty536"
+        "familie-fox"
       ],
       "frei": true
     },
     {
-      "id": "VSE335",
-      "uname": "robin-hood--schlitzohr-von-sherwood-vse335",
-      "titel": "Robin Hood - Schlitzohr von Sherwood",
+      "id": "VSE303",
+      "uname": "voll-zu-spaet-vse303",
+      "titel": "Voll zu spät!",
       "figuren": [
-        "robin-hood--schlitzohr-von-sherwood-pty583"
+        "voll-zu-spaet"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE23",
+      "uname": "gustavs-welt-vse23",
+      "titel": "Gustavs Welt",
+      "figuren": [
+        "gustavs-welt"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE25",
+      "uname": "bob-der-baumeister-vse25",
+      "titel": "Bob der Baumeister",
+      "figuren": [
+        "bob-der-baumeister"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE73",
+      "uname": "bob-der-baumeister--kurze-clips",
+      "titel": "Bob der Baumeister - Kurze Clips",
+      "figuren": [
+        "bob-der-baumeister"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE307",
+      "uname": "ranger-rob-vse307",
+      "titel": "Ranger Rob",
+      "figuren": [
+        "ranger-rob"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE5",
+      "uname": "meine-freundin-conni-vse5",
+      "titel": "Meine Freundin Conni",
+      "figuren": [
+        "meine-freundin-conni-pty99"
       ],
       "frei": false
-    },
-    {
-      "id": "VSE336",
-      "uname": "peter-pan--neue-abenteuer-vse336",
-      "titel": "Peter Pan - Neue Abenteuer",
-      "figuren": [
-        "peter-pan--neue-abenteuer-pty584"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE156",
-      "uname": "hotel-transsilvanien--die-serie",
-      "titel": "Hotel Transsilvanien - Die Serie",
-      "figuren": [
-        "hotel-transsilvanien"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE70",
-      "uname": "hotel-transsilvanien--kurze-clips",
-      "titel": "Hotel Transsilvanien - Kurze Clips",
-      "figuren": [
-        "hotel-transsilvanien"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE9",
-      "uname": "der-kleine-tiger-daniel-vse9",
-      "titel": "Der kleine Tiger Daniel",
-      "figuren": [
-        "der-kleine-tiger-daniel-pty118"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE345",
-      "uname": "wolfblood--verwandlung-bei-vollmond-vse345",
-      "titel": "Wolfblood - Verwandlung bei Vollmond",
-      "figuren": [
-        "wolfblood-pty591"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE343",
-      "uname": "wolfblood-entschluesselt-vse343",
-      "titel": "Wolfblood Entschlüsselt",
-      "figuren": [
-        "wolfblood-pty591"
-      ],
-      "frei": false
-    },
-    {
-      "id": "VSE309",
-      "uname": "kurze-geschichten-aus-der-unicorn-academy-vse309",
-      "titel": "Kurze Geschichten aus der Unicorn Academy",
-      "figuren": [
-        "unicorn-academy-pty562"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE376",
-      "uname": "unicorn-academy-vse376",
-      "titel": "Unicorn Academy",
-      "figuren": [
-        "unicorn-academy-pty562"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE377",
-      "uname": "unicorn-academy--wie-alles-begann-vse377",
-      "titel": "Unicorn Academy - Wie alles begann",
-      "figuren": [
-        "unicorn-academy-pty562"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE387",
-      "uname": "unicorn-academy-songs-vse387",
-      "titel": "Unicorn Academy Songs",
-      "figuren": [
-        "unicorn-academy-pty562"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE425",
-      "uname": "unicorn-academy-ein-legendaerer-sommer-vse425",
-      "titel": "Unicorn Academy: Ein legendärer Sommer",
-      "figuren": [
-        "unicorn-academy-pty562"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE457",
-      "uname": "unicorn-academy-wintersonnenwende-vse457",
-      "titel": "Unicorn Academy: Wintersonnenwende",
-      "figuren": [
-        "unicorn-academy-pty562"
-      ],
-      "frei": true
     },
     {
       "id": "VSE172",
@@ -1172,58 +335,13 @@
       "frei": true
     },
     {
-      "id": "VSE120",
-      "uname": "familie-fox--die-geheimnishueter",
-      "titel": "Familie Fox - Die Geheimnishüter",
+      "id": "VSE3",
+      "uname": "bibi-blocksberg-vse3",
+      "titel": "Bibi Blocksberg",
       "figuren": [
-        "familie-fox"
+        "bibi-blocksberg-pty95"
       ],
-      "frei": true
-    },
-    {
-      "id": "VSE85",
-      "uname": "moka--cherry--immer-unterwegs",
-      "titel": "Moka & Cherry - Immer unterwegs",
-      "figuren": [
-        "moka--cherry"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE13",
-      "uname": "benjamin-bluemchen-vse13",
-      "titel": "Benjamin Blümchen",
-      "figuren": [
-        "benjamin-bluemchen"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE393",
-      "uname": "benjamin-bluemchen-vse393",
-      "titel": "Benjamin Blümchen",
-      "figuren": [
-        "benjamin-bluemchen"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE31",
-      "uname": "idefix-und-die-unbeugsamen",
-      "titel": "Idefix und die Unbeugsamen",
-      "figuren": [
-        "idefix"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE39",
-      "uname": "nova-one--mission-sonnenstaub",
-      "titel": "Nova One - Mission Sonnenstaub",
-      "figuren": [
-        "nova-one"
-      ],
-      "frei": true
+      "frei": false
     },
     {
       "id": "VSE2",
@@ -1235,173 +353,29 @@
       "frei": false
     },
     {
-      "id": "VSE367",
-      "uname": "toggo-touchdown--being-a-falcon-vse367",
-      "titel": "Being a Falcon - Eine Saison mit den Cologne Falcons",
+      "id": "VSE58",
+      "uname": "mascha-und-der-baer-vse58",
+      "titel": "Mascha und der Bär",
       "figuren": [
-        "toggo-touchdown-pty534"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE365",
-      "uname": "toggo-touchdown-spotlights-vse365",
-      "titel": "TOGGO Touchdown - Das sind die Teams",
-      "figuren": [
-        "toggo-touchdown-pty534"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE264",
-      "uname": "toggo-touchdown-klasse-vse264",
-      "titel": "TOGGO Touchdown Klasse",
-      "figuren": [
-        "toggo-touchdown-pty534"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE384",
-      "uname": "toggo-touchdown-shorts-vse384",
-      "titel": "TOGGO Touchdown Shorts",
-      "figuren": [
-        "toggo-touchdown-pty534"
-      ],
-      "frei": true
-    },
-    {
-      "id": "DSE2",
-      "uname": "toggo-touchdown-fun--more-dse2",
-      "titel": "Inside TOGGO Touchdown",
-      "figuren": [
-        "toggo-touchdown-pty534"
-      ],
-      "frei": true
-    },
-    {
-      "id": "DSE3",
-      "uname": "toggo-touchdown-dse3",
-      "titel": "TOGGO Touchdown",
-      "figuren": [
-        "toggo-touchdown-pty534"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE47",
-      "uname": "100-wolf--die-legende-des-mondsteins",
-      "titel": "100% Wolf",
-      "figuren": [
-        "100-wolf"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE271",
-      "uname": "monster-loving-maniacs-vse271",
-      "titel": "Monster Loving Maniacs",
-      "figuren": [
-        "monster-loving-maniacs-pty538"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE242",
-      "uname": "sesame-streets-mecha-builders-vse242",
-      "titel": "Sesame Street's Mecha Builders",
-      "figuren": [
-        "sesame-streets-mecha-builders-pty522"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE255",
-      "uname": "dreamzzz--abenteuer-der-traumwelten-vse255",
-      "titel": "DreamZzz",
-      "figuren": [
-        "dreamzzz-pty529"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE294",
-      "uname": "rubble--crew-vse294",
-      "titel": "Rubble & Crew",
-      "figuren": [
-        "rubble--crew-pty561"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE305",
-      "uname": "rubble--crew--die-besten-momente-vse305",
-      "titel": "Rubble & Crew - Die besten Momente",
-      "figuren": [
-        "rubble--crew-pty561"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE413",
-      "uname": "rubble--crew--kurze-clips-vse413",
-      "titel": "Rubble & Crew - Kurze Clips",
-      "figuren": [
-        "rubble--crew-pty561"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE358",
-      "uname": "die-casagrandes-vse358",
-      "titel": "Die Casagrandes",
-      "figuren": [
-        "willkommen-bei-den-louds"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE304",
-      "uname": "willkommen-bei-den-louds-vse304",
-      "titel": "Willkommen bei den Louds",
-      "figuren": [
-        "willkommen-bei-den-louds"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE62",
-      "uname": "bo-flo--co--familie-und-so",
-      "titel": "Bo, Flo & Co. - Familie und so",
-      "figuren": [
-        "bo-flo--co"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE3",
-      "uname": "bibi-blocksberg-vse3",
-      "titel": "Bibi Blocksberg",
-      "figuren": [
-        "bibi-blocksberg-pty95"
+        "mascha-und-der-baer-pty92"
       ],
       "frei": false
     },
     {
-      "id": "VSE362",
-      "uname": "die-patrick-star-show-vse362",
-      "titel": "Die Patrick Star Show",
+      "id": "VSE164",
+      "uname": "44-cats-vse164",
+      "titel": "44 Cats",
       "figuren": [
-        "spongebob-schwammkopf"
+        "44-cats"
       ],
       "frei": true
     },
     {
-      "id": "VSE282",
-      "uname": "spongebob-schwammkopf-vse282",
-      "titel": "SpongeBob Schwammkopf",
+      "id": "VSE106",
+      "uname": "woodiehoo-vse106",
+      "titel": "Woodiehoo",
       "figuren": [
-        "spongebob-schwammkopf"
+        "woodiehoo"
       ],
       "frei": true
     },
@@ -1424,146 +398,20 @@
       "frei": true
     },
     {
-      "id": "VSE236",
-      "uname": "dragons--die-9-welten-vse236",
-      "titel": "Dragons - Die 9 Welten",
+      "id": "VSE99",
+      "uname": "gigantosaurus-vse99",
+      "titel": "Gigantosaurus",
       "figuren": [
-        "dragons"
+        "gigantosaurus"
       ],
       "frei": true
     },
     {
-      "id": "VSE238",
-      "uname": "dragons--die-9-welten-kurze-clips-vse238",
-      "titel": "Dragons - Die 9 Welten Kurze Clips",
+      "id": "VSE183",
+      "uname": "go-wild--mission-wildnis",
+      "titel": "Go Wild! - Mission Wildnis",
       "figuren": [
-        "dragons"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE44",
-      "uname": "brave-bunnies--hasenbande-unterwegs",
-      "titel": "Brave Bunnies - Hasenbande unterwegs",
-      "figuren": [
-        "brave-bunnies"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE323",
-      "uname": "zig--sharko--meerjungfrauen-frisst-man-nicht-vse323",
-      "titel": "Zig & Sharko - Meerjungfrauen frisst man nicht!",
-      "figuren": [
-        "zig--sharko"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE28",
-      "uname": "pikwik-pack-vse28",
-      "titel": "Pikwik Pack",
-      "figuren": [
-        "pikwik-pack"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE307",
-      "uname": "ranger-rob-vse307",
-      "titel": "Ranger Rob",
-      "figuren": [
-        "ranger-rob"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE154",
-      "uname": "die-nektons--abenteurer-der-tiefe",
-      "titel": "Die Nektons - Abenteurer der Tiefe",
-      "figuren": [
-        "die-nektons"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE49",
-      "uname": "scooby-doo-und-wer-bist-du-vse49",
-      "titel": "Scooby-Doo und wer bist Du?",
-      "figuren": [
-        "scooby-doo-pty178"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE43",
-      "uname": "das-okto-lied",
-      "titel": "Das Okto-Lied",
-      "figuren": [
-        "die-oktonauten"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE18",
-      "uname": "die-oktonauten-vse18",
-      "titel": "Die Oktonauten",
-      "figuren": [
-        "die-oktonauten"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE263",
-      "uname": "die-oktonauten-auf-dem-festland-vse263",
-      "titel": "Die Oktonauten auf dem Festland",
-      "figuren": [
-        "die-oktonauten"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE22",
-      "uname": "peppa-pig-vse22",
-      "titel": "Peppa Pig",
-      "figuren": [
-        "peppa-pig"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE322",
-      "uname": "peppa-pig--kurze-clips-vse322",
-      "titel": "Peppa Pig - Kurze Clips",
-      "figuren": [
-        "peppa-pig"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE14",
-      "uname": "chuggington--die-loks-sind-los",
-      "titel": "Chuggington - Die Loks sind los!",
-      "figuren": [
-        "chuggington"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE372",
-      "uname": "beyblade-burst-quadstrike-vse372",
-      "titel": "BEYBLADE BURST QUADSTRIKE",
-      "figuren": [
-        "beyblade-x-pty605"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE359",
-      "uname": "beyblade-x-vse359",
-      "titel": "BEYBLADE X",
-      "figuren": [
-        "beyblade-x-pty605"
+        "go-wild"
       ],
       "frei": true
     },
@@ -1631,47 +479,515 @@
       "frei": true
     },
     {
-      "id": "VSE262",
-      "uname": "barbie--ein-verborgener-zauber-vse262",
-      "titel": "Barbie - Ein verborgener Zauber",
+      "id": "VSE397",
+      "uname": "simon-vse397",
+      "titel": "Simon",
       "figuren": [
-        "barbie"
+        "simon-pty626"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE396",
+      "uname": "die-thundermans-vse396",
+      "titel": "Die Thundermans",
+      "figuren": [
+        "die-thundermans-pty625"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE451",
+      "uname": "die-thundermans-undercover-vse451",
+      "titel": "Die Thundermans: Undercover",
+      "figuren": [
+        "die-thundermans-pty625"
       ],
       "frei": true
     },
     {
-      "id": "VSE207",
-      "uname": "barbie-im-doppelpack--musikclips",
-      "titel": "Barbie - Musikclips",
+      "id": "VSE394",
+      "uname": "dragons--die-jungen-drachenretter-vse394",
+      "titel": "Dragons - Die jungen Drachenretter",
       "figuren": [
-        "barbie"
+        "dragons--die-jungen-drachenretter-helden-der-luefte-pty623"
       ],
       "frei": true
     },
     {
-      "id": "VSE204",
-      "uname": "barbie-im-doppelpack",
-      "titel": "Barbie im Doppelpack",
+      "id": "VSE391",
+      "uname": "willkommen-bei-den-echten-louds-vse391",
+      "titel": "Willkommen bei den echten Louds",
       "figuren": [
-        "barbie"
+        "willkommen-bei-den-echten-louds-pty619"
       ],
       "frei": true
     },
     {
-      "id": "VSE173",
-      "uname": "super-wings-vse173",
-      "titel": "Super Wings",
+      "id": "VSE378",
+      "uname": "die-abenteuer-der-teenage-mutant-ninja-turtles-vse378",
+      "titel": "Die Abenteuer der Teenage Mutant Ninja Turtles",
       "figuren": [
-        "super-wings"
+        "teenage-mutant-ninja-turtles-pty612"
       ],
       "frei": true
     },
     {
-      "id": "VSE183",
-      "uname": "go-wild--mission-wildnis",
-      "titel": "Go Wild! - Mission Wildnis",
+      "id": "VSE390",
+      "uname": "lana-longbeard-vse390",
+      "titel": "Lana Longbeard",
       "figuren": [
-        "go-wild"
+        "lana-longbeard-pty616"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE371",
+      "uname": "dora-vse371",
+      "titel": "Dora",
+      "figuren": [
+        "dora-pty609"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE385",
+      "uname": "sylvanian-families-vse385",
+      "titel": "Sylvanian Families",
+      "figuren": [
+        "sylvanian-families-pty613"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE386",
+      "uname": "sylvanian-families--freyas-froehliches-tagebuch-vse386",
+      "titel": "Sylvanian Families - Freyas fröhliches Tagebuch",
+      "figuren": [
+        "sylvanian-families-pty613"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE369",
+      "uname": "inside-uferpark-vse369",
+      "titel": "Inside Uferpark",
+      "figuren": [
+        "uferpark--gute-zeiten-wilde-zeiten-pty608"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE375",
+      "uname": "uferpark--gute-zeiten-wilde-zeiten-vse375",
+      "titel": "Uferpark - Gute Zeiten, wilde Zeiten",
+      "figuren": [
+        "uferpark--gute-zeiten-wilde-zeiten-pty608"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE372",
+      "uname": "beyblade-burst-quadstrike-vse372",
+      "titel": "BEYBLADE BURST QUADSTRIKE",
+      "figuren": [
+        "beyblade-x-pty605"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE359",
+      "uname": "beyblade-x-vse359",
+      "titel": "BEYBLADE X",
+      "figuren": [
+        "beyblade-x-pty605"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE349",
+      "uname": "sherlock-yack--der-zoodetektiv-vse349",
+      "titel": "Sherlock Yack - Der Zoodetektiv",
+      "figuren": [
+        "sherlock-yack--der-zoodetektiv-pty597"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE389",
+      "uname": "boruto-naruto-next-generations-vse389",
+      "titel": "Boruto: Naruto Next Generations",
+      "figuren": [
+        "naruto-pty606"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE361",
+      "uname": "naruto-vse361",
+      "titel": "Naruto",
+      "figuren": [
+        "naruto-pty606"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE379",
+      "uname": "naruto-shippuden-vse379",
+      "titel": "Naruto Shippuden",
+      "figuren": [
+        "naruto-pty606"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE336",
+      "uname": "peter-pan--neue-abenteuer-vse336",
+      "titel": "Peter Pan - Neue Abenteuer",
+      "figuren": [
+        "peter-pan--neue-abenteuer-pty584"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE341",
+      "uname": "die-kleine-prinzessin-vse341",
+      "titel": "Die Kleine Prinzessin",
+      "figuren": [
+        "die-kleine-prinzessin-pty588"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE345",
+      "uname": "wolfblood--verwandlung-bei-vollmond-vse345",
+      "titel": "Wolfblood - Verwandlung bei Vollmond",
+      "figuren": [
+        "wolfblood-pty591"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE343",
+      "uname": "wolfblood-entschluesselt-vse343",
+      "titel": "Wolfblood Entschlüsselt",
+      "figuren": [
+        "wolfblood-pty591"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE334",
+      "uname": "lassie-vse334",
+      "titel": "Lassie",
+      "figuren": [
+        "lassie-pty580"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE331",
+      "uname": "find-me-in-paris-vse331",
+      "titel": "Find me in Paris",
+      "figuren": [
+        "find-me-in-paris-pty577"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE326",
+      "uname": "simsalagrimm-vse326",
+      "titel": "SimsalaGrimm",
+      "figuren": [
+        "simsalagrimm-pty572"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE328",
+      "uname": "h2o--abenteuer-meerjungfrau-vse328",
+      "titel": "H2O - Abenteuer Meerjungfrau",
+      "figuren": [
+        "h2o-pty573"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE327",
+      "uname": "h2o--ploetzlich-meerjungfrau-vse327",
+      "titel": "H2O - Plötzlich Meerjungfrau",
+      "figuren": [
+        "h2o-pty573"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE338",
+      "uname": "mako--einfach-meerjungfrau-vse338",
+      "titel": "Mako - Einfach Meerjungfrau",
+      "figuren": [
+        "h2o-pty573"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE324",
+      "uname": "dance-academy--tanz-deinen-traum-vse324",
+      "titel": "Dance Academy - Tanz Deinen Traum",
+      "figuren": [
+        "dance-academy--tanz-deinen-traum-pty570"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE318",
+      "uname": "milo-vse318",
+      "titel": "Milo",
+      "figuren": [
+        "milo-pty567"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE293",
+      "uname": "billy--der-cowboy-hamster-vse293",
+      "titel": "Billy - Der Cowboy Hamster",
+      "figuren": [
+        "billy--der-cowboy-hamster-pty559"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE290",
+      "uname": "heidi-vse290",
+      "titel": "Heidi",
+      "figuren": [
+        "heidi-pty555"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE287",
+      "uname": "wickie-und-die-starken-maenner-vse287",
+      "titel": "Wickie und die starken Männer",
+      "figuren": [
+        "wickie-und-die-starken-maenner-pty553"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE277",
+      "uname": "mystic--das-geheimnis-von-kauri-point-vse277",
+      "titel": "Mystic - Das Geheimnis von Kauri Point",
+      "figuren": [
+        "mystic--das-geheimnis-von-kauri-point-pty540"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE280",
+      "uname": "neue-geschichten-vom-pumuckl-vse280",
+      "titel": "Neue Geschichten vom Pumuckl",
+      "figuren": [
+        "neue-geschichten-vom-pumuckl-pty541"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE271",
+      "uname": "monster-loving-maniacs-vse271",
+      "titel": "Monster Loving Maniacs",
+      "figuren": [
+        "monster-loving-maniacs-pty538"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE275",
+      "uname": "monster-high-vse275",
+      "titel": "Monster High",
+      "figuren": [
+        "monster-high-pty536"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE270",
+      "uname": "baby-born-vse270",
+      "titel": "BABY born",
+      "figuren": [
+        "baby-born-pty537"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE255",
+      "uname": "dreamzzz--abenteuer-der-traumwelten-vse255",
+      "titel": "DreamZzz",
+      "figuren": [
+        "dreamzzz-pty529"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE254",
+      "uname": "haus-anubis-das-vse254",
+      "titel": "Das Haus Anubis",
+      "figuren": [
+        "das-haus-anubis-pty528"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE246",
+      "uname": "kruemelmonsters-foodie-truck-mit-steffen-henssler-vse246",
+      "titel": "Krümelmonsters Foodie Truck mit Steffen Henssler",
+      "figuren": [
+        "kruemelmonsters-foodie-truck"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE243",
+      "uname": "smash-vse243",
+      "titel": "S.M.A.S.H!",
+      "figuren": [
+        "smash-pty523"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE247",
+      "uname": "petronix-defenders-vse247",
+      "titel": "Petronix Defenders",
+      "figuren": [
+        "petronix-defenders-pty526"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE242",
+      "uname": "sesame-streets-mecha-builders-vse242",
+      "titel": "Sesame Street's Mecha Builders",
+      "figuren": [
+        "sesame-streets-mecha-builders-pty522"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE208",
+      "uname": "karate-schaf-vse208",
+      "titel": "Karate Schaf",
+      "figuren": [
+        "karate-schaf"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE197",
+      "uname": "dino-ranch-vse197",
+      "titel": "Dino Ranch",
+      "figuren": [
+        "dino-ranch"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE203",
+      "uname": "dino-ranch-charaktere",
+      "titel": "Dino Ranch Shorts",
+      "figuren": [
+        "dino-ranch"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE381",
+      "uname": "toggo-adventskalender-vse381",
+      "titel": "TOGGO Adventskalender",
+      "figuren": [
+        "toggo-adventskalender-pty508"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE200",
+      "uname": "geolino-tv-vse200",
+      "titel": "GEOLINO TV",
+      "figuren": [
+        "geolino"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE201",
+      "uname": "geolino-tv--kurze-clips",
+      "titel": "GEOLINO TV - Kurze Clips",
+      "figuren": [
+        "geolino"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE188",
+      "uname": "der-toggo-weihnachtstausch-vse188",
+      "titel": "Der TOGGO Weihnachtstausch",
+      "figuren": [
+        "der-toggo-tausch"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE194",
+      "uname": "der-toggo-wintertausch",
+      "titel": "Der TOGGO Wintertausch",
+      "figuren": [
+        "der-toggo-tausch"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE156",
+      "uname": "hotel-transsilvanien--die-serie",
+      "titel": "Hotel Transsilvanien - Die Serie",
+      "figuren": [
+        "hotel-transsilvanien"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE70",
+      "uname": "hotel-transsilvanien--kurze-clips",
+      "titel": "Hotel Transsilvanien - Kurze Clips",
+      "figuren": [
+        "hotel-transsilvanien"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE154",
+      "uname": "die-nektons--abenteurer-der-tiefe",
+      "titel": "Die Nektons - Abenteurer der Tiefe",
+      "figuren": [
+        "die-nektons"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE151",
+      "uname": "nexo-knights--die-ritter-der-zukunft",
+      "titel": "Nexo Knights - Die Ritter der Zukunft",
+      "figuren": [
+        "nexo-knights"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE315",
+      "uname": "alvinnn-und-die-chipmunks-vse315",
+      "titel": "ALVINNN!!! und die Chipmunks",
+      "figuren": [
+        "alvinnn-und-die-chipmunks"
       ],
       "frei": true
     },
@@ -1820,130 +1136,229 @@
       "frei": true
     },
     {
-      "id": "VSE302",
-      "uname": "paw-patrol--helfer-auf-vier-pfoten-vse302",
-      "titel": "PAW Patrol - Helfer auf vier Pfoten",
+      "id": "VSE320",
+      "uname": "grizzy--die-lemminge-vse320",
+      "titel": "Grizzy & die Lemminge",
       "figuren": [
-        "paw-patrol"
+        "grizzy--die-lemminge"
       ],
       "frei": true
     },
     {
-      "id": "VSE101",
-      "uname": "paw-patrol--kurze-clips",
-      "titel": "PAW Patrol - Kurze Clips",
+      "id": "VSE231",
+      "uname": "grizzy--die-lemminge--kurze-clips-vse231",
+      "titel": "Grizzy & die Lemminge - Kurze Clips",
       "figuren": [
-        "paw-patrol"
+        "grizzy--die-lemminge"
       ],
       "frei": true
     },
     {
-      "id": "VSE314",
-      "uname": "angelo-vse314",
-      "titel": "Angelo!",
+      "id": "VSE362",
+      "uname": "die-patrick-star-show-vse362",
+      "titel": "Die Patrick Star Show",
       "figuren": [
-        "angelo"
+        "spongebob-schwammkopf"
       ],
       "frei": true
     },
     {
-      "id": "VSE458",
-      "uname": "angelos-tipps-vse458",
-      "titel": "Angelos Tipps",
+      "id": "VSE282",
+      "uname": "spongebob-schwammkopf-vse282",
+      "titel": "SpongeBob Schwammkopf",
       "figuren": [
-        "angelo"
+        "spongebob-schwammkopf"
       ],
       "frei": true
     },
     {
-      "id": "VSE389",
-      "uname": "boruto-naruto-next-generations-vse389",
-      "titel": "Boruto: Naruto Next Generations",
+      "id": "VSE401",
+      "uname": "spellbound--verzaubert-in-paris-vse401",
+      "titel": "Spellbound - Verzaubert in Paris",
       "figuren": [
-        "naruto-pty606"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE361",
-      "uname": "naruto-vse361",
-      "titel": "Naruto",
-      "figuren": [
-        "naruto-pty606"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE379",
-      "uname": "naruto-shippuden-vse379",
-      "titel": "Naruto Shippuden",
-      "figuren": [
-        "naruto-pty606"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE315",
-      "uname": "alvinnn-und-die-chipmunks-vse315",
-      "titel": "ALVINNN!!! und die Chipmunks",
-      "figuren": [
-        "alvinnn-und-die-chipmunks"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE303",
-      "uname": "voll-zu-spaet-vse303",
-      "titel": "Voll zu spät!",
-      "figuren": [
-        "voll-zu-spaet"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE369",
-      "uname": "inside-uferpark-vse369",
-      "titel": "Inside Uferpark",
-      "figuren": [
-        "uferpark--gute-zeiten-wilde-zeiten-pty608"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE375",
-      "uname": "uferpark--gute-zeiten-wilde-zeiten-vse375",
-      "titel": "Uferpark - Gute Zeiten, wilde Zeiten",
-      "figuren": [
-        "uferpark--gute-zeiten-wilde-zeiten-pty608"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE360",
-      "uname": "friends-das-naechste-kapitel-vse360",
-      "titel": "Friends: Das nächste Kapitel",
-      "figuren": [
-        "friends"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE381",
-      "uname": "toggo-adventskalender-vse381",
-      "titel": "TOGGO Adventskalender",
-      "figuren": [
-        "toggo-adventskalender-pty508"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE254",
-      "uname": "haus-anubis-das-vse254",
-      "titel": "Das Haus Anubis",
-      "figuren": [
-        "das-haus-anubis-pty528"
+        "spellbound--verzaubert-in-paris-pty631"
       ],
       "frei": false
+    },
+    {
+      "id": "VSE450",
+      "uname": "witch-detectives-vse450",
+      "titel": "Witch Detectives",
+      "figuren": [
+        "witch-detectives-pty679"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE460",
+      "uname": "wild-kat-vse460",
+      "titel": "Wild Kat",
+      "figuren": [
+        "wild-kat-pty680"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE448",
+      "uname": "submarine-jim-vse448",
+      "titel": "Submarine Jim",
+      "figuren": [
+        "submarine-jim-pty676"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE452",
+      "uname": "submarine-jim--die-besten-momente-vse452",
+      "titel": "Submarine Jim - Die besten Momente",
+      "figuren": [
+        "submarine-jim-pty676"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE446",
+      "uname": "dragon-ball-daima-vse446",
+      "titel": "Dragon Ball DAIMA",
+      "figuren": [
+        "dragon-ball-daima-pty669"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE445",
+      "uname": "floyd-fliege-vse445",
+      "titel": "Floyd Fliege",
+      "figuren": [
+        "floyd-fliege-pty668"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE444",
+      "uname": "grisu--der-kleine-drache-vse444",
+      "titel": "Grisu - Der kleine Drache",
+      "figuren": [
+        "grisu--der-kleine-drache-pty667"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE442",
+      "uname": "lauras-stern-vse442",
+      "titel": "Lauras Stern",
+      "figuren": [
+        "lauras-stern-pty665"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE437",
+      "uname": "avatar--der-herr-der-elemente-vse437",
+      "titel": "Avatar - Der Herr der Elemente",
+      "figuren": [
+        "avatar--der-herr-der-elemente-pty658"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE435",
+      "uname": "captain-tsubasa--die-tollen-fusballstars-vse435",
+      "titel": "Captain Tsubasa - Die tollen Fußballstars",
+      "figuren": [
+        "captain-tsubasa-pty655"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE429",
+      "uname": "die-eintracht-und-ich-vse429",
+      "titel": "Die Eintracht und Ich",
+      "figuren": [
+        "die-eintracht-und-ich-pty649"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE433",
+      "uname": "haikyu-vse433",
+      "titel": "Haikyu!!",
+      "figuren": [
+        "haikyu-pty652"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE439",
+      "uname": "toggo-liga-songs-vse439",
+      "titel": "TOGGO Liga Songs",
+      "figuren": [
+        "toggo-liga-pty632"
+      ],
+      "frei": true
+    },
+    {
+      "id": "DSE19",
+      "uname": "toggo-liga-dse19",
+      "titel": "TOGGO Liga",
+      "figuren": [
+        "toggo-liga-pty632"
+      ],
+      "frei": true
+    },
+    {
+      "id": "DSE18",
+      "uname": "toggo-liga-highlights-at-dse18",
+      "titel": "TOGGO Liga Highlights",
+      "figuren": [
+        "toggo-liga-pty632"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE416",
+      "uname": "the-next-step-vse416",
+      "titel": "The Next Step",
+      "figuren": [
+        "the-next-step-pty640"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE415",
+      "uname": "pocoyo-vse415",
+      "titel": "Pocoyo",
+      "figuren": [
+        "pocoyo-pty636"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE440",
+      "uname": "pocoyo--kurze-clips-vse440",
+      "titel": "Pocoyo - Kurze Clips",
+      "figuren": [
+        "pocoyo-pty636"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE417",
+      "uname": "pocoyo-lieder-vse417",
+      "titel": "Pocoyo Songs",
+      "figuren": [
+        "pocoyo-pty636"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE418",
+      "uname": "pocoyo-specials-vse418",
+      "titel": "Pocoyo Specials",
+      "figuren": [
+        "pocoyo-pty636"
+      ],
+      "frei": true
     },
     {
       "id": "VSE428",
@@ -1973,20 +1388,659 @@
       "frei": false
     },
     {
-      "id": "VSE405",
-      "uname": "inside-ninja-academy-vse405",
-      "titel": "Inside Ninja Academy",
+      "id": "VSE422",
+      "uname": "gangnam-project-vse422",
+      "titel": "Gangnam Project",
       "figuren": [
-        "ninja-warrior-germany-kids"
+        "gangnam-project-pty644"
       ],
       "frei": true
     },
     {
-      "id": "VSE412",
-      "uname": "ninja-warrior-germany-kids-academy-vse412",
-      "titel": "Ninja Warrior Germany Kids Academy",
+      "id": "VSE424",
+      "uname": "gangnam-project-musikclips-vse424",
+      "titel": "Gangnam Project Musikclips",
       "figuren": [
-        "ninja-warrior-germany-kids"
+        "gangnam-project-pty644"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE421",
+      "uname": "fuse-vse421",
+      "titel": "FUSE",
+      "figuren": [
+        "fuse-pty642"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE260",
+      "uname": "hello-kitty-super-style-vse260",
+      "titel": "Hello Kitty: Super Style!",
+      "figuren": [
+        "hello-kitty-pty531"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE212",
+      "uname": "mighty-express--superschnelle-zugfreunde-shorts",
+      "titel": "Mighty Express - Kurze Clips",
+      "figuren": [
+        "mighty-express"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE26",
+      "uname": "mighty-express--superschnelle-zugfreunde",
+      "titel": "Mighty Express - Superschnelle Zugfreunde",
+      "figuren": [
+        "mighty-express"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE21",
+      "uname": "caillou-vse21",
+      "titel": "Caillou",
+      "figuren": [
+        "caillou"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE370",
+      "uname": "caillou-vse370",
+      "titel": "Caillou",
+      "figuren": [
+        "caillou"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE367",
+      "uname": "toggo-touchdown--being-a-falcon-vse367",
+      "titel": "Being a Falcon - Eine Saison mit den Cologne Falcons",
+      "figuren": [
+        "toggo-touchdown-pty534"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE365",
+      "uname": "toggo-touchdown-spotlights-vse365",
+      "titel": "TOGGO Touchdown - Das sind die Teams",
+      "figuren": [
+        "toggo-touchdown-pty534"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE264",
+      "uname": "toggo-touchdown-klasse-vse264",
+      "titel": "TOGGO Touchdown Klasse",
+      "figuren": [
+        "toggo-touchdown-pty534"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE384",
+      "uname": "toggo-touchdown-shorts-vse384",
+      "titel": "TOGGO Touchdown Shorts",
+      "figuren": [
+        "toggo-touchdown-pty534"
+      ],
+      "frei": true
+    },
+    {
+      "id": "DSE2",
+      "uname": "toggo-touchdown-fun--more-dse2",
+      "titel": "Inside TOGGO Touchdown",
+      "figuren": [
+        "toggo-touchdown-pty534"
+      ],
+      "frei": true
+    },
+    {
+      "id": "DSE3",
+      "uname": "toggo-touchdown-dse3",
+      "titel": "TOGGO Touchdown",
+      "figuren": [
+        "toggo-touchdown-pty534"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE314",
+      "uname": "angelo-vse314",
+      "titel": "Angelo!",
+      "figuren": [
+        "angelo"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE458",
+      "uname": "angelos-tipps-vse458",
+      "titel": "Angelos Tipps",
+      "figuren": [
+        "angelo"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE22",
+      "uname": "peppa-pig-vse22",
+      "titel": "Peppa Pig",
+      "figuren": [
+        "peppa-pig"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE322",
+      "uname": "peppa-pig--kurze-clips-vse322",
+      "titel": "Peppa Pig - Kurze Clips",
+      "figuren": [
+        "peppa-pig"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE237",
+      "uname": "jade-armor-vse237",
+      "titel": "Jade Armor",
+      "figuren": [
+        "jade-armor-pty521"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE285",
+      "uname": "agent-203-vse285",
+      "titel": "Agent 203",
+      "figuren": [
+        "agent-203-pty550"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE302",
+      "uname": "paw-patrol--helfer-auf-vier-pfoten-vse302",
+      "titel": "PAW Patrol - Helfer auf vier Pfoten",
+      "figuren": [
+        "paw-patrol"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE101",
+      "uname": "paw-patrol--kurze-clips",
+      "titel": "PAW Patrol - Kurze Clips",
+      "figuren": [
+        "paw-patrol"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE294",
+      "uname": "rubble--crew-vse294",
+      "titel": "Rubble & Crew",
+      "figuren": [
+        "rubble--crew-pty561"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE305",
+      "uname": "rubble--crew--die-besten-momente-vse305",
+      "titel": "Rubble & Crew - Die besten Momente",
+      "figuren": [
+        "rubble--crew-pty561"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE413",
+      "uname": "rubble--crew--kurze-clips-vse413",
+      "titel": "Rubble & Crew - Kurze Clips",
+      "figuren": [
+        "rubble--crew-pty561"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE236",
+      "uname": "dragons--die-9-welten-vse236",
+      "titel": "Dragons - Die 9 Welten",
+      "figuren": [
+        "dragons"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE238",
+      "uname": "dragons--die-9-welten-kurze-clips-vse238",
+      "titel": "Dragons - Die 9 Welten Kurze Clips",
+      "figuren": [
+        "dragons"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE13",
+      "uname": "benjamin-bluemchen-vse13",
+      "titel": "Benjamin Blümchen",
+      "figuren": [
+        "benjamin-bluemchen"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE393",
+      "uname": "benjamin-bluemchen-vse393",
+      "titel": "Benjamin Blümchen",
+      "figuren": [
+        "benjamin-bluemchen"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE173",
+      "uname": "super-wings-vse173",
+      "titel": "Super Wings",
+      "figuren": [
+        "super-wings"
+      ],
+      "frei": true
+    },
+    {
+      "id": "DSE5",
+      "uname": "toggo-hypezeit-dse5",
+      "titel": "TOGGO Hypezeit",
+      "figuren": [
+        "toggo-hypezeit-pty557"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE410",
+      "uname": "ninja-warrior-academy-shorts-gg-vse410",
+      "titel": "Ninja Warrior Academy Shorts",
+      "figuren": [
+        "toggo-gg-pty530"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE395",
+      "uname": "toggo-gg--der-podcast-vse395",
+      "titel": "TOGGO GG - Der Podcast",
+      "figuren": [
+        "toggo-gg-pty530"
+      ],
+      "frei": true
+    },
+    {
+      "id": "DSE13",
+      "uname": "cozy-corner-dse13",
+      "titel": "Cozy Corner",
+      "figuren": [
+        "toggo-gg-pty530"
+      ],
+      "frei": true
+    },
+    {
+      "id": "DSE8",
+      "uname": "first-try-dse8",
+      "titel": "First Try",
+      "figuren": [
+        "toggo-gg-pty530"
+      ],
+      "frei": true
+    },
+    {
+      "id": "DSE7",
+      "uname": "fortnite-dse7",
+      "titel": "Fortnite",
+      "figuren": [
+        "toggo-gg-pty530"
+      ],
+      "frei": true
+    },
+    {
+      "id": "DSE16",
+      "uname": "gg-news-dse16",
+      "titel": "GG News",
+      "figuren": [
+        "toggo-gg-pty530"
+      ],
+      "frei": true
+    },
+    {
+      "id": "DSE11",
+      "uname": "komplett-eskaliert-dse11",
+      "titel": "Komplett eskaliert",
+      "figuren": [
+        "toggo-gg-pty530"
+      ],
+      "frei": true
+    },
+    {
+      "id": "DSE12",
+      "uname": "mario--friends-dse12",
+      "titel": "Mario & Friends",
+      "figuren": [
+        "toggo-gg-pty530"
+      ],
+      "frei": true
+    },
+    {
+      "id": "DSE9",
+      "uname": "minecraft-dse9",
+      "titel": "Minecraft",
+      "figuren": [
+        "toggo-gg-pty530"
+      ],
+      "frei": true
+    },
+    {
+      "id": "DSE6",
+      "uname": "roblox-dse6",
+      "titel": "Roblox",
+      "figuren": [
+        "toggo-gg-pty530"
+      ],
+      "frei": true
+    },
+    {
+      "id": "DSE21",
+      "uname": "toggo-gg-livestreams-dse21",
+      "titel": "TOGGO GG Livestreams",
+      "figuren": [
+        "toggo-gg-pty530"
+      ],
+      "frei": true
+    },
+    {
+      "id": "DSE17",
+      "uname": "story-game-dse17",
+      "titel": "TOGGO GG: Story Game",
+      "figuren": [
+        "toggo-gg-pty530"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE309",
+      "uname": "kurze-geschichten-aus-der-unicorn-academy-vse309",
+      "titel": "Kurze Geschichten aus der Unicorn Academy",
+      "figuren": [
+        "unicorn-academy-pty562"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE376",
+      "uname": "unicorn-academy-vse376",
+      "titel": "Unicorn Academy",
+      "figuren": [
+        "unicorn-academy-pty562"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE377",
+      "uname": "unicorn-academy--wie-alles-begann-vse377",
+      "titel": "Unicorn Academy - Wie alles begann",
+      "figuren": [
+        "unicorn-academy-pty562"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE387",
+      "uname": "unicorn-academy-songs-vse387",
+      "titel": "Unicorn Academy Songs",
+      "figuren": [
+        "unicorn-academy-pty562"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE425",
+      "uname": "unicorn-academy-ein-legendaerer-sommer-vse425",
+      "titel": "Unicorn Academy: Ein legendärer Sommer",
+      "figuren": [
+        "unicorn-academy-pty562"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE457",
+      "uname": "unicorn-academy-wintersonnenwende-vse457",
+      "titel": "Unicorn Academy: Wintersonnenwende",
+      "figuren": [
+        "unicorn-academy-pty562"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE262",
+      "uname": "barbie--ein-verborgener-zauber-vse262",
+      "titel": "Barbie - Ein verborgener Zauber",
+      "figuren": [
+        "barbie"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE207",
+      "uname": "barbie-im-doppelpack--musikclips",
+      "titel": "Barbie - Musikclips",
+      "figuren": [
+        "barbie"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE204",
+      "uname": "barbie-im-doppelpack",
+      "titel": "Barbie im Doppelpack",
+      "figuren": [
+        "barbie"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE449",
+      "uname": "baby-lemminge-vse449",
+      "titel": "Baby Lemminge",
+      "figuren": [
+        "baby-lemminge-pty678"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE461",
+      "uname": "baby-lemminge--kurze-clips-vse461",
+      "titel": "Baby Lemminge - Kurze Clips",
+      "figuren": [
+        "baby-lemminge-pty678"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE17",
+      "uname": "barbie--dreamtopia",
+      "titel": "Barbie - Dreamtopia",
+      "figuren": [
+        "barbie--dreamtopia-pty622"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE49",
+      "uname": "scooby-doo-und-wer-bist-du-vse49",
+      "titel": "Scooby-Doo und wer bist Du?",
+      "figuren": [
+        "scooby-doo-pty178"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE272",
+      "uname": "batwheels-vse272",
+      "titel": "Batwheels",
+      "figuren": [
+        "batwheels-pty539"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE441",
+      "uname": "gluecksbaerchis--entdecke-die-magie-vse441",
+      "titel": "Glücksbärchis - Entdecke die Magie",
+      "figuren": [
+        "gluecksbaerchis--entdecke-die-magie-pty662"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE402",
+      "uname": "weasy-family-vse402",
+      "titel": "Weasy Family",
+      "figuren": [
+        "weasy-family-pty633"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE115",
+      "uname": "lexi--lottie--detektive-im-doppelpack",
+      "titel": "Lexi & Lottie - Detektive im Doppelpack",
+      "figuren": [
+        "lexi--lottie"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE110",
+      "uname": "camp-sumpfgrund-vse110",
+      "titel": "Camp Sumpfgrund",
+      "figuren": [
+        "camp-sumpfgrund-pty50"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE360",
+      "uname": "friends-das-naechste-kapitel-vse360",
+      "titel": "Friends: Das nächste Kapitel",
+      "figuren": [
+        "friends"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE335",
+      "uname": "robin-hood--schlitzohr-von-sherwood-vse335",
+      "titel": "Robin Hood - Schlitzohr von Sherwood",
+      "figuren": [
+        "robin-hood--schlitzohr-von-sherwood-pty583"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE284",
+      "uname": "die-biene-maja-vse284",
+      "titel": "Biene Maja",
+      "figuren": [
+        "die-biene-maja-pty546"
+      ],
+      "frei": false
+    },
+    {
+      "id": "VSE265",
+      "uname": "he-man-and-the-masters-of-the-universe-vse265",
+      "titel": "He-Man and the Masters of the Universe",
+      "figuren": [
+        "he-man-pty535"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE403",
+      "uname": "gabbys-dollhouse-vse403",
+      "titel": "Gabby's Dollhouse",
+      "figuren": [
+        "gabbys-dollhouse-pty634"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE9",
+      "uname": "der-kleine-tiger-daniel-vse9",
+      "titel": "Der kleine Tiger Daniel",
+      "figuren": [
+        "der-kleine-tiger-daniel-pty118"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE47",
+      "uname": "100-wolf--die-legende-des-mondsteins",
+      "titel": "100% Wolf",
+      "figuren": [
+        "100-wolf"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE43",
+      "uname": "das-okto-lied",
+      "titel": "Das Okto-Lied",
+      "figuren": [
+        "die-oktonauten"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE18",
+      "uname": "die-oktonauten-vse18",
+      "titel": "Die Oktonauten",
+      "figuren": [
+        "die-oktonauten"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE263",
+      "uname": "die-oktonauten-auf-dem-festland-vse263",
+      "titel": "Die Oktonauten auf dem Festland",
+      "figuren": [
+        "die-oktonauten"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE233",
+      "uname": "oggy-oggy-vse233",
+      "titel": "Oggy Oggy",
+      "figuren": [
+        "oggy-pty519"
+      ],
+      "frei": true
+    },
+    {
+      "id": "VSE234",
+      "uname": "oggy-oggy-shorts-vse234",
+      "titel": "Oggy Oggy - Kurze Clips",
+      "figuren": [
+        "oggy-pty519"
       ],
       "frei": true
     },
@@ -2232,51 +2286,6 @@
         "pokemon"
       ],
       "frei": true
-    },
-    {
-      "id": "VSE270",
-      "uname": "baby-born-vse270",
-      "titel": "BABY born",
-      "figuren": [
-        "baby-born-pty537"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE233",
-      "uname": "oggy-oggy-vse233",
-      "titel": "Oggy Oggy",
-      "figuren": [
-        "oggy-pty519"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE234",
-      "uname": "oggy-oggy-shorts-vse234",
-      "titel": "Oggy Oggy - Kurze Clips",
-      "figuren": [
-        "oggy-pty519"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE320",
-      "uname": "grizzy--die-lemminge-vse320",
-      "titel": "Grizzy & die Lemminge",
-      "figuren": [
-        "grizzy--die-lemminge"
-      ],
-      "frei": true
-    },
-    {
-      "id": "VSE231",
-      "uname": "grizzy--die-lemminge--kurze-clips-vse231",
-      "titel": "Grizzy & die Lemminge - Kurze Clips",
-      "figuren": [
-        "grizzy--die-lemminge"
-      ],
-      "frei": true
     }
   ],
   "masse": {
@@ -2331,12 +2340,12 @@
       "staffeln": 1
     },
     "VSE292": {
-      "folgen": 137,
+      "folgen": 138,
       "minuten": 21,
       "staffeln": 4
     },
     "VSE359": {
-      "folgen": 126,
+      "folgen": 127,
       "minuten": 22,
       "staffeln": 3
     },
@@ -4961,6 +4970,12 @@
           "bis": "2027-12-31T23:59"
         },
         {
+          "staffel": 4,
+          "folge": 2,
+          "ab": "2026-12-04T00:00",
+          "bis": "2027-12-31T23:59"
+        },
+        {
           "staffel": 1,
           "folge": 3,
           "ab": "2025-10-01T00:00",
@@ -6227,6 +6242,12 @@
           "bis": "2027-12-31T23:59"
         },
         {
+          "staffel": 3,
+          "folge": 27,
+          "ab": "2026-11-27T00:00",
+          "bis": "2027-12-31T23:59"
+        },
+        {
           "staffel": 1,
           "folge": 28,
           "ab": "2025-03-14T00:00",
@@ -6777,12 +6798,6 @@
           "bis": "2027-03-31T23:59"
         },
         {
-          "staffel": 1,
-          "folge": 2,
-          "ab": "2026-04-03T00:00",
-          "bis": "2027-03-31T23:59"
-        },
-        {
           "staffel": 2,
           "folge": 2,
           "ab": "2026-04-03T00:00",
@@ -6790,6 +6805,12 @@
         },
         {
           "staffel": 3,
+          "folge": 2,
+          "ab": "2026-04-03T00:00",
+          "bis": "2027-03-31T23:59"
+        },
+        {
+          "staffel": 1,
           "folge": 2,
           "ab": "2026-04-03T00:00",
           "bis": "2027-03-31T23:59"
@@ -6803,12 +6824,6 @@
         {
           "staffel": 5,
           "folge": 2,
-          "ab": "2026-04-03T00:00",
-          "bis": "2027-03-31T23:59"
-        },
-        {
-          "staffel": 1,
-          "folge": 3,
           "ab": "2026-04-03T00:00",
           "bis": "2027-03-31T23:59"
         },
@@ -6825,6 +6840,12 @@
           "bis": "2027-03-31T23:59"
         },
         {
+          "staffel": 1,
+          "folge": 3,
+          "ab": "2026-04-03T00:00",
+          "bis": "2027-03-31T23:59"
+        },
+        {
           "staffel": 4,
           "folge": 3,
           "ab": "2026-04-03T00:00",
@@ -6837,12 +6858,6 @@
           "bis": "2027-03-31T23:59"
         },
         {
-          "staffel": 1,
-          "folge": 4,
-          "ab": "2026-04-03T00:00",
-          "bis": "2027-03-31T23:59"
-        },
-        {
           "staffel": 2,
           "folge": 4,
           "ab": "2026-04-03T00:00",
@@ -6850,6 +6865,12 @@
         },
         {
           "staffel": 3,
+          "folge": 4,
+          "ab": "2026-04-03T00:00",
+          "bis": "2027-03-31T23:59"
+        },
+        {
+          "staffel": 1,
           "folge": 4,
           "ab": "2026-04-03T00:00",
           "bis": "2027-03-31T23:59"
@@ -6867,12 +6888,6 @@
           "bis": "2027-03-31T23:59"
         },
         {
-          "staffel": 1,
-          "folge": 5,
-          "ab": "2026-04-03T00:00",
-          "bis": "2027-03-31T23:59"
-        },
-        {
           "staffel": 2,
           "folge": 5,
           "ab": "2026-04-03T00:00",
@@ -6880,6 +6895,12 @@
         },
         {
           "staffel": 3,
+          "folge": 5,
+          "ab": "2026-04-03T00:00",
+          "bis": "2027-03-31T23:59"
+        },
+        {
+          "staffel": 1,
           "folge": 5,
           "ab": "2026-04-03T00:00",
           "bis": "2027-03-31T23:59"
@@ -6897,12 +6918,6 @@
           "bis": "2027-03-31T23:59"
         },
         {
-          "staffel": 1,
-          "folge": 6,
-          "ab": "2026-04-03T00:00",
-          "bis": "2027-03-31T23:59"
-        },
-        {
           "staffel": 2,
           "folge": 6,
           "ab": "2026-04-03T00:00",
@@ -6910,6 +6925,12 @@
         },
         {
           "staffel": 3,
+          "folge": 6,
+          "ab": "2026-04-03T00:00",
+          "bis": "2027-03-31T23:59"
+        },
+        {
+          "staffel": 1,
           "folge": 6,
           "ab": "2026-04-03T00:00",
           "bis": "2027-03-31T23:59"
@@ -6927,12 +6948,6 @@
           "bis": "2027-03-31T23:59"
         },
         {
-          "staffel": 1,
-          "folge": 7,
-          "ab": "2026-04-03T00:00",
-          "bis": "2027-03-31T23:59"
-        },
-        {
           "staffel": 2,
           "folge": 7,
           "ab": "2026-04-03T00:00",
@@ -6940,6 +6955,12 @@
         },
         {
           "staffel": 3,
+          "folge": 7,
+          "ab": "2026-04-03T00:00",
+          "bis": "2027-03-31T23:59"
+        },
+        {
+          "staffel": 1,
           "folge": 7,
           "ab": "2026-04-03T00:00",
           "bis": "2027-03-31T23:59"
@@ -6957,13 +6978,13 @@
           "bis": "2027-03-31T23:59"
         },
         {
-          "staffel": 1,
+          "staffel": 2,
           "folge": 8,
           "ab": "2026-04-03T00:00",
           "bis": "2027-03-31T23:59"
         },
         {
-          "staffel": 2,
+          "staffel": 1,
           "folge": 8,
           "ab": "2026-04-03T00:00",
           "bis": "2027-03-31T23:59"
@@ -6987,13 +7008,13 @@
           "bis": "2027-03-31T23:59"
         },
         {
-          "staffel": 1,
+          "staffel": 2,
           "folge": 9,
           "ab": "2026-04-03T00:00",
           "bis": "2027-03-31T23:59"
         },
         {
-          "staffel": 2,
+          "staffel": 1,
           "folge": 9,
           "ab": "2026-04-03T00:00",
           "bis": "2027-03-31T23:59"

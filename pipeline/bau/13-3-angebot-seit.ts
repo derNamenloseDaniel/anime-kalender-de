@@ -3,6 +3,7 @@ import { mitHandvorrang } from '../lib/tmdb-von-hand.ts'
 import { type MotnDaten, LEER as MOTN_LEER } from '../lib/motn.ts'
 import { type PlatformId, type Release, type Title } from '../../shared/types.ts'
 import { todayIso } from '../../shared/time.ts'
+import { erstausgabeBeimAnbieterBis } from '../../shared/verlag-anbieter.ts'
 import { type SlimTitel } from './13-2-auslieferung.ts'
 import { erfassungsStichtage, stichtagSchluessel } from './angebot-stichtag.ts'
 import { titelMitTermin } from './titel-mit-termin.ts'
@@ -86,6 +87,7 @@ export function ergaenzeAngebotSeit({ slim, releases, titles, quellen }: { slim:
   const stichtage = erfassungsStichtage(Object.values(monatsstand.shows ?? {}))
   let alsTermin = 0
   let nurAmTitel = 0
+  let neulistung = 0
 
   for (const title of titles.values()) {
     if (hatTermin.has(title.id)) continue
@@ -115,13 +117,18 @@ export function ergaenzeAngebotSeit({ slim, releases, titles, quellen }: { slim:
     nurAmTitel++
 
     if (seit < GRENZE) continue
+    /* Führte der Anbieter den Titel laut aniSearch schon vorher, ist das Datum eine Neulistung, kein „Neu bei …“ (Exception, Netflix seit 2022). */
+    if (erstausgabeBeimAnbieterBis(title.deErstausgabe, anbieter, seit)) {
+      neulistung++
+      continue
+    }
     releases.push(angebotRelease(title, anbieter, seit))
     alsTermin++
   }
   if (nurAmTitel) {
     log(
       `${nurAmTitel} Titel ohne Termin tragen jetzt ein „Im Angebot seit" ` +
-        `(${alsTermin} davon aus ${GRENZE.slice(0, 4)} auch als Kalendereintrag)`,
+        `(${alsTermin} davon aus ${GRENZE.slice(0, 4)} auch als Kalendereintrag, ${neulistung} Neulistungen beim Erstausgabe-Anbieter ohne Eintrag)`,
     )
   }
 }

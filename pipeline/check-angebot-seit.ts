@@ -47,6 +47,14 @@ titelMit(4, { netflix: { seit: '2024-03-05' } })
 fuelle('netflix', '2024-03-05', 13, 0)
 /* Vor 2026, kein Stichtag: bleibt am Titel, aber kein Termin. */
 titelMit(5, { primevideo: { seit: '2025-05-05' } })
+/* Neulistung (Exception, 27.11.2026): Netflix ist laut aniSearch seit 13.10.2022 Verlag, der MOTN-Feed meldet am 25.11.2026 „new“. */
+titelMit(6, { netflix: { seit: '2026-11-25' } })
+titel.get(6)!.deErstausgabe = { von: '2022-10-13', publisher: 'Netflix, Inc.', synchro: true }
+/* Gegenproben: Erstausgabe bei einem Disc-Verlag (Netflix ist neu) und Netflix-Erstausgabe erst nach dem Katalogdatum. */
+titelMit(7, { netflix: { seit: '2026-11-25' } })
+titel.get(7)!.deErstausgabe = { von: '2016-07-29', publisher: 'Kazé Deutschland', synchro: true }
+titelMit(8, { netflix: { seit: '2026-11-25' } })
+titel.get(8)!.deErstausgabe = { von: '2026-11-26', publisher: 'Netflix, Inc.', synchro: true }
 
 const slim = [...titel.values()].map((t) => ({ ...t }))
 const releases: Release[] = []
@@ -64,6 +72,9 @@ pruefe('ein Tag knapp unter der Schwelle bleibt ein Termin am Titel', releases.s
 pruefe('Welle als frühester Anbieter: der nächste Anbieter (Netflix, 10.07.2026) gewinnt', titel.get(3)!.angebotSeit?.platform === 'netflix' && releases.some((r) => r.slug === 'motn-3-netflix'), titel.get(3)!.angebotSeit)
 pruefe('Netflix 05.03.2024 (14 Titel): kein angebotSeit', !titel.get(4)!.angebotSeit && !slimVon(4).angebotSeit, titel.get(4)!.angebotSeit)
 pruefe('vor 2026 ohne Welle: am Titel, aber kein Termin', titel.get(5)!.angebotSeit?.date === '2025-05-05' && !releases.some((r) => r.titleId === 5))
+pruefe('Neulistung beim Erstausgabe-Anbieter: kein Termin „Neu bei Netflix“', !releases.some((r) => r.titleId === 6), releases.filter((r) => r.titleId === 6).map((r) => r.slug))
+pruefe('Erstausgabe bei einem Disc-Verlag: „Neu bei Netflix“ bleibt', releases.some((r) => r.slug === 'motn-7-netflix'))
+pruefe('Netflix-Erstausgabe nach dem Katalogdatum: der Termin bleibt', releases.some((r) => r.slug === 'motn-8-netflix'))
 
 if (verletzt) {
   console.error(`\n${verletzt} Zusicherung(en) verletzt.`)

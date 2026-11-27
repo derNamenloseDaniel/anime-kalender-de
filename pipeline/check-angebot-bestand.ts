@@ -8,6 +8,7 @@ import { readFileSync } from 'node:fs'
 import type { Release, ReleaseEvent, Title } from '../shared/types.ts'
 import { STICHTAG_AB } from './bau/angebot-stichtag.ts'
 import { releasesOhneQuelle } from './lib/release-ohne-quelle.ts'
+import { erstausgabeBeimAnbieterBis } from '../shared/verlag-anbieter.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -31,6 +32,9 @@ console.log('\n„Im Angebot seit“ im Bestand:')
   const titel = new Map(lies<Title[]>('titles.json').map((t) => [t.id, t]))
   const falsch = [...termine.values()].filter((e) => e.erstausgabe && titel.get(e.titleId)?.deErstausgabe?.von !== e.date).map((e) => e.id)
   pruefe('jede Erstveröffentlichung liegt auf dem aniSearch-Erstausgabetag des Titels', !falsch.length, falsch.slice(0, 5))
+  /* Eine MOTN-Neulistung beim Erstausgabe-Anbieter ist kein „Neu bei …“ (Exception: Netflix seit 13.10.2022, Feed „new“ am 25.11.2026). */
+  const neulistung = releases.filter((r) => r.slug.startsWith('motn-') && erstausgabeBeimAnbieterBis(titel.get(r.titleId)?.deErstausgabe, r.platform, r.schedule.firstEpisodeDate)).map((r) => r.slug)
+  pruefe('kein „Neu bei …“ aus MOTN beim Anbieter, der den Titel laut aniSearch schon vorher führte', !neulistung.length, neulistung.slice(0, 5))
   /* Alle Releases des Titels, auch Disc und Fernsehen: ein früherer Termin heißt, die Synchro war nicht „zuerst“ hier (Bleach, Snowball Earth). */
   const alle = lies<Release[]>('releases.json').filter((r) => !r.widerlegt && r.schedule?.firstEpisodeDate)
   const fruehesterTag = new Map<number, string>()

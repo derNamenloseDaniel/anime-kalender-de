@@ -478,6 +478,7 @@ pipeline/check-nein-handbeleg-aufrufer.ts
 pipeline/check-nein-handbeleg-cr.ts
 pipeline/check-nein-handbeleg-datum.ts
 pipeline/check-nein-handbeleg.ts
+pipeline/check-nein-nach-start-widerlegt.ts
 pipeline/check-nein-nachmessung.ts
 pipeline/check-nein-sprache-offen.ts
 pipeline/check-nein-wiedervorlage-lesen.ts

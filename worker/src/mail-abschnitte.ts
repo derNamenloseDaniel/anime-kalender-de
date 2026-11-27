@@ -13,7 +13,6 @@ import { SPRACHE_HINWEIS, SPRACHE_MARKE } from '../../shared/ics.ts'
 import { ankuendigungsWort, tagIstAngekuendigt } from '../../shared/news-typen.ts'
 import { toIsoDate } from '../../shared/time.ts'
 import { zeitMitMarke } from '../../shared/zeit-text.ts'
-import { omuStartText } from '../../shared/ankuendigung.ts'
 import { folgenProWoche } from '../../shared/folgenrhythmus.ts'
 import { taktSatz } from '../../shared/takt-text.ts'
 import { OFFIZIELL_SATZ } from '../../shared/news-offiziell-satz.ts'
@@ -129,7 +128,7 @@ export function newsSatz(m: NewsMeldung): string {
         ? `Folgen ${m.von}–${m.bis} auf Deutsch bei ${anbieter}`
         : `Folge ${m.von} auf Deutsch bei ${anbieter}`
     case 'angekuendigt':
-      if (m.omu) return `Start ${omuStartText(m.datum ?? '')}${anbieter ? ` bei ${anbieter}` : ''} mit Untertiteln, ${m.omu === 'synchro-angekuendigt' ? 'deutsche Synchro angekündigt' : 'keine deutsche Synchro angekündigt'}`
+      if (m.omu) return `Deutsche Synchro angekündigt${anbieter ? ` bei ${anbieter}` : ''}`
       if (m.platform === 'tv' && m.datum) return `${m.premiere ? 'Deutsche TV-Premiere' : 'Im TV'}${m.anbieter ? ` bei ${m.anbieter}` : ''} am ${['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'][new Date(`${m.datum}T12:00:00Z`).getUTCDay()]}, den ${datum}`
       if (m.schonKaufbar) return `Ab ${datum} im Abo bei ${anbieter}${m.kanal ? ` (${m.kanal})` : ''}!`
       if (m.jahre && anbieter) return m.discSeitText ? `Nach ${m.jahre} Jahren endlich im Stream auf Deutsch: ab ${datum} bei ${anbieter}! (Auf Disc gibt es die Synchro seit ${m.discSeitText})` : `Nach ${m.jahre} Jahren endlich auf Deutsch: ab ${datum} mit Synchro bei ${anbieter}!`

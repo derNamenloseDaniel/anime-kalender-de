@@ -714,7 +714,7 @@ export interface ReleaseEvent {
   /** An diesem Tag kostenlos schaubar — nur für Termine von heute gesetzt (`shared/kostenlos.ts`). */
   kostenlos?: boolean
   name: string
-  estimated?: boolean; sprache?: Release['sprache']; nachLuecke?: boolean // hinter einer offenen Lücke: kann noch nicht erschienen sein (`shared/luecken.ts`)
+  estimated?: boolean; sprache?: Exclude<Release['sprache'], 'omu'>; nachLuecke?: boolean // hinter einer offenen Lücke: kann noch nicht erschienen sein (`shared/luecken.ts`)
   /**
    * Gesetzt, wenn der Anbieter diesen Termin nicht eingehalten hat.
    *

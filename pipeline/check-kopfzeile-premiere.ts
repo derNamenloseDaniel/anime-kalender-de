@@ -19,7 +19,7 @@ import { berechneAntwort } from '../web/src/components/detail/antwort-berechnen.
 import { AntwortKasten } from '../web/src/components/detail/antwort-kasten.tsx'
 import { deutschBegonnen } from '../web/src/components/detail/antwort-regeln.ts'
 import { deSeitZeigen } from '../web/src/components/detail/de-seit.ts'
-import { alleNurUntertitel, alleOhneSprachbeleg, streamStatus, streamWegStatus } from '../web/src/components/detail/legende-zeilen.ts'
+import { wegeOhneNurUntertitel, alleOhneSprachbeleg, streamStatus, streamWegStatus } from '../web/src/components/detail/legende-zeilen.ts'
 import { legendeFuer } from '../web/src/components/detail/pille.tsx'
 import { translate } from '../web/src/lib/i18n.tsx'
 import { newsSatz } from '../web/src/lib/news-text.ts'
@@ -108,17 +108,16 @@ pruefe('streamStatus: belegtes Deutsch geht vor', streamStatus(titel(), weg(akib
 const kaufweg = (url: string): Parameters<typeof streamWegStatus>[0] => ({ eintraege: [{ url }] }) as never
 pruefe('streamWegStatus: OmU-Adresse → omu', streamWegStatus(kaufweg(akiba), titel()) === 'omu')
 pruefe('streamWegStatus: ohne Kennung → offen', streamWegStatus(kaufweg('https://x.de/serie/foo'), titel()) === 'offen')
-const wege = (...urls: string[]): Parameters<typeof alleNurUntertitel>[0] => [{ plattformen: urls.map((u) => weg(u)), streamWege: [] }] as never
-pruefe('Kopf: nur OmU-Zeilen → „nur Untertitel“', alleNurUntertitel(wege(akiba), titel(), []))
-pruefe('Kopf: eine Zeile ohne Kennung dabei → nicht „nur Untertitel“', !alleNurUntertitel(wege(akiba, 'https://x.de/serie/foo'), titel(), []))
-pruefe('Kopf: OmU und offen zusammen → weiter „ohne Sprachbeleg“', alleOhneSprachbeleg(wege(akiba, 'https://x.de/serie/foo'), titel(), []))
-const mitKaufweg = (pillen: string[], kauf: string[]): Parameters<typeof alleNurUntertitel>[0] =>
-  [{ plattformen: pillen.map((u) => weg(u)), streamWege: kauf.map((u) => kaufweg(u)) }] as never
-pruefe('Kopf: OmU-Pille plus Kaufweg ohne Kennung → nicht „nur Untertitel“', !alleNurUntertitel(mitKaufweg([akiba], ['https://x.de/serie/foo']), titel(), []))
-pruefe('Kopf: nur OmU-Kaufwege → „nur Untertitel“', alleNurUntertitel(mitKaufweg([], [akiba]), titel(), []))
-pruefe('Kopf: OmU-Pille plus OmU-Kaufweg → „nur Untertitel“', alleNurUntertitel(mitKaufweg([akiba], [akiba]), titel(), []))
+const wege = (...urls: string[]): Parameters<typeof wegeOhneNurUntertitel>[0] => [{ plattformen: urls.map((u) => weg(u)), streamWege: [], shops: [] }] as never
+const mitKaufweg = (pillen: string[], kauf: string[]): Parameters<typeof wegeOhneNurUntertitel>[0] =>
+  [{ plattformen: pillen.map((u) => weg(u)), streamWege: kauf.map((u) => kaufweg(u)), shops: [] }] as never
+const urls = (w: ReturnType<typeof wegeOhneNurUntertitel>): string[] => w.flatMap((x) => [...x.plattformen.map((p) => p.url), ...x.streamWege.map((g) => g.eintraege[0].url)])
+pruefe('Anzeige: OmU-Pille fällt weg (Akibapass „nur Untertitel“)', wegeOhneNurUntertitel(wege(akiba), titel(), []).length === 0)
+pruefe('Anzeige: Pille ohne Kennung bleibt, OmU daneben fällt weg', urls(wegeOhneNurUntertitel(wege(akiba, 'https://x.de/serie/foo'), titel(), [])).join() === 'https://x.de/serie/foo')
+pruefe('Anzeige: OmU-Kaufweg fällt weg, Kaufweg ohne Kennung bleibt', urls(wegeOhneNurUntertitel(mitKaufweg([akiba], [akiba, 'https://x.de/serie/foo']), titel(), [])).join() === 'https://x.de/serie/foo')
+pruefe('Anzeige: nur OmU-Wege → keine Zeile übrig', wegeOhneNurUntertitel(mitKaufweg([akiba], [akiba]), titel(), []).length === 0)
 pruefe('Kopf: Kaufweg ohne Kennung bleibt „ohne Sprachbeleg“', alleOhneSprachbeleg(mitKaufweg([akiba], ['https://x.de/serie/foo']), titel(), []))
-pruefe('Kopf: keine Zeilen → nicht „nur Untertitel“', !alleNurUntertitel(wege(), titel(), []))
+pruefe('Kopf: OmU und offen zusammen → weiter „ohne Sprachbeleg“', alleOhneSprachbeleg(wege(akiba, 'https://x.de/serie/foo'), titel(), []))
 
 console.log('\n„Auf Deutsch seit“ (Failure Frame):')
 const cr = { platform: 'crunchyroll', url: 'https://x/cr', dub: true }
@@ -149,7 +148,7 @@ function bereich(t: Title, rs: Release[]): string {
   const eingabe = {
     ...leer,
     antwort,
-    sortiertNachZugang: sortiereNachZugang({ title: t }),
+    sortiertNachZugang: wegeOhneNurUntertitel(sortiereNachZugang({ title: t }), t, rs),
     streamReleases: [],
     terminReleases: [],
     title: t,
@@ -168,15 +167,14 @@ function bereich(t: Title, rs: Release[]): string {
 const omuWeg = { platform: 'crunchyroll', url: akiba, zugang: 'abo' }
 const offenWeg = { platform: 'netflix', url: 'https://x.de/serie/foo', zugang: 'abo' }
 const alt = (streams: object[]): Title => titel({ episodes: 12, streams })
-pruefe('nur OmU-Wege: „Anbieter, nur Untertitel“', bereich(alt([omuWeg]), [ffTermin]).includes('Anbieter, nur Untertitel'), bereich(alt([omuWeg]), [ffTermin]))
+pruefe('nur OmU-Wege: weder „Untertitel“ noch eine Pille (Daniel, 26.11.2026)', !/untertitel|omu/i.test(bereich(alt([omuWeg]), [ffTermin])) && !bereich(alt([omuWeg]), [ffTermin]).includes('Sprache offen'), bereich(alt([omuWeg]), [ffTermin]))
 pruefe('OmU und offener Weg: „Anbieter, Sprache offen“', bereich(alt([omuWeg, offenWeg]), [ffTermin]).includes('Anbieter, Sprache offen'), bereich(alt([omuWeg, offenWeg]), [ffTermin]))
 pruefe('nur offener Weg: „Anbieter, Sprache offen“', bereich(alt([offenWeg]), [ffTermin]).includes('Anbieter, Sprache offen'))
-pruefe('Pille trägt „nur Untertitel“, nicht „Sprache offen“', bereich(alt([omuWeg]), [ffTermin]).includes('nur Untertitel') && !bereich(alt([omuWeg]), [ffTermin]).includes('Sprache offen'))
 const zaehle = (html: string, wort: string): number => html.split(wort).length - 1
 const nurOffen = bereich(alt([offenWeg]), [ffTermin])
 pruefe('Kopf „Sprache offen“ und keine Marke daneben: genau einmal', zaehle(nurOffen, 'Sprache offen') === 1, nurOffen)
 const omuUndOffen = bereich(alt([omuWeg, offenWeg]), [ffTermin])
-pruefe('OmU und offen: „Sprache offen“ nur im Kopf, die OmU-Marke bleibt', zaehle(omuUndOffen, 'Sprache offen') === 1 && omuUndOffen.includes('nur Untertitel'), omuUndOffen)
+pruefe('OmU und offen: „Sprache offen“ nur im Kopf, keine OmU-Marke', zaehle(omuUndOffen, 'Sprache offen') === 1 && !/untertitel/i.test(omuUndOffen), omuUndOffen)
 const belegtUndOffen = bereich(alt([{ ...cr, dubRanges: [{ from: 1, to: 12, dub: true }] }, offenWeg]), [ffTermin])
 pruefe('Kopf sagt Deutsch, ein Weg offen: die Marke „Sprache offen“ steht allein einmal', zaehle(belegtUndOffen, 'Sprache offen') === 1 && !belegtUndOffen.includes('Anbieter, Sprache offen'), belegtUndOffen)
 const laeuftOffen = bereich(alt([{ ...cr, dubRanges: [{ from: 1, to: 6, dub: true }] }, offenWeg]), [ffTermin])

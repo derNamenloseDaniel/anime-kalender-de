@@ -3,11 +3,11 @@ import { useLang, type TranslationKey } from '../lib/i18n.tsx'
 import { Tooltip } from './ui.tsx'
 
 /** Abkürzungen, die im Fließtext eine Erklärung bekommen. */
-const FACHWOERTER: Record<string, TranslationKey> = { OmU: 'fachwort.omu', Zeitumstellung: 'fachwort.zeitumstellung' }
+const FACHWOERTER: Record<string, TranslationKey> = { Zeitumstellung: 'fachwort.zeitumstellung' }
 const MUSTER = new RegExp(`\\b(${Object.keys(FACHWOERTER).join('|')})\\b`)
 
 /**
- * **„OmU" ist unterstrichen und erklärt sich**: Wer die Abkürzung nicht
+ * **Eine Abkürzung ist unterstrichen und erklärt sich**: Wer sie nicht
  * kennt, sieht an der Unterstreichung, dass er zeigen oder tippen kann.
  */
 export function MitFachwoertern({ text }: { text: string }): ReactNode {

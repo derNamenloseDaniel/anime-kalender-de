@@ -2390,6 +2390,11 @@
       "am": "2026-11-26",
       "vorschlaege": 0
     },
+    "1076510": {
+      "am": "2026-11-27",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
     "1076668": {
       "am": "2026-11-27",
       "vorschlaege": 4
@@ -2414,6 +2419,10 @@
     "1077302": {
       "am": "2026-11-27",
       "vorschlaege": 0
+    },
+    "1077491": {
+      "am": "2026-11-27",
+      "vorschlaege": 6
     }
   },
   "vorschlaege": [
@@ -18077,6 +18086,150 @@
       "artikelId": "1076694",
       "artikel": "»Witch on the Holy Night« feiert große Erfolge in den japanischen Kinos",
       "quelle": "https://www.anime2you.de/news/1076694/witch-on-the-holy-night-grosse-erfolge-in-japan/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Die Biene Maja",
+      "zitat": "»Die Biene Maja« Verfügbar ab: 15. Dezember 2026 Episoden: 104 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "rtlplus",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "RTL+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "104 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „RTL+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „rtl+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Die Biene Maja",
+      "zitat": "»Die Biene Maja« Verfügbar ab: 15. Dezember 2026 Episoden: 104 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "primevideo",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "Prime Video",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "104 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „Prime Video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „prime video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Heidi",
+      "zitat": "»Heidi« Verfügbar ab: 15. Dezember 2026 Episoden: 52 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "rtlplus",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "RTL+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "52 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „RTL+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „rtl+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Heidi",
+      "zitat": "»Heidi« Verfügbar ab: 15. Dezember 2026 Episoden: 52 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "primevideo",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "Prime Video",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "52 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „Prime Video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „prime video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Wickie und die starken Männer",
+      "zitat": "»Wickie und die starken Männer« Verfügbar ab: 15. Dezember 2026 Episoden: 78 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "rtlplus",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "RTL+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "78 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „RTL+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „rtl+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Wickie und die starken Männer",
+      "zitat": "»Wickie und die starken Männer« Verfügbar ab: 15. Dezember 2026 Episoden: 78 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "primevideo",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "Prime Video",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "78 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „Prime Video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „prime video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
       "veroeffentlicht": "2026-11-27",
       "gelesenAm": "2026-11-27"
     }

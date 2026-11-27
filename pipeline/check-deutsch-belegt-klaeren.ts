@@ -3,6 +3,8 @@
  * Ist Deutsch für Titel und Anbieter belegt, trägt der Termin weder „Synchro offen“ noch den Hinweis „ob mit deutscher Synchro …“.
  */
 import { klaereDeutschBelegteTermine } from './bau/deutsch-belegt-klaeren.ts'
+import { autoReleaseWidersprueche } from './lib/auto-release-pruefung.ts'
+import type { DubCheck } from './lib/dub-confirmed.ts'
 import { deutschBelegtTrotzOffen } from './lib/deutsch-belegt.ts'
 import { SPRACH_NOTIZEN } from './lib/meldungen.ts'
 import { schlussFehler } from './lib/pruefung.ts'
@@ -20,7 +22,8 @@ const NETFLIX = 'https://www.netflix.com/title/1'
 const titel = (streams: Title['streams'], extra: Partial<Title> = {}): Title => ({ id: 7, streams, ...extra }) as unknown as Title
 const termin = (extra: Partial<Release> = {}): Release =>
   ({ slug: 's', name: 'Probe', titleId: 7, platform: 'netflix', platformUrl: NETFLIX, automatisch: true, releaseType: 'batch', sprache: 'offen', hinweis: NOTIZ, schedule: { firstEpisodeDate: '2026-11-25' }, sources: ['https://a/'], ...extra }) as unknown as Release
-const lauf = (r: Release, t: Title) => klaereDeutschBelegteTermine([r], new Map([[7, t]]), new Set(['https://a/']))
+const HEUTE = '2026-11-27'
+const lauf = (r: Release, t: Title) => klaereDeutschBelegteTermine([r], new Map([[7, t]]), new Set(['https://a/']), [], HEUTE)
 const belegt = titel([{ platform: 'netflix', url: NETFLIX, dub: true }])
 
 console.log('\nBelegtes Deutsch:')
@@ -63,13 +66,37 @@ console.log('\nNetflix-Eigenproduktion:')
   pruefe('Lizenztitel (kein Original) bekommt kein dub', lizenz.dub === undefined)
 }
 
-console.log('\nQuelle ohne Synchro-Zusage (Fool Night):')
+console.log('\nQuelle ohne Synchro-Zusage:')
 {
   const r = termin()
-  const ohneZusage = klaereDeutschBelegteTermine([r], new Map([[7, belegt]]), new Set())
+  const ohneZusage = klaereDeutschBelegteTermine([r], new Map([[7, belegt]]), new Set(), [], HEUTE)
   pruefe('automatischer Termin, Quelle ohne Zusage: bleibt „offen“ samt Hinweis', ohneZusage.length === 0 && r.sprache === 'offen' && r.hinweis === NOTIZ, r)
   const hand = termin({ automatisch: undefined })
-  pruefe('Handtermin braucht keine Quellenzusage', klaereDeutschBelegteTermine([hand], new Map([[7, belegt]]), new Set()).length === 1 && hand.sprache === undefined)
+  pruefe('Handtermin braucht keine Quellenzusage', klaereDeutschBelegteTermine([hand], new Map([[7, belegt]]), new Set(), [], HEUTE).length === 1 && hand.sprache === undefined)
+}
+
+console.log('\nAutomatischer Termin mit Handbeleg (Fool Night 213457):')
+{
+  const beleg: DubCheck = { anilistId: 7, platform: 'netflix', url: NETFLIX, dub: true, checkedAt: '2026-11-26' }
+  const lauf2 = (r: Release, t: Title, b: DubCheck[]) => klaereDeutschBelegteTermine([r], new Map([[7, t]]), new Set(), b, HEUTE)
+  const r = termin()
+  pruefe('Handbeleg an derselben Adresse: geklärt', lauf2(r, belegt, [beleg]).join() === 's' && r.sprache === undefined && r.hinweis === undefined, r)
+  const q = r.quellen?.find((x) => x.url === NETFLIX)
+  pruefe('Beleg steht als Quelle (Adresse, Messung, Tag) und in sources', !!q && q.gesehenAm === '2026-11-26' && !!q.sagt?.includes('2026-11-26') && r.sources[0] === 'https://a/' && r.sources.includes(NETFLIX) && r.quellen?.some((x) => x.url === 'https://a/') === true, r)
+  const vorschlag = [{ articleUrl: 'https://a/', dates: [] }] as never
+  pruefe('autoReleaseWidersprueche schlägt dann nicht an', autoReleaseWidersprueche([r], vorschlag).length === 0, autoReleaseWidersprueche([r], vorschlag))
+  const ohneBeleg = termin()
+  pruefe('ohne Handbeleg bleibt „offen“', lauf2(ohneBeleg, belegt, []).length === 0 && ohneBeleg.sprache === 'offen')
+  pruefe('Gegenprobe: Termin ohne Sprache und ohne Beleg-Quelle schlägt an', autoReleaseWidersprueche([termin({ sprache: undefined, hinweis: undefined })], vorschlag).length === 1)
+  const nurAbgeleitet = termin()
+  const weg = titel([{ platform: 'netflix', url: NETFLIX, dub: true, dubAbgeleitet: 'kanal-erbt' } as never])
+  pruefe('nur abgeleiteter Weg ohne Zusage und ohne Handbeleg: bleibt offen', lauf2(nurAbgeleitet, weg, []).length === 0 && nurAbgeleitet.sprache === 'offen')
+  const andere = termin()
+  pruefe('Handbeleg an anderer Adresse zählt nicht', lauf2(andere, belegt, [{ ...beleg, url: 'https://www.netflix.com/title/2' }]).length === 0 && andere.sprache === 'offen')
+  pruefe('Handbeleg bei anderem Anbieter zählt nicht', lauf2(termin(), belegt, [{ ...beleg, platform: 'primevideo' }]).length === 0)
+  pruefe('Handbeleg mit dub:false zählt nicht', lauf2(termin(), belegt, [{ ...beleg, dub: false }]).length === 0)
+  const ohneAdresse = termin({ platformUrl: undefined })
+  pruefe('Termin ohne Adresse: Beleg des Anbieters genügt, Adresse aus dem Beleg', lauf2(ohneAdresse, belegt, [beleg]).length === 1 && ohneAdresse.sources.includes(NETFLIX))
 }
 
 console.log('\nWächter:')

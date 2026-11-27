@@ -16,6 +16,7 @@
 import { entscheide } from './abnahme-freigabe.mjs'
 
 export const PFLICHT_CHECK = 'PR-Prüfkette'
+const WORKFLOW_ORDNER = '.github/workflows/'
 /** Das CI-Urteil schreibt `github-actions[bot]` (REST-Name, gemessen 01.11.2026 an PR 2639; `gh pr view` zeigt ihn ohne `[bot]`); ein gleich lautender Kommentar anderer Nutzer zählt nie. */
 export const PRUEFER_LOGIN = 'github-actions[bot]'
 const URTEIL = /^\*\*Prüfer-Review\*\* für ([0-9a-f]{9}) - Urteil: \*\*([^*\r\n]+)\*\*/
@@ -126,13 +127,12 @@ export function reihenfolge(prs, bestandRot) {
  */
 export function freigabeVerworfen(pr) {
   if (!pr.offen || pr.entwurf || pr.zweig.startsWith('daten/') || pr.reviewDecision !== 'REVIEW_REQUIRED') return false
-  if (pr.mergeStateStatus === 'DIRTY' || pr.pfade.some((p) => p.startsWith('.github/workflows/'))) return false
+  if (pr.mergeStateStatus === 'DIRTY' || pr.pfade.some((p) => p.startsWith(WORKFLOW_ORDNER))) return false
   if (!ketteStand(pr.checks).gruen || freigabe(pr.kommentare, pr.kopf).frei) return false
-  const urteile = pr.kommentare
-    .filter((k) => k.login === PRUEFER_LOGIN)
-    .map((k) => ({ at: k.at, treffer: URTEIL.exec(k.body) }))
-    .filter((u) => u.treffer !== null)
-    .sort((a, b) => Date.parse(a.at) - Date.parse(b.at))
-  const letztes = urteile.at(-1)
-  return letztes !== undefined && urteilIstOk(letztes.treffer[2].trim()) && !pr.kopf.startsWith(letztes.treffer[1])
+  const urteile = pr.kommentare.filter((k) => k.login === PRUEFER_LOGIN && URTEIL.test(k.body))
+  if (urteile.length === 0) return false
+  // Das jüngste Urteil gilt; bei gleicher Zeit das spätere in der Liste
+  const juengstes = urteile.reduce((a, b) => (Date.parse(b.at) >= Date.parse(a.at) ? b : a))
+  const [, kopf9, titel] = URTEIL.exec(juengstes.body)
+  return urteilIstOk(titel.trim()) && !pr.kopf.startsWith(kopf9)
 }

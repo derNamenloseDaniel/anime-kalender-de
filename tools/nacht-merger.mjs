@@ -70,7 +70,7 @@ export function uebernahmeFall(welt, pr, { trocken, frei }) {
     welt.zeile(`ÜBERNAHME RIEGEL ${wo}: höchstens ${UEBERNAHMEN_JE_LAUF} Anstöße je Lauf, kommt im nächsten Lauf dran`)
     return { fall: true, angestossen: false }
   }
-  if (trocken) {
+  if (trocken === true) {
     welt.zeile(`WÜRDE ÜBERNAHME ANSTOSSEN ${wo}: Freigabe nach Main-Nachzug verworfen (Trockenlauf)`)
     return { fall: true, angestossen: true }
   }

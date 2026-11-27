@@ -531,19 +531,6 @@ DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
 CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
-UID:auto-156040-primevideo@2026-11-26@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261126
-DTEND;VALUE=DATE:20261127
-SUMMARY:The Most Heretical Last Boss Queen: From Villainess to Savior (neu 
- bei Prime Video) (Synchro offen)
-DESCRIPTION:Plattform: Prime Video\nRelease-Art: Katalog\nIm Angebot seit d
- iesem Tag – nicht der Erscheinungstag der deutschen Fassung.\nSynchro of
- fen: Der Termin ist belegt\, eine deutsche Synchro nicht.\nUhrzeit noch ni
- cht bestätigt.\nDetails: https://anime-kalender.de/t/14693/
-CATEGORIES:Prime Video
-END:VEVENT
-BEGIN:VEVENT
 UID:auto-158871-tv-super-rtl@2026-11-27@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261127T151500Z

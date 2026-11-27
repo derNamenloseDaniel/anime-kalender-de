@@ -609,6 +609,21 @@ pruefe('argumente: ungültig', argumente(['--hoechstens', '0']) === null && argu
   lauf(f, { hoechstens: 3 })
   pruefe('Übernahme: Fehler beim Anstoß steht mit erster Zeile im Protokoll und zählt nicht gegen den Riegel', f.log.zeilen.some((z) => z === 'ÜBERNAHME FEHLGESCHLAGEN #95 Kopf a1b2c3d4e: HTTP 403: Resource not accessible') && f.log.zeilen.some((z) => z.startsWith('ÜBERNAHME ANGESTOSSEN #96')))
 }
+{
+  // Übernahme-Fälle erzeugen nie eine zweite ÜBERSPRUNGEN-Zeile; Fehler zählen nicht gegen den Riegel, der Trockenlauf zählt wie der Echtlauf
+  const rr = (nummer) => pr({ nummer, reviewDecision: 'REVIEW_REQUIRED', kommentare: [urteil(ALTER_KOPF, 'ok')] })
+  const alleOhneUebersprungen = (w) => !w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN'))
+  const f = welt([rr(101), rr(102), rr(103), rr(104)], { anstossFehler: 101 })
+  lauf(f, { hoechstens: 3 })
+  pruefe('Übernahme: nach einem Fehler kommen noch drei Anstöße (Fehler verbraucht keinen Riegel), kein ÜBERSPRUNGEN', f.log.aufrufe.filter((a) => a.startsWith('anstoss')).length === 3 && !f.log.zeilen.some((z) => z.startsWith('ÜBERNAHME RIEGEL')) && alleOhneUebersprungen(f))
+  const t = welt([rr(111), rr(112), rr(113), rr(114)])
+  lauf(t, { trocken: true })
+  pruefe('Übernahme: Trockenlauf zählt Anstöße gegen den Riegel (3 Zeilen WÜRDE, 1 RIEGEL), kein ÜBERSPRUNGEN', t.log.zeilen.filter((z) => z.startsWith('WÜRDE ÜBERNAHME')).length === 3 && t.log.zeilen.some((z) => z.startsWith('ÜBERNAHME RIEGEL #114')) && alleOhneUebersprungen(t))
+  const l = welt([rr(121)], { laeuft: [121] })
+  lauf(l, { hoechstens: 3 })
+  pruefe('Übernahme: wartender Lauf erzeugt nur die WARTET-Zeile', l.log.zeilen.filter((z) => z.includes('#121')).length === 1 && alleOhneUebersprungen(l))
+  pruefe('freigabeVerworfen: gleiche Zeit zweier Urteile, das spätere in der Liste gilt (aendern zuletzt → kein Fall)', freigabeVerworfen(pr({ reviewDecision: 'REVIEW_REQUIRED', kommentare: [urteil(ALTER_KOPF, 'ok', '2026-11-01T10:00:00Z'), urteil(ALTER_KOPF, 'aendern', '2026-11-01T10:00:00Z')] })) === false)
+}
 if (fehler > 0) {
   console.error(`nacht-merger.test: ${fehler} von ${anzahl} Fällen rot`)
   process.exit(1)

@@ -28,6 +28,11 @@ assert.equal(warteschlangeMeldung(ghMit([lauf('Deploy', 'Deploy', 120)]), JETZT)
 assert.equal(warteschlangeMeldung(ghMit([]), JETZT), null)
 const viele = Array.from({ length: 7 }, (_, i) => lauf('PR-Prüfer', `PR-Prüfer #${i} x`, 40 + i))
 assert.match(warteschlangeMeldung(ghMit(viele), JETZT), /^WARTESCHLANGE: .*\(46 min\), .* und 2 weitere stehen auf queued/, 'ab dem sechsten nur gezählt, älteste zuerst')
+const lang60 = warteschlangeMeldung(ghMit([lauf('Abnahme — Freigabe', 'x'.repeat(80), 40)]), JETZT)
+assert.ok(lang60.includes(`Abnahme — Freigabe ${'x'.repeat(41)} (40 min)`) && !lang60.includes('x'.repeat(42)), 'Name auf 60 Zeichen gekürzt')
+const genau5 = Array.from({ length: 5 }, (_, i) => lauf('PR-Prüfer', `PR-Prüfer #${i} x`, 40 + i))
+assert.ok(!warteschlangeMeldung(ghMit(genau5), JETZT).includes('weitere'), 'genau fünf: keine Kürzung')
+assert.equal((warteschlangeMeldung(ghMit(genau5), JETZT).match(/ min\)/g) ?? []).length, 5)
 assert.throws(() => warteschlangeMeldung(() => 'kein json', JETZT))
 
 // Verdrahtung: Wachphase und Kommandozeile melden die Zeile

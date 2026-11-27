@@ -313,6 +313,30 @@
 # Shaman King (2001, 64 Folgen) bei aniverse, Prime Video Channel: aniverse veröffentlicht in Blöcken zu 16 Folgen
 # (Anime2You 1035676: „Part 3“, 16 Folgen, 06.08.; 1065078: „Staffel 4“, 16 Folgen, 12.11.; Handbeleg B0DYF8BKVP: Staffel 4 = 16 Folgen, Deutsch).
 # Die Folgennummern sind abgeleitet (64 = 4 × 16), keine Quelle nennt sie; deshalb „≈“ im Hinweis.
+# Part 1 und Part 2 (je 16 Folgen, Dub) erschienen vorher (Anime2You 922565: ab 14.08.2025; 938606: Oktober 2025, 23.10.); ohne sie lag der
+# erste Termin bei Folge 33 und 1–32 standen ohne Beleg davor (Bestandsprüfung folgen-vor-start, 27.11.2026). Nummern abgeleitet (≈).
+- slug: shaman-king-2001-part1-primevideo
+  anilistId: 154
+  titleDe: "Shaman King – Part 1"
+  platform: primevideo
+  kanal: Aniverse
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2025-08-14", firstEpisodeNumber: 1, episodeCount: 16 }
+  hinweis: "16 Folgen (≈ Folgen 1–16) seit 14.08.2025 über den Prime-Kanal aniverse."
+  sources:
+    - https://www.anime2you.de/news/922565/aniverse-august-2025-neuzugaenge/
+- slug: shaman-king-2001-part2-primevideo
+  anilistId: 154
+  titleDe: "Shaman King – Part 2"
+  platform: primevideo
+  kanal: Aniverse
+  releaseType: batch
+  dateMeaning: available-from
+  schedule: { firstEpisodeDate: "2025-10-23", firstEpisodeNumber: 17, episodeCount: 16 }
+  hinweis: "16 Folgen (≈ Folgen 17–32) seit 23.10.2025 über den Prime-Kanal aniverse."
+  sources:
+    - https://www.anime2you.de/news/938606/aniverse-oktober-2025-neuzugaenge/
 - slug: shaman-king-2001-part3-primevideo
   anilistId: 154
   titleDe: "Shaman King – Part 3"

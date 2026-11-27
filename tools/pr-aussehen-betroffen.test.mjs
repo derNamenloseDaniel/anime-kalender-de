@@ -10,11 +10,11 @@ const liste = listeAus('# Kopf\n\ntools/a-b.mjs\ntools/c.mjs\n')
 assert.deepEqual([...liste], ['tools/a-b.mjs', 'tools/c.mjs'], 'Kommentar- und Leerzeilen zählen nicht')
 
 // Oberfläche und Workflow lösen aus
-for (const d of ['web/src/App.tsx', 'web/src/lib/x.ts', 'web/buehne/mockups/a.tsx', 'extension/popup.css', 'extension/sub/x.css', '.github/workflows/pr-pruefung.yml', 'package.json', 'tools/pr-aussehen-pfade.txt']) {
+for (const d of ['web/src/App.tsx', 'web/src/lib/x.ts', 'web/buehne/mockups/a.tsx', 'extension/popup.css', 'extension/sub/x.css', '.github/workflows/pr-pruefung.yml', 'package.json', 'tools/pr-aussehen-pfade.txt', 'tools/pr-aussehen-betroffen.mjs']) {
   assert.equal(betroffen([d], liste), true, `${d} löst aus`)
 }
 // Alles andere nicht, auch nicht Beinahe-Treffer
-for (const d of ['docs/wissen/betrieb.md', 'data/curated/x.yaml', 'worker/src/a.ts', 'extension/popup.js', 'extension/x.css.map', '.github/workflows/pr-pruefung.yml.bak', '.github/workflows/nacht-pruefung.yml', 'web/srcx/a.ts', 'web/buehne', 'package.json5', 'tools/andere.mjs', 'tools/c.mjsx', 'xtools/c.mjs']) {
+for (const d of ['docs/wissen/betrieb.md', 'data/curated/x.yaml', 'worker/src/a.ts', 'extension/popup.js', 'extension/x.css.map', '.github/workflows/pr-pruefung.yml.bak', '.github/workflows/nacht-pruefung.yml', 'web/srcx/a.ts', 'web/buehne', 'package.json5', 'tools/pr-aussehen-betroffen.mjsx', 'tools/pr-aussehen-betroffen.test.mjs', 'tools/andere.mjs', 'tools/c.mjsx', 'xtools/c.mjs']) {
   assert.equal(betroffen([d], liste), false, `${d} löst nicht aus`)
 }
 // Liste gilt wörtlich: Punkt und Bindestrich sind keine Muster

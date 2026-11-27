@@ -4,14 +4,14 @@
  * (7 von 12 Ketten, Messung 27.11.2026: 19 Jobs, zusammen 286–324 s), hinter den Ketten-Jobs anderer PRs in der Warteschlange (20-Jobs-Grenze).
  *
  * Außer der Oberfläche zählen genau die Dateien, die diese Jobs ausführen: die Werkzeuge von check:panel und check:ansichten, deren direkte Importe
- * (Liste `tools/pr-aussehen-pfade.txt`, Test `tools/pr-aussehen-pfade.test.mjs`) und der Workflow selbst.
+ * (Liste `tools/pr-aussehen-pfade.txt`, Test `tools/pr-aussehen-pfade.test.mjs`), der Workflow und dieses Werkzeug selbst (sonst käme ein PR, der es auf `aussehen=0` umstellt, ohne Aussehen-Jobs durch).
  * Aufruf (nur Node-Bordmittel, der Job hat kein `npm ci`): node tools/pr-aussehen-betroffen.mjs HEAD^1 HEAD >> "$GITHUB_OUTPUT"
  */
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 
-export const PFADE = /^(web\/src\/|web\/buehne\/|extension\/.*\.css$|\.github\/workflows\/pr-pruefung\.yml$|package\.json$|tools\/pr-aussehen-pfade\.txt$)/
+export const PFADE = /^(web\/src\/|web\/buehne\/|extension\/.*\.css$|\.github\/workflows\/pr-pruefung\.yml$|package\.json$|tools\/pr-aussehen-pfade\.txt$|tools\/pr-aussehen-betroffen\.mjs$)/
 export const LISTE_DATEI = 'tools/pr-aussehen-pfade.txt'
 
 /** Die Pfade der Liste (ohne Kommentar- und Leerzeilen) als Menge; sie gelten wörtlich, nie als Muster. */

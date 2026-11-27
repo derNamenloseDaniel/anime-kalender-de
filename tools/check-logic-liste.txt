@@ -729,6 +729,7 @@ pipeline/check-tmdb-ablauf.ts
 pipeline/check-tmdb-angebote-kopie.ts
 pipeline/check-tmdb-film-suche.ts
 pipeline/check-tmdb-film-vorrang-lauf.ts
+pipeline/check-tmdb-film-zwilling.ts
 pipeline/check-tmdb-folgen-404-lauf.ts
 pipeline/check-tmdb-folgen-404.ts
 pipeline/check-tmdb-folgen-auswahl.ts

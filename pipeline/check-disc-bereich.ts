@@ -265,9 +265,16 @@ console.log('Ausgaben: Termin ohne Artikelbezug und aniSearch-Artikel am selben 
   const band = (name: string): Release => ({ ...termin('band', '2026-09-03', 'Limited Edition, Blu-ray'), name })
   pruefe('„Vol. 2“ am Tag der Gesamtausgabe ist nicht die Gesamtausgabe (Dan Da Dan, 30.10.2026)', zeilen([gesamt], [band('Probetitel – Vol. 2')]).length === 2)
   pruefe('„Vol. 2“ ist nicht „Vol. 3/3“', zeilen([['Vol. 3/3: Limited Edition', 'b', 't', '2026-09-03', 900313]], [band('Probetitel – Vol. 2')]).length === 2)
-  pruefe('„Box 9“ ist „Box 09“', zeilen([['Box 09', 'b', 't', '2026-09-03', 900314]], [band('Probetitel – Box 9')]).length === 1)
+  pruefe('„Box 9“ ist „Box 09“', zeilen([['Box 09: Limited Edition', 'b', 't', '2026-09-03', 900314]], [band('Probetitel – Box 9')]).length === 1)
   const mitBezug = zeilen([gesamt], [termin('lose', '2026-09-03', 'Complete Box, Blu-ray'), termin('bezug', '2026-09-03', 'Limited Edition, Blu-ray', ['https://www.anisearch.de/article/900311'])])
   pruefe('ein Artikel, den ein anderer Termin nennt, ist nicht frei: der Bezug gewinnt, der lose Termin bleibt eigen', mitBezug.length === 2 && mitBezug.find((a) => a.artikel.b === 900311)?.release?.slug === 'bezug', mitBezug.map((a) => [a.schluessel, a.release?.slug]))
+  /* Edition: Eine genannte Edition muss zum Artikel passen (PR 5252, Prüfer: 8 von 123 Paaren waren zwei Produkte). */
+  const limitedArtikel: DiscAusgabe = ['Gesamtausgabe: Limited Edition', 'b', 'g', '2026-09-03', 900316]
+  pruefe('Artikel „Limited“, Termin „Complete Box“ (Re:Monster, 04.09.2026): zwei Produkte, zwei Zeilen', zeilen([limitedArtikel], [termin('box', '2026-09-03', 'Complete Box, Blu-ray')]).length === 2)
+  pruefe('Artikel schlicht, Termin „Limited Edition mit Sammelschuber“ (Tagebücher der Apothekerin): zwei Zeilen', zeilen([['Vol. 1/4', 'b', 't', '2026-09-03', 900317]], [band('Probetitel – Vol. 1')]).length === 2)
+  pruefe('andere Art der Limited-Ausgabe (Steelbook gegen Collector’s): zwei Zeilen', zeilen([['Limited Steelbook Edition', 'b', 't', '2026-09-03', 900318]], [termin('c', '2026-09-03', 'Limited Collector’s Edition, Blu-ray')]).length === 2)
+  pruefe('Termin ohne Editionsangabe (nur Format) passt zum Limited-Artikel am Tag: eine Zeile', zeilen([limitedArtikel], [termin('f', '2026-09-03', 'Blu-ray')]).length === 1)
+  pruefe('Limited gegen „Limited Mediabook“: dieselbe Ausgabe, eine Zeile', zeilen([['Vol. 4/4: Limited Mediabook Edition', 'b', 't', '2026-09-03', 900319]], [termin('m', '2026-09-03', 'Limited Edition, Blu-ray')]).length === 1)
 }
 
 if (verletzt) {

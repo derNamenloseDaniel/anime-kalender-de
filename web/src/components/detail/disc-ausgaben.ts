@@ -81,6 +81,21 @@ function gleicherBand(r: Release, a: Ausgabe): boolean {
   return !a.gesamt && [termin, ''].includes(band(a.name))
 }
 
+const BESONDERS = /limited|limitiert|steelbook|steelcase|mediabook|collector|ultimate|schuber|deluxe|premium|special/i
+const ARTEN = [/steelbook/i, /steelcase/i, /mediabook/i, /collector/i, /ultimate/i, /schuber/i, /deluxe|premium/i, /special/i]
+
+/** Nennt der Termin eine Edition? Nur Format („DVD & Blu-ray“) oder nichts sagt über das Produkt nichts. */
+const nenntEdition = (edition = ''): boolean => /[a-zäöü]{3,}/i.test(edition.replace(/blu-?ray|\bdvd\b|\b4k\b|uhd|\bund\b/gi, ''))
+
+/** Nennt ein Termin eine Edition, muss der Artikel dieselbe Art Ausgabe sein (Limited gegen schlichte, Steelbook gegen Collector’s sind zwei Produkte). */
+function gleicheEdition(r: Release, a: Ausgabe): boolean {
+  const edition = r.edition ?? ''
+  if (!nenntEdition(edition)) return true
+  if (BESONDERS.test(edition) !== BESONDERS.test(a.name)) return false
+  const [t, n] = [ARTEN.filter((re) => re.test(edition)), ARTEN.filter((re) => re.test(a.name))]
+  return !t.length || !n.length || t.some((re) => n.includes(re))
+}
+
 /**
  * Ein Termin ohne Artikelbezug ist dieselbe Ausgabe wie der aniSearch-Artikel, der am selben Tag im selben Format erscheint —
  * aber nur eindeutig: genau ein freier Artikel und genau ein loser Termin an dem Tag (26.11.2026: 124 von 183 losen Terminen).
@@ -93,7 +108,7 @@ function amSelbenTag(r: Release, ausgaben: Ausgabe[], lose: Release[]): Ausgabe 
   /* Ohne Termin ist nur ein aniSearch-Artikel: Jede Zeile aus einem Termin trägt ihn. */
   const artikel = ausgaben.filter((a) => !a.release && passt(a.datum, a.formate) && gleicherBand(r, a))
   const termine = lose.filter((l) => passt(terminDatum(l), formateAus(l.edition)))
-  return artikel.length === 1 && termine.length === 1 ? artikel[0] : undefined
+  return artikel.length === 1 && termine.length === 1 && gleicheEdition(r, artikel[0]!) ? artikel[0] : undefined
 }
 
 /** Ein Termin gehört zu der aniSearch-Ausgabe, auf deren Artikel er verweist oder die am selben Tag dieselbe ist; sonst wird er eine eigene Zeile. */

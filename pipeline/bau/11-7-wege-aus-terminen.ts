@@ -73,7 +73,7 @@ export function ueberholteNeins(belege: Parameters<typeof baueNeinGilt>[0], rele
 function jaNachNein(belege: Parameters<typeof baueNeinGilt>[0], k: string): boolean {
   const eigene = belege.filter((b) => dubKey(b.anilistId, b.platform) === k)
   const neinAm = eigene.filter((b) => b.available === false).reduce((m, b) => ((b.checkedAt ?? '') > m ? (b.checkedAt ?? '') : m), '')
-  return eigene.some((b) => b.dub === true && (b.checkedAt ?? '') > neinAm)
+  return eigene.some((b) => tonAusBeleg(b).dub !== undefined && (b.checkedAt ?? '') > neinAm) // Ja-Beleg wie in tonAusBeleg gelesen, keine eigene dub-Lesestelle
 }
 
 /** Ein Handbeleg „deutsch" bringt Urteil und Folgenbereiche mit; ohne ihn bleibt der Ton offen, und die Herkunft ist der Termin. */

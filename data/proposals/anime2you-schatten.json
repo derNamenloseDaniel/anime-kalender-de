@@ -1718,6 +1718,43 @@
         "stichprobe": 0,
         "rest": 1
       }
+    },
+    {
+      "am": "2026-11-27",
+      "artikel": 1,
+      "ohneAntwort": 0,
+      "schattenFehler": 0,
+      "gleich": 3,
+      "nurRegel": 0,
+      "nurClaude": 3,
+      "ms": 2.7222260000000063,
+      "faelle": [
+        {
+          "artikelId": "1077491",
+          "seite": "nurClaude",
+          "titel": "Die Biene Maja",
+          "plattform": "primevideo"
+        },
+        {
+          "artikelId": "1077491",
+          "seite": "nurClaude",
+          "titel": "Heidi",
+          "plattform": "primevideo"
+        },
+        {
+          "artikelId": "1077491",
+          "seite": "nurClaude",
+          "titel": "Wickie und die starken Männer",
+          "plattform": "primevideo"
+        }
+      ],
+      "router": {
+        "scharf": false,
+        "artikel": 1,
+        "erspart": 0,
+        "stichprobe": 0,
+        "rest": 1
+      }
     }
   ]
 }

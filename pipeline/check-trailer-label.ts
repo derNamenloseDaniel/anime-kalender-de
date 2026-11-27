@@ -1,6 +1,7 @@
 /** Prüft `lib/trailer-label.ts` (Zuordnung deutscher Label-Trailer) an Fixtures und dem echten Fall 156040 — kein Netz. */
 import { readJson } from './lib/util.ts'
 import { ladeTrailerHand } from './lib/trailer-hand.ts'
+import { melde } from './lib/quarantaene.ts'
 import {
   istDeutschesVideo,
   staffelNummer,
@@ -27,6 +28,7 @@ console.log('Der gemeldete Fall (AniList 156040)')
 const echt = readJson<(LabelTitel & { format?: string })[]>('public/data/titles.json', []).find((t) => t.id === 156040)
 const KSM = v('n5yRD1JypBU', 'THE MOST HERETICAL LAST BOSS QUEEN | Trailer HD | Deutsch | Anime | 2026')
 const r = wahl(echt ? [echt] : [], [KSM])
+if (!echt) melde(156040, 'trailer-label', 'Titel 156040 fehlt im Datensatz')
 pruefe('echter Titel 156040 liegt im Datensatz', Boolean(echt))
 pruefe('KSM-Trailer n5yRD1JypBU geht an 156040', r.funde.get(156040)?.video === 'n5yRD1JypBU', [...r.funde])
 pruefe('Fund ist deutsch und trägt Herkunft label', r.funde.get(156040)?.sprache === 'de' && r.funde.get(156040)?.herkunft === 'label')
@@ -85,12 +87,16 @@ pruefe('Trailer vor Teaser, dann der jüngste', mehr.funde.get(1)?.video === 't3
 console.log('Handtrailer')
 const hand = ladeTrailerHand()
 pruefe('156040 steht in trailer-hand.yaml mit n5yRD1JypBU, deutsch', hand['156040']?.video === 'n5yRD1JypBU' && hand['156040']?.sprache === 'de', hand['156040'])
-pruefe('jeder Handeintrag gehört zu einem Titel im Datensatz', Object.keys(hand).every((id) => readJson<{ id: number }[]>('public/data/titles.json', []).some((t) => String(t.id) === id)))
+const titelIds = new Set(readJson<{ id: number }[]>('public/data/titles.json', []).map((t) => String(t.id)))
+const verwaist = Object.keys(hand).filter((id) => !titelIds.has(id))
+for (const id of verwaist) melde(Number(id), 'trailer-hand', 'Handtrailer ohne Titel im Datensatz')
+pruefe('jeder Handeintrag gehört zu einem Titel im Datensatz', verwaist.length === 0, verwaist)
 
 console.log('Logzeile')
 pruefe('nennt nur Gründe mit Treffern', verwerfungenText(clip.verworfen) === '1× kein-trailer, 1× kein-treffer', verwerfungenText(clip.verworfen))
 pruefe('ohne Verwerfung „keine“', verwerfungenText(r.verworfen) === 'keine')
 
+console.log(`VERSTÖSSE: ${fehler}`)
 if (fehler) {
   console.error(`\n${fehler} Prüfung(en) fehlgeschlagen`)
   process.exit(1)

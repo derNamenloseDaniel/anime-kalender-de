@@ -326,6 +326,7 @@ const TEXTE = {
   // Der deutsche Termin stand da, doch der Anbieter selbst führt an dem Tag nur OmU (02.10.2026).
   'antwort.widerlegtTitel': 'Angekündigt — vom Anbieter widerlegt',
   'antwort.widerlegtNeben': 'Am {datum} führt Crunchyrolls Wochenprogramm nur die japanische Fassung.',
+  'antwort.widerlegtNebenAnbieter': 'Für {datum} angekündigt, {anbieter} führt nur den Originalton.',
   // Angekündigter Simulcast (data/ankuendigungen.yaml, 25.09.2026) — kurz, der Kasten ist klein.
   'antwort.synchroAngekuendigt': 'Deutsche Synchro angekündigt',
   'antwort.omuAb': 'mit Untertiteln ab {wann}',

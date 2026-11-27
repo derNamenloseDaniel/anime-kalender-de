@@ -1,7 +1,8 @@
 import { schreibeSuchadressen } from './nebendateien.ts'
 import { type SlimTitel } from './13-2-auslieferung.ts'
 
-export type OffeneSuche = { id: number; titel: string; plattform: string; url: string }
+/** `termin`: Suche einer Prime-Pille (`offeneTerminSuchen`); die Erweiterungsliste nimmt sie auch bei einer nachrangigen Staffel auf. */
+export type OffeneSuche = { id: number; titel: string; plattform: string; url: string; termin?: true }
 
 /** Titelseite im Sinn der Suchadressen-Liste: weder Suche (`/search`, `/s`, `?k=`, `?q=`) noch Startseite ohne Pfad. */
 function istTitelseite(url: string): boolean {
@@ -39,7 +40,11 @@ export function logzeileBeantwortete(offen: OffeneSuche[], uebrig: OffeneSuche[]
 /** `terminSuchen` (Prime-Pillen ohne Titelseite) bleiben stehen, auch wenn der Titel eine Prime-Seite eines anderen Kanals trägt: die Pille sucht, der Kanal ist unbeantwortet. */
 export function schreibeSuchadressenImEndzustand(offen: OffeneSuche[], slim: SlimTitel[], terminSuchen: OffeneSuche[] = []): void {
   const uebrig = suchenOhneTitelseite(offen, slim)
-  for (const s of terminSuchen) if (!uebrig.some((e) => e.id === s.id && e.plattform === s.plattform)) uebrig.push(s)
+  for (const s of terminSuchen) {
+    const da = uebrig.find((e) => e.id === s.id && e.plattform === s.plattform)
+    if (da) da.termin = true
+    else uebrig.push(s)
+  }
   console.log(logzeileBeantwortete(offen, uebrig))
   schreibeSuchadressen(uebrig)
 }

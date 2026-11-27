@@ -459,7 +459,7 @@
     "aenderungen": [
       {
         "datei": "pipeline/bau/13-3-termin-suchen.ts",
-        "suche": "je.set(r.titleId, { id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name) })",
+        "suche": "je.set(r.titleId, { id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name), termin: true })",
         "ersetze": "void 0",
         "zeile": 22
       }
@@ -473,8 +473,8 @@
     "aenderungen": [
       {
         "datei": "pipeline/bau/13-3-termin-suchen.ts",
-        "suche": "je.set(r.titleId, { id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name) })",
-        "ersetze": "je.set({ id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name) }, r.titleId)",
+        "suche": "je.set(r.titleId, { id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name), termin: true })",
+        "ersetze": "je.set({ id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name), termin: true }, r.titleId)",
         "zeile": 22
       }
     ],
@@ -487,8 +487,8 @@
     "aenderungen": [
       {
         "datei": "pipeline/bau/13-3-termin-suchen.ts",
-        "suche": "je.set(r.titleId, { id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name) })",
-        "ersetze": "je.set({ id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name) })",
+        "suche": "je.set(r.titleId, { id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name), termin: true })",
+        "ersetze": "je.set({ id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name), termin: true })",
         "zeile": 22
       }
     ],
@@ -501,7 +501,7 @@
     "aenderungen": [
       {
         "datei": "pipeline/bau/13-3-termin-suchen.ts",
-        "suche": "je.set(r.titleId, { id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name) })",
+        "suche": "je.set(r.titleId, { id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name), termin: true })",
         "ersetze": "je.set(r.titleId)",
         "zeile": 22
       }

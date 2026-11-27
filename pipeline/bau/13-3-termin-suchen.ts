@@ -19,7 +19,7 @@ export function offeneTerminSuchen(releases: Release[], titles: Title[]): Offene
     const titel = titelNachId.get(r.titleId)
     if (!titel || je.has(r.titleId)) continue
     const name = anzeigeName(titel)
-    je.set(r.titleId, { id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name) })
+    je.set(r.titleId, { id: r.titleId, titel: name, plattform: 'primevideo', url: r.platformUrl ?? primeVideoSearchUrl(name), termin: true })
   }
   return [...je.values()]
 }

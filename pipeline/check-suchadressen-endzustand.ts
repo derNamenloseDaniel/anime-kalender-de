@@ -39,18 +39,21 @@ pruefe('Mischfall: nur der Titel ohne Seite bleibt', ids(suchenOhneTitelseite([s
 
 /* Stiller Ausfall: Was der Filter weglässt, steht mit Anzahl und Beispielen im Log (Aufruf wie in Phase 13, Listen in einem Temp-Ordner). */
 suchadressenInTemp()
+const schonDa: ReturnType<typeof such> & { termin?: true } = such(25, 'primevideo')
 const zeilen: string[] = []
 const echtesLog = console.log
 console.log = (...a: unknown[]) => void zeilen.push(a.join(' '))
 try {
   schreibeSuchadressenImEndzustand([such(21, 'primevideo'), such(22, 'primevideo'), such(23, 'primevideo')], [slimTitel(21, [{ platform: 'primevideo', url: SEITE }]), slimTitel(22, [])])
   schreibeSuchadressenImEndzustand([such(24, 'primevideo')], [slimTitel(24, [])])
+  schreibeSuchadressenImEndzustand([schonDa], [slimTitel(25, [])], [{ ...such(25, 'primevideo'), termin: true }])
 } finally {
   console.log = echtesLog
 }
 const logzeilen = zeilen.filter((z) => z.startsWith('Suchadressen-Liste:'))
 pruefe('Logzeile nennt Anzahl und Beispiel der weggelassenen Einträge', logzeilen[0] === 'Suchadressen-Liste: 1 von 3 Einträgen im Endzustand beantwortet — z. B. 21 T21 (primevideo)', logzeilen[0])
 pruefe('Logzeile auch ohne weggelassene Einträge: 0 von 1', logzeilen[1] === 'Suchadressen-Liste: 0 von 1 Einträgen im Endzustand beantwortet', logzeilen[1])
+pruefe('Pillen-Suche zu einem schon gelisteten Titel markiert den Eintrag (termin)', schonDa.termin === true, schonDa)
 
 /* Der Aufrufer: `liefereAus` in build.ts reicht `synchro.suchOffen` an die Auslieferung (Mutant `suchOffen: []` ließe die Liste live immer leer). */
 const quelle = ts.createSourceFile('build.ts', readFileSync(new URL('./build.ts', import.meta.url), 'utf8'), ts.ScriptTarget.Latest, true)

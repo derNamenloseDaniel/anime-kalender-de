@@ -164,13 +164,3 @@
   zitat: 'Der Begriff Anime leitet sich von Animation ab. Das Anohana-Special mit den Briefen an Menma lässt sich hingegen eher als Diashow beschreiben. Keine Animation → kein Anime.'
   sources:
     - 'aniSearch-Antwort an Daniel, 08.10.2026'
-
-# Cloud-Lauf 26.11.2026 (synchro-urteil-2): Rockman.EXE Axess (zweite Staffel, 51 Folgen). de.wikipedia „MegaMan NT Warrior“ (?action=raw gelesen): nur die erste Staffel lief auf RTL II.
-# Zweite Quelle: Synchronkartei führt laut Bericht vom 06.10.2026 (docs/wissen/synchro-recherche-2026-10-06.md) nur „MegaMan: NT Warrior (2002-2003)“; dort gelesen, aus der Cloud nicht neu abrufbar (Abwesenheit allein wäre kein Nein, trägt hier nur als zweite Stimme zur ausdrücklichen Wikipedia-Aussage).
-- anilistId: 2108
-  title: 'Rockman.EXE AXESS'
-  belegtAm: '2026-11-26'
-  zitat: 'die erste Staffel unter dem Namen MegaMan NT Warrior auf dem Sender RTL II ausgestrahlt wurde. Weitere Staffeln blieben jedoch aus.'
-  sources:
-    - https://de.wikipedia.org/wiki/MegaMan_NT_Warrior
-    - https://www.synchronkartei.de/serie/11929

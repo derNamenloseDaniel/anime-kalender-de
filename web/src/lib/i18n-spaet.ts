@@ -211,6 +211,7 @@ export const TEXTE_SPAET = {
   'antwort.erscheintRelativ': 'erscheint {rel}, am {tag} den {datum}.',
   'antwort.erscheintDatum': 'erscheint am {tag} den {datum}.',
   'antwort.erscheintUmZeit': '{termin}, voraussichtlich um {zeit} Uhr.',
+  'antwort.erscheintAbZeit': '{termin}, ab {zeit} Uhr.',
   'antwort.ausgeblieben': 'Folge {n} ist nicht erschienen',
   'antwort.angekuendigtFuerZeit': 'angekündigt für {tag} den {datum}, {zeit} Uhr.',
   'antwort.erwartetFuerZeit': 'erwartet für {tag} den {datum}, {zeit} Uhr (geschätzt).',

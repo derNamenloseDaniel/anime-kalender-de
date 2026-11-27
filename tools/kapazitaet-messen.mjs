@@ -141,7 +141,11 @@ export async function lauf({ token, konto, jetzt, tage = 7, holen = fetch, ausga
   if (messung.stundenFehler) ausgabe(`::warning::Kapazität: Stundenabfrage nicht lesbar (${messung.stundenFehler})`)
   const { befunde, warnungen } = bewerteKapazitaet(messung.tage)
   for (const m of messung.nichtLesbar) befunde.push(`Kapazität: Datensatz nicht lesbar (${m}) — Messung unvollständig, Token-Rechte und Feldnamen prüfen`)
-  for (const w of warnungen) ausgabe(`::warning::${w}`)
+  // `::warning::` sieht nur die Lauf-Zusammenfassung; die Wachphase liest die ⚠-Zeile im Log.
+  for (const w of warnungen) {
+    ausgabe(`::warning::${w}`)
+    ausgabe(`⚠ WARNUNG ${w}`)
+  }
   for (const b of befunde) ausgabe(`::error::${b}`)
   ausgabe(befunde.length ? 'Kapazität: ÜBER einer Schwelle oder Messung unvollständig.' : 'Kapazität: alles im Rahmen.')
   return befunde.length ? 1 : 0

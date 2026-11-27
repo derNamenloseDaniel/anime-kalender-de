@@ -27,6 +27,7 @@ writeFileSync(
   JSON.stringify({ 900001: { anisearchId: 9_000_001 }, 900002: { anisearchId: 9_000_001 }, 900003: { anisearchId: 9_000_003 } }),
 )
 writeFileSync(join(wurzel, 'data/kino-ankuendigungen.yaml'), '[]\n')
+writeFileSync(join(wurzel, 'data/anisearch-ids-hand.yaml'), '') // ladeQuellen liest sie über die aniSearch-Brücke der Filmgruppen
 writeFileSync(join(wurzel, 'data/anisearch-mal-verworfen.json'), JSON.stringify({ 700001: { anisearch: 9_000_001, anilist: 900001, grund: 'Probe' } }))
 
 try {
@@ -59,7 +60,6 @@ try {
   const meldung = anisearchFelderAnwenden(titelKarten as never)
   pruefe('Laufzeit in der Titelkarte (anisearch-felder): nur der Titel ohne Streichung bekommt sie', meldung.endsWith('1 mit Laufzeit aus aniSearch, 0 aus AniList') && titelKarten.get(900_001)?.runtimeMin === undefined, meldung)
 
-  writeFileSync(join(wurzel, 'data/anisearch-ids-hand.yaml'), '')
   const { anisearchBruecke } = await import('./lib/anisearch-katalog-ids.ts')
   const bruecke = [...anisearchBruecke()]
   pruefe('Brücke Titel → Seite (anisearch-katalog-ids): die verworfene Seite fehlt, die andere bleibt', JSON.stringify(bruecke) === '[["900002","9000001"]]', bruecke)

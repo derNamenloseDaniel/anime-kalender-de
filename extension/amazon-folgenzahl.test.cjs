@@ -700,7 +700,7 @@ pruefe(
   )
   pruefe(
     'er wird in beiden Trefferzweigen gerufen',
-    (quelle.match(/auswahlGruppe\(auftrag, gefunden\)/g) ?? []).length >= 2 && quelle.includes('nurAehnlich ? auswahlGruppe(auftrag, gefunden)'),
+    (quelle.match(/auswahlGruppe\(auftrag, \{ treffer: /g) ?? []).length >= 2 && quelle.includes('nurAehnlich ? auswahlGruppe(auftrag, { treffer: befund.treffer })'),
     'sonst lässt sich ein Eintrag mit mehreren Prime-Ausgaben nicht vollständig wählen',
   )
 }

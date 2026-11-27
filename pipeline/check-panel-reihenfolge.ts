@@ -1,6 +1,6 @@
 /**
  * Zusicherung (Daniel, 20.11.2026): Im Detail-Panel steht die Handlung über den Neuigkeiten, die Neuigkeiten über der Reihe.
- * Gerendert wird das echte `DetailPanel` (Mini-DOM, Handlung aus einer Synopsis-Attrappe, Reihe aus zwei Titeln einer Franchise);
+ * Gerendert wird das echte `DetailPanel` (Mini-DOM, Handlung aus einer Synopsis-Attrappe, Reihe aus Serie und Film einer Franchise);
  * die Reihenfolge wird an den Überschriften der Karten gelesen. Aufruf: `npm run check:logic`.
  */
 import { act, createElement as h } from 'react'
@@ -64,7 +64,7 @@ const stelle = (text: string, wort: string): number => text.indexOf(wort)
 
 console.log('\nTitel mit Handlung und Reihe')
 {
-  const w = await rendere([teil(ID, 'Probe Eins'), teil(ID + 1, 'Probe Zwei')])
+  const w = await rendere([teil(ID, 'Probe Eins'), { ...teil(ID + 1, 'Probe Zwei'), format: 'MOVIE' } as Title])
   const text = w.textContent
   const handlung = stelle(text, HANDLUNGSTEXT)
   const reihe = w.finde((k) => k.tagName === 'SECTION' && (k.getAttribute('aria-label') ?? '').includes('Reihe'))[0]
@@ -87,7 +87,7 @@ console.log('\nTitel ohne Reihe (nur ein Teil)')
 console.log('\nTitel ohne Handlung')
 {
   Object.assign(globalThis, { fetch: async () => antwort('x') })
-  const w = await rendere([{ ...teil(ID + 5, 'Ohne Text'), franchiseId: ID + 5 } as Title, { ...teil(ID + 6, 'Ohne Text 2'), franchiseId: ID + 5 } as Title])
+  const w = await rendere([{ ...teil(ID + 5, 'Ohne Text'), franchiseId: ID + 5 } as Title, { ...teil(ID + 6, 'Ohne Text 2'), franchiseId: ID + 5, format: 'MOVIE' } as Title])
   const text = w.textContent
   pruefe('kein Handlungstext, kein Platzhalter-Rest „Handlung“ vor der Reihe', stelle(text, HANDLUNGSTEXT) < 0 && !w.finde((k) => k.tagName === 'SECTION' && (k.getAttribute('aria-label') ?? '') === 'Handlung').length, text)
   pruefe('die Reihe steht trotzdem da', w.finde((k) => k.tagName === 'SECTION' && (k.getAttribute('aria-label') ?? '').includes('Reihe')).length > 0, text)

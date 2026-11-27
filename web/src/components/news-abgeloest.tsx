@@ -1,8 +1,8 @@
 import { istLink } from '@shared/quelle.ts'
 import type { NewsMeldung } from '@shared/types.ts'
-import { GRUND_NUR_ORIGINALTON } from '@shared/news-typen.ts'
 import { useLang } from '../lib/i18n.tsx'
 import { datumKurz } from '../lib/news-text.ts'
+import { Tooltip } from './ui.tsx'
 
 /**
  * **Was eine Meldung abgelöst hat, steht neben ihr**.
@@ -16,26 +16,27 @@ export function AbgeloestHinweis({ m }: { m: NewsMeldung }) {
   if (m.ersetzt) {
     const text = t('news.ersetzt', { datum: m.ersetzt.datum ? datumKurz(m.ersetzt.datum) : '' })
     return istLink(m.ersetzt.quelle) ? (
-      <a
-        href={m.ersetzt.quelle}
-        target="_blank"
-        rel="noopener noreferrer"
-        title={t('news.ersetztTitel')}
-        className="shrink-0 text-[11px] text-ak-warnung-text underline decoration-dotted underline-offset-2 hover:text-ak-text"
-      >
-        {text} ↗
-      </a>
+      <Tooltip text={t('news.ersetztTitel')} seite="unten" className="shrink-0">
+        <a
+          href={m.ersetzt.quelle}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[11px] text-ak-warnung-text underline decoration-dotted underline-offset-2 hover:text-ak-text"
+        >
+          {text} ↗
+        </a>
+      </Tooltip>
     ) : (
-      <span title={t('news.ersetztTitel')} className="shrink-0 text-[11px] text-ak-warnung-text">
-        {text}
-      </span>
+      <Tooltip text={t('news.ersetztTitel')} seite="unten" className="shrink-0">
+        <span className="text-[11px] text-ak-warnung-text">{text}</span>
+      </Tooltip>
     )
   }
   if (m.zurueckgezogen) {
     return (
-      <span title={m.zurueckgezogen.grund === GRUND_NUR_ORIGINALTON ? GRUND_NUR_ORIGINALTON : t('news.zurueckgezogenTitel')} className="shrink-0 text-[11px] text-ak-fehler-text">
-        {t(m.zurueckgezogen.grund === GRUND_NUR_ORIGINALTON ? 'news.zurueckgezogenOmu' : 'news.zurueckgezogen')}
-      </span>
+      <Tooltip text={t('news.zurueckgezogenTitel')} seite="unten" className="shrink-0">
+        <span className="text-[11px] text-ak-fehler-text">{t('news.zurueckgezogen')}</span>
+      </Tooltip>
     )
   }
   return null

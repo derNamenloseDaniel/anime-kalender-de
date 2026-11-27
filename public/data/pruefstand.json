@@ -1,19 +1,24 @@
 {
- "erzeugtAm": "2026-11-26T19:24:09.198Z",
+ "erzeugtAm": "2026-11-27T13:49:23.087Z",
  "anbieter": [
   {
    "name": "Amazon",
    "plattform": "primevideo",
-   "gemeldet": 1017,
-   "gesamt": 1046,
-   "offen": 29,
-   "ohneSeite": 2,
+   "gemeldet": 1020,
+   "gesamt": 1047,
+   "offen": 27,
+   "ohneSeite": 3,
    "suchAdressen": [
+    "https://www.amazon.de/s?k=Cat's%20Eye%20Season%202&i=instant-video",
     "https://www.amazon.de/s?k=The%20Birth%20Of%20Kitaro%20-%20Das%20Geheimnis%20von%20Gegege&i=instant-video",
     "https://www.amazon.de/s?k=Black%20Butler&i=instant-video"
    ],
-   "ziel": "https://www.amazon.de/gp/video/detail/B09JLN6S1R",
+   "ziel": "https://www.amazon.de/gp/video/detail/0OPTCDPN7UYNAUNUCD1KACDL6P",
    "ziele": [
+    {
+     "url": "https://www.amazon.de/gp/video/detail/0OPTCDPN7UYNAUNUCD1KACDL6P",
+     "titel": "A Wild Last Boss Appeared! Staffel 2 (A Wild Last Boss Appeared! Season 2)"
+    },
     {
      "url": "https://www.amazon.de/gp/video/detail/B09JLN6S1R",
      "titel": "Detektiv Conan (Detective Conan)"
@@ -35,16 +40,8 @@
      "titel": "Meine Wiedergeburt als Schleim in einer anderen Welt: Staffel 4 (That Time I Got Reincarnated as a Slime Season 4)"
     },
     {
-     "url": "https://www.amazon.de/gp/video/detail/B0FCQJPR5S",
-     "titel": "Kaiju No. 8: Mission Recon"
-    },
-    {
      "url": "https://www.amazon.de/gp/video/detail/B0DJKGJQ7K",
      "titel": "Yandere Dark Elf: She Chased Me All the Way from Another World!"
-    },
-    {
-     "url": "https://www.amazon.de/gp/video/detail/B0H11D41SV",
-     "titel": "Miss Kobayashi’s Dragon Maid: Ein einsamer Drache sehnt sich nach Liebe (Miss Kobayashi's Dragon Maid: A lonely dragon wants to be loved)"
     },
     {
      "url": "https://www.amazon.de/gp/video/detail/B0CJRZY5ND",
@@ -61,10 +58,6 @@
     {
      "url": "https://www.amazon.de/gp/video/detail/B0CJYLSY3D",
      "titel": "Golden Kamuy 4 (Golden Kamuy Season 4)"
-    },
-    {
-     "url": "https://www.amazon.de/gp/video/detail/B098JKZFBH",
-     "titel": "Made in Abyss: Die Reise beginnt (Made in Abyss: Journey's Dawn)"
     },
     {
      "url": "https://www.amazon.de/gp/video/detail/B0CHP5RVPL",
@@ -116,7 +109,7 @@
      "hinweis": "Staffeln unklar: TMDB zählt 62 Folgen insgesamt, der Anbieter kann sie anders schneiden"
     }
    ],
-   "naechster": "Detektiv Conan (Detective Conan)",
+   "naechster": "A Wild Last Boss Appeared! Staffel 2 (A Wild Last Boss Appeared! Season 2)",
    "bekannt": {
     "B0DGGZSKRM": 13,
     "B0FKZM9J6V": 25,
@@ -299,9 +292,9 @@
   {
    "name": "Netflix",
    "plattform": "netflix",
-   "gemeldet": 774,
-   "gesamt": 914,
-   "offen": 140,
+   "gemeldet": 778,
+   "gesamt": 917,
+   "offen": 139,
    "ohneSeite": 15,
    "ziel": "https://www.netflix.com/title/81608820",
    "ziele": [
@@ -312,10 +305,6 @@
     {
      "url": "https://www.netflix.com/title/81272431",
      "titel": "Numberblocks"
-    },
-    {
-     "url": "https://www.netflix.com/title/81991076",
-     "titel": "Fool Night"
     },
     {
      "url": "https://www.netflix.com/title/80107103",
@@ -329,12 +318,15 @@
      ]
     },
     {
-     "url": "https://www.netflix.com/title/81684733",
-     "titel": "Oshi no Ko: Mein Star"
+     "url": "https://www.netflix.com/title/81506915",
+     "titel": "Devil May Cry",
+     "staffeln": [
+      2
+     ]
     },
     {
-     "url": "https://www.netflix.com/title/82036361",
-     "titel": "My Hero Academia: Vigilantes Staffel 2"
+     "url": "https://www.netflix.com/title/81684733",
+     "titel": "Oshi no Ko: Mein Star"
     },
     {
      "url": "https://www.netflix.com/title/82746480",
@@ -395,6 +387,10 @@
      "staffeln": [
       1
      ]
+    },
+    {
+     "url": "https://www.netflix.com/title/81172267",
+     "titel": "Sonic X: The Metarex Saga"
     },
     {
      "url": "https://www.netflix.com/title/80193421",
@@ -683,7 +679,6 @@
     "80103318": 13,
     "80174918": 12,
     "80174974": 10,
-    "80186926": 6,
     "80206326": 26,
     "80212481": 13,
     "80221272": 13,
@@ -715,7 +710,6 @@
     "81442091": 12,
     "81497635": 12,
     "81499847": 13,
-    "81506915": 1,
     "81564899": 1,
     "81642998": 12,
     "81684552": 12,
@@ -985,6 +979,24 @@
     "8cc06990-0faf-4a7e-ac1f-fb74cb4b9286": 15,
     "5ecc8b00-79fd-4c1a-81ed-f44260ef38d4": 13
    }
+  },
+  {
+   "name": "Suchadressen",
+   "plattform": "suchadressen",
+   "gemeldet": 0,
+   "gesamt": 1,
+   "offen": 1,
+   "titel": 0,
+   "ohneSeite": 1,
+   "ziel": "https://www.amazon.de/s?k=Cat's%20Eye%20Season%202&i=instant-video",
+   "ziele": [
+    {
+     "url": "https://www.amazon.de/s?k=Cat's%20Eye%20Season%202&i=instant-video",
+     "titel": "Cat's Eye Season 2"
+    }
+   ],
+   "naechster": "Cat's Eye Season 2",
+   "hinweis": "Suchadressen ohne Titelseite: den richtigen Treffer beim Anbieter heraussuchen"
   }
  ]
 }

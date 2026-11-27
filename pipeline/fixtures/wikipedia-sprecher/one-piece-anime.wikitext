@@ -1,0 +1,493 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/One_Piece_(Anime) (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=One_Piece_(Anime)&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+Die erste deutsche Synchronfassung der Fernsehserie wurde bis Episode 314 im Auftrag von [[RTL II]] und für die Episoden 315 bis 400 im Auftrag von [[Tele 5]] in den [[München]]er [[Synchronstudio]]s der ''PPA Film GmbH'' mit deutschsprachigen Dialogen versehen.<ref name="PPA">[http://www.ppafilm.de/ Homepage der PPA Film GmbH]</ref><ref name="Animeaufdvd">[http://www.animeaufdvd.info/synchro/serien_119.php Eintrag] auf Anime auf DVD.</ref>
+Seit Episode 401 wird die Serie von der [[Rescue Film|Rescue Film GmbH]], im Auftrag von Tōei Animation Europe, bearbeitet und synchronisiert und bei [[ProSieben Maxx]] ausgestrahlt.<ref>[http://www.rescue-film.de/produktionen/one-piece-401-456/ Rescue Film GmbH – One Piece 401 – 456]</ref>
+
+Im Laufe der Jahre übernahmen verschiedene Personen die Regie- und Dialogbuch-Arbeiten:<ref>{{Synchronkartei|serie|8550|One Piece &#91;1. Synchro (2003)&#93;|Abruf=2026-01-24}}</ref>
+
+'''Dialogbuch''': [[Inez Günther]] (Episoden 314–400), Florian Kramer, Julian Klefke, Tanja Paidar, Hans-Werner Schwarz (Episoden 401–456), Uwe Thomsen, Kai Medinger, Florian Kramer (Episoden 401–456), [[Daniel Schlauch]], Kai Medinger, [[Yannick Forstenhäusler]] (Episoden 518–628 & 785–829), [[Nicole Hise]] (Episoden 635–652), [[Katharina von Daake]] (ab Episode 653), Cindy Kepke (Episoden 682–771 & 787–856), Kathrin Stoll (Episoden 780–877), Uwe Thomsen (Episoden 783–872), [[Marie-Jeanne Widera]] (Episoden 786–867), Davide Valente (Episode 789 & 799), Timo R. Schouren (Episoden 809–863), Tom Sielemann (Episoden 821–871)
+
+'''Dialogregie''': [[Martin Halm]], [[Pascal Breuer]] (Episoden 1–150), [[Ekkehardt Belle]] (Episoden 151–195), Heiko Feld (Episoden 196–314), Inez Günther (Episoden 315–400), Hans-Werner Schwarz, [[Paul Sedlmeir]] (Episoden 401–456), Felix Auer (Episoden 518–628), Daniel Schlauch (ab Episode 518), Yannick Forstenhäusler (ab Episode 629), Pascal Breuer (ab Episode 780), Marie-Jeanne Widera (ab Episode 828)
+
+Die zweite deutsche Synchronfassung wurde für den [[Video-on-Demand|Online-Stream]] bei [[Netflix]] produziert und hält sich bei den Namen näher am japanischen Original statt am deutschen Manga.<ref name="neusynchro" /><ref>{{Synchronkartei|serie|61562|One Piece &#91;2. Synchro (2025)&#93;|Abruf=2026-01-24}}</ref> Diese Synchronfassung ist im deutschsprachigen Raum erstmals ab 15. November 2025 verfügbar, ist jedoch schon vorab in anderen Ländern zu hören gewesen.
+
+{| class="wikitable" id="Synchronisation Serie"
+|-
+! rowspan="2"| Rollenname<br />(Netflix-Rollenname)
+! rowspan="2"| [[Seiyū|Japanischer Sprecher]]
+! colspan="2"| Deutscher Sprecher
+|-
+! TV-Synchro
+! [[Netflix]]-Synchro
+|-
+| ''Erzähler''
+| Mahito Ōba
+| [[Reinhard Brock]] <small>(bis Folge 400, Film 1 & 9)</small><br />Andreas Wilde <small>(Folge 401–558 & Specials)</small><br />Andreas Baum <small>(Folge 559–779)</small><br />[[Markus Kästle]] <small>(ab Folge 780)</small>
+| Markus Kästle
+|-
+! colspan="4"| Strohhut-Piratenbande
+|-
+| [[Monkey D. Ruffy]]<br />(Monkey D. Luffy)
+| [[Mayumi Tanaka]]
+| [[Daniel Schlauch]]
+| Daniel Schlauch<br />[[Lara Schmidt (Synchronsprecherin)|Lara Schmidt]] <small>(Kind)</small>
+|-
+| [[Lorenor Zorro]]<br />(Roronoa Zoro)
+| [[Kazuya Nakai]]<br />Megumi Urawa <small>(Kind)</small>
+| [[Philipp Brammer]] <small>(bis Folge 400 & bis Film 11)</small><br />[[Uwe Thomsen]] <small>(ab Folge 401 & ab Film 12)</small><br />[[Anja Taborsky]] <small>(Kind; ab Folge 1059)</small>
+| Uwe Thomsen<br />[[Angelina Markiefka]] <small>(Kind)</small>
+|-
+| Nami
+| [[Akemi Okamura]]<br />[[Wakana Yamazaki]] <small>(Folge 70–79)</small>
+| colspan="2" align="center"| [[Stephanie Kellner]]
+|-
+| Lysop / Sogeking<br />(Usopp)
+| [[Kappei Yamaguchi]]
+| [[Dirk Meyer (Synchronsprecher)|Dirk Meyer]]
+| Dirk Meyer<br />[[Eileen Fuhrmann]] <small>(Kind)</small>
+|-
+| Vinsmoke Sanji
+| Hiroaki Hirata<br />[[Ikue Ōtani]] <small>(Kind)</small>
+| [[Hubertus von Lerchenfeld]]
+| Hubertus von Lerchenfeld<br />[[Johanna Giraud]] <small>(Kind)</small>
+|-
+| Tony Chopper<br />(Tony Tony Chopper)
+| Ikue Ōtani<br />Kazue Ikura <small>(Folge 254–263)</small>
+| [[Florian Halm]] <small>(bis Folge 262)</small><br />[[Martin Halm]] <small>(ab Folge 263 & Filme)</small>
+| Martin Halm
+|-
+| Prinzessin Nefeltari Vivi <!-- Bitte nicht entfernen. Vivi war für eine Zeit Mitglied der Strohhutbande, und wird daher hier aufgelistet.-->
+| Misa Watanabe
+| colspan="2" align="center"|[[Kathrin Gaube]]
+|-
+| Nico Robin / Miss Bloody Sunday<br />(Nico Robin / Miss All Sunday)
+| Yuriko Yamaguchi<br />Yuko Kobayashi <small>(Folge 299–319)</small><br />Anzu Nagai <small>(Kind)</small>
+| colspan="2" align="center"| [[Simone Brahmann]]
+|-
+| Cutty „Franky“ Framm<!--Franky ist kein Alias, sondern ein Spitzname, weshalb es so bleiben darf. Spitznamen werden immer mit „“ gekennzeichnet.-->
+| [[Kazuki Yao]]<br />Junko Noda <small>(jung)</small>
+| [[Frank Engelhardt]] <small>(bis Folge 1085)</small><br />[[Momme Mommsen (Schauspieler)|Momme Mommsen]] <small>(ab Folge 1086)</small><br />[[Julian Manuel]] <small>(jung)</small>
+|-
+| Brook
+| [[Chō (Synchronsprecher)|Chō]]
+| [[Benedikt Gutjan]]
+|-
+| Jinbei
+| [[Daisuke Gōri]] <small>(bis Folge 439)</small><br />Katsuhisa Hōki <small>(ab Folge 440)</small>
+| [[Willi Röbke]]
+|-
+! colspan="4"| Marine
+|-
+| Corby<br />(Coby)
+| Doi Mika
+| [[Katrin Fröhlich]] <small>(bis Folge 314)</small><br />[[Inez Günther]] <small>(Folge 315–324)</small><br />[[Tim Schwarzmaier]] <small>(ab Folge 550)</small>
+| Tim Schwarzmaier
+|-
+| Captain Morgan
+| Banjō Ginga
+| colspan="2" align="center"| Willi Röbke
+|-
+| Helmeppo
+| Kōichi Nagano
+| [[Oliver Stritzel]] <small>(bis Folge 324)</small><br />Gerd Meyer <small>(ab Folge 550)</small>
+| [[Nils Thalmann]]
+|-
+| Vizeadmiral Smoker
+| Ginzō Matsuo <small>(bis Folge 79)</small><br />Mahito Ōba <small>(ab Folge 94)</small>
+| [[Ekkehardt Belle]]
+| [[Tobias Brecklinghaus]]
+|-
+| Tashigi
+| Junko Noda
+| colspan="2" align="center" | [[Maren Rainer]]
+|-
+| Vizeadmiral Monkey D. Garp
+| Hiroshi Naka
+| Frank Engelhardt <small>(Folge 68–69)</small><br />[[Dieter Memel]] <small>(ab Folge 313)</small>
+| Dieter Memel
+|-
+| Großadmiral Sengoku
+| Takkō Ishimori
+| [[Matti Klemm]]<br />[[Gerhard Jilka]] <small>(Folge 277–278)</small><br />[[Matthias Kupfer]] <small>(Film 10 & 11)</small>
+|-
+| Admiral Kuzan / Aokiji
+| [[Takehito Koyasu]]
+| [[Ole Pfennig]]
+|-
+| Großadmiral Sakazuki / Akainu
+| Fumihiko Tachiki
+| [[Gerhard Acktun]] <small>(Folge 278 & Film 11)</small><br />[[Michael Brennicke]] <small>(Folge 462–642 & Film 12)</small><br />[[Holger Schwiers]] <small>(ab Folge 736 & Film 13)</small>
+|-
+| Admiral Borsalino / Kizaru
+| Unshō Ishizuka <small>(bis Folge 751)</small><br />Ryōtarō Okiayu <small>(ab Folge 881)</small>
+| [[Mike Carl]]
+|-
+| Admiral Issho / Fujitora
+| Ikuya Sawaki
+| [[Walter von Hauff]]
+|-
+| Admiral Ryokugyu / Aramaki
+| Keiji Fujiwara
+| [[Daniel Sellier]]
+|-
+! colspan="4"| Samurai der Meere
+|-
+| Buggy, „der Clown“
+| Shigeru Chiba
+| colspan="2" align="center"| [[Gudo Hoegel]]
+|-
+| Mihawk „Falkenauge“ Dulacre <br />(Dracule „Falkenauge“ Mihawk)
+| Takeshi Aono <small>(bis Folge 460)</small><br />Hirohiko Kakegawa <small>(ab Folge 461)</small>
+| colspan="2" align="center"| [[Matthias Klie]]
+|-
+| Don Quichotte de Flamingo / „Joker“
+| Hideyuki Tanaka<br />Tomoe Hanba <small>(Kind)</small>
+| [[Pascal Breuer]] <small>(Folge 151)</small><br />[[Jochen Bendel]] <small>(Folge 207)</small><br />Gerhard Acktun <small>(Folge 398)</small><br />[[Jakob Riedl (Synchronsprecher)|Jakob Riedl]] <small>(ab Folge 458)</small>
+|-
+| Bartholomäus Bär / PX-0
+| Hideyuki Hori
+| [[Thomas Albus]]
+|-
+| Gecko Moria
+| Katsuhisa Hōki
+| [[Ulrich Frank (Synchronsprecher)|Ulrich Frank]] <small>(bis Folge 374)</small><br />[[Alexander Brem (Synchronsprecher)|Alexander Brem]] <small>(ab Folge 458)</small>
+|-
+| Trafalgar D. Water Law
+| [[Hiroshi Kamiya]]
+| [[Bernd Simon]] <small>(Folge 392)</small><br />[[Manou Lubowski]] <small>(ab Folge 394)</small>
+|-
+| Boa Hancock
+| [[Kotono Mitsuishi]]
+| [[Ilena Gwisdalla]]
+|-
+| Edward Weevil
+| Kōzō Shioya
+| [[Timocin Ziegler]]
+|-
+! colspan="4" | Die Vier Kaiser
+|-
+| „Der Rote“ Shanks<br />(„Rothaar“ Shanks)
+| Shūichi Ikeda
+| Martin Halm
+| [[Roman Wolko]]
+|-
+| Marshall D. Teach / „[[Blackbeard]]“
+| [[Akio Ōtsuka]]
+| [[Christoph Jablonka]]
+|-
+| Edward Newgate / „Whitebeard“
+| Kinryū Arimoto
+| [[Manfred Erdmann]]
+|-
+| Charlotte Linlin / „Big Mom“
+| Toshiko Fujita <small>(Folge 571 & 762)</small><br />Mami Koyama <small>(ab Folge 786)</small>
+| [[Nicole Belstler-Boettcher]]<br />Kathrin Gaube <small>(Folge 762)</small><br />[[Leslie-Vanessa Lill]] <small>(Kind)</small>
+|-
+| Kaido
+| Tesshō Genda
+| Alexander Wohnhaas <small>(Folge 739)</small><br />[[Torsten Münchow]] <small>(ab Folge 771)</small>
+|-
+! colspan="4"| Weitere Piraten
+|-
+| Lady Alvida
+| Yōko Matsuoka
+| [[Anita Höfer]] <small>(bis Folge 422)</small><br />[[Angela Wiederhut]] <small>(ab Folge 512)</small>
+| [[Stefanie Dischinger]]
+|-
+| Käpt’n Black / Beauregard
+| Kōichi Hashimoto
+| Walter von Hauff
+| [[Philipp Moog]]
+|-
+| Don Creek<br />(Don Krieg)
+| Fumihiko Tachiki
+| colspan="2" align="center" | Christoph Jablonka
+|-
+| Gin
+| Kenichi Ono
+| [[Frank Röth]]
+| [[Julian Bayer]]
+|-
+| Arlong
+| Jūrōta Kosugi
+| [[Peter Musäus]]<br />[[Pierre Peters-Arnolds]] <small>(Folge 387)</small>
+| [[Michael Iwannek]]
+|-
+| Bellamy, „die Hyäne“
+| Wataru Takagi
+| [[Oliver Mink]]
+|-
+| Foxy, „der Silberfuchs“
+| Bin Shimada
+| [[Christian Weygand]]
+|-
+| Eustass „Captain“ Kid
+| [[Daisuke Namikawa]]
+| Ole Pfennig
+|-
+| Basil Hawkins
+| Shigenori Souya
+| [[Niko Macoulis]]
+|-
+| Jewelry Bonney
+| Reiko Kiuchi <small>(bis Folge 736)</small><br />Reiko Takagi <small>(ab Folge 888)</small>
+| [[Sonja Reichelt]]
+|-
+| Capone „Gang“ Bege
+| Naoki Tatsuta
+| Wolfgang Schatz <small>(Folge 392–398)</small><br />Niko Macoulis <small>(Folge 401 & 490)</small><br />Gerhard Acktun <small>(Folge 513)</small><br />[[Robert Dölle]] <small>(ab Folge 756)</small>
+|-
+| Urouge
+| Taiten Kusunoki
+| [[Matthias Kupfer]]
+|-
+| Killer / Kamazo
+| Kenji Hamada
+| Bernd Simon <small>(Folge 398)</small><br />Niko Macoulis <small>(Folge 511)</small><br />Yannik Forstenhäusler <small>(Film 13)</small><br />Sebastian Kempf <small>(ab Folge 887)</small>
+|-
+| X. Drake
+| Eiji Takemoto
+| Wolfgang Schatz <small>(Folge 392)</small><br />Bernd Simon <small>(Folge 395 & 398)</small><br />[[Andreas Borcherding]] <small>(Folge 401 & 402)</small><br />[[Crock Krumbiegel]] <small>(Folge 513)</small><br />Martin Bonvicini <small>(Folge 923–1010 & Film 13)</small><br />[[Nils Kreutinger]] <small>(ab Folge 1012)</small><br />[[Oliver Troska]] <small>(jung)</small>
+|-
+! colspan="4"| Barock Firma
+|-
+| Gal Dino / Mr. 3
+| Nobuyuki Hiyama
+| [[Manfred Trilling]]<br />[[Dennis Schmidt-Foß]] <small>(ab Folge 1086)</small>
+| Dennis Schmidt-Foß
+|-
+| Sir Crocodile / Mr. 0
+| Ryūzaburō Ōtomo
+| Andreas Borcherding <small>(Folge 76–79)</small><br />Frank Röth <small>(ab Folge 91 & Film 8)</small>
+| Frank Röth
+|-
+| Bon Curry / Bentham / Mr. 2<br />(Bon Clay / Mr. 2)
+| [[Kazuki Yao]]
+| Pierre Peters-Arnolds <small>(bis Folge 129 & Film 8)</small><br />[[Benedikt Weber]] <small>(ab Folge 431)</small>
+| [[Michael Gugel]]
+|-
+| Pola / Ms. Doublefinger
+| Ako Mayama <small>(Folge 103–104)</small><br />Yūko Tachibana <small>(ab Folge 107)</small>
+| colspan="2" align="center" | [[Susanne von Medvey]]
+|-
+| Jazz Boner / Mr. 1
+| Tetsu Inada
+| Crock Krumbiegel
+| [[Bernd Egger]]
+|-
+! colspan="4"| Whitebeards Piratenbande
+|-
+| Puma D. Ace<br />(Portgas D. Ace)
+| Toshio Furukawa<br />Daisuke Sakaguchi <small>(Kind)</small>
+| Pascal Breuer<br />Wolfgang Schatz <small>(Folge 381)</small>
+| Pascal Breuer
+|-
+| Marco, „der Phönix“
+| [[Masakazu Morita]]
+| Niko Macoulis <small>(Folge 151)</small><br />[[Johannes Raspe]] <small>(Folge 316–1009)</small><br />[[Malte Wetzel]] <small>(ab Folge 1011)</small>
+|-
+| Jozu
+| Takashi Nagasako
+| [[Michael Schwarzmaier]]
+|-
+| Vista
+| Masaya Takatsuka
+| [[René Oltmanns]]
+|-
+! colspan="4"| Blackbeards Piratenbande
+|-
+| Jesus Barges
+| Tetsu Inada
+| Gerhard Jilka <small>(Folge 146)</small><br />Ekkehardt Belle <small>(Folge 151–513)</small><br />[[Pat Zwingmann]] <small>(ab Folge 634)</small>
+|-
+| Raffit
+| [[Taiki Matsuno]]
+| Andreas Borcherding <small>(Folge 151)</small><br />Wolfgang Schatz <small>(ab Folge 325)</small>
+|-
+| Shiryuu
+| Takayuki Sugō
+| Andreas Borcherding
+|-
+| Catharina Devon
+| Kimiko Saitō
+| Inez Günther
+|-
+| Avalo Pizarro
+| Kazunari Tanaka
+| Johannes Haag
+|-
+| Vasco Shot
+| Naoki Tatsuta
+| Klaus Wolf
+|-
+! colspan="4"| Big Moms Piratenbande
+|-
+| Charlotte Lola <!--Debüt in Folge 370-->
+| [[Aya Hisakawa]]
+| Inez Günther
+|-
+| Charlotte Pudding <!--Debüt in Folge 571-->
+| [[Miyuki Sawashiro]]<br />[[Hōko Kuwashima]] <small>(Folge 856–863)</small>
+| [[Stefanie von Lerchenfeld]]
+|-
+| Charlotte Chiffon <!--Debüt in Folge 783-->
+| Aya Hisakawa
+| Ditte Schupp
+|-
+| Charlotte Amande <!--Debüt in Folge 786-->
+| Wasabi Mizuta
+| [[Caroline Ebner]]
+|-
+| Charlotte Galette <!--Debüt in Folge 789-->
+| Ai Maeda
+| [[Elisabeth Günther]]
+|-
+| Charlotte Mont d’Or <!--Debüt in Folge 789-->
+| Atsushi Imaruoka
+| [[Jochen Paletschek]]
+|-
+| Charlotte Opera <!--Debüt in Folge 789-->
+| Yoshihisa Kawahara
+| [[Jan Langer]]
+|-
+| Charlotte Praline <!--Debüt in Folge 790-->
+| Yūko Tachibana
+| Janina Dietz
+|-
+| Charlotte Brûlée <!--Debüt in Folge 792-->
+| Yūko Mita
+| [[Carin C. Tietze]]
+|-
+| Charlotte Perospero <!--Debüt in Folge 795-->
+| Yūya Uchida
+| [[Wolfgang Müller (Schauspieler, 1953)|Wolfgang Müller]]
+|-
+| Charlotte Cracker <!--Debüt in Folge 796-->
+| Takuya Kirimoto
+| Dustin Peters
+|-
+| Charlotte Counter <!--Debüt in Folge 809-->
+| Tsuyoshi Koyama
+| [[Claus Vester]]
+|-
+| Charlotte Joscarpone <!--Debüt in Folge 809-->
+| Yuriko Yamaguchi
+| [[Marget Flach]]
+|-
+| Charlotte Mascarpone <!--Debüt in Folge 809-->
+| Yūsuke Numata
+| Malte Wetzel
+|-
+| Charlotte Smoothie <!--Debüt in Folge 812-->
+| Masako Katsuki
+| [[Alexandra Ludwig (Synchronsprecherin)|Alexandra Ludwig]]
+|-
+| Charlotte Katou <!--Debüt in Folge 822-->
+| Keiji Hirai
+| Grischa Olbrich
+|-
+| Charlotte Katakuri <!--Debüt in Folge 825-->
+| [[Tomokazu Sugita]]
+| [[Marios Gavrilis]]
+|-
+| Charlotte Daifuku <!--Debüt in Folge 826-->
+| Shunsuke Sakuya
+| [[Torben Liebrecht]]
+|-
+| Charlotte Oven <!--Debüt in Folge 827-->
+| Masafumi Kimura
+| Stefan Lehnen
+|-
+| Charlotte Compote <!--Debüt in Folge 830-->
+| Mami Kingetsu
+| Claudia Jacobacci
+|-
+| Charlotte Flambe <!--Debüt in Folge 865-->
+| [[Chiwa Saitō]]
+| [[Marie-Jeanne Widera]]
+|-
+! colspan="4"| CP9/CP0
+|-
+| Rob Lucci
+| [[Tomokazu Seki]]
+| Manfred Trilling<br />Dennis Schmidt-Foß <small>(ab Folge 1092)</small>
+|-
+| Kalifa
+| [[Naomi Shindō]]
+| Kathrin Simon
+|-
+| Spandam
+| Masaya Onosaka
+| [[Tobias Lelle]]
+|-
+| Eule
+| [[Kumiko Watanabe]]
+| [[Claus-Peter Damitz]]
+|-
+| Ecki Zugluft
+| Ryoutarou Okiayu
+| Johannes Raspe<br />[[Gerrit Schmidt-Foß]] <small>(ab Folge 1092)</small>
+|-
+! colspan="4"| Revolutionäre
+|-
+| Monkey D. Dragon
+| Hidekatsu Shibata
+| colspan="2" align="center" | Gerhard Jilka
+|-
+| Emporio Ivankov
+| Norio Imamura <small>(bis Folge 460)</small><br />Mitsuo Iwata <small>(ab Folge 461)</small>
+| [[Hans-Georg Panczak]]
+|-
+| Inazuma
+| Kenji Hamada <small>(Männliche Form)</small><br />Umeka Shōji <small>(Weibliche Form)</small>
+| Gerd Meyer <small>(Männliche Form)</small><br />Julia Lowack <small>(Weibliche Form)</small>
+|-
+| Sabo
+| [[Tōru Furuya]]<br />[[Junko Takeuchi]] <small>(Kind)</small>
+| [[Felix Mayer (Synchronsprecher)|Felix Mayer]]
+|-
+! colspan="4"| Weitere Figuren / Zivilisten / Ehemalige Piraten
+|-
+| Piratenkönig Gol D. Roger
+| Chikao Ōtsuka <small>(bis Folge 770)</small><br />Masane Tsukayama <small>(ab Folge 849)</small><br />Takeshi Kusao <small>(jung)</small>
+| [[Hartmut Neugebauer]] <small>(bis Folge 628)</small><br />Michael Brennicke <small>(Folge 568)</small><br />Holger Schwiers <small>(ab Folge 770 & Film 13)</small><br />[[Patrick Roche]] <small>(jung)</small>
+| [[Stefan Wilkening]]
+|-
+| Makino
+| Makiko Ōmoto
+|colspan="2" align="center"| [[Tatjana Pokorny]]
+|-
+| Silvers Rayleigh
+| Keiichi Sonobe
+| Ole Pfennig <small>(Folge 8)</small><br />Christoph Jablonka <small>(ab Folge 395)</small>
+| Christoph Jablonka
+|-
+| Jeff
+| [[Kōji Yada]] <small>(bis Folge 324)</small><br />Ben Hiura <small>(ab Folge 794)</small>
+| [[Dirk Galuba]]<br />Gerhard Jilka <small>(Folge 133)</small><br />[[Michael Rüth]] <small>(Folge 324–325)</small>
+| [[Christian Weygand]]
+|-
+| Enel
+| [[Toshiyuki Morikawa]]
+| [[Stephan Hoffmann (Schauspieler)|Stephan Hoffmann]]
+|-
+| Kali Dadan
+| Noriko Uemura
+| [[Angelika Bender]]
+|-
+| Kinemon
+| Kenyu Horiuchi
+| Matthias Klie <small>(Serie)</small><br />Manfred Trilling <small>(Specials)</small>
+|-
+| Caesar Crown
+| Ryūsei Nakao
+| Robinson Reichel <small>(Serie)</small><br />Cyril Geffcken <small>(Specials)</small>
+|-
+| Vinsmoke Jajji
+| Hideyuki Hori
+| [[Jacques Breuer (Schauspieler)|Jacques Breuer]]
+|}
+
+Die japanischen Sprecherinnen Akemi Okamura, Ikue Ōtani und Yuriko Yamaguchi unterbrachen ihre Beschäftigung als Seiyū aufgrund von [[Mutterschaft]].

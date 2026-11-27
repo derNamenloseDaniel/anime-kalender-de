@@ -7,7 +7,7 @@ import { kartenPlattform } from '../lib/wege-filter.ts'
 import { useLang } from '../lib/i18n.tsx'
 import { ueberschriftSagtStatus, type RelevanzArt } from '../lib/db-relevanz.ts'
 import { istOhneBelegteSynchro } from '../lib/titel-sortierung.ts'
-import { teilbarerSlug } from '@shared/teilen.ts'
+import { teilenZiel } from '@shared/teilen.ts'
 import { HideEye } from './ui.tsx'
 import { KartenCover, KartenText } from './db-karte-teile.tsx'
 
@@ -90,7 +90,7 @@ export function DbKarte({ main, members, data, today, grouped, favorites, hidden
    * Detail-Panels, wo sie hingehört.
    */
   const keinDub = members.every(istOhneBelegteSynchro)
-  const teilbar = teilbarerSlug(main)
+  const teilbar = teilenZiel(main)
 
   if (isHidden) return <AusgeblendeteKarte main={main} onToggleHidden={onToggleHidden} />
 

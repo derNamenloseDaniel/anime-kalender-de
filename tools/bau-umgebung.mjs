@@ -44,6 +44,24 @@ export function ohneCiToken(env = process.env) {
 }
 
 /**
+ * Prüfungen, die die CI-Anmeldung wirklich brauchen: Sie lesen die PR-Kommentare (`patchnotes-kommentar.mjs`, Ausweg „Patch Notes: …“).
+ * `check:logic` reicht ihnen, und nur ihnen, die Variablen aus der Umgebung des Schritts durch (PR 5078, 26.11.2026: `ohneCiToken` entzog sie
+ * still, der Kommentar-Ausweg wirkte in der Kette nie). Jede Prüfung der Liste, die `beschreibungMitKommentaren` ruft, steht hier
+ * (Wächter `tools/ci-anmeldung-durchreichung.test.mjs`).
+ */
+export const CI_ANMELDUNG_DURCHREICHUNG = {
+  'tools/check-patchnotes-pflicht.mjs': ['GH_TOKEN', 'GITHUB_REPOSITORY'],
+  'tools/mockup-freigabe-pflicht.mjs': ['GH_TOKEN', 'GITHUB_REPOSITORY'],
+}
+
+/** Kopie von `env`, ergänzt um die Variablen, die `datei` laut `CI_ANMELDUNG_DURCHREICHUNG` aus `quelle` braucht. */
+export function mitCiAnmeldung(env, datei, quelle = process.env) {
+  const kopie = { ...env }
+  for (const name of CI_ANMELDUNG_DURCHREICHUNG[datei] ?? []) if (quelle[name] !== undefined) kopie[name] = quelle[name]
+  return kopie
+}
+
+/**
  * Schlüssel und Tokens der Datenläufe (Secrets der Workflows). Ein Testlauf, der `fetch.ts` oder einen Sammler mit `...process.env` startet,
  * erbt sie sonst: die Fehlermeldung enthält die TMDB-Adresse samt `api_key` und landet im öffentlichen CI-Log (Nachtbericht 25.11.2026,
  * `pipeline/check-anilist-mangel-lauf.ts`). `check:logic` und `tests-alle` entfernen sie für jede Prüfung; wer einen Schlüssel braucht, setzt ihn selbst.

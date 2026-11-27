@@ -3,6 +3,7 @@ import { addDays, todayIso, utcZeitInBerlin, toIsoDate } from './time.ts'
 import { markiereNachLuecke, verpasstAnVorhandenes } from './luecken.ts'
 import { istAusgeblieben, istKatalogstartOhneUhrzeit, markiereOhneSichtung, terminZustand, type TerminFelder } from './termin-zustand.ts'
 import { erstesFreiesDatum, folgeNachOriginal } from './synchro-original.ts'
+import { istNurUntertitel } from './nur-deutsch.ts'
 
 /** Berliner Kalendertag eines Vermerk-Zeitpunkts (`erwartetAm`, `neuErwartet` sind UTC). */
 const vermerkTag = (zeitpunkt: string): string => toIsoDate(new Date(zeitpunkt))
@@ -241,7 +242,7 @@ export function erscheintErst(t: Pick<Title, 'jpStart' | 'jpStatus' | 'jpYear'>,
  *
  * Fehlt die Uhrzeit, gilt der Tag als abgeschlossen (23:59): Wir wissen dann nicht,
  * wann sie kam, aber dass sie kam. Ausnahme: ein Katalogstart (`batch`, nicht TV) gilt ab 00:00 als erschienen,
- * sonst steht am Starttag "0 von 6"; der Kasten nennt dann "genaue Uhrzeit unbekannt" (`heuteOffen` in `fertigAntwort`).
+ * sonst steht am Starttag "0 von 6"; der Kasten sagt dann "Alle N Folgen da" (`heuteOffen` in `fertigAntwort`).
  * Der Push bleibt bei 23:59 (`katalogAmTagesbeginn = false`): Netflix schaltet erst gegen 9 Uhr frei.
  */
 export function istErschienen(
@@ -274,6 +275,7 @@ export { istKatalogstartOhneUhrzeit, istAusgeblieben }
 export const NETFLIX_UHRZEIT_UTC = '08:00'
 
 export function expandEvents(release: Release): ReleaseEvent[] {
+  if (istNurUntertitel(release)) return [] // nur deutsche Termine (`shared/nur-deutsch.ts`)
   const termine = markiereOhneSichtung(release, termineAusPlan(release))
   if (release.dateMeaning === 'available-from') for (const e of termine) e[release.erstausgabe ? 'erstausgabe' : 'imAngebot'] = true
   if (release.platform !== 'netflix' || !release.netflixOriginal) return termine
@@ -314,6 +316,7 @@ function terminGeschaetzt(
   const nachBeobachtung = Object.keys(s.observed ?? {}).some((k) => Number(k) < episode)
   const belegt =
     s.observed?.[episode] ||
+    s.sendeplanBelegt ||
     (s.belegtBis && nachBeobachtung && episode <= s.belegtBis.folge && date <= s.belegtBis.am) ||
     /* Zwischen zwei Stützpunkten eines Sendeplans ist der Tag belegt, nicht geschätzt. */
     (s.wochentage?.length && lastAnchor && episode < lastAnchor.episode && !s.estimated)
@@ -351,7 +354,7 @@ function terminBasis(release: Release, s: Plan) {
     ...uhrzeitAusPlan(s),
     releaseType: release.releaseType,
     platform: release.platform,
-    ...(release.sender ? { sender: release.sender } : {}), ...(release.sprache ? { sprache: release.sprache } : {}),
+    ...(release.sender ? { sender: release.sender } : {}), ...(release.sprache === 'offen' ? { sprache: release.sprache } : {}),
     ...(release.tvLetzteSichtung && !release.folgenBelegt ? { sichtung: true } : {}), ...(s.episodeCountAssumed ? { episodeCountAssumed: true } : {}),
     name: release.name,
     estimated: s.estimated,

@@ -98,7 +98,7 @@ pruefe('nur Prime-Kanal abgeleitet: Kopf sagt „laut Anbieter“', kopf([abgele
 pruefe('abgeleitet und gemessen (Horimiya): Kopf bleibt „Auf Deutsch“', kopf([abgeleitet, gemessen]) === false, kopf([abgeleitet, gemessen]))
 pruefe('nur gemessen: Kopf bleibt „Auf Deutsch“ (Gegenprobe)', kopf([gemessen]) === false, kopf([gemessen]))
 pruefe('Kopftext „anbieter“ ist die Blase der Pille', text(kopfSchluesselOhneBeleg('anbieter')) === 'Deutsch laut Anbieter', kopfSchluesselOhneBeleg('anbieter'))
-pruefe('Kopftext „omu“ und „offen“ unverändert', kopfSchluesselOhneBeleg('omu') === 'antwort.nurUntertitel' && kopfSchluesselOhneBeleg(true) === 'antwort.sprachOffen')
+pruefe('Kopftext „offen“ unverändert, „nur Untertitel“ gibt es nicht mehr', kopfSchluesselOhneBeleg(true) === 'antwort.sprachOffen')
 
 console.log('\nAntwort-Kasten gerendert (Art „fertig“, Rahmen des Panels):')
 const alleTexte: Record<string, string> = { ...TEXTE_ANTWORT, ...TEXTE_ZEILEN }

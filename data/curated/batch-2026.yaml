@@ -196,6 +196,8 @@
   hinweis: "Die Auftaktfolge („1st STAGE“, eigener Titel 190327) lief bereits am 19.03.2026."
   schedule:
     firstEpisodeDate: "2026-09-25"
+    # Netflix zählt die Reihe durch: 25.09. ist Folge 2, 27.11. Folge 11, 04.12. Folge 12 = Finale (jojowiki, Daniel-Sichtung 26.11.2026).
+    firstEpisodeNumber: 2
     episodeCount: 11
     # Regeltermin 17:00 JST = 08:00 UTC: Folge 2 fehlte um 09:35 MESZ, war um 10:11 da (Daniel, 25.09.2026);
     # Fenster unter 60 min gilt als belegt, daher ohne ≈. Ab der Zeitumstellung (25.10.) 09:00 Berliner Zeit.
@@ -205,20 +207,23 @@
       seen: "10:11"
       date: "2026-09-25"
       source: eigene Sichtung
-    # Nummern von Titel 210482 (Phase 2-3, 11 Folgen ab 1): Folge 7 bis 12 der Gesamtreihe = 6 bis 11 hier.
+    # Nummern der Gesamtreihe (Folge 7 bis 12 nach der Zeitumstellung).
     zeiten:
-      6: "09:00"
       7: "09:00"
       8: "09:00"
       9: "09:00"
       10: "09:00"
       11: "09:00"
+      12: "09:00"
     # Netflix schreibt „PHASE 2 bis 3: ab 25. September wöchentlich" — „Phase" ist die
     # Rennetappe (Stage) der Vorlage, keine Folgenzahl. Elf neue Folgen, freitags bis 04.12.
     # (whats-on-netflix, 16.09.2026; Daniels Frage, geprüft).
   sources:
     - https://www.anime2you.de/news/1027799/jojo-steel-ball-run-fortsetzung-netflix-termin/
     - https://www.whats-on-netflix.com/news/steel-ball-run-part-2-netflix-release-date/
+    # Sammelartikel: Start 25.09. und „Staffelfinale“ 04.12. (= Folge 11, zehn Wochen nach dem Start) gehören zu diesem Release.
+    - https://www.anime2you.de/news/1052324/netflix-fuenf-herbst-2026-simulcasts/
+    - https://www.anime2you.de/news/1073600/netflix-anime-neu-im-dezember-2026/
 
 # Netflix nennt die Sprachfassungen im Teaser-Artikel: deutsche Synchro und OmU. Zehn Folgen:
 # „der ebenfalls zehnteilige erste" (Anime2You, 22.09.2026).

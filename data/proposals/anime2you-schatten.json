@@ -1646,6 +1646,78 @@
         "stichprobe": 0,
         "rest": 1
       }
+    },
+    {
+      "am": "2026-11-26",
+      "artikel": 10,
+      "ohneAntwort": 0,
+      "schattenFehler": 0,
+      "gleich": 2,
+      "nurRegel": 0,
+      "nurClaude": 0,
+      "ms": 3.1573099999999954,
+      "faelle": [],
+      "router": {
+        "scharf": false,
+        "artikel": 10,
+        "erspart": 0,
+        "stichprobe": 0,
+        "rest": 10
+      }
+    },
+    {
+      "am": "2026-11-27",
+      "artikel": 2,
+      "ohneAntwort": 0,
+      "schattenFehler": 0,
+      "gleich": 0,
+      "nurRegel": 0,
+      "nurClaude": 0,
+      "ms": 1.6107990000000143,
+      "faelle": [],
+      "router": {
+        "scharf": false,
+        "artikel": 2,
+        "erspart": 0,
+        "stichprobe": 0,
+        "rest": 2
+      }
+    },
+    {
+      "am": "2026-11-27",
+      "artikel": 2,
+      "ohneAntwort": 0,
+      "schattenFehler": 0,
+      "gleich": 0,
+      "nurRegel": 0,
+      "nurClaude": 0,
+      "ms": 2.7304579999999987,
+      "faelle": [],
+      "router": {
+        "scharf": false,
+        "artikel": 2,
+        "erspart": 0,
+        "stichprobe": 0,
+        "rest": 2
+      }
+    },
+    {
+      "am": "2026-11-27",
+      "artikel": 1,
+      "ohneAntwort": 0,
+      "schattenFehler": 0,
+      "gleich": 0,
+      "nurRegel": 0,
+      "nurClaude": 0,
+      "ms": 1.5241670000000056,
+      "faelle": [],
+      "router": {
+        "scharf": false,
+        "artikel": 1,
+        "erspart": 0,
+        "stichprobe": 0,
+        "rest": 1
+      }
     }
   ]
 }

@@ -8,6 +8,7 @@ import { verwirfKopierteAnbieter } from '../lib/tmdb-angebote-kopie.ts'
 import { meldeCacheStand } from './cache-stand.ts'
 import { loadCurated } from '../lib/curated.ts'
 import { ladeAnisearchAbruf } from '../lib/anisearch-verworfen.ts'
+import { anisearchBruecke } from '../lib/anisearch-katalog-ids.ts'
 import { sperreSerienTreffer } from '../lib/treffer-erben.ts'
 
 /** Je AniList-ID: deutsche Handlung, FSK und Anbieter aus TMDB (`data/tmdb-titles.json`). */
@@ -55,7 +56,7 @@ export function ladeQuellen() {
   // nur die kuratierten.
   const tmdbTitles = mitHandvorrang(readJson<Record<string, TmdbTitelEintrag>>('data/tmdb-titles.json', {}))
   /* Mehrfach vergebene Filme verlieren ihre TMDB-Angaben — siehe `mehrdeutigeFilmzuordnungen()`. */
-  const tmdbMehrdeutig = mehrdeutigeFilmzuordnungen(tmdbTitles)
+  const tmdbMehrdeutig = mehrdeutigeFilmzuordnungen(tmdbTitles, anisearchBruecke())
   merkeGeteilteFilme(tmdbMehrdeutig)
   for (const id of tmdbMehrdeutig) delete tmdbTitles[id]
   if (tmdbMehrdeutig.size)

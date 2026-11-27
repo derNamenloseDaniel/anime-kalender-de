@@ -9,7 +9,7 @@ Der Vorschlag stammt aus einem Namensvergleich und ist **kein Beleg**:
 gehört die gemeldete Adresse als zusätzlicher Verweis an den Titel; stimmt er
 nicht, gehört die Zeile gestrichen.
 
-Stand: 2026-11-26
+Stand: 2026-11-27
 
 ## Was hier zu tun ist
 
@@ -36,8 +36,8 @@ nicht. Vier Fälle, vier Handgriffe:
 | primevideo | https://www.amazon.de/gp/video/detail/B07VP6VPVR | Naruto — Staffel 7 in der Reihe nicht zu bestimmen | dub | [Naruto](https://anilist.co/anime/20) | Seite B0F9Z35RH6 als Verweis an den Titel von Staffel 7 eintragen |
 | primevideo | https://www.amazon.de/gp/video/detail/B07VP6VPVR | Naruto — Staffel 8 in der Reihe nicht zu bestimmen | dub | [Naruto](https://anilist.co/anime/20) | Seite B0FBKHYWCF als Verweis an den Titel von Staffel 8 eintragen |
 | disneyplus | https://www.disneyplus.com/de-de/series/bleach/6g48QKlgQdWK | Bleach — Staffel 16 in der Reihe nicht zu bestimmen | dub | [Bleach](https://anilist.co/anime/269) | Seite https://www.disneyplus.com/de-de/series/bleach/6g48QKlgQdWK als Verweis an den Titel von Staffel 16 eintragen |
-| primevideo | https://www.amazon.de/gp/video/detail/B0DYF8BKVP | Shaman King — Staffel 3 in der Reihe nicht zu bestimmen | dub | [Shaman King](https://anilist.co/anime/154) | Seite B0DVTJ4VFB als Verweis an den Titel von Staffel 3 eintragen |
-| primevideo | https://www.amazon.de/gp/video/detail/B0DYF8BKVP | Shaman King — Staffel 2 in der Reihe nicht zu bestimmen | dub | [Shaman King](https://anilist.co/anime/154) | Seite B0DNJQ89BT als Verweis an den Titel von Staffel 2 eintragen |
+| primevideo | https://www.amazon.de/gp/video/detail/B0DYF8BKVP | Shaman King | dub | [Shaman King (2021)](https://anilist.co/anime/119675) | Vorschlag bestätigen, dann Adresse eintragen |
+| primevideo | https://www.amazon.de/gp/video/detail/B0DYF8BKVP | Shaman King | dub | [Shaman King (2021)](https://anilist.co/anime/119675) | Vorschlag bestätigen, dann Adresse eintragen |
 | primevideo | https://www.amazon.de/gp/video/detail/B0FRXMBN3D | Arifureta: From Commonplace to World’s Strongest (Arifureta: From Commonplace to World's Strongest Season 3) — Staffel 1 der Seite B0DMKK6DWD gehört nicht zum Auftragstitel | dub | [Arifureta: From Commonplace to World’s Strongest](https://anilist.co/anime/154473) | Seite B0DMKK6DWD als Verweis an ihren Staffel-Titel eintragen |
 | primevideo | https://www.amazon.de/gp/video/detail/B07LHCSXV6 | Chaika, die Sargprinzessin (Chaika -The Coffin Princess-) | weg | — | nichts — diese Adresse steht bei uns nirgends |
 | primevideo | https://www.amazon.de/gp/video/detail/B0G75LX98H | Classroom of the Elite: Staffel 3 (Classroom of the Elite Season 3) — Staffel 1 der Seite B0GGJKGT5P gehört nicht zum Auftragstitel | dub | [Classroom of the Elite: Staffel 3](https://anilist.co/anime/146066) | Seite B0GGJKGT5P als Verweis an ihren Staffel-Titel eintragen |
@@ -55,7 +55,6 @@ nicht. Vier Fälle, vier Handgriffe:
 | primevideo | https://www.amazon.de/gp/video/detail/B0FHW8DNTG | Made in Abyss — Staffel 2 in der Reihe nicht zu bestimmen | dub | [Made in Abyss](https://anilist.co/anime/97986) | Seite B0FLDMFYKT als Verweis an den Titel von Staffel 2 eintragen |
 | primevideo | https://www.amazon.de/gp/video/detail/B0CJC11GRB | Meine Wiedergeburt als Schleim in einer anderen Welt: Staffel 2 (That Time I Got Reincarnated as a Slime Season 2 Part 2) — Staffel 1 der Seite B0CHH3X5QB gehört nicht zum Auftragstitel | dub | [Meine Wiedergeburt als Schleim in einer anderen Welt: Staffel 2](https://anilist.co/anime/108511)<br>[Meine Wiedergeburt als Schleim in einer anderen Welt: Staffel 2](https://anilist.co/anime/116742) | Seite B0CHH3X5QB als Verweis an ihren Staffel-Titel eintragen |
 | primevideo | https://www.amazon.de/gp/video/detail/B0FSY8YZT9 | Sekirei — Staffel 2 in der Reihe nicht zu bestimmen | dub | [Sekirei](https://anilist.co/anime/4063) | Seite B0GJ7PZZNP als Verweis an den Titel von Staffel 2 eintragen |
-| primevideo | https://www.amazon.de/gp/video/detail/B0C7HBNRR2 | Sonic X — Staffel 2 in der Reihe nicht zu bestimmen | dub | [Sonic X](https://anilist.co/anime/1816) | Seite B0DYBKP9XR als Verweis an den Titel von Staffel 2 eintragen |
 | primevideo | https://www.amazon.de/gp/video/detail/B0CHDBLWD1 | Strike Witches — Staffel 3 in der Reihe nicht zu bestimmen | kein_dub | [Strike Witches](https://anilist.co/anime/3667) | Seite B0H37ZGLCP als Verweis an den Titel von Staffel 3 eintragen |
 | primevideo | https://www.amazon.de/gp/video/detail/B0H4R4DFWJ | Terra Formars — Staffel 2 in der Reihe nicht zu bestimmen | kein_dub | [Terra Formars](https://anilist.co/anime/20629) | Seite B0H4BGKSTS als Verweis an den Titel von Staffel 2 eintragen |
 | primevideo | https://www.amazon.de/gp/video/detail/B0CB1X24TG | The Devil Is a Part-Timer! — Staffel 2: 24 Folgen gemeldet, Zielstaffel hat 12 | dub | [The Devil Is a Part-Timer!](https://anilist.co/anime/15809) | Staffel 2 prüfen: Folgenzahl passt nicht |
@@ -255,7 +254,7 @@ nicht. Vier Fälle, vier Handgriffe:
 | netflix | https://www.netflix.com/title/81279322 | Unicorn Academy — keine Folge der Meldung fällt in die Zielstaffeln | dub | [Unicorn Academy](https://anilist.co/anime/-221504) | Staffelaufteilung der Seite prüfen |
 | netflix | https://www.netflix.com/title/81279322 | Unicorn Academy — keine Folge der Meldung fällt in die Zielstaffeln | dub | [Unicorn Academy](https://anilist.co/anime/-221504) | Staffelaufteilung der Seite prüfen |
 | netflix | https://www.netflix.com/title/81279322 | Unicorn Academy — keine Folge der Meldung fällt in die Zielstaffeln | dub | [Unicorn Academy](https://anilist.co/anime/-221504) | Staffelaufteilung der Seite prüfen |
-| primevideo | https://www.amazon.de/gp/video/detail/B0F1Z6FJFQ | Meine Wiedergeburt als Schleim in einer anderen Welt (That Time I Got Reincarnated as a Slime) — Staffel 2: 12 Folgen gemeldet, Zielstaffel hat 24 | dub | [Meine Wiedergeburt als Schleim in einer anderen Welt](https://anilist.co/anime/101280) | Staffel 2 prüfen: Folgenzahl passt nicht |
+| primevideo | https://www.amazon.de/gp/video/detail/B0F1Z6FJFQ | Meine Wiedergeburt als Schleim in einer anderen Welt (That Time I Got Reincarnated as a Slime) | dub | — | Titel von Hand suchen |
 | primevideo | https://www.amazon.de/gp/video/detail/B0DW9JB7L7 | Meine Wiedergeburt als Schleim in einer anderen Welt (That Time I Got Reincarnated as a Slime) | dub | — | Titel von Hand suchen |
 | primevideo | https://www.amazon.de/gp/video/detail/B0F2JH4Y5M | Mob Psycho 100 II — Staffel 1 der Seite B0F3CWS728 gehört nicht zum Auftragstitel | dub | [Mob Psycho 100 II](https://anilist.co/anime/101338) | Seite B0F3CWS728 als Verweis an ihren Staffel-Titel eintragen |
 | primevideo | https://www.amazon.de/gp/video/detail/B0CJRZY5ND | Mob Psycho 100 III — Staffel 3: 1 Folgen gemeldet, Zielstaffel hat 12 | dub | [Mob Psycho 100 III](https://anilist.co/anime/140439) | Staffel 3 prüfen: Folgenzahl passt nicht |

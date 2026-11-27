@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { anzeigeName } from '@shared/titles.ts'
-import { teilbarerSlug } from '@shared/teilen.ts'
+import { teilenZiel } from '@shared/teilen.ts'
 import type { Title } from '@shared/types.ts'
 import { useShare } from '../../lib/share.ts'
 import type { Translate } from '../../lib/i18n.tsx'
@@ -53,8 +53,9 @@ export function PanelAktionen({ title, favorites, onToggleFavorite, onToggleHidd
 }) {
   const { share, copiedSlug } = useShare()
   const gemerkt = favorites.has(title.id)
+  const ziel = teilenZiel(title)
   const merkenText = t(gemerkt ? 'kopf.gemerkt' : 'kopf.merken')
-  const teilenText = t(copiedSlug === title.slug ? 'kopf.kopiert' : 'detail.share')
+  const teilenText = t(copiedSlug === ziel ? 'kopf.kopiert' : 'detail.share')
   return (
     <div className="flex flex-wrap gap-2 px-4 pb-4">
       <Tooltip text={merkenText} seite="oben">
@@ -62,16 +63,16 @@ export function PanelAktionen({ title, favorites, onToggleFavorite, onToggleHidd
           <Stern gefuellt={gemerkt} />
         </button>
       </Tooltip>
-      {teilbarerSlug(title) && (
-        <Tooltip text={teilenText} seite="oben">
-          <button type="button" aria-label={teilenText} onClick={() => share(title.slug, anzeigeName(title))} className={KNOPF_ZEICHEN}>
-            <Kette />
-          </button>
-        </Tooltip>
-      )}
-      <button type="button" onClick={() => onToggleHidden(title.id)} aria-label={t('kopf.ausblenden')} title={t('kopf.ausblenden')} className={KNOPF_ZEICHEN}>
-        <Auge />
-      </button>
+      <Tooltip text={teilenText} seite="oben">
+        <button type="button" aria-label={teilenText} onClick={() => share(ziel, anzeigeName(title))} className={KNOPF_ZEICHEN}>
+          <Kette />
+        </button>
+      </Tooltip>
+      <Tooltip text={t('kopf.ausblenden')} seite="unten">
+        <button type="button" onClick={() => onToggleHidden(title.id)} aria-label={t('kopf.ausblenden')} className={KNOPF_ZEICHEN}>
+          <Auge />
+        </button>
+      </Tooltip>
       {trailer}
     </div>
   )

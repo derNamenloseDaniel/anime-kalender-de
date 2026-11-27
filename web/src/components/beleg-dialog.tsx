@@ -8,7 +8,7 @@ import { useEscape } from '../lib/escape.ts'
 import { useSeiteGesperrt } from '../lib/use-seite-gesperrt.ts'
 import { istSammelartikel } from '../lib/sammel-belege.ts'
 import { quellenLabel } from './news-belege.tsx'
-import { Ladeanzeige } from './ui.tsx'
+import { Ladeanzeige, Tooltip } from './ui.tsx'
 
 /** **Das Beleg-Bild** an einer Quelle; öffentlich lesbar (Daniel, 04.10.2026). Der archivierte Text (HTML) bleibt privat (Daniel, 05.10.2026). */
 const WORKER = import.meta.env?.VITE_NEWSLETTER_API ?? ''
@@ -25,23 +25,25 @@ export function QuellenKnopf({ belege, betreff }: { belege: NewsBeleg[]; betreff
   const text = belege.length > 1 ? `${wort === 'Beleg' ? 'Belege' : 'Quellen'} ${belege.length}` : wort
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOffen(true)}
-        title={belege.map(quellenLabel).join(' · ')}
-        className="-my-2.5 ml-auto inline-flex min-h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center px-1 text-t4 text-slate-600 underline underline-offset-2 hover:text-ak-text dark:text-slate-300"
-      >
-        {archiv ? '▣ ' : ''}
-        {text}
-      </button>
+      <Tooltip text={belege.map(quellenLabel).join(' · ')} seite="unten" className="-my-2.5 ml-auto shrink-0">
+        <button
+          type="button"
+          onClick={() => setOffen(true)}
+          className="inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center px-1 text-t4 text-slate-600 underline underline-offset-2 hover:text-ak-text dark:text-slate-300"
+        >
+          {archiv ? '▣ ' : ''}
+          {text}
+        </button>
+      </Tooltip>
       {offen && <BelegDialog belege={belege} betreff={betreff} zu={() => setOffen(false)} />}
     </>
   )
 }
 
 /** Was die Quelle zeigt, in einem Satz — mit dem Tag, an dem sie es sagte oder wir nachgesehen haben. */
-function erklaerung(b: NewsBeleg): string {
-  if (b.gemessenAm) return `Unsere Messung vom ${datumKurz(b.gemessenAm)}: So sah ${b.name} an diesem Tag aus.`
+function erklaerung(b: NewsBeleg, mitBild: boolean): string {
+  /* „So sah es aus“ nur, wo die Ansicht Bild oder Messzeilen zeigt (27.11.2026: 5 von 14 Messbelegen hatten beides nicht). */
+  if (b.gemessenAm) return `Unsere Messung vom ${datumKurz(b.gemessenAm)}: ${mitBild || b.messung ? `So sah ${b.name} an diesem Tag aus.` : `Stand von ${b.name} an diesem Tag.`}`
   if (b.ausgabeAm) return `Produktseite bei ${b.name}; die Ausgabe erscheint am ${datumKurz(b.ausgabeAm)}.`
   const wann = b.veroeffentlichtAm ? `, veröffentlicht am ${datumKurz(b.veroeffentlichtAm)}` : ''
   const spaeter = b.aktualisiertAm && b.aktualisiertAm !== b.veroeffentlichtAm ? `, aktualisiert am ${datumKurz(b.aktualisiertAm)}` : ''
@@ -132,7 +134,7 @@ export function Erklaerung({ beleg, mitBild }: { beleg: NewsBeleg; mitBild: bool
   const [lang, setLang] = useState(false)
   return (
     <p className={`min-w-0 flex-1 cursor-pointer md:cursor-auto ${lang ? '' : 'line-clamp-2 md:line-clamp-none'}`} onClick={() => setLang((l) => !l)} aria-expanded={lang}>
-      {erklaerung(beleg)}
+      {erklaerung(beleg, mitBild)}
       {pruefzeile(beleg, mitBild)}
       {mitBild ? ' Wir sichern von jeder Quelle ein Bild, damit prüfbar bleibt, worauf die Meldung beruht.' : ''}
     </p>

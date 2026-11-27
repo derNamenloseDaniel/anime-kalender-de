@@ -53,3 +53,202 @@
   beleg: "Amazon.de: DVD „Der Glückselefant – Khans grosses Abenteuer“, erschienen 26.03.2010 (deutsche Erstausgabe), ab 6; filmdienst: „FSK: ab 6“, DVD-Anbieter Senator."
   sources:
     - "https://www.amazon.de/-/en/Gl%C3%BCckselefant-Khans-grosses-Abenteuer/dp/B00378JNP0"
+
+# --- Ab hier W2-Titel mit deutscher Disc-Erstausgabe (die W3-Titel sind fast nur TV-Altbestand ohne Disc) ---
+
+- anilistId: 51
+  titel: "Angel Sanctuary"
+  fsk: 16
+  art: disc
+  beleg: "Amazon.de: DVD „Angel Sanctuary“, OVA Films (OVA-400), 1 h 30 min, „Freigegeben ab 16 Jahren“."
+  sources:
+    - "https://www.amazon.de/Angel-Sanctuary-Anime/dp/B000063WJM"
+
+- anilistId: 111729
+  titel: "Arifureta: From Commonplace to World’s Strongest OVAs"
+  fsk: 16
+  art: disc
+  beleg: "AniMoon: Arifureta Vol. 2 (19.02.2021, mit OVA-Bonusfolge „Yues Tagebuch“) und Vol. 3 (26.03.2021, mit OVA-Bonusfolge „Die heiße Quelle der Liebe“), je FSK 16."
+  sources:
+    - "https://animoon-publishing.de/products/arifureta-vol-2-limited-mediabook-edition-mit-bonusfolge-booklet-maxiposter-und-mini-aufsteller"
+    - "https://animoon-publishing.de/products/arifureta-vol-3-limited-mediabook-edition-mit-bonusfolge-booklet-maxiposter-und-mini-aufsteller"
+
+- anilistId: 143846
+  titel: "Arifureta: Über Umwege zum stärksten der Welt"
+  fsk: 16
+  art: disc
+  beleg: "AniMoon: Arifureta 2 Vol. 3 Limited Mediabook (02.12.2022 = deutsche Erstausgabe), „Episode 11-12 sowie alle OVAs zur 2. Staffel“, FSK 16; bluray-disc.de und jpc ebenfalls FSK 16."
+  sources:
+    - "https://animoon-publishing.de/products/arifureta-2-vol-3-limited-mediabook-edition-mit-exklusivem-maxi-poster"
+
+- anilistId: 146921
+  titel: "Arifureta: Die wundersame Begegnung und das phantasmagorische Abenteuer"
+  fsk: 16
+  art: disc
+  beleg: "AniMoon: Arifureta 2 Vol. 3 Limited Mediabook (02.12.2022 = deutsche Erstausgabe), „Episode 11-12 sowie alle OVAs zur 2. Staffel“, FSK 16."
+  sources:
+    - "https://animoon-publishing.de/products/arifureta-2-vol-3-limited-mediabook-edition-mit-exklusivem-maxi-poster"
+
+- anilistId: 1079
+  titel: "Armitage III: OVA"
+  fsk: 16
+  art: disc
+  beleg: "OFDb: Armitage III, DVD Pioneer (Perfect Collection) mit den OVA-Folgen Electro Blood, Flesh & Stone, Heart Core, Bit of Love, FSK 16, uncut."
+  sources:
+    - "https://www.ofdb.de/fassung/25707,46678,Armitage-III/"
+
+- anilistId: 116867
+  titel: "Bofuri Staffel 2"
+  fsk: 12
+  art: disc
+  beleg: "Thalia/jpc: Bofuri Staffel 2 Vol. 1 (20.09.2024), Vol. 2 (22.11.2024), Vol. 3 (07.02.2025), AniMoon, alle FSK 12."
+  sources:
+    - "https://www.thalia.de/shop/home/artikeldetails/A1072126720"
+
+- anilistId: 2575
+  titel: "Chack der Biber"
+  fsk: 0
+  art: disc
+  beleg: "Amazon.de: VHS „Chack der Biber V“ (United Video, 3 Folgen): „Freigegeben ohne Altersbeschränkung“; Teil IV ebenso ohne Altersbeschränkung."
+  sources:
+    - "https://www.amazon.de/Chack-Biber-V-animated/dp/B00Q2PUWJ6"
+
+- anilistId: 170891
+  titel: "Cheer for You!"
+  fsk: 6
+  art: disc
+  beleg: "Amazon.de: Vol. 1 Blu-ray (LEONINE, 11.07.2025) „Freigegeben ab 6 Jahren“; jpc: Vol. 2 „FSK ab 6 freigegeben“."
+  sources:
+    - "https://www.amazon.de/Cheer-You-Vol-1-Blu-ray/dp/B0F3RZJPFK"
+    - "https://www.jpc.de/jpcng/movie/detail/-/art/cheer-for-you-vol-2/hnum/12266122"
+
+- anilistId: 10014885
+  titel: "Chidori RSC: Rifle Is Beautiful - Die Landesmeisterschaft ist nah"
+  fsk: 12
+  art: disc
+  beleg: "bluray-disc.de: Chidori RSC Gesamtausgabe, Anime House (05.08.2021 = deutsche Erstausgabe), Extras u. a. „Special-Episode 7.5“, „FSK: Freigegeben ab 12 Jahren“."
+  sources:
+    - "https://bluray-disc.de/blu-ray-filme/152865-chidori_rsc_rifle_is_beautiful_gesamtausgabe"
+
+- anilistId: 99734
+  titel: "Dagashi Kashi Staffel 2"
+  fsk: 12
+  art: disc
+  beleg: "bluray-disc.de: Dagashi Kashi – Staffel 2, Kazé/AV Visionen, 20.05.2021, FSK 12; jpc „FSK ab 12“."
+  sources:
+    - "https://bluray-disc.de/blu-ray-filme/154609-dagashi_kashi_staffel_2"
+
+- anilistId: 112125
+  titel: "Danmachi: Familia Myth II OVA"
+  fsk: 12
+  art: disc
+  beleg: "bluray-disc.de: „DanMachi – OVA 2 Collector's Edition“ und Standardausgabe, Anime House, „FSK: Freigegeben ab 12 Jahren“."
+  sources:
+    - "https://bluray-disc.de/blu-ray-filme/152867-danmachi_ova_2"
+    - "https://bluray-disc.de/blu-ray-filme/162244-danmachi_ova_2"
+
+- anilistId: 127368
+  titel: "Danmachi: Familia Myth III OVA"
+  fsk: 12
+  art: disc
+  beleg: "bluray-disc.de: „DanMachi – OVA 3 Collector's Edition“, Anime House, 04.08.2022, ca. 23 min, FSK 12; jpc ebenfalls FSK 12."
+  sources:
+    - "https://bluray-disc.de/blu-ray-filme/165871-danmachi_ova_3_collectors_edition"
+
+- anilistId: 98707
+  titel: "Das Land der Juwelen"
+  fsk: 12
+  art: disc
+  beleg: "KSM Anime Vol. 1 (09.12.2021), Vol. 2 (20.01.2022), Vol. 3 (24.03.2022): alle „ab 12 Jahren“ (bluray-disc.de, Thalia, jpc)."
+  sources:
+    - "https://bluray-disc.de/blu-ray-filme/167169-das_land_der_juwelen_vol_1"
+
+- anilistId: 5006
+  titel: "Der gestiefelte Kater im wilden Westen"
+  fsk: 6
+  art: disc
+  beleg: "OFDb: Der Gestiefelte Kater im wilden Westen (1972), DVD Ostalgica (deutsche Erstausgabe, 4-DVD-Box), 50:37 min, FSK 6, ungeschnitten."
+  sources:
+    - "https://www.ofdb.de/fassung/230203,344961,Der-Gestiefelte-Kater-im-wilden-Westen/"
+
+- anilistId: 185613
+  titel: "Der Herr der Ringe: Die Schlacht der Rohirrim"
+  fsk: 12
+  art: disc
+  beleg: "jpc: Blu-ray (Warner), 13.03.2025, „FSK 12“; Thalia, bluray-disc.de, Schnittberichte (BD, 4K, Steelbook) ebenfalls FSK 12."
+  sources:
+    - "https://www.jpc.de/jpcng/movie/detail/-/art/der-herr-der-ringe-die-schlacht-der-rohirrim/hnum/12128029"
+
+- anilistId: 168345
+  titel: "Dungeon People"
+  fsk: 12
+  art: disc
+  beleg: "Thalia: Vol. 1 (KSM Anime, 22.05.2025) „FSK: Freigegeben ab 12 Jahren“; jpc: Vol. 2 (19.06.2025) „FSK ab 12 freigegeben“."
+  sources:
+    - "https://www.thalia.de/shop/home/artikeldetails/A1074306311"
+
+- anilistId: 20862
+  titel: "Fate/Kaleid Liner Prisma Illya 2wei! Die Magical Girls auf Onsen-Reise"
+  fsk: 12
+  art: disc
+  beleg: "Thalia: Fate/kaleid liner PRISMA ILLYA 2wei! [2 BRs], peppermint anime, 20.10.2022, „10 Folgen + OVA und 5 Miniserien“, „Freigegeben ab 12 Jahren“."
+  sources:
+    - "https://www.thalia.de/shop/home/artikeldetails/A1064155281"
+
+- anilistId: 100269
+  titel: "Fate/Kaleid Liner Prisma Illya: Prisma Phantasm"
+  fsk: 12
+  art: disc
+  beleg: "Thalia: „Prisma Phantasm – The Movie“ Blu-ray, peppermint anime, 62 min, 09.02.2023, FSK 12."
+  sources:
+    - "https://www.thalia.de/shop/home/artikeldetails/A1067053093"
+
+- anilistId: 172453
+  titel: "From Bureaucrat to Villainess: Dad’s Been Reincarnated!"
+  fsk: 12
+  art: disc
+  beleg: "jpc: 2 Blu-rays, KSM Anime, 26.02.2026, „FSK ab 12 freigegeben“; Amazon.de „Rated: Ages 12 and over“."
+  sources:
+    - "https://www.jpc.de/jpcng/movie/detail/-/art/from-bureaucrat-to-villainess-dad-s-been-reincarnated-2-brs/hnum/12506216"
+
+- anilistId: 105334
+  titel: "Fruits Basket (2019)"
+  fsk: 12
+  art: disc
+  beleg: "bluray-disc.de: Fruits Basket 2019 – Staffel 1 – Vol. 1, Vol. 2 (03.02.2022) und Vol. 3 (17.03.2022), peppermint anime, je „Freigegeben ab 12 Jahren“."
+  sources:
+    - "https://bluray-disc.de/blu-ray-filme/149587-fruits_basket_2019_staffel_1_vol_1"
+    - "https://bluray-disc.de/blu-ray-filme/149589-fruits_basket_2019_staffel_1_vol_2"
+    - "https://bluray-disc.de/blu-ray-filme/166755-fruits_basket_2019_staffel_1_vol_3"
+
+- anilistId: 126791
+  titel: "Full Dive: This Ultimate Next-Gen Full Dive RPG Is Even Shittier than Real Life!"
+  fsk: 16
+  art: disc
+  beleg: "AniMoon: Vol. 1 (Folgen 1–6, 24.11.2023) und Vol. 2 (Folgen 7–12), je FSK 16."
+  sources:
+    - "https://animoon-publishing.de/products/full-dive-this-ultimate-next-gen-full-dive-rpg-is-even-shittier-than-real-life-staffel-1-bundle"
+
+- anilistId: 1761
+  titel: "Golgo 13: Die Bienenkönigin"
+  fsk: 18
+  art: disc
+  beleg: "OFDb: DVD VCL (Deutschland), „Freigabe: FSK Keine Jugendfreigabe“, uncut, 56:52 min; Schnittberichte: VCL-DVD 05.06.2003 „FSK keine Jugendfreigabe“."
+  sources:
+    - "https://ssl.ofdb.de/view.php?fid=23431&page=fassung&vid=70042"
+
+- anilistId: 111790
+  titel: "Haikyu!! An Land vs. In der Luft / Der Weg des Balls"
+  fsk: 6
+  art: disc
+  beleg: "Thalia: „Haikyu!!: To the Top – Staffel 4 – Vol.1 + OVAs – Der Weg des Balls & An Land vs. In der Luft“, peppermint, 15.04.2021, „Freigegeben ab 6 Jahren“."
+  sources:
+    - "https://www.thalia.de/shop/home/artikeldetails/ID150912285.html"
+
+- anilistId: 21348
+  titel: "Haikyu!! Kampf gegen ungenügende Noten"
+  fsk: 6
+  art: disc
+  beleg: "jpc: „Haikyu!!: To the Top Staffel 4 Vol. 4 (mit OVA zur Staffel 2 & 3)“, 2 DVDs, 02.12.2021 (= deutsche Erstausgabe), „ab 6 Jahren“; Thalia DVD ebenfalls FSK 6."
+  sources:
+    - "https://www.jpc.de/jpcng/movie/detail/-/art/haikyu-to-the-top-staffel-4-ova-zur-staffel-2-3-vol-4-2-dvds/hnum/10699364"

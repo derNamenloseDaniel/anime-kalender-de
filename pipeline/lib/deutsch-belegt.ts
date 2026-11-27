@@ -2,7 +2,7 @@ import { SPRACH_NOTIZEN } from './meldungen.ts'
 import type { Release, StreamLink, Title } from '../../shared/types.ts'
 
 /** Die letzte Teilzeichenkette einer Adresse (Titelkennung): macht `/dp/B…` und `/gp/video/detail/B…` vergleichbar. */
-export const kennung = (url: string): string => url.replace(/[?#].*$/, '').replace(/\/+$/, '').split('/').pop() ?? ''
+export const kennung = (url: string | undefined): string => (url ?? '').replace(/[?#].*$/, '').replace(/\/+$/, '').split('/').pop() ?? ''
 
 /** Ein Weg desselben Anbieters mit belegtem Deutsch (kein abgeleiteter) an der Adresse des Termins; ohne Adresse am Termin zählt jeder Weg des Anbieters. */
 export function belegterWeg(r: Release, title: Title): StreamLink | undefined {

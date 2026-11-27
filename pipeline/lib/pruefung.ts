@@ -273,7 +273,7 @@ for (const t of titles.values())
       fehler.push(`Anime ${t.id}: Bezugsweg „${w.name}" zeigt auf TMDB, ohne als „über TMDB" gekennzeichnet zu sein`)
 }
 /** Die Prüfungen am Ende von `pruefeErgebnis`, die nicht je Release laufen (eigene Funktion, damit jene nicht wächst). */
-function schlussFehler(releases: Release[], events: ReleaseEvent[], titles: Map<number, Title>, heute: string, discQuellen?: DiscPruefQuellen): string[] {
+export function schlussFehler(releases: Release[], events: ReleaseEvent[], titles: Map<number, Title>, heute: string, discQuellen?: DiscPruefQuellen): string[] {
   return [
     ...discTerminFehler(releases, heute, discQuellen),
     ...landFehler(titles),

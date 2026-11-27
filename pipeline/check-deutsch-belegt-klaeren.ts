@@ -5,6 +5,7 @@
 import { klaereDeutschBelegteTermine } from './bau/deutsch-belegt-klaeren.ts'
 import { deutschBelegtTrotzOffen } from './lib/deutsch-belegt.ts'
 import { SPRACH_NOTIZEN } from './lib/meldungen.ts'
+import { schlussFehler } from './lib/pruefung.ts'
 import type { Release, Title } from '../shared/types.ts'
 
 let verletzt = 0
@@ -79,6 +80,21 @@ console.log('\nWächter:')
   pruefe('nach dem Klären nichts mehr', deutschBelegtTrotzOffen([sauber], new Map([[7, belegt]])).length === 0)
   pruefe('omu ist keine Unsicherheit: kein Fund', deutschBelegtTrotzOffen([termin({ sprache: 'omu' })], new Map([[7, belegt]])).length === 0)
   pruefe('ohne Beleg kein Fund', deutschBelegtTrotzOffen([termin({ automatisch: undefined })], new Map([[7, titel([])]])).length === 0)
+}
+
+{
+  const ohneAdresse = titel([{ platform: 'netflix', dub: true } as never])
+  pruefe('Weg ohne Adresse (check-staffel-anzeige-bau, Kette 27.11.2026): kein Absturz, kein Beleg', deutschBelegtTrotzOffen([termin({ automatisch: undefined })], new Map([[7, ohneAdresse]])).length === 0)
+}
+
+console.log('\nVerdrahtung (schlussFehler, wie die Bau-Prüfung sie ruft):')
+{
+  const t = new Map([[7, belegt]])
+  const offen = termin({ automatisch: undefined })
+  const fehler = schlussFehler([offen], [], t, '2026-11-27').filter((f) => f.includes('"s"') && f.includes('Deutsch ist belegt'))
+  pruefe('offen trotz Beleg: schlussFehler meldet den Termin', fehler.length === 1, fehler)
+  lauf(offen, belegt)
+  pruefe('nach dem Klären meldet schlussFehler nichts dazu', schlussFehler([offen], [], t, '2026-11-27').every((f) => !f.includes('Deutsch ist belegt')))
 }
 
 if (verletzt) {

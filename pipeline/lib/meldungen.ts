@@ -32,6 +32,7 @@ import { ordneTeilHinweis, teilHinweis } from './teil-hinweis.ts'
 import type { Verschiebung } from './disc-verschiebungen.ts'
 import type { SammelEintrag } from './sammelartikel.ts'
 import { folgenzahlUeberWerk } from './pruefung.ts'
+import { komplettstartZahl } from './komplettstart-zahl.ts'
 import { spracheDerMeldung, type Sprachbefund } from './sprachbefund.ts'
 import { frischAngekuendigt } from '../bau/ohne-beleg.ts'
 import { istSammelMeldung, ohneSammelName, sammelName, sammelTitel } from './sammel-titel.ts'
@@ -393,6 +394,9 @@ const SPRACH_NOTIZ: Partial<Record<Sprachbefund, string>> = {
   offen: 'Termin laut Quelle – ob mit deutscher Synchro, ist dort noch offen.',
 }
 
+/** Die Hinweistexte aus `SPRACH_NOTIZ`: `deutsch-belegt-klaeren.ts` nimmt sie zurück, sobald Deutsch belegt ist. */
+export const SPRACH_NOTIZEN: readonly string[] = Object.values(SPRACH_NOTIZ)
+
 function sprachHinweis(sprache: Sprachbefund, platform: string): Pick<Release, 'hinweis' | 'sprache'> {
   const hinweis = platform === 'disc' ? undefined : SPRACH_NOTIZ[sprache]
   return hinweis ? { hinweis, sprache: 'offen' } : {}
@@ -707,7 +711,7 @@ export function zeitplanAusVorschlag(
   v: Pick<Vorschlag, 'folgen' | 'woechentlich'> & Partial<Pick<Vorschlag, 'articleTitle' | 'dates' | 'ersteFolgen'>>,
   art: ReleaseType,
   tag: string,
-  treffer: Pick<Title, 'episodes' | 'jpYear'> & Partial<Pick<Title, 'format' | 'id'>>,
+  treffer: Pick<Title, 'episodes' | 'jpYear'> & Partial<Pick<Title, 'format' | 'id' | 'jpEnd'>>,
   platform?: string,
 ): Pick<Release, 'releaseType' | 'schedule' | 'dateMeaning'> {
   /* Nur die ersten N Folgen: „im Angebot seit“ dem Meldetag, kein Wochentakt, keine Uhrzeit; die übrigen Folgen sind offen, nicht „alle“. */
@@ -725,10 +729,11 @@ export function zeitplanAusVorschlag(
   const katalog = art === 'batch' && v.folgen && treffer.jpYear && treffer.jpYear < Number(tag.slice(0, 4))
   /* Ein Cartoon ohne Taktangabe, nicht bei Netflix (dort kommt eine Miniserie am Stück): nur „im Angebot ab“ dem Tag, kein Wochentakt. */
   const cartoonAbTag = art === 'batch' && (treffer.id ?? 0) < 0 && platform !== 'netflix'
+  const komplett = v.folgen ? undefined : komplettstartZahl(art, tag, treffer, platform)
   return {
     releaseType: art,
     /* Eine Zahl weit über dem Werk (86: 23 für Teil 1 mit 11) gehört dem ganzen Katalogeintrag, nicht diesem Titel — Keine Folgenzahl erfinden. */
-    schedule: { firstEpisodeDate: tag, ...(v.folgen && art === 'batch' && !(treffer.episodes && folgenzahlUeberWerk(v.folgen, treffer.episodes)) ? { episodeCount: v.folgen } : {}) },
+    schedule: { firstEpisodeDate: tag, ...(v.folgen && art === 'batch' && !(treffer.episodes && folgenzahlUeberWerk(v.folgen, treffer.episodes)) ? { episodeCount: v.folgen } : {}), ...(komplett ? { episodeCount: komplett } : {}) },
     ...(katalog || cartoonAbTag ? { dateMeaning: 'available-from' as const } : {}),
   }
 }

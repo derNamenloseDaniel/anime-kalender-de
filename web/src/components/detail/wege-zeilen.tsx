@@ -1,5 +1,4 @@
 import { PLATFORMS, type Release, type Title, type DiscAusgabe, type StreamLink } from '@shared/types.ts'
-import { streamNurOmu, synchroAngekuendigt } from '@shared/ankuendigung.ts'
 import { anzeigeName } from '@shared/titles.ts'
 import { farbeZuAnbieter, istToggo } from './pillen.tsx'
 import { DiscBereich } from './disc-bereich.tsx'
@@ -157,7 +156,6 @@ function anbieterPillen({ sortiertNachZugang, title, t, today, folgenAngabeFuer,
           titel={
             [
               ...dubZeilen(s),
-              streamNurOmu(title, s, releases) ? t(synchroAngekuendigt(title, s) ? 'detail.pilleNurOmu' : 'detail.pilleNurOmuOffen') : '',
               s.teilBereich ? teilAngaben(title, s.teilBereich, t, folgenAngabe).titel : '',
               (s.sharedWith ?? 0) > 1
                 ? t('detail.sharedUrlNote', { count: s.sharedWith! })
@@ -185,7 +183,7 @@ function ausgabePillen(title: Title, t: Translate) {
       durchgestrichen
       unten={[
         a.kanal ? t('detail.ausgabeKanal', { kanal: a.kanal }) : t('detail.ausgabeAndere'),
-        t(a.untertitelDe ? 'detail.ausgabeNurUt' : 'detail.ausgabeOhneDe'),
+        t('detail.ausgabeOhneDe'),
       ].join(' · ')}
       titel={t('detail.ausgabeTitel', { anbieter: PLATFORMS[a.platform]?.name ?? a.platform })}
     />

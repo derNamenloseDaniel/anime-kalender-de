@@ -45,6 +45,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       nur_mod: ${{ steps.pfad.outputs.nur_mod }}
+      aussehen: ${{ steps.aussehen.outputs.aussehen }}
     steps:
       # Tiefe 2: HEAD^1 ist die Basis (main im Merge-Ref), HEAD der Merge-Commit.
       - uses: actions/checkout@v4
@@ -53,6 +54,10 @@ jobs:
       - name: Nur Mod-Dateien?
         id: pfad
         run: node tools/pr-nur-mod.mjs HEAD^1 HEAD >> "$GITHUB_OUTPUT"
+      # Einmal fragen statt in jedem der 19 Aussehen-Jobs (27.11.2026, Issue 5209): ohne Oberfläche starten sie nicht (Warteschlange, 20-Jobs-Grenze).
+      - name: Betrifft der PR die Oberfläche?
+        id: aussehen
+        run: node tools/pr-aussehen-betroffen.mjs HEAD^1 HEAD >> "$GITHUB_OUTPUT"
 
   modschnell:
     name: Kette – Mod-Schnellweg
@@ -283,7 +288,7 @@ jobs:
   aussehen:
     name: PR-Aussehen – ${{ matrix.teil }}
     needs: [scope]
-    if: ${{ needs.scope.outputs.nur_mod != '1' && !startsWith(github.head_ref, 'daten/') && !github.event.pull_request.draft }}
+    if: ${{ needs.scope.outputs.nur_mod != '1' && needs.scope.outputs.aussehen != '0' && !startsWith(github.head_ref, 'daten/') && !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: ${{ matrix.frist || 20 }}
     strategy:
@@ -341,28 +346,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
-      - name: Betrifft der PR die Oberfläche?
-        id: pfad
-        run: |
-          # Außer der Oberfläche zählen genau die Dateien, die dieser Job ausführt: die Werkzeuge von check:panel und
-          # check:ansichten, deren direkte Importe und dieser Workflow. Die Werkzeuge stehen in tools/pr-aussehen-pfade.txt.
-          PFADE='^(web/src/|web/buehne/|extension/.*\.css$|\.github/workflows/pr-pruefung\.yml$|package\.json$|tools/pr-aussehen-pfade\.txt$)'
-          LISTE="^($(grep -v '^#' tools/pr-aussehen-pfade.txt | sed -e 's/\./\\./g' | paste -sd'|'))\$"
-          if git diff --name-only HEAD^1 HEAD | grep -qE -e "$PFADE" -e "$LISTE"; then
-            echo "betroffen=1" >> "$GITHUB_OUTPUT"
-          fi
-      - if: steps.pfad.outputs.betroffen == '1'
-        uses: ./.github/actions/kette-einrichten
+      - uses: ./.github/actions/kette-einrichten
         with:
           playwright: 'true'
-      - if: steps.pfad.outputs.betroffen == '1'
-        run: npm run build
+      - run: npm run build
       - name: Umfang der Bühne-Messung
         id: umfang
-        if: steps.pfad.outputs.betroffen == '1' && matrix.scheibe
+        if: matrix.scheibe
         run: node tools/buehne-umfang.mjs HEAD^1 HEAD | tee -a "$GITHUB_OUTPUT"
-      - if: steps.pfad.outputs.betroffen == '1'
-        env:
+      - env:
           BUEHNE_MOCKUPS: ${{ steps.umfang.outputs.mockups }}
           BUEHNE_SCHEIBE: ${{ matrix.scheibe }}
         run: ${{ matrix.befehl }}

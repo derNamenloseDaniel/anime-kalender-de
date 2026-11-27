@@ -1,0 +1,66 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/My_Hero_Academia (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=My_Hero_Academia&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+Die deutsche [[Synchronisation (Film)|Synchronisation]] erfolgte in den G&G Tonstudios in [[Kaarst]] unter der [[Dialogregie]] und [[Dialogbuch]] von [[Jörn Friese]].<ref name="dt_sync">{{Synchronkartei|serie|38636|My Hero Academia|Abruf=2018-03-18}}</ref>
+{| class="wikitable"
+! Rolle || japanische Stimme ([[Seiyū]]) || deutsche Stimme<ref name="dt_sync" /><ref name="anisearch">{{Internetquelle |url=https://www.anisearch.de/anime/10978,my-hero-academia |titel=My Hero Academia (2016) – Boku no Hero Academia / {{lang|ja|僕のヒーローアカデミア}} |werk=[[aniSearch]] |abruf=2025-10-16 |kommentar=[[Anime]]-[[Datenbank]]}}</ref>
+|-
+| Izuku Midoriya || [[Daiki Yamashita]] || [[Sebastian Fitzner]]
+|-
+| Toshinori Yagi/All Might || [[Kenta Miyake]] || [[Matti Klemm]]
+|-
+| Hanta Sero || [[Kiyotaka Furushima]] || [[Patrick Mölleken]]
+|-
+| Katsuki Bakugō || [[Nobuhiko Okamoto]] || [[Daniel Käser]]
+|-
+| Ochako Uraraka || [[Ayane Sakura]] || [[Meri Dogan]]
+|-
+| Tenya Īda || [[Kaito Ishikawa]] || [[Arne Stephan]]
+|-
+| Shōto Todoroki || [[Yūki Kaji]] || [[Amadeus Strobl]]
+|-
+| Tsuyu Asui || [[Aoi Yūki]] || [[Charlotte Uhlig]]
+|-
+| Minoru Mineta || [[Ryō Hirohashi]] || [[Esther Brandt]]
+|-
+| Momo Yaoyorozu || [[Marina Inoue]] || [[Milena Karas]]
+|-
+| Mina Ashido || [[Eri Kitamura]] || [[Rieke Werner]]
+|-
+| Kyōka Jirō || [[Kei Shindō]] || [[Birte Baumgardt]]
+|-
+| Tōru Hagakure || [[Kaori Nazuka]] || [[Signe Zurmühlen]]
+|-
+| Fumikage Tokoyami || [[Yoshimasa Hosoya]] || [[Michael Borgard]]
+|-
+| Eijirō Kirishima || [[Toshiki Masuda]] || [[Dennis Saemann]]
+|-
+| Denki Kaminari || [[Tasuku Hatanaka]] || [[Benjamin Stolz]]
+|-
+| Shota Aizawa || [[Jun'ichi Suwabe]] || [[Michael-Che Koch]]
+|-
+| Yū Takeyama/Mount Lady || [[Kaori Nazuka]] || [[Gabriele Wienand]]
+|-
+| Zen Shigaraki/All For One || [[Akio Ōtsuka]] || [[Thorsten-Kai Botenbender]] (Folge 13)<br />[[Peter Sura]] (ab Folge 22)
+|-
+| Rektor Nezu || [[Yasuhiro Takato]] || [[Sascha von Zambelly]]
+|-
+| Tomura Shigaraki || [[Kōki Uchiyama]] || [[Louis Friedemann Thiele]]
+|-
+| Jin Bubaigawara || [[Daichi Endou]] || [[Vincent Fallow]]
+|-
+| Toya Todoroki || [[Hiro Shimono]] || [[Ricardo Richter]]
+|-
+| Himiko Toga || [[Misato Fukuen]] || [[Vivien Faber]]
+|-
+| Manami Aiba || [[Yui Horie]] || [[Eleni Möller-Architektonidou]]
+|-
+| Muscular || [[Kosuke Takaguchi]] || [[Stephan Schleberger]]
+|-
+| Kai Chisaki || [[Kenjiro Tsuda]] || [[Tim Knauer]]
+|-
+| Chizome Akaguro || [[Go Inoue]] || [[Sven Brieger]]
+|-
+| Danjuro Tobita || [[Kōichi Yamadera]] || [[Andreas Meese]]
+|}

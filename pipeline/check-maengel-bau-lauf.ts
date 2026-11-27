@@ -83,6 +83,7 @@ const weitere = () => [
   einfach(18),
   einfach(19, { franchiseId: 70 }),
   einfach(20, { franchiseId: 70 }),
+  ...[21, 22, 23, 24, 25].map((id) => einfach(id, { bannerImage: undefined })),
 ]
 schreibe('public/data/titles.json', [titel1({ coverImage: undefined }), titel(2), kurz(), ...weitere()])
 schreibe('public/data/events.json', [{ titleId: 1, date: '2099-01-01' }, { titleId: 8, date: todayIso() }])
@@ -101,7 +102,7 @@ schreibe('data/tmdb-folgen.json', { 19: { tmdbId: 9019, folgen: [{ s: 1, e: 1, t
 schreibe('public/data/folgen/1.json', { f: [[1, 'A'], [2, 'B'], [3, 'C']] })
 schreibe('public/data/folgen/2.json', { f: [[1, 'A'], [2, ''], [3, 'C']] })
 schreibe('public/data/synopses/1.json', { 1: { de: 'Text' }, 33: { de: 'Text' } })
-for (const id of [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]) schreibe(`public/data/synopses/${id}.json`, { [id]: { de: 'Text' } })
+for (const id of [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]) schreibe(`public/data/synopses/${id}.json`, { [id]: { de: 'Text' } })
 for (const id of [12, 13, 14]) schreibe(`public/data/folgen/${id}.json`, { f: [[1, 'A'], [2, 'B'], [3, 'C']] })
 /* Titel 12 und 13: ein Franchise, je 6 Folgen beim Anbieter bei 3 Folgen und einer Schwester von 3 → Ausnahme anbieter-franchise (Verdrahtung franchiseTeile); Titel 14 ohne Franchise bleibt offen. */
 /* Titel 10 und 11: ein Franchise, eine Netflix-Adresse mit einer Staffel zu einer Folge, zusammen zwei: staffel-zuordnung (Verdrahtung Bau → Regel). */
@@ -110,6 +111,9 @@ schreibe(COVER_BEKANNT_DATEI, { 5: 'TMDB führt ihn nicht' })
 /* Titel 15: AniList-Cover und -Banner, TMDB hat keins; Titel 16: japanisches Plakat mit Beleg `nurJa`; Titel 17: AniList-Cover, Plakat eines geteilten Films → alle drei Ausnahme bei bild-fremdsprachig (Verdrahtung der Bildbestände). */
 schreibe('data/tmdb-poster.json', { 15: null, 16: { p: '/j16.jpg', w: 1000, h: 1500, l: 'ja', inhaltAm: '2026-12-01', nurJa: true }, 17: { p: '/g17.jpg', w: 1000, h: 1500, l: 'de' } })
 schreibe('data/tmdb-banner.json', { 15: null })
+/* Titel 21 bis 25 ohne AniList-Banner: 21 `miss` ohne Kennung, 22 `miss` mit Kennung, 23 kein Eintrag, 24 Handkennung auf `miss` → alle offen („kein Treffer“ ist kein Beleg); 25 `miss` plus `ohne: true` von Hand → Ausnahme (Verdrahtung Bau → Banner-Lookup). */
+schreibe('data/tmdb-titles.json', { 21: { miss: true }, 22: { miss: true, tmdbId: 5 }, 24: { miss: true }, 25: { miss: true } })
+schreibe('data/tmdb-von-hand.yaml', '- anilistId: 24\n  tmdbId: 99\n  kind: tv\n  titel: T\n  geprueftAm: "2026-01-01"\n  grund: Kulisse\n- anilistId: 25\n  ohne: true\n  titel: T\n  geprueftAm: "2026-01-01"\n  grund: Kulisse\n')
 /* Der Import von `luecken-titel.ts` (über `fehlendes`) liest diese Datei schon beim Laden. */
 schreibe('data/kino-ankuendigungen.yaml', '[]')
 /* Titel 9: Handbeleg „ohne deutschen Ton“ bei ADN → Ausnahme belegtes-nein; Titel 1 hat keinen und bleibt offen. */
@@ -121,7 +125,7 @@ git('commit', '-q', '-m', 'kulisse')
 const l1 = lauf()
 pruefe('Lauf 1 endet mit Exit 0', l1.status === 0, l1.stderr.slice(-300))
 const r1 = register()
-pruefe('Lauf 1: genau die erwarteten Mängel aus den echten Dateiformaten', schluessel(r1) === 'adresse-mehrfach:6:offen adresse-mehrfach:7:offen cover:1:offen erschienen-ohne-weg:1:offen folgentitel:2:offen folgenzahl-widerspruch:14:offen handlung-de:2:offen staffel-zuordnung:10:offen staffel-zuordnung:11:offen tv-sichtung-ohne-folge:18:offen', schluessel(r1))
+pruefe('Lauf 1: genau die erwarteten Mängel aus den echten Dateiformaten', schluessel(r1) === 'adresse-mehrfach:6:offen adresse-mehrfach:7:offen banner:21:offen banner:22:offen banner:23:offen banner:24:offen cover:1:offen erschienen-ohne-weg:1:offen folgentitel:2:offen folgenzahl-widerspruch:14:offen handlung-de:2:offen staffel-zuordnung:10:offen staffel-zuordnung:11:offen tv-sichtung-ohne-folge:18:offen', schluessel(r1))
 pruefe('Lauf 1: Handliste: Cover von Titel 5 ist Ausnahme (nur im Zähler)', r1.zaehler.cover!.ausnahme === 1 && !r1.zeilen.some((z) => z.art === 'cover' && z.t === 5), r1.zaehler.cover)
 pruefe('Lauf 1: Disc-Termin ist ein Weg (kein kein-weg, kein erstausgabe-ohne-weg bei Titel 4)', !r1.zeilen.some((z) => z.t === 4), r1.zeilen.filter((z) => z.t === 4))
 pruefe('Lauf 1: Termin am heutigen Tag zählt als künftig (kein termin-fehlt-laufend bei Titel 8)', !r1.zeilen.some((z) => z.t === 8), r1.zeilen.filter((z) => z.t === 8))
@@ -129,6 +133,8 @@ pruefe('Lauf 1: Erstlauf kennt kein „neu“', Object.values(r1.zaehler).every(
 pruefe('Lauf 1: erschienen-ohne-weg: Titel 1 offen, Titel 9 (Handbeleg dub:false) Ausnahme', r1.zaehler['erschienen-ohne-weg']?.offen === 1 && r1.zaehler['erschienen-ohne-weg']?.ausnahme === 1, r1.zaehler['erschienen-ohne-weg'])
 pruefe('Lauf 1: alle 28 Arten im Zähler', Object.keys(r1.zaehler).length === 28, Object.keys(r1.zaehler))
 pruefe('Lauf 1: bild-fremdsprachig: Titel 15 (TMDB ohne Bild), 16 (nur japanisch) und 17 (geteilter Film) sind Ausnahme', r1.zaehler['bild-fremdsprachig']?.offen === 0 && r1.zaehler['bild-fremdsprachig']?.ausnahme === 3, r1.zaehler['bild-fremdsprachig'])
+
+pruefe('Lauf 1: banner: Titel 25 (von Hand belegt „ohne TMDB“) ist Ausnahme, 21 bis 24 bleiben offen', r1.zaehler.banner?.offen === 4 && r1.zaehler.banner?.ausnahme === 1, r1.zaehler.banner)
 
 /* Vorfassung altern lassen und committen; Titel 1 bekommt sein Cover, Titel 3 ist neu ohne Banner. */
 schreibe('data/maengel.json', readFileSync(join(wurzel, 'data/maengel.json'), 'utf8').replaceAll(/"seit":"[\d-]+"/g, '"seit":"2026-01-01"'))
@@ -138,7 +144,7 @@ schreibe('public/data/synopses/3.json', { 3: { de: 'Text' } })
 schreibe('public/data/titles.json', [titel1(), titel(2), kurz(), einfach(3, { bannerImage: undefined }), ...weitere()])
 pruefe('Lauf 2 endet mit Exit 0', lauf().status === 0)
 const r2 = register()
-pruefe('Lauf 2: Cover behoben, Banner von Titel 3 neu, Rest bleibt', schluessel(r2) === 'adresse-mehrfach:6:offen adresse-mehrfach:7:offen banner:3:offen cover:1:behoben erschienen-ohne-weg:1:offen folgentitel:2:offen folgenzahl-widerspruch:14:offen handlung-de:2:offen staffel-zuordnung:10:offen staffel-zuordnung:11:offen tv-sichtung-ohne-folge:18:offen', schluessel(r2))
+pruefe('Lauf 2: Cover behoben, Banner von Titel 3 neu, Rest bleibt', schluessel(r2) === 'adresse-mehrfach:6:offen adresse-mehrfach:7:offen banner:21:offen banner:22:offen banner:23:offen banner:24:offen banner:3:offen cover:1:behoben erschienen-ohne-weg:1:offen folgentitel:2:offen folgenzahl-widerspruch:14:offen handlung-de:2:offen staffel-zuordnung:10:offen staffel-zuordnung:11:offen tv-sichtung-ohne-folge:18:offen', schluessel(r2))
 pruefe('Lauf 2: `seit` der offenen Zeile bleibt aus der Vorfassung', r2.zeilen.find((z) => z.art === 'handlung-de')!.seit === '2026-01-01', r2.zeilen)
 pruefe('Lauf 2: Zähler neu 1 (banner), behoben 1 (cover)', r2.zaehler.banner!.neu === 1 && r2.zaehler.cover!.behoben === 1, r2.zaehler)
 pruefe('Lauf 2: Ereignis nur an der neuen Zeile', r2.zeilen.filter((z) => z.ereignis).map((z) => `${z.art}:${z.t}:${z.ereignis}`).join() === 'banner:3:neu', r2.zeilen)

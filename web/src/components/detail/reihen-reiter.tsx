@@ -78,7 +78,7 @@ export function ReihenReiterZeile(p: { reiter: ReihenReiter[]; aktiv: number; la
               aria-selected={gewaehlt}
               aria-controls={`${kennung}-kasten`}
               tabIndex={gewaehlt ? 0 : -1}
-              aria-label={`${r.staffel ? `Staffel ${r.label}: ` : ''}${r.name}${LAGE_WORT[l]}${r.ohneSynchro ? OHNE_SYNCHRO_WORT : ''}`}
+              aria-label={`Staffel ${r.label}: ${r.name}${LAGE_WORT[l]}${r.ohneSynchro ? OHNE_SYNCHRO_WORT : ''}`}
               {...blase.an(r.id)}
               onClick={() => beiWahl(r.id)}
               className={r.ohneSynchro ? gestrichelt(reiterKlassen(gewaehlt, farbe)) : reiterKlassen(gewaehlt, farbe)}

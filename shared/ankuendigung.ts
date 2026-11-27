@@ -8,7 +8,7 @@
  */
 import type { Release, StreamLink, Title } from './types.ts'
 import { PLATFORMS } from './types.ts'
-import { diffDays, formatDate, monthName, todayIso } from './time.ts'
+import { diffDays, formatDate, monthName } from './time.ts'
 
 type Ankuendigung = NonNullable<Title['ankuendigung']>
 
@@ -77,16 +77,10 @@ export const ankuendigungOhneTermin = (t: { westlich?: true; ankuendigung?: Anku
 
 type Uebersetze = (k: string, v?: Record<string, string | number>) => string
 
-/** „mit Untertiteln ab/seit 07.10.2026“ — vor dem Start „ab“, danach „seit“. */
-export function omuZeile(a: Ankuendigung, T: Uebersetze, heute = todayIso()): string {
-  const begonnen = nurMonat(a.omuAb) ? omuLetzterTag(a.omuAb) < heute : a.omuAb <= heute
-  return T(begonnen ? 'antwort.omuSeit' : 'antwort.omuAb', { wann: omuDatumText(a.omuAb) })
-}
-
-export function ankuendigungZeile(a: Ankuendigung, T: Uebersetze, heute = todayIso()): string {
+/** Anbieter und Stand der Synchro; der Start mit Untertiteln steht nie da (`shared/nur-deutsch.ts`). */
+export function ankuendigungZeile(a: Ankuendigung, T: Uebersetze): string {
   return [
     PLATFORMS[a.platform]?.name ?? a.platform,
-    omuZeile(a, T, heute),
     T(a.synchro === 'angekuendigt' ? 'antwort.synchroTerminOffen' : 'antwort.synchroOffen'),
   ].join(' · ')
 }

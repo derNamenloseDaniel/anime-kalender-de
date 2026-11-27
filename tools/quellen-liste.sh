@@ -355,6 +355,8 @@ QUELLEN=(
   data/trailer.json
   # Wann ein Titel zuletzt ohne deutschen Trailer gesucht wurde (30 Tage Wiedervorlage).
   data/trailer-versuche.json
+  # Label-Kanäle des Trailerlaufs: Kanalname → Uploads-Playlist (aus der YouTube-API aufgelöst) bzw. Tag eines Fehlversuchs; ohne diese Zeile löst jeder Lauf neu auf (100 Einheiten je Suche).
+  data/trailer-label-kanaele.json
   # Westliche Animationsserien aus TMDB — der zweite Bestand seit dem
   # 12.09.2026. Ohne diese Zeile wirft der Reset im CI-Lauf weg, was der
   # Abruf geholt hat, und die Seite verliert 906 Titel.

@@ -107,6 +107,7 @@ pipeline/check-ausloeser-zeilen.ts
 pipeline/check-auto-disc-handeintrag.ts
 pipeline/check-banner-ersatz.ts
 pipeline/check-banner-franchise.ts
+pipeline/check-banner-serienbild.ts
 pipeline/check-beleg-adresswechsel.ts
 pipeline/check-beleg-anbieter.ts
 pipeline/check-beleg-api-web.ts
@@ -806,6 +807,7 @@ pipeline/check-weg-adresse-bezugsweg.ts
 pipeline/check-weg-aus-meldung.ts
 pipeline/check-weg-handrecherche-b.ts
 pipeline/check-weg-handrecherche-c.ts
+pipeline/check-weg-handrecherche-w3.ts
 pipeline/check-weg-massenabgang.ts
 pipeline/check-weg-nein-gti.ts
 pipeline/check-weg-unten.ts

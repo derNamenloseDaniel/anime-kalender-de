@@ -3,6 +3,7 @@ import { mitHandvorrang } from '../lib/tmdb-von-hand.ts'
 import { type MotnDaten, LEER as MOTN_LEER } from '../lib/motn.ts'
 import { type PlatformId, type Release, type Title } from '../../shared/types.ts'
 import { todayIso } from '../../shared/time.ts'
+import { erstausgabeBeimAnbieterBis } from '../../shared/verlag-anbieter.ts'
 import { type SlimTitel } from './13-2-auslieferung.ts'
 import { erfassungsStichtage, stichtagSchluessel } from './angebot-stichtag.ts'
 import { titelMitTermin } from './titel-mit-termin.ts'
@@ -86,6 +87,7 @@ export function ergaenzeAngebotSeit({ slim, releases, titles, quellen }: { slim:
   const stichtage = erfassungsStichtage(Object.values(monatsstand.shows ?? {}))
   let alsTermin = 0
   let nurAmTitel = 0
+  let neulistung = 0
 
   for (const title of titles.values()) {
     if (hatTermin.has(title.id)) continue
@@ -98,7 +100,10 @@ export function ergaenzeAngebotSeit({ slim, releases, titles, quellen }: { slim:
 
     const bester = fruehesterAnbieter(show, title, stichtage)
     if (!bester) continue
-    const { anbieter, seit } = bester
+    const { anbieter } = bester
+    /* Führte der Anbieter den Titel laut aniSearch schon vorher, ist das Katalogdatum eine Neulistung: der Weg bleibt, aber am Erstausgabetag statt als „Neu bei …“ (Exception, Netflix seit 2022). */
+    const neulistungTag = bester.seit >= GRENZE && erstausgabeBeimAnbieterBis(title.deErstausgabe, anbieter, bester.seit) ? title.deErstausgabe!.von! : undefined
+    const seit = neulistungTag ?? bester.seit
 
     /*
       Am Titel steht es immer — das Panel zeigt es auch ohne Kalendereintrag.
@@ -114,14 +119,15 @@ export function ergaenzeAngebotSeit({ slim, releases, titles, quellen }: { slim:
     if (ausgeliefert) ausgeliefert.angebotSeit = angebot
     nurAmTitel++
 
-    if (seit < GRENZE) continue
+    if (seit < GRENZE && !neulistungTag) continue
+    if (neulistungTag) neulistung++
     releases.push(angebotRelease(title, anbieter, seit))
     alsTermin++
   }
   if (nurAmTitel) {
     log(
       `${nurAmTitel} Titel ohne Termin tragen jetzt ein „Im Angebot seit" ` +
-        `(${alsTermin} davon aus ${GRENZE.slice(0, 4)} auch als Kalendereintrag)`,
+        `(${alsTermin} davon aus ${GRENZE.slice(0, 4)} auch als Kalendereintrag, ${neulistung} davon Neulistungen beim Erstausgabe-Anbieter, am Erstausgabetag)`,
     )
   }
 }

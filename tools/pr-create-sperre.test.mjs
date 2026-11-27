@@ -1,6 +1,6 @@
 /**
  * Test für `.claude/hooks/pr-create-sperre.js` (PreToolUse auf Bash): rohes `gh pr create` wird abgewiesen,
- * `bash tools/pr-einreichen.sh` (das intern `gh pr create` ruft) und andere `gh pr`-Befehle bleiben frei.
+ * `bash tools/pr-einreichen.sh` (das den PR per `gh api` anlegt) und andere `gh pr`-Befehle bleiben frei.
  */
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
@@ -59,8 +59,10 @@ for (const c of [
 assert.equal(lauf('gh pr create --title x', 'Write'), null, 'Write frei')
 assert.equal(pruefe({ tool_name: 'Bash' }), null, 'ohne tool_input frei')
 
-// Das Skript selbst darf `gh pr create` weiter rufen: der Hook prüft nur den äußeren Befehl.
-assert.match(readFileSync(join(wurzel, 'tools', 'pr-einreichen.sh'), 'utf8'), /gh pr create/, 'pr-einreichen.sh ruft gh pr create')
+// Das Skript legt den PR per REST an (`gh api …/pulls`, seit 27.11.2026: GraphQL ist in Cloud-Sitzungen gesperrt) und steht dem Hook frei im Weg.
+const skriptText = readFileSync(join(wurzel, 'tools', 'pr-einreichen.sh'), 'utf8')
+assert.match(skriptText, /gh api 'repos\/\{owner\}\/\{repo\}\/pulls' -f title=/, 'pr-einreichen.sh legt den PR per REST an')
+assert.doesNotMatch(skriptText, /gh pr (view|create)/, 'pr-einreichen.sh ruft kein GraphQL-gh pr view/create')
 frei('bash tools/pr-einreichen.sh "Titel" "Text"')
 
 // Ziel-Repo: gesperrt nur, wo tools/pr-einreichen.sh existiert (Anlass: chrome-utilities hat es nicht, 23.11.2026).

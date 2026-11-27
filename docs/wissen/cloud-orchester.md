@@ -82,7 +82,7 @@ Stand 22.11.2026, 02:00 UTC (erste und zweite Nacht, Auftrag Issue 4420). Alle Z
 5. **Reine Kommentar-PRs** in `pr-stufe` herabstufen (Vorschlag A21).
 6. **Gegenprobe:** Mutanten nur per Zeilenanker setzen, nie per erster Textfundstelle.
 7. **Monitor:** meldet `github-actions`-Kommentare; `## Frage`-Kommentare der Bauer meldet er nicht — mit aufnehmen.
-8. **Patch-Notes-Pflicht** von Anfang an in jeden Daten-Auftrag schreiben (Hänger 22:49–23:09).
+8. **Patch-Notes-Pflicht** von Anfang an in jeden Daten-Auftrag schreiben (Hänger 22:49–23:09). **Seit 27.11.2026 (Issue 5209):** PRs in der Cloud nur über `bash tools/pr-einreichen.sh` (REST, fährt die Vorprüfung; rohes `gh api …/pulls` oder das GitHub-MCP umgeht sie, Wellen-PRs 5130–5146). Bei jedem Wecken zusätzlich `node tools/liegegut.mjs`: rote Ketten und „Welle …“-Zeilen gehören dem Nacht-Dirigenten, Ursache einmal am Kettenlog nachlesen, je PR ein Bauer mit derselben Auflage.
 9. **Zweig der Auflagen-Sitzung** nur aus `pulls/<N> --jq .head.ref` nehmen, nie raten.
 10. **Prüfer-Neustart**, wenn eine Auflage per Kommentar statt Commit erfüllt wird (`pr-pruefer-nachtrag.yml`, Job `neustart`).
 11. **Nachschub** nur für Mängelarten mit erreichbarer Quelle; TMDB-Aufgaben über `claude-auftrag.yml` (die Umgebung hat keinen Schlüssel, siehe „Ergänzungen und Bauer-Weg“).

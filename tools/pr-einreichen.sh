@@ -7,6 +7,8 @@
 #
 # Aufruf: bash tools/pr-einreichen.sh "<Titel>" ["<Text für die Squash-Nachricht>"]
 # `PR_BASIS=zug` setzt eine andere Basis als main (Sammelzug). Der Text gehört beim Merge als --body in die Squash-Nachricht (das Skript druckt den Befehl); `deploy.yml` liest dort `[schlank]`.
+# Alles über REST (`gh api`): Cloud-Sitzungen sperren GraphQL, die `gh pr`-Befehle scheitern dort mit HTTP 403 (gemessen 27.11.2026).
+# Sonst öffneten Cloud-Aufträge ihre PRs an dieser Vorprüfung vorbei (Wellen-PRs 5130–5146: Patch-Notes-Pflicht in allen zwölf rot).
 set -euo pipefail
 
 TITEL="${1:?Titel fehlt}"
@@ -17,10 +19,14 @@ if [ "$ZWEIG" = HEAD ] || [ "$ZWEIG" = main ]; then
   exit 1
 fi
 
+# Offener PR dieses Zweigs: Feld (number, body, html_url) oder leer. `{owner}/{repo}` löst gh aus dem Git-Remote auf.
+EIGNER="$(gh api 'repos/{owner}/{repo}' --jq .owner.login)"
+pr_feld() { gh api -X GET 'repos/{owner}/{repo}/pulls' -f head="$EIGNER:$ZWEIG" -f state=open --jq ".[0].$1 // empty"; }
+
 # Vorprüfung (tools/pr-vorpruefung.mjs): fängt vor dem Push, was der CI-Prüfer sonst mit „ändern“ zurückgibt. Rot bricht ab.
 # Gibt es den PR schon, gilt seine (unveränderliche) Beschreibung, sonst der Text dieses Aufrufs.
-if gh pr view "$ZWEIG" --json number -q .number > /dev/null 2>&1; then
-  PR_TEXT="$(gh pr view "$ZWEIG" --json body -q .body)"
+if [ -n "$(pr_feld number)" ]; then
+  PR_TEXT="$(pr_feld body)"
 else
   PR_TEXT="${TEXT:-$TITEL}"
 fi
@@ -28,11 +34,11 @@ export PR_TEXT
 node tools/pr-vorpruefung.mjs --titel "$TITEL" || { echo "✖ Einreichen abgebrochen: Vorprüfung rot (Befunde oben)." >&2; exit 1; }
 
 git push -q -u origin "$ZWEIG"
-if ! gh pr view "$ZWEIG" --json number -q .number > /dev/null 2>&1; then
-  gh pr create --base "${PR_BASIS:-main}" --head "$ZWEIG" --title "$TITEL" --body "${TEXT:-$TITEL}"
+if [ -z "$(pr_feld number)" ]; then
+  gh api 'repos/{owner}/{repo}/pulls' -f title="$TITEL" -f head="$ZWEIG" -f base="${PR_BASIS:-main}" -f body="${TEXT:-$TITEL}" --silent
 fi
-PR_URL="$(gh pr view "$ZWEIG" --json url -q .url)"
-PR_NR="$(gh pr view "$ZWEIG" --json number -q .number)"
+PR_URL="$(pr_feld html_url)"
+PR_NR="$(pr_feld number)"
 echo "PR eingereicht: $PR_URL"
 echo "Nächster Schritt (kein Auto-Merge): node tools/pr-nachrechnen.mjs $PR_NR, bei Exit 0 dann:"
 if [ -n "$TEXT" ]; then

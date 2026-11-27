@@ -12,6 +12,7 @@ import { istZugPr, leseZugAktiv } from './zug-aktiv.mjs'
 import { schleifeSignal, schleifenBeginn } from './nachrechnen-schleife.mjs'
 import { PRAEFIX as ABNAHME_PRAEFIX } from './abnahme-freigabe.mjs'
 import { hatNachtrag } from './nacht-merger-wahl.mjs'
+import { gruppiereWellen } from './liegegut-wellen.mjs'
 import { vorratMeldung } from './liegegut-vorrat.mjs'
 
 const STUNDE = 3600 * 1000
@@ -359,7 +360,7 @@ function bewerteEntwurf(pr, kopfZeit, jetzt, repo) {
   const gruende = entwurfGruende(pr)
   const texte = signale.map((s) => `${s.nr} ${s.text}${gruende.length > 0 ? ` (${gruende.join(', ')})` : ''}`)
   const text = zeile(pr.number, NAECHSTER.ENTWURF, texte, signale[0].seit, [], false, repo)
-  return { nr: pr.number, repo, signale: [{ nr: 11, seit: signale[0].seit }], zeile: text }
+  return { nr: pr.number, repo, zweig: pr.headRefName ?? '', signale: [{ nr: 11, seit: signale[0].seit }], zeile: text }
 }
 
 /** Bewertet einen PR; null, wenn nichts auffällt, sonst { nr, signale: [{ nr, seit }], zeile }. */
@@ -386,7 +387,7 @@ function bewertePr(ghFn, gitFn, pr, geteilt, jetzt, karte, stapel, imZug, repo, 
   const treffer = geprueft ? probeFuer(ghFn, gitFn, pr) : []
   const botLetzt = urteileAufKopf(urteile(pr.comments), pr.headRefOid, kopfZeit).at(-1)?.quelle === 'bot'
   const text = zeile(pr.number, naechsterSchritt(nummern, treffer, botLetzt, imZug), texte, Math.min(...zeiten), treffer, geprueft, repo)
-  return { nr: pr.number, repo, signale: nummern.map((n, i) => ({ nr: n, seit: zeiten[i] })), zeile: text }
+  return { nr: pr.number, repo, zweig: pr.headRefName ?? '', signale: nummern.map((n, i) => ({ nr: n, seit: zeiten[i] })), zeile: text }
 }
 
 const FELDER_LEICHT = 'number,title,headRefName,author,headRefOid,createdAt,mergeable,mergeStateStatus,isDraft,body,baseRefName'
@@ -455,8 +456,14 @@ const KURZ = { 1: 'Freigabe ruht', 2: 'Urteile widersprechen', 3: 'Konflikt', 4:
 /** Eine Sammelzeile für die Wachphase: `LIEGT: 2377 (Konflikt 30 h, Stillstand 52 h), …`; null ohne Funde. */
 export function liegtZeile(funde, jetzt) {
   if (funde.length === 0) return null
-  const je = funde.map((f) => `${f.repo && f.repo !== HAUPT_REPO.name ? `${f.repo}#` : ''}${f.nr} (${f.signale.map((s) => `${KURZ[s.nr]} ${Math.floor(stunden(s.seit, jetzt))} h`).join(', ')})`)
-  return `LIEGT: ${je.join(', ')}`
+  const signaleText = (f) => f.signale.map((s) => `${KURZ[s.nr]} ${Math.floor(stunden(s.seit, jetzt))} h`).join(', ')
+  const fremdesRepo = (f) => f.repo && f.repo !== HAUPT_REPO.name
+  const { wellen, einzeln } = gruppiereWellen(funde)
+  const einzelText = einzeln.map((f) => `${fremdesRepo(f) ? `${f.repo}#` : ''}${f.nr} (${signaleText(f)})`)
+  // Die Welle nennt die Stunden ihres ältesten Mitglieds
+  const seit = (f) => Math.min(...f.signale.map((s) => s.seit))
+  const welleText = wellen.map((w) => `${fremdesRepo(w.funde[0]) ? `${w.funde[0].repo} ` : ''}Welle ${w.stamm}* ${w.funde.length} PRs ${w.funde.map((f) => f.nr).join(', ')} (${signaleText(w.funde.reduce((a, b) => (seit(b) < seit(a) ? b : a)))})`)
+  return `LIEGT: ${[...einzelText, ...welleText].join(', ')}`
 }
 
 /** Wachphase: Sammelzeile oder eigene Fehlerzeile, wirft nie (kein stilles „nichts“). */

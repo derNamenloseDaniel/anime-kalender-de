@@ -25,6 +25,7 @@ import { beobachtetOhneTermin } from './folge-ueber-anzahl.ts'
 import { discTerminFehler, type DiscPruefQuellen } from './disc-anisearch-datum.ts'
 import { sichtungsZeilen } from './sichtungsfenster.ts'
 import { crWegDoppelt } from './cr-doppelter-weg.ts'
+import { deutschBelegtTrotzOffen } from './deutsch-belegt.ts'
 import { veralteteSynchroHinweise } from './veraltete-hinweise.ts'
 import { fuerBesucher, istNurUntertitel } from '../../shared/nur-deutsch.ts'
 import { joynHinterTv, belegvermerkImHinweis } from './joyn-folgen-aus-tv.ts'
@@ -272,7 +273,7 @@ for (const t of titles.values())
       fehler.push(`Anime ${t.id}: Bezugsweg „${w.name}" zeigt auf TMDB, ohne als „über TMDB" gekennzeichnet zu sein`)
 }
 /** Die Prüfungen am Ende von `pruefeErgebnis`, die nicht je Release laufen (eigene Funktion, damit jene nicht wächst). */
-function schlussFehler(releases: Release[], events: ReleaseEvent[], titles: Map<number, Title>, heute: string, discQuellen?: DiscPruefQuellen): string[] {
+export function schlussFehler(releases: Release[], events: ReleaseEvent[], titles: Map<number, Title>, heute: string, discQuellen?: DiscPruefQuellen): string[] {
   return [
     ...discTerminFehler(releases, heute, discQuellen),
     ...landFehler(titles),
@@ -280,6 +281,7 @@ function schlussFehler(releases: Release[], events: ReleaseEvent[], titles: Map<
     ...geteilteWegeTrotzWiderlegung(releases, titles),
     ...premiereFehler(releases),
     ...beobachtetOhneTermin(fuerBesucher(releases), events),
+    ...deutschBelegtTrotzOffen(releases, titles),
     ...joynHinterTv(releases, events, heute),
     ...belegvermerkImHinweis(releases),
   ]

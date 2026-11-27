@@ -207,7 +207,8 @@ export function fertigAntwort(
   releases: Release[] = [],
 ): { art: 'fertig'; raus?: number; gesamt?: number; gesamtAbgeleitet: boolean; heuteOffen?: boolean } {
   const wochenplan = events.some((e) => e.releaseType === 'weekly' && e.platform !== 'tv' && e.platform !== 'disc')
-  const belegt = Boolean(gesamt && belegteFolgen >= gesamt) || wochenplan
+  /* Nennt ein Release des Titels die Zahl belegt (Anbieter-Folgenzahl, Erweiterung), ist sie keine Zahl des Werks. */
+  const belegt = Boolean(gesamt && (belegteFolgen >= gesamt || releases.some((r) => reichtBis(r, gesamt)))) || wochenplan
   const heuteOffen = katalogstartHeuteOffen(events, heute, releases) || undefined
   return { art: 'fertig', raus, gesamt, gesamtAbgeleitet: !belegt, heuteOffen }
 }
@@ -273,7 +274,7 @@ export const gesamtIstBelegt = (title: Title, releases: Release[], gesamt: numbe
 export type FolgenZaehlung = [number, number] | [number, number, 1]
 
 /** Reicht die belegte Zahl des Releases bis Folge `m`? Ein Teilstapel (Folge 101–122) belegt keine 128 Folgen. */
-const reichtBis = (r: Release, m: number): boolean => belegteZahl(r) && (r.schedule.firstEpisodeNumber ?? 1) + r.schedule.episodeCount! - 1 >= m
+export const reichtBis = (r: Release, m: number): boolean => belegteZahl(r) && (r.schedule.firstEpisodeNumber ?? 1) + r.schedule.episodeCount! - 1 >= m
 
 /**
  * „N von M Folgen auf Deutsch“ aus der Folgenliste. Das „von M“ steht nur, wenn ein Release die Zahl bis M belegt (weder angenommen

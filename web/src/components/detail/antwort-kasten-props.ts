@@ -11,8 +11,6 @@ export interface AntwortKastenProps {
   pillenGruppen?: Map<string, Gruppe>
   /** Über einen Disc-Termin geöffnet — dann steht der Umschalter auf „Disc". */
   discZuerst?: boolean
-  /** Erklärt die Zustände der Anbieterzeilen (Stream-Seite) — nur, was dort wirklich vorkommt. */
-  legende?: string
   /** Alle Stream-Zeilen ohne Sprachbeleg: Die Überschrift „Auf Deutsch …“ entfällt. */
   ohneSprachbeleg?: boolean | 'anbieter'
   /** Die Termine des Titels — gebraucht für den frühesten deutschen Start (`de-seit.ts`). */

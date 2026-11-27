@@ -5,14 +5,12 @@ import { type ReactNode } from 'react'
 import { type Antwort } from './antwort-typ.ts'
 import { type Gruppe } from './stream-pillen.ts'
 
-export function KastenPillen({ pillen, mitBereichen, gruppeVon, kostenlosKopf, T, legende, aktivDisc }: {
+export function KastenPillen({ pillen, mitBereichen, gruppeVon, kostenlosKopf, T }: {
   pillen: ReactNode[]
   mitBereichen: boolean
   gruppeVon: (p: ReactNode) => Gruppe | 'sonst'
   kostenlosKopf: string | undefined
   T: (k: string, v?: Record<string, string | number>) => string
-  legende: string | undefined
-  aktivDisc: boolean
 }) {
   return (
     <>
@@ -50,7 +48,6 @@ export function KastenPillen({ pillen, mitBereichen, gruppeVon, kostenlosKopf, T
               <div className={PILLEN_REIHE}>{pillen}</div>
             )}
           </div>
-          {legende && !aktivDisc && <p className="mt-2 text-t4 text-ak-leise">{legende}</p>}
         </div>
       )}
     </>

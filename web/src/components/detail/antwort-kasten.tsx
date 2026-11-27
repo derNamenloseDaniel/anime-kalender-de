@@ -37,7 +37,6 @@ export function AntwortKasten({
   pillenGruppen = new Map(),
   terminPillen = [],
   discZuerst = false,
-  legende,
   ohneSprachbeleg,
   releases = [],
 }: AntwortKastenProps) {
@@ -74,8 +73,6 @@ export function AntwortKasten({
         gruppeVon={z.gruppeVon}
         kostenlosKopf={z.kostenlosKopf}
         T={z.T}
-        legende={legende}
-        aktivDisc={z.aktivDisc}
       />
       {folgen}
     </section>

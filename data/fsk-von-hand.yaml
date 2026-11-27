@@ -245,10 +245,234 @@
   sources:
     - "https://www.thalia.de/shop/home/artikeldetails/ID150912285.html"
 
-- anilistId: 21348
-  titel: "Haikyu!! Kampf gegen ungenügende Noten"
+- anilistId: 20884
+  titel: "Haikyu!! Lev ist hier!"
   fsk: 6
   art: disc
-  beleg: "jpc: „Haikyu!!: To the Top Staffel 4 Vol. 4 (mit OVA zur Staffel 2 & 3)“, 2 DVDs, 02.12.2021 (= deutsche Erstausgabe), „ab 6 Jahren“; Thalia DVD ebenfalls FSK 6."
+  beleg: "jpc: „Haikyu!!: To the Top Staffel 4 Vol. 3 (mit OVA zur Staffel 1)“, peppermint anime, 21.10.2021 (= deutsche Erstausgabe), „FSK ab 6 freigegeben“; Amazon Blu-ray Vol. 3 ebenfalls ab 6."
   sources:
-    - "https://www.jpc.de/jpcng/movie/detail/-/art/haikyu-to-the-top-staffel-4-ova-zur-staffel-2-3-vol-4-2-dvds/hnum/10699364"
+    - "https://www.jpc.de/jpcng/movie/detail/-/art/haikyu-to-the-top-staffel-4-ova-zur-staffel-1-vol-3-2-dvds/hnum/10699334"
+
+- anilistId: 3710
+  titel: "Hakaba Kitaro: Der Junge vom Friedhof"
+  fsk: 12
+  art: disc
+  beleg: "Polyband-Shop: komplette Serie, LTD. Mediabook (Blu-ray), 11 Folgen, FSK 12; jpc Vol. 1 Mediabook ebenfalls FSK 12."
+  sources:
+    - "https://shop.polyband.de/Hakaba-Kitaro-Der-Junge-vom-Friedhof-Die-komplette-Serie-LTD.-Mediabook-Blu-ray/7736857POY"
+
+- anilistId: 747
+  titel: "Haru o daiteita"
+  fsk: 16
+  art: disc
+  beleg: "eBay-Produktkatalog: „Haru o daiteita (DVD)“, EAN 4038925305852, 62 Min., FSK 16; eine 82-Min.-Ausgabe (EAN 4014260501753) ebenfalls FSK 16."
+  sources:
+    - "https://www.ebay.de/p/63506588"
+
+- anilistId: 9549
+  titel: "Heidi: Ein Sommer voller Glück"
+  fsk: 0
+  art: disc
+  beleg: "Amazon.de: DVD „Heidi – Ein Sommer voll Glück“, 15.05.2000, ohne Altersbeschränkung; filmdienst „FSK ab 0“."
+  sources:
+    - "https://www.amazon.de/Heidi-Ein-Sommer-voll-Gl%C3%BCck/dp/B00004TVXZ"
+
+- anilistId: 9548
+  titel: "Heidi: Kindheit in den Bergen"
+  fsk: 0
+  art: disc
+  beleg: "Händlerangabe eBay: DVD „Heidi – Kindheit in den Bergen“ (2000, ca. 88 Min.), „FSK: Freigegeben ohne Altersbeschränkung“."
+  sources:
+    - "https://www.ebay.de/itm/385282247481"
+
+- anilistId: 145140
+  titel: "Helck"
+  fsk: 16
+  art: disc
+  beleg: "Thalia: „Helck – Staffel 1 – Vol.1 [2 BRs]“, peppermint anime, „Freigegeben ab 16 Jahren“; Vol. 2 ebenfalls FSK 16."
+  sources:
+    - "https://www.thalia.de/shop/home/artikeldetails/A1072171789"
+
+- anilistId: 138103
+  titel: "How Heavy Are the Dumbbells You Lift? Gnadenlose Trainingsstunde"
+  fsk: 12
+  art: disc
+  beleg: "Thalia: Blu-ray Vol. 3, Kazé, 02.09.2021, Bonus „Die Gnadenlose Trainingsstunde“ Teil 2, FSK 12; bluray-disc.de Vol. 2 (05.08.2021) „Freigegeben ab 12 Jahren“."
+  sources:
+    - "https://www.thalia.de/shop/home/artikeldetails/A1060433608"
+
+- anilistId: 169931
+  titel: "How I Attended an All-Guy’s Mixer"
+  fsk: 12
+  art: disc
+  beleg: "jpc: „How I Attended an All-Guy's Mixer Vol. 2 (Blu-ray)“, peppermint, „FSK ab 12 freigegeben“, ca. 144 Min."
+  sources:
+    - "https://www.jpc.de/jpcng/movie/detail/-/art/how-i-attended-an-all-guy-s-mixer-vol-2/hnum/12494914"
+
+- anilistId: 13469
+  titel: "Hyouka OVA"
+  fsk: 12
+  art: disc
+  beleg: "Thalia: „Hyouka Vol. 2 (Ep. 7-12 + OVA)“ Blu-ray, KSM, Extra „Episode 11.5“, „FSK: Freigegeben ab 12 Jahren“; jpc DVD Vol. 2 ebenfalls FSK 12."
+  sources:
+    - "https://www.thalia.de/shop/home/artikeldetails/A1063513935"
+
+- anilistId: 151126
+  titel: "I’m Quitting Heroing OVA"
+  fsk: 12
+  art: disc
+  beleg: "jpc: „I'm Quitting Heroing Vol. 2 (Blu-ray)“, 20.04.2023, „Volume 2 mit den Episoden 7-12 plus zweiteiliger OVA erstmals auf Deutsch synchronisiert!“, „FSK ab 12 freigegeben“."
+  sources:
+    - "https://www.jpc.de/jpcng/movie/detail/-/art/i-m-quitting-heroing-vol-2/hnum/11127036"
+
+- anilistId: 10794
+  titel: "Infinite Stratos OVA: Ein Sextett sehnt sich nach Liebe"
+  fsk: 16
+  art: disc
+  beleg: "Polyband-Shop: „Infinite Stratos – Volume 2 LTD. (Blu-ray)“, „enthält die Episoden 7-12 + OVA“, „Freigegeben ab 16 Jahren“; Thalia ebenfalls FSK 16."
+  sources:
+    - "https://shop.polyband.de/Infinite-Stratos-Volume-2-LTD.-Blu-ray/7736704POY"
+
+- anilistId: 136435
+  titel: "Ippon Again!"
+  fsk: 12
+  art: disc
+  beleg: "jpc: „Ippon Again! Vol. 2 (Blu-ray)“, KSM, 22.02.2024, FSK 12; Vol. 1 (Amazon, OFDb) FSK 6 — höchste Freigabe eingetragen."
+  sources:
+    - "https://www.jpc.de/jpcng/movie/detail/-/art/ippon-again-volume-2/hnum/11683110"
+
+- anilistId: 4814
+  titel: "Junjo Romantica 2"
+  fsk: 16
+  art: disc
+  beleg: "jpc: „Junjo Romantica Staffel 2 (Gesamtausgabe) (DVD)“, FSK 16."
+  sources:
+    - "https://www.jpc.de/jpcng/movie/detail/-/art/junjo-romantica-staffel-2/hnum/12192870"
+
+- anilistId: 20796
+  titel: "Junjo Romantica 3"
+  fsk: 16
+  art: disc
+  beleg: "jpc: „Junjo Romantica Staffel 3 Vol. 1 (Limited Edition mit Sammelbox) (Blu-ray)“, 21.07.2023, FSK 16; Vol. 2 (Kazé) laut Händler ebenfalls FSK 16."
+  sources:
+    - "https://www.jpc.de/jpcng/movie/detail/-/art/junjo-romantica-3-staffel-vol-1-limited-edition-mit-sammelbox/hnum/11564975"
+
+- anilistId: 1530
+  titel: "Kanon"
+  fsk: 12
+  art: disc
+  beleg: "OFDb: Kanon (2006), Blu-ray FilmConfect Anime (Vol. 1 + Sammelschuber), 03.11.2023, FSK 12; Vol. 4 und Gesamtausgabe ebenfalls FSK 12."
+  sources:
+    - "https://www.ofdb.de/fassung/153612,493453,Kanon/"
+
+- anilistId: 104217
+  titel: "Keine Cheats für die Liebe OVA"
+  fsk: 12
+  art: disc
+  beleg: "Thalia: „Keine Cheats für die Liebe Anime-DVD“, Altraverse, 3 OADs, ca. 71 Min., 15.07.2024, „Freigegeben ab 12 Jahren“; Amazon ebenfalls 12."
+  sources:
+    - "https://www.thalia.de/shop/home/artikeldetails/A1070100498"
+
+- anilistId: 7593
+  titel: "Kiss × Sis (TV)"
+  fsk: 16
+  art: disc
+  beleg: "Thalia: „Kiss x Sis Vol.1 (TV 1) – Mediabook – Limited Edition“, AniMoon, „Freigegeben ab 16 Jahren“; Vol. 2 (TV) laut Händler FSK 16."
+  sources:
+    - "https://www.thalia.de/shop/home/artikeldetails/A1071125073"
+
+- anilistId: 166523
+  titel: "Kizuna no Allele: Staffel 2"
+  fsk: 0
+  art: disc
+  beleg: "Amazon.de: „Kizuna no allele: Die komplette zweite Staffel (2 Blu-rays)“, PLAION PICTURES, 06.03.2025, „Freigegeben ohne Altersbeschränkung“."
+  sources:
+    - "https://www.amazon.de/Kizuna-allele-komplette-Staffel-Blu-rays/dp/B0DN6862R5"
+
+- anilistId: 21235
+  titel: "Kuroko’s Basketball: Das Beste Geschenk"
+  fsk: 6
+  art: disc
+  beleg: "Thalia: „Kuroko’s Basketball Season 3 Volume 5 (Steelcase Edition)“, AniMoon, 19.08.2022 (= deutsche Erstausgabe), „Episoden 71-75 plus Bonus-OVA“, „Freigegeben ab 6 Jahren“."
+  sources:
+    - "https://www.thalia.de/shop/home/artikeldetails/A1062337965"
+
+- anilistId: 20603
+  titel: "Kuroko’s Basketball: Kannst du das gleich nochmal machen?"
+  fsk: 6
+  art: disc
+  beleg: "bluray-disc.de: Kuroko’s Basketball Staffel 2 Vol. 4 (Ep. 41-45 + OVA-Bonusfolge, 01.10.2021 = deutsche Erstausgabe), „Freigegeben ab 6 Jahren“; Amazon „Ages 6 and over“."
+  sources:
+    - "https://bluray-disc.de/blu-ray-filme/148822-kurokos_basketball_staffel_2_vol_4_limited_futurepak_edition"
+
+- anilistId: 16916
+  titel: "Kuroko’s Basketball: Tip Off"
+  fsk: 6
+  art: disc
+  beleg: "Amazon.de: „Kuroko's Basketball Season 1 Vol.5“ Blu-ray, AniMoon, Ep. 21-25 + OVA-Bonusfolge, 26.03.2021 (= deutsche Erstausgabe), ab 6."
+  sources:
+    - "https://www.amazon.de/Kurokos-Basketball-Season-Vol-5-Blu-ray/dp/B08TZ6TDSS"
+
+- anilistId: 20960
+  titel: "Love Stage!! Daran war gar nichts leicht"
+  fsk: 12
+  art: disc
+  beleg: "Thalia: „Love Stage!! – Gesamtausgabe – inkl. OVA (+ 2 DVDs) [2 BRs]“, peppermint, „Freigegeben ab 12 Jahren“; OFDb dieselbe Ausgabe FSK 12."
+  sources:
+    - "https://www.thalia.de/shop/home/artikeldetails/A1061705977"
+
+- anilistId: 4472
+  titel: "Lucky Star OVA"
+  fsk: 6
+  art: disc
+  beleg: "Thalia: „Lucky Star – OVA Collection – Mediabook Edition“ (DVD), AniMoon Publishing, FSK 6."
+  sources:
+    - "https://www.thalia.de/shop/home/artikeldetails/A1063077379"
+
+- anilistId: 134623
+  titel: "Lupin III. Part 6"
+  fsk: 16
+  art: disc
+  beleg: "jpc: „Lupin III.: Part 6 Vol. 2 (Blu-ray)“, 18.08.2023, „FSK ab 16 freigegeben“; bluray-disc.de Vol. 1 FSK 12 — höchste Freigabe eingetragen."
+  sources:
+    - "https://www.jpc.de/jpcng/movie/detail/-/art/lupin-iii-part-6-vol-2-2-brs/hnum/11506159"
+
+- anilistId: 1285
+  titel: "M.D. Geist"
+  fsk: 16
+  art: disc
+  beleg: "Amazon.de: „M.D. Geist Perfect Collection“ DVD, „Rated: Ages 16 and over“, Rezension „Uncut mit einer fsk 16 Freigabe“."
+  sources:
+    - "https://www.amazon.de/M-D-Geist-Perfect-Collection/dp/B00005Q4DJ"
+
+- anilistId: 153791
+  titel: "Made in Abyss: Mit Papa"
+  fsk: 16
+  art: disc
+  beleg: "bluray-disc.de: „Made in Abyss: Die goldene Stadt der sengenden Sonne – Staffel 2 – Vol. 2 Limited Collector’s Edition“, LEONINE, 02.06.2023, „FSK: Freigegeben ab 16 Jahren“; OFDb: Extra „Exklusiv-Anime ‚Mit Papa‘ (6:54 Min.)“."
+  sources:
+    - "https://bluray-disc.de/blu-ray-filme/173317-made_in_abyss_die_goldene_stadt_der_sengenden_sonne_staffel_2_vol_2_limited_collectors_edition"
+
+- anilistId: 162989
+  titel: "Mask Danshi: This Shouldn’t Lead to Love"
+  fsk: 12
+  art: disc
+  beleg: "jpc/Thalia/OFDb: „Mask Danshi: This Shouldn't Lead To Love (Blu-ray)“, KSM Anime, 25.04.2024, FSK 12."
+  sources:
+    - "https://www.jpc.de/jpcng/movie/detail/-/art/mask-danshi-this-shouldn-t-lead-to-love/hnum/11743331"
+
+- anilistId: 111015
+  titel: "Mein Freund Tyrano: Für immer zusammen"
+  fsk: 6
+  art: disc
+  beleg: "Thalia: Blu-ray „Mein Freund Tyrano – Für immer zusammen“, KSM, 18.08.2022, „Freigegeben ab 6 Jahren“; Amazon und OFDb ebenfalls FSK 6."
+  sources:
+    - "https://www.thalia.de/shop/home/artikeldetails/A1063789629"
+
+- anilistId: 110173
+  titel: "Midnight Occult Civil Servants OVA"
+  fsk: 12
+  art: disc
+  beleg: "Thalia: „Midnight Occult Civil Servants OVA-Collection (3 OVAs)“ Blu-ray, KSM, 79 Min., FSK 12."
+  sources:
+    - "https://www.thalia.de/shop/home/artikeldetails/A1059615969"

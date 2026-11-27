@@ -3,7 +3,8 @@ import { expandEvents } from '../../shared/logic.ts'
 import { istPremiere, istStaffelfinale, istStaffelstart } from '../../shared/tv-signale.ts'
 import { primeKanalAnbieter, schreibeZweitanbieter } from '../../shared/zweitanbieter.ts'
 import { schreibeStreamingVorher } from '../../shared/streaming-vorher.ts'
-import { schreibeKatalogReleaseVonHand } from '../lib/katalog-belege.ts'
+import { ladeKatalogBelegEintraege, katalogBeobachtungen, schreibeKatalogReleaseVonHand } from '../lib/katalog-belege.ts'
+import { loeseFolgenzahlAnnahmen, vermutungenMitBeleg } from '../../shared/vermutung-beleg.ts'
 import { log, warn } from '../lib/util.ts'
 import { pruefeErgebnis } from '../lib/pruefung.ts'
 import { brichAbBeiWiderspruch } from '../lib/bau-widerspruch.ts'
@@ -62,8 +63,16 @@ export function schreibeTvAuskunft(events: ReleaseEvent[], releases: Release[], 
   }
   log(`TV-Auskunft an den Terminen: ${premier} Premieren, ${wiederholungen} Wiederholungen, ${ohneAussage} ohne Aussage (kein Beleg), ${finale} Staffelfinale`)
   log(`Katalog-Release: ${schreibeKatalogReleaseVonHand(events, releases)} Termine`)
+  meldeVermutungenMitBeleg(events, releases)
   schreibePremiereMitMeldung(events, releases, titles)
   schreibeZweitanbieterMitMeldung(events, releases, titles)
+}
+
+/** Wächter über den erzeugten Datensatz: jede Vermutung, deren Beleg vorliegt, ist eine Warnung (`shared/vermutung-beleg.ts`). */
+function meldeVermutungenMitBeleg(events: ReleaseEvent[], releases: Release[]): void {
+  const b = vermutungenMitBeleg(releases, events, katalogBeobachtungen(ladeKatalogBelegEintraege()))
+  for (const z of b.zeilen) warn(z)
+  log(`Vermutungen: Katalog ≈ ${b.katalog.marker} (${b.katalog.aufloesbar} mit Beleg), angenommene Folgenzahl ${b.folgenzahl.marker} (${b.folgenzahl.aufloesbar} mit Beleg)`)
 }
 
 /** Die Marke „Zweitanbieter“ nach den Handbelegen schreiben; ein widersprechender Premiere-Beleg ist eine Warnung. */
@@ -89,6 +98,8 @@ export function rolleTermineAus({ releases, titles, jpStart }: {
   widerlegeDeutscheTermine(releases, titles)
   const joynAusTv = leiteJoynAusTv(releases)
   if (joynAusTv.length) log(`${joynAusTv.length} Joyn-Termin(e) aus dem belegten TV-Sendeplan abgeleitet: ${joynAusTv.join(', ')}`)
+  const folgenzahlBelegt = loeseFolgenzahlAnnahmen(releases)
+  if (folgenzahlBelegt.length) log(`${folgenzahlBelegt.length} Folgenzahl(en) nicht mehr angenommen (letzte Folge beobachtet): ${folgenzahlBelegt.join(', ')}`)
   const events: ReleaseEvent[] = releases
     .flatMap(expandEvents)
     .sort(nachTagUndZeit)

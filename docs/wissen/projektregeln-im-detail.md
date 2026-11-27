@@ -59,6 +59,17 @@ Dieses Projekt lebt davon, dass die Termine stimmen. Deshalb gilt ausnahmslos:
   widerlegen“). Sie steht dort ohne „≈“; der abgeleitete Tag bleibt gekennzeichnet („voraussichtlich“,
   „(Termin abgeleitet)“, Mail „geschätzt“, ICS „Geschätzter Termin“). „≈“ an der Uhrzeit nur bei `timeEstimated`
   (`zeitGeschaetzt()` in `shared/zeit-text.ts`, Test `tools/zeit-kennzeichnung.test.ts`).
+- **Erschienen und belegt löst die Vermutung ab (Daniel, 27.11.2026, Fall Fool Night 213457: Kachel „Katalog-Release ≈“ trotz
+  Browser-Meldung „Folgen 1–12 mit deutschem Ton“ am Starttag).** Jede Vermutung, die live landet, hat einen Auflösebeleg, und
+  genau eine Stelle urteilt (`bleibt`/`belegt`/`widerlegt`): `shared/vermutung-beleg.ts`, Test `pipeline/check-vermutung-beleg.ts`.
+  Im Bau angewendet: *Katalog-Release ≈* (`urteilKatalog`: Beobachtung am Starttag oder davor mit der letzten Folge → belegt, später
+  gemessen → bleibt ≈; Beobachtung steht als `art: beobachtet` mit `gesehenAm` und `bisFolge` in `data/katalog-release-von-hand.yaml`)
+  und *angenommene Folgenzahl* (`urteilFolgenzahl`: letzte Folge in `observed` und belegtes Ende `lastEpisodeDate` auf ihrem Tag →
+  nicht mehr angenommen). Der Bau (`10-termine.ts`) warnt je Marker, dessen Beleg vorliegt. **Inventur, noch nicht angeschlossen:**
+  `estimated` (Beleg: Beobachtung der Folge 1 in `observed`, belegter Starttag), `timeEstimated`/„≈“ an der Uhrzeit (Beleg: gemessene
+  Uhrzeit, `FESTGELEGTE_ZEITEN` ist der Altfall), `sichtung`/`timeSighting` (Beleg: belegte Folgennummer), `episodeCountSource: 'anisearch'`
+  (Beleg: AniList- oder Anbieter-Zahl), `kal.katalogAlleVermutlich`/`kal.katalogVermutlich*` in `i18n-kalender.ts` (folgen aus `katalog`),
+  „voraussichtlich“/„Termin abgeleitet“ (folgen aus `estimated`). Neue Vermutungsmarker bekommen ihre Funktion in dieser Datei.
 - **Keine Folgenzahl erfinden, auch nicht als Rückfall.** Ein einzelner Termin im
   Crunchyroll-Kalender ist kein Beleg für eine Wochenserie — dort stehen auch Specials,
   Filmpremieren und die Anime Awards. Ein `Math.max(12, …)` als Standardwert machte daraus neun

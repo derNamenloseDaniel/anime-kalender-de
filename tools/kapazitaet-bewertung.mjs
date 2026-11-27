@@ -3,8 +3,9 @@
  * damit `tools/kapazitaet.test.mjs` sie prüft (23.10.2026, Plan `skalierung-100-bis-100k.md`, B1).
  *
  * Free-Stufe: 100.000 Worker-Anfragen und 100.000 geschriebene D1-Zeilen je UTC-Tag und Konto. Rot ab
- * 70 % davon (Luft, bevor die Stufe wirklich sperrt) und bei einem Cron-CPU-p99 über 8 ms (Free-Limit
- * 10 ms je Aufruf). Anfragen und D1-Schreiben zählen nur in den letzten zwei Tagen als Befund (09.11.2026), Cron-CPU über das ganze Fenster.
+ * 70 % davon (Luft, bevor die Stufe wirklich sperrt) und bei Aufrufen, die Cloudflare wegen CPU-Zeit abbricht (`exceededCpu`).
+ * Ein Cron-CPU-p99 über 8 ms (Free-Limit 10 ms je Aufruf) ist seit 27.11.2026 nur eine Warnung (Abbruch erst bei dauerhaftem Überschreiten).
+ * Anfragen, D1-Schreiben und `exceededCpu` zählen nur in den letzten zwei Tagen als Befund (09.11.2026), älter als Warnung.
  */
 export const KONTINGENT_ANFRAGEN = 100_000
 export const KONTINGENT_D1_GESCHRIEBEN = 100_000
@@ -65,13 +66,14 @@ export function bewerteKapazitaet(tage) {
   const { frisch, alt } = ueberschreitungen(tage)
   const befunde = frisch.map((m) => `Kapazität: ${m}`)
   const warnungen = alt.map((m) => `Kapazität: ${m} (älter als ${FRISCHE_TAGE} Tage, nicht mehr rot)`)
+  // Cloudflare bricht erst bei dauerhaftem Überschreiten ab: Cron p99 50–73 ms bei 0 exceededCpu (25./26.11.2026). Rot ist der Abbruch, p99 nur Vorwarnung.
   const c = schlimmster(tage, 'cronP99Ms')
   if (c && c.cronP99Ms > GRENZE_CRON_P99_MS) {
-    befunde.push(`Kapazität: Cron-CPU p99 ${c.cronP99Ms.toFixed(1)} ms am ${c.datum} über ${GRENZE_CRON_P99_MS} ms (Free-Limit 10 ms)`)
+    warnungen.push(`Kapazität: Cron-CPU p99 ${c.cronP99Ms.toFixed(1)} ms am ${c.datum} über ${GRENZE_CRON_P99_MS} ms (Free-Limit 10 ms, abgebrochen wird erst dauerhaft)`)
   }
-  const u = schlimmster(tage, 'ueberCpu')
-  if (u && u.ueberCpu > 0) {
-    warnungen.push(`Kapazität: ${zahl(u.ueberCpu)} Aufrufe mit überschrittener CPU-Zeit am ${u.datum}`)
-  }
+  const u = schlimmster(tage.slice(-FRISCHE_TAGE), 'ueberCpu')
+  if (u && u.ueberCpu > 0) befunde.push(`Kapazität: ${zahl(u.ueberCpu)} Aufrufe wegen CPU-Zeit abgebrochen (exceededCpu) am ${u.datum}`)
+  const uAlt = schlimmster(tage.slice(0, -FRISCHE_TAGE), 'ueberCpu')
+  if (uAlt && uAlt.ueberCpu > 0) warnungen.push(`Kapazität: ${zahl(uAlt.ueberCpu)} Aufrufe wegen CPU-Zeit abgebrochen am ${uAlt.datum} (älter als ${FRISCHE_TAGE} Tage, nicht mehr rot)`)
   return { befunde, warnungen }
 }

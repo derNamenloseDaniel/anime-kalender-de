@@ -30,14 +30,17 @@ assert.equal(befunde({ anfragen: 69_999 }).length, 0)
 assert.equal(befunde({ geschrieben: 70_000 }).length, 0)
 assert.equal(befunde({ geschrieben: 70_001 }).length, 1)
 assert.match(befunde({ geschrieben: 70_001 })[0], /D1-Zeilen geschrieben/)
-/* ---- Cron-CPU p99 ---- */
-assert.equal(befunde({ cronP99Ms: 8 }).length, 0)
-assert.equal(befunde({ cronP99Ms: 8.1 }).length, 1)
-assert.match(befunde({ cronP99Ms: 8.1 })[0], /Cron-CPU p99 8,1 ms|Cron-CPU p99 8\.1 ms/)
-/* ---- exceededCpu: nur Warnung, genau 1 genügt ---- */
-assert.equal(bewerteKapazitaet([tag({ ueberCpu: 1 })]).warnungen.length, 1)
-assert.equal(bewerteKapazitaet([tag({ ueberCpu: 1 })]).befunde.length, 0)
+/* ---- Cron-CPU p99: nur Warnung (Cloudflare bricht erst dauerhaft ab; 27.11.2026: p99 72,8 ms bei 0 exceededCpu) ---- */
+const warnungen = (felder) => bewerteKapazitaet([tag(felder)]).warnungen
+assert.equal(warnungen({ cronP99Ms: 8 }).length, 0)
+assert.equal(warnungen({ cronP99Ms: 8.1 }).length, 1)
+assert.equal(befunde({ cronP99Ms: 72.8 }).length, 0, 'Lauf 45871569491: p99 72,8 ms allein ist nicht rot')
+assert.match(warnungen({ cronP99Ms: 8.1 })[0], /Cron-CPU p99 8\.1 ms/)
+/* ---- exceededCpu: im frischen Fenster rot, genau 1 genügt; älter nur Warnung ---- */
+assert.equal(befunde({ ueberCpu: 1 }).length, 1)
+assert.match(befunde({ ueberCpu: 1 })[0], /1 Aufrufe wegen CPU-Zeit abgebrochen \(exceededCpu\) am 2026-10-22/)
 assert.equal(bewerteKapazitaet([tag({ ueberCpu: 0 })]).warnungen.length, 0)
+assert.equal(befunde({ ueberCpu: 0 }).length, 0)
 /* ---- Nicht gemessen (null) ist weder rot noch 0 ---- */
 assert.deepEqual(bewerteKapazitaet([tag({ anfragen: null, geschrieben: null, cronP99Ms: null, ueberCpu: null })]), { befunde: [], warnungen: [] })
 assert.deepEqual(bewerteKapazitaet([]), { befunde: [], warnungen: [] })
@@ -59,8 +62,13 @@ assert.equal(bewerteKapazitaet(tage3({ anfragen: 70_001 }, {}, {})).warnungen.le
 assert.equal(bewerteKapazitaet(tage3({ geschrieben: 80_000 }, {}, {})).befunde.length, 0)
 assert.match(bewerteKapazitaet(tage3({ geschrieben: 80_000 }, {}, {})).warnungen[0], /D1-Zeilen geschrieben am 2026-10-20/)
 assert.equal(bewerteKapazitaet(tage3({}, {}, { geschrieben: 80_000 })).befunde.length, 1)
-/* Cron-CPU zählt weiter über das ganze Fenster */
-assert.equal(bewerteKapazitaet(tage3({ cronP99Ms: 9 }, {}, {})).befunde.length, 1)
+/* Cron-CPU warnt über das ganze Fenster; exceededCpu vor 3 Tagen ist eine Warnung, am vorletzten Tag rot */
+assert.equal(bewerteKapazitaet(tage3({ cronP99Ms: 9 }, {}, {})).warnungen.length, 1)
+assert.equal(bewerteKapazitaet(tage3({ cronP99Ms: 9 }, {}, {})).befunde.length, 0)
+const altCpu = bewerteKapazitaet(tage3({ ueberCpu: 3 }, {}, {}))
+assert.equal(altCpu.befunde.length, 0)
+assert.match(altCpu.warnungen[0], /3 Aufrufe wegen CPU-Zeit abgebrochen am 2026-10-20 \(älter als 2 Tage/)
+assert.match(bewerteKapazitaet(tage3({}, { ueberCpu: 1 }, {})).befunde[0], /2026-10-21/)
 /* Ein einzelner Tag ist frisch; ohne Tage nichts */
 assert.equal(bewerteKapazitaet([tag({ anfragen: 70_001 })]).befunde.length, 1)
 /* Grenze je Skript und zusätzlich die Kontosumme: ein einzelnes Skript darüber ist rot und namentlich genannt (die Summe
@@ -149,7 +157,8 @@ assert.equal(t.cronP99Ms, 8.2, 'Cron getrennt von allen Aufrufen')
 assert.equal(t.gelesen, 5000)
 assert.equal(t.geschrieben, 321)
 assert.equal(m.nichtLesbar.length, 0)
-assert.equal(bewerteKapazitaet(m.tage).befunde.length, 1, 'nur Cron p99 8,2 ms ist über der Schwelle')
+assert.equal(bewerteKapazitaet(m.tage).befunde.length, 1, 'nur exceededCpu (2) ist rot')
+assert.equal(bewerteKapazitaet(m.tage).warnungen.filter((w) => w.includes('Cron-CPU p99 8.2 ms')).length, 1, 'Cron p99 8,2 ms warnt')
 assert.match(berichtZeilen(m).join('\n'), /Skript newsletter: 1\.002 Anfragen am 2026-10-23/)
 
 /* ---- Stundentabelle: Zeilen ohne Stunde/Skript übergangen, gleiche Stunde summiert, Zeilen nur bei Anfragen ---- */
@@ -175,7 +184,7 @@ const n = await messe({ token: 'T', konto: 'K', jetzt: JETZT, tage: 2, holen: b.
 assert.equal(n.tage[1].cronP99Ms, null)
 assert.equal(n.tage[1].anfragen, 1042)
 assert.equal(n.nichtLesbar.length, 1)
-assert.equal(bewerteKapazitaet(n.tage).befunde.length, 0)
+assert.ok(!bewerteKapazitaet(n.tage).befunde.some((b) => b.includes('Cron')), 'fehlender Cron-Datensatz ergibt keinen Cron-Befund')
 
 /* ---- Prozess ohne Token: Exit 0 mit Hinweis ---- */
 const env = { ...process.env }
@@ -192,17 +201,19 @@ const sammle = () => {
   return { zeilen, ausgabe: (z) => zeilen.push(z) }
 }
 const gut = sammle()
-assert.equal(await lauf({ token: 'T', konto: 'K', jetzt: JETZT, tage: 2, holen: api().holen, ausgabe: gut.ausgabe }), 1, 'Cron p99 8,2 ms ist über 8 ms')
+assert.equal(await lauf({ token: 'T', konto: 'K', jetzt: JETZT, tage: 2, holen: api().holen, ausgabe: gut.ausgabe }), 1, 'exceededCpu im frischen Fenster ist rot')
 assert.ok(gut.zeilen.some((z) => z.startsWith('  Stunden newsletter 2026-10-22 (00–23 UTC, gesamt 7100): ')), 'Stundenzeilen stehen im Protokoll')
 assert.ok(!gut.zeilen.some((z) => z.startsWith('::warning::Kapazität: Stundenabfrage')))
-assert.ok(gut.zeilen.some((z) => z.startsWith('::error::Kapazität: Cron-CPU p99')))
+assert.ok(gut.zeilen.some((z) => z.startsWith('::error::Kapazität: 2 Aufrufe wegen CPU-Zeit abgebrochen')))
+assert.ok(gut.zeilen.some((z) => z.startsWith('::warning::Kapazität: Cron-CPU p99')))
+assert.ok(!gut.zeilen.some((z) => z.startsWith('::error::Kapazität: Cron-CPU')))
 const fehlt = sammle()
 assert.equal(await lauf({ token: 'T', konto: 'K', jetzt: JETZT, tage: 2, holen: api({ ohne: ['workersInvocationsScheduled'] }).holen, ausgabe: fehlt.ausgabe }), 1, 'nicht lesbarer Datensatz = rot')
 assert.ok(fehlt.zeilen.some((z) => /^::error::Kapazität: Datensatz nicht lesbar \(cron: unknown field/.test(z)))
 /* ---- Stundenabfrage scheitert: nur Warnung, Exit-Code wie ohne sie ---- */
 const sf = sammle()
 const codeSf = await lauf({ token: 'T', konto: 'K', jetzt: JETZT, tage: 2, holen: api({ stundenFehlt: true }).holen, ausgabe: sf.ausgabe })
-assert.equal(codeSf, 1, 'Cron p99 8,2 ms bleibt der einzige Befund')
+assert.equal(codeSf, 1, 'exceededCpu bleibt der einzige Befund')
 assert.ok(sf.zeilen.some((z) => /^::warning::Kapazität: Stundenabfrage nicht lesbar \(unknown field datetimeHour\)/.test(z)))
 assert.ok(!sf.zeilen.some((z) => /^::error::.*Stunden/.test(z)))
 assert.equal(sf.zeilen.filter((z) => z.startsWith('::error::')).length, 1)

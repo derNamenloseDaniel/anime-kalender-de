@@ -19,9 +19,12 @@ if [ "$ZWEIG" = HEAD ] || [ "$ZWEIG" = main ]; then
   exit 1
 fi
 
-# Offener PR dieses Zweigs: Feld (number, body, html_url) oder leer. `{owner}/{repo}` löst gh aus dem Git-Remote auf.
-EIGNER="$(gh api 'repos/{owner}/{repo}' --jq .owner.login)"
-pr_feld() { gh api -X GET 'repos/{owner}/{repo}/pulls' -f head="$EIGNER:$ZWEIG" -f state=open --jq ".[0].$1 // empty"; }
+# Offener PR dieses Zweigs: Feld (number, body, html_url) oder leer. Das Repo kommt aus GH_REPO oder GITHUB_REPOSITORY (Cloud-Sitzungen, Actions); sonst löst gh
+# `{owner}/{repo}` aus dem Git-Remote auf (in der Cloud ein Proxy, dort ohne GH_REPO nicht verlässlich).
+PLATZHALTER="{owner}/{repo}"
+REPO_PFAD="repos/${GH_REPO:-${GITHUB_REPOSITORY:-$PLATZHALTER}}"
+EIGNER="$(gh api "$REPO_PFAD" --jq .owner.login)"
+pr_feld() { gh api -X GET "$REPO_PFAD/pulls" -f head="$EIGNER:$ZWEIG" -f state=open --jq ".[0].$1 // empty"; }
 
 # Vorprüfung (tools/pr-vorpruefung.mjs): fängt vor dem Push, was der CI-Prüfer sonst mit „ändern“ zurückgibt. Rot bricht ab.
 # Gibt es den PR schon, gilt seine (unveränderliche) Beschreibung, sonst der Text dieses Aufrufs.
@@ -35,7 +38,7 @@ node tools/pr-vorpruefung.mjs --titel "$TITEL" || { echo "✖ Einreichen abgebro
 
 git push -q -u origin "$ZWEIG"
 if [ -z "$(pr_feld number)" ]; then
-  gh api 'repos/{owner}/{repo}/pulls' -f title="$TITEL" -f head="$ZWEIG" -f base="${PR_BASIS:-main}" -f body="${TEXT:-$TITEL}" --silent
+  gh api "$REPO_PFAD/pulls" -f title="$TITEL" -f head="$ZWEIG" -f base="${PR_BASIS:-main}" -f body="${TEXT:-$TITEL}" --silent
 fi
 PR_URL="$(pr_feld html_url)"
 PR_NR="$(pr_feld number)"

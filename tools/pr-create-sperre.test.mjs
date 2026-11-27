@@ -61,7 +61,7 @@ assert.equal(pruefe({ tool_name: 'Bash' }), null, 'ohne tool_input frei')
 
 // Das Skript legt den PR per REST an (`gh api …/pulls`, seit 27.11.2026: GraphQL ist in Cloud-Sitzungen gesperrt) und steht dem Hook frei im Weg.
 const skriptText = readFileSync(join(wurzel, 'tools', 'pr-einreichen.sh'), 'utf8')
-assert.match(skriptText, /gh api 'repos\/\{owner\}\/\{repo\}\/pulls' -f title=/, 'pr-einreichen.sh legt den PR per REST an')
+assert.match(skriptText, /gh api "\$REPO_PFAD\/pulls" -f title=/, 'pr-einreichen.sh legt den PR per REST an')
 assert.doesNotMatch(skriptText, /gh pr (view|create)/, 'pr-einreichen.sh ruft kein GraphQL-gh pr view/create')
 frei('bash tools/pr-einreichen.sh "Titel" "Text"')
 

@@ -26,14 +26,25 @@ if (args[0] === 'pr') {
   process.exit(1)
 }
 const pfad = args.find((a) => a.startsWith('repos/'))
-if (pfad === 'repos/{owner}/{repo}') {
+const basis = process.env.ATTRAPPE_REPO_PFAD
+const streng = (bedingung, text) => {
+  if (!bedingung) {
+    console.error('Attrappe: ' + text + ' (' + args.join(' ') + ')')
+    process.exit(1)
+  }
+}
+if (pfad === basis) {
   console.log('derNamenloseDaniel')
-} else if (pfad === 'repos/{owner}/{repo}/pulls' && args.includes('-X')) {
+} else if (pfad === basis + '/pulls' && args.includes('-X')) {
+  // Ohne Eigner-Präfix ignoriert GitHub den head-Filter (sonst wäre das erste Ergebnis ein fremder PR), mit state=all träfe er geschlossene PRs
+  streng(args.includes('-f') && args.includes('head=derNamenloseDaniel:' + process.env.ATTRAPPE_ZWEIG), 'head-Filter muss Eigner:Zweig tragen')
+  streng(args.includes('state=open'), 'nur offene PRs')
   const feld = (args.find((a) => a.startsWith('.[0].')) ?? '').replace('.[0].', '').replace(' // empty', '')
   const vorhanden = process.env.ATTRAPPE_PR_VORHANDEN === '1' || existsSync(ablage + '/angelegt')
   const werte = { number: '4711', body: 'Text des alten PR', html_url: 'https://github.com/x/y/pull/4711' }
   if (vorhanden) console.log(werte[feld])
-} else if (pfad === 'repos/{owner}/{repo}/pulls') {
+} else if (pfad === basis + '/pulls') {
+  streng(args.includes('head=' + process.env.ATTRAPPE_ZWEIG) && args.some((a) => a.startsWith('title=')) && args.some((a) => a.startsWith('base=')) && args.some((a) => a.startsWith('body=')), 'Anlegen braucht title, head, base, body')
   writeFileSync(ablage + '/angelegt', '1')
 } else {
   console.error('unerwarteter Aufruf: ' + args.join(' '))
@@ -48,7 +59,7 @@ const git = (ordner, ...args) => {
 }
 
 /** Ein Szenario im frischen Wegwerf-Ordner; Rückgabe: Ausgang des Skripts, gh-Aufrufe, übergebener PR_TEXT, Zweige des Remotes. */
-function szenario({ zweig = 'fix/test', vorhanden = false, vorpruefungExit = 0, basis, tools = true } = {}) {
+function szenario({ zweig = 'fix/test', vorhanden = false, vorpruefungExit = 0, basis, tools = true, repo } = {}) {
   const wurzel = mkdtempSync(join(tmpdir(), 'pr-einreichen-'))
   try {
     const remote = join(wurzel, 'remote.git')
@@ -70,8 +81,11 @@ function szenario({ zweig = 'fix/test', vorhanden = false, vorpruefungExit = 0, 
     writeFileSync(join(bin, 'gh-attrappe.mjs'), ATTRAPPE)
     writeFileSync(join(bin, 'gh'), `#!/bin/sh\nexec "${process.execPath}" "${join(bin, 'gh-attrappe.mjs')}" "$@"\n`)
     chmodSync(join(bin, 'gh'), 0o755)
-    const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, ATTRAPPE_ORDNER: ablage, ATTRAPPE_PR_VORHANDEN: vorhanden ? '1' : '0' }
+    const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, ATTRAPPE_ORDNER: ablage, ATTRAPPE_PR_VORHANDEN: vorhanden ? '1' : '0', ATTRAPPE_ZWEIG: zweig, ATTRAPPE_REPO_PFAD: repo === undefined ? 'repos/{owner}/{repo}' : `repos/${repo.wert}` }
     delete env.PR_BASIS
+    delete env.GH_REPO
+    delete env.GITHUB_REPOSITORY
+    if (repo !== undefined) env[repo.name] = repo.wert
     if (basis) env.PR_BASIS = basis
     const r = spawnSync('bash', ['tools/pr-einreichen.sh', 'Titel', 'Text'], { cwd: arbeit, env, encoding: 'utf8', timeout: 60000 })
     const aufrufe = existsSync(join(ablage, 'aufrufe.jsonl')) ? readFileSync(join(ablage, 'aufrufe.jsonl'), 'utf8').trim().split('\n').filter(Boolean).map((z) => JSON.parse(z)) : []
@@ -83,7 +97,7 @@ function szenario({ zweig = 'fix/test', vorhanden = false, vorpruefungExit = 0, 
   }
 }
 
-const anlegen = (aufrufe) => aufrufe.filter((a) => a.includes('repos/{owner}/{repo}/pulls') && !a.includes('-X'))
+const anlegen = (aufrufe) => aufrufe.filter((a) => a.some((x) => /^repos\/.*\/pulls$/.test(x)) && !a.includes('-X'))
 const graphql = (aufrufe) => aufrufe.filter((a) => a[0] === 'pr' || a.includes('graphql'))
 
 {
@@ -121,4 +135,15 @@ const graphql = (aufrufe) => aufrufe.filter((a) => a[0] === 'pr' || a.includes('
   assert.equal(s.exit, 1, s.aus)
   assert.equal(s.aufrufe.length, 0, 'auf main kein gh-Aufruf')
 }
-console.log('pr-einreichen.test: 5 Szenarien grün (nur REST, Vorprüfung vor Push, Basis, bestehender PR, main)')
+// Repo aus GH_REPO oder GITHUB_REPOSITORY (Cloud-Remote ist ein Proxy): kein Platzhalter im Pfad, GH_REPO vor GITHUB_REPOSITORY
+for (const repo of [{ name: 'GH_REPO', wert: 'eigner/repo' }, { name: 'GITHUB_REPOSITORY', wert: 'andere/sache' }]) {
+  const s = szenario({ repo })
+  assert.equal(s.exit, 0, s.aus)
+  assert.equal(anlegen(s.aufrufe).length, 1, `${repo.name}: ein Anlegen`)
+  assert.ok(s.aufrufe.every((a) => !a.some((x) => x.includes('{owner}'))), `${repo.name}: kein Platzhalter im Pfad`)
+}
+{
+  const s = szenario({ repo: { name: 'GITHUB_REPOSITORY', wert: 'andere/sache' } })
+  assert.ok(s.aufrufe.some((a) => a.includes('repos/andere/sache/pulls')), 'Pfad aus der Umgebung')
+}
+console.log('pr-einreichen.test: 8 Szenarien grün (nur REST, Vorprüfung vor Push, Basis, bestehender PR, main, Repo aus der Umgebung, strenge Attrappe)')

@@ -30,13 +30,14 @@ const PR_MD = '<!-- titel: fix(x): Beispiel -->\n## Ursache\nText mit $(rm -rf /
 const BERICHT = 'Bericht: fertig.\nRückblick: gut.\n'
 
 /** Welt mit Zweigen (Name → sha), Dateien je prtext-Zweig, offenen PRs und Kommentaren; jede Mutation wird in `log` festgehalten. */
-function welt({ zweige = {}, dateien = {}, prs = {}, kommentare = {}, labels = {}, stufe = 1, anlegenSchlaegtFehl = false } = {}) {
+function welt({ zweige = {}, dateien = {}, prs = {}, kommentare = {}, labels = {}, stufe = 1, anlegenSchlaegtFehl = false, aenderungen = 'M\tdocs/x.md\n' } = {}) {
   const log = []
   const w = {
     log,
     zeile: (t) => log.push(['zeile', t]),
     datei: (zweig, name) => dateien[zweig]?.[name] ?? null,
     zweigSha: (z) => zweige[z] ?? null,
+    aenderungen: () => aenderungen,
     offenerPr: (z) => (prs[z] === undefined ? null : { nummer: prs[z] }),
     prAnlegen: (a) => {
       log.push(['prAnlegen', a])
@@ -278,6 +279,13 @@ const mitPfad = (teil) => (args) => args.some((x) => String(x).includes(teil))
   pruefe('zweigSha: 403 wirft', wirft)
 }
 {
+  // aenderungen: Compare-Schnittstelle gegen main, Zweig kodiert, jq-Ausdruck liefert `A<Tab>Pfad`/`M<Tab>Pfad`
+  const { gh, aufrufeGh } = ghAttrappe([{ passt: mitPfad('compare/main...fix/foo?per_page=100'), antwort: 'A\tdata/patchnotes/x.yaml\nM\tweb/src/a.tsx\n' }])
+  const w = echteWelt({ gh, repo: R })
+  pruefe('aenderungen: Antwort der Schnittstelle unverändert', w.aenderungen('fix/foo') === 'A\tdata/patchnotes/x.yaml\nM\tweb/src/a.tsx\n')
+  pruefe('aenderungen: Compare gegen main mit Zweig als Pfad, jq mit Status → A/M', aufrufeGh[0].args[1] === `repos/${R}/compare/main...fix/foo?per_page=100` && aufrufeGh[0].args.includes('--jq') && /added.*"A".*"M"/.test(aufrufeGh[0].args.at(-1)), JSON.stringify(aufrufeGh[0].args))
+}
+{
   const treffer = [
     { number: 1, head: { ref: 'fix/foo-anders', repo: { full_name: R } } },
     { number: 2, head: { ref: 'fix/foo', repo: { full_name: 'fremder/fork' } } },
@@ -455,6 +463,33 @@ for (const [args, muster] of [[[], /Aufruf/], [['fix/foo'], /kein prtext-Zweig/]
   pruefe('Workflow: Zweigname nur über env, run ohne Ausdruck', schritt.run === 'node tools/cloud-abgabe.mjs "$ZWEIG"' && !job.steps.some((s) => String(s.run ?? '').includes('${{')))
   pruefe('Workflow: kein weiterer Schritt sieht das Token', job.steps.filter((s) => JSON.stringify(s).includes('steps.app.outputs')).length === 1)
   gleich('Workflow: Gruppe je Zweig, nie abbrechen', [wf.concurrency.group.includes('github.event.inputs.zweig || github.ref'), wf.concurrency['cancel-in-progress']], [true, false])
+}
+
+// --- Patch-Notes-Pflicht vor dem Anlegen (Cloud-Welle 5130–5146, 27.11.2026; Auflage A1 des Prüfers an PR 5212) ------------------------------------
+{
+  const mitZeile = (zeile) => ({ 'prtext/foo': { 'pr.md': `${PR_MD}${zeile}\n`, 'bericht.md': BERICHT } })
+  const SICHTBAR = 'A\tdata/curated/ein-satz-handlung/teil-01.yaml\n'
+  const lauft = (extra) => {
+    const w = standard(extra)
+    const code = lauf(['prtext/foo'], w)
+    return { w, code, meldung: w.log.filter((e) => e[0] === 'zeile').map((e) => e[1]).join(' | ') }
+  }
+  const ohne = lauft({ aenderungen: SICHTBAR })
+  pruefe('Patch Notes: sichtbare Änderung ohne Zeile → Exit 2, kein PR, Meldung nennt die Pflicht', ohne.code === 2 && aufrufe(ohne.w, 'prAnlegen').length === 0 && /Patch-Notes-Pflicht/.test(ohne.meldung) && /FEHLER/.test(ohne.meldung), ohne.meldung)
+  const klammer = lauft({ aenderungen: SICHTBAR, dateien: mitZeile('Patch Notes: keine (Daten noch nicht eingebunden)') })
+  pruefe('Patch Notes: „keine (Grund)“ statt „keine – Grund“ → Exit 2, kein PR (Form der Wellen-PRs)', klammer.code === 2 && aufrufe(klammer.w, 'prAnlegen').length === 0, klammer.meldung)
+  const ohneKlasse = lauft({ aenderungen: SICHTBAR, dateien: mitZeile('Patch Notes: keine – Daten ohne Einbindung') })
+  pruefe('Patch Notes: Grund ohne Klasse (Daten …) bei sichtbarer Änderung → Exit 2', ohneKlasse.code === 2 && aufrufe(ohneKlasse.w, 'prAnlegen').length === 0, ohneKlasse.meldung)
+  const gut = lauft({ aenderungen: SICHTBAR, dateien: mitZeile('Patch Notes: keine – intern: Datei wird von nichts gelesen') })
+  pruefe('Patch Notes: „keine – <Klasse>: Grund“ → PR angelegt', gut.code === 0 && aufrufe(gut.w, 'prAnlegen').length === 1, gut.meldung)
+  const neueDatei = lauft({ aenderungen: `${SICHTBAR}A\tdata/patchnotes/ein-satz.yaml\n` })
+  pruefe('Patch Notes: neue Datei in data/patchnotes/ genügt ohne Zeile', neueDatei.code === 0 && aufrufe(neueDatei.w, 'prAnlegen').length === 1, neueDatei.meldung)
+  const geaendert = lauft({ aenderungen: `${SICHTBAR}M\tdata/patchnotes/alt.yaml\n` })
+  pruefe('Patch Notes: geänderte (nicht neue) Patchnote-Datei genügt nicht', geaendert.code === 2, geaendert.meldung)
+  const unsichtbar = lauft({ aenderungen: 'M\tdocs/wissen/betrieb.md\nM\ttools/x.mjs\n' })
+  pruefe('Patch Notes: nur Doku und Werkzeug → keine Zeile nötig', unsichtbar.code === 0 && aufrufe(unsichtbar.w, 'prAnlegen').length === 1, unsichtbar.meldung)
+  const offen = lauft({ aenderungen: SICHTBAR, prs: { 'fix/foo': 50 } })
+  pruefe('Patch Notes: bei offenem PR kein Anlegen und keine Prüfung (nur Nachtrag)', offen.code === 0 && aufrufe(offen.w, 'prAnlegen').length === 0, offen.meldung)
 }
 
 console.log(`cloud-abgabe.test: ${anzahl} Prüfungen, ${fehler} Fehler`)

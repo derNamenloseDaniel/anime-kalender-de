@@ -94,6 +94,58 @@ zurueck()
 await melde({ stapel: [{ ...meldung({ suchUrl: 'https://www.amazon.de/s?k=A' }), url: undefined }, { ...meldung({ suchUrl: 'https://www.amazon.de/s?k=B' }), url: undefined }] })
 pruefe(dispatches() === 0, 'alle Such-Meldungen abgelehnt: kein Start', starts)
 
+// Direkt: Rückgabe, Anfrage (Kopf, Körper, Adresse) und Fehlerpfade von `stosseBauAn`; die Attrappe merkt sich jede Anfrage.
+{
+  const anfragen: { url: string; init?: RequestInit }[] = []
+  let laeufe: Response | Error = new Response(JSON.stringify({ workflow_runs: [] }), { status: 200 })
+  let dispatchStatus = 204
+  const meldungen: string[] = []
+  console.error = (...a: unknown[]) => void meldungen.push(a.join(' '))
+  globalThis.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
+    anfragen.push({ url: String(url), init })
+    if (String(url).includes('/runs?')) {
+      if (laeufe instanceof Error) throw laeufe
+      return laeufe.clone()
+    }
+    return new Response(null, { status: dispatchStatus })
+  }) as typeof fetch
+  const { stosseBauAn, stoesstBauAn } = await import('../worker/src/bau-anstoss.ts')
+  const env = { GITHUB_WECKER_TOKEN: 'tok' } as never
+  const start = () => anfragen.find((a) => a.url.includes('/dispatches'))
+
+  pruefe((await stosseBauAn({} as never)) === 'ohne-token' && anfragen.length === 0, 'ohne Token: „ohne-token“, keine Anfrage', anfragen)
+  pruefe((await stosseBauAn(env)) === 'gestartet', 'Läufe leer, 204: „gestartet“')
+  const s = start()
+  pruefe(s?.url === 'https://api.github.com/repos/derNamenloseDaniel/anime-kalender-de/actions/workflows/bestand-bauen.yml/dispatches', 'Start: Adresse des Bau-Workflows', s?.url)
+  pruefe(s?.init?.method === 'POST' && s?.init?.body === '{"ref":"main"}', 'Start: POST mit {"ref":"main"}', s?.init)
+  pruefe((s?.init?.headers as Record<string, string>)?.Authorization === 'Bearer tok', 'Start: Token im Kopf', s?.init?.headers)
+
+  anfragen.length = 0
+  dispatchStatus = 403
+  pruefe((await stosseBauAn(env)) === 'abgelehnt' && meldungen.some((m) => m.includes('HTTP 403')), 'HTTP 403: „abgelehnt“ und Fehlerzeile', meldungen)
+  dispatchStatus = 204
+
+  anfragen.length = 0
+  laeufe = new Response(JSON.stringify({ workflow_runs: [{ status: 'completed' }, { status: 'queued' }] }), { status: 200 })
+  pruefe((await stosseBauAn(env)) === 'wartet-schon' && !start(), 'wartender Lauf an zweiter Stelle: „wartet-schon“, kein Start')
+  laeufe = new Response(JSON.stringify({ workflow_runs: [{ status: 'completed' }, { status: 'in_progress' }] }), { status: 200 })
+  pruefe((await stosseBauAn(env)) === 'gestartet', 'nur beendete und laufende Läufe: „gestartet“')
+
+  anfragen.length = 0
+  meldungen.length = 0
+  laeufe = new Error('Netz weg')
+  pruefe((await stosseBauAn(env)) === 'gestartet' && !!start(), 'Läufe nicht lesbar: Bau wird trotzdem gestartet')
+  pruefe(meldungen.some((m) => m.includes('[bau-anstoss] Läufe nicht lesbar') && m.includes('Netz weg')), 'Läufe nicht lesbar: Fehlerzeile mit Ursache', meldungen)
+  anfragen.length = 0
+  laeufe = new Response('nein', { status: 500 })
+  pruefe((await stosseBauAn(env)) === 'gestartet' && !!start(), 'API-Antwort 500 (null): Bau wird gestartet')
+
+  pruefe(stoesstBauAn({ stapel: [{ plattform: 'netflix', suchUrl: 'x' }, { plattform: 'primevideo', suchUrl: 'https://a' }] }) === true, 'Stapel: eine Prime-Such-Meldung genügt')
+  pruefe(stoesstBauAn({ stapel: [{ plattform: 'primevideo' }, { plattform: 'primevideo', suchUrl: '' }] }) === false, 'Stapel ohne Such-Meldung (fehlend, leer): kein Anstoß')
+  pruefe(stoesstBauAn({ stapel: [] }) === false && stoesstBauAn(null) === false && stoesstBauAn({ plattform: 'primevideo', suchUrl: 1 }) === false, 'leerer Stapel, null, suchUrl keine Zeichenkette: kein Anstoß')
+  console.error = () => {}
+}
+
 if (fehler) {
   console.error(`${fehler} Zusicherung(en) verletzt`)
   process.exit(1)

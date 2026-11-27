@@ -6,6 +6,7 @@
 import type { Release } from '../../shared/types.ts'
 import { taktDerMeldung, type Vorschlag } from './meldungen.ts'
 import { spracheDerMeldung } from './sprachbefund.ts'
+import { hatHandbelegQuelle } from './deutsch-belegt.ts'
 
 export function autoReleaseWidersprueche(releases: Release[], vorschlaege: Vorschlag[]): string[] {
   const jeAdresse = new Map<string, Vorschlag[]>()
@@ -15,7 +16,7 @@ export function autoReleaseWidersprueche(releases: Release[], vorschlaege: Vorsc
     if (!r.automatisch || r.platform === 'disc' || r.platform === 'tv' || r.platform === 'rtlplus') continue
     const quellen = jeAdresse.get(r.sources[0] ?? '') ?? []
     if (!quellen.length) continue
-    if (!r.sprache && !quellen.some((v) => spracheDerMeldung(v) === 'ja'))
+    if (!r.sprache && !hatHandbelegQuelle(r) && !quellen.some((v) => spracheDerMeldung(v) === 'ja'))
       fehler.push(`"${r.slug}": Quelle sagt keine deutsche Synchro zu, der Termin ist nicht gekennzeichnet (sprache)`)
     const einzel = quellen.filter((v) => !v.dates?.every((d) => d.context === 'Sammelartikel'))
     if (r.releaseType === 'batch' && !r.schedule.episodeCount && !r.dateMeaning && einzel.some((v) => taktDerMeldung(v) === 'woechentlich'))

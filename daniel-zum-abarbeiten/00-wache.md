@@ -1,6 +1,6 @@
 # Wache — Bestand und Briefkasten
 
-**⚠ Auffälligkeit** · letzter Befund vom 26.11.2026 um 22:21 Uhr
+**⚠ Auffälligkeit** · letzter Befund vom 27.11.2026 um 18:31 Uhr
 
 Diese Zeile nennt den letzten **Befund**, nicht den letzten Lauf: Seit dem 26.09.2026 wird nur noch
 ein Befund committet (Daniel: „Behalten, still bei Ruhe"). Ob die Wache täglich läuft, steht in
@@ -17,48 +17,61 @@ Disney-Meldungen wurden zu einem einzigen Eintrag abgehakt, 216
 One-Piece-Meldungen verschwanden ganz. Gefunden hat es Daniel, weil ihm eine Zahl
 komisch vorkam. Das soll ihm keiner mehr abverlangen.
 
+## Was aufgefallen ist
+
+- 150 Termine weniger
+- 1 Titel weniger; 1 Urteile verloren; 1 Titel ohne Synchro-Beleg; primevideo: 1 Synchro-Belege weniger; primevideo: fehlt Shaman King (154): https://www.amazon.de/gp/video/detail/B0DYF8BKVP (link-check: {"status":200,"geprueftAm":"2026-09-21","prime":true} (jüngere Handprüfung widerspricht))
+
 ## Bestand — die letzten 24 Stunden
 
 ```
-29 Läufe in den letzten 1 Tagen (2725 insgesamt)
+34 Läufe in den letzten 1 Tagen (2755 insgesamt)
 
-25.11., 23:09  Bestand — zusammenführ   verweise +1, ohneUrteil +1, releases +1, termine +1
-26.11., 04:25  --ersetzen               titel +1
-26.11., 04:29  Bestand — zusammenführ   verweise +2, mitUrteil +1, ohneUrteil +1
-26.11., 05:12  Bestand — zusammenführ   verweise +2, ohneUrteil +2, releases +1, termine +8
-26.11., 12:17  Bestand — zusammenführ   mitUrteil +2, ohneUrteil -2, titelMitSynchro +1
 26.11., 19:24  Bestand — zusammenführ   verweise +11, mitUrteil +13, ohneUrteil -2, titelMitSynchro +2
+26.11., 23:13  Bestand — zusammenführ   verweise +1, mitUrteil +3, ohneUrteil -2, titelMitSynchro +1, releases +1, termine -150
+            ⚠  150 Termine weniger
+27.11., 00:24  Bestand — zusammenführ   releases +2, termine +2
+27.11., 00:51  Bestand — zusammenführ   releases +2, termine +2
+27.11., 04:32  Bestand — zusammenführ   titel +3, verweise +4, ohneUrteil +4, releases +1, termine +1
+27.11., 05:17  Bestand — zusammenführ   verweise +1, mitUrteil +2, ohneUrteil -1, titelMitSynchro +1, termine +7
+27.11., 12:55  Bestand — zusammenführ   verweise +1, ohneUrteil +1, releases +1, termine +1
+27.11., 13:56  --ersetzen               titel -1, verweise -1, mitUrteil -1, titelMitSynchro -1, termine -14
+            ⚠  1 Titel weniger; 1 Urteile verloren; 1 Titel ohne Synchro-Beleg; primevideo: 1 Synchro-Belege weniger; primevideo: fehlt Shaman King (154): https://www.amazon.de/gp/video/detail/B0DYF8BKVP (link-check: {"status":200,"geprueftAm":"2026-09-21","prime":true} (jüngere Handprüfung widerspricht))
+               • Shaman King (154) · Titel entfernt
+27.11., 15:24  --ersetzen               releases -1
+27.11., 16:57  --ersetzen               mitUrteil +1, ohneUrteil -1, titelMitSynchro +1, releases +3, termine +3
+27.11., 17:09  Bestand — zusammenführ   titel +1, verweise +1, mitUrteil +1, titelMitSynchro +1, releases +4, termine +4
 
-Stand jetzt: 2924 Titel, 2329 Urteile, 151 offen
-Über den Zeitraum: Titel +1, Urteile +16, offen 0
+Stand jetzt: 2927 Titel, 2335 Urteile, 152 offen
+Über den Zeitraum: Titel +3, Urteile +19, offen -1
+
+⚠  2 Lauf/Läufe mit Auffälligkeiten — siehe oben.
 ```
 
 ## Briefkasten
 
 ```
-Briefkasten: 4129 Meldungen auf 234 Adressen (primevideo 563, adn 133, disneyplus 2217, netflix 1216)
-Liste daniel-zum-abarbeiten/listen/11-meldungen-ohne-zuordnung.md: 436 Adressen
+Briefkasten: 4128 Meldungen auf 233 Adressen (primevideo 562, adn 133, disneyplus 2217, netflix 1216)
+Liste daniel-zum-abarbeiten/listen/11-meldungen-ohne-zuordnung.md: 434 Adressen
 Zurückgestellt (data/meldungen-zurueckgestellt.json): 0 Adressen im Briefkasten
 Alle Adressen sind gelistet.
-Übernahme: zuletzt 2026-11-26T19:17:45.733Z (data/meldungen-uebernahme.json)
-✓ refresh-hourly.yml: letzter Erfolg vor 0 h (Frist 3 h)
-✓ refresh-data.yml: letzter Erfolg vor 17 h (Frist 36 h)
-✓ refresh-weekly.yml: letzter Erfolg vor 88 h (Frist 336 h)
-✓ daten-auf-abruf.yml: letzter Erfolg vor 11 h (Frist 36 h)
-✓ anisearch-katalog.yml: letzter Erfolg vor 15 h (Frist 36 h)
-✓ tonspuren-monatlich.yml: letzter Erfolg vor 473 h (Frist 1008 h)
+Übernahme: zuletzt 2026-11-27T05:08:44.916Z (data/meldungen-uebernahme.json)
+✓ refresh-hourly.yml: letzter Erfolg vor 1 h (Frist 3 h)
+✓ refresh-data.yml: letzter Erfolg vor 14 h (Frist 36 h)
+✓ refresh-weekly.yml: letzter Erfolg vor 109 h (Frist 336 h)
+✓ daten-auf-abruf.yml: letzter Erfolg vor 7 h (Frist 36 h)
+✓ anisearch-katalog.yml: letzter Erfolg vor 12 h (Frist 36 h)
+✓ tonspuren-monatlich.yml: letzter Erfolg vor 494 h (Frist 1008 h)
 ✓ bestand-bauen.yml: letzter Erfolg vor 0 h (Frist 18 h)
-✓ d1-verbrauch.yml: letzter Erfolg vor 27 h (Frist 48 h)
-✓ claude-anime2you-extraktion.yml: letzter Erfolg vor 0 h (Frist 3 h)
-✓ claude-wache-urteil.yml: letzter Erfolg vor 12 h (Frist 36 h)
-✓ claude-verpasst-recherche.yml: letzter Erfolg vor 10 h (Frist 36 h)
+✓ d1-verbrauch.yml: letzter Erfolg vor 47 h (Frist 48 h)
+✓ claude-anime2you-extraktion.yml: letzter Erfolg vor 1 h (Frist 3 h)
+✓ claude-wache-urteil.yml: letzter Erfolg vor 9 h (Frist 36 h)
+✓ claude-verpasst-recherche.yml: letzter Erfolg vor 7 h (Frist 36 h)
 ✓ claude-daten-merge.yml: letzter Erfolg vor 0 h (Frist 48 h)
-✗ claude-reparatur.yml: Claude-Schritt „Run anthropics/claude-code-action@v1“ endete nach wenigen Sekunden (Lauf 45870267412, 2026-11-26T17:44Z) — Kontingent leer oder CLAUDE_CODE_OAUTH_TOKEN ungültig
-✓ GITHUB_WECKER_TOKEN: letzter Start durch den Wecker vor 0 h
+✓ GITHUB_WECKER_TOKEN: letzter Start durch den Wecker vor 1 h
 ℹ Ablaufdatum unbekannt (gueltigBis leer): CLAUDE_CODE_OAUTH_TOKEN, LAUF_TOKEN, CR_ZUGANG, ANISEARCH_TOKEN, TMDB_API_KEY, YOUTUBE_API_KEY, STREAMING_API_KEY, SERPER_API_KEY, DATEN_APP_KEY, DISCORD_WEBHOOK, CLOUDFLARE_API_TOKEN, CLOUDFLARE_ANALYTICS_TOKEN, NACHT_MERGER_TOKEN, GITHUB_WECKER_TOKEN, MAIL_API_KEY, WEICHE_TOKEN — Daniel liest es einmal im Konto ab und trägt es ins Register ein.
-::warning title=Claude-Kontingent leer::Claude-Läufe enden nach Sekunden — Abo-Kontingent oder CLAUDE_CODE_OAUTH_TOKEN prüfen (docs/wissen/betrieb.md)
 
-1 Befund(e) bei den Zugängen.
+Zugänge unauffällig.
 ```
 
 ## Von den Ableitungen verworfen
@@ -79,6 +92,7 @@ Die letzten 60 Läufe. Älteres hat seinen Zweck erfüllt.
 
 | Zeitpunkt | Titel / Urteile / offen | Veränderung | Befund |
 |---|---|---|---|
+| 27.11.2026 18:31 | 2927 / 2335 / 152 | Titel +3, Urteile +19, offen -1 | 150 Termine weniger; 1 Titel weniger; 1 Urteile verloren; 1 Titel ohne Synchro-Beleg; primevideo: 1 Synchro-Belege weniger; primevideo: fehlt Shaman King (154): https://www.amazon.de/gp/video/detail/B0DYF8BKVP (link-check: {"status":200,"geprueftAm":"2026-09-21","prime":true} (jüngere Handprüfung widerspricht)) |
 | 26.11.2026 22:21 | 2924 / 2329 / 151 | Titel +1, Urteile +16, offen 0 | Auffälligkeit |
 | 26.11.2026 18:44 | 2924 / 2316 / 153 | Titel +1, Urteile +3, offen +2 | Auffälligkeit |
 | 25.11.2026 18:58 | 2926 / 2314 / 151 | Titel -3, Urteile -2, offen +4 | 3 Titel weniger |

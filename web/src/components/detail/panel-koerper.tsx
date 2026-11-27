@@ -1,7 +1,8 @@
 import type { FranchiseMember, Release, Title } from '@shared/types.ts'
-import { useLang } from '../../lib/i18n.tsx'
+import { useLang, type Translate } from '../../lib/i18n.tsx'
 import type { NewsletterVerbindung } from '../../lib/newsletterSync.ts'
 import { Quellenuebersicht } from '../Quellenuebersicht.tsx'
+import { legendeDerZeilen } from './legende-zeilen.ts'
 import { KinoBanner } from './kino.tsx'
 import { VoiceCast, AehnlicheTitel } from './weitere.tsx'
 import { EckdatenAbschnitt, HandlungAbschnitt, TermineAbschnitt } from './abschnitte.tsx'
@@ -36,6 +37,11 @@ interface PanelKoerperProps extends Pick<DetailPanelProps, 'data' | 'favorites' 
   wechsel: ReturnType<typeof useReihenWechsel>
 }
 
+/** Die Zeichen der Anbieterzeilen („≈“, „laut JustWatch“) stehen unter „Woher diese Angaben stammen“, nicht im Antwortkasten. */
+function legendeVon(p: PanelKoerperProps, t: Translate): string | undefined {
+  return legendeDerZeilen({ sortiert: p.a.sortiertNachZugang, title: p.title, releases: p.releases, folgenAngabeFuer: p.a.folgenAngabeFuer, t })
+}
+
 /** Alles unter der Bühne des Detail-Panels: Antwortkasten, Handlung, Reihe, Termine, Eckdaten, Quellen. */
 export function PanelKoerper(p: PanelKoerperProps) {
   const { t, tGenre, tKeyword } = useLang()
@@ -48,6 +54,7 @@ export function PanelKoerper(p: PanelKoerperProps) {
       <AntwortBereichOderNichts
         antwort={a.antwort}
         sortiertNachZugang={a.sortiertNachZugang}
+        ohneSprachbeleg={a.ohneSprachbeleg}
         streamReleases={a.streamReleases}
         terminReleases={a.terminReleases}
         title={title}
@@ -109,7 +116,7 @@ export function PanelKoerper(p: PanelKoerperProps) {
         allKeywords={s.allKeywords}
       />
       <AehnlicheTitel title={title} data={p.data} onOpenTitle={p.onOpenTitle} />
-      <Quellenuebersicht title={title} releases={releases} asZiel={p.asZiel} />
+      <Quellenuebersicht title={title} releases={releases} asZiel={p.asZiel} legende={legendeVon(p, t)} />
     </div>
   )
 }

@@ -21,9 +21,10 @@ if [ "${1:-}" = "--einrichten" ]; then
   # 02.10.2026 drei Stunden lang jeden Deploy rot, weil der Commit ohne check:vor-commit lief.
   # Dazu die Patch-Notes-Prüfung (nur bei gestagten data/patchnotes/*.yaml): ein Doppelpunkt im Untertitel fiel am 12.10.2026 erst
   # in check:vor-commit auf. Dazu die Leerzeichen-Prüfung über gestagte Quelldateien (PR 2690: `=await` fiel erst in der CI auf).
+  # Dazu die Listen-Prüfung (gestagte tools/check-*-liste.txt sortiert, ohne Doppelzeile): Nachbesserungen am PR umgingen die Sortierung (Fall 4857).
   # Die Hook-Datei liegt für alle Worktrees im gemeinsamen Git-Verzeichnis; Zweige ohne das Werkzeug überspringen es.
   hook=$(git rev-parse --git-path hooks/pre-commit)
-  printf '#!/usr/bin/env bash\nbash tools/quellen-commit-wache.sh && node tools/umfang-pruefen.mjs && { [ ! -f tools/patchnotes-gestagt-pruefen.mjs ] || node tools/patchnotes-gestagt-pruefen.mjs; } && { [ ! -f tools/leerzeichen-gestagt-pruefen.mjs ] || node tools/leerzeichen-gestagt-pruefen.mjs; }\n' > "$hook"
+  printf '#!/usr/bin/env bash\nbash tools/quellen-commit-wache.sh && node tools/umfang-pruefen.mjs && { [ ! -f tools/patchnotes-gestagt-pruefen.mjs ] || node tools/patchnotes-gestagt-pruefen.mjs; } && { [ ! -f tools/leerzeichen-gestagt-pruefen.mjs ] || node tools/leerzeichen-gestagt-pruefen.mjs; } && { [ ! -f tools/listen-gestagt-pruefen.mjs ] || node tools/listen-gestagt-pruefen.mjs; }\n' > "$hook"
   chmod +x "$hook"
   echo "pre-commit-Wache eingerichtet"
   exit 0

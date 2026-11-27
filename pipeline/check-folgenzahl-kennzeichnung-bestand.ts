@@ -6,6 +6,7 @@
 import { readFileSync } from 'node:fs'
 import type { Release, StreamLink, Title } from '../shared/types.ts'
 import { folgenAuskunft } from '../web/src/components/detail/folgen-angabe.ts'
+import { reichtBis } from '../web/src/components/detail/antwort-regeln.ts'
 import { zaehlPlattform } from '../web/src/components/detail/prime-kanal.ts'
 import { titelMitTerminBereichen } from '../web/src/components/detail/stream-bereiche.ts'
 import { leereListe } from './lib/leere-liste.ts'
@@ -44,7 +45,10 @@ function pruefeBestand(datei: string, releasesJeTitel: Map<number, Release[]>): 
       }
       if (!text.startsWith(ZAHL)) continue
       const plattform = zaehlPlattform(s, t0.streams ?? [])
-      const belegt = s.dubRanges?.some((r) => r.dub) || releases.some((r) => r.platform === plattform && r.releaseType === 'weekly')
+      const n = (JSON.parse(text.slice(ZAHL.length)) as { n: number }).n
+      /* Belegt: Wochenplan, deutsche Bereiche oder ein Release des Anbieters mit belegter Zahl bis n (Call of the Night, 26.11.2026). */
+      const belegt =
+        s.dubRanges?.some((r) => r.dub) || releases.some((r) => r.platform === plattform && (r.releaseType === 'weekly' || reichtBis(r, n)))
       if (belegt) continue
       unmarkiert++
       if (unmarkiert <= 5) console.error(`  ${datei} ${roh.id} ${s.platform}: ${text}`)

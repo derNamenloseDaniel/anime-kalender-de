@@ -34,6 +34,6 @@
   {"name":"messen Umgebung nicht gelesen","aenderungen":[{"datei":"tools/buehne-messen.mjs","suche":"umgebungsOptionen(env)","ersetze":"umgebungsOptionen({})"}],"tests":["node tools/buehne-lauf.test.mjs"]},
   {"name":"workflow Scheibe nicht an den Messschritt gereicht","aenderungen":[{"datei":".github/workflows/pr-pruefung.yml","suche":"BUEHNE_SCHEIBE: ${{ matrix.scheibe }}","ersetze":"BUEHNE_SCHEIBE: ''"}],"tests":["node tools/buehne-umfang.test.mjs"]},
   {"name":"workflow Umfang nicht an den Messschritt gereicht","aenderungen":[{"datei":".github/workflows/pr-pruefung.yml","suche":"BUEHNE_MOCKUPS: ${{ steps.umfang.outputs.mockups }}","ersetze":"BUEHNE_MOCKUPS: ''"}],"tests":["node tools/buehne-umfang.test.mjs"]},
-  {"name":"workflow Umfang-Schritt entfällt","aenderungen":[{"datei":".github/workflows/pr-pruefung.yml","suche":"if: steps.pfad.outputs.betroffen == '1' && matrix.scheibe","ersetze":"if: ${{ false }}"}],"tests":["node tools/buehne-umfang.test.mjs"]},
+  {"name":"workflow Umfang-Schritt entfällt","aenderungen":[{"datei":".github/workflows/pr-pruefung.yml","suche":"if: matrix.scheibe","ersetze":"if: ${{ false }}"}],"tests":["node tools/buehne-umfang.test.mjs"]},
   {"name":"workflow fünfte Scheibe fehlt","aenderungen":[{"datei":".github/workflows/pr-pruefung.yml","suche":"scheibe: 5/5","ersetze":"scheibe: 4/5"}],"tests":["node tools/buehne-umfang.test.mjs"]}
 ]

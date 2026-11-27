@@ -46,12 +46,13 @@ export function istSichererTermin(r: Release): boolean {
 }
 
 /**
- * Schlüssel `Titel|Anbieter`, deren Handbeleg-Nein „nicht verfügbar“ (Suche ohne Treffer) älter ist als ein sicherer Prime-Kanal-Termin (17.11.2026: Kamisama Kiss
- * 14713, Nein 27.08. gegen Aniverse-Termin 08.10.; Call of the Night 175914). Das Nein hat die Amazon-Suche gemessen, der Kanal-Termin kam danach; das Angebot kann
- * erst später erschienen sein (`baueNeinGilt`). Bei Kanal-Terminen immer; bei jedem anderen sicheren Streaming-Termin (Netflix, Crunchyroll …) nur, wenn kein „nicht verfügbar“
- * des Titels eine echte Adresse trägt: Ein Nein mit Adresse ist eine Messung dieser Seite und bleibt (`neinMitAdresse`). Der Weg bleibt dann ohne Adresse und ohne Ton (Kuroko 102836).
+ * Schlüssel `Titel|Anbieter`, deren Handbeleg-Nein „nicht verfügbar“ (Suche ohne Treffer) älter ist als ein sicherer Termin (Kamisama Kiss 14713: Nein 27.08.
+ * gegen Aniverse-Termin 08.10.; Kuroko 102836: Nein 30.08. gegen Nachtrag-Termin 13.09.). Das Nein hat vor dem Termin gemessen, die Quelle des Termins
+ * widerlegt es (`baueNeinGilt`). Auch ohne `kanal` (26.11.2026): Ein Weg ohne Adresse oder Ton meldet `weg-ohne-adresse` bzw. `sprachurteil-offen`,
+ * sonst stünde der belegte Anbieter als `kein-weg` offen. Ohne `kanal` bleibt ein Nein, das an einer echten Titeladresse gemessen wurde (`neinMitAdresse`).
  * Nur begonnene Termine (`ab <= heute`, wie die Mängelart `erschienen-ohne-weg`): Ein Weg ohne Tonurteil für einen erst kommenden Termin brächte nur `sprachurteil-offen`
  * hinzu (Call of the Night 175914, Termin 20.11.2026).
+ * Ein jüngerer Ja-Beleg hat das Nein schon selbst abgelöst (`jaNachNein`); der Schlüssel bleibt dann draußen, sonst übersähe `check-handbelege` den Ja-Beleg.
  */
 export function ueberholteNeins(belege: Parameters<typeof baueNeinGilt>[0], releases: Release[], heute: string): Set<string> {
   const gilt = baueNeinGilt(belege)
@@ -65,7 +66,7 @@ export function ueberholteNeins(belege: Parameters<typeof baueNeinGilt>[0], rele
   }
   const ueberholt = [...fruehester].filter(([k, ab]) => {
     const [id, plattform] = k.split('|')
-    return belege.some((b) => b.available === false && dubKey(b.anilistId, b.platform) === k) && !gilt(Number(id), plattform!, ab)
+    return belege.some((b) => b.available === false && dubKey(b.anilistId, b.platform) === k) && !gilt(Number(id), plattform!, ab) && !jaNachNein(belege, k)
   })
   return new Set(ueberholt.map(([k]) => k))
 }
@@ -76,8 +77,15 @@ function neinMitAdresse(belege: Parameters<typeof baueNeinGilt>[0]): Set<string>
   return new Set(echt.map((b) => dubKey(b.anilistId, b.platform)))
 }
 
+/** Steht zum Schlüssel ein „deutsch“-Beleg, der jünger ist als jedes „nicht verfügbar“? */
+function jaNachNein(belege: Parameters<typeof baueNeinGilt>[0], k: string): boolean {
+  const eigene = belege.filter((b) => dubKey(b.anilistId, b.platform) === k)
+  const neinAm = eigene.filter((b) => b.available === false).reduce((m, b) => ((b.checkedAt ?? '') > m ? (b.checkedAt ?? '') : m), '')
+  return eigene.some((b) => tonAusBeleg(b).dub !== undefined && (b.checkedAt ?? '') > neinAm) // Ja-Beleg wie in tonAusBeleg gelesen, keine eigene dub-Lesestelle
+}
+
 /** Ein Handbeleg „deutsch" bringt Urteil und Folgenbereiche mit; ohne ihn bleibt der Ton offen, und die Herkunft ist der Termin. */
-function tonAusBeleg(beleg: DubCheck | undefined): Pick<StreamLink, 'dub' | 'dubRanges' | 'herkunft'> {
+function tonAusBeleg(beleg: Pick<DubCheck, 'dub' | 'dubRanges'> | undefined): Pick<StreamLink, 'dub' | 'dubRanges' | 'herkunft'> {
   if (beleg?.dub !== true) return { herkunft: 'termin' }
   const bereiche = beleg.dubRanges?.map((b) => ({ from: b.from, to: b.to, dub: b.dub }))
   return { dub: true, ...(bereiche?.length ? { dubRanges: bereiche } : {}) }
@@ -104,7 +112,7 @@ export function ergaenzeWegeAusTerminen({ titles, releases, istTot, verweiseEntf
   istTot: IstTot
   verweiseEntfernt: EntfernterVerweis[]
   belegFuer: BelegFuer
-  /** `ueberholteNeins`: ihr Handbeleg-Nein verneint den sicheren Termin nicht. */
+  /** `ueberholteNeins`: ihr Handbeleg-Nein verneint den Termin nicht. */
   nein?: ReadonlySet<string>
 }): number {
   const entfernt = new Set(verweiseEntfernt.map((v) => `${v.titleId}|${v.plattform}`))
@@ -118,8 +126,9 @@ export function ergaenzeWegeAusTerminen({ titles, releases, istTot, verweiseEntf
     if (titel.streams?.some((s) => s.platform === r.platform)) continue
     const belegt = r.platformUrl && !istKeineTitelseite(r.platformUrl) && !istTot(r.platformUrl)
     const url = belegt ? r.platformUrl! : ''
-    const schonDa = neu.get(schluessel)
-    if (schonDa && (schonDa.weg.url || !url)) continue
+    // Ein zweiter Termin ersetzt den ersten nur, wenn er mehr weiß: eine Adresse, wo jener keine hat, oder sonst einen Kanal.
+    const bisher = neu.get(schluessel)
+    if (bisher && (bisher.weg.url || (!url && (bisher.weg.kanal || !r.kanal)))) continue
     const beleg = belegFuer(r.titleId, r.platform, url || undefined)
     if ((beleg?.available === false || beleg?.dub === false) && !nein.has(dubKey(r.titleId, r.platform))) {
       handNein.add(schluessel)

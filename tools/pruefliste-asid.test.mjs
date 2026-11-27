@@ -164,6 +164,17 @@ try {
     assert.deepEqual(pruefeAsId(wurzel), [`${datei} fehlt`])
     writeFileSync(join(wurzel, datei), inhalt)
   }
+
+  /* Fortsetzung (185756, 27.11.2026): eine abgelegte Suche fällt dem Staffelfilter zum Opfer, die Suche ihrer Prime-Pille (`termin`) nicht. */
+  const staffeln = [titel(91, 5091, { titleDe: 'Staffeltest', franchiseId: 900, jpYear: 2020 }), titel(92, 5092, { titleDe: 'Staffeltest 2nd Season', franchiseId: 900, jpYear: 2022 })]
+  schreibe(wurzel, 'public/data/titles.json', [...TITEL, ...staffeln])
+  const s2 = { id: 92, titel: 'Staffeltest 2nd Season', plattform: 'primevideo', url: 'https://www.amazon.de/s?k=Staffeltest&i=instant-video' }
+  schreibe(wurzel, 'data/suchadressen-offen.json', [s2])
+  erzeuge(wurzel)
+  assert.equal(Object.values(primeListe(wurzel)).filter((e) => e.id === 92).length, 0, 'abgelegte Suche einer Fortsetzung: über die erste Staffel')
+  schreibe(wurzel, 'data/suchadressen-offen.json', [{ ...s2, termin: true }])
+  erzeuge(wurzel)
+  assert.equal(Object.values(primeListe(wurzel)).filter((e) => e.id === 92).length, 1, 'Pillen-Suche einer Fortsetzung bleibt Auftrag')
 } finally {
   rmSync(wurzel, { recursive: true, force: true })
 }

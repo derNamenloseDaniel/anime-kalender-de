@@ -10,7 +10,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { chromium } from 'playwright'
 import { DubStatus, Pille, type DubStatusArt } from '../web/src/components/detail/pille.tsx'
 
-const ARTEN: DubStatusArt[] = ['belegt', 'justwatch', 'schwester', 'annahme', 'anbieter', 'omu', 'offen']
+const ARTEN: DubStatusArt[] = ['belegt', 'justwatch', 'schwester', 'annahme', 'anbieter', 'offen']
 const NAMEN = ['Joyn', 'ADN', 'RTL+', 'Arte']
 const BREITEN = [375, 480]
 

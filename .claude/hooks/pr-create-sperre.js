@@ -1,7 +1,7 @@
 // PreToolUse(Bash): `gh pr create` wird abgewiesen; ein PR geht nur über `bash tools/pr-einreichen.sh "<Titel>"`, das die Vorprüfung fährt.
 // Anlass: Lehre 232 (23.11.2026): PR 4738 kam mit rohem `gh pr create`, die Kette war rot an der Patch-Notes-Pflicht; dasselbe schon 25.10.2026 (PR 2056).
 // Der Hook sieht nur den äußeren Befehl: `bash tools/pr-einreichen.sh …` enthält den Text `gh pr create` nicht und bleibt frei,
-// auch wenn das Skript ihn intern aufruft. Andere `gh pr`-Befehle (view, merge, comment, checks, edit) bleiben frei.
+// auch wenn das Skript einen PR anlegt (per `gh api`, REST). Andere `gh pr`-Befehle (view, merge, comment, checks, edit) bleiben frei.
 // Zerlegung wie in merge-riegel.js (Heredocs weg, Ketten, `bash -c`/`eval` rekursiv); `echo`/`printf`-Text zählt nicht.
 // Nur für dieses Repo (Anlass: chrome-utilities hat kein `tools/pr-einreichen.sh`, 23.11.2026). Ziel-Repo in dieser Reihenfolge:
 // `--repo`/`-R`/`--repo=`/`-Rowner/name` an beliebiger Stelle der gh-Zeile (auch nach `create`), `GH_REPO=` (auch `env`/`export`), sonst das Verzeichnis

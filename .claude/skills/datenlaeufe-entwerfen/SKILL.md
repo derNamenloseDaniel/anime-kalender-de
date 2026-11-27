@@ -37,7 +37,7 @@ Dazu steht das Einreichen mit `if: always()` am Ende **jedes** Jobs: Ein hängen
 
 1. Ein laufender Sammler hindert den Push nicht mehr: sein Zweig-Push läuft mit dem App-Token samt Recht `workflows` (Beleg 12.11.2026, betrieb.md „Workflow-Sperre“). Ausnahme bleibt `claude-daten-merge.yml` (Konfliktauflösung, Push mit dem Claude-Token): dort vorher `node tools/sammler-laeuft.mjs` (Exit 0 = kein Sammler läuft).
 2. `npm run check:workflows` **und** `npm run typecheck` (Wurzel). Ein Test, der den Worker importiert, bricht den Wurzel-Typecheck (Deploy zweimal rot).
-3. Nach dem Push einen Testlauf der kleinsten Variante (`workflow_dispatch`) und das Protokoll lesen, nicht nur die Farbe.
+3. Nach dem Push einen Testlauf der kleinsten Variante (`workflow_dispatch`) und das Protokoll lesen, nicht nur die Farbe. Eine neue Action mit App-Token läuft **vor dem Merge** einmal (Testlauf oder `workflow_dispatch` vom Zweig) bis hinter den Token-Schritt; `permission-*` nur aus `APP_RECHTE` (`tools/app-token-sperre.mjs`), sonst 422 (cloud-abgabe.yml, 27.11.2026: 13 Abgaben blieben liegen).
 
 ## Messen vor dem Umbauen
 

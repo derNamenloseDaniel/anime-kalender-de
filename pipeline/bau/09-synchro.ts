@@ -6,6 +6,7 @@ import { type KatalogEintrag } from '../lib/anilist.ts'
 import { hebeFolgenzahlAnnahmeAuf } from '../lib/folgenzahl-belegt.ts'
 import { hebeFolgenzahlAufBeobachtung } from '../lib/folge-ueber-anzahl.ts'
 import { readJson } from '../lib/util.ts'
+import { todayIso } from '../../shared/time.ts'
 import { type EntfernterVerweis } from './grundlagen.ts'
 import { type AnisearchEintrag, type TmdbTitelEintrag } from './01-quellen.ts'
 import { sammleBelege } from './09-1-belege.ts'
@@ -18,6 +19,8 @@ import { schliesseSynchroAb } from './09-7-abschluss.ts'
 import { haltePunkt } from './phasen-zustand.ts'
 import { kennzeichneAdnNeuzugaengeOhneSprache } from './adn-sprache-offen.ts'
 import { kennzeichneNeinTermineAlsOffen } from './nein-sprache-offen.ts'
+import { widerlegeNeinNachStart } from './nein-nach-start-widerlegt.ts'
+import { adressenMitSynchroZusage, klaereDeutschBelegteTermine } from './deutsch-belegt-klaeren.ts'
 import { ladeHandbelege } from '../lib/dub-confirmed.ts'
 import { baueNeinGilt } from '../lib/maengel-nein.ts'
 
@@ -41,6 +44,7 @@ export function pruefeSynchroJePlattform({
   adnVerweiseErgaenzt,
   vorherTitles,
   schreibWurzel,
+  handbelege,
 }: {
   releases: Release[]
   titles: Map<number, Title>
@@ -57,6 +61,8 @@ export function pruefeSynchroJePlattform({
   /** Nur für Tests: voriger Bestand und Wurzel der Prüflisten statt `public/data` und `data/`. */
   vorherTitles?: Title[]
   schreibWurzel?: string
+  /** Nur für Tests: Handbelege als Fixture statt `data/dub-confirmed.yaml`. */
+  handbelege?: ReturnType<typeof ladeHandbelege>
 }) {
   const crDub = readJson<CrDubData>('data/crunchyroll-dub.json', { scrapedAt: '', serien: [] })
   const belege = sammleBelege({ releases, titles, crBySeriesId, tmdbMehrdeutig, tmdbTitles, tvJeTmdb, toteAdressen, crDub })
@@ -95,11 +101,18 @@ export function pruefeSynchroJePlattform({
   haltePunkt('09-6-anisearch-wege', titles)
   schliesseSynchroAb({ titles, verweiseEntfernt, releases, crDub, belegFuer: belege.belegFuer, schreibWurzel })
   kennzeichneAdnNeuzugaengeOhneSprache(releases, titles, belege.belegFuer)
-  kennzeichneNeinTermineAlsOffen(releases, titles, baueNeinGilt(ladeHandbelege()))
+  ordneSpracheDerTermine(releases, titles, handbelege ?? ladeHandbelege())
   /* Erst hier sind alle Crunchyroll-Termine da; vor Phase 10 übernehmen die Ereignisse das Flag. */
   hebeFolgenzahlAufBeobachtung(releases)
   hebeFolgenzahlAnnahmeAuf(releases)
   return synchroErgebnis(belege, pruefung, motnBelege, motnTon)
+}
+
+/** Widerlegen vor dem Klären: das Klären räumt „offen“ ab, das Widerlegen braucht es. */
+function ordneSpracheDerTermine(releases: Release[], titles: Map<number, Title>, belegeHand: ReturnType<typeof ladeHandbelege>) {
+  kennzeichneNeinTermineAlsOffen(releases, titles, baueNeinGilt(belegeHand))
+  widerlegeNeinNachStart(releases, belegeHand, todayIso())
+  klaereDeutschBelegteTermine(releases, titles, adressenMitSynchroZusage(), belegeHand, todayIso())
 }
 
 /** Was die Phasen nach der Synchro-Prüfung brauchen (`build.ts` reicht es als `synchro` weiter). */

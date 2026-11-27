@@ -16,9 +16,23 @@ type Kaufweg = Wege[number]['streamWege'][number]
 export function streamStatus(title: Title, s: StreamLink, releases: Release[]): DubStatusArt {
   const art = statusArt(s.dub, s.dubQuelle === 'justwatch' ? s.dubStand : undefined)
   if (art === 'justwatch' && !s.dubHintOnly) return 'jwDeutsch'
-  /* Abgeleitet (Joyn pauschal, Prime-Kanal erbt), nicht am Weg gemessen: zählt als Deutsch, sieht aber nicht wie ein Beleg aus. */
-  if (art === 'belegt' && istLautAnbieter(s)) return 'anbieter'
+  /* Abgeleitet (Joyn pauschal, Prime-Kanal ohne belegten Anbieter-Weg), nicht am Weg gemessen: zählt als Deutsch, sieht aber nicht wie ein Beleg aus. */
+  if (art === 'belegt' && istLautAnbieter(s, title.streams ?? [])) return 'anbieter'
   return art === 'offen' && (streamNurOmu(title, s, releases) || adresseIstOmu(s.url)) ? 'omu' : art
+}
+
+/**
+ * **Anbieter ohne deutsche Synchro stehen nicht in der Anzeige** (Daniel, 26.11.2026, Akibapass „nur Untertitel“ unter „Kauf / Leihe“):
+ * Pillen und Bezugswege, die nur Untertitel tragen, fallen hier heraus; `releases` sind die Termine samt der Untertitel-Termine.
+ */
+export function wegeOhneNurUntertitel(sortiert: Wege, title: Title, releases: Release[]): Wege {
+  return sortiert
+    .map((x) => ({
+      ...x,
+      plattformen: x.plattformen.filter((s) => streamStatus(title, s, releases) !== 'omu'),
+      streamWege: x.streamWege.filter((g) => streamWegStatus(g, title) !== 'omu'),
+    }))
+    .filter((x) => x.plattformen.length || x.streamWege.length || x.shops.length)
 }
 
 /** Weder belegt noch von JustWatch gemeldet: die Zeile steht unter „Weitere Anbieter“ und trägt keinen Sprachbeleg. */
@@ -66,21 +80,14 @@ export function alleOhneSprachbeleg(sortiert: Wege, title: Title, releases: Rele
   return arten.length > 0 && arten.every(ohneBeleg)
 }
 
-/** Alle Stream-Zeilen tragen nur Untertitel (OmU): Der Kopf sagt „nur Untertitel“ statt „Sprache offen“. */
-export function alleNurUntertitel(sortiert: Wege, title: Title, releases: Release[]): boolean {
-  const arten = zeilenArten(sortiert, title, releases)
-  return arten.length > 0 && arten.every((a) => a === 'omu')
-}
-
 /** Deutsch steht nur laut Anbieter da (Joyn, Prime-Kanal): keine Zeile ist belegt, mindestens eine „laut Anbieter“. */
 export function nurAnbieterDeutsch(sortiert: Wege, title: Title, releases: Release[]): boolean {
   const arten = zeilenArten(sortiert, title, releases)
   return arten.includes('anbieter') && !arten.some((a) => a === 'belegt' || a === 'jwDeutsch')
 }
 
-/** Was der Kopf über die Sprache sagt, wenn keine Zeile sie belegt: nur Untertitel, nur laut Anbieter, offen — oder nichts davon. */
-export function ohneSprachbelegFuer(sortiert: Wege, title: Title, releases: Release[]): boolean | 'omu' | 'anbieter' {
-  if (alleNurUntertitel(sortiert, title, releases)) return 'omu'
+/** Was der Kopf über die Sprache sagt, wenn keine Zeile sie belegt: nur laut Anbieter, offen — oder nichts davon. */
+export function ohneSprachbelegFuer(sortiert: Wege, title: Title, releases: Release[]): boolean | 'anbieter' {
   if (nurAnbieterDeutsch(sortiert, title, releases)) return 'anbieter'
   return alleOhneSprachbeleg(sortiert, title, releases)
 }

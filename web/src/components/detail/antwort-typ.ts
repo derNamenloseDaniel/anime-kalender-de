@@ -46,7 +46,7 @@ export type Antwort =
       gesamt?: number
       /** Die Zahl ist die Folgenzahl des Werks, nicht am Weg belegt — „≈“ im Kasten. */
       gesamtAbgeleitet?: boolean
-      /** Katalogstart ohne Uhrzeit am Starttag: da, aber Zeitpunkt offen — Kasten sagt "heute, genaue Uhrzeit unbekannt". */
+      /** Katalogstart ohne Uhrzeit am Starttag: Kasten sagt "Alle N Folgen da", ohne Uhrzeit-Zusatz. */
       heuteOffen?: boolean
     }
   /** Belegt ist nur ein Teil — die Zahl sagt welcher. */
@@ -88,7 +88,7 @@ export type Antwort =
    * die japanische Fassung, kommt keine deutsche Folge — „Erste Folge erscheint
    * heute" wäre falsch. Der Kasten nennt den widerlegten Tag und den Grund.
    */
-  | { art: 'widerlegt'; datum: string; grund: string; quelle?: string; terminOffen: boolean }
+  | { art: 'widerlegt'; datum: string; grund: string; quelle?: string; anbieter?: string; terminOffen: boolean }
   /**
    * **Eine Disc ist kein Sendeplan.**
    *

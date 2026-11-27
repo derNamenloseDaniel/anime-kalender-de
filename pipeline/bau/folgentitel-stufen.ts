@@ -10,7 +10,7 @@ import { tmdbStaffelFolgentitel } from './folgentitel-tmdb-staffel.ts'
 import { tmdbTitelNachDatum } from './folgentitel-tmdb-datum.ts'
 import { mitKitsuTiteln, type KitsuEintrag } from './folgentitel-kitsu.ts'
 import { rtlplusFolgentitel, type RtlplusEintrag } from './folgentitel-rtlplus.ts'
-import { ladeHandTitel } from './folgentitel-hand.ts'
+import { ladeHandTitel, mitHandTiteln } from './folgentitel-hand.ts'
 import { ohnePlatzhalterTitel } from './folgentitel-zeilen.ts'
 
 interface Folge {
@@ -83,5 +83,5 @@ export function mitFremdTiteln(t: Title, ausAsRoh: Folge[] | undefined, q: Titel
   const containerStaffel = vorhandeneTitel(mitRtl).size ? undefined : tmdbStaffelFolgentitel(t, q.tmdbFolgen[String(t.franchiseId)], nummern)
   const mitTmdbStaffel = verlaengereBisFolgenzahl(t, mitCrTiteln(mitRtl, tmdbEigen ?? containerStaffel), tmdbEigen, deutscheTitel(mitRtl))
   const mitTmdb = mitCrTiteln(mitTmdbStaffel, tmdbTitelNachDatum(mitTmdbStaffel, q.tmdbFolgen[String(t.id)]))
-  return mitKitsuTiteln(t, mitCrTiteln(mitTmdb, q.hand[String(t.id)]), kitsu)
+  return mitKitsuTiteln(t, mitHandTiteln(mitTmdb, q.hand[String(t.id)], t.episodes ?? undefined), kitsu)
 }

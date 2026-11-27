@@ -645,3 +645,13 @@
   sources:
     - https://www.fernsehserien.de/cyborg-009-call-of-justice
     - https://www.anime2you.de/news/866645/netflix-entfernt-cyborg-009-call-of-justice/
+
+# Exception: Netflix-Eigenproduktion, weltweit am 13.10.2022 mit allen 8 Folgen, deutsche Fassung ab diesem Tag (Daniel, 27.11.2026; aniSearch 16390).
+# Von Hand, weil der eigene Termin (`exception-netflix-2022`) aniSearchs Datum sonst verdrängt und „Auf Deutsch seit" entfiele.
+- anilistId: 135660
+  title: 'Exception'
+  von: '2022-10-13'
+  publisher: 'Netflix, Inc.'
+  sources:
+    - https://www.anisearch.de/anime/16390
+    - https://www.moviepilot.de/serie/exception/episodenguide

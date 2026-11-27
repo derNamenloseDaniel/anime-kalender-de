@@ -3,7 +3,6 @@
   { "name": "shared/ankuendigung.ts ankuendigungOhneTermin: Art-Weiche immer wahr", "datei": "shared/ankuendigung.ts", "suche": "antwortArt === 'ohne' && titelSynchroAngekuendigt(t)", "ersetze": "true && titelSynchroAngekuendigt(t)" },
   { "name": "shared/ankuendigung.ts ankuendigungOhneTermin: Art-Weiche umgedreht", "datei": "shared/ankuendigung.ts", "suche": "antwortArt === 'ohne' && titelSynchroAngekuendigt(t)", "ersetze": "antwortArt !== 'ohne' && titelSynchroAngekuendigt(t)" },
   { "name": "shared/ankuendigung.ts ankuendigungOhneTermin: Synchro-Weiche immer wahr", "datei": "shared/ankuendigung.ts", "suche": "antwortArt === 'ohne' && titelSynchroAngekuendigt(t)", "ersetze": "antwortArt === 'ohne' && true" },
-  { "name": "shared/ankuendigung.ts omuZeile: ab/seit vertauscht", "datei": "shared/ankuendigung.ts", "suche": "T(begonnen ? 'antwort.omuSeit' : 'antwort.omuAb'", "ersetze": "T(begonnen ? 'antwort.omuAb' : 'antwort.omuSeit'" },
   { "name": "antwort-bereich.tsx: Pille des Anbieters bleibt", "datei": "web/src/components/detail/antwort-bereich.tsx", "suche": "sortiertNachZugang: ohneAnkuendigungsWeg(sortiertNachZugang, ankuendigung)", "ersetze": "sortiertNachZugang" },
   { "name": "antwort-bereich.tsx: Karte nie übergeben", "datei": "web/src/components/detail/antwort-bereich.tsx", "suche": "karte={ankuendigung && <TerminOffenKarte", "ersetze": "karte={undefined && <TerminOffenKarte" },
   { "name": "antwort-bereich.tsx: Knopf schaltet nichts", "datei": "web/src/components/detail/antwort-bereich.tsx", "suche": "onToggleFavorite={onToggleFavorite} verbindung={verbindung} t={t} />}", "ersetze": "onToggleFavorite={() => undefined} verbindung={verbindung} t={t} />}" },
@@ -30,6 +29,5 @@
   { "name": "termin-offen-karte.tsx: Hinweis-Texte vertauscht", "datei": "web/src/components/detail/termin-offen-karte.tsx", "suche": "verbindung.verbunden ? 'termin.bescheidMail' : 'termin.bescheidOffen'", "ersetze": "verbindung.verbunden ? 'termin.bescheidOffen' : 'termin.bescheidMail'" },
   { "name": "termin-offen-karte.tsx: Klick schaltet falschen Titel", "datei": "web/src/components/detail/termin-offen-karte.tsx", "suche": "onToggle={() => onToggleFavorite(title.id)}", "ersetze": "onToggle={() => onToggleFavorite(0)}" },
   { "name": "termin-offen-karte.tsx: Klick ruft nichts", "datei": "web/src/components/detail/termin-offen-karte.tsx", "suche": "onClick={onToggle}", "ersetze": "onClick={() => undefined}" },
-  { "name": "termin-offen-karte.tsx: Start-Zeile klein geschrieben", "datei": "web/src/components/detail/termin-offen-karte.tsx", "suche": "omu.charAt(0).toUpperCase() + omu.slice(1)", "ersetze": "omu" },
   { "name": "i18n-zeilen.ts: Kartentitel anders", "datei": "web/src/lib/i18n-zeilen.ts", "suche": "'termin.titel': 'Termin offen'", "ersetze": "'termin.titel': 'Offen'" }
 ]

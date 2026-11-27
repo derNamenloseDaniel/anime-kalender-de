@@ -5567,17 +5567,14 @@ pruefe(
   /* Kennzeichnung ohne belegte Synchro in ICS und Newsletter (10.10.2026); UID bleibt, Termine mit Synchro unverändert. */
   const ev = { id: 'x', name: 'Test', date: '2026-10-01', time: '18:00', platform: 'netflix', releaseType: 'weekly', episode: 3, releaseSlug: 'x' } as unknown as ReleaseEvent
   const roh = buildIcs([ev])
-  const omu = buildIcs([{ ...ev, sprache: 'omu' }])
   const offen = buildIcs([{ ...ev, sprache: 'offen' }])
   pruefe(
-    'ICS kennzeichnet OmU und „Synchro offen“ im Titel und in der Beschreibung, ohne die UID zu ändern',
-    omu.includes('SUMMARY:Test – Folge 3 (OmU)') && offen.includes('SUMMARY:Test – Folge 3 (Synchro offen)') &&
-      omu.includes('keine deutsche Synchro') && !roh.includes('OmU') && !roh.includes('Synchro offen') &&
-      roh.match(/UID:.*/)![0] === omu.match(/UID:.*/)![0],
+    'ICS kennzeichnet „Synchro offen“ im Titel und in der Beschreibung, ohne die UID zu ändern',
+    offen.includes('SUMMARY:Test – Folge 3 (Synchro offen)') && !roh.includes('Synchro offen') && roh.match(/UID:.*/)![0] === offen.match(/UID:.*/)![0],
   )
   pruefe(
     'der Newsletter trägt dieselbe Marke',
-    badge({ ...ev, sprache: 'omu' } as ReleaseEvent).includes('>OmU<') && badge({ ...ev, sprache: 'offen' } as ReleaseEvent).includes('>Synchro offen<') && !badge(ev).includes('OmU'),
+    badge({ ...ev, sprache: 'offen' } as ReleaseEvent).includes('>Synchro offen<') && !badge(ev).includes('Synchro offen'),
   )
 }
 {
@@ -7135,11 +7132,8 @@ pruefe(
   pruefe('Ankündigung: Rayearth (2026) — Crunchyroll ab 07.10., Synchro angekündigt', ray?.platform === 'crunchyroll' && ray.omuAb === '2026-10-07' && ray.synchro === 'angekuendigt', ray)
   pruefe('Ankündigung: jede Zeile trägt eine Quellenadresse', [...a.values()].every((x) => x.quellen.length && x.quellen.every((q) => q.startsWith('https://'))))
   const T = (k: string, v?: Record<string, string | number>) => `${k}${v?.wann ? `(${v.wann})` : ''}`
-  pruefe('Ankündigung: vor dem Start „ab"', ankuendigungZeile(ray!, T, '2026-09-25') === 'Crunchyroll · antwort.omuAb(07.10.2026) · antwort.synchroTerminOffen', ankuendigungZeile(ray!, T, '2026-09-25'))
-  pruefe('Ankündigung: am Starttag „seit"', ankuendigungZeile(ray!, T, '2026-10-07').includes('antwort.omuSeit(07.10.2026)'))
-  const psyren = a.get(204011)!
-  pruefe('Ankündigung: nur der Monat — „Oktober 2026", bis Monatsende bevorstehend', ankuendigungZeile(psyren, T, '2026-10-20').includes('antwort.omuAb(Oktober 2026)'), ankuendigungZeile(psyren, T, '2026-10-20'))
-  pruefe('Ankündigung: ohne Synchro-Angabe heißt „offen"', ankuendigungZeile(a.get(187402)!, T, '2026-09-25').endsWith('antwort.synchroOffen'))
+  pruefe('Ankündigung: Zeile nennt Anbieter und Synchro-Stand, nie den Start mit Untertiteln', ankuendigungZeile(ray!, T) === 'Crunchyroll · antwort.synchroTerminOffen', ankuendigungZeile(ray!, T))
+  pruefe('Ankündigung: ohne Synchro-Angabe heißt „offen"', ankuendigungZeile(a.get(187402)!, T).endsWith('antwort.synchroOffen'))
 }
 {
   /*
@@ -7223,6 +7217,16 @@ pruefe(
   pruefe('Staffelstart: Folge 2 ist keiner', !istStaffelstart(ev('w', 2), data))
   pruefe('Staffelstart: geteilter Start zählt ab firstEpisodeNumber', istStaffelstart(ev('teil2', 13), data) && !istStaffelstart(ev('teil2', 1), data))
   pruefe('Staffelstart: „im Angebot seit" ist kein Start', !istStaffelstart(ev('katalog', 1), data))
+  /* N4 (26.11.2026): „Folge 1 sofort, Rest wöchentlich" — Folge 2 desselben Titels beim selben Anbieter ist kein Start. */
+  data.releaseBySlug.set('sofort-f1', rel('sofort-f1', { titleId: 7, releaseType: 'batch', schedule: { firstEpisodeDate: '2026-10-05', episodeCount: 1 } }))
+  data.releaseBySlug.set('sofort-rest', rel('sofort-rest', { titleId: 7, schedule: { firstEpisodeDate: '2026-10-10', firstEpisodeNumber: 2, episodeCount: 11 } }))
+  data.releaseBySlug.set('sonst-teil2', rel('sonst-teil2', { titleId: 8, platform: 'netflix', schedule: { firstEpisodeDate: '2026-10-10', firstEpisodeNumber: 13 } }))
+  data.releaseBySlug.set('sonst-f1', rel('sonst-f1', { titleId: 8, platform: 'crunchyroll', schedule: { firstEpisodeDate: '2026-04-01' } }))
+  data.releaseBySlug.set('nr5', rel('nr5', { titleId: 9, schedule: { firstEpisodeDate: '2026-04-01', firstEpisodeNumber: 5 } }))
+  data.releaseBySlug.set('nr1', rel('nr1', { titleId: 9, schedule: { firstEpisodeDate: '2026-10-10' } }))
+  pruefe('Staffelstart N4: früherer Release mit höherer Startnummer verhindert keinen Start', istStaffelstart(ev('nr1', 1, { titleId: 9 }), data))
+  pruefe('Staffelstart N4: frühere Folge beim selben Anbieter → kein Start', !istStaffelstart(ev('sofort-rest', 2, { titleId: 7 }), data))
+  pruefe('Staffelstart N4: frühere Folge bei einem anderen Anbieter ändert nichts', istStaffelstart(ev('sonst-teil2', 13, { titleId: 8, platform: 'netflix' }), data))
   pruefe('Staffelstart: Fernsehen fragt tvPremiere(), nicht diese Regel', !istStaffelstart(ev('w', 1, { platform: 'tv' }), data))
   /* Staffelfinale (26.09.2026): letzte Folge nur bei belegter Folgenzahl — eine geratene macht kein Finale. */
   data.releaseBySlug.set('geraten', rel('geraten', { schedule: { firstEpisodeDate: '2026-10-01', episodeCountAssumed: true } }))
@@ -7756,10 +7760,10 @@ console.log('\nNews-Verlauf:')
 /* OmU-Starts angekündigter Serien sind eine Meldung mit Quelle, solange es kein Release des Anbieters gibt (Beerus, 03.10.2026). */
 console.log('\nOmU-Meldung:')
 {
-  const titel = { id: 7, ankuendigung: { platform: 'crunchyroll', omuAb: '2026-10-11', synchro: 'offen', quellen: ['https://www.crunchyroll.com/de/news/seasonal-lineup/2026/9/15/x'], stand: '2026-09-15' } } as never
-  const monat = { id: 8, ankuendigung: { platform: 'crunchyroll', omuAb: '2026-10', synchro: 'offen', quellen: ['https://x'], stand: '2026-09-15' } } as never
+  const titel = { id: 7, ankuendigung: { platform: 'crunchyroll', omuAb: '2026-10-11', synchro: 'angekuendigt', quellen: ['https://www.crunchyroll.com/de/news/seasonal-lineup/2026/9/15/x'], stand: '2026-09-15' } } as never
+  const monat = { id: 8, ankuendigung: { platform: 'crunchyroll', omuAb: '2026-10', synchro: 'angekuendigt', quellen: ['https://x'], stand: '2026-09-15' } } as never
   const m = omuMeldungen([titel, monat], [])
-  pruefe('OmU: ein Start mit Tag wird Meldung am Tag der Quelle, mit Beleg und Kennzeichen „Synchro offen"', m.length === 2 && m[0]!.fallback === '2026-09-15' && m[0]!.datum === '2026-10-11' && m[0]!.belege?.length === 1 && m[0]!.omu === 'synchro-offen', m)
+  pruefe('OmU: ein Start mit Tag wird Meldung am Tag der Quelle, mit Beleg und Kennzeichen „Synchro angekündigt"', m.length === 2 && m[0]!.fallback === '2026-09-15' && m[0]!.datum === '2026-10-11' && m[0]!.belege?.length === 1 && m[0]!.omu === 'synchro-angekuendigt', m)
   /* PSYREN (10.10.2026): Die Quelle nennt nur „Oktober" — „Synchro angekündigt" hat trotzdem seinen Beleg und seinen Tag. */
   const { omuStartText, omuLetzterTag, streamNurOmu } = await import('../shared/ankuendigung.ts')
   pruefe('OmU: nennt die Quelle nur den Monat, wird es eine Meldung am Tag der Quelle mit dem Monat', m[1]!.datum === '2026-10' && m[1]!.fallback === '2026-09-15' && m[1]!.belege?.length === 1, m[1])
@@ -7771,7 +7775,8 @@ console.log('\nOmU-Meldung:')
   pruefe('Pille: Anbieter des Simulcasts ohne belegte Synchro = OmU', streamNurOmu(monat, crOhne))
   pruefe('Pille: belegte Synchro, anderer Anbieter oder kein Simulcast = keine OmU-Marke', !streamNurOmu(monat, crDub) && !streamNurOmu(monat, prime) && !streamNurOmu({ id: 1 } as never, crOhne))
   const rel = { titleId: 7, platform: 'crunchyroll', schedule: { firstEpisodeDate: '2026-10-11' } } as never
-  pruefe('OmU: gibt es ein Release desselben Anbieters, entfällt „Synchro offen"', omuMeldungen([titel], [rel]).length === 0)
+  const offenTitel = { id: 7, ankuendigung: { platform: 'crunchyroll', omuAb: '2026-10-11', synchro: 'offen', quellen: ['https://x'], stand: '2026-09-15' } } as never
+  pruefe('OmU: „Synchro offen“ gibt nie eine Meldung', omuMeldungen([offenTitel], []).length === 0 && omuMeldungen([offenTitel], [rel]).length === 0)
   /* Der Bau legt `ankuendigung` erst beim Schreiben an den Titel — die Meldung muss sie selbst nachschlagen (Beerus, 04.10.2026). */
   const ohneFeld = { id: 9 } as never
   const aus = omuMeldungen([ohneFeld], [], new Map([[9, { platform: 'crunchyroll', omuAb: '2026-10-11', synchro: 'angekuendigt', quellen: ['https://x'], stand: '2026-10-01' } as never]]))

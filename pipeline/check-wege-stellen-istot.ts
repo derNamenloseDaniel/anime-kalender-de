@@ -10,6 +10,7 @@
  * Aufruf: npm run check:logic (steckt darin) oder `tsx pipeline/check-wege-stellen-istot.ts`
  */
 import { readFileSync } from 'node:fs'
+import { pathToFileURL } from 'node:url'
 import { alleWegeStellen, findeWegeStellen, TOT_FRAGEN, zusammenfassen } from './lib/wege-stellen.ts'
 
 interface Eintrag {
@@ -80,7 +81,7 @@ function eigeneFaelle(liste: Liste): string[] {
   return fehler
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const liste = JSON.parse(readFileSync('pipeline/lib/wege-stellen-geprueft.json', 'utf8')) as Liste
   const fehler = [...vergleicheMitListe(zusammenfassen(alleWegeStellen(process.cwd())), liste), ...eigeneFaelle(liste)]
   if (fehler.length) {

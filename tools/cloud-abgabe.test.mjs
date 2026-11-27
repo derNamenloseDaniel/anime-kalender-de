@@ -494,6 +494,8 @@ for (const [args, muster] of [[[], /Aufruf/], [['fix/foo'], /kein prtext-Zweig/]
   pruefe('Patch Notes: nur Doku und Werkzeug → keine Zeile nötig', unsichtbar.code === 0 && aufrufe(unsichtbar.w, 'prAnlegen').length === 1, unsichtbar.meldung)
   const offen = lauft({ aenderungen: SICHTBAR, prs: { 'fix/foo': 50 } })
   pruefe('Patch Notes: bei offenem PR kein Anlegen und keine Prüfung (nur Nachtrag)', offen.code === 0 && aufrufe(offen.w, 'prAnlegen').length === 0, offen.meldung)
+  const ausgenommen = lauft({ aenderungen: SICHTBAR, zweige: { 'claude/foo': SHA_A }, dateien: { 'prtext/foo': { 'pr.md': `<!-- titel: fix(x): Beispiel -->\n<!-- zweig: claude/foo -->\nText\n`, 'bericht.md': BERICHT } } })
+  pruefe('Patch Notes: Zweig claude/… ist ausgenommen wie in der Kette → PR angelegt ohne Zeile', ausgenommen.code === 0 && aufrufe(ausgenommen.w, 'prAnlegen').length === 1, ausgenommen.meldung)
   const mehrere = lauft({ aenderungen: `M\tdocs/a.md\nM\ttools/b.mjs\n${SICHTBAR}` })
   pruefe('Patch Notes: sichtbare Datei in der dritten Zeile wird erkannt (alle Zeilen zählen)', mehrere.code === 2 && aufrufe(mehrere.w, 'prAnlegen').length === 0, mehrere.meldung)
   const datenTitel = (zeile) => ({ 'prtext/foo': { 'pr.md': `<!-- titel: fix(data): Beispiel -->\nText\n${zeile}\n`, 'bericht.md': BERICHT } })

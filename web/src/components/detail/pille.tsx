@@ -20,7 +20,7 @@ const FUSS_RING_MARKE = `bg-ak-pille text-ak-text ${FUSS_OVERLAY} after:shadow-[
  * nächster Termin; der Sprachzustand sitzt als Blase oben rechts (`status`). Der Kalenderknopf (`aktion`) steht neben der Pille.
  * Mindesthöhe 52 px (Tippziel).
  */
-export function Pille({ name, farbe, url, unten, titel, icon, durchgestrichen, status, aktion, fuss }: {
+export function Pille({ name, farbe, url, unten, titel, icon, durchgestrichen, status, aktion, fuss, breit }: {
   name: ReactNode
   farbe?: string
   url?: string
@@ -33,9 +33,11 @@ export function Pille({ name, farbe, url, unten, titel, icon, durchgestrichen, s
   aktion?: ReactNode
   /** Knöpfe als Fußzeile in derselben Fläche; die Chip nimmt die ganze Breite, `aktion` entfällt. */
   fuss?: ReactNode
+  /** In einer Liste untereinander (Disc-Varianten): die Pille füllt die Zeile, damit alle gleich breit sind. */
+  breit?: boolean
 }) {
   const flaeche = farbe ? PILLE_MARKE : PILLE_OHNE_MARKE
-  const form = fuss ? 'flex w-full rounded-b-none' : `inline-flex max-w-full ${RING} ${flaeche}`
+  const form = fuss ? 'flex w-full rounded-b-none' : breit ? `flex flex-1 ${RING} ${flaeche}` : `inline-flex max-w-full ${RING} ${flaeche}`
   const marke = farbe ? ({ '--marke': farbe } as CSSProperties) : undefined
   const haupt = (
     <a
@@ -50,7 +52,7 @@ export function Pille({ name, farbe, url, unten, titel, icon, durchgestrichen, s
           {icon}
         </span>
       )}
-      <span className="flex min-w-0 flex-col">
+      <span className={`flex min-w-0 flex-col ${breit ? 'flex-1' : ''}`}>
         <span className={`text-t3 font-semibold ${durchgestrichen ? 'line-through' : ''}`}>{name}</span>
         {unten && <span className="text-t4 text-ak-leise">{unten}</span>}
         {status}

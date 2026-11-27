@@ -32,11 +32,6 @@ const ERLAUBT: Record<string, Record<string, string>> = {
   'web/src/components/detail/kino.tsx': { suche: 'Kino-Suchseite, selbst gebaut', kinoheld: 'Kinoheld-Seite, selbst gebaut' },
   'web/src/components/detail/merken.tsx': { 'googleCalendarUrl(ev, {}, wochenserie(kuenftige))': 'selbst gebaute Kalenderadresse' },
   'web/src/components/detail/pille.tsx': { 'url || undefined': 'Anbieter-Adresse (platformUrl/Weg), keine Beleg-Quelle' },
-  'web/src/components/detail/disc-matrix.tsx': {
-    'googleCalendarUrl(termine[0], {}, wochenserie(termine))': 'selbst gebaute Kalenderadresse',
-    url: 'Kauflink aus dem Termin (Shop, nie aniSearch): Beschriftung über kaufTextSchluessel, keine Beleg-Quelle',
-    'v.quelle': 'aniSearch-Artikel der Ausgabe, selbst gebaut aus der Artikelnummer (artikelUrl)',
-  },
   'web/src/components/detail/hilfen.tsx': { url: 'blob:-Adresse der ICS-Datei aus URL.createObjectURL (downloadIcs), keine Adresse aus den Daten' },
   'web/src/components/detail/live-link.tsx': {
     url: 'Parameter von LiveLink; einziger Aufrufer übergibt liveAdresse().url (feste Tabelle in lib/live-adresse.ts)',

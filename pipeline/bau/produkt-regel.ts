@@ -3,8 +3,10 @@ import { log, readJson } from '../lib/util.ts'
 import { ladeBewertungen } from '../lib/anisearch-bewertung.ts'
 import { type AnilistWertung, ladeAnilistWertungen } from '../lib/anilist-wertung.ts'
 import { BANNER_DATEI, bannerAdresse, type TmdbBanner } from '../lib/tmdb-banner.ts'
+import { mitHandvorrang } from '../lib/tmdb-von-hand.ts'
 import type { Title } from '../../shared/types.ts'
 import { anisearchKennungen } from './anisearch-kennung.ts'
+import { geteilteSerien, serienbildFremd, type SerienFolgen, type SerienZuordnung } from './banner-serienbild.ts'
 
 /**
  * **Woher Bewertung, Schlagworte und Banner kommen** (Daniel, 11.10.2026): Bewertung (Klarwert) und Schlagworte aus der aniSearch-Seite
@@ -14,6 +16,13 @@ type Bewertung = Pick<Title, 'score' | 'scoreQuelle'>
 
 let tmdbBanner: TmdbBanner | undefined
 const banner = (): TmdbBanner => (tmdbBanner ??= ohneGeteilteFilme(readJson<TmdbBanner>(BANNER_DATEI, {}), 'Banner'))
+
+let serien: { zuordnung: SerienZuordnung; folgen: SerienFolgen; geteilt: Set<number> } | undefined
+function serienDaten(): NonNullable<typeof serien> {
+  if (serien) return serien
+  const zuordnung = mitHandvorrang(readJson<Record<string, { tmdbId?: number; kind?: string }>>('data/tmdb-titles.json', {}))
+  return (serien = { zuordnung, folgen: readJson<SerienFolgen>('data/tmdb-folgen.json', {}), geteilt: geteilteSerien(zuordnung) })
+}
 
 /** Unter dieser Stimmenzahl zeigt der Titel keine Bewertung: ein Durchschnitt aus 1–4 Stimmen ist kein Beleg (Dirigent, 11.10.2026). */
 export const MIN_STIMMEN_BEWERTUNG = 5
@@ -34,10 +43,13 @@ export function schlagworteNachRegel(anisearchId: number | undefined): string[] 
 /**
  * Bannerbild eines Titels: das TMDB-Hintergrundbild. ÜBERGANG: Wo TMDB keins hat (Lückenliste `daniel-zum-abarbeiten/listen/luecken/banner.md`),
  * bleibt vorerst das AniList-Banner — diese Zeile entfällt, sobald für die Lücken ein Ersatz gefunden ist.
+ * Umfasst die TMDB-Serie mehr als den Titel (`serienbildFremd`), geht das eigene AniList-Banner vor: Es gehört zu genau diesem Teil.
  */
-export function bannerNachRegel(id: number, anilistBanner: string | undefined): string | undefined {
+export function bannerNachRegel(id: number, anilistBanner: string | undefined, episodes?: number): string | undefined {
   const tmdb = banner()[String(id)]?.p
-  return tmdb ? bannerAdresse(tmdb) : anilistBanner
+  if (!tmdb) return anilistBanner
+  const { zuordnung, folgen, geteilt } = serienDaten()
+  return anilistBanner && serienbildFremd({ id, episodes }, zuordnung, folgen, geteilt) ? anilistBanner : bannerAdresse(tmdb)
 }
 
 /** Bewertung, Schlagworte und Banner nach der Regel; auch für die Kopien in `verschoben`, die vor `setzeProduktFelder` entstanden. */
@@ -48,7 +60,7 @@ export function mitProduktFeldern<T extends Title>(t: T, anisearchId: number | u
     score,
     scoreQuelle,
     keywords: schlagworteNachRegel(anisearchId),
-    bannerImage: bannerNachRegel(t.id, t.bannerImage),
+    bannerImage: bannerNachRegel(t.id, t.bannerImage, t.episodes),
   }
 }
 

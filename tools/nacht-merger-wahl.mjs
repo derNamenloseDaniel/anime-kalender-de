@@ -118,3 +118,21 @@ export function reihenfolge(prs, bestandRot) {
   const vorrang = (p) => (bestandRot && VORRANG_ZEILE.test(p.beschreibung ?? '') ? 0 : 1)
   return [...prs].sort((a, b) => vorrang(a) - vorrang(b) || Date.parse(a.erstellt) - Date.parse(b.erstellt) || a.nummer - b.nummer)
 }
+
+/**
+ * Freigabe nach einem Main-Nachzug verworfen (27.11.2026, Dirigent-Nachtrag 7218441221): Das Ruleset verwirft die Freigabe bei jedem Push (`dismiss_stale`),
+ * auch bei einem reinen Main-Merge. Der PR ist dann REVIEW_REQUIRED, obwohl die Kette am Kopf grün ist und das jüngste Prüfer-Urteil „ok“ lautet,
+ * nur zu einem früheren Kopf. Nur dann soll der Merger die Übernahme (Prüfer-Lauf) anstoßen; jeder andere Grund für REVIEW_REQUIRED bleibt Abweisung.
+ */
+export function freigabeVerworfen(pr) {
+  if (!pr.offen || pr.entwurf || pr.zweig.startsWith('daten/') || pr.reviewDecision !== 'REVIEW_REQUIRED') return false
+  if (pr.mergeStateStatus === 'DIRTY' || pr.pfade.some((p) => p.startsWith('.github/workflows/'))) return false
+  if (!ketteStand(pr.checks).gruen || freigabe(pr.kommentare, pr.kopf).frei) return false
+  const urteile = pr.kommentare
+    .filter((k) => k.login === PRUEFER_LOGIN)
+    .map((k) => ({ at: k.at, treffer: URTEIL.exec(k.body) }))
+    .filter((u) => u.treffer !== null)
+    .sort((a, b) => Date.parse(a.at) - Date.parse(b.at))
+  const letztes = urteile.at(-1)
+  return letztes !== undefined && urteilIstOk(letztes.treffer[2].trim()) && !pr.kopf.startsWith(letztes.treffer[1])
+}

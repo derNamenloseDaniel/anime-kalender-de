@@ -10,6 +10,7 @@ const aufrufe = []
 const ghMit = (treffer) => (args) => {
   aufrufe.push(args.join(' '))
   if (args.some((a) => a.includes('repos/{owner}/{repo}/issues'))) return JSON.stringify(treffer)
+  if (args[0] === 'run' && args[1] === 'list') return '[]'
   if (args[0] === 'pr' && args[1] === 'list') return '[]'
   return ''
 }

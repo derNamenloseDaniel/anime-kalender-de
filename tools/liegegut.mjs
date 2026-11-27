@@ -13,6 +13,7 @@ import { schleifeSignal, schleifenBeginn } from './nachrechnen-schleife.mjs'
 import { PRAEFIX as ABNAHME_PRAEFIX } from './abnahme-freigabe.mjs'
 import { vorratMeldung } from './liegegut-vorrat.mjs'
 import { nachpruefungMeldung } from './liegegut-nachpruefung.mjs'
+import { warteschlangeMeldung } from './liegegut-warteschlange.mjs'
 
 const STUNDE = 3600 * 1000
 
@@ -140,6 +141,19 @@ export function datenZweigSignal(pr, kopfZeit) {
   return [{ nr: 13, text: `daten/-Zweig von ${pr.author?.login ?? 'unbekannt'} (Kette überspringt ihn)`, seit: kopfZeit }]
 }
 
+export const FREIGABE_VERWORFEN_MIN = 30 // Minuten nach dem Kopf-Commit, bis ein verworfenes Prüfer-Ok gemeldet wird (die Übernahme braucht ihre Zeit)
+
+/**
+ * Signal 14 (27.11.2026, Dirigent-Nachtrag 7218441221): Das Ruleset verwirft die Freigabe bei jedem Push (`dismiss_stale`), auch bei einem reinen
+ * Main-Nachzug. Das jüngste Review ist dann `DISMISSED`, die Kette am neuen Kopf grün; ohne neues Review (Übernahme oder Abnahme-Freigabe) bleibt der PR liegen.
+ */
+export function freigabeVerworfenSignal(pr, kopfZeit, jetzt) {
+  const reviews = (pr.reviews ?? []).filter((r) => !Number.isNaN(Date.parse(r.submittedAt)))
+  const juengstes = reviews.sort((a, b) => Date.parse(a.submittedAt) - Date.parse(b.submittedAt)).at(-1)
+  if (juengstes?.state !== 'DISMISSED' || checkStand(pr.statusCheckRollup).art !== 'gruen' || stunden(kopfZeit, jetzt) * 60 < FREIGABE_VERWORFEN_MIN) return []
+  return [{ nr: 14, text: 'Freigabe verworfen nach Main-Nachzug (Übernahme fehlt)', seit: kopfZeit }]
+}
+
 /** Signal 11: Entwurf ohne Aktivität länger als ENTWURF_H; für Entwürfe das einzige Signal (die übrigen gelten nur für ready-PRs). */
 export function entwurfSignal(pr, kopfZeit, jetzt) {
   const letzte = letzteAktivitaet(pr, kopfZeit)
@@ -260,13 +274,14 @@ export function ueberholtTreffer(patches, grepFn) {
   return gesamt > 0 && funde.length === gesamt ? funde : []
 }
 
-const NAECHSTER = { ENTWURF: 'ENTWURF (prüfen, auf bereit stellen oder schließen)', STAPEL: 'STAPEL', STILLSTAND: 'STILLSTAND', SCHLEIFE: 'SCHLEIFE (Nachrechnen-Gründe in den Kommentaren lesen)', UEBERHOLT: 'ÜBERHOLT?', ZWEIG: 'ZWEIG UMBENENNEN (auf fix/ oder korrektur/ neu pushen)', DANIEL: 'DANIEL', MERGEN: 'MERGEN', ZUG: 'AUF ZUG MERGEN (merge-reihe-zug.sh)', NACHBESSERN: 'NACHBESSERN' }
+const NAECHSTER = { ENTWURF: 'ENTWURF (prüfen, auf bereit stellen oder schließen)', STAPEL: 'STAPEL', STILLSTAND: 'STILLSTAND', SCHLEIFE: 'SCHLEIFE (Nachrechnen-Gründe in den Kommentaren lesen)', UEBERHOLT: 'ÜBERHOLT?', UEBERNAHME: 'ÜBERNAHME (Prüfer-Lauf anstoßen: gh workflow run pr-pruefer.yml --ref main -f pr=<PR>)', ZWEIG: 'ZWEIG UMBENENNEN (auf fix/ oder korrektur/ neu pushen)', DANIEL: 'DANIEL', MERGEN: 'MERGEN', ZUG: 'AUF ZUG MERGEN (merge-reihe-zug.sh)', NACHBESSERN: 'NACHBESSERN' }
 
 /** Nächster Schritt aus Signalen und Gegenprobe; `daniel` = Signal 6 oder Signal 2 mit Bot-Urteil als letztem (nur Daniel löst das). */
 export function naechsterSchritt(nummern, treffer, botLetzt, imZug = false) {
   const hat = (n) => nummern.includes(n)
   if (hat(9)) return NAECHSTER.STAPEL
   if (hat(13)) return NAECHSTER.ZWEIG
+  if (hat(14)) return NAECHSTER.UEBERNAHME
   if (nummern.every((n) => n === 8)) return NAECHSTER.STILLSTAND
   if (nummern.every((n) => n === 10 || n === 8)) return NAECHSTER.SCHLEIFE
   if (treffer.length > 0 && (hat(1) || hat(3) || hat(5))) return NAECHSTER.UEBERHOLT
@@ -330,7 +345,7 @@ function bewertePr(ghFn, gitFn, pr, geteilt, jetzt, karte, stapel, imZug, repo) 
   const kopfZeit = kopfZeitVon(ghFn, pr, karte)
   if (Number.isNaN(kopfZeit)) throw new Error(`PR ${pr.number}: Kopf-Zeit nicht lesbar`)
   if (pr.isDraft) return bewerteEntwurf(pr, kopfZeit, jetzt, repo)
-  const signale = [...signaleEinzel(pr, kopfZeit, jetzt), ...stillstandSignal(pr, kopfZeit, jetzt), ...schleifeSignal(pr, schleifenBeginn(ghFn, pr, kopfZeit)), ...datenZweigSignal(pr, kopfZeit)]
+  const signale = [...signaleEinzel(pr, kopfZeit, jetzt), ...stillstandSignal(pr, kopfZeit, jetzt), ...schleifeSignal(pr, schleifenBeginn(ghFn, pr, kopfZeit)), ...datenZweigSignal(pr, kopfZeit), ...freigabeVerworfenSignal(pr, kopfZeit, jetzt)]
   const texte = signale.map((s) => `${s.nr} ${s.text}`)
   const zeiten = signale.map((s) => s.seit)
   const nummern = signale.map((s) => s.nr)
@@ -412,7 +427,7 @@ export const liegegut = (ghFn, gitFn, jetzt, hinweis, standText, zugAktiv) => li
 /** Textzeilen aller überwachten Repos. */
 export const liegegutAlle = (ghFn, gitFn, jetzt, hinweis, standText, zugAktiv) => liegegutAlleFunde(ghFn, gitFn, jetzt, hinweis, standText, zugAktiv).map((f) => f.zeile)
 
-const KURZ = { 1: 'Freigabe ruht', 2: 'Urteile widersprechen', 3: 'Konflikt', 4: 'rot', 5: 'Ändern offen', 6: 'gleiche Entscheidung', 8: 'Stillstand', 9: 'Stapel', 10: 'Nachrechnen-Schleife', 11: 'Entwurf liegt', 13: 'daten/-Zweig fremd' }
+const KURZ = { 1: 'Freigabe ruht', 2: 'Urteile widersprechen', 3: 'Konflikt', 4: 'rot', 5: 'Ändern offen', 6: 'gleiche Entscheidung', 8: 'Stillstand', 9: 'Stapel', 10: 'Nachrechnen-Schleife', 11: 'Entwurf liegt', 13: 'daten/-Zweig fremd', 14: 'Freigabe verworfen' }
 
 /** Eine Sammelzeile für die Wachphase: `LIEGT: 2377 (Konflikt 30 h, Stillstand 52 h), …`; null ohne Funde. */
 export function liegtZeile(funde, jetzt) {
@@ -430,6 +445,8 @@ export function meldeLiegt(ghFn, gitFn, log, jetzt) {
     if (vorrat) log(vorrat)
     const nachpruefung = nachpruefungMeldung(ghFn, jetzt)
     if (nachpruefung) log(nachpruefung)
+    const warteschlange = warteschlangeMeldung(ghFn, jetzt)
+    if (warteschlange) log(warteschlange)
   } catch (e) {
     log(`LIEGT? liegegut nicht lesbar: ${String(e.message).split('\n')[0]}`)
   }
@@ -471,6 +488,8 @@ export function main(ghFn, gitFn, melde, jetzt) {
     if (vorrat) melde(vorrat)
     const nachpruefung = nachpruefungMeldung(ghFn, jetzt)
     if (nachpruefung) melde(nachpruefung)
+    const warteschlange = warteschlangeMeldung(ghFn, jetzt)
+    if (warteschlange) melde(warteschlange)
     melde(`liegegut: ${zeilen.length} auffällige PRs`)
     return 0
   } catch (e) {

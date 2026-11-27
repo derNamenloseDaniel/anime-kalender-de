@@ -10,7 +10,7 @@ import { mitLimit } from './kind-mit-limit.mjs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { liegegutAlle, liegegutAlleFunde, liegtZeile, offenePrs, checkStand, geteilteEntscheidungen, offeneEntscheidungen, kopfZeitVon, kopfZeiten, liegegut, main, meldeLiegt, hauptordner, standImProjekt, stapelBasis, grepMain, neueBezeichner, naechsterSchritt, signaleEinzel, stillstandSignal, entwurfSignal, datenZweigSignal, stapelKandidat, ueberholtTreffer, urteile, JQ_PATCHES } from './liegegut.mjs'
+import { freigabeVerworfenSignal, liegegutAlle, liegegutAlleFunde, liegtZeile, offenePrs, checkStand, geteilteEntscheidungen, offeneEntscheidungen, kopfZeitVon, kopfZeiten, liegegut, main, meldeLiegt, hauptordner, standImProjekt, stapelBasis, grepMain, neueBezeichner, naechsterSchritt, signaleEinzel, stillstandSignal, entwurfSignal, datenZweigSignal, stapelKandidat, ueberholtTreffer, urteile, JQ_PATCHES } from './liegegut.mjs'
 
 // Der echte Vorrat im Hauptordner darf diese Fälle nicht färben (Vorrat-Signal: tools/liegegut-vorrat.test.mjs).
 process.env.AK_VORRAT_ORDNER = path.join(os.tmpdir(), 'liegegut-ohne-vorrat')
@@ -285,6 +285,7 @@ const attrappeGh = (liste, aufrufe = [], listeNativ = []) => (args) => {
   const nativ = args.some((a) => a.includes(NATIV) || a === 'name=anime-kalender-nativ')
   if (args[0] === 'pr') return JSON.stringify(nativ ? listeNativ : liste)
   if (args[1] === '-X' && args.some((a) => a.includes('/issues'))) return '[]' // offene Nachprüfungen (liegegut-nachpruefung.mjs)
+  if (args[0] === 'run' && args[1] === 'list') return '[]' // Warteschlange (liegegut-warteschlange.mjs)
   if (args[1].includes('/commits/')) return h(100)
   if (args[1].endsWith('/files')) return patchVon(args[1])
   throw new Error(`unerwartet: ${args.join(' ')}`)
@@ -337,7 +338,7 @@ console.log('liegegut: Signal 13 daten/-Zweig von fremdem Autor (PR 4732)')
 console.log('liegegut: Sammelzeile je Signalnummer (Tabelle, PR 3854: 8 überlebende Mutanten an KURZ und istZugPr)')
 {
   // Signalnummer → Kurzname; 7 hat keinen Eintrag in KURZ (Signal 7 ist nur Gegenprobe, nie ein eigenes Signal).
-  const tabelle = [[1, 'Freigabe ruht'], [2, 'Urteile widersprechen'], [3, 'Konflikt'], [4, 'rot'], [5, 'Ändern offen'], [6, 'gleiche Entscheidung'], [8, 'Stillstand'], [9, 'Stapel'], [10, 'Nachrechnen-Schleife'], [11, 'Entwurf liegt'], [13, 'daten/-Zweig fremd']]
+  const tabelle = [[1, 'Freigabe ruht'], [2, 'Urteile widersprechen'], [3, 'Konflikt'], [4, 'rot'], [5, 'Ändern offen'], [6, 'gleiche Entscheidung'], [8, 'Stillstand'], [9, 'Stapel'], [10, 'Nachrechnen-Schleife'], [11, 'Entwurf liegt'], [13, 'daten/-Zweig fremd'], [14, 'Freigabe verworfen']]
   for (const [nr, kurz] of tabelle) {
     const ist = liegtZeile([{ nr: 77, repo: 'anime-kalender-de', signale: [{ nr, seit: JETZT - 5 * 3600 * 1000 }] }], JETZT)
     pruefe(`Signal ${nr} → „${kurz}“ mit Stundenzahl`, ist === `LIEGT: 77 (${kurz} 5 h)`, ist)
@@ -631,6 +632,7 @@ console.log('liegegut: eigener Prozess (Vorlader tools/pr-nachrechnen-mock.mjs)'
     [`api repos/{owner}/{repo}/commits/${KOPF} --jq .commit.committer.date`]: { aus: '2026-10-20T10:40:00Z\n' },
     [`api repos/{owner}/{repo}/pulls/1676/files --paginate --jq ${JQ_PATCHES}`]: { aus: '+++ b/tools/x.mjs\n@@ -1 +1,2 @@\n+nagel = 1\n' },
     'api -X GET repos/{owner}/{repo}/issues -f labels=nachpruefung-offen -f state=all -f per_page=100 --jq [.[] | {nr: .number, zu: .closed_at}]': { aus: '[]' },
+    'run list --status queued --limit 100 --json workflowName,displayTitle,createdAt': { aus: '[]' },
     'rev-parse --git-common-dir': { aus: `${path.join(werk, 'haupt', '.git')}\n` },
   }
   // nativ-Repo: leere Listen (die Ablaufschlüssel tragen --repo)
@@ -665,6 +667,23 @@ console.log('liegegut: eigener Prozess (Vorlader tools/pr-nachrechnen-mock.mjs)'
   const ohneDatei = fahre()
   pruefe('Prozess: stand.md fehlt → sichtbare Hinweiszeile, Exit 0, Signal 6 wieder da', ohneDatei.status === 0 && /liegegut: .*stand\.md fehlt – offene F-Nummern unbekannt/.test(ohneDatei.stdout) && /; 6 Gleiche offene/.test(ohneDatei.stdout), { o: ohneDatei.stdout, e: ohneDatei.stderr })
   fs.rmSync(werk, { recursive: true, force: true })
+}
+
+console.log('liegegut: Signal 14 – Freigabe nach Main-Nachzug verworfen (Dirigent-Nachtrag 7218441221)')
+{
+  const verworfen = (stunden, state, extra = {}) => ({ ...pr(14, { reviews: [{ state, submittedAt: h(stunden), author: { login: 'github-actions' } }] }), ...extra })
+  const sig = (p, kopfMin = 45) => freigabeVerworfenSignal(p, JETZT - kopfMin * 60 * 1000, JETZT)
+  pruefe('jüngstes Review DISMISSED, Kette grün, Kopf 45 min alt → Signal 14', JSON.stringify(sig(verworfen(5, 'DISMISSED')).map((s) => s.nr)) === '[14]')
+  pruefe('Signal 14: seit = Kopf-Commit', sig(verworfen(5, 'DISMISSED'))[0].seit === JETZT - 45 * 60 * 1000)
+  pruefe('Kopf jünger als 30 min → noch kein Signal', sig(verworfen(5, 'DISMISSED'), 29).length === 0 && sig(verworfen(5, 'DISMISSED'), 30).length === 1)
+  pruefe('jüngstes Review APPROVED → kein Signal', sig(verworfen(5, 'APPROVED')).length === 0)
+  pruefe('DISMISSED, danach neues APPROVED → kein Signal (Übernahme kam)', sig(pr(14, { reviews: [{ state: 'DISMISSED', submittedAt: h(9) }, { state: 'APPROVED', submittedAt: h(1) }] })).length === 0)
+  pruefe('APPROVED, danach DISMISSED (Reihenfolge der Liste egal) → Signal', sig(pr(14, { reviews: [{ state: 'DISMISSED', submittedAt: h(1) }, { state: 'APPROVED', submittedAt: h(9) }] })).length === 1)
+  pruefe('rote oder laufende Kette → kein Signal', sig(verworfen(5, 'DISMISSED', { statusCheckRollup: [{ name: 'PR-Prüfkette', status: 'COMPLETED', conclusion: 'FAILURE' }] })).length === 0 && sig(verworfen(5, 'DISMISSED', { statusCheckRollup: [{ name: 'PR-Prüfkette', status: 'IN_PROGRESS' }] })).length === 0)
+  pruefe('ohne Reviews oder ohne Zeit → kein Signal', sig(pr(14, {})).length === 0 && sig(pr(14, { reviews: [{ state: 'DISMISSED', submittedAt: 'x' }] })).length === 0)
+  pruefe('Schritt ÜBERNAHME mit Dispatch-Befehl', naechsterSchritt([14], [], false).startsWith('ÜBERNAHME (Prüfer-Lauf anstoßen: gh workflow run pr-pruefer.yml --ref main -f pr=<PR>)'))
+  const zeilen = liegegutAlle(attrappeGh([verworfen(5, 'DISMISSED', { headRefOid: KOPF })]), attrappeGit(), JETZT, () => {}, null)
+  pruefe('Gesamtlauf: Zeile mit Signal 14 und Schritt ÜBERNAHME', zeilen.length === 1 && /ÜBERNAHME \(.*Signal 14 Freigabe verworfen nach Main-Nachzug/.test(zeilen[0]), zeilen)
 }
 
 if (fehler.length > 0) {

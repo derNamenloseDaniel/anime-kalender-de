@@ -68,6 +68,7 @@ console.log('liegt-wachphase: eigener Prozess laeufe-aufraeumen --trocken')
     [graphqlSchluessel.replace('owner={owner}', 'owner=derNamenloseDaniel').replace('name={repo}', 'name=anime-kalender-nativ')]: { aus: `${KOPF_NATIV} ${vorStunden(100)}\n` },
     'pr list --state open --limit 100 --json number,title,body,createdAt': { aus: '[]' },
     'api -X GET repos/{owner}/{repo}/issues -f labels=nachpruefung-offen -f state=all -f per_page=100 --jq [.[] | {nr: .number, zu: .closed_at}]': { aus: '[]' }, // offene Nachprüfungen (27.11.2026)
+    'run list --status queued --limit 100 --json workflowName,displayTitle,createdAt': { aus: '[]' }, // Warteschlange (27.11.2026)
     'api repos/derNamenloseDaniel/anime-kalender-de/pulls?state=open&per_page=100': { aus: '[]' }, // Wache „Kopf ohne Urteil“ (19.11.2026)
     'api repos/derNamenloseDaniel/anime-kalender-de/actions/runs?status=in_progress&per_page=100': { aus: '{"workflow_runs":[]}' },
     'run list --repo derNamenloseDaniel/anime-kalender-de --workflow deploy.yml --branch main --status success --limit 6 --json databaseId': { aus: '[]' },

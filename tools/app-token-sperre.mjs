@@ -27,7 +27,12 @@ export const TOKEN_JOBS = {
   'claude-anime2you-extraktion.yml': { lesen: 'quellen-pr' },
   'claude-verpasst-recherche.yml': { recherchieren: 'quellen-pr' },
   'claude-wache-urteil.yml': { urteilen: 'quellen-pr' },
+  'cloud-abgabe.yml': { abgeben: 'cloud-abgabe' },
 }
+/* cloud-abgabe: nur `node tools/cloud-abgabe.mjs "$ZWEIG"` (Skript aus main, Zweigname über env); das Token trägt kein contents: write (Workflow-Test). */
+const CLOUD_ABGABE_ENV = ['GH_TOKEN', 'ZWEIG']
+const CLOUD_ABGABE_ZWEIG = '${{ github.event.inputs.zweig || github.ref_name }}'
+const CLOUD_ABGABE_RUN = 'node tools/cloud-abgabe.mjs "$ZWEIG"'
 
 const MERGEN_RUNS = ['bash tools/daten-pr-mergen.sh $NUMMERN', 'bash tools/daten-pr-mergen.sh ${NUMMERN//,/ }']
 const ANMELDUNG = [
@@ -85,7 +90,12 @@ function formFehler(art, s, ausdruck) {
   }
   const fehler = []
   if (Object.keys(s).some((k) => !RUN_SCHLUESSEL.includes(k))) fehler.push(`nur die Schlüssel ${RUN_SCHLUESSEL.join(', ')}`)
-  if (s.env?.GH_TOKEN !== ausdruck || Object.keys(s.env ?? {}).some((k) => !ENV_SCHLUESSEL.includes(k))) fehler.push(`env nur ${ENV_SCHLUESSEL.join(', ')}, GH_TOKEN genau ${ausdruck}`)
+  const envSchluessel = art === 'cloud-abgabe' ? CLOUD_ABGABE_ENV : ENV_SCHLUESSEL
+  if (s.env?.GH_TOKEN !== ausdruck || Object.keys(s.env ?? {}).some((k) => !envSchluessel.includes(k))) fehler.push(`env nur ${envSchluessel.join(', ')}, GH_TOKEN genau ${ausdruck}`)
+  if (art === 'cloud-abgabe') {
+    const ok = s.env?.ZWEIG === CLOUD_ABGABE_ZWEIG && String(s.run ?? '').trim() === CLOUD_ABGABE_RUN
+    return ok ? fehler : [...fehler, `env.ZWEIG genau ${CLOUD_ABGABE_ZWEIG} und run genau ${CLOUD_ABGABE_RUN}`]
+  }
   const zeilen = String(s.run ?? '').trim().split('\n').map((z) => z.trim())
   const passt =
     art === 'daten-pr-mergen'

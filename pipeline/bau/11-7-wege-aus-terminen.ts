@@ -5,7 +5,8 @@ import { anzeigeName } from '../../shared/titles.ts'
 import { log } from '../lib/util.ts'
 import { type Ausloeser, ausloeserZeilen } from '../lib/ausloeser-zeilen.ts'
 import type { EntfernterVerweis } from './grundlagen.ts'
-import { type DubCheck, dubKey } from '../lib/dub-confirmed.ts'
+import { type DubCheck, adressKern, dubKey } from '../lib/dub-confirmed.ts'
+import { istSammelKern } from '../../shared/adresse-kern.ts'
 import { baueNeinGilt } from '../lib/maengel-nein.ts'
 import { brichAbBeiWiderspruch } from '../lib/bau-widerspruch.ts'
 
@@ -48,17 +49,18 @@ export function istSichererTermin(r: Release): boolean {
  * Schlüssel `Titel|Anbieter`, deren Handbeleg-Nein „nicht verfügbar“ (Suche ohne Treffer) älter ist als ein sicherer Termin (Kamisama Kiss 14713: Nein 27.08.
  * gegen Aniverse-Termin 08.10.; Kuroko 102836: Nein 30.08. gegen Nachtrag-Termin 13.09.). Das Nein hat vor dem Termin gemessen, die Quelle des Termins
  * widerlegt es (`baueNeinGilt`). Auch ohne `kanal` (26.11.2026): Ein Weg ohne Adresse oder Ton meldet `weg-ohne-adresse` bzw. `sprachurteil-offen`,
- * sonst stünde der belegte Anbieter als `kein-weg` offen.
+ * sonst stünde der belegte Anbieter als `kein-weg` offen. Ohne `kanal` bleibt ein Nein, das an einer echten Titeladresse gemessen wurde (`neinMitAdresse`).
  * Nur begonnene Termine (`ab <= heute`, wie die Mängelart `erschienen-ohne-weg`): Ein Weg ohne Tonurteil für einen erst kommenden Termin brächte nur `sprachurteil-offen`
  * hinzu (Call of the Night 175914, Termin 20.11.2026).
  * Ein jüngerer Ja-Beleg hat das Nein schon selbst abgelöst (`jaNachNein`); der Schlüssel bleibt dann draußen, sonst übersähe `check-handbelege` den Ja-Beleg.
  */
 export function ueberholteNeins(belege: Parameters<typeof baueNeinGilt>[0], releases: Release[], heute: string): Set<string> {
   const gilt = baueNeinGilt(belege)
+  const mitAdresse = neinMitAdresse(belege)
   const fruehester = new Map<string, string>()
   for (const r of releases) {
     const ab = r.schedule?.firstEpisodeDate
-    if (!ab || ab > heute || !istSichererTermin(r)) continue
+    if (!ab || ab > heute || !istSichererTermin(r) || (!r.kanal && mitAdresse.has(dubKey(r.titleId, r.platform)))) continue
     const k = dubKey(r.titleId, r.platform)
     if (ab < (fruehester.get(k) ?? '9')) fruehester.set(k, ab)
   }
@@ -67,6 +69,12 @@ export function ueberholteNeins(belege: Parameters<typeof baueNeinGilt>[0], rele
     return belege.some((b) => b.available === false && dubKey(b.anilistId, b.platform) === k) && !gilt(Number(id), plattform!, ab) && !jaNachNein(belege, k)
   })
   return new Set(ueberholt.map(([k]) => k))
+}
+
+/** Schlüssel `Titel|Anbieter`, deren „nicht verfügbar“ an einer echten Titeladresse gemessen wurde (keine Suche, keine Startseite). */
+function neinMitAdresse(belege: Parameters<typeof baueNeinGilt>[0]): Set<string> {
+  const echt = belege.filter((b) => b.available === false && adressKern(b.url) !== '' && !istSammelKern(adressKern(b.url)))
+  return new Set(echt.map((b) => dubKey(b.anilistId, b.platform)))
 }
 
 /** Steht zum Schlüssel ein „deutsch“-Beleg, der jünger ist als jedes „nicht verfügbar“? */

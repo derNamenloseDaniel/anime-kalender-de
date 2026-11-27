@@ -89,6 +89,14 @@ pruefe('Bild nicht erreichbar (Netzfehler): kein Hinweis', netz.abgerufen && !ne
 const laedt = await zeige(RAYEARTH, 'offen')
 pruefe('Bild lädt noch: kein Hinweis', laedt.abgerufen && !laedt.text.includes(HINWEIS), laedt.text)
 
+const MESSUNG: NewsBeleg = { url: 'https://www.crunchyroll.com/de/simulcastcalendar?date=2026-11-16', name: 'Crunchyroll-Kalender', gemessenAm: '2026-11-16' }
+const ohneBild = await zeige(MESSUNG, 'ok')
+pruefe('Messbeleg ohne Bild und ohne Messzeilen: kein „So sah … aus“', !ohneBild.text.includes('So sah'), ohneBild.text)
+const mitBild = await zeige({ ...MESSUNG, bild: RAYEARTH.bild }, 'ok')
+pruefe('Messbeleg mit Bild: „So sah … aus“ steht da', mitBild.text.includes('So sah'), mitBild.text)
+const mitBildOhneWorker = await zeige({ ...MESSUNG, bild: RAYEARTH.bild }, 'ok', '')
+pruefe('Messbeleg mit Bild, aber ohne Worker (kein Bild zu sehen): kein „So sah“', !mitBildOhneWorker.text.includes('So sah'), mitBildOhneWorker.text)
+
 merkeSammelartikel([eintrag(178868, [EINZEL])])
 pruefe('neuer Stand ersetzt den alten (Rayearth nicht mehr geteilt)', !istSammelartikel(RAYEARTH.url))
 

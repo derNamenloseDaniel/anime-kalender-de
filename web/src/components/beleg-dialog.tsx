@@ -41,8 +41,9 @@ export function QuellenKnopf({ belege, betreff }: { belege: NewsBeleg[]; betreff
 }
 
 /** Was die Quelle zeigt, in einem Satz — mit dem Tag, an dem sie es sagte oder wir nachgesehen haben. */
-function erklaerung(b: NewsBeleg): string {
-  if (b.gemessenAm) return `Unsere Messung vom ${datumKurz(b.gemessenAm)}: So sah ${b.name} an diesem Tag aus.`
+function erklaerung(b: NewsBeleg, mitBild: boolean): string {
+  /* „So sah es aus“ nur, wo die Ansicht Bild oder Messzeilen zeigt (27.11.2026: 5 von 14 Messbelegen hatten beides nicht). */
+  if (b.gemessenAm) return `Unsere Messung vom ${datumKurz(b.gemessenAm)}: ${mitBild || b.messung ? `So sah ${b.name} an diesem Tag aus.` : `Stand von ${b.name} an diesem Tag.`}`
   if (b.ausgabeAm) return `Produktseite bei ${b.name}; die Ausgabe erscheint am ${datumKurz(b.ausgabeAm)}.`
   const wann = b.veroeffentlichtAm ? `, veröffentlicht am ${datumKurz(b.veroeffentlichtAm)}` : ''
   const spaeter = b.aktualisiertAm && b.aktualisiertAm !== b.veroeffentlichtAm ? `, aktualisiert am ${datumKurz(b.aktualisiertAm)}` : ''
@@ -133,7 +134,7 @@ export function Erklaerung({ beleg, mitBild }: { beleg: NewsBeleg; mitBild: bool
   const [lang, setLang] = useState(false)
   return (
     <p className={`min-w-0 flex-1 cursor-pointer md:cursor-auto ${lang ? '' : 'line-clamp-2 md:line-clamp-none'}`} onClick={() => setLang((l) => !l)} aria-expanded={lang}>
-      {erklaerung(beleg)}
+      {erklaerung(beleg, mitBild)}
       {pruefzeile(beleg, mitBild)}
       {mitBild ? ' Wir sichern von jeder Quelle ein Bild, damit prüfbar bleibt, worauf die Meldung beruht.' : ''}
     </p>

@@ -1,0 +1,93 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Fullmetal_Alchemist (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Fullmetal_Alchemist&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+==== Synchronisation ====
+Bei der zweiten Verfilmung des Mangas, deren Sprecher die folgende Tabelle aufführt, wurden sowohl in der japanischen als auch in der deutschen Synchronfassung weitgehend wieder die Sprecher der ersten Serie eingesetzt.
+{| class="wikitable"
+|- class="hintergrundfarbe5"
+! Rolle
+! Japanischer Sprecher ([[Seiyū]])
+! Deutscher Sprecher
+|-
+| Edward „Ed“ Elric
+| [[Romi Park]]
+| [[David Turba]]
+|-
+| Alphonse „Al“ Elric
+| [[Rie Kugimiya]]
+| [[Wanja Gerick]]
+|-
+| Winry Rockbell
+| [[Megumi Toyoguchi]]
+| [[Demet Fey]]
+|-
+| Roy Mustang
+| [[Shin’ichirō Miki]]
+| [[David Nathan]]
+|-
+| Riza Hawkeye
+| [[Fumiko Orikasa]]
+| [[Gabriele Wienand]]
+|-
+| Alex Louis Armstrong
+| [[Kenji Utsumi]]
+| [[Detlef Bierstedt]]
+|-
+| Maria Ross
+| [[Kaori Nazuka]]
+| [[Birte Baumgardt]]
+|-
+| Van Hohenheim
+| [[Unshō Ishizuka]]
+| [[Olaf Reitz]]
+|-
+| Izumi Curtis
+| [[Shoko Tsuda]]
+| [[Kordula Leiße]]
+|-
+| Lan Fan
+| [[Nana Mizuki]]
+| [[Winnie Brandes]]
+|-
+| Envy
+| [[Minami Takayama]]
+| [[Julien Haggége]]
+|-
+| Gluttony
+| [[Tetsu Shiratori]]
+| rowspan="2"| [[Renier Baaken]]
+|-
+| Erzähler
+| rowspan="2"| [[Iemasa Kayumi]]
+|-
+| Vater
+| [[Jochen Langner]]
+|-
+| Lust
+| [[Kikuko Inoue (Synchronsprecherin)|Kikuko Inoue]]
+| [[Ilya Welter]]
+|-
+| Greed
+| [[Yūichi Nakamura (Synchronsprecher)|Yūichi Nakamura]]
+| [[Gregor Höppner]]
+|-
+| Zolf J. Kimblee
+| [[Hiroyuki Hoshino]]
+| [[Fritz Rott (Synchronsprecher)|Fritz Rott]]
+|-
+| Großer Anführer King Bradley
+| [[Hidekatsu Shibata]]
+| [[Erich Räuker]]
+|-
+| Selim Bradley
+| [[Yuko Sanpei]]
+| [[Rieke Werner]]
+|-
+| Sloth
+| [[Fumihiko Tachiki]]
+| [[Hans Bayer (Schauspieler)|Hans Bayer]]
+|-
+| Scar
+| [[Kenta Miyake]]
+| [[Stefan Schleberger]]
+|}

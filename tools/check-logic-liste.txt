@@ -344,6 +344,7 @@ pipeline/check-handlung-eigen-hinweis.ts
 pipeline/check-handlung-eigen.ts
 pipeline/check-handlung-quelle-panel.ts
 pipeline/check-handlung-quelle.ts
+pipeline/check-handlung-satz.ts
 pipeline/check-hauptrelease.ts
 pipeline/check-herkunft-je-folge.ts
 pipeline/check-herkunftsfilter.ts
@@ -473,6 +474,8 @@ pipeline/check-monitor-statistik.ts
 pipeline/check-motn-reihe.ts
 pipeline/check-motn-uebernahme.ts
 pipeline/check-nachlade-vorwaermen.ts
+pipeline/check-nachleger-im-kasten.ts
+pipeline/check-nachleger-panel.ts
 pipeline/check-namens-zuordnung.ts
 pipeline/check-nebendateien-laufzeit.ts
 pipeline/check-nein-datum.ts
@@ -683,6 +686,7 @@ pipeline/check-staffelzaehlung.ts
 pipeline/check-staffelzitat.ts
 pipeline/check-stand-halten.ts
 pipeline/check-start-texte.ts
+pipeline/check-stream-pillen-sichtbar.ts
 pipeline/check-streaming-kleinfixes.ts
 pipeline/check-streaming-luecke-klassen.ts
 pipeline/check-streaming-luecke.ts
@@ -709,6 +713,8 @@ pipeline/check-synchro-termin-offen.ts
 pipeline/check-synchro-widerspruch.ts
 pipeline/check-tab-titel-quelle-lauf.ts
 pipeline/check-takt.ts
+pipeline/check-teilen-knoepfe-karten.ts
+pipeline/check-teilen-knopf.ts
 pipeline/check-telekom-annahme.ts
 pipeline/check-telekom-pille.ts
 pipeline/check-termin-knopfzahl.ts
@@ -791,6 +797,7 @@ pipeline/check-verweis-grund-region.ts
 pipeline/check-verweis-ziel.ts
 pipeline/check-verweise-gedaechtnis.ts
 pipeline/check-verweise-von-hand.ts
+pipeline/check-vor-beobachtung.ts
 pipeline/check-vorfaelle-ablauf.ts
 pipeline/check-vorlieben-getrennt.ts
 pipeline/check-vorlieben.ts

@@ -99,6 +99,8 @@ const nichtGefuehrtBei = new Set<string>()
 let kinocheckFehler = false
 let leerAlle = false
 let kanalVideos: { id: string; titel: string }[] = []
+let labelVideos: { id: string; titel: string }[] = []
+let beispielAbrufe = 0
 
 /** Rennt gegen eine Wartezeit: ein hängender Lauf (Frist-Abbruch) endet nie, `true` heißt „kam nicht zu Ende“. */
 async function bisAbbruch(lauf: Promise<void>): Promise<boolean> {
@@ -110,6 +112,14 @@ async function bisAbbruch(lauf: Promise<void>): Promise<boolean> {
 globalThis.fetch = (async (eingabe: string | URL | Request): Promise<Response> => {
   const url = String(eingabe)
   const antwort = (daten: unknown, status = 200): Response => new Response(JSON.stringify(daten), { status })
+  if (url.includes('/youtube/v3/search')) return url.includes('Ausfall') ? antwort({}, 500) : antwort({ items: [] })
+  if (url.includes('/youtube/v3/videos') && url.includes('part=snippet')) {
+    beispielAbrufe++
+    return antwort({ items: [{ id: 'BEISPIEL', snippet: { channelId: 'UCksmProbe0000000000000', channelTitle: 'KSM Anime' } }] })
+  }
+  if (url.includes('/youtube/v3/playlistItems') && url.includes('UUksmProbe0000000000000')) {
+    return antwort({ items: labelVideos.map((v) => ({ snippet: { title: v.titel, publishedAt: '2026-08-13T00:00:00Z', resourceId: { videoId: v.id } } })) })
+  }
   if (url.includes('/youtube/v3/videos')) {
     const gefragt = (/[?&]id=([^&]+)/.exec(url)?.[1] ?? '').split(',')
     return antwort({ items: gefragt.map((id) => ({ id })) })
@@ -240,6 +250,37 @@ const kanalErgebnis = lies<Record<string, { video: string; herkunft: string }>>(
 pruefe('Kanalindex: der Film bekommt den Kanal-Trailer', kanalErgebnis['909001']?.video === 'vidA' && kanalErgebnis['909001']?.herkunft === 'kanal', kanalErgebnis['909001'])
 pruefe('Kanalindex: die Serie mit gleichem Namen bekommt ihn nicht, TMDB antwortet', kanalErgebnis['909002']?.herkunft === 'tmdb', kanalErgebnis['909002'])
 pruefe('Kanalindex: für den Film kein TMDB-Abruf nötig', tmdbAbrufe.join(',') === '42', tmdbAbrufe)
+
+/* A7: Label-Kanal (KSM Anime) — Serie bekommt den deutschen Trailer, auch ohne Pool-Zugehörigkeit; ein OmU-Video nicht; TMDB-Ersatz wird ersetzt. */
+mkdirSync(join(wurzel, 'data', 'curated'), { recursive: true })
+writeFileSync(join(wurzel, 'data', 'curated', 'trailer-label-kanaele.yaml'), 'kanaele:\n  - name: KSM Anime\n    beispielVideo: BEISPIEL\n  - name: Gibt Es Nicht\n  - name: Ausfall Kanal\n')
+richteEin(
+  [probe(910001, 'TV', 2023, 'Heretic Queen Saga'), probe(910002, 'TV', 2023, 'Quiet Garden Tales')],
+  { '910001': { tmdbId: 43, kind: 'tv' }, '910002': { tmdbId: 44, kind: 'tv' } },
+)
+rmSync(join(wurzel, 'data', 'trailer-label-kanaele.json'), { force: true })
+schreibe('public/data/empfehlung.json', { einstiege: [] })
+schreibe(join('data', 'trailer.json'), { '910001': { video: 'enAlt', titel: 'PV', sprache: 'en', herkunft: 'tmdb', gefundenAm: '2026-10-01' } })
+labelVideos = [
+  { id: 'ksm1', titel: 'HERETIC QUEEN SAGA | Trailer HD | Deutsch | Anime | 2026' },
+  { id: 'ksm2', titel: 'QUIET GARDEN TALES | Trailer | OmU | Anime | 2026' },
+]
+beispielAbrufe = 0
+await main({ riegel: 9 })
+const labelErgebnis = lies<Record<string, { video: string; sprache: string; herkunft: string }>>(join('data', 'trailer.json'))
+pruefe('Label: Serie bekommt den deutschen KSM-Trailer statt des englischen', labelErgebnis['910001']?.video === 'ksm1' && labelErgebnis['910001']?.sprache === 'de' && labelErgebnis['910001']?.herkunft === 'label', labelErgebnis['910001'])
+pruefe('Label: OmU-Video wird nicht zugeordnet', labelErgebnis['910002']?.video !== 'ksm2', labelErgebnis['910002'])
+pruefe('Label: zugeordnete Serie kostet keinen TMDB-Abruf', !arten.includes('tv:43'), arten)
+const kanalStand = lies<Record<string, { uploads?: string; versuchAm: string }>>(join('data', 'trailer-label-kanaele.json'))
+pruefe('Label: Kennung aus der API, Uploads-Playlist abgeleitet', kanalStand['KSM Anime']?.uploads === 'UUksmProbe0000000000000', kanalStand)
+pruefe('Label: unbekannter Name bekommt Fehlversuch-Stempel statt Kennung', kanalStand['Gibt Es Nicht']?.uploads === undefined && Boolean(kanalStand['Gibt Es Nicht']?.versuchAm), kanalStand)
+pruefe('Label: ausgefallene Abfrage wird nicht gestempelt (keine Auskunft)', kanalStand['Ausfall Kanal'] === undefined, kanalStand)
+const ersteBeispiele = beispielAbrufe
+await main({ riegel: 9 })
+pruefe('Label: zweiter Lauf löst nichts erneut auf', beispielAbrufe === ersteBeispiele, [ersteBeispiele, beispielAbrufe])
+labelVideos = []
+rmSync(join(wurzel, 'data', 'curated'), { recursive: true, force: true })
+rmSync(join(wurzel, 'data', 'trailer-label-kanaele.json'), { force: true })
 
 /* A6: ein gescheiterter Abruf stempelt nicht, der nächste Lauf fragt wieder. */
 const drei = [probe(907001, 'TV'), probe(907002, 'TV'), probe(907003, 'TV'), probe(907004, 'TV')]

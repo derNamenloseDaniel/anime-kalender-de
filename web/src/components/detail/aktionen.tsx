@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { anzeigeName } from '@shared/titles.ts'
-import { teilbarerSlug } from '@shared/teilen.ts'
+import { teilenZiel } from '@shared/teilen.ts'
 import type { Title } from '@shared/types.ts'
 import { useShare } from '../../lib/share.ts'
 import type { Translate } from '../../lib/i18n.tsx'
@@ -55,18 +55,17 @@ export function PanelAktionen({ title, favorites, onToggleFavorite, onToggleHidd
 }) {
   const { share, copiedSlug } = useShare()
   const gemerkt = favorites.has(title.id)
+  const ziel = teilenZiel(title)
   return (
     <div className="flex flex-wrap gap-2 px-4 pb-4">
       <button type="button" aria-pressed={gemerkt} onClick={() => onToggleFavorite(title.id)} className={`${KNOPF} ${gemerkt ? AN : ''}`}>
         <Stern gefuellt={gemerkt} />
         {t(gemerkt ? 'kopf.gemerkt' : 'kopf.merken')}
       </button>
-      {teilbarerSlug(title) && (
-        <button type="button" onClick={() => share(title.slug, anzeigeName(title))} className={KNOPF}>
-          <Kette />
-          {t(copiedSlug === title.slug ? 'kopf.kopiert' : 'detail.share')}
-        </button>
-      )}
+      <button type="button" onClick={() => share(ziel, anzeigeName(title))} className={KNOPF}>
+        <Kette />
+        {t(copiedSlug === ziel ? 'kopf.kopiert' : 'detail.share')}
+      </button>
       <Tooltip text={t('kopf.ausblenden')} seite="unten">
         <button type="button" onClick={() => onToggleHidden(title.id)} aria-label={t('kopf.ausblenden')} className={KNOPF_ZEICHEN}>
           <Auge />

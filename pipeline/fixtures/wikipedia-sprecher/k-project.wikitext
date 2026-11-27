@@ -1,0 +1,18 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/K_Project (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=K_Project&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+Die deutsche Synchronfassung entstand bei [[G&G Tonstudios]] unter der Regie und nach einem Dialogbuch von [[Jörn Friese]].
+{| class="wikitable"
+! Rolle || Japanische Stimme || Deutsche Stimme
+|-
+| Yashiro Isana || [[Daisuke Namikawa]] || [[Nicolás Artajo]]
+|-
+| Kurō Yatogami || [[Daisuke Ono]] || [[Arne Stephan]]
+|-
+| Mikoto Suō || [[Kenjiro Tsuda]] || [[Tobias Brecklinghaus]]
+|-
+| Neko || [[Mikako Komatsu]] || [[Patricia Strasburger]]
+|-
+| Reisi Munakata || [[Tomokazu Sugita]] || [[Norman Matt]]
+|}

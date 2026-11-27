@@ -1,0 +1,25 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/The_Quintessential_Quintuplets (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=The_Quintessential_Quintuplets&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+[[Datei:The Quintessential Quintuplets cosplayers 20190727b.jpg|miniatur|300px|rechts|[[Cosplayer]]innen verkörpern die Nakano-Fünflinge, 2019. <br /><small>V.l.n.r: Itsuki, Yotsuba, Miku, Nino und Ichika Nakano.</small>]]Die deutsche Synchronfassung entstand bei Oxygen Sound Studios unter der Regie von [[Jasmin Arnoldt]] (Staffel 1) und [[Wiebke Westphal]] (Staffel 2/Kinofilm).<ref>{{Internetquelle |url=https://www.synchronkartei.de/serie/50771 |titel=Deutsche Synchronkartei {{!}} Serien {{!}} The Quintessential Quintuplets |abruf=2024-10-19}}</ref><ref>{{Internetquelle |url=https://www.synchronkartei.de/film/55126 |titel=Deutsche Synchronkartei {{!}} Filme {{!}} The Quintessential Quintuplets Movie |abruf=2024-10-19}}</ref>
+{| class="wikitable"
+! Rolle || japanische Sprecher([[Seiyū]])<ref name="sprecher_quint">{{Internetquelle |url=https://www.anisearch.de/anime/13794,the-quintessential-quintuplets/seiyuu |titel=Sprecherliste |hrsg=[[AniSearch|AniSearch.de]] |abruf=2021-08-06}}</ref> || deutsche Sprecher<ref name="sprecher_quint"></ref>
+|-
+| Fūtarō Uesugi || [[Yoshitsugi Matsuoka]] || [[Amadeus Strobl]]
+|-
+| Ichika Nakano || [[Kana Hanazawa]] || [[Lisa Braun]]
+|-
+| Nino Nakano || [[Ayana Taketatsu]] || [[Christina Wöllner]]
+|-
+| Miku Nakano || [[Miku Itō]] || [[Giovanna Winterfeldt]]
+|-
+| Yotsuba Nakano || [[Ayane Sakura]] || [[Sarah Tkotsch]]
+|-
+| Itsuki Nakano || [[Inori Minase]] || [[Nicole Hannak]]
+|-
+| Raiha Uesugi || [[Natsumi Takamori]] || [[Saskia Glück]]
+|-
+| Isanari Uesugi || [[Satoshi Hino]] || [[Dirk Bublies]]
+|-
+|}

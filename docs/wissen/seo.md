@@ -33,6 +33,10 @@ Chronik zu `pipeline/build-share-pages.ts` und `pipeline/lib/{startseite,titel-s
 - **Kleine Fassung und Cartoon-Cover als Vorschau (11.11.2026, Datenstand `e9a6a5a7d`):** Ein AniList-`large`-Cover über 250 KB führt die Seite mit seiner `medium`-Fassung (`mediumFassung`, gleicher Dateiname unter `/cover/medium/`; alle 100 gemessenen Fassungen 120–250 KB, 230 px breit, kein neuer Hotlink-Host); `ungemessene` fügt sie hinzu, sobald `large` gemessen und unbrauchbar ist (zwei Läufe). Cartoon-Cover (TMDB `w342`, im Bestand 914) führen die Seite mit den Maßen der w342-Datei selbst (`data/cartoon-cover-masse.json`, `lib/cartoon-cover-masse.ts`; die Original-Maße in `tmdb-poster.json` kennen Cartoon-Pfade nicht, w500 wäre also geraten); nur mit Breite 342 und bis 250 KB. Wirkung (Standardbild ohne Termin, Anime + Cartoons): mit Cover 118 → 16 (nur die aniSearch-Kopien aus dem Bucket-Fehler), ohne Cover 12 bleiben, gesamt 130 → 28. Grenzen `check-cover-vorschau-bestand.ts` und `check-teilseiten.ts` 110/170 → 27.
 - Nach dem Deploy WhatsApp-Cache der Adresse im Facebook-Debugger mit „Scrape Again“ erneuern.
 
+## Teilen-Knopf bei Titeln ohne Synchro (27.11.2026)
+
+Daniel: „share btn fehlt bei titel ohne synchro“. `teilbarerSlug` blendete den Knopf aus, weil der Katalog ohne Synchro (17.791 Titel, `ohne-synchro.json`) keine `/t/<ak>/`-Seite hat; die 404 führt dort zur Startseite. Seit 27.11.2026 nennt der Knopf `teilenZiel(titel)`: Teilen-Seite, sonst `#/woche?t=<ak>`; diese Adresse öffnet das Panel, das den Titel über `ladeTitelBestand` nachlädt. Ohne Vorschaubild (alles hinter `#` erreicht keinen Crawler), dafür ohne 17.791 zusätzliche Seiten im Bau. Panel, Datenbank-Karte und Kalender-Poster zeigen den Knopf immer. Wächter: `pipeline/check-teilen-knopf.ts`.
+
 ## Prüfungen
 
 - `check:logic` → `pipeline/check-seiten-seo.ts` (Ähnliche Titel, Startseite, Verzeichnis, Brotkrumen, Seitentitel, `lastmod`; Gegenproben).

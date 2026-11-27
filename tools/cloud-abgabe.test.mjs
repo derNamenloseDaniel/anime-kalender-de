@@ -37,7 +37,10 @@ function welt({ zweige = {}, dateien = {}, prs = {}, kommentare = {}, labels = {
     zeile: (t) => log.push(['zeile', t]),
     datei: (zweig, name) => dateien[zweig]?.[name] ?? null,
     zweigSha: (z) => zweige[z] ?? null,
-    aenderungen: () => aenderungen,
+    aenderungen: (z) => {
+      log.push(['aenderungen', z])
+      return aenderungen
+    },
     offenerPr: (z) => (prs[z] === undefined ? null : { nummer: prs[z] }),
     prAnlegen: (a) => {
       log.push(['prAnlegen', a])
@@ -482,6 +485,7 @@ for (const [args, muster] of [[[], /Aufruf/], [['fix/foo'], /kein prtext-Zweig/]
   pruefe('Patch Notes: Grund ohne Klasse (Daten …) bei sichtbarer Änderung → Exit 2', ohneKlasse.code === 2 && aufrufe(ohneKlasse.w, 'prAnlegen').length === 0, ohneKlasse.meldung)
   const gut = lauft({ aenderungen: SICHTBAR, dateien: mitZeile('Patch Notes: keine – intern: Datei wird von nichts gelesen') })
   pruefe('Patch Notes: „keine – <Klasse>: Grund“ → PR angelegt', gut.code === 0 && aufrufe(gut.w, 'prAnlegen').length === 1, gut.meldung)
+  pruefe('Patch Notes: Änderungen werden für den Code-Zweig der Abgabe abgefragt', JSON.stringify(aufrufe(gut.w, 'aenderungen')) === '[["aenderungen","fix/foo"]]', JSON.stringify(aufrufe(gut.w, 'aenderungen')))
   const neueDatei = lauft({ aenderungen: `${SICHTBAR}A\tdata/patchnotes/ein-satz.yaml\n` })
   pruefe('Patch Notes: neue Datei in data/patchnotes/ genügt ohne Zeile', neueDatei.code === 0 && aufrufe(neueDatei.w, 'prAnlegen').length === 1, neueDatei.meldung)
   const geaendert = lauft({ aenderungen: `${SICHTBAR}M\tdata/patchnotes/alt.yaml\n` })
@@ -490,6 +494,18 @@ for (const [args, muster] of [[[], /Aufruf/], [['fix/foo'], /kein prtext-Zweig/]
   pruefe('Patch Notes: nur Doku und Werkzeug → keine Zeile nötig', unsichtbar.code === 0 && aufrufe(unsichtbar.w, 'prAnlegen').length === 1, unsichtbar.meldung)
   const offen = lauft({ aenderungen: SICHTBAR, prs: { 'fix/foo': 50 } })
   pruefe('Patch Notes: bei offenem PR kein Anlegen und keine Prüfung (nur Nachtrag)', offen.code === 0 && aufrufe(offen.w, 'prAnlegen').length === 0, offen.meldung)
+  const mehrere = lauft({ aenderungen: `M\tdocs/a.md\nM\ttools/b.mjs\n${SICHTBAR}` })
+  pruefe('Patch Notes: sichtbare Datei in der dritten Zeile wird erkannt (alle Zeilen zählen)', mehrere.code === 2 && aufrufe(mehrere.w, 'prAnlegen').length === 0, mehrere.meldung)
+  const datenTitel = (zeile) => ({ 'prtext/foo': { 'pr.md': `<!-- titel: fix(data): Beispiel -->\nText\n${zeile}\n`, 'bericht.md': BERICHT } })
+  const ohneWirkung = lauft({ aenderungen: SICHTBAR, dateien: datenTitel('Patch Notes: keine – intern: kein sichtbarer Unterschied') })
+  pruefe('Patch Notes: Titel fix(data) verlangt die gemessene Wirkung („0 Titel …“) in der Zeile', ohneWirkung.code === 2 && aufrufe(ohneWirkung.w, 'prAnlegen').length === 0, ohneWirkung.meldung)
+  const mitWirkung = lauft({ aenderungen: SICHTBAR, dateien: datenTitel('Patch Notes: keine – intern: 0 Titel ändern sich') })
+  pruefe('Patch Notes: Titel fix(data) mit „0 Titel …“ → PR angelegt', mitWirkung.code === 0 && aufrufe(mitWirkung.w, 'prAnlegen').length === 1, mitWirkung.meldung)
+  const vertagt = 'Patch Notes: vertagt – wirkt erst nach dem nächsten Lauf'
+  const ohneVorrat = lauft({ aenderungen: SICHTBAR, dateien: mitZeile(vertagt) })
+  pruefe('Patch Notes: „vertagt“ ohne Entwurf unter vorrat/ → Exit 2', ohneVorrat.code === 2 && aufrufe(ohneVorrat.w, 'prAnlegen').length === 0, ohneVorrat.meldung)
+  const mitVorrat = lauft({ aenderungen: `${SICHTBAR}A\tdata/patchnotes/vorrat/ein-satz.yaml\n`, dateien: mitZeile(vertagt) })
+  pruefe('Patch Notes: „vertagt“ mit neuem Entwurf unter vorrat/ → PR angelegt', mitVorrat.code === 0 && aufrufe(mitVorrat.w, 'prAnlegen').length === 1, mitVorrat.meldung)
 }
 
 console.log(`cloud-abgabe.test: ${anzahl} Prüfungen, ${fehler} Fehler`)

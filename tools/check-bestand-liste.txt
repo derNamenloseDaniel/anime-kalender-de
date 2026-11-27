@@ -82,6 +82,7 @@ pipeline/check-news-offiziell-bestand.ts
 pipeline/check-nur-omu-bestand.ts
 pipeline/check-pokemon-staffeln-bestand.ts
 pipeline/check-prime-gleiche-gti-bestand.ts
+pipeline/check-prime-suchlink-bestand.ts
 pipeline/check-prime-teilseiten-bestand.ts
 pipeline/check-reihen-namen-bestand.ts
 pipeline/check-reihen-reiter-bestand.ts

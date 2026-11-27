@@ -58,6 +58,28 @@ pruefe('Disc und Titelseite zählen nicht', offeneTerminSuchen(r3, [titel(5, [])
 const r4 = [termin(7, 'Aniverse', { platformUrl: 'https://www.amazon.de/s?k=Testtitel%207&i=instant-video' })]
 pruefe('Suche am Termin ist ein Auftrag', offeneTerminSuchen(r4, [titel(7, [])]).length === 1)
 
+/* Mutanten der Prüfer-Runde 2 (PR 5105): jede Teilbedingung der Auswahl und der Inhalt des Auftrags einzeln. */
+const AMAZON_SUCHE = 'https://www.amazon.de/s?k=Testtitel%209&i=instant-video'
+const auswahl = [
+  termin(9, 'Aniverse', { platform: 'netflix' as Release['platform'] }), // anderer Anbieter, kein Disc, keine Kauf-Adresse
+  termin(9, 'Aniverse', { releaseType: 'disc' }), // Prime, aber Typ disc
+  termin(9, 'Aniverse', { buyUrl: 'https://www.amazon.de/dp/B0TESTKAUF' } as Partial<Release>), // Prime mit Kauf-Adresse
+  termin(99, 'Aniverse'), // Titel unbekannt: kein Absturz, kein Auftrag
+  termin(9, 'Aniverse', { platformUrl: 'https://www.amazon.de/s?k=Testtitel%209&i=instant-video' }), // der erste Termin des Titels gewinnt
+  termin(9, 'Aniverse', { platformUrl: 'https://www.amazon.de/s?k=ANDERE&i=instant-video' }),
+]
+const titel9 = [titel(9, [])]
+const aus = offeneTerminSuchen(auswahl, titel9)
+pruefe('Auswahl: nur der erste Prime-Termin ohne Kauf/Disc/Titelseite, je Titel ein Auftrag', aus.length === 1 && aus[0]!.id === 9, aus)
+pruefe('Auftrag: Titel, Plattform und die Adresse des ersten Termins', JSON.stringify(aus[0]) === JSON.stringify({ id: 9, titel: 'Testtitel 9', plattform: 'primevideo', url: AMAZON_SUCHE }), aus[0])
+const ohneAdresse = offeneTerminSuchen([termin(9, 'Aniverse')], titel9)
+pruefe('Termin ohne Adresse: Suche aus dem Anzeigenamen', ohneAdresse[0]?.url === AMAZON_SUCHE, ohneAdresse[0])
+const w = suchlinksOhneAusweg(auswahl.slice(0, 4), titel9, new Set())
+pruefe('Wächter: Netflix, Disc, Kauf-Adresse und unbekannter Titel sind kein Verstoß', w.probleme.length === 0, w)
+pruefe('Wächter: Titelseite am Termin ist kein Verstoß', suchlinksOhneAusweg([termin(9, 'Aniverse', { platformUrl: 'https://www.amazon.de/gp/video/detail/B0TESTCCCC' })], titel9, new Set()).probleme.length === 0)
+const vorrang = suchlinksOhneAusweg([termin(1, 'Aniverse')], titel1, new Set([1]))
+pruefe('Wächter: Direktlink desselben Kanals ist auch mit Auftrag ein Verstoß, mit Adresse im Text', vorrang.probleme.length === 1 && vorrang.probleme[0]!.includes(DIREKT) && vorrang.probleme[0]!.includes('Direktlink desselben Kanals'), vorrang)
+
 /* Der Aufrufer: `schreibeDatensatz` reicht `offeneTerminSuchen(releases, allTitles)` unbedingt als dritte Liste an die Suchadressen (Mutant: Aufruf weg, `[]`, `titles`). */
 const schreiben = unbedingteAufrufe(readFileSync(new URL('./bau/13-schreiben.ts', import.meta.url), 'utf8'), 'schreibeDatensatz')
 pruefe('13-schreiben: Suchadressen mit offeneTerminSuchen(releases, allTitles)', schreiben.find((a) => a.name === 'schreibeSuchadressenImEndzustand')?.args.join('|') === 'suchOffen|slim|offeneTerminSuchen(releases, allTitles)', schreiben.find((a) => a.name === 'schreibeSuchadressenImEndzustand')?.args)

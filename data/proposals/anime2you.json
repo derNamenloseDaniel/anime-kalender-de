@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-26T23:14:03.526Z",
+  "scrapedAt": "2026-11-27T03:01:43.694Z",
   "verworfen": {
     "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 6,
@@ -3511,7 +3511,7 @@
       ],
       "dates": [],
       "dub": "ja",
-      "alreadyCurated": false,
+      "alreadyCurated": true,
       "sammel": [
         {
           "titel": "A Wild Last Boss Appeared!",
@@ -6643,7 +6643,7 @@
       ],
       "dates": [],
       "dub": "unklar",
-      "alreadyCurated": false,
+      "alreadyCurated": true,
       "sammel": [
         {
           "titel": "#I’m Looking For a Zombie",

@@ -132,6 +132,10 @@ jobs:
       - name: Wikipedia — Folgennummern für das TV-Programm
         run: bash tools/schritt.sh --zeit 10m "Wikipedia-Folgennummern" -- npm run data:wikipedia-folgen
 
+      # Deutsche Sprecher für die Seiten der Handliste data/wikipedia-sprecher-seiten.yaml (je Seite einmal je Woche, 2 s Abstand).
+      - name: Wikipedia — Sprechertabellen der Handliste
+        run: bash tools/schritt.sh --zeit 5m "Wikipedia-Sprecher" -- npm run data:wikipedia-sprecher
+
       # Erzeugt nur Vorschläge für die Kuratierung, keine Termine.
       - name: Nachrichtenlage bei Anime2You prüfen
         run: bash tools/schritt.sh --zeit 12m "Anime2You" -- npm run data:anime2you

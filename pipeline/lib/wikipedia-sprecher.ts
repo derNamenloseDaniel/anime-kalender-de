@@ -1,5 +1,5 @@
 /**
- * Sprechertabelle aus dem Wikitext eines de.wikipedia-Abschnitts „Synchronisation“ (Vorstufe, noch ohne Bau-Anschluss).
+ * Sprechertabelle aus dem Wikitext eines de.wikipedia-Abschnitts „Synchronisation“ (Sammler `fetch-wikipedia-sprecher.ts`, Bau `bau/sprecher-wikipedia.ts`).
  * Quelle: de.wikipedia, Lizenz CC BY-SA 4.0 (Quellennennung mit Link auf die Versionsgeschichte der Seite).
  * Gelesen werden Wikitext-Tabellen mit einer Spalte „Deutsch…“ in der Kopfzeile (auch zweizeiliger Kopf mit
  * rowspan/colspan, mehrere deutsche Spalten je Fassung). Datenzellen gelten als eine Spalte je Zelle.
@@ -102,9 +102,11 @@ function spaltenPfade(kopfzeilen: Zeile[]): string[][] {
 
 function stimmen(zellText: string, spaltenZusatz: string | null): DeutscheStimme[] {
   const aus: DeutscheStimme[] = []
-  for (const teil of zellText.split(/<br\s*\/?>/i)) {
+  // Zweite Stimme auch auf eigener Zeile ohne <br>, wenn sie mit einem Namen beginnt (Ranma, Stand 26.11.2026:
+  // „Thomas Rauscher\n[[Torsten Münchow]] <small>…“); kleingeschrieben setzt die Zeile die Stimme fort.
+  for (const teil of zellText.split(/<[Bb][Rr]\s*\/?>|\n(?=\s*\p{Lu})/u)) {
     const klein = /<small>([\s\S]*?)<\/small>/i.exec(teil)?.[1]?.replace(/^\s*\(|\)\s*$/g, '').trim()
-    const sprecher = teil.replace(/<small>[\s\S]*?<\/small>/gi, '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+    const sprecher = teil.replace(/<small>[\s\S]*?<\/small>/gi, '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').replace(/,$/, '').trim()
     if (KEINE_STIMME.has(sprecher)) continue
     const zusatz = [spaltenZusatz, klein].filter((x): x is string => !!x).join(', ')
     aus.push({ sprecher, zusatz: zusatz || null })

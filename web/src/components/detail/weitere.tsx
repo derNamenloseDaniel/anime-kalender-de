@@ -67,22 +67,34 @@ export function WeitereTitel({ title }: { title: Title }) {
  * eine Quellenangabe **und** einen Link zum jeweiligen Eintrag auf jeder Seite, die die Angaben zeigt. Der Link steht
  * deshalb hier und nicht auf der Quellenseite: Er gehört dorthin, wo die Daten stehen.
  */
-function VoiceQuellen({ stimmen }: { stimmen: Voices }) {
+export function VoiceQuellen({ stimmen }: { stimmen: Voices }) {
   const { t } = useLang()
   const namen = [stimmen.roles.some((r) => r.von === 'anisearch') && 'aniSearch', stimmen.roles.some((r) => !r.von) && 'AniList'].filter(Boolean)
+  // Wikipedia (CC BY-SA 4.0) verlangt wie ANN die Quelle mit Link an der Stelle, wo die Angaben stehen.
+  const links = [
+    stimmen.annUrl && { url: stimmen.annUrl, name: 'Anime News Network' },
+    stimmen.wikipedia && stimmen.roles.some((r) => r.von === 'wikipedia') && { url: stimmen.wikipedia.url, name: `Wikipedia („${stimmen.wikipedia.seite}“)` },
+  ].filter((l): l is { url: string; name: string } => Boolean(l))
   return (
     <p className="mt-2 text-t5 text-ak-leise">
       {t('detail.voicesSource')} {namen.join(', ')}
-      {stimmen.annUrl && (
-        <>
-          {namen.length ? ', ' : ''}
-          <a href={stimmen.annUrl} target="_blank" rel="noreferrer noopener" className="underline hover:text-ak-text">
-            Anime News Network
+      {links.map((l, i) => (
+        <Fragment key={l.url}>
+          {namen.length || i ? ', ' : ''}
+          <a href={l.url} target="_blank" rel="noreferrer noopener" className="underline hover:text-ak-text">
+            {l.name}
           </a>
-        </>
-      )}
+        </Fragment>
+      ))}
     </p>
   )
+}
+
+/** Vermutete Besetzung: die Wikipedia-Tabelle nennt diesen Film, dieses Special oder diese Staffel nicht. */
+export function VoiceVermutet({ stimmen }: { stimmen: Voices }) {
+  const { t } = useLang()
+  const grund = stimmen.roles.some((r) => r.von === 'wikipedia') ? stimmen.wikipedia?.unsicher : undefined
+  return grund ? <p className="mb-2 text-t5 text-ak-leise">{t('detail.voicesVermutet', { grund })}</p> : null
 }
 
 /**
@@ -133,6 +145,7 @@ export function VoiceCast({ titleId }: { titleId: number }) {
             <p className="text-t3 text-ak-leise">{t('detail.voicesNone')}</p>
           ) : (
             <>
+              <VoiceVermutet stimmen={stimmen} />
               <dl className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-x-3 gap-y-1 text-t3">
                 {stimmen.roles.map((r) => (
                   <Fragment key={`${r.character}-${r.actor}`}>

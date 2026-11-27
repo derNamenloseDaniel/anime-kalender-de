@@ -22,13 +22,15 @@ const GRUPPE_MAX_GZIP = 60_000
 
 interface VoiceDatei {
   titleId: number
-  roles?: { character: string; actor: string; von?: 'ann' | 'anisearch' }[]
+  roles?: { character: string; actor: string; von?: 'ann' | 'anisearch' | 'wikipedia' }[]
+  wikipedia?: { unsicher?: string }
 }
 
 export function schreibeSprecherIndex({ ausgeliefert }: { ausgeliefert: Set<number> }): void {
   const gruppen = new Map<string, SprecherGruppe>()
   const titelJeName = new Map<string, Map<number, SprecherTitel>>()
   let dateienOhneTitel = 0
+  let vermutet = 0
   if (existsSync(VOICES_DIR)) {
     for (const datei of readdirSync(VOICES_DIR)) {
       if (!datei.endsWith('.json')) continue
@@ -39,6 +41,11 @@ export function schreibeSprecherIndex({ ausgeliefert }: { ausgeliefert: Set<numb
         continue
       }
       if (!inhalt.roles?.length) continue
+      // Vermutete Besetzung (Wikipedia-Tabelle nennt diesen Teil nicht): die Suche „Wer sprach wo?“ nennt nur Belegtes.
+      if (inhalt.wikipedia?.unsicher) {
+        vermutet++
+        continue
+      }
       if (!ausgeliefert.has(inhalt.titleId)) {
         dateienOhneTitel++
         continue
@@ -77,7 +84,8 @@ export function schreibeSprecherIndex({ ausgeliefert }: { ausgeliefert: Set<numb
   writeJson(`${OUT}/sprecher.json`, index)
   log(
     `Sprecher-Index: ${index.sprecher.length} Sprecher in ${gruppen.size} Gruppen (Index ${Math.round(indexBytes / 1024)} KB, größte Gruppe ${Math.round(groessteGruppe / 1024)} KB gepackt)` +
-      (dateienOhneTitel ? `; ${dateienOhneTitel} Sprecherdateien zu nicht ausgelieferten Titeln übergangen` : ''),
+      (dateienOhneTitel ? `; ${dateienOhneTitel} Sprecherdateien zu nicht ausgelieferten Titeln übergangen` : '') +
+      (vermutet ? `; ${vermutet} Titel mit vermuteter Wikipedia-Besetzung nicht im Index` : ''),
   )
 }
 

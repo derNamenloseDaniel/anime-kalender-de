@@ -13,8 +13,8 @@ export interface Rolle {
   character: string
   actor: string
   role?: string
-  /** Fehlt = AniList. */
-  von?: 'ann' | 'anisearch'
+  /** Fehlt = AniList. `wikipedia` füllt nur Titel ohne andere Rollen (`sprecher-wikipedia.ts`). */
+  von?: 'ann' | 'anisearch' | 'wikipedia'
 }
 
 export interface AnisearchRolle {

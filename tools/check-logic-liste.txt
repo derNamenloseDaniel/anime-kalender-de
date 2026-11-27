@@ -664,6 +664,8 @@ pipeline/check-sprache-termin.ts
 pipeline/check-sprecher-anisearch.ts
 pipeline/check-sprecher-dran.ts
 pipeline/check-sprecher-filter.ts
+pipeline/check-sprecher-wikipedia-anzeige.ts
+pipeline/check-sprecher-wikipedia-bau.ts
 pipeline/check-sprung-lage.ts
 pipeline/check-sprung-lesestelle.ts
 pipeline/check-staerkste-seite.ts
@@ -831,6 +833,7 @@ pipeline/check-widerlegung-de-folgen-bau.ts
 pipeline/check-widerlegung-de-folgen.ts
 pipeline/check-widerlegung-eigene-serie.ts
 pipeline/check-wikibis-wegbereiche.ts
+pipeline/check-wikipedia-sprecher-sammeln.ts
 pipeline/check-wikipedia-sprecher.ts
 pipeline/check-woche-beleg.ts
 pipeline/check-woche-groesse.ts

@@ -2,9 +2,8 @@
  * Zählt die `WARNUNG`-Zeilen des Baus dort, wo sie entstehen (`log`/`warn` in `util.ts`), und liefert am Bau-Ende die Zusammenfassung:
  * Anzahl je Art, absteigend, höchstens `MAX_ARTEN`, dazu die Gesamtzahl. Kein Parsen der Konsole, keine Dateiänderung am Datensatz.
  * Die Zusammenfassung selbst enthält kein „WARNUNG“ (`tools/commit-data.sh` macht solche Zeilen zu Annotationen).
+ * Das Melden am Bau-Ende steht in `warnungen-melden.ts` (diese Datei liegt über `util.ts` im Importgraph von `fetch.ts`).
  */
-import { appendFileSync } from 'node:fs'
-
 export const MAX_ARTEN = 20
 const ZEICHEN_ART = 40
 const zaehler = new Map<string, number>()
@@ -39,11 +38,4 @@ export function warnungsZusammenfassung(): string {
   const gezeigt = sortiert.slice(0, MAX_ARTEN).map(([art, n]) => `${n}× ${art}`)
   const weitere = sortiert.length - gezeigt.length
   return `Warnungen im Bau: ${gesamt} in ${sortiert.length} Arten — ${gezeigt.join('; ')}${weitere > 0 ? `; … ${weitere} weitere Arten` : ''}`
-}
-
-/** Am Bau-Ende: Zeile ins Log, im GitHub-Actions-Lauf zusätzlich ins Step Summary. */
-export function meldeWarnungen(zusammenfassungsDatei = process.env.GITHUB_STEP_SUMMARY): void {
-  const zeile = warnungsZusammenfassung()
-  console.log(`[pipeline] ${zeile}`)
-  if (zusammenfassungsDatei) appendFileSync(zusammenfassungsDatei, `${zeile}\n\n`, 'utf8')
 }

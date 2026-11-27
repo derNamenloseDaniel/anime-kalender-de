@@ -18,6 +18,7 @@ import { schliesseSynchroAb } from './09-7-abschluss.ts'
 import { haltePunkt } from './phasen-zustand.ts'
 import { kennzeichneAdnNeuzugaengeOhneSprache } from './adn-sprache-offen.ts'
 import { kennzeichneNeinTermineAlsOffen } from './nein-sprache-offen.ts'
+import { adressenMitSynchroZusage, klaereDeutschBelegteTermine } from './deutsch-belegt-klaeren.ts'
 import { ladeHandbelege } from '../lib/dub-confirmed.ts'
 import { baueNeinGilt } from '../lib/maengel-nein.ts'
 
@@ -96,6 +97,7 @@ export function pruefeSynchroJePlattform({
   schliesseSynchroAb({ titles, verweiseEntfernt, releases, crDub, belegFuer: belege.belegFuer, schreibWurzel })
   kennzeichneAdnNeuzugaengeOhneSprache(releases, titles, belege.belegFuer)
   kennzeichneNeinTermineAlsOffen(releases, titles, baueNeinGilt(ladeHandbelege()))
+  klaereDeutschBelegteTermine(releases, titles, adressenMitSynchroZusage())
   /* Erst hier sind alle Crunchyroll-Termine da; vor Phase 10 übernehmen die Ereignisse das Flag. */
   hebeFolgenzahlAufBeobachtung(releases)
   hebeFolgenzahlAnnahmeAuf(releases)

@@ -1,0 +1,47 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Mushoku_Tensei (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Mushoku_Tensei&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+Die deutsche Synchronisation wurde nach dem Dialogdrehbuch von [[Christos Topulos]] und unter der Dialogregie von [[Martin May]] in Hamburg bei DMT Digital Media Technologie (Staffel 1) und Tonik Studio (Staffel 2) realisiert.<ref name="dts:0">{{Synchronkartei |Typ=serie |ID=49434 |Linktext=Mushoku Tensei: Jobless Reincarnation |Abruf=2024-06-30}}</ref>
+{| class="wikitable" id="Synchronisation 1"
+! Rolle || Japanische Stimme ([[Seiyū]])<ref>{{Internetquelle |url=https://www.anisearch.de/anime/14254,mushoku-tensei-jobless-reincarnation/seiyuu |titel=Sprecherliste (Staffel 1) |hrsg=[[AniSearch]] |abruf=2021-02-22}}</ref><ref>{{Internetquelle |url=https://www.anisearch.de/anime/17184,mushoku-tensei-jobless-reincarnation-staffel-2/seiyuu |titel=Sprecherliste (Staffel 2) |werk=AniSearch |abruf=2023-07-02}}</ref> || Deutsche Stimme<ref name="dts:0" />
+|-
+| Rudeus Greyrat || [[Tomokazu Sugita]] <small>(vor Wiedergeburt)</small><br />[[Yumi Uchiyama]] <small>(nach Wiedergeburt, Kind)</small> || [[Martin May]] <small>(Erwachsen)</small><br />[[Elise Eikermann]] <small>(Kind)</small>
+|-
+| Roxy Migurdia || [[Konomi Kohara]] || [[Leoni Kristin Oeffinger]]
+|-
+| Sylphiette || [[Ai Kayano]] || [[Arlette Stanschus]]
+|-
+| Eris Boreas Greyrat || [[Ai Kakuma]] || [[Liza Ohm]]
+|-
+| Paul Greyrat || [[Toshiyuki Morikawa]] || [[Markus Hanse]]
+|-
+| Zenith Greyrat || [[Hisako Kanemoto]] || [[Nina Witt]]
+|-
+| Philip Boreas Greyrat || [[Daisuke Ono]] || [[Jesse Grimm]]
+|-
+| Sauros Boreas Greyrat || [[Binbin Takaoka]] || [[Michael Prelle]]
+|-
+| Lillia Greyrat || [[Lynn (Synchronsprecherin)|Lynn]] || [[Sina Zadra]]
+|-
+| Norn Greyrat || [[Saya Aizawa]] || [[Laura Pfister]]
+|-
+| Aisha Greyrat || [[Yūki Takada]] || [[Lea Stamm]]
+|-
+| Ghislaine Dedoldia || [[Megumi Toyoguchi]] || [[Elena Wilms]]
+|-
+| Ruijerd Superdia || [[Daisuke Namikawa]] || [[Mike Olsowski]]
+|-
+| Orsted || [[Kenjiro Tsuda]] || [[Patrick Stamme]]
+|-
+| Kishirika Kishirisu || [[Yuka Iguchi]] || [[Samina König]] (1. Stimme),
+[[Daniela Reidies]] (2. Stimme)
+|-
+| Perugius Dola || [[Rikiya Koyama]] || [[Joshy Peters]]
+|-
+| Arumanfi || [[Kengo Kawanishi]] || [[Rasmus Borowski]]
+|-
+| Hitogami || [[Kujira (Synchronsprecher)|Kujira]] || [[Konstantin Graudus]]
+|-
+| Nanahoshi Shizuka || [[Shion Wakayama]] || Samina König
+|}

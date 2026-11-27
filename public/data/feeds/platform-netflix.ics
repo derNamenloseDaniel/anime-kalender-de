@@ -62,21 +62,9 @@ UID:auto-141391-netflix@2026-11-25@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261125
 DTEND;VALUE=DATE:20261126
-SUMMARY:Call of the Night (Synchro offen)
-DESCRIPTION:Plattform: Netflix\nRelease-Art: Katalog\nSynchro offen: Der Te
- rmin ist belegt\, eine deutsche Synchro nicht.\nUhrzeit noch nicht bestät
- igt.\nDetails: https://anime-kalender.de/t/13665/
-CATEGORIES:Netflix
-END:VEVENT
-BEGIN:VEVENT
-UID:motn-135660-netflix@2026-11-25@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261125
-DTEND;VALUE=DATE:20261126
-SUMMARY:Exception (neu bei Netflix)
-DESCRIPTION:Plattform: Netflix\nRelease-Art: Katalogtitel\nIm Angebot seit 
- diesem Tag – nicht der Erscheinungstag der deutschen Fassung.\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/13073/
+SUMMARY:Call of the Night
+DESCRIPTION:Plattform: Netflix\nRelease-Art: Katalogtitel\nUhrzeit noch nic
+ ht bestätigt.\nDetails: https://anime-kalender.de/t/13665/
 CATEGORIES:Netflix
 END:VEVENT
 BEGIN:VEVENT

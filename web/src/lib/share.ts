@@ -1,23 +1,22 @@
 import { useCallback, useState } from 'react'
-import { teilenPfad } from '@shared/teilen.ts'
-
 /**
- * Adresse unter `/t/<ak>/` statt der Hash-Adresse aus der Browserleiste.
+ * Volle Adresse zu `teilenZiel()`: meist `/t/<ak>/` statt der Hash-Adresse aus der Browserleiste.
  * Nur diese Seite existiert als echte Datei und trägt deshalb ein eigenes
  * Vorschaubild — alles hinter dem `#` erreicht weder Server noch Crawler.
  */
-export function shareUrl(slug: string): string {
-  return new URL(`${import.meta.env?.BASE_URL ?? '/'}${teilenPfad(slug)}`, window.location.origin).toString()
+export function shareUrl(ziel: string): string {
+  return new URL(`${import.meta.env?.BASE_URL ?? '/'}${ziel}`, window.location.origin).toString()
 }
 
 export function useShare(): {
-  share: (slug: string, title: string) => Promise<void>
+  share: (ziel: string, title: string) => Promise<void>
+  /** Das zuletzt kopierte `teilenZiel()`. */
   copiedSlug: string | undefined
 } {
   const [copiedSlug, setCopiedSlug] = useState<string>()
 
-  const share = useCallback(async (slug: string, title: string) => {
-    const url = shareUrl(slug)
+  const share = useCallback(async (ziel: string, title: string) => {
+    const url = shareUrl(ziel)
     // Auf Mobilgeräten das Teilen-Menü des Systems, sonst in die Zwischenablage.
     if (navigator.share) {
       try {
@@ -29,7 +28,7 @@ export function useShare(): {
     }
     try {
       await navigator.clipboard.writeText(url)
-      setCopiedSlug(slug)
+      setCopiedSlug(ziel)
       setTimeout(() => setCopiedSlug(undefined), 1800)
     } catch {
       window.prompt('Link kopieren:', url)

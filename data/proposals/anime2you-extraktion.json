@@ -2347,6 +2347,11 @@
       "am": "2026-11-25",
       "vorschlaege": 5
     },
+    "1076111": {
+      "am": "2026-11-27",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
     "1076120": {
       "am": "2026-11-25",
       "vorschlaege": 0
@@ -2372,6 +2377,11 @@
       "am": "2026-11-26",
       "vorschlaege": 2
     },
+    "1076318": {
+      "am": "2026-11-27",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
     "1076406": {
       "am": "2026-11-26",
       "vorschlaege": 0
@@ -2379,6 +2389,44 @@
     "1076464": {
       "am": "2026-11-26",
       "vorschlaege": 0
+    },
+    "1076510": {
+      "am": "2026-11-27",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1076668": {
+      "am": "2026-11-27",
+      "vorschlaege": 4
+    },
+    "1076693": {
+      "am": "2026-11-27",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1076694": {
+      "am": "2026-11-27",
+      "vorschlaege": 1
+    },
+    "1076796": {
+      "am": "2026-11-27",
+      "vorschlaege": 1
+    },
+    "1077056": {
+      "am": "2026-11-27",
+      "vorschlaege": 0
+    },
+    "1077302": {
+      "am": "2026-11-27",
+      "vorschlaege": 0
+    },
+    "1077491": {
+      "am": "2026-11-27",
+      "vorschlaege": 6
+    },
+    "1077542": {
+      "am": "2026-11-27",
+      "vorschlaege": 3
     }
   },
   "vorschlaege": [
@@ -17910,6 +17958,305 @@
       "quelle": "https://www.anime2you.de/news/1076257/akiba-pass-shop-sechs-polyband-neuheiten/",
       "veroeffentlicht": "2026-11-26",
       "gelesenAm": "2026-11-26"
+    },
+    {
+      "titel": "The Cat and the Dragon",
+      "zitat": "Der Streaming-Dienst Crunchyroll zeigt die Fortsetzung im Originalton mit deutschen Untertiteln im Simulcast.",
+      "art": "ankuendigung",
+      "sprache": "omu",
+      "plattform": "crunchyroll",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1076796",
+      "artikel": "Start der zweiten »The Cat and the Dragon«-Staffel + Trailer",
+      "quelle": "https://www.anime2you.de/news/1076796/the-cat-and-the-dragon-staffel-2-start/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Bocchi the Rock! – Vol. 1 (Limited Edition mit Sammelschuber)",
+      "zitat": "Bocchi the Rock! – Vol. 1 (Limited Edition mit Sammelschuber) 04.12. 18.12.",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2026-12-18",
+      "uhrzeit": null,
+      "anbieter": "AniMoon Publishing",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „AniMoon Publishing“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076668",
+      "artikel": "Vier Blu-ray-Termine von KSM Anime und AniMoon verschoben",
+      "quelle": "https://www.anime2you.de/news/1076668/ksm-animoon-vier-disc-verschiebungen/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "My Love Story with Yamada-kun at Lv999 – Vol. 2 (Limited Edition)",
+      "zitat": "My Love Story with Yamada-kun at Lv999 – Vol. 2 (Limited Edition) 18.12. 05.02.",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2027-02-05",
+      "uhrzeit": null,
+      "anbieter": "AniMoon Publishing",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „AniMoon Publishing“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076668",
+      "artikel": "Vier Blu-ray-Termine von KSM Anime und AniMoon verschoben",
+      "quelle": "https://www.anime2you.de/news/1076668/ksm-animoon-vier-disc-verschiebungen/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Sakamoto Days – Vol. 1 (Limited Edition mit Sammelschuber)",
+      "zitat": "Sakamoto Days – Vol. 1 (Limited Edition mit Sammelschuber) 04.12. 11.12.",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2026-12-11",
+      "uhrzeit": null,
+      "anbieter": "AniMoon Publishing",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [
+        "anbieter „AniMoon Publishing“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076668",
+      "artikel": "Vier Blu-ray-Termine von KSM Anime und AniMoon verschoben",
+      "quelle": "https://www.anime2you.de/news/1076668/ksm-animoon-vier-disc-verschiebungen/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Die Königin der 1000 Jahre (Komplettbox)",
+      "zitat": "Die Königin der 1000 Jahre (Komplettbox) 17.12. 28.01.",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2027-01-28",
+      "uhrzeit": null,
+      "anbieter": "KSM Anime",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [
+        "anbieter „KSM Anime“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1076668",
+      "artikel": "Vier Blu-ray-Termine von KSM Anime und AniMoon verschoben",
+      "quelle": "https://www.anime2you.de/news/1076668/ksm-animoon-vier-disc-verschiebungen/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Witch on the Holy Night",
+      "zitat": "Crunchyroll bringt den Film am 26. Januar 2027 in die deutschen Kinos.",
+      "art": "kino",
+      "sprache": "unklar",
+      "plattform": "kino",
+      "datum": "2027-01-26",
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [],
+      "artikelId": "1076694",
+      "artikel": "»Witch on the Holy Night« feiert große Erfolge in den japanischen Kinos",
+      "quelle": "https://www.anime2you.de/news/1076694/witch-on-the-holy-night-grosse-erfolge-in-japan/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Die Biene Maja",
+      "zitat": "»Die Biene Maja« Verfügbar ab: 15. Dezember 2026 Episoden: 104 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "rtlplus",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "RTL+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "104 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „RTL+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „rtl+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Die Biene Maja",
+      "zitat": "»Die Biene Maja« Verfügbar ab: 15. Dezember 2026 Episoden: 104 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "primevideo",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "Prime Video",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "104 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „Prime Video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „prime video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Heidi",
+      "zitat": "»Heidi« Verfügbar ab: 15. Dezember 2026 Episoden: 52 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "rtlplus",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "RTL+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "52 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „RTL+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „rtl+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Heidi",
+      "zitat": "»Heidi« Verfügbar ab: 15. Dezember 2026 Episoden: 52 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "primevideo",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "Prime Video",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "52 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „Prime Video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „prime video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Wickie und die starken Männer",
+      "zitat": "»Wickie und die starken Männer« Verfügbar ab: 15. Dezember 2026 Episoden: 78 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "rtlplus",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "RTL+",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "78 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „RTL+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „rtl+“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Wickie und die starken Männer",
+      "zitat": "»Wickie und die starken Männer« Verfügbar ab: 15. Dezember 2026 Episoden: 78 (komplett) Sprache: Deutsch",
+      "art": "start",
+      "sprache": "deutsch",
+      "plattform": "primevideo",
+      "datum": "2026-12-15",
+      "uhrzeit": null,
+      "anbieter": "Prime Video",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "78 (komplett)",
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „Prime Video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „prime video“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077491",
+      "artikel": "RTL+ kündigt drei beliebte Anime-Klassiker für Dezember 2026 an",
+      "quelle": "https://www.anime2you.de/news/1077491/rtl-plus-drei-anime-klassiker/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Pokémon Horizonte",
+      "zitat": "Hierzulande feiert die vierte Staffel von »Pokémon Horizonte« am morgigen Samstag, den 28. November 2026, um 12:55 Uhr ihre TV-Premiere im TOGGO-Programm von SUPER RTL.",
+      "art": "start",
+      "sprache": "unklar",
+      "plattform": "tv",
+      "datum": "2026-11-28",
+      "uhrzeit": "12:55",
+      "anbieter": null,
+      "sender": "TOGGO-Programm von SUPER RTL",
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Samstag",
+      "warnungen": [],
+      "artikelId": "1077542",
+      "artikel": "Neue »Pokémon«-Staffel für 2027 angekündigt + Teaser",
+      "quelle": "https://www.anime2you.de/news/1077542/pokemon-neue-staffel-fuer-2027-angekuendigt/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
     }
   ]
 }

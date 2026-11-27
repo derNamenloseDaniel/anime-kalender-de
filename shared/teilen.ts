@@ -11,6 +11,16 @@ export function teilbarerSlug(titel: { slug?: string; ohneSynchro?: boolean } | 
   return titel?.slug && !titel.ohneSynchro ? titel.slug : undefined
 }
 
+/**
+ * Was der Teilen-Knopf nennt, relativ zur Wurzel der Seite: die Teilen-Seite, sonst (Katalog ohne Synchro, keine Seite) die Adresse, die
+ * das Panel des Titels öffnet. So hat jeder Titel einen Knopf (Daniel 27.11.2026), und keiner führt auf die 404.
+ */
+export function teilenZiel(titel: { id: number; slug?: string; ohneSynchro?: boolean }): string {
+  const slug = teilbarerSlug(titel)
+  /* Leere Adresse: die Kennung steht dann als `t=` im Hash (`titelHash`). */
+  return slug ? teilenPfad(slug) : titelHash(titel.id, '')
+}
+
 /** Cartoon mit belegter deutscher Synchro: ein Weg mit `dub: true`, nicht nur abgeleitet. „Laut JustWatch“ (`dubHinweis`) reicht für die Sitemap nicht. */
 export function cartoonMitSynchroBeleg(titel: { streams?: Array<{ dub?: boolean; dubAbgeleitet?: string }> }): boolean {
   return (titel.streams ?? []).some((s) => s.dub === true && !s.dubAbgeleitet)

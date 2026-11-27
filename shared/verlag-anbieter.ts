@@ -17,9 +17,12 @@ export function verlagIstAnbieter(publisher: string | undefined, platform: Platf
   return ANBIETER_VON_VERLAG[publisher] === platform || publisher.toLowerCase().includes((PLATFORMS[platform]?.name ?? '§').toLowerCase())
 }
 
-/** Führte dieser Anbieter laut aniSearch-Erstausgabe den Titel schon am `datum` oder früher? Dann ist ein Katalogdatum dort keine Neuheit, nur eine Neulistung. */
-export function erstausgabeBeimAnbieterBis(e: { von?: string; publisher?: string } | undefined, platform: PlatformId, datum: string): boolean {
-  return !!e?.von && e.von <= datum && verlagIstAnbieter(e.publisher, platform)
+/**
+ * Führte dieser Anbieter den Titel laut aniSearch-Erstausgabe schon am `datum` oder früher auf Deutsch? Dann ist ein Katalogdatum dort eine Neulistung, keine Neuheit.
+ * Nur ein Einzeltag (`bis` fehlt: alles auf einmal) mit Synchro-Marke zählt; ein Simulcast-Zeitraum (Wandance, Disney+ 10–12.2025) sagt nichts über den späteren Katalogtag.
+ */
+export function erstausgabeBeimAnbieterBis(e: { von?: string; bis?: string; publisher?: string; synchro?: boolean } | undefined, platform: PlatformId, datum: string): boolean {
+  return !!e?.von && !e.bis && e.synchro === true && e.von <= datum && verlagIstAnbieter(e.publisher, platform)
 }
 
 /** Verlage der Erstausgabe, die keine Discs herausgeben: Streaming-Dienste, Fernsehsender, Kino-Verleih (Messung 23.11.2026 an den Verlagsnamen in `titles.json`). */

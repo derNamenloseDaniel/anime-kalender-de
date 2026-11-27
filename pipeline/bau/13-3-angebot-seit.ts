@@ -100,7 +100,10 @@ export function ergaenzeAngebotSeit({ slim, releases, titles, quellen }: { slim:
 
     const bester = fruehesterAnbieter(show, title, stichtage)
     if (!bester) continue
-    const { anbieter, seit } = bester
+    const { anbieter } = bester
+    /* Führte der Anbieter den Titel laut aniSearch schon vorher, ist das Katalogdatum eine Neulistung: der Weg bleibt, aber am Erstausgabetag statt als „Neu bei …“ (Exception, Netflix seit 2022). */
+    const neulistungTag = erstausgabeBeimAnbieterBis(title.deErstausgabe, anbieter, bester.seit) ? title.deErstausgabe!.von! : undefined
+    const seit = neulistungTag ?? bester.seit
 
     /*
       Am Titel steht es immer — das Panel zeigt es auch ohne Kalendereintrag.
@@ -116,19 +119,15 @@ export function ergaenzeAngebotSeit({ slim, releases, titles, quellen }: { slim:
     if (ausgeliefert) ausgeliefert.angebotSeit = angebot
     nurAmTitel++
 
-    if (seit < GRENZE) continue
-    /* Führte der Anbieter den Titel laut aniSearch schon vorher, ist das Datum eine Neulistung, kein „Neu bei …“ (Exception, Netflix seit 2022). */
-    if (erstausgabeBeimAnbieterBis(title.deErstausgabe, anbieter, seit)) {
-      neulistung++
-      continue
-    }
+    if (seit < GRENZE && !neulistungTag) continue
+    if (neulistungTag) neulistung++
     releases.push(angebotRelease(title, anbieter, seit))
     alsTermin++
   }
   if (nurAmTitel) {
     log(
       `${nurAmTitel} Titel ohne Termin tragen jetzt ein „Im Angebot seit" ` +
-        `(${alsTermin} davon aus ${GRENZE.slice(0, 4)} auch als Kalendereintrag, ${neulistung} Neulistungen beim Erstausgabe-Anbieter ohne Eintrag)`,
+        `(${alsTermin} davon aus ${GRENZE.slice(0, 4)} auch als Kalendereintrag, ${neulistung} davon Neulistungen beim Erstausgabe-Anbieter, am Erstausgabetag)`,
     )
   }
 }

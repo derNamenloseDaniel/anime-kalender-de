@@ -431,6 +431,7 @@ pipeline/check-katalog-eingefroren.ts
 pipeline/check-katalog-release.ts
 pipeline/check-katalogstart-kasten.ts
 pipeline/check-katalogstart-tag.ts
+pipeline/check-kein-weg-trotz-quelle.ts
 pipeline/check-kino-zuletzt.ts
 pipeline/check-kopf-menue.ts
 pipeline/check-kopfzeile-premiere.ts

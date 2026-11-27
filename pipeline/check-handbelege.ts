@@ -111,7 +111,7 @@ let bestaetigt = 0
 let entferntWieVorgesehen = 0
 let uneindeutig = 0
 let neinUeberholt = 0
-/* Ein „nicht verfügbar“ älter als ein sicherer Prime-Kanal-Termin verneint den Kanal-Weg nicht (`ueberholteNeins`, wie im Bau). */
+/* Ein „nicht verfügbar“ älter als ein sicherer, begonnener Termin verneint den Weg nicht (`ueberholteNeins`, wie im Bau). */
 const ueberholt = ueberholteNeins(belege, readJson<Release[]>(resolve(ROOT, 'public/data/releases.json'), []), todayIso())
 
 for (const [k, gruppe] of jeVerweis) {
@@ -227,7 +227,7 @@ log(`Handprüfungen: ${belege.length} Einträge auf ${jeVerweis.size} Verweise`)
 log(`  im Datensatz bestätigt : ${bestaetigt}`)
 log(`  korrekt entfernt       : ${entferntWieVorgesehen}`)
 log(`  uneindeutig (Bereiche) : ${uneindeutig} — nicht bewertet`)
-log(`  Nein überholt (Kanal-Termin) : ${neinUeberholt} — nicht bewertet`)
+log(`  Nein überholt (jüngerer Termin) : ${neinUeberholt} — nicht bewertet`)
 
 if (fehler.length) {
   warn(`${fehler.length} Handprüfungen werden vom Datensatz nicht wiedergegeben:`)

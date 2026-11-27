@@ -20,6 +20,7 @@ import { haltePunkt } from './phasen-zustand.ts'
 import { kennzeichneAdnNeuzugaengeOhneSprache } from './adn-sprache-offen.ts'
 import { kennzeichneNeinTermineAlsOffen } from './nein-sprache-offen.ts'
 import { widerlegeNeinNachStart } from './nein-nach-start-widerlegt.ts'
+import { adressenMitSynchroZusage, klaereDeutschBelegteTermine } from './deutsch-belegt-klaeren.ts'
 import { ladeHandbelege } from '../lib/dub-confirmed.ts'
 import { baueNeinGilt } from '../lib/maengel-nein.ts'
 
@@ -100,13 +101,18 @@ export function pruefeSynchroJePlattform({
   haltePunkt('09-6-anisearch-wege', titles)
   schliesseSynchroAb({ titles, verweiseEntfernt, releases, crDub, belegFuer: belege.belegFuer, schreibWurzel })
   kennzeichneAdnNeuzugaengeOhneSprache(releases, titles, belege.belegFuer)
-  const belegeHand = handbelege ?? ladeHandbelege()
-  kennzeichneNeinTermineAlsOffen(releases, titles, baueNeinGilt(belegeHand))
-  widerlegeNeinNachStart(releases, belegeHand, todayIso())
+  ordneSpracheDerTermine(releases, titles, handbelege ?? ladeHandbelege())
   /* Erst hier sind alle Crunchyroll-Termine da; vor Phase 10 übernehmen die Ereignisse das Flag. */
   hebeFolgenzahlAufBeobachtung(releases)
   hebeFolgenzahlAnnahmeAuf(releases)
   return synchroErgebnis(belege, pruefung, motnBelege, motnTon)
+}
+
+/** Widerlegen vor dem Klären: das Klären räumt „offen“ ab, das Widerlegen braucht es. */
+function ordneSpracheDerTermine(releases: Release[], titles: Map<number, Title>, belegeHand: ReturnType<typeof ladeHandbelege>) {
+  kennzeichneNeinTermineAlsOffen(releases, titles, baueNeinGilt(belegeHand))
+  widerlegeNeinNachStart(releases, belegeHand, todayIso())
+  klaereDeutschBelegteTermine(releases, titles, adressenMitSynchroZusage())
 }
 
 /** Was die Phasen nach der Synchro-Prüfung brauchen (`build.ts` reicht es als `synchro` weiter). */

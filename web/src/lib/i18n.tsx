@@ -329,8 +329,6 @@ const TEXTE = {
   'antwort.widerlegtNebenAnbieter': 'Für {datum} angekündigt, {anbieter} führt nur den Originalton.',
   // Angekündigter Simulcast (data/ankuendigungen.yaml, 25.09.2026) — kurz, der Kasten ist klein.
   'antwort.synchroAngekuendigt': 'Deutsche Synchro angekündigt',
-  'antwort.omuAb': 'mit Untertiteln ab {wann}',
-  'antwort.omuSeit': 'mit Untertiteln seit {wann}',
   'antwort.synchroTerminOffen': 'Synchro-Termin offen',
   'antwort.synchroOffen': 'Synchro offen',
   // JustWatch gilt der Serie, nicht der Folge (Entscheidung 07.09.2026).

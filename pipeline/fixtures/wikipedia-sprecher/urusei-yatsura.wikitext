@@ -1,0 +1,68 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Urusei_Yatsura (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Urusei_Yatsura&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+==== Synchronsprecher ====
+{| class="wikitable" id="Synchronisation"
+|-
+! Rolle || Japanischer Sprecher ([[Seiyū]]) || Japanische Sprecher (ab 2022) || Deutsche Sprecher
+|-
+| Ataru Moroboshi
+| [[Toshio Furukawa]]
+| [[Hiroshi Kamiya]]
+| [[Benjamin Mereis]]
+|-
+| Lum Invader
+| [[Fumi Hirano]]
+| [[Sumire Uesaka]]
+| [[Angelina Markiefka]]
+|-
+| Shinobu Miyake
+| [[Saeko Shimazu]]
+| [[Maaya Uchida]]
+| [[Paulina Rümmelein]]
+|-
+| Shūtarō Mendō
+| [[Akira Kamiya]]
+| [[Mamoru Miyano]]
+| [[Xiduo Zhao]]
+|-
+| Jariten/Ten
+| [[Kazuko Sugiyama]]
+| [[Aoi Yūki]]
+| [[Jana Dunja Gries]]
+|-
+| Ryūnosuke Fujinami
+| [[Mayumi Tanaka]]
+| [[Ayahi Takagaki]]
+| [[Alina Freund]]
+|-
+| Cherry/Sakurambō
+| [[Ichirō Nagai]]
+| [[Wataru Takagi]]
+| [[Gerd Meyer (Synchronsprecher)|Gerd Meyer]]
+|-
+| Sakura
+| [[Machiko Washio]]
+| [[Miyuki Sawashiro]]
+| [[Nicolle Gonsior]]
+|-
+| Ran
+| [[Yō Inoue]]<br />[[Kazue Komiya]]
+| [[Kana Hanazawa]]
+| [[Julia Bautz]]
+|-
+| Benten
+| [[Yūko Mita]]
+| [[Shizuka Ishigami]]
+| [[Johanna Giraud]]
+|-
+| Onsen-Mark
+| [[Michihiro Ikemizu]]
+| [[Kenta Miyake]]
+| [[Alexander Wohnhaas]]
+|-
+| Rei
+| [[Tesshō Genda]]
+| [[Katsuyuki Konishi]]
+| [[Christopher Kussin]]
+|}

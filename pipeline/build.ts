@@ -20,7 +20,7 @@ import { schreibeAboFeeds } from './bau/14-ics.ts'
 import { pruefeSchalter } from './bau/phasen-zustand.ts'
 import { merkeBestandVorher } from './lib/bestand-vorher.ts'
 import { teileStaffelTitel } from './bau/staffel-titel.ts'
-import { meldeWarnungen } from './lib/warnungen-zaehlen.ts'
+import { meldeWarnungen } from './lib/warnungen-melden.ts'
 
 function main(): void {
   liefereAus(bauePhasenfolge(ladeQuellen()))

@@ -1,0 +1,62 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Jujutsu_Kaisen (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Jujutsu_Kaisen&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+==== Synchronisation ====
+Die deutsche Synchronisation wurde in den Oxygen Sound Studios in Berlin produziert. Die [[Dialogregie]] führte [[René Dawn-Claude]], der gemeinsam mit [[Charlotte Uhlig]] die [[Dialogbuch|Dialogbücher]] schrieb.<ref name="dt_sync">{{Synchronkartei|serie|48828}}</ref>
+{| class="wikitable"
+! Rolle || japanischer Sprecher ([[Seiyū]]) || deutsche Sprecher<ref name="dt_sync" /><ref>{{Internetquelle |url=https://www.anisearch.de/anime/14790,jujutsu-kaisen/seiyuu |titel=Jujutsu Kaisen (2020) – Sprecher |werk=[[aniSearch]] |abruf=2025-09-19}}</ref>
+|-
+| Yūji Itadori || [[Jun’ya Enoki]]|| [[Jan Rohrbach]]
+|-
+| Satoru Gojō || [[Yūichi Nakamura (Synchronsprecher)|Yūichi Nakamura]] || [[René Dawn-Claude]]
+|-
+| Megumi Fushiguro || [[Yūma Uchida]]|| [[Jannik Endemann]]
+|-
+| Nobara Kugisaki || [[Asami Seto]] || [[Katharina Schwarzmaier]]
+|-
+| Zwiegesicht Sukuna<ref group="Fn." name="b" /> || [[Jun’ichi Suwabe]]|| [[Tommy Morgenstern]]
+|-
+| Kiyotaka Ijichi || [[Mitsuo Iwata]] || [[Oliver Nitsche]]
+|-
+| Akari Nitta || [[Sora Tokui]] || [[Magdalena Turba]]
+|-
+| Toge Inumaki || [[Kōki Uchiyama]] || [[Carlos Fanselow]]
+|-
+| Kento Nanami || [[Kenjirō Tsuda]]|| [[Oliver Feld]]
+|-
+| Panda || [[Tomokazu Seki]] || [[Daniel Zillmann]]
+|-
+| Aoi Tōdō || [[Subaru Kimura]] || [[Daniel Welbat]]
+|-
+| Maki Zen’in || [[Mikako Komatsu]]|| [[Alice Bauer]]
+|-
+| Mai Zen'in || [[Marina Inoue]] || [[Anne Düe]]
+|-
+| Ultimate Mechamaru || [[Yoshitsugu Matsuoka]]|| [[Ricardo Richter]]
+|-
+| Yuta Okkotsu || [[Megumi Ogata]]|| [[Nicolás Artajo]]
+|-
+| Kento Nanami || [[Kenjiro Tsuda]]|| [[Oliver Feld]]
+|-
+| Toji Fushiguro || [[Takehito Koyasu]]|| [[Uli Krohm]]
+|-
+| Choso || [[Daisuke Namikawa]]|| [[Marcel Collé]]
+|-
+| Suguru Geto || [[Takahiro Sakurai]] || [[David Nathan]]
+|-
+| Masamichi Yaga || [[Takaya Kuroda]] || [[Tilo Schmitz]]
+|-
+| Mahito || [[Nobunaga Shimazaki]] || [[Dirk Stollberg]]
+|-
+| Jogo || [[Shigeru Chiba]] || [[Andreas Müller (Synchronsprecher)|Andreas Müller]]
+|-
+| Hanami || [[Atsuko Tanaka (Synchronsprecherin)|Atsuko Tanaka]] || [[Claudia Urbschat-Mingues]]
+|-
+| Esō || [[Nobuyuki Hiyama]] || [[Christoph Banken]]
+|-
+| Noritoshi Kamo || [[Satoshi Hino]] || [[Tim Knauer]]
+|-
+| Kasumi Miwa || [[Chinatsu Akasaki]] || [[Nicole Hannak]]
+|-
+| Rika Orimoto || [[Kana Hanazawa]] || [[Shanti Chakraborty]]
+|}

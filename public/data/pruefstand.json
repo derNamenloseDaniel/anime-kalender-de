@@ -1,5 +1,5 @@
 {
- "erzeugtAm": "2026-11-27T17:09:17.862Z",
+ "erzeugtAm": "2026-11-27T18:40:55.525Z",
  "anbieter": [
   {
    "name": "Amazon",
@@ -7,9 +7,14 @@
    "gemeldet": 1021,
    "gesamt": 1048,
    "offen": 27,
-   "ohneSeite": 3,
+   "ohneSeite": 8,
    "suchAdressen": [
+    "https://www.amazon.de/s?k=Chrono%20Crusade&i=instant-video",
+    "https://www.amazon.de/s?k=Yandere%20Dark%20Elf%3A%20She%20Chased%20Me%20All%20the%20Way%20from%20Another%20World!&i=instant-video",
+    "https://www.amazon.de/s?k=As%20a%20Reincarnated%20Aristocrat%2C%20I%E2%80%99ll%20Use%20My%20Appraisal%20Skill%20to%20Rise%20in%20the%20World%3A%20Staffel%203&i=instant-video",
+    "https://www.amazon.de/s?k=Snowball%20Earth&i=instant-video",
     "https://www.amazon.de/s?k=Cat's%20Eye%20Season%202&i=instant-video",
+    "https://www.amazon.de/s?k=Zorros%20Geheimnis&i=instant-video",
     "https://www.amazon.de/s?k=The%20Birth%20Of%20Kitaro%20-%20Das%20Geheimnis%20von%20Gegege&i=instant-video",
     "https://www.amazon.de/s?k=Black%20Butler&i=instant-video"
    ],
@@ -980,18 +985,110 @@
    "name": "Suchadressen",
    "plattform": "suchadressen",
    "gemeldet": 0,
-   "gesamt": 1,
-   "offen": 1,
+   "gesamt": 24,
+   "offen": 24,
    "titel": 0,
-   "ohneSeite": 1,
-   "ziel": "https://www.amazon.de/s?k=Cat's%20Eye%20Season%202&i=instant-video",
+   "ohneSeite": 24,
+   "ziel": "https://www.amazon.de/s?k=Aesthetica%20of%20a%20Rogue%20Hero&i=instant-video",
    "ziele": [
+    {
+     "url": "https://www.amazon.de/s?k=Aesthetica%20of%20a%20Rogue%20Hero&i=instant-video",
+     "titel": "Aesthetica of a Rogue Hero"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Ame%20%26%20Yuki%3A%20Die%20Wolfskinder&i=instant-video",
+     "titel": "Ame & Yuki: Die Wolfskinder"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Angel%E2%80%99s%20Egg&i=instant-video",
+     "titel": "Angel’s Egg"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=As%20a%20Reincarnated%20Aristocrat%2C%20I%E2%80%99ll%20Use%20My%20Appraisal%20Skill%20to%20Rise%20in%20the%20World%3A%20Staffel%203&i=instant-video",
+     "titel": "As a Reincarnated Aristocrat, I’ll Use My Appraisal Skill to Rise in the World: Staffel 3"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Attack%20on%20Titan&i=instant-video",
+     "titel": "Attack on Titan"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Azumanga%20Daioh&i=instant-video",
+     "titel": "Azumanga Daioh"
+    },
     {
      "url": "https://www.amazon.de/s?k=Cat's%20Eye%20Season%202&i=instant-video",
      "titel": "Cat's Eye Season 2"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Chrono%20Crusade&i=instant-video",
+     "titel": "Chrono Crusade"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Der%20Junge%20und%20das%20Biest&i=instant-video",
+     "titel": "Der Junge und das Biest"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Gantz&i=instant-video",
+     "titel": "Gantz"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Gunslinger%20Girl&i=instant-video",
+     "titel": "Gunslinger Girl"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Gunslinger%20Girl%20il%20teatrino&i=instant-video",
+     "titel": "Gunslinger Girl il teatrino"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Overlord%3A%20The%20Sacred%20Kingdom&i=instant-video",
+     "titel": "Overlord: The Sacred Kingdom"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Peter%20Pan&i=instant-video",
+     "titel": "Peter Pan"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Samurai%20Girls&i=instant-video",
+     "titel": "Samurai Girls"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Snowball%20Earth&i=instant-video",
+     "titel": "Snowball Earth"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Summer%20Wars&i=instant-video",
+     "titel": "Summer Wars"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Trinity%20Blood&i=instant-video",
+     "titel": "Trinity Blood"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Trinity%20Seven%3A%20Heavens%20Library%20%26%20Crimson%20Lord&i=instant-video",
+     "titel": "Trinity Seven: Heavens Library & Crimson Lord"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Wolf%20Girl%20%26%20Black%20Prince&i=instant-video",
+     "titel": "Wolf Girl & Black Prince"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Yandere%20Dark%20Elf%3A%20She%20Chased%20Me%20All%20the%20Way%20from%20Another%20World!&i=instant-video",
+     "titel": "Yandere Dark Elf: She Chased Me All the Way from Another World!"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Your%20Forma&i=instant-video",
+     "titel": "Your Forma"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Yu-Gi-Oh!&i=instant-video",
+     "titel": "Yu-Gi-Oh!"
+    },
+    {
+     "url": "https://www.amazon.de/s?k=Zorros%20Geheimnis&i=instant-video",
+     "titel": "Zorros Geheimnis"
     }
    ],
-   "naechster": "Cat's Eye Season 2",
+   "naechster": "Aesthetica of a Rogue Hero",
    "hinweis": "Suchadressen ohne Titelseite: den richtigen Treffer beim Anbieter heraussuchen"
   }
  ]

@@ -321,6 +321,7 @@ pipeline/check-fsk-franchise.ts
 pipeline/check-fsk-justwatch-bilanz.ts
 pipeline/check-fsk-kopf-hinweis.ts
 pipeline/check-fsk-kopf-render.ts
+pipeline/check-fsk-von-hand.ts
 pipeline/check-geheimnis-testlauf.ts
 pipeline/check-genre-aus-tmdb.ts
 pipeline/check-geteilte-adressen.ts

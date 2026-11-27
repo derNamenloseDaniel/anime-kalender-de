@@ -9,6 +9,8 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import yaml from 'js-yaml'
 import { liesSprechertabelle, type SprecherZeile } from './lib/wikipedia-sprecher.ts'
+import { sprecherAusSeite } from './lib/wikipedia-sprecher-seite.ts'
+import { istPlatzhalter, verwirfFalscheStimmen } from './lib/wikipedia-sprecher-waechter.ts'
 
 let fehler = 0
 function pruefe(name: string, ok: boolean, ist?: unknown): void {
@@ -69,6 +71,8 @@ pruefe('leere Eingabe', !liesSprechertabelle('').deutscheSpalte)
 const lesen = (wikitext: string): string => liesSprechertabelle(wikitext).zeilen.map(kurz).join(';')
 pruefe('Tags, Kommentar, leerer Verweis, nbsp und einfacher Link in Rolle und Sprecher', lesen(tab('! Rolle !! Deutsch', '| <span style="x">[[Rolle A]]</span> || <span>Anna</span><!-- k -->&nbsp;Maria<ref name="a" />')) === 'Rolle A=Anna Maria[]', lesen(tab('! Rolle !! Deutsch', '| <span style="x">[[Rolle A]]</span> || <span>Anna</span><!-- k -->&nbsp;Maria<ref name="a" />')))
 pruefe('Überschrift der Tabelle (|+) steht vor dem Kopf, mehrzeilige Zelle wird angehängt', lesen('{| class="wikitable"\n|+ Titel\n! Rolle !! Deutsch\n|-\n| A || Anna\nund Anja\n|}') === 'A=Anna und Anja[]')
+pruefe('Zeile mit großgeschriebenem Namen ist eine zweite Stimme, <small> gehört zu ihr (Ranma, Stand 26.11.2026)', lesen('{| class="wikitable"\n! Rolle !! Deutsch\n|-\n| Genma || [[Thomas Rauscher (Synchronsprecher)|Thomas Rauscher]]\n[[Torsten Münchow]] <small>(ab Staffel 3)</small>\n|}') === 'Genma=Thomas Rauscher[]+Torsten Münchow[ab Staffel 3]')
+pruefe('Komma am Ende einer Stimme fällt weg (Mushoku Tensei: „Samina König (1. Stimme),“)', lesen('{| class="wikitable"\n! Rolle !! Deutsch\n|-\n| K || Samina König (1. Stimme),\nDaniela Reidies (2. Stimme)\n|}') === 'K=Samina König (1. Stimme)[]+Daniela Reidies (2. Stimme)[]')
 pruefe('Kopfzelle mit rowspan und colspan: beide Spalten werden in der Folgezeile übersprungen', lesen('{| class="wikitable"\n! rowspan="2" colspan="2"| Rolle !! Japanisch !! Deutsch\n|-\n! Jap !! Alt\n|-\n| A || x || J || Anna\n|}') === 'A=Anna[Alt]')
 pruefe('rowspan 2 gilt nur für eine Folgezeile', lesen('{| class="wikitable"\n! rowspan="2"| Rolle !! Deutsch\n|-\n! Zeitraum\n|-\n! Alt\n|-\n| A || Anna\n|}') === 'A=Anna[Zeitraum]')
 pruefe('rowspan 3: der letzte Unterkopf zählt', lesen('{| class="wikitable"\n! rowspan="3"| Rolle !! Deutsch\n|-\n! Zeitraum\n|-\n! Alt\n|-\n| A || Anna\n|}') === 'A=Anna[Alt]')
@@ -80,6 +84,29 @@ pruefe('„Deu. Synchronsprecher“ (Made in Abyss) zählt als deutsche Spalte',
 pruefe('„dt. Stimme“ unter „Anime“ (Mob Psycho 100) zählt, Bühnenstück und Realserie nicht', lesen('{| class="wikitable"\n! rowspan="2"| Rolle || colspan="2"| Anime || colspan="2"| Darsteller\n|-\n! jap. Stimme || dt. Stimme || Bühnenstück || Realserie\n|-\n| A || Ja || Anna || Bü || Re\n|}') === 'A=Anna[]')
 pruefe('Kopfzelle in Fettdruck („\'\'\'Deutsche Stimme\'\'\'“) auf Fortsetzungszeile mit ||', lesen('{| class="wikitable" \n! Rolle || Japanische Stimme\n  || \'\'\'Deutsche Stimme\'\'\'\n|-\n| A || Ja\n| Anna\n|}') === 'A=Anna[]')
 pruefe('Fortsetzungszeile mit !! in der Kopfzeile und zwei Zellen in einer Datenzeile', lesen('{| class="wikitable"\n! Rolle\n  !! Japanisch !! Deutsch\n|-\n| A\n  || Ja || Anna\n|}') === 'A=Anna[]')
+
+console.log('Kaiju No. 8, Attack on Titan, Detektiv Conan (Beanstandung PR 5248, 27.11.2026)')
+const kaiju = sprecherAusSeite(fixture('kaiju-no-8'))
+const kaijuAoi = zeile(kaiju.zeilen, 'Aoi Kaguragi')
+pruefe('Kaiju: Spalte „Rolle › Deutsch“ ist keine Stimme, Aoi = Rêzan Cheikhmous (Staffel 1)', kurz(kaijuAoi) === 'Aoi Kaguragi=Rêzan Cheikhmous[Staffel 1]+N. N.[Staffel 2]', kurz(kaijuAoi))
+pruefe('Kaiju: colspan-Zelle gilt für beide Staffeln (Iharu = René Dawn-Claude 1 und 2)', kurz(zeile(kaiju.zeilen, 'Iharu Furuhashi')) === 'Iharu Furuhashi=René Dawn-Claude[Staffel 1]+René Dawn-Claude[Staffel 2]', kurz(zeile(kaiju.zeilen, 'Iharu Furuhashi')))
+pruefe('Kaiju: keine Stimme gleich Rolle', kaiju.zeilen.every((z) => z.deutsch.every((d) => d.sprecher !== z.rolle)), kaiju.zeilen.filter((z) => z.deutsch.some((d) => d.sprecher === z.rolle)).map(kurz))
+const attack = sprecherAusSeite(fixture('attack-on-titan'))
+pruefe('Attack on Titan: Gruppenkopf „Zivilisten“ hängt an keiner Rolle', kurz(zeile(attack.zeilen, 'Eren Jäger')) === 'Eren Jäger=Max Felder[]' && !JSON.stringify(attack.zeilen).includes('Zivilisten'), kurz(zeile(attack.zeilen, 'Eren Jäger')))
+const conan = sprecherAusSeite(fixture('detektiv-conan'))
+pruefe('Detektiv Conan: Gruppenkopf „Protagonisten“ wird nicht Zusatz, colspan-Zelle nur einmal', kurz(zeile(conan.zeilen, 'Conan Edogawa')) === 'Conan Edogawa=Tobias Müller[]', kurz(zeile(conan.zeilen, 'Conan Edogawa')))
+pruefe('Gruppenkopf zwischen den Datenzeilen und Rolle als deutsche Spalte (Kleinstfall)', lesen('{| class="wikitable"\n! colspan="2"| Rolle !! Deutsch\n|-\n! Name !! Jap\n|-\n| A || x || Anna\n|-\n! colspan="3"| Gruppe\n|-\n| B || y || Berta\n|}') === 'A=Anna[];B=Berta[]')
+
+console.log('Wächter: Sprecher gleich Rolle und Platzhalter werden verworfen, gezählt, gemeldet')
+const wz: SprecherZeile[] = [
+  { rolle: 'Aoi Kaguragi', deutsch: [{ sprecher: 'Aoi Kaguragi', zusatz: null }, { sprecher: 'N. N.', zusatz: 'Staffel 2' }] },
+  { rolle: 'B', deutsch: [{ sprecher: 'Berta', zusatz: null }, { sprecher: 'unbekannt', zusatz: null }, { sprecher: '?', zusatz: null }] },
+  { rolle: 'Eren Jäger', deutsch: [{ sprecher: 'eren  jäger', zusatz: null }] },
+]
+const w = verwirfFalscheStimmen(wz)
+pruefe('fünf falsche Stimmen verworfen, Zeile ohne Stimme entfällt, Berta bleibt', w.verworfen.length === 5 && w.zeilen.map(kurz).join(';') === 'B=Berta[]', w)
+pruefe('Meldung nennt Rolle, Sprecher und Grund', w.verworfen[0] === 'Aoi Kaguragi → „Aoi Kaguragi“ (Sprecher gleich Rolle)' && w.verworfen[1] === 'Aoi Kaguragi → „N. N.“ (Platzhalter)', w.verworfen)
+pruefe('echter Sprecher mit „N“ im Namen ist kein Platzhalter', !istPlatzhalter('Nils Nolte') && istPlatzhalter('N.N.') && istPlatzhalter('???'))
 
 console.log('Handliste')
 type Eintrag = { seite: string; fixture: string; titel: { id: number; fassung?: string; unsicher?: string }[] }

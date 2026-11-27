@@ -1,8 +1,9 @@
 /**
- * Sprechertabelle aus dem Wikitext eines de.wikipedia-Abschnitts „Synchronisation“ (Vorstufe, noch ohne Bau-Anschluss).
+ * Sprechertabelle aus dem Wikitext eines de.wikipedia-Abschnitts „Synchronisation“ (Sammler `fetch-wikipedia-sprecher.ts`, Bau `bau/sprecher-wikipedia.ts`).
  * Quelle: de.wikipedia, Lizenz CC BY-SA 4.0 (Quellennennung mit Link auf die Versionsgeschichte der Seite).
  * Gelesen werden Wikitext-Tabellen mit einer Spalte „Deutsch…“ in der Kopfzeile (auch zweizeiliger Kopf mit
- * rowspan/colspan, mehrere deutsche Spalten je Fassung). Datenzellen gelten als eine Spalte je Zelle.
+ * rowspan/colspan, mehrere deutsche Spalten je Fassung). Eine Datenzelle mit colspan deckt mehrere Spalten (Kaiju No. 8:
+ * ein Sprecher für Staffel 1 und 2); Gruppenköpfe („! colspan=3 | Zivilisten“) zwischen den Datenzeilen sind kein Spaltenkopf.
  */
 
 export interface DeutscheStimme {
@@ -75,6 +76,12 @@ function zeilenAusTabelle(tabelle: string): Zeile[] {
   return zeilen
 }
 
+/** Spaltenköpfe: die Kopfzeilen vor der ersten Datenzeile, ohne einzelne Zelle über mehrere Spalten (Gruppenkopf, Attack on Titan). */
+function spaltenKoepfe(zeilen: Zeile[]): Zeile[] {
+  const erste = zeilen.findIndex((z) => !z.kopf)
+  return zeilen.slice(0, erste < 0 ? undefined : erste).filter((z, i) => i === 0 || !(z.zellen.length === 1 && z.zellen[0]!.colspan > 1))
+}
+
 /** Kopfzeilen zu Spaltenpfaden auflösen (rowspan trägt den Text in die Folgezeile, colspan über mehrere Spalten). */
 function spaltenPfade(kopfzeilen: Zeile[]): string[][] {
   const pfade: string[][] = []
@@ -102,9 +109,11 @@ function spaltenPfade(kopfzeilen: Zeile[]): string[][] {
 
 function stimmen(zellText: string, spaltenZusatz: string | null): DeutscheStimme[] {
   const aus: DeutscheStimme[] = []
-  for (const teil of zellText.split(/<br\s*\/?>/i)) {
+  // Zweite Stimme auch auf eigener Zeile ohne <br>, wenn sie mit einem Namen beginnt (Ranma, Stand 26.11.2026:
+  // „Thomas Rauscher\n[[Torsten Münchow]] <small>…“); kleingeschrieben setzt die Zeile die Stimme fort.
+  for (const teil of zellText.split(/<[Bb][Rr]\s*\/?>|\n(?=\s*\p{Lu})/u)) {
     const klein = /<small>([\s\S]*?)<\/small>/i.exec(teil)?.[1]?.replace(/^\s*\(|\)\s*$/g, '').trim()
-    const sprecher = teil.replace(/<small>[\s\S]*?<\/small>/gi, '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+    const sprecher = teil.replace(/<small>[\s\S]*?<\/small>/gi, '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').replace(/,$/, '').trim()
     if (KEINE_STIMME.has(sprecher)) continue
     const zusatz = [spaltenZusatz, klein].filter((x): x is string => !!x).join(', ')
     aus.push({ sprecher, zusatz: zusatz || null })
@@ -115,6 +124,7 @@ function stimmen(zellText: string, spaltenZusatz: string | null): DeutscheStimme
 function deutscheSpalten(pfade: string[][]): { spalte: number; zusatz: string | null }[] {
   const aus: { spalte: number; zusatz: string | null }[] = []
   pfade.forEach((pfad, spalte) => {
+    if (spalte === 0) return // Spalte 0 ist die Rolle (Kaiju No. 8: „Rolle › Deutsch“ ist der Figurname, kein Sprecher)
     const i = pfad.findIndex((p) => /^(?:deutsch|deu\.|dt\.)/i.test(p.replace(/'{2,}/g, '').trim()))
     if (i < 0) return
     const unter = pfad.slice(i + 1).at(-1)
@@ -126,12 +136,15 @@ function deutscheSpalten(pfade: string[][]): { spalte: number; zusatz: string | 
 export function liesSprechertabelle(wikitext: string): SprecherTabelle {
   for (const [, tabelle] of bereinige(wikitext).matchAll(/^\{\|[^\n]*\n([\s\S]*?)^\|\}/gm)) {
     const zeilen = zeilenAusTabelle(tabelle!)
-    const spalten = deutscheSpalten(spaltenPfade(zeilen.filter((z) => z.kopf)))
+    const spalten = deutscheSpalten(spaltenPfade(spaltenKoepfe(zeilen)))
     if (spalten.length === 0) continue
     const ergebnis: SprecherZeile[] = []
     for (const z of zeilen.filter((x) => !x.kopf)) {
       const rolle = (z.zellen[0]?.text ?? '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
-      const deutsch = spalten.flatMap((s) => stimmen(z.zellen[s.spalte]?.text ?? '', s.zusatz))
+      const jeSpalte = z.zellen.flatMap((c) => Array<Zelle>(c.colspan).fill(c))
+      const deutsch = spalten
+        .flatMap((s) => stimmen(jeSpalte[s.spalte]?.text ?? '', s.zusatz))
+        .filter((d, i, alle) => alle.findIndex((x) => x.sprecher === d.sprecher && x.zusatz === d.zusatz) === i) // eine Zelle über zwei gleich benannte Spalten (Conan)
       if (rolle && deutsch.length > 0) ergebnis.push({ rolle, deutsch })
     }
     return { deutscheSpalte: true, zeilen: ergebnis }

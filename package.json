@@ -158,6 +158,7 @@
     "data:kinoheld": "tsx pipeline/fetch-kinoheld.ts",
     "data:imdb": "tsx pipeline/fetch-wikidata-imdb.ts",
     "data:wikipedia-folgen": "tsx pipeline/fetch-wikipedia-folgen.ts",
+    "data:wikipedia-sprecher": "tsx pipeline/fetch-wikipedia-sprecher.ts",
     "check:panel": "node tools/schwer.mjs npm run check:panel-teile",
     "check:panel-teile": "node tools/trefferprobe-selbsttest.mjs && node tools/panel-bild.mjs && node tools/panel-messen.mjs && npx tsx tools/pille-blase-messen.ts && node tools/panel-zurueck.mjs && node tools/panel-sprung.mjs && node tools/such-chip-messen.mjs && node tools/aehnlich-kacheln-bild.mjs",
     "panel:bilder": "node tools/panel-bild.mjs --docs && node tools/panel-messen.mjs --docs --echte-bilder",

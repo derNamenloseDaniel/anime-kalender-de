@@ -77,6 +77,7 @@ export const FRISTEN = {
   'beleg-lesungen': 4,
   'cartoon-reihen': 4,
   'wikipedia-folgen': 4,
+  'wikipedia-sprecher': 4,
   /*
     Wöchentlich. Der Lauf arbeitet eine Liste ab, die kleiner wird — sind alle
     Verweise beurteilt, holt er nichts mehr und meldet trotzdem seinen Bestand.

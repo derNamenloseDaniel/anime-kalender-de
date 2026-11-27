@@ -192,6 +192,7 @@ export const TEXTE_SPAET = {
   'detail.voicesLoading': 'Wird geladen …',
   'detail.voicesNone': 'Keine Angaben gefunden.',
   'detail.voicesSource': 'Angaben von',
+  'detail.voicesVermutet': '≈ Vermutet: {grund}',
   'detail.aehnlich': 'Ähnliche Titel',
   'detail.aehnlichLaedt': 'Wird geladen …',
   'detail.aehnlichKeine': 'Keine ähnlichen Titel gefunden.',

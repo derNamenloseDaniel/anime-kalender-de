@@ -48,7 +48,7 @@ const ERLAUBT: Record<string, Record<string, string>> = {
     'h.url': 'Nachrichtenartikel-Hinweis',
     'vermerk.rechercheQuelle': 'Rechercheseite des Vermerks',
   },
-  'web/src/components/detail/weitere.tsx': { 'stimmen.annUrl': 'ANN-Seite' },
+  'web/src/components/detail/weitere.tsx': { 'l.url': 'ANN-Eintrag oder Wikipedia-Seite aus voices/<id>.json (annUrl, wikipedia.url)' },
   'web/src/components/Header.tsx': { startHref: 'eigene Seite' },
   'web/src/components/KopfNavigation.tsx': { 'hrefFuer(ziel)': 'eigene Seite' },
   'web/src/components/NewsView.tsx': { "feedUrl('news.xml')": 'eigener Feed' },

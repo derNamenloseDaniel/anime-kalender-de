@@ -1,15 +1,17 @@
 /**
  * Zusicherung am gebauten Bestand (`public/data/feeds/*.ics`): jede erzeugte Kalenderdatei erfüllt RFC 5545 (Zähler je Verstoß).
- * Nachnutzer wie AniNews importieren den Kalender. Läuft in `check:bestand`; die Regeln und ihre Gegenfälle:
- * `shared/ics-pruefung.ts`, `pipeline/check-ics-rfc-faelle.ts`.
- * Aufruf: `npx tsx pipeline/check-ics-rfc-bestand.ts`
+ * Nachnutzer wie AniNews importieren den Kalender. Läuft in `check:bestand` über `tools/check-bestand-liste.txt` (`npm run check:bestand-liste`);
+ * die Regeln und ihre Gegenfälle: `shared/ics-pruefung.ts`, `pipeline/check-ics-rfc-faelle.ts`; Exit 1 bei Verstoß und bei leerem Ordner:
+ * `pipeline/check-ics-rfc-bestand-lauf.ts`.
+ * Aufruf: `npx tsx pipeline/check-ics-rfc-bestand.ts [ordner]` (Standard `public/data/feeds`)
  */
 import { readFileSync, readdirSync } from 'node:fs'
+import { join } from 'node:path'
 import { ICS_REGELN, pruefeIcs, summiere } from '../shared/ics-pruefung.ts'
 
-const ORDNER = new URL('../public/data/feeds/', import.meta.url)
+const ORDNER = process.argv[2] ?? join(import.meta.dirname, '..', 'public', 'data', 'feeds')
 const dateien = readdirSync(ORDNER).filter((d) => d.endsWith('.ics'))
-const je = dateien.map((d) => ({ d, z: pruefeIcs(readFileSync(new URL(d, ORDNER), 'utf8')) }))
+const je = dateien.map((d) => ({ d, z: pruefeIcs(readFileSync(join(ORDNER, d), 'utf8')) }))
 const summe = summiere(je.map((e) => e.z))
 console.log(`\n${dateien.length} ICS-Dateien gegen RFC 5545:`)
 if (!dateien.length) console.error('  ✖ keine ICS-Datei im Bestand')

@@ -352,6 +352,7 @@ pipeline/check-horizonte-staffeln-bestand-lauf.ts
 pipeline/check-horizonte-staffeln.ts
 pipeline/check-ics-folgen.ts
 pipeline/check-ics-kopf.ts
+pipeline/check-ics-rfc-bestand-lauf.ts
 pipeline/check-ics-rfc-faelle.ts
 pipeline/check-ics-zweitanbieter.ts
 pipeline/check-import-meta-env.ts

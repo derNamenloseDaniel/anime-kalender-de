@@ -18,6 +18,8 @@ import { useReleaseSichten } from './release-sichten.ts'
 interface PanelAntwortEingabe {
   title: Title | undefined
   releases: Release[]
+  /** Releases mit Untertiteln allein: nur zum Ausblenden ihrer Wege (`wegeOhneNurUntertitel`), nie angezeigt. */
+  nurUntertitel: Release[]
   today: string
   synopsis: Synopsis | undefined
   favorites: Set<number>
@@ -26,7 +28,7 @@ interface PanelAntwortEingabe {
 }
 
 /** Die Sichten auf Titel und Termine, nach denen die Wege des Panels gegliedert sind. */
-function useWegeSichten({ title, releases, today }: Pick<PanelAntwortEingabe, 'title' | 'releases' | 'today'>) {
+function useWegeSichten({ title, releases, nurUntertitel, today }: Pick<PanelAntwortEingabe, 'title' | 'releases' | 'nurUntertitel' | 'today'>) {
   /**
    * Streaming, aufgeteilt nach dem, was es kostet.
    *
@@ -45,9 +47,11 @@ function useWegeSichten({ title, releases, today }: Pick<PanelAntwortEingabe, 't
    * kommentarlos aus der Anzeige.
    */
   const alleWege = useMemo(() => sortiereNachZugang({ title }), [title])
-  const sortiertNachZugang = useMemo(() => (title ? sichtbareWege(alleWege, title, releases) : alleWege), [alleWege, title, releases])
-  /* Der Kopf sagt „Sprache offen“ / „nur Untertitel“ nach allen Wegen des Titels, auch nach denen, die als Pille entfallen. */
-  const ohneSprachbeleg = useMemo(() => (title ? ohneSprachbelegFuer(alleWege, title, releases) : undefined), [alleWege, title, releases])
+  /* Termine mit Untertiteln allein sind aus `releases` heraus; sie dienen nur dazu, ihre Wege zu erkennen und auszublenden. */
+  const mitUntertitel = useMemo(() => [...releases, ...nurUntertitel], [releases, nurUntertitel])
+  const sortiertNachZugang = useMemo(() => (title ? sichtbareWege(alleWege, title, mitUntertitel) : alleWege), [alleWege, title, mitUntertitel])
+  /* Der Kopf sagt „Sprache offen“ nach allen Wegen des Titels, auch nach denen, die als Pille entfallen. */
+  const ohneSprachbeleg = useMemo(() => (title ? ohneSprachbelegFuer(alleWege, title, mitUntertitel) : undefined), [alleWege, title, mitUntertitel])
   const { discReleases, releaseJePlattform, kinoRelease } = useReleaseSichten(releases, today)
   const alleTermine = useTerminReleases(releases, title, kinoRelease?.slug, today)
   const terminReleases = useMemo(() => sichtbareTermine(alleTermine, sortiertNachZugang), [alleTermine, sortiertNachZugang])

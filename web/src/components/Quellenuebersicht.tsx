@@ -110,7 +110,7 @@ function quellenZeilen(
  * existiert, ist sie verlinkt; wo keine existiert, steht der Name ohne Link
  * statt einer erfundenen Adresse.
  */
-export function Quellenuebersicht({ title, releases, asZiel }: { title: Title; releases: Release[]; asZiel?: string }) {
+export function Quellenuebersicht({ title, releases, asZiel, legende }: { title: Title; releases: Release[]; asZiel?: string; legende?: string }) {
   const { t } = useLang()
   const [offen, setOffen] = useState(false)
 
@@ -135,6 +135,8 @@ export function Quellenuebersicht({ title, releases, asZiel }: { title: Title; r
       </button>
 
       {offen && <QuellenTabelle zeilen={zeilen} />}
+      {/* Die Zeichen der Anbieterzeilen („≈“, „laut JustWatch“) erklärt dieser Abschnitt, nicht der Antwortkasten (Daniel, 26.11.2026). */}
+      {offen && legende && <p className="mt-2 text-t5 text-ak-leise">{legende}</p>}
     </div>
   )
 }

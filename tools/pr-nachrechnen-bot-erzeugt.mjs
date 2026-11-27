@@ -112,6 +112,7 @@ export const ERZEUGTE_DATEIEN = [
   'tmdb.json',
   'toggo.json',
   'tonspur-verdacht.json',
+  'trailer-label-kanaele.json',
   'trailer-versuche.json',
   'trailer.json',
   'tv-programm.json',

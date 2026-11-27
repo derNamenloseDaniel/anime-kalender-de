@@ -49,6 +49,9 @@ export function echteWelt({ ausfuehren = execFileSync, gh = ghMit(ausfuehren), r
       const pr = liste.find((p) => p.head?.ref === zweig && p.head?.repo?.full_name === repo)
       return pr ? { nummer: pr.number } : null
     },
+    // Geänderte Dateien des Code-Zweigs gegen main als `A<Tab>Pfad` (neu) oder `M<Tab>Pfad`, wie `git diff --name-status` (die Compare-Schnittstelle nennt höchstens 300 Dateien)
+    aenderungen: (zweig) =>
+      lesen([`repos/${repo}/compare/main...${kodiert(zweig)}?per_page=100`, '--jq', '.files[] | "\\(if .status == "added" then "A" else "M" end)\\t\\(.filename)"']),
     prAnlegen: ({ titel, text, zweig }) => {
       try {
         return { nummer: JSON.parse(schreiben('POST', 'pulls', { title: titel, head: zweig, base: 'main', body: text })).number }

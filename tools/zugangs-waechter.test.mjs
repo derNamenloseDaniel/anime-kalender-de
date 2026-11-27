@@ -5,7 +5,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writ
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { ausloeser, kontingentFunde, zahlBefunde, pruefeLauf, registerBefunde, spezMitFrist, vomWecker, wachePlanBefunde, weckplanLuecken } from './zugangs-waechter.mjs'
+import { ausloeser, claudeErholung, kontingentFunde, zahlBefunde, pruefeLauf, registerBefunde, spezMitFrist, vomWecker, wachePlanBefunde, wacheLauf, weckplanLuecken } from './zugangs-waechter.mjs'
 
 const schritt = (name, conclusion, von, bis) => ({ name, conclusion, started_at: von, completed_at: bis })
 
@@ -87,6 +87,115 @@ assert.match(pruefeLauf('x.yml', { fristStunden: 24 }, attrappe([]), JETZT)[0].t
 assert.equal(pruefeLauf('x.yml', { fristStunden: 24 }, attrappe([]), JETZT)[0].rot, true)
 // Ohne Frist keine Zeile aus der Fristprüfung
 assert.deepEqual(pruefeLauf('x.yml', { fristStunden: null }, attrappe([]), JETZT), [])
+
+// Kontingent-Schnellabbruch (Lauf 45870267412, 26.11.2026 17:45Z): rot, bis irgendein Claude-Workflow danach gelang (gleiches Token).
+const schnell = { databaseId: 7, status: 'completed', conclusion: 'failure', createdAt: vor(5), event: 'workflow_run' }
+const claudeSchritt = { name: 'Run anthropics/claude-code-action@v1', conclusion: 'failure', started_at: vor(5), completed_at: new Date(Date.parse(vor(5)) + 14e3).toISOString() }
+const claudeGh = () => (...a) => {
+  if (a[0] === 'api') return { jobs: [{ steps: [claudeSchritt] }] }
+  if (a.includes('--status')) return []
+  return [schnell]
+}
+const erh = (h, workflow = 'claude-daten-merge.yml') => ({ createdAt: vor(h), workflow, lauf: 9 })
+const kontingent = (erholt) => pruefeLauf('claude-reparatur.yml', { claude: true, fristStunden: null }, claudeGh(), JETZT, erholt)
+assert.equal(kontingent(null).filter((z) => z.kontingent).length, 1, 'ohne spätere Erholung rot')
+assert.equal(kontingent(erh(4)).filter((z) => z.kontingent).length, 0, 'anderer Claude-Workflow danach grün: Kontingent zurück')
+assert.equal(kontingent(erh(6)).filter((z) => z.kontingent).length, 1, 'Erfolg vor dem Abbruch zählt nicht')
+assert.equal(kontingent(erh(1, 'claude-reparatur.yml')).filter((z) => z.kontingent).length, 0, 'eigener späterer Claude-Erfolg')
+// A2: die Deckung durch einen fremden Workflow bleibt als Zeile sichtbar (nicht rot), mit Lauf und Zeit der Erholung.
+const gedeckt = kontingent(erh(4))
+assert.equal(gedeckt.length, 1)
+assert.equal(gedeckt[0].rot, false)
+assert.match(gedeckt[0].text, /claude-reparatur\.yml: Claude-Schritt „Run anthropics\/claude-code-action@v1“ endete nach wenigen Sekunden \(Lauf 7, .*Z\) — Token läuft wieder: claude-daten-merge\.yml Lauf 9/)
+assert.equal(kontingent(erh(1, 'claude-reparatur.yml')).length, 0, 'eigene Erholung braucht keine Deckungszeile')
+
+// A1: Erholung zählt nur, wenn ein Claude-Schritt success meldete (Läufe 45986775382, 45987704866, 45970050457: grün, Schritte skipped).
+const stepsJe = {
+  11: [{ name: 'Artikel-Router', conclusion: 'skipped' }, { name: 'Artikel auswerten', conclusion: 'skipped' }],
+  12: [{ name: 'Run anthropics/claude-code-action@v1', conclusion: 'success' }],
+  13: [{ name: 'Recherche', conclusion: 'failure' }],
+  14: [{ name: 'Recherche', conclusion: 'success' }],
+}
+const erfolgeJe = { 'a.yml': [{ databaseId: 11, createdAt: vor(1) }, { databaseId: 13, createdAt: vor(3) }], 'b.yml': [{ databaseId: 14, createdAt: vor(5) }, { databaseId: 12, createdAt: vor(8) }] }
+// Die Attrappen prüfen Befehl und Argumente, nicht nur die Antwort (sonst überlebt ein Mutant am Aufrufort).
+const strikt = (a) => {
+  if (a[0] === 'api') return assert.match(a[1], /^repos\/[^/]+\/[^/]+\/actions\/(runs\/\d+\/jobs$|workflows\/refresh-hourly\.yml\/runs\?per_page=20&event=workflow_dispatch$)/)
+  assert.deepEqual(a.slice(0, 2), ['run', 'list'])
+  assert.match(a[a.indexOf('--repo') + 1], /^[^/]+\/[^/]+$/)
+  assert.match(a[a.indexOf('--workflow') + 1], /\.yml$/)
+  if (a.includes('--status')) assert.ok(a[a.indexOf('--status') + 1] === 'success' && ['1', '8'].includes(a[a.indexOf('--limit') + 1]), a.join(' '))
+  assert.match(a[a.indexOf('--json') + 1], /^databaseId,.*createdAt/)
+}
+const erholGh = (...a) => (strikt(a), a[0] === 'api' ? { jobs: [{ steps: stepsJe[a[1].match(/runs\/(\d+)\/jobs/)[1]] ?? [] }] } : erfolgeJe[a[a.indexOf('--workflow') + 1]] ?? [])
+// Die Reihenfolge der Workflows im Register entscheidet nicht: der jüngste Lauf gewinnt, ob er vorn, in der Mitte oder hinten steht.
+const claudeLauf = (id, h) => ({ databaseId: id, createdAt: vor(h) })
+const reihe = (...paare) => Object.fromEntries(paare.map(([w]) => [w, { claude: true }]))
+const reihenGh = (je) => (...a) => (strikt(a), a[0] === 'api' ? { jobs: [{ steps: [{ name: 'Recherche', conclusion: 'success' }] }] } : je[a[a.indexOf('--workflow') + 1]])
+const je = { 'd.yml': [claudeLauf(41, 9)], 'b.yml': [claudeLauf(42, 5)], 'e.yml': [claudeLauf(43, 7)] }
+for (const reihenfolge of [['d.yml', 'b.yml', 'e.yml'], ['b.yml', 'd.yml', 'e.yml'], ['e.yml', 'd.yml', 'b.yml'], ['d.yml', 'e.yml', 'b.yml']]) {
+  assert.equal(claudeErholung(reihe(...reihenfolge.map((w) => [w])), reihenGh(je)).workflow, 'b.yml', reihenfolge.join())
+}
+assert.deepEqual(claudeErholung(reihe(['d.yml']), reihenGh(je)), { createdAt: vor(9), workflow: 'd.yml', lauf: 41 })
+assert.deepEqual(claudeErholung(reihe(['b.yml']), reihenGh(je)), { createdAt: vor(5), workflow: 'b.yml', lauf: 42 })
+assert.deepEqual(claudeErholung({}, reihenGh(je)), null)
+assert.deepEqual(claudeErholung({ 'a.yml': { claude: true }, 'b.yml': { claude: true }, 'c.yml': {} }, erholGh), { createdAt: vor(5), workflow: 'b.yml', lauf: 14 }, 'jüngster Lauf mit Claude-Erfolg; grüner Lauf ohne Claude-Schritt und Claude-Fehlschlag zählen nicht')
+assert.equal(claudeErholung({ 'a.yml': { claude: true } }, erholGh), null, 'nur Läufe ohne gelungenen Claude-Schritt: keine Erholung')
+assert.equal(claudeErholung({ 'c.yml': {} }, erholGh), null)
+
+// A3: wacheLauf (die Schleife aus main) mit gh-Attrappe: Abbruch von a.yml, danach Claude-Erfolg in b.yml → kein roter Befund; ohne echten Claude-Schritt bleibt er rot.
+const abbruch = { databaseId: 20, status: 'completed', conclusion: 'failure', createdAt: vor(6), event: 'workflow_run' }
+const laufGh = (erfolge, jobsJe, weckerH = 1) => (...a) => {
+  strikt(a)
+  if (a[0] === 'api') {
+    if (a[1].includes('refresh-hourly.yml')) return { workflow_runs: [{ event: 'workflow_dispatch', actor: { login: 'daniel' }, created_at: vor(weckerH) }] }
+    return { jobs: [{ steps: jobsJe[a[1].match(/runs\/(\d+)\/jobs/)[1]] ?? [] }] }
+  }
+  const w = a[a.indexOf('--workflow') + 1]
+  return a.includes('--status') ? (erfolge[w] ?? []).slice(0, Number(a[a.indexOf('--limit') + 1])) : w === 'a.yml' ? [abbruch] : []
+}
+const schnellSchritte = [{ name: 'Recherche', conclusion: 'failure', started_at: vor(6), completed_at: new Date(Date.parse(vor(6)) + 9e3).toISOString() }]
+const lauf = (erfolge, jobsJe, { zugaenge = [], weckerH } = {}) => {
+  const s = sammle()
+  const code = wacheLauf({ reg: { laeufe: { 'a.yml': { claude: true }, 'b.yml': { claude: true } }, zugaenge }, ghAufruf: laufGh(erfolge, jobsJe, weckerH), jetzt: JETZT, ausgabe: s.ausgabe })
+  return { code, zeilen: s.zeilen }
+}
+function sammle() {
+  const zeilen = []
+  return { zeilen, ausgabe: (z) => zeilen.push(z) }
+}
+const echtErholt = lauf({ 'b.yml': [{ databaseId: 31, createdAt: vor(2) }] }, { 20: schnellSchritte, 31: [{ name: 'Recherche', conclusion: 'success' }] })
+assert.equal(echtErholt.code, 0, echtErholt.zeilen.join('\n'))
+assert.deepEqual(echtErholt.zeilen, [
+  '✓ a.yml: Claude-Schritt „Recherche“ endete nach wenigen Sekunden (Lauf 20, 2999-12-31T06:00Z) — Token läuft wieder: b.yml Lauf 31 (2999-12-31T10:00Z)',
+  '✓ GITHUB_WECKER_TOKEN: letzter Start durch den Wecker vor 1 h',
+  '\nZugänge unauffällig.',
+])
+// Ablauf und Wecker laufen durch dieselbe Schleife: Ablauf in 9 Tagen und seit 4 Tagen rot, ein fernes Datum nicht, „unbekannt“ als ℹ-Zeile; Wecker 7 h alt rot.
+const zugang = (id, gueltigBis, art = 'handgriff') => ({ id, gueltig: { gueltigBis }, erneuerung: { art, text: 't' } })
+const ablauf = lauf({ 'b.yml': [{ databaseId: 31, createdAt: vor(2) }] }, { 20: schnellSchritte, 31: [{ name: 'Recherche', conclusion: 'success' }] }, { zugaenge: [zugang('X', '3000-01-10'), zugang('V', '2999-12-28'), zugang('F', '3000-06-01'), zugang('Y', null), zugang('W', null), zugang('Z', null, 'automatisch')], weckerH: 7 })
+assert.equal(ablauf.code, 1)
+assert.deepEqual(ablauf.zeilen.slice(1), [
+  '✗ GITHUB_WECKER_TOKEN: letzter Start durch den Wecker vor 7 h',
+  '✗ X: läuft in 9 Tagen ab (3000-01-10) — t',
+  '✗ V: läuft seit 4 Tagen ab ab (2999-12-28) — t', // vorhandene doppelte Silbe „ab ab“ nicht Teil dieses Auftrags
+  'ℹ Ablaufdatum unbekannt (gueltigBis leer): Y, W — Daniel liest es einmal im Konto ab und trägt es ins Register ein.',
+  '\n3 Befund(e) bei den Zugängen.',
+])
+// Nur ein Lauf aus a.yml mit anderem Ergebnis als „failure“, zu alt (> 7 Tage) oder gleichzeitig mit der Erholung löst den roten Befund nicht aus bzw. bleibt rot (Grenzen).
+const listeGh = (lauf) => (...a) => (a[0] === 'api' ? { jobs: [{ steps: [claudeSchritt] }] } : a.includes('--status') ? [] : [lauf])
+const bef = (l, erholt = null) => pruefeLauf('claude-reparatur.yml', { claude: true, fristStunden: null }, listeGh(l), JETZT, erholt)
+assert.equal(bef({ ...schnell, createdAt: vor(24 * 7) }).length, 1, 'genau 7 Tage zählt')
+assert.equal(bef({ ...schnell, createdAt: vor(24 * 7 + 1) }).length, 0, 'älter als 7 Tage nicht')
+assert.equal(bef({ ...schnell, conclusion: 'success' }).length, 0, 'ein Erfolg mit gleichen Schritten ist kein Befund')
+assert.equal(bef(schnell, erh(5)).filter((z) => z.rot).length, 1, 'Erholung zur selben Sekunde deckt den Abbruch nicht')
+const viele = (...a) => (a[0] === 'api' ? { jobs: [{ steps: [claudeSchritt] }] } : a.includes('--status') ? [] : Array.from({ length: 7 }, (_, i) => ({ ...schnell, databaseId: 50 + i })))
+assert.equal(pruefeLauf('claude-reparatur.yml', { claude: true, fristStunden: null }, viele, JETZT, null).length, 5, 'höchstens fünf Läufe je Workflow werden gelesen')
+assert.equal(bef(schnell)[0].text, 'claude-reparatur.yml: Claude-Schritt „Run anthropics/claude-code-action@v1“ endete nach wenigen Sekunden (Lauf 7, 2999-12-31T07:00Z) — Kontingent leer oder CLAUDE_CODE_OAUTH_TOKEN ungültig')
+assert.equal(bef(schnell, erh(4))[0].text, 'claude-reparatur.yml: Claude-Schritt „Run anthropics/claude-code-action@v1“ endete nach wenigen Sekunden (Lauf 7, 2999-12-31T07:00Z) — Token läuft wieder: claude-daten-merge.yml Lauf 9 (2999-12-31T08:00Z)')
+const nurGruen = lauf({ 'b.yml': [{ databaseId: 32, createdAt: vor(2) }] }, { 20: schnellSchritte, 32: [{ name: 'Artikel auswerten', conclusion: 'skipped' }] })
+assert.equal(nurGruen.code, 1, 'grüner Lauf ohne Claude-Schritt löscht den Befund nicht')
+assert.ok(nurGruen.zeilen.some((z) => z.startsWith('✗ a.yml: Claude-Schritt „Recherche“')))
+assert.ok(nurGruen.zeilen.some((z) => z.startsWith('::warning title=Claude-Kontingent leer')))
 
 // Eine Frist-Quelle: die Register-Datei trägt keine Fristen mehr, die Wache liest die Tabelle.
 assert.equal(readFileSync(new URL('data/zugangs-register.json', wurzel), 'utf8').includes('fristStunden'), false)

@@ -1,6 +1,7 @@
 import { readJson, log } from '../lib/util.ts'
 import { type Title, type Release } from '../../shared/types.ts'
 import { amazonAdresseRichten } from '../lib/amazon-adresse.ts'
+import { ladeTrailerHand } from '../lib/trailer-hand.ts'
 import { richtePrimeWege } from './13-1-prime-richten.ts'
 import { richteTerminAdressen } from './13-1-termin-adressen.ts'
 import { setzeJoynFenster } from './13-1-joyn-fenster.ts'
@@ -17,6 +18,9 @@ export interface SynopsisEintrag {
   asUrl?: string
   /** Eigener Text aus Fakten mehrerer Quellen (`data/handlung-eigen.yaml`): alle Quellen, Lizenz des Textes, `reihe` = beschreibt nur die Reihe. */
   eigen?: { quellen: { name: string; url: string }[]; lizenz: string; reihe?: true }
+  /** Ein selbst geschriebener Satz Handlung (`data/curated/ein-satz-handlung/`); `satzReihe` = er beschreibt die Reihe, nicht diesen Titel. */
+  satz?: string
+  satzReihe?: true
   /** Nur ein Teil der Folgen liegt auf Deutsch vor (`data/erstausgabe-von-hand.yaml`): Zahl der deutschen Folgen, Quelle samt kurzem Zitat. */
   deFolgen?: { n: number; quelle: { name: string; url: string }; zitat: string }
   /** Größtes brauchbares Plakat (TMDB): Pfad, Breite, Höhe — nur für die Vergrößerung des Covers. */
@@ -73,6 +77,8 @@ export function schreibeSynopsenUndReichereAn({ allTitles, releases, kanalJeAdre
     'data/trailer.json',
     {},
   )
+  /* Ein Handeintrag (`data/curated/trailer-hand.yaml`) geht dem Lauf-Ergebnis vor. */
+  Object.assign(trailer, ladeTrailerHand())
   setzeToggoFenster(allTitles)
   setzeToggoSeiten(allTitles, 'Anime')
 

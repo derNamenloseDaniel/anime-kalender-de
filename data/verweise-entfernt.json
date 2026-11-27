@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-26T23:13:17.101Z",
+  "stand": "2026-11-27T16:00:24.830Z",
   "verweise": [
     {
       "titleId": 99629,
@@ -7078,7 +7078,7 @@
       "titleId": 156040,
       "titel": "The Most Heretical Last Boss Queen: From Villainess to Savior",
       "plattform": "primevideo",
-      "url": "https://www.amazon.de/gp/video/detail/B0F923DJJ9",
+      "url": "https://www.amazon.de/gp/video/detail/B0FBGJLZ4Y",
       "seriesId": null,
       "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
       "geprueftAm": null,
@@ -7909,6 +7909,17 @@
       "geprueftAm": null,
       "entferntAm": "2026-11-27",
       "letzterWeg": false
+    },
+    {
+      "titleId": 156040,
+      "titel": "The Most Heretical Last Boss Queen: From Villainess to Savior",
+      "plattform": "primevideo",
+      "url": "https://www.amazon.de/gp/video/detail/B0F923DJJ9",
+      "seriesId": null,
+      "grund": "belegtes Nein: dort gibt es keine deutsche Tonspur",
+      "geprueftAm": null,
+      "entferntAm": "2026-11-27",
+      "letzterWeg": true
     },
     {
       "titleId": 111790,

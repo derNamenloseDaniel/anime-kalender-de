@@ -11,6 +11,7 @@
  * gehen nur als Dateiinhalt/JSON an die API, nie in einen Shell-Befehl.
  */
 import { pathToFileURL } from 'node:url'
+import { bewerte, neueEintraege, neueVorratEintraege } from './check-patchnotes-pflicht.mjs'
 
 export const PRTEXT = 'prtext/'
 export const ENDZEILE = '🤖 Generated with [Claude Code](https://claude.com/claude-code)'
@@ -57,6 +58,17 @@ export function codeZweig(auftrag, zeile, welt) {
   return da[0]
 }
 
+/**
+ * Patch-Notes-Pflicht der PR-Kette (`bewerte` in check-patchnotes-pflicht.mjs, dieselbe Regel wie die Vorprüfung) vor dem Anlegen: Eine Abgabe, die sie
+ * verletzt, öffnete bisher einen roten PR (Cloud-Welle 5130–5146, 27.11.2026). `welt.aenderungen(zweig)` liefert die Zeilen `A<Tab>Pfad` / `M<Tab>Pfad` gegen main.
+ */
+export function patchNotesPruefen({ titel, text, zweig }, welt) {
+  const nameStatus = welt.aenderungen(zweig)
+  const dateien = nameStatus.split('\n').map((z) => z.split('\t')[1]).filter(Boolean)
+  const urteil = bewerte({ dateien, neu: neueEintraege(nameStatus), beschreibung: text, zweig, vorrat: neueVorratEintraege(nameStatus), titel })
+  if (!urteil.ok) abbruch(`pr.md verletzt die Patch-Notes-Pflicht, kein PR angelegt: ${urteil.grund}`)
+}
+
 /** Erste Zeile des Nachtrags; der Kopf-sha macht die Abgabe idempotent. */
 export const nachtragKopf = (sha) => `## Nachtrag (Cloud-Bericht, Kopf ${sha.slice(0, 7)})`
 export const nachtragText = (sha, bericht) => `${nachtragKopf(sha)}\n\n${bericht.replace(/\s+$/, '')}\n`
@@ -87,6 +99,7 @@ export function abgabe(zweig, welt) {
   let angelegt = false
   if (pr === null) {
     if (titel === null) abbruch(`${zweig}: pr.md hat keine erste Zeile <!-- titel: … -->`)
+    patchNotesPruefen({ titel, text, zweig: code }, welt)
     pr = welt.prAnlegen({ titel, text: mitEndzeile(text), zweig: code })
     // 422 „existiert schon“ (zwei Abgaben gleichzeitig): auf den Nachtragsweg wechseln, nie ein zweiter PR.
     if (pr === null) pr = welt.offenerPr(code) ?? abbruch(`PR für ${code} nicht anlegbar und nicht auffindbar`)

@@ -1,11 +1,11 @@
 /**
- * Zusicherung (Daniel, 14.10.2026, Beerus): Ein OmU-Termin ohne Deutsch-Beleg und ohne Deutsch-Ankündigung erzeugt kein Ereignis.
+ * Zusicherung (Daniel, 14.10.2026 und 26.11.2026): Ein OmU-Termin erzeugt nie ein Ereignis, mit oder ohne Deutsch-Beleg.
  * Aufruf: `npm run check:logic`.
  */
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import type { Release, ReleaseEvent, Title } from '../shared/types.ts'
+import type { Release, Title } from '../shared/types.ts'
 
 /* Der Bauschritt schreibt Dateien nach `data/`: Er läuft gegen eine leere Kulisse (`AK_ROOT`), nie gegen das Repo. */
 const kulisse = mkdtempSync(join(tmpdir(), 'omu-ohne-termin-'))
@@ -13,7 +13,8 @@ mkdirSync(join(kulisse, 'data', 'curated'), { recursive: true })
 for (const datei of ['ohne-synchro-von-hand.yaml', 'kino-ankuendigungen.yaml']) writeFileSync(join(kulisse, 'data', datei), '[]\n')
 process.env.AK_ROOT = kulisse
 const { rolleTermineAus } = await import('./bau/10-termine.ts')
-const { ohneOmuTermine, hinweiseAnVerworfenen } = await import('./bau/omu-ohne-termin.ts')
+const { omuOhneDeutschBeleg, hinweiseAnVerworfenen } = await import('./bau/omu-ohne-termin.ts')
+const { expandEvents } = await import('../shared/logic.ts')
 const { setzeMarkenFuerPruefung } = await import('./lib/anisearch-marke.ts')
 
 let verletzt = 0
@@ -35,23 +36,16 @@ const titles = new Map<number, Title>([
   [900007, titel(900007)],
   [900008, titel(900008, { deErstausgabe: { synchro: true } } as Partial<Title>)],
 ])
-const ev = (titleId: number, sprache?: 'omu' | 'offen'): ReleaseEvent => ({ titleId, id: `${titleId}@${sprache ?? 'x'}`, ...(sprache ? { sprache } : {}) }) as unknown as ReleaseEvent
-const bleibt = (e: ReleaseEvent): boolean => ohneOmuTermine([e], titles).length === 1
+const omuRelease = (titleId: number): Release => ({ slug: `r${titleId}`, titleId, name: 'x', platform: 'netflix', releaseType: 'weekly', sprache: 'omu', schedule: { firstEpisodeDate: '2099-01-02', episodeCount: 2 } }) as unknown as Release
 
-console.log('OmU-Termine ohne Deutsch-Beleg:')
-pruefe('OmU ohne Beleg und Ankündigung: kein Termin', !bleibt(ev(900001, 'omu')))
-pruefe('OmU, Ankündigung nur „offen“ (Beerus): kein Termin', !bleibt(ev(900004, 'omu')))
-pruefe('OmU, aniSearch ohne Deutsch (-): kein Termin', !bleibt(ev(900007, 'omu')))
-pruefe('Weg mit belegter Synchro: Termin bleibt', bleibt(ev(900002, 'omu')))
-pruefe('Synchro angekündigt: Termin bleibt', bleibt(ev(900003, 'omu')))
-pruefe('aniSearch vertont: Termin bleibt', bleibt(ev(900005, 'omu')))
-pruefe('aniSearch geplant: Termin bleibt', bleibt(ev(900006, 'omu')))
-pruefe('Erstausgabe-Marke: Termin bleibt', bleibt(ev(900008, 'omu')))
-pruefe('Termin ohne Sprachkennzeichnung bleibt', bleibt(ev(900001)))
-pruefe('Sprache „offen“ bleibt', bleibt(ev(900001, 'offen')))
-pruefe('Titel unbekannt: Termin bleibt', bleibt(ev(999999, 'omu')))
-const gemischt = ohneOmuTermine([ev(900001, 'omu'), ev(900002, 'omu'), ev(900001)], titles).map((e) => e.id)
-pruefe('Reihenfolge und Rest bleiben', gemischt.join() === '900002@omu,900001@x', gemischt)
+console.log('Releases mit Untertiteln allein erzeugen nie ein Ereignis (auch mit Deutsch-Beleg am Titel):')
+for (const id of [900001, 900002, 900003, 900004, 900005, 900006, 900007, 900008]) {
+  pruefe(`Titel ${id}: kein Termin`, expandEvents(omuRelease(id)).length === 0)
+}
+pruefe('„Synchro offen“ bleibt ein Termin', expandEvents({ ...omuRelease(1), sprache: 'offen' }).length === 2)
+pruefe('ohne Sprachkennzeichnung bleibt der Termin', expandEvents({ ...omuRelease(1), sprache: undefined }).length === 2)
+const omuOhneBeleg = [900001, 900004, 900007].map((id) => omuOhneDeutschBeleg(titles.get(id)))
+pruefe('omuOhneDeutschBeleg gilt weiter für nurOmuTitel', omuOhneBeleg.every(Boolean) && !omuOhneDeutschBeleg(titles.get(900002)) && !omuOhneDeutschBeleg(titles.get(900003)))
 
 /* Verdrahtung: der echte Bauschritt lässt die OmU-Termine weg, der Titel bleibt im Bestand. */
 const release = (titleId: number, slug: string, hinweis?: string): Release => ({
@@ -82,11 +76,11 @@ const rein = hinweiseAnVerworfenen(titles, [release(900001, 'a', 'x'), release(9
 pruefe('Wächter: nur Hinweis an Titel ohne Beleg, nicht widerlegt', rein.length === 1 && rein[0].includes('„a“'), rein)
 pruefe('Wächter: Weg ohne OmU hält den Titel im Bestand', hinweiseAnVerworfenen(titles, [release(900001, 'a', 'x'), { ...release(900001, 'e'), sprache: undefined } as Release]).length === 0)
 const verbleibend = [...new Set(lauf.events.map((e) => e.titleId))]
-pruefe('Bauschritt: nur der Titel mit Beleg behält Termine', verbleibend.join() === '900002', verbleibend)
+pruefe('Bauschritt: kein Titel behält einen Untertitel-Termin, auch der mit Beleg nicht', verbleibend.length === 0, verbleibend)
 
 setzeMarkenFuerPruefung(undefined)
 if (verletzt) {
   console.error(`${verletzt} Verletzung(en).`)
   process.exit(1)
 }
-console.log('OmU-Termine: alle 16 Fälle in Ordnung.')
+console.log('OmU-Termine: alle Fälle in Ordnung.')

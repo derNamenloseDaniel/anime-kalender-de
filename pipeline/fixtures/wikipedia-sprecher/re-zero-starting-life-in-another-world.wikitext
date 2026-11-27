@@ -1,0 +1,49 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Re:Zero_–_Starting_Life_in_Another_World (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Re:Zero_–_Starting_Life_in_Another_World&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+==== Synchronisation ====
+Die deutsche Synchronfassung der ersten beiden Staffeln entstand bei [[Oxygen Sound Studios]] in Berlin. Die [[Dialogbuch|Dialogbücher]] stammen von [[René Dawn-Claude]]. Die [[Dialogregie]] führten René Dawn-Claude (1. Staffel) und [[Velin Marcone]] (2. Staffel).<ref name="dt_sync">{{Synchronkartei |Typ=serie |ID=44812 |Linktext=Re:Zero – Starting Life in Another World |Abruf=2024-10-11}}</ref>
+{| class="wikitable"
+! Rolle || japanischer Sprecher ([[Seiyū]]) || deutscher Sprecher<ref name="dt_sync" /><ref>{{Internetquelle |url=https://www.anisearch.de/anime/10572,re-zero-kara-hajimeru-isekai-seikatsu/seiyuu |titel=Sprecherliste ''Re:Zero'' bei anisearch.de |werk=anisearch.de |hrsg=AniSearch |abruf=2019-10-17}}</ref>
+|-
+| Subaru Natsuki || [[Yūsuke Kobayashi (Synchronsprecher)|Yūsuke Kobayashi]]|| [[Tim Schwarzmaier]]
+|-
+| Emilia || [[Rie Takahashi]]|| [[Gabrielle Pietermann]]
+|-
+| Puck || [[Yumi Uchiyama]]|| [[Rubina Nath]]
+|-
+| Felt || [[Chinatsu Akasaki]]|| [[Charlotte Uhlig]]
+|-
+| Rem || [[Inori Minase]]|| [[Marie Hinze]]
+|-
+| Ram || [[Rie Murakawa]]|| [[Kristina Tietz]]
+|-
+| Beatrice || [[Satomi Arai]]|| [[Cathlen Gawlich]]
+|-
+| Reinhard van Astrea || [[Yūichi Nakamura (Synchronsprecher)|Yūichi Nakamura]] || [[Tim Knauer]]
+|-
+| Elsa Granhiert || [[Mamiko Noto]] || [[Sonja Spuhl]]
+|-
+| Roswaal L. Mathers || [[Takehito Koyasu]] || [[Matthias Klie]] (Staffel 1)
+[[Matthias Deutelmoser]] (Staffel 2)<ref>{{Internetquelle |autor=Melanie Höpfler |url=https://www.crunchyroll.com/de/anime-news/2022/12/08/deutsche-synchro-von-rezero-starting-life-in-another-world-staffel-2-jetzt-angelaufen |titel=Deutsche Synchro von Re:ZERO – Starting Life in Another World – Staffel 2 jetzt angelaufen! |werk=crunchyroll.com |sprache=de-DE |abruf=2022-12-17}}</ref>
+|-
+|Echidna
+|[[Maaya Sakamoto]]
+|[[Marieke Oeffinger]]
+|-
+|Frederica Baumann
+|[[Nazuka Kaori]]
+|[[Jessica Rusch|Jessica Rust]]
+|-
+|Garfiel Tinsel
+|[[Nobuhiko Okamoto]]
+|[[Vincent Borko]]
+|-
+|Regulus Corneas
+|[[Akira Ishida]]
+|[[Julien Haggège]]
+|-
+|Typhon
+|[[Misaki Kuno]]
+|[[Jodie Blank]]
+|}

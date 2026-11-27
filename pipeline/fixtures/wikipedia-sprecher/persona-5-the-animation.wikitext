@@ -1,0 +1,30 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Persona_5:_The_Animation (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Persona_5:_The_Animation&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+Die deutsche Synchronfassung entstand unter der Regie von Katharina von Daake und nach einem Dialogbuch von Nicole Schröder und Vincent Fallow.
+{| class="wikitable"
+!Rolle
+!japanischer Sprecher ([[Seiyū]])
+!deutscher Sprecher
+|-
+|Ren Amamiya
+|[[Jun Fukuyama]]
+|[[Felix Mayer (Synchronsprecher)|Felix Mayer]]
+|-
+|Sojiro Sakura
+|[[Jōji Nakata]]
+|[[Josef Vossenkuhl]]
+|-
+|Morgana
+|[[Ikue Ōtani]]
+|[[Rieke Werner]]
+|-
+|Anne Takamaki
+|[[Nana Mizuki]]
+|[[Ilena Gwisdalla]]
+|-
+|Ryūji Sakamoto
+|[[Mamoru Miyano]]
+|[[Julian Manuel]]
+|}

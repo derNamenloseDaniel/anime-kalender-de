@@ -1,0 +1,194 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Kaiju_No._8 (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Kaiju_No._8&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+Die deutsche Synchronfassung entstand bei Oxygen Sound Studios in Berlin. [[René Dawn-Claude]] schrieb die [[Dialogbuch|Dialogbücher]] und führte die [[Dialogregie]] zur ersten und zweiten Staffel der Animeserie.<ref name="synchron:0">{{Synchronkartei |Typ=serie |ID=57763 |Linktext=Kaiju No. 8 |Abruf=2024-06-13}}</ref><ref name="synchron:1">{{Internetquelle |autor=Melanie Höpfler |url=https://www.crunchyroll.com/de/news/announcements/2025/7/19/kaiju-no-8-staffel-2-deutsche-synchro-crunchyroll-stream-sprechercast |titel=Deutsche Synchro zu Kaiju No. 8 Staffel 2 auf Crunchyroll gestartet |titelerg=Jeden Samstag mit einer neuen Folge |werk=[[Crunchyroll|crunchyroll.com]] |hrsg=[[Crunchyroll (Unternehmen)|Crunchyroll, LLC]] |datum=2025-07-19 |sprache=de |abruf=2025-07-20 |kommentar=erste Liste der deutschen Synchronsprecher}}</ref><ref name="synchron:2">{{Internetquelle |autor=Simon Münch |url=https://www.crunchyroll.com/de/news/guides/2025/7/19/kaiju-no-8-staffel-2-wann-wo-im-stream-trailer-mehr |titel=Kaiju No. 8 Staffel 2: Wann und wo im Stream, Trailer & mehr |werk=[[Crunchyroll|crunchyroll.com]] |hrsg=[[Crunchyroll (Unternehmen)|Crunchyroll, LLC]] |datum=2025-07-19 |sprache=de |abruf=2025-07-20 |kommentar=Figuren der Animeserie und deren japanischen Synchronsprecher}}</ref>
+
+{| class="wikitable sortable"
+! colspan="2"|Rolle
+! colspan="2"|japanischer Sprecher ([[Seiyū]])<ref name="seiyu">{{Internetquelle |url=https://times.abema.tv/articles/-/10117494 |titel={{lang|ja|アニメ}}『{{lang|ja|怪獣8号}}』{{lang|ja|声優・キャラクター一覧}}{{!}}{{lang|ja|全キャスト71人を網羅＆随時更新}} |titelerg=dt. etwa: Liste der Synchronsprecher und Charaktere aus dem Anime „Kaiju No. 8“ ¡ Alle 71 Darsteller und regelmäßig aktualisiert |werk=times.abema.tv |hrsg=ABEMA |datum=2025-07-20 |sprache=ja |abruf=2025-07-21 |kommentar=ausführliche Synchronsprecherliste}}</ref><ref name="cast">{{Internetquelle |url=https://kaiju-no8.net/#e |titel=Cast – Kaiju No. 8 |titelerg={{lang|ja|怪獣8号}} {{!}} {{lang|ja|アニメ公式サイト}} – Kaiju No. 8 {{!}} Official Site |werk=kaiju-no8.net |hrsg={{lang|ja|防衛隊第3部隊|Bōeitai Dai San Butai}} {{lang|ja|松本直也|Matsumoto Naoya}}／{{lang|ja|集英社|Shūeisha}} |sprache=ja |abruf=2025-01-20 |kommentar=offizielle Liste der [[Rollenbesetzung|Besetzung]] von „Kaiju No. 8“}}</ref>
+! colspan="2"|deutscher Sprecher<ref name="synchron:0" /><ref name="synchron:1" />
+|-
+! Deutsch
+! Japanisch
+! Staffel 1
+! Staffel 2
+! Staffel 1
+! Staffel 2
+|-
+|Aoi Kaguragi
+| data-sort-value="Kaguragi Aoi"|{{lang|ja|神楽木 葵<!-- |Kaguragi Aoi -->}}
+| colspan="2" style="text-align:center;"|[[Shunsuke Takeuchi]] ({{lang|ja|武内 駿輔<!-- |Takeuchi Shunsuke -->}})
+|[[Rêzan Cheikhmous]]
+|[[Nomen nominandum|N. N.]]
+|-
+|Haruichi Izumo
+| data-sort-value="Izumo Haruichi"|{{lang|ja|出雲 ハルイチ<!-- |Izumo Haruichi -->}}
+| colspan="2" style="text-align:center;"|[[Keisuke Koumoto]] ({{lang|ja|河本 啓佑<!-- |Kōmoto Keisuke -->}})
+|[[Julian Tennstedt]]
+|[[Nomen nominandum|N. N.]]
+|-
+|Iharu Furuhashi
+| data-sort-value="Furuhashi Iharu"|{{lang|ja|古橋 伊春<!-- |Furuhashi Iharu -->}}
+| colspan="2" style="text-align:center;"|[[Yuuki Shin]] ({{lang|ja|新 祐樹<!-- |Shin Yūki -->}})
+| colspan="2" style="text-align:center;"|[[René Dawn-Claude]]
+|-
+|Isao Shinomiya
+| data-sort-value="Shinomiya Isao"|{{lang|ja|四ノ宮 功<!-- |Shinomiya Isao -->}}
+| colspan="2" style="text-align:center;"|[[Tesshou Genda]] ({{lang|ja|玄田 哲章<!-- |Genda Tesshō -->}})
+| colspan="2" style="text-align:center;"|[[Dirk Bublies]]
+|-
+|Kafka (Kind)
+| data-sort-value="Hibino Kafka"|{{lang|ja|カフカ (幼少期)<!-- |Kafka (yōshōki) -->}}
+| colspan="2" style="text-align:center;"|[[Megumi Han]] ({{lang|ja|潘 めぐみ<!-- |Han Megumi -->}})
+| colspan="2" style="text-align:center;"|[[Peggy Pollow]]
+|-
+|Kafka Hibino (Kaiju Nr. 8)
+| data-sort-value="Hibino Kafka"|{{lang|ja|日比野 カフカ<!-- |Hibino Kafka -->}} ({{lang|ja|怪獣8号<!-- |Kaijū hachi-gō -->}})
+| colspan="2" style="text-align:center;"|[[Masaya Fukunishi]] ({{lang|ja|福西 勝也<!-- |Fukunishi Masaya -->}})
+| colspan="2" style="text-align:center;"|[[Felix Kamin]]
+|-
+|Kaiju Nr. 9
+| data-sort-value="Kaijū kyuu-gou"|{{lang|ja|怪獣9号<!-- |Kaijū kyū-gō -->}}
+| colspan="2" style="text-align:center;"|[[Hiroyuki Yoshino (Synchronsprecher)|Hiroyuki Yoshino]] ({{lang|ja|吉野 裕行<!-- |Yoshino Hiroyuki -->}})
+|[[Sebastian Schulz]]
+|[[Nomen nominandum|N. N.]]
+|-
+|Kikoru Shinomiya
+| data-sort-value="Shinomiya Kikoru"|{{lang|ja|四ノ宮 キコル<!-- |Shinomiya Kikoru -->}}
+| colspan="2" style="text-align:center;"|[[Ai Fairouz]] ({{lang|ja|ファイルーズ あい<!-- |Fairūzu Ai -->}})
+| colspan="2" style="text-align:center;"|[[Kristina Tietz]]
+|-
+|Konomi Okonogi
+| data-sort-value="Okonogi Konomi"|{{lang|ja|小此木 このみ<!-- |Okonogi Konomi -->}}
+| colspan="2" style="text-align:center;"|[[Sayaka Senbongi]] ({{lang|ja|千本木 彩花<!-- |Senbongi Sayaka -->}})
+|[[Muriel Bielenberg]]
+|[[Nomen nominandum|N. N.]]
+|-
+|Mina Ashiro
+| data-sort-value="Ashiro Mina"|{{lang|ja|亜白 ミナ<!-- |Ashiro Mina -->}}
+| colspan="2" style="text-align:center;"|[[Asami Seto]] ({{lang|ja|瀬戸 麻沙美<!-- |Seto Asami -->}})
+| colspan="2" style="text-align:center;"|[[Jessica Rust]]
+|-
+|Reno Ichikawa
+| data-sort-value="Ichikawa Reno"|{{lang|ja|市川 レノ<!-- |Ichikawa Reno -->}}
+| colspan="2" style="text-align:center;"|[[Wataru Katou]] ({{lang|ja|加藤 渉<!-- |Katō Wataru -->}})
+| colspan="2" style="text-align:center;"|[[Flemming Stein]]
+|-
+|Soshiro Hoshina
+| data-sort-value="Hoshina Soshiro"|{{lang|ja|保科 宗四郎<!-- |Hoshina Soshiro -->}}
+| colspan="2" style="text-align:center;"|[[Kengo Kawanishi]] ({{lang|ja|河西 健吾<!-- |Kawanishi Kengo -->}})
+| colspan="2" style="text-align:center;"|[[Dirk Petrick]]
+|-
+|[[Künstliche Intelligenz|AI]]-Stimme
+| data-sort-value="AI onjō"|AI{{lang|ja|音声<!-- |onjō -->}}
+|[[Tomokazu Seki]] ({{lang|ja|関 智一<!-- |Seki Tomokazu -->}})
+|style="text-align:center;"| –
+|[[Isabella Vinet]]
+|style="text-align:center;"| –
+|-
+|Itakura
+| data-sort-value="Itakura"|{{lang|ja|板倉<!-- |Itakura -->}}
+|[[Taito Ban]] ({{lang|ja|坂 泰斗<!-- |Ban Taito -->}})
+|style="text-align:center;"| –
+|[[David Hörning]]
+|style="text-align:center;"| –
+|-
+|Kinugasa
+| data-sort-value="Kinugasa"|{{lang|ja|衣笠<!-- |Kinugasa -->}}
+|[[Takuya Masumoto]] ({{lang|ja|増元 拓也<!-- |Masumoto Takuya -->}})
+|style="text-align:center;"| –
+|[[Christopher Groß]]
+|style="text-align:center;"| –
+|-
+|Miike
+| data-sort-value="Miike"|{{lang|ja|三池<!-- |Miike -->}}
+|[[Jun Fukushima]] ({{lang|ja|福島 潤<!-- |Fukushima Jun -->}})
+|style="text-align:center;"| –
+|[[Rajko Geith]]
+|style="text-align:center;"| –
+|-
+|Mizoguchi
+| data-sort-value="Mizoguchi"|{{lang|ja|溝口<!-- |Mizoguchi -->}}
+|[[Mitsuru Miyamoto]] ({{lang|ja|宮本 充<!-- |Miyamoto Mitsuru -->}})
+|style="text-align:center;"| –
+|[[Jan Kurbjuweit]]
+|style="text-align:center;"| –
+|-
+|Risas Vater
+| data-sort-value="Risa no chichi oya"|{{lang|ja|リサの父親<!-- |Risa no chichi oya -->}}
+|[[Ryou Sugisaki]] ({{lang|ja|杉崎 亮<!-- |Sugisaki Ryō -->}})
+|style="text-align:center;"| –
+|[[Levin Jäger]]
+|style="text-align:center;"| –
+|-
+|Soldat
+| data-sort-value="Bōeitai kanbu"|{{lang|ja|防衛隊幹部<!-- |Bōeitai kanbu -->}}
+|[[Takuya Masumoto]] ({{lang|ja|増元 拓也<!-- |Masumoto Takuya -->}})
+|style="text-align:center;"| –
+|[[Levin Jäger]]
+|style="text-align:center;"| –
+|-
+|Tae Nakanoshima
+| data-sort-value="Nakanoshima Tae"|{{lang|ja|中之島 タエ<!-- |Nakanoshima Tae -->}}
+|[[Mutsumi Tamura]] ({{lang|ja|田村 睦心<!-- |Tamura Mutsumi -->}})
+|style="text-align:center;"| –
+|[[Vera Bunk]]
+|style="text-align:center;"| –
+|-
+|Toku (Masahide Tokuda)
+| data-sort-value="Tokuda Masahide"|{{lang|ja|徳<!-- |Toku -->}} ({{lang|ja|徳田 マサヒデ<!-- |Tokuda Masahide -->}})
+|[[Yutaka Aoyama]] ({{lang|ja|青山 穣<!-- |Aoyama Yutaka -->}})
+|style="text-align:center;"| –
+|[[Fabian Oscar Wien]]
+|style="text-align:center;"| –
+|-
+|Yoshimura
+| data-sort-value="Yoshimura"|{{lang|ja|吉村<!-- |Yoshimura -->}}
+|[[Tomohiro Oono]] ({{lang|ja|大野 智敬<!-- |Ōno Tomohiro -->}})
+|style="text-align:center;"| –
+|[[Tom Ferenc]]
+|style="text-align:center;"| –
+|-
+|Gen Narumi
+| data-sort-value="Narumi Gen"|{{lang|ja|鳴海 弦<!-- |Naumi Gen -->}}
+|style="text-align:center;"| –
+|[[Kouki Uchiyama]] ({{lang|ja|内山 昂輝<!-- |Uchiyama Kōki -->}})
+|style="text-align:center;"| –
+|[[Jan Makino]]
+|-
+|Eiji Hasegawa
+| data-sort-value="Hasegawa Eiji"|{{lang|ja|長谷川 エイジ<!-- |Hasegawa Eiji -->}}
+|style="text-align:center;"| –
+|[[Hiroki Yasumoto]] ({{lang|ja|安元 洋貴<!-- |Yasumoto Hiroki -->}})
+|style="text-align:center;"| –
+|[[Peter Sura]]
+|-
+|Akira Kurusu
+| data-sort-value="Kurusu Akira"|{{lang|ja|来栖 アキラ<!-- |Kurusu Akira -->}}
+|style="text-align:center;"| –
+|[[Ryouta Suzuki]] ({{lang|ja|鈴木 崚汰<!-- |Suzuki Ryōta -->}})
+|style="text-align:center;"| –
+|[[Alex Friedland]]
+|-
+|Rin Shinonome
+| data-sort-value="Shinonome Rin"|{{lang|ja|東雲 りん<!-- |Shinonome Rin -->}}
+|style="text-align:center;"| –
+|[[Kana Hanazawa]] ({{lang|ja|花澤 香菜<!-- |Hanazawa Kana -->}})
+|style="text-align:center;"| –
+|[[Alice Bauer]]
+|-
+|Tachibana (Kouta Tachibana)
+| data-sort-value="Tachibana Kōta"|{{lang|ja|立花<!-- |Tachibana -->}} ({{lang|ja|立花 コウタ<!-- |Tachibana Kōta -->}})
+|style="text-align:center;"| –
+|[[Genta Nakamura]] ({{lang|ja|中村 源太<!-- |Nakamura Genta -->}})
+|style="text-align:center;"| –
+|[[Imme Aldag]]
+|-
+|Miyake (Kurato Miyake)
+| data-sort-value="Miyake Kurato"|{{lang|ja|三宅<!-- |Miyake -->}} ({{lang|ja|三宅 蔵人<!-- |Miyake Kurato -->}})
+|style="text-align:center;"| –
+|[[Shouta Yamamoto]] ({{lang|ja|山本 祥太<!-- |Yamamoto Shōta -->}})
+|style="text-align:center;"| –
+|[[Christoph Banken]]
+|}

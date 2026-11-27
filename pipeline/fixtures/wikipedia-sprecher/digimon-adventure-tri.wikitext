@@ -1,0 +1,87 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Digimon_Adventure_tri. (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Digimon_Adventure_tri.&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+== Synchronisation ==
+Die acht Digiritter erhielten aufgrund des Zeitsprungs im Franchise neue japanische Sprecher, während die der Digimon aus der ersten Serie übernommen wurden.<ref>{{Internetquelle |url=https://www.animenewsnetwork.com/encyclopedia/anime.php?id=16310 |titel=Digimon Adventure tri - auf AnimeNewsNetwork |werk=animenewsnetwork.com |hrsg=[[Anime News Network]] |datum= |abruf=2015-12-05}}</ref> In der deutschen Fassung wurden, bis auf den Sprecher der Figur Izzy, alle Sprecher der Originalserie übernommen. Die deutsche [[Synchronfassung]] wurde von [[Tōei Animation]] in Auftrag gegeben und durch die RRP Media in Berlin erstellt, Nachfolgerfirma der MME Studios, welche die Vorgängerserien synchronisierte.<ref>Abspann der deutschen Version des ersten Digimon Adventure tri. Filmes</ref>
+
+{| class="wikitable"
+! Rolle (jp./dt.)
+! Japanischer Sprecher ([[Seiyū]])
+! Deutscher Sprecher<ref>{{Synchronkartei|film|35916|Digimon Adventure tri. Chapter 1 – Reunion}}</ref><ref>{{Synchronkartei|film|36042|Digimon Adventure tri. Chapter 2 – Determination}}</ref>
+|-
+| Taichi Yagami / Tai Yagami
+| Natsuki Hanae
+| [[Florian Knorn]]
+|-
+| Yamato Ishida / Matt Ishida
+| Yoshimasa Hosoya
+| [[Robin Kahnmeyer]]
+|-
+| Sora Takenouchi
+| Suzuko Mimori
+| [[Sonja Spuhl]]
+|-
+| Kōshirō Izumi / Izzy Izumi
+| Mutsumi Tamura
+| [[Christian Zeiger]] (1–3)<br />[[Christopher Kohn]] (4–6)<ref name="synchronsprecher">[https://www.animenachrichten.de/news/digimon-adventure-tri-izzy-und-kari-bekommen-neue-deutsche-synchronsprecher Digimon Adventure tri. – Izzy und Kari bekommen neue deutsche Synchronsprecher]; animenachrichten.de, vom 18. Januar 2018, abgerufen am 12. März 2018</ref>
+|-
+| Mimi Tachikawa
+| Hitomi Yoshida
+| [[Giuliana Jakobeit]]
+|-
+| Jō Kido / Joe Kido
+| Junya Ikeda
+| [[Marius Clarén]]
+|-
+| Takeru Takaishi / T.K. Takaishi
+| Junya Enoki
+| [[Nicolás Artajo]]
+|-
+| Hikari Yagami / Kari Yagami
+| Mao Ichimichi
+| [[Marie-Luise Schramm]] (1–3)<br />[[Josephine Schmidt]] (4–6)<ref name="synchronsprecher" />
+|-
+| Meiko Mochizuki
+| Miho Arakawa
+| [[Alice Bauer]]
+|-
+| Agumon
+| Chika Sakamoto
+| [[Gerald Schaale]]
+|-
+| Gabumon
+| Mayumi Yamaguchi
+| [[Julien Haggége]]
+|-
+| Piyomon / Biyomon
+| Atori Shigematsu
+| [[Daniela Reidies]]
+|-
+| Tentomon
+| [[Takahiro Sakurai]]
+| [[Joachim Kaps]]
+|-
+| Palmon
+| Kinoko Yamada
+| Gabriele Schramm-Philipp
+|-
+| Gomamon
+| [[Junko Takeuchi]]
+| [[Rainer Fritzsche]]
+|-
+| Patamon
+| Miwa Matsumoto
+| [[Hans Hohlbein]]
+|-
+| Tailmon / Gatomon
+| Yuka Tokumitsu
+| [[Katrin Zimmermann]]
+|-
+| Meikuumon
+| Yukiko Morishita
+| [[Sarah Alles]]
+|-
+| Erzähler
+| Hiroaki Hirata
+| [[Kim Hasper]]
+|}

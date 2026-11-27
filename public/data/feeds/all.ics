@@ -585,19 +585,6 @@ DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nUhrze
 CATEGORIES:Netflix
 END:VEVENT
 BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll@2026-11-21@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261121
-DTEND;VALUE=DATE:20261122
-SUMMARY:Black Clover – Staffel 2 – Folge 8/≈12 (OmU)
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
- lton mit deutschen Untertiteln\, keine deutsche Synchro.\nUhrzeit noch nic
- ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
- dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
- e-kalender.de/t/16920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
 UID:das-band-der-unterwelt-netflix@2026-11-21@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261121
@@ -987,21 +974,9 @@ UID:auto-141391-netflix@2026-11-25@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART;VALUE=DATE:20261125
 DTEND;VALUE=DATE:20261126
-SUMMARY:Call of the Night (Synchro offen)
-DESCRIPTION:Plattform: Netflix\nRelease-Art: Katalog\nSynchro offen: Der Te
- rmin ist belegt\, eine deutsche Synchro nicht.\nUhrzeit noch nicht bestät
- igt.\nDetails: https://anime-kalender.de/t/13665/
-CATEGORIES:Netflix
-END:VEVENT
-BEGIN:VEVENT
-UID:motn-135660-netflix@2026-11-25@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261125
-DTEND;VALUE=DATE:20261126
-SUMMARY:Exception (neu bei Netflix)
-DESCRIPTION:Plattform: Netflix\nRelease-Art: Katalogtitel\nIm Angebot seit 
- diesem Tag – nicht der Erscheinungstag der deutschen Fassung.\nUhrzeit n
- och nicht bestätigt.\nDetails: https://anime-kalender.de/t/13073/
+SUMMARY:Call of the Night
+DESCRIPTION:Plattform: Netflix\nRelease-Art: Katalogtitel\nUhrzeit noch nic
+ ht bestätigt.\nDetails: https://anime-kalender.de/t/13665/
 CATEGORIES:Netflix
 END:VEVENT
 BEGIN:VEVENT
@@ -1228,10 +1203,18 @@ DTSTAMP:20200101T000000Z
 DTSTART:20261127T160000Z
 DTEND:20261127T163000Z
 SUMMARY:Die Tagebücher der Apothekerin: Staffel 3 - Teil 1 – Folge 6/12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 6914/
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
+ etails: https://anime-kalender.de/t/16914/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
+UID:cr-GT00383999@2026-11-27@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261127T160000Z
+DTEND:20261127T163000Z
+SUMMARY:Firefly Wedding – Folge 5/12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
+ etails: https://anime-kalender.de/t/17358/
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
@@ -1255,18 +1238,6 @@ DESCRIPTION:Plattform: Disney+\nRelease-Art: Wöchentlich (Simuldub)\nGesch
  r Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15957
  /
 CATEGORIES:Disney+
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GT00383999@2026-11-27@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261127T170000Z
-DTEND:20261127T173000Z
-SUMMARY:Firefly Wedding – Folge 5/12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7358/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:yaiba-samurai-legend-prosieben-maxx@2026-11-27@anime-kalender-de
@@ -1432,19 +1403,6 @@ DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nUhrze
  r Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: h
  ttps://anime-kalender.de/t/17567/
 CATEGORIES:Netflix
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll@2026-11-28@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261128
-DTEND;VALUE=DATE:20261129
-SUMMARY:Black Clover – Staffel 2 – Folge 9/≈12 (OmU)
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
- lton mit deutschen Untertiteln\, keine deutsche Synchro.\nUhrzeit noch nic
- ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
- dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
- e-kalender.de/t/16920/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:das-band-der-unterwelt-netflix@2026-11-28@anime-kalender-de
@@ -1786,6 +1744,18 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GT00383999@2026-12-04@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261204T160000Z
+DTEND:20261204T163000Z
+SUMMARY:Firefly Wedding – Folge 6/12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7358/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:tokyo-revengers-s3-disneyplus@2026-12-04@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261204T170000Z
@@ -1796,18 +1766,6 @@ DESCRIPTION:Plattform: Disney+\nRelease-Art: Wöchentlich (Simuldub)\nGesch
  r Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15957
  /
 CATEGORIES:Disney+
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GT00383999@2026-12-04@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261204T170000Z
-DTEND:20261204T173000Z
-SUMMARY:Firefly Wedding – Folge 6/12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7358/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:yaiba-samurai-legend-prosieben-maxx@2026-12-04@anime-kalender-de
@@ -2063,19 +2021,6 @@ DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nUhrze
  r Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: h
  ttps://anime-kalender.de/t/17567/
 CATEGORIES:Netflix
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll@2026-12-05@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261205
-DTEND;VALUE=DATE:20261206
-SUMMARY:Black Clover – Staffel 2 – Folge 10/≈12 (OmU)
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
- lton mit deutschen Untertiteln\, keine deutsche Synchro.\nUhrzeit noch nic
- ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
- dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
- e-kalender.de/t/16920/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:das-band-der-unterwelt-netflix@2026-12-05@anime-kalender-de
@@ -2404,6 +2349,18 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GT00383999@2026-12-11@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261211T160000Z
+DTEND:20261211T163000Z
+SUMMARY:Firefly Wedding – Folge 7/12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7358/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:tokyo-revengers-s3-disneyplus@2026-12-11@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261211T170000Z
@@ -2414,18 +2371,6 @@ DESCRIPTION:Plattform: Disney+\nRelease-Art: Wöchentlich (Simuldub)\nGesch
  r Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15957
  /
 CATEGORIES:Disney+
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GT00383999@2026-12-11@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261211T170000Z
-DTEND:20261211T173000Z
-SUMMARY:Firefly Wedding – Folge 7/12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7358/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2026-12-11@anime-kalender-de
@@ -2541,19 +2486,6 @@ DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nUhrze
  r Tag\, sondern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: h
  ttps://anime-kalender.de/t/17567/
 CATEGORIES:Netflix
-END:VEVENT
-BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll@2026-12-12@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261212
-DTEND;VALUE=DATE:20261213
-SUMMARY:Black Clover – Staffel 2 – Folge 11/≈12 (OmU)
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
- lton mit deutschen Untertiteln\, keine deutsche Synchro.\nUhrzeit noch nic
- ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
- dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
- e-kalender.de/t/16920/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:das-band-der-unterwelt-netflix@2026-12-12@anime-kalender-de
@@ -2771,6 +2703,18 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GT00383999@2026-12-18@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261218T160000Z
+DTEND:20261218T163000Z
+SUMMARY:Firefly Wedding – Folge 8/12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7358/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:tokyo-revengers-s3-disneyplus@2026-12-18@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261218T170000Z
@@ -2781,18 +2725,6 @@ DESCRIPTION:Plattform: Disney+\nRelease-Art: Wöchentlich (Simuldub)\nGesch
  r Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15957
  /
 CATEGORIES:Disney+
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GT00383999@2026-12-18@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261218T170000Z
-DTEND:20261218T173000Z
-SUMMARY:Firefly Wedding – Folge 8/12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7358/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2026-12-18@anime-kalender-de
@@ -3026,19 +2958,6 @@ DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nUhrze
 CATEGORIES:Netflix
 END:VEVENT
 BEGIN:VEVENT
-UID:black-clover-s2-crunchyroll@2026-12-19@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261219
-DTEND;VALUE=DATE:20261220
-SUMMARY:Black Clover – Staffel 2 – Folge 12/≈12 (OmU)
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich\nOmU: Origina
- lton mit deutschen Untertiteln\, keine deutsche Synchro.\nUhrzeit noch nic
- ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
- dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
- e-kalender.de/t/16920/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
 UID:cr-GT00384006@2026-12-20@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261220T140000Z
@@ -3241,6 +3160,18 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
 CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
+UID:cr-GT00383999@2026-12-25@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261225T160000Z
+DTEND:20261225T163000Z
+SUMMARY:Firefly Wedding – Folge 9/12
+DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
+ eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
+  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
+ 7358/
+CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
 UID:tokyo-revengers-s3-disneyplus@2026-12-25@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261225T170000Z
@@ -3251,18 +3182,6 @@ DESCRIPTION:Plattform: Disney+\nRelease-Art: Wöchentlich (Simuldub)\nGesch
  r Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/15957
  /
 CATEGORIES:Disney+
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GT00383999@2026-12-25@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261225T170000Z
-DTEND:20261225T173000Z
-SUMMARY:Firefly Wedding – Folge 9/12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
- eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
-  oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
- 7358/
-CATEGORIES:Crunchyroll
 END:VEVENT
 BEGIN:VEVENT
 UID:one-piece-whole-cake-island-prosieben-maxx@2026-12-25@anime-kalender-de
@@ -3497,8 +3416,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383999@2027-01-01@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20270101T170000Z
-DTEND:20270101T173000Z
+DTSTART:20270101T160000Z
+DTEND:20270101T163000Z
 SUMMARY:Firefly Wedding – Folge 10/12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -3715,8 +3634,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383999@2027-01-08@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20270108T170000Z
-DTEND:20270108T173000Z
+DTSTART:20270108T160000Z
+DTEND:20270108T163000Z
 SUMMARY:Firefly Wedding – Folge 11/12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus
@@ -3896,8 +3815,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:cr-GT00383999@2027-01-15@anime-kalender-de
 DTSTAMP:20200101T000000Z
-DTSTART:20270115T170000Z
-DTEND:20270115T173000Z
+DTSTART:20270115T160000Z
+DTEND:20270115T163000Z
 SUMMARY:Firefly Wedding – Folge 12/12
 DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
  eschätzter Termin: kein vom Anbieter genannter Tag\, sondern aus Rhythmus

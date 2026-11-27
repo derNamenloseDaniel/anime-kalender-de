@@ -160,6 +160,10 @@ const angebotZeile = (platform: PlatformId, date: string, verlag: string) =>
   angebotSeitZeileVon({ angebotSeit: { platform, date }, ...erstausgabe('2026-07-04', verlag) } as unknown as Title, t)
 pruefe('Kasten: „Amazon.com, Inc.“ nennt die Erstausgabe schon (früher oder gleich) — keine Zeile „im Angebot seit“ bei Prime Video', angebotZeile('primevideo', '2026-07-04', 'Amazon.com, Inc.') === undefined)
 pruefe('Kasten: „The Walt Disney Company“ bei Disney+ — keine Zeile', angebotZeile('disneyplus', '2026-07-05', 'The Walt Disney Company') === undefined)
+/* Das Panel kennt keine Verschärfung: „Auf Deutsch seit“ und „im Angebot seit“ desselben Anbieters nie zugleich (Prüfer Runde 2, 27.11.2026). */
+const zeileMit = (erst: Record<string, unknown>) => angebotSeitZeileVon({ angebotSeit: { platform: 'disneyplus', date: '2026-04-23' }, deErstausgabe: { publisher: 'The Walt Disney Company', ...erst } } as unknown as Title, t)
+pruefe('Kasten: Erstausgabe mit Zeitraum (bis) beim selben Anbieter — keine Zeile „im Angebot seit“ (Wandance)', zeileMit({ von: '2025-10-08', bis: '2025-12-24', synchro: true }) === undefined)
+pruefe('Kasten: Erstausgabe ohne Synchro-Marke beim selben Anbieter — keine Zeile', zeileMit({ von: '2025-10-08' }) === undefined)
 pruefe('Kasten: Verlag Kazé bei Crunchyroll — die Zeile bleibt', angebotZeile('crunchyroll', '2026-07-04', 'Kazé') !== undefined)
 pruefe('Kasten: Verlag Amazon, Angebot bei Netflix — die Zeile bleibt', angebotZeile('netflix', '2026-07-04', 'Amazon.com, Inc.') !== undefined)
 pruefe('kastenNenntSeit: Angebot', kastenNenntSeit(angebot('crunchyroll', '2026-07-20') as never, 'crunchyroll', '2026-07-20') && !kastenNenntSeit(angebot('crunchyroll', '2026-07-20') as never, 'crunchyroll', '2026-07-21'))

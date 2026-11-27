@@ -1,0 +1,23 @@
+<!-- Quelle: https://de.wikipedia.org/wiki/Fire_Force (Abschnitt Synchronisation), Wikitext per ?action=raw abgerufen am 2026-11-26.
+     Lizenz: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/deed.de), Autoren: Versionsgeschichte https://de.wikipedia.org/w/index.php?title=Fire_Force&action=history
+     Nur dieser Abschnitt, Wortlaut unveraendert. -->
+=== Synchronisation ===
+Die deutsche Vertonung der Anime-Adaption vom Manga Fire Force fand beim [[Oxygen Sound Studios]] GmbH in [[Berlin]] statt. Die Dialogregie zur Synchronisation führten [[Rieke Werner]] (Staffeln 1 & 2), [[Bartosz Bludau]] (Staffel 2) und [[Wiebke Westphal]] (Staffel 3). Die Diaglogbücher schrieben Rieke Werner (Staffel 1), [[Timo R. Schouren]] (Staffel 1), [[Daniel Gärtner]] (Staffel 2) und Bartosz Bludau (Staffeln 2 und 3).<ref name="dt_synchron">{{Synchronkartei |Typ=serie |ID=46987 |Linktext=Fire Force |Abruf=2025-06-14}}</ref>
+
+{| class="wikitable"
+! Rolle || japanischer Sprecher ([[Seiyū]]) || deutscher Sprecher<ref name="dt_synchron" /><ref>{{Internetquelle |url=https://www.anisearch.de/anime/13987,enen-no-shouboutai/seiyuu |titel=Sprecherliste ''Firce Force'' bei anisearch.de |hrsg=[[aniSearch]] |abruf=2020-05-26}}</ref>
+|-
+| Shinra Kusakabe || [[Gakuto Kajiwara]] || [[Dennis Saemann]]
+|-
+| Akitaru Ōbi || [[Kazuya Nakai]] || [[Daniel Welbat]]
+|-
+| Takehisa Hinawa || [[Kenichi Suzumura]] || [[Florian Clyde]]
+|-
+| Maki Oze || [[Saeko Kamijō]] || [[Patrizia Carlucci]]
+|-
+| Iris || [[M.A.O]] || [[Daniela Molina]]
+|-
+|Arthur Boyle || Yūsuke Kobayashi || [[Amadeus Strobl]]
+|-
+|Tamaki Kotatsu || Aoi Yūki || [[Marie Hinze]]
+|}

@@ -7,7 +7,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { ladeSaetze, satzBestandFehler, satzDateiFehler, SATZ_MAX, teilDateien } from './lib/handlung-satz.ts'
+import { HANDLUNG_SATZ_ORDNER, ladeSaetze, satzBestandFehler, satzDateiFehler, SATZ_MAX, teilDateien } from './lib/handlung-satz.ts'
 import { ergaenzeSaetze } from './bau/handlung-satz-einbinden.ts'
 import { type SynopsisEintrag } from './bau/13-1-anreichern.ts'
 
@@ -76,11 +76,11 @@ pruefe('Verdrahtung: 13-schreiben.ts bindet die Sätze für slim und verschoben 
 function bestandLauf(satz: string): { status: number | null; aus: string } {
   const kulisse = mkdtempSync(join(tmpdir(), 'satz-bestand-'))
   try {
-    for (const d of ['public/data/synopses', 'data/curated/ein-satz-handlung']) mkdirSync(join(kulisse, d), { recursive: true })
+    for (const d of ['public/data/synopses', HANDLUNG_SATZ_ORDNER]) mkdirSync(join(kulisse, d), { recursive: true })
     writeFileSync(join(kulisse, 'public/data/titles.json'), JSON.stringify([{ id: 1, titleDe: 'Titel Eins' }]))
     writeFileSync(join(kulisse, 'public/data/ohne-synchro.json'), '[]')
     writeFileSync(join(kulisse, 'public/data/synopses/1.json'), '{"1":{"de":"Text"}}')
-    writeFileSync(join(kulisse, 'data/curated/ein-satz-handlung/teil-01.yaml'), `- id: 1\n  satz: ${satz}\n  quellen: [aniSearch]\n  geprueftAm: 2026-11-26\n`)
+    writeFileSync(join(kulisse, HANDLUNG_SATZ_ORDNER, 'teil-01.yaml'), `- id: 1\n  satz: ${satz}\n  quellen: [aniSearch]\n  geprueftAm: 2026-11-26\n`)
     const r = spawnSync('npx', ['tsx', fileURLToPath(new URL('./check-handlung-satz-bestand.ts', import.meta.url))], { env: { ...process.env, AK_ROOT: kulisse }, encoding: 'utf8', timeout: 60000 })
     return { status: r.status, aus: `${r.stdout}${r.stderr}` }
   } finally {

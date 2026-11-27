@@ -83,6 +83,17 @@ zurueck()
 await melde({ stapel: [meldung({ folge_nr: 1 }), meldung({ folge_nr: 2, suchUrl: 'https://www.amazon.de/s?k=A' })] })
 pruefe(dispatches() === 1, 'ein Stapel mit einer Such-Meldung stößt genau einmal an', starts)
 
+// Abgelehnte Such-Meldung (ohne `url`) neben einer angenommenen ohne `suchUrl`: nichts Neues im Bau, kein Start.
+zurueck()
+r = await melde({ stapel: [meldung(), { ...meldung({ suchUrl: 'https://www.amazon.de/s?k=A' }), url: undefined }] })
+const abgelehnt = ((await r.json()) as { ergebnisse: { ok: boolean }[] }).ergebnisse
+pruefe(r.status === 200 && abgelehnt[0]!.ok && !abgelehnt[1]!.ok, 'Kulisse: die Such-Meldung wird abgelehnt, die andere angenommen', abgelehnt)
+pruefe(dispatches() === 0, 'abgelehnte Such-Meldung im Stapel: kein Start', starts)
+// Nur abgelehnte Such-Meldungen im Stapel: kein Start.
+zurueck()
+await melde({ stapel: [{ ...meldung({ suchUrl: 'https://www.amazon.de/s?k=A' }), url: undefined }, { ...meldung({ suchUrl: 'https://www.amazon.de/s?k=B' }), url: undefined }] })
+pruefe(dispatches() === 0, 'alle Such-Meldungen abgelehnt: kein Start', starts)
+
 if (fehler) {
   console.error(`${fehler} Zusicherung(en) verletzt`)
   process.exit(1)

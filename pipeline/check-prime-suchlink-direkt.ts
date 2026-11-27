@@ -2,7 +2,9 @@
  * Zusicherung (Daniel, 26.11.2026, The Most Heretical Last Boss Queen): Eine Prime-Pille ohne Adresse führt nicht in die Amazon-Suche, wenn `watchLinks` die Titelseite
  * desselben Kanals tragen; bleibt sie bei der Suche, steht der Titel auf der Suchauftragsliste. Erfundene Titel, fester Tag, kein Netz. Läuft in `check:logic`.
  */
+import { readFileSync } from 'node:fs'
 import type { Release, Title } from '../shared/types.ts'
+import { unbedingteAufrufe } from './lib/unbedingte-aufrufe.ts'
 import { richteTerminAdressen } from './bau/13-1-termin-adressen.ts'
 import { offeneTerminSuchen, suchlinksOhneAusweg } from './bau/13-3-termin-suchen.ts'
 
@@ -55,6 +57,10 @@ pruefe('Disc und Titelseite zählen nicht', offeneTerminSuchen(r3, [titel(5, [])
 /* Eine Suche als platformUrl des Termins zählt wie eine fehlende Adresse. */
 const r4 = [termin(7, 'Aniverse', { platformUrl: 'https://www.amazon.de/s?k=Testtitel%207&i=instant-video' })]
 pruefe('Suche am Termin ist ein Auftrag', offeneTerminSuchen(r4, [titel(7, [])]).length === 1)
+
+/* Der Aufrufer: `schreibeDatensatz` reicht `offeneTerminSuchen(releases, allTitles)` unbedingt als dritte Liste an die Suchadressen (Mutant: Aufruf weg, `[]`, `titles`). */
+const schreiben = unbedingteAufrufe(readFileSync(new URL('./bau/13-schreiben.ts', import.meta.url), 'utf8'), 'schreibeDatensatz')
+pruefe('13-schreiben: Suchadressen mit offeneTerminSuchen(releases, allTitles)', schreiben.find((a) => a.name === 'schreibeSuchadressenImEndzustand')?.args.join('|') === 'suchOffen|slim|offeneTerminSuchen(releases, allTitles)', schreiben.find((a) => a.name === 'schreibeSuchadressenImEndzustand')?.args)
 
 if (fehler) process.exit(1)
 console.log('check-prime-suchlink-direkt: ok')

@@ -298,7 +298,7 @@ async function speichereStapel({ request, antwort, token, env, ctx }: Kontext, s
   const ergebnisse = stapel.map((_, i) => inTitelzeile.get(i) ?? uebrige.shift()!)
   const erste = stapel[0] as Record<string, unknown>
   ctx?.waitUntil(ereignisSenden(env, 'pruefung', { plattform: String(erste?.plattform ?? 'unbekannt') }))
-  if (stoesstBauAn({ stapel }) && ergebnisse.some((e) => e.ok)) ctx?.waitUntil(stosseBauAn(env).catch((e) => fehlerLog('[bau-anstoss]', e)))
+  if (stapel.some((m, i) => stoesstBauAn(m) && ergebnisse[i]?.ok)) ctx?.waitUntil(stosseBauAn(env).catch((e) => fehlerLog('[bau-anstoss]', e)))
   return antwort({ ok: true, ergebnisse })
 }
 

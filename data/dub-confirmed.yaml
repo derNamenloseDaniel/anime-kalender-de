@@ -42309,3 +42309,12 @@
   dub: false
   checkedAt: '2026-11-26'
   note: "Daniels Meldung vom 26.11.2026: im Stream keine deutsche Synchro (Aniverse-Kanal-Bezugsweg aus aniSearch). Die Schwesterseiten B0FBGJHHXK und B0F923DJJ9 tragen laut Messung nur 日本語 (Abos: Prime, aniversede)"
+# --- Aus dem Browser gemeldet, abgeholt am 2026-11-27 ---
+
+- anilistId: 1816
+  title: "Sonic X"
+  platform: primevideo
+  url: https://www.amazon.de/gp/video/detail/B0DYBKP9XR
+  dub: true
+  checkedAt: '2026-09-28'
+  note: "Tonspuren: Deutsch, Deutsch Dialogue Boost: Medium, Deutsch Dialogue Boost: High — Amazon-Seite B0DYBKP9XR: alle 26 Folgen geprüft, Abos: Prime, zugang=abo_und_kauf, gti=amzn1.dv.gti.dffe5a08-86ef-4b84-9b40-d8c31b29dfbc"

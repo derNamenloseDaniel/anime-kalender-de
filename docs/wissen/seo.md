@@ -42,6 +42,10 @@ Crawler sehen bei Hash-Routing nur `index.html`; `#/woche` und `#/heute` teilen 
 - **Einbau:** `build-share-pages.ts` setzt die Adresse nur, wenn die Datei im `dist` liegt (`startseiteMitTagesbild`); sonst bleibt `default.jpg`. Nach Mitternacht Berlin zeigt die Startseite also das Markenbild, bis der erste Bestandsbau des Tages samt Deploy durch ist (Bestandsbau etwa alle 4,5 h, `betrieb.md`); ein eigener Cron lohnt erst, wenn das stört.
 - **Ehrlich:** Der Text nennt nur belegte Fakten („Alle 12 Folgen“ nur mit `schedule.episodeCount` ab 2, nie `titel.episodes` (kann mehrere Staffeln zählen); sonst „Neu“; Katalogtitel „Neu im Angebot“ ohne Zahl). Ein Fehler beim Zeichnen warnt nur (`baueTagesbild`), der Bestandsbau bleibt grün.
 
+## Teilen-Knopf bei Titeln ohne Synchro (27.11.2026)
+
+Daniel: „share btn fehlt bei titel ohne synchro“. `teilbarerSlug` blendete den Knopf aus, weil der Katalog ohne Synchro (17.791 Titel, `ohne-synchro.json`) keine `/t/<ak>/`-Seite hat; die 404 führt dort zur Startseite. Seit 27.11.2026 nennt der Knopf `teilenZiel(titel)`: Teilen-Seite, sonst `#/woche?t=<ak>`; diese Adresse öffnet das Panel, das den Titel über `ladeTitelBestand` nachlädt. Ohne Vorschaubild (alles hinter `#` erreicht keinen Crawler), dafür ohne 17.791 zusätzliche Seiten im Bau. Panel, Datenbank-Karte und Kalender-Poster zeigen den Knopf immer. Wächter: `pipeline/check-teilen-knopf.ts`.
+
 ## Prüfungen
 
 - `check:logic` → `pipeline/check-seiten-seo.ts` (Ähnliche Titel, Startseite, Verzeichnis, Brotkrumen, Seitentitel, `lastmod`; Gegenproben).

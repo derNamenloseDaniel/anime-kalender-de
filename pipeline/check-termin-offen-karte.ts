@@ -60,7 +60,7 @@ async function rendere(title: Title, favorites = new Set<number>(), verbunden = 
   if (verbunden) setSyncToken('t')
   else clearSyncToken()
   setSyncMail('a@b.de')
-  const data = { titles: [title], titleById: new Map([[title.id, title]]), releases: [], releaseBySlug: new Map(), events: [], eventsByDate: new Map(), releasesByTitle: new Map(), meta: {} }
+  const data = { titles: [title], titleById: new Map([[title.id, title]]), releases: [], releaseBySlug: new Map(), events: [], eventsByDate: new Map(), nurUntertitelByTitle: new Map(), releasesByTitle: new Map(), meta: {} }
   const e = { data, titleId: title.id, favorites, hidden: new Set(), onToggleFavorite: (id: number) => void gemerkt.push(id), onToggleHidden() {}, onClose() {}, onFilterBy() {}, onOpenTitle() {} }
   await act(async () => wurzel.render(h(DetailPanel as never, e as never)))
   /* Die Abrufe des Panels (Disc-Ausgaben, Folgenverzeichnis) laufen ins Leere und setzen Zustand: erst nach ihnen lesen. */
@@ -81,7 +81,7 @@ console.log('\nVermilion Mask: Synchro angekündigt, Termin offen')
   pruefe('Stand und Quelle in der Karte', !!karte && karte.textContent.includes('Stand 15.09.2026') && karte.textContent.includes('Quelle'), karte?.textContent)
   const quelle = karte?.finde((k) => k.tagName === 'A' && k.textContent.startsWith('Quelle'))[0]
   pruefe('die Quelle ist der Synchro-Artikel', quelle?.getAttribute('href') === SYNCHROS, quelle?.getAttribute('href'))
-  pruefe('der Start mit Untertiteln steht in der Karte', !!karte && karte.textContent.includes('Mit Untertiteln seit 10.10.2026.'), karte?.textContent)
+  pruefe('der Start mit Untertiteln steht nirgends in der Karte (nur deutsche Fassungen)', !!karte && !/untertitel|omu/i.test(karte.textContent), karte?.textContent)
   pruefe('Crunchyroll steht genau einmal da (nicht mehr unter „Weitere Anbieter“, nicht in der Nebenzeile)', zaehle(text, 'Crunchyroll') === 1, text)
   pruefe('der Anbieter in der Karte ist der Link zur Serie', w.finde((k) => k.tagName === 'A' && k.getAttribute('href') === SERIE && k.textContent === 'Crunchyroll').length === 1)
   pruefe('keine Überschrift „Weitere Anbieter“ mehr', !text.includes('Weitere Anbieter'), text)
@@ -94,16 +94,16 @@ console.log('\nVermilion Mask: Synchro angekündigt, Termin offen')
   const taste = knopf(w)
   if (taste) klicke(dom.wurzel, taste)
   pruefe('der Klick kommt bei der Seite an und merkt den Titel (wie das ☆ im Kopf)', JSON.stringify(gemerkt) === '[195571]', gemerkt)
-  const stern = w.finde((k) => k.tagName === 'BUTTON' && k.textContent === 'Merken')[0]
+  const stern = w.finde((k) => k.tagName === 'BUTTON' && k.getAttribute('aria-label') === 'Merken')[0]
   if (stern) klicke(dom.wurzel, stern)
   pruefe('das ☆ im Kopf ruft denselben Handler mit derselben Kennung', JSON.stringify(gemerkt) === '[195571,195571]', gemerkt)
 }
 
-console.log('\nStart mit Untertiteln liegt noch in der Zukunft')
+console.log('\nStart mit Untertiteln liegt noch in der Zukunft: ebenfalls nicht genannt')
 {
   const spaeter = { ...vermilion, ankuendigung: { ...vermilion.ankuendigung!, omuAb: '2999-01-01' } } as Title
   const w = await rendere(spaeter)
-  pruefe('„Mit Untertiteln ab 01.01.2999.“', w.textContent.includes('Mit Untertiteln ab 01.01.2999.'), w.textContent)
+  pruefe('keine Zeile „Mit Untertiteln ab …“', !/untertitel|omu/i.test(w.textContent), w.textContent)
 }
 
 console.log('\nNennt keine Quelle die Synchro, gilt die erste')
@@ -128,7 +128,7 @@ console.log('\nOhne Karte bleibt der Kasten, wie er war')
   /* Mit deutscher Tonspur beim Anbieter ist die Antwort nicht mehr „ohne“: der Kasten rechnet Termin und Folgen, die Karte entfällt. */
   const mitSynchro = { ...vermilion, dub: true, streams: [{ ...vermilion.streams[0], dub: true }] } as unknown as Title
   const faelle: [string, Title, boolean][] = [
-    ['Ankündigung ohne Synchro („offen“): Nebenzeile und Anbieter-Pille bleiben', { ...vermilion, ankuendigung: { ...angekuendigt, synchro: 'offen' } } as Title, true],
+    ['Ankündigung ohne Synchro („offen“): Nebenzeile bleibt, keine Karte', { ...vermilion, ankuendigung: { ...angekuendigt, synchro: 'offen' } } as Title, true],
     ['Synchro schon belegt (andere Antwort als „ohne“): keine Karte', mitSynchro, false],
     ['westlicher Titel: keine Karte', { ...vermilion, westlich: true } as Title, false],
   ]
@@ -136,7 +136,7 @@ console.log('\nOhne Karte bleibt der Kasten, wie er war')
     const w = await rendere(title)
     pruefe(`${name}`, !karteIn(w) && !w.textContent.includes('Bescheid bei Termin'), w.textContent)
     if (ohneAntwort) {
-      pruefe('… die Pille des Anbieters steht weiter da (Link zur Serie)', w.finde((k) => k.tagName === 'A' && k.getAttribute('href') === SERIE).length === 1)
+      pruefe('… die Pille des Anbieters entfällt: er führt dort nur Untertitel (nur deutsche Fassungen, 26.11.2026)', w.finde((k) => k.tagName === 'A' && k.getAttribute('href') === SERIE).length === 0)
       pruefe('… die Nebenzeile nennt „Synchro offen“', w.textContent.includes('Synchro offen'), w.textContent)
     }
   }

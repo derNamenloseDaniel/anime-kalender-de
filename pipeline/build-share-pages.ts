@@ -41,6 +41,7 @@ import { startseiteFuerTag } from './lib/og-tag.ts'
 import { seitenQuelle, type SynopsenFuerSeiten } from './lib/handlung-eigen.ts'
 import { ladeAkVon, umleitungen, type AkVon, type KennungsZeile } from './lib/ausgabe-kennung.ts'
 import { body, head } from './lib/termin-seite.ts'
+import { fuerBesucher } from '../shared/nur-deutsch.ts'
 
 const DIST = resolve(ROOT, 'dist')
 /** Kennung des Standard-Vorschaubilds zum gebauten Bestand — dieselbe Rechnung wie `build-og.ts`, damit Bild und `?v=` zusammenpassen. */
@@ -61,7 +62,7 @@ function main(): void {
   const after = template.slice(end + '<!-- social:end -->'.length)
 
   const standardKennung = ladeStandardKennung()
-  const releases = readJson<Release[]>('public/data/releases.json', [])
+  const releases = fuerBesucher(readJson<Release[]>('public/data/releases.json', []))
   const titles = readJson<Title[]>('public/data/titles-core.json', [])
   const titleById = new Map(titles.map((t) => [t.id, t]))
   // Die Synopsen liegen seit dem 10.08.2026 in Gruppen statt in einer Datei.

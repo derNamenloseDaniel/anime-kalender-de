@@ -90,8 +90,8 @@ export function KartenCover({ main, keinDub, members, t, today, favorite, onTogg
   favorite: boolean
   onToggleFavorite: (id: number) => void
   onToggleHidden: (id: number) => void
-  teilbar: string | undefined
-  share: (slug: string, title: string) => Promise<void>
+  teilbar: string
+  share: (ziel: string, title: string) => Promise<void>
   copiedSlug: string | undefined
   grouped: boolean
 }) {
@@ -131,8 +131,8 @@ export function KartenCover({ main, keinDub, members, t, today, favorite, onTogg
         favorite={favorite}
         onToggleFavorite={() => onToggleFavorite(main.id)}
         onToggleHidden={() => onToggleHidden(main.id)}
-        onShare={teilbar ? () => share(teilbar, main.titleDe ?? main.titleEn ?? main.titleRomaji ?? '') : undefined}
-        copied={!!teilbar && copiedSlug === teilbar}
+        onShare={() => share(teilbar, main.titleDe ?? main.titleEn ?? main.titleRomaji ?? '')}
+        copied={copiedSlug === teilbar}
       />
       {grouped && members.length > 1 && (
         /*

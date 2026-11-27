@@ -11,9 +11,12 @@
  * Exit 0 sonst, 1 wenn ein Merge scheiterte, 2 bei Aufruffehlern.
  */
 import { pathToFileURL } from 'node:url'
-import { kandidat, reihenfolge, vorabGrund } from './nacht-merger-wahl.mjs'
+import { MIN_HASH } from './abnahme-freigabe.mjs'
+import { freigabeVerworfen, kandidat, reihenfolge, vorabGrund } from './nacht-merger-wahl.mjs'
 
 export const HOECHSTENS_VORGABE = 3
+/** Übernahme-Anstöße (Prüfer-Läufe) je Lauf: jeder ist ein Actions-Lauf, nicht mehr als beim Merge */
+export const UEBERNAHMEN_JE_LAUF = 3
 /** Wartezeit vor der einen Wiederholung, wenn GitHub die Mergebarkeit noch rechnet (UNKNOWN, gemessen 07.11.2026 bei #2994/#3049: wenig später CLEAN). */
 export const UNKNOWN_WARTE_MS = Number(process.env.NACHT_MERGER_WARTE_MS) || 20_000 // Umgebungswert nur für den Prozesstest (wie WACHE_LIMIT_MS)
 /** Zeitbudget je Lauf: der Job hat 20 min (nacht-merger.yml), je UNKNOWN-PR kommen bis zu 40 s Wartezeit dazu; danach geordnet aufhören. */
@@ -38,6 +41,49 @@ export function mergeStatusGrund(welt, nummer) {
   return status === 'CLEAN' ? null : { grund: `Mergestatus in der Einzelabfrage ${status}, nicht CLEAN`, unentschieden: status === 'UNKNOWN' }
 }
 
+export const NACHPRUEFUNG_LABEL = 'nachpruefung-offen'
+
+/** Gemergter Stufe-2-PR bekommt das Label (Daniel 27.11.2026: Prüfung nach dem Merge statt Tor davor); scheitert es, steht der Fehler im Protokoll, der Merge gilt. */
+export function markiereNachpruefung(welt, nummer) {
+  try {
+    welt.markiere(nummer, NACHPRUEFUNG_LABEL)
+    welt.zeile(`NACHPRÜFUNG OFFEN #${nummer}: Label ${NACHPRUEFUNG_LABEL} gesetzt`)
+  } catch (e) {
+    welt.zeile(`NACHPRÜFUNG-LABEL FEHLGESCHLAGEN #${nummer}: ${String(e.message).split('\n')[0]}`)
+  }
+}
+
+/**
+ * REVIEW_REQUIRED nach einem Main-Nachzug (Ruleset `dismiss_stale`, Dirigent-Nachtrag 7218441221): Das Prüfer-Ok liegt am Vorgänger-Kopf, die Kette am neuen
+ * ist grün. Dann startet der Merger den Prüfer-Lauf (`pr-pruefer.yml`, seine Übernahme schreibt bei gleichem eigenem Diff das Ok neu), sofern nicht schon
+ * einer läuft; im nächsten Lauf kommt der PR als Kandidat dran. Rückgabe { fall, angestossen }: `fall` = der PR ist ein solcher Fall (keine ÜBERSPRUNGEN-Zeile).
+ */
+export function uebernahmeFall(welt, pr, { trocken, frei }) {
+  const voll = welt.leicht(pr)
+  if (!freigabeVerworfen(voll)) return { fall: false, angestossen: false }
+  const wo = `#${pr.nummer} Kopf ${voll.kopf.slice(0, MIN_HASH)}`
+  if (welt.pruefungLaeuft(pr.nummer)) {
+    welt.zeile(`ÜBERNAHME WARTET ${wo}: Freigabe nach Main-Nachzug verworfen, ein Prüfer-Lauf steht schon in der Warteschlange oder läuft`)
+    return { fall: true, angestossen: false }
+  }
+  if (!frei) {
+    welt.zeile(`ÜBERNAHME RIEGEL ${wo}: höchstens ${UEBERNAHMEN_JE_LAUF} Anstöße je Lauf, kommt im nächsten Lauf dran`)
+    return { fall: true, angestossen: false }
+  }
+  if (trocken === true) {
+    welt.zeile(`WÜRDE ÜBERNAHME ANSTOSSEN ${wo}: Freigabe nach Main-Nachzug verworfen (Trockenlauf)`)
+    return { fall: true, angestossen: true }
+  }
+  try {
+    welt.uebernahmeAnstossen(pr.nummer, voll.kopf)
+    welt.zeile(`ÜBERNAHME ANGESTOSSEN ${wo}: Freigabe nach Main-Nachzug verworfen, Prüfer-Ok am Vorgänger-Kopf`)
+    return { fall: true, angestossen: true }
+  } catch (e) {
+    welt.zeile(`ÜBERNAHME FEHLGESCHLAGEN ${wo}: ${String(e.message).split('\n')[0]}`)
+    return { fall: true, angestossen: false }
+  }
+}
+
 /** Warnzeile (GitHub-Anmerkung), wenn ein Lauf nichts merget, obwohl PRs technisch nicht entschieden werden konnten; sonst null. */
 export function stillstandWarnung(gemergt, unentschieden) {
   if (gemergt > 0 || unentschieden.length === 0) return null
@@ -54,10 +100,13 @@ export function lauf(welt, { hoechstens = HOECHSTENS_VORGABE, trocken = false, b
   const start = welt.jetzt()
   const abgewiesen = (pr, grund) => welt.zeile(`ÜBERSPRUNGEN #${pr.nummer}: ${grund}`)
   const kandidaten = []
+  let uebernahmen = 0
   for (const pr of welt.offene()) {
     const vorab = vorabGrund(pr)
     if (vorab !== null) {
-      abgewiesen(pr, vorab)
+      const u = pr.reviewDecision === 'REVIEW_REQUIRED' ? uebernahmeFall(welt, pr, { trocken, frei: uebernahmen < UEBERNAHMEN_JE_LAUF }) : { fall: false }
+      if (u.angestossen) uebernahmen += 1
+      if (!u.fall) abgewiesen(pr, vorab)
       continue
     }
     const voll = welt.details(pr)
@@ -113,6 +162,7 @@ export function lauf(welt, { hoechstens = HOECHSTENS_VORGABE, trocken = false, b
     }
     gemergt.push(pr.nummer)
     welt.zeile(`GEMERGT #${pr.nummer}: ${pr.grund}`)
+    if (pr.stufe === 2) markiereNachpruefung(welt, pr.nummer)
   }
   welt.zeile(`Nacht-Merger: ${gemergt.length} ${trocken ? 'wären gemergt' : 'gemergt'}, ${fehler} Fehler, ${kandidaten.length} Kandidaten`)
   const warnung = stillstandWarnung(gemergt.length, unentschieden)

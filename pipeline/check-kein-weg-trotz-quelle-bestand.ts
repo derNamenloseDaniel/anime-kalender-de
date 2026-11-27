@@ -11,6 +11,7 @@ import { todayIso } from '../shared/time.ts'
 import { ladeHandbelege } from './lib/dub-confirmed.ts'
 import { baueNeinGilt } from './lib/maengel-nein.ts'
 import { MAENGEL_DATEI, type Register } from './lib/maengel-register.ts'
+import { melde } from './lib/quarantaene.ts'
 import { keinWegTrotzQuelle, OHNE_WEG_ARTEN, type KuratierterEintrag } from './lib/kein-weg-trotz-quelle.ts'
 
 const register = JSON.parse(readFileSync(MAENGEL_DATEI, 'utf8')) as Register
@@ -29,6 +30,7 @@ const funde = keinWegTrotzQuelle({ offen, releases, kuratiert, belege, neinGilt:
 
 for (const f of funde) console[f.rot ? 'error' : 'log'](`  ${f.rot ? '✖' : '⚠ WARNUNG'} ${f.titleId} ohne Weg offen, aber ${f.platform} laut ${f.quelle}`)
 const rot = funde.filter((f) => f.rot).length
+for (const f of funde.filter((x) => x.rot)) melde(f.titleId, 'kein-weg-trotz-quelle-bestand', `ohne Weg offen, aber ${f.platform} laut ${f.quelle}`)
 if (rot) {
   console.error(`check-kein-weg-trotz-quelle-bestand: ${rot} Titel ohne Weg trotz sicherem Termin — Bauphase 11-7 (Wege aus Terminen) oder die Zuordnung des Termins prüfen`)
   process.exit(1)

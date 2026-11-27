@@ -5,7 +5,7 @@
  */
 import { BUDGET_MS, argumente, exitCode, lauf, starte } from './nacht-merger.mjs'
 import { bauCommittetGerade, bestandIstRot, echteWelt, ghEcht, ghMitWiederholung, mergeMit5xxPruefung, stufeVon } from './nacht-merger-welt.mjs'
-import { freigabe, kandidat, ketteStand, neuesteJeCheck, reihenfolge, urteilIstOk, vorabGrund } from './nacht-merger-wahl.mjs'
+import { freigabe, hatNachtrag, kandidat, ketteStand, nachtragZeile, neuesteJeCheck, reihenfolge, urteilIstOk, vorabGrund } from './nacht-merger-wahl.mjs'
 
 let fehler = 0
 let anzahl = 0
@@ -117,6 +117,19 @@ pruefe('Stufe 2 mit Urteil aendern nie', !wahl({ stufe: 2, kommentare: [urteil(K
 pruefe('Stufe 2 mit Workflow-Datei nie', wahl({ stufe: 2, pfade: ['.github/workflows/x.yml'] }).grund.includes('.github/workflows/x.yml'))
 pruefe('Stufe 2 mit roter Kette nie', !wahl({ stufe: 2, checks: [{ name: 'PR-Prüfkette', status: 'COMPLETED', conclusion: 'FAILURE' }] }).kandidat)
 pruefe('Stufe 2 ohne APPROVED nie', !wahl({ stufe: 2, reviewDecision: 'CHANGES_REQUESTED' }).kandidat)
+// Nachtrag-fehlt-Marke (27.11.2026): genau die Stufe-2-PRs, die nur noch der Nachtrag des Dirigenten aufhält
+pruefe('Stufe 2 mit Bot-ok, Kette grün: nachtragFehlt', wahl({ stufe: 2 }).nachtragFehlt === true)
+pruefe('Stufe 1 mit Bot-ok: keine Marke', wahl({ stufe: 1 }).nachtragFehlt === undefined)
+pruefe('Stufe 2 mit Nachtrag: Kandidat ohne Marke', wahl({ stufe: 2, kommentare: [nachtrag(KOPF)] }).nachtragFehlt === undefined)
+pruefe('Stufe 2 ohne Urteil: keine Marke (es fehlt mehr als der Nachtrag)', wahl({ stufe: 2, kommentare: [] }).nachtragFehlt === undefined)
+pruefe('Stufe 2 mit rotem Check: keine Marke', wahl({ stufe: 2, checks: [{ name: 'PR-Prüfkette', status: 'COMPLETED', conclusion: 'FAILURE' }] }).nachtragFehlt === undefined)
+pruefe('Stufe 2 mit Workflow-Pfad: keine Marke', wahl({ stufe: 2, pfade: ['.github/workflows/x.yml'] }).nachtragFehlt === undefined)
+// Die vorgeschriebene Zeile erkennt der Merger als Nachtrag des Inhabers, die eines Fremden nie, und nur für genau diesen Kopf
+const eigener = (body, login = 'derNamenloseDaniel', assoc = 'OWNER') => ({ login, assoc, at: '2026-11-01T11:00:00Z', body })
+pruefe('nachtragZeile nennt den Kopf mit neun Zeichen', nachtragZeile(KOPF) === '## Nachtrag (Abnahme Dirigent) — Kopf a1b2c3d4e')
+pruefe('nachtragZeile des Inhabers gibt frei', hatNachtrag([eigener(`${nachtragZeile(KOPF)}\nAuflagen erfüllt: keine`)], KOPF))
+pruefe('nachtragZeile eines Fremden gibt nie frei', !hatNachtrag([eigener(nachtragZeile(KOPF), 'jemand', 'NONE')], KOPF))
+pruefe('nachtragZeile zu anderem Kopf gibt nie frei', !hatNachtrag([eigener(nachtragZeile(ALTER_KOPF))], KOPF))
 pruefe('Stufe unbekannt nie', !wahl({ stufe: undefined }).kandidat && !wahl({ stufe: '1' }).kandidat && !wahl({ stufe: 3 }).kandidat && !wahl({ stufe: null }).kandidat)
 pruefe('Workflow-Pfad nie', wahl({ pfade: ['web/src/a.tsx', '.github/workflows/x.yml'] }).grund.includes('.github/workflows/x.yml'))
 pruefe('Workflow-Pfad als Umbenennungsursprung nie', !wahl({ pfade: ['docs/neu.md', '.github/workflows/alt.yml'] }).kandidat)
@@ -540,6 +553,18 @@ pruefe('argumente: ungültig', argumente(['--hoechstens', '0']) === null && argu
   pruefe('starte: Stillstand (0 Merges, PR unentschieden) -> Exit 1 aus exitCode', starte([], () => w4) === 1)
 }
 
+{
+  // Stufe 2 mit Bot-ok: eine eigene Zeile mit Kopf und Nachtragszeile statt der allgemeinen Abweisung; Stufe 1 daneben wird gemergt
+  const w = welt([pr({ nummer: 31, stufe: 2 }), pr({ nummer: 32, stufe: 1 }), pr({ nummer: 33, stufe: 2, kommentare: [] })])
+  const r = lauf(w, { hoechstens: 3 })
+  const fehlt = w.log.zeilen.filter((z) => z.startsWith('NACHTRAG FEHLT'))
+  pruefe('Nachtrag fehlt: genau eine Zeile, nur für PR 31', fehlt.length === 1 && fehlt[0].startsWith('NACHTRAG FEHLT #31 '))
+  pruefe('Nachtrag fehlt: Zeile nennt Kopf und die zu schreibende Zeile', fehlt[0].includes('a1b2c3d4e') && fehlt[0].includes(nachtragZeile(KOPF)))
+  pruefe('Nachtrag fehlt: keine zweite ÜBERSPRUNGEN-Zeile für 31', !w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN #31')))
+  pruefe('Nachtrag fehlt: PR 33 ohne Urteil bleibt ÜBERSPRUNGEN', w.log.zeilen.some((z) => z.startsWith('ÜBERSPRUNGEN #33')))
+  pruefe('Nachtrag fehlt: Stufe 1 wird gemergt, 31 nie', r.gemergt.join(',') === '32')
+  pruefe('Nachtrag fehlt: Schlusszeile zählt sie mit', w.log.zeilen.at(-1) === 'Nacht-Merger: 1 gemergt, 0 Fehler, 1 Kandidaten, 1 warten auf Nachtrag')
+}
 if (fehler > 0) {
   console.error(`nacht-merger.test: ${fehler} von ${anzahl} Fällen rot`)
   process.exit(1)

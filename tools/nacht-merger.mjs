@@ -11,7 +11,8 @@
  * Exit 0 sonst, 1 wenn ein Merge scheiterte, 2 bei Aufruffehlern.
  */
 import { pathToFileURL } from 'node:url'
-import { kandidat, reihenfolge, vorabGrund } from './nacht-merger-wahl.mjs'
+import { MIN_HASH } from './abnahme-freigabe.mjs'
+import { kandidat, nachtragZeile, reihenfolge, vorabGrund } from './nacht-merger-wahl.mjs'
 
 export const HOECHSTENS_VORGABE = 3
 /** Wartezeit vor der einen Wiederholung, wenn GitHub die Mergebarkeit noch rechnet (UNKNOWN, gemessen 07.11.2026 bei #2994/#3049: wenig später CLEAN). */
@@ -54,6 +55,7 @@ export function lauf(welt, { hoechstens = HOECHSTENS_VORGABE, trocken = false, b
   const start = welt.jetzt()
   const abgewiesen = (pr, grund) => welt.zeile(`ÜBERSPRUNGEN #${pr.nummer}: ${grund}`)
   const kandidaten = []
+  let wartenAufNachtrag = 0
   for (const pr of welt.offene()) {
     const vorab = vorabGrund(pr)
     if (vorab !== null) {
@@ -63,7 +65,10 @@ export function lauf(welt, { hoechstens = HOECHSTENS_VORGABE, trocken = false, b
     const voll = welt.details(pr)
     const urteil = kandidat(voll)
     if (urteil.kandidat) kandidaten.push({ ...voll, grund: urteil.grund })
-    else abgewiesen(pr, urteil.grund)
+    else if (urteil.nachtragFehlt) {
+      wartenAufNachtrag += 1
+      welt.zeile(`NACHTRAG FEHLT #${pr.nummer} Kopf ${voll.kopf.slice(0, MIN_HASH)}: Stufe 2, Prüfer-Ok, Kette grün; Nacht-Dirigent liest Diff und Prüferbericht, dann Nachtrag „${nachtragZeile(voll.kopf)}“`)
+    } else abgewiesen(pr, urteil.grund)
   }
   const gemergt = []
   const unentschieden = []
@@ -114,7 +119,7 @@ export function lauf(welt, { hoechstens = HOECHSTENS_VORGABE, trocken = false, b
     gemergt.push(pr.nummer)
     welt.zeile(`GEMERGT #${pr.nummer}: ${pr.grund}`)
   }
-  welt.zeile(`Nacht-Merger: ${gemergt.length} ${trocken ? 'wären gemergt' : 'gemergt'}, ${fehler} Fehler, ${kandidaten.length} Kandidaten`)
+  welt.zeile(`Nacht-Merger: ${gemergt.length} ${trocken ? 'wären gemergt' : 'gemergt'}, ${fehler} Fehler, ${kandidaten.length} Kandidaten${wartenAufNachtrag > 0 ? `, ${wartenAufNachtrag} warten auf Nachtrag` : ''}`)
   const warnung = stillstandWarnung(gemergt.length, unentschieden)
   if (warnung !== null) welt.zeile(warnung)
   return { gemergt, fehler, stillstand: warnung !== null }

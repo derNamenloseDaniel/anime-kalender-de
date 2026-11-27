@@ -29,7 +29,7 @@ const FSK = [0, 6, 12, 16, 18]
  */
 function handdateiLeseFehler(): string[] {
   const errors: string[] = []
-  for (const datei of ['data/dub-confirmed.yaml', 'data/watch-links.yaml', 'data/synchro-von-hand.yaml', 'data/erstausgabe-von-hand.yaml', 'data/ohne-synchro-von-hand.yaml']) {
+  for (const datei of ['data/dub-confirmed.yaml', 'data/watch-links.yaml', 'data/synchro-von-hand.yaml', 'data/erstausgabe-von-hand.yaml', 'data/ohne-synchro-von-hand.yaml', 'data/fsk-von-hand.yaml']) {
     const pfad = resolve(ROOT, datei)
     if (!existsSync(pfad)) continue
     try {

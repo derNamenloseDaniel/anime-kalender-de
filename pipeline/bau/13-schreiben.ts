@@ -20,6 +20,7 @@ import { schreibeSprecherIndex } from './sprecher-index.ts'
 import { schreibeListen } from './13-3-listen.ts'
 import { schreibeKinoZuletzt } from './kino-zuletzt.ts'
 import { schreibeSuchadressenImEndzustand, type OffeneSuche } from './13-3-suchadressen-endzustand.ts'
+import { offeneTerminSuchen } from './13-3-termin-suchen.ts'
 import { baueAuslieferung } from './13-2-auslieferung.ts'
 import { anisearchKennungen } from './anisearch-kennung.ts'
 import { schreibeSynopsenUndReichereAn } from './13-1-anreichern.ts'
@@ -110,7 +111,7 @@ export function schreibeDatensatz({
   const asKennungen = anisearchKennungen([...titles.values()].map((t) => ({ id: t.id, mal: t.malId })))
   ergaenzeErstausgabeAngebot({ titles: titles.values(), releases, kennungen: asKennungen })
   schreibeListen({ slim, tmdbTitles, releases, titles, istTot })
-  schreibeSuchadressenImEndzustand(suchOffen, slim)
+  schreibeSuchadressenImEndzustand(suchOffen, slim, offeneTerminSuchen(releases, allTitles))
   ergaenzeAngebotTermine({ events, releases, ab: releasesVorAngebot, slim, titles })
   schreibeKinoZuletzt(titles, tmdbTitles)
 

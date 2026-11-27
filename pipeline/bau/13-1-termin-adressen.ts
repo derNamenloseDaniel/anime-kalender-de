@@ -19,7 +19,21 @@ export function adresseDesWegs(r: Release, titel: Title | undefined): string | u
   const wege = (titel.streams ?? []).filter(
     (s) => s.platform === r.platform && s.url && !istKeineTitelseite(s.url) && (!r.kanal || s.kanal?.toLowerCase() === r.kanal.toLowerCase()),
   )
+  if (wege.length === 0) return primeVerweisDesKanals(r, titel)
   return wege.length === 1 ? wege[0]!.url : undefined
+}
+
+/**
+ * Der Prime-Kanal-Termin ohne Verweis in `streams` nimmt den Bezugsweg „Amazon Prime (<Kanal>)“ aus `watchLinks` (26.11.2026, The Most Heretical Last Boss Queen:
+ * Pille „Prime Video (Aniverse)“ führte in die Amazon-Suche, obwohl `watchLinks` die Titelseite desselben Kanals trugen). Genau ein Treffer, sonst keine Übernahme.
+ */
+function primeVerweisDesKanals(r: Release, titel: Title): string | undefined {
+  if (r.platform !== 'primevideo' || !r.kanal) return undefined
+  const marke = `(${r.kanal.toLowerCase()})`
+  const treffer = (titel.watchLinks ?? []).filter(
+    (w) => w.kind === 'stream' && /^https:\/\/(?:www\.|watch\.)?amazon\.de\//.test(w.url) && !istKeineTitelseite(w.url) && w.name.toLowerCase().includes(marke),
+  )
+  return treffer.length === 1 ? treffer[0]!.url : undefined
 }
 
 /**

@@ -3,5 +3,6 @@
 tools/leerlauf-tempo.mjs # braucht Chromium, das der Testjob nicht hat; Gesamtlauf ist der Kettenteil Leerlauf (pr-pruefung.yml), das Urteil testet leerlauf-urteil.test.mjs
 tools/anime2you-staffel.d.mts # reine Typdeklaration zu anime2you-staffel.mjs, ohne Laufzeitcode; die Regel testet anime2you-suche.test.mjs, der Wächter check-staffelzitat.ts
 tools/bau-umgebung.d.mts # reine Typdeklaration zu bau-umgebung.mjs, ohne Laufzeitcode; die Passung prüft tsc über check-geheimnis-testlauf.ts, die Funktionen testet bau-umgebung.test.mjs
+tools/lighthouse-urteil.d.mts # reine Typdeklaration zu lighthouse-urteil.mjs, ohne Laufzeitcode; die Funktion testet lighthouse-urteil.test.mjs, die Nutzung check-tbt-drift.ts
 tools/extension-tests.mjs # ist selbst der Läufer aller Erweiterungstests (extension/*.test.*) und hängt als Schritt in check:extension (package.json); ein Fehlschlag eines Tests macht ihn rot, ein eigener Test dafür wäre nur ein Doppelgänger
 tools/pille-blase-messen.ts # braucht Chromium und das gebaute CSS, das der Testjob nicht hat; ist selbst der Wächter in check:panel-teile, Mutationsprobe im PR (vorher 116 Verletzungen)

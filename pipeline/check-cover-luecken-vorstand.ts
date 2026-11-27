@@ -25,7 +25,7 @@ type Stand = { reihen: Record<string, unknown[]>; titel: unknown[]; ohne: unknow
 // Katalog 900004 mit, 900005 ohne Cover.
 const VORSTAND: Stand = {
   reihen: { '900001': [{ id: 900001, cover: bild }, { id: 900002, cover: bild }] },
-  titel: [{ id: 900001, coverImage: bild }, { id: 900003 }],
+  titel: [{ id: 900001, coverImage: bild }, { id: 900003 }, { id: 900007, coverImage: bild }],
   ohne: [{ id: 900004, coverImage: bild }, { id: 900005 }],
   luecken: { '900003': 'ohne-quelle', '900005': 'ohne-quelle' },
 }
@@ -74,9 +74,9 @@ try {
   const teil = lauf()
   pruefe('Kennung verliert das Cover nur in der Reihe, Datenbank behält es → rot', teil.code === 1 && teil.aus.includes('900001'), teil.aus)
 
-  schreibe({ ...VORSTAND, reihen: { '900001': [{ id: 900002, cover: bild }] }, titel: [{ id: 900001 }, { id: 900003 }], luecken: { ...VORSTAND.luecken, '900001': 'ohne-quelle' } })
+  schreibe({ ...VORSTAND, titel: [{ id: 900001, coverImage: bild }, { id: 900003 }, { id: 900007 }], luecken: { ...VORSTAND.luecken, '900007': 'ohne-quelle' } })
   const haupt = lauf()
-  pruefe('Hauptbestand: Titel verliert sein Cover (Reihe ohne ihn) → rot mit Kennung', haupt.code === 1 && haupt.aus.includes('900001'), haupt.aus)
+  pruefe('Hauptbestand: Titel ohne Reihe verliert sein Cover → rot mit Kennung', haupt.code === 1 && haupt.aus.includes('900007'), haupt.aus)
 
   schreibe({ ...VORSTAND, ohne: [...VORSTAND.ohne, { id: 900006 }], luecken: { ...VORSTAND.luecken, '900006': 'nicht-abgerufen' } })
   pruefe('neue Kennung ohne Cover auf der Lückenliste → grün', lauf().code === 0, lauf().aus)

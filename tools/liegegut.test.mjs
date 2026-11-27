@@ -280,13 +280,13 @@ const patchVon = (url) => {
 }
 const NATIV = 'derNamenloseDaniel/anime-kalender-nativ'
 // `listeNativ` kommt für Aufrufe an das nativ-Repo (`--repo`, Adresse oder graphql-Name), sonst `liste`; ohne Angabe ist nativ leer.
-const attrappeGh = (liste, aufrufe = [], listeNativ = []) => (args) => {
+const attrappeGh = (liste, aufrufe = [], listeNativ = [], kopfStunden = 100) => (args) => {
   aufrufe.push(args.join(' '))
   const nativ = args.some((a) => a.includes(NATIV) || a === 'name=anime-kalender-nativ')
   if (args[0] === 'pr') return JSON.stringify(nativ ? listeNativ : liste)
   if (args[1] === '-X' && args.some((a) => a.includes('/issues'))) return '[]' // offene Nachprüfungen (liegegut-nachpruefung.mjs)
   if (args[0] === 'run' && args[1] === 'list') return '[]' // Warteschlange (liegegut-warteschlange.mjs)
-  if (args[1].includes('/commits/')) return h(100)
+  if (args[1].includes('/commits/')) return h(kopfStunden)
   if (args[1].endsWith('/files')) return patchVon(args[1])
   throw new Error(`unerwartet: ${args.join(' ')}`)
 }
@@ -684,6 +684,10 @@ console.log('liegegut: Signal 14 – Freigabe nach Main-Nachzug verworfen (Dirig
   pruefe('Schritt ÜBERNAHME mit Dispatch-Befehl', naechsterSchritt([14], [], false).startsWith('ÜBERNAHME (Prüfer-Lauf anstoßen: gh workflow run pr-pruefer.yml --ref main -f pr=<PR>)'))
   const zeilen = liegegutAlle(attrappeGh([verworfen(5, 'DISMISSED', { headRefOid: KOPF })]), attrappeGit(), JETZT, () => {}, null)
   pruefe('Gesamtlauf: Zeile mit Signal 14 und Schritt ÜBERNAHME', zeilen.length === 1 && /ÜBERNAHME \(.*Signal 14 Freigabe verworfen nach Main-Nachzug/.test(zeilen[0]), zeilen)
+  const jung = liegegutAlle(attrappeGh([verworfen(5, 'DISMISSED', { headRefOid: KOPF })], [], [], 10 / 60), attrappeGit(), JETZT, () => {}, null)
+  pruefe('Gesamtlauf: Kopf erst 10 min alt → keine Zeile (Schwelle 30 min wird mit der echten Zeit gerechnet)', jung.length === 0, jung)
+  const reif = liegegutAlle(attrappeGh([verworfen(5, 'DISMISSED', { headRefOid: KOPF })], [], [], 45 / 60), attrappeGit(), JETZT, () => {}, null)
+  pruefe('Gesamtlauf: Kopf 45 min alt → Zeile mit Signal 14', reif.length === 1 && /Signal 14/.test(reif[0]), reif)
 }
 
 if (fehler.length > 0) {

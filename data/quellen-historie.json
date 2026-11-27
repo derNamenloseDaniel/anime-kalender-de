@@ -7293,11 +7293,29 @@
   ],
   "auto-204389-primevideo": [
     {
+      "url": "https://www.anime2you.de/news/1063615/crunchyroll-apotheke-staffel-3-synchro-und-mehr/",
+      "name": "anime2you.de",
+      "gesehenAm": "2026-11-27",
+      "stand": "aktuell"
+    },
+    {
+      "url": "https://www.crunchyroll.com/de/news/seasonal-lineup/2026/9/15/crunchyroll-anime-lineup-herbst-2026",
+      "name": "Crunchyroll News",
+      "gesehenAm": "2026-11-27",
+      "stand": "aktuell"
+    },
+    {
+      "url": "https://www.crunchyroll.com/de/news/seasonal-lineup/2026/9/15/crunchyroll-deutsche-synchros-herbst-2026",
+      "name": "Crunchyroll News",
+      "gesehenAm": "2026-11-27",
+      "stand": "aktuell"
+    },
+    {
       "url": "https://www.anime2you.de/news/1050718/crunchyroll-19-neue-herbst-2026-simulcasts/",
       "name": "anime2you.de",
       "gesehenAm": "2026-10-13",
-      "sagt": "2026-09-26",
-      "stand": "aktuell"
+      "stand": "aktuell",
+      "sagt": "2026-09-26"
     }
   ],
   "auto-185756-primevideo": [

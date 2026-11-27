@@ -2020,6 +2020,10 @@
       "am": "2026-11-19",
       "vorschlaege": 1
     },
+    "1073705": {
+      "am": "2026-11-27",
+      "vorschlaege": 1
+    },
     "1073719": {
       "am": "2026-11-20",
       "vorschlaege": 0
@@ -2046,6 +2050,10 @@
       "am": "2026-11-22",
       "vorschlaege": 0,
       "uebersprungen": "kein Deutschland-Bezug"
+    },
+    "1073824": {
+      "am": "2026-11-27",
+      "vorschlaege": 0
     },
     "1073842": {
       "am": "2026-11-20",
@@ -2412,9 +2420,17 @@
       "am": "2026-11-27",
       "vorschlaege": 1
     },
+    "1076950": {
+      "am": "2026-11-27",
+      "vorschlaege": 0
+    },
     "1077056": {
       "am": "2026-11-27",
       "vorschlaege": 0
+    },
+    "1077111": {
+      "am": "2026-11-27",
+      "vorschlaege": 2
     },
     "1077302": {
       "am": "2026-11-27",
@@ -18255,6 +18271,75 @@
       "artikelId": "1077542",
       "artikel": "Neue »Pokémon«-Staffel für 2027 angekündigt + Teaser",
       "quelle": "https://www.anime2you.de/news/1077542/pokemon-neue-staffel-fuer-2027-angekuendigt/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Hallo Kurt!",
+      "zitat": "3. Dezember 2026 Hallo Kurt! Komplettbox PIDAX · Serie DVD",
+      "art": "disc",
+      "sprache": "unklar",
+      "plattform": "disc",
+      "datum": "2026-12-03",
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Donnerstag",
+      "warnungen": [],
+      "artikelId": "1073705",
+      "artikel": "Anime-Neuheiten im Dezember 2026 auf DVD und Blu-ray",
+      "quelle": "https://www.anime2you.de/news/1073705/disc-neuheiten-dezember-2026/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Fafner: The Beyond",
+      "zitat": "»Fafner: The Beyond« Episoden: 12 (komplett) Sprache: Japanisch (UT)",
+      "art": "start",
+      "sprache": "omu",
+      "plattform": "crunchyroll",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "12 (komplett)",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „Crunchyroll“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „crunchyroll“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077111",
+      "artikel": "Zwei Anime-Neuzugänge ab sofort auf Crunchyroll verfügbar",
+      "quelle": "https://www.anime2you.de/news/1077111/crunchyroll-detektiv-conan-rueckkehr-und-mehr/",
+      "veroeffentlicht": "2026-11-27",
+      "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Detektiv Conan",
+      "zitat": "»Detektiv Conan« – Episode 484 bis 486 Episoden: 484 bis 486 Sprache: Deutsch, Japanisch (UT)",
+      "art": "folgen",
+      "sprache": "deutsch+omu",
+      "plattform": "crunchyroll",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": "484 bis 486",
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [
+        "anbieter „Crunchyroll“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „crunchyroll“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077111",
+      "artikel": "Zwei Anime-Neuzugänge ab sofort auf Crunchyroll verfügbar",
+      "quelle": "https://www.anime2you.de/news/1077111/crunchyroll-detektiv-conan-rueckkehr-und-mehr/",
       "veroeffentlicht": "2026-11-27",
       "gelesenAm": "2026-11-27"
     }

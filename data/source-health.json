@@ -83,7 +83,7 @@
   },
   "rohfolgen": {
     "lastOk": "2026-11-26T19:23:10.796Z",
-    "lastRun": "2026-11-28T11:02:42.910Z",
+    "lastRun": "2026-11-28T11:19:06.142Z",
     "lastCount": 0
   },
   "anisearch-folgen": {
@@ -112,9 +112,10 @@
     "lastCount": 9
   },
   "vorfaelle": {
-    "lastOk": "2026-11-28T11:02:38.997Z",
-    "lastRun": "2026-11-28T11:02:38.997Z",
-    "lastCount": 6
+    "lastOk": "2026-11-28T11:19:01.702Z",
+    "lastRun": "2026-11-28T11:19:01.702Z",
+    "lastCount": 0,
+    "leerSeit": "2026-11-28T11:19:01.702Z"
   },
   "crunchyroll-neu": {
     "lastOk": "2026-11-28T11:01:15.201Z",

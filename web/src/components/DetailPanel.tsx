@@ -14,6 +14,7 @@ import { useErsatzHandlung } from './detail/ersatz-handlung.ts'
 import { PanelLeer, PanelVersteckt } from './detail/panel-huellen.tsx'
 import { PANEL_SCHLEIER } from './detail/schleier.ts'
 import { useDiscAusgaben, useReihenWechsel, useTitelNachladen } from './detail/panel-laden.ts'
+import { usePanelPlatzhalter } from './detail/panel-platzhalter.tsx'
 import { usePanelReihe } from './detail/panel-reihe-namen.ts'
 import { usePanelAntwort } from './detail/panel-antwort.ts'
 import { usePanelSynopse } from './detail/panel-synopse.ts'
@@ -51,17 +52,17 @@ export function DetailPanel({
   const holt = useTitelNachladen(data, titleId)
   const nurUntertitel = useMemo(() => data.nurUntertitelByTitle.get(titleId) ?? [], [data, titleId])
   const a = usePanelAntwort({ title, releases, nurUntertitel, today, synopsis: s.synopsis, favorites, verbindung, t })
-  const wechsel = useReihenWechsel(data, titleId, onOpenTitle)
+  const wechsel = useReihenWechsel(titleId, onOpenTitle)
+  const platzhalter = usePanelPlatzhalter(titleId, t, wechsel.wechsleZu)
   const ersatz = useErsatzHandlung({ titleId, title, synopsis: s.synopsis, reihenTeile })
 
-  if (!title) return <PanelLeer holt={holt} t={t} onClose={onClose} />
+  if (!title) return <PanelLeer holt={holt} t={t} onClose={onClose} platzhalter={platzhalter.element} />
   if (hidden.has(title.id)) return <PanelVersteckt title={title} t={t} onClose={onClose} onToggleHidden={onToggleHidden} />
 
-  // Handlung auf Deutsch; fehlt sie, lieber den englischen Text mit Hinweis
-  // zeigen als gar keinen. Der englische Rückfall bleibt bewusst, obwohl die
-  // Oberfläche seit dem 10.08.2026 einsprachig ist: Er stammt aus der Quelle,
-  // nicht aus einer Übersetzung der Seite. Für rund 700 der 2.750 Titel gibt es
-  // nirgends eine deutsche Inhaltsangabe — dort wäre die Alternative eine leere Fläche.
+  // Handlung auf Deutsch; fehlt sie, lieber den englischen Text mit Hinweis zeigen als gar keinen.
+  // Der englische Rückfall bleibt bewusst, obwohl die Oberfläche seit dem 10.08.2026 einsprachig ist:
+  // Er stammt aus der Quelle, nicht aus einer Übersetzung der Seite. Für rund 700 der 2.750 Titel
+  // gibt es nirgends eine deutsche Inhaltsangabe — dort wäre die Alternative eine leere Fläche.
   const { plot } = plotVon({ synopsis: s.synopsis, anilistId: title.al, ersatz, erschienen: titelGestartet(title, today) })
   const asZiel = eigenerAsZiel(plot, s.synopsis?.asUrl)
 
@@ -95,7 +96,7 @@ export function DetailPanel({
           weitereVerweise={weitereAnisearchVerweise(andereTeile(franchise, title.id).map((x) => ({ titel: data.titleById.get(x.id), teil: x.teil })))}
         />
         {/* Reiter der Kategorie am Antwortkasten (F157): ein Reiter öffnet den Titel auf demselben Weg wie die Reihenliste, die ihn dafür nicht mehr zeigt. */}
-        <ReihenReiterKontext.Provider value={{ data, reiter: reihenReiterVon(title, reihenTeile, reihenName, data.titles, today, franchise), wechsleZu: wechsel.wechsleZu, anbieterSpanne: anbieterSpanne(franchise, title.id) }}>
+        <ReihenReiterKontext.Provider value={{ data, reiter: platzhalter.merke(reihenReiterVon(title, reihenTeile, reihenName, data.titles, today, franchise)), wechsleZu: wechsel.wechsleZu, anbieterSpanne: anbieterSpanne(franchise, title.id) }}>
           <PanelKoerper
             {...{ data, title, today, releases, verbindung, favorites, onToggleFavorite, onFilterBy, onOpenTitle }}
             {...{ a, s, discAusgaben, discZuerst, plot, asZiel, reihenTeile, reihenName, reihe, wechsel }}

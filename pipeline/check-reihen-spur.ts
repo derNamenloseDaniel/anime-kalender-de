@@ -106,7 +106,6 @@ const kartenProps = (m: FranchiseMember, mehr: Partial<CoverProps> = {}): CoverP
   nr: undefined,
   namen: { voll: m.name, rest: m.name, kurz: m.name },
   angaben: '2020 · 12 Fg.',
-  gesperrt: false,
   onWaehlen: () => {},
   ...mehr,
 })
@@ -147,11 +146,7 @@ const langProps = kartenProps(lang, { namen: { voll: 'Der volle Name des Teils',
 gleich('Tooltip-Text ist der volle Name', tooltipText(ReihenCover(langProps)), 'Der volle Name des Teils')
 gleich('kurzer Name: kein Tooltip-Knoten', tooltipText(ReihenCover(kartenProps(teil(900003, 'Kurz')))), undefined)
 
-/* Während des Wechsels (`gesperrt`) sind die Karten aus; sonst nicht. */
-const tabKnopf = (html: string) => html.match(/<button[^>]*role="tab"[^>]*>/)?.[0] ?? ''
 const kartenHtml = (mehr: Partial<CoverProps>, m = teil(900003, 'Kurz')) => renderToStaticMarkup(createElement(() => ReihenCover(kartenProps(m, mehr))))
-pruefe('gesperrt: Karte aus', tabKnopf(kartenHtml({ gesperrt: true })).includes('disabled=""'))
-pruefe('nicht gesperrt: Karte an', !tabKnopf(kartenHtml({ gesperrt: false })).includes('disabled=""'))
 
 /* „Ohne Synchro“ gilt nur für Erschienenes; ein kommender Teil trägt kein ✕ und ist nicht gedämpft. */
 const ohneSynchro = teil(900004, 'Ohne', { ohneSynchro: true, cover: 'https://ak.test/cover/medium/o.jpg' })
@@ -222,7 +217,6 @@ function liste(teile: FranchiseMember[], gewaehlt: number, mehr: { suche?: strin
       reihenName: 'Reihe',
       title: titel(gewaehlt),
       favorites: new Set<number>(),
-      wechselt: false,
       wechsleZu: () => {},
       reihenSchluessel: 1,
       reiheSuche: { reihe: 1, text: mehr.suche ?? '' },

@@ -69,7 +69,6 @@ function KopfMitZustaenden(eigenschaften: ComponentProps<typeof PanelBuehne>) {
           reihenName={eigenschaften.reihenName}
           title={eigenschaften.title}
           favorites={new Set([gemerkt])}
-          wechselt={false}
           wechsleZu={() => {}}
           reihenSchluessel={1}
           reiheSuche={{ reihe: 0, text: '' }}

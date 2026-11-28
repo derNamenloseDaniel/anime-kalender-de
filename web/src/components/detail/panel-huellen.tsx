@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { Title } from '@shared/types.ts'
 import { anzeigeName } from '@shared/titles.ts'
 import type { Translate } from '../../lib/i18n.tsx'
@@ -5,7 +6,7 @@ import { Button } from '../ui.tsx'
 import { PANEL_KENNUNG } from './reihen-spur-regeln.ts'
 
 /** Der Rahmen, solange der Titel fehlt: Ladehinweis oder „keine Metadaten“. */
-export function PanelLeer({ holt, t, onClose }: { holt: boolean; t: Translate; onClose: () => void }) {
+export function PanelLeer({ holt, t, onClose, platzhalter }: { holt: boolean; t: Translate; onClose: () => void; platzhalter?: ReactNode }) {
   /*
     **`overscroll-contain` nur mit Maus: Am Ende des Panels hört das Scrollen auf.**
 
@@ -32,9 +33,7 @@ export function PanelLeer({ holt, t, onClose }: { holt: boolean; t: Translate; o
         lange, bis beide Bestände da sind — danach entscheidet erst, ob es den
         Titel wirklich nicht gibt.
       */}
-      <p className="mb-3 text-t3 text-slate-500">
-        {holt ? t('detail.seasonLoading') : t('detail.noMeta')}
-      </p>
+      {holt && platzhalter ? <div className="mb-3">{platzhalter}</div> : <p className="mb-3 text-t3 text-slate-500">{holt ? t('detail.seasonLoading') : t('detail.noMeta')}</p>}
       <Button onClick={onClose} size="sm">
         {t('detail.close')}
       </Button>

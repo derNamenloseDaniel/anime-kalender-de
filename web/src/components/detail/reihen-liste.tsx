@@ -9,7 +9,7 @@ import { gezeigteGruppen, gezeigteZahl, istGrosseReihe } from './reihen-uebersic
 export function ReihenListe(eingang: ReihenListeProps) {
   /* Was als Reiter am Antwortkasten steht, fehlt hier (F157, Daniel 24.11.2026: „dafür die aus der reihe entfernen“). */
   const props = { ...eingang, ohne: titelAlsReiter(useContext(ReihenReiterKontext)?.reiter ?? []) }
-  const { reihenTeile, t, reihenName, title, wechselt } = props
+  const { reihenTeile, t, reihenName, title } = props
   if (reihenTeile.length < 2) return null
   /* Große Reihen (eine Gruppe über 12 Teile) als Übersicht mit eingeklappten Gruppen, alle anderen als Spur (F148, 20.11.2026). */
   const o = reihenOrdnung(reihenTeile, reihenName, t, props.ohne)
@@ -23,7 +23,6 @@ export function ReihenListe(eingang: ReihenListeProps) {
       <div data-reihe-liste className="p-0.5">
         {reihenInhalt(props)}
       </div>
-      {wechselt && <span className="text-t5 text-ak-sehr-leise">{t('detail.seasonLoading')}</span>}
     </ReihenKarte>
   )
 }

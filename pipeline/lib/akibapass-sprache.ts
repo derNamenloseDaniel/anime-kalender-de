@@ -8,7 +8,7 @@ import { adresseIstOmu } from '../../shared/omu-adresse.ts'
  * Die Adresse ist nur Vorfilter: „omu“ im Pfad folgt der OmU-Regel (`shared/omu-adresse.ts`), alles andere braucht die Seite.
  */
 export type AkibapassSprache = 'de' | 'omu' | 'offen'
-export type AkibapassDatei = { geholtAm?: string; seiten: Record<string, { sprache: AkibapassSprache; am: string }> }
+export type AkibapassDatei = { geholtAm?: string; seiten: Record<string, { sprache: AkibapassSprache; am: string; episoden?: number }> }
 
 export const istAkibapassWeg = (w: WatchLink): boolean => w.name === 'Akibapass'
 
@@ -55,33 +55,48 @@ export function seitenText(html: string): string {
 /** `Sprache: Deutsch / Untertitel: keine` → de; `Sprache: Japanisch / Untertitel: Deutsch` → omu; ohne Angabe offen. */
 export function spracheAusSeite(html: string): AkibapassSprache {
   const text = seitenText(html)
-  // Nur „Sprache: X / Untertitel: Y“ zählt; ein alleinstehendes „Sprache:“ (Sprachwahl in Kopf oder Fuß) und ein früheres „Sprache:“ davor nicht.
-  const ton = /Sprache:\s*((?:(?!Sprache:).){0,60}?)\s*\/?\s*Untertitel/i.exec(text)?.[1]
-  if (ton !== undefined) {
-    if (/deutsch/i.test(ton)) return 'de'
-    if (/\S/.test(ton)) return 'omu'
+  // Die echte Seite trägt „Sprache: X / Untertitel: Y“ mehrfach (28.11.2026: 17-mal, alle gleich). Ein Urteil nur, wenn **alle** Treffer gleich lauten;
+  // ein „Sprache:“ ohne „/ Untertitel“ (Sprachwahl) oder ein abweichender Treffer lässt den Titel offen.
+  const stuecke = text.split(/Sprache:/i).slice(1)
+  if (stuecke.length) {
+    const toene = stuecke.map((s) => /^\s*((?:(?!\/).){0,60}?)\s*\/\s*Untertitel/i.exec(s)?.[1])
+    if (toene.some((t) => t === undefined || !/\S/.test(t))) return 'offen'
+    const arten = new Set(toene.map((t) => (/deutsch/i.test(t!) ? 'de' : 'omu')))
+    return arten.size === 1 ? (arten.has('de') ? 'de' : 'omu') : 'offen'
   }
   if (/mit deutscher Synchronisation/i.test(text)) return 'de'
   if (/\bOmU\b|Originalton mit (deutschen )?Untertiteln/i.test(text)) return 'omu'
   return 'offen'
 }
 
+/** „Enthält alle 13 Episoden der Season 1“ → 13; ohne diesen Satz undefined. */
+export function folgenAusSeite(html: string): number | undefined {
+  const n = Number(/Enthält alle (\d{1,4}) Episoden?/i.exec(seitenText(html))?.[1])
+  return n > 0 ? n : undefined
+}
+
+export type Anwendung = { gesetzt: number; ohneFolgenzahl: number; abweichend: number }
+
 /**
- * Trägt belegtes Deutsch als `dubRanges` ein (wie bei anderen Anbietern: Folgen 1 bis zur Folgenzahl des Titels).
- * Ein Weg mit eigener Angabe und ein OmU-Pfad bleiben unberührt. Rückgabe: Zahl der gesetzten Wege.
+ * Trägt belegtes Deutsch als `dubRanges` ein: Folgen 1 bis zur Zahl, die die Produktseite nennt („Enthält alle N Episoden“), sonst bis `episodes` des Titels.
+ * Fehlt beides, bleibt der Weg offen (`ohneFolgenzahl`); nennt die Seite eine andere Zahl als der Titel (etwa ein Teil einer Staffel), ebenso (`abweichend`).
+ * Ein Weg mit eigener Angabe und ein OmU-Pfad bleiben unberührt.
  */
-export function setzeAkibapassSprache(titles: Iterable<Title>, datei: AkibapassDatei): number {
-  let n = 0
+export function setzeAkibapassSprache(titles: Iterable<Title>, datei: AkibapassDatei): Anwendung {
+  const z: Anwendung = { gesetzt: 0, ohneFolgenzahl: 0, abweichend: 0 }
   for (const t of titles) {
     for (const w of t.watchLinks ?? []) {
       if (!istAkibapassWeg(w) || w.dubRanges?.length || adresseIstOmu(w.url)) continue
-      if (datei.seiten[w.url]?.sprache !== 'de') continue
-      if (!t.episodes) continue // keine erfundene Folgenzahl: ohne Folgenzahl des Titels bleibt der Weg offen
-      w.dubRanges = [{ from: 1, to: Math.max(1, t.episodes ?? 1), dub: true }]
-      n++
+      const e = datei.seiten[w.url]
+      if (e?.sprache !== 'de') continue
+      const zahl = e.episoden ?? t.episodes
+      if (!zahl) { z.ohneFolgenzahl++; continue } // keine erfundene Folgenzahl
+      if (e.episoden && t.episodes && e.episoden !== t.episodes) { z.abweichend++; continue }
+      w.dubRanges = [{ from: 1, to: zahl, dub: true }]
+      z.gesetzt++
     }
   }
-  return n
+  return z
 }
 
 export type HostZahl = { geholt: number; gesperrt: number; uebersprungen: number }
@@ -100,13 +115,23 @@ export async function holeAkibapassSeiten(urls: string[], abruf: Abruf, heute: s
     const { host, pathname } = new URL(url)
     const z = (hosts[host] ??= { geholt: 0, gesperrt: 0, uebersprungen: 0 })
     if (gesperrt.has(host)) { z.uebersprungen++; continue }
+    if (!robots.has(host)) {
+      // Ergebnis je Host einmal; scheitert der Abruf (5xx, Timeout, Netz), ruht der Host für diesen Lauf.
+      try { robots.set(host, await abruf.holeRobots(host)) } catch (fehler) {
+        warn(`robots.txt von ${host} nicht lesbar, Host ruht in diesem Lauf: ${(fehler as Error).message}`)
+        gesperrt.add(host)
+        z.uebersprungen++
+        continue
+      }
+    }
     try {
-      if (!robots.has(host)) robots.set(host, await abruf.holeRobots(host))
       if (!robotsErlaubt(robots.get(host)!, pathname, 'anime-kalender-de')) { warn(`robots.txt sperrt ${url}`); z.uebersprungen++; continue }
       const antwort = await abruf.holeSeite(url)
       if (antwort.status === 403 || antwort.status === 429) { warn(`HTTP ${antwort.status} bei ${host}: Host pausiert, Rest im nächsten Lauf`); gesperrt.add(host); z.gesperrt++; continue }
       if (antwort.status !== 200) { warn(`${url}: HTTP ${antwort.status}`); continue }
-      seiten[url] = { sprache: spracheAusSeite(await antwort.text()), am: heute }
+      const html = await antwort.text()
+      const episoden = folgenAusSeite(html)
+      seiten[url] = { sprache: spracheAusSeite(html), am: heute, ...(episoden ? { episoden } : {}) }
       z.geholt++
     } catch (fehler) {
       warn(`${url}: ${(fehler as Error).message}`)

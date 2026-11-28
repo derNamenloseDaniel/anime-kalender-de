@@ -186,6 +186,7 @@ export function werteWeitereQuellenAus({ releases, titles, adnKatalog, adnVerwei
   const adnStreamSchaerfen = baueAdnStreamSchaerfer({ ...adnAdressen, adnArchiv })
   entferneVerweiseOhneDeutsch({ titles, verweiseEntfernt })
   const akibapass = setzeAkibapassSprache(titles.values(), readJson<AkibapassDatei>('data/akibapass-sprache.json', { seiten: {} }))
-  if (akibapass) log(`${akibapass} Akibapass-Wege: Deutsch aus der Produktseite belegt`)
+  if (akibapass.gesetzt) log(`${akibapass.gesetzt} Akibapass-Wege: Deutsch aus der Produktseite belegt`)
+  if (akibapass.ohneFolgenzahl || akibapass.abweichend) log(`Akibapass-Wege mit belegtem Deutsch, aber offen: ${akibapass.ohneFolgenzahl} ohne Folgenzahl, ${akibapass.abweichend} mit abweichender Folgenzahl`)
   return { adnArchiv, adnStreamSchaerfen, motnBelege, motnTon }
 }

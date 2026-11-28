@@ -13,7 +13,7 @@ import { type Abruf, type AkibapassDatei, holeAkibapassSeiten, istAkibapassWeg, 
 const UA = 'anime-kalender-de (https://anime-kalender.de; eine Seite je Akibapass-Weg und Monat)'
 const ZIEL = 'data/akibapass-sprache.json'
 const PAUSE_MS = 3000
-const ABRUF_MS = 30_000
+const ABRUF_MS = 15_000
 
 const tageSeit = (iso: string, heute: string): number => (Date.parse(heute) - Date.parse(iso)) / 864e5
 const veraltet = (e: AkibapassDatei['seiten'][string] | undefined, heute: string): boolean =>

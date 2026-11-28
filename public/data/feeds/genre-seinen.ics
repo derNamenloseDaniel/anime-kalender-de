@@ -36,7 +36,9 @@ DTSTART;VALUE=DATE:20261126
 DTEND;VALUE=DATE:20261127
 SUMMARY:Fool Night
 DESCRIPTION:Plattform: Netflix\nRelease-Art: Katalogtitel\nUhrzeit noch nic
- ht bestätigt.\nDetails: https://anime-kalender.de/t/17705/
+ ht bestätigt.\nGeschätzter Termin: kein vom Anbieter genannter Tag\, son
+ dern aus Rhythmus oder Originalterminen abgeleitet.\nDetails: https://anim
+ e-kalender.de/t/17705/
 CATEGORIES:Netflix
 END:VEVENT
 BEGIN:VEVENT

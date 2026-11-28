@@ -181,6 +181,17 @@ DESCRIPTION:Plattform: Netflix\nRelease-Art: Wöchentlich (Simuldub)\nAuf D
 CATEGORIES:Netflix
 END:VEVENT
 BEGIN:VEVENT
+UID:auto-101291-adn@2026-12-05@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261205
+DTEND;VALUE=DATE:20261206
+SUMMARY:Rascal Does Not Dream of Bunny Girl Senpai (neu bei ADN)
+DESCRIPTION:Plattform: ADN\nRelease-Art: Katalogtitel\nIm Angebot seit dies
+ em Tag – nicht der Erscheinungstag der deutschen Fassung.\nUhrzeit noch 
+ nicht bestätigt.\nDetails: https://anime-kalender.de/t/9041/
+CATEGORIES:ADN
+END:VEVENT
+BEGIN:VEVENT
 UID:cr-G24H1N334@2026-12-09@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261209T133000Z
@@ -191,6 +202,17 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
   oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
  4415/
 CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-6547-adn@2026-12-10@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261210
+DTEND;VALUE=DATE:20261211
+SUMMARY:Angel Beats! (neu bei ADN)
+DESCRIPTION:Plattform: ADN\nRelease-Art: Katalogtitel\nIm Angebot seit dies
+ em Tag – nicht der Erscheinungstag der deutschen Fassung.\nUhrzeit noch 
+ nicht bestätigt.\nDetails: https://anime-kalender.de/t/3898/
+CATEGORIES:ADN
 END:VEVENT
 BEGIN:VEVENT
 UID:auto-60-primevideo@2026-12-10@anime-kalender-de
@@ -337,6 +359,16 @@ DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nG
   oder Originalterminen abgeleitet.\nDetails: https://anime-kalender.de/t/1
  6918/
 CATEGORIES:Crunchyroll
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-6746-adn@2026-12-21@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261221
+DTEND;VALUE=DATE:20261222
+SUMMARY:Durarara!!
+DESCRIPTION:Plattform: ADN\nRelease-Art: Katalogtitel\nUhrzeit noch nicht b
+ estätigt.\nDetails: https://anime-kalender.de/t/3973/
+CATEGORIES:ADN
 END:VEVENT
 BEGIN:VEVENT
 UID:cr-G24H1N334@2026-12-23@anime-kalender-de

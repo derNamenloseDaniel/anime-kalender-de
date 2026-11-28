@@ -9,7 +9,7 @@ Abschnitt „JustWatch-Ton je Seite“. Unsere Messung (Handbeleg, Meldung der E
 
 Flagge „Deutsch“: 52 Wege, nur Hinweis: 1.
 
-JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine Flagge): mehrere Staffeln 15, Mehrteiler 13.
+JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine Flagge): mehrere Staffeln 15, Mehrteiler 14.
 
 | Anbieter | mit eigener Messung | Widersprüche | Anteil | Anzeige |
 |---|---|---|---|---|
@@ -22,7 +22,7 @@ JustWatch-„de“ nur als Serienangabe (Mehrteiler oder mehrere Staffeln, keine
 | Titel | Anbieter | Adresse | JustWatch | Gemessen |
 |---|---|---|---|---|
 
-### Kandidaten für neue Wege (814)
+### Kandidaten für neue Wege (815)
 
 JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „Weg ohne Kennung“: ein Weg zum Anbieter steht, seine Adresse trägt aber keine Seitenkennung.
 
@@ -622,13 +622,14 @@ JustWatch nennt deutschen Ton an einer Seite, zu der wir keinen Weg haben. „We
 | Insomniacs after School (143653) | Aniverse Amazon Channel | amazon:amzn1.dv.gti.eefa45cc-f921-4804-83e6-f259301a5dbb | ja |
 | Gods’ Games We Play (144176) | Crunchyroll | crunchyroll:GD9UV33DP | nein |
 | Gods’ Games We Play (144176) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.4747ce9d-41b9-4a7d-adf8-52e723b438f2 | nein |
+| Gods’ Games We Play (144176) | Crunchyroll | crunchyroll:G31UX44DM | nein |
 | Bibliophile Princess (144533) | Aniverse Amazon Channel | amazon:amzn1.dv.gti.c440fb64-cb84-49ad-8134-eea3e6b13015 | ja |
 | Helck (145140) | Aniverse Amazon Channel | amazon:amzn1.dv.gti.50380163-bcb9-491d-bdc9-68df8e239b30 | ja |
 | Shinobi no Ittoki (145604) | Crunchyroll | crunchyroll:G8WUNZQKJ | nein |
 | Shinobi no Ittoki (145604) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.c9d9bf3e-016b-41d4-bc40-187e8f06c68d | nein |
 | NieR:Automata Ver1.1a (145665) | Crunchyroll | crunchyroll:G50UZ5VDM | ja |
 | NieR:Automata Ver1.1a (145665) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.96f14089-6dde-4e53-9e32-bd6eddfa0e17 | ja |
-| Spice and Wolf: Merchant Meets the Wise Wolf (145728) | Crunchyroll | crunchyroll:GWDU7V9ZK | nein |
+| Spice and Wolf: Merchant Meets the Wise Wolf (145728) | Crunchyroll | crunchyroll:G7PU3P5GE | nein |
 | Spice and Wolf: Merchant Meets the Wise Wolf (145728) | Crunchyroll Amazon Channel | amazon:amzn1.dv.gti.ace6b3ba-9d82-49c9-883d-da10bb274f0a | nein |
 | I’ve Somehow Gotten Stronger When I Improved My Farm-Related Skills (145815) | Aniverse Amazon Channel | amazon:amzn1.dv.gti.b8512336-9f32-41be-a161-33c8e306f8af | ja |
 | Vermeil in Gold (146210) | Aniverse Amazon Channel | amazon:amzn1.dv.gti.d1b34ba3-3cdd-472a-839b-c7500015a14f | ja |

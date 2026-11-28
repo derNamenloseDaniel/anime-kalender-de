@@ -20,6 +20,8 @@ import { usePanelSynopse } from './detail/panel-synopse.ts'
 import { useReiheZustand } from './detail/panel-reihe-zustand.ts'
 import { PanelKoerper } from './detail/panel-koerper.tsx'
 import { ReihenReiterKontext } from './detail/reihen-reiter.tsx'
+import { andereTeile, anbieterSpanne } from './detail/anbieter-staffel.ts'
+import { weitereAnisearchVerweise } from './detail/verweise.ts'
 import { reihenReiterVon } from './detail/reihen-reiter-liste.ts'
 import type { DetailPanelProps } from './detail/panel-props.ts'
 
@@ -90,9 +92,10 @@ export function DetailPanel({
           eigenerTeil={eigenerTeil}
           kinoRelease={a.kinoRelease}
           asZiel={asZiel}
+          weitereVerweise={weitereAnisearchVerweise(andereTeile(franchise, title.id).map((x) => ({ titel: data.titleById.get(x.id), teil: x.teil })))}
         />
         {/* Reiter der Kategorie am Antwortkasten (F157): ein Reiter öffnet den Titel auf demselben Weg wie die Reihenliste, die ihn dafür nicht mehr zeigt. */}
-        <ReihenReiterKontext.Provider value={{ data, reiter: reihenReiterVon(title, reihenTeile, reihenName, data.titles, today, franchise), wechsleZu: wechsel.wechsleZu }}>
+        <ReihenReiterKontext.Provider value={{ data, reiter: reihenReiterVon(title, reihenTeile, reihenName, data.titles, today, franchise), wechsleZu: wechsel.wechsleZu, anbieterSpanne: anbieterSpanne(franchise, title.id) }}>
           <PanelKoerper
             {...{ data, title, today, releases, verbindung, favorites, onToggleFavorite, onFilterBy, onOpenTitle }}
             {...{ a, s, discAusgaben, discZuerst, plot, asZiel, reihenTeile, reihenName, reihe, wechsel }}

@@ -118,13 +118,15 @@ type KopfEingabe = {
   staffeln?: StaffelZeile[]
   deSeitNeben: string
   title: Title
+  /** Folgenbereich in der Zählung des Anbieters, wenn er nicht bei Folge 1 beginnt (`anbieter-staffel.ts`). */
+  anbieterSpanne?: { von: number; bis: number }
 }
 
 /** Die Zeile „10 von 12 Folgen erschienen“ unter dem Kopf; bei durchlaufender Zählung mit den Nummern des Anbieters („Folge 2–11 von 12“). */
-function erschienenZeile(antwort: Extract<Antwort, { art: 'laeuft' }>, releases: Release[], T: KopfEingabe['T']): ReactNode {
+function erschienenZeile(antwort: Extract<Antwort, { art: 'laeuft' }>, releases: Release[], T: KopfEingabe['T'], anbieterSpanne: KopfEingabe['anbieterSpanne']): ReactNode {
   if (!antwort.gesamt) return ''
   const fett = 'font-semibold text-ak-gut-text'
-  const spanne = zaehlSpanne(releases, antwort.raus, antwort.gesamt)
+  const spanne = zaehlSpanne(releases, antwort.raus, antwort.gesamt, anbieterSpanne)
   if (spanne) {
     return (
       <>
@@ -144,7 +146,7 @@ function erschienenZeile(antwort: Extract<Antwort, { art: 'laeuft' }>, releases:
 }
 
 /** Antwortart „laeuft“. */
-function kopfLaeuft({ antwort, relativImSatz, T, betont, ohneSprachbeleg, releases }: Omit<KopfEingabe, 'antwort'> & { antwort: Extract<Antwort, { art: 'laeuft' }> }): KopfTeile {
+function kopfLaeuft({ antwort, relativImSatz, T, betont, ohneSprachbeleg, releases, anbieterSpanne }:Omit<KopfEingabe, 'antwort'> & { antwort: Extract<Antwort, { art: 'laeuft' }> }): KopfTeile {
   let haupt: ReactNode, neben: string, anteil: number | undefined, zaehl: ReactNode, fakten: Fakt[] | undefined, gedaempft = false, nebenTitel: string | undefined
   const e = antwort.haupt
   /*
@@ -206,7 +208,7 @@ function kopfLaeuft({ antwort, relativImSatz, T, betont, ohneSprachbeleg, releas
     Hervorgehoben wird die Zahl, nicht der Satz: Wer den Kasten überfliegt,
     soll sehen, wie viel schon da ist.
   */
-  zaehl = erschienenZeile(antwort, releases, T)
+  zaehl = erschienenZeile(antwort, releases, T, anbieterSpanne)
   const vorstart = vorstartSatz(antwort, Boolean(ohneSprachbeleg), releases)
   if (vorstart) [haupt, neben, anteil, zaehl] = [betont(vorstart), '', undefined, '']
   else if (antwort.faellig) haupt = betont(faelligText(e, rel === T('antwort.relHeute'), T))

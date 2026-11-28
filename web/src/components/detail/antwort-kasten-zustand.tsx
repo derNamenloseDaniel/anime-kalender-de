@@ -70,11 +70,12 @@ type KopfWunsch = Pick<AntwortKastenProps, 'antwort' | 'title' | 'today' | 'ohne
   releases: NonNullable<AntwortKastenProps['releases']>
   folgenZahl: ReturnType<typeof useKopfZahlen>['folgenZahl']
   staffeln: ReturnType<typeof useKopfZahlen>['staffeln']
+  anbieterSpanne?: { von: number; bis: number }
 }
 
 /** Überschrift, Nebenzeile, Anteil, Zähler und Fakten des Kastens (aus `AntwortKasten` herausgelöst). */
 export function kastenKopfVon(w: KopfWunsch) {
-  const { antwort, title, today, T, releases, ohneSprachbeleg, folgenZahl, staffeln } = w
+  const { antwort, title, today, T, releases, ohneSprachbeleg, folgenZahl, staffeln, anbieterSpanne } = w
   /*
     Dieselbe Angabe, aber kleingeschrieben: Sie steht jetzt mitten im Satz
     („erscheint in 2 Tagen, am …") statt am Satzanfang. Ein großes „Heute"
@@ -96,7 +97,7 @@ export function kastenKopfVon(w: KopfWunsch) {
   */
   /* „Auf Deutsch seit …“ der Zustände fertig und Film: Neuigkeit, Zukunft oder eine frühere Pille ersetzen die Zeile (`de-seit.ts`). */
   const deSeitNeben = !erstausgabeAlsNeuigkeit(title, today, releases) && deSeitZeigen(title, releases, today) ? deSeitZeile(title, T) : ''
-  return antwortKopf({ antwort, relativImSatz, T, betont, ohneSprachbeleg, releases, folgenZahl, staffeln, deSeitNeben, title })
+  return antwortKopf({ antwort, relativImSatz, T, betont, ohneSprachbeleg, releases, folgenZahl, staffeln, deSeitNeben, title, anbieterSpanne })
 }
 
 /** Die Klassen der Kastenhülle: Mindesthöhe und Farbe (aus `AntwortKasten` herausgelöst). */

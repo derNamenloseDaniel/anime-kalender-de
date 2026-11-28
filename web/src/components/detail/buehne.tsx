@@ -5,6 +5,7 @@ import { fskAngabeVon, metaVon, unterzeileVon } from './kopf-texte.ts'
 import { Tooltip } from '../ui.tsx'
 import { WeitereTitel } from './weitere.tsx'
 import { Flaggen } from './flaggen.tsx'
+import type { Verweis } from './verweise.ts'
 import { PanelAktionen } from './aktionen.tsx'
 import { KopfGrund, Posterkarte, SchliessenKnopf } from './kopf-bild.tsx'
 import { type Title, type FranchiseMember, type Release } from '@shared/types.ts'
@@ -15,7 +16,7 @@ import type { Translate } from '../../lib/i18n.tsx'
  * unscharfe Cover), darauf ✕ und die Flaggen; darunter das ganze Poster als Karte, die in das Banner ragt, und der Name daneben.
  * Merken, Teilen, Ausblenden stehen als Reihe darunter. Ein Klick aufs Banner öffnet das Banner, einer aufs Poster das Cover groß.
  */
-export function PanelBuehne({ reihenName, teilName, reihenTeile, buehnenBild, grossBild, title, onToggleHidden, favorites, onToggleFavorite, onClose, t, folgenImKasten, eigenerTeil, kinoRelease, asZiel }: {
+export function PanelBuehne({ reihenName, teilName, reihenTeile, buehnenBild, grossBild, title, onToggleHidden, favorites, onToggleFavorite, onClose, t, folgenImKasten, eigenerTeil, kinoRelease, asZiel, weitereVerweise }: {
   reihenName: string
   teilName: string
   reihenTeile: FranchiseMember[]
@@ -31,6 +32,8 @@ export function PanelBuehne({ reihenName, teilName, reihenTeile, buehnenBild, gr
   eigenerTeil: FranchiseMember | undefined
   kinoRelease: Release | undefined
   asZiel?: string
+  /** aniSearch-Absprünge der anderen Teile einer Anbieter-Staffel (`weitereAnisearchVerweise`). */
+  weitereVerweise?: Verweis[]
 }) {
   const teil = reihenTeile.length > 1 && teilName !== reihenName ? teilName : undefined
   const unter = unterzeileVon(title, teil, folgenImKasten, t)
@@ -47,7 +50,7 @@ export function PanelBuehne({ reihenName, teilName, reihenTeile, buehnenBild, gr
       >
         <KopfGrund banner={title.bannerImage} cover={buehnenBild} />
         <SchliessenKnopf onClose={onClose} label={t('detail.close')} />
-        <Flaggen title={title} ziel={asZiel} t={t} />
+        <Flaggen title={title} ziel={asZiel} t={t} weitere={weitereVerweise} />
       </div>
       <CoverMaximieren bild={buehnenBild} banner={title.bannerImage} gross={grossBild} titel={anzeigeName(title)} />
       <div data-kopfblock className="pointer-events-none relative z-10 -mt-[72px] grid shrink-0 grid-cols-[120px_1fr] gap-3 px-4 pb-3 min-[512px]:-mt-[84px] min-[512px]:grid-cols-[140px_1fr]">

@@ -147,6 +147,8 @@ type StaffelFeld = {
   staffelQuelle?: number
   /** Letzte deutsche Staffel, die ein Sammeltitel mit abdeckt (Pokémon 527: Staffel 1 bis 5); nur gesetzt, wenn es mehr als eine ist. */
   staffelBis?: number
+  /** Staffel und Teil, die der Anbieter für diesen Eintrag festlegt (Stone Ocean: Staffel 6, Teil 1 und 2); fehlt es, zählt der Name. */
+  gruppe?: { nr: number; teil: number }
   /** Kennung des Originals, wenn dieser Eintrag eine Neuverfilmung ist (`zaehlgruppen`). */
   remakeVon?: number
 }
@@ -192,6 +194,13 @@ function spanneBis(m: StaffelFeld): number | undefined {
   return m.staffelQuelle && m.staffelBis && m.staffelBis > m.staffelQuelle ? m.staffelBis : undefined
 }
 
+/** Die von außen festgelegte Staffel: erst die belegte deutsche Quelle, dann die Gruppe des Anbieters. */
+function festeStaffel(m: StaffelFeld): Pick<StaffelEintrag, 'staffel' | 'bis' | 'teil'> | undefined {
+  if (m.staffelQuelle) return { staffel: m.staffelQuelle, bis: spanneBis(m) }
+  if (m.gruppe) return { staffel: m.gruppe.nr, teil: m.gruppe.teil }
+  return undefined
+}
+
 /** „5" bzw. „1–5" für einen Eintrag, der mehrere Staffeln abdeckt. */
 export function staffelSpanne(e: { staffel: number; bis?: number }): string {
   return e.bis && e.bis > e.staffel ? `${e.staffel}–${e.bis}` : String(e.staffel)
@@ -206,14 +215,16 @@ function zaehleStaffeln<T extends StaffelFeld>(staffeln: T[], reihenName: string
   const partIstStaffel = zaehltPartAlsStaffel(sortiert.map((m) => eindeutschenStaffel(m.name)))
   for (const m of sortiert) {
     /* Lupin III. Part 6 ist die sechste Serie, nicht Teil 2 der ersten; der Name bleibt als Beschriftung (`shared/staffel-part.ts`). */
-    const part = partIstStaffel && !m.staffelQuelle ? partNummer(eindeutschenStaffel(m.name)) : undefined
+    const fest = festeStaffel(m)
+    const part = partIstStaffel && !fest ? partNummer(eindeutschenStaffel(m.name)) : undefined
     if (part) {
       eintraege.push({ id: m.id, staffel: (aktuell = part), eigenerName: true })
       continue
     }
-    /* Nennt die belegte deutsche Quelle eine Staffel, gilt sie (86: Eighty Six, 01.10.2026). */
-    if (m.staffelQuelle) {
-      eintraege.push({ id: m.id, staffel: (aktuell = m.staffelQuelle), bis: spanneBis(m), eigenerName: false })
+    /* Nennt die belegte deutsche Quelle (oder der Anbieter) eine Staffel, gilt sie (86: Eighty Six, 01.10.2026). */
+    if (fest) {
+      eintraege.push({ id: m.id, ...fest, eigenerName: false })
+      aktuell = fest.staffel
       continue
     }
     const voll = eindeutschenStaffel(m.name)

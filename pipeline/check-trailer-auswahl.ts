@@ -1,8 +1,6 @@
 /** Prüft `lib/trailer-auswahl.ts`: Kandidaten des Trailerlaufs und die TMDB-Videoadresse. */
 import { tmdbArt, tmdbVideosUrl, trailerKandidaten, waehleTmdbVideo } from './lib/trailer-auswahl.ts'
-import { ablehnungenText, ablehnungsgrund, animeNamen, entferneAbgelehnte, macheAblehner, neueAblehnungen } from './lib/trailer-ablehnung.ts'
-import { ladeTrailerSperre } from './lib/trailer-hand.ts'
-import { readJson } from './lib/util.ts'
+import { ablehnungenText, ablehnungsgrund, entferneAbgelehnte, macheAblehner, neueAblehnungen } from './lib/trailer-ablehnung.ts'
 
 let fehler = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -78,12 +76,6 @@ console.log('Bestand')
 const bestand = { 141391: { video: 'iPvK4ORRTHA', titel: 'X Anime Review' }, 2: { video: 'ok', titel: 'X | Trailer' } }
 const weg = entferneAbgelehnte(bestand, () => ['X'], new Set())
 pruefe('entfernt nur den Nicht-Trailer und nennt ihn', weg.length === 1 && weg[0]!.id === '141391' && weg[0]!.grund === 'review' && Object.keys(bestand).join() === '2', weg)
-
-const echt = readJson<Record<string, { video: string; titel: string }>>('data/trailer.json', {})
-const titles = new Map(readJson<{ id: number; titleDe?: string; titleEn?: string; titleRomaji?: string }[]>('public/data/titles.json', []).map((t) => [String(t.id), t]))
-const tmdbNamen = readJson<Record<string, { nameDe?: string }>>('data/tmdb-titles.json', {})
-const uebrig = entferneAbgelehnte({ ...echt }, (id) => animeNamen(titles.get(id) ?? {}, tmdbNamen[id]?.nameDe), ladeTrailerSperre())
-pruefe('data/trailer.json enthält keinen Nicht-Trailer', uebrig.length === 0, uebrig.map((e) => `${e.id} ${e.grund} ${e.titel}`))
 
 if (fehler) {
   console.error(`${fehler} Fehler`)

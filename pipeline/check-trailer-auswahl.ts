@@ -59,6 +59,27 @@ pruefe('Animename mit „Ranking“ bleibt (Videotitel ohne Namen geprüft)', gr
 pruefe('ohne bekannten Namen hielte „Ranking“ an', grund('Ranking of Kings | Offizieller Trailer') === 'ranking')
 pruefe('„Let’s Play“ bleibt', grund('Let’s Play | Offizieller Trailer - OmU', 'Let’s Play') === null)
 pruefe('Lupin III. vs. Detektiv Conan bleibt', grund('Lupin III. vs. Detektiv Conan | Offizieller Trailer', 'Lupin III. vs. Detektiv Conan') === null)
+console.log('Weite Muster gelten nur ohne Trailer-Wort im Videotitel (Befund 5)')
+for (const [t, erwartet] of [
+  ['Top 10 Anime 2022', 'ranking'],
+  ['Top 5 Fights | Offizieller Trailer', null],
+  ['Best of Naruto', 'ranking'],
+  ['Best of Season | Teaser', null],
+  ['Ending erklärt', 'analyse'],
+  ['Ending explained', 'analyse'],
+  ['Die Handlung erklärt | Vorschau', null],
+  ['Plot explained | PV', null],
+  ['Show Ep 3', 'folgen-upload'],
+  ['Show Ep 3 | Yokoku', null],
+  ['Show Ep 3 | Tokuho', null],
+  ['Anime Review | Trailer', 'review'],
+  ['Chainsaw Man Reaction | Trailer', 'reaktion'],
+  ['Show Full Movie | Trailer', 'ganzer-film'],
+  ['wrong title | Trailer', 'falscher-titel'],
+  ['Fate AMV | Trailer', 'fan-edit'],
+] as const)
+  pruefe(`${t} → ${erwartet ?? 'bleibt'}`, grund(t) === erwartet, grund(t))
+
 for (const t of ['Space Dandy Season 2 - Blu-ray/DVD Combo - Coming Soon!', 'Kiss Him, Not Me! Complete Series | Pre-Order Now!', 'Persona3 THE MOVIE #2 Midsummer Knight’s Dream Coming to Blu-ray!', 'Code Geass (Seasons 1 and 2) – Available Now', 'The Place Promised in Our Early Days | On Blu-ray & Digital', 'Chainsaw Man | JETZT AUF CRUNCHYROLL'])
   pruefe(`Disc-/Streamwerbung bleibt: ${t}`, grund(t) === null)
 

@@ -9,20 +9,23 @@ export const ABLEHNUNGEN = ['review', 'kritik', 'reaktion', 'ganzer-film', 'folg
 export type Ablehnung = (typeof ABLEHNUNGEN)[number]
 export type Ablehnungen = Record<Ablehnung, number>
 
-const MUSTER: [Ablehnung, RegExp][] = [
-  ['review', /\b(reviews?|rezension\w*)\b/],
-  ['kritik', /\bkritik\w*\b/],
-  ['reaktion', /\b(reactions?|reaktion\w*|reacts?\s+to)\b/],
-  ['ganzer-film', /\b(full\s+(movie|film|episodes?|anime)|ganze[rnms]?\s+(film|folgen?|episoden?|anime)|komplette[rnms]?\s+(film|folgen?|episoden?))\b/],
-  ['ranking', /\b(ranking|top\s*\d+|tier\s*list|best\s+anime|beste[rnms]?\s+anime|best\s+of)\b/],
-  ['analyse', /\b(analy[sz]\w*|erkl[aä]rt|explained|breakdown)\b/],
-  ['fan-edit', /\b(amv|fan[\s-]?(edit|made|film|trailer|dub|sub)|fanedit|fanmade)\b/],
-  ['falscher-titel', /\b(wrong\s+title|please\s+delete)\b/],
-  ['marathon', /\b(marathon|catch[\s-]?up)\b/],
+/** `weich`: weites Muster, das nur gilt, wenn der Videotitel kein Trailer-Wort trägt („Top 10 Anime“ ja, „Top 10 Fights | Trailer“ nein). */
+const MUSTER: [Ablehnung, RegExp, boolean][] = [
+  ['review', /\b(reviews?|rezension\w*)\b/, false],
+  ['kritik', /\bkritik\w*\b/, false],
+  ['reaktion', /\b(reactions?|reaktion\w*|reacts?\s+to)\b/, false],
+  ['ganzer-film', /\b(full\s+(movie|film|episodes?|anime)|ganze[rnms]?\s+(film|folgen?|episoden?|anime)|komplette[rnms]?\s+(film|folgen?|episoden?))\b/, false],
+  ['ranking', /\b(ranking|tier\s*list|best\s+anime|beste[rnms]?\s+anime)\b/, false],
+  ['ranking', /\b(top\s*\d+|best\s+of)\b/, true],
+  ['analyse', /\b(analy[sz]\w*|breakdown)\b/, false],
+  ['analyse', /\b(erkl[aä]rt|explained)\b/, true],
+  ['fan-edit', /\b(amv|fan[\s-]?(edit|made|film|trailer|dub|sub)|fanedit|fanmade)\b/, false],
+  ['falscher-titel', /\b(wrong\s+title|please\s+delete)\b/, false],
+  ['marathon', /\b(marathon|catch[\s-]?up)\b/, false],
 ]
 
 const FOLGE = /\b(episode|folge|ep)\s*\d+\b/
-const TRAILER_WORT = /\b(trailer|teaser|preview|vorschau|promo|pv)\b/
+const TRAILER_WORT = /\b(trailer|teaser|preview|vorschau|promo|pv|yokoku|tokuho)\b/
 
 /** Klein, ohne Satzzeichen (Schrift jeder Art bleibt), einfache Leerzeichen. */
 function glatt(s: string): string {
@@ -40,8 +43,9 @@ function ohneNamen(videoTitel: string, namen: string[]): string {
 /** Der Grund, aus dem ein Video kein Trailer ist, oder `null`. */
 export function ablehnungsgrund(videoTitel: string, namen: string[]): Ablehnung | null {
   const text = ohneNamen(videoTitel, namen)
-  for (const [grund, muster] of MUSTER) if (muster.test(text)) return grund
-  if (FOLGE.test(text) && !TRAILER_WORT.test(text)) return 'folgen-upload'
+  const trailerWort = TRAILER_WORT.test(text)
+  for (const [grund, muster, weich] of MUSTER) if (muster.test(text) && !(weich && trailerWort)) return grund
+  if (FOLGE.test(text) && !trailerWort) return 'folgen-upload'
   return null
 }
 

@@ -28,7 +28,7 @@
     "staffel-zuordnung": {"wirkung":2,"wer":"hand:synchro-belegen","offen":0,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":29},
     "herkunft-fremder-titel": {"wirkung":3,"wer":"auto:bau","offen":0,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0},
     "weg-ohne-adresse": {"wirkung":3,"wer":"auto:anbieterkalender","offen":8,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0},
-    "tv-sichtung-ohne-folge": {"wirkung":2,"wer":"auto:bau","offen":8,"neu":0,"behoben":0,"rueckfall":0,"ausnahme":0}
+    "tv-sichtung-ohne-folge": {"wirkung":2,"wer":"auto:bau","offen":6,"neu":0,"behoben":2,"rueckfall":0,"ausnahme":0}
   },
   "zeilen": [
     {"t":10013739,"art":"cover","wirkung":3,"wer":"auto:tmdb-poster","status":"abwesend","seit":"2026-11-17","bis":"2026-11-17"},
@@ -4691,10 +4691,10 @@
     {"t":204389,"art":"weg-ohne-adresse","wirkung":3,"wer":"auto:anbieterkalender","status":"behoben","seit":"2026-11-26","bis":"2026-11-27"},
     {"t":15,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
     {"t":21,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
-    {"t":223,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
+    {"t":223,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"behoben","seit":"2026-11-22","bis":"2026-11-28"},
     {"t":5027,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
     {"t":6920,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
-    {"t":101347,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
+    {"t":101347,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"behoben","seit":"2026-11-22","bis":"2026-11-28"},
     {"t":112153,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"offen","seit":"2026-11-22"},
     {"t":118399,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"behoben","seit":"2026-11-22","bis":"2026-11-23"},
     {"t":158871,"art":"tv-sichtung-ohne-folge","wirkung":2,"wer":"auto:bau","status":"behoben","seit":"2026-11-22","bis":"2026-11-23"},

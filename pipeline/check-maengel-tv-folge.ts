@@ -7,7 +7,7 @@ import type { Release, Title } from '../shared/types.ts'
 import { titelMitSichtungOhneFolge, tvSichtungOhneFolge } from './lib/maengel-tv-folge.ts'
 import { REGELN, zaehleMaengel, type Kontext } from './lib/maengel-regeln.ts'
 import type { WikiListen } from './lib/tv-termine.ts'
-import { mitAnisearchErsatz } from './lib/tv-folgen-ersatz.ts'
+import { ersatzNummerGilt, mitAnisearchErsatz } from './lib/tv-folgen-ersatz.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean): void {
@@ -93,6 +93,13 @@ pruefe('Ersatz: Folgentitel nur bei aniSearch: Nummer gefunden, kein Mangel', !e
 pruefe('Ersatz: Folgentitel bei keiner Liste: Mangel bleibt', erMessung(mitErsatz, 'Ein ganz neuer Titel').has(ER))
 pruefe('Ersatz: ohne Ersatz (TMDB allein) fehlt die Nummer', erMessung(tmdbListe(3), 'Das Kapitel von Saru').has(ER))
 pruefe('Ersatz: führende Liste zählt höher als aniSearch (Pokémon Reisen 1235 gegen 90): kein Ersatz, keine fremde Zählung', mitAnisearchErsatz(tmdbListe(1235), aniListe)[ER]!.ersatz === undefined)
+const teilListe: WikiListen = { [ER]: { seite: 'aniSearch', url: 'u', folgen: [{ nr: 1, dt: 'Das Ammenlied-Kapitel, Teil 2' }, { nr: 2, dt: 'Das Kapitel von Jorogumo' }] } }
+const teilErsatz = mitAnisearchErsatz(tmdbListe(2), teilListe)
+pruefe('Ersatz: „Teil 1“ (ein Zeichen neben „Teil 2“, einziger ähnlicher Kern) bekommt nicht die Nummer von „Teil 2“', erMessung(teilErsatz, 'Das Ammenlied-Kapitel, Teil 1').has(ER))
+pruefe('Ersatz: „Teil 2“ wortgleich trifft weiter', !erMessung(teilErsatz, 'Das Ammenlied-Kapitel, Teil 2').has(ER))
+pruefe('Ersatz: Schreibvariante „Kame-Hame-Ha“ gegen „Kame-hame-ha“ gilt', ersatzNummerGilt([{ nr: 75, dt: 'Zweimal Kame-hame-ha' }], 75, 'Zweimal Kame-Hame-Ha'))
+pruefe('Ersatz: „II“ gegen „III“ gilt nicht', !ersatzNummerGilt([{ nr: 3, dt: 'Das Duell II' }], 3, 'Das Duell III'))
+pruefe('Ersatz: Nummer ohne Eintrag gilt nicht', !ersatzNummerGilt([], 3, 'Das Duell'))
 pruefe('Ersatz: aniSearch führt selbst: kein Ersatz bei sich selbst', mitAnisearchErsatz(aniListe, aniListe)[ER]!.ersatz === undefined)
 
 process.exit(verletzt ? 1 : 0)

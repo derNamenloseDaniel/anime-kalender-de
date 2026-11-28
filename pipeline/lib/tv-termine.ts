@@ -23,6 +23,7 @@ import { TVDE_SENDER, type TvSendung } from '../fetch-tv-programm.ts'
 import type { WikiFolge } from './wikipedia-folgen.ts'
 import { folgenKern } from '../../shared/folgen-zuordnung.ts'
 import { warn } from './util.ts'
+import { ersatzNummerGilt } from './tv-folgen-ersatz.ts'
 
 /**
  * Folgenlisten je Titel. Ohne `url` ist `seite` eine Wikipedia-Seite; mit `url` stammt die
@@ -142,11 +143,14 @@ export function sendungenAnhaengen(
     */
     const eigene = wiki[String(r.titleId)]
     const nummern = eigene?.folgen.length ? nummernNachTitel(eigene.folgen, !eigene.url) : undefined
+    // Der aniSearch-Ersatz nummeriert nur die Sendung; Staffelzuordnung und Termine (`nummeriereGruppe`) bleiben bei der führenden Liste, eine andere Nummer dort verschöbe Staffeln.
     const ersatzNummern = eigene?.ersatz ? nummernNachTitel(eigene.ersatz, false) : undefined
     r.sendungen = liste
       .sort((a, b) => a.start.localeCompare(b.start))
       .map((s) => {
-        const nr = s.folge ? (nummerFuer(nummern, s.folge) ?? nummerFuer(ersatzNummern, s.folge)) : undefined
+        const ersatzNr = s.folge ? nummerFuer(ersatzNummern, s.folge) : undefined
+        const ersatz = ersatzNr !== undefined && ersatzNummerGilt(eigene!.ersatz!, ersatzNr, s.folge!) ? ersatzNr : undefined
+        const nr = s.folge ? (nummerFuer(nummern, s.folge) ?? ersatz) : undefined
         /*
           Die Detailseite der Sendung bei tv.de. `/sendung/r/s,<kennung>/` leitet per 301 auf die
           sprechende Adresse weiter — gemessen am 22.09.2026 an One Piece 23.09. 18:20

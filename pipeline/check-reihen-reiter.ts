@@ -15,7 +15,8 @@ import { ReihenListe } from '../web/src/components/detail/reihen-liste.tsx'
 import { kastenFarbe, ReihenReiterKontext, ReihenReiterZeile } from '../web/src/components/detail/reihen-reiter.tsx'
 import type { Dataset } from '../web/src/lib/data.ts'
 import { reihenTeileVon } from '../web/src/components/detail/reihen-daten.ts'
-import { reihenNameVon } from '../web/src/components/detail/reihen-namen.ts'
+import { teilMerkmal } from '../shared/staffel-part.ts'
+import { kopfTextVon, reihenNameVon } from '../web/src/components/detail/reihen-namen.ts'
 import type { FranchiseMember, Release, Title } from '../shared/types.ts'
 import { attrappeUhr, feuere, ignoriereCss, installiereMiniDom, klicke, type MiniKnoten } from '../tools/mini-dom.ts'
 import { festeUhr } from '../tools/feste-uhr.ts'
@@ -47,7 +48,7 @@ const haupt = reiter(483).map((r) => r.label).join()
 const HAUPT_REITER = '1–5,6–9,10–13,14–15,15–16,16a,16b,17–18,19,20–22,23–25,25'
 pruefe('Hauptserie: 12 Reiter ohne „Staffel“, nach Nummer', haupt === HAUPT_REITER, haupt)
 pruefe('Hauptserie: Ids in Staffelfolge', reiter(10852).map((r) => r.id).join() === '483,1349,1350,4745,5979,6415,6563,6802,7798,8283,10852,14838', reiter(10852).map((r) => r.id))
-pruefe('Name am Reiter ist der Titel der Daten', reiter(483)[1]!.name === 'Pokémon Advanced Generation', reiter(483)[1]!.name)
+pruefe('Name am Reiter ist der Name des Kopfs (Reihe · Teil)', reiter(483)[1]!.name === 'Pokémon · Staffel 6–9', reiter(483)[1]!.name)
 /* Deutsche Staffelteilung als Sammeltitel: seit der Zusammenlegung ohne Bühnenfall, daher aus Horizonte nachgestellt. */
 const staffel = (id: number, nr: number, bis: number) =>
   ({ ...offen(14839), id, titleDe: `Horizonte Staffel ${nr}`, staffelTitel: { sammel: 14839, nr, ab: 1 }, streams: [{ platform: 'netflix', url: 'https://x.invalid', dub: true, teilBereich: { von: 1, bis } }] }) as Title
@@ -60,6 +61,30 @@ const teilGlied = (id: number, name: string, jpYear: number) => ({ id, name, for
 const teilStaffeln = [teilGlied(900901, 'Reihe', 2020), teilGlied(900902, 'Reihe Staffel 2', 2021), teilGlied(900903, 'Reihe Staffel 3 Teil 1', 2022), teilGlied(900904, 'Reihe Staffel 3 Teil 2', 2023)]
 pruefe('Hauptserie mit Teilstaffeln: Reiter 1, 2, 3.1, 3.2, der Name bleibt lang', JSON.stringify(reihenReiterVon({ id: 900901 } as Title, teilStaffeln, 'Reihe', [], HEUTE).map((r) => [r.label, r.name])) === '[["1","Reihe"],["2","Reihe Staffel 2"],["3.1","Reihe Staffel 3 Teil 1"],["3.2","Reihe Staffel 3 Teil 2"]]')
 pruefe('Reiter-Kurzform: nur am Ende, mit Zusatz bleibt es', reiterKurzform('Staffel 3 - Teil 1 Zusatz') === '3 - Teil 1 Zusatz')
+/* JoJo Steel Ball Run (Daniel 27.11.2026): „… - Phase 1“ (1 Folge, ONA) und „… - Phase 2-3“ (11) sind eine Staffel in zwei Teilen: Reiter 7.1 und 7.2–3 (hier 6.x,
+   weil die Kulisse nur fünf Staffeln davor führt); Stone Ocean bleibt 5.1/5.2, und ein kurzes ONA mit anderem Namen („Prolog“) bleibt draußen. */
+const onaGlied = (id: number, name: string, episodes: number, jpStart: string) => ({ id, name, format: 'ONA', jpYear: Number(jpStart.slice(0, 4)), jpStart, episodes, jpStatus: 'FINISHED' }) as FranchiseMember
+const jojo = [
+  teilGlied(910001, 'JoJo’s Bizarre Adventure', 2012),
+  teilGlied(910002, 'JoJo’s Bizarre Adventure: Stardust Crusaders', 2014),
+  teilGlied(910003, 'JoJo’s Bizarre Adventure: Diamond Is Unbreakable', 2016),
+  teilGlied(910004, 'JoJo’s Bizarre Adventure: Golden Wind', 2018),
+  onaGlied(910005, 'JoJo’s Bizarre Adventure: Stone Ocean', 12, '2021-12-01'),
+  onaGlied(910006, 'JoJo’s Bizarre Adventure: Stone Ocean – Teil 2', 26, '2022-09-01'),
+  onaGlied(910007, 'Steel Ball Run: Jojo’s Bizarre Adventure - Phase 1', 1, '2026-03-19'),
+  onaGlied(910008, 'Steel Ball Run: Jojo’s Bizarre Adventure - Phase 2-3', 11, '2026-09-25'),
+]
+const jojoReiter = reihenReiterVon({ id: 910008 } as Title, jojo, 'JoJo’s Bizarre Adventure', [], HEUTE)
+pruefe('JoJo: Steel Ball Run Phase 1 und Phase 2-3 sind Reiter 6.1 und 6.2–3, Stone Ocean 5.1/5.2', jojoReiter.map((r) => `${r.id}:${r.label}`).join() === '910001:1,910002:2,910003:3,910004:4,910005:5.1,910006:5.2,910007:6.1,910008:6.2–3', jojoReiter.map((r) => `${r.id}:${r.label}`))
+const merkmal = (n: string) => JSON.stringify(teilMerkmal(n))
+pruefe(
+  'teilMerkmal: Phase/Part/Teil am Ende, Spanne mit Bindestrich oder Halbgeviertstrich; nicht mitten im Namen, nicht ohne Stamm',
+  [merkmal('Steel Ball Run: Jojo’s Bizarre Adventure - Phase 2-3'), merkmal('Reihe: Part 2'), merkmal('Reihe – Teil 4–5'), merkmal('Reihe Part 2: Zusatz'), merkmal('Phase 1'), merkmal('Reihe')].join('|') ===
+    '{"stamm":"Steel Ball Run: Jojo’s Bizarre Adventure","teil":2,"bis":3}|{"stamm":"Reihe","teil":2}|{"stamm":"Reihe","teil":4,"bis":5}|||',
+)
+pruefe('Reiter-Kurzform: Teilspanne „Staffel 7 - Teil 2–3“ wird „7.2–3“', reiterKurzform('Staffel 7 - Teil 2–3') === '7.2–3')
+const gundam = [teilGlied(920001, 'Gundam Build Fighters', 2013), onaGlied(920002, 'Gundam Build Divers Re:Rise', 25, '2019-04-01'), onaGlied(920003, 'Gundam Build Divers: Prolog', 1, '2018-09-01')]
+pruefe('Gegenprobe: ein kurzes ONA mit anderem Namen („Prolog“) bleibt keine Hauptstaffel', hauptstaffeln(gundam).map((m) => m.id).join() === '920001,920002', hauptstaffeln(gundam).map((m) => m.id))
 /* Reiter ohne Synchro (26.11.2026): auch Hauptstaffeln und Sammeltitel-Staffeln tragen das Flag, erschienen vorausgesetzt. */
 const ohneSt = { ...st2, ohneSynchro: true, jpStatus: 'FINISHED' } as Title
 pruefe('Sammeltitel-Staffel ohne Synchro: Reiter trägt ohneSynchro, die andere nicht', reihenReiterVon(ohneSt, teile, 'Pokémon', [ohneSt, st1], HEUTE).map((r) => `${r.id}:${r.ohneSynchro}`).join() === '990101:false,990102:true')
@@ -109,7 +134,7 @@ try {
  * Klasse zum Nachtrag (Daniel 24.11.2026 20:21–20:25), je Titel-Reihe-Paar: Reiter tragen nur die Kurzform, der volle Titel steht im
  * Namen; kein Reiter-Titel steht noch in der Reihenliste, und jeder Teil der Reihe bleibt erreichbar (Reiter oder Liste).
  */
-const KURZFORM = /^(\d+[a-z]?(–\d+)?(\.\d+)?|Teil \d+)$/
+const KURZFORM = /^(\d+[a-z]?(–\d+)?(\.\d+(–\d+)?)?|Teil \d+)$/
 const nachtragFehler: string[] = []
 function klasseNachtrag(wo: string, liste: ReturnType<typeof reihenReiterVon>, rTeile: FranchiseMember[], rName: string): void {
   const ids = new Set(liste.map((r) => r.id))
@@ -129,6 +154,14 @@ function klasseMeldung(wo: string, t: Title, liste: ReturnType<typeof reihenReit
   if (liste.length && !t.staffelTitel && !haupt.some((m) => m.id === t.id)) meldungFehler.push(`${wo}: Reiter ohne Hauptserie`)
   if (!liste.length && stand.size >= 2 && stand.has(t.id)) meldungFehler.push(`${wo}: Hauptstaffel ohne Reiter`)
 }
+/* Klasse zu Daniels Meldung 27.11.2026 (Yaiba 2: Tooltip „Shin Samurai-den YAIBA 2“, Kopf „Yaiba: Samurai Legend · Staffel 2“): der Name eines Hauptserien-Reiters ist der Name, den der Kopf seines Titels zeigt. */
+const kopfnamenFehler: string[] = []
+function klasseKopfname(wo: string, liste: ReturnType<typeof reihenReiterVon>, reihe: FranchiseMember[], rTeile: FranchiseMember[], daten: Dataset): void {
+  for (const r of liste) {
+    const t = daten.titleById.get(r.id)
+    if (t && !t.staffelTitel && r.name !== kopfTextVon(t, reihe, rTeile, daten)) kopfnamenFehler.push(`${wo}: ${r.id} ${r.name}`)
+  }
+}
 /* Klasse: jeder Titel jedes Bühnenfalls mit Reihe und Reihenname wie im Panel (`reihenTeileVon`, `reihenNameVon`), Liste und Lage ohne Absturz. */
 const abstuerze: string[] = []
 let gerechnet = 0
@@ -141,7 +174,8 @@ for (const [name, f] of Object.entries(faelle)) {
     for (const reihe of [[], reihen[t.franchiseId ?? t.id] ?? []]) {
       try {
         const [rTeile, rName] = [reihenTeileVon(t, reihe, daten), reihenNameVon(t, reihe, daten)]
-        const liste = reihenReiterVon(t, rTeile, rName, alle, HEUTE)
+        const liste = reihenReiterVon(t, rTeile, rName, alle, HEUTE, reihe)
+        klasseKopfname(`${name}/${t.id}`, liste, reihe, rTeile, daten)
         for (const r of liste) reihenLageVon(daten.titleById.get(r.id) ?? t, [], '2026-11-24')
         klasseNachtrag(`${name}/${t.id}`, liste, rTeile, rName)
         klasseMeldung(`${name}/${t.id}`, t, liste, rTeile, rName)
@@ -155,6 +189,7 @@ for (const [name, f] of Object.entries(faelle)) {
 pruefe(`alle Bühnenfälle ohne Absturz (${gerechnet} Titel-Reihe-Paare)`, gerechnet > 100 && abstuerze.length === 0, abstuerze.slice(0, 5))
 pruefe('alle Bühnenfälle: Kurzform, kein Titel in Reiter und Reihenliste, keiner unerreichbar', nachtragFehler.length === 0, nachtragFehler.slice(0, 5))
 pruefe('alle Bühnenfälle: Reiter nur an Hauptstaffeln, jede nummerierte Hauptstaffel mit Reitern', meldungFehler.length === 0, meldungFehler.slice(0, 5))
+pruefe('alle Bühnenfälle: Reiter-Name ist der Name im Kopf (Reihe · Teil)', kopfnamenFehler.length === 0, kopfnamenFehler.slice(0, 5))
 const rohe = (labels: string[]) => labels.map((label, i) => ({ id: i + 1, label, name: `T${i + 1}`, ohneSynchro: false }))
 pruefe('Eindeutigkeit: gleiche Beschriftung a, b in Listenreihenfolge; einmalige und Überlappung bleiben', eindeutigeBeschriftung(rohe(['14–15', '15–16', '16', '16', '25', '16'])).map((r) => r.label).join() === '14–15,15–16,16a,16b,25,16c')
 pruefe('Staffel in zwei Teilen ohne Staffelstand: Teil 1, Teil 2 nach Kennung', JSON.stringify(skReiter) === '[[15940,"Teil 1"],[16333,"Teil 2"]]', skReiter)
@@ -322,7 +357,7 @@ const hauptAria = hauptPanel.tabs[0]?.getAttribute('aria-label') ?? ''
 const hauptBlase = await blasenText(hauptPanel.tabs[0])
 pruefe('Hauptserie: aria-label nennt Staffel und Titel', hauptAria.startsWith(`Staffel ${text(hauptPanel.tabs[0]!)}: ${ersteZeile(hauptBlase)}`), hauptAria)
 /* Der Grund der Marke kommt aus den Lagen am Kasten (`ReihenReiterAmKasten`): die erste Serie kommt mit der DVD am 27.11.2026. */
-pruefe('Hauptserie: Reiter 1–5 nennt Titel und Grund des Rings', text(hauptPanel.tabs[0]!) === '1–5' && hauptBlase === 'Pokémon\n○ = DVD am 27.11.2026', hauptBlase)
+pruefe('Hauptserie: Reiter 1–5 nennt Titel und Grund des Rings', text(hauptPanel.tabs[0]!) === '1–5' && hauptBlase === 'Pokémon · Staffel 1–5\n○ = DVD am 27.11.2026', hauptBlase)
 /* Ein Titel ohne Reihe (eigene Kennung, keine Reihenteile): keine Leiste, kein tabpanel um den Kasten. */
 const allein = { ...offen(5726), id: 990001, franchiseId: 990001, titleDe: 'Ohne Reihe', titleEn: 'Ohne Reihe', titleRomaji: 'Ohne Reihe' } as Title
 const ohneReihe = await zeige(990001, { ...data, titles: [allein], titleById: new Map([[allein.id, allein]]), releasesByTitle: new Map() })

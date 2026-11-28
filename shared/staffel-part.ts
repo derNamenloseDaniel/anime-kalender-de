@@ -50,3 +50,10 @@ export function teilEinerFrueherenStaffel<T extends { name: string }>(name: stri
   }
   return undefined
 }
+
+/** Ein abschließendes Teil-Merkmal „- Phase 1“, „Part 2“, „Teil 2-3“ (auch Spanne): Namensstamm davor, erste und letzte Nummer. */
+export function teilMerkmal(name: string): { stamm: string; teil: number; bis?: number } | undefined {
+  const m = /^(.+?)[\s:–—-]+(?:Phase|Part|Teil)\s+(\d+)(?:\s*[-–]\s*(\d+))?\s*$/i.exec(name)
+  if (!m?.[1]) return undefined
+  return { stamm: m[1], teil: Number(m[2]), bis: m[3] ? Number(m[3]) : undefined }
+}

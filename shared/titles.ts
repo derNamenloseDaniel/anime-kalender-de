@@ -6,7 +6,7 @@
  * Regel laufen auseinander — hier ist der eine Ort.
  */
 import type { Title } from './types.ts'
-import { partNummer, teilEinerFrueherenStaffel, zaehltPartAlsStaffel } from './staffel-part.ts'
+import { partNummer, teilEinerFrueherenStaffel, teilMerkmal, zaehltPartAlsStaffel } from './staffel-part.ts'
 
 /**
  * „Season" kommt nicht auf die Seite.
@@ -108,12 +108,17 @@ function hauptstaffelnAllerTeile<T extends { format?: string; beiwerk?: boolean;
       .filter(Boolean)
       .join(' ') +
     ' '
-  const lange = langeOna.map((m) => woerter((m as { name?: string }).name))
+  /* Ein abschließendes „Phase 1“ fällt vor dem Vergleich weg: „… - Phase 1“ ist kein Anfang von „… - Phase 2-3“, aber derselbe Stamm. */
+  const stamm = (name: unknown) => teilMerkmal(String(name ?? ''))?.stamm
+  const lange = langeOna.map((m) => ({ voll: woerter((m as { name?: string }).name), stamm: woerter(stamm((m as { name?: string }).name)) }))
   return teile.filter((m) => {
     if (m.format === 'TV' || langeOna.includes(m)) return true
     if (m.format !== 'ONA' || m.beiwerk) return false
-    const eigen = woerter((m as { name?: string }).name)
-    return eigen.trim().includes(' ') && lange.some((l) => l !== eigen && l.startsWith(eigen))
+    const name = (m as { name?: string }).name
+    const eigen = woerter(name)
+    const eigenStamm = stamm(name)
+    if (eigenStamm) return woerter(eigenStamm).trim().includes(' ') && lange.some((l) => l.stamm.startsWith(woerter(eigenStamm)))
+    return eigen.trim().includes(' ') && lange.some((l) => l.voll !== eigen && l.voll.startsWith(eigen))
   })
 }
 
@@ -133,7 +138,7 @@ function plaetzeInStaffel(eintraege: { id: number; staffel: number }[]): Map<num
   return platz
 }
 
-type StaffelEintrag = { id: number; staffel: number; bis?: number; teil?: number; eigenerName: boolean }
+type StaffelEintrag = { id: number; staffel: number; bis?: number; teil?: number; /** Letzte Teilnummer der Spanne („Phase 2-3“), nur aus dem Namen. */ teilBis?: number; eigenerName: boolean }
 type StaffelFeld = {
   id: number
   name: string
@@ -197,6 +202,7 @@ function zaehleStaffeln<T extends StaffelFeld>(staffeln: T[], reihenName: string
   const sortiert = staffeln.slice().sort((a, b) => ausstrahlungsZeit(a).localeCompare(ausstrahlungsZeit(b)) || a.id - b.id)
   const eintraege: StaffelEintrag[] = []
   let aktuell = 0
+  const phasenStaffeln = new Map<string, number>()
   const partIstStaffel = zaehltPartAlsStaffel(sortiert.map((m) => eindeutschenStaffel(m.name)))
   for (const m of sortiert) {
     /* Lupin III. Part 6 ist die sechste Serie, nicht Teil 2 der ersten; der Name bleibt als Beschriftung (`shared/staffel-part.ts`). */
@@ -255,7 +261,16 @@ function zaehleStaffeln<T extends StaffelFeld>(staffeln: T[], reihenName: string
         eintraege.push(split)
         continue
       }
+      /* „Steel Ball Run - Phase 1“ und „… - Phase 2-3“ teilen den Stamm: ein Name, eine Staffel in Teilen. */
+      const merkmal = teilMerkmal(m.name)
+      const stammKey = merkmal ? kern(merkmal.stamm) : ''
+      const vorn = phasenStaffeln.get(stammKey)
+      if (merkmal && vorn) {
+        eintraege.push({ id: m.id, staffel: (aktuell = vorn), teil: merkmal.teil, teilBis: merkmal.bis, eigenerName: true })
+        continue
+      }
       aktuell += 1
+      if (merkmal) phasenStaffeln.set(stammKey, aktuell)
       eintraege.push({ id: m.id, staffel: aktuell, eigenerName: rest !== '' && !staffelMarke })
     }
   }
@@ -334,7 +349,7 @@ function beschrifteGruppe<T extends StaffelFeld>(staffeln: T[], reihenName: stri
   return beschriftung
 }
 
-export type StaffelNummer = { staffel: number; bis?: number; teil?: number; von: number; eigenerName: boolean }
+export type StaffelNummer = { staffel: number; bis?: number; teil?: number; /** Letzter Teil einer Spanne („Teil 2–3“): Start aus unserer Zählung, Breite aus dem Namen. */ teilBis?: number; von: number; eigenerName: boolean }
 
 /**
  * **Die Staffelnummer jedes Eintrags, auch bei eigenem Namen** (09.10.2026: „Staffel 4 von 4" für „War of the
@@ -352,7 +367,11 @@ function staendeGruppe<T extends StaffelFeld>(staffeln: T[], reihenName: string)
   const mitTeilen = new Set(eintraege.filter((e) => (e.teil ?? 1) >= 2).map((e) => e.staffel))
   const platz = plaetzeInStaffel(eintraege)
   return new Map(
-    eintraege.map((e) => [e.id, { staffel: e.staffel, bis: e.bis, teil: mitTeilen.has(e.staffel) ? (platz.get(e.id) ?? 1) : undefined, von, eigenerName: e.eigenerName }]),
+    eintraege.map((e) => {
+      const teil = mitTeilen.has(e.staffel) ? (platz.get(e.id) ?? 1) : undefined
+      const teilBis = teil && e.teil && e.teilBis && e.teilBis > e.teil ? teil + e.teilBis - e.teil : undefined
+      return [e.id, { staffel: e.staffel, bis: e.bis, teil, teilBis, von, eigenerName: e.eigenerName }]
+    }),
   )
 }
 

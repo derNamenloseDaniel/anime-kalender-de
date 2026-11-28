@@ -295,6 +295,9 @@ const TEXTE = {
   // Dieselbe Zeile, aber ohne die vordere Zahl: Die steht hervorgehoben
   // davor, weil sie die Auskunft ist, um die es geht.
   'antwort.erschienenRest': 'von {gesamt} Folgen erschienen',
+  // Zählt der Anbieter durch (Folge 1 im Vorfilm): „Folge 2–11“ fett, dahinter „von 12 erschienen“.
+  'antwort.folgeNr': 'Folge {nr}',
+  'antwort.erschienenNrRest': 'von {gesamt} erschienen',
   // Steht nur noch, wo die Folgenzahl fehlt — sonst trägt „Alle {count} Folgen
   // auf Deutsch" die Überschrift allein. „Vollständig synchronisiert" und
   // „Alle Folgen auf Deutsch" sagten dasselbe noch zwei weitere Male und sind

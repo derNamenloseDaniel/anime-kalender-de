@@ -16,6 +16,7 @@ import { ausgebliebenTerminText, faelligText, widerlegtTexte } from './kasten-te
 import { Countdown } from './hilfen.tsx'
 import { vorstartSatz } from './antwort-vorstart.ts'
 import { discKopf } from './antwort-disc-kopf.ts'
+import { zaehlSpanne } from './antwort-davor.ts'
 import { KINO_LAND, kinoDatum } from './kino.tsx'
 import { formatDate } from '@shared/time.ts'
 import { ankuendigungOhneTermin, titelSynchroAngekuendigt, ankuendigungZeile } from '@shared/ankuendigung.ts'
@@ -119,6 +120,29 @@ type KopfEingabe = {
   title: Title
 }
 
+/** Die Zeile „10 von 12 Folgen erschienen“ unter dem Kopf; bei durchlaufender Zählung mit den Nummern des Anbieters („Folge 2–11 von 12“). */
+function erschienenZeile(antwort: Extract<Antwort, { art: 'laeuft' }>, releases: Release[], T: KopfEingabe['T']): ReactNode {
+  if (!antwort.gesamt) return ''
+  const fett = 'font-semibold text-ak-gut-text'
+  const spanne = zaehlSpanne(releases, antwort.raus, antwort.gesamt)
+  if (spanne) {
+    return (
+      <>
+        <span className={fett}>{T('antwort.folgeNr', { nr: spanne.nr })}</span>
+        {' '}
+        {T('antwort.erschienenNrRest', { gesamt: ungefaehr(spanne.gesamt, antwort.gesamtGeschaetzt) })}
+      </>
+    )
+  }
+  return (
+    <>
+      <span className={fett}>{antwort.raus}</span>
+      {' '}
+      {T('antwort.erschienenRest', { gesamt: ungefaehr(antwort.gesamt, antwort.gesamtGeschaetzt) })}
+    </>
+  )
+}
+
 /** Antwortart „laeuft“. */
 function kopfLaeuft({ antwort, relativImSatz, T, betont, ohneSprachbeleg, releases }: Omit<KopfEingabe, 'antwort'> & { antwort: Extract<Antwort, { art: 'laeuft' }> }): KopfTeile {
   let haupt: ReactNode, neben: string, anteil: number | undefined, zaehl: ReactNode, fakten: Fakt[] | undefined, gedaempft = false, nebenTitel: string | undefined
@@ -182,15 +206,7 @@ function kopfLaeuft({ antwort, relativImSatz, T, betont, ohneSprachbeleg, releas
     Hervorgehoben wird die Zahl, nicht der Satz: Wer den Kasten überfliegt,
     soll sehen, wie viel schon da ist.
   */
-  zaehl = antwort.gesamt
-    ? (
-        <>
-          <span className="font-semibold text-ak-gut-text">{antwort.raus}</span>
-          {' '}
-          {T('antwort.erschienenRest', { gesamt: ungefaehr(antwort.gesamt, antwort.gesamtGeschaetzt) })}
-        </>
-      )
-    : ''
+  zaehl = erschienenZeile(antwort, releases, T)
   const vorstart = vorstartSatz(antwort, Boolean(ohneSprachbeleg), releases)
   if (vorstart) [haupt, neben, anteil, zaehl] = [betont(vorstart), '', undefined, '']
   else if (antwort.faellig) haupt = betont(faelligText(e, rel === T('antwort.relHeute'), T))

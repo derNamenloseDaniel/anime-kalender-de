@@ -44,7 +44,7 @@ export function DetailPanel({
   /* Das Panel liegt über der Seite: sie bleibt dahinter stehen (Daniel, 11.10.2026). */
   useSeiteGesperrt(true)
 
-  const { reihenTeile, eigenerTeil, reihenName, kopfName, teilName } = usePanelReihe(title, data)
+  const { reihe: franchise, reihenTeile, eigenerTeil, reihenName, kopfName, teilName } = usePanelReihe(title, data)
   const reihe = useReiheZustand(reihenTeile)
   const holt = useTitelNachladen(data, titleId)
   const nurUntertitel = useMemo(() => data.nurUntertitelByTitle.get(titleId) ?? [], [data, titleId])
@@ -92,7 +92,7 @@ export function DetailPanel({
           asZiel={asZiel}
         />
         {/* Reiter der Kategorie am Antwortkasten (F157): ein Reiter öffnet den Titel auf demselben Weg wie die Reihenliste, die ihn dafür nicht mehr zeigt. */}
-        <ReihenReiterKontext.Provider value={{ data, reiter: reihenReiterVon(title, reihenTeile, reihenName, data.titles, today), wechsleZu: wechsel.wechsleZu }}>
+        <ReihenReiterKontext.Provider value={{ data, reiter: reihenReiterVon(title, reihenTeile, reihenName, data.titles, today, franchise), wechsleZu: wechsel.wechsleZu }}>
           <PanelKoerper
             {...{ data, title, today, releases, verbindung, favorites, onToggleFavorite, onFilterBy, onOpenTitle }}
             {...{ a, s, discAusgaben, discZuerst, plot, asZiel, reihenTeile, reihenName, reihe, wechsel }}

@@ -1,6 +1,14 @@
 {
-  "geholtAm": "2026-11-27T02:00:56.510Z",
+  "geholtAm": "2026-11-28T02:02:04.310Z",
   "artikel": [
+    {
+      "titel": "Even the Student Council Has Its Holes! – Episode 9 verschoben",
+      "url": "https://news.animationdigitalnetwork.com/de/2026/11/25/even-the-student-council-has-its-holes-episode-9-verschoben/",
+      "datum": "2026-11-25",
+      "showIds": [
+        1428
+      ]
+    },
     {
       "titel": "WITCH WATCH Staffel 2: Ausstrahlung in 2027, Manga beendet!",
       "url": "https://news.animationdigitalnetwork.com/de/2026/11/16/witch-watch-staffel-2-ausstrahlung-in-2027-manga-beendet/",
@@ -650,39 +658,6 @@
       "datum": "2026-06-01",
       "showIds": [
         1396
-      ]
-    },
-    {
-      "titel": "Sailor Moon Sailor Stars – Staffel 5 im Stream bei ADN",
-      "url": "https://news.animationdigitalnetwork.com/de/2026/06/01/sailor-moon-sailor-stars-staffel-5-im-stream-bei-adn/",
-      "datum": "2026-06-01",
-      "showIds": [
-        427
-      ]
-    },
-    {
-      "titel": "10 neue Anime ab Juni 2026 bei ADN",
-      "url": "https://news.animationdigitalnetwork.com/de/2026/05/28/10-neue-anime-ab-juni-2026-bei-adn/",
-      "datum": "2026-05-28",
-      "showIds": [
-        1396,
-        427,
-        190,
-        1391,
-        1370,
-        131,
-        770,
-        522,
-        1368,
-        1364
-      ]
-    },
-    {
-      "titel": "Dreamland: Offizielles Visual zum neuen Animationsfilm",
-      "url": "https://news.animationdigitalnetwork.com/de/2026/05/27/dreamland-offizielles-visual-zum-neuen-animationsfilm/",
-      "datum": "2026-05-27",
-      "showIds": [
-        887
       ]
     }
   ]

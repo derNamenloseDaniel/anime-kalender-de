@@ -30,7 +30,7 @@ export function folgenzahlAusMenue(text: string | null): number | null {
 export type StaffelListen = Record<string, { staffeln?: { seq: number; folgen: number }[] } | undefined>
 
 /** Netflix' Folgenzahlen in Staffelreihenfolge; `null`, wo die Liste fehlt oder nicht von 1 an lückenlos zählt. */
-function netflixFolgenliste(url: string, listen: StaffelListen): number[] | null {
+export function netflixFolgenliste(url: string, listen: StaffelListen): number[] | null {
   const id = /netflix\.com\/(?:[a-z-]+\/)?title\/(\d+)/i.exec(url)?.[1]
   const staffeln = id ? listen[id]?.staffeln : undefined
   if (!staffeln?.length) return null

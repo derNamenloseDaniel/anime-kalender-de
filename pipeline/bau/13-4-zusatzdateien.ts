@@ -20,6 +20,7 @@ import { ergaenzeCoverGross } from './cover-gross.ts'
 import { ausgelieferteCartoons, riegelHandlungQuellen } from '../lib/handlung-quellen.ts'
 import { ohneBelegteSynchro } from './synchro-belegt.ts'
 import { schreibeSaisonDatei } from './saison-datei.ts'
+import { markiereAnbieterStaffeln } from './anbieter-zuschnitt.ts'
 import { cartoonsMitReihe, ladeAlleEigenenWerke, markiereEigeneWerke, mitStaffelTiteln } from './cartoon-reihen.ts'
 import { markiereRemakes } from './remake-von.ts'
 import { schreibeAnisearchOffen } from './anisearch-kennung.ts'
@@ -411,7 +412,7 @@ export function schreibeZusatzdateien({ titles, anisearch, slim, verschoben, rel
   const imBestand = new Set([...slim, ...cartoons].map((t) => t.id))
   const fuerReihen: ReihenTitel[] = [...slim, ...cartoons, ...ausKatalog.filter((t) => !imBestand.has(t.id)).map((t) => ({ ...t, ohneSynchro: true }))]
   const reihen = baueReihen(fuerReihen, imBestand, { releases, jpStartAnzeige, deStart })
-  writeJson(`${OUT}/franchises.json`, markiereEigeneWerke(markiereRemakes(reihen, fuerReihen), mitStaffelTiteln(ladeAlleEigenenWerke(), titles.values())))
+  writeJson(`${OUT}/franchises.json`, markiereAnbieterStaffeln(markiereEigeneWerke(markiereRemakes(reihen, fuerReihen), mitStaffelTiteln(ladeAlleEigenenWerke(), titles.values())), titles.values()))
   log(`${Object.keys(reihen).length} Reihen mit mehr als einem Eintrag geschrieben`)
 
   schreibeMeldungen(slim)

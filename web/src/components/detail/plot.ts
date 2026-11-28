@@ -36,6 +36,7 @@ export function plotVon({ synopsis, anilistId, ersatz, erschienen }: {
         fallback: false,
         quelle: synopsis.deSource,
         eigen: synopsis.eigen,
+        satz: synopsis.satz,
       }
     }
     if (synopsis?.en && !(synopsis.en.trim().length < KURZ && ersatz && aussagekraeftig(ersatz.plot))) {
@@ -44,6 +45,7 @@ export function plotVon({ synopsis, anilistId, ersatz, erschienen }: {
         text: synopsis.en,
         fallback: true,
         quelle: { name: 'anilist.co', url: anilistId ? `https://anilist.co/anime/${anilistId}` : 'https://anilist.co/' },
+        satz: synopsis.satz,
       }
     }
     if (!ersatz) return undefined
@@ -54,12 +56,24 @@ export function plotVon({ synopsis, anilistId, ersatz, erschienen }: {
       vonTeil: ersatz.von,
       erschienen,
       eigen: ersatz.plot.de ? ersatz.plot.eigen : undefined,
+      satz: ersatz.plot.satz,
       quelle: ersatz.plot.de
         ? ersatz.plot.deSource
         : { name: 'anilist.co', url: ersatz.von.al ? `https://anilist.co/anime/${ersatz.von.al}` : 'https://anilist.co/' },
     }
   })()
   return { plot }
+}
+
+/**
+ * Was die Karte „Handlung“ zeigt: mit Satz den Satz, den Volltext erst nach dem Klick (kein „…“, keine Vorschau daneben);
+ * ohne Satz die Vorschau mit `vorschau` Zeichen wie bisher. `aufklappbar` = es gibt mehr zu lesen als gerade steht.
+ */
+export function handlungAnzeige(plot: { text: string; satz?: string }, offen: boolean, vorschau: number): { text: string; aufklappbar: boolean; volltext: boolean } {
+  const satz = plot.satz?.trim()
+  if (satz) return offen ? { text: plot.text, aufklappbar: true, volltext: true } : { text: satz, aufklappbar: plot.text.trim() !== satz, volltext: false }
+  const aufklappbar = plot.text.length > vorschau
+  return { text: offen || !aufklappbar ? plot.text : `${plot.text.slice(0, vorschau).trimEnd()} …`, aufklappbar, volltext: offen || !aufklappbar }
 }
 
 /**

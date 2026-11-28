@@ -8,7 +8,7 @@ import type { Dispatch, SetStateAction } from 'react'
 import { Chip } from '../ui.tsx'
 import { HerkunftZeile, zeigtHerkunft } from './herkunft-zeile.tsx'
 import { EigeneQuellenZeile, ReiheHinweis } from './handlung-quelle.tsx'
-import { type plotVon } from './plot.ts'
+import { handlungAnzeige, type plotVon } from './plot.ts'
 
 export function EckdatenAbschnitt({ title, t, genresOffen, onFilterBy, tGenre, setGenresOffen }: {
   title: Title
@@ -54,9 +54,10 @@ export function HandlungAbschnitt({ plot, t, plotOffen, setPlotOffen }: {
   plotOffen: boolean
   setPlotOffen: Dispatch<SetStateAction<boolean>>
 }) {
+  const anzeige = plot ? handlungAnzeige(plot, plotOffen, PLOT_PREVIEW) : undefined
   return (
     <>
-      {plot && (
+      {plot && anzeige && (
         <PanelKarte symbol={<BuchZeichen />} titel={t('detail.plot')} akzent="akzent">
           {/*
             **Der Hinweis steht über dem Text, nicht darunter.**
@@ -79,16 +80,14 @@ export function HandlungAbschnitt({ plot, t, plotOffen, setPlotOffen }: {
             einordnen will, sieht den Anfang und bleibt im Überblick.
           */}
           <p className="whitespace-pre-line text-t3 text-ak-text/85">
-            {plotOffen || plot.text.length <= PLOT_PREVIEW
-              ? plot.text
-              : `${plot.text.slice(0, PLOT_PREVIEW).trimEnd()} …`}
+            {anzeige.text}
           </p>
-          {plot.fallback && (
+          {plot.fallback && anzeige.volltext && (
             <p className="mt-1.5 text-t5 text-slate-400">{t('detail.plotOnlyEnglish')}</p>
           )}
           {/* Die Quelle steht immer sichtbar am Fuß der Karte, auch eingeklappt (aniSearch verlangt Nennung und Link bei übernommenen Texten, 05.10.2026). */}
           <div className="mt-2 flex items-center justify-between gap-2">
-            {plot.text.length > PLOT_PREVIEW ? (
+            {anzeige.aufklappbar ? (
               <button
                 type="button"
                 onClick={() => setPlotOffen((v) => !v)}

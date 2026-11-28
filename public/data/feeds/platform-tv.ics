@@ -480,6 +480,36 @@ DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
 CATEGORIES:TOGGO plus
 END:VEVENT
 BEGIN:VEVENT
+UID:auto-158871-tv-super-rtl@2026-11-28@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261128T115500Z
+DTEND:20261128T122500Z
+SUMMARY:Pokémon Horizonte – Folge 137
+DESCRIPTION:Plattform: Super RTL\nRelease-Art: Wöchentlich (Simuldub)\nDet
+ ails: https://anime-kalender.de/t/14839/
+CATEGORIES:Super RTL
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-158871-tv-toggo-plus@2026-11-28@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261128T125500Z
+DTEND:20261128T132500Z
+SUMMARY:Pokémon Horizonte – Folge 137
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/14839/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-165159-tv-toggo-plus@2026-11-28@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART:20261128T194000Z
+DTEND:20261128T201000Z
+SUMMARY:Beyblade X – Folge 126
+DESCRIPTION:Plattform: TOGGO plus\nRelease-Art: Wöchentlich (Simuldub)\nDe
+ tails: https://anime-kalender.de/t/15075/
+CATEGORIES:TOGGO plus
+END:VEVENT
+BEGIN:VEVENT
 UID:yaiba-samurai-legend-prosieben-maxx@2026-11-30@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261130T172500Z

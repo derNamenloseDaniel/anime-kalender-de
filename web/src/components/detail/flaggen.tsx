@@ -45,17 +45,18 @@ function Flagge({ name, wertung, verweis, hinweis }: { name: string; wertung?: s
  * ohne Wertung steht kein Stern. Direktlinks auf die Titelseite, nie eine Suche. `z-[11]`: der Namensblock darunter (`z-10`) ragt 72 px in das Banner und
  * risse sonst die untere Flagge an sich (16.10.2026); `panel-messen.mjs` prüft, dass jeder Link an seiner Mitte oben liegt.
  */
-export function Flaggen({ title, ziel, t }: { title: Title; ziel?: string; t: Translate }) {
+export function Flaggen({ title, ziel, t, weitere = [] }: { title: Title; ziel?: string; t: Translate; weitere?: Verweis[] }) {
   const verweise = verweiseFuer(title, ziel)
   const quelle = verweise.find((v) => v.name !== 'MAL')
   const mal = verweise.find((v) => v.name === 'MAL')
   const quellenName = quelle?.name ?? (title.scoreQuelle === 'tmdb' ? 'TMDB' : 'aniSearch')
   const wertung = title.score === undefined ? undefined : wertungText(title.score)
   const quelleHinweis = [quelle?.hinweis, wertung ? t('detail.scoreHint', { quelle: quellenName }) : undefined].filter(Boolean).join(' — ')
-  if (!quelle && !wertung && !mal) return null
+  if (!quelle && !wertung && !mal && !weitere.length) return null
   return (
     <div data-flaggen className="absolute bottom-6 right-0 z-[11] flex flex-col items-end gap-1">
       {(quelle || wertung) && <Flagge name={quellenName} wertung={wertung} verweis={quelle} hinweis={quelleHinweis} />}
+      {weitere.map((v) => <Flagge key={v.name} name={v.name} verweis={v} hinweis={v.hinweis} />)}
       {mal && <Flagge name="MAL" verweis={mal} hinweis={mal.hinweis} />}
     </div>
   )

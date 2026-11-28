@@ -45,6 +45,7 @@ pipeline/check-ak-umleitung-versatz.ts
 pipeline/check-akibapass-sprache.ts
 pipeline/check-aktive-chips.ts
 pipeline/check-aktualisierung-verborgen.ts
+pipeline/check-anbieter-anzeige.ts
 pipeline/check-anbieter-eintraege-bestand-lauf.ts
 pipeline/check-anbieter-logo.ts
 pipeline/check-anbieter-wegname-geerbt.ts

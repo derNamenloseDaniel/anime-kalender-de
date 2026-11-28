@@ -37,7 +37,18 @@ export function abwurfBereich(release: Release | undefined): [number, number] | 
  * Staffel, keine Vorstaffel); sonst nichts. Gemessen 27.11.2026 an public/data: vier Titel erfüllen die ersten beiden Bedingungen, mit der
  * dritten bleiben zwei (JoJo 210482, Eighty Six Teil 2 mit Folge 12–23); Wistoria und The 100 Girlfriends Staffel 3 behalten ihre Zeile.
  */
-export function zaehlSpanne(releases: Pick<Release, 'releaseType' | 'schedule'>[], raus: number, gesamt: number | undefined): { nr: string; gesamt: number } | undefined {
+export function zaehlSpanne(releases: Pick<Release, 'releaseType' | 'schedule'>[], raus: number, gesamt: number | undefined, anbieter?: { von: number; bis: number }): { nr: string; gesamt: number } | undefined {
+  return zaehlSpanneAusTermin(releases, raus, gesamt) ?? spanneDesAnbieters(raus, anbieter)
+}
+
+/** Teil 2 einer Anbieter-Staffel (Stone Ocean 13–38): die Folgen zählen weiter, auch wenn die Termine bei 1 beginnen; die Termine gehen vor. */
+function spanneDesAnbieters(raus: number, anbieter: { von: number; bis: number } | undefined): { nr: string; gesamt: number } | undefined {
+  if (!anbieter || raus < 1) return undefined
+  const bis = anbieter.von + raus - 1
+  return { nr: bis > anbieter.von ? `${anbieter.von}–${bis}` : String(anbieter.von), gesamt: anbieter.bis }
+}
+
+function zaehlSpanneAusTermin(releases: Pick<Release, 'releaseType' | 'schedule'>[], raus: number, gesamt: number | undefined): { nr: string; gesamt: number } | undefined {
   const ohneDisc = releases.filter((r) => r.releaseType !== 'disc' && r.schedule?.episodeCount && !r.schedule.episodeCountAssumed)
   if (!ohneDisc.length || !gesamt || raus < 1) return undefined
   const erste = Math.min(...ohneDisc.map((r) => r.schedule?.firstEpisodeNumber ?? 1))

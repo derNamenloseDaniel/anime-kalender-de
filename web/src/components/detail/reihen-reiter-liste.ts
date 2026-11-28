@@ -1,6 +1,7 @@
 import { expandEvents, fruehesterTermin, releaseStatus, titleStatus, type LageMitGrund, type StaffelLage } from '@shared/logic.ts'
 import { anzeigeName, hauptstaffeln, staffelBeschriftungen, staffelStaende } from '@shared/titles.ts'
 import type { FranchiseMember, Release, Title } from '@shared/types.ts'
+import { fasseAnbieterStaffeln, type AnbieterTeil } from './anbieter-staffel.ts'
 import { ohneDeutscheSynchro } from './reihen-teil.ts'
 import { kopfNameVon, kopfTextVon, reihenNameVon } from './reihen-namen.ts'
 import { staffelKurz } from './reihen-regeln.ts'
@@ -15,6 +16,8 @@ export interface ReihenReiter {
   label: string
   name: string
   ohneSynchro: boolean
+  /** Nur bei einer Staffel, die der Anbieter als eine führt: ihre Teile für den Umschalter (`anbieter-staffel.ts`). */
+  teile?: AnbieterTeil[]
 }
 
 /** Staffeln einer deutschen Staffelteilung (Pokémon Horizonte): Geschwister mit demselben Sammeltitel, nach Staffelnummer. */
@@ -35,7 +38,7 @@ export function reiterKurzform(beschriftung: string): string {
  * Staffel in Teilen („Teil 1“, „Teil 2“) hat Beschriftungen, aber keinen Staffelstand: dann zählt nur die Kennung. Eine Staffel mit
  * eigenem Namen („Christmas Showdown“) hat keine Beschriftung, aber ihre Nummer im Staffelstand: die steht am Reiter, wie in der Reihenliste.
  */
-function ausHauptstaffeln(teile: FranchiseMember[], reihe: FranchiseMember[], reihenName: string, titel: Title[], today: string): ReihenReiter[] {
+function ausHauptstaffeln(teile: FranchiseMember[], reihe: FranchiseMember[], reihenName: string, titel: Title[], today: string, offen: number): ReihenReiter[] {
   const haupt = hauptstaffeln(teile)
   /* Der Tooltip nennt den Namen, den der Kopf des Reiter-Titels zeigt, nicht den Rohnamen der Reihe (Yaiba 2: „Shin Samurai-den YAIBA 2“). */
   const titleById = new Map(titel.map((t) => [t.id, t]))
@@ -52,10 +55,11 @@ function ausHauptstaffeln(teile: FranchiseMember[], reihe: FranchiseMember[], re
     const teil = beschriftung(m.id)
     return teil && teil !== kopf ? `${kopf} · ${teil}` : kopf
   }
-  return haupt
+  const reiter = haupt
     .filter((m) => beschriftung(m.id) !== undefined)
     .sort((a, b) => nummer(a.id) - nummer(b.id) || a.id - b.id)
     .map((m) => ({ id: m.id, label: reiterKurzform(beschriftung(m.id)!), name: kopfText(m), ohneSynchro: ohneDeutscheSynchro(m, today) }))
+  return fasseAnbieterStaffeln(reiter, reihe, offen)
 }
 
 /** Gleiche Kurzbeschriftungen verschiedener Titel (zwei „16“, zwei „1“) bekommen in Listenreihenfolge a, b, …; einmalige bleiben. */
@@ -79,7 +83,7 @@ export function eindeutigeBeschriftung(liste: ReihenReiter[]): ReihenReiter[] {
  */
 export function reihenReiterVon(title: Title, teile: FranchiseMember[], reihenName: string, titel: Title[], today: string, reihe: FranchiseMember[] = teile): ReihenReiter[] {
   const istHaupt = hauptstaffeln(teile).some((m) => m.id === title.id)
-  const liste = title.staffelTitel ? ausSammeltitel(title.staffelTitel.sammel, titel, today) : istHaupt ? ausHauptstaffeln(teile, reihe, reihenName, titel, today) : []
+  const liste = title.staffelTitel ? ausSammeltitel(title.staffelTitel.sammel, titel, today) : istHaupt ? ausHauptstaffeln(teile, reihe, reihenName, titel, today, title.id) : []
   return liste.length >= 2 && liste.some((r) => r.id === title.id) ? eindeutigeBeschriftung(liste) : []
 }
 

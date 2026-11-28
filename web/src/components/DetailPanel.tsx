@@ -21,6 +21,8 @@ import { usePanelSynopse } from './detail/panel-synopse.ts'
 import { useReiheZustand } from './detail/panel-reihe-zustand.ts'
 import { PanelKoerper } from './detail/panel-koerper.tsx'
 import { ReihenReiterKontext } from './detail/reihen-reiter.tsx'
+import { andereTeile, anbieterSpanne } from './detail/anbieter-staffel.ts'
+import { weitereAnisearchVerweise } from './detail/verweise.ts'
 import { reihenReiterVon } from './detail/reihen-reiter-liste.ts'
 import type { DetailPanelProps } from './detail/panel-props.ts'
 
@@ -57,11 +59,10 @@ export function DetailPanel({
   if (!title) return <PanelLeer holt={holt} t={t} onClose={onClose} platzhalter={platzhalter.element} />
   if (hidden.has(title.id)) return <PanelVersteckt title={title} t={t} onClose={onClose} onToggleHidden={onToggleHidden} />
 
-  // Handlung auf Deutsch; fehlt sie, lieber den englischen Text mit Hinweis
-  // zeigen als gar keinen. Der englische Rückfall bleibt bewusst, obwohl die
-  // Oberfläche seit dem 10.08.2026 einsprachig ist: Er stammt aus der Quelle,
-  // nicht aus einer Übersetzung der Seite. Für rund 700 der 2.750 Titel gibt es
-  // nirgends eine deutsche Inhaltsangabe — dort wäre die Alternative eine leere Fläche.
+  // Handlung auf Deutsch; fehlt sie, lieber den englischen Text mit Hinweis zeigen als gar keinen.
+  // Der englische Rückfall bleibt bewusst, obwohl die Oberfläche seit dem 10.08.2026 einsprachig ist:
+  // Er stammt aus der Quelle, nicht aus einer Übersetzung der Seite. Für rund 700 der 2.750 Titel
+  // gibt es nirgends eine deutsche Inhaltsangabe — dort wäre die Alternative eine leere Fläche.
   const { plot } = plotVon({ synopsis: s.synopsis, anilistId: title.al, ersatz, erschienen: titelGestartet(title, today) })
   const asZiel = eigenerAsZiel(plot, s.synopsis?.asUrl)
 
@@ -92,9 +93,10 @@ export function DetailPanel({
           eigenerTeil={eigenerTeil}
           kinoRelease={a.kinoRelease}
           asZiel={asZiel}
+          weitereVerweise={weitereAnisearchVerweise(andereTeile(franchise, title.id).map((x) => ({ titel: data.titleById.get(x.id), teil: x.teil })))}
         />
         {/* Reiter der Kategorie am Antwortkasten (F157): ein Reiter öffnet den Titel auf demselben Weg wie die Reihenliste, die ihn dafür nicht mehr zeigt. */}
-        <ReihenReiterKontext.Provider value={{ data, reiter: platzhalter.merke(reihenReiterVon(title, reihenTeile, reihenName, data.titles, today, franchise)), wechsleZu: wechsel.wechsleZu }}>
+        <ReihenReiterKontext.Provider value={{ data, reiter: platzhalter.merke(reihenReiterVon(title, reihenTeile, reihenName, data.titles, today, franchise)), wechsleZu: wechsel.wechsleZu, anbieterSpanne: anbieterSpanne(franchise, title.id) }}>
           <PanelKoerper
             {...{ data, title, today, releases, verbindung, favorites, onToggleFavorite, onFilterBy, onOpenTitle }}
             {...{ a, s, discAusgaben, discZuerst, plot, asZiel, reihenTeile, reihenName, reihe, wechsel }}

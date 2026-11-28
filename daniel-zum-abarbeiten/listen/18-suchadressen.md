@@ -1,6 +1,6 @@
 # Suchadressen — welcher Titel steckt dahinter?
 
-_Stand 2026-11-27 · 24 offen_
+_Stand 2026-11-28 · 24 offen_
 
 Diese Verweise führten auf eine **Suche** statt auf eine Titelseite und sind
 deshalb von der Seite verschwunden. Was hier steht, ist die Frage danach, wo
@@ -41,8 +41,7 @@ hinter einem /dp/ kann eine DVD liegen.
 
 - Anbieter: **primevideo** · unser Titel 16498
 - war verlinkt als: <https://www.amazon.de/s?k=Attack%20on%20Titan&i=instant-video>
-- aniSearch nennt: <https://www.amazon.de/dp/B0GZJ7KH73?tag=anisearch.de-21> — passt das?
-- aniSearch nennt: <https://www.amazon.de/dp/B0CWG9V8VB?tag=anisearch.de-21> — passt das?
+- aniSearch nennt: <https://www.amazon.de/gp/video/detail/0OBFWER39MSK6AW8LH870ZI3IY?ref_=atv_dl_rdr> — passt das?
 - **Antwort:** 
 
 ## Azumanga Daioh
@@ -84,10 +83,10 @@ hinter einem /dp/ kann eine DVD liegen.
 - aniSearch nennt: <https://www.amazon.de/dp/B0C8WS43WW?tag=anisearch.de-21> — passt das?
 - **Antwort:** 
 
-## Gunslinger Girl il teatrino
+## Gunslinger Girl: Il Teatrino
 
 - Anbieter: **primevideo** · unser Titel 3231
-- war verlinkt als: <https://www.amazon.de/s?k=Gunslinger%20Girl%20il%20teatrino&i=instant-video>
+- war verlinkt als: <https://www.amazon.de/s?k=Gunslinger%20Girl%3A%20Il%20Teatrino&i=instant-video>
 - aniSearch nennt: <https://www.amazon.de/dp/B0G1KJL6FL?tag=anisearch.de-21> — passt das?
 - **Antwort:** 
 

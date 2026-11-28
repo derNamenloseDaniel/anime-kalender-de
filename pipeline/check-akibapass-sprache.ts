@@ -3,7 +3,7 @@
  * die Seite sagt „mit deutscher Synchronisation. Sprache: Deutsch / Untertitel: keine“; S2 ist OmU und bleibt es). Läuft in `check:logic`, kein Netz.
  */
 import type { Title } from '../shared/types.ts'
-import { type Abruf, holeAkibapassSeiten, robotsErlaubt, setzeAkibapassSprache, spracheAusSeite } from './lib/akibapass-sprache.ts'
+import { type Abruf, holeAkibapassSeiten, robotsAusAntwort, robotsErlaubt, setzeAkibapassSprache, spracheAusSeite } from './lib/akibapass-sprache.ts'
 
 let fehler = 0
 function pruefe(name: string, ok: boolean, ist?: unknown): void {
@@ -54,6 +54,19 @@ pruefe('robots: /admin gesperrt', !robotsErlaubt(ROBOTS, '/admin/x', 'anime-kale
 pruefe('robots: längere Allow-Regel gewinnt', robotsErlaubt(ROBOTS, '/admin/ok/1', 'anime-kalender-de'))
 pruefe('robots: namentlicher Block eines anderen Bots gilt nicht für uns', robotsErlaubt(ROBOTS, '/products/a', 'anime-kalender-de'))
 pruefe('robots: namentlicher Block für uns gilt', !robotsErlaubt('User-agent: anime-kalender-de\nDisallow: /', '/products/a', 'anime-kalender-de'))
+
+pruefe('robots 200: Text bleibt', robotsAusAntwort(200, 'Disallow: /x', 'h') === 'Disallow: /x')
+pruefe('robots 404: keine Datei, alles erlaubt', robotsAusAntwort(404, 'Not found', 'h') === '' && robotsErlaubt(robotsAusAntwort(404, 'x', 'h'), '/products/a', 'anime-kalender-de'))
+for (const s of [403, 500, 503]) {
+  let geworfen = false
+  try { robotsAusAntwort(s, '', 'h') } catch { geworfen = true }
+  pruefe(`robots ${s}: Fehler (Host wird nicht geholt), nicht „erlaubt“`, geworfen)
+}
+pruefe('Sprachwahl in der Navigation („Sprache: Englisch“ ohne Untertitel) zählt nicht', spracheAusSeite('<nav>Sprache: Deutsch</nav><p>Staffel 1</p>') === 'offen')
+pruefe('Sprachwahl vor der Angabe verfälscht sie nicht', spracheAusSeite('<nav>Sprache: Deutsch</nav><p>Sprache: Japanisch / Untertitel: Deutsch</p>') === 'omu')
+const ohneZahl = cotn(5, 'https://www.akibapass.tv/products/q-de-season-1', 0)
+const beide = { seiten: { [ohneZahl.watchLinks![0].url]: { sprache: 'de' as const, am: '2026-11-28' } } }
+pruefe('fehlende Folgenzahl: kein dubRanges erfunden', setzeAkibapassSprache([ohneZahl], beide) === 0 && !ohneZahl.watchLinks![0].dubRanges)
 
 const antwort = (status: number, text = '<p>Sprache: Deutsch / Untertitel: keine</p>') => ({ status, text: async () => text })
 const abgerufen: string[] = []

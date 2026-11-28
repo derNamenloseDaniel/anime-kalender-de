@@ -8,20 +8,20 @@
 import { readJson, writeJson, log, warn, sleep } from './lib/util.ts'
 import { todayIso } from '../shared/time.ts'
 import { adresseIstOmu } from '../shared/omu-adresse.ts'
-import { type Abruf, type AkibapassDatei, holeAkibapassSeiten, istAkibapassWeg } from './lib/akibapass-sprache.ts'
+import { type Abruf, type AkibapassDatei, holeAkibapassSeiten, istAkibapassWeg, robotsAusAntwort } from './lib/akibapass-sprache.ts'
 
 const UA = 'anime-kalender-de (https://anime-kalender.de; eine Seite je Akibapass-Weg und Monat)'
 const ZIEL = 'data/akibapass-sprache.json'
 const PAUSE_MS = 3000
+const ABRUF_MS = 30_000
 
 const tageSeit = (iso: string, heute: string): number => (Date.parse(heute) - Date.parse(iso)) / 864e5
 const veraltet = (e: AkibapassDatei['seiten'][string] | undefined, heute: string): boolean =>
   !e || tageSeit(e.am, heute) > (e.sprache === 'offen' ? 7 : 28)
 
 async function robotsVon(host: string): Promise<string> {
-  const antwort = await fetch(`https://${host}/robots.txt`, { headers: { 'user-agent': UA } })
-  if (antwort.status !== 200) throw new Error(`robots.txt von ${host}: HTTP ${antwort.status}`)
-  return antwort.text()
+  const antwort = await fetch(`https://${host}/robots.txt`, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(ABRUF_MS) })
+  return robotsAusAntwort(antwort.status, await antwort.text(), host)
 }
 
 async function main(): Promise<void> {
@@ -37,7 +37,7 @@ async function main(): Promise<void> {
   const offen = adressen.filter((u) => veraltet(datei.seiten[u], heute))
   const abruf: Abruf = {
     holeRobots: robotsVon,
-    holeSeite: (url) => fetch(url, { headers: { 'user-agent': UA } }),
+    holeSeite: (url) => fetch(url, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(ABRUF_MS) }),
     pause: () => sleep(PAUSE_MS),
   }
   const { seiten, hosts } = await holeAkibapassSeiten(offen, abruf, heute, warn)

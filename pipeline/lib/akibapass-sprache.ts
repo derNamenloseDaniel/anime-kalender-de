@@ -12,6 +12,13 @@ export type AkibapassDatei = { geholtAm?: string; seiten: Record<string, { sprac
 
 export const istAkibapassWeg = (w: WatchLink): boolean => w.name === 'Akibapass'
 
+/** Antwort auf robots.txt: 200 → Text; 404/410 → keine Datei, alles erlaubt (RFC 9309); sonst Fehler (Host wird nicht geholt, Warnung). */
+export function robotsAusAntwort(status: number, text: string, host: string): string {
+  if (status === 200) return text
+  if (status === 404 || status === 410) return ''
+  throw new Error(`robots.txt von ${host}: HTTP ${status}`)
+}
+
 /** robots.txt: gilt für `*` und für uns (`agent`); die längste passende Regel gewinnt, bei Gleichstand Allow. Leerer Text erlaubt alles. */
 export function robotsErlaubt(robots: string, pfad: string, agent: string): boolean {
   let gilt = false
@@ -48,7 +55,8 @@ export function seitenText(html: string): string {
 /** `Sprache: Deutsch / Untertitel: keine` → de; `Sprache: Japanisch / Untertitel: Deutsch` → omu; ohne Angabe offen. */
 export function spracheAusSeite(html: string): AkibapassSprache {
   const text = seitenText(html)
-  const ton = /Sprache:\s*(.{0,60}?)(?:\s*\/\s*Untertitel|\s*Untertitel|$)/i.exec(text)?.[1]
+  // Nur „Sprache: X / Untertitel: Y“ zählt; ein alleinstehendes „Sprache:“ (Sprachwahl in Kopf oder Fuß) und ein früheres „Sprache:“ davor nicht.
+  const ton = /Sprache:\s*((?:(?!Sprache:).){0,60}?)\s*\/?\s*Untertitel/i.exec(text)?.[1]
   if (ton !== undefined) {
     if (/deutsch/i.test(ton)) return 'de'
     if (/\S/.test(ton)) return 'omu'
@@ -68,6 +76,7 @@ export function setzeAkibapassSprache(titles: Iterable<Title>, datei: AkibapassD
     for (const w of t.watchLinks ?? []) {
       if (!istAkibapassWeg(w) || w.dubRanges?.length || adresseIstOmu(w.url)) continue
       if (datei.seiten[w.url]?.sprache !== 'de') continue
+      if (!t.episodes) continue // keine erfundene Folgenzahl: ohne Folgenzahl des Titels bleibt der Weg offen
       w.dubRanges = [{ from: 1, to: Math.max(1, t.episodes ?? 1), dub: true }]
       n++
     }

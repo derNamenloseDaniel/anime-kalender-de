@@ -1,4 +1,6 @@
+import type { Dispatch, SetStateAction } from 'react'
 import type { Translate } from '../../lib/i18n.tsx'
+import type { plotVon } from './plot.ts'
 import { type Synopsis } from '../../lib/data.ts'
 import { LIZENZ_SEITEN } from '@shared/lizenzen.ts'
 
@@ -27,6 +29,45 @@ export function EigeneQuellenZeile({ eigen, t }: { eigen: NonNullable<Synopsis['
         eigen.lizenz
       )}
     </span>
+  )
+}
+
+/** Anbietername wie auf der Quelle selbst: aus der Adresse („anisearch.de") wird „aniSearch". */
+const quelleLabel = (name: string): string => (name === 'anisearch.de' ? 'aniSearch' : name === 'anilist.co' ? 'AniList' : name === 'themoviedb.org' ? 'TMDB' : name)
+
+/** Fuß der Karte „Handlung“: links der Aufklapper, rechts die Quelle (sie steht immer sichtbar, auch eingeklappt). */
+export function HandlungFuss({ plot, aufklappbar, t, plotOffen, setPlotOffen }: {
+  plot: NonNullable<ReturnType<typeof plotVon>['plot']>
+  aufklappbar: boolean
+  t: Translate
+  plotOffen: boolean
+  setPlotOffen: Dispatch<SetStateAction<boolean>>
+}) {
+  return (
+    <div className="mt-2 flex items-center justify-between gap-2">
+      {aufklappbar ? (
+        <button
+          type="button"
+          onClick={() => setPlotOffen((v) => !v)}
+          aria-expanded={plotOffen}
+          className="min-h-11 cursor-pointer rounded-full border border-ak-rand bg-ak-flaeche-2 px-4 text-t3 font-semibold text-ak-text transition hover:border-ak-leise"
+        >
+          {t(plotOffen ? 'detail.plotLess' : 'detail.plotMore')}
+        </button>
+      ) : (
+        <span />
+      )}
+      {plot.eigen ? (
+        <EigeneQuellenZeile eigen={plot.eigen} t={t} />
+      ) : plot.quelle ? (
+        <span className="text-t4 text-slate-600 dark:text-slate-400">
+          {t('detail.plotQuelle')}{' '}
+          <a href={plot.quelle.url} target="_blank" rel="noopener noreferrer" className={linkKlasse}>
+            {quelleLabel(plot.quelle.name)} ↗
+          </a>
+        </span>
+      ) : null}
+    </div>
   )
 }
 

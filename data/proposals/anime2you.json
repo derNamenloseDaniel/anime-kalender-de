@@ -1,15 +1,44 @@
 {
-  "scrapedAt": "2026-11-28T04:14:12.090Z",
+  "scrapedAt": "2026-11-28T13:01:45.301Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 41,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 4,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "schon in einem Rubrik-Feed gelesen": 35,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 49,
-    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 4,
-    "Sprachhinweis älter als 45 Tage": 7
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 11,
+    "schon in einem Rubrik-Feed gelesen": 10,
+    "Sprachhinweis älter als 45 Tage": 6
   },
   "proposals": [
+    {
+      "articleTitle": "Start des Original-Anime »LONA« steht fest + Visual",
+      "articleUrl": "https://www.anime2you.de/news/1077668/start-des-original-anime-lona/",
+      "publishedAt": "2026-11-28",
+      "category": "allgemein",
+      "platforms": [],
+      "dates": [
+        {
+          "month": "2027-04",
+          "context": "count des Original-Anime »LONA« wurde heute verkündet, dass die Serie ab April 2027 im japanischen Fernsehen ausgestrahlt wird. Ein neues Vi"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
+    {
+      "articleTitle": "Konkreter Termin des Original-Anime »Inherit the Winds« + Trailer",
+      "articleUrl": "https://www.anime2you.de/news/1077663/inherit-the-winds-konkreter-termin/",
+      "publishedAt": "2026-11-28",
+      "category": "allgemein",
+      "platforms": [],
+      "dates": [
+        {
+          "iso": "2027-01-10",
+          "context": ".: »Kaze wo Tsugumono«) wurde vor Kurzem verkündet, dass die Serie am 10. Januar 2027 im japanischen Fernsehen startet. Einen ersten Trailer"
+        }
+      ],
+      "dub": "unklar",
+      "alreadyCurated": false
+    },
     {
       "articleTitle": "Termin von »Wazamonogatari: Karen Ogre« steht fest + Trailer",
       "articleUrl": "https://www.anime2you.de/news/1077302/termin-von-wazamonogatari-karen-ogre/",

@@ -1,3 +1,4 @@
+import { useLang } from '../../lib/i18n.tsx'
 import { teilBereich, type AnbieterTeil } from './anbieter-staffel.ts'
 
 /**
@@ -6,9 +7,10 @@ import { teilBereich, type AnbieterTeil } from './anbieter-staffel.ts'
  * mindestens 44 px (design-regeln.md E2). Ohne zwei Teile steht nichts da.
  */
 export function TeilUmschalter({ teile, aktiv, beiWahl }: { teile: AnbieterTeil[]; aktiv: number; beiWahl: (id: number) => void }) {
+  const { t } = useLang()
   if (teile.length < 2) return null
   return (
-    <div data-teil-umschalter className="mt-2 inline-flex rounded-full border border-ak-rand bg-ak-flaeche p-0.5 text-t3" role="tablist" aria-label="Teil der Staffel">
+    <div data-teil-umschalter className="mt-2 inline-flex rounded-full border border-ak-rand bg-ak-flaeche p-0.5 text-t3" role="tablist" aria-label={t('detail.teilDerStaffel')}>
       {teile.map((t) => (
         <button
           key={t.id}

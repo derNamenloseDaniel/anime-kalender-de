@@ -146,7 +146,7 @@ function erschienenZeile(antwort: Extract<Antwort, { art: 'laeuft' }>, releases:
 }
 
 /** Antwortart „laeuft“. */
-function kopfLaeuft({ antwort, relativImSatz, T, betont, ohneSprachbeleg, releases, anbieterSpanne }:Omit<KopfEingabe, 'antwort'> & { antwort: Extract<Antwort, { art: 'laeuft' }> }): KopfTeile {
+function kopfLaeuft({ antwort, relativImSatz, T, betont, ohneSprachbeleg, releases, anbieterSpanne }: Omit<KopfEingabe, 'antwort'> & { antwort: Extract<Antwort, { art: 'laeuft' }> }): KopfTeile {
   let haupt: ReactNode, neben: string, anteil: number | undefined, zaehl: ReactNode, fakten: Fakt[] | undefined, gedaempft = false, nebenTitel: string | undefined
   const e = antwort.haupt
   /*

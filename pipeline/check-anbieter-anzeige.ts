@@ -52,6 +52,13 @@ pruefe('offen ist eine andere Staffel: der Reiter „1“ öffnet Teil 1', kurz(
 pruefe('Umschalter-Teile in Reihenfolge mit Folgenbereich des Anbieters', JSON.stringify(reiter(mitFeld(), EINS)[0]!.teile) === JSON.stringify([{ id: EINS, von: 1, bis: 11 }, { id: ZWEI, von: 12, bis: 22 }]), reiter(mitFeld(), EINS)[0]!.teile)
 pruefe('Reiter ohne Anbieter-Staffel tragen keine Teile', reiter(mitFeld(), EINS)[1]!.teile === undefined)
 pruefe('Reihenliste lässt beide Teile der Anbieter-Staffel weg, nicht nur den des Reiters', [EINS, ZWEI, DRITTE].every((id) => titelAlsReiter(reiter(mitFeld(), EINS)).has(id)), [...titelAlsReiter(reiter(mitFeld(), EINS))])
+{
+  /* Nur ein Glied hat einen Reiter (das andere ist OVA/Special, Dorohedoro): nichts zu fassen, nichts umzuschalten. */
+  const einzeln = frisch()
+  einzeln.find((m) => m.id === ZWEI)!.anbieterStaffel = { nr: 1, teil: 2, von: 12, bis: 22 }
+  const roh = reiter(frisch(), EINS)
+  pruefe('ein einzelnes Glied bleibt, wie es ist: gleiche Reiter, keine Teile', JSON.stringify(fasseAnbieterStaffeln(roh, einzeln, EINS)) === JSON.stringify(roh) && fasseAnbieterStaffeln(roh, einzeln, EINS).every((r) => r.teile === undefined), fasseAnbieterStaffeln(roh, einzeln, EINS))
+}
 pruefe('Beschriftung des Umschalters: „Folge 1–11“, ein einzelner Teil „Folge 13“', teilBereich({ von: 1, bis: 11 }) === 'Folge 1–11' && teilBereich({ von: 13, bis: 13 }) === 'Folge 13')
 
 console.log('\nStone Ocean (Reihennummer 6) und Steel Ball Run (7.1 / 7.2–3, PR 5261):')
@@ -91,6 +98,7 @@ console.log('\nFolgenzeile und Absprung:')
   pruefe('Spanne des Anbieters nur für Teil 2 (beginnt nicht bei Folge 1)', anbieterSpanne(reihe, EINS) === undefined && JSON.stringify(anbieterSpanne(reihe, ZWEI)) === '{"von":12,"bis":22}')
   pruefe('Teil 2 mit 4 erschienenen Folgen: „Folge 12–15 von 22“', JSON.stringify(zaehlSpanne([], 4, 11, { von: 12, bis: 22 })) === '{"nr":"12–15","gesamt":22}', zaehlSpanne([], 4, 11, { von: 12, bis: 22 }))
   pruefe('ohne Anbieter und ohne Termine keine Spanne (wie vorher)', zaehlSpanne([], 4, 11) === undefined)
+  pruefe('Teil 2 mit einer erschienenen Folge: „Folge 12 von 22“; ohne erschienene Folge keine Spanne', zaehlSpanne([], 1, 11, { von: 12, bis: 22 })?.nr === '12' && zaehlSpanne([], 0, 11, { von: 12, bis: 22 }) === undefined, [zaehlSpanne([], 1, 11, { von: 12, bis: 22 }), zaehlSpanne([], 0, 11, { von: 12, bis: 22 })])
   const weitere = weitereAnisearchVerweise(andereTeile(reihe, EINS).map((x) => ({ titel: offen(x.id), teil: x.teil })))
   pruefe('Absprung von Teil 1 nennt den aniSearch-Eintrag von Teil 2 als Direktlink', JSON.stringify(weitere.map((v) => [v.name, v.ziel])) === '[["aniSearch Teil 2","https://www.anisearch.de/anime/19797"]]', weitere)
   const zurueck = weitereAnisearchVerweise(andereTeile(reihe, ZWEI).map((x) => ({ titel: offen(x.id), teil: x.teil })))

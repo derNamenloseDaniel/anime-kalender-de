@@ -19,6 +19,19 @@ pruefe('Seite „Sprache: Japanisch / Untertitel: Deutsch“ → omu, nicht de',
 pruefe('Seite ohne Sprachangabe → offen', spracheAusSeite('<body>Staffel 1, 12 Folgen</body>') === 'offen')
 pruefe('Deutsch nur als Untertitel zählt nicht', spracheAusSeite('<li>Sprache: Japanisch / Untertitel: Deutsch</li>') !== 'de')
 
+/* Echte Textausschnitte (Dirigent, 28.11.2026, curl) */
+const ECHT: [string, string, string][] = [
+  ['call-of-the-night-de-season-1', 'Sprache: Deutsch / Untertitel: keine', 'de'],
+  ['fruits-basket-omu-season-1-1', 'Sprache: Japanisch / Untertitel: Deutsch', 'omu'],
+  ['beelzebub-omu-season-1-5', 'Sprache: Japanisch / Untertitel: Deutsch', 'omu'],
+  ['wolf-s-rain-de-season-1-2', 'Sprache: Deutsch / Untertitel: Keine', 'de'],
+  ['sword-of-the-stranger-de', 'Sprache: Deutsch / Untertitel: keine', 'de'],
+]
+for (const [seite, text, soll] of ECHT) {
+  const ist = spracheAusSeite(`<div class="meta"><p>${text}</p></div>`)
+  pruefe(`echte Seite ${seite} → ${soll}`, ist === soll, ist)
+}
+
 const cotn = (id: number, url: string, episodes = 13): Title =>
   ({ id, episodes, watchLinks: [{ name: 'Akibapass', url, kind: 'stream', zugang: 'abo' }] }) as unknown as Title
 const s1 = cotn(141391, 'https://www.akibapass.tv/products/call-of-the-night-de-season-1')

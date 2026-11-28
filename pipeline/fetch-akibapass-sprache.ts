@@ -1,7 +1,7 @@
 /**
  * Holt je Akibapass-Weg die Produktseite und liest die Sprache (`lib/akibapass-sprache.ts`), Ergebnis `data/akibapass-sprache.json`.
  *
- * Nur in GitHub Actions. Höflich: robots.txt je Host vorab, eine Seite alle 3 s, erkennbarer User-Agent, 403/429 = Pause (Rest bleibt
+ * Nur in GitHub Actions. Höflich: robots.txt je Host vorab, eine Seite alle 3 s, erkennbarer User-Agent, 403/429 = Pause nur für diesen Host (Rest bleibt
  * für den nächsten Lauf, nichts wird als „offen“ gewertet). Seiten mit Befund bleiben 28 Tage gültig, „offen“ wird nach 7 Tagen neu geholt.
  * OmU-Pfade (`shared/omu-adresse.ts`) werden nicht geholt: sie folgen der OmU-Regel.
  */
@@ -36,14 +36,16 @@ async function main(): Promise<void> {
   const datei = readJson<AkibapassDatei>(ZIEL, { seiten: {} })
   const offen = adressen.filter((u) => veraltet(datei.seiten[u], heute))
   const robots = new Map<string, string>()
+  const gesperrt = new Set<string>() // Hosts, die 403/429 sagten: nur sie pausieren, die anderen laufen weiter
   let geholt = 0
   for (const url of offen) {
     const { host, pathname } = new URL(url)
+    if (gesperrt.has(host)) continue
     try {
       if (!robots.has(host)) robots.set(host, await robotsVon(host))
       if (!robotsErlaubt(robots.get(host)!, pathname, 'anime-kalender-de')) { warn(`robots.txt sperrt ${url}`); continue }
       const antwort = await fetch(url, { headers: { 'user-agent': UA } })
-      if (antwort.status === 403 || antwort.status === 429) { warn(`HTTP ${antwort.status} bei ${host}: Pause, Rest im nächsten Lauf`); break }
+      if (antwort.status === 403 || antwort.status === 429) { warn(`HTTP ${antwort.status} bei ${host}: Host pausiert, Rest im nächsten Lauf`); gesperrt.add(host); continue }
       if (antwort.status !== 200) { warn(`${url}: HTTP ${antwort.status}`); continue }
       datei.seiten[url] = { sprache: spracheAusSeite(await antwort.text()), am: heute }
       geholt++

@@ -1,13 +1,13 @@
 # Was JustWatch zu offenen Verweisen sagt
 
-Stand: 2026-11-27. Erzeugt von `npm run data:justwatch`.
+Stand: 2026-11-28. Erzeugt von `npm run data:justwatch`.
 
 **Das sind Kandidaten, keine Belege.** Die Angabe gilt der **Serie**, nicht der
 einzelnen Folge — bei „Kill Blue" meldet JustWatch `de` für alle zwölf, belegt
 sind acht. Und ein fehlendes `de` belegt nichts: Netflix meldet dort gar keine
 Tonspur. Was hier steht, sagt, **wo sich das Nachsehen lohnt**.
 
-24 offene Verweise, zu denen JustWatch eine Tonspur nennt.
+25 offene Verweise, zu denen JustWatch eine Tonspur nennt.
 
 | Titel | Anbieter | JustWatch sagt | Tonspuren | Quelle |
 |---|---|---|---|---|
@@ -20,6 +20,7 @@ Tonspur. Was hier steht, sagt, **wo sich das Nachsehen lohnt**.
 | [Karakai Jozu no Takagi-san: Staffel 2](https://anime-kalender.de/#/datenbank?t=107068) | crunchyroll | 🇩🇪 **Deutsch dabei** | `de, en, ja, ru` | [JustWatch](https://www.justwatch.com/de/Serie/karakaiShang-Shou-noGao-Mu-san) |
 | [Beauty Water](https://anime-kalender.de/#/datenbank?t=119978) | crunchyroll | 🇩🇪 **Deutsch dabei** | `de, ko` | [JustWatch](https://www.justwatch.com/de/Film/Beauty-Water) |
 | [Jujutsu Kaisen 0](https://anime-kalender.de/#/datenbank?t=131573) | crunchyroll | 🇩🇪 **Deutsch dabei** | `de, en, es, fr, it, ja, pl, pt, ru, th` | [JustWatch](https://www.justwatch.com/de/Film/jujutsu-kaisen-0) |
+| [Saint Seiya: Knights of the Zodiac](https://anime-kalender.de/#/datenbank?t=102427) | crunchyroll | kein Deutsch | `en, es, ja, pt` | [JustWatch](https://www.justwatch.com/de/Serie/Saint-Seiya-Knights-of-the-Zodiac-2019) |
 | [undefined](https://anime-kalender.de/#/datenbank?t=-204084) | crunchyroll | kein Deutsch | `en, fr, ja` | [JustWatch](https://www.justwatch.com/de/Serie/dreamland-2026) |
 | [undefined](https://anime-kalender.de/#/datenbank?t=-99777) | crunchyroll | 🇩🇪 **Deutsch dabei** | `de, en, es, fr, pt, ru` | [JustWatch](https://www.justwatch.com/de/Serie/Onyx-Equinox) |
 | [undefined](https://anime-kalender.de/#/datenbank?t=-13247) | primevideo | 🇩🇪 **Deutsch dabei** | `de` | [JustWatch](https://www.justwatch.com/de/Serie/Sylvanian-Families) |

@@ -63,7 +63,7 @@ import { log, readJson, sleep, warn, writeJson } from './lib/util.ts'
 import { recordSource } from './lib/health.ts'
 import { todayIso } from '../shared/time.ts'
 import type { EmpfehlungsDatei } from '../shared/empfehlung-pool.ts'
-import { tmdbArt, tmdbVideosUrl, trailerKandidaten } from './lib/trailer-auswahl.ts'
+import { tmdbArt, tmdbVideosUrl, trailerKandidaten, waehleTmdbVideo, type TmdbVideo } from './lib/trailer-auswahl.ts'
 import { RIEGEL_JE_LAUF, SPEICHERN_ALLE, arbeiteInStuecken, lageVon, waehleDran, type Versuche } from './lib/trailer-lauf.ts'
 import { AUSFALL, ladeLabelKanaele, loeseKanaeleAuf, type KanalStand } from './lib/trailer-label-kanaele.ts'
 import { uebernehmeLabel, verwerfungenText } from './lib/trailer-label.ts'
@@ -329,21 +329,8 @@ async function ausKinocheck(tmdbId: number, art: string): Promise<TrailerEintrag
 async function ausTmdb(tmdbId: number, art: string, schluessel: string): Promise<TrailerEintrag | null | typeof FEHLER> {
   const roh = await holeAntwort(tmdbVideosUrl(TMDB, art, tmdbId, schluessel))
   if (roh === FEHLER) return FEHLER
-  const daten = roh as {
-    results?: { key?: string; name?: string; site?: string; type?: string; iso_639_1?: string; published_at?: string }[]
-  } | null
-  const brauchbar = (daten?.results ?? []).filter(
-    (v) => v.site === 'YouTube' && v.key && (v.type === 'Trailer' || v.type === 'Teaser'),
-  )
-  for (const sprache of ['de', 'en', 'ja'] as const) {
-    const passend = brauchbar
-      .filter((v) => v.iso_639_1 === sprache)
-      /* Der jüngste zuerst — er zeigt den fertigen Film, nicht die erste Ankündigung. */
-      .sort((a, b) => (b.published_at ?? '').localeCompare(a.published_at ?? ''))
-    const fund = passend[0]
-    if (fund?.key) return { video: fund.key, titel: fund.name ?? '', sprache, herkunft: 'tmdb', gefundenAm: heute() }
-  }
-  return null
+  const fund = waehleTmdbVideo((roh as { results?: TmdbVideo[] } | null)?.results ?? [])
+  return fund ? { ...fund, herkunft: 'tmdb', gefundenAm: heute() } : null
 }
 
 /**

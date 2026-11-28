@@ -1,5 +1,5 @@
 /** Prüft `lib/trailer-auswahl.ts`: Kandidaten des Trailerlaufs und die TMDB-Videoadresse. */
-import { tmdbArt, tmdbVideosUrl, trailerKandidaten } from './lib/trailer-auswahl.ts'
+import { tmdbArt, tmdbVideosUrl, trailerKandidaten, waehleTmdbVideo } from './lib/trailer-auswahl.ts'
 
 let fehler = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -37,6 +37,13 @@ const tv = tmdbVideosUrl('https://x/3', 'tv', 7, 'K')
 pruefe('Serie fragt tv und alle drei Sprachen', tv === 'https://x/3/tv/7/videos?include_video_language=de,en,ja&api_key=K', tv)
 pruefe('Film fragt movie', tmdbVideosUrl('https://x/3', 'movie', 7, 'K').startsWith('https://x/3/movie/7/videos?'))
 pruefe('unbekannte Art fällt auf tv', tmdbVideosUrl('https://x/3', 'anderes', 7, 'K').includes('/tv/7/'))
+
+console.log('TMDB-Videoauswahl (Verhalten wie vor dem Auslagern)')
+const yt = (key: string, iso: string, am: string, type = 'Trailer') => ({ key, name: key, site: 'YouTube', type, iso_639_1: iso, published_at: am })
+pruefe('deutsch vor englisch', waehleTmdbVideo([yt('en1', 'en', '2020'), yt('de1', 'de', '2019')])?.video === 'de1')
+pruefe('je Sprache der jüngste', waehleTmdbVideo([yt('a', 'de', '2019'), yt('b', 'de', '2021')])?.video === 'b')
+pruefe('Teaser zählt, Featurette nicht', waehleTmdbVideo([yt('t', 'en', '2020', 'Teaser')])?.video === 't' && waehleTmdbVideo([yt('f', 'en', '2020', 'Featurette')]) === null)
+pruefe('fremde Site zählt nicht', waehleTmdbVideo([{ ...yt('v', 'de', '2020'), site: 'Vimeo' }]) === null)
 
 if (fehler) {
   console.error(`${fehler} Fehler`)

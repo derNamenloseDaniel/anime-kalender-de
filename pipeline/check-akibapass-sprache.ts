@@ -124,6 +124,18 @@ pruefe('429 auf Host A: Host B wird weiter abgerufen', Object.keys(lauf.seiten).
 pruefe('429 auf Host A: weitere Adressen von A übersprungen, nicht abgerufen', !abgerufen.includes('https://shop.example/b') && lauf.hosts['shop.example'].uebersprungen === 1 && lauf.hosts['shop.example'].gesperrt === 1, lauf.hosts)
 pruefe('Zählung je Host', lauf.hosts['tv.example'].geholt === 2, lauf.hosts)
 
+const abrufG: Abruf = {
+  holeRobots: async () => '',
+  holeSeite: async (u) => antwort(u.includes('geo.example') ? 404 : 200),
+  pause: async () => {},
+}
+const warnG: string[] = []
+const geo = await holeAkibapassSeiten(['https://geo.example/a', 'https://geo.example/b', 'https://tv.example/c'], abrufG, '2026-11-28', (t) => warnG.push(t))
+pruefe('404 auf Host: eigene Zählung geo-gesperrt, Host läuft weiter (alle Adressen versucht)', geo.hosts['geo.example'].geoGesperrt === 2 && geo.hosts['geo.example'].gesperrt === 0 && geo.hosts['tv.example'].geoGesperrt === 0, geo.hosts)
+pruefe('404-Seiten landen nicht in den Befunden', Object.keys(geo.seiten).join() === 'https://tv.example/c', geo.seiten)
+pruefe('Host nur mit 404: eine Sammelwarnung „geo-gesperrt“ statt stiller Einzelwarnung', warnG.filter((w) => w.includes('geo-gesperrt') && w.includes('geo.example')).length === 1, warnG)
+pruefe('Host mit Treffern: keine Geo-Warnung', !warnG.some((w) => w.includes('tv.example') && w.includes('geo-gesperrt')), warnG)
+
 if (fehler) {
   console.error(`${fehler} Fehler`)
   process.exit(1)

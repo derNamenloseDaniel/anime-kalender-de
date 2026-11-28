@@ -99,7 +99,8 @@ export function setzeAkibapassSprache(titles: Iterable<Title>, datei: AkibapassD
   return z
 }
 
-export type HostZahl = { geholt: number; gesperrt: number; uebersprungen: number }
+/** `geoGesperrt` = HTTP 404 auf einer Produktseite (28.11.2026: aus CI 404, von einer deutschen IP 200); von einer echt fehlenden Seite nicht zu unterscheiden, deshalb eigene Zählung. */
+export type HostZahl = { geholt: number; gesperrt: number; uebersprungen: number; geoGesperrt: number }
 export type Abruf = { holeRobots: (host: string) => Promise<string>; holeSeite: (url: string) => Promise<{ status: number; text: () => Promise<string> }>; pause: () => Promise<void> }
 
 /**
@@ -113,7 +114,7 @@ export async function holeAkibapassSeiten(urls: string[], abruf: Abruf, heute: s
   const gesperrt = new Set<string>()
   for (const url of urls) {
     const { host, pathname } = new URL(url)
-    const z = (hosts[host] ??= { geholt: 0, gesperrt: 0, uebersprungen: 0 })
+    const z = (hosts[host] ??= { geholt: 0, gesperrt: 0, uebersprungen: 0, geoGesperrt: 0 })
     if (gesperrt.has(host)) { z.uebersprungen++; continue }
     if (!robots.has(host)) {
       // Ergebnis je Host einmal; scheitert der Abruf (5xx, Timeout, Netz), ruht der Host für diesen Lauf.
@@ -128,6 +129,7 @@ export async function holeAkibapassSeiten(urls: string[], abruf: Abruf, heute: s
       if (!robotsErlaubt(robots.get(host)!, pathname, 'anime-kalender-de')) { warn(`robots.txt sperrt ${url}`); z.uebersprungen++; continue }
       const antwort = await abruf.holeSeite(url)
       if (antwort.status === 403 || antwort.status === 429) { warn(`HTTP ${antwort.status} bei ${host}: Host pausiert, Rest im nächsten Lauf`); gesperrt.add(host); z.gesperrt++; continue }
+      if (antwort.status === 404) { z.geoGesperrt++; continue }
       if (antwort.status !== 200) { warn(`${url}: HTTP ${antwort.status}`); continue }
       const html = await antwort.text()
       const episoden = folgenAusSeite(html)
@@ -137,6 +139,9 @@ export async function holeAkibapassSeiten(urls: string[], abruf: Abruf, heute: s
       warn(`${url}: ${(fehler as Error).message}`)
     }
     await abruf.pause()
+  }
+  for (const [host, z] of Object.entries(hosts)) {
+    if (z.geoGesperrt && !z.geholt) warn(`${host}: ${z.geoGesperrt} Produktseiten HTTP 404, keine einzige geholt – vermutlich geo-gesperrt (Lauf von einer deutschen IP nötig), Sprache dieser Wege bleibt offen`)
   }
   return { seiten, hosts }
 }

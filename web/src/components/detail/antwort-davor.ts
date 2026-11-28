@@ -38,6 +38,10 @@ export function abwurfBereich(release: Release | undefined): [number, number] | 
  * dritten bleiben zwei (JoJo 210482, Eighty Six Teil 2 mit Folge 12–23); Wistoria und The 100 Girlfriends Staffel 3 behalten ihre Zeile.
  */
 export function zaehlSpanne(releases: Pick<Release, 'releaseType' | 'schedule'>[], raus: number, gesamt: number | undefined): { nr: string; gesamt: number } | undefined {
+  return zaehlSpanneAusTermin(releases, raus, gesamt)
+}
+
+function zaehlSpanneAusTermin(releases: Pick<Release, 'releaseType' | 'schedule'>[], raus: number, gesamt: number | undefined): { nr: string; gesamt: number } | undefined {
   const ohneDisc = releases.filter((r) => r.releaseType !== 'disc' && r.schedule?.episodeCount && !r.schedule.episodeCountAssumed)
   if (!ohneDisc.length || !gesamt || raus < 1) return undefined
   const erste = Math.min(...ohneDisc.map((r) => r.schedule?.firstEpisodeNumber ?? 1))

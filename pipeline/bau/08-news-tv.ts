@@ -20,6 +20,7 @@ import { type TvSendung } from '../fetch-tv-programm.ts'
 import { type WikiListen, sendungNeuZuordnen, releasesAusTvProgramm, sendungenAnhaengen } from '../lib/tv-termine.ts'
 import { belegeHandTermine } from '../lib/tv-hand-belege.ts'
 import { type AnisearchFolgen, anisearchFolgenListe, kennungenVereint } from '../lib/anisearch-folgen-liste.ts'
+import { mitAnisearchErsatz } from '../lib/tv-folgen-ersatz.ts'
 import { anisearchKennungen } from './anisearch-kennung.ts'
 import { quellenHistorieLaden, quellenPflegen } from './nebendateien.ts'
 import { type Title, type Release } from '../../shared/types.ts'
@@ -106,14 +107,15 @@ export function folgenListen(titles: Map<number, Title>, dep: Partial<FolgenQuel
   // Einmal lesen: Je Eintrag neu geparst kostete die ~10-MB-Datei über 10 Minuten (10.10.2026).
   const kennungenDerTitel = kennungenVon([...titles.values()].map((t) => ({ id: t.id, mal: t.malId })))
   const anisearchFolgen = lies<AnisearchFolgen>('data/anisearch-folgen.json', {})
-  return {
+  const anisearch = anisearchFolgenListe(kennungenVereint(ladeAnisearchAbruf<{ anisearchId?: number }>(lies), kennungenDerTitel), anisearchFolgen)
+  return mitAnisearchErsatz({
     /*
       **aniSearch-Folgentitel als Grundstock** (23.09.2026). Ohne sie hat ein Titel ohne
       Wikipedia-Liste gar keine Folgennamen — „One Piece Log: Fish-Man Island Saga" (183423)
       zum Beispiel, dessen vier Sendungen am 28./29.09.2026 unter One Piece liefen. Steht
       weiter unten eine bessere Liste (TMDB, RTL+, Wikipedia), gewinnt sie: Sie kommt später.
     */
-    ...anisearchFolgenListe(kennungenVereint(ladeAnisearchAbruf<{ anisearchId?: number }>(lies), kennungenDerTitel), anisearchFolgen),
+    ...anisearch,
       /*
         TMDB zuletzt: deutsche Folgentitel, über Staffeln durchgezählt (Staffel 0 = Specials
         zählt nicht). Bei Solo Leveling die einzige Liste; bei Eyeshield 21 passten 0 von 5
@@ -145,5 +147,5 @@ export function folgenListen(titles: Map<number, Title>, dep: Partial<FolgenQuel
         ).map(([id, x]) => [id, { seite: 'den Folgenseiten von RTL+', url: `https://plus.rtl.de/${x.programm}`, folgen: x.folgen }]),
       ),
       ...(lies<{ titel?: WikiListen }>('data/wikipedia-folgen.json', {}).titel ?? {}),
-  }
+  }, anisearch)
 }

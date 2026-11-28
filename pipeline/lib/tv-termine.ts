@@ -23,12 +23,19 @@ import { TVDE_SENDER, type TvSendung } from '../fetch-tv-programm.ts'
 import type { WikiFolge } from './wikipedia-folgen.ts'
 import { folgenKern } from '../../shared/folgen-zuordnung.ts'
 import { warn } from './util.ts'
+import { ersatzNummerGilt } from './tv-folgen-ersatz.ts'
 
 /**
  * Folgenlisten je Titel. Ohne `url` ist `seite` eine Wikipedia-Seite; mit `url` stammt die
  * Liste von anderswo (RTL+, 19.09.2026) und `seite` ist der Name, unter dem sie genannt wird.
  */
-export type WikiListen = Record<string, { seite: string; url?: string; folgen: WikiFolge[] }>
+export type WikiListen = Record<string, {
+  seite: string
+  url?: string
+  folgen: WikiFolge[]
+  /** aniSearch-Liste für Folgentitel, die `folgen` nicht führt (`mitAnisearchErsatz`). */
+  ersatz?: WikiFolge[]
+}>
 
 /**
  * Folgentitel → Nummer in der Serie; ein Titel, der zweimal vorkommt, ordnet nichts zu.
@@ -136,10 +143,14 @@ export function sendungenAnhaengen(
     */
     const eigene = wiki[String(r.titleId)]
     const nummern = eigene?.folgen.length ? nummernNachTitel(eigene.folgen, !eigene.url) : undefined
+    // Der aniSearch-Ersatz nummeriert nur die Sendung; Staffelzuordnung und Termine (`nummeriereGruppe`) bleiben bei der führenden Liste, eine andere Nummer dort verschöbe Staffeln.
+    const ersatzNummern = eigene?.ersatz ? nummernNachTitel(eigene.ersatz, false) : undefined
     r.sendungen = liste
       .sort((a, b) => a.start.localeCompare(b.start))
       .map((s) => {
-        const nr = s.folge ? nummerFuer(nummern, s.folge) : undefined
+        const ersatzNr = s.folge ? nummerFuer(ersatzNummern, s.folge) : undefined
+        const ersatz = ersatzNr !== undefined && ersatzNummerGilt(eigene!.ersatz!, ersatzNr, s.folge!) ? ersatzNr : undefined
+        const nr = s.folge ? (nummerFuer(nummern, s.folge) ?? ersatz) : undefined
         /*
           Die Detailseite der Sendung bei tv.de. `/sendung/r/s,<kennung>/` leitet per 301 auf die
           sprechende Adresse weiter — gemessen am 22.09.2026 an One Piece 23.09. 18:20

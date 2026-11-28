@@ -7,6 +7,7 @@ import type { Release, Title } from '../shared/types.ts'
 import { titelMitSichtungOhneFolge, tvSichtungOhneFolge } from './lib/maengel-tv-folge.ts'
 import { REGELN, zaehleMaengel, type Kontext } from './lib/maengel-regeln.ts'
 import type { WikiListen } from './lib/tv-termine.ts'
+import { ersatzNummerGilt, mitAnisearchErsatz } from './lib/tv-folgen-ersatz.ts'
 
 let verletzt = 0
 function pruefe(name: string, ok: boolean): void {
@@ -80,5 +81,25 @@ pruefe('Kurz: „Ein Lied am See“ (Kern 9) wird nicht geraten', kurzMessung('E
 pruefe('Kurz: Eintrag mit leerem Kern (dt „?“) ordnet keiner fremden Sendung seine Nummer zu', kurzMessung('Völlig anderer Folgentitel').has(KURZ))
 pruefe('Kurz: „Die Chronik des Grauens“ trifft über den Artikel „die“', !kurzMessung('Die Chronik des Grauens').has(KURZ))
 pruefe('Kurz: Titel ohne jede Liste: Mangel statt Absturz', titelMitSichtungOhneFolge([kurzTermin], [{ ...programm('Irgendeine Folge'), titleId: KURZ }], {}, new Map([[KURZ, { id: KURZ }]]) as unknown as Map<number, Title>).has(KURZ))
+
+// aniSearch-Ersatz (28.11.2026, Dororo/Eyeshield 21): TMDB führt den Folgentitel anders, aniSearch kennt ihn; nur bei gleichem Zählmaß.
+const ER = 900005
+const erTermin = { titleId: ER, platform: 'tv', sender: 'Super RTL', schedule: { firstEpisodeDate: '2026-09-01' } } as unknown as Release
+const aniListe: WikiListen = { [ER]: { seite: 'aniSearch', url: 'u', folgen: [{ nr: 1, dt: 'Der Götterbote' }, { nr: 2, dt: 'Das Kapitel von Saru' }, { nr: 3, dt: 'Halbzeit für die Bats' }] } }
+const tmdbListe = (hoechste: number): WikiListen => ({ [ER]: { seite: 'TMDB', url: 'u', folgen: [{ nr: 1, dt: 'Ein Bote der Götter' }, { nr: hoechste, dt: 'Etwas ganz anderes hier' }] } })
+const erMessung = (liste: WikiListen, folge: string) => titelMitSichtungOhneFolge([erTermin], [{ ...programm(folge), titleId: ER }], liste, new Map([[ER, { id: ER }]]) as unknown as Map<number, Title>)
+const mitErsatz = mitAnisearchErsatz(tmdbListe(3), aniListe)
+pruefe('Ersatz: Folgentitel nur bei aniSearch: Nummer gefunden, kein Mangel', !erMessung(mitErsatz, 'Das Kapitel von Saru').has(ER))
+pruefe('Ersatz: Folgentitel bei keiner Liste: Mangel bleibt', erMessung(mitErsatz, 'Ein ganz neuer Titel').has(ER))
+pruefe('Ersatz: ohne Ersatz (TMDB allein) fehlt die Nummer', erMessung(tmdbListe(3), 'Das Kapitel von Saru').has(ER))
+pruefe('Ersatz: führende Liste zählt höher als aniSearch (Pokémon Reisen 1235 gegen 90): kein Ersatz, keine fremde Zählung', mitAnisearchErsatz(tmdbListe(1235), aniListe)[ER]!.ersatz === undefined)
+const teilListe: WikiListen = { [ER]: { seite: 'aniSearch', url: 'u', folgen: [{ nr: 1, dt: 'Das Ammenlied-Kapitel, Teil 2' }, { nr: 2, dt: 'Das Kapitel von Jorogumo' }] } }
+const teilErsatz = mitAnisearchErsatz(tmdbListe(2), teilListe)
+pruefe('Ersatz: „Teil 1“ (ein Zeichen neben „Teil 2“, einziger ähnlicher Kern) bekommt nicht die Nummer von „Teil 2“', erMessung(teilErsatz, 'Das Ammenlied-Kapitel, Teil 1').has(ER))
+pruefe('Ersatz: „Teil 2“ wortgleich trifft weiter', !erMessung(teilErsatz, 'Das Ammenlied-Kapitel, Teil 2').has(ER))
+pruefe('Ersatz: Schreibvariante „Kame-Hame-Ha“ gegen „Kame-hame-ha“ gilt', ersatzNummerGilt([{ nr: 75, dt: 'Zweimal Kame-hame-ha' }], 75, 'Zweimal Kame-Hame-Ha'))
+pruefe('Ersatz: „II“ gegen „III“ gilt nicht', !ersatzNummerGilt([{ nr: 3, dt: 'Das Duell II' }], 3, 'Das Duell III'))
+pruefe('Ersatz: Nummer ohne Eintrag gilt nicht', !ersatzNummerGilt([], 3, 'Das Duell'))
+pruefe('Ersatz: aniSearch führt selbst: kein Ersatz bei sich selbst', mitAnisearchErsatz(aniListe, aniListe)[ER]!.ersatz === undefined)
 
 process.exit(verletzt ? 1 : 0)

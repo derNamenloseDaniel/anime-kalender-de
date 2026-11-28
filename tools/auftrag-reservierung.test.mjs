@@ -112,4 +112,17 @@ async function naiverGriff(git) {
   const r = await griff('42', wer('A'), { git: s.git(), jetzt: zeit(0) })
   assert.deepEqual([r.gewonnen, r.grund], [false, 'unlesbar'])
 }
+// Schlägt commit-tree fehl, wird nichts gepusht (leere Quelle im Push wäre ein Löschen).
+{
+  const s = neuerServer()
+  const echt = s.git()
+  let gepusht = 0
+  const git = async (args) => {
+    if (args[0] === 'commit-tree') return { code: 128, out: '' }
+    if (args[0] === 'push') gepusht++
+    return echt(args)
+  }
+  await assert.rejects(griff('42', wer('A'), { git, jetzt: zeit(0) }), /commit-tree fehlgeschlagen/)
+  assert.equal(gepusht, 0)
+}
 console.log('auftrag-reservierung: ok')

@@ -25,6 +25,13 @@ export async function echtesGit(args) {
   }
 }
 
+/** Ausgabe eines Git-Aufrufs; Fehler oder leere Ausgabe werfen, sonst würde ein Fehlertext zur SHA (leere Quelle im Push = Löschen). */
+async function ausgabe(git, args) {
+  const r = await git(args)
+  if (r.code !== 0 || !r.out) throw new Error(`${args[0]} fehlgeschlagen: ${r.out}`)
+  return r.out
+}
+
 export const zweigName = (kennung) => `claude/auftrag-${kennung}`
 
 /** Lesen: { zweig, spitze|null, eintrag|null, status } mit status neu | frei | belegt | abgelaufen | unlesbar. */
@@ -35,8 +42,8 @@ export async function lesen(kennung, { git = echtesGit, jetzt = () => new Date()
   if (!ls.out) return { zweig, spitze: null, eintrag: null, status: 'neu' }
   const hol = await git(['fetch', '-q', 'origin', `refs/heads/${zweig}`])
   if (hol.code !== 0) throw new Error(`fetch fehlgeschlagen: ${hol.out}`)
-  const spitze = (await git(['rev-parse', 'FETCH_HEAD'])).out
-  const nachricht = (await git(['log', '-1', '--format=%B', spitze])).out
+  const spitze = await ausgabe(git, ['rev-parse', 'FETCH_HEAD'])
+  const nachricht = await ausgabe(git, ['log', '-1', '--format=%B', spitze])
   let eintrag = null
   try { eintrag = JSON.parse(nachricht.split('\n')[0]) } catch { /* fremder Commit */ }
   if (!eintrag?.zustand) return { zweig, spitze, eintrag: null, status: 'unlesbar' }
@@ -48,7 +55,7 @@ export async function lesen(kennung, { git = echtesGit, jetzt = () => new Date()
 /** Ein Zustand als Kind der Spitze pushen; gewonnen nur, wenn danach die Remote-Spitze der eigene SHA ist. */
 async function schreibe(stand, eintrag, git) {
   const args = ['commit-tree', LEERER_BAUM, ...(stand.spitze ? ['-p', stand.spitze] : []), '-m', JSON.stringify(eintrag)]
-  const sha = (await git(args)).out
+  const sha = await ausgabe(git, args)
   await git(['push', '-q', 'origin', `${sha}:refs/heads/${stand.zweig}`])
   const nach = await git(['ls-remote', 'origin', `refs/heads/${stand.zweig}`])
   return { gewonnen: nach.out.split(/\s/)[0] === sha, spitze: sha }

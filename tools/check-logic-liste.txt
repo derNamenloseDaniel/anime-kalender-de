@@ -891,6 +891,7 @@ tools/link-check-ende.test.ts
 tools/link-check-zeitbudget.test.ts
 tools/link-faelligkeit.test.ts
 tools/mockup-freigabe-pflicht.mjs
+tools/neuigkeiten-ueberholt.test.tsx
 tools/quarantaene-pruefungen.test.ts
 tools/quellen-gesundheit.test.ts
 tools/quellen-leer.test.ts
@@ -910,4 +911,3 @@ tools/web-push-voll.test.ts
 tools/werkzeug-ohne-test-wache.mjs
 tools/workflow-abbruch-waechter.mjs
 tools/workflow-ohne-pakete.mjs
-tools/neuigkeiten-ueberholt.test.tsx

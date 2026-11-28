@@ -8,7 +8,7 @@
 import { readJson, writeJson, log, warn, sleep } from './lib/util.ts'
 import { todayIso } from '../shared/time.ts'
 import { adresseIstOmu } from '../shared/omu-adresse.ts'
-import { type AkibapassDatei, istAkibapassWeg, robotsErlaubt, spracheAusSeite } from './lib/akibapass-sprache.ts'
+import { type Abruf, type AkibapassDatei, holeAkibapassSeiten, istAkibapassWeg } from './lib/akibapass-sprache.ts'
 
 const UA = 'anime-kalender-de (https://anime-kalender.de; eine Seite je Akibapass-Weg und Monat)'
 const ZIEL = 'data/akibapass-sprache.json'
@@ -35,25 +35,15 @@ async function main(): Promise<void> {
   const adressen = [...new Set(titel.flatMap((t) => (t.watchLinks ?? []).filter((w) => istAkibapassWeg({ ...w, kind: 'stream' })).map((w) => w.url)))].filter((u) => !adresseIstOmu(u))
   const datei = readJson<AkibapassDatei>(ZIEL, { seiten: {} })
   const offen = adressen.filter((u) => veraltet(datei.seiten[u], heute))
-  const robots = new Map<string, string>()
-  const gesperrt = new Set<string>() // Hosts, die 403/429 sagten: nur sie pausieren, die anderen laufen weiter
-  let geholt = 0
-  for (const url of offen) {
-    const { host, pathname } = new URL(url)
-    if (gesperrt.has(host)) continue
-    try {
-      if (!robots.has(host)) robots.set(host, await robotsVon(host))
-      if (!robotsErlaubt(robots.get(host)!, pathname, 'anime-kalender-de')) { warn(`robots.txt sperrt ${url}`); continue }
-      const antwort = await fetch(url, { headers: { 'user-agent': UA } })
-      if (antwort.status === 403 || antwort.status === 429) { warn(`HTTP ${antwort.status} bei ${host}: Host pausiert, Rest im nächsten Lauf`); gesperrt.add(host); continue }
-      if (antwort.status !== 200) { warn(`${url}: HTTP ${antwort.status}`); continue }
-      datei.seiten[url] = { sprache: spracheAusSeite(await antwort.text()), am: heute }
-      geholt++
-    } catch (fehler) {
-      warn(`${url}: ${(fehler as Error).message}`)
-    }
-    await sleep(PAUSE_MS)
+  const abruf: Abruf = {
+    holeRobots: robotsVon,
+    holeSeite: (url) => fetch(url, { headers: { 'user-agent': UA } }),
+    pause: () => sleep(PAUSE_MS),
   }
+  const { seiten, hosts } = await holeAkibapassSeiten(offen, abruf, heute, warn)
+  Object.assign(datei.seiten, seiten)
+  const geholt = Object.keys(seiten).length
+  for (const [host, z] of Object.entries(hosts)) log(`Akibapass ${host}: ${z.geholt} geholt, ${z.gesperrt} gesperrt, ${z.uebersprungen} übersprungen`)
   // Adressen, die der Bestand nicht mehr führt, fallen heraus.
   const aktuell = new Set(adressen)
   datei.seiten = Object.fromEntries(Object.entries(datei.seiten).filter(([u]) => aktuell.has(u)))

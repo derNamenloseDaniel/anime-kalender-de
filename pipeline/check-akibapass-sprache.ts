@@ -3,7 +3,7 @@
  * die Seite sagt „mit deutscher Synchronisation. Sprache: Deutsch / Untertitel: keine“; S2 ist OmU und bleibt es). Läuft in `check:logic`, kein Netz.
  */
 import type { Title } from '../shared/types.ts'
-import { robotsErlaubt, setzeAkibapassSprache, spracheAusSeite } from './lib/akibapass-sprache.ts'
+import { type Abruf, holeAkibapassSeiten, robotsErlaubt, setzeAkibapassSprache, spracheAusSeite } from './lib/akibapass-sprache.ts'
 
 let fehler = 0
 function pruefe(name: string, ok: boolean, ist?: unknown): void {
@@ -54,6 +54,18 @@ pruefe('robots: /admin gesperrt', !robotsErlaubt(ROBOTS, '/admin/x', 'anime-kale
 pruefe('robots: längere Allow-Regel gewinnt', robotsErlaubt(ROBOTS, '/admin/ok/1', 'anime-kalender-de'))
 pruefe('robots: namentlicher Block eines anderen Bots gilt nicht für uns', robotsErlaubt(ROBOTS, '/products/a', 'anime-kalender-de'))
 pruefe('robots: namentlicher Block für uns gilt', !robotsErlaubt('User-agent: anime-kalender-de\nDisallow: /', '/products/a', 'anime-kalender-de'))
+
+const antwort = (status: number, text = '<p>Sprache: Deutsch / Untertitel: keine</p>') => ({ status, text: async () => text })
+const abgerufen: string[] = []
+const abrufA: Abruf = {
+  holeRobots: async () => '',
+  holeSeite: async (u) => { abgerufen.push(u); return antwort(u.includes('shop.example') ? 429 : 200) },
+  pause: async () => {},
+}
+const lauf = await holeAkibapassSeiten(['https://shop.example/a', 'https://shop.example/b', 'https://tv.example/c', 'https://tv.example/d'], abrufA, '2026-11-28', () => {})
+pruefe('429 auf Host A: Host B wird weiter abgerufen', Object.keys(lauf.seiten).join() === 'https://tv.example/c,https://tv.example/d', lauf.seiten)
+pruefe('429 auf Host A: weitere Adressen von A übersprungen, nicht abgerufen', !abgerufen.includes('https://shop.example/b') && lauf.hosts['shop.example'].uebersprungen === 1 && lauf.hosts['shop.example'].gesperrt === 1, lauf.hosts)
+pruefe('Zählung je Host', lauf.hosts['tv.example'].geholt === 2, lauf.hosts)
 
 if (fehler) {
   console.error(`${fehler} Fehler`)

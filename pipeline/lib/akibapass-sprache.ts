@@ -74,3 +74,35 @@ export function setzeAkibapassSprache(titles: Iterable<Title>, datei: AkibapassD
   }
   return n
 }
+
+export type HostZahl = { geholt: number; gesperrt: number; uebersprungen: number }
+export type Abruf = { holeRobots: (host: string) => Promise<string>; holeSeite: (url: string) => Promise<{ status: number; text: () => Promise<string> }>; pause: () => Promise<void> }
+
+/**
+ * Holt die Seiten; 403/429 sperrt nur den Host dieser Adresse, dessen weitere Adressen werden übersprungen, andere Hosts laufen weiter.
+ * Rückgabe: Befunde je Adresse und Zählung je Host.
+ */
+export async function holeAkibapassSeiten(urls: string[], abruf: Abruf, heute: string, warn: (t: string) => void): Promise<{ seiten: AkibapassDatei['seiten']; hosts: Record<string, HostZahl> }> {
+  const seiten: AkibapassDatei['seiten'] = {}
+  const hosts: Record<string, HostZahl> = {}
+  const robots = new Map<string, string>()
+  const gesperrt = new Set<string>()
+  for (const url of urls) {
+    const { host, pathname } = new URL(url)
+    const z = (hosts[host] ??= { geholt: 0, gesperrt: 0, uebersprungen: 0 })
+    if (gesperrt.has(host)) { z.uebersprungen++; continue }
+    try {
+      if (!robots.has(host)) robots.set(host, await abruf.holeRobots(host))
+      if (!robotsErlaubt(robots.get(host)!, pathname, 'anime-kalender-de')) { warn(`robots.txt sperrt ${url}`); z.uebersprungen++; continue }
+      const antwort = await abruf.holeSeite(url)
+      if (antwort.status === 403 || antwort.status === 429) { warn(`HTTP ${antwort.status} bei ${host}: Host pausiert, Rest im nächsten Lauf`); gesperrt.add(host); z.gesperrt++; continue }
+      if (antwort.status !== 200) { warn(`${url}: HTTP ${antwort.status}`); continue }
+      seiten[url] = { sprache: spracheAusSeite(await antwort.text()), am: heute }
+      z.geholt++
+    } catch (fehler) {
+      warn(`${url}: ${(fehler as Error).message}`)
+    }
+    await abruf.pause()
+  }
+  return { seiten, hosts }
+}

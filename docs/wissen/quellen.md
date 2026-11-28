@@ -4607,3 +4607,11 @@ Anlass: Daniel, live `/t/6041/` (JoJo 2012): Crunchyroll „Deutsch“, Prime-Ka
 ## Katalogtitel mit Disc-Termin ohne `anisearch.json`-Eintrag (26.11.2026)
 
 Gezählt am Bestand: 2.924 Titel, 269 ohne Eintrag (155 Katalogtitel ab 10.000.000, 114 AniList-Titel); 248 davon mit Disc/Kauf-Weg. **Ursache:** Katalogtitel stehen per Bauart nie in `anisearch.json` (nur AniList-Schlüssel). Geschlossen seit PR 4854 (`lib/disc-nachlese.ts`, `check-disc-ohne-lesequelle-bestand`): Heute 149 Titel mit frischem oder künftigem Termin, 3 davon ohne Eintrag (11635, 13220, 18543) werden nachgelesen, 0 ohne Lesequelle. Alle 248 haben eine aniSearch-Kennung und eine archivierte Seite.
+
+## Akibapass: Sprache aus der Produktseite (28.11.2026)
+
+Anlass: Daniel, Call of the Night S1 (`www.akibapass.tv/products/call-of-the-night-de-season-1`): Panel „Sprache offen“, die Seite sagt „mit deutscher Synchronisation. Sprache: Deutsch / Untertitel: keine“.
+
+- **Bestand 28.11.2026:** 120 Akibapass-Wege in `watchLinks`, keiner mit `dubRanges`; Adresse: 74 mit `-de-`, 28 mit `omu`, 18 ohne Hinweis (`akibapassshop.de/p/…`). Die Wege kommen aus aniSearch (`03-3-anisearch-und-titel.ts`), nicht aus TMDB.
+- **Ablauf:** `pipeline/fetch-akibapass-sprache.ts` (wöchentlich, nur in Actions) → `data/akibapass-sprache.json`; der Bau (`09-5-weitere-quellen.ts`) setzt über `lib/akibapass-sprache.ts` bei belegtem „Deutsch“ `dubRanges` 1 bis Folgenzahl. OmU-Pfade werden weder geholt noch umgedeutet (`shared/omu-adresse.ts`); der Slug ist nur Vorfilter.
+- **Nicht aus der Cloud prüfbar:** der Agent-Proxy dieser Sitzung lässt `www.akibapass.tv` und `akibapassshop.de` nicht durch (HTTP 403 vom Proxy, nicht von Akibapass). robots.txt beider Hosts und der Aufbau der Seiten sind deshalb **ungelesen**; der Sammler liest robots.txt je Host vor dem ersten Abruf und der Parser arbeitet auf dem sichtbaren Text („Sprache: …“, „mit deutscher Synchronisation“). Erster Lauf: Zeile „Akibapass: N Adressen, … de/omu/offen“ im Log prüfen; steht fast alles auf „offen“, ist die Seite JavaScript-gerendert und der Weg über das Netzwerkprotokoll (VHX/Shopify `.json`) nachzuziehen.

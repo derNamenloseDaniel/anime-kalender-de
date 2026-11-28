@@ -46,7 +46,7 @@ Nicht erfasst (keine Daten im Repo): Crunchyroll führt je Serie nur eine Staffe
 
 ## 3. Ansätze
 
-**Untergrenze (Ansatz 0): nichts am Datensatz, Beschriftung von Hand.** Die 12 Fälle bekommen einen Eintrag in `data/reihen-von-hand.yaml`-artiger Handliste („6.1/6.2 heißen im Panel ‚6‘“). Kein Feld, keine Pipeline. Ergebnis: Panel zeigt Reiter „6“ für beide? — nein: zwei Titel müssen zwei Reiter bleiben, solange jeder Titel seine eigene Kennung, Termine und Folgen hat. Ansatz 0 kann nur die **Beschriftung** ändern („6“ und „6“ gleich beschriftet wäre doppelte Information auf dem Bildschirm, gegen `design-regeln.md`). Er taugt nur als Vergleichswert, nicht als Lösung.
+**Untergrenze (Ansatz 0): nur Beschriftung, kein neues Feld.** Handliste in `data/` nennt je Fall „diese zwei Titel heißen im Panel Staffel 6“; `staffelBeschriftungen` liest sie. Zwei Reiter blieben (je Titel einer), beide „6“ — doppelte Information auf dem Bildschirm (`design-regeln.md` 13). Nur Vergleichswert.
 
 ### Ansatz A — Anzeigefeld `anbieterStaffel` je Titel (Beschriftung, ein Reiter je Anbieter-Staffel)
 
@@ -67,10 +67,39 @@ Gleiches Feld `anbieterStaffel`, aber es ändert nur die **Beschriftung** der be
 
 Neuer Titel 6 mit 38 Folgen; 131942/146722 verschwinden aus dem Bestand. Verletzt „Ein Vorfilter verschiebt, er löscht“, bricht Kalender-Abos (UID), Favoriten, Handbelege (`dub-confirmed.yaml` nutzt `anilistId`), aniSearch-/MAL-Zuordnung (jeder der beiden hat eigene IDs) und die Regel „ein Anime gehört genau einer Kennung“. Verworfen; nur zur Vollständigkeit.
 
-## 4. Gegenentwurf (Agent, nur Ziel bekannt)
+## 4. Gegenentwurf (Agent `Plan`, kannte nur das Ziel; Wortlaut gekürzt, Inhalt vollständig)
 
-_Wird nach Rückkehr des Agenten eingefügt._
+**Einfachster Weg laut Agent:** `staffelQuelle: 6` auf 131942 und 146722 — zeigt „Staffel 6 – Teil 1/2“, also den AniList-Zuschnitt; Ziel verfehlt, nur Zwischenschritt für die Nummer.
+**Vorschlag: „Zuschnitt-Titel“, Gegenstück zum Staffel-Titel.**
+- Handdaten `data/curated/anbieter-zuschnitt.yaml` (`url`, `staffel` = Netflix-seq, `glieder` = AniList-IDs in Reihenfolge); der Bau schlägt Treffer per Summenfolgen vor (12+26=38), bestätigt wird per Eintrag; reine Automatik riskant (Netflix ändert Liste → Zuschnitt verschwindet still).
+- Neue Phase `pipeline/bau/anbieter-zuschnitt.ts` (nach `schliesseWegeAb`, vor `baueMeta`): **neuer Titel mit eigener Kennung** (Raum 7,5–8 Mio., aus kleinster Glied-Kennung abgeleitet), `episodes` = Summe (38), gleiche `franchiseId`, neues Feld `zuschnitt: { glieder: [{id, ab}], staffel, url }`; die Glieder bekommen `zuschnittIn` und sind für Besucher ausgeblendet (`sichtbareTitel` in `shared/titles.ts`), Pipeline/Prüfungen/aniSearch-Absprung sehen sie weiter.
+- Termine wandern mit unveränderter `ev.id` an den Zuschnitt-Titel, Folgennummern um `ab` verschoben (Glied 2: Folge n → 12+n). Reiter „5“ statt „5.1/5.2“; Folgen 38 durchlaufend; ICS: UID gleich, Summary/Folgennummer verschoben; Suche findet den Zuschnitt-Titel, Glieder als Alias; aniSearch-Absprung mit Liste `anisearchIds` („Teil 1“, „Teil 2“); Erweiterungsmeldungen: Folge ≤ 12 → 131942, sonst 146722 (Folge−12), dafür Variante von `ordneStaffelnZu`.
+- Risiken (Agent): Merklisten/Verläufe/alte Links auf ausgeblendete Kennungen (Weiterleitung), `ev.id` exakt gleich, Zuschnitt-Titel und Glieder dürfen nie beide zählen („Staffel 5 von 7“), Netflix-Drift laut melden, `titleStatus` aus beiden Gliedern, Synchro je Glied belegt (nicht für die ganze Staffel behaupten), nur Netflix in der ersten Fassung.
+- Wächter (Agent): `check-anbieter-zuschnitt.ts` (12+26 ↔ 38 ergibt Titel; Gegenprobe 12+25 ergibt keinen und eine gezählte Meldung), Beschriftung „5“ nie „5.1/5.2“, Riegel „vorher = nachher“ (Termine, `ev.id`), ICS (UID gleich), Suche (einmal), Absprung (zwei Ziele), Meldung Folge 20 → 146722 Folge 8, Folge 39 verworfen und gezählt, Mutationsprobe 12/13.
+- Aufgefallen: Der Agent liest `ordneStaffelnZu` (`netflix-staffeln.ts`) so, dass es bei mehr Titeln als Menü-Staffeln aussteigt (JoJo) — von mir nicht nachgeprüft, aber mit meinem Befund vereinbar (Folgenzahl passt auf keinen Einzeltitel).
+
+**Vergleich:** Der Agent erfüllt „intern bleibt 6.1/6.2/6, außen 6“ wörtlich über eine **zusätzliche Kennung**; mein Ansatz A erfüllt es über ein **Anzeigefeld ohne neue Kennung**. Beide sind sich einig: Zusammenlegen (C) ist verworfen, Kalender-UIDs bleiben, Folgenzählung als Spanne (13–38), Netflix-Nummerierung ist ein Zuschnitt, der Bau prüft per Summenfolgen, Abweichung = kein Zuschnitt und gezählte Meldung. Unterschied: Der Zuschnitt-Titel vervielfacht die Risiken (ausgeblendete Kennungen, Weiterleitungen, Suchsynonyme, Status aus zwei Gliedern, Meldungen zurückrechnen) für 12 Kennungen / 31 Titel (1 %). Ein Gewinn gegenüber A bleibt: ein Reiter-Eintrag ist wirklich ein Titel (kein neuer Reiter-Typ).
+**Übernommen vom Gegenentwurf:** Handeintrag je Fall mit Summenvorschlag statt Automatik; Netflix-Nummer ist nicht unsere Nummer (siehe 5, offener Punkt); Riegel „vorher = nachher“; Gegenprobe 12+25; Umbau vor Verhaltensänderung.
 
 ## 5. Empfehlung
 
-_Wird nach dem Gegenentwurf eingefügt._
+**Ansatz A (Anzeigefeld `anbieterStaffel`, keine neue Kennung), Zuschnitt-Titel nur, wenn A an echter Bedienung scheitert.** Grund: Es genügt, die Gruppierung zu *zeigen*; Kennungen, Kalender, ICS, Suche und Favoriten bleiben, wie sie sind (kein Risiko für Abonnenten), und die Klasse ist klein. Den Zuschnitt-Titel kann man später auf A aufsetzen (das Feld ist seine Vorstufe), umgekehrt nicht.
+
+**Offener Punkt (Daniels Entscheidung, Empfehlung steht):** Netflix zählt Stone Ocean als Staffel **5** (Phantom Blood + Battle Tendency = Netflix-Staffel 1), unsere Reihe als **6** (Teil der Reihe). Empfehlung: Besucher sieht die **Reihennummer 6**; vom Anbieter kommen nur die **Grenzen** (welche Teile eine Staffel bilden). Sonst steht dieselbe Staffel in Reihe und Reiter mit zwei Nummern.
+
+### Bau-Schritte (je ein PR, Umbau getrennt von Verhaltensänderung)
+1. **Umbau, ohne Wirkung:** `staffelBeschriftungen`/`zaehleStaffeln` bekommen einen optionalen Eingang `gruppe` je Titel; Ausgabe für alle Titel unverändert (`bau-vergleich.mjs`, `panel-vergleich.mjs`).
+2. **Daten:** `data/curated/anbieter-zuschnitt.yaml` (`url`, `staffel`, `glieder`, Quelle, Datum) mit den 12 Fällen aus Abschnitt 1; neue Bau-Phase `pipeline/bau/anbieter-zuschnitt.ts` (Logik in `pipeline/lib/`) prüft jeden Eintrag gegen `data/anbieter-staffeln.json` (Summe der Glieder = Netflix-Folgenzahl, Position für Position wie `netflix-staffeln.ts`) und setzt `Title.anbieterStaffel = { nr, teil, von, bis }`; Abweichung = Feld fehlt, Zähler + Meldung im Bau (Skill `stille-ausfaelle-verhindern`). Feld nur an den 31 Titeln, nicht in `titles.json` für alle (CLAUDE.md: neues Feld nur, wenn die Mehrheit es braucht → in die Detaildatei/`franchises.json`-Mitglied legen).
+3. **Anzeige:** Reiter „6“ für beide Teile (Klick öffnet den Teil, der offen ist, sonst Teil 1; im Panel Umschalter „Folge 1–12 | 13–38“), Folgenzeile als Spanne (`zaehlSpanne` aus PR 5261), Absprung zeigt beide aniSearch-Einträge (`verweise.ts`).
+4. **Beobachtung:** nach dem ersten Fall, nach etwa fünf Fällen, nach einem Tag, einer Woche (Regel Arbeitsweise).
+Reihenfolge der Fälle: JoJo → Tiger & Bunny, Kengan Ashura, Beastars (je klare Cour-Folge) → Rest. Die 9 Gegenrichtungs-Fälle bleiben beim Staffel-Titel-Weg (eigene Entscheidung, F153).
+
+### Wächter (vorher rot, gegen main)
+- `check-anbieter-zuschnitt.ts` (check:logic): 12+26 ↔ Netflix 38 ⇒ `anbieterStaffel` an beiden; Gegenprobe 12+25 ⇒ keins und gezählte Meldung; Titelzahl und alle `ev.id` vorher = nachher.
+- Beschriftung: Stone Ocean zeigt **ein** Reiter-Label „6“ (nicht „6.1/6.2“); Steel Ball Run bleibt „7.1/7.2–3“, solange Netflix nur 1+1 kennt (PR 5261 darf nicht kippen).
+- Bestandswächter `check-anbieter-zuschnitt-bestand.ts` (check:bestand): jeder Eintrag der Yaml gegen die aktuelle `anbieter-staffeln.json` (Drift ⇒ rot mit Titel); jeder Fall der Klasse aus Abschnitt 1 hat Eintrag oder begründete Ausnahme (Zählung 12 heute, nur sinkend).
+- Panel: Fake-Bühnen-Test über den echten Stone-Ocean-Fall, beide Themen (Screenshot), Tippfläche des Umschalters.
+- Mutationsprobe (`pruef-technik`) für Summengrenze 12/13 und Positionsvergleich.
+
+## 6. Grenzen dieses Berichts
+Nur Netflix gezählt (Crunchyroll/Prime liefern keine Folgen je Staffel); Netflix-Seiten nicht abgerufen, `anbieter-staffeln.json` stammt aus Erweiterungsmeldungen (Stand 25.09.–12.10.2026); Klassenzahl 12 ist eine Obergrenze für „sicher“ (Pokémon Concierge hat nur 1 Netflix-Staffel mit 8 Folgen, 2×4 bei uns — Folgen je Cour ungeprüft).

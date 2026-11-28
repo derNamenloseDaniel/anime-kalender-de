@@ -7,8 +7,8 @@ import type { Translate } from '../../lib/i18n.tsx'
 import type { Dispatch, SetStateAction } from 'react'
 import { Chip } from '../ui.tsx'
 import { HerkunftZeile, zeigtHerkunft } from './herkunft-zeile.tsx'
-import { EigeneQuellenZeile, ReiheHinweis } from './handlung-quelle.tsx'
-import { type plotVon } from './plot.ts'
+import { HandlungFuss, ReiheHinweis, textIstUnser } from './handlung-quelle.tsx'
+import { handlungAnzeige, type plotVon } from './plot.ts'
 
 export function EckdatenAbschnitt({ title, t, genresOffen, onFilterBy, tGenre, setGenresOffen }: {
   title: Title
@@ -45,18 +45,16 @@ export function EckdatenAbschnitt({ title, t, genresOffen, onFilterBy, tGenre, s
   )
 }
 
-/** Anbietername wie auf der Quelle selbst: aus der Adresse („anisearch.de") wird „aniSearch". */
-const quelleLabel = (name: string): string => (name === 'anisearch.de' ? 'aniSearch' : name === 'anilist.co' ? 'AniList' : name === 'themoviedb.org' ? 'TMDB' : name)
-
 export function HandlungAbschnitt({ plot, t, plotOffen, setPlotOffen }: {
   plot: ReturnType<typeof plotVon>['plot']
   t: Translate
   plotOffen: boolean
   setPlotOffen: Dispatch<SetStateAction<boolean>>
 }) {
+  const anzeige = plot ? handlungAnzeige(plot, plotOffen, PLOT_PREVIEW) : undefined
   return (
     <>
-      {plot && (
+      {plot && anzeige && (
         <PanelKarte symbol={<BuchZeichen />} titel={t('detail.plot')} akzent="akzent">
           {/*
             **Der Hinweis steht über dem Text, nicht darunter.**
@@ -79,38 +77,13 @@ export function HandlungAbschnitt({ plot, t, plotOffen, setPlotOffen }: {
             einordnen will, sieht den Anfang und bleibt im Überblick.
           */}
           <p className="whitespace-pre-line text-t3 text-ak-text/85">
-            {plotOffen || plot.text.length <= PLOT_PREVIEW
-              ? plot.text
-              : `${plot.text.slice(0, PLOT_PREVIEW).trimEnd()} …`}
+            {anzeige.text}
           </p>
-          {plot.fallback && (
+          {plot.fallback && anzeige.volltext && (
             <p className="mt-1.5 text-t5 text-slate-400">{t('detail.plotOnlyEnglish')}</p>
           )}
           {/* Die Quelle steht immer sichtbar am Fuß der Karte, auch eingeklappt (aniSearch verlangt Nennung und Link bei übernommenen Texten, 05.10.2026). */}
-          <div className="mt-2 flex items-center justify-between gap-2">
-            {plot.text.length > PLOT_PREVIEW ? (
-              <button
-                type="button"
-                onClick={() => setPlotOffen((v) => !v)}
-                aria-expanded={plotOffen}
-                className="min-h-11 cursor-pointer rounded-full border border-ak-rand bg-ak-flaeche-2 px-4 text-t3 font-semibold text-ak-text transition hover:border-ak-leise"
-              >
-                {t(plotOffen ? 'detail.plotLess' : 'detail.plotMore')}
-              </button>
-            ) : (
-              <span />
-            )}
-            {plot.eigen ? (
-              <EigeneQuellenZeile eigen={plot.eigen} t={t} />
-            ) : plot.quelle ? (
-              <span className="text-t4 text-slate-600 dark:text-slate-400">
-                {t('detail.plotQuelle')}{' '}
-                <a href={plot.quelle.url} target="_blank" rel="noopener noreferrer" className="-my-3 inline-flex min-h-11 items-center underline decoration-slate-400/50 underline-offset-2 hover:text-ak-text">
-                  {quelleLabel(plot.quelle.name)} ↗
-                </a>
-              </span>
-            ) : null}
-          </div>
+          <HandlungFuss plot={plot} aufklappbar={anzeige.aufklappbar} unser={textIstUnser(plot, !anzeige.volltext)} t={t} plotOffen={plotOffen} setPlotOffen={setPlotOffen} />
         </PanelKarte>
       )}
     </>

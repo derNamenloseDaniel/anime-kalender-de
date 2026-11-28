@@ -59,7 +59,12 @@ pruefe('eine Staffel allein: keine Reiter', reihenReiterVon(st2, teile, 'Pokémo
 pruefe('Reiter-Kurzform: Teilstaffel 3.1 und 3.2, Staffel 3, Spanne 1–5, Teil ohne Staffelnummer', [reiterKurzform('Staffel 3 - Teil 1'), reiterKurzform('Staffel 3 - Teil 2'), reiterKurzform('Staffel 3'), reiterKurzform('Staffel 1–5'), reiterKurzform('Teil 1'), reiterKurzform('Staffel 12 - Teil 10')].join('|') === '3.1|3.2|3|1–5|Teil 1|12.10')
 const teilGlied = (id: number, name: string, jpYear: number) => ({ id, name, format: 'TV', jpYear, episodes: 12, jpStatus: 'FINISHED' }) as FranchiseMember
 const teilStaffeln = [teilGlied(900901, 'Reihe', 2020), teilGlied(900902, 'Reihe Staffel 2', 2021), teilGlied(900903, 'Reihe Staffel 3 Teil 1', 2022), teilGlied(900904, 'Reihe Staffel 3 Teil 2', 2023)]
-pruefe('Hauptserie mit Teilstaffeln: Reiter 1, 2, 3.1, 3.2, der Name bleibt lang', JSON.stringify(reihenReiterVon({ id: 900901 } as Title, teilStaffeln, 'Reihe', [], HEUTE).map((r) => [r.label, r.name])) === '[["1","Reihe"],["2","Reihe Staffel 2"],["3.1","Reihe Staffel 3 Teil 1"],["3.2","Reihe Staffel 3 Teil 2"]]')
+pruefe('Hauptserie mit Teilstaffeln: Reiter 1, 2, 3.1, 3.2, der Name ist Reihe · Teil', JSON.stringify(reihenReiterVon({ id: 900901 } as Title, teilStaffeln, 'Reihe', [], HEUTE).map((r) => [r.label, r.name])) === '[["1","Reihe · Staffel 1"],["2","Reihe · Staffel 2"],["3.1","Reihe · Staffel 3 - Teil 1"],["3.2","Reihe · Staffel 3 - Teil 2"]]')
+/* Reihenmitglied ohne Titeleintrag (Yaiba 2, #/datenbank?t=17067, 28.11.2026): der Reiter-Tooltip nennt wie der Kopf Reihe · Teil, nicht den Rohnamen. */
+const ohneEintragReihe = [teilGlied(920001, 'Yaiba: Samurai Legend', 2025), teilGlied(920002, 'Shin Samurai-den YAIBA 2', 2026)]
+const ohneEintragTitel = [{ id: 920001, titleDe: 'Yaiba: Samurai Legend', format: 'TV' } as Title]
+const ohneEintragReiter = reihenReiterVon(ohneEintragTitel[0]!, ohneEintragReihe, 'Yaiba: Samurai Legend', ohneEintragTitel, HEUTE)
+pruefe('Reihenmitglied ohne Titeleintrag: Reiter-Name ist Reihe · Teil, nicht der Rohname', ohneEintragReiter.map((r) => r.name).join('|') === 'Yaiba: Samurai Legend|Yaiba: Samurai Legend · Staffel 2', ohneEintragReiter.map((r) => r.name))
 pruefe('Reiter-Kurzform: nur am Ende, mit Zusatz bleibt es', reiterKurzform('Staffel 3 - Teil 1 Zusatz') === '3 - Teil 1 Zusatz')
 /* JoJo Steel Ball Run (Daniel 27.11.2026): „… - Phase 1“ (1 Folge, ONA) und „… - Phase 2-3“ (11) sind eine Staffel in zwei Teilen: Reiter 7.1 und 7.2–3 (hier 6.x,
    weil die Kulisse nur fünf Staffeln davor führt); Stone Ocean bleibt 5.1/5.2, und ein kurzes ONA mit anderem Namen („Prolog“) bleibt draußen. */

@@ -55,7 +55,10 @@ async function schreibe(stand, eintrag, git) {
 }
 
 const neuerEintrag = (zustand, { besitzer, sitzung, fristMin }, jetzt) => ({
-  besitzer, sitzung, nonce: randomBytes(6).toString('hex'), zustand,
+  besitzer,
+  sitzung,
+  nonce: randomBytes(6).toString('hex'),
+  zustand,
   bis: new Date(jetzt().getTime() + fristMin * 60_000).toISOString(),
 })
 

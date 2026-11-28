@@ -4498,5 +4498,170 @@
   "wolfs-rain-ova-peppermint-classics-5-blu-ray-2017-07-28": {},
   "techno-police-das-gesetz-der-zukunft-dvd-2017-08-31": {
     "tmdbId": 76427
-  }
+  },
+  "exception-netflix-2022": {
+    "tmdbId": 127325,
+    "fsk": 12,
+    "justwatchUrl": "https://www.themoviedb.org/tv/127325-exception/watch?locale=DE",
+    "offers": [
+      {
+        "name": "Netflix",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Netflix Standard with Ads",
+        "kind": "flatrate"
+      }
+    ],
+    "providers": [
+      "netflix"
+    ],
+    "inhaltAm": "2026-11-28"
+  },
+  "shaman-king-2001-part1-primevideo": {
+    "tmdbId": 40143,
+    "fsk": 12,
+    "justwatchUrl": "https://www.themoviedb.org/tv/40143-shiyamankingu/watch?locale=DE",
+    "offers": [
+      {
+        "name": "Amazon Prime Video",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Amazon Prime Video with Ads",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Aniverse Amazon Channel",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Amazon Video",
+        "kind": "buy"
+      }
+    ],
+    "providers": [
+      "primevideo"
+    ],
+    "inhaltAm": "2026-11-28"
+  },
+  "shaman-king-2001-part2-primevideo": {
+    "tmdbId": 40143,
+    "fsk": 12,
+    "justwatchUrl": "https://www.themoviedb.org/tv/40143-shiyamankingu/watch?locale=DE",
+    "offers": [
+      {
+        "name": "Amazon Prime Video",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Amazon Prime Video with Ads",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Aniverse Amazon Channel",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Amazon Video",
+        "kind": "buy"
+      }
+    ],
+    "providers": [
+      "primevideo"
+    ],
+    "inhaltAm": "2026-11-28"
+  },
+  "shaman-king-2001-part3-primevideo": {
+    "tmdbId": 40143,
+    "fsk": 12,
+    "justwatchUrl": "https://www.themoviedb.org/tv/40143-shiyamankingu/watch?locale=DE",
+    "offers": [
+      {
+        "name": "Amazon Prime Video",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Amazon Prime Video with Ads",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Aniverse Amazon Channel",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Amazon Video",
+        "kind": "buy"
+      }
+    ],
+    "providers": [
+      "primevideo"
+    ],
+    "inhaltAm": "2026-11-28"
+  },
+  "shaman-king-2001-staffel4-primevideo": {
+    "tmdbId": 40143,
+    "fsk": 12,
+    "justwatchUrl": "https://www.themoviedb.org/tv/40143-shiyamankingu/watch?locale=DE",
+    "offers": [
+      {
+        "name": "Amazon Prime Video",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Amazon Prime Video with Ads",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Aniverse Amazon Channel",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Amazon Video",
+        "kind": "buy"
+      }
+    ],
+    "providers": [
+      "primevideo"
+    ],
+    "inhaltAm": "2026-11-28"
+  },
+  "devil-may-cry-s2-netflix": {},
+  "sinbad-mahou-no-lamp-trilogie-uncut-2019-06-14": {
+    "tmdbId": 1545854,
+    "justwatchUrl": "https://www.themoviedb.org/movie/1545854-shindobatdo-mo-fa-noranputo-dong-ku-dao/watch?locale=DE",
+    "offers": [
+      {
+        "name": "Amazon Prime Video",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Amazon Prime Video with Ads",
+        "kind": "flatrate"
+      }
+    ],
+    "providers": [
+      "primevideo"
+    ],
+    "inhaltAm": "2026-11-28"
+  },
+  "sinbad-mahiru-no-yoru-trilogie-uncut-2019-06-14": {
+    "tmdbId": 459290,
+    "justwatchUrl": "https://www.themoviedb.org/movie/459290-shindobatdo-zhen-zhou-no-ye-tofushigino-men/watch?locale=DE",
+    "offers": [
+      {
+        "name": "Amazon Prime Video",
+        "kind": "flatrate"
+      },
+      {
+        "name": "Amazon Prime Video with Ads",
+        "kind": "flatrate"
+      }
+    ],
+    "providers": [
+      "primevideo"
+    ],
+    "inhaltAm": "2026-11-28"
+  },
+  "to-love-ru-darkness-2nd-specials-komplettset-2024-03-08": {}
 }

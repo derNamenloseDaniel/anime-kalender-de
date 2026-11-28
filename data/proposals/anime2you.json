@@ -1,12 +1,13 @@
 {
-  "scrapedAt": "2026-11-28T00:01:39.007Z",
+  "scrapedAt": "2026-11-28T04:14:12.090Z",
   "verworfen": {
-    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 9,
+    "streaming: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 41,
     "disc: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 4,
     "kino: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 12,
-    "schon in einem Rubrik-Feed gelesen": 11,
-    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 12,
-    "Sprachhinweis älter als 45 Tage": 6
+    "schon in einem Rubrik-Feed gelesen": 35,
+    "Gesamt-Feed ohne Deutschland-Bezug (Japan, Figuren, Trailer)": 49,
+    "allgemein: kein künftiger Tag, keine Pause, keine Sendezeit, keine Sprachaussage": 4,
+    "Sprachhinweis älter als 45 Tage": 7
   },
   "proposals": [
     {
@@ -35,7 +36,29 @@
       "dates": [],
       "dub": "unklar",
       "pause": "verschoben",
-      "alreadyCurated": false
+      "alreadyCurated": false,
+      "verschiebungen": [
+        {
+          "titel": "Bocchi the Rock! – Vol. 1 (Limited Edition mit Sammelschuber)",
+          "alt": "2026-12-04",
+          "neu": "2026-12-18"
+        },
+        {
+          "titel": "My Love Story with Yamada-kun at Lv999 – Vol. 2 (Limited Edition)",
+          "alt": "2026-12-18",
+          "neu": "2027-02-05"
+        },
+        {
+          "titel": "Sakamoto Days – Vol. 1 (Limited Edition mit Sammelschuber)",
+          "alt": "2026-12-04",
+          "neu": "2026-12-11"
+        },
+        {
+          "titel": "Die Königin der 1000 Jahre (Komplettbox)",
+          "alt": "2026-12-17",
+          "neu": "2027-01-28"
+        }
+      ]
     },
     {
       "articleTitle": "Nur noch für kurze Zeit: Über 800 Anime-Produkte im AKIBA PASS SHOP reduziert",
@@ -79,7 +102,34 @@
       ],
       "dates": [],
       "dub": "nein",
-      "alreadyCurated": false
+      "alreadyCurated": false,
+      "sammel": [
+        {
+          "titel": "Detektiv Conan",
+          "zusatz": "Episode 484 bis 486",
+          "deutsch": true,
+          "woechentlich": false,
+          "stream": [
+            "Crunchyroll",
+            "Prime Video"
+          ],
+          "datum": "2026-11-27",
+          "datumGeschaetzt": true
+        },
+        {
+          "titel": "Fafner: The Beyond",
+          "deutsch": false,
+          "woechentlich": false,
+          "stream": [
+            "Crunchyroll",
+            "Prime Video"
+          ],
+          "folgen": 12,
+          "datum": "2026-11-27",
+          "datumGeschaetzt": true
+        }
+      ],
+      "sammelGelesen": "2026-11-28"
     },
     {
       "articleTitle": "Anime-Neuheiten im Dezember 2026 auf DVD und Blu-ray",
@@ -96,7 +146,298 @@
         }
       ],
       "dub": "unklar",
-      "alreadyCurated": false
+      "alreadyCurated": false,
+      "discZeilen": [
+        {
+          "datum": "2026-12-03",
+          "titel": "Hallo Kurt!",
+          "label": "pidax",
+          "format": "serie",
+          "medium": "dvd",
+          "edition": "gesamtausgabe"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "A Gatherer’s Adventure in Isekai",
+          "label": "crunchyroll",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "gesamtausgabe"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "Black Butler: Emerald Witch Arc – Vol. 2",
+          "label": "crunchyroll",
+          "format": "serie",
+          "medium": "dvd blu-ray",
+          "edition": ""
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "Die Tagebücher der Apothekerin (Staffel 2) – Vol. 1",
+          "label": "crunchyroll",
+          "format": "serie",
+          "medium": "dvd blu-ray",
+          "edition": ""
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "Fate/Grand Order – Film 1 bis 3",
+          "label": "peppermint-anime",
+          "format": "film",
+          "medium": "blu-ray",
+          "edition": "gesamtausgabe limited-edition"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "Jujutsu Kaisen – Staffel 1",
+          "label": "crunchyroll",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "gesamtausgabe limited-edition steelbook"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "Kaiju No. 8 – Staffel 1",
+          "label": "crunchyroll",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "gesamtausgabe limited-edition steelbook"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "Loner Life in Another World – Vol. 1",
+          "label": "polyband-anime",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "limited-edition sammelschuber"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "Magia Record – Staffel 1 bis 3",
+          "label": "peppermint-anime",
+          "format": "serie",
+          "medium": "dvd blu-ray",
+          "edition": "gesamtausgabe"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "Miss Kobayashi’s Dragon Maid – Staffel 1",
+          "label": "crunchyroll",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "gesamtausgabe limited-edition steelbook"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "Miss Kobayashi’s Dragon Maid – Staffel 2",
+          "label": "crunchyroll",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "gesamtausgabe limited-edition steelbook"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "My Dress-Up Darling – Staffel 1",
+          "label": "crunchyroll",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "gesamtausgabe limited-edition steelbook"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "Pass the Monster Meat, Milady!",
+          "label": "crunchyroll",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "gesamtausgabe"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "Saekano – Staffel 1 & 2 + Film",
+          "label": "peppermint-anime",
+          "format": "",
+          "medium": "dvd blu-ray",
+          "edition": "gesamtausgabe"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "Suzume",
+          "label": "crunchyroll",
+          "format": "film",
+          "medium": "4k-blu-ray",
+          "edition": "limited-edition steelbook"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "The 100 Girlfriends (Staffel 2) – Vol. 1",
+          "label": "crunchyroll",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "limited-edition sammelschuber"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "The Familiar of Zero – Staffel 1",
+          "label": "animoon-publishing",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "gesamtausgabe"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "The Promised Neverland – Staffel 1 & 2",
+          "label": "peppermint-anime",
+          "format": "serie",
+          "medium": "dvd blu-ray",
+          "edition": "gesamtausgabe"
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "YAIBA: Samurai Legend – Vol. 1",
+          "label": "peppermint-anime",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": ""
+        },
+        {
+          "datum": "2026-12-04",
+          "titel": "YAIBA: Samurai Legend – Vol. 1 (Exklusiv)",
+          "label": "peppermint-anime",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "limited-edition sammelschuber"
+        },
+        {
+          "datum": "2026-12-10",
+          "titel": "Bikini Warriors",
+          "label": "ksm-anime",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "gesamtausgabe"
+        },
+        {
+          "datum": "2026-12-10",
+          "titel": "Kubo Won’t Let Me Be Invisible",
+          "label": "ksm-anime",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "gesamtausgabe"
+        },
+        {
+          "datum": "2026-12-10",
+          "titel": "Peter Pan",
+          "label": "ksm-anime",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "gesamtausgabe"
+        },
+        {
+          "datum": "2026-12-11",
+          "titel": "Sakamoto Days – Vol. 1",
+          "label": "animoon-publishing",
+          "format": "serie",
+          "medium": "dvd blu-ray",
+          "edition": "limited-edition sammelschuber"
+        },
+        {
+          "datum": "2026-12-11",
+          "titel": "Shin Chan – Vol. 16",
+          "label": "polyband-anime",
+          "format": "serie",
+          "medium": "dvd",
+          "edition": ""
+        },
+        {
+          "datum": "2026-12-18",
+          "titel": "A New Dawn",
+          "label": "polyband-anime",
+          "format": "film",
+          "medium": "blu-ray",
+          "edition": ""
+        },
+        {
+          "datum": "2026-12-18",
+          "titel": "Bitte zieh dich an, Takamine! – Vol. 1",
+          "label": "animoon-publishing",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "limited-edition sammelschuber"
+        },
+        {
+          "datum": "2026-12-18",
+          "titel": "Bocchi the Rock! – Vol. 1",
+          "label": "animoon-publishing",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "limited-edition sammelschuber"
+        },
+        {
+          "datum": "2026-12-18",
+          "titel": "Detektiv Conan – Vol. 1 (30th Anniversary Edition)",
+          "label": "crunchyroll",
+          "format": "serie",
+          "medium": "dvd blu-ray",
+          "edition": "limited-edition"
+        },
+        {
+          "datum": "2026-12-18",
+          "titel": "Fate/stay night: Heaven’s Feel – Film 1 bis 3",
+          "label": "peppermint-anime",
+          "format": "film",
+          "medium": "blu-ray",
+          "edition": "gesamtausgabe"
+        },
+        {
+          "datum": "2026-12-18",
+          "titel": "Inazuma Eleven – Staffel 1",
+          "label": "animoon-publishing",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "gesamtausgabe"
+        },
+        {
+          "datum": "2026-12-18",
+          "titel": "Pokémon – Staffel 1 & 2",
+          "label": "polyband-anime",
+          "format": "serie",
+          "medium": "dvd",
+          "edition": "gesamtausgabe limited-edition"
+        },
+        {
+          "datum": "2026-12-18",
+          "titel": "Pokémon – Staffel 3 bis 5",
+          "label": "polyband-anime",
+          "format": "serie",
+          "medium": "dvd",
+          "edition": "gesamtausgabe limited-edition"
+        },
+        {
+          "datum": "2026-12-18",
+          "titel": "Sailor Moon – Staffel 3",
+          "label": "crunchyroll",
+          "format": "serie",
+          "medium": "dvd blu-ray",
+          "edition": "gesamtausgabe limited-edition steelbook"
+        },
+        {
+          "datum": "2026-12-18",
+          "titel": "Spice and Wolf: Merchant Meets the Wise Wolf – Vol. 2",
+          "label": "animoon-publishing",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "limited-edition"
+        },
+        {
+          "datum": "2026-12-18",
+          "titel": "Virgin Road – Vol. 2",
+          "label": "animoon-publishing",
+          "format": "serie",
+          "medium": "blu-ray",
+          "edition": "limited-edition"
+        }
+      ],
+      "discGelesen": "2026-11-28"
     },
     {
       "articleTitle": "Fast 500 Produkte: Große 3-für-2-Aktion bei Anime Planet endet bald",
@@ -128,7 +469,77 @@
         }
       ],
       "dub": "unklar",
-      "alreadyCurated": false
+      "alreadyCurated": false,
+      "sammel": [
+        {
+          "titel": "Rascal Does Not Dream of Bunny Girl Senpai",
+          "datum": "2026-12-05",
+          "deutsch": true,
+          "woechentlich": false,
+          "stream": [
+            "ADN"
+          ],
+          "folgen": 13
+        },
+        {
+          "titel": "Angel Beats!",
+          "datum": "2026-12-10",
+          "deutsch": true,
+          "woechentlich": false,
+          "stream": [
+            "ADN"
+          ],
+          "folgen": 13
+        },
+        {
+          "titel": "Eromanga Sensei",
+          "datum": "2026-12-15",
+          "deutsch": true,
+          "woechentlich": false,
+          "stream": [
+            "ADN"
+          ],
+          "folgen": 12
+        },
+        {
+          "titel": "Durarara!!",
+          "datum": "2026-12-21",
+          "deutsch": true,
+          "woechentlich": false,
+          "stream": [
+            "ADN"
+          ]
+        },
+        {
+          "titel": "Durarara!! x2",
+          "datum": "2026-12-21",
+          "deutsch": false,
+          "woechentlich": false,
+          "stream": [
+            "ADN"
+          ]
+        },
+        {
+          "titel": "Reborn!",
+          "zusatz": "Episode 154 bis 203",
+          "datum": "2026-12-28",
+          "deutsch": false,
+          "woechentlich": false,
+          "stream": [
+            "ADN"
+          ]
+        },
+        {
+          "titel": "Reborn! Hier kommt eine Klassenfahrt im Vongola-Stil!",
+          "datum": "2026-12-28",
+          "deutsch": false,
+          "woechentlich": false,
+          "stream": [
+            "ADN"
+          ]
+        }
+      ],
+      "sammelGelesen": "2026-11-28"
     },
     {
       "articleTitle": "ProSieben MAXX zeigt 13 Anime-Filme zu Weihnachten 2026",
@@ -193,7 +604,33 @@
       ],
       "dates": [],
       "dub": "ja",
-      "alreadyCurated": false
+      "alreadyCurated": false,
+      "sammel": [
+        {
+          "titel": "Call of the Night",
+          "zusatz": "Staffel 1",
+          "deutsch": true,
+          "woechentlich": false,
+          "stream": [
+            "Netflix"
+          ],
+          "folgen": 13,
+          "datum": "2026-11-26",
+          "datumGeschaetzt": true
+        },
+        {
+          "titel": "Fool Night",
+          "deutsch": true,
+          "woechentlich": false,
+          "stream": [
+            "Netflix"
+          ],
+          "folgen": 12,
+          "datum": "2026-11-26",
+          "datumGeschaetzt": true
+        }
+      ],
+      "sammelGelesen": "2026-11-28"
     },
     {
       "articleTitle": "Disney+ nimmt zwei Anime-Neuzugänge ins Programm",
@@ -1636,7 +2073,7 @@
           "datumGeschaetzt": true
         }
       ],
-      "sammelGelesen": "2026-11-25"
+      "sammelGelesen": "2026-11-28"
     },
     {
       "articleTitle": "Neun Disc-Neuheiten ab sofort im AKIBA PASS SHOP vorbestellbar",
@@ -1745,7 +2182,7 @@
           "folgen": 25
         }
       ],
-      "sammelGelesen": "2026-11-25"
+      "sammelGelesen": "2026-11-28"
     },
     {
       "articleTitle": "Große Anime-Rabattaktion mit Serien und Filmen bei Amazon gestartet",
@@ -2151,7 +2588,7 @@
           ]
         }
       ],
-      "sammelGelesen": "2026-11-25"
+      "sammelGelesen": "2026-11-28"
     },
     {
       "articleTitle": "Erster Trailer zum Netflix-Anime »Fool Night« + Visual",

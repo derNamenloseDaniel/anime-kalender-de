@@ -3,7 +3,7 @@
     "2026-08": 55,
     "2026-09": 68,
     "2026-10": 99,
-    "2026-11": 91
+    "2026-11": 95
   },
   "gesehen": {
     "26341901:netflix": {
@@ -150,7 +150,7 @@
       "imdbId": "tt9096108",
       "tmdbId": "tv/105218",
       "dienst": "prime",
-      "am": "2026-10-06",
+      "am": "2026-11-27",
       "deutsch": false,
       "deutschBeiDienst": false
     },
@@ -1580,7 +1580,7 @@
       "imdbId": "tt16993822",
       "tmdbId": "tv/313311",
       "dienst": "prime",
-      "am": "2026-09-07",
+      "am": "2026-11-27",
       "deutsch": false,
       "deutschBeiDienst": false
     },
@@ -2770,7 +2770,7 @@
       "imdbId": "tt0457226",
       "tmdbId": "tv/63361",
       "dienst": "prime",
-      "am": "2026-11-21",
+      "am": "2026-11-27",
       "deutsch": false,
       "deutschBeiDienst": false
     },
@@ -2927,8 +2927,9 @@
       "imdbId": "tt11165808",
       "tmdbId": "tv/205475",
       "dienst": "prime",
-      "am": "2026-09-01",
-      "deutsch": false
+      "am": "2026-11-27",
+      "deutsch": true,
+      "deutschBeiDienst": false
     },
     "removed:39057:prime": {
       "art": "removed",
@@ -2981,7 +2982,7 @@
       "imdbId": "tt23858980",
       "tmdbId": "tv/214875",
       "dienst": "prime",
-      "am": "2026-11-21",
+      "am": "2026-11-27",
       "deutsch": true,
       "deutschBeiDienst": false
     },
@@ -3270,7 +3271,7 @@
       "imdbId": "tt23901812",
       "tmdbId": "tv/216769",
       "dienst": "prime",
-      "am": "2026-11-18",
+      "am": "2026-11-27",
       "deutsch": false,
       "deutschBeiDienst": false
     },
@@ -3281,7 +3282,7 @@
       "imdbId": "tt14115938",
       "tmdbId": "tv/119495",
       "dienst": "prime",
-      "am": "2026-11-21",
+      "am": "2026-11-27",
       "deutsch": true,
       "deutschBeiDienst": false
     },
@@ -3355,8 +3356,9 @@
       "imdbId": "tt29685022",
       "tmdbId": "tv/271493",
       "dienst": "prime",
-      "am": "2026-09-04",
-      "deutsch": false
+      "am": "2026-11-27",
+      "deutsch": true,
+      "deutschBeiDienst": false
     },
     "removed:24671574:prime": {
       "art": "removed",
@@ -3615,7 +3617,7 @@
       "imdbId": "tt19883272",
       "tmdbId": "tv/279739",
       "dienst": "prime",
-      "am": "2026-11-21",
+      "am": "2026-11-27",
       "deutsch": false,
       "deutschBeiDienst": false
     },
@@ -5466,7 +5468,7 @@
       "imdbId": "tt0969666",
       "tmdbId": "tv/4645",
       "dienst": "prime",
-      "am": "2026-09-26",
+      "am": "2026-11-27",
       "deutsch": false,
       "deutschBeiDienst": false
     },
@@ -7073,7 +7075,7 @@
       "imdbId": "tt32592756",
       "tmdbId": "tv/255492",
       "dienst": "prime",
-      "am": "2026-11-18",
+      "am": "2026-11-27",
       "deutsch": false,
       "deutschBeiDienst": false
     },
@@ -7421,8 +7423,9 @@
       "imdbId": "tt9386834",
       "tmdbId": "tv/261845",
       "dienst": "prime",
-      "am": "2026-10-11",
-      "deutsch": false
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
     },
     "removed:541:prime": {
       "art": "removed",
@@ -7898,7 +7901,7 @@
       "imdbId": "tt28306899",
       "tmdbId": "tv/230505",
       "dienst": "prime",
-      "am": "2026-10-31",
+      "am": "2026-11-28",
       "deutsch": false,
       "deutschBeiDienst": false
     },
@@ -7973,7 +7976,7 @@
       "imdbId": "tt5622316",
       "tmdbId": "tv/85077",
       "dienst": "prime",
-      "am": "2026-11-21",
+      "am": "2026-11-27",
       "deutsch": true,
       "deutschBeiDienst": false
     },
@@ -9171,8 +9174,9 @@
       "imdbId": "tt11915950",
       "tmdbId": "tv/105031",
       "dienst": "prime",
-      "am": "2026-10-19",
-      "deutsch": false
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
     },
     "removed:11733079:prime": {
       "art": "removed",
@@ -11158,7 +11162,7 @@
       "imdbId": "tt10443362",
       "tmdbId": "tv/88044",
       "dienst": "prime",
-      "am": "2026-11-21",
+      "am": "2026-11-27",
       "deutsch": false,
       "deutschBeiDienst": false
     },
@@ -12830,7 +12834,7 @@
       "imdbId": "tt27999634",
       "tmdbId": "tv/251286",
       "dienst": "prime",
-      "am": "2026-11-18",
+      "am": "2026-11-27",
       "deutsch": false,
       "deutschBeiDienst": false
     },
@@ -12907,7 +12911,7 @@
       "imdbId": "tt2622982",
       "tmdbId": "tv/45997",
       "dienst": "prime",
-      "am": "2026-11-18",
+      "am": "2026-11-27",
       "deutsch": false,
       "deutschBeiDienst": false
     },
@@ -15009,7 +15013,7 @@
       "tmdbId": "tv/60855",
       "dienst": "netflix",
       "am": "2026-11-25",
-      "deutsch": false,
+      "deutsch": true,
       "deutschBeiDienst": false
     },
     "new:14626029:netflix": {
@@ -15814,7 +15818,447 @@
       "am": "2026-11-26",
       "deutsch": false,
       "deutschBeiDienst": false
+    },
+    "new:89890:prime": {
+      "art": "new",
+      "titel": "Big Brother",
+      "originalTitel": "Big Brother",
+      "imdbId": "tt13784818",
+      "tmdbId": "tv/114885",
+      "dienst": "prime",
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "new:14410507:prime": {
+      "art": "new",
+      "titel": "Dare to Defy",
+      "originalTitel": "Dare to Defy",
+      "imdbId": "tt34966931",
+      "tmdbId": "tv/279463",
+      "dienst": "prime",
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "new:15415123:prime": {
+      "art": "new",
+      "titel": "Mission Unknown",
+      "originalTitel": "Mission Unknown",
+      "imdbId": "tt35651208",
+      "tmdbId": "tv/283451",
+      "dienst": "prime",
+      "am": "2026-11-27",
+      "deutsch": true,
+      "deutschBeiDienst": true
+    },
+    "new:52919:prime": {
+      "art": "new",
+      "titel": "Monster",
+      "originalTitel": "몬스터",
+      "imdbId": "tt5569480",
+      "tmdbId": "tv/65806",
+      "dienst": "prime",
+      "am": "2026-11-27",
+      "deutsch": true,
+      "deutschBeiDienst": true
+    },
+    "new:4820894:prime": {
+      "art": "new",
+      "titel": "Spellbound",
+      "originalTitel": "Spellbound",
+      "imdbId": "tt21105638",
+      "tmdbId": "tv/59369",
+      "dienst": "prime",
+      "am": "2026-11-27",
+      "deutsch": true,
+      "deutschBeiDienst": true
+    },
+    "new:2436747:prime": {
+      "art": "new",
+      "titel": "American Manhunt: The Boston Marathon Bombing",
+      "originalTitel": "American Manhunt: The Boston Marathon Bombing",
+      "imdbId": "tt27142031",
+      "tmdbId": "tv/222314",
+      "dienst": "prime",
+      "am": "2026-11-27",
+      "deutsch": true,
+      "deutschBeiDienst": false
+    },
+    "removed:12725475:prime": {
+      "art": "removed",
+      "titel": "Spice Up Our Love",
+      "originalTitel": "사장님의 식단표",
+      "imdbId": "tt33143834",
+      "tmdbId": "tv/273307",
+      "dienst": "prime",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:8954520:prime": {
+      "art": "removed",
+      "titel": "STHLM Blackout",
+      "originalTitel": "STHLM Blackout",
+      "imdbId": "tt29424368",
+      "tmdbId": "tv/253360",
+      "dienst": "prime",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:10271283:disney": {
+      "art": "removed",
+      "titel": "Seoul Busters",
+      "originalTitel": "강매강",
+      "imdbId": "tt32482847",
+      "tmdbId": "tv/239005",
+      "dienst": "disney",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:2700769:disney": {
+      "art": "removed",
+      "titel": "Hailey's On It!",
+      "originalTitel": "Hailey's On It!",
+      "imdbId": "tt16152776",
+      "tmdbId": "tv/138992",
+      "dienst": "disney",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:26002:disney": {
+      "art": "removed",
+      "titel": "Apocalypse: War of Worlds (1945-1991)",
+      "originalTitel": "Apocalypse, La Guerre des mondes (1945-1991)",
+      "imdbId": "tt8589702",
+      "tmdbId": "tv/95224",
+      "dienst": "disney",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:39689:disney": {
+      "art": "removed",
+      "titel": "Cesar Millan: Better Human, Better Dog",
+      "originalTitel": "Cesar Millan: Better Human, Better Dog",
+      "imdbId": "tt15083978",
+      "tmdbId": "tv/118512",
+      "dienst": "disney",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:10027:netflix": {
+      "art": "removed",
+      "titel": "OATS Studios",
+      "originalTitel": "OATS Studios",
+      "imdbId": "tt16351432",
+      "tmdbId": "tv/158325",
+      "dienst": "netflix",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:11901:prime": {
+      "art": "removed",
+      "titel": "Die Hart",
+      "originalTitel": "Die Hart",
+      "imdbId": "tt10726424",
+      "tmdbId": "tv/99072",
+      "dienst": "prime",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:6133156:prime": {
+      "art": "removed",
+      "titel": "LOL: Last One Laughing Norway",
+      "originalTitel": "LOL: Den som ler sist - Norge",
+      "imdbId": "tt30421302",
+      "tmdbId": "tv/241584",
+      "dienst": "prime",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:1131199:disney": {
+      "art": "removed",
+      "titel": "Still Missing Morgan",
+      "originalTitel": "Still Missing Morgan",
+      "imdbId": "tt11595808",
+      "tmdbId": "tv/220155",
+      "dienst": "disney",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:19843427:prime": {
+      "art": "removed",
+      "titel": "Deadly Science",
+      "originalTitel": "Deadly Science",
+      "imdbId": "tt27481278",
+      "tmdbId": "tv/278494",
+      "dienst": "prime",
+      "am": "2026-11-28",
+      "deutsch": true,
+      "deutschBeiDienst": false
+    },
+    "removed:79333:netflix": {
+      "art": "removed",
+      "titel": "Australia's Ocean Odyssey: A journey down the East Australian Current",
+      "originalTitel": "Australia's Ocean Odyssey: A journey down the East Australian Current",
+      "imdbId": "tt12465772",
+      "tmdbId": "tv/105006",
+      "dienst": "netflix",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:8597:disney": {
+      "art": "removed",
+      "titel": "Big Mouth",
+      "originalTitel": "빅마우스",
+      "imdbId": "tt21195490",
+      "tmdbId": "tv/155226",
+      "dienst": "disney",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:75149:prime": {
+      "art": "removed",
+      "titel": "Colombia - Wild and Free",
+      "originalTitel": "Colombia - Wild and Free",
+      "imdbId": "tt20223712",
+      "tmdbId": "tv/201858",
+      "dienst": "prime",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:47638:netflix": {
+      "art": "removed",
+      "titel": "Only for Love",
+      "originalTitel": "Só Se For Por Amor",
+      "imdbId": "tt15847542",
+      "tmdbId": "tv/197526",
+      "dienst": "netflix",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:17584235:prime": {
+      "art": "removed",
+      "titel": "Par de ideotas",
+      "originalTitel": "Par de ideotas",
+      "imdbId": "tt36041464",
+      "tmdbId": "tv/284416",
+      "dienst": "prime",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:19840455:prime": {
+      "art": "removed",
+      "titel": "In the Name of the Father",
+      "originalTitel": "Be-Shem Ha-Av",
+      "imdbId": "tt27687806",
+      "tmdbId": "tv/283234",
+      "dienst": "prime",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:10246943:netflix": {
+      "art": "removed",
+      "titel": "Destination Wild: India",
+      "originalTitel": "Destination Wild: India",
+      "imdbId": "tt33065992",
+      "tmdbId": "tv/260898",
+      "dienst": "netflix",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:6416386:prime": {
+      "art": "removed",
+      "titel": "Undercover: Caught on Tape",
+      "originalTitel": "Undercover: Caught on Tape",
+      "imdbId": "tt17524192",
+      "tmdbId": "tv/243357",
+      "dienst": "prime",
+      "am": "2026-11-28",
+      "deutsch": true,
+      "deutschBeiDienst": false
+    },
+    "removed:41919:prime": {
+      "art": "removed",
+      "titel": "Wishenpoof!",
+      "originalTitel": "Wishenpoof!",
+      "imdbId": "tt3496824",
+      "tmdbId": "tv/70082",
+      "dienst": "prime",
+      "am": "2026-11-28",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:31837:prime": {
+      "art": "removed",
+      "titel": "LEGO Jurassic World: The Secret Exhibit",
+      "originalTitel": "LEGO Jurassic World: The Secret Exhibit",
+      "imdbId": "tt9322614",
+      "tmdbId": "tv/99127",
+      "dienst": "prime",
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:6075811:netflix": {
+      "art": "removed",
+      "titel": "#90’s - A Middle Class Biopic",
+      "originalTitel": "#90’s - A Middle Class Biopic",
+      "imdbId": "tt29764006",
+      "tmdbId": "tv/242983",
+      "dienst": "netflix",
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:44074:disney": {
+      "art": "removed",
+      "titel": "Kommissarin Lucas",
+      "originalTitel": "Kommissarin Lucas",
+      "imdbId": "tt0907688",
+      "tmdbId": "tv/40627",
+      "dienst": "disney",
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:1696751:disney": {
+      "art": "removed",
+      "titel": "Restaurants at the End of the World",
+      "originalTitel": "Restaurants at the End of the World",
+      "imdbId": "tt26215854",
+      "tmdbId": "tv/202139",
+      "dienst": "disney",
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:20048401:prime": {
+      "art": "removed",
+      "titel": "Battle Disc",
+      "originalTitel": "激战奇轮",
+      "imdbId": "tt22403206",
+      "tmdbId": "tv/211230",
+      "dienst": "prime",
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:33570:prime": {
+      "art": "removed",
+      "titel": "The One That Got Away",
+      "originalTitel": "The One That Got Away",
+      "imdbId": "tt19895748",
+      "tmdbId": "tv/203756",
+      "dienst": "prime",
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:3721368:disney": {
+      "art": "removed",
+      "titel": "The Superfantastic Story of Balão",
+      "originalTitel": "A Superfantástica História do Balão",
+      "imdbId": "tt18046722",
+      "tmdbId": "tv/206419",
+      "dienst": "disney",
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:10264708:disney": {
+      "art": "removed",
+      "titel": "The Tyrant",
+      "originalTitel": "폭군",
+      "imdbId": "tt26009468",
+      "tmdbId": "tv/246748",
+      "dienst": "disney",
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:91062:prime": {
+      "art": "removed",
+      "titel": "The VAR Room",
+      "originalTitel": "The VAR Room",
+      "imdbId": "tt14942374",
+      "tmdbId": "tv/136436",
+      "dienst": "prime",
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:16697194:disney": {
+      "art": "removed",
+      "titel": "Welcome to the Family",
+      "originalTitel": "Bienvenidos a la familia",
+      "imdbId": "tt30057076",
+      "tmdbId": "tv/285042",
+      "dienst": "disney",
+      "am": "2026-11-27",
+      "deutsch": true,
+      "deutschBeiDienst": false
+    },
+    "removed:38631:disney": {
+      "art": "removed",
+      "titel": "Shadow Detective",
+      "originalTitel": "형사록",
+      "imdbId": "tt23032868",
+      "tmdbId": "tv/157161",
+      "dienst": "disney",
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:25477:prime": {
+      "art": "removed",
+      "titel": "House of Frankenstein",
+      "originalTitel": "House of Frankenstein",
+      "imdbId": "tt0127378",
+      "tmdbId": "tv/48938",
+      "dienst": "prime",
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:2484893:prime": {
+      "art": "removed",
+      "titel": "Yu-Gi-Oh! 5D's",
+      "originalTitel": "遊☆戯☆王5D's",
+      "imdbId": "tt1196094",
+      "tmdbId": "tv/20695",
+      "dienst": "prime",
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
+    },
+    "removed:9308918:prime": {
+      "art": "removed",
+      "titel": "My Deer Friend Nokotan",
+      "originalTitel": "しかのこのこのここしたんたん",
+      "imdbId": "tt32332970",
+      "tmdbId": "tv/248866",
+      "dienst": "prime",
+      "am": "2026-11-27",
+      "deutsch": false,
+      "deutschBeiDienst": false
     }
   },
-  "fetchedAt": "2026-11-27T04:10:32.660Z"
+  "fetchedAt": "2026-11-28T04:10:11.615Z"
 }

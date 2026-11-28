@@ -630,6 +630,7 @@ export const TEXTE_SPAET = {
   'detail.linkBuy': 'kaufen oder leihen',
   'detail.sharedUrl': '{count} Einträge',
   'detail.staffelNummer': 'Staffel {n}',
+  'detail.teilDerStaffel': 'Teil der Staffel',
   'detail.genres': 'Genres',
   'detail.reiheKuenftig': 'noch nicht erschienen',
   'detail.faktFsk': 'Altersfreigabe',

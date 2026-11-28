@@ -1,4 +1,6 @@
+import { useContext } from 'react'
 import { type ReleaseEvent } from '@shared/types.ts'
+import { ReihenReiterKontext } from './reihen-reiter.tsx'
 import { istAusgeblieben } from '@shared/logic.ts'
 import { KastenPillen, KastenWegeHinweis } from './antwort-kasten-teile.tsx'
 import { type AntwortKastenProps } from './antwort-kasten-props.ts'
@@ -41,7 +43,8 @@ export function AntwortKasten({
   releases = [],
 }: AntwortKastenProps) {
   const z = useKastenZustand({ antwort, title, t, stream, disc, pillenGruppen, terminPillen, discZuerst })
-  const { neben, gedaempft, haupt, nebenTitel, fakten, anteil, zaehl } = kastenKopfVon({ antwort, title, today, T: z.T, releases, ohneSprachbeleg, folgenZahl: z.folgenZahl, staffeln: z.staffeln })
+  const anbieterSpanne = useContext(ReihenReiterKontext)?.anbieterSpanne
+  const { neben, gedaempft, haupt, nebenTitel, fakten, anteil, zaehl } = kastenKopfVon({ antwort, title, today, T: z.T, releases, ohneSprachbeleg, folgenZahl: z.folgenZahl, staffeln: z.staffeln, anbieterSpanne })
 
   return (
     /* Höhe und Farbe der Hülle: `kastenKlassen` (Daniel, 03.09.2026: Höhe des Kastens soll nicht springen). */

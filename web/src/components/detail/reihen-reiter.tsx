@@ -6,6 +6,7 @@ import type { AntwortKastenProps } from './antwort-kasten-props.ts'
 import { reihenLageMitGrund, type ReihenReiter } from './reihen-reiter-liste.ts'
 import { ReiterPfeil, rolleUm, usePfeilLage } from './staffel-pfeile.tsx'
 import { useReiterBlase } from './reiter-blase.tsx'
+import { TeilUmschalter } from './reihen-teil-umschalter.tsx'
 import { Akzentstrich, LAGE_WORT, LageMarke, LEISTE, LEISTE_HUELLE, naechsterReiter, reiterKlassen, reiterTitel, zeigeGewaehlten } from './staffel-reiter.tsx'
 import { useLang } from '../../lib/i18n.tsx'
 
@@ -16,6 +17,8 @@ export interface ReihenReiterDaten {
   reiter: ReihenReiter[]
   /** Derselbe Weg wie ein Klick in der Reihenliste (`useReihenWechsel`). */
   wechsleZu: (id: number) => void
+  /** Folgenbereich des geöffneten Titels in der Zählung des Anbieters, wenn er nicht bei Folge 1 beginnt (`anbieterSpanne`). */
+  anbieterSpanne?: { von: number; bis: number }
 }
 
 /** Hinter dem Namen im `aria-label`: Der gestrichelte Rand sagt es nur dem Auge. */
@@ -118,6 +121,7 @@ export function ReihenReiterAmKasten({ eigenschaften, kasten }: { eigenschaften:
       <ReihenReiterZeile reiter={reiter} aktiv={title.id} lagen={lagen} farbe={farbe} kennung={kennung} beiWahl={quelle.wechsleZu} />
       <div role="tabpanel" data-kasten id={`${kennung}-kasten`} aria-labelledby={`${kennung}-reiter-${title.id}`}>
         {kasten}
+        <TeilUmschalter teile={reiter.find((r) => r.id === title.id)?.teile ?? []} aktiv={title.id} beiWahl={quelle.wechsleZu} />
       </div>
     </div>
   )

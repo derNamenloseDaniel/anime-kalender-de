@@ -1,4 +1,5 @@
 import { useContext } from 'react'
+import { titelAlsReiter } from './anbieter-staffel.ts'
 import { ReihenKarte } from './reihen-karte.tsx'
 import { reihenInhalt, reihenOrdnung, type ReihenListeProps } from './reihen-inhalt.tsx'
 import { ReihenReiterKontext } from './reihen-reiter.tsx'
@@ -7,7 +8,7 @@ import { gezeigteGruppen, gezeigteZahl, istGrosseReihe } from './reihen-uebersic
 
 export function ReihenListe(eingang: ReihenListeProps) {
   /* Was als Reiter am Antwortkasten steht, fehlt hier (F157, Daniel 24.11.2026: „dafür die aus der reihe entfernen“). */
-  const props = { ...eingang, ohne: new Set(useContext(ReihenReiterKontext)?.reiter.map((r) => r.id)) }
+  const props = { ...eingang, ohne: titelAlsReiter(useContext(ReihenReiterKontext)?.reiter ?? []) }
   const { reihenTeile, t, reihenName, title, wechselt } = props
   if (reihenTeile.length < 2) return null
   /* Große Reihen (eine Gruppe über 12 Teile) als Übersicht mit eingeklappten Gruppen, alle anderen als Spur (F148, 20.11.2026). */

@@ -19,6 +19,17 @@ export interface Verweis {
   hinweis: string
 }
 
+/**
+ * Absprünge zu den aniSearch-Einträgen der anderen Teile einer Staffel, die der Anbieter als eine führt (Stone Ocean: Teil 1 und Teil 2 sind zwei
+ * aniSearch-Seiten). Nur mit Kennung, immer Direktlink; ohne Wertung, die gehört dem geöffneten Titel.
+ */
+export function weitereAnisearchVerweise(teile: { titel: Pick<Title, 'anisearchId'> | undefined; teil: number }[]): Verweis[] {
+  return teile
+    .filter((t) => t.titel?.anisearchId)
+    .sort((a, b) => a.teil - b.teil)
+    .map((t) => ({ name: `aniSearch Teil ${t.teil}`, ziel: `https://www.anisearch.de/anime/${t.titel!.anisearchId}`, hinweis: `Teil ${t.teil} bei aniSearch ansehen` }))
+}
+
 /** `asZiel`: die kanonische aniSearch-Adresse mit Slug, wo die Beschreibung sie schon trägt (Panel, `deSource`). */
 export function verweiseFuer(title: Title, asZiel?: string): Verweis[] {
   const raus: Verweis[] = []

@@ -4,6 +4,8 @@
  */
 const ADRESSE = 'http://ak.test/#/woche'
 const KARTE = '[data-hover-zeile]'
+/* Feste Uhr (ein Freitag): an Wochenenden liegt keine Karte über dem Feld, die Messung hing am Wochentag (28.11.2026). */
+const UHR = new Date('2026-11-27T10:00:00+01:00')
 
 /** `m`: { vorher, nachher, panel, karte } = offene Filterfelder vor und nach dem Klick, offene Panels danach, ob eine Karte außerhalb des Feldes lag. */
 export function klickDanebenAbweichungen(wo, m) {
@@ -17,6 +19,7 @@ export function klickDanebenAbweichungen(wo, m) {
 
 async function messeKlickDaneben(browser, antworte) {
   const seite = await browser.newPage({ viewport: { width: 1366, height: 900 } })
+  await seite.clock.install({ time: UHR })
   await seite.route('**/*', antworte)
   await seite.goto('about:blank')
   await seite.goto(ADRESSE, { waitUntil: 'networkidle' })

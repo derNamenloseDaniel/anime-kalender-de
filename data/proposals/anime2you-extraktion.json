@@ -2451,6 +2451,22 @@
     "1077624": {
       "am": "2026-11-27",
       "vorschlaege": 7
+    },
+    "1077663": {
+      "am": "2026-11-28",
+      "vorschlaege": 0
+    },
+    "1077668": {
+      "am": "2026-11-28",
+      "vorschlaege": 0
+    },
+    "1077690": {
+      "am": "2026-11-28",
+      "vorschlaege": 0
+    },
+    "1077696": {
+      "am": "2026-11-28",
+      "vorschlaege": 1
     }
   },
   "vorschlaege": [
@@ -18771,6 +18787,30 @@
       "quelle": "https://www.anime2you.de/news/1077600/prosieben-maxx-weihnachten-2026-filme/",
       "veroeffentlicht": "2026-11-27",
       "gelesenAm": "2026-11-27"
+    },
+    {
+      "titel": "Medaka Kuroiwa is Impervious to My Charms",
+      "zitat": "Auf dem X-Account der Anime-Adaption von »Medaka Kuroiwa is Impervious to My Charms« wurde heute verkündet, dass die zweite Staffel am 5. Januar 2027 startet.",
+      "art": "start",
+      "sprache": "unklar",
+      "plattform": "crunchyroll",
+      "datum": "2027-01-05",
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Dienstag",
+      "warnungen": [
+        "anbieter „Crunchyroll“ steht nur im Artikeltext, nicht im Zitat – gegenlesen",
+        "plattform „crunchyroll“ steht nur im Artikeltext, nicht im Zitat – gegenlesen"
+      ],
+      "artikelId": "1077696",
+      "artikel": "Termin der zweiten »Medaka Kuroiwa«-Staffel steht fest + Visual",
+      "quelle": "https://www.anime2you.de/news/1077696/medaka-kuroiwa-staffel-2-termin/",
+      "veroeffentlicht": "2026-11-28",
+      "gelesenAm": "2026-11-28"
     }
   ]
 }

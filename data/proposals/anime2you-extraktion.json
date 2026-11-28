@@ -2432,6 +2432,15 @@
       "am": "2026-11-27",
       "vorschlaege": 2
     },
+    "1077157": {
+      "am": "2026-11-28",
+      "vorschlaege": 2
+    },
+    "1077238": {
+      "am": "2026-11-28",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
+    },
     "1077302": {
       "am": "2026-11-27",
       "vorschlaege": 0
@@ -2439,6 +2448,11 @@
     "1077491": {
       "am": "2026-11-27",
       "vorschlaege": 6
+    },
+    "1077540": {
+      "am": "2026-11-28",
+      "vorschlaege": 0,
+      "uebersprungen": "kein Deutschland-Bezug"
     },
     "1077542": {
       "am": "2026-11-27",
@@ -2467,6 +2481,18 @@
     "1077696": {
       "am": "2026-11-28",
       "vorschlaege": 1
+    },
+    "1077713": {
+      "am": "2026-11-28",
+      "vorschlaege": 0
+    },
+    "1077715": {
+      "am": "2026-11-28",
+      "vorschlaege": 1
+    },
+    "1077831": {
+      "am": "2026-11-28",
+      "vorschlaege": 0
     }
   },
   "vorschlaege": [
@@ -18809,6 +18835,69 @@
       "artikelId": "1077696",
       "artikel": "Termin der zweiten »Medaka Kuroiwa«-Staffel steht fest + Visual",
       "quelle": "https://www.anime2you.de/news/1077696/medaka-kuroiwa-staffel-2-termin/",
+      "veroeffentlicht": "2026-11-28",
+      "gelesenAm": "2026-11-28"
+    },
+    {
+      "titel": "The Eminence in Shadow: Lost Echoes",
+      "zitat": "peppermint anime bringt den Film hierzulande im Laufe des nächsten Jahres auf die große Leinwand. Ein Termin steht noch aus.",
+      "art": "ankuendigung",
+      "sprache": "unklar",
+      "plattform": "kino",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": "peppermint anime",
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1077715",
+      "artikel": "Start des »The Eminence in Shadow«-Films steht fest + Trailer",
+      "quelle": "https://www.anime2you.de/news/1077715/start-des-the-eminence-in-shadow-films/",
+      "veroeffentlicht": "2026-11-28",
+      "gelesenAm": "2026-11-28"
+    },
+    {
+      "titel": "The Apothecary Diaries",
+      "zitat": "Hierzulande läuft der zwölfteilige erste Teil der dritten Staffel seit dem 2. Oktober 2026 jeden Freitag bei Crunchyroll im Simulcast.",
+      "art": "start",
+      "sprache": "unklar",
+      "plattform": "crunchyroll",
+      "datum": "2026-10-02",
+      "uhrzeit": null,
+      "anbieter": "Crunchyroll",
+      "sender": null,
+      "wochentage": "jeden Freitag",
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": "Freitag",
+      "warnungen": [],
+      "artikelId": "1077157",
+      "artikel": "Dritte »The Apothecary Diaries«-Staffel dominiert Netflix-Charts in Japan",
+      "quelle": "https://www.anime2you.de/news/1077157/apothecary-diaries-staffel-3-netflix-charts-japan/",
+      "veroeffentlicht": "2026-11-28",
+      "gelesenAm": "2026-11-28"
+    },
+    {
+      "titel": "The Apothecary Diaries",
+      "zitat": "Ein Film startet am 11. Dezember 2026 in den japanischen Kinos und soll zu einem späteren Zeitpunkt auch in die deutschen Lichtspielhäuser kommen.",
+      "art": "ankuendigung",
+      "sprache": "unklar",
+      "plattform": "kino",
+      "datum": null,
+      "uhrzeit": null,
+      "anbieter": null,
+      "sender": null,
+      "wochentage": null,
+      "folgen": null,
+      "unsicher": null,
+      "wochentag": null,
+      "warnungen": [],
+      "artikelId": "1077157",
+      "artikel": "Dritte »The Apothecary Diaries«-Staffel dominiert Netflix-Charts in Japan",
+      "quelle": "https://www.anime2you.de/news/1077157/apothecary-diaries-staffel-3-netflix-charts-japan/",
       "veroeffentlicht": "2026-11-28",
       "gelesenAm": "2026-11-28"
     }

@@ -12,7 +12,7 @@ const FUNKTION = 'schreibeZusatzdateien'
 const aufruf = (n: ts.Node | undefined, name: string): n is ts.CallExpression =>
   n !== undefined && ts.isCallExpression(n) && ts.isIdentifier(n.expression) && n.expression.text === name
 
-/** Alle Abweichungen von `writeJson(`${OUT}/franchises.json`, markiereEigeneWerke(markiereRemakes(reihen, <Titel>), mitStaffelTiteln(<Handlisten>, <Titel>)))`. */
+/** Alle Abweichungen von `writeJson(`${OUT}/franchises.json`, markiereAnbieterStaffeln(markiereEigeneWerke(markiereRemakes(reihen, <Titel>), mitStaffelTiteln(<Handlisten>, <Titel>)), titles.values()))`. */
 export function verdrahtungsFehler(quelltext: string): string[] {
   const datei = ts.createSourceFile('x.ts', quelltext, ts.ScriptTarget.Latest, true)
   const rumpf = datei.statements.find((s): s is ts.FunctionDeclaration => ts.isFunctionDeclaration(s) && s.name?.text === FUNKTION)?.body
@@ -25,9 +25,12 @@ export function verdrahtungsFehler(quelltext: string): string[] {
   besuche(rumpf)
   if (schreiber.length !== 1) return [`franchises.json muss genau einmal geschrieben werden (gefunden: ${schreiber.length})`]
   const fehler: string[] = []
-  // Der Anbieter-Zuschnitt markiert nur Glieder und darf außen herum stehen; geprüft wird, was er umschließt.
+  // Der Anbieter-Zuschnitt (Stone Ocean Teil 1/2) steht außen herum; ohne ihn fehlt `anbieterStaffel` still.
   const aussen = schreiber[0]!.arguments[1]
-  const eigene = aufruf(aussen, 'markiereAnbieterStaffeln') ? aussen.arguments[0] : aussen
+  if (!aufruf(aussen, 'markiereAnbieterStaffeln') || aussen.arguments.length !== 2 || aussen.arguments[1]?.getText(datei) !== 'titles.values()') {
+    return ['franchises.json muss aus markiereAnbieterStaffeln(<Reihen>, titles.values()) kommen']
+  }
+  const eigene = aussen.arguments[0]
   if (!aufruf(eigene, 'markiereEigeneWerke') || eigene.arguments.length !== 2 || !aufruf(eigene.arguments[1], 'mitStaffelTiteln')) return ['franchises.json muss aus markiereEigeneWerke(<Reihen>, mitStaffelTiteln(…)) kommen']
   const remakes = eigene.arguments[0]
   if (!aufruf(remakes, 'markiereRemakes')) return ['markiereEigeneWerke muss die Reihen aus markiereRemakes(reihen, <Titel>) bekommen']
@@ -63,6 +66,9 @@ const abweichungen: [string, string][] = [
   ['Staffel-Titel nicht als eigene Werke', quelle.replace(', mitStaffelTiteln(ladeAlleEigenenWerke(), titles.values())', '')],
   ['Aufruf mit drittem Argument', quelle.replace(AUFRUF, 'markiereRemakes(reihen, fuerReihen, {})')],
   ['Aufruf außerhalb der Schreibzeile', quelle.replace(AUFRUF, 'reihen').replace('  writeJson(`${OUT}/franchises.json`', `  ${AUFRUF}\n  writeJson(\`\${OUT}/franchises.json\``)],
+  ['Anbieter-Zuschnitt fehlt', quelle.replace('markiereAnbieterStaffeln(markiereEigeneWerke(', 'markiereEigeneWerke(').replace('titles.values())), titles.values()))', 'titles.values())))')],
+  ['Anbieter-Zuschnitt um falschen Inhalt', quelle.replace('markiereAnbieterStaffeln(markiereEigeneWerke(', 'markiereAnbieterStaffeln(markiereRemakes(reihen, fuerReihen) || markiereEigeneWerke(')],
+  ['Anbieter-Zuschnitt ohne Titel', quelle.replace('titles.values())), titles.values()))', 'titles.values())), []))')],
   ['zweites Schreiben ohne Markierung', quelle.replace('  writeJson(`${OUT}/franchises.json`', '  writeJson(`${OUT}/franchises.json`, reihen)\n  writeJson(`${OUT}/franchises.json`')],
 ]
 pruefe('Jede Abweichung ändert den Quelltext wirklich', abweichungen.every(([, text]) => text !== quelle))

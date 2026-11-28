@@ -2,7 +2,7 @@ import { expandEvents, fruehesterTermin, releaseStatus, titleStatus, type LageMi
 import { anzeigeName, hauptstaffeln, staffelBeschriftungen, staffelStaende } from '@shared/titles.ts'
 import type { FranchiseMember, Release, Title } from '@shared/types.ts'
 import { ohneDeutscheSynchro } from './reihen-teil.ts'
-import { kopfTextVon } from './reihen-namen.ts'
+import { kopfNameVon, kopfTextVon, reihenNameVon } from './reihen-namen.ts'
 import { staffelKurz } from './reihen-regeln.ts'
 
 /**
@@ -39,14 +39,19 @@ function ausHauptstaffeln(teile: FranchiseMember[], reihe: FranchiseMember[], re
   const haupt = hauptstaffeln(teile)
   /* Der Tooltip nennt den Namen, den der Kopf des Reiter-Titels zeigt, nicht den Rohnamen der Reihe (Yaiba 2: „Shin Samurai-den YAIBA 2“). */
   const titleById = new Map(titel.map((t) => [t.id, t]))
-  const kopfText = (m: FranchiseMember) => {
-    const t = titleById.get(m.id)
-    return t ? kopfTextVon(t, reihe, teile, { titleById }) : m.name
-  }
   const stand = staffelStaende(haupt, reihenName)
   const text = staffelBeschriftungen(haupt, reihenName)
   const nummer = (id: number) => stand.get(id)?.staffel ?? 0
   const beschriftung = (id: number) => text.get(id) ?? (stand.has(id) ? staffelKurz(stand.get(id)!) : undefined)
+  /* Ein Reihenmitglied ohne Titeleintrag (Yaiba 2, 28.11.2026) hat keinen Namen zum Abziehen: Reihenname · Beschriftung wie im Kopf. */
+  const kopfText = (m: FranchiseMember) => {
+    const t = titleById.get(m.id)
+    if (t) return kopfTextVon(t, reihe, teile, { titleById })
+    const roh = { id: m.id, titleDe: m.name, format: m.format } as Title
+    const kopf = kopfNameVon(roh, reihe, reihenNameVon(roh, reihe, { titleById }))
+    const teil = beschriftung(m.id)
+    return teil && teil !== kopf ? `${kopf} · ${teil}` : kopf
+  }
   return haupt
     .filter((m) => beschriftung(m.id) !== undefined)
     .sort((a, b) => nummer(a.id) - nummer(b.id) || a.id - b.id)

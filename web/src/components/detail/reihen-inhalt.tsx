@@ -17,7 +17,6 @@ export type ReihenListeProps = {
   reihenName: string
   title: Title
   favorites: Set<number>
-  wechselt: boolean
   wechsleZu: (id: number) => void
   reihenSchluessel: number
   reiheSuche: { reihe: number; text: string; }
@@ -106,7 +105,7 @@ export function reihenOrdnung(reihenTeile: FranchiseMember[], reihenName: string
 export type Ordnung = ReturnType<typeof reihenOrdnung>
 
 /** Ein Teil als Cover-Karte der Spur; Spur und Übersicht großer Reihen bauen sie hier, damit beide gleich groß sind. */
-export function reihenKarte(m: FranchiseMember, o: Ordnung, p: Pick<ReihenListeProps, 't' | 'reihenName' | 'title' | 'favorites' | 'wechselt' | 'wechsleZu'>) {
+export function reihenKarte(m: FranchiseMember, o: Ordnung, p: Pick<ReihenListeProps, 't' | 'reihenName' | 'title' | 'favorites' | 'wechsleZu'>) {
   const offen = o.kuenftig(m)
   return (
     <ReihenCover
@@ -120,17 +119,16 @@ export function reihenKarte(m: FranchiseMember, o: Ordnung, p: Pick<ReihenListeP
       unterschied={o.unterschied.get(m.id)}
       namen={teilNamen(m, p.reihenName, o.istHauptstaffel(m), o.staffelLabel.get(m.id))}
       angaben={angabenZeile(m, offen, p.t)}
-      gesperrt={p.wechselt}
       onWaehlen={p.wechsleZu}
     />
   )
 }
 
 /** Der Inhalt der Reihen-Karte:Suche, Schalter und die Gruppen mit ihren Teilen. */
-export function reihenInhalt({ reihenTeile, t, reihenName, title, favorites, wechselt, wechsleZu, reihenSchluessel, reiheSuche, setReiheSuche, ohne = new Set() }: ReihenListeProps) {
+export function reihenInhalt({ reihenTeile, t, reihenName, title, favorites, wechsleZu, reihenSchluessel, reiheSuche, setReiheSuche, ohne = new Set() }: ReihenListeProps) {
   const o = reihenOrdnung(reihenTeile, reihenName, t, ohne)
   const { gruppen } = o
-  const karte = (m: FranchiseMember) => reihenKarte(m, o, { t, reihenName, title, favorites, wechselt, wechsleZu })
+  const karte = (m: FranchiseMember) => reihenKarte(m, o, { t, reihenName, title, favorites, wechsleZu })
 
   const lang = reihenTeile.length >= 15
   const suchText = reiheSuche.reihe === reihenSchluessel ? reiheSuche.text.trim() : ''

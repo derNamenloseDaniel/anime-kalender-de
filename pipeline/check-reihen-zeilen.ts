@@ -43,7 +43,6 @@ const html = renderToStaticMarkup(
     reihenName: 'Yaiba',
     title: { id: 910001 } as Title,
     favorites: new Set<number>(),
-    wechselt: false,
     wechsleZu: () => {},
     reihenSchluessel: 1,
     reiheSuche: { reihe: 1, text: '' },

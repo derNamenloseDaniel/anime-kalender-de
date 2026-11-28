@@ -87,7 +87,6 @@ export function PanelKoerper(p: PanelKoerperProps) {
             reihenName={p.reihenName}
             title={title}
             favorites={favorites}
-            wechselt={p.wechsel.wechselt}
             wechsleZu={p.wechsel.wechsleZu}
             reihenSchluessel={p.reihe.reihenSchluessel}
             reiheSuche={p.reihe.reiheSuche}

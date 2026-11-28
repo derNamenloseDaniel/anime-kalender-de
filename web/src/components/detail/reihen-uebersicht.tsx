@@ -79,7 +79,6 @@ export function ReihenUebersicht(p: UebersichtProps) {
           )
         })}
       </div>
-      {p.wechselt && <span className="text-t5 text-ak-sehr-leise">{t('detail.seasonLoading')}</span>}
     </PanelKarte>
   )
 }

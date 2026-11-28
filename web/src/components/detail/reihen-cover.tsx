@@ -55,7 +55,6 @@ export type CoverProps = {
   unterschied?: string
   namen: { voll: string; rest: string; kurz: string }
   angaben: string
-  gesperrt: boolean
   onWaehlen: (id: number) => void
 }
 
@@ -118,7 +117,6 @@ export function ReihenCover(p: CoverProps) {
       role="tab"
       data-reihe-teil={m.id}
       aria-selected={gewaehlt}
-      disabled={p.gesperrt}
       onClick={() => {
         if (gewaehlt) return
         p.onWaehlen(m.id)

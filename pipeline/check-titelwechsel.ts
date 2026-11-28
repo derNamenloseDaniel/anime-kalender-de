@@ -90,7 +90,6 @@ const karte = ReihenCover({
   nr: undefined,
   namen: { voll: teil.name, rest: teil.name, kurz: teil.name },
   angaben: '2001',
-  gesperrt: false,
   onWaehlen: () => lauf.render(900103, titel(900103, 'Bebop Film'), true),
 })
 const klickHandler = (karte.props as { onClick: (e: unknown) => void }).onClick

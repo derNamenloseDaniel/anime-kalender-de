@@ -1694,7 +1694,7 @@
         "téknolàiz"
       ]
     },
-    "fetchedAt": "2026-10-29T04:17:54.532Z"
+    "fetchedAt": "2026-11-28T06:14:05.514Z"
   },
   "27": {
     "anisearchId": 2570,
@@ -1783,7 +1783,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:18:01.475Z"
+    "fetchedAt": "2026-11-28T06:01:45.434Z"
   },
   "28": {
     "anisearchId": 2782,
@@ -2048,6 +2048,10 @@
         {
           "name": "Store Gkids",
           "url": "https://store.gkids.com/pages/neon-genesis-evangelion?utm_source=gkids&utm_medium=vanity&utm_campaign=evagkids&utm_id=NGE"
+        },
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/neon-genesis-evangelion/"
         }
       ],
       "synonyms": [
@@ -2058,7 +2062,7 @@
         "Shin Seiki Evangelion"
       ]
     },
-    "fetchedAt": "2026-10-29T04:01:34.324Z"
+    "fetchedAt": "2026-11-28T06:01:52.756Z"
   },
   "31": {
     "anisearchId": 1301,
@@ -2179,6 +2183,10 @@
         {
           "name": "Gkids",
           "url": "https://gkids.com/films/evangelion-death-true2-rebirth/"
+        },
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/neon-genesis-evangelion-death-true2/"
         }
       ],
       "synonyms": [
@@ -2187,7 +2195,7 @@
         "Neon Genesis Evangelion: Death and Rebirth"
       ]
     },
-    "fetchedAt": "2026-10-29T04:18:08.404Z"
+    "fetchedAt": "2026-11-28T06:14:12.657Z"
   },
   "32": {
     "anisearchId": 2877,
@@ -2308,6 +2316,10 @@
         {
           "name": "Gkids",
           "url": "https://gkids.com/films/end-of-evangelion/"
+        },
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/neon-genesis-evangelion-the-end-of-evangelion/"
         }
       ],
       "synonyms": [
@@ -2315,7 +2327,7 @@
         "Shin Seiki Evangelion Gekijouban: The End of Evangelion"
       ]
     },
-    "fetchedAt": "2026-10-29T04:18:15.462Z"
+    "fetchedAt": "2026-11-28T06:14:19.944Z"
   },
   "33": {
     "anisearchId": 927,
@@ -2432,7 +2444,7 @@
         "Berserk TV"
       ]
     },
-    "fetchedAt": "2026-10-29T04:18:22.503Z"
+    "fetchedAt": "2026-11-28T06:02:00.050Z"
   },
   "43": {
     "anisearchId": 2088,
@@ -2564,7 +2576,7 @@
         "gits"
       ]
     },
-    "fetchedAt": "2026-10-29T04:18:29.562Z"
+    "fetchedAt": "2026-11-28T06:14:27.233Z"
   },
   "44": {
     "anisearchId": 1283,
@@ -2667,7 +2679,7 @@
         "Samurai X: Trust and Betrayal"
       ]
     },
-    "fetchedAt": "2026-10-29T04:18:36.499Z"
+    "fetchedAt": "2026-11-28T06:14:34.379Z"
   },
   "45": {
     "anisearchId": 2363,
@@ -2870,7 +2882,7 @@
         "Samurai X: The Movie"
       ]
     },
-    "fetchedAt": "2026-10-29T04:18:43.411Z"
+    "fetchedAt": "2026-11-28T06:14:41.514Z"
   },
   "47": {
     "anisearchId": 1730,
@@ -3001,7 +3013,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:18:50.346Z"
+    "fetchedAt": "2026-11-28T06:14:48.668Z"
   },
   "48": {
     "anisearchId": 3491,
@@ -3114,7 +3126,7 @@
         "hack//SIGN"
       ]
     },
-    "fetchedAt": "2026-10-29T04:18:57.493Z"
+    "fetchedAt": "2026-11-28T06:14:55.818Z"
   },
   "49": {
     "anisearchId": 2497,
@@ -3223,7 +3235,7 @@
         "Oh! My Goddess"
       ]
     },
-    "fetchedAt": "2026-10-29T04:19:04.423Z"
+    "fetchedAt": "2026-11-28T06:15:02.961Z"
   },
   "50": {
     "anisearchId": 590,
@@ -3307,7 +3319,7 @@
         "Oh! Mi Diosa"
       ]
     },
-    "fetchedAt": "2026-10-29T04:19:11.372Z"
+    "fetchedAt": "2026-11-28T06:15:10.113Z"
   },
   "51": {
     "anisearchId": 3350,
@@ -3412,7 +3424,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:19:18.303Z"
+    "fetchedAt": "2026-11-28T06:15:17.256Z"
   },
   "52": {
     "anisearchId": 1705,
@@ -3499,7 +3511,7 @@
         "Battle Doll Angelic Layer"
       ]
     },
-    "fetchedAt": "2026-10-29T04:19:25.239Z"
+    "fetchedAt": "2026-11-28T06:15:24.402Z"
   },
   "53": {
     "anisearchId": 555,
@@ -3674,7 +3686,7 @@
         "Appleseed: The Movie"
       ]
     },
-    "fetchedAt": "2026-10-29T04:19:32.164Z"
+    "fetchedAt": "2026-11-28T06:15:31.547Z"
   },
   "55": {
     "anisearchId": 2621,
@@ -4032,7 +4044,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:19:39.111Z"
+    "fetchedAt": "2026-11-28T06:15:38.705Z"
   },
   "60": {
     "anisearchId": 386,
@@ -4131,7 +4143,7 @@
         "Chrno Crusade: Mary Magdalene"
       ]
     },
-    "fetchedAt": "2026-10-29T04:19:46.047Z"
+    "fetchedAt": "2026-11-28T06:02:07.202Z"
   },
   "61": {
     "anisearchId": 2536,
@@ -4277,12 +4289,12 @@
     "descriptionDe": "Vor einem Jahr landete in der Bucht von Tokio ein Raumschiff der DearS, einer außerirdischen Rasse die fast alle weiblich sind. Eigentlich will der Schüler Takeya mit den Besuchern aus dem All nichts zu tun haben. Doch eines Tages findet er zufällig ein hilfloses Mädchen am Straßenrand, das er aus Mitleid bei sich aufnimmt. Nicht nur weil sie kein Japanisch spricht, sondern auch weil Ren ein einziges Rätsel ist. Sie ist ebenso hübsch und anhänglich. Nicht nur für Takeya ist das der Beginn eines großen Abenteuers … \n\nQuelle: www.anisearch.de/anime/3327",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CGMSXB24?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/dears"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CGMSXB24?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -4351,7 +4363,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:19:52.988Z"
+    "fetchedAt": "2026-11-28T06:15:45.855Z"
   },
   "64": {
     "anisearchId": 201,
@@ -4433,7 +4445,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:19:59.919Z"
+    "fetchedAt": "2026-11-28T06:15:53.003Z"
   },
   "65": {
     "anisearchId": 2852,
@@ -4518,7 +4530,7 @@
         "Rozen Maiden: Dreaming"
       ]
     },
-    "fetchedAt": "2026-10-29T04:20:06.851Z"
+    "fetchedAt": "2026-11-28T06:16:00.150Z"
   },
   "66": {
     "anisearchId": 2305,
@@ -4720,19 +4732,19 @@
         "Basilisk: Die Chroniken der Kouga-Ninja"
       ]
     },
-    "fetchedAt": "2026-10-29T04:20:13.783Z"
+    "fetchedAt": "2026-11-28T06:16:07.301Z"
   },
   "68": {
     "anisearchId": 300,
     "descriptionDe": "Train Heartnet ist einer der berüchtigsten Assassinen Chronos – einer Art Mafia-Organisation, die so ziemlich die gesamte Welt kontrolliert.\n\nEr soll kein Herz besitzen und so schnell und tödlich sein, wie eine Katze; daher auch sein Codename »Black Cat«, Schwarze Katze. Train ist allerdings nicht wirklich glücklich mit seinem Leben, was er erst erkennt, als er auf Saya trifft. Saya – jung, hübsch, mutig und eine Sweeperin (Kopfgeldjägerin). Durch ihren Einfluss beginnt Train selbständig zu denken: Warum soll er töten, wenn er nicht töten will? Als er dann bei seinem nächsten Auftrag wieder jemanden eliminieren soll, es aber nicht tut, rufen ihn die Anführer der Organisation zu sich. Ihnen erklärt er, dass er mit dem sinnlosen Morden … Eigentlich wäre dies sein Todesurteil, doch er hatte nicht mit Creed gerechnet, einem Verräter von Chronos. Er ist um einiges gefährlicher für die Welt, sodass die Eliminierung Trains auf sich warten muss! Doch was will Creed überhaupt von Train? Nun, er will ihn für seine eigenen Pläne haben und mit ihm seine eigene Welt kreieren. Und er scheut auch nicht davor zurück, die unschuldige Saya zu töten, damit Train wieder so wird wie früher … Wird Train ihn davon abhalten können mit seiner Organisation im Nacken? \n\nQuelle: www.anisearch.de/anime/300",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0BZMFZN1J?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/black-cat"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0BZMFZN1J?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -4823,7 +4835,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:20:20.724Z"
+    "fetchedAt": "2026-11-28T06:16:14.440Z"
   },
   "69": {
     "anisearchId": 3034,
@@ -4983,7 +4995,7 @@
         "Fullmetal Panic!"
       ]
     },
-    "fetchedAt": "2026-10-29T04:20:27.664Z"
+    "fetchedAt": "2026-11-28T06:16:21.833Z"
   },
   "72": {
     "anisearchId": 1465,
@@ -5094,7 +5106,7 @@
         "Fullmetal Panic? Fumoffu"
       ]
     },
-    "fetchedAt": "2026-10-29T04:20:34.607Z"
+    "fetchedAt": "2026-11-28T06:16:28.989Z"
   },
   "73": {
     "anisearchId": 304,
@@ -6506,7 +6518,7 @@
         "New Mobile War Century: Gundam Wing"
       ]
     },
-    "fetchedAt": "2026-10-29T04:20:41.548Z"
+    "fetchedAt": "2026-11-28T06:16:36.133Z"
   },
   "91": {
     "anisearchId": 1861,
@@ -6781,7 +6793,7 @@
         "Gundam Seed"
       ]
     },
-    "fetchedAt": "2026-10-29T04:20:48.592Z"
+    "fetchedAt": "2026-11-28T06:16:43.419Z"
   },
   "94": {
     "anisearchId": 1444,
@@ -7061,7 +7073,10 @@
           "title": "Last Exile",
           "status": "Abgeschlossen",
           "dubbed": true,
-          "released": "26.10.2005 - ?"
+          "released": "26.10.2005 - ?",
+          "publisher": [
+            "Selecta Visión S.L.U."
+          ]
         },
         {
           "language": "Französisch",
@@ -7105,13 +7120,17 @@
         {
           "name": "Jvcmusic",
           "url": "https://www.jvcmusic.co.jp/m-serve/last-exile/"
+        },
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/last-exile/"
         }
       ],
       "synonyms": [
         "LastEXILE"
       ]
     },
-    "fetchedAt": "2026-10-29T04:20:55.533Z"
+    "fetchedAt": "2026-11-28T06:16:50.568Z"
   },
   "98": {
     "anisearchId": 2162,
@@ -7201,7 +7220,7 @@
         "My Princess"
       ]
     },
-    "fetchedAt": "2026-10-29T04:21:02.460Z"
+    "fetchedAt": "2026-11-28T06:16:57.719Z"
   },
   "99": {
     "anisearchId": 1195,
@@ -8050,7 +8069,7 @@
         "Exploding Angel"
       ]
     },
-    "fetchedAt": "2026-10-29T04:21:09.406Z"
+    "fetchedAt": "2026-11-28T06:17:04.876Z"
   },
   "110": {
     "anisearchId": 1811,
@@ -8583,7 +8602,7 @@
         "Shinpi no Sekai El-Hazard"
       ]
     },
-    "fetchedAt": "2026-10-29T04:21:16.320Z"
+    "fetchedAt": "2026-11-28T06:17:12.008Z"
   },
   "118": {
     "anisearchId": 2224,
@@ -8925,7 +8944,7 @@
         "HagaRen"
       ]
     },
-    "fetchedAt": "2026-10-29T04:21:23.377Z"
+    "fetchedAt": "2026-11-28T06:17:19.168Z"
   },
   "122": {
     "anisearchId": 646,
@@ -10501,7 +10520,7 @@
         "Thief of the Heavenly Wind Joan of Arc"
       ]
     },
-    "fetchedAt": "2026-10-29T04:21:30.310Z"
+    "fetchedAt": "2026-11-28T06:17:26.321Z"
   },
   "143": {
     "anisearchId": 1407,
@@ -10724,7 +10743,7 @@
         "Tales at North Hills High"
       ]
     },
-    "fetchedAt": "2026-10-29T04:21:37.258Z"
+    "fetchedAt": "2026-11-28T06:17:33.469Z"
   },
   "146": {
     "anisearchId": 73,
@@ -10883,7 +10902,7 @@
         "The Eternity You Wish For"
       ]
     },
-    "fetchedAt": "2026-10-29T04:21:44.195Z"
+    "fetchedAt": "2026-11-28T06:17:40.621Z"
   },
   "148": {
     "anisearchId": 2859,
@@ -10999,7 +11018,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:21:51.363Z"
+    "fetchedAt": "2026-11-28T06:17:47.768Z"
   },
   "150": {
     "anisearchId": 3261,
@@ -11102,7 +11121,7 @@
         "Blood TV"
       ]
     },
-    "fetchedAt": "2026-10-29T04:21:58.299Z"
+    "fetchedAt": "2026-11-28T06:17:54.923Z"
   },
   "151": {
     "anisearchId": 2500,
@@ -11258,7 +11277,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:22:05.239Z"
+    "fetchedAt": "2026-11-28T06:18:02.069Z"
   },
   "153": {
     "anisearchId": 1558,
@@ -11462,7 +11481,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:22:12.170Z"
+    "fetchedAt": "2026-11-28T06:02:14.347Z"
   },
   "155": {
     "anisearchId": 1028,
@@ -11576,7 +11595,7 @@
         "X: Der Film"
       ]
     },
-    "fetchedAt": "2026-10-29T04:22:19.111Z"
+    "fetchedAt": "2026-11-28T06:18:09.235Z"
   },
   "156": {
     "anisearchId": 1655,
@@ -11684,7 +11703,7 @@
         "X: Die Serie"
       ]
     },
-    "fetchedAt": "2026-10-29T04:22:26.154Z"
+    "fetchedAt": "2026-11-28T06:18:16.528Z"
   },
   "157": {
     "anisearchId": 2505,
@@ -11784,7 +11803,7 @@
         "Mahou Sensei Negima"
       ]
     },
-    "fetchedAt": "2026-10-29T04:22:33.101Z"
+    "fetchedAt": "2026-11-28T06:18:23.682Z"
   },
   "158": {
     "anisearchId": 3295,
@@ -12018,16 +12037,16 @@
     "descriptionDe": "»Peace Maker Kurogane« spielt in den mittleren 1860er-Jahren. Der 15-jährige Tetsunosuke möchte den Shinsengumi beitreten, um stärker zu werden und den Tod seines Vaters zu rächen, der von einem Samurai ermordet wurde. Zunächst wird er jedoch wegen seines jungen Aussehens nicht ins Gebäude gelassen.\n\nSein Bruder Tatsunosuke Ichimura versucht ihn aufzuhalten, doch es gelingt ihm nicht. Zufällig wird Tetsu von einem Ferkel namens Saizo in einen Bach geschubst, dessen Besitzer ihn daraufhin zum Tee einlädt. Dort erfährt er, dass er über Beziehungen ein gutes Wort beim Shinsengumi-Kommando einlegen kann.\n\nIm Dojo muss Tetsu Truppenkapitän Souji besiegen, um aufgenommen zu werden. Mit seiner Zwei-Schwerter-Technik schlägt er sich gut, wird aber besiegt. Der Kommandant Kondou-san möchte ihn trotzdem aufnehmen, doch Vize-Kommandeur Toshizou Hijikata verhindert dies. Souji rät Tetsu, nachts an einen bestimmten Ort zu schleichen. Dort wird er Zeuge, wie Hijikata angegriffen wird und alle Angreifer besiegt. Danach bietet der Vize-Kommandeur Tetsu die Chance, Mitglied zu werden, wenn er bereit ist, sein Leben als Mensch aufzugeben und ein gnadenloser Dämon zu werden … \n\nQuelle: www.anisearch.de/anime/3113",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJHN6RSV?tag=anisearch.de-21"
-      },
-      {
         "provider": "amazon-de",
         "url": "https://www.amazon.de/dp/B0D59HJGBZ?tag=anisearch.de-21"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/peacemaker"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJHN6RSV?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -12114,7 +12133,7 @@
         "Peacemaker Kurogane"
       ]
     },
-    "fetchedAt": "2026-10-29T04:01:47.517Z"
+    "fetchedAt": "2026-11-28T06:02:21.495Z"
   },
   "162": {
     "anisearchId": 395,
@@ -12246,7 +12265,7 @@
         "Powerstone"
       ]
     },
-    "fetchedAt": "2026-10-29T04:22:40.009Z"
+    "fetchedAt": "2026-11-28T06:18:30.814Z"
   },
   "164": {
     "anisearchId": 3320,
@@ -12387,6 +12406,10 @@
           "url": "https://www.wildbunch-germany.de/movie/prinzessin-mononoke-imax-4k-re-release"
         },
         {
+          "name": "Cinetopia",
+          "url": "https://www.cinetopia.cl/amy_movie/la-princesa-mononoke/"
+        },
+        {
           "name": "Vertigofilms",
           "url": "https://vertigofilms.es/movie/la-princesa-mononoke/"
         },
@@ -12396,7 +12419,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:22:47.069Z"
+    "fetchedAt": "2026-11-28T06:18:37.974Z"
   },
   "165": {
     "anisearchId": 1015,
@@ -12508,7 +12531,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:22:54.103Z"
+    "fetchedAt": "2026-11-28T06:18:45.263Z"
   },
   "166": {
     "anisearchId": 996,
@@ -12604,7 +12627,7 @@
         "Samurai Seven"
       ]
     },
-    "fetchedAt": "2026-10-29T04:23:01.047Z"
+    "fetchedAt": "2026-11-28T06:18:52.407Z"
   },
   "167": {
     "anisearchId": 248,
@@ -12700,7 +12723,7 @@
         "Haiki Oujo"
       ]
     },
-    "fetchedAt": "2026-10-29T04:23:07.979Z"
+    "fetchedAt": "2026-11-28T06:18:59.556Z"
   },
   "168": {
     "anisearchId": 2707,
@@ -13168,7 +13191,7 @@
         "Tenjho Tenge"
       ]
     },
-    "fetchedAt": "2026-10-29T04:23:14.935Z"
+    "fetchedAt": "2026-11-28T06:19:06.716Z"
   },
   "175": {
     "anisearchId": 2637,
@@ -13278,12 +13301,12 @@
     "descriptionDe": "Der jugendliche Hobby-Archäologe Shaolan ist mit den Ausgrabungen der von Wüstensand verschütteten Ruinen beschäftigt, die vor dem Königreich Clow Country liegen. In diesem Königreich lebt auch die Prinzessin Sakura, in die Shaolan verliebt ist. Sakura, die Schwester von Prinz Touya, erwidert Shaolans Gefühle auch und will sie ihm sogar gestehen.\n\nDoch bevor es dazu kommt, öffnet sich in den Ruinen eine Kammer. Sakura wird dort in ein mystisches Siegel gezogen und ihr wachsen plötzlich zwei Flügel aus dem Rücken. Shaolan kommt ihr zu Hilfe und kann sie auch befreien, doch als er sie im Arm hält, zerbrechen ihre Flügel und verschwinden im Nirgendwo. Shaolan trägt seine Geliebte, die nun bewusstlos ist, aus den Ruinen nach draußen, wo er auf Touya und sein Magier Yukito trifft, die gegen aus dem Nichts aufgetauchte Krieger kämpfen. Yukito liest Shaolans Gedächtnis und erkennt sofort, was passiert ist: Sakuras Flügel verkörperten ihre Erinnerungen und Seele, die nun als Federn in anderen Welten verstreut sind. Ohne lange zu warten, schickt Yukito Sakura und Shaolan zu der Dimensionshexe, die ihnen helfen soll Sakuras Federn zurückzuholen … \n\nQuelle: www.anisearch.de/anime/759",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CH99N8Y6?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/tsubasa-reservoir-chronicle"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CH99N8Y6?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -13378,7 +13401,7 @@
         "Tsubasa Reservoir Chronicles"
       ]
     },
-    "fetchedAt": "2026-10-29T04:01:54.494Z"
+    "fetchedAt": "2026-11-28T06:02:28.650Z"
   },
   "178": {
     "anisearchId": 2173,
@@ -13753,7 +13776,7 @@
         },
         {
           "language": "Französisch",
-          "title": "Vision d'Escaflowne",
+          "title": "Vision d’Escaflowne",
           "status": "Abgeschlossen",
           "dubbed": true,
           "released": "06.1998 - ?",
@@ -13801,14 +13824,17 @@
         {
           "name": "Sunrise Inc",
           "url": "https://www.sunrise-inc.co.jp/work/detail.php?cid=118"
+        },
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/la-vision-de-escaflowne/"
         }
       ],
       "synonyms": [
-        "Escaflowne of the Heavens",
-        "The Vision of EscaFlowne"
+        "Escaflowne of the Heavens"
       ]
     },
-    "fetchedAt": "2026-10-29T04:23:21.980Z"
+    "fetchedAt": "2026-11-28T06:19:14.031Z"
   },
   "183": {
     "anisearchId": 419,
@@ -14380,7 +14406,7 @@
         "Love Hina OVA"
       ]
     },
-    "fetchedAt": "2026-10-29T04:23:28.926Z"
+    "fetchedAt": "2026-11-28T06:19:21.395Z"
   },
   "191": {
     "anisearchId": 1916,
@@ -15053,7 +15079,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:23:49.838Z"
+    "fetchedAt": "2026-11-28T06:19:28.683Z"
   },
   "199": {
     "anisearchId": 2895,
@@ -15468,7 +15494,7 @@
         "Wolfs Rain"
       ]
     },
-    "fetchedAt": "2026-10-29T04:02:08.495Z"
+    "fetchedAt": "2026-11-28T06:02:35.802Z"
   },
   "204": {
     "anisearchId": 431,
@@ -15641,10 +15667,14 @@
         {
           "name": "Samuraichamploo",
           "url": "https://www.samuraichamploo.com/"
+        },
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/samurai-champloo/"
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:23:56.787Z"
+    "fetchedAt": "2026-11-28T06:19:35.834Z"
   },
   "206": {
     "anisearchId": 2691,
@@ -15746,7 +15776,7 @@
         "Nouvelles Chroniques de la Guerre de Lodoss : La légende du Chevalier héroïque"
       ]
     },
-    "fetchedAt": "2026-10-29T04:24:03.721Z"
+    "fetchedAt": "2026-11-28T06:19:42.978Z"
   },
   "207": {
     "anisearchId": 1694,
@@ -15861,11 +15891,17 @@
         }
       ],
       "adaptedFrom": "Novel",
+      "websites": [
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/record-of-lodoss-war/"
+        }
+      ],
       "synonyms": [
         "RoLW"
       ]
     },
-    "fetchedAt": "2026-10-29T04:24:10.667Z"
+    "fetchedAt": "2026-11-28T06:19:50.133Z"
   },
   "208": {
     "anisearchId": 1322,
@@ -15943,7 +15979,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:24:17.598Z"
+    "fetchedAt": "2026-11-28T06:19:57.275Z"
   },
   "209": {
     "anisearchId": 618,
@@ -16118,7 +16154,7 @@
         "Ranma ½"
       ]
     },
-    "fetchedAt": "2026-10-29T04:24:24.536Z"
+    "fetchedAt": "2026-11-28T06:20:04.417Z"
   },
   "212": {
     "anisearchId": 961,
@@ -16518,7 +16554,7 @@
         "Mezzo TV Danger Service Agency"
       ]
     },
-    "fetchedAt": "2026-10-29T04:24:31.466Z"
+    "fetchedAt": "2026-11-28T06:20:11.553Z"
   },
   "223": {
     "anisearchId": 468,
@@ -16620,7 +16656,7 @@
         "Dragonball"
       ]
     },
-    "fetchedAt": "2026-10-29T04:02:15.537Z"
+    "fetchedAt": "2026-11-28T06:02:43.095Z"
   },
   "225": {
     "anisearchId": 2748,
@@ -16727,7 +16763,7 @@
         "ドラゴンボール グランド・ツーリング"
       ]
     },
-    "fetchedAt": "2026-10-29T04:24:38.539Z"
+    "fetchedAt": "2026-11-28T06:20:18.856Z"
   },
   "226": {
     "anisearchId": 1822,
@@ -18769,13 +18805,17 @@
         {
           "name": "Sunrise Inc",
           "url": "https://www.sunrise-inc.co.jp/yasya/"
+        },
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/inuyasha/"
         }
       ],
       "synonyms": [
         "Inu Yasha"
       ]
     },
-    "fetchedAt": "2026-10-29T04:02:29.640Z"
+    "fetchedAt": "2026-11-28T06:02:50.388Z"
   },
   "250": {
     "anisearchId": 1648,
@@ -33103,7 +33143,7 @@
         "Inuyasha: The Crimson Hourai Island"
       ]
     },
-    "fetchedAt": "2026-10-29T04:02:57.672Z"
+    "fetchedAt": "2026-11-28T06:02:57.525Z"
   },
   "450": {
     "anisearchId": 671,
@@ -33202,7 +33242,7 @@
         "Inuyasha: Dream Castle Inside the Mirror"
       ]
     },
-    "fetchedAt": "2026-10-29T04:03:04.611Z"
+    "fetchedAt": "2026-11-28T06:03:04.674Z"
   },
   "451": {
     "anisearchId": 1455,
@@ -33306,7 +33346,7 @@
         "Inuyasha: The World Conquering Swords"
       ]
     },
-    "fetchedAt": "2026-10-29T04:03:11.536Z"
+    "fetchedAt": "2026-11-28T06:03:11.814Z"
   },
   "452": {
     "anisearchId": 1930,
@@ -33416,7 +33456,7 @@
         "Inuyasha: Toki wo Koeru Omoi"
       ]
     },
-    "fetchedAt": "2026-10-29T04:03:18.473Z"
+    "fetchedAt": "2026-11-28T06:03:18.974Z"
   },
   "454": {
     "anisearchId": 2559,
@@ -33839,6 +33879,10 @@
         {
           "name": "Toei Animation",
           "url": "https://www.toei-anim.co.jp/movie/2000_spring/index.html"
+        },
+        {
+          "name": "Bfdistribution",
+          "url": "https://www.bfdistribution.cl/pelicula/one-piece-la-pelicula/"
         }
       ],
       "synonyms": [
@@ -33847,7 +33891,7 @@
         "One Piece: 1. Film - Der Film"
       ]
     },
-    "fetchedAt": "2026-10-29T04:03:25.398Z"
+    "fetchedAt": "2026-11-28T06:03:26.120Z"
   },
   "460": {
     "anisearchId": 1815,
@@ -33957,7 +34001,7 @@
         "One Piece: 2. Film - Abenteuer auf der Spiralinsel"
       ]
     },
-    "fetchedAt": "2026-10-29T04:03:32.340Z"
+    "fetchedAt": "2026-11-28T06:03:33.262Z"
   },
   "461": {
     "anisearchId": 1854,
@@ -34070,7 +34114,7 @@
         "l’île des bêtes étranges"
       ]
     },
-    "fetchedAt": "2026-10-29T04:03:39.269Z"
+    "fetchedAt": "2026-11-28T06:03:40.411Z"
   },
   "462": {
     "anisearchId": 3260,
@@ -34185,7 +34229,7 @@
         "One Piece : L’Aventure sans issue"
       ]
     },
-    "fetchedAt": "2026-10-29T04:03:46.206Z"
+    "fetchedAt": "2026-11-28T06:03:47.558Z"
   },
   "463": {
     "anisearchId": 2376,
@@ -34298,7 +34342,7 @@
         "One Piece: The Curse of the Sacred Sword"
       ]
     },
-    "fetchedAt": "2026-10-29T04:03:53.133Z"
+    "fetchedAt": "2026-11-28T06:03:54.708Z"
   },
   "464": {
     "anisearchId": 2553,
@@ -34413,7 +34457,7 @@
         "One Piece: Baron Omatsuri and the Island of Secrets"
       ]
     },
-    "fetchedAt": "2026-10-29T04:04:00.079Z"
+    "fetchedAt": "2026-11-28T06:04:01.854Z"
   },
   "465": {
     "anisearchId": 3359,
@@ -34527,7 +34571,7 @@
         "One Piece: Karakuri Shiro no Meka Kyohei"
       ]
     },
-    "fetchedAt": "2026-10-29T04:04:07.004Z"
+    "fetchedAt": "2026-11-28T06:04:09.000Z"
   },
   "466": {
     "anisearchId": 1369,
@@ -35807,7 +35851,7 @@
         "Yugioh! GX"
       ]
     },
-    "fetchedAt": "2026-10-29T04:04:14.066Z"
+    "fetchedAt": "2026-11-28T06:20:26.152Z"
   },
   "483": {
     "anisearchId": 443,
@@ -52146,7 +52190,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:04:42.215Z"
+    "fetchedAt": "2026-11-28T06:04:16.160Z"
   },
   "779": {
     "anisearchId": 120,
@@ -63984,12 +64028,12 @@
     "descriptionDe": "Shaolan und Sakura wohnen in Clow Country und sind trotz ihres Standesunterschiedes ineinander verliebt. Doch dunkle Mächte rauben Sakura sämtliche Erinnerungen und es gibt nur ein einziges Mittel, das Sakura retten kann: Shaolan muss die »Federn« ihrer Erinnerung, die in fremde Welten zerstreut wurden, wieder einsammeln. Eine lange Reise durch die Dimensionen nimmt ihren Lauf … \n\nQuelle: www.anisearch.de/anime/222",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CHQSJDSB?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/tsubasa-reservoir-chronicle"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CHQSJDSB?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -64075,7 +64119,7 @@
         "Tsubasa: Reservoir Chronicle 2nd Season"
       ]
     },
-    "fetchedAt": "2026-10-29T04:06:05.399Z"
+    "fetchedAt": "2026-11-28T06:04:23.540Z"
   },
   "970": {
     "anisearchId": 2468,
@@ -82610,7 +82654,7 @@
         "Esteban: The Child of the Sun"
       ]
     },
-    "fetchedAt": "2026-10-29T04:06:33.200Z"
+    "fetchedAt": "2026-11-28T06:04:30.670Z"
   },
   "1280": {
     "anisearchId": 2828,
@@ -87820,8 +87864,8 @@
       "languages": [
         {
           "language": "Japanisch",
-          "title": "Kyuuketsuki Miyu",
-          "titleNative": "Kyūketsuki Miyu",
+          "title": "Vampire Miyu",
+          "titleNative": "吸血姫美夕",
           "status": "Abgeschlossen",
           "released": "21.07.1988 - 21.04.1989"
         },
@@ -87906,11 +87950,12 @@
         }
       ],
       "synonyms": [
+        "Vanpaia Miyu",
         "Kyuuketsu Hime Miyu",
-        "Vanpaia Miyu"
+        "Kyuuketsuki Miyu"
       ]
     },
-    "fetchedAt": "2026-10-29T04:06:53.981Z"
+    "fetchedAt": "2026-11-28T06:04:37.805Z"
   },
   "1391": {
     "anisearchId": 264,
@@ -88563,7 +88608,7 @@
         "Lupin the Third TV"
       ]
     },
-    "fetchedAt": "2026-10-29T04:07:00.883Z"
+    "fetchedAt": "2026-11-28T06:04:44.945Z"
   },
   "1413": {
     "anisearchId": 3098,
@@ -95982,7 +96027,7 @@
         "Kanon Remake"
       ]
     },
-    "fetchedAt": "2026-10-29T04:07:14.830Z"
+    "fetchedAt": "2026-11-28T06:04:52.234Z"
   },
   "1531": {
     "anisearchId": 4000,
@@ -96431,7 +96476,7 @@
         "DN"
       ]
     },
-    "fetchedAt": "2026-10-29T04:07:22.125Z"
+    "fetchedAt": "2026-11-28T06:04:59.564Z"
   },
   "1536": {
     "anisearchId": 3650,
@@ -97825,7 +97870,7 @@
         "History’s Strongest Disciple Kenichi"
       ]
     },
-    "fetchedAt": "2026-10-29T04:07:35.977Z"
+    "fetchedAt": "2026-11-28T06:05:06.714Z"
   },
   "1560": {
     "anisearchId": 433,
@@ -98893,12 +98938,12 @@
     "descriptionDe": "Am 10. August 2010 fiel das Königreich Britannia in Japan ein. Ein furchtbarer Krieg begann, den Japan auf Grund der von Britannia entwickelten Mechas, den Knightmare Frames, verlor. Japan wurde Teil des Reiches Britannias und verlor seine Freiheit und Rechte und bekam einen neuen Namen, Area 11. Weil Lelouch Lamperouge, der Sohn des Königs Charles vi Britannia, mitansehen musste, wie seine Mutter Marianne vi Britannia vor seinen Augen von Terroristen getötet wurde und sein Vater nichts dagegen unternahm, schwor er aus Rache, das Königreich Britannia zu zerstören.\n\n7 Jahre nach dem Krieg lebt Lelouch in Area 11 und geht dort zur Schule. Eines Tages sieht er, wie ein von Knightmare Frames verfolgter Laster in eine Mauer kracht. Durch unglückliche Zwischenfälle fällt er in den Laster und als er sich in einem unterirdischen Gewölbe wiederfindet, entsteigt plötzlich ein Mädchen aus einem auf dem Laster befindlichen Behälter. Lelouch flieht mit dem Mädchen durch die Kanalisation, wird aber am Ausgang von den Truppen Britannias gefasst. Als man ihn wegen Terrorismus erschießen will, bietet das Mädchen ihm an, einen Vertrag mit ihr einzugehen, der ihm die Macht verleiht, lebend aus dieser Situation zu entkommen. Ohne zu zögern willigt Lelouch ein. Nun hat Lelouch etwas, das er benutzen kann, um das Königreich Britannia zu zerstören und somit beginnt er seine Vorbereitungen zum Feldzug zur Vernichtung Britannias. \n\nQuelle: www.anisearch.de/anime/3663",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CGPJJH21?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GY2P9ED0Y/code-geass"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CGPJJH21?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -99012,7 +99057,7 @@
         "Code Geass 1st Season"
       ]
     },
-    "fetchedAt": "2026-10-29T04:07:42.993Z"
+    "fetchedAt": "2026-11-28T06:05:14.009Z"
   },
   "1576": {
     "anisearchId": 3710,
@@ -104094,12 +104139,12 @@
     "descriptionDe": "Der elfjährige Wataru hört von seinem Freund Katsumi, dass es in einem nahegelegenen Haus spuken soll, und er zögert keinen Augenblick, sich die Sache zusammen mit ihm einmal genauer anzusehen. Gespenster begegnen den beiden dort zwar nicht, jedoch aber einem sonderbaren Jungen namens Mitsuru, der plötzlich spurlos verschwindet und sich am nächsten Tag als neuer Mitschüler in ihrer Klasse herausstellt.\n\nAn diesem Tag verändert sich Watarus Leben dann schlagartig, da sein Vater sich von seiner Mutter scheiden lässt, diese wegen des Kummers zusammenbricht und ins Krankenhaus eingeliefert wird. Der traurige Wataru betritt, um sich abzulenken, noch einmal das verlassene Gebäude, wo er Mitsuru vor ein paar Rowdys aus seiner Schule rettet und von ihm in die Geheimnisse einer anderen Welt eingeweiht wird. Da er kaum noch etwas zu verlieren hat, nimmt er als angehender »Traveller« all seinen Mut zusammen und tritt in die ihm völlig fremde magische Welt ein, mit dem Ziel, sein Schicksal zu verändern und seine Wünsche zu erfüllen. \n\nQuelle: www.anisearch.de/anime/2952",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJQR5TXD?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/brave-story/brave-story-unbekannt-821310?ssid=422329"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJQR5TXD?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -104172,7 +104217,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:07:56.812Z"
+    "fetchedAt": "2026-11-28T06:05:21.168Z"
   },
   "1682": {
     "anisearchId": 2661,
@@ -106399,7 +106444,7 @@
         "Clannad: The Movie"
       ]
     },
-    "fetchedAt": "2026-10-29T04:08:03.749Z"
+    "fetchedAt": "2026-11-28T06:05:28.312Z"
   },
   "1724": {
     "anisearchId": 3578,
@@ -118911,7 +118956,7 @@
         "Meitantei Houmuzu"
       ]
     },
-    "fetchedAt": "2026-10-29T04:08:10.646Z"
+    "fetchedAt": "2026-11-28T06:05:35.452Z"
   },
   "1973": {
     "anisearchId": 3258,
@@ -125327,7 +125372,7 @@
         "One Piece: Episode of Arabasta: The Pirates and the Princess of the Desert"
       ]
     },
-    "fetchedAt": "2026-10-29T04:08:17.572Z"
+    "fetchedAt": "2026-11-28T06:05:42.594Z"
   },
   "2108": {
     "anisearchId": 287,
@@ -128122,7 +128167,7 @@
     "streams": [
       {
         "provider": "primevideo-channel-aniverse-de",
-        "url": "https://www.amazon.de/dp/B0CN5T82TL?tag=anisearch.de-21"
+        "url": "https://www.amazon.de/dp/B0H4F2CGPX?tag=anisearch.de-21"
       },
       {
         "provider": "filmfriend-de",
@@ -128131,6 +128176,10 @@
       {
         "provider": "adn-de",
         "url": "https://animationdigitalnetwork.de/video/clannad"
+      },
+      {
+        "provider": "joyn",
+        "url": "https://www.joyn.de/serien/clannad-dpp0mkvw37d3"
       }
     ],
     "info": {
@@ -128217,7 +128266,7 @@
         "Kuranado"
       ]
     },
-    "fetchedAt": "2026-10-29T04:08:24.587Z"
+    "fetchedAt": "2026-11-28T06:05:49.884Z"
   },
   "2168": {
     "anisearchId": 4075,
@@ -143173,7 +143222,7 @@
         "Tales of Little Women"
       ]
     },
-    "fetchedAt": "2026-10-29T04:08:38.426Z"
+    "fetchedAt": "2026-11-28T06:05:57.018Z"
   },
   "2549": {
     "anisearchId": 3410,
@@ -158344,12 +158393,12 @@
     "descriptionDe": "»Code Geass: Lelouch of the Rebellion R2« setzt die erste Staffel nahezu nahtlos fort. Ein Jahr ist seit dem Fehlschlagen der Rebellion und dem mutmaßlichen Tod von Zero vergangen. Die Herrschaft von Britannia wurde wieder gefestigt und die Anhänger der Rebellion zu großen Teilen inhaftiert. Um zukünftige Aufstände und rebellische Gedanken in Area 11 zu unterdrücken, wird nun an den Elevens mit brutaler Gewalt ein Exempel statuiert. Lelouch, unwissend seiner Vergangenheit als Zero und inzwischen einfacher Schüler an seiner Highschool, findet sich plötzlich in einem Komplott gegen sein Leben und das einer mysteriösen Frau namens C.C. wieder. Sie enthüllt ihm seine vergangenen Pläne sowie seine frühere Identität, damit er das, was er begonnen hat, nun auch zu Ende bringt. \n\nQuelle: www.anisearch.de/anime/4174",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CGW8Q8VK?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/code-geass"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CGW8Q8VK?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -158467,7 +158516,7 @@
         "Code Geass: Lelouch of the Rebellion Season 2"
       ]
     },
-    "fetchedAt": "2026-10-29T04:08:45.466Z"
+    "fetchedAt": "2026-11-28T06:06:04.311Z"
   },
   "2905": {
     "anisearchId": 3063,
@@ -161365,10 +161414,6 @@
         "url": "https://www.amazon.de/dp/B08FNPM83G?tag=anisearch.de-21"
       },
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CH49B21C?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/rosario-vampire"
       },
@@ -161383,6 +161428,10 @@
       {
         "provider": "adn-de",
         "url": "https://animationdigitalnetwork.de/video/rosario-vampire"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CH49B21C?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -161481,7 +161530,7 @@
         "rtv"
       ]
     },
-    "fetchedAt": "2026-10-29T04:08:59.297Z"
+    "fetchedAt": "2026-11-28T06:06:11.470Z"
   },
   "2994": {
     "anisearchId": 4441,
@@ -165302,16 +165351,16 @@
     "descriptionDe": "Misaki Takahashi lebt nach dem Tod seiner Eltern gemeinsam mit seinem Bruder Takahiro zusammen. Er kümmert sich um ihn und gibt dafür auch sein Studium auf, weswegen Misaki unbedingt an seiner Stelle studieren will. Um das zu erreichen, soll ihm Takahiros Freund Akihiko Usami Nachhilfe geben, dieser ist ein erfolgreicher Autor von Romanen. Bald entdeckt Misaki, dass Akihiko in Takahiro verliebt ist, jedoch heiratet sein Bruder bald und Misaki bedauert Akihiko dafür … \n\nQuelle: www.anisearch.de/anime/4555",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CHNH5BTP?tag=anisearch.de-21"
-      },
-      {
         "provider": "amazon-de",
         "url": "https://www.amazon.de/dp/B0D1Y5SLY1?tag=anisearch.de-21"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GRMGM57VR/junjo-romantica"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CHNH5BTP?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -165392,7 +165441,7 @@
         "Pure Hearted Romance"
       ]
     },
-    "fetchedAt": "2026-10-29T04:09:06.214Z"
+    "fetchedAt": "2026-11-28T06:06:18.619Z"
   },
   "3095": {
     "anisearchId": 2025,
@@ -168889,7 +168938,7 @@
   },
   "3231": {
     "anisearchId": 4460,
-    "descriptionDe": "In »Gunslinger Girl il teatrino« verrichten die Cyborg-Mädchen Henrietta, Rico und Triela weiterhin ihre Arbeit für die Social Welfare Agency, wie beispielsweise das Verhindern von Bombenattentaten. Dann verschwindet jedoch ein Mitglied der Public Safety Division während Ermittlungen spurlos; er war einem Auftragskiller der Padania Republics Faction auf der Spur, einem gewissen Pinocchio, der schon seit jungen Jahren aktiv ist. Triela und ihr Partner Victor erhalten den Auftrag, das Mitglied aufzuspüren. Stattdessen kommen sie dem Attentäter auf die Spur, doch weil der nicht allein arbeitet, verläuft die Mission nicht gerade geplant – sehr zuungunsten von Trielas Selbstbewusstsein. Die Sektion muss nun nicht nur den Attentäter Pinocchio, sondern auch die zwei berüchtigten Bombenbauer Franco und Franca aufspüren.\n\nWährenddessen hat sich das Cyborg-Mädchen Angelica von den Verletzungen des letzten Einsatzes erholt und darf jetzt wieder an einer Mission teilnehmen. Doch schnell zeigt sich, dass sie nicht nur an den Folgen ihrer Behandlung zu leiden scheint, sondern an etwas Schwerwiegenderem … \n\nQuelle: www.anisearch.de/anime/4460",
+    "descriptionDe": "In »Gunslinger Girl: Il Teatrino« verrichten die Cyborg-Mädchen Henrietta, Rico und Triela weiterhin ihre Arbeit für die Social Welfare Agency, wie beispielsweise das Verhindern von Bombenattentaten. Dann verschwindet jedoch ein Mitglied der Public Safety Division während Ermittlungen spurlos; er war einem Auftragskiller der Padania Republics Faction auf der Spur, einem gewissen Pinocchio, der schon seit jungen Jahren aktiv ist. Triela und ihr Partner Victor erhalten den Auftrag, das Mitglied aufzuspüren. Stattdessen kommen sie dem Attentäter auf die Spur, doch weil der nicht allein arbeitet, verläuft die Mission nicht gerade geplant – sehr zuungunsten von Trielas Selbstbewusstsein. Die Sektion muss nun nicht nur den Attentäter Pinocchio, sondern auch die zwei berüchtigten Bombenbauer Franco und Franca aufspüren.\n\nWährenddessen hat sich das Cyborg-Mädchen Angelica von den Verletzungen des letzten Einsatzes erholt und darf jetzt wieder an einer Mission teilnehmen. Doch schnell zeigt sich, dass sie nicht nur an den Folgen ihrer Behandlung zu leiden scheint, sondern an etwas Schwerwiegenderem … \n\nQuelle: www.anisearch.de/anime/4460",
     "streams": [
       {
         "provider": "amazon-de",
@@ -168924,7 +168973,7 @@
         },
         {
           "language": "Deutsch",
-          "title": "Gunslinger Girl il teatrino",
+          "title": "Gunslinger Girl: Il Teatrino",
           "status": "Abgeschlossen",
           "dubbed": true,
           "released": "26.01.2009 - 25.05.2009",
@@ -168977,7 +169026,7 @@
         "Gunslinger Girl 2nd Season"
       ]
     },
-    "fetchedAt": "2026-10-29T04:09:13.143Z"
+    "fetchedAt": "2026-11-28T06:06:25.764Z"
   },
   "3232": {
     "anisearchId": 8535,
@@ -174260,7 +174309,7 @@
         "ToLoveRu"
       ]
     },
-    "fetchedAt": "2026-10-29T04:09:20.059Z"
+    "fetchedAt": "2026-11-28T06:06:32.915Z"
   },
   "3456": {
     "anisearchId": 4604,
@@ -180505,7 +180554,7 @@
       ],
       "format": "TV-Serie",
       "episodes": 11,
-      "runtimeMinutes": 24,
+      "runtimeMinutes": 23,
       "season": "Winter 2007/08",
       "studios": [
         "Toei Animation Co., Ltd."
@@ -180535,7 +180584,7 @@
         "Graveyard Kitarou"
       ]
     },
-    "fetchedAt": "2026-10-29T04:09:26.982Z"
+    "fetchedAt": "2026-11-28T06:06:40.063Z"
   },
   "3712": {
     "anisearchId": 4638,
@@ -185270,7 +185319,7 @@
         "Miracle Sakura"
       ]
     },
-    "fetchedAt": "2026-10-29T04:09:33.883Z"
+    "fetchedAt": "2026-11-28T06:06:47.212Z"
   },
   "3849": {
     "anisearchId": 8765,
@@ -190843,12 +190892,12 @@
     "descriptionDe": "In »Michiko & Hatchin« hat es die kleine Hana Morenos nicht einfach: Sie ist ein Waisenkind, wurde von Pfarrer Pedro nur des Geldes wegen aufgenommen und wird vom Rest der Familie schäbigst behandelt, insbesondere von ihren zwei Ziehgeschwistern. Eines Tages donnert eine junge, attraktive Frau mit ihrem Motorrad mit durchs Fenster ins Esszimmer. Ihr Name ist Michiko Malandro und sie ist gerade eben erst dem Gefängnis geflohen, ihr Auftritt ist aber kein Zufall: Hana ist die Tochter ihres ehemaligen Liebhabers Hiroshi Morenos, und genau den will sie finden.\n\nZwar machen sich die beiden gemeinsam auf den Weg, aber Hana, nun unter dem Namen Hatchin, ist von ihrer neuen Reisegefährtin nicht gerade begeistert: Die impulsive Michiko glänzt weder mit Vernunft noch Rücksichtnahme, nimmt sich, was sie will, und ist generell eher laut, was einem vernünftigen Wesen wie der kleinen Hatchin natürlich öfter sauer aufstößt, die ihre Vorstellung bezüglich Gerechtigkeit und der zuweilen harschen Realität nur schwer in Einklang bringen kann.\n\nDie Suche nach dem schwer zu findenden Hiroshi führt sie in die verschiedensten Orte – und des Öfteren zu eher brenzlichen Begegnungen. Ruhig können es die beiden auch nicht angehen lassen, denn die Polizei ist der flüchtigen Michiro längst auf der Spur, ausgerechnet unter der Führung von ihrer ehemaligen Freundin Atsuko Jackson. \n\nQuelle: www.anisearch.de/anime/4807",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CHDV2G6Q?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/michiko-hatchin"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CHDV2G6Q?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -190944,7 +190993,7 @@
         "Michiko e Hatchin"
       ]
     },
-    "fetchedAt": "2026-10-29T04:09:40.813Z"
+    "fetchedAt": "2026-11-28T06:06:54.352Z"
   },
   "4088": {
     "anisearchId": 2964,
@@ -192453,7 +192502,7 @@
         "One Piece: 10. Film - Strong World"
       ]
     },
-    "fetchedAt": "2026-10-29T04:09:47.720Z"
+    "fetchedAt": "2026-11-28T06:07:01.511Z"
   },
   "4156": {
     "anisearchId": 10422,
@@ -192874,7 +192923,7 @@
         "Clannad Staffel 2"
       ]
     },
-    "fetchedAt": "2026-10-29T04:09:54.761Z"
+    "fetchedAt": "2026-11-28T06:07:08.677Z"
   },
   "4182": {
     "anisearchId": 6849,
@@ -194145,10 +194194,6 @@
     "descriptionDe": "Das neue Schuljahr an der Youkai Oberschule steht an, genauso wie jede Menge neuer Ärger. Während Kurumu, Yukari und Mizore von den neuen Erstklässlern umschwärmt werden, erhält Moka reihenweise Drohbriefe. Doch auch eine der neuen Schülerinnen fällt besonders auf, da sie sich sehr streitlustig aufführt. Es handelt sich um keine Geringere als Mokas kleine Schwester. \n\nQuelle: www.anisearch.de/anime/4837",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CGW4KF1K?tag=anisearch.de-21"
-      },
-      {
         "provider": "amazon-de",
         "url": "https://www.amazon.de/dp/B09C53B6BQ?tag=anisearch.de-21"
       },
@@ -194163,6 +194208,10 @@
       {
         "provider": "akibapass",
         "url": "https://akibapassshop.de/p/23d058-03?ref=anisearch"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CGW4KF1K?tag=anisearch.de-21"
       },
       {
         "provider": "adn-de",
@@ -194260,7 +194309,7 @@
         "Rosario + Vampire Season 2"
       ]
     },
-    "fetchedAt": "2026-10-29T04:10:01.672Z"
+    "fetchedAt": "2026-11-28T06:07:15.831Z"
   },
   "4218": {
     "anisearchId": 10428,
@@ -203891,16 +203940,16 @@
     "descriptionDe": "»Junjo Romantica 2« führt die Geschichten der Protagonistenpaare Misaki Takahashi und Akihiko Usami, Hiroki Kamijou und Nowaki Kusama sowie Shinobu Takatsuki und You Miyagi weiter, die schon aus dem ersten Teil bekannt sind; es wird gezeigt, wie sich die Beziehungen der Charaktere weiterentwickeln und sie mit ihren Problemen umgehen.\n\nMisaki wird in Usamis Familienprobleme hineingezogen, und dieser muss erst mal damit klarkommen, dass sein Bruder großes Interesse an seinem Schützling zeigt. Hiro und Nowaki sind sich uneinig über ihre gemeinsame Zukunft, auch weil Nowaki nicht hinter Hiro zurückstehen will. Und als Shinobu ein Bild von Yous mysteriösem »Sensei« findet, kapselt sich der sonst so hartnäckige Junge von seinem Geliebten ab. \n\nQuelle: www.anisearch.de/anime/5010",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CHFDPCWQ?tag=anisearch.de-21"
-      },
-      {
         "provider": "amazon-de",
         "url": "https://www.amazon.de/dp/B0DD79RP8J?tag=anisearch.de-21"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GRMGM57VR/junjo-romantica"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CHFDPCWQ?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -203982,7 +204031,7 @@
         "Pure Hearted Romance 2"
       ]
     },
-    "fetchedAt": "2026-10-29T04:10:15.725Z"
+    "fetchedAt": "2026-11-28T06:07:23.189Z"
   },
   "4823": {
     "anisearchId": 3587,
@@ -207454,7 +207503,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:10:22.639Z"
+    "fetchedAt": "2026-11-28T06:07:30.321Z"
   },
   "5028": {
     "anisearchId": 4956,
@@ -217337,7 +217386,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:10:29.557Z"
+    "fetchedAt": "2026-11-28T06:07:37.468Z"
   },
   "5534": {
     "anisearchId": 4933,
@@ -223959,7 +224008,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:10:36.481Z"
+    "fetchedAt": "2026-11-28T06:07:44.603Z"
   },
   "5967": {
     "anisearchId": 1270,
@@ -238898,7 +238947,7 @@
         "Inuyasha: El acto final"
       ]
     },
-    "fetchedAt": "2026-10-29T04:10:50.318Z"
+    "fetchedAt": "2026-11-28T06:07:51.750Z"
   },
   "6822": {
     "anisearchId": 6001,
@@ -244327,16 +244376,16 @@
         "url": "https://www.amazon.de/dp/B08V14MGSB?tag=anisearch.de-21"
       },
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CHN254RC?tag=anisearch.de-21"
-      },
-      {
         "provider": "akibapass",
         "url": "https://akibapassshop.de/Demon-King-Daimao-Season-1-DIGITAL_2?ref=anisearch"
       },
       {
         "provider": "akibapass",
         "url": "https://akibapasstv.vhx.tv/products/demon-king-daimao-de-season-1"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CHN254RC?tag=anisearch.de-21"
       },
       {
         "provider": "adn-de",
@@ -244430,7 +244479,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:10:57.231Z"
+    "fetchedAt": "2026-11-28T06:07:58.901Z"
   },
   "7090": {
     "anisearchId": 3476,
@@ -246553,7 +246602,7 @@
         "The Vanishment of Haruhi Suzumiya"
       ]
     },
-    "fetchedAt": "2026-10-29T04:11:04.180Z"
+    "fetchedAt": "2026-11-28T06:08:06.051Z"
   },
   "7314": {
     "anisearchId": 4747,
@@ -255294,6 +255343,10 @@
         {
           "name": "Web Archive (Geneonuniversal)",
           "url": "https://web.archive.org/web/20140502204829/https://www.geneonuniversal.jp/rondorobe/anime/hotd/"
+        },
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/high-school-of-the-dead-especial-television/"
         }
       ],
       "synonyms": [
@@ -255302,7 +255355,7 @@
         "High School of the Dead - Apocalipsis en el instituto"
       ]
     },
-    "fetchedAt": "2026-10-29T04:11:11.196Z"
+    "fetchedAt": "2026-11-28T06:08:13.339Z"
   },
   "8078": {
     "anisearchId": 6061,
@@ -258708,7 +258761,7 @@
         "Samurai Girls : Expertes en Strip Fighting !"
       ]
     },
-    "fetchedAt": "2026-10-29T04:11:25.040Z"
+    "fetchedAt": "2026-11-28T06:08:20.491Z"
   },
   "8278": {
     "anisearchId": 7390,
@@ -259037,7 +259090,7 @@
         "Kid The Phantom Thief"
       ]
     },
-    "fetchedAt": "2026-10-29T04:11:31.960Z"
+    "fetchedAt": "2026-11-28T06:08:27.629Z"
   },
   "8311": {
     "anisearchId": 6207,
@@ -260682,7 +260735,7 @@
         "Metal Fight Beyblade Explosion"
       ]
     },
-    "fetchedAt": "2026-10-29T04:11:38.862Z"
+    "fetchedAt": "2026-11-28T06:08:34.761Z"
   },
   "8415": {
     "anisearchId": 3010,
@@ -263984,7 +264037,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:11:45.786Z"
+    "fetchedAt": "2026-11-28T06:08:41.907Z"
   },
   "8630": {
     "anisearchId": 6226,
@@ -270478,7 +270531,7 @@
         "To Love-Ru: Staffel 2"
       ]
     },
-    "fetchedAt": "2026-10-29T04:11:52.699Z"
+    "fetchedAt": "2026-11-28T06:08:49.053Z"
   },
   "9200": {
     "anisearchId": 6787,
@@ -271250,7 +271303,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:11:59.780Z"
+    "fetchedAt": "2026-11-28T06:08:56.369Z"
   },
   "9254": {
     "anisearchId": 7166,
@@ -274086,16 +274139,16 @@
     "descriptionDe": "2036. Drei Schülerinnen streifen durch die Außenbezirke von Tokio. An sich nichts Besonderes, doch sind sie weit und breit die einzigen Menschen, denn der einstige Stolz des Landes hat sich in eine Geisterstadt verwandelt. 20 Jahre zuvor verstrahlte eine Kernschmelze den gesamten Großraum Tokio, wobei der Großteil der Bevölkerung entweder direkt durch die Strahlung oder durch deren Spätfolgen umkam. Die Mädchen gehören zu den Wenigen, die sich in diesem verstrahlten Gebiet frei bewegen können, denn sie sind Teil einer militärischen Sondereinheit und wurden mittels genetischer Manipulation resistent gegen die Radioaktivität gemacht, wurden also eigens für diese Mission erschaffen. Ihre Aufgabe ist es nun den letzten verbliebenen Notsignalen aus der Stadt nachzugehen und das seit zwei Jahrzehnten nicht mehr betretene Gebiet zu erforschen. \n\nQuelle: www.anisearch.de/anime/6483",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CH3DKBLV?tag=anisearch.de-21"
-      },
-      {
         "provider": "amazon-de",
         "url": "https://www.amazon.de/dp/B0CH3FN1S9?tag=anisearch.de-21"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/coppelion"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CH3DKBLV?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -274177,7 +274230,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:12:06.693Z"
+    "fetchedAt": "2026-11-28T06:09:03.519Z"
   },
   "9488": {
     "anisearchId": 6547,
@@ -277979,7 +278032,12 @@
   "9756": {
     "anisearchId": 6601,
     "descriptionDe": "Madoka Kaname lebt ein gewöhnliches und unauffälliges Leben, hat normale Vorlieben und legt in der Schule ein schier mustergültiges Verhalten an den Tag. Sie spielt sich nie in den Vordergrund, sondern steht für ein harmonisches Miteinander ein und denkt meist zuerst an andere als an sich selbst. Trotzdem wünscht sie sich insgeheim auch, etwas Bedeutsames tun zu können oder etwas Besonderes zu sein.\n\nAls eines Tages die Austauschschülerin Homura Akemi in ihre Klasse kommt, die in allem, was sie tut, perfekt zu sein scheint und dennoch für jeden unnahbar wirkt, bleiben dieser die freundlichen Ambitionen von Madoka nicht verborgen. Daher gibt sie ihr einen Ratschlag mit auf den Weg: Wenn ihr ihre Familie am Herzen läge, solle sie nicht versuchen, jemand anderes sein zu wollen als sie selbst. So ungewöhnlich das auch klingen mag, macht es doch Sinn, als Madoka einem kleinen Wesen namens Kyubey begegnet, der nur dann gesehen werden kann, wenn er dies selbst wünscht. Er berichtet ihr von dem Kampf der rechtschaffenen Magical Girls gegen die bösen Hexen, die überall auf der Welt versuchen, die Menschen ins Verderben zu stürzen. Wenn sie einen Kontrakt mit ihm eingehen würde, wird er ihr einen beliebigen Wunsch erfüllen, aber als Gegenleistung muss sie ihn fortan als »Puella Magi« beziehungsweise »Mahou Shoujo« im Kampf gegen die Hexen unterstützen.\n\nDabei ist sie nicht das einzige Mädchen aus ihrem Umfeld, das gerade in diesen verworrenen und fürchterlichen Konflikt hineingezogen wird, in dem kaum etwas so ist, wie es scheint. \n\nQuelle: www.anisearch.de/anime/6601",
-    "streams": [],
+    "streams": [
+      {
+        "provider": "animation-digital-network-(de)",
+        "url": "https://animationdigitalnetwork.com/de/video/1318"
+      }
+    ],
     "info": {
       "languages": [
         {
@@ -278083,7 +278141,7 @@
         "Mahou Shoujo Madoka Magika"
       ]
     },
-    "fetchedAt": "2026-10-29T04:12:13.736Z"
+    "fetchedAt": "2026-11-28T06:09:10.808Z"
   },
   "9759": {
     "anisearchId": 1165,
@@ -284848,7 +284906,7 @@
         "Fate/Zero (2011)"
       ]
     },
-    "fetchedAt": "2026-10-29T04:12:20.652Z"
+    "fetchedAt": "2026-11-28T06:09:17.959Z"
   },
   "10098": {
     "anisearchId": 16250,
@@ -291523,7 +291581,7 @@
         "Blood-C: The Series"
       ]
     },
-    "fetchedAt": "2026-10-29T04:12:27.695Z"
+    "fetchedAt": "2026-11-28T06:09:25.258Z"
   },
   "10491": {
     "anisearchId": 6978,
@@ -302884,7 +302942,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:12:55.379Z"
+    "fetchedAt": "2026-11-28T06:09:32.419Z"
   },
   "11505": {
     "anisearchId": 12890,
@@ -303545,7 +303603,7 @@
         "Steins;Gate: Loading Area Of Déjà Vu"
       ]
     },
-    "fetchedAt": "2026-10-29T04:13:02.401Z"
+    "fetchedAt": "2026-11-28T06:09:39.708Z"
   },
   "11593": {
     "anisearchId": 651,
@@ -305337,7 +305395,7 @@
         "Fate/Zero: Second Season"
       ]
     },
-    "fetchedAt": "2026-10-29T04:13:09.569Z"
+    "fetchedAt": "2026-11-28T06:09:46.857Z"
   },
   "11743": {
     "anisearchId": 7338,
@@ -305636,16 +305694,16 @@
     "descriptionDe": "Die Geschichte handelt von dem Jungen Kazuto »Kirito« Kirigaya, der an einem Massen-Mehrspieler-Online-Rollenspiel, kurz MMORPG, namens »Sword Art Online« teilnimmt.\n\nAnders als Spiele an einem Computer funktioniert dieses Spiel mithilfe eines Hightech-Helms, welcher den Nutzer in die Welt von »SAO« befördert. Nach Eröffnung des Spiels bemerken die Spieler allerdings zunehmend ein Problem: Das Menü innerhalb des Spiels verfügt über keinen Eintrag zum Ausloggen. Somit sind alle Spieler in der Fantasy-Welt gefangen und können die virtuelle Realität nicht verlassen.\n\nDer Täter scheint der Chefentwickler des Spiels zu sein, der in der Einführung zudem davor warnt, dass ein gewaltvolles Ausschalten des Helms von Außen den Tod des Spielers zufolge hätte. Auch ein Tod im Spiel soll den Helm des entsprechenden Spielers dazu veranlassen, ihn mit elektrischen Strömen zu töten, welche eigentlich nur zum Datentransfer mit dem Gehirn des Spielers gedacht sind. Die einzige Möglichkeit, um aus dem Spiel zu entkommen: Die Spieler sollen es schaffen, bis zur letzten Ebene zu gelangen und das Spiel zu gewinnen … \n\nQuelle: www.anisearch.de/anime/7335",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJM4QKV4?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/70302573"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/sword-art-online"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJM4QKV4?tag=anisearch.de-21"
       },
       {
         "provider": "adn-de",
@@ -305757,7 +305815,7 @@
         "SAO"
       ]
     },
-    "fetchedAt": "2026-10-29T04:13:16.591Z"
+    "fetchedAt": "2026-11-28T06:09:54.150Z"
   },
   "11759": {
     "anisearchId": 7328,
@@ -307320,16 +307378,16 @@
     "descriptionDe": "Eigentlich sind die fünf Schüler Taichi, Iori, Himeko, Aoki und Yui dem Kulturclub beigetreten, um ihre Ruhe zu haben und ohne viel Arbeit durch die Yamahoshi Hochschule zu kommen. Doch die beschaulichen Nachmittage sind vorbei, als Herzsame erscheint, eine unbekannte Lebensform, die sich für die menschlichen Emotionen interessiert. Als Testobjekte hat er sich den Kulturclub ausgesucht und um die Sache voran zu treiben, lässt er die Mitglieder willkürlich die Körper tauschen. Die fünf Freunde sind nun dazu gezwungen, sich mit ihren Problemen und Traumata auseinander zu setzen, die sie bis jetzt versucht haben, geheim zu halten. \n\nQuelle: www.anisearch.de/anime/7383",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CH1KS1R4?tag=anisearch.de-21"
-      },
-      {
         "provider": "amazon-de",
         "url": "https://www.amazon.de/dp/B0D489L88J?tag=anisearch.de-21"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/kokoro-connect"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CH1KS1R4?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -307408,7 +307466,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:13:23.533Z"
+    "fetchedAt": "2026-11-28T06:10:01.306Z"
   },
   "11889": {
     "anisearchId": 8778,
@@ -312249,7 +312307,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:13:30.444Z"
+    "fetchedAt": "2026-11-28T06:10:08.451Z"
   },
   "12481": {
     "anisearchId": 6590,
@@ -317377,7 +317435,7 @@
         "Hagure Yusha no Estetica"
       ]
     },
-    "fetchedAt": "2026-10-29T04:13:37.389Z"
+    "fetchedAt": "2026-11-28T06:10:15.599Z"
   },
   "13163": {
     "anisearchId": 7639,
@@ -317953,12 +318011,12 @@
     "descriptionDe": "Viele Menschen fallen einer neuen, sehr verdächtigen Religion zum Opfer. Lupin III infiltriert diese Gruppe, um so an den Schatz zu gelangen, der vom Anführer dieser Gruppe versteckt gehalten wird. Dort begegnet er der wunderschönen, bezaubernden Fujiko Mine, die den Anführer dieser religiösen Gruppe durch ihre Schönheit verführen konnte. Dies ist die Geschichte über die diebische Fujiko Mine, wie sie den Meisterdieb Lupin III das erste Mal traf. \n\nQuelle: www.anisearch.de/anime/7647",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CHNCTS9X?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/series/GY795JDZR/lupin-the-third---the-woman-called-fujiko-mine"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CHNCTS9X?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -318050,7 +318108,7 @@
         "Lupin the 3rd: The Woman Called Fujiko Mine"
       ]
     },
-    "fetchedAt": "2026-10-29T04:13:44.300Z"
+    "fetchedAt": "2026-11-28T06:10:22.965Z"
   },
   "13207": {
     "anisearchId": 6949,
@@ -330173,7 +330231,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:14:05.089Z"
+    "fetchedAt": "2026-11-28T06:10:30.112Z"
   },
   "15125": {
     "anisearchId": 8003,
@@ -331445,7 +331503,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:14:12.003Z"
+    "fetchedAt": "2026-11-28T06:10:37.258Z"
   },
   "15379": {
     "anisearchId": 8024,
@@ -339444,19 +339502,11 @@
     "streams": [
       {
         "provider": "amazon-de",
-        "url": "https://www.amazon.de/dp/B0GZJ7KH73?tag=anisearch.de-21"
-      },
-      {
-        "provider": "amazon-de",
-        "url": "https://www.amazon.de/dp/B0CWG9V8VB?tag=anisearch.de-21"
+        "url": "https://www.amazon.de/gp/video/detail/0OBFWER39MSK6AW8LH870ZI3IY?ref_=atv_dl_rdr"
       },
       {
         "provider": "youtube",
         "url": "https://www.youtube.com/playlist?list=PLNcqwhPhO46GSE_1eBVzMpx4eu8NjIrG-"
-      },
-      {
-        "provider": "adn-de",
-        "url": "https://animationdigitalnetwork.com/de/video/662-attack-on-titan"
       }
     ],
     "info": {
@@ -339522,7 +339572,7 @@
         },
         {
           "language": "Italienisch",
-          "title": "L'Attacco dei Giganti",
+          "title": "L’Attacco dei Giganti",
           "status": "Abgeschlossen",
           "dubbed": true,
           "released": "21.07.2014 - 30.12.2014",
@@ -339561,6 +339611,10 @@
         {
           "name": "Shingeki",
           "url": "https://shingeki.tv/season1/"
+        },
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/ataque-a-los-titanes/"
         }
       ],
       "synonyms": [
@@ -339569,7 +339623,7 @@
         "SnK"
       ]
     },
-    "fetchedAt": "2026-10-29T04:14:19.061Z"
+    "fetchedAt": "2026-11-28T06:10:44.549Z"
   },
   "16506": {
     "anisearchId": 11108,
@@ -345953,12 +346007,12 @@
     "descriptionDe": "»Log Horizon« adaptiert den Beginn der gleichnamigen Light Novel aus der Feder des Autors Mamare Touno.\n\nEs ist schon einige Jahre her, dass er sich bei dem Online-Rollenspiel »Elder Tale« registriert hat. Doch als sich Shiroe endlich wieder dazu durchringen kann, sich anzumelden, muss er mit Schrecken feststellen, dass sich nicht nur sein Spiegelbild zu einem Halb-Alv verwandelt hat: Für ein Online-RPG fühlt sich alles viel zu real an. Zu allem Überfluss kann er sich auch nicht mehr ausloggen. Wie sich bald herausstellt, teilt er dieses Schicksal mit tausenden anderen Spielern, die alle zum Zeitpunkt eines neuen Updates eingeloggt waren. Mit seinem alten Freund Naotsugu, einem Ritter, und Akatsuki, einer Assassine, die er noch aus seiner aktiven Zockerzeit kennt, macht sich Shiroe alsbald auf die Suche nach einer Lösung für dieses Problem … \n\nQuelle: www.anisearch.de/anime/8348",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CG8YLC3X?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/log-horizon"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CG8YLC3X?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -346067,7 +346121,7 @@
         }
       ]
     },
-    "fetchedAt": "2026-10-29T04:14:26.083Z"
+    "fetchedAt": "2026-11-28T06:10:51.842Z"
   },
   "17267": {
     "anisearchId": 8352,
@@ -350538,12 +350592,12 @@
         "url": "https://www.amazon.de/dp/B0CGMHX1JB?tag=anisearch.de-21"
       },
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0C8X9NYNX?tag=anisearch.de-21"
-      },
-      {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/dog-scissors"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0C8X9NYNX?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -350627,7 +350681,7 @@
         "InuHasa"
       ]
     },
-    "fetchedAt": "2026-10-29T04:14:33.015Z"
+    "fetchedAt": "2026-11-28T06:10:58.987Z"
   },
   "17835": {
     "anisearchId": 8393,
@@ -353150,7 +353204,7 @@
         "Beyond the Horizon"
       ]
     },
-    "fetchedAt": "2026-10-29T04:14:39.934Z"
+    "fetchedAt": "2026-11-28T06:11:06.144Z"
   },
   "18155": {
     "anisearchId": 8434,
@@ -355998,10 +356052,6 @@
     "descriptionDe": "Haruka Nanase liebt es, zu schwimmen! Zudem ist er auch richtig gut darin, sodass er und seine Freunde und Schwimmklubkollegen Makoto Tachibana, Nagisa Hazuki und Rin Matsuoka sich dazu entscheiden, gemeinsam an einem Wettbewerb teilzunehmen. Sie schaffen es, das Turnier zu gewinnen, doch das markiert auch das Ende ihrer gemeinsamen Zeit im Schwimmklub. Denn Rin macht sich auf den Weg nach Australien, um dort an einer Schule mit starkem Schwimmteam zu trainieren.\n\nJahre vergehen und Haru und Co. sind mittlerweile Schüler an der Iwatobi Oberschule. Und auch Rin taucht wieder auf, hat sich über die Jahre jedoch komplett verändert. Prompt fordert er Haruka zu Wettkampf heraus, zeigt dabei seine überwältigende Kraft. Das Einzige, was ihn noch interessiert, ist zu zeigen, dass er besser als Haru ist. Es ist ein bitteres Wiedersehen …\n\nZusammen mit Makoto, Nagisa und Rei Ryugazaki, einem Mitschüler, dem sie das Schwimmen erst beibringen müssen, gründen sie den Iwatobi-Schwimmklub. Ihr Ziel: Spaß haben, Rin besiegen und den Streit endgültig schlichten! \n\nQuelle: www.anisearch.de/anime/8639",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CGVS29ZD?tag=anisearch.de-21"
-      },
-      {
         "provider": "amazon-de",
         "url": "https://www.amazon.de/dp/B097TFHK8F?tag=anisearch.de-21"
       },
@@ -356012,6 +356062,10 @@
       {
         "provider": "akibapass",
         "url": "https://akibapasstv.vhx.tv/products/free-de-season-1"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CGVS29ZD?tag=anisearch.de-21"
       },
       {
         "provider": "adn-de",
@@ -356114,7 +356168,7 @@
         "Free! Staffel 1"
       ]
     },
-    "fetchedAt": "2026-10-29T04:14:46.877Z"
+    "fetchedAt": "2026-11-28T06:11:13.292Z"
   },
   "18521": {
     "anisearchId": 8630,
@@ -367315,7 +367369,7 @@
         "SAO: Extra Edition"
       ]
     },
-    "fetchedAt": "2026-10-29T04:14:53.791Z"
+    "fetchedAt": "2026-11-28T06:11:20.435Z"
   },
   "20023": {
     "anisearchId": 10616,
@@ -371619,13 +371673,17 @@
         {
           "name": "J Haikyu",
           "url": "https://www.j-haikyu.com/"
+        },
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/haikyuu-temporada-1-3/"
         }
       ],
       "synonyms": [
         "HQ!!"
       ]
     },
-    "fetchedAt": "2026-10-29T04:15:00.736Z"
+    "fetchedAt": "2026-11-28T06:11:27.588Z"
   },
   "20465": {
     "anisearchId": 8961,
@@ -379377,10 +379435,6 @@
     "descriptionDe": "Ein Jahr ist bereits vergangen, seit Kazuto Kirigaya und seine Kameraden wieder in die reale Welt zurückgekehrt sind, und trotz der tragischen Ereignisse in der Welt von »Sword Art Online« reißt die weltweite Popularität von VRMMOs nicht ab. Als eines der härtesten und populärsten Spiele sticht vor allem eines dabei in jüngster Zeit heraus, in dem weniger mit Klingen als mit Schusswaffen gekämpft wird – das berüchtigte »Gun Gale Online«, das als ungemein hart gilt. Während Kazuto zusammen mit seiner Freundin Asuna in letzter Zeit wieder einen normalen Alltag und ein ruhigeres Leben genießt, beginnen sich in diesem neuen Spiel die seltsamen Ereignisse zu häufen.\n\nSeit der Spieler Death Gun auf der Bildfläche erschienen ist und virtuell besiegte Gegner scheinbar auch in der realen Welt tötet, greift die Angst um sich. Von einem Staatsbeamten um Hilfe bei der Aufklärung der Morde gebeten, nimmt Kazuto erneut seine Rolle als Kirito an und registriert sich bei »Gun Gale Online«, um den Mörder zu stoppen. Allerdings liegt ihm das Schießen mit Pistolen und Langwaffen so gar nicht und die erste Trainingseinheit, die er zusammen mit der äußerst talentierten Scharfschützin Sinon absolviert, offenbart, dass er in diesem Spiel weniger ein Profi, sondern eher ein blutiger Anfänger ist. Zumindest bis er bemerkt, dass die von anderen Spieler verachteten Lichtschwerter dieser Welt mit seinen mitgebrachten Fähigkeiten aus Sword Art Online harmonieren und Kugeln im richtigen Winkel mühelos aufhalten können.\n\nNun doch gut gerüstet und immer noch undercover fehlt von dem Mörder leider aber immer noch jede Spur, und selbst bei Sinon, die von ihrer tragischen Vergangenheit geplagt wird, kann man sich nicht sicher sein, dass sie unschuldig ist. Ob Kirito Death Gun wohl vielleicht bald schon näherkommen kann, wenn er sich für das Bullet of Bullets Turnier registriert? \n\nQuelle: www.anisearch.de/anime/9323",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CH5VT86J?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/70302573"
       },
@@ -379391,6 +379445,10 @@
       {
         "provider": "adn-de",
         "url": "https://animationdigitalnetwork.com/de/video/442-sword-art-online?s=2"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CH5VT86J?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -379503,7 +379561,7 @@
         "Sword Art Online: Staffel 2"
       ]
     },
-    "fetchedAt": "2026-10-29T04:15:07.787Z"
+    "fetchedAt": "2026-11-28T06:11:34.902Z"
   },
   "20595": {
     "anisearchId": 9328,
@@ -382345,7 +382403,7 @@
         "Terraformars"
       ]
     },
-    "fetchedAt": "2026-10-29T04:15:14.729Z"
+    "fetchedAt": "2026-11-28T06:11:42.050Z"
   },
   "20630": {
     "anisearchId": 9649,
@@ -406141,10 +406199,6 @@
         "url": "https://www.amazon.de/dp/B07F1TXDSV?tag=anisearch.de-21"
       },
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJDNM547?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/80090673"
       },
@@ -406155,6 +406209,10 @@
       {
         "provider": "adn-de",
         "url": "https://animationdigitalnetwork.de/video/haikyuu"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJDNM547?tag=anisearch.de-21"
       },
       {
         "provider": "akibapass",
@@ -406263,6 +406321,10 @@
         {
           "name": "J Haikyu",
           "url": "https://www.j-haikyu.com/anime/"
+        },
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/haikyuu-temporada-2/"
         }
       ],
       "synonyms": [
@@ -406270,7 +406332,7 @@
         "Haikyuu!! 2"
       ]
     },
-    "fetchedAt": "2026-10-29T04:15:21.643Z"
+    "fetchedAt": "2026-11-28T06:11:49.205Z"
   },
   "20993": {
     "anisearchId": 10122,
@@ -414928,7 +414990,7 @@
         "Dragonball Super"
       ]
     },
-    "fetchedAt": "2026-10-29T04:15:28.589Z"
+    "fetchedAt": "2026-11-28T06:11:56.351Z"
   },
   "21177": {
     "anisearchId": 10948,
@@ -429326,7 +429388,8 @@
           "released": "08.07.2016 - 30.09.2016",
           "publisher": [
             "Crunchyroll",
-            "FUNimation"
+            "FUNimation",
+            "Muse Communication Co.,Ltd."
           ]
         },
         {
@@ -429394,14 +429457,14 @@
       "websites": [
         {
           "name": "Alderamin",
-          "url": "https://alderamin.net/"
+          "url": "http://alderamin.net/"
         }
       ],
       "synonyms": [
         "Alderamin of the Sky"
       ]
     },
-    "fetchedAt": "2026-10-29T04:15:35.500Z"
+    "fetchedAt": "2026-11-28T06:12:03.496Z"
   },
   "21411": {
     "anisearchId": 9431,
@@ -443478,10 +443541,6 @@
         "url": "https://www.amazon.de/dp/B07L1CMH2D?tag=anisearch.de-21"
       },
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJJHX83T?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/80090673"
       },
@@ -443492,6 +443551,10 @@
       {
         "provider": "adn-de",
         "url": "https://animationdigitalnetwork.de/video/haikyuu"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJJHX83T?tag=anisearch.de-21"
       },
       {
         "provider": "akibapass",
@@ -443599,6 +443662,10 @@
         {
           "name": "Web Archive (J Haikyu)",
           "url": "https://web.archive.org/web/20251018124225/https://www.j-haikyu.com/anime/"
+        },
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/haikyuu-temporada-3/"
         }
       ],
       "synonyms": [
@@ -443608,7 +443675,7 @@
         "Haikyuu!! Third Season"
       ]
     },
-    "fetchedAt": "2026-10-29T04:15:42.432Z"
+    "fetchedAt": "2026-11-28T06:12:10.644Z"
   },
   "21699": {
     "anisearchId": 11210,
@@ -494569,16 +494636,16 @@
     "descriptionDe": "Als Kirito in einem riesigen Wald erwacht, umgeben von einer atemberaubenden Kulisse aus gewaltigen Bäumen, bemerkt er, dass er nur noch eine verschwommene Erinnerung daran hat, was vor seinem Einloggen in die virtuelle Welt geschehen ist. Auf der Suche nach Hinweisen beginnt er den Wald zu erkunden und trifft vor der großen Zeder auf einen Jungen namens Eugeo, der Kirito bereits zu kennen scheint. Obwohl es sich bei dem Jungen um einen Non Player Character handeln muss, besitzt er dieselbe Tiefe und Komplexität an Emotionen wie ein menschliches Wesen. Die beiden machen sich auf die Suche nach seinen Eltern, bis Kirito plötzlich eine Erinnerung, die tief in ihm verborgen lag, wiedererlangt – eine Erinnerung aus seiner eigenen Kindheit! Darin läuft er gemeinsam mit Eugeo durch den Wald und an seiner Seite ist ein Mädchen mit goldenen Haaren, das den Namen Alice trägt. Doch wer ist diese mysteriöse Alice, deren Name nie hätte vergessen werden sollen?Anmerkung:\nVor ihrer TV-Premiere im Oktober 2018 wurde die erste Episode am 15. September 2018 in mehreren Ländern vorab gezeigt.",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CGGMH67R?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/70302573"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/sword-art-online"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CGGMH67R?tag=anisearch.de-21"
       },
       {
         "provider": "adn-de",
@@ -494697,7 +494764,7 @@
         "SAO: Alicization"
       ]
     },
-    "fetchedAt": "2026-10-29T04:15:49.458Z"
+    "fetchedAt": "2026-11-28T06:12:17.936Z"
   },
   "100183": {
     "anisearchId": 12853,
@@ -555616,10 +555683,6 @@
     "descriptionDe": "Mit »Haikyu!! To the Top« geht die Anime-Adaption des gleichnamigen Ganbatte-Mangas in die nunmehr 4. Staffel, die in zwei Teilen ausgestrahlt wird.\n\nDas Volleyball-Team der Karasuno-Oberschule hat sich endlich für das begehrte Nationalturnier qualifiziert, nachdem es zuletzt seine Gegner der Shiratorizawa-Akademie besiegt hat. Als Vorbereitung auf das wichtige Ereignis beginnt für alle die Trainingsphase. Der geniale Steller (Zuspieler) Tobio Kageyama, der auch »König des Spielfeldes« genannt wird, wurde hierfür zum »All-Japan Jugendtrainingscamp« nach Tokio eingeladen und erhält das Privileg, mit den Besten der Besten zu trainieren, und darf sich somit zu einem der anerkanntesten Spieler des Landes zählen. Der Mittelblocker Kei Tsukishima wird ebenfalls zu einem speziellen Trainingslager zur Förderung des Nachwuchses der ersten Oberschul-Jahrgangsstufen der Präfektur Miyagi eingeladen. Einzig Shouyou Hinata erhält keine Einladung, was ihn ziemlich kränkt. Shouyou gibt allerdings nicht nach und entschließt sich kurzerhand, sich in dasselbe Camp einzuschleichen, das auch Kei besucht. Er ergattert zwar nur einen Job als Balljunge, empfindet dies aber trotzdem als große Chance, nicht nur seine eigenen Fähigkeiten als Volleyballer zu reflektieren, sondern im gleichen Zug auch sein Umfeld sowie die Spielweisen der anderen Teilnehmer gründlich zu analysieren, um sich selbst weiterzuentwickeln. \n\nQuelle: www.anisearch.de/anime/14041",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CGM219R1?tag=anisearch.de-21"
-      },
-      {
         "provider": "amazon-de",
         "url": "https://www.amazon.de/dp/B09192P17W?tag=anisearch.de-21"
       },
@@ -555642,6 +555705,10 @@
       {
         "provider": "adn-de",
         "url": "https://animationdigitalnetwork.de/video/haikyuu"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CGM219R1?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -555742,13 +555809,17 @@
         {
           "name": "J Haikyu",
           "url": "https://www.j-haikyu.com/anime/"
+        },
+        {
+          "name": "Selecta Vision",
+          "url": "https://www.selecta-vision.com/catalogos/haikyuu-temporada-4/"
         }
       ],
       "synonyms": [
         "Haikyu!! 4th Season"
       ]
     },
-    "fetchedAt": "2026-10-29T04:15:56.378Z"
+    "fetchedAt": "2026-11-28T06:12:25.086Z"
   },
   "106674": {
     "anisearchId": 14805,
@@ -568296,16 +568367,16 @@
     "descriptionDe": "»Sword Art Online: Alicization - War of Underworld« setzt den »Alicization«-Handlungsbogen der Anime-Adaption zu Reki Kawaharas Light-Novel fort. Der lange Aufstieg zur höchsten Ebene der Kathedrale verlangte Kirito und Eugeo einiges ab und auch erneutes ihr Wiedersehen mit Alice verlief alles andere als erhofft … Nach der Auseinandersetzung musste Eugeo seinen Weg zur Spitze getrennt von Kirito und Alice fortsetzen, die sich nun gemeinsam an der Außenmauer des Turms nach oben arbeiteten. Als sie endlich auf den obersten Stockwerken ankamen, war es nicht nur an ihnen, den einer Gehirnwäsche unterzogenen Eugeo wieder auf die rechte Bahn zu lenken, sondern stand nun der Kampf gegen den Administrator an. Kirito und seine Freunde konnten dieses Gefecht zwar erfolgreich überstehen, doch der Preis für diesen hart erkämpften Sieg war hoch. Nicht nur Alices Erinnerungsmodul und Cardinal fielen Administrator zum Opfer, auch Eugeo gab sein Leben, um den Sieg seiner Freunde zu garantieren …!\n\nDurch Quinellas Fluchtversuch und den schweren Angriff auf die Forschungseinrichtung Rath ist die Zukunft für Kirito, Alice und die übrigen Bewohner Underworlds jedoch mehr als unsicher. Wie wird es weitergehen und was hat es mit den letzten Anweisungen Kikuokas auf sich? Sind sie die Rettung für Kirito …? \n\nQuelle: www.anisearch.de/anime/14323",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJCZYJWZ?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/70302573"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/sword-art-online"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJCZYJWZ?tag=anisearch.de-21"
       },
       {
         "provider": "adn-de",
@@ -568420,7 +568491,7 @@
         "SAO Alicization 2"
       ]
     },
-    "fetchedAt": "2026-10-29T04:16:03.527Z"
+    "fetchedAt": "2026-11-28T06:12:32.237Z"
   },
   "108760": {
     "anisearchId": 14189,
@@ -591721,10 +591792,6 @@
     "descriptionDe": "»Haikyu!! To the Top Cour 2« ist die zweite Hälfte der vierten Staffel und wirft den Zuschauer zurück ins Geschehen des Nationalturniers der Oberschulen, das bereits in der ersten Hälfte begann. Die Karasuno-Oberschule konnte ihr Auftaktspiel gewinnen, doch ihr zweiter Gegner gehört bereits zu den gefürchtetsten des ganzen Turniers: die Inarizaki-Oberschule, die nicht nur im »Inter-High-Nationalturnier 2012« Zweiter geworden ist, sondern zu allem Übel auch noch eine regelrechte Armee des Anfeuerns mit sich führt.\n\nDie Mannschaft der Karasuno-Oberschule muss erneut über sich hinauswachsen – es wird sich zeigen, was Tobio Kageyama und Kei Tsukishima in ihren jeweiligen Trainingslagern gelernt haben. Nachdem Inarizaki ihren Gegner mit einem Auftakt-Ass direkt schockiert, entwickelt sich ein Schlagabtausch, bei dem sich Karasuno trotz mitunter irritierender Fanunterstützung nicht unterkriegen lässt. Doch dann dreht der Gegner den Spieß auf eine Weise um, mit der Shouyou Hinata und seine Teammitglieder in ihren schlimmsten Träumen nicht gerechnet hätten. \n\nQuelle: www.anisearch.de/anime/14832",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CGM219R1?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/80090673"
       },
@@ -591743,6 +591810,10 @@
       {
         "provider": "adn-de",
         "url": "https://animationdigitalnetwork.de/video/haikyuu"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CGM219R1?tag=anisearch.de-21"
       }
     ],
     "info": {
@@ -591849,7 +591920,7 @@
         "Haikyuu!! To the Top Part II"
       ]
     },
-    "fetchedAt": "2026-10-29T04:16:17.368Z"
+    "fetchedAt": "2026-11-28T06:12:46.533Z"
   },
   "113555": {
     "anisearchId": 14074,
@@ -597722,16 +597793,16 @@
     "descriptionDe": "Die letzte Etappe des »Alicization«-Handlungsbogens der Anime-Adaption zu Reki Kawaharas »Sword Art Online«-Light-Novel beginnt: Es herrscht Krieg und Gabriel Millers Plan, mit dem Dark Territory das Human Empire zu besiegen, schlug fehl. Doch mithilfe seines Komplizen Critter konnten sich mehrere tausend amerikanische Spieler in die Underworld einloggen. Als Einheiten beider Seiten von diesen getötet wurden, beschlossen Alice, Asuna und Iskahn einen Waffenstillstand zwischen ihren beiden Reichen und kämpfen nun gemeinsam gegen die feindlichen Eindringlinge. Weiterhin geplagt von Schuldgefühlen, ist Kirito nicht dazu in der Lage, aktiv in das Geschehen einzugreifen.\n\nWährend der Schlacht konnte Gabriel Alice gefangen nehmen und als Bercouli und Asuna aufbrachen, um sie zurückzuholen, erschienen tausende weitere Einheiten und schnitten ihren Weg ab, doch die Rettung in Form von Sinon kam in letzter Minute. In der realen Welt versuchen Yui und die anderen Unterstützung zu sammeln, aber Verletzungen, die für echte Schmerzen sorgen, und der Tod, der den Verlust des Charakters bedeutet, sind für viele potentielle Unterstützer ein Dealbreaker. Das Schicksal der Underworld liegt in Asunas und Kiritos Händen, doch deren Vergangenheit aus »SAO« holt sie wieder ein und sie müssen sich einem altbekannten Widersacher stellen. \n\nQuelle: www.anisearch.de/anime/14847",
     "streams": [
       {
-        "provider": "primevideo-channel-crunchyroll-de",
-        "url": "https://www.amazon.de/dp/B0CJCZYJWZ?tag=anisearch.de-21"
-      },
-      {
         "provider": "netflix",
         "url": "https://www.netflix.com/title/70302573"
       },
       {
         "provider": "crunchyroll",
         "url": "https://www.crunchyroll.com/sword-art-online"
+      },
+      {
+        "provider": "primevideo-channel-crunchyroll-de",
+        "url": "https://www.amazon.de/dp/B0CJCZYJWZ?tag=anisearch.de-21"
       },
       {
         "provider": "adn-de",
@@ -597846,7 +597917,7 @@
         "SAO: Alicization - War of Underworld 2"
       ]
     },
-    "fetchedAt": "2026-10-29T04:16:10.445Z"
+    "fetchedAt": "2026-11-28T06:12:39.387Z"
   },
   "114333": {
     "anisearchId": 15484,
@@ -688831,7 +688902,7 @@
         "Demon Slave"
       ]
     },
-    "fetchedAt": "2026-10-29T04:16:31.212Z"
+    "fetchedAt": "2026-11-28T06:20:33.293Z"
   },
   "141852": {
     "anisearchId": 17102,
@@ -697144,7 +697215,7 @@
     "streams": [
       {
         "provider": "primevideo-channel-aniverse-de",
-        "url": "https://www.amazon.de/dp/B0GPJCH159?tag=anisearch.de-21"
+        "url": "https://www.amazon.de/gp/video/detail/0JRDPUTPQ3OSO5O8K4QKK6YS0N?ref_=atv_dl_rdr"
       },
       {
         "provider": "netflix",
@@ -697259,8 +697330,8 @@
       "adaptedFrom": "Manga",
       "websites": [
         {
-          "name": "Twitter",
-          "url": "https://twitter.com/uy_allstars"
+          "name": "X",
+          "url": "https://x.com/uy_allstars"
         },
         {
           "name": "Uy Allstars",
@@ -697275,7 +697346,7 @@
         "Urusei Yatsura Reboot"
       ]
     },
-    "fetchedAt": "2026-10-29T04:16:38.156Z"
+    "fetchedAt": "2026-11-28T06:12:53.672Z"
   },
   "143287": {
     "anisearchId": 19477,
@@ -720513,7 +720584,7 @@
         "The Bad Part of My Heart"
       ]
     },
-    "fetchedAt": "2026-10-29T04:16:45.092Z"
+    "fetchedAt": "2026-11-28T06:13:00.829Z"
   },
   "153288": {
     "anisearchId": 17576,
@@ -730303,7 +730374,7 @@
         "Lum: Urusei Yatsura Part 2"
       ]
     },
-    "fetchedAt": "2026-10-29T04:16:58.962Z"
+    "fetchedAt": "2026-11-28T06:13:15.116Z"
   },
   "155657": {
     "anisearchId": 17776,
@@ -737787,7 +737858,7 @@
         "My Instant Death Ability Is Overpowered"
       ]
     },
-    "fetchedAt": "2026-10-29T04:16:52.038Z"
+    "fetchedAt": "2026-11-28T06:13:07.976Z"
   },
   "158036": {
     "anisearchId": 17926,
@@ -750435,7 +750506,7 @@
         "Jellyfish Can’t Swim at Night"
       ]
     },
-    "fetchedAt": "2026-10-29T04:17:05.903Z"
+    "fetchedAt": "2026-11-28T06:13:22.494Z"
   },
   "163079": {
     "anisearchId": 18299,
@@ -758164,7 +758235,7 @@
         "The Dangers in My Heart: Staffel 2"
       ]
     },
-    "fetchedAt": "2026-10-29T04:17:12.835Z"
+    "fetchedAt": "2026-11-28T06:13:29.658Z"
   },
   "166217": {
     "anisearchId": 18588,
@@ -812392,7 +812463,7 @@
         "Mission: Yozakura Family 2nd Season"
       ]
     },
-    "fetchedAt": "2026-10-29T04:17:26.696Z"
+    "fetchedAt": "2026-11-28T06:13:36.794Z"
   },
   "182587": {
     "anisearchId": 19667,
@@ -821530,8 +821601,7 @@
             "Animation Digital Network (DE)",
             "Crunchyroll",
             "Netflix, Inc.",
-            "polyband Medien GmbH",
-            "AniMoon Publishing GmbH"
+            "polyband Medien GmbH"
           ]
         },
         {
@@ -821628,7 +821698,7 @@
         "Dandadan 2nd Season"
       ]
     },
-    "fetchedAt": "2026-10-29T04:17:33.640Z"
+    "fetchedAt": "2026-11-28T06:13:43.950Z"
   },
   "185663": {
     "anisearchId": 17574,
@@ -822826,7 +822896,7 @@
           "title": "Tensei Kizoku, Kantei Skill de Nariagaru Dai 3 Ki",
           "titleNative": "転生貴族、鑑定スキルで成り上がる 第3期",
           "status": "Laufend",
-          "released": "28.09.2026 - ?"
+          "released": "28.09.2026 - 13.12.2026"
         },
         {
           "language": "Englisch",
@@ -822877,12 +822947,8 @@
           ]
         }
       ],
-      "issues": [
-        "Episodenanzahl: vorläufige Schätzung"
-      ],
       "format": "TV-Serie",
       "episodes": 12,
-      "episodesEstimated": true,
       "season": "Herbst 2026",
       "studios": [
         "GeyeG Pictures Co., Ltd."
@@ -822922,7 +822988,7 @@
         "I’ll Use My Appraisal Skill to Rise in the World 3rd Season"
       ]
     },
-    "fetchedAt": "2026-10-29T04:17:40.559Z"
+    "fetchedAt": "2026-11-28T06:13:51.091Z"
   },
   "185773": {
     "anisearchId": 20000,
@@ -843562,7 +843628,7 @@
         "Cyberpunk: Edgerunners II"
       ]
     },
-    "fetchedAt": "2026-10-29T04:17:47.492Z"
+    "fetchedAt": "2026-11-28T06:13:58.226Z"
   },
   "195571": {
     "anisearchId": 21216,

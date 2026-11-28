@@ -69,6 +69,11 @@ pruefe('vier Jahre nach der Ausstrahlung liegen außerhalb des Fensters', spaet.
 const mehrWorte = wahl([{ id: 9, titleEn: 'Dragon Quest Saga', jpYear: 2024 }], [v('b2', 'DRAGON QUEST SAGA DAWN | Trailer | Deutsch', '2024-05-01')])
 pruefe('Videoname mit zusätzlichem Wort deckt den Titel nicht (kein-treffer)', mehrWorte.funde.size === 0 && mehrWorte.verworfen['kein-treffer'] === 1, mehrWorte.verworfen)
 
+const rev = wahl([foo], [v('r1', 'DRAGON QUEST SAGA | Anime Review | Trailer | Deutsch')])
+pruefe('Label-Video mit Review im Titel: verworfen (abgelehnt)', rev.funde.size === 0 && rev.verworfen.abgelehnt === 1, rev.verworfen)
+const revNurNamen = wahl([{ id: 10, titleEn: 'Review Squad', jpYear: 2024 }], [v('r2', 'REVIEW SQUAD | Trailer | Deutsch', '2024-05-01')])
+pruefe('„Review“ im Animenamen lehnt nicht ab', revNurNamen.funde.get(10)?.video === 'r2', revNurNamen.verworfen)
+
 console.log('Übernahme in den Bestand')
 const bestand: Record<string, { sprache?: string; video?: string }> = { '1': { sprache: 'de', video: 'alt-de' }, '2': { sprache: 'en', video: 'alt-en' } }
 const ue = uebernehmeLabel(

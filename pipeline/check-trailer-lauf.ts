@@ -141,6 +141,14 @@ globalThis.fetch = (async (eingabe: string | URL | Request): Promise<Response> =
   if (nichtGefuehrtBei.has(tv)) return antwort({ status_message: 'not found' }, 404)
   /* 3 hat keinen Trailer, 4 einen deutschen, die anderen einen japanischen. */
   if (leerAlle || tv === '3') return antwort({ results: [] })
+  if (tv === '46') return antwort({ results: [{ key: 'ytRev46', name: 'Serie Gamma Anime Review', site: 'YouTube', type: 'Trailer', iso_639_1: 'de' }] })
+  if (tv === '47')
+    return antwort({
+      results: [
+        { key: 'ytRev47', name: 'Serie Epsilon Review', site: 'YouTube', type: 'Trailer', iso_639_1: 'de' },
+        { key: 'ytEn47', name: 'Serie Epsilon | Official Trailer', site: 'YouTube', type: 'Trailer', iso_639_1: 'en' },
+      ],
+    })
   if (tv === '4') return antwort({ results: [{ key: 'yt4de', name: 'Trailer', site: 'YouTube', type: 'Trailer', iso_639_1: 'de' }] })
   return antwort({ results: [{ key: `yt${tv}`, name: 'PV', site: 'YouTube', type: 'Trailer', iso_639_1: 'ja' }] })
 }) as typeof fetch
@@ -281,6 +289,24 @@ pruefe('Label: zweiter Lauf löst nichts erneut auf', beispielAbrufe === ersteBe
 labelVideos = []
 rmSync(join(wurzel, 'data', 'curated'), { recursive: true, force: true })
 rmSync(join(wurzel, 'data', 'trailer-label-kanaele.json'), { force: true })
+
+/* A8: ein Review als „Trailer“ wird nicht geschrieben und gezählt, der nächste echte Trailer genommen, ein Review im Bestand entfernt. */
+richteEin(
+  [probe(911001, 'TV', 2005, 'Serie Gamma'), probe(911002, 'TV', 2005, 'Serie Epsilon'), probe(911003, 'TV', 2005, 'Serie Delta')],
+  { '911001': { tmdbId: 46, kind: 'tv' }, '911002': { tmdbId: 47, kind: 'tv' }, '911003': { tmdbId: 48, kind: 'tv' } },
+)
+schreibe(join('data', 'trailer.json'), { '911003': { video: 'ytAltRev', titel: 'Serie Delta Anime Review', sprache: 'de', herkunft: 'tmdb', gefundenAm: '2026-10-01' } })
+const zeilen: string[] = []
+const logOriginal = console.log
+console.log = (...a: unknown[]): void => void zeilen.push(a.join(' '))
+await main({ riegel: 9 })
+console.log = logOriginal
+const abgelehntErgebnis = lies<Record<string, { video: string; sprache: string }>>(join('data', 'trailer.json'))
+pruefe('Review als einziger Fund wird nicht geschrieben', !('911001' in abgelehntErgebnis), abgelehntErgebnis['911001'])
+pruefe('Review übergangen, englischer Trailer genommen', abgelehntErgebnis['911002']?.video === 'ytEn47' && abgelehntErgebnis['911002']?.sprache === 'en', abgelehntErgebnis['911002'])
+pruefe('Review im Bestand wird entfernt, der Titel neu gesucht', abgelehntErgebnis['911003']?.video !== 'ytAltRev', abgelehntErgebnis['911003'])
+pruefe('Lauflog zählt die Ablehnungen (3× review)', zeilen.some((z) => z.includes('Kein Trailer (abgelehnt): 3× review')), zeilen.filter((z) => z.includes('abgelehnt')))
+pruefe('Lauflog nennt das abgelehnte Video mit Titel', zeilen.some((z) => z.includes('ytRev46') && z.includes('Serie Gamma Anime Review')), zeilen.filter((z) => z.includes('ytRev46')))
 
 /* A6: ein gescheiterter Abruf stempelt nicht, der nächste Lauf fragt wieder. */
 const drei = [probe(907001, 'TV'), probe(907002, 'TV'), probe(907003, 'TV'), probe(907004, 'TV')]

@@ -15,6 +15,7 @@ export const ERZEUGTE_DATEIEN = [
   'adn-offen-seit.json',
   'adn-vde-historie.json',
   'adn.json',
+  'akibapass-sprache.json',
   'amazon-gti-belegt.json',
   'anbieter-staffeln.json',
   'anbieter-vorschlaege.json',

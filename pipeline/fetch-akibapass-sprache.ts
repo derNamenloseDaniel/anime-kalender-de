@@ -43,7 +43,7 @@ async function main(): Promise<void> {
   const { seiten, hosts } = await holeAkibapassSeiten(offen, abruf, heute, warn)
   Object.assign(datei.seiten, seiten)
   const geholt = Object.keys(seiten).length
-  for (const [host, z] of Object.entries(hosts)) log(`Akibapass ${host}: ${z.geholt} geholt, ${z.gesperrt} gesperrt, ${z.uebersprungen} übersprungen`)
+  for (const [host, z] of Object.entries(hosts)) log(`Akibapass ${host}: ${z.geholt} geholt, ${z.gesperrt} gesperrt, ${z.geoGesperrt} geo-gesperrt (404), ${z.uebersprungen} übersprungen`)
   // Adressen, die der Bestand nicht mehr führt, fallen heraus.
   const aktuell = new Set(adressen)
   datei.seiten = Object.fromEntries(Object.entries(datei.seiten).filter(([u]) => aktuell.has(u)))

@@ -61,7 +61,7 @@ Object.assign(MiniKnoten.prototype, {
 /* Auch die Messung der Spur braucht Frame-Aufrufe; ohne Layout im Mini-DOM laufen sie ins Leere. */
 Object.assign(globalThis, { requestAnimationFrame: () => 0, cancelAnimationFrame: () => {} })
 
-type Stand = { titel: number; suche?: string; gemerkt?: number[]; wechselt?: boolean }
+type Stand = { titel: number; suche?: string; gemerkt?: number[] }
 const aufrufe = { wechsel: [] as number[], suche: [] as unknown[] }
 function props(teile: FranchiseMember[], s: Stand) {
   return {
@@ -70,7 +70,6 @@ function props(teile: FranchiseMember[], s: Stand) {
     reihenName: 'Reihe',
     title: { id: s.titel } as Title,
     favorites: new Set<number>(s.gemerkt ?? []),
-    wechselt: s.wechselt ?? false,
     wechsleZu: (id: number) => void aufrufe.wechsel.push(id),
     reihenSchluessel: 1,
     reiheSuche: { reihe: 1, text: s.suche ?? '' },
@@ -245,10 +244,10 @@ await w.zeige({ titel: 900207 })
 gleich('Wechsel ohne Klick: nur Filme offen, Hauptserie geht zu', w.lage().gruppe.map((g) => g.offen), [false, true, false])
 await w.ende()
 
-/* Wechsel läuft: Ladehinweis, Zeilen gesperrt; ein gemerkter Teil trägt den Stern. */
-const l = await oeffne(GROSS, { titel: 900102, wechselt: true, gemerkt: [900101] })
-pruefe('Wechsel läuft: „Wird geladen …“', (l.text() ?? '').includes('Wird geladen'))
-gleich('Wechsel läuft: Karten gesperrt; Stern nur am gemerkten Teil', [l.zeile(900101)?.aus, l.zeile(900101)?.stern, l.zeile(900103)?.stern], [true, true, false])
+/* Ein gemerkter Teil trägt den Stern; den Wechsel zeigt der Panel-Platzhalter, die Liste bleibt frei und ohne Ladehinweis. */
+const l = await oeffne(GROSS, { titel: 900102, gemerkt: [900101] })
+pruefe('Liste ohne „Wird geladen …“', !(l.text() ?? '').includes('Wird geladen'))
+gleich('Karten frei; Stern nur am gemerkten Teil', [l.zeile(900101)?.aus, l.zeile(900101)?.stern, l.zeile(900103)?.stern], [false, true, false])
 await l.ende()
 
 /* Staffelstand ohne geöffnete Hauptstaffel (Spur-Untertitel): Einzahl, Mehrzahl, ohne Staffeln leer. */
@@ -263,8 +262,7 @@ pruefe('12 Filme: Spur, keine Übersicht', klein.includes('role="tab"') && !klei
 const kopfSpur = (s: Stand) => /tabular-nums text-ak-text">(\d+)</.exec(renderToStaticMarkup(h(ReihenListe, props([teil(900101, 'Reihe'), ...filme(4, [2, 3, 4])], s))))?.[1]
 gleich('Spur-Kopf: alle 5 Teile, auch ohne Synchro', kopfSpur({ titel: 900101 }), '5')
 gleich('Spur-Kopf mit Suchtext: Treffer', kopfSpur({ titel: 900101, suche: 'Film 4' }), '1')
-const kleinLaedt = renderToStaticMarkup(h(ReihenListe, props([teil(900101, 'Reihe'), ...filme(12)], { titel: 900101, wechselt: true })))
-gleich('Spur: Ladehinweis nur während des Wechsels', [klein.includes('Wird geladen'), kleinLaedt.includes('Wird geladen')], [false, true])
+pruefe('Spur: kein Ladehinweis', !klein.includes('Wird geladen'))
 
 if (verletzt > 0) {
   console.error(`\n${verletzt} Prüfung(en) verletzt`)

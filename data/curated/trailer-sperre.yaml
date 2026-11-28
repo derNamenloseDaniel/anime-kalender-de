@@ -1,0 +1,11 @@
+# Videos, die kein Trailer sind und die keine Titelregel erkennt (`pipeline/lib/trailer-ablehnung.ts`).
+# Der Trailerlauf nimmt sie nie, auch wenn TMDB sie als „Trailer“ führt. `grund` = was das Video wirklich ist.
+sperre:
+  - video: KomeKKNbY5c
+    grund: "Szenenclip „Mit 0 Punkten bestanden!“ (Greatest Demon Lord, Titel 130586), kein Trailer."
+  - video: qOVgjkrwfV0
+    grund: "Intro der koreanischen Fassung von Raumpatrouille (Titel 6671), kein Trailer."
+  - video: 0ChiZCpK-24
+    grund: "Opening von Techno Police 21c (Titel 5090), kein Trailer."
+  - video: c_jkdjkdrq0
+    grund: "Szene „本編冒頭映像“ (Anfang des Films) aus Princess Principal Crown Handler (Titel 101595), kein Trailer."

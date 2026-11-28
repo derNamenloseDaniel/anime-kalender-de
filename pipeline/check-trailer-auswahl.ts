@@ -1,5 +1,6 @@
 /** Prüft `lib/trailer-auswahl.ts`: Kandidaten des Trailerlaufs und die TMDB-Videoadresse. */
-import { tmdbArt, tmdbVideosUrl, trailerKandidaten } from './lib/trailer-auswahl.ts'
+import { tmdbArt, tmdbVideosUrl, trailerKandidaten, waehleTmdbVideo } from './lib/trailer-auswahl.ts'
+import { ablehnungenText, ablehnungsgrund, entferneAbgelehnte, macheAblehner, neueAblehnungen } from './lib/trailer-ablehnung.ts'
 
 let fehler = 0
 function pruefe(name: string, ok: boolean, gefunden?: unknown): void {
@@ -37,6 +38,65 @@ const tv = tmdbVideosUrl('https://x/3', 'tv', 7, 'K')
 pruefe('Serie fragt tv und alle drei Sprachen', tv === 'https://x/3/tv/7/videos?include_video_language=de,en,ja&api_key=K', tv)
 pruefe('Film fragt movie', tmdbVideosUrl('https://x/3', 'movie', 7, 'K').startsWith('https://x/3/movie/7/videos?'))
 pruefe('unbekannte Art fällt auf tv', tmdbVideosUrl('https://x/3', 'anderes', 7, 'K').includes('/tv/7/'))
+
+console.log('TMDB-Videoauswahl (Verhalten wie vor dem Auslagern)')
+const yt = (key: string, iso: string, am: string, type = 'Trailer') => ({ key, name: key, site: 'YouTube', type, iso_639_1: iso, published_at: am })
+pruefe('deutsch vor englisch', waehleTmdbVideo([yt('en1', 'en', '2020'), yt('de1', 'de', '2019')])?.video === 'de1')
+pruefe('je Sprache der jüngste', waehleTmdbVideo([yt('a', 'de', '2019'), yt('b', 'de', '2021')])?.video === 'b')
+pruefe('Teaser zählt, Featurette nicht', waehleTmdbVideo([yt('t', 'en', '2020', 'Teaser')])?.video === 't' && waehleTmdbVideo([yt('f', 'en', '2020', 'Featurette')]) === null)
+pruefe('fremde Site zählt nicht', waehleTmdbVideo([{ ...yt('v', 'de', '2020'), site: 'Vimeo' }]) === null)
+
+console.log('Kein Trailer: echte Fälle aus data/trailer.json (28.11.2026, Call of the Night)')
+const grund = (titel: string, ...namen: string[]) => ablehnungsgrund(titel, namen)
+pruefe('Review wird abgelehnt', grund('CALL OF THE NIGHT | Der beste Anime der Sommer-Season 2022 | Anime Review', 'Call of the Night') === 'review')
+pruefe('Full Movie wird abgelehnt', grund('Detective Conan Movie 2: The Fourteenth Target[Full Movie English Sub][Link below]', 'Detective Conan Movie 2: The Fourteenth Target') === 'ganzer-film')
+pruefe('„wrong title“ wird abgelehnt', grund('wrong title, please delete') === 'falscher-titel')
+pruefe('Reaktion, Kritik, Top-Liste, Analyse, AMV, Marathon',
+  [grund('Chainsaw Man Reaction'), grund('Kritik zu Bleach'), grund('Top 10 Anime 2022'), grund('Ending erklärt'), grund('Fate AMV'), grund('Yuri!!! on ICE Series Marathon | Crunchyroll Movie Night')].join() ===
+    'reaktion,kritik,ranking,analyse,fan-edit,marathon')
+pruefe('Folgen-Upload ohne Trailer-Wort wird abgelehnt, mit Vorschau bleibt', grund('Show Episode 3 English Sub') === 'folgen-upload' && grund('Show Episode 3 Preview') === null)
+pruefe('Animename mit „Ranking“ bleibt (Videotitel ohne Namen geprüft)', grund('Ranking of Kings | Offizieller Trailer', 'Ranking of Kings') === null)
+pruefe('ohne bekannten Namen hielte „Ranking“ an', grund('Ranking of Kings | Offizieller Trailer') === 'ranking')
+pruefe('„Let’s Play“ bleibt', grund('Let’s Play | Offizieller Trailer - OmU', 'Let’s Play') === null)
+pruefe('Lupin III. vs. Detektiv Conan bleibt', grund('Lupin III. vs. Detektiv Conan | Offizieller Trailer', 'Lupin III. vs. Detektiv Conan') === null)
+console.log('Weite Muster gelten nur ohne Trailer-Wort im Videotitel (Befund 5)')
+for (const [t, erwartet] of [
+  ['Top 10 Anime 2022', 'ranking'],
+  ['Top 5 Fights | Offizieller Trailer', null],
+  ['Best of Naruto', 'ranking'],
+  ['Best of Season | Teaser', null],
+  ['Ending erklärt', 'analyse'],
+  ['Ending explained', 'analyse'],
+  ['Die Handlung erklärt | Vorschau', null],
+  ['Plot explained | PV', null],
+  ['Show Ep 3', 'folgen-upload'],
+  ['Show Ep 3 | Yokoku', null],
+  ['Show Ep 3 | Tokuho', null],
+  ['Anime Review | Trailer', 'review'],
+  ['Chainsaw Man Reaction | Trailer', 'reaktion'],
+  ['Show Full Movie | Trailer', 'ganzer-film'],
+  ['wrong title | Trailer', 'falscher-titel'],
+  ['Fate AMV | Trailer', 'fan-edit'],
+] as const)
+  pruefe(`${t} → ${erwartet ?? 'bleibt'}`, grund(t) === erwartet, grund(t))
+
+for (const t of ['Space Dandy Season 2 - Blu-ray/DVD Combo - Coming Soon!', 'Kiss Him, Not Me! Complete Series | Pre-Order Now!', 'Persona3 THE MOVIE #2 Midsummer Knight’s Dream Coming to Blu-ray!', 'Code Geass (Seasons 1 and 2) – Available Now', 'The Place Promised in Our Early Days | On Blu-ray & Digital', 'Chainsaw Man | JETZT AUF CRUNCHYROLL'])
+  pruefe(`Disc-/Streamwerbung bleibt: ${t}`, grund(t) === null)
+
+console.log('TMDB-Auswahl nimmt den nächsten echten Trailer')
+const callOfTheNight = [yt('iPvK4ORRTHA', 'de', '2022-09-01'), { ...yt('ENtrailer1', 'en', '2022-06-01'), name: 'CALL OF THE NIGHT | Official Trailer' }]
+callOfTheNight[0]!.name = 'CALL OF THE NIGHT | Der beste Anime der Sommer-Season 2022 | Anime Review'
+const zahl = neueAblehnungen()
+const gewaehlt = waehleTmdbVideo(callOfTheNight, macheAblehner(['Call of the Night']), zahl)
+pruefe('Review (de) übergangen, englischer Trailer genommen', gewaehlt?.video === 'ENtrailer1' && gewaehlt.sprache === 'en', gewaehlt)
+pruefe('Ablehnung gezählt und im Text benannt', zahl.review === 1 && ablehnungenText(zahl) === '1× review', ablehnungenText(zahl))
+pruefe('nur ein Review: kein Trailer', waehleTmdbVideo([callOfTheNight[0]!], macheAblehner(['Call of the Night'])) === null)
+pruefe('gesperrte Kennung wird abgelehnt', waehleTmdbVideo([yt('KomeKKNbY5c', 'de', '2022')], macheAblehner([], new Set(['KomeKKNbY5c']))) === null)
+
+console.log('Bestand')
+const bestand = { 141391: { video: 'iPvK4ORRTHA', titel: 'X Anime Review' }, 2: { video: 'ok', titel: 'X | Trailer' } }
+const weg = entferneAbgelehnte(bestand, () => ['X'], new Set())
+pruefe('entfernt nur den Nicht-Trailer und nennt ihn', weg.length === 1 && weg[0]!.id === '141391' && weg[0]!.grund === 'review' && Object.keys(bestand).join() === '2', weg)
 
 if (fehler) {
   console.error(`${fehler} Fehler`)

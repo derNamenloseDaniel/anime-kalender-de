@@ -97,6 +97,7 @@ const fehlerBei = new Set<string>()
 const netzfehlerBei = new Set<string>()
 const nichtGefuehrtBei = new Set<string>()
 let kinocheckFehler = false
+let kinocheckReview = false
 let leerAlle = false
 let kanalVideos: { id: string; titel: string }[] = []
 let labelVideos: { id: string; titel: string }[] = []
@@ -129,6 +130,7 @@ globalThis.fetch = (async (eingabe: string | URL | Request): Promise<Response> =
     const items = kanalVideos.map((v) => ({ snippet: { title: v.titel, publishedAt: '2005-06-01T00:00:00Z', resourceId: { videoId: v.id } } }))
     return antwort({ items })
   }
+  if (url.includes('api.kinocheck.de') && kinocheckReview) return antwort({ trailer: { youtube_video_id: 'kcRev', title: 'Serie Zeta Review' } })
   if (url.includes('api.kinocheck.de')) return kinocheckFehler ? antwort({}, 500) : antwort({ message: 'not found' }, 404)
   const treffer = /\/(tv|movie)\/(\d+)\/videos/.exec(url)
   if (!treffer) throw new Error(`unerwartete Adresse ${url}`)
@@ -141,6 +143,14 @@ globalThis.fetch = (async (eingabe: string | URL | Request): Promise<Response> =
   if (nichtGefuehrtBei.has(tv)) return antwort({ status_message: 'not found' }, 404)
   /* 3 hat keinen Trailer, 4 einen deutschen, die anderen einen japanischen. */
   if (leerAlle || tv === '3') return antwort({ results: [] })
+  if (tv === '46') return antwort({ results: [{ key: 'ytRev46', name: 'Serie Gamma Anime Review', site: 'YouTube', type: 'Trailer', iso_639_1: 'de' }] })
+  if (tv === '47')
+    return antwort({
+      results: [
+        { key: 'ytRev47', name: 'Serie Epsilon Review', site: 'YouTube', type: 'Trailer', iso_639_1: 'de' },
+        { key: 'ytEn47', name: 'Serie Epsilon | Official Trailer', site: 'YouTube', type: 'Trailer', iso_639_1: 'en' },
+      ],
+    })
   if (tv === '4') return antwort({ results: [{ key: 'yt4de', name: 'Trailer', site: 'YouTube', type: 'Trailer', iso_639_1: 'de' }] })
   return antwort({ results: [{ key: `yt${tv}`, name: 'PV', site: 'YouTube', type: 'Trailer', iso_639_1: 'ja' }] })
 }) as typeof fetch
@@ -251,6 +261,20 @@ pruefe('Kanalindex: der Film bekommt den Kanal-Trailer', kanalErgebnis['909001']
 pruefe('Kanalindex: die Serie mit gleichem Namen bekommt ihn nicht, TMDB antwortet', kanalErgebnis['909002']?.herkunft === 'tmdb', kanalErgebnis['909002'])
 pruefe('Kanalindex: für den Film kein TMDB-Abruf nötig', tmdbAbrufe.join(',') === '42', tmdbAbrufe)
 
+/* A2b: Review im Kanalindex (Weg 1) und bei KinoCheck (Weg 2) wird nicht genommen. */
+richteEin([probe(909003, 'MOVIE', 2005, 'Film Alpha')], { '909003': { tmdbId: 45, kind: 'movie' } })
+kanalVideos = [{ id: 'vidRev', titel: 'Film Alpha Trailer Review German Deutsch (2005)' }]
+await main({ riegel: 9 })
+kanalVideos = []
+const kanalReview = lies<Record<string, { video: string; herkunft: string }>>(join('data', 'trailer.json'))
+pruefe('Kanalindex: Review-Video wird nicht genommen', kanalReview['909003']?.video !== 'vidRev', kanalReview['909003'])
+richteEin([probe(912001, 'TV', 2020, 'Serie Zeta')], { '912001': { tmdbId: 49, kind: 'tv' } })
+kinocheckReview = true
+await main({ riegel: 9 })
+kinocheckReview = false
+const kcReview = lies<Record<string, { video: string; herkunft: string }>>(join('data', 'trailer.json'))
+pruefe('KinoCheck: Review wird nicht genommen, TMDB antwortet', kcReview['912001']?.video !== 'kcRev' && kcReview['912001']?.herkunft === 'tmdb', kcReview['912001'])
+
 /* A7: Label-Kanal (KSM Anime) — Serie bekommt den deutschen Trailer, auch ohne Pool-Zugehörigkeit; ein OmU-Video nicht; TMDB-Ersatz wird ersetzt. */
 mkdirSync(join(wurzel, 'data', 'curated'), { recursive: true })
 writeFileSync(join(wurzel, 'data', 'curated', 'trailer-label-kanaele.yaml'), 'kanaele:\n  - name: KSM Anime\n    beispielVideo: BEISPIEL\n  - name: Gibt Es Nicht\n  - name: Ausfall Kanal\n')
@@ -281,6 +305,24 @@ pruefe('Label: zweiter Lauf löst nichts erneut auf', beispielAbrufe === ersteBe
 labelVideos = []
 rmSync(join(wurzel, 'data', 'curated'), { recursive: true, force: true })
 rmSync(join(wurzel, 'data', 'trailer-label-kanaele.json'), { force: true })
+
+/* A8: ein Review als „Trailer“ wird nicht geschrieben und gezählt, der nächste echte Trailer genommen, ein Review im Bestand entfernt. */
+richteEin(
+  [probe(911001, 'TV', 2005, 'Serie Gamma'), probe(911002, 'TV', 2005, 'Serie Epsilon'), probe(911003, 'TV', 2005, 'Serie Delta')],
+  { '911001': { tmdbId: 46, kind: 'tv' }, '911002': { tmdbId: 47, kind: 'tv' }, '911003': { tmdbId: 48, kind: 'tv' } },
+)
+schreibe(join('data', 'trailer.json'), { '911003': { video: 'ytAltRev', titel: 'Serie Delta Anime Review', sprache: 'de', herkunft: 'tmdb', gefundenAm: '2026-10-01' } })
+const zeilen: string[] = []
+const logOriginal = console.log
+console.log = (...a: unknown[]): void => void zeilen.push(a.join(' '))
+await main({ riegel: 9 })
+console.log = logOriginal
+const abgelehntErgebnis = lies<Record<string, { video: string; sprache: string }>>(join('data', 'trailer.json'))
+pruefe('Review als einziger Fund wird nicht geschrieben', !('911001' in abgelehntErgebnis), abgelehntErgebnis['911001'])
+pruefe('Review übergangen, englischer Trailer genommen', abgelehntErgebnis['911002']?.video === 'ytEn47' && abgelehntErgebnis['911002']?.sprache === 'en', abgelehntErgebnis['911002'])
+pruefe('Review im Bestand wird entfernt, der Titel neu gesucht', abgelehntErgebnis['911003']?.video !== 'ytAltRev', abgelehntErgebnis['911003'])
+pruefe('Lauflog zählt die Ablehnungen (3× review)', zeilen.some((z) => z.includes('Kein Trailer (abgelehnt): 3× review')), zeilen.filter((z) => z.includes('abgelehnt')))
+pruefe('Lauflog nennt das abgelehnte Video mit Titel', zeilen.some((z) => z.includes('ytRev46') && z.includes('Serie Gamma Anime Review')), zeilen.filter((z) => z.includes('ytRev46')))
 
 /* A6: ein gescheiterter Abruf stempelt nicht, der nächste Lauf fragt wieder. */
 const drei = [probe(907001, 'TV'), probe(907002, 'TV'), probe(907003, 'TV'), probe(907004, 'TV')]

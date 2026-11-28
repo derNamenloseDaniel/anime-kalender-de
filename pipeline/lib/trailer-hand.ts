@@ -10,6 +10,19 @@ export interface HandTrailer {
   sprache: 'de' | 'en' | 'ja'
 }
 
+/** Gesperrte YouTube-Kennungen (`data/curated/trailer-sperre.yaml`): Videos, die kein Trailer sind und die keine Regel erkennt. */
+export function ladeTrailerSperre(): Set<string> {
+  const pfad = resolve(ROOT, 'data/curated/trailer-sperre.yaml')
+  if (!existsSync(pfad)) return new Set()
+  const roh = yaml.load(readFileSync(pfad, 'utf8'), { json: false }) as { sperre?: { video?: string; grund?: string }[] } | null
+  const aus = new Set<string>()
+  for (const e of roh?.sperre ?? []) {
+    if (!/^[\w-]{11}$/.test(e.video ?? '') || !e.grund) throw new Error(`trailer-sperre.yaml: Eintrag unvollständig oder ungültig: ${JSON.stringify(e)}`)
+    aus.add(e.video!)
+  }
+  return aus
+}
+
 /** Ohne Datei leer; eine kaputte Zeile wirft, statt den Trailer still zu verlieren. */
 export function ladeTrailerHand(): Record<string, HandTrailer> {
   const pfad = resolve(ROOT, 'data/curated/trailer-hand.yaml')

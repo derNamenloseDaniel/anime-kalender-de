@@ -7,7 +7,7 @@ import type { Translate } from '../../lib/i18n.tsx'
 import type { Dispatch, SetStateAction } from 'react'
 import { Chip } from '../ui.tsx'
 import { HerkunftZeile, zeigtHerkunft } from './herkunft-zeile.tsx'
-import { HandlungFuss, ReiheHinweis } from './handlung-quelle.tsx'
+import { HandlungFuss, ReiheHinweis, textIstUnser } from './handlung-quelle.tsx'
 import { handlungAnzeige, type plotVon } from './plot.ts'
 
 export function EckdatenAbschnitt({ title, t, genresOffen, onFilterBy, tGenre, setGenresOffen }: {
@@ -83,7 +83,7 @@ export function HandlungAbschnitt({ plot, t, plotOffen, setPlotOffen }: {
             <p className="mt-1.5 text-t5 text-slate-400">{t('detail.plotOnlyEnglish')}</p>
           )}
           {/* Die Quelle steht immer sichtbar am Fuß der Karte, auch eingeklappt (aniSearch verlangt Nennung und Link bei übernommenen Texten, 05.10.2026). */}
-          <HandlungFuss plot={plot} aufklappbar={anzeige.aufklappbar} t={t} plotOffen={plotOffen} setPlotOffen={setPlotOffen} />
+          <HandlungFuss plot={plot} aufklappbar={anzeige.aufklappbar} unser={textIstUnser(plot, !anzeige.volltext)} t={t} plotOffen={plotOffen} setPlotOffen={setPlotOffen} />
         </PanelKarte>
       )}
     </>

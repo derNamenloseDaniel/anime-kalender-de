@@ -1,5 +1,0 @@
-kategorie: bugfix
-text: Hintergrundbilder für neun ältere Serien und Filme
-untertitel: Etwa Regina Regenbogen und Willy Fog
-wartetAuf: "Bestandsbau nach dem nächsten TMDB-Lauf (Banner) zu PR 5078. Stand 27.11.2026 22:20 UTC: Regina Regenbogen (10018543) und Um die Welt mit Willy Fog (2579) ohne bannerImage, Titel ohne Banner 59 → 60. Probe: beide Titel tragen in public/data/titles.json ein bannerImage, und die Zahl der Titel ohne Banner liegt bei höchstens 51. Ändert sich nichts, wird der Eintrag gelöscht."
-seit: '2026-11-27'

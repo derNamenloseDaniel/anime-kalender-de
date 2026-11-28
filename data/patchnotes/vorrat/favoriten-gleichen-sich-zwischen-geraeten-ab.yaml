@@ -1,5 +1,0 @@
-kategorie: bugfix
-text: Favoriten gleichen sich zwischen Handy und PC ab
-untertitel: Für Geräte, die über den Newsletter-Link verbunden sind
-wartetAuf: "Merge und Deploy von PR 4763 (der Abgleich aus PR 4747 löschte am 23.11. am PC gemerkte Titel). Probe: Das Live-Bundle enthält den Schlüssel favoritenAbgleichBasis, und ein Gerätepaar ist gemessen. PR 4763 bringt den Eintrag gemerkte-titel-kommen-zurueck mit; deckt er dasselbe ab, diesen Entwurf löschen statt freigeben."
-seit: '2026-11-24'

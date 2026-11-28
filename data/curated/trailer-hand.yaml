@@ -1,8 +1,0 @@
-# Handgepflegte Trailer: ein Eintrag gilt im Bau vor `data/trailer.json` (Lauf-Ergebnis). Nur belegte Videos:
-# `beleg` = wer/wann geprüft hat, dass Kanal und Fassung stimmen.
-trailer:
-  - id: 156040
-    video: n5yRD1JypBU
-    titel: "THE MOST HERETICAL LAST BOSS QUEEN | Trailer HD | Deutsch | Anime | 2026"
-    sprache: de
-    beleg: "Daniel 26.11.2026 (Fehlermeldung): offizieller Kanal KSM Anime, Upload 13.08.2026, Inhalt deutsch vertont, geprüft."

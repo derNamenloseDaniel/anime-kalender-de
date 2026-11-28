@@ -1,6 +1,0 @@
-[
- { "name": "Kontrolle", "aenderungen": [], "tests": ["npx tsx pipeline/check-wertungsfilter.ts"] },
- { "name": "app-ansicht: titelFuerAnsichtGen ohne grouped", "aenderungen": [{ "datei": "web/src/lib/app-ansicht.ts", "suche": "titelFuerAnsichtGen(quelle, data, filters, today, favorites, grouped, sprecher.auswahl)", "ersetze": "titelFuerAnsichtGen(quelle, data, filters, today, favorites, false, sprecher.auswahl)" }], "tests": ["npx tsx pipeline/check-wertungsfilter.ts"] },
- { "name": "App: useKalenderTermine ohne voll", "aenderungen": [{ "datei": "web/src/App.tsx", "suche": "useKalenderTermine(data, voll, kalenderFilters", "ersetze": "useKalenderTermine(data, undefined, kalenderFilters" }], "tests": ["npx tsx pipeline/check-wertungsfilter.ts"] },
- { "name": "app-ansicht: Wertungsregel nicht mit voll", "aenderungen": [{ "datei": "web/src/lib/app-ansicht.ts", "suche": "wertungNurMitVollenDaten(kalenderFilters, !!voll)", "ersetze": "wertungNurMitVollenDaten(kalenderFilters, true)" }], "tests": ["npx tsx pipeline/check-wertungsfilter.ts"] }
-]

@@ -1,5 +1,0 @@
-kategorie: feature
-text: Zu fast jedem Titel ein Satz Handlung
-untertitel: Kurz erklärt, worum es geht
-wartetAuf: "Anzeige auf der Seite. Die 2.899 Sätze stehen seit 27.11.2026 in public/data/synopses (Feld satz), web/src liest das Feld aber nirgends. Probe: grep nach dem Feld satz in web/src findet eine Stelle, die es anzeigt, und der Satz steht im Live-Bundle. Kommt keine Anzeige, wird der Eintrag gelöscht."
-seit: '2026-11-27'

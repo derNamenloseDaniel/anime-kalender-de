@@ -1,5 +1,0 @@
-[
-  { "name": "Kontrolle (unmutiert)", "aenderungen": [], "tests": ["npx tsx pipeline/check-kasten-hinweis.ts"] },
-  { "name": "KastenHinweis: Kino-Weiche weg", "aenderungen": [{ "datei": "web/src/components/detail/antwort-bereich.tsx", "suche": "title.ohneSynchro && antwort?.art !== 'kino'", "ersetze": "title.ohneSynchro" }], "tests": ["npx tsx pipeline/check-kasten-hinweis.ts"] },
-  { "name": "KastenHinweis: Gemerkt-Zeile nie", "aenderungen": [{ "datei": "web/src/components/detail/antwort-bereich.tsx", "suche": "{favorites.has(title.id) && (", "ersetze": "{false && (" }], "tests": ["npx tsx pipeline/check-kasten-hinweis.ts"] }
-]

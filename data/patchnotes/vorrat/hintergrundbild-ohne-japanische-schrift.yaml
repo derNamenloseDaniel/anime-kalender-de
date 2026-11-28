@@ -1,5 +1,0 @@
-kategorie: bugfix
-text: Hintergrundbilder ohne japanische Schrift
-untertitel: Folgestaffeln, OVAs und Filme zeigen das Bild ihrer Serie
-wartetAuf: "Bestandsbau nach PR zu fix/maengel-bild-fremdsprachig. Probe: node tools/maengel.mjs zeigt bei bild-fremdsprachig weniger als 509 offene Titel (Hochrechnung 26.11.2026: rund 250 weniger, 399 Banner ersetzt). Vor der Freigabe die Zahl der ersetzten Banner (Bauprotokoll „AniList-Banner durch das TMDB-Banner der Reihe ersetzt“) in den Text setzen. Ändert sich nichts, wird der Eintrag gelöscht."
-seit: '2026-11-26'

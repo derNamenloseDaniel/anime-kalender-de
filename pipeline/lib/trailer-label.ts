@@ -6,6 +6,7 @@
  * gezählt (`Verwerfungen`), damit der Lauf sagen kann, warum ein Video nicht zugeordnet wurde.
  */
 import { bewerteTreffer, woerterVon } from './adn.ts'
+import { ablehnungsgrund } from './trailer-ablehnung.ts'
 
 export interface LabelVideo {
   video: string
@@ -32,7 +33,7 @@ export interface LabelFund {
   gefundenAm: string
 }
 
-export const VERWERFUNGEN = ['kein-trailer', 'nicht-deutsch', 'kein-name', 'kein-treffer', 'mehrdeutig', 'staffel', 'jahr'] as const
+export const VERWERFUNGEN = ['kein-trailer', 'nicht-deutsch', 'kein-name', 'kein-treffer', 'mehrdeutig', 'staffel', 'jahr', 'abgelehnt'] as const
 export type Verwerfung = (typeof VERWERFUNGEN)[number]
 export type Verwerfungen = Record<Verwerfung, number>
 
@@ -164,6 +165,7 @@ function pruefeVideo(v: LabelVideo, idx: Map<string, LabelTitel[]>): Verwerfung 
   if (!erster) return 'staffel'
   if (zweiter && zweiter.punkte === erster.punkte) return 'mehrdeutig'
   if (!jahrPasst(v, erster.t)) return 'jahr'
+  if (ablehnungsgrund(v.titel, varianten(erster.t))) return 'abgelehnt'
   return erster.t
 }
 

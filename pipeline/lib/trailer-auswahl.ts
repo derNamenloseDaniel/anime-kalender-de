@@ -1,5 +1,7 @@
 /** Welche Titel der Trailerlauf abfragt und wie er TMDBs Videoliste anspricht. */
 
+import type { Ablehner, Ablehnungen } from './trailer-ablehnung.ts'
+
 /** Filme (Kinokanäle) und die Einstiege des Entdecken-Pools (`empfehlung.json`, Reihe → erster Teil). */
 export function trailerKandidaten<T extends { id: number; format?: string }>(titel: T[], einstiege: ReadonlySet<number>): T[] {
   return titel.filter((t) => t.format === 'MOVIE' || einstiege.has(t.id))
@@ -25,8 +27,17 @@ export interface TmdbVideo {
  * Ein `Trailer` oder `Teaser` auf YouTube, in der Reihenfolge `de`, `en`, `ja`, je Sprache der jüngste
  * (er zeigt den fertigen Film, nicht die erste Ankündigung). Nur hier ist die Sprache belegt statt geraten.
  */
-export function waehleTmdbVideo(videos: TmdbVideo[]): { video: string; titel: string; sprache: 'de' | 'en' | 'ja' } | null {
-  const brauchbar = videos.filter((v) => v.site === 'YouTube' && v.key && (v.type === 'Trailer' || v.type === 'Teaser'))
+export function waehleTmdbVideo(
+  videos: TmdbVideo[],
+  ablehnen?: Ablehner,
+  abgelehnt?: Ablehnungen,
+): { video: string; titel: string; sprache: 'de' | 'en' | 'ja' } | null {
+  const brauchbar = videos.filter((v) => {
+    if (v.site !== 'YouTube' || !v.key || (v.type !== 'Trailer' && v.type !== 'Teaser')) return false
+    const grund = ablehnen?.(v.key, v.name ?? '')
+    if (grund && abgelehnt) abgelehnt[grund]++
+    return !grund
+  })
   for (const sprache of ['de', 'en', 'ja'] as const) {
     const fund = brauchbar
       .filter((v) => v.iso_639_1 === sprache)

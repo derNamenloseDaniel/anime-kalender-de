@@ -67,6 +67,16 @@ import { tmdbArt, tmdbVideosUrl, trailerKandidaten, waehleTmdbVideo, type TmdbVi
 import { RIEGEL_JE_LAUF, SPEICHERN_ALLE, arbeiteInStuecken, lageVon, waehleDran, type Versuche } from './lib/trailer-lauf.ts'
 import { AUSFALL, ladeLabelKanaele, loeseKanaeleAuf, type KanalStand } from './lib/trailer-label-kanaele.ts'
 import { uebernehmeLabel, verwerfungenText } from './lib/trailer-label.ts'
+import {
+  ablehnungenText,
+  animeNamen,
+  entferneAbgelehnte,
+  macheAblehner,
+  neueAblehnungen,
+  type Ablehner,
+  type Ablehnungen,
+} from './lib/trailer-ablehnung.ts'
+import { ladeTrailerSperre } from './lib/trailer-hand.ts'
 import { pathToFileURL } from 'node:url'
 
 /**
@@ -266,14 +276,26 @@ async function kanalIndex(schluessel: string, label: { name: string; uploads: st
  * den international gebräuchlichen Namen, und der ist mal unser deutscher, mal
  * unser englischer.
  */
-function ausIndex(titel: Titel, index: Video[], tmdbName?: string): TrailerEintrag | null {
+function ausIndex(
+  titel: Titel,
+  index: Video[],
+  tmdbName: string | undefined,
+  ablehnen: Ablehner,
+  abgelehnt: Ablehnungen,
+): TrailerEintrag | null {
   /* TMDBs deutscher Name zählt mit: „Detektiv Conan Film 29: …" steht so beim Verleih, bei uns ohne „Film 29". */
-  const namen = new Set([titel.titleDe, titel.titleEn, titel.titleRomaji, tmdbName].filter(Boolean).map((n) => normal(n!)))
+  const namen = new Set(animeNamen(titel, tmdbName).map(normal))
   if (!namen.size) return null
 
   const treffer = index.filter((v) => {
     if (!istDeutsch(v.titel)) return false
     if (!namen.has(filmteilVon(v.titel))) return false
+    const grund = ablehnen(v.video, v.titel)
+    if (grund) {
+      abgelehnt[grund]++
+      log(`  abgelehnt (${grund}, Kanal ${v.kanal}): ${v.video} „${v.titel}“`)
+      return false
+    }
     const jahr = jahrAus(v.titel)
     /*
       **Der deutsche Trailer kommt nach der japanischen Ausstrahlung, aber nicht
@@ -302,7 +324,12 @@ function ausIndex(titel: Titel, index: Video[], tmdbName?: string): TrailerEintr
  * nicht führt. Das ist keine Auskunft über den Trailer, sondern über die
  * Zuordnung; der Aufrufer geht dann weiter.
  */
-async function ausKinocheck(tmdbId: number, art: string): Promise<TrailerEintrag | null | typeof FEHLER> {
+async function ausKinocheck(
+  tmdbId: number,
+  art: string,
+  ablehnen: Ablehner,
+  abgelehnt: Ablehnungen,
+): Promise<TrailerEintrag | null | typeof FEHLER> {
   const pfad = art === 'movie' ? 'movies' : 'shows'
   const roh = await holeAntwort(`${KINOCHECK}/${pfad}?tmdb_id=${tmdbId}&language=de&categories=Trailer`)
   if (roh === FEHLER) return FEHLER
@@ -311,7 +338,14 @@ async function ausKinocheck(tmdbId: number, art: string): Promise<TrailerEintrag
   } | null
   const video = daten?.trailer?.youtube_video_id
   if (!video) return null
-  return { video, titel: daten?.trailer?.title ?? '', sprache: 'de', herkunft: 'kinocheck', gefundenAm: heute() }
+  const titel = daten?.trailer?.title ?? ''
+  const grund = ablehnen(video, titel)
+  if (grund) {
+    abgelehnt[grund]++
+    log(`  abgelehnt (${grund}, KinoCheck): ${video} „${titel}“`)
+    return null
+  }
+  return { video, titel, sprache: 'de', herkunft: 'kinocheck', gefundenAm: heute() }
 }
 
 /**
@@ -326,10 +360,21 @@ async function ausKinocheck(tmdbId: number, art: string): Promise<TrailerEintrag
  * geht es. `Featurette`, `Clip` und `Behind the Scenes` nicht; die setzen
  * voraus, dass man den Film schon kennt.
  */
-async function ausTmdb(tmdbId: number, art: string, schluessel: string): Promise<TrailerEintrag | null | typeof FEHLER> {
+async function ausTmdb(
+  tmdbId: number,
+  art: string,
+  schluessel: string,
+  ablehnen: Ablehner,
+  abgelehnt: Ablehnungen,
+): Promise<TrailerEintrag | null | typeof FEHLER> {
   const roh = await holeAntwort(tmdbVideosUrl(TMDB, art, tmdbId, schluessel))
   if (roh === FEHLER) return FEHLER
-  const fund = waehleTmdbVideo((roh as { results?: TmdbVideo[] } | null)?.results ?? [])
+  const meldend: Ablehner = (video, titel) => {
+    const grund = ablehnen(video, titel)
+    if (grund) log(`  abgelehnt (${grund}, TMDB ${art}/${tmdbId}): ${video} „${titel}“`)
+    return grund
+  }
+  const fund = waehleTmdbVideo((roh as { results?: TmdbVideo[] } | null)?.results ?? [], meldend, abgelehnt)
   return fund ? { ...fund, herkunft: 'tmdb', gefundenAm: heute() } : null
 }
 
@@ -379,6 +424,8 @@ interface Zaehler {
   /** Abrufe mit Auskunft (auch „nichts gefunden“) und Abrufe, die scheiterten. */
   antworten: number
   ausgefallen: number
+  /** Videos, die die Regel für Nicht-Trailer in Weg 1 bis 3 abgelehnt hat (`lib/trailer-ablehnung.ts`). */
+  abgelehnt: Ablehnungen
 }
 
 /**
@@ -391,13 +438,15 @@ async function frageSchnittstellen(
   bestand: Record<string, TrailerEintrag>,
   tmdbSchluessel: string | undefined,
   zaehler: Zaehler,
+  sperre: ReadonlySet<string>,
 ): Promise<boolean> {
   if (!eintrag?.tmdbId) return true
   const art = tmdbArt(eintrag.kind, titel.format)
+  const ablehnen = macheAblehner(animeNamen(titel, eintrag.nameDe), sperre)
   let auskunft = true
 
   if ((titel.jpYear ?? 0) >= 2012) {
-    const vonKc = await ausKinocheck(eintrag.tmdbId, art)
+    const vonKc = await ausKinocheck(eintrag.tmdbId, art, ablehnen, zaehler.abgelehnt)
     await sleep(250)
     if (vonKc === FEHLER) {
       zaehler.ausgefallen++
@@ -413,7 +462,7 @@ async function frageSchnittstellen(
   }
 
   if (!tmdbSchluessel) return auskunft
-  const vonTmdb = await ausTmdb(eintrag.tmdbId, art, tmdbSchluessel)
+  const vonTmdb = await ausTmdb(eintrag.tmdbId, art, tmdbSchluessel, ablehnen, zaehler.abgelehnt)
   await sleep(120)
   if (vonTmdb === FEHLER) {
     zaehler.ausgefallen++
@@ -471,6 +520,22 @@ async function ladeIndexMitLabel(
   return index
 }
 
+/** Wirft Nicht-Trailer aus dem Bestand (Regel und Sperrliste), zählt je Grund und nennt jeden im Protokoll. */
+function entferneNichtTrailer(
+  bestand: Record<string, TrailerEintrag>,
+  titles: Titel[],
+  tmdb: Record<string, TmdbEintrag>,
+  sperre: ReadonlySet<string>,
+  abgelehnt: Ablehnungen,
+): void {
+  const jeId = new Map(titles.map((t) => [String(t.id), t]))
+  const namenJe = (id: string): string[] => animeNamen(jeId.get(id) ?? {}, tmdb[id]?.nameDe)
+  for (const e of entferneAbgelehnte(bestand, namenJe, sperre)) {
+    abgelehnt[e.grund]++
+    log(`  Bestand: ${e.id} entfernt (${e.grund}): ${e.video} „${e.titel}“`)
+  }
+}
+
 /** `riegel` und `speichernAlle` nur für die Probe; im Betrieb gelten `RIEGEL_JE_LAUF` und `SPEICHERN_ALLE`. */
 export async function main(opt: { riegel?: number; speichernAlle?: number } = {}): Promise<void> {
   const schluessel = process.env.YOUTUBE_API_KEY
@@ -490,6 +555,9 @@ export async function main(opt: { riegel?: number; speichernAlle?: number } = {}
 
   /* Zuerst aufräumen: Ein toter Eintrag soll in derselben Runde neu gesucht werden. */
   const weg = schluessel ? await pruefeAdressen(bestand, schluessel) : 0
+  const sperre = ladeTrailerSperre()
+  const abgelehnt = neueAblehnungen()
+  entferneNichtTrailer(bestand, titles, tmdb, sperre, abgelehnt)
   const index = await ladeIndexMitLabel(schluessel, titles, bestand)
 
   /*
@@ -508,7 +576,8 @@ export async function main(opt: { riegel?: number; speichernAlle?: number } = {}
   let ausKanal = 0
 
   for (const titel of dran.filter((t) => t.format === 'MOVIE')) {
-    const fund = ausIndex(titel, index, tmdb[String(titel.id)]?.nameDe)
+    const ablehnen = macheAblehner(animeNamen(titel, tmdb[String(titel.id)]?.nameDe), sperre)
+    const fund = ausIndex(titel, index, tmdb[String(titel.id)]?.nameDe, ablehnen, abgelehnt)
     if (fund) {
       bestand[String(titel.id)] = fund
       ausKanal++
@@ -517,13 +586,13 @@ export async function main(opt: { riegel?: number; speichernAlle?: number } = {}
 
   /* Die Schnittstellen (Weg 2 und 3) nur für das, was der Index nicht fand. */
   const nochOffen = dran.filter((t) => bestand[String(t.id)]?.sprache !== 'de')
-  const zaehler: Zaehler = { kc: 0, tmdbDe: 0, fremd: 0, antworten: 0, ausgefallen: 0 }
+  const zaehler: Zaehler = { kc: 0, tmdbDe: 0, fremd: 0, antworten: 0, ausgefallen: 0, abgelehnt }
   /* Ohne beide Schlüssel war die Suche keine Auskunft — dann kein Stempel. */
   const stempeln = Boolean(schluessel && tmdbSchluessel)
   await arbeiteInStuecken(
     nochOffen,
     async (titel) => {
-      const auskunft = await frageSchnittstellen(titel, tmdb[String(titel.id)], bestand, tmdbSchluessel, zaehler)
+      const auskunft = await frageSchnittstellen(titel, tmdb[String(titel.id)], bestand, tmdbSchluessel, zaehler, sperre)
       if (stempeln && auskunft && bestand[String(titel.id)]?.sprache !== 'de') versuche[String(titel.id)] = heute()
     },
     () => {
@@ -542,6 +611,7 @@ export async function main(opt: { riegel?: number; speichernAlle?: number } = {}
     `${ausKanal} über den Kanalindex, ${ausKc} über KinoCheck, ${ausTmdbDe} deutsche über TMDB, ` +
       `${fremd} fremdsprachig · ${deutsche} deutsche von ${Object.keys(bestand).length} Trailern`,
   )
+  log(`Kein Trailer (abgelehnt): ${ablehnungenText(abgelehnt)}`)
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) await main()

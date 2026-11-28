@@ -582,6 +582,8 @@ export const TEXTE_SPAET = {
   'detail.reiterOhneSynchro': 'gestrichelt = ohne deutsche Synchro',
   'detail.neuigkeiten': 'Neuigkeiten',
   'detail.neuigkeitenAlle': 'Alle {n} Meldungen',
+  'detail.neuigkeitenAltEins': '1 überholte Meldung',
+  'detail.neuigkeitenAlt': '{n} überholte Meldungen',
   'detail.staffelVon': 'Staffel {n} von {von}',
   'detail.reihe': 'Reihe',
   'detail.eineStaffel': '1 Staffel',

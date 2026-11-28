@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { PLATFORMS, type NewsEintrag, type Release } from '@shared/types.ts'
+import { PLATFORMS, type NewsEintrag, type Release, type Title } from '@shared/types.ts'
 import { loadNews, type Dataset } from '../../lib/data.ts'
 import { useLang } from '../../lib/i18n.tsx'
 import { artLabel, datumKurz, newsSatz } from '../../lib/news-text.ts'
@@ -9,7 +9,7 @@ import { QuellenKnopf } from '../beleg-dialog.tsx'
 import { Klapptext } from '../klapptext.tsx'
 import { NachtragText } from '../news-nachtrag.tsx'
 import { todayIso } from '@shared/time.ts'
-import { laeuftFuerSlug, meldungenImPanel, type Zeile } from './neuigkeiten-regeln.ts'
+import { laeuftFuerSlug, meldungenImPanel, trenneUeberholte, type Zeile } from './neuigkeiten-regeln.ts'
 import { hostVon, istLink } from '@shared/quelle.ts'
 import { GlockeZeichen, PanelKarte } from './panel-karte.tsx'
 import { ErstausgabeZeile } from './erstausgabe-zeile.tsx'
@@ -18,14 +18,15 @@ import { erstausgabeNeuigkeitTitel } from './antwort-regeln.ts'
 /** Wie viele Meldungen ohne Aufklappen zu sehen sind. */
 const SICHTBAR = 3
 
+const KNOPF = 'mt-2 min-h-11 cursor-pointer rounded-full border border-ak-rand bg-ak-flaeche-2 px-4 text-t3 font-bold text-ak-text transition hover:border-ak-leise'
+const ZEITLEISTE = 'relative flex flex-col gap-3.5 pl-4 before:absolute before:bottom-1 before:left-[3px] before:top-1.5 before:w-px before:bg-ak-rand'
+
 /**
  * **Die News eines Titels stehen auch in seinem Panel**, mit Sprung zur Quelle —
  * nur die des eigenen Titels, neueste zuerst (`meldungenImPanel`).
  */
 export function Neuigkeiten({ data, titelId }: { data: Dataset; titelId: number }) {
-  const { t } = useLang()
   const [liste, setListe] = useState<NewsEintrag[] | null>(null)
-  const [alle, setAlle] = useState(false)
   useEffect(() => {
     let aktiv = true
     void loadNews().then((l) => aktiv && setListe(l))
@@ -38,21 +39,46 @@ export function Neuigkeiten({ data, titelId }: { data: Dataset; titelId: number 
     [liste, titelId, data],
   )
   const erst = erstausgabeNeuigkeitTitel(data, titelId, todayIso())
+  return <NeuigkeitenKarte data={data} zeilen={zeilen} erst={erst} />
+}
+
+/** Geltende Meldungen stehen offen, zurückgezogene und ersetzte hinter einem Aufklapper am Ende. */
+export function NeuigkeitenKarte({ data, zeilen, erst }: { data: Dataset; zeilen: Zeile[]; erst?: Title }) {
+  const { t } = useLang()
+  const [alle, setAlle] = useState(false)
+  const [alt, setAlt] = useState(false)
   if (!zeilen.length && !erst) return null
-  const gezeigt = alle ? zeilen : zeilen.slice(0, SICHTBAR)
+  const { gueltig, ueberholt } = trenneUeberholte(zeilen)
+  const gezeigt = alle ? gueltig : gueltig.slice(0, SICHTBAR)
   return (
-    <PanelKarte symbol={<GlockeZeichen />} titel={t('detail.neuigkeiten')} zaehler={zeilen.length + (erst ? 1 : 0)} akzent="info">
+    <PanelKarte symbol={<GlockeZeichen />} titel={t('detail.neuigkeiten')} zaehler={gueltig.length + (erst ? 1 : 0)} akzent="info">
       {/* Zeitleiste: ein senkrechter Strich, je Meldung ein farbiger Punkt in der Farbe ihrer Art. */}
-      <ul className="relative flex flex-col gap-3.5 pl-4 before:absolute before:bottom-1 before:left-[3px] before:top-1.5 before:w-px before:bg-ak-rand">
-        {gezeigt.map((z, i) => (
-          <NeuigkeitZeile key={`${z.am}-${z.m.art}-${i}`} z={z} data={data} />
-        ))}
-        {erst && (alle || zeilen.length < SICHTBAR) && <ErstausgabeZeile title={erst} />}
-      </ul>
-      {zeilen.length > SICHTBAR && (
-        <button type="button" onClick={() => setAlle(!alle)} aria-expanded={alle} className="mt-2 min-h-11 cursor-pointer rounded-full border border-ak-rand bg-ak-flaeche-2 px-4 text-t3 font-bold text-ak-text transition hover:border-ak-leise">
-          {alle ? t('filter.showLess') : t('detail.neuigkeitenAlle', { n: zeilen.length })}
+      {(gezeigt.length > 0 || erst) && (
+        <ul className={ZEITLEISTE}>
+          {gezeigt.map((z, i) => (
+            <NeuigkeitZeile key={`${z.am}-${z.m.art}-${i}`} z={z} data={data} />
+          ))}
+          {erst && (alle || gueltig.length < SICHTBAR) && <ErstausgabeZeile title={erst} />}
+        </ul>
+      )}
+      {gueltig.length > SICHTBAR && (
+        <button type="button" onClick={() => setAlle(!alle)} aria-expanded={alle} className={KNOPF}>
+          {alle ? t('filter.showLess') : t('detail.neuigkeitenAlle', { n: gueltig.length })}
         </button>
+      )}
+      {ueberholt.length > 0 && (
+        <>
+          <button type="button" onClick={() => setAlt(!alt)} aria-expanded={alt} className={KNOPF}>
+            {alt ? t('filter.showLess') : t(ueberholt.length === 1 ? 'detail.neuigkeitenAltEins' : 'detail.neuigkeitenAlt', { n: ueberholt.length })}
+          </button>
+          {alt && (
+            <ul className={`${ZEITLEISTE} mt-2`}>
+              {ueberholt.map((z, i) => (
+                <NeuigkeitZeile key={`${z.am}-${z.m.art}-${i}`} z={z} data={data} />
+              ))}
+            </ul>
+          )}
+        </>
       )}
     </PanelKarte>
   )

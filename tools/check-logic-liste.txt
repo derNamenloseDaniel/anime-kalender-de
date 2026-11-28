@@ -891,6 +891,8 @@ tools/link-check-ende.test.ts
 tools/link-check-zeitbudget.test.ts
 tools/link-faelligkeit.test.ts
 tools/mockup-freigabe-pflicht.mjs
+tools/neuigkeiten-ueberholt-klick.test.tsx
+tools/neuigkeiten-ueberholt.test.tsx
 tools/quarantaene-pruefungen.test.ts
 tools/quellen-gesundheit.test.ts
 tools/quellen-leer.test.ts

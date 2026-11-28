@@ -3,13 +3,15 @@ import { resolve } from 'node:path'
 import yaml from 'js-yaml'
 import { ROOT } from './util.ts'
 import { schreibeKatalogRelease, type KatalogBelege } from '../../shared/katalog-release.ts'
+import type { Beobachtung, Beobachtungen } from '../../shared/vermutung-beleg.ts'
 import type { Release, ReleaseEvent } from '../../shared/types.ts'
 
 /**
  * **Belege für den Katalog-Release von Hand** (`data/katalog-release-von-hand.yaml`, 13.10.2026): Ohne Eintrag gilt ein Release,
  * dessen Folgen alle an einem Tag liegen, nur als abgeleitet („Vermutlich alle 13 Folgen auf einmal“).
  *  - `komplett`: die Quelle schreibt „Episoden: N (komplett)“ zum Starttag;
- *  - `beobachtet`: alle Folgen waren am selben Tag im Abruf zu sehen, nicht nur als Katalog-Stempel;
+ *  - `beobachtet`: alle Folgen waren am selben Tag im Abruf zu sehen, nicht nur als Katalog-Stempel; mit `gesehenAm` und `bisFolge`
+ *    (Tag der Messung, höchste Folge) entscheidet `urteilKatalog`: am Starttag oder davor mit der letzten Folge → belegt, später → ≈;
  *  - `teil`: nur ein Teil der Staffel („12 von 24“) — kein Katalog-Release.
  */
 export const KATALOG_BELEGE_VON_HAND = 'data/katalog-release-von-hand.yaml'
@@ -24,6 +26,9 @@ export interface KatalogBelegEintrag {
   art: string
   url: string
   zitat: string
+  /** Nur `beobachtet`: Tag der Messung (Europe/Berlin) und höchste dabei sichtbare Folge; beide oder keins. */
+  gesehenAm?: string
+  bisFolge?: number
 }
 
 export function ladeKatalogBelegEintraege(pfad = resolve(ROOT, KATALOG_BELEGE_VON_HAND)): KatalogBelegEintrag[] {
@@ -45,6 +50,8 @@ export function katalogBelegFehler(eintraege: KatalogBelegEintrag[]): string[] {
     const woerter = (e.zitat ?? '').trim().split(/\s+/).filter(Boolean).length
     if (!woerter) fehler.push(`${at}: Zitat fehlt`)
     else if (woerter >= KATALOG_ZITAT_MAX_WOERTER) fehler.push(`${at}: Zitat hat ${woerter} Wörter, erlaubt sind unter ${KATALOG_ZITAT_MAX_WOERTER}`)
+    if ((e.gesehenAm === undefined) !== (e.bisFolge === undefined)) fehler.push(`${at}: gesehenAm und bisFolge stehen zusammen`)
+    else if (e.gesehenAm !== undefined && (e.art !== 'beobachtet' || !/^\d{4}-\d{2}-\d{2}$/.test(e.gesehenAm) || !Number.isInteger(e.bisFolge))) fehler.push(`${at}: gesehenAm (JJJJ-MM-TT) und bisFolge gibt es nur bei „beobachtet“`)
     if (e.art === 'komplett' && !/\(komplett\)/.test(e.zitat ?? '')) fehler.push(`${at}: „komplett“ braucht ein Zitat mit „(komplett)“`)
   }
   return fehler
@@ -66,9 +73,16 @@ export function katalogBelegBestandFehler(eintraege: KatalogBelegEintrag[], rele
   return fehler
 }
 
-/** Kennung → Urteil: `belegt` (komplett, beobachtet) oder `teil`. */
+/** Kennung → Urteil: `belegt` (komplett, beobachtet ohne Tag) oder `teil`; eine Beobachtung mit Tag urteilt `katalogBeobachtungen`. */
 export function katalogBelege(eintraege: KatalogBelegEintrag[]): KatalogBelege {
-  return new Map(eintraege.map((e) => [e.slug, e.art === 'teil' ? 'teil' : 'belegt']))
+  return new Map(eintraege.filter((e) => e.gesehenAm === undefined).map((e) => [e.slug, e.art === 'teil' ? 'teil' : 'belegt']))
+}
+
+/** Kennung → Beobachtungen mit Tag und letzter Folge; sie lösen das ≈ nur ab, wenn `urteilKatalog` es sagt. */
+export function katalogBeobachtungen(eintraege: KatalogBelegEintrag[]): Beobachtungen {
+  const karte = new Map<string, Beobachtung[]>()
+  for (const e of eintraege) if (e.gesehenAm !== undefined) karte.set(e.slug, [...(karte.get(e.slug) ?? []), { am: e.gesehenAm, folge: e.bisFolge! }])
+  return karte
 }
 
 /** `katalog` an die Termine schreiben, mit den Belegen der Handdatei; ein Strukturfehler dort bricht den Bau ab. */
@@ -76,5 +90,5 @@ export function schreibeKatalogReleaseVonHand(events: ReleaseEvent[], releases: 
   const eintraege = ladeKatalogBelegEintraege()
   const fehler = katalogBelegFehler(eintraege)
   if (fehler.length) throw new Error(`${KATALOG_BELEGE_VON_HAND}:\n${fehler.join('\n')}`)
-  return schreibeKatalogRelease(events, releases, katalogBelege(eintraege))
+  return schreibeKatalogRelease(events, releases, katalogBelege(eintraege), katalogBeobachtungen(eintraege))
 }

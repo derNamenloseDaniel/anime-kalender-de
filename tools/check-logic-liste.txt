@@ -347,7 +347,9 @@ pipeline/check-handbelege-veraltet-lauf.ts
 pipeline/check-handlung-eigen-hinweis.ts
 pipeline/check-handlung-eigen.ts
 pipeline/check-handlung-quelle-panel.ts
+pipeline/check-handlung-quelle-zeile.ts
 pipeline/check-handlung-quelle.ts
+pipeline/check-handlung-satz-anzeige.ts
 pipeline/check-handlung-satz.ts
 pipeline/check-hauptrelease.ts
 pipeline/check-herkunft-je-folge.ts
@@ -804,6 +806,8 @@ pipeline/check-urteile-ablauf.ts
 pipeline/check-us-nein-adresse.ts
 pipeline/check-verlauf-eintrag.ts
 pipeline/check-vermerk-berliner-tag.ts
+pipeline/check-vermutung-beleg-bau.ts
+pipeline/check-vermutung-beleg.ts
 pipeline/check-verpasst-beobachtet.ts
 pipeline/check-verpasst-katalog.ts
 pipeline/check-verpasst-verdrahtung.ts
@@ -889,6 +893,8 @@ tools/link-check-ende.test.ts
 tools/link-check-zeitbudget.test.ts
 tools/link-faelligkeit.test.ts
 tools/mockup-freigabe-pflicht.mjs
+tools/neuigkeiten-ueberholt-klick.test.tsx
+tools/neuigkeiten-ueberholt.test.tsx
 tools/quarantaene-pruefungen.test.ts
 tools/quellen-gesundheit.test.ts
 tools/quellen-leer.test.ts

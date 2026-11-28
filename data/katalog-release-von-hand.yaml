@@ -69,6 +69,15 @@
   url: https://beta-api.crunchyroll.com/content/v2/discover/browse?type=episode&sort_by=newly_added
   zitat: '"staffelId":"GS00371870DEDE" … "verfuegbarAb":"2026-10-12T15:30:00.000Z"'
 
+# Fool Night (Netflix): Browser-Meldung vom 26.11.2026 (Starttag), Folge 1 und 12 gemessen, Folgen 1–12 mit deutschem Ton (data/dub-confirmed.yaml).
+# Mit gesehenAm und bisFolge entscheidet shared/vermutung-beleg.ts: am Starttag oder davor mit der letzten Folge → belegt.
+- slug: auto-10021751-netflix
+  art: beobachtet
+  url: https://www.netflix.com/title/81991076
+  zitat: "Folgen 1–12 mit deutschem Ton"
+  gesehenAm: '2026-11-26'
+  bisFolge: 12
+
 # Nur der erste Teil der Staffel: „Episoden: 12 von 24“.
 - slug: gachiakuta-teil1-disneyplus
   art: teil

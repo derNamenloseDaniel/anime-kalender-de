@@ -5,10 +5,12 @@
  *    ist `batch` oft nur ein Starttermin aus einer Meldung (A Wild Last Boss Appeared! Staffel 2: Termin aus einer Simulcast-Übersicht);
  *  - ein wöchentlicher Release, dessen Folgen vom Start bis zum Finale (belegte Zahl) alle am Starttag liegen. Liegen sie später,
  *    ist es ein Wochentakt: Crunchyrolls Katalog stempelt bei laufenden Serien das Finale-Datum auf alle Folgen (The Beginning After the End).
- * `katalog: 'belegt'` steht nur mit ausdrücklichem Beleg (`data/katalog-release-von-hand.yaml`); sonst `'abgeleitet'` („Vermutlich …“).
+ * `katalog: 'belegt'` steht nur mit ausdrücklichem Beleg (`data/katalog-release-von-hand.yaml`) oder einer Beobachtung am Starttag
+ * mit der letzten Folge (`urteilKatalog`); sonst `'abgeleitet'` („Vermutlich …“).
  * „Im Angebot seit“ ist nie ein Katalog-Release: Ob die Folgen dort neu erschienen, sagt das Datum nicht.
  */
 import type { Release, ReleaseEvent } from './types.ts'
+import { urteilKatalog, type Beobachtungen } from './vermutung-beleg.ts'
 
 /** Ab so vielen Folgen heißt „alles auf einmal“ Katalog-Release; zwei Folgen sind eine Doppelfolge. */
 export const KATALOG_MIN_FOLGEN = 3
@@ -49,7 +51,7 @@ function istStaffelAmStueck(tag: ReleaseEvent[], r: Release | undefined): boolea
 }
 
 /** Setzt `katalog` an die betroffenen Termine; liefert deren Zahl. Ein Release, den die Handdatei als Teil führt, bleibt außen vor. */
-export function schreibeKatalogRelease(events: ReleaseEvent[], releases: Release[], belege: KatalogBelege): number {
+export function schreibeKatalogRelease(events: ReleaseEvent[], releases: Release[], belege: KatalogBelege, beobachtungen: Beobachtungen = new Map()): number {
   const releaseBySlug = new Map(releases.map((r) => [r.slug, r]))
   const jeTag = new Map<string, ReleaseEvent[]>()
   for (const e of events) {
@@ -62,7 +64,8 @@ export function schreibeKatalogRelease(events: ReleaseEvent[], releases: Release
     const r = releaseBySlug.get(slug)
     if (belege.get(slug) === 'teil') continue
     if (!tag.every((e) => istBatchAmStueck(e, r)) && !istStaffelAmStueck(tag, r)) continue
-    for (const e of tag) e.katalog = belege.get(slug) === 'belegt' ? 'belegt' : 'abgeleitet'
+    const belegt = belege.get(slug) === 'belegt' || urteilKatalog(tag[0]!.date, tag[0]!.episodeCount, beobachtungen.get(slug)) === 'belegt'
+    for (const e of tag) e.katalog = belegt ? 'belegt' : 'abgeleitet'
     anzahl += tag.length
   }
   return anzahl

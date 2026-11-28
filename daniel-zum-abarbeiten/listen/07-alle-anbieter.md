@@ -1,6 +1,6 @@
 # Prüfliste: Wo läuft es wirklich auf Deutsch?
 
-Stand 2026-11-27 · **11 offene Verweise** in **11 Zeilen**.
+Stand 2026-11-28 · **12 offene Verweise** in **12 Zeilen**.
 
 Erzeugt von `npm run data:dub-checks`, **nicht von Hand pflegen**. Was geprüft ist, gehört
 nach `data/dub-confirmed.yaml`; beim nächsten Lauf verschwindet es hier.
@@ -33,8 +33,8 @@ Synchro und zweiter ohne, Zeile 4 tot.
 
 | Offen je Anbieter | Verweise |
 |---|---|
+| [Prime Video](07-primevideo.md) | 5 |
 | [Netflix](07-netflix.md) | 4 |
-| [Prime Video](07-primevideo.md) | 4 |
 | [Disney+](07-disneyplus.md) | 2 |
 | [Pluto TV](07-plutotv.md) | 1 |
 
@@ -52,7 +52,8 @@ Synchro und zweiter ohne, Zeile 4 tot.
 | 8 | 2019-12-13 | Dr. Stone | [Hauptserie](https://pluto.tv/gsa/shows/dr-stone/) |
 | 9 | 2009-03-27 | Black Butler | [Hauptserie](https://watch.amazon.de/detail?gti=amzn1.dv.gti.6aad68c8-1e46-46e9-be1e-3d4de43488a5) |
 | 10 | 2006-05-06 | Sonic X: The Metarex Saga | [Hauptserie](https://www.netflix.com/title/81172267) |
-| 11 | 2003-10-22 | Ikki Tousen: Dragon Girls | [Hauptserie](https://watch.amazon.de/detail?gti=amzn1.dv.gti.1374d3dd-9d96-4d41-b0f8-38932f0c9145) |
+| 11 | 2006-05-06 | Sonic X: The Metarex Saga | [Hauptserie](https://watch.amazon.de/detail?gti=amzn1.dv.gti.38b96790-6f2f-1299-0807-4b7dbf607245) |
+| 12 | 2003-10-22 | Ikki Tousen: Dragon Girls | [Hauptserie](https://watch.amazon.de/detail?gti=amzn1.dv.gti.1374d3dd-9d96-4d41-b0f8-38932f0c9145) |
 
 ## Warum die einzelnen Anbieter unsicher sind
 

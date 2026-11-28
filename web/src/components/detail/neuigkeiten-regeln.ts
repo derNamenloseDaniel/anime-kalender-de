@@ -52,3 +52,11 @@ export function laeuftNoch(r: Release | undefined, heute: string): boolean {
 export function laeuftFuerSlug(releaseBySlug: Map<string, Release>, heute: string): (releaseSlug?: string) => boolean {
   return (slug) => laeuftNoch(releaseBySlug.get(slug ?? ''), heute)
 }
+
+/** Zurückgezogen oder ersetzt: die Meldung gilt nicht mehr und steht im Panel eingeklappt. */
+export const istUeberholt = (z: Zeile): boolean => Boolean(z.m.ersetzt || z.m.zurueckgezogen)
+
+/** Teilt die Zeilen in geltende und überholte; die Reihenfolge bleibt. */
+export function trenneUeberholte(zeilen: Zeile[]): { gueltig: Zeile[]; ueberholt: Zeile[] } {
+  return { gueltig: zeilen.filter((z) => !istUeberholt(z)), ueberholt: zeilen.filter(istUeberholt) }
+}

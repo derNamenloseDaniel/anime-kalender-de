@@ -10,37 +10,6 @@ X-WR-TIMEZONE:Europe/Berlin
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:apothecary-diaries-s3-cour1@2026-11-20@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261120T160000Z
-DTEND:20261120T163000Z
-SUMMARY:Die Tagebücher der Apothekerin: Staffel 3 - Teil 1 – Folge 5/12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
- etails: https://anime-kalender.de/t/16914/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:cr-GT00383999@2026-11-20@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART:20261120T170000Z
-DTEND:20261120T173000Z
-SUMMARY:Firefly Wedding – Folge 4/12
-DESCRIPTION:Plattform: Crunchyroll\nRelease-Art: Wöchentlich (Simuldub)\nD
- etails: https://anime-kalender.de/t/17358/
-CATEGORIES:Crunchyroll
-END:VEVENT
-BEGIN:VEVENT
-UID:auto-384-disc@2026-11-20@anime-kalender-de
-DTSTAMP:20200101T000000Z
-DTSTART;VALUE=DATE:20261120
-DTEND;VALUE=DATE:20261121
-SUMMARY:Gantz (Disc)
-DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nAuf Deuts
- ch vor der Disc bei ADN im Streaming (spätestens ab 05.06.2026).\nUhrzeit
-  noch nicht bestätigt.\nDetails: https://anime-kalender.de/t/348/
-CATEGORIES:DVD / Blu-ray
-END:VEVENT
-BEGIN:VEVENT
 UID:apothecary-diaries-s3-cour1@2026-11-27@anime-kalender-de
 DTSTAMP:20200101T000000Z
 DTSTART:20261127T160000Z
@@ -94,6 +63,17 @@ DESCRIPTION:Plattform: DVD / Blu-ray\nRelease-Art: DVD / Blu-ray\nAuf Deuts
  ch vor der Disc bei Crunchyroll im Streaming (ab 31.01.2025).\nUhrzeit noc
  h nicht bestätigt.\nDetails: https://anime-kalender.de/t/15778/
 CATEGORIES:DVD / Blu-ray
+END:VEVENT
+BEGIN:VEVENT
+UID:auto-6547-adn@2026-12-10@anime-kalender-de
+DTSTAMP:20200101T000000Z
+DTSTART;VALUE=DATE:20261210
+DTEND;VALUE=DATE:20261211
+SUMMARY:Angel Beats! (neu bei ADN)
+DESCRIPTION:Plattform: ADN\nRelease-Art: Katalogtitel\nIm Angebot seit dies
+ em Tag – nicht der Erscheinungstag der deutschen Fassung.\nUhrzeit noch 
+ nicht bestätigt.\nDetails: https://anime-kalender.de/t/3898/
+CATEGORIES:ADN
 END:VEVENT
 BEGIN:VEVENT
 UID:apothecary-diaries-s3-cour1@2026-12-11@anime-kalender-de

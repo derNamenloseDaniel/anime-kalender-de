@@ -25,7 +25,9 @@ export function verdrahtungsFehler(quelltext: string): string[] {
   besuche(rumpf)
   if (schreiber.length !== 1) return [`franchises.json muss genau einmal geschrieben werden (gefunden: ${schreiber.length})`]
   const fehler: string[] = []
-  const eigene = schreiber[0]!.arguments[1]
+  // Der Anbieter-Zuschnitt markiert nur Glieder und darf außen herum stehen; geprüft wird, was er umschließt.
+  const aussen = schreiber[0]!.arguments[1]
+  const eigene = aufruf(aussen, 'markiereAnbieterStaffeln') ? aussen.arguments[0] : aussen
   if (!aufruf(eigene, 'markiereEigeneWerke') || eigene.arguments.length !== 2 || !aufruf(eigene.arguments[1], 'mitStaffelTiteln')) return ['franchises.json muss aus markiereEigeneWerke(<Reihen>, mitStaffelTiteln(…)) kommen']
   const remakes = eigene.arguments[0]
   if (!aufruf(remakes, 'markiereRemakes')) return ['markiereEigeneWerke muss die Reihen aus markiereRemakes(reihen, <Titel>) bekommen']

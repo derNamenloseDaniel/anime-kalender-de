@@ -1,5 +1,5 @@
 /**
- * Bestandsteil von `check-anbieter-zuschnitt.ts` (Konzept Staffelzuschnitt, Schritt 2): Jeder Eintrag in `data/curated/anbieter-zuschnitt.yaml` geht
+ * Bestandsteil von `check-anbieter-zuschnitt.ts` (Konzept Staffelzuschnitt, Schritt 2): Jeder Eintrag in `data/anbieter-zuschnitt.yaml` geht
  * gegen die aktuelle `data/anbieter-staffeln.json` und `public/data` noch auf (Drift ⇒ rot mit Titel), jede Netflix-Staffel, die mehrere unserer
  * Titel lückenlos füllt, hat einen Eintrag oder steht mit Grund in `ABWEICHUNGEN_ERLAUBT` (nur sinkend), und `franchises.json` trägt `anbieterStaffel`
  * genau an den Gliedern der Einträge. Liest `public/data` und gehört deshalb in `check:bestand`.

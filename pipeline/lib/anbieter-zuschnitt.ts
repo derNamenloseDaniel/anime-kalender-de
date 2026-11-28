@@ -2,7 +2,7 @@
  * **Der Zuschnitt des Anbieters als Anzeigefeld** (Konzept `daniel-zum-abarbeiten/berichte/konzept-staffel-zuschnitt.md`, Ansatz A).
  *
  * Netflix führt manchmal als eine Staffel, was wir als mehrere Titel führen (Stone Ocean: 12 + 26 Folgen gegen eine Staffel mit 38).
- * `data/curated/anbieter-zuschnitt.yaml` nennt je Fall die Netflix-Staffel und unsere Glieder; hier wird jeder Eintrag gegen
+ * `data/anbieter-zuschnitt.yaml` nennt je Fall die Netflix-Staffel und unsere Glieder; hier wird jeder Eintrag gegen
  * `data/anbieter-staffeln.json` gehalten und trägt nur dann `FranchiseMember.anbieterStaffel`, wenn er **Position für Position**
  * aufgeht (wie `netflix-staffeln.ts`): unsere Folgen vor den Gliedern = Netflix' Folgen vor der Staffel, Summe der Glieder = Folgen
  * der Staffel. Kennungen, Titel und Kalender bleiben unberührt; die Nummer ist die der Reihe, vom Anbieter kommen nur die Grenzen.

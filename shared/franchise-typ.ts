@@ -73,7 +73,7 @@ export interface FranchiseMember {
   staffelFolgen?: [staffel: number, von: number, bis: number][]
   /** Kennung des Originals, wenn dieser Teil eine Neuverfilmung ist; Remake und Folgendes zählen als eigene Linie (`zaehlgruppen()`). */
   remakeVon?: number
-  /** Zuschnitt des Anbieters, wenn er mehrere unserer Titel als eine Staffel führt (Stone Ocean: eine Netflix-Staffel mit 38 Folgen); `data/curated/anbieter-zuschnitt.yaml`. */
+  /** Zuschnitt des Anbieters, wenn er mehrere unserer Titel als eine Staffel führt (Stone Ocean: eine Netflix-Staffel mit 38 Folgen); `data/anbieter-zuschnitt.yaml`. */
   anbieterStaffel?: AnbieterZuschnitt
 }
 

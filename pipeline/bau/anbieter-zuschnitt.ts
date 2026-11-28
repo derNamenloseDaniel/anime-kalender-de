@@ -7,7 +7,7 @@ import { markiereZuschnitt, type ZuschnittEintrag } from '../lib/anbieter-zuschn
 import type { StaffelListen } from '../lib/netflix-staffeln.ts'
 import { ROOT, log, readJson, warn } from '../lib/util.ts'
 
-export const ZUSCHNITT_DATEI = 'data/curated/anbieter-zuschnitt.yaml'
+export const ZUSCHNITT_DATEI = 'data/anbieter-zuschnitt.yaml'
 
 /** Die Handeinträge; ohne Netflix-Adresse, Staffel, Glieder, Quelle oder Datum bricht der Bau ab, fehlt die Datei, gibt es keine. */
 export function ladeZuschnitt(datei = resolve(ROOT, ZUSCHNITT_DATEI)): ZuschnittEintrag[] {
@@ -20,7 +20,7 @@ export function ladeZuschnitt(datei = resolve(ROOT, ZUSCHNITT_DATEI)): Zuschnitt
 }
 
 /**
- * Setzt `FranchiseMember.anbieterStaffel` aus `data/curated/anbieter-zuschnitt.yaml`. Ein Eintrag, der gegen Netflix' Staffelliste nicht
+ * Setzt `FranchiseMember.anbieterStaffel` aus `data/anbieter-zuschnitt.yaml`. Ein Eintrag, der gegen Netflix' Staffelliste nicht
  * aufgeht (Folgenzahl, Position, Reihennummer), setzt nichts und steht als Warnung im Protokoll; die Zahl steht immer darin.
  */
 export function markiereAnbieterStaffeln(reihen: Record<number, FranchiseMember[]>, titles: Iterable<Title>): Record<number, FranchiseMember[]> {

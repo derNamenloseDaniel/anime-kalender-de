@@ -14,6 +14,7 @@ import { ergaenzeErstausgabeAusWikiUndHand, uebernehmeAnisearchErstausgabe } fro
 import { schaerfeAdnAdressen } from './09-5-2-adn-adressen.ts'
 import { belegeAdnAusArchiv, belegeAdnUeberKatalog, stelleAdnFolgenverweiseUm } from './09-5-2-adn-belege.ts'
 import { stelleRtlAdressenUm } from './09-5-3-rtl-adressen.ts'
+import { type AkibapassDatei, setzeAkibapassSprache } from '../lib/akibapass-sprache.ts'
 
 interface WeitereQuellenEingabe {
   releases: Release[]
@@ -184,5 +185,7 @@ export function werteWeitereQuellenAus({ releases, titles, adnKatalog, adnVerwei
   const adnArchiv = belegeAdnAusGedaechtnis({ titles, schreibWurzel })
   const adnStreamSchaerfen = baueAdnStreamSchaerfer({ ...adnAdressen, adnArchiv })
   entferneVerweiseOhneDeutsch({ titles, verweiseEntfernt })
+  const akibapass = setzeAkibapassSprache(titles.values(), readJson<AkibapassDatei>('data/akibapass-sprache.json', { seiten: {} }))
+  if (akibapass) log(`${akibapass} Akibapass-Wege: Deutsch aus der Produktseite belegt`)
   return { adnArchiv, adnStreamSchaerfen, motnBelege, motnTon }
 }

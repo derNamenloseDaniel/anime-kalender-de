@@ -445,6 +445,10 @@ jobs:
           SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
         run: bash tools/schritt.sh --zeit 15m "kinoheld-Adressen" -- npm run data:kinoheld
 
+      # Sprache der Akibapass-Produktseiten (28.11.2026): robots.txt vorab, 3 s Abstand, bei 403/429 Pause.
+      - name: Akibapass — Sprache der Produktseiten
+        run: bash tools/schritt.sh --zeit 15m "Akibapass-Sprache" -- npm run data:akibapass-sprache
+
       # Die offizielle Data API v3 nennt die Ländersperre ausdrücklich; Wiedervorlage 30 Tage.
       - name: YouTube-Verweise auf Abrufbarkeit in Deutschland
         env:

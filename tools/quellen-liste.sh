@@ -315,6 +315,8 @@ QUELLEN=(
   # `pipeline/fetch-toggo.ts`). Täglich geholt — ohne diese Zeile stünde jeden Tag der
   # Stand der letzten lokalen Messung in der Pille.
   data/toggo.json
+  # Sprache der Akibapass-Produktseiten, wöchentlich (28.11.2026, `pipeline/fetch-akibapass-sprache.ts`).
+  data/akibapass-sprache.json
   # kinoheld-Adressen für Kinotermine, über DuckDuckGo gefunden (19.09.2026, wöchentlich).
   data/kinoheld.json
   # IMDb-Kennungen über Wikidata, MAL → IMDb (19.09.2026, wöchentlich).

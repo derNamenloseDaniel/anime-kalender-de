@@ -1,5 +1,0 @@
-kategorie: feature
-text: 23 weitere Titel mit deutscher Handlung
-untertitel: Etwa Der Zauberpinsel, T・P Bon Staffel 2 und die Sinbad-Filme
-wartetAuf: "Bestandsbau nach dem Merge. Probe: node tools/maengel.mjs zeigt bei handlung-de statt 63 höchstens 40 offene Titel. Ändert sich nichts, wird der Eintrag gelöscht."
-seit: '2026-11-26'

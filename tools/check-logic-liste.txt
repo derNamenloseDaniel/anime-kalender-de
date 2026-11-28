@@ -681,6 +681,7 @@ pipeline/check-staffel-anzeige.ts
 pipeline/check-staffel-aufrufer.ts
 pipeline/check-staffel-des-titels.ts
 pipeline/check-staffel-folge-tv.ts
+pipeline/check-staffel-gruppe.ts
 pipeline/check-staffel-historie.ts
 pipeline/check-staffel-jahr0.ts
 pipeline/check-staffel-lesekennung.ts

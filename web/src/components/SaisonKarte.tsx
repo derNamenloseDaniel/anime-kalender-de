@@ -2,7 +2,7 @@ import { PLATFORMS } from '@shared/types.ts'
 import { anzeigeName } from '@shared/titles.ts'
 import { todayIso } from '@shared/time.ts'
 import { ANILIST_COVER_BASIS } from '@shared/mappings.ts'
-import { ladeTitelBestand, type Dataset } from '../lib/data.ts'
+import { type Dataset } from '../lib/data.ts'
 import { coverBild } from '../lib/cover.ts'
 import { useLang, type TranslationKey } from '../lib/i18n.tsx'
 import { anbieterChips, type SaisonZeile, type Stufe } from '../lib/saison.ts'
@@ -30,15 +30,10 @@ export function SaisonKarte({ z, data, favorit, oeffne, ausblick }: { z: SaisonZ
   const anbieter = chips.map((c) => ({ name: PLATFORMS[c.platform]?.name ?? c.platform, laut: c.laut }))
   const termin = terminText(z, Boolean(ausblick), todayIso().slice(0, 4), t)
   const rand = favorit ? 'border-ak-favorit/70 shadow-[0_0_0_1px_color-mix(in_srgb,var(--ak-favorit)_30%,transparent)]' : z.erschienen ? 'border-ak-rand hover:border-ak-leise' : 'border-dashed border-ak-rand hover:border-ak-leise'
-  /* Ein Titel außerhalb des Kerns liegt in titles.json, ein Katalogtitel hinter dem Schalter: Erst beim Klick wird geholt, was das Panel zum Finden braucht. */
-  const klick = async () => {
-    if (!z.titel) await ladeTitelBestand(data, z.id)
-    oeffne(z.id)
-  }
   return (
     <li className="flex">
       {vorschau}
-      <button type="button" onClick={() => void klick()} {...zeiger} className={`flex w-full cursor-pointer gap-2.5 rounded-xl border bg-ak-flaeche p-2 text-left transition ${rand}`}>
+      <button type="button" onClick={() => oeffne(z.id)} {...zeiger} className={`flex w-full cursor-pointer gap-2.5 rounded-xl border bg-ak-flaeche p-2 text-left transition ${rand}`}>
         {cover ? (
           <img {...coverBild(cover, 60)} alt="" width={60} height={85} loading="lazy" decoding="async" className={`h-[85px] w-[60px] shrink-0 rounded-md object-cover ${z.erschienen ? '' : 'opacity-45 grayscale-[40%]'}`} />
         ) : (

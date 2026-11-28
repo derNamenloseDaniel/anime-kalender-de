@@ -2484,6 +2484,12 @@
   ],
   "adn-427-s1-20251029": [
     {
+      "url": "https://news.animationdigitalnetwork.com/de/2026/11/10/adn-erscheint-mit-app-auf-fire-tv-und-ps4/",
+      "name": "news.animationdigitalnetwork.com",
+      "gesehenAm": "2026-11-28",
+      "stand": "aktuell"
+    },
+    {
       "url": "https://gw.api.animationdigitalnetwork.com/video/show/427",
       "name": "ADN API",
       "gesehenAm": "2026-10-19",
@@ -2495,11 +2501,17 @@
       "url": "https://news.animationdigitalnetwork.com/de/2026/06/01/sailor-moon-sailor-stars-staffel-5-im-stream-bei-adn/",
       "name": "news.animationdigitalnetwork.com",
       "gesehenAm": "2026-10-01",
-      "stand": "aktuell",
+      "stand": "vermutlich-ueberholt",
       "sagt": "2025-10-29"
     }
   ],
   "adn-427-s2-20251126": [
+    {
+      "url": "https://news.animationdigitalnetwork.com/de/2026/11/10/adn-erscheint-mit-app-auf-fire-tv-und-ps4/",
+      "name": "news.animationdigitalnetwork.com",
+      "gesehenAm": "2026-11-28",
+      "stand": "aktuell"
+    },
     {
       "url": "https://gw.api.animationdigitalnetwork.com/video/show/427",
       "name": "ADN API",
@@ -2512,11 +2524,17 @@
       "url": "https://news.animationdigitalnetwork.com/de/2026/06/01/sailor-moon-sailor-stars-staffel-5-im-stream-bei-adn/",
       "name": "news.animationdigitalnetwork.com",
       "gesehenAm": "2026-10-01",
-      "stand": "aktuell",
+      "stand": "vermutlich-ueberholt",
       "sagt": "2025-11-26"
     }
   ],
   "adn-427-s3-20251223": [
+    {
+      "url": "https://news.animationdigitalnetwork.com/de/2026/11/10/adn-erscheint-mit-app-auf-fire-tv-und-ps4/",
+      "name": "news.animationdigitalnetwork.com",
+      "gesehenAm": "2026-11-28",
+      "stand": "aktuell"
+    },
     {
       "url": "https://gw.api.animationdigitalnetwork.com/video/show/427",
       "name": "ADN API",
@@ -2529,11 +2547,17 @@
       "url": "https://news.animationdigitalnetwork.com/de/2026/06/01/sailor-moon-sailor-stars-staffel-5-im-stream-bei-adn/",
       "name": "news.animationdigitalnetwork.com",
       "gesehenAm": "2026-10-01",
-      "stand": "aktuell",
+      "stand": "vermutlich-ueberholt",
       "sagt": "2025-12-23"
     }
   ],
   "adn-427-s4-20260401": [
+    {
+      "url": "https://news.animationdigitalnetwork.com/de/2026/11/10/adn-erscheint-mit-app-auf-fire-tv-und-ps4/",
+      "name": "news.animationdigitalnetwork.com",
+      "gesehenAm": "2026-11-28",
+      "stand": "aktuell"
+    },
     {
       "url": "https://gw.api.animationdigitalnetwork.com/video/show/427",
       "name": "ADN API",
@@ -2546,11 +2570,17 @@
       "url": "https://news.animationdigitalnetwork.com/de/2026/06/01/sailor-moon-sailor-stars-staffel-5-im-stream-bei-adn/",
       "name": "news.animationdigitalnetwork.com",
       "gesehenAm": "2026-10-01",
-      "stand": "aktuell",
+      "stand": "vermutlich-ueberholt",
       "sagt": "2026-04-01"
     }
   ],
   "adn-427-s5-20260601": [
+    {
+      "url": "https://news.animationdigitalnetwork.com/de/2026/11/10/adn-erscheint-mit-app-auf-fire-tv-und-ps4/",
+      "name": "news.animationdigitalnetwork.com",
+      "gesehenAm": "2026-11-28",
+      "stand": "aktuell"
+    },
     {
       "url": "https://gw.api.animationdigitalnetwork.com/video/show/427",
       "name": "ADN API",
@@ -2563,7 +2593,7 @@
       "url": "https://news.animationdigitalnetwork.com/de/2026/06/01/sailor-moon-sailor-stars-staffel-5-im-stream-bei-adn/",
       "name": "news.animationdigitalnetwork.com",
       "gesehenAm": "2026-10-01",
-      "stand": "aktuell",
+      "stand": "vermutlich-ueberholt",
       "sagt": "2026-06-01"
     }
   ],

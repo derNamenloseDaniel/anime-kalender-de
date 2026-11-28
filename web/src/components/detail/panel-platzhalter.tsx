@@ -1,10 +1,21 @@
+import { useRef } from 'react'
 import type { FranchiseMember } from '@shared/types.ts'
 import { coverBild } from '../../lib/cover.ts'
 import type { Translate } from '../../lib/i18n.tsx'
+import { useReihenmitglied } from './panel-laden.ts'
 import { ReihenReiterZeile } from './reihen-reiter.tsx'
 import type { ReihenReiter } from './reihen-reiter-liste.ts'
 
 const BLOCK = 'animate-pulse motion-reduce:animate-none rounded-xl bg-ak-flaeche-2'
+
+/** Merkt die Reiter des gezeigten Titels (`merke`); wechselt der Klick auf einen noch ungeladenen Teil, bleiben sie im Platzhalter stehen. */
+export function usePanelPlatzhalter(titleId: number, t: Translate, wechsleZu: (id: number) => void) {
+  const letzteReiter = useRef<ReihenReiter[]>([])
+  const mitglied = useReihenmitglied(titleId)
+  const merke = (reiter: ReihenReiter[]) => (letzteReiter.current = reiter)
+  const element = <PanelPlatzhalter titleId={titleId} reiter={letzteReiter.current} mitglied={mitglied} t={t} wechsleZu={wechsleZu} />
+  return { merke, element }
+}
 
 /**
  * Das Panel, solange der Titelbestand für den gewählten Teil noch lädt: Reiter (aktiver markiert), Cover und Name aus der

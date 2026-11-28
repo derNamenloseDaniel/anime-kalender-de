@@ -1,5 +1,5 @@
 import '../lib/i18n-spaet.ts' // Texte der nachgeladenen Ansichten
-import { useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { todayIso } from '@shared/time.ts'
 import { anzeigeName } from '@shared/titles.ts'
 import { useEscape } from '../lib/escape.ts'
@@ -13,9 +13,8 @@ import { plotVon, eigenerAsZiel, titelGestartet } from './detail/plot.ts'
 import { useErsatzHandlung } from './detail/ersatz-handlung.ts'
 import { PanelLeer, PanelVersteckt } from './detail/panel-huellen.tsx'
 import { PANEL_SCHLEIER } from './detail/schleier.ts'
-import { useDiscAusgaben, useReihenmitglied, useReihenWechsel, useTitelNachladen } from './detail/panel-laden.ts'
-import { PanelPlatzhalter } from './detail/panel-platzhalter.tsx'
-import type { ReihenReiter } from './detail/reihen-reiter-liste.ts'
+import { useDiscAusgaben, useReihenWechsel, useTitelNachladen } from './detail/panel-laden.ts'
+import { usePanelPlatzhalter } from './detail/panel-platzhalter.tsx'
 import { usePanelReihe } from './detail/panel-reihe-namen.ts'
 import { usePanelAntwort } from './detail/panel-antwort.ts'
 import { usePanelSynopse } from './detail/panel-synopse.ts'
@@ -52,15 +51,10 @@ export function DetailPanel({
   const nurUntertitel = useMemo(() => data.nurUntertitelByTitle.get(titleId) ?? [], [data, titleId])
   const a = usePanelAntwort({ title, releases, nurUntertitel, today, synopsis: s.synopsis, favorites, verbindung, t })
   const wechsel = useReihenWechsel(titleId, onOpenTitle)
-  /* Die Reiter des zuletzt gezeigten Titels bleiben beim Wechsel auf einen noch ungeladenen Teil stehen (Platzhalter). */
-  const letzteReiter = useRef<ReihenReiter[]>([])
+  const platzhalter = usePanelPlatzhalter(titleId, t, wechsel.wechsleZu)
   const ersatz = useErsatzHandlung({ titleId, title, synopsis: s.synopsis, reihenTeile })
 
-  const mitglied = useReihenmitglied(titleId)
-  if (!title) {
-    const platzhalter = <PanelPlatzhalter titleId={titleId} reiter={letzteReiter.current} mitglied={mitglied} t={t} wechsleZu={wechsel.wechsleZu} />
-    return <PanelLeer holt={holt} t={t} onClose={onClose} platzhalter={platzhalter} />
-  }
+  if (!title) return <PanelLeer holt={holt} t={t} onClose={onClose} platzhalter={platzhalter.element} />
   if (hidden.has(title.id)) return <PanelVersteckt title={title} t={t} onClose={onClose} onToggleHidden={onToggleHidden} />
 
   // Handlung auf Deutsch; fehlt sie, lieber den englischen Text mit Hinweis
@@ -71,8 +65,6 @@ export function DetailPanel({
   const { plot } = plotVon({ synopsis: s.synopsis, anilistId: title.al, ersatz, erschienen: titelGestartet(title, today) })
   const asZiel = eigenerAsZiel(plot, s.synopsis?.asUrl)
 
-  const reiter = reihenReiterVon(title, reihenTeile, reihenName, data.titles, today, franchise)
-  letzteReiter.current = reiter
   return (
     <>
       <div className={PANEL_SCHLEIER} onClick={onClose} aria-hidden="true" />
@@ -102,7 +94,7 @@ export function DetailPanel({
           asZiel={asZiel}
         />
         {/* Reiter der Kategorie am Antwortkasten (F157): ein Reiter öffnet den Titel auf demselben Weg wie die Reihenliste, die ihn dafür nicht mehr zeigt. */}
-        <ReihenReiterKontext.Provider value={{ data, reiter, wechsleZu: wechsel.wechsleZu }}>
+        <ReihenReiterKontext.Provider value={{ data, reiter: platzhalter.merke(reihenReiterVon(title, reihenTeile, reihenName, data.titles, today, franchise)), wechsleZu: wechsel.wechsleZu }}>
           <PanelKoerper
             {...{ data, title, today, releases, verbindung, favorites, onToggleFavorite, onFilterBy, onOpenTitle }}
             {...{ a, s, discAusgaben, discZuerst, plot, asZiel, reihenTeile, reihenName, reihe, wechsel }}
